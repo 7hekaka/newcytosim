@@ -56,7 +56,7 @@ To compile, enter these commands in a terminal window:
 	cd cytosim
 	make
 
-Once cytosim is running on your machine, check the tutorials, the page on [running simulations](doc/runs.md), and the examples contained in the folder `cym`. Inspect in particular the short configuration files (e.g. fiber.cym, self.cym). 
+Once cytosim is running on your machine, check the tutorials, the page on [running simulations](doc/main/runs.md), and the examples contained in the folder `cym`. Inspect in particular the short configuration files (e.g. fiber.cym, self.cym). 
 
 # Contributors
 

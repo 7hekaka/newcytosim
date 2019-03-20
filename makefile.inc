@@ -8,10 +8,7 @@ MACHINE := auto
 COMPILER := gcc
 
 #---------------- MODE = {F, P, D, C}
-# F = Fast
-# P = Profiling
-# D = Debug 
-# C = Coverage
+# F = Fast; P = Profiling; D = Debug; C = Coverage
 MODE := D
 
 #---------------- INTEL Math Kernel Library
@@ -19,7 +16,7 @@ MODE := D
 # If it is installed on your system, you can set:
 #     HAS_MKL := 1 for dynamic linking
 #     HAS_MKL := 2 for static linking
-# use otherwise HAS_MKL := 0;
+# otherwise, set HAS_MKL := 0;
 
 HAS_MKL := 0
 
@@ -123,8 +120,8 @@ else ifeq ($(COMPILER),clang)
 # the old library: -stdlib=libstdc++ (deprecated)
 
     CXX      := c++ -Wfatal-errors -mmacosx-version-min=10.10
-    FAST     := -O3 -ffast-math -funroll-loops #-floop-optimize2
     FAST     := -O3 -ffast-math -funroll-loops -mavx2 -mfma
+    FAST     := -O3 -ffast-math -funroll-loops
     DEBUG    := -g3 -ggdb
     COVERAGE := -fprofile-arcs -ftest-coverage
 
