@@ -1,0 +1,58 @@
+/**
+ @example frap.cym
+ Deleting objects within a region
+ F. Nedelec, April 2013
+*/
+
+set simul system
+{
+    time_step = 0.01
+    viscosity = 0.1
+    display = ( style=2; )
+}
+
+set space cell
+{
+    geometry = ( sphere 10 )
+}
+
+new cell
+
+set hand motor
+{
+    binding = 10, 0.05
+    unbinding = 1, 1
+    display = ( size=8; color=light_green )
+}
+
+set single protein
+{
+    hand = motor
+    diffusion = 0.1
+}
+
+new 10000 protein
+
+run 100 system
+{
+    nb_frames = 2
+}
+
+set space A
+{
+    geometry = ( square 3 3 3 )
+}
+
+new A
+
+delete protein
+{
+    position = inside, A
+}
+
+delete space A
+
+run 2000 system
+{
+    nb_frames = 20
+}

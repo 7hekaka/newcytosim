@@ -1,0 +1,90 @@
+#! /bin/bash
+# F. Nedelec, 26.01.2019
+
+if [[ ( $1 = "help" ) || ( $# -eq 0 ) ]]; then
+    echo "| dif by F. Nedelec, version 22.05.2016";
+    echo "| Usage: dif [-c] name-of-master names-of-files";
+    echo "| dif will invoke diff between the master and all the files";
+    echo "| dif tries to guess the real names of the datafiles from the given names.";
+    echo "| you may specify a directory, or just the number, in the case of job???? or run???";
+    echo "| with option -c, only a count of the difference is printed";
+    exit;
+fi
+#-----------------------------------------------------------------------------------------
+
+col=$COLUMNS
+diff_options="-bB --side-by-side --width=200 --suppress-common-lines --text";
+
+count=0;
+
+if [[ $1 = "-c" ]]; then
+    shift 1;
+    count=1;
+fi
+
+#-----------------------------------------------------------------------------------------
+function findfile ()
+{
+	# check for files:
+	f=$(ls -1 $1*.cym 2> /dev/null | head -n 1);
+	g=$(ls -1 *$1.cym.tpl 2> /dev/null | head -n 1);
+    if [[ -f $1 && -r $1 ]]; then 
+        echo $1;
+	elif [[ -f $f && -r $f ]]; then 
+        echo $f;
+	elif [[ -f $g && -r $g ]]; then 
+        echo $g;
+	fi
+    
+	# check for files in subdirectories:
+	f=$(ls -1 $1/config.cym 2> /dev/null | head -n 1);
+	g=$(ls -1 *$1/config.cym 2> /dev/null | head -n 1);
+	h=$(ls -1 *$1/config.cym.tpl 2> /dev/null | head -n 1);
+    if [[ -f $f && -r $f ]]; then 
+        echo $f;
+	elif [[ -f $g && -r $g ]]; then 
+        echo $g;
+	elif [[ -f $h && -r $h ]]; then 
+        echo $h;
+	fi		
+}
+
+#-----------------------------------------------------------------------------------------
+
+if [[ $# -ge 2 ]]; then
+    master=$(findfile $1);
+    if [[ ! -s $master ]]; then
+        echo "file '$1' not found";
+        exit 1;
+    fi
+    shift 1;
+else
+    master=$(findfile .);
+fi
+
+#-----------------------------------------------------------------------------------------
+for d in $*; do
+
+  f=$(findfile $d);
+  
+  if [[ ! -r $f ]]; then
+    echo "file '$d' not found";
+    continue;
+  fi
+  
+  if [[ $count -eq 0 ]]; then
+    printf "%70s  <   <   <   <   <   <   <  |" $master;
+    printf "  >   >   >   >   >   >   >  %-70s\n" $f;
+    diff $diff_options $master $f;
+    echo;
+  else
+    n=$(diff $diff_options $master $f | wc -l);
+    if [[ $n -lt 16 ]]; then
+        printf "%-20s %-20s :  %s\n" $master $f $n;
+    fi
+  fi
+done
+
+exit 0;
+
+

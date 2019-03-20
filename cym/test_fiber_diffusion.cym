@@ -1,0 +1,35 @@
+% A test to measure the diffusion of fiber
+% F. Nedelec, 01.02.2019 in Cambridge, UK
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 0.01
+}
+
+set space cell
+{
+    geometry = ( square 5 5 5 )
+}
+
+set fiber filament
+{
+    rigidity = 10
+    segmentation = 1
+}
+
+new cell
+
+new 100 filament
+{
+    length = 5
+    position = 0 0 0
+    direction = 1 0 0
+}
+
+run 10000 system
+{
+    nb_frames = 10
+}
+
+report fiber:position *

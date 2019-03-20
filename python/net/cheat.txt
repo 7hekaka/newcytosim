@@ -1,0 +1,100 @@
+
+28.03.2016
+
+------ ORDER
+
+grep -F geometry job*/config.cym.tpl
+
+grep "new " */config.cym | grep fil
+
+grep "^new" tmp/*/config.cym | grep fil | grep 1000 | cut -c 1-9 | xargs -n 1 collect.py job%02i
+
+tell.py rigidity 
+sort x -n -k 2
+
+------ INFO
+
+scan.py 'cp config.cym.tpl config.cym;' job*
+
+scan.py 'simplify_config.py > get_interval.m' job* 
+
+scan.py 'diff config.cym run0010/config.cym | grep "^<" | sed -e "s|random.||" | cut -c 3- > info.txt' job*
+
+------ SIZE = MOMENT 
+
+scan.py 'test -r mom.txt || reportN fiber:moment prefix=time > mom.txt && rm log.txt' run*
+
+scan.py 'reportN fiber:moment prefix=time > mom.txt' run*
+
+scan.py 'test -r mom.txt || reportN fiber:moment prefix=time > mom.txt && rm log.txt' run*
+
+------ GET_DATA
+
+scan.py 'get_contraction.py run* > data.txt' job*
+
+get_data.py run* > data; cut -c 4- data > d
+
+scan.py 'get_data.py run* > data; cut -c 4- data > d' job*
+
+scan.py 'reportN fiber:intersection details=0 frame=0 > cross.txt' run*
+
+------ THEORY
+
+predict_network.py run*/config.cym > theory.txt
+
+scan.py 'predict_network.py run*/config.cym > theory.txt' job??
+
+------ BINDING
+
+scan.py 'reportN couple > couple.txt frame=1' job??/run*
+
+scan.py '../predict_binding.py run*/config.cym > couple.txt' job??
+
+
+------ VISU
+
+scan.py 'play2 image downsample=2 frame=100 ../display.cms' run*
+make_page.py width=256 table=5 run*
+
+scan.py 'play2 image downsample=2 frame=0,1,2,3,4,5,10,15,20 ../../../display.cms' save??/run*
+
+collect.py --copy %02i-contract.png job*/contract.png
+
+------ RUN
+
+./preconfig.py config.cym.tpl 333; ./submit.py sim config????.cym; cp config.cym.tpl job00/save/.
+
+------ TAR
+
+tar cf job09.tar --exclude "run0??[12346789]/objects.cmo" job09
+
+
+------ TABLE
+
+
+scan.py 'play2 movie label=none downsample=2 ../../table.cms' run*
+
+scale="-scale 50%"
+for f in run00/image*.png; do
+   im=${f#run00/};
+   montage run*/$im -tile 5,5 -geometry +0+0 $scale -depth 8 montage${im#image00}
+done
+
+scan.py 'make_page.py width=256 table=5 run*' table??
+
+------ OLD
+
+grep  "^new [0-9]* couple crosslinker" run*/config.cym > val
+
+cut -f 1 -d ' ' val > values
+
+cut -c 43- mom.txt | tr "\n" " " > m 
+
+scan.py 'cut -c 43- mom.txt | tr "\n" " " > m; echo >> m' run*
+
+scan.py 'grep  "^new [0-9]* couple crosslinker" config.cym | cut -f 2 -d " " > m; cut -c 43- mom.txt | tr -d "\n" >> m; echo >> m' run* 
+
+scan.py 'cut -c 43- mom.txt | tr "\n" " " > m; grep  "^new [0-9]* couple crosslinker" config.cym | cut -f 2 -d " " >> m' run*
+
+
+

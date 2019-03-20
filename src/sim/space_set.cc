@@ -1,0 +1,112 @@
+// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+#include "space_set.h"
+#include "space_prop.h"
+#include "iowrapper.h"
+#include "glossary.h"
+#include "simul.h"
+#include "space.h"
+#include "modulo.h"
+
+//---------------------------- GLOBAL VARIABLE ---------------------------------
+
+/**
+ This is a global variable that is initialized in Simul
+ It is used to implement periodic boundary conditions
+ */
+Modulo const* modulo = nullptr;
+
+//------------------------------------------------------------------------------
+
+Property * SpaceSet::newProperty(const std::string& kd,const std::string& nm, Glossary&) const
+{
+    if ( kd == "space" )
+        return new SpaceProp(nm);
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+void SpaceSet::step()
+{
+    for ( Space * sp = first(); sp; sp=sp->next() )
+        sp->step();
+}
+
+
+//------------------------------------------------------------------------------
+void SpaceSet::erase()
+{
+    ObjectSet::erase();
+    
+    // simul has lost its current Space:
+    simul.changeSpace(nullptr);
+}
+
+/**
+ This will change the Simul current Space if it was not set
+*/
+void SpaceSet::add(Object * obj)
+{
+    assert_true(obj->tag() == Space::TAG);
+    //std::clog << "SpaceSet::add " << obj << std::endl;
+    ObjectSet::add(obj);
+    
+    Space const* spc = simul.space();
+    if ( !spc || obj->identity() < spc->identity() )
+        simul.changeSpace(static_cast<Space*>(obj));
+}
+
+/**
+ If the Simulation current Space is deleted,
+ the 'oldest' remaining Space is chosen to replace it.
+ */
+void SpaceSet::remove(Object * obj)
+{
+    //std::clog << "SpaceSet::remove " << obj << std::endl;
+    ObjectSet::remove(obj);
+
+    if ( obj == simul.space() )
+    {
+        /*
+         if the current space was deleted, use the oldest Space available
+         */
+        Space * spc = first();
+        
+        for ( Space * s=spc; s; s=s->next() )
+            if ( s->identity() < spc->identity() )
+                spc = s;
+        
+        simul.changeSpace(spc);
+    }
+}
+
+//------------------------------------------------------------------------------
+Object * SpaceSet::newObjectT(const ObjectTag tag, unsigned idx)
+{
+    if ( tag == Space::TAG )
+    {
+        SpaceProp * p = simul.findProperty<SpaceProp>("space", idx);
+
+        Glossary tmp;
+        return p->newSpace(tmp);
+    }
+    return nullptr;
+}
+
+/**
+ The dimensions of a Space can be specified when it is created
+ 
+     new cell
+     {
+        dimension = 3 4
+     }
+ 
+ */
+ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
+{
+    SpaceProp * p = simul.findProperty<SpaceProp>("space", name);
+    Space * obj = p->newSpace(opt);
+
+    ObjectList res(2);
+    res.push_back(obj);
+    return res;
+}

@@ -1,0 +1,72 @@
+% test stochastic events in function 'run system'
+% F. Nedelec, 8 Feb 2011
+
+set simul system
+{
+    steric = 1, 100
+    steric_max_range = 0.5
+    
+    time_step = 0.001
+    viscosity = 0.1
+    precondition = 0
+}
+
+set space cell
+{
+    geometry = ( sphere 3 )
+}
+
+new cell
+    
+set bead ball
+{
+    confine = inside, 1000
+    steric = 1
+    display = ( style=9; coloring=1; )
+}
+
+new 100 ball
+{
+    radius = 0.1
+    position = ( 0 0 0 )
+    mark = 1
+}
+
+new 100 ball
+{
+    radius = 0.1
+    position = ( 0 0 0 )
+    mark = 2
+}
+
+run 200 system
+
+delete ball
+{   
+    mark = 2
+}
+
+run system
+{
+    nb_steps = 2000
+    event = 100, ( new ball { radius=0.15; position=0 0 0; } )
+}
+
+delete ball
+{   
+    mark = 1
+}
+
+run system
+{
+    nb_steps = 1000
+    event = 50, ( new ball { radius=0.20; position=0 0 0; } )
+}
+
+run system
+{
+    nb_steps = 1000
+    nb_frames = 10
+    event = 5, ( new ball { radius=0.25; position=0 0 0; } )
+}
+

@@ -1,0 +1,86 @@
+% Cut a system along a plane
+% F. Nedelec, April 2011
+
+set simul system
+{
+    time_step = 0.01
+    viscosity = 0.02
+}
+
+set space cell
+{
+    geometry = ( sphere 5 )
+}
+
+new cell
+
+set fiber microtubule
+{
+    rigidity = 20
+    segmentation = 0.5
+    confine = inside, 100
+}
+
+new 50 microtubule
+{
+    length = 12
+    orientation = horizontal
+}
+
+set fiber glucan
+{
+    rigidity = 20
+    segmentation = 0.5
+    confine = inside, 100
+}
+
+new 50 glucan
+{
+    length = 12
+    orientation = horizontal
+}
+
+run system 
+{
+    nb_steps = 100
+    nb_frames = 2
+}
+
+
+% make a red flash!
+change system display { back_color=red }
+
+cut glucan
+{
+    plane = 1 0 0, 0
+}
+
+run 10 system
+
+change system display { back_color=black }
+
+
+run 100 system
+{
+    nb_frames = 2
+}
+
+% make a blue flash!
+change system display { back_color=blue }
+
+cut microtubule
+{
+    plane = 0 1 0, -2
+}
+
+run 10 system 
+
+change system display { back_color=black }
+
+
+run system
+{
+    nb_steps = 100
+    nb_frames = 2
+}
+
