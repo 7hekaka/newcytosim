@@ -72,10 +72,13 @@ void report_raw(Simul const& simul, std::ostream& os, std::string const& what, i
 void report_prefix(Simul const& simul, std::ostream& os, std::string const& what, int frm, Glossary& opt)
 {
     char str[256] = { 0 };
-    if ( prefix == 1 )
-        snprintf(str, sizeof(str), "%9.3f ", simul.time());
-    else
-        snprintf(str, sizeof(str), "%9i ", frm);
+    size_t str_len = 0;
+    
+    if ( prefix & 1 )
+        str_len += snprintf(str, sizeof(str), "%9.3f ", simul.time());
+    
+    if ( prefix & 2 )
+        str_len += snprintf(str+str_len, sizeof(str)-str_len, "%9i ", frm);
     
     std::stringstream ss;
  
@@ -136,15 +139,16 @@ int main(int argc, char* argv[])
     std::ostream * osp = &std::cout;
     std::ofstream ofs;
 
+    // check for prefix:
     int inx = 1;
-    if ( argc > inx+1 && strstr(argv[inx], "time") )
+    while ( argc > inx+1 )
     {
-        prefix = 1;
-        ++inx;
-    }
-    if ( argc > inx+1 && strstr(argv[inx], "frame") )
-    {
-        prefix = 2;
+        if ( strstr(argv[inx], "time") )
+            prefix |= 1;
+        else if ( strstr(argv[inx], "frame") )
+            prefix |= 2;
+        else
+            break;
         ++inx;
     }
     
@@ -157,7 +161,7 @@ int main(int argc, char* argv[])
 #endif
     
     unsigned frame = 0;
-    unsigned period = 1;
+    unsigned period = 0;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     arg.set(verbose, "verbose");
@@ -166,10 +170,10 @@ int main(int argc, char* argv[])
 
     Simul simul;
     FrameReader reader;
-    RNG.seed();
 
     try
     {
+        RNG.seed();
         simul.loadProperties();
         reader.openFile(input);
     }
@@ -194,10 +198,34 @@ int main(int argc, char* argv[])
     
     Cytosim::all_silent();
     
-    if ( arg.has_key("frame") )
+    // load frame if specified:
+    if ( arg.set(frame, "frame") )
+    {
+        if ( reader.loadFrame(simul, frame) )
+        {
+            std::cerr << "Error: missing frame " << frame << '\n';
+            return EXIT_FAILURE;
+        }
+    }
+    
+    // generate report on first frame:
+    report(simul, *osp, what, frame, arg);
+
+    if ( period > 0 )
+    {
+        // process every 'period' frame in the file:
+        unsigned f = frame;
+        while ( 0 == reader.loadNextFrame(simul) )
+        {
+            if ( f % period == frame % period )
+                report(simul, *osp, what, f, arg);
+            ++f;
+        }
+    }
+    else
     {
         // multiple frame indices can be specified:
-        unsigned s = 0;
+        unsigned s = 1;
         while ( arg.set(frame, "frame", s) )
         {
             // try to load the specified frame:
@@ -210,16 +238,6 @@ int main(int argc, char* argv[])
             }
             ++s;
         };
-    }
-    else
-    {
-        // process every 'period' frame in the file:
-        while ( 0 == reader.loadNextFrame(simul) )
-        {
-            if ( 0 == frame % period )
-                report(simul, *osp, what, frame, arg);
-            ++frame;
-        }
     }
     
     if ( ofs.is_open() )

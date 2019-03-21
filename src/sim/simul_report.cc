@@ -70,7 +70,7 @@ void Simul::report(std::ostream& out, std::string const& arg, Glossary& opt) con
     int p = 4;
     opt.set(p, "precision");
     out.precision(p);
-    opt.set(column_width, "column") || opt.set(column_width, "column_width");
+    opt.set(column_width, "column") || opt.set(column_width, "width");
 
     //out << "\n% start   " << prop->time; // historical
     out << "\n% time    " << prop->time;
