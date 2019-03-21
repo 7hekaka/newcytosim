@@ -1,10 +1,10 @@
 # Cytosim
 
-Cytosim is a cytoskeleton simulation designed to handle large systems of flexible filaments with associated proteins such as molecular motors. It is a versatile base that has been used to study actin and microtubule systems in 1D, 2D and 3D. It is built around a core C++ engine that can run on UNIX, Mac OS, GNU/Linux and within Cygwin on Windows. The code is modular and extensible, allowing Cytosim to be customized to fulfill particular needs.
+Cytosim is a cytoskeleton simulation designed to handle large systems of flexible filaments with associated proteins such as molecular motors. It is a versatile base that has been used to study actin and microtubule systems in 1D, 2D and 3D. It is built around a core cross-platform C++ engine. It runs on UNIX, Mac OSX, GNU/Linux and within Cygwin on Windows. The code is modular and extensible, making Cytosim a convenient base that can be customized to meet particular tasks.
 
 ![Cytosim](doc/data/cytosim.png)
 
-Cytosim is a suite of command-line tools with simulation and display capabilities. The simulation to be performed is specified in a text file `config.cym`, defining objects, their parameters and a suite of operations, such as advancing time, saving frames or generating report files. Here is a basic example:
+Cytosim is a suite of command-line tools with simulation and display capabilities. The simulation to be performed is specified in a text file `config.cym`, defining objects, their parameters and a suite of operations, such as advancing time, saving frames or generating reports. Here is a basic example:
 
     set simul system
     {
@@ -44,18 +44,19 @@ You can view the files with [MacDown (Mac OSX only)](https://macdown.uranusjr.co
 
 [Link to cytosim documentation](doc/index.md)
 
-The Brownian dynamics approach was described in the New Journal of Physics: [Collective Langevin Dynamics of Flexible Cytoskeletal Fibers](http://iopscience.iop.org/article/10.1088/1367-2630/9/11/427/meta).
+The Brownian dynamics approach was described in: [Collective Langevin Dynamics of Flexible Cytoskeletal Fibers (New Journal of Physics)](http://iopscience.iop.org/article/10.1088/1367-2630/9/11/427/meta).
 
 # Installation
 
-Cytosim is distributed as source code and [must be compiled](doc/compile/index.md) before use. On Mac OS X and Linux this should be straightforward if you are familiar with compilation in general. On Windows, we suggest to [compile within Cygwin](doc/compile/cygwin.md). For more information, please check [the dedicated pages](doc/compile/index.md).
+Cytosim is distributed as source code and [must be compiled](doc/compile/index.md) before use. On Mac OS X and Linux this should be uncomplicated if you are familiar with compilation in general. On Windows, this is more challenging, and we suggest to [compile within Cygwin](doc/compile/cygwin.md).
 
 To compile, enter these commands in a terminal window:
 
-	git clone https://github.com/nedelec/cytosim.git
+	git clone https://gitlab.com/f.nedelec/cytosim
 	cd cytosim
 	make
 
+For more information, please check [the compile instructions](doc/compile/index.md).
 Once cytosim is running on your machine, check the tutorials, the page on [running simulations](doc/main/runs.md), and the examples contained in the folder `cym`. Inspect in particular the short configuration files (e.g. fiber.cym, self.cym). 
 
 # Contributors

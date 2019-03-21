@@ -69,6 +69,10 @@ void FiberDisp::read(Glossary& glos)
         back_color = color.darken(0.625);
     glos.set(back_color,       "color", 1);
     glos.set(hide_color,       "color", 2);
+
+    glos.set(back_color,       "back_color");
+    glos.set(hide_color,       "hide_color");
+
     glos.set(coloring,         "coloring");
     
     glos.set(line_width,       "line");
@@ -166,8 +170,7 @@ void FiberDisp::write_values(std::ostream& os) const
 {
     write_value(os, "style",        style);
     write_value(os, "visible",      visible);
-    write_value(os, "color",        color, back_color);
-    write_value(os, "hide_color",   hide_color);
+    write_value(os, "color",        color, back_color, hide_color);
     write_value(os, "coloring",     coloring);
     
     write_value(os, "points",       point_size, point_style, point_interval);

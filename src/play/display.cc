@@ -282,6 +282,8 @@ void Display::prepareLineDisp(const Fiber * fib)
             self->visible = 0;
         else if ( self->color.transparent() )
             self->visible = -1;
+        else
+            self->visible = 1;
     }
     else
         self->visible = 0;
