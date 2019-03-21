@@ -212,12 +212,8 @@ ifeq ($(MACHINE),linux)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
     FlagsF := -O3 -finline-functions $(ALIGN) $(FAST)
 
-    # This may be outdated:
-    ifeq ($(shell uname -m),x86_64)
-         USRLIB := /usr/lib64
-    else
-         USRLIB := /usr/lib
-    endif
+    # specify the lib path:
+    USRLIB := /usr/lib
 
     ### For 64bit Centos 5.8 March 2012:
     # Centos  blas: yum install blas-devel
