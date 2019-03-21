@@ -115,11 +115,9 @@ arrow-keys | move around
  
 Cytosim offers additional tools:
 
-Program        |   Typical usage                                 |
----------------|--------------------------------------------------
-`report`       | extract data from trajectory files
-`frametool`    | extract frames from trajectory files
-`preconfig.py` | generate many config files from a template file
+- [`report`](sim/report.md) extracts data from trajectory files
+- [`preconfig`](https://openresearchsoftware.metajnl.com/articles/10.5334/jors.156/) generates configurations files from a template file
+- `frametool` extracts frames from trajectory files
 
 [See how they are used](runs.md).
  
