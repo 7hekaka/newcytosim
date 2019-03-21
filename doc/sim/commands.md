@@ -1,16 +1,20 @@
 # Cytosim commands
 
-Cytosim expects a succession of commands in its configuration file, following this syntax:
+The normal syntax of a command is:
  
-     COMMAND ARGUMENT1 ARGUMENT2 ...
+     COMMAND ARGUMENT1 ARGUMENT2
      {
          PARAMETER = VALUE1, VALUE2, ...;
          ...
      }
 
-where `COMMAND` is the name of the command, with `ARGUMENTS` separated by space, and parameters defined within curly braces `{}`.
+where `COMMAND` is the name of the command, with `ARGUMENTS` separated by space, and followed by a curly braced `{}` block of parameter specifications.
+
+Some commands offer a short syntax:
  
-For any simulation, you will need to use these **essential commands**:
+     COMMAND ARGUMENT1 ARGUMENT2
+ 
+### Essential commands
  
  Command        | Description 
  ---------------|-----------------------------------------------------
@@ -18,7 +22,7 @@ For any simulation, you will need to use these **essential commands**:
  `new`          | Create objects of a certain Property
  `run`          | Simulate the system to advance in time
  
-You will at some point also use these **additional commands**:
+### Additional commands
  
  Command        | Description
  ---------------|---------------------------------------------------------
@@ -29,7 +33,7 @@ You will at some point also use these **additional commands**:
  `export`       | Export all simulated objects to a file
  `report`       | generate file or text with formatted information
 
- Other commands:
+### Other commands
  
  Command        | Effect 
  ---------------|---------------------------------------------------------
@@ -58,13 +62,13 @@ You may use `set` to change values of an existing Property:
  
      set NAME
      {
-       PARAMETER = VALUE
+       PARAMETER = VALUE;
        ...
      }
  
  and equivalently:
  
-     set NAME { PARAMETER = VALUE }
+     set NAME { PARAMETER = VALUE; }
  
  or the shorter version:
  

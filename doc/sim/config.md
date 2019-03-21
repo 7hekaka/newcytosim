@@ -1,18 +1,28 @@
 # Cytosim's Configuration File
  
-The virtual system and the sequence of actions to be performed is specified in a configuration file (e.g. ***config.cym***). This config file must be a plain text file produced by any plain text editor.
+The virtual system and the sequence of actions to be performed is specified in a configuration file. This config file must be a plain text file produced by any plain text editor.
+By default, it is called **`config.cym`**.
  
 Cytosim understand a [small set of commands](commands.md) and [predefined objects](objects.md) with their [associated parameters](parameters.md).
  
 You will at least need to call:
  
- - `set` to define a new object category, with parameter values ([Units](units.md))
+ - `set` to define a new object category, and set its parameter values,
  - `new` to create objects,
  - `run` to perform simulation steps. 
- 
+
+About the config file:
+
+- Parameters should be specified in [units of `(s, um, pN)`](units.md)
+- Parameter names are predefined in the simulations for each [object class](objects.md)
+- Parameters are specified with a ` = ` sign, and can contain multiple values
+- Two parameters can be specified on the same line if they are separated by a semi-column: `;`
+- Curly brackets `{  }` are used to group the parameters together in logical units
+- Parentheses `(  )` can be used for certain parameters, such as `display`
+
 # Example
  
-Many examples can be found in the directory called ***cym***.
+Many examples can be found in the directory called [***cym***](../../cym).
 	 
 
 	% Self organization of Microtubules driven by bivalent Motors
@@ -27,7 +37,8 @@ Many examples can be found in the directory called ***cym***.
 	
 	set space cell
 	{
-	    geometry = ( circle 10 )
+	    shape = circle
+	    dimension = 10
 	}
 	
 	new cell
@@ -37,15 +48,13 @@ Many examples can be found in the directory called ***cym***.
 	    rigidity = 20
 	    segmentation = 0.5
 	    confine = inside, 100
-	    display = ( line_width=1; )
+	    display = ( line_width=1; color=white; )
 	}
 	
 	set hand kinesin
 	{
-	    binding_rate = 10
-	    binding_range = 0.01
-	    unbinding_rate = 0.1
-	    unbinding_force = 3
+	    binding = 10, 0.01   % rate, range
+	    unbinding = 0.1, 3   % rate, force
 	    
 	    activity = move
 	    unloaded_speed = 0.8
@@ -71,11 +80,6 @@ Many examples can be found in the directory called ***cym***.
 	}
 	
 	new 2000 complex
-	
-	set system display
-	{
-	    label = (Nedelec et al. 1998 -)
-	}
 	
 	run 5000 system
 	{

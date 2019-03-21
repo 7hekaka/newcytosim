@@ -103,7 +103,13 @@ new linker
 
 new 3200 grafted
 
-run 10000 system
+repeat 100
 {
-    nb_frames = 100
+	run 100 system
+	{
+	    nb_frames = 100
+	}
+	report fiber:force *
+	report bead *
 }
+

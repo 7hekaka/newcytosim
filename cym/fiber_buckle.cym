@@ -9,19 +9,19 @@ set simul system
 
 set space cell
 {
-    geometry = ( rectangle 5 0 )
+    shape = circle
+	dimension = 5
 }
 
 new cell
 
 set fiber microtubule
 {
-    rigidity = 20
+    rigidity = 100
     segmentation = 0.5
-    confine = off, 100
 }
 
-new 1 microtubule
+new microtubule
 {
     length = 10
     orientation = 1 0 0
@@ -40,16 +40,17 @@ set single holder
 
 new holder
 {
-    position = 3 0 0
+    position = 4 0 0
     attach = fiber1, 0, plus_end
 }
 
 new holder
 {
-    position = -3 0 0
+    position = -4 0 0
     attach = fiber1, 0, minus_end
 }
 
-run 2000 system
+run 1000 system
 
 report single:force *
+report fiber:force *

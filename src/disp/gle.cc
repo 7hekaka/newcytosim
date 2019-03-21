@@ -93,7 +93,7 @@ namespace gle
         const double c = cos(theta);
         const double s = sin(theta);
         const double c2 = c * c - s * s;
-        const double s2 = 2.0 * c * s;
+        const double s2 = c * s + c * s;
 
         vec4 cs{ c2, s2,  c2, s2};
         vec4 sc{-s2, c2, -s2, c2};

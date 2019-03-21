@@ -1,6 +1,6 @@
 # Cytosim Code Documentation
 
-Cytosim is built around a core C++ engine under [`src/`](../../src).
+Cytosim is built around [a core C++ engine](../../src/index.md) under [`src/`](../../src).  
 Associated [Python scripts](../../python/index.md) are found under [`python/`](../../python).
 
 The [detailled documentation for the C++ code](doxygen/index.html) needs to be generated.
@@ -14,10 +14,6 @@ After installing `doxygen` on your machine, in the project root directory, enter
 	make doc
 
 The output is dumped into [`doc/code/doxygen/`](doxygen).
-
-### C++ Source Code
-
-[directory index](../../src/index.md)
 
 ### Contact
 

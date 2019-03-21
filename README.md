@@ -4,7 +4,7 @@ Cytosim is a cytoskeleton simulation designed to handle large systems of flexibl
 
 ![Cytosim](doc/data/cytosim.png)
 
-Cytosim is a suite of command-line tools with simulation and display capabilities. The simulation to be performed is specified in a text file `config.cym`, defining objects, their parameters and a suite of operations, such as advancing time, saving frames or generating reports. Here is a basic example:
+Cytosim is a suite of command-line tools with simulation and display capabilities. The simulation is specified in a [configuration file](doc/sim/config.md), defining objects, their parameters and a suite of operations, such as advancing time, saving frames or [generating reports](doc/sim/report.md). Here is a basic example:
 
     set simul system
     {
@@ -36,6 +36,8 @@ Cytosim is a suite of command-line tools with simulation and display capabilitie
     {
         nb_frames = 10
     }
+
+The parameters are specified in [units of second, micrometers and pico-Newtons](doc/sim/units.md).
 
 # Documentation
 
