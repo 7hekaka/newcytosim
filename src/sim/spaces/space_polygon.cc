@@ -77,6 +77,8 @@ bool SpacePolygon::inside(Vector const& w) const
 #endif
 #if ( DIM > 1 )
     return mPoly.inside(w.XX, w.YY, 1);
+#else
+    return false;
 #endif
 }
 
