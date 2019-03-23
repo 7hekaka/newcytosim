@@ -1858,7 +1858,7 @@ void Simul::reportCoupleLink(std::ostream& out, std::string const& which) const
             //out << SEP << obj->posHand2();
 
             out << SEP << obj->force().norm();
-            out << SEP << dot(obj->dirFiber1(), obj->dirFiber2());
+            out << SEP << obj->cosAngle();
         }
     }
 }
