@@ -360,7 +360,11 @@ void Parser::parse_new(std::istream& is)
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
     if ( simul.isPropertyClass(name) )
-        name = Tokenizer::get_symbol(is);
+    {
+        std::string str = Tokenizer::get_symbol(is);
+        if ( !str.empty() )
+            name = str;
+    }
 #endif
 
     // Syntax sugar: () specify only position
@@ -414,7 +418,7 @@ void Parser::parse_new(std::istream& is)
             }
             else
             {
-                // place each object independently from the other:
+                // place each object independently from the others:
                 for ( unsigned n = 0; n < cnt; ++n )
                     execute_new(name, opt);
             }
@@ -448,7 +452,9 @@ void Parser::parse_new(std::istream& is)
         state     = [0|1], [0|1]
      }
  
- NAME can be '*', and the parameters (mark, position, state) are all optional.
+ MULTIPLICITY is an integer, or the keyword 'all'.
+ 
+ The parameters (mark, position, state) are all optional.
  All specified conditions must be fulfilled (this is a logical AND).
  The parameter `state` refers to bound/unbound state of Hands for Single and Couple,
  and to dynamic state for Fibers:
@@ -463,9 +469,9 @@ void Parser::parse_new(std::istream& is)
  
      delete all NAME
  
- To delete at most CNT objects of class NAME:
+ To delete at most COUNT objects of class NAME:
  
-     delete CNT NAME
+     delete COUNT NAME
  
  To delete all objects with a specified mark:
  
@@ -497,18 +503,23 @@ void Parser::parse_new(std::istream& is)
 
 void Parser::parse_delete(std::istream& is)
 {
-    unsigned cnt = -1; // this is like +inf
+    unsigned cnt = 1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
     if ( simul.isPropertyClass(name) )
     {
-        name = Tokenizer::get_symbol(is);
+        std::string str = Tokenizer::get_symbol(is);
+        if ( !str.empty() )
+            name = str;
     }
 #endif
     if ( !has_cnt  &&  name == "all" )
+    {
+        cnt = ~0; // this is very large
         name = Tokenizer::get_symbol(is);
+    }
     std::string blok = Tokenizer::get_block(is, '{');
     
     if ( do_new )
@@ -552,7 +563,11 @@ void Parser::parse_mark(std::istream& is)
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
     if ( simul.isPropertyClass(name) )
-        name = Tokenizer::get_symbol(is);
+    {
+        std::string str = Tokenizer::get_symbol(is);
+        if ( !str.empty() )
+            name = str;
+    }
 #endif
     if ( !has_cnt  &&  name == "all" )
         name = Tokenizer::get_symbol(is);
@@ -729,7 +744,7 @@ void Parser::parse_read(std::istream& is)
     if ( ! fis.fail() )
     {
         VLOG("-READ " << file << "\n");
-        parse(fis, "in `"+file+"'");
+        evaluate(fis, "in `"+file+"'");
     }
     else
     {
@@ -938,7 +953,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( unsigned c = 0; c < cnt; ++c )
     {
-        parse(code, ", while executing `repeat'");
+        evaluate(code, ", inside `repeat'");
     }
 }
 
@@ -987,7 +1002,7 @@ void Parser::parse_for(std::istream& is)
         // substitute Variable name for this iteration:
         StreamFunc::find_and_replace(sub, var, std::to_string(c));
         //we use a fresh stream and Parser for each instance:
-        Parser(*this).parse(sub, ", while executing `for'");
+        Parser(*this).evaluate(sub, ", inside `for'");
         //hold();
     }
 }
@@ -1065,7 +1080,7 @@ void Parser::parse_end(std::istream& is)
  `call`         | Call a custom function
 
  */
-void Parser::parse(std::istream& is)
+void Parser::evaluate(std::istream& is)
 {
     std::string tok;
 
@@ -1175,11 +1190,11 @@ void Parser::parse(std::istream& is)
 }
 
 
-void Parser::parse(std::istream& is, std::string const& msg)
+void Parser::evaluate(std::istream& is, std::string const& msg)
 {
     std::streampos saved = spos;
     try {
-        parse(is);
+        evaluate(is);
     }
     catch( Exception & e )
     {
@@ -1192,10 +1207,10 @@ void Parser::parse(std::istream& is, std::string const& msg)
 }
 
 
-void Parser::parse(std::string const& code, std::string const& msg)
+void Parser::evaluate(std::string const& code, std::string const& msg)
 {
     std::istringstream iss(code);
-    parse(iss, msg);
+    evaluate(iss, msg);
 }
 
 
@@ -1208,7 +1223,7 @@ int Parser::readConfig(std::string const& file)
         VLOG("  ( set " << do_set << "  change " << do_change << "  new " << do_new);
         VLOG("  run " << do_run << "  write " << do_write << " )\n");
         
-        parse(is, "in `"+file+"'");
+        evaluate(is, "in `"+file+"'");
         return 0;
     }
     return 1;

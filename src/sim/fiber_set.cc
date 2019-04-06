@@ -170,47 +170,36 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         for ( unsigned n = 0; n < cnt; ++n )
         {
             FiberSite fb(fib, fib->someAbscissa(var, opt, n/real(cnt-1)));
-            
+            Object * cs = nullptr;
+            Hand * h = nullptr;
             if ( sip )
             {
-                Single * si = sip->newSingle();
-                if ( si->hand()->attachmentAllowed(fb) )
-                {
-                    si->attach(fb);
-                    Vector vec;
-                    if ( opt.set(vec, var, 4) )
-                        si->setPosition(vec);
-                    else
-                        si->setPosition(fb.pos());
-                    res.push_back(si);
-                }
-                else
-                {
-                    delete(si);
-                    throw InvalidParameter("single:hand cannot attach to specified fiber");
-                }
+                Single * s = sip->newSingle();
+                h = s->hand();
+                cs = s;
             }
-            else if ( cop )
+            else
             {
-                Couple * cp = cop->newCouple();
-                if ( cp->hand1()->attachmentAllowed(fb) )
-                {
-                    cp->attach1(fb);
-                    Vector vec;
-                    if ( opt.set(vec, var, 4) )
-                        cp->setPosition(vec);
-                    else
-                        cp->setPosition(fb.pos());
-                    res.push_back(cp);
-                }
+                Couple * c = cop->newCouple();
+                h = c->hand1();
+                cs = c;
+            }
+            if ( h->attachmentAllowed(fb) )
+            {
+                h->attach(fb);
+                Vector vec;
+                if ( opt.set(vec, var, 4) )
+                    cs->setPosition(vec);
                 else
-                {
-                    delete(cp);
-                    throw InvalidParameter("couple:hand1 cannot attach to specified fiber");
-                }
+                    cs->setPosition(fb.pos());
+                res.push_back(cs);
+            }
+            else
+            {
+                delete(cs);
+                throw InvalidParameter("hand cannot attach to specified fiber");
             }
         }
-        
         var = "attach" + std::to_string(++inp);
     }
 

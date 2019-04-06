@@ -8,15 +8,13 @@
 /// a bent cylinder of constant diameter terminated by hemispheric caps
 /**
  Space `banana` is comprised from a section of a torus,
- terminated by two hemispheres. It is defined by three parameters:
+ terminated by two hemispheres.
  
-    banana length width radius
- 
- With:
- - `length` = the overall length minus 2*width
- - `width`  = the diameter of the torus in its crosssections.
- - `radius` = the main radius of the torus, which defines curvature
- .
+ Parameters:
+     - `length` = the overall length minus 2*width
+     - `width`  = the diameter of the torus in its crosssections.
+     - `radius` = the main radius of the torus, which defines curvature
+     .
  
  This class was first conceived by Dietrich Foethke, to simulate S. pombe.
  
@@ -26,9 +24,9 @@ class SpaceBanana : public Space
 private:
     
     /// dimensions
+    real  bCurvature;
     real  bLength;
-    real  bWidth, bWidthSqr;
-    real  bRadius;
+    real  bRadius, bRadiusSqr;
 
     /// angle covered by torus section
     real bAngle;
@@ -39,6 +37,8 @@ private:
     /// coordinates of the center of the torus
     Vector bCenter;
     
+    void update();
+    
     /// project on the backbone circle
     Vector project0(Vector const& pos) const;
 
@@ -46,12 +46,15 @@ public:
         
     /// constructor
     SpaceBanana(const SpaceProp* p);
-        
-    /// check number and validity of specified lengths
-    void        resize();
     
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
+    
+    /// radius
+    real        radius() const { return bRadius; }
 
     /// the volume inside
     real        volume() const;
@@ -64,6 +67,15 @@ public:
     
     /// OpenGL display function; returns true if successful
     bool        draw() const;
+    
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
     
 };
 

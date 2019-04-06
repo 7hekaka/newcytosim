@@ -38,16 +38,16 @@ class Simul
 private:
     
     /// the first Space defined in the simulation
-    Space const*  sSpace;
+    Space const*    sSpace;
     
     /// for periodic boundary conditions
-    Modulo        sModulo;
+    Modulo          sModulo;
     
     /// Meca used to set and integrate the equations of motion of Mecables
-    mutable Meca  sMeca;
+    mutable Meca    sMeca;
     
     /// Meca used to solve the system with option 'solve=horizontal'
-    mutable Meca1D sMeca1D;
+    mutable Meca1D  sMeca1D;
     
     /// grid used for attachment of Hand to Fiber
     mutable FiberGrid fiberGrid;
@@ -56,16 +56,16 @@ private:
     mutable PointGrid pointGrid;
     
     /// signals that engine is ready to perform a step
-    bool          sReady;
+    bool            sReady;
 
     /// preconditionning method used in last solve
-    unsigned int  precondMethod;
+    unsigned int    precondMethod;
     
     /// counter that is used to automatically set the preconditionning option
-    unsigned int  precondCounter;
+    unsigned int    precondCounter;
     
     /// stores cpu time to automatically set the preconditionning option
-    unsigned long precondCPU[4];
+    unsigned long   precondCPU[4];
     
     /// a copy of the properties as they were stored to file
     mutable std::string properties_saved;
@@ -73,41 +73,41 @@ private:
 public:
 
     /// Global cytosim parameters
-    SimulProp *      prop;
+    SimulProp *     prop;
     
     /// list of all Object Property (does not include the SimulProp)
-    PropertyList     properties;
+    PropertyList    properties;
     
     
     /// list of Space in the Simulation
-    SpaceSet         spaces;
+    SpaceSet        spaces;
     
     /// list of Field in the Simulation
-    FieldSet         fields;
+    FieldSet        fields;
     
     /// list of Fiber in the Simulation
-    FiberSet         fibers;
+    FiberSet        fibers;
     
     /// list of Sphere in the Simulation
-    SphereSet        spheres;
+    SphereSet       spheres;
     
     /// list of Bead in the Simulation
-    BeadSet          beads;
+    BeadSet         beads;
     
     /// list of Solid in the Simulation
-    SolidSet         solids;
+    SolidSet        solids;
     
     /// list of Single in the Simulation
-    SingleSet        singles;
+    SingleSet       singles;
     
     /// list of Couple in the Simulation
-    CoupleSet        couples;
+    CoupleSet       couples;
     
     /// list of Organizer in the Simulation
-    OrganizerSet     organizers;
+    OrganizerSet    organizers;
 
     /// list of Events in the Simulation
-    EventSet         events;
+    EventSet        events;
     
     //-------------------------------------------------------------------------------
     
@@ -120,119 +120,119 @@ public:
     //-------------------------------------------------------------------------------
     
     /// add Object to Simulation
-    void             add(Object *);
+    void            add(Object *);
 
     /// add all Objects from given list
-    void             add(ObjectList const&);
+    void            add(ObjectList const&);
 
     /// remove Object from Simulation
-    void             remove(Object *);
+    void            remove(Object *);
 
     /// remove all Objects from given list
-    void             remove(ObjectList const&);
+    void            remove(ObjectList const&);
     
     /// remove and delete object
-    void             erase(Object *);
+    void            erase(Object *);
     
     /// remove and delete all objects from given list
-    void             erase(ObjectList const&);
+    void            erase(ObjectList const&);
 
     /// mark objects from given list
-    static void      mark(ObjectList const&, ObjectMark);
+    static void     mark(ObjectList const&, ObjectMark);
 
     /// reset simulation world (clear all sub-lists and variables)
-    void             erase();
+    void            erase();
     
     //-------------------------------------------------------------------------------
 
     /// total number of objects in the Simulation
-    size_t           nbObjects() const;
+    size_t          nbObjects() const;
 
     /// time in the simulated world
-    real             time()   const;
+    real            time()   const;
     
     //-------------------------------------------------------------------------------
    
     /// perform basic initialization; register callbacks
-    void             initialize(Glossary&);
+    void            initialize(Glossary&);
     
     /// change 'master' Space
-    void             changeSpace(Space const*);
+    void            changeSpace(Space const*);
 
     /// return 'master' Space, usually the first one that was created, with the smallest `identity()`
-    Space const*     space() const { return sSpace; }
+    Space const*    space() const { return sSpace; }
     
     /// return first Space with given name
-    Space const*     findSpace(std::string const& name) const;
+    Space const*    findSpace(std::string const& name) const;
 
     /// call foldPosition() for all objects (implements periodic boundary conditions)
-    void             foldPosition() const;
+    void            foldPosition() const;
     
     //-------------------------------------------------------------------------------
     
     /// ready the engine for a call to `step()` and `solve()`
-    void             prepare();
+    void            prepare();
     
     /// perform one Monte-Carlo step, corresponding to `time_step`
-    void             step();
+    void            step();
     
     /// this is called after a sequence of `step()` have been done
-    void             relax();
+    void            relax();
     
     /// true if engine is ready to go (between `prepare()` and `relax()`)
-    bool             ready() const { return sReady; }
+    bool            ready() const { return sReady; }
 
     
     /// call setInteractions(Meca) for all objects (this is called before `solve()`
-    void             setInteractions(Meca&) const;
+    void            setInteractions(Meca&) const;
 
     /// display Meca's links
-    void             drawLinks();
+    void            drawLinks();
     
     /// simulate the mechanics of the system and move Mecables accordingly, corresponding to `time_step`
-    void             solve();
+    void            solve();
     
     /// like 'solve' but automatically select the fastest preconditionning method
-    void             solve_auto();
+    void            solve_auto();
 
     /// replace coordinates of Mecables by the ones calculated in solve()
-    void             apply() const;
+    void            apply() const;
 
     /// calculate the motion of objects, but only in the X-direction
-    void             solveX();
+    void            solveX();
     
     /// move every Fiber backward by `shift` (this is a extremely crude model)
-    void             solveF(real shift);
+    void            solveF(real shift);
     
     /// calculate Forces and Lagrange multipliers on the Mecables, but do not move them
-    void             computeForces() const;
+    void            computeForces() const;
     
     /// dump matrix and vector from Meca
-    void             dump() const;
+    void            dump() const;
     
 private:
     
     /// give an estimate of the cell size of the FiberGrid
-    real             estimateFiberGridStep() const;
+    real            estimateFiberGridStep() const;
     
     /// set FiberGrid and StericGrid over the given space
-    void             setFiberGrid(Space const*) const;
+    void            setFiberGrid(Space const*) const;
     
     /// give an estimate for the cell size of the PointGrid used for steric interactions
-    real             estimateStericRange() const;
+    real            estimateStericRange() const;
     
     /// initialize the grid for steric interaction (pointGrid)
-    void             setStericGrid(Space const*) const;
+    void            setStericGrid(Space const*) const;
     
     /// add steric interactions between spheres, solids and fibers to Meca
-    void             setStericInteractions(Meca&) const;
+    void            setStericInteractions(Meca&) const;
     
     //-------------------------------------------------------------------------------
     /// Function used to parse the config file, and to read state from a file:
     //-------------------------------------------------------------------------------
 
     /// return the ObjectSet corresponding to this Tag in the simulation (used for IO)
-    ObjectSet*       findSetT(const ObjectTag);
+    ObjectSet*      findSetT(const ObjectTag);
     
 public:
     
@@ -240,7 +240,7 @@ public:
     static Mecable* toMecable(Object *);
     
     /// return the ObjectSet corresponding to a class
-    ObjectSet*       findSet(const std::string& kind);
+    ObjectSet*      findSet(const std::string& kind);
     
     /// return the ObjectSet corresponding to a class
     ObjectSet const* findSet(const std::string& kind) const
@@ -289,13 +289,13 @@ public:
     }
 
     /// create a new property
-    Property*       newProperty(const std::string&, const std::string&, Glossary&);
+    Property* newProperty(const std::string&, const std::string&, Glossary&);
     
     /// export all Properties to speficied file
-    void            writeProperties(std::ostream&, bool prune) const;
+    void      writeProperties(std::ostream&, bool prune) const;
     
     /// export all Properties to a new file with specified name
-    void            writeProperties(char const* filename, bool prune) const;
+    void      writeProperties(char const* filename, bool prune) const;
 
     //-------------------------------------------------------------------------------
     

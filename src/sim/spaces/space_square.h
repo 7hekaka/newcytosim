@@ -8,19 +8,17 @@
 /**
  Space `square` is a 2D or 3D rectangular volume.
  
-    square sizeX sizeY sizeZ
-
- With:
- - sizeX = half-width along X
- - sizeY = half-width along Y
- - sizeZ = half-width along Z
- .
-
+ Parameters:
+     - length = half-width along X, Y and Z
+     .
 
  @ingroup SpaceGroup
  */
 class SpaceSquare : public Space
 {
+    /// dimensions
+    real   length_[3];
+
 private:
     
     /// apply a force directed towards the edge of the Space
@@ -31,9 +29,9 @@ public:
     ///creator
     SpaceSquare(const SpaceProp*);
     
-    /// check number and validity of specified lengths
-    void        resize() { Space::checkLengths(DIM, false); }
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -59,6 +57,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

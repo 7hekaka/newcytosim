@@ -2,22 +2,20 @@
 // Copyright 2019, Cambridge University
 #include "dim.h"
 #include "space_mesh.h"
-#include "mecapoint.h"
 #include "exceptions.h"
+#include "mecapoint.h"
 #include "glossary.h"
 #include "meca.h"
 #include <fstream>
 
 
-SpaceMesh::SpaceMesh(SpaceProp const* p, Glossary& opt)
+SpaceMesh::SpaceMesh(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("mesh is only usable in 3D");
     
 #if COMPLETE_SPACE_MESH
-    mMesh.read(p->shape_spec);
-
     real x;
     if ( opt.set(x, "scale") )
         mMesh.scale(x, x);
@@ -25,7 +23,6 @@ SpaceMesh::SpaceMesh(SpaceProp const* p, Glossary& opt)
     if ( opt.set(x, "inflate") )
         mMesh.inflate(x);
 #endif
-    resize();
 }
 
 
@@ -38,17 +35,17 @@ SpaceMesh::~SpaceMesh()
  recalculate bounding box, volume
  and points offsets that are used to project
  */
-void SpaceMesh::resize()
+void SpaceMesh::resize(Glossary& opt)
 {
 #if COMPLETE_SPACE_MESH
-    mVolume = mMesh.volume();
-    if ( mVolume < 0 )
+    volume_ = mMesh.volume();
+    if ( volume_ < 0 )
         throw InvalidParameter("mesh volume is < 0");
 
     real box[4];
     mMesh.find_extremes(box);
-    mInf.set(box[0], box[2], 0);
-    mSup.set(box[1], box[3], 0);
+    inf_.set(box[0], box[2], 0);
+    sup_.set(box[1], box[3], 0);
 #endif
 }
 
@@ -90,6 +87,17 @@ void SpaceMesh::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
 
 
 void SpaceMesh::setInteractions(Meca & meca, FiberSet const& fibers) const
+{
+}
+
+//------------------------------------------------------------------------------
+
+void SpaceMesh::write(Outputter& out) const
+{
+}
+
+
+void SpaceMesh::read(Inputter& in, Simul&, ObjectTag)
 {
 }
 

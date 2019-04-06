@@ -7,42 +7,45 @@
 SpaceDynamicSphere::SpaceDynamicSphere(const SpaceProp* p)
 : SpaceSphere(p)
 {
-    rForce = 0;
+    force_ = 0;
 }
 
 
 void SpaceDynamicSphere::setInteractions(Meca &, FiberSet const&) const
 {
-    rForce = 0;
+    force_ = 0;
 }
 
 
-void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
+                                        Meca & meca, real stiff) const
 {
-    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius, stiff);
-    rForce += stiff * ( pos.norm() - radius );
+    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
+    force_ += stiff * ( pos.norm() - radius_ );
 }
 
 
-void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
+                                        real rad, Meca & meca, real stiff) const
 {
-    if ( radius > rad )
+    if ( radius_ > rad )
     {
-        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius-rad, stiff);
-        rForce += stiff * ( rad + pos.norm() - radius );
+        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
+        force_ += stiff * ( rad + pos.norm() - radius_ );
     }
     else {
         meca.addPointClamp( pe, Vector(0,0,0), stiff );
         std::cerr << "object is too big to fit in SpaceDynamicSphere\n";
-        rForce += 2 * stiff * ( rad - radius );
+        force_ += 2 * stiff * ( rad - radius_ );
     }
 }
 
 
 void SpaceDynamicSphere::step()
 {
-    real dr = prop->mobility_dt * rForce;
-    std::clog << "SpaceDynamicSphere:  radius " << std::setw(12) << radius << " force " << rForce << " delta_radius " << dr << "\n";
-    radius += dr;
+    real dr = prop->mobility_dt * force_;
+    std::clog << "SpaceDynamicSphere:  radius " << std::setw(12) << radius_;
+    std::clog << " force " << force_ << " delta_radius " << dr << "\n";
+    radius_ += dr;
 }
 

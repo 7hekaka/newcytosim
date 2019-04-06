@@ -85,7 +85,7 @@ void Simul::writeObjects(Outputter& out) const
     singles.write(out);
     couples.write(out);
     organizers.write(out);
-    events.write(out);
+    //events.write(out);
     
     out.put_line("\n#section end");
     out.put_line("\n#end cytosim");
@@ -260,29 +260,46 @@ class Simul::InputLock
 private:
     
     Simul * sim;
-    bool    era;
 
+    bool  frozen;
+    
 public:
     
-    /// change the mandate to 'erase' objects
-    void erase(bool e) { era = e; }
-    
-    InputLock(Simul * s, bool e)
-    : sim(s), era(e)
+    /// flag all objects with number '7'
+    InputLock(Simul * s)
+    : sim(s)
     {
         //Cytosim::log("Simul::InputLock created with %i objects\n", sim->nbObjects());
-        sim->couples.freeze();
-        sim->singles.freeze();
-        sim->fibers.freeze();
-        sim->beads.freeze();
-        sim->solids.freeze();
-        sim->spheres.freeze();
-        sim->organizers.freeze();
-        sim->fields.freeze();
-        sim->spaces.freeze();
-        sim->events.freeze();
+        sim->couples.freeze(7);
+        sim->singles.freeze(7);
+        sim->fibers.freeze(7);
+        sim->beads.freeze(7);
+        sim->solids.freeze(7);
+        sim->spheres.freeze(7);
+        sim->organizers.freeze(7);
+        sim->fields.freeze(7);
+        sim->spaces.freeze(7);
+        //sim->events.freeze(7);
+        frozen = true;
     }
     
+    /// erase objects flagged with number '7'
+    void prune()
+    {
+        //sim->events.prune(7);
+        sim->organizers.prune(7);
+        sim->couples.prune(7);
+        sim->singles.prune(7);
+        sim->beads.prune(7);
+        sim->solids.prune(7);
+        sim->spheres.prune(7);
+        sim->fibers.prune(7);
+        sim->spaces.prune(7);
+        sim->fields.prune(7);
+        frozen = false;
+    }
+
+    /// reset flags
     ~InputLock()
     {
         /*
@@ -292,22 +309,9 @@ public:
          as if they had been updated from reading the file.
          Destroying couples and singles before the fibers avoid this problem.
          */
-        if ( era )
+        if ( frozen )
         {
-            sim->events.prune();
-            sim->organizers.prune();
-            sim->couples.prune();
-            sim->singles.prune();
-            sim->beads.prune();
-            sim->solids.prune();
-            sim->spheres.prune();
-            sim->fibers.prune();
-            sim->spaces.prune();
-            sim->fields.prune();
-        }
-        else
-        {
-            sim->events.thaw();
+            //sim->events.thaw();
             sim->organizers.thaw();
             sim->couples.thaw();
             sim->singles.thaw();
@@ -317,6 +321,7 @@ public:
             sim->fibers.thaw();
             sim->spaces.thaw();
             sim->fields.thaw();
+            frozen = false;
         }
         //Cytosim::log("Simul::InputLock deleted with %i objects\n", sim->nbObjects());
     }
@@ -341,11 +346,11 @@ public:
 int Simul::reloadObjects(Inputter & in, ObjectSet* subset)
 {
     // set flag to erase any object that was not updated
-    InputLock lock(this, true);
+    InputLock lock(this);
 
-    // if an error occurs, we do not erase objects:
-    if ( loadObjects(in, subset) )
-        lock.erase(false);
+    // if no error occured, erase objects that have not been updated
+    if ( 0 == loadObjects(in, subset) )
+        lock.prune();
 
     return in.eof();
 }
@@ -644,9 +649,8 @@ int Simul::readObjects(Inputter & in, ObjectSet* subset)
 void Simul::writeProperties(std::ostream& os, const bool prune) const
 {
     //std::clog << "Writing properties" << std::endl;
-    os << "% Cytosim property file" << std::endl;
-    os << "% " << TicToc::date() << std::endl;
-    os << "% pid " << getpid() << '\n';
+    os << "% Cytosim property file, pid " << getpid() << '\n';
+    os << "% " << TicToc::date() << '\n';
 
     prop->write(os, prune);
     properties.write(os, prune);

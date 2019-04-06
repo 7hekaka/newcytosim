@@ -1,40 +1,57 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "space_cylinder.h"
-#include "mecapoint.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "mecapoint.h"
+#include "glossary.h"
 #include "meca.h"
 
 
 SpaceCylinder::SpaceCylinder(const SpaceProp* p)
-: Space(p), length(mLength[0]), radius(mLength[1])
+: Space(p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("cylinder is only valid in 3D: use rectangle instead");
+    length_ = 0;
+    radius_ = 0;
+}
+
+
+void SpaceCylinder::resize(Glossary& opt)
+{
+    opt.set(length_, "length");
+    opt.set(radius_, "radius");
+
+    if ( length_ < 0 )
+        throw InvalidParameter("cylinder:length must be >= 0");
+
+    if ( radius_ < 0 )
+        throw InvalidParameter("cylinder:radius must be >= 0");
 }
 
 
 void SpaceCylinder::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length,-radius,-radius);
-    sup.set( length, radius, radius);
+    inf.set(-length_,-radius_,-radius_);
+    sup.set( length_, radius_, radius_);
 }
 
 
 real SpaceCylinder::volume() const
 {
-    return 2 * M_PI * length * radius * radius;
+    return 2 * M_PI * length_ * radius_ * radius_;
 }
 
 
 bool SpaceCylinder::inside(Vector const& w) const
 {
-    if ( fabs(w.XX) > length )
+    if ( fabs(w.XX) > length_ )
         return false;
     
 #if ( DIM > 2 )
-    return ( w.YY*w.YY + w.ZZ*w.ZZ <= radius * radius );
+    return ( w.YY*w.YY + w.ZZ*w.ZZ <= radius_ * radius_ );
 #elif ( DIM > 1 )
-    return ( fabs(w.YY) <= radius );
+    return ( fabs(w.YY) <= radius_ );
 #else
     return false;
 #endif
@@ -45,13 +62,13 @@ bool SpaceCylinder::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
     
-    if ( fabs(w.XX) + rad > length )
+    if ( fabs(w.XX) + rad > length_ )
         return false;
     
 #if ( DIM > 2 )
-    return ( w.YY*w.YY + w.ZZ*w.ZZ <= square(radius-rad) );
+    return ( w.YY*w.YY + w.ZZ*w.ZZ <= square(radius_-rad) );
 #elif ( DIM > 1 )
-    return ( fabs(w.YY) <= radius-rad );
+    return ( fabs(w.YY) <= radius_-rad );
 #else
     return false;
 #endif
@@ -61,12 +78,12 @@ bool SpaceCylinder::allInside(Vector const& w, const real rad) const
 Vector SpaceCylinder::randomPlace() const
 {
 #if ( DIM >= 3 )
-    Vector2 sec = Vector2::randB(radius);
-    return Vector(length*RNG.sreal(), sec.XX, sec.YY);
+    Vector2 sec = Vector2::randB(radius_);
+    return Vector(length_*RNG.sreal(), sec.XX, sec.YY);
 #elif ( DIM > 1 )
-    return Vector(length*RNG.sreal(), radius*RNG.sreal());
+    return Vector(length_*RNG.sreal(), radius_*RNG.sreal());
 #else
-    return Vector(length*RNG.sreal());
+    return Vector(length_*RNG.sreal());
 #endif
 }
 
@@ -77,17 +94,17 @@ Vector SpaceCylinder::project(Vector const& w) const
 #if ( DIM >= 3 )
     bool inX = 1;
     
-    if ( fabs(w.XX) > length )
+    if ( fabs(w.XX) > length_ )
     {
-        p.XX = std::copysign(length, w.XX);
+        p.XX = std::copysign(length_, w.XX);
         inX = 0;
     }
     
     real n = w.normYZ();
     
-    if ( n > radius )
+    if ( n > radius_ )
     {
-        n = radius / n;
+        n = radius_ / n;
         p.YY = n * w.YY;
         p.ZZ = n * w.ZZ;
     }
@@ -95,13 +112,13 @@ Vector SpaceCylinder::project(Vector const& w) const
     {
         if ( inX )
         {
-            if ( length - fabs(w.XX) < radius - n )
+            if ( length_ - fabs(w.XX) < radius_ - n )
             {
-                p.XX = std::copysign(length, w.XX);
+                p.XX = std::copysign(length_, w.XX);
             }
             else
             {
-                n = radius / n;
+                n = radius_ / n;
                 p.YY = n * w.YY;
                 p.ZZ = n * w.ZZ;
             }
@@ -160,7 +177,7 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
  */
 void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length, radius);
+    setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
 
 /**
@@ -169,12 +186,35 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
 void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe,
                                    real rad, Meca & meca, real stiff) const
 {
-    real eRadius = radius - rad;
+    real eRadius = radius_ - rad;
     if ( eRadius < 0 ) eRadius = 0;
-    real eLength = length - rad;
+    real eLength = length_ - rad;
     if ( eLength < 0 ) eLength = 0;
     
     setInteraction(pos, pe, meca, stiff, eLength, eRadius);
+}
+
+//------------------------------------------------------------------------------
+
+void SpaceCylinder::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(2);
+    out.writeFloat(length_);
+    out.writeFloat(radius_);
+}
+
+
+void SpaceCylinder::setLengths(const real len[])
+{
+    length_ = len[0];
+    radius_ = len[1];
+}
+
+void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
 }
 
 //------------------------------------------------------------------------------
@@ -191,8 +231,8 @@ bool SpaceCylinder::draw() const
 
     const size_t fin = 512;
 
-    GLfloat L = (GLfloat)length;
-    GLfloat R = (GLfloat)radius;
+    GLfloat L = (GLfloat)length_;
+    GLfloat R = (GLfloat)radius_;
     
     GLfloat c[fin+1], s[fin+1];
     gle::circle(fin, c, s, 1);

@@ -11,50 +11,60 @@
  The volume only has edge in the last dimension, and otherwise wraps on itself.
  The last dimension is Y in 2D and Z in 3D.
  
-    strip sizeX sizeY sizeZ
- 
- With:
- - sizeX = half-width along X
- - sizeY = half-width along Y
- - sizeZ = half-width along Z
- .
- 
+ Parameters:
+     - length = half-width along X, Y and Z
+     .
+     
+ @ingroup SpaceGroup
  */
 class SpaceStrip : public Space
 {
+    /// dimensions
+    real   length_[3];
+
 public:
     
     /// creator
     SpaceStrip(const SpaceProp*);
 
-    /// check number and validity of specified lengths
-    void       resize();
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+
     /// initialize Modulo Object
-    void       setModulo(Modulo&) const;
+    void        setModulo(Modulo&) const;
     
     /// return bounding box in `inf` and `sup`
-    void       boundaries(Vector& inf, Vector& sup) const;
+    void        boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real       volume()           const;
+    real        volume()           const;
     
     /// true if the point is inside the Space
-    bool       inside(Vector const&) const;
+    bool        inside(Vector const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector     project(Vector const& pos) const;
+    Vector      project(Vector const& pos) const;
 
     
     /// apply a force directed towards the edge of the Space
-    void       setInteraction(Vector const& pos, Mecapoint const&, Meca &, real stiff) const;
+    void        setInteraction(Vector const& pos, Mecapoint const&, Meca &, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void       setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca &, real stiff) const;
+    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca &, real stiff) const;
     
     
     /// OpenGL display function; returns true if successful
-    bool       draw() const;
+    bool        draw() const;
+    
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
     
 };
 

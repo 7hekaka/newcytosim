@@ -169,60 +169,60 @@ public:
     //--------------------------------------------------------------------------
 
     /// pointer to Hand1
-    Hand const*    hand1()                              const { return cHand1; }
+    Hand*    hand1()                            { return cHand1; }
     
     /// true if Hand1 is attached
-    bool           attached1()                          const { return cHand1->attached(); }
+    bool     attached1()                  const { return cHand1->attached(); }
     
     /// Fiber to which Hand1 is attached, or zero if not attached
-    Fiber*         fiber1()                             const { return cHand1->fiber(); }
+    Fiber*   fiber1()                     const { return cHand1->fiber(); }
     
     /// attachment position of Hand1 along fiber (only valid if Hand1 is attached)
-    real           abscissa1()                          const { return cHand1->abscissa(); }
+    real     abscissa1()                  const { return cHand1->abscissa(); }
     
     /// position of Hand1 when attached (only valid if Hand1 is attached)
-    Vector         posHand1()                           const { return cHand1->pos(); }
+    Vector   posHand1()                   const { return cHand1->pos(); }
     
     /// direction of Fiber at attachment point of Hand1 (only valid if Hand1 is attached)
-    Vector         dirFiber1()                          const { return cHand1->dirFiber(); }
+    Vector   dirFiber1()                  const { return cHand1->dirFiber(); }
  
     /// attach Hand1 at the given FiberSite
-    void           attach1(FiberSite const& fb)               { cHand1->attach(fb); }
+    void     attach1(FiberSite const& fb)       { cHand1->attach(fb); }
     
     /// attach Hand1 at the given end
-    void           attachEnd1(Fiber* f, FiberEnd end)         { cHand1->attachEnd(f, end); }
+    void     attachEnd1(Fiber* f, FiberEnd end) { cHand1->attachEnd(f, end); }
     
     /// move Hand1 to given end
-    void           moveToEnd1(FiberEnd end)                   { cHand1->moveToEnd(end); }
+    void     moveToEnd1(FiberEnd end)           { cHand1->moveToEnd(end); }
 
     //--------------------------------------------------------------------------
 
     /// pointer to Hand2
-    Hand const*    hand2()                              const { return cHand2; }
+    Hand*    hand2()                            { return cHand2; }
     
     /// true if Hand2 is attached
-    bool           attached2()                          const { return cHand2->attached(); }
+    bool     attached2()                  const { return cHand2->attached(); }
     
     /// Fiber to which Hand2 is attached, or zero if not attached
-    Fiber*         fiber2()                             const { return cHand2->fiber(); }
+    Fiber*   fiber2()                     const { return cHand2->fiber(); }
     
     /// attachment position of Hand2 along fiber (only valid if Hand2 is attached)
-    real           abscissa2()                          const { return cHand2->abscissa(); }
+    real     abscissa2()                  const { return cHand2->abscissa(); }
     
     /// position of Hand2 when attached (only valid if Hand2 is attached)
-    Vector         posHand2()                           const { return cHand2->pos(); }
+    Vector   posHand2()                   const { return cHand2->pos(); }
     
     /// direction of Fiber at attachment point of Hand2 (only valid if Hand2 is attached)
-    Vector         dirFiber2()                          const { return cHand2->dirFiber(); }
+    Vector   dirFiber2()                  const { return cHand2->dirFiber(); }
     
     /// attach Hand2 at the given FiberSite
-    void           attach2(FiberSite const& fb)               { cHand2->attach(fb); }
+    void     attach2(FiberSite const& fb)       { cHand2->attach(fb); }
     
     /// attach Hand2 at the given end
-    void           attachEnd2(Fiber *f, FiberEnd end)         { cHand2->attachEnd(f, end); }
+    void     attachEnd2(Fiber *f, FiberEnd end) { cHand2->attachEnd(f, end); }
     
     /// move Hand2 to given end
-    void           moveToEnd2(FiberEnd end)                   { cHand2->moveToEnd(end); }
+    void     moveToEnd2(FiberEnd end)           { cHand2->moveToEnd(end); }
 
     //--------------------------------------------------------------------------
 

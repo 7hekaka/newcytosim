@@ -2,37 +2,47 @@
 #include "dim.h"
 #include "space_sphere.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "glossary.h"
 #include "random.h"
 #include "meca.h"
 
-
 SpaceSphere::SpaceSphere(const SpaceProp* p)
-: Space(p), radius(mLength[0]), radiusSqr(mLengthSqr[0])
+: Space(p), radius_(0), radiusSqr_(0)
 {
 }
 
 
+void SpaceSphere::resize(Glossary& opt)
+{
+    opt.set(radius_, "radius");
+    
+    if ( radius_ < 0 )
+        throw InvalidParameter(prop->name()+":radius must be >= 0");
+    update();
+}
+
 void SpaceSphere::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-radius,-radius,-radius);
-    sup.set( radius, radius, radius);
+    inf.set(-radius_,-radius_,-radius_);
+    sup.set( radius_, radius_, radius_);
 }
 
 
 real SpaceSphere::volume() const
 {
 #if ( DIM == 1 )
-    return 2 * radius;
+    return 2 * radius_;
 #elif ( DIM == 2 )
-    return M_PI * radius * radius;
+    return M_PI * square(radius_);
 #else
-    return 4/3.0 * M_PI * radius * radius * radius;
+    return 4/3.0 * M_PI * cube(radius_);
 #endif
 }
 
 bool SpaceSphere::inside(Vector const& pos) const
 {
-    return pos.normSqr() <= radiusSqr;
+    return pos.normSqr() <= radiusSqr_;
 }
 
 Vector SpaceSphere::project(Vector const& pos) const
@@ -40,11 +50,11 @@ Vector SpaceSphere::project(Vector const& pos) const
     real n = pos.normSqr();
     
     if ( n > 0 ) {
-        return pos * ( radius / sqrt(n) );
+        return pos * ( radius_ / sqrt(n) );
     }
     else {
         //select a random point on the surface
-        return radius * Vector::randU();
+        return radius_ * Vector::randU();
     }
 }
 
@@ -52,19 +62,45 @@ Vector SpaceSphere::project(Vector const& pos) const
 
 void SpaceSphere::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    meca.addSphereClamp( pos, pe, Vector(0,0,0), radius, stiff );
+    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
 }
 
 
 void SpaceSphere::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    if ( radius > rad )
-        meca.addSphereClamp( pos, pe, Vector(0,0,0), radius-rad, stiff );
+    if ( radius_ > rad )
+        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
     else {
-        meca.addPointClamp( pe, Vector(0,0,0), stiff );
+        meca.addPointClamp(pe, Vector(0,0,0), stiff);
         std::cerr << "object is too big to fit in SpaceSphere\n";
     }
 }
+
+
+//------------------------------------------------------------------------------
+
+void SpaceSphere::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(1);
+    out.writeFloat(radius_);
+}
+
+
+void SpaceSphere::setLengths(const real len[])
+{
+    radius_ = len[0];
+    update();
+}
+
+
+void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+    setLengths(len);
+}
+
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
@@ -83,7 +119,7 @@ bool SpaceSphere::draw() const
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     
     GLfloat cir[2*fin+2];
-    gle::circle(fin, cir, (GLfloat)radius);
+    gle::circle(fin, cir, (GLfloat)radius_);
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, cir);
@@ -92,7 +128,7 @@ bool SpaceSphere::draw() const
 
 #else
     
-    GLfloat R = (GLfloat)radius;
+    GLfloat R = (GLfloat)radius_;
     glPushMatrix();
     glScalef(R, R, R);
     gle::gleSphere8B();
@@ -110,6 +146,5 @@ bool SpaceSphere::draw() const
 {
     return false;
 }
-
 
 #endif

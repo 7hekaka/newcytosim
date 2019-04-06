@@ -7,6 +7,8 @@
 #include "glossary.h"
 #include "filepath.h"
 #include "tictoc.h"
+#include "simul.h"
+#include "sim.h"
 #include <fstream>
 
 #include "../math/evaluator.cc"
@@ -71,6 +73,21 @@ Property * Interface::execute_change(std::string const& name, Glossary& def)
     pp->read(def);
     pp->complete(simul);
     
+    // additional code to make 'change space:dimension' work.
+    if ( pp->category() == "space" )
+    {
+        // update any Space with this property:
+        for ( Space * s = simul.spaces.first(); s; s=s->next() )
+        {
+            if ( s->prop == pp )
+            {
+                s->resize(def);
+                // allow Simul to update:
+                if ( s == simul.space() )
+                    simul.changeSpace(s);
+            }
+        }
+    }
     return pp;
 }
 
@@ -234,8 +251,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
         bool condition = true;
         if ( has_condition )
         {
-            Evaluator::variable_list vars = {{'X', iso.vec.x()}, {'Y', iso.vec.y()}, {'Z', iso.vec.z()},
-                                             {'N', iso.vec.norm()}, {'R', RNG.preal()}};
+            Evaluator::variable_list vars = {{'x', iso.vec.x()}, {'y', iso.vec.y()}, {'z', iso.vec.z()},
+                                             {'r', iso.vec.norm()}, {'p', RNG.preal()}};
             try {
                 char const* ptr = condition_str.c_str();
                 condition = Evaluator::inequality(ptr, vars);
@@ -282,17 +299,20 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
  */
 ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
 {
-    Property * pp = simul.properties.find(name);
-    
-    if ( !pp )
-        throw InvalidSyntax("unknown property `"+name+"'");
-    
-    ObjectSet * set = simul.findSet(pp->category());
+    ObjectList res;
+    ObjectSet * set = nullptr;
+
+    {
+        Property * pp = simul.properties.find(name);
+        
+        if ( pp )
+            set = simul.findSet(pp->category());
+        else
+            set = simul.findSet(name);
+    }
 
     if ( !set )
-        throw InvalidSyntax("could not determine class of `"+name+"'");
-
-    ObjectList res;
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
     
     do {
         
@@ -392,7 +412,7 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
     ObjectSet * set = simul.findSet(pp->category());
     
     if ( !set )
-        throw InvalidSyntax("could not determine class of `"+name+"'");
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
 
     Glossary opt;
 
@@ -448,12 +468,12 @@ class SelectionCriteria
 {
 public:
 
-    ObjectMark   mrk;
-    unsigned     st1;
-    unsigned     st2;
-    void  const* prp;
-    Space const* ins;
-    Space const* ous;
+    ObjectMark      mrk;
+    unsigned        st1;
+    unsigned        st2;
+    Space    const* ins;
+    Space    const* ous;
+    Property const* prp;
 
     /// initialize
     SelectionCriteria()
@@ -466,10 +486,9 @@ public:
         ous = nullptr;
     }
     
-    void set(Simul& sim, std::string const& name, Glossary& opt)
+    void set(Simul& sim, Property* pp, Glossary& opt)
     {
-        if ( name != "*" )
-            prp = sim.properties.find_or_die(name);
+        prp = pp;
         
         std::string str;
         if ( opt.set(str, "position") )
@@ -539,22 +558,26 @@ bool match_criteria(Object const* obj, void const* val)
 void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned cnt)
 {
     Property * pp = simul.properties.find(name);
+    ObjectSet * set;
     
-    if ( !pp )
-        throw InvalidSyntax("unknown property `"+name+"'");
-    
-    ObjectSet * set = simul.findSet(pp->category());
+    if ( pp )
+        set = simul.findSet(pp->category());
+    else
+        set = simul.findSet(name);
     
     if ( !set )
-        throw InvalidSyntax("could not determine class of `"+name+"'");
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
     
     SelectionCriteria cri;
-    cri.set(simul, name, opt);
+    cri.set(simul, pp, opt);
 
     ObjectList objs = set->collect(match_criteria, &cri);
     
     if ( objs.size() == 0 )
-        throw InvalidSyntax("no object found to delete");
+    {
+        std::cerr << "found no `" << name << "' to delete\n";
+        return;
+    }
     
     if ( cnt == 1 )
     {
@@ -586,7 +609,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, unsigned cn
     ObjectSet * set = simul.findSet(pp->category());
     
     if ( !set )
-        throw InvalidSyntax("could not determine class of `"+name+"'");
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
 
     ObjectMark mrk;
     if ( ! opt.set(mrk, "mark") )
@@ -594,7 +617,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, unsigned cn
     opt.clear("mark");
     
     SelectionCriteria cri;
-    cri.set(simul, name, opt);
+    cri.set(simul, pp, opt);
     
     ObjectList objs = set->collect(match_criteria, &cri);
     
@@ -638,7 +661,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
             throw InvalidSyntax("only `cut fiber' is supported");
         
         SelectionCriteria cri;
-        cri.set(simul, name, opt);
+        cri.set(simul, pp, opt);
         objs = simul.fibers.collect(match_criteria, &cri);
     }
     
@@ -744,16 +767,23 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     int          solve      = 1;
     bool         prune      = true;
     bool         binary     = true;
-    real         event_rate = 0;
-    std::string  event_code;
     real         flux_speed = 0;
     
     bool has_code = opt.set(code, "nb_frames", 1);
-    opt.set(event_rate, "event");
-    opt.set(event_code, "event", 1);
-    opt.set(solve,      "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
-    opt.set(prune,      "prune");
-    opt.set(binary,     "binary");
+#ifdef BACKWARD_COMPATIBILITY
+    Event * event = nullptr;
+    if ( opt.has_key("event") )
+    {
+        event = new Event();
+        opt.set(event->rate, "event");
+        opt.set(event->code, "event", 1);
+        event->initialize(simul.time());
+        simul.events.add(event);
+    }
+#endif
+    opt.set(solve,  "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
+    opt.set(prune,  "prune");
+    opt.set(binary, "binary");
     
     if ( solve == 3 )
     {
@@ -780,18 +810,13 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
             simul.prop->clear_trajectory = false;
         }
         if ( has_code )
-            parse(code, ", while executing 'run' code");
+            evaluate(code, ", in run:code");
 
         delta = real(nb_steps) / real(nb_frames);
         check = (int)delta;
     }
     
     simul.prepare();
-    
-    // Gillespie countdown timer for next event:
-    real etime = RNG.exponential();
-    // decrement of Gillespie timer corresponding to one time-step:
-    real event_rate_dt = event_rate * simul.prop->time_step;
     
     unsigned cnt = 0;
     while ( 1 )
@@ -804,23 +829,11 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
                 simul.writeObjects(TRAJECTORY, true, binary);
                 reportCPUtime(frame, simul.time());
                 if ( has_code )
-                    parse(code, ", while executing `run' code");
+                    evaluate(code, ", in run:write:code");
             }
             if ( cnt >= nb_steps )
                 break;
             check = (int)( ++frame * delta );
-        }
-        
-        etime -= event_rate_dt;
-        if ( etime < 0.0 )
-        {
-            simul.relax();
-            do {
-                VLOG("-EVENT\n");
-                parse(event_code, ", while executing `event' code");
-                etime += RNG.exponential();
-            } while ( etime < 0.0 );
-            simul.prepare();
         }
 
         simul.step();
@@ -836,7 +849,10 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
         hold();
         ++cnt;
     }
-    
+#ifdef BACKWARD_COMPATIBILITY
+    if ( event )
+        simul.events.remove(event);
+#endif
     simul.relax();
     VLOG("+RUN COMPLETED\n");
 }

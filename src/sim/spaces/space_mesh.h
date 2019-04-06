@@ -7,38 +7,39 @@
 /// a volume defined by a triangular mesh
 /**
  Space `mesh` implements a generic volume in 3D.
- The mesh is read from a file.
 
-    mesh file_name
+ Parameters:
+    - file = name of file containing mesh data
+    .
 
  @ingroup SpaceGroup
 */
 class SpaceMesh : public Space
 {
 private:
-    
+
     /// The 3D mesh object
     //Mesh              mMesh;
     
     /// pre-calculated bounding box derived from mMesh
-    Vector            mInf, mSup;
+    Vector            inf_, sup_;
     
     /// Volume calculated from mMesh
-    real              mVolume;
+    real              volume_;
 
 public:
         
     /// constructor
-    SpaceMesh(const SpaceProp *, Glossary&);
+    SpaceMesh(const SpaceProp *);
     
     /// destructor
     ~SpaceMesh();
     
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const { inf=mInf; sup=mSup; }
+    void        boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
     
     /// the volume inside
-    real        volume() const { return mVolume; }
+    real        volume() const { return volume_; }
     
     /// true if the point is inside the Space
     bool        inside(Vector const&) const;
@@ -55,12 +56,18 @@ public:
     /// add interactions between fibers and reentrant corners
     void        setInteractions(Meca &, FiberSet const&) const;
 
-    /// update since length have changed
-    void        resize();
+    /// update geometry
+    void        resize(Glossary& opt);
     
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

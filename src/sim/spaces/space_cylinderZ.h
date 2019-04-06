@@ -9,13 +9,11 @@
  Space `cylinderZ` is radial symmetric along the Z-axis.
  The crosssection in the XY plane is a disc.
 
-    cylinderZ radius bottom top
- 
- With:
- - radius = radius of cylinder
- - bottom = smallest Z
- - top = highest Z
- .
+ Parameters:
+     - radius = radius of cylinder
+     - bottom = smallest Z
+     - top = highest Z
+     .
 
  @ingroup SpaceGroup
  */
@@ -26,26 +24,29 @@ class SpaceCylinderZ : public Space
 
 private:
     
-    /// the radius of the cylinder (alias to mLength[0])
-    real &      radius;
+    /// the radius of the cylinder
+    real        radius_;
     
-    /// position in Z of the bottom limit (alias to mLength[1])
-    real &      bot;
+    /// position in Z of the bottom limit
+    real        bot_;
     
-    /// position in Z of the top limit (alias to mLength[2])
-    real &      top;
+    /// position in Z of the top limit
+    real        top_;
     
 public:
         
     ///creator
     SpaceCylinderZ(const SpaceProp*);
-    
-    /// check number and validity of specified lengths
-    void        resize();
-    
+
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
+    /// radius
+    real        radius() const { return radius_; }
+
     /// the volume inside
     real        volume() const;
 
@@ -70,6 +71,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

@@ -22,7 +22,7 @@ void print_types()
     print_sizeof<char>("char");
     print_sizeof<short>("short");
     print_sizeof<int>("int");
-    print_sizeof<unsigned>("usigned");
+    print_sizeof<unsigned>("unsigned");
     print_sizeof<long>("long int");
     print_sizeof<long long int>("long long int");
     

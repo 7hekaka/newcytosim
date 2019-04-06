@@ -9,44 +9,54 @@
 /**
  Space `periodic` implements periodic boundary condition in all dimensions.
  The volume has no edge and wraps on itself.
+
+ Parameters:
+     - length = half-width along X, Y and Z
+     .
  
-    periodic sizeX sizeY sizeZ
- 
- With:
- - sizeX = half-width along X
- - sizeY = half-width along Y
- - sizeZ = half-width along Z
- .
- 
+ @ingroup SpaceGroup
  */
 class SpacePeriodic : public Space
 {
     
+    /// dimensions
+    real   length_[3];
+ 
 public:
     
     /// creator
     SpacePeriodic(const SpaceProp*);
 
-    /// check number and validity of specified lengths
-    void       resize();
-
+    /// update geometry
+    void        resize(Glossary& opt);
+    
     /// initialize Modulo Object
-    void       setModulo(Modulo&) const;
+    void        setModulo(Modulo&) const;
     
     /// return bounding box in `inf` and `sup`
-    void       boundaries(Vector& inf, Vector& sup) const;
+    void        boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real       volume()           const;
+    real        volume()           const;
     
     /// true if the point is inside the Space
-    bool       inside(Vector const&) const;
+    bool        inside(Vector const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector     project(Vector const& pos) const;
+    Vector      project(Vector const& pos) const;
     
     /// OpenGL display function; returns true if successful
-    bool       draw() const;
+    bool        draw() const;
+    
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
     
 };
 

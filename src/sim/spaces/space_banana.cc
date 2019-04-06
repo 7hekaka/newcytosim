@@ -2,47 +2,56 @@
 #include "dim.h"
 #include "space_banana.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "glossary.h"
+
 
 SpaceBanana::SpaceBanana(const SpaceProp* p)
 : Space(p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("banana is not edible in 1D");
-    //resize();
 }
 
 
-void SpaceBanana::resize()
+void SpaceBanana::resize(Glossary& opt)
 {
-    checkLengths(3, true);
-    
-    bLength   = mLength[0] - 2 * mLength[1];
-    bWidth    = mLength[1];
-    bWidthSqr = bWidth * bWidth;
-    bRadius   = mLength[2];
-    
+    real total = 0;
+    opt.set(total,   "length");
+    opt.set(bCurvature,   "curvature");
+    opt.set(bRadius, "radius");
+
+    bLength = total - 2 * bCurvature;
+    bRadiusSqr = bRadius * bRadius;
+
     if ( bLength <= 0 )
         throw InvalidParameter("banana:length must be specified and greater than 2 * width");
-
-    if ( bRadius <= 0 )
-        throw InvalidParameter("banana:radius must be specified and > 0");
-
-    if ( bWidth > bRadius )
+    if ( bCurvature <= 0 )
+        throw InvalidParameter("banana:radius must be >= 0");
+    if ( bRadius < 0 )
+        throw InvalidParameter("banana:width must be > 0");
+    if ( bRadius > bCurvature )
         throw InvalidParameter("banana:width must be smaller than radius");
-    
-    bAngle = 0.5 * bLength / bRadius;
+   
+    bAngle = 0.5 * bLength / bCurvature;
     
     if ( bAngle > M_PI )
     {
         bAngle = M_PI;
-        std::cerr << "banana:length should not exceed 2*PI*radius" << std::endl;
+        std::cerr << "banana:length should not exceed 2*PI*radius\n";
     }
+    update();
+}
 
-    bEnd[0] = bRadius * sin(bAngle);
-    bEnd[1] = 0.5*bRadius*(1-cos(bAngle));
+
+void SpaceBanana::update()
+{
+    bRadiusSqr = bRadius * bRadius;
+    bEnd[0] = bCurvature * sin(bAngle);
+    bEnd[1] = 0.5*bCurvature*(1-cos(bAngle));
     
     bCenter[0] = 0;
-    bCenter[1] = bRadius - bEnd[1];
+    bCenter[1] = bCurvature - bEnd[1];
     bCenter[2] = 0;
 }
 
@@ -50,17 +59,17 @@ void SpaceBanana::resize()
 real SpaceBanana::volume() const
 {
 #if ( DIM > 2 )
-    return 2*bAngle*M_PI*bRadius*bWidthSqr + 4/3.*M_PI*bWidthSqr*bWidth;
+    return 2*bAngle*M_PI*bCurvature*bRadiusSqr + 4/3.*M_PI*bRadiusSqr*bRadius;
 #else
-    return 4*bAngle*bRadius*bWidth + M_PI*bWidthSqr;
+    return 4*bAngle*bCurvature*bRadius + M_PI*bRadiusSqr;
 #endif
 }
 
 
 void SpaceBanana::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-bEnd[0]-bWidth,-bWidth,-bWidth);
-    sup.set( bEnd[0]+bWidth, bEnd[1]+bWidth, bWidth);
+    inf.set(-bEnd[0]-bRadius,-bRadius,-bRadius);
+    sup.set( bEnd[0]+bRadius, bEnd[1]+bRadius, bRadius);
 }
 
 
@@ -69,7 +78,7 @@ Vector SpaceBanana::project0(Vector const& pos) const
 {
     Vector cp = pos - bCenter;
     
-    real n = bRadius / cp.normXY();
+    real n = bCurvature / cp.normXY();
     Vector prj;
 
     prj[0] = bCenter[0] + n * cp[0];
@@ -90,7 +99,7 @@ Vector SpaceBanana::project0(Vector const& pos) const
 bool SpaceBanana::inside(Vector const& pos) const
 {
     Vector prj = project0(pos);
-    return ( distanceSqr(pos, prj) <= bWidthSqr );
+    return ( distanceSqr(pos, prj) <= bRadiusSqr );
 }
 
 
@@ -99,9 +108,36 @@ Vector SpaceBanana::project(Vector const& pos) const
     Vector cen = project0(pos);
     Vector dif = pos - cen;
     real n = dif.normSqr();
-    return cen + (bWidth / sqrt(n)) * dif;
+    return cen + (bRadius / sqrt(n)) * dif;
 }
 
+
+//------------------------------------------------------------------------------
+
+void SpaceBanana::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(3);
+    out.writeFloat(bLength);
+    out.writeFloat(bCurvature);
+    out.writeFloat(bRadius);
+}
+
+
+void SpaceBanana::setLengths(const real len[])
+{
+    bLength    = len[0];
+    bCurvature = len[1];
+    bRadius    = len[2];
+    update();
+}
+
+void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+    setLengths(len);
+}
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
@@ -125,22 +161,22 @@ bool SpaceBanana::draw() const
     
     glBegin(GL_LINE_LOOP);
     // lower swing
-    gle::arc(fin, c, s, bRadius+bWidth, A-M_PI, B, bCenter[0], bCenter[1]);
+    gle::arc(fin, c, s, bCurvature+bRadius, A-M_PI, B, bCenter[0], bCenter[1]);
     for ( size_t i = 0; i < fin; ++i )
         gleVertex(c[i], s[i], 0);
     
     // right cap
-    gle::arc(fin, c, s, bWidth, B, B+M_PI, bEnd[0], bEnd[1]);
+    gle::arc(fin, c, s, bRadius, B, B+M_PI, bEnd[0], bEnd[1]);
     for ( size_t i = 0; i < fin; ++i )
         gleVertex(c[i], s[i], 0);
     
     // upper swing
-    gle::arc(fin, c, s, bRadius-bWidth, B, A-M_PI, bCenter[0], bCenter[1]);
+    gle::arc(fin, c, s, bCurvature-bRadius, B, A-M_PI, bCenter[0], bCenter[1]);
     for ( size_t i = 0; i < fin; ++i )
         gleVertex(c[i], s[i], 0);
         
     // left cap
-    gle::arc(fin, c, s, bWidth, A, A+M_PI, -bEnd[0], bEnd[1]);
+    gle::arc(fin, c, s, bRadius, A, A+M_PI, -bEnd[0], bEnd[1]);
     for ( size_t i = 0; i < fin; ++i )
         gleVertex(c[i], s[i], 0);
 
@@ -166,7 +202,7 @@ bool SpaceBanana::draw() const
     glTranslated(bCenter[0], bCenter[1], 0);
     glClipPlane(glp1, plane1);
     glClipPlane(glp2, plane2);
-    gleTorus(bRadius, bWidth);
+    gleTorus(bCurvature, bRadius);
     glPopMatrix();
 
     glDisable(glp2);
@@ -175,7 +211,7 @@ bool SpaceBanana::draw() const
     glPushMatrix();
     glTranslated(bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane1i);
-    gleScale(bWidth);
+    gleScale(bRadius);
     gleSphere8B();
     glPopMatrix();
 
@@ -183,7 +219,7 @@ bool SpaceBanana::draw() const
     glPushMatrix();
     glTranslated(-bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane2i);
-    gleScale(bWidth);
+    gleScale(bRadius);
     gleSphere8B();
     glPopMatrix();
     

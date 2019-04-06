@@ -8,11 +8,9 @@
 /**
  Space `sphere` is a sphere centered around the origin
  
-    sphere radius
- 
-With:
- - radius = radius of the sphere
- .
+ Parameters:
+    - radius = radius of the sphere
+    .
  
  @ingroup SpaceGroup
  */
@@ -21,11 +19,14 @@ class SpaceSphere : public Space
 {
 protected:
     
-    /// the radius of the sphere (set by mLength[0])
-    real & radius;
+    /// the radius of the sphere
+    real  radius_;
     
-    /// square of the radius (set by mLengthSqr[0])
-    real & radiusSqr;
+    /// square of the radius
+    real  radiusSqr_;
+    
+    /// calculate radiusSqr
+    void  update() { radiusSqr_ = square(radius_); }
     
 public:
     
@@ -33,11 +34,14 @@ public:
     SpaceSphere(const SpaceProp*);
 
     /// check number and validity of specified lengths
-    void        resize() { Space::checkLengths(1, false); }
+    void        resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
+    /// radius
+    real        radius() const { return radius_; }
+
     /// the volume inside
     real        volume() const;
     
@@ -45,7 +49,7 @@ public:
     bool        inside(Vector const&) const;
     
     /// a random position inside the volume
-    Vector      randomPlace() const { return Vector::randB(radius); }
+    Vector      randomPlace() const { return Vector::randB(radius_); }
     
     /// direct normal direction calculation
     Vector      normalToEdge(Vector const& pos) const { return normalize(pos); }
@@ -62,6 +66,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

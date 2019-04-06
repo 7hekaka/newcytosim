@@ -14,11 +14,6 @@ Space::Space(const SpaceProp* p)
 : prop(p)
 {
     assert_true(prop);
-    
-    for ( unsigned int d = 0; d < DMAX; ++d )
-        setLength(d, 0);
-    
-    readLengths(p->dimensions);
 }
 
 
@@ -27,69 +22,6 @@ Space::~Space()
     //std::clog << "~Space(" << prop->name() << ")\n";
     prop = nullptr;
 }
-
-
-void Space::readLengths(const std::string& str)
-{
-    //std::clog << "Space::readLengths(" << str << ")\n";
-    unsigned d = 0;
-    char const* ptr = str.c_str();
-    char const*const end = ptr + str.size();
-    char * nxt = const_cast<char*>(ptr);
-
-    while ( ptr < end )
-    {
-        real s = strtod(ptr, &nxt);
-        if ( nxt == ptr )
-            break;
-        
-        setLength(d++, s);
-        ptr = nxt;
-    }
-    if ( d )
-        resize();
-
-    if ( nxt < end )
-        std::cerr << "Warning: ignored trailing `" << nxt << "' in Space:geometry\n";
-}
-
-
-/**
- Checks that the number of specified dimensions is greater or equal to `required`,
- and if `positive == true`, also check that they are non-negative values.
- */
-void Space::checkLengths(unsigned required, int strict) const
-{
-    for ( unsigned d = 0; d < required; ++d )
-    {
-        if ( strict && length(d) <= 0 )
-            throw InvalidParameter(prop->name()+":dimension[",d,"] must be > 0");
-        if ( length(d) < 0 )
-            throw InvalidParameter(prop->name()+":dimension[",d,"] must be >= 0");
-    }
-}
-
-
-void Space::setLength(unsigned int d, const real v)
-{
-    //std::clog << "Space `" << prop->name() << "' length[" << d << "] = " << v << "\n";
-    if ( d < DMAX )
-    {
-        mLength[d]    = v;
-        mLengthSqr[d] = v*v;
-    }
-    else
-        throw InvalidParameter("exceeded space:dimension hard-coded limits");
-}
-
-
-void Space::resize(unsigned int d, const real v)
-{
-    setLength(d, v);
-    //std::cerr << " dim[" << d << "] = " << mLength[d] << std::endl;
-    resize();
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark - Random Places
@@ -214,7 +146,7 @@ bool Space::allOutside(Vector const& cen, const real rad) const
 /**
 this code is equivalent to SpaceInflate::project(), with a negative radius
  */
-Vector Space::project(Vector const& pos, const real rad) const
+Vector Space::projectDeflated(Vector const& pos, const real rad) const
 {
     if ( rad < 0 )
         ABORT_NOW("radius should not be negative");
@@ -435,7 +367,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, 
 
 void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    Vector prj= project(pos, rad);
+    Vector prj = projectDeflated(pos, rad);
     Vector dir = pos - prj;
     real n = dir.normSqr();
     if ( n > 0 )
@@ -491,13 +423,18 @@ void Space::setInteraction(Interpolation const& pi, Meca & meca, real stiff, Con
 void Space::write(Outputter& out) const
 {
     out.put_line(" "+prop->shape+" ");
-    out.writeUInt16(DMAX);
-    for ( unsigned d = 0; d < DMAX; ++d )
-        out.writeFloat(mLength[d]);
+    out.writeUInt16(0);
 }
 
 
 void Space::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+}
+
+
+void Space::read_data(Inputter& in, real len[8])
 {
 #ifdef BACKWARD_COMPATIBILITY
 
@@ -507,8 +444,7 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
     if ( in.formatID() < 36 )
     {
         for ( unsigned d = 0; d < 3; ++d )
-            setLength(d, in.readFloat());
-        resize();
+            len[d] = in.readFloat();
         return;
     }
     
@@ -516,8 +452,7 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
     {
         unsigned n = in.readUInt8();
         for ( unsigned d = 0; d < n; ++d )
-            setLength(d, in.readFloat());
-        resize();
+            len[d] = in.readFloat();
         return;
     }
     
@@ -551,10 +486,9 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
 #endif
         n = in.readUInt16();
     
+    n = std::min(n, 8U);
     for ( unsigned d = 0; d < n; ++d )
-        setLength(d, in.readFloat());
-    
-    resize();
+        len[d] = in.readFloat();
 }
 
 //------------------------------------------------------------------------------

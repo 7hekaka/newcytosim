@@ -36,11 +36,11 @@ class SpaceForce : public Space
 public:
     
     ///creator
-    SpaceForce(const SpaceProp*, Glossary&);
+    SpaceForce(const SpaceProp*);
     
-    /// check number and validity of specified lengths
-    void        resize() { Space::checkLengths(DIM, false); }
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -70,7 +70,7 @@ public:
     
     /// OpenGL display function; returns true if successful
     bool        draw() const;
-    
+
 };
 
 #endif

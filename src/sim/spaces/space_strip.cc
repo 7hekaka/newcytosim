@@ -3,6 +3,8 @@
 #include "space_strip.h"
 #include "exceptions.h"
 #include "mecapoint.h"
+#include "iowrapper.h"
+#include "glossary.h"
 #include "meca.h"
 
 
@@ -13,27 +15,26 @@ SpaceStrip::SpaceStrip(const SpaceProp* p)
         throw InvalidParameter("strip is not usable in 1D");
 }
 
+void SpaceStrip::resize(Glossary& opt)
+{
+    opt.set(length_, 3, "length");
+    
+    for ( int d = 0; d < DIM; ++d )
+        if ( length_[d] <= 0 )
+            throw InvalidParameter("strip:length_[] must be > 0");
+}
 
 void SpaceStrip::setModulo(Modulo& mod) const
 {
     for ( int d = 0; d < DIM-1; ++d )
-        mod.enable(d, length(d));
-}
-
-
-void SpaceStrip::resize()
-{
-    checkLengths(DIM-1, true);
-    
-    if ( length(DIM-1) < 0 )
-        throw InvalidParameter("strip:dimension[DIM-1] must be >= 0");
+        mod.enable(d, length_[d]);
 }
 
 
 void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length(0),-length(1),-length(2));
-    sup.set( length(0), length(1), length(2));
+    inf.set(-length_[0],-length_[1],-length_[2]);
+    sup.set( length_[0], length_[1], length_[2]);
 }
 
 //------------------------------------------------------------------------------
@@ -44,20 +45,20 @@ void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 
 real SpaceStrip::volume() const
 {
-    return 2.0 * length(0);
+    return 2.0 * length_[0];
 }
 
 bool  SpaceStrip::inside(Vector const& point) const
 {
-    if ( point[0] >  length(0) ) return false;
-    if ( point[0] < -length(0) ) return false;
+    if ( point[0] >  length_[0] ) return false;
+    if ( point[0] < -length_[0] ) return false;
     return true;
 }
 
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
-    return Vector(std::copysign(length(0), pos.XX));
+    return Vector(std::copysign(length_[0], pos.XX));
 }
 
 #endif
@@ -69,20 +70,20 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 real SpaceStrip::volume() const
 {
-    return 4.0 * length(0) * length(1);
+    return 4.0 * length_[0] * length_[1];
 }
 
 bool  SpaceStrip::inside(Vector const& point) const
 {
-    if ( point[1] >  length(1) ) return false;
-    if ( point[1] < -length(1) ) return false;
+    if ( point[1] >  length_[1] ) return false;
+    if ( point[1] < -length_[1] ) return false;
     return true;
 }
 
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
-    return Vector(pos.XX, std::copysign(length(1), pos.YY));
+    return Vector(pos.XX, std::copysign(length_[1], pos.YY));
 }
 
 #endif
@@ -93,19 +94,19 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 real SpaceStrip::volume() const
 {
-    return 8.0 * length(0) * length(1) * length(2);
+    return 8.0 * length_[0] * length_[1] * length_[2];
 }
 
 bool  SpaceStrip::inside(Vector const& point) const
 {
-    if ( point[2] >  length(2) ) return false;
-    if ( point[2] < -length(2) ) return false;
+    if ( point[2] >  length_[2] ) return false;
+    if ( point[2] < -length_[2] ) return false;
     return true;
 }
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
-    return Vector(pos.XX, pos.YY, std::copysign(length(2), pos.ZZ));
+    return Vector(pos.XX, pos.YY, std::copysign(length_[2], pos.ZZ));
 }
 
 #endif
@@ -119,9 +120,9 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & m
     meca.mC(inx, inx) -= stiff;
 
 #if ( DIM == 2 )
-    meca.base(inx) += stiff * std::copysign(length(1), pos.YY);
+    meca.base(inx) += stiff * std::copysign(length_[1], pos.YY);
 #elif ( DIM > 2 )
-    meca.base(inx) += stiff * std::copysign(length(2), pos.ZZ);
+    meca.base(inx) += stiff * std::copysign(length_[2], pos.ZZ);
 #endif
 }
 
@@ -133,11 +134,37 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad
     meca.mC(inx, inx) -= stiff;
 
 #if ( DIM == 2 )
-    meca.base(inx) += stiff * std::copysign(length(1)-rad, pos.YY);
+    meca.base(inx) += stiff * std::copysign(length_[1]-rad, pos.YY);
 #elif ( DIM > 2 )
-    meca.base(inx) += stiff * std::copysign(length(2)-rad, pos.ZZ);
+    meca.base(inx) += stiff * std::copysign(length_[2]-rad, pos.ZZ);
 #endif
 }
+
+//------------------------------------------------------------------------------
+
+void SpaceStrip::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(3);
+    out.writeFloat(length_[0]);
+    out.writeFloat(length_[1]);
+    out.writeFloat(length_[2]);
+}
+
+
+void SpaceStrip::setLengths(const real len[])
+{
+    length_[0] = len[0];
+    length_[1] = len[1];
+    length_[2] = len[2];
+}
+
+void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+}
+
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
@@ -151,9 +178,9 @@ using namespace gle;
 
 bool SpaceStrip::draw() const
 {
-    const real X = length(0);
-    const real Y = ( DIM > 1 ) ? length(1) : 1;
-    const real Z = ( DIM > 2 ) ? length(2) : 0;
+    const real X = length_[0];
+    const real Y = ( DIM > 1 ) ? length_[1] : 1;
+    const real Z = ( DIM > 2 ) ? length_[2] : 0;
     
 #if ( DIM > 2 )
     // draw faces:

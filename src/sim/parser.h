@@ -91,14 +91,14 @@ public:
     void      parse_end(std::istream&);
 
     
-    /// Parse stream
-    void      parse(std::istream&);
+    /// Parse content of stream
+    void      evaluate(std::istream&);
 
     /// Parse stream, using `msg` to report errors
-    void      parse(std::istream&, std::string const& msg);
+    void      evaluate(std::istream&, std::string const& msg);
 
     /// Parse code, using `msg` to report errors
-    void      parse(std::string const&, std::string const& msg);
+    void      evaluate(std::string const&, std::string const& msg);
 
     //-------------------------------------------------------------------------------
 

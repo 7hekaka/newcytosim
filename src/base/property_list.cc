@@ -43,7 +43,8 @@ void PropertyList::deposit(Property * p)
 void PropertyList::remove(Property const* val)
 {
     const_iterator last = vec_.end();
-    for (iterator i = vec_.begin(); i != last; ++i) {
+    for (iterator i = vec_.begin(); i != last; ++i)
+    {
         if ( *i == val )
         {
             vec_.erase(i);

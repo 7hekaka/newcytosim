@@ -321,14 +321,14 @@ void Sphere::setDragCoefficientPiston()
     assert_true( prop->confine_space_ptr );
     
     const real rad = spRadius;
-    real cell_radius = prop->confine_space_ptr->length(1);
+    real cell_radius = prop->confine_space_ptr->radius();
     real eps  = ( cell_radius - rad ) / rad;
     
     if ( eps <= 0 )
-        throw InvalidParameter("Error: piston formula invalid if sphere is larger than the cell");
+        throw InvalidParameter("Error: piston formula yield invalid value");
 
     if ( eps > 1 )
-        throw InvalidParameter("Error: piston formula invalid if sphere and cylinder do not fit");
+        throw InvalidParameter("Error: piston formula yield invalid value");
 
     spDrag    = 9*M_PI*M_PI * prop->viscosity * rad * M_SQRT2 / ( 4 * pow(eps,2.5) );
     spDragRot = 2*M_PI*M_PI * prop->viscosity * rad * rad * rad * sqrt(2.0/eps);

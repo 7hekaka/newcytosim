@@ -6,13 +6,16 @@
 #include "meca.h"
 
 
-SpaceForce::SpaceForce(const SpaceProp* p, Glossary& opt)
+SpaceForce::SpaceForce(const SpaceProp* p)
 : Space(p)
 {
     force.reset();
     center.reset();
     stiffness = 0;
-    
+}
+
+void SpaceForce::resize(Glossary& opt)
+{
     opt.set(force, "force");
     opt.set(center, "center");
     opt.set(stiffness, "stiffness");

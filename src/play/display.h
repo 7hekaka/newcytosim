@@ -157,13 +157,13 @@ public:
     
         
     /// find an individual color
-    void bodyColor(PointDisp const*, ObjectID) const;
+    void bodyColor(PointDisp const*, unsigned) const;
     
     /// find an individual color
-    void bodyColor2(PointDisp const*, ObjectID) const;
+    void bodyColor2(PointDisp const*, unsigned) const;
 
     /// find an individual color that may be transparent
-    void bodyColorT(PointDisp const*, ObjectID) const;
+    void bodyColorT(PointDisp const*, unsigned) const;
 
     /// set OpenGL line width
     void lineWidth(real w) const { glLineWidth(std::max((GLfloat)(w*uFactor), 0.25f)); }

@@ -107,10 +107,10 @@ void Glossary::clear_except(key_type const& key)
 
 void Glossary::clear_counts() const
 {
-    for ( pair_type const& i : mTerms )
+    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
     {
-        for ( size_t v = 0; v < i.second.size(); ++v )
-            i.second[v].count_ = 0;
+        for ( val_type const& v : i->second )
+            v.count_ = 0;
     }
 }
 
@@ -123,6 +123,23 @@ Glossary Glossary::extract(key_type const& key) const
     if ( w != mTerms.end() )
         res.mTerms[key] = w->second;
     
+    return res;
+}
+
+
+Glossary Glossary::extract_unused() const
+{
+    Glossary res;
+    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
+    {
+        bool used = false;
+        for ( val_type const& v : i->second )
+            if ( v.count_ == 0 )
+                used = true;
+        
+        if ( !used )
+            res.mTerms[i->first] = i->second;
+    }
     return res;
 }
 
@@ -162,15 +179,15 @@ Glossary::rec_type const* Glossary::values(key_type const& key) const
 }
 
 
-std::string Glossary::value(key_type const& key, unsigned indx) const
+std::string Glossary::value(key_type const& key, unsigned inx) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
     {
-        if ( indx < w->second.size() )
+        if ( inx < w->second.size() )
         {
-            w->second[indx].count_++;
-            return w->second[indx].value_;
+            w->second[inx].count_++;
+            return w->second[inx].value_;
         }
     }
     return "";
@@ -181,16 +198,16 @@ std::string Glossary::value(key_type const& key, unsigned indx) const
  This is equivalement to value(key, indx) == val, except
  that the counter is incremented only if there is a match
  */
-bool Glossary::value_is(key_type const& key, unsigned indx, std::string const& val) const
+bool Glossary::value_is(key_type const& key, unsigned inx, std::string const& val) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
     {
-        if ( indx < w->second.size() )
+        if ( inx < w->second.size() )
         {
-            if ( w->second[indx].value_ == val )
+            if ( w->second[inx].value_ == val )
             {
-                w->second[indx].count_++;
+                w->second[inx].count_++;
                 return true;
             }
         }
@@ -620,9 +637,9 @@ void Glossary::write_counts(std::ostream& os, std::string const& prefix, Glossar
 
 void Glossary::write(std::ostream& os, std::string const& prefix) const
 {
-    for ( pair_type const& i : mTerms )
+    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
     {
-        write(os, prefix, i);
+        write(os, prefix, *i);
         std::endl(os);
     }
 }
@@ -704,8 +721,8 @@ int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, unsign
 int Glossary::warnings(std::ostream& os, unsigned threshold) const
 {
     int res = 0;
-    for ( pair_type const& i : mTerms )
-        res |= warnings(os, i, threshold);
+    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
+        res |= warnings(os, *i, threshold);
     return res;
 }
 

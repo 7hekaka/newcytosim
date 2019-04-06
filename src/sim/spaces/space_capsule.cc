@@ -1,33 +1,47 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "dim.h"
 #include "space_capsule.h"
-#include "mecapoint.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "mecapoint.h"
 #include "meca.h"
 
 
 
 SpaceCapsule::SpaceCapsule(const SpaceProp* p)
-: Space(p), length(mLength[0]), radius(mLength[1]), radiusSqr(mLengthSqr[1])
+: Space(p)
 {
     if ( DIM == 1 )
-        throw InvalidParameter("capsule is only defined for DIM = 2 or 3");
+        throw InvalidParameter("capsule is only defined for DIM = 2 and 3");
+}
+
+
+void SpaceCapsule::resize(Glossary& opt)
+{
+    opt.set(length_, "length");
+    opt.set(radius_, "radius");
+
+    if ( length_ < 0 )
+        throw InvalidParameter("capsule:length must be >= 0");
+
+    if ( radius_ < 0 )
+        throw InvalidParameter("capsule:radius must be >= 0");
 }
 
 
 void SpaceCapsule::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-radius-length,-radius,-radius);
-    sup.set( radius+length, radius, radius);
+    inf.set(-radius_-length_,-radius_,-radius_);
+    sup.set( radius_+length_, radius_, radius_);
 }
 
 
 real SpaceCapsule::volume() const
 {
 #if ( DIM >= 3 )
-    return ( length + (2/3.0) * radius ) * radiusSqr * ( 2 * M_PI );
+    return ( length_ + (2/3.0) * radius_ ) * radiusSqr_ * ( 2 * M_PI );
 #else
-    return 4 * length * radius + M_PI * radiusSqr;
+    return 4 * length_ * radius_ + M_PI * radiusSqr_;
 #endif
 }
 
@@ -43,10 +57,10 @@ bool SpaceCapsule::inside(Vector const& w) const
 #endif
     real x = fabs(w.XX);
     
-    if ( x > length )
-        nrm += square( x - length );
+    if ( x > length_ )
+        nrm += square( x - length_ );
     
-    return ( nrm <= radiusSqr );
+    return ( nrm <= radiusSqr_ );
 }
 
 
@@ -62,10 +76,10 @@ bool SpaceCapsule::allInside(Vector const& w, const real rad) const
 #endif
     real x = fabs(w.XX);
     
-    if ( x > length )
-        nrm += square( x - length );
+    if ( x > length_ )
+        nrm += square( x - length_ );
     
-    return ( nrm <= square(radius-rad) );
+    return ( nrm <= square(radius_-rad) );
 }
 
 //------------------------------------------------------------------------------
@@ -75,19 +89,19 @@ Vector SpaceCapsule::project(Vector const& w) const
     real nrm = w.normYZ();
     
     //calculate the projection on the axis, within boundaries:
-    if ( fabs(w.XX) > length )
+    if ( fabs(w.XX) > length_ )
     {
-        real L = std::copysign(length, w.XX);
+        real L = std::copysign(length_, w.XX);
         nrm  += square( w.XX - L );
         //normalize from this point on the axis
-        if ( nrm > 0 ) nrm = radius / sqrt( nrm );
+        if ( nrm > 0 ) nrm = radius_ / sqrt( nrm );
         
-        p.XX = length + nrm * ( w.XX - L );
+        p.XX = length_ + nrm * ( w.XX - L );
     }
     else
     {
         //normalize from this point on the axis
-        if ( nrm > 0 ) nrm = radius / sqrt( nrm );
+        if ( nrm > 0 ) nrm = radius_ / sqrt( nrm );
         
         p.XX = w.XX;
     }
@@ -105,7 +119,7 @@ Vector SpaceCapsule::project(Vector const& w) const
     {
         //we project on a arbitrary point on the cylinder
 #if ( DIM > 1 )
-        p.YY = radius;
+        p.YY = radius_;
 #endif
 #if ( DIM >= 3 )
         p.ZZ = 0;
@@ -125,12 +139,12 @@ Vector SpaceCapsule::randomPlace() const
     do {
         
 #if ( DIM == 1 )
-        res.set((length+radius)*RNG.sreal());
+        res.set((length_+radius_)*RNG.sreal());
 #elif ( DIM == 2 )
-        res.set((length+radius)*RNG.sreal(), radius*RNG.sreal());
+        res.set((length_+radius_)*RNG.sreal(), radius_*RNG.sreal());
 #else
-        Vector2 sec = Vector2::randB(radius);
-        res.set((length+radius)*RNG.sreal(), sec.XX, sec.YY);
+        Vector2 sec = Vector2::randB(radius_);
+        res.set((length_+radius_)*RNG.sreal(), sec.XX, sec.YY);
 #endif
         
         if ( ++ouf > nb_trials )
@@ -163,7 +177,7 @@ void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
  */
 void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length, radius);
+    setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
 
 /**
@@ -171,10 +185,34 @@ void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
  */
 void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    if ( rad < radius )
-        setInteraction(pos, pe, meca, stiff, length, radius-rad);
+    if ( rad < radius_ )
+        setInteraction(pos, pe, meca, stiff, length_, radius_-rad);
     else
-        setInteraction(pos, pe, meca, stiff, length, 0);
+        setInteraction(pos, pe, meca, stiff, length_, 0);
+}
+
+//------------------------------------------------------------------------------
+
+void SpaceCapsule::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(2);
+    out.writeFloat(length_);
+    out.writeFloat(radius_);
+}
+
+
+void SpaceCapsule::setLengths(const real len[])
+{
+    length_ = len[0];
+    radius_ = len[1];
+    update();
+}
+
+void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
 }
 
 
@@ -194,8 +232,8 @@ bool SpaceCapsule::draw() const
     GLfloat c[4*fin+1], s[4*fin+1];
     gle::circle(4*fin, c, s, 1);
     
-    GLfloat L = (GLfloat)length;
-    GLfloat R = (GLfloat)radius;
+    GLfloat L = (GLfloat)length_;
+    GLfloat R = (GLfloat)radius_;
     
 #if ( DIM <= 2 )
     

@@ -20,8 +20,7 @@ class Bead;
  */
 
 class SpaceBeads : public Space
-{
-
+{    
     typedef Array<Bead*> BeadList;
     
     BeadList        mBeads;
@@ -36,10 +35,10 @@ public:
 
     /// constructor
     SpaceBeads(SpaceProp const*);
-    
-    /// length have changed
-    void        resize();
-    
+
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -63,7 +62,7 @@ public:
     
     /// OpenGL display function; returns true if successful
     bool        draw() const;
-    
+
 };
 
 #endif

@@ -1,49 +1,30 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "event_set.h"
-#include "event_prop.h"
 #include "iowrapper.h"
 #include "glossary.h"
 #include "simul.h"
 
-//------------------------------------------------------------------------------
-
-void EventSet::prepare()
-{
-    for ( Event * f=first(); f; f=f->next() )
-    {
-        f->prepare();
-    }
-}
-
 
 void EventSet::step()
 {
-    for ( Event * f=first(); f; f=f->next() )
-    {
-        f->step();
-    }
+    for ( Event * e=first(); e; e=e->next() )
+        e->step(simul);
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
 
 Property* EventSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
 {
-    if ( kd == "event" )
-        return new EventProp(nm);
     return nullptr;
 }
 
 
 Object * EventSet::newObjectT(const ObjectTag tag, unsigned idx)
 {
+    Event * e = nullptr;
     if ( tag == Event::TAG )
-    {
-        EventProp * p = simul.findProperty<EventProp>("event", idx);
-        return p->newEvent();
-    }
-    return nullptr;
+        e = new Event();
+    return e;
 }
 
 
@@ -58,13 +39,12 @@ Object * EventSet::newObjectT(const ObjectTag tag, unsigned idx)
 
      }
  */
-ObjectList EventSet::newObjects(const std::string& name, Glossary& opt)
+ObjectList EventSet::newObjects(const std::string&, Glossary& opt)
 {
-    EventProp * p = simul.findProperty<EventProp>("event", name);
-    Event * obj = p->newEvent();
-
     ObjectList res;
-    res.push_back(obj);
+    Event * e = new Event();
+    e->initialize(simul.time(), opt);
+    res.push_back(e);
     return res;
 }
 

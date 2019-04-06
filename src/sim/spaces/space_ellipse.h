@@ -12,35 +12,43 @@
 /**
  The ellipse/ellipsoid is aligned with the principal axes X, Y and Z.
  
-    ellipse sizeX sizeY sizeZ
-
- With:
- - sizeX = half length of X axis
- - sizeY = half length of Y axis
- - sizeZ = half length of Z axis
- .
+ Parameters:
+     - length = half length of X, Y and Z axis
+     .
  
  The projection of one point on the surface of the ellipse is done numerically. 
  In 3D this is the only solution if the 3 axes have different length.
  setInteraction() relies on project() and thus uses the tangent plane at the
  projection point to approximate the confinement force.
+
+ @ingroup SpaceGroup
  */
 
 class SpaceEllipse : public Space
 {
+protected:
+
+    /// dimensions
+    real length_[3];
+  
+    /// dimensions squared
+    real lengthSqr_[3];
+
 #ifdef HAS_SPHEROID
     /// indicates that two axes are equal
     int mSpheroid;
 #endif
+    
+    void update();
     
 public:
         
     /// creator
     SpaceEllipse(const SpaceProp*);
         
-    /// check number and validity of specified lengths
-    void        resize();
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -76,7 +84,17 @@ public:
     
     
     /// OpenGL display function; returns true if successful
-    bool       draw() const;
+    bool        draw() const;
+    
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
     
 };
 

@@ -4,6 +4,7 @@
 
 #include "real.h"
 #include "property.h"
+#include "glossary.h"
 #include "vector.h"
 
 class PointDisp;
@@ -22,8 +23,8 @@ class SpaceProp : public Property
 {
     friend class Space;
     
-    /// create a new Space
-    static Space * newSpace(SpaceProp const*, Glossary&);
+    /// create a new, uninitialized, Space
+    Space * newSpace() const;
 
 public:
 
@@ -33,18 +34,9 @@ public:
      @{
     */
     
-    /// shape followed by parameters (see @ref SpaceGroup)
-    std::string  geometry;
-    
-    /// primitive (e.g. `rectangle`), derived from `geometry`
+    /// primitive (e.g. `rectangle`)
     std::string  shape;
     
-    /// file name used to specify shape (the second word in `geometry`)
-    std::string  shape_spec;
-
-    /// sizes derived from `geometry`
-    std::string  dimensions;
-
     /// display string (see @ref PointDispPar)
     std::string  display;
     
@@ -66,11 +58,11 @@ public:
     
     /// @}
     
+    /// BACKWARD_COMPATIBILITY
+    std::string  dimensions;
+    
     /// equal to time_step / viscosity
     real         mobility_dt, mobility_rot_dt;
-    
-    /// derived variable: a copy of `dimensions`
-    std::string  dimensions_old;
     
     /// derived variable: flag to indicate that `display` has a new value
     bool         display_fresh;

@@ -211,6 +211,9 @@ public:
     
     /// create a new Glossary with only the given key
     Glossary     extract(key_type const&) const;
+    
+    /// create a new Glossary with terms that were not used
+    Glossary     extract_unused() const;
 
     /// return number of values associated with a key
     size_t       nb_values(key_type const&) const;

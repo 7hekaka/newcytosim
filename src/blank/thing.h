@@ -31,7 +31,14 @@ public:
     void step();
     
     /// draw using OpenGL
-    void draw() const;
+    void     bool        draw() const;
+    
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
     
     ///record state to FILE, the current time is provided
     void write(FILE*, real time) const;

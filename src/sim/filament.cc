@@ -1142,8 +1142,8 @@ void Filament::segmentationVariance(real& avg, real& var) const
         avg += r;
         var += r*r;
     }
-    var = var - avg * avg / cnt;
     avg /= cnt;
+    var = var / cnt - avg * avg;
 }
 
 /**
@@ -1866,7 +1866,7 @@ void Filament::read(Inputter & in, Simul& sim, ObjectTag tag)
 {
     //Cytosim::log << "  reading Filament at " << in.pos() << '\n';
     
-    unsigned s = in.readUInt32();
+    ObjectSignature s = in.readUInt32();
     if ( s ) signature(s);
     
     real len    = in.readFloat();

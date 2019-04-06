@@ -81,38 +81,38 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// a reference to the Hand
-    Hand const*  hand()                          const  { return sHand; }
+    /// associated Hand
+    Hand*  hand()                              { return sHand; }
     
     /// sHand->attached()
-    bool    attached()                           const  { return sHand->attached(); }
+    bool    attached()                  const  { return sHand->attached(); }
     
     /// sHand->attached()
-    int     state()                              const  { return sHand->attached(); }
+    int     state()                     const  { return sHand->attached(); }
 
     /// Fiber to which this is attached
-    Fiber*  fiber()                              const  { return sHand->fiber(); }
+    Fiber*  fiber()                     const  { return sHand->fiber(); }
     
     /// attachment position of Hand along fiber (call is invalid if Hand is not attached)
-    real    abscissa()                           const  { return sHand->abscissa(); }
+    real    abscissa()                  const  { return sHand->abscissa(); }
     
     /// position of the Hand (call is invalid if Hand is not attached)
-    Vector  posHand()                            const  { return sHand->pos(); }
+    Vector  posHand()                   const  { return sHand->pos(); }
     
     /// direction of Fiber at attachment point (call is invalid if Hand is not attached)
-    Vector  dirFiber()                           const  { return sHand->dirFiber(); }
+    Vector  dirFiber()                  const  { return sHand->dirFiber(); }
     
     /// attach Hand at the given site
-    void    attach(FiberSite const& fb)                 { sHand->attach(fb); }
+    void    attach(FiberSite const& fb)        { sHand->attach(fb); }
     
     /// attach Hand at given Fiber end
-    void    attachEnd(Fiber * f, FiberEnd end)          { sHand->attachEnd(f, end); }
+    void    attachEnd(Fiber * f, FiberEnd end) { sHand->attachEnd(f, end); }
 
     /// move Hand at given end
-    void    moveToEnd(FiberEnd end)                     { sHand->moveToEnd(end); }
+    void    moveToEnd(FiberEnd end)            { sHand->moveToEnd(end); }
     
     /// detach
-    void    detach()                                    { sHand->detach(); }
+    void    detach()                           { sHand->detach(); }
 
     //--------------------------------------------------------------------------
     
@@ -120,13 +120,13 @@ public:
     virtual Vector  position() const;
     
     /// Single can be translated only if it is not attached
-    virtual int     mobile()                     const  { return !sHand->attached(); }
+    virtual int     mobile()              const  { return !sHand->attached(); }
     
     /// translate object's position by the given vector
-    virtual void    translate(Vector const& x)          { sPos += x; }
+    virtual void    translate(Vector const& x)   { sPos += x; }
     
     /// move object to specified position
-    virtual void    setPosition(Vector const& x)        { sPos = x; }
+    virtual void    setPosition(Vector const& x) { sPos = x; }
 
     /// modulo the position of the grafted
     virtual void    foldPosition(const Modulo * s);
@@ -137,19 +137,19 @@ public:
     //--------------------------------------------------------------------------
     
     /// the position of the anchoring point
-    virtual Vector  posFoot()                    const  { return sPos; }
+    virtual Vector  posFoot()             const  { return sPos; }
     
     /// position on the side of fiber used for sideInteractions
-    virtual Vector  posSide()                    const  { return sHand->pos(); }
+    virtual Vector  posSide()             const  { return sHand->pos(); }
     
     /// the Mecable to which this is anchored, or zero
-    virtual Mecable const* base()                const  { return nullptr; }
+    virtual Mecable const* base()         const  { return nullptr; }
     
     /// true if Single creates an interaction
-    virtual bool    hasForce() const                    { return false; }
+    virtual bool    hasForce() const             { return false; }
 
     /// force = stiffness * ( position_anchor - position_hand ), or zero for a diffusible Single
-    virtual Vector  force()                      const  { return Vector(0,0,0); }
+    virtual Vector  force()               const  { return Vector(0,0,0); }
 
     /// Monte-Carlo step if the Hand is not attached
     virtual void    stepF(const FiberGrid&);

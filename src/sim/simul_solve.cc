@@ -215,51 +215,54 @@ void Simul::setInteractions(Meca & meca) const
     // prepare the meca, and register Mecables
     meca.clear();
     
-    for ( Fiber  * mt= fibers.first(); mt ; mt=mt->next() )
-        meca.add(mt);
-    for ( Solid  * so= solids.first(); so ; so=so->next() )
-        meca.add(so);
-    for ( Sphere * se=spheres.first(); se ; se=se->next() )
-        meca.add(se);
-    for ( Bead   * bd=  beads.first(); bd ; bd=bd->next() )
-        meca.add(bd);
+    for ( Fiber  * f= fibers.first(); f ; f=f->next() )
+        meca.add(f);
+    for ( Solid  * s= solids.first(); s ; s=s->next() )
+        meca.add(s);
+    for ( Sphere * o=spheres.first(); o ; o=o->next() )
+        meca.add(o);
+    for ( Bead   * b=  beads.first(); b ; b=b->next() )
+        meca.add(b);
     
     meca.prepare(prop);
     
     // add interactions for all objects:
     
-    for ( Space * sp=spaces.first(); sp; sp=sp->next() )
-        sp->setInteractions(meca, fibers);
+    for ( Space * s=spaces.first(); s; s=s->next() )
+        s->setInteractions(meca, fibers);
     
-    for ( Fiber * mt=fibers.first(); mt ; mt=mt->next() )
-        mt->setInteractions(meca);
+    for ( Fiber * f=fibers.first(); f ; f=f->next() )
+        f->setInteractions(meca);
     
-    for ( Solid * so=solids.first(); so ; so=so->next() )
-        so->setInteractions(meca);
+    for ( Solid * s=solids.first(); s ; s=s->next() )
+        s->setInteractions(meca);
     
-    for ( Sphere * sp=spheres.first(); sp ; sp=sp->next() )
-        sp->setInteractions(meca);
+    for ( Sphere * o=spheres.first(); o ; o=o->next() )
+        o->setInteractions(meca);
     
-    for ( Bead * bd=beads.first(); bd ; bd=bd->next() )
-        bd->setInteractions(meca);
+    for ( Bead * b=beads.first(); b ; b=b->next() )
+        b->setInteractions(meca);
 
-    for ( Single * si=singles.firstA(); si ; si=si->next() )
-        si->setInteractions(meca);
+    for ( Single * i=singles.firstA(); i ; i=i->next() )
+        i->setInteractions(meca);
 
-    for ( Couple * cx=couples.firstAA(); cx ; cx=cx->next() )
-        cx->setInteractions(meca);
+    for ( Couple * c=couples.firstAA(); c ; c=c->next() )
+        c->setInteractions(meca);
 
 #ifdef NEW_DANGEROUS_CONFINEMENTS
-    for ( Couple * cx=couples.firstAF(); cx ; cx=cx->next() )
-        cx->setInteractionsAF(meca);
+    for ( Couple * c=couples.firstAF(); c ; c=c->next() )
+        c->setInteractionsAF(meca);
 
-    for ( Couple * cx=couples.firstFA(); cx ; cx=cx->next() )
-        cx->setInteractionsFA(meca);
+    for ( Couple * c=couples.firstFA(); c ; c=c->next() )
+        c->setInteractionsFA(meca);
 #endif
     
-    for ( Organizer * as = organizers.first(); as; as=as->next() )
-        as->setInteractions(meca);
-    
+    for ( Organizer * a = organizers.first(); a; a=a->next() )
+        a->setInteractions(meca);
+
+    //for ( Event * e = events.first(); e; e=e->next() )
+    //    e->setInteractions(meca);
+
     // add steric interactions
     if ( prop->steric && sSpace )
         setStericInteractions(meca);

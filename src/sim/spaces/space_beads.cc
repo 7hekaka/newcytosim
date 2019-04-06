@@ -23,12 +23,14 @@ SpaceBeads::SpaceBeads(const SpaceProp* p)
 /**
  refresh the list of Beads 
  */
-void SpaceBeads::resize()
+void SpaceBeads::resize(Glossary& opt)
 {
     if ( objset() )
     {
+        std::string name;
+        opt.set(name, "bead");
         Simul const& sim = simul();
-        Property * bip = sim.properties.find("bead", prop->shape_spec);
+        Property * bip = sim.properties.find("bead", name);
 
         mBeads.clear();
         if ( !bip )
@@ -82,7 +84,6 @@ void SpaceBeads::setBoundaries()
 
 void SpaceBeads::step()
 {
-    resize();
     setBoundaries();
 }
 

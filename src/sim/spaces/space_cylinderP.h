@@ -5,19 +5,16 @@
 #include "space.h"
 #include "modulo.h"
 
-///a cylinder of axis X that is periodic along X
+/// a periodic cylinder aligned with X
 /**
  Space `cylinderP` is a cylinder with periodic boundary conditions
  along the X-axis. It has no ends and loops on itself like a torus,
  but without the curvature.
 
-    cylinderP length radius
-
- With:
- - length = half-length of the cylinder along X
- - radius = radius of the cylinder
- .
- 
+ Parameters:
+     - length = half-length of the cylinder along X
+     - radius = radius of the cylinder
+     .
 
  @ingroup SpaceGroup
  */
@@ -25,26 +22,29 @@ class SpaceCylinderP : public Space
 {
 private:
     
-    /// half the length of the central cylinder (alias to mLength[0])
-    real &      length;
+    /// half the length of the central cylinder
+    real  length_;
     
-    /// the radius of the cylinder (alias to mLength[1])
-    real &      radius;
+    /// the radius of the cylinder
+    real  radius_;
 
 public:
         
     ///creator
     SpaceCylinderP(const SpaceProp*);
-    
-    /// check number and validity of specified lengths
-    void        resize();
-    
+
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// initialize Modulo Object
     void        setModulo(Modulo&) const;
     
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
+    /// radius
+    real        radius() const { return radius_; }
+
     /// the volume inside
     real        volume() const;
     
@@ -71,6 +71,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

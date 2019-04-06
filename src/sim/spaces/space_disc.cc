@@ -3,23 +3,34 @@
 #include "dim.h"
 #include "space_disc.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "glossary.h"
 #include "random.h"
 #include "meca.h"
 
 
 SpaceDisc::SpaceDisc(const SpaceProp* p)
-: Space(p), radius(mLength[0])
+: Space(p)
 {
     if ( DIM != 2 )
         throw InvalidParameter("disc is only usable in 2D");
-    rForce = 0;
+    radius_ = 0;
+    force_  = 0;
+}
+
+
+void SpaceDisc::resize(Glossary& opt)
+{
+    opt.set(radius_, "radius");
+    if ( radius_ < 0 )
+        throw InvalidParameter("disc:radius must be >= 0");
 }
 
 
 void SpaceDisc::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-radius,-radius,-radius);
-    sup.set( radius, radius, radius);
+    inf.set(-radius_,-radius_,-radius_);
+    sup.set( radius_, radius_, radius_);
 }
 
 
@@ -46,12 +57,12 @@ Vector SpaceDisc::project(Vector const&) const
 
 real SpaceDisc::volume() const
 {
-    return M_PI * radius * radius;
+    return M_PI * radius_ * radius_;
 }
 
 bool SpaceDisc::inside(Vector const& pos) const
 {
-    return pos.normSqr() <= radius * radius;
+    return pos.normSqr() <= radius_ * radius_;
 }
 
 Vector SpaceDisc::project(Vector const& pos) const
@@ -59,11 +70,11 @@ Vector SpaceDisc::project(Vector const& pos) const
     real n = pos.normSqr();
     
     if ( n > 0 ) {
-        return pos * ( radius / sqrt(n) );
+        return pos * ( radius_ / sqrt(n) );
     }
     else {
         //select a random point on the surface
-        return radius * Vector::randU();
+        return radius_ * Vector::randU();
     }
 }
 
@@ -74,37 +85,60 @@ Vector SpaceDisc::project(Vector const& pos) const
 /// add interactions to a Meca
 void SpaceDisc::setInteractions(Meca &, FiberSet const&) const
 {
-    rForce = 0;
+    force_ = 0;
 }
 
 
 void SpaceDisc::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius, stiff);
-    rForce += stiff * ( pos.norm() - radius );
+    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
+    force_ += stiff * ( pos.norm() - radius_ );
 }
 
 
 void SpaceDisc::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    if ( radius > rad )
+    if ( radius_ > rad )
     {
-        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius-rad, stiff);
-        rForce += stiff * ( rad + pos.norm() - radius );
+        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
+        force_ += stiff * ( rad + pos.norm() - radius_ );
     }
     else {
         meca.addPointClamp( pe, Vector(0,0,0), stiff );
         std::cerr << "object is too big to fit in SpaceDisc\n";
-        rForce += 2 * stiff * ( rad - radius );
+        force_ += 2 * stiff * ( rad - radius_ );
     }
 }
 
 
 void SpaceDisc::step()
 {
-    real dr = prop->mobility_dt * rForce;
-    //std::clog << "SpaceDisc:  radius " << std::setw(12) << radius << " force " << rForce << " delta_radius " << dr << "\n";
-    radius += dr;
+    real dr = prop->mobility_dt * force_;
+    //std::clog << "SpaceDisc:  radius " << std::setw(12) << radius_ << " force " << force_ << " delta_radius " << dr << "\n";
+    radius_ += dr;
+}
+
+//------------------------------------------------------------------------------
+
+void SpaceDisc::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(2);
+    out.writeFloat(radius_);
+    out.writeFloat(force_);
+}
+
+
+void SpaceDisc::setLengths(const real len[])
+{
+    radius_ = len[0];
+    force_  = len[1];
+}
+
+void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
 }
 
 
@@ -119,7 +153,7 @@ bool SpaceDisc::draw() const
 
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     GLfloat cir[2*fin+2];
-    gle::circle(fin, cir, (GLfloat)radius);
+    gle::circle(fin, cir, (GLfloat)radius_);
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, cir);

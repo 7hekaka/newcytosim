@@ -94,52 +94,52 @@
      }
  
  */
-Space * SpaceProp::newSpace(SpaceProp const* sp, Glossary& opt)
+Space * SpaceProp::newSpace() const
 {
-    const std::string s = sp->shape;
+    const std::string& s = SpaceProp::shape;
     
-    if ( s=="rectangle" || s=="square" )       return new SpaceSquare(sp);
-    if ( s=="circle" || s=="sphere" )          return new SpaceSphere(sp);
-    if ( s=="polygon" )                        return new SpacePolygon(sp, opt);
-    if ( s=="polygonZ" )                       return new SpacePolygonZ(sp, opt);
-    if ( s=="capsule" || s=="spherocylinder" ) return new SpaceCapsule(sp);
-    if ( s=="banana" )                         return new SpaceBanana(sp);
-    if ( s=="torus" )                          return new SpaceTorus(sp);
-    if ( s=="dice" )                           return new SpaceDice(sp);
-    if ( s=="strip" || s=="half_periodic" )    return new SpaceStrip(sp);
-    if ( s=="periodic" )                       return new SpacePeriodic(sp);
-    if ( s=="ellipse" || s=="ellipsoid" )      return new SpaceEllipse(sp);
+    if ( s=="rectangle" || s=="square" )       return new SpaceSquare(this);
+    if ( s=="circle" || s=="sphere" )          return new SpaceSphere(this);
+    if ( s=="polygon" )                        return new SpacePolygon(this);
+    if ( s=="polygonZ" )                       return new SpacePolygonZ(this);
+    if ( s=="capsule" || s=="spherocylinder" ) return new SpaceCapsule(this);
+    if ( s=="banana" )                         return new SpaceBanana(this);
+    if ( s=="torus" )                          return new SpaceTorus(this);
+    if ( s=="dice" )                           return new SpaceDice(this);
+    if ( s=="strip" || s=="half_periodic" )    return new SpaceStrip(this);
+    if ( s=="periodic" )                       return new SpacePeriodic(this);
+    if ( s=="ellipse" || s=="ellipsoid" )      return new SpaceEllipse(this);
 #if ( DIM >= 3 )
-    if ( s=="cubic" )                          return new SpaceSquare(sp);
-    if ( s=="cylinder" )                       return new SpaceCylinder(sp);
-    if ( s=="cylinderZ" )                      return new SpaceCylinderZ(sp);
-    if ( s=="cylinderP" )                      return new SpaceCylinderP(sp);
+    if ( s=="cubic" )                          return new SpaceSquare(this);
+    if ( s=="cylinder" )                       return new SpaceCylinder(this);
+    if ( s=="cylinderZ" )                      return new SpaceCylinderZ(this);
+    if ( s=="cylinderP" )                      return new SpaceCylinderP(this);
 #elif ( DIM == 2 )
-    if ( s=="cylinder" )                       return new SpaceSquare(sp);
-    if ( s=="cylinderP" )                      return new SpaceStrip(sp);
+    if ( s=="cylinder" )                       return new SpaceSquare(this);
+    if ( s=="cylinderP" )                      return new SpaceStrip(this);
 #else
-    if ( s=="cylinder" )                       return new SpaceSquare(sp);
-    if ( s=="cylinderP" )                      return new SpacePeriodic(sp);
+    if ( s=="cylinder" )                       return new SpaceSquare(this);
+    if ( s=="cylinderP" )                      return new SpacePeriodic(this);
 #endif
-    if ( s=="ring" )                           return new SpaceRing(sp);
-    if ( s=="tee" )                            return new SpaceTee(sp);
+    if ( s=="ring" )                           return new SpaceRing(this);
+    if ( s=="tee" )                            return new SpaceTee(this);
 #if NEW_SPACES
-    if ( s=="mesh" )                           return new SpaceMesh(sp, opt);
-    if ( s=="force" )                          return new SpaceForce(sp, opt);
-    if ( s=="beads" )                          return new SpaceBeads(sp);
+    if ( s=="mesh" )                           return new SpaceMesh(this);
+    if ( s=="force" )                          return new SpaceForce(this);
+    if ( s=="beads" )                          return new SpaceBeads(this);
 #endif
 #if NEW_DYNAMIC_SPACES
-    if ( s=="lid" )                            return new SpaceLid(sp);
-    if ( s=="disc" )                           return new SpaceDisc(sp);
-    if ( s=="dynamic_sphere" )                 return new SpaceDynamicSphere(sp);
-    if ( s=="dynamic_ellipse" )                return new SpaceDynamicEllipse(sp);
+    if ( s=="lid" )                            return new SpaceLid(this);
+    if ( s=="disc" )                           return new SpaceDisc(this);
+    if ( s=="dynamic_sphere" )                 return new SpaceDynamicSphere(this);
+    if ( s=="dynamic_ellipse" )                return new SpaceDynamicEllipse(this);
     // backward compatibility:
-    if ( s=="contractile" )                    return new SpaceDynamicEllipse(sp);
+    if ( s=="contractile" )                    return new SpaceDynamicEllipse(this);
 #endif
     
 #if ( 1 )
     std::cerr << "INCIDENT: using unbounded Space instead of unknown class `"+s+"'\n";
-    return new Space(sp);
+    return new Space(this);
 #endif
     return nullptr;
 }
@@ -147,17 +147,23 @@ Space * SpaceProp::newSpace(SpaceProp const* sp, Glossary& opt)
 
 Space * SpaceProp::newSpace(Glossary& opt) const
 {
-    Space * spc = newSpace(this, opt);
+    Space * spc = newSpace();
     
     if ( spc )
     {
-        // set dimensions:
-        if ( dimensions.length() )
-            spc->readLengths(dimensions);
-        
-        std::string dim;
-        if ( opt.set(dim, "dimensions") )
-            spc->readLengths(dim);
+#ifdef BACKWARD_COMPATIBILITY
+        std::string str = dimensions;
+        if ( str.size() || opt.set(str, "dimensions") )
+        {
+            std::stringstream iss(str);
+            real len[8] = { 0 };
+            for ( int d = 0; d < 8 && iss.good(); ++d )
+                iss >> len[d];
+            spc->setLengths(len);
+        }
+#endif
+        // normal way to set the size:
+        spc->resize(opt);
     }
     return spc;
 }
@@ -167,10 +173,7 @@ Space * SpaceProp::newSpace(Glossary& opt) const
 
 void SpaceProp::clear()
 {
-    geometry      = "";
-    shape         = "undefined";
-    dimensions    = "";
-    shape_spec    = "";
+    shape         = "";
     display       = "";
     display_fresh = false;
     
@@ -182,20 +185,28 @@ void SpaceProp::clear()
     mobility_dt   = 0;
     mobility_rot_dt = 0;
 #endif
-    
-    dimensions_old = "";
 }
+
 
 void SpaceProp::read(Glossary& glos)
 {    
-    glos.set(shape,        "shape");
-    glos.set(shape_spec,   "shape", 1);
-    glos.set(dimensions,   "dimension") || glos.set(dimensions, "dimensions");
 #ifdef BACKWARD_COMPATIBILITY
-    glos.set(dimensions,   "spec");  // format 36
+    glos.set(dimensions, "dimensions");
 #endif
-    glos.set(geometry,     "geometry");
-    
+    if ( !glos.set(shape, "shape") )
+    {
+#ifdef BACKWARD_COMPATIBILITY
+        std::string str;
+        if ( glos.set(str, "geometry") )
+        {
+            std::stringstream iss(str);
+            iss >> shape;
+            if ( dimensions.empty() )
+                dimensions = iss.str().substr(iss.tellg());
+        }
+#endif
+    }
+
 #if NEW_DYNAMIC_SPACES
     glos.set(tension,       "tension");
     glos.set(volume,        "volume");
@@ -209,38 +220,11 @@ void SpaceProp::read(Glossary& glos)
 
 //------------------------------------------------------------------------------
 
-void SpaceProp::complete()
-{
-    if ( !geometry.empty() )
-    {
-        std::istringstream iss(geometry);
-        iss >> shape;
-        
-        if ( iss.fail() )
-            throw InvalidParameter("invalid geometry `"+geometry+"' for Space");
-        
-        int c;
-        while ( isspace(iss.peek()) )
-            iss.get();
-        
-        c = iss.peek();
-        if ( !isdigit(c) && c != '+' && c != '-' )
-            iss >> shape_spec;
-        
-        while ( isspace(iss.peek()) )
-            iss.get();
-
-        // get remaining characters as a whole:
-        if ( iss.good() )
-            dimensions = geometry.substr(iss.tellg());
-    }
-}
-
-
 void SpaceProp::complete(Simul const& sim)
 {
-    complete();
-    
+    if ( shape.empty() )
+        throw InvalidParameter("space:shape must be defined");
+
 #if NEW_DYNAMIC_SPACES
     if ( viscosity > 0 )
         mobility_dt = sim.prop->time_step / viscosity;
@@ -252,25 +236,6 @@ void SpaceProp::complete(Simul const& sim)
     else if ( sim.ready() )
         throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
 #endif
-
-    /*
-     If the dimensions have changed, update any Space with this property.
-     This is necessary to make 'change space:dimension' work.
-     */
-    if ( dimensions != dimensions_old )
-    {
-        for ( Space * spc = sim.spaces.first(); spc; spc=spc->next() )
-        {
-            if ( spc->prop == this )
-            {
-                spc->readLengths(dimensions);
-                // allow Simul to update:
-                if ( spc == sim.space() )
-                    const_cast<Simul&>(sim).changeSpace(spc);
-            }
-        }
-        dimensions_old = dimensions;
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -278,11 +243,7 @@ void SpaceProp::complete(Simul const& sim)
 void SpaceProp::write_values(std::ostream& os) const
 {
     //write_value(os, "geometry",   geometry);
-    if ( shape_spec.empty() )
-        write_value(os, "shape",  shape);
-    else
-        write_value(os, "shape",  shape, shape_spec);
-    write_value(os, "dimensions", dimensions);
+    write_value(os, "shape",  shape);
 #if NEW_DYNAMIC_SPACES
     write_value(os, "tension",    tension);
     write_value(os, "volume",     volume);
@@ -290,6 +251,4 @@ void SpaceProp::write_values(std::ostream& os) const
 #endif
     write_value(os, "display",    "("+display+")");
 }
-
-
 

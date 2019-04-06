@@ -11,9 +11,10 @@
  In 3D, and additional HEIGHT can be specified to describe a generalized 
  cylinder of axis Z, that has the 2D polygon as cross-section.
  
- The coordinates of the polygon are read from a file.
-
-    polygon file_name HEIGHT
+ Parameters:
+     - file: name of file with polygon data
+     - height: height of polygon in Z
+    .
 
  @ingroup SpaceGroup
  @todo add SpacePolygon::setInteraction() for re-entrant corners
@@ -21,32 +22,38 @@
 class SpacePolygon : public Space
 {
 private:
-    
+
     /// The 2D polygon object
-    Polygon           mPoly;
+    Polygon           poly_;
         
-    /// pre-calculated bounding box derived from mPoly
-    Vector            mInf, mSup;
+    /// pre-calculated bounding box derived from poly_
+    Vector            inf_, sup_;
     
-    /// Volume calculated from mPoly
-    real              mVolume;
+    /// Volume calculated from poly_
+    real              volume_;
     
-    /// half the total height in Z (set by mLength[0])
-    real              mHeight;
+    /// half the total height in Z
+    real              height_;
+
+    /// update
+    void        update();
 
 public:
         
     /// constructor
-    SpacePolygon(const SpaceProp *, Glossary&);
+    SpacePolygon(const SpaceProp *);
     
     /// destructor
     ~SpacePolygon();
     
+    /// update geometry
+    void        resize(Glossary& opt);
+    
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const { inf=mInf; sup=mSup; }
+    void        boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
     
     /// the volume inside
-    real        volume() const { return mVolume; }
+    real        volume() const { return volume_; }
     
     /// true if the point is inside the Space
     bool        inside(Vector const&) const;
@@ -63,12 +70,9 @@ public:
     /// add interactions between fibers and reentrant corners
     void        setInteractions(Meca &, FiberSet const&) const;
 
-    /// update since length have changed
-    void        resize();
-    
     /// OpenGL display function; returns true if successful
     bool        draw() const;
-    
+
 };
 
 #endif

@@ -2,6 +2,8 @@
 #include "space_square.h"
 #include "exceptions.h"
 #include "mecapoint.h"
+#include "iowrapper.h"
+#include "glossary.h"
 #include "meca.h"
 
 
@@ -11,10 +13,20 @@ SpaceSquare::SpaceSquare(const SpaceProp* p)
 }
 
 
+void SpaceSquare::resize(Glossary& opt)
+{
+    opt.set(length_, 3, "length");
+    
+    for ( int d = 0; d < DIM; ++d )
+        if ( length_[d] < 0 )
+            throw InvalidParameter("square:length_[] must be >= 0");
+}
+
+
 void SpaceSquare::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length(0),-length(1),-length(2));
-    sup.set( length(0), length(1), length(2));
+    inf.set(-length_[0],-length_[1],-length_[2]);
+    sup.set( length_[0], length_[1], length_[2]);
 }
 
 //------------------------------------------------------------------------------
@@ -25,24 +37,24 @@ void SpaceSquare::boundaries(Vector& inf, Vector& sup) const
 
 real SpaceSquare::volume() const
 {
-    return 2 * length(0);
+    return 2 * length_[0];
 }
 
 bool  SpaceSquare::inside(Vector const& w) const
 {
-    return fabs(w.XX) <= length(0);
+    return fabs(w.XX) <= length_[0];
 }
 
 bool  SpaceSquare::allInside(Vector const& w, const real rad ) const
 {
     assert_true( rad >= 0 );
     
-    return rad-w.XX <= length(0) and w.XX+rad <= length(0);
+    return rad-w.XX <= length_[0] and w.XX+rad <= length_[0];
 }
 
 Vector SpaceSquare::project(Vector const& w) const
 {
-    return Vector(std::copysign(length(0), w.XX), 0, 0);
+    return Vector(std::copysign(length_[0], w.XX), 0, 0);
 }
 
 #endif
@@ -56,22 +68,22 @@ Vector SpaceSquare::project(Vector const& w) const
 
 real SpaceSquare::volume() const
 {
-    return 4 * length(0) * length(1);
+    return 4 * length_[0] * length_[1];
 }
 
 
 bool  SpaceSquare::inside(Vector const& w) const
 {
-    return fabs(w.XX) <= length(0) and
-           fabs(w.YY) <= length(1);
+    return fabs(w.XX) <= length_[0] and
+           fabs(w.YY) <= length_[1];
 }
 
 bool  SpaceSquare::allInside(Vector const& w, const real rad ) const
 {
     assert_true( rad >= 0 );
     
-    return rad-w.XX <= length(0) and w.XX+rad <= length(0) and
-           rad-w.YY <= length(1) and w.YY+rad <= length(1);
+    return rad-w.XX <= length_[0] and w.XX+rad <= length_[0] and
+           rad-w.YY <= length_[1] and w.YY+rad <= length_[1];
 }
 
 #endif
@@ -84,23 +96,23 @@ bool  SpaceSquare::allInside(Vector const& w, const real rad ) const
 
 real SpaceSquare::volume() const
 {
-    return 8 * length(0) * length(1) * length(2);
+    return 8 * length_[0] * length_[1] * length_[2];
 }
 
 bool  SpaceSquare::inside(Vector const& w) const
 {
-    return fabs(w.XX) <= length(0) and
-           fabs(w.YY) <= length(1) and
-           fabs(w.ZZ) <= length(2);
+    return fabs(w.XX) <= length_[0] and
+           fabs(w.YY) <= length_[1] and
+           fabs(w.ZZ) <= length_[2];
 }
 
 bool  SpaceSquare::allInside(Vector const& w, const real rad ) const
 {
     assert_true( rad >= 0 );
     
-    return rad-w.XX <= length(0) and w.XX+rad <= length(0) and
-           rad-w.YY <= length(1) and w.YY+rad <= length(1) and
-           rad-w.ZZ <= length(2) and w.ZZ+rad <= length(2);
+    return rad-w.XX <= length_[0] and w.XX+rad <= length_[0] and
+           rad-w.YY <= length_[1] and w.YY+rad <= length_[1] and
+           rad-w.ZZ <= length_[2] and w.ZZ+rad <= length_[2];
 }
 #endif
 
@@ -110,43 +122,43 @@ Vector SpaceSquare::project(Vector const& w) const
 {
     Vector p = w;
     
-    if ( fabs(p.XX) > length(0) )
+    if ( fabs(p.XX) > length_[0] )
     {
-        p.XX = std::copysign(length(0), p.XX);
+        p.XX = std::copysign(length_[0], p.XX);
         return p;
     }
-    if ( fabs(p.YY) > length(1) )
+    if ( fabs(p.YY) > length_[1] )
     {
-        p.YY = std::copysign(length(1), p.YY);
+        p.YY = std::copysign(length_[1], p.YY);
         return p;
     }
 #if ( DIM > 2 )
-    if ( fabs(p.ZZ) > length(2) )
+    if ( fabs(p.ZZ) > length_[2] )
     {
-        p.ZZ = std::copysign(length(2), p.ZZ);
+        p.ZZ = std::copysign(length_[2], p.ZZ);
         return p;
     }
 #endif
 
     // find the dimensionality corresponding to the closest face
-    real d0 = length(0) - fabs(w.XX);
-    real d1 = length(1) - fabs(w.YY);
+    real d0 = length_[0] - fabs(w.XX);
+    real d1 = length_[1] - fabs(w.YY);
 #if ( DIM > 2 )
-    real d2 = length(2) - fabs(w.ZZ);
+    real d2 = length_[2] - fabs(w.ZZ);
     if ( d2 < d1 )
     {
         if ( d0 < d2 )
-            p.XX = std::copysign(length(0), w.XX);
+            p.XX = std::copysign(length_[0], w.XX);
         else
-            p.ZZ = std::copysign(length(2), w.ZZ);
+            p.ZZ = std::copysign(length_[2], w.ZZ);
     }
     else
 #endif
     {
         if ( d0 < d1 )
-            p.XX = std::copysign(length(0), w.XX);
+            p.XX = std::copysign(length_[0], w.XX);
         else
-            p.YY = std::copysign(length(1), w.YY);
+            p.YY = std::copysign(length_[1], w.YY);
     }
     
     return p;
@@ -204,7 +216,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
 
 void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, mLength);
+    setInteraction(pos, pe, meca, stiff, length_);
 }
 
 
@@ -212,13 +224,34 @@ void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real ra
 {
     real dim[DIM];
     for ( int d = 0; d < DIM; ++d )
-    {
-        dim[d] = length(d) - rad;
-        if ( dim[d] < 0 )
-            dim[d] = 0;
-    }
+        dim[d] = std::max((real)0, length_[d] - rad);
 
     setInteraction(pos, pe, meca, stiff, dim);
+}
+
+//------------------------------------------------------------------------------
+
+void SpaceSquare::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(3);
+    out.writeFloat(length_[0]);
+    out.writeFloat(length_[1]);
+    out.writeFloat(length_[2]);
+}
+
+
+void SpaceSquare::setLengths(const real len[])
+{
+    length_[0] = len[0];
+    length_[1] = len[1];
+    length_[2] = len[2];
+}
+
+void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
 }
 
 //------------------------------------------------------------------------------
@@ -232,9 +265,9 @@ using namespace gle;
 
 bool SpaceSquare::draw() const
 {
-    const real X = length(0);
-    const real Y = length(1);
-    const real Z = ( DIM > 2 ) ? length(2) : 0;
+    const real X = length_[0];
+    const real Y = length_[1];
+    const real Z = ( DIM > 2 ) ? length_[2] : 0;
   
     glPushAttrib(GL_ENABLE_BIT);
 

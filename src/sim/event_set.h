@@ -47,9 +47,6 @@ public:
         return static_cast<Event*>(inventory.get(n));
     }
     
-    /// get ready to do a step()
-    void        prepare();
-    
     /// Monte-Carlo simulation step for every Object
     void        step();
 

@@ -108,7 +108,7 @@ void Simul::step()
     // increment time:
     prop->time += prop->time_step;
 
-    // mix every list
+    // mix object lists
     events.shuffle();
     organizers.shuffle();
     beads.shuffle();
@@ -119,7 +119,7 @@ void Simul::step()
     singles.shuffle();
     spaces.shuffle();
     
-    // Monte-Carlo step for every object
+    // Monte-Carlo step for all objects
     events.step();
     organizers.step();
     fields.step();
@@ -129,7 +129,7 @@ void Simul::step()
     solids.step();
     fibers.step();
    
-    // distribute fibers over the attachment grid:
+    // distribute Fibers over a grid for binding of Hands:
     fiberGrid.paintGrid(fibers.first(), nullptr);
     
 #if ( 0 )
@@ -153,7 +153,7 @@ void Simul::step()
     
 #endif
     
-    // step Hand-containing objects that may attach to fibers:
+    // step Hand-containing objects, giving them a possibility to attach Fibers:
     couples.step(fibers, fiberGrid);
     singles.step(fibers, fiberGrid);
 }

@@ -8,12 +8,10 @@
 /**
  Space `capsule` is cylinder ending with hemispheres (a spherocylinder)
 
-    capsule length radius 
- 
- With: 
- - length: half the length of the central cylinder
- - radius: the radius of the hemisphere and central cylinder
- .
+ Parameters:
+     - length: half the length of the central cylinder
+     - radius: the radius of the hemisphere and central cylinder
+     .
 
  @ingroup SpaceGroup
  */
@@ -24,25 +22,31 @@ class SpaceCapsule : public Space
 
 private:
     
-    /// half the length of the central cylinder (alias to mLength[0])
-    real &      length;
+    /// half the length of the central cylinder
+    real  length_;
     
-    /// the radius of the hemisphere (alias to mLength[1])
-    real &      radius;
+    /// the radius of the hemisphere
+    real  radius_;
     
-    /// the square of the radius (alias to mLengthSqr[1])
-    real &      radiusSqr;
+    /// the square of the radius
+    real  radiusSqr_;
+    
+    /// calculate radiusSqr
+    void  update() { radiusSqr_ = square(radius_); }
 
 public:
         
     /// creator
     SpaceCapsule(const SpaceProp*);
     
-    /// check number and validity of specified lengths
-    void        resize() { Space::checkLengths(2, false); }
+    /// update geometry
+    void        resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
+    
+    /// radius
+    real        radius() const { return radius_; }
 
     /// the volume inside
     real        volume() const;
@@ -68,6 +72,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

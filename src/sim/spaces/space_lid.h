@@ -10,33 +10,34 @@
  a rectangular Space with partial periodic boundary conditions similar to SpaceStrip
  The space can grow with a constant velocity or a velocity depending on total force on the membrane
  
-    strip sizeX sizeY sizeZ
- 
- With:
- - sizeX = half-width along X
- - sizeY = half-width along Y
- - sizeZ = half-width along Z
- .
+ Parameters:
+     - length = half-width along X, Y and Z
+     .
  
  Author: Antonio Z. Politi
- */
+
+ @ingroup SpaceGroup
+*/
 class SpaceLid : public Space
 {
 private:
     
-    /// the position of the top lid (an alias to mLength[3])
-    real &  ceiling;
+    /// dimensions
+    real  length_[3];
     
+    /// the position of the top lid
+    real  top_;
+
     /// force during last time step
-    mutable real force;
+    mutable real force_;
     
 public:
     
     /// creator
     SpaceLid(const SpaceProp*);
     
-    /// check number and validity of specified lengths
-    void       resize();
+    /// update geometry
+    void        resize(Glossary& opt);
     
     /// initialize Modulo Object
     void       setModulo(Modulo&) const;
@@ -71,17 +72,26 @@ public:
 
     
     /// add interactions to a Meca
-    void       setInteractions(Meca &, FiberSet const&) const;
+    void        setInteractions(Meca &, FiberSet const&) const;
     
     /// one Monte-Carlo simulation step
-    void       step();
+    void        step();
     
     /// near the top edge
-    Vector     randomPlaceNearEdge(real radius, unsigned long) const;
+    Vector      randomPlaceNearEdge(real radius, unsigned long) const;
 
     /// OpenGL display function; returns true if successful
-    bool       draw() const;
+    bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

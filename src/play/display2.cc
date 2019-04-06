@@ -548,7 +548,6 @@ inline void drawLink(const Vector & a, const Fiber * fibA, const PointDisp* disp
 
 void Display2::drawSinglesF(const SingleSet & set) const
 {
-    //display the attached position of free singles:
     if ( prop->point_size > 0 )
     {
         pointSize(prop->point_size);
@@ -557,7 +556,7 @@ void Display2::drawSinglesF(const SingleSet & set) const
         {
 #if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
             obj->disp()->color2.load();
-            gleVertex(obj->posFoot().XX, ( obj->signature() * 0x1p-31 - 1 ) * 10);
+            gleVertex(obj->posFoot().XX, obj->signature() * 0x1p-28 - 4);
 #else
             drawVertex(obj->posFoot(), obj->disp());
 #endif
@@ -608,26 +607,26 @@ void Display2::drawCouplesF1(CoupleSet const& set) const
         pointSize(prop->point_size);
         
         glBegin(GL_POINTS);
-        for ( Couple * cx = set.firstFF(); cx ; cx=cx->next() )
+        for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
 #if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
-            const PointDisp * disp = cx->disp1();
+            const PointDisp * disp = obj->disp1();
             if ( disp->perceptible )
             {
                 disp->color2.load();
-                gleVertex(cx->posFree().XX, ( cx->signature() * 0x1p-31 - 1 ) * 10);
+                gleVertex(obj->posFree().XX, obj->signature() * 0x1p-28 - 4);
             }
 #else
-            drawVertex(cx->posFree(), cx->disp1());
+            drawVertex(obj->posFree(), obj->disp1());
 #endif
         }
         glEnd();
         
 #if ( DIM > 1 )
         // display inactive Couples with bitmap:
-        for ( Couple * cx = set.firstFF(); cx ; cx=cx->next() )
-            if ( !cx->active() && cx->disp1()->perceptible )
-                cx->disp1()->drawI(cx->posFree());
+        for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
+            if ( !obj->active() && obj->disp1()->perceptible )
+                obj->disp1()->drawI(obj->posFree());
 #endif
     }
 }

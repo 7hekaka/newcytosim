@@ -176,7 +176,6 @@ void setGeometry()
     prop.read(opt);
     
     try {
-        prop.complete();
         if ( spc )
         {
             delete(spc);
@@ -186,7 +185,6 @@ void setGeometry()
     
         std::clog << "    shape      = " << prop.shape << "\n";
         std::clog << "    dimensions = " << prop.dimensions << "\n";
-        std::clog << "    shape_spec = " << prop.shape_spec << "\n";
     }
     catch( Exception & e )
     {
@@ -212,7 +210,7 @@ void checkVolume()
     real e1 = spc->estimateVolume(cnt);
     real e2 = spc->estimateVolume(cnt);
     
-    printf("Monte-Carlo estimated volume of `%s`:\n", spc->prop->geometry.c_str());
+    printf("Monte-Carlo estimated volume of `%s`:\n", spc->geometry().c_str());
     printf("    volume = %.6f +/- %.6f\n", e1, fabs(e2-e1));
     
     real v = spc->volume();

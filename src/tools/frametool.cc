@@ -15,7 +15,7 @@
  > mv o.cmo objects.cmo
  
  Another tool 'sieve' can be used to read/write object-files,
- when more advanced manipulations of the simulation frames.
+ allowing finer manipulation of the simulation frames.
 */
 
 #include <errno.h>
@@ -31,7 +31,8 @@
 enum { COUNT, COPY, LAST, SIZE, EPID, SPLIT };
 enum { UNKNOWN, FRAME_START, FRAME_SECTION, FRAME_END };
 
-const size_t buf_size = 32;
+FILE * output = stdout;
+const size_t buf_size = 64;
 char buf[buf_size];
 
 unsigned long frame_pid = 0;
@@ -42,17 +43,17 @@ FILE * openfile(char name[], char const* mode)
 {
     FILE * file = fopen(name, mode);
     
-    if ( file==0 )
+    if ( file==nullptr )
     {
-        printf("Could not open file `%s'\n", name);
-        return 0;
+        fprintf(stderr, "Could not open file `%s'\n", name);
+        return nullptr;
     }
     
     if ( ferror(file) )
     {
         fclose(file);
-        printf("Error opening file `%s'\n", name);
-        return 0;
+        fprintf(stderr, "Error opening file `%s'\n", name);
+        return nullptr;
     }
     
     return file;
@@ -63,14 +64,14 @@ FILE * openfile(char name[], char const* mode)
  read a line, and returns a code indicating if this is the start
  or the end of a cytosim frame
  */
-int whatline(FILE* input, FILE* output)
+int whatline(FILE* in, FILE* out)
 {
     char *const end = buf + buf_size - 1;
     char * ptr = buf;
 
     int c = 0;
     do {
-        c = getc_unlocked(input);
+        c = getc_unlocked(in);
         
         if ( c == EOF )
             return EOF;
@@ -78,8 +79,8 @@ int whatline(FILE* input, FILE* output)
         if ( ptr < end )
             *ptr++ = (char)c;
         
-        if ( output )
-            putc_unlocked(c, output);
+        if ( out )
+            putc_unlocked(c, out);
         
     } while ( c != '\n' );
     
@@ -95,7 +96,7 @@ int whatline(FILE* input, FILE* output)
         if ( 0 == strncmp(buf, "#frame ", 7) )   return FRAME_START;
         if ( 0 == strncmp(buf, "#Cytosim ", 9) )
         {
-            frame_pid = strtoul(buf+10, 0, 10);
+            frame_pid = strtoul(buf+10, nullptr, 10);
             return FRAME_START;
         }
         if ( 0 == strncmp(buf, "#end ", 5) )     return FRAME_END;
@@ -173,12 +174,12 @@ public:
 
 //=============================================================================
 
-void countFrame(const char str[], FILE* input)
+void countFrame(const char str[], FILE* in)
 {
     int  frm = 0;
     int code = 0;
     do {
-        code = whatline(input, 0);
+        code = whatline(in, nullptr);
         if ( code == FRAME_END )
             ++frm;
     } while ( code != EOF );
@@ -187,14 +188,14 @@ void countFrame(const char str[], FILE* input)
 }
 
 
-void sizeFrame(FILE* input)
+void sizeFrame(FILE* in)
 {
     int  code = 0, frm = -1, cnt = 0, oldcnt = 0;
 
     while ( code != EOF )
     {
         ++cnt;
-        code = whatline(input, 0);
+        code = whatline(in, nullptr);
         
         if ( code == FRAME_END )
         {
@@ -211,74 +212,74 @@ void sizeFrame(FILE* input)
 }
 
 
-void extract(FILE* input, Slice sli)
+void extract(FILE* in, FILE* out, Slice sli)
 {
     unsigned frm = 0;
     int  code = 0;
-    FILE * output = sli.match(0) ? stdout : 0;
+    FILE * file = sli.match(0) ? out : nullptr;
 
     while ( code != EOF )
     {
-        code = whatline(input, output);
+        code = whatline(in, file);
         
         if ( code == FRAME_START )
         {
             if ( frm > sli.last() )
                 return;
-            output = sli.match(frm) ? stdout : 0;
+            file = sli.match(frm) ? out : nullptr;
         }
 
         if ( code == FRAME_END )
         {
             if ( ++frm > sli.last() )
                 return;
-            output = sli.match(frm) ? stdout : 0;
+            file = sli.match(frm) ? out : nullptr;
         }
     }
 }
 
 
-void extract_pid(FILE* input, unsigned long pid)
+void extract_pid(FILE* in, unsigned long pid)
 {
     int code = 0;
-    FILE * output = 0;
+    FILE * out = nullptr;
 
     while ( code != EOF )
     {
-        code = whatline(input, output);
+        code = whatline(in, out);
         
         if ( code == FRAME_START && pid == frame_pid )
-            output = stdout;
+            out = stdout;
         else
-            output = 0;
+            out = nullptr;
     }
 }
 
 
 
-void extractLast(FILE* input)
+void extractLast(FILE* in)
 {
     fpos_t pos, start;
-    fgetpos(input, &start);
+    fgetpos(in, &start);
 
     int code = 0;
     while ( code != EOF )
     {
-        code = whatline(input, 0);
+        code = whatline(in, nullptr);
         if ( code == FRAME_END )
         {
             start = pos;
-            fgetpos(input, &pos);
+            fgetpos(in, &pos);
         }
     }
     
-    clearerr(input);
-    fsetpos(input, &start);
+    clearerr(in);
+    fsetpos(in, &start);
     
     int c = 0;
     while ( 1 )
     {
-        c = getc_unlocked(input);
+        c = getc_unlocked(in);
         if ( c == EOF )
             break;
         putchar(c);
@@ -288,30 +289,30 @@ void extractLast(FILE* input)
 }
 
 
-void split(FILE * input)
+void split(FILE * in)
 {
     int frm = 0;
     int  code = 0;
     char name[128] = { 0 };
     snprintf(name, sizeof(name), "objects%04i.cmo", frm);
-    FILE * output = fopen(name, "w");
+    FILE * out = fopen(name, "w");
    
     while ( code != EOF )
     {
-        code = whatline(input, output);
+        code = whatline(in, out);
         
         if ( code == FRAME_END )
         {
-            if ( output )
+            if ( out )
             {
-                funlockfile(output);
-                fclose(output);
+                funlockfile(out);
+                fclose(out);
             }
             ++frm;
             snprintf(name, sizeof(name), "objects%04i.cmo", frm);
-            output = openfile(name, "w");
-            if ( output )
-                flockfile(output);
+            out = openfile(name, "w");
+            if ( out )
+                flockfile(out);
         }
     }
 }
@@ -397,7 +398,7 @@ int main(int argc, char* argv[])
             {
                 mode = EPID;
                 errno = 0;
-                pid = strtoul(cmd+4, 0, 10);
+                pid = strtoul(cmd+4, nullptr, 10);
                 if ( errno )
                 {
                     fprintf(stderr, "unexpected syntax");
@@ -416,7 +417,7 @@ int main(int argc, char* argv[])
     
     FILE * file = openfile(filename, "r");
     
-    if ( file==0 )
+    if ( !file )
         return EXIT_FAILURE;
     
     flockfile(file);
@@ -431,7 +432,7 @@ int main(int argc, char* argv[])
             break;
 
         case COPY:
-            extract(file, Slice(cmd));
+            extract(file, stdout, Slice(cmd));
             break;
             
         case LAST:

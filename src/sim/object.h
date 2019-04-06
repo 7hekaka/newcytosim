@@ -25,6 +25,8 @@ typedef unsigned long ObjectMark;
 /// Type used to flag objects
 typedef unsigned long ObjectFlag;
 
+/// Type used for signature
+typedef unsigned ObjectSignature;
 
 /// Parent class for all simulated objects
 /**
@@ -47,7 +49,7 @@ private:
     /// integer used for custom tasks, which is recorded to file
     ObjectMark        mark_;
 
-    /// another integer used for temporary tasks, not saved to file
+    /// another integer used for various tasks, not saved to file
     ObjectFlag        flag_;
     
     /// a random number associated with this object
@@ -133,10 +135,10 @@ public:
 
     
     /// a random number that makes objects unique
-    unsigned        signature()     const { return signature_; }
+    ObjectSignature signature()     const { return signature_; }
     
     /// set signature
-    void            signature(unsigned s) { signature_ = s; }
+    void     signature(ObjectSignature s) { signature_ = s; }
 
     //--------------------------
 

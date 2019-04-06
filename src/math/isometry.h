@@ -4,7 +4,7 @@
 #define ISOMETRY_H
 
 #include "dim.h"
-
+#include "vector.h"
 
 #if ( DIM == 1 )
 

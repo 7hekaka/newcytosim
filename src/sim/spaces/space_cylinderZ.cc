@@ -1,50 +1,61 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "space_cylinderZ.h"
-#include "mecapoint.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "mecapoint.h"
+#include "glossary.h"
 #include "meca.h"
 
 
 SpaceCylinderZ::SpaceCylinderZ(const SpaceProp* p)
-: Space(p), radius(mLength[0]), bot(mLength[1]), top(mLength[2])
+: Space(p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("cylinderZ is only valid in 3D: use sphere instead");
+    bot_ = 0;
+    top_ = 0;
+    radius_ = 0;
 }
 
 
-void SpaceCylinderZ::resize()
+void SpaceCylinderZ::resize(Glossary& opt)
 {
-    Space::checkLengths(1, false);
-    if ( top < bot )
-        throw InvalidParameter("bottom must be lower than top ( size[1] <= size[2] )");
+    opt.set(radius_, "radius_");
+    opt.set(bot_,    "bottom");
+    opt.set(top_,    "top");
+    
+    if ( radius_ < 0 )
+        throw InvalidParameter("cylinder:radius must be >= 0");
+
+    if ( top_ < bot_ )
+        throw InvalidParameter("cyliner:bottom must be <= top");
 }
 
 
 void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-radius,-radius, bot);
-    sup.set( radius, radius, top);
+    inf.set(-radius_,-radius_, bot_);
+    sup.set( radius_, radius_, top_);
 }
 
 
 
 real  SpaceCylinderZ::volume() const
 {
-    return 2 * M_PI * ( top - bot ) * radius * radius;
+    return 2 * M_PI * ( top_ - bot_ ) * radius_ * radius_;
 }
 
 
 bool  SpaceCylinderZ::inside(Vector const& w) const
 {
 #if ( DIM > 2 )
-    if ( w.ZZ < bot ) return false;
-    if ( w.ZZ > top ) return false;
+    if ( w.ZZ < bot_ ) return false;
+    if ( w.ZZ > top_ ) return false;
 #endif
 #if ( DIM > 1 )
-    return ( w.XX*w.XX + w.YY*w.YY <= radius * radius );
+    return ( w.XX*w.XX + w.YY*w.YY <= radius_ * radius_ );
 #else
-    return ( fabs(w.XX) <= radius );
+    return ( fabs(w.XX) <= radius_ );
 #endif
 }
 
@@ -52,20 +63,20 @@ bool  SpaceCylinderZ::allInside(Vector const& w, const real rad ) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    if ( w.ZZ - rad < bot ) return false;
-    if ( w.ZZ + rad > top ) return false;
+    if ( w.ZZ - rad < bot_ ) return false;
+    if ( w.ZZ + rad > top_ ) return false;
 #endif
 #if ( DIM > 1 )
-    return ( w.XX*w.XX + w.YY*w.YY <= square(radius-rad) );
+    return ( w.XX*w.XX + w.YY*w.YY <= square(radius_-rad) );
 #else
-    return ( fabs(w.XX) <= radius-rad );
+    return ( fabs(w.XX) <= radius_-rad );
 #endif
 }
 
 Vector SpaceCylinderZ::randomPlace() const
 {
-    Vector2 sec = Vector2::randB(radius);
-    return Vector(sec.XX, sec.YY, bot+RNG.preal()*(top-bot));
+    Vector2 sec = Vector2::randB(radius_);
+    return Vector(sec.XX, sec.YY, bot_+RNG.preal()*(top_-bot_));
 }
 
 //------------------------------------------------------------------------------
@@ -75,22 +86,22 @@ Vector SpaceCylinderZ::project(Vector const& w) const
 #if ( DIM >= 3 )
     bool inZ = true;
     
-    if ( w.ZZ > top )
+    if ( w.ZZ > top_ )
     {
-        p.ZZ = top;
+        p.ZZ = top_;
         inZ = false;
     }
-    else if ( w.ZZ < bot )
+    else if ( w.ZZ < bot_ )
     {
-        p.ZZ = bot;
+        p.ZZ = bot_;
         inZ = false;
     }
 
     real n = w.normXY();
     
-    if ( n > radius )
+    if ( n > radius_ )
     {
-        n = radius / n;
+        n = radius_ / n;
         p.XX = n * w.XX;
         p.YY = n * w.YY;
     }
@@ -98,13 +109,13 @@ Vector SpaceCylinderZ::project(Vector const& w) const
     {
         if ( inZ )
         {
-            if ( top - w.ZZ < radius - n )
-                p.ZZ = top;
-            else if ( w.ZZ - bot < radius - n )
-                p.ZZ = bot;
+            if ( top_ - w.ZZ < radius_ - n )
+                p.ZZ = top_;
+            else if ( w.ZZ - bot_ < radius_ - n )
+                p.ZZ = bot_;
             else
             {
-                n = radius / n;
+                n = radius_ / n;
                 p.XX = n * w.XX;
                 p.YY = n * w.YY;
             }
@@ -120,23 +131,23 @@ Vector SpaceCylinderZ::project(Vector const& w) const
  This applies the correct forces in the cylindrical and spherical parts.
  */
 void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff,
-                                    const real rad, const real bot, const real top)
+                                    const real rad, const real B, const real T)
 {
 #if ( DIM >= 3 )
     bool cap = false;
     bool cyl = false;
     real zzz;
 
-    // inside cylinder radius
-    if ( 2 * pos.ZZ - bot > top )
+    // inside cylinder radius_
+    if ( 2 * pos.ZZ - B > T )
     {
-        zzz = top;
-        cap = ( pos.ZZ > top );
+        zzz = T;
+        cap = ( pos.ZZ > T );
     }
     else
     {
-        zzz = bot;
-        cap = ( pos.ZZ < bot );
+        zzz = B;
+        cap = ( pos.ZZ < B );
     }
     
     real dis = pos.XX*pos.XX + pos.YY*pos.YY;
@@ -174,7 +185,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
  */
 void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, radius, bot, top);
+    setInteraction(pos, pe, meca, stiff, radius_, bot_, top_);
 }
 
 /**
@@ -182,19 +193,44 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
  */
 void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    real R = std::max((real)0, radius - rad);
-    real T = top - rad;
-    real B = bot + rad;
+    real R = std::max((real)0, radius_ - rad);
+    real T = top_ - rad;
+    real B = bot_ + rad;
     
     if ( B > T )
     {
-        B = 0.5 * ( top + bot );
+        B = 0.5 * ( top_ + bot_ );
         T = B;
     }
     
     setInteraction(pos, pe, meca, stiff, R, B, T);
 }
 
+
+//------------------------------------------------------------------------------
+
+void SpaceCylinderZ::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(3);
+    out.writeFloat(radius_);
+    out.writeFloat(bot_);
+    out.writeFloat(top_);
+}
+
+
+void SpaceCylinderZ::setLengths(const real len[])
+{
+    radius_ = len[0];
+    bot_    = len[1];
+    top_    = len[2];
+}
+
+void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+}
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
@@ -208,9 +244,9 @@ bool SpaceCylinderZ::draw() const
 {
 #if ( DIM > 2 )
     
-    GLfloat T = top;
-    GLfloat B = bot;
-    GLfloat R = radius;
+    GLfloat T = top_;
+    GLfloat B = bot_;
+    GLfloat R = radius_;
     
     const size_t fin = 512;
     GLfloat c[fin+1], s[fin+1];

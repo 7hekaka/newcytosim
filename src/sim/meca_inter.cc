@@ -241,7 +241,7 @@ void Meca::addTorque(const Interpolation & pta,
  The direction of `ptb` is rotated around `axis` defined as cross( dirA, dirB ).
  The calculation is explicit and all contributions go in the force vector vBAS[]
  It is assumed that `cosinus^2 + sinus^2 = 1`
- Note that if ( sinus == 0 ), you can use interTorque(pta, ptb, weight)
+ Note that if ( sinus == 0 ), you can use addTorque(pta, ptb, weight)
  */
 void Meca::addTorque(const Interpolation & pta,
                      const Interpolation & ptb,
@@ -528,7 +528,7 @@ void Meca::interTorque(const Interpolation & pt1,
     const real wUV = wU * iV;
     const real wVV = wV * iV;
     
-#if ( 1 )
+#if ( 0 )
     /// matrices used during development for testing different formula
     const MatrixBlock uxu = MatrixBlock::outerProduct(u);
     //const MatrixBlock uxv = MatrixBlock::outerProduct(u,v);
@@ -579,11 +579,10 @@ void Meca::interTorque(const Interpolation & pt1,
     const MatrixBlock dvFu = ( T * 2 - uxRu - Tvxv ) * ( wUV * 0.5 );
     const MatrixBlock duFv = ( R * 2 - Ruxu - vxTv ) * ( wUV * 0.5 );
     const MatrixBlock dvFv = ( RuxRu + vxv - Id * 2 ) * ( wVV * 0.5 );
-*/
-/*
+
     // near equilibrium, further assuming that ( Tv = u ) and ( Ru = v )
     const MatrixBlock duFu = ( uxu - Id ) * wUU;
-    const MatrixBlock dvFu = ( T - uxv ) * wUV;
+    //const MatrixBlock dvFu = ( T - uxv ) * wUV;
     const MatrixBlock duFv = ( R - vxu ) * wUV;
     const MatrixBlock dvFv = ( vxv - Id ) * wVV;
 */
@@ -593,7 +592,6 @@ void Meca::interTorque(const Interpolation & pt1,
     //const MatrixBlock dvFu = ( T - MatrixBlock::outerProduct(u,v) ) * wUV;
     const MatrixBlock duFv = ( R - MatrixBlock::outerProduct(v,u) ) * wUV;
     const MatrixBlock dvFv = MatrixBlock::offsetOuterProduct(-wVV, v, wVV);
-
 /*
     // SIMPLIFIED 4: why not just put the formula in?
     // Fu = ( Tv - u * Tvu ) * wU
@@ -602,14 +600,14 @@ void Meca::interTorque(const Interpolation & pt1,
     const MatrixBlock dvFu = T * wUV;
     const MatrixBlock duFv = R * wUV;
     const MatrixBlock dvFv = Id * ( -wVV * Ruv );
-    
-    // SIMPLIFIED 5: accept that the component parallel is without influence
-    const Matrix33 Z(0,0,0,0,0,0,0,0,0);
-    const MatrixBlock duFu = Z;
-    const MatrixBlock dvFu = T * wUV;
+ 
+    // SIMPLIFIED 5: just put the formula in!
+    const MatrixBlock duFu = Id * ( -wUU );
+    //const MatrixBlock dvFu = T * wUV;
     const MatrixBlock duFv = R * wUV;
-    const MatrixBlock dvFv = Z;
-*/
+    const MatrixBlock dvFv = Id * ( -wVV );
+ */
+
 #endif
 
 #if USE_MATRIX_BLOCK
@@ -660,6 +658,7 @@ void Meca::interTorque(const Interpolation & pt1,
     Fv0.add_to(vBAS+iiD);        // F(D) = +Fv
 
 #if ( 0 )
+    const MatrixBlock dvFu = duFv.transposed();
     //std::clog << iiA << " " << iiB << " " << iiC << " " << iiD << " " << sinus << "\n";
     std::clog << "duFu " << std::setw(12) << duFu << " duFv " << std::setw(12) << duFv << "\n";
     std::clog << "dvFu " << std::setw(12) << dvFu << " dvFv " << std::setw(12) << dvFv << "\n";
@@ -3962,14 +3961,20 @@ The force on `pt1` is then Hookean:
 
     w1 * ( X - pt1 )
 
-and similarly for the other points
+and similarly for the other points.
+ 
+We first derive:
+
+    X = ( w1 * pt1 + w2 * pt2 + w3 * pt3 ) / sum
+
+and for the first point:
+
+    f1 = ( w1 / sum ) * [ w2 * ( pt2 - pt1 ) + w3 * ( pt3 - pt1 ) ]
 */
 void  Meca::interTriLink(Interpolation const& pt1, const real w1,
                          Interpolation const& pt2, const real w2,
                          Interpolation const& pt3, const real w3)
 {
-    /* we replace `x` obtained from the first equation into the second equation,
-    to derive the stiffness of each pair of points */
     const real sum = w1 + w2 + w3;
     assert_true( sum > REAL_EPSILON );
     interLink(pt1, pt2, w1*w2/sum);

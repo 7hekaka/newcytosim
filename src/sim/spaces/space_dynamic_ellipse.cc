@@ -3,8 +3,9 @@
 #include "dim.h"
 #include "space_dynamic_ellipse.h"
 #include "exceptions.h"
-#include "smath.h"
 #include "iowrapper.h"
+#include "glossary.h"
+#include "smath.h"
 
 /// prefactor for volume computation
 constexpr real pref = (DIM+1)*M_PI/3.0;
@@ -44,9 +45,9 @@ void SpaceDynamicEllipse::report(std::ostream& out) const
 {
     char str[1024];
     
-    real S = surfaceEllipse(mLength);
+    real S = surfaceEllipse(length_);
     snprintf(str, sizeof(str), " DynamicEllipse %7.3f %7.3f %7.3f  S %7.3f  V %7.3f  P %7.3f  E %9.2f",
-             mLength[0], mLength[1], mLength[2], S, volumeEllipse(mLength), pressure, prop->tension * S);
+             length_[0], length_[1], length_[2], S, volumeEllipse(length_), pressure, prop->tension * S);
     out << str;
     
 #if ( DIM > 1 )
@@ -129,14 +130,14 @@ void SpaceDynamicEllipse::decompose_force(const Vector& forces, const Vector& po
 void SpaceDynamicEllipse::add_radial_force(const Vector& forces, const Vector& pos) const
 {
     Vector U = director(0);
-    Rforces.XX += dot(U, forces) * dot(U, pos) / length(0);
+    Rforces.XX += dot(U, forces) * dot(U, pos) / length_[0];
 #if ( DIM >= 2 )
     Vector V = director(1);
-    Rforces.YY += dot(V, forces) * dot(V, pos) / length(1);
+    Rforces.YY += dot(V, forces) * dot(V, pos) / length_[1];
 #endif
 #if ( DIM > 2 )
     Vector W = director(2);
-    Rforces.ZZ += dot(W, forces) * dot(W, pos) / length(2);
+    Rforces.ZZ += dot(W, forces) * dot(W, pos) / length_[2];
 #endif
 }
 
@@ -210,23 +211,23 @@ Vector SpaceDynamicEllipse::tension_forces() const
 #if ( DIM == 2 )
 
     real S = -prop->tension * M_PI;
-    real N = sqrt( (3.0*length(0)+length(1))*(length(0)+3.0*length(1)) );
+    real N = sqrt( (3.0*length_[0]+length_[1])*(length_[0]+3.0*length_[1]) );
 
-    res.XX = S * (3.0 - ( 3.0*length(0) + 5.0*length(1) ) / N );
-    res.YY = S * (3.0 - ( 3.0*length(1) + 5.0*length(0) ) / N );
+    res.XX = S * (3.0 - ( 3.0*length_[0] + 5.0*length_[1] ) / N );
+    res.YY = S * (3.0 - ( 3.0*length_[1] + 5.0*length_[0] ) / N );
     
 #elif ( DIM > 2 )
     
-    real S = -prop->tension * surfaceEllipse(mLength);
+    real S = -prop->tension * surfaceEllipse(length_);
     
-    real pXY = surf_block(length(0), length(1));
-    real pXZ = surf_block(length(0), length(2));
-    real pYZ = surf_block(length(1), length(2));
-    real XYZ = surf_block(length(0), length(1), length(2));
+    real pXY = surf_block(length_[0], length_[1]);
+    real pXZ = surf_block(length_[0], length_[2]);
+    real pYZ = surf_block(length_[1], length_[2]);
+    real XYZ = surf_block(length_[0], length_[1], length_[2]);
 
-    res.XX = S * ( pXY + pXZ ) / ( length(0) * XYZ );
-    res.YY = S * ( pXY + pYZ ) / ( length(1) * XYZ );
-    res.ZZ = S * ( pXZ + pYZ ) / ( length(2) * XYZ );
+    res.XX = S * ( pXY + pXZ ) / ( length_[0] * XYZ );
+    res.YY = S * ( pXY + pYZ ) / ( length_[1] * XYZ );
+    res.ZZ = S * ( pXZ + pYZ ) / ( length_[2] * XYZ );
 
 #endif
     return res;
@@ -242,12 +243,12 @@ Vector SpaceDynamicEllipse::pressure_forces(const real P) const
     real S = pref * P;
     Vector res;
 #if ( DIM == 2 )
-    res.XX = S*length(1);
-    res.YY = S*length(0);
+    res.XX = S*length_[1];
+    res.YY = S*length_[0];
 #elif ( DIM > 2 )
-    res.XX = S*length(1)*length(2);
-    res.YY = S*length(2)*length(0);
-    res.ZZ = S*length(0)*length(1);
+    res.XX = S*length_[1]*length_[2];
+    res.YY = S*length_[2]*length_[0];
+    res.ZZ = S*length_[0]*length_[1];
 #endif
     return res;
 }
@@ -265,7 +266,7 @@ void SpaceDynamicEllipse::step()
         
         // calculate forces:
         Rforces += tension_forces();
-        pressure = compute_pressure(mLength, Rforces);
+        pressure = compute_pressure(length_, Rforces);
         Rforces += pressure_forces(pressure);
 
         // implement changes in shape:
@@ -275,7 +276,7 @@ void SpaceDynamicEllipse::step()
             for (int i=0; i<DIM ;++i)
             {
                 assert_true(delta[i] == delta[i]);
-                Space::setLength(i, length(i) + delta[i]);
+                length_[i] += delta[i];
             }
             report(std::clog);
             //std::clog << "%  balance " << Rforces << "\n";
@@ -311,7 +312,7 @@ void SpaceDynamicEllipse::step()
 
 
 /// Checking consistency of ellipse sizes
-void SpaceDynamicEllipse::resize()
+void SpaceDynamicEllipse::resize(Glossary& opt)
 {
     if ( prop->volume <= 0 )
     {
@@ -363,9 +364,9 @@ real SpaceDynamicEllipse::volumeEllipse(Vector const& sizes)
 }
 
 
-void  SpaceDynamicEllipse::read(Inputter& in, Simul& sim, ObjectTag tag)
+void SpaceDynamicEllipse::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    Space::read(in, sim, tag);
+    SpaceEllipse::read(in, sim, tag);
     unsigned n = in.readUInt16();
     if ( n != 10 )
         throw InvalidIO("Unexpected data in SpaceDynamicEllipse::read");
@@ -390,9 +391,9 @@ void  SpaceDynamicEllipse::read(Inputter& in, Simul& sim, ObjectTag tag)
 }
 
 
-void  SpaceDynamicEllipse::write(Outputter& out) const
+void SpaceDynamicEllipse::write(Outputter& out) const
 {
-    Space::write(out);
+    SpaceEllipse::write(out);
     out.writeUInt16(10);
     out.writeFloat(prop->volume);
 #if ( DIM > 2 )

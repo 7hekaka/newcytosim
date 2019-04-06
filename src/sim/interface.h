@@ -3,9 +3,13 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "simul.h"
 #include <iostream>
+#include "isometry.h"
+#include "object.h"
 
+class Glossary;
+class Property;
+class Simul;
 
 /// Cytosim Application Programming Interface
 /*
@@ -41,7 +45,7 @@ public:
     /**
      This is defined in the derived class Parser
      */
-    virtual void parse(std::string const&, std::string const& msg) = 0;
+    virtual void evaluate(std::string const&, std::string const& msg) = 0;
     
     //-------------------------------------------------------------------------------
     

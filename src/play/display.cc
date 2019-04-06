@@ -434,12 +434,12 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
  if `coloring` is enabled, this loads the N-th bright color,
  otherwise load the object' display color
  */
-void Display::bodyColor(PointDisp const* disp, ObjectID id) const
+void Display::bodyColor(PointDisp const* disp, unsigned s) const
 {
     if ( disp->coloring )
     {
-        gle::bright_color(id).load_both();
-        gle::bright_color(id).load();
+        gle::bright_color(s).load_both();
+        gle::bright_color(s).load();
     }
     else
     {
@@ -452,10 +452,10 @@ void Display::bodyColor(PointDisp const* disp, ObjectID id) const
  if `coloring` is enabled, this loads the N-th bright color,
  otherwise load the object' display color
  */
-void Display::bodyColor2(PointDisp const* disp, ObjectID id) const
+void Display::bodyColor2(PointDisp const* disp, unsigned s) const
 {
     if ( disp->coloring )
-        gle::bright_color(id).match_a(disp->color).load();
+        gle::bright_color(s).match_a(disp->color).load();
     else
         disp->color.load();
 }
@@ -464,11 +464,11 @@ void Display::bodyColor2(PointDisp const* disp, ObjectID id) const
  if `coloring` is enabled, this loads the N-th bright color,
  with an alpha value matched to the one of the object's display color.
  */
-void Display::bodyColorT(PointDisp const* disp, ObjectID id) const
+void Display::bodyColorT(PointDisp const* disp, unsigned s) const
 {
     if ( disp->coloring )
     {
-        gle_color col = gle::bright_color(id).match_a(disp->color);
+        gle_color col = gle::bright_color(s).match_a(disp->color);
         col.load_load();
         col.load_back();
     }

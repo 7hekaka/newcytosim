@@ -237,18 +237,18 @@ void SingleSet::erase()
 }
 
 
-void SingleSet::freeze()
+void SingleSet::freeze(ObjectFlag f)
 {
     relax();
-    ObjectSet::flag(aList, 1);
-    ObjectSet::flag(fList, 1);
+    ObjectSet::flag(aList, f);
+    ObjectSet::flag(fList, f);
 }
 
 
-void SingleSet::prune()
+void SingleSet::prune(ObjectFlag f)
 {
-    ObjectSet::prune(aList, 1, 0);
-    ObjectSet::prune(fList, 1, 0);
+    ObjectSet::prune(aList, f, 0);
+    ObjectSet::prune(fList, f, 0);
 }
 
 
@@ -460,7 +460,6 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserveList& reserve)
         if ( h->attachmentAllowed(i) )
         {
             Vector pos = i.pos();
-            
             Space const* spc = i.fiber()->prop->confine_space_ptr;
 
             // Only attach if position is within the confining Space:

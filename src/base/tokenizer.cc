@@ -515,7 +515,7 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
         else if ( block_delimiter(c) )
             res.append( get_block_text(is, c, block_delimiter(c)) );
         else if ( c == ')' || c == '}' )
-            throw InvalidSyntax("unmatched delimiter '"+std::string(1,c_in)+"'");
+            throw InvalidSyntax("unclosed delimiter '"+std::string(1,c_in)+"'");
 #if ( 0 )
         else if ( c == COMMENT_START )
         {

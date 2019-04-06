@@ -9,23 +9,25 @@
 /**
  Space `torus` is defined by two parameters: 
  
-    torus radius width
- 
- With:
- - `radius` = the main radius of the torus
- - `width`  = the diameter of the torus in its crosssections.
- .
- 
+ Parameters:
+     - `radius` = the main radius of the torus
+     - `width`  = the diameter of the torus in its crosssections.
+     .
+
+ @ingroup SpaceGroup
  */
 class SpaceTorus : public Space
 {
 private:
     
     /// main radius
-    real  bRadius;
+    real  bCurvature;
     
     /// thickness
-    real  bWidth, bWidthSqr;
+    real  bRadius, bRadiusSqr;
+    
+    
+    void update() { bRadiusSqr = square(bRadius); }
     
     /// project on the backbone
     Vector project0(Vector const& pos) const;
@@ -35,11 +37,14 @@ public:
     /// constructor
     SpaceTorus(const SpaceProp* p);
         
-    /// this is called if any length has been changed
-    void        resize();
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
+    
+    /// radius
+    real        radius() const { return bRadius; }
 
     /// the volume inside
     real        volume() const;
@@ -53,6 +58,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

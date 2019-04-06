@@ -11,12 +11,10 @@
  It is terminated by flat discs at `X = +/- length/2`.
  For spherical caps, see `capsule`.
  
-    cylinder length radius
-
- With:
- - length = half-length of the cylinder along X
- - radius = radius of the cylinder
- .
+ Parameters:
+     - length = half-length of the cylinder along X
+     - radius = radius of the cylinder
+     .
 
  @ingroup SpaceGroup
  */
@@ -27,23 +25,26 @@ class SpaceCylinder : public Space
 
 private:
     
-    /// half the length of the central cylinder (alias to mLength[0])
-    real &      length;
+    /// half the length of the central cylinder
+    real  length_;
     
-    /// the radius of the cylinder (alias to mLength[1])
-    real &      radius;
+    /// the radius of the cylinder
+    real  radius_;
     
 public:
         
     ///creator
     SpaceCylinder(const SpaceProp*);
-    
-    /// check number and validity of specified lengths
-    void        resize() { Space::checkLengths(2, false); }
-    
+
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
+    /// radius
+    real        radius() const { return radius_; }
+
     /// the volume inside
     real        volume() const;
     
@@ -69,6 +70,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

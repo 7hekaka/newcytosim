@@ -36,22 +36,6 @@ class Space : public Object
 {
 public:
     
-    /// max number of dimensions
-    static const unsigned DMAX = 8;
-
-protected:
-    
-    /// dimensions that define the geometry of most derived classes
-    real   mLength[DMAX];
-    
-    /// square of each dimension
-    real   mLengthSqr[DMAX];
-    
-    /// sets the length at index `d` and updates mLengthSqr[d]
-    void   setLength(unsigned d, real v);
-    
-public:
-    
     /// parameters
     const SpaceProp* prop;
     
@@ -63,27 +47,18 @@ public:
     
     //------------------------------ BASIC -------------------------------------
     
-    /// return dimension `d`
-    real length(unsigned int d) const { assert_true(d<DMAX); return mLength[d]; }
-
-    /// return squared dimension `d`
-    real lengthSqr(unsigned int d) const { assert_true(d<DMAX); return mLengthSqr[d]; }
-    
-    /// read dimensions from a string
-    void readLengths(const std::string&);
-    
-    /// check that all `required` lengths are positive
-    void checkLengths(unsigned required, int strict) const;
-    
-    /// change dimension `d` to `v`, and update derived variables by calling resize()
-    void resize(unsigned d, real v);
-    
     /// this is called if any length has been changed
-    virtual void resize() {}
+    virtual void resize(Glossary& opt) {};
 
     /// initialize Modulo if this Space has some periodic dimensions
     virtual void setModulo(Modulo& m) const { m.disable(); }
+
+    /// a Human-readible description
+    virtual std::string geometry() const { return prop->shape; }
     
+    /// the radius (that is defined only for certain shapes)
+    virtual real radius() const { return 0; }
+
     //------------------------------ OBJECT ------------------------------------
     
     /// the volume inside in 3D, or the surface area in 2D
@@ -137,7 +112,7 @@ public:
     bool           outside(Vector const& pos)  const { return ! inside(pos); }
     
     /// project `point` on this Space deflated by `radius`, putting the result in `proj`
-    Vector         project(Vector const&, real rad) const;
+    Vector         projectDeflated(Vector const&, real rad) const;
     
     
     /// the square of the distance to the edge of this Space
@@ -182,23 +157,29 @@ public:
     static const ObjectTag TAG = 'e';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag      tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }
     
     /// a static_cast<> of Node::next()
-    Space*              next() const { return static_cast<Space*>(nNext); }
+    Space*         next() const { return static_cast<Space*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Space*              prev() const { return static_cast<Space*>(nPrev); }
-
-    /// read from file
-    virtual void        read(Inputter&, Simul&, ObjectTag);
+    Space*         prev() const { return static_cast<Space*>(nPrev); }
     
     /// write to file
-    virtual void       write(Outputter&) const;
+    void           write(Outputter&) const;
+
+    /// read from file
+    void           read(Inputter&, Simul&, ObjectTag);
     
+    /// get dimensions from array `len`
+    virtual void   setLengths(const real len[8]) {}
+
+    /// read numbers from file
+    virtual void   read_data(Inputter&, real*);
+
     //------------------------------ DISPLAY ----------------------------------
     
     /// a shape-specific openGL display function, return true if display was done
@@ -206,10 +187,10 @@ public:
      In 2D, this should draw the edge of the surface using lines.
      in 3D, this should draw the surface of the volume, using triangles.
      */
-    virtual bool  draw()  const { return false; }
+    virtual bool   draw()  const { return false; }
 
     /// Default 2D display, tracing the outline of a section of the Volume
-    void          drawSection(int dim, real pos, real step) const;
+    void           drawSection(int dim, real pos, real step) const;
 
 };
 

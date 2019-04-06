@@ -2,6 +2,8 @@
 #include "dim.h"
 #include "space_periodic.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "glossary.h"
 
 
 SpacePeriodic::SpacePeriodic(const SpaceProp* p)
@@ -10,23 +12,26 @@ SpacePeriodic::SpacePeriodic(const SpaceProp* p)
 }
 
 
+void SpacePeriodic::resize(Glossary& opt)
+{
+    opt.set(length_, 3, "length");
+    
+    for ( int d = 0; d < DIM; ++d )
+        if ( length_[d] <= 0 )
+            throw InvalidParameter("periodic:length[] must be > 0");
+}
+
+
 void SpacePeriodic::setModulo(Modulo& mod) const
 {
     for ( int d = 0; d < DIM; ++d )
-        mod.enable(d, length(d));
+        mod.enable(d, length_[d]);
 }
-
-
-void SpacePeriodic::resize()
-{
-    checkLengths(DIM, true);
-}
-
 
 void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length(0),-length(1),-length(2));
-    sup.set( length(0), length(1), length(2));
+    inf.set(-length_[0],-length_[1],-length_[2]);
+    sup.set( length_[0], length_[1], length_[2]);
 }
 
 //------------------------------------------------------------------------------
@@ -36,7 +41,7 @@ void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
 
 real SpacePeriodic::volume() const
 {
-    return 2.0 * length(0);
+    return 2.0 * length_[0];
 }
 
 bool  SpacePeriodic::inside(Vector const& point) const
@@ -60,7 +65,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 real SpacePeriodic::volume() const
 {
-    return 4.0 * length(0) * length(1);
+    return 4.0 * length_[0] * length_[1];
 }
 
 bool  SpacePeriodic::inside(Vector const& point) const
@@ -82,7 +87,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 real SpacePeriodic::volume() const
 {
-    return 8.0 * length(0) * length(1) * length(2);
+    return 8.0 * length_[0] * length_[1] * length_[2];
 }
 
 bool  SpacePeriodic::inside(Vector const& point) const
@@ -99,6 +104,32 @@ Vector SpacePeriodic::project(Vector const&) const
 #endif
 
 //------------------------------------------------------------------------------
+
+void SpacePeriodic::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(3);
+    out.writeFloat(length_[0]);
+    out.writeFloat(length_[1]);
+    out.writeFloat(length_[2]);
+}
+
+
+void SpacePeriodic::setLengths(const real len[])
+{
+    length_[0] = len[0];
+    length_[1] = len[1];
+    length_[2] = len[2];
+}
+
+
+void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+}
+
+//------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -110,9 +141,9 @@ using namespace gle;
 
 bool SpacePeriodic::draw() const
 {
-    const real X = length(0);
-    const real Y = ( DIM > 1 ) ? length(1) : 10;
-    const real Z = ( DIM > 2 ) ? length(2) : 0;
+    const real X = length_[0];
+    const real Y = ( DIM > 1 ) ? length_[1] : 10;
+    const real Z = ( DIM > 2 ) ? length_[2] : 0;
     
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);

@@ -406,7 +406,7 @@ void ObjectSet::flag(NodeList const& list, ObjectFlag f)
 }
 
 
-void ObjectSet::prune(NodeList const& list, ObjectFlag f, ObjectFlag s)
+void ObjectSet::prune(NodeList const& list, ObjectFlag f, ObjectFlag g)
 {
     Node * n = list.front();
     
@@ -417,7 +417,7 @@ void ObjectSet::prune(NodeList const& list, ObjectFlag f, ObjectFlag s)
         if ( o->flag() == f )
             delete(o);
         else
-            o->flag(s);
+            o->flag(g);
         n = p;
     }
 }
@@ -556,13 +556,20 @@ void ObjectSet::report(std::ostream& os) const
     {
         os << title() << '\n';
         PropertyList plist = simul.properties.find_all(title());
-        for ( Property * p : plist )
+        if ( plist.size() > 0 )
         {
-            unsigned cnt = count(match_property, p);
-            os << std::setw(10) << cnt << " " << p->name() << '\n';
+            for ( Property * p : plist )
+            {
+                unsigned cnt = count(match_property, p);
+                os << std::setw(10) << cnt << " " << p->name() << '\n';
+            }
+            if ( plist.size() > 1 )
+                os << std::setw(10) << size() << " total\n";
         }
-        if ( plist.size() > 1 )
-            os << std::setw(10) << size() << " total\n";
+        else
+        {
+            os << std::setw(10) << size() << " " << title() << '\n';
+        }
     }
 }
 

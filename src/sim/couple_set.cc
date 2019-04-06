@@ -387,22 +387,22 @@ void CoupleSet::erase()
     inventory.clear();
 }
 
-void CoupleSet::freeze()
+void CoupleSet::freeze(ObjectFlag f)
 {
     relax();
-    ObjectSet::flag(aaList, 1);
-    ObjectSet::flag(faList, 1);
-    ObjectSet::flag(afList, 1);
-    ObjectSet::flag(ffList, 1);
+    ObjectSet::flag(aaList, f);
+    ObjectSet::flag(faList, f);
+    ObjectSet::flag(afList, f);
+    ObjectSet::flag(ffList, f);
 }
 
 
-void CoupleSet::prune()
+void CoupleSet::prune(ObjectFlag f)
 {
-    ObjectSet::prune(aaList, 1, 0);
-    ObjectSet::prune(faList, 1, 0);
-    ObjectSet::prune(afList, 1, 0);
-    ObjectSet::prune(ffList, 1, 0);
+    ObjectSet::prune(aaList, f, 0);
+    ObjectSet::prune(faList, f, 0);
+    ObjectSet::prune(afList, f, 0);
+    ObjectSet::prune(ffList, f, 0);
 }
 
 

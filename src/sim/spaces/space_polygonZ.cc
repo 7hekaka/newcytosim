@@ -1,8 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "dim.h"
 #include "space_polygonZ.h"
-#include "mecapoint.h"
 #include "exceptions.h"
+#include "mecapoint.h"
 #include "glossary.h"
 #include "polygon.h"
 #include "random.h"
@@ -10,28 +10,34 @@
 #include <fstream>
 
 
-
-SpacePolygonZ::SpacePolygonZ(SpaceProp const* p, Glossary& opt)
+SpacePolygonZ::SpacePolygonZ(SpaceProp const* p)
 : Space(p)
 {
-    mVolume = 0;
+    volume_ = 0;
     
     if ( DIM < 3 )
         throw InvalidParameter("polygonZ is only usable in 3D");
-    
-    mPoly.read(p->shape_spec);
+}
+
+
+void SpacePolygonZ::resize(Glossary& opt)
+{
+    std::string file;
+    opt.set(file, "file");
+
+    poly_.read(file);
     
 #if ( DIM > 2 )
     Vector vec;
     if ( opt.set(vec, "translate") )
-        mPoly.translate(vec.XX, vec.YY);
+        poly_.translate(vec.XX, vec.YY);
 
     real len;
     if ( opt.set(len, "inflate") && len > 0 )
-        mPoly.inflate(len);
+        poly_.inflate(len);
 #endif
-    
-    resize();
+
+    update();
 }
 
 
@@ -48,7 +54,7 @@ SpacePolygonZ::~SpacePolygonZ()
 real SpacePolygonZ::estimateVolumeZ(unsigned long cnt) const
 {
     real box[4];
-    mPoly.find_extremes(box);
+    poly_.find_extremes(box);
     
     real H = box[3] - box[2];
 
@@ -66,7 +72,7 @@ real SpacePolygonZ::estimateVolumeZ(unsigned long cnt) const
     {
         real x = box[0] + W * RNG.preal();
         real y = box[2] + H * RNG.preal();
-        if ( mPoly.inside(x, y, 1) )
+        if ( poly_.inside(x, y, 1) )
             in  += x;
         else
             out += x;
@@ -80,29 +86,29 @@ real SpacePolygonZ::estimateVolumeZ(unsigned long cnt) const
  recalculate bounding box, volume
  and points offsets that are used to project
  */
-void SpacePolygonZ::resize()
+void SpacePolygonZ::update()
 {
-    if ( mPoly.surface() < 0 )
+    if ( poly_.surface() < 0 )
     {
-        //std::clog << "flipping clockwise polygon `" << prop->shape_spec << "'" << std::endl;
-        mPoly.flip();
+        //std::clog << "flipping clockwise polygon `" << file << "'" << std::endl;
+        poly_.flip();
     }
 
-    if ( mPoly.complete(REAL_EPSILON) )
+    if ( poly_.complete(REAL_EPSILON) )
         throw InvalidParameter("unfit polygon: consecutive points may overlap");
 
     real box[4];
-    mPoly.find_extremes(box);
-    mInf.set(-box[1],-box[1], box[2]);
-    mSup.set( box[1], box[1], box[3]);
+    poly_.find_extremes(box);
+    inf_.set(-box[1],-box[1], box[2]);
+    sup_.set( box[1], box[1], box[3]);
 
-    mVolume = estimateVolumeZ(1<<17);
+    volume_ = estimateVolumeZ(1<<17);
 }
 
 
 bool SpacePolygonZ::inside(Vector const& w) const
 {
-    return mPoly.inside(w.normXY(), w[2], 1);
+    return poly_.inside(w.normXY(), w[2], 1);
 }
 
 
@@ -110,7 +116,7 @@ Vector SpacePolygonZ::project(Vector const& w) const
 {
     real P, Z, R = w.normXY();
     int hit;
-    mPoly.project(R, w.z(), P, Z, hit);
+    poly_.project(R, w.z(), P, Z, hit);
     
     real n = P / R;
     return Vector( w.XX * n, w.y() * n, Z);
@@ -132,9 +138,9 @@ void SpacePolygonZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
     
     Vector prj;
 
-    int edg = mPoly.project(R, pos.ZZ, P, prj.ZZ, hit);
-    real nX = -mPoly.pts_[hit].dy;
-    real nY =  mPoly.pts_[hit].dx;
+    int edg = poly_.project(R, pos.ZZ, P, prj.ZZ, hit);
+    real nX = -poly_.pts_[hit].dy;
+    real nY =  poly_.pts_[hit].dx;
 
     prj.XX = pos.XX * P / R;
     prj.YY = pos.YY * P / R;
@@ -189,8 +195,8 @@ void SpacePolygonZ::setInteractions(Meca & meca, FiberSet const& fibers) const
 
 void SpacePolygonZ::drawZ(bool rings) const
 {
-    const unsigned npts = mPoly.nbPoints();
-    Polygon::Point2D const* pts = mPoly.pts_;
+    const unsigned npts = poly_.nbPoints();
+    Polygon::Point2D const* pts = poly_.pts_;
 
     // that is a dummy way to initialize a circle:
     constexpr size_t fin = 8 * gle::finesse;

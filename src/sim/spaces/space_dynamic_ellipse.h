@@ -76,6 +76,9 @@ public:
     /// constructor
     SpaceDynamicEllipse(const SpaceProp*);
     
+    /// update geometry
+    void    resize(Glossary& opt);
+
     /// add interactions to a Meca
     void    setInteractions(Meca &, FiberSet const&) const;
 
@@ -98,21 +101,19 @@ public:
         Vector p = inv * pos;
         return SpaceEllipse::inside(p);
     }
-
-    ///
-    void    resize();
-    
-    /// read from file
-    void    read(Inputter& , Simul&, ObjectTag);
-    
-    /// write to file
-    void    write(Outputter&) const;
     
     /// return forces
     void    report(std::ostream&) const;
 
     /// OpenGL display function; returns true if successful
     bool    draw() const;
+    
+    /// write to file
+    void    write(Outputter&) const;
+
+    /// read from file
+    void    read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

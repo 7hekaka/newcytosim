@@ -1,6 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "space_ellipse.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "glossary.h"
 #include "project_ellipse.h"
 
 
@@ -13,9 +15,10 @@ SpaceEllipse::SpaceEllipse(const SpaceProp* p)
 }
 
 
-void SpaceEllipse::resize()
+void SpaceEllipse::update()
 {
-    Space::checkLengths(DIM, true);
+    for ( int d = 0; d < DIM; ++d )
+        lengthSqr_[d] = square(length_[d]);
     
 #if ( DIM > 2 ) && defined HAS_SPHEROID
     mSpheroid = -1;
@@ -32,10 +35,23 @@ void SpaceEllipse::resize()
 }
 
 
+void SpaceEllipse::resize(Glossary& opt)
+{
+    opt.set(length_, 3, "length");
+    
+    for ( int d = 0; d < DIM; ++d )
+    {
+        if ( length_[d] <= 0 )
+            throw InvalidParameter("ellipse:length[] must be > 0");
+    }
+    update();
+}
+
+
 void SpaceEllipse::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length(0),-length(1),-length(2));
-    sup.set( length(0), length(1), length(2));
+    inf.set(-length_[0],-length_[1],-length_[2]);
+    sup.set( length_[0], length_[1], length_[2]);
 }
 
 /**
@@ -51,9 +67,9 @@ Vector SpaceEllipse::normalToEdge(Vector const& pos) const
 #if ( DIM == 1 )
     return Vector(std::copysign(real(1.0), pos.XX));
 #elif ( DIM == 2 )
-    return normalize(Vector(pos.XX/lengthSqr(0), pos.YY/lengthSqr(1)));
+    return normalize(Vector(pos.XX/lengthSqr_[0], pos.YY/lengthSqr_[1]));
 #else
-    return normalize(Vector(pos.XX/lengthSqr(0), pos.YY/lengthSqr(1), pos.ZZ/lengthSqr(2)));
+    return normalize(Vector(pos.XX/lengthSqr_[0], pos.YY/lengthSqr_[1], pos.ZZ/lengthSqr_[2]));
 #endif
 }
 
@@ -61,36 +77,36 @@ Vector SpaceEllipse::normalToEdge(Vector const& pos) const
 
 real SpaceEllipse::volume() const
 {
-    return 2 * length(0);
+    return 2 * length_[0];
 }
 
 bool  SpaceEllipse::inside(Vector const& w) const
 {
-    return fabs(w.XX) < length(0);
+    return fabs(w.XX) < length_[0];
 }
 
 #elif ( DIM == 2 )
 
 real SpaceEllipse::volume() const
 {
-    return M_PI * length(0) * length(1);
+    return M_PI * length_[0] * length_[1];
 }
 
 bool  SpaceEllipse::inside(Vector const& w) const
 {
-    return square(w.XX/length(0)) + square(w.YY/length(1)) <= 1;
+    return square(w.XX/length_[0]) + square(w.YY/length_[1]) <= 1;
 }
 
 #else
 
 real SpaceEllipse::volume() const
 {
-    return 4/3.0 * M_PI * length(0) * length(1) * length(2);
+    return 4/3.0 * M_PI * length_[0] * length_[1] * length_[2];
 }
 
 bool SpaceEllipse::inside(Vector const& w) const
 {
-    return square(w.XX/length(0)) + square(w.YY/length(1)) + square(w.ZZ/length(2)) <= 1;
+    return square(w.XX/length_[0]) + square(w.YY/length_[1]) + square(w.ZZ/length_[2]) <= 1;
 }
 
 #endif
@@ -100,9 +116,9 @@ bool SpaceEllipse::inside(Vector const& w) const
 Vector1 SpaceEllipse::project1D(Vector1 const& w) const
 {
     if ( w.XX >= 0 )
-        return Vector1(length(0), 0, 0);
+        return Vector1(length_[0], 0, 0);
     else
-        return Vector1(-length(0), 0, 0);
+        return Vector1(-length_[0], 0, 0);
 }
 
 
@@ -110,7 +126,7 @@ Vector1 SpaceEllipse::project1D(Vector1 const& w) const
 Vector2 SpaceEllipse::project2D(Vector2 const& w) const
 {
     Vector2 p;
-    projectEllipse(p.XX, p.YY, w.XX, w.YY, mLength[0], mLength[1]);
+    projectEllipse(p.XX, p.YY, w.XX, w.YY, length_[0], length_[1]);
 #if ( 0 )
     // check that results are valid numbers:
     assert_true(p[0]==p[0]);
@@ -155,7 +171,7 @@ Vector3 SpaceEllipse::project3D(Vector3 const& w) const
     }
 #endif
     
-    projectEllipsoid(p.data(), w.data(), mLength);
+    projectEllipsoid(p.data(), w.data(), length_);
     
 #if ( 0 )
     // check that results are valid numbers:
@@ -166,6 +182,31 @@ Vector3 SpaceEllipse::project3D(Vector3 const& w) const
     return p;
 }
 
+
+//------------------------------------------------------------------------------
+
+void SpaceEllipse::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(3);
+    out.writeFloat(length_[0]);
+    out.writeFloat(length_[1]);
+    out.writeFloat(length_[2]);
+}
+
+void SpaceEllipse::setLengths(const real len[])
+{
+    length_[0] = len[0];
+    length_[1] = len[1];
+    length_[2] = len[2];
+    update();
+}
+
+void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+}
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
@@ -181,7 +222,7 @@ bool SpaceEllipse::draw() const
 {
 #if ( DIM == 1 )
     
-    GLfloat X = length(0);
+    GLfloat X = length_[0];
     
     glBegin(GL_LINES);
     glVertex2f(-X, -1);
@@ -197,7 +238,7 @@ bool SpaceEllipse::draw() const
     gle::circle(fin, cir, 1);
 
     glPushMatrix();
-    glScaled(length(0), length(1), 1.0);
+    glScaled(length_[0], length_[1], 1.0);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_LOOP, 0, fin+1);
@@ -216,9 +257,9 @@ bool SpaceEllipse::draw() const
         gle::circle(2*fin, c, s, 1);
     }
 
-    GLfloat X = (GLfloat)length(0), iX = 1.0f / ( X * X );
-    GLfloat Y = (GLfloat)length(1), iY = 1.0f / ( Y * Y );
-    GLfloat Z = (GLfloat)length(2), iZ = 1.0f / ( Z * Z );
+    GLfloat X = (GLfloat)length_[0], iX = 1.0f / ( X * X );
+    GLfloat Y = (GLfloat)length_[1], iY = 1.0f / ( Y * Y );
+    GLfloat Z = (GLfloat)length_[2], iZ = 1.0f / ( Z * Z );
     
     /*
      A vector orthogonal to the ellipse at position (X, Y, Z) is

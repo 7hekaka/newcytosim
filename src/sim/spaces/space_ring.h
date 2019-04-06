@@ -11,12 +11,10 @@
  The end discs are not part of the surface.
  project() will always project on the curvy surface of the cylinder.
 
-    ring length radius
-
- With:
- - length = half-length of the cylinder along X
- - radius = radius of the cylinder
- .
+ Parameters:
+     - length = half-length of the cylinder along X
+     - radius = radius of the cylinder
+     .
 
  @ingroup SpaceGroup
  */
@@ -27,23 +25,26 @@ class SpaceRing : public Space
 
 private:
     
-    /// half the length of the cylinder (alias to mLength[0])
-    real &      length;
+    /// half the length of the cylinder
+    real  length_;
     
-    /// the radius of the ring (alias to mLength[1])
-    real &      radius;
+    /// the radius of the ring
+    real  radius_;
     
-    /// the square of the radius (alias to mLengthSqr[1])
-    real &      radiusSqr;
+    /// the square of the radius
+    real  radiusSqr_;
     
+    /// calculate radiusSqr
+    void  update() { radiusSqr_ = square(radius_); }
+
 public:
         
     ///creator
     SpaceRing(const SpaceProp*);
     
-    /// check number and validity of specified lengths
-    void        resize() { Space::checkLengths(2, true); }
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -72,6 +73,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

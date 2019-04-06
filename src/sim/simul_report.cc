@@ -1485,8 +1485,7 @@ void Simul::reportSpace(std::ostream& out) const
     {
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();
-        for ( unsigned d = 0; d < Space::DMAX; ++d )
-            out << SEP << std::fixed << obj->length(d);
+        out << SEP << std::fixed << obj->geometry();
     }
 }
 

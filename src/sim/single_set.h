@@ -143,10 +143,10 @@ public:
     void          shuffle();
 
     /// mark object before import
-    void          freeze();
+    void          freeze(ObjectFlag f);
     
     /// delete marked object after import
-    void          prune();
+    void          prune(ObjectFlag f);
 
     /// unmark objects after import
     void          thaw();

@@ -1,40 +1,57 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "space_ring.h"
-#include "mecapoint.h"
 #include "exceptions.h"
+#include "mecapoint.h"
+#include "iowrapper.h"
+#include "glossary.h"
 #include "meca.h"
 
 
 SpaceRing::SpaceRing(const SpaceProp* p)
-: Space(p), length(mLength[0]), radius(mLength[1]), radiusSqr(mLengthSqr[1])
+: Space(p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("ring is only valid in 3D: use rectangle instead");
+    length_ = 0;
+    radius_ = 0;
+}
+
+
+void SpaceRing::resize(Glossary& opt)
+{
+    opt.set(length_, "length");
+    opt.set(radius_, "radius");
+
+    if ( length_ < 0 )
+        throw InvalidParameter("ring:length must be > 0");
+    
+    if ( radius_ < 0 )
+        throw InvalidParameter("ring:radius must be >= 0");
 }
 
 
 void SpaceRing::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length,-radius,-radius);
-    sup.set( length, radius, radius);
+    inf.set(-length_,-radius_,-radius_);
+    sup.set( length_, radius_, radius_);
 }
 
 
 real  SpaceRing::volume() const
 {
-    return 2 * M_PI * length * radius * radius;
+    return 2 * M_PI * length_ * radius_ * radius_;
 }
 
 
 Vector SpaceRing::randomPlace() const
 {
 #if ( DIM >= 3 )
-    Vector2 sec = Vector2::randB(radius);
-    return Vector(length*RNG.sreal(), sec.XX, sec.YY);
+    Vector2 sec = Vector2::randB(radius_);
+    return Vector(length_*RNG.sreal(), sec.XX, sec.YY);
 #elif ( DIM > 1 )
-    return Vector(length*RNG.sreal(), radius*RNG.sreal());
+    return Vector(length_*RNG.sreal(), radius_*RNG.sreal());
 #else
-    return Vector(length*RNG.sreal());
+    return Vector(length_*RNG.sreal());
 #endif
 }
 
@@ -42,11 +59,11 @@ Vector SpaceRing::randomPlace() const
 //------------------------------------------------------------------------------
 bool  SpaceRing::inside(Vector const& w) const
 {
-    if ( fabs(w.XX) > length )
+    if ( fabs(w.XX) > length_ )
         return false;
 
 #if ( DIM > 2 )
-    return ( w.YY*w.YY + w.ZZ*w.ZZ <= radiusSqr );
+    return ( w.YY*w.YY + w.ZZ*w.ZZ <= radiusSqr_ );
 #else
     return false;
 #endif
@@ -56,11 +73,11 @@ bool  SpaceRing::allInside(Vector const& w, const real rad ) const
 {
     assert_true( rad >= 0 );
     
-    if ( fabs(w.XX) + rad > length )
+    if ( fabs(w.XX) + rad > length_ )
         return false;
 
 #if ( DIM > 2 )
-    return ( w.YY*w.YY + w.ZZ*w.ZZ <= square(radius-rad) );
+    return ( w.YY*w.YY + w.ZZ*w.ZZ <= square(radius_-rad) );
 #else
     return false;
 #endif
@@ -73,10 +90,10 @@ bool  SpaceRing::allInside(Vector const& w, const real rad ) const
 Vector SpaceRing::project(Vector const& w) const
 {
     Vector p;
-    if ( w.XX >  length )
-        p.XX =  length;
-    else if ( w.XX < -length )
-        p.XX = -length;
+    if ( w.XX >  length_ )
+        p.XX =  length_;
+    else if ( w.XX < -length_ )
+        p.XX = -length_;
     else
         p.XX = w.XX;
     
@@ -85,13 +102,13 @@ Vector SpaceRing::project(Vector const& w) const
     
     if ( n > 0 )
     {
-        n = radius / n;
+        n = radius_ / n;
         p.YY = n * w.YY;
         p.ZZ = n * w.ZZ;
     }
     else
     {
-        p.YY = radius;
+        p.YY = radius_;
         p.ZZ = 0;
     }
 #endif
@@ -127,7 +144,7 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & me
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length, radius);
+    setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
 
 /**
@@ -135,7 +152,32 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & me
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length, radius);
+    setInteraction(pos, pe, meca, stiff, length_, radius_);
+}
+
+//------------------------------------------------------------------------------
+
+void SpaceRing::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(2);
+    out.writeFloat(length_);
+    out.writeFloat(radius_);
+}
+
+
+void SpaceRing::setLengths(const real len[])
+{
+    length_ = len[0];
+    radius_ = len[1];
+    update();
+}
+
+
+void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
 }
 
 //------------------------------------------------------------------------------
@@ -152,9 +194,9 @@ bool SpaceRing::draw() const
 
     const size_t fin = 512;
     GLfloat c[fin+1], s[fin+1];
-    gle::circle(fin, c, s, GLfloat(radius));
+    gle::circle(fin, c, s, GLfloat(radius_));
 
-    GLfloat L = GLfloat(length);
+    GLfloat L = GLfloat(length_);
     
     glBegin(GL_TRIANGLE_STRIP);
     for ( size_t n = 0; n <= fin; ++n )

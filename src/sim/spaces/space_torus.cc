@@ -2,6 +2,8 @@
 #include "dim.h"
 #include "space_torus.h"
 #include "exceptions.h"
+#include "iowrapper.h"
+#include "glossary.h"
 
 SpaceTorus::SpaceTorus(const SpaceProp* p)
 : Space(p)
@@ -11,15 +13,16 @@ SpaceTorus::SpaceTorus(const SpaceProp* p)
 }
 
 
-void SpaceTorus::resize()
+void SpaceTorus::resize(Glossary& opt)
 {
-    checkLengths(2, true);
+    opt.set(bCurvature, "radius");
+    opt.set(bRadius,   "width");
 
-    bRadius   = mLength[0];
-    bWidth    = mLength[1];
-    bWidthSqr = bWidth * bWidth;
-
-    if ( bWidth > bRadius )
+    if ( bCurvature <= 0 )
+        throw InvalidParameter("torus:width must be < radius");
+    if ( bRadius <= 0 )
+        throw InvalidParameter("torus:width must be < radius");
+    if ( bRadius > bCurvature )
         throw InvalidParameter("torus:width must be < radius");
 }
 
@@ -27,17 +30,17 @@ void SpaceTorus::resize()
 real SpaceTorus::volume() const
 {
 #if ( DIM == 2 )
-    return 4 * M_PI * bRadius * bWidth;
+    return 4 * M_PI * bCurvature * bRadius;
 #else
-    return 2 * M_PI * M_PI * bRadius * bWidthSqr;
+    return 2 * M_PI * M_PI * bCurvature * bRadiusSqr;
 #endif
 }
 
 
 void SpaceTorus::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-bRadius-bWidth,-bRadius-bWidth,-bWidth);
-    sup.set( bRadius+bWidth, bRadius+bWidth, bWidth);
+    inf.set(-bCurvature-bRadius,-bCurvature-bRadius,-bRadius);
+    sup.set( bCurvature+bRadius, bCurvature+bRadius, bRadius);
 }
 
 
@@ -45,7 +48,7 @@ void SpaceTorus::boundaries(Vector& inf, Vector& sup) const
 Vector SpaceTorus::project0(Vector const& pos) const
 {
 #if ( DIM > 1 )
-    real n = bRadius / pos.normXY();
+    real n = bCurvature / pos.normXY();
     return Vector(n * pos.XX, n * pos.YY, 0);
 #else
     return Vector(0, 0, 0);
@@ -56,7 +59,7 @@ Vector SpaceTorus::project0(Vector const& pos) const
 bool SpaceTorus::inside(Vector const& pos) const
 {
     Vector prj = project0(pos);
-    return ( distanceSqr(prj, pos) <= bWidthSqr );
+    return ( distanceSqr(prj, pos) <= bRadiusSqr );
 }
 
 
@@ -65,10 +68,34 @@ Vector SpaceTorus::project(Vector const& pos) const
     Vector cen = project0(pos);
     Vector ax = pos - cen;
     real n = ax.normSqr();
-    n = bWidth / sqrt(n);
+    n = bRadius / sqrt(n);
     return cen + n * ax;
 }
 
+
+//------------------------------------------------------------------------------
+
+void SpaceTorus::write(Outputter& out) const
+{
+    out.put_line(" "+prop->shape+" ");
+    out.writeUInt16(2);
+    out.writeFloat(bCurvature);
+    out.writeFloat(bRadius);
+}
+
+
+void SpaceTorus::setLengths(const real len[])
+{
+    bCurvature = len[0];
+    bRadius = len[2];
+    update();
+}
+
+void SpaceTorus::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, len);
+}
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
@@ -88,11 +115,11 @@ bool SpaceTorus::draw() const
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    gle::circle(fin, cir, GLfloat(bRadius-bWidth));
+    gle::circle(fin, cir, GLfloat(bCurvature-bRadius));
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
 
-    gle::circle(fin, cir, GLfloat(bRadius+bWidth));
+    gle::circle(fin, cir, GLfloat(bCurvature+bRadius));
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
 
@@ -101,7 +128,7 @@ bool SpaceTorus::draw() const
     
 #elif ( DIM > 2 )
     
-    gleTorus(bRadius, bWidth);
+    gleTorus(bCurvature, bRadius);
     return true;
     
 #else

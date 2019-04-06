@@ -13,37 +13,41 @@
  `radius` from the inner cube obtained by subtracting `radius` to the sizes.
  The dice is thus included in the rectangular space of similar size.
 
-    dice sizeX sizeY sizeZ radius
-
- With:
- - sizeX = half-width along X
- - sizeY = half-width along Y
- - sizeZ = half-width along Z
- - radius = rounding radius of edges
- .
+ Parameters:
+     - length = half-width along X, Y and Z
+     - radius = rounding radius of edges
+     .
 
  Note: Dice::setInteraction() relies on project(), and numerical instabilities
  may arise in particular if `radius << size`, because determining the tangent
  plane to a point becomes imprecise.
-*/
+ 
+ @ingroup SpaceGroup
+ */
 class SpaceDice : public Space
 {
 public:
     
-    /// the radius by which the corners are smoothed (alias to mLength[3])
-    real &      radius;
+    /// dimensions
+    real      length_[3];
+    
+    /// the radius by which the corners are smoothed
+    real      radius_;
     
     /// the square of the radius
-    real &      radiusSqr;
+    real      radiusSqr_;
     
+    /// calculate radiusSqr
+    void  update() { radiusSqr_ = square(radius_); }
+
 public:
         
     /// constructor
     SpaceDice(const SpaceProp*);
-    
-    /// check number and validity of specified lengths
-    void        resize();
-    
+
+    /// update geometry
+    void        resize(Glossary& opt);
+ 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -59,6 +63,15 @@ public:
     
     /// OpenGL display function; returns true if successful
     bool        draw() const;
+    
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
     
 };
 

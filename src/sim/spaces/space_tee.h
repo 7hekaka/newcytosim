@@ -7,17 +7,14 @@
 /// a Capsule with a cylindrical arm perpendicular to it
 /**
  Space `tee` is a capsule with a cylindrical arms in a perpendicular direction.
- 
-    tee length radius arm_position arm_length 
 
- With:
- - length = half length of central cylinder
- - radius = radius/width of central and arm cylinders, radius of caps
- - arm_position = position of perpendicular arm on the cylinder
- - arm_length = length of perpendicular arm
- .
+ Parameters:
+     - length = half length of central cylinder
+     - radius = radius/width of central and arm cylinders, radius of caps
+     - arm_position = position of perpendicular arm on the cylinder
+     - arm_length = length of perpendicular arm
+     .
  
-
  This is an OLD Space: 
  The re-entrant corners at the base of the arm are not
  properly considered in setInteraction().
@@ -38,7 +35,9 @@ private:
     real tJunction;
     
     ///the radius of the caps, and square of it
-    real tWidth,  tWidthSq;
+    real tRadius,  tRadiusSq;
+    
+    void update() { tRadiusSq = square(tRadius); }
     
     ///project on base cylinder, return distance
     real projectOnBase(const Vector w, Vector& p)  const;
@@ -54,9 +53,9 @@ public:
     ///constructor
     SpaceTee(const SpaceProp*);
    
-    /// check number and validity of specified lengths
-    void        resize();
-    
+    /// update geometry
+    void        resize(Glossary& opt);
+
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     
@@ -72,6 +71,15 @@ public:
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     
+    /// write to file
+    void        write(Outputter&) const;
+
+    /// get dimensions from array `len`
+    void        setLengths(const real len[8]);
+    
+    /// read from file
+    void        read(Inputter&, Simul&, ObjectTag);
+
 };
 
 #endif

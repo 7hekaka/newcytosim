@@ -195,10 +195,10 @@ public:
     /// @}
     
     /// text displayed in center of window
-    std::string         memo;
+    std::string      memo;
     
     /// flag to display information on screen
-    int                 show_memo;
+    int              show_memo;
 
 public:
    

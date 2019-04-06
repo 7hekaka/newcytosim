@@ -110,13 +110,13 @@ public:
     /// remove object (should be a Couple)
     void         unlink(Object *);
 
-    /// reassign Couple to different sublist following attachement of Hand 1
+    /// reassign Couple to sublist following attachement of Hand 1
     void         relinkA1(Couple *);
-    /// reassign Couple to different sublist following detachment of Hand 1
+    /// reassign Couple to sublist following detachment of Hand 1
     void         relinkD1(Couple *);
-    /// reassign Couple to different sublist following attachement of Hand 2
+    /// reassign Couple to sublist following attachement of Hand 2
     void         relinkA2(Couple *);
-    /// reassign Couple to different sublist following detachment of Hand 2
+    /// reassign Couple to sublist following detachment of Hand 2
     void         relinkD2(Couple *);
     
     /// reassign Couple to different sublist, given previous state
@@ -197,10 +197,10 @@ public:
     void         relax() { uniRelax(); }
      
     /// mark object before import
-    void         freeze();
+    void         freeze(ObjectFlag f);
     
     /// delete marked object after import
-    void         prune();
+    void         prune(ObjectFlag f);
     
     /// unmark objects after import
     void         thaw();

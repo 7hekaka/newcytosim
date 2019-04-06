@@ -8,13 +8,13 @@
 /// A disc centered at the origin, with variable radius.
 /**
  Space `dynamic_sphere` is a disc or a sphere centered around the origin
- 
-    disc radius
- 
  Forces registered with 'setInteractions' are added, and used to update the
  radius of the Space. How fast the radius changes is set by the value 'mobility'
  in SpaceProp.
  
+ Parameters:
+     - radius
+
  @ingroup SpaceGroup
  
  FJN, Strasbourg 29.01.2017
@@ -25,15 +25,12 @@ class SpaceDynamicSphere : public SpaceSphere
 private:
     
     /// radial force
-    mutable real   rForce;
+    mutable real force_;
     
 public:
     
     /// constructor
     SpaceDynamicSphere(const SpaceProp*);
-
-    /// check number and validity of specified lengths
-    void        resize() { }
     
     /// add interactions to a Meca
     void        setInteractions(Meca &, FiberSet const&) const;

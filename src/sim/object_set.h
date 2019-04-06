@@ -59,18 +59,18 @@ protected:
     static void       flag(NodeList const&, ObjectFlag f);
     
     /// delete objects which are marked as `f` from given list, and mark objects with `s`
-    static void       prune(NodeList const&, ObjectFlag f, ObjectFlag s);
+    static void       prune(NodeList const&, ObjectFlag f, ObjectFlag g);
     
 public:
     
     /// mark objects before import
-    virtual void      freeze() { flag(nodes, 1); }
+    virtual void      freeze(ObjectFlag f) { flag(nodes, f); }
     
     /// delete marked objects
-    virtual void      prune()  { prune(nodes, 1, 0); }
+    virtual void      prune(ObjectFlag f)  { prune(nodes, f, 0); }
     
     /// unmark objects after import
-    virtual void      thaw()   { flag(nodes, 0); }
+    virtual void      thaw()               { flag(nodes, 0); }
     
     /// apply translation to all Objects in ObjectList
     static void       translateObjects(ObjectList const&, Vector const&);
