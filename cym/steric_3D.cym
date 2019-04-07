@@ -16,11 +16,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 1 )
+    shape = circle
     display = ( color=0xFFFFFF11 )
 }
 
 new cell
+{
+    radius = 1
+}
 
 set fiber filament
 {

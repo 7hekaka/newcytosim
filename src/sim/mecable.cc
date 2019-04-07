@@ -394,9 +394,9 @@ void Mecable::print(std::ostream& os) const
 {
     os << "new mecable " << reference() << "\n{\n";
     os << " nb_points = " << nPoints << '\n';
-    for ( unsigned pp = 0; pp < nPoints ; ++pp )
+    for ( unsigned i = 0; i < nPoints ; ++i )
     {
-        os << " point" << pp+1 << " = " << posP(pp) << '\n';
+        os << " point" << i+1 << " = " << posP(i) << '\n';
     }
     os << "}\n";
 }

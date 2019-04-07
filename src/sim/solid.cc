@@ -56,53 +56,53 @@ void Solid::setInteractions(Meca & meca) const
         switch ( prop->confine )
         {
             case CONFINE_INSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    const real rad = soRadius[pp];
+                    const real rad = soRadius[i];
                     // confine all massive points:
                     if ( rad > 0 )
                     {
-                        Vector pos = posP(pp);
+                        Vector pos = posP(i);
                         if ( ! spc->inside(pos) )
-                            spc->setInteraction(pos, Mecapoint(this, pp), meca, prop->confine_stiffness);
+                            spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                     }
                 }
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    const real rad = soRadius[pp];
+                    const real rad = soRadius[i];
                     // confine all massive points:
                     if ( rad > 0 )
                     {
-                        Vector pos = posP(pp);
+                        Vector pos = posP(i);
                         if ( spc->inside(pos) )
-                            spc->setInteraction(pos, Mecapoint(this, pp), meca, prop->confine_stiffness);
+                            spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                     }
                 }
                 break;
                 
             case CONFINE_ALL_INSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    const real rad = soRadius[pp];
+                    const real rad = soRadius[i];
                     // confine all massive points:
                     if ( rad > 0 )
                     {
-                        Vector pos = posP(pp);
+                        Vector pos = posP(i);
                         if ( ! spc->allInside(pos, rad) )
-                            spc->setInteraction(pos, Mecapoint(this, pp), rad, meca, prop->confine_stiffness);
+                            spc->setInteraction(pos, Mecapoint(this, i), rad, meca, prop->confine_stiffness);
                     }
                 }
                 break;
                 
             case CONFINE_ON:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
                     // only confine massive points:
-                    if ( soRadius[pp] > 0 )
-                        spc->setInteraction(posP(pp), Mecapoint(this, pp), meca, prop->confine_stiffness);
+                    if ( soRadius[i] > 0 )
+                        spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
                 
@@ -561,12 +561,12 @@ Vector Solid::centroid() const
     
     real sum = 0;
     Vector res(0,0,0);
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        if ( soRadius[pp] > 0 )
+        if ( soRadius[i] > 0 )
         {
-            res += soRadius[pp] * posP(pp);
-            sum += soRadius[pp];
+            res += soRadius[i] * posP(i);
+            sum += soRadius[i];
         }
     }
     if ( sum < REAL_EPSILON )
@@ -628,8 +628,8 @@ void Solid::scaleShape(const real scale[DIM])
     
     //recalculate the momentum needed in rescale():
     soShapeSqr = 0;
-    for ( unsigned pp = 0; pp < DIM * soShapeSize; ++pp )
-        soShapeSqr += soShape[pp] * soShape[pp];
+    for ( unsigned i = 0; i < DIM * soShapeSize; ++i )
+        soShapeSqr += soShape[i] * soShape[i];
     
     setDragCoefficient();
 }
@@ -686,17 +686,17 @@ void Solid::reshape()
         ABORT_NOW("mismatch with current number of points: forgot to call fixShape()?");
          
     real cc = 0, a = 0;
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        a  += pPos[pp] * soShape[pp];
-        cc += pPos[pp];
+        a  += pPos[i] * soShape[i];
+        cc += pPos[i];
     }
     
     cc /= real( nPoints );
     real s = a / fabs(a);
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
-        pPos[pp] = s * soShape[pp] + cc;
+    for ( unsigned i = 0; i < nPoints; ++i )
+        pPos[i] = s * soShape[i] + cc;
 }
 
 #elif ( DIM == 2 )
@@ -716,10 +716,10 @@ void Solid::reshape()
     
     real a = 0, b = 0;
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        a += pPos[DIM*pp] * soShape[DIM*pp  ] + pPos[DIM*pp+1] * soShape[DIM*pp+1];
-        b += soShape[DIM*pp] * pPos[DIM*pp+1] - soShape[DIM*pp+1] * pPos[DIM*pp  ];
+        a += pPos[DIM*i] * soShape[DIM*i  ] + pPos[DIM*i+1] * soShape[DIM*i+1];
+        b += soShape[DIM*i] * pPos[DIM*i+1] - soShape[DIM*i+1] * pPos[DIM*i  ];
     }
     
     real n = sqrt( a*a + b*b );
@@ -735,10 +735,10 @@ void Solid::reshape()
     
     // apply transformation = rotation + translation:
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        pPos[DIM*pp  ] = c * soShape[DIM*pp] - s * soShape[DIM*pp+1] + avg.XX;
-        pPos[DIM*pp+1] = s * soShape[DIM*pp] + c * soShape[DIM*pp+1] + avg.YY;
+        pPos[DIM*i  ] = c * soShape[DIM*i] - s * soShape[DIM*i+1] + avg.XX;
+        pPos[DIM*i+1] = s * soShape[DIM*i] + c * soShape[DIM*i+1] + avg.YY;
     }
 }
 
@@ -759,11 +759,11 @@ void Solid::reshape()
     Vector avg = Mecable::position();
     
     real S[3*3] = { 0 };
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
         for ( unsigned dd = 0; dd < DIM; ++dd )
             for ( unsigned ee = 0; ee < DIM; ++ee )
-                S[dd+3*ee] += soShape[DIM*pp+dd] * pPos[DIM*pp+ee];
+                S[dd+3*ee] += soShape[DIM*i+dd] * pPos[DIM*i+ee];
     }
     
     //the scaling is arbitrary here, but it keeps the magnitude of the matrix:
@@ -808,21 +808,21 @@ void Solid::reshape()
         quat.setMatrix3(S, 3);
     
         //apply the transformation = rotation + translation:
-        for ( unsigned pp = 0; pp < nPoints; ++pp )
+        for ( unsigned i = 0; i < nPoints; ++i )
         {
-            pPos[DIM*pp  ] = avg.XX + S[0]*soShape[DIM*pp]+ S[3]*soShape[DIM*pp+1] + S[6]*soShape[DIM*pp+2];
-            pPos[DIM*pp+1] = avg.YY + S[1]*soShape[DIM*pp]+ S[4]*soShape[DIM*pp+1] + S[7]*soShape[DIM*pp+2];
-            pPos[DIM*pp+2] = avg.ZZ + S[2]*soShape[DIM*pp]+ S[5]*soShape[DIM*pp+1] + S[8]*soShape[DIM*pp+2];
+            pPos[DIM*i  ] = avg.XX + S[0]*soShape[DIM*i]+ S[3]*soShape[DIM*i+1] + S[6]*soShape[DIM*i+2];
+            pPos[DIM*i+1] = avg.YY + S[1]*soShape[DIM*i]+ S[4]*soShape[DIM*i+1] + S[7]*soShape[DIM*i+2];
+            pPos[DIM*i+2] = avg.ZZ + S[2]*soShape[DIM*i]+ S[5]*soShape[DIM*i+1] + S[8]*soShape[DIM*i+2];
         }
     }
     else
     {
         //apply translation:
-        for ( unsigned pp = 0; pp < nPoints; ++pp )
+        for ( unsigned i = 0; i < nPoints; ++i )
         {
-            pPos[DIM*pp  ] = avg.XX + soShape[DIM*pp  ];
-            pPos[DIM*pp+1] = avg.YY + soShape[DIM*pp+1];
-            pPos[DIM*pp+2] = avg.ZZ + soShape[DIM*pp+2];
+            pPos[DIM*i  ] = avg.XX + soShape[DIM*i  ];
+            pPos[DIM*i+1] = avg.YY + soShape[DIM*i+1];
+            pPos[DIM*i+2] = avg.ZZ + soShape[DIM*i+2];
         }
         
         printf("Solid::reshape(): lapack::xsyevx() failed with code %i\n", info);
@@ -869,8 +869,8 @@ real Solid::dragCoefficient() const
 {
     real sumR = 0;
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
-        sumR += soRadius[pp];
+    for ( unsigned i = 0; i < nPoints; ++i )
+        sumR += soRadius[i];
     
     return ( 6 * M_PI ) * prop->viscosity * sumR;
 }
@@ -895,16 +895,16 @@ void Solid::setDragCoefficient()
     real roti = 0;     //in 2D, the total rotational inertia
 #endif
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        real R = soRadius[pp];
+        real R = soRadius[i];
         if ( R > 0 )
         {
             sumR   += R;
             sumR3  += R * R * R;
-            cen    += R * posP(pp);
+            cen    += R * posP(i);
 #if ( DIM < 3 )
-            roti   += R * posP(pp).normSqr();
+            roti   += R * posP(i).normSqr();
 #endif
         }
     }
@@ -1004,15 +1004,15 @@ void Solid::makeProjection()
     real sumR = 0;
     real sumR3 = 0;
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        real R = soRadius[pp];
+        real R = soRadius[i];
         if ( R > 0 )
         {
             sumR  += R;
             sumR3 += R * R * R;
-            cen   += R * posP(pp);
-            roti  += R * posP(pp).normSqr();
+            cen   += R * posP(i);
+            roti  += R * posP(i).normSqr();
         }
     }
     
@@ -1072,14 +1072,14 @@ void Solid::makeProjection()
     Vector cen(0,0,0);
     real mXX=0, mXY=0, mXZ=0, mYY=0, mYZ=0, mZZ=0;
     
-    for ( unsigned pp = 0; pp < nPoints; ++pp )
+    for ( unsigned i = 0; i < nPoints; ++i )
     {
-        const real R = soRadius[pp];
+        const real R = soRadius[i];
         if ( R > 0 )
         {
             ++cnt;
             sum += R;
-            const Vector pos = posP(pp);
+            const Vector pos = posP(i);
             const Vector vec = R * pos;
             cen += vec;
             mXX += vec.XX * pos.XX;
@@ -1202,10 +1202,10 @@ void Solid::read(Inputter & in, Simul&, ObjectTag)
     {
         unsigned nbp = in.readUInt16();
         setNbPoints(nbp);
-        for ( unsigned pp = 0; pp < nbp ; ++pp )
+        for ( unsigned i = 0; i < nbp ; ++i )
         {
-            in.readFloatVector(pPos+DIM*pp, DIM);
-            soRadius[pp] = in.readFloat();
+            in.readFloatVector(pPos+DIM*i, DIM);
+            soRadius[i] = in.readFloat();
         }
     }
     catch( Exception & e )

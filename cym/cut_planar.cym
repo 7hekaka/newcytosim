@@ -9,7 +9,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 5 )
+    geometry = ( sphere 4 )
 }
 
 new cell
@@ -21,9 +21,9 @@ set fiber microtubule
     confine = inside, 100
 }
 
-new 50 microtubule
+new 60 microtubule
 {
-    length = 12
+    length = 10
     orientation = horizontal
 }
 
@@ -34,9 +34,9 @@ set fiber glucan
     confine = inside, 100
 }
 
-new 50 glucan
+new 40 glucan
 {
-    length = 12
+    length = 10
     orientation = horizontal
 }
 

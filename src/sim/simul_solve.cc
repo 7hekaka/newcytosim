@@ -165,13 +165,13 @@ void Simul::setStericInteractions(Meca& meca) const
     {
         if ( so->prop->steric )
         {
-            for ( unsigned int pp = 0; pp < so->nbPoints(); ++pp )
+            for ( unsigned i = 0; i < so->nbPoints(); ++i )
             {
-                if ( so->radius(pp) > REAL_EPSILON )
+                if ( so->radius(i) > REAL_EPSILON )
 #if ( NB_STERIC_PANES == 1 )
-                    pointGrid.add(Mecapoint(so, pp), so->radius(pp), so->radius(pp)+so->prop->steric_range);
+                    pointGrid.add(Mecapoint(so, i), so->radius(i), so->radius(i)+so->prop->steric_range);
 #else
-                    pointGrid.add(so->prop->steric, Mecapoint(so, pp), so->radius(pp), so->radius(pp)+so->prop->steric_range);
+                    pointGrid.add(so->prop->steric, Mecapoint(so, i), so->radius(i), so->radius(i)+so->prop->steric_range);
 #endif
             }
         }

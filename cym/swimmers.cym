@@ -13,12 +13,22 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 10 )
+    shape = circle
+}
+
+new cell
+{
+    radius = 10
 }
 
 set space inner
 {
-    geometry = ( sphere 9.25 )
+    shape = circle
+}
+
+new inner
+{
+    radius = 9.25
 }
 
 set fiber microtubule
@@ -43,10 +53,8 @@ set aster head
     stiffness = 100, 50
 }
 
-new cell
-new inner
-
-repeat 5 {
+repeat 5
+{
 new 1 head
 {
     type = regular

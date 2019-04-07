@@ -664,8 +664,8 @@ void Sphere::print(std::ostream& os) const
     os << "new sphere " << reference() << '\n';
     os << "{\n";
     os << " nb_points = " << nbPoints() << '\n';
-    for ( unsigned pp = 0; pp < nbPoints() ; ++pp )
-        os << " point" << pp+1 << " = " << posP(pp) << '\n';
+    for ( unsigned i = 0; i < nbPoints() ; ++i )
+        os << " point" << i+1 << " = " << posP(i) << '\n';
     os << "}" << '\n';
 }
 

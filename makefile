@@ -114,29 +114,23 @@ doc:
 	doxygen doc/code/doxygen.cfg > log.txt 2> /dev/null
 
 #------------------------------- archive ---------------------------------------
-.PHONY: cytosim.tar cytosim_src.tar tar pack
+.PHONY: tar tarzip tarsrc pack
+
+tar:
+	COPYFILE_DISABLE=1 tar cf cytosim.tar --exclude "*.o" --exclude "*~"\
+	src makefile makefile.inc cym python bash doc cytosim.xcodeproj
 
 
-cytosim.tar:
-	tar cf cytosim.tar --exclude \*.cmo --exclude \*tar\* \
-        --exclude bin/\* --exclude build/\*  *
-
-
-cytosim.tar.bz2: cytosim.tar
+tarzip: tar
 	rm -f cytosim.tar.bz2;
 	bzip2 cytosim.tar;
 
 
-cytosim_src.tar:
-	if ! test -f config.cym; then cp cym/fiber.cym config.cym; fi
+tarsrc:
 	COPYFILE_DISABLE=1 tar cf cytosim_src.tar --exclude "*.o" --exclude ".*" \
-	--exclude ".svn" --exclude "*~" src makefile makefile.inc *.cym cym python
+	--exclude ".svn" --exclude "*~" src makefile makefile.inc cym python bash
 
-
-tar: cytosim_src.tar cytosim.tar.bz2
-
-
-pack: sterile tar
+pack: sterile tarsrc
 
 #---------------------------- maintenance --------------------------------------
 .PHONY: bin build clean cleaner sterile
@@ -163,10 +157,10 @@ sterile:
 	rm -rf lib/*
 	rm -f  dep/*.dep
 	rm -rf bin/*.dSYM
-	rm -f  bin/*
-	rm -f  bin1/*
-	rm -f  bin2/*
-	rm -f  bin3/*
+	rm -rf bin/*
+	rm -rf bin1/*
+	rm -rf bin2/*
+	rm -rf bin3/*
 	rm -f *.cmo
 	rm -f log.txt;
 	svn cleanup

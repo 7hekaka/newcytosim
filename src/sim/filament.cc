@@ -282,15 +282,15 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
     dst[2] = src[2] + e.ZZ;
 #endif
     
-    for ( unsigned pp = 1; pp < ns; ++pp )
+    for ( unsigned i = 1; i < ns; ++i )
     {
-        d = sca[pp] * dif[pp];
-        dst[DIM*pp  ] = src[DIM*pp  ] + d.XX - e.XX;
+        d = sca[i] * dif[i];
+        dst[DIM*i  ] = src[DIM*i  ] + d.XX - e.XX;
 #if ( DIM > 1 )
-        dst[DIM*pp+1] = src[DIM*pp+1] + d.YY - e.YY;
+        dst[DIM*i+1] = src[DIM*i+1] + d.YY - e.YY;
 #endif
 #if ( DIM > 2 )
-        dst[DIM*pp+2] = src[DIM*pp+2] + d.ZZ - e.ZZ;
+        dst[DIM*i+2] = src[DIM*i+2] + d.ZZ - e.ZZ;
 #endif
         e = d;
     }
@@ -382,12 +382,12 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
      */
     val[0] = dif[0].normSqr() - alphaSqr;
     dia[0] = 2 * dif[0].normSqr();
-    for ( unsigned pp = 1; pp < ns; ++pp )
+    for ( unsigned i = 1; i < ns; ++i )
     {
-        real n = dif[pp].normSqr();
-        val[pp  ] = n - alphaSqr;
-        dia[pp  ] = 2 * n;
-        low[pp-1] = -dot(dif[pp], dif[pp-1]);
+        real n = dif[i].normSqr();
+        val[i  ] = n - alphaSqr;
+        dia[i  ] = 2 * n;
+        low[i-1] = -dot(dif[i], dif[i-1]);
     }
     
     lapack::xpttrf(ns, dia, low, &info);
@@ -398,16 +398,16 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     lapack::xptts2(ns, 1, dia, low, val, ns);
     
     err = 0;
-    for ( unsigned pp = 0; pp < ns; ++pp )
+    for ( unsigned i = 0; i < ns; ++i )
     {
-        sca[pp] = 0.5 * val[pp];
-        err += fabs(val[pp]);
+        sca[i] = 0.5 * val[i];
+        err += fabs(val[i]);
     }
 
 #if ( 0 )
     printf("\n --- \n 0 sca ");
-    for ( unsigned pp = 0; pp < ns; ++pp )
-        printf(" %+6.4f", sca[pp]);
+    for ( unsigned i = 0; i < ns; ++i )
+        printf(" %+6.4f", sca[i]);
 #endif
 
     while ( err > 1e-12 )
@@ -437,23 +437,23 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
 
 #if ( 0 )
         real sum = 0;
-        for ( unsigned pp = 0; pp < ns; ++pp )
-            sum += val[pp];
+        for ( unsigned i = 0; i < ns; ++i )
+            sum += val[i];
         printf("\n   %i sum %8.5f", cnt, sum);
 #endif
 #if ( 0 )
         printf("\n   %i val  ", cnt);
-        for ( unsigned pp = 0; pp < ns; ++pp )
-            printf("%+6.4f ", val[pp]);
+        for ( unsigned i = 0; i < ns; ++i )
+            printf("%+6.4f ", val[i]);
         printf("\n   %i upe  ", cnt);
-        for ( unsigned pp = 0; pp+1 < ns; ++pp )
-            printf("%+6.4f ", upe[pp]);
+        for ( unsigned i = 0; i+1 < ns; ++i )
+            printf("%+6.4f ", upe[i]);
         printf("\n   %i dia  ", cnt);
-        for ( unsigned pp = 0; pp < ns; ++pp )
-            printf("%+6.4f ", dia[pp]);
+        for ( unsigned i = 0; i < ns; ++i )
+            printf("%+6.4f ", dia[i]);
         printf("\n   %i low  ", cnt);
-        for ( unsigned pp = 0; pp < ns-1; ++pp )
-            printf("%+6.4f ", low[pp]);
+        for ( unsigned i = 0; i < ns-1; ++i )
+            printf("%+6.4f ", low[i]);
 #endif
         
         lapack::xgtsv(ns, 1, low, dia, upe, val, ns, &info);
@@ -465,10 +465,10 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
 
         // update `sca` and calculate residual error
         err = 0;
-        for ( pp = 0; pp < ns; ++pp )
+        for ( unsigned u = 0; u < ns; ++u )
         {
-            sca[pp] -= 0.5 * val[pp];
-            err += fabs(val[pp]);
+            sca[u] -= 0.5 * val[u];
+            err += fabs(val[u]);
         }
         if ( ++cnt > 31 )
         {
@@ -478,15 +478,15 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
         
 #if ( 0 )
         printf("\n %3i sca ", cnt);
-        for ( pp = 0; pp < ns; ++pp )
-            printf(" %+6.4f", sca[pp]);
+        for ( int i = 0; i < ns; ++i )
+            printf(" %+6.4f", sca[i]);
 #endif
     }
     
 #if ( 0 )
     printf("\n%2i sca  ", cnt);
-    for ( pp = 0; pp < ns; ++pp )
-        printf("%+6.4f ", sca[pp]);
+    for ( int i = 0; i < ns; ++i )
+        printf("%+6.4f ", sca[i]);
     printf("\n%2i err %e\n", cnt, err);
 #endif
     
@@ -517,10 +517,10 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     real * upe = new_real(ns);
     
     // calculate differences
-    for ( unsigned pp = 0; pp < ns; ++pp )
+    for ( unsigned i = 0; i < ns; ++i )
     {
-        dif[pp] = diffPoints(src, pp);
-        sca[pp] = 0.0;
+        dif[i] = diffPoints(src, i);
+        sca[i] = 0.0;
     }
     
     real err = 0;
@@ -528,40 +528,40 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     do {
 #if ( 0 )
         printf("\n   %i sca  ", cnt);
-        for ( unsigned pp = 0; pp < ns; ++pp )
-            printf("%+6.4f ", sca[pp]);
+        for ( unsigned i = 0; i < ns; ++i )
+            printf("%+6.4f ", sca[i]);
 #endif
 
         // calculate all values of 'vec'
         vec[0] = (1-2*sca[0])*dif[0] + sca[1]*dif[1];
-        for ( unsigned pp = 1; pp+1 < ns; ++pp )
-            vec[pp] = sca[pp-1]*dif[pp-1] + (1-2*sca[pp])*dif[pp] + sca[pp+1]*dif[pp+1];
+        for ( unsigned i = 1; i+1 < ns; ++i )
+            vec[i] = sca[i-1]*dif[i-1] + (1-2*sca[i])*dif[i] + sca[i+1]*dif[i+1];
         vec[ns-1] = sca[ns-2]*dif[ns-2] + (1-2*sca[ns-1])*dif[ns-1];
         
         // calculate the matrix elements and RHS of system
         val[0] = vec[0].normSqr() - alphaSqr;
         dia[0] = -2 * ( vec[0] * dif[0] );
-        for ( unsigned pp = 1; pp < ns; ++pp )
+        for ( unsigned i = 1; i < ns; ++i )
         {
-            val[pp] = vec[pp].normSqr() - alphaSqr;
-            dia[pp] = -2 * ( vec[pp] * dif[pp] );
-            upe[pp-1] = vec[pp-1] * dif[pp];
-            low[pp-1] = vec[pp] * dif[pp-1];
+            val[i] = vec[i].normSqr() - alphaSqr;
+            dia[i] = -2 * ( vec[i] * dif[i] );
+            upe[i-1] = vec[i-1] * dif[i];
+            low[i-1] = vec[i] * dif[i-1];
         }
         
 #if ( 0 )
         printf("\n   %i val  ", cnt);
-        for ( unsigned pp = 0; pp < ns; ++pp )
-            printf("%+6.4f ", val[pp]);
+        for ( unsigned i = 0; i < ns; ++i )
+            printf("%+6.4f ", val[i]);
         printf("\n   %i upe  ", cnt);
-        for ( unsigned pp = 0; pp+1 < ns; ++pp )
-            printf("%+6.4f ", upe[pp]);
+        for ( unsigned i = 0; i+1 < ns; ++i )
+            printf("%+6.4f ", upe[i]);
         printf("\n   %i dia  ", cnt);
-        for ( unsigned pp = 0; pp < ns; ++pp )
-            printf("%+6.4f ", dia[pp]);
+        for ( unsigned i = 0; i < ns; ++i )
+            printf("%+6.4f ", dia[i]);
         printf("\n   %i low  ", cnt);
-        for ( unsigned pp = 0; pp < ns-1; ++pp )
-            printf("%+6.4f ", low[pp]);
+        for ( unsigned i = 0; i < ns-1; ++i )
+            printf("%+6.4f ", low[i]);
 #endif
         
         lapack::xgtsv(ns, 1, low, dia, upe, val, ns, &info);
@@ -572,10 +572,10 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
         }
         
         err = 0;
-        for ( unsigned pp = 0; pp < ns; ++pp )
+        for ( unsigned i = 0; i < ns; ++i )
         {
-            sca[pp] += -0.5 * val[pp];
-            err += fabs(val[pp]);
+            sca[i] += -0.5 * val[i];
+            err += fabs(val[i]);
         }
         if ( ++cnt > 32 )
         {
@@ -588,8 +588,8 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
 #if ( 0 )
     printf("\n%2i err %e", cnt, err);
     printf("\n%2i sca  ", cnt);
-    for ( unsigned pp = 0; pp < ns; ++pp )
-        printf("%+6.4f ", sca[pp]);
+    for ( unsigned i = 0; i < ns; ++i )
+        printf("%+6.4f ", sca[i]);
     printf("\n");
 #endif
     
@@ -603,15 +603,15 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
 #if ( DIM > 2 )
         dst[2] = src[2] + e.ZZ;
 #endif
-        for ( unsigned pp = 1; pp < ns; ++pp )
+        for ( unsigned u = 1; u < ns; ++u )
         {
-            d = sca[pp] * dif[pp];
-            dst[DIM*pp  ] = src[DIM*pp  ] + d.XX - e.XX;
+            d = sca[u] * dif[u];
+            dst[DIM*u  ] = src[DIM*u  ] + d.XX - e.XX;
 #if ( DIM > 1 )
-            dst[DIM*pp+1] = src[DIM*pp+1] + d.YY - e.YY;
+            dst[DIM*u+1] = src[DIM*u+1] + d.YY - e.YY;
 #endif
 #if ( DIM > 2 )
-            dst[DIM*pp+2] = src[DIM*pp+2] + d.ZZ - e.ZZ;
+            dst[DIM*u+2] = src[DIM*u+2] + d.ZZ - e.ZZ;
 #endif
             e = d;
         }
@@ -667,13 +667,13 @@ void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
     if ( dis > REAL_EPSILON )
         dp = ( cut/dis - 1.0 ) * seg;
     
-    for ( unsigned pp = 1; pp < ns; ++pp )
+    for ( unsigned i = 1; i < ns; ++i )
     {
-        seg = diffPoints(vec, pp);
+        seg = diffPoints(vec, i);
         dis = seg.norm();
         
         //move the left point by dp:
-        dp.add_to(vec+DIM*pp);
+        dp.add_to(vec+DIM*i);
         //update the uniform motion of the points:
         sum += dp;
         
@@ -689,8 +689,8 @@ void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
     sum = ( sum + dp ) * ( -1.0 / ( ns + 1 ) );
     
     //translate the entire fiber uniformly:
-    for ( unsigned pp = 0; pp <= ns; ++pp )
-        sum.add_to(vec+DIM*pp);
+    for ( unsigned i = 0; i <= ns; ++i )
+        sum.add_to(vec+DIM*i);
 }
 
 #else
@@ -720,8 +720,8 @@ void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
     }
     
     sum *= ( -1.0 / (1+ns) );
-    for ( unsigned pp = 0; pp <= ns; ++pp )
-        sum.add_to(vec+DIM*pp);
+    for ( unsigned i = 0; i <= ns; ++i )
+        sum.add_to(vec+DIM*i);
 }
 
 #endif
@@ -881,10 +881,10 @@ void Filament::cutM(const real delta)
     real* tmp = new_real(DIM*np);
 
     // calculate intermediate points into tmp[]:
-    for ( unsigned pp=0; pp+1 < np; ++pp )
+    for ( unsigned i=0; i+1 < np; ++i )
     {
-        Vector w = interpolateM(delta+pp*cut).pos();
-        w.store(tmp+DIM*pp);
+        Vector w = interpolateM(delta+i*cut).pos();
+        w.store(tmp+DIM*i);
     }
     
     // copy the position of plus-end into tmp[]:
@@ -895,13 +895,14 @@ void Filament::cutM(const real delta)
     setNbPoints(np);
     
     // copy calculated points to pPos[]
-    for ( unsigned pp = 0; pp < DIM*np; ++pp )
-        pPos[pp] = tmp[pp];
+    for ( unsigned i = 0; i < DIM*np; ++i )
+        pPos[i] = tmp[i];
     
     free_real(tmp);
     fnAbscissaM += delta;
     setSegmentation(cut);
     postUpdate();
+    reshape();
 }
 
 
@@ -996,22 +997,23 @@ void Filament::cutP(const real delta)
     real* tmp = new_real(DIM*np);
     
     // calculate intermediate points into tmp[]:
-    for ( unsigned pp = 1; pp < np; ++pp )
+    for ( unsigned i = 1; i < np; ++i )
     {
-        Vector w = interpolateM(pp*cut).pos();
-        w.store(tmp+DIM*pp);
+        Vector w = interpolateM(i*cut).pos();
+        w.store(tmp+DIM*i);
     }
     
     setNbPoints(np);
     
     // copy calculated points to pPos[]
     // point at minus-end has not changed
-    for ( unsigned pp = DIM; pp < DIM*np; ++pp )
-        pPos[pp] = tmp[pp];
+    for ( unsigned i = DIM; i < DIM*np; ++i )
+        pPos[i] = tmp[i];
     
     free_real(tmp);
     setSegmentation(cut);
     postUpdate();
+    reshape();
 }
 
 //------------------------------------------------------------------------------
@@ -1046,7 +1048,7 @@ void Filament::adjustLength(real len, FiberEnd ref)
 }
 
 
-void Filament::truncateM(const unsigned int p)
+void Filament::truncateM(unsigned p)
 {
     Mecable::truncateM(p);
     fnAbscissaM = abscissaPoint(p);
@@ -1054,7 +1056,7 @@ void Filament::truncateM(const unsigned int p)
 }
 
 
-void Filament::truncateP(const unsigned int p)
+void Filament::truncateP(unsigned p)
 {
     Mecable::truncateP(p);
     postUpdate();
@@ -1083,22 +1085,22 @@ void Filament::join(Filament const* fib)
     real* tmp = new_real(DIM*np);
     
     // calculate new points into tmp[]:
-    for ( unsigned pp = 1; pp < np; ++pp )
+    for ( unsigned i = 1; i < np; ++i )
     {
         Vector w;
-        if ( pp*cut < len1 )
-            w = interpolateM(pp*cut).pos();
+        if ( i*cut < len1 )
+            w = interpolateM(i*cut).pos();
         else
-            w = fib->interpolateM(pp*cut-len1).pos();
+            w = fib->interpolateM(i*cut-len1).pos();
         
-        w.store(tmp+DIM*pp);
+        w.store(tmp+DIM*i);
     }
     
     setNbPoints(np+1);
     
     // copy point back in place:
-    for ( unsigned int pp = DIM; pp < DIM*np; ++pp )
-        pPos[pp] = tmp[pp];
+    for ( unsigned int i = DIM; i < DIM*np; ++i )
+        pPos[i] = tmp[i];
     
     ppe.store(pPos+DIM*np);
     
@@ -1121,10 +1123,8 @@ void Filament::segmentationMinMax(real& mn, real& mx) const
     for ( unsigned n = 1; n < lastPoint(); ++n )
     {
         real r = diffPoints(n).norm();
-        if ( r > mx )
-            mx = r;
-        if ( r < mn )
-            mn = r;
+        mx = std::max(mx, r);
+        mn = std::min(mn, r);
     }
 }
 
@@ -1811,31 +1811,32 @@ real Filament::projectedForceEnd(const FiberEnd end) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-int Filament::checkLength(real len) const
+int Filament::checkLength(real len, bool arg) const
 {
     assert_small( length() - len );
     real con = contourLength(pPos, nPoints);
     if ( fabs( con - len ) > 0.1 )
     {
-        Cytosim::log << "Warning: length of " << reference() << " is " << con << " but " << len << " was expected" << std::endl;
+        if ( arg ) std::clog << reference() << "  ";
+        std::clog << " length is " << con << " but " << len << " was expected\n";
         return 1;
     }
     return 0;
 }
 
 
-int Filament::checkSegments() const
+real Filament::checkSegmentation(bool arg) const
 {
     real mn, mx;
     segmentationMinMax(mn, mx);
-    real d = mx - mn;
-    if ( d > 1e-3 )
+    real d = ( mx - mn ) / segmentation();
+    if ( d > 0.01 )
     {
-         std::clog << "Fiber " << reference() << " segments [ " << std::fixed << mx << " " << std::fixed << mx;
-         std::clog << " ] deviate from segmentation " << segmentation() << " by " << d << std::endl;
-         return 1;
+        if ( arg ) std::clog << reference() << "  ";
+        std::clog << " Segments in [ " << std::fixed << mn << " " << std::fixed << mx;
+        std::clog << " ] for " << segmentation() << std::endl;
     }
-    return 0;
+    return d;
 }
 
 
@@ -1846,20 +1847,8 @@ void Filament::dump(std::ostream& os) const
 {
     os << "Fiber " << std::setw(7) << reference();
     os << "  " << std::left << std::setw(6) << fnCut << " {";
-    
-#if ( 1 )
-    real mn, mx;
-    segmentationMinMax(mn, mx);
-    real p = 100 * ( mx - mn ) / mn;
-    os.precision(4);
-    os << " " << mn << " + " << std::setw(7) << std::fixed << p << " %";
-#else
-    for ( size_t pp = 0; pp < lastPoint(); ++pp )
-    {
-        real p = 100 * ( diffPoints(pp).norm() / fnCut - 1.0 );
-        os << " " << std::left << std::setw(5) << p;
-    }
-#endif
+    real d = checkSegmentation(false);
+    os << " deviation " << std::fixed << 100*d << " %";
     os << " }" << std::endl;
 }
 
@@ -1931,7 +1920,7 @@ void Filament::read(Inputter & in, Simul& sim, ObjectTag tag)
     if ( in.vectorSize() == DIM )
     {
         checkLength(len);
-        checkSegments();
+        checkSegmentation();
     }
 }
 

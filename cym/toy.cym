@@ -16,11 +16,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 5 )
+    shape = sphere
     display = ( visible=0 )
 }
 
-new cell 
+new cell
+{
+    radius = 5
+}
 
 set fiber 0 beam
 {

@@ -150,8 +150,8 @@ public:
     /// add a new point with a sphere (extends Mecable::addPoint)
     unsigned    addSphere(Vector const&, real radius);
     
-    /// change radius of the sphere around point `pp`
-    void        radius(unsigned pp, real radius);
+    /// change radius of the sphere around point `i`
+    void        radius(unsigned i, real radius);
 
     /// add DIM points separated by `len`, to make a coordinate system around the last point
     unsigned    addTriad(real len);
@@ -161,8 +161,8 @@ public:
     /// add the interactions due to confinement
     void        setInteractions(Meca &) const;
     
-    /// radius of the sphere around point `pp`
-    real        radius(const unsigned pp) const { return soRadius[pp]; }
+    /// radius of the sphere around point `i`
+    real        radius(const unsigned i) const { return soRadius[i]; }
     
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
     Vector      centroid() const;

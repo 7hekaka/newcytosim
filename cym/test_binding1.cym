@@ -16,10 +16,13 @@ set system display
 
 set space cell
 {
-    geometry = ( circle 15  )
+    shape = circle
 }
 
 new cell
+{
+    radius = 15
+}
 
 set fiber microtubule
 {

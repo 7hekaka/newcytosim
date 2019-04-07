@@ -15,10 +15,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 1.0 )
+    shape = circle
 }
 
 new cell
+{
+    radius = 1
+}
 
 set fiber filament
 {

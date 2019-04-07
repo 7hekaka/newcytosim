@@ -17,7 +17,7 @@ set space cell
 
 new cell
 {
-    dimensions = 2
+    radius = 2
 }
 
 set hand tip_tracker

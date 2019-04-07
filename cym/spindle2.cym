@@ -8,10 +8,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 30 )
+    shape = circle
 }
 
 new cell
+{
+    radius = 30
+}
 
 set field blue
 {

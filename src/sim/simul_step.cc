@@ -128,7 +128,7 @@ void Simul::step()
     beads.step();
     solids.step();
     fibers.step();
-   
+    
     // distribute Fibers over a grid for binding of Hands:
     fiberGrid.paintGrid(fibers.first(), nullptr);
     

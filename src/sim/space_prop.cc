@@ -162,10 +162,9 @@ Space * SpaceProp::newSpace(Glossary& opt) const
             {
                 real x = 0;
                 iss >> x;
-                if ( iss.good() )
-                    len[d++] = x;
-                else
+                if ( iss.fail() )
                     break;
+                len[d++] = x;
             }
             if ( d > 0 )
             {

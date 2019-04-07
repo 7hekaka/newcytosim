@@ -33,7 +33,6 @@ set space cell
 {
     % volume ellipsoid = 4/3 PI * A * B * C
     shape = ellipse
-    dimensions = 0.85 0.85 0.21
     display = ( visible=0; )
 }
 
@@ -41,7 +40,6 @@ set space envelope
 {
     % volume ellipsoid = 4/3 PI * A * B * C
     shape = ellipse
-    dimensions = 0.92 0.92 0.27
     display = ( color=0x00000033, darker_gray; visible=2; )
 }
 
@@ -123,14 +121,13 @@ set couple gamma
 
 %----------------------------------
 
-new cell
+new cell { length = 1.7, 1.7, 0.42; }
 new 8 gamma
 new 1523 complex
-new envelope
+new envelope { length = 1.84, 1.84, 0.54; }
 
 run 1000000 system 
 {
     nb_frames = 100
 }
-
 

@@ -399,11 +399,11 @@ public:
 
     //---------------------
     
-    /// check the sum of the length of the segments
-    int          checkLength(real) const;
+    /// sum the length of the segments and compare with 'len'
+    int          checkLength(real len, bool = true) const;
     
-    /// check the length of all segments
-    int          checkSegments() const;
+    /// check the length of all segments, and returns deviation
+    real         checkSegmentation(bool = true) const;
     
     /// dump for debugging
     void         dump(std::ostream&) const;

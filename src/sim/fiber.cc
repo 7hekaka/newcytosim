@@ -876,11 +876,11 @@ void Fiber::setInteractions(Meca & meca) const
     if ( prop->colinear_force )
     {
         real s = 0.5 * prop->colinear_force * segmentation();
-        for ( unsigned pp = 0; pp < nbSegments(); ++pp )
+        for ( unsigned i = 0; i < nbSegments(); ++i )
         {
-            Vector f = s * dirSegment(pp);
-            meca.addForce(Mecapoint(this, pp  ), f);
-            meca.addForce(Mecapoint(this, pp+1), f);
+            Vector f = s * dirSegment(i);
+            meca.addForce(Mecapoint(this, i  ), f);
+            meca.addForce(Mecapoint(this, i+1), f);
         }
     }
 #endif
@@ -891,26 +891,26 @@ void Fiber::setInteractions(Meca & meca) const
         switch ( prop->confine )
         {
             case CONFINE_INSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    Vector pos = posP(pp);
+                    Vector pos = posP(i);
                     if ( spc->outside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, pp), meca, prop->confine_stiffness);
+                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    Vector pos = posP(pp);
+                    Vector pos = posP(i);
                     if ( spc->inside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, pp), meca, prop->confine_stiffness);
+                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
                 
             case CONFINE_ON:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
-                    spc->setInteraction(posP(pp), Mecapoint(this, pp), meca, prop->confine_stiffness);
+                for ( unsigned i = 0; i < nPoints; ++i )
+                    spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
                 break;
                 
             case CONFINE_MINUS_END:
@@ -952,26 +952,26 @@ void Fiber::setInteractions(Meca & meca) const
         switch ( prop->confine2 )
         {
             case CONFINE_INSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    Vector pos = posP(pp);
+                    Vector pos = posP(i);
                     if ( spc->outside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, pp), meca, prop->confine2_stiffness);
+                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine2_stiffness);
                 }
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
+                for ( unsigned i = 0; i < nPoints; ++i )
                 {
-                    Vector pos = posP(pp);
+                    Vector pos = posP(i);
                     if ( spc->inside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, pp), meca, prop->confine2_stiffness);
+                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine2_stiffness);
                 }
                 break;
                 
             case CONFINE_ON:
-                for ( unsigned pp = 0; pp < nPoints; ++pp )
-                    spc->setInteraction(posP(pp), Mecapoint(this, pp), meca, prop->confine2_stiffness);
+                for ( unsigned i = 0; i < nPoints; ++i )
+                    spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine2_stiffness);
                 break;
                 
             default:
@@ -1636,18 +1636,18 @@ void Fiber::setGlue3(Single* glue, const Space * spc)
             return;
         
         // find a vertex that is on the other side of the Space edge:
-        for ( unsigned pp = 1; pp < nPoints; ++pp )
+        for ( unsigned i = 1; i < nPoints; ++i )
         {
-            if ( spc->inside(posP(pp)) != in )
+            if ( spc->inside(posP(i)) != in )
             {
                 // the abscissa is interpolated using the distances of P1 and P2 to the edge
-                real d1 = spc->distanceToEdge(posP(pp-1));
-                real d2 = spc->distanceToEdge(posP(pp));
+                real d1 = spc->distanceToEdge(posP(i-1));
+                real d2 = spc->distanceToEdge(posP(i));
                 if ( d1 + d2 > REAL_EPSILON )
                 {
                     /* we find the abscissa corresponding to the intersection,
                      assuming that the edge is locally straight */
-                    FiberSite fs(this, abscissaPoint(pp-1+d1/(d2+d1)));
+                    FiberSite fs(this, abscissaPoint(i-1+d1/(d2+d1)));
                     glue->attach(fs);
                     glue->setPosition(fs.pos());
                     break;

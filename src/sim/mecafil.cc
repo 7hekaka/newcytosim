@@ -118,7 +118,7 @@ real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 void Mecafil::storeDirections()
 {
 #if ( 1 )
-    //checkSegments();
+    //checkSegmentation();
     /*
      assume here that successive points are correctly separated, which is usally
      not the case, but the error is usually small

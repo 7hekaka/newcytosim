@@ -14,7 +14,6 @@ set simul system
 set space cell
 {
     shape = circle
-    dimensions = 15
 }
 
 set fiber microtubule
@@ -51,6 +50,9 @@ set couple complex
 }
 
 new cell
+{
+    radius = 15
+}
 
 new 200 microtubule
 {

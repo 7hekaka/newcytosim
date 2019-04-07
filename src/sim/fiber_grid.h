@@ -14,15 +14,15 @@
 #endif
 
 
+class Simul;
 class PropertyList;
 class FiberSegment;
-class Space;
 class Modulo;
+class Space;
 class Fiber;
 class HandProp;
 class Hand;
 class Node;
-class Simul;
 
 
 /// Divide-and-Conquer method to find all FiberSegment located near a given point in space
@@ -76,37 +76,37 @@ private:
 public:
     
     /// constructor
-    FiberGrid()     { gridRange = -1; }
+    FiberGrid()  { gridRange = -1; }
     
     /// set binding range
-    void              setRange(real s) { gridRange = s; }
+    void         setRange(real s) { gridRange = s; }
     
     /// number of cells in grid
-    index_t           nbCells() const { return fGrid.nbCells(); }
+    index_t      nbCells() const { return fGrid.nbCells(); }
 
     /// set a grid to cover the specified Space with cells of width `max_step` at most
-    unsigned          setGrid(const Space *, real max_step);
+    unsigned     setGrid(const Space *, real max_step);
     
     /// allocate memory for the grid, with the dimensions set by setGrid()
-    void              createCells();
+    void         createCells();
     
     /// true if the grid was initialized by calling setGrid()
-    size_t            hasGrid() const;
+    size_t       hasGrid() const;
     
     /// register the Fiber segments on the grid cells
-    void              paintGrid(const Fiber * first, const Fiber * last);
+    void         paintGrid(const Fiber * first, const Fiber * last);
     
     /// given a position, find nearby Fiber segments and test attachement of the provided Hand
-    void              tryToAttach(Vector const&, Hand&) const;
+    void         tryToAttach(Vector const&, Hand&) const;
     
     /// return all fiber segments located at a distance D or less from P, except those belonging to `exclude`
-    SegmentList       nearbySegments(Vector const& P, real D, Fiber * exclude = nullptr);
+    SegmentList  nearbySegments(Vector const& P, real D, Fiber * exclude = nullptr);
 
     /// Among the segments closer than gridRange, return the closest one
-    FiberSegment      closestSegment(Vector const&);
+    FiberSegment closestSegment(Vector const&);
     
     ///test the results of tryToAttach(), at a particular position
-    void              testAttach(FILE *, Vector place, Fiber * start, HandProp const*);
+    void         testAttach(FILE *, Vector place, Fiber * start, HandProp const*);
     
     
 #ifdef DISPLAY
