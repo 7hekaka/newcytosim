@@ -42,15 +42,15 @@ void simReset()
         PAM.max = maxThings;
     
     sTime = 0;
-    for(unsigned int s = 0; s < PAM.max; ++s)
-        things[s].reset();
+    for(unsigned i = 0; i < PAM.max; ++i)
+        things[i].reset();
 }
 
 void simStep()
 {
     sTime += PAM.time_step;
-    for(unsigned int s = 0; s < PAM.max; ++s)
-        things[s].step();
+    for(unsigned i = 0; i < PAM.max; ++i)
+        things[i].step();
     glApp::postRedisplay();
 }
 
@@ -59,7 +59,7 @@ void * simulateForever(void *)
     simReset();
     while ( 1 )
     {
-        for (unsigned int r = 0; r < PAM.repeat; ++r )
+        for (unsigned r = 0; r < PAM.repeat; ++r )
             simStep();
         pthread_cond_wait(&condition, &mutex);
     }
@@ -68,15 +68,15 @@ void * simulateForever(void *)
 //------------------------------------------------------------------------------
 void simulateToFile(FILE * out)
 {
-    for(unsigned int s = 0; s < PAM.max; ++s)
-        things[s].write(out, sTime);
+    for(unsigned i = 0; i < PAM.max; ++i)
+        things[i].write(out, sTime);
 
-    for(unsigned int frame = 1; frame <= PAM.repeat; ++frame )
+    for(unsigned f = 1; f <= PAM.repeat; ++f )
     {
-        while ( sTime < frame * PAM.time ) 
+        while ( sTime < f * PAM.time )
             simStep();
-        for (unsigned int s = 0; s < PAM.max; ++s )
-            things[s].write(out, sTime);
+        for (unsigned i = 0; i < PAM.max; ++i )
+            things[i].write(out, sTime);
         fprintf(out, "\n");
     }
 }
@@ -123,8 +123,8 @@ void processNormalKey(unsigned char c, int x, int y)
             glApp::flashText("Reset view");
             break;
         case 'r':
-            for(unsigned int s = 0; s < PAM.max; ++s)
-                things[s].write(stdout, sTime);
+            for(unsigned i = 0; i < PAM.max; ++i)
+                things[i].write(stdout, sTime);
             break;
         case 'R':
             PAM.write(std::cout);
@@ -171,8 +171,8 @@ void display()
     glPointSize(6);
     glBegin(GL_POINTS);
     pthread_mutex_lock(&mutex);
-    for(unsigned int s = 0; s < PAM.max; ++s)
-        things[s].draw();
+    for(unsigned i = 0; i < PAM.max; ++i)
+        things[i].draw();
     pthread_mutex_unlock(&mutex);
     glEnd();
 }

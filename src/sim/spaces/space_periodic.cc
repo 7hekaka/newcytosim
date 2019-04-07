@@ -23,7 +23,7 @@ void SpacePeriodic::resize(Glossary& opt)
             length_[d] = len * 0.5;
         
         if ( length_[d] <= 0 )
-            throw InvalidParameter("ellipse:length[] must be > 0");
+            throw InvalidParameter("periodic:length[] must be > 0");
     }
 }
 

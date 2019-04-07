@@ -598,13 +598,11 @@ void Solid::fixShape()
     
     //we store the current points:
     soShapeSize = nPoints;
-    //set reference to current shape translated to be centered:
+    // set reference to current shape translated to be centered:
     for ( unsigned p = 0; p < soShapeSize; ++p )
     {
-        real * sss = soShape + DIM * p;
-        real * pos = pPos + DIM * p;
-        for ( int d = 0; d < DIM; ++d )
-            sss[d] = pos[d] - avg[d];
+        for ( unsigned d = 0; d < DIM; ++d )
+            soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
     
     setDragCoefficient();
@@ -624,9 +622,8 @@ void Solid::scaleShape(const real scale[DIM])
     //scale in only in the specified dimension
     for ( unsigned p = 0; p < soShapeSize; ++p )
     {
-        real * sss = soShape + DIM * p;
         for ( int d = 0; d < DIM; ++d )
-            sss[d] *= scale[d];
+            soShape[DIM*p+d] *= scale[d];
     }
     
     //recalculate the momentum needed in rescale():

@@ -242,7 +242,7 @@ int main(int argc, char * argv[])
     Engine engine(1,1,1);
 
     real time_step = 1;
-    for ( int s = 0; s < 10; ++s )
+    for ( int i = 0; i < 10; ++i )
     {
         sim_time += time_step;
         engine.step(time_step);

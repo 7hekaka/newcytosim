@@ -33,10 +33,10 @@ public:
     FiberSegment() {}
     
     /// constructor
-    FiberSegment(Fiber const* f, int p) : fib_(f), pti_(p) {}
+    FiberSegment(Fiber const* f, unsigned p) : fib_(f), pti_(p) {}
     
     /// setter
-    void         set(Fiber const* f, int p) { fib_ = f; pti_ = p; }
+    void     set(Fiber const* f, unsigned p) { fib_ = f; pti_ = p; }
 
     /// the Fiber
     Fiber const* fiber()       const { return fib_; }

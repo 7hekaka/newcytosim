@@ -161,7 +161,10 @@ Space * SpaceProp::newSpace(Glossary& opt) const
             while ( d < 8 && iss.good() )
                 iss >> len[d++];
             if ( d > 0 )
+            {
                 spc->setLengths(len);
+                return spc;
+            }
         }
 #endif
         // normal way to set the size:

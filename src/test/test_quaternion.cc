@@ -162,7 +162,7 @@ void test2(const int max)
     Matrix33 rot;
     Vector3 vec;
     
-    for(int s = 0; s < max; ++s)
+    for(int i = 0; i < max; ++i)
     {
         Q = Quaternion<real>::randomRotation();
         pos = Q * Quaternion<real>(0,1,0,0) * Q.conjugated();

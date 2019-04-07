@@ -25,9 +25,11 @@ void SpaceStrip::resize(Glossary& opt)
         if ( opt.set(len, "length", d) )
             length_[d] = len * 0.5;
         
-        if ( length_[d] <= 0 )
-            throw InvalidParameter("ellipse:length[] must be > 0");
+        if ( length_[d] < 0 )
+            throw InvalidParameter("strip:length[] must be >= 0");
     }
+    if ( length_[DIM-1] <= 0 )
+        throw InvalidParameter("strip:length[DIM-1] must be > 0");
 }
 
 void SpaceStrip::setModulo(Modulo& mod) const

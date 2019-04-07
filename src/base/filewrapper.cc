@@ -171,7 +171,7 @@ void FileWrapper::skip_until(const char * str)
     fpos_t pos, match;
     size_t offset = 0;
     
-    const char sss = str[0];
+    const char ccc = str[0];
     const char * s = str;
     const char * b;
 
@@ -182,7 +182,8 @@ void FileWrapper::skip_until(const char * str)
         
         if ( s == str )
         {
-            b = (char*)memchr(buf, sss, nbuf);
+            // locate 'ccc' inside 'buf'
+            b = (char*)memchr(buf, ccc, nbuf);
             if ( !b )
                 continue;
             match  = pos;
@@ -211,7 +212,7 @@ void FileWrapper::skip_until(const char * str)
             else
             {
                 s = str;
-                b = (char*)memchr(b, sss, nbuf-(b-buf));
+                b = (char*)memchr(b, ccc, nbuf-(b-buf));
                 if ( !b )
                     break;
                 match  = pos;

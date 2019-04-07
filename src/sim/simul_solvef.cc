@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "simul.h"
+#include "simul_prop.h"
 
 /**
  The motion occurs along the X-axis for all fibers,
@@ -8,8 +9,12 @@
  
  If ( flux_speed < 0 ), right pointing fibers move left, while Left pointing fiber move right.
  */
-void Simul::solveF(real shift)
+void Simul::solve_flux()
 {
+    if ( prop->flux_speed > 0 )
+        throw InvalidParameter("simul:flux_speed should be <= 0");
+    real shift = prop->flux_speed * prop->time_step;
+
     for ( Fiber * fib = fibers.first(); fib ; fib=fib->next() )
     {
         real const* pos = fib->data();

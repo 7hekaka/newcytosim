@@ -124,7 +124,7 @@ bool has_trail(std::istream& is)
     return false;
 }
 
-/// report warning 
+/// report warning
 void warn_trail(std::istream& is, std::string const& msg)
 {
     std::string str;
@@ -697,7 +697,6 @@ void reportCPUtime(int frame, real simtime)
         event      = RATE, ( CODE )
         nb_frames  = INTEGER, ( CODE )
         prune      = BOOL
-        flux_speed = NEGATIVE_REAL
      }
  
  or
@@ -765,7 +764,6 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     int          solve      = 1;
     bool         prune      = true;
     bool         binary     = true;
-    real         flux_speed = 0;
     
     bool has_code = opt.set(code, "nb_frames", 1);
 #ifdef BACKWARD_COMPATIBILITY
@@ -780,16 +778,18 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     }
 #endif
     opt.set(solve,  "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
+    
+    void (Simul::* solveFunc)() = &Simul::solve_not;
+    switch ( solve )
+    {
+        case 1: solveFunc = &Simul::solve;      break;
+        case 2: solveFunc = &Simul::solve_auto; break;
+        case 3: solveFunc = &Simul::solveX;     break;
+        case 4: solveFunc = &Simul::solve_flux; break;
+    }
+
     opt.set(prune,  "prune");
     opt.set(binary, "binary");
-    
-    if ( solve == 3 )
-    {
-        opt.set(flux_speed, "flux_speed");
-        if ( flux_speed > 0 )
-            throw InvalidParameter("simul:flux_speed should be <= 0");
-        flux_speed *= simul.prop->time_step;
-    }
     
     unsigned int  frame = 1;
     real          delta = nb_steps;
@@ -816,10 +816,10 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     
     simul.prepare();
     
-    unsigned cnt = 0;
+    unsigned sss = 0;
     while ( 1 )
     {
-        if ( cnt >= check )
+        if ( sss >= check )
         {
             if ( do_write )
             {
@@ -829,23 +829,16 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
                 if ( has_code )
                     evaluate(code, ", in run:write:code");
             }
-            if ( cnt >= nb_steps )
+            if ( sss >= nb_steps )
                 break;
             check = (int)( ++frame * delta );
         }
 
         simul.step();
-
-        switch ( solve )
-        {
-            case 1: simul.solve();            break;
-            case 2: simul.solve_auto();       break;
-            case 3: simul.solveX();           break;
-            case 4: simul.solveF(flux_speed); break;
-        }
+        (simul.*solveFunc)();
         
         hold();
-        ++cnt;
+        ++sss;
     }
 #ifdef BACKWARD_COMPATIBILITY
     if ( event )
@@ -864,8 +857,8 @@ void Interface::execute_run(unsigned nb_steps)
 {
     VLOG("-RUN START " << nb_steps << '\n');
     simul.prepare();
-
-    for ( unsigned n = 0; n < nb_steps; ++n )
+    
+    for ( unsigned sss = 0; sss < nb_steps; ++sss )
     {
         simul.step();
         simul.solve();

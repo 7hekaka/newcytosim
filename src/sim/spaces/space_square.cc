@@ -23,8 +23,8 @@ void SpaceSquare::resize(Glossary& opt)
         if ( opt.set(len, "length", d) )
             length_[d] = len * 0.5;
         
-        if ( length_[d] <= 0 )
-            throw InvalidParameter("ellipse:length[] must be > 0");
+        if ( length_[d] < 0 )
+            throw InvalidParameter("square:length[] must be >= 0");
     }
 }
 

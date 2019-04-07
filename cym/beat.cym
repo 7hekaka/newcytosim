@@ -12,7 +12,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 5 2 )
+    shape = capsule
 }
 
 set fiber microtubule
@@ -62,6 +62,10 @@ set couple motor
 }
 
 new cell
+{
+    length = 14
+    radius = 3
+}
 
 new microtubule
 {
