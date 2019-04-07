@@ -10,11 +10,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( polygon axon.txt 2 )
+    shape = polygon
     display = ( line = 5 )
 }
 
 new cell
+{
+    file = axon.txt
+    height = 2
+}
 
 set fiber microtubule
 {

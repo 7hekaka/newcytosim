@@ -9,11 +9,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( polygon texas.txt 2 )
+    shape = polygon
     display = ( visible=3; width=9; color=0x0000FFFF; )
 }
 
 new cell
+{
+    file = texas.txt;
+    height = 2;
+}
 
 set fiber microtubule
 {

@@ -9,10 +9,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( polygon texas.txt )
+    shape = polygon
 }
 
 new cell
+{
+    file = texas.txt
+    height = 2
+}
 
 set fiber microtubule
 {

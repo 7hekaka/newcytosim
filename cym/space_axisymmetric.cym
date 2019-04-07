@@ -12,11 +12,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( polygonZ endocytosis.txt )
+    shape = polygonZ
     display = ( color=blue, dark_blue; visible=3; )
 }
 
 new cell
+{
+    file = endocytosis.txt
+}
 
 set fiber microtubule
 {

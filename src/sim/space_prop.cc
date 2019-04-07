@@ -158,8 +158,15 @@ Space * SpaceProp::newSpace(Glossary& opt) const
             std::stringstream iss(str);
             real len[8] = { 0 };
             int d = 0;
-            while ( d < 8 && iss.good() )
-                iss >> len[d++];
+            while ( d < 8 )
+            {
+                real x = 0;
+                iss >> x;
+                if ( iss.good() )
+                    len[d++] = x;
+                else
+                    break;
+            }
             if ( d > 0 )
             {
                 spc->setLengths(len);

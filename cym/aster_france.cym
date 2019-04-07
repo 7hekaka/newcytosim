@@ -11,12 +11,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( polygon france.txt 2 )
+    shape = polygon
     display = ( visible=3; width=9; color=0x0000FFFF; period=8; )
 }
 
 new cell
 {
+    file = france.txt
+    height = 2
     scale = 0.25
 }
 
