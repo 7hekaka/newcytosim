@@ -4,6 +4,7 @@
 
 set simul system
 {
+    dim = 2
     time_step = 0.005
     viscosity = 0.5
     display = { window_size=800,400 }

@@ -19,10 +19,13 @@ set system display
 
 set space cell
 {
-    geometry = ( periodic 5 5 5 )
+    shape = periodic
 }
 
 new cell
+{
+    length = 10, 10, 10
+}
 
 set fiber microtubule
 {

@@ -10,6 +10,7 @@ new cell
 
 set simul system
 {
+    dim = 2
     viscosity = 0.02
     time_step = 0.0025
 %    random_seed = 87 

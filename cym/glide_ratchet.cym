@@ -3,18 +3,22 @@
 
 set simul system
 {
+    dim = 2
     viscosity = 0.001
     time_step = 0.005
     precondition = 0
     display = ( tiled=2, 1 )
 }
 
-set space slide
+set space cell
 {
-    geometry = ( periodic 5 5 )
+    shape = periodic
 }
 
-new slide
+new cell
+{
+    length = 10, 10, 10
+}
 
 set fiber microtubule
 {

@@ -9,6 +9,7 @@ new cell
 
 set simul system
 {
+    dim = 2
     viscosity = 0.01
     time_step = 0.0025
     display = (

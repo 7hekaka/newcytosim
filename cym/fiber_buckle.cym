@@ -10,10 +10,12 @@ set simul system
 set space cell
 {
     shape = circle
-	dimension = 5
 }
 
 new cell
+{
+    radius = 5
+}
 
 set fiber microtubule
 {

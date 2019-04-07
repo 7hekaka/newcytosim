@@ -13,11 +13,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 0.05 0.05 0.05 )
+    shape = periodic
     display = ( color=blue; width=1; )
 }
 
 new cell
+{
+    length = 0.1, 0.1, 0.1
+}
 
 set fiber actin
 {

@@ -5,6 +5,7 @@
 
 set simul system
 {
+    dim = 2
     time_step = 0.01
     steric = 1, 1000
     kT = 0.0002
@@ -14,10 +15,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 2 2 )
+    shape = periodic
 }
 
 new cell
+{
+    length = 4, 4
+}
 
 set fiber filament
 {

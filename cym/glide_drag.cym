@@ -3,6 +3,7 @@
 
 set simul system
 {
+    dim = 2
     time_step = 0.01
     viscosity = 0.1
     precondition = 0

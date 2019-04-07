@@ -4,13 +4,17 @@
 
 set space cell
 {
-    geometry = ( periodic 5 5 )
+    shape = periodic
 }
 
 new cell
+{
+    length = 10, 10, 10
+}
 
 set simul system
 {
+    dim = 2
     viscosity = 0.025
     time_step = 0.005
 %    random_seed = 87 

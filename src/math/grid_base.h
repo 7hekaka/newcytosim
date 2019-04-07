@@ -235,20 +235,20 @@ public:
         nCells = 1;
         cVolume = 1;
         
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( unsigned d = 0; d < ORD; ++d )
         {
             if ( nbcells[d] <= 0 )
-                throw InvalidParameter("Cannot build a grid as nbcells[] is <= 0");
+                throw InvalidParameter("Cannot build grid as nbcells[] is <= 0");
             
             if ( infs[d] > sups[d] )
             {
                 if ( infs[d] > sups[d] + REAL_EPSILON )
-                    throw InvalidParameter("Cannot build a grid as sup[] < inf[]");
+                    throw InvalidParameter("Cannot build grid as sup[] < inf[]");
                 sups[d] = infs[d];
             }
             
             if ( infs[d] == sups[d] )
-                throw InvalidParameter("Cannot build a grid as sup[] == inf[]");
+                throw InvalidParameter("Cannot build grid as sup[] == inf[]");
             
             gStride[d] = nCells;
             nCells    *= nbcells[d];

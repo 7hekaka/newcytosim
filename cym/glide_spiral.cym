@@ -4,6 +4,7 @@
 
 set simul system
 {
+    dim = 2
     time_step = 0.0025
     viscosity = 0.2
     precondition = 1
@@ -22,12 +23,14 @@ set system display
 
 set space cell
 {
-    geometry = ( periodic 2 2 )
+    shape = periodic
     display = ( width = 2 )
 }
 
 new cell
-
+{
+    length = 4, 4
+}
 
 set hand holder
 {

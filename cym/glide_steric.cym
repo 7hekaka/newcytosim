@@ -6,6 +6,7 @@
 
 set simul system
 {
+    dim = 2
     time_step = 0.005
     viscosity = 1
     steric = 1, 100
