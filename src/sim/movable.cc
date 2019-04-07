@@ -33,7 +33,7 @@ void Movable::rotate(Rotation const& rot)
 */
 void Movable::rotateT(Rotation const& rot)
 {
-    assert_true( mobile() & 1 );
+    assert_true( mobile() == 1 );
     Vector pos = position();
     translate(rot*pos-pos);
 }
@@ -746,6 +746,7 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, const Space*
                 is >> vec;
             else
                 is.seekg(isp);
+            vec.normalize();
             return Rotation::rotationAroundAxis(vec, cos(ang), sin(ang));
 #else
             return Rotation::rotation(cos(ang), sin(ang));
@@ -764,6 +765,7 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, const Space*
                 is >> vec;
             else
                 is.seekg(isp);
+            vec.normalize();
             return Rotation::rotationAroundAxis(vec, cos(ang), sin(ang));
 #else
             return Rotation::rotation(cos(ang), sin(ang));

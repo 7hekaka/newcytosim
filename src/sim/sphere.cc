@@ -311,18 +311,18 @@ void Sphere::setDragCoefficientStokes()
  <b>P. Bungay and H. Brenner, Int. J. Multiphase Flow</b>\n
  Vol 1, pp. 25-56, 1973 (see 3.6, 4.68a and 5.11)
  @latex
- \gamma = \frac{9 \pi^2 \sqrt{2} }{ 4\epsilon^{5/2}} \,\eta \, r
- \gamma^{rot} = 2 \pi^2 \sqrt{\frac{2}{\epsilon}} \,\eta\, r^3
+     \gamma = \frac{9 \pi^2 \sqrt{2} }{ 4\epsilon^{5/2}} \,\eta \, r
+     \gamma^{rot} = 2 \pi^2 \sqrt{\frac{2}{\epsilon}} \,\eta\, r^3
  @end
  */
 void Sphere::setDragCoefficientPiston()
 {
-    assert_true( spRadius > 0 );
+    assert_true( radius() > 0 );
     assert_true( prop->confine_space_ptr );
     
-    const real rad = spRadius;
-    real cell_radius = prop->confine_space_ptr->radius();
-    real eps  = ( cell_radius - rad ) / rad;
+    const real rad = radius();
+    real thickness = prop->confine_space_ptr->thickness();
+    real eps = ( thickness - rad ) / rad;
     
     if ( eps <= 0 )
         throw InvalidParameter("Error: piston formula yield invalid value");
@@ -334,7 +334,7 @@ void Sphere::setDragCoefficientPiston()
     spDragRot = 2*M_PI*M_PI * prop->viscosity * rad * rad * rad * sqrt(2.0/eps);
         
     //report the reduced mobility of the sphere:
-    Cytosim::out << "Sphere of radius "<<spRadius<<" has drag coefficient "<<spDrag<<", due to piston effect" << std::endl;
+    Cytosim::out << "Sphere of radius "<< radius() <<" has drag coefficient "<<spDrag<<", due to piston effect" << std::endl;
 }
 
 

@@ -157,9 +157,11 @@ Space * SpaceProp::newSpace(Glossary& opt) const
         {
             std::stringstream iss(str);
             real len[8] = { 0 };
-            for ( int d = 0; d < 8 && iss.good(); ++d )
-                iss >> len[d];
-            spc->setLengths(len);
+            int d = 0;
+            while ( d < 8 && iss.good() )
+                iss >> len[d++];
+            if ( d > 0 )
+                spc->setLengths(len);
         }
 #endif
         // normal way to set the size:
@@ -190,19 +192,21 @@ void SpaceProp::clear()
 
 void SpaceProp::read(Glossary& glos)
 {    
-#ifdef BACKWARD_COMPATIBILITY
-    glos.set(dimensions, "dimensions");
-#endif
-    if ( !glos.set(shape, "shape") )
+    if ( glos.set(shape, "shape") )
     {
 #ifdef BACKWARD_COMPATIBILITY
+        glos.set(dimensions, "dimensions");
+    }
+    else
+    {
         std::string str;
         if ( glos.set(str, "geometry") )
         {
             std::stringstream iss(str);
             iss >> shape;
+            std::getline(iss, dimensions);
             if ( dimensions.empty() )
-                dimensions = iss.str().substr(iss.tellg());
+                throw InvalidParameter("space:geometry should contains dimensions");
         }
 #endif
     }

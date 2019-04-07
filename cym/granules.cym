@@ -3,21 +3,25 @@
 
 set simul system
 {
-    time_step = 0.01
-    viscosity = 10
+    time_step = 0.001
+    viscosity = 1
 }
 
 set space cell
 {
-    geometry = ( dice 2 2 0.5 0.5 )
+    shape = dice
 }
 
 new cell
+{
+    length = 3, 3, 1.5
+    radius = 0.5
+}
 
 set fiber microtubule
 {
     rigidity = 20
-    segmentation = 0.5
+    segmentation = 0.25
     confine = inside, 100
 
     activity       = grow
@@ -27,7 +31,8 @@ set fiber microtubule
 
 % make filaments shrink if they are outside the Space:
     shrink_outside = 1
-        
+    shrinking_speed = -1;
+    
     display = ( line=0.5 )
 }
 

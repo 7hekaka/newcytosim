@@ -39,34 +39,47 @@ new 100 ball
     mark = 2
 }
 
-run 200 system
+run 1000 system
 
 delete ball
 {   
     mark = 2
 }
 
-run system
+new 1 event
 {
-    nb_steps = 2000
-    event = 100, ( new ball { radius=0.15; position=0 0 0; } )
-}
-
-delete ball
-{   
-    mark = 1
+   rate = 100
+   code = ( delete ball )
 }
 
 run system
 {
     nb_steps = 1000
-    event = 50, ( new ball { radius=0.20; position=0 0 0; } )
+    event = 50, ( new ball { radius=0.25; position=0 0 0; } )
 }
+
+delete all ball
+{   
+    mark = 1
+}
+
+new event
+{
+   rate = 100
+   code = ( new ball { radius=0.15; position=0 0 0; } )
+}
+
+run system
+{
+    nb_steps = 1000
+    event = 50, ( new ball { radius=0.25; position=0 0 0; } )
+}
+
+delete 1 event
 
 run system
 {
     nb_steps = 1000
     nb_frames = 10
-    event = 5, ( new ball { radius=0.25; position=0 0 0; } )
 }
 

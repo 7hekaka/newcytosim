@@ -15,7 +15,9 @@ SpaceSphere::SpaceSphere(const SpaceProp* p)
 
 void SpaceSphere::resize(Glossary& opt)
 {
-    opt.set(radius_, "radius");
+    real len = 0;
+    if ( opt.set(len, "radius") )      radius_ = len;
+    else if ( opt.set(len, "length") ) radius_ = len * 0.5;
     
     if ( radius_ < 0 )
         throw InvalidParameter(prop->name()+":radius must be >= 0");

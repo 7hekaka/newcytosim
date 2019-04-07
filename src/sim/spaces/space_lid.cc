@@ -16,6 +16,8 @@ SpaceLid::SpaceLid(const SpaceProp* p)
     if ( DIM == 1 )
         throw InvalidParameter("lid is only valid in DIM=2 or 3");
     
+    for ( int d = 0; d < 3; ++d )
+        length_[d] = 0;
     top_ = 0;
     force_ = 0;
 }
@@ -23,12 +25,16 @@ SpaceLid::SpaceLid(const SpaceProp* p)
 
 void SpaceLid::resize(Glossary& opt)
 {
-    opt.set(length_, 3, "length");
-    
+    real len;
     for ( int d = 0; d < DIM; ++d )
+    {
+        if ( opt.set(len, "length", d) )
+            length_[d] = len * 0.5;
+            
         if ( length_[d] <= 0 )
             throw InvalidParameter("lid:length_[] must be > 0");
-
+    }
+    
     opt.set(top_, "ceiling");
     if ( top_ < 0 )
         throw InvalidParameter("lid:ceiling must be >= 0");
@@ -183,6 +189,7 @@ void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 //------------------------------------------------------------------------------

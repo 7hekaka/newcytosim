@@ -38,15 +38,18 @@ protected:
      X1 Y1 Z1, X2 Y2 Z2, etc. for DIM==3
      */
     real *      pPos;
-
-private:
-
-    /// Currently allocated size of arrays pPos[] and pForce[]
-    size_t      pAllocated;
     
     /// Array containing force-coordinates which is allocated in Meca
     real const* pForce;
     
+    /// Number of points in pForce[]
+    size_t      pForceMax;
+
+private:
+
+    /// Currently allocated size of arrays pPos[]
+    size_t      pAllocated;
+
     /// Matrix block used for preconditionning in Meca::solve()
     real *      pBlock;
     
@@ -54,7 +57,7 @@ private:
     int *       pPivot;
     
     /// Allocated size of pBlock[]
-    size_t      pBlockAllocated;
+    size_t      pBlockAllo;
     
     /// Current size of pBlock[]
     unsigned    pBlockSize;
@@ -291,7 +294,7 @@ public:
     Vector          netForce(const unsigned p) const;
     
     /// replaces current forces by the ones provided as argument
-    void            getForces(const real* ptr) { pForce = ptr; }
+    void            getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
     
     /// compute Lagrange multiplier corresponding to mechanical constraints
     virtual void    computeTensions(const real* force) {}

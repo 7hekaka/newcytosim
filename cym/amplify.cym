@@ -23,13 +23,15 @@ set fiber microtubule
     rigidity = 20
     segmentation = 0.5
     confine = inside, 100
+    activity = grow;
+    growing_speed = 1;
 }
 
 new 1 microtubule
 {
-    length = 5
-    position = ( 0 0 0 )
-    orientation = horizontal
+    length = 4
+    position = -3 0 0
+    orientation = 1 0 0
 }
 
 set hand activator

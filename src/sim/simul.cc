@@ -45,7 +45,7 @@ void out_of_memory_handler()
 void termination_handler()
 {
     write(STDERR_FILENO, "\n* * * * *\n", 11);
-    write(STDERR_FILENO, "Cytosim: uncaught exception", 26);
+    write(STDERR_FILENO, "Cytosim: uncaught exception", 27);
     write(STDERR_FILENO, "\n* * * * *\n", 11);
     print_backtrace();
     abort();

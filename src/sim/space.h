@@ -56,8 +56,8 @@ public:
     /// a Human-readible description
     virtual std::string geometry() const { return prop->shape; }
     
-    /// the radius (that is defined only for certain shapes)
-    virtual real radius() const { return 0; }
+    /// radius used for piston effect (and defined only for certain shapes)
+    virtual real thickness() const { return 0; }
 
     //------------------------------ OBJECT ------------------------------------
     

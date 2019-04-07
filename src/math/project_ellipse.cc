@@ -168,9 +168,9 @@ void projectEllipsoid(real  p[3],
                       const real w[3],
                       const real len[3])
 {
-    assert_true( len[0] > REAL_EPSILON );
-    assert_true( len[1] > REAL_EPSILON );
-    assert_true( len[2] > REAL_EPSILON );
+    assert_true( len[0]==len[0] && len[0] > REAL_EPSILON );
+    assert_true( len[1]==len[1] && len[1] > REAL_EPSILON );
+    assert_true( len[2]==len[2] && len[2] > REAL_EPSILON );
     
     // handle the pathological cases:
     if ( w[0] == 0 )

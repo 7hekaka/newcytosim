@@ -15,16 +15,16 @@ clear pointers
  */
 void Mecable::clearMecable()
 {
-    pAllocated      = 0;
-    nPoints         = 0;
-    pBlock          = nullptr;
-    pPivot          = nullptr;
-    pBlockAllocated = 0;
-    pBlockUse       = false;
-    pBlockSize      = 0;
-    pPos            = nullptr;
-    pForce          = nullptr;
-    pIndex          = -1;  // that is an invalid value
+    pAllocated = 0;
+    nPoints    = 0;
+    pBlock     = nullptr;
+    pPivot     = nullptr;
+    pBlockAllo = 0;
+    pBlockUse  = false;
+    pBlockSize = 0;
+    pPos       = nullptr;
+    pForce     = nullptr;
+    pIndex     = -1;  // that is an invalid value
 }
 
 
@@ -61,7 +61,7 @@ void Mecable::allocateBlock()
 {
     pBlockSize = DIM * nPoints;
     
-    if ( pBlockSize > pBlockAllocated )
+    if ( pBlockSize > pBlockAllo )
     {
         if ( pBlock )
         {
@@ -73,7 +73,7 @@ void Mecable::allocateBlock()
    
         pBlock = new_real(bum*bum);
         pPivot = (int*)malloc(bum*sizeof(int));
-        pBlockAllocated = bum;
+        pBlockAllo = bum;
         
         //zero_real(bum*bum, pBlock);
     }
@@ -86,6 +86,7 @@ void Mecable::allocateBlock()
  */
 size_t Mecable::allocateMecable(const size_t nbp)
 {
+    pForce = nullptr;
     if ( pAllocated < nbp )
     {
         size_t all = chunk_real(nbp);
@@ -117,7 +118,7 @@ void Mecable::releaseMecable()
         pPivot = nullptr;
     }
     
-    pBlockAllocated = 0;
+    pBlockAllo = 0;
     pBlockSize = 0;
     
     if ( pPos )
@@ -135,7 +136,7 @@ void Mecable::releaseMecable()
 //------------------------------------------------------------------------------
 #pragma mark - Modifying points
 
-unsigned Mecable::addPoint( Vector const& vec )
+unsigned Mecable::addPoint(Vector const& vec)
 {
     allocateMecable(nPoints+1);
     unsigned p = nPoints++;
@@ -265,8 +266,9 @@ void Mecable::getPoints(const real * x)
 
 Vector Mecable::netForce(const unsigned p) const
 {
-    assert_true( p < nPoints );
-    if ( pForce && p < nPoints )
+    assert_true( !pForce || nPoints==pForceMax );
+    
+    if ( pForce && p < pForceMax )
         return Vector(pForce+DIM*p);
     else
         return Vector(0,0,0);

@@ -301,14 +301,14 @@ public:
     /// normalized tangent vector to the fiber at PLUS_END
     Vector       dirEndP() const { return dirSegment(lastSegment()); }
 
+    /// force on the MINUS_END projected on the direction of elongation
+    real         projectedForceEndM() const;
+
+    /// force on the PLUS_END projected on the direction of elongation
+    real         projectedForceEndP() const;
+
     /// dot-product (force at the end of the Fiber).(direction of Fiber growth)
     real         projectedForceEnd(FiberEnd end) const;
-
-    /// force on the PLUS_END projected on the direction of elongation
-    real         projectedForceEndM() const { return -dot(netForce(0), dirSegment(0)); }
-
-    /// force on the PLUS_END projected on the direction of elongation
-    real         projectedForceEndP() const { return dot(netForce(lastPoint()), dirSegment(lastSegment())); }
     
     /// average direction
     Vector       avgDirection() const { return normalize( posEndP() - posEndM() ); }

@@ -21,7 +21,10 @@ SpaceDisc::SpaceDisc(const SpaceProp* p)
 
 void SpaceDisc::resize(Glossary& opt)
 {
-    opt.set(radius_, "radius");
+    real len = 0;
+    if ( opt.set(len, "radius") )     radius_ = len;
+    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
+
     if ( radius_ < 0 )
         throw InvalidParameter("disc:radius must be >= 0");
 }
@@ -139,6 +142,7 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 

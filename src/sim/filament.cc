@@ -1395,6 +1395,7 @@ void Filament::adjustSegmentation()
     
     if ( best != nPoints )
     {
+        //std::clog << reference() << " resegment " << nPoints << " -> " << best << "\n";
 #if ( 1 )
         resegment(best-1);
 #else
@@ -1776,6 +1777,21 @@ Vector Filament::dirEnd(const FiberEnd end) const
 }
 
 
+
+/// force on the PLUS_END projected on the direction of elongation
+real Filament::projectedForceEndM() const
+{
+    return -dot(netForce(0), dirSegment(0));
+}
+
+/// force on the PLUS_END projected on the direction of elongation
+real Filament::projectedForceEndP() const
+{
+    unsigned p = lastSegment();
+    return dot(netForce(p+1), dirSegment(p));
+}
+
+
 /**
  The returned value is negative when the force antagonizes elongation,
  and this is true at both ends. 
@@ -1790,6 +1806,7 @@ real Filament::projectedForceEnd(const FiberEnd end) const
         return projectedForceEndM();
     }
 }
+
 
 //------------------------------------------------------------------------------
 #pragma mark -

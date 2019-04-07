@@ -19,8 +19,12 @@ SpaceCylinder::SpaceCylinder(const SpaceProp* p)
 
 void SpaceCylinder::resize(Glossary& opt)
 {
-    opt.set(length_, "length");
-    opt.set(radius_, "radius");
+    real len = 0;
+    opt.set(len, "length");
+    length_ = len * 0.5;
+
+    if ( opt.set(len, "radius") )     radius_ = len;
+    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
 
     if ( length_ < 0 )
         throw InvalidParameter("cylinder:length must be >= 0");
@@ -215,6 +219,7 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 //------------------------------------------------------------------------------

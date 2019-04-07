@@ -22,7 +22,7 @@ class SpaceCapsule : public Space
 
 private:
     
-    /// half the length of the central cylinder
+    /// half the length of the central cylinder, not counting the caps
     real  length_;
     
     /// the radius of the hemisphere
@@ -46,7 +46,7 @@ public:
     void        boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        radius() const { return radius_; }
+    real        thickness() const { return radius_; }
 
     /// the volume inside
     real        volume() const;

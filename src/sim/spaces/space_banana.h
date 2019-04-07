@@ -11,9 +11,9 @@
  terminated by two hemispheres.
  
  Parameters:
-     - `length` = the overall length minus 2*width
-     - `width`  = the diameter of the torus in its crosssections.
-     - `radius` = the main radius of the torus, which defines curvature
+     - `length` = the overall length
+     - `width` = the diameter of the torus in its crosssections.
+     - `curvature` = the main radius of the torus, which defines curvature
      .
  
  This class was first conceived by Dietrich Foethke, to simulate S. pombe.
@@ -24,9 +24,9 @@ class SpaceBanana : public Space
 private:
     
     /// dimensions
-    real  bCurvature;
+    real  bRadius;
     real  bLength;
-    real  bRadius, bRadiusSqr;
+    real  bWidth, bWidthSqr;
 
     /// angle covered by torus section
     real bAngle;
@@ -54,7 +54,7 @@ public:
     void        boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        radius() const { return bRadius; }
+    real        thickness() const { return bWidth; }
 
     /// the volume inside
     real        volume() const;

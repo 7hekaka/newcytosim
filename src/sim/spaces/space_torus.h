@@ -21,13 +21,13 @@ class SpaceTorus : public Space
 private:
     
     /// main radius
-    real  bCurvature;
+    real  bRadius;
     
     /// thickness
-    real  bRadius, bRadiusSqr;
+    real  bWidth, bWidthSqr;
     
     
-    void update() { bRadiusSqr = square(bRadius); }
+    void update() { bWidthSqr = square(bWidth); }
     
     /// project on the backbone
     Vector project0(Vector const& pos) const;
@@ -44,7 +44,7 @@ public:
     void        boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        radius() const { return bRadius; }
+    real        thickness() const { return bWidth; }
 
     /// the volume inside
     real        volume() const;

@@ -110,8 +110,8 @@ void Interface::execute_change_all(std::string const& kind, Glossary& def)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-
-bool check_trail(std::istream& is)
+/// check if stream still contains a non-space character
+bool has_trail(std::istream& is)
 {
     int c = is.get();
     while ( isspace(c) )
@@ -124,14 +124,12 @@ bool check_trail(std::istream& is)
     return false;
 }
 
+/// report warning 
 void warn_trail(std::istream& is, std::string const& msg)
 {
-    if ( check_trail(is) )
-    {
-        std::string str;
-        std::getline(is, str);
-        std::cerr << "Warning: ignored trailing `" << str << "' in: " << msg << "\n";
-    }
+    std::string str;
+    std::getline(is, str);
+    std::cerr << "Warning: ignored trailing `" << str << "' in: " << msg << "\n";
 }
 
 /**
@@ -153,7 +151,7 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         iso.vec = Movable::readPosition(iss, spc);
-        warn_trail(iss, "position = "+str);
+        if ( has_trail(iss) ) warn_trail(iss, "position = "+str);
     }
     else if ( spc )
         iso.vec = spc->randomPlace();
@@ -163,13 +161,13 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         iso.rot = Movable::readRotation(iss, iso.vec, spc);
-        warn_trail(iss, "orientation = "+str);
+        if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
     }
     else if ( opt.set(str, "direction") )
     {
         std::istringstream iss(str);
         Vector vec = Movable::readDirection(iss, iso.vec, spc);
-        warn_trail(iss, "direction = "+str);
+        if ( has_trail(iss) ) warn_trail(iss, "direction = "+str);
         iso.rot = Rotation::randomRotationToVector(vec);
     }
     else
@@ -180,7 +178,7 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         Rotation rot = Movable::readRotation(iss, iso.vec, spc);
-        warn_trail(iss, "orientation = "+str);
+        if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
         iso.rotate(rot);
     }
     

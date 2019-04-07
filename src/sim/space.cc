@@ -248,7 +248,7 @@ Vector Space::bounce(Vector pos) const
 
         static unsigned msg = 0;
         if ( ++msg < 32 )
-            std::cerr << "Warning: Space:bounce("+prop->name()+") failed: is any dimension small?\n";
+            std::cerr << "Warning: "+prop->name()+":bounce failed: is any dimension small?\n";
 
         // Place point on edge, as last resort:
         return p;
@@ -431,13 +431,13 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 
 void Space::read_data(Inputter& in, real len[8])
 {
 #ifdef BACKWARD_COMPATIBILITY
-
     if ( in.formatID() < 35 )
         return;
     
@@ -455,7 +455,6 @@ void Space::read_data(Inputter& in, real len[8])
             len[d] = in.readFloat();
         return;
     }
-    
 #endif
     
     // read the 'shape' stored as a space-terminated string

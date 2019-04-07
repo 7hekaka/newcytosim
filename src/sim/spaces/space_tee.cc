@@ -400,6 +400,7 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 

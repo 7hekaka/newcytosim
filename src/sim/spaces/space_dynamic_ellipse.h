@@ -38,8 +38,8 @@ private:
     /// pressure : lagrange parameter for volume conservation
     real     pressure;
     
-    /// Forces from interactions
-    Vector   inter_forces;
+    /// external radial forces
+    Vector   rad_forces;
     
     /// Radial and circular forces
     mutable Vector Rforces;

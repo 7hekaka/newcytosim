@@ -5,31 +5,35 @@
 
 set simul system
 {
-    time_step = 0.005
-    viscosity = 0.02
+    time_step = 0.001
+    viscosity = 0.1
 }
 
 set space cell
 {
-    geometry = ( dynamic_ellipse 5 5 4 )
+    shape = dynamic_ellipse
     tension = 1
 }
 
 new cell
+{
+    length = 5, 5, 4
+}
 
 set fiber microtubule
 {
-    rigidity = 20
-    segmentation = 0.5
+    rigidity = 10
+    segmentation = 0.25
     confine = inside, 200
 }
 
 new 10 microtubule
 {
-    length = 12
+    length = 7
+    orientation = parallel X
 }
 
-run 1000 system
+run 100 system
 {
 }
 

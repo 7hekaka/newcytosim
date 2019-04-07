@@ -18,14 +18,20 @@ SpaceCapsule::SpaceCapsule(const SpaceProp* p)
 
 void SpaceCapsule::resize(Glossary& opt)
 {
-    opt.set(length_, "length");
-    opt.set(radius_, "radius");
+    real len = 0;
+    if ( opt.set(len, "radius") )     radius_ = len;
+    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
+    // total length is specified:
+    opt.set(len, "length");
+
+    length_ = ( len - 2 * radius_ ) * 0.5;
 
     if ( length_ < 0 )
-        throw InvalidParameter("capsule:length must be >= 0");
-
+        throw InvalidParameter("capsule:length must be >= 2 * radius");
     if ( radius_ < 0 )
         throw InvalidParameter("capsule:radius must be >= 0");
+    
+    update();
 }
 
 
@@ -49,18 +55,15 @@ real SpaceCapsule::volume() const
 bool SpaceCapsule::inside(Vector const& w) const
 {
 #if ( DIM > 2 )
-    real nrm = w.YY * w.YY + w.ZZ * w.ZZ;
+    real n = square(w.YY) + square(w.ZZ);
 #elif ( DIM > 1 )
-    real nrm = w.YY * w.YY;
+    real n = square(w.YY);
 #else
-    real nrm = 0;
+    real n = 0;
 #endif
-    real x = fabs(w.XX);
+    n += square(std::max((real)0, fabs(w.XX)-length_));
     
-    if ( x > length_ )
-        nrm += square( x - length_ );
-    
-    return ( nrm <= radiusSqr_ );
+    return ( n <= radiusSqr_ );
 }
 
 
@@ -68,51 +71,54 @@ bool SpaceCapsule::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    real nrm = w.YY * w.YY + w.ZZ * w.ZZ;
+    real n = square(w.YY) + square(w.ZZ);
 #elif ( DIM > 1 )
-    real nrm = w.YY * w.YY;
+    real n = square(w.YY);
 #else
-    real nrm = 0;
+    real n = 0;
 #endif
-    real x = fabs(w.XX);
+    n += square(std::max((real)0, fabs(w.XX)-length_));
     
-    if ( x > length_ )
-        nrm += square( x - length_ );
-    
-    return ( nrm <= square(radius_-rad) );
+    return ( n <= square(radius_-rad) );
 }
 
 //------------------------------------------------------------------------------
 Vector SpaceCapsule::project(Vector const& w) const
 {
     Vector p;
-    real nrm = w.normYZ();
+#if ( DIM > 2 )
+    real n = square(w.YY) + square(w.ZZ);
+#elif ( DIM > 1 )
+    real n = square(w.YY);
+#else
+    real n = 0;
+#endif
     
     //calculate the projection on the axis, within boundaries:
     if ( fabs(w.XX) > length_ )
     {
         real L = std::copysign(length_, w.XX);
-        nrm  += square( w.XX - L );
+        n += square( w.XX - L );
         //normalize from this point on the axis
-        if ( nrm > 0 ) nrm = radius_ / sqrt( nrm );
+        if ( n > 0 ) n = radius_ / sqrt(n);
         
-        p.XX = length_ + nrm * ( w.XX - L );
+        p.XX = length_ + n * ( w.XX - L );
     }
     else
     {
         //normalize from this point on the axis
-        if ( nrm > 0 ) nrm = radius_ / sqrt( nrm );
+        if ( n > 0 ) n = radius_ / sqrt(n);
         
         p.XX = w.XX;
     }
     
-    if ( nrm > 0 )
+    if ( n > 0 )
     {
 #if ( DIM > 1 )
-        p.YY = nrm * w.YY;
+        p.YY = n * w.YY;
 #endif
 #if ( DIM >= 3 )
-        p.ZZ = nrm * w.ZZ;
+        p.ZZ = n * w.ZZ;
 #endif
     }
     else
@@ -213,6 +219,7 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 

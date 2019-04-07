@@ -65,15 +65,15 @@ new 100 actin
 {
     length = 5
     position = circle 5 0
-    placement = inside, cell, ( X > -1 )
+    placement = inside, cell, ( x > -1 )
 }
 
 run 5 system
 
-new 1000 motor { position = inside; placement = inside, cell, ( X < -1 ); }
-new 1000 motor { position = inside; placement = inside, cell, ( Y > X ); }
-new 1000 crosslinker { position = inside; placement = inside, cell, ( R > 6 ); }
-new 1000 crosslinker { position = inside; placement = inside, cell, ( Y < -5 ); }
+new 1000 motor { position = inside; placement = inside, cell, ( x < -1 ); }
+new 1000 motor { position = inside; placement = inside, cell, ( y > x ); }
+new 1000 crosslinker { position = inside; placement = inside, cell, ( r > 6 ); }
+new 1000 crosslinker { position = inside; placement = inside, cell, ( y < -5 ); }
 
 run 1000 system
 {   

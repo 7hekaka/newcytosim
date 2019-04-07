@@ -10,16 +10,22 @@
 SpaceSquare::SpaceSquare(const SpaceProp* p)
 : Space(p)
 {
+    for ( int d = 0; d < 3; ++d )
+        length_[d] = 0;
 }
 
 
 void SpaceSquare::resize(Glossary& opt)
 {
-    opt.set(length_, 3, "length");
-    
+    real len;
     for ( int d = 0; d < DIM; ++d )
-        if ( length_[d] < 0 )
-            throw InvalidParameter("square:length_[] must be >= 0");
+    {
+        if ( opt.set(len, "length", d) )
+            length_[d] = len * 0.5;
+        
+        if ( length_[d] <= 0 )
+            throw InvalidParameter("ellipse:length[] must be > 0");
+    }
 }
 
 
@@ -252,6 +258,7 @@ void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 //------------------------------------------------------------------------------

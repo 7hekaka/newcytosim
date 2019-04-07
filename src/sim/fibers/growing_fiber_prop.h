@@ -53,7 +53,6 @@ public:
     /// Characteristic force for polymer assembly
     real    growing_force[2];
 
-    
     /// Flag to enable special dynamics in which growth is determined by the position of the fiber end
     /**
      If 'shrink_outside[0] == true', the PLUS_END will:
@@ -65,6 +64,10 @@ public:
      The shrinking speed is equal to the specified growing_speed.
      */
     bool    shrink_outside[2];
+    
+    /// Shrinking speed of end that are outside, for option 'shrink_outside'
+    real    shrinking_speed[2];
+
     /// @}
     
 private:
@@ -75,6 +78,9 @@ private:
     /// derived variable
     real    growing_off_speed_dt[2];
     
+    /// derived variable
+    real    shrinking_speed_dt[2];
+
 public:
     
     /// constructor

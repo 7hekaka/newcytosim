@@ -34,7 +34,7 @@ public:
     /// values of the elements
     real val[BLD*3];
     
-    Matrix33() {}
+    Matrix33() { clear_extra(); }
     
     /// copy constructor
     Matrix33(Matrix33 const& M)
@@ -160,6 +160,7 @@ public:
         return os.str();
     }
 
+    /// clear values that do not represent matrix elements
     void clear_extra()
     {
 #if ( BLD == 4 )
@@ -250,7 +251,6 @@ public:
         for ( int x = 0; x < 3; ++x )
         for ( int y = 0; y < 3; ++y )
             res[y+BLD*x] = val[x+BLD*y];
-        res.clear_extra();
         return res;
     }
     

@@ -50,27 +50,27 @@ public:
     //--------------------------------------------------------------------------
     
     /// return the position in space of the object
-    Vector       position()              const { return Vector(pPos); }
+    Vector      position()             const { return Vector(pPos); }
     
     /// move the object position ( position += given vector )
-    void         translate(Vector const& x)    { x.add_to(pPos); }
+    void        translate(Vector const& x)   { x.add_to(pPos); }
     
     /// set the object position ( position = given vector )
-    void         setPosition(Vector const& x)  { x.store(pPos); }
+    void        setPosition(Vector const& x) { x.store(pPos); }
 
     //--------------------------------------------------------------------------
         
     /// the radius of the Bead
-    real         radius()                const { return paRadius; }
+    real        radius()               const { return paRadius; }
     
     /// the volume of the bead
-    real         radiusSqr()             const { return paRadius * paRadius; }
+    real        radiusSqr()            const { return paRadius * paRadius; }
     
     /// set the radius of the Bead
-    void         resize(real R)                { assert_true(R>0); paRadius = R; setDragCoefficient(); }
+    void        resize(real R)               { assert_true(R>0); paRadius = R; setDragCoefficient(); }
     
     /// the volume of the bead
-    real         volume() const;
+    real        volume() const;
     
     //--------------------------------------------------------------------------
     
@@ -78,7 +78,7 @@ public:
     void        setDragCoefficient();
     
     /// the total drag-coefficient of object (force = drag * speed)
-    real        dragCoefficient()        const { return paDrag; }
+    real        dragCoefficient()      const { return paDrag; }
     
     /// sets the mobility (called at every step)
     /**

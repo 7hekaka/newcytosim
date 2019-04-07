@@ -10,19 +10,29 @@ SpaceDice::SpaceDice(const SpaceProp* p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("dice is not usable in 1D");
+
+    for ( int d = 0; d < 3; ++d )
+        length_[d] = 0;
+    radius_ = 0;
 }
 
 
 void SpaceDice::resize(Glossary& opt)
 {
-    opt.set(length_, 3, "length");
-    
+    opt.set(radius_, "radius");
     if ( radius_ < 0 )
         throw InvalidParameter("dice:radius must be >= 0");
 
+    real len;
     for ( int d = 0; d < DIM; ++d )
+    {
+        if ( opt.set(len, "length", d) )
+            length_[d] = len * 0.5;
+        
         if ( length_[d] < radius_ )
-            throw InvalidParameter("all dice's dimensions must be >= radius");
+            throw InvalidParameter("dice:length[] must be >= 2 * radius");
+    }
+    update();
 }
 
 
@@ -63,9 +73,7 @@ bool  SpaceDice::inside(Vector const& w) const
         real a = fabs(w[d]) - length_[d];
         if ( a > 0 )
             return false;
-        a += radius_;
-        if ( a > 0 )
-            dis += a * a;
+        dis += square(std::max((real)0, a+radius_));
     }
     return ( dis <= radiusSqr_ );
 }
@@ -152,12 +160,14 @@ void SpaceDice::setLengths(const real len[])
     length_[1] = len[1];
     length_[2] = len[2];
     radius_ = len[4];
+    update();
 }
 
 void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 //------------------------------------------------------------------------------

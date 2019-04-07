@@ -77,7 +77,7 @@ void GrowingFiber::step()
     // PLUS_END
     if ( prop->shrink_outside[0] && prop->confine_space_ptr->outside(posEndP()) )
     {
-        mGrowthP = -prop->growing_speed_dt[0];
+        mGrowthP = prop->shrinking_speed_dt[0];
     }
     else if ( mStateP == STATE_GREEN )
     {
@@ -101,7 +101,7 @@ void GrowingFiber::step()
     // MINUS_END
     if ( prop->shrink_outside[1] && prop->confine_space_ptr->outside(posEndM()) )
     {
-        mGrowthM = -prop->growing_speed_dt[1];
+        mGrowthM = prop->shrinking_speed_dt[1];
     }
     else if ( mStateM == STATE_GREEN )
     {

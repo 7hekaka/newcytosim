@@ -20,7 +20,10 @@ SpaceCylinderZ::SpaceCylinderZ(const SpaceProp* p)
 
 void SpaceCylinderZ::resize(Glossary& opt)
 {
-    opt.set(radius_, "radius_");
+    real len = 0;
+    if ( opt.set(len, "radius") )     radius_ = len;
+    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
+
     opt.set(bot_,    "bottom");
     opt.set(top_,    "top");
     
@@ -230,6 +233,7 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
     read_data(in, len);
+    setLengths(len);
 }
 
 //------------------------------------------------------------------------------
