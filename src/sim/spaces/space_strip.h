@@ -12,9 +12,10 @@
  The last dimension is Y in 2D and Z in 3D.
  
  Parameters:
-     - length = half-width along X, Y and Z
+     - length = along X, Y and Z
      .
      
+ To display a periodic Space, use simul:display parameter 'tile'.
  @ingroup SpaceGroup
  */
 class SpaceStrip : public Space

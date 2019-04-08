@@ -11,9 +11,10 @@
  The volume has no edge and wraps on itself.
 
  Parameters:
-     - length = half-width along X, Y and Z
+     - length = along X, Y and Z
      .
  
+ To display a periodic Space, use simul:display parameter 'tile'.
  @ingroup SpaceGroup
  */
 class SpacePeriodic : public Space

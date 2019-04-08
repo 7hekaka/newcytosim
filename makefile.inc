@@ -7,8 +7,7 @@ MACHINE := auto
 #---------------- COMPILER = {gcc, icc, clang}
 COMPILER := gcc
 
-#---------------- MODE = {F, P, D, C}
-# F = Fast; P = Profiling; D = Debug; C = Coverage
+#---------------- MODE = {F = Fast; D = Debug; P = Profiling; C = Coverage}
 MODE := D
 
 #---------------- INTEL Math Kernel Library
@@ -116,10 +115,10 @@ else ifeq ($(COMPILER),icc)
 
 else ifeq ($(COMPILER),clang)
 
-# for the standard libraries, use: -stdlib=libc++
+# for the standard library, use: -stdlib=libc++
 # the old library: -stdlib=libstdc++ (deprecated)
 
-    CXX      := c++ -Wfatal-errors -mmacosx-version-min=10.10
+    CXX      := c++ -Wfatal-errors
     FAST     := -O3 -ffast-math -funroll-loops -mavx2 -mfma
     FAST     := -O3 -ffast-math -funroll-loops
     DEBUG    := -g3 -ggdb

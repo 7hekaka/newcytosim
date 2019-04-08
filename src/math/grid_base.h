@@ -102,7 +102,7 @@ Example:
 
 ///\todo add Grid<> copy constructor and copy assignment
 
-template <unsigned int ORD>
+template <int ORD>
 class GridBase
 {
 public:
@@ -136,63 +136,99 @@ protected:
     /// The position of the superior (max) edge in each dimension
     real    gSup[ORD];
     
+    /// true if Grid has periodic boundary conditions
+    bool    gPeriodic[ORD];
+
     /// The size of a cell: cWidth[d] = ( gSup[d] - inf[d] ) / gDim[d]
     real    cWidth[ORD];
     
     /// cDelta[d] = 1.0 / cWidth[d]
     real    cDelta[ORD];
     
+    /// gStart[d] = gInf[d] / cWidth[d]
+    real    gStart[ORD];
+
     /// The volume occupied by one cell
     real    cVolume;
-
-#if GRID_HAS_PERIODIC
-    /// true if Grid has periodic boundary conditions
-    bool    gPeriodic;
-#endif
     
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
-    inline index_t imagei(const int& s, int c) const
+    static inline index_t imagei_periodic(index_t s, int c)
     {
-#if GRID_HAS_PERIODIC
-        if ( gPeriodic )
-        {
-            while ( c <  0 )  c += s;
-            while ( c >= s )  c -= s;
-            return c;
-        }
-#endif
-        return std::max(0, std::min(c, s-1));
+        while ( c <  0 )  c += s;
+        index_t u = (index_t) c;
+        while ( u >= s )  u -= s;
+        return u;
+    }
+
+    static inline index_t imagei_clamped(index_t s, int c)
+    {
+        return std::min((index_t)std::max(0, c), s-1);
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
     }
     
     /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
     inline index_t image(const int d, int c) const
     {
-        return imagei(gDim[d], c);
+#if GRID_HAS_PERIODIC
+        if ( gPeriodic[d] )
+            return imagei_periodic(gDim[d], c);
+        else
+#endif
+            return imagei_clamped(gDim[d], c);
     }
 
+
     /// return f modulo s in [ 0, s-1 ]
-    inline index_t imagef(const int& s, real f) const
+    static inline index_t imagef_periodic(index_t s, real f)
     {
-#if GRID_HAS_PERIODIC
-        if ( gPeriodic )
-        {
-            while ( f <  0 )  f += s;
-            int i = (int)f;
-            while ( i >= s )  i -= s;
-            return i;
-        }
-#endif
-        //return std::max(0, std::min((int)c, s-1));
+        while ( f <  0 )  f += s;
+        index_t u = (index_t) f;
+        while ( u >= s )  u -= s;
+        return u;
+    }
+
+    static inline index_t imagef_clamped(index_t s, real f)
+    {
         if ( f > 0 )
         {
-            int c = (int) f;
-            //return ( c >= s ? s-1 : c );
-            return std::min(c, s-1);
+            index_t u = (index_t) f;
+            //return ( u >= s ? s-1 : u );
+            return std::min(u, s-1);
         }
         return 0;
+    }
+    
+    
+    /// returns  ( f - gInf[d] ) / cWidth[d]
+    inline real map(const int d, real f) const
+    {
+        return f * cDelta[d] - gStart[d];
+    }
+
+    /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
+    inline index_t imagef(const int d, real f) const
+    {
+        real x = map(d, f);
+#if GRID_HAS_PERIODIC
+        if ( gPeriodic[d] )
+            return imagef_periodic(gDim[d], x);
+        else
+#endif
+            return imagef_clamped(gDim[d], x);
+    }
+
+    /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
+    inline index_t imagef(const int d, real f, real offset) const
+    {
+        real x = map(d, f) + offset;
+#if GRID_HAS_PERIODIC
+        if ( gPeriodic[d] )
+            return imagef_periodic(gDim[d], x);
+        else
+#endif
+            return imagef_clamped(gDim[d], x);
     }
 
 //--------------------------------------------------------------------------
@@ -200,11 +236,8 @@ protected:
 public:
     
     /// constructor
-    GridBase() : gDim(), gInf(), gSup(), cWidth(), cDelta()
+    GridBase() : gDim{0}, gInf{0}, gSup{0}, gPeriodic{false}, cWidth{0}, cDelta{0}, gStart{0}
     {
-#if GRID_HAS_PERIODIC
-        gPeriodic   = false;
-#endif
         gAllocated  = 0;
         nCells      = 0;
         regionsEdge = nullptr;
@@ -256,7 +289,9 @@ public:
             gInf[d]    = infs[d];
             gSup[d]    = sups[d];
             cWidth[d]  = ( gSup[d] - gInf[d] ) / real( gDim[d] );
+            // inverse of cell width:
             cDelta[d]  = real( gDim[d] ) / ( gSup[d] - gInf[d] );
+            gStart[d]  = ( gInf[d] * gDim[d] ) / ( gSup[d] - gInf[d] );
             cVolume   *= cWidth[d];
         }
     }
@@ -267,25 +302,37 @@ public:
         return nCells > 0;
     }
     
-    /// true if boundary conditions are periodic
-    bool periodic() const
+    /// true if dimension `d` has periodic boundary conditions
+    bool isPeriodic(int d) const
     {
 #if GRID_HAS_PERIODIC
-        return gPeriodic;
-#else
-        return false;
+        if ( d < ORD )
+            return gPeriodic[d];
 #endif
+        return false;
     }
     
     /// change boundary conditions
-    void periodic(bool p)
+    void setPeriodic(int d, bool p)
     {
 #if GRID_HAS_PERIODIC
-        gPeriodic = p;
+        if ( d < ORD )
+            gPeriodic[d] = p;
 #else
         if ( p )
             throw InvalidParameter("grid.h was compiled without PERIODIC_SUPPORT");
 #endif
+    }
+    
+    /// true if boundary conditions are periodic
+    bool isPeriodic() const
+    {
+#if GRID_HAS_PERIODIC
+        for ( int d = 0; d < ORD; ++d )
+            if ( gPeriodic[d] )
+                return true;
+#endif
+        return false;
     }
 
     //--------------------------------------------------------------------------
@@ -319,7 +366,7 @@ public:
     real            position(int d, real c) const { return gInf[d] + c * cWidth[d]; }
     
     /// index in dimension `d` corresponding to position `w`
-    int             index(int d, real w) const { return (int)(( w - gInf[d] ) * cDelta[d]); }
+    int             index(int d, real w) const { return (int)map(d, w); }
     
     /// the volume of a cell
     real            cellVolume()        const { return cVolume; }
@@ -387,7 +434,7 @@ public:
     void bringInside(int coord[ORD]) const
     {
         for ( unsigned int d = 0; d < ORD; ++d )
-            coord[d] = imagei(gDim[d], coord[d]);
+            coord[d] = image(d, coord[d]);
     }
     
     /// conversion from index to coordinates
@@ -404,7 +451,7 @@ public:
     void setCoordinatesFromPosition(int coord[ORD], const real w[ORD], const real offset=0) const
     {
         for ( unsigned int d = 0; d < ORD; ++d )
-            coord[d] = imagef(gDim[d], offset+(w[d]-gInf[d])*cDelta[d]);
+            coord[d] = imagef(d, w[d], offset);
     }
 
     /// conversion from Index to Position (offset should be in [0,1])
@@ -427,10 +474,10 @@ public:
     /// conversion from coordinates to index
     index_t pack(const int coord[ORD]) const
     {
-        index_t inx = imagei(gDim[ORD-1], coord[ORD-1]);
+        index_t inx = image(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + imagei(gDim[d], coord[d]);
+            inx = gDim[d] * inx + image(d, coord[d]);
         
         return inx;
     }
@@ -439,10 +486,10 @@ public:
     /// returns the index of the cell whose center is closest to the point w[]
     index_t index(const real w[ORD]) const
     {
-        index_t inx = imagef(gDim[ORD-1], (w[ORD-1]-gInf[ORD-1])*cDelta[ORD-1]);
+        index_t inx = imagef(ORD-1, w[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + imagef(gDim[d], (w[d]-gInf[d])*cDelta[d]);
+            inx = gDim[d] * inx + imagef(d, w[d]);
         
         return inx;
     }
@@ -451,10 +498,10 @@ public:
     /// returns the index of the cell whose center is closest to the point w[]
     index_t index(const real w[ORD], const real offset) const
     {
-        index_t inx = imagef(gDim[ORD-1], offset+(w[ORD-1]-gInf[ORD-1])*cDelta[ORD-1]);
+        index_t inx = imagef(ORD-1, w[ORD-1], offset);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + imagef(gDim[d], offset+(w[d]-gInf[d])*cDelta[d]);
+            inx = gDim[d] * inx + imagef(d, w[d], offset);
         
         return inx;
     }
@@ -470,7 +517,7 @@ public:
             c       /= gDim[d];
         }
 
-        coord[dd] = imagei(gDim[dd], coord[dd]+1);
+        coord[dd] = image(dd, coord[dd]+1);
 
         index_t inx = coord[ORD-1];
         
@@ -502,22 +549,22 @@ public:
     /// return index of cell corresponding to position (x), if ORD==1
     index_t index1D(const real x) const
     {
-        return image(0, (x-gInf[0])*cDelta[0]);
+        return image(0, map(0, x));
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
     index_t index2D(const real x, const real y) const
     {
-        return image(0, (x-gInf[0])*cDelta[0])
-               + gDim[0] * image(1, (y-gInf[1])*cDelta[1]);
+        return image(0, map(0, x))
+               + gDim[0] * image(1, map(1, y));
     }
     
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     index_t index3D(const real x, const real y, const real z) const
     {
-        return image(0, (x-gInf[0])*cDelta[0])
-               + gDim[0]*( image(1, (y-gInf[1])*cDelta[1])
-               + gDim[1]*  image(2, (z-gInf[2])*cDelta[2]) );
+        return image(0, map(0, x))
+               + gDim[0]*( image(1, map(1, y))
+               + gDim[1]*  image(2, map(2, z)) );
     }
 
     //--------------------------------------------------------------------------
@@ -607,7 +654,7 @@ private:
             int off = (int)pack(cc) - ori_indx;
             
             bool add = ( positive ? off >= 0 : true );
-            if ( periodic() )
+            if ( isPeriodic() )
             {
                 //check that cell is not already included:
                 for ( int n = 0; n < nb; ++n )

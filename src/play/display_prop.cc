@@ -32,8 +32,10 @@ void DisplayProp::read(Glossary& glos)
     glos.set(tile,          "periodic");
     glos.set(fold,          "periodic", 1);
 
+#ifdef BACKWARD_COMPATIBILITY
     glos.set(tile,          "tiled");
     glos.set(fold,          "tiled", 1);
+#endif
     glos.set(meca_links,    "meca_links");
 
     glos.set(couple_flip,   "couple_flip");

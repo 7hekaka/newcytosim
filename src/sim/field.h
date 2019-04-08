@@ -92,10 +92,11 @@ private:
         //verify the cell size:
         for ( int d = 0; d < DIM; ++d )
         {
-            real dif = mGrid.delta(d) * step - 1.0;
-            if ( fabs(dif) > 1e-6 )
+            real dif = fabs( step - mGrid.cellWidth(d) );
+            if ( fabs(dif) > 1e-3 )
             {
-                Cytosim::warn << "Field:step[" << d << "] is not as expected:\n  field: " << mGrid.cellWidth(d) << "  prop: " << step << std::endl;
+                Cytosim::warn << "Field:step[" << d << "] is not as expected:\n";
+                Cytosim::warn << "  field: " << mGrid.cellWidth(d) << "  prop: " << step << std::endl;
             }
         }
     }
@@ -147,7 +148,8 @@ public:
             
             if ( prop->periodic )
             {
-                mGrid.periodic(true);
+                for ( int d = 0; d < DIM; ++d )
+                    mGrid.setPeriodic(d, true);
                 setGrid(inf, sup, prop->step, true);
             }
             else
@@ -338,10 +340,11 @@ public:
         {
             for ( unsigned int d = 0; d < DIM; ++d )
             {
-                real dif = mGrid.delta(d)*prop->step - 1.0;
-                if ( fabs(dif) > 1e-6 )
+                real dif = fabs( prop->step - mGrid.cellWidth(d) );
+                if ( fabs(dif) > 1e-3 )
                 {
-                    Cytosim::warn << "Field:step["<<d<<"] has changed:\n  file: " << mGrid.cellWidth(d) << " prop: " << prop->step  << std::endl;
+                    Cytosim::warn << "Field:step["<<d<<"] has changed:\n";
+                    Cytosim::warn << "  file: " << mGrid.cellWidth(d) << " prop: " << prop->step << std::endl;
                 }
             }
             

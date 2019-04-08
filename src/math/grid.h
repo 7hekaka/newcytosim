@@ -318,7 +318,7 @@ public:
         int nb = 0;
         for ( int d = ORD-1; d >= 0; --d )
         {
-            real a = ( w[d] - GRID::gInf[d] ) * GRID::cDelta[d] + 0.5;
+            real a = GRID::map(d, w[d]) + 0.5;
             int ia = std::floor(a);
             a     -= ia;
             int  l = GRID::image(d, ia-1);
@@ -360,7 +360,7 @@ public:
     {
         assert_true( ORD == 1 );
         
-        real  ax = 0.5 + ( xx - GRID::gInf[0] ) * GRID::cDelta[0];
+        real  ax = 0.5 + GRID::map(0, xx);
         
 #if GRID_HAS_PERIODIC
         int   ix = std::floor(ax);
@@ -382,8 +382,8 @@ public:
     {
         assert_true( ORD == 2 );
         
-        real  ax = 0.5 + ( w[0] - GRID::gInf[0] ) * GRID::cDelta[0];
-        real  ay = 0.5 + ( w[1] - GRID::gInf[1] ) * GRID::cDelta[1];
+        real  ax = 0.5 + GRID::map(0, w[0]);
+        real  ay = 0.5 + GRID::map(1, w[1]);
         
 #if GRID_HAS_PERIODIC
         int   ix = std::floor(ax);
@@ -415,9 +415,9 @@ public:
     {
         assert_true( ORD == 3 );
         
-        real  ax = 0.5 + ( w[0] - GRID::gInf[0] ) * GRID::cDelta[0];
-        real  ay = 0.5 + ( w[1] - GRID::gInf[1] ) * GRID::cDelta[1];
-        real  az = 0.5 + ( w[2] - GRID::gInf[2] ) * GRID::cDelta[2];
+        real  ax = 0.5 + GRID::map(0, w[0]);
+        real  ay = 0.5 + GRID::map(1, w[1]);
+        real  az = 0.5 + GRID::map(2, w[2]);
         
 #if GRID_HAS_PERIODIC
         int   ix = std::floor(ax);

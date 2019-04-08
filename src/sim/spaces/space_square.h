@@ -9,7 +9,7 @@
  Space `square` is a 2D or 3D rectangular volume.
  
  Parameters:
-     - length = half-width along X, Y and Z
+     - length = along X, Y and Z
      .
 
  @ingroup SpaceGroup

@@ -42,7 +42,6 @@ unsigned FiberGrid::setGrid(const Space * space, real max_step)
     Vector inf, sup;
     space->boundaries(inf, sup);
     
-    bool periodic = false;
     int n_cell[3] = { 1, 1, 1 };
     
     for ( int d = 0; d < DIM; ++d )
@@ -55,7 +54,7 @@ unsigned FiberGrid::setGrid(const Space * space, real max_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges exactly
-            periodic = true;
+            fGrid.setPeriodic(d, true);
         }
         else
         {
@@ -70,9 +69,6 @@ unsigned FiberGrid::setGrid(const Space * space, real max_step)
     }
 
     //create the grid using the calculated dimensions:
-    if ( periodic )
-        fGrid.periodic(true);
-    
     fGrid.setDimensions(inf, sup, n_cell);
     return fGrid.nbCells();
 }

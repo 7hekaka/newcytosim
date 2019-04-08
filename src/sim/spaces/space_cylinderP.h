@@ -16,6 +16,7 @@
      - radius = radius of the cylinder
      .
 
+ To display a periodic Space, use simul:display parameter 'tile'.
  @ingroup SpaceGroup
  */
 class SpaceCylinderP : public Space

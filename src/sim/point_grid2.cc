@@ -25,7 +25,6 @@ void PointGrid::setGrid(Space const* space, Modulo const* modulo, real min_step)
     Vector inf, sup;
     space->boundaries(inf, sup);
     
-    bool periodic = false;
     int n_cell[3];
     for ( int d = 0; d < DIM; ++d )
     {
@@ -40,7 +39,7 @@ void PointGrid::setGrid(Space const* space, Modulo const* modulo, real min_step)
             n_cell[d] = (int)floor(n);
             if ( n_cell[d] <= 0 )
                 n_cell[d] = 1;
-            periodic = true;
+            pGrid.setPeriodic(d, true);
         }
         else
         {
@@ -54,7 +53,6 @@ void PointGrid::setGrid(Space const* space, Modulo const* modulo, real min_step)
     }
     
     //create the grid using the calculated dimensions:
-    pGrid.periodic(periodic);
     pGrid.setDimensions(inf, sup, n_cell);
     pGrid.createCells();
 

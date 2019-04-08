@@ -28,7 +28,12 @@ public:
      */
     unsigned       style;
 
-    /// if true, repeat the display for periodic boundary conditions
+    /// if true, repeat the display along periodic boundary directions
+    /**
+    This is only useful is the main Space is periodic, strip or cylinderP
+    In this case, the whole system will be displayed multiple times,
+    shifted appropriately in the directions that are periodic.
+    */
     int            tile;
     
     /// if true, translate objects to place them in the root cell for periodic boundary conditions

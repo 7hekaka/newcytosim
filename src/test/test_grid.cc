@@ -55,7 +55,8 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
     switch (c)
     {
         case 'p':
-            myGrid.periodic(!myGrid.periodic());
+            for ( int d = 0; d < DIM; ++d )
+                myGrid.setPeriodic(d, !myGrid.isPeriodic(d));
             break;
             
         case 'i':
@@ -134,19 +135,19 @@ void processMouseDrag(int mx, int my, Vector3 & a, const Vector3 & b, int m)
 }
 
 //------------------------------------------------------------------------------
-
-static bool field_color2(void*, const real& val, Vector2 const& pos)
+#if ( DIM == 3 )
+static bool field_color(void*, const real& val, Vector3 const& pos)
 {
     glColor3f(val/5.0, 0, 0);
     return true;
 }
-
-static bool field_color3(void*, const real& val, Vector3 const& pos)
+#else
+static bool field_color(void*, const real& val, Vector2 const& pos)
 {
     glColor3f(val/5.0, 0, 0);
     return true;
 }
-
+#endif
 
 void display(View&, int)
 {
@@ -155,9 +156,9 @@ void display(View&, int)
 
 #if ( DIM == 3 )
     Vector3 dir(0,0,1);
-    drawValues(myGrid, field_color3, 0, dir);
+    drawValues(myGrid, field_color, 0, dir);
 #else
-    drawValues(myGrid, field_color2, 0);
+    drawValues(myGrid, field_color, 0);
 #endif
     
     //--------------draw a grid in gray:
@@ -182,7 +183,7 @@ void display(View&, int)
     }
 
     //-------------draw selected-cell
-    glPointSize(8.0);
+    glPointSize(12);
     glBegin(GL_POINTS);
     glColor4f(1,1,1,1);
     gleVertex(pos);
@@ -314,7 +315,8 @@ int main(int argc, char* argv[])
     //initialize the grid:
     myGrid.setDimensions(left, right, size);
     myGrid.createCells();
-    //myGrid.periodic(1);
+    //myGrid.setPeriodic(0, true);
+    //myGrid.setPeriodic(1, true);
     throwMarbles(8*(1<<DIM));
 
     glutInit(&argc, argv);

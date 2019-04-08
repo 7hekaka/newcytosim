@@ -5,37 +5,39 @@ Cytosim is a cytoskeleton simulation designed to handle large systems of flexibl
 ![Cytosim](doc/data/cytosim.png)
 
 Cytosim is a suite of command-line tools with simulation and display capabilities. The simulation is specified in a [configuration file](doc/sim/config.md), defining objects, their parameters and a suite of operations, such as advancing time, saving frames or [generating reports](doc/sim/report.md). Here is a basic example:
-
-    set simul system
-    {
-        time_step = 0.005
-        viscosity = 0.02
-    }
-
-    set space cell
-    {
-        shape = sphere
-        dimensions = 5
-    }
-
-    set fiber microtubule
-    {
-        rigidity = 20
-        segmentation = 0.5
-        confine = inside, 200, cell
-    }
-        
-    new cell
-
-    new 5 microtubule
-    {
-        length = 11
-    }
-
-    run 5000 system
-    {
-        nb_frames = 10
-    }
+	
+	set simul system
+	{
+	    time_step = 0.005
+	    viscosity = 0.02
+	}
+	
+	set space cell
+	{
+	    shape = sphere
+	}
+	
+	set fiber microtubule
+	{
+	    rigidity = 20
+	    segmentation = 0.5
+	    confine = inside, 200, cell
+	}
+	    
+	new cell
+	{
+	    radius = 5
+	}
+	
+	new 5 microtubule
+	{
+	    length = 11
+	}
+	
+	run 5000 system
+	{
+	    nb_frames = 10
+	}
 
 The parameters are specified in [units of second, micrometers and pico-Newtons](doc/sim/units.md).
 

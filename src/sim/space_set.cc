@@ -97,7 +97,7 @@ Object * SpaceSet::newObjectT(const ObjectTag tag, unsigned idx)
  
      new cell
      {
-        dimension = 3 4
+        length = 3, 4
      }
  
  */

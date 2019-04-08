@@ -7,11 +7,13 @@
 #include "modulo.h"
 
 /**
- a rectangular Space with partial periodic boundary conditions similar to SpaceStrip
- The space can grow with a constant velocity or a velocity depending on total force on the membrane
+ SpaceLid is a rectangular Space with partial periodic boundary conditions in
+ all except the last dimension. The top surface can move with a constant velocity,
+ or with a velocity proportional to the force it experience.
  
  Parameters:
-     - length = half-width along X, Y and Z
+     - length = along X, Y and Z
+     - ceiling = position of the top boundary
      .
  
  Author: Antonio Z. Politi

@@ -108,7 +108,7 @@ void Display::display(Simul const& sim)
  and then all transparent objects for all tiles. Here, we calls Display::display()
  a number of times, and objects are sorted within each tile. The result is not perfect.
  */
-void Display::displayTiled(Simul const& sim, int nine)
+void Display::displayTiled(Simul const& sim, int arg)
 {
     assert_true(modulo);
     
@@ -119,7 +119,7 @@ void Display::displayTiled(Simul const& sim, int nine)
     {
         if ( modulo->isPeriodic(d) )
         {
-            l[d] = (nine>1) ? -1 : 0;
+            l[d] = (arg>1) ? -1 : 0;
             u[d] = +1;
         }
     }
