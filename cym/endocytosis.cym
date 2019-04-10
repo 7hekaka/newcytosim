@@ -72,7 +72,7 @@ set hand nucleator
 {
     unbinding = 0, inf
     activity = nucleate
-    nucleate = 10, actin, ( length=0.0055; )
+    nucleate = 10, actin, ( plus_end=grow; length=0.0055; )
     display = ( size=7; width=5; color=green; )
 }
 
@@ -153,16 +153,20 @@ new link
 
 run system
 {
-    nb_steps = 200000
-    nb_frames = 1000
+    nb_steps = 2000
+    nb_frames = 50
 }
 
 mark actin { mark = 0; }
 
 run system
 {
-    nb_steps = 400000
-    nb_frames = 2000
+    nb_steps = 4000
+    nb_frames = 100
 }
 
+change blob
+{
+    confine = none
+}
 

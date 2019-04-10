@@ -12,10 +12,10 @@
 template< typename FLOAT >
 FLOAT grained(FLOAT x, int inc)
 {
-    const FLOAT half = (FLOAT)0.5;
-    FLOAT dx = inc * ( 1 + ( x >= 8 ) + 2 * ( x >= 32 ) );
-    FLOAT nx = half * ( dx + std::round( 2 * x ));
-    return std::max(half, nx);
+    const FLOAT grain = (FLOAT)0.25;
+    FLOAT dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 16 ) + 4 * ( x >= 16 ) );
+    FLOAT nx = grain * std::round( x / grain + dx );
+    return std::max(abs(inc)*grain, nx);
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ void setSize(PointDisp * p, GLfloat s)
     if ( s >= 0.5 )
     {
         p->size = s;
-        flashText("%s:size = %.1f", p->name_str(), s);
+        flashText("%s:size = %.2f", p->name_str(), s);
     }
 }
 
@@ -54,7 +54,7 @@ void setWidth(PointDisp * p, GLfloat s)
     if ( s > 0.5 )
     {
         p->width = s;
-        flashText("%s:width = %.1f", p->name_str(), s);
+        flashText("%s:width = %.2f", p->name_str(), s);
     }
 }
 
@@ -66,7 +66,7 @@ void scaleSize(PointDisp * p, int s)
         if ( p->size > 16 )
             p->size = 0.5;
         p->width = p->size / 2;
-        flashText("%s:size = %.1f", p->name_str(), p->size);
+        flashText("%s:size = %.2f", p->name_str(), p->size);
     }
 }
 
@@ -110,44 +110,32 @@ PointDisp * nextPointDisp(PropertyList const& plist, int& cnt)
 }
 
 
-void changePointDispSize(PropertyList const& plist, DisplayProp& DP, int inc)
+void changePointDispSize(PropertyList const& plist, DisplayProp& DP, int inc,
+						 bool dos, bool dow)
 {
     for ( Property * i : plist )
     {
         PointDisp * p = toPointDisp(i);
-        p->size = grained(p->size, inc);
+        if ( dos ) p->size = grained(p->size, inc*2);
+        if ( dow ) p->width = grained(p->width, inc);
     }
     
     if ( DP.style == 2 || plist.size() > 1 )
     {
-        DP.point_size = grained(DP.point_size, inc);
-        flashText("simul:point_size %.1f", DP.point_size);
-    }
+		if ( dow ) {
+			DP.link_width = grained(DP.link_width, inc);
+			flashText("simul:link_width %.2f", DP.link_width);
+		}
+		if ( dos ) {
+			DP.point_size = grained(DP.point_size, inc*2);
+			flashText("simul:point_size %.2f", DP.point_size);
+		}
+	}
     else if ( plist.size() == 1 )
     {
         PointDisp * p = toPointDisp(plist.front());
-        flashText((p->name()+":size %.1f").c_str(), p->size);
-    }
-}
-
-
-void changePointDispWidth(PropertyList const& plist, DisplayProp& DP, int inc)
-{
-    for ( Property * i : plist )
-    {
-        PointDisp * p = toPointDisp(i);
-        p->width = grained(p->width, inc);
-    }
-    
-    if ( DP.style == 2 || plist.size() > 1 )
-    {
-        DP.link_width = grained(DP.link_width, inc);
-        flashText("simul:link_width %.1f", DP.link_width);
-    }
-    else if ( plist.size() == 1 )
-    {
-        PointDisp * p = toPointDisp(plist.front());
-        flashText((p->name()+":width %.1f").c_str(), p->width);
+        if ( dow ) flashText((p->name()+":width %.2f").c_str(), p->width);
+        if ( dos ) flashText((p->name()+":size %.2f").c_str(), p->size);
     }
 }
 
@@ -453,14 +441,14 @@ void changeEndSize(FiberDisp* p, int inc)
         if ( p->end_style[1] )
         {
             size[1] = s1;
-            flashText((p->name()+":end_size %.1f %.1f").c_str(), s0, s1);
+            flashText((p->name()+":end_size %.2f %.2f").c_str(), s0, s1);
         }
         else
-            flashText((p->name()+":plus_end %.1f").c_str(), s0);
+            flashText((p->name()+":plus_end %.2f").c_str(), s0);
     } else if ( p->end_style[1] )
     {
         size[1] = s1;
-        flashText((p->name()+":minus_end %.1f").c_str(), s1);
+        flashText((p->name()+":minus_end %.2f").c_str(), s1);
     }
 }
 
@@ -610,6 +598,7 @@ void processKey(unsigned char key)
     View & view = glApp::currentView();
     
     const bool altKeyDown = glutGetModifiers() & GLUT_ACTIVE_ALT;
+    const bool shiftKeyDown = glutGetModifiers() & GLUT_ACTIVE_SHIFT;
     /*
      In the switch below:
      - use break if the display need to be refreshed,
@@ -856,24 +845,24 @@ void processKey(unsigned char key)
             
         case '2':
             if ( altKeyDown)
-                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -1);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -2);
             else
-                setFiberDisp(player.allVisibleFiberDisp(), changeSize, -1);
+                setFiberDisp(player.allVisibleFiberDisp(), changeSize, -2);
             break;
 
         case '@':
-            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, -1);
+            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, -2);
             break;
 
         case '3':
             if ( altKeyDown)
-                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 2);
             else
-                setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
+                setFiberDisp(player.allVisibleFiberDisp(), changeSize, 2);
             break;
             
         case '#':
-            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, 1);
+            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, 2);
             break;
             
         case '4':
@@ -924,18 +913,12 @@ void processKey(unsigned char key)
             break;
             
         case '8':
-            if ( altKeyDown )
-                changePointDispWidth(player.allVisibleHandDisp(), DP, -1);
-            else
-                changePointDispSize(player.allVisibleHandDisp(), DP, -1);
-            break;
-
+			changePointDispSize(player.allVisibleHandDisp(), DP, -1, !altKeyDown, !shiftKeyDown);
+			break;
+			
         case '9':
-            if ( altKeyDown )
-                changePointDispWidth(player.allVisibleHandDisp(), DP, 1);
-            else
-                changePointDispSize(player.allVisibleHandDisp(), DP, 1);
-            break;
+			changePointDispSize(player.allVisibleHandDisp(), DP, +1, !altKeyDown, !shiftKeyDown);
+			break;
 
         case '0':
             if ( altKeyDown )

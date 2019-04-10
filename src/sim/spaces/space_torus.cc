@@ -17,17 +17,14 @@ SpaceTorus::SpaceTorus(const SpaceProp* p)
 
 void SpaceTorus::resize(Glossary& opt)
 {
-    real len = 0;
-    opt.set(len, "length");
-    bRadius = len * 0.5;
-
-    if ( opt.set(len, "radius") )     bRadius = len;
-    else if ( opt.set(len, "width") ) bRadius = len * 0.5;
+	real len = 0;
+    if ( opt.set(len, "width") ) bWidth = len * 0.5;
+    opt.set(bRadius, "radius");
 
     if ( bRadius <= 0 )
-        throw InvalidParameter("torus:width must be < radius");
+        throw InvalidParameter("torus:radius must be > 0");
     if ( bWidth <= 0 )
-        throw InvalidParameter("torus:width must be < radius");
+        throw InvalidParameter("torus:width must be > 0");
     if ( bWidth > bRadius )
         throw InvalidParameter("torus:width must be < radius");
     update();

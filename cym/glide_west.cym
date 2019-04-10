@@ -7,7 +7,7 @@ set simul system
     viscosity = 0.01
     time_step = 0.005
     display = {
-        tiled = 1, 1;
+        tile = 1, 1;
         zoom = 0.5;
         style = 2;
         delay = 10;

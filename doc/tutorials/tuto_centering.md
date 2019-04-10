@@ -36,11 +36,14 @@ Start with a fresh empty directory and a new configuration file:
     
     set space cell
     {
-        geometry = sphere 5
+        shape = sphere
     }
     
     new cell
-    
+    {
+        radius = 5
+    }
+
     set fiber microtubule
     {
         rigidity = 20
@@ -232,9 +235,9 @@ Position the centrosome 1 um away from the cell edge to start with, in a cell wi
 Is the pushing mechanism efficient in a larger cell, say with a radius of 15 um? 
 Change cell size by modifying the geometry line:
 
-    set space cell
+    new cell
     {
-        geometry = sphere 15
+        radius = 15
     }
 
 Place the centrosome 1 um away from the cell membrane by modifying the position line:
@@ -250,18 +253,27 @@ What happens? Adjust the total amount of polymer so that all fibers can growth u
 
 Try different shapes, while keeping the size similar:
 
+    set space cell
+    {
+        shape = capsule
+    }
+    new cell
+    {
+        length = 8, 2
+    }
+
+and:
     
     set space cell
     {
-        geometry = capsule 4 1
+        shape = dice
     }
-    
-    
-    set space cell
+    new cell
     {
-        geometry = dice 4 4 1
+        length = 8, 8;
+        radius = 2;
     }
-    
+
 Do you find that centration is different when the cells has 'corners'?
 
 

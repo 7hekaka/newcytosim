@@ -29,23 +29,23 @@ set fiber microtubule
     growing_speed   = 0.18
     growing_force   = 1.7
 
-    display = ( lines=6,2; points=10,0; plus_end=16, 2; )
+    display = ( lines=4,2; points=4,0; plus_end=8, 2; )
 }
 
 set hand regulator
 {
-    binding = 10, 0.01
-    unbinding = 10, inf
+    binding = 10, 0.05
+    unbinding = 0, inf
     activity = regulate
 }
 
-set single complex
+set single protein
 {
     hand = regulator
     diffusion = 1
 }
 
-new 100 complex
+new 100 protein
 
 
 new 0 microtubule
@@ -56,9 +56,14 @@ new 0 microtubule
     plus_end = grow
 }
 
+new event
+{
+	rate = 0.1
+	code = ( new microtubule { position=(rectangle 0 20); length=0.05; direction=X; plus_end=grow; })
+}
+
 run 500000 system
 {
     nb_frames = 10
     solve = 0
-    event = 1, ( new microtubule { position=(rectangle 0 20); length=0.05; orientation=horizontal; plus_end=grow; } )
 }

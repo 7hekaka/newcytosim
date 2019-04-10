@@ -22,7 +22,7 @@ Some commands offer a short syntax:
  `new`          | Create objects of a certain Property
  `run`          | Simulate the system to advance in time
  
-### Additional commands
+### Useful commands
  
  Command        | Description
  ---------------|---------------------------------------------------------
@@ -32,6 +32,7 @@ Some commands offer a short syntax:
  `import`       | Import objects from a trajectory file
  `export`       | Export all simulated objects to a file
  `report`       | generate file or text with formatted information
+ `repeat`       | Execute code a number of times
 
 ### Other commands
  
@@ -39,7 +40,6 @@ Some commands offer a short syntax:
  ---------------|---------------------------------------------------------
  `mark`         | Mark objects
  `cut`          | Cut fibers along a plane
- `repeat`       | Execute code a number of times
  `for`          | Execute code a number of times (disabled)
  `end`          | Terminates simulation
  `call`         | Call a custom function
@@ -55,7 +55,7 @@ Some commands offer a short syntax:
        ...
      }
  
- `CLASS` should be one of the predefined object class [objects](objects).
+ `CLASS` should be one of the predefined object class [objects](objects.md).
 `NAME` is a string you may choose, starting with a letter, followed by alphanumeric characters. The underscore character is also allowed, as in `fiber_3`. The list of parameter depends on the class.
  
 You may use `set` to change values of an existing Property:
@@ -186,8 +186,7 @@ You may use `set` to change values of an existing Property:
 
 
 ---
----
----
+
 
 # `change`
 
@@ -373,10 +372,14 @@ Examples:
      report fiber:length fibers_length.txt
  
  Note that this command is disabled for `play`.
+ 
+# `repeat`
+ 
+ Repeat specified code.
+ 
+     repeat INTEGER { CODE }
 
 
----
----
 ---
 
 # `mark`
@@ -400,12 +403,6 @@ Examples:
 
  NAME can be '*', and the parameter 'position' is optional.
  The syntax is the same as for command `delete`.
- 
-# `repeat`
- 
- Repeat specified code.
- 
-     repeat INTEGER { CODE }
  
 # `for` 
 

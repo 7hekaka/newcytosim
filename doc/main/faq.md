@@ -19,7 +19,7 @@ Yes, Cytosim is an Open Source project [hosted on GitHub](https://github.com/ned
 **Can I install Cytosim on Windows?**
 </summary>
 
-Compiling ‘natively’ on windows would require dealing with ‘/‘ becoming ‘\’ and different end-of-lines, and other annoying issues. You can however run Cytosim on your Windows computer, within [Cygwin](https://cygwin.com) which is a Unix emulator for Windows. We provide [instructions to compile on Cygwin](compile/cygwin.md).
+Compiling "natively" on windows would require dealing with `/` becoming `\` and different end-of-lines, and other annoying issues. You can however run Cytosim on your Windows computer, within [Cygwin](https://cygwin.com) which is a Unix emulator for Windows. We provide [instructions to compile on Cygwin](compile/cygwin.md).
 </details>
 
 <details>
@@ -43,9 +43,9 @@ For example the parameters of `hand` are in file `hand_prop.h`, in which you wil
     /// maximum distance at which the Hand can bind (also known as `binding[1]`)
     real         binding_range;
 
-In this case, it refers to the work of [Leduc et al. PNAS 2004 vol. 101 no. 49 17096-17101](http://www.pnas.org/content/101/49/17096.abstract), in which the molecular binding rate of kinesin was determined to be 4.7 +/- 2.4 /s. Usually, the name of a parameter in the configuration file is also the name of this parameter in the source code, which makes it easy to find the lines where this parameter is used. Try for example to search for 'binding_range' in the source code.
+In this case, it refers to the work of [Leduc et al. PNAS 2004 vol. 101 no. 49 17096-17101](http://www.pnas.org/content/101/49/17096.abstract), in which the molecular binding rate of kinesin was determined to be 4.7 +/- 2.4 /s. Usually, the name of a parameter in the configuration file is also the name of this parameter in the source code, which makes it easy to find the lines where this parameter is used. Try for example to search for `binding_range` in the source code.
 
-Cytosim has [many objects](sim/objects.md), and the documentation is distributed. For each class 'foo.h' there is a parameter file 'foo_prop.h'. All parameters use the same [system of units](sim/units.md).
+Cytosim has [many objects](sim/objects.md), and the documentation is distributed. If a class is called `foo.h`, check for its parameter class that would be called `foo_prop.h`. All parameters use the same [system of units](sim/units.md).
 
 </details>
 
@@ -63,7 +63,7 @@ Please, check the examples in `cym`.
 <summary>
 **My simulations take several hours. Can I monitor the progress of `sim` while it is running?**
 </summary>
-When ’sim’ is running, it continuously writes to ‘messages.cmo’ so you can just open this file to check progression (just read it from the command line, using ‘cat’ or ’tail’)
+When `sim` is running, it continuously writes to `messages.cmo` and you can read this file to check progression (we recommand using the command line, for example with `cat` or `tail`)
 </details>
 
 
@@ -91,7 +91,7 @@ For a spherical object, this is Stokes’ law:
 	drag_coefficient = 6 * PI * viscosity * radius
 
 A similar formula is used for elongated objects (filaments).
-Cytosim allows you to set a different viscosity for the Fiber or the Solid (by default it is using the global viscosity). In this way, you can control where the ‘drag’ of your objects more finely.
+Cytosim allows you to set a different viscosity for the Fiber or the Solid (by default it is using the global viscosity). In this way, you can control where the `drag` of your objects more finely.
 For instance, you can set the viscosity of the Solid higher, and this affects only the drag coefficient of this Solid.
 
 The speed of an object is then proportional to the total force vector acting on it:
@@ -134,7 +134,7 @@ We recommend using [preconfig](https://github.com/nedelec/preconfig) with a temp
 **Can I change parameters throughout the simulation (i.e. lower the motor speed) or add in filaments at specific time points?**
 </summary>
 You can already change most parameters in the config file (see cym/overlap.cym)
-This is a discrete abrupt change. You can add filament with ’new‘ at any time in the same way, between multiple ‘run’. If you want a more continuous change, we may have to implement it, but it is possible.
+This is a discrete abrupt change. You can add filament with `new` at any time in the same way, between multiple `run`. If you want a more continuous change, we may have to implement it, but it is possible.
 
 	set hand kinesin
 	{
@@ -187,7 +187,7 @@ The distance between points is not equal to the segmentation, because there is t
 
 (that is rigidity divided by the power 3 of the distance between points.)
 
-You can easily measure the ‘buckling force’ by putting a filament in a circular space, and varying the segmentation and the rigidity parameters. There is a lot of noise in the system, but after averaging many runs, you should recover Euler’s formula. Hopefully these results should be independent of ’segmentation’.
+You can easily measure the `buckling force` by putting a filament in a circular space, and varying the segmentation and the rigidity parameters. There is a lot of noise in the system, but after averaging many runs, you should recover Euler`s formula. Hopefully these results should be independent of `segmentation`.
 
 For this work, you need to start from `fiber.cym` and vary parameter values using [preconfig](https://github.com/nedelec/preconfig)
 </details>
@@ -199,11 +199,11 @@ For this work, you need to start from `fiber.cym` and vary parameter values usin
 </summary>
 Yes, there are two ways to do this:
 
-1. set ‘max_length’ and then all individual MTs will stop growing when they reach this length.
-2. set ’total_polymer’ and this will limit the sum of all the lengths, but not individual ones.
+1. set `max_length` and then all individual MTs will stop growing when they reach this length.
+2. set `total_polymer` and this will limit the sum of all the lengths, but not individual ones.
 It works by scaling the growth speed by `1 - sum_of_all_MT_length / total_polymer`
 
-These are parameters of ‘Fiber’ and in addition, you should set the catastrophe rate to zero, and have all MTs created in the growing state.
+These are parameters of `Fiber` and in addition, you should set the catastrophe rate to zero, and have all MTs created in the growing state.
 
 With 2 the growth speed will decrease gradually, so that is probably the more realistic way.
 </details>
@@ -213,7 +213,7 @@ With 2 the growth speed will decrease gradually, so that is probably the more re
 <summary>
 **If I have two fiber types (actin, microtubule), is there a way to make hands selective for one or the other fiber?**
 </summary>
-Yes, you can use the parameters ‘binding_key’ for this:
+Yes, you can use the parameters `binding_key` for this:
 
 IN short, set the binding keys of the filaments to be binary exclusive, eg. 1 and 2 
 and then set the binding keys of the hands equal to the fiber to which they may bind.
@@ -228,15 +228,15 @@ There is an example for this: cym/fiber_both.cym
 </summary>
 
 You might want to use the steric interaction to induce bundling, because this can also be configured with an attractive component.
-Check the example ‘cym/steric_bundling.cym’, and check [the documentation](sim/steric.md). 
+Check the example `cym/steric_bundling.cym`, and check [the documentation](sim/steric.md). 
 </details>
 
 
 <details>
 <summary>
-**Can I attach Single whose activity is fixed to each Fiber when it is created to make them immobile?**
+**Is there a way to fix one end of fiber to any given point?**
 </summary>
-Yes, that would work as well. please check how this is done in ‘cym/wash.cym’
+Yes, you can create a `single` at the desired location, and attach them directly where you want on the filaments. With one pivot the fiber can rotate, but using two pivots, you will restrict the rotation of the fiber as well. Please check how this is done in `cym/fiber_anchor.cym`.
 </details>
 
 
@@ -256,7 +256,7 @@ No, but if you know C++, you could code this feature.
 *I noticed there is already code in place to model severing, however, how to include it as an option in the filament properties is not covered in the tutorials.*
 
 The code to sever a filament is included, but at the moment it is only used for the Hand with activity=cut.
-Please, check the example ‘cym/hand_cut.cym’, as it is quite simple:
+Please, check the example `cym/hand_cut.cym`, as it is quite simple:
 
     activity = cut
     cutting_rate = 1         % rate of cutting when bound to a filament
@@ -271,11 +271,21 @@ You would need to dig into the code to use this.
 
 <details>
 <summary>
+**The filaments extend outside the simulation space. What is going on?**
+</summary>
+Cytosim will initially put the filaments at random, such that their middle will be inside the box, but not necessarily the ends. This default behavior can be changed with `placement=all_inside`.
+
+If you must enable confinement, the filaments we be brought inside, but this takes some time steps (with solve=1), depending on the stiffness, viscosity, time_step, etc.
+</details>
+
+
+<details>
+<summary>
 **Can I do a simulation in which filaments spontaneously spawn in time to simulate the addition of microtubules to the system? (it can be after a fixed time or stochastically)**
 </summary>
 Yes, you can do this in three ways:
 
-1. use command 'new' at any time to add objects:
+1. use command `new` at any time to add objects:
 
 		run 1000 system
 		new 1 filament
@@ -289,7 +299,7 @@ Yes, you can do this in three ways:
 		}
 
 
-2. use the event parameter of ‘run’ to create objects:
+2. use the event parameter of `run` to create objects:
 
 		run 100000 system
 		{
@@ -313,7 +323,7 @@ Yes, you can do this in three ways:
 		}
 
 Method (1) is not stochastic, but you can chose the time and number of fibers.
-Method (2) is stochastic, and you only provide a 'rate' (here it is equal to 2).
+Method (2) is stochastic, and you only provide a `rate` (here it is equal to 2).
 With (3) the new fiber is created at the position of the Nucleator.
 </details>
 
@@ -331,13 +341,22 @@ There are a few possible ways to approach the problem, depending on how the posi
 
 - as a single continuous scalar: “the abscissa”
 - as a single discrete integer: the index of the tubulin monomer.
-- as multiple discrete integers, for example recording the two ‘heads’ of a motor.
+- as multiple discrete integers, for example recording the two `heads` of a motor.
 
 Cytosim has classes that use A or B, but not C.
 Once you have decided what is the best way to go, all the events (stop, diffuse, unbind, etc) can be treated using stochastic methods, following standard practice (eg. Gillespie or just tossing random numbers).
 </details>
 
 ### Single / Couple #################################
+
+<details>
+<summary>
+**Can I attach Single whose activity is fixed to each Fiber when it is created to make them immobile?**
+</summary>
+Yes, and that is the recommended method. please check how this is done in `cym/fiber_anchor.cym`.
+You can adjust the stiffness to tune the effect.
+</details>
+
 
 <details>
 <summary>
@@ -393,7 +412,7 @@ You could use however B=M entities, where B is a binder, which bind but is not m
 **Can I simulate a microtubule on a motor surface that consists of two parts with different properties, e.g. maximal velocities, and maybe even different motor properties?**
 </summary>
 The easiest is to define two type of motors, and to put them at different places.
-There is an example ‘glide_stripe.cym’ showing you how to place Single into simple regions.
+There is an example `glide_stripe.cym` showing you how to place Single into simple regions.
 </details>
 
 
@@ -412,7 +431,7 @@ Yes, you can easily setup a gradient in the command used to place the motors use
 
 <details>
 <summary>
-**Is it possible to fix a 'couple' to the position where it is at first time?**
+**Is it possible to fix a `couple` to the position where it is at first time?**
 </summary>
 No, you cannot fix a Couple at a given position.
 You can set the diffusion constant to zero, and it will not move, but only until it binds to a filament. As long as it is bound, it will move with the filament.
@@ -490,7 +509,7 @@ However, cytosim could be modified to change this. One can also print the drag c
 <summary>
 **Is it possible to restart the simulation from the same configuration at which it stopped?**
 </summary>
-Yes, you will need to extract the frame you want to restart from, with the program ‘frametool’, which you first need to compile, in cytosim source directory:
+Yes, you will need to extract the frame you want to restart from, with the program `frametool`, which you first need to compile, in cytosim source directory:
 
 	make frametool
 
@@ -498,10 +517,10 @@ then navigate to the old run dir, and run:
 	
 	frametool objects.cmo 30 > objects.cmi
 
-in this example, we extracted frame #30 (index start at 0), to create the file ‘objects.cmi’. Run ‘frametool objects.cmo` to know how many frames are in the file.
+in this example, we extracted frame #30 (index start at 0), to create the file `objects.cmi`. Run `frametool objects.cmo` to know how many frames are in the file.
 
-2. Use a fresh directory, copy ‘objects.cmi’ and ‘config.cym’ from the old simulation.
-Edit ‘config.cym’ and add the ‘import’ command to read the frame.
+2. Use a fresh directory, copy `objects.cmi` and `config.cym` from the old simulation.
+Edit `config.cym` and add the `import` command to read the frame.
 	
 	set …
 	
@@ -512,11 +531,11 @@ Edit ‘config.cym’ and add the ‘import’ command to read the frame.
 	    nb_frames = 100
 	}
 
-the ‘import’ command replaces all the objects of the simulation, without affecting their properties. You should remove all the ’new’ since the ‘import’ will erase all objects anyhow. Any ’new’ after ‘import’ will add objects to the imported state.
+the `import` command replaces all the objects of the simulation, without affecting their properties. You should remove all the `new` since the `import` will erase all objects anyhow. Any `new` after `import` will add objects to the imported state.
  
-It is important to do this in a fresh directory, as ’sim’ will create a new ‘object.cmo’ file, erasing the old one.
+It is important to do this in a fresh directory, as `sim` will create a new `object.cmo` file, erasing the old one.
 
-You can later merge two object files later if you want to display them continuously in play. Make sure you copy all the files before you start experimenting, but normally this works with the standard unix ‘cat’.
+You can later merge two object files later if you want to display them continuously in play. Make sure you copy all the files before you start experimenting, but normally this works with the standard unix `cat`.
 </details>
 
 
@@ -610,12 +629,12 @@ Alternatively, you could also scale the movie size with the cell size.
 <summary>
 **Is there a way to customize the colors, size of filaments, etc?**
 </summary>
-You can use a ’setup’ file you want to change some parameters of the display.
+You can use a `setup` file you want to change some parameters of the display.
 
 To create this file, follow these steps:
 1. Adjust the parameters to what you like in `play`. 
-2. Press ‘R’ to output the parameters values on the terminal
-3. Copy-paste to a new file that you call ’style.cyp’
+2. Press `R` to output the parameters values on the terminal
+3. Copy-paste to a new file that you call `style.cyp`
 
 You can then start play with this file, and you should recover the display the way it was:
 
@@ -680,7 +699,7 @@ This gives the exact location of the filaments in the model, but these points ca
 
 	report fiber:speckle
 
-Gives points that are distributed randomly over the filaments, but which are fixed relative to the 'lattice' and stable over time. If the filament lengthen, you will get more 'speckles' but the existing one will not move or disapear. Speckles disappear when the fiber is shortening. So the speckles indicate the movement of the filaments.
+Gives points that are distributed randomly over the filaments, but which are fixed relative to the `lattice` and stable over time. If the filament lengthen, you will get more `speckles` but the existing one will not move or disapear. Speckles disappear when the fiber is shortening. So the speckles indicate the movement of the filaments.
 
 </details>
 
@@ -697,7 +716,7 @@ The position and length are given in micro-metres.
 <summary>
 **How can I extract the position of both hands in a couple?**
 </summary>
-You can get the position of the attachment point on the fibers for all ‘bridging’ couple like this:
+You can get the position of the attachment point on the fibers for all `bridging` couple like this:
 
 	bin/report couple:link
 
@@ -762,12 +781,12 @@ This will store the coordinates at this particular time of the simulation, into 
 <summary>
 **Can I use either Python or MATLAB to read the coordinate of all the system components?**
 </summary>
-We recommend using ‘report’ to make easy-to-parse files. For example, to get the coordinates of fibers:
+We recommend using `report` to make easy-to-parse files. For example, to get the coordinates of fibers:
 
 	bin/report fiber:point > fiber.txt
 
-There are plenty of output modules, and please check ’simul_report.cc’ to see what is there.
-However, if you want to get the whole thing, you can also generate ‘objects.cmo’ in text mode:
+There are plenty of output modules, and please check `simul_report.cc` to see what is there.
+However, if you want to get the whole thing, you can also generate `objects.cmo` in text mode:
 	
 	run 10000 system
 	{
@@ -819,8 +838,8 @@ And the output trajectory `objects.cmo` will contain everything in text-mode:
 <summary>
 **How can I export the XY positions of the data, e.g. the strain force?**
 </summary>
-There is an ‘export’ function, and even an accessory program to export things.
-For example, I get the force of every motor in the simulation from ‘report single:force’, like this:
+There is an `export` function, and even an accessory program to export things.
+For example, I get the force of every motor in the simulation from `report single:force`, like this:
 
 	% frame   49
 	% start   50
@@ -845,8 +864,8 @@ For example, I get the force of every motor in the simulation from ‘report sin
 	0       290 1  -3.03989 -0.432839  -1.79529 0.0626133
 	% end
 
-You can get the position of the microtubules with ‘report fiber:position’
-There are many other outputs possible, listed in the file ’simul_report.cc'.
+You can get the position of the microtubules with `report fiber:position`
+There are many other outputs possible, listed in the file `simul_report.cc`.
 </details>
 
 
@@ -860,7 +879,7 @@ There are many other outputs possible, listed in the file ’simul_report.cc'.
 </summary>
 You cannot select 2D versus 3D from the config file.
 To run a simulation in 3D, you need to edit the file `dim.h` and recompile Cytosim.
-You can call the 3D executable 'sim3' and then you run this one to get a 3D simulation.
+You can call the 3D executable `sim3` and then you run this one to get a 3D simulation.
 </details>
 
 
@@ -876,11 +895,11 @@ You can find a precompiled BLAS/LAPACK distributions for Linux. Ask you system a
 <summary>
 **Is there any way to improve calculation speed?**
 </summary>
-To speed up the calculation, you should compile with the ‘fast’ option, and turn off assertions.
+To speed up the calculation, you should compile with the `fast` option, and turn off assertions.
 
-You can select the ‘fast’ option by editing the file ‘makefile.inc’. That is a variable in the beggining that you need to set to ‘F’.
+You can select the `fast` option by editing the file `makefile.inc`. That is a variable in the beggining that you need to set to `F`.
 
-You can turn off assertion by editing the file ‘assert.h’. The keyword NDEBUG needs to be defined.
+You can turn off assertion by editing the file `assert.h`. The keyword NDEBUG needs to be defined.
 </details>
 
 
@@ -979,7 +998,7 @@ To call the function in Fiber::step() and it will break if the angle is sharp, y
 <summary>
 **Can I make fibers severed when they are locally stretched with the tensile stress above a critical one?**
 </summary>
-There is not equivalent function for the ’severKinks()’ above, but that is feasible, using 
+There is not equivalent function for the `severKinks()` above, but that is feasible, using 
 
 	real RigidFiber::tension(unsigned p) const 
 
@@ -993,7 +1012,7 @@ You could make this code dependent on a parameter, and link the value of the par
 </summary>
 <p>
 Currently, you cannot have some objects immobile and other not.
-There is a parameter ‘solve’ in ‘run simul’. If you set it to zero, objects are immobile but this applies to all objects.
+There is a parameter `solve` in `run simul`. If you set it to zero, objects are immobile but this applies to all objects.
 
 It should however be possible to modify cytosim to do have some object mobile while others are not.
 There is a function that calculates the speed, as a function of the force:
@@ -1019,7 +1038,7 @@ Hence, if you want the Fibers to be immobile, you must do this in the RigidFiber
 <summary>
 **I want to make some fiber class fixed in space while others can move in space normally.**
 </summary>
-At the moment, ’solve=0’ applies to all mecable and simply turns all the mechanics off.
+At the moment, `solve=0` applies to all mecable and simply turns all the mechanics off.
 
 It is possible however to do what you describe, by modifying the code to do two things:
 
@@ -1039,7 +1058,7 @@ You can add a boolean parameter “mobile" into these classes, and test for it w
 **Is it possible to change functional form of bending stiffness/axial stiffness for a fiber?**
 </summary>
 
-The Rigidity term is calculated in class ‘RigidFiber’:
+The Rigidity term is calculated in class `RigidFiber`:
 
 	void RigidFiber::addRigidity(const real* X, real* Y) const
 
@@ -1052,9 +1071,9 @@ This correspond to standard elasticity, everywhere the same in the filament.
 
 You can already define different classes of filaments with different rigidity.
 You could make the rigidity dependent on some thing else, with a rigidity defined for each filament at each time point.
-You would just need to plug in the value instead of ‘rfRigidity’.
+You would just need to plug in the value instead of `rfRigidity`.
 
-That’s crazy but for fun you could do this:
+That`s crazy but for fun you could do this:
 
 	#include "object_set.h"
 	#include "simul.h"
@@ -1078,7 +1097,7 @@ That’s crazy but for fun you could do this:
 	    }
 	}
 
-The axial stiffness is ‘infinite’ in cytosim, and that kind of built-in. It would be much more work to change.
+The axial stiffness is `infinite` in cytosim, and that kind of built-in. It would be much more work to change.
 </details>
 
 
@@ -1093,8 +1112,8 @@ It depends on your levelin programming, but you could start for example by
 
 To do this, I recommend printing the .h and .cc files on paper (yes, paper), and to read the code from top to bottom, in a quiet time and away from your computer. This will allow you to examine the structure of the code in detail. 
 
-To understand how cytosim *really* works, please check ’src/sim/meca1d.h’.
-This is a 1D bare-bone solver, which is equivalent to what is done in Meca, but much simpler than the 2D and 3D version ’src/sim/simul_solve.cc’.
+To understand how cytosim *really* works, please check `src/sim/meca1d.h`.
+This is a 1D bare-bone solver, which is equivalent to what is done in Meca, but much simpler than the 2D and 3D version `src/sim/simul_solve.cc`.
 </details>
 
 <details>
@@ -1122,13 +1141,13 @@ Tu pourra alors obtenir la force sur le lien qui retient le `core`:
 <summary>
 **I have a daughter filament branching off a mother filament (by a nucleator) and the mother filament gets depolymerized, how can I make sure the daughter filament is then also destroyed?**
 </summary>
-I guess you are using a Couple with an ‘activator’ and a ’nucleator’.
-You want the nucleator to kill its Filament, if the ‘activator’ detaches.
-If ‘nucleator:addictive=1’, the filament catastrophes if the ’nucleator’ detaches.
+I guess you are using a Couple with an `activator` and a `nucleator`.
+You want the nucleator to kill its Filament, if the `activator` detaches.
+If `nucleator:addictive=1`, the filament catastrophes if the `nucleator` detaches.
 
-Your condition is different, but if the mother filament vanished, then the ‘activator’ detaches, and this is easy to detect. If the ‘activator’ is attached, the function ’stepLoaded()’ of ‘nucleator’ will be called, whereas if the ‘activator’ is detached, ’nucleator:stepUnloaded()’ will be called. 
+Your condition is different, but if the mother filament vanished, then the `activator` detaches, and this is easy to detect. If the `activator` is attached, the function `stepLoaded()` of `nucleator` will be called, whereas if the `activator` is detached, `nucleator:stepUnloaded()` will be called. 
 
-Hence two lines of code in ’Nucleator::stepUnloaded()’ should do the job:
+Hence two lines of code in `Nucleator::stepUnloaded()` should do the job:
 
 	void Nucleator::stepUnloaded()
 	{
@@ -1142,8 +1161,8 @@ Hence two lines of code in ’Nucleator::stepUnloaded()’ should do the job:
 	…
 	}
 
-If you make the parameter ‘addictive’ an integer so it can take multiple values.
-In file ’nucleator_prop.h’:
+If you make the parameter `addictive` an integer so it can take multiple values.
+In file `nucleator_prop.h`:
 
     int          addictive;
 

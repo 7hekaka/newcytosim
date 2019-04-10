@@ -30,7 +30,7 @@ set fiber microtubule
 new 10 microtubule
 {
     length = 7
-    orientation = parallel X
+    orientation = align X
 }
 
 run 100 system

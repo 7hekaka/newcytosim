@@ -12,7 +12,7 @@
  project() will always project on the curvy surface of the cylinder.
 
  Parameters:
-     - length = half-length of the cylinder along X
+     - length = total extent of the cylinder in X
      - radius = radius of the cylinder
      .
 

@@ -1,121 +1,160 @@
 # Cytosim's objects
 
-[doxyfile](doxygen/md_doc_code_objects.html)
+For up-to-date reference, check the [code documentation](doxygen/md_doc_code_objects.html).
 
-# Simul
+# Simul & Immobile objects 
 
- The command `set simul` will define the global parameters.
- There can only be one `simul` object, and it is automatically created,
- so you do not need to call 'new simul'.
+- `simul`: unique master class with [global parameters](doxygen/group___simul_par.html)
+- `space`: a volume element used to confined objects in space
+- `field`: a scalar value as a function of position
+- `event`: a code executed at stochastic times
+ 
+[simul class reference](doxygen/class_simul.html)
 
- [Simul Parameters](../doxy/group___fiber_par.html)
- 
-# Surfaces & Volumes 
- 
- These objects are immobile:
-
-   Class       | Parameters       | Property     | Options 
- --------------|------------------|--------------|-----------------
- Space         | @ref SpacePar    | SpaceProp    | @ref SpaceGroup
- Field         | @ref FieldPar    | FieldProp    | @ref FieldSet::newObjects
- Event         | @ref EventPar    | EventProp    | (unfinished)
- 
- 
 # Mecables
- 
-  `Mecables` can move or deform. There are 4 basic classes:
 
-   Class       | Parameters       | Property     | Options     
- --------------|------------------|--------------|---------------------------
- Fiber         | @ref FiberPar    | FiberProp    | @ref FiberGroup
- Bead          | @ref SolidPar    | SolidProp    | @ref BeadSet::newObjects
- Solid         | @ref SolidPar    | SolidProp    | @ref SolidSet::newObjects
- Sphere        | @ref SpherePar   | SphereProp   | @ref SphereSet::newObjects
+ Cytosim uses vertices (points) to describe objects.
+ `Mecables` are objects made of multiple points that can move or deform:
+
+The `mecables` are created directly:
+
+- `fiber`: a linear object with points, with [multiple classes](doxygen/group___fiber_group.html)
+- `solid`: a set of points that move and rotate but conserves its shape
+- `bead`: a single point (center) with a radius
+- `sphere`: a center with mobile points on the surface
+ 
+[class reference](doxygen/class_mecable.html)
 
 # Fibers
- @ref FiberGroup
 
-  `activity`   | Class               | Parameters                | Property        
- --------------|---------------------|---------------------------|----------------------
- `none`        | Fiber               | @ref FiberPar             | FiberProp
- `grow`        | GrowingFiber        | @ref GrowingFiberPar      | GrowingFiberProp
- `dynamic`     | DynamicFiber        | @ref DynamicFiberPar      | DynamicFiberProp
- `classic`     | ClassicFiber        | @ref ClassicFiberPar      | ClassicFiberProp
- `treadmill`   | TreadmillingFiber   | @ref TreadmillingFiberPar | TreadmillingFiberProp
- `tubule`      | Tubule (deprecated) | @ref TubulePar            | TubuleProp
+The `fiber` can grow and shrink according to different models,
+specified by specifying an `activity`:
+
+- `none`: constant length (default)
+- `grow`: can grow from both ends
+- `dynamic`: follow a stochastic dynamic instability model with multiple states
+- `classic`: follows the two-state T. Hill model of dynamic instability
+- `treadmill`: grow at the plus end, shrink at the minus end
+- `tubule`: outdated class
  
+[class reference](doxygen/class_fiber.html) —
+[group reference](doxygen/group___fiber_group.html)
+
+Example:
+
+	set fiber microtubule
+	{
+		rigidity = 20
+		activity = grow
+		growing_speed = 1.0
+	} 
+
 # Hands
  
- A `Hand` is an object that can bind to fiber, but it can only be used
- as a subpart of `Single` or `Couple`.
-
- @ref HandGroup
+ A `hand` represents the capacity to bind to a single fiber.
+ It can only be used as a subpart of `single` (one hand) or `couple` (two hands).
  
-  `activity`   | Class         | Parameters         | Property    
- --------------|---------------|--------------------|---------------
- `bind`        | Hand          | @ref HandPar       | HandProp
- `move`        | Motor         | @ref MotorPar      | MotorProp
- `nucleate`    | Nucleator     | @ref NucleatorPar  | NucleatorProp
- `slide`       | Slider        | @ref SliderPar     | SliderProp
- `track`       | Tracker       | @ref TrackerPar    | TrackerProp
- `rescue`      | Rescuer       | @ref RescuerPar    | RescuerProp
- `regulate`*   | Regulator     | @ref RegulatorPar  | RegulatorProp
- `cut`         | Cutter        | @ref CutterPar     | CutterProp
- `chew`        | Chewer        | @ref ChewerPar     | ChewerProp
- `mighty`      | Mighty        | @ref MightyPar     | MightyProp
- `act`         | Actor         | @ref ActorPar      | ActorProp
+The type of `hand` is selected by specifying an `activity`:
 
-# Digital Hands:
+- `bind`: only bind and unbinds from fibers
+- `move`: moves along fibers in a continuous manner
+- `nucleate`: can create a new fiber
+- `slide`: passively moves along fiber
+- `track`: stays associated with the end of fiber
+- `rescue`: induce rescue in a dynamic fiber
+- `regulate`: freeze the growth of a fiber (unfinished)
+- `cut`: sever fiber at the position of attachment
+- `chew`: induce dissassembly of fiber end when reached
+- `mighty`: do multiple things to fiber (unfinished)
+- `act`: do nothing to fiber (unfinished)
 
-  `activity`   | Class         | Parameters         | Property   
- --------------|---------------|--------------------|---------------
- `digit`       | Digit         | @ref DigitPar      | DigitProp
- `walk`        | Walker        | @ref WalkerPar     | WalkerProp
- `kinesin`*    | Kinesin       | @ref KinesinPar    | KinesinProp
- `dynein`*     | Dynein        | @ref DyneinPar     | DyneinProp
- `myosin`*     | Myosin        | @ref MyosinPar     | MyosinProp
+Example:
+
+	set hand kinesin
+	{
+		binding = 10, 2
+		unbinding = 1, inf
+		activity = move
+		unloaded_speed = 1.0
+		stall_force = 6.0
+	} 
+
+[class reference](doxygen/class_hand.html) —
+[group reference](doxygen/group___hand_group.html)
+
+
+### Digital Hands
+
+Some hand type can only bind at discrete positions along a Fiber, corresponding to the Lattice associated with a fiber.
+
+ Digital hand `activity`:
  
- `*` Unfinished classes.
+- `digit`: bind and unbind at discrete sites
+- `walk`: moves along fiber following discrete steps
+- `kinesin`: unfinished
+- `dynein`: unfinished
+- `myosin`: unfinished
 
 
 # Singles
  
- A `Single` contains one `Hand`, and can have different `activity`:
+ A `single` contains one `hand`, for example:
+ 
+	set single grafted
+	{
+		hand = kinesin
+		stiffness = 100
+		activity = fixed
+	} 
+ 
+The type of `single` is selected by specifying an `activity`:
+ 
+- `diffuse`: diffuse in space
+- `fixed`: remains attached to a fixed position in space
+- `wrist`: remains anchored to a `mecable`
+ 
+[class reference](doxygen/class_single.html) —
+[group reference](doxygen/group___single_group.html)
 
- @ref SingleGroup
- 
- `activity`     | Classes           | Parameters      | Property 
- ---------------|-------------------|-----------------|-------------
- `diffuse`      | Single            | @ref SinglePar  | SingleProp
- `fixed`        | Picket PicketLong | @ref SinglePar  | SingleProp
- not applicable | Wrist  WristLong  | @ref SinglePar  | SingleProp
- 
 # Couples
  
- A `Couple` contains two `Hand`, and can have different `activity`:
+ A `couple` contains two `hand`, for example:
+  
+	set couple complex
+	{
+		hand1 = kinesin
+		hand2 = kinesin
+		stiffness = 100
+		diffusion = 10
+	} 
 
- @ref CoupleGroup
+The type of `couple` is selected by specifying an `activity`:
+
+- `diffuse`: moves in space following diffusion and crosslink fibers
+- `crosslink`: uses a 'longlink'
+- `bridge`:
+- `duo`:
+- `slide`:
+- `fork`: connect two fibers with a angular stiffness
  
- `activity`    | Classes                 | Parameters           | Property  
- --------------|-------------------------|----------------------|---------------
- `diffuse`     | Couple CoupleLong       | @ref CouplePar       | CoupleProp
- `crosslink`   | Crosslink CrosslinkLong | @ref CrosslinkPar    | CrosslinkProp
- `bridge`      | Bridge                  | @ref BridgePar       | BridgeProp
- `duo`         | Duo  DuoLong            | @ref DuoPar          | DuoProp
- `slide`       | Shackle ShackleLong     | @ref ShacklePar      | ShackleProp
- `fork`        | Fork                    | @ref ForkPar         | ForkProp
-
+[class reference](doxygen/class_couple.html) —
+[group reference](doxygen/group___couple_group.html)
  
 # Organizers
  
- The `Organizers` describe composite objects build from multiple Mecables:
+An `organizer` is a composite object build from multiple `mecable`
 
- Class         | Parameters       | Property  
- --------------|------------------|---------------
- Aster         | @ref AsterPar    | AsterProp
- Fake          | @ref FakePar     | FakeProp
- Bundle        | @ref BundlePar   | BundleProp
- Nucleus       | @ref NucleusPar  | NucleusProp
+The type of `organizer ` is selected directly:
+
+- `aster`: a radial array of fiber
+- `fake`: two connected asters
+- `bundle`: a linear bundle of parallel/antiparallel fibers
+- `nucleus`: a sphere with bundles attached to its surface
+
+[class reference](doxygen/class_organizer.html) —
+[group reference](doxygen/group___organizer_group.html)
+
+
  
 
 

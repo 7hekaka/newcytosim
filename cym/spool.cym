@@ -61,10 +61,8 @@ new 1 dna
     plus_end = grow
 }
 
-
-run system
+run 100000 system
 {
-    nb_steps = 100000
-    nb_frames = 50
+    nb_frames = 500
 }
 

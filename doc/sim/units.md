@@ -17,10 +17,10 @@
 
  Quantity    | Unit        | Symbol | Value                           |
  ------------|-------------|--------|----------------------------------
- Distance    | micro-meter | um     | 10^(-6) = 0.000001 meter
- Force       | pico-Newton | pN     | 10^(-12) = 0.000000000001 Newton
+ Distance    | micrometer  | um     | 10^(-6) = 0.000001 meter
+ Force       | picoNewton  | pN     | 10^(-12) = 0.000000000001 Newton
  Time        | second      | s      | 1/60 minute
- Angle       | Radian      | rad    | PI radian = 180 degrees
+ Angle       | radian      | rad    | PI radian = 180 degrees
 
 
  The most common physical quantities have these units:
@@ -38,7 +38,8 @@
  angular stiffness  |  pN.um/rad
  energy             |  pN.um
  bending elasticity |  pN.um^2
-
+ viscosity          |  pN.s/um^2
+ 
 The number of objects are usually specified directly. Thus if you know a concentration,
 you simply need to multiply by the volume of the cell. The binding and unbinding rates are
 specified as molecular rate (1/s) and knowing the equilibrium constant of the reaction is

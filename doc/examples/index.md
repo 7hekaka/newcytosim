@@ -1,5 +1,6 @@
 # Examples of work that used Cytosim
 
+[Additional references here](biblio.md)
 
 [Microtubule organization by mitotic motors](https://doi.org/10.1016/j.cell.2018.09.029)  
 <img src="data/nematics.png" alt="image" style="width:512px;"/>
@@ -34,7 +35,7 @@
 
 
 [Nuclear movements in multinucleated fungi](http://www.molbiolcell.org/content/28/5/645.abstract)  
-<img src="data/ashbya.png" alt="image" style="width:1024px;"/>
+<img src="data/ashbya.png" alt="image" style="width:512px;"/>
 
 
 [Nuclear movements during development in C.elegans](http://www.cell.com/cell-reports/abstract/S2211-1247(16)30093-6)  

@@ -11,7 +11,7 @@
  The volume has no edge and wraps on itself.
 
  Parameters:
-     - length = along X, Y and Z
+     - length = total extent in X, Y and Z
      .
  
  To display a periodic Space, use simul:display parameter 'tile'.

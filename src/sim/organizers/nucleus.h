@@ -16,6 +16,8 @@ A Nucleus attaches Fibers to a Sphere:\n
  - organized(n) for n>0 is a Fiber attached to the sphere
  - prop->stiffness is the stiffness of the link.
  .
+
+ @ingroup OrganizerGroup
  */
 class Nucleus : public Organizer
 {

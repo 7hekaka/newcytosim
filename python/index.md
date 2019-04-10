@@ -39,7 +39,7 @@ More scripts located in [`python/run`](run)
 
 More scripts located in [`python/look `](look)
 
-# Export to `blender` for advanced graphical rendering
+# Cytosim to `blender`
 
 Scripts located in [`python/blender`](blender)
 

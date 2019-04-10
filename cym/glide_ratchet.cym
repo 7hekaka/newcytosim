@@ -7,7 +7,7 @@ set simul system
     viscosity = 0.001
     time_step = 0.005
     precondition = 0
-    display = ( tiled=2, 1 )
+    display = ( tile=2, 1 )
 }
 
 set space cell

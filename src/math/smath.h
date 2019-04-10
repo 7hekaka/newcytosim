@@ -137,14 +137,15 @@ namespace sMath
      Building an Orthonormal Basis, Revisited
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
      */
-    inline void orthonormal(const float z[3], float x[3], float y[3])
+	template < typename FLOAT >
+    inline void orthonormal(const FLOAT z[3], FLOAT x[3], FLOAT y[3])
     {
-        const float s = std::copysign(1.0f, z[2]);
+        const FLOAT s = std::copysign((FLOAT)1.0, z[2]);
 #if ( 1 )
         /// optimized version by Marc B. Reynolds
-        const float a = z[1] / ( z[2] + s );
-        const float b = z[1] * a;
-        const float c = z[0] * a;
+        const FLOAT a = z[1] / ( z[2] + s );
+        const FLOAT b = z[1] * a;
+        const FLOAT c = z[0] * a;
         x[0] = -z[2] - b;
         x[1] = c;
         x[2] = z[0];
@@ -152,8 +153,8 @@ namespace sMath
         y[1] = s * b - 1.0f;
         y[2] = s * z[1];
 #else
-        const float a = -1.0f / ( a[2] + s );
-        const float b = a[0] * a[1] * a;
+        const FLOAT a = -1.0f / ( a[2] + s );
+        const FLOAT b = a[0] * a[1] * a;
         x[0] = 1.0 + s * z[0] * z[0] * a;
         x[1] = s * b;
         x[2] = -s * z[0];
@@ -163,13 +164,14 @@ namespace sMath
 #endif
     }
     
-    inline void orthonormal(const float z[3], float x[3], float y[3], float scale)
+	template < typename FLOAT >
+    inline void orthonormal(const FLOAT z[3], FLOAT x[3], FLOAT y[3], FLOAT scale)
     {
-        const float s = std::copysign(1.0f, z[2]);
+        const FLOAT s = std::copysign((FLOAT)1.0, z[2]);
         /// optimized version by Marc B. Reynolds
-        const float a = z[1] / ( z[2] + s );
-        const float b = z[1] * a;
-        const float c = z[0] * a;
+        const FLOAT a = z[1] / ( z[2] + s );
+        const FLOAT b = z[1] * a;
+        const FLOAT c = z[0] * a;
         float ss = s * scale;
         x[0] = scale * ( -z[2] - b );
         x[1] = scale * c;
@@ -178,39 +180,7 @@ namespace sMath
         y[1] = ss * b - scale;
         y[2] = ss * z[1];
     }
-
-    /**
-     Set vectors 'x' and 'y' to make an orthonormal basis (x, y, z)
-     
-     Building an Orthonormal Basis, Revisited
-     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
-     */
-    inline void orthonormal(const double z[3], double x[3], double y[3])
-    {
-        const double s = std::copysign(1.0, z[2]);
-#if ( 1 )
-        /// optimized version by Marc B. Reynolds
-        const double a = z[1] / ( z[2] + s );
-        const double b = z[1] * a;
-        const double c = z[0] * a;
-        x[0] = -z[2] - b;
-        x[1] = c;
-        x[2] = z[0];
-        y[0] = s * c;
-        y[1] = s * b - 1.0;
-        y[2] = s * z[1];
-#else
-        const double a = -1.0 / ( a[2] + s );
-        const double b = a[0] * a[1] * a;
-        x[0] = 1.0 + s * z[0] * z[0] * a;
-        x[1] = s * b;
-        x[2] = -s * z[0];
-        y[0] = b;
-        y[1] = s + z[1] * z[1] * a;
-        y[2] = -z[1];
-#endif
-    }
-    
+	
 #if ( 0 )
     /// bit-hack absolute value
     inline float absf(float a)

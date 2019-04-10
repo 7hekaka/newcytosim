@@ -42,10 +42,13 @@ It defines a circular cell of radius 10 um:
 
 	set space cell
 	{
-	    geometry = ( circle 10 )
+	    shape = circle
 	}
-	
+
 	new cell
+	{
+	    radius = 10
+	}
 
 # Step 2: Microtubules
 
@@ -148,13 +151,13 @@ The last parameters define the behavior of the motor with respect to the end of 
 
 To check that the motors are behaving as expected, we will first create a motile particle that contains one motor. This is done with the class `single`:
 
-    set single particle
-    {
-        hand = kinesin
-        diffusion = 1
-    }
-    
-    new 1000 particle
+	set single particle
+	{
+	    hand = kinesin
+	    diffusion = 1
+	}
+	
+	new 1000 particle
 
 Here the diffusion constant is `1 um^2/s`. This is in the lower range of the physiological values, but it makes things easier to see.
 
@@ -166,11 +169,11 @@ Change `unloaded_speed` to a lower value, and to a negative value to define a mi
 
 Reduce the diffusion constant of the particles:
 
-    set single particle
-    {
-        hand = kinesin
-        diffusion = 0.1
-    }
+	set single particle
+	{
+	    hand = kinesin
+	    diffusion = 0.1
+	}
 
 With this lower value, the complexes diffuse now very slowly. There is no interaction between them, but they bounce off the walls of the box.
 
@@ -178,10 +181,10 @@ With this lower value, the complexes diffuse now very slowly. There is no intera
 
 To start the simulation with all the particles in the center, use this:
 
-    new 100 particle
-    {
-        position = 0 0 0
-    }
+	new 100 particle
+	{
+	    position = 0 0 0
+	}
 
 This will not affect the system much, provided the diffusion constant is high enough.
 
@@ -265,10 +268,10 @@ See if you can reproduce the results observed in vesicles of different sizes:
 
 Can you reproduce these results by changing the radius of the box?
 
-    set space cell 
-    {
-        geometry = ( circle 8 )
-    }
+	new cell
+	{
+	    radius = 8
+	}
 
 What determines the transitions between the different type of organizations?
 
@@ -276,20 +279,31 @@ What determines the transitions between the different type of organizations?
 ## Influence of cell geometry
 
 Change the `geometry` parameter to increase the box size to 60 x 60 micro-meters. The points seems to move even  slower on the animation, but this is an impression that is due to the larger field of view of the simulation. The coefficient of diffusion has not changed.
-    
+	
 Cytosim has a set of simple geometries associated with the `space` class. You can try: 
 
-    set space cell 
-    {
-        geometry = ( circle 10 )
-    }
+	set space cell
+	{
+	    shape = circle
+	}
+
+	new cell
+	{
+	    radius = 10
+	}
 
 or
 
-    set space cell 
-    {
-        geometry = ( capsule 8 2 )
-    }
+	set space cell
+	{
+	    shape = capsule
+	}
+
+	new cell
+	{
+	    length = 20
+	    radius = 2
+	}
 
 ## The behavior of the motors at the end of microtubules
 
@@ -319,27 +333,27 @@ It is easy to define a *binder* that does not move. No `activity` should be spec
 
 You can define a slow motor as follows:
 
-    set hand slow_kinesin
-    {
-        ...
-        activity = move
-        unloaded_speed = 0.1
-        stall_force = 5
-        
-        display = ( color=red; size=7; width=7; )
-    }
+	set hand slow_kinesin
+	{
+	    ...
+	    activity = move
+	    unloaded_speed = 0.1
+	    stall_force = 5
+	    
+	    display = ( color=red; size=7; width=7; )
+	}
 
 If `unloaded_speed` is set positive, the motor walks towards the plus-end of the microtubules. If `unloaded_speed` is set negative, the motor walks towards the minus-end of the microtubule. 
 
-    set hand dynein
-    {
-        ...
-        activity = move
-        unloaded_speed = -1
-        stall_force = 5
-        
-        display = ( color=green; size=7; width=7; )
-    }
+	set hand dynein
+	{
+	    ...
+	    activity = move
+	    unloaded_speed = -1
+	    stall_force = 5
+	    
+	    display = ( color=green; size=7; width=7; )
+	}
 
 In Cytosim, motors moving in opposite directly never collide, and instead pass through each other like fantoms. Can you check this by defining two class of motors?
 
@@ -347,28 +361,28 @@ In Cytosim, motors moving in opposite directly never collide, and instead pass t
 
 Create different type of `couple` with these hands and check what they do: 
 
-    set couple dynein_complex
-    {
-        hand1 = dynein
-        hand2 = dynein
-        diffusion = 10
-        stiffness = 100
-    }
-    
-    new 1000 dynein_complex
+	set couple dynein_complex
+	{
+	    hand1 = dynein
+	    hand2 = dynein
+	    diffusion = 10
+	    stiffness = 100
+	}
+	
+	new 1000 dynein_complex
 
 Can you imagine what a complex with both plus- and minus-end directed motor will do?
 
-    set couple binder_kinesin
-    {
-        hand1 = binder
-        hand2 = kinesin
-        diffusion = 10
-        stiffness = 100
-    }
-    
-    new 1000 binder_kinesin
-    ...
+	set couple binder_kinesin
+	{
+	    hand1 = binder
+	    hand2 = kinesin
+	    diffusion = 10
+	    stiffness = 100
+	}
+	
+	new 1000 binder_kinesin
+	...
 
 Try different combinations, guided by your imagination.
 

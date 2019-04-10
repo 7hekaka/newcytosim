@@ -14,7 +14,7 @@
  The dice is thus included in the rectangular space of similar size.
 
  Parameters:
-     - length = along X, Y and Z
+     - length = total extent along X, Y and Z
      - radius = rounding radius of edges
      .
 

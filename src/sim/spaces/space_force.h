@@ -10,15 +10,11 @@
  It is sufficient to create a space, for the force to be active.
  This space cannot be used for confinement.
  
-     set space force_field
-     {
-        shape = force
-     }
- 
-     new force_field
-     {
-        force = 1 0 0
-     }
+ Parameter:
+	 - force = vector force
+	 - center = origin of force field
+	 - stiffness = stiffness
+ .
  
  @ingroup SpaceGroup
  */

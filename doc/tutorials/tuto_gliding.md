@@ -42,10 +42,13 @@ We will use [periodic boundary conditions](https://en.wikipedia.org/wiki/Periodi
 
 	set space cell
 	{
-	    geometry = ( periodic 2 2 )
+		shape = periodic
 	}
-	
+
 	new cell
+	{
+		length = 4, 4
+	}
 
 ### Microtubules
 

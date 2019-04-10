@@ -31,12 +31,15 @@ It is simulated for 1 second, and nothing happens.
         time_step = 0.01
     }
     
-    set space cell 
+    set space cell
     {
-        geometry = rectangle 10 10
+        shape = rectangle
     }
-    
+
     new cell
+    {
+        length = 20, 20
+    }
     
     run 100 system
     {
@@ -55,7 +58,12 @@ defines the name of the simulation (*tutorial*), and sets the time step to 0.01 
 
     set space cell
     {
-        geometry = rectangle 10 10
+        shape = rectangle
+    }
+
+    new cell
+    {
+        length = 20, 20
     }
 
 defines a rectangular space named *cell* with dimensions `W = 10` and `H = 10` micrometers. The entire box is actually `2W` wide, and `2H` high, and the origin is placed in the center.
@@ -79,12 +87,15 @@ Let's add a diffusing particle to the "cell":
         time_step = 0.01
     }
     
-    set space cell 
+    set space cell
     {
-        geometry = rectangle 10 10
+        shape = rectangle
     }
-    
+
     new cell
+    {
+        length = 20, 20
+    }
     
     set hand kinesin
     {    
@@ -187,16 +198,27 @@ Change the `geometry` parameter to increase the box size to 60 x 60 micro-meters
     
 Cytosim has a set of simple geometries that can be used within the `space` class. You can try: 
 
-    set space cell 
+    set space cell
     {
-        geometry = circle 10
+        shape = circle
+    }
+
+    new cell
+    {
+        radius = 10
     }
 
 or
 
-    set space cell 
+    set space cell
     {
-        geometry = capsule 8 2
+        shape = capsule
+    }
+
+    new cell
+    {
+        length = 20
+        radius = 2
     }
 
 
@@ -253,12 +275,15 @@ Let's now define [microtubules](http://en.wikipedia.org/wiki/Microtubules)!
         kT = 0.0042
     }
     
-    set space cell 
-    { 
-        geometry = ( circle 5 )
+    set space cell
+    {
+        shape = circle
     }
-    
+
     new cell
+    {
+        radius = 5
+    }
     
     set fiber microtubule
     {
@@ -420,12 +445,15 @@ As particles bind, this progressively clears the space.
         viscosity = 5
     }
     
-    set space cell 
-    { 
-        geometry = ( circle 5 )
+    set space cell
+    {
+        shape = circle
     }
-    
+
     new cell
+    {
+        radius = 5
+    }
     
     set fiber microtubule
     {

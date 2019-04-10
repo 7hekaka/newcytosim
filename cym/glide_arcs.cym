@@ -7,7 +7,7 @@ set simul system
     viscosity = 0.02
     time_step = 0.01
     display = {
-        tiled = 1, 1;
+        tile = 1, 1;
         zoom = 0.5;
         style = 2;
         delay = 10;
@@ -56,7 +56,7 @@ set single graftedK
 new 1 microtubule
 {
     length = 10
-    orientation = parallel XY
+    orientation = align XY
 }
 
 new 500 graftedK ( arc 12.56 3.14 at -1 4.2 )

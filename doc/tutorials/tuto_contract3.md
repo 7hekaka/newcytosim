@@ -39,10 +39,13 @@ The firs step in this tutorial is to create a simple simulation composed of many
 
     set space cell 
     {
-        geometry = circle 5
+        shape = circle
     }
     
-    new space cell
+    new cell
+    {
+        radius = 5
+    }
     
     set fiber actin
     {

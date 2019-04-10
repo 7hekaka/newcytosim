@@ -30,10 +30,13 @@ Let's see what this files contains.
 	
 	set space cell
 	{
-	    geometry = sphere 35;
+	    shape = sphere;
 	}
 		
 	new cell
+	{
+	    radius = 35;
+	}
 
 
 # Microtubules

@@ -9,16 +9,20 @@ set simul system
     kT        = 0.0001
     viscosity = 1000
     steric    = 1, 1e5
-    display = ( point_value=0.001; style=3; tiled=0; fold=0; )
+    display = ( point_value=0.001; style=3; tile=0; fold=0; )
 }
 
 set space cell
 {
-    geometry = ( strip 0.1 0.1 0.05 )
+    shape = strip
     display = ( color=0x0000FF94; visible=3; )
 }
 
 new cell
+{
+	length = 0.2, 0.2, 0.1
+
+}
 
 set fiber actin
 {
@@ -74,9 +78,14 @@ delete couple crosslink
     state2 = 0
 }
 
-run 20000 system
+new event
 {
-    nb_frames = 1000
-    event = 50, ( new actin { position=rectangle 0.1 0.1 0.01 at 0 0 -0.05; length=0.005; plus_end=grow; } )
+	rate = 50;
+	code = ( new actin { position=rectangle 0.1 0.1 0.01 at 0 0 -0.05; length=0.005; plus_end=grow; } )
+}
+
+run 2000 system
+{
+    nb_frames = 100
 }
 

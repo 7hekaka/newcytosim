@@ -10,6 +10,7 @@
 #include "opengl.h"
 #include "player.h"
 #include "view.h"
+#include "gle.h"
 
 Player player;
 
@@ -18,6 +19,8 @@ Simul&      simul = thread.sim();
 PlayProp&      PP = player.PP;
 DisplayProp&   DP = player.DP;
 
+/// enable to create a player for command-line-only offscreen rendering
+//#define HEADLESS_PLAYER
 
 #ifdef HEADLESS_PLAYER
 void helpKeys(std::ostream& os) {}
@@ -94,7 +97,7 @@ void blitBuffers(GLuint normal, GLuint multi, GLint W, GLint H)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, normal);
 }
 
-
+#ifndef HEADLESS_PLAYER
 /*
  This is needed to work around a bug on Mac OSX 10.14 Mojave,
  and to enter fullscreen with a bit of delay compared to startup
@@ -124,6 +127,7 @@ void delayedCallback(int cnt)
     else
         glutTimerFunc(16, delayedCallback, cnt-1);
 }
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - main
@@ -187,10 +191,7 @@ int main(int argc, char* argv[])
         std::cout << "    DIM = " << DIM << '\n';
         return EXIT_SUCCESS;
     }
-
-    if ( arg.use_key("fullscreen") )
-        glApp::setFullScreen(1);
-    
+	
     if ( arg.use_key("live") )
         player.goLive = true;
     
@@ -240,6 +241,8 @@ int main(int argc, char* argv[])
     view.setDisplayFunc(displayOffscreen);
 #else
     glApp::setDimensionality(DIM);
+    if ( arg.use_key("fullscreen") )
+        glApp::setFullScreen(1);
     View& view = glApp::views[0];
     view.setDisplayFunc(displayLive);
 #endif

@@ -147,40 +147,36 @@ The tools and python scripts should be able provide up-to-date help, for example
 	make_page.py help
 	scan.py help
 
-# Restarting a Simulation
+# Restarting a simulation
 
-One can start a simulation from a frame stored in a trajectory file.
-Follow these steps:
+To restart a simulation from a frame stored in a trajectory file,
+follow these steps:
 
-1. build the accessory program `frametool` if needed.
-2. using `frametool`, extract the desired frame.
-3. adjust the `config.cym` to import this frame.
+1. Build the accessory program `frametool` if necessary:
 
-For 1, you may use `make`:
+		make frametool
 
-	make frametool
+2. Using `frametool`, extract the desired frame (in this example, 30).
+This will create a file ‘objects.cmi’. The frame index start at 0. 
 
-For 2, you need to provide a trajectory file, and the index of the frame to extract:
-
-	frametool objects.cmo 30 > objects.cmi
-
-This will create the file ‘objects.cmi’ containing frame 30, where the frame
-index start at 0. You need to replace `30` with the appropriate index.
+		frametool objects.cmo 30 > objects.cmi
 Note that ‘frametool objects.cmo’ will tell you how many frames are contained
 in the file.
 
-For 3, use the ‘import’ command within a config file to read the frame:
-
-	import objects objects.cmi
+3. Adjust the `config.cym` to import this frame.
+Use the ‘import’ command to read the file created in step 1:
 	
-	run 1000000 system
-	{
-		nb_frames = 100
-	}
+		import objects objects.cmi
+		
+		% simulate as usual:
+		run 1000000 system
+		{
+			nb_frames = 100
+		}
 
-The ‘import’ command replaces all the objects of the simulation, without changing the Properties. The config file should thus define all the Properties with ’set’ as usual, but skip all the ’new’ instructions. From an existing configuration, one simply adds the 'import' and deletes all the 'new'.
+The ‘import’ command replaces the objects of the simulation, without changing their Properties. The config file should thus define all the Properties with ’set’ as usual, before the ’import’ command. From an existing configuration, one simply adds the 'import' and deletes all the 'new'.
 
-However, any ’new’ after ‘import’ will add objects as usual. The simulation should be started in a fresh directory, as ’sim’ will erase the ‘object.cmo’ file.
+However, any ’new’ placed after ‘import’ will add objects as usual. The simulation should be started in a fresh directory, as ’sim’ will erase the ‘object.cmo’ file.
 
 One can merge two trajectory files later with 'cat' if necessary:
 
@@ -196,6 +192,6 @@ file containing all the simulation state variables.
 Simply execute a following config file:
 
 	read properties.cmo
-	import objects.cmo { frame = 10 }
-	export objects objects.txt { binary=0 }
+	import objects.cmo { frame=10; }
+	export objects objects.txt { binary=0; }
 

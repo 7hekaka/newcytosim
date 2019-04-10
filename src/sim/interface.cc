@@ -249,8 +249,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
         bool condition = true;
         if ( has_condition )
         {
-            Evaluator::variable_list vars = {{'x', iso.vec.x()}, {'y', iso.vec.y()}, {'z', iso.vec.z()},
-                                             {'r', iso.vec.norm()}, {'p', RNG.preal()}};
+            Evaluator::variable_list vars = {{'X', iso.vec.x()}, {'Y', iso.vec.y()}, {'Z', iso.vec.z()},
+                                             {'R', iso.vec.norm()}, {'P', RNG.preal()}};
             try {
                 char const* ptr = condition_str.c_str();
                 condition = Evaluator::inequality(ptr, vars);

@@ -14,7 +14,7 @@ class Mecable;
 class PointDisp;
 class Display;
 
-/// an assemblage of Object
+/// an assemblage of Mecable
 /** 
 Organizer contains an Array of pointers of type Mecable*.
 These Mecables are organized by Organizer::setInteraction()

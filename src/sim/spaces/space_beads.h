@@ -14,7 +14,9 @@ class Bead;
 /** 
  Space `bead` is a volume defined as the union of Beads
  
-    beads BEAD_NAME
+ Parameters:
+ 
+    bead = BEAD_NAME
  
  The implementation is quite incomplete, as only inside() works.
  */

@@ -15,10 +15,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 5 )
+    shape = sphere
 }
 
 new cell
+{
+	radius = 2.5
+}
 
 set fiber microtubule
 {
@@ -26,7 +29,7 @@ set fiber microtubule
     segmentation = 0.20
     confine = surface, 1000
     activity = grow
-    growing_speed = 0.05, 0.05
+    growing_speed = 0.1, 0.1
     growing_force = 1, 1
     max_length = 5
     steric = 1, 0.02, 0.01
@@ -54,7 +57,7 @@ set couple motor
 }
 
 
-new 1500 microtubule
+new 400 microtubule
 {
     length = 0.1
     position = surface
@@ -64,13 +67,13 @@ new 1500 microtubule
 }
 
 % Let Fiber grow to cover the sphere:
-run 50000 system
+run 25000 system
 {   
     nb_frames = 10
 }
 
 % add motors and simulate further
-new 50000 motor
+new 10000 motor
 
 run 10000 system
 {   

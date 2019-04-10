@@ -8,19 +8,13 @@
 #include "space_ellipse.h"
 #include "meca.h"
 
-/// ellipse in 2D, ellipsoid or spheroid in 3D 
+/// deformable ellipse in 2D, ellipsoid or spheroid in 3D
 /**
- Space `ellipse` is aligned with the principal axes X, Y and Z.
- In 2D, there are two principal axis, and this is called an ellipse.
- In 3D, it is called an ellipsoid.
+ Space `ellipse` change its axis length and rotate
  
-    ellipse sizeX sizeY sizeZ
-
- With:
- - sizeX = half length of X axis
- - sizeY = half length of Y axis
- - sizeZ = half length of Z axis
- .
+ Parameters:
+     - length = total length in X, Y and Z directions
+     .
 
  This Space has no corners: setInteraction() relies on project()
  */

@@ -6,6 +6,7 @@
 
 set simul system
 {
+	dim = 2
     kT = 0.0042;
     time_step = 0.002;
     viscosity = 0.02;

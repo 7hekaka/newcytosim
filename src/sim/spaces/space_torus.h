@@ -10,7 +10,7 @@
  Space `torus` is defined by two parameters: 
  
  Parameters:
-     - `radius` = the main radius of the torus
+     - `radius` = the main radius of the torus centerline
      - `width`  = the diameter of the torus in its crosssections.
      .
 
@@ -26,7 +26,7 @@ private:
     /// thickness
     real  bWidth, bWidthSqr;
     
-    
+    /// set bWidthSqr
     void update() { bWidthSqr = square(bWidth); }
     
     /// project on the backbone

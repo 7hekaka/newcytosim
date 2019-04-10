@@ -19,8 +19,9 @@
  - The stiffness of the interaction is 'prop->stiffness'.
  - The amount of overlap is 'prop->overlap'.
  .
+ 
+ @ingroup OrganizerGroup
  */
-
 class Bundle : public Organizer
 {
     

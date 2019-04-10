@@ -40,10 +40,13 @@ Lets create a small simulation space with radius 2 um and add single actin filam
     
     set space cell 
     {
-        geometry = circle 2
+        shape = circle
     }
     
-    new space cell
+    new cell
+    {
+        radius = 2
+    }
 
     set fiber actin
     {

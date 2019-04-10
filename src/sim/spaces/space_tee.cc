@@ -19,9 +19,9 @@ SpaceTee::SpaceTee(const SpaceProp* p)
 
 void SpaceTee::resize(Glossary& opt)
 {
-    opt.set(tLength,    "length");
-    opt.set(tRadius,     "width");
-    opt.set(tJunction,  "junction");
+    opt.set(tLength, "length");
+    if ( opt.set(tRadius, "width") ) tRadius *= 0.5;
+    opt.set(tJunction, "junction");
     opt.set(tArmLength, "arm_length");
     tRadiusSq   = tRadius * tRadius;
     if ( tLength <= 0 || tRadius <= 0 || tArmLength < 0 )

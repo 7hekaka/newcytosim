@@ -37,7 +37,7 @@ namespace Evaluator
     {
         for ( variable const& v : vars )
         {
-            if ( *str == v.first )
+            if ( *str == v.first || toupper(*str) == v.first )
             {
                 ++str;
                 return v.second;

@@ -12,7 +12,7 @@
  but without the curvature.
 
  Parameters:
-     - length = half-length of the cylinder along X
+     - length = length of the cylinder in X
      - radius = radius of the cylinder
      .
 

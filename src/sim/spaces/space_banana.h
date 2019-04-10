@@ -12,8 +12,8 @@
  
  Parameters:
      - `length` = the overall length
-     - `width` = the diameter of the torus in its crosssections.
-     - `curvature` = the main radius of the torus, which defines curvature
+     - `width` = the diameter of the torus in its crosssections
+     - `curvature` = the main radius of the torus centerline
      .
  
  This class was first conceived by Dietrich Foethke, to simulate S. pombe.

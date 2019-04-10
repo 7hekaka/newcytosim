@@ -5,18 +5,18 @@
 *  [**Overview**](main/overview.md)
 *  [Getting started (introduction to the command line)](main/starter.md)
 *  [The configuration file](sim/config.md)
+*  [Set of standard config files](main/examples.md)
 *  [**Tutorials**](tutorials/index.md)
+*  [Simulation engine](sim/index.md)
 *  [The different executables](main/executables.md)
-*  [File types](main/file_types.md)
 *  [Running simulations on your computer](main/runs.md)
-*  [Standard config files](main/examples.md)
+*  [Running cytosim on a cluster](main/run_slurm.md)
 *  [Graphical rendering](sim/graphics.md)
 *  [Making movies](main/movies.md)
 *  [Getting numbers out of Cytosim with `report`](sim/report.md)
-*  [Simulation engine](sim/index.md)
-*  [Running cytosim on a cluster](main/run_slurm.md)
 *  [Frequently asked questions](main/faq.md)
 *  [Prior work](examples/index.md)
+*  [File types](main/file_types.md)
 
 # Installation
 

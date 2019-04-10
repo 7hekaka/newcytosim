@@ -19,7 +19,7 @@ set simul system
     time_step = 0.005
 %    random_seed = 87 
     display = {
-        tiled = 1, 1;
+        tile = 1, 1;
         zoom = 0.75;
         style = 2;
         delay = 10;

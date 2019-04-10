@@ -34,10 +34,9 @@ if the required library was linked during compilation.
 
 # Assembling the images
 
-Multiple images can be combined into a movie file by using <a href="http://rsbweb.nih.gov/ij/">ImageJ</a>:\n
-simply drag the folder containing all the images directly onto the ImageJ window,
-and ImageJ will open a dialog asking if you would like to assemble them into a stack.
-Accept, and this stack can then be exported as a movie in the format of your choice.
+Multiple images can be combined into a movie file by using <a href="http://rsbweb.nih.gov/ij/">ImageJ</a>:  
+
+> simply drag the folder containing all the images directly onto the ImageJ window, and ImageJ will open a dialog asking if you would like to assemble them into a stack. Accept, and the resulting stack can then be exported as a movie in several formats.
  
 Alternatively, <a href="http://ffmpeg.org/">ffmpeg</a> is a versatile command line tool that can assemble images into a movie file.
 Please check their manual for the different options. We often use this command:

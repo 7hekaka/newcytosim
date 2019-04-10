@@ -9,7 +9,7 @@
  Space `capsule` is cylinder ending with hemispheres (a spherocylinder)
 
  Parameters:
-     - length: half the length of the central cylinder
+     - length: total length in X
      - radius: the radius of the hemisphere and central cylinder
      .
 

@@ -150,6 +150,7 @@ public:
  The stiffness of the links is defined in AsterProp::stiffness, and can be adjusted independently.
  .
  
+ @ingroup OrganizerGroup
  */
 class Aster : public Organizer
 {

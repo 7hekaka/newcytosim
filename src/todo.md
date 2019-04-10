@@ -26,6 +26,8 @@ F. Nedelec
 - fiber:max_length could trigger switch to a different Dynamic state
 - Could add color of Hands for summary obtained with 'I'
 - Implement two confinements for Mecables. That's easier than constructive geometry on Spaces
+- use 'cyo' as extension for ouput file
+- use 'cpp' extension for c++ code file
 
 # Spindles
 

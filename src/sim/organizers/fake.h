@@ -16,8 +16,9 @@
  This object cannot handle the destruction of the Asters
  
  The Fake should just link two Solid, without reference to the Asters
+ 
+ @ingroup OrganizerGroup
  */
-
 class Fake : public Organizer
 {
 

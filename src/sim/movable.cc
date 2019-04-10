@@ -572,47 +572,46 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* 
         if ( tok == "random" )
             return Vector::randU();
 
+		if ( tok == "X" )
+			return Vector(RNG.sflip(), 0, 0);
+		if ( tok == "Y" )
+			return Vector(0, RNG.sflip(), 0);
+		if ( tok == "Z" && DIM >= 3 )
+			return Vector(0, 0, RNG.sflip());
+		if ( tok == "XY" )
+		{
+			Vector2 h = Vector2::randU();
+			return Vector(h.XX, h.YY, 0);
+		}
+#if ( DIM >= 3 )
+		if ( tok == "XZ" )
+		{
+			Vector2 h = Vector2::randU();
+			return Vector(h.XX, 0, h.YY);
+		}
+		if ( tok == "YZ" )
+		{
+			Vector2 h = Vector2::randU();
+			return Vector(0, h.XX, h.YY);
+		}
+#endif
+
+        if ( tok == "align" )
+        {
+            Vector vec;
+            if ( is >> vec )
+                return RNG.sflip() * normalize(vec);
+            throw InvalidParameter("expected vector after `align`");
+        }
+		
         if ( tok == "parallel" )
         {
-            c = Tokenizer::get_space(is, false);
-            
-            // an axis or a plane can be specified:
-            if ( c == 'X' || c == 'Y' || c == 'Z' )
-            {
-                std::string k = Tokenizer::get_symbol(is);
-                
-                if ( k == "X" )
-                    return Vector(RNG.sflip(), 0, 0);
-                if ( k == "Y" )
-                    return Vector(0, RNG.sflip(), 0);
-                if ( k == "Z" && DIM >= 3 )
-                    return Vector(0, 0, RNG.sflip());
-                if ( k == "XY" )
-                {
-                    Vector2 h = Vector2::randU();
-                    return Vector(h.XX, h.YY, 0);
-                }
-#if ( DIM >= 3 )
-                if ( k == "XZ" )
-                {
-                    Vector2 h = Vector2::randU();
-                    return Vector(h.XX, 0, h.YY);
-                }
-                if ( k == "YZ" )
-                {
-                    Vector2 h = Vector2::randU();
-                    return Vector(0, h.XX, h.YY);
-                }
-#endif
-                throw InvalidParameter("Unexpected keyword `"+k+"' after `parallel`");
-            }
-            
             Vector vec;
             if ( is >> vec )
                 return normalize(vec);
             throw InvalidParameter("expected vector after `parallel`");
         }
-        
+
         if ( tok == "orthogonal" )
         {
             Vector vec;
@@ -787,7 +786,7 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, const Space*
         is.seekg(isp);
     }
 
-    // The last option is to specity a vector:
+    // The last option is to specity a direction:
     Vector vec = readDirection(is, pos, spc);
     
     isp = is.tellg();

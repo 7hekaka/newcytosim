@@ -38,10 +38,13 @@ The first step in this tutorial is to define a simple simuation containing only 
     
     set space cell 
     {
-        geometry = circle 4
+        shape = circle
     }
     
     new cell
+    {
+        radius = 4
+    }
     
     run 1000 system
     {

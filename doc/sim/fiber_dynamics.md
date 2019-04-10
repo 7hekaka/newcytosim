@@ -1,7 +1,5 @@
 # Filament Assembly Dynamics
 
-### Objective
-
 This document provides an overview of different models that can be used to simulate filament growth and shrinkage. They are selected by the `activity` parameter. Each of this model is implemented in a separate class and represent a specialization of the `fiber` class. 
 
 Note that you do not have to worry about the vertices that are used to represent the filaments. Points are dynamically added or removed as filament grow and shrink. All points on a filament remain at any time regularly distributed and equidistant. The number of points is always such that this distance is as close as possible to the preferred section length provided with the `segmentation` parameter.

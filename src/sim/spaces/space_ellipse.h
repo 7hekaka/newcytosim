@@ -13,7 +13,7 @@
  The ellipse/ellipsoid is aligned with the principal axes X, Y and Z.
  
  Parameters:
-     - length = half length of X, Y and Z axis
+     - length = total length in X, Y and Z directions
      .
  
  The projection of one point on the surface of the ellipse is done numerically. 

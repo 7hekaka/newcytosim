@@ -72,7 +72,7 @@ new 1000 filament
 {
     length = 0.75, exponential
 	equilibrate = 17
-	direction = parallel XY
+	direction = align XY
 }
 
 new 50 minifilament

@@ -10,8 +10,8 @@
 
  Parameters:
      - length = half length of central cylinder
-     - radius = radius/width of central and arm cylinders, radius of caps
-     - arm_position = position of perpendicular arm on the cylinder
+     - width = radius/width of central and arm cylinders, radius of caps
+     - junction = position of perpendicular arm on the cylinder
      - arm_length = length of perpendicular arm
      .
  

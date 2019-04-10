@@ -1,12 +1,12 @@
 # Cytosim's Configuration File
- 
+
 The virtual system and the sequence of actions to be performed is specified in a configuration file. This config file must be a plain text file produced by any plain text editor.
 By default, it is called **`config.cym`**.
  
 Cytosim understand a [small set of commands](commands.md) and [predefined objects](objects.md) with their [associated parameters](parameters.md).
- 
-You will at least need to call:
- 
+
+One needs to call at least:
+
  - `set` to define a new object category, and set its parameter values,
  - `new` to create objects,
  - `run` to perform simulation steps. 
@@ -18,7 +18,7 @@ About the config file:
 - Parameters are specified with a ` = ` sign, and can contain multiple values
 - Two parameters can be specified on the same line if they are separated by a semi-column: `;`
 - Curly brackets `{  }` are used to group the parameters together in logical units
-- Parentheses `(  )` can be used for certain parameters, such as `display`
+- Parentheses `(  )` can be used for subgroups, such as `display`
 
 # Example
  
@@ -30,59 +30,61 @@ Many examples can be found in the directory called [***cym***](../../cym).
 	
 	set simul system
 	{
-	    time_step = 0.01
-	    viscosity = 0.05
-	    display = ( style=2; )
+		time_step = 0.01
+		viscosity = 0.05
+		display = ( style=2; )
 	}
 	
 	set space cell
 	{
-	    shape = circle
-	    dimension = 10
+		shape = circle
 	}
 	
 	new cell
-	
+	{   
+		radius = 10
+	}
+
 	set fiber microtubule
 	{
-	    rigidity = 20
-	    segmentation = 0.5
-	    confine = inside, 100
-	    display = ( line_width=1; color=white; )
+		rigidity = 20
+		segmentation = 0.5
+		confine = inside, 100
+		display = ( line_width=1; color=white; )
 	}
 	
 	set hand kinesin
 	{
-	    binding = 10, 0.01   % rate, range
-	    unbinding = 0.1, 3   % rate, force
-	    
-	    activity = move
-	    unloaded_speed = 0.8
-	    stall_force = 5
+		binding = 10, 0.01   % rate, range
+		unbinding = 0.1, 3   % rate, force
+		
+		activity = move
+		unloaded_speed = 0.8
+		stall_force = 5
 	
-	    bind_also_ends = 1
-	    hold_growing_end = 1
+		bind_also_ends = 1
+		hold_growing_end = 1
 	
-	    display = ( size=7; width=7 )
+		display = ( size=7; width=7 )
 	}
 	
 	set couple complex
 	{
-	    hand1 = kinesin
-	    hand2 = kinesin
-	    stiffness = 100
-	    diffusion = 10
+		hand1 = kinesin
+		hand2 = kinesin
+		stiffness = 100
+		diffusion = 10
 	}
 	
 	new 100 microtubule
 	{
-	    length = 9
+		length = 9
 	}
 	
 	new 2000 complex
 	
 	run 5000 system
 	{
-	    nb_frames = 50
+		nb_frames = 50
 	}
 	

@@ -13,7 +13,7 @@
  in SpaceProp.
  
  Parameters:
-     - radius
+     - radius = radius of the disc
 
  @ingroup SpaceGroup
  

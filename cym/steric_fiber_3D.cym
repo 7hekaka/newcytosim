@@ -8,7 +8,7 @@ set simul system
     time_step = 0.00001
     viscosity = 10
     steric = 1, 100
-    display = ( point_value=0.001; style=3; tiled=0; zoom=0.5; stencil=1; )
+    display = ( point_value=0.001; style=3; tile=0; zoom=0.5; stencil=1; )
 }
 
 set space cell

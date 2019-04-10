@@ -36,7 +36,7 @@
  `classic`     | ClassicFiber        | @ref ClassicFiberPar
  `dynamic`     | DynamicFiber        | @ref DynamicFiberPar
  `treadmill`   | TreadmillingFiber   | @ref TreadmillingFiberPar
- `tubule`      | Tubule              | @ref TubulePar
+ `tubule`      | Tubule (disabled)   | @ref TubulePar
  
  */
 Property* FiberSet::newProperty(const std::string& kd, const std::string& nm, Glossary& opt) const
@@ -58,7 +58,7 @@ Property* FiberSet::newProperty(const std::string& kd, const std::string& nm, Gl
                 return new FiberProp(nm);
 
 
-            std::cerr << "INCIDENT: substituting generic Fiber for class `"+a+"'\n";
+            std::cerr << "INCIDENT: substituting generic Fiber class for `"+a+"'\n";
             return new FiberProp(nm);
             //throw InvalidParameter("unknown fiber:activity `"+a+"'");
         }
