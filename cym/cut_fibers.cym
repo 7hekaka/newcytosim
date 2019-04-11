@@ -9,10 +9,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 4 3 )
+    shape = capsule
 }
 
 new cell
+{
+	length = 10
+	radius = 3
+}
 
 set fiber microtubule
 {

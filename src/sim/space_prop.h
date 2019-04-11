@@ -22,9 +22,6 @@ class Simul;
 class SpaceProp : public Property
 {
     friend class Space;
-    
-    /// create a new, uninitialized, Space
-    Space * newSpace() const;
 
 public:
 
@@ -77,8 +74,11 @@ public:
 
     /// destructor
     ~SpaceProp() { }
- 
-    /// create a new Space
+	
+    /// create a new, uninitialized, Space
+    Space * newSpace() const;
+
+    /// create a new Space according to specifications
     Space * newSpace(Glossary&) const;
     
     /// identifies the property

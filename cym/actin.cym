@@ -20,7 +20,7 @@ set fiber actin
     rigidity = 0.05
     segmentation = 0.0055      %that is 4 monomers
     confine = inside, 200
-    display = ( style=actin; point=7, 5; color=red, dark_red; end_color=yellow; )
+    display = ( style=actin; color=red, dark_red; end_color=yellow; )
 }
 
 new 10 actin

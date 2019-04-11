@@ -1,7 +1,8 @@
-# Articles describing Cytosim
+# Articles describing Cytosim and related work
 
+- [Collective Langevin Dynamics of Flexible Cytoskeletal Fibers](http://dx.doi.org/10.1088/1367-2630/9/11/427)  
 
-- [Microtubule organization by mitotic motors](https://doi.org/10.1016/j.cell.2018.09.029)  
+- [Preconfig: A Versatile Configuration File Generator for Varying Parameters](http://doi.org/10.5334/jors.156)  
 
 
 # Articles from other groups that used Cytosim

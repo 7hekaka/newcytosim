@@ -62,7 +62,7 @@ int FrameReader::badFile()
         return 8;
     
     if ( inputter.eof() )
-        inputter.clearerr();
+        inputter.clear();
     
     if ( ! inputter.good() )
         return 7;
@@ -77,7 +77,7 @@ void FrameReader::checkFile()
         throw InvalidIO("No open file");
     
     if ( inputter.eof() )
-        inputter.clearerr();
+        inputter.clear();
     
     if ( ! inputter.good() )
         throw InvalidIO("File has errors");
@@ -136,7 +136,7 @@ void FrameReader::savePos(int frm, const fpos_t& pos, int s)
 int FrameReader::seekPos(int frm)
 {
     if ( inputter.eof() )
-        inputter.clearerr();
+        inputter.clear();
     
     if ( frm < 1 || framePos.empty() )
     {
@@ -244,7 +244,7 @@ int FrameReader::loadFrame(Simul& sim, int frm, const bool reload)
     {
         int res = loadLastFrame(sim);
         if ( frm == -1 ) return res;
-        VLOG("FrameReader: going down from frame " << lastKnownFrame() << '\n');
+        VLOG("FrameReader: counting down from frame " << lastKnownFrame() << '\n');
         frm = std::max(0, frm + 1 + lastKnownFrame());
     }
     

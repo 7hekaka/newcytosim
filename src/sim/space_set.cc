@@ -85,9 +85,7 @@ Object * SpaceSet::newObjectT(const ObjectTag tag, unsigned idx)
     if ( tag == Space::TAG )
     {
         SpaceProp * p = simul.findProperty<SpaceProp>("space", idx);
-
-        Glossary tmp;
-        return p->newSpace(tmp);
+        return p->newSpace();
     }
     return nullptr;
 }

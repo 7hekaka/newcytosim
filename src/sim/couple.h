@@ -74,7 +74,9 @@ protected:
     Vector    otherDirection(Hand const*) const;
     /// specialization of HandMonitor
     real      interactionLength() const;
-    
+	/// specialization of HandMonitor
+	ObjectFlag parent_flag() const { return flag(); }
+
     /// update position to account for diffusion in one time step
     void      diffuse() { cPos.addRand(prop->diffusion_dt); }
     

@@ -1,5 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
+#include <algorithm>
+
 #include "fiber.h"
 #include "messages.h"
 #include "glossary.h"
@@ -10,7 +12,6 @@
 #include "meca.h"
 #include "hand.h"
 #include "sim.h"
-#include <algorithm>
 
 
 #pragma mark - Step

@@ -11,17 +11,22 @@
 
 /// FiberSite indicates a location on a Fiber by its abscissa from the Fiber's origin
 /**
- The main variable of a FiberSite is a pointer `fbFiber`, to the Fiber to which
- the FiberSite is refereeing to, which is NULL if the state is `unattached`.
+ The key variable is a pointer to a Fiber, `fbFiber`, which can be NULL for instance
+ if the state is `unattached`.
  
- In the attached state, the precise location on the Fiber is recorded using the
- curvilinear abscissa (`fbAbs`) measured along the fiber, from a reference
+ In the `attached` state, the precise location on the Fiber is recorded using the
+ curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
  that is fixed on the Fiber, called the Fiber's origin. This origin is virtual
- and may reside outside the Fiber.
+ and may reside outside the Fiber ends.
  
- The abscissa is independent from the vertices used to represent the Fiber's position,
- and also unaffected by assembly/disassembly at the tips of the Fiber.
- The FiberSite uses an Interpolation to calculate its position in space.
+ Importantly, the value of abscissa is independent from the vertices used to
+ represent the Fiber's position, and also unaffected by assembly/disassembly
+ at the tips of the Fiber.
+ 
+ The `FiberSite` also support discrete binding, if the Fiber have a Lattice,
+ and in this case uses an integer `fbSite` to keep track of the position.
+ 
+ A `FiberSite` uses Interpolation to calculate its position in space.
 */
 class FiberSite
 {
@@ -111,13 +116,13 @@ public:
     FiberLattice* lattice() const { return fbLattice; }
     
     /// index of Lattice's site
-    site_t        site() const { return fbSite; }
+    site_t        site()    const { return fbSite; }
     
     /// true if current Lattice's site is unoccupied
-    bool          vacant() const { return vacant(fbSite); }
+    bool          vacant()  const { return vacant(fbSite); }
 
     /// value of current Lattice site
-    cell_t        cell() const { return fbLattice->data(fbSite); }
+    cell_t        cell()    const { return fbLattice->data(fbSite); }
 
     /// transfer from current site to given one
     void          hop(site_t);

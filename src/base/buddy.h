@@ -7,7 +7,7 @@
 #include <algorithm>
 
 
-/// Maintains mutual relationship between objects.
+/// Maintains a list of mutual relationship between objects.
 /**
  Buddy implements mutual relationship between objects.
  
@@ -41,7 +41,7 @@ private:
         BuddyList::iterator bi = std::find(buddies_.begin(), buddies_.end(), b);
         if ( bi != buddies_.end() )
         {
-            std::cerr << " Error: duplicated Buddy::enlist()" << std::endl;
+            std::cerr << " Warning: duplicate Buddy::enlist()\n";
             return;
         }
 #endif

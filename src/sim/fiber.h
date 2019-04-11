@@ -291,7 +291,7 @@ public:
     /// sever fiber proportionally to the quantity stored in the Lattice
     void           cutFiberLattice(FiberLattice&);
 
-    /// recalculate occupancy of all lattice sites
+    /// recalculate occupancy of all lattice sites from bound Hands
     void           resetLattice(FiberLattice&) const;
 
     /// write Fiber's Lattice

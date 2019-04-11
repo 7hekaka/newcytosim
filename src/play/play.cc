@@ -284,7 +284,7 @@ int main(int argc, char* argv[])
             std::string file = simul.prop->property_file;
             
             if ( !FilePath::is_file(file) )
-                throw InvalidIO("unknown file `"+file+"'\n");
+                throw InvalidIO("could not find `"+file+"'\n");
             
             Parser(simul, 1, 1, 0, 0, 0).readConfig(file);
             

@@ -18,7 +18,7 @@
 #include <string>
 
 
-/// A simple wrapper around a C-FILE
+/// A wrapper around a C-file
 /**
  The FileWrapper has a cast-operator to FILE*,
  and it can thus be used directly in the functions of the C-library.
@@ -51,46 +51,46 @@ public:
     void operator =(FILE *);
     
     /// automatic conversion to a FILE *
-    operator FILE*()                     { return mFile; }
+    operator FILE*()                 { return mFile; }
     
     /// open a file
     int     open(const char* name, const char* mode);
     
     /// rewind file
-    void    rewind()                     { if ( mFile ) { std::clearerr(mFile); std::rewind(mFile); } }
+    void    rewind()                 { if ( mFile ) { clearerr(mFile); std::rewind(mFile); } }
 
-    /// rewind file
-    void    clearerr()                   { if ( mFile ) std::clearerr(mFile); }
+    /// clear error flag
+    void    clear()                  { if ( mFile ) clearerr(mFile); }
 
     /// close file
     void    close();
     
     /// return the file pointer
-    FILE*   file()                       { return mFile; }
+    FILE*   file()                   { return mFile; }
     
     /// the path of the file, or of the last attempt to open a file
-    const char * path()          const   { return mPath.c_str(); }
+    const char * path()        const { return mPath.c_str(); }
     
     /// true if output goes to stdout
-    bool    std()               const    { return mFile==stdout; }
+    bool    is_stdout()        const { return mFile==stdout; }
     
     /// true if at end of file
-    bool    eof()               const    { return mFile && std::feof(mFile); }
+    bool    eof()              const { return mFile && feof(mFile); }
     
     /// return the value of ferror()
-    int     error()             const    { return std::ferror(mFile); }
+    int     error()            const { return ferror(mFile); }
 
     /// true if file is good for writing / reading
-    bool    good()              const    { return mFile && !std::ferror(mFile); }
+    bool    good()             const { return mFile && !ferror(mFile); }
 
-    /// set `p` to current reading position of file, relative to beggining
-    long    pos()               const    { if ( mFile ) return ftell(mFile); else return 0; }
+    /// return current reading position of file
+    long    pos()              const { if ( mFile ) return ftell(mFile); else return 0; }
 
-    /// set `p` to current reading position of file, relative to beggining
-    int     get_pos(fpos_t& p)  const    { return fgetpos(mFile, &p); }
+    /// set `p` to current reading position of file
+    int     get_pos(fpos_t& p) const { return fgetpos(mFile, &p); }
 
-    /// change current reading position to `p` specified from the beginning of the file
-    void    set_pos(const fpos_t& p)     { fsetpos(mFile, &p); }
+    /// change current reading position to `p`
+    void    set_pos(const fpos_t& p) { fsetpos(mFile, &p); }
     
     
     /// put a C-string
@@ -106,28 +106,28 @@ public:
     void    skip_until(const char * str);
     
     /// lock file for current thread
-    void    lock()                       { flockfile(mFile); }
+    void    lock()                   { flockfile(mFile); }
     
     /// unlock file for current thread
-    void    unlock()                     { funlockfile(mFile); }
+    void    unlock()                 { funlockfile(mFile); }
     
     /// report next character to be read
-    int     peek()                       { int c=getc_unlocked(mFile); if ( c != EOF ) ungetc(c, mFile); return c; }
+    int     peek()                   { int c=getc_unlocked(mFile); if ( c != EOF ) ungetc(c, mFile); return c; }
     
     /// read a character
-    int     get_char()                   { return getc_unlocked(mFile); }
+    int     get_char()               { return getc_unlocked(mFile); }
 
     /// read a byte
-    uint8_t get_byte()                   { return (uint8_t)getc_unlocked(mFile); }
+    uint8_t get_byte()               { return (uint8_t)getc_unlocked(mFile); }
 
     /// unget character from input
-    void    unget(int c)                 { ungetc(c, mFile); }
+    void    unget(int c)             { ungetc(c, mFile); }
 
     /// write a character
-    int     put_char(int c)              { return putc_unlocked(c, mFile); }
+    int     put_char(int c)          { return putc_unlocked(c, mFile); }
 
     /// flush
-    void    flush()                      { std::fflush(mFile); }
+    void    flush()                  { fflush(mFile); }
 
 };
 
