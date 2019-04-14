@@ -321,7 +321,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         // check for zero value in list, which should not happen:
         if ( res.count(nullptr) )
         {
-            std::clog << "cytosim: empty slots in newObjects(" << name << ")\n";
+            std::clog << "cytosim found empty slots in newObjects(" << name << ")\n";
             res.remove_pack(nullptr);
         }
 #endif
@@ -462,7 +462,7 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
 #pragma mark -
 
 /// holds a set of criteria used to select Objects
-class SelectionCriteria
+class Filter
 {
 public:
 
@@ -474,7 +474,7 @@ public:
     Property const* prp;
 
     /// initialize
-    SelectionCriteria()
+    Filter()
     {
         mrk = 0;
         st1 = ~0U;
@@ -514,7 +514,7 @@ public:
     }
     
     /// return `true` if given object fulfills all the conditions specified
-    bool match(Object const* obj) const
+    bool pass(Object const* obj) const
     {
         if ( mrk > 0 && obj->mark() != mrk )
             return false;
@@ -547,9 +547,9 @@ public:
 };
 
 
-bool match_criteria(Object const* obj, void const* val)
+bool pass_filter(Object const* obj, void const* val)
 {
-    return static_cast<SelectionCriteria const*>(val)->match(obj);
+    return static_cast<Filter const*>(val)->pass(obj);
 }
 
 
@@ -566,14 +566,13 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned 
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     
-    SelectionCriteria cri;
-    cri.set(simul, pp, opt);
-
-    ObjectList objs = set->collect(match_criteria, &cri);
+    Filter filter;
+    filter.set(simul, pp, opt);
+    ObjectList objs = set->collect(pass_filter, &filter);
     
     if ( objs.size() == 0 )
     {
-        std::cerr << "found no `" << name << "' to delete\n";
+        std::cerr << "Warning: found no `" << name << "' to delete\n";
         return;
     }
     
@@ -590,7 +589,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned 
             objs.truncate(cnt);
         }
         
-        //std::clog << " deleting " << objs.size() << " objects" << std::endl;
+        //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
         simul.erase(objs);
     }
 }
@@ -614,10 +613,9 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, unsigned cn
         throw InvalidParameter("mark must be specified for command `mark'");
     opt.clear("mark");
     
-    SelectionCriteria cri;
-    cri.set(simul, pp, opt);
-    
-    ObjectList objs = set->collect(match_criteria, &cri);
+    Filter filter;
+    filter.set(simul, pp, opt);
+    ObjectList objs = set->collect(pass_filter, &filter);
     
     // optionally limit the list to a random subset
     if ( cnt < objs.size() )
@@ -658,9 +656,9 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
         if ( pp->category() != "fiber" )
             throw InvalidSyntax("only `cut fiber' is supported");
         
-        SelectionCriteria cri;
-        cri.set(simul, pp, opt);
-        objs = simul.fibers.collect(match_criteria, &cri);
+        Filter filter;
+        filter.set(simul, pp, opt);
+        objs = simul.fibers.collect(pass_filter, &filter);
     }
     
     VLOG("-CUT PLANE (" << n << ").x = " << -a << "\n");
@@ -842,7 +840,7 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     }
 #ifdef BACKWARD_COMPATIBILITY
     if ( event )
-        simul.events.remove(event);
+        simul.events.erase(event);
 #endif
     simul.relax();
     VLOG("+RUN COMPLETED\n");

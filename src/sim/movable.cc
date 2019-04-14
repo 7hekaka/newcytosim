@@ -572,28 +572,28 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* 
         if ( tok == "random" )
             return Vector::randU();
 
-		if ( tok == "X" )
-			return Vector(RNG.sflip(), 0, 0);
-		if ( tok == "Y" )
-			return Vector(0, RNG.sflip(), 0);
-		if ( tok == "Z" && DIM >= 3 )
-			return Vector(0, 0, RNG.sflip());
-		if ( tok == "XY" )
-		{
-			Vector2 h = Vector2::randU();
-			return Vector(h.XX, h.YY, 0);
-		}
+        if ( tok == "X" )
+            return Vector(RNG.sflip(), 0, 0);
+        if ( tok == "Y" )
+            return Vector(0, RNG.sflip(), 0);
+        if ( tok == "Z" && DIM >= 3 )
+            return Vector(0, 0, RNG.sflip());
+        if ( tok == "XY" )
+        {
+            Vector2 h = Vector2::randU();
+            return Vector(h.XX, h.YY, 0);
+        }
 #if ( DIM >= 3 )
-		if ( tok == "XZ" )
-		{
-			Vector2 h = Vector2::randU();
-			return Vector(h.XX, 0, h.YY);
-		}
-		if ( tok == "YZ" )
-		{
-			Vector2 h = Vector2::randU();
-			return Vector(0, h.XX, h.YY);
-		}
+        if ( tok == "XZ" )
+        {
+            Vector2 h = Vector2::randU();
+            return Vector(h.XX, 0, h.YY);
+        }
+        if ( tok == "YZ" )
+        {
+            Vector2 h = Vector2::randU();
+            return Vector(0, h.XX, h.YY);
+        }
 #endif
 
         if ( tok == "align" )
@@ -603,7 +603,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* 
                 return RNG.sflip() * normalize(vec);
             throw InvalidParameter("expected vector after `align`");
         }
-		
+        
         if ( tok == "parallel" )
         {
             Vector vec;

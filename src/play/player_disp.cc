@@ -298,7 +298,7 @@ void Player::readDisplayString(View& view, std::string const& str)
     catch( Exception & e )
     {
         std::cerr << "Error: " << e.what();
-        std::cerr << "while reading simul:display\n";
+        std::cerr << " while reading simul:display\n";
     }
 }
 

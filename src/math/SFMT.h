@@ -139,8 +139,8 @@ struct SFMT_T {
     /** the 128-bit internal state array */
 #ifdef __AVX2__
     union {
-	    __m256i state_y[SFMT_N256];
-    	w128_t state[SFMT_N];
+        __m256i state_y[SFMT_N256];
+        w128_t state[SFMT_N];
     };    
 #else
     w128_t state[SFMT_N];

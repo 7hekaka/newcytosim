@@ -137,7 +137,7 @@ namespace sMath
      Building an Orthonormal Basis, Revisited
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
      */
-	template < typename FLOAT >
+    template < typename FLOAT >
     inline void orthonormal(const FLOAT z[3], FLOAT x[3], FLOAT y[3])
     {
         const FLOAT s = std::copysign((FLOAT)1.0, z[2]);
@@ -164,7 +164,7 @@ namespace sMath
 #endif
     }
     
-	template < typename FLOAT >
+    template < typename FLOAT >
     inline void orthonormal(const FLOAT z[3], FLOAT x[3], FLOAT y[3], FLOAT scale)
     {
         const FLOAT s = std::copysign((FLOAT)1.0, z[2]);
@@ -180,7 +180,7 @@ namespace sMath
         y[1] = ss * b - scale;
         y[2] = ss * z[1];
     }
-	
+    
 #if ( 0 )
     /// bit-hack absolute value
     inline float absf(float a)

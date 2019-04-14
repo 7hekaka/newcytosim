@@ -22,7 +22,7 @@ class LineDisp;
 
 
 /// Flag to associate a Lattice to the Fiber
-#define FIBER_HAS_LATTICE -1
+#define FIBER_HAS_LATTICE 1
 
 /**
  @todo Allow type of FiberLattice to be selected at run time,

@@ -17,7 +17,7 @@ SpaceTorus::SpaceTorus(const SpaceProp* p)
 
 void SpaceTorus::resize(Glossary& opt)
 {
-	real len = 0;
+    real len = 0;
     if ( opt.set(len, "width") ) bWidth = len * 0.5;
     opt.set(bRadius, "radius");
 

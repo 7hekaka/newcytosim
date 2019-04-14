@@ -60,7 +60,7 @@ private:
     /// specialization of HandMonitor
     real      interactionLength() const;
     /// specialization of HandMonitor
-	ObjectFlag parent_flag() const { return flag(); }
+    ObjectFlag parent_flag() const { return flag(); }
 
 protected:
     

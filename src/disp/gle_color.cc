@@ -99,6 +99,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
             }
             catch ( InvalidSyntax & e )
             {
+                is.setstate(std::istream::failbit);
                 std::cerr << e.what() << " : using white" << std::endl;
                 gle::print_std_colors(std::cerr);
                 col = 0xFFFFFFFF;

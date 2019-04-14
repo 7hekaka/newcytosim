@@ -11,9 +11,9 @@
  This space cannot be used for confinement.
  
  Parameter:
-	 - force = vector force
-	 - center = origin of force field
-	 - stiffness = stiffness
+     - force = vector force
+     - center = origin of force field
+     - stiffness = stiffness
  .
  
  @ingroup SpaceGroup

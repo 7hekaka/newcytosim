@@ -74,7 +74,7 @@ public:
 
     /// destructor
     ~SpaceProp() { }
-	
+    
     /// create a new, uninitialized, Space
     Space * newSpace() const;
 

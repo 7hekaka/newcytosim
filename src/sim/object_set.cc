@@ -164,7 +164,7 @@ void ObjectSet::add(ObjectList const& list)
 
 void ObjectSet::remove(Object * obj)
 {
-    //std::clog << "ObjectSet::remove(" <<  obj->reference() << ")\n";
+    //std::clog << "ObjectSet::remove " <<  obj->reference() << '\n';
     inventory.unassign(obj);
     if ( obj->linked() )
         unlink(obj);
@@ -194,6 +194,7 @@ void ObjectSet::erase(NodeList & list)
 
 void ObjectSet::erase(Object * obj)
 {
+    //std::clog << "ObjectSet::erase " << title() << " " << obj->reference() << '\n';
     remove(obj);
     delete(obj);
 }

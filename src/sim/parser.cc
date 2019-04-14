@@ -525,9 +525,7 @@ void Parser::parse_delete(std::istream& is)
     if ( do_new )
     {
         Glossary opt(blok);
-
         execute_delete(name, opt, cnt);
-        
         if ( opt.warnings(std::cerr) )
             show_lines(is, spos);
     }
@@ -576,9 +574,7 @@ void Parser::parse_mark(std::istream& is)
     if ( do_new )
     {
         Glossary opt(blok);
-
         execute_mark(name, opt, cnt);
-        
         if ( opt.warnings(std::cerr) )
             show_lines(is, spos);
     }
@@ -627,6 +623,8 @@ void Parser::parse_cut(std::istream& is)
     {
         Glossary opt(blok);
         execute_cut(name, opt);
+        if ( opt.warnings(std::cerr) )
+            show_lines(is, spos);
     }
 }
 
@@ -898,7 +896,6 @@ void Parser::parse_report(std::istream& is)
     {
         Glossary opt(blok);
         execute_report(file, what, opt);
-
         if ( opt.warnings(std::cerr) )
             show_lines(is, spos);
     }
@@ -928,7 +925,6 @@ void Parser::parse_call(std::istream& is)
     {
         Glossary opt(blok);
         execute_call(str, opt);
-    
         if ( opt.warnings(std::cerr) )
             show_lines(is, spos);
     }

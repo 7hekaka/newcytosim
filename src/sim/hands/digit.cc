@@ -48,16 +48,16 @@ void Digit::attach(FiberSite const& sit)
 
 void Digit::detach()
 {
-	/*
-	 We need to workaround the fact that when reading file, the lattice
-	 values can become out of sync with the states of the digits on the fiber.
-	 @todo: find a better fix for keeping Digit/Lattice sync
-	*/
-	if ( haMonitor->parent_flag() != 7 )
-	{
-		dec();
-		assert_true(vacant());
-	}
+    /*
+     We need to workaround the fact that when reading file, the lattice
+     values can become out of sync with the states of the digits on the fiber.
+     @todo: find a better fix for keeping Digit/Lattice sync
+    */
+    if ( haMonitor->parent_flag() != 7 )
+    {
+        dec();
+        assert_true(vacant());
+    }
     Hand::detach();
 }
 

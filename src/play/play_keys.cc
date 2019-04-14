@@ -111,7 +111,7 @@ PointDisp * nextPointDisp(PropertyList const& plist, int& cnt)
 
 
 void changePointDispSize(PropertyList const& plist, DisplayProp& DP, int inc,
-						 bool dos, bool dow)
+                         bool dos, bool dow)
 {
     for ( Property * i : plist )
     {
@@ -122,15 +122,15 @@ void changePointDispSize(PropertyList const& plist, DisplayProp& DP, int inc,
     
     if ( DP.style == 2 || plist.size() > 1 )
     {
-		if ( dow ) {
-			DP.link_width = grained(DP.link_width, inc);
-			flashText("simul:link_width %.2f", DP.link_width);
-		}
-		if ( dos ) {
-			DP.point_size = grained(DP.point_size, inc*2);
-			flashText("simul:point_size %.2f", DP.point_size);
-		}
-	}
+        if ( dow ) {
+            DP.link_width = grained(DP.link_width, inc);
+            flashText("simul:link_width %.2f", DP.link_width);
+        }
+        if ( dos ) {
+            DP.point_size = grained(DP.point_size, inc*2);
+            flashText("simul:point_size %.2f", DP.point_size);
+        }
+    }
     else if ( plist.size() == 1 )
     {
         PointDisp * p = toPointDisp(plist.front());
@@ -913,12 +913,12 @@ void processKey(unsigned char key)
             break;
             
         case '8':
-			changePointDispSize(player.allVisibleHandDisp(), DP, -1, !altKeyDown, !shiftKeyDown);
-			break;
-			
+            changePointDispSize(player.allVisibleHandDisp(), DP, -1, !altKeyDown, !shiftKeyDown);
+            break;
+            
         case '9':
-			changePointDispSize(player.allVisibleHandDisp(), DP, +1, !altKeyDown, !shiftKeyDown);
-			break;
+            changePointDispSize(player.allVisibleHandDisp(), DP, +1, !altKeyDown, !shiftKeyDown);
+            break;
 
         case '0':
             if ( altKeyDown )

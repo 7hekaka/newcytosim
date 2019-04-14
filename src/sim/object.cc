@@ -88,7 +88,10 @@ std::string Object::reference(ObjectTag tag, unsigned pix, ObjectID id)
  */
 std::string Object::reference() const
 {
-    return reference(tag(), property()->number(), identity());
+    if ( property() )
+        return reference(tag(), property()->number(), identity());
+    else
+        return reference(tag(), 0, identity());
 }
 
 

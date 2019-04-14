@@ -15,7 +15,7 @@ from __future__ import print_function
 import sys, os, shutil, time, subprocess
 
 exe = "diff"
-diff="diff -w --side-by-side -W200 -p --suppress-common-lines"
+diff="diff --side-by-side -W200 -p --suppress-common-lines"
 
 
 
@@ -63,14 +63,23 @@ def compareFiles(fileL, fileR):
 
 def interesting(file):
     return ( file.endswith('.py') or file.endswith('.m')
-        or file.endswith('.h')  or file.endswith('.cc')
-        or file.startswith('makefile') )
+        or file.endswith('.h') or file.endswith('.cc')
+        or file.endswith('.md') or file.endswith('.txt')
+        or file.startswith('makefile') or file.startswith('.cym') )
 
 
 def process_dir(roots, dirnameL, files):
     """compare files in the current directory"""
     #print("dirname=%s  args=%s" % (dirnameL,args))
     if 0 <= dirnameL.find('.svn'):
+        return
+    if 0 <= dirnameL.find('.git'):
+        return
+    if 0 <= dirnameL.find('DerivedData'):
+        return
+    if 0 <= dirnameL.find('bin'):
+        return
+    if 0 <= dirnameL.find('build'):
         return
     dirnameR = dirnameL.replace(roots[0], roots[1])
     spacer(dirnameL)
@@ -100,7 +109,7 @@ def main(args):
         process_dir([rootL, rootR], path, files)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3 or sys.argv[1].endswith("help"):
+    if len(sys.argv) < 3 or sys.argv[1]=='help':
         print(__doc__)
     else:
         main(sys.argv[1:])

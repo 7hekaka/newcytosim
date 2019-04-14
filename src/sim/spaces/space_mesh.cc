@@ -8,6 +8,8 @@
 #include "meca.h"
 #include <fstream>
 
+#define COMPLETE_SPACE_MESH 0
+
 
 SpaceMesh::SpaceMesh(SpaceProp const* p)
 : Space(p)
