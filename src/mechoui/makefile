@@ -15,7 +15,7 @@ ifeq ($(Flags$(MODE)),)
    $(error No compiler-options defined for $$(MACHINE)=$(MACHINE) in mode $(MODE))
 endif
 
-CXXFLAGS=$(CXX) $(Flags$(MODE))
+CXXFLAGS=$(CXX) $(CXXFLG) $(Flags$(MODE))
 
 ifneq ($(HAS_PNG), 0)
     IMAGE_DEF = -DHAS_PNG $(INC_PNG)
@@ -64,7 +64,7 @@ build/saveimage.o: saveimage.cc saveimage.h
 # Attention: Mersenne-Twister is coded in C-language,
 # and we must provide this with '-x c' to the compiler:
 SFMT.o: SFMT.c SFMT.h
-	$(CXXFLAGS) -x c -DNDEBUG -DSFMT_MEXP=19937 -c $< -o build/$@
+	$(CXX) -x c -DNDEBUG -DSFMT_MEXP=19937 -c $< -o build/$@
 
 #----------------------------makedep--------------------------------------------
 

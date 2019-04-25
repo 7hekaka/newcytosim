@@ -91,7 +91,7 @@ void Movable::revolve(Rotation const& T)
 
 Vector Movable::readPrimitive(std::istream& is, const Space* spc)
 {
-    int c = Tokenizer::get_space(is, false);
+    int c = Tokenizer::skip_space(is, false);
 
     if ( c == EOF )
         return Vector(0,0,0);
@@ -560,7 +560,7 @@ Vector Movable::readPosition(std::istream& is, const Space* spc)
 
 Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* spc)
 {
-    int c = Tokenizer::get_space(is, false);
+    int c = Tokenizer::skip_space(is, false);
     
     if ( c == EOF )
         return Vector::randU();
@@ -717,7 +717,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* 
 
 Rotation Movable::readRotation(std::istream& is, Vector const& pos, const Space* spc)
 {
-    int c = Tokenizer::get_space(is, false);
+    int c = Tokenizer::skip_space(is, false);
     
     if ( c == EOF )
         return Rotation::randomRotation();

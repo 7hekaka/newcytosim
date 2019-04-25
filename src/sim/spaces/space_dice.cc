@@ -58,7 +58,7 @@ real SpaceDice::volume() const
 #else
     return 8 * length_[0]*length_[1]*length_[2]
     + 2 * (M_PI-4) * ( length_[0] + length_[1] + length_[2] - 3 * radius_ ) * radius_ * radius_
-    + (4/3.0 * M_PI - 8) * radius_ * radius_ * radius_;
+    + (4*M_PI/3.0 - 8) * radius_ * radius_ * radius_;
 #endif
 }
 

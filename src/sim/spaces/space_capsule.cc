@@ -1,11 +1,10 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-#include "dim.h"
+
 #include "space_capsule.h"
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "mecapoint.h"
 #include "meca.h"
-
 
 
 SpaceCapsule::SpaceCapsule(const SpaceProp* p)
@@ -51,17 +50,9 @@ real SpaceCapsule::volume() const
 #endif
 }
 
-
 bool SpaceCapsule::inside(Vector const& w) const
 {
-#if ( DIM > 2 )
-    real n = square(w.YY) + square(w.ZZ);
-#elif ( DIM > 1 )
-    real n = square(w.YY);
-#else
-    real n = 0;
-#endif
-    n += square(std::max((real)0, fabs(w.XX)-length_));
+    real n = w.normYZSqr() + square(std::max((real)0, fabs(w.XX)-length_));
     
     return ( n <= radiusSqr_ );
 }
@@ -70,14 +61,7 @@ bool SpaceCapsule::inside(Vector const& w) const
 bool SpaceCapsule::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
-#if ( DIM > 2 )
-    real n = square(w.YY) + square(w.ZZ);
-#elif ( DIM > 1 )
-    real n = square(w.YY);
-#else
-    real n = 0;
-#endif
-    n += square(std::max((real)0, fabs(w.XX)-length_));
+    real n = w.normYZSqr() + square(std::max((real)0, fabs(w.XX)-length_));
     
     return ( n <= square(radius_-rad) );
 }
@@ -86,13 +70,7 @@ bool SpaceCapsule::allInside(Vector const& w, const real rad) const
 Vector SpaceCapsule::project(Vector const& w) const
 {
     Vector p;
-#if ( DIM > 2 )
-    real n = square(w.YY) + square(w.ZZ);
-#elif ( DIM > 1 )
-    real n = square(w.YY);
-#else
-    real n = 0;
-#endif
+    real n = w.normYZSqr();
     
     //calculate the projection on the axis, within boundaries:
     if ( fabs(w.XX) > length_ )
@@ -102,7 +80,7 @@ Vector SpaceCapsule::project(Vector const& w) const
         //normalize from this point on the axis
         if ( n > 0 ) n = radius_ / sqrt(n);
         
-        p.XX = length_ + n * ( w.XX - L );
+        p.XX = L + n * ( w.XX - L );
     }
     else
     {

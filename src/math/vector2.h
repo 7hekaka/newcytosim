@@ -278,6 +278,12 @@ public:
     {
         return fabs(YY);
     }
+    
+    /// the 2D norm = y^2 since Z = 0
+    real normYZSqr() const
+    {
+        return YY*YY;
+    }
 
     /// square of the distance to other point, equivalent to (a-this).normSqr()
     real distanceSqr(Vector2 const& a) const

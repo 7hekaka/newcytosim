@@ -202,14 +202,7 @@ real Space::estimateVolume(unsigned long cnt) const
     unsigned long in = 0;
     for ( unsigned long i = 0; i < cnt; ++i )
     {
-        Vector pos;
-        pos.XX = inf.XX + dif.XX * RNG.preal();
-#if ( DIM > 1 )
-        pos.YY = inf.YY + dif.YY * RNG.preal();
-#endif
-#if ( DIM > 2 )
-        pos.ZZ = inf.ZZ + dif.ZZ * RNG.preal();
-#endif
+        Vector pos = inf + dif.e_mul(Vector::randP());
         in += inside(pos);
     }
     

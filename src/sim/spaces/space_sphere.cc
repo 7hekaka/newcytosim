@@ -38,7 +38,7 @@ real SpaceSphere::volume() const
 #elif ( DIM == 2 )
     return M_PI * square(radius_);
 #else
-    return 4/3.0 * M_PI * cube(radius_);
+    return 4*M_PI/3.0 * cube(radius_);
 #endif
 }
 

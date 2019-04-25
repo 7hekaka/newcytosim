@@ -53,7 +53,6 @@ void processNormalKey(unsigned char c, int x, int y)
             break;
         case 'p':
         {
-            const unsigned int minDelay = 2;
             if ( pam.delay < 6 )
                 pam.delay = 3;
             else
@@ -103,9 +102,9 @@ void  processMouseClick(int mx, int my, const Vector3 & a, int)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPickMatrix(mx, my, 2, 2, viewport);
-    view.makeProjection();
+    view.setProjection();
     pam.selected = mesh.pick();
-    view.makeProjection();
+    view.setProjection();
     glMatrixMode(GL_MODELVIEW);
 
 }
@@ -126,7 +125,7 @@ void timer(int value)
 }
 
 
-void display()
+void display(View&, int)
 {
     pam.back_color.load_clear();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

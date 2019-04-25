@@ -212,7 +212,7 @@ void SpaceProp::read(Glossary& glos)
         if ( glos.set(str, "geometry") )
         {
             std::stringstream iss(str);
-            iss >> shape;
+            iss >> shape >> std::ws;
             std::getline(iss, dimensions);
             if ( dimensions.empty() )
                 throw InvalidParameter("space:geometry should contains dimensions");

@@ -50,9 +50,9 @@ real SpaceTee::volume() const
     return( base + arm );
 #else
     //the complete base cylinder
-    real base  = 2 * tLength * M_PI * tRadiusSq + 4./3. * M_PI * tRadius * tRadiusSq;
+    real base  = 2*M_PI * tLength * tRadiusSq + 4*M_PI/3.0 * tRadius * tRadiusSq;
     //the part of the arm with y > tRadius
-    real arm   =  tArmLength * M_PI * tRadiusSq + 2./3. * M_PI * tRadius * tRadiusSq;
+    real arm   =  tArmLength * M_PI * tRadiusSq + 2*M_PI/3.0 * tRadius * tRadiusSq;
     //the part of the arm with y < tRadius without the intersection with the base 
     real inter = ( M_PI - 8./3. )*tRadius*tRadiusSq;
     return( base + arm + inter );

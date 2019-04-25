@@ -5,6 +5,7 @@
 *  [**Overview**](main/overview.md)
 *  [Getting started (introduction to the command line)](main/starter.md)
 *  [The configuration file](sim/config.md)
+*  [Units in Cytosim `(s, um, pN)`](sim/units.md)
 *  [Set of standard config files](main/examples.md)
 *  [**Tutorials**](tutorials/index.md)
 *  [Simulation engine](sim/index.md)

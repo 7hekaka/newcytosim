@@ -34,7 +34,7 @@ std::string Tokenizer::get_line(std::istream& is)
 }
 
 
-int Tokenizer::get_space(std::istream& is, bool eat_line)
+int Tokenizer::skip_space(std::istream& is, bool eat_line)
 {
     int c = is.get();
     while ( isspace(c) )
@@ -103,7 +103,7 @@ bool valid_symbol(int c)
  */
 std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
 {
-    int c = get_space(is, eat_line);
+    int c = skip_space(is, eat_line);
     
     if ( !isalpha(c) )
         return "";
@@ -121,7 +121,7 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
  */
 std::string Tokenizer::get_symbols(std::istream& is, bool eat_line)
 {
-    int c = get_space(is, eat_line);
+    int c = skip_space(is, eat_line);
     
     if ( !isalpha(c) )
         return "";
@@ -152,7 +152,7 @@ bool valid_filename(int c)
  */
 std::string Tokenizer::get_filename(std::istream& is, bool eat_line)
 {
-    int c = get_space(is, eat_line);
+    int c = skip_space(is, eat_line);
     
     if ( c == '*' )
     {
@@ -442,7 +442,7 @@ std::string Tokenizer::get_hexadecimal(std::istream& is)
 
 std::string Tokenizer::get_token(std::istream& is, bool eat_line)
 {
-    int c = get_space(is, eat_line);
+    int c = skip_space(is, eat_line);
  
     if ( c == EOF )
         return "";
@@ -545,7 +545,7 @@ std::string Tokenizer::get_block(std::istream& is, char c_in)
 {
     assert_true(c_in);
     
-    int c = get_space(is, true);
+    int c = skip_space(is, true);
     
     if ( c == c_in )
     {
@@ -561,7 +561,7 @@ std::string Tokenizer::get_block(std::istream& is, char c_in)
 
 std::string Tokenizer::get_block(std::istream& is)
 {
-    int c = get_space(is, true);
+    int c = skip_space(is, true);
     
     if ( block_delimiter(c) )
         return get_block_text(is, (char)c, block_delimiter(c));

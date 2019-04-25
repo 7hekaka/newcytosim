@@ -198,6 +198,12 @@ public:
         return 0;
     }
     
+    /// the 2D norm = 0 since Y = Z = 0
+    real normYZSqr() const
+    {
+        return 0;
+    }
+
     /// square of the distance to other point, equivalent to (a-this).normSqr()
     real distanceSqr(Vector1 const& a) const
     {

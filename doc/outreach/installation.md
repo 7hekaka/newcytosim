@@ -158,13 +158,13 @@ When moving the sliders, a message should appear on the top right corner of the 
 
 # Practical details
 
-Off site preparation (~ 2 weeks, which does not need to be repeated):
+Off-site preparation (~ 2 weeks, which does not need to be repeated):
 
 - Modifying Cytosim
 - Writing `cytomaster` derived from `midi2cyto` (Gaelle LETORT)
 - Preparing 5 models
 
-On site (~ 2 hours):
+On-site (~ 1 hour):
 
 - Connect all equipment (15 min.)
 - Adjust `cytomaster.cpp` to the controller, changing the slider numbers (40 min.).

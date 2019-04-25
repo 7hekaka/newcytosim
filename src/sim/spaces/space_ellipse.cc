@@ -105,7 +105,7 @@ bool  SpaceEllipse::inside(Vector const& w) const
 
 real SpaceEllipse::volume() const
 {
-    return 4/3.0 * M_PI * length_[0] * length_[1] * length_[2];
+    return 4*M_PI/3.0 * length_[0] * length_[1] * length_[2];
 }
 
 bool SpaceEllipse::inside(Vector const& w) const

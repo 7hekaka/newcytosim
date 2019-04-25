@@ -22,7 +22,7 @@ class SpaceCapsule : public Space
 
 private:
     
-    /// half the length of the central cylinder, not counting the caps
+    /// half the length of the central cylinder, hemispherical caps not included
     real  length_;
     
     /// the radius of the hemisphere

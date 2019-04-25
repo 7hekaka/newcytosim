@@ -524,8 +524,7 @@ class MidiInApi : public MidiApi
   :front(0), back(0), ringSize(0), ring(0) {}
     bool push(const MidiMessage&);
     bool pop(std::vector<unsigned char>*, double*);
-    unsigned int size(unsigned int *back=0,
-		      unsigned int *front=0);
+    unsigned int size(unsigned int *back=0, unsigned int *front=0);
   };
 
   // The RtMidiInData structure is used to pass private class data to

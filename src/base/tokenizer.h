@@ -19,7 +19,7 @@ namespace Tokenizer
     inline char block_delimiter(int c) { return block_delimiter((char)c); }
     
     /// skip space and new-line if `eat_line`==true, return the next character
-    int get_space(std::istream& is, bool eat_line);
+    int skip_space(std::istream& is, bool eat_line);
     
     /// skip upcomming characters for which isspace() is true, and new-line if `eat_line`==true
     int get_character(std::istream& is, bool eat_space=true, bool eat_line=false);

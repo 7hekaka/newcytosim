@@ -313,7 +313,13 @@ public:
     {
         return sqrt(YY*YY + ZZ*ZZ);
     }
-    
+
+    /// the 2D norm = y^2+z^2
+    real normYZSqr() const
+    {
+        return YY*YY + ZZ*ZZ;
+    }
+
     /// square of the distance to other point, equivalent to (a-this).normSqr()
     real distanceSqr(Vector3 const& a) const
     {

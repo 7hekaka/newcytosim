@@ -27,7 +27,7 @@ Glossary opt;
 SpaceProp prop("test_space");
 
 // Space to be tested:
-Space * spc = 0;
+Space * spc = nullptr;
 
 // number of points
 const int maxpts = 1<<17;
@@ -179,7 +179,7 @@ void setGeometry()
         if ( spc )
         {
             delete(spc);
-            spc = 0;
+            spc = nullptr;
         }
         spc = prop.newSpace(opt);
     
@@ -564,5 +564,4 @@ int main(int argc, char* argv[])
     
     return EXIT_SUCCESS;
 }
-
 

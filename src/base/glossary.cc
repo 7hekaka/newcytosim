@@ -330,7 +330,7 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
         if ( k.size() || delimited )
             add_value(res, k, true);
         // go to next line:
-        Tokenizer::get_space(is, true);
+        Tokenizer::skip_space(is, true);
         return 1;
     }
     
@@ -436,7 +436,7 @@ void Glossary::define(key_type const& k, const std::string& rhs)
 
 void Glossary::read_entry(std::istream& is, int no_overwrite)
 {
-    int c = Tokenizer::get_space(is, true);
+    int c = Tokenizer::skip_space(is, true);
     std::streampos isp = is.tellg();
 
     if ( c == EOF )
