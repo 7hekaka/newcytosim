@@ -138,7 +138,7 @@ Space * SpaceProp::newSpace() const
 #endif
     
 #if ( 1 )
-    std::cerr << "INCIDENT: using unbounded Space instead of unknown class `"+s+"'\n";
+    std::cerr << "Warning: substituting unbounded Space for unknown `"+s+"'\n";
     return new Space(this);
 #endif
     return nullptr;

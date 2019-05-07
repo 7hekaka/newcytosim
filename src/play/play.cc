@@ -97,38 +97,6 @@ void blitBuffers(GLuint normal, GLuint multi, GLint W, GLint H)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, normal);
 }
 
-#ifndef HEADLESS_PLAYER
-/*
- This is needed to work around a bug on Mac OSX 10.14 Mojave,
- and to enter fullscreen with a bit of delay compared to startup
-*/
-void delayedCallback(int cnt)
-{
-    static int W = 800, H = 800;
-    if ( cnt == 1 )
-    {
-        glutTimerFunc(16, delayedCallback, cnt-1);
-#ifdef __APPLE__
-        View view = glApp::currentView();
-        W = view.window_size[0];
-        H = view.window_size[1];
-        glutReshapeWindow(W-1, H);
-#endif
-    }
-    else if ( cnt == 0 )
-    {
-        if ( glApp::isFullScreen() )
-            glutFullScreen();
-#ifdef __APPLE__
-        else
-            glutReshapeWindow(W, H);
-#endif
-    }
-    else
-        glutTimerFunc(16, delayedCallback, cnt-1);
-}
-#endif
-
 //------------------------------------------------------------------------------
 #pragma mark - main
 
@@ -191,7 +159,7 @@ int main(int argc, char* argv[])
         std::cout << "    DIM = " << DIM << '\n';
         return EXIT_SUCCESS;
     }
-	
+    
     if ( arg.use_key("live") )
         player.goLive = true;
     
@@ -421,7 +389,8 @@ int main(int argc, char* argv[])
         player.setStyle(DP.style);
         buildMenus();
         glutTimerFunc(100, timerCallback, 0);
-        glutTimerFunc(32, delayedCallback, 7);
+        if ( glApp::isFullScreen() )
+            glutFullScreen();
     }
     catch ( Exception & e )
     {

@@ -37,5 +37,3 @@ void Actor::stepLoaded(Vector const& force, real force_norm)
     // do something:
 }
 
-
-

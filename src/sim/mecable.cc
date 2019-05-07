@@ -8,7 +8,6 @@
 #include "space.h"
 
 
-
 //------------------------------------------------------------------------------
 /**
 clear pointers
@@ -356,14 +355,12 @@ bool Mecable::allInside(const Space * spc) const
 #pragma mark - Read/write
 
 
-
 void Mecable::write(Outputter& out) const
 {
     out.writeUInt16(nPoints);
     for ( unsigned int p = 0; p < nPoints ; ++p )
         out.writeFloatVector(pPos+DIM*p, DIM, '\n');
 }
-
 
 
 void Mecable::read(Inputter& in, Simul&, ObjectTag)

@@ -59,8 +59,6 @@ private:
     Simul*    simul_ptr() const { return &Object::simul(); }
     /// specialization of HandMonitor
     real      interactionLength() const;
-    /// specialization of HandMonitor
-    ObjectFlag parent_flag() const { return flag(); }
 
 protected:
     

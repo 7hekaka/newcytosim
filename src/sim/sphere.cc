@@ -58,7 +58,6 @@ Sphere::Sphere(SphereProp const* p, real rad)
 }
 
 
-
 Sphere::Sphere(const Sphere & o)
 : Mecable(o)
 {
@@ -623,7 +622,6 @@ void Sphere::setSpeedsFromForces(const real* X, const real alpha, real* Y) const
 }
 
 #endif
-
 
 
 //------------------------------------------------------------------------------

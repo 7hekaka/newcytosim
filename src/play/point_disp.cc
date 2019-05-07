@@ -288,7 +288,6 @@ void PointDisp::downsampleRGBA(GLubyte dst[], unsigned sx, unsigned sy,
 }
 
 
-
 void PointDisp::storePixelmap(GLubyte* bitmap, unsigned dim, GLuint pbi) const
 {
 #if POINTDISP_USES_PIXEL_BUFFERS
@@ -513,7 +512,6 @@ void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
 
 
 #pragma mark - I/O
-
 
 
 void PointDisp::read(Glossary& glos)

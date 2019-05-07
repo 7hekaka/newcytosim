@@ -60,7 +60,6 @@ void ForkProp::complete(Simul const& sim)
 }
 
 
-
 void ForkProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);

@@ -49,7 +49,6 @@ void KinesinProp::complete(Simul const& sim)
 }
 
 
-
 void KinesinProp::write_values(std::ostream& os) const
 {
     DigitProp::write_values(os);

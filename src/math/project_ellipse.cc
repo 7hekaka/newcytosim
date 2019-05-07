@@ -137,10 +137,6 @@ void projectEllipse(real&   pX, real&  pY,
 }
 
 
-
-
-
-
 /**
  Calculates the projection P = (pX, pY, pZ) of the point W = (wX, wY, wZ) on the ellipse that
  is aligned with the X and Y axis, and has radii (lenX, lenY, lenZ).
@@ -293,9 +289,6 @@ void projectEllipsoid(real  p[3],
     fprintf(stderr, " %2i  >>> h %12.8f  F  %+e\n", cnt, h, F);
 #endif
 }
-
-
-
 
 
 #if ( 0 )

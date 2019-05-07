@@ -41,7 +41,6 @@ MatrixSparseSymmetric1::MatrixSparseSymmetric1()
 }
 
 
-
 void MatrixSparseSymmetric1::allocate(size_t alc)
 {
     if ( alc > allocated_ )
@@ -389,7 +388,6 @@ void MatrixSparseSymmetric1::addDiagonalBlock(real* mat, unsigned ldd,
         }
     }
 }
-
 
 
 int MatrixSparseSymmetric1::bad() const

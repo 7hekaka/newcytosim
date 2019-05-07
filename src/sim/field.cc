@@ -8,7 +8,6 @@
 #include "sim.h"
 
 
-
 /**
  Initialize the diffusion matrix using periodic boundary conditions
  if the underlying space is peridic
@@ -83,7 +82,6 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
 }
 
 
-
 /**
  Initialize Field to be ready for step()
  */
@@ -137,7 +135,6 @@ void Field::prepare()
         }
     }
 }
-
 
 
 #pragma mark -
@@ -291,7 +288,6 @@ void Field::laplacian(const real* field, real * mat) const
 }
 
 
-
 void Field::setEdgesX(real * field, real val)
 {
     const FieldGrid::index_t nbc = mGrid.nbCells();
@@ -359,7 +355,6 @@ void Field::setEdgesZ(real * field, real val)
     }
 #endif
 }
-
 
 
 /**

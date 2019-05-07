@@ -91,7 +91,6 @@ void drawValues(Grid<CELL, 2> const& grid,
 }
 
 
-
 /// display the slice of a 3D grid in a plane parallel to XY at `Z = z_pos`
 /**
  OpenGL color is to be specified by the provided function:
@@ -164,7 +163,6 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
 }
 
 
-
 // display the slice of a 3D grid in a plane parallel to X: `X=pos`
 /**
  OpenGL color is to be specified by the provided function:
@@ -199,8 +197,6 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
         }
     }
 }
-
-
 
 
 /// display a slice of the field in a plane perpendicular to 'dir'

@@ -13,7 +13,6 @@ Hand * MyosinProp::newHand(HandMonitor* m) const
 }
 
 
-
 void MyosinProp::clear()
 {
     DigitProp::clear();
@@ -49,7 +48,6 @@ void MyosinProp::complete(Simul const& sim)
     stepping_rate_dt  = sim.prop->time_step * stepping_rate;
     var_rate_dt       = std::copysign(stepping_rate_dt/stall_force, unloaded_speed);
 }
-
 
 
 void MyosinProp::write_values(std::ostream& os) const

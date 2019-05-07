@@ -77,7 +77,6 @@ void flip_cap( GLenum cap )
 }
 
 
-
 void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c)

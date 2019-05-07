@@ -60,7 +60,6 @@ void AsterProp::complete(Simul const& sim)
 }
 
 
-
 //------------------------------------------------------------------------------
 
 void AsterProp::write_values(std::ostream& os) const

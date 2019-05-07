@@ -46,6 +46,9 @@ class PointsOnSphere
 {
 public:
     
+    /// a-priori expected distance between neighboring points, as a function of number of points
+    static real expectedDistance(unsigned);
+
     /// default constructor, does nothing
     PointsOnSphere();
     
@@ -66,9 +69,6 @@ public:
     
     /// the 'virtual' total energy of the configuration
     real   finalEnergy() const { return energy_; }
-    
-    /// a-priori expected distance between neighboring points, as a function of number of points
-    static real expectedDistance(unsigned);
     
     /// minimum distance in the actual configuration, in 3D space
     real   minimumDistance();
@@ -95,7 +95,7 @@ public:
 private:
 
     /// This number affects convergence speed but not the result
-    static constexpr unsigned magic_seven = 7;
+    static constexpr unsigned SEVEN = 7;
     
     /// number of point on the sphere
     unsigned num_points_;

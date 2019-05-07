@@ -158,7 +158,6 @@ uint32_t Inputter::readUInt32()
 }
 
 
-
 float Inputter::readFloat()
 {
     float v;
@@ -403,7 +402,6 @@ void Outputter::writeInt32(const int n, char before)
 }
 
 
-
 void Outputter::writeUInt8(const unsigned n, char before)
 {
     uint8_t v = (uint8_t)n;
@@ -484,7 +482,6 @@ void Outputter::writeUInt32(const unsigned n, char before)
         }
     }
 }
-
 
 
 void Outputter::writeFloat(const float x)

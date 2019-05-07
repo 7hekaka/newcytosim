@@ -35,7 +35,6 @@ void ObjectSet::unlink(Object * obj)
 #pragma mark -
 
 
-
 /**
  Translate all listed movable objects ( Object::mobile()==true ) by `vec`
  */
@@ -72,7 +71,6 @@ void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso)
         }
     }
 }
-
 
 
 void ObjectSet::flagObjects(ObjectList const& objs, ObjectFlag f)
@@ -330,7 +328,6 @@ Object * ObjectSet::findObject(Property const* prop) const
             return obj;
     return nullptr;
 }
-
 
 
 unsigned ObjectSet::count(const NodeList & list,

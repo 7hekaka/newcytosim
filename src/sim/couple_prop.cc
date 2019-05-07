@@ -153,7 +153,6 @@ void CoupleProp::complete(Simul const& sim)
 }
 
 
-
 void CoupleProp::write_values(std::ostream& os) const
 {
     write_value(os, "hand1",           hand1);

@@ -20,6 +20,7 @@
 
  @ingroup SpaceGroup
 */
+/// Periodic boundary conditions in all but the last dimension
 class SpaceLid : public Space
 {
 private:

@@ -69,7 +69,6 @@ void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
 }
 
 
-
 void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char prefix[],
                               char keep, char skip)
 {

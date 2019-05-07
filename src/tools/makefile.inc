@@ -38,7 +38,6 @@ reader: reader.cc frame_reader.o $(TOOL_OBJ)
 vpath reader bin
 
 
-
 report: report.cc frame_reader.o $(TOOL_OBJ) | bin
 	$(COMPILE) $(TOOL_INC) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
@@ -61,7 +60,6 @@ bin3/report: report.cc frame_reader.o cytosimD3.a cytospaceD3.a cytomathD3.a cyt
 	$(COMPILE) -DDIM=3 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin3/report
 	$(DONE)
 vpath bin3/report bin3
-
 
 
 

@@ -22,7 +22,7 @@ class LineDisp;
 
 
 /// Flag to associate a Lattice to the Fiber
-#define FIBER_HAS_LATTICE 1
+#define FIBER_HAS_LATTICE -1
 
 /**
  @todo Allow type of FiberLattice to be selected at run time,
@@ -190,7 +190,7 @@ public:
     
     /// return the abscissa of the closest position to `w` on this Fiber, and set `dis` to the square of the distance
     real           projectPoint(Vector const& w, real & dis) const;
-        
+    
     //--------------------------------------------------------------------------
     
     /// return assembly/disassembly state of MINUS_END

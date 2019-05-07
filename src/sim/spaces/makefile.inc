@@ -38,7 +38,6 @@ cytospaceD3.a: $(OBJ_SPACED3)
 	$(DONE)
 
 
-
 #library with display
 cytospaceG.a: $(OBJ_SPACEG)
 	$(MAKELIB)

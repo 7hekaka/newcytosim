@@ -113,7 +113,6 @@ Vector SpaceCapsule::project(Vector const& w) const
 }
 
 
-
 Vector SpaceCapsule::randomPlace() const
 {
     size_t nb_trials = 1<<13;

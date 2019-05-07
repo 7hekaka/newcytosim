@@ -23,7 +23,6 @@ MatrixSparse::MatrixSparse()
 }
 
 
-
 void MatrixSparse::allocate(size_t sz)
 {
     size_ = sz;
@@ -347,7 +346,6 @@ void MatrixSparse::vecMulAddIso3D( const real* X, real* Y ) const
             }
     }
 }
-
 
 
 #else  //MATRIX_OPTIMIZED_MULTIPLY

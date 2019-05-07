@@ -63,7 +63,6 @@ Filament::Filament()
 }
 
 
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -1155,13 +1154,14 @@ void Filament::segmentationVariance(real& avg, real& var) const
      curvature = 2 * sin(angle) / |AC|
      curvature = 2 * sqrt( ( 1 - cos(angle)^2 ) / AC^2 )
 
+ curvature is ZERO if A, B and C are aligned
  */
 real curvature3(Vector const& A, Vector const& B, Vector const& C)
 {
     Vector ab = B - A;
     Vector bc = C - B;
     real P = dot(ab, bc);
-    real S = 1.0 - ( P * P ) / ( ab.normSqr() * bc.normSqr() );
+    real S = std::max(0.0, 1.0 - ( P * P ) / ( ab.normSqr() * bc.normSqr() ));
     real D = ( C - A ).normSqr();
     return 2.0 * sqrt( S / D );
 }
@@ -1414,7 +1414,7 @@ void Filament::adjustSegmentation()
 
 #else
 
-static const real RECUT_PRECISION = 0.05;
+static constexpr real RECUT_PRECISION = 0.05;
 
 /**
  A fiber is segmented as a function of its curvature.
@@ -1775,7 +1775,6 @@ Vector Filament::dirEnd(const FiberEnd end) const
     else
         return dirM(abscissaFrom(0, end));
 }
-
 
 
 /// force on the PLUS_END projected on the direction of elongation

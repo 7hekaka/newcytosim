@@ -10,7 +10,6 @@
 #endif
 
 
-
 /// Scalar type (real) for a Field
 /**
  Example of type that can be used in Field
@@ -52,9 +51,6 @@ public:
 };
 
 
-
-
-
 /// Vector of N scalar, suitable for a Field
 /**
  Example of type that can be used in Field
@@ -93,7 +89,6 @@ public:
     }
 #endif
 };
-
 
 
 #endif

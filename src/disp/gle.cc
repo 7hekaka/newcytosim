@@ -320,13 +320,24 @@ namespace gle
     
     void gleTriangleS()
     {
-        glBegin(GL_TRIANGLES);
-        glNormal3f(0, 0, 1);
-        const GLfloat H = 0.8660254037844386f; //sqrt(3)/2;
-        glVertex2f( 0,  1.0);
-        glVertex2f(-H, -0.5);
-        glVertex2f( H, -0.5);
-        glEnd();
+        constexpr GLfloat H = 0.8660254037844386f; //sqrt(3)/2;
+        const GLfloat pts[] = {
+             0,  1.0, 0,
+            -H, -0.5, 0,
+             H, -0.5, 0 };
+
+        const GLfloat dir[] = {
+            0, 0, 1.0,
+            0, 0, 1.0,
+            0, 0, 1.0 };
+        
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glNormalPointer(GL_FLOAT, 0, dir);
+        glDrawArrays(GL_TRIANGLES, 0, 1);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
     }
     
     void gleTriangleL()
@@ -786,7 +797,7 @@ namespace gle
              X, -H, B,  X, -H, A,
              R,  0, B,  R,  0, A };
         
-        const GLfloat nor[] = {
+        const GLfloat dir[] = {
              1,  0, 0,  1,  0, 0,
              S,  C, 0,  S,  C, 0,
             -S,  C, 0, -S,  C, 0,
@@ -798,11 +809,11 @@ namespace gle
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, nor);
+        glNormalPointer(GL_FLOAT, 0, dir);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
         glDisableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
-   }
+    }
     
     
     void gleCylinder1()
@@ -1060,6 +1071,52 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
+    
+    void gleCube1()
+    {
+        constexpr GLfloat R = 0.5;
+        constexpr GLfloat pts[] = {
+            -R,  R,  R,
+             R,  R,  R,
+            -R, -R,  R,
+             R, -R,  R,
+             R, -R, -R,
+             R,  R,  R,
+             R,  R, -R,
+            -R,  R,  R,
+            -R,  R, -R,
+            -R, -R,  R,
+            -R, -R, -R,
+             R, -R, -R,
+            -R,  R, -R,
+             R,  R, -R };
+        
+        constexpr GLfloat N = 0.5773502692;
+        constexpr GLfloat dir[] = {
+            -N,  N,  N,
+             N,  N,  N,
+            -N, -N,  N,
+             N, -N,  N,
+             N, -N, -N,
+             N,  N,  N,
+             N,  N, -N,
+            -N,  N,  N,
+            -N,  N, -N,
+            -N, -N,  N,
+            -N, -N, -N,
+             N, -N, -N,
+            -N,  N, -N,
+             N,  N, -N };
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glNormalPointer(GL_FLOAT, 0, dir);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+    }
+    
     void gleCylinderZ()
     {
         const GLfloat top =  0.5;
@@ -1507,23 +1564,17 @@ namespace gle
     void gleMan(Vector2 const& a, Vector2 const& da,
                 Vector2 const& b, Vector2 const& db)
     {
-#if ( 1 )
-        Vector2 vec[6] = { b-db, b, a-da, a+da, b, b+db };
-        assert_true(sizeof(vec)==12*sizeof(double));
-        glVertexPointer(2, GL_DOUBLE, 0, vec);
+        GLfloat pts[6];
+        (b-db).store(pts);
+        b.store(pts+2);
+        (a-da).store(pts+4);
+        (a+da).store(pts+6);
+        b.store(pts+8);
+        (b+db).store(pts+12);
+        glVertexPointer(2, GL_DOUBLE, 0, pts);
         glEnableClientState(GL_VERTEX_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_VERTEX_ARRAY);
-#else
-        glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(b-db);
-        gleVertex(b);
-        gleVertex(a-da);
-        gleVertex(a+da);
-        gleVertex(b);
-        gleVertex(b+db);
-        glEnd();
-#endif
     }
     
     /**
@@ -1533,38 +1584,20 @@ namespace gle
     void gleMan(Vector2 const& a, Vector2 const& da, gle_color ca,
                 Vector2 const& b, Vector2 const& db, gle_color cb)
     {
-#if ( 1 )
-        GLfloat col[6*4];
-        cb.put_floats(col);
-        cb.put_floats(col+4);
-        ca.put_floats(col+8);
-        ca.put_floats(col+12);
-        cb.put_floats(col+16);
-        cb.put_floats(col+20);
-        
-        Vector2 vec[6] = { b-db, b, a-da, a+da, b, b+db };
-        assert_true(sizeof(vec)==12*sizeof(double));
-        
+        GLfloat pts[6], col[6*4];
+        (b-db).store(pts);    cb.store(col);
+             b.store(pts+2);  cb.store(col+4);
+        (a-da).store(pts+4);  ca.store(col+8);
+        (a+da).store(pts+6);  ca.store(col+12);
+             b.store(pts+8);  cb.store(col+16);
+        (b+db).store(pts+12); cb.store(col+20);
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(2, GL_DOUBLE, 0, vec);
+        glVertexPointer(2, GL_DOUBLE, 0, pts);
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(4, GL_FLOAT, 0, col);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-#else
-        glBegin(GL_TRIANGLE_STRIP);
-        cb.load();
-        gleVertex(b-db);
-        gleVertex(b);
-        ca.load();
-        gleVertex(a-da);
-        gleVertex(a+da);
-        cb.load();
-        gleVertex(b);
-        gleVertex(b+db);
-        glEnd();
-#endif
     }
     
     

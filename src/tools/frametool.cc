@@ -38,7 +38,6 @@ char buf[buf_size];
 unsigned long frame_pid = 0;
 
 
-
 FILE * openfile(char name[], char const* mode)
 {
     FILE * file = fopen(name, mode);
@@ -254,7 +253,6 @@ void extract_pid(FILE* in, unsigned long pid)
             out = nullptr;
     }
 }
-
 
 
 void extractLast(FILE* in)

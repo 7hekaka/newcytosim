@@ -55,7 +55,6 @@ will fix problem for off-screen: glutBitmapCharacter() requires GLUT to be initi
 - Implement new 3D SideInteraction with vector product + include Maxima code in doxycomments
 - Extend 'properties.cmo' to be able to store multiple time-points?
 - Find a solution for 'confine = type, stiff, space' and 'confine = type, space' in Single.
-- Finish Event class
 
 - add generic classes that can be customized: OpenFiber, OpenHand, OpenCouple, OpenSingle...
 - fix SpaceBead: list of beads not set correctly after a read state.cym

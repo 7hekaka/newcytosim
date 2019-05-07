@@ -8,7 +8,6 @@
 #include "random.h"
 
 
-
 SpaceTee::SpaceTee(const SpaceProp* p)
 : Space(p)
 {

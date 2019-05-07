@@ -277,7 +277,6 @@ void testMatrix(MATRIX & mat,
 }
 
 
-
 void testMatrices(const int size, const int fill)
 {
     printf("\n **** Matrix size %i  filled %.1f %% :\n", size, fill*100.0/size/size);
@@ -317,7 +316,6 @@ void testMatrices(const int size, const int fill)
     delete[] inx;
     delete[] iny;
 }
-
 
 
 const real dir[4] = {  2, 1, -1, 3 };
@@ -416,7 +414,6 @@ void testMatrixBlock(const int size, const int fill)
     delete[] inx;
     delete[] iny;
 }
-
 
 
  int main( int argc, char* argv[] )

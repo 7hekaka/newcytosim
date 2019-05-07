@@ -229,7 +229,6 @@ void Meca::addTorque(const Interpolation & pta,
 }
 
 
-
 /**
  Add an explicit torque to induce two segments to make an angle
  defined by (cosinus, sinus) relative to each other:
@@ -1162,7 +1161,6 @@ void Meca::interLink3(const Mecapoint & pte,
 }
 
 
-
 /**
  Link `pti` (A) and interpolated point (B)
  The force is linear with a zero resting length:
@@ -1606,7 +1604,6 @@ void Meca::interLongLink(const Mecapoint & pte,
         off.add_to(ww[2], vBAS+ii2);
     }
 }
-
 
 
 /**
@@ -2780,7 +2777,6 @@ void Meca::interSideSlidingLink2D(const Interpolation & pta,
 }
 
 
-
 /**
  Alternative 2D method in which we add an offset to vBAS
  */
@@ -3307,7 +3303,6 @@ void Meca::addPointClamp(Mecapoint const& pta,
 }
 
 
-
 /**
  Link `pti` (A) and a fixed position `pos` (G)
  The force is linear:
@@ -3438,8 +3433,6 @@ void Meca::addSphereClamp(Interpolation const& pti,
 }
 
 
-
-
 /**
  Link `pte` (P) to a cylinder of axis X and radius `rad`
  The force is affine with non-zero resting length:
@@ -3551,7 +3544,6 @@ void Meca::addCylinderClampZ(const Mecapoint & pte,
 
 #endif
 }
-
 
 
 //------------------------------------------------------------------------------
@@ -3802,7 +3794,6 @@ void Meca::addLineClamp(const Mecapoint & pta,
 }
 
 
-
 /**
  Link `pta` and the line defined by `pos` (C) and tangent vector `dir`.
  The force is linear with position with a stiffness `weight`, and its
@@ -3851,7 +3842,6 @@ void Meca::addLineClamp(const Interpolation & pta,
     off.add_to(A, vBAS+ii0);
     off.add_to(B, vBAS+ii1);
 }
-
 
 
 /**
@@ -4020,5 +4010,4 @@ void Meca::interCoulomb( const Mecapoint & pta, const Mecapoint & ptb, real weig
         }
     }
 }
-
 

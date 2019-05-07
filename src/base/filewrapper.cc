@@ -117,7 +117,6 @@ void FileWrapper::put_line(const std::string& str, bool end)
 }
 
 
-
 void FileWrapper::get_line(std::string& line, const char sep)
 {
     line.clear();

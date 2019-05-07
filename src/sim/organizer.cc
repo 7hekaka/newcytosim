@@ -6,7 +6,6 @@
 #include "simul.h"
 
 
-
 Organizer::~Organizer()
 {
     //Cytosim::log("destroying Organizer %p\n", this);

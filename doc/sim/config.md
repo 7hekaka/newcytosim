@@ -1,6 +1,6 @@
 # Cytosim's Configuration File
 
-The virtual system and the sequence of actions to be performed is specified in a configuration file. This config file must be a plain text file produced by any plain text editor.
+The virtual system and the sequence of actions to be performed is specified in a configuration file. This config file must be a plain text file produced by many text editor.
 By default, it is called **`config.cym`**.
  
 Cytosim understand a [small set of commands](commands.md) and [predefined objects](objects.md) with their [associated parameters](parameters.md).

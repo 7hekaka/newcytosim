@@ -47,7 +47,6 @@ void CrosslinkProp::complete(Simul const& sim)
 }
 
 
-
 void CrosslinkProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);

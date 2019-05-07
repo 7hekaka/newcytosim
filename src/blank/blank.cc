@@ -54,6 +54,7 @@ void simStep()
     glApp::postRedisplay();
 }
 
+
 void * simulateForever(void *)
 {
     simReset();
@@ -65,7 +66,7 @@ void * simulateForever(void *)
     }
 }
 
-//------------------------------------------------------------------------------
+
 void simulateToFile(FILE * out)
 {
     for(unsigned i = 0; i < PAM.max; ++i)
@@ -138,7 +139,7 @@ void processNormalKey(unsigned char c, int x, int y)
 }
 
 /// mouse callback for shift-click, with unprojected mouse position
-void processMouseClick(const Vector3 & a, int)
+void processMouseClick(int, int, const Vector3& a, int)
 {
     
     glApp::flashText("click %.1f %.1f %.1f", a.XX, a.YY, a.ZZ);
@@ -146,7 +147,7 @@ void processMouseClick(const Vector3 & a, int)
 }
 
 /// mouse callback for shift-drag, with unprojected mouse positions
-void processMouseDrag(Vector3 & a, const Vector3 & b, int)
+void processMouseDrag(int, int, Vector3& a, const Vector3& b, int)
 {
     
     glApp::flashText("move %.1f %.1f %.1f", b.XX, b.YY, b.ZZ);
@@ -162,11 +163,11 @@ void timerFunction(int value)
 }
 
 //------------------------------------------------------------------------------
-void display()
+void display(View& view, int)
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-    glApp::currentView().full_label = "- " + std::to_string(sTime);
+    view.setLabel(std::to_string(sTime));
 
     glPointSize(6);
     glBegin(GL_POINTS);
@@ -241,9 +242,9 @@ int main(int argc, char* argv[])
     gle::initialize();
     simReset();
     
-    pthread_mutex_init(&mutex, 0);
-    pthread_cond_init(&condition, 0);
-    pthread_create(&slave, 0, &simulateForever, 0);
+    pthread_mutex_init(&mutex, nullptr);
+    pthread_cond_init(&condition, nullptr);
+    pthread_create(&slave, nullptr, &simulateForever, nullptr);
 
     timerFunction(0);
     glutMainLoop();

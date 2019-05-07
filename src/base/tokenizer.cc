@@ -646,5 +646,3 @@ std::string Tokenizer::trimmed(std::string const& str, const std::string& ws)
     return str.substr(beg, 1+end-beg);
 }
 
-
-

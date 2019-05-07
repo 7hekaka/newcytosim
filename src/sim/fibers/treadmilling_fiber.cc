@@ -51,8 +51,6 @@ real TreadmillingFiber::freshAssemblyM() const
 }
 
 
-
-
 unsigned TreadmillingFiber::dynamicStateP() const
 {
     return mStateP;

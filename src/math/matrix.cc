@@ -131,5 +131,3 @@ void Matrix::printSparse(std::ostream& os) const
         }
 }
 
-
-

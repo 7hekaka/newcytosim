@@ -6,7 +6,6 @@
 KiDy:  Kinesin & Dynein
 
 
-
 ### Idea 1
 
 Throw filaments randomly in rectangular space. Equilibrate shape to not be straight.

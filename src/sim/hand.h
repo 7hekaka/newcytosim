@@ -136,7 +136,11 @@ public:
     /// detach
     virtual void   detach();
 
-    
+#if FIBER_HAS_LATTICE
+    /// detach only if of Digit class
+    void   detachDigit() { if ( fbLattice ) detach(); }
+#endif
+
     /// simulate when the Hand is not attached
     virtual void   stepUnattached(FiberGrid const&, Vector const& pos);
 

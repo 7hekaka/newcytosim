@@ -330,6 +330,36 @@ With (3) the new fiber is created at the position of the Nucleator.
 
 ### Motors ##########################################
  
+<details>
+<summary>
+**I simulate a gliding assay. How can I convert the value for surface density in the simulation to a filament line density that we know from experiments?**
+</summary>
+The best way to calibrate is indeed to output the actual number of attached motors in the simulation and to match this number with the desired value.
+You can get the number of bound motor using `report`.
+</details>
+
+
+<details>
+<summary>
+**I simulate a gliding assay. Can I predict the density of bound motors along the filaments from the parameter of the simulation?**
+</summary>
+Yes the number of bound motors can be predicted:
+
+	The capture area = A = length_of_filament * 2 * binding_range
+	Number of motors in this area = A * density_of_immobilized_motors
+
+For this N motors you have an equilibrium:
+
+	U = unbound motors
+	B = bound motors
+	U + B = N
+	U -> B with rate `binding_rate`
+	B -> U with rate `unbinding_rate`.
+
+You can easily solve the equilibrium for this system analytically.
+If the unbinding depends of force, and the effect is significant, you will see a disagreement with the simulation.
+</details>
+
 
 <details>
 <summary>
@@ -869,7 +899,19 @@ There are many other outputs possible, listed in the file `simul_report.cc`.
 </details>
 
 
+<details>
+<summary>
+**I am performing a parameter sweep with `scan.py`. How can I get different names for the report file?**
+</summary>
+You can use `preconfig` to template the file name:
 
+	report fiber:force force_[[nb]].txt
+
+Normally, these files will be created in the local run folder, but you may also use:
+
+	report fiber:force ../report.txt
+	
+</details>
 
 # Compilation #################################################
 
@@ -1214,5 +1256,5 @@ Please write to feedbackATcytosimDOTorg
 
 
 
-FJN, 6.3.2019
+FJN, 2.5.2019
 

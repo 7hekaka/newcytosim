@@ -242,6 +242,17 @@ void SingleSet::freeze(ObjectFlag f)
     relax();
     ObjectSet::flag(aList, f);
     ObjectSet::flag(fList, f);
+    
+#if FIBER_HAS_LATTICE
+    /* This patch is necessary when reading from file, as the Lattice will be
+     read before the Hands are read, leading to out-of-sync information between
+     Hands positions and Lattice values */
+    for (Single *s=firstA(), *n; s; s=n)
+    {
+        n = s->next();
+        s->hand()->detachDigit();
+    }
+#endif
 }
 
 
@@ -286,10 +297,11 @@ int SingleSet::bad() const
     }
     
     code = aList.bad();
-    if ( code ) return code;
-    for ( ghi = firstA();  ghi ; ghi=ghi->next() )
+    if ( !code )
     {
-        if ( !ghi->attached() ) return 101;
+        for ( ghi = firstA();  ghi ; ghi=ghi->next() )
+            if ( !ghi->attached() )
+                return 101;
     }
     
     return code;
@@ -496,7 +508,6 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserveList& reserve)
         }
     }
 }
-
 
 
 /**

@@ -105,10 +105,12 @@ namespace glApp
     void       processPassiveMouseMotion(int x, int y);
     
     /// set callback for shift-click, with unprojected down-position
-    void       actionFunc(void (*func)(int, int, const Vector3 &, int));
+    //func(mouseX, mouseY, mouseDown, specialKeys);
+    void       actionFunc(void (*func)(int, int, const Vector3&, int));
     
     /// set callback for shift-click, with unprojected down- and current- mouse positions
-    void       actionFunc(void (*func)(int, int, Vector3 &, const Vector3 &, int));
+    //func(mouseX, mouseY, mouseDown, mousePosition, specialKeys);
+    void       actionFunc(void (*func)(int, int, Vector3&, const Vector3&, int));
     
     //---------------------------------MESSAGES---------------------------------
     

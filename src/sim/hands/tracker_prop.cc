@@ -45,7 +45,6 @@ void TrackerProp::complete(Simul const& sim)
 }
 
 
-
 void TrackerProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);

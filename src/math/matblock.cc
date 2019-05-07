@@ -109,7 +109,6 @@ MatrixOfBlocks::index_t MatrixOfBlocks::calculateSize()
 }
 
 
-
 //------------------------------------------------------------------------------
 real* MatrixOfBlocks::addr(index_t ii, index_t jj) const
 {

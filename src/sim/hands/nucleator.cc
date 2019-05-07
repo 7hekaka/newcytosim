@@ -173,7 +173,6 @@ void Nucleator::stepUnattached(const FiberGrid&, Vector const& pos)
 }
 
 
-
 void Nucleator::stepUnloaded()
 {
     assert_true( attached() );
@@ -194,7 +193,6 @@ void Nucleator::stepUnloaded()
     else if ( prop->track_end == PLUS_END )
         relocateP();
 }
-
 
 
 void Nucleator::stepLoaded(Vector const& force, real force_norm)
@@ -224,6 +222,4 @@ void Nucleator::detach()
         
     Hand::detach();    
 }
-
-
 

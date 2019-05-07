@@ -25,7 +25,6 @@ void FakeProp::complete(Simul const& sim)
 }
 
 
-
 //------------------------------------------------------------------------------
 
 void FakeProp::write_values(std::ostream& os) const

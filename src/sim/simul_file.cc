@@ -93,7 +93,6 @@ void Simul::writeObjects(Outputter& out) const
 }
 
 
-
 /**
  This writes the current state to a trajectory file called `name`.
  If this file does not exist, it is created de novo.
@@ -259,43 +258,48 @@ class Simul::InputLock
 {
 private:
     
+    /// pointer
     Simul * sim;
 
+    /// state
     bool  frozen;
+    
+    /// value of flag
+    constexpr static ObjectFlag FLAG = 777;
     
 public:
     
-    /// flag all objects with number '7'
+    /// flag all objects with FLAG
     InputLock(Simul * s)
     : sim(s)
     {
         //Cytosim::log("Simul::InputLock created with %i objects\n", sim->nbObjects());
-        sim->couples.freeze(7);
-        sim->singles.freeze(7);
-        sim->fibers.freeze(7);
-        sim->beads.freeze(7);
-        sim->solids.freeze(7);
-        sim->spheres.freeze(7);
-        sim->organizers.freeze(7);
-        sim->fields.freeze(7);
-        sim->spaces.freeze(7);
-        //sim->events.freeze(7);
+        sim->couples.freeze(FLAG);
+        sim->singles.freeze(FLAG);
+        sim->fibers.freeze(FLAG);
+        sim->beads.freeze(FLAG);
+        sim->solids.freeze(FLAG);
+        sim->spheres.freeze(FLAG);
+        sim->organizers.freeze(FLAG);
+        sim->fields.freeze(FLAG);
+        sim->spaces.freeze(FLAG);
+        //sim->events.freeze(FLAG);
         frozen = true;
     }
     
     /// erase objects flagged with number '7'
     void prune()
     {
-        //sim->events.prune(7);
-        sim->organizers.prune(7);
-        sim->couples.prune(7);
-        sim->singles.prune(7);
-        sim->beads.prune(7);
-        sim->solids.prune(7);
-        sim->spheres.prune(7);
-        sim->fibers.prune(7);
-        sim->spaces.prune(7);
-        sim->fields.prune(7);
+        //sim->events.prune(FLAG);
+        sim->organizers.prune(FLAG);
+        sim->couples.prune(FLAG);
+        sim->singles.prune(FLAG);
+        sim->beads.prune(FLAG);
+        sim->solids.prune(FLAG);
+        sim->spheres.prune(FLAG);
+        sim->fibers.prune(FLAG);
+        sim->spaces.prune(FLAG);
+        sim->fields.prune(FLAG);
         frozen = false;
     }
 

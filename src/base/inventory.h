@@ -111,7 +111,6 @@ public:
 };
 
 
-
 /// output of all values
 std::ostream& operator << (std::ostream&, Inventory const&);
 

@@ -841,7 +841,10 @@ inline std::ostream& operator << (std::ostream& os, Matrix33 const& M)
     for ( int x = 0; x < 3; ++x )
     {
         for ( int y = 0; y < 3; ++y )
-            os << std::setw(w) << std::fixed << M(y,x) << " ";
+        {
+            os.width(w);
+            os << std::fixed << M(y,x) << " ";
+        }
         if ( x < 2 )
             os << "| ";
         else

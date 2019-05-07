@@ -51,7 +51,6 @@ void LinearSolvers::CG(const LinearOperator& mat, const real* rhs, real* x, Moni
 }
 
 
-
 /**
 Conjugate Gradient, with Preconditioning
 */
@@ -95,9 +94,6 @@ void LinearSolvers::CGP(const LinearOperator& mat, const real* rhs, real* x, Mon
     
     allocator.release();
 }
-
-
-
 
 
 /**
@@ -150,7 +146,6 @@ void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Mon
     
     allocator.release();
 }
-
 
 
 /**

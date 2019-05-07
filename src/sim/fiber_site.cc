@@ -16,7 +16,6 @@
 const real SUBSITE_POS = 0.5;
 
 
-
 FiberSite::FiberSite(Fiber* f, real a)
 : fbFiber(f), fbAbs(a)
 {

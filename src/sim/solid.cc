@@ -577,7 +577,6 @@ Vector Solid::centroid() const
 }
 
 
-
 /**
  fixShape() copies the current shape in the array soShape[],
  and calculates the moment of inertia of the ensemble of points.
@@ -662,7 +661,6 @@ void Solid::rescale()
         }
     }
 }
-
 
 
 /**

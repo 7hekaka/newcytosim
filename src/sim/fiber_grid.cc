@@ -89,15 +89,7 @@ size_t FiberGrid::hasGrid() const
 //------------------------------------------------------------------------------
 #pragma mark - Paint
 
-/** 
- paintCell(x,y,z) adds a Segment to the SegmentList associated with
- the grid point (x,y,z). 
- It is called by the rasterizer function paintFatLine().
- 
- This version uses the fact that cells with consecutive
- X-coordinates should be consecutive also in the Grid
- */
-
+/// Structure used by FiberGrid::paintGrid to find Hand's attachement
 struct PaintJob
 {
     FiberGrid::grid_type * grid;
@@ -105,6 +97,14 @@ struct PaintJob
 };
 
 
+/**
+ paintCell(x,y,z) adds a Segment to the SegmentList associated with
+ the grid point (x,y,z).
+ It is called by the rasterizer function paintFatLine().
+ 
+ This version uses the fact that cells with consecutive
+ X-coordinates should be consecutive also in the Grid
+ */
 void paintCell(const int x_inf, const int x_sup, const int y, const int z, void * arg)
 {
     auto* grid = static_cast<PaintJob*>(arg)->grid;
@@ -222,7 +222,6 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last)
 }
 
 
-
 //------------------------------------------------------------------------------
 #pragma mark - Access
 
@@ -291,7 +290,6 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 }
 
 
-
 /**
  This function is limited to the range given in paintGrid();
  */
@@ -328,7 +326,6 @@ FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real
     
     return res;
 }
-
 
 
 FiberSegment FiberGrid::closestSegment(Vector const& place)

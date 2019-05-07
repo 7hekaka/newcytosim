@@ -6,7 +6,6 @@
 #include "simul.h"
 
 
-
 /**
  The parameters BeadSet and BeadProp define the inner volume for this Space
 */

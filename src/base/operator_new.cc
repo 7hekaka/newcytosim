@@ -1,6 +1,6 @@
-//
+// Cytosim was created by Francois Nedelec. Copyright 2019 Cambridge University
 
-// replace global new & delete operators to control alignment
+// replace global new & delete operators to control memory alignment
 
 #include <new>
 #include <cstdio>

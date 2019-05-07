@@ -6,6 +6,7 @@
 #include "clapack.h"
 #include "matrix.h"
 #include "random.h"
+#include "fiber_prop.h" // needed for NEW_FIBER_LOOP
 //#include "vecprint.h"
 
 
@@ -489,7 +490,6 @@ inline void add_rigidity3(const unsigned nbt, const real* X, const real rigid, r
 }
 
 
-
 #if ( DIM == 2 ) && REAL_IS_DOUBLE
 
 #include "simd.h"
@@ -688,81 +688,35 @@ void Mecafil::addRigidity(const real* X, real* Y) const
         free_real(tmp);
 #endif
     
-#if ( 0 )
-        if ( prop->loop )
-            loopRigidity(X,Y);
+#if NEW_FIBER_LOOP
+        if ( rfRigidityLoop && nPoints > 3 )
+        {
+            /*
+             With Serge DMITRIEFF:
+             Link first and last point in the same way as all other points,
+             making the fiber mechanically homogeneous and all points equivalent
+             */
+            const unsigned L = lastPoint();
+            addRigidity(X, Y, L,   0, 1);
+            addRigidity(X, Y, L-1, L, 0);
+        }
 #endif
     }
 }
-
 
 
 /**
  Add rigidity terms between the last and first points, to loop the fiber onto itself.
  Done with Serge DMITRIEFF, 2015
  */
-void Mecafil::loopRigidity(const real* X, real* Y) const
+void Mecafil::addRigidity(const real* X, real* Y, unsigned A, unsigned B, unsigned C) const
 {
-    const unsigned lpx = DIM * lastPoint();
-    if ( nPoints < 4 )
-        return;
-    
-#if ( 1 )
-    /*
-     Better method done with Serge DMITRIEFF:
-     link first and last point in the same way as all other points
-     this makes the entire fiber mechanically symmetric and all points equivalent
-    */
-    for ( int d = 0; d < DIM; ++ d )
+    for ( unsigned d = 0; d < DIM; ++ d )
     {
-        // 3-point rigidity term on [last, 0, 1]
-        real f = rfRigidity * ( X[d+lpx] - 2*X[d] + X[d+DIM] );
-        Y[d+lpx] -=   f;
-        Y[d    ] += f+f;
-        Y[d+DIM] -=   f;
-        
-        // 3-point rigidity term on [last-1, last, 0]
-        real g = rfRigidity * ( X[d+lpx-DIM] - 2*X[d+lpx] + X[d] );
-        Y[d+lpx-DIM] -=   g;
-        Y[d+lpx    ] += g+g;
-        Y[d        ] -=   g;
+        real f = rfRigidity * (( X[DIM*A+d] - X[DIM*B+d] ) - ( X[DIM*B+d] - X[DIM*C+d] ));
+        Y[DIM*A+d] -=   f;
+        Y[DIM*B+d] += f+f;
+        Y[DIM*C+d] -=   f;
     }
-    
-#elif ( 1 )
-    
-    // Make links to overlap first and last points
-    for ( int d = 0; d < DIM; ++ d )
-    {
-        // 3-point rigidity term on [last-1, 0, 1]
-        real f = rfRigidity * ( X[d+lpx-DIM] - 2*X[d] + X[d+DIM] );
-        Y[d+lpx-DIM] -=   f;
-        Y[d        ] += f+f;
-        Y[d    +DIM] -=   f;
-        
-        // 3-point rigidity term on [last-1, last, DIM]
-        real g = rfRigidity * ( X[d+lpx-DIM] - 2*X[d+lpx] + X[d+DIM] );
-        Y[d+lpx-DIM] -=   g;
-        Y[d+lpx    ] += g+g;
-        Y[d    +DIM] -=   g;
-    }
-    
-#else
-    
-    for ( int d = 0; d < DIM; ++ d )
-    {
-        // 4-point rigidity term between [last-1, last] and [0 and 1]
-        real f = rfRigidity * ( X[d+lpx-DIM] - X[d+lpx] - X[d] + X[d+DIM] );
-        Y[d+lpx-DIM] -= f;
-        Y[d+lpx    ] += f;
-        Y[d        ] += f;
-        Y[d    +DIM] -= f;
-        
-        // link last and first points, with an arbitrary (high) stiffness
-        real g = 1000 * rfRigidity * ( X[d+lpx] - X[d] );
-        Y[d+lpx] += g;
-        Y[d    ] -= g;
-    }
-
-#endif
 }
 

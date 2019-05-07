@@ -9,8 +9,8 @@
 #include "solid.h"
 #include "fiber.h"
 
-/// AsterLink represents a connection between a Fiber and a Solid
-///@todo new Interpolation4() to replace coef1[] and coef2[]
+/// A connection between a Fiber and a Solid
+//@todo new Interpolation4() to replace coef1[] and coef2[]
 class AsterLink
 {
     friend class Aster;

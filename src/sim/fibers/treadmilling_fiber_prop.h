@@ -5,7 +5,6 @@
 #include "fiber_prop.h"
 
 
-
 /// additional Property for TreadmillingFiber
 /**
  @ingroup Properties

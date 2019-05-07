@@ -394,6 +394,28 @@ void CoupleSet::freeze(ObjectFlag f)
     ObjectSet::flag(faList, f);
     ObjectSet::flag(afList, f);
     ObjectSet::flag(ffList, f);
+    
+#if FIBER_HAS_LATTICE
+    /* This patch is necessary when reading from file, as the Lattice will be
+     read before the Hands are read, leading to out-of-sync information between
+     Hands positions and Lattice values */
+    for (Couple *s=firstAF(), *n; s; s=n)
+    {
+        n = s->next();
+        s->hand1()->detachDigit();
+    }
+    for (Couple *s=firstFA(), *n; s; s=n)
+    {
+        n = s->next();
+        s->hand2()->detachDigit();
+    }
+    for (Couple *s=firstAA(), *n; s; s=n)
+    {
+        n = s->next();
+        s->hand1()->detachDigit();
+        s->hand2()->detachDigit();
+    }
+#endif
 }
 
 

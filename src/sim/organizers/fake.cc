@@ -12,7 +12,6 @@
 #include "meca.h"
 
 
-
 void Fake::step()
 {
 }

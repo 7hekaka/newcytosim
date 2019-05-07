@@ -131,7 +131,6 @@ void run(real (*func)(), const char name[])
 }
 
 
-
 void test_swapSSE()
 {
     vec2 a = set2(0, 1);
@@ -203,6 +202,21 @@ void test_deswizzle()
     print(16, b);
 }
 
+void test_cat()
+{
+    printf("------ test_cat\n");
+    vec2 y{1.0, 2.0};
+    vec2 x{3.0, 4.0};
+    
+    print(cat4(x, y), "cat4(x, y)");
+    print(cat7(x, y), "cat7(x, y)");
+    
+    x = set2(1.0, 2.0);
+    y = set2(3.0, 4.0);
+    
+    print(cat4(x, y), "cat4(x, y)");
+    print(cat7(x, y), "cat7(x, y)");
+}
 
 void test_load()
 {
@@ -217,13 +231,10 @@ void test_load()
     print(cast4(load1(mem)), "cast4(load1)");
     print(cast4(load2(mem)), "cast4(load2)");
 
-    vec4 z = load3(mem);
-    print(z, "load3");
-    
-    vec4 t = cat4(load1(mem+2), load2(mem));
-    print(t, "cat4(load1, load2)");
-    
-    t = blend4(load4(mem), setzero4(), 0b1000);
+    print(load3(mem), "load3");
+    print(cat4(load1(mem+2), load2(mem)), "cat4(load1, load2)");
+
+    vec4 t = blend4(load4(mem), setzero4(), 0b1000);
     print(t, "blend(load4, zero)");
 
 
@@ -544,6 +555,7 @@ int main(int argc, char * argv[])
 #ifdef __AVX__
     if ( 1 )
     {
+        test_cat();
         test_deswizzle();
         test_load();
         test_store();

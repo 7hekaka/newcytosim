@@ -41,7 +41,6 @@ void BridgeProp::complete(Simul const& sim)
 }
 
 
-
 void BridgeProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);

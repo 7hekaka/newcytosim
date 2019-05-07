@@ -18,7 +18,6 @@ void BlankParam::clear()
 }
 
 
-
 void BlankParam::read(Glossary& glos) 
 {
     glos.set(max,        "max");
@@ -51,8 +50,6 @@ static  void write_value(std::ostream& os, std::string const& name, C const& c)
     os << " " << std::left << std::setw(20) << name << " = " << c << ";" << std::endl;
 }
 
-
-
 void BlankParam::write(std::ostream& os) const
 {
     write_value(os, "max",       max);
@@ -63,5 +60,4 @@ void BlankParam::write(std::ostream& os) const
     write_value(os, "repeat",    repeat);
     write_value(os, "config",    config);
 }
-
 

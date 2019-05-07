@@ -519,4 +519,3 @@ Property* Simul::newProperty(const std::string& kd, const std::string& nm, Gloss
     return p;
 }
 
-

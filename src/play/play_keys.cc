@@ -82,6 +82,9 @@ inline PointDisp* toPointDisp(Property * ptr)
 /// apply function to all PointDisp is plist
 void setPointDisp(PropertyList const& plist, void(*func)(PointDisp*, int), int val)
 {
+    if ( plist.empty() )
+        flashText("no relevant object");
+
     for ( Property * i : plist )
         if ( toPointDisp(i)->visible )
             func(toPointDisp(i), val);
@@ -142,6 +145,9 @@ void changePointDispSize(PropertyList const& plist, DisplayProp& DP, int inc,
 
 void setPointDispVisible(PropertyList const& plist, int val)
 {
+    if ( plist.empty() )
+        flashText("no relevant object");
+    
     for ( Property * i : plist )
         toPointDisp(i)->visible = val;
 }
@@ -149,6 +155,9 @@ void setPointDispVisible(PropertyList const& plist, int val)
 
 void shufflePointDispVisible(const PropertyList& plist)
 {
+    if ( plist.empty() )
+        flashText("no relevant object");
+
     if ( plist.size() == 1 )
     {
         flipVisible(toPointDisp(plist.front()));
@@ -288,7 +297,6 @@ void changeScale(FiberDisp* p, int d)
     else if ( DP.style == 2 )
         flipExplode(p);
 }
-
 
 
 void changeColoring(FiberDisp* p, int)

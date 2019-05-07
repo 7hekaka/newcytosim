@@ -17,8 +17,6 @@
 #include "saveimage.h"
 
 
-
-
 unsigned   hits = 1000;
 unsigned dim[2] = { 1024, 1024 };
 real        pix = 6.5;

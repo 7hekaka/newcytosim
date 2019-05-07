@@ -3,7 +3,7 @@
 #define MECAFIL_H
 
 #include "filament.h"
-
+#include "fiber_prop.h"  // needed for NEW_FIBER_LOOP
 
 /**
  Enable this option to build the projection matrix explicitly.
@@ -82,6 +82,11 @@ protected:
     
     /// rigidity scaling factor used in addRigidity()
     real        rfRigidity;
+    
+#if NEW_FIBER_LOOP
+    /// link filament into a loop
+    bool        rfRigidityLoop;
+#endif
     
     /// calculate the normalized difference of successive vertices in rfDiff[]
     void        storeDirections();
@@ -169,8 +174,8 @@ public:
     /// add rigidity terms to upper side of matrix
     void        addRigidityUpper(real*) const;
     
-    /// add terms to loop the fiber on itself
-    void        loopRigidity(const real* X, real* Y) const;
+    /// add rigidity terms on three specified points
+    void        addRigidity(const real* X, real* Y, unsigned, unsigned, unsigned) const;
 
 };
 

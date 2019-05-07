@@ -95,7 +95,6 @@ void MotorProp::complete(Simul const& sim)
 }
 
 
-
 void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
 {
     HandProp::checkStiffness(stiff, len, mul, kT);
@@ -142,7 +141,6 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
     if ( exp( stall_force * unbinding_force_inv ) > 100 )
         Cytosim::warn << "Hand:exp( stall_force / unbinding_force ) is greater than 100" << std::endl;
 }
-
 
 
 void MotorProp::write_values(std::ostream& os) const

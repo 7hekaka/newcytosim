@@ -279,7 +279,6 @@ void HandProp::complete(Simul const& sim)
 }
 
 
-
 /**
  Compare the energy in a link when it binds at its maximum distance,
  with the Thermal energy

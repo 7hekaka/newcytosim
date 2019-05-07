@@ -38,5 +38,3 @@ void Regulator::stepLoaded(Vector const& force, real force_norm)
     testKramersDetachment(force_norm);
 }
 
-
-

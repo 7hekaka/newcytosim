@@ -57,9 +57,6 @@ public:
     /// resting length of the interaction
     virtual real   interactionLength() const { return 0; }
     
-    /// flag of container object
-    virtual ObjectFlag parent_flag() const { return 0; }
-
 };
 
 

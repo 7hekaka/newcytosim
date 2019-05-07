@@ -32,7 +32,6 @@ MatrixSparseSymmetric2::MatrixSparseSymmetric2()
 }
 
 
-
 void MatrixSparseSymmetric2::allocate(size_t alc)
 {
     if ( alc > allocated_ )

@@ -36,12 +36,14 @@ Once cytosim is running on your machine, check the tutorials, the page on [runni
 For more information, please check [the dedicated pages](compile/index.md).  
 You may need to manually edit the makefiles depending on your platform.
 
+cytosimATcytosimDOTorg
+
 # Advanced matter
 
 *  [Code documentation](code/index.md)
 *  [Doxygen documentation](doc/code/doxygen/index.html)
 
-# Contact
+# Credits
 
-cytosimATcytosimDOTorg
+[Credits and history](main/credits.md)
 

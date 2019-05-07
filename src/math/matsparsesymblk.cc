@@ -24,7 +24,6 @@ MatrixSparseSymmetricBlock::MatrixSparseSymmetricBlock()
 }
 
 
-
 void MatrixSparseSymmetricBlock::allocate(size_t alc)
 {
     if ( alc > allocated_ )

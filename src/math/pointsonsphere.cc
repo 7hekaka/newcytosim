@@ -95,7 +95,6 @@ bool PointsOnSphere::project(const real S[3], real P[3])
 }
 
 
-
 /**
  hypercube rejection method
  */
@@ -252,7 +251,6 @@ void PointsOnSphere::refinePoints( real Pnew[], const real Pold[], real forces[]
 }
 
 
-
 /**
  create a relatively even distribution of nbp points on the sphere
  the coordinates are stored in real array coord_[]
@@ -324,10 +322,11 @@ unsigned PointsOnSphere::distributePoints(unsigned nbp, real precision, unsigned
                 energy_ = energy;
                 
                 /*
-                 After 'magic_seven' successful moves at a given step size, we increase the step size.
-                 Values for 'magic_seven' were tested in term of convergence, and 7 seems to work well.
+                 After 'SEVEN' successful moves at a given step size, we increase
+                 the step size. Values for 'magic_seven' were tested in term of
+                 convergence, and 7 seems to work well.
                  */
-                if ( ++history >= magic_seven )
+                if ( ++history >= SEVEN )
                 {
                     mag *= 1.4147;   //this value is somewhat arbitrary
                     history = 0;

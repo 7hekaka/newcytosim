@@ -20,7 +20,6 @@ enum FiberEnd
 };
 
 
-
 /// Possible dynamic states for the tip of a Fiber [dynamic instability]
 /** 
  The naming is intentionally vague and does not refer to the nature of the states,
@@ -37,7 +36,6 @@ enum AssemblyState
 };
 
 
-
 /// Possible modes of confinements
 enum Confinement
 {
@@ -51,9 +49,9 @@ enum Confinement
     CONFINE_MINUS_END   = 11,  ///< confine the MINUS_END of fibers to the surface of the Space
     CONFINE_BOTH_ENDS   = 12,  ///< confine both ends of fibers to the surface of the Space
     CONFINE_PLUS_OUT    = 13,  ///< confine the PLUS_END outside
-    CONFINE_POINT       = 14   ///< confine Point 0 of a Solid
+    CONFINE_POINT       = 14,  ///< confine Point 0 of a Solid
+    CONFINE_RANGE       = 15   ///< confine a range of point on Fibers
 };
-
 
 
 #endif

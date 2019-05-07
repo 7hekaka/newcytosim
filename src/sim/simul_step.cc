@@ -18,7 +18,6 @@ real Simul::estimateFiberGridStep() const
 }
 
 
-
 /**
  The FiberGrid is used to quickly find the fibers that are close to any point.
  Procedure:
@@ -62,7 +61,6 @@ void Simul::setFiberGrid(Space const* spc) const
     Cytosim::log(" BindingGrid has %i cells of size %.3f um\n", fiberGrid.nbCells(), step);
     //std::clog << " BindingGrid with " << fiberGrid.nbCells() << " cells of size " << step << '\n';
 }
-
 
 
 /**

@@ -33,5 +33,3 @@ gives a catch-bond like behavior.
 
 Please run `cym/motor_race.cym` to check the effect of different unbinding models.
 
-
-

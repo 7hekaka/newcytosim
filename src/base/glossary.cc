@@ -339,7 +339,6 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
 }
 
 
-
 /**
  If `no_overwrite == 0`, previous values can be erased without warning,
  If `no_overwrite == 1`, a prexisting symbol cannot be altered, but no exception is thrown

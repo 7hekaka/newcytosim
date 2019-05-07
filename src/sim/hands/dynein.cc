@@ -8,8 +8,6 @@
 #include "simul.h"
 
 
-
-
 Dynein::Dynein(DyneinProp const* p, HandMonitor* h)
 : Digit(p,h), prop(p)
 {
@@ -44,7 +42,6 @@ void Dynein::stepUnloaded()
 }
 
 
-
 /**
  Currently, antagonistic force only reduced the rate of forward stepping.
  However, force is also known to increase the rate of backward steps.
@@ -75,6 +72,4 @@ void Dynein::stepLoaded(Vector const& force, real force_norm)
     assert_true( nextDetach >= 0 );
     testKramersDetachment(force_norm);
 }
-
-
 

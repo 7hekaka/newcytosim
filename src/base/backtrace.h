@@ -18,13 +18,11 @@
  */
 
 
-
 #include <cstdio>
 
 
 /// print the stack of function calls for the current thread
 void print_backtrace(int fildes = 2);
-
 
 
 #endif

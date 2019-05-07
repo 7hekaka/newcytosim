@@ -260,7 +260,3 @@ You can download them [here](http://doi:mendeleyXXXX).
 
 Congratulations, you have completed the tutorial.
 
-
-
-
-

@@ -130,7 +130,6 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
 }
 
 
-
 void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void * arg,
                                 const unsigned int n_pts, const Vertex2 pts[],
                                 const int zz)
@@ -223,7 +222,6 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
 }
 
 
-
 void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void * arg,
                                 const Vector2& P, const Vector2& Q, const real length,
                                 const real radius)
@@ -273,7 +271,6 @@ void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void *
     
     paintPolygon2D(paint, arg, 4, pts, 0);
 }
-
 
 
 void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void * arg,
@@ -328,7 +325,6 @@ void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void *
     
     paintPolygon2D(paint, arg, 4, pts, 0);
 }
-
 
 
 void Rasterizer::paintBox2D(void (*paint)(int, int, int, int, void*), void * arg,
@@ -485,7 +481,6 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
 }
 
 
-
 void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void * arg,
                                 const Vector3& P, const Vector3& Q, real length,
                                 const real radius, const Vector3& offset, const Vector3& delta )
@@ -536,7 +531,6 @@ void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void *
     //paint the volume:
     paintPolygon3D(paint, arg, 8, pts);
 }
-
 
 
 /**
@@ -605,8 +599,6 @@ void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void *
     
     paintPolygon3D(paint, arg, 12, pts);
 }
-
-
 
 
 void Rasterizer::paintBox3D(void (*paint)(int, int, int, int, void*), void * arg,

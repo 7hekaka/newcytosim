@@ -45,7 +45,7 @@ const size_t NBS = 31;
 const size_t NBR = DIM * ( NBS + 1 );
 const size_t ALOC = NBR + 8;
 
-real *diff = 0, *pos = 0, *lag = 0, *force = 0;
+real *diff = nullptr, *pos = nullptr, *lag = nullptr, *force = nullptr;
 
 const real scalar = 2.0;
 
@@ -77,7 +77,7 @@ void setFilament(int np, real * vec, real seg, real persistence_length)
 
 void setRandom(int np, real * vec, real mag)
 {
-    for ( int p = 0 ; p < ALOC; ++p )
+    for ( size_t p = 0 ; p < ALOC; ++p )
         vec[p] = mag * RNG.sreal();
 }
 
@@ -383,11 +383,9 @@ void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
 }
 
 
-
-
 inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*, real, real*), char const* str)
 {
-    real * x = 0, * y = 0, * z = 0;
+    real * x = nullptr, * y = nullptr, * z = nullptr;
     new_real(x, y, z, 1.0);
     
     unsigned nbt = DIM * ( NBS - 1 );
@@ -398,7 +396,7 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
         func(nbt, x, scalar, z);
         func(nbt, z, scalar, x);
     }
-    TicToc::toc(str, 0);
+    TicToc::toc(str, nullptr);
     zero_real(ALOC, x);
     func(nbt, pos, scalar, x);
     VecPrint::print(std::cout, std::min(20ul,2+NBR), x);
@@ -613,7 +611,6 @@ void projectForcesD_(unsigned nbs, const real* dif, const real alpha, const real
 #endif
     }
 }
-
 
 
 /**
@@ -843,7 +840,7 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha, 
 
 inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*, real*), char const* str)
 {
-    real *x = 0, *y = 0, *z = 0;
+    real *x = nullptr, *y = nullptr, *z = nullptr;
     new_real(x, y, z, 1.0);
 
     TicToc::tic();
@@ -854,7 +851,7 @@ inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*,
         func(NBS, diff, x+2, y);
         func(NBS, diff, z+4, y);
     }
-    TicToc::toc(str, 0);
+    TicToc::toc(str, nullptr);
     
     zero_real(ALOC, lag);
     func(NBS, diff, force, lag);
@@ -866,7 +863,7 @@ inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*,
 
 inline void testD(unsigned cnt, void (*func)(unsigned, const real*, real, const real*, const real*, real*), char const* str)
 {
-    real *x = 0, *y = 0, *z = 0;
+    real *x = nullptr, *y = nullptr, *z = nullptr;
     new_real(x, y, z, 1.0);
 
     TicToc::tic();
@@ -877,7 +874,7 @@ inline void testD(unsigned cnt, void (*func)(unsigned, const real*, real, const 
         func(NBS, diff, 0.5, y+2, z, x+2);
         func(NBS, diff, 2.0, z+4, x, y+4);
     }
-    TicToc::toc(str, 0);
+    TicToc::toc(str, nullptr);
     
     zero_real(ALOC, x);
     func(NBS, diff, 1.0, pos, lag, x);
@@ -914,8 +911,6 @@ void testProjectionD(unsigned cnt)
     testD(cnt, projectForcesD_AVX, "D_AVX");
 #endif
 }
-
-
 
 
 int main(int argc, char* argv[])

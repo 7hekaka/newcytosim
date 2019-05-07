@@ -393,7 +393,6 @@ public:
 };
 
 
-
 /// output operator:
 std::ostream& operator << (std::ostream& os, Mecable const&);
 

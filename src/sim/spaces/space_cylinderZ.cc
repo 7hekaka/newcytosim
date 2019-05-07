@@ -42,7 +42,6 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-
 real  SpaceCylinderZ::volume() const
 {
     return 2 * M_PI * ( top_ - bot_ ) * radius_ * radius_;

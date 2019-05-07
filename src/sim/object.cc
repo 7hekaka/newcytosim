@@ -177,9 +177,6 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
 }
 
 
-
-
-
 /// print a list of objects
 std::ostream& operator << (std::ostream& os, ObjectList const& list)
 {

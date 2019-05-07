@@ -3,7 +3,6 @@
 Author: XXX (XX.09.2018)
 
 
-
 ### Objective
 
 This tutorial will teach you how to simulate the capture of chromosomes by an aster of dynamic microtubules.

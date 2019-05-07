@@ -79,7 +79,7 @@ private:
 #if CURVATURE_DEPENDENT_SEGMENTATION
     /** number of time steps between each attempt to remove/add a point
     also number of states over which curvature information is averaged */
-    static const unsigned RECUT_PERIOD = 4;
+    static constexpr unsigned RECUT_PERIOD = 4;
     
     /// error due to the cutting at different steps
     real         fnCutError;
@@ -210,8 +210,9 @@ public:
     /// calculate the domain in which ab is located (near a FiberEnd, or central)
     FiberEnd     whichEndDomain(real a, real lambda) const;
     
-    /// return P such that segment [ P, P+1 ] contains abscissa `a` counted from the MINUS_END
-    unsigned     indexM(const real a) const { return std::min((unsigned)(std::max(a,(real)0)/fnCut), lastSegment()); }
+    /// return P where segment [ P, P+1 [ contains point at distance `a` from the MINUS_END
+    /** returns 0 if ( a < 0 ) and last point index if ( a > lastSegment() ) */
+    unsigned     clampedIndexM(const real a) const { return std::min((unsigned)(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
     

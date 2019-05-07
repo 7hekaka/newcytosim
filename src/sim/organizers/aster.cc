@@ -18,7 +18,6 @@
 #include "meca.h"
 
 
-
 void Aster::step()
 {
     assert_true( linked() );

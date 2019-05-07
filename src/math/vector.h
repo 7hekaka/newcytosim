@@ -37,7 +37,5 @@ const   Torque  nullTorque(0,0,0,0);
 
 #endif
 
-
-
 #endif
 

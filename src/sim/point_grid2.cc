@@ -485,7 +485,6 @@ void PointGrid::setInteractions(Meca& meca, PointGridParam const& pam,
 }
 
 
-
 #if ( NB_STERIC_PANES == 1 )
 
 /**
@@ -555,7 +554,6 @@ void  PointGrid::setInteractions(Meca& meca, PointGridParam const& pam, const un
         }
     }
 }
-
 
 
 /**

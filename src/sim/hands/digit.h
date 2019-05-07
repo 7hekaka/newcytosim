@@ -47,6 +47,7 @@ public:
     /// detach
     void   detach();
 
+    
     /// relocate without checking intermediate sites
     int    jumpTo(site_t npos);
     

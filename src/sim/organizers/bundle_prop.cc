@@ -54,7 +54,6 @@ void BundleProp::complete(Simul const& sim)
 }
 
 
-
 //------------------------------------------------------------------------------
 
 void BundleProp::write_values(std::ostream& os) const

@@ -17,7 +17,6 @@ MatrixSparseSymmetric::MatrixSparseSymmetric()
 }
 
 
-
 void MatrixSparseSymmetric::allocate(size_t alc)
 {
     if ( alc > allocated_ )
@@ -203,7 +202,6 @@ void MatrixSparseSymmetric::scale(const real alpha)
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
             col_[jj][n].val *= alpha;
 }
-
 
 
 void MatrixSparseSymmetric::addTriangularBlock(real* mat, const unsigned ldd,

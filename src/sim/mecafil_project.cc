@@ -426,7 +426,6 @@ void projectForcesD__(unsigned nbs, const real* dif, const real alpha,
 }
 
 
-
 void projectForcesD___(unsigned nbs, const real* dif, const real alpha,
                        const real* X, const real* mul, real* Y)
 {
@@ -634,7 +633,6 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha,
 #endif
 
 
-
 /**
  Perform first calculation needed by projectForces:
  */
@@ -667,7 +665,6 @@ inline void projectForcesU_PTR(unsigned nbs, const real* dif, const real* X, rea
         x1 = x4;
     }
 }
-
 
 
 /**
@@ -777,7 +774,6 @@ void projectForcesD_PTR(unsigned nbs, const real* dif, const real alpha,
     pY[2] = alpha * x2;
 #endif
 }
-
 
 
 //------------------------------------------------------------------------------
@@ -1196,7 +1192,6 @@ inline void add_projectiondiffAVX(const unsigned nbs, const real* mul, const rea
 }
 
 #endif
-
 
 
 void Mecafil::addProjectionDiff(const real* X, real* Y) const

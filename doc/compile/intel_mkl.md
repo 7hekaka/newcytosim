@@ -41,7 +41,6 @@ Note that `MKLROOT` should be defined by the OS, when you load module `imkl`
 On the EMBL SLURM cluster, the `imkl` module should not be needed if we used static linking as specifed with `HAS_MKL := 2`.
 
 
-
 # Verification
 
 Check the library needed by cytosim with `ldd`:

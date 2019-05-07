@@ -3,7 +3,7 @@
 Cytosim is built around [a core C++ engine](../../src/index.md) under [`src/`](../../src).  
 Associated [Python scripts](../../python/index.md) are found under [`python/`](../../python).
 
-The [detailled documentation for the C++ code](doxygen/index.html) needs to be generated.
+The [detailed documentation for the C++ code](doxygen/index.html) needs to be generated.
 
 ### Generating the documentation
 

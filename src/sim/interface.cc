@@ -291,7 +291,6 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
 }
 
 
-
 /**
  This would usually create ONE object of type 'name'.
  */
@@ -595,7 +594,6 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned 
 }
 
 
-
 void Interface::execute_mark(std::string const& name, Glossary& opt, unsigned cnt)
 {
     Property * pp = simul.properties.find(name);
@@ -771,7 +769,7 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
         event = new Event();
         opt.set(event->rate, "event");
         opt.set(event->code, "event", 1);
-        event->initialize(simul.time());
+        event->reset(simul.time());
         simul.events.add(event);
     }
 #endif
@@ -866,7 +864,6 @@ void Interface::execute_run(unsigned nb_steps)
     simul.relax();
     VLOG("-RUN COMPLETED\n");
 }
-
 
 
 //------------------------------------------------------------------------------
@@ -1017,7 +1014,6 @@ void Interface::execute_report(std::string& file, std::string const& what, Gloss
 }
 
 
-
 void Interface::execute_call(std::string& str, Glossary& opt)
 {
     if ( str == "equilibrate" )
@@ -1047,5 +1043,4 @@ void Interface::execute_call(std::string& str, Glossary& opt)
     else
         throw InvalidSyntax("called unknown command");
 }
-
 

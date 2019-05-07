@@ -83,7 +83,7 @@ public:
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE > 0
 
-    /// bits to be set on the occupied Lattice's site
+    /// bits used to signify occupation on the Lattice's site
     cell_t        footprint() const { return 1; }
 
     /// true if given Lattice's site is unoccupied (check footprint bits)

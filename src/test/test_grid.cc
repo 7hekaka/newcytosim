@@ -136,13 +136,13 @@ void processMouseDrag(int mx, int my, Vector3 & a, const Vector3 & b, int m)
 
 //------------------------------------------------------------------------------
 #if ( DIM == 3 )
-static bool field_color(void*, const real& val, Vector3 const& pos)
+static bool field_color(void*, const real& val, Vector3 const&)
 {
     glColor3f(val/5.0, 0, 0);
     return true;
 }
 #else
-static bool field_color(void*, const real& val, Vector2 const& pos)
+static bool field_color(void*, const real& val, Vector2 const&)
 {
     glColor3f(val/5.0, 0, 0);
     return true;
@@ -156,9 +156,9 @@ void display(View&, int)
 
 #if ( DIM == 3 )
     Vector3 dir(0,0,1);
-    drawValues(myGrid, field_color, 0, dir);
+    drawValues(myGrid, field_color, nullptr, dir);
 #else
-    drawValues(myGrid, field_color, 0);
+    drawValues(myGrid, field_color, nullptr);
 #endif
     
     //--------------draw a grid in gray:
@@ -194,7 +194,7 @@ void display(View&, int)
     //-------------draw region
     if ( myGrid.hasRegions() )
     {
-        int * offset = 0;
+        int * offset = nullptr;
         int nb = myGrid.getRegion(offset, cell_indx);
 
         glColor4f(1,1,1,0.7);
@@ -219,12 +219,12 @@ void speedTest()
 {
     printf("Real test...");
 
-    real  left[] = { 0, 0, 0};
-    real right[] = { 1, 1, 1};
-    int   size[] = { 10, 10, 10};
+    real L[] = { 0, 0, 0};
+    real R[] = { 1, 1, 1};
+    int  S[] = { 10, 10, 10};
 
     Grid<float, 3> map;
-    map.setDimensions(left, right, size);
+    map.setDimensions(L, R, S);
     map.createCells();
     map.setValues(0);
 
@@ -258,9 +258,9 @@ void speedTest()
 
 void testInterpolate()
 {
-    real  left[] = { 0, 0, 0 };
-    real right[] = { 1, 1, 1 };
-    int   size[] = { 100, 100, 100 };
+    real L[] = { 0, 0, 0};
+    real R[] = { 1, 1, 1};
+    int  S[] = { 100, 100, 100 };
     
     const int MAX = 1 << 14;
     real  rand[MAX+3] = { 0 };
@@ -268,7 +268,7 @@ void testInterpolate()
         rand[i] = RNG.preal();
     
     Grid<double, 3> map;
-    map.setDimensions(left, right, size);
+    map.setDimensions(L, R, S);
     map.createCells();
     map.setValues(0);
     

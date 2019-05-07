@@ -129,7 +129,6 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
 }
 
 
-
 void WalkerProp::write_values(std::ostream& os) const
 {
     DigitProp::write_values(os);

@@ -21,7 +21,6 @@
 //#define NDEBUG
 
 
-
 /// strips the full pathname for a file name
 #define SFILE strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__
 

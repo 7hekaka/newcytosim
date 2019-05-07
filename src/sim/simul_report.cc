@@ -623,7 +623,6 @@ void Simul::reportFiber(std::ostream& out, std::string const& which) const
 }
 
 
-
 /**
  Export length, position and directions at center of fibers
  */
@@ -1182,7 +1181,6 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
 }
 
 
-
 #include "motor_prop.h"
 
 real hand_speed(HandProp const* hp)
@@ -1473,7 +1471,6 @@ void Simul::reportSpherePosition(std::ostream& out) const
 }
 
 
-
 /**
  Report something about Space (incomplete)
  */
@@ -1682,10 +1679,10 @@ void Simul::reportSingle(std::ostream& out) const
             ++free[ix];
     }
     
-    for ( Single * si = singles.firstA(); si ; si = si->next() )
+    for ( Single * sig=singles.firstA(); sig ; sig=sig->next() )
     {
-        assert_true(si->attached());
-        unsigned ix = si->prop->number();
+        assert_true(sig->attached());
+        unsigned ix = sig->prop->number();
         if ( ix < mx )
             ++bound[ix];
     }

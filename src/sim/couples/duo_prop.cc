@@ -73,7 +73,6 @@ void DuoProp::complete(Simul const& sim)
 }
 
 
-
 void DuoProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);

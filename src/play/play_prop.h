@@ -12,7 +12,7 @@ class PlayProp : public Property
 public:
     
     /// number of programmable keys
-    static const int NB_MAGIC_KEYS = 4;
+    static constexpr int NB_MAGIC_KEYS = 4;
 
 public:
     

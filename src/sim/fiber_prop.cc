@@ -276,7 +276,11 @@ void FiberProp::clear()
     confine2_space      = "first";
     confine2_space_ptr  = nullptr;
 #endif
-    
+#if NEW_FIBER_CONFINE_RANGE
+    confine_range[0] = 0;
+    confine_range[1] = INFINITY;
+#endif
+
     steric              = 0;
     steric_radius       = 0;
     steric_range        = 0;
@@ -294,7 +298,10 @@ void FiberProp::clear()
 #if NEW_CHEW_FIBERS
     max_chewing_speed   = 0;
 #endif
-    
+#if NEW_FIBER_LOOP
+    loop                = 0;
+#endif
+
     activity            = "none";
     display             = "";
     display_fresh       = false;
@@ -361,6 +368,9 @@ void FiberProp::read(Glossary& glos)
                                             {"plus_end",  CONFINE_PLUS_END},
                                             {"minus_end", CONFINE_MINUS_END},
                                             {"both_ends", CONFINE_BOTH_ENDS},
+#if NEW_FIBER_CONFINE_RANGE
+                                            {"range",     CONFINE_RANGE},
+#endif
                                             {"plus_out",  CONFINE_PLUS_OUT}});
     
     glos.set(confine_stiffness, "confine", 1);
@@ -379,7 +389,10 @@ void FiberProp::read(Glossary& glos)
     glos.set(confine2_stiffness, "confine2_stiffness");
     glos.set(confine2_space,     "confine2_space");
 #endif
-    
+#if NEW_FIBER_CONFINE_RANGE
+    glos.set(confine_range, 2,   "confine_range");
+#endif
+
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( confine_space == "current" )
@@ -417,7 +430,10 @@ void FiberProp::read(Glossary& glos)
 #if NEW_CHEW_FIBERS
     glos.set(max_chewing_speed, "max_chewing_speed");
 #endif
-    
+#if NEW_FIBER_LOOP
+    glos.set(loop,              "loop");
+#endif
+
     glos.set(activity, "activity");
     if ( glos.set(display, "display") )
         display_fresh = true;
@@ -583,6 +599,9 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_FIBER_CONFINE2
     write_value(os, "confine2",            confine2, confine2_stiffness, confine2_space);
 #endif
+#if NEW_FIBER_CONFINE_RANGE
+    write_value(os, "confine_range",       confine_range, 2);
+#endif
     write_value(os, "steric",              steric, steric_radius, steric_range);
     write_value(os, "field",               field);
     write_value(os, "glue",                glue, glue_single);
@@ -591,6 +610,9 @@ void FiberProp::write_values(std::ostream& os) const
 #endif
 #if NEW_CHEW_FIBERS
     write_value(os, "max_chewing_speed",   max_chewing_speed);
+#endif
+#if NEW_FIBER_LOOP
+    write_value(os, "loop",                loop);
 #endif
     write_value(os, "activity",            activity);
     write_value(os, "display",             "("+display+")");

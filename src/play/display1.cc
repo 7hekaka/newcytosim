@@ -411,7 +411,6 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
 }
 
 
-
 PointDisp * Couple::disp12() const
 {
     if ( disp1()->visible )

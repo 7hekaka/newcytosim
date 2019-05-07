@@ -37,7 +37,7 @@ class Sphere : public Mecable
 public:
     
     /// number of reference points, including center: 1, 2, 4 for DIM = 1, 2 and 3
-    static const unsigned nbRefPts = DIM+(DIM==3);
+    static constexpr unsigned nbRefPts = DIM+(DIM==3);
 
     /// number of reference points
     static unsigned  nbRefPoints() { return nbRefPts; }

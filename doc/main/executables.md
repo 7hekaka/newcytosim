@@ -55,7 +55,6 @@ Perform a live simulation                       |  `play live`
 Generate images offscreen                       |  `play image`     
 
 
-
 ## Play's replay mode
 
 Use `play` to display a simulation calculated by `sim`.

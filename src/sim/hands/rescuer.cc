@@ -7,7 +7,6 @@
 #include "simul.h"
 
 
-
 Rescuer::Rescuer(RescuerProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
@@ -79,8 +78,6 @@ void Rescuer::handleDisassemblyP()
 }
 
 
-
-
 void Rescuer::stepUnloaded()
 {
     assert_true( attached() );
@@ -96,6 +93,4 @@ void Rescuer::stepLoaded(Vector const& force, real force_norm)
     
     testKramersDetachment(force_norm);
 }
-
-
 

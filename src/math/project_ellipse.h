@@ -19,5 +19,4 @@ void projectEllipsoid(real         p[3],
                       const real len[3]);
 
 
-
 #endif

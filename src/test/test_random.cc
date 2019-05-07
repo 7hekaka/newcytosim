@@ -102,7 +102,6 @@ float convertFix(uint32_t x)
 }
 
 
-
 void testbits()
 {
     const int SCALE=2;
@@ -562,7 +561,6 @@ void test_gaussian(int cnt)
     }
 #endif
 }
-
 
 
 //==========================================================================

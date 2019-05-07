@@ -61,7 +61,6 @@ void Tracker::stepUnloaded()
 }
 
 
-
 void Tracker::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );

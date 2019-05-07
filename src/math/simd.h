@@ -171,7 +171,8 @@ inline vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m12
 inline void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
 */
 /// concatenate two vec2 into a vec4
-inline vec4 cat4(vec2 hi, vec2 lo)       { return _mm256_set_m128d(hi, lo); }
+inline vec4 cat4(vec2 h, vec2 l)  { return _mm256_set_m128d(h, l); }
+inline vec4 cat7(vec2 h, vec2 l)  { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), (h), 1); }
 //#define cat4(h, l)           _mm256_set_m128d(h, l)
 
 

@@ -7,18 +7,25 @@
 #include "simul.h"
 #include "parser.h"
 
-void Event::initialize(real time)
+
+void Event::reset(real time)
 {
-    stochastic = ( rate > 0 );
     nextEvent = time + RNG.exponential() / rate;
 }
 
 
-void Event::initialize(real time, Glossary& opt)
+Event::Event()
+: code(""), recurrent(false), rate(0), nextEvent(0)
 {
-    if (!opt.set(rate, "rate")) rate = 0;
+}
+
+
+Event::Event(real time, Glossary& opt)
+{
     if (!opt.set(code, "code")) code = "";
-    initialize(time);
+    if (!opt.set(rate, "rate")) rate = 0;
+    if (!opt.set(recurrent, "recurrent")) recurrent = 0;
+    reset(time);
 }
 
 
@@ -31,7 +38,7 @@ Event::~Event()
 /// stochastic firing at specified rate
 void Event::step(Simul& sim)
 {
-    if ( sim.time() > nextEvent )
+    if ( recurrent || sim.time() > nextEvent )
     {
         sim.relax();
         do {

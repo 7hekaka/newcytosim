@@ -47,7 +47,6 @@ void SolverC::release(real** vec1, real** vec2, real** vec3, real** vec4,
 }
 
 
-
 //=============================================================================
 //              Conjugate Gradient, no Preconditionning
 //=============================================================================
@@ -97,11 +96,9 @@ void SolverC::CG(int dim, const real* rhs, real* x,
 }
 
 
-
 //=============================================================================
 //              Conjugate Gradient, with Preconditioning
 //=============================================================================
-
 
 
 void SolverC::CGP(int dim, const real* rhs, real* x,
@@ -152,11 +149,9 @@ void SolverC::CGP(int dim, const real* rhs, real* x,
 }
 
 
-
 //=============================================================================
 //                      Bi-Conjugate Gradient
 //=============================================================================
-
 
 
 void SolverC::BCG(int dim, const real* rhs, real* x,
@@ -212,11 +207,9 @@ void SolverC::BCG(int dim, const real* rhs, real* x,
 }
 
 
-
 //=============================================================================
 //                 Bi-Conjugate Gradient Stabilized
 //=============================================================================
-
 
 
 int SolverC::BCGS(int dim, const real* rhs, real* x,
@@ -297,7 +290,6 @@ int SolverC::BCGS(int dim, const real* rhs, real* x,
     release(&r, &rtilde, &p, &t, &v);
     return ret;
 }
-
 
 
 //=============================================================================

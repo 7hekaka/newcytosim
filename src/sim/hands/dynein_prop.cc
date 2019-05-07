@@ -50,7 +50,6 @@ void DyneinProp::complete(Simul const& sim)
 }
 
 
-
 void DyneinProp::write_values(std::ostream& os) const
 {
     DigitProp::write_values(os);

@@ -15,7 +15,6 @@
 #include "simul_prop.h"
 
 
-
 void help(std::ostream& os)
 {
     os << "Synopsis: generate reports/statistics about cytosim's objects\n";

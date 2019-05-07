@@ -393,7 +393,7 @@ void Display3::drawFiberLinesM(Fiber const& fib, real len, real width) const
     if ( len > 0 )
     {
         real rad = width * sFactor;
-        unsigned inx = fib.indexM(len);
+        unsigned inx = fib.clampedIndexM(len);
         real cut = fib.segmentation() * inx;
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(-1.0, -1.0);
@@ -417,7 +417,7 @@ void Display3::drawFiberLinesP(Fiber const& fib, real len, real width) const
     {
         real rad = width * sFactor;
         real abs = fib.length() - len;
-        unsigned inx = 1 + fib.indexM(abs);
+        unsigned inx = 1 + fib.clampedIndexM(abs);
         real cut = fib.segmentation() * inx;
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(-1.0, -1.0);
@@ -1078,7 +1078,6 @@ void Display3::drawCoupleBfast(Couple const* cx) const
         if ( pd2->visible ) drawHand(p2, pd2);
     }
 }
-
 
 
 void Display3::drawCoupleB(Couple const* cx) const

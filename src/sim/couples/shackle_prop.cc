@@ -40,7 +40,6 @@ void ShackleProp::complete(Simul const& sim)
 }
 
 
-
 void ShackleProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);

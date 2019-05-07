@@ -517,7 +517,6 @@ void Display::drawSpace(Space const* obj, bool opaque)
 }
 
 
-
 void Display::drawSpaces(SpaceSet const& set)
 {
 #if ( DIM == 3 )
@@ -544,7 +543,6 @@ void Display::drawSpaces(SpaceSet const& set)
     
 #endif
 }
-
 
 
 /**
@@ -731,6 +729,9 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
             case 5:
                 gle::gleArrowTail(fib.posEndM(), -fib.dirEndM(), width);
                 break;
+            case 6:
+                gle::gleObject(fib.posEndM(), width, gle::gleCube1);
+                break;
         }
     }
 }
@@ -766,6 +767,9 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
                 break;
             case 5:
                 gle::gleArrowTail(fib.posEndP(), -fib.dirEndP(), width);
+                break;
+            case 6:
+                gle::gleObject(fib.posEndP(), width, gle::gleCube1);
                 break;
         }
     }
@@ -987,7 +991,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     }
     else if ( disp->point_style == 3 )
     {
-        // display middle of fiber:
+        // display only middle of fiber:
         gle::gleObject(fib.posMiddle(), 2*disp->point_size, gle::gleSphere2B);
     }
 }
@@ -1533,7 +1537,6 @@ void Display::drawFibers(FiberSet const& set)
             drawFiber(*fib);
     }
 }
-
 
 
 //------------------------------------------------------------------------------

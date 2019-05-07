@@ -29,5 +29,4 @@ The following tutorials correspond to work published in the past and they are al
 - [Bipolarity](tuto_bipolarity.md)
 
 
-
 [Back to main page](../index.md)

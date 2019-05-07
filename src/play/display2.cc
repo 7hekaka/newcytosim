@@ -20,7 +20,6 @@ using namespace gle;
 extern Modulo const* modulo;
 
 
-
 #define ENABLE_EXPLODE_DISPLAY ( DIM < 3 )
 
 

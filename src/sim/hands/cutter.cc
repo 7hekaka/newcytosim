@@ -69,5 +69,3 @@ void Cutter::stepLoaded(Vector const& force, real force_norm)
     }
 }
 
-
-

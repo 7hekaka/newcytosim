@@ -62,7 +62,6 @@ public:
 };
 
 
-
 /// represents the Segment of a Fiber for steric interactions
 class FatSegment
 {
@@ -122,8 +121,6 @@ public:
 };
 
 
-
-
 /// type for a list of FatPoint
 typedef Array<FatPoint> FatPointList;
 
@@ -134,7 +131,6 @@ typedef Array<FatSegment> FatSegmentList;
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
 #define NB_STERIC_PANES 3
-
 
 
 /// a set of lists associated with the same location

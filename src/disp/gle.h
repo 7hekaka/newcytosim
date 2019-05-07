@@ -179,6 +179,8 @@ namespace gle
     void gleSphere8();
     /// draw a icosahedron of radius 1
     void gleIcosahedron1();
+    /// display a Cube in 3D and a Square in 2D
+    void gleCube1();
     /// draw Torus of radius `rad` and thickness `thick`
     void gleTorus(GLfloat rad, GLfloat thick, size_t inc = 1);
     

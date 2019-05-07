@@ -3,6 +3,7 @@
 #include "vector3.h"
 #include "quaternion.h"
 #include "gle_color.h"
+#include "iowrapper.h"
 
 /// something
 class Thing
@@ -31,14 +32,7 @@ public:
     void step();
     
     /// draw using OpenGL
-    void     bool        draw() const;
-    
-    /// write to file
-    void        write(Outputter&) const;
-
-    /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
-
+    void        draw() const;
     
     ///record state to FILE, the current time is provided
     void write(FILE*, real time) const;

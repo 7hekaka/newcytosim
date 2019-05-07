@@ -5,7 +5,7 @@
 - [Preconfig: A Versatile Configuration File Generator for Varying Parameters](http://doi.org/10.5334/jors.156)  
 
 
-# Articles from other groups that used Cytosim
+# Articles from other groups using Cytosim
 
 *Please, let us know if we are missing citations here*
 

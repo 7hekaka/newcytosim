@@ -7,7 +7,6 @@
 #include "property.h"
 
 
-
 /// Property for Nucleus
 /**
  @ingroup Properties

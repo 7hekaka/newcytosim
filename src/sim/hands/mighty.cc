@@ -58,7 +58,6 @@ void Mighty::stepUnloaded()
 }
 
 
-
 void Mighty::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );

@@ -328,7 +328,6 @@ real  Space::signedDistanceToEdge(Vector const& pos) const
 }
 
 
-
 //------------------------------------------------------------------------------
 #pragma mark - Interactions
 

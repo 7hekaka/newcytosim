@@ -23,8 +23,8 @@ public:
     /// code to be executed
     std::string code;
     
-    /// true if event has stochastic firing type
-    bool        stochastic;
+    /// true if event executes at every time step
+    bool        recurrent;
 
     /// rate at which code is executed
     real        rate;
@@ -35,16 +35,16 @@ public:
 public:
 
     /// default constructor
-    Event() {};
+    Event();
     
+    /// constructor
+    Event(real time, Glossary&);
+
     /// destructor
     virtual ~Event();
     
     /// initialize counters
-    void initialize(real time);
-    
-    /// set values of parameters
-    void initialize(real time, Glossary&);
+    void reset(real time);
 
     /// returns 0, since Event have no Property
     Property const* property() const { return nullptr; }
@@ -77,7 +77,6 @@ public:
     /// write
     void      write(Outputter&) const;
 };
-
 
 
 #endif

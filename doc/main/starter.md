@@ -93,6 +93,3 @@ For more info on the Unix Command Line, check the resources online:
 - [Unix Command Line](https://en.wikipedia.org/wiki/Command-line_interface)
 - [lifehacker](https://lifehacker.com/5633909/who-needs-a-mouse-learn-to-use-the-command-line-for-almost-anything)
 
-
-
-

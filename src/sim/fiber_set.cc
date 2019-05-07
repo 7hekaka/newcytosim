@@ -68,7 +68,6 @@ Property* FiberSet::newProperty(const std::string& kd, const std::string& nm, Gl
 }
 
 
-
 /**
  Split string `arg` into an integer, a space, and the remaining string.
  Any space after the integer is discarded. `arg` is truncated.
@@ -351,7 +350,6 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
         }
     }
 }
-
 
 
 /**
@@ -778,7 +776,6 @@ real FiberSet::infoNematic(ObjectList const& objs,
 }
 
 
-
 /**
  Return the principal component directions of the cloud of vertices.
  Each fiber is weighted by its length.
@@ -911,7 +908,6 @@ int FiberSet::infoComponents(ObjectList const& objs,
 }
 
 
-
 /**
  This counts the number of times Fibers intersect within a distance `max_dis`.
  In 2D, `max_dis` is irrelevant, as an intersection is necessarily complete.
@@ -941,8 +937,6 @@ unsigned FiberSet::countIntersections(real max_dis) const
     }
     return res;
 }
-
-
 
 
 /**
@@ -1175,7 +1169,4 @@ void FiberSet::infoLattice(real& len, unsigned& cnt, real& sm, real& mn, real& m
     }
 #endif
 }
-
-
-
 

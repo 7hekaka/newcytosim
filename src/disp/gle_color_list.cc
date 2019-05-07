@@ -1521,7 +1521,6 @@ void gle::print_std_colors(std::ostream& os)
 }
 
 
-
 gle_color gle::alt_color(unsigned indx)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);
@@ -1583,7 +1582,7 @@ gle_color gle::bright_color(unsigned indx, const GLfloat minb, const GLfloat max
 
 gle_color gle::nice_color(unsigned indx)
 {
-    static const unsigned max = sizeof(nice_colors) / sizeof(gle_color);
+    static constexpr unsigned max = sizeof(nice_colors) / sizeof(gle_color);
     
     return nice_colors[ indx % max ];
 }

@@ -73,8 +73,6 @@ real Simul::estimateStericRange() const
 }
 
 
-
-
 void Simul::setStericGrid(Space const* spc) const
 {
     assert_true(spc);
@@ -415,8 +413,6 @@ void Simul::dump() const
 }
 
 
-
-
 //==============================================================================
 //                              SOLVE-X 1D
 //==============================================================================
@@ -462,5 +458,4 @@ void Simul::solveX()
     sMeca1D.solve(prop->tolerance * noise);
     sMeca1D.apply();
 }
-
 

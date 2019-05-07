@@ -13,7 +13,6 @@
 #include "meca.h"
 
 
-
 void Nucleus::step()
 {
 }
@@ -37,7 +36,6 @@ void Nucleus::setInteractions(Meca & meca) const
         }
     }
 }
-
 
 
 //------------------------------------------------------------------------------

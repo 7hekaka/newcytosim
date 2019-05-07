@@ -36,14 +36,15 @@ Object * EventSet::newObjectT(const ObjectTag tag, unsigned idx)
  
      new event NAME
      {
-
+         code = CODE;
+         rate = POSITIVE_REAL;
+         recurrent = [0, 1];
      }
  */
 ObjectList EventSet::newObjects(const std::string&, Glossary& opt)
 {
     ObjectList res;
-    Event * e = new Event();
-    e->initialize(simul.time(), opt);
+    Event * e = new Event(simul.time(), opt);
     res.push_back(e);
     return res;
 }

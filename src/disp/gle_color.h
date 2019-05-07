@@ -99,7 +99,7 @@ public:
     }
     
     /// export floating point components
-    void put_floats(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat& a)
+    void store(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat& a)
     {
         r = col_[0];
         g = col_[1];
@@ -108,7 +108,7 @@ public:
     }
     
     /// export floating point components to array
-    void put_floats(GLfloat c[4])
+    void store(GLfloat c[4])
     {
         c[0] = col_[0];
         c[1] = col_[1];
@@ -424,7 +424,6 @@ public:
         os << '\n';
     }
 };
-
 
 
 /// input operator:

@@ -223,7 +223,6 @@ void Couple::stepAA()
 }
 
 
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -336,7 +335,7 @@ void Couple::beforeDetachment(Hand const* h)
      Set position near the attachment point, but offset in the perpendicular
      direction at a random distance within the range of attachment of the Hand
  
-     This is necessary to achieve detailled balance, which in particular implies
+     This is necessary to achieve detailed balance, which in particular implies
      that rounds of binding/unbinding should not get the Couples closer to
      the Filaments to which they bind.
      */

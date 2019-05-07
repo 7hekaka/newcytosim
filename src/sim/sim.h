@@ -14,7 +14,6 @@
 #define BACKWARD_COMPATIBILITY
 
 
-
 /**
  If the keyword below is defined, the viscous drag of the fibers
  will be different in the transverse and parallel directions, such that

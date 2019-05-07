@@ -16,12 +16,14 @@ class SingleSet;
 class Space;
 
 
-/// switches to enable advanced features:
-#define OLD_SQUEEZE_FORCE  0
-#define NEW_COLINEAR_FORCE 0
-#define NEW_CHEW_FIBERS    0
-#define NEW_FIBER_CONFINE2 0
-#define NEW_AGING_LATTICE  0
+/// compile switches to enable advanced features:
+#define OLD_SQUEEZE_FORCE       0
+#define NEW_COLINEAR_FORCE      0
+#define NEW_CHEW_FIBERS         0
+#define NEW_FIBER_CONFINE2      0
+#define NEW_FIBER_CONFINE_RANGE 0
+#define NEW_AGING_LATTICE       0
+#define NEW_FIBER_LOOP          0
 
 /// Property for a Fiber
 /**
@@ -239,6 +241,9 @@ public:
     /// name of space used for confinement (also known as `confine[2]`)
     std::string  confine2_space;
 #endif
+#if NEW_FIBER_CONFINE_RANGE
+    real         confine_range[2];
+#endif
     
     /// if true, include steric interaction for this object
     /**
@@ -311,6 +316,9 @@ public:
     real squeeze_range;
 #endif
     
+#if NEW_FIBER_LOOP
+    bool loop;
+#endif
     /// @}
 
     /// derived variable: flag to indicate that `display` has a new value

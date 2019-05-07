@@ -293,7 +293,6 @@ void Fiber::cutP(real len)
 }
 
 
-
 /**
  The Fiber is cut at point P
  - A new Fiber is created from the section [ P , PLUS_END ],
@@ -614,7 +613,6 @@ Clift R, Grace JR, Weber ME. Bubbles, drops, and particles: Courier Corporation;
  */
 
 
-
 /** 
  Fiber::setDragCoefficientVolume() calculates the mobility for the entire fiber, 
  considering that the cylinder is straight and moving in a infinite fluid.
@@ -720,7 +718,6 @@ real Fiber::dragCoefficientVolume()
 }
 
 
-
 /**
  Fiber::setDragCoefficientSurface() uses a formula calculated by F. Gittes in:\n
  <em>
@@ -773,7 +770,6 @@ real Fiber::dragCoefficientSurface()
 }
 
 
-
 /**
  Calculate drag coefficient from two possible formulas
 
@@ -819,7 +815,9 @@ void Fiber::prepareMecable()
 
     // the scaling of the bending elasticity depends on the length of the segments
     rfRigidity = prop->rigidity / segmentationCube();
-    
+#if NEW_FIBER_LOOP
+    rfRigidityLoop = prop->loop;
+#endif
 #if ( 0 )
     real energy = bendingEnergy();
     real euler = M_PI * M_PI * prop->rigidity / ( length() * length() );
@@ -916,8 +914,8 @@ void Fiber::setInteractions(Meca & meca) const
                 
             case CONFINE_MINUS_END:
                 spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
-            break;
-                
+                break;
+
             case CONFINE_PLUS_END:
             {
                 unsigned L = lastPoint();
@@ -938,7 +936,16 @@ void Fiber::setInteractions(Meca & meca) const
                 if ( spc->inside(pos) )
                     spc->setInteraction(pos, Mecapoint(this, L), meca, prop->confine_stiffness);
             } break;
-                
+#if NEW_FIBER_CONFINE_RANGE
+            case CONFINE_RANGE:
+            {
+                // we use here the MINUS_END as a reference... which maybe problematic
+                unsigned S = clampedIndexM(prop->confine_range[0]);
+                unsigned E = clampedIndexM(prop->confine_range[1]);
+                for ( unsigned i = S; i < E; ++i )
+                    spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
+            } break;
+#endif
             default:
                 throw InvalidParameter("Invalid fiber::confine");
         }
@@ -1819,4 +1826,5 @@ void Fiber::read(Inputter & in, Simul& sim, ObjectTag tag)
         Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'" << std::endl;
     }
 }
+
 

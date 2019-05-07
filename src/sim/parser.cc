@@ -32,7 +32,6 @@ Parser::Parser(Simul& s, bool ds, bool dc, bool dn, bool dr, bool dw)
 }
 
 
-
 void Parser::show_lines(std::istream& is, std::streampos pos)
 {
     std::cerr << "in\n";

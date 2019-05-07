@@ -310,7 +310,6 @@ void Hand::stepUnattached(const FiberGrid& grid, Vector const & pos)
 }
 
 
-
 /**
  Test for spontaneous detachment at rate HandProp::unbinding_rate, 
  */
@@ -337,7 +336,6 @@ void Hand::stepLoaded(Vector const& force, real force_norm)
     else
         testDetachment();
 }
-
 
 
 //------------------------------------------------------------------------------

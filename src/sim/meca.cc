@@ -359,7 +359,6 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 }
 
 
-
 /**
  calculate the matrix vector product corresponding to 'mec'
  
@@ -422,9 +421,6 @@ void Meca::multiply( const real* X, real* Y ) const
     }
 #endif
 }
-
-
-
 
 
 /**
@@ -581,7 +577,6 @@ void expand_matrix(unsigned siz, real * mat)
     VecPrint::print(std::clog, siz, siz, mat, siz);
 #endif
 }
-
 
 
 /**
@@ -884,7 +879,6 @@ void Meca::extractBlock(real* res, const Mecable * mec) const
     for ( unsigned ii = 0; ii < bs; ++ii )
         res[bs*ii+ii] += 1.0;
 }
-
 
 
 /**
@@ -1710,10 +1704,6 @@ void Meca::apply()
         //write(2, "extra Meca::apply() calls\n", 26);
     }
 }
-
-
-
-
 
 
 //------------------------------------------------------------------------------

@@ -245,7 +245,6 @@ void View::setLights(bool local) const
 #pragma mark -
 
 
-
 void View::reshape(int W, int H)
 {
     //std::clog << "View::reshaped " << W << " " << H << std::endl;

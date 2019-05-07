@@ -21,13 +21,13 @@ Random RNG;
 /// the last bit in a 32-bits integer
 constexpr uint32_t BIT31 = 1U << 31;
 
-//static const uint32_t FRAC32 = 0x7FFFFFU;
+/// constexpr uint32_t FRAC32 = 0x7FFFFFU;
 constexpr uint32_t EXPON32 = 127U << 23;
 
 /// exponent for a double precision float
 constexpr uint64_t BIT63 = 1ULL << 63;
 
-// const uint64_t EXPON64 = 1023ULL << 52;
+// constexpr uint64_t EXPON64 = 1023ULL << 52;
 
 
 /**
@@ -617,7 +617,4 @@ uint32_t Random::binomial(const int N, const real P)
             ++s;
     return s;
 }
-
-
-
 

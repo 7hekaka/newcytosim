@@ -217,7 +217,6 @@ void drawActin(Fiber const& fib)
 }
 
 
-
 /// save tubular structure made of 13-protofilaments
 void drawMicrotubule(Fiber const& fib)
 {

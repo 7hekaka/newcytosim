@@ -62,7 +62,7 @@ Molecular motors can be modelled using a continuous approximation or as discrete
 
 [All molecular events such as binding/unbinding are stochastic](../sim/stochastic.md).
 
-## Code Architecture
+# Code Architecture
 
 Cytosim has a modular architecture and can be customized.
 The entities (fiber, motor, nucleator, etc.) are specified in derived C++ classes with usually few lines of code. These classes can be modified for custom applications.

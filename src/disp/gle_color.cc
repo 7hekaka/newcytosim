@@ -191,7 +191,6 @@ void gle_color::RGB2HSV(const GLfloat r, const GLfloat g, const GLfloat b, GLflo
 }
 
 
-
 void gle_color::HSV2RGB(const GLfloat h, const GLfloat s, const GLfloat v, GLfloat* r, GLfloat* g, GLfloat* b)
 {
     int i;
@@ -218,7 +217,6 @@ void gle_color::HSV2RGB(const GLfloat h, const GLfloat s, const GLfloat v, GLflo
         default: *r = 1; *g = 1; *b = 1; break;
     }
 }
-
 
 
 /**
@@ -309,7 +307,6 @@ void gle_color::set_jet_components_dark(GLfloat& r, GLfloat& g, GLfloat& b, cons
         }
     }
 }
-
 
 
 /**

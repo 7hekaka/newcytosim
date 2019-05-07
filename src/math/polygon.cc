@@ -172,7 +172,6 @@ void Polygon::flip()
 }
 
 
-
 void Polygon::translate(real dx, real dy)
 {
     for ( unsigned n = 0; n <= npts_; ++n )
@@ -251,7 +250,6 @@ void Polygon::inflate(real eps)
         pts_[npts_].yy = pts_[0].yy;
     }
 }
-
 
 
 /**
@@ -498,7 +496,6 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, int& hit) const
 }
 
 
-
 void Polygon::dump(std::ostream& os) const
 {
     os << "polygon " << npts_ << "\n";
@@ -508,6 +505,4 @@ void Polygon::dump(std::ostream& os) const
         os << " " << std::setw(10) << pts_[n].dx << " " << std::setw(10) << pts_[n].dy << "\n";
     }
 }
-
-
 

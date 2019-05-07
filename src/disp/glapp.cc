@@ -1059,7 +1059,6 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
 }
 
 
-
 //------------------------------------------------------------------------------
 void glApp::processMouseDrag(int mX, int mY)
 {

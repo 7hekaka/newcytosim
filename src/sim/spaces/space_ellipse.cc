@@ -116,7 +116,6 @@ bool SpaceEllipse::inside(Vector const& w) const
 #endif
 
 
-
 Vector1 SpaceEllipse::project1D(Vector1 const& w) const
 {
     if ( w.XX >= 0 )
@@ -124,7 +123,6 @@ Vector1 SpaceEllipse::project1D(Vector1 const& w) const
     else
         return Vector1(-length_[0], 0, 0);
 }
-
 
 
 Vector2 SpaceEllipse::project2D(Vector2 const& w) const
