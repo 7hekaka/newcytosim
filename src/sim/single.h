@@ -129,7 +129,7 @@ public:
     virtual void    setPosition(Vector const& x) { sPos = x; }
 
     /// modulo the position of the grafted
-    virtual void    foldPosition(const Modulo * s);
+    virtual void    foldPosition(Modulo const* s);
     
     /// set the position randomly inside prop->confine_space
     void            randomizePosition();
@@ -174,10 +174,10 @@ public:
     static const ObjectTag TAG = 's';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag        tag() const { return TAG; }
     
     /// return associated Property
-    Property const* property() const { return prop; }
+    Property const*  property() const { return prop; }
     
     /// return PointDisp of associated Hand
     PointDisp const* disp() const { return sHand->prop->disp; }

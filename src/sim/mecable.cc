@@ -329,7 +329,7 @@ void Mecable::calculateMomentum(Vector& avg, Vector& sec, bool sub)
 }
 
 
-void Mecable::foldPosition(const Modulo * s)
+void Mecable::foldPosition(Modulo const* s)
 {
     Vector off = s->offset(position());
     if ( !off.null() )
@@ -337,7 +337,7 @@ void Mecable::foldPosition(const Modulo * s)
 }
 
 
-bool Mecable::allInside(const Space * spc) const
+bool Mecable::allInside(Space const* spc) const
 {
     bool res = true;
     for ( unsigned ii = 0; ii < nPoints; ++ii )

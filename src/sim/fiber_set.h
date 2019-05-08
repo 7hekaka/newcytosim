@@ -70,7 +70,7 @@ public:
     void step();
     
     /// modulo the position (periodic boundary conditions)
-    void foldPosition(const Modulo *) const;
+    void foldPosition(Modulo const*) const;
     
     /// find intersections between fibers in entire network, within given threshold
     void allIntersections(Array<FiberSite>&, Array<FiberSite>&, real max_distance) const;

@@ -42,7 +42,7 @@ public:
     NucleatorProp const* prop;
     
     /// constructor
-    Nucleator(NucleatorProp const* p, HandMonitor* h);
+    Nucleator(NucleatorProp const*, HandMonitor*);
 
     /// destructor
     ~Nucleator() {}

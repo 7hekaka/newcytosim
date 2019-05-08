@@ -40,13 +40,13 @@ public:
     //-------------------------------------------------------------------------------
     
     /// add a new Property in the list, and set its number
-    void         deposit(Property * p);
+    void         deposit(Property *);
     
     /// push a new Property in the list
     void         push_back(Property * p) { vec_.push_back(p); }
 
     /// forget pointer to p
-    void         remove(Property const* p);
+    void         remove(Property const*);
     
     /// delete all Property
     void         erase();

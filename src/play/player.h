@@ -117,9 +117,6 @@ public:
     /// write Object display parameters
     void writeDisplayParameters(std::ostream& out, bool prune) const;
     
-    /// Check standard input for incoming commands
-    void checkInput(int);
-    
     //-----------------------------DISPLAY--------------------------------------
   
     /// initialize display with given style

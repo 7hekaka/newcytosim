@@ -3,6 +3,7 @@
 #define SINGLE_PROP_H
 
 #include "real.h"
+#include "vector.h"
 #include "property.h"
 #include "hand_prop.h"
 #include "common.h"
@@ -11,6 +12,8 @@ class Mecable;
 class Single;
 class Wrist;
 class Space;
+
+#define NEW_MOBILE_SINGLE 0
 
 /// Property for Single
 /**
@@ -71,7 +74,12 @@ public:
 
      */
     int          fast_diffusion;
-
+    
+#if NEW_MOBILE_SINGLE
+    /// constant drift
+    Vector       speed;
+#endif
+    
     /// Confinement can be `none`, `inside` (default) or `surface`
     Confinement  confine;
     
@@ -97,9 +105,14 @@ protected:
     /// pointer to actual confinement Space, derived from `confine_space`
     Space const*   confine_space_ptr;
     
+#if NEW_MOBILE_SINGLE
+    /// movement in one time_step
+    Vector         speed_dt;
+#endif
+
     /// displacement in one time_step
     real           diffusion_dt;
-
+    
 public:
     
     /// constructor

@@ -45,7 +45,7 @@ private:
 public:
         
     /// constructor
-    SpaceBanana(const SpaceProp* p);
+    SpaceBanana(SpaceProp const*);
     
     /// update geometry
     void        resize(Glossary& opt);

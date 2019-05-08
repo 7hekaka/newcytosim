@@ -34,7 +34,7 @@ extern Modulo const* modulo;
  A good compromise is to set `max_step` equivalent to the attachment distance,
  or at least to the size of the segments of the Fibers.
  */
-unsigned FiberGrid::setGrid(const Space * space, real max_step)
+unsigned FiberGrid::setGrid(Space const* space, real max_step)
 {
     if ( max_step <= 0 )
         throw InvalidParameter("simul:binding_grid_step should be > 0");

@@ -36,7 +36,7 @@ public:
     DyneinProp const* prop;
     
     /// constructor
-    Dynein(DyneinProp const* p, HandMonitor* h);
+    Dynein(DyneinProp const*, HandMonitor*);
     
     /// destructor
     ~Dynein() {}

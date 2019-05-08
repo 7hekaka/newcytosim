@@ -56,7 +56,7 @@ void Modulo::fold(Vector& vec) const
 
 
 //this makes modulo around the center 'ref'
-void Modulo::fold(Vector & pos, const Vector& ref) const
+void Modulo::fold(Vector & pos, Vector const& ref) const
 {
     pos -= ref;
     fold(pos);

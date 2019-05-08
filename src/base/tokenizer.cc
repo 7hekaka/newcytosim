@@ -302,7 +302,7 @@ std::vector<std::string> Tokenizer::split(std::string& str, char sep, bool get_e
  Split string `arg` into an integer, a space, and the remaining string.
  Any space after the integer is discarded. `arg` is truncated.
  */
-bool Tokenizer::split_integer(std::string& arg, long& var)
+int Tokenizer::get_integer(std::string& arg, int val)
 {
     char const* ptr = arg.c_str();
     char * end;
@@ -310,21 +310,20 @@ bool Tokenizer::split_integer(std::string& arg, long& var)
     long num = strtol(ptr, &end, 10);
     if ( !errno && end > ptr && isspace(*end) )
     {
-        var = num;
         // skip any additional space characters:
         while ( isspace(*end) )
             ++end;
         arg.erase(0, end-ptr);
-        return true;
+        return num;
     }
-    return false;
+    return val;
 }
 
 /**
  Split string `arg` into an integer, a space, and the remaining string.
  Any space after the integer is discarded. `arg` is truncated.
  */
-bool Tokenizer::split_integer(std::string& arg, unsigned long& var)
+unsigned int Tokenizer::get_integer(std::string& arg, unsigned int val)
 {
     char const* ptr = arg.c_str();
     char * end;
@@ -332,14 +331,13 @@ bool Tokenizer::split_integer(std::string& arg, unsigned long& var)
     unsigned long num = strtoul(ptr, &end, 10);
     if ( !errno && end > ptr && isspace(*end) )
     {
-        var = num;
         // skip any additional space characters:
         while ( isspace(*end) )
             ++end;
         arg.erase(0, end-ptr);
-        return true;
+        return num;
     }
-    return false;
+    return val;
 }
 
 /**

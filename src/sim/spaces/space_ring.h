@@ -40,7 +40,7 @@ private:
 public:
         
     ///creator
-    SpaceRing(const SpaceProp*);
+    SpaceRing(SpaceProp const*);
     
     /// update geometry
     void        resize(Glossary& opt);

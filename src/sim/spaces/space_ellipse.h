@@ -44,7 +44,7 @@ protected:
 public:
         
     /// creator
-    SpaceEllipse(const SpaceProp*);
+    SpaceEllipse(SpaceProp const*);
         
     /// update geometry
     void        resize(Glossary& opt);

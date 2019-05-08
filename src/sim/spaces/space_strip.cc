@@ -8,7 +8,7 @@
 #include "meca.h"
 
 
-SpaceStrip::SpaceStrip(const SpaceProp* p)
+SpaceStrip::SpaceStrip(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -19,14 +19,14 @@ SpaceStrip::SpaceStrip(const SpaceProp* p)
 
 void SpaceStrip::resize(Glossary& opt)
 {
-    real len;
     for ( int d = 0; d < DIM; ++d )
     {
+        real len = length_[d];
         if ( opt.set(len, "length", d) )
-            length_[d] = len * 0.5;
-        
-        if ( length_[d] < 0 )
-            throw InvalidParameter("strip:length[] must be >= 0");
+            len *= 0.5;
+        if ( len < 0 )
+            throw InvalidParameter("square:length[] must be >= 0");
+        length_[d] = len;
     }
     if ( length_[DIM-1] <= 0 )
         throw InvalidParameter("strip:length[DIM-1] must be > 0");

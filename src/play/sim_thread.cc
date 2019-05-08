@@ -266,7 +266,7 @@ SingleProp * SimThread::makeHandleProperty(real range)
 }
 
 
-Single * SimThread::createHandle(const Vector & pos, real range)
+Single * SimThread::createHandle(Vector const& pos, real range)
 {
     SingleProp * sip = getHandleProperty();
     if ( !sip )
@@ -335,7 +335,7 @@ void SimThread::detachHandle()
     }
 }
 
-void SimThread::moveHandle(const Vector & pos)
+void SimThread::moveHandle(Vector const& pos)
 {
     if ( mHandle )
     {
@@ -344,7 +344,7 @@ void SimThread::moveHandle(const Vector & pos)
 }
 
 
-void SimThread::moveHandles(const Vector & vec)
+void SimThread::moveHandles(Vector const& vec)
 {
     SingleProp * sip = getHandleProperty();
     if ( sip )
@@ -429,7 +429,7 @@ size_t SimThread::readInput(size_t max_nb_lines)
             // check if more input is available:
             if ( has_input(STDIN_FILENO) < 1 )
             {
-                //printf("only %i lines available\n", cnt);
+                //printf("processed %i lines from standard input\n", cnt);
                 break;
             }
         }

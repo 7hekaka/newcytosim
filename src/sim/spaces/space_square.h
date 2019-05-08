@@ -27,7 +27,7 @@ private:
 public:
     
     ///creator
-    SpaceSquare(const SpaceProp*);
+    SpaceSquare(SpaceProp const*);
     
     /// update geometry
     void        resize(Glossary& opt);

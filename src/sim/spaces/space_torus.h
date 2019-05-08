@@ -35,7 +35,7 @@ private:
 public:
         
     /// constructor
-    SpaceTorus(const SpaceProp* p);
+    SpaceTorus(SpaceProp const*);
         
     /// update geometry
     void        resize(Glossary& opt);

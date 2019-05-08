@@ -75,7 +75,7 @@ void SolidSet::remove(Object * obj)
 }
 
 
-void SolidSet::foldPosition(const Modulo * s) const
+void SolidSet::foldPosition(Modulo const* s) const
 {
     for ( Solid * o=first(); o; o=o->next() )
         o->foldPosition(s);

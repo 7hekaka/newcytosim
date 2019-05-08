@@ -26,7 +26,7 @@ inline real surf_block(const real a, const real b, const real c)
 }
 
 
-SpaceDynamicEllipse::SpaceDynamicEllipse(const SpaceProp* p)
+SpaceDynamicEllipse::SpaceDynamicEllipse(SpaceProp const* p)
 : SpaceEllipse(p)
 {
     if ( DIM == 1 )
@@ -111,7 +111,7 @@ void SpaceDynamicEllipse::reset_forces() const
 /**
  register forces applied to the space
  */
-void SpaceDynamicEllipse::decompose_force(const Vector& forces, const Vector& pos,const Vector& dir) const
+void SpaceDynamicEllipse::decompose_force(Vector const& forces, Vector const& pos,Vector const& dir) const
 {
 #if ( 0 )
     // keep only force component in the normal direction:
@@ -126,7 +126,7 @@ void SpaceDynamicEllipse::decompose_force(const Vector& forces, const Vector& po
 /**
  Add a point-like force acting on the ellipse
  */
-void SpaceDynamicEllipse::add_radial_force(const Vector& forces, const Vector& pos) const
+void SpaceDynamicEllipse::add_radial_force(Vector const& forces, Vector const& pos) const
 {
     Vector U = director(0);
     Rforces.XX += dot(U, forces) * dot(U, pos) / length_[0];
@@ -175,7 +175,7 @@ Vector SpaceDynamicEllipse::pressure_forces(const real P) const
  
  until the machine precision is exhausted
 */
-real SpaceDynamicEllipse::compute_pressure(const Vector & sizes, const Vector & radif) const
+real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& radif) const
 {
     real P = pressure;
     real err = INFINITY, last_err;

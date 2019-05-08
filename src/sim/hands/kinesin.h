@@ -36,7 +36,7 @@ public:
     KinesinProp const* prop;
     
     /// constructor
-    Kinesin(KinesinProp const* p, HandMonitor* h);
+    Kinesin(KinesinProp const*, HandMonitor*);
     
     /// destructor
     ~Kinesin() {}

@@ -6,7 +6,7 @@
 #include "glossary.h"
 
 
-SpaceBanana::SpaceBanana(const SpaceProp* p)
+SpaceBanana::SpaceBanana(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -19,23 +19,28 @@ SpaceBanana::SpaceBanana(const SpaceProp* p)
 
 void SpaceBanana::resize(Glossary& opt)
 {
-    real len = 0;
-    if ( opt.set(len, "radius") )     bWidth = len;
-    else if ( opt.set(len, "width") ) bWidth = len * 0.5;
+    real len = bLength, wid = bWidth, rad = bRadius;
     
-    opt.set(bRadius, "curvature");
+    if ( opt.set(wid, "radius") )
+        wid *= 2;
+    else opt.set(wid, "width");
+    opt.set(rad, "curvature");
     opt.set(len, "length");
 
-    bLength = len - 2 * bWidth;
+    len = len - 2 * wid;
 
-    if ( bLength <= 0 )
+    if ( len <= 0 )
         throw InvalidParameter("banana:length must be >= 2 * width");
-    if ( bRadius <= 0 )
+    if ( rad <= 0 )
         throw InvalidParameter("banana:radius must be >= 0");
-    if ( bWidth < 0 )
+    if ( wid < 0 )
         throw InvalidParameter("banana:width must be > 0");
-    if ( bWidth > bRadius )
+    if ( wid > bRadius )
         throw InvalidParameter("banana:width must be <= radius");
+    
+    bLength = len;
+    bWidth = wid;
+    bRadius = rad;
     update();
 }
 

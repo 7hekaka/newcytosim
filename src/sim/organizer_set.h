@@ -55,7 +55,7 @@ public:
     Organizer*  findOrganizer(Mecable const*) const;
     
     /// modulo the position (periodic boundary conditions)
-    void        foldPosition(const Modulo * s) const;
+    void        foldPosition(Modulo const* s) const;
 
     /// Monte-Carlo simulation step for every Object
     void        step();

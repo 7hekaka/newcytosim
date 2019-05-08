@@ -27,12 +27,21 @@ Display1::Display1(DisplayProp const* dp) : Display(dp)
 
 void Display1::drawSimul(Simul const& sim)
 {
+    glDepthMask(GL_FALSE);
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
-    
-    drawSpaces(sim.spaces);
     drawFields(sim.fields);
     
+    glEnable(GL_LIGHTING);
+#if ( DIM > 2 )
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+#endif
+    drawSpaces(sim.spaces);
+    
+    glDisable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
+
     if ( prop->couple_select & 1 )
         drawCouplesF(sim.couples);
     

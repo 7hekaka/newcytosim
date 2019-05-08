@@ -60,15 +60,15 @@ private:
     /// Gives the i-th eigenvector of the ellipsoid
     Vector      director(unsigned i) const;
     /// Surface area of an ellipse of given axis length
-    static real surfaceEllipse(const Vector &);
+    static real surfaceEllipse(Vector const&);
     
     /// Volume of an ellipse of given axis length
-    static real volumeEllipse(const Vector &);
+    static real volumeEllipse(Vector const&);
     
 public:
      
     /// constructor
-    SpaceDynamicEllipse(const SpaceProp*);
+    SpaceDynamicEllipse(SpaceProp const*);
     
     /// update geometry
     void    resize(Glossary& opt);

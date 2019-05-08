@@ -105,7 +105,7 @@ Vector Single::position() const
     return sPos;
 }
 
-void Single::foldPosition(const Modulo * s)
+void Single::foldPosition(Modulo const* s)
 {
     s->fold(sPos);
 }
@@ -119,6 +119,11 @@ void Single::randomizePosition()
 void Single::stepF(const FiberGrid& grid)
 {
     assert_false( sHand->attached() );
+
+#if NEW_MOBILE_SINGLE
+    // translation:
+    sPos += prop->speed_dt;
+#endif
 
     // diffusion:
     sPos.addRand(prop->diffusion_dt);
@@ -145,6 +150,11 @@ void Single::stepA()
     assert_true( sHand->attached() );
     assert_true( !hasForce() );
 
+#if NEW_MOBILE_SINGLE
+    // translation:
+    sPos += prop->speed_dt;
+#endif
+    
     sHand->stepUnloaded();
 }
 
@@ -158,7 +168,7 @@ void Single::setInteractions(Meca & meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        const Space* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_space_ptr;
         spc->setInteraction(sHand->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif

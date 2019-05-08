@@ -37,10 +37,10 @@ class Space : public Object
 public:
     
     /// parameters
-    const SpaceProp* prop;
+    SpaceProp const* prop;
     
     /// constructor
-    Space(const SpaceProp* p);
+    Space(SpaceProp const*);
     
     /// destructor
     virtual ~Space();

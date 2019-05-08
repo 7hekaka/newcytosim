@@ -37,16 +37,16 @@ class Movable
 public:
     
     /// read a position specified with primitives, such as 'circle 5', etc.
-    static Vector readPrimitive(std::istream&, const Space*);
+    static Vector readPrimitive(std::istream&, Space const*);
     
     /// read a position in space
-    static Vector readPosition(std::istream&, const Space*);
+    static Vector readPosition(std::istream&, Space const*);
 
     /// read an orientation, and return a normalized vector
-    static Vector readDirection(std::istream&, const Vector&, const Space*);
+    static Vector readDirection(std::istream&, Vector const&, Space const*);
 
     /// read a rotation specified in stream, at position `pos`
-    static Rotation readRotation(std::istream&, const Vector&, const Space*);
+    static Rotation readRotation(std::istream&, Vector const&, Space const*);
     
 public:
     
@@ -92,7 +92,7 @@ public:
     
     
     /// perform modulo for periodic boundary conditions
-    /** This brings the object to the centered mirror image defined by Modulo */
+    /** This brings the object to the centered mirror image defined by Modulo*/
     virtual void      foldPosition(Modulo const*) {}
     
 };

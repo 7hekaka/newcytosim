@@ -32,7 +32,7 @@ private:
 public:
         
     ///creator
-    SpaceCylinderP(const SpaceProp*);
+    SpaceCylinderP(SpaceProp const*);
 
     /// update geometry
     void        resize(Glossary& opt);

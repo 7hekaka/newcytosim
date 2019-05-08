@@ -9,7 +9,7 @@
 /**
  The parameters BeadSet and BeadProp define the inner volume for this Space
 */
-SpaceBeads::SpaceBeads(const SpaceProp* p)
+SpaceBeads::SpaceBeads(SpaceProp const* p)
 : Space(p)
 {
     for ( int d = 0; d < 3; ++d )

@@ -97,7 +97,7 @@ void Couple::setInteractions(Meca & meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        const Space* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_space_ptr;
         spc->setInteraction(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
         spc->setInteraction(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
     }
@@ -112,7 +112,7 @@ void Couple::setInteractionsAF(Meca & meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        const Space* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_space_ptr;
         spc->setInteraction(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
@@ -126,7 +126,7 @@ void Couple::setInteractionsFA(Meca & meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        const Space* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_space_ptr;
         spc->setInteraction(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
@@ -380,7 +380,7 @@ Vector Couple::position() const
 }
 
 
-void Couple::foldPosition(const Modulo * s)
+void Couple::foldPosition(Modulo const* s)
 {
     modulo->fold(cPos);
 }

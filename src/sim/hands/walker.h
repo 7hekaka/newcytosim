@@ -61,7 +61,7 @@ public:
     void setDirectionality(bool plus);
 
     /// constructor
-    Walker(WalkerProp const* p, HandMonitor* h);
+    Walker(WalkerProp const*, HandMonitor*);
     
     /// destructor
     ~Walker() {}

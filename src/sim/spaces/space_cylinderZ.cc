@@ -7,7 +7,7 @@
 #include "meca.h"
 
 
-SpaceCylinderZ::SpaceCylinderZ(const SpaceProp* p)
+SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM < 3 )
@@ -20,18 +20,23 @@ SpaceCylinderZ::SpaceCylinderZ(const SpaceProp* p)
 
 void SpaceCylinderZ::resize(Glossary& opt)
 {
-    real len = 0;
-    if ( opt.set(len, "radius") )     radius_ = len;
-    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
+    real rad = radius_, top = top_, bot = bot_;
 
-    opt.set(bot_, "bottom");
-    opt.set(top_, "top");
+    if ( opt.set(rad, "width") )
+        rad *= 0.5;
+    else opt.set(rad, "radius");
+    opt.set(bot, "bottom");
+    opt.set(top, "top");
     
-    if ( radius_ < 0 )
+    if ( rad < 0 )
         throw InvalidParameter("cylinderZ:radius must be >= 0");
 
-    if ( top_ < bot_ )
+    if ( top < bot )
         throw InvalidParameter("cylinerZ:bottom must be <= top");
+    
+    bot_ = bot;
+    top_ = top;
+    radius_ = rad;
 }
 
 
@@ -132,7 +137,8 @@ Vector SpaceCylinderZ::project(Vector const& w) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff,
+void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
+                                    Meca & meca, real stiff,
                                     const real rad, const real B, const real T)
 {
 #if ( DIM >= 3 )

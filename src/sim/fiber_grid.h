@@ -85,7 +85,7 @@ public:
     index_t      nbCells() const { return fGrid.nbCells(); }
 
     /// set a grid to cover the specified Space with cells of width `max_step` at most
-    unsigned     setGrid(const Space *, real max_step);
+    unsigned     setGrid(Space const*, real max_step);
     
     /// allocate memory for the grid, with the dimensions set by setGrid()
     void         createCells();

@@ -33,7 +33,7 @@ public:
     DigitProp const* prop;
     
     /// constructor
-    Digit(DigitProp const* p, HandMonitor* h);
+    Digit(DigitProp const*, HandMonitor*);
     
     /// destructor
     ~Digit() {}

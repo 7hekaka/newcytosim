@@ -35,7 +35,7 @@ public:
     CutterProp const* prop;
     
     /// constructor
-    Cutter(CutterProp const* p, HandMonitor* h);
+    Cutter(CutterProp const*, HandMonitor*);
     
     /// destructor
     ~Cutter() {}

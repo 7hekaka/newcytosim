@@ -64,7 +64,7 @@ ObjectList SphereSet::newObjects(const std::string& name, Glossary& opt)
 }
 
 
-void SphereSet::foldPosition(const Modulo * s) const
+void SphereSet::foldPosition(Modulo const* s) const
 {
     for ( Sphere * o=SphereSet::first(); o; o=o->next() )
         o->foldPosition(s);

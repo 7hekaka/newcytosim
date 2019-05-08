@@ -358,7 +358,7 @@ void CoupleSet::relink(Object * obj, const bool s1, const bool s2)
 }
 
 
-void CoupleSet::foldPosition(const Modulo * s) const
+void CoupleSet::foldPosition(Modulo const* s) const
 {
     Couple * cx;
     for ( cx=firstAA(); cx; cx=cx->next() )  cx->foldPosition(s);

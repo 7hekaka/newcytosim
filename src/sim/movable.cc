@@ -89,7 +89,7 @@ void Movable::revolve(Rotation const& T)
  chosen randomly inside this area following a uniform probability.
  */
 
-Vector Movable::readPrimitive(std::istream& is, const Space* spc)
+Vector Movable::readPrimitive(std::istream& is, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
 
@@ -430,7 +430,7 @@ Vector Movable::readPrimitive(std::istream& is, const Space* spc)
    position = square 3 align 1 1 0 at 1 1
  
  */ 
-Vector Movable::readPosition(std::istream& is, const Space* spc)
+Vector Movable::readPosition(std::istream& is, Space const* spc)
 {
     std::string tok;
     Vector pos(0,0,0);
@@ -558,7 +558,7 @@ Vector Movable::readPosition(std::istream& is, const Space* spc)
  */
 
 
-Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* spc)
+Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
     
@@ -715,7 +715,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, const Space* 
  with equal probability for all.
 */
 
-Rotation Movable::readRotation(std::istream& is, Vector const& pos, const Space* spc)
+Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
     

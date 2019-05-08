@@ -51,7 +51,7 @@ private:
 public:
         
     ///constructor
-    SpaceTee(const SpaceProp*);
+    SpaceTee(SpaceProp const*);
    
     /// update geometry
     void        resize(Glossary& opt);

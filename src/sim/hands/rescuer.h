@@ -38,7 +38,7 @@ public:
     RescuerProp const* prop;
     
     /// constructor
-    Rescuer(RescuerProp const* p, HandMonitor* h);
+    Rescuer(RescuerProp const*, HandMonitor*);
     
     /// destructor
     ~Rescuer() {}

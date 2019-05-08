@@ -80,8 +80,10 @@ void SingleProp::clear()
     length            = 0;
     diffusion         = 0;
     fast_diffusion    = false;
+#if NEW_MOBILE_SINGLE
+    speed.reset();
+#endif
     activity          = "diffuse";
-    
     confine           = CONFINE_INSIDE;
     //confine_stiffness = 0;
     confine_space     = "first";
@@ -99,6 +101,9 @@ void SingleProp::read(Glossary& glos)
     else
         glos.set(diffusion,  "diffusion");
     glos.set(fast_diffusion, "fast_diffusion");
+#if NEW_MOBILE_SINGLE
+    glos.set(speed,          "speed");
+#endif
     glos.set(activity,       "activity");
 
     glos.set(confine,        "confine", {{"off",     CONFINE_OFF},
@@ -147,6 +152,9 @@ void SingleProp::complete(Simul const& sim)
      and we need `diffusion_dt^2 = 6 D dt`
      */
     diffusion_dt = sqrt( 6.0 * diffusion * sim.prop->time_step );
+#if NEW_MOBILE_SINGLE
+    speed_dt = speed * sim.prop->time_step;
+#endif
     
     if ( stiffness < 0 )
         throw InvalidParameter("single:stiffness must be >= 0");
@@ -180,6 +188,9 @@ void SingleProp::write_values(std::ostream& os) const
     write_value(os, "length",         length);
     write_value(os, "diffusion",      diffusion);
     write_value(os, "fast_diffusion", fast_diffusion);
+#if NEW_MOBILE_SINGLE
+    write_value(os, "speed",          speed);
+#endif
     write_value(os, "confine",        confine, "", confine_space);
     write_value(os, "activity",       activity);
 }

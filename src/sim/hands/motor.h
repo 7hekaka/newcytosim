@@ -45,7 +45,7 @@ public:
     MotorProp const* prop;
     
     /// constructor
-    Motor(MotorProp const* p, HandMonitor* h);
+    Motor(MotorProp const*, HandMonitor*);
     
     /// destructor
     ~Motor() {}

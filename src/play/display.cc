@@ -443,8 +443,8 @@ void Display::bodyColor(PointDisp const* disp, unsigned s) const
     }
     else
     {
-        disp->color2.load_back();
         disp->color.load_load(1.0);
+        disp->color2.load_back();
     }
 }
 
@@ -480,8 +480,8 @@ void Display::bodyColorT(PointDisp const* disp, unsigned s) const
             disp->color.load_both();
         else
         {
-            disp->color2.load_back();
             disp->color.load_front();
+            disp->color2.load_back();
         }
     }
 }
@@ -499,21 +499,20 @@ void Display::drawSpace(Space const* obj, bool opaque)
     const PointDisp * disp = obj->prop->disp;
     
     lineWidth(disp->width);
-    disp->color.load_load();
-    disp->color2.load_back();
 
-    glEnable(GL_CULL_FACE);
+    assert_true(glIsEnabled(GL_CULL_FACE));
     if ( disp->visible & 1 && disp->color.opaque() == opaque )
     {
         glCullFace(GL_BACK);
+        disp->color.load_front();
         obj->draw();
     }
     if ( disp->visible & 2 && disp->color2.opaque() == opaque )
     {
         glCullFace(GL_FRONT);
+        disp->color2.load_back();
         obj->draw();
     }
-    glDisable(GL_CULL_FACE);
 }
 
 

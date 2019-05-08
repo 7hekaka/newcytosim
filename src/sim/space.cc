@@ -10,7 +10,7 @@
 #include "meca.h"
 
 
-Space::Space(const SpaceProp* p) 
+Space::Space(SpaceProp const* p) 
 : prop(p)
 {
     assert_true(prop);
@@ -240,7 +240,7 @@ Vector Space::bounce(Vector pos) const
         } while ( ++cnt < 8 );
 
         static unsigned msg = 0;
-        if ( ++msg < 32 )
+        if ( ++msg < 16 )
             std::cerr << "Warning: "+prop->name()+":bounce failed: is any dimension small?\n";
 
         // Place point on edge, as last resort:
@@ -251,7 +251,7 @@ Vector Space::bounce(Vector pos) const
 
 
 /** 
- `normalToEdge(const Vector&)` uses an iterative method to find
+ `normalToEdge(Vector const&)` uses an iterative method to find
  the normal to the edge, using Space::project().
  
  If you know for certain that `point[]` is far from the edge,
@@ -261,7 +261,7 @@ Vector Space::bounce(Vector pos) const
      normal = normalize( proj - point )
  
  */
-Vector Space::normalToEdge(const Vector& pos) const
+Vector Space::normalToEdge(Vector const& pos) const
 {
     const real goal = 10000*REAL_EPSILON*REAL_EPSILON;
     

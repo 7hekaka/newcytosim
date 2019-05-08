@@ -68,7 +68,7 @@ public:
     static const ObjectTag TAG = 'u';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

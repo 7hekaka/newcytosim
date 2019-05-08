@@ -7,7 +7,7 @@
 #include "random.h"
 #include "meca.h"
 
-SpaceSphere::SpaceSphere(const SpaceProp* p)
+SpaceSphere::SpaceSphere(SpaceProp const* p)
 : Space(p), radius_(0), radiusSqr_(0)
 {
 }
@@ -15,12 +15,16 @@ SpaceSphere::SpaceSphere(const SpaceProp* p)
 
 void SpaceSphere::resize(Glossary& opt)
 {
-    real len = 0;
-    if ( opt.set(len, "radius") )      radius_ = len;
-    else if ( opt.set(len, "length") ) radius_ = len * 0.5;
+    real rad = radius_;
     
-    if ( radius_ < 0 )
+    if ( opt.set(rad, "length") )
+        rad *= 0.5;
+    else opt.set(rad, "radius");
+    
+    if ( rad < 0 )
         throw InvalidParameter(prop->name()+":radius must be >= 0");
+    
+    radius_ = rad;
     update();
 }
 

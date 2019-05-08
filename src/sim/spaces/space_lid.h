@@ -37,7 +37,7 @@ private:
 public:
     
     /// creator
-    SpaceLid(const SpaceProp*);
+    SpaceLid(SpaceProp const*);
     
     /// update geometry
     void        resize(Glossary& opt);

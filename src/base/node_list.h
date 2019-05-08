@@ -52,19 +52,19 @@ public:
     NodeList() : nFront(nullptr), nBack(nullptr), nSize(0) { }
     
     /// Destructor
-    virtual         ~NodeList()         { clear(); }
+    virtual         ~NodeList()    { clear(); }
     
     /// First Node in list
-    Node *          front()       const { return nFront; }
+    Node *          front()  const { return nFront; }
     
     /// Last Node in list
-    Node *          back()        const { return nBack; }
+    Node *          back()   const { return nBack; }
 
     /// Number of objects in the list
-    size_t          size()        const { return nSize; }
+    size_t          size()   const { return nSize; }
     
     /// true if list has zero elements
-    bool            empty()       const { return nFront == nullptr; }
+    bool            empty()  const { return nFront == nullptr; }
     
     /// put Node first in the list
     void            push_front(Node *);
@@ -75,10 +75,10 @@ public:
     /// import all objects from given list, and empty it
     void            merge(NodeList& list);
     
-    /// put new Node `n` after existing one `p`
+    /// link `n` after already linked `p`
     void            push_after(Node * p, Node * n);
     
-    /// put new Node `n` before existing one `p`
+    /// link `n` before already linked `p`
     void            push_before(Node * p, Node * n);
     
     /// Remove Node `n` from list
@@ -103,13 +103,13 @@ public:
     void            quicksort(int (*comp)(const void*, const void*));
 
     /// Rearrange the list by exchanging the portions before and after `p`
-    void            permute(Node * p);
+    void            permute(Node *);
     
     /// Rearrange the list by moving a central portion to the top
-    void            shuffle_up(Node * p, Node * q);
+    void            shuffle_up(Node *, Node *);
     
     /// Rearrange the list by moving a central portion to the bottom
-    void            shuffle_down(Node * p, Node * q);
+    void            shuffle_down(Node *, Node *);
     
     /// Mix list using permute() and shuffle() functions
     void            shuffle();

@@ -30,12 +30,21 @@ Display2::Display2(DisplayProp const* dp) : Display(dp)
 
 void Display2::drawSimul(Simul const& sim)
 {
+    glDepthMask(GL_FALSE);
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
-    
-    drawSpaces(sim.spaces);
     drawFields(sim.fields);
     
+    glEnable(GL_LIGHTING);
+#if ( DIM > 2 )
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+#endif
+    drawSpaces(sim.spaces);
+    
+    glDisable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
+
     if ( prop->couple_select & 1 )
         drawCouplesF(sim.couples);
 
@@ -405,7 +414,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
 #pragma mark -
 
 
-inline void drawVertex(const Vector & pos, const PointDisp* disp)
+inline void drawVertex(Vector const& pos, const PointDisp* disp)
 {
     if ( disp->perceptible )
     {
@@ -447,7 +456,7 @@ inline void drawVertex2(Vector const& pos, const Fiber * fib, const PointDisp* d
     }
 }
 
-inline void drawLink(const Vector & a, const Fiber * fib, const PointDisp* disp, const Vector & b)
+inline void drawLink(Vector const& a, const Fiber * fib, const PointDisp* disp, Vector const& b)
 {
     if ( disp->visible && fib->disp->visible )
     {
@@ -461,8 +470,8 @@ inline void drawLink(const Vector & a, const Fiber * fib, const PointDisp* disp,
 
 /**
  */
-inline void drawLink(const Vector & a, const Fiber * fibA, const PointDisp* dispA,
-                     const Vector & b, const Fiber * fibB, const PointDisp* dispB)
+inline void drawLink(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
+                     Vector const& b, const Fiber * fibB, const PointDisp* dispB)
 {
 #if ( 1 )
     //draw two segments if `explode` is enabled
@@ -516,7 +525,7 @@ inline void drawVertex2(Vector const& pos, const Fiber * fib, const PointDisp* d
 }
 
 
-inline void drawLink(const Vector & a, const Fiber * fib, const PointDisp* disp, const Vector & b)
+inline void drawLink(Vector const& a, const Fiber * fib, const PointDisp* disp, Vector const& b)
 {
     if ( disp->perceptible && fib->disp->visible )
     {
@@ -527,8 +536,8 @@ inline void drawLink(const Vector & a, const Fiber * fib, const PointDisp* disp,
     }
 }
 
-inline void drawLink(const Vector & a, const Fiber * fibA, const PointDisp* dispA,
-                     const Vector & b, const Fiber * fibB, const PointDisp* dispB)
+inline void drawLink(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
+                     Vector const& b, const Fiber * fibB, const PointDisp* dispB)
 {
     if (   dispA->perceptible && dispB->perceptible
         && ( fibA->disp->visible || fibB->disp->visible ))

@@ -239,7 +239,7 @@ public:
     static const ObjectTag TAG = 'i';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG; }
     
     /// return index of 'prop' in corresponding PropertyList
     Property const* property() const { return prop; }

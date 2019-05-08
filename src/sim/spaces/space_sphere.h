@@ -31,7 +31,7 @@ protected:
 public:
     
     /// constructor
-    SpaceSphere(const SpaceProp*);
+    SpaceSphere(SpaceProp const*);
 
     /// check number and validity of specified lengths
     void        resize(Glossary& opt);

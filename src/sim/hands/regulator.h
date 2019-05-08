@@ -28,7 +28,7 @@ public:
     RegulatorProp const* prop;
     
     /// constructor
-    Regulator(RegulatorProp const* p, HandMonitor* h);
+    Regulator(RegulatorProp const*, HandMonitor*);
     
     /// destructor
     ~Regulator() {}

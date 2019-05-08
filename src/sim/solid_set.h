@@ -68,7 +68,7 @@ public:
     }
     
     /// modulo the position (periodic boundary conditions)
-    void        foldPosition(const Modulo *) const;
+    void        foldPosition(Modulo const*) const;
     
     /// Monte-Carlo simulation step for every Object
     void        step() {}

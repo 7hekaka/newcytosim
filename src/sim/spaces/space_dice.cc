@@ -5,7 +5,7 @@
 #include "glossary.h"
 
 
-SpaceDice::SpaceDice(const SpaceProp* p)
+SpaceDice::SpaceDice(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -19,19 +19,23 @@ SpaceDice::SpaceDice(const SpaceProp* p)
 
 void SpaceDice::resize(Glossary& opt)
 {
-    opt.set(radius_, "radius");
-    if ( radius_ < 0 )
+    real rad = radius_;
+    
+    opt.set(rad, "radius");
+    if ( rad < 0 )
         throw InvalidParameter("dice:radius must be >= 0");
 
-    real len;
     for ( int d = 0; d < DIM; ++d )
     {
+        real len = length_[d];
         if ( opt.set(len, "length", d) )
-            length_[d] = len * 0.5;
-        
-        if ( length_[d] < radius_ )
+            len *= 0.5;
+        if ( len < rad )
             throw InvalidParameter("dice:length[] must be >= 2 * radius");
+        length_[d] = len;
     }
+    
+    radius_ = rad;
     update();
 }
 

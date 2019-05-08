@@ -29,7 +29,7 @@ public:
     ActorProp const* prop;
     
     /// constructor
-    Actor(ActorProp const* p, HandMonitor* h);
+    Actor(ActorProp const*, HandMonitor*);
     
     /// destructor
     ~Actor() {}

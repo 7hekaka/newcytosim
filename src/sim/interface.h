@@ -49,10 +49,13 @@ public:
     
     //-------------------------------------------------------------------------------
     
-    /// create a new Property of kind `k` from options set in Glossary
+    /// create a new Property of kind `k` from values set in Glossary
     Property*  execute_set(std::string const& kind, std::string const& name, Glossary&);
 
-    /// change values in Property of kind `k` following options specified in Glossary
+    /// change values in Property as specified in Glossary
+    void       execute_change(Property*, Glossary&);
+
+    /// change values in Property called `name` as specified in Glossary
     Property*  execute_change(std::string const& name, Glossary&);
     
     /// change values of all Property of category `kind`

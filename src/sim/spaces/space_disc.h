@@ -33,7 +33,7 @@ private:
 public:
     
     /// constructor
-    SpaceDisc(const SpaceProp*);
+    SpaceDisc(SpaceProp const*);
 
     /// update geometry
     void        resize(Glossary& opt);

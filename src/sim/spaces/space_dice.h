@@ -43,7 +43,7 @@ public:
 public:
         
     /// constructor
-    SpaceDice(const SpaceProp*);
+    SpaceDice(SpaceProp const*);
 
     /// update geometry
     void        resize(Glossary& opt);

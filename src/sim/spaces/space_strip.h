@@ -26,7 +26,7 @@ class SpaceStrip : public Space
 public:
     
     /// creator
-    SpaceStrip(const SpaceProp*);
+    SpaceStrip(SpaceProp const*);
 
     /// update geometry
     void        resize(Glossary& opt);

@@ -30,7 +30,7 @@ private:
 public:
     
     /// constructor
-    SpaceDynamicSphere(const SpaceProp*);
+    SpaceDynamicSphere(SpaceProp const*);
     
     /// add interactions to a Meca
     void        setInteractions(Meca &, FiberSet const&) const;

@@ -105,6 +105,7 @@ The procedure depends on the OS.
 On Mac OSX, open an Application called "Audio MIDI Setup" (`Menu > Windows > Show MIDI Studio`)  
 The MIDI device should show up there, allowing you to customize (double click)
 and **activate the output port**.
+You may need to create a new configuration.
 
 ### Identifying the MIDI port number
 

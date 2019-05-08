@@ -43,7 +43,7 @@ public:
     ChewerProp const* prop;
     
     /// constructor
-    Chewer(ChewerProp const* p, HandMonitor* h);
+    Chewer(ChewerProp const*, HandMonitor*);
     
     /// destructor
     ~Chewer() {}

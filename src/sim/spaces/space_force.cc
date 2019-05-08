@@ -6,7 +6,7 @@
 #include "meca.h"
 
 
-SpaceForce::SpaceForce(const SpaceProp* p)
+SpaceForce::SpaceForce(SpaceProp const* p)
 : Space(p)
 {
     force.reset();

@@ -34,10 +34,12 @@ void Display3::drawSimul(Simul const& sim)
     drawFields(sim.fields);
     
     glEnable(GL_LIGHTING);
+    glEnable(GL_CULL_FACE);
     glDepthMask(GL_TRUE);
-
     drawSpaces(sim.spaces);
-   
+    
+    glDisable(GL_CULL_FACE);
+
     if ( stencil_ )
     {
         /*

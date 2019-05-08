@@ -75,10 +75,10 @@ public:
        
     //------------------- construction and destruction -------------------------
     /// create but do not initialize
-    Sphere(SphereProp const* p);
+    Sphere(SphereProp const*);
 
     /// create and initialize following the specifications of SphereProp
-    Sphere(SphereProp const* p, real radius);
+    Sphere(SphereProp const*, real radius);
     
     /// Copy constructor
     Sphere(const Sphere&);
@@ -160,7 +160,7 @@ public:
     static const ObjectTag TAG = 'o';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

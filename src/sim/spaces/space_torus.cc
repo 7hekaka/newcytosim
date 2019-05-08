@@ -5,7 +5,7 @@
 #include "iowrapper.h"
 #include "glossary.h"
 
-SpaceTorus::SpaceTorus(const SpaceProp* p)
+SpaceTorus::SpaceTorus(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -17,16 +17,21 @@ SpaceTorus::SpaceTorus(const SpaceProp* p)
 
 void SpaceTorus::resize(Glossary& opt)
 {
-    real len = 0;
-    if ( opt.set(len, "width") ) bWidth = len * 0.5;
+    real rad = bRadius, wid = bWidth;
+    
+    if ( opt.set(wid, "width") )
+        wid *= 0.5;
     opt.set(bRadius, "radius");
 
-    if ( bRadius <= 0 )
+    if ( rad <= 0 )
         throw InvalidParameter("torus:radius must be > 0");
-    if ( bWidth <= 0 )
+    if ( wid <= 0 )
         throw InvalidParameter("torus:width must be > 0");
-    if ( bWidth > bRadius )
+    if ( wid > rad )
         throw InvalidParameter("torus:width must be < radius");
+    
+    bWidth = wid;
+    bRadius = rad;
     update();
 }
 

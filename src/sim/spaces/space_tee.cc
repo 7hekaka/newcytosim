@@ -8,7 +8,7 @@
 #include "random.h"
 
 
-SpaceTee::SpaceTee(const SpaceProp* p)
+SpaceTee::SpaceTee(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -18,15 +18,25 @@ SpaceTee::SpaceTee(const SpaceProp* p)
 
 void SpaceTee::resize(Glossary& opt)
 {
-    opt.set(tLength, "length");
-    if ( opt.set(tRadius, "width") ) tRadius *= 0.5;
-    opt.set(tJunction, "junction");
-    opt.set(tArmLength, "arm_length");
-    tRadiusSq   = tRadius * tRadius;
-    if ( tLength <= 0 || tRadius <= 0 || tArmLength < 0 )
+    real arm = tArmLength, jun = tJunction;
+    real len = tLength, rad = tRadius;
+    
+    if ( opt.set(rad, "width") )
+        rad *= 0.5;
+    else opt.set(rad, "radius");
+    opt.set(len, "length");
+    opt.set(jun, "junction");
+    opt.set(arm, "arm_length");
+
+    if ( len <= 0 || rad <= 0 || arm < 0 )
         throw InvalidParameter("Space tee can't have negative length, arm length or radius.");
-    if ( fabs(tJunction)+tRadius > tLength )
+    if ( fabs(jun)+rad > len )
         throw InvalidParameter("Space tee: the position of the branch plus the radius must lie within the length of the T.");
+    
+    tLength = len;
+    tRadius = rad;
+    tArmLength = arm;
+    tJunction = jun;
     update();
 }
 

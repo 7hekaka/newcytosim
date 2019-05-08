@@ -36,7 +36,7 @@ public:
     MyosinProp const* prop;
     
     /// constructor
-    Myosin(MyosinProp const* p, HandMonitor* h);
+    Myosin(MyosinProp const*, HandMonitor*);
     
     /// destructor
     ~Myosin() {}

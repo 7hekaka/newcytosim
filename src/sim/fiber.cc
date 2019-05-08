@@ -1111,7 +1111,7 @@ unsigned Fiber::nbHands() const
 }
 
 
-int Fiber::nbHands(int (*count)(const Hand *)) const
+int Fiber::nbHands(int (*count)(Hand const*)) const
 {
     int res = 0;
     
@@ -1570,7 +1570,7 @@ void Fiber::infoLattice(FiberLattice const& lat, unsigned& cnt, real& sm, real& 
  The Single detaches if the Fiber tip is pulled inside.
  This generates mostly a pushing force from the cortex
  */
-void Fiber::setGlue1(Single* glue, const FiberEnd end, const Space * spc)
+void Fiber::setGlue1(Single* glue, const FiberEnd end, Space const* spc)
 {
     assert_true(spc);
     if ( spc->inside(posEnd(end)) )
@@ -1602,7 +1602,7 @@ void Fiber::setGlue1(Single* glue, const FiberEnd end, const Space * spc)
  The Single's hand detaches only spontaneously.
  This creates both pulling and pushing force from the cortex
  */
-void Fiber::setGlue2(Single* glue, const FiberEnd end, const Space * spc)
+void Fiber::setGlue2(Single* glue, const FiberEnd end, Space const* spc)
 {
     assert_true(spc);
     if ( glue->attached() )
@@ -1629,7 +1629,7 @@ void Fiber::setGlue2(Single* glue, const FiberEnd end, const Space * spc)
  This makes an anchor point exactly at the cortex.
  The Single's Hand behaves and detaches normally.
  */
-void Fiber::setGlue3(Single* glue, const Space * spc)
+void Fiber::setGlue3(Single* glue, Space const* spc)
 {    
     assert_true(spc);
     /*
@@ -1697,7 +1697,7 @@ void Fiber::makeGlue(Single*& glue)
 /**
  setGlue() creates Single when MT interact with the edge of the Space
 */
-void Fiber::setGlue(Single*& glue, const FiberEnd end, const Space * space)
+void Fiber::setGlue(Single*& glue, const FiberEnd end, Space const* space)
 {
     assert_true(space);
     

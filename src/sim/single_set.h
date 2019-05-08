@@ -168,7 +168,7 @@ public:
     void          write(Outputter&) const;
     
     /// modulo the position (periodic boundary conditions)
-    void          foldPosition(const Modulo *) const;
+    void          foldPosition(Modulo const*) const;
     
     /// check internal consistency, returns 0 if everything is OK
     int           bad() const;

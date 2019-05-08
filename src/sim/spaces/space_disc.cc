@@ -9,7 +9,7 @@
 #include "meca.h"
 
 
-SpaceDisc::SpaceDisc(const SpaceProp* p)
+SpaceDisc::SpaceDisc(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM != 2 )
@@ -21,12 +21,16 @@ SpaceDisc::SpaceDisc(const SpaceProp* p)
 
 void SpaceDisc::resize(Glossary& opt)
 {
-    real len = 0;
-    if ( opt.set(len, "radius") )     radius_ = len;
-    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
+    real rad = radius_;
+    
+    if ( opt.set(rad, "width") )
+        rad *= 0.5;
+    else opt.set(rad, "radius");
 
-    if ( radius_ < 0 )
+    if ( rad < 0 )
         throw InvalidParameter("disc:radius must be >= 0");
+    
+    radius_ = rad;
 }
 
 

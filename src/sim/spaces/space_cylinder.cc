@@ -7,7 +7,7 @@
 #include "meca.h"
 
 
-SpaceCylinder::SpaceCylinder(const SpaceProp* p)
+SpaceCylinder::SpaceCylinder(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM < 3 )
@@ -19,18 +19,22 @@ SpaceCylinder::SpaceCylinder(const SpaceProp* p)
 
 void SpaceCylinder::resize(Glossary& opt)
 {
-    real len = 0;
-    opt.set(len, "length");
-    length_ = len * 0.5;
+    real len = length_, rad = radius_;
+    
+    if ( opt.set(rad, "width") )
+        rad *= 0.5;
+    else opt.set(rad, "radius");
+    if ( opt.set(len, "length") )
+        len *= 0.5;
 
-    if ( opt.set(len, "radius") )     radius_ = len;
-    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
-
-    if ( length_ < 0 )
+    if ( len < 0 )
         throw InvalidParameter("cylinder:length must be >= 0");
 
-    if ( radius_ < 0 )
+    if ( rad < 0 )
         throw InvalidParameter("cylinder:radius must be >= 0");
+    
+    length_ = len;
+    radius_ = rad;
 }
 
 

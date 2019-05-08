@@ -212,7 +212,7 @@ public:
     void         report(std::ostream&) const;
 
     /// modulo the position (periodic boundary conditions)
-    void         foldPosition(const Modulo *) const;
+    void         foldPosition(Modulo const*) const;
     
     ///debug function
     int          bad() const;

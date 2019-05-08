@@ -62,18 +62,15 @@ Property* Interface::execute_set(std::string const& kind, std::string const& nam
 }
 
 
-Property * Interface::execute_change(std::string const& name, Glossary& def)
+void Interface::execute_change(Property * pp, Glossary& def)
 {
-    // in this form, 'name' designs the property name:
-    Property * pp = simul.findProperty(name);
-    
-    if ( !pp )
-        throw InvalidSyntax("unknown property `"+name+"'");
-    
     pp->read(def);
     pp->complete(simul);
     
-    // additional code to make 'change space:dimension' work.
+    /*
+     Specific code to make 'change space:dimension' work.
+     This is needed as dimensions are specified in Space hold, and not SpaceProp
+     */
     if ( pp->category() == "space" )
     {
         // update any Space with this property:
@@ -88,6 +85,19 @@ Property * Interface::execute_change(std::string const& name, Glossary& def)
             }
         }
     }
+}
+
+
+// in this form, 'name' designates the property name
+Property * Interface::execute_change(std::string const& name, Glossary& def)
+{
+    Property * pp = simul.findProperty(name);
+    
+    if ( pp )
+        execute_change(pp, def);
+    else
+        throw InvalidSyntax("unknown property `"+name+"'");
+    
     return pp;
 }
 
@@ -100,10 +110,7 @@ void Interface::execute_change_all(std::string const& kind, Glossary& def)
         throw InvalidSyntax("could not find any property of class `"+kind+"'");
     
     for ( Property * i : plist )
-    {
-        i->read(def);
-        i->complete(simul);
-    }
+        execute_change(i, def);
 }
 
 
@@ -228,7 +235,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
     
     opt.set(nb_trials, "nb_trials");
 
-    const Space* spc = simul.space();
+    Space const* spc = simul.space();
     if ( opt.set(str, "placement", 1) )
         spc = simul.findSpace(str);
     

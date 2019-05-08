@@ -6,7 +6,7 @@
 #include "glossary.h"
 
 
-SpacePeriodic::SpacePeriodic(const SpaceProp* p)
+SpacePeriodic::SpacePeriodic(SpaceProp const* p)
 : Space(p)
 {
     for ( int d = 0; d < 3; ++d )
@@ -16,14 +16,14 @@ SpacePeriodic::SpacePeriodic(const SpaceProp* p)
 
 void SpacePeriodic::resize(Glossary& opt)
 {
-    real len;
     for ( int d = 0; d < DIM; ++d )
     {
+        real len = length_[d];
         if ( opt.set(len, "length", d) )
-            length_[d] = len * 0.5;
-        
-        if ( length_[d] <= 0 )
+            len *= 0.5;
+        if ( len <= 0 )
             throw InvalidParameter("periodic:length[] must be > 0");
+        length_[d] = len;
     }
 }
 

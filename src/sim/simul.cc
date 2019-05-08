@@ -122,7 +122,7 @@ void Simul::changeSpace(Space const* spc)
 }
 
 
-const Space* Simul::findSpace(std::string const& str) const
+Space const* Simul::findSpace(std::string const& str) const
 {
     if ( str == "first" )
         return static_cast<Space*>(spaces.inventory.first());

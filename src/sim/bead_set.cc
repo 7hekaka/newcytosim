@@ -114,7 +114,7 @@ void BeadSet::remove(Object * obj)
 }
 
 
-void BeadSet::foldPosition(const Modulo * s) const
+void BeadSet::foldPosition(Modulo const* s) const
 {
     for ( Bead * o=first(); o; o=o->next() )
         o->foldPosition(s);

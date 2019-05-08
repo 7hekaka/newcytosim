@@ -45,15 +45,15 @@ public:
     
     /// initialize counters
     void reset(real time);
-
-    /// returns 0, since Event have no Property
-    Property const* property() const { return nullptr; }
     
     /// a unique character identifying the class
     static const ObjectTag TAG = 't';
 
     /// an ASCII character identifying the class of this object
-    ObjectTag tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG; }
+
+    /// returns 0, since Event have no Property
+    Property const* property() const { return nullptr; }
 
     //--------------------------------------------------------------------------
     

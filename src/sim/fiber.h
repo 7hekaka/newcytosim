@@ -213,13 +213,13 @@ public:
     void           setDynamicState(FiberEnd end, unsigned s);
     
     
-    /// the amount of freshly assembled polymer during the last time step (this has units of length)
+    /// the length of freshly assembled polymer at the MINUS_END during the last time step
     virtual real   freshAssemblyM() const { return 0; }
 
-    /// the amount of freshly assembled polymer during the last time step (this has units of length)
+    /// the length of freshly assembled polymer at the PLUS_END during the last time step
     virtual real   freshAssemblyP() const { return 0; }
 
-    /// the amount of freshly assembled polymer during the last time step (this has units of length)
+    /// the length of freshly assembled polymer during the last time step
     real           freshAssembly(FiberEnd end) const;
     
     
@@ -306,16 +306,16 @@ public:
     //--------------------------------------------------------------------------
     
     /// set the box glue for pure pushing
-    void           setGlue1(Single* glue, FiberEnd, const Space * space);
+    void           setGlue1(Single* glue, FiberEnd, Space const* space);
     
     /// set the box glue for pure pulling
-    void           setGlue2(Single* glue, FiberEnd, const Space * space);
+    void           setGlue2(Single* glue, FiberEnd, Space const* space);
     
     /// set the box glue for pushing and pulling
-    void           setGlue3(Single* glue, const Space * space);
+    void           setGlue3(Single* glue, Space const* space);
     
     /// a setGlue to rule them all
-    void           setGlue(Single*& glue, FiberEnd, const Space * space);
+    void           setGlue(Single*& glue, FiberEnd, Space const* space);
     
     /// create a Single that can be used as glue
     void           makeGlue(Single*& glue);
@@ -340,7 +340,7 @@ public:
     static const ObjectTag TAG_LATTICE = 'l';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

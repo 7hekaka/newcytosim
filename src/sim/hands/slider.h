@@ -33,7 +33,7 @@ public:
     SliderProp const* prop;
     
     /// constructor
-    Slider(SliderProp const* p, HandMonitor* h);
+    Slider(SliderProp const*, HandMonitor*);
 
     /// destructor
     ~Slider() {}

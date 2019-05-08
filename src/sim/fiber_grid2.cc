@@ -16,7 +16,7 @@ typedef std::vector <FiberSegment> SegmentVector;
 SegmentVector allSegments;
 
 
-unsigned FiberGrid::setGrid(const Space *, real)
+unsigned FiberGrid::setGrid(Space const*, real)
 {
     PRINT_ONCE("Cytosim is using a slow method to localize fibers!\n");
     gridRange = 0;

@@ -87,7 +87,7 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
  */
 void Field::prepare()
 {
-    const Space * spc = prop->confine_space_ptr;
+    Space const* spc = prop->confine_space_ptr;
 
     if ( !spc )
         throw InvalidParameter("A Space must be created before the field");

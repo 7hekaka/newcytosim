@@ -32,7 +32,7 @@ class SpaceForce : public Space
 public:
     
     ///creator
-    SpaceForce(const SpaceProp*);
+    SpaceForce(SpaceProp const*);
     
     /// update geometry
     void        resize(Glossary& opt);

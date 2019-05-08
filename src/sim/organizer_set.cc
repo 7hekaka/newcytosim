@@ -117,7 +117,7 @@ Organizer * OrganizerSet::findOrganizer(const Mecable * m) const
 
 
 //------------------------------------------------------------------------------
-void OrganizerSet::foldPosition(const Modulo * s) const
+void OrganizerSet::foldPosition(Modulo const* s) const
 {
     for ( Organizer * o=first(); o; o=o->next() )
         o->foldPosition(s);

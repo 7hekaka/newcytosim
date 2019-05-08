@@ -6,6 +6,7 @@
 #include "exceptions.h"
 #include "hand_prop.h"
 #include "iowrapper.h"
+#include "tokenizer.h"
 #include "glossary.h"
 #include "meca.h"
 #include "simul.h"
@@ -393,16 +394,15 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         // add a bead with a local coordinate system
         unsigned ref = addSphere(vec, rad);
         addTriad(rad);
-        
-        // attach Single on the surface of this sphere:
-        size_t nbs = opt.nb_values(var) - 2;
-        // 'pts' is a set of unit vectors:
-        std::vector<Vector> pts(nbs, Vector(0,0,0));
 
         real sep = 1.0, dev = 0.0;
-        opt.set(dev, "deviation");
-        if ( opt.set(sep, "separation") )
+        if ( opt.set(dev, "deviation") && opt.set(sep, "separation") )
         {
+            // attach Single on the surface of this sphere:
+            size_t nbs = opt.nb_values(var) - 2;
+            // 'pts' is a set of unit vectors:
+            std::vector<Vector> pts(nbs, Vector(0,0,0));
+
             // we decrease gradually the separation, until all points can fit:
             real dis = sep;
             size_t ouf = 0;
@@ -416,46 +416,48 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             }
             if ( dis < sep )
                 std::cerr << "Warning: solid:separation reduced to " << dis << "\n";
+            
+            inx = 2;
+            while ( opt.set(str, var, inx++) )
+            {
+                // get a number and the name of a class:
+                unsigned num = Tokenizer::get_integer(str, 1);
+                SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+                
+                /* add Wrists anchored on the local coordinate system:
+                 we use unit vectors here since the Triad is build with 'rad' */
+                // we use unit vectors here since the Triad is build with 'rad'
+                Vector pos = pts[inx-3];
+                for ( unsigned i = 0; i < num; ++i )
+                {
+#if ( DIM > 1 )
+                    vec = normalize(pos+pos.randOrthoB(dev/rad));
+                    res.push_back(new Wrist(sip, this, ref, vec));
+#else
+                    throw InvalidParameter("Cannot use patchy decoration in 1D");
+#endif
+                }
+            }
         }
         else
         {
-            for ( size_t n = 0; n < nbs; ++n )
-                pts[n] = Vector::randU();
-        }
-        
-        inx = 2;
-        while ( opt.set(str, var, inx++) )
-        {
-            // get a number and the name of a class:
-            unsigned num = 1;
-            iss.str(str);
-            iss.clear();
-            iss >> num;
-            if ( iss.fail() )
+            // Singles are distributed uniformly on the surface of the sphere
+            inx = 2;
+            while ( opt.set(str, var, inx++) )
             {
-                num = 1;
-                iss.clear();
-            }
-            iss >> str;
-            
-            SingleProp * sip = sim.findProperty<SingleProp>("single", str);
-            
-            /* add Wrists anchored on the local coordinate system:
-             we use unit vectors here since the Triad is build with 'rad' */
-            for ( unsigned i = 0; i < num; ++i )
-            {
-                // we use unit vectors here since the Triad is build with 'rad'
-                Vector pos = pts[inx-3];
-#if ( DIM > 1 )
-                if ( dev > 0 )
-                    pos = normalize(pos + pos.randOrthoB(dev/rad));
-#endif
-                res.push_back(new Wrist(sip, this, ref, pos));
+                // get a number and the name of a class:
+                unsigned num = Tokenizer::get_integer(str, 1);
+                SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+                
+                /* add Wrists anchored on the local coordinate system:
+                 we use unit vectors here since the Triad is build with 'rad' */
+                for ( unsigned i = 0; i < num; ++i )
+                    res.push_back(new Wrist(sip, this, ref, Vector::randU()));
             }
         }
         var = "sphere" + std::to_string(++inp);
     }
-
+    
 #ifdef BACKWARD_COMPATIBILITY
     /* attach Singles to be distributed over all the points:
      this is deprecated, since one can attach Single at any point since 03.2017

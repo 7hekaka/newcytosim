@@ -6,7 +6,7 @@
 #include "project_ellipse.h"
 
 
-SpaceEllipse::SpaceEllipse(const SpaceProp* p)
+SpaceEllipse::SpaceEllipse(SpaceProp const* p)
 : Space(p)
 {
 #ifdef HAS_SPHEROID
@@ -39,14 +39,14 @@ void SpaceEllipse::update()
 
 void SpaceEllipse::resize(Glossary& opt)
 {
-    real len;
     for ( int d = 0; d < DIM; ++d )
     {
+        real len = length_[d];
         if ( opt.set(len, "length", d) )
-            length_[d] = len * 0.5;
-        
-        if ( length_[d] < REAL_EPSILON )
+            len *= 0.5;
+        if ( len < REAL_EPSILON )
             throw InvalidParameter("ellipse:length[] must be > 0");
+        length_[d] = len;
     }
     update();
 }

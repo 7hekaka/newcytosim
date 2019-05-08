@@ -26,7 +26,7 @@ class SpacePeriodic : public Space
 public:
     
     /// creator
-    SpacePeriodic(const SpaceProp*);
+    SpacePeriodic(SpaceProp const*);
 
     /// update geometry
     void        resize(Glossary& opt);

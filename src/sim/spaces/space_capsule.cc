@@ -7,7 +7,7 @@
 #include "meca.h"
 
 
-SpaceCapsule::SpaceCapsule(const SpaceProp* p)
+SpaceCapsule::SpaceCapsule(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -17,19 +17,22 @@ SpaceCapsule::SpaceCapsule(const SpaceProp* p)
 
 void SpaceCapsule::resize(Glossary& opt)
 {
-    real len = 0;
-    if ( opt.set(len, "radius") )     radius_ = len;
-    else if ( opt.set(len, "width") ) radius_ = len * 0.5;
+    real len = length_, rad = radius_;
+    
+    if ( opt.set(rad, "width") )
+        rad *= 0.5;
+    else opt.set(rad, "radius");
     // total length is specified:
-    opt.set(len, "length");
+    if ( opt.set(len, "length") )
+        len = ( len - 2 * rad ) * 0.5;
 
-    length_ = ( len - 2 * radius_ ) * 0.5;
-
-    if ( length_ < 0 )
+    if ( len < 0 )
         throw InvalidParameter("capsule:length must be >= 2 * radius");
-    if ( radius_ < 0 )
+    if ( rad < 0 )
         throw InvalidParameter("capsule:radius must be >= 0");
     
+    length_ = len;
+    radius_ = rad;
     update();
 }
 

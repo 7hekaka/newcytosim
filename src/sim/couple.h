@@ -118,7 +118,7 @@ public:
     void           setPosition(Vector const& x) { cPos = x; }
 
     /// modulo the current position vector in the space
-    virtual void   foldPosition(const Modulo*);
+    virtual void   foldPosition(Modulo const*);
     
     /// set the position randomly inside prop->confine_space
     void           randomizePosition();
@@ -238,7 +238,7 @@ public:
     static const ObjectTag TAG = 'c';
     
     /// return unique character identifying the class
-    ObjectTag            tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

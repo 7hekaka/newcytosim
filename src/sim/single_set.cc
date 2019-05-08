@@ -213,7 +213,7 @@ void SingleSet::unlink(Object * obj)
 }
 
 
-void SingleSet::foldPosition(const Modulo * s) const
+void SingleSet::foldPosition(Modulo const* s) const
 {
     Single * obj;
     for ( obj=firstF(); obj; obj=obj->next() )  obj->foldPosition(s);

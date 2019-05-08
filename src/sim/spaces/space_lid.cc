@@ -10,7 +10,7 @@
 #include "random.h"
 
 
-SpaceLid::SpaceLid(const SpaceProp* p)
+SpaceLid::SpaceLid(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM == 1 )
@@ -25,14 +25,14 @@ SpaceLid::SpaceLid(const SpaceProp* p)
 
 void SpaceLid::resize(Glossary& opt)
 {
-    real len;
     for ( int d = 0; d < DIM; ++d )
     {
+        real len = length_[d];
         if ( opt.set(len, "length", d) )
-            length_[d] = len * 0.5;
-            
-        if ( length_[d] <= 0 )
+            len *= 0.5;
+        if ( len <= 0 )
             throw InvalidParameter("lid:length_[] must be > 0");
+        length_[d] = len;
     }
     
     opt.set(top_, "ceiling");
