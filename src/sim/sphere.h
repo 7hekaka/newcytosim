@@ -49,24 +49,11 @@ private:
     
     /// drag coefficients for translation and rotation
     real             spDrag, spDragRot;
-    
-    
-    /// size of allocated projection memory
-    size_t           spAllocated;
-        
-    /// radial vectors used for projecting the forces perpendicular to constraints
-    real*            spProj;
         
     //--------------------------------------------------------------------------
     
     /// move the reference points such as to restore a orthogonal reference
     void             orthogonalizeRef(unsigned i);
-    
-    /// allocate memory for the projection matrices
-    void             allocateProjection(size_t);
-    
-    ///sets the number of points in the Fiber
-    virtual size_t   allocateMecable(size_t);
 
 public:
     
@@ -127,7 +114,7 @@ public:
     void         reshape();
     
     /// set position
-    void         getPoints(const real * x) { Mecable::getPoints(x); reshape(); }
+    void         getPoints(real const* x) { Mecable::getPoints(x); reshape(); }
 
     /// normalize point and add center
     unsigned     addSurfacePoint(Vector const&);

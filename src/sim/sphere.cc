@@ -24,7 +24,7 @@
  The Sphere is returned with no points
  */
 Sphere::Sphere(SphereProp const* p)
-: spRadius(0), spDrag(0), spDragRot(0), spAllocated(0), spProj(nullptr), prop(p)
+: spRadius(0), spDrag(0), spDragRot(0), prop(p)
 {
 }
 
@@ -33,7 +33,7 @@ Sphere::Sphere(SphereProp const* p)
  This will create the center point
  */
 Sphere::Sphere(SphereProp const* p, real rad)
-: spRadius(rad), spDrag(0), spDragRot(0), spAllocated(0), spProj(nullptr), prop(p)
+: spRadius(rad), spDrag(0), spDragRot(0), prop(p)
 {
     if ( !prop )
         throw InvalidParameter("Sphere:prop should be specified");
@@ -78,31 +78,11 @@ Sphere & Sphere::operator =(const Sphere & o)
 
 Sphere::~Sphere()
 {
-    //free memory
-    if ( spProj )
-        free_real(spProj);
     prop = nullptr;
 }
 
 //------------------------------------------------------------------------------
 #pragma mark -
-
-/// this extends Mecable::allocatedMecable()
-size_t Sphere::allocateMecable(const size_t nbp)
-{
-    /*
-     if Mecable::allocatePoints() allocated memory, it will return the
-     size of the new array, and we allocate the same size for other arrays.
-     */
-    size_t ms = Mecable::allocateMecable(nbp);
-    if ( ms )
-    {
-        //std::clog << "Sphere::allocatePoints " << ms << std::endl;
-        allocateProjection(ms);
-    }
-    return ms;
-}
-
 
 /*
  here 'cp' is the vector from the center to the point to be added,
@@ -504,20 +484,6 @@ void Sphere::reshape()
 //------------------- methods for the projection -------------------------------
 #pragma mark -
 
-
-void Sphere::allocateProjection(const size_t nbp)
-{
-    //std::clog << "Sphere::allocateProjection(" << nbp << ")" << std::endl;
-    if ( spAllocated < nbp )
-    {        
-        if ( spProj )
-            free_real(spProj);
-        spAllocated = nbp;
-        spProj = new_real(DIM*spAllocated);
-    }
-}
-
-
 #if ( DIM == 1 )
 
 //this is unsafe, don't use the sphere in 1D!
@@ -531,15 +497,13 @@ void Sphere::setSpeedsFromForces(const real* X, real, real* Y) const {}
  */
 void Sphere::makeProjection()
 {
-    allocateProjection(nPoints);
-    assert_true( spAllocated >= nPoints );
     assert_true( nPoints >= nbRefPts );
     
     // calculate radial vectors from center:
     real curv = 1.0 / spRadius;
     for ( unsigned p = nbRefPts; p < nPoints; ++p )
     {
-        real * ppp = spProj + DIM * p;
+        real * ppp = pVEC + DIM * p;
         real * pos = pPos + DIM * p;
         for ( int d = 0; d < DIM; ++d )
             ppp[d] = curv * ( pos[d] - pPos[d] );
@@ -606,7 +570,7 @@ void Sphere::setSpeedsFromForces(const real* X, const real alpha, real* Y) const
     {
         real * yyy = Y + DIM * p;
         real * pos = pPos + DIM * p;
-        real * rad = spProj + DIM * p;
+        real * rad = pVEC + DIM * p;
         real const* xxx = X + DIM * p;
 #if   ( DIM == 2 )
         real a = rad[0] * xxx[0] + rad[1] * xxx[1];

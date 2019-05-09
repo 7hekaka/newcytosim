@@ -145,7 +145,7 @@ public:
     void        reshape();
     
     /// change coordinate values
-    void        getPoints(const real * x);
+    void        getPoints(real const*);
 
     /// add a new point with a sphere (extends Mecable::addPoint)
     unsigned    addSphere(Vector const&, real radius);

@@ -17,13 +17,13 @@ PointGrid::PointGrid()
 }
 
 
-void PointGrid::setGrid(Space const* space, Modulo const* modulo, real min_step)
+size_t PointGrid::setGrid(Space const* spc, real min_step)
 {
     if ( min_step <= REAL_EPSILON )
-        return;
+        return 0;
     
     Vector inf, sup;
-    space->boundaries(inf, sup);
+    spc->boundaries(inf, sup);
     
     int n_cell[3];
     for ( int d = 0; d < DIM; ++d )
@@ -54,6 +54,11 @@ void PointGrid::setGrid(Space const* space, Modulo const* modulo, real min_step)
     
     //create the grid using the calculated dimensions:
     pGrid.setDimensions(inf, sup, n_cell);
+    return pGrid.nbCells();
+}
+
+void PointGrid::createCells()
+{
     pGrid.createCells();
 
     //Create side regions suitable for pairwise interactions:
@@ -63,7 +68,8 @@ void PointGrid::setGrid(Space const* space, Modulo const* modulo, real min_step)
     max_diameter = pGrid.minimumWidth(1);
 
     //report the grid size used
-    //pGrid.printSummary(std::clog, "StericGrid");
+    if ( pGrid.nbCells() > 4096 )
+        pGrid.printSummary(std::clog, "StericGrid");
 }
 
 
@@ -103,7 +109,7 @@ void PointGrid::add(unsigned pan, FiberSegment const& fl, real rd, real rg) cons
     if ( pan == 0 || pan > NB_STERIC_PANES )
         throw InvalidParameter("object:steric is out-of-range");
 
-    //we use the middle of the segment (interpolation coefficient is ignored)
+    // link in the cell containing the middle of the segment:
     Vector w = fl.center();
     segment_list(w, pan).new_val().set(fl, rd, rg);
     
@@ -133,12 +139,13 @@ void PointGrid::add(unsigned pan, FiberSegment const& fl, real rd, real rg) cons
 
 /**
  This is used to check two spherical objects:
- Solid/Bead/Sphere or Fiber-tip
+ Solid/Bead/Sphere or the terminal vertex (the tips) of a Fiber
  
  The force is applied if the objects are closer to the maximum
  of their specified range + radius.
  */
-void PointGrid::checkPP(Meca& meca, PointGridParam const& pam, FatPoint const& aa, FatPoint const& bb) const
+void PointGrid::checkPP(Meca& meca, PointGridParam const& pam,
+                        FatPoint const& aa, FatPoint const& bb) const
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << std::endl;
     const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
@@ -174,18 +181,18 @@ void PointGrid::checkPL(Meca& meca, PointGridParam const& pam,
     const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
     
     // get position of point with respect to segment:
-    real a, d;
-    bb.seg.projectPoint0(aa.pos, a, d);
+    real dis2;
+    real abs = bb.seg.projectPoint0(aa.pos, dis2);
     
-    if ( 0 <= a )
+    if ( 0 <= abs )
     {
-        if ( a <= bb.seg.len() )
+        if ( abs <= bb.seg.len() )
         {
-            if ( d < ran*ran )
+            if ( dis2 < ran*ran )
             {
                 const real len = aa.radius + bb.radius;
-                Interpolation bi(bb.seg, a);
-                if ( d > len*len )
+                Interpolation bi(bb.seg, abs);
+                if ( dis2 > len*len )
                     meca.interSideSlidingLink(bi, aa.pnt, len, pam.stiff_pull);
                 else
                     meca.interSideSlidingLink(bi, aa.pnt, len, pam.stiff_push);
@@ -210,13 +217,13 @@ void PointGrid::checkPL(Meca& meca, PointGridParam const& pam,
             if ( modulo )
                 modulo->fold(vab);
             
-            if ( vab * bb.seg.fiber()->diffPoints(bb.seg.point()-1) >= 0 )
+            if ( dot(vab, bb.seg.fiber()->diffPoints(bb.seg.point()-1)) >= 0 )
             {
-                const real d = vab.normSqr();
-                if ( d < ran*ran )
+                const real dis2 = vab.normSqr();
+                if ( dis2 < ran*ran )
                 {
                     const real len = aa.radius + bb.radius;
-                    if ( d > len*len )
+                    if ( dis2 > len*len )
                         meca.interLongLink(aa.pnt, bb.seg.exact1(), len, pam.stiff_pull);
                     else
                         meca.interLongLink(aa.pnt, bb.seg.exact1(), len, pam.stiff_push);
@@ -228,7 +235,8 @@ void PointGrid::checkPL(Meca& meca, PointGridParam const& pam,
 
 
 /**
- This is used to check a segment of a fiber against the non-end vertex of a fiber.
+ This is used to check a segment of a fiber against another segment of fiber,
+ not including the terminal vertex of fibers.
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
@@ -239,23 +247,23 @@ void PointGrid::checkLL1(Meca& meca, PointGridParam const& pam,
     const real ran = aa.range + bb.radius;
     
     // get position of bb.point1() with respect to segment 'aa'
-    real a, d = INFINITY;
-    aa.seg.projectPoint0(bb.seg.pos1(), a, d);
+    real dis2 = INFINITY;
+    real abs = aa.seg.projectPoint0(bb.seg.pos1(), dis2);
     
-    if ( d < ran*ran )
+    if ( dis2 < ran*ran )
     {
         /*
          bb.point1() projects inside segment 'aa'
          */
-        assert_true( 0 <= a  &&  a <= aa.seg.len() );
+        assert_true( 0 <= abs  &&  abs <= aa.seg.len() );
         const real len = aa.radius + bb.radius;
-        Interpolation ai(aa.seg, a);
-        if ( d > len*len )
+        Interpolation ai(aa.seg, abs);
+        if ( dis2 > len*len )
             meca.interSideSlidingLink(ai, bb.seg.exact1(), len, pam.stiff_pull);
         else
             meca.interSideSlidingLink(ai, bb.seg.exact1(), len, pam.stiff_push);
     }
-    else if ( a < 0 )
+    else if ( abs < 0 )
     {
         if ( aa.isFirst() )
         {
@@ -271,7 +279,7 @@ void PointGrid::checkLL1(Meca& meca, PointGridParam const& pam,
                     modulo->fold(vab);
                 
                 const real len = aa.radius + bb.radius;
-                if ( vab.normSqr() < len*len  &&  vab * bb.seg.diff() >= 0 )
+                if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg.diff()) >= 0 )
                     meca.interLongLink(aa.seg.exact1(), bb.seg.exact1(), len, pam.stiff_push);
             }
         }
@@ -286,7 +294,7 @@ void PointGrid::checkLL1(Meca& meca, PointGridParam const& pam,
             if ( modulo )
                 modulo->fold(vab);
             
-            if ( vab * aa.seg.fiber()->diffPoints(aa.seg.point()-1) >= 0 )
+            if ( dot(vab, aa.seg.fiber()->diffPoints(aa.seg.point()-1)) >= 0 )
             {
                 const real d = vab.normSqr();
                 if ( d < ran*ran )
@@ -304,7 +312,8 @@ void PointGrid::checkLL1(Meca& meca, PointGridParam const& pam,
 
 
 /**
- This is used to check a segment of a fiber against the non-end vertex of a fiber.
+ This is used to check a segment of a fiber against another segment of fiber,
+ the non-terminal vertex of a fiber.
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
@@ -315,23 +324,23 @@ void PointGrid::checkLL2(Meca& meca, PointGridParam const& pam,
     const real ran = aa.range + bb.radius;
     
     // get position of bb.point2() with respect to segment 'aa'
-    real a, d = INFINITY;
-    aa.seg.projectPoint0(bb.seg.pos2(), a, d);
+    real dis2 = INFINITY;
+    real abs = aa.seg.projectPoint0(bb.seg.pos2(), dis2);
     
-    if ( d < ran*ran )
+    if ( dis2 < ran*ran )
     {
         /*
          bb.point2() projects inside segment 'aa'
          */
-        assert_true( 0 <= a  &&  a <= aa.seg.len() );
+        assert_true( 0 <= abs  &&  abs <= aa.seg.len() );
         const real len = aa.radius + bb.radius;
-        Interpolation ai(aa.seg, a);
-        if ( d > len*len )
+        Interpolation ai(aa.seg, abs);
+        if ( dis2 > len*len )
             meca.interSideSlidingLink(ai, bb.seg.exact2(), len, pam.stiff_pull);
         else
             meca.interSideSlidingLink(ai, bb.seg.exact2(), len, pam.stiff_push);
     }
-    else if ( a < 0 )
+    else if ( abs < 0 )
     {
         /*
          Check the projection to the segment located before 'aa',
@@ -346,12 +355,12 @@ void PointGrid::checkLL2(Meca& meca, PointGridParam const& pam,
         {
             assert_true(bb.isLast());
             const real len = aa.radius + bb.radius;
-            if ( vab.normSqr() < len*len  &&  vab * bb.seg.diff() <= 0 )
+            if ( vab.normSqr() < len*len  && dot(vab, bb.seg.diff()) <= 0 )
                 meca.interLongLink(aa.seg.exact1(), bb.seg.exact2(), len, pam.stiff_push);
         }
         else
         {
-            if ( vab * aa.seg.fiber()->diffPoints(aa.seg.point()-1) >= 0 )
+            if ( dot(vab, aa.seg.fiber()->diffPoints(aa.seg.point()-1)) >= 0 )
             {
                 const real d = vab.normSqr();
                 if ( d < ran*ran )
@@ -365,7 +374,7 @@ void PointGrid::checkLL2(Meca& meca, PointGridParam const& pam,
             }
         }
     }
-    else if ( &bb < &aa  &&  aa.isLast()  &&  a > aa.seg.len() )
+    else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.seg.len() )
     {
         /*
          Check the projection of aa.point2(),
@@ -379,7 +388,7 @@ void PointGrid::checkLL2(Meca& meca, PointGridParam const& pam,
             modulo->fold(vab);
         
         const real len = aa.radius + bb.radius;
-        if ( vab.normSqr() < len*len  &&  vab * bb.seg.diff() <= 0 )
+        if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg.diff()) <= 0 )
             meca.interLongLink(aa.seg.exact2(), bb.seg.exact2(), len, pam.stiff_push);
     }
 }
@@ -524,9 +533,10 @@ void  PointGrid::setInteractions(Meca& meca, PointGridParam const& pam) const
 #else
 
 /**
- Check interactions between the FatPoints contained in Pane `pan1`, and `pan2`.
+ Check interactions between the FatPoints contained in Pane `pan`.
  */
-void  PointGrid::setInteractions(Meca& meca, PointGridParam const& pam, const unsigned pan) const
+void  PointGrid::setInteractions(Meca& meca, PointGridParam const& pam,
+                                 const unsigned pan) const
 {
     assert_true(pam.stiff_push >= 0);
     assert_true(pam.stiff_pull >= 0);
@@ -557,7 +567,7 @@ void  PointGrid::setInteractions(Meca& meca, PointGridParam const& pam, const un
 
 
 /**
- Check interactions between the FatPoints contained in Panes `pan1`, and `pan2`,
+ Check interactions between the FatPoints contained in Panes `pan1` and `pan2`,
  where ( pan1 != pan2 )
  */
 void  PointGrid::setInteractions(Meca& meca, PointGridParam const& pam,

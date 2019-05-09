@@ -180,21 +180,6 @@ Fiber::~Fiber()
 }
 
 
-size_t Fiber::allocateMecable(const size_t nbp)
-{
-    size_t ms = Mecafil::allocateMecable(nbp);
-    /*
-     if Mecafil::allocateMecable() allocated memory, it will return the 
-     size of the new array, and we allocate the same size for other arrays.
-     */
-    if ( ms )
-    {
-        //Cytosim::log << "Fiber::allocatePoints " << ms << std::endl;
-    }
-    return ms;
-}
-
-
 real Fiber::projectPoint(Vector const& w, real & dis) const
 {
     // initialize with the minus-end:

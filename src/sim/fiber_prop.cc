@@ -177,7 +177,6 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
         fib->setShape(tmp, nbp, 0);
         if ( fib->nbPoints() < 2 )
             throw InvalidParameter("the vectors specified in fiber:shape must be different");
-        fib->reshape();
         free_real(tmp);
     }
     else

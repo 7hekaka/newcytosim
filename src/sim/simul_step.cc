@@ -41,7 +41,7 @@ void Simul::setFiberGrid(Space const* spc) const
     assert_true( step > 0 );
 
     // increase the cell size until we get acceptable memory requirements:
-    const unsigned max = 1<<16;
+    const size_t max = 1<<16;
     while ( fiberGrid.setGrid(spc, step) > max )
     {
         //std::clog << "increasing simul:binding_grid_step\n";

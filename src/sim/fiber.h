@@ -132,9 +132,6 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// allocate memory for 'nbp' points
-    virtual size_t allocateMecable(size_t);
-    
     /// calculate viscous drag coefficient
     void           setDragCoefficient();
     

@@ -314,7 +314,7 @@ public:
         FieldGrid::index_t nbc = in.readUInt32();
         if ( nbc != mGrid.nbCells() )
         {
-            printf("file: %u field:%u\n", nbc, mGrid.nbCells());
+            printf("file: %u field:%lu\n", nbc, mGrid.nbCells());
             throw InvalidIO("mismatch in Field::size");
         }
         //std::clog << "Field::read() nb_cells=" << nbc << std::endl;

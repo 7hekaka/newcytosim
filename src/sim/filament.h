@@ -109,7 +109,7 @@ protected:
     void         postUpdate() { needUpdate = true; }
 
     /// oldest method to restore the distance between successive vertices
-    static void  reshape_sure(unsigned, real*, real cut);
+    static void  reshape_sure(unsigned, const real*, real*, real cut);
 
     /// apply the forces movements needed to the distance between two points
     static void  reshape_apply(unsigned, const real*, real*, const real*, const Vector*);
@@ -118,7 +118,7 @@ protected:
     static void  reshape_two(const real*, real*, real cut);
 
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_it(unsigned, const real*, real*, real cut);
+    static int   reshape_it(unsigned, const real*, real*, real cut, real* tmp);
     
     /// change segmentation
     void         setSegmentation(real c) { fnCut = c; fnAbscissaP = fnAbscissaM + c * nbSegments(); }
@@ -325,18 +325,21 @@ public:
     /// returns third power of segmentation()
     real         segmentationCube() const { return fnCut*fnCut*fnCut; }
     
-    /// recalculate fiber to have `np` vertices
-    void         resegment(unsigned np);
+    /// reinterpolate vertices and adjust fiber to have `ns` segments
+    void         resegment(unsigned ns);
     
     /// automatically select the number of points if needed, and resegment the fiber
     void         adjustSegmentation();
     
-    /// restore the distance between successive vertices
-    void         reshape();
+    /// change all vertices from given array of coordinates
+    void         setPoints(real const*);
     
     /// change position
-    void         getPoints(const real * x);
-    
+    void         getPoints(real const* ptr) { setPoints(ptr); }
+
+    /// restore the distance between successive vertices
+    void         reshape() { setPoints(pPos); }
+
     /// invert polarity (swap PLUS end MINUS ends in place)
     virtual void flipPolarity();
     
@@ -404,7 +407,7 @@ public:
     int          checkLength(real len, bool = true) const;
     
     /// check the length of all segments, and returns deviation
-    real         checkSegmentation(bool = true) const;
+    real         checkSegmentation(real tolerance, bool = true) const;
     
     /// dump for debugging
     void         dump(std::ostream&) const;

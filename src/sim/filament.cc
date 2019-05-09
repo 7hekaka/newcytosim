@@ -14,6 +14,7 @@
 #include "modulo.h"
 #include "vector3.h"
 #include "simul.h"
+#include "vecprint.h"
 
 extern Modulo const* modulo;
 
@@ -170,6 +171,7 @@ void Filament::setShape(const real pts[], unsigned n_pts, unsigned np)
     b.load(pts+DIM*n_pts-DIM);
     setPoint(np, b);
     postUpdate();
+    reshape();
 }
 
 /**
@@ -338,7 +340,7 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
  FJN, Strasbourg, 22 Feb 2015
  */
 #if ( 1 )
-int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut)
+int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut, real* tmp)
 {
     assert_true( ns > 1 );
     const real alphaSqr = cut * cut;
@@ -346,7 +348,7 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     real err = 0;
     int info = 0;
     
-    Vector * dif = new Vector[ns];
+    Vector * dif = reinterpret_cast<Vector*>(tmp);
     
     // make a multiple of chunk to align memory:
     size_t chk = chunk_real(ns);
@@ -404,9 +406,7 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     }
 
 #if ( 0 )
-    printf("\n --- \n 0 sca ");
-    for ( unsigned i = 0; i < ns; ++i )
-        printf(" %+6.4f", sca[i]);
+    printf("\n --- \n 0 sca "); VecPrint::print(std::cout, ns, sca, 3);
 #endif
 
     while ( err > 1e-12 )
@@ -441,18 +441,10 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
         printf("\n   %i sum %8.5f", cnt, sum);
 #endif
 #if ( 0 )
-        printf("\n   %i val  ", cnt);
-        for ( unsigned i = 0; i < ns; ++i )
-            printf("%+6.4f ", val[i]);
-        printf("\n   %i upe  ", cnt);
-        for ( unsigned i = 0; i+1 < ns; ++i )
-            printf("%+6.4f ", upe[i]);
-        printf("\n   %i dia  ", cnt);
-        for ( unsigned i = 0; i < ns; ++i )
-            printf("%+6.4f ", dia[i]);
-        printf("\n   %i low  ", cnt);
-        for ( unsigned i = 0; i < ns-1; ++i )
-            printf("%+6.4f ", low[i]);
+        printf("\n  %i val  ", cnt); VecPrint::print(std::cout, ns, val, 3);
+        printf("\n  %i upe  ", cnt); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n  %i dia  ", cnt); VecPrint::print(std::cout, ns, dia, 3);
+        printf("\n  %i low  ", cnt); VecPrint::print(std::cout, ns-1, low, 3);
 #endif
         
         lapack::xgtsv(ns, 1, low, dia, upe, val, ns, &info);
@@ -476,16 +468,12 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
         }
         
 #if ( 0 )
-        printf("\n %3i sca ", cnt);
-        for ( int i = 0; i < ns; ++i )
-            printf(" %+6.4f", sca[i]);
+        printf("\n %3i sca ", cnt); VecPrint::print(std::cout, ns, sca, 3);
 #endif
     }
     
 #if ( 0 )
-    printf("\n%2i sca  ", cnt);
-    for ( int i = 0; i < ns; ++i )
-        printf("%+6.4f ", sca[i]);
+    printf("\n%2i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
     printf("\n%2i err %e\n", cnt, err);
 #endif
     
@@ -494,14 +482,12 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     
 finish:
     free_real(mem);
-    delete[] dif;
-    
     return info;
 }
 
 #else
 
-int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut)
+int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut, real* tmp)
 {
     assert_true( ns > 1 );
     const real alphaSqr = cut * cut;
@@ -526,9 +512,7 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     unsigned cnt = 0;
     do {
 #if ( 0 )
-        printf("\n   %i sca  ", cnt);
-        for ( unsigned i = 0; i < ns; ++i )
-            printf("%+6.4f ", sca[i]);
+        printf("\n   %i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
 #endif
 
         // calculate all values of 'vec'
@@ -539,28 +523,20 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
         
         // calculate the matrix elements and RHS of system
         val[0] = vec[0].normSqr() - alphaSqr;
-        dia[0] = -2 * ( vec[0] * dif[0] );
+        dia[0] = -2 * dot(vec[0], dif[0]);
         for ( unsigned i = 1; i < ns; ++i )
         {
             val[i] = vec[i].normSqr() - alphaSqr;
-            dia[i] = -2 * ( vec[i] * dif[i] );
-            upe[i-1] = vec[i-1] * dif[i];
-            low[i-1] = vec[i] * dif[i-1];
+            dia[i] = -2 * dot(vec[i], dif[i]);
+            upe[i-1] = dot(vec[i-1], dif[i]);
+            low[i-1] = dot(vec[i], dif[i-1]);
         }
         
 #if ( 0 )
-        printf("\n   %i val  ", cnt);
-        for ( unsigned i = 0; i < ns; ++i )
-            printf("%+6.4f ", val[i]);
-        printf("\n   %i upe  ", cnt);
-        for ( unsigned i = 0; i+1 < ns; ++i )
-            printf("%+6.4f ", upe[i]);
-        printf("\n   %i dia  ", cnt);
-        for ( unsigned i = 0; i < ns; ++i )
-            printf("%+6.4f ", dia[i]);
-        printf("\n   %i low  ", cnt);
-        for ( unsigned i = 0; i < ns-1; ++i )
-            printf("%+6.4f ", low[i]);
+        printf("\n  %i val  ", cnt); VecPrint::print(std::cout, ns, val, 3);
+        printf("\n  %i upe  ", cnt); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n  %i dia  ", cnt); VecPrint::print(std::cout, ns, dia, 3);
+        printf("\n  %i low  ", cnt); VecPrint::print(std::cout, ns-1, low, 3);
 #endif
         
         lapack::xgtsv(ns, 1, low, dia, upe, val, ns, &info);
@@ -586,9 +562,7 @@ int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut
     
 #if ( 0 )
     printf("\n%2i err %e", cnt, err);
-    printf("\n%2i sca  ", cnt);
-    for ( unsigned i = 0; i < ns; ++i )
-        printf("%+6.4f ", sca[i]);
+    printf("\n%2i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
     printf("\n");
 #endif
     
@@ -656,12 +630,13 @@ finish:
  likely, the Brownian motion will push the points appart soon.
  */
 
-void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
+void Filament::reshape_sure(const unsigned ns, const real* src, real* vec, real cut)
 {
     Vector dp(0,0,0), sum(0,0,0);
     Vector seg = diffPoints(vec, 0);
     real   dis = seg.norm();
     
+    copy_real(DIM*(ns+1), src, vec);
     // translation needed to restore first segment
     if ( dis > REAL_EPSILON )
         dp = ( cut/dis - 1.0 ) * seg;
@@ -681,30 +656,31 @@ void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
             dp += ( cut/dis - 1.0 ) * seg;
     }
     
-    //move the last point by dy[]:
+    // move the last point by dy[]:
     dp.add_to(vec+DIM*ns);
     
     // calculte a uniform motion to conserve the center of gravity:
     sum = ( sum + dp ) * ( -1.0 / ( ns + 1 ) );
     
-    //translate the entire fiber uniformly:
+    // translate the entire fiber uniformly:
     for ( unsigned i = 0; i <= ns; ++i )
         sum.add_to(vec+DIM*i);
 }
 
 #else
 
-// ------------  old ( unoptimal ) version:
+// ------------  old ( less optimal ) version:
 /**
  Move the vertices relative to each other, such that when this is done,
  all segments have the same distance segmentation() = fnCut.
  This is operation does not change the center of gravity of the fiber.
  */
 
-void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
+void Filament::reshape_sure(const unsigned ns, const real* src, real* vec, real cut)
 {
     Vector dp, sum(0,0,0);
-    
+
+    copy_real(DIM*(ns+1), src, vec);
     for ( unsigned pp = 1; pp <= ns; ++pp )
     {
         dp       = diffPoints(vec, pp-1);
@@ -726,33 +702,17 @@ void Filament::reshape_sure(const unsigned ns, real* vec, real cut)
 #endif
 
 
-void Filament::reshape()
+void Filament::setPoints(real const* ptr)
 {
-    assert_true( nPoints > 1 );
 #if ( DIM > 1 )
     if ( nPoints == 2 )
-        reshape_two(pPos, pPos, fnCut);
-    else if ( reshape_it(nbSegments(), pPos, pPos, fnCut) )
+        reshape_two(ptr, pPos, fnCut);
+    else if ( reshape_it(nbSegments(), ptr, pPos, fnCut, pVEC) )
 #endif
-        reshape_sure(nbSegments(), pPos, fnCut);
-}
-
-
-void Filament::getPoints(const real * x)
-{
-#if ( DIM == 1 )
-    Mecable::getPoints(x);
-    reshape_sure(nbSegments(), pPos, fnCut);
-#else
-    if ( nPoints == 2 )
-        reshape_two(x, pPos, fnCut);
-    else if ( reshape_it(nbSegments(), x, pPos, fnCut) )
     {
-        Mecable::getPoints(x);
-        reshape_sure(nbSegments(), pPos, fnCut);
+        reshape_sure(nbSegments(), ptr, pPos, fnCut);
         //std::cerr << "A crude method was used to reshape " << reference() << '\n';
     }
-#endif
     //dump(std::cerr);
 }
 
@@ -879,29 +839,22 @@ void Filament::cutM(const real delta)
     const real cut = (len-delta) / (np-1);
     real* tmp = new_real(DIM*np);
 
-    // calculate intermediate points into tmp[]:
+    // calculate intermediate points:
     for ( unsigned i=0; i+1 < np; ++i )
     {
         Vector w = interpolateM(delta+i*cut).pos();
         w.store(tmp+DIM*i);
     }
-    
-    // copy the position of plus-end into tmp[]:
-    const unsigned lp = lastPoint();
-    for ( unsigned d = 0 ; d < DIM; ++d )
-        tmp[DIM*(np-1)+d] = pPos[DIM*lp+d];
+
+    // copy the position of plus-end:
+    copy_real(DIM, pPos+DIM*lastPoint(), tmp+DIM*(np-1));
     
     setNbPoints(np);
-    
-    // copy calculated points to pPos[]
-    for ( unsigned i = 0; i < DIM*np; ++i )
-        pPos[i] = tmp[i];
-    
-    free_real(tmp);
     fnAbscissaM += delta;
     setSegmentation(cut);
+    setPoints(tmp);
+    free_real(tmp);
     postUpdate();
-    reshape();
 }
 
 
@@ -994,25 +947,22 @@ void Filament::cutP(const real delta)
     const unsigned np = bestNumberOfPoints((len-delta)/fnSegmentation);
     const real cut = (len-delta) / (np-1);
     real* tmp = new_real(DIM*np);
-    
-    // calculate intermediate points into tmp[]:
+
+    // copy minus end:
+    copy_real(DIM, pPos, tmp);
+
+    // calculate intermediate points:
     for ( unsigned i = 1; i < np; ++i )
     {
         Vector w = interpolateM(i*cut).pos();
         w.store(tmp+DIM*i);
     }
-    
+
     setNbPoints(np);
-    
-    // copy calculated points to pPos[]
-    // point at minus-end has not changed
-    for ( unsigned i = DIM; i < DIM*np; ++i )
-        pPos[i] = tmp[i];
-    
-    free_real(tmp);
     setSegmentation(cut);
+    setPoints(tmp);
+    free_real(tmp);
     postUpdate();
-    reshape();
 }
 
 //------------------------------------------------------------------------------
@@ -1075,16 +1025,13 @@ void Filament::join(Filament const* fib)
 {
     const real len1 = length();
     const real lenT = len1 + fib->length();
-    const unsigned np = bestNumberOfPoints(lenT/fnSegmentation) - 1;
-    const real cut = lenT / real(np);
+    const unsigned ns = bestNumberOfPoints(lenT/fnSegmentation) - 1;
+    const real cut = lenT / real(ns);
     
-    // save position of PLUS_END:
-    Vector ppe = fib->posEndP();
-    
-    real* tmp = new_real(DIM*np);
-    
+    real* tmp = new_real(DIM*(ns+1));
+
     // calculate new points into tmp[]:
-    for ( unsigned i = 1; i < np; ++i )
+    for ( unsigned i = 1; i < ns; ++i )
     {
         Vector w;
         if ( i*cut < len1 )
@@ -1095,16 +1042,13 @@ void Filament::join(Filament const* fib)
         w.store(tmp+DIM*i);
     }
     
-    setNbPoints(np+1);
-    
-    // copy point back in place:
-    for ( unsigned int i = DIM; i < DIM*np; ++i )
-        pPos[i] = tmp[i];
-    
-    ppe.store(pPos+DIM*np);
-    
-    free_real(tmp);
+    // copy position of PLUS_END:
+    fib->posEndP().store(tmp+DIM*ns);
+
+    setNbPoints(ns+1);
     setSegmentation(cut);
+    setPoints(tmp);
+    free_real(tmp);
     postUpdate();
 }
 
@@ -1317,19 +1261,22 @@ real Filament::planarIntersect(unsigned s, Vector const& n, const real a) const
  Recalculate the vertices of the Filament for 'ns' segments.
  
  @todo 2d-order interpolation in Filament::resegment()
+ 
+ Note: Unless the Filament is straight, the length of the segments after
+ an interpolation will not exactly match `segmentation()`, and we therefore
+ call reshape() here to correct for the problem.
  */
 void Filament::resegment(unsigned ns)
 {
     assert_true( ns > 0 );
-    
     real cut = nbSegments() * fnCut / ns;
     
     // calculate new intermediate points in tmp[]:
-    real* tmp = new_real(DIM*ns);
     Vector a = posP(0), b = posP(1);
     
     real h = 0;
     unsigned p = 1;
+    real* tmp = new_real(DIM*(ns+1));
     
     for ( unsigned n = 1; n < ns; ++n )
     {
@@ -1340,7 +1287,7 @@ void Filament::resegment(unsigned ns)
             h -= fnCut;
             a = b;
             ++p;
-            assert_true(p<nPoints);
+            assert_true(p<lastPoint());
             b.load(pPos+DIM*p);
         }
         
@@ -1348,28 +1295,14 @@ void Filament::resegment(unsigned ns)
         w.store(tmp+DIM*n);
     }
     
-    // save index of PLUS_END
-    p = DIM*lastPoint();
-    
-    // resize array:
-    setNbPoints(ns+1);
-
     // move coordinates of last point
-    for ( unsigned d = 0; d < DIM; ++d )
-        pPos[DIM*ns+d] = pPos[p+d];
+    copy_real(DIM, pPos+DIM*lastPoint(), tmp+DIM*ns);
 
-    // copy calculated coordinates back into pPos
-    for ( unsigned d = DIM; d < DIM*ns; ++d )
-        pPos[d] = tmp[d];
-
-    free_real(tmp);
+    // resize filament:
+    setNbPoints(ns+1);
     setSegmentation(cut);
-    /*
-     Note: Unless the Filament is straight, the length of the segments after the
-     interpolation will not exactly match `segmentation()`, and we therefore
-     call reshape() to correct for the problem.
-     */
-    reshape();
+    setPoints(tmp);
+    free_real(tmp);
 }
 
 
@@ -1396,16 +1329,14 @@ void Filament::adjustSegmentation()
     if ( best != nPoints )
     {
         //std::clog << reference() << " resegment " << nPoints << " -> " << best << "\n";
-#if ( 1 )
+#if ( 0 )
         resegment(best-1);
 #else
-        unsigned np = nPoints;
         // copy current points in temporary array:
-        real* tmp = new_real(DIM*np);
-        for ( int n = 0; n < DIM*np; ++n )
-            tmp[n] = pPos[n];
+        real* tmp = new_real(DIM*nPoints);
+        copy_real(DIM*nPoints, pPos, tmp);
         // re-interpolate:
-        setShape(tmp, np, best);
+        setShape(tmp, nPoints, best);
         free_real(tmp);
 #endif
     }
@@ -1824,12 +1755,12 @@ int Filament::checkLength(real len, bool arg) const
 }
 
 
-real Filament::checkSegmentation(bool arg) const
+real Filament::checkSegmentation(real tol, bool arg) const
 {
     real mn, mx;
     segmentationMinMax(mn, mx);
     real d = ( mx - mn ) / segmentation();
-    if ( d > 0.01 )
+    if ( d > tol )
     {
         if ( arg ) std::clog << reference() << "  ";
         std::clog << " Segments in [ " << std::fixed << mn << " " << std::fixed << mx;
@@ -1846,7 +1777,7 @@ void Filament::dump(std::ostream& os) const
 {
     os << "Fiber " << std::setw(7) << reference();
     os << "  " << std::left << std::setw(6) << fnCut << " {";
-    real d = checkSegmentation(false);
+    real d = checkSegmentation(0.01, false);
     os << " deviation " << std::fixed << 100*d << " %";
     os << " }" << std::endl;
 }
@@ -1919,7 +1850,7 @@ void Filament::read(Inputter & in, Simul& sim, ObjectTag tag)
     if ( in.vectorSize() == DIM )
     {
         checkLength(len);
-        checkSegmentation();
+        checkSegmentation(0.01);
     }
 }
 

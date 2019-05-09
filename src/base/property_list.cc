@@ -206,6 +206,7 @@ PropertyList PropertyList::find_all(std::string const& cat) const
     //std::clog << this << "->find_all(" << cat << ") " << std::endl;
 
     PropertyList res;
+    res.reserve(4);
     for ( Property* i : vec_ )
     {
         if ( i->category() == cat )

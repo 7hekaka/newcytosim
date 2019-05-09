@@ -146,7 +146,7 @@ public:
         
         if ( gCell )
             delete[] gCell;
-                
+        
         gCell = new CELL[GRID::nCells];
         GRID::gAllocated = GRID::nCells;
     }

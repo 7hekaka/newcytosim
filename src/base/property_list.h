@@ -39,6 +39,9 @@ public:
     
     //-------------------------------------------------------------------------------
     
+    /// allocate for `s` slots
+    void         reserve(size_t s) { vec_.reserve(s); }
+    
     /// add a new Property in the list, and set its number
     void         deposit(Property *);
     

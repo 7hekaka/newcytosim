@@ -122,7 +122,7 @@ protected:
     index_t gAllocated;
    
     /// Total number of cells in the map; size of cells[]
-    index_t nCells;
+    size_t  nCells;
     
     /// The number of cells in each dimension
     index_t gDim[ORD];
@@ -339,7 +339,7 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    index_t         nbCells()           const { return nCells; }
+    size_t          nbCells()           const { return nCells; }
 
     /// number of cells in dimensionality `d`
     index_t         breadth(int d)      const { return gDim[d]; }
@@ -698,7 +698,7 @@ private:
             regionsEdge[e] = 0;
         
         int ori[ORD];
-        for ( index_t indx = 0; indx < nCells; ++indx )
+        for ( size_t indx = 0; indx < nCells; ++indx )
         {
             setCoordinatesFromIndex(ori, indx);
             index_t e = edgeFromCoordinates(ori, range);

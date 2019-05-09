@@ -832,9 +832,9 @@ void Solid::reshape()
  
  The calls for different solids are shifted by using the identity() of each Solid.
  */
-void Solid::getPoints(const real * x)
+void Solid::getPoints(real const* ptr)
 {
-    Mecable::getPoints(x);
+    Mecable::getPoints(ptr);
     
     // for one point, nothing should be done
     if ( nPoints < 2 )

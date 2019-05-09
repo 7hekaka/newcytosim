@@ -17,10 +17,10 @@ PointGrid::PointGrid()
 }
 
 
-void PointGrid::setGrid(Space const* spc, Modulo const* mod, real min_step)
+size_t PointGrid::setGrid(Space const* spc, real min_step)
 {
     if ( min_step <= REAL_EPSILON )
-        return;
+        return 0;
     
     Vector inf, sup;
     spc->boundaries(inf, sup);
@@ -33,7 +33,7 @@ void PointGrid::setGrid(Space const* spc, Modulo const* mod, real min_step)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
         
-        if ( mod  &&  mod->isPeriodic(d) )
+        if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges
             n_cell[d] = (int)floor(n);
@@ -54,6 +54,11 @@ void PointGrid::setGrid(Space const* spc, Modulo const* mod, real min_step)
     
     //create the grid using the calculated dimensions:
     pGrid.setDimensions(inf, sup, n_cell);
+    return pGrid.nbCells();
+}
+
+void PointGrid::createCells()
+{
     pGrid.createCells();
 
     //Create side regions suitable for pairwise interactions:

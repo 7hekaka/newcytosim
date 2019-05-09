@@ -16,12 +16,12 @@ Mecafil::Mecafil()
     buildProjection();
     rfDragPoint = 0;
     rfRigidity  = 0;
-    rfDiff      = nullptr;
-    rfLag       = nullptr;
-    rfLLG       = nullptr;
-    rfVTP       = nullptr;
+    rfDiff = nullptr;
+    rfLag  = nullptr;
+    rfLLG  = nullptr;
+    rfVTP  = nullptr;
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    rfDir       = 0;
+    rfDir  = 0;
 #endif
 }
 
@@ -119,7 +119,7 @@ real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 void Mecafil::storeDirections()
 {
 #if ( 1 )
-    //checkSegmentation();
+    //checkSegmentation(0.01);
     /*
      assume here that successive points are correctly separated, which is usally
      not the case, but the error is usually small

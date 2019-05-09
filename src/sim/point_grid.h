@@ -336,8 +336,11 @@ public:
     /// creator
     PointGrid();
     
-    /// create a grid to cover the specified Space, with cell of size min_step at least
-    void setGrid(Space const*, Modulo const*, real min_step);
+    /// define grid covering specified Space, with cell of size min_step at least
+    size_t setGrid(Space const*, real min_step);
+    
+    /// allocate memory for grid
+    void createCells();
     
     /// true if the grid was initialized by calling setGrid()
     bool hasGrid() const    { return pGrid.hasCells(); }

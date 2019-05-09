@@ -27,9 +27,6 @@ class Mecable : public Object, public Buddy
 {
 protected:
     
-    /// Number of points in the Mecable
-    unsigned    nPoints;
-    
     /// array of size DIM*pAllocated contains DIM*nPoints coordinates
     /**
      The coordinates are organized as follows:
@@ -39,11 +36,20 @@ protected:
      */
     real *      pPos;
     
+    /// another array of size DIM*pAllocated
+    real *      pVEC;
+    
+    /// an array of size 5*pAllocated
+    real *      pMEM;
+
     /// Array containing force-coordinates which is allocated in Meca
     real const* pForce;
     
     /// Number of points in pForce[]
     size_t      pForceMax;
+    
+    /// Number of points in the Mecable
+    unsigned    nPoints;
 
 private:
 
@@ -127,7 +133,7 @@ public:
     void            putPoints(real * dst) const;
     
     /// replace current coordinates by values from the provided array
-    virtual void    getPoints(const real *);
+    virtual void    getPoints(real const*);
     
     /// Add a point and expand the object, returning the array index that was used
     unsigned        addPoint(Vector const& w);

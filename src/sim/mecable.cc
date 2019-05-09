@@ -22,6 +22,8 @@ void Mecable::clearMecable()
     pBlockUse  = false;
     pBlockSize = 0;
     pPos       = nullptr;
+    pVEC       = nullptr;
+    pMEM       = nullptr;
     pForce     = nullptr;
     pIndex     = -1;  // that is an invalid value
 }
@@ -32,8 +34,7 @@ Mecable::Mecable(const Mecable & o)
     clearMecable();
     allocateMecable(o.nPoints);
     nPoints = o.nPoints;
-    for ( unsigned p = 0; p < DIM*nPoints; ++p )
-        pPos[p] = o.pPos[p];
+    copy_real(DIM*nPoints, o.pPos, pPos);
 }
 
 
@@ -41,8 +42,7 @@ Mecable& Mecable::operator =(const Mecable& o)
 {
     allocateMecable(o.nPoints);
     nPoints = o.nPoints;
-    for ( unsigned p = 0; p < DIM*nPoints; ++p )
-        pPos[p] = o.pPos[p];
+    copy_real(DIM*nPoints, o.pPos, pPos);
     return *this;
 }
 
@@ -89,16 +89,20 @@ size_t Mecable::allocateMecable(const size_t nbp)
     if ( pAllocated < nbp )
     {
         size_t all = chunk_real(nbp);
-        //std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
+        // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
         // retain existing data:
-        real * mem = new_real(DIM*all);
+        real * mem = new_real(all*DIM);
+        real * vec = new_real(all*sizeof(Vector));
         if ( pPos )
         {
-            copy_real(DIM*nPoints, pPos, mem);
+            copy_real(nPoints*DIM, pPos, mem);
+            copy_real(nPoints*DIM, pVEC, vec);
             free_real(pPos);
+            free_real(pVEC);
         }
         pPos = mem;
+        pVEC = vec;
         pAllocated = all;
         return all;
     }
@@ -122,8 +126,10 @@ void Mecable::releaseMecable()
     
     if ( pPos )
     {
-        free(pPos);
+        free_real(pPos);
+        free_real(pVEC);
         pPos = nullptr;
+        pVEC = nullptr;
     }
     
     pForce = nullptr;
@@ -253,12 +259,12 @@ void Mecable::putPoints(real * x) const
 }
 
 
-void Mecable::getPoints(const real * x)
+void Mecable::getPoints(const real * ptr)
 {
 #if ( DIM == 4 )
-    blas::xcopy(DIM*nPoints, x, 1, pPos, 1);
+    blas::xcopy(DIM*nPoints, ptr, 1, pPos, 1);
 #else
-    copy_real(DIM*nPoints, x, pPos);
+    copy_real(DIM*nPoints, ptr, pPos);
 #endif
 }
 

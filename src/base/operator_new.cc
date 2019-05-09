@@ -8,10 +8,12 @@
 
 void* operator new(std::size_t s)
 {
+    //printf("new(%lu)\n", s);
     void* ptr = nullptr;
 #if ( 1 )
     // we align all memory to 32 bytes
-    posix_memalign(&ptr, 32, s);
+    if ( s < ( 1 << 30 ) )
+        posix_memalign(&ptr, 32, s);
 #else
     // system's default (unaligned) memory
     ptr = std::malloc(s);

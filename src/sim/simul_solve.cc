@@ -84,10 +84,16 @@ void Simul::setStericGrid(Space const* spc) const
         //Cytosim::log("auto setting simul:steric_max_range=%.3f\n", range);
     }
     
-    if ( range > 0 ) 
-        pointGrid.setGrid(spc, modulo, range);
-    else
-        throw InvalidParameter("simul:steric is enabled, but simul:steric_max_range was not set");
+    if ( range <= 0 )
+        throw InvalidParameter("simul:steric_max_range must be defined");
+
+    const size_t max = 1<<16;
+    while ( pointGrid.setGrid(spc, range) > max )
+    {
+        //std::clog << "increasing simul:steric_max_range\n";
+        range *= 2;
+    }
+    pointGrid.createCells();
 }
 
 
