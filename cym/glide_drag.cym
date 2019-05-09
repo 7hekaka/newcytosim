@@ -41,7 +41,7 @@ set hand kinesin
     activity = move
     unloaded_speed = 0.4
     stall_force = 6
-	display = ( size=3; color=light_blue, dark_blue )
+    display = ( size=3; color=light_blue, dark_blue )
 }
 
 set single grafted
@@ -106,11 +106,11 @@ new 3200 grafted
 
 repeat 100
 {
-	run 100 system
-	{
-	    nb_frames = 100
-	}
-	report fiber:force *
-	report bead *
+    run 100 system
+    {
+        nb_frames = 100
+    }
+    report fiber:force *
+    report bead *
 }
 

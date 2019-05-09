@@ -13,7 +13,7 @@ set simul system
 set space cell
 {
     shape = capsule
-	display = ( color=dark_gray; width=10; )
+    display = ( color=dark_gray; width=10; )
 }
 
 set fiber filament
@@ -60,8 +60,8 @@ set couple crosslinker
 
 new cell
 {
-	length = 9
-	radius = 2.5
+    length = 9
+    radius = 2.5
 }
 
 new 128 filament

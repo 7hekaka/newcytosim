@@ -114,21 +114,21 @@ set solid blob
 
 new cylinder
 {
-	 radius = 0.150
-	 bottom = -0.030
-	 top = 0.100
+     radius = 0.150
+     bottom = -0.030
+     top = 0.100
 }
 new base
 {
-	 radius = 0.050
-	 bottom = -0.030
-	 top = -0.027
+    radius = 0.050
+    bottom = -0.030
+    top = -0.027
 }
 new pin
 {
-	 radius = 0.000
-	 bottom = -0.040
-	 top = -0.040
+    radius = 0.000
+    bottom = -0.040
+    top = -0.040
 }
 
 new 350 arp23 ( disc 0.05 at 0 0 -0.030 )

@@ -9,11 +9,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 5 )
+    shape = sphere
     display = ( color = gray; width = 5; )
 }
 
 new cell
+{
+    radius = 5
+}
 
 set fiber filament
 {

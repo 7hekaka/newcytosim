@@ -18,7 +18,7 @@ set space cell
 
 set fiber filament
 {
-	confine = inside, 100
+    confine = inside, 100
     rigidity = 0.05
     segmentation = 0.0275
     max_length = 4
@@ -71,8 +71,8 @@ new cell
 new 1000 filament
 {
     length = 0.75, exponential
-	equilibrate = 17
-	direction = align XY
+    equilibrate = 17
+    direction = align XY
 }
 
 new 50 minifilament

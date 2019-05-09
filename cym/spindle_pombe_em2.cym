@@ -34,7 +34,6 @@ set fiber microtubule
 
 
 
-
 % mt index 1
 new microtubule
 {

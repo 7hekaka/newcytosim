@@ -64,8 +64,8 @@ new cell
 new 250 filament
 {
     length = 2.5
-	% initialize shape from a persistent random walk
-	equilibrate = 17
+    % initialize shape from a persistent random walk
+    equilibrate = 17
 }
 
 new 2000 motor

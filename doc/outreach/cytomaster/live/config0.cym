@@ -5,15 +5,18 @@ set simul system
 {
     time_step = 0.005
     viscosity = 0.02
-	display = ( point_size=12; zoom = 0.8; )
+    display = ( point_size=12; zoom = 0.8; )
 }
 
 set space cell
 {
-    geometry = ( sphere 5 )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 5
+}
 
 set fiber filament
 {

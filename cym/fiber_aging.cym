@@ -13,11 +13,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 5 )
+    shape = sphere
     display = ( color = 0x0000FF11; )
 }
 
 new cell
+{
+    radius = 5
+}
 
 set fiber microtubule
 {

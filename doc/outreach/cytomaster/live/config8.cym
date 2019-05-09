@@ -66,14 +66,14 @@ set nucleus noyau
 
 new cytoplasm
 {
-	 length = 10
-	 radius = 1.62
+    length = 10
+    radius = 1.62
 }
 
 new cell
 {
-	 length = 10.2
-	 radius = 1.72
+    length = 10.2
+    radius = 1.72
 }
 
 new noyau

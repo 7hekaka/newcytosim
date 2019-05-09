@@ -14,8 +14,8 @@ set space cell
 
 new cell
 {
-	length = 10
-	radius = 3
+    length = 10
+    radius = 3
 }
 
 set fiber microtubule

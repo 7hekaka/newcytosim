@@ -165,7 +165,6 @@ set couple kch
 new 5000 kch
 
 
-
 run 40000 system
 {
     nb_frames  = 20

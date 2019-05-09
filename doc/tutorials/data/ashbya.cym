@@ -17,7 +17,7 @@ set simul system
 set system display
 {
     window_size = 1024, 200;
-    tiled       = 3, 1;
+    tile        = 3, 1;
     point_value = 0.01;
     style       = 3;
     back_color  = dark_gray;

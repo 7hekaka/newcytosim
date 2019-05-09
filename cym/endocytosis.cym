@@ -1,6 +1,7 @@
 % Endocytosis in Yeast cells is driven by actin polymerization
 % F. Nedelec, in Switzerland towards Bern, 27.11.2013
 % F. Nedelec, Strasbourg, 19-21.09.2015
+% Using implicit torque, F. Nedelec, Cambridge, 03.2019
 
 set simul system
 {
@@ -9,27 +10,27 @@ set simul system
     viscosity = 10
     steric = 1, 50000
     steric_max_range = 0.05
-    display = ( point_value=0.001; style=3; back_color=black; window_size=1024,768; zoom=2.5; rotation= 0.81 -0.59 0 0; )
+    display = ( point_value=0.001; style=3; back_color=black; zoom=1.5; rotation= 0.81 -0.59 0 0; )
 }
 
 % simulation space
 set space cylinder
 {
-    geometry = ( cylinderZ 0.150 -0.030 0.100 )
+    shape = cylinderZ
     display = ( color=0x00000044, dark_gray; visible=3 )
 }
 
 % very thin cylinder at the base of the cell:
 set space base
 {
-    geometry = ( cylinderZ 0.050 -0.031 -0.029 )
+    shape = cylinderZ
     display = ( color=0x0000FF44; visible=1 )
 }
 
 % just a single point:
 set space pin
 {
-    geometry = ( cylinderZ 0.000 -0.040 -0.040 )
+    shape = cylinderZ
     display = ( color=red; visible=3 )
 }
 
@@ -112,8 +113,23 @@ set solid blob
 }
 
 new cylinder
+{
+    radius = 0.150
+    bottom = -0.030
+    top = 0.100
+}
 new base
+{
+    radius = 0.050
+    bottom = -0.030
+    top = -0.027
+}
 new pin
+{
+    radius = 0.000
+    bottom = -0.040
+    top = -0.040
+}
 
 new 350 arp23 ( disc 0.05 at 0 0 -0.030 )
 new 3000 crosslinker

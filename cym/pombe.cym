@@ -9,24 +9,19 @@ set simul system
     kT         = 0.0042
     viscosity  = 0.9
     precondition = 0
-    display = ( window_size=1024,384 )
+    display = ( delay=4; )
 }
 
 set space cell
 {
     shape = capsule
-    display = ( color=0xFFFFFF33, 0x11111188; visible=3; )
+    display = ( color=0x7777770F, black; visible=3; )
 }
 
-new cell
-{
-    length = 10
-    width = 3.24
-}
 
 set fiber microtubule
 {
-    rigidity       = 30
+    rigidity       = 20
     segmentation   = 0.5
     confine        = inside, 200
     
@@ -48,7 +43,7 @@ set sphere envelope
     confine        = all_inside, 200
     piston_effect  = 1
     
-    display = ( color=0x0000FFEE; size=12; style=15 )
+    display = ( color=0x0000FF88; size=12; style=15 )
 }
 
 set bundle bunch
@@ -60,6 +55,12 @@ set bundle bunch
 set nucleus noyau
 {
     stiffness  = 200
+}
+
+new cell
+{
+    length = 10
+    radius = 1.62
 }
 
 new noyau
