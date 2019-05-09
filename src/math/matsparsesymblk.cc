@@ -391,7 +391,7 @@ size_t MatrixSparseSymmetricBlock::nbElements(index_t start, index_t end) const
 
 std::string MatrixSparseSymmetricBlock::what() const
 {
-    int nbe = SquareBlock::dimension() * SquareBlock::height();
+    int nbe = SquareBlock::dimension() * SquareBlock::stride();
     std::ostringstream msg;
 #if MATRIXSSB_USES_AVX
     msg << "MSSBx (" << nbe << "*" << nbElements() << ")";
@@ -922,8 +922,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
     const vec4 x1 = broadcast1(X+jj+1);
     const vec4 x2 = broadcast1(X+jj+2);
 #else
-    vec4 l = permute2f128(tt, tt, 0x00);
-    vec4 u = permute2f128(tt, tt, 0x11);
+    vec4 p = permute2f128(tt, tt, 0x01);
+    vec4 l = blend4(tt, p, 0b1100);
+    vec4 u = blend4(tt, p, 0b0011);
     const vec4 x0 = duplo4(l);
     const vec4 x1 = duphi4(l);
     const vec4 x2 = duplo4(u);
@@ -993,7 +994,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
         sb = mul4(load4(D+4), tt);
         sc = mul4(load4(D+8), tt);
         // prepare broadcasted vectors:
-        vec4 p = permute2f128(tt, tt, 0x1);
+        vec4 p = permute2f128(tt, tt, 0x01);
         vec4 l = blend4(tt, p, 0b1100);
         vec4 u = blend4(tt, p, 0b0011);
         xa = duplo4(l);

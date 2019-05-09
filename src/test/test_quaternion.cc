@@ -32,7 +32,7 @@ void testRotation(Vector3 vec, real angle)
     printf(" |  %+6.2f %+6.2f %+6.2f  =", vec[0],vec[1],vec[2]);
     printf("%+6.2f %+6.2f %+6.2f  |  ", T[0],T[1],T[2]);
     
-    q.setMatrix3(mat.data(), mat.height());
+    q.setMatrix3(mat);
     //mat.print(stdout);
     printf("  deviation = %e", maxDeviationFromRotation(mat));
     
@@ -120,7 +120,7 @@ void test1()
         vec = Vector3::randU();
         real a = RNG.sreal() * M_PI;
         p.setFromAxis(vec, a);
-        p.setMatrix3(mat.data(), mat.height());
+        p.setMatrix3(mat);
         q.setFromMatrix3(mat.data());
         //printf("%f  :", a); p.print(); q.println();
         if ( q[0] * p[0] < 0 ) q = -q;
@@ -148,7 +148,7 @@ void test1()
     for ( int ii = 0; ii<3; ++ii )
     {
         q.setFromPrincipalAxis(ii, angle);
-        q.setMatrix3(mat.data(), mat.height());
+        q.setMatrix3(mat);
         mat.print(stdout);
         printf("\n");
     }

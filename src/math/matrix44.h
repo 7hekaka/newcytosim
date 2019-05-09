@@ -58,13 +58,20 @@ public:
         val[0xF] = p;
     }
 
+    /// construct Matrix with all values equal to `a`
+    Matrix44(real a)
+    {
+        for ( int u = 0; u < 16; ++u )
+            val[u] = a;
+    }
+
     ~Matrix44() {}
     
     /// dimensionality
     static int dimension() { return 4; }
     
     /// leading dimension
-    static int height() { return 4; }
+    static int stride() { return 4; }
 
     /// set all elements to zero
     void reset()
@@ -104,6 +111,12 @@ public:
     Vector4 line(const unsigned i) const
     {
         return Vector4(val[i], val[4+i], val[8+i], val[12+i]);
+    }
+    
+    /// extract diagonal
+    Vector4 diagonal() const
+    {
+        return Vector4(val[0], val[5], val[10], val[15]);
     }
 
     void print(FILE * f) const
@@ -229,14 +242,14 @@ public:
     /// multiplication by a vector: this * V
     const vec4 vecmul4(vec4 const& vec) const
     {
-        vec4 p = permute2f128(vec, vec, 0x1);
+        vec4 p = permute2f128(vec, vec, 0x01);
         vec4 l = blend4(vec, p, 0b1100);
         vec4 u = blend4(vec, p, 0b0011);
-        vec4 x0 = mul4(load4(val   ), duplo4(l));
-        vec4 x1 = mul4(load4(val+4 ), duphi4(l));
-        vec4 x2 = mul4(load4(val+8 ), duplo4(u));
-        vec4 x3 = mul4(load4(val+12), duphi4(u));
-        return add4(add4(x0, x1), add4(x2,x3));
+        vec4 x = mul4(load4(val   ), duplo4(l));
+        vec4 y = mul4(load4(val+4 ), duphi4(l));
+        vec4 z = mul4(load4(val+8 ), duplo4(u));
+        vec4 t = mul4(load4(val+12), duphi4(u));
+        return add4(add4(x, y), add4(z, t));
     }
     
     /// multiplication by a vector: transpose(this) * V
@@ -518,7 +531,7 @@ public:
 #if MATRIX44_USES_AVX
         Matrix44 res;
         vec4 s = load4(V);
-        vec4 p = permute2f128(s, s, 0x1);
+        vec4 p = permute2f128(s, s, 0x01);
         vec4 l = blend4(s, p, 0b1100);
         vec4 u = blend4(s, p, 0b0011);
         vec4 d = load4(D);

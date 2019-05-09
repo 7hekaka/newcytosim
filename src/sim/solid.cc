@@ -12,7 +12,6 @@
 #include "simul.h"
 #include "space.h"
 #include "wrist.h"
-#include <errno.h>
 
 #if ( DIM >= 3 )
 #   include "quaternion.h"
@@ -758,32 +757,33 @@ void Solid::reshape()
     
     Vector avg = Mecable::position();
     
-    real S[3*3] = { 0 };
+    Matrix33 S = { 0 };
     for ( unsigned i = 0; i < nPoints; ++i )
-    {
-        for ( unsigned dd = 0; dd < DIM; ++dd )
-            for ( unsigned ee = 0; ee < DIM; ++ee )
-                S[dd+3*ee] += soShape[DIM*i+dd] * pPos[DIM*i+ee];
-    }
+        S.addOuterProduct(soShape+DIM*i, pPos+DIM*i);
     
-    //the scaling is arbitrary here, but it keeps the magnitude of the matrix:
-    real scale = 1.0 / ( fabs(S[0])+fabs(S[4])+fabs(S[8]) );
-    
+    // scale to keep the magnitude of the matrix in range
+    real scale = 1.0 / ( S.diagonal().abs().e_sum() );
     real N[4*4];
     
-    N[0+4*0] = scale * ( S[0+3*0] + S[1+3*1] + S[2+3*2] );
-    N[0+4*1] = scale * ( S[1+3*2] - S[2+3*1] );
-    N[0+4*2] = scale * ( S[2+3*0] - S[0+3*2] );
-    N[0+4*3] = scale * ( S[0+3*1] - S[1+3*0] );
-    N[1+4*1] = scale * ( S[0+3*0] - S[1+3*1] - S[2+3*2] );
-    N[1+4*2] = scale * ( S[0+3*1] + S[1+3*0] );
-    N[1+4*3] = scale * ( S[2+3*0] + S[0+3*2] );
-    N[2+4*2] = scale * ( S[1+3*1] - S[0+3*0] - S[2+3*2] );
-    N[2+4*3] = scale * ( S[1+3*2] + S[2+3*1] );
-    N[3+4*3] = scale * ( S[2+3*2] - S[1+3*1] - S[0+3*0] );
+    // set upper triangle of the 4x4 matrix:
+    N[0+4*0] = scale * ( S(0,0) + S(1,1) + S(2,2) );
+    N[0+4*1] = scale * ( S(1,2) - S(2,1) );
+    N[0+4*2] = scale * ( S(2,0) - S(0,2) );
+    N[0+4*3] = scale * ( S(0,1) - S(1,0) );
     
+    N[1+4*1] = scale * ( S(0,0) - S(1,1) - S(2,2) );
+    N[1+4*2] = scale * ( S(0,1) + S(1,0) );
+    N[1+4*3] = scale * ( S(2,0) + S(0,2) );
+    
+    N[2+4*2] = scale * ( S(1,1) - S(0,0) - S(2,2) );
+    N[2+4*3] = scale * ( S(1,2) + S(2,1) );
+    
+    N[3+4*3] = scale * ( S(2,2) - S(1,1) - S(0,0) );
+
+    //VecPrint::print(std::cout, 4, 4, N, 4, 3);
+
     /* 
-     Use lapack to find the largest Eigenvalue, and associated Eigenvector,
+     Use LApack to find the largest Eigenvalue, and associated Eigenvector,
      which is the quaternion corresponding to the best rotation
      */
     
@@ -805,25 +805,17 @@ void Solid::reshape()
     if ( info == 0 )
     {
         //get the rotation matrix corresponding to the quaternion:
-        quat.setMatrix3(S, 3);
-    
-        //apply the transformation = rotation + translation:
+        quat.setMatrix3(S);
+
+        // apply rotation + translation:
         for ( unsigned i = 0; i < nPoints; ++i )
-        {
-            pPos[DIM*i  ] = avg.XX + S[0]*soShape[DIM*i]+ S[3]*soShape[DIM*i+1] + S[6]*soShape[DIM*i+2];
-            pPos[DIM*i+1] = avg.YY + S[1]*soShape[DIM*i]+ S[4]*soShape[DIM*i+1] + S[7]*soShape[DIM*i+2];
-            pPos[DIM*i+2] = avg.ZZ + S[2]*soShape[DIM*i]+ S[5]*soShape[DIM*i+1] + S[8]*soShape[DIM*i+2];
-        }
+            (avg+S*Vector3(soShape+DIM*i)).store(pPos+DIM*i);
     }
     else
     {
-        //apply translation:
+        // apply translation:
         for ( unsigned i = 0; i < nPoints; ++i )
-        {
-            pPos[DIM*i  ] = avg.XX + soShape[DIM*i  ];
-            pPos[DIM*i+1] = avg.YY + soShape[DIM*i+1];
-            pPos[DIM*i+2] = avg.ZZ + soShape[DIM*i+2];
-        }
+            (avg+Vector3(soShape+DIM*i)).store(pPos+DIM*i);
         
         printf("Solid::reshape(): lapack::xsyevx() failed with code %i\n", info);
     }

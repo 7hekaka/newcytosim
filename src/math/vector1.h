@@ -228,7 +228,13 @@ public:
     {
         return fabs(a.XX-b.XX);
     }
-    
+ 
+    /// absolute values: (|x|)
+    Vector1 abs() const
+    {
+        return Vector1(fabs(XX));
+    }
+
     /// the infinite norm = |x|
     real norm_inf() const
     {

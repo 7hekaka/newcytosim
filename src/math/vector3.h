@@ -346,7 +346,13 @@ public:
     {
         return sqrt(a.distanceSqr(b));
     }
-    
+
+    /// absolute values: (|x|, |y|, |z|)
+    Vector3 abs() const
+    {
+        return Vector3(fabs(XX), fabs(YY), fabs(ZZ));
+    }
+
     /// the infinite norm = max(|x|, |y|, |z|)
     real norm_inf() const
     {
@@ -370,7 +376,7 @@ public:
     {
 #if VECTOR3_USES_AVX
         vec4 m = mul4(vec, vec);
-        vec4 p = permute2f128(m, m, 0x1);
+        vec4 p = permute2f128(m, m, 0x01);
         vec4 s = add4(m, p);
         vec4 n = add4(s, permute4(s, 0b0101));
         vec = div4(vec, sqrt4(n));
@@ -387,7 +393,7 @@ public:
     {
 #if VECTOR3_USES_AVX
         vec4 m = mul4(vec, vec);
-        vec4 p = permute2f128(m, m, 0x1);
+        vec4 p = permute2f128(m, m, 0x01);
         vec4 s = add4(m, p);
         m = sqrt4(add4(s, permute4(s, 0b0101)));
         vec = mul4(vec, div4(set4(n), m));

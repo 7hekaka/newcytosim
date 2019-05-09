@@ -256,6 +256,36 @@ void test_load()
     print(load4(mem), "load(store3)");
 }
 
+
+void test_broadcast()
+{
+    printf("------ test_broadcast\n");
+    double mem[4] = { 1, 2, 3, 4 };
+    
+    // using 4 loads
+    print(broadcast1(mem  ), "mem[0]");
+    print(broadcast1(mem+1), "mem[1]");
+    print(broadcast1(mem+2), "mem[2]");
+    print(broadcast1(mem+3), "mem[3]");
+    
+    // using 2 loads
+    vec4 xyxy = broadcast2(mem);
+    vec4 ztzt = broadcast2(mem+2);
+    print(duplo4(xyxy), "x");
+    print(duphi4(xyxy), "y");
+    print(duplo4(ztzt), "z");
+    print(duphi4(ztzt), "t");
+    
+    // using 1 load
+    vec4 xyzt = load4(mem);
+    xyxy = permute2f128(xyzt, xyzt, 0x00);
+    ztzt = permute2f128(xyzt, xyzt, 0x11);
+    print(duplo4(xyxy), "X");
+    print(duphi4(xyxy), "T");
+    print(duplo4(ztzt), "Z");
+    print(duphi4(ztzt), "T");
+}
+
 __m256i make_mask2(long i)
 {
     switch( i )
@@ -357,7 +387,7 @@ void test_swap4()
         print(permute2f128(u, u, 0x11), "permute2f128(u,u) 0x11");
     }
     {
-        vec4 p = permute2f128(s, s, 0x1);
+        vec4 p = permute2f128(s, s, 0x01);
         vec4 l = blend4(s, p, 0b1100);
         vec4 u = blend4(s, p, 0b0011);
         vec4 x0 = unpacklo4(l,l);
@@ -372,7 +402,7 @@ void test_swap4()
         print(x3, "tttt");
     }
     {
-        vec4 p = permute2f128(s, s, 0x1);
+        vec4 p = permute2f128(s, s, 0x01);
         vec4 l = blend4(s, p, 0b1100);
         vec4 u = blend4(s, p, 0b0011);
         vec4 z = unpacklo4(u,u);
@@ -558,6 +588,7 @@ int main(int argc, char * argv[])
         test_cat();
         test_deswizzle();
         test_load();
+        test_broadcast();
         test_store();
     }
     if ( 1 )

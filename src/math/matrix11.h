@@ -33,7 +33,7 @@ public:
     static int dimension() { return 1; }
     
     /// leading dimension
-    static int height() { return 1; }
+    static int stride() { return 1; }
 
     /// set all elements to zero
     void reset()
@@ -69,6 +69,12 @@ public:
     
     /// extract line vector at given index
     Vector1 line(const unsigned) const
+    {
+        return Vector1(val);
+    }
+
+    /// extract diagonal
+    Vector1 diagonal() const
     {
         return Vector1(val);
     }

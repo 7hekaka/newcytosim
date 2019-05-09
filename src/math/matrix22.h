@@ -65,6 +65,13 @@ public:
         val[3] = d;
     }
 
+    /// construct Matrix with all values equal to `a`
+    Matrix22(real a)
+    {
+        for ( int u = 0; u < 4; ++u )
+            val[u] = a;
+    }
+
     /// constructor from array
     Matrix22(real const M[])
     {
@@ -92,7 +99,7 @@ public:
     static int dimension() { return 2; }
     
     /// leading dimension
-    static int height() { return 2; }
+    static int stride() { return 2; }
 
     /// set all elements to zero
     void reset()
@@ -141,6 +148,12 @@ public:
     Vector2 line(const unsigned i) const
     {
         return Vector2(val[i], val[2+i]);
+    }
+
+    /// extract diagonal
+    Vector2 diagonal() const
+    {
+        return Vector2(val[0], val[3]);
     }
 
     void print(FILE * f) const

@@ -60,13 +60,21 @@ public:
         clear_extra();
     }
 
+    /// construct Matrix with all values equal to `a`
+    Matrix33(real a)
+    {
+        for ( int u = 0; u < BLD*3; ++u )
+            val[u] = a;
+        clear_extra();
+    }
+
     ~Matrix33() {}
     
     /// dimensionality
     static int dimension() { return 3; }
     
     /// leading dimension
-    static int height() { return BLD; }
+    static int stride() { return BLD; }
 
     /// set all elements to zero
     void reset()
@@ -108,6 +116,12 @@ public:
         return Vector3(val[i], val[BLD+i], val[BLD*2+i]);
     }
     
+    /// extract diagonal
+    Vector3 diagonal() const
+    {
+        return Vector3(val[0], val[BLD+1], val[BLD*2+2]);
+    }
+
     /// set matrix by giving its lines
     void setLines(Vector3 const& A, Vector3 const& B, Vector3 const& C)
     {
@@ -378,11 +392,11 @@ public:
     /// multiplication by a vector: this * V
     const vec4 vecmul4(const vec4 xyzt) const
     {
-        vec4 xxzz = duplo4(xyzt);
-        vec4 yytt = duphi4(xyzt);
-        vec4 xxxx = permute2f128(xxzz, xxzz, 0x00);
-        vec4 yyyy = permute2f128(yytt, yytt, 0x00);
-        vec4 zzzz = permute2f128(xxzz, xxzz, 0x11);
+        vec4 xyxy = permute2f128(xyzt, xyzt, 0x00);
+        vec4 ztzt = permute2f128(xyzt, xyzt, 0x11);
+        vec4 xxxx = duplo4(xyxy);
+        vec4 yyyy = duphi4(xyxy);
+        vec4 zzzz = duplo4(ztzt);
 #if ( BLD == 4 )
         xxxx = mul4(load4(val), xxxx);
         yyyy = mul4(load4(val+BLD), yyyy);
@@ -724,7 +738,7 @@ public:
 #if MATRIX33_USES_AVX && ( BLD == 4 )
         Matrix33 res;
         vec4 v = vec;
-        vec4 p = permute2f128(v, v, 0x1);
+        vec4 p = permute2f128(v, v, 0x01);
         vec4 l = blend4(v, p, 0b1100);
         vec4 u = blend4(v, p, 0b0011);
         vec4 d = dir;
@@ -739,6 +753,44 @@ public:
 #endif
     }
     
+    /// return outer product: [ dir (x) transpose(vec) ]
+    static Matrix33 outerProduct(real const* dir, real const* vec)
+    {
+#if MATRIX33_USES_AVX && ( BLD == 4 )
+        Matrix33 res;
+        vec4 d = load3(dir);
+        store4(res.val  , mul4(d, broadcast1(vec  )));
+        store4(res.val+4, mul4(d, broadcast1(vec+1)));
+        store4(res.val+8, mul4(d, broadcast1(vec+2)));
+        return res;
+#else
+        return Matrix33(dir[0]*vec[0], dir[1]*vec[0], dir[2]*vec[0],
+                        dir[0]*vec[1], dir[1]*vec[1], dir[2]*vec[1],
+                        dir[0]*vec[2], dir[1]*vec[2], dir[2]*vec[2] );
+#endif
+    }
+    
+    /// add outer product: [ dir (x) transpose(vec) ]
+    void addOuterProduct(real const* dir, real const* vec)
+    {
+#if MATRIX33_USES_AVX && ( BLD == 4 )
+        vec4 d = load3(dir);
+        store4(val  , fmadd4(d, broadcast1(vec  ), load4(val  )));
+        store4(val+4, fmadd4(d, broadcast1(vec+1), load4(val+4)));
+        store4(val+8, fmadd4(d, broadcast1(vec+2), load4(val+8)));
+#else
+        val[0      ] += dir[0]*vec[0];
+        val[1      ] += dir[1]*vec[0];
+        val[2      ] += dir[2]*vec[0];
+        val[0+BLD  ] += dir[0]*vec[1];
+        val[1+BLD  ] += dir[1]*vec[1];
+        val[2+BLD  ] += dir[2]*vec[1],
+        val[0+BLD*2] += dir[0]*vec[2];
+        val[1+BLD*2] += dir[1]*vec[2];
+        val[2+BLD*2] += dir[2]*vec[2];
+#endif
+    }
+
     /// return [ dir (x) transpose(vec) + vec (x) transpose(dir) ]
     static Matrix33 symmetricOuterProduct(Vector3 const& dir, Vector3 const& vec)
     {

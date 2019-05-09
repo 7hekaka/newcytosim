@@ -311,6 +311,12 @@ public:
         return sqrt(a.distanceSqr(b));
     }
     
+    /// absolute values: (|x|, |y|)
+    Vector2 abs() const
+    {
+        return Vector2(fabs(XX), fabs(YY));
+    }
+
     /// the infinite norm = max(|x|, |y|)
     real norm_inf() const
     {

@@ -3,7 +3,6 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <errno.h>
 #include <cstdio>
 #include <time.h>
 #include "sim_thread.h"

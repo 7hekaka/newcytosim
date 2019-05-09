@@ -10,7 +10,7 @@
 /// Templated functions to print Vectors and Matrices with minimal formatting
 namespace VecPrint
 {
-    /// print 'm' components of  'vec' on a line
+    /// print 'm' components of 'vec' on a line
     template< typename T >
     std::ostream& print(std::ostream& os, size_t m, const T* vec, int digits = 3)
     {
@@ -66,10 +66,11 @@ namespace VecPrint
             char str[32] = { 0 };
             char fmt[32] = " %4.0f";
             char zer[32] = "    .";
-#if ( 0 )
-            snprintf(fmt, sizeof(fmt), " %%9.%if", digits);
-            snprintf(zer, sizeof(zer), "     .   ");
-#endif
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+            snprintf(zer, sizeof(zer), fmt, 0.0);
+            for ( size_t d = 0; d < sizeof(zer); ++d )
+                if ( zer[d] == '0' ) zer[d] = ' ';
+            
             for ( size_t ii = 0; ii < m; ++ii )
             {
                 for ( size_t jj = 0; jj < n; ++jj )

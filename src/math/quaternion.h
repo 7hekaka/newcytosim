@@ -379,9 +379,9 @@ public:
     }
     
     
-    /// generate the associated 3x3 rotation matrix, assuming norm(this)==1
+    /// generate the associated 3x3 rotation matrix for unit Quaternion
     /** This assumes that norm(*this) = 1 */
-    void setMatrix3( R m[], int ldd) const
+    void setMatrix3( R mat[], int ldd ) const
     {
         R rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
         
@@ -393,19 +393,46 @@ public:
         xx = q[1] * x2; xy = q[1] * y2; xz = q[1] * z2;
         yy = q[2] * y2; yz = q[2] * z2; zz = q[3] * z2;
         
-        m[0      ] = 1.0 - (yy + zz);
-        m[1      ] = xy + rz;
-        m[2      ] = xz - ry;
+        mat[0      ] = 1.0 - (yy + zz);
+        mat[1      ] = xy + rz;
+        mat[2      ] = xz - ry;
         
-        m[0+ldd  ] = xy - rz;
-        m[1+ldd  ] = 1.0 - (xx + zz);
-        m[2+ldd  ] = yz + rx;
+        mat[0+ldd  ] = xy - rz;
+        mat[1+ldd  ] = 1.0 - (xx + zz);
+        mat[2+ldd  ] = yz + rx;
         
-        m[0+ldd*2] = xz + ry;
-        m[1+ldd*2] = yz - rx;
-        m[2+ldd*2] = 1.0 - (xx + yy);
+        mat[0+ldd*2] = xz + ry;
+        mat[1+ldd*2] = yz - rx;
+        mat[2+ldd*2] = 1.0 - (xx + yy);
     }
     
+    /// generate the associated 3x3 rotation matrix for unit Quaternion
+    /** This assumes that norm(*this) = 1 */
+    template < typename Matrix >
+    void setMatrix3( Matrix & mat ) const
+    {
+        R rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+        
+        x2 = q[1] + q[1];
+        y2 = q[2] + q[2];
+        z2 = q[3] + q[3];
+        
+        rx = q[0] * x2; ry = q[0] * y2; rz = q[0] * z2;
+        xx = q[1] * x2; xy = q[1] * y2; xz = q[1] * z2;
+        yy = q[2] * y2; yz = q[2] * z2; zz = q[3] * z2;
+        
+        mat(0,0) = 1.0 - (yy + zz);
+        mat(1,0) = xy + rz;
+        mat(2,0) = xz - ry;
+        
+        mat(0,1) = xy - rz;
+        mat(1,1) = 1.0 - (xx + zz);
+        mat(2,1) = yz + rx;
+        
+        mat(0,2) = xz + ry;
+        mat(1,2) = yz - rx;
+        mat(2,2) = 1.0 - (xx + yy);
+    }
     
     /// Rotate a 3D vector: des = Q * src * Q.conjugated()
     /** This assumes that norm(*this) = 1 */

@@ -3,7 +3,6 @@
 #include "single_prop.h"
 #include "glossary.h"
 #include "iowrapper.h"
-#include <errno.h>
 
 #include "simul.h"
 #include "wrist.h"

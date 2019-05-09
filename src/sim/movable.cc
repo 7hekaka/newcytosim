@@ -777,7 +777,7 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const*
             is >> quat;
             quat.normalize();
             Rotation rot;
-            quat.setMatrix3(rot.data(), rot.height());
+            quat.setMatrix3(rot);
             return rot;
         }
 #endif

@@ -908,8 +908,6 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        //__m128i ii = _mm_slli_epi32(_mm_loadu_si128((__m128i*)(ija_+n)), 0x1);
-        //printi(ii, "indx");
         const index_t i0 = ija_[n  ];
         const index_t i1 = ija_[n+1];
         const index_t i2 = ija_[n+2];
