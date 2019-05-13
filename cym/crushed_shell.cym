@@ -66,7 +66,7 @@ delete crosslink { state1 = 0; }
 delete crosslink { state2 = 0; }
 
 % Compress cell:
-change cell { geometry = sphere 4; }
+change cell { radius = 4; }
 
 run 1000 system { nb_frames = 10; }
 

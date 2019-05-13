@@ -7,11 +7,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 6 )
-    display = ( color = 0x99999944 )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 6
+    display = ( color = 0x99999944 )
+}
 
 set field blue
 {

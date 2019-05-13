@@ -31,11 +31,15 @@ set fiber microtubule2
 
 set space cell
 {
-    geometry = ( sphere 1.0 )
-    display = ( visible=0; )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 1.0
+    display = ( visible=0; )
+}
+
 
 set hand binder
 {

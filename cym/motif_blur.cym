@@ -9,10 +9,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 8 )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 8
+}
 
 set fiber filament
 {

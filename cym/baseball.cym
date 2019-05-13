@@ -11,11 +11,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 1.6 )
+    shape = sphere
     display = ( color=0x77777711, 0xBBBBBBFF; visible=3; )
 }
 
 new cell
+{
+    radius = 1.6
+}
 
 set fiber microtubule
 {
@@ -54,10 +57,13 @@ new link
 }
 
 run 100 system
+
 change link { stiffness = 100 }
 run 100 system
+
 change link { stiffness = 1000 }
 run 100 system
+
 change link { stiffness = 10000 }
 run 100 system
 
@@ -73,17 +79,22 @@ change link { stiffness = 100000 }
 
 run 100 system
 
-change cell { geometry = sphere 1.5 }
+change cell { radius = 1.5 }
 run 10 system
-change cell { geometry = sphere 1.4 }
+
+change cell { radius = 1.4 }
 run 10 system
-change cell { geometry = sphere 1.3 }
+
+change cell { radius = 1.3 }
 run 10 system
-change cell { geometry = sphere 1.2 }
+
+change cell { radius = 1.2 }
 run 10 system
-change cell { geometry = sphere 1.1 }
+
+change cell { radius = 1.1 }
 run 10 system
-change cell { geometry = sphere 1 }
+
+change cell { radius = 1 }
 run 10 system
 
 

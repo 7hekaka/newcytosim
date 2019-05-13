@@ -17,7 +17,12 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 2.5 )
+    shape = sphere
+}
+
+new cell
+{
+    radius = 2.5
 }
 
 set fiber filament
@@ -67,8 +72,6 @@ set couple link
     stiffness = 1
 }
 
-
-new cell
 
 new filament
 {

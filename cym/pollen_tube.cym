@@ -1,7 +1,7 @@
 % Model of sperm motion in pollen tubes?
 % Wim Walter and F. Nedelec
 %
-% Made in PZF, Klein Flottbeg, Hamburg, 12 Jan 2017
+% Made in PZF, Klein Flottbek, Hamburg, 12.01.2017
 
 set simul system
 {
@@ -12,10 +12,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 4 2 )
+    shape = capsule
 }
 
 new cell
+{
+	length = 12
+	radius = 2
+}
 
 set fiber microtubule
 {

@@ -10,7 +10,12 @@ set simul system
 
 set space cell
 {
-    geometry = sphere 0.125
+    shape = sphere
+}
+
+new cell
+{
+    radius = 0.125
 }
 
 new cell

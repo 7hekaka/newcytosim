@@ -23,11 +23,15 @@ set fiber microtubule
 
 set space cell
 {
-    geometry = ( sphere 1 )
-    display = ( visible=0; )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 1
+    display = ( visible=0; )
+}
+
 
 % record 1 with 53 points
 new microtubule

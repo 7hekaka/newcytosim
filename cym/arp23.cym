@@ -15,10 +15,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 0.3 )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 0.3
+}
 
 set fiber actin
 {

@@ -12,11 +12,14 @@ set simul system
 
 set space cell
 {
-    geometry = sphere 0.25
-    display = ( visible = 0 )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 0.25
+    display = ( visible = 0 )
+}
 
 set fiber microtubule
 {

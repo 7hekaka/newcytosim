@@ -18,11 +18,15 @@ set system display
 
 set space cell
 {
-    geometry = ( sphere 8 )
-    display = ( visible=1; width=1; )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 8
+    display = ( visible=1; width=1; )
+}
+
 
 set fiber microtubule
 {

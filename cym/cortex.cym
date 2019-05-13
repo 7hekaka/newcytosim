@@ -12,7 +12,7 @@ set simul contract
 
 set space cell
 {
-    geometry = ( strip 1 1 0.100 )
+    shape = strip
     display = ( visible = 0; )
 }
 
@@ -67,12 +67,15 @@ set solid minifilament
 }
 
 new cell
+{
+	length = 2, 2, 0.2;
+}
 
 new 1000 filament
 {
     length = 0.75, exponential
     equilibrate = 17
-    direction = align XY
+    direction = XY
 }
 
 new 50 minifilament

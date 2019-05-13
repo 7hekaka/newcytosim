@@ -11,7 +11,12 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 30 )
+    shape = sphere
+}
+
+new cell
+{
+    radius = 30
 }
 
 set hand glue
@@ -93,8 +98,6 @@ set couple amplificator
 }
 
 % ----------------- PLACEMENTS ------------------
-
-new cell
 
 new 22 chromosome
 {

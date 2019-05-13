@@ -10,15 +10,17 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 4.5 )
+    shape = sphere
 }
 
 new cell
-
+{
+    radius = 4.5
+}
 
 set fiber microtubule
 {
-    rigidity = 100
+    rigidity = 10
     segmentation = 0.5
     confine = inside, 100
     display = ( color=blue; point=3,1; line=10,2; tension=10; )
@@ -28,7 +30,6 @@ set hand binder
 {
     binding = 10, 0.05
     unbinding = 0, inf
- 
     display = ( width=5; size=12; color=green; )
 }
 

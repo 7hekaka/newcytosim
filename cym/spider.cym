@@ -8,10 +8,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( sphere 4 )
+    shape = sphere
 }
 
 new cell
+{
+    radius = 4
+}
 
 
 set fiber microtubule
