@@ -267,7 +267,380 @@ void Filament::reshape_two(const real* src, real* dst, real cut)
 
 
 /**
- Apply correction
+ Shorten segments to restore their length to 'cut'.
+ We use a multidimensional Newton's method, to find iteratively the scalar
+ coefficients that define the amount of displacement of each point.
+ 
+     X[i] = vector of position
+ 
+ We note 'dif' the differences between consecutive points:  dif[i] = X[i+1] - X[i]
+ Given one scalar per segment: A[i], the point is displaced as:
+ 
+     Y[i] = X[i] + A[i] * dif[i] - A[i-1] * dif[i-1]
+ 
+ except for the first and last points, for which there is only one term:
+ 
+     Y[0] = X[0] + A[  0] * dif[  0]
+     Y[L] = X[L] - A[L-1] * dif[L-1]
+ 
+ We want 'A[]' to restore the length of segments:
+ 
+     ( Y[i+1] - Y[i] )^2 = cut^2
+ 
+ i.e. 'A[]' should fulfill a set of equalities F[i] = 0, with:
+ 
+     F[i] = ( Y[i+1] - Y[i] )^2 - cut^2
+ 
+ Note that:
+ 
+     Y[i+1] - Y[i] = A[i+1] * dif[i+1] + (1-2*A[i]) * dif[i] + A[i-1] * dif[i-1]
+ 
+ Method: use all zeros as first guess for 'sca', and apply a multidimensional
+ Newton's method to iteratively refine the guess.
+ 
+ In practice, we calculate `A_next` from `A` using the relationship:
+ 
+     J(A) * ( A_next - A ) = -F(A)
+ 
+ Where J is the Jacobian matrix: J[i,j] = dF[i] / dA[j]
+ 
+ For this problem, J is square and tri-diagonal but not symmetric,
+ and must be recalculated at each iteration. A factor 2 can be factorized:
+
+     A_next = A - 1/2 inv(K).F(A)
+ 
+ Where J = 2 * K
+
+ FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
+ */
+int Filament::reshape_calculate(const unsigned ns, real cutSqr,
+                                real const* mag, real const* pri, real const* sec,
+                                real* mem, size_t chk)
+{
+    real * sca = mem;
+    real * val = mem+chk;
+    real * dia = mem+chk*2;
+    real * low = mem+chk*3;
+    real * upe = mem+chk*4;
+    
+    real err0 = 0;
+    /*
+     Perform here the first iteration of Newton's method
+     the formula is the same as below, with all `sca` equal to zero,
+     and thus 'vec == dif'
+     The system is symmetric, and we can use a faster factorization
+     */
+    for ( unsigned i = 0; i < ns; ++i )
+    {
+        val[i] = mag[i] - cutSqr;
+        err0 += fabs(val[i]);
+        dia[i] = mag[i];
+        low[i] = pri[i] * (-0.5);
+    }
+    
+    int info = 0;
+    lapack::xpttrf(ns, dia, low, &info);
+    if ( info ) {
+        std::cerr << " reshape_local lapack::xpttrf failed " << info << std::endl;
+        return 1;
+    }
+    lapack::xptts2(ns, 1, dia, low, val, ns);
+    
+    for ( unsigned i = 0; i < ns; ++i )
+        sca[i] = 0.25 * val[i];
+    
+    //printf("\n ====err %20.16f", err0);
+    //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+    
+    unsigned cnt = 0;
+    while ( ++cnt < 16 )
+    {
+        assert_true( ns > 1 );
+        // set the matrix elements and RHS of system,
+        real a = 0, b = 1-2*sca[0], c = sca[1];
+        //vec = b*dif[i] + c*dif[i+1];
+        val[0] = b*b*mag[0] + c*c*mag[1] + 2*b*c*pri[0] - cutSqr;
+        dia[0] = ( b*mag[0] + c*pri[0] ) * ( -2 );
+        upe[0] =   b*pri[0] + c*mag[1];
+        real err = fabs(val[0]);
+        for( unsigned i = 1; i+1 < ns; ++i )
+        {
+            a = sca[i-1];
+            b = 1 - 2 * sca[i];
+            c = sca[i+1];
+            //vec = a*dif[i-1] + b*dif[i] + c*dif[i+1];
+            val[i] = a*a*mag[i-1] + b*b*mag[i] + c*c*mag[i+1]
+            + 2 * ( a*b*pri[i-1] + a*c*sec[i-1] + b*c*pri[i] ) - cutSqr;
+            err += fabs(val[i]);
+            low[i] =   a*mag[i-1] + b*pri[i-1] + c*sec[i-1];
+            dia[i] = ( a*pri[i-1] + b*mag[i  ] + c*pri[i  ] ) * ( -2 );
+            upe[i] =   a*sec[i-1] + b*pri[i  ] + c*mag[i+1];
+        }
+        a = sca[ns-2];
+        b = 1 - 2 * sca[ns-1];
+        //vec = a*dif[ns-2] + b*dif[ns-1];
+        val[ns-1] = a*a*mag[ns-2] + b*b*mag[ns-1] + 2*a*b*pri[ns-2] - cutSqr;
+        err += fabs(val[ns-1]);
+        low[ns-1] =   a*mag[ns-2] + b*pri[ns-2];
+        dia[ns-1] = ( a*pri[ns-2] + b*mag[ns-1] ) * ( -2 );
+#if ( 0 )
+        printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
+        //printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
+        printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+#endif
+        if ( err < 1e-12 )
+            return 0;
+        if ( err > err0 )
+            return 3;
+        err0 = err;
+#if ( 0 )
+        printf("\n     dia "); VecPrint::print(std::cout, ns, dia, 3);
+        printf("\n     upe "); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n     low "); VecPrint::print(std::cout, ns-1, low+1, 3);
+#endif
+#if ( 0 )
+        real asy = 0, sup = 0;
+        for ( unsigned i = 0; i < ns-1; ++i )
+        {
+            sup = std::max(sup, fabs(low[i+1]+upe[i]));
+            asy += fabs(low[i+1]-upe[i]);
+        }
+        printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
+#endif
+        lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);
+        if ( info )
+        {
+            std::cerr << " LAPACK dgtsv failed " << info << std::endl;
+            return 2;
+        }
+        
+        // update `sca`
+        for ( unsigned u = 0; u < ns; ++u )
+            sca[u] -= 0.5 * val[u];
+        
+        //printf("\n   ->sca "); VecPrint::print(std::cout, ns, sca, 3);
+    }
+    //printf("\n   >>err %20.16f", err);
+    //printf("\n   >>sca "); VecPrint::print(std::cout, ns, sca, 3);
+    return 4;
+}
+
+
+/**
+ Apply correction of magnitude 'sca' along the segment directions:
+ 
+ except for the edges, this is:
+ P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) + sca[i-1] * ( P[i-1] - P[i] )
+ */
+void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
+                             const real * sca)
+{
+    assert_true( ns > 1 );
+    Vector A(src);
+    Vector B(src+DIM);
+    Vector old = sca[0] * ( B - A );
+    (A+old).store(dst);
+    
+    for ( unsigned i = 1; i < ns; ++i )
+    {
+        Vector C(src+DIM*i+DIM);
+        Vector vec = sca[i] * ( C - B );
+        (B+(vec-old)).store(dst+DIM*i);
+        old = vec;
+        B = C;
+    }
+    
+    (B-old).store(dst+DIM*ns);
+}
+
+
+#if 1
+/// old version (2018)
+int Filament::reshape_calculate(const unsigned ns, real cutSqr, Vector const* dif,
+                                real* mem, size_t chk)
+{
+    real * sca = mem;
+    real * val = mem+chk;
+    real * dia = mem+chk*2;
+    real * low = mem+chk*3;
+    real * upe = mem+chk*4;
+
+    /*
+     Perform here the first iteration of Newton's method
+     the formula is the same as below, with all `sca` equal to zero,
+     and thus 'vec == dif'
+     The system is symmetric, and we can use a faster factorization
+     */
+    real err0 = 0;
+    for ( unsigned i = 0; i < ns; ++i )
+    {
+        real n = dif[i].normSqr();
+        val[i] = n - cutSqr;
+        err0 += fabs(val[i]);
+        dia[i] = 2 * n;
+        low[i] = -dot(dif[i], dif[i+1]);  //using undefined value
+    }
+    
+    int info = 0;
+    lapack::xpttrf(ns, dia, low, &info);
+    if ( info ) {
+        std::cerr << " reshape_local lapack::xpttrf failed " << info << std::endl;
+        return 1;
+    }
+    lapack::xptts2(ns, 1, dia, low, val, ns);
+    
+    for ( unsigned i = 0; i < ns; ++i )
+        sca[i] = 0.5 * val[i];
+
+    //printf("\n ----err %20.16f", err0);
+    //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+
+    unsigned cnt = 0;
+    while ( ++cnt < 16 )
+    {
+        assert_true( ns > 1 );
+        // set the matrix elements and RHS of system,
+        Vector vec = (1-2*sca[0])*dif[0] + sca[1]*dif[1];
+        val[0] = vec.normSqr() - cutSqr;
+        dia[0] = dot(vec, dif[0]) * ( -2 );
+        upe[0] = dot(vec, dif[1]);
+        real err = fabs(val[0]);
+        for( unsigned i = 1; i+1 < ns; ++i )
+        {
+            vec = sca[i-1]*dif[i-1] + (1-2*sca[i])*dif[i] + sca[i+1]*dif[i+1];
+            val[i] = vec.normSqr() - cutSqr;
+            err += fabs(val[i]);
+            low[i] = dot(vec, dif[i-1]);
+            dia[i] = dot(vec, dif[i  ]) * ( -2 );
+            upe[i] = dot(vec, dif[i+1]);
+        }
+        vec = sca[ns-2]*dif[ns-2] + (1-2*sca[ns-1])*dif[ns-1];
+        val[ns-1] = vec.normSqr() - cutSqr;
+        low[ns-1] = dot(vec, dif[ns-2]);
+        dia[ns-1] = dot(vec, dif[ns-1]) * ( -2 );
+        err += fabs(val[ns-1]);
+#if ( 0 )
+        printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
+        //printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
+        printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+#endif
+        if ( err < 1e-12 )
+            return 0;
+        if ( err > err0 )
+            return 3;
+        err0 = err;
+#if ( 0 )
+        printf("\n     dia "); VecPrint::print(std::cout, ns, dia, 3);
+        printf("\n     upe "); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n     low "); VecPrint::print(std::cout, ns-1, low+1, 3);
+#endif
+#if ( 0 )
+        real asy = 0, sup = 0;
+        for ( unsigned i = 0; i < ns-1; ++i )
+        {
+            sup = std::max(sup, fabs(low[i+1]+upe[i]));
+            asy += fabs(low[i+1]-upe[i]);
+        }
+        printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
+#endif
+        lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);
+        if ( info )
+        {
+            std::cerr << " LAPACK dgtsv failed " << info << std::endl;
+            return 2;
+        }
+
+        // update `sca`
+        for ( unsigned u = 0; u < ns; ++u )
+            sca[u] -= 0.5 * val[u];
+
+        //printf("\n   ->sca "); VecPrint::print(std::cout, ns, sca, 3);
+    }
+    //printf("\n   >>err %20.16f", err);
+    //printf("\n   >>sca "); VecPrint::print(std::cout, ns, sca, 3);
+    return 4;
+}
+
+#else
+
+/// older version 22.02.2015
+int Filament::reshape_calculate(const unsigned ns, real cutSqr,
+                                Vector const* dif, real* mem, size_t chk)
+{
+    real * sca = mem;
+    real * val = mem+chk;
+    real * dia = mem+chk*2;
+    real * low = mem+chk*3;
+    real * upe = mem+chk*4;
+
+    zero_real(ns, sca);
+    zero_real(ns, sca);
+    zero_real(ns, sca);
+
+    real err0 = INFINITY;
+    unsigned cnt = 0;
+    while ( ++cnt < 16 )
+    {
+        //printf("\n   %i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
+        
+        // calculate the matrix elements and RHS of system
+        Vector vec = (1-2*sca[0]) * dif[0] + sca[1]*dif[1];
+        val[0] = vec.normSqr() - cutSqr;
+        dia[0] = dot(vec, dif[0]) * ( -2 );
+        upe[0] = dot(vec, dif[1]);
+        real err = fabs(val[0]);
+        for ( unsigned i = 1; i+1 < ns; ++i )
+        {
+            vec = sca[i-1]*dif[i-1] + (1-2*sca[i])*dif[i] + sca[i+1]*dif[i+1];
+            val[i] = vec.normSqr() - cutSqr;
+            low[i] = dot(vec, dif[i-1]);
+            dia[i] = dot(vec, dif[i]) * ( -2 );
+            upe[i] = dot(vec, dif[i+1]);
+            err += fabs(val[i]);
+        }
+        vec = sca[ns-2]*dif[ns-2] + (1-2*sca[ns-1])*dif[ns-1];
+        val[ns-1] = vec.normSqr() - cutSqr;
+        low[ns-1] = dot(vec, dif[ns-2]);
+        dia[ns-1] = dot(vec, dif[ns-1]) * ( -2 );
+#if ( 1 )
+        printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
+        printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
+        printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+#endif
+        if ( err < 1e-12 )
+            return 0;
+        if ( err > err0 )
+            return 3;
+        err0 = err;
+#if ( 0 )
+        printf("\n     dia "); VecPrint::print(std::cout, ns, dia, 3);
+        printf("\n     upe "); VecPrint::print(std::cout, ns-1, upe+1, 3);
+        printf("\n     low "); VecPrint::print(std::cout, ns-1, low+1, 3);
+#endif
+        int info = 0;
+        lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);
+        if ( info )
+        {
+            std::cerr << " LAPACK dgtsv failed " << info << std::endl;
+            return 1;
+        }
+        
+        for ( unsigned i = 0; i < ns; ++i )
+            sca[i] -= 0.5 * val[i];
+    }
+
+#if ( 0 )
+    printf("\n%2i err %e", cnt, err);
+    printf("\n%2i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
+    printf("\n");
+#endif
+    
+    return 4;
+}
+#endif
+
+/**
+ Apply correction (old version)
  */
 void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
                              const real * sca, const Vector* dif)
@@ -306,308 +679,60 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
 }
 
 
-/**
- Shorten segments to restore their length to 'cut'.
- We use a multidimensional Newton's method, to find iteratively the scalar
- coefficients that define the amount of displacement of each point.
- 
- X[i] = vector of position
- We note 'dif' the differences between consecutive points:  dif[i] = X[i+1] - X[i]
- 
- Given one scalar per segment: sca[i], the point is displaced as:
- Y[i] = X[i] + sca[i] * dif[i] - sca[i-1] * dif[i-1]
- except for the first and last points, for which there is only one term:
- Y[0] = X[0] + sca[  0] * dif[  0]
- Y[L] = X[L] - sca[L-1] * dif[L-1]
- 
- We want 'sca' to restore the length of segments:
- ( Y[i+1] - Y[i] )^2 = cut^2
- 
- i.e. 'sca' should fulfill a set of equalities F[i] = 0, with:
- F[i] = ( Y[i+1] - Y[i] )^2 - cut^2
- 
- Method: use all zeros as first guess for 'sca', and apply a multidimensional
- Newton's method to iteratively refine the guess.
- 
- In practice, we calculate `sca_next` from `sca` using the relationship:
- J(sca) * ( sca_next - sca ) = -F(sca)
- 
- Where J is the Jacobian matrix: J[i,j] = dF[i] / dX[j]
- 
- For this problem, J is square and tri-diagonal but not symmetric,
- and must be recalculated at each iteration.
-
- FJN, Strasbourg, 22 Feb 2015
+/*
+ Atempts to re-establish the length of the segments, by moving points along
+ the directions of the flanking segments
  */
-#if ( 1 )
-int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut, real* tmp)
+int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real cut, real* tmp, size_t tmp_size)
 {
+    int res;
     assert_true( ns > 1 );
-    const real alphaSqr = cut * cut;
-    unsigned cnt = 0;
-    real err = 0;
-    int info = 0;
+    //std::clog << "fiber::reshape_local allocates " << chk << std::endl;
     
-    Vector * dif = reinterpret_cast<Vector*>(tmp);
-    
-    // make a multiple of chunk to align memory:
-    size_t chk = chunk_real(ns);
+    //std::clog << "fiber::reshape_local allocates " << chk << std::endl;
+    real * mem = new_real(tmp_size*5);
 
-    //std::clog << "fiber::reshape_it allocates " << chk << std::endl;
-    real * mem = new_real(chk*5);
-    real * sca = mem;
-    real * val = mem+chk;
-    real * dia = mem+chk*2;
-    real * low = mem+chk*3;
-    real * upe = mem+chk*4;
+#if ( 0 )
+    // using old version for testing
+    Vector * dif = reinterpret_cast<Vector*>(tmp);
 
     // calculate differences:
-    if ( sizeof(Vector) == DIM * sizeof(real) )
-    {
-        real * dif_ = dif->data();
-        const int end = DIM * ns;
-        for ( int p = 0; p < end; ++p )
-            dif_[p] = src[p+DIM] - src[p];
-    }
-    else
-    {
-        for ( unsigned p = 0; p < ns; ++p )
-            dif[p] = diffPoints(src, p);
-    }
+    for ( unsigned p = 0; p < ns; ++p )
+        dif[p] = diffPoints(src, p);
+    dif[ns].reset();
     
-    /*
-     Perform here the first iteration of Newton's method
-     the formula is the same as below, with all `sca` equal to zero,
-     and thus 'vec == dif'
-     The system is symmetric, and we can use a faster factorization
-     */
-    val[0] = dif[0].normSqr() - alphaSqr;
-    dia[0] = 2 * dif[0].normSqr();
-    for ( unsigned i = 1; i < ns; ++i )
-    {
-        real n = dif[i].normSqr();
-        val[i  ] = n - alphaSqr;
-        dia[i  ] = 2 * n;
-        low[i-1] = -dot(dif[i], dif[i-1]);
-    }
-    
-    lapack::xpttrf(ns, dia, low, &info);
-    if ( info ) {
-        std::cerr << " reshape_it lapack::xpttrf failed " << info << std::endl;
-        goto finish;
-    }
-    lapack::xptts2(ns, 1, dia, low, val, ns);
-    
-    err = 0;
-    for ( unsigned i = 0; i < ns; ++i )
-    {
-        sca[i] = 0.5 * val[i];
-        err += fabs(val[i]);
-    }
-
-#if ( 0 )
-    printf("\n --- \n 0 sca "); VecPrint::print(std::cout, ns, sca, 3);
+    res = reshape_calculate(ns, cut*cut, dif, mem, tmp_size);
 #endif
 
-    while ( err > 1e-12 )
+    real * mag = tmp;
+    real * pri = tmp + tmp_size;
+    real * sec = tmp + tmp_size * 2;
+
+    // calculate differences:
+    Vector A = diffPoints(src, 0);
+    mag[0] = A.normSqr();
+    Vector B = diffPoints(src, 1);
+    mag[1] = B.normSqr();
+    pri[0] = dot(A, B);
+
+    for ( unsigned i = 2; i < ns; ++i )
     {
-        assert_true( ns > 1 );
-        // set the matrix elements and RHS of system,
-        // calculating 'vec' on the fly
-        Vector vec0 = (1-2*sca[0])*dif[0] + sca[1]*dif[1];
-        val[0] = vec0.normSqr() - alphaSqr;
-        dia[0] = -2 * dot(vec0, dif[0]);
-        upe[0] = dot(vec0, dif[1]);
-        unsigned pp = 1;
-        while ( pp+1 < ns )
-        {
-            vec0 = sca[pp-1]*dif[pp-1] + (1-2*sca[pp])*dif[pp] + sca[pp+1]*dif[pp+1];
-            val[pp  ] = vec0.normSqr() - alphaSqr;
-            dia[pp  ] = -2 * dot(vec0, dif[pp]);
-            upe[pp  ] = dot(vec0, dif[pp+1]);
-            low[pp-1] = dot(vec0, dif[pp-1]);
-            ++pp;
-        }
-        assert_true( pp == ns-1 );
-        vec0 = sca[pp-1]*dif[pp-1] + (1-2*sca[pp])*dif[pp];
-        val[pp  ] = vec0.normSqr() - alphaSqr;
-        dia[pp  ] = -2 * dot(vec0, dif[pp]);
-        low[pp-1] = dot(vec0, dif[pp-1]);
-
-#if ( 0 )
-        real sum = 0;
-        for ( unsigned i = 0; i < ns; ++i )
-            sum += val[i];
-        printf("\n   %i sum %8.5f", cnt, sum);
-#endif
-#if ( 0 )
-        printf("\n  %i val  ", cnt); VecPrint::print(std::cout, ns, val, 3);
-        printf("\n  %i upe  ", cnt); VecPrint::print(std::cout, ns-1, upe, 3);
-        printf("\n  %i dia  ", cnt); VecPrint::print(std::cout, ns, dia, 3);
-        printf("\n  %i low  ", cnt); VecPrint::print(std::cout, ns-1, low, 3);
-#endif
-        
-        lapack::xgtsv(ns, 1, low, dia, upe, val, ns, &info);
-        if ( info )
-        {
-            std::cerr << " LAPACK dgtsv failed " << info << std::endl;
-            goto finish;
-        }
-
-        // update `sca` and calculate residual error
-        err = 0;
-        for ( unsigned u = 0; u < ns; ++u )
-        {
-            sca[u] -= 0.5 * val[u];
-            err += fabs(val[u]);
-        }
-        if ( ++cnt > 31 )
-        {
-            info = 1;
-            goto finish;
-        }
-        
-#if ( 0 )
-        printf("\n %3i sca ", cnt); VecPrint::print(std::cout, ns, sca, 3);
-#endif
+        Vector C = diffPoints(src, i);
+        mag[i] = C.normSqr();
+        pri[i-1] = dot(B, C);
+        sec[i-2] = dot(A, C);
+        A = B;
+        B = C;
     }
+    res = reshape_calculate(ns, cut*cut, mag, pri, sec, mem, tmp_size);
     
-#if ( 0 )
-    printf("\n%2i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
-    printf("\n%2i err %e\n", cnt, err);
-#endif
-    
-    //apply corrections:
-    reshape_apply(ns, src, dst, sca, dif);
-    
-finish:
+    if ( res == 0 )
+        reshape_apply(ns, src, dst, mem);
+
     free_real(mem);
-    return info;
+    return res;
 }
 
-#else
-
-int Filament::reshape_it(const unsigned ns, const real* src, real* dst, real cut, real* tmp)
-{
-    assert_true( ns > 1 );
-    const real alphaSqr = cut * cut;
-    int info = 0;
-    
-    Vector * dif = new Vector[ns];
-    Vector * vec = new Vector[ns];
-    real * sca = new_real(ns);
-    real * val = new_real(ns);
-    real * dia = new_real(ns);
-    real * low = new_real(ns);
-    real * upe = new_real(ns);
-    
-    // calculate differences
-    for ( unsigned i = 0; i < ns; ++i )
-    {
-        dif[i] = diffPoints(src, i);
-        sca[i] = 0.0;
-    }
-    
-    real err = 0;
-    unsigned cnt = 0;
-    do {
-#if ( 0 )
-        printf("\n   %i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
-#endif
-
-        // calculate all values of 'vec'
-        vec[0] = (1-2*sca[0])*dif[0] + sca[1]*dif[1];
-        for ( unsigned i = 1; i+1 < ns; ++i )
-            vec[i] = sca[i-1]*dif[i-1] + (1-2*sca[i])*dif[i] + sca[i+1]*dif[i+1];
-        vec[ns-1] = sca[ns-2]*dif[ns-2] + (1-2*sca[ns-1])*dif[ns-1];
-        
-        // calculate the matrix elements and RHS of system
-        val[0] = vec[0].normSqr() - alphaSqr;
-        dia[0] = -2 * dot(vec[0], dif[0]);
-        for ( unsigned i = 1; i < ns; ++i )
-        {
-            val[i] = vec[i].normSqr() - alphaSqr;
-            dia[i] = -2 * dot(vec[i], dif[i]);
-            upe[i-1] = dot(vec[i-1], dif[i]);
-            low[i-1] = dot(vec[i], dif[i-1]);
-        }
-        
-#if ( 0 )
-        printf("\n  %i val  ", cnt); VecPrint::print(std::cout, ns, val, 3);
-        printf("\n  %i upe  ", cnt); VecPrint::print(std::cout, ns-1, upe, 3);
-        printf("\n  %i dia  ", cnt); VecPrint::print(std::cout, ns, dia, 3);
-        printf("\n  %i low  ", cnt); VecPrint::print(std::cout, ns-1, low, 3);
-#endif
-        
-        lapack::xgtsv(ns, 1, low, dia, upe, val, ns, &info);
-        if ( info )
-        {
-            std::cerr << " LAPACK dgtsv failed " << info << std::endl;
-            goto finish;
-        }
-        
-        err = 0;
-        for ( unsigned i = 0; i < ns; ++i )
-        {
-            sca[i] += -0.5 * val[i];
-            err += fabs(val[i]);
-        }
-        if ( ++cnt > 32 )
-        {
-            info = 1;
-            goto finish;
-        }
-    } while ( err > 0.0001 );
-
-    
-#if ( 0 )
-    printf("\n%2i err %e", cnt, err);
-    printf("\n%2i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
-    printf("\n");
-#endif
-    
-    //apply corrections:
-    {
-        Vector d, e = sca[0] * dif[0];
-        dst[0] = src[0] + e.XX;
-#if ( DIM > 1 )
-        dst[1] = src[1] + e.YY;
-#endif
-#if ( DIM > 2 )
-        dst[2] = src[2] + e.ZZ;
-#endif
-        for ( unsigned u = 1; u < ns; ++u )
-        {
-            d = sca[u] * dif[u];
-            dst[DIM*u  ] = src[DIM*u  ] + d.XX - e.XX;
-#if ( DIM > 1 )
-            dst[DIM*u+1] = src[DIM*u+1] + d.YY - e.YY;
-#endif
-#if ( DIM > 2 )
-            dst[DIM*u+2] = src[DIM*u+2] + d.ZZ - e.ZZ;
-#endif
-            e = d;
-        }
-        dst[DIM*ns+0] = src[DIM*ns+0] - d.XX;
-#if ( DIM > 1 )
-        dst[DIM*ns+1] = src[DIM*ns+1] - d.YY;
-#endif
-#if ( DIM > 2 )
-        dst[DIM*ns+2] = src[DIM*ns+2] - d.ZZ;
-#endif
-    }
-    
-finish:
-    delete[] dif;
-    delete[] vec;
-    free_real(sca);
-    free_real(val);
-    free_real(dia);
-    free_real(low);
-    free_real(upe);
-    return info;
-}
-#endif
 
 /**
  The response of this method to a sudden perpendicular force is not ideal:
@@ -617,7 +742,7 @@ finish:
  of the fiber, irrespective of the length of this section.
  */
 
-#if ( 1 )   // 1 = optimized version of Filament::reshape_sure()
+#if ( 1 )   // 1 = optimized version of Filament::reshape_global()
 
 /**
  Move the vertices relative to each other, such that when this is done,
@@ -630,41 +755,42 @@ finish:
  likely, the Brownian motion will push the points appart soon.
  */
 
-void Filament::reshape_sure(const unsigned ns, const real* src, real* vec, real cut)
+void Filament::reshape_global(const unsigned ns, const real* src, real* dst, real cut)
 {
-    Vector dp(0,0,0), sum(0,0,0);
-    Vector seg = diffPoints(vec, 0);
+    Vector inc(0,0,0), sum(0,0,0);
+    Vector seg = diffPoints(src, 0);
     real   dis = seg.norm();
     
-    copy_real(DIM*(ns+1), src, vec);
     // translation needed to restore first segment
     if ( dis > REAL_EPSILON )
-        dp = ( cut/dis - 1.0 ) * seg;
+        inc = ( cut/dis - 1.0 ) * seg;
     
+    Vector(src).store(dst);
+
     for ( unsigned i = 1; i < ns; ++i )
     {
-        seg = diffPoints(vec, i);
+        seg = diffPoints(src, i);
         dis = seg.norm();
         
-        //move the left point by dp:
-        dp.add_to(vec+DIM*i);
+        //move the left point by off:
+        (inc+Vector(src+DIM*i)).store(dst+DIM*i);
         //update the uniform motion of the points:
-        sum += dp;
+        sum += inc;
         
         //add to the translation needed to restore this segment
         if ( dis > REAL_EPSILON )
-            dp += ( cut/dis - 1.0 ) * seg;
+            inc += ( cut/dis - 1.0 ) * seg;
     }
     
-    // move the last point by dy[]:
-    dp.add_to(vec+DIM*ns);
+    // move the last point by dp:
+    (inc+Vector(src+DIM*ns)).store(dst+DIM*ns);
     
-    // calculte a uniform motion to conserve the center of gravity:
-    sum = ( sum + dp ) * ( -1.0 / ( ns + 1 ) );
+    // calculate uniform motion needed to conserve the center of gravity:
+    sum = ( sum + inc ) * ( -1.0 / ( ns + 1 ) );
     
-    // translate the entire fiber uniformly:
+    // translate entire fiber uniformly:
     for ( unsigned i = 0; i <= ns; ++i )
-        sum.add_to(vec+DIM*i);
+        sum.add_to(dst+DIM*i);
 }
 
 #else
@@ -676,27 +802,27 @@ void Filament::reshape_sure(const unsigned ns, const real* src, real* vec, real 
  This is operation does not change the center of gravity of the fiber.
  */
 
-void Filament::reshape_sure(const unsigned ns, const real* src, real* vec, real cut)
+void Filament::reshape_global(const unsigned ns, const real* src, real* dst, real cut)
 {
-    Vector dp, sum(0,0,0);
+    Vector off, sum(0,0,0);
 
-    copy_real(DIM*(ns+1), src, vec);
+    copy_real(DIM*(ns+1), src, dst);
     for ( unsigned pp = 1; pp <= ns; ++pp )
     {
-        dp       = diffPoints(vec, pp-1);
-        real dis = dp.norm();
+        off      = diffPoints(dst, pp-1);
+        real dis = off.norm();
         if ( dis > REAL_EPSILON )
         {
-            dp  *= ( cut/dis - 1.0 );
+            off  *= ( cut/dis - 1.0 );
             for ( unsigned qq = pp; qq <= ns; ++qq )
-                dp.add_to(vec+DIM*qq);
-            sum += ( 1 + ns - pp ) * dp;
+                off.add_to(dst+DIM*qq);
+            sum += ( 1 + ns - pp ) * off;
         }
     }
     
     sum *= ( -1.0 / (1+ns) );
     for ( unsigned i = 0; i <= ns; ++i )
-        sum.add_to(vec+DIM*i);
+        sum.add_to(dst+DIM*i);
 }
 
 #endif
@@ -707,10 +833,10 @@ void Filament::setPoints(real const* ptr)
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
-    else if ( reshape_it(nbSegments(), ptr, pPos, fnCut, pVEC) )
+    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, pVEC, allocated()) )
 #endif
     {
-        reshape_sure(nbSegments(), ptr, pPos, fnCut);
+        reshape_global(nbSegments(), ptr, pPos, fnCut);
         //std::cerr << "A crude method was used to reshape " << reference() << '\n';
     }
     //dump(std::cerr);
@@ -718,8 +844,8 @@ void Filament::setPoints(real const* ptr)
 
 
 /**
- Flip all the points. We do not change fnAscissa,
- and the abscissa of center thus stays as it is:
+ Flip all the points. This does not change fnAscissa,
+ and the abscissa of center thus stays as it is.
 */
 void Filament::flipPolarity()
 {
@@ -1775,7 +1901,7 @@ real Filament::checkSegmentation(real tol, bool arg) const
  */
 void Filament::dump(std::ostream& os) const
 {
-    os << "Fiber " << std::setw(7) << reference();
+    os << "\n Filament " << std::setw(7) << reference();
     os << "  " << std::left << std::setw(6) << fnCut << " {";
     real d = checkSegmentation(0.01, false);
     os << " deviation " << std::fixed << 100*d << " %";

@@ -8,10 +8,10 @@
 #include "simul.h"
 
 
-Property* BeadSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
+Property* BeadSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
 {
-    if ( kd == "bead" )
-        return new BeadProp(kd, nm);
+    if ( cat == "bead" )
+        return new BeadProp(cat, nm);
     return nullptr;
 }
 
@@ -74,7 +74,7 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     }
     else
     {
-        inx = 1;
+        inx = 0;
         var = "attach";
         opt.set(rad, "radius");
         

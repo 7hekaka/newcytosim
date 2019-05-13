@@ -7,7 +7,7 @@
 #include <cstdlib>
 
 
-#if ( 1 )
+#if ( 0 )
 
 
 /* Return the number of colors that the terminal supports */
@@ -16,9 +16,10 @@ int nb_colors_supported()
     unsigned long n = 0;
     FILE * fp = popen("tput colors 2> /dev/null", "r");
     if ( fp ) {
-        char str[32];
+        char str[32] = { 0 };
         if ( fgets(str, sizeof(str), fp) )
             n = strtoul(str, nullptr, 10);
+        printf("tput: %s\n", str);
         pclose(fp);
     }
     //printf("%i colors\n", n);

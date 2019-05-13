@@ -25,12 +25,12 @@ void OrganizerSet::step()
 
 //------------------------------------------------------------------------------
 
-Property* OrganizerSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
+Property* OrganizerSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
 {
-    if ( kd == "aster" )   return new AsterProp(nm);
-    if ( kd == "bundle" )  return new BundleProp(nm);
-    if ( kd == "nucleus" ) return new NucleusProp(nm);
-    if ( kd == "fake" )    return new FakeProp(nm);
+    if ( cat == "aster" )   return new AsterProp(nm);
+    if ( cat == "bundle" )  return new BundleProp(nm);
+    if ( cat == "nucleus" ) return new NucleusProp(nm);
+    if ( cat == "fake" )    return new FakeProp(nm);
     return nullptr;
 }
 

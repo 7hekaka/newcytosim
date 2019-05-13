@@ -46,9 +46,9 @@
 
  */
 
-Property* CoupleSet::newProperty(const std::string& kd, const std::string& nm, Glossary& opt) const
+Property* CoupleSet::newProperty(const std::string& cat, const std::string& nm, Glossary& opt) const
 {
-    if ( kd == "couple" )
+    if ( cat == "couple" )
     {
         std::string a;
         if ( opt.peek(a, "activity") )

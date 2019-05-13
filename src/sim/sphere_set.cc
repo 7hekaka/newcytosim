@@ -14,9 +14,9 @@ void SphereSet::remove(Object * obj)
 }
 
 
-Property* SphereSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
+Property* SphereSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
 {
-    if ( kd == "sphere" )
+    if ( cat == "sphere" )
         return new SphereProp(nm);
     return nullptr;
 }

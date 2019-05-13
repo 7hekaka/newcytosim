@@ -392,12 +392,12 @@ bool Simul::isPropertyClass(const std::string& name) const
 }
 
 
-Property* Simul::findProperty(const std::string& kd, const std::string& nm) const
+Property* Simul::findProperty(const std::string& cat, const std::string& nm) const
 {
-    if ( kd == "simul" && nm == prop->name() )
+    if ( cat == "simul" && nm == prop->name() )
         return prop;
 
-    return properties.find(kd, nm);
+    return properties.find(cat, nm);
 }
 
 
@@ -410,16 +410,16 @@ Property* Simul::findProperty(const std::string& nm) const
 }
 
 
-PropertyList Simul::findAllProperties(const std::string& kd) const
+PropertyList Simul::findAllProperties(const std::string& cat) const
 {
-    if ( kd == "simul" )
+    if ( cat == "simul" )
     {
         PropertyList list;
         list.push_back(prop);
         return list;
     }
     
-    return properties.find_all(kd);
+    return properties.find_all(cat);
 }
 
 
@@ -481,9 +481,9 @@ PropertyList Simul::findAllProperties(const std::string& kd) const
  .
  
  */
-Property* Simul::newProperty(const std::string& kd, const std::string& nm, Glossary& glos)
+Property* Simul::newProperty(const std::string& cat, const std::string& nm, Glossary& glos)
 {
-    if ( kd == "simul" )
+    if ( cat == "simul" )
     {
         /* There can only be one SimulProp and it is already created */
         assert_true(prop);
@@ -500,19 +500,19 @@ Property* Simul::newProperty(const std::string& kd, const std::string& nm, Gloss
     if ( p )
         throw InvalidSyntax("property `"+nm+"' is already defined");
     
-    if ( kd == "hand" )
+    if ( cat == "hand" )
     {
         p = HandProp::newProperty(nm, glos);
         properties.deposit(p);
     }
     else
     {
-        ObjectSet * set = findSet(kd);
+        ObjectSet * set = findSet(cat);
         
         if ( !set )
-            throw InvalidSyntax("unknown class `"+kd+"'");
+            throw InvalidSyntax("unknown class `"+cat+"'");
         
-        p = set->newProperty(kd, nm, glos);
+        p = set->newProperty(cat, nm, glos);
         properties.deposit(p);
     }
     

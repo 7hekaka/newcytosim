@@ -87,14 +87,13 @@ inline double sdsdot(int N, float SB, const float* X, int incX, const float* Y, 
     return sdsdot_(&N, &SB, X, &incX, Y, &incY);
 }
 
-/*
- // one should always use 'blas::nrm2' defined above
+
+// use 'blas::nrm2' defined above if applicable
 real FORTRAN(nrm2)(int*, const real*, int*);
 inline real xnrm2(int N, const real*X, int incX)
 {
     return FORTRAN(nrm2)(&N, X, &incX);
 }
-*/
     
 real FORTRAN(asum)(int*, const real*, int*);
 inline real xasum(int N, const real*X, int incX)

@@ -17,9 +17,9 @@ Modulo const* modulo = nullptr;
 
 //------------------------------------------------------------------------------
 
-Property * SpaceSet::newProperty(const std::string& kd,const std::string& nm, Glossary&) const
+Property * SpaceSet::newProperty(const std::string& cat,const std::string& nm, Glossary&) const
 {
-    if ( kd == "space" )
+    if ( cat == "space" )
         return new SpaceProp(nm);
     return nullptr;
 }

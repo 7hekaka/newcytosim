@@ -576,14 +576,14 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
             return Vector(RNG.sflip(), 0, 0);
         if ( tok == "Y" )
             return Vector(0, RNG.sflip(), 0);
-        if ( tok == "Z" && DIM >= 3 )
-            return Vector(0, 0, RNG.sflip());
         if ( tok == "XY" )
         {
             Vector2 h = Vector2::randU();
             return Vector(h.XX, h.YY, 0);
         }
 #if ( DIM >= 3 )
+        if ( tok == "Z" )
+            return Vector(0, 0, RNG.sflip());
         if ( tok == "XZ" )
         {
             Vector2 h = Vector2::randU();

@@ -243,12 +243,26 @@ Object* ObjectSet::findObject(std::string spec, long num) const
         return static_cast<Object*>(inv);
     }
     
-    // finally get object by identity:
-    Object * obj = findID(num);
-    if ( obj )
+    if ( num > 0 )
     {
-        if ( spec == obj->property()->name() || spec == obj->property()->category() )
-        return obj;
+        // finally get object by identity:
+        Object * obj = findID(num);
+        if ( obj )
+        {
+            if ( spec == obj->property()->name() || spec == obj->property()->category() )
+                return obj;
+        }
+    }
+    else
+    {
+        // 'microtubule0' would return a random 'microtubule'
+        Property * prop = simul.findProperty(title(), spec);
+        if ( prop )
+        {
+            ObjectList sel = collect(match_property, prop);
+            if ( sel.size() > 0 )
+                return sel.pick_one();
+        }
     }
     
     return nullptr;
@@ -302,14 +316,12 @@ Object* ObjectSet::findObject(std::string spec) const
     if ( splitObjectSpec(spec, num) )
         return findObject(spec, num);
 
+    // check category name, eg. 'fiber':
     if ( spec == title() )
-        return collect().pick_one();
-    
-    PropertyList plist = simul.findAllProperties(spec);
-    for ( Property * p : plist )
     {
-        if ( spec == p->name() )
-            return collect(match_property, p).pick_one();
+        ObjectList all = collect();
+        if ( all.size() > 0 )
+            return all.pick_one();
     }
     
     return nullptr;

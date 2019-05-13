@@ -32,16 +32,14 @@ void Mecable::clearMecable()
 Mecable::Mecable(const Mecable & o)
 {
     clearMecable();
-    allocateMecable(o.nPoints);
-    nPoints = o.nPoints;
+    setNbPoints(o.nPoints);
     copy_real(DIM*nPoints, o.pPos, pPos);
 }
 
 
 Mecable& Mecable::operator =(const Mecable& o)
 {
-    allocateMecable(o.nPoints);
-    nPoints = o.nPoints;
+    setNbPoints(o.nPoints);
     copy_real(DIM*nPoints, o.pPos, pPos);
     return *this;
 }
@@ -65,13 +63,13 @@ void Mecable::allocateBlock()
         if ( pBlock )
         {
             free_real(pBlock);
-            free(pPivot);
+            delete[] pPivot;
         }
         size_t bum = chunk_real(pBlockSize);
         //std::clog << "Mecable("<<reference()<<")::allocateBlock " << bum << "\n";
    
         pBlock = new_real(bum*bum);
-        pPivot = (int*)malloc(bum*sizeof(int));
+        pPivot = new int[bum];
         pBlockAllo = bum;
         
         //zero_real(bum*bum, pBlock);
@@ -117,7 +115,7 @@ void Mecable::releaseMecable()
     {
         free_real(pBlock);
         pBlock = nullptr;
-        free(pPivot);
+        delete[] pPivot;
         pPivot = nullptr;
     }
     

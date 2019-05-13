@@ -33,9 +33,9 @@ void FieldSet::step()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-Property* FieldSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
+Property* FieldSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
 {
-    if ( kd == "field" )
+    if ( cat == "field" )
         return new FieldProp(nm);
     return nullptr;
 }

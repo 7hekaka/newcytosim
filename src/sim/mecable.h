@@ -76,7 +76,7 @@ private:
 
     /// Clear pointers
     void        clearMecable();
-   
+    
 public:
 
     /// The constructor resets the pointers to memory
@@ -108,6 +108,9 @@ public:
     /// Index of the last segment = nbPoints() - 2
     unsigned        lastSegment()  const { return nPoints - 2; }
     
+    /// size currently allocated
+    size_t          allocated()    const { return pAllocated; }
+
     //--------------------------------------------------------------------------
     
     /// Position of point 'p' of the object

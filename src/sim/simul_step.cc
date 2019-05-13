@@ -105,6 +105,7 @@ void Simul::step()
 {
     // increment time:
     prop->time += prop->time_step;
+    //printf("\n------ time is %8.3f\n", prop->time);
 
     // mix object lists
     events.shuffle();

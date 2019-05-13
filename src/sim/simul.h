@@ -271,23 +271,23 @@ public:
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& kd, unsigned ix) const
+    T* findProperty(std::string const& cat, unsigned ix) const
     {
-        Property * p = properties.find(kd, ix);
+        Property * p = properties.find(cat, ix);
         if ( !p )
-            throw InvalidIO("could not find `"+kd+"' class with id "+std::to_string(ix));
+            throw InvalidIO("could not find `"+cat+"' class with id "+std::to_string(ix));
         return static_cast<T*>(p);
     }
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& kd, std::string const& nm) const
+    T* findProperty(std::string const& cat, std::string const& nm) const
     {
         if ( nm.empty() )
-            throw InvalidIO("could not find "+kd+" undefined class");
-        Property * p = properties.find(kd, nm);
+            throw InvalidIO("could not find "+cat+" undefined class");
+        Property * p = properties.find(cat, nm);
         if ( !p )
-            throw InvalidIO("could not find "+kd+" class `"+nm+"'");
+            throw InvalidIO("could not find "+cat+" class `"+nm+"'");
         return static_cast<T*>(p);
     }
 

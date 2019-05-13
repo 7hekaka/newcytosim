@@ -93,7 +93,7 @@ void MatrixSparseSymmetric2::deallocate()
         delete[] col_max_;   col_max_  = nullptr;
 #if MATRIX2_OPTIMIZED_MULTIPLY
         delete[] col_next_;  col_next_ = nullptr;
-        if ( ija_ ) { free(ija_);    ija_ = nullptr; }
+        if ( ija_ ) { delete[] ija_;    ija_ = nullptr; }
         if ( sa_ )  { free_real(sa_); sa_ = nullptr; }
 #endif
     }
@@ -524,11 +524,11 @@ void MatrixSparseSymmetric2::prepareForMultiply(int)
     //allocate classical sparse matrix storage (Numerical Recipes)
     if ( nbe > nmax_ )
     {
-        if ( ija_ ) free(ija_);
+        if ( ija_ ) delete[] ija_;
         if ( sa_ )  free_real(sa_);
         
         nmax_  = nbe + size_;
-        ija_   = (index_t*)malloc(sizeof(index_t)*nmax_);
+        ija_   = new index_t[nmax_];
         sa_    = new_real(nmax_);
     }
     

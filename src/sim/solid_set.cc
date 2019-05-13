@@ -18,10 +18,10 @@ void SolidSet::step()
 
 //------------------------------------------------------------------------------
 
-Property* SolidSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
+Property* SolidSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
 {
-    if ( kd == "solid" )
-        return new SolidProp(kd, nm);
+    if ( cat == "solid" )
+        return new SolidProp(cat, nm);
     return nullptr;
 }
 

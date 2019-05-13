@@ -13,7 +13,7 @@ void EventSet::step()
 }
 
 
-Property* EventSet::newProperty(const std::string& kd, const std::string& nm, Glossary&) const
+Property* EventSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
 {
     return nullptr;
 }

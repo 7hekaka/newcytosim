@@ -119,7 +119,7 @@ void Meca::allocate(size_t alc)
         // make a multiple of chunk to align pointers:
         allocated_ = chunk_real(alc);
         
-        // pad with 4 doubles to allow SIMD instructions overspill
+        // pad with 4 doubles to allow SIMD instruction burr
         alc = DIM * allocated_ + 4;
         allocate_vector(alc, vPTS, 1);
         allocate_vector(alc, vSOL, 1);

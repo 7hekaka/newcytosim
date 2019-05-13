@@ -12,9 +12,9 @@
 /**
  @copydetails SingleGroup
  */
-Property* SingleSet::newProperty(const std::string& kd, const std::string& nm, Glossary& opt) const
+Property* SingleSet::newProperty(const std::string& cat, const std::string& nm, Glossary& opt) const
 {
-    if ( kd == "single" )
+    if ( cat == "single" )
         return new SingleProp(nm);
     else
         return nullptr;

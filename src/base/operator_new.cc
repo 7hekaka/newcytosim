@@ -6,17 +6,18 @@
 #include <cstdio>
 #include <cstdlib>
 
-void* operator new(std::size_t s)
+void* operator new(std::size_t size)
 {
-    //printf("new(%lu)\n", s);
+    constexpr std::size_t max = 1 << 30;
+    //printf("new(%lu)\n", size);
     void* ptr = nullptr;
 #if ( 1 )
     // we align all memory to 32 bytes
-    if ( s < ( 1 << 30 ) )
-        posix_memalign(&ptr, 32, s);
+    if ( size < max )
+        posix_memalign(&ptr, 32, size);
 #else
     // system's default (unaligned) memory
-    ptr = std::malloc(s);
+    ptr = std::malloc(size);
 #endif
     if ( ptr == nullptr )
         throw std::bad_alloc();

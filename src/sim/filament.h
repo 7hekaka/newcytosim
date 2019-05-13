@@ -107,19 +107,28 @@ protected:
     
     /// callback to signal that update is needed, to be called after a change in length
     void         postUpdate() { needUpdate = true; }
-
-    /// oldest method to restore the distance between successive vertices
-    static void  reshape_sure(unsigned, const real*, real*, real cut);
-
-    /// apply the forces movements needed to the distance between two points
-    static void  reshape_apply(unsigned, const real*, real*, const real*, const Vector*);
     
     /// restore the distance between two points
     static void  reshape_two(const real*, real*, real cut);
 
+    /// oldest method to restore the distance between successive vertices
+    static void  reshape_global(unsigned, const real*, real*, real cut);
+
+    /// apply the forces movements needed to the distance between two points
+    static void  reshape_apply(unsigned, const real*, real*, const real*, const Vector*);
+
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_it(unsigned, const real*, real*, real cut, real* tmp);
-    
+    static int   reshape_calculate(unsigned, real cut, Vector const*, real*, size_t);
+
+    /// apply the forces movements needed to the distance between two points
+    static void  reshape_apply(unsigned, const real*, real*, const real*);
+
+    /// iterative method to restore the distance between successive vertices
+    static int   reshape_calculate(unsigned, real cut, real const*, real const*, real const*, real*, size_t);
+
+    /// iterative method to restore the distance between successive vertices
+    static int   reshape_local(unsigned, const real*, real*, real cut, real* tmp, size_t);
+
     /// change segmentation
     void         setSegmentation(real c) { fnCut = c; fnAbscissaP = fnAbscissaM + c * nbSegments(); }
     

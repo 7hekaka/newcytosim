@@ -39,9 +39,9 @@
  `tubule`      | Tubule (disabled)   | @ref TubulePar
  
  */
-Property* FiberSet::newProperty(const std::string& kd, const std::string& nm, Glossary& opt) const
+Property* FiberSet::newProperty(const std::string& cat, const std::string& nm, Glossary& opt) const
 {
-    if ( kd == "fiber" )
+    if ( cat == "fiber" )
     {
         std::string a;
         if ( opt.peek(a, "activity") )
