@@ -359,8 +359,6 @@
 		BB88394F10B4912A00A4028F /* space_capsule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88394B10B4912A00A4028F /* space_capsule.cc */; };
 		BB88395010B4912A00A4028F /* space_capsule.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88394C10B4912A00A4028F /* space_capsule.h */; };
 		BB89999420CECB5C00498F48 /* matrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89999320CECB5C00498F48 /* matrix44.h */; };
-		BB89A3FA1A6410D800D724F4 /* event_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3EE1A6410CF00D724F4 /* event_prop.cc */; };
-		BB89A3FB1A6410DB00D724F4 /* event_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89A3EF1A6410CF00D724F4 /* event_prop.h */; };
 		BB89A3FC1A6410E000D724F4 /* event_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3F01A6410CF00D724F4 /* event_set.cc */; };
 		BB89A3FD1A6410E000D724F4 /* event_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89A3F11A6410CF00D724F4 /* event_set.h */; };
 		BB89A3FE1A6410E000D724F4 /* event.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3F21A6410CF00D724F4 /* event.cc */; };
@@ -492,9 +490,6 @@
 		BBB1C6D70CB2CAA300679ADC /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
 		BBB1C6D90CB2CAA300679ADC /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BBB1C6DE0CB2CAA300679ADC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
-		BBB1C6E60CB2CAC100679ADC /* thing.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1C6150CB2BF7700679ADC /* thing.cc */; };
-		BBB1C6E70CB2CAC100679ADC /* blank_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1C6120CB2BF7700679ADC /* blank_param.cc */; };
-		BBB1C6E80CB2CAC200679ADC /* blank.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1C6140CB2BF7700679ADC /* blank.cc */; };
 		BBB1E47D126DC70B00B19D26 /* actor_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E479126DC70B00B19D26 /* actor_prop.cc */; };
 		BBB1E47E126DC70B00B19D26 /* actor_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47A126DC70B00B19D26 /* actor_prop.h */; };
 		BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
@@ -575,6 +570,7 @@
 		BBDF81801E677FDD0032906A /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF817D1E677FDD0032906A /* space_dynamic_ellipse.cc */; };
 		BBDF81811E677FDD0032906A /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF817E1E677FDD0032906A /* space_dynamic_ellipse.h */; };
 		BBDF81821E677FDD0032906A /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF817E1E677FDD0032906A /* space_dynamic_ellipse.h */; };
+		BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF9AA3228BFBD3005018BD /* dpttrf.h */; };
 		BBDFE3BF0C6A37FF00CD333A /* hand_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */; };
 		BBDFE3C00C6A37FF00CD333A /* hand_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */; };
 		BBE15DA212CDF8DB007C3D44 /* allot.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE15DA112CDF8DB007C3D44 /* allot.h */; };
@@ -1033,7 +1029,6 @@
 		BB2BF8D60E085C3C0024546A /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; name = makefile.inc; path = src/play/makefile.inc; sourceTree = SOURCE_ROOT; };
 		BB2BF8D80E085C620024546A /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; lineEnding = 0; name = makefile.inc; path = src/sim/makefile.inc; sourceTree = SOURCE_ROOT; };
 		BB2BF8DA0E085C880024546A /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; lineEnding = 0; name = makefile.inc; path = src/base/makefile.inc; sourceTree = SOURCE_ROOT; };
-		BB2BF8DB0E085D790024546A /* makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; name = makefile; path = src/blank/makefile; sourceTree = "<group>"; };
 		BB2BFFDC184640D800EBE4EC /* space_polygonZ.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_polygonZ.cc; path = src/sim/spaces/space_polygonZ.cc; sourceTree = SOURCE_ROOT; };
 		BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_polygonZ.h; path = src/sim/spaces/space_polygonZ.h; sourceTree = SOURCE_ROOT; };
 		BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_site.cc; path = src/sim/fiber_site.cc; sourceTree = SOURCE_ROOT; };
@@ -1263,9 +1258,8 @@
 		BB8838DC10B48EF900A4028F /* space_torus.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = space_torus.h; path = src/sim/spaces/space_torus.h; sourceTree = SOURCE_ROOT; };
 		BB88394B10B4912A00A4028F /* space_capsule.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = space_capsule.cc; path = src/sim/spaces/space_capsule.cc; sourceTree = SOURCE_ROOT; };
 		BB88394C10B4912A00A4028F /* space_capsule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = space_capsule.h; path = src/sim/spaces/space_capsule.h; sourceTree = SOURCE_ROOT; };
+		BB893BB7228B016C00A24F16 /* misc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = misc; path = src/misc; sourceTree = "<group>"; };
 		BB89999320CECB5C00498F48 /* matrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix44.h; path = src/math/matrix44.h; sourceTree = SOURCE_ROOT; };
-		BB89A3EE1A6410CF00D724F4 /* event_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_prop.cc; sourceTree = "<group>"; };
-		BB89A3EF1A6410CF00D724F4 /* event_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event_prop.h; sourceTree = "<group>"; };
 		BB89A3F01A6410CF00D724F4 /* event_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_set.cc; sourceTree = "<group>"; };
 		BB89A3F11A6410CF00D724F4 /* event_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event_set.h; sourceTree = "<group>"; };
 		BB89A3F21A6410CF00D724F4 /* event.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event.cc; sourceTree = "<group>"; };
@@ -1382,11 +1376,6 @@
 		BBAE3DD3155B102600BE1914 /* simul_solvef.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_solvef.cc; sourceTree = "<group>"; };
 		BBAF2B2E0FD01048006E8E27 /* hand_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hand_prop.h; path = src/sim/hand_prop.h; sourceTree = SOURCE_ROOT; };
 		BBAF2B2F0FD01048006E8E27 /* hand_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hand_prop.cc; path = src/sim/hand_prop.cc; sourceTree = SOURCE_ROOT; };
-		BBB1C6120CB2BF7700679ADC /* blank_param.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = blank_param.cc; path = src/blank/blank_param.cc; sourceTree = SOURCE_ROOT; };
-		BBB1C6130CB2BF7700679ADC /* blank_param.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = blank_param.h; path = src/blank/blank_param.h; sourceTree = SOURCE_ROOT; };
-		BBB1C6140CB2BF7700679ADC /* blank.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = blank.cc; path = src/blank/blank.cc; sourceTree = SOURCE_ROOT; };
-		BBB1C6150CB2BF7700679ADC /* thing.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = thing.cc; path = src/blank/thing.cc; sourceTree = "<group>"; };
-		BBB1C6160CB2BF7700679ADC /* thing.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = thing.h; path = src/blank/thing.h; sourceTree = "<group>"; };
 		BBB1C6E40CB2CAA300679ADC /* blank */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = blank; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBB1E479126DC70B00B19D26 /* actor_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = actor_prop.cc; path = hands/actor_prop.cc; sourceTree = "<group>"; };
 		BBB1E47A126DC70B00B19D26 /* actor_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actor_prop.h; path = hands/actor_prop.h; sourceTree = "<group>"; };
@@ -1479,6 +1468,7 @@
 		BBDF81781E677D620032906A /* space_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_disc.h; path = src/sim/spaces/space_disc.h; sourceTree = SOURCE_ROOT; };
 		BBDF817D1E677FDD0032906A /* space_dynamic_ellipse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_ellipse.cc; path = src/sim/spaces/space_dynamic_ellipse.cc; sourceTree = SOURCE_ROOT; };
 		BBDF817E1E677FDD0032906A /* space_dynamic_ellipse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_ellipse.h; path = src/sim/spaces/space_dynamic_ellipse.h; sourceTree = SOURCE_ROOT; };
+		BBDF9AA3228BFBD3005018BD /* dpttrf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dpttrf.h; sourceTree = "<group>"; };
 		BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = hand_monitor.h; path = src/sim/hand_monitor.h; sourceTree = SOURCE_ROOT; };
 		BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = hand_monitor.cc; path = src/sim/hand_monitor.cc; sourceTree = SOURCE_ROOT; };
 		BBE0993E0869D87F005FF210 /* libcytospace.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospace.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1736,6 +1726,7 @@
 		BB21D1F017D9BDA8005F5A8E /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				BBDF9AA3228BFBD3005018BD /* dpttrf.h */,
 				BB73586F05B98DA3006956D5 /* cblas.h */,
 				BB73587005B98DA3006956D5 /* clapack.h */,
 			);
@@ -2167,8 +2158,8 @@
 			children = (
 				BB9C48DA20BE6E8400E1522A /* todo.md */,
 				BB4EDF01162CB0DA001C3FE8 /* config.cym */,
-				BB64CD940869C129004DD8FE /* makefile */,
 				BB2BF8CD0E085BF30024546A /* makefile.inc */,
+				BB64CD940869C129004DD8FE /* makefile */,
 				BB73586C05B98DA3006956D5 /* base */,
 				BB7190A20EF1C92E00CED9E2 /* math */,
 				BB7358D205B98DA3006956D5 /* sim */,
@@ -2181,7 +2172,7 @@
 				BB5020D51576514C007DCAA5 /* bash */,
 				BB568CCA0BFCEAA300CB5335 /* cym */,
 				BBAD0F610BF712D8005BFFFA /* python */,
-				BBB1C6170CB2BF8100679ADC /* blank */,
+				BB893BB7228B016C00A24F16 /* misc */,
 				BBAF37610748EB4600A29DB7 /* lib */,
 				BBB7ED3A06933C7700E2B49B /* Frameworks */,
 				BB1B723C05CD47BE0027A712 /* build */,
@@ -2455,8 +2446,6 @@
 		BB89A3ED1A6410BB00D724F4 /* Event */ = {
 			isa = PBXGroup;
 			children = (
-				BB89A3EE1A6410CF00D724F4 /* event_prop.cc */,
-				BB89A3EF1A6410CF00D724F4 /* event_prop.h */,
 				BB89A3F01A6410CF00D724F4 /* event_set.cc */,
 				BB89A3F11A6410CF00D724F4 /* event_set.h */,
 				BB89A3F21A6410CF00D724F4 /* event.cc */,
@@ -2635,19 +2624,6 @@
 			name = lib;
 			path = build;
 			sourceTree = SOURCE_ROOT;
-		};
-		BBB1C6170CB2BF8100679ADC /* blank */ = {
-			isa = PBXGroup;
-			children = (
-				BB2BF8DB0E085D790024546A /* makefile */,
-				BBB1C6160CB2BF7700679ADC /* thing.h */,
-				BBB1C6150CB2BF7700679ADC /* thing.cc */,
-				BBB1C6130CB2BF7700679ADC /* blank_param.h */,
-				BBB1C6120CB2BF7700679ADC /* blank_param.cc */,
-				BBB1C6140CB2BF7700679ADC /* blank.cc */,
-			);
-			name = blank;
-			sourceTree = "<group>";
 		};
 		BBB1E478126DC6EB00B19D26 /* Actor */ = {
 			isa = PBXGroup;
@@ -3054,7 +3030,6 @@
 				BBA005B6163496170026FCB1 /* digit_prop.h in Headers */,
 				BBFF313E16F3583800C09B51 /* myosin_prop.h in Headers */,
 				BBFF314016F3583800C09B51 /* myosin.h in Headers */,
-				BB89A3FB1A6410DB00D724F4 /* event_prop.h in Headers */,
 				BBFF314816F364AE00C09B51 /* dynein_prop.h in Headers */,
 				BBFF314A16F364AE00C09B51 /* dynein.h in Headers */,
 				BBF0386018BCF7A3002E8568 /* splash.h in Headers */,
@@ -3113,6 +3088,7 @@
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
 				BB71917E0EF1CD9900CED9E2 /* cblas.h in Headers */,
+				BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
 				BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */,
 				BB7191820EF1CD9900CED9E2 /* real.h in Headers */,
@@ -3591,7 +3567,7 @@
 		BB73574F05B98A51006956D5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = EMBL;
 				TargetAttributes = {
 					BB18BBB61DFD78F600567023 = {
@@ -3607,13 +3583,11 @@
 			};
 			buildConfigurationList = BB87B9D608CDC50600A05F58 /* Build configuration list for PBXProject "cytosim" */;
 			compatibilityVersion = "Xcode 8.0";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
-				English,
-				Japanese,
-				French,
-				German,
+				en,
+				Base,
 			);
 			mainGroup = BB73574B05B98A50006956D5;
 			productRefGroup = BB1B723C05CD47BE0027A712 /* build */;
@@ -3785,7 +3759,6 @@
 				BBFDB9DA0FF35FD200C9541B /* simul_prop.cc in Sources */,
 				BBDBF9DB0FF74835003E94D0 /* solid_prop.cc in Sources */,
 				BBDBF9ED0FF7515A003E94D0 /* organizer.cc in Sources */,
-				BB89A3FA1A6410D800D724F4 /* event_prop.cc in Sources */,
 				BBD5DA7A0FF7956C0010D08D /* organizer_set.cc in Sources */,
 				BB50CEF20FFA0AAD00278580 /* sphere_prop.cc in Sources */,
 				BBD025E01B28DF950002B9FE /* chewer.cc in Sources */,
@@ -4013,9 +3986,6 @@
 				BBB1C6D50CB2CAA300679ADC /* random.cc in Sources */,
 				BBB1C6D70CB2CAA300679ADC /* platonic.cc in Sources */,
 				BBB1C6D90CB2CAA300679ADC /* vector3.cc in Sources */,
-				BBB1C6E60CB2CAC100679ADC /* thing.cc in Sources */,
-				BBB1C6E70CB2CAC100679ADC /* blank_param.cc in Sources */,
-				BBB1C6E80CB2CAC200679ADC /* blank.cc in Sources */,
 				BB92D7D4110E0D0500727008 /* property_list.cc in Sources */,
 				BB92D7D5110E0D0600727008 /* property.cc in Sources */,
 				BB92D7D8110E0D1000727008 /* glossary.cc in Sources */,
@@ -5217,7 +5187,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_ASM_KEYWORD = YES;
@@ -5248,7 +5218,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ICC_FP_CHKSTK = YES;
 				ICC_OPT_REQUIRE_INTEL_ARCH = "CORE-AVX2";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wzero-as-null-pointer-constant",
@@ -5319,7 +5289,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ICC_FP_CHKSTK = YES;
 				ICC_OPT_REQUIRE_INTEL_ARCH = "CORE-AVX2";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wzero-as-null-pointer-constant",
@@ -5387,7 +5357,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ICC_FP_CHKSTK = YES;
 				ICC_OPT_REQUIRE_INTEL_ARCH = "CORE-AVX2";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wzero-as-null-pointer-constant",
