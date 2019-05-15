@@ -294,7 +294,7 @@ void FiberProp::clear()
 #if NEW_COLINEAR_FORCE
     colinear_force      = 0;
 #endif
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     max_chewing_speed   = 0;
 #endif
 #if NEW_FIBER_LOOP
@@ -426,7 +426,7 @@ void FiberProp::read(Glossary& glos)
 #if NEW_COLINEAR_FORCE
     glos.set(colinear_force,    "colinear_force");
 #endif
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     glos.set(max_chewing_speed, "max_chewing_speed");
 #endif
 #if NEW_FIBER_LOOP
@@ -607,7 +607,7 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_COLINEAR_FORCE
     write_value(os, "colinear_force",      colinear_force);
 #endif
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     write_value(os, "max_chewing_speed",   max_chewing_speed);
 #endif
 #if NEW_FIBER_LOOP

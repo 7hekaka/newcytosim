@@ -46,7 +46,7 @@
 
  */
 
-Property* CoupleSet::newProperty(const std::string& cat, const std::string& nm, Glossary& opt) const
+Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
 {
     if ( cat == "couple" )
     {
@@ -54,17 +54,17 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nm, 
         if ( opt.peek(a, "activity") )
         {
             if ( a == "fork" )
-                return new ForkProp(nm);
+                return new ForkProp(nom);
             if ( a == "crosslink" )
-                return new CrosslinkProp(nm);
+                return new CrosslinkProp(nom);
             if ( a == "bridge" )
-                return new BridgeProp(nm);
+                return new BridgeProp(nom);
             if ( a == "duo" )
-                return new DuoProp(nm);
+                return new DuoProp(nom);
             if ( a == "slide" )
-                return new ShackleProp(nm);
+                return new ShackleProp(nom);
             if ( a == "diffuse" )
-                return new CoupleProp(nm);
+                return new CoupleProp(nom);
 #if ( 0 )
             throw InvalidParameter("unknown single:activity `"+a+"'");
 #else
@@ -72,7 +72,7 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nm, 
         std::cerr << "WARNING: unknown couple:activity `" << a << "'" << std::endl;
 #endif
         }
-        return new CoupleProp(nm);
+        return new CoupleProp(nom);
     }
     return nullptr;
 }
@@ -191,11 +191,11 @@ void CoupleSet::step(FiberSet const& fibers, FiberGrid const& fgrid)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-Object * CoupleSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * CoupleSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Couple::TAG )
     {
-        CoupleProp * p = simul.findProperty<CoupleProp>("couple", idx);
+        CoupleProp * p = simul.findProperty<CoupleProp>("couple", num);
         return p->newCouple();
     }
     return nullptr;

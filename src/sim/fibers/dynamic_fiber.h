@@ -51,7 +51,7 @@ class DynamicFiberProp;
  The predicted mean time until catastrophe is approximately
 
      growing_rate = growing_speed / unit_length
-     real ctime = growing_rate / ( 3 * hydrolysis_rate * hydrolysis_rate ); 
+     real ctime = growing_rate / ( 3 * hydrolysis_rate * hydrolysis_rate );
  
  The implemented model includes off-rate in the assembly state, as described in:\n
  <em>

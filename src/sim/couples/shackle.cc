@@ -35,7 +35,7 @@ void Shackle::stepAA()
     // project the position of cHand2 to set abscissa of cHand1
     real a = cHand1->fiber()->projectPoint(cHand2->pos(), dis);
     
-    //std::clog << "Shackle " << proj.abscissa() - cHand1->abscissa() << std::endl; 
+    //std::clog << "Shackle " << proj.abscissa() - cHand1->abscissa() << std::endl;
     cHand1->moveTo(a);
     
     if ( attached1() )

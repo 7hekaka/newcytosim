@@ -125,7 +125,7 @@ public:
     Property* clone() const { return new MotorProp(*this); }
 
     /// write all values
-    void write_values(std::ostream&) const;    
+    void write_values(std::ostream&) const;
     
 };
 

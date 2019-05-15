@@ -300,7 +300,7 @@ void Digit::handleDisassemblyM()
 {
     assert_true( attached() );
     
-    if ( prop->hold_shrinking_end )
+    if ( RNG.test(prop->hold_shrinking_end) )
     {
         if ( jumpToEndM() )
             detach();

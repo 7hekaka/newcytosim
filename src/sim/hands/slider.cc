@@ -33,7 +33,7 @@ void Slider::stepLoaded(Vector const& force, real force_norm)
     
     if ( a <= fbFiber->abscissaM() )
     {
-        if ( !prop->hold_growing_end )
+        if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
@@ -43,7 +43,7 @@ void Slider::stepLoaded(Vector const& force, real force_norm)
     
     if ( a >= fbFiber->abscissaP() )
     {
-        if ( !prop->hold_growing_end )
+        if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;

@@ -25,7 +25,7 @@ void Fiber::step()
         setGlue(frGlue, PLUS_END, prop->confine_space_ptr);
     }
     
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     if ( frChewP > 0 )
     {
         if ( frChewP > prop->max_chewing_speed_dt )
@@ -144,7 +144,7 @@ Fiber::Fiber(FiberProp const* p)
 #endif
         }
     }
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     frChewM = 0;
     frChewP = 0;
 #endif
@@ -656,7 +656,7 @@ real Fiber::dragCoefficientVolume()
 
 #if ( 0 )
     /*
-     For an ellipsoid,  
+     For an ellipsoid,
      drag_transverse = 2*drag_parallel = 4*PI*L*visc / log(length/radius)
      We should average the mobility coefficients:  speed = mu * f
        mu_X = mu_parallel   = 2 * mu
@@ -675,7 +675,7 @@ real Fiber::dragCoefficientVolume()
 #else
     /*
      Tirado and de la Torre. J. Chem. Phys 71(6) 1979
-     give the averaged translational friction coefficient for a cylinder:
+     given the averaged translational friction coefficient for a cylinder:
      (Table 1, last line for infinite aspect ratio)
      3*PI*length*viscosity / ( log(length/diameter) + 0.32 )
      */
@@ -740,7 +740,7 @@ real Fiber::dragCoefficientVolume()
 */
 real Fiber::dragCoefficientSurface()
 {
-    real len = length();    
+    real len = length();
     
     if ( prop->cylinder_height <= 0 )
         throw InvalidParameter("fiber:surface_effect[1] (height above surface) must set and > 0!");

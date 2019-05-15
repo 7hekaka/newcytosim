@@ -203,7 +203,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
         //real x = sgn * exp( log(fabs(R)+sqrt(RR-QQQ)) / 3.0 );
         real y = Q / x;
 
-        r1 = x + y - B3;        
+        r1 = x + y - B3;
         return 1;
     }
 }

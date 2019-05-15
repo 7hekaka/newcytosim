@@ -16,6 +16,9 @@
 #include "simul.h"
 #include "vecprint.h"
 
+//extern void lapack_xpttrf(int, real*, real*, int*);
+//extern void lapack_xptts2(int, int, const real*, const real*, real*, int);
+
 extern Modulo const* modulo;
 
 /**
@@ -244,24 +247,29 @@ real Filament::age() const
  */
 void Filament::reshape_two(const real* src, real* dst, real cut)
 {
+    real X = src[  DIM] - src[0];
 #if ( DIM == 1 )
-        Vector dif(src[1]-src[0]);
+    real s = 0.5 - 0.5 * (cut/fabs(X));
 #elif ( DIM == 2 )
-        Vector dif(src[2]-src[0], src[3]-src[1]);
+    real Y = src[1+DIM] - src[1];
+    real n = sqrt( X * X + Y * Y );
+    real s = 0.5 - 0.5 * (cut/n);
 #else
-        Vector dif(src[3]-src[0], src[4]-src[1], src[5]-src[2]);
+    real Y = src[1+DIM] - src[1];
+    real Z = src[2+DIM] - src[2];
+    real n = sqrt( X * X + Y * Y + Z * Z );
+    real s = 0.5 - 0.5 * (cut/n);
 #endif
-        dif *= 0.5 * ( 1 - cut/dif.norm() );
-        
-        dst[0    ] = src[0    ] + dif.XX;
-        dst[  DIM] = src[  DIM] - dif.XX;
+    
+    dst[0    ] = src[0    ] + s * X;
+    dst[  DIM] = src[  DIM] - s * X;
 #if ( DIM > 1 )
-        dst[1    ] = src[1    ] + dif.YY;
-        dst[1+DIM] = src[1+DIM] - dif.YY;
+    dst[1    ] = src[1    ] + s * Y;
+    dst[1+DIM] = src[1+DIM] - s * Y;
 #endif
 #if ( DIM > 2 )
-        dst[2    ] = src[2    ] + dif.ZZ;
-        dst[2+DIM] = src[2+DIM] - dif.ZZ;
+    dst[2    ] = src[2    ] + s * Z;
+    dst[2+DIM] = src[2+DIM] - s * Z;
 #endif
 }
 
@@ -313,6 +321,7 @@ void Filament::reshape_two(const real* src, real* dst, real cut)
 
  FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
  */
+
 int Filament::reshape_calculate(const unsigned ns, real cutSqr,
                                 real const* mag, real const* pri, real const* sec,
                                 real* mem, size_t chk)
@@ -332,10 +341,10 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr,
      */
     for ( unsigned i = 0; i < ns; ++i )
     {
-        val[i] = mag[i] - cutSqr;
-        err0 += fabs(val[i]);
-        dia[i] = mag[i];
-        low[i] = pri[i] * (-0.5);
+        sca[i] = mag[i] - cutSqr;
+        err0 += fabs(sca[i]);
+        dia[i] = mag[i] * 4;
+        low[i] = pri[i] * (-2);  //accessing pri[ns-1], but not used
     }
     
     int info = 0;
@@ -344,51 +353,66 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr,
         std::cerr << " reshape_local lapack::xpttrf failed " << info << std::endl;
         return 1;
     }
-    lapack::xptts2(ns, 1, dia, low, val, ns);
+    lapack::xptts2(ns, 1, dia, low, sca, ns);
     
-    for ( unsigned i = 0; i < ns; ++i )
-        sca[i] = 0.25 * val[i];
-    
-    //printf("\n ====err %20.16f", err0);
-    //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
-    
+#if ( 0 )
+    printf("\n ====err %20.16f", err0);
+    printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+#endif
     unsigned cnt = 0;
     while ( ++cnt < 16 )
     {
         assert_true( ns > 1 );
         // set the matrix elements and RHS of system,
-        real a = 0, b = 1-2*sca[0], c = sca[1];
-        //vec = b*dif[i] + c*dif[i+1];
-        val[0] = b*b*mag[0] + c*c*mag[1] + 2*b*c*pri[0] - cutSqr;
-        dia[0] = ( b*mag[0] + c*pri[0] ) * ( -2 );
-        upe[0] =   b*pri[0] + c*mag[1];
+        {
+            real b = 1-2*sca[0], c = sca[1];
+            //vec = b*dif[i] + c*dif[i+1];
+            real D = b * mag[0] + c * pri[0];
+            real U = b * pri[0] + c * mag[1];
+            val[0] = b * D + c * U - cutSqr;
+            dia[0] = D * ( -2 );
+            upe[0] = U;
+        }
         real err = fabs(val[0]);
         for( unsigned i = 1; i+1 < ns; ++i )
         {
-            a = sca[i-1];
-            b = 1 - 2 * sca[i];
-            c = sca[i+1];
-            //vec = a*dif[i-1] + b*dif[i] + c*dif[i+1];
-            val[i] = a*a*mag[i-1] + b*b*mag[i] + c*c*mag[i+1]
-            + 2 * ( a*b*pri[i-1] + a*c*sec[i-1] + b*c*pri[i] ) - cutSqr;
+            real a = sca[i-1];
+            real b = 1 - 2 * sca[i];
+            real c = sca[i+1];
+            /*
+             vec = a*dif[i-1] + b*dif[i] + c*dif[i+1];
+             val = vec.normSqr() - curSqr;
+             low = derivate(val, sca[i-1])
+             dia = derivate(val, sca[i]);
+             upe = derivate(val, sca[i+1);
+             */
+            real L = a * mag[i-1] + b * pri[i-1] + c * sec[i-1];
+            real D = a * pri[i-1] + b * mag[i  ] + c * pri[i  ];
+            real U = a * sec[i-1] + b * pri[i  ] + c * mag[i+1];
+
+            val[i] = ( a * L + b * D ) + ( c * U - cutSqr );
+            low[i] = L;
+            dia[i] = D * ( -2 );
+            upe[i] = U;
             err += fabs(val[i]);
-            low[i] =   a*mag[i-1] + b*pri[i-1] + c*sec[i-1];
-            dia[i] = ( a*pri[i-1] + b*mag[i  ] + c*pri[i  ] ) * ( -2 );
-            upe[i] =   a*sec[i-1] + b*pri[i  ] + c*mag[i+1];
         }
-        a = sca[ns-2];
-        b = 1 - 2 * sca[ns-1];
-        //vec = a*dif[ns-2] + b*dif[ns-1];
-        val[ns-1] = a*a*mag[ns-2] + b*b*mag[ns-1] + 2*a*b*pri[ns-2] - cutSqr;
-        err += fabs(val[ns-1]);
-        low[ns-1] =   a*mag[ns-2] + b*pri[ns-2];
-        dia[ns-1] = ( a*pri[ns-2] + b*mag[ns-1] ) * ( -2 );
+        {
+            real a = sca[ns-2];
+            real b = 1 - 2 * sca[ns-1];
+            //vec = a*dif[ns-2] + b*dif[ns-1];
+            real L = a * mag[ns-2] + b * pri[ns-2];
+            real D = a * pri[ns-2] + b * mag[ns-1];
+            val[ns-1] = a * L + b * D - cutSqr;
+            low[ns-1] = L;
+            dia[ns-1] = D * ( -2 );
+            err += fabs(val[ns-1]);
+        }
 #if ( 0 )
         printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
         //printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
         printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
 #endif
-        if ( err < 1e-12 )
+        if ( err < 1e-10 )
             return 0;
         if ( err > err0 )
             return 3;
@@ -414,7 +438,7 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr,
             return 2;
         }
         
-        // update `sca`
+        // update scalars
         for ( unsigned u = 0; u < ns; ++u )
             sca[u] -= 0.5 * val[u];
         
@@ -475,10 +499,10 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr, Vector const* di
     for ( unsigned i = 0; i < ns; ++i )
     {
         real n = dif[i].normSqr();
-        val[i] = n - cutSqr;
-        err0 += fabs(val[i]);
-        dia[i] = 2 * n;
-        low[i] = -dot(dif[i], dif[i+1]);  //using undefined value
+        sca[i] = n - cutSqr;
+        err0 += fabs(sca[i]);
+        dia[i] = n * 4;
+        low[i] = dot(dif[i], dif[i+1]) * (-2);  //using undefined value
     }
     
     int info = 0;
@@ -487,10 +511,7 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr, Vector const* di
         std::cerr << " reshape_local lapack::xpttrf failed " << info << std::endl;
         return 1;
     }
-    lapack::xptts2(ns, 1, dia, low, val, ns);
-    
-    for ( unsigned i = 0; i < ns; ++i )
-        sca[i] = 0.5 * val[i];
+    lapack::xptts2(ns, 1, dia, low, sca, ns);
 
     //printf("\n ----err %20.16f", err0);
     //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
@@ -524,7 +545,7 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr, Vector const* di
         //printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
         printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
 #endif
-        if ( err < 1e-12 )
+        if ( err < 1e-10 )
             return 0;
         if ( err > err0 )
             return 3;
@@ -687,12 +708,12 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real 
 {
     int res;
     assert_true( ns > 1 );
-    //std::clog << "fiber::reshape_local allocates " << chk << std::endl;
-    
-    //std::clog << "fiber::reshape_local allocates " << chk << std::endl;
+
     real * mem = new_real(tmp_size*5);
+    //auto rdtsc = __rdtsc();
 
 #if ( 0 )
+    
     // using old version for testing
     Vector * dif = reinterpret_cast<Vector*>(tmp);
 
@@ -702,7 +723,8 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real 
     dif[ns].reset();
     
     res = reshape_calculate(ns, cut*cut, dif, mem, tmp_size);
-#endif
+
+#else
 
     real * mag = tmp;
     real * pri = tmp + tmp_size;
@@ -714,7 +736,6 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real 
     Vector B = diffPoints(src, 1);
     mag[1] = B.normSqr();
     pri[0] = dot(A, B);
-
     for ( unsigned i = 2; i < ns; ++i )
     {
         Vector C = diffPoints(src, i);
@@ -724,8 +745,16 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real 
         A = B;
         B = C;
     }
+    // this terms should not be used:
+    pri[ns-1] = 0;
+    sec[ns-2] = 0;
+    sec[ns-1] = 0;
+
     res = reshape_calculate(ns, cut*cut, mag, pri, sec, mem, tmp_size);
+#endif
     
+    //printf("reshape %3i cycles: %16llu\n", ns, __rdtsc()-rdtsc);
+
     if ( res == 0 )
         reshape_apply(ns, src, dst, mem);
 
@@ -786,11 +815,11 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
     (inc+Vector(src+DIM*ns)).store(dst+DIM*ns);
     
     // calculate uniform motion needed to conserve the center of gravity:
-    sum = ( sum + inc ) * ( -1.0 / ( ns + 1 ) );
+    sum = ( sum + inc ) / ( ns + 1 );
     
     // translate entire fiber uniformly:
     for ( unsigned i = 0; i <= ns; ++i )
-        sum.add_to(dst+DIM*i);
+        sum.sub_to(dst+DIM*i);
 }
 
 #else
@@ -820,14 +849,17 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
         }
     }
     
-    sum *= ( -1.0 / (1+ns) );
+    sum /= ns + 1;
     for ( unsigned i = 0; i <= ns; ++i )
-        sum.add_to(dst+DIM*i);
+        sum.sub_to(dst+DIM*i);
 }
 
 #endif
 
-
+/**
+ Replace coordinates by ones provided in `ptr`
+ A reshape operation is done
+ */
 void Filament::setPoints(real const* ptr)
 {
 #if ( DIM > 1 )

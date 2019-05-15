@@ -236,7 +236,7 @@ void print_str(const char * name, GLenum cap)
 
 void print_cap(const char * name, GLenum cap)
 {
-    GLint b[10]; 
+    GLint b[10];
     glGetIntegerv(cap, b);
     printf("%s = %i\n", name, (int)b[0]);
 }

@@ -13,13 +13,13 @@ void EventSet::step()
 }
 
 
-Property* EventSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
+Property* EventSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
     return nullptr;
 }
 
 
-Object * EventSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * EventSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     Event * e = nullptr;
     if ( tag == Event::TAG )

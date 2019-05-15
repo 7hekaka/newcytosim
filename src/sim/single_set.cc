@@ -12,10 +12,10 @@
 /**
  @copydetails SingleGroup
  */
-Property* SingleSet::newProperty(const std::string& cat, const std::string& nm, Glossary& opt) const
+Property* SingleSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
 {
     if ( cat == "single" )
-        return new SingleProp(nm);
+        return new SingleProp(nom);
     else
         return nullptr;
 }
@@ -74,16 +74,16 @@ void SingleSet::step(FiberSet const& fibers, FiberGrid const& fgrid)
 #pragma mark -
 
 
-Object * SingleSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * SingleSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Single::TAG )
     {
-        SingleProp * p = simul.findProperty<SingleProp>("single", idx);
+        SingleProp * p = simul.findProperty<SingleProp>("single", num);
         return p->newSingle();
     }
     else if ( tag == Wrist::TAG )
     {
-        SingleProp * p = simul.findProperty<SingleProp>("single", idx);
+        SingleProp * p = simul.findProperty<SingleProp>("single", num);
         return p->newWrist(nullptr, 0);
     }
     return nullptr;

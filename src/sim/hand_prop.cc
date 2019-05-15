@@ -84,44 +84,44 @@
      }
  
  */
-HandProp * HandProp::newProperty(const std::string& nm, Glossary& glos)
+HandProp * HandProp::newProperty(const std::string& nom, Glossary& glos)
 {
     std::string a;
     if ( glos.peek(a, "activity") )
     {
         if ( a == "move" || a == "motor" )
-            return new MotorProp(nm);
+            return new MotorProp(nom);
         if ( a == "digit" )
-            return new DigitProp(nm);
+            return new DigitProp(nom);
         if ( a == "walk" )
-            return new WalkerProp(nm);
+            return new WalkerProp(nom);
         if ( a == "slide" )
-            return new SliderProp(nm);
+            return new SliderProp(nom);
         if ( a == "nucleate" )
-            return new NucleatorProp(nm);
+            return new NucleatorProp(nom);
         if ( a == "regulate" )
-            return new RegulatorProp(nm);
+            return new RegulatorProp(nom);
         if ( a == "track" )
-            return new TrackerProp(nm);
+            return new TrackerProp(nom);
         if ( a == "rescue" )
-            return new RescuerProp(nm);
+            return new RescuerProp(nom);
         if ( a == "cut" )
-            return new CutterProp(nm);
+            return new CutterProp(nom);
         if ( a == "chew" )
-            return new ChewerProp(nm);
+            return new ChewerProp(nom);
         if ( a == "mighty" )
-            return new MightyProp(nm);
+            return new MightyProp(nom);
         if ( a == "act" )
-            return new ActorProp(nm);
+            return new ActorProp(nom);
         if ( a == "bind" )
-            return new HandProp(nm);
+            return new HandProp(nom);
 #if NEW_HANDS
         if ( a == "kinesin" )
-            return new KinesinProp(nm);
+            return new KinesinProp(nom);
         if ( a == "dynein" )
-            return new DyneinProp(nm);
+            return new DyneinProp(nom);
         if ( a == "myosin" )
-            return new MyosinProp(nm);
+            return new MyosinProp(nom);
 #endif
 #if ( 0 )
         throw InvalidParameter("unknown hand:activity `"+a+"'");
@@ -130,7 +130,7 @@ HandProp * HandProp::newProperty(const std::string& nm, Glossary& glos)
         std::cerr << "WARNING: unknown hand:activity `" << a << "'" << std::endl;
 #endif
     }
-    return new HandProp(nm);
+    return new HandProp(nom);
 }
 
 
@@ -160,8 +160,8 @@ void HandProp::clear()
 #if NEW_BIND_ONLY_FREE_END
     bind_only_free_end = false;
 #endif
-    hold_growing_end   = false;
-    hold_shrinking_end = false;
+    hold_growing_end   = 0;
+    hold_shrinking_end = 0;
     
     activity           = "bind";
     display            = "";

@@ -41,14 +41,15 @@ void Simul::setFiberGrid(Space const* spc) const
     assert_true( step > 0 );
 
     // increase the cell size until we get acceptable memory requirements:
-    const size_t max = 1<<16;
-    while ( fiberGrid.setGrid(spc, step) > max )
+    const size_t sup = 1 << 18;
+    while ( fiberGrid.setGrid(spc, step) > sup )
     {
         //std::clog << "increasing simul:binding_grid_step\n";
         step *= 2;
     }
     prop->binding_grid_step = step;
-    
+    //std::clog << "simul:binding_grid_step = " << prop->binding_grid_step << "\n";
+
     // set grid range:
     real range = 0.0;
     for ( Property * i : properties.find_all("hand") )
@@ -58,6 +59,7 @@ void Simul::setFiberGrid(Space const* spc) const
     // create the grid cells:
     fiberGrid.createCells();
 
+    //Cytosim::log("simul:binding_grid_step %.3f\n", prop->binding_grid_step);
     Cytosim::log(" BindingGrid has %i cells of size %.3f um\n", fiberGrid.nbCells(), step);
     //std::clog << " BindingGrid with " << fiberGrid.nbCells() << " cells of size " << step << '\n';
 }
@@ -103,6 +105,7 @@ void Simul::prepare()
  */
 void Simul::step()
 {
+    //auto rdtsc = __rdtsc();
     // increment time:
     prop->time += prop->time_step;
     //printf("\n------ time is %8.3f\n", prop->time);
@@ -118,6 +121,8 @@ void Simul::step()
     singles.shuffle();
     spaces.shuffle();
     
+    //printf("Simul::shuffles %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+
     // Monte-Carlo step for all objects
     events.step();
     organizers.step();
@@ -128,9 +133,13 @@ void Simul::step()
     solids.step();
     fibers.step();
     
+    //printf("     ::steps    %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+
     // distribute Fibers over a grid for binding of Hands:
     fiberGrid.paintGrid(fibers.first(), nullptr);
     
+    //printf("     ::paint    %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+
 #if ( 0 )
     
     // This code continuously tests the binding algorithm.
@@ -155,6 +164,8 @@ void Simul::step()
     // step Hand-containing objects, giving them a possibility to attach Fibers:
     couples.step(fibers, fiberGrid);
     singles.step(fibers, fiberGrid);
+    
+    //printf("     ::attach   %16llu\n", (__rdtsc()-rdtsc)>>3);
 }
 
 

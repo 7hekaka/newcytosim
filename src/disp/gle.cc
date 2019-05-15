@@ -1564,14 +1564,13 @@ namespace gle
     void gleMan(Vector2 const& a, Vector2 const& da,
                 Vector2 const& b, Vector2 const& db)
     {
-        GLfloat pts[6];
-        (b-db).store(pts);
-        b.store(pts+2);
-        (a-da).store(pts+4);
-        (a+da).store(pts+6);
-        b.store(pts+8);
-        (b+db).store(pts+12);
+        Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
+        assert_true(sizeof(pts)==12*sizeof(double));
+#if REAL_IS_DOUBLE
         glVertexPointer(2, GL_DOUBLE, 0, pts);
+#else
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+#endif
         glEnableClientState(GL_VERTEX_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_VERTEX_ARRAY);
@@ -1584,15 +1583,21 @@ namespace gle
     void gleMan(Vector2 const& a, Vector2 const& da, gle_color ca,
                 Vector2 const& b, Vector2 const& db, gle_color cb)
     {
-        GLfloat pts[6], col[6*4];
-        (b-db).store(pts);    cb.store(col);
-             b.store(pts+2);  cb.store(col+4);
-        (a-da).store(pts+4);  ca.store(col+8);
-        (a+da).store(pts+6);  ca.store(col+12);
-             b.store(pts+8);  cb.store(col+16);
-        (b+db).store(pts+12); cb.store(col+20);
+        Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
+        assert_true(sizeof(pts)==12*sizeof(double));
+        GLfloat col[24];
+        cb.store(col);
+        cb.store(col+4);
+        ca.store(col+8);
+        ca.store(col+12);
+        cb.store(col+16);
+        cb.store(col+20);
         glEnableClientState(GL_VERTEX_ARRAY);
+#if REAL_IS_DOUBLE
         glVertexPointer(2, GL_DOUBLE, 0, pts);
+#else
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+#endif
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(4, GL_FLOAT, 0, col);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);

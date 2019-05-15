@@ -82,7 +82,7 @@ For the 3D Platelet simulation:
 We made a specific program `cytomaster` to read the MIDI messages and pipe commands to Cytosim. It can also restart the simulation in another model, when some MIDI buttons are pressed.
 
 `Cytomaster` uses [RtMIDI by Gary Scavone](https://www.music.mcgill.ca/~gary/rtmidi/) for cross-platform access to the MIDI interface. 
-You will need to adjust `cytomaster.cpp` and recompile multiple times during preparation.
+You will need to adjust [`cytomaster.cpp`](../../src/misc/cytomaster) and recompile multiple times during preparation.
 
 On Mac OSX you can make it as:
 
@@ -112,7 +112,7 @@ You may need to create a new configuration.
 The MIDI device sends its messages to a port, which is identified by an integer.
 To get a list of all the available ports, enter:
 
-	cytomaster 10000
+	cytomaster scan
 
 The output is for example:
 	

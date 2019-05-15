@@ -48,7 +48,7 @@ public:
         pnt    = p;
         radius = rd;
         range  = rg;
-        pos    = w;        
+        pos    = w;
     }    
     
     /// set from Mecapoint p, with radius=rd and range=rd+erg

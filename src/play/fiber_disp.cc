@@ -40,7 +40,7 @@ void FiberDisp::clear()
     lattice_style    = 0;
     lattice_scale    = 1;
     
-    label_style      = 0;    
+    label_style      = 0;
     speckle_size     = 3;
     speckle_style    = 0;
     speckle_interval = 1;
@@ -106,11 +106,13 @@ void FiberDisp::read(Glossary& glos)
     if ( glos.set(end_size[0], "plus_end") )
         end_style[0] = 2;
     glos.set(end_style[0], "plus_end", 1, {{"off", 0}, {"sphere", 1}, {"cone", 2},
-            {"cylinder", 3}, {"arrow", 4}, {"inverted_arrow", 5}, {"cube", 6}});
+            {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
+    
     if ( glos.set(end_size[1], "minus_end") )
-        end_style[1] = 3;
+        end_style[1] = 1;
     glos.set(end_style[1], "minus_end", 1, {{"off", 0}, {"sphere", 1}, {"cone", 2},
-            {"cylinder", 3}, {"arrow", 4}, {"inverted_arrow", 5}, {"cube", 6}});
+            {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
+    
     glos.set(end_style, 2,     "end_style");
     glos.set(end_size,  2,     "end_size");
     glos.set(end_length, 2,    "end_length");

@@ -14,6 +14,7 @@ Polygon::Polygon()
 {
 }
 
+
 Polygon::~Polygon()
 {
     if ( pts_ )
@@ -21,17 +22,30 @@ Polygon::~Polygon()
 }
 
 
-void Polygon::resize(unsigned s)
+void Polygon::allocate(unsigned s)
 {
     if ( pts_ )
         delete[] pts_;
-    
     pts_  = new Point2D[s+1];
     npts_ = s;
 }
 
 
-void Polygon::set(unsigned i, real x, real y)
+void Polygon::set(unsigned ord, real rad, real ang)
+{
+    allocate(ord);
+    real a = 2 * M_PI / ord;
+    for ( unsigned i = 0; i < ord; ++i )
+    {
+        pts_[i].xx = rad * cos(i*a+ang);
+        pts_[i].yy = rad * sin(i*a+ang);
+    }
+    pts_[ord].xx = pts_[0].xx;
+    pts_[ord].yy = pts_[0].yy;
+}
+
+
+void Polygon::setPoint(unsigned i, real x, real y)
 {
     if ( pts_ && i < npts_ )
     {
@@ -52,7 +66,7 @@ void Polygon::set(unsigned i, real x, real y)
  */
 unsigned Polygon::read(std::istream& in, Point2D* pts, unsigned pts_size)
 {
-    unsigned ix = 0;
+    unsigned i = 0;
     char str[2048];
     real x, y;
     long k;
@@ -90,28 +104,22 @@ unsigned Polygon::read(std::istream& in, Point2D* pts, unsigned pts_size)
                 k = 0;
         }
         
-        if ( ix < pts_size )
+        if ( i < pts_size )
         {
-            pts[ix].xx = x;
-            pts[ix].yy = y;
-            pts[ix].color = k;
+            pts[i].xx = x;
+            pts[i].yy = y;
+            pts[i].color = k;
         }
-        ++ix;
+        ++i;
     }
-    return ix;
+    return i;
 }
 
 
 void Polygon::read(std::istream& in)
 {
-    // read number of points:
-    npts_ = read(in, nullptr, 0);
-    
-    if ( pts_ )
-        delete[] pts_;
-    
-    pts_ = new Point2D[npts_+1];
-    
+    unsigned n = read(in, nullptr, 0);
+    allocate(n);
     in.clear();
     in.seekg(0);
     read(in, pts_, npts_);
@@ -123,7 +131,7 @@ void Polygon::read(std::string const& file)
     if ( file.empty() )
         throw InvalidParameter("a polygon file should be specified");
     
-    std::ifstream in(file.c_str());
+    std::ifstream in(file.c_str(), std::ifstream::in);
     
     if ( ! in.good() )
         throw InvalidParameter("polygon file `"+file+"' not found");
@@ -503,6 +511,17 @@ void Polygon::dump(std::ostream& os) const
     {
         os << " " << std::setw(10) << pts_[n].xx << " " << std::setw(10) << pts_[n].yy << " " << pts_[n].color;
         os << " " << std::setw(10) << pts_[n].dx << " " << std::setw(10) << pts_[n].dy << "\n";
+    }
+}
+
+
+void Polygon::print(FILE * f) const
+{
+    fprintf(f, "polygon %i\n", npts_);
+    for ( unsigned n = 0; n <= npts_; ++n )
+    {
+        fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].color);
+        fprintf(f, "  %10.2f %10.2f\n", pts_[n].dx, pts_[n].dy);
     }
 }
 

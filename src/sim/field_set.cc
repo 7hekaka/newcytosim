@@ -33,19 +33,19 @@ void FieldSet::step()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-Property* FieldSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
+Property* FieldSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
     if ( cat == "field" )
-        return new FieldProp(nm);
+        return new FieldProp(nom);
     return nullptr;
 }
 
 
-Object * FieldSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * FieldSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Field::TAG )
     {
-        FieldProp * p = simul.findProperty<FieldProp>("field", idx);
+        FieldProp * p = simul.findProperty<FieldProp>("field", num);
         return new Field(p);
     }
     return nullptr;

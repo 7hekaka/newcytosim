@@ -281,13 +281,11 @@ public:
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& cat, std::string const& nm) const
+    T* findProperty(std::string const& cat, std::string const& nom) const
     {
-        if ( nm.empty() )
-            throw InvalidIO("could not find "+cat+" undefined class");
-        Property * p = properties.find(cat, nm);
+        Property * p = properties.find(cat, nom);
         if ( !p )
-            throw InvalidIO("could not find "+cat+" class `"+nm+"'");
+            throw InvalidIO("could not find "+cat+" class `"+nom+"'");
         return static_cast<T*>(p);
     }
 

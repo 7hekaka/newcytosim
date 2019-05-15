@@ -156,7 +156,7 @@ public:
      
      <em>default = false</em>
      */
-    bool         hold_growing_end;
+    real         hold_growing_end;
     
     
     /// if false, the Hand will detach immediately upon reaching a shrinking fiber end
@@ -169,7 +169,7 @@ public:
 
      <em>default = false</em>
      */
-    bool         hold_shrinking_end;
+    real         hold_shrinking_end;
     
     
     /// specialization

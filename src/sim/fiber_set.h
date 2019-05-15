@@ -37,7 +37,7 @@ public:
     /// create a new property for class `kind` with given name
     Property *  newProperty(const std::string& kind, const std::string& name, Glossary&) const;
     
-    /// create new objects, of class `kind` and type `name`, give the options provided in `opt`
+    /// create new objects, of class `kind` and type `name`, given the options provided in `opt`
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
@@ -78,9 +78,12 @@ public:
     /// set random sites along the fibers, separated on average by `spread`
     void uniFiberSites(Array<FiberSite>&, real spread) const;
     
-    /// a random site on the fiber, equidistributed over length on all Fibers
+    /// a random site on the fibers, uniformly distributed over all Fibers
     FiberSite randomSite() const;
     
+    /// a random site on the fibers of specified class, uniformly distributed
+    FiberSite randomSite(FiberProp *) const;
+
     /// a site on a fiber, as specified by Glossary[key]
     FiberSite someSite(std::string const& key, Glossary&) const;
 

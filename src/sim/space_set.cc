@@ -17,10 +17,10 @@ Modulo const* modulo = nullptr;
 
 //------------------------------------------------------------------------------
 
-Property * SpaceSet::newProperty(const std::string& cat,const std::string& nm, Glossary&) const
+Property * SpaceSet::newProperty(const std::string& cat,const std::string& nom, Glossary&) const
 {
     if ( cat == "space" )
-        return new SpaceProp(nm);
+        return new SpaceProp(nom);
     return nullptr;
 }
 
@@ -80,11 +80,11 @@ void SpaceSet::remove(Object * obj)
 }
 
 //------------------------------------------------------------------------------
-Object * SpaceSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * SpaceSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Space::TAG )
     {
-        SpaceProp * p = simul.findProperty<SpaceProp>("space", idx);
+        SpaceProp * p = simul.findProperty<SpaceProp>("space", num);
         return p->newSpace();
     }
     return nullptr;

@@ -383,7 +383,7 @@ Vector Movable::readPrimitive(std::istream& is, Space const* spc)
                 real angle = RNG.preal() * theta;
                 // substract R to have the arc start from 0,0:
                 x = (radiusInner + thickness * RNG.preal()) * cos( angle ) - radius;
-                y = (radiusInner + thickness * RNG.preal()) * sin( angle );            
+                y = (radiusInner + thickness * RNG.preal()) * sin( angle );
             }
             
             real cr = cos(rotation);

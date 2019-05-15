@@ -32,11 +32,11 @@ void Chewer::stepUnloaded()
     
     if ( engaged != NO_END )
     {
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
         fbFiber->chew(prop->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
-        throw InvalidParameter("Fiber:chew is not enabled");
+        throw InvalidParameter("fiber:chew is not enabled");
 #endif
         return;
     }
@@ -55,7 +55,7 @@ void Chewer::stepUnloaded()
         engaged = PLUS_END;
     }
     
-    if ( engaged && !prop->hold_growing_end )
+    if ( engaged && RNG.test_not(prop->hold_growing_end) )
         detach();
     else
         moveTo(a);
@@ -72,11 +72,11 @@ void Chewer::stepLoaded(Vector const& force, real force_norm)
     
     if ( engaged != NO_END )
     {
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
         fbFiber->chew(prop->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
-        throw InvalidParameter("Fiber:chew is not enabled");
+        throw InvalidParameter("fiber:chew is not enabled");
 #endif
         return;
     }
@@ -100,7 +100,7 @@ void Chewer::stepLoaded(Vector const& force, real force_norm)
         engaged = PLUS_END;
     }
     
-    if ( engaged && !prop->hold_growing_end )
+    if ( engaged && RNG.test_not(prop->hold_growing_end) )
         detach();
     else
         moveTo(a);

@@ -392,21 +392,21 @@ bool Simul::isPropertyClass(const std::string& name) const
 }
 
 
-Property* Simul::findProperty(const std::string& cat, const std::string& nm) const
+Property* Simul::findProperty(const std::string& cat, const std::string& nom) const
 {
-    if ( cat == "simul" && nm == prop->name() )
+    if ( cat == "simul" && nom == prop->name() )
         return prop;
 
-    return properties.find(cat, nm);
+    return properties.find(cat, nom);
 }
 
 
-Property* Simul::findProperty(const std::string& nm) const
+Property* Simul::findProperty(const std::string& nom) const
 {
-    if ( nm == prop->name() )
+    if ( nom == prop->name() )
         return prop;
     
-    return properties.find(nm);
+    return properties.find(nom);
 }
 
 
@@ -481,28 +481,28 @@ PropertyList Simul::findAllProperties(const std::string& cat) const
  .
  
  */
-Property* Simul::newProperty(const std::string& cat, const std::string& nm, Glossary& glos)
+Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glossary& glos)
 {
     if ( cat == "simul" )
     {
         /* There can only be one SimulProp and it is already created */
         assert_true(prop);
-        prop->rename(nm);
-        //std::clog << "Simul is named `" << nm << "'\n";
+        prop->rename(nom);
+        //std::clog << "Simul is named `" << nom << "'\n";
         return prop;
     }
     
-    if ( isPropertyClass(nm) )
-        throw InvalidSyntax("`"+nm+"' is a reserved keyword");
+    if ( isPropertyClass(nom) )
+        throw InvalidSyntax("`"+nom+"' is a reserved keyword");
     
-    Property * p = findProperty(nm);
+    Property * p = findProperty(nom);
     
     if ( p )
-        throw InvalidSyntax("property `"+nm+"' is already defined");
+        throw InvalidSyntax("property `"+nom+"' is already defined");
     
     if ( cat == "hand" )
     {
-        p = HandProp::newProperty(nm, glos);
+        p = HandProp::newProperty(nom, glos);
         properties.deposit(p);
     }
     else
@@ -512,7 +512,7 @@ Property* Simul::newProperty(const std::string& cat, const std::string& nm, Glos
         if ( !set )
             throw InvalidSyntax("unknown class `"+cat+"'");
         
-        p = set->newProperty(cat, nm, glos);
+        p = set->newProperty(cat, nom, glos);
         properties.deposit(p);
     }
     

@@ -51,7 +51,7 @@ inline static void mm_recursion2(__m256i* r, __m256i a, __m256i b, __m256i c)
 
     /* assume SFMT_SL1 >= 16 */
     z = _mm256_permute2f128_si256(c, x, 0x21);     /* [c.upper, x.lower] */ 
-    z = _mm256_slli_epi32(z, SFMT_SL1); 
+    z = _mm256_slli_epi32(z, SFMT_SL1);
     x = _mm256_xor_si256(x, z);
 
     _mm256_store_si256(r, x);
@@ -105,7 +105,7 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
     __m256i r;
     w128_t * pstate = sfmt->state;
 
-    r = _mm256_loadu_si256((__m256i*)&pstate[SFMT_N - 2]); 
+    r = _mm256_loadu_si256((__m256i*)&pstate[SFMT_N - 2]);
     for (i = 0; i < SFMT_N - SFMT_POS1; i+=2) {
         mm_recursion2(
             (__m256i*)&array[i], 

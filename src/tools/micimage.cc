@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
     for ( std::string const& f : files )
     {
         std::string in = FilePath::file_part(f);
-        std::ifstream is(in.c_str());
+        std::ifstream is(in.c_str(), std::ifstream::in);
         
         if ( is.good() )
         {

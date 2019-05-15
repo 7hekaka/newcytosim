@@ -14,19 +14,19 @@ void SphereSet::remove(Object * obj)
 }
 
 
-Property* SphereSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
+Property* SphereSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
     if ( cat == "sphere" )
-        return new SphereProp(nm);
+        return new SphereProp(nom);
     return nullptr;
 }
 
 
-Object * SphereSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * SphereSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Sphere::TAG )
     {
-        SphereProp * p = simul.findProperty<SphereProp>("sphere", idx);
+        SphereProp * p = simul.findProperty<SphereProp>("sphere", num);
         return new Sphere(p);
     }
     return nullptr;

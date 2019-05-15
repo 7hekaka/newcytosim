@@ -201,7 +201,7 @@ void Nucleator::stepLoaded(Vector const& force, real force_norm)
     assert_true( nextDetach >= 0 );
     
     if ( testKramersDetachment(force_norm) )
-        return;    
+        return;
     
     // may track the end of the Fiber:
     if ( prop->track_end == MINUS_END )
@@ -220,6 +220,6 @@ void Nucleator::detach()
     if ( prop->addictive )
         fiber()->setDynamicState(nearestEnd(), STATE_RED);
         
-    Hand::detach();    
+    Hand::detach();
 }
 

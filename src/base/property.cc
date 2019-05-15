@@ -38,7 +38,7 @@ void Property::read_string(std::string& str)
 
 void Property::read_file(char const* filename)
 {
-    std::ifstream is(filename);
+    std::ifstream is(filename, std::ifstream::in);
     Glossary glos(is);
     read(glos);
 }

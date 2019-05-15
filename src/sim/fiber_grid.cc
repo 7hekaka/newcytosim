@@ -77,7 +77,10 @@ unsigned FiberGrid::setGrid(Space const* space, real max_step)
 void FiberGrid::createCells()
 {
     fGrid.createCells();
-    //fGrid.printSummary(std::cerr, "FiberGrid");
+#if ( 0 )
+    if ( fGrid.nbCells() > 4096 )
+        fGrid.printSummary(std::cerr, "FiberGrid");
+#endif
 }
 
 

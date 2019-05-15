@@ -12,12 +12,22 @@ To change it, [follow these instructions](dimensionality.md).
 
 ### Mathematical libraries
  
-Running cytosim with `sim` or `play` require these mathematical libraries:
+Running cytosim with `sim` or `play` requires these mathematical libraries:
 
 * [BLAS](http://netlib.org/blas)
 * [LAPACK](http://netlib.org/lapack)
 
-These libraries offer standard interface to linear algebra, with [public reference implementations](http://netlib.org). Compiling these libraries from source requires a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler, but precompiled libraries are often available. They are included in [Intel MKL](http://software.intel.com/en-us/articles/intel-mkl/) and [Apple's vecLib](http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html), and in many Linux distributions.
+These libraries offer standard interface to linear algebra functions used in Cytosim.
+There is a [public reference implementations](http://netlib.org). 
+Compiling the reference code is possible with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
+Precompiled libraries are available for most platforms, within:
+
+- [Intel Math Kernel Library](http://software.intel.com/en-us/articles/intel-mkl/)
+- [Apple's vecLib](http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html)
+- [OpenBLAS](https://www.openblas.net)
+- Also available for many Linux distributions.
+
+Apple's veclib is preinstalled on Mac OSX, and [Intel's MKL](https://en.wikipedia.org/wiki/Math_Kernel_Library) is available free of charge. MKL has better performance on Intel processors.
 
 ### Graphical libraries
  

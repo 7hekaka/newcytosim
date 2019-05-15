@@ -123,11 +123,11 @@ public:
     /// create a new property for class `kind` with given name
     virtual Property *  newProperty(const std::string& kind, const std::string& name, Glossary&) const = 0;
     
-    /// create new objects, of class `kind` and type `name`, give the options provided in `opt`
+    /// create new objects, of class `kind` and type `name`, given the options provided in `opt`
     virtual ObjectList  newObjects(const std::string& name, Glossary& opt) = 0;
    
-    /// create a non-initialized Object with the corresponding Tag (used for reading trajectory file)
-    virtual Object *    newObjectT(ObjectTag, unsigned) = 0;
+    /// create new Object with given Tag and Property `num` (used for reading trajectory file)
+    virtual Object *    newObjectT(ObjectTag, unsigned num) = 0;
     
     //--------------------------
     

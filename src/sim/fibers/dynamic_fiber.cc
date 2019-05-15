@@ -93,7 +93,7 @@ int DynamicFiber::stepMinusEnd()
     
     // add chewing rate to stochastic off rate:
     
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     
     // convert chewing rate to stochastic off rate:
     if ( frChewM > prop->max_chewing_speed_dt )
@@ -170,7 +170,7 @@ int DynamicFiber::stepPlusEnd()
     int res = 0;
     real chewing_rate = 0;
     
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     
     // convert chewing rate to stochastic off rate:
     ///@todo implement smooth saturation using logistic function

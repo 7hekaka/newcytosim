@@ -26,7 +26,7 @@ public:
     /// create a new property for class `kind` with given name
     Property *  newProperty(const std::string& kind, const std::string& name, Glossary&) const;
     
-    /// create new objects, of class `kind` and type `name`, give the options provided in `opt`
+    /// create new objects, of class `kind` and type `name`, given the options provided in `opt`
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)

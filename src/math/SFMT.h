@@ -139,7 +139,7 @@ struct SFMT_T {
     union {
         __m256i state_y[SFMT_N256];
         w128_t state[SFMT_N];
-    };    
+    };
 #else
     w128_t state[SFMT_N];
 #endif

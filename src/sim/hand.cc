@@ -257,7 +257,7 @@ void Hand::checkFiberRange()
 
 void Hand::handleDisassemblyM()
 {
-    if ( prop->hold_shrinking_end )
+    if ( RNG.test(prop->hold_shrinking_end) )
         relocateM();
     else
         detach();
@@ -265,7 +265,7 @@ void Hand::handleDisassemblyM()
 
 void Hand::handleDisassemblyP()
 {
-    if ( prop->hold_shrinking_end )
+    if ( RNG.test(prop->hold_shrinking_end) )
         relocateP();
     else
         detach();

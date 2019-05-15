@@ -8,19 +8,19 @@
 #include "simul.h"
 
 
-Property* BeadSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
+Property* BeadSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
     if ( cat == "bead" )
-        return new BeadProp(cat, nm);
+        return new BeadProp(cat, nom);
     return nullptr;
 }
 
 
-Object * BeadSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * BeadSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Bead::TAG )
     {
-        BeadProp * p = simul.findProperty<BeadProp>("bead", idx);
+        BeadProp * p = simul.findProperty<BeadProp>("bead", num);
         return new Bead(p, Vector(0,0,0), 0);
     }
     return nullptr;

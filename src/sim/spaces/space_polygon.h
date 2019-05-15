@@ -8,7 +8,7 @@
 /// a polygonal convex region in space
 /**
  Space `polygon` implements a polygon. It works best for convex polygon.
- In 3D, and additional HEIGHT can be specified to describe a generalized 
+ In 3D, the thickness in Z can be specified to describe a generalized 
  cylinder of axis Z, that has the 2D polygon as cross-section.
  
  Parameters:
@@ -16,6 +16,16 @@
      - height: height of polygon in Z
     .
 
+ Alternatively:
+     - order : number of sides
+     - radius : distance from center
+     - angle : rotation offset in radian
+     .
+ 
+ Example:
+ 
+     change cell { order=4; radius=13; angle=0.7853; }
+ 
  @ingroup SpaceGroup
  @todo add SpacePolygon::setInteraction() for re-entrant corners
 */

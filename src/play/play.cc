@@ -305,7 +305,7 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to create off-screen pixels\n";
             return EXIT_FAILURE;
         }
-        GLuint multi = 0;        
+        GLuint multi = 0;
         if ( view.multisample > 1 )
         {
             multi = OffScreen::createBuffer(W, H, view.multisample);

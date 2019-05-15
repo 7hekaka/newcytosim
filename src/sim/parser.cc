@@ -737,7 +737,7 @@ void Parser::parse_read(std::istream& is)
             show_lines(is, spos);
     }
     
-    std::ifstream fis(file.c_str());
+    std::ifstream fis(file.c_str(), std::ifstream::in);
     if ( ! fis.fail() )
     {
         VLOG("-READ " << file << "\n");
@@ -1211,7 +1211,7 @@ void Parser::evaluate(std::string const& code, std::string const& msg)
 
 int Parser::readConfig(std::string const& file)
 {
-    std::ifstream is(file.c_str());
+    std::ifstream is(file.c_str(), std::ifstream::in);
     if ( is.good() )
     {
         VLOG("-----------  Cytosim reads " << file);

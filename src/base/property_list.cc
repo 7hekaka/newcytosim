@@ -104,14 +104,14 @@ Property const* PropertyList::contains(Property const* p) const
 #pragma mark -
 
 /** 
- returns the first Property named as 'nm' or zero
+ returns the first Property named as 'nom' or zero
  */
-Property * PropertyList::find(std::string const& nm) const
+Property * PropertyList::find(std::string const& nom) const
 {
-    //std::clog << this << "->find(" << nm << ")" << std::endl;
+    //std::clog << this << "->find(" << nom << ")" << std::endl;
     for ( Property* i : vec_ )
     {
-        if ( i->name() == nm )
+        if ( i->name() == nom )
             return i;
     }
     
@@ -120,17 +120,17 @@ Property * PropertyList::find(std::string const& nm) const
 
 
 /**
- returns the first Property named as 'nm'
+ returns the first Property named as 'nom'
  */
-Property * PropertyList::find_or_die(std::string const& nm) const
+Property * PropertyList::find_or_die(std::string const& nom) const
 {
-    //std::clog << this << "->find_or_die(" << nm << ")" << std::endl;
-    Property * p = find(nm);
+    //std::clog << this << "->find_or_die(" << nom << ")" << std::endl;
+    Property * p = find(nom);
 
     if ( !p )
     {
         std::ostringstream oss;
-        oss << "Unknown class `" << nm << "'\n";
+        oss << "Unknown class `" << nom << "'\n";
         write_names(oss, PREF);
         throw InvalidSyntax(oss.str());
     }
@@ -141,13 +141,13 @@ Property * PropertyList::find_or_die(std::string const& nm) const
 /**
  returns the first match
  */
-Property * PropertyList::find(std::string const& cat, std::string const& nm) const
+Property * PropertyList::find(std::string const& cat, std::string const& nom) const
 {
-    //std::clog << this << "->find(" << cat << ", " << nm << ")" << std::endl;
+    //std::clog << this << "->find(" << cat << ", " << nom << ")" << std::endl;
 
     for ( Property* i : vec_ )
     {
-        if ( i->category()==cat  &&  i->name()==nm )
+        if ( i->category()==cat  &&  i->name()==nom )
             return i;
     }
     
@@ -169,14 +169,14 @@ Property * PropertyList::find(std::string const& cat, const unsigned num) const
 }
 
 
-Property * PropertyList::find_or_die(std::string const& cat, std::string const& nm) const
+Property * PropertyList::find_or_die(std::string const& cat, std::string const& nom) const
 {
-    Property * res = find(cat, nm);
+    Property * res = find(cat, nom);
     
     if ( !res )
     {
         std::ostringstream oss;
-        oss << "Unknown " << cat << " class `" << nm << "'\n";
+        oss << "Unknown " << cat << " class `" << nom << "'\n";
         write_names(oss, PREF);
         throw InvalidSyntax(oss.str());
     }

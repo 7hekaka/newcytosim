@@ -25,39 +25,39 @@ void OrganizerSet::step()
 
 //------------------------------------------------------------------------------
 
-Property* OrganizerSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
+Property* OrganizerSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
-    if ( cat == "aster" )   return new AsterProp(nm);
-    if ( cat == "bundle" )  return new BundleProp(nm);
-    if ( cat == "nucleus" ) return new NucleusProp(nm);
-    if ( cat == "fake" )    return new FakeProp(nm);
+    if ( cat == "aster" )   return new AsterProp(nom);
+    if ( cat == "bundle" )  return new BundleProp(nom);
+    if ( cat == "nucleus" ) return new NucleusProp(nom);
+    if ( cat == "fake" )    return new FakeProp(nom);
     return nullptr;
 }
 
 
-Object * OrganizerSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * OrganizerSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Aster::TAG )
     {
-        AsterProp * p = simul.findProperty<AsterProp>("aster", idx);
+        AsterProp * p = simul.findProperty<AsterProp>("aster", num);
         return new Aster(p);
     }
     
     if ( tag == Bundle::TAG )
     {
-        BundleProp * p = simul.findProperty<BundleProp>("bundle", idx);
+        BundleProp * p = simul.findProperty<BundleProp>("bundle", num);
         return new Bundle(p);
     }
     
     if ( tag == Nucleus::TAG )
     {
-        NucleusProp * p = simul.findProperty<NucleusProp>("nucleus", idx);
+        NucleusProp * p = simul.findProperty<NucleusProp>("nucleus", num);
         return new Nucleus(p);
     }
     
     if ( tag == Fake::TAG )
     {
-        FakeProp * p = simul.findProperty<FakeProp>("fake", idx);
+        FakeProp * p = simul.findProperty<FakeProp>("fake", num);
         return new Fake(p);
     }
     
@@ -65,10 +65,10 @@ Object * OrganizerSet::newObjectT(const ObjectTag tag, unsigned idx)
 }
 
 
-ObjectList OrganizerSet::newObjects(const std::string& nm, Glossary& opt)
+ObjectList OrganizerSet::newObjects(const std::string& nom, Glossary& opt)
 {
     Organizer * obj = nullptr;
-    Property * p = simul.properties.find_or_die(nm);
+    Property * p = simul.properties.find_or_die(nom);
     
     if ( p->category() == "aster" )
         obj = new Aster(static_cast<AsterProp*>(p));

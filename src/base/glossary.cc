@@ -30,7 +30,7 @@ Glossary::Glossary()
 
 Glossary::Glossary(std::istream& in)
 {
-    read(in); 
+    read(in);
 }
 
 Glossary::Glossary(const std::string& str)
@@ -492,7 +492,7 @@ void Glossary::read(std::string const& str, int no_overwrite)
 
 void Glossary::read_file(const char path[], int no_overwrite)
 {
-    std::ifstream is(path);
+    std::ifstream is(path, std::ifstream::in);
     if ( is.good() )
         read(is, no_overwrite);
     else

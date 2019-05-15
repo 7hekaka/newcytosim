@@ -99,7 +99,7 @@ void SphereProp::write_values(std::ostream& os) const
     write_value(os, "point_mobility", point_mobility);
     write_value(os, "piston_effect",  piston_effect);
     write_value(os, "steric",         steric, steric_range);
-    write_value(os, "confine",        confine, confine_stiffness, confine_space);    
+    write_value(os, "confine",        confine, confine_stiffness, confine_space);
     write_value(os, "display",        "("+display+")");
 }
 

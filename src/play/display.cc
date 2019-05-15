@@ -638,7 +638,7 @@ void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg)
     glDepthMask(GL_FALSE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     drawAverageFiber(objs);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);        
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDepthMask(GL_TRUE);
 #endif
     
@@ -660,7 +660,7 @@ void Display::drawAverageFiber2(FiberSet const& fibers, void const* arg)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     drawAverageFiber(objsR);
     drawAverageFiber(objsL);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);        
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDepthMask(GL_TRUE);
 #endif
     

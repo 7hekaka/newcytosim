@@ -666,7 +666,7 @@ public:
         return Vector3(std::max(XX, v.XX), std::max(YY, v.YY), std::max(ZZ, v.ZZ));
     }
     
-#if VECTOR3_USES_AVX
+#if VECTOR3_USES_AVX && defined __AVX2__
     /// cross product of two vectors ( X Y Z 0 )
     friend vec4 cross(vec4 a, vec4 b)
     {

@@ -13,6 +13,7 @@ SpacePolygon::SpacePolygon(SpaceProp const* p)
 : Space(p)
 {
     volume_ = 0;
+    height_ = 0;
     
     if ( DIM == 1 )
         throw InvalidParameter("polygon is not usable in 1D");
@@ -31,11 +32,18 @@ SpacePolygon::~SpacePolygon()
 void SpacePolygon::resize(Glossary& opt)
 {
     std::string file;
-    opt.set(file, "file");
-    if ( DIM == 3 )
-        opt.set(height_, "height");
-    
-    poly_.read(file);
+    if ( opt.set(file, "file") )
+        poly_.read(file);
+    else
+    {
+        int ord = 6;
+        real rad = 1, ang = 0;
+        opt.set(rad, "radius");
+        opt.set(ord, "order");
+        opt.set(ang, "angle");
+        poly_.set(ord, rad, ang);
+        //poly_.print(stdout);
+    }
     
     if ( poly_.surface() < 0 )
     {
@@ -49,6 +57,15 @@ void SpacePolygon::resize(Glossary& opt)
 
     if ( opt.set(x, "inflate") )
         poly_.inflate(x);
+    
+#if ( DIM == 3 )
+    x = height_;
+    if ( opt.set(x, "height") )
+        x *= 0.5;
+    if ( x < 0 )
+        throw InvalidParameter("polygon:height must be >= 0");
+    height_ = x;
+#endif
 
     update();
 }

@@ -1,20 +1,26 @@
 # Cytosim's C++ source code
 
-The source code is written in [C++11](https://en.wikipedia.org/wiki/C++11)
+Most source code is written in [C++11](https://en.wikipedia.org/wiki/C++11)
 
 # Essential code
 
 - [**base**](base) : List, Nodes, Arrays, Exceptions, etc.
-- [**math**](math) : Vectors, Matrices, Quaternion, Random, etc.
+- [**math**](math) : Vectors, Matrices, Quaternion, Random Number Generator, etc.
 - [**sim**](sim) : Mecable, Fiber, etc.
-- [**disp**](disp) : View, Colors, GLapp, etc.
+
+# GUI code
+
+- [**disp**](disp) : Classes used to build *play*: `View`, `Colors`, `GLapp`, etc.
 - [**play**](play) : Code for Cytosim's GUI `play`
-- [**tools**](tools) : Cytosim accessory programs: report, frametool, etc.
 
+# Other code
 
-# Accessory code
+- [**tools**](tools) : Cytosim accessory programs: `report`, `frametool`, etc.
+- [**test**](test) : test programs: `test_blas`, `test_math`, etc.
+- [**SFMT**](SFMT) : Copy of Mersenne Twister, a random number generator
 
-- **test** : tests: test_blas, test_math, etc.
-- **blank** : a little program based on Cytosim's toolset
-- **mechoui** : a mesh displaying program
-- **SFMT** : Copy of Mersenne Twister random number generator
+# More code
+
+- [**cytmaster**](misc/cytomaster) : a program to control cytosim during installation
+- [**blank**](misc/blank) : a little GUI interface based on Cytosim's toolset
+- [**mechoui**](misc/mechoui) : a mesh displaying program

@@ -19,7 +19,7 @@ class Space;
 /// compile switches to enable advanced features:
 #define OLD_SQUEEZE_FORCE       0
 #define NEW_COLINEAR_FORCE      0
-#define NEW_CHEW_FIBERS         0
+#define NEW_FIBER_CHEW          0
 #define NEW_FIBER_CONFINE2      0
 #define NEW_FIBER_CONFINE_RANGE 0
 #define NEW_AGING_LATTICE       0
@@ -293,7 +293,7 @@ public:
      */
     real         colinear_force;
 #endif
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     /// maximum speed of disassembly due to chewing (speed)
     real         max_chewing_speed;
 #endif

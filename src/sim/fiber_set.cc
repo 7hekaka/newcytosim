@@ -39,7 +39,7 @@
  `tubule`      | Tubule (disabled)   | @ref TubulePar
  
  */
-Property* FiberSet::newProperty(const std::string& cat, const std::string& nm, Glossary& opt) const
+Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
 {
     if ( cat == "fiber" )
     {
@@ -47,22 +47,22 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nm, G
         if ( opt.peek(a, "activity") )
         {
             if ( a == "classic" )
-                return new ClassicFiberProp(nm);
+                return new ClassicFiberProp(nom);
             if ( a == "grow" )
-                return new GrowingFiberProp(nm);
+                return new GrowingFiberProp(nom);
             if ( a == "dynamic" )
-                return new DynamicFiberProp(nm);
+                return new DynamicFiberProp(nom);
             if ( a == "treadmill" )
-                return new TreadmillingFiberProp(nm);
+                return new TreadmillingFiberProp(nom);
             if ( a == "none" )
-                return new FiberProp(nm);
+                return new FiberProp(nom);
 
 
             std::cerr << "INCIDENT: substituting generic Fiber class for `"+a+"'\n";
-            return new FiberProp(nm);
+            return new FiberProp(nom);
             //throw InvalidParameter("unknown fiber:activity `"+a+"'");
         }
-        return new FiberProp(nm);
+        return new FiberProp(nom);
     }
     return nullptr;
 }
@@ -208,7 +208,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
 /**
  The returned object is not initialized, since this is used for file input
  */
-Object * FiberSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * FiberSet::newObjectT(const ObjectTag tag, unsigned num)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( tag == Fiber::TAG || tag == 'm' )
@@ -216,7 +216,7 @@ Object * FiberSet::newObjectT(const ObjectTag tag, unsigned idx)
     if ( tag == Fiber::TAG )
 #endif
     {
-        FiberProp * p = simul.findProperty<FiberProp>("fiber", idx);
+        FiberProp * p = simul.findProperty<FiberProp>("fiber", num);
         Fiber * obj = p->newFiber();
         obj->birthTime(simul.time());
         return obj;
@@ -390,6 +390,8 @@ FiberSite FiberSet::randomSite() const
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
         abs += fib->length();
 
+    assert_true( abs > 0 );
+    
     abs *= RNG.preal();
 
     for ( Fiber* fib=first(); fib; fib=fib->next() )
@@ -399,6 +401,36 @@ FiberSite FiberSet::randomSite() const
             return FiberSite(fib, fib->abscissaM()+abs);
         abs -= len;
     }
+    
+    ABORT_NOW("unexpected abscissa overrun");
+    return FiberSite(first(), 0);
+}
+
+
+/// a random site on the fiber of class 'prop'
+/**
+ This method is unefficient if multiple sites are desired
+ */
+FiberSite FiberSet::randomSite(FiberProp * arg) const
+{
+    real abs = 0;
+    for ( Fiber const* fib=first(); fib; fib=fib->next() )
+        if ( fib->property() == arg )
+            abs += fib->length();
+
+    if ( abs == 0 )
+        throw InvalidParameter("randomSite() called with no fibers!");
+
+    abs *= RNG.preal();
+    
+    for ( Fiber* fib=first(); fib; fib=fib->next() )
+        if ( fib->property() == arg )
+        {
+            real len = fib->length();
+            if ( abs <= len )
+                return FiberSite(fib, fib->abscissaM()+abs);
+            abs -= len;
+        }
     
     ABORT_NOW("unexpected abscissa overrun");
     return FiberSite(first(), 0);
@@ -429,7 +461,16 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
             Fiber* fib = Fiber::toFiber(findObject(str));
             
             if ( !fib )
+            {
+                // without argument, a fiber name specifies uniform attachment:
+                if ( opt.nb_values(key) == 1 )
+                {
+                    Property * p = simul.findProperty(title(), str);
+                    if ( p )
+                        return randomSite(static_cast<FiberProp*>(p));
+                }
                 throw InvalidParameter("Could not find fiber specified for attachment");
+            }
             
             return FiberSite(fib, fib->someAbscissa(key, opt, 1.0));
         }

@@ -87,8 +87,8 @@ void Simul::setStericGrid(Space const* spc) const
     if ( range <= 0 )
         throw InvalidParameter("simul:steric_max_range must be defined");
 
-    const size_t max = 1<<16;
-    while ( pointGrid.setGrid(spc, range) > max )
+    const size_t sup = 1 << 17;
+    while ( pointGrid.setGrid(spc, range) > sup )
     {
         //std::clog << "increasing simul:steric_max_range\n";
         range *= 2;
@@ -318,9 +318,13 @@ void Simul::setInteractions(Meca & meca) const
 /// solve the system
 void Simul::solve()
 {
+    //auto rdtsc = __rdtsc();
     setInteractions(sMeca);
+    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
     sMeca.solve(prop, prop->precondition);
+    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
     sMeca.apply();
+    //printf("     ::apply    %16llu\n", (__rdtsc()-rdtsc)>>3);
 }
 
 

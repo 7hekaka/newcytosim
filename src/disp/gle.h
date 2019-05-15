@@ -156,7 +156,7 @@ namespace gle
     void gleRectangleS();
     /// draw a PLUS of radius 1 in plane XY, normals pointing in +Z
     void glePlusS();
-    void glePlusL();    
+    void glePlusL();
     /// draw a pentagon of radius 1 in plane XY, normals pointing in +Z
     void glePentagonS();
     void glePentagonL();

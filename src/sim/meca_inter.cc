@@ -1896,11 +1896,11 @@ void Meca::interSideLink3D(const Interpolation & pta,
     //real an = a * sca;
     //real bn = b * sca;
     // Maxima code: matrix([ex, ey, ez]) . T;
-    //real TP[9] = { an*ex, an*ey, an*ez, bn*ex, bn*ey, bn*ez, -ex, -ey, -ez };    
+    //real TP[9] = { an*ex, an*ey, an*ez, bn*ex, bn*ey, bn*ez, -ex, -ey, -ez };
     //blas::xgemm('N','N', 6, 1, 3, sca, T, 6, arm, 3, 0.0, TP, 6);
     
     //blas::xsyrk('U','N', 6, 1, weight, TP, 6, -weight, TT, 6);
-    blas::xscal(36, -weight, TT, 1); 
+    blas::xscal(36, -weight, TT, 1);
     
     for ( int ii=0 ; ii<6; ++ii )
     for ( int jj=ii; jj<6; ++jj )
@@ -2831,7 +2831,7 @@ void Meca::interSideSlidingLinkS(const Interpolation & pta,
 #endif
 
     if ( modulo )
-        throw Exception("interSideSlidingLinkS is not usable with periodic boundary conditions");    
+        throw Exception("interSideSlidingLinkS is not usable with periodic boundary conditions");
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )

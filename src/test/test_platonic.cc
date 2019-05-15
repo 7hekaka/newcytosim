@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
      printf("-------------- order 32:\n");
      Platonic::Solid T5(kind, 32);
      printf("-------------- order 64:\n");
-     Platonic::Solid T6(kind, 64);     
+     Platonic::Solid T6(kind, 64);
     return 0;
 }
 */

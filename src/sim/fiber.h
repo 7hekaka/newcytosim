@@ -96,7 +96,7 @@ private:
     Single *            frGlue;
     
 protected:
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     /// stored chewing at the end
     real                frChewM, frChewP;
 #endif
@@ -166,7 +166,7 @@ public:
     /// perform all the cuts registered by sever()
     void           severNow();
 
-#if NEW_CHEW_FIBERS
+#if NEW_FIBER_CHEW
     /// register a chewing quantity
     void           chew(const real x, FiberEnd end) { if ( end == PLUS_END ) frChewP += x; else frChewM += x; }
 #endif

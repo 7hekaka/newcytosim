@@ -58,13 +58,16 @@ public:
     unsigned nbPoints() const { return npts_; }
     
     /// set number of points and allocate memory
-    void     resize(unsigned s);
+    void     allocate(unsigned s);
     
+    /// set as regular polygon with `ord` sides (4 : square)
+    void     set(unsigned ord, real radius, real angle = 0);
+
     /// return copy of point at index `inx`
     Point2D  point(unsigned inx) { assert_true( inx < npts_ ); return pts_[inx]; }
 
     /// set coordinates of point at index `inx`:
-    void     set(unsigned inx, real x, real y);
+    void     setPoint(unsigned inx, real x, real y);
     
     /// subfunction
     static unsigned read(std::istream&, Point2D *pts, unsigned pts_size);
@@ -107,6 +110,9 @@ public:
     
     /// printout
     void     dump(std::ostream&) const;
+    
+    /// printout
+    void     print(FILE*) const;
 };
 
 #endif

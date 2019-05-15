@@ -181,6 +181,11 @@ public:
     GLfloat   b() const { return col_[2]; }
     GLfloat   a() const { return col_[3]; }
     
+    GLfloat   red()   const { return col_[0]; }
+    GLfloat   green() const { return col_[1]; }
+    GLfloat   blue()  const { return col_[2]; }
+    GLfloat   alpha() const { return col_[3]; }
+
     void      set_red  (GLfloat s) { col_[0] = s; update_rgba(); }
     void      set_green(GLfloat s) { col_[1] = s; update_rgba(); }
     void      set_blue (GLfloat s) { col_[2] = s; update_rgba(); }

@@ -8,12 +8,12 @@
 
 void* operator new(std::size_t size)
 {
-    constexpr std::size_t max = 1 << 30;
     //printf("new(%lu)\n", size);
-    void* ptr = nullptr;
+    void * ptr = nullptr;
 #if ( 1 )
+    constexpr std::size_t sup = 1 << 30;
     // we align all memory to 32 bytes
-    if ( size < max )
+    if ( size < sup )
         posix_memalign(&ptr, 32, size);
 #else
     // system's default (unaligned) memory

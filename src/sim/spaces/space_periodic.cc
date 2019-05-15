@@ -161,7 +161,7 @@ bool SpacePeriodic::draw() const
     gleVertex(  X,  Y, 0 );
     gleVertex( -X,  Y, 0 );
     gleVertex( -X, -Y, 0 );
-    glEnd();    
+    glEnd();
 #endif
     
 #if ( DIM > 1 )

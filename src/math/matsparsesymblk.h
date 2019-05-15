@@ -58,7 +58,7 @@ public:
 private:
     
     /// size of matrix
-    index_t  size_;    
+    index_t  size_;
     
     /// amount of memory which has been allocated
     size_t   allocated_;

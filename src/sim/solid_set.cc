@@ -18,26 +18,26 @@ void SolidSet::step()
 
 //------------------------------------------------------------------------------
 
-Property* SolidSet::newProperty(const std::string& cat, const std::string& nm, Glossary&) const
+Property* SolidSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
     if ( cat == "solid" )
-        return new SolidProp(cat, nm);
+        return new SolidProp(cat, nom);
     return nullptr;
 }
 
 
-Object * SolidSet::newObjectT(const ObjectTag tag, unsigned idx)
+Object * SolidSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Solid::TAG )
     {
-        Property * p = simul.properties.find("solid", idx);
+        Property * p = simul.properties.find("solid", num);
 #ifdef BACKWARD_COMPATIBILITY
         // prior to 04.2016, "bead" and "solid" were used interchangeably
         if ( !p )
-             p = simul.properties.find("bead", idx);
+             p = simul.properties.find("bead", num);
 #endif
         if ( !p )
-            throw InvalidIO("could not find `solid' class with id "+std::to_string(idx));
+            throw InvalidIO("could not find `solid' class with id "+std::to_string(num));
         return new Solid(static_cast<SolidProp*>(p));
    }
     return nullptr;

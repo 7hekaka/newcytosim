@@ -54,7 +54,7 @@ public:
      
      up to 4 keys (magic_key, magic_key1 ... 3) can be defined.
      */
-    char           magic_key[NB_MAGIC_KEYS];    
+    char           magic_key[NB_MAGIC_KEYS];
     
     /// flag to export image files
     bool           save_images;
