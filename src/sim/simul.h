@@ -37,12 +37,6 @@ class Simul
 {
 private:
     
-    /// the first Space defined in the simulation
-    Space const*    sSpace;
-    
-    /// for periodic boundary conditions
-    Modulo          sModulo;
-    
     /// Meca used to set and integrate the equations of motion of Mecables
     mutable Meca    sMeca;
     
@@ -155,12 +149,6 @@ public:
    
     /// perform basic initialization; register callbacks
     void            initialize(Glossary&);
-    
-    /// change 'master' Space
-    void            changeSpace(Space const*);
-
-    /// return 'master' Space, usually the first one that was created, with the smallest `identity()`
-    Space const*    space() const { return sSpace; }
     
     /// return first Space with given name
     Space const*    findSpace(std::string const& name) const;

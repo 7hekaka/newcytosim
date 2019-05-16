@@ -9,7 +9,7 @@
     #include "real.h"
 #endif
 
-/// Basic data structures and function associated with closed polygons
+/// Data and functions representing a closed 2D polygon
 class Polygon
 {
 public:
@@ -19,18 +19,18 @@ public:
     {
         real xx, yy;   ///< coordinates of point
         real dx, dy;   ///< normalized direction to next point
-        long color;    ///< indicates the type of edge
+        long info;     ///< indicates the type of edge
         real len;      ///< distance to next point
         
         /// constructor
-        Point2D() {}
+        Point2D() { info = 0; }
         
         /// set coordinates of point
         Point2D(real sx, real sy)
         {
             xx = sx;
             yy = sy;
-            color = 0;
+            info = 0;
         }
         
         /// test if given point overlap with *this
@@ -67,7 +67,7 @@ public:
     Point2D  point(unsigned inx) { assert_true( inx < npts_ ); return pts_[inx]; }
 
     /// set coordinates of point at index `inx`:
-    void     setPoint(unsigned inx, real x, real y);
+    void     setPoint(unsigned inx, real x, real y, long c = 0);
     
     /// subfunction
     static unsigned read(std::istream&, Point2D *pts, unsigned pts_size);

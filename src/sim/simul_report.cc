@@ -798,7 +798,7 @@ void Simul::reportFiberDisplacement(std::ostream& out) const
         if ( i != positions.end() )
         {
             ++cnt;
-            sum += pos.distanceSqr(i->second);
+            sum += distanceSqr(pos, i->second);
             i->second = pos;
         }
         else

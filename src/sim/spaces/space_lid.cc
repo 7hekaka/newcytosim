@@ -35,20 +35,24 @@ void SpaceLid::resize(Glossary& opt)
         length_[d] = len;
     }
     
-    opt.set(top_, "ceiling");
+    opt.set(top_, "top");
     if ( top_ < 0 )
-        throw InvalidParameter("lid:ceiling must be >= 0");
+        throw InvalidParameter("lid:top must be >= 0");
 }
 
 
-void SpaceLid::setModulo(Modulo& mod) const
+Modulo * SpaceLid::makeModulo() const
 {
-    mod.enable(0, length_[0]);
+    Modulo * mod = new Modulo();
+    mod->enable(0, length_[0]);
+    return mod;
 }
 
-Vector SpaceLid::extension() const
+
+void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 {
-    return Vector(length_[0], length_[1], length_[2]);
+    inf.set(-length_[0],-length_[1],-length_[2]);
+    sup.set( length_[0], length_[1], top_);
 }
 
 

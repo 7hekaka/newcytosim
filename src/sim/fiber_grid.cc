@@ -267,7 +267,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     for ( FiberSegment const& seg : segments )
     {
 #if !TRICKY_HAND_ATTACHMENT
-        if ( RNG.test(ha.prop->binding_rate_dt) )
+        if ( RNG.test(ha.prop->binding_rate_prob) )
 #else
         if ( RNG.flip_8th() )
 #endif
@@ -300,7 +300,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 /**
  This function is limited to the range given in paintGrid();
  */
-FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real D, Fiber * exclude)
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real D, Fiber * exclude) const
 {
     if ( gridRange < 0 )
         throw InvalidParameter("the Grid was not initialized");
@@ -335,7 +335,7 @@ FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real
 }
 
 
-FiberSegment FiberGrid::closestSegment(Vector const& place)
+FiberSegment FiberGrid::closestSegment(Vector const& place) const
 {
     //get the cell index from the position in space:
     const auto indx = fGrid.index(place, 0.5);
@@ -344,7 +344,7 @@ FiberSegment FiberGrid::closestSegment(Vector const& place)
     SegmentList & segments =  fGrid.icell(indx);
     
     FiberSegment res(nullptr, 0);
-    real closest = 4 * gridRange * gridRange;
+    real hit = INFINITY;
     
     for ( FiberSegment const& seg : segments )
     {
@@ -353,9 +353,9 @@ FiberSegment FiberGrid::closestSegment(Vector const& place)
         real dis = INFINITY;
         seg.projectPoint(place, dis);
         
-        if ( dis < closest )
+        if ( dis < hit )
         {
-            closest = dis;
+            hit = dis;
             res = seg;
         }
     }
@@ -374,6 +374,13 @@ FiberSegment FiberGrid::closestSegment(Vector const& place)
 #include <map>
 #include "simul.h"
 
+
+/// used for debugging
+unsigned mingle(FiberSegment const& seg)
+{
+    return ( seg.fiber()->identity() << 10 ) | seg.point();
+}
+
 /**
 Function testAttach() is given a position in space,
  it calls tryToAttach() from this position to check that:
@@ -381,97 +388,90 @@ Function testAttach() is given a position in space,
  - no target is missed,
  - attachment are not made to targets that are beyond binding_range
  */
-void FiberGrid::testAttach(FILE * out, const Vector pos, Fiber * start, HandProp const* hp)
+void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, HandProp const* hp) const
 {
-    //create a test motor with a dummy HandMonitor:
+    typedef std::map < unsigned, int > map_type;
+    map_type hits;
+
+    // create a test Hand with a dummy HandMonitor:
     HandMonitor hm;
     Hand ha(hp, &hm);
-    real dsq = hp->binding_range_sqr;
+    real sup = square(hp->binding_range);
     
-    typedef std::map < FiberSegment const*, int > map_type;
-    map_type hits;
-    
-    //go through all the segments to find those close enough from pos:
-    for ( Fiber * fib=start; fib; fib=fib->next() )
+    //check all the segments to find those close enough from pos:
+    for ( Fiber const* fib=set.first(); fib; fib=fib->next() )
     {
         for ( unsigned p = 0; p < fib->nbSegments(); ++p )
         {
             FiberSegment seg(fib, p);
             real dis = INFINITY;
             seg.projectPoint(pos, dis);
-            
-            if ( dis < dsq )
-                hits[&seg] = 0;
+            if ( dis < sup )
+                hits[mingle(seg)] = 0;
         }
     }
     
-    const size_t targets = hits.size();
-    
-    if ( targets == 0 )
+    const size_t n_targets = hits.size();
+    // call tryTyAttach 100 times per target:
+    for ( size_t n = 0; n < n_targets; ++n )
+    for ( size_t i = 0; i < 100; ++i )
     {
-        //fprintf(out, "no target here\n");
-        return;
-    }
-    
-    //call tryTyAttach NB times to check to which rods the Hand binds:
-    const size_t NB = 100 * targets;
-    for ( size_t n = 0; n < NB; ++n )
-    {
-        // we set 'prob' to bind immediately
         tryToAttach(pos, ha);
         if ( ha.attached() )
         {
             Interpolation inter = ha.fiber()->interpolate(ha.abscissa());
             FiberSegment seg(ha.fiber(), inter.point1());
             
-            if ( hits.find(&seg) != hits.end() )
-                ++hits[&seg];
+            if ( hits.find(mingle(seg)) != hits.end() )
+                ++hits[mingle(seg)];
             else
-                hits[&seg] = -2;
-            
+                hits[mingle(seg)] = -2;
+            //fprintf(out, "   attached to f%04d abscissa %7.3f\n", ha.fiber()->identity(), ha.abscissa());
             ha.detach();
         }
     }
     
+    if ( hits.empty() )
+        return;
+
     //detect segments that have been missed or mistargeted:
-    int verbose = 1;
+    int verbose = 0;
     for ( auto const& i : hits )
     {
-        if ( i.second <= 50 )
+        if ( i.second < 50 )
             verbose = 1;
-        if ( i.second < 0 )
-            verbose = 2;
     }
     
     if ( verbose )
     {
         // print a summary of all targets:
-        fprintf(out, "FiberGrid::testAttach %lu target(s) within %.3f um of", targets, hp->binding_range);
-        pos.print(out);
-
+        fprintf(out, "FiberGrid::testAttach %lu target(s) within %.3f um of", n_targets, hp->binding_range);
+        pos.println(out);
 #if ( 0 )
+        //report content of grid's list
         const auto indx = fGrid.index(pos, 0.5);
         for ( FiberSegment const& seg : fGrid.icell(indx) )
-            fprintf(out, "\n    target f%04d:%02i", seg->fiber()->identity(), seg->point());
+            fprintf(out, "    target f%04d:%02i\n", seg.fiber()->identity(), seg.point());
 #endif
-        
         //report for all the segments that were targeted:
-        for ( auto const& it : hits )
+        for ( auto const& hit : hits )
         {
-            FiberSegment const* seg = it.first;
-            Fiber const* fib = seg->fiber();
+            ObjectID id = hit.first >> 10;
+            int pt = hit.first & 1023;
+            Fiber const* fib = set.findID(id);
+            FiberSegment seg(fib, pt);
             real dis = INFINITY;
-            real abs = seg->projectPoint(pos, dis);
+            real abs = seg.projectPoint(pos, dis);
             
-            fprintf(out, "\n    rod f%04d:%02i at %5.3f um, abs %+.2f : ", fib->identity(), seg->point(), dis, abs);
-            if ( hits[seg] == 0 )
+            fprintf(out, "    rod f%04d:%02i at %12.7f um, abs %+.2f : ", id, pt, dis, abs);
+            if ( hit.second == 0 )
                 fprintf(out, "missed");
-            else if ( hits[seg] < 0 )
+            else if ( hit.second < 0 )
                 fprintf(out, "found, although out of range");
-            else if ( hits[seg] > 0 )
-                fprintf(out, "%-3i hits", hits[seg]);
+            else if ( hit.second > 0 )
+                fprintf(out, "%-3i hits", hit.second);
+            fprintf(out, "\n");
         }
-        fprintf(out, "\n");
     }
 }
 

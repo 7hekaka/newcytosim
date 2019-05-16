@@ -283,33 +283,21 @@ public:
     {
         return YY*YY + ZZ*ZZ;
     }
-
-    /// square of the distance to other point, equivalent to (a-this).normSqr()
-    real distanceSqr(Vector4 const& a) const
-    {
-        real x = a.XX - XX;
-        real y = a.YY - YY;
-        real z = a.ZZ - ZZ;
-        real t = a.TT - TT;
-        return x*x + y*y + z*z + t*t;
-    }
     
     /// square of the distance between two points, equivalent to (a-b).normSqr()
     friend real distanceSqr(Vector4 const& a, Vector4 const& b)
     {
-        return a.distanceSqr(b);
-    }
-    
-    /// distance to other point, equivalent to (a-this).norm()
-    real distance(Vector4 const& b) const
-    {
-        return sqrt(distanceSqr(b));
+        real x = a.XX - b.XX;
+        real y = a.YY - b.YY;
+        real z = a.ZZ - b.ZZ;
+        real t = a.TT - b.TT;
+        return x*x + y*y + z*z + t*t;
     }
 
     /// distance between two points, equivalent to (a-b).norm()
     friend real distance(Vector4 const& a, Vector4 const& b)
     {
-        return sqrt(a.distanceSqr(b));
+        return sqrt(distanceSqr(a, b));
     }
     
     /// absolute values: (|x|, |y|, |z|, |t|)

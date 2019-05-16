@@ -52,7 +52,7 @@ void countMTtips(const Stage action, const int frame=0)
     {
         case INIT:
         {
-            real xdim = sim.space()->max_extension();
+            real xdim = sim.spaces.master()->max_extension();
             density.create1D(-xdim, xdim, 100);
             denR.create1D(-xdim, xdim, 100);
             denL.create1D(-xdim, xdim, 100);

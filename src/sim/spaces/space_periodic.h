@@ -32,8 +32,8 @@ public:
     void        resize(Glossary& opt);
     
     /// initialize Modulo Object
-    void        setModulo(Modulo&) const;
-    
+    Modulo *    makeModulo() const;
+
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;
     

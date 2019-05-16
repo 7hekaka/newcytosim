@@ -29,7 +29,7 @@ Space::~Space()
 /**
  Provide a uniform random distribution in the volume by Monte-Carlo.
  
- Algorithm: throw a point in the rectangular volume provided by extension()
+ Algorithm: throw a point in the rectangular volume provided by boundaries()
  until inside() returns true.
 */
 Vector Space::randomPlace() const
@@ -304,7 +304,7 @@ Vector Space::normalToEdge(Vector const& pos) const
     }
     
     printf("warning: normalToEdge() failed\n");
-    printf("         error = %e at height = %e\n", P.distance(prj), H);
+    printf("         error = %e at height = %e\n", distance(P, prj), H);
     if ( inside(prj+res) )
         return -normalize(res);
     else

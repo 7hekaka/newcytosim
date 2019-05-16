@@ -17,6 +17,7 @@
 class Simul;
 class PropertyList;
 class FiberSegment;
+class FiberSet;
 class Modulo;
 class Space;
 class Fiber;
@@ -81,6 +82,9 @@ public:
     /// set binding range
     void         setRange(real s) { gridRange = s; }
     
+    /// return range
+    real         range() const { return gridRange; }
+    
     /// number of cells in grid
     index_t      nbCells() const { return fGrid.nbCells(); }
 
@@ -100,14 +104,13 @@ public:
     void         tryToAttach(Vector const&, Hand&) const;
     
     /// return all fiber segments located at a distance D or less from P, except those belonging to `exclude`
-    SegmentList  nearbySegments(Vector const& P, real D, Fiber * exclude = nullptr);
+    SegmentList  nearbySegments(Vector const& P, real D, Fiber * exclude = nullptr) const;
 
     /// Among the segments closer than gridRange, return the closest one
-    FiberSegment closestSegment(Vector const&);
+    FiberSegment closestSegment(Vector const&) const;
     
     ///test the results of tryToAttach(), at a particular position
-    void         testAttach(FILE *, Vector place, Fiber * start, HandProp const*);
-    
+    void         testAttach(FILE *, Vector place, FiberSet const&, HandProp const*) const;
     
 #ifdef DISPLAY
     void draw() const
@@ -120,7 +123,6 @@ public:
         glPopAttrib();
     }
 #endif
-    
  };
 
 

@@ -320,31 +320,19 @@ public:
         return YY*YY + ZZ*ZZ;
     }
 
-    /// square of the distance to other point, equivalent to (a-this).normSqr()
-    real distanceSqr(Vector3 const& a) const
-    {
-        real x = a.XX - XX;
-        real y = a.YY - YY;
-        real z = a.ZZ - ZZ;
-        return x*x + y*y + z*z;
-    }
-    
     /// square of the distance between two points, equivalent to (a-b).normSqr()
     friend real distanceSqr(Vector3 const& a, Vector3 const& b)
     {
-        return a.distanceSqr(b);
-    }
-    
-    /// distance to other point, equivalent to (a-this).norm()
-    real distance(Vector3 const& b) const
-    {
-        return sqrt(distanceSqr(b));
+        real x = a.XX - b.XX;
+        real y = a.YY - b.YY;
+        real z = a.ZZ - b.ZZ;
+        return x*x + y*y + z*z;
     }
 
     /// distance between two points, equivalent to (a-b).norm()
     friend real distance(Vector3 const& a, Vector3 const& b)
     {
-        return sqrt(a.distanceSqr(b));
+        return sqrt(distanceSqr(a,b));
     }
 
     /// absolute values: (|x|, |y|, |z|)

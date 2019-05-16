@@ -118,7 +118,7 @@ bool SpaceBeads::inside(Vector const& point) const
     Vector pos(point);
     
     for ( Bead * i : mBeads )
-        if ( pos.distanceSqr(i->position()) < i->radiusSqr() )
+        if ( distanceSqr(pos, i->position()) < i->radiusSqr() )
             return true;
     
     return false;
@@ -132,7 +132,7 @@ Vector SpaceBeads::project(Vector const& pos) const
 
     for ( Bead * i : mBeads )
     {
-        real d = fabs(pos.distance(i->position()) - i->radius());
+        real d = fabs(distance(pos, i->position()) - i->radius());
         if ( d < dmin )
         {
             dmin = d;

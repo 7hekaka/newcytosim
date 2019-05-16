@@ -38,9 +38,11 @@ void SpaceCylinderP::resize(Glossary& opt)
 }
 
 
-void SpaceCylinderP::setModulo(Modulo& mod) const
+Modulo * SpaceCylinderP::makeModulo() const
 {
-    mod.enable(0, length_);
+    Modulo * mod = new Modulo();
+    mod->enable(0, length_);
+    return mod;
 }
 
 

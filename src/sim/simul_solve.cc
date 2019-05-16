@@ -119,7 +119,11 @@ void Simul::setStericGrid(Space const* spc) const
 void Simul::setStericInteractions(Meca& meca) const
 {
     if ( !pointGrid.hasGrid() )
-        setStericGrid(sSpace);
+    {
+        if (!spaces.master())
+            return;
+        setStericGrid(spaces.master());
+    }
 
     // clear grid
     pointGrid.clear();
@@ -268,7 +272,7 @@ void Simul::setInteractions(Meca & meca) const
     //    e->setInteractions(meca);
 
     // add steric interactions
-    if ( prop->steric && sSpace )
+    if ( prop->steric )
         setStericInteractions(meca);
     
     

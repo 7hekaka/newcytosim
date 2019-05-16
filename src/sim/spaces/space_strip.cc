@@ -17,6 +17,7 @@ SpaceStrip::SpaceStrip(SpaceProp const* p)
         length_[d] = 0;
 }
 
+
 void SpaceStrip::resize(Glossary& opt)
 {
     for ( int d = 0; d < DIM; ++d )
@@ -32,10 +33,13 @@ void SpaceStrip::resize(Glossary& opt)
         throw InvalidParameter("strip:length[DIM-1] must be > 0");
 }
 
-void SpaceStrip::setModulo(Modulo& mod) const
+
+Modulo * SpaceStrip::makeModulo() const
 {
+    Modulo * mod = new Modulo();
     for ( int d = 0; d < DIM-1; ++d )
-        mod.enable(d, length_[d]);
+        mod->enable(d, length_[d]);
+    return mod;
 }
 
 

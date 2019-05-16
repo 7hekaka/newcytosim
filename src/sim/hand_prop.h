@@ -14,9 +14,9 @@
 /// enables "bind_only_free_end" to limit binding of Hands to Fibers
 #define NEW_BIND_ONLY_FREE_END 0
 
-class PointDisp;
 class Hand;
 class HandMonitor;
+class PointDisp;
 
 /// Property for Hand
 /**
@@ -115,17 +115,22 @@ public:
     
     /// if true, the Hand can also bind directly to the tip of fibers
     /**
-     This parameter determines the binding ability of a Hand that is located within
-     `binding_range` of a fiber, but at a position where the orthogonal projection is
-     outside the Fiber, either below the Minus end or above the Plus end.
-     In this case, the attachement will be at the ends of the fiber, and it is allowed
-     only if `bind_also_ends` is true. In other words, with 'bind_also_ends==true', the
-     capture regions of the fibers are extended by adding two hemi-spheres at the two
-     ends of each fibers, with a radius `binding_range`.
+     The value of `bind_also_end` affects Hands that are located at a position
+     for which the orthogonal projection on the fiber backbone is beyond one
+     of the end. In this case, the attachement will occur only if `bind_also_end`
+     is set and matches this end. Attachment will occur at the end of the fiber,
+     if the distance is shorter than `binding_range`.
      
-     <em>default value = false</em>
+     Values for  are `off`, `minus_end`, `plus_end` and `both_ends`.
+     
+     In other words, setting 'bind_also_end==true', will extend the capture
+     regions of the fibers to include one or two hemi-spheres at the ends of
+     the fibers, with a radius `binding_range`.
+     
+     <em>default value = off</em>
      */
-    bool         bind_also_ends;
+    int          bind_also_end;
+    
     
     /// if true, the Hand can bind only near the ends of the fibers
     /**
@@ -187,15 +192,15 @@ public:
     /// derived variable: inverse of unbinding_force. This is a flag to Kramer
     real unbinding_force_inv;
     
-    /// oversampled binding_rate_dt
+    /// oversampled binding_rate for Gillespie's method
     real   binding_rate_dt_8;
 
 public:
     
-    /// binding_rate_dt = binding_rate * time_step;
-    real   binding_rate_dt;
+    /// binding_rate_prob = probability to bind in one `time_step`;
+    real   binding_rate_prob;
     
-    /// binding_range_sqr = binding_range * binding_range;
+    /// binding_range_sqr = square(binding_range);
     real   binding_range_sqr;
     
     /// unbinding_rate_dt = unbinding_rate * time_step;

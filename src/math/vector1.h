@@ -204,23 +204,11 @@ public:
         return 0;
     }
 
-    /// square of the distance to other point, equivalent to (a-this).normSqr()
-    real distanceSqr(Vector1 const& a) const
-    {
-        real x = a.XX - XX;
-        return x*x;
-    }
-    
     /// square of the distance between two points, equivalent to (a-b).normSqr()
     friend real distanceSqr(Vector1 const& a, Vector1 const& b)
     {
-        return a.distanceSqr(b);
-    }
-    
-    /// distance to other point, equivalent to (a-this).norm()
-    real distance(Vector1 const& a) const
-    {
-        return fabs(a.XX-XX);
+        real x = a.XX - b.XX;
+        return x*x;
     }
     
     /// distance between two points, equivalent to (a-b).norm()

@@ -337,7 +337,7 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials)
         Vector2 xy = Vector2::randB();
         
         for ( size_t i = 0; i < n; ++i )
-            if ( xy.distanceSqr(pts[i]) < ss )
+            if ( distanceSqr(xy, pts[i]) < ss )
                 goto toss;
         
         vec = xy;
@@ -371,7 +371,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit
         Vector3 pos(u, v*cos(a), v*sin(a));
         
         for ( size_t i = 0; i < n; ++i )
-            if ( pos.distanceSqr(pts[i]) < ss )
+            if ( distanceSqr(pos, pts[i]) < ss )
                 goto toss;
         
         vec = pos;

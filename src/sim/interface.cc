@@ -79,9 +79,9 @@ void Interface::execute_change(Property * pp, Glossary& def)
             if ( s->prop == pp )
             {
                 s->resize(def);
-                // allow Simul to update:
-                if ( s == simul.space() )
-                    simul.changeSpace(s);
+                // allow Simul to update periodic:
+                if ( s == simul.spaces.master() )
+                    simul.spaces.setMaster(s);
             }
         }
     }
@@ -147,7 +147,7 @@ Isometry Interface::read_placement(Glossary& opt)
     Isometry iso;
     std::string str;
     
-    Space const* spc = simul.space();
+    Space const* spc = simul.spaces.master();
     
     // Space specified as second argument to 'position'
     if ( opt.set(str, "position", 1) )
@@ -235,7 +235,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
     
     opt.set(nb_trials, "nb_trials");
 
-    Space const* spc = simul.space();
+    Space const* spc = simul.spaces.master();
     if ( opt.set(str, "placement", 1) )
         spc = simul.findSpace(str);
     
@@ -360,7 +360,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
                 for ( Object * i : res )
                 {
                     Mecable * mec = Simul::toMecable(i);
-                    if ( mec && ! mec->allInside(simul.space()) )
+                    if ( mec && ! mec->allInside(simul.spaces.master()) )
                     {
                         res.destroy();
                         continue;
@@ -414,7 +414,8 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
         throw InvalidSyntax("unknown property `"+name+"'");
     
     ObjectSet * set = simul.findSet(pp->category());
-    
+    Space const* spc = simul.spaces.master();
+
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
@@ -427,7 +428,7 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
         if ( objs.empty() )
             throw InvalidSyntax("could not create object class of `"+name+"'");
 
-        if ( simul.space() )
+        if ( spc )
         {
             // This is a very common case, where we can skip Rotation::randomRotation():
             if ( objs.size() == 1 )
@@ -437,12 +438,12 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
                 {
                     case 2: obj->rotate(Rotation::randomRotation()); break;
                     case 3: obj->rotate(Rotation::randomRotation());
-                    case 1: obj->translate(simul.space()->randomPlace());
+                    case 1: obj->translate(spc->randomPlace());
                 }
             }
             else
             {
-                Isometry iso(simul.space()->randomPlace(), Rotation::randomRotation());
+                Isometry iso(spc->randomPlace(), Rotation::randomRotation());
 #if ( 0 )
                 ObjectSet::flagObjects(objs, 1);
                 ObjectSet::moveObjects(objs, iso, 0);
@@ -502,7 +503,7 @@ public:
             if ( opt.set(spn, "position", 1) )
                 spc = sim.findSpace(spn);
             else
-                spc = sim.space();
+                spc = sim.spaces.master();
             if ( !spc )
                 throw InvalidSyntax("unknown Space `"+spn+"'");
             

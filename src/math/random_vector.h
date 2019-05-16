@@ -43,7 +43,7 @@ size_t tossPointsSphere(std::vector<VECTOR>& pts, real sep, size_t limit_trials)
         
         // check distance will all the other points:
         for ( size_t i = 0; i < n; ++i )
-            if ( pos.distanceSqr(pts[i]) < ss )
+            if ( distanceSqr(pos, pts[i]) < ss )
                 goto toss;
         
         vec = pos;

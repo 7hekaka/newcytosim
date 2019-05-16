@@ -343,7 +343,7 @@ public:
     void createCells();
     
     /// true if the grid was initialized by calling setGrid()
-    bool hasGrid() const    { return pGrid.hasCells(); }
+    size_t hasGrid() const  { return pGrid.hasCells(); }
     
     /// clear the grid
     void clear()            { pGrid.clear(); }

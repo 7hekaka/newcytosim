@@ -62,7 +62,7 @@ Many examples can be found in the directory called [***cym***](../../cym).
 		unloaded_speed = 0.8
 		stall_force = 5
 	
-		bind_also_ends = 1
+		bind_also_end = 1
 		hold_growing_end = 1
 	
 		display = ( size=7; width=7 )

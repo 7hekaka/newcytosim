@@ -51,7 +51,7 @@ public:
     virtual void resize(Glossary& opt) {};
 
     /// initialize Modulo if this Space has some periodic dimensions
-    virtual void setModulo(Modulo& m) const { m.disable(); }
+    virtual Modulo * makeModulo() const { return nullptr; }
 
     /// a Human-readible description
     virtual std::string geometry() const { return prop->shape; }

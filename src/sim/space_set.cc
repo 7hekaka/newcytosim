@@ -15,6 +15,36 @@
  */
 Modulo const* modulo = nullptr;
 
+
+/// static variable of SpaceSet:
+Space const* SpaceSet::master_ = nullptr;
+
+/**
+ set current Space to `spc`. (spc==NULL is a valid argument).
+ */
+void SpaceSet::setMaster(Space const* spc)
+{
+    if ( spc != master_ )
+    {
+        master_ = spc;
+        
+#if ( 0 )
+        if ( spc )
+            std::clog << "setMaster(" << spc->prop->name() << ")" << std::endl;
+        else
+            std::clog << "setMaster(NULL)" << std::endl;
+#endif
+    }
+    
+    if ( modulo )
+    {
+        delete(modulo);
+        modulo = nullptr;
+    }
+    if ( master_ )
+        modulo = master_->makeModulo();
+}
+
 //------------------------------------------------------------------------------
 
 Property * SpaceSet::newProperty(const std::string& cat,const std::string& nom, Glossary&) const
@@ -24,7 +54,7 @@ Property * SpaceSet::newProperty(const std::string& cat,const std::string& nom, 
     return nullptr;
 }
 
-//------------------------------------------------------------------------------
+
 void SpaceSet::step()
 {
     for ( Space * sp = first(); sp; sp=sp->next() )
@@ -32,13 +62,12 @@ void SpaceSet::step()
 }
 
 
-//------------------------------------------------------------------------------
 void SpaceSet::erase()
 {
     ObjectSet::erase();
     
     // simul has lost its current Space:
-    simul.changeSpace(nullptr);
+    setMaster(nullptr);
 }
 
 /**
@@ -50,9 +79,8 @@ void SpaceSet::add(Object * obj)
     //std::clog << "SpaceSet::add " << obj << std::endl;
     ObjectSet::add(obj);
     
-    Space const* spc = simul.space();
-    if ( !spc || obj->identity() < spc->identity() )
-        simul.changeSpace(static_cast<Space*>(obj));
+    if ( !master() || obj->identity() < master()->identity() )
+        setMaster(static_cast<Space*>(obj));
 }
 
 /**
@@ -64,7 +92,7 @@ void SpaceSet::remove(Object * obj)
     //std::clog << "SpaceSet::remove " << obj << std::endl;
     ObjectSet::remove(obj);
 
-    if ( obj == simul.space() )
+    if ( obj == master() )
     {
         /*
          if the current space was deleted, use the oldest Space available
@@ -75,11 +103,12 @@ void SpaceSet::remove(Object * obj)
             if ( s->identity() < spc->identity() )
                 spc = s;
         
-        simul.changeSpace(spc);
+        setMaster(spc);
     }
 }
 
 //------------------------------------------------------------------------------
+
 Object * SpaceSet::newObjectT(const ObjectTag tag, unsigned num)
 {
     if ( tag == Space::TAG )

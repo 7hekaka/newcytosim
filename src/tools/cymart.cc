@@ -108,11 +108,11 @@ Vector3 closestPoint(Fiber const* fib, const Vector3 pos)
         return Vector3(0,0,0);
     
     Vector3 res = pts[0];
-    real dis = pos.distanceSqr(res);
+    real dis = distanceSqr(pos, res);
     
     for ( Vector3 const& vec : pts )
     {
-        real d = pos.distanceSqr(vec);
+        real d = distanceSqr(pos, vec);
         if ( d < dis )
         {
             res = vec;

@@ -112,7 +112,7 @@ void DynamicFiberProp::complete(Simul const& sim)
     if ( min_length <= 0 )
         min_length = 3 * unit_length;
     
-    zone_radius_sqr = zone_radius * zone_radius;
+    zone_radius_sqr = square(zone_radius);
     
     /// print predicted average length in verbose mode:
     if ( sim.prop->verbose && sim.ready() )

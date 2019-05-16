@@ -78,7 +78,7 @@ public:
     /// type of a pair (key, record)
     typedef std::pair<key_type, rec_type> pair_type;
     
-    /// type for a dictionary given to set(T&, ...)
+    /// type for a dictionary of terms given to set(T&, ...)
     template < typename T >
     using dict_type = std::initializer_list<std::pair<Glossary::key_type, T> >;
     

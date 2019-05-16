@@ -76,7 +76,7 @@ void Simul::setFiberGrid(Space const* spc) const
  */
 void Simul::prepare()
 {
-    if ( !sSpace )
+    if ( !spaces.master() )
         throw InvalidSyntax("A space must be defined first!");
 
     // make sure properties are ready for simulations:
@@ -84,7 +84,7 @@ void Simul::prepare()
     prop->complete(*this);
     
     // prepare grid for attachments:
-    setFiberGrid(sSpace);
+    setFiberGrid(spaces.master());
     
     // this is necessary for diffusion in Field:
     fields.prepare();
@@ -144,18 +144,19 @@ void Simul::step()
     
     // This code continuously tests the binding algorithm.
     
-    if ( HandProp::binding_range_max > 0 ) 
+    if ( fiberGrid.hasGrid() )
     {
         HandProp hp("test_binding");
-        hp.binding_rate  = 1;
-        hp.binding_range = HandProp::binding_range_max;
-        hp.bind_also_ends = true;
-        hp.complete(this);
+        hp.binding_rate  = INFINITY;
+        hp.binding_range = RNG.preal() * fiberGrid.range();
+        hp.bind_also_end = BOTH_ENDS;
+        hp.complete(*this);
         
-        for ( unsigned cnt = 0; cnt < 16; ++cnt )
+        Space const* spc = spaces.master();
+        for ( unsigned i = 0; i < 16; ++i )
         {
-            Vector pos = sSpace->randomPlace();
-            fiberGrid.testAttach(stdout, pos, fibers.first(), &hp);
+            Vector pos = spc->randomPlace();
+            fiberGrid.testAttach(stdout, pos, fibers, &hp);
         }
     }
     

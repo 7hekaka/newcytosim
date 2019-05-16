@@ -154,7 +154,7 @@ void HandProp::clear()
     unbinding_force    = INFINITY;
     unbinding_force_inv = 0;
 
-    bind_also_ends     = false;
+    bind_also_end      = 0;
     bind_only_end      = NO_END;
     bind_end_range     = 0;
 #if NEW_BIND_ONLY_FREE_END
@@ -189,16 +189,23 @@ void HandProp::read(Glossary& glos)
     glos.set(unbinding_rate,     "unbinding", 0);
     glos.set(unbinding_force,    "unbinding", 1);
     
-    glos.set(bind_also_ends, "bind_also_ends") || glos.set(bind_also_ends, "bind_also_end");
+    glos.set(bind_also_end, "bind_also_end", {{"off",       NO_END},
+                                              {"plus_end",  PLUS_END},
+                                              {"minus_end", MINUS_END},
+                                              {"both_ends", BOTH_ENDS}});
 
-    glos.set(bind_only_end,      "bind_only_end", {{"off",       NO_END},
-                                                   {"plus_end",  PLUS_END},
-                                                   {"minus_end", MINUS_END},
-                                                   {"both_ends", BOTH_ENDS}});
+    glos.set(bind_only_end, "bind_only_end", {{"off",       NO_END},
+                                              {"plus_end",  PLUS_END},
+                                              {"minus_end", MINUS_END},
+                                              {"both_ends", BOTH_ENDS}});
     glos.set(bind_end_range,     "bind_only_end", 1);
     glos.set(bind_end_range,     "bind_end_range");
 
 #ifdef BACKWARD_COMPATIBILITY
+    glos.set(bind_also_end, "bind_also_ends", {{"off",       NO_END},
+                                               {"plus_end",  PLUS_END},
+                                               {"minus_end", MINUS_END},
+                                               {"both_ends", BOTH_ENDS}});
     glos.set(bind_only_end,      "bind_end", {{"off",       NO_END},
                                               {"plus_end",  PLUS_END},
                                               {"minus_end", MINUS_END},
@@ -229,11 +236,11 @@ void HandProp::complete(Simul const& sim)
     if ( sim.prop->time_step < REAL_EPSILON )
         throw InvalidParameter("simul:time_step is not defined");
     
-    binding_range_sqr = binding_range * binding_range;
-    binding_rate_dt   = binding_rate * sim.prop->time_step;
+    binding_range_sqr = square(binding_range);
+    binding_rate_prob = 1 - exp(-binding_rate * sim.prop->time_step);
     unbinding_rate_dt = unbinding_rate * sim.prop->time_step;
     
-    binding_rate_dt_8 = 8 * binding_rate_dt;
+    binding_rate_dt_8 = 8 * binding_rate * sim.prop->time_step;
     
     if ( binding_range < 0 )
         throw InvalidParameter(name()+":binding_range must be >= 0");
@@ -318,7 +325,7 @@ void HandProp::write_values(std::ostream& os) const
 #endif
     write_value(os, "unbinding",          unbinding_rate, unbinding_force);
     
-    write_value(os, "bind_also_ends",     bind_also_ends);
+    write_value(os, "bind_also_end",      bind_also_end);
     write_value(os, "hold_growing_end",   hold_growing_end);
     write_value(os, "hold_shrinking_end", hold_shrinking_end);
     write_value(os, "bind_only_end",      bind_only_end, bind_end_range);
@@ -335,7 +342,7 @@ void HandProp::write_values(std::ostream& os) const
  */
 real HandProp::bindingSection(bool with_time_step) const
 {
-    real rate = ( with_time_step ? binding_rate_dt : binding_rate );
+    real rate = ( with_time_step ? binding_rate_prob : binding_rate );
 
 #if ( DIM == 2 )
     return 2 * binding_range * rate;
@@ -345,5 +352,4 @@ real HandProp::bindingSection(bool with_time_step) const
     return 0;
 #endif
 }
-
 

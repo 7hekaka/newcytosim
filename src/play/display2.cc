@@ -120,7 +120,7 @@ void Display2::drawBall(Vector const& pos, real radius)
     gleScale(radius);
     if ( DIM == 3 )
     {
-        assert_true(glIsEnabled(GL_CULL_FACE));
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         gleSphere2B();
         glCullFace(GL_BACK);
@@ -693,7 +693,6 @@ void Display2::drawCouplesA(CoupleSet const& set) const
 
 void Display2::drawCouplesB(CoupleSet const& set) const
 {
-#if ( 0 )
     // display bridging couples
     if ( prop->point_size > 0 )
     {
@@ -718,7 +717,6 @@ void Display2::drawCouplesB(CoupleSet const& set) const
         }
         glEnd();
     }
-#endif
     
     // display the link for bridging couples
     if ( prop->link_width > 0 )

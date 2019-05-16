@@ -34,6 +34,19 @@ void SpacePolygon::resize(Glossary& opt)
     std::string file;
     if ( opt.set(file, "file") )
         poly_.read(file);
+    else if ( opt.has_key("points") )
+    {
+        // specify vertices directly:
+        unsigned nbp = opt.nb_values("points");
+        poly_.allocate(nbp);
+        for ( unsigned p = 0; p < nbp; ++p )
+        {
+            Vector2 vec(0,0);
+            if ( ! opt.set(vec, "points", p) )
+                throw InvalidParameter("polygon:points must be a list of comma-separated points: X Y, X Y, X Y, etc.");
+            poly_.setPoint(p, vec.XX, vec.YY);
+        }
+    }
     else
     {
         int ord = 6;
@@ -42,7 +55,6 @@ void SpacePolygon::resize(Glossary& opt)
         opt.set(ord, "order");
         opt.set(ang, "angle");
         poly_.set(ord, rad, ang);
-        //poly_.print(stdout);
     }
     
     if ( poly_.surface() < 0 )

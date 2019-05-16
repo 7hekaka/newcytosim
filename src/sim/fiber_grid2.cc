@@ -26,7 +26,7 @@ unsigned FiberGrid::setGrid(Space const*, real)
 void FiberGrid::paintGrid(const Fiber * first, const Fiber * last)
 {
     allSegments.clear();
-    //we go through all the segments
+    // add all segments
     for ( const Fiber * f = first ; f != last ; f=f->next() )
     {
         for ( unsigned s = 0; s < f->nbSegments(); ++s )
@@ -38,7 +38,7 @@ void FiberGrid::createCells()
 {
 }
 
-unsigned FiberGrid::hasGrid() const
+size_t FiberGrid::hasGrid() const
 {
     return 1;
 }
@@ -53,7 +53,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     for ( FiberSegment const& seg : allSegments )
     {
 #if !TRICKY_HAND_ATTACHMENT
-        if ( RNG.test(ha.prop->binding_rate_dt) )
+        if ( RNG.test(ha.prop->binding_rate_prob) )
 #else
         if ( RNG.flip_8th() )
 #endif
@@ -82,10 +82,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 }
 
 
-/**
- This function is limited to the range given in paintGrid();
- */
-FiberGrid::SegmentList FiberGrid::nearbySegments( Vector const& place, const real D, Fiber * exclude )
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real D, Fiber * exclude) const
 {
     SegmentList res;
     
@@ -101,6 +98,28 @@ FiberGrid::SegmentList FiberGrid::nearbySegments( Vector const& place, const rea
         
         if ( dis < DD )
             res.push_back(seg);
+    }
+    
+    return res;
+}
+
+
+FiberSegment FiberGrid::closestSegment(Vector const& place) const
+{
+    FiberSegment res(nullptr, 0);
+    real hit = INFINITY;
+    
+    for ( FiberSegment const& seg : allSegments )
+    {
+        real dis = INFINITY;
+        // Compute the distance from the hand to the rod:
+        seg.projectPoint(place, dis);
+        
+        if ( dis < hit )
+        {
+            hit = dis;
+            res = seg;
+        }
     }
     
     return res;

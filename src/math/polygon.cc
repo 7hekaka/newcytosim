@@ -40,17 +40,17 @@ void Polygon::set(unsigned ord, real rad, real ang)
         pts_[i].xx = rad * cos(i*a+ang);
         pts_[i].yy = rad * sin(i*a+ang);
     }
-    pts_[ord].xx = pts_[0].xx;
-    pts_[ord].yy = pts_[0].yy;
+    pts_[ord] = pts_[0];
 }
 
 
-void Polygon::setPoint(unsigned i, real x, real y)
+void Polygon::setPoint(unsigned i, real x, real y, long c)
 {
     if ( pts_ && i < npts_ )
     {
         pts_[i].xx = x;
         pts_[i].yy = y;
+        pts_[i].info = c;
     }
 }
 
@@ -108,7 +108,7 @@ unsigned Polygon::read(std::istream& in, Point2D* pts, unsigned pts_size)
         {
             pts[i].xx = x;
             pts[i].yy = y;
-            pts[i].color = k;
+            pts[i].info = k;
         }
         ++i;
     }
@@ -154,8 +154,8 @@ void Polygon::write(std::ostream& os) const
     for ( unsigned i = 1; i < npts_; ++i )
     {
         os << std::setw(12) << pts_[i].xx << "  " << std::setw(12) << pts_[i].yy;
-        if ( pts_[i].color )
-            os << " " << pts_[i].color;
+        if ( pts_[i].info )
+            os << " " << pts_[i].info;
         std::endl(os);
     }
 }
@@ -300,8 +300,7 @@ int Polygon::complete(real epsilon)
     int res = 0;
     if ( npts_ > 1 )
     {
-        pts_[npts_].xx = pts_[0].xx;
-        pts_[npts_].yy = pts_[0].yy;
+        pts_[npts_] = pts_[0];
    
         unsigned i = 0, n = 0, p = 0;
         do {
@@ -315,8 +314,7 @@ int Polygon::complete(real epsilon)
                 d = sqrt( dx * dx + dy * dy );
             } while ( d < epsilon );
             //normalize the vector:
-            pts_[i].xx  = pts_[n].xx;
-            pts_[i].yy  = pts_[n].yy;
+            pts_[i]     = pts_[n];
             pts_[i].dx  = dx / d;
             pts_[i].dy  = dy / d;
             pts_[i].len = d;
@@ -334,8 +332,7 @@ finish:
         
         if ( npts_ > 1 )
         {
-            pts_[npts_].xx = pts_[0].xx;
-            pts_[npts_].yy = pts_[0].yy;
+            pts_[npts_] = pts_[0];
             pts_[npts_].dx = pts_[0].dx;
             pts_[npts_].dy = pts_[0].dy;
         }
@@ -509,7 +506,7 @@ void Polygon::dump(std::ostream& os) const
     os << "polygon " << npts_ << "\n";
     for ( unsigned n = 0; n <= npts_; ++n )
     {
-        os << " " << std::setw(10) << pts_[n].xx << " " << std::setw(10) << pts_[n].yy << " " << pts_[n].color;
+        os << " " << std::setw(10) << pts_[n].xx << " " << std::setw(10) << pts_[n].yy << " " << pts_[n].info;
         os << " " << std::setw(10) << pts_[n].dx << " " << std::setw(10) << pts_[n].dy << "\n";
     }
 }
@@ -520,7 +517,7 @@ void Polygon::print(FILE * f) const
     fprintf(f, "polygon %i\n", npts_);
     for ( unsigned n = 0; n <= npts_; ++n )
     {
-        fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].color);
+        fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].info);
         fprintf(f, "  %10.2f %10.2f\n", pts_[n].dx, pts_[n].dy);
     }
 }

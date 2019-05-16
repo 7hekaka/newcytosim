@@ -40,17 +40,17 @@ public:
     SpaceLid(SpaceProp const*);
     
     /// update geometry
-    void        resize(Glossary& opt);
+    void       resize(Glossary& opt);
     
     /// initialize Modulo Object
-    void       setModulo(Modulo&) const;
+    Modulo*    makeModulo() const;
 
     /// true if the Space is periodic in dimension ii
     bool       isPeriodic(int ii) const { return ( ii < DIM-1 ); }
     
-    /// maximum extension along each axis
-    Vector     extension()        const;
-    
+    /// return bounding box in `inf` and `sup`
+    void       boundaries(Vector& inf, Vector& sup) const;
+
     /// the volume inside
     real       volume()           const;
     
@@ -75,25 +75,25 @@ public:
 
     
     /// add interactions to a Meca
-    void        setInteractions(Meca &, FiberSet const&) const;
+    void       setInteractions(Meca &, FiberSet const&) const;
     
     /// one Monte-Carlo simulation step
-    void        step();
+    void       step();
     
     /// near the top edge
-    Vector      randomPlaceNearEdge(real radius, unsigned long) const;
+    Vector     randomPlaceNearEdge(real radius, unsigned long) const;
 
     /// OpenGL display function; returns true if successful
-    bool        draw() const;
+    bool       draw() const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void       write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void       setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void       read(Inputter&, Simul&, ObjectTag);
 
 };
 

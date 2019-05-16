@@ -137,14 +137,14 @@ bool Hand::attachmentAllowed(FiberSite & sit) const
     // check end-on binding:
     if ( sit.abscissaFromM() < 0 )
     {
-        if ( prop->bind_also_ends )
+        if ( prop->bind_also_end & MINUS_END )
             sit.relocateM();
         else
             return false;
     }
     else if ( sit.abscissaFromP() < 0 )
     {
-        if ( prop->bind_also_ends )
+        if ( prop->bind_also_end & PLUS_END )
             sit.relocateP();
         else
             return false;

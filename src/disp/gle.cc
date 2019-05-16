@@ -1313,7 +1313,7 @@ namespace gle
      */
     void gleDualPass(void primitive())
     {
-        assert_true(glIsEnabled(GL_CULL_FACE));
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         primitive();
         glCullFace(GL_BACK);

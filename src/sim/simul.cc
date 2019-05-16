@@ -69,7 +69,6 @@ fibers(*this), spheres(*this), beads(*this), solids(*this),
 singles(*this), couples(*this), organizers(*this), events(*this)
 {
     sReady        = false;
-    sSpace        = nullptr;
     precondCPU[0] = 0;
     precondCPU[1] = 0;
     precondCPU[2] = 0;
@@ -90,37 +89,6 @@ Simul::~Simul()
 
 //------------------------------------------------------------------------------
 #pragma mark -
-
-/**
- set current Space to `spc`. (spc==NULL is a valid argument).
-*/
-void Simul::changeSpace(Space const* spc)
-{
-    if ( spc != sSpace )
-    {
-        sSpace = spc;
-        
-#if ( 0 )
-        if ( spc )
-            std::clog << "Simul::changeSpace(" << spc->prop->name() << ")" << std::endl;
-        else
-            std::clog << "Simul::changeSpace(NULL)" << std::endl;
-#endif
-    }
-    
-    modulo = nullptr;
-
-    if ( sSpace )
-    {
-        assert_true(spc->prop);
-
-        sSpace->setModulo(sModulo);
-        
-        if ( sModulo.isPeriodic() )
-            modulo = &sModulo;
-    }
-}
-
 
 Space const* Simul::findSpace(std::string const& str) const
 {
@@ -187,7 +155,6 @@ void Simul::erase()
     properties.erase();
  
     prop->time = 0;
-    sSpace     = nullptr;
     modulo     = nullptr;
 }
 

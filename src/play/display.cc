@@ -85,11 +85,14 @@ void Display::display(Simul const& sim)
 
 #if ( DIM >= 3 )
     
+    glDisable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glDepthMask(GL_FALSE);
     
     if ( zObjects.size() )
         drawTransparentObjects(zObjects);
+    
+    glEnable(GL_CULL_FACE);
     drawTransparentSpaces(sim.spaces);
 
 #endif
@@ -500,7 +503,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
     
     lineWidth(disp->width);
 
-    assert_true(glIsEnabled(GL_CULL_FACE));
+    glEnable(GL_CULL_FACE);
     if ( disp->visible & 1 && disp->color.opaque() == opaque )
     {
         glCullFace(GL_BACK);

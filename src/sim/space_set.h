@@ -9,9 +9,18 @@ class Simul;
 ///a list of Space
 class SpaceSet : public ObjectSet
 {
+    /// the master space
+    static Space const* master_;
+
 public:
-    
-    /// creator
+
+    /// return master
+    static Space const* master() { return master_; }
+
+    /// change master
+    void setMaster(Space const* s);
+
+    /// constructor
     SpaceSet(Simul& s) : ObjectSet(s) {}
     
     //--------------------------

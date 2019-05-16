@@ -494,7 +494,7 @@ Any *hand* can bind with a rate `binding_rate` per seconds to every filament clo
 
 ### End-binding
 
-By default hands will bind only to the side of the filaments, but the capture region can be extended with the parameter `bind_also_ends`. 
+By default hands will bind only to the side of the filaments, but the capture region can be extended with the parameter `bind_also_end`. 
 
     set hand kinesin
     {

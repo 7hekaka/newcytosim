@@ -146,10 +146,9 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     {
         unsigned nbp = opt.nb_values("points");
         fib->setNbPoints(nbp);
-        
-        Vector vec(0,0,0);
         for ( unsigned p = 0; p < nbp; ++p )
         {
+            Vector vec(0,0,0);
             if ( ! opt.set(vec, "points", p) )
                 throw InvalidParameter("fiber:points must be a list of comma-separated vectors");
             fib->setPoint(p, vec);
@@ -166,10 +165,9 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             throw InvalidParameter("fiber:shape must be a list of comma-separated vectors");
 
         real* tmp = new_real(DIM*nbp);
-
-        Vector vec(0,0,0);
         for ( unsigned p = 0; p < nbp; ++p )
         {
+            Vector vec(0,0,0);
             if ( ! opt.set(vec, "shape", p) )
                 throw InvalidParameter("fiber:shape must be a list of comma-separated vectors");
             vec.store(tmp+DIM*p);

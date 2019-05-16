@@ -69,8 +69,9 @@ void Display3::drawSimul(Simul const& sim)
     }
     else
     {
-        /**  If the display is 'cut', we might see the inner sides,
-        but rendering will be approx. twice faster with Culling enabled
+        /**
+         If the display is 'cut', we might see the inner sides,
+         but rendering would be faster with Culling enabled
         */
         //glEnable(GL_CULL_FACE);
         //glCullFace(GL_BACK);
@@ -107,6 +108,7 @@ void Display3::drawSimul(Simul const& sim)
     }
 
     drawOrganizers(sim.organizers);
+    glDisable(GL_CULL_FACE);
     drawMisc(sim);
 }
 
@@ -116,7 +118,7 @@ void Display3::drawSimul(Simul const& sim)
 
 void Display3::drawBall(Vector const& pos, real radius) const
 {
-    assert_true(glIsEnabled(GL_CULL_FACE));
+    glEnable(GL_CULL_FACE);
     assert_true(glIsEnabled(GL_LIGHTING));
     glPushMatrix();
     gleTranslate(pos);

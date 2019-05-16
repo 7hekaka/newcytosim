@@ -183,7 +183,7 @@ Fiber::~Fiber()
 real Fiber::projectPoint(Vector const& w, real & dis) const
 {
     // initialize with the minus-end:
-    dis = w.distanceSqr(posP(0));
+    dis = distanceSqr(w, posP(0));
     real abs = 0, len = segmentation();
     
     // try all segments
@@ -196,7 +196,7 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
         if ( len < a )
         {
             // test exact point
-            real e = w.distanceSqr(posP(ii+1));
+            real e = distanceSqr(w, posP(ii+1));
             if ( e < dis ) {
                 abs = abscissaPoint(ii+1);
                 dis = e;

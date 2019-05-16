@@ -194,10 +194,10 @@ How much time is required until the motor distribute uniformly?
 
 Two parameters have a great influence on the outcome of the simulation:
 
-* `bind_also_end = 1` will allow the motors to bind directly to the end of the microtubules, and not only to the side.
+* `bind_also_end = both_ends` will allow the motors to bind directly to the end of the microtubules, and not only to the side.
 * with `hold_growing_end = 1`, motors reaching the end of a microtubule, by their movements, will stay there.
 
-Setting `bind_also_ends` extends the the capture region of the filaments: 
+Setting `bind_also_ends` extends  the capture region of the filaments: 
 
 ![bind_end](images/bind_also_end.png)
 
