@@ -224,29 +224,32 @@ real Space::estimateVolume(unsigned long cnt) const
 */
 Vector Space::bounce(Vector pos) const
 {
-    Vector p = project(pos);
-    // bounce once on the edge, and return if inside
+    Vector q, p = project(pos);
+    // bounce on edge
     pos = 2*p - pos;
     
-    if ( !inside(pos) )
-    {
-        // bounce on the edge, and return if inside
-        int cnt = 0;
-        do {
-            p = project(pos);
-            pos = 2*p - pos;
-            if ( inside(pos) )
-                return pos;
-        } while ( ++cnt < 8 );
+    if ( inside(pos) )
+        return pos;
 
-        static unsigned msg = 0;
-        if ( ++msg < 16 )
-            std::cerr << "Warning: "+prop->name()+":bounce failed: is any dimension small?\n";
-
-        // Place point on edge, as last resort:
-        return p;
-    }
-    return pos;
+    // bounce on the edge, and return if inside
+    int cnt = 0;
+    do {
+        p = project(pos);
+        pos = 2*p - pos;
+        q = project(pos);
+        pos = 2*q - pos;
+        if ( inside(pos) )
+            return pos;
+        else if ( distanceSqr(p, q) < REAL_EPSILON )
+            return p;
+    } while ( ++cnt < 8 );
+    
+    static unsigned msg = 0;
+    if ( ++msg < 16 )
+        std::cerr << "Warning: "+prop->name()+":bounce failed?\n";
+    
+    // Place point on edge, as last resort:
+    return p;
 }
 
 

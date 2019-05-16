@@ -113,7 +113,7 @@ PointDisp * nextPointDisp(PropertyList const& plist, int& cnt)
 }
 
 
-void changePointDispSize(PropertyList const& plist, DisplayProp& DP, int inc,
+void changePointDispSize(PropertyList const& plist, int inc,
                          bool dos, bool dow)
 {
     for ( Property * i : plist )
@@ -188,7 +188,7 @@ void shufflePointDispVisible(const PropertyList& plist)
 #pragma mark - Single Couple
 
 
-void changeSingleSelect(DisplayProp& DP)
+void changeSingleSelect()
 {
     unsigned int & select = DP.single_select;
     switch( select )
@@ -201,7 +201,7 @@ void changeSingleSelect(DisplayProp& DP)
 }
 
 
-void changeCoupleSelect(DisplayProp& DP)
+void changeCoupleSelect()
 {
     unsigned int & select = DP.couple_select;
     switch( select )
@@ -214,7 +214,7 @@ void changeCoupleSelect(DisplayProp& DP)
     }
 }
 
-void changeCoupleSelect2(DisplayProp& DP)
+void changeCoupleSelect2()
 {
     unsigned int & select = DP.couple_select;
     if ( select & 8 )
@@ -906,7 +906,7 @@ void processKey(unsigned char key)
                 flashText("meca_links = %i", DP.meca_links);
             }
             else
-                changeSingleSelect(DP);
+                changeSingleSelect();
             break;
             
         case '&':
@@ -915,17 +915,17 @@ void processKey(unsigned char key)
 
         case '7':
             if ( altKeyDown )
-                changeCoupleSelect2(DP);
+                changeCoupleSelect2();
             else
-                changeCoupleSelect(DP);
+                changeCoupleSelect();
             break;
             
         case '8':
-            changePointDispSize(player.allVisibleHandDisp(), DP, -1, !altKeyDown, !shiftKeyDown);
+            changePointDispSize(player.allVisibleHandDisp(), -1, !altKeyDown, !shiftKeyDown);
             break;
             
         case '9':
-            changePointDispSize(player.allVisibleHandDisp(), DP, +1, !altKeyDown, !shiftKeyDown);
+            changePointDispSize(player.allVisibleHandDisp(), +1, !altKeyDown, !shiftKeyDown);
             break;
 
         case '0':

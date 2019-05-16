@@ -1544,20 +1544,29 @@ void Meca::solve(SimulProp const* prop, const int precond)
     else if ( precond )
         computePreconditionner(precond);
 
+    //fprintf(stderr, "Solve precond %i size %6i\n", precond, dimension());
+
     // GMRES generally performs best:
     LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV);
 
+    //std::clog << "Solve size " << dimension() << "  precondition " << precond << "  " << residual << "\n";
+    //fprintf(stderr, "    GMRES     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+#if ( 0 )
+    // enable this to compare with another GMRES
+    monitor.reset();
+    zero_real(dimension(), vSOL);
+    LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV);
+    fprintf(stderr, "    GMRES-32  count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+#endif
 #if ( 0 )
     // enable this to compare BCGS and GMRES
-    std::clog << "Solve size " << dimension() << "  precondition " << precond << "  " << residual << "\n";
-    fprintf(stderr, "    GMRES count %4i residual %10.6f\n", monitor.count(), monitor.residual());
     monitor.reset();
     zero_real(dimension(), vSOL);
     if ( precond )
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
     else
         LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    BCGS  count %4i residual %10.6f\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    BCGS     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
@@ -1568,7 +1577,6 @@ void Meca::solve(SimulProp const* prop, const int precond)
 #endif
     
     //------- in case the solver did not converge, we try other methods:
-    //dump();
     
     if ( !monitor.converged() )
     {

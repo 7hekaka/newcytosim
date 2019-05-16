@@ -121,7 +121,7 @@ void Simul::step()
     singles.shuffle();
     spaces.shuffle();
     
-    //printf("Simul::shuffles %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+    //printf("Simul::shuffles %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
 
     // Monte-Carlo step for all objects
     events.step();
@@ -133,12 +133,12 @@ void Simul::step()
     solids.step();
     fibers.step();
     
-    //printf("     ::steps    %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+    //printf("     ::steps    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
 
     // distribute Fibers over a grid for binding of Hands:
     fiberGrid.paintGrid(fibers.first(), nullptr);
     
-    //printf("     ::paint    %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+    //printf("     ::paint    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
 
 #if ( 0 )
     

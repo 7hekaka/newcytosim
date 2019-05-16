@@ -324,11 +324,11 @@ void Simul::solve()
 {
     //auto rdtsc = __rdtsc();
     setInteractions(sMeca);
-    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
     sMeca.solve(prop, prop->precondition);
-    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>3); rdtsc = __rdtsc();
+    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
     sMeca.apply();
-    //printf("     ::apply    %16llu\n", (__rdtsc()-rdtsc)>>3);
+    //printf("     ::apply    %16llu\n", (__rdtsc()-rdtsc)>>5);
 }
 
 

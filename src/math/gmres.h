@@ -101,7 +101,7 @@ namespace LinearSolvers
 #if RIGHTSIDED_PRECONDITIONNER
             mat.precondition(sol, tt);              // tt = P*x
             mat.multiply(tt, ww);                   // ww = M*P*x
-            blas::xaxpy(dim, -1.0, rhs, 1, ww, 1); // ww = M*P*x - rhs
+            blas::xaxpy(dim, -1.0, rhs, 1, ww, 1);  // ww = ww - rhs = M*P*x - rhs
             // we get here the true residual, since P*x will be the solution:
             resid = blas::nrm2(dim, ww);
             if ( monitor.finished(resid) )
@@ -109,23 +109,24 @@ namespace LinearSolvers
             beta = resid;                           // beta = norm(ww)
 #else
             mat.multiply(sol, tt);                  // tt = M*x
-            blas::xaxpy(dim, -1.0, rhs, 1, tt, 1); // tt = M*x - rhs
+            blas::xaxpy(dim, -1.0, rhs, 1, tt, 1);  // tt = tt - rhs = M*x - rhs
             // we get here the absolute residual:
             resid = blas::nrm2(dim, tt);
             // check for convergence:
             if ( monitor.finished(resid) )
                 break;
-            mat.precondition(tt, ww);            // ww = P * ( M*x - rhs )
-            beta = blas::nrm2(dim, ww);         // beta = norm(ww)
+            mat.precondition(tt, ww);            // ww = P * tt = P * ( M*x - rhs )
+            beta = blas::nrm2(dim, ww);          // beta = norm(ww)
             ratio = resid / beta;                // ratio ~ x / Px
 #endif
-            blas::xscal(dim, -1.0/beta, ww, 1); // ww = -ww/beta
+            blas::xscal(dim, -1.0/beta, ww, 1);  // ww = -ww/beta
             blas::xcopy(dim, ww, 1, V.column(0), 1);
             zero_real(restart+1, ss);            // ss = 0
 
             ss[0] = beta;
             int it = -1;
             //fprintf(stderr, "   %4i residual %10.6f\n", monitor.count(), resid);
+            //auto rdtsc = __rdtsc();
 
             do {
                 ++it;
@@ -176,24 +177,29 @@ namespace LinearSolvers
                 
             } while ( it+1 < restart );
             
+            //auto rdtsc1 = __rdtsc()-rdtsc; rdtsc = __rdtsc();
+
             // solve upper triangular system in place
             for (int j = it; j >= 0; --j)
             {
                 ss[j] /= H(j,j);
-                // S(0:j) = S(0:j) - S[j] * H(0:j,j)
+                // S(0:j) = S(0:j) - ss[j] * H(0:j,j)
                 blas::xaxpy(j, -ss[j], H.column(j), 1, ss, 1);
                 //for (int k = 0; k < j; ++k)
                 //    ss[k] -= H(k,j) * ss[j];
             }
             
-            // update the solution `sol`
+            //auto rdtsc2 = __rdtsc()-rdtsc; rdtsc = __rdtsc();
+
+            // update the solution `sol`: can be parallelized
             for (int j = 0; j <= it; ++j)
             {
-                // sol = sol + s[j] * V(j)
+                // sol = sol + ss[j] * V(j)
                 blas::xaxpy(dim, ss[j], V.column(j), 1, sol, 1);
                 //for (int k = 0; k < dim; ++k)
                 //    sol[k] += V(k,j) * ss[j];
             }
+            //printf("    GMRES %12llu %12llu %12llu\n", rdtsc1>>5, rdtsc2>>5, (__rdtsc()-rdtsc)>>5);
         }
 #if RIGHTSIDED_PRECONDITIONNER
         // we have calculated the solution to M*P*sol = rhs, and we need P*sol:
@@ -210,7 +216,6 @@ namespace LinearSolvers
 #if ( 0 )
         fprintf(stderr, "GMRES count %4i residual %10.6f\n", monitor.count(), resid);
 #endif
-
         allocator.release();
     }
 }
