@@ -68,7 +68,7 @@ void ViewProp::read(Glossary& glos)
     glos.set(rotation,    "rotation");
     
     // normalize quaternion:
-    if ( rotation.norm() > 0.001 )
+    if ( rotation.normSqr() > 0.00001 )
         rotation.normalize();
     else
         rotation.set(1,0,0,0);

@@ -738,15 +738,14 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const*
             real ang = 0;
             is >> ang;
 #if ( DIM >= 3 )
-            Vector vec(0,0,1);
+            Vector dir(0,0,1);
             isp = is.tellg();
             tok = Tokenizer::get_symbol(is);
             if ( tok == "axis" )
-                is >> vec;
+                is >> dir;
             else
                 is.seekg(isp);
-            vec.normalize();
-            return Rotation::rotationAroundAxis(vec, cos(ang), sin(ang));
+            return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
             return Rotation::rotation(cos(ang), sin(ang));
 #endif
@@ -757,15 +756,14 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const*
             is >> ang;
             ang *= M_PI/180.0;
 #if ( DIM >= 3 )
-            Vector vec(0,0,1);
+            Vector dir(0,0,1);
             isp = is.tellg();
             tok = Tokenizer::get_symbol(is);
             if ( tok == "axis" )
-                is >> vec;
+                is >> dir;
             else
                 is.seekg(isp);
-            vec.normalize();
-            return Rotation::rotationAroundAxis(vec, cos(ang), sin(ang));
+            return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
             return Rotation::rotation(cos(ang), sin(ang));
 #endif

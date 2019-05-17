@@ -573,7 +573,8 @@ void test_swap7()
     print(permute4x64(s, 0x88), "permute4x64 0x88");
     print(permute4x64(s, 0xD8), "permute4x64 0xD8");
     print(permute4x64(s, 0xC9), "permute4x64 0xC9");
-    print(permute4x64(s, 0xD2), "permute4x64 0xD2");
+    print(permute4x64(s, 0xD2), "permute4x64 0xD2"); // Z X Y T
+    print(permute4x64(s, 0xC9), "permute4x64 0xC9"); // Y Z X T
 #endif
 }
 

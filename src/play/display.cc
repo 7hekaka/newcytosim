@@ -573,8 +573,7 @@ void Display::drawFields(FieldSet const& set)
     glGetFloatv(GL_MODELVIEW_MATRIX, mat);
     
     // extract axis corresponding to vertical direction:
-    Vector3 dir(mat[2], mat[6], mat[10]);
-    dir.normalize();
+    Vector3 dir = normalize(Vector3(mat[2], mat[6], mat[10]));
 #else
     Vector3 dir(0,0,1);
 #endif

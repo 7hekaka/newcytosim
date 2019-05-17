@@ -321,7 +321,7 @@ public:
     real         projectedForceEnd(FiberEnd end) const;
     
     /// average direction
-    Vector       avgDirection() const { return normalize( posEndP() - posEndM() ); }
+    Vector       avgDirection() const { return normalize(posEndP()-posEndM()); }
     
     //--------------------- Segmentation / discrete representation
     

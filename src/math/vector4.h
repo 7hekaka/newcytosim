@@ -328,11 +328,7 @@ public:
     void normalize()
     {
 #if VECTOR4_USES_AVX
-        vec4 m = mul4(vec, vec);
-        vec4 p = permute2f128(m, m, 0x01);
-        vec4 s = add4(m, p);
-        vec4 n = add4(s, permute4(s, 0b0101));
-        vec = div4(vec, sqrt4(n));
+        vec = normalize4(vec);
 #else
         real s = norm();
         XX /= s;
@@ -343,37 +339,41 @@ public:
     }
     
     /// scale to obtain norm `n`
-    void normalize(const real n = 1.0)
+    void normalize(const real n)
     {
+#if VECTOR4_USES_AVX
+        vec = normalize4(vec, n);
+#else
         real s = n / norm();
         XX *= s;
         YY *= s;
         ZZ *= s;
         TT *= s;
+#endif
     }
 
     /// returns the colinear vector of norm `n` (default 1.0)
     const Vector4 normalized(const real n = 1.0) const
     {
+#if VECTOR4_USES_AVX
+        return Vector4(normalize4(vec, n));
+#else
         real s = n / norm();
         return Vector4(s*XX, s*YY, s*ZZ, s*TT);
+#endif
     }
     
-    /// returns vector parallel to argument with unit one
+    /// returns vector parallel to argument of unit norm
     friend const Vector4 normalize(Vector4 const& V)
     {
 #if VECTOR4_USES_AVX
-        vec4 m = mul4(V.vec, V.vec);
-        vec4 p = permute2f128(m, m, 0x01);
-        vec4 s = add4(m, p);
-        vec4 n = add4(s, permute4(s, 0b0101));
-        return Vector4(div4(V.vec, sqrt4(n)));
+        return Vector4(normalize4(V.vec));
 #else
         const real s = V.norm();
         return Vector4(V.XX/s, V.YY/s, V.ZZ/s, V.TT/s);
 #endif
     }
-    
+
     //------------------------------------------------------------------
     
     /// linear interpolation, returning a + x * b
@@ -421,7 +421,11 @@ public:
     /// returns a vector with each element squared
     const Vector4 e_squared() const
     {
+#if VECTOR4_USES_AVX
+        return Vector4(mul4(vec, vec));
+#else
         return Vector4(XX*XX, YY*YY, ZZ*ZZ, TT*TT);
+#endif
     }
     
     /// returns sum of all coordinates

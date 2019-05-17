@@ -18,14 +18,19 @@
 /// Vector of 2 doubles
 typedef __m128d vec2;
 
-inline void print(vec2 v, char const* x)
+inline void print(vec2 v, char const* s)
 {
-    printf("vec2 %s ( %5.2f %5.2f )\n", x, v[1], v[0]);
+    printf("vec2 %s ( %5.2f %5.2f )\n", s, v[1], v[0]);
 }
 
-inline void print(__m128i v, char const* x)
+inline void print(vec2 v, vec2 w, char const* s)
 {
-    printf("veci %s ( %8lli %8lli %8lli %8lli )\n", x, v[3], v[2], v[1], v[0]);
+    printf("vec2 %s ( %5.2f %5.2f )( %5.2f %5.2f )\n", s, v[1], v[0], w[1], w[0]);
+}
+
+inline void print(__m128i v, char const* s)
+{
+    printf("veci %s ( %8lli %8lli %8lli %8lli )\n", s, v[3], v[2], v[1], v[0]);
 }
 
 inline vec2 load1(double const* a)           { return _mm_load_sd(a); }
@@ -79,12 +84,34 @@ inline vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 #define blendv2(a,b,c)    _mm_blendv_pd(a,b,c)
 #define cmp2(a,b,c)       _mm_cmp_pd(a,b,c)
 
+/// square of vector norm, broadcasted
+inline vec2 normsqr2(vec2 vec)
+{
+    vec2 p = mul2(vec, vec);
+    return add2(p, shuffle2(p, p, 0b01));
+}
+
+/// normalize vector
+inline vec2 normalize2(vec2 vec)
+{
+    vec2 p = mul2(vec, vec);
+    vec2 s = add2(p, shuffle2(p, p, 0b01));
+    return div2(vec, sqrt2(s));
+}
+
+/// normalize vector to 'n'
+inline vec2 normalize2(vec2 vec, double n)
+{
+    vec2 p = mul2(vec, vec);
+    vec2 s = add2(p, shuffle2(p, p, 0b01));
+    return mul2(vec, div2(set2(n), sqrt2(s)));
+}
 
 typedef __m128  vec4f;
 
-inline void print(vec4f v, char const* x)
+inline void print(vec4f v, char const* s)
 {
-    printf("vec4f %s ( %5.2f %5.2f %5.2f %5.2f )\n", x, v[3], v[2], v[1], v[0]);
+    printf("vec4f %s ( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
 inline vec4f load4f(float const* a)          { return _mm_load_ps(a); }
@@ -101,9 +128,15 @@ inline void store4f(float* a, vec4f b)       { return _mm_store_ps(a, b); }
 /// Vector of 4 doubles
 typedef __m256d vec4;
 
-inline void print(vec4 v, char const* x)
+inline void print(vec4 v, char const* s)
 {
-    printf("vec4 %s ( %5.2f %5.2f %5.2f %5.2f )\n", x, v[3], v[2], v[1], v[0]);
+    printf("vec4 %s ( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
+}
+
+inline void print(vec4 v, vec4 w, char const* s)
+{
+    printf("vec4 %s ( %5.2f %5.2f %5.2f %5.2f )( %5.2f %5.2f %5.2f %5.2f )\n",
+           s, v[3], v[2], v[1], v[0], w[3], w[2], w[1], w[0]);
 }
 
 #define set64x(a,b,c,d)     _mm256_setr_epi64x(a,b,c,d)
@@ -192,6 +225,32 @@ inline vec4 cat7(vec2 h, vec2 l)  { return _mm256_insertf128_pd(_mm256_castpd128
 #define blendv4(a,b,mask)   _mm256_blendv_pd(a,b,mask)
 #define cmp4(a,b,c)         _mm256_cmp_pd(a,b,c)
 
+/// square of vector norm, broadcasted
+inline vec4 normsqr4(vec4 vec)
+{
+    vec4 m = mul4(vec, vec);
+    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    return add4(s, permute4(s, 0b0101));
+}
+
+/// normalize vector
+inline vec4 normalize4(vec4 vec)
+{
+    vec4 m = mul4(vec, vec);
+    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    m = add4(s, permute4(s, 0b0101));
+    return div4(vec, sqrt4(m));
+}
+
+/// normalize vector to 'n'
+inline vec4 normalize4(vec4 vec, double n)
+{
+    vec4 m = mul4(vec, vec);
+    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    m = add4(s, permute4(s, 0b0101));
+    return mul4(vec, div4(set4(n), sqrt4(m)));
+}
+
 #endif
 
 //-------------------------- AVX Single Precision-------------------------------
@@ -245,6 +304,15 @@ inline vec8f cvt8i(__m256i a)           { return _mm256_cvtepi32_ps(a); }
 #define interleave4(a)      _mm256_permute4x64_pd(cast4(a), 0x50)
 
 inline vec4 broadcast1(vec2 a)  { return _mm256_broadcastsd_pd(a); }
+
+
+/// cross product of two 3D vectors ( X Y Z T )
+inline vec4 cross4(vec4 a, vec4 b)
+{
+    vec4 a1 = permute4x64(a, 0xC9); // Y Z X T
+    vec4 b1 = permute4x64(b, 0xC9); // Y Z X T
+    return permute4x64(sub4(mul4(a,b1), mul4(a1,b)), 0xC9);
+}
 
 #else
 

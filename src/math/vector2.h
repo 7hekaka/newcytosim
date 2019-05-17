@@ -327,9 +327,7 @@ public:
     void normalize()
     {
 #if VECTOR2_USES_SSE
-        vec2 m = mul2(vec, vec);
-        vec2 s = sqrt2(add2(m, shuffle2(m, m, 0b01)));
-        vec = div2(vec, s);
+        vec = normalize2(vec);
 #else
         real s = norm();
         XX /= s;
@@ -341,9 +339,7 @@ public:
     void normalize(const real n)
     {
 #if VECTOR2_USES_SSE
-        vec2 m = mul2(vec, vec);
-        vec2 s = sqrt2(add2(m, shuffle2(m, m, 0b01)));
-        vec = mul2(vec, div2(set2(n), s));
+        vec = normalize2(vec, n);
 #else
         real s = n / norm();
         XX *= s;
@@ -355,28 +351,24 @@ public:
     const Vector2 normalized(const real n = 1.0) const
     {
 #if VECTOR2_USES_SSE
-        vec2 m = mul2(vec, vec);
-        vec2 s = sqrt2(add2(m, shuffle2(m, m, 0b01)));
-        return Vector2(mul2(vec, div2(set2(n), s)));
+        return Vector2(normalize2(vec, n));
 #else
         real s = n / norm();
         return Vector2(s*XX, s*YY);
 #endif
     }
     
-    /// returns vector parallel to argument with unit one
+    /// returns vector parallel to argument of unit norm
     friend const Vector2 normalize(Vector2 const& V)
     {
 #if VECTOR2_USES_SSE
-        vec2 m = mul2(V.vec, V.vec);
-        vec2 n = add2(m, shuffle2(m, m, 0b01));
-        return Vector2(div2(V.vec, sqrt2(n)));
+        return Vector2(normalize2(V.vec));
 #else
         const real s = V.norm();
         return Vector2(V.XX/s, V.YY/s);
 #endif
     }
-    
+
     //------------------------------------------------------------------
     
     /// returns a perpendicular vector, of same norm
@@ -458,7 +450,11 @@ public:
     /// returns a vector with each element squared
     const Vector2 e_squared() const
     {
+#if VECTOR3_USES_AVX
+        return Vector2(mul2(vec, vec));
+#else
         return Vector2(XX*XX, YY*YY);
+#endif
     }
     
     /// returns sum of all coordinates

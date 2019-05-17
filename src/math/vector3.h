@@ -358,16 +358,12 @@ public:
     {
         return ( XX == 0.0 ) && ( YY == 0.0 ) && ( ZZ == 0.0 );
     }
-    
+
     /// scale to unit norm
     void normalize()
     {
 #if VECTOR3_USES_AVX
-        vec4 m = mul4(vec, vec);
-        vec4 p = permute2f128(m, m, 0x01);
-        vec4 s = add4(m, p);
-        vec4 n = add4(s, permute4(s, 0b0101));
-        vec = div4(vec, sqrt4(n));
+        vec = normalize4(vec);
 #else
         real s = norm();
         XX /= s;
@@ -375,16 +371,12 @@ public:
         ZZ /= s;
 #endif
     }
-    
+
     /// scale to obtain norm `n`
     void normalize(const real n)
     {
 #if VECTOR3_USES_AVX
-        vec4 m = mul4(vec, vec);
-        vec4 p = permute2f128(m, m, 0x01);
-        vec4 s = add4(m, p);
-        m = sqrt4(add4(s, permute4(s, 0b0101)));
-        vec = mul4(vec, div4(set4(n), m));
+        vec = normalize4(vec, n);
 #else
         real s = n / norm();
         XX *= s;
@@ -393,20 +385,28 @@ public:
 #endif
     }
 
+    /// returns vector parallel to argument of unit norm
+    friend const Vector3 normalize(Vector3 const& V)
+    {
+#if VECTOR3_USES_AVX
+        return Vector3(normalize4(V.vec));
+#else
+        const real s = V.norm();
+        return Vector3(V.XX/s, V.YY/s, V.ZZ/s);
+#endif
+    }
+
     /// returns the colinear vector of norm `n` (default 1.0)
     const Vector3 normalized(const real n = 1.0) const
     {
+#if VECTOR3_USES_AVX
+        return Vector3(normalize4(vec, n));
+#else
         real s = n / norm();
         return Vector3(s*XX, s*YY, s*ZZ);
+#endif
     }
-    
-    /// returns vector parallel to argument with unit one
-    friend const Vector3 normalize(Vector3 const& V)
-    {
-        const real s = V.norm();
-        return Vector3(V.XX/s, V.YY/s, V.ZZ/s);
-    }
-    
+
     //------------------------------------------------------------------
     
     /// returns a perpendicular vector, of comparable but unspecified norm
@@ -483,8 +483,9 @@ public:
      */
     void orthonormal(Vector3& ex, Vector3& ey) const
     {
-#ifndef NDEBUG
-        if ( normSqr() < 0.9 )
+        assert_true(fabs(normSqr() - 1.0) < 0.001);
+#if 0
+        if ( fabs(normSqr() - 1.0) > 0.01 )
         {
             // this should not happen...
             ex = orthogonal(1);
@@ -654,26 +655,19 @@ public:
         return Vector3(std::max(XX, v.XX), std::max(YY, v.YY), std::max(ZZ, v.ZZ));
     }
     
-#if VECTOR3_USES_AVX && defined __AVX2__
-    /// cross product of two vectors ( X Y Z 0 )
-    friend vec4 cross(vec4 a, vec4 b)
-    {
-        vec4 a1 = permute4x64(a, 0xC9); // Y Z X T
-        vec4 b2 = permute4x64(b, 0xD2); // Z X Y T
-        vec4 a2 = permute4x64(a, 0xD2); // Z X Y T
-        vec4 b1 = permute4x64(b, 0xC9); // Y Z X T
-        return sub4(mul4(a1,b2), mul4(a2,b1));
-    }
-#endif
 
     /// cross product of two vectors
     friend const Vector3 cross(Vector3 const& a, Vector3 const& b)
     {
+#if VECTOR3_USES_AVX && defined __AVX2__
+        return Vector3(cross4(a.vec, b.vec));
+#else
         return Vector3(a.YY * b.ZZ - a.ZZ * b.YY,
                        a.ZZ * b.XX - a.XX * b.ZZ,
                        a.XX * b.YY - a.YY * b.XX);
+#endif
     }
-    
+
     /// scalar product with another vector
     real dot(Vector3 const& b) const
     {
@@ -861,7 +855,6 @@ public:
     static const Vector3 randG(real n);
     
 };
-
 
 //-------------------------- associated global functions -----------------------
 

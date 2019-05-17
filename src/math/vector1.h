@@ -259,7 +259,7 @@ public:
         return Vector1(std::copysign(n, XX));
     }
     
-    /// returns vector parallel to argument with unit one
+    /// returns vector parallel to argument of unit norm
     friend const Vector1 normalize(Vector1 const& V)
     {
         return Vector1(std::copysign(1.0, V.XX));

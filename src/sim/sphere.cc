@@ -436,17 +436,15 @@ void Sphere::orthogonalizeRef(unsigned i)
     assert_true( nPoints >= nbRefPts );
     
     // reduce to the center of mass an normalize
-    Vector tmpX =   posP(ix) - cen;
-    Vector tmpY =   posP(iy) - cen;
+    Vector tmpX = posP(ix) - cen;
+    Vector tmpY = posP(iy) - cen;
     Vector tmpZ = normalize( posP(iz) - cen );
     
     // make tmpY orthogonal to tmpZ, and normalized
-    tmpY -= dot(tmpZ, tmpY) * tmpZ;
-    tmpY.normalize();
+    tmpY = normalize(tmpY - dot(tmpZ, tmpY) * tmpZ);
     
     // make tmpX orthogonal to tmpZ and tmpY
-    tmpX -= dot(tmpZ, tmpX) * tmpZ + dot(tmpY, tmpX) * tmpY;
-    tmpX.normalize();
+    tmpX = normalize(tmpX - dot(tmpZ, tmpX) * tmpZ - dot(tmpY, tmpX) * tmpY);
     
     // store corrected vectors back into the array
     ( cen + spRadius * tmpX ).store(pPos+DIM*ix);
