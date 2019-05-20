@@ -26,12 +26,25 @@ public:
     /// size of one step
     real   step_size;
     
+    ///
+    FiberLattice::cell_t footprint;
+    
+    /// specifies the position occupied within the Lattice site
+    /**
+     `site_pos` should be in [0, 1]:
+     - with `0.0`, the attachment position is at the start of the site
+     - with `1.0`, the attachment position is at the end of the site
+     - with `0.5`, the attachment is exactly midway
+     [default = 0.5]
+     */
+    real   site_pos;
+    
     /// @}
     
 public:
 
     /// constructor
-    DigitProp(const std::string& n) : HandProp(n)  { clear(); }
+    DigitProp(const std::string& n) : HandProp(n)  { footprint=0; clear(); }
     
     /// destructor
     ~DigitProp() { }

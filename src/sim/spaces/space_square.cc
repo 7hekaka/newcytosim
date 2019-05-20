@@ -365,7 +365,4 @@ bool SpaceSquare::draw() const
     return false;
 }
 
-
 #endif
-
-

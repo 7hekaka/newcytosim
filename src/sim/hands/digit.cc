@@ -10,20 +10,32 @@
 #include "simul.h"
 
 
+
 Digit::Digit(DigitProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
 }
 
-
 bool Digit::attachmentAllowed(FiberSite & sit) const
 {
     if ( Hand::attachmentAllowed(sit) )
     {
-        sit.engageLattice();
-        if ( ! sit.betweenMP() )
+#if FIBER_HAS_LATTICE
+        FiberLattice * lat = &sit.fiber()->lattice();
+        
+        if ( !lat->ready() )
+            throw InvalidParameter("fiber:lattice was not defined");
+        
+        // index to site containing given abscissa:
+        site_t s = lat->index(sit.abscissa());
+
+        if ( occupied(lat, s) )
             return false;
-        return sit.vacant();
+        
+        // adjust site:
+        sit.engageLattice(lat, s, lat->abscissa(s+prop->site_pos));
+#endif
+        return true;
     }
     return false;
 }
@@ -31,164 +43,38 @@ bool Digit::attachmentAllowed(FiberSite & sit) const
 
 void Digit::attach(FiberSite const& sit)
 {
-    assert_true(sit.vacant());
     Hand::attach(sit);
+    assert_true(vacant(site()));
     inc();
-
-    if ( lattice()->unit() != prop->step_size  )
-    {
-        /*
-         This is not necessarily a bug, but we would need to write additional code,
-         to be able to handle a step_size that would be a multiple of fiber:lattice_unit.
-         */
-        throw InvalidParameter("digit:step_size must be defined and equal to fiber:lattice_unit");
-    }
 }
 
 
 void Digit::detach()
 {
     dec();
-    assert_true(vacant());
+#ifndef NDEBUG
+    cell_t c = lattice()->data(site());
+    if ( c )
+        std::clog << *this << " detach site " << (int)c << "\n";
+#endif
     Hand::detach();
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
 
-/**
- This will attempt to relocate to site `npos`,
- without checking the intermediate sites.
-
-@retval 0 : the move was done
-@retval 1 : the move aborted, because the specified destination is occupied
- 
- */
-int Digit::jumpTo(const site_t npos)
-{
-    assert_true( npos != site() );
-    if ( vacant(npos) )
-    {
-        hop(npos);
-        return 0;
-    }
-    return 1;
-}
-
-
-int Digit::jumpToEndM()
-{
-    site_t s = lattice()->index(fiber()->abscissaM()) + 1;
-    return jumpTo(s);
-}
-
-
-int Digit::jumpToEndP()
-{
-    site_t s = lattice()->index(fiber()->abscissaP());
-    return jumpTo(s);
-}
-
-
-//------------------------------------------------------------------------------
-
-/**
- Try to jump `n` sites in the PLUS_END direction,
- without checking the intermediate positions.
-
- @retval 0 : the move was done
- @retval 1 : the move aborted, because the destination is occupied
- @retval 2 : the move aborted, because the destination is outside the Fiber
-*/
-int Digit::jumpP(const int s)
-{
-    assert_true( s > 0 );
-    assert_true( attached() );
-    
-    site_t npos = site() + s;
-
-    /*
-     If lattice is used, we could have a special value to indicate
-     ranges outside of the fibers.
-     This would be easier to check than the abscissaM() and abscissaP()
-     */
-    if ( lattice()->abscissa(npos) > fiber()->abscissaP() )
-        return 2;
-    
-    return jumpTo(npos);
-}
-
-/**
- Try to jump to `n` sites in the MINUS_END direction,
- without checking the intermediate positions.
-
- @retval 0 : the move was done
- @retval 1 : the move aborted, because the destination is occupied
- @retval 2 : the move aborted, because the destination is outside the Fiber
- */
-int Digit::jumpM(const int s)
-{
-    assert_true( s > 0 );
-    assert_true( attached() );
-
-    site_t npos = site() - s;
-    
-    /*
-     If lattice is used, we could have a special value to indicate 
-     ranges outside of the fibers.
-     This would be easier to check than the abscissaM() and abscissaP()
-     */
-    if ( lattice()->abscissa(npos+1) < fiber()->abscissaM() )
-        return 2;
-        
-    return jumpTo(npos);
-}
-
-//------------------------------------------------------------------------------
-
-/**
- Try to move to the adjacent site in the PLUS_END direction.
- 
- @retval 0 : the move was done
- @retval 1 : the move aborted, because the destination is occupied
- @retval 2 : the move aborted, because the destination is outside the Fiber
- */
-int Digit::stepP()
+void Digit::hop(site_t s)
 {
     assert_true( attached() );
-    site_t npos = site() + 1;
-    
-    /*
-     If lattice is used, we could have a special value to indicate
-     ranges outside of the fibers.
-     This would be easier to check than the abscissaM() and abscissaP()
-     */
-    if ( lattice()->abscissa(npos) >= fiber()->abscissaP() )
-        return 2;
-    
-    return jumpTo(npos);
-}
-
-/**
- Try to move to the adjacent site in the MINUS_END direction.
- 
- @retval 0 : the move was done
- @retval 1 : the move aborted, because the destination is occupied
- @retval 2 : the move aborted, because the destination is outside the Fiber
- */
-int Digit::stepM()
-{
-    assert_true( attached() );
-    site_t npos = site() - 1;
-    
-    /*
-     If lattice is used, we could have a special value to indicate
-     ranges outside of the fibers.
-     This would be easier to check than the abscissaM() and abscissaP()
-     */
-    if ( lattice()->abscissa(npos+1) <= fiber()->abscissaM() )
-        return 2;
-    
-    return jumpTo(npos);
+#if FIBER_HAS_LATTICE
+    dec();
+    fbSite = s;
+    inc();
+    fbAbs = lattice()->abscissa(s+prop->site_pos);
+#else
+    fbAbs = s * prop->step_size;
+#endif
+    update();
 }
 
 //------------------------------------------------------------------------------
@@ -196,102 +82,47 @@ int Digit::stepM()
 /**
  Try to move `n` sites in the PLUS_END direction,
  stopping if any intermediate position is already occupied.
- 
- @retval 0 : the specified number of steps was done
- @retval 1 : the move stopped at an occupied intermediate site
- @retval 2 : the end of the Fiber was reached
- 
- For 1 and 2, the Digit is relocated to the site just before the obstacle.
  */
-int Digit::crawlP(const int n)
+void Digit::crawlP(const int n)
 {
-    assert_true( n > 0 );
-    assert_true( attached() );
+    site_t s = site();
+    site_t e = s + n;
     
-    int res = 0, s = 0;
-    site_t npos = site();
-    
-    while ( s < n )
+    while ( s < e )
     {
-        ++npos;
-        
-        if ( ! vacant(npos) )
-        {
-            res = 1;
+        if ( vacant(s+1) )
+            ++s;
+        else
             break;
-        }
-        /*
-         We could define a special value of Lattice to indicate
-         ranges outside of the fibers.
-         */
-        if ( lattice()->abscissa(npos) > fiber()->abscissaP() )
-        {
-            res = 2;
-            break;
-        }
-        
-        ++s;
     }
-    
-    if ( s )
-    {
-        assert_true( vacant(site()+s) );
-        hop(site()+s);
-    }
-    return res;
+    if ( s != site() )
+        hop(s);
 }
 
 
 /**
  Try to move `n` sites in the MINUS_END direction,
  stopping if any intermediate position is already occupied.
- 
- @retval 0 : the specified number of steps was done
- @retval 1 : the move stopped at an occupied intermediate site
- @retval 2 : the end of the Fiber was reached
- 
- For 1 and 2, the Digit is relocated to the site just before the obstacle.
+
  */
-int Digit::crawlM(const int n)
+void Digit::crawlM(const int n)
 {
-    assert_true( n > 0 );
-    assert_true( attached() );
+    site_t s = site();
+    site_t e = s - n;
     
-    int res = 0, s = 0;
-    site_t npos = site();
-    
-    while ( s < n )
+    while ( s > e )
     {
-        --npos;
-        
-        if ( ! vacant(npos) )
-        {
-            res = 1;
+        if ( vacant(s-1) )
+            --s;
+        else
             break;
-        }
-        /*
-         We could define a special value of Lattice to indicate
-         ranges outside of the fibers.
-         */
-        if ( lattice()->abscissa(npos+1) < fiber()->abscissaM() )
-        {
-            res = 2;
-            break;
-        }
-        
-        ++s;
     }
-    
-    if ( s )
-    {
-        assert_true( vacant(site()-s) );
-        hop(site()-s);
-    }
-    return res;
+    if ( s != site() )
+        hop(s);
 }
 
 //------------------------------------------------------------------------------
-
+#pragma mark -
 
 /**
  The Digit normally does not move by itself
@@ -302,7 +133,8 @@ void Digit::handleDisassemblyM()
     
     if ( RNG.test(prop->hold_shrinking_end) )
     {
-        if ( jumpToEndM() )
+        jumpToEndM();
+        if ( site() <= lattice()->edgeM() )
             detach();
     }
     else
@@ -319,7 +151,8 @@ void Digit::handleDisassemblyP()
     
     if ( prop->hold_shrinking_end )
     {
-        if ( jumpToEndP() )
+        jumpToEndP();
+        if ( site() >= lattice()->edgeP() )
             detach();
     }
     else
@@ -327,14 +160,12 @@ void Digit::handleDisassemblyP()
 }
 
 
-//------------------------------------------------------------------------------
 /**
 tests detachment
  */
 void Digit::stepUnloaded()
 {
     assert_true( attached() );
-
     testDetachment();
 }
 
@@ -348,5 +179,29 @@ void Digit::stepLoaded(Vector const& force, real force_norm)
     assert_true( nextDetach >= 0 );
 
     testKramersDetachment(force_norm);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
+std::ostream& operator << (std::ostream& os, Digit const& obj)
+{
+    os << "digit(" << obj.fiber()->reference() << ", " << obj.abscissa();
+    os << ", " << obj.site() << ")";
+    return os;
+}
+
+
+void Fiber::resetLattice()
+{
+#if FIBER_HAS_LATTICE
+    frLattice.clear();
+    
+    for ( Hand * ha = handListFront; ha; ha = ha->next() )
+    {
+        if ( ha->lattice() == &frLattice )
+            static_cast<Digit*>(ha)->inc();
+    }
+#endif
 }
 

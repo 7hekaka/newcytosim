@@ -28,13 +28,16 @@ void Kinesin::stepUnloaded()
     while ( nextStep <= 0 )
     {
         assert_true( attached() );
-        if ( stepP() == 2 )
+        site_t s = site() + 1;
+        if ( edgy(s) )
         {
             nextStep = RNG.exponential();
             //immediately detach at the end of the Fiber:
             detach();
             return;
         }
+        if ( vacant(s) )
+            hop(s);
         nextStep += RNG.exponential();
     }
     
@@ -54,18 +57,21 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
     // calculate displacement, dependent on the load along the desired direction of displacement
     real rate_step = prop->stepping_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
-    nextStep   -= rate_step;
+    nextStep -= rate_step;
     
     while ( nextStep <= 0 )
     {
         assert_true( attached() );
-        if ( stepP() == 2 )
+        site_t s = site() + 1;
+        if ( edgy(s) )
         {
             nextStep = RNG.exponential();
             //immediately detach at the end of the Fiber:
             detach();
             return;
         }
+        if ( vacant(s) )
+            hop(s);
         nextStep += RNG.exponential();
     }
     

@@ -56,13 +56,13 @@ protected:
     
     /// propagate type
     typedef FiberLattice::cell_t cell_t;
-
+    
 #if FIBER_HAS_LATTICE
     /// pointer to the Lattice of the Fiber, or NULL if not in use
-    FiberLattice * fbLattice;
+    FiberLattice* fbLattice;
     
     /// index in the Fiber's Lattice
-    site_t         fbSite;
+    site_t        fbSite;
 #endif
 
 public:
@@ -80,66 +80,22 @@ public:
     /// make destructor non-virtual
     ~FiberSite() {}
     
-    //--------------------------------------------------------------------------
-#if FIBER_HAS_LATTICE > 0
-
-    /// bits used to signify occupation on the Lattice's site
-    cell_t        footprint() const { return 1; }
-
-    /// true if given Lattice's site is unoccupied (check footprint bits)
-    bool          vacant(site_t const& s) const { return 0 == ( fbLattice->data(s) & footprint() ); }
-    
-    /// flip footprint bits on current site
-    void          inc() const { fbLattice->data(fbSite) ^= footprint(); }
-    
-    /// flip footprint bits on current site
-    void          dec() const { fbLattice->data(fbSite) ^= footprint(); }
-    
-#elif FIBER_HAS_LATTICE < 0
-    
-    /// true if given Lattice's site is unoccupied
-    bool          vacant(site_t const& s) const { return ( fbLattice->data(s) == 0 ); }
-    
-    /// increment (occupy) Lattice's site
-    void          inc() const { ++fbLattice->data(fbSite); }
-    
-    /// decrement (release) Lattice's site
-    void          dec() const { --fbLattice->data(fbSite); }
-
-#endif
 #if FIBER_HAS_LATTICE
-
-    /// define Lattice position as a function of abscissa
-    void          engageLattice();
-
+    
     /// return Lattice if engaged
     FiberLattice* lattice() const { return fbLattice; }
     
     /// index of Lattice's site
     site_t        site()    const { return fbSite; }
     
-    /// true if current Lattice's site is unoccupied
-    bool          vacant()  const { return vacant(fbSite); }
-
-    /// value of current Lattice site
-    cell_t        cell()    const { return fbLattice->data(fbSite); }
-
-    /// transfer from current site to given one
-    void          hop(site_t);
+    /// set FiberLattice pointer at site `s` and abscissa `a`
+    void engageLattice(FiberLattice* l, site_t s, real a) { fbLattice=l; fbSite=s; fbAbs=a; }
 
 #else
     
-    void          engageLattice() {}
-    FiberLattice* lattice()        const { return nullptr; }
-    int           site()           const { return 0; }
-    bool          vacant()         const { return true; }
-    bool          vacant(site_t)   const { return true; }
-    void          inc()            const {}
-    void          dec()            const {}
-    void          hop(site_t)            {}
+    FiberLattice* lattice() const { return nullptr; }
 
 #endif
-
     //--------------------------------------------------------------------------
 
     /// return the interpolation

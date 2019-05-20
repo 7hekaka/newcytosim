@@ -8,6 +8,7 @@ set simul system
 {
     time_step = 0.005
     viscosity = 0.1
+    precondition = 0
     display = ( style=2; delay=4; label="Nedelec et al. 1998 -" )
 }
 
@@ -18,7 +19,7 @@ set space cell
 
 set fiber microtubule
 {
-    rigidity = 10
+    rigidity = 20
     segmentation = 0.5
     confine = inside, 100
     lattice = 1, 0.008
@@ -37,8 +38,8 @@ set hand kinesin
     unloaded_speed = 0.8
     stall_force = 5
 
-    bind_also_ends = 1
-    dangling_chance = 0.95
+    bind_also_end = 1
+    hold_growing_end = 0.95
 
     display = ( color=green; size=7; width=7; )
 }
@@ -56,7 +57,7 @@ new cell
     radius = 10
 }
 
-new 100 microtubule
+new 64 microtubule
 {
     length = 8
 }

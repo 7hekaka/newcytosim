@@ -43,7 +43,7 @@ set hand kinesin
     
     activity = walk
     step_size = 0.008
-    dangling_chance = 1
+    hold_growing_end = 1
     unloaded_speed = 0
     stall_force = 6
 }

@@ -28,11 +28,9 @@ void Picket::beforeDetachment(Hand const*)
 {
     assert_true( attached() );
 
-    if ( linked() )
-    {
-        SingleSet * set = static_cast<SingleSet*>(objset());
+    SingleSet * set = static_cast<SingleSet*>(objset());
+    if ( set )
         set->relinkD(this);
-    }
 }
 
 

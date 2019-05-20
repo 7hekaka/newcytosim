@@ -251,6 +251,12 @@ void HandProp::complete(Simul const& sim)
     if ( unbinding_rate < 0 )
         throw InvalidParameter(name()+":unbinding_rate must be positive");
     
+    if ( hold_growing_end < 0 )
+        throw InvalidParameter(name()+":hold_growing_end must be >= 0");
+    
+    if ( hold_shrinking_end < 0 )
+        throw InvalidParameter(name()+":hold_shrinking_end must be >= 0");
+
     if ( sim.ready() )
     {
         if ( binding_rate_dt_8 > sim.prop->acceptable_rate )

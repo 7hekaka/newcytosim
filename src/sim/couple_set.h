@@ -118,7 +118,7 @@ public:
     void         relinkA2(Couple *);
     /// reassign Couple to sublist following detachment of Hand 2
     void         relinkD2(Couple *);
-    
+
     /// reassign Couple to different sublist, given previous state
     void         relink(Object *, bool attached1, bool attached2);
 
@@ -195,7 +195,19 @@ public:
     
     /// cleanup at end of simulation period
     void         relax() { uniRelax(); }
-     
+    
+    /// modulo the position (periodic boundary conditions)
+    void         foldPosition(Modulo const*) const;
+
+    //--------------------------
+    
+    /// delete FF Couple
+    void         deleteAA(Couple *);
+    /// delete AF Couple
+    void         deleteAF(Couple *);
+    /// delete FA Couple
+    void         deleteFA(Couple *);
+
     /// mark object before import
     void         freeze(ObjectFlag f);
     
@@ -210,9 +222,6 @@ public:
     
     /// print a summary of the content (nb of objects, class)
     void         report(std::ostream&) const;
-
-    /// modulo the position (periodic boundary conditions)
-    void         foldPosition(Modulo const*) const;
     
     ///debug function
     int          bad() const;

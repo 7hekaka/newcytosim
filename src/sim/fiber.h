@@ -62,6 +62,9 @@ private:
     
     /// Disabled copy constructor
     Fiber(Fiber const&);
+    
+    /// disabled assignment operator
+    Fiber& operator =(const Fiber&);
 
     /// Stores the information needed to sever a Fiber
     class SeverPos
@@ -129,7 +132,7 @@ public:
     
     /// destructor
     virtual ~Fiber();
-    
+
     //--------------------------------------------------------------------------
     
     /// calculate viscous drag coefficient
@@ -155,10 +158,10 @@ public:
     void           planarCut(Vector const& n, real a, int stateP, int stateM);
     
     /// cut fiber at distance `abs` from the MINUS_END; returns section `[ abs - PLUS_END ]`
-    Fiber *        severM(real abs);
+    Fiber *        severP(real abs);
 
     /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
-    Fiber *        severNow(real abs) { return severM(abs-abscissaM()); }
+    Fiber *        severNow(real abs) { return severP(abs-abscissaM()); }
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
     void           sever(real a, int p, int m) { pendingCuts.insert(SeverPos(a, p, m)); }
@@ -265,6 +268,8 @@ public:
     
     /// const reference to Fiber's Lattice
     FiberLattice const&  lattice() const { return frLattice; }
+#else
+    real  unit_;
 #endif
 
     /// initialize lattice sites to represent a constant linear density
@@ -288,9 +293,6 @@ public:
     /// sever fiber proportionally to the quantity stored in the Lattice
     void           cutFiberLattice(FiberLattice&);
 
-    /// recalculate occupancy of all lattice sites from bound Hands
-    void           resetLattice(FiberLattice&) const;
-
     /// write Fiber's Lattice
     void           writeLattice(FiberLattice const&, Outputter& out) const;
     
@@ -299,6 +301,9 @@ public:
 
     /// print Lattice data (for debugging purpose)
     void           printLattice(std::ostream&, FiberLattice const&) const;
+    
+    /// recalculate occupancy lattice from bound Hands
+    void           resetLattice();
 
     //--------------------------------------------------------------------------
     

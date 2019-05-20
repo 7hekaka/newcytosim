@@ -49,7 +49,7 @@ set fiber dna
     growing_speed = 0.1,   0
     growing_force = inf, inf
  
-    display = ( speckles=7,1,1; lines=5, 2; minus_end=4, 8; )
+    display = ( speckles=7,1,1; lines=5, 2; minus_end=8; )
 }
 
 new 1 dna

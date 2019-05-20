@@ -110,7 +110,7 @@ repeat 100
     {
         nb_frames = 100
     }
-    report fiber:force *
-    report bead *
+    report fiber:force fiber.txt
+    report bead bead.txt
 }
 

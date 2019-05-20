@@ -39,7 +39,6 @@ set hand kinesin
     use_lattice = 1
     
     unbinding_chance = 0
-    dangling_chance = 0
     hold_growing_end = 1
     hold_shrinking_end = 0
 }

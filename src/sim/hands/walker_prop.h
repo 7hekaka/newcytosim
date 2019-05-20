@@ -41,17 +41,6 @@ public:
      Hence, this does not contributes to the detachment of a stalled motor.
      */
     real    unbinding_chance;
- 
-    /// probability to not unbind when attempting a step into the void (outside the fiber)
-    /**
-     The probability `dangling_chance` in `[0,1]` is tested if the Walker is at the last site
-     on the Fiber, and attempts to step further. The result will be detachment with a probability
-     `1 - dangling_chance`. This probability is per attempted step, the rate of which
-     depends on the stepping rate `( unloaded_speed / step_size )`.
-     
-     <em>default = 0</em>
-     */
-    real    dangling_chance;
     
     /// @}
     

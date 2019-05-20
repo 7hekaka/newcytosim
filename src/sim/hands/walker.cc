@@ -10,6 +10,8 @@
 Walker::Walker(WalkerProp const* p, HandMonitor* h)
 : Digit(p,h), nextStep(0), prop(p)
 {
+    // works if digit:step_size == lattice:step_size
+    stride = std::copysign(1, prop->unloaded_speed);
 }
 
 
@@ -17,24 +19,12 @@ void Walker::attach(FiberSite const& fb)
 {
     Digit::attach(fb);
     nextStep = RNG.exponential();
-}
-
-
-int  Walker::stepForward()
-{
-    if ( prop->unloaded_speed > 0 )
-        return Digit::stepP();
-    else
-        return Digit::stepM();
-}
-
-
-int  Walker::stepBackward()
-{
-    if ( prop->unloaded_speed > 0 )
-        return Digit::stepM();
-    else
-        return Digit::stepP();
+    
+#if ( 0 )
+    // this allows for step size being different from lattice site
+    unsigned n = std::round(prop->step_size/lattice()->unit());
+    stride = std::copysign(n, prop->unloaded_speed);
+#endif
 }
 
 
@@ -46,27 +36,31 @@ void Walker::stepUnloaded()
 {
     assert_true( attached() );
     
-    nextStep   -= prop->stepping_rate_dt;
+    nextStep -= prop->stepping_rate_dt;
     
     while ( nextStep <= 0 )
     {
-        assert_true( attached() );
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
         {
+            nextStep = RNG.exponential();
             detach();
             return;
         }
         
-        if ( stepForward() == 2 )
+        site_t s = site() + stride;
+        
+        if ( edgy(s) )
         {
-            // we have reached the tip of the fiber
-            if ( RNG.test_not(prop->dangling_chance) )
-            {
+            nextStep = RNG.exponential();
+            if ( RNG.test_not(prop->hold_growing_end) )
                 detach();
-                return;
-            }
+            return;
         }
+        
+        if ( vacant(s) )
+            hop(s);
+    
         nextStep += RNG.exponential();
     }
     
@@ -88,24 +82,29 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
 
     nextStep -= rate_step;
     
-    while ( nextStep <= 0  &&  attached() )
+    while ( nextStep <= 0 )
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
         {
+            nextStep = RNG.exponential();
             detach();
             return;
         }
-        
-        if ( stepForward() == 2 )
+
+        site_t s = site() + stride;
+
+        if ( edgy(s) )
         {
-            // we have reached the tip of the fiber
-            if ( RNG.test_not(prop->dangling_chance) )
-            {
+            nextStep = RNG.exponential();
+            if ( RNG.test_not(prop->hold_growing_end) )
                 detach();
-                return;
-            }
+            return;
         }
+
+        if ( vacant(s) )
+            hop(s);
+        
         nextStep += RNG.exponential();
     }
     

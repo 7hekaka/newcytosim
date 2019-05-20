@@ -8,6 +8,8 @@ set simul system
 {
     time_step = 0.01
     viscosity = 0.1
+    precondition = 0
+    binding_grid_step = 0.5
     display = ( style=2; delay=4; label="Nedelec et al. 1998 -" )
 }
 
@@ -35,7 +37,7 @@ set hand kinesin
     unloaded_speed = 0.8
     stall_force = 5
 
-    bind_also_ends = 1
+    bind_also_end = 1
     hold_growing_end = 1
 
     display = ( color=green; size=7; width=7; )

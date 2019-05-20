@@ -43,7 +43,6 @@ typedef unsigned ObjectSignature;
  */
 class Object : public Node, public Inventoried, public Movable
 {
-    
 private:
     
     /// integer used for custom tasks, which is recorded to file
@@ -70,6 +69,12 @@ public:
     
     /// constructor
     Object() : mark_(0), flag_(0), signature_(RNG.pint()), set_(nullptr) { }
+    
+    /// copy constructor
+    Object(Object const& o) : mark_(o.mark_), flag_(o.flag_), signature_(o.signature_), set_(nullptr) {}
+    
+    /// assignment operator
+    Object& operator =(const Object& o) { mark_=o.mark_; flag_=o.flag_; signature_=o.signature_; set_=nullptr; return *this; }
     
     /// destructor
     ~Object();
@@ -165,7 +170,7 @@ typedef Array<Object *> ObjectList;
 //typedef std::vector<Object *> ObjectList;
 
 
-/// printout for debugging purpose
+/// output operator
 std::ostream& operator << (std::ostream& os, ObjectList const&);
 
 

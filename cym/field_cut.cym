@@ -8,12 +8,12 @@ set simul system
 set space cell
 {
     shape = sphere
+    display = ( color = 0x99999944 )
 }
 
 new cell
 {
     radius = 6
-    display = ( color = 0x99999944 )
 }
 
 set field blue

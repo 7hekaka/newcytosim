@@ -339,12 +339,22 @@ void CoupleSet::link(Object * obj)
 }
 
 
+/**
+ This will also detach the Hands
+ */
 void CoupleSet::unlink(Object * obj)
 {
     assert_true( obj->objset() == this );
+
+    Couple * c = static_cast<Couple*>(obj);
+
+    if ( c->hand1()->attached() )
+        c->hand1()->detach();
+    
+    if ( c->hand2()->attached() )
+        c->hand2()->detach();
     
     obj->objset(nullptr);
-    Couple * c = static_cast<Couple*>(obj);
     sublist(c->attached1(), c->attached2()).pop(obj);
 }
 
@@ -387,6 +397,7 @@ void CoupleSet::erase()
     inventory.clear();
 }
 
+
 void CoupleSet::freeze(ObjectFlag f)
 {
     relax();
@@ -394,36 +405,66 @@ void CoupleSet::freeze(ObjectFlag f)
     ObjectSet::flag(faList, f);
     ObjectSet::flag(afList, f);
     ObjectSet::flag(ffList, f);
-    
-#if FIBER_HAS_LATTICE
-    /* This patch is necessary when reading from file, as the Lattice will be
-     read before the Hands are read, leading to out-of-sync information between
-     Hands positions and Lattice values */
-    for (Couple *s=firstAF(), *n; s; s=n)
-    {
-        n = s->next();
-        s->hand1()->detachDigit();
-    }
-    for (Couple *s=firstFA(), *n; s; s=n)
-    {
-        n = s->next();
-        s->hand2()->detachDigit();
-    }
-    for (Couple *s=firstAA(), *n; s; s=n)
-    {
-        n = s->next();
-        s->hand1()->detachDigit();
-        s->hand2()->detachDigit();
-    }
-#endif
+}
+
+
+void CoupleSet::deleteAA(Couple * c)
+{
+    c->hand1()->detachHand();
+    c->hand2()->detachHand();
+    inventory.unassign(c);
+    c->objset(nullptr);
+    aaList.pop(c);
+    delete(c);
+}
+
+
+void CoupleSet::deleteFA(Couple * c)
+{
+    c->hand2()->detachHand();
+    inventory.unassign(c);
+    c->objset(nullptr);
+    faList.pop(c);
+    delete(c);
+}
+
+
+void CoupleSet::deleteAF(Couple * c)
+{
+    c->hand1()->detachHand();
+    inventory.unassign(c);
+    c->objset(nullptr);
+    afList.pop(c);
+    delete(c);
 }
 
 
 void CoupleSet::prune(ObjectFlag f)
 {
-    ObjectSet::prune(aaList, f, 0);
-    ObjectSet::prune(faList, f, 0);
-    ObjectSet::prune(afList, f, 0);
+    /* After reading from file, the Hands should not
+     update any Fiber, Single or Couple as they will be deleted */
+    for (Couple* c=firstAF(), *n; c; c=n)
+    {
+        n = c->next();
+        if ( c->flag() == f )
+            deleteAF(c);
+    }
+    for (Couple* c=firstFA(), *n; c; c=n)
+    {
+        n = c->next();
+        if ( c->flag() == f )
+            deleteFA(c);
+    }
+    for (Couple* c=firstAA(), *n; c; c=n)
+    {
+        n = c->next();
+        if ( c->flag() == f )
+            deleteAA(c);
+    }
+
+    //ObjectSet::prune(aaList, f, 0);
+    //ObjectSet::prune(faList, f, 0);
+    //ObjectSet::prune(afList, f, 0);
     ObjectSet::prune(ffList, f, 0);
 }
 

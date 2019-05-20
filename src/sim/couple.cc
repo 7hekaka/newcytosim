@@ -34,14 +34,14 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
 
 Couple::~Couple()
 {
-    if ( linked() )
-        objset()->remove(this);
-
     if ( cHand1  &&  attached1() )
         cHand1->detach();
     
     if ( cHand2  &&  attached2() )
         cHand2->detach();
+    
+    if ( linked() )
+        objset()->remove(this);
     
     if ( cHand1 )
     {
@@ -299,10 +299,10 @@ bool Couple::allowAttachment(FiberSite const& sit)
 
 void Couple::afterAttachment(Hand const* h)
 {
-    if ( linked() )
+    // link into correct CoupleSet sublist:
+    CoupleSet * set = static_cast<CoupleSet*>(objset());
+    if ( set )
     {
-        // link into correct CoupleSet sublist:
-        CoupleSet * set = static_cast<CoupleSet*>(objset());
         if ( h == cHand1 )
             set->relinkA1(this);
         else
@@ -334,7 +334,7 @@ void Couple::beforeDetachment(Hand const* h)
     /*
      Set position near the attachment point, but offset in the perpendicular
      direction at a random distance within the range of attachment of the Hand
- 
+     
      This is necessary to achieve detailed balance, which in particular implies
      that rounds of binding/unbinding should not get the Couples closer to
      the Filaments to which they bind.
@@ -342,10 +342,10 @@ void Couple::beforeDetachment(Hand const* h)
     cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
 #endif
     
-    if ( linked() )
+    // link into correct CoupleSet sublist:
+    CoupleSet * set = static_cast<CoupleSet*>(objset());
+    if ( set )
     {
-        // link into correct CoupleSet sublist:
-        CoupleSet * set = static_cast<CoupleSet*>(objset());
         if ( h == cHand1 )
             set->relinkD1(this);
         else

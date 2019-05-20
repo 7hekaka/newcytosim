@@ -6,16 +6,6 @@
 #include "sim.h"
 
 
-/// specifies the position occupied within the Lattice site
-/**
- `SUBSITE_POS` should be in [0, 1]:
- - with `0.0`, the attachment position is at the start of the site
- - with `1.0`, the attachment position is at the end of the site
- - with `0.5`, the attachment is exactly midway
- */
-const real SUBSITE_POS = 0.5;
-
-
 FiberSite::FiberSite(Fiber* f, real a)
 : fbFiber(f), fbAbs(a)
 {
@@ -26,34 +16,6 @@ FiberSite::FiberSite(Fiber* f, real a)
 #endif
     inter = f->interpolate(a);
 }
-
-
-#if FIBER_HAS_LATTICE
-void FiberSite::engageLattice()
-{
-    assert_true( fbFiber );
-    fbLattice = &fbFiber->lattice();
-        
-    if ( !fbLattice->ready() )
-        throw InvalidParameter("Fiber:lattice was not initialized");
-    
-    // attach to site closest from given abscissa:
-    fbSite = fbLattice->index(fbAbs);
-    // adjust abscissa
-    fbAbs = fbLattice->abscissa(fbSite+SUBSITE_POS);
-}
-
-
-void FiberSite::hop(site_t s)
-{
-    dec();
-    fbSite = s;
-    inc();
-    fbAbs = fbLattice->abscissa(fbSite+SUBSITE_POS);
-    assert_true(fiber()->betweenMP(fbAbs));
-    update();
-}
-#endif
 
 
 void FiberSite::relocateM()
@@ -179,8 +141,9 @@ void FiberSite::read(Inputter& in, Simul& sim)
             fbLattice = &fbFiber->lattice();
             fbAbs = fbLattice->abscissa(fbSite);
 #else
-            in.readUInt32();
-            throw InvalidIO("Cannot import Digit without fiber's lattice");
+            site_t t = in.readUInt32();
+            fbAbs = t * fbFiber->unit_;
+            //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }
 #ifdef BACKWARD_COMPATIBILITY

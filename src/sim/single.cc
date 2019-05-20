@@ -28,12 +28,12 @@ Single::Single(SingleProp const* p, Vector const& w)
 
 Single::~Single()
 {
-    if ( linked() )
-        objset()->remove(this);
-
     if ( sHand  &&  sHand->attached() )
         sHand->detach();
 
+    if ( linked() )
+        objset()->remove(this);
+    
     if ( sHand )
     {
         delete(sHand);
@@ -49,12 +49,10 @@ Single::~Single()
 void Single::afterAttachment(Hand const*)
 {
     assert_true( attached() );
-    if ( linked() )
-    {
-        // link into correct SingleSet sublist:
-        SingleSet * set = static_cast<SingleSet*>(objset());
+    // link into correct SingleSet sublist:
+    SingleSet * set = static_cast<SingleSet*>(objset());
+    if ( set )
         set->relinkA(this);
-    }
 }
 
 
@@ -80,12 +78,10 @@ void Single::beforeDetachment(Hand const* h)
     sPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
 #endif
 
-    if ( linked() )
-    {
-        // link into correct SingleSet sublist:
-        SingleSet * set = static_cast<SingleSet*>(objset());
+    // link into correct SingleSet sublist:
+    SingleSet * set = static_cast<SingleSet*>(objset());
+    if ( set )
         set->relinkD(this);
-    }
 }
 
 real Single::interactionLength() const
@@ -207,5 +203,4 @@ void Single::read(Inputter & in, Simul& sim, ObjectTag tag)
         }
     }
 }
-
 

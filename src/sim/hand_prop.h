@@ -154,12 +154,12 @@ public:
     
     /// if false, the Hand will detach immediately upon reaching a growing or a static fiber end
     /**
-     A Hand may reach the tip of the fiber on which it is bound,
-     either by self-movement, or possibly dragged by some other force.
-     When this happens, `hold_growing_end` will determine if the Hand
-     will detach or not.
+     A Hand may reach the tip of the fiber on which it is bound, because it has
+     moved, and `hold_growing_end` will determine the probability of detachment
+     in this case. A value of 0 leads to immediate detachment.
+     With a value of 1, the hand will remain attached.
      
-     <em>default = false</em>
+     <em>default = 0</em>
      */
     real         hold_growing_end;
     

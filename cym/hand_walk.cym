@@ -67,7 +67,7 @@ set hand motor1
     unloaded_speed = 0.8
     stall_force = 5
     unbinding_chance = 0.01;
-    dangling_chance = 0
+    hold_growing_end = 0
 
     display = { size=10; color=orange; }
 }
@@ -80,15 +80,13 @@ set hand motor2
     unbinding_rate = 0.1
     unbinding_force = 300
     
-    hold_growing_end = 0
-
     activity = walk
     use_lattice = 1
     step_size = 0.01
     unloaded_speed = -0.8
     stall_force = 5
     unbinding_chance = 0.01;
-    dangling_chance = 1
+    hold_growing_end = 1
 
     display = { size=10; color=sky_blue }
 }

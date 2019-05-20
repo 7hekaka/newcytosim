@@ -92,6 +92,8 @@ public:
     /// reassign Single to different sublist following detachment of Hand
     void          relinkD(Single *);
     
+    /// delete an attached Single
+    void          deleteA(Single *);
     
     /// create Wrists anchored on given Mecable
     ObjectList    makeWrists(Mecable const*, unsigned, unsigned, std::string&);
@@ -142,15 +144,6 @@ public:
     /// mix order of elements
     void          shuffle();
 
-    /// mark object before import
-    void          freeze(ObjectFlag f);
-    
-    /// delete marked object after import
-    void          prune(ObjectFlag f);
-
-    /// unmark objects after import
-    void          thaw();
-    
     /// prepare for step()
     void          prepare(PropertyList const& properties);
     
@@ -160,15 +153,25 @@ public:
     /// cleanup at end of simulation period
     void          relax() { uniRelax(); }
     
+    /// modulo the position (periodic boundary conditions)
+    void          foldPosition(Modulo const*) const;
+
+    //--------------------------
     
+    /// mark object before import
+    void          freeze(ObjectFlag f);
+    
+    /// delete marked object after import
+    void          prune(ObjectFlag f);
+    
+    /// unmark objects after import
+    void          thaw();
+
     /// print a summary of the content (nb of objects, class)
     void          report(std::ostream&) const;
 
     /// write
     void          write(Outputter&) const;
-    
-    /// modulo the position (periodic boundary conditions)
-    void          foldPosition(Modulo const*) const;
     
     /// check internal consistency, returns 0 if everything is OK
     int           bad() const;

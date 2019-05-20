@@ -450,7 +450,7 @@ public:
     /// returns a vector with each element squared
     const Vector2 e_squared() const
     {
-#if VECTOR3_USES_AVX
+#if VECTOR2_USES_SSE
         return Vector2(mul2(vec, vec));
 #else
         return Vector2(XX*XX, YY*YY);

@@ -688,7 +688,7 @@ int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, unsign
     if ( !used )
         warn = "this parameter was ignored";
     else if ( !exhausted )
-        warn = "a value was unused (check for `used : 0` below)";
+        warn = "a value was unused:";
     if ( overused )
         warn = "some value might have been overused";
     

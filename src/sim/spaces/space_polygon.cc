@@ -31,7 +31,9 @@ SpacePolygon::~SpacePolygon()
  */
 void SpacePolygon::resize(Glossary& opt)
 {
+    int ord = 6;
     std::string file;
+    
     if ( opt.set(file, "file") )
         poly_.read(file);
     else if ( opt.has_key("points") )
@@ -47,15 +49,15 @@ void SpacePolygon::resize(Glossary& opt)
             poly_.setPoint(p, vec.XX, vec.YY);
         }
     }
-    else
+    else if ( opt.set(ord, "order") )
     {
-        int ord = 6;
         real rad = 1, ang = 0;
         opt.set(rad, "radius");
-        opt.set(ord, "order");
         opt.set(ang, "angle");
         poly_.set(ord, rad, ang);
     }
+    else
+        return;
     
     if ( poly_.surface() < 0 )
     {

@@ -26,8 +26,8 @@ void DyneinProp::read(Glossary& glos)
 {
     DigitProp::read(glos);
     
-    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "motor_force");
-    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "motor_speed");
+    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
+    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(unloaded_speed, "max_speed");
 #endif

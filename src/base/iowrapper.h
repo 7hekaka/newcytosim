@@ -142,6 +142,9 @@ public:
 
     /// constructor
     Outputter();
+    
+    /// constructor which opens a file
+    Outputter(FILE* f, bool b) : FileWrapper(f, nullptr), binary_(b) {};
 
     /// constructor which opens a file where `a` specifies append and `b` binary mode.
     Outputter(const char* name, bool a, bool b=false);

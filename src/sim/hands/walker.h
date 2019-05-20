@@ -33,24 +33,18 @@ class WalkerProp;
  because it can only make forward steps, wereas a stalled kinesin keeps moving
  back-and-forth over a few lattice sites.
  Thus one should be careful when using Walker to model Kinesin.
-
- @todo handle cases where digit::step_size = INT * fiber:lattice_size
 */
 class Walker : public Digit
 {
 private:
-    
+    /// number of steps for a forward move
+    int stride;
+
     /// disabled default constructor
     Walker();
     
     /// Gillespie countdown timer for stepping
     real   nextStep;
-    
-    /// attempts a step towards PLUS_END if (speed > 0), or towards the MINUS_END if ( speed < 0 )
-    int  stepForward();
-    
-    /// attempts a step towards MINUS_END if (speed > 0), or towards the PLUS_END if ( speed < 0 )
-    int  stepBackward();
 
 public:
     

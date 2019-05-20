@@ -146,7 +146,7 @@ void Field::diffuseX(real * field, real c)
 
     FieldGrid::index_t nx = mGrid.breadth(0);
     FieldGrid::index_t nyz = nbc / nx;
-    FieldGrid::index_t stride = mGrid.stride(1);
+    FieldGrid::index_t ide = mGrid.stride(1);
     
     real * a = new_real(nyz);
     real * b = new_real(nyz);
@@ -158,27 +158,27 @@ void Field::diffuseX(real * field, real c)
         real * h = field + x - 1;
         real * n = field + x;
         // b = n - h
-        blas::xcopy(nyz,  n, stride, b, 1);
-        blas::xaxpy(nyz, -1, h, stride, b, 1);
+        blas::xcopy(nyz,  n, ide, b, 1);
+        blas::xaxpy(nyz, -1, h, ide, b, 1);
         // a = a - b
         blas::xaxpy(nyz, -1, b, 1, a, 1);
         // h = h - c * a
-        blas::xaxpy(nyz, -c, a, 1, h, stride);
+        blas::xaxpy(nyz, -c, a, 1, h, ide);
         // swap a and b
         real * t = a;
         a = b;
         b = t;
     }
     real * h = field + nx - 1;
-    blas::xaxpy(nyz, -c, a, 1, h, stride);
+    blas::xaxpy(nyz, -c, a, 1, h, ide);
     
     if ( prop->periodic )
     {
         real * n = field;
-        blas::xcopy(nyz,  n, stride, b, 1);
-        blas::xaxpy(nyz, -1, h, stride, b, 1);
-        blas::xaxpy(nyz,  c, b, 1, h, stride);
-        blas::xaxpy(nyz, -c, b, 1, n, stride);
+        blas::xcopy(nyz,  n, ide, b, 1);
+        blas::xaxpy(nyz, -1, h, ide, b, 1);
+        blas::xaxpy(nyz,  c, b, 1, h, ide);
+        blas::xaxpy(nyz, -c, b, 1, n, ide);
     }
     
     free_real(a);

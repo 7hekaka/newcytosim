@@ -66,7 +66,7 @@ public:
 };
 
 /// output operator for debugging purpose
-std::ostream& operator << (std::ostream&, const Mecapoint &);
+std::ostream& operator << (std::ostream&, const Mecapoint&);
 
 
 #endif

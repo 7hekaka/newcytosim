@@ -1,12 +1,15 @@
 % F. Nedelec, July 2011
-% in Strasbourg, IBMC 10 Aug 2011
+% in IBMC Strasbourg, 10 Aug 2011
 
 set space cell
 {
-    geometry = ( square 80 45 )
+    shape = square
 }
 
 new cell
+{
+	length = 80, 45;
+}
 
 set simul system
 {

@@ -21,7 +21,6 @@ void WalkerProp::clear()
     stall_force       = 0;
     unloaded_speed    = 0;
     unbinding_chance  = 0;
-    dangling_chance   = 0;
 }
 
 
@@ -29,25 +28,17 @@ void WalkerProp::read(Glossary& glos)
 {
     DigitProp::read(glos);
     
-    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "motor_force");
-    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "motor_speed");
+    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
+    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
 #ifdef BACKWARD_COMPATIBILITY
-    glos.set(unloaded_speed,    "max_speed");
-    bool u = true;
-    if ( glos.set(u, "use_lattice") && !u )
-        throw InvalidParameter("option `use_lattice = false` is not supported");
+    glos.set(unloaded_speed,   "max_speed");
 #endif
-    glos.set(unbinding_chance,  "unbinding_chance");
+    glos.set(unbinding_chance, "unbinding_chance");
     //alternative syntax:
-    glos.set(unbinding_chance,  "unbinding", 2);
+    glos.set(unbinding_chance, "unbinding", 2);
     
-    glos.set(dangling_chance,   "dangling_chance");
-    
-    if ( dangling_chance > 0 )
-    {
-        Cytosim::warn << "defined walker:hold_growing_end=1, because walker:dangling_chance > 0" << std::endl;
-        hold_growing_end = true;
-    }
+    if ( glos.has_key("dangling_chance") )
+        Cytosim::warn << "please use `hold_growing_end` instead of `dangling_chance`\n";
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( glos.set(hold_growing_end,  "hold_fiber") )
@@ -68,9 +59,6 @@ void WalkerProp::complete(Simul const& sim)
 
     if ( unbinding_chance > 1 )
         throw InvalidParameter("walker:unbinding_chance must be <= 1");
-
-    if ( dangling_chance < 0 )
-        throw InvalidParameter("walker:dangling_chance must be >= 0");
     
     stepping_rate     = fabs(unloaded_speed) / step_size;
     stepping_rate_dt  = sim.prop->time_step * stepping_rate;
@@ -135,6 +123,5 @@ void WalkerProp::write_values(std::ostream& os) const
     write_value(os, "stall_force",      stall_force);
     write_value(os, "unloaded_speed",   unloaded_speed);
     write_value(os, "unbinding_chance", unbinding_chance);
-    write_value(os, "dangling_chance",  dangling_chance);
 }
 

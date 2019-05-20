@@ -507,6 +507,7 @@ inline void drawLink(Vector const& a, const Fiber * fibA, const PointDisp* dispA
 
 inline void drawVertex(Vector const& pos, const Fiber * fib, const PointDisp* disp)
 {
+    assert_true(fib->disp);
     if ( disp->perceptible && fib->disp->visible )
     {
         disp->color.load();
@@ -707,13 +708,9 @@ void Display2::drawCouplesB(CoupleSet const& set) const
             // only display if bridging two parallel filaments
             if ( prop->couple_select & 16 && cx->cosAngle() < 0 )
                 continue;
-            
+#endif
             drawVertex(cx->posHand1(), cx->fiber1(), cx->disp1());
             drawVertex(cx->posHand2(), cx->fiber2(), cx->disp2());
-#else
-         cx->disp1()->color.load();  gleVertex(cx->posHand1());
-         cx->disp2()->color.load();  gleVertex(cx->posHand2());
-#endif
         }
         glEnd();
     }

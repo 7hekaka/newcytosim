@@ -4,7 +4,7 @@
 #define DIGIT_H
 
 #include "hand.h"
-class DigitProp;
+#include "digit_prop.h"
 
 
 /// A Hand that bind to discrete sites along a Fiber
@@ -38,6 +38,52 @@ public:
     /// destructor
     ~Digit() {}
     
+    //--------------------------------------------------------------------------
+
+#if FIBER_HAS_LATTICE > 0
+    
+    /// true if given Lattice's site is occupied
+    bool          edgy(site_t const& s) const { return fbLattice->data(s) == FiberLattice::EDGE; }
+
+    /// true if given Lattice's site is occupied
+    bool          occupied(FiberLattice* lat, site_t const& s) const { return lat->data(s) & prop->footprint; }
+
+    /// true if given Lattice's site is unoccupied (check footprint bits)
+    bool          vacant(site_t const& s) const { return 0 == (fbLattice->data(s) & prop->footprint); }
+
+    /// flip footprint bits on current site
+    void          inc() { fbLattice->data(fbSite) ^= prop->footprint; }
+
+    /// flip footprint bits on current site
+    void          dec() { fbLattice->data(fbSite) ^= prop->footprint; }
+    
+#elif FIBER_HAS_LATTICE < 0
+    
+    /// true if given Lattice's site is occupied
+    bool          edgy(site_t const& s) const { return ( s <= fbLattice->edgeM() || s >= fbLattice->edgeP() ); }
+
+    /// true if given Lattice's site is occupied
+    bool          occupied(FiberLattice* lat, site_t const& s) const { return lat->data(s) != 0.0; }
+
+    /// true if given Lattice's site is unoccupied
+    bool          vacant(site_t const& s) const { return fbLattice->data(s) == 0.0; }
+
+    /// add 1.0 to Lattice's site
+    void          inc() { fbLattice->data(fbSite) += 1.0; }
+
+    /// subtract 1.0 to Lattice's site
+    void          dec() { fbLattice->data(fbSite) -= 1.0; }
+    
+#else
+
+    site_t        site() const { return std::round(fbAbs/prop->step_size); }
+    bool          edgy(site_t) const { return false; }
+    bool          vacant(site_t) const { return true; }
+    void          inc() {}
+    void          dec() {}
+    
+#endif
+    
     /// check if attachement is possible according to properties
     bool   attachmentAllowed(FiberSite& site) const;
 
@@ -48,35 +94,38 @@ public:
     void   detach();
 
     
-    /// relocate without checking intermediate sites
-    int    jumpTo(site_t npos);
+    /// transfer to given site
+    void   hop(site_t);
+
+    /// transfer to given site if it is vacant
+    void   jumpTo(site_t p) { if ( vacant(p) ) hop(p); }
     
     /// relocate without checking intermediate sites
-    int    jumpToEndM();
-    
+    void   jumpToEndM() { jumpTo(lattice()->edgeM() + 1); }
+
     /// relocate without checking intermediate sites
-    int    jumpToEndP();
+    void   jumpToEndP() { jumpTo(lattice()->edgeP() - 1); }
 
     
     /// attempt one step towards the PLUS_END
-    int    stepP();
+    void   stepP()      { jumpTo(site()+1); }
     
     /// attempt one step towards the MINUS_END
-    int    stepM();
+    void   stepM()      { jumpTo(site()-1); }
 
     
     /// attempt one step of size `s` towards the PLUS_END
-    int    jumpP(int s);
+    void   jumpP(int s) { jumpTo(site()+s); }
     
     /// attempt one step of size `s` towards the MINUS_END
-    int    jumpM(int s);
+    void   jumpM(int s) { jumpTo(site()-s); }
 
     
     /// attempt `n` steps towards the PLUS_END, checking all intermediate sites
-    int    crawlP(int n);
+    void   crawlP(int n);
     
     /// attempt `n` steps towards the MINUS_END, checking all intermediate sites
-    int    crawlM(int n);
+    void   crawlM(int n);
 
     
     /// simulate when `this` is attached but not under load
@@ -93,6 +142,9 @@ public:
     void   handleDisassemblyP();
     
 };
+
+/// output operator
+std::ostream& operator << (std::ostream&, Digit const&);
 
 #endif
 

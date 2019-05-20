@@ -180,7 +180,7 @@ public:
 };
 
 /// printing operator
-std::ostream& operator << (std::ostream&, const Property &);
+std::ostream& operator << (std::ostream&, const Property&);
 
 
 #endif

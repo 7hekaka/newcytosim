@@ -1770,17 +1770,10 @@ Interpolation Filament::interpolateCenter() const
  */
 Interpolation Filament::interpolateM(const real ab) const
 {
-    if ( ab <= 0 )
-        return Interpolation(this, 0, 1, 0.0);
-    
-    real a = ab / fnCut;
-    unsigned s = (unsigned)a;
-    
+    real a = std::max(ab, 0.0) / fnCut;
     //beyond the last point, we interpolate the PLUS_END
-    if ( s+1 < nPoints )
-        return Interpolation(this, s, s+1, a-s);
-    else
-        return Interpolation(this, nPoints-2, nPoints-1, 1.0);
+    unsigned s = std::min((unsigned)a, nPoints-2);
+    return Interpolation(this, s, s+1, std::min(a-s, 1.0));
 }
 
 

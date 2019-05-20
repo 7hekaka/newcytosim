@@ -23,19 +23,19 @@ namespace LinearSolvers
 {
     
     /// Conjugate Gradient
-    void CG(const LinearOperator&, const real* rhs, real* sol, Monitor &, Allocator &);
+    void CG(const LinearOperator&, const real* rhs, real* sol, Monitor&, Allocator&);
     
     /// Conjugate Gradient, with Preconditionning
-    void CGP(const LinearOperator&, const real* rhs, real* sol, Monitor &, Allocator &);
+    void CGP(const LinearOperator&, const real* rhs, real* sol, Monitor&, Allocator&);
     
     /// Bi-Conjugate Gradient
-    void BCG(const LinearOperator&, const real* rhs, real* sol, Monitor &, Allocator &);
+    void BCG(const LinearOperator&, const real* rhs, real* sol, Monitor&, Allocator&);
     
     /// Bi-Conjugate Gradient Stabilized
-    void BCGS(const LinearOperator&, const real* rhs, real* sol, Monitor &, Allocator &);
+    void BCGS(const LinearOperator&, const real* rhs, real* sol, Monitor&, Allocator&);
     
     /// Bi-Conjugate Gradient Stabilized with Preconditionning
-    void BCGSP(const LinearOperator&, const real* rhs, real* sol, Monitor &, Allocator &);
+    void BCGSP(const LinearOperator&, const real* rhs, real* sol, Monitor&, Allocator&);
         
 };
 

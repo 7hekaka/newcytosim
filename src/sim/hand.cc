@@ -62,11 +62,7 @@ void Hand::relocate(Fiber* f)
         fbFiber = f;
 #if FIBER_HAS_LATTICE
         if ( fbLattice )
-        {
-            dec();
-            engageLattice();
-            inc();
-        }
+            fbLattice = &f->lattice();
 #endif
     }
     f->addHand(this);
@@ -85,11 +81,7 @@ void Hand::relocate(Fiber* f, const real a)
             fbFiber = f;
 #if FIBER_HAS_LATTICE
             if ( fbLattice )
-            {
-                dec();
-                engageLattice();
-                inc();
-            }
+                fbLattice = &f->lattice();
 #endif
         }
         f->addHand(this);
@@ -235,8 +227,22 @@ void Hand::detach()
     haMonitor->beforeDetachment(this);
     fbFiber->removeHand(this);
     fbFiber = nullptr;
+#if FIBER_HAS_LATTICE
+    fbLattice = nullptr;
+#endif
 #if TRICKY_HAND_ATTACHMENT
     nextAttach = RNG.exponential();
+#endif
+}
+
+
+void Hand::detachHand()
+{
+    assert_true( attached() );
+    fbFiber->removeHand(this);
+    fbFiber = nullptr;
+#if FIBER_HAS_LATTICE
+    fbLattice = nullptr;
 #endif
 }
 
@@ -362,8 +368,8 @@ void Hand::read(Inputter & in, Simul& sim)
     Fiber * fib = fbFiber;
     FiberSite::read(in, sim);
     resetTimers();
-        
-    // link or relink as needed:
+    
+    // update fiber's lists:
     if ( fib != fbFiber )
     {
         if ( fib )
@@ -371,4 +377,10 @@ void Hand::read(Inputter & in, Simul& sim)
         if ( fbFiber )
             fbFiber->addHand(this);
     }
+}
+
+std::ostream& operator << (std::ostream& os, Hand const& obj)
+{
+    os << "hand(" << obj.fiber()->reference() << ", " << obj.abscissa() << ")";
+    return os;
 }

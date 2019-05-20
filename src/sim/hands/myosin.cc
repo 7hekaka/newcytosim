@@ -26,18 +26,21 @@ void Myosin::stepUnloaded()
     if ( testDetachment() )
         return;
     
-    nextStep   -= prop->stepping_rate_dt;
+    nextStep -= prop->stepping_rate_dt;
     
     while ( nextStep <= 0 )
     {
         assert_true( attached() );
-        if ( stepP() == 2 )
+        site_t s = site() + 1;
+        if ( edgy(s) )
         {
             nextStep = RNG.exponential();
             //immediately detach at the end of the Fiber:
             detach();
             return;
         }
+        if ( vacant(s) )
+            hop(s);
         nextStep += RNG.exponential();
     }
 }
@@ -60,13 +63,16 @@ void Myosin::stepLoaded(Vector const& force, real force_norm)
     while ( nextStep <= 0 )
     {
         assert_true( attached() );
-        if ( stepP() == 2 )
+        site_t s = site() + 1;
+        if ( edgy(s) )
         {
             nextStep = RNG.exponential();
             //immediately detach at the end of the Fiber:
             detach();
             return;
         }
+        if ( vacant(s) )
+            hop(s);
         nextStep += RNG.exponential();
     }
     

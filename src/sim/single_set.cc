@@ -198,14 +198,21 @@ void SingleSet::link(Object * obj)
         fList.push_front(obj);
 }
 
-
+/**
+ This will also detach the Hand
+ */
 void SingleSet::unlink(Object * obj)
 {
     assert_true( obj->objset() == this );
     
+    Single * s = static_cast<Single*>(obj);
+  
+    if ( s->attached() )
+        s->detach();
+    
     obj->objset(nullptr);
 
-    if ( static_cast<Single*>(obj)->attached() )
+    if ( s->attached() )
         aList.pop(obj);
     else
         fList.pop(obj);
@@ -241,23 +248,31 @@ void SingleSet::freeze(ObjectFlag f)
     relax();
     ObjectSet::flag(aList, f);
     ObjectSet::flag(fList, f);
-    
-#if FIBER_HAS_LATTICE
-    /* This patch is necessary when reading from file, as the Lattice will be
-     read before the Hands are read, leading to out-of-sync information between
-     Hands positions and Lattice values */
-    for (Single *s=firstA(), *n; s; s=n)
-    {
-        n = s->next();
-        s->hand()->detachDigit();
-    }
-#endif
+}
+
+
+void SingleSet::deleteA(Single * s)
+{
+    s->hand()->detachHand();
+    inventory.unassign(s);
+    s->objset(nullptr);
+    aList.pop(s);
+    delete(s);
 }
 
 
 void SingleSet::prune(ObjectFlag f)
 {
-    ObjectSet::prune(aList, f, 0);
+    /* After reading from file, the Hands should not
+     update any Fiber, Single or Couple as they will be deleted */
+    for (Single* s=firstA(), *n; s; s=n)
+    {
+        n = s->next();
+        if ( s->flag() == f )
+            deleteA(s);
+    }
+
+    //ObjectSet::prune(aList, f, 0);
     ObjectSet::prune(fList, f, 0);
 }
 
@@ -542,7 +557,6 @@ void SingleSet::uniAttach(FiberSet const& fibers)
         if ( p->fast_diffusion )
         {
             unlink(obj);
-            assert_true(!obj->attached());
             assert_true((size_t)p->number() < uniLists.size());
             uniLists[p->number()].push_back(obj);
         }

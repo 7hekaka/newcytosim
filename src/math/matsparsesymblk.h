@@ -80,7 +80,7 @@ private:
         Column() { size_ = 0; allo_ = 0; inx_ = nullptr; blk_ = nullptr; }
         
         /// the assignment operator will transfer memory
-        void operator =(Column &);
+        void operator =(Column&);
         
         /// destructor
         ~Column() { deallocate(); }

@@ -133,13 +133,11 @@ public:
     /// attach at the given end of Fiber (this calls attach(FiberSite))
     void           attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
 
+    /// detach, without updating Monitor
+    void           detachHand();
+    
     /// detach
     virtual void   detach();
-
-#if FIBER_HAS_LATTICE
-    /// detach only if of Digit class
-    void   detachDigit() { if ( fbLattice ) detach(); }
-#endif
 
     /// simulate when the Hand is not attached
     virtual void   stepUnattached(FiberGrid const&, Vector const& pos);
@@ -221,6 +219,9 @@ protected:
         return false;
     }
 };
+
+/// output operator
+std::ostream& operator << (std::ostream&, Hand const&);
 
 #endif
 

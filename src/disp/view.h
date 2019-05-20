@@ -166,7 +166,7 @@ public:
     //---------------------------------------------------------------------------
     
     /// set rotation to given Quaternion
-    void       rotate_to(const Quaternion<real> &);
+    void       rotate_to(const Quaternion<real>&);
     
     /// rotate to have `dir` aligned with the X-axis
     void       align_with(const Vector3& dir);

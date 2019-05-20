@@ -18,8 +18,6 @@ new cell
     radius = 0.125
 }
 
-new cell
-
 set fiber actin
 {
     rigidity = 0.05

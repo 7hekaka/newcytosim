@@ -44,6 +44,9 @@ public:
     /// type stored in each Lattice cell
     typedef CELL cell_t;
     
+    /// indicates the edges of the Lattice
+    static constexpr cell_t EDGE = ~0;
+    
 private:
     
     /// lowest valid index (can be negative or positive)
@@ -61,20 +64,54 @@ private:
     /// Array of sites, of valid range [laInf, laSup[
     cell_t *   laSite;
     
+    /// index of edges
+    site_t     laEdgeM, laEdgeP;
+    
     //------------------------------------------------------------------------------
     #pragma mark - Allocation
     
+    /// allocate for indices within [inf, sup[, and copy values from `src`
+    void allocate_copy(site_t inf, site_t sup, cell_t src[], site_t src_inf, site_t src_sup)
+    {
+        //std::clog << this << " Lattice::allocate [" << inf << ", " << sup << "[\n";
+        assert_true( inf <= sup );
+        
+        cell_t * ptr = new cell_t[sup-inf];
+        cell_t * mem = ptr - inf;
+        
+        // reset new array:
+        for ( site_t s = inf; s < sup; ++s )
+            mem[s] = 0;
+
+        // transfer `src` data from given range
+        if ( src )
+        {
+            for ( site_t s = src_inf; s < src_sup; ++s )
+            {
+                assert_true( inf <= s );
+                assert_true( s < sup );
+                mem[s] = src[s];
+            }
+        }
+        
+        if ( laSite0 )
+            delete[] laSite0;
+
+        laInf = inf;
+        laSup = sup;
+        laSite0 = ptr;
+        laSite  = mem;
+    }
+    
+    
     /// allocate sites for indices within [inf, sup[, conserving existing indices
-    site_t allocateLattice(site_t inf, site_t sup, site_t margin)
+    void allocate(site_t inf, site_t sup, site_t margin)
     {
         assert_true( inf <= sup );
         
-        if ( laSite )
-        {
-            // return if existing boundaries are sufficient
-            if ( laInf <= inf  &&  sup <= laSup )
-                return 0;
-        }
+        // return if existing boundaries are sufficient
+        if ( laSite  &&  laInf <= inf  &&  sup <= laSup )
+            return;
         
         inf -= margin;
         sup += margin;
@@ -84,42 +121,17 @@ private:
             // only extend the current coverage:
             inf = std::min(inf, laInf);
             sup = std::max(sup, laSup);
+            //std::clog<<"Lattice "<<this<<" covers ["<<laInf<<","<<laSup<<"[\n";
         }
         
-        //std::clog << this << " Lattice::allocate [" << inf << ", " << sup << "[\n";
-        
-        const site_t dim = sup - inf;
-        cell_t * laSite0_new = new cell_t[dim];
-        cell_t * laSite_new  = laSite0_new - inf;
-        
-        // reset new array:
-        for ( site_t s = 0; s < dim; ++s )
-            laSite0_new[s] = 0;
-        
-        // transfer the current data, from the overlapping zone
-        if ( laSite )
-        {
-            for ( site_t s = laInf; s < laSup; ++s )
-                laSite_new[s] = laSite[s];
-            delete[] laSite0;
-        }
-        
-        assert_true( inf <= sup );
-
-        laInf = inf;
-        laSup = sup;
-        laSite0 = laSite0_new;
-        laSite  = laSite_new;
-        
-        //std::clog<<"Lattice "<<this<<" covers ["<<laInf<<","<<laSup<<"[\n";
-        return dim;
+        allocate_copy(inf, sup, laSite, laInf, laSup);
     }
     
     
     /// free all occupied memory
     void deallocate()
     {
-        //printf("Lattice %p realeased\n", this);
+        //std::clog<<"Lattice realeased\n";
         if ( laSite0 )
             delete[] laSite0;
         laSite0 = nullptr;
@@ -133,9 +145,6 @@ private:
     template<typename T> cell_t&  site(const T s);
     template<typename T> cell_t&  operator[](const T s);
     
-    /// disable assignment operator
-    Lattice & operator =(const Lattice &);
-    
     //------------------------------------------------------------------------------
     #pragma mark - Construction
     
@@ -146,29 +155,35 @@ public:
     {
         laInf   = 0;
         laSup   = 0;
-        laUnit  = 0.0;
+        laUnit  = 0;
         laSite0 = nullptr;
         laSite  = nullptr;
+        laEdgeM = 0;
+        laEdgeP = 0;
     }
     
     /// Copy constructor
     Lattice(const Lattice & lat)
     {
-        std::clog << this << " Lattice::Lattice [" << laInf << ", " << laSup << "[\n";
+        //std::clog << this << " Lattice::Lattice [" << lat.laInf << ", " << lat.laSup << "[\n";
         
         //copy member variables:
-        memcpy(this, &lat, sizeof(Lattice));
-        
-        // allocate memory:
-        laSite0 = new cell_t[laSup-laInf];
-        laSite  = laSite0 - laInf;
-        
-        // copy data:
-        for ( site_t s = laInf; s < laSup; ++s )
-            laSite[s] = lat.laSite[s];
+        laUnit = lat.laUnit;
+
+        // allocate and copy lat's data:
+        allocate_copy(lat.laInf, lat.laSup, lat.laSite, lat.laInf, lat.laSup);
     }
     
-    
+    /// assignment operator
+    Lattice & operator =(const Lattice & lat)
+    {
+        laUnit = lat.laUnit;
+
+        // allocate and copy lat's data:
+        allocate_copy(lat.laInf, lat.laSup, lat.laSite, lat.laInf, lat.laSup);
+        return *this;
+    }
+
     /// Destructor
     ~Lattice()    { deallocate(); }
     
@@ -198,17 +213,45 @@ public:
         }
     }
     
+    /// clear edge marks
+    void clearEdges()
+    {
+        for ( site_t i = laInf; i <= laEdgeM; ++i ) laSite[i] = 0;
+        for ( site_t i = laEdgeP;  i < laSup; ++i ) laSite[i] = 0;
+    }
+    
+    /// set edge marks
+    void markEdges()
+    {
+        for ( site_t i = laInf; i <= laEdgeM; ++i ) laSite[i] = EDGE;
+        for ( site_t i = laEdgeP;  i < laSup; ++i ) laSite[i] = EDGE;
+    }
+    
     /// set the range of valid abscissa
-    void setRange(real i, real s)
+    void setRange(real a, real b)
     {
         assert_true( laUnit > REAL_EPSILON );
         //std::clog << this << " Lattice::setRange(" << i << ", " << s << ") " << laUnit << "\n";
-
-        ///\todo use special Lattice value to indicate the ends of the fibers
+        
+        if ( !std::is_same<real, cell_t>::value && laSite )
+            clearEdges();
+        
+        laEdgeM = index(a);
+        laEdgeP = index(b);
+        
         /* add here some safety margin */
-        allocateLattice(index(i), index(s)+1, 8);
+        allocate(laEdgeM, laEdgeP+1, 8);
+        
+        if ( !std::is_same<real, cell_t>::value )
+            markEdges();
     }
     
+    /// first site past the MINUS_END
+    site_t     edgeM() const { return laEdgeM; }
+    
+    /// first site past the PLUS_END
+    site_t     edgeP() const { return laEdgeP; }
+
     //------------------------------------------------------------------------------
     #pragma mark - Index / Abscissa
     
@@ -223,6 +266,9 @@ public:
     
     /// index of the site after the one containing abscissa `a`
     site_t  index_sup(const real a) const { return (site_t)ceil(a/laUnit); }
+    
+    /// index of the site after the one containing abscissa `a`
+    site_t  index_round(const real a) const { return (site_t)round(a/laUnit); }
 
     /// true if index 'i' is covered by the lattice
     bool    valid(const site_t i) const { return ( laInf <= i  &&  i < laSup ); }
@@ -252,18 +298,21 @@ public:
 
     /// pointer to data array
     cell_t* data() const  { return laSite; }
+    
+    /// value at index `s`, equivalent to []
+    cell_t&       data(const site_t& s)       { assert_true(valid(s)); return laSite[s]; }
 
     /// value at index `s`, equivalent to []
-    cell_t& data(const site_t& s)     const { assert_true(valid(s)); return laSite[s]; }
+    cell_t const& data(const site_t& s) const { assert_true(valid(s)); return laSite[s]; }
     
     /// reference to Site at index s
-    cell_t& operator[](const site_t& s)     { assert_true(valid(s)); return laSite[s]; }
+    cell_t& operator[](const site_t& s) { assert_true(valid(s)); return laSite[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
-    cell_t& cell(real a)             { site_t s=index(a); assert_true(valid(s)); return laSite[s]; }
+    cell_t&       cell(real a)          { site_t s=index(a); assert_true(valid(s)); return laSite[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
-    cell_t const& cell(real a) const { site_t s=index(a); assert_true(valid(s)); return laSite[s]; }
+    cell_t const& cell(real a)    const { site_t s=index(a); assert_true(valid(s)); return laSite[s]; }
 
     /// set all sites to `value`
     void clear(cell_t value = 0)
@@ -271,22 +320,20 @@ public:
         for ( site_t s = laInf; s < laSup; ++s )
             laSite[s] = value;
     }
-    
+
     //------------------------------------------------------------------------------
     #pragma mark - Transfer
     
     /// transfer lat->sites within `[s, e[` to *this, and set lat->sites to zero
     void take(Lattice<CELL> & lat, site_t is, site_t ie)
     {
-        // check all boundaries
-        if ( is < laInf )     is = laInf;
-        if ( is < lat.laInf ) is = lat.laInf;
-        
-        if ( ie > laSup )     ie = laSup;
-        if ( ie > lat.laSup ) ie = lat.laSup;
+        //std::clog << " Lattice::take [" << is << ", " << ie << "[\n";
+        // select valid range:
+        is = std::max(is, std::max(laInf, lat.laInf));
+        ie = std::min(ie, std::min(laSup, lat.laSup));
         
         CELL * s = laSite + is;
-        CELL * e = laSite + ie;
+        CELL *const e = laSite + ie;
         CELL * o = lat.laSite + is;
 
         // transfer values
@@ -300,13 +347,13 @@ public:
     }
     
     
-    /// sum all sites in [inf, e[; set sites to zero and return total in `res`
+    /// transfer values in [inf, e[
     void takeM(Lattice<CELL> & lat, const site_t e)
     {
         take(lat, laInf, e);
     }
     
-    /// sum all sites in [s, sup]; set sites to zero and return total in `res`
+    /// transfer values in [s, sup[
     void takeP(Lattice<CELL> & lat, const site_t s)
     {
         take(lat, s, laSup);
@@ -320,22 +367,7 @@ public:
     void collectR(SUM& res, site_t is, site_t ie)
     {
         res = 0;
-#if ( 1 )
-        // check boundaries
-        if ( is < laInf )
-            is = laInf;
-        
-        if ( ie > laSup )
-            ie = laSup;
-        
-        // collect
-        for ( ; is < ie; ++is )
-        {
-            res += laSite[is];
-            laSite[is] = 0;
-        }
-#else
-        // check boundaries
+        // limit boundaries
         CELL * s = laSite + std::max(is, laInf);
         CELL * e = laSite + std::min(ie, laSup);
         
@@ -346,7 +378,6 @@ public:
             *s = 0;
             ++s;
         }
-#endif
     }
     
     
@@ -431,9 +462,9 @@ public:
     void write(Outputter& out, site_t inf, site_t sup) const
     {
         if ( sup < inf )
-            throw InvalidIO("cannot write incoherent Lattice boundaries");
+            throw InvalidIO("incoherent Lattice boundaries");
         if ( laUnit < REAL_EPSILON )
-            throw InvalidIO("cannot write incoherent Lattice unit value");
+            throw InvalidIO("incoherent Lattice unit value");
 
         out.writeInt32(inf);
         out.writeInt32(sup);
@@ -442,7 +473,11 @@ public:
         if ( laSite )
             write_data(out, inf, sup);
         else
-            out.writeUInt32(0);
+        {
+            out.writeUInt16(0);
+            out.writeUInt8(0);
+            out.writeUInt8(0);
+        }
     }
     
     /// write all data to file
@@ -467,10 +502,12 @@ public:
             throw InvalidIO("incoherent Lattice unit value");
         
         //only change unit length if the difference is significant
-        if ( fabs( laUnit - uni ) > 1e-6 )
+        if ( laUnit <= 0 )
+            laUnit = uni;
+        else if ( fabs( laUnit - uni ) > 1e-6 )
             changeUnit(uni);
         
-        allocateLattice(inf, sup, 0);
+        allocate(inf, sup, 0);
         clear();
         
         if ( nbytes == 1 )
@@ -495,6 +532,12 @@ public:
         }
     }
 
+    /// printout
+    void dump(FILE *f)
+    {
+        Outputter out(f, 0);
+        write(out);
+    }
     
     /// debug function
     int bad()

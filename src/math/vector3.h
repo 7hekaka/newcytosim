@@ -483,7 +483,7 @@ public:
      */
     void orthonormal(Vector3& ex, Vector3& ey) const
     {
-        assert_true(fabs(normSqr() - 1.0) < 0.001);
+        assert_true(fabs(normSqr() - 1.0) < 0.01);
 #if 0
         if ( fabs(normSqr() - 1.0) > 0.01 )
         {

@@ -203,8 +203,8 @@ namespace Platonic
         unsigned  * edges_;
         
         void        setCorner(unsigned, real x, real y, real z);
-        unsigned    addVertex(const Vertex &);
-        unsigned    getVertex(const Vertex &);
+        unsigned    addVertex(const Vertex&);
+        unsigned    getVertex(const Vertex&);
         
         void        init(unsigned, real* vdata[3], unsigned, unsigned* fdata[3], unsigned);
         void        initTetrahedron(unsigned div);

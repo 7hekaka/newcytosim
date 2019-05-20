@@ -76,7 +76,7 @@ set hand binder2
     binding_key     = 2
     binding_rate    = 1
     binding_range   = 5
-    bind_also_ends   = 1
+    bind_also_end   = 1
     unbinding       = 0, inf
     display = { color=red, 0x0000FF77; width=0 }
 }

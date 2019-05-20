@@ -19,12 +19,12 @@ set system display
 set space cell
 {
     shape = sphere
+    display = ( visible=1; width=2; )
 }
 
 new cell
 {
     radius = 8
-    display = ( visible=1; width=1; )
 }
 
 

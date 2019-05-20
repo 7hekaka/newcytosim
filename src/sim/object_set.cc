@@ -19,6 +19,7 @@ extern Modulo const* modulo;
  */
 void ObjectSet::link(Object * obj)
 {
+    assert_true( !obj->objset() );
     obj->objset(this);
     nodes.push_front(obj);
 }
@@ -148,7 +149,7 @@ void ObjectSet::add(Object * obj)
     }
     else
     {
-        //std::clog << "Warning: attempted to re-link "+obj->reference()+" \n";
+        std::cerr << "Warning: attempted to re-link "+obj->reference()+" \n";
     }
 }
 

@@ -140,7 +140,7 @@ Fiber::Fiber(FiberProp const* p)
             //Cytosim::log << reference() <<  " new Lattice" << std::endl;
             frLattice.setUnit(prop->lattice_unit);
 #else
-            throw InvalidParameter("Cytosim does not support fiber:lattice");
+            //throw InvalidParameter("Cytosim does not support fiber:lattice");
 #endif
         }
     }
@@ -315,7 +315,7 @@ Fiber* Fiber::severPoint(unsigned int pti)
     {
         assert_true( frLattice.unit() == fib->frLattice.unit() );
         // transfer Lattice values located above the cut
-        fib->frLattice.takeP(frLattice, (int)ceil(abs/frLattice.unit()));
+        fib->frLattice.takeP(frLattice, frLattice.index_round(abs));
     }
 #endif
 
@@ -334,6 +334,10 @@ Fiber* Fiber::severPoint(unsigned int pti)
         ha = nx;
     }
     
+#if FIBER_HAS_LATTICE > 0
+    resetLattice();
+    fib->resetLattice();
+#endif
     return fib;
 }
 
@@ -341,29 +345,32 @@ Fiber* Fiber::severPoint(unsigned int pti)
 /**
 The Fiber is cut at distance `abs` from its MINUS_END:
  - current Fiber is truncated to keep only the section [ MINUS_END , abs ],
- - A new Fiber is created inheriting the other section [ abs , PLUS_END ],
- - FiberSite within the severed section are transfered to the new Fiber,
+ - A new Fiber is created representing the other section [ abs , PLUS_END ],
+ - Hands are transfered to the new Fiber if appropriate,
  - lattice substances are also transfered,
  .
  A pointer to the new Fiber is returned (containing the PLUS_END), but this
  pointer may be zero, if `abs` was not within the valid range of abscissa.
  If a new Fiber was created, it should be added to the FiberSet.
  */
-Fiber* Fiber::severM(real abs)
+Fiber* Fiber::severP(real abs)
 {
     if ( abs <= REAL_EPSILON || abs + REAL_EPSILON >= length() )
         return nullptr;
     
+    //std::clog << "severP " << reference() << " at " << abscissaM()+abs << "\n";
+
     // create a new Fiber of the same kind:
     Fiber* fib = prop->newFiber();
     assert_true( fib->prop == prop );
 
     // copy the Filament part of the object:
     *(static_cast<Filament*>(fib)) = *this;
-    
+    *(static_cast<Object*>(fib)) = *this;
+
     // the signature on both pieces should be conserved:
-    fib->signature(signature());
-    fib->birthTime(birthTime());
+    assert_true(fib->signature() == signature());
+    assert_true(fib->birthTime() == birthTime());
 
     assert_small(fib->abscissaM() - abscissaM());
     // remove MINUS_END portion on new piece
@@ -377,7 +384,7 @@ Fiber* Fiber::severM(real abs)
         fib->frLattice.setRange(abscissaM()+abs, abscissaP());
         
         // transfer Lattice values located above the cut:
-        fib->frLattice.takeP(frLattice, (int)ceil((abscissaM()+abs)/frLattice.unit()));
+        fib->frLattice.takeP(frLattice, frLattice.index_round(abscissaM()+abs));
     }
 #endif
     
@@ -395,12 +402,17 @@ Fiber* Fiber::severM(real abs)
     while ( ha )
     {
         Hand * nx = ha->next();
-        if ( ha->abscissa() > abs )
+        if ( ha->abscissa() >= abs )
             ha->relocate(fib);
         else
             ha->update();
         ha = nx;
     }
+
+#if FIBER_HAS_LATTICE > 0
+    resetLattice();
+    fib->resetLattice();
+#endif
 
     return fib;
 }
@@ -439,7 +451,7 @@ void Fiber::severNow()
         }
         else
         {
-            Fiber * frag = severM(cut.abs-abscissaM());
+            Fiber * frag = severP(cut.abs-abscissaM());
             
             // special case where the PLUS_END section is simply deleted
             if ( cut.stateM == STATE_BLACK )
@@ -533,6 +545,7 @@ void Fiber::planarCut(Vector const& n, const real a, int stateP, int stateM)
             // dynamic of new ends are set as usual:
             setDynamicStateP(stateP);
             fib->setDynamicStateM(stateM);
+            //assert_true(!fib->linked());
             objset()->add(fib);
         }
     }
@@ -559,6 +572,18 @@ void Fiber::join(Fiber * fib)
     
     //transfer dynamic state of PLUS_END:
     setDynamicStateP(fib->dynamicStateP());
+
+#if FIBER_HAS_LATTICE
+    if ( frLattice.ready() )
+    {
+        assert_true( frLattice.unit() == fib->frLattice.unit() );
+        // ensure valid range:
+        frLattice.setRange(abscissaM(), abscissaP());
+        
+        // transfer Lattice values from other fiber
+        frLattice.takeP(fib->frLattice, frLattice.index_sup(fib->abscissaM()));
+    }
+#endif
 
     // transfer all Hands
     Hand * ha = fib->handListFront;
@@ -1222,7 +1247,7 @@ void Fiber::update()
         {
             real sum;
             // release Lattice substance located outside the valid abscissa range
-            frLattice.collectM(sum, frLattice.index(abscissaM()));
+            frLattice.collectM(sum, frLattice.index_sup(abscissaM()));
             prop->field_ptr->cell(posEndM()) += sum;
             //Cytosim::log << " Fiber::MINUS_END releases " << sumM << std::endl;
             
@@ -1491,18 +1516,6 @@ void Fiber::cutFiberLattice(FiberLattice& lat)
             as = abscissaP();
         else
             as += uni;
-    }
-}
-
-
-void Fiber::resetLattice(FiberLattice& lat) const
-{
-    lat.clear();
-    
-    for ( Hand * ha = handListFront; ha; ha = ha->next() )
-    {
-        if ( ha->lattice() == &lat )
-            ha->inc();
     }
 }
 
@@ -1780,6 +1793,7 @@ void Fiber::read(Inputter & in, Simul& sim, ObjectTag tag)
 #else
             FiberLattice dummy;
             dummy.read(in);
+            unit_ = dummy.unit();
 #endif
         }
         catch( Exception & e ) {
