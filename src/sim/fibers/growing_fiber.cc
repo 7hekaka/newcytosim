@@ -171,7 +171,7 @@ void GrowingFiber::write(Outputter& out) const
 }
 
 
-void GrowingFiber::read(Inputter & in, Simul& sim, ObjectTag tag)
+void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( tag == TAG_DYNAMIC || ( tag == TAG && in.formatID() < 44 ) )

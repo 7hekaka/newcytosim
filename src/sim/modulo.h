@@ -30,7 +30,7 @@ private:
         {
             real i = std::copysign(p, x);
             do
-                x = std::fma(-2, i, x);  // -2*i + x
+                x = x - 2.0 * i;
             while ( fabs(x) > p );
         }
     }

@@ -56,8 +56,7 @@ int main(int argc, char* argv[])
     arg.set(binary, "binary");
     arg.set(simul.prop->skip_free_couple, "skip_free_couple");
     
-    Inputter in;
-    in.vectorSize(DIM);
+    Inputter in(DIM);
     try {
         simul.loadProperties();
         in.open(input.c_str(), "rb");

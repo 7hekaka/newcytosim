@@ -139,10 +139,12 @@ void FiberSite::read(Inputter& in, Simul& sim)
 #if FIBER_HAS_LATTICE
             fbSite = in.readUInt32();
             fbLattice = &fbFiber->lattice();
-            fbAbs = fbLattice->abscissa(fbSite);
+            // put in the middle of the site:
+            ///@todo: we should use digit:site_shift here:
+            fbAbs = ( fbSite + 0.5 ) * fbLattice->unit();
 #else
             site_t t = in.readUInt32();
-            fbAbs = t * fbFiber->unit_;
+            fbAbs = ( t + 0.5 ) * fbFiber->unit_;
             //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }
@@ -194,11 +196,11 @@ void FiberSite::checkAbscissa() const
     
     real a = fbFiber->abscissaM() - fbAbs;
     if ( a > 1e-3 )
-        Cytosim::warn << "FiberSite:abscissa < fiber:abscissa(MINUS_END) :  " << a << std::endl;
+        std::cerr << "FiberSite:abscissa < fiber:abscissa(MINUS_END) :  " << a << std::endl;
     
     real b = fbAbs - fbFiber->abscissaP();
     if ( b > 1e-3 )
-        Cytosim::warn << "FiberSite:abscissa > fiber:abscissa(PLUS_END)  :  " << b << std::endl;
+        std::cerr << "FiberSite:abscissa > fiber:abscissa(PLUS_END)  :  " << b << std::endl;
 }
 
 

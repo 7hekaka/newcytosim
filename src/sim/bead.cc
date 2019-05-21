@@ -151,7 +151,7 @@ void Bead::write(Outputter& out) const
 }
 
 
-void Bead::read(Inputter & in, Simul&, ObjectTag)
+void Bead::read(Inputter& in, Simul&, ObjectTag)
 {
     Vector pos;
     in.readFloatVector(pos, DIM);

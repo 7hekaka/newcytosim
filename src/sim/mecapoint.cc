@@ -6,7 +6,7 @@
 #include "simul.h"
 
 
-void Mecapoint::read(Inputter & in, Simul& sim)
+void Mecapoint::read(Inputter& in, Simul& sim)
 {
     ObjectTag g;
     mec_ = Simul::toMecable(sim.readReference(in, g));

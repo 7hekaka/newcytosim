@@ -15,11 +15,11 @@ The output can be sent to a specific file:
 		{
 		    nb_frames = 100
 		}
-		report fiber:force fiber_force.txt
-		report solid:position solid_position.txt
+		report fiber:force forces.txt
+		report solid:position positions.txt
 	}
 
-Or to the terminal:
+A 'star' sends the reports to the terminal:
 	
 	run 1000 system
 	

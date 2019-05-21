@@ -530,7 +530,7 @@ void Aster::write(Outputter& out) const
 }
 
 
-void Aster::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() < 40 )

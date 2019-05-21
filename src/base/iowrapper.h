@@ -70,13 +70,13 @@ public:
     void      reset();
     
     /// Constructor
-    Inputter() : FileWrapper(nullptr)  { reset(); }
+    Inputter(int d) : FileWrapper(nullptr), vecsize_(d) { reset(); }
     
     /// Constructor
-    Inputter(FILE * f, const char * path = nullptr) : FileWrapper(f, path) { reset(); }
+    Inputter(int d, FILE * f, const char * path = nullptr) : FileWrapper(f, path), vecsize_(d) { reset(); }
     
     /// constructor which opens a file
-    Inputter(const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); }
+    Inputter(int d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r"), vecsize_(d) { reset(); }
 
     /// return dimensionnally of vectors
     int       vectorSize()      const { return vecsize_; }

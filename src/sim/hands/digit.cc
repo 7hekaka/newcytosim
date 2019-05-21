@@ -29,11 +29,11 @@ bool Digit::attachmentAllowed(FiberSite & sit) const
         // index to site containing given abscissa:
         site_t s = lat->index(sit.abscissa());
 
-        if ( occupied(lat, s) )
+        if ( unavailable(lat, s) )
             return false;
         
         // adjust site:
-        sit.engageLattice(lat, s, lat->abscissa(s+prop->site_pos));
+        sit.engageLattice(lat, s, lat->unit() * s + prop->site_shift);
 #endif
         return true;
     }
@@ -70,7 +70,7 @@ void Digit::hop(site_t s)
     dec();
     fbSite = s;
     inc();
-    fbAbs = lattice()->abscissa(s+prop->site_pos);
+    fbAbs = lattice()->unit() * s + prop->site_shift;
 #else
     fbAbs = s * prop->step_size;
 #endif

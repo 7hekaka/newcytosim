@@ -42,11 +42,11 @@ public:
 
 #if FIBER_HAS_LATTICE > 0
     
-    /// true if given Lattice's site is occupied
+    /// true if given Lattice's site is outside range
     bool          edgy(site_t const& s) const { return fbLattice->data(s) == FiberLattice::EDGE; }
 
     /// true if given Lattice's site is occupied
-    bool          occupied(FiberLattice* lat, site_t const& s) const { return lat->data(s) & prop->footprint; }
+    bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->data(s) & prop->footprint; }
 
     /// true if given Lattice's site is unoccupied (check footprint bits)
     bool          vacant(site_t const& s) const { return 0 == (fbLattice->data(s) & prop->footprint); }
@@ -58,12 +58,12 @@ public:
     void          dec() { fbLattice->data(fbSite) ^= prop->footprint; }
     
 #elif FIBER_HAS_LATTICE < 0
-    
-    /// true if given Lattice's site is occupied
-    bool          edgy(site_t const& s) const { return ( s <= fbLattice->edgeM() || s >= fbLattice->edgeP() ); }
+
+    /// true if given Lattice's site is outside range
+    bool          edgy(site_t const& s) const { return s <= fbLattice->edgeM() || s >= fbLattice->edgeP(); }
 
     /// true if given Lattice's site is occupied
-    bool          occupied(FiberLattice* lat, site_t const& s) const { return lat->data(s) != 0.0; }
+    bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->data(s) != 0.0 || s <= lat->edgeM() || s >= lat->edgeP(); }
 
     /// true if given Lattice's site is unoccupied
     bool          vacant(site_t const& s) const { return fbLattice->data(s) == 0.0; }

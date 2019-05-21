@@ -180,7 +180,7 @@ void Single::write(Outputter& out) const
 }
 
 
-void Single::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Single::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     const bool s = attached();
     sHand->read(in, sim);

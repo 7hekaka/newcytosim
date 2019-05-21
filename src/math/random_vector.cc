@@ -187,7 +187,7 @@ const Vector3 Vector3::randU()
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
     real h = 2 * sqrt(d);
-    return Vector3(x*h, y*h, std::fma(2.0, d, -1.0));
+    return Vector3(x*h, y*h, 2.0*d-1.0);
 }
 
 const Vector3 Vector3::randU(const real n)
@@ -199,7 +199,7 @@ const Vector3 Vector3::randU(const real n)
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
     real h = ( n + n ) * sqrt(d);
-    return Vector3(x*h, y*h, n*std::fma(2.0, d, -1.0));
+    return Vector3(x*h, y*h, n*(2.0*d-1.0));
 }
 
 #else

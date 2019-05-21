@@ -902,8 +902,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
             throw InvalidIO("unexpected class specified for import");
     }
 
-    Inputter in(file.c_str(), true);
-    in.vectorSize(DIM);
+    Inputter in(DIM, file.c_str(), true);
 
     if ( ! in.good() )
         throw InvalidIO("Could not open file `"+file+"'");

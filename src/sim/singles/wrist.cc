@@ -93,7 +93,7 @@ void Wrist::write(Outputter& out) const
 }
 
 
-void Wrist::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Wrist::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     const int s = state();
 

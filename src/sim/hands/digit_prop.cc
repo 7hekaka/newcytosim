@@ -23,7 +23,7 @@ void DigitProp::clear()
 
     step_size = 0;
     footprint = 1;
-    site_pos = 0.5;
+    site_shift = 0;
 }
 
 
@@ -31,15 +31,17 @@ void DigitProp::read(Glossary& glos)
 {
     HandProp::read(glos);
     
-    glos.set(step_size, "step_size");
+    if ( glos.set(step_size, "step_size") )
+        site_shift = 0.5 * step_size;
+    glos.set(site_shift, "site_shift");
+    
     if ( !std::is_same<FiberLattice::cell_t, double>::value )
     {
         unsigned long i = 0;
         if ( glos.set(i, "footprint") )
             footprint = i;
     }
-    glos.set(site_pos,  "site_pos");
-    
+
 #ifdef BACKWARD_COMPATIBILITY
     bool u = true;
     if ( glos.set(u, "use_lattice") && !u )
@@ -55,8 +57,8 @@ void DigitProp::complete(Simul const& sim)
     if ( step_size <= 0 )
         throw InvalidParameter("Digit:step_size must be defined and > 0");
     
-    if ( site_pos < 0 || 1 < site_pos )
-        throw InvalidParameter("Digit:site_pos must be in [0, 1]");
+    if ( site_shift < 0 || step_size < site_shift )
+        throw InvalidParameter("Digit:site_shift must be in [0, step_size]");
 }
 
 
@@ -65,6 +67,6 @@ void DigitProp::write_values(std::ostream& os) const
     HandProp::write_values(os);
     write_value(os, "step_size", step_size);
     write_value(os, "footprint", footprint);
-    write_value(os, "site_pos", site_pos);
+    write_value(os, "site_shift", site_shift);
 }
 

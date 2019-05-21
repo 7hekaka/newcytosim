@@ -335,8 +335,8 @@ void Hand::stepUnloaded()
 void Hand::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );
-    
     assert_true( nextDetach >= 0 );
+    
     if ( prop->unbinding_force_inv > 0 )
         testKramersDetachment(force_norm);
     else
@@ -358,7 +358,7 @@ void Hand::write(Outputter& out) const
 }
 
 
-void Hand::read(Inputter & in, Simul& sim)
+void Hand::read(Inputter& in, Simul& sim)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() < 32 )

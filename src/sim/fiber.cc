@@ -1740,7 +1740,7 @@ void Fiber::write(Outputter& out) const
 }
 
 
-void Fiber::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //std::clog << this << " Fiber::read(" << tag << ")\n";
 #ifdef BACKWARD_COMPATIBILITY

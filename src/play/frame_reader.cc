@@ -12,7 +12,7 @@
 
 //------------------------------------------------------------------------------
 
-FrameReader::FrameReader() : inputter(nullptr)
+FrameReader::FrameReader() : inputter(DIM)
 {
     frameIndex = -1;
 }

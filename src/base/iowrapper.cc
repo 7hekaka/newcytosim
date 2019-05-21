@@ -23,7 +23,6 @@ void Inputter::reset()
 {
     format_  = 0;
     binary_  = 0;
-    vecsize_ = 3;
     
     if ( nonStandardTypes() )
     {
@@ -198,7 +197,7 @@ double Inputter::readDouble()
 
 /**
  This will read vecsize_ floats, and store the first D ones in a[].
- VECSIZE is defined by calling vectorSize(INT)
+ VECSIZE can be changed by calling vectorSize(INT)
  */
 void Inputter::readFloatVector(float a[], const unsigned D)
 {

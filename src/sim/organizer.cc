@@ -162,7 +162,7 @@ void Organizer::write(Outputter& out) const
 }
 
 
-void Organizer::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Organizer::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     unsigned nbo = in.readUInt16();
     nbOrganized(nbo);

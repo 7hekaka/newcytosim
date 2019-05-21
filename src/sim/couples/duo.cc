@@ -151,7 +151,7 @@ void Duo::write(Outputter& out) const
 }
 
 
-void Duo::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() > 36 )

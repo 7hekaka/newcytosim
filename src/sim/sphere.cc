@@ -596,7 +596,7 @@ void Sphere::write(Outputter& out) const
 }
 
 
-void Sphere::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Sphere::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     try
     {

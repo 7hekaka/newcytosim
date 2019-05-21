@@ -71,7 +71,7 @@ sim: sim.cc cytosim.a cytospace.a cytomath.a cytobase.a | bin
 vpath sim  bin
 
 
-cytosim.a: $(OBJ_CYTOSIM) splash.o | lib
+cytosim.a: $(OBJ_CYTOSIM) | lib
 	$(MAKELIB)
 	$(DONE)
 
@@ -90,7 +90,7 @@ bin1/sim: sim.cc cytosimD1.a cytospaceD1.a cytomathD1.a cytobase.a
 	$(COMPILE) $(INC_BM) $(CODE_VERSION) -DDIM=1 $(OBJECTS) $(LINK) -o bin1/sim
 	$(DONE)
 
-cytosimD1.a: $(OBJ_CYTOSIMD1) splash.o
+cytosimD1.a: $(OBJ_CYTOSIMD1)
 	$(MAKELIB)
 	$(DONE)
 
@@ -99,7 +99,7 @@ bin2/sim: sim.cc cytosimD2.a cytospaceD2.a cytomathD2.a cytobase.a
 	$(COMPILE) $(INC_BM) $(CODE_VERSION) -DDIM=2 $(OBJECTS) $(LINK) -o bin2/sim
 	$(DONE)
 
-cytosimD2.a: $(OBJ_CYTOSIMD2) splash.o
+cytosimD2.a: $(OBJ_CYTOSIMD2)
 	$(MAKELIB)
 	$(DONE)
 
@@ -108,7 +108,7 @@ bin3/sim: sim.cc cytosimD3.a cytospaceD3.a cytomathD3.a cytobase.a
 	$(COMPILE) $(INC_BM) $(CODE_VERSION) -DDIM=3 $(OBJECTS) $(LINK) -o bin3/sim
 	$(DONE)
 
-cytosimD3.a: $(OBJ_CYTOSIMD3) splash.o
+cytosimD3.a: $(OBJ_CYTOSIMD3)
 	$(MAKELIB)
 	$(DONE)
 
@@ -126,9 +126,6 @@ $(OBJ_CYTOSIMD2): %D2.o: %.cc %.h | build
 
 $(OBJ_CYTOSIMD3): %D3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o build/$@
-
-splash.o: %.o: %.cc %.h | build
-	$(COMPILE) $(CODE_VERSION) $(COMPILER_VERSION) -Isrc/base -Isrc/math -c $< -o build/$@
 
 mecaGL.o: %.o: %.cc %.h | build
 	$(COMPILE) $(INC_SIM) -Isrc/disp -c $< -o build/$@

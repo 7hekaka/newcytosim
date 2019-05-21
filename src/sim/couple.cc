@@ -480,7 +480,7 @@ void Couple::write(Outputter& out) const
 }
 
 
-void Couple::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     const bool s1 = attached1();
     const bool s2 = attached2();

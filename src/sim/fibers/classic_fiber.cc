@@ -216,7 +216,7 @@ void ClassicFiber::write(Outputter& out) const
 }
 
 
-void ClassicFiber::read(Inputter & in, Simul& sim, ObjectTag tag)
+void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( tag == TAG_DYNAMIC || ( tag == TAG && in.formatID() < 44 ) )

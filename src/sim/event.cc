@@ -55,6 +55,6 @@ void Event::write(Outputter& out) const
 }
 
 
-void Event::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Event::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
 }

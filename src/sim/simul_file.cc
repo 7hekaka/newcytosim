@@ -124,7 +124,7 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
 /**
  The Object is not modified
  */
-Object * Simul::readReference(Inputter & in, ObjectTag & tag)
+Object * Simul::readReference(Inputter& in, ObjectTag & tag)
 {
     do
         tag = in.get_char();
@@ -347,7 +347,7 @@ public:
  - 1 = EOF
  .
  */
-int Simul::reloadObjects(Inputter & in, ObjectSet* subset)
+int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
 {
     // set flag to erase any object that was not updated
     InputLock lock(this);
@@ -371,7 +371,7 @@ int Simul::reloadObjects(Inputter & in, ObjectSet* subset)
  - 1 = EOF
  .
  */
-int Simul::loadObjects(Inputter & in, ObjectSet* subset)
+int Simul::loadObjects(Inputter& in, ObjectSet* subset)
 {
     if ( in.eof() )
         return 1;
@@ -404,8 +404,7 @@ int Simul::loadObjects(Inputter & in, ObjectSet* subset)
  */
 int Simul::loadObjects(char const* filename)
 {
-    Inputter in(filename, true);
-    in.vectorSize(DIM);
+    Inputter in(DIM, filename, true);
 
     if ( ! in.good() )
         throw InvalidIO("Could not open specified file for reading");
@@ -428,7 +427,7 @@ int Simul::loadObjects(char const* filename)
  - 2 : the file does not appear to be a valid cytosim archive
  
   */
-int Simul::readObjects(Inputter & in, ObjectSet* subset)
+int Simul::readObjects(Inputter& in, ObjectSet* subset)
 {
     ObjectSet * objset = nullptr;
     std::string section, line;
@@ -505,11 +504,9 @@ int Simul::readObjects(Inputter & in, ObjectSet* subset)
                 int d = 0, f = 0;
                 iss >> f >> tok >> d;
                 in.formatID(f);
-                if ( d != in.vectorSize() )
-                {
+                in.vectorSize(d);
+                if ( d != DIM )
                     Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
-                    in.vectorSize(d);
-                }
                 //if ( f != currentFormatID )
                 //    std::clog << "Cytosim is reading data format "<<f<<"\n";
             }
@@ -525,11 +522,9 @@ int Simul::readObjects(Inputter & in, ObjectSet* subset)
                     iss >> tok >> i;
                     if ( tok == "dim" )
                     {
-                        if ( i != in.vectorSize() )
-                        {
+                        in.vectorSize(i);
+                        if ( i != DIM )
                             Cytosim::warn << "mismatch between file ("<<i<<"D) and executable ("<<DIM<<"D)\n";
-                            in.vectorSize(i);
-                        }
                     }
                     if ( iss.get() == ',' )
                     {

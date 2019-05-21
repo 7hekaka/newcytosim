@@ -1949,7 +1949,7 @@ void Filament::write(Outputter& out) const
  The fiber will be re-segmented if its current desired segmentation 
  does not match the one stored in the file.
  */
-void Filament::read(Inputter & in, Simul& sim, ObjectTag tag)
+void Filament::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //Cytosim::log << "  reading Filament at " << in.pos() << '\n';
     

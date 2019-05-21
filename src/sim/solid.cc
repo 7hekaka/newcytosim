@@ -1188,7 +1188,7 @@ void Solid::write(Outputter& out) const
 }
 
 
-void Solid::read(Inputter & in, Simul&, ObjectTag)
+void Solid::read(Inputter& in, Simul&, ObjectTag)
 {
     try
     {

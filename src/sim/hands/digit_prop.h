@@ -31,13 +31,13 @@ public:
     
     /// specifies the position occupied within the Lattice site
     /**
-     `site_pos` should be in [0, 1]:
-     - with `0.0`, the attachment position is at the start of the site
-     - with `1.0`, the attachment position is at the end of the site
-     - with `0.5`, the attachment is exactly midway
-     [default = 0.5]
+     `site_shift` should be in [0, step_size]:
+     - at `0.0`, the attachment position is at the start of the site
+     - at `step_size`, the attachment position is at the end of the site
+     - at `step_size/2`, the attachment is midway
+     [default = step_size/2]
      */
-    real   site_pos;
+    real   site_shift;
     
     /// @}
     

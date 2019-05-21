@@ -117,8 +117,8 @@ doc:
 .PHONY: tar tarzip tarsrc pack
 
 tar:
-	COPYFILE_DISABLE=1 tar cf cytosim.tar --exclude "*.o" --exclude "*~"\
-	src makefile makefile.inc cym python bash doc cytosim.xcodeproj
+	COPYFILE_DISABLE=1 tar cf cytosim.tar --exclude "*.o" --exclude "*~" --exclude xcuserdata \
+	--exclude doxygen src makefile makefile.inc cym python bash doc cytosim.xcodeproj
 
 
 tarzip: tar
