@@ -44,7 +44,7 @@ set hand nucleator
     display = { size=5; color=blue, gray; }
 }
 
-set single protein
+set single simplex
 {
     hand = nucleator
     activity = fixed
@@ -70,7 +70,7 @@ set single cargo
     diffusion = 0.01
 }
 
-new 40 protein
+new 40 simplex
 {
     position = disc 0.25
 }

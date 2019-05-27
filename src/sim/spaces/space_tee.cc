@@ -26,7 +26,7 @@ void SpaceTee::resize(Glossary& opt)
     else opt.set(rad, "radius");
     opt.set(len, "length");
     opt.set(jun, "junction");
-    opt.set(arm, "arm_length");
+    opt.set(arm, "arm");
 
     if ( len <= 0 || rad <= 0 || arm < 0 )
         throw InvalidParameter("Space tee can't have negative length, arm length or radius.");

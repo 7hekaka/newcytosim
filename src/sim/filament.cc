@@ -1641,8 +1641,8 @@ real Filament::abscissaFrom(const real dis, const FiberEnd ref) const
  
      new filament
      {
-         attach1 = protein, 0.0, minus_end
-         attach2 = protein, 0.0, plus_end
+         attach1 = simplex, 0.0, minus_end
+         attach2 = simplex, 0.0, plus_end
      }
 
 */

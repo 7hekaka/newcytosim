@@ -10,10 +10,13 @@ set simul system
 
 set space embryo
 {
-    geometry = ( sphere 30 )
+    shape = sphere
 }
 
 new embryo
+{
+    radius = 30
+}
 
 set bead cell
 {

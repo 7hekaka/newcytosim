@@ -11,10 +11,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( dice 1 1 0.1 0.1 )
+    shape = dice
 }
 
 new cell
+{
+    length = 1, 1, 0.1
+    radius = 0.1
+}
 
 set fiber microtubule
 {

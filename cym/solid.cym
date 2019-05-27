@@ -20,7 +20,7 @@ new cell
 }
 
 
-set hand protein
+set hand binder
 {
     binding = 10, 0.05
     unbinding = 0, 3
@@ -29,7 +29,7 @@ set hand protein
 
 set single grafted
 {
-    hand = protein
+    hand = binder
     stiffness = 100
 }
 

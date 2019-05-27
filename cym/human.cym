@@ -35,10 +35,14 @@ set fiber microtubule
 
 set space plate
 {
-    geometry = ( cylinder 0 5 )
+    shape = cylinder
 }
 
 new plate
+{
+    length = 0
+    radius = 5
+}
 
 set bead ball
 {

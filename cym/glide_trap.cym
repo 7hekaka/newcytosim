@@ -3,10 +3,13 @@
 
 set space cell
 {
-    geometry = ( square 30 14 1 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 60, 28, 2
+}
 
 set simul system
 {

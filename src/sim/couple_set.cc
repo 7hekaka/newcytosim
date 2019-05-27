@@ -207,7 +207,7 @@ Object * CoupleSet::newObjectT(const ObjectTag tag, unsigned num)
 
  You can attach the hands of a Couple:
  
-     new protein
+     new complex
      {
         attach1 = FIBER, REAL, REFERENCE
         attach2 = FIBER, REAL, REFERENCE

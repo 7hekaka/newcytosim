@@ -21,7 +21,6 @@ set space cell
 new cell
 {
     length = 0.2, 0.2, 0.1
-
 }
 
 set fiber actin

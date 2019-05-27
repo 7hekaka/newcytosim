@@ -14,19 +14,27 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 6 1.62 )    % cell is 15 um long
+    shape = capsule
     display = ( visible=0; )
 }
 
 new cell
+{
+    length = 15
+    radius = 1.62
+}
 
 set space squeeze
 {
-    geometry = ( capsule 2 0.1 )
+    shape = capsule
     display = ( color=0xFF000055; visible=1; )
 }
 
 new squeeze
+{
+	length = 2
+	radius = 0.1
+}
 
 set fiber microtubule
 {

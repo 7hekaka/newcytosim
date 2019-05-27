@@ -10,7 +10,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( strip 7 7 0.5 )
+    shape = strip
 }
 
 set fiber filament
@@ -55,6 +55,9 @@ set couple crosslinker
 }
 
 new cell
+{
+    length = 14, 14, 1
+}
 
 new 500 filament
 {

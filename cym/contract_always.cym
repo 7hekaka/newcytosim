@@ -10,7 +10,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( circle 7 )
+    shape = circle
 }
 
 set fiber filament
@@ -57,6 +57,9 @@ set couple crosslinker
 }
 
 new cell
+{
+    radius = 7
+}
 
 new 512 filament
 {

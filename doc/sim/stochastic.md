@@ -13,7 +13,7 @@ where `random()` returns a random number uniformly distributed in ]0,1] (zero is
 
 The detachment of a molecular link follows the theory described by Hendrik Kramers in:
 
->  Brownian motion in a field of force and the diffusion model of chemical reactions\n
+>  Brownian motion in a field of force and the diffusion model of chemical reactions  
 >  H.A. Kramers - Physica VII, no 4, pp284-304 - 1940
 
 Essentially, the detachment rate `off_rate` varies with the force exerted on the link:
@@ -26,12 +26,11 @@ In cytosim, these parameters are specified in the properties of `Hands`.
 
 # Time-dependent rates
 
-Using Kramers rate theory implies that the rate of the event is varying in time.\n
+Using Kramers rate theory implies that the rate of the event is varying in time.  
 The Gillespie approach needs to be modified, and we follow the procedure described in:
  
->  A Dynamical Monte Carlo Algorithm for Master Equations with Time-Dependent Transition Rates\n
->  A. Prados et al.\n
->  Journal of Statistical Physics, Vol. 89, Nos. 3/4, 1997\n
+>  A Dynamical Monte Carlo Algorithm for Master Equations with Time-Dependent Transition Rates  
+>  A. Prados et al. Journal of Statistical Physics, Vol. 89, Nos. 3/4, 1997  
 >  http://dx.doi.org/10.1007/BF02765541
 
  

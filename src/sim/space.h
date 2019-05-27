@@ -52,9 +52,6 @@ public:
 
     /// initialize Modulo if this Space has some periodic dimensions
     virtual Modulo * makeModulo() const { return nullptr; }
-
-    /// a Human-readible description
-    virtual std::string geometry() const { return prop->shape; }
     
     /// radius used for piston effect (and defined only for certain shapes)
     virtual real thickness() const { return 0; }

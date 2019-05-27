@@ -17,10 +17,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 4 8.4 )
+    shape = periodic
 }
 
 new cell
+{
+    length = 8, 16.8
+}
 
 set fiber microtubule
 {

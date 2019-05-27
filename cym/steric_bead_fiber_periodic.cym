@@ -11,10 +11,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 2 3 1)
+    shape = periodic
 }
 
 new cell
+{
+    length = 4, 6, 2
+}
 
 set fiber filament
 {

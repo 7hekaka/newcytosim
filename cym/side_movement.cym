@@ -11,11 +11,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( square 4 4 3 )
+    shape = rectangle
     display = ( visible=1 )
 }
 
 new cell
+{
+    length = 8, 8, 6
+}
 
 set fiber filament
 {

@@ -3,10 +3,13 @@
 
 set space cell
 {
-    geometry = ( periodic 5 2.5 )
+    shape = periodic
 }
 
 new cell
+{
+    length = 10, 5
+}
 
 set simul system
 {

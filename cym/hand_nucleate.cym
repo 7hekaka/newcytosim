@@ -13,10 +13,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 1 2 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 6
+    radius = 2
+}
 
 set fiber microtubule
 {
@@ -40,14 +44,14 @@ set hand nucleator
     display = { size=5; color=green, gray; }
 }
 
-set single protein
+set single simplex
 {
     hand = nucleator
     activity = fixed
     stiffness = 1000
 }
 
-new 100 protein
+new 100 simplex
 {
     position = 1 0 0
 }

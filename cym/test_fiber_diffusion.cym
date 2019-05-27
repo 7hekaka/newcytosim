@@ -9,7 +9,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( square 5 5 5 )
+    shape = rectangle
 }
 
 set fiber filament
@@ -19,6 +19,9 @@ set fiber filament
 }
 
 new cell
+{
+    length = 10, 10, 10
+}
 
 new 100 filament
 {

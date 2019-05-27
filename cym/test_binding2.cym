@@ -63,7 +63,7 @@ set hand minus_binder
     display = { color=orange; width=0 }
 }
 
-set couple protein
+set couple complex
 {
     hand1 = plus_binder
     hand2 = minus_binder
@@ -71,7 +71,7 @@ set couple protein
     stiffness = 0
 }
 
-new 25000 protein
+new 25000 complex
 
 
 run system

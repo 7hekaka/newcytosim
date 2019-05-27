@@ -10,10 +10,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( square 25 12 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 50, 24, 24
+}
 
 set field blue
 {

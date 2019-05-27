@@ -13,19 +13,27 @@ set simul system
 
 set space cell
 {
-    geometry = ( cylinder 10 2 )
+    shape = cylinder
     display = ( color=0xFFFFFF10 )
 }
 
 new cell
+{
+    length = 20
+    radius = 2
+}
 
 set space plate
 {
-    geometry = ( cylinder 0.5 1 )
+    shape = cylinder
     display = ( color=0x0000FF11; visible=0 )
 }
 
 new plate
+{
+    length = 1
+    radius = 1
+}
 
 set fiber microtubule
 {

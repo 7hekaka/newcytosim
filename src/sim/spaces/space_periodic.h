@@ -28,7 +28,7 @@ public:
     /// creator
     SpacePeriodic(SpaceProp const*);
 
-    /// update geometry
+    /// change dimensions
     void        resize(Glossary& opt);
     
     /// initialize Modulo Object

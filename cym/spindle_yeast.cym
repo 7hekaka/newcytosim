@@ -28,11 +28,15 @@ new cell
 
 set space squeeze
 {
-    geometry = ( capsule 2 0.1 )
+    shape = capsule
     display = ( color=0xFF000055; visible=1; )
 }
 
 new squeeze
+{
+    length = 4.2
+    radius = 0.1
+}
 
 
 %% ----------------------------------------------------------------------

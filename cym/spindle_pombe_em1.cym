@@ -32,12 +32,12 @@ set fiber microtubule2
 set space cell
 {
     shape = sphere
+    display = ( visible=0; )
 }
 
 new cell
 {
     radius = 1.0
-    display = ( visible=0; )
 }
 
 

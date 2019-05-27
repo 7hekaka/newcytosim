@@ -11,10 +11,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( ellipse 12 10 10 )
+    shape = ellipse
 }
 
 new cell
+{
+    length = 24, 20, 20
+}
 
 
 set solid blob

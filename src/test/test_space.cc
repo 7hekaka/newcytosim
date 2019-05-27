@@ -6,6 +6,7 @@
 #include <ctime>
 #include "dim.h"
 #include "exceptions.h"
+#include "iowrapper.h"
 #include "glossary.h"
 #include "real.h"
 #include "vector.h"
@@ -182,9 +183,9 @@ void setGeometry()
             spc = nullptr;
         }
         spc = prop.newSpace(opt);
-    
-        std::clog << "    shape      = " << prop.shape << "\n";
-        std::clog << "    dimensions = " << prop.dimensions << "\n";
+        Outputter out(stdout, false);
+        spc->write(out);
+        out.writeSoftNewline();
     }
     catch( Exception & e )
     {
@@ -210,7 +211,7 @@ void checkVolume()
     real e1 = spc->estimateVolume(cnt);
     real e2 = spc->estimateVolume(cnt);
     
-    printf("Monte-Carlo estimated volume of `%s`:\n", spc->geometry().c_str());
+    printf("Monte-Carlo estimated volume of `%s`:\n", spc->prop->shape.c_str());
     printf("    volume = %.6f +/- %.6f\n", e1, fabs(e2-e1));
     
     real v = spc->volume();
@@ -554,7 +555,7 @@ int main(int argc, char* argv[])
     if ( ! spc )
     {
         printf("A geometry should be given in the command line, for example:\n");
-        printf("    test_space geometry='capsule 1 2'\n");
+        printf("    test_space shape=ellipse length=2,3,4\n");
         exit(EXIT_SUCCESS);
     }
 

@@ -1482,7 +1482,7 @@ void Simul::reportSpace(std::ostream& out) const
     {
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();
-        out << SEP << std::fixed << obj->geometry();
+        out << SEP << std::fixed << obj->prop->shape;
     }
 }
 

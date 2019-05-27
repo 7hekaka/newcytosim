@@ -14,10 +14,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 10 2 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 24
+    radius = 2
+}
 
 set fiber microtubule
 {
@@ -54,13 +58,13 @@ set hand tracker
     display = { width=3; size=8; color=0x00FF0044; }
 }
 
-set single protein
+set single simplex
 {
     hand = tracker
     diffusion = 10
 }
 
-new 1000 protein
+new 1000 simplex
 
 run system
 {

@@ -9,11 +9,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( ellipse 15 10 10 )
+    shape = ellipse
     display = ( visible=3; color=0x22222222; )
 }
 
 new cell
+{
+    length = 30, 20, 20
+}
 
 set fiber microtubule
 {

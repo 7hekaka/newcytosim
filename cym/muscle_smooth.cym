@@ -11,10 +11,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( square 5 1 1 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 10, 2, 2
+}
 
 set fiber actin
 {

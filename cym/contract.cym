@@ -16,10 +16,13 @@ change system
 
 set space cell
 {
-    geometry = ( circle 7 )
+    shape = circle 7
 }
 
 new cell
+{
+    radius = 7
+}
 
 set fiber filament
 {

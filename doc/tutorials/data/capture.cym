@@ -15,7 +15,7 @@ set simul system
 
 set space cell
 {
-    geometry             = sphere 35;
+    shape                = sphere;
 }
 
 set hand glue
@@ -80,6 +80,7 @@ set single complex
 
 new cell
 {
+    radius = 35;
 }
 
 new 22 chromosome

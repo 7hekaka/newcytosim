@@ -45,52 +45,61 @@
  @ingroup NewObject
  @brief A Space defines a confined region
  
- A Space is created by specifying a geometry:
+ A Space is created by specifying shape and dimensions:
  
      set space NAME
      {
-        geometry = GEOMETRY DIMENSIONS
+        shape = SHAPE
      }
  
+     new NAME
+     {
+        PARAMETER = DIMENSIONS
+     }
  
- DIMENSIONS is usually a list of numbers.
+ PARAMETER is usually 'length' or 'radius', but also 'height' or 'width'
+ DIMENSIONS is a single REAL or a comma-separated list of REAL.
  
- List of known `geometry`:
+ List of known `shape`:
  
- GEOMETRY      | Class                | DIMENSIONS                             |
- --------------|----------------------|-----------------------------------------
+ SHAPE         | Class                | PARAMETER
+ --------------|----------------------|-------------------------------------
  `rectangle`   | SpaceSquare          | sizeX sizeY sizeZ
  `sphere`      | SpaceSphere          | radius
  `polygon`     | SpacePolygon         | file_name height
  `polygonZ`    | SpacePolygonZ        | file_name
- `capsule`     | SpaceCapsule         | half_length radius
- `torus`       | SpaceTorus           | radius thickness
- `banana`      | SpaceBanana          | total_length width radius_of_curvature
+ `capsule`     | SpaceCapsule         | length radius
+ `torus`       | SpaceTorus           | radius width
+ `banana`      | SpaceBanana          | length width radius (for curvature)
  `dice`        | SpaceDice            | sizeX sizeY sizeZ radius
  `strip`       | SpaceStrip           | sizeX sizeY sizeZ
  `periodic`    | SpacePeriodic        | sizeX sizeY sizeZ
  `ellipse`     | SpaceEllipse         | sizeX sizeY sizeZ
- `cylinder`    | SpaceCylinder        | half_length radius
+ `cylinder`    | SpaceCylinder        | length radius
  `cylinderZ`   | SpaceCylinderZ       | radius bottom top
- `cylinderP`   | SpaceCylinderP       | half_length radius
- `ring`        | SpaceRing            | half_length radius
- `tee`         | SpaceTee             | half_length radius arm_position arm_length
- `mesh`        | SpaceMesh            | mesh file
+ `cylinderP`   | SpaceCylinderP       | length radius
+ `ring`        | SpaceRing            | length radius
+ `tee`         | SpaceTee             | length radius junction arm
+ `mesh`        | SpaceMesh            | file_name
 
  Dynamic Space with variable geometry:
  
- GEOMETRY           | Class                | DIMENSIONS        |
+ GEOMETRY           | Class                | PARAMETER        |
  -------------------|----------------------|--------------------
  `lid`              | SpaceLid             | width height
  `disc`             | SpaceDisc            | radius
  `dynamic_sphere`   | SpaceDynamicSphere   | radius
- `dynamic_ellipse`  | SpaceDynamicEllipse  | sizeX sizeY sizeZ
+ `dynamic_ellipse`  | SpaceDynamicEllipse  | length
  
  Example:
  
      set space cell
      {
-          geometry = sphere 5
+         shape = sphere
+     }
+     new cell
+     {
+         radius = 5
      }
  
  */
@@ -256,7 +265,7 @@ void SpaceProp::complete(Simul const& sim)
 void SpaceProp::write_values(std::ostream& os) const
 {
     //write_value(os, "geometry",   geometry);
-    write_value(os, "shape",  shape);
+    write_value(os, "shape",      shape);
 #if NEW_DYNAMIC_SPACES
     write_value(os, "tension",    tension);
     write_value(os, "volume",     volume);

@@ -61,9 +61,12 @@ set couple basketer
 
 set space template
 {
-    geometry = ( circle 2 )
+    shape = circle
 }
 new template
+{
+    radius = 2
+}
 
 change microtubule
 {

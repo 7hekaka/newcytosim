@@ -10,10 +10,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( strip 4 4 4 )
+    shape = strip
 }
 
 new cell
+{
+    length = 8, 8, 8
+}
 
 set bead balls
 {

@@ -8,11 +8,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 4 2 )
+    shape = capsule
     display = ( visible=0 )
 }
 
 new cell
+{
+    length = 12
+    radius = 2
+}
 
 set hand motor
 {
@@ -24,13 +28,13 @@ set hand motor
     display = ( size=2; color=green )
 }
 
-set single protein
+set single simplex
 {
     hand = motor
     diffusion = 1
 }
 
-new 100000 protein
+new 100000 simplex
 
 set fiber filament
 {

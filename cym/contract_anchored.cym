@@ -10,10 +10,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 10 5 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 30
+    radius = 5
+}
 
 set hand myosin
 {

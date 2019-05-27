@@ -28,11 +28,14 @@ set fiber microtubule
 
 set space rail
 {
-    geometry = ( rectangle 10 0 0 )
+    shape = rectangle
     display = ( color = red )
 }
 
 new rail
+{
+    length = 20, 0, 0
+}
 
 set solid core
 {

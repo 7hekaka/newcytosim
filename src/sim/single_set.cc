@@ -114,7 +114,7 @@ Object * SingleSet::newObjectT(const ObjectTag tag, unsigned num)
 
  You can attach a Single to a fiber:
  
-     new protein
+     new simplex
      {
         attach = FIBER, REAL, REFERENCE
      }

@@ -13,10 +13,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( rectangle 4 5 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 8, 10
+}
 
 set fiber filament
 {
@@ -46,7 +49,7 @@ new 0 ball
 
 set space force_field
 {
-    geometry = force
+    shape = force
     display = ( color=gray )
 }
 

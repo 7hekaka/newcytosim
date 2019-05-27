@@ -70,7 +70,7 @@ public:
     /// constructor
     SpaceDynamicEllipse(SpaceProp const*);
     
-    /// update geometry
+    /// change dimensions
     void    resize(Glossary& opt);
 
     /// add interactions to a Meca

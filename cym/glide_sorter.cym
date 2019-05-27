@@ -9,7 +9,7 @@ set space cell
 
 new cell
 {
-    length = 10, 10, 10
+    length = 10, 10, 2
 }
 
 set simul system

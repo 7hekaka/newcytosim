@@ -122,12 +122,12 @@ bool splitNumber(std::string& arg, unsigned& num)
  activity `fixed`.
  
  One can specify multiple attachement instructions with `attach1`, `attach2`, etc.
- For example, to attach one `protein` at each end of the filaments, one can use:
+ For example, this attaches one `simplex` at each end of the filaments:
  
      new filament
      {
-        attach1 = protein, 0.0, minus_end
-        attach2 = protein, 0.0, plus_end
+        attach1 = simplex, 0.0, minus_end
+        attach2 = simplex, 0.0, plus_end
      }
 
  @}

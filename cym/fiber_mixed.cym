@@ -18,10 +18,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 2 1 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 6
+    radius = 1
+}
 
 set fiber microtubule
 {
@@ -71,7 +75,7 @@ set hand myosin
     display = ( size=10; color=sky_blue )
 }
 
-set couple protein
+set couple complex
 {
     hand1 = myosin
     hand2 = kinesin
@@ -90,7 +94,7 @@ new 10 actin
     length = 1
 }
 
-new 100 protein
+new 100 complex
 
 
 run system

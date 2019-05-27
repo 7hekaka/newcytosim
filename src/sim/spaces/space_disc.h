@@ -35,7 +35,7 @@ public:
     /// constructor
     SpaceDisc(SpaceProp const*);
 
-    /// update geometry
+    /// change dimensions
     void        resize(Glossary& opt);
  
     /// the volume inside

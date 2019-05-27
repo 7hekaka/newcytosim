@@ -1,8 +1,8 @@
 # Cytosim to Blender export
 
 For its display, Cytosim uses methods that are fast but not physically exact.
-It uses [OpenGL](https://en.wikipedia.org/wiki/OpenGL), a library used extensively in computer games.
-More realistic (and nicer) images can be obtained using [Ray tracing](https://en.wikipedia.org/wiki/Ray_tracing_(graphics)).
+It uses [OpenGL](https://en.wikipedia.org/wiki/OpenGL), a library used extensively in computer games, that uses drawing techniques.
+More realistic (and nicer looking) images can be obtained using [Ray tracing](https://en.wikipedia.org/wiki/Ray_tracing_(graphics)) a technique in which the trajectory of light rays through the scene are estimated.
 
 Funded by the DivIDE consortium, we developped an output module for Cytosim, which creates files that can be read into [Blender](https://en.wikipedia.org/wiki/Blender_(software)), an OpenSource computer graphics software with Ray Tracing capacity.
 
@@ -26,7 +26,7 @@ As usual, create a config file and run `sim` in a separate directory:
 	edit config.cym
 	./sim
 
-This should create `object.cmo` and `properties.cmo`.
+This should create `object.cmo` and `properties.cmo` in the `run` directory.
 
 ### Step 2
 

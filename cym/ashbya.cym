@@ -26,11 +26,16 @@ set system display
 
 set space cell
 {
-    geometry = ( cylinderP 15 1.5 )
+    shape = cylinderP
     display = ( color=0x00000033, black )
 }
 
 new cell
+{
+    length = 30
+    radius = 1.5
+}
+
 
 % Values for MT dynamics in Ashbya gossypii from Grava and Philippsen MBoC 2010 21, 3680-3692
 % Assumption that catastrophe rate = growing speed / average MT length

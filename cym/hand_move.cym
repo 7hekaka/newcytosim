@@ -49,13 +49,13 @@ set hand motor
     display = { width=3; size=12; color=green }
 }
 
-set single protein
+set single simplex
 {
     hand = motor
     diffusion = 0.1
 }
 
-new 100 protein
+new 100 simplex
 
 run system
 {

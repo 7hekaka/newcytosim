@@ -47,7 +47,7 @@ public:
     /// constructor
     SpaceBanana(SpaceProp const*);
     
-    /// update geometry
+    /// change dimensions
     void        resize(Glossary& opt);
  
     /// return bounding box in `inf` and `sup`

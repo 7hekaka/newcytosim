@@ -18,16 +18,19 @@ set simul system
 
 set space cell
 {
-    geometry = ( ellipse 15 10 10 )
+    shape = ellipse
     display = ( visible=3; color=0x0000FF22 )
 }
 
 new cell
+{
+    length = 30, 20, 20
+}
 
 set fiber microtubule
 {
     rigidity = 20
-    segmentation = 1.0
+    segmentation = 1.5
 
 % add a 'pulling' length-dependent force:
     colinear_force = 10
@@ -75,6 +78,6 @@ new centrosome
 
 run 50000 system
 {
-    nb_frames = 500
+    nb_frames = 100
 }
 

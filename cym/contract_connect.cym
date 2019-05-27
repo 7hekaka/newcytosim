@@ -13,7 +13,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( circle 4 )
+    shape = circle
 }
 
 set fiber filament
@@ -60,6 +60,9 @@ set couple motor
 
 
 new cell
+{
+    radius = 4
+}
 
 new 250 filament
 {

@@ -12,11 +12,15 @@ set simul system
 
 set space plate
 {
-    geometry = ( cylinder 0.5 4.5 )
+    shape = cylinder
     display = ( color=0x0000FF11; visible=0 )
 }
 
 new plate
+{
+    length = 1
+    radius = 4.5
+}
 
 set bead chromosome
 {
@@ -35,19 +39,26 @@ run 200 system
 
 set space chromosomes
 {
-    geometry = ( beads chromosome )
+    shape = beads
     display = ( visible=0 )
 }
 
 new chromosomes
+{
+    bead = chromosome
+}
 
 set space cell
 {
-    geometry = ( cylinder 15 6 )
+    shape = cylinder
     display = ( color=0xFFFFFF10 )
 }
 
 new cell
+{
+    length = 30
+    radius = 6
+}
 
 set fiber microtubule
 {

@@ -40,11 +40,14 @@ You should first set up a basic configuration file. Since we are interested in t
 
     set space cell
     {
-        geometry = rectangle 2 0.2 0.05
+        shape = rectangle
         display  = (visible = 0;)
     }
 
     new cell
+    {
+        length = 4, 0.4, 0.1
+    }
 
     set fiber microtubule
     {

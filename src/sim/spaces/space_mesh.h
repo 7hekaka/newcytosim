@@ -56,7 +56,7 @@ public:
     /// add interactions between fibers and reentrant corners
     void        setInteractions(Meca &, FiberSet const&) const;
 
-    /// update geometry
+    /// change dimensions
     void        resize(Glossary& opt);
     
     /// OpenGL display function; returns true if successful

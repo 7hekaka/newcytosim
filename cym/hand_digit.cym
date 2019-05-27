@@ -16,10 +16,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 0.5 0.25 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 1.50
+    radius = 0.25
+}
 
 set fiber fiber1
 {

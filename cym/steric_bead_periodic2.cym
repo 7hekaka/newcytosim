@@ -14,11 +14,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 2.5 3 4 )
+    shape = periodic
 }
 
 new cell
-    
+{
+    length = 5, 6, 8
+}
+
 set bead balls
 {
     steric = 1

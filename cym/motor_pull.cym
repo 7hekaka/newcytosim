@@ -10,10 +10,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 2.5 1 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 7
+    radius = 1
+}
 
 set fiber microtubule
 {
@@ -34,9 +38,9 @@ set hand motor
     binding = 50, 0.01
     unbinding = 0.5, 2
     
-    activity    = motor
-    motor_speed = -1
-    motor_force = 5
+    activity = motor
+    unloaded_speed = -1
+    stall_force = 5
     display = ( size=8; color=orange )
 }
 

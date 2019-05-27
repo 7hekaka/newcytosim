@@ -10,11 +10,14 @@ set simul system
 
 set space cell 
 {
-    geometry = ( rectangle 1 0.5 1 )
+    shape = rectangle
     display = ( visible = 0 )
 }
 
 new cell
+{
+    length = 2, 1, 2
+}
 
 set fiber microtubule
 {

@@ -15,10 +15,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( square 40 20 1 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 80, 40, 2
+}
 
 set fiber microtubule
 {
@@ -39,14 +42,13 @@ set hand regulator
     activity = regulate
 }
 
-set single protein
+set single simplex
 {
     hand = regulator
     diffusion = 1
 }
 
-new 100 protein
-
+new 100 simplex
 
 new 0 microtubule
 {

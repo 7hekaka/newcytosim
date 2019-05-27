@@ -28,13 +28,13 @@ set hand motor
     display = ( size=8; color=light_green )
 }
 
-set single protein
+set single simplex
 {
     hand = motor
     diffusion = 0.1
 }
 
-new 10000 protein
+new 10000 simplex
 
 run 100 system
 {
@@ -43,12 +43,15 @@ run 100 system
 
 set space A
 {
-    geometry = ( square 3 3 3 )
+    shape = rectangle
 }
 
 new A
+{
+    length = 6, 6, 6
+}
 
-delete protein
+delete all simplex
 {
     position = inside, A
 }

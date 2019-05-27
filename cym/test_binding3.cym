@@ -47,14 +47,14 @@ set hand binder1
     display = { color=blue, 0x0000FF77; width=0 }
 }
 
-set single protein1
+set single simplex1
 {
     hand = binder1
     activity = fixed
     stiffness = 0
 }
 
-new 10000 protein1
+new 10000 simplex1
 
 
 set fiber microtubule2
@@ -81,14 +81,14 @@ set hand binder2
     display = { color=red, 0x0000FF77; width=0 }
 }
 
-set single protein2
+set single simplex2
 {
     hand = binder2
     activity = fixed
     stiffness = 0
 }
 
-new 10000 protein2
+new 10000 simplex2
 
 
 run system

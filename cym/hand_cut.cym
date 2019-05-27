@@ -13,10 +13,14 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 4 1 )
+    shape = capsule
 }
 
 new cell
+{
+    length = 10
+    radius = 1
+}
 
 set fiber microtubule
 {
@@ -52,13 +56,13 @@ set hand cutter
     display = ( size=6; color=green, dark_green; )
 }
 
-set single protein
+set single simplex
 {
     hand = cutter
     diffusion = 0.2
 }
 
-new 3 protein
+new 3 simplex
 
 run 5000 system
 {

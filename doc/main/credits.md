@@ -10,21 +10,21 @@ A simulation of the cytoskeleton was started in 1995 at Princeton and pursued at
 - 2001 Implicit integration scheme
 - 2012 Scripting language
 - 2018-2019 version 4
-
+  
 
 ## Contributors
  
-- Francois Nedelec        1995-\n
-- Dietrich Foethke        2003-2007\n
-- Cleopatra Kozlowski     2003-2007\n
-- Elizabeth Loughlin      2006-2010\n
-- Ludovic Brun            2008-2010\n
-- Beat Rupp               2008-2011\n
-- Jonathan Ward           2008-2014\n
-- Antonio Politi          2010-2012\n
-- Andre-Claude Clapson    2011-2013\n
-- Serge Dmitrieff         2013-\n
-- Julio Belmonte          2014-\n
+- Francois Nedelec        1995-  
+- Dietrich Foethke        2003-2007  
+- Cleopatra Kozlowski     2003-2007  
+- Elizabeth Loughlin      2006-2010  
+- Ludovic Brun            2008-2010  
+- Beat Rupp               2008-2011  
+- Jonathan Ward           2008-2014  
+- Antonio Politi          2010-2012  
+- Andre-Claude Clapson    2011-2013  
+- Serge Dmitrieff         2013-  
+- Julio Belmonte          2014-  
 
 ### Contact:
  

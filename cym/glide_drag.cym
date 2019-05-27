@@ -12,17 +12,24 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 15 5 )
+    shape = periodic
 }
 
 set space rail
 {
-    geometry = ( strip 15 0 )
+    shape = strip
     display = ( color = red )
 }
 
 new cell
+{
+    length = 30, 10
+}
+
 new rail
+{
+    length = 30, 0
+}
 
 set fiber microtubule
 {

@@ -12,11 +12,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 5 5 )
+    shape = capsule
     display = ( color = 0xFFFFFF22; )
 }
 
 new cell
+{
+    length = 20
+    radius = 5
+}
 
 set hand molecule
 {

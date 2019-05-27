@@ -8,11 +8,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 4 2 )
+    shape = capsule
     display = ( visible=0 )
 }
 
 new cell
+{
+    length = 12
+    radius = 2
+}
 
 set field blue
 {

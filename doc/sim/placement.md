@@ -36,15 +36,15 @@ Most primitives describe a certain area in Space, and the returned position is
  `A B C`              | The specified vector (A,B,C)
  `inside`             | A random position inside the current Space
  `edge E`             | At distance E from the edge of the current Space
- `surface E`          | On the surface of the current Space\n By projecting a point at distance E from the surface.
+ `surface E`          | On the surface of the current Space; By projecting a point at distance E from the surface.
  `line L T`           | Selected randomly with -L/2 < X < L/2; norm(Y,Z) < T
- `sphere R T`         | At distance R +/- T/2 from the origin\n `R-T/2 < norm(X,Y,Z) < R+T/2`
- `ball R`             | At distance R at most from the origin\n `norm(X,Y,Z) < R`
- `disc R T`           | in 2D, a disc in the XY-plane \n in 3D, a disc in the XY-plane of thickness T in Z
+ `sphere R T`         | At distance R +/- T/2 from the origin; `R-T/2 < norm(X,Y,Z) < R+T/2`
+ `ball R`             | At distance R at most from the origin; `norm(X,Y,Z) < R`
+ `disc R T`           | in 2D, a disc in the XY-plane; in 3D, a disc in the XY-plane of thickness T in Z
  `discXZ R T`         | Disc in the XZ-plane of radius R, thickness T
  `discYZ R T`         | Disc in the YZ-plane of radius R, thickness T
- `equator R T`        | At distance R from the origin, and T from the XY plane:\n `norm(X,Y) < R` `norm(Z) < T`
- `circle R T`         | Circle of radius R and thickness T \n At distance T from the circle of radius R
+ `equator R T`        | At distance R from the origin, and T from the XY plane: `norm(X,Y) < R` `norm(Z) < T`
+ `circle R T`         | Circle of radius R and thickness T; At distance T from the circle of radius R
  `cylinder W R`       | Cylinder of axis X, W=thickness in X, R=radius in YZ
  `ellipse A B C`      | Inside the ellipse or ellipsoid of main axes 2A, 2B and 2C
  `arc L Theta`        | A piece of circle of length L and covering an angle Theta

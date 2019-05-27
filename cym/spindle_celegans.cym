@@ -16,19 +16,25 @@ set simul system
 
 set space cell
 {
-    geometry = (circle 5)
+    shape = circle
     display = { visible=0; }
 }
 
 new cell
+{
+    radius = 5
+}
 
 set space plate
 {
-    geometry = ( ellipse 0.5 2.5 2.5 )
+    shape = ellipse
     display = { color=0xFFFFFF22; visible=2; }
 }
 
 new plate
+{
+    length = 1, 5, 5
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MICROTUBULES

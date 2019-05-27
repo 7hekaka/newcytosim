@@ -13,11 +13,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 3.5 1.62 )
+    shape = capsule
     display = ( color=0xFFFFFF33, 0x11111188; visible=3; )
 }
 
 new cell
+{
+    length = 10
+    radius = 1.62
+}
 
 set fiber microtubule
 {

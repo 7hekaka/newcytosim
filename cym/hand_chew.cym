@@ -14,10 +14,13 @@ set simul system
 
 set space cell
 {
-    geometry = ( square 10 1 1 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 20, 2, 2
+}
 
 set fiber microtubule
 {
@@ -59,13 +62,13 @@ set hand chewer
     display = ( size=7; color=0x7777FF77; )
 }
 
-set single protein
+set single simplex
 {
     hand = chewer
     diffusion = 1
 }
 
-new 500 protein
+new 500 simplex
 
 run 50000 system
 {

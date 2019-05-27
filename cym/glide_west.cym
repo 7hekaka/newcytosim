@@ -18,10 +18,13 @@ set simul system
 
 set space slide
 {
-    geometry = ( periodic 8.666 5 )
+    shape = periodic
 }
 
 new slide
+{
+    length = 17.333, 10
+}
 
 set fiber microtubule
 {

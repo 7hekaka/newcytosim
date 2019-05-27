@@ -17,10 +17,13 @@ set simul system
 
 set space cell 
 {
-    geometry = ( rectangle 6 1.5 1.5 )
+    shape = rectangle
 }
 
 new cell
+{
+    length = 12, 3, 3
+}
 
 set fiber microtubule
 {

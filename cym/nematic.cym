@@ -14,10 +14,13 @@ set simul system
 
 set space spindle
 {
-    geometry = ( ellipse 6 5 5 )
+    shape = ellipse
     display = ( color=0x0000FF33; visible=1; )
 }
 new spindle
+{
+    length = 12, 10, 10
+}
 
 %-------------------------MICROTUBULES
 

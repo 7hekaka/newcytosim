@@ -2,10 +2,13 @@
 
 set space cell
 {
-    geometry = ( periodic 10 10 10 )
+    shape = periodic
 }
 
 new cell
+{
+    length = 20, 20, 20
+}
 
 set simul system
 {

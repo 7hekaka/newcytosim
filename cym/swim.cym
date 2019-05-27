@@ -18,7 +18,7 @@ set system display
 
 set space cell
 {
-    geometry = ( rectangle 8 4 )
+    shape = rectangle
     display = ( visible=0; width=1; )
 }
 
@@ -71,6 +71,9 @@ set solid head
 
 
 new cell
+{
+    length = 16, 8
+}
 
 new head
 {

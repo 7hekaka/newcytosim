@@ -3,7 +3,7 @@
 
 set space cell
 {
-    shape = square
+    shape = rectangle
 }
 
 new cell

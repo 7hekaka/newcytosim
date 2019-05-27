@@ -53,15 +53,14 @@ set hand binder
     display = { color=0x0000FF88; width=0 }
 }
 
-set single protein
+set single simplex
 {
     hand = binder
     activity = fixed
     stiffness = 0
 }
 
-new 25000 protein
-
+new 25000 simplex
 
 run system
 {

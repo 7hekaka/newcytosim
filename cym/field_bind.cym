@@ -7,11 +7,15 @@ set simul system
 
 set space cell
 {
-    geometry = ( capsule 10 5 )
+    shape = capsule
     display = ( color = 0x99999944 )
 }
 
 new cell
+{
+    length = 30
+    radius = 5
+}
 
 set field blue
 {

@@ -15,7 +15,7 @@ set simul system
 
 set space cell
 {
-    geometry = ( periodic 10 10 )
+    shape = periodic
 }
 
 set fiber microtubule
@@ -73,6 +73,10 @@ set single graftedS
 
 
 new cell
+{
+    length = 20, 20
+}
+
 new 1 microtubule
 {
     length = 10
