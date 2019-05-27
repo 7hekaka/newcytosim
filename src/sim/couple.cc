@@ -461,11 +461,6 @@ Vector Couple::otherDirection(Hand const* h) const
 }
 
 
-real Couple::interactionLength() const
-{
-    return prop->length;
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

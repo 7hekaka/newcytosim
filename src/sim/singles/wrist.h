@@ -45,6 +45,9 @@ public:
     
     /// modulo the position of the grafted
     void    foldPosition(Modulo const*) { }
+    
+    /// stiffness of the interaction
+    real    interactionStiffness() const { return prop->stiffness; }
 
     //--------------------------------------------------------------------------
     

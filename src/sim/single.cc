@@ -84,11 +84,6 @@ void Single::beforeDetachment(Hand const* h)
         set->relinkD(this);
 }
 
-real Single::interactionLength() const
-{
-    return prop->length;
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark -

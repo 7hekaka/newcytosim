@@ -70,9 +70,9 @@ void Digit::hop(site_t s)
     dec();
     fbSite = s;
     inc();
-    fbAbs = lattice()->unit() * s + prop->site_shift;
+    fbAbs = s * lattice()->unit() + prop->site_shift;
 #else
-    fbAbs = s * prop->step_size;
+    fbAbs = s * prop->step_size + prop->site_shift;
 #endif
     update();
 }

@@ -57,6 +57,9 @@ public:
     /// resting length of the interaction
     virtual real   interactionLength() const { return 0; }
     
+    /// stiffness of the interaction
+    virtual real   interactionStiffness() const { return 0; }
+
 };
 
 

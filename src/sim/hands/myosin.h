@@ -40,7 +40,10 @@ public:
     
     /// destructor
     ~Myosin() {}
-    
+
+    /// attach and update variables
+    void   attach(FiberSite const& site);
+
     /// simulate when `this` is attached but not under load
     void   stepUnloaded();
     

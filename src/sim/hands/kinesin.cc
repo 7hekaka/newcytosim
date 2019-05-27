@@ -11,8 +11,14 @@
 Kinesin::Kinesin(KinesinProp const* p, HandMonitor* h)
 : Digit(p,h), prop(p)
 {
-    nextStep = RNG.exponential();
     ABORT_NOW("unfinished class");
+}
+
+
+void Kinesin::attach(FiberSite const& fb)
+{
+    Digit::attach(fb);
+    nextStep = RNG.exponential();
 }
 
 
@@ -31,7 +37,6 @@ void Kinesin::stepUnloaded()
         site_t s = site() + 1;
         if ( edgy(s) )
         {
-            nextStep = RNG.exponential();
             //immediately detach at the end of the Fiber:
             detach();
             return;
@@ -65,7 +70,6 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
         site_t s = site() + 1;
         if ( edgy(s) )
         {
-            nextStep = RNG.exponential();
             //immediately detach at the end of the Fiber:
             detach();
             return;

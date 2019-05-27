@@ -58,7 +58,9 @@ private:
     /// Simul container
     Simul*    simul_ptr() const { return &Object::simul(); }
     /// specialization of HandMonitor
-    real      interactionLength() const;
+    real      interactionLength() const { return prop->length; }
+    /// stiffness of the interaction
+    real      interactionStiffness() const { return 0; }
 
 protected:
     

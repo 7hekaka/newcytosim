@@ -19,7 +19,9 @@ public:
     
     /// sPos should never change
     void    beforeDetachment(Hand const*);
-       
+    /// stiffness of the interaction
+    real    interactionStiffness() const { return prop->stiffness; }
+
 public:
 
     /// constructor

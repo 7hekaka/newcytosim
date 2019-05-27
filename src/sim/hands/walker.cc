@@ -46,7 +46,6 @@ void Walker::stepUnloaded()
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
         {
-            nextStep = RNG.exponential();
             detach();
             return;
         }
@@ -55,13 +54,13 @@ void Walker::stepUnloaded()
         
         if ( edgy(s) )
         {
-            nextStep = RNG.exponential();
             if ( RNG.test_not(prop->hold_growing_end) )
+            {
                 detach();
-            return;
+                return;
+            }
         }
-        
-        if ( vacant(s) )
+        else if ( vacant(s) )
             hop(s);
     
         nextStep += RNG.exponential();
@@ -90,7 +89,6 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
         {
-            nextStep = RNG.exponential();
             detach();
             return;
         }
@@ -99,13 +97,13 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
 
         if ( edgy(s) )
         {
-            nextStep = RNG.exponential();
             if ( RNG.test_not(prop->hold_growing_end) )
+            {
                 detach();
-            return;
+                return;
+            }
         }
-
-        if ( vacant(s) )
+        else if ( vacant(s) )
             hop(s);
         
         nextStep += RNG.exponential();
