@@ -577,12 +577,12 @@ void SingleSet::uniAttach(FiberSet const& fibers)
             
             if ( p->fast_diffusion == 2 )
             {
-                real dis = vol / ( cnt * p->hand_prop->bindingSection(0) );
+                real dis = vol / ( cnt * p->hand_prop->bindingSectionRate() );
                 fibers.newFiberSitesP(loc, dis);
             }
             else
             {
-                real dis = vol / ( cnt * p->hand_prop->bindingSection(1) );
+                real dis = vol / ( cnt * p->hand_prop->bindingSectionProb() );
                 fibers.uniFiberSites(loc, dis);
             }
             

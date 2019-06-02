@@ -718,12 +718,12 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 
         if ( p->fast_diffusion == 2 )
         {
-            real dis = alpha / p->hand1_prop->bindingSection(0);
+            real dis = alpha / p->hand1_prop->bindingSectionRate();
             fibers.newFiberSitesP(loc, dis);
         }
         else
         {
-            real dis = alpha / p->hand1_prop->bindingSection(1);
+            real dis = alpha / p->hand1_prop->bindingSectionProb();
             fibers.uniFiberSites(loc, dis);
         }
         
@@ -735,12 +735,12 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         // if ( couple:trans_activated == true ), Hand2 cannot bind
         if ( p->fast_diffusion == 2 )
         {
-            real dis = alpha / p->hand2_prop->bindingSection(0);
+            real dis = alpha / p->hand2_prop->bindingSectionRate();
             fibers.newFiberSitesP(loc, dis);
         }
         else
         {
-            real dis = alpha / p->hand2_prop->bindingSection(1);
+            real dis = alpha / p->hand2_prop->bindingSectionProb();
             fibers.uniFiberSites(loc, dis);
         }
         

@@ -9,7 +9,7 @@
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    rfAllocated  = 0;
+    mtJJAlloc    = 0;
     mtP          = 0;
     mtDiffP      = 0;
     mtJJtiJ      = 0;
@@ -19,13 +19,13 @@ void Mecafil::buildProjection()
 
 void Mecafil::allocateProjection(const size_t nbp)
 {
-    if ( rfAllocated < nbp )
+    if ( mtJJAlloc < nbp )
     {
         //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
         if ( mtP )     free_real(mtP);
         if ( mtDiffP ) free_real(mtDiffP);
         if ( mtJJtiJ ) free_real(mtJJtiJ);
-        rfAllocated  = nbp;
+        mtJJAlloc = nbp;
         mtP          = new_real(DIM*nbp*DIM*nbp);
         mtDiffP      = new_real(DIM*nbp*DIM*nbp);
         mtJJtiJforce = new_real(nbp);
@@ -64,7 +64,7 @@ void Mecafil::makeProjection()
     const unsigned int nbv = DIM * nbPoints();         //number of variables
     assert_true( nbc > 0 );
     
-    assert_true( rfAllocated >= nbPoints() );
+    assert_true( mtJJAlloc >= nbPoints() );
     
     //----- we allocate the arrays needed:
     real* J   = new_real(nbv*nbc);

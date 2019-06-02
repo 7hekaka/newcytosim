@@ -238,9 +238,12 @@ public:
     /// perform additional tests for the validity of parameters, given the elasticity
     virtual void checkStiffness(real stiff, real len, real mul, real kT) const;
     
-    /// Estimate attachment propensity per unit length of fiber
-    real  bindingSection(bool) const;
+    /// Attachment rate per unit length of fiber
+    real bindingSectionRate() const;
     
+    /// Attachment probability per unit length of fiber in one time_step
+    real bindingSectionProb() const;
+
     /// write all values
     void write_values(std::ostream&) const;
     

@@ -31,9 +31,6 @@ class Mecafil : public Filament
 {
 private:
     
-    /// allocation size for projection
-    size_t      rfAllocated;
-    
     /// Lagrange multipliers associated with longitudinal imcompressibility
     real   *    rfLag;
     
@@ -48,6 +45,9 @@ private:
     /// memory allocated to hold nbPoints() values (used as temporary variables)
     real   *    rfLLG, * rfVTP;
     
+    /// allocation size for projection
+    size_t      mtJJAlloc;
+
 #if PROJECT_WITH_MATRIX
     
     /* variables used for projecting with a matrix ( mecafil_projectmat.cc ) */

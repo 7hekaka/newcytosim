@@ -394,6 +394,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         unsigned ref = addSphere(vec, rad);
         addTriad(rad);
 
+#if ( DIM > 1 )
         real sep = 1.0, dev = 0.0;
         if ( opt.set(dev, "deviation") && opt.set(sep, "separation") )
         {
@@ -429,16 +430,13 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 Vector pos = pts[inx-3];
                 for ( unsigned i = 0; i < num; ++i )
                 {
-#if ( DIM > 1 )
                     vec = normalize(pos+pos.randOrthoB(dev/rad));
                     res.push_back(new Wrist(sip, this, ref, vec));
-#else
-                    throw InvalidParameter("Cannot use patchy decoration in 1D");
-#endif
                 }
             }
         }
         else
+#endif
         {
             // Singles are distributed uniformly on the surface of the sphere
             inx = 2;

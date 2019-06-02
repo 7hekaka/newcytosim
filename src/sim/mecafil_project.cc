@@ -41,7 +41,7 @@ should be defined as ZERO
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    rfAllocated  = 0;
+    mtJJAlloc    = 0;
     mtJJt        = nullptr;
     mtJJtiJforce = nullptr;
 }
@@ -49,22 +49,22 @@ void Mecafil::buildProjection()
 
 void Mecafil::allocateProjection(const size_t nbp)
 {
-    if ( rfAllocated < nbp )
+    if ( mtJJAlloc < nbp )
     {
         //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
         if ( mtJJt )
             free_real(mtJJt);
         
         // make a multiple of chunk to align memory:
-        rfAllocated  = chunk_real(nbp);
-        assert_true(rfAllocated > 0);
+        mtJJAlloc = chunk_real(nbp);
+        assert_true(mtJJAlloc > 0);
         
-        real * mem = new_real(4*rfAllocated);
-        //zero_real(4*rfAllocated, mem);
+        real * mem = new_real(4*mtJJAlloc);
+        //zero_real(4*mtJJAlloc, mem);
         
         mtJJt        = mem;
-        mtJJtU       = mem + rfAllocated * 2;
-        mtJJtiJforce = mem + rfAllocated * 3;
+        mtJJtU       = mem + mtJJAlloc * 2;
+        mtJJtiJforce = mem + mtJJAlloc * 3;
     }
 }
 
@@ -85,7 +85,7 @@ void Mecafil::destroyProjection()
 void Mecafil::makeProjection()
 {
     assert_true( nbPoints() >= 2 );
-    assert_true( rfAllocated >= nbPoints() );
+    assert_true( mtJJAlloc >= nbPoints() );
 
     //set the diagonal and off-diagonal of J*J'
     const unsigned nbu = nbPoints() - 2;
@@ -131,7 +131,7 @@ void Mecafil::makeProjection()
 void Mecafil::makeProjection()
 {
     assert_true( nbPoints() >= 2 );
-    assert_true( rfAllocated >= nbPoints() );
+    assert_true( mtJJAlloc >= nbPoints() );
 
     //set the diagonal and off-diagonal of J*J'
     const unsigned nbu = nbPoints() - 2;

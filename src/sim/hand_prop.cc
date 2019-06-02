@@ -344,16 +344,29 @@ void HandProp::write_values(std::ostream& os) const
 
 
 /**
- Estimate attachment propensity per unit length of fiber
+ Attachment rate per unit length of fiber
  */
-real HandProp::bindingSection(bool with_time_step) const
+real HandProp::bindingSectionRate() const
 {
-    real rate = ( with_time_step ? binding_rate_prob : binding_rate );
-
 #if ( DIM == 2 )
-    return 2 * binding_range * rate;
+    return 2 * binding_range * binding_rate;
 #elif ( DIM == 3 )
-    return M_PI * binding_range * binding_range * rate;
+    return M_PI * binding_range * binding_range * binding_rate;
+#else
+    return 0;
+#endif
+}
+
+
+/**
+ Attachment probability per unit length of fiber in one time_step
+ */
+real HandProp::bindingSectionProb() const
+{
+#if ( DIM == 2 )
+    return 2 * binding_range * binding_rate_prob;
+#elif ( DIM == 3 )
+    return M_PI * binding_range * binding_range * binding_rate_prob;
 #else
     return 0;
 #endif
