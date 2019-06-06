@@ -149,11 +149,11 @@ void ClassicFiberProp::complete(Simul const& sim)
         
         if ( rescue_rate[i] < 0 )
             throw InvalidParameter("fiber:rescue_rate should be >= 0");
-        rescue_prob[i] = 1 - exp( -rescue_rate[i] * sim.prop->time_step );
+        rescue_prob[i] = -std::expm1( -rescue_rate[i] * sim.prop->time_step );
 
         if ( rebirth_rate[i] < 0 )
             throw InvalidParameter("fiber:rebirth_rate should be >= 0");
-        rebirth_prob[i] = 1 - exp( -rebirth_rate[i] * sim.prop->time_step );
+        rebirth_prob[i] = -std::expm1( -rebirth_rate[i] * sim.prop->time_step );
     }
 }
 

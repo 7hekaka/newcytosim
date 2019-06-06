@@ -106,7 +106,7 @@ void DynamicFiberProp::complete(Simul const& sim)
         
         if ( rebirth_rate[i] < 0 )
             throw InvalidParameter("fiber:rebirth_rate should be >= 0");
-        rebirth_prob[i] = 1 - exp( -rebirth_rate[i] * sim.prop->time_step );
+        rebirth_prob[i] = -std::expm1( -rebirth_rate[i] * sim.prop->time_step );
     }
 
     if ( min_length <= 0 )

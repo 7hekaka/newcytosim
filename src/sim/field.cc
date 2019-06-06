@@ -428,7 +428,7 @@ void Field::step(FiberSet& fibers)
     {
         const real spread = 0.5 * cellWidth();
         const real rate = prop->transport_strength * spread / cellVolume();
-        const real frac = 1 - exp( -rate * prop->time_step );
+        const real frac = -std::expm1( -rate * prop->time_step );
         
         if ( frac >= 0.5 )
             throw InvalidParameter("field:transport_strength is too high");

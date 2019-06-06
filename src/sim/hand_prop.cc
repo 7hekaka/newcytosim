@@ -237,7 +237,7 @@ void HandProp::complete(Simul const& sim)
         throw InvalidParameter("simul:time_step is not defined");
     
     binding_range_sqr = square(binding_range);
-    binding_rate_prob = 1 - exp(-binding_rate * sim.prop->time_step);
+    binding_rate_prob = -std::expm1(-binding_rate * sim.prop->time_step);
     unbinding_rate_dt = unbinding_rate * sim.prop->time_step;
     
     binding_rate_dt_8 = 8 * binding_rate * sim.prop->time_step;

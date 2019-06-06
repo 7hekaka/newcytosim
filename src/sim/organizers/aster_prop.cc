@@ -56,7 +56,7 @@ void AsterProp::complete(Simul const& sim)
         sim.properties.find_or_die("fiber", fiber_type);
     }
  
-    fiber_prob = 1 - exp( -fiber_rate * sim.prop->time_step );
+    fiber_prob = -std::expm1( -fiber_rate * sim.prop->time_step );
 }
 
 

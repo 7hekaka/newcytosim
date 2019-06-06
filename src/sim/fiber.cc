@@ -94,7 +94,7 @@ void Fiber::step()
     if ( prop->lattice_binding_rate > 0 || prop->lattice_unbinding_rate > 0 )
     {
         real on  = prop->lattice_binding_rate * prop->time_step;
-        real off = 1.0 - exp( -prop->lattice_unbinding_rate * prop->time_step );
+        real off = -std::expm1( -prop->lattice_unbinding_rate * prop->time_step );
         equilibrateLattice(frLattice, prop->field_ptr, on, off);
     }
     
@@ -1327,7 +1327,7 @@ void Fiber::bindLattice(FiberLattice& lat, Field * fld, real binding_rate) const
     const real rate = binding_rate * spread / fld->cellVolume();
     
     // fraction of the cell content that will bind in one time_step:
-    const real frac = 1 - exp( -rate * prop->time_step );
+    const real frac = -std::expm1( -rate * prop->time_step );
     
     real abs = spread * RNG.exponential();
     const real len = length();

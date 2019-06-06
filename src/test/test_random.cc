@@ -320,7 +320,7 @@ int method2(const int maxTime, const real rate[])
 {
     for ( int ii=0; ii<maxTime; ++ii )
     {
-        if ( RNG.preal() < (1.-exp(-rate[ii])) )
+        if ( RNG.preal() < -std::expm1(-rate[ii]) )
             return ii;
     }
     return maxTime;
