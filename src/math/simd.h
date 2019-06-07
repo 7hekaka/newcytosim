@@ -205,15 +205,16 @@ inline vec4 min4(vec4 a, vec4 b)         { return _mm256_min_pd(a,b); }
 inline vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
 inline vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 
-/*
-// unused functions:
+/* Unused functions:
+ inline vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
+ inline void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
+ */
 
-inline vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
-inline void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
-*/
 /// concatenate two vec2 into a vec4
-inline vec4 cat4(vec2 h, vec2 l)  { return _mm256_set_m128d(h, l); }
-inline vec4 cat7(vec2 h, vec2 l)  { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), (h), 1); }
+inline vec4 cat4(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
+inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
+
+//inline vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
 //#define cat4(h, l)           _mm256_set_m128d(h, l)
 
 
