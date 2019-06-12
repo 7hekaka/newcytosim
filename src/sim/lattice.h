@@ -324,8 +324,8 @@ public:
     //------------------------------------------------------------------------------
     #pragma mark - Transfer
     
-    /// transfer lat->sites within `[s, e[` to *this, and set lat->sites to zero
-    void take(Lattice<CELL> & lat, site_t is, site_t ie)
+    /// transfer cells within `[s, e[` to *this, and reset transfered values
+    void take(Lattice<CELL> & lat, site_t is, site_t ie, cell_t zero)
     {
         //std::clog << " Lattice::take [" << is << ", " << ie << "[\n";
         // select valid range:
@@ -340,7 +340,7 @@ public:
         while ( s < e )
         {
             *s = *o;
-            *o = 0;
+            *o = zero;
             ++s;
             ++o;
         }
@@ -350,13 +350,13 @@ public:
     /// transfer values in [inf, e[
     void takeM(Lattice<CELL> & lat, const site_t e)
     {
-        take(lat, laInf, e);
+        take(lat, laInf, e, 0);
     }
     
     /// transfer values in [s, sup[
     void takeP(Lattice<CELL> & lat, const site_t s)
     {
-        take(lat, s, laSup);
+        take(lat, s, laSup, 0);
     }
     
     //------------------------------------------------------------------------------

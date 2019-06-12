@@ -16,7 +16,7 @@ change system
 
 set space cell
 {
-    shape = circle 7
+    shape = circle
 }
 
 new cell

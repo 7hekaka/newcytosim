@@ -17,7 +17,7 @@ set space cell
 
 set space rail
 {
-    shape = strip
+    shape = square
     display = ( color = red )
 }
 

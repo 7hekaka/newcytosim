@@ -9,10 +9,13 @@ set simul system
 
 set space cell
 {
-    geometry = sphere 5
+    shape = sphere
 }
 
 new cell
+{
+    radius = 5
+}
 
 set fiber filament
 {
@@ -58,5 +61,5 @@ run 10000 system
     nb_frames = 10
 }
 
-report single:force for.txt { append=1; verbose=0; }
-report fiber:tension out.txt { append=1; verbose=0; plane = 1 0 0, 0; }
+report single:force force.txt { verbose=0; }
+report fiber:tension tension.txt { verbose=0; plane = 1 0 0, 0; }

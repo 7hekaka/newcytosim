@@ -93,6 +93,7 @@ public:
     }
 #endif
 
+    /// destructor
     ~Matrix22() {}
     
     /// dimensionality
@@ -112,6 +113,7 @@ public:
 #endif
     }
     
+    /// true if any element is different than 'zero'
     bool operator != (real zero) const
     {
         for ( int u = 0; u < 4; ++u )
@@ -120,7 +122,7 @@ public:
         return false;
     }
 
-    // copy values from lower triangle to upper triangle
+    /// copy values from lower triangle to upper triangle
     void copy_lower()
     {
         val[2] = val[1];
@@ -129,12 +131,15 @@ public:
     /// conversion to pointer of real
     operator real const*() const { return val; }
 
+    /// conversion to array of 'real'
     real* data()             { return val; }
     real* addr(int i, int j) { return val + ( i + 2*j ); }
 
+    /// access operator to elements by index
     real& operator[](int i)       { return val[i]; }
     real  operator[](int i) const { return val[i]; }
     
+    /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val[i+2*j]; }
     real  operator()(int i, int j) const { return val[i+2*j]; }
     
@@ -156,6 +161,7 @@ public:
         return Vector2(val[0], val[3]);
     }
 
+    /// human-friendly ouput
     void print(FILE * f) const
     {
         fprintf(f, "/ %9.3f %9.3f \\\n", val[0], val[2]);
@@ -174,6 +180,7 @@ public:
         return os.str();
     }
 
+    /// true if matrix is symmetric
     bool is_symmetric() const
     {
         return ( val[1] == val[2] );
@@ -279,6 +286,7 @@ public:
         return std::max(a, b);
     }
 
+    /// determinant
     real determinant() const
     {
         return ( val[0] * val[3] - val[1] * val[2] );
@@ -485,6 +493,7 @@ public:
 #endif
     }
     
+    /// matrix-matrix multiplication
     friend Matrix22 operator * (Matrix22 const& mat, Matrix22 const& mut)
     {
         return mat.mul(mut);
@@ -721,6 +730,7 @@ public:
 };
 
 
+/// output operator to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix22 const& M)
 {
     std::streamsize w = os.width();

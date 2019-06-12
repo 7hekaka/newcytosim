@@ -17,15 +17,9 @@ set space cell
     display = ( color=0xFFFFFF33, 0x11111188; visible=3; )
 }
 
-new cell
-{
-    length = 10
-    radius = 1.62
-}
-
 set fiber microtubule
 {
-    rigidity       = 30
+    rigidity       = 20
     segmentation   = 0.5
     confine        = inside, 200
     
@@ -55,7 +49,6 @@ set sphere envelope
 
 set bundle bunch
 {
-    fibers    = microtubule
     overlap   = 0.5
     stiffness = 1000
 }
@@ -65,10 +58,16 @@ set nucleus noyau
     stiffness  = 200
 }
 
+new cell
+{
+    length = 10
+    radius = 1.62
+}
+
 new noyau
 {
     sphere       = envelope
-    bundles      = 4, bunch, (fibers=2, microtubule, (length=0.5))
+    bundles      = 4, bunch, (fibers=2, microtubule, (length=0.5; plus_end=grow;))
     radius       = 1.1
     position     = 3.5 0 0
 }

@@ -98,9 +98,11 @@ public:
     real* data()             { return val; }
     real* addr(int i, int j) { return val + ( i + BLD*j ); }
 
+    /// access operator to elements by index
     real& operator[](int i)       { return val[i]; }
     real  operator[](int i) const { return val[i]; }
 
+    /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val[i+BLD*j]; }
     real  operator()(int i, int j) const { return val[i+BLD*j]; }
     
@@ -150,6 +152,7 @@ public:
         val[2+BLD*2] = C.ZZ;
     }
 
+    /// print matrix in human readible format
     void print(FILE * f) const
     {
         fprintf(f, " / %9.3f %+9.3f %+9.3f \\\n",  val[0], val[0+BLD], val[0+BLD*2]);
@@ -277,6 +280,7 @@ public:
         return res;
     }
 
+    /// determinant of matrix
     real determinant() const
     {
         return ( val[0]*val[BLD+1]*val[BLD*2+2] + val[2]*val[BLD  ]*val[BLD*2+1]
@@ -307,7 +311,7 @@ public:
         return res;
     }
     
-    // inversion of a symmetric matrix, addressing lower triangle
+    /// inversion of a symmetric matrix, addressing lower triangle
     /** This methods uses a L*D*L^t factorization with:
      L = ( 1 0 0; a 1 0; b c 1 )
      D = ( u 0 0; 0 v 0; 0 0 w )
@@ -355,7 +359,7 @@ public:
         return 0;
     }
 
-    // copy values from lower triangle to upper triangle
+    /// copy values from lower triangle to upper triangle
     void copy_lower()
     {
         val[0+BLD  ] = val[1];
@@ -363,6 +367,7 @@ public:
         val[1+BLD*2] = val[2+BLD];
     }
 
+    /// true if matrix is symmetric
     bool is_symmetric() const
     {
         return ( val[BLD] == val[1]
@@ -462,6 +467,7 @@ public:
 #endif
     }
 
+    /// multiplication with a vector: M * V
     friend Vector3 operator * (Matrix33 const& mat, Vector3 const& vec)
     {
         return mat.vecmul(vec);
@@ -511,6 +517,7 @@ public:
         return res;
     }
     
+    /// multiplication with a matrix
     friend Matrix33 operator * (Matrix33 const& mat, Matrix33 const& mut)
     {
         return mat.mul(mut);
@@ -886,6 +893,7 @@ public:
 };
 
 
+/// output operator to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix33 const& M)
 {
     std::streamsize w = os.width();

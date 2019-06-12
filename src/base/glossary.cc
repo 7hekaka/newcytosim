@@ -677,7 +677,7 @@ int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, unsign
         val_type const& val = rec[v];
         if ( val.count_ > 0 )
             used = 1;
-        if ( val.count_ == 0 && val.defined_ )
+        if ( !val.count_ && val.defined_ )
             exhausted = 0;
         else if ( val.count_ > threshold )
             overused = 1;
@@ -688,7 +688,7 @@ int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, unsign
     if ( !used )
         warn = "this parameter was ignored";
     else if ( !exhausted )
-        warn = "a value was unused:";
+        warn = "a value was ignored";
     if ( overused )
         warn = "some value might have been overused";
     

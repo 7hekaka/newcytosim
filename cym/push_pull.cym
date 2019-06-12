@@ -76,4 +76,4 @@ run 20000 system
 }
 
 report fiber:tension * { plane = 1 0 0, 0; }
-
+report single:force *

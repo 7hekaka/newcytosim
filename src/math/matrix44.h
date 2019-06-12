@@ -80,6 +80,7 @@ public:
             val[u] = 0.0;
     }
     
+    /// true if any value is different from 'zero'
     bool operator != (real zero) const
     {
         for ( int u = 0; u < 16; ++u )
@@ -95,9 +96,11 @@ public:
     real* data()             { return val; }
     real* addr(int i, int j) { return val + ( i + 4*j ); }
 
+    /// access operator to elements by index
     real& operator[](int i)       { return val[i]; }
     real  operator[](int i) const { return val[i]; }
 
+    /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val[i+4*j]; }
     real  operator()(int i, int j) const { return val[i+4*j]; }
     
@@ -119,6 +122,7 @@ public:
         return Vector4(val[0], val[5], val[10], val[15]);
     }
 
+    /// output in human-friendly format
     void print(FILE * f) const
     {
         fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n",  val[0x0], val[0x4], val[0x8], val[0xC]);
@@ -134,7 +138,7 @@ public:
             val[u] *= alpha;
     }
 
-    /// scaled matrix
+    /// returns alpha * M
     const Matrix44 operator *(const real alpha) const
     {
         Matrix44 M;
@@ -216,7 +220,7 @@ public:
         return res;
     }
 
-    // copy values from lower triangle to upper triangle
+    /// copy values from lower triangle to upper triangle
     void copy_lower()
     {
         val[0x4] = val[0x1];
@@ -227,7 +231,7 @@ public:
         val[0xE] = val[0xB];
     }
 
-    
+    /// true if matrix is symmetric
     bool is_symmetric() const
     {
         return ( val[0x4] == val[0x1]
@@ -310,6 +314,7 @@ public:
                        val[0x3] * ptr[0] + val[0x7] * ptr[1] + val[0xB] * ptr[2] + val[0xF] * ptr[3]);
     }
 
+    /// vector multiplication
     friend Vector4 operator * (Matrix44 const& mat, Vector4 const& ptr)
     {
         return mat.vecmul0(ptr);
@@ -360,6 +365,7 @@ public:
         return res;
     }
     
+    /// multiplication by matrix
     friend Matrix44 operator * (Matrix44 const& mat, Matrix44 const& mut)
     {
         return mat.mul(mut);
@@ -589,6 +595,7 @@ public:
 };
 
 
+/// output operator to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix44 const& M)
 {
     std::streamsize w = os.width();

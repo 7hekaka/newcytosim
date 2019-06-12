@@ -41,12 +41,13 @@ public:
         val = 0.;
     }
     
+    /// true if element is different from 'zero'
     bool operator != (real zero) const
     {
         return ( val != zero );
     }
 
-    // copy values from lower triangle to upper triangle
+    /// copy values from lower triangle to upper triangle
     void copy_lower()
     {
     }
@@ -55,9 +56,11 @@ public:
     real* data()             { return &val; }
     real* addr(int i, int j) { return &val; }
 
+    /// access functions to element by index
     real& operator[](int i)       { return val; }
     real  operator[](int i) const { return val; }
     
+    /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val; }
     real  operator()(int i, int j) const { return val; }
     
@@ -79,6 +82,7 @@ public:
         return Vector1(val);
     }
 
+    /// human-friendly output
     void print(FILE * f) const
     {
         fprintf(f, "[ %9.3f ]\n", val);
@@ -93,6 +97,7 @@ public:
         return os.str();
     }
 
+    /// true is matrix is symmetric
     bool is_symmetric() const
     {
         return true;
@@ -163,6 +168,7 @@ public:
         return Vector1(val * ptr[0]);
     }
 
+    /// matrix-vector multiplication
     friend Vector1 operator * (Matrix11 const& mat, Vector1 const& vec)
     {
         return mat.vecmul(vec);
@@ -180,6 +186,7 @@ public:
         return Matrix11(val * B.val);
     }
     
+    /// matrix-matrix multiplication
     friend Matrix11 operator * (Matrix11 const& mat, Matrix11 const& mut)
     {
         return mat.mul(mut);
@@ -309,6 +316,7 @@ public:
 };
 
 
+/// output operator to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix11 const& M)
 {
     os << "[ " << M.val << " ]";

@@ -925,7 +925,7 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
     {
         real a = 0;
         opt.set(a, "plane", 1);
-        out << COM << "plane equation: (" << n << ").pos + (" << a << ") = 0";
+        out << COM << "fiber tension orthogonal to plane: (" << n << ").pos = " << -a;
         fibers.infoTension(cnt, ten, n, a);
         out << LIN << cnt << SEP << ten;
     }
