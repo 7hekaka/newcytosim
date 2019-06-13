@@ -157,23 +157,23 @@ Isometry Interface::read_placement(Glossary& opt)
     if ( opt.set(str, "position") )
     {
         std::istringstream iss(str);
-        iso.vec = Movable::readPosition(iss, spc);
+        iso.mov = Movable::readPosition(iss, spc);
         if ( has_trail(iss) ) warn_trail(iss, "position = "+str);
     }
     else if ( spc )
-        iso.vec = spc->randomPlace();
+        iso.mov = spc->randomPlace();
     
     // Rotation applied before the translation
     if ( opt.set(str, "orientation") )
     {
         std::istringstream iss(str);
-        iso.rot = Movable::readRotation(iss, iso.vec, spc);
+        iso.rot = Movable::readRotation(iss, iso.mov, spc);
         if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
     }
     else if ( opt.set(str, "direction") )
     {
         std::istringstream iss(str);
-        Vector vec = Movable::readDirection(iss, iso.vec, spc);
+        Vector vec = Movable::readDirection(iss, iso.mov, spc);
         if ( has_trail(iss) ) warn_trail(iss, "direction = "+str);
         iso.rot = Rotation::randomRotationToVector(vec);
     }
@@ -184,7 +184,7 @@ Isometry Interface::read_placement(Glossary& opt)
     if ( opt.set(str, "orientation", 1) )
     {
         std::istringstream iss(str);
-        Rotation rot = Movable::readRotation(iss, iso.vec, spc);
+        Rotation rot = Movable::readRotation(iss, iso.mov, spc);
         if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
         iso.rotate(rot);
     }
@@ -256,8 +256,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
         bool condition = true;
         if ( has_condition )
         {
-            Evaluator::variable_list vars = {{'X', iso.vec.x()}, {'Y', iso.vec.y()}, {'Z', iso.vec.z()},
-                                             {'R', iso.vec.norm()}, {'P', RNG.preal()}};
+            Evaluator::variable_list vars = {{'X', iso.mov.x()}, {'Y', iso.mov.y()}, {'Z', iso.mov.z()},
+                                             {'R', iso.mov.norm()}, {'P', RNG.preal()}};
             try {
                 char const* ptr = condition_str.c_str();
                 condition = Evaluator::inequality(ptr, vars);
@@ -275,11 +275,11 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
             
             if ( placement == PLACE_EDGE )
             {
-                iso.vec = spc->project(iso.vec);
+                iso.mov = spc->project(iso.mov);
                 return iso;
             }
             
-            if ( spc->inside(iso.vec) )
+            if ( spc->inside(iso.mov) )
             {
                 if ( placement == PLACE_INSIDE || placement == PLACE_ALL_INSIDE )
                     return iso;

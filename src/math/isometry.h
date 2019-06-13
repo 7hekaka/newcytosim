@@ -49,38 +49,38 @@ public:
     MatrixD rot;
     
     /// translation component
-    Vector  vec;
+    Vector  mov;
 
 public:
     
     Isometry()
     {
-        vec.reset();
+        mov.reset();
         rot = MatrixD::identity();
     }
 
     Isometry(Vector const& v)
     {
-        vec = v;
+        mov = v;
         rot = MatrixD::identity();
     }
 
     Isometry(Vector const& v, MatrixD const& r)
     {
-        vec = v;
+        mov = v;
         rot = r;
     }
 
     void reset()
     {
-        vec.reset();
+        mov.reset();
         rot = MatrixD::identity();
     }
 
     /// allow automatic conversion to a Vector
     operator Vector const& () const
     {
-        return vec;
+        return mov;
     }
     
     /// allow automatic conversion to a Rotation matrix
@@ -91,18 +91,18 @@ public:
     
     void translate(Vector const& v)
     {
-        vec += v;
+        mov += v;
     }
     
     void rotate(MatrixD const& mat)
     {
         rot = mat * rot;
-        vec = mat * vec;
+        mov = mat * mov;
     }
 
     void combine(Isometry const& iso)
     {
-        vec = iso.rot * vec + iso.vec;
+        mov = iso.rot * mov + iso.mov;
         rot = iso.rot * rot;
     }
 };
@@ -111,7 +111,7 @@ public:
 /// output operator
 inline std::ostream& operator << (std::ostream& os, Isometry const& iso)
 {
-    os << "Isometry { " << iso.vec << " | " << iso.rot << " }";
+    os << "Isometry { " << iso.mov << " | " << iso.rot << " }";
     return os;
 }
 
