@@ -37,10 +37,11 @@ void help(std::ostream& os)
     os << "\n";
     os << "  This tool must be invoked in a directory containing the simulation output,\n";
     os << "  and it will generate reports by calling Simul::report(). The only required\n";
-    os << "  argument `WHAT` determines what data will be generated. Many options are\n";
+    os << "  argument `WHAT` determines what sort of data will be generated. Many options are\n";
     os << "  available, but are not listed here. Please check the HTML documentation.\n";
     os << "  By default, all frames in the file are processed in order, but a frame index,\n";
     os << "  or multiple indices can be specified (the first frame has index 0).\n";
+    os << "  A periodicity can also be specified (ignored if multiple frames are specified).\n";
     os << "  The input trajectory file is `objects.cmo` unless otherwise specified.\n";
     os << "  The result is sent to standard output unless a file is specified as `output`\n";
     os << "  Attention: there should be no whitespace in any of the option.\n";
@@ -49,6 +50,7 @@ void help(std::ostream& os)
     os << "       report fiber:points\n";
     os << "       report fiber:points frame=10 > fibers.txt\n";
     os << "       report fiber:points frame=10,20 > fibers.txt\n";
+    os << "       report fiber:points period=8 > fibers.txt\n";
 }
 
 //------------------------------------------------------------------------------
@@ -161,12 +163,11 @@ int main(int argc, char* argv[])
 #endif
     
     unsigned frame = 0;
-    unsigned period = 0;
+    unsigned period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     arg.set(verbose, "verbose");
     if ( arg.use_key("-") ) verbose = 0;
-    arg.set(period, "period");
 
     Simul simul;
     FrameReader reader;
@@ -198,33 +199,22 @@ int main(int argc, char* argv[])
     
     Cytosim::all_silent();
     
-    // load frame if specified:
+    // get arguments:
     if ( arg.set(frame, "frame") )
-    {
-        if ( reader.loadFrame(simul, frame) )
-        {
-            std::cerr << "Error: missing frame " << frame << '\n';
-            return EXIT_FAILURE;
-        }
-    }
+        period = 0;
+    arg.set(period, "period");
     
-    // generate report on first frame:
+    // process first record, at index 'frame':
+    if ( reader.loadFrame(simul, frame) )
+    {
+        std::cerr << "Error: missing frame " << frame << '\n';
+        return EXIT_FAILURE;
+    }
     report(simul, *osp, what, frame, arg);
 
-    if ( period > 0 )
+    if ( arg.nb_values("frame") > 1 )
     {
-        // process every 'period' frame in the file:
-        unsigned f = frame;
-        while ( 0 == reader.loadNextFrame(simul) )
-        {
-            if ( f % period == frame % period )
-                report(simul, *osp, what, f, arg);
-            ++f;
-        }
-    }
-    else
-    {
-        // multiple frame indices can be specified:
+        // multiple record indices were specified:
         unsigned s = 1;
         while ( arg.set(frame, "frame", s) )
         {
@@ -237,13 +227,24 @@ int main(int argc, char* argv[])
                 return EXIT_FAILURE;
             }
             ++s;
-        };
+        }
+    }
+    else if ( period > 0 )
+    {
+        // process every 'period' record:
+        unsigned f = frame;
+        while ( 0 == reader.loadNextFrame(simul)  )
+        {
+            ++f;
+            if ( f % period == frame % period )
+                report(simul, *osp, what, f, arg);
+        }
     }
     
     if ( ofs.is_open() )
         ofs.close();
 
-    /// check that all specified parameters have been used:
+    /// check if all specified parameters were used:
     std::stringstream ss;
     if ( arg.warnings(ss) > 1 )
         std::cerr << ss.str() << '\n';
