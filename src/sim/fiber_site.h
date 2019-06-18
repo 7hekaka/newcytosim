@@ -51,11 +51,8 @@ protected:
     /// the abscissa from the origin of the Fiber
     real          fbAbs;
     
-    /// propagate type (lattice cell index type)
+    /// propagate Lattice cell index type
     typedef FiberLattice::site_t site_t;
-    
-    /// propagate type (lattice cell value type)
-    typedef FiberLattice::cell_t cell_t;
     
 #if FIBER_HAS_LATTICE
     /// pointer to the Lattice of the Fiber, or NULL if not in use

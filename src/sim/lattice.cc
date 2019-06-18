@@ -41,6 +41,18 @@ void Lattice<uint32_t>::write_data(Outputter& out, site_t inf, site_t sup) const
 
 /// write data within [inf, sup[ to file
 template <>
+void Lattice<uint64_t>::write_data(Outputter& out, site_t inf, site_t sup) const
+{
+    out.writeUInt16(0);
+    out.writeUInt8(0);
+    out.writeUInt8(8);
+    
+    for ( site_t s = inf; s < sup; ++s )
+        out.writeUInt64(laSite[s]);
+}
+
+/// write data within [inf, sup[ to file
+template <>
 void Lattice<real>::write_data(Outputter& out, site_t inf, site_t sup) const
 {
     out.writeUInt16(0);

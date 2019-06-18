@@ -53,7 +53,7 @@ void Digit::detach()
 {
     dec();
 #ifndef NDEBUG
-    cell_t c = lattice()->data(site());
+    FiberLattice::cell_t c = lattice()->data(site());
     if ( c )
         std::clog << *this << " detach site " << (int)c << "\n";
 #endif
@@ -134,7 +134,7 @@ void Digit::handleDisassemblyM()
     if ( RNG.test(prop->hold_shrinking_end) )
     {
         jumpToEndM();
-        if ( site() <= lattice()->edgeM() )
+        if ( site() < lattice()->indexM() )
             detach();
     }
     else
@@ -152,7 +152,7 @@ void Digit::handleDisassemblyP()
     if ( prop->hold_shrinking_end )
     {
         jumpToEndP();
-        if ( site() >= lattice()->edgeP() )
+        if ( site() > lattice()->indexP() )
             detach();
     }
     else

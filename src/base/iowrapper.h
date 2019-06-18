@@ -107,6 +107,8 @@ public:
     uint16_t  readUInt16();
     /// Read unsigned integer on 4 bytes
     uint32_t  readUInt32();
+    /// Read unsigned integer on 8 bytes
+    uint64_t  readUInt64();
     
     /// Reads one float on 4 bytes
     float     readFloat();
@@ -180,7 +182,9 @@ public:
     void    writeUInt16(unsigned, char before=' ');
     /// Write unsigned integer on 4 bytes
     void    writeUInt32(unsigned, char before=' ');
-    
+    /// Write unsigned integer on 4 bytes
+    void    writeUInt64(unsigned long, char before=' ');
+
     /// Write value on 4 bytes
     void    writeFloat(float);
     /// Write value on 4 bytes

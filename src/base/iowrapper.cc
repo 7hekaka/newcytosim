@@ -157,6 +157,29 @@ uint32_t Inputter::readUInt32()
 }
 
 
+uint64_t Inputter::readUInt64()
+{
+    uint64_t v;
+    if ( binary_ )
+    {
+        if ( 1 != fread(&v, 8, 1, mFile) )
+            throw InvalidIO("readUInt64 failed");
+        if ( binary_ == 2 )
+            swap8(reinterpret_cast<unsigned char*>(&v));
+    }
+    else
+    {
+        unsigned long u;
+        if ( 1 != fscanf(mFile, " %lu", &u) )
+            throw InvalidIO("readUInt64() failed");
+        v = (uint64_t)u;
+        if ( v != u )
+            throw InvalidIO("invalid uint64");
+    }
+    return v;
+}
+
+
 float Inputter::readFloat()
 {
     float v;
@@ -478,6 +501,34 @@ void Outputter::writeUInt32(const unsigned n, char before)
         {
             if ( 1 > fprintf(mFile, "%u", n) )
                 throw InvalidIO("writeUInt32() failed");
+        }
+    }
+}
+
+
+void Outputter::writeUInt64(const unsigned long n, char before)
+{
+    uint64_t v = (uint64_t)n;
+    
+    if ( n != v )
+        throw InvalidIO("value out of range for writeUInt64()");
+    
+    if ( binary_ )
+    {
+        if ( 8 != fwrite(&v, 1, 8, mFile) )
+            throw InvalidIO("writeUInt64()-binary failed");
+    }
+    else
+    {
+        if ( before )
+        {
+            if ( 2 > fprintf(mFile, "%c%lu", before, n) )
+                throw InvalidIO("writeUInt64() failed");
+        }
+        else
+        {
+            if ( 1 > fprintf(mFile, "%lu", n) )
+                throw InvalidIO("writeUInt64() failed");
         }
     }
 }

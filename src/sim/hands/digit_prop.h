@@ -26,7 +26,7 @@ public:
     /// size of one step
     real   step_size;
     
-    ///
+    /// list of bits occupied on the lattice
     FiberLattice::cell_t footprint;
     
     /// specifies the position occupied within the Lattice site

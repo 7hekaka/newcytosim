@@ -71,7 +71,7 @@
         } }
 
   #define assert_small(expression)\
-        { real e = expression; real m = 1e-04;\
+        { real e = expression; real m = 1e-03;\
         if ( e < -m || m < e ) {\
             fprintf(stderr, "- - - - - - - - - - - - - - - - - - - - - - - - - -\n");\
             fprintf(stderr, "Cytosim failed assert_small(%s) with value %e\n", #expression, e);\

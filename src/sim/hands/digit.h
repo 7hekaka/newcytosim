@@ -60,10 +60,10 @@ public:
 #elif FIBER_HAS_LATTICE < 0
 
     /// true if given Lattice's site is outside range
-    bool          edgy(site_t const& s) const { return s <= fbLattice->edgeM() || s >= fbLattice->edgeP(); }
+    bool          edgy(site_t const& s) const { return fbLattice->outside(s) }
 
     /// true if given Lattice's site is occupied
-    bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->data(s) != 0.0 || s <= lat->edgeM() || s >= lat->edgeP(); }
+    bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->outside(s) || lat->data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
     bool          vacant(site_t const& s) const { return fbLattice->data(s) == 0.0; }
@@ -101,10 +101,10 @@ public:
     void   jumpTo(site_t p) { if ( vacant(p) ) hop(p); }
     
     /// relocate without checking intermediate sites
-    void   jumpToEndM() { jumpTo(lattice()->edgeM() + 1); }
+    void   jumpToEndM() { jumpTo(lattice()->indexM()); }
 
     /// relocate without checking intermediate sites
-    void   jumpToEndP() { jumpTo(lattice()->edgeP() - 1); }
+    void   jumpToEndP() { jumpTo(lattice()->indexP()); }
 
     
     /// attempt one step towards the PLUS_END

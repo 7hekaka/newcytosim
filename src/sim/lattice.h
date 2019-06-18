@@ -64,11 +64,13 @@ private:
     /// Array of sites, of valid range [laInf, laSup[
     cell_t *   laSite;
     
-    /// index of edges
-    site_t     laEdgeM, laEdgeP;
+    /// index of cell containing the MINUS_END
+    site_t     laIndexM;
     
-    //------------------------------------------------------------------------------
-    #pragma mark - Allocation
+    /// index of cell containing the PLUS_END
+    site_t     laIndexP;
+    
+#pragma mark - Allocation
     
     /// allocate for indices within [inf, sup[, and copy values from `src`
     void allocate_copy(site_t inf, site_t sup, cell_t src[], site_t src_inf, site_t src_sup)
@@ -145,8 +147,7 @@ private:
     template<typename T> cell_t&  site(const T s);
     template<typename T> cell_t&  operator[](const T s);
     
-    //------------------------------------------------------------------------------
-    #pragma mark - Construction
+#pragma mark - Construction
     
 public:
     
@@ -158,8 +159,8 @@ public:
         laUnit  = 0;
         laSite0 = nullptr;
         laSite  = nullptr;
-        laEdgeM = 0;
-        laEdgeP = 0;
+        laIndexM = 0;
+        laIndexP = 0;
     }
     
     /// Copy constructor
@@ -195,6 +196,12 @@ public:
             throw InvalidParameter("lattice:unit must be > 0");
         laUnit = u;
     }
+    
+    /// true if lattice unit size was set
+    bool ready() const
+    {
+        return laUnit > REAL_EPSILON;
+    }
 
     /// change distance betwen adjacent sites
     void changeUnit(real u)
@@ -213,18 +220,20 @@ public:
         }
     }
     
+#pragma mark - Edges
+
     /// clear edge marks
     void clearEdges()
     {
-        for ( site_t i = laInf; i <= laEdgeM; ++i ) laSite[i] = 0;
-        for ( site_t i = laEdgeP;  i < laSup; ++i ) laSite[i] = 0;
+        for ( site_t i = laInf; i < laIndexM; ++i ) laSite[i] = 0;
+        for ( site_t i = laIndexP+1; i < laSup; ++i ) laSite[i] = 0;
     }
     
     /// set edge marks
     void markEdges()
     {
-        for ( site_t i = laInf; i <= laEdgeM; ++i ) laSite[i] = EDGE;
-        for ( site_t i = laEdgeP;  i < laSup; ++i ) laSite[i] = EDGE;
+        for ( site_t i = laInf; i < laIndexM; ++i ) laSite[i] = EDGE;
+        for ( site_t i = laIndexP+1; i < laSup; ++i ) laSite[i] = EDGE;
     }
     
     /// set the range of valid abscissa
@@ -236,65 +245,64 @@ public:
         if ( !std::is_same<real, cell_t>::value && laSite )
             clearEdges();
         
-        laEdgeM = index(a);
-        laEdgeP = index(b);
+        laIndexM = index(a);
+        laIndexP = index_sup(b) - 1;
         
         /* add here some safety margin */
-        allocate(laEdgeM, laEdgeP+1, 8);
+        allocate(laIndexM, laIndexP, 8);
         
         if ( !std::is_same<real, cell_t>::value )
             markEdges();
     }
-    
-    /// first site past the MINUS_END
-    site_t     edgeM() const { return laEdgeM; }
-    
-    /// first site past the PLUS_END
-    site_t     edgeP() const { return laEdgeP; }
 
-    //------------------------------------------------------------------------------
-    #pragma mark - Index / Abscissa
+    /// index of site containing the MINUS_END
+    site_t  indexM() const { return laIndexM; }
     
-    /// true if lattice unit size was set
-    bool    ready() const { return laUnit > REAL_EPSILON; }
+    /// index of site containing the PLUS_END
+    site_t  indexP() const { return laIndexP; }
+
+    /// first valid index
+    site_t  inf()   const { return laInf; }
+    
+    /// last valid index plus one
+    site_t  sup()   const { return laSup; }
 
     /// distance between adjacent sites
-    real    unit() const { return laUnit; }
+    real    unit()  const { return laUnit; }
     
+#pragma mark - Index / Abscissa
+
     /// index of the site containing abscissa `a`
-    site_t  index(const real a) const { return (site_t)floor(a/laUnit); }
+    site_t  index(const real& a)       const { return (site_t)floor(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
-    site_t  index_sup(const real a) const { return (site_t)ceil(a/laUnit); }
+    site_t  index_sup(const real& a)   const { return (site_t)ceil(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
-    site_t  index_round(const real a) const { return (site_t)round(a/laUnit); }
+    site_t  index_round(const real& a) const { return (site_t)round(a/laUnit); }
 
     /// true if index 'i' is covered by the lattice
-    bool    valid(const site_t i) const { return ( laInf <= i  &&  i < laSup ); }
+    bool    valid(const site_t& i)     const { return ( laInf <= i  &&  i < laSup ); }
     
     /// true if index 'i' is not covered by the lattice
-    bool    invalid(const site_t i) const { return ( i < laInf  || laSup <= i ); }
+    bool    invalid(const site_t& i)   const { return ( i < laInf  ||  laSup <= i ); }
     
+    /// true if index 'i' corresponds to a site that is between Minus and Plus ends
+    bool    within(const site_t& i)    const { return ( laIndexM <= i  &&  i <= laIndexP ); }
+    
+    /// true if index 'i' corresponds to a site that falls completely outside
+    bool    outside(const site_t& i)   const { return ( i < laIndexM   ||  laIndexP < i ); }
+
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`
     /**
      abscissa(h) returns the abscissa corresponding to the beginning of the site.
-     The range covered by site 'h' is [ abscissa(h), abscissa(h+1) ]
+     The range covered by site 'h' is [ abscissa(h), abscissa(h+1) ], and the
+     abscissa of the center is abscissa(h+0.5).
      */
-    real    abscissa(const real s) const { return s * laUnit; }
-    
-    /// true if abscissa `a` corresponds to a site that is covered by the lattice
-    bool    within(const real a) const { return laInf * laUnit <= a  &&  a <= laSup * laUnit; }
+    real    abscissa(const real s)    const { return s * laUnit; }
 
-    //------------------------------------------------------------------------------
-    #pragma mark - Access
-
-    /// first valid index
-    site_t  inf()  const  { return laInf; }
-    
-    /// last valid index plus one
-    site_t  sup()  const  { return laSup; }
+#pragma mark - data access
 
     /// pointer to data array
     cell_t* data() const  { return laSite; }
@@ -321,8 +329,7 @@ public:
             laSite[s] = value;
     }
 
-    //------------------------------------------------------------------------------
-    #pragma mark - Transfer
+#pragma mark - Transfer
     
     /// transfer cells within `[s, e[` to *this, and reset transfered values
     void take(Lattice<CELL> & lat, site_t is, site_t ie, cell_t zero)
@@ -359,12 +366,11 @@ public:
         take(lat, s, laSup, 0);
     }
     
-    //------------------------------------------------------------------------------
-    #pragma mark - Collect
+#pragma mark - Collect
 
     /// sum all sites in `[s, e[`, set them to zero and return total in `res`
     template <typename SUM>
-    void collectR(SUM& res, site_t is, site_t ie)
+    void collectCells(SUM& res, site_t is, site_t ie)
     {
         res = 0;
         // limit boundaries
@@ -385,21 +391,21 @@ public:
     template <typename SUM>
     void collectM(SUM& res, const site_t e)
     {
-        collectR(res, laInf, e);
+        collectCells(res, laInf, e);
     }
     
     /// sum all sites in ]s, sup]; set sites to zero and return total in `res`
     template <typename SUM>
     void collectP(SUM& res, const site_t s)
     {
-        collectR(res, s+1, laSup);
+        collectCells(res, s+1, laSup);
     }
     
     /// sum of values in the entire lattice; set sites to zero
     template <typename SUM>
     void collect(SUM& res) const
     {
-        collectR(res, laInf, laSup);
+        collectCells(res, laInf, laSup);
     }
     
     //------------------------------------------------------------------------------
@@ -452,13 +458,12 @@ public:
         return res;
     }
 
-    //------------------------------------------------------------------------------
-    #pragma mark - I/O
+#pragma mark - I/O
     
     /// write data within [inf, sup[ to file
     void write_data(Outputter& out, site_t inf, site_t sup) const;
     
-    /// write to file
+    /// write specified range to file
     void write(Outputter& out, site_t inf, site_t sup) const
     {
         if ( sup < inf )
@@ -524,6 +529,11 @@ public:
         {
             for ( site_t s = inf; s < sup; ++s )
                 laSite[s] = in.readUInt32();
+        }
+        else if ( nbytes == 8 )
+        {
+            for ( site_t s = inf; s < sup; ++s )
+                laSite[s] = in.readUInt64();
         }
         else
         {

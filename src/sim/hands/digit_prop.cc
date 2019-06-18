@@ -2,9 +2,9 @@
 
 #include "dim.h"
 #include "sim.h"
-#include "exceptions.h"
-#include "glossary.h"
 #include "common.h"
+#include "glossary.h"
+#include "exceptions.h"
 #include "property_list.h"
 #include "simul_prop.h"
 #include "digit_prop.h"
@@ -35,11 +35,10 @@ void DigitProp::read(Glossary& glos)
         site_shift = 0.5 * step_size;
     glos.set(site_shift, "site_shift");
     
-    if ( !std::is_same<FiberLattice::cell_t, double>::value )
+    if ( glos.set(footprint, "footprint") )
     {
-        unsigned long i = 0;
-        if ( glos.set(i, "footprint") )
-            footprint = i;
+        if ( std::is_same<real, FiberLattice::cell_t>::value )
+            throw InvalidParameter("`footprint` is only valid with Integer-based Lattice");
     }
 
 #ifdef BACKWARD_COMPATIBILITY

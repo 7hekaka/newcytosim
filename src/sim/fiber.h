@@ -10,7 +10,6 @@
 #include "node_list.h"
 #include "lattice.h"
 #include "field.h"
-#include "array.h"
 #include "sim.h"
 
 
@@ -21,22 +20,17 @@ class FiberSegment;
 class LineDisp;
 
 
-/// Flag to associate a Lattice to the Fiber
-#define FIBER_HAS_LATTICE -1
+/// Flag to associate a Lattice to the Fiber {-1, 0, 1}
+#define FIBER_HAS_LATTICE 1
 
 /**
- @todo Allow type of FiberLattice to be selected at run time,
- by the user via some parameter setting.
+ The type of Lattice associated with each Fiber is defined here:
  */
-#if FIBER_HAS_LATTICE == 8
+#if FIBER_HAS_LATTICE > 0
+// Lattice composed of integers, appropriate for discrete occupancy
 typedef Lattice<uint64_t> FiberLattice;
-#elif FIBER_HAS_LATTICE == 4
-typedef Lattice<uint32_t> FiberLattice;
-#elif FIBER_HAS_LATTICE == 2
-typedef Lattice<uint16_t> FiberLattice;
-#elif FIBER_HAS_LATTICE == 1
-typedef Lattice<uint8_t> FiberLattice;
 #else
+// Lattice composed of floating point values, for continuous values
 typedef Lattice<real> FiberLattice;
 #endif
 
@@ -273,25 +267,25 @@ public:
 #endif
 
     /// initialize lattice sites to represent a constant linear density
-    void           setLattice(FiberLattice&, real density) const;
+    void           setLattice(Lattice<real>&, real density) const;
 
     /// transfer all lattice substance to the Field
-    void           releaseLattice(FiberLattice&, Field*) const;
+    void           releaseLattice(Lattice<real>&, Field*) const;
 
     /// update lattice values as `value <- cst + fac * value`
-    void           evolveLattice(FiberLattice&, real cst, real fac) const;
+    void           evolveLattice(Lattice<real>&, real cst, real fac) const;
 
     /// transfer from Field to Lattice at rate `on` and back at rate `off`
-    void           equilibrateLattice(FiberLattice&, Field*, real on, real off) const;
+    void           equilibrateLattice(Lattice<real>&, Field*, real on, real off) const;
     
     /// transfer from Field to Lattice at rate `on`
-    void           bindLattice(FiberLattice&, Field*, real rate) const;
+    void           bindLattice(Lattice<real>&, Field*, real rate) const;
     
     /// transfer from Field to Lattice at rate `on`
-    void           fluxLattice(FiberLattice&, Field*, real speed) const;
+    void           fluxLattice(Lattice<real>&, Field*, real speed) const;
     
     /// sever fiber proportionally to the quantity stored in the Lattice
-    void           cutFiberLattice(FiberLattice&);
+    void           cutFiberLattice(Lattice<real>&);
 
     /// write Fiber's Lattice
     void           writeLattice(FiberLattice const&, Outputter& out) const;

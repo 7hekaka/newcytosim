@@ -87,7 +87,7 @@ void Fiber::step()
         update();
     }
     
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE < 0
     //std::clog << reference() << " lattice " << std::fixed << frLattice->data(0) << std::endl;
     //std::clog << reference() << " lattice sum = " << frLattice->sum() << "     ";
     
@@ -116,7 +116,6 @@ void Fiber::step()
         //std::clog << reference() << " lattice avg = " << frLattice->sum()*frLattice->unit()/length() << std::endl;
     }
 #endif
-    
     //std::clog << frLattice->sum() << std::endl;
 #endif
 }
@@ -155,7 +154,7 @@ Fiber::~Fiber()
 {
     detachHands();
     
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE < 0
     if ( prop->field_ptr )
         releaseLattice(frLattice, prop->field_ptr);
 #endif
@@ -310,7 +309,7 @@ Fiber* Fiber::severPoint(unsigned int pti)
     fib->truncateM(pti);
     assert_true(fib->abscissaM() == abs);
     
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE < 0
     if ( frLattice.ready() )
     {
         assert_true( frLattice.unit() == fib->frLattice.unit() );
@@ -376,7 +375,7 @@ Fiber* Fiber::severP(real abs)
     // remove MINUS_END portion on new piece
     fib->Filament::cutM(abs);
 
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE < 0
     if ( frLattice.ready() )
     {
         assert_true( frLattice.unit() == fib->frLattice.unit() );
@@ -573,7 +572,7 @@ void Fiber::join(Fiber * fib)
     //transfer dynamic state of PLUS_END:
     setDynamicStateP(fib->dynamicStateP());
 
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE < 0
     if ( frLattice.ready() )
     {
         assert_true( frLattice.unit() == fib->frLattice.unit() );
@@ -594,6 +593,10 @@ void Fiber::join(Fiber * fib)
         ha = nx;
     }
     delete(fib);
+
+#if FIBER_HAS_LATTICE > 0
+    resetLattice();
+#endif
 }
 
 
@@ -607,11 +610,11 @@ void Fiber::join(Fiber * fib)
      drag_transverse = 2*drag_parallel = 4*PI*L*visc / log(length/radius)
 
  We should average the mobility coefficients:  speed = mu * f
- mu_X = mu_parallel   = 2 * mu
- mu_Y = mu_transverse = mu
- mu_Z = mu_transverse = mu
+     mu_X = mu_parallel   = 2 * mu
+     mu_Y = mu_transverse = mu
+     mu_Z = mu_transverse = mu
  Hence:
- mu_averaged = ( mu + mu + 2*mu ) / 3 = 4/3 * mu.
+     mu_averaged = ( mu + mu + 2*mu ) / 3 = 4/3 * mu.
  drag_averaged = 3*PI*length*viscosity / log(length/radius)
 
 APPROXIMATE FORMULA FOR ELLIPSOIDAL PARTICLE
@@ -684,11 +687,11 @@ real Fiber::dragCoefficientVolume()
      For an ellipsoid,
      drag_transverse = 2*drag_parallel = 4*PI*L*visc / log(length/radius)
      We should average the mobility coefficients:  speed = mu * f
-       mu_X = mu_parallel   = 2 * mu
-       mu_Y = mu_transverse = mu
-       mu_Z = mu_transverse = mu
+           mu_X = mu_parallel   = 2 * mu
+           mu_Y = mu_transverse = mu
+           mu_Z = mu_transverse = mu
      Hence:
-       mu_averaged = ( mu + mu + 2*mu ) / 3 = 4/3 * mu.
+           mu_averaged = ( mu + mu + 2*mu ) / 3 = 4/3 * mu.
      drag_averaged = 3*PI*length*viscosity / log(length/radius)
      See for example "Random Walks in Biology" by HC. Berg, Princeton University Press.
      */
@@ -1245,14 +1248,15 @@ void Fiber::update()
         
         if ( prop->field_ptr )
         {
-            real sum;
+            real sumM;
             // release Lattice substance located outside the valid abscissa range
-            frLattice.collectM(sum, frLattice.index_sup(abscissaM()));
-            prop->field_ptr->cell(posEndM()) += sum;
+            frLattice.collectM(sumM, frLattice.index_sup(abscissaM()));
+            prop->field_ptr->cell(posEndM()) += sumM;
             //Cytosim::log << " Fiber::MINUS_END releases " << sumM << std::endl;
             
-            frLattice.collectP(sum, frLattice.index(abscissaP()));
-            prop->field_ptr->cell(posEndP()) += sum;
+            real sumP;
+            frLattice.collectP(sumP, frLattice.index(abscissaP()));
+            prop->field_ptr->cell(posEndP()) += sumP;
             //Cytosim::log << " Fiber::PLUS_END releases " << sumP << std::endl;
         }
     }
@@ -1264,11 +1268,8 @@ void Fiber::update()
 
 /**
  */
-void Fiber::setLattice(FiberLattice& lat, real density) const
+void Fiber::setLattice(Lattice<real>& lat, real density) const
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t type");
-    
     const real uni = lat.unit();
     const auto inf = lat.index(abscissaM());
     const auto sup = lat.index(abscissaP());
@@ -1300,11 +1301,8 @@ Update all Lattice sites according to:
     site[i] <- cst + fac * site[i]
 
  */
-void Fiber::evolveLattice(FiberLattice& lat, real cst, real fac) const
+void Fiber::evolveLattice(Lattice<real>& lat, real cst, real fac) const
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t (need to recompile)");
-    
     const auto inf = lat.index(abscissaM());
     const auto sup = lat.index(abscissaP());
     auto * site = lat.data();
@@ -1315,11 +1313,8 @@ void Fiber::evolveLattice(FiberLattice& lat, real cst, real fac) const
 }
 
 
-void Fiber::bindLattice(FiberLattice& lat, Field * fld, real binding_rate) const
+void Fiber::bindLattice(Lattice<real>& lat, Field * fld, real binding_rate) const
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t (need to recompile)");
-    
     // we want roughly one point per cell:
     const real spread = fld->cellWidth();
     
@@ -1356,11 +1351,8 @@ void Fiber::bindLattice(FiberLattice& lat, Field * fld, real binding_rate) const
  corresponding to a random position within this site.
  The factor `frac` must be between 0 and 1.
  */
-void Fiber::equilibrateLattice(FiberLattice& lat, Field * fld, real on, real off) const
+void Fiber::equilibrateLattice(Lattice<real>& lat, Field * fld, real on, real off) const
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t (need to recompile)");
-    
     const real uni = lat.unit();
     const auto inf = lat.index(abscissaM());
     const auto sup = lat.index(abscissaP());
@@ -1403,11 +1395,8 @@ void Fiber::equilibrateLattice(FiberLattice& lat, Field * fld, real on, real off
 }
 
 
-void Fiber::fluxLattice(FiberLattice& lat, Field * fld, real speed) const
+void Fiber::fluxLattice(Lattice<real>& lat, Field * fld, real speed) const
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t (need to recompile)");
-    
     const auto inf = lat.index(abscissaM());
     const auto sup = lat.index(abscissaP());
     auto * site = lat.data();
@@ -1445,11 +1434,8 @@ void Fiber::fluxLattice(FiberLattice& lat, Field * fld, real speed) const
  The subtance in each Lattice site is released in a cell
  corresponding to a random position within this site.
  */
-void Fiber::releaseLattice(FiberLattice& lat, Field * fld) const
+void Fiber::releaseLattice(Lattice<real>& lat, Field * fld) const
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t (need to recompile)");
-    
     const real uni = lat.unit();
     const auto inf = lat.index(abscissaM());
     const auto sup = lat.index(abscissaP());
@@ -1464,11 +1450,8 @@ void Fiber::releaseLattice(FiberLattice& lat, Field * fld) const
 }
 
 
-void Fiber::cutFiberLattice(FiberLattice& lat)
+void Fiber::cutFiberLattice(Lattice<real>& lat)
 {
-    if ( ! std::is_same<real, FiberLattice::cell_t>::value )
-        throw Exception("incompatible FiberLattice::cell_t (need to recompile)");
-    
     const real uni = lat.unit();
     const auto inf = lat.index(abscissaM());
     const auto sup = lat.index(abscissaP());
@@ -1523,7 +1506,7 @@ void Fiber::cutFiberLattice(FiberLattice& lat)
 void Fiber::writeLattice(FiberLattice const& lat, Outputter& out) const
 {
     writeHeader(out, TAG_LATTICE);
-    //frLattice.write(out);
+    // lat.write(out);
     // only write information corresponding to actual Fiber abscissa range:
     auto inf = lat.index(abscissaM());
     auto sup = lat.index(abscissaP()) + 1;
