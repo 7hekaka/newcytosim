@@ -291,23 +291,23 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
  This is used primarily to parse the configuration file,
  using full class name
  */
-ObjectSet * Simul::findSet(const std::string& kind)
+ObjectSet * Simul::findSet(const std::string& cat)
 {
     //std::clog << "findSet("<<kind<<")"<<std::endl;
-    if ( kind == "space" )        return &spaces;
-    if ( kind == "field" )        return &fields;
-    if ( kind == "fiber" )        return &fibers;
-    if ( kind == "bead" )         return &beads;
-    if ( kind == "solid" )        return &solids;
-    if ( kind == "sphere" )       return &spheres;
-    if ( kind == "single" )       return &singles;
-    if ( kind == "couple" )       return &couples;
-    if ( kind == "organizer" )    return &organizers;
-    if ( kind == "aster" )        return &organizers;
-    if ( kind == "bundle" )       return &organizers;
-    if ( kind == "nucleus" )      return &organizers;
-    if ( kind == "fake" )         return &organizers;
-    if ( kind == "event" )        return &events;
+    if ( cat == "space" )        return &spaces;
+    if ( cat == "field" )        return &fields;
+    if ( cat == "fiber" )        return &fibers;
+    if ( cat == "bead" )         return &beads;
+    if ( cat == "solid" )        return &solids;
+    if ( cat == "sphere" )       return &spheres;
+    if ( cat == "single" )       return &singles;
+    if ( cat == "couple" )       return &couples;
+    if ( cat == "organizer" )    return &organizers;
+    if ( cat == "aster" )        return &organizers;
+    if ( cat == "bundle" )       return &organizers;
+    if ( cat == "nucleus" )      return &organizers;
+    if ( cat == "fake" )         return &organizers;
+    if ( cat == "event" )        return &events;
     return nullptr;
 }
 
@@ -355,7 +355,7 @@ bool Simul::isPropertyClass(const std::string& name) const
     if ( name == "hand" )
         return true;
     
-    return ( findSet(name) );
+    return const_cast<Simul*>(this)->findSet(name);
 }
 
 

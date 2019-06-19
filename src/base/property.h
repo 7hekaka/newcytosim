@@ -11,7 +11,7 @@ class Glossary;
 class Simul;
 
 
-/// A Property holds the parameters for a particular kind of objects
+/// A Property holds the parameters for a particular category of objects
 /**
  A Property is a list of parameters associated with a class of objects in Cytosim.
  A Property is identified by:
@@ -27,9 +27,9 @@ class Simul;
      - write() will save parameter values to a file.
  .
  
- A Property defacto defines a class of Objects in Cytosim. User-accessible objects 
- have a pointer `prop` to their associated Property. If two objects A and B have the 
- same Property (A.prop == B.prop), they should then be of the the same kind.
+ Cytosim objects have a pointer `prop` to their associated Property.
+ This pointer defines a class of Objects in Cytosim. If two objects A and B share
+ the same Property, they are defacto of the same kind.
  */
 class Property
 {

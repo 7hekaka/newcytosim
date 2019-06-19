@@ -28,10 +28,10 @@ public:
     /// identifies the property
     std::string title() const { return "space"; }
     
-    /// create a new property for class `kind` with given name
-    Property *  newProperty(const std::string& kind, const std::string& name, Glossary&) const;
+    /// create a new property of category `cat` for a class `name`
+    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
-    /// create new objects, of class `kind` and type `name`, given the options provided in `opt`
+    /// create objects of class `name`, given the options provided in `opt`
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)

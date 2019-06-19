@@ -614,12 +614,8 @@ void Simul::reportFiber(std::ostream& out, FiberProp const* selected) const
  */
 void Simul::reportFiber(std::ostream& out, std::string const& which) const
 {
-    Property * fp = properties.find("fiber", which);
-    
-    if ( !fp )
-        throw InvalidSyntax("unknown fiber class `"+which+"'");
-
-    reportFiber(out, static_cast<FiberProp*>(fp));
+    Property * p = properties.find_or_die("fiber", which);
+    reportFiber(out, static_cast<FiberProp*>(p));
 }
 
 
@@ -1970,7 +1966,7 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
             sum += cnt[ii][jj];
         if ( sum )
         {
-            Property const* ip = properties.find("couple", ii);
+            Property const* ip = properties.find_or_die("couple", ii);
             out << LIN << ljust(ip->name(), 2);
             for ( unsigned jj = 0; jj <= nbin; ++jj )
                 out << ' ' << std::setw(5) << cnt[ii][jj];

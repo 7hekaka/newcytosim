@@ -120,10 +120,10 @@ public:
     /// identifies the category of objects stored in this set
     virtual std::string title() const = 0;
 
-    /// create a new property for class `kind` with given name
-    virtual Property *  newProperty(const std::string& kind, const std::string& name, Glossary&) const = 0;
+    /// create a new property of category `cat` for a class `name`
+    virtual Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const = 0;
     
-    /// create new objects, of class `kind` and type `name`, given the options provided in `opt`
+    /// create objects of class `name`, given the options provided in `opt`
     virtual ObjectList  newObjects(const std::string& name, Glossary& opt) = 0;
    
     /// create new Object with given Tag and Property `num` (used for reading trajectory file)

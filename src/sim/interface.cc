@@ -40,9 +40,9 @@ Interface::Interface(Simul& s)
  - remove any check for the existence of invoked properties, in which case 
  error would be detected only when objects are created later.
  */
-Property* Interface::execute_set(std::string const& kind, std::string const& name, Glossary& def)
+Property* Interface::execute_set(std::string const& cat, std::string const& name, Glossary& def)
 {
-    VLOG("-SET " << kind << " `" << name << "'\n");
+    VLOG("-SET " << cat << " `" << name << "'\n");
     
     /* mostly for historical reason, we do not allow for name that are class name,
     but this should also limit confusions in the config file */
@@ -50,10 +50,10 @@ Property* Interface::execute_set(std::string const& kind, std::string const& nam
     if ( simul.isPropertyClass(name) )
         throw InvalidSyntax("property name `"+name+"' is a reserved keyword");
     
-    Property* pp = simul.newProperty(kind, name, def);
+    Property* pp = simul.newProperty(cat, name, def);
     
     if ( !pp )
-        throw InvalidSyntax("failed to create property of class `"+kind+"'");
+        throw InvalidSyntax("failed to create property of class `"+cat+"'");
     
     pp->read(def);
     pp->complete(simul);
@@ -102,12 +102,12 @@ Property * Interface::execute_change(std::string const& name, Glossary& def)
 }
 
 
-void Interface::execute_change_all(std::string const& kind, Glossary& def)
+void Interface::execute_change_all(std::string const& cat, Glossary& def)
 {
-    PropertyList plist = simul.findAllProperties(kind);
+    PropertyList plist = simul.findAllProperties(cat);
     
     if ( plist.size() == 0 )
-        throw InvalidSyntax("could not find any property of class `"+kind+"'");
+        throw InvalidSyntax("could not find any property of class `"+cat+"'");
     
     for ( Property * i : plist )
         execute_change(i, def);
@@ -304,17 +304,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
 ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
 {
     ObjectList res;
-    ObjectSet * set = nullptr;
-
-    {
-        Property * pp = simul.properties.find(name);
-        
-        if ( pp )
-            set = simul.findSet(pp->category());
-        else
-            set = simul.findSet(name);
-    }
-
+    Property * pp = simul.properties.find_or_die(name);
+    ObjectSet * set = simul.findSet(pp->category());
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     
@@ -323,7 +314,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         // create the objects:
         res = set->newObjects(name, opt);
         
-#if ( 1 )
+#if ( 0 )
         // check for zero value in list, which should not happen:
         if ( res.count(nullptr) )
         {
@@ -394,24 +385,19 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
 
 //------------------------------------------------------------------------------
 /**
- Creates `cnt` objects of class `kind` and type `name`.
+ Creates `cnt` objects of class `name`.
  The objects are placed at random position in a random orientation within the current Space.
  
- This is meant to be faster than calling execute_new(set, kind, name, opt) 
- `cnt` times.
+ This is meant to be faster than calling execute_new(name, opt) `cnt` times.
  */
 void Interface::execute_new(std::string const& name, unsigned cnt)
 {
-    Property * pp = simul.properties.find(name);
-    
-    if ( !pp )
-        throw InvalidSyntax("unknown property `"+name+"'");
-    
+    Property * pp = simul.properties.find_or_die(name);
     ObjectSet * set = simul.findSet(pp->category());
-    Space const* spc = simul.spaces.master();
-
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
+
+    Space const* spc = simul.spaces.master();
 
     Glossary opt;
 
@@ -552,13 +538,11 @@ bool pass_filter(Object const* obj, void const* val)
 void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned cnt)
 {
     Property * pp = simul.properties.find(name);
-    ObjectSet * set;
-    
+    ObjectSet * set = nullptr;
     if ( pp )
         set = simul.findSet(pp->category());
     else
         set = simul.findSet(name);
-    
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     
@@ -594,12 +578,11 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned 
 void Interface::execute_mark(std::string const& name, Glossary& opt, unsigned cnt)
 {
     Property * pp = simul.properties.find(name);
-    
-    if ( !pp )
-        throw InvalidSyntax("unknown property `"+name+"'");
-        
-    ObjectSet * set = simul.findSet(pp->category());
-    
+    ObjectSet * set = nullptr;
+    if ( pp )
+        set = simul.findSet(pp->category());
+    else
+        set = simul.findSet(name);
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
@@ -643,11 +626,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
     }
     else
     {
-        Property * pp = simul.properties.find(name);
-        
-        if ( !pp )
-            throw InvalidSyntax("unknown property `"+name+"'");
-        
+        Property * pp = simul.properties.find_or_die(name);
         if ( pp->category() != "fiber" )
             throw InvalidSyntax("only `cut fiber' is supported");
         

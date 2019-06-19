@@ -75,7 +75,7 @@ void Parser::show_lines(std::istream& is, std::streampos pos)
 
 void Parser::parse_set(std::istream& is)
 {
-    std::string kind = Tokenizer::get_symbol(is);
+    std::string cat = Tokenizer::get_symbol(is);
     std::string name, para, blok;
     
 #ifdef BACKWARD_COMPATIBILITY
@@ -89,7 +89,7 @@ void Parser::parse_set(std::istream& is)
 
     bool spec = ( is.peek() == ':' );
     
-    if ( simul.isPropertyClass(kind) && !spec )
+    if ( simul.isPropertyClass(cat) && !spec )
     {
         /* in this form, 'set' defines a new Property
          set CLASS NAME { PARAMETER = VALUE }
@@ -102,9 +102,9 @@ void Parser::parse_set(std::istream& is)
 
         if ( do_set )
         {
-            VLOG("+DEF |" << kind << "|" << name << "|\n");
+            VLOG("+DEF |" << cat << "|" << name << "|\n");
             opt.read(blok);
-            pp = execute_set(kind, name, opt);
+            pp = execute_set(cat, name, opt);
             
             unsigned ix;
 #ifdef BACKWARD_COMPATIBILITY
@@ -118,7 +118,7 @@ void Parser::parse_set(std::istream& is)
                     throw InvalidSyntax("Property number missmatch");
             }
         }
-        else if ( kind == "simul" )
+        else if ( cat == "simul" )
         {
             // adjust the name of the 'simul' property:
             if ( simul.prop->name() == "undefined" )
@@ -136,7 +136,7 @@ void Parser::parse_set(std::istream& is)
     }
     else
     {
-        name = kind;
+        name = cat;
         //in this form, 'set' changes the value of an existing Property
 #ifdef BACKWARD_COMPATIBILITY
         if ( spec )
@@ -145,7 +145,7 @@ void Parser::parse_set(std::istream& is)
             is.get();
             para = Tokenizer::get_symbol(is);
             // Patch to accept 'set simul:display * {}':
-            if ( kind == "simul" )
+            if ( cat == "simul" )
             {
                 name = simul.prop->name();
                 // skip the name

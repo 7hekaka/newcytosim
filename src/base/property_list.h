@@ -80,8 +80,8 @@ public:
     /// number of known Property
     size_t       size()  const    { return vec_.size(); }
 
-    /// number of Property of given kind
-    unsigned int size(std::string const& kind) const;
+    /// number of Property of given category
+    unsigned int size(std::string const& cat) const;
     
     /// return property stored at index `n`
     Property *   operator[] (size_t n) const;
@@ -98,37 +98,37 @@ public:
     Property *   find(std::string const& name) const;
 
     /// return property which has the provided name, or zero if it cannot be found
-    Property *   find(std::string const& kind, std::string const& name) const;
+    Property *   find(std::string const& cat, std::string const& name) const;
     
     /// return property which has the provided index, or zero if it cannot be found
-    Property *   find(std::string const& kind, const unsigned index) const;
+    Property *   find(std::string const& cat, const unsigned index) const;
     
     
     /// return property with provided name, throwing an exception if it cannot be found
     Property *   find_or_die(std::string const& name) const;
 
     /// return property with provided name, throwing an exception if it cannot be found
-    Property *   find_or_die(std::string const& kind, std::string const& name) const;
+    Property *   find_or_die(std::string const& cat, std::string const& name) const;
 
     /// return property with provided name, throwing an exception if it cannot be found
-    Property *   find_or_die(std::string const& kind, const unsigned index) const;
+    Property *   find_or_die(std::string const& cat, const unsigned index) const;
     
     
-    /// return list of properties of the given kind
-    PropertyList find_all(std::string const& kind) const;
+    /// return list of properties of the given category
+    PropertyList find_all(std::string const&) const;
     
-    /// return list of properties matching any of the given kinds
-    PropertyList find_all(std::string const& kind1, std::string const& kind2) const;
+    /// return list of properties matching any of the given categories
+    PropertyList find_all(std::string const&, std::string const&) const;
 
-    /// return list of properties matching any of the given kinds
+    /// return list of properties matching any of the given categories
     PropertyList find_all(std::string const&, std::string const&, std::string const&) const;
     
     
-    /// return the Property of the given kind that follows the given one
-    Property *   find_next(std::string const& kind, Property *) const;
+    /// return the Property of the given category that follows the given one
+    Property *   find_next(std::string const& cat, Property*) const;
     
-    /// return list of properties which are not of the given kind
-    PropertyList find_all_except(std::string const& kind) const;
+    /// return list of properties which are not of the given category
+    PropertyList find_all_except(std::string const&) const;
 
     /// return position where `p` is stored, end() otherwise
     Property const* contains(Property const* p) const;

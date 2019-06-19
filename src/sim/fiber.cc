@@ -293,7 +293,7 @@ Fiber* Fiber::severPoint(unsigned int pti)
     
     const real abs = abscissaPoint(pti);
 
-    // create a new Fiber of the same kind:
+    // create a new Fiber of the same class:
     Fiber* fib = prop->newFiber();
     assert_true( fib->prop == prop );
     
@@ -359,7 +359,7 @@ Fiber* Fiber::severP(real abs)
     
     //std::clog << "severP " << reference() << " at " << abscissaM()+abs << "\n";
 
-    // create a new Fiber of the same kind:
+    // create a new Fiber of the same class:
     Fiber* fib = prop->newFiber();
     assert_true( fib->prop == prop );
 
@@ -560,7 +560,7 @@ void Fiber::planarCut(Vector const& n, const real a, int stateP, int stateM)
 void Fiber::join(Fiber * fib)
 {
     assert_true( fib );
-    // the two fibers should be of the same kind:
+    // the two fibers should be of the same class:
     assert_true( prop == fib->prop );
     
     // shift in abscissa must be calculated before joining

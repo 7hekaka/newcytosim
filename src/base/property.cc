@@ -96,7 +96,7 @@ bool Property::modified() const
 /**
  This outputs the Properties in this format:
 
-     set kind name
+     set CATEGORY name
      {
        property_number = INTEGER
        key = values

@@ -13,7 +13,7 @@ void PropertyList::erase()
 /**
  Add a property to the list. If ( p == 0 ) nothing is done.
 
- This function sets the index of `p` to follow the Properties of the same kind,
+ This function sets the index of `p` to follow the Properties of the same category,
  that are already present in the list.
  */
 void PropertyList::deposit(Property * p)

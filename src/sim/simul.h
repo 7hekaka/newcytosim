@@ -231,13 +231,7 @@ public:
     static Mecable* toMecable(Object *);
     
     /// return the ObjectSet corresponding to a class
-    ObjectSet*      findSet(const std::string& kind);
-    
-    /// return the ObjectSet corresponding to a class
-    ObjectSet const* findSet(const std::string& kind) const
-    {
-        return const_cast<Simul*>(this)->findSet(kind);
-    }
+    ObjectSet*      findSet(const std::string& cat);
     
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
     Mecable*        findMecable(const std::string& spec) const;

@@ -49,8 +49,8 @@ public:
     
     //-------------------------------------------------------------------------------
     
-    /// create a new Property of kind `k` from values set in Glossary
-    Property*  execute_set(std::string const& kind, std::string const& name, Glossary&);
+    /// create a new Property of category `cat` from values set in Glossary
+    Property*  execute_set(std::string const& cat, std::string const& name, Glossary&);
 
     /// change values in Property as specified in Glossary
     void       execute_change(Property*, Glossary&);
@@ -58,8 +58,8 @@ public:
     /// change values in Property called `name` as specified in Glossary
     Property*  execute_change(std::string const& name, Glossary&);
     
-    /// change values of all Property of category `kind`
-    void       execute_change_all(std::string const& kind, Glossary&);
+    /// change values of all Property of category `cat`
+    void       execute_change_all(std::string const& cat, Glossary&);
 
     /// read the specification of position and orientation of an object
     Isometry   read_placement(Glossary&);
