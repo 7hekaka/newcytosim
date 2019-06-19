@@ -25,7 +25,7 @@ typedef std::vector<byte> Message;
 /// debug mode
 unsigned mode = 0;
 
-/// which scenario is running [0 ... 8]
+/// which scenario is running [1 ... 8]
 unsigned config = 0;
 
 /// child process id:
@@ -48,6 +48,137 @@ void handler(int sig)
     // _exit(sig);
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaReset(RtMidiOut& nova, byte color)
+{
+    // set button layout 0 (session layout)
+    byte msg[9] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0x22, 0x0, 0xF7 };
+    nova.sendMessage(msg, 9);
+    // turn all buttons off:
+    //byte msg[9] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xE, 0, 0xF7 };
+    msg[6] = 0xE;
+    nova.sendMessage(msg, 9);
+    // light specific button:
+    if ( 0 < config )
+    {
+        msg[0] = 144;
+        msg[1] = 10*config+9;
+        msg[2] = color;
+        nova.sendMessage(msg, 3);
+    }
+}
+
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaButton(RtMidiOut& nova, int X, int Y, byte color)
+{
+    byte msg[3] = { 144, 10*Y+X, color };
+    nova.sendMessage(msg, 3);
+}
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaButton(RtMidiOut& nova, int X, int Y, byte R, byte G, byte B)
+{
+    byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xB, 10*Y+X, R, G, B, 0xF7 };
+    nova.sendMessage(msg, 12);
+}
+
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaCol(RtMidiOut& nova, int X, int Y, byte color)
+{
+    // message to turn entire column off:
+    byte msg[10] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xC, 0, 0, 0xF7 };
+    msg[7] = X-1;
+    nova.sendMessage(msg, 10);
+    // light specific button:
+    msg[0] = 144;
+    msg[1] = 10*Y+X;
+    msg[2] = color;
+    nova.sendMessage(msg, 3);
+}
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaRow(RtMidiOut& nova, int X, int Y, byte color)
+{
+    // message to turn entire row off:
+    byte msg[10] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xD, 0, 0, 0xF7 };
+    msg[7] = Y-1;
+    nova.sendMessage(msg, 10);
+    // light specific button:
+    msg[0] = 144;
+    msg[1] = 10*Y+X;
+    msg[2] = color;
+    nova.sendMessage(msg, 3);
+    // light scenario button:
+    if ( 0 < config )
+    {
+        msg[0] = 144;
+        msg[1] = 10*config+9;
+        msg[2] = 9;
+        nova.sendMessage(msg, 3);
+    }
+    // specify LED in RGB mode:
+    //byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, LED, R, G, B, 0xF7 };
+}
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaRamp(RtMidiOut& nova, int Y, int S, int E, byte R, byte G, byte B)
+{
+    byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xB, 10*Y+S-1, 0x3F, 0x0, 0x3F, 0xF7 };
+    if ( S > 1 )
+        nova.sendMessage(msg, 12);
+    for ( int X = S; X <= E; ++X )
+    {
+        msg[ 7] = 10*Y+X;
+        float s = (X-S+0.25)/float(E-S+0.25);
+        msg[ 8] = R * s;
+        msg[ 9] = G * s;
+        msg[10] = B * s;
+        nova.sendMessage(msg, 12);
+    }
+    //byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xB, LED, R, G, B, 0xF7 };
+}
+
+
+/// adjust LEDs on the Novation Launchpad MK2
+void novaWedge(RtMidiOut& nova, int Y, byte R, byte G, byte B)
+{
+    byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xB, 10*Y+1, 0x3F, 0x0, 0x3F, 0xF7 };
+    nova.sendMessage(msg, 12);
+    for ( int X = 1; X <= 8; ++X )
+    {
+        msg[ 7] = 10*Y+X;
+        float s = (fabs(X-4.5)-0.25) / 3.25;
+        msg[ 8] = R * s;
+        msg[ 9] = G * s;
+        msg[10] = B * s;
+        nova.sendMessage(msg, 12);
+    }
+    //byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xB, LED, R, G, B, 0xF7 };
+}
+
+void novaLights(RtMidiOut& nova)
+{
+    novaRamp(nova, 1, 2, 8, 63, 63, 63);
+    novaRamp(nova, 2, 2, 8,  0, 63,  0);
+    novaRamp(nova, 3, 2, 8,  0,  0, 63);
+    novaWedge(nova, 4, 0, 63,  0);
+    novaWedge(nova, 5, 0, 0, 63);
+    novaRamp(nova, 6, 1, 8, 63,  0,  0);
+    novaRamp(nova, 7, 1, 8,  0, 63, 63);
+    novaButton(nova, 1, 8, 8);
+    novaButton(nova, 2, 8, 16);
+    novaButton(nova, 3, 8, 40);
+    novaButton(nova, 4, 8, 48);
+    novaButton(nova, 8, 8, 56);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 /// stop current child process
 void stop(int)
@@ -60,7 +191,7 @@ void stop(int)
 }
 
 /// start child process executing specified command
-void start(const char* path, char *const command[])
+void start(const char* path, char *const args[])
 {
     // create a unidirectional pipe:
     if ( pipe(fds) < 0 )
@@ -86,18 +217,15 @@ void start(const char* path, char *const command[])
         // map the standard-input to the pipe exit:
         while ((dup2(fds[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
         // run executable (this should not return, except if error occurred)
-        write(STDERR_FILENO, " > ", 3);
-        write(STDERR_FILENO, path, strlen(path));
-        write(STDERR_FILENO, "\n", 1);
-        execv(path, command);
-        // the command failed, check what is indicated by 'errno':
+        execv(path, args);
+        // if the command failed, check what is indicated by 'errno':
         perror("Error: could not start child process");
         write(STDERR_FILENO, " > ", 3);
         write(STDERR_FILENO, path, strlen(path));
-        for ( int i = 1; command[i]; ++i )
+        for ( int i = 1; args[i]; ++i )
         {
             write(STDERR_FILENO, " ", 1);
-            write(STDERR_FILENO, command[i], strlen(command[i]));
+            write(STDERR_FILENO, args[i], strlen(args[i]));
         }
         write(STDERR_FILENO, "\n", 1);
         // end child execution here:
@@ -119,12 +247,12 @@ void start(unsigned conf)
     char* args[6] = { mem, mem+LEN, mem+2*LEN, mem+3*LEN, mem+4*LEN, mem+5*LEN };
     
     snprintf(args[0], LEN, "play%i", conf);
-    snprintf(args[1], LEN, "config%i.cym", conf);
-    snprintf(args[2], LEN, "live");
+    snprintf(args[1], LEN, "live");
+    snprintf(args[2], LEN, "config%i.cym", conf);
     snprintf(args[3], LEN, "fullscreen=1");
-    args[4] = 0;
-    args[5] = 0;
-    
+    args[4] = nullptr;
+    args[5] = nullptr;
+
     // build full path to executable:
     snprintf(path, LEN, "%s/%s", cwd, args[0]);
     
@@ -140,7 +268,7 @@ void start(unsigned conf)
 void restart(unsigned arg)
 {
     stop(0);
-    start(arg);
+    start(std::min(arg,8u));
 }
 
 //------------------------------------------------------------------------------
@@ -185,107 +313,47 @@ float prange(int X, float max)
 }
 
 
-/// for the Novation Control XL
-int makeCommandXL(char * str, size_t len, int slider, int value)
-{
-    float v = (float)value / 127.0; // map value to [0, 1]
-    switch ( slider )
-    {
-        case 1:    case 95:
-            return snprintf(str, len, "change system { viscosity=%.3f }\n", linear(v, 0.1, 1.0));
-        case 2:    case 96:
-            return snprintf(str, len, "change filament { rigidity=%.3f }\n", geometric(v, 20));
-        case 3:    case 97:
-            return snprintf(str, len, "change filament { growing_speed=%.3f }\n", linear(v, 0, 0.2));
-        case 4:    case 100:
-            return snprintf(str, len, "change motor { unloaded_speed=%.3f }\n", linear(v, -0.8, 0.8));
-        case 5:    case 101:
-            return snprintf(str, len, "change dynein { unloaded_speed=%.3f }\n", linear(v, -0.8, 0.8));
-        case 6:    case 102:
-            return snprintf(str, len, "change centrosome { stiffness=1000, %.3f }\n", linear(v, 1, 1000));
-        case 7:    case 103:
-            return snprintf(str, len, "change complex { stiffness=%.3f }\n", linear(v, 0, 256));
-        case 8:    case 106:
-        {
-            float w = linear(v, 0.54, 1.0);
-            float h = ( 0.85 * 0.85 * 0.21 ) / ( w * w );
-            return snprintf(str, len, "change all space { length=%.3f, %f, %f }\n", w, w, h);
-        }
-    }
-    return 0;
-}
-
-
-
 /// for the Novation Launchpad MK2
 int makeCommand(char * str, size_t len, int X, int Y, int value)
 {
     switch ( Y )
     {
-        case 1: return snprintf(str, len, "change motor { unloaded_speed=%.3f }\n", srange(X, 0.8));
-        case 2: return snprintf(str, len, "change dynein { unloaded_speed=%.3f }\n", srange(X, 0.8));
-        case 3: return snprintf(str, len, "change filament { rigidity=%.3f }\n", prange(X, 20));
-        case 4: return snprintf(str, len, "change filament { growing_speed=%.3f }\n", prange(X, 0.512));
-        case 5: return snprintf(str, len, "change centrosome { stiffness=1000, %.3f }\n", prange(X, 1000));
-        case 6: return snprintf(str, len, "change complex { stiffness=%.3f }\n", prange(X, 512));
-        case 7: return snprintf(str, len, "change system { viscosity=%.3f }\n", prange(X, 1.0));
+        case 1:
+            if ( X == 1 )
+                return snprintf(str, len, "delete all protein; delete all filament\n");
+            else
+                return snprintf(str, len, "new %i protein\n", 1<<(X-1));
+        case 2:
+            if ( X == 1 )
+                return snprintf(str, len, "delete all bimotor\n");
+            else
+                return snprintf(str, len, "new %i bimotor\n", 1<<(X+1));
+        case 3:
+            if ( X == 1 )
+                return snprintf(str, len, "delete all bidynein\n");
+            else
+                return snprintf(str, len, "new %i bidynein\n", 1<<(X+1));
+        case 4:
+            return snprintf(str, len, "change motor { unloaded_speed=%.1f }\n", srange(X, 0.8));
+        case 5:
+            return snprintf(str, len, "change dynein { unloaded_speed=%.1f }\n", srange(X, 0.8));
+        case 6:
+            return snprintf(str, len, "change filament { rigidity=%.3f }\n", prange(X, 20));
+        case 7:
+            return snprintf(str, len, "change bimotor { stiffness=%.3f }\n", prange(X, 512));
         case 8:
         {
-            float w = linear((X-1)/7.0, 0.54, 1.0);
-            float h = ( 0.85 * 0.85 * 0.21 ) / ( w * w );
-            return snprintf(str, len, "change all space { length=%f, %f, %f }\n", w, w, h);
+            switch ( X )
+            {
+                case 1: return snprintf(str, len, "change cell { points=17 -10, 17 10, -17 10, -17 -10; }\n");
+                case 2: return snprintf(str, len, "change cell { points=10 -10, 10 10, -10 10, -10 -10; }\n");
+                case 3: return snprintf(str, len, "change cell { points=16 0.0, 8 10, -8 10, -16 0.0, -8 -10, 8 -10; }\n");
+                case 4: return snprintf(str, len, "change cell { order=64; radius=10; }\n");
+                case 8: return snprintf(str, len, "delete all filament\n");
+            }
         }
     }
     return 0;
-}
-
-/// adjust LEDs on the Novation Launchpad MK2
-void resetNovation(RtMidiOut& nova, byte color)
-{
-    // message to turn all buttons off:
-    byte msg[9] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xE, 0, 0xF7 };
-    nova.sendMessage(msg, 9);
-    // light specific button:
-    msg[0] = 144;
-    msg[1] = 10*config+9;
-    msg[2] = color;
-    nova.sendMessage(msg, 3);
-}
-
-/// adjust LEDs on the Novation Launchpad MK2
-void setNovationCol(RtMidiOut& nova, int X, int Y, byte color)
-{
-    // message to turn entire column off:
-    byte msg[10] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xC, 0, 0, 0xF7 };
-    msg[7] = X-1;
-    nova.sendMessage(msg, 10);
-    // light specific button:
-    msg[0] = 144;
-    msg[1] = 10*Y+X;
-    msg[2] = color;
-    nova.sendMessage(msg, 3);
-}
-
-/// adjust LEDs on the Novation Launchpad MK2
-void setNovationRow(RtMidiOut& nova, int X, int Y, byte color)
-{
-    // message to turn entire row off:
-    byte msg[10] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0xD, 0, 0, 0xF7 };
-    msg[7] = Y-1;
-    nova.sendMessage(msg, 10);
-    // light specific button:
-    msg[0] = 144;
-    msg[1] = 10*Y+X;
-    msg[2] = color;
-    nova.sendMessage(msg, 3);
-    // light scenario button:
-    msg[0] = 144;
-    msg[1] = 10*config+9;
-    msg[2] = 9;
-    nova.sendMessage(msg, 3);
-
-    // specify LED in RGB mode:
-    //byte msg[12] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0x0B, LED, R, G, B, 0xF7 };
 }
 
 
@@ -304,8 +372,9 @@ void goLive(RtMidiIn& midi, RtMidiOut& nova)
 {
     Message msg;
     char cmd[4096] = { 0 };
-
     start(config);
+    novaReset(nova, 9);
+    novaLights(nova);
 
     while ( child )
     {
@@ -327,8 +396,9 @@ void goLive(RtMidiIn& midi, RtMidiOut& nova)
             {
                 if ( value == 0 )
                 {
-                    restart(Y%10);
-                    resetNovation(nova, 9);
+                    restart(Y);
+                    novaReset(nova, 9);
+                    novaLights(nova);
                 }
                 continue;
             }
@@ -342,16 +412,16 @@ void goLive(RtMidiIn& midi, RtMidiOut& nova)
                 int len = makeCommand(cmd, sizeof(cmd), X, Y, value);
                 if ( len > 0 )
                 {
+                    // send string down the pipe:
+                    ssize_t s = write(fds[1], cmd, len);
                     if ( mode )
                     {
+                        if ( s != len )
+                            write(STDOUT_FILENO, "Broken pipe", 11);
                         // copy message to terminal
                         write(STDOUT_FILENO, " > ", 3);
                         write(STDOUT_FILENO, cmd, len);
                     }
-                    // send string down the pipe:
-                    ssize_t s = write(fds[1], cmd, len);
-                    if ( s == len )
-                        setNovationRow(nova, X, Y, 45);
                 }
                 else if ( mode )
                     printf("Ignored button %i (value %i)\n", button, value);
@@ -363,15 +433,16 @@ void goLive(RtMidiIn& midi, RtMidiOut& nova)
     }
 }
 
-//------------------------------------------------------------------------------
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#pragma mark -
 
 void usage()
 {
-    printf("Cytomaster 1.0, G. Letort and F. Nedelec 8.5.2019\n");
+    printf("Cytobuilder 1.0, G. Letort and F. Nedelec 17.5.2019\n");
     printf("   usage: cytomaster PORT MODE\n");
     printf("      PORT = MIDI port device number to listen to\n");
     printf("      MODE = [ 0, 1 ]\n");
-    printf("  `cytomaster scan' will list known MIDI ports\n\n");
 }
 
 
@@ -383,11 +454,11 @@ void scanPorts(RtMidiIn& midi)
         printf("No MIDI port detected!\n");
     else
     {
-        printf("%u MIDI ports detected:\n", np);
+        printf("   %u MIDI ports detected:\n", np);
         for ( unsigned p = 0; p < np; ++p )
         {
             midi.openPort(p);
-            printf("   port %u is `%s'\n", p, midi.getPortName().c_str());
+            printf("      port %u is `%s'\n", p, midi.getPortName().c_str());
             midi.closePort();
         }
     }
@@ -399,35 +470,35 @@ int main( int argc, char *argv[] )
     RtMidiIn midi(RtMidi::MACOSX_CORE);
     RtMidiOut nova(RtMidi::MACOSX_CORE);
 
-    if ( argc < 2 || 3 < argc || !isdigit(*argv[1]) )
+    if ( 1 < argc && !isdigit(*argv[1]) )
     {
-        if ( argc != 2 ) usage();
+        usage();
         scanPorts(midi);
         return 1;
     }
 
     unsigned nPorts = midi.getPortCount();
-    unsigned port = (unsigned)atoi(argv[1]);
-
     if ( nPorts == 0 )
     {
         printf("No MIDI port detected!\n");
         return 1;
     }
-    else if ( port >= nPorts )
+    
+    unsigned port = 0;
+    if ( argc > 1 && isdigit(*argv[1]) )
+        port = (unsigned)atoi(argv[1]);
+    if ( port >= nPorts )
     {
         printf("Invalid MIDI port specified\n");
         scanPorts(midi);
         return 1;
     }
-    
+    //fprintf(stderr, "port %u\n", port);
+
     try
     {
         midi.openPort(port);
         nova.openPort(port);
-        // set Novation to button layout 0
-        byte msg[9] = { 0xF0, 0x00, 0x20, 0x29, 0x02, 0x18, 0x22, 0x0, 0xF7 };
-        nova.sendMessage(msg, 9);
     }
     catch ( RtMidiError &error )
     {
@@ -447,7 +518,7 @@ int main( int argc, char *argv[] )
         fprintf(stderr, "Could not register SIGPIPE handler\n");
 
     getcwd(cwd, LEN);
-    printf("Cytomaster is listening to `%s'... please, terminate with Ctrl-C\n", midi.getPortName().c_str());
+    printf("Cytobuilder is listening to `%s'... please, terminate with Ctrl-C\n", midi.getPortName().c_str());
     
     if ( 2 < argc )
         mode = (unsigned)atoi(argv[2]);

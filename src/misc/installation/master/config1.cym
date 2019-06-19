@@ -70,7 +70,7 @@ set hand dynein
     display = ( color=red; size=16; width=8; )
 }
 
-set single protein
+set single simplex
 {
     hand = dynein
     stiffness = 100
@@ -112,7 +112,7 @@ new core
 }
 
 new 256 complex
-new 128 protein
+new 128 simplex
 
 run 1000000 system
 {

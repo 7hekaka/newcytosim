@@ -56,7 +56,7 @@ set hand dynein
 }
 
 
-set single protein
+set single mobile
 {
     hand = motor
     diffusion = 0.1
@@ -68,7 +68,7 @@ set single motile
     diffusion = 0.1
 }
 
-new 100 protein
+new 100 mobile
 new 100 motile
 
 run system
