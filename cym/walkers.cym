@@ -32,7 +32,7 @@ set hand kinesin
 
     activity = walk
     step_size = 0.02
-    footprint = 2
+    footprint = 1
     site_shift = 0.005
     unloaded_speed = 0.8
     stall_force = 5
@@ -52,7 +52,7 @@ set hand dynein
     
     activity = walk
     step_size = 0.02
-    footprint = 1
+    footprint = 2
     site_shift = 0.015
     unloaded_speed = -0.8
     stall_force = 5
