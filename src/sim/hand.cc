@@ -196,8 +196,8 @@ void Hand::locate(Fiber* f, real a)
 {
     assert_true(f);
     assert_true(!fbFiber);
-    assert_true(f->abscissaM() <= a + REAL_EPSILON);
-    assert_true(a <= f->abscissaP() + REAL_EPSILON);
+    //assert_true(f->abscissaM() <= a + REAL_EPSILON);
+    //assert_true(a <= f->abscissaP() + REAL_EPSILON);
 
     fbAbs   = a;
     fbFiber = f;

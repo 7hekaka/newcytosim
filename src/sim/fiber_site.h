@@ -91,8 +91,8 @@ public:
         fbLattice = l;
         fbSite    = s;
         fbAbs     = a;
-        assert_true(fbFiber->abscissaM() < a + REAL_EPSILON);
-        assert_true(a < fbFiber->abscissaP() + REAL_EPSILON);
+        //assert_true(fbFiber->abscissaM() < a + REAL_EPSILON);
+        //assert_true(a < fbFiber->abscissaP() + REAL_EPSILON);
     }
 
 #else

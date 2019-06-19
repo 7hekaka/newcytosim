@@ -44,9 +44,6 @@ public:
     /// type stored in each Lattice cell
     typedef CELL cell_t;
     
-    /// indicates the edges of the Lattice
-    static constexpr cell_t EDGE = ~0;
-    
 private:
     
     /// lowest valid index (can be negative or positive)
@@ -245,7 +242,7 @@ public:
         allocate(laIndexM, laIndexP, 8);
 #if 0
         if ( !std::is_same<real, cell_t>::value )
-            markEdges(EDGE);
+            markEdges(~0);
 #endif
     }
 
@@ -256,13 +253,13 @@ public:
     site_t  indexP() const { return laIndexP; }
 
     /// first valid index
-    site_t  inf()   const { return laInf; }
+    site_t  inf()    const { return laInf; }
     
     /// last valid index plus one
-    site_t  sup()   const { return laSup; }
+    site_t  sup()    const { return laSup; }
 
     /// distance between adjacent sites
-    real    unit()  const { return laUnit; }
+    real    unit()   const { return laUnit; }
     
 #pragma mark - Index / Abscissa
 
@@ -285,7 +282,7 @@ public:
     bool    within(const site_t& i)    const { return ( laIndexM <= i  &&  i <= laIndexP ); }
     
     /// true if index 'i' corresponds to a site that falls completely outside
-    bool    outside(const site_t& i)   const { return ( i <= laIndexM  ||  laIndexP <= i ); }
+    bool    outside(const site_t& i)   const { return ( i < laIndexM  ||  laIndexP < i ); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`

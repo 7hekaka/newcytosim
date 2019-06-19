@@ -43,11 +43,11 @@ def job(execut, template, index):
     dic = parameters(index)
     # create config file:
     content = template.substitute(dic)
-    with open('screen_config.cym', 'w') as file:
+    with open('config.cym', 'w') as file:
         file.write(content)
         file.close()
     # run simulation:
-    sub = subprocess.Popen([execut, '-', 'screen_config.cym'], stdout=subprocess.PIPE)
+    sub = subprocess.Popen([execut, '-', 'config.cym'], stdout=subprocess.PIPE)
     # get result from standard output:
     line = sub.stdout.readline().encode("utf-8")
     while line.startswith('%'):

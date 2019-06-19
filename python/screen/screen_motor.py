@@ -27,14 +27,6 @@ from pyned import find_differences, uncode
 out = sys.stdout  #open("screen.txt", 'w')
 err = sys.stderr
 
-def uncode(arg):
-    try:
-        if isinstance(arg, unicode):
-            return str(arg.decode('utf-8'))
-    except:
-        pass
-    return arg
-
 #------------------------------------------------------------------------
 
 
