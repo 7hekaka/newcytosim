@@ -760,15 +760,15 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
     fibers.uniFiberSites(loc, spread);
     
     Fiber * ofib = nullptr;
-    for ( FiberSite & site : loc )
+    for ( FiberSite & i : loc )
     {
-        if ( ofib != site.fiber() )
+        if ( ofib != i.fiber() )
         {
-            out << COM << "fiber " << site.fiber()->reference();
-            ofib = site.fiber();
+            out << COM << "fiber " << i.fiber()->reference();
+            ofib = i.fiber();
         }
         
-        out << LIN << site.pos();
+        out << LIN << i.pos();
     }
 }
 

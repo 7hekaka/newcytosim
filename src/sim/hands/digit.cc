@@ -16,7 +16,7 @@ Digit::Digit(DigitProp const* p, HandMonitor* h)
 {
 }
 
-bool Digit::attachmentAllowed(FiberSite & sit) const
+bool Digit::attachmentAllowed(FiberSite& sit) const
 {
     if ( Hand::attachmentAllowed(sit) )
     {
@@ -41,9 +41,10 @@ bool Digit::attachmentAllowed(FiberSite & sit) const
 }
 
 
-void Digit::attach(FiberSite const& sit)
+void Digit::attach(FiberSite const& s)
 {
-    Hand::attach(sit);
+    assert_true(s.lattice());
+    Hand::attach(s);
     assert_true(vacant(site()));
     inc();
 }

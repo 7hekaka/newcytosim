@@ -14,9 +14,9 @@ Regulator::Regulator(RegulatorProp const* p, HandMonitor* h)
 
 
     
-void Regulator::attach(FiberSite const& site)
+void Regulator::attach(FiberSite const& s)
 {
-    Hand::attach(site);
+    Hand::attach(s);
     // freeze the PLUS_END:
     fiber()->setDynamicStateP(STATE_WHITE);
 }

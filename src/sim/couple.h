@@ -189,7 +189,7 @@ public:
     Vector   dirFiber1()                  const { return cHand1->dirFiber(); }
  
     /// attach Hand1 at the given FiberSite
-    void     attach1(FiberSite const& fb)       { cHand1->attach(fb); }
+    void     attach1(FiberSite const& s)        { cHand1->attach(s); }
     
     /// attach Hand1 at the given end
     void     attachEnd1(Fiber* f, FiberEnd end) { cHand1->attachEnd(f, end); }
@@ -218,7 +218,7 @@ public:
     Vector   dirFiber2()                  const { return cHand2->dirFiber(); }
     
     /// attach Hand2 at the given FiberSite
-    void     attach2(FiberSite const& fb)       { cHand2->attach(fb); }
+    void     attach2(FiberSite const& s)        { cHand2->attach(s); }
     
     /// attach Hand2 at the given end
     void     attachEnd2(Fiber *f, FiberEnd end) { cHand2->attachEnd(f, end); }

@@ -13,7 +13,7 @@ Mighty::Mighty(MightyProp const* p, HandMonitor* h)
 }
 
 
-bool Mighty::attachmentAllowed(FiberSite & sit) const
+bool Mighty::attachmentAllowed(FiberSite& sit) const
 {
     if ( !Hand::attachmentAllowed(sit) )
         return false;

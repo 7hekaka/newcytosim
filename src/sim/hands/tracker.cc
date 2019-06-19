@@ -13,7 +13,7 @@ Tracker::Tracker(TrackerProp const* p, HandMonitor* h)
 }
 
 
-bool Tracker::attachmentAllowed(FiberSite & sit) const
+bool Tracker::attachmentAllowed(FiberSite& sit) const
 {
     if ( !Hand::attachmentAllowed(sit) )
         return false;

@@ -15,9 +15,9 @@ Dynein::Dynein(DyneinProp const* p, HandMonitor* h)
 }
 
 
-void Dynein::attach(FiberSite const& fb)
+void Dynein::attach(FiberSite const& s)
 {
-    Digit::attach(fb);
+    Digit::attach(s);
     nextStep = RNG.exponential();
 }
 

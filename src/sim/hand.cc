@@ -108,7 +108,7 @@ void Hand::moveToEnd(const FiberEnd end)
 /**
 Checks that all the conditions required for attachment are met
  */
-bool Hand::attachmentAllowed(FiberSite & sit) const
+bool Hand::attachmentAllowed(FiberSite& sit) const
 {
     assert_true( sit.attached() );
     

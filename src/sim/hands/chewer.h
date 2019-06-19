@@ -50,7 +50,7 @@ public:
     
     
     /// attach and update variables
-    void   attach(FiberSite const& site);
+    void   attach(FiberSite const&);
 
     /// simulate when `this` is attached but not under load
     void   stepUnloaded();

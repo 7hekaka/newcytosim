@@ -26,7 +26,7 @@ public:
     /// constructor
     FieldScalar()                     { val = 0; }
     /// implicit conversion from real
-    FieldScalar(const real& a)        { val = a; }
+    FieldScalar(real a)        { val = a; }
     /// implicit conversion to real
     operator real&()                  { return val; }
 

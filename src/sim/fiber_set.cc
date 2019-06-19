@@ -168,7 +168,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         
         for ( unsigned n = 0; n < cnt; ++n )
         {
-            FiberSite fb(fib, fib->someAbscissa(var, opt, n/real(cnt-1)));
+            FiberSite fs(fib, fib->someAbscissa(var, opt, n/real(cnt-1)));
             Object * cs = nullptr;
             Hand * h = nullptr;
             if ( sip )
@@ -183,14 +183,14 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
                 h = c->hand1();
                 cs = c;
             }
-            if ( h->attachmentAllowed(fb) )
+            if ( h->attachmentAllowed(fs) )
             {
-                h->attach(fb);
+                h->attach(fs);
                 Vector vec;
                 if ( opt.set(vec, var, 4) )
                     cs->setPosition(vec);
                 else
-                    cs->setPosition(fb.pos());
+                    cs->setPosition(fs.pos());
                 res.push_back(cs);
             }
             else

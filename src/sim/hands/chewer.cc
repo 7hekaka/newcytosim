@@ -15,10 +15,10 @@ Chewer::Chewer(ChewerProp const* p, HandMonitor* h)
 }
 
 
-void Chewer::attach(FiberSite const& fb)
+void Chewer::attach(FiberSite const& s)
 {
     engaged = NO_END;
-    Hand::attach(fb);
+    Hand::attach(s);
 }
 
 

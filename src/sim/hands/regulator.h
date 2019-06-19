@@ -34,7 +34,7 @@ public:
     ~Regulator() {}
     
     /// attach the hand at the position described by site
-    void   attach(FiberSite const& site);
+    void   attach(FiberSite const&);
     
     /// simulate when `this` is attached but not under load
     void   stepUnloaded();

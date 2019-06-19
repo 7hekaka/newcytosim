@@ -122,7 +122,7 @@ public:
     void           locate(Fiber* f, real a);
 
     /// tell if attachment at given site is permitted
-    virtual bool   attachmentAllowed(FiberSite& site) const;
+    virtual bool   attachmentAllowed(FiberSite&) const;
     
     /// bin at position represented by FiberSite
     virtual void   attach(FiberSite const&);

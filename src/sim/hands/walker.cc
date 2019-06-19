@@ -15,9 +15,9 @@ Walker::Walker(WalkerProp const* p, HandMonitor* h)
 }
 
 
-void Walker::attach(FiberSite const& fb)
+void Walker::attach(FiberSite const& s)
 {
-    Digit::attach(fb);
+    Digit::attach(s);
     nextStep = RNG.exponential();
     
 #if ( 0 )

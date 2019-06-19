@@ -105,7 +105,7 @@ public:
     Vector  dirFiber()                  const  { return sHand->dirFiber(); }
     
     /// attach Hand at the given site
-    void    attach(FiberSite const& fb)        { sHand->attach(fb); }
+    void    attach(FiberSite const& s)         { sHand->attach(s); }
     
     /// attach Hand at given Fiber end
     void    attachEnd(Fiber * f, FiberEnd end) { sHand->attachEnd(f, end); }

@@ -434,20 +434,20 @@ void Field::step(FiberSet& fibers)
             throw InvalidParameter("field:transport_strength is too high");
         
         fibers.uniFiberSites(loc, spread);
-        for ( FiberSite & site : loc )
+        for ( FiberSite & i : loc )
         {
             // abscissa for exit point of transport:
-            real abs = site.abscissa() + RNG.exponential(prop->transport_length);
+            real abs = i.abscissa() + RNG.exponential(prop->transport_length);
 
             // find index of cell:
-            FieldGrid::value_type cell = mGrid.cell(site.pos());
+            FieldGrid::value_type cell = mGrid.cell(i.pos());
             
             // amount to be transfered:
             real mass = cell * frac;
             
             // transport:
             cell -= mass;
-            field[mGrid.index(site.fiber()->pos(abs))] += mass;
+            field[mGrid.index(i.fiber()->pos(abs))] += mass;
         }
     }
     
@@ -460,13 +460,13 @@ void Field::step(FiberSet& fibers)
         const real fac = spread * prop->time_step / cellVolume();
         
         fibers.uniFiberSites(loc, spread);
-        for ( FiberSite & site : loc )
+        for ( FiberSite & i : loc )
         {
-            real val = field[mGrid.index(site.pos())];
+            real val = field[mGrid.index(i.pos())];
             if ( prop->cut_fibers == 2 )
                 val = val * val / cellVolume();
             if ( RNG.test_not( exp(-fac*val) ) )
-                site.fiber()->sever(site.abscissa(), STATE_RED, STATE_GREEN);
+                i.fiber()->sever(i.abscissa(), STATE_RED, STATE_GREEN);
         }
     }
     

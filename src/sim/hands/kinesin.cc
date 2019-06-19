@@ -15,9 +15,9 @@ Kinesin::Kinesin(KinesinProp const* p, HandMonitor* h)
 }
 
 
-void Kinesin::attach(FiberSite const& fb)
+void Kinesin::attach(FiberSite const& s)
 {
-    Digit::attach(fb);
+    Digit::attach(s);
     nextStep = RNG.exponential();
 }
 

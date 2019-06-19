@@ -1235,7 +1235,7 @@ That is very easy to implement.
 There is a function `Hand::attachmentAllowed()` that returns true of false.
 You simply need to add a test in there for the length. The quick and dirty way is this:
 
-	bool Hand::attachmentAllowed(FiberSite & sit) const
+	bool Hand::attachmentAllowed(FiberSite& sit) const
 	{
 	    if ( sit.fiber()->length() < 1 )
 	        return false;	 

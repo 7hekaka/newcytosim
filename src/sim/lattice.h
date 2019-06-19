@@ -264,25 +264,25 @@ public:
 #pragma mark - Index / Abscissa
 
     /// index of the site containing abscissa `a`
-    site_t  index(const real& a)       const { return (site_t)floor(a/laUnit); }
+    site_t  index(real a)       const { return (site_t)floor(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
-    site_t  index_sup(const real& a)   const { return (site_t)ceil(a/laUnit); }
+    site_t  index_sup(real a)   const { return (site_t)ceil(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
-    site_t  index_round(const real& a) const { return (site_t)round(a/laUnit); }
+    site_t  index_round(real a) const { return (site_t)round(a/laUnit); }
 
     /// true if index 'i' is covered by the lattice
-    bool    valid(const site_t& i)     const { return ( laInf <= i  &&  i < laSup ); }
+    bool    valid(site_t i)     const { return ( laInf <= i  &&  i < laSup ); }
     
     /// true if index 'i' is not covered by the lattice
-    bool    invalid(const site_t& i)   const { return ( i < laInf  ||  laSup <= i ); }
+    bool    invalid(site_t i)   const { return ( i < laInf  ||  laSup <= i ); }
     
     /// true if index 'i' corresponds to a site that is between Minus and Plus ends
-    bool    within(const site_t& i)    const { return ( laIndexM <= i  &&  i <= laIndexP ); }
+    bool    within(site_t i)    const { return ( laIndexM <= i  &&  i <= laIndexP ); }
     
     /// true if index 'i' corresponds to a site that falls completely outside
-    bool    outside(const site_t& i)   const { return ( i < laIndexM  ||  laIndexP < i ); }
+    bool    outside(site_t i)   const { return ( i < laIndexM  ||  laIndexP < i ); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`
@@ -299,13 +299,13 @@ public:
     cell_t* data() const  { return laSite; }
     
     /// value at index `s`, equivalent to []
-    cell_t&       data(const site_t& s)       { assert_true(valid(s)); return laSite[s]; }
+    cell_t&       data(site_t s)       { assert_true(valid(s)); return laSite[s]; }
 
     /// value at index `s`, equivalent to []
-    cell_t const& data(const site_t& s) const { assert_true(valid(s)); return laSite[s]; }
+    cell_t const& data(site_t s) const { assert_true(valid(s)); return laSite[s]; }
     
     /// reference to Site at index s
-    cell_t& operator[](const site_t& s) { assert_true(valid(s)); return laSite[s]; }
+    cell_t& operator[](site_t s) { assert_true(valid(s)); return laSite[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
     cell_t&       cell(real a)          { site_t s=index(a); assert_true(valid(s)); return laSite[s]; }
