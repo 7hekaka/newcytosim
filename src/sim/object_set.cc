@@ -80,9 +80,9 @@ void ObjectSet::flagObjects(ObjectList const& objs, ObjectFlag f)
         obj->flag(f);
 }
 
-#if ( 0 )
+
 /**
- Translate all listed movable objects ( Object::mobile()==true ) by `vec`
+ Translate movable objects in list if ( obj->flag() != f )
  */
 void ObjectSet::translateObjects(ObjectList const& objs, Vector const& vec, ObjectFlag f)
 {
@@ -97,7 +97,7 @@ void ObjectSet::translateObjects(ObjectList const& objs, Vector const& vec, Obje
 }
 
 /**
- Apply Rotation around the origin to all movable objects in list
+ Apply Rotation around the origin to objects in list if ( obj->flag() != f )
  */
 void ObjectSet::rotateObjects(ObjectList const& objs, Rotation const& rot, ObjectFlag f)
 {
@@ -110,10 +110,9 @@ void ObjectSet::rotateObjects(ObjectList const& objs, Rotation const& rot, Objec
         }
     }
 }
-#endif
 
 /**
-Apply isometry to all objects
+Apply isometry to objects in list if ( obj->flag() != f )
  */
 void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso, ObjectFlag f)
 {

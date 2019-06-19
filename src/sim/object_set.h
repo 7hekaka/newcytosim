@@ -84,13 +84,13 @@ public:
     /// flag all Objects in ObjectList
     static void       flagObjects(ObjectList const&, ObjectFlag f);
 
-    /// apply translation to all Objects in ObjectList
+    /// apply translation to unflagged Objects in list
     static void       translateObjects(ObjectList const&, Vector const&, ObjectFlag f);
     
-    /// apply rotation to all Objects in ObjectList
+    /// apply rotation to unflagged Objects in list
     static void       rotateObjects(ObjectList const&, Rotation const&, ObjectFlag f);
 
-    /// apply Isometry to all Objects in ObjectList for which ( flag() != f )
+    /// apply Isometry to unflagged Objects in list
     static void       moveObjects(ObjectList const&, Isometry const&, ObjectFlag f);
 
 protected:

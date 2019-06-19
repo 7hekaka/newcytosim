@@ -334,7 +334,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         
         PlacementType placement = PLACE_INSIDE;
         
-        opt.set(placement, "placement",{{"off",        PLACE_NOT},
+        opt.set(placement, "placement",{{"off",       PLACE_NOT},
 #ifdef BACKWARD_COMPATIBILITY
                                        {"none",       PLACE_NOT},
 #endif
@@ -347,13 +347,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         if ( placement != PLACE_NOT )
         {
             Isometry iso = find_placement(opt, placement);
-#if ( 0 )
-            //std::clog << iso << "\n";
-            ObjectSet::flagObjects(res, 1);
-            ObjectSet::moveObjects(res, iso, 0);
-#else
             ObjectSet::moveObjects(res, iso);
-#endif
             // special case for which we check all vertices:
             if ( placement == PLACE_ALL_INSIDE )
             {
@@ -444,12 +438,7 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
             else
             {
                 Isometry iso(spc->randomPlace(), Rotation::randomRotation());
-#if ( 0 )
-                ObjectSet::flagObjects(objs, 1);
-                ObjectSet::moveObjects(objs, iso, 0);
-#else
                 ObjectSet::moveObjects(objs, iso);
-#endif
             }
         }
         
