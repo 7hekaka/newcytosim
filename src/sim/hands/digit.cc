@@ -29,7 +29,7 @@ bool Digit::attachmentAllowed(FiberSite & sit) const
         // index to site containing given abscissa:
         site_t s = lat->index(sit.abscissa());
 
-        if ( unavailable(lat, s) )
+        if ( lat->outside(s) || unavailable(lat, s) )
             return false;
         
         // adjust site:
@@ -52,10 +52,11 @@ void Digit::attach(FiberSite const& sit)
 void Digit::detach()
 {
     dec();
-#ifndef NDEBUG
+#if 0
+    // testing the value of the lattice after detachment:
     FiberLattice::cell_t c = lattice()->data(site());
-    if ( c )
-        std::clog << *this << " detach site " << (int)c << "\n";
+    if ( c & prop->footprint )
+        std::clog << *this << " detach " << (int)c << "\n";
 #endif
     Hand::detach();
 }
@@ -186,7 +187,7 @@ void Digit::stepLoaded(Vector const& force, real force_norm)
 
 std::ostream& operator << (std::ostream& os, Digit const& obj)
 {
-    os << "digit(" << obj.fiber()->reference() << ", " << obj.abscissa();
+    os << obj.property()->name() << "(" << obj.fiber()->reference() << ", " << obj.abscissa();
     os << ", " << obj.site() << ")";
     return os;
 }

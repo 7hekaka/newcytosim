@@ -86,7 +86,14 @@ public:
     site_t        site()    const { return fbSite; }
     
     /// set FiberLattice pointer at site `s` and abscissa `a`
-    void engageLattice(FiberLattice* l, site_t s, real a) { fbLattice=l; fbSite=s; fbAbs=a; }
+    void engageLattice(FiberLattice* l, site_t s, real a)
+    {
+        fbLattice = l;
+        fbSite    = s;
+        fbAbs     = a;
+        assert_true(fbFiber->abscissaM() < a + REAL_EPSILON);
+        assert_true(a < fbFiber->abscissaP() + REAL_EPSILON);
+    }
 
 #else
     

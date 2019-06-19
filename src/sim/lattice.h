@@ -221,19 +221,12 @@ public:
     }
     
 #pragma mark - Edges
-
-    /// clear edge marks
-    void clearEdges()
-    {
-        for ( site_t i = laInf; i < laIndexM; ++i ) laSite[i] = 0;
-        for ( site_t i = laIndexP+1; i < laSup; ++i ) laSite[i] = 0;
-    }
     
-    /// set edge marks
-    void markEdges()
+    /// set cell values outside the valid range
+    void markEdges(const cell_t val)
     {
-        for ( site_t i = laInf; i < laIndexM; ++i ) laSite[i] = EDGE;
-        for ( site_t i = laIndexP+1; i < laSup; ++i ) laSite[i] = EDGE;
+        for ( site_t i = laInf; i < laIndexM; ++i ) laSite[i] = val;
+        for ( site_t i = laIndexP+1; i < laSup; ++i ) laSite[i] = val;
     }
     
     /// set the range of valid abscissa
@@ -243,7 +236,7 @@ public:
         //std::clog << this << " Lattice::setRange(" << i << ", " << s << ") " << laUnit << "\n";
         
         if ( !std::is_same<real, cell_t>::value && laSite )
-            clearEdges();
+            markEdges(0);
         
         laIndexM = index(a);
         laIndexP = index_sup(b) - 1;
@@ -252,7 +245,7 @@ public:
         allocate(laIndexM, laIndexP, 8);
         
         if ( !std::is_same<real, cell_t>::value )
-            markEdges();
+            markEdges(EDGE);
     }
 
     /// index of site containing the MINUS_END
@@ -291,7 +284,7 @@ public:
     bool    within(const site_t& i)    const { return ( laIndexM <= i  &&  i <= laIndexP ); }
     
     /// true if index 'i' corresponds to a site that falls completely outside
-    bool    outside(const site_t& i)   const { return ( i < laIndexM   ||  laIndexP < i ); }
+    bool    outside(const site_t& i)   const { return ( i <= laIndexM  ||  laIndexP <= i ); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`

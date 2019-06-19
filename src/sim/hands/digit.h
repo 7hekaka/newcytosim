@@ -40,10 +40,10 @@ public:
     
     //--------------------------------------------------------------------------
 
+    /// true if given Lattice's site is outside Lattice's range
+    bool          outside(site_t const& s) const { return fbLattice->outside(s); }
+
 #if FIBER_HAS_LATTICE > 0
-    
-    /// true if given Lattice's site is outside range
-    bool          edgy(site_t const& s) const { return fbLattice->data(s) == FiberLattice::EDGE; }
 
     /// true if given Lattice's site is occupied
     bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->data(s) & prop->footprint; }
@@ -59,11 +59,8 @@ public:
     
 #elif FIBER_HAS_LATTICE < 0
 
-    /// true if given Lattice's site is outside range
-    bool          edgy(site_t const& s) const { return fbLattice->outside(s) }
-
     /// true if given Lattice's site is occupied
-    bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->outside(s) || lat->data(s) != 0.0; }
+    bool          unavailable(FiberLattice* lat, site_t const& s) const { return lat->data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
     bool          vacant(site_t const& s) const { return fbLattice->data(s) == 0.0; }
@@ -77,7 +74,7 @@ public:
 #else
 
     site_t        site() const { return std::round(fbAbs/prop->step_size); }
-    bool          edgy(site_t) const { return false; }
+    bool          outside(site_t) const { return false; }
     bool          vacant(site_t) const { return true; }
     void          inc() {}
     void          dec() {}

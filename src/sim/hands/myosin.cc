@@ -39,7 +39,7 @@ void Myosin::stepUnloaded()
     {
         assert_true( attached() );
         site_t s = site() + 1;
-        if ( edgy(s) )
+        if ( outside(s) )
         {
             //immediately detach at the end of the Fiber:
             detach();
@@ -70,7 +70,7 @@ void Myosin::stepLoaded(Vector const& force, real force_norm)
     {
         assert_true( attached() );
         site_t s = site() + 1;
-        if ( edgy(s) )
+        if ( outside(s) )
         {
             //immediately detach at the end of the Fiber:
             detach();
