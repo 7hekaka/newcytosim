@@ -234,18 +234,19 @@ public:
     {
         assert_true( laUnit > REAL_EPSILON );
         //std::clog << this << " Lattice::setRange(" << i << ", " << s << ") " << laUnit << "\n";
-        
+#if 0
         if ( !std::is_same<real, cell_t>::value && laSite )
             markEdges(0);
-        
+#endif
         laIndexM = index(a);
         laIndexP = index_sup(b) - 1;
         
-        /* add here some safety margin */
+        /* allocate with some safety margin */
         allocate(laIndexM, laIndexP, 8);
-        
+#if 0
         if ( !std::is_same<real, cell_t>::value )
             markEdges(EDGE);
+#endif
     }
 
     /// index of site containing the MINUS_END
