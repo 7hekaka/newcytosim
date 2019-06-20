@@ -44,9 +44,9 @@ SRCDIR  := $(SRCDIR1) $(SRCDIR2)
 #command used to build the dependencies files automatically
 MAKEDEP := gcc -MM $(addprefix -I, $(SRCDIR))
 
-#-----------------------SVN revision number-------------------------------------
+#-----------------------GIT revision number-------------------------------------
 
-CODE_VERSION = -D'CODE_VERSION="$(shell svnversion -n . || echo unknown)"'
+CODE_VERSION = -D'CODE_VERSION="$(shell git rev-parse --short HEAD || echo unknown)"'
 
 COMPILER_VERSION = -D'COMPILER_VERSION="$(shell $(word 1, $(CXX)) --version | head -1)"'
 
@@ -163,7 +163,6 @@ sterile:
 	rm -rf bin3/*
 	rm -f *.cmo
 	rm -f log.txt;
-	svn cleanup
 
 
 #---------------------------- dependencies -------------------------------------

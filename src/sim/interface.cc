@@ -304,8 +304,15 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
 ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
 {
     ObjectList res;
-    Property * pp = simul.properties.find_or_die(name);
-    ObjectSet * set = simul.findSet(pp->category());
+    ObjectSet * set = nullptr;
+    {
+        Property * pp = simul.properties.find(name);
+        // Allows to make an object without an associated Property
+        if ( pp )
+            set = simul.findSet(pp->category());
+        else
+            set = simul.findSet(name);
+    }
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     
