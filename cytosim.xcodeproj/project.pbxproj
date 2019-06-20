@@ -1202,8 +1202,6 @@
 		BB73591105B98DA3006956D5 /* test_rasterizer.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_rasterizer.cc; path = src/test/test_rasterizer.cc; sourceTree = SOURCE_ROOT; };
 		BB73591405B98DA3006956D5 /* test_solve.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_solve.cc; path = src/test/test_solve.cc; sourceTree = SOURCE_ROOT; };
 		BB73591705B98DA3006956D5 /* test_sphere.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_sphere.cc; path = src/test/test_sphere.cc; sourceTree = SOURCE_ROOT; };
-		BB73591A05B98DA3006956D5 /* analyse2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = analyse2.cc; path = src/tools/analyse2.cc; sourceTree = SOURCE_ROOT; };
-		BB73591B05B98DA3006956D5 /* analyse3.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = analyse3.cc; path = src/tools/analyse3.cc; sourceTree = SOURCE_ROOT; };
 		BB749D6017935DAC00B43298 /* quartic_solver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quartic_solver.cc; path = src/math/quartic_solver.cc; sourceTree = SOURCE_ROOT; };
 		BB749D621793620500B43298 /* test_quartic.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_quartic.cc; sourceTree = "<group>"; };
 		BB749D641793645C00B43298 /* polygon.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polygon.cc; path = src/math/polygon.cc; sourceTree = SOURCE_ROOT; };
@@ -1683,15 +1681,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BB1749A307D798C300BC7BDC /* Lattice */ = {
-			isa = PBXGroup;
-			children = (
-				BB1749A507D798E600BC7BDC /* lattice.h */,
-				BB1749A407D798E600BC7BDC /* lattice.cc */,
-			);
-			name = Lattice;
-			sourceTree = "<group>";
-		};
 		BB1B723C05CD47BE0027A712 /* build */ = {
 			isa = PBXGroup;
 			children = (
@@ -2220,14 +2209,13 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D80E085C620024546A /* makefile.inc */,
-				BB7D839510274A4500C1DC38 /* common.h */,
-				BB5D4A9512BC035600A1312F /* common.cc */,
 				BBF0385F18BCF7A3002E8568 /* splash.h */,
 				BBF0385D18BCF207002E8568 /* splash.cc */,
+				BB7D839510274A4500C1DC38 /* common.h */,
+				BB5D4A9512BC035600A1312F /* common.cc */,
 				BBA8C0BD0E20CA8A009C7F93 /* Objects */,
 				BB62247E12ABB215003D8C0F /* Mecable */,
 				BB88388610B48E6900A4028F /* Space */,
-				BB1749A307D798C300BC7BDC /* Lattice */,
 				BBCAA48F06B0653500638608 /* Fibers */,
 				BBCAA7B806B07B6000638608 /* Hands */,
 				BB614D9A05BE8F150048FA70 /* Singles */,
@@ -2288,16 +2276,14 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D40E085C110024546A /* makefile.inc */,
-				BB9BEB9C1C774BB30085E19F /* analyse.cc */,
-				BBEEC85B16E5D891006C1C6E /* micimage.cc */,
-				BB9771601F52D98200EB8C92 /* cymart.cc */,
-				BB77D6FB05F12F16001C0596 /* frametool.cc */,
 				BBCD6993126F818F00D19DDF /* sieve.cc */,
 				BBAB0D36138FAEC6006DEAF9 /* reader.cc */,
 				BBA721BB1462C3B900ACF26D /* report.cc */,
 				BB30391F16FB42C700CDF586 /* reportF.cc */,
-				BB73591A05B98DA3006956D5 /* analyse2.cc */,
-				BB73591B05B98DA3006956D5 /* analyse3.cc */,
+				BB77D6FB05F12F16001C0596 /* frametool.cc */,
+				BBEEC85B16E5D891006C1C6E /* micimage.cc */,
+				BB9771601F52D98200EB8C92 /* cymart.cc */,
+				BB9BEB9C1C774BB30085E19F /* analyse.cc */,
 			);
 			name = tools;
 			path = src/tools;
@@ -2360,12 +2346,12 @@
 			children = (
 				BB88388810B48EC400A4028F /* modulo.h */,
 				BB88388710B48EC400A4028F /* modulo.cc */,
-				BB88388A10B48EC400A4028F /* space_prop.h */,
-				BB88388910B48EC400A4028F /* space_prop.cc */,
 				BB88388C10B48EC400A4028F /* space.h */,
 				BB88388B10B48EC400A4028F /* space.cc */,
 				BB955C4C116FBF4C000E70A6 /* space_set.h */,
 				BB955C4B116FBF4C000E70A6 /* space_set.cc */,
+				BB88388A10B48EC400A4028F /* space_prop.h */,
+				BB88388910B48EC400A4028F /* space_prop.cc */,
 				BB8838BE10B48EF900A4028F /* spaces */,
 			);
 			name = Space;
@@ -2653,18 +2639,20 @@
 		BBCAA48F06B0653500638608 /* Fibers */ = {
 			isa = PBXGroup;
 			children = (
+				BB1749A507D798E600BC7BDC /* lattice.h */,
+				BB1749A407D798E600BC7BDC /* lattice.cc */,
 				BBCAA3E906B05D3C00638608 /* filament.h */,
 				BBCAA3E806B05D3C00638608 /* filament.cc */,
 				BB9D992608D6281100DBD2BF /* mecafil.h */,
 				BB9D992508D6281100DBD2BF /* mecafil.cc */,
 				BBCAA49D06B0655A00638608 /* mecafil_project.cc */,
 				BBCAA49E06B0655A00638608 /* mecafil_projectmat.cc */,
-				BB07F48911627E2200A15828 /* fiber_prop.h */,
-				BB07F48811627E2200A15828 /* fiber_prop.cc */,
 				BB171C310B3DEBE700CFFC3B /* fiber.h */,
 				BB171C320B3DEBE700CFFC3B /* fiber.cc */,
 				BB07F522116291E800A15828 /* fiber_set.h */,
 				BB07F521116291E800A15828 /* fiber_set.cc */,
+				BB07F48911627E2200A15828 /* fiber_prop.h */,
+				BB07F48811627E2200A15828 /* fiber_prop.cc */,
 				BBD74E161366CA6500B50C62 /* fiber_segment.h */,
 				BBD74E151366CA6500B50C62 /* fiber_segment.cc */,
 				BB650A95182E472800A7998B /* GrowingFiber */,
@@ -2730,10 +2718,10 @@
 		BBD720D31C69C774008D9B4F /* Regulator */ = {
 			isa = PBXGroup;
 			children = (
-				BBD720D41C69C7AC008D9B4F /* regulator_prop.cc */,
-				BBD720D51C69C7AC008D9B4F /* regulator_prop.h */,
-				BBD720D61C69C7AC008D9B4F /* regulator.cc */,
 				BBD720D71C69C7AC008D9B4F /* regulator.h */,
+				BBD720D61C69C7AC008D9B4F /* regulator.cc */,
+				BBD720D51C69C7AC008D9B4F /* regulator_prop.h */,
+				BBD720D41C69C7AC008D9B4F /* regulator_prop.cc */,
 			);
 			name = Regulator;
 			sourceTree = "<group>";
@@ -2812,10 +2800,10 @@
 		BBFF313816F3580500C09B51 /* Myosin */ = {
 			isa = PBXGroup;
 			children = (
-				BBFF313916F3583800C09B51 /* myosin_prop.cc */,
-				BBFF313A16F3583800C09B51 /* myosin_prop.h */,
-				BBFF313B16F3583800C09B51 /* myosin.cc */,
 				BBFF313C16F3583800C09B51 /* myosin.h */,
+				BBFF313B16F3583800C09B51 /* myosin.cc */,
+				BBFF313A16F3583800C09B51 /* myosin_prop.h */,
+				BBFF313916F3583800C09B51 /* myosin_prop.cc */,
 			);
 			name = Myosin;
 			sourceTree = "<group>";
@@ -2823,10 +2811,10 @@
 		BBFF314116F3648800C09B51 /* Kinesin */ = {
 			isa = PBXGroup;
 			children = (
-				BBFF314B16F364C000C09B51 /* kinesin_prop.cc */,
-				BBFF314C16F364C000C09B51 /* kinesin_prop.h */,
-				BBFF314D16F364C000C09B51 /* kinesin.cc */,
 				BBFF314E16F364C000C09B51 /* kinesin.h */,
+				BBFF314D16F364C000C09B51 /* kinesin.cc */,
+				BBFF314C16F364C000C09B51 /* kinesin_prop.h */,
+				BBFF314B16F364C000C09B51 /* kinesin_prop.cc */,
 			);
 			name = Kinesin;
 			sourceTree = "<group>";
@@ -2834,10 +2822,10 @@
 		BBFF314216F3648E00C09B51 /* Dynein */ = {
 			isa = PBXGroup;
 			children = (
-				BBFF314316F364AD00C09B51 /* dynein_prop.cc */,
-				BBFF314416F364AD00C09B51 /* dynein_prop.h */,
-				BBFF314516F364AD00C09B51 /* dynein.cc */,
 				BBFF314616F364AD00C09B51 /* dynein.h */,
+				BBFF314516F364AD00C09B51 /* dynein.cc */,
+				BBFF314416F364AD00C09B51 /* dynein_prop.h */,
+				BBFF314316F364AD00C09B51 /* dynein_prop.cc */,
 			);
 			name = Dynein;
 			sourceTree = "<group>";

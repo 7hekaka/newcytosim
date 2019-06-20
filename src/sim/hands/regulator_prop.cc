@@ -36,7 +36,7 @@ void RegulatorProp::complete(Simul const& sim)
     HandProp::complete(sim);
     
     if ( rate < 0 )
-        throw InvalidParameter("rescuer:rescue_prob must be >= 0");
+        throw InvalidParameter("regulator:rate must be >= 0");
     
     rate_dt = rate * sim.prop->time_step;
 }

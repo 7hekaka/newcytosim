@@ -450,8 +450,8 @@ void Simul::solveX()
         Hand const* h1 = co->hand1();
         Hand const* h2 = co->hand2();
         
-        const Matrix::index_t  i1 = h1->fiber()->matIndex();
-        const Matrix::index_t  i2 = h2->fiber()->matIndex();
+        const Matrix::index_t i1 = h1->fiber()->matIndex();
+        const Matrix::index_t i2 = h2->fiber()->matIndex();
         assert_true( i1 != i2 );
         
         sMeca1D.addLink(i1, i2, co->stiffness(), h2->pos().XX - h1->pos().XX);
