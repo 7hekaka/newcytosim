@@ -239,7 +239,7 @@ public:
         laIndexP = index_sup(b) - 1;
         
         /* allocate with some safety margin */
-        allocate(laIndexM, laIndexP, 8);
+        allocate(laIndexM, laIndexP+1, 8);
 #if 0
         if ( !std::is_same<real, cell_t>::value )
             markEdges(~0);

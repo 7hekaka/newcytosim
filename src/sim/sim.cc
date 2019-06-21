@@ -94,9 +94,9 @@ int main(int argc, char* argv[])
     }
     
 #ifdef CODE_VERSION
-    Cytosim::out << "CYTOSIM PI version " << CODE_VERSION << "\n";
+    Cytosim::out << "CYTOSIM " << DIM << "D version " << CODE_VERSION << '\n';
 #else
-    Cytosim::out << "CYTOSIM PI\n";
+    Cytosim::out << "CYTOSIM " << DIM << "D\n";
 #endif
 #if NEW_ANISOTROPIC_FIBER_DRAG
     Cytosim::out << "    ANISOTROPIC_FIBER_DRAG = 1\n";
