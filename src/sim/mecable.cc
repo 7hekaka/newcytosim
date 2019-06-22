@@ -391,13 +391,13 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
 }
 
 
-void Mecable::print(std::ostream& os) const
+void Mecable::print(std::ostream& os, real const* ptr) const
 {
     os << "new mecable " << reference() << "\n{\n";
     os << " nb_points = " << nPoints << '\n';
     for ( unsigned i = 0; i < nPoints ; ++i )
     {
-        os << " point" << i+1 << " = " << posP(i) << '\n';
+        os << " point" << i+1 << " = " << Vector(ptr+DIM*i) << '\n';
     }
     os << "}\n";
 }
@@ -405,7 +405,7 @@ void Mecable::print(std::ostream& os) const
 
 std::ostream& operator << (std::ostream& os, Mecable const& obj)
 {
-    obj.print(os);
+    obj.print(os, obj.data());
     return os;
 }
 

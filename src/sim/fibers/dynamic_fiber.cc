@@ -276,12 +276,14 @@ void DynamicFiber::step()
 {
     // perform stochastic simulation:
     int incP = stepPlusEnd();
-    
-    mGrowthP = incP * prop->unit_length;
+    int incM = stepMinusEnd();
 
-    if ( incP )
+    mGrowthP = incP * prop->unit_length;
+    mGrowthM = incM * prop->unit_length;
+
+    if ( incM || incP )
     {
-        if ( mGrowthP < 0  &&  length() + mGrowthP < prop->min_length )
+        if ( length() + mGrowthM + mGrowthP < prop->min_length )
         {
             // do something if the fiber is too short:
             if ( !prop->persistent )
@@ -290,36 +292,15 @@ void DynamicFiber::step()
                 // exit to avoid doing anything with a dead object:
                 return;
             }
-            
+            // possibly rescue:
             if ( RNG.test(prop->rebirth_prob[0]) )
                 setDynamicStateP(STATE_GREEN);
         }
-        else if ( length() + mGrowthP < prop->max_length )
+        else if ( length() + mGrowthM + mGrowthP < prop->max_length )
         {
-            growP(mGrowthP);
-        }
-    }
-    
-    
-    int incM = stepMinusEnd();
-    
-    mGrowthM = incM * prop->unit_length;
-
-    if ( incM )
-    {
-        if ( mGrowthM < 0  &&  length() + mGrowthM < prop->min_length )
-        {
-            // do something if the fiber is too short:
-            if ( !prop->persistent )
-            {
-                delete(this);
-                // exit to avoid doing anything with a dead object:
-                return;
-            }
-        }
-        else if ( length() + mGrowthM < prop->max_length )
-        {
-            growM(mGrowthM);
+            if ( incP ) growP(mGrowthP);
+            if ( incM ) growM(mGrowthM);
+            //std::clog << reference() << " " << mGrowthM << " " << mGrowthP << " " << length() << '\n';
         }
     }
 

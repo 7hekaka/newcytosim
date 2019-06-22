@@ -50,20 +50,25 @@ real Filament::contourLength(const real* pts, unsigned n_pts)
 }
 
 
+/** number of time steps between each attempt to remove/add a point
+ also number of states over which curvature information is averaged */
+#define RECUT_PERIOD 8
+
 Filament::Filament()
 {
     fnNormal.set(0, 0, 1);
-    fnCut           = 0;
-    fnSegmentation  = 0;
-    fnAbscissaM     = 0;
-    fnAbscissaP     = 0;
-    fnBirthTime     = 0;
+    fnCut          = 0;
+    fnSegmentation = 0;
+    fnAbscissaM    = 0;
+    fnAbscissaP    = 0;
+    fnBirthTime    = 0;
 #if CURVATURE_DEPENDENT_SEGMENTATION
-    fnCutError      = 0;
+    fnCutErrorVal  = 0;
+    fnCutErrorCnt  = 0;
     // set different 'seeds' to desynchronize the adjustSegmentation()
-    fnCutErrorIndex = RNG.pint(RECUT_PERIOD);
+    fnCutErrorIdx  = RNG.pint(RECUT_PERIOD);
 #endif
-    needUpdate      = false;
+    needUpdate     = false;
 }
 
 
@@ -95,6 +100,7 @@ void Filament::setStraight(Vector const& pos, Vector const& dir, real len, const
     
     setNbPoints(np);
     setSegmentation(len/(np-1));
+    fnAbscissaP = fnAbscissaM + len;
 
     switch( ref )
     {
@@ -145,6 +151,7 @@ void Filament::setShape(const real pts[], unsigned n_pts, unsigned np)
     }
     setNbPoints(np);
     setSegmentation(len/(np-1));
+    fnAbscissaP = fnAbscissaM + len;
     
     a.load(pts);
     b.load(pts+DIM);
@@ -190,6 +197,7 @@ void Filament::setEquilibrated(real len, real persistence_length)
     
     setNbPoints(np);
     setSegmentation(len/(np-1));
+    fnAbscissaP = fnAbscissaM + len;
     
     real sigma = sqrt(2*fnCut/persistence_length);
     
@@ -954,7 +962,7 @@ void Filament::growM(const real delta)
     }
     
     fnAbscissaM -= delta;
-    setSegmentation(fnCut-a*fnCut);
+    setSegmentation(fnCut + delta/nbSegments());
     postUpdate();
 }
 
@@ -1066,7 +1074,8 @@ void Filament::growP(const real delta)
             movePoint(p, ( a * p ) * diffPoints(p-1));
     }
     
-    setSegmentation(fnCut+a*fnCut);
+    setSegmentation(fnCut + delta/nbSegments());
+    fnAbscissaP += delta;
     postUpdate();
 }
 
@@ -1084,6 +1093,7 @@ void Filament::addSegmentP()
     for ( unsigned int dd = 0; dd < DIM; ++dd )
         psp[dd] = 2 * psp[dd-DIM] - psp[dd-2*DIM];
     
+    fnAbscissaP += fnCut;
     postUpdate();
 }
 
@@ -1118,6 +1128,7 @@ void Filament::cutP(const real delta)
 
     setNbPoints(np);
     setSegmentation(cut);
+    fnAbscissaP -= delta;
     setPoints(tmp);
     free_real(tmp);
     postUpdate();
@@ -1205,6 +1216,7 @@ void Filament::join(Filament const* fib)
 
     setNbPoints(ns+1);
     setSegmentation(cut);
+    fnAbscissaP = fnAbscissaM + cut * fnCut;
     setPoints(tmp);
     free_real(tmp);
     postUpdate();
@@ -1436,6 +1448,7 @@ void Filament::resegment(unsigned ns)
     unsigned p = 1;
     real* tmp = new_real(DIM*(ns+1));
     
+    a.store(tmp);
     for ( unsigned n = 1; n < ns; ++n )
     {
         h += cut;
@@ -1445,7 +1458,7 @@ void Filament::resegment(unsigned ns)
             h -= fnCut;
             a = b;
             ++p;
-            assert_true(p<lastPoint());
+            assert_true(p<nbPoints());
             b.load(pPos+DIM*p);
         }
         
@@ -1453,8 +1466,9 @@ void Filament::resegment(unsigned ns)
         w.store(tmp+DIM*n);
     }
     
-    // move coordinates of last point
-    copy_real(DIM, pPos+DIM*lastPoint(), tmp+DIM*ns);
+    // copy coordinates of last point:
+    a.load(pPos+DIM*lastPoint());
+    a.store(tmp+DIM*ns);
 
     // resize filament:
     setNbPoints(ns+1);
@@ -1487,7 +1501,7 @@ void Filament::adjustSegmentation()
     if ( best != nPoints )
     {
         //std::clog << reference() << " resegment " << nPoints << " -> " << best << "\n";
-#if ( 0 )
+#if ( 1 )
         resegment(best-1);
 #else
         // copy current points in temporary array:
@@ -1515,27 +1529,27 @@ void Filament::adjustSegmentation()
     PRINT_ONCE("adjustSegmentation() is using the fiber curvature\n");
     
     const int upLimit = 8;
-    unsgiend nbs = nbSegments();
-    real len = nbs * fnCut;
+    unsigned nbs = nbSegments();
+    real len = length();
     
     assert_true( fnSegmentation > REAL_EPSILON );
-    //one segment for very short tubes
+    // use one segment for very short tubes
     if ( len <= fnSegmentation )
     {
         if ( nbs > 1 )
         {
             resegment(1);
-            fnCutErrorIndex = 0;
+            goto clear_counter;
         }
         return;
     }
-    //at least two segments if length exceeds 2*fnSegmentation
+    //use at least two segments if length exceeds 2*fnSegmentation
     if ( nbs < 2 )
     {
         if ( len > fnSegmentation )
         {
             resegment(2);
-            fnCutErrorIndex = 0;
+            goto clear_counter;
         }
         return;
     }
@@ -1543,44 +1557,46 @@ void Filament::adjustSegmentation()
     if ( fnCut >= upLimit * fnSegmentation )
     {
         resegment(2*nbs);
-        fnCutErrorIndex = 0;
-        return;
+        goto clear_counter;
     }
     
     // accumulate the error in variable fnCutError, 
     // The error is in angle-square: 1-cos(angle) ~ (angle)^2
-    if ( fnCutErrorIndex == 0 )
-        fnCutError  =  1.0 - minCosinus();
-    else
-        fnCutError +=  1.0 - minCosinus();
+    fnCutErrorCnt += 1.0;
+    fnCutErrorVal += minCosinus();
     
     // after accumulation of RECUT_PERIOD time steps, we check the result
-    if ( ++fnCutErrorIndex >= RECUT_PERIOD )
+    if ( ++fnCutErrorIdx < RECUT_PERIOD )
+        return;
+    
+    if ( fnCutErrorCnt > 2 )
     {
-        //we scale the error accumulated over the last steps
-        fnCutError *= fnCut / ( RECUT_PRECISION * RECUT_PERIOD );
+        // calculate error accumulated over the last steps
+        fnCutErrorVal = ( 1.0 - fnCutErrorVal/fnCutErrorCnt ) * fnCut;
         
-        if ( fnCutError > 1.0 )
+        if ( fnCutErrorVal > RECUT_PRECISION )
         {
             //cut more finely if the error is large
             if ( fnCut > fnSegmentation )
                 resegment(2*nbs);
         }
-        else if ( fnCutError < 0.1 )
+        else if ( fnCutErrorVal < 0.1 * RECUT_PRECISION )
         {
             /*
-            We want the future error with fewer points to be small.
-            At constant curvature, the error scales like (length-of-rods)^2
-            We can expect the error to raise by 4x, if we divide the number of segments by 2.
-            For safety, we use 0.125 here, instead of 1/4, i.e. add another factor 2.
-            */
+             We want the future error with fewer points to be small.
+             At constant curvature, the error scales like (length-of-rods)^2
+             We can expect the error to raise by 4x, if we divide the number of segments by 2.
+             For safety, we use 0.125 here, instead of 1/4, i.e. add another factor 2.
+             */
             if ( nbs > 3 && fnCut < (upLimit/2)*fnSegmentation )
                 resegment(nbs/2);
         }
-        
-        //reset the counter and error accumulator
-        fnCutErrorIndex = 0;
     }
+clear_counter:
+    //reset the counter and error accumulator
+    fnCutErrorIdx = 0;
+    fnCutErrorCnt = 0;
+    fnCutErrorVal = 0;
 }
 
 #endif

@@ -6,7 +6,7 @@
 #include "hand_prop.h"
 
 /// enable lattice-dependent speed of motors
-#define NEW_VARIABLE_SPEED 0
+#define NEW_VARIABLE_SPEED 1
 
 /// enable movement-dependent detachment of motors
 #define NEW_UNBINDING_DENSITY 0

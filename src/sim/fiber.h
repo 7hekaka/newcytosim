@@ -21,7 +21,7 @@ class LineDisp;
 
 
 /// Flag to associate a Lattice to the Fiber {-1, 0, 1}
-#define FIBER_HAS_LATTICE 1
+#define FIBER_HAS_LATTICE -1
 
 /**
  The type of Lattice associated with each Fiber is defined here:

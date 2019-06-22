@@ -394,7 +394,7 @@ public:
     void            read(Inputter&, Simul&, ObjectTag);
     
     /// Human friendly ouput
-    void            print(std::ostream&) const;
+    void            print(std::ostream&, real const*) const;
     
     /// return index encoded in `str`
     static unsigned point_index(std::string const& str, unsigned max);

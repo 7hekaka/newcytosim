@@ -76,16 +76,15 @@ private:
     /// target segmentation length (equal to parameter 'fiber:segmentation')
     real         fnSegmentation;
   
-#if CURVATURE_DEPENDENT_SEGMENTATION
-    /** number of time steps between each attempt to remove/add a point
-    also number of states over which curvature information is averaged */
-    static constexpr unsigned RECUT_PERIOD = 4;
-    
+#if CURVATURE_DEPENDENT_SEGMENTATION    
     /// error due to the cutting at different steps
-    real         fnCutError;
+    real         fnCutErrorVal;
+    
+    /// number of errors accumulated
+    real         fnCutErrorCnt;
     
     /// index into the fnCutError[]
-    unsigned int fnCutErrorIndex;
+    unsigned int fnCutErrorIdx;
 #endif
     
     /// abscissa of the minus-end (equal to zero initially)
@@ -130,7 +129,7 @@ protected:
     static int   reshape_local(unsigned, const real*, real*, real cut, real* tmp, size_t);
 
     /// change segmentation
-    void         setSegmentation(real c) { fnCut = c; fnAbscissaP = fnAbscissaM + c * nbSegments(); }
+    void         setSegmentation(real c) { fnCut = c; }
     
 public:
     
@@ -156,7 +155,7 @@ public:
     void         setEquilibrated(real len, real persistence_length);
 
     /// change the current segmentation to force `length()==len` (normally not needed)
-    void         imposeLength(real len) { setSegmentation( len / ( nbPoints() - 1 )); }
+    void         imposeLength(real len) { setSegmentation( len / ( nbPoints() - 1 )); fnAbscissaP = fnAbscissaM + len; }
 
     /// return updated `normal` that is orthogonal to `d` (used for display)
     Vector3      adjustedNormal(Vector3 const& d) const;
@@ -201,8 +200,8 @@ public:
     //---------------------
     
     /// the total length of the Fiber, estimated from the segmentation and number of segment
-    real         length()                const { return nbSegments() * fnCut; }
-    //real         length()                const { return fnAbscissaP - fnAbscissaM; }
+    //real         length()                const { return nbSegments() * fnCut; }
+    real         length()                const { return fnAbscissaP - fnAbscissaM; }
     
     /// the sum of the distance between vertices (used for debugging)
     real         trueLength()            const { return contourLength(pPos, nPoints); }
