@@ -67,8 +67,7 @@ inline real* new_real(size_t size)
     void* ptr = nullptr;
     // we align to 4 doubles (of size 8 bytes), hence 32 bytes
     posix_memalign(&ptr, 32, size*sizeof(real));
-    printf("new_real(%lu)\n", size);
-    //std::clog << "memory alignment " << ((uintptr_t)ptr & 63) << "\n";
+    //printf("new_real(%lu)  %lu\n", size, ((uintptr_t)ptr&63));
     return (real*)ptr;
 }
 
