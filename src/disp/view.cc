@@ -410,7 +410,7 @@ void View::sliceView(int mode) const
 
 void View::reset()
 {
-    zoom = 1;
+    zoom = 0.933033;
     auto_scale = 1;
     focus.reset();
     focus_shift.reset();

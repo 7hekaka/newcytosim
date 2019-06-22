@@ -66,7 +66,7 @@ INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/c
 
 
 sim: sim.cc cytosim.a cytospace.a cytomath.a cytobase.a | bin
-	$(COMPILE) $(INC_BM) $(CODE_VERSION) $(OBJECTS) $(LINK) -o bin/$@
+	$(COMPILE) $(INC_BM) $(INFO) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath sim  bin
 
@@ -78,7 +78,7 @@ cytosim.a: $(OBJ_CYTOSIM) | lib
 #--- build for debuging:
 
 simd: sim.cc cytosim.a cytospace.a cytomath.a cytobase.a | bin
-	$(CXX) $(FlagsD) $(INC_BM) $(CODE_VERSION) $(OBJECTS) $(LINK) -o bin/$@
+	$(CXX) $(FlagsD) $(INC_BM) $(INFO) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath simd  bin
 
@@ -87,7 +87,7 @@ vpath simd  bin
 
 
 bin1/sim: sim.cc cytosimD1.a cytospaceD1.a cytomathD1.a cytobase.a
-	$(COMPILE) $(INC_BM) $(CODE_VERSION) -DDIM=1 $(OBJECTS) $(LINK) -o bin1/sim
+	$(COMPILE) $(INC_BM) $(INFO) -DDIM=1 $(OBJECTS) $(LINK) -o bin1/sim
 	$(DONE)
 
 cytosimD1.a: $(OBJ_CYTOSIMD1)
@@ -96,7 +96,7 @@ cytosimD1.a: $(OBJ_CYTOSIMD1)
 
 
 bin2/sim: sim.cc cytosimD2.a cytospaceD2.a cytomathD2.a cytobase.a
-	$(COMPILE) $(INC_BM) $(CODE_VERSION) -DDIM=2 $(OBJECTS) $(LINK) -o bin2/sim
+	$(COMPILE) $(INC_BM) $(INFO) -DDIM=2 $(OBJECTS) $(LINK) -o bin2/sim
 	$(DONE)
 
 cytosimD2.a: $(OBJ_CYTOSIMD2)
@@ -105,7 +105,7 @@ cytosimD2.a: $(OBJ_CYTOSIMD2)
 
 
 bin3/sim: sim.cc cytosimD3.a cytospaceD3.a cytomathD3.a cytobase.a
-	$(COMPILE) $(INC_BM) $(CODE_VERSION) -DDIM=3 $(OBJECTS) $(LINK) -o bin3/sim
+	$(COMPILE) $(INC_BM) $(INFO) -DDIM=3 $(OBJECTS) $(LINK) -o bin3/sim
 	$(DONE)
 
 cytosimD3.a: $(OBJ_CYTOSIMD3)

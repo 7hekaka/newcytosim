@@ -4,13 +4,14 @@
 #include "assert_macro.h"
 #include "fiber.h"
 #include "real.h"
+#include "dim.h"
 
 
 /// print header line identifying the project
 inline void splash(std::ostream& os)
 {
     os << " ------------------------------------------------------------- \n";
-    os << "|  CytoSIM  -  www.cytosim.org  -  version PI  -  Jan  2019   |\n";
+    os << "|  CytoSIM " <<DIM<<"D -  www.cytosim.org  -  version PI  - June 2019  |\n";
     os << " ------------------------------------------------------------- \n";
 }
 
@@ -18,31 +19,31 @@ inline void splash(std::ostream& os)
 /// print general info about the program
 inline void print_version(std::ostream& os)
 {
-    os << "    Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON << "\n";
+    os << "    Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON;
     
 #ifdef FIBER_HAS_LATTICE
-    os << "    Fiber lattice " << FIBER_HAS_LATTICE << "\n";
+    os << "    Fiber Lattice " << FIBER_HAS_LATTICE << "\n";
 #endif
     
-    os << "    Built on " <<__DATE__<< " at " <<__TIME__<< "\n";
+    os << "    Built on " <<__DATE__<< " at " <<__TIME__;
     
 #ifdef COMPILER_VERSION
-    os << "    with " << COMPILER_VERSION << "\n";
+    os << " with " << COMPILER_VERSION << "\n";
 #else
-    os << "    with unknown compiler\n";
+    os << " with unknown compiler\n";
 #endif
-    os << "    C++ version " << __cplusplus << "\n";
+    //os << "    C++ version " << __cplusplus << "\n";
     
 #ifdef CODE_VERSION
-    os << "    Code version " << CODE_VERSION << "\n";
+    os << "    Code version " << CODE_VERSION;
 #else
-    os << "    Code version unknown\n";
+    os << "    Code version unknown";
 #endif
     
 #ifdef NDEBUG
-    os << "    (no assertions)\n";
+    os << " (no assertions)\n";
 #else
-    os << "    with assertions\n";
+    os << " with assertions\n";
 #endif
 }
 

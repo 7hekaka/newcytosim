@@ -21,7 +21,7 @@ $(OBJ_PLAY): %.o: %.cc %.h | build
 	$(COMPILE) $(PLAY_INC) -c $< -o build/$@
 
 play: play.cc player.o $(OBJ_PLAY) cytosim.a cytospaceG.a libcytodisp.a cytomath.a cytobase.a | bin
-	$(COMPILE) $(OBJECTS) $(PLAY_DEP) -o bin/play
+	$(COMPILE) $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin/play
 	$(DONE)
 vpath play bin
 
@@ -34,7 +34,7 @@ $(OBJ_PLAY1D): %D1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o build/$@
 
 bin1/play: play.cc playerD1.o $(OBJ_PLAY1D) cytosimD1.a cytospaceD1G.a libcytodisp.a cytomathD1.a cytobase.a
-	$(COMPILE) -DDIM=1 $(OBJECTS) $(PLAY_DEP) -o bin1/play
+	$(COMPILE) -DDIM=1 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin1/play
 	$(DONE)
 vpath bin1/play bin1
 
@@ -47,7 +47,7 @@ $(OBJ_PLAY2D): %D2.o: %.cc %.h | build
 	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o build/$@
 
 bin2/play: play.cc playerD2.o $(OBJ_PLAY2D) cytosimD2.a cytospaceD2G.a libcytodisp.a cytomathD2.a cytobase.a
-	$(COMPILE) -DDIM=2 $(OBJECTS) $(PLAY_DEP) -o bin2/play
+	$(COMPILE) -DDIM=2 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin2/play
 	$(DONE)
 vpath bin2/play bin2
 
@@ -60,7 +60,7 @@ $(OBJ_PLAY3D): %D3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o build/$@
 
 bin3/play: play.cc playerD3.o $(OBJ_PLAY3D) cytosimD3.a cytospaceD3G.a libcytodisp.a cytomathD3.a cytobase.a
-	$(COMPILE) -DDIM=3 $(OBJECTS) $(PLAY_DEP) -o bin3/play
+	$(COMPILE) -DDIM=3 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin3/play
 	$(DONE)
 vpath bin3/play bin3
 

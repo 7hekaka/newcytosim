@@ -156,7 +156,6 @@ int main(int argc, char* argv[])
         print_version(std::cout);
         if ( SaveImage::supported("png") )
             std::cout << "    PNG enabled\n";
-        std::cout << "    DIM = " << DIM << '\n';
         return EXIT_SUCCESS;
     }
     
