@@ -370,7 +370,7 @@ void changeSpeckleStyle(FiberDisp* p, int)
 
 void changeLatticeStyle(FiberDisp* p, int)
 {
-    p->lattice_style = ( 1 + p->lattice_style ) % 3;
+    p->lattice_style = ( 1 + p->lattice_style ) % 4;
     flashText("Fibers: lattice_style=%i", p->lattice_style);
 }
 

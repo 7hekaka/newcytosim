@@ -179,7 +179,7 @@ The function `set_color` is used to set the color of the segments
 */
 void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_cap, real rad,
                                     unsigned inx, const unsigned last,
-                                    void (*set_color)(Fiber const&, unsigned, real), real alpha) const
+                                    void (*set_color)(Fiber const&, unsigned, real), real beta) const
 {
     Vector pos = fib.posPoint(inx), old;
     Vector nxt = fib.posPoint(inx+1);
@@ -187,7 +187,7 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_
 
     assert_true( last <= fib.lastSegment() );
     
-    set_color(fib, inx, alpha);
+    set_color(fib, inx, beta);
     if ( minus_cap )
         drawCap(fib.prop->disp->line_caps, pos, -dir, rad);
     
@@ -203,7 +203,7 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_
         pos = nxt;
         nxt = fib.posPoint(inx+2);
         dir = normalize(nxt-old);
-        set_color(fib, inx++, alpha);
+        set_color(fib, inx++, beta);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         gleTube(old, pos, rad, gleLongTube2B);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
@@ -211,7 +211,7 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_
 
     // draw last segment:
     dir = normalize(nxt-pos);
-    set_color(fib, last, alpha);
+    set_color(fib, last, beta);
     setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
     gleTube(pos, nxt, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
@@ -221,7 +221,7 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_
     {
         pos = nxt;
         nxt = fib.posP(inx+1);
-        set_color(fib, inx, alpha);
+        set_color(fib, inx, beta);
         gleTube(pos, nxt, rad, gleTube2B);
     }
     dir = fib.dirEndP();
@@ -239,14 +239,14 @@ The function `set_color` is used to set the color of the segments.
 */
 void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus_cap, real rad,
                                      long inx, const long last, real abs, const real inc,
-                                     void (*set_color)(Fiber const&, long, real), real alpha) const
+                                     void (*set_color)(Fiber const&, long, real), real beta) const
 {
     // draw MINUS_END
     Vector pos = fib.posM(abs), old;
     Vector nxt = fib.posM(abs+inc);
     Vector dir = normalize(nxt-pos);
 
-    set_color(fib, inx, alpha);
+    set_color(fib, inx, beta);
     if ( minus_cap )
         drawCap(fib.prop->disp->line_caps, pos, -dir, rad);
 
@@ -262,7 +262,7 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
         pos = nxt;
         nxt = fib.posM(abs+2*inc);
         dir = normalize(nxt-old);
-        set_color(fib, inx, alpha);
+        set_color(fib, inx, beta);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         gleTube(old, pos, rad, gleLongTube2B);
         // draw a circle to obturate the tube
@@ -274,7 +274,7 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
     
     // draw last segment:
     dir = normalize(nxt-pos);
-    set_color(fib, last, alpha);
+    set_color(fib, last, beta);
     setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
     gleTube(pos, nxt, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
@@ -284,7 +284,7 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
     {
         pos = nxt;
         nxt = fib.posM(abs+inc);
-        set_color(fib, inx, alpha);
+        set_color(fib, inx, beta);
         gleTube(pos, nxt, rad, gleTube2B);
         abs += inc;
     }
@@ -322,9 +322,9 @@ void set_color_not(Fiber const&, unsigned, real)
 {
 }
 
-void set_color_tension(Fiber const& fib, unsigned seg, real alpha)
+void set_color_tension(Fiber const& fib, unsigned seg, real beta)
 {
-    real x = alpha * fib.tension(seg);
+    real x = beta * fib.tension(seg);
 #if ( 1 )
     if ( x > 0 )  // invert color for extended fibers
         fib.disp->color.inverted().load_front(x);
@@ -376,8 +376,8 @@ void Display3::drawFiberLines(Fiber const& fib) const
     else if ( disp->line_style == 2 )
     {
         disp->back_color.load_back();
-        real alpha = 1.0 / disp->tension_scale;
-        drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_tension, alpha);
+        real beta = 1.0 / disp->tension_scale;
+        drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_tension, beta);
     }
     else if ( disp->line_style == 3 )
     {
@@ -461,47 +461,18 @@ void set_color_lattice(Fiber const& fib, long ix, real scale)
 }
 
 
-void Display3::drawFiberLatticeEdges(Fiber const& fib, FiberLattice const& lat, real width) const
+void set_rainbow_lattice(Fiber const& fib, long ix, real scale)
 {
-    glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);
-    GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   blk);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   blk);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  blk);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  blk);
-    glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 32);
-
-    const real uni = lat.unit();
-    const real rad = width * sFactor;
-    
-    auto inf = lat.index_sup(fib.abscissaM());
-    auto sup = lat.index(fib.abscissaP());
-
-    real lenM = uni * inf - fib.abscissaM();
-    real lenP = fib.abscissaP() - uni * sup;
-    
-    bool capM = ( lenM > 0 );
-    bool capP = ( lenP > 0 );
-
-    if ( capM )
-    {
-        set_color_alternate(fib, inf-1, 0);
-        drawFiberSegment(fib, 1, 0, rad, 0, lenM);
-    }
-    
-    drawJoinedFiberLinesL(fib, !capM, !capP, rad, inf, sup, lenM, uni, set_color_alternate, 1.0);
-    
-    if ( capP )
-    {
-        set_color_alternate(fib, sup, 0);
-        drawFiberSegment(fib, 0, 1, rad, uni*sup-fib.abscissaM(), fib.length());
-    }
-
-    glPopAttrib();
+#if FIBER_HAS_LATTICE
+    gle_color::jet_color(scale * fib.lattice().data(ix)).load_front();
+#else
+    fib.disp->color.load_front();
+#endif
 }
 
 
-void Display3::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display3::drawFiberLattice(Fiber const& fib, FiberLattice const& lat, real width,
+                                 void (*set_color)(Fiber const&, long, real)) const
 {
     glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);
     GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -512,7 +483,6 @@ void Display3::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 32);
     
     FiberDisp const*const disp = fib.prop->disp;
-    bool rescale = ( disp->lattice_style & 4 );
 
     const real fac = 1.0 / disp->lattice_scale;
     const real uni = lat.unit();
@@ -529,26 +499,35 @@ void Display3::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real
 
     if ( capM )
     {
-        set_color_lattice(fib, inf-1, rescale ? fac*uni/lenM : fac);
+        set_color(fib, inf-1, disp->lattice_rescale ? fac*uni/lenM : fac);
         drawFiberSegment(fib, 1, 0, rad, 0, lenM);
     }
 
-    drawJoinedFiberLinesL(fib, !capM, !capP, rad, inf, sup, lenM, uni, set_color_lattice, fac);
+    drawJoinedFiberLinesL(fib, !capM, !capP, rad, inf, sup, lenM, uni, set_color, fac);
     
     if ( capP )
     {
-        set_color_lattice(fib, sup, rescale ? fac*uni/lenP : fac);
+        set_color(fib, sup, disp->lattice_rescale ? fac*uni/lenP : fac);
         drawFiberSegment(fib, 0, 1, rad, uni*sup-fib.abscissaM(), fib.length());
     }
     glPopAttrib();
 }
 
 
-void Display3::drawFiberLattice2(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display3::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real width) const
 {
-    drawFiberLatticeEdges(fib, lat, width);
+    drawFiberLattice(fib, lat, width, set_color_lattice);
 }
 
+void Display3::drawFiberLattice2(Fiber const& fib, FiberLattice const& lat, real width) const
+{
+    drawFiberLattice(fib, lat, width, set_rainbow_lattice);
+}
+
+void Display3::drawFiberLatticeEdges(Fiber const& fib, FiberLattice const& lat, real width) const
+{
+    drawFiberLattice(fib, lat, width, set_color_alternate);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark -

@@ -178,6 +178,9 @@ public:
     /// defines the range of colors when displaying the lattice (also known as `lattice[1]`)
     real         lattice_scale;
     
+    /// rescale concentration for the cells at the edge of reduced length
+    bool         lattice_rescale;
+    
     /// style of labels
     /**
      Possible `label_style`:

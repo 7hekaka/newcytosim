@@ -39,6 +39,7 @@ void FiberDisp::clear()
     
     lattice_style    = 0;
     lattice_scale    = 1;
+    lattice_rescale  = 0;
     
     label_style      = 0;
     speckle_size     = 3;
@@ -127,6 +128,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(lattice_scale,    "lattice_scale");
     glos.set(lattice_style,    "lattice");
     glos.set(lattice_scale,    "lattice", 1);
+    glos.set(lattice_rescale,  "lattice", 2);
 
     glos.set(label_style,      "labels");
     glos.set(label_style,      "label_style");
@@ -181,7 +183,7 @@ void FiberDisp::write_values(std::ostream& os) const
     write_value(os, "end_length",   end_length, 2);
     write_value(os, "end_color",    end_color, 5);
  
-    write_value(os, "lattice",      lattice_style, lattice_scale);
+    write_value(os, "lattice",      lattice_style, lattice_scale, lattice_rescale);
     write_value(os, "labels",       label_style);
     write_value(os, "speckles",     speckle_size, speckle_style, speckle_interval);
     write_value(os, "exclude",      exclude, exclude_axis);

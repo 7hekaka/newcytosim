@@ -1009,7 +1009,7 @@ void set_lattice_color(Fiber const& fib, FiberLattice const& lat, real val, real
     FiberDisp const*const disp = fib.prop->disp;
     const gle_color col = disp->color;
 
-    if ( disp->lattice_style & 4 )
+    if ( disp->lattice_rescale )
         // use this if the lattice cells hold a quantity:
         col.darken( val * len / ( lat.unit() * disp->lattice_scale )).load();
     else // use this if the lattice cells hold a concentration:
@@ -1435,11 +1435,11 @@ void Display::drawFiber(Fiber const& fib)
         {
             FiberLattice const& lat = fib.lattice();
 
-            if ( disp->lattice_style & 1 )
+            if ( disp->lattice_style == 1 )
                 drawFiberLattice1(fib, lat, disp->line_width);
-            else if ( disp->lattice_style & 2 )
+            else if ( disp->lattice_style == 2 )
                 drawFiberLattice2(fib, lat, disp->line_width);
-            if ( disp->lattice_style & 8 )
+            if ( disp->lattice_style == 3 )
                 drawFiberLatticeEdges(fib, lat, disp->line_width);
         }
         else
