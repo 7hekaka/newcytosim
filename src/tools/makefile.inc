@@ -1,7 +1,7 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-TOOLS:=frametool sieve reader report reportF analyse analyse2 analyse3
+TOOLS:=frametool sieve reader report reportF analyse
 
 .PHONY: tools
 tools: $(TOOLS)

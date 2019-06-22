@@ -84,8 +84,7 @@ void MatrixSparseSymmetric1::allocate(size_t alc)
         }
         
 #if MATRIX1_USES_COLNEXT
-        if ( col_next_ )
-            delete[] col_next_;
+        delete[] col_next_;
         col_next_ = new index_t[allocated_+1];
 #endif
     }
@@ -97,16 +96,15 @@ void MatrixSparseSymmetric1::deallocate()
     if ( column_ )
     {
         for ( size_t ii = 0; ii < allocated_; ++ii )
-        {
-            if ( column_[ii] )
-                delete[] column_[ii];
-        }
+            delete[] column_[ii];
         delete[] column_;    column_   = nullptr;
         delete[] col_size_;  col_size_ = nullptr;
         delete[] col_max_;   col_max_  = nullptr;
 #if MATRIX1_OPTIMIZED_MULTIPLY
-        if ( ija_ ) { delete[] ija_; ija_ = nullptr; }
-        if ( sa_ )  { free_real(sa_); sa_ = nullptr; }
+        delete[] ija_;
+        free_real(sa_);
+        ija_ = nullptr;
+        sa_ = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
         delete[] col_next_;  col_next_ = nullptr;
@@ -683,8 +681,8 @@ void MatrixSparseSymmetric1::prepareForMultiply(int dim)
     //allocate classical sparse matrix storage (Numerical Recipes)
     if ( nbe > nmax_ )
     {
-        if ( ija_ ) delete[] ija_;
-        if ( sa_ )  free_real(sa_);
+        delete[] ija_;
+        free_real(sa_);
 
         nmax_  = nbe + size_;
         ija_   = new index_t[nmax_];

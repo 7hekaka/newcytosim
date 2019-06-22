@@ -52,8 +52,8 @@ private:
         
     //--------------------------------------------------------------------------
     
-    /// move the reference points such as to restore a orthogonal reference
-    void             orthogonalizeRef(unsigned i);
+    /// used for projecting forces
+    real *           sRad;
 
 public:
     
@@ -61,6 +61,7 @@ public:
     SphereProp const* prop;
        
     //------------------- construction and destruction -------------------------
+    
     /// create but do not initialize
     Sphere(SphereProp const*);
 
@@ -74,64 +75,74 @@ public:
     Sphere& operator =(const Sphere&);
 
     /// destructor
-    virtual      ~Sphere();
+    virtual    ~Sphere();
     
     //-------------------------------- info ------------------------------------
     
     /// calculate mobility with piston effect
-    void         setDragCoefficientPiston();
+    void        setDragCoefficientPiston();
     
     /// calculate mobility with piston effect
-    void         setDragCoefficientStokes();
+    void        setDragCoefficientStokes();
     
     /// calculate mobility
-    void         setDragCoefficient();
+    void        setDragCoefficient();
     
     /// total drag-coefficient of object (force = drag * speed)
-    real         dragCoefficient() const { return spDrag; }
+    real        dragCoefficient() const { return spDrag; }
+
+    /// allocate memory
+    size_t      allocateMecable(size_t);
     
+    /// free allocated memory
+    void        release();
+
     /// calculate mobility and diffusion constant
-    void         prepareMecable();
+    void        prepareMecable();
 
     /// returns position of center of gravity (the center of the sphere)
-    Vector       position()        const { return posP(0); }
+    Vector      position()        const { return posP(0); }
     
     /// radius of the sphere
-    real         radius()          const { return spRadius; }
+    real        radius()          const { return spRadius; }
 
     /// change radius
-    void         resize(real);
+    void        resize(real);
     
     /// add the interactions due to confinement
-    void         setInteractions(Meca &) const;
+    void        setInteractions(Meca &) const;
     
     //------------------- technical functions and mathematics ------------------
         
     /// add contribution of Brownian forces
-    real         addBrownianForces(real const* rnd, real sc, real* rhs) const;
+    real        addBrownianForces(real const* rnd, real sc, real* rhs) const;
 
     /// bring all surface points at distance spRadius from center, by moving them radially
-    void         reshape();
+    void        reshape();
     
+    
+    /// move the reference points such as to restore a orthogonal reference
+    void        orthogonalize(unsigned i);
+
     /// set position
-    void         getPoints(real const* x) { Mecable::getPoints(x); reshape(); }
+    void        getPoints(real const* x) { Mecable::getPoints(x); reshape(); }
 
     /// normalize point and add center
-    unsigned     addSurfacePoint(Vector const&);
+    unsigned    addSurfacePoint(Vector const&);
     
     /// number of points on the surface
-    unsigned     nbSurfacePoints() const { return nPoints - nbRefPts; }
+    unsigned    nbSurfacePoints() const { return nPoints - nbRefPts; }
     
     /// initialize according to options given in Glossary
-    ObjectList   build(Glossary&, Simul&);
+    ObjectList  build(Glossary&, Simul&);
 
     //------------------- methods for the projection ---------------------------
     
     /// prepare for constrained projection
-    void         makeProjection();
+    void        makeProjection();
     
     /// calculate speed of points in Y, for the forces given in X, scaled by sc
-    void         setSpeedsFromForces(const real* X, real, real* Y) const;
+    void        setSpeedsFromForces(const real* X, real, real* Y) const;
     
     //--------------------------------------------------------------------------
     
@@ -147,19 +158,19 @@ public:
     static const ObjectTag TAG = 'o';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag    tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }
     
     /// write to file
-    void         write(Outputter&) const;
+    void        write(Outputter&) const;
     
     /// read from file
-    void         read(Inputter&, Simul&, ObjectTag);
+    void        read(Inputter&, Simul&, ObjectTag);
     
     /// Human friendly ouput
-    void         print(std::ostream&) const;
+    void        print(std::ostream&) const;
 };
 
 

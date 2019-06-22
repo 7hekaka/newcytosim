@@ -711,19 +711,23 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
 /*
  Atempts to re-establish the length of the segments, by moving points along
  the directions of the flanking segments
+ 
+ here ns = nbSegments() and tmp_size >= ns
+ `tmp` should be of size 5*tmp_size
  */
-int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real cut, real* tmp, size_t tmp_size)
+int Filament::reshape_local(const unsigned ns, const real* src, real* dst,
+                            real cut, real* tmp, size_t tmp_size)
 {
     int res;
     assert_true( ns > 1 );
-
-    real * mem = new_real(tmp_size*5);
     //auto rdtsc = __rdtsc();
+
+    real * mem = tmp + tmp_size * 3;
 
 #if ( 0 )
     
     // using old version for testing
-    Vector * dif = reinterpret_cast<Vector*>(tmp);
+    Vector * dif = new Vector[tmp_size];
 
     // calculate differences:
     for ( unsigned p = 0; p < ns; ++p )
@@ -731,7 +735,8 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real 
     dif[ns].reset();
     
     res = reshape_calculate(ns, cut*cut, dif, mem, tmp_size);
-
+    delete[] dif;
+    
 #else
 
     real * mag = tmp;
@@ -766,7 +771,6 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst, real 
     if ( res == 0 )
         reshape_apply(ns, src, dst, mem);
 
-    free_real(mem);
     return res;
 }
 
@@ -870,10 +874,21 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
  */
 void Filament::setPoints(real const* ptr)
 {
+    // use here thread-local static memory
+    thread_local static size_t alc = 0;
+    thread_local static std::unique_ptr<real> uptr(nullptr);
+    
+    if ( alc < allocated() )
+    {
+        alc = allocated();
+        free_real(uptr.release());
+        uptr.reset(new_real(alc*8));
+    }
+    
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
-    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, pVEC, allocated()) )
+    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, uptr.get(), allocated()) )
 #endif
     {
         reshape_global(nbSegments(), ptr, pPos, fnCut);

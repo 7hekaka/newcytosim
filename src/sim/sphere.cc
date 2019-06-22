@@ -24,7 +24,7 @@
  The Sphere is returned with no points
  */
 Sphere::Sphere(SphereProp const* p)
-: spRadius(0), spDrag(0), spDragRot(0), prop(p)
+: spRadius(0), spDrag(0), spDragRot(0), sRad(nullptr), prop(p)
 {
 }
 
@@ -78,6 +78,7 @@ Sphere & Sphere::operator =(const Sphere & o)
 
 Sphere::~Sphere()
 {
+    release();
     prop = nullptr;
 }
 
@@ -333,6 +334,25 @@ void Sphere::setDragCoefficient()
 
 #pragma mark -
 
+size_t Sphere::allocateMecable(size_t nbp)
+{
+    size_t ms = Mecable::allocateMecable(nbp);
+    if ( ms )
+    {
+        free_real(sRad);
+        sRad = new_real(3*ms);
+    }
+    return ms;
+}
+
+
+void Sphere::release()
+{
+    free_real(sRad);
+    sRad = nullptr;
+}
+
+
 void Sphere::prepareMecable()
 {
     //setDragCoefficient() was already called by the constructor
@@ -425,7 +445,11 @@ real Sphere::addBrownianForces(real const* rnd, real sc, real* res) const
 }
 
 
-void Sphere::orthogonalizeRef(unsigned i)
+/**
+ Here we start from the i-th Vector and make the other ones orthogonal.
+ There must be a better way to do this...
+ */
+void Sphere::orthogonalize(unsigned i)
 {
 #if ( DIM == 3 )
     const unsigned ix = 1 + i;
@@ -473,7 +497,7 @@ void Sphere::reshape()
     }
     
 #if ( DIM == 3 )
-    orthogonalizeRef(RNG.pint(3));
+    orthogonalize(RNG.pint(3));
 #endif
 }
 
@@ -501,7 +525,7 @@ void Sphere::makeProjection()
     real curv = 1.0 / spRadius;
     for ( unsigned p = nbRefPts; p < nPoints; ++p )
     {
-        real * ppp = pVEC + DIM * p;
+        real * ppp = sRad + DIM * p;
         real * pos = pPos + DIM * p;
         for ( int d = 0; d < DIM; ++d )
             ppp[d] = curv * ( pos[d] - pPos[d] );
@@ -568,7 +592,7 @@ void Sphere::setSpeedsFromForces(const real* X, const real alpha, real* Y) const
     {
         real * yyy = Y + DIM * p;
         real * pos = pPos + DIM * p;
-        real * rad = pVEC + DIM * p;
+        real * rad = sRad + DIM * p;
         real const* xxx = X + DIM * p;
 #if   ( DIM == 2 )
         real a = rad[0] * xxx[0] + rad[1] * xxx[1];

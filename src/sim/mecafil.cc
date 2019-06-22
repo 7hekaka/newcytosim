@@ -29,14 +29,11 @@ Mecafil::Mecafil()
 Mecafil::~Mecafil()
 {
     destroyProjection();
-    if ( rfDiff )
-    {
-        free_real(rfDiff);
-        rfDiff = nullptr;
-        rfLag  = nullptr;
-        rfLLG  = nullptr;
-        rfVTP  = nullptr;
-    }
+    free_real(rfDiff);
+    rfDiff = nullptr;
+    rfLag  = nullptr;
+    rfLLG  = nullptr;
+    rfVTP  = nullptr;
 }
 
 
@@ -67,8 +64,7 @@ size_t Mecafil::allocateMecable(const size_t nbp)
         allocateProjection(ms);
         
         // allocate memory:
-        if ( rfDiff )
-            free_real(rfDiff);
+        free_real(rfDiff);
         
 #if NEW_ANISOTROPIC_FIBER_DRAG
         rfDiff = new_real(ms*(4*DIM+1));
@@ -86,6 +82,12 @@ size_t Mecafil::allocateMecable(const size_t nbp)
         zero_real(ms, rfLag);
     }
     return ms;
+}
+
+void Mecafil::release()
+{
+    free_real(rfDiff);
+    rfDiff = nullptr;
 }
 
 

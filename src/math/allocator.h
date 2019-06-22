@@ -7,6 +7,7 @@
 #include "assert_macro.h"
 #include <cstdio>
 
+/** A custom of smart pointer to allocat memory for vectors */
 namespace LinearSolvers
 {
     /// allocates vectors of real
@@ -26,8 +27,8 @@ namespace LinearSolvers
     public:
         
         /// initialize
-        Allocator()  { siz_ = 0; alc_ = 16; mem_ = new_real(16); }
-        
+        Allocator() { siz_ = 0; alc_ = 0; mem_ = nullptr; }
+
         /// calls release()
         ~Allocator() { deallocate(); }
         
@@ -50,11 +51,8 @@ namespace LinearSolvers
         /// release memory
         void deallocate()
         {
-            if ( mem_ )
-            {
-                free_real(mem_);
-                //fprintf(stdout, "Allocator::releases %lu bytes\n", alc*sizeof(real));
-            }
+            free_real(mem_);
+            //fprintf(stdout, "Allocator::releases %lu bytes\n", alc*sizeof(real));
             mem_ = nullptr;
             alc_ = 0;
             siz_ = 0;
@@ -113,11 +111,8 @@ namespace LinearSolvers
         
         ~Matrix()
         {
-            if ( val_ )
-            {
-                free_real(val_);
-                val_ = nullptr;
-            }
+            free_real(val_);
+            val_ = nullptr;
         }
         
         void resize(size_t l, size_t c)
@@ -127,7 +122,7 @@ namespace LinearSolvers
             ldd_ = chunk_real(l);
             if ( alc_ < c * ldd_ )
             {
-                if ( val_ ) free_real(val_);
+                free_real(val_);
                 alc_ = c * ldd_;
                 val_ = new_real(alc_);
             }

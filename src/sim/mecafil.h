@@ -44,9 +44,6 @@ private:
     
     /// memory allocated to hold nbPoints() values (used as temporary variables)
     real   *    rfLLG, * rfVTP;
-    
-    /// allocation size for projection
-    size_t      mtJJAlloc;
 
 #if PROJECT_WITH_MATRIX
     
@@ -116,10 +113,12 @@ public:
     /// Destructor
     virtual    ~Mecafil();
     
-    ///sets the number of points in the Fiber
-    virtual size_t allocateMecable(size_t);
+    /// allocate memory
+    size_t      allocateMecable(size_t);
     
-    
+    /// free allocated memory
+    void        release();
+
     /// compute Lagrange multiplier corresponding to the longitudinal tensions in the segments
     void        computeTensions(const real* force);
     

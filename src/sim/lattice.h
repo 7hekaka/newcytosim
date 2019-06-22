@@ -93,8 +93,7 @@ private:
             }
         }
         
-        if ( laSite0 )
-            delete[] laSite0;
+        delete[] laSite0;
 
         laInf = inf;
         laSup = sup;
@@ -131,8 +130,7 @@ private:
     void deallocate()
     {
         //std::clog<<"Lattice realeased\n";
-        if ( laSite0 )
-            delete[] laSite0;
+        delete[] laSite0;
         laSite0 = nullptr;
         laSite  = nullptr;
         laInf   = 0;

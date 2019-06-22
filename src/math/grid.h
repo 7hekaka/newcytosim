@@ -144,8 +144,7 @@ public:
         if ( GRID::nCells == 0 )
             printf("nCells==0 in createCells() : call setDimensions() first\n");
         
-        if ( gCell )
-            delete[] gCell;
+        delete[] gCell;
         
         gCell = new CELL[GRID::nCells];
         GRID::gAllocated = GRID::nCells;
@@ -162,8 +161,7 @@ public:
     /// deallocate array of cells
     void deleteCells()
     {
-        if ( gCell )
-            delete[] gCell;
+        delete[] gCell;
         gCell = nullptr;
         GRID::gAllocated = 0;
     }

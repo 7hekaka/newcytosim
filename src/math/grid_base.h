@@ -852,12 +852,10 @@ public:
     /// free memory occupied by the regions
     void deleteRegions()
     {
-        if ( regions )
-            delete[] regions;
+        delete[] regions;
         regions = nullptr;
         
-        if ( regionsEdge )
-            delete[] regionsEdge;
+        delete[] regionsEdge;
         regionsEdge = nullptr;
     }
 

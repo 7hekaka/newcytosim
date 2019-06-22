@@ -72,9 +72,7 @@
 
 
 #if NUM_THREADS > 1
-/*
- Parallelization is implemented with Intel's OpenMP
- */
+// Parallelization uses Intel's OpenMP
 #include <omp.h>
 #endif
 
@@ -103,8 +101,7 @@ Meca::Meca()
 
 void allocate_vector(size_t s, real *& ptr, bool reset)
 {
-    if ( ptr )
-        free_real(ptr);
+    free_real(ptr);
     ptr = new_real(s);
     if ( reset )
         zero_real(s, ptr);
@@ -138,14 +135,14 @@ void Meca::allocate(size_t alc)
 void Meca::release()
 {
     //std::clog << "Meca::release()\n";
-    if ( vPTS ) free_real(vPTS);
-    if ( vSOL ) free_real(vSOL);
-    if ( vBAS ) free_real(vBAS);
-    if ( vRND ) free_real(vRND);
-    if ( vRHS ) free_real(vRHS);
-    if ( vFOR ) free_real(vFOR);
-    if ( vTMP ) free_real(vTMP);
-    if ( vMEM ) free_real(vMEM);
+    free_real(vPTS);
+    free_real(vSOL);
+    free_real(vBAS);
+    free_real(vRND);
+    free_real(vRHS);
+    free_real(vFOR);
+    free_real(vTMP);
+    free_real(vMEM);
     vPTS = nullptr;
     vSOL = nullptr;
     vBAS = nullptr;
@@ -1014,11 +1011,12 @@ void Meca::testBlock(const Mecable * mec, const real* blk)
 
 /**
  Arrays 'tmp' and 'wrk' should be of size (nb_points*DIM)^2 or more
- 'method' should be {1, 2 or 3}
+ 'method' in {0, 2}
  
- This is where 'advanced' methods are implemented, which may or may not perform well
+ Method 2 attempts to keep the existing block, and evaluates it fitness
+ by iterations to identify the largest eigenvalue, which may or may not perform well
  */
-void Meca::computePreconditionner(Mecable* mec, int method, real* tmp, real* wrk, size_t wrksize)
+void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
 {
     unsigned bs = DIM * mec->nbPoints();
     assert_true( bs*bs <= wrksize );
@@ -1026,7 +1024,7 @@ void Meca::computePreconditionner(Mecable* mec, int method, real* tmp, real* wrk
     bool may_keep = false;
     
     if ( mec->blockSize() == bs )
-        may_keep = ( method == 2 );
+        may_keep = true;
     else
         mec->allocateBlock();
     
@@ -1088,8 +1086,8 @@ void Meca::computePreconditionner(Mecable* mec, int method, real* tmp, real* wrk
 }
 
 
-// Compute all the blocks of the preconditionner
-void Meca::computePreconditionner(int method)
+// Compute sequentially all the blocks of the preconditionner
+void Meca::computePreconditionnerAlt()
 {
     const size_t vecsize = DIM * largestMecable();
     const size_t wrksize = vecsize * vecsize;
@@ -1098,9 +1096,8 @@ void Meca::computePreconditionner(int method)
     real * tmp = new_real(wrksize);
     real * wrk = new_real(wrksize);
     
-    // PARALLELIZABLE LOOP
     for ( Mecable * mec : objs )
-        computePreconditionner(mec, method, tmp, wrk, wrksize);
+        computePreconditionnerAlt(mec, tmp, wrk, wrksize);
     
     free_real(wrk);
     free_real(tmp);
@@ -1541,13 +1538,13 @@ void Meca::solve(SimulProp const* prop, const int precond)
 
     if ( precond == 1 )
         computePreconditionner();
-    else if ( precond )
-        computePreconditionner(precond);
+    else if ( precond == 2 )
+        computePreconditionnerAlt();
 
     //fprintf(stderr, "Solve precond %i size %6i\n", precond, dimension());
 
     // GMRES generally performs best:
-    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV);
+    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
 
     //std::clog << "Solve size " << dimension() << "  precondition " << precond << "  " << residual << "\n";
     //fprintf(stderr, "    GMRES     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
@@ -1555,7 +1552,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     // enable this to compare with another GMRES
     monitor.reset();
     zero_real(dimension(), vSOL);
-    LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV);
+    LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
     fprintf(stderr, "    GMRES-32  count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
@@ -1586,7 +1583,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
         // try with different initial seed: vRHS
         monitor.reset();
         copy_real(dimension(), vRHS, vSOL);
-        LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV);
+        LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
         Cytosim::out("     seed: count %4i residual %.2e\n", monitor.count(), monitor.residual());
         
         if ( !monitor.converged() )
@@ -1604,7 +1601,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
             {
                 // try with a preconditioner
                 computePreconditionner();
-                LinearSolvers::GMRES(*this, vRHS, vSOL, 127, monitor, allocator, mH, mV);
+                LinearSolvers::GMRES(*this, vRHS, vSOL, 127, monitor, allocator, mH, mV, temporary);
                 Cytosim::out("    GMRES: count %4i residual %.2e\n", monitor.count(), monitor.residual());
                 if ( !monitor.converged() )
                 {
@@ -1620,7 +1617,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
                 // try with different GMRES parameters:
                 monitor.reset();
                 zero_real(dimension(), vSOL);
-                LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV);
+                LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
                 Cytosim::out("    GMRES(256): count %4i residual %.2e\n", monitor.count(), monitor.residual());
                 
                 if ( !monitor.converged() )

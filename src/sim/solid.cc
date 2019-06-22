@@ -167,7 +167,7 @@ Solid & Solid::operator =(const Solid & o)
 
 Solid::~Solid()
 {
-    releaseMecable();
+    release();
     prop = nullptr;
 }
 
@@ -213,19 +213,12 @@ size_t Solid::allocateMecable(const size_t nbp)
 }
 
 
-void Solid::releaseMecable()
+void Solid::release()
 {
-    Mecable::releaseMecable();
-    if ( soRadius )
-    {
-        free_real(soRadius);
-        soRadius = nullptr;
-    }
-    if ( soShape )
-    {
-        free_real(soShape);
-        soShape = nullptr;
-    }
+    free_real(soRadius);
+    soRadius = nullptr;
+    free_real(soShape);
+    soShape = nullptr;
 }
 
 

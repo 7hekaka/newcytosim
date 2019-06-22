@@ -91,10 +91,10 @@ namespace Platonic
     
     Solid::~Solid()
     {
-        if ( corners_ )  delete[] corners_;
-        if ( vertices_ ) delete[] vertices_;
-        if ( edges_ )    delete[] edges_;
-        if ( faces_ )    delete[] faces_;
+        delete[] corners_;
+        delete[] vertices_;
+        delete[] edges_;
+        delete[] faces_;
     }
     
     
@@ -400,9 +400,7 @@ namespace Platonic
         assert_true( num_vertices_ == max_vertices_ );
         assert_true( num_faces_ == max_faces_ );
         
-        if ( coordinates_ )
-            delete[] coordinates_;
-        
+        delete[] coordinates_;
         coordinates_ = new float[3*max_vertices_];
 
         for ( unsigned n = 0; n < num_vertices_; ++n )
@@ -434,9 +432,7 @@ namespace Platonic
     
     void Solid::setEdges()
     {
-        if ( edges_ )
-            delete[] edges_;
-        
+        delete[] edges_;
         edges_ = new unsigned[2*max_edges_];
         num_edges_ = 0;
 

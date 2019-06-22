@@ -41,38 +41,27 @@ should be defined as ZERO
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    mtJJAlloc    = 0;
     mtJJt        = nullptr;
     mtJJtiJforce = nullptr;
 }
 
 
-void Mecafil::allocateProjection(const size_t nbp)
+void Mecafil::allocateProjection(const size_t ms)
 {
-    if ( mtJJAlloc < nbp )
-    {
-        //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
-        if ( mtJJt )
-            free_real(mtJJt);
-        
-        // make a multiple of chunk to align memory:
-        mtJJAlloc = chunk_real(nbp);
-        assert_true(mtJJAlloc > 0);
-        
-        real * mem = new_real(4*mtJJAlloc);
-        //zero_real(4*mtJJAlloc, mem);
-        
-        mtJJt        = mem;
-        mtJJtU       = mem + mtJJAlloc * 2;
-        mtJJtiJforce = mem + mtJJAlloc * 3;
-    }
+    //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
+    free_real(mtJJt);
+    real * mem = new_real(4*ms);
+    //zero_real(4*ms, mem);
+    mtJJt        = mem;
+    mtJJtU       = mem + ms * 2;
+    mtJJtiJforce = mem + ms * 3;
 }
 
 
 void Mecafil::destroyProjection()
 {
     //std::clog << reference() << "destroyProjection\n";
-    if ( mtJJt ) free_real(mtJJt);
+    free_real(mtJJt);
     mtJJt        = nullptr;
     mtJJtU       = nullptr;
     mtJJtiJforce = nullptr;
@@ -85,7 +74,6 @@ void Mecafil::destroyProjection()
 void Mecafil::makeProjection()
 {
     assert_true( nbPoints() >= 2 );
-    assert_true( mtJJAlloc >= nbPoints() );
 
     //set the diagonal and off-diagonal of J*J'
     const unsigned nbu = nbPoints() - 2;
@@ -131,7 +119,6 @@ void Mecafil::makeProjection()
 void Mecafil::makeProjection()
 {
     assert_true( nbPoints() >= 2 );
-    assert_true( mtJJAlloc >= nbPoints() );
 
     //set the diagonal and off-diagonal of J*J'
     const unsigned nbu = nbPoints() - 2;
@@ -653,7 +640,7 @@ void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) cons
     const unsigned nbs = nbSegments();
     //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
 
-    // calculate `lag` without modifying `X`
+    // calculate `rfLLG` without modifying `X`
 #if NEW_ANISOTROPIC_FIBER_DRAG
     scaleTangentially(nPoints, X, rfDir, rfVTP);
     projectForcesU(nbs, rfDiff, rfVTP, rfLLG);
@@ -661,10 +648,10 @@ void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) cons
     projectForcesU(nbs, rfDiff, X, rfLLG);
 #endif
 
-    // lag <- inv( J * Jt ) * lag to find the Lagrange multipliers
+    // rfLLG <- inv( J * Jt ) * rfLLG to find the Lagrange multipliers
     DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
     
-    // set Y, using values in X and lag
+    // set Y, using values in X and rfLLG
     projectForcesD(nbs, rfDiff, alpha/rfDragPoint, X, rfLLG, Y);
 
 #if NEW_ANISOTROPIC_FIBER_DRAG

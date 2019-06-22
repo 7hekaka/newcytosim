@@ -61,13 +61,13 @@ inline void check_alignment(void * ptr)
 
 
 /// allocate a new array to hold `size` real scalars
-/** The pointer is aligned to a 32 byte boundary */
+/** The returned pointer is aligned to a 32 byte boundary */
 inline real* new_real(size_t size)
 {
     void* ptr = nullptr;
     // we align to 4 doubles (of size 8 bytes), hence 32 bytes
     posix_memalign(&ptr, 32, size*sizeof(real));
-    //printf("new_real(%lu)\n", size);
+    printf("new_real(%lu)\n", size);
     //std::clog << "memory alignment " << ((uintptr_t)ptr & 63) << "\n";
     return (real*)ptr;
 }

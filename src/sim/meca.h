@@ -153,6 +153,9 @@ private:
     /// working memory allocator for BCGS and GMRES used in solve()
     LinearSolvers::Allocator allocator;
     
+    /// secondary memory allocator for GMRES
+    LinearSolvers::Allocator temporary;
+    
     /// Matrices used for GMRES
     LinearSolvers::Matrix mH, mV;
 
@@ -275,10 +278,10 @@ private:
     void testBlock(const Mecable*, const real*);
     
     /// compute the preconditionner block corresponding to given Mecable
-    void computePreconditionner(Mecable*, int method, real*, real*, size_t);
+    void computePreconditionnerAlt(Mecable*, real*, real*, size_t);
 
     /// compute all blocks of the preconditionner
-    void computePreconditionner(int method);
+    void computePreconditionnerAlt();
     
     /// compute the preconditionner block corresponding to given Mecable
     void computePreconditionner(Mecable*);

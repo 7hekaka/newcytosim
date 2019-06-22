@@ -22,10 +22,7 @@ void MatrixOfBlocks::deallocate()
     if ( block_ == nullptr ) return;
     
     for ( unsigned int ii=0; ii < block_cnt; ++ii )
-    {
-        if ( block_[ii] )
-            delete[] block_[ii];
-    }
+        delete[] block_[ii];
     
     delete[] block_;
     delete[] block_size;
@@ -93,8 +90,7 @@ void MatrixOfBlocks::setBlockSize( const unsigned int bb, unsigned int sz )
 
         //printf("MatrixOfBlocks::new block %i size %i\n", bb, sz );
         block_alc[bb] = sz;
-        if ( block_[bb] )
-            free_real(block_[bb]);
+        free_real(block_[bb]);
         block_[bb] = new_real(sz*sz);
     }
 }

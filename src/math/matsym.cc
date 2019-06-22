@@ -19,8 +19,7 @@ void MatrixSymmetric::allocate(size_t alc)
     if ( alc > allocated_ )
     {
         allocated_ = alc;
-        if ( val )
-            free_real(val);
+        free_real(val);
         val = new_real(alc*alc);
     }
 }
@@ -29,10 +28,7 @@ void MatrixSymmetric::allocate(size_t alc)
 void MatrixSymmetric::deallocate()
 {
     if ( in_charge )
-    {
-        if ( val )
-            free_real(val);
-    }
+        free_real(val);
     allocated_ = 0;
     val = nullptr;
 }

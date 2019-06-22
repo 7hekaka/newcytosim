@@ -447,8 +447,7 @@ int SaveImage::readPNG(FILE* fp, png_bytep *& row_pointers, int& bit_depth, int&
     if (setjmp(png_jmpbuf(png_ptr)))
         return 4;
     
-    if ( row_pointers )
-        free(row_pointers);
+    free(row_pointers);
     
     row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
     

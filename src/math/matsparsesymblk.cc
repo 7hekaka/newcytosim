@@ -56,13 +56,10 @@ void MatrixSparseSymmetricBlock::allocate(size_t alc)
 
 void MatrixSparseSymmetricBlock::deallocate()
 {
-    if ( column_ )
-    {
-        delete[] column_;
-        delete[] col_next_;
-        column_   = nullptr;
-        col_next_ = nullptr;
-    }
+    delete[] column_;
+    delete[] col_next_;
+    column_   = nullptr;
+    col_next_ = nullptr;
     allocated_ = 0;
 }
 
@@ -113,8 +110,8 @@ void MatrixSparseSymmetricBlock::Column::allocate(size_t alc)
 void MatrixSparseSymmetricBlock::Column::deallocate()
 {
     //if ( inx_ ) fprintf(stderr, "MSSB deallocates column %i\n", inx_[0]);
-    if ( inx_ ) free(inx_);
-    if ( blk_ ) free_real(blk_);
+    free(inx_);
+    free_real(blk_);
     inx_ = nullptr;
     blk_ = nullptr;
 }
@@ -123,8 +120,8 @@ void MatrixSparseSymmetricBlock::Column::deallocate()
 void MatrixSparseSymmetricBlock::Column::operator =(MatrixSparseSymmetricBlock::Column & col)
 {
     //if ( inx_ ) fprintf(stderr, "MSSB transfers column %u\n", inx_[0]);
-    if ( inx_ ) free(inx_);
-    if ( blk_ ) free_real(blk_);
+    free(inx_);
+    free_real(blk_);
 
     size_ = col.size_;
     allo_ = col.allo_;
@@ -509,9 +506,8 @@ size_t newElements(Element*& ptr, size_t size)
 {
     constexpr size_t chunk = 16;
     size_t all = ( size + chunk - 1 ) & ~( chunk - 1 );
-    void* tmp = ptr;
-    if ( tmp )
-        free(tmp);  // there is no destructor with Element
+    free(ptr);  // there is no destructor with Element
+    void* tmp = nullptr;
     if ( size > 0 )
     {
         posix_memalign(&tmp, 32, all * sizeof(Element));

@@ -270,12 +270,9 @@ public:
     /// Release occupied memory
     void deallocate()
     {
-        if ( val_ )
-        {
-            //printf("Array %p deallocate %i\n", this, allocated);
-            delete[] val_;
-            val_ = nullptr;
-        }
+        //printf("Array %p deallocate %i\n", this, allocated);
+        delete[] val_;
+        val_ = nullptr;
         alc_ = 0;
         nbo_ = 0;
     }
@@ -292,12 +289,9 @@ public:
         assert_true( val_ || nbo_==0 );
         for ( size_t ii=0; ii < nbo_; ++ii )
         {
-            if ( val_[ii] )
-            {
-                //std::clog << " delete " << val_[ii] << std::endl;
-                delete(val_[ii]);
-                val_[ii] = nullptr;
-            }
+            //std::clog << " delete " << val_[ii] << std::endl;
+            delete(val_[ii]);
+            val_[ii] = nullptr;
         }
         nbo_ = 0;
     }

@@ -9,7 +9,6 @@
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    mtJJAlloc    = 0;
     mtP          = 0;
     mtDiffP      = 0;
     mtJJtiJ      = 0;
@@ -17,30 +16,26 @@ void Mecafil::buildProjection()
 }
 
 
-void Mecafil::allocateProjection(const size_t nbp)
+void Mecafil::allocateProjection(const size_t ms)
 {
-    if ( mtJJAlloc < nbp )
-    {
-        //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
-        if ( mtP )     free_real(mtP);
-        if ( mtDiffP ) free_real(mtDiffP);
-        if ( mtJJtiJ ) free_real(mtJJtiJ);
-        mtJJAlloc = nbp;
-        mtP          = new_real(DIM*nbp*DIM*nbp);
-        mtDiffP      = new_real(DIM*nbp*DIM*nbp);
-        mtJJtiJforce = new_real(nbp);
-        mtJJtiJ      = new_real(DIM*nbp*nbp);
-    }
+    //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
+    free_real(mtP);
+    free_real(mtDiffP);
+    free_real(mtJJtiJ);
+    mtP          = new_real(DIM*nbp*DIM*nbp);
+    mtDiffP      = new_real(DIM*nbp*DIM*nbp);
+    mtJJtiJforce = new_real(nbp);
+    mtJJtiJ      = new_real(DIM*nbp*nbp);
 }
 
 
 void Mecafil::destroyProjection()
 {
     //std::clog << reference() << "destroyProjection\n";
-    if ( mtP )          free_real(mtP);
-    if ( mtDiffP )      free_real(mtDiffP);
-    if ( mtJJtiJforce ) free_real(mtJJtiJforce);
-    if ( mtJJtiJ )      free_real(mtJJtiJ);
+    free_real(mtP);
+    free_real(mtDiffP);
+    free_real(mtJJtiJforce);
+    free_real(mtJJtiJ);
     mtP          = 0;
     mtDiffP      = 0;
     mtJJtiJforce = 0;
@@ -63,8 +58,6 @@ void Mecafil::makeProjection()
     const unsigned int nbc = nbSegments();             //number of constraints
     const unsigned int nbv = DIM * nbPoints();         //number of variables
     assert_true( nbc > 0 );
-    
-    assert_true( mtJJAlloc >= nbPoints() );
     
     //----- we allocate the arrays needed:
     real* J   = new_real(nbv*nbc);

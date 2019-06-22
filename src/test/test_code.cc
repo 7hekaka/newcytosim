@@ -97,9 +97,9 @@ void new_real(real*& x, real*& y, real*& z, real mag)
 
 void free_real(real* x, real* y, real* z)
 {
-    if ( x ) free_real(x);
-    if ( y ) free_real(y);
-    if ( z ) free_real(z);
+    free_real(x);
+    free_real(y);
+    free_real(z);
 }
 
 

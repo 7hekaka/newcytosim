@@ -63,10 +63,7 @@ void MatrixSparseSymmetric::deallocate()
     if ( col_ )
     {
         for ( size_t  ii = 0; ii < allocated_; ++ii )
-        {
-            if ( col_[ii] )
-                delete[] col_[ii];
-        }
+            delete[] col_[ii];
         delete[] col_;       col_      = nullptr;
         delete[] col_size_;  col_size_ = nullptr;
         delete[] col_max_;   col_max_  = nullptr;

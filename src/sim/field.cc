@@ -95,8 +95,7 @@ void Field::prepare()
     const FieldGrid::index_t nbc = mGrid.nbCells();
     assert_true( nbc > 0 );
     
-    if ( fiTMP )
-        free_real(fiTMP);
+    free_real(fiTMP);
     fiTMP = new_real(nbc);
     fiTMPSize = nbc;
 

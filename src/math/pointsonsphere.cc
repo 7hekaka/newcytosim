@@ -260,8 +260,7 @@ unsigned PointsOnSphere::distributePoints(unsigned nbp, real precision, unsigned
     //reallocate the array if needed:
     if ( num_points_ != nbp || ! coord_ )
     {
-        if ( coord_ )
-            free_real(coord_);
+        free_real(coord_);
         coord_ = new_real(3*nbp);
         num_points_ = nbp;
     }

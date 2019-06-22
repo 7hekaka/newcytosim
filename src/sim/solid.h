@@ -86,12 +86,12 @@ public:
     /// Property
     SolidProp const* prop;
     
-    /// allocate memory to hold 'size' points
-    virtual size_t allocateMecable(size_t);
+    /// allocate memory
+    size_t      allocateMecable(size_t);
     
-    /// free all memory allocated by allocateMecable()
-    void        releaseMecable();
-    
+    /// free allocated memory
+    void        release();
+
     /// initialize according to options given in Glossary
     ObjectList  build(Glossary&, Simul&);
     

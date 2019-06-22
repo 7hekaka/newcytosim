@@ -17,15 +17,13 @@ Polygon::Polygon()
 
 Polygon::~Polygon()
 {
-    if ( pts_ )
-        delete[] pts_;
+    delete[] pts_;
 }
 
 
 void Polygon::allocate(unsigned s)
 {
-    if ( pts_ )
-        delete[] pts_;
+    delete[] pts_;
     pts_  = new Point2D[s+1];
     npts_ = s;
 }

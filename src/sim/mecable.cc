@@ -18,12 +18,10 @@ void Mecable::clearMecable()
     nPoints    = 0;
     pBlock     = nullptr;
     pPivot     = nullptr;
-    pBlockAllo = 0;
+    pBlockAlc  = 0;
     pBlockUse  = false;
     pBlockSize = 0;
     pPos       = nullptr;
-    pVEC       = nullptr;
-    pMEM       = nullptr;
     pForce     = nullptr;
     pIndex     = -1;  // that is an invalid value
 }
@@ -58,19 +56,16 @@ void Mecable::allocateBlock()
 {
     pBlockSize = DIM * nPoints;
     
-    if ( pBlockSize > pBlockAllo )
+    if ( pBlockSize > pBlockAlc )
     {
-        if ( pBlock )
-        {
-            free_real(pBlock);
-            delete[] pPivot;
-        }
+        free_real(pBlock);
+        delete[] pPivot;
         size_t bum = chunk_real(pBlockSize);
         //std::clog << "Mecable("<<reference()<<")::allocateBlock " << bum << "\n";
    
         pBlock = new_real(bum*bum);
         pPivot = new int[bum];
-        pBlockAllo = bum;
+        pBlockAlc = bum;
         
         //zero_real(bum*bum, pBlock);
     }
@@ -89,18 +84,16 @@ size_t Mecable::allocateMecable(const size_t nbp)
         size_t all = chunk_real(nbp);
         // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
-        // retain existing data:
+        // allocate memory:
         real * mem = new_real(all*DIM);
-        real * vec = new_real(all*sizeof(Vector));
+
+        // retain existing data:
         if ( pPos )
         {
             copy_real(nPoints*DIM, pPos, mem);
-            copy_real(nPoints*DIM, pVEC, vec);
             free_real(pPos);
-            free_real(pVEC);
         }
         pPos = mem;
-        pVEC = vec;
         pAllocated = all;
         return all;
     }
@@ -109,26 +102,18 @@ size_t Mecable::allocateMecable(const size_t nbp)
 }
 
 
-void Mecable::releaseMecable()
+void Mecable::release()
 {
-    if ( pBlock )
-    {
-        free_real(pBlock);
-        pBlock = nullptr;
-        delete[] pPivot;
-        pPivot = nullptr;
-    }
+    free_real(pBlock);
+    pBlock = nullptr;
+    delete[] pPivot;
+    pPivot = nullptr;
     
-    pBlockAllo = 0;
+    pBlockAlc  = 0;
     pBlockSize = 0;
     
-    if ( pPos )
-    {
-        free_real(pPos);
-        free_real(pVEC);
-        pPos = nullptr;
-        pVEC = nullptr;
-    }
+    free_real(pPos);
+    pPos = nullptr;
     
     pForce = nullptr;
     pAllocated = 0;

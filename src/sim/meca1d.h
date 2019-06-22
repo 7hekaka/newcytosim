@@ -58,10 +58,10 @@ public:
 
     void deallocate()
     {
-        if ( vBAS ) free_real(vBAS);
-        if ( vSOL ) free_real(vSOL);
-        if ( vMOB ) free_real(vMOB);
-        if ( vRHS ) free_real(vRHS);
+        free_real(vBAS);
+        free_real(vSOL);
+        free_real(vMOB);
+        free_real(vRHS);
         allocated_ = 0;
         vBAS = nullptr;
         vSOL = nullptr;
@@ -88,10 +88,10 @@ public:
             // make a multiple of chunk to align memory:
             allocated_ = chunk_real(dim);
             
-            if ( vBAS ) free_real(vBAS);
-            if ( vSOL ) free_real(vSOL);
-            if ( vMOB ) free_real(vMOB);
-            if ( vRHS ) free_real(vRHS);
+            free_real(vBAS);
+            free_real(vSOL);
+            free_real(vMOB);
+            free_real(vRHS);
             
             vBAS = new_real(allocated_);
             vSOL = new_real(allocated_);

@@ -47,8 +47,8 @@ bool equal(int size, real const* a, real const* b)
 // fill lower triangle of matrix
 void setIndices(int fill, int*& ii, int*& jj, int mx, int bs)
 {
-    if ( ii ) delete[] ii;
-    if ( jj ) delete[] jj;
+    delete[] ii;
+    delete[] jj;
     
     ii = new int[fill];
     jj = new int[fill];
@@ -64,9 +64,9 @@ void setIndices(int fill, int*& ii, int*& jj, int mx, int bs)
 
 void setVectors(size_t size, real*& x, real*& y, real*& z)
 {
-    if ( x ) free_real(x);
-    if ( y ) free_real(y);
-    if ( z ) free_real(z);
+    free_real(x);
+    free_real(y);
+    free_real(z);
 
     x = new_real(size+PAD);
     y = new_real(size+PAD);

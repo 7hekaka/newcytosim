@@ -26,8 +26,7 @@ void SolverC::allocate(int dim,
     {
         if ( vec[ii] )
         {
-            if ( *vec[ii] )
-                free_real(*vec[ii]);
+            free_real(*vec[ii]);
             *vec[ii] = new_real(dim);
             //zero_real(dim, *vec[ii]);
         }
@@ -41,7 +40,7 @@ void SolverC::release(real** vec1, real** vec2, real** vec3, real** vec4,
     
     for ( int ii = 0; ii < 8; ++ii )
     {
-        if ( vec[ii] && *vec[ii] )
+        if ( vec[ii] )
             free_real(*vec[ii]);
     }
 }

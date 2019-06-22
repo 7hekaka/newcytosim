@@ -35,12 +35,6 @@ protected:
      X1 Y1 Z1, X2 Y2 Z2, etc. for DIM==3
      */
     real *      pPos;
-    
-    /// another array of size DIM*pAllocated
-    real *      pVEC;
-    
-    /// an array of size 5*pAllocated
-    real *      pMEM;
 
     /// Array containing force-coordinates which is allocated in Meca
     real const* pForce;
@@ -63,7 +57,7 @@ private:
     int *       pPivot;
     
     /// Allocated size of pBlock[]
-    size_t      pBlockAllo;
+    size_t      pBlockAlc;
     
     /// Current size of pBlock[]
     unsigned    pBlockSize;
@@ -82,8 +76,8 @@ public:
     /// The constructor resets the pointers to memory
     Mecable()            { clearMecable(); }
     
-    /// Destructor de-allocates memory
-    virtual ~Mecable()   { releaseMecable(); }
+    /// Destructor should release memory
+    virtual ~Mecable()   { release(); }
 
     /// Copy constructor
     Mecable(Mecable const&);
@@ -240,11 +234,11 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// Allocate memory to store 'nbp' points
-    virtual size_t   allocateMecable(size_t nbp);
+    /// Allocate memory to store given number of vertices
+    virtual size_t   allocateMecable(size_t);
     
-    /// Free memory allocated by allocateMecable()
-    virtual void     releaseMecable();
+    /// free allocated memory
+    void             release();
     
     /// prepare the Mecable to solve the mechanics in Meca::solve()
     /**

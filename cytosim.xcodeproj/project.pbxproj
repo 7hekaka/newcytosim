@@ -573,7 +573,6 @@
 		BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF9AA3228BFBD3005018BD /* dpttrf.h */; };
 		BBDFE3BF0C6A37FF00CD333A /* hand_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */; };
 		BBDFE3C00C6A37FF00CD333A /* hand_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */; };
-		BBE15DA212CDF8DB007C3D44 /* allot.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE15DA112CDF8DB007C3D44 /* allot.h */; };
 		BBE4269A14437BA4003795C4 /* treadmilling_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4269614437BA4003795C4 /* treadmilling_fiber_prop.cc */; };
 		BBE4269B14437BA4003795C4 /* treadmilling_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4269714437BA4003795C4 /* treadmilling_fiber_prop.h */; };
 		BBE4269C14437BA4003795C4 /* treadmilling_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4269814437BA4003795C4 /* treadmilling_fiber.cc */; };
@@ -1472,7 +1471,6 @@
 		BBE0993E0869D87F005FF210 /* libcytospace.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospace.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE13B800CD535DE008C212D /* test_thread.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_thread.cc; path = src/test/test_thread.cc; sourceTree = SOURCE_ROOT; };
 		BBE151DF05E574F300F782A8 /* test_space.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_space.cc; path = src/test/test_space.cc; sourceTree = SOURCE_ROOT; };
-		BBE15DA112CDF8DB007C3D44 /* allot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allot.h; sourceTree = "<group>"; };
 		BBE4269614437BA4003795C4 /* treadmilling_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = treadmilling_fiber_prop.cc; path = fibers/treadmilling_fiber_prop.cc; sourceTree = "<group>"; };
 		BBE4269714437BA4003795C4 /* treadmilling_fiber_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treadmilling_fiber_prop.h; path = fibers/treadmilling_fiber_prop.h; sourceTree = "<group>"; };
 		BBE4269814437BA4003795C4 /* treadmilling_fiber.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = treadmilling_fiber.cc; path = fibers/treadmilling_fiber.cc; sourceTree = "<group>"; };
@@ -1998,7 +1996,6 @@
 			isa = PBXGroup;
 			children = (
 				BB6E52CE15D206DF00946BFF /* buddy.h */,
-				BBE15DA112CDF8DB007C3D44 /* allot.h */,
 				BB73586D05B98DA3006956D5 /* array.h */,
 				BB73589505B98DA3006956D5 /* node.h */,
 				BB73589405B98DA3006956D5 /* node.cc */,
@@ -2902,7 +2899,6 @@
 				BB65DBEC11AD53AC005DD116 /* filepath.h in Headers */,
 				BB7085EA1285A2CA00D8D79A /* stream_func.h in Headers */,
 				BB61B7F019B7622800B1F4F6 /* ansi_colors.h in Headers */,
-				BBE15DA212CDF8DB007C3D44 /* allot.h in Headers */,
 				BB19FEF712F352A400ACEA12 /* inventoried.h in Headers */,
 				BB19FEF912F352A400ACEA12 /* inventory.h in Headers */,
 				BB6E52CF15D206DF00946BFF /* buddy.h in Headers */,

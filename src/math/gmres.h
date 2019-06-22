@@ -68,7 +68,8 @@ namespace LinearSolvers
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
     void GMRES(const LinearOperator& mat, const real* rhs, real* sol, int restart,
-               Monitor& monitor, Allocator& allocator, Matrix& H, Matrix& V)
+               Monitor& monitor, Allocator& allocator, Matrix& H, Matrix& V,
+               Allocator& temporary)
     {
         const int dim = mat.dimension();
         real beta, resid, ratio = 1.0;
@@ -81,9 +82,7 @@ namespace LinearSolvers
         // Arnoldi matrix
         V.resize(dim, restart+1);
         
-        Allocator temporary;
         temporary.allocate(restart+1, 3);
-        
         real * sn = temporary.bind(0);
         real * cs = temporary.bind(1);
         real * ss = temporary.bind(2);  // vector of dim 'restart+1'

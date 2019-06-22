@@ -129,8 +129,7 @@ public:
     /// destructor
     ~Field()
     {
-        if ( fiTMP )
-            free_real(fiTMP);
+        free_real(fiTMP);
     }
     
     /// initialize with squares of size 'step'
