@@ -186,7 +186,6 @@ def get_intersections(filename):
     return tim, res
 
 
-
 def parse(dirpath):
     """
     Work in current directory

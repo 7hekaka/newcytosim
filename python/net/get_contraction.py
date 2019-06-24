@@ -78,7 +78,6 @@ def process(path):
     return res
 
 
-
 def main(args):
     paths = []
     

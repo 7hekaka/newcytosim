@@ -37,7 +37,6 @@ def sqr(x):
     return x * x;
 
 
-
 def process(filename):
     """ 
         This extracts parameters from the config file,

@@ -98,7 +98,6 @@ def get_meshsize(filename):
     return mesh_size
 
 
-
 def plot_scatter(size, cord):
     """
         Make a scatter-plot with data provided as arguments
@@ -161,7 +160,6 @@ def get_intersections(filename):
                     else:
                         res[k] = [a]
     return tim, res
-
 
 
 def plot_bridge_count(tim, data):
@@ -440,7 +438,6 @@ def get_size(file):
     tim, mom = get_moment(file)
     siz = [ math.sqrt(2*m) for m in mom ]
     return tim, siz
-
 
 
 def parse(dirpath):

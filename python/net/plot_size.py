@@ -178,7 +178,6 @@ def main(args):
             process(p)
 
 
-
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].endswith("help"):
         print(__doc__)

@@ -79,7 +79,6 @@ def executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
 
-
 def run(conf, name):
     """
         run executable 'exe' with config 'conf' in a directory of name 'name'
@@ -101,7 +100,6 @@ def run(conf, name):
             out.write("            ---> parked in %s\n" % res)
         except Exception as e:
             err.write("go_sim.py cannot move directory: %s\n" % repr(e))
-
 
 
 def run_queue(queue):

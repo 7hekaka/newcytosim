@@ -47,7 +47,6 @@ def uncode(arg):
     return arg
 
 
-
 def plot_force(scale, data):
     #fig = plt.figure(figsize=(1, 1))
     #ax = fig.add_axes([0, 0, 1, 1])
@@ -113,7 +112,6 @@ def parse(dirpath):
     plt.close()
 
 
-
 #------------------------------------------------------------------------
 
 def main(args):
@@ -138,8 +136,6 @@ def main(args):
             except Exception as e:
                 out.write("Error: %s\n" % repr(e));
             os.chdir(cdir)
-
-
 
 
 if __name__ == "__main__":

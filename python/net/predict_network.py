@@ -83,7 +83,6 @@ nb_motor     = 0
 nb_crosslink = 0
 
 
-
 def predict_single(binding_rate, binding_range, unbinding_rate):
     ratio_fibs = nb_fiber * fiber_length * 2 * binding_range / space_volume
     AsF = ratio_fibs * binding_rate / unbinding_rate
@@ -277,7 +276,6 @@ def main(args):
 
     for f in files:
         process(f)
-
 
 
 if __name__ == "__main__":

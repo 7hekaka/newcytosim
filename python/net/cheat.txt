@@ -97,4 +97,3 @@ scan.py 'grep  "^new [0-9]* couple crosslinker" config.cym | cut -f 2 -d " " > m
 scan.py 'cut -c 43- mom.txt | tr "\n" " " > m; grep  "^new [0-9]* couple crosslinker" config.cym | cut -f 2 -d " " >> m' run*
 
 
-

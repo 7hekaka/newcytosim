@@ -45,7 +45,6 @@ def kizduzs(z):
         return ( b, a - b )
 
 
-
 def format_line(data):
     """
         Convert line of data to column-aligned string
@@ -120,7 +119,6 @@ def get_column(file, jj):
 def frange(s, e, n):
     i = ( e - s ) / n
     return [ s+i*x for x in range(n) ]
-
 
 
 def simple_linear_fit(arg):

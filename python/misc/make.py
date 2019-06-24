@@ -28,7 +28,6 @@ except ImportError:
     sys.exit()
 
 
-
 #------------------------------------------------------------------------
 
 action='none'
@@ -52,7 +51,6 @@ def process_dir(dirpath, directories, filenames):
     os.chdir(cdir)
 
 
-
 def process(dirpath):
     """make something in directory dirpath"""
     global action, dictionnary
@@ -69,7 +67,6 @@ def process(dirpath):
         else:
             res = eval(action, globals(), dictionnary)
             print res
-
 
 
 #------------------------------------------------------------------------

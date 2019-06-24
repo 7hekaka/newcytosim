@@ -102,7 +102,6 @@ def move_directory(path, park, name):
     return dst
 
 
-
 def copy_config(conf, repeat):
     """
         make 'repeat' copies of the config files.
