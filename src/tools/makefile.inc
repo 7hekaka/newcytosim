@@ -67,20 +67,11 @@ reportF: reportF.cc frame_reader.o $(TOOL_OBJ)
 	$(DONE)
 vpath reportF bin
 
+
 analyse: analyse.cc frame_reader.o $(TOOL_OBJ)
 	$(TOOL_MAKE)
 	$(DONE)
 vpath analyse bin
-
-analyse2: analyse2.cc frame_reader.o $(TOOL_OBJ)
-	$(TOOL_MAKE)
-	$(DONE)
-vpath analyse2 bin
-
-analyse3: analyse3.cc frame_reader.o $(TOOL_OBJ)
-	$(TOOL_MAKE)
-	$(DONE)
-vpath analyse3 bin
 
 
 cymart: cymart.cc frame_reader.o $(TOOL_OBJ)

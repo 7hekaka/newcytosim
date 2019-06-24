@@ -9,6 +9,7 @@
 #include "random.h"
 #include "vecprint.h"
 #include "cblas.h"
+#include "iacaMarks.h"
 
 #include "simd.h"
 //#include "iacaMarks.h"
@@ -39,15 +40,15 @@ inline void print_alignment(real const* ptr, const char msg[])
 
 //------------------------------------------------------------------------------
 
-/// number of segments:
-const size_t NBS = 31;
+const real scalar = 2.0;
 
+/// number of segments:
+const size_t NBS = 231;
 const size_t NBR = DIM * ( NBS + 1 );
 const size_t ALOC = NBR + 8;
 
-real *diff = nullptr, *pos = nullptr, *lag = nullptr, *force = nullptr;
 
-const real scalar = 2.0;
+real *diff = nullptr, *pos = nullptr, *lagmul = nullptr, *force = nullptr;
 
 
 void setFilament(int np, real * vec, real seg, real persistence_length)
@@ -301,6 +302,7 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
     vec4 xxx = load4(X);
     vec4 eee = setzero4();
 #if 1
+    // unrolled 2x2
     while ( Y < end )
     {
         vec4 nnn = load4(X+4);
@@ -322,7 +324,7 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
     {
         vec4 nnn = load4(X+4);
         X += 4;
-        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 iii = loadu4(X-2);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
         vec4 ppp = permute2f128(eee, ddd, 0x21);
@@ -356,29 +358,35 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
 
 void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
 {
-    real const* E = X + nbt + DIM;
+    real const* E = X + nbt + DIM;  //index to last point
     
-    for ( int d = 0; d < DIM; ++d )
-    {
-        Y[        d] += rigid * ( X[d+DIM] + X[d+DIM] - X[d] - X[d+2*DIM] );
-        Y[nbt+DIM+d] += rigid * ( E[d-DIM] + E[d-DIM] - E[d] - E[d-2*DIM] );
-    }
+    const real R1 = rigid;
+    const real R2 = rigid * 2;
+    const real R4 = rigid * 4;
+    const real R6 = rigid * 6;
     
     if ( nbt == DIM )
     {
         for ( int d = 0; d < DIM; ++d )
-            Y[d+DIM] += 2 * rigid * ( X[d] - X[d+DIM] - X[d+DIM] + X[d+DIM*2] );
+        {
+            Y[    d+DIM] -= R2 * (X[d+DIM*2]+X[d]) - R4 * X[d+DIM];
+            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+        }
     }
     else
     {
-        for ( unsigned ii = DIM*2; ii < nbt; ++ii )
-            Y[ii] += rigid * ( - X[ii-DIM*2] - 6*X[ii] + 4*( X[ii-DIM] + X[ii+DIM] ) - X[ii+DIM*2] );
-        //Y[ii] += rigid * ( (4*( X[ii-DIM] + X[ii+DIM] ) - X[ii+DIM*2]) - (6*X[ii] + X[ii-DIM*2]) );
-
+        // this is where the bulk of the calculation takes place:
+        const int end = nbt;
+        for ( int i = DIM*2; i < end; ++i )
+            Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
+        
         for ( int d = 0; d < DIM; ++d )
         {
-            Y[DIM +d] += rigid * ( X[d] + X[d] - 5*X[d+DIM] + 4*X[d+DIM*2] - X[d+DIM*3] );
-            Y[nbt+d] += rigid * ( E[d] + E[d] - 5*E[d-DIM] + 4*E[d-DIM*2] - E[d-DIM*3] );
+            Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R2 * X[d] - R4 * (X[d+DIM*2]-X[d+DIM]);
+            Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R2 * E[d] - R4 * (E[d-DIM*2]-E[d-DIM]);
+            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
         }
     }
 }
@@ -400,7 +408,7 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
     TicToc::toc(str, nullptr);
     zero_real(ALOC, x);
     func(nbt, pos, scalar, x);
-    VecPrint::print(std::cout, std::min(20ul,2+NBR), x);
+    VecPrint::print(std::cout, std::min(16ul,2+NBR), x);
     
     zero_real(ALOC, y);
     add_rigidity0(nbt, pos, scalar, y);
@@ -413,7 +421,7 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
 
 void testRigidity(unsigned cnt)
 {
-    std::cout << "addRigidity\n";
+    std::cout << "addRigidity " << NBS << "\n";
     testRigidity(cnt, add_rigidity0,    "0  ");
 #if ( DIM == 2 )
     testRigidity(cnt, add_rigidity2,    "2  ");
@@ -854,9 +862,9 @@ inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*,
     }
     TicToc::toc(str, nullptr);
     
-    zero_real(ALOC, lag);
-    func(NBS, diff, force, lag);
-    VecPrint::print(std::cout, std::min(20ul,NBS+1), lag) << std::endl;
+    zero_real(ALOC, lagmul);
+    func(NBS, diff, force, lagmul);
+    VecPrint::print(std::cout, std::min(20ul,NBS+1), lagmul) << std::endl;
     
     free_real(x,y,z);
 }
@@ -878,7 +886,7 @@ inline void testD(unsigned cnt, void (*func)(unsigned, const real*, real, const 
     TicToc::toc(str, nullptr);
     
     zero_real(ALOC, x);
-    func(NBS, diff, 1.0, pos, lag, x);
+    func(NBS, diff, 1.0, pos, lagmul, x);
     VecPrint::print(std::cout, std::min(20ul,NBR+2), x) << std::endl;
     
     free_real(x,y,z);
@@ -920,7 +928,7 @@ int main(int argc, char* argv[])
     RNG.seed();
 
     pos = new_real(ALOC);
-    new_real(force, lag, diff, 0.0);
+    new_real(force, lagmul, diff, 0.0);
     
     setFilament(NBS+1, pos, 1.0, 2.0);
     setRandom(NBS+1, force, 1.0);
@@ -930,7 +938,7 @@ int main(int argc, char* argv[])
     //testProjectionD(1<<20);
 
     free_real(pos);
-    free_real(diff, lag, force);
+    free_real(diff, lagmul, force);
     
     return EXIT_SUCCESS;
 }

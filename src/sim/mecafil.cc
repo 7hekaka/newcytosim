@@ -621,29 +621,35 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
  */
 void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
 {
-    assert_true( X != Y );
-    real const* E = X + nbt + DIM;
+    real const* E = X + nbt + DIM;  //index to last point
     
-    for ( unsigned d = 0; d < DIM; ++d )
-    {
-        Y[        d] += rigid * ( X[d+DIM] + X[d+DIM] - X[d] - X[d+2*DIM] );
-        Y[nbt+DIM+d] += rigid * ( E[d-DIM] + E[d-DIM] - E[d] - E[d-2*DIM] );
-    }
+    const real R1 = rigid;
+    const real R2 = rigid * 2;
+    const real R4 = rigid * 4;
+    const real R6 = rigid * 6;
     
     if ( nbt == DIM )
     {
-        for ( unsigned d = 0; d < DIM; ++d )
-            Y[DIM+d] += 2 * rigid * ( X[d] - X[d+DIM] - X[d+DIM] + X[d+DIM*2] );
+        for ( int d = 0; d < DIM; ++d )
+        {
+            Y[    d+DIM] -= R2 * (X[d+DIM*2]+X[d]) - R4 * X[d+DIM];
+            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+        }
     }
     else
     {
-        for ( unsigned ii = DIM*2; ii < nbt; ++ii )
-            Y[ii] += rigid * ( - X[ii-DIM*2] - 6*X[ii] + 4*( X[ii-DIM] + X[ii+DIM] ) - X[ii+DIM*2] );
+        // this is where the bulk of the calculation takes place:
+        const int end = nbt;
+        for ( int i = DIM*2; i < end; ++i )
+            Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
         
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( int d = 0; d < DIM; ++d )
         {
-            Y[DIM+d] += rigid * ( X[d] + X[d] - 5*X[d+DIM] + 4*X[d+DIM*2] - X[d+DIM*3] );
-            Y[nbt+d] += rigid * ( E[d] + E[d] - 5*E[d-DIM] + 4*E[d-DIM*2] - E[d-DIM*3] );
+            Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R2 * X[d] - R4 * (X[d+DIM*2]-X[d+DIM]);
+            Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R2 * E[d] - R4 * (E[d-DIM*2]-E[d-DIM]);
+            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
         }
     }
 }
@@ -669,7 +675,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #endif
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-        add_rigidity_AVX(nbt, X, rfRigidity, Y);
+        add_rigidityF(nbt, X, rfRigidity, Y);
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
         add_rigidity_SSE(nbt, X, rfRigidity, Y);
 #else
