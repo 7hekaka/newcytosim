@@ -3,45 +3,48 @@
  projections performed with explicit matrices
  This is a slow method, but it can be useful to compare with other methods
 */
-//#include "vecprint.h"
+#include "vecprint.h"
 
 
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    mtP          = 0;
-    mtDiffP      = 0;
-    mtJJtiJ      = 0;
-    mtJJtiJforce = 0;
+    mtProj       = nullptr;
+    mtDiffP      = nullptr;
+    mtJJtiJ      = nullptr;
+    mtJJtiJforce = nullptr;
 }
 
 
 void Mecafil::allocateProjection(const size_t ms)
 {
     //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
-    free_real(mtP);
+    free_real(mtProj);
     free_real(mtDiffP);
     free_real(mtJJtiJ);
-    mtP          = new_real(DIM*nbp*DIM*nbp);
-    mtDiffP      = new_real(DIM*nbp*DIM*nbp);
-    mtJJtiJforce = new_real(nbp);
-    mtJJtiJ      = new_real(DIM*nbp*nbp);
+    const size_t N = DIM * ms;
+    mtProj       = new_real(N*N);
+    mtDiffP      = new_real(N*N);
+    mtJJtiJ      = new_real(N*ms);
+    mtJJtiJforce = new_real(ms);
 }
 
 
 void Mecafil::destroyProjection()
 {
     //std::clog << reference() << "destroyProjection\n";
-    free_real(mtP);
+    free_real(mtProj);
     free_real(mtDiffP);
     free_real(mtJJtiJforce);
     free_real(mtJJtiJ);
-    mtP          = 0;
-    mtDiffP      = 0;
-    mtJJtiJforce = 0;
-    mtJJtiJ      = 0;
+    mtProj       = nullptr;
+    mtDiffP      = nullptr;
+    mtJJtiJ      = nullptr;
+    mtJJtiJforce = nullptr;
 }
 
+
+#pragma mark -
 
 /*
  Computes the projection matrix
@@ -59,38 +62,34 @@ void Mecafil::makeProjection()
     const unsigned int nbv = DIM * nbPoints();         //number of variables
     assert_true( nbc > 0 );
     
-    //----- we allocate the arrays needed:
-    real* J   = new_real(nbv*nbc);
-    real* JJt = new_real(2*nbc);
+    //----- allocate needed temporaries:
+    real* J    = new_real(nbv*nbc);
+    real* JJt0 = new_real(nbc);
+    real* JJt1 = new_real(nbc);
     
     //------------compute the projection matrix
-    real x;
     Vector v, w, dv, dw;
-    int ofs, jj, kk;
-    int info=0;
-    
     zero_real(nbv*nbc, J);
     
     //set up the Jacobian matrix J and the diagonals of J * Jt
     w  = posP(0);
-    for ( jj = 0; jj < nbc ; ++jj )
+    dw.set(0,0,0);
+    for ( unsigned jj = 0; jj < nbc ; ++jj )
     {
         //set J:
-        for ( ofs = 0; ofs < DIM ; ++ofs )
+        v = w;
+        w = posP(jj+1);
+        dv = -dw;
+        dw = w - v;
+        for ( unsigned d = 0; d < DIM ; ++d )
         {
-            kk = DIM * jj + ofs;
-            x = pPos[kk+DIM] - pPos[kk];
-            J[jj+nbc*kk      ] = -x;
-            J[jj+nbc*(kk+DIM)] =  x;
+            J[jj+nbc*(DIM*jj+d)    ] = -dw[d];
+            J[jj+nbc*(DIM*jj+DIM+d)] =  dw[d];
         }
         
         //set the diagonal and off-diagonal term of JJt:
-        v  = w;
-        w  = posP(jj+1);
-        dv = dw;
-        dw = w - v;
-        JJt[jj] = 2 * dw.normSqr();     //diagonal term
-        JJt[jj+nbc] = - dv * dw;        //off-diagonal term
+        JJt0[jj] = 2 * dw.normSqr();  // diagonal
+        JJt1[jj] = dot(dv, dw);       // off-diagonal (first term not used)
     }
     
     // JJtiJ <- J
@@ -98,27 +97,48 @@ void Mecafil::makeProjection()
     copy_real(nbc*nbv, J, mtJJtiJ);
     
     // JJtiJ <- inv( JJt ) * J
-    lapack::xptsv(nbc, nbv, JJt, JJt+nbc+1, mtJJtiJ, nbc, &info);
+    int info = 0;
+    lapack::xptsv(nbc, nbv, JJt0, JJt1, mtJJtiJ, nbc, &info);
     if ( info ) ABORT_NOW("lapack::ptsv() failed");
     
-    // mtP <-  - Jt * JJtiJ
-    blas::xgemm('T', 'N', nbv, nbv, nbc, -1., J, nbc,
-               mtJJtiJ, nbc, 0., mtP, nbv );
+    // mtProj <-  -Jt * JJtiJ
+    blas::xgemm('T', 'N', nbv, nbv, nbc, -1.0, J, nbc, mtJJtiJ, nbc, 0., mtProj, nbv );
     
-    // mtP <- mtP + I
-    for ( jj = 0; jj < nbv*nbv; jj += nbv+1 )
-        mtP[jj] += 1.0;
+    // mtProj <- mtProj + I
+    for (unsigned j = 0; j < nbv*nbv; j += nbv+1 )
+        mtProj[j] += 1.0;
     
-    //printf(" m%lu\n", name); VecPrint::print( nbv, nbv, mtP );
     free_real(J);
-    free_real(JJt);
+    free_real(JJt0);
+    free_real(JJt1);
 }
 
 
+/**
+ Attention, the vector 'X' and 'Y' may point to the same address!
+ */
 void Mecafil::setSpeedsFromForces(const real* X, real alpha, real* Y) const
 {
     const unsigned nbv = DIM * nbPoints();
-    blas::xsymv('U', nbv, alpha, mtP, nbv, X, 1, 0.0, Y, 1);
+    copy_real(nbv, X, rfLLG);
+    blas::xsymv('U', nbv, alpha/rfDragPoint, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
+    //blas::xgemv('N', nbv, nbv, alpha/rfDragPoint, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
+}
+
+
+void Mecafil::printProjection(std::ostream& os) const
+{
+    const unsigned nbv = DIM * nbPoints();
+    os << reference() << '\n';
+#if ( 0 )
+    real * mem = new_real(nbv*nbv);
+    copy_real(nbv*nbv, mtProj, mem);
+    blas::xscal(nbv*nbv, 1.0/rfDragPoint, mem, 1);
+    VecPrint::print(os, nbv, nbv, mem, nbv);
+    free_real(mem);
+#else
+    VecPrint::print(os, nbv, nbv, mtProj, nbv);
+#endif
 }
 
 
@@ -138,13 +158,12 @@ void Mecafil::storeTensions(const real* force)
 }
 
 //------------------------------------------------------------------------------
-
+#pragma mark -
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
     const unsigned nbs = nbSegments();             //number of constraints
     const unsigned nbv = DIM * nbPoints();         //number of variables
-    assert_true( nbs > 0 );
     
     // calculate the lagrangian coefficients:
     blas::xgemv('N', nbs, nbv, 1., mtJJtiJ, nbs, force, 1, 0., rfLag, 1);
@@ -152,10 +171,14 @@ void Mecafil::makeProjectionDiff(const real* force)
     //printf("Lagrange: "); VecPrint::print(std::clog, nbc, rfLag);
     
     // select expensive forces ( lagrangian > 0 )
-    for ( int ii = 0; ii < nbs; ++ii )
+    useProjectionDiff = false;
+    for ( unsigned ii = 0; ii < nbs; ++ii )
     {
         if ( rfLag[ii] > 0 )
+        {
             mtJJtiJforce[ii] = rfLag[ii];
+            useProjectionDiff = true;
+        }
         else
             mtJJtiJforce[ii] = 0.0;
     }
@@ -164,11 +187,11 @@ void Mecafil::makeProjectionDiff(const real* force)
     
     //set up the first term in the derivative of J with respect to variable x[ii]
     //set up term  P * (DJ)t (JJti) J force:
-    for ( int jj = 0; jj < nbv; ++jj )
+    for ( unsigned jj = 0; jj < nbv; ++jj )
     {
         real* coljj = mtDiffP + nbv * jj;
         zero_real(nbv, coljj);
-        int lin = jj / DIM;
+        unsigned lin = jj / DIM;
         if ( lin > 0 ) {
             coljj[jj-DIM] = +mtJJtiJforce[lin-1];
             coljj[jj    ] = -mtJJtiJforce[lin-1];
@@ -184,12 +207,13 @@ void Mecafil::makeProjectionDiff(const real* force)
      as can be seen from the above relations to set its columns
      */
     //printf("projectionDiff\n");
-    //VecPrint::print(std::clog, nbv, nbv, mtDiffP);
+    //VecPrint::print(std::clog, nbv, nbv, mtDiffP, nbv);
 }
 
 
 void Mecafil::addProjectionDiff( const real* X, real* Y ) const
 {
+    assert_true(useProjectionDiff);
     unsigned int nbv = DIM * nbPoints();
     blas::xsymv('U', nbv, 1.0, mtDiffP, nbv, X, 1, 1.0, Y, 1);
 }

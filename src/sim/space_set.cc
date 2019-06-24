@@ -7,7 +7,7 @@
 #include "space.h"
 #include "modulo.h"
 
-//---------------------------- GLOBAL VARIABLE ---------------------------------
+//---------------------------- GLOBAL VARIABLES --------------------------------
 
 /**
  This is a global variable that is initialized in Simul

@@ -393,7 +393,6 @@ def process(template, values, text):
             out.write("|%50s --> %s\n" % (code, str(val)) )
 
 
-
 def expand_values(template, values, text):
     """
         Call self recursively to remove all entries of the 

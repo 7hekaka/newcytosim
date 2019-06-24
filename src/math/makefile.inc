@@ -46,14 +46,8 @@ cytomathD3.a: $(OBJ_MATH) matsparsesymblkD3.o
 	$(DONE)
 
 
-# build the rasterizer with graphical debugging enabled:
-rasterizerGL.o: rasterizer.cc rasterizer.h
+# build the rasterizer with display enabled:
+rasterizerG.o: rasterizer.cc rasterizer.h
 	$(COMPILE) $(INC_BM) -Isrc/disp -DDISPLAY -c $< -o build/$@
-vpath rasterizerGL.o build
-
-# build the grid with display functions enabled:
-gridGL.o: grid.cc grid.h
-	$(COMPILE) $(INC_BM) -Isrc/disp -DDISPLAY -c $< -o build/$@
-vpath gridGL.o build
-
+vpath rasterizerG.o build
 

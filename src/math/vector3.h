@@ -470,7 +470,7 @@ public:
      */
     const Vector3 orthogonal(Vector3 const& d, const real n) const
     {
-        real s = dot(d) / normSqr();
+        real s = dot(*this, d) / normSqr();
         return ( d - s * (*this) ).normalized(n);
     }
     
@@ -525,8 +525,8 @@ public:
         Vector3 ex, ey;
         orthonormal(ex, ey);
         // compute coordinates of n in reference frame (x, y):
-        real x = vec.dot(ex);
-        real y = vec.dot(ey);
+        real x = dot(vec, ex);
+        real y = dot(vec, ey);
         // normalization factor:
         real n = sqrt( x * x + y * y );
         // rotate coefficients:
@@ -668,12 +668,6 @@ public:
 #endif
     }
 
-    /// scalar product with another vector
-    real dot(Vector3 const& b) const
-    {
-        return XX * b.XX + YY * b.YY + ZZ * b.ZZ;
-    }
-    
     /// scalar product of two vectors
     friend real dot(Vector3 const& a, Vector3 const& b)
     {

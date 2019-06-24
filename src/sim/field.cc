@@ -188,7 +188,6 @@ void Field::diffuseX(real * field, real c)
 void Field::laplacian(const real* field, real * mat) const
 {
     const FieldGrid::index_t nbc = mGrid.nbCells();
-    
     const real sc = 2 * DIM;
 
     for ( FieldGrid::index_t c = 0; c < nbc; ++c )

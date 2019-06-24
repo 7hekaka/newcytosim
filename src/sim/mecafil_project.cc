@@ -663,8 +663,11 @@ void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) cons
 #else
 
 /**
-This optimized setSpeedFromForces() works only in 2D,
-and only with the 'alsatian' factorization:
+This optimized setSpeedsFromForces() works only in 2D,
+and only with the 'alsatian' factorization.
+This merges the operations done in:
+     DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
+     projectForcesD(nbs, rfDiff, alpha/rfDragPoint, X, rfLLG, Y);
 */
 void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) const
 {
@@ -720,7 +723,6 @@ void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) cons
         pM += 2;
     }
     }
-
 
 #if ( 1 )
     real const* E = mtJJtU;
@@ -827,6 +829,31 @@ void Mecafil::storeTensions(const real*)
 {
     copy_real(nPoints, rfLLG, rfLag);
 }
+
+
+void Mecafil::printProjection(std::ostream& os) const
+{
+    const unsigned nbv = DIM * nbPoints();
+    real * res = new_real(nbv*nbv);
+    real * src = new_real(nbv);
+    real * dst = new_real(nbv);
+    zero_real(nbv, src);
+    zero_real(nbv, dst);
+    for ( unsigned i = 0; i < nbv; ++i )
+    {
+        src[i] = 1.0;
+        setSpeedsFromForces(src, 1.0, dst);
+        copy_real(nbv, dst, res+nbv*i);
+        src[i] = 0.0;
+    }
+    free_real(dst);
+    free_real(src);
+    os << "Mecafil:Projection  " << reference() << '\n';
+    VecPrint::print(os, nbv, nbv, res, nbv);
+    free_real(res);
+}
+
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Projection DIFF

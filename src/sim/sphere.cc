@@ -340,7 +340,7 @@ size_t Sphere::allocateMecable(size_t nbp)
     if ( ms )
     {
         free_real(sRad);
-        sRad = new_real(3*ms);
+        sRad = new_real(DIM*ms);
     }
     return ms;
 }

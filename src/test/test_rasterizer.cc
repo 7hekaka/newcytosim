@@ -12,7 +12,7 @@
 #include "rasterizer.h"
 #include "vector.h"
 
-extern bool rasterizer_draw_things;
+extern bool rasterizer_draws;
 
 const int size = 50;
 const unsigned MAX = 16;
@@ -327,12 +327,12 @@ int main(int argc, char* argv[])
     newPoints();
     if ( argc > 1 )
     {
-        rasterizer_draw_things = 0;
+        rasterizer_draws = 0;
         speedTest(strtoul(argv[1], nullptr, 10));
     }
     else
     {
-        rasterizer_draw_things = 1;
+        rasterizer_draws = 1;
         glutInit(&argc, argv);
         glApp::setDimensionality(3);
         glApp::attachMenu(GLUT_RIGHT_BUTTON);

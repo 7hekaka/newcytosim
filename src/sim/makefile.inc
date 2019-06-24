@@ -127,6 +127,6 @@ $(OBJ_CYTOSIMD2): %D2.o: %.cc %.h | build
 $(OBJ_CYTOSIMD3): %D3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o build/$@
 
-mecaGL.o: %.o: %.cc %.h | build
+mecaG.o: %.o: %.cc %.h | build
 	$(COMPILE) $(INC_SIM) -Isrc/disp -c $< -o build/$@
 

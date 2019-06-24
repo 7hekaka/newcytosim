@@ -553,7 +553,7 @@ void PointDisp::read(Glossary& glos)
 void PointDisp::write_values(std::ostream& os) const
 {
     write_value(os, "visible",     visible);
-    if ( color2 != color.darken(0.5) )
+    if ( color2 != color.alpha(0.5) )
         write_value(os, "color",   color, color2);
     else
         write_value(os, "color",   color);

@@ -539,7 +539,7 @@ public:
     /// Save elasticity matrix in binary format
     void dumpElasticity(FILE *) const;
     
-    /// Save mobility matrix in binary format
+    /// Save mobility/projection matrix in binary format
     void dumpMobility(FILE *) const;
     
     /// Save preconditionner in binary format

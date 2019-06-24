@@ -84,6 +84,13 @@ inline vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 #define blendv2(a,b,c)    _mm_blendv_pd(a,b,c)
 #define cmp2(a,b,c)       _mm_cmp_pd(a,b,c)
 
+/// returns the dot product of two vectors, broadcasted
+inline vec2 dot2(vec2 a, vec2 b)
+{
+    vec2 p = mul2(a, b);
+    return add2(p, shuffle2(p, p, 0b01));
+}
+
 /// square of vector norm, broadcasted
 inline vec2 normsqr2(vec2 vec)
 {
@@ -225,6 +232,15 @@ inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
 #define blend4(a,b,mask)    _mm256_blend_pd(a,b,mask)
 #define blendv4(a,b,mask)   _mm256_blendv_pd(a,b,mask)
 #define cmp4(a,b,c)         _mm256_cmp_pd(a,b,c)
+
+
+/// returns the dot product of two vectors, broadcasted
+inline vec4 dot4(vec4 a, vec4 b)
+{
+    vec4 m = mul4(a, b);
+    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    return add4(s, permute4(s, 0b0101));
+}
 
 /// square of vector norm, broadcasted
 inline vec4 normsqr4(vec4 vec)

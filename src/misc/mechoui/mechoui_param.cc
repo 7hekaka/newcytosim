@@ -21,7 +21,6 @@ void MechouiParam::clear()
 }
 
 
-
 void MechouiParam::read(Glossary& glos)
 {
     glos.set(point_size,    "point_size");
@@ -43,7 +42,6 @@ static  void write_param(std::ostream& os, std::string const& name, T const& c)
 {
     os << " " << std::left << std::setw(20) << name << " = " << c << ";" << std::endl;
 }
-
 
 
 void MechouiParam::write(std::ostream& os) const

@@ -458,12 +458,6 @@ public:
         return Vector4(std::max(XX, v.XX), std::max(YY, v.YY), std::max(ZZ, v.ZZ), std::max(TT, v.TT));
     }
     
-    /// scalar product with another vector
-    real dot(Vector4 const& b) const
-    {
-        return XX * b.XX + YY * b.YY + ZZ * b.ZZ + TT * b.TT;
-    }
-    
     /// scalar product of two vectors
     friend real dot(Vector4 const& a, Vector4 const& b)
     {

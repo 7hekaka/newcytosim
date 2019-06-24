@@ -360,7 +360,7 @@ void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
     
     for ( int d = 0; d < DIM; ++d )
     {
-        Y[         d] += rigid * ( X[d+DIM] + X[d+DIM] - X[d] - X[d+2*DIM] );
+        Y[        d] += rigid * ( X[d+DIM] + X[d+DIM] - X[d] - X[d+2*DIM] );
         Y[nbt+DIM+d] += rigid * ( E[d-DIM] + E[d-DIM] - E[d] - E[d-2*DIM] );
     }
     
@@ -373,7 +373,8 @@ void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
     {
         for ( unsigned ii = DIM*2; ii < nbt; ++ii )
             Y[ii] += rigid * ( - X[ii-DIM*2] - 6*X[ii] + 4*( X[ii-DIM] + X[ii+DIM] ) - X[ii+DIM*2] );
-        
+        //Y[ii] += rigid * ( (4*( X[ii-DIM] + X[ii+DIM] ) - X[ii+DIM*2]) - (6*X[ii] + X[ii-DIM*2]) );
+
         for ( int d = 0; d < DIM; ++d )
         {
             Y[DIM +d] += rigid * ( X[d] + X[d] - 5*X[d+DIM] + 4*X[d+DIM*2] - X[d+DIM*3] );

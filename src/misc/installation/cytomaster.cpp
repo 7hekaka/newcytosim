@@ -218,7 +218,6 @@ int makeCommandXL(char * str, size_t len, int slider, int value)
 }
 
 
-
 /// for the Novation Launchpad MK2
 int makeCommand(char * str, size_t len, int X, int Y, int value)
 {

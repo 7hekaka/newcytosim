@@ -23,6 +23,7 @@ Mecafil::Mecafil()
 #if NEW_ANISOTROPIC_FIBER_DRAG
     rfDir  = 0;
 #endif
+    useProjectionDiff = false;
 }
 
 
@@ -262,36 +263,34 @@ void Mecafil::addRigidityMatrix(Matrix & mat, const int offset, const int dim) c
 void Mecafil::addRigidityMatrix(Matrix & mat, const int s, const int dim) const
 {
     const real R = rfRigidity;
-    int Z = nPoints;
-    if ( Z < 3 ) return;
+    if ( nPoints < 3 ) return;
     
-    int ddd = 2*dim;
-    int e = s + dim * ( Z - 2 );
+    const int e = s + dim * ( nPoints - 2 );
 
-    mat(s    , s    ) -= R;
-    mat(s    , s+dim) += R * 2;
-    mat(s    , s+ddd) -= R;
+    mat(s    , s      ) -= R;
+    mat(s    , s+dim  ) += R * 2;
+    mat(s    , s+dim*2) -= R;
     
     mat(e    , e+dim) += R * 2;
     mat(e+dim, e+dim) -= R;
 
-    if ( 3 < Z )
+    if ( 3 < nPoints )
     {
-        mat(s+dim, s+ddd) += R * 4;
-        mat(s+dim, s+dim) -= R * 5;
-        mat(e    , e    ) -= R * 5;
-        mat(s+dim, s+dim+ddd) -= R;
+        mat(s+dim, s+dim*2) += R * 4;
+        mat(s+dim, s+dim  ) -= R * 5;
+        mat(e    , e      ) -= R * 5;
+        mat(s+dim, s+dim*3) -= R;
     }
     else
     {
         mat(s+dim, s+dim) -= R * 4;
     }
     
-    for ( int n = s+ddd; n < e ; n += dim )
+    for ( int n = s+dim*2; n < e ; n += dim )
     {
-        mat(n, n    ) -= R * 6;
-        mat(n, n+dim) += R * 4;
-        mat(n, n+ddd) -= R;
+        mat(n, n      ) -= R * 6;
+        mat(n, n+dim  ) += R * 4;
+        mat(n, n+dim*2) -= R;
     }
 }
 
@@ -305,37 +304,35 @@ void Mecafil::addRigidityMatrix(Matrix & mat, const int s, const int dim) const
 void Mecafil::addRigidityUpper(real * mat) const
 {
     const real R = rfRigidity;
-    int Z = nPoints;
-    if ( Z < 3 ) return;
+    if ( nPoints < 3 ) return;
     
-    int LDD = Z*DIM;
-    int ddd = 2*DIM;
-    int e = DIM * ( Z - 2 );
+    const int ldd = DIM * nPoints;
+    const int e = DIM * ( nPoints - 2 );
     
     mat[0                  ] -= R;
-    mat[        LDD*DIM    ] += R * 2;
-    mat[        LDD*ddd    ] -= R;
+    mat[      ldd*DIM    ] += R * 2;
+    mat[      ldd*DIM*2  ] -= R;
     
-    mat[e     + LDD*(e+DIM)] += R * 2;
-    mat[e+DIM + LDD*(e+DIM)] -= R;
+    mat[e    +ldd*(e+DIM)] += R * 2;
+    mat[e+DIM+ldd*(e+DIM)] -= R;
     
-    if ( 3 < Z )
+    if ( 3 < nPoints )
     {
-        mat[DIM + LDD*ddd      ] += R * 4;
-        mat[DIM + LDD*DIM      ] -= R * 5;
-        mat[e   + LDD*e        ] -= R * 5;
-        mat[DIM + LDD*(DIM+ddd)] -= R;
+        mat[DIM+ldd*DIM*2  ] += R * 4;
+        mat[DIM+ldd*DIM    ] -= R * 5;
+        mat[e  +ldd*e      ] -= R * 5;
+        mat[DIM+ldd*(DIM*3)] -= R;
     }
     else
     {
-        mat[DIM + LDD*DIM] -= R * 4;
+        mat[DIM+ldd*DIM] -= R * 4;
     }
     
-    for ( int n = ddd; n < e ; n += DIM )
+    for ( int n = DIM*2; n < e ; n += DIM )
     {
-        mat[n + LDD*(n    )] -= R * 6;
-        mat[n + LDD*(n+DIM)] += R * 4;
-        mat[n + LDD*(n+ddd)] -= R;
+        mat[n+ldd*(n      )] -= R * 6;
+        mat[n+ldd*(n+DIM  )] += R * 4;
+        mat[n+ldd*(n+DIM*2)] -= R;
     }
 }
 

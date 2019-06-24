@@ -5,12 +5,14 @@
 #include "vector3.h"
 #include <cmath>
 
-/// DISPLAY is defined for compiling test_rasterizer.cc, adding visual output
+/**
+ DISPLAY is defined for compiling test_rasterizer.cc,
+ adding support for visual output
+ */
 #ifdef DISPLAY
 #include "opengl.h"
+bool rasterizer_draws = true;
 #endif
-
-bool rasterizer_draw_things = 1;
 
 //==============================================================================
 //                             1D
@@ -48,7 +50,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
                                 const int zz)
 {
 #ifdef DISPLAY
-    if ( rasterizer_draw_things )
+    if ( rasterizer_draws )
     {
         glLineWidth(1);
         glColor3f(0.0, 0.0, 1.0);
@@ -135,7 +137,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
                                 const int zz)
 {
 #ifdef DISPLAY
-    if ( rasterizer_draw_things )
+    if ( rasterizer_draws )
     {
         glLineWidth(1);
         glColor3f(0.0, 0.0, 1.0);
@@ -376,7 +378,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
     assert_true( n_pts > 1 );
     
 #ifdef DISPLAY
-    if ( rasterizer_draw_things )
+    if ( rasterizer_draws )
     {
         //draw the vertex of the volume:
         glPointSize(6);

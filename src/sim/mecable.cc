@@ -85,12 +85,12 @@ size_t Mecable::allocateMecable(const size_t nbp)
         // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
         // allocate memory:
-        real * mem = new_real(all*DIM);
+        real * mem = new_real(DIM*all);
 
         // retain existing data:
         if ( pPos )
         {
-            copy_real(nPoints*DIM, pPos, mem);
+            copy_real(DIM*nPoints, pPos, mem);
             free_real(pPos);
         }
         pPos = mem;
@@ -209,22 +209,11 @@ void Mecable::translate(Vector const& T)
         T.add_to(pPos+DIM*p);
 }
 
-/*
-void Mecable::translate(real ttt[DIM])
-{
-    for ( unsigned p = 0; p < nPoints; ++p )
-    {
-        real * pos = pPos + p * DIM;
-        for ( int d = 0; d < DIM; ++d )
-            pos[d] += ttt[d];
-    }
-}
-*/
 
 void Mecable::rotate(Rotation const& T)
 {
     for ( unsigned p = 0; p < nPoints; ++p)
-        ( T.vecmul(pPos+p*DIM) ).store(pPos+p*DIM);
+        ( T.vecmul(pPos+DIM*p) ).store(pPos+DIM*p);
 }
 
 

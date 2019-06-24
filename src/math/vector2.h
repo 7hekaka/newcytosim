@@ -387,7 +387,7 @@ public:
     /// returns a vector perpendicular to *this, close to `d` and of norm = `n`
     const Vector2 orthogonal(Vector2 const& d, const real n) const
     {
-        real s = dot(d) / normSqr();
+        real s = dot(*this, d) / normSqr();
         return ( d - s * (*this) ).normalized(n);
     }
     
@@ -510,13 +510,6 @@ public:
     friend const Vector2 cross(const real a, Vector2 const& b)
     {
         return Vector2(-a*b.YY, a*b.XX);
-    }
-    
-    
-    /// scalar product with another vector
-    real dot(Vector2 const& b) const
-    {
-        return XX * b.XX + YY * b.YY;
     }
     
     /// scalar product of two vectors

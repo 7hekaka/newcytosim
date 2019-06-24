@@ -396,13 +396,6 @@ public:
         return Vector1(0.0);
     }
     
-    
-    /// scalar product with another vector
-    real dot(Vector1 const& b) const
-    {
-        return XX * b.XX;
-    }
-    
     /// scalar product of two vectors
     friend real dot(Vector1 const& a, Vector1 const& b)
     {

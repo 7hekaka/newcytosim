@@ -42,15 +42,18 @@ private:
     real   *    rfDir;
 #endif
     
-    /// memory allocated to hold nbPoints() values (used as temporary variables)
-    real   *    rfLLG, * rfVTP;
+    /// work array allocated to hold DIM*nbPoints() coordinates
+    real   *    rfLLG;
+    
+    /// work array allocated to hold DIM*nbPoints() coordinates
+    real   *    rfVTP;
 
 #if PROJECT_WITH_MATRIX
     
     /* variables used for projecting with a matrix ( mecafil_projectmat.cc ) */
     
     /// projection matrix
-    real   *    mtP;
+    real   *    mtProj;
     
     /// differential of projection matrix
     real   *    mtDiffP;
@@ -59,8 +62,6 @@ private:
     real   *    mtJJtiJ;
     
 #else
-    
-    /* variables used for projecting without an explicit matrix ( mecafil_project.cc ) */
     
     /// J*J', a nbSegments^2 matrix. We store the diagonal and one off-diagonal
     real   *    mtJJt, * mtJJtU;
@@ -146,7 +147,7 @@ public:
     
     /// prepare for projection
     void        makeProjection();
-    
+
     /// prepare the correction to the projection
     void        makeProjectionDiff(const real* );
     
@@ -162,6 +163,9 @@ public:
     /// calculate the speeds from the forces, including projection
     void        setSpeedsFromForces(const real* X, real alpha, real* Y) const;
     
+    /// print projection matrix
+    void        printProjection(std::ostream&) const;
+
     //--------------------- Rigidity
 
     /// add the rigidity force corresponding to configuration X into vector Y

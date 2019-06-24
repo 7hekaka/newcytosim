@@ -342,7 +342,7 @@ public:
      .
      The default implementation ( Y <- 0 ) makes the object immobile
      */
-    virtual void    setSpeedsFromForces(const real* X, real alpha, real* Y) const { zero_real(nPoints*DIM, Y); }
+    virtual void    setSpeedsFromForces(const real* X, real alpha, real* Y) const { zero_real(DIM*nPoints, Y); }
     
     //--------------------------------------------------------------------------
 

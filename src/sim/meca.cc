@@ -1815,11 +1815,10 @@ void Meca::dumpMobility(FILE * file) const
     
     zero_real(dim, src);
     
-    for ( index_t ii = 0; ii < dim; ++ii )
+    for ( index_t i = 0; i < dim; ++i )
     {
-        src[ii] = 1.0;
-        
-        zero_real(dim, res);
+        src[i] = 1.0;
+        zero_real(dim, res); // this should not be necessary
         
         for ( Mecable const* mec : objs )
         {
@@ -1827,9 +1826,9 @@ void Meca::dumpMobility(FILE * file) const
             // this includes the mobility, but not the time_step:
             mec->setSpeedsFromForces(src+inx, 1.0, res+inx);
         }
-        
+        // write column to file directly:
         fwrite(res, sizeof(real), dim, file);
-        src[ii] = 0.0;
+        src[i] = 0.0;
     }
     
     free_real(res);

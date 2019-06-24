@@ -823,7 +823,8 @@ void Fiber::prepareMecable()
     setDragCoefficient();
     storeDirections();
     makeProjection();
-
+    //printProjection(std::clog);
+    
     assert_true( rfDragPoint > REAL_EPSILON );
 
     // the scaling of the bending elasticity depends on the length of the segments

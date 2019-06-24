@@ -148,7 +148,7 @@ test_platonic: test_platonic.cc platonic.o $(OBJGLAP) cytomath.a cytobase.a
 	$(DONE)
 vpath test_platonic bin
 
-test_rasterizer: test_rasterizer.cc rasterizerGL.o cytomath.a $(OBJGLAP) cytobase.a
+test_rasterizer: test_rasterizer.cc rasterizerG.o cytomath.a $(OBJGLAP) cytobase.a
 	$(TEST_MAKE) $(TEST_GL)
 	$(DONE)
 vpath test_rasterizer bin

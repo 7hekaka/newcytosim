@@ -505,6 +505,9 @@ void FiberProp::complete(Simul const& sim)
             if ( !field_ptr )
                 throw InvalidParameter("fiber:field not found");
         }
+#if !FIBER_HAS_LATTICE
+        throw InvalidParameter("Cytosim cannot run with fiber:lattice");
+#endif
     }
 
 #if NEW_AGING_LATTICE

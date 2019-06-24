@@ -10,7 +10,6 @@
 #include "simul.h"
 
 
-
 Digit::Digit(DigitProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {

@@ -1104,7 +1104,7 @@ void Filament::addSegmentP()
     unsigned pp = nPoints;
     setNbPoints(pp+1);
     
-    real * psp = pPos + pp * DIM;
+    real * psp = pPos + DIM * pp;
     for ( unsigned int dd = 0; dd < DIM; ++dd )
         psp[dd] = 2 * psp[dd-DIM] - psp[dd-2*DIM];
     

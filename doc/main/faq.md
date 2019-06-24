@@ -70,7 +70,6 @@ When `sim` is running, it continuously writes to `messages.cmo` and you can read
 # Simulation #################################################
 
 
-
 <details>
 <summary>
 **How can I run simulations in 3D?**
@@ -78,7 +77,6 @@ When `sim` is running, it continuously writes to `messages.cmo` and you can read
 The executables `sim`, `play`, `report`, etc. are built for a specific dimension: 1D, 2D or 3D.
 Hence to change the dimension, you need to select the right executable. To set the dimension of the executables, set `DIM=3` in the `src/math/dim.h`, enter `make clean` to remove the old files and start the compilation with `make` as usual. You can query the dimension with `sim info`.
 </details>
-
 
 
 <details>
@@ -1035,7 +1033,6 @@ To call the function in Fiber::step() and it will break if the angle is sharp, y
 </details>
 
 
-
 <details>
 <summary>
 **Can I make fibers severed when they are locally stretched with the tensile stress above a critical one?**
@@ -1065,7 +1062,7 @@ To make the corresponding object immobile, set `Y` to zero like this:
 	
 	void setSpeedsFromForces(const real*, real, real* Y) const
 	{
-	   for(int i=0; i < nbPoints()*DIM; ++i)
+	   for(int i=0; i < DIM*nbPoints(); ++i)
 	   		Y[i] = 0;
 	}
 
@@ -1073,7 +1070,6 @@ This is a virtual function, and you must modify it in a child class of Mecable.
 Hence, if you want the Fibers to be immobile, you must do this in the RigidFiber class.
 </p>
 </details>
-
 
 
 <details>
@@ -1178,7 +1174,6 @@ Tu pourra alors obtenir la force sur le lien qui retient le `core`:
 </details>
 
 
-
 <details>
 <summary>
 **I have a daughter filament branching off a mother filament (by a nucleator) and the mother filament gets depolymerized, how can I make sure the daughter filament is then also destroyed?**
@@ -1226,7 +1221,6 @@ In this way you would keep backward compatibility with your older model.
 </details>
 
 
-
 <details>
 <summary>
 **Can I limit binding to microtubules once they are a certain minimum length?**
@@ -1253,7 +1247,6 @@ You simply need to add a test in there for the length. The quick and dirty way i
 </summary>
 Please write to feedbackATcytosimDOTorg
 </details>
-
 
 
 FJN, 2.5.2019

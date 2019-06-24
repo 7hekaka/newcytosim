@@ -15,7 +15,6 @@ Myosin::Myosin(MyosinProp const* p, HandMonitor* h)
 }
 
 
-
 void Myosin::attach(FiberSite const& s)
 {
     Digit::attach(s);

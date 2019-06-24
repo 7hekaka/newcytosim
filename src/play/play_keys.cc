@@ -406,7 +406,7 @@ void changeEndStyle(FiberDisp* p, int)
 {
     int * style = p->end_style;
     // showing the plus ends -> the minus ends -> both -> none
-    switch( (style[1]?1:0) + (style[0]?2:0) )
+    switch( bool(style[1]) + 2*bool(style[0]) )
     {
         case 0:
             style[0] = 2;
@@ -418,12 +418,12 @@ void changeEndStyle(FiberDisp* p, int)
             break;
         case 2:
             style[0] = 2;
-            style[1] = 4;
+            style[1] = 1;
             break;
         case 3:
         default:
             style[0] = 0;
-            style[1] = 4;
+            style[1] = 1;
             break;
     }
     

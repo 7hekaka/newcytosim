@@ -8,8 +8,6 @@
 
 namespace Platonic
 {
-    
-    
     /// One of the corner of a Platonic solid
     class Corner
     {
@@ -25,7 +23,6 @@ namespace Platonic
         
         ~Corner() {}
     };
-    
     
     
     /// A vertex is interpolated from 3 Corners
@@ -63,7 +60,6 @@ namespace Platonic
         
         void     print(unsigned, std::ostream&) const;
     };
-    
     
     
     /// A refined polyhedra to serve as a tesselation
@@ -217,7 +213,6 @@ namespace Platonic
         void        refineEdge(unsigned a, unsigned b, unsigned div);
         void        refineFace(unsigned a, unsigned b, unsigned c, unsigned div);
     };
-    
 }
 
 #endif
