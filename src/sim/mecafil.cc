@@ -341,14 +341,14 @@ void Mecafil::addRigidityUpper(real * mat) const
 /*
  This is the reference implementation
  */
-inline void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
 {
     assert_true( X != Y );
     for ( unsigned jj = 0; jj < nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
         Y[jj      ] -=   f;
-        Y[jj+DIM  ] += f+f;
+        Y[jj+DIM  ] += 2*f;
         Y[jj+DIM*2] -=   f;
     }
 }
@@ -356,7 +356,7 @@ inline void add_rigidity0(const unsigned nbt, const real* X, const real rigid, r
 /*
  In this version the loop is unrolled
  */
-inline void add_rigidity2(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2(const unsigned nbt, const real* X, const real rigid, real* Y)
 {    
     assert_true( X != Y );
     real dx = X[DIM  ] - X[0];
@@ -408,7 +408,7 @@ inline void add_rigidity2(const unsigned nbt, const real* X, const real rigid, r
  and further optimization are made by replacing
  ( a0 -2*a1 + a2 ) by (a2-a1)-(a1-a0).
  */
-inline void add_rigidity3(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity3(const unsigned nbt, const real* X, const real rigid, real* Y)
 {
     assert_true( X != Y );
     const real * xn = X + DIM;
@@ -615,42 +615,43 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
 #endif
 
 /*
- In this version the loop is unrolled, pointers are used
- and further optimization are made by calculating
- (a2-a1)-(a1-a0) instead of ( a0 -2*a1 + a2 ).
+ This is an optimized implementation
  */
-void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
 {
+    assert_true(nbt > DIM);
     real const* E = X + nbt + DIM;  //index to last point
     
-    const real R1 = rigid;
-    const real R2 = rigid * 2;
-    const real R4 = rigid * 4;
-    const real R6 = rigid * 6;
+    const real R2 = R1 * 2;
+    const real R4 = R1 * 4;
+    const real R6 = R1 * 6;
     
-    if ( nbt == DIM )
+    // this is where the bulk of the calculation takes place:
+    const int end = nbt;
+    for ( int i = DIM*2; i < end; ++i )
+        Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
+    
+    for ( int d = 0; d < DIM; ++d )
     {
-        for ( int d = 0; d < DIM; ++d )
-        {
-            Y[    d+DIM] -= R2 * (X[d+DIM*2]+X[d]) - R4 * X[d+DIM];
-            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
-        }
+        Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
+        Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
+        Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
     }
-    else
+}
+
+/**
+ Add rigidity terms between three points {A, B, C}
+ Done with Serge DMITRIEFF, 2015
+ */
+void add_rigidity(unsigned A, unsigned B, unsigned C, const real* X, const real rigid, real* Y)
+{
+    for ( unsigned d = 0; d < DIM; ++ d )
     {
-        // this is where the bulk of the calculation takes place:
-        const int end = nbt;
-        for ( int i = DIM*2; i < end; ++i )
-            Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
-        
-        for ( int d = 0; d < DIM; ++d )
-        {
-            Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R2 * X[d] - R4 * (X[d+DIM*2]-X[d+DIM]);
-            Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R2 * E[d] - R4 * (E[d-DIM*2]-E[d-DIM]);
-            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
-        }
+        real x = 2*X[B*DIM+d] - ( X[A*DIM+d] - X[C*DIM+d] );
+        Y[A*DIM+d] += x * rigid;
+        Y[B*DIM+d] -= x * (rigid+rigid);
+        Y[C*DIM+d] += x * rigid;
     }
 }
 
@@ -664,9 +665,9 @@ void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
 */
 void Mecafil::addRigidity(const real* X, real* Y) const
 {
-    unsigned nbt = DIM * ( nPoints - 2 );  // number of triplets
-    if ( nbt > 0 )
+    if ( nPoints > 3 )
     {
+        unsigned nbt = DIM * ( nPoints - 2 );  // number of triplets
 #if CHECK_RIGIDITY
         // compare to default implementation:
         real * tmp = new_real(DIM*nPoints);
@@ -679,7 +680,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
         add_rigidity_SSE(nbt, X, rfRigidity, Y);
 #else
-        add_rigidity3(nbt, X, rfRigidity, Y);
+        add_rigidityF(nbt, X, rfRigidity, Y);
 #endif
         
 #if CHECK_RIGIDITY
@@ -694,7 +695,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #endif
     
 #if NEW_FIBER_LOOP
-        if ( rfRigidityLoop && nPoints > 3 )
+        if ( rfRigidityLoop )
         {
             /*
              With Serge DMITRIEFF:
@@ -702,26 +703,14 @@ void Mecafil::addRigidity(const real* X, real* Y) const
              making the fiber mechanically homogeneous and all points equivalent
              */
             const unsigned L = lastPoint();
-            addRigidity(X, Y, L,   0, 1);
-            addRigidity(X, Y, L-1, L, 0);
+            add_rigidity(L,   0, 1, X, rfRigidity, Y);
+            add_rigidity(L-1, L, 0, X, rfRigidity, Y);
         }
 #endif
     }
-}
-
-
-/**
- Add rigidity terms between the last and first points, to loop the fiber onto itself.
- Done with Serge DMITRIEFF, 2015
- */
-void Mecafil::addRigidity(const real* X, real* Y, unsigned A, unsigned B, unsigned C) const
-{
-    for ( unsigned d = 0; d < DIM; ++ d )
+    else if ( nPoints > 2 )
     {
-        real f = rfRigidity * (( X[DIM*A+d] - X[DIM*B+d] ) - ( X[DIM*B+d] - X[DIM*C+d] ));
-        Y[DIM*A+d] -=   f;
-        Y[DIM*B+d] += f+f;
-        Y[DIM*C+d] -=   f;
+        add_rigidity(0, 1, 2, X, rfRigidity, Y);
     }
 }
 

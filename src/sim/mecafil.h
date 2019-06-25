@@ -176,9 +176,6 @@ public:
     
     /// add rigidity terms to upper side of matrix
     void        addRigidityUpper(real*) const;
-    
-    /// add rigidity terms on three specified points
-    void        addRigidity(const real* X, real* Y, unsigned, unsigned, unsigned) const;
 
 };
 
