@@ -270,7 +270,7 @@ void Meca::addTorque(const Interpolation & pta,
      in 3D the axis of torque is perpendicular to both `da` and `db`,
      and the angle is only defined between 0 and PI,
      */
-    Vector axis = cross(db, da).normalized(sign(sinus));
+    Vector axis = cross(db, da).normalized(std::copysign(1.0, sinus));
     
     // rotate vector `db` around `arm` by angle specified as (cosinus, sinus):
     Vector rot = cosinus * db + sinus * cross(axis, db);

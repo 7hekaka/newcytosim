@@ -109,7 +109,7 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 # Performance:
 
 - Store Mecable vertices as XXXXXXYYYYYYZZZZZZ to improve vectorization
-- use DIM==4 for 3D simulations in which vectors have a stride of 4
+- use VAS = Vector Array Stride; MVL = Meca Vector Length
 - implement IDRS to replace BICGSTAB - convergence in matlab seems better
   http://ta.twi.tudelft.nl/nw/users/gijzen/IDR.html
 - Use Pardiso matrix & solver

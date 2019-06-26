@@ -98,7 +98,7 @@ inline void zero_real(size_t size, real * ptr)
 #if ( 1 )
     memset(ptr, 0, size*sizeof(real));
 #else
-    #pragma vector unaligned
+    #pragma ivdep
     for ( size_t u = 0; u < size; ++u )
         ptr[u] = 0.0;
 #endif
@@ -111,7 +111,7 @@ inline real square(const real x) { return x * x; }
 /// cube of the argument: `x * x * x`
 inline real cube(const real x) { return x * x * x; }
 
-#if ( 1 )
+#if ( 0 )
 
 /// sign of `val` in ( 0, -1 or +1 ), result is 0 if ( x == 0 )
 template <typename T> int signi(T val) { return ( T(0) < val ) - ( val < T(0) ); }

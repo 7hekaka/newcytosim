@@ -2,7 +2,7 @@
 
 #include <sys/time.h>
 
-#define DIM 2
+#define DIM 3
 
 #include "real.h"
 #include "tictoc.h"
@@ -13,6 +13,16 @@
 
 #include "simd.h"
 //#include "iacaMarks.h"
+
+
+const real scalar = 2.0;
+
+/// number of segments:
+const size_t NBS = 1231;
+const size_t NBR = DIM * ( NBS + 1 );
+const size_t ALOC = NBR + 8;
+
+
 
 #ifdef __AVX__
 
@@ -39,13 +49,6 @@ inline void print_alignment(real const* ptr, const char msg[])
 }
 
 //------------------------------------------------------------------------------
-
-const real scalar = 2.0;
-
-/// number of segments:
-const size_t NBS = 231;
-const size_t NBR = DIM * ( NBS + 1 );
-const size_t ALOC = NBR + 8;
 
 
 real *diff = nullptr, *pos = nullptr, *lagmul = nullptr, *force = nullptr;
@@ -117,7 +120,7 @@ void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
         Y[jj      ] -=   f;
-        Y[jj+DIM  ] += f+f;
+        Y[jj+DIM  ] += 2*f;
         Y[jj+DIM*2] -=   f;
     }
 }
@@ -324,7 +327,7 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
     {
         vec4 nnn = load4(X+4);
         X += 4;
-        vec4 iii = loadu4(X-2);
+        vec4 iii = loadu4(X-2); //permute2f128(xxx, nnn, 0x21);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
         vec4 ppp = permute2f128(eee, ddd, 0x21);
@@ -356,38 +359,63 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
 
 #endif
 
-void add_rigidityF(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidityE(const unsigned nbt, const real* X, const real R1, real* Y)
 {
     real const* E = X + nbt + DIM;  //index to last point
     
-    const real R1 = rigid;
-    const real R2 = rigid * 2;
-    const real R4 = rigid * 4;
-    const real R6 = rigid * 6;
+    const real R2 = R1 * 2;
     
     if ( nbt == DIM )
     {
         for ( int d = 0; d < DIM; ++d )
         {
-            Y[    d+DIM] -= R2 * (X[d+DIM*2]+X[d]) - R4 * X[d+DIM];
-            Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-            Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+            real x = 2 * X[d+DIM] - ( X[d+DIM*2] + X[d] );
+            Y[d      ] += R1 * x;
+            Y[d+DIM  ] -= R2 * x;
+            Y[d+DIM*2] += R1 * x;
         }
     }
     else
     {
+        const real R4 = R1 * 4;
+        const real R6 = R1 * 6;
+        
         // this is where the bulk of the calculation takes place:
         const int end = nbt;
+        #pragma ivdep
         for ( int i = DIM*2; i < end; ++i )
             Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
         
         for ( int d = 0; d < DIM; ++d )
         {
-            Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R2 * X[d] - R4 * (X[d+DIM*2]-X[d+DIM]);
-            Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R2 * E[d] - R4 * (E[d-DIM*2]-E[d-DIM]);
+            Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
+            Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
             Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
             Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
         }
+    }
+}
+
+
+void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
+{
+    const real R6 = R1 * 6;
+    const real R4 = R1 * 4;
+    const real R2 = R1 * 2;
+
+    const int end = nbt;
+    #pragma ivdep
+    for ( int i = DIM*2; i < end; ++i )
+        Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
+    
+    // special cases near the edges:
+    real const* E = X + nbt + DIM;
+    for ( int d = 0; d < DIM; ++d )
+    {
+        Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
+        Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
+        Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
     }
 }
 
@@ -408,7 +436,7 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
     TicToc::toc(str, nullptr);
     zero_real(ALOC, x);
     func(nbt, pos, scalar, x);
-    VecPrint::print(std::cout, std::min(16ul,2+NBR), x);
+    VecPrint::print(std::cout, std::min(16ul,NBR), x);
     
     zero_real(ALOC, y);
     add_rigidity0(nbt, pos, scalar, y);
@@ -427,6 +455,7 @@ void testRigidity(unsigned cnt)
     testRigidity(cnt, add_rigidity2,    "2  ");
 #endif
     testRigidity(cnt, add_rigidity3,    "3  ");
+    testRigidity(cnt, add_rigidityE,    "E  ");
     testRigidity(cnt, add_rigidityF,    "F  ");
 #if defined __SSE__ & ( DIM == 2 )
     testRigidity(cnt, add_rigidity_SSO, "SSO");

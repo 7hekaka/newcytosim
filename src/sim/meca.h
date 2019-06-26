@@ -522,7 +522,7 @@ public:
     /// Calculate motion of all Mecables in the system
     void solve(SimulProp const*, int precondition);
     
-    // transfer newly calculated point coordinates back to Mecables
+    /// transfer newly calculated point coordinates back to Mecables
     void apply();
 
     /// calculate Forces on Mecables and Lagrange multipliers for Fiber, without thermal motion

@@ -620,17 +620,17 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
 void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
 {
     assert_true(nbt > DIM);
-    real const* E = X + nbt + DIM;  //index to last point
-    
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
     const real R6 = R1 * 6;
     
-    // this is where the bulk of the calculation takes place:
     const int end = nbt;
+    #pragma ivdep
     for ( int i = DIM*2; i < end; ++i )
         Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
     
+    // special cases near the edges:
+    real const* E = X + nbt + DIM;
     for ( int d = 0; d < DIM; ++d )
     {
         Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
