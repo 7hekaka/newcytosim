@@ -19,7 +19,6 @@ void help(std::ostream& os)
     os << "  *       print messages to terminal (and not `messages.cmo')\n";
     os << "  info    print build options\n";
     os << "  help    print this message\n";
-    os << "  -       suppress splash\n";
 }
 
 
@@ -69,12 +68,10 @@ int main(int argc, char* argv[])
     
     if ( arg.use_key("help") || arg.use_key("--help") )
     {
+        splash(std::cout);
         help(std::cout);
         return EXIT_SUCCESS;
     }
-    
-    if ( ! arg.use_key("-") )
-        splash(std::cout);
 
     if ( arg.use_key("info") || arg.use_key("--version")  )
     {
