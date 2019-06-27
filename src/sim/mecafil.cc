@@ -4,11 +4,10 @@
 #include "mecafil.h"
 #include "cblas.h"
 #include "clapack.h"
-#include "matrix.h"
+#include "matsym.h"
 #include "random.h"
 #include "fiber_prop.h" // needed for NEW_FIBER_LOOP
 //#include "vecprint.h"
-
 
 //------------------------------------------------------------------------------
 Mecafil::Mecafil()
@@ -237,102 +236,145 @@ void Mecafil::addProjectionDiff(const real*, real*) const {} //DIM == 1
 #if ( 0 )
 
 /**
- only the upper terms are set
+ Set rigidity terms with modulus 'R1' in lower part of `mat`,
+ for a filament with 'cnt' points (and thus with 'cnt/DIM-2' triplets).
  */
-void Mecafil::addRigidityMatrix(Matrix & mat, const int offset, const int dim) const
+template<typename MATRIX>
+void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R1, const int dim)
 {
-    const real R = rfRigidity;
-    for ( unsigned ii = 0; ii < nPoints - 2 ; ++ii )
+    const real R2 = R1 * 2;
+    const real R4 = R1 * 4;
+
+    const int end = dim * ( inx + cnt - 1 );
+    
+    for ( int i = dim*(inx+1); i < end; ++i )
     {
-        mat(offset+dim* ii   , offset+dim* ii   ) -= R;
-        mat(offset+dim* ii   , offset+dim*(ii+1)) += R * 2;
-        mat(offset+dim* ii   , offset+dim*(ii+2)) -= R;
-        mat(offset+dim*(ii+1), offset+dim*(ii+1)) -= R * 4;
-        mat(offset+dim*(ii+1), offset+dim*(ii+2)) += R * 2;
-        mat(offset+dim*(ii+2), offset+dim*(ii+2)) -= R;
+        mat(i-dim, i-dim) -= R1;
+        mat(i    , i-dim) += R2;
+        mat(i+dim, i-dim) -= R1;
+        mat(i    , i    ) -= R4;
+        mat(i+dim, i    ) += R2;
+        mat(i+dim, i+dim) -= R1;
     }
 }
 
 #else
 
 /**
- Set elements of matrix `mat` corresponding to the elastic terms of the Fiber.
- The dimension of the matrix must be `dim * this->nPoints`
- Only the upper diagonal terms corresponding to the first subspace are set
+ Set rigidity terms with modulus 'R1' in upper diagonal of `mat`,
+ for a filament with 'cnt' points (and thus with 'cnt-2' triplets).
  */
-void Mecafil::addRigidityMatrix(Matrix & mat, const int s, const int dim) const
+template<typename MATRIX>
+void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R1, const int dim)
 {
-    const real R = rfRigidity;
-    if ( nPoints < 3 ) return;
-    
-    const int e = s + dim * ( nPoints - 2 );
+    const real R2 = R1 * 2;
+    const real R4 = R1 * 4;
+    const real R5 = R1 * 5;
+    const real R6 = R1 * 6;
 
-    mat(s    , s      ) -= R;
-    mat(s    , s+dim  ) += R * 2;
-    mat(s    , s+dim*2) -= R;
-    
-    mat(e    , e+dim) += R * 2;
-    mat(e+dim, e+dim) -= R;
+    const int D = dim, T = dim*2, V = dim*3;
+    const int s = dim * inx;
+    const int e = s + dim * ( cnt - 2 );
 
-    if ( 3 < nPoints )
+    mat(s  , s  ) -= R1;
+    mat(s+D, s  ) += R2;
+    mat(s+T, s  ) -= R1;
+    
+    mat(e+D, e+D) -= R1;
+    mat(e+D, e  ) += R2;
+
+    if ( 3 < cnt )
     {
-        mat(s+dim, s+dim*2) += R * 4;
-        mat(s+dim, s+dim  ) -= R * 5;
-        mat(e    , e      ) -= R * 5;
-        mat(s+dim, s+dim*3) -= R;
+        mat(s+D, s+D) -= R5;
+        mat(s+T, s+D) += R4;
+        mat(s+V, s+D) -= R1;
+        mat(e  , e  ) -= R5;
     }
     else
     {
-        mat(s+dim, s+dim) -= R * 4;
+        mat(s+D, s+D) -= R4;
     }
     
-    for ( int n = s+dim*2; n < e ; n += dim )
+    for ( int n = s+T; n < e ; n += D )
     {
-        mat(n, n      ) -= R * 6;
-        mat(n, n+dim  ) += R * 4;
-        mat(n, n+dim*2) -= R;
+        mat(n,   n) -= R6;
+        mat(n+D, n) += R4;
+        mat(n+T, n) -= R1;
     }
 }
 
 #endif
 
+void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const int inx, int dim) const
+{
+    if ( nPoints > 2 )
+    {
+        add_rigidity_matrix(nPoints, mat, inx, rfRigidity, dim);
+#if ( 1 )
+        int N = nPoints;
+        MatrixSymmetric m(N);
+        add_rigidity_matrix(N, m, 0, 1.0, 1);
+        VecPrint::print(std::clog, N, N, m.data(), N, 0);
+#endif
+    }
+}
+
+
 /**
  Set elements of matrix `mat` corresponding to the elastic terms of the Fiber.
  The array `mat` must be square of dimension `dim * this->nPoints`
- Only the upper diagonal terms corresponding to the first subspace are set
+ Only terms above the diagonal and corresponding to the first subspace are set
  */
-void Mecafil::addRigidityUpper(real * mat) const
+void add_rigidity_upper(unsigned cnt, real* mat, unsigned ldd, const real R1)
 {
-    const real R = rfRigidity;
-    if ( nPoints < 3 ) return;
+    const real R2 = R1 * 2;
+    const real R4 = R1 * 4;
+    const real R5 = R1 * 5;
+    const real R6 = R1 * 6;
+
+    constexpr unsigned D = DIM, T = DIM*2, V = DIM*3;
+    const unsigned e = DIM * ( cnt - 2 );
+    const unsigned f = DIM * ( cnt - 1 );
     
-    const int ldd = DIM * nPoints;
-    const int e = DIM * ( nPoints - 2 );
+    mat[0      ] -= R1;
+    mat[  ldd*D] += R2;
+    mat[  ldd*T] -= R1;
     
-    mat[0                  ] -= R;
-    mat[      ldd*DIM    ] += R * 2;
-    mat[      ldd*DIM*2  ] -= R;
+    mat[e+ldd*f] += R2;
+    mat[f+ldd*f] -= R1;
     
-    mat[e    +ldd*(e+DIM)] += R * 2;
-    mat[e+DIM+ldd*(e+DIM)] -= R;
-    
-    if ( 3 < nPoints )
+    if ( 3 < cnt )
     {
-        mat[DIM+ldd*DIM*2  ] += R * 4;
-        mat[DIM+ldd*DIM    ] -= R * 5;
-        mat[e  +ldd*e      ] -= R * 5;
-        mat[DIM+ldd*(DIM*3)] -= R;
+        mat[D+ldd*D] -= R5;
+        mat[D+ldd*T] += R4;
+        mat[D+ldd*V] -= R1;
+        mat[e+ldd*e] -= R5;
     }
     else
     {
-        mat[DIM+ldd*DIM] -= R * 4;
+        mat[D+ldd*D] -= R4;
     }
     
-    for ( int n = DIM*2; n < e ; n += DIM )
+    for ( unsigned n = T; n < e; n += D )
     {
-        mat[n+ldd*(n      )] -= R * 6;
-        mat[n+ldd*(n+DIM  )] += R * 4;
-        mat[n+ldd*(n+DIM*2)] -= R;
+        mat[n+ldd* n   ] -= R6;
+        mat[n+ldd*(n+D)] += R4;
+        mat[n+ldd*(n+T)] -= R1;
+    }
+}
+
+
+void Mecafil::addRigidityUpper(real * mat, unsigned ldd) const
+{
+    if ( nPoints > 2 )
+    {
+        add_rigidity_upper(nPoints, mat, ldd, rfRigidity);
+#if ( 0 )
+        int N = DIM*nPoints;
+        MatrixSymmetric m(N);
+        add_rigidity_upper(nPoints, m.data(), ldd, 1.0);
+        VecPrint::print(std::clog, N, N, m.data(), N, 0);
+#endif
     }
 }
 
@@ -630,13 +672,15 @@ void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
         Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
     
     // special cases near the edges:
+    real      * Z = Y + nbt + DIM;
     real const* E = X + nbt + DIM;
+    #pragma ivdep
     for ( int d = 0; d < DIM; ++d )
     {
-        Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
-        Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
-        Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-        Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+        Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
+        Z[d-DIM] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
+        Z[d    ] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
     }
 }
 
@@ -644,14 +688,14 @@ void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
  Add rigidity terms between three points {A, B, C}
  Done with Serge DMITRIEFF, 2015
  */
-void add_rigidity(unsigned A, unsigned B, unsigned C, const real* X, const real rigid, real* Y)
+void add_rigidity(unsigned A, unsigned B, unsigned C, const real* X, const real R1, real* Y)
 {
     for ( unsigned d = 0; d < DIM; ++ d )
     {
-        real x = 2*X[B*DIM+d] - ( X[A*DIM+d] - X[C*DIM+d] );
-        Y[A*DIM+d] += x * rigid;
-        Y[B*DIM+d] -= x * (rigid+rigid);
-        Y[C*DIM+d] += x * rigid;
+        real x = 2*X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
+        Y[A*DIM+d] += x * R1;
+        Y[B*DIM+d] -= x * (R1+R1);
+        Y[C*DIM+d] += x * R1;
     }
 }
 
@@ -660,20 +704,20 @@ void add_rigidity(unsigned A, unsigned B, unsigned C, const real* X, const real 
 #define CHECK_RIGIDITY 0
 
 /**
- calculate the second-differential of points,
+ calculates the second-derivative of point's coordinates,
  scale by the rigidity term, and add to vector Y
 */
 void Mecafil::addRigidity(const real* X, real* Y) const
 {
+#if CHECK_RIGIDITY
+    // compare to default implementation:
+    real * tmp = new_real(DIM*nPoints);
+    copy_real(DIM*nPoints, Y, tmp);
+    add_rigidity0(nbt, X, rfRigidity, tmp);
+#endif
     if ( nPoints > 3 )
     {
-        unsigned nbt = DIM * ( nPoints - 2 );  // number of triplets
-#if CHECK_RIGIDITY
-        // compare to default implementation:
-        real * tmp = new_real(DIM*nPoints);
-        copy_real(DIM*nPoints, Y, tmp);
-        add_rigidity0(nbt, X, rfRigidity, tmp);
-#endif
+        unsigned nbt = DIM * ( nPoints - 2 );  // number of triplet values
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
         add_rigidityF(nbt, X, rfRigidity, Y);
@@ -681,17 +725,6 @@ void Mecafil::addRigidity(const real* X, real* Y) const
         add_rigidity_SSE(nbt, X, rfRigidity, Y);
 #else
         add_rigidityF(nbt, X, rfRigidity, Y);
-#endif
-        
-#if CHECK_RIGIDITY
-        static int cnt = 0;
-        real err = blas::max_diff(DIM*nPoints, tmp, Y);
-        if ( err > 1.0e-6 || ++cnt > 1<<14 )
-        {
-            cnt = 0;
-            printf("addRigidity(%u) error %e\n", nPoints, err);
-        }
-        free_real(tmp);
 #endif
     
 #if NEW_FIBER_LOOP
@@ -712,5 +745,16 @@ void Mecafil::addRigidity(const real* X, real* Y) const
     {
         add_rigidity(0, 1, 2, X, rfRigidity, Y);
     }
+    
+#if CHECK_RIGIDITY
+    static int cnt = 0;
+    real err = blas::max_diff(DIM*nPoints, tmp, Y);
+    if ( err > 1.0e-6 || ++cnt > 1<<14 )
+    {
+        cnt = 0;
+        printf("addRigidity(%u) error %e\n", nPoints, err);
+    }
+    free_real(tmp);
+#endif
 }
 

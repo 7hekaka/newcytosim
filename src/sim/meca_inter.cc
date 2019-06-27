@@ -39,8 +39,8 @@ void drawLink(Vector const& a, Vector const& ab, Vector c)
 
 
 /// true if any two values are equal
-bool any_equal(const Meca::index_t a, const Meca::index_t b,
-               const Meca::index_t c)
+bool any_equal(const index_t a, const index_t b,
+               const index_t c)
 {
     //if ( a == b ) return true;
     if ( a == c ) return true;
@@ -50,8 +50,8 @@ bool any_equal(const Meca::index_t a, const Meca::index_t b,
 
 
 /// true if any two values are equal
-bool any_equal(const Meca::index_t a, const Meca::index_t b,
-               const Meca::index_t c, const Meca::index_t d)
+bool any_equal(const index_t a, const index_t b,
+               const index_t c, const index_t d)
 {
     //if ( a == b ) return true;
     if ( a == c ) return true;

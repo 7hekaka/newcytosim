@@ -795,7 +795,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj,
 
 #if MATRIX1_USES_SSE
 
-inline void multiply2(const real* X, real* Y, MatrixSparseSymmetric1::index_t ii,
+inline void multiply2(const real* X, real* Y, index_t ii,
                       real* val, vec2 const& xx, vec2& ss)
 {
     vec2 aa = loaddup2(val);
@@ -945,7 +945,7 @@ Accumulation is done here in the higher part of 'ss'
 The high position of 'xx' is not used
 The low position of 'ss' is used locally
 */
-inline void multiply4(const real* X, real* Y, MatrixSparseSymmetric1::index_t ii,
+inline void multiply4(const real* X, real* Y, index_t ii,
                       real* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend4(xx, broadcast2(X+ii), 0b1100);  // hi <- X , lo <- xx

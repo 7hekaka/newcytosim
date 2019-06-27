@@ -3,6 +3,7 @@
 #ifndef MATSPARSESYMBLK_H
 #define MATSPARSESYMBLK_H
 
+#include "matrix.h"
 #include <cstdio>
 #include "assert_macro.h"
 
@@ -50,11 +51,6 @@ class Element;
  */
 class MatrixSparseSymmetricBlock
 {
-public:
-    
-    /// type of an index into the matrix (4 bytes)
-    typedef unsigned index_t;
-
 private:
     
     /// size of matrix

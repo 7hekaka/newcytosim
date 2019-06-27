@@ -18,7 +18,7 @@
 const real scalar = 2.0;
 
 /// number of segments:
-const size_t NBS = 1231;
+const size_t NBS = 331;
 const size_t NBR = DIM * ( NBS + 1 );
 const size_t ALOC = NBR + 8;
 
@@ -409,13 +409,15 @@ void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
         Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
     
     // special cases near the edges:
+    real      * Z = Y + nbt + DIM;
     real const* E = X + nbt + DIM;
+    #pragma ivdep
     for ( int d = 0; d < DIM; ++d )
     {
-        Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
-        Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
-        Y[    d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-        Y[nbt+d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+        Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
+        Z[d-DIM] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
+        Z[d    ] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
     }
 }
 
@@ -427,11 +429,11 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
     
     unsigned nbt = DIM * ( NBS - 1 );
     TicToc::tic();
-    for ( unsigned int ii=0; ii<cnt; ++ii )
+    for ( unsigned int i=0; i<cnt; ++i )
     {
         func(nbt, y, scalar, x);
         func(nbt, x, scalar, z);
-        func(nbt, z, scalar, x);
+        func(nbt, z, scalar, y);
     }
     TicToc::toc(str, nullptr);
     zero_real(ALOC, x);
@@ -457,6 +459,7 @@ void testRigidity(unsigned cnt)
     testRigidity(cnt, add_rigidity3,    "3  ");
     testRigidity(cnt, add_rigidityE,    "E  ");
     testRigidity(cnt, add_rigidityF,    "F  ");
+    testRigidity(cnt, add_rigidityE,    "E  ");
 #if defined __SSE__ & ( DIM == 2 )
     testRigidity(cnt, add_rigidity_SSO, "SSO");
     testRigidity(cnt, add_rigidity_SSE, "SSE");

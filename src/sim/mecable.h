@@ -11,6 +11,8 @@
 #include "sim.h"
 
 class Meca;
+class MatrixSparseSymmetric1;
+
 
 /// Can be simulated using a Meca.
 /**
@@ -66,7 +68,7 @@ private:
     int         pBlockUse;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    Matrix::index_t pIndex;
+    index_t     pIndex;
 
     /// Clear pointers
     void        clearMecable();
@@ -265,13 +267,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// Store the index where coordinates are located in Meca
-    void            matIndex(Matrix::index_t inx) { pIndex = inx; }
+    void            matIndex(index_t inx) { pIndex = inx; }
     
     /// Index in mB of the first point. the index in the vectors is DIM*matIndex()
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */
-    Matrix::index_t matIndex()           const { return pIndex; }
+    index_t         matIndex()           const { return pIndex; }
     
     /// Allocates pBlock[] to hold a `N x N` full matrix, where N = DIM * nbPoints()
     void            allocateBlock();
@@ -321,7 +323,7 @@ public:
      It should fill at maximum the upper part of the diagonal block corresponding to indices [offset, offset+dim*nbPoints()].
      It should be consistent with addRigidity(), adding exactly the same terms.
      */
-    virtual void    addRigidityMatrix(Matrix &, int offset, int dim) const {}
+    virtual void    addRigidityMatrix(MatrixSparseSymmetric1&, int inx, int dim) const {}
 
     /// Fill upper diagonal of `mat` with matrix elements
     /**
@@ -330,7 +332,7 @@ public:
      This version is used to build the preconditionner in Meca.
      It should be consistent with addRigidity(), adding exactly the same terms.
      */
-    virtual void    addRigidityUpper(real * mat) const {}
+    virtual void    addRigidityUpper(real * mat, unsigned ldd) const {}
 
     /// Calculate speeds for given forces
     /**

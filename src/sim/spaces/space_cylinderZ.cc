@@ -177,7 +177,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
     
     if ( cap )
     {
-        const Matrix::index_t inx = 2 + DIM * pe.matIndex();
+        const index_t inx = 2 + DIM * pe.matIndex();
         meca.mC(inx, inx) -= stiff;
         meca.base(inx)    += stiff * zzz;
     }

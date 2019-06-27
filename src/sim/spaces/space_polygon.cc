@@ -181,7 +181,7 @@ Vector SpacePolygon::project(Vector const& w) const
 void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {    
 #if ( DIM > 1 )
-    Matrix::index_t inx = DIM * pe.matIndex();
+    index_t inx = DIM * pe.matIndex();
     
     int hit;
     real pX, pY;

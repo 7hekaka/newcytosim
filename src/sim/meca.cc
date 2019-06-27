@@ -530,9 +530,9 @@ void duplicate_matrix(unsigned siz, real const* src, real * dst)
     
 #if ( 0 )
     std::clog << "\nOriginal:\n";
-    VecPrint::print(std::clog, siz, siz, src);
+    VecPrint::print(std::clog, siz, siz, src, siz);
     std::clog << "Duplicated:\n";
-    VecPrint::print(std::clog, ddd, ddd, dst);
+    VecPrint::print(std::clog, ddd, ddd, dst, ddd);
 #endif
 }
 
@@ -587,7 +587,7 @@ void truncate_matrix(unsigned siz, real* mat, unsigned diag)
 {
 #if ( 0 )
     std::clog << "\nOriginal:\n";
-    VecPrint::print(std::clog, siz, siz, mat);
+    VecPrint::print(std::clog, siz, siz, mat, siz);
 #endif
     
     for ( unsigned ii = 0; ii < siz; ++ii )
@@ -602,7 +602,7 @@ void truncate_matrix(unsigned siz, real* mat, unsigned diag)
     
 #if ( 0 )
     std::clog << "Truncated:\n";
-    VecPrint::print(std::clog, siz, siz, mat);
+    VecPrint::print(std::clog, siz, siz, mat, siz);
 #endif
 }
 
@@ -830,9 +830,9 @@ void Meca::extractBlock(real* res, const Mecable * mec) const
     
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
     // set the Rigidity terms:
-    mec->addRigidityUpper(res);
+    mec->addRigidityUpper(res, bs);
     //std::clog<<"Rigidity block " << mec->reference() << "\n";
-    //VecPrint::print(std::clog, bs, bs, tmp, bs);
+    //VecPrint::print(std::clog, bs, bs, res, bs, 0);
 #endif
     
     mB.addTriangularBlock(res, bs, mec->matIndex(), ps, DIM);

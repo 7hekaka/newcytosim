@@ -5,6 +5,7 @@
 
 #include "vector.h"
 #include "mecable.h"
+#include "matrix.h"
 
 /// Indicates one Vertex of a Mecable
 /**
@@ -35,34 +36,34 @@ public:
     void   set(const Mecable * m, unsigned p) { mec_ = m; pti_ = p; }
     
     /// Constant pointer to the Mecable 
-    Mecable const*      mecable()       const { return mec_; }
+    Mecable const* mecable()       const { return mec_; }
     
     /// true if the pointer seems to be valid.
-    bool                valid()         const { return mec_ == nullptr || pti_ < mec_->nbPoints(); }
+    bool           valid()         const { return mec_ == nullptr || pti_ < mec_->nbPoints(); }
     
     /// Index of point in object
-    unsigned int        point()         const { return pti_; }
+    unsigned int   point()         const { return pti_; }
         
     /// Position of the point-of-interest in space
-    Vector              pos()           const { return mec_->posPoint(pti_); }
+    Vector         pos()           const { return mec_->posPoint(pti_); }
     
     /// Index of the point-of-interest in the big matrix
-    Matrix::index_t  matIndex()         const { return mec_->matIndex() + pti_; }
+    index_t        matIndex()      const { return mec_->matIndex() + pti_; }
     
     /// Write to file
-    void                write(Outputter&) const;
+    void           write(Outputter&) const;
     
     /// Read from file
-    void                read(Inputter&, Simul&);
+    void           read(Inputter&, Simul&);
     
     /// test if `this` shares one point with the argument
-    bool                overlapping(const Mecapoint &) const;
+    bool           overlapping(const Mecapoint &) const;
 
     /// test if `this` is one point away from the argument
-    bool                near(const Mecapoint &) const;
+    bool           near(const Mecapoint &) const;
 
     /// Human friendly ouput
-    void                print(std::ostream&) const;
+    void           print(std::ostream&) const;
 };
 
 /// output operator for debugging purpose

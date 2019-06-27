@@ -66,10 +66,10 @@ public:
     }
     
     /// Index of point 1 in the matrix of dynamics (Meca)
-    Matrix::index_t matIndex1() const { return mec_->matIndex() + pt1_; }
+    index_t         matIndex1() const { return mec_->matIndex() + pt1_; }
     
     /// Index of point 2 in the matrix of dynamics (Meca)
-    Matrix::index_t matIndex2() const { return mec_->matIndex() + pt2_; }
+    index_t         matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.
     bool            valid()    const { return mec_ == nullptr || ( pt1_ < mec_->nbPoints() && pt2_ < mec_->nbPoints() ); }

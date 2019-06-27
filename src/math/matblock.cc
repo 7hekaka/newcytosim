@@ -96,7 +96,7 @@ void MatrixOfBlocks::setBlockSize( const unsigned int bb, unsigned int sz )
 }
 
 //------------------------------------------------------------------------------
-MatrixOfBlocks::index_t MatrixOfBlocks::calculateSize()
+index_t MatrixOfBlocks::calculateSize()
 {
     size_ = 0;
     for ( unsigned int ii = 0; ii < block_cnt; ++ii )

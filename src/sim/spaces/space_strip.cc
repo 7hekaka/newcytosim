@@ -127,7 +127,7 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    Matrix::index_t inx = DIM-1 + DIM * pe.matIndex();
+    index_t inx = DIM-1 + DIM * pe.matIndex();
     
     meca.mC(inx, inx) -= stiff;
 
@@ -141,7 +141,7 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & m
 
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    Matrix::index_t inx = DIM-1 + DIM * pe.matIndex();
+    index_t inx = DIM-1 + DIM * pe.matIndex();
     
     meca.mC(inx, inx) -= stiff;
 

@@ -118,7 +118,7 @@ Vector SpaceLid::project(Vector const& pos) const
 void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
                               Meca & meca, real stiff) const
 {
-    Matrix::index_t inx = DIM-1 + DIM * pe.matIndex();
+    index_t inx = DIM-1 + DIM * pe.matIndex();
     
     meca.mC(inx, inx) -= stiff;
     meca.base(inx)    += stiff * top_;
@@ -134,7 +134,7 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
 void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
                               Meca & meca, real stiff) const
 {
-    Matrix::index_t inx = DIM-1 + DIM * pe.matIndex();
+    index_t inx = DIM-1 + DIM * pe.matIndex();
     
     meca.mC(inx, inx) -= stiff;
     meca.base(inx)    += stiff * ( top_ - rad );

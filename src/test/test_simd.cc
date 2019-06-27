@@ -14,12 +14,6 @@
 #include "simd.h"
 
 
-inline double sum(vec2 const& v)
-{
-    double * s = (double*)(&v);
-    return s[0] + s[1];
-}
-
 typedef double real;
 
 const unsigned SIZE = 1<<14;
@@ -61,16 +55,10 @@ real vector2()
         s = add2(s, mul2( load2(x+ii), load2(y+ii) ));
     _mm_empty();
     
-    return sum(s);
+    return esum(s)[0];
 }
 
 #ifdef __AVX__
-
-inline double sum(vec4 const& v)
-{
-    double * s = (double*)(&v);
-    return s[0] + s[1] + s[2] + s[3];
-}
 
 real vector4()
 {
@@ -79,7 +67,7 @@ real vector4()
         s = add4(s, mul4( load4(x+ii), load4(y+ii) ));
     _mm_empty();
     
-    return sum(s);
+    return esum(s)[0];
 }
 
 
@@ -101,7 +89,7 @@ real vectorU()
     vec4 s = add4(add4(v0, v1), add4(v2, v3));
     _mm_empty();
     
-    return sum(s);
+    return esum(s)[0];
 }
 
 #endif
@@ -209,13 +197,11 @@ void test_cat()
     vec2 x{3.0, 4.0};
     
     print(cat4(x, y), "cat4(x, y)");
-    print(cat7(x, y), "cat7(x, y)");
     
     x = set2(1.0, 2.0);
     y = set2(3.0, 4.0);
     
     print(cat4(x, y), "cat4(x, y)");
-    print(cat7(x, y), "cat7(x, y)");
 }
 
 void test_load()
@@ -607,7 +593,6 @@ int main(int argc, char * argv[])
         test_swap7();
     }
 #endif
-    return 0;
     if ( 1 )
     {
         init();

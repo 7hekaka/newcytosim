@@ -63,13 +63,19 @@ namespace VecPrint
         else
         {
             const T threshold = pow(0.1, digits);
-            char str[32] = { 0 };
-            char fmt[32] = " %4.0f";
-            char zer[32] = "    .";
-            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
-            snprintf(zer, sizeof(zer), fmt, 0.0);
-            for ( size_t d = 0; d < sizeof(zer); ++d )
-                if ( zer[d] == '0' ) zer[d] = ' ';
+            char str[32] = { 0 }, zer[32] = { 0 }, fmt[32] = " %4.0f";
+            
+            { // build format strings:
+                snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+                snprintf(zer, sizeof(zer), fmt, 0.0);
+                bool dot = false; char * d = zer;
+                for ( char * c = zer; *c; ++c )
+                {
+                    if ( *c == '0' ) { *c = ' '; d = c; }
+                    dot |= ( *c == '.' );
+                }
+                if ( !dot ) *d = '.';
+            }
             
             for ( size_t ii = 0; ii < m; ++ii )
             {
@@ -143,7 +149,7 @@ namespace VecPrint
             os << " void";
         else
         {
-            char str[] = ".:+*hTM";
+            char str[] = ".:+*hTM$";
             
             const T threshold = 0.01 * scale;
             for ( size_t ii = 0; ii < m; ++ii )
@@ -158,11 +164,8 @@ namespace VecPrint
                         os << ' ';
                     else
                     {
-                        int x = 2 + log10( fabs(val) / scale );
-                        if ( x < 7 )
-                            os << str[x];
-                        else
-                            os << 'M';
+                        int x = std::max(7, 2 + log10( fabs(val) / scale ));
+                        os << str[x];
                     }
                 }
                 os << "|\n";

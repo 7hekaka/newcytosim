@@ -172,10 +172,10 @@ public:
     void        addRigidity(const real* X, real* Y) const;
     
     /// add rigidity terms to a symmetric matrix
-    void        addRigidityMatrix(Matrix &, int offset, int dim) const;
+    void        addRigidityMatrix(MatrixSparseSymmetric1&, int inx, int dim) const;
     
     /// add rigidity terms to upper side of matrix
-    void        addRigidityUpper(real*) const;
+    void        addRigidityUpper(real*, unsigned) const;
 
 };
 

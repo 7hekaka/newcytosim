@@ -4,6 +4,7 @@
 #define MATSPARSESYM2_H
 
 #include "real.h"
+#include "matrix.h"
 #include <cstdio>
 #include <string>
 
@@ -20,9 +21,6 @@
 class MatrixSparseSymmetric2
 {
 public:
-    
-    /// type of an index into the matrix (4 bytes)
-    typedef unsigned index_t;
     
     /// An element of the sparse matrix
     struct Element

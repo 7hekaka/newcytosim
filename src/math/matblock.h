@@ -4,6 +4,7 @@
 #define MATBLOCK_H
 
 #include "real.h"
+#include "matrix.h"
 #include "assert_macro.h"
 #include <cstdio>
 #include <string>
@@ -14,11 +15,6 @@
  */
 class MatrixOfBlocks
 {    
-public:
-    
-    /// type of an index into the matrix (4 bytes)
-    typedef unsigned index_t;
-    
 private:
     
     /// size of matrix

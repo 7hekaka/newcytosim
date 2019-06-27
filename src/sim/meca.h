@@ -6,7 +6,7 @@
 #include "dim.h"
 #include "array.h"
 #include "vector.h"
-#include "matsym.h"
+#include "matrix.h"
 #include "matsparse.h"
 #include "matsparsesym1.h"
 #include "matsparsesymblk.h"
@@ -109,9 +109,6 @@ The equation is formulated using linear-algebra:
 class Meca
 {
 public:
-
-    /// type of an index into the matrix
-    typedef unsigned index_t;
 
     /// enables graphical display of all interactions
     bool             drawLinks;

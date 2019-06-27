@@ -54,18 +54,23 @@ void Fiber::step()
     }
 #endif
     
+    //assert_false(hasKink(0));
 #if ( 0 )
-    /**
-     Cut the filaments at first position where two segments
-     make an acute angle above PI/2
-     */
-    PRINT_ONCE("NEW_DELETE_KINKED_FIBERS\n");
+    // Cut kinked filaments
     unsigned p = hasKink(0);
     if ( p )
     {
+        PRINT_ONCE("SEVER_KINKED_FIBERS\n");
+        objset()->add(severPoint(p));
+    }
+#endif
+#if ( 0 )
+    // Delete kinked filaments
+    if ( hasKink(0) )
+    {
+        PRINT_ONCE("DELETE_KINKED_FIBERS\n");
         delete(this);
         return;
-        objset()->add(severPoint(p));
     }
 #endif
 
@@ -500,17 +505,13 @@ void Fiber::severNow()
 
 
 /**
- Cut the fiber if the angle made by consecutive segments is acute ( cosine < max_cosine ).
- The Fiber may be severed multiple times, at every vertices where there
- is a kink. Fiber parts are added to the FiberSet to which the current Fiber belongs.
+ returns index of first point for which ( cos(angle) < max_cosine ),
+ or zero
  */
 unsigned Fiber::hasKink(const real max_cosine) const
 {
-    /*
-     We must consider points in reverse order,
-     because severPoint() removes the distal part of the fiber
-    */
-    for ( unsigned p = 0; p+2 < nPoints; ++p )
+    unsigned end = nPoints - 2;
+    for ( unsigned p = 0; p < end; ++p )
     {
         if ( dot(diffPoints(p), diffPoints(p+1)) < max_cosine )
             return p+1;

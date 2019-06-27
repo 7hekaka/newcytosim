@@ -118,14 +118,14 @@ public:
     }
     
     /// add a clamp between point at index 'ii' to position 'dx'
-    void addClamp(Matrix::index_t ii, real w, real dx)
+    void addClamp(index_t ii, real w, real dx)
     {
         mB(ii, ii) -= w;
         vBAS[ii]   += w * dx;
     }
     
     /// add a link between points 'ii' and 'jj' with a position shift 'dx'
-    void addLink(Matrix::index_t ii, Matrix::index_t jj, real w, real dx)
+    void addLink(index_t ii, index_t jj, real w, real dx)
     {
         mB(ii, ii) -= w;
         mB(ii, jj) += w;

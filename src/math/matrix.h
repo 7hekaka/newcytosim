@@ -7,13 +7,15 @@
 #include <iostream>
 #include "real.h"
 
+
+/// type of an index into a matrix (unsigned)
+typedef unsigned index_t;
+
+
 /// The interface for all the large matrices
 class Matrix
 {
 public:
-    
-    /// type of an index into the matrix (4 bytes)
-    typedef unsigned index_t;
     
 protected:
 

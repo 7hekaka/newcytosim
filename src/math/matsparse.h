@@ -4,6 +4,7 @@
 #define MATSPARSE_H
 
 #include "real.h"
+#include "matrix.h"
 #include <cstdio>
 #include <string>
 
@@ -13,11 +14,6 @@
  */
 class MatrixSparse
 {
-public:
-    
-    /// type of an index into the matrix (4 bytes)
-    typedef unsigned index_t;
-    
 private:
     
     /// size of matrix

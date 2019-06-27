@@ -4,21 +4,17 @@
 #define MATSYM_H
 
 #include "real.h"
+#include "matrix.h"
 #include <cstdio>
 #include <string>
 
 /// A real symmetric Matrix
 /**
-the full upper triangular is stored
+the full lower triangular is stored
  (not used in Cytosim)
  */
 class MatrixSymmetric
 {
-public:
-    
-    /// type of an index into the matrix (4 bytes)
-    typedef unsigned index_t;
-    
 private:
     
     /// leading dimension of array
@@ -34,7 +30,7 @@ private:
     real* val;
     
     // if 'false', destructor will not call delete[] val;
-    int in_charge;
+    bool in_charge;
     
 public:
     
@@ -52,12 +48,13 @@ public:
     
     
     /// constructor from an existing array
-    MatrixSymmetric(int s, real* array)
+    MatrixSymmetric(int s)
     {
         resize(s);
         msLDD = s;
-        val = array;
-        in_charge = 0;
+        val = new_real(s*s);
+        zero_real(s*s, val);
+        in_charge = true;
     }
 
     /// constructor from an existing array
@@ -66,7 +63,7 @@ public:
         resize(s);
         msLDD = ldd;
         val = array;
-        in_charge = 0;
+        in_charge = false;
     }
     
     /// default destructor
@@ -78,6 +75,9 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
     
+    /// returns address of data array
+    real* data() const { return val; }
+
     /// returns the address of element at (x, y), no allocation is done
     real* addr(index_t x, index_t y) const;
     

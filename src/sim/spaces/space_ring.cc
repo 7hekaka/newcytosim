@@ -130,7 +130,7 @@ Vector SpaceRing::project(Vector const& w) const
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff, const real len, const real rad)
 {
-    const Matrix::index_t inx = DIM * pe.matIndex();
+    const index_t inx = DIM * pe.matIndex();
 
     if ( pos.XX > len )
     {

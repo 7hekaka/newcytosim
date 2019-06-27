@@ -101,7 +101,7 @@ protected:
     /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
     virtual Fiber* severPoint(unsigned int pti);
     
-    /// return index of point where consecutive segments make a kink
+    /// return index of point where there is a kink
     unsigned       hasKink(real) const;
 
     

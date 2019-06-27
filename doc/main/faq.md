@@ -1013,20 +1013,19 @@ This is a more work but it will guarantee that your code does not break someone`
 
 <details>
 <summary>
-**I found a function whose name is severKinkedFibers in the Fiber class.
+**I found a function whose name is hasKinks() in the Fiber class.
 Can I use this function in my simulation?**
 </summary>
 The function was not called, and this is not a feature that can be access from the config.
-
-To call the function in Fiber::step() and it will break if the angle is sharp, you need to change a 0 into 1 in:
+You could for example cut filaments at the positions where they make a sharp angle like this:
 	
 	void Fiber::step()
 	{
-	#if ( 0 )
-	    assert_true(linked());
-	    // sever fiber at joints that make an angle above 90 degrees:
-	    severKinks();
-	#endif
+        #if ( 0 )
+            unsigned p = hasKink(0);
+            if ( p )
+                objset()->add(severPoint(p));
+        #endif
 	...
 	}
    
@@ -1037,7 +1036,7 @@ To call the function in Fiber::step() and it will break if the angle is sharp, y
 <summary>
 **Can I make fibers severed when they are locally stretched with the tensile stress above a critical one?**
 </summary>
-There is not equivalent function for the `severKinks()` above, but that is feasible, using 
+That is feasible, using 
 
 	real RigidFiber::tension(unsigned p) const 
 

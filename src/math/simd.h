@@ -84,6 +84,12 @@ inline vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 #define blendv2(a,b,c)    _mm_blendv_pd(a,b,c)
 #define cmp2(a,b,c)       _mm_cmp_pd(a,b,c)
 
+/// returns the sum of the elements, broadcasted
+inline vec2 esum(vec2 v)
+{
+    return add2(v, shuffle2(v, v, 0b01));
+}
+
 /// returns the dot product of two vectors, broadcasted
 inline vec2 dot2(vec2 a, vec2 b)
 {
@@ -233,6 +239,13 @@ inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
 #define blendv4(a,b,mask)   _mm256_blendv_pd(a,b,mask)
 #define cmp4(a,b,c)         _mm256_cmp_pd(a,b,c)
 
+
+/// returns the sum of the elements, broadcasted
+inline vec4 esum(vec4 v)
+{
+    vec4 s = add4(v, permute2f128(v, v, 0x01));
+    return add4(s, permute4(s, 0b0101));
+}
 
 /// returns the dot product of two vectors, broadcasted
 inline vec4 dot4(vec4 a, vec4 b)

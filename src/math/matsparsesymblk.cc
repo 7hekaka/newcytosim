@@ -464,7 +464,7 @@ public:
     SquareBlock blk;
     
     /// index
-    MatrixSparseSymmetricBlock::index_t inx;
+    index_t inx;
 };
 
 

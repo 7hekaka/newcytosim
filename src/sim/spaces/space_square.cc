@@ -187,7 +187,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
 {
     bool in = true;
     
-    Matrix::index_t inx = DIM * pe.matIndex();
+    index_t inx = DIM * pe.matIndex();
     
     for ( int d = 0; d < DIM; ++d )
     {
