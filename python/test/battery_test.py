@@ -88,7 +88,6 @@ def main(args):
         for f in files:
             run_live(f, executable)
     else:
-        executable.append('-')
         for f in files:
             run(f, executable)
 

@@ -874,9 +874,15 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
  */
 void Filament::setPoints(real const* ptr)
 {
+#if 0
     // use here thread-local static memory
     thread_local static size_t alc = 0;
     thread_local static std::unique_ptr<real> uptr(nullptr);
+#else
+    // use here thread-local static memory
+    static size_t alc = 0;
+    static std::unique_ptr<real> uptr(nullptr);
+#endif
     
     if ( alc < allocated() )
     {

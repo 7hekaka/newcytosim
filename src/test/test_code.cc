@@ -451,7 +451,7 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
 
 void testRigidity(unsigned cnt)
 {
-    std::cout << "addRigidity " << NBS << "\n";
+    std::cout << "addRigidity " << DIM << "D " << NBS << "\n";
     testRigidity(cnt, add_rigidity0,    "0  ");
 #if ( DIM == 2 )
     testRigidity(cnt, add_rigidity2,    "2  ");
