@@ -6,7 +6,6 @@
 #include "clapack.h"
 #include "matsym.h"
 #include "random.h"
-#include "fiber_prop.h" // needed for NEW_FIBER_LOOP
 //#include "vecprint.h"
 
 //------------------------------------------------------------------------------

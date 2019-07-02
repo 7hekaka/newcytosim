@@ -1543,9 +1543,21 @@ void Meca::solve(SimulProp const* prop, const int precond)
 
     //fprintf(stderr, "Solve precond %i size %6i\n", precond, dimension());
 
-    // GMRES generally performs best:
+    /*
+     GMRES generally converges faster than BCGGS, but requires more memory
+     hence for a very large system, biCGGS may be advantageous.
+     */
+#if ( 1 )
+    if ( precond )
+        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+    else
+        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
+#else
+    //size_t mem = dimension() * (64+2) * sizeof(real);
+    //std::clog << "GMRES mem " << (mem >> 20) << "MB\n";
     LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
-
+#endif
+    
     //std::clog << "Solve size " << dimension() << "  precondition " << precond << "  " << residual << "\n";
     //fprintf(stderr, "    GMRES     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #if ( 0 )
@@ -1789,9 +1801,11 @@ void Meca::dumpElasticity(FILE * file) const
 #if ADD_PROJECTION_DIFF
         for ( Mecable const* mec : objs )
         {
-            const index_t inx = DIM * mec->matIndex();
             if ( mec->hasProjectionDiff() )
+            {
+                const index_t inx = DIM * mec->matIndex();
                 mec->addProjectionDiff(src+inx, res+inx);
+            }
         }
 #endif
         
@@ -1898,7 +1912,7 @@ void Meca::dumpDrag(FILE * file) const
 /**
  This dump the total matrix and some vectors in binary files.
  
- This matlab code should read the output:
+ This MATLAB code should read the output:
  
      ord = load('ord.txt');
      time_step = load('stp.txt');

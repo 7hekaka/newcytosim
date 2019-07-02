@@ -9,10 +9,7 @@
 #include "random.h"
 #include "vecprint.h"
 #include "cblas.h"
-#include "iacaMarks.h"
-
 #include "simd.h"
-//#include "iacaMarks.h"
 
 
 const real scalar = 2.0;

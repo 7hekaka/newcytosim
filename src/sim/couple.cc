@@ -247,12 +247,9 @@ bool Couple::allowAttachment(FiberSite const& sit)
     if ( !that )
         return true;
     
-    if ( prop->stiff )
-    {
-        if ( that->fiber() == sit.fiber()
-            && fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
+    if ( prop->stiff && that->fiber() == sit.fiber() &&
+        fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
         return false;
-    }
     
     /*
      Allow or disallow binding based on the angle made between the two Fibers.

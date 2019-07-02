@@ -181,7 +181,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// check that fbAbs is within Fiber::abscissaM() and Fiber::abscissaP()
-    void         checkAbscissa() const;
+    int          checkAbscissa() const;
     
     /// check validity of the interpolation (debuging purposes)
     int          bad() const;
