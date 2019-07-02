@@ -309,7 +309,7 @@ void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const int inx, int 
     if ( nPoints > 2 )
     {
         add_rigidity_matrix(nPoints, mat, inx, rfRigidity, dim);
-#if ( 1 )
+#if ( 0 )
         int N = nPoints;
         MatrixSymmetric m(N);
         add_rigidity_matrix(N, m, 0, 1.0, 1);
