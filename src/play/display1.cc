@@ -300,7 +300,7 @@ void Display1::drawSphereT(Sphere const& obj)
 //------------------------------------------------------------------------------
 void Display1::drawOrganizer(Organizer const& obj) const
 {
-    const PointDisp * disp = obj.disp();
+    PointDisp const* disp = obj.disp();
     
     if ( !disp )
         return;
@@ -420,7 +420,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
 }
 
 
-PointDisp * Couple::disp12() const
+PointDisp const* Couple::disp12() const
 {
     if ( disp1()->visible )
         return disp1();
@@ -429,7 +429,7 @@ PointDisp * Couple::disp12() const
 }
 
 
-PointDisp * Couple::disp21() const
+PointDisp const* Couple::disp21() const
 {
     if ( disp2()->visible )
         return disp2();

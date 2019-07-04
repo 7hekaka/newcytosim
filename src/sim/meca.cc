@@ -34,7 +34,7 @@
  Add correction term to the constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
 */
-#define ADD_PROJECTION_DIFF 1
+#define ADD_PROJECTION_DIFF 0
 
 
 /**

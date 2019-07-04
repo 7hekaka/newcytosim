@@ -879,7 +879,7 @@ void Display3::drawSphereT(Sphere const& obj)
 
 void Display3::drawOrganizer(Organizer const& obj) const
 {
-    const PointDisp * disp = obj.disp();
+    PointDisp const* disp = obj.disp();
     
     if ( !disp )
         return;
