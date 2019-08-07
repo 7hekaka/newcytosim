@@ -1238,6 +1238,35 @@ You simply need to add a test in there for the length. The quick and dirty way i
 </details>
 
 
+<details>
+<summary>
+**Adding fluid: I’ve been told that this is an extremely difficult task and should not be attempted unless one is absolutely sure of its necessity?**
+</summary>
+I tend to agree with this. You could add hydrodynamic interactions using Oseen's tensors, and that would involve adding another matrix into the master equation. That is very serious work and will require a good knowledge of the topic, and of the inner working of Cytosim. Ultimately, performance will be significantly reduced (because everything interacts with everything else), such that you may be limited to small systems, or be obliged to spend effort on the parallelization/hardware side. I would be happy if someone did this, but it is a major endeavor!
+</details>
+
+
+<details>
+<summary>
+**Local conversion of Single motors to linked motor Couples**
+</summary>
+**I would like the ability to define a region (say a rectangle centered on the cell) such that any two single motors that moved into this region has some probability of following a dimer, given they are within close proximity of one another?**
+
+That is doable in a few weeks. You could start with a naive method to detect which objects are within this rectangle, delete pairs of ’Single’ and create a corresponding number of ‘Couple’ with appropriate positions and properties to compensate for the ones that have been deleted. For you first attempt, do not worry about performance, and just implement a exhaustive scan: 
+
+	( for all A ) x ( for all B ) : if ( A close to B )  …
+
+However, before you do this, I would still advise to think hard wether you really need this in your model. There maybe a simpler solution!
+</details>
+
+
+<details>
+<summary>
+** ?**
+</summary>
+</details>
+
+
 # More questions? #########################################
 
 <details>
