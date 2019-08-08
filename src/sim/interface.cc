@@ -824,7 +824,7 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
         simul.events.erase(event);
 #endif
     simul.relax();
-    VLOG("+RUN COMPLETED\n");
+    VLOG("+RUN END\n");
 }
 
 
@@ -845,7 +845,7 @@ void Interface::execute_run(unsigned nb_steps)
     }
     
     simul.relax();
-    VLOG("-RUN COMPLETED\n");
+    VLOG("-RUN END\n");
 }
 
 

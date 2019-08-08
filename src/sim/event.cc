@@ -25,6 +25,8 @@ Event::Event(real time, Glossary& opt)
     if (!opt.set(code, "code")) code = "";
     if (!opt.set(rate, "rate")) rate = 0;
     if (!opt.set(recurrent, "recurrent")) recurrent = 0;
+    if ( rate < 0 )
+        throw InvalidParameter("event:rate must be >= 0");
     reset(time);
 }
 

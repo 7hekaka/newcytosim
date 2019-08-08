@@ -3,9 +3,6 @@
 #ifndef FILAMENT_H
 #define FILAMENT_H
 
-// Option to segment Fibers according to their curvature (experimental)
-#define CURVATURE_DEPENDENT_SEGMENTATION 0
-
 #include "sim.h"
 #include "vector.h"
 #include "common.h"
@@ -14,6 +11,9 @@
 
 class Mecapoint;
 class Glossary;
+
+// Option to segment Filaments according to their curvature (experimental)
+#define CURVATURE_DEPENDENT_SEGMENTATION 0
 
 /// Mecable with linear geometry
 /**
@@ -59,6 +59,8 @@ class Glossary;
  The class FiberSite keeps track of its position using an abscissa from the origin,
  and all Hand objects are built from this class.
  The class Fiber keeps track of the FiberSite that are attached to itself.
+ 
+ \todo Rename Filament -> Chain
 */
 class Filament : public Mecable
 {
@@ -343,13 +345,10 @@ public:
     void         adjustSegmentation();
     
     /// change all vertices from given array of coordinates
-    void         setPoints(real const*);
+    void         getPoints(real const*);
     
-    /// change position
-    void         getPoints(real const* ptr) { setPoints(ptr); }
-
     /// restore the distance between successive vertices
-    void         reshape() { setPoints(pPos); }
+    void         reshape() { getPoints(pPos); }
 
     /// invert polarity (swap PLUS end MINUS ends in place)
     virtual void flipPolarity();

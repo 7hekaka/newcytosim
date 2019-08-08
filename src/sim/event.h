@@ -3,7 +3,6 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include "assert_macro.h"
 #include "object.h"
 
 class Meca;
@@ -11,7 +10,15 @@ class Simul;
 class Glossary;
 
 /// Performs actions on the simulation
-/** 
+/**
+ An Event is a class that can perform some action in the simulation world,
+ at regular interval or at stochastic time with a specified rate.
+ This can be used for example to add or remove objects.
+ 
+ It is a special class that is not associated with a Property,
+ and can be created with 'new' without a preceeding 'set'.
+ 
+ Events are not saved to trajectory files.
 */
 class Event: public Object
 {
@@ -60,7 +67,7 @@ public:
     /// monte-carlo simulation step
     void      step(Simul&);
     
-    /// add interactions to the Meca
+    /// add interactions to a Meca
     void      setInteractions(Meca &) const {}
     
     

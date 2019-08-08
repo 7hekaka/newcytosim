@@ -96,13 +96,13 @@ public:
     /// change the property and update the two Hands
     void           setProperty(CoupleProp *);
     
-    /// add interactions to the Meca
+    /// add interactions to a Meca
     virtual void   setInteractions(Meca &) const;
     
-    /// add interactions to the Meca (experimental)
+    /// add interactions to a Meca (experimental)
     virtual void   setInteractionsAF(Meca &) const;
     
-    /// add interactions to the Meca (experimental)
+    /// add interactions to a Meca (experimental)
     virtual void   setInteractionsFA(Meca &) const;
     
     //--------------------------------------------------------------------------

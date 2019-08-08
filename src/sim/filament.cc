@@ -27,12 +27,8 @@ extern Modulo const* modulo;
  */
 unsigned Filament::bestNumberOfPoints(const real ratio)
 {
-    unsigned n = (int)ratio;
-    
-    if ( (2*n+1)*ratio >= 2*n*(n+1) )
-        return n+2;
-    
-    return n+1;
+    real n = 1 + std::floor(ratio);
+    return n + ( ratio*(n-0.5) >= n*(n-1) );
 }
 
 
@@ -211,8 +207,7 @@ void Filament::setEquilibrated(real len, real persistence_length)
         setPoint(p, vec);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
-        real c = cos(a), s = sin(a);
-        dir = c * dir + s * dir.randOrthoU(1);
+        dir = cos(a) * dir + dir.randOrthoU(sin(a));
     }
     
     // cancel out mean orientation and position:
@@ -327,6 +322,7 @@ void Filament::reshape_two(const real* src, real* dst, real cut)
  
  Where J = 2 * K
 
+ mem[] should be temporary memory for 5*chk `real`
  FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
  */
 
@@ -713,7 +709,7 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
  the directions of the flanking segments
  
  here ns = nbSegments() and tmp_size >= ns
- `tmp` should be of size 5*tmp_size
+ `tmp` should be of size (5+3)*tmp_size
  */
 int Filament::reshape_local(const unsigned ns, const real* src, real* dst,
                             real cut, real* tmp, size_t tmp_size)
@@ -758,7 +754,7 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst,
         A = B;
         B = C;
     }
-    // this terms should not be used:
+    // these terms should not be used:
     pri[ns-1] = 0;
     sec[ns-2] = 0;
     sec[ns-1] = 0;
@@ -869,32 +865,49 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
 #endif
 
 /**
- Replace coordinates by ones provided in `ptr`
+ Replace coordinates by the ones provided in `ptr`
  A reshape operation is done
  */
-void Filament::setPoints(real const* ptr)
+void Filament::getPoints(real const* ptr)
 {
-#if 0
-    // use here thread-local static memory
-    thread_local static size_t alc = 0;
-    thread_local static std::unique_ptr<real> uptr(nullptr);
-#else
-    // use here thread-local static memory
+#if 1
+    // use here static memory (that is not thread safe)
     static size_t alc = 0;
-    static std::unique_ptr<real> uptr(nullptr);
-#endif
+    static real* mem = nullptr;
     
     if ( alc < allocated() )
     {
         alc = allocated();
+        free_real(mem);
+        mem = new_real(alc*8);
+    }
+#else
+    // use here thread-local static memory
+    thread_local static size_t alc = 0;
+    
+    auto delete_real = [](real * x)
+    {
+        printf("> del real[%lu] %p %p\n", alc, x, pthread_self());
+        free_real(x);
+        alc = 0;
+    };
+
+    thread_local static std::unique_ptr<real, decltype(delete_real)> uptr(nullptr, delete_real);
+    
+    if ( alc < allocated() || uptr.get() == nullptr )
+    {
+        alc = allocated();
         free_real(uptr.release());
         uptr.reset(new_real(alc*8));
+        printf("> new real[%lu] %p %p\n", alc, uptr.get(), pthread_self());
     }
+    real * mem = uptr.get();
+#endif
     
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
-    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, uptr.get(), allocated()) )
+    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, mem, allocated()) )
 #endif
     {
         reshape_global(nbSegments(), ptr, pPos, fnCut);
@@ -1039,7 +1052,7 @@ void Filament::cutM(const real delta)
     setNbPoints(np);
     fnAbscissaM += delta;
     setSegmentation(cut);
-    setPoints(tmp);
+    getPoints(tmp);
     free_real(tmp);
     postUpdate();
 }
@@ -1150,7 +1163,7 @@ void Filament::cutP(const real delta)
     setNbPoints(np);
     setSegmentation(cut);
     fnAbscissaP -= delta;
-    setPoints(tmp);
+    getPoints(tmp);
     free_real(tmp);
     postUpdate();
 }
@@ -1238,7 +1251,7 @@ void Filament::join(Filament const* fib)
     setNbPoints(ns+1);
     setSegmentation(cut);
     fnAbscissaP = fnAbscissaM + cut * fnCut;
-    setPoints(tmp);
+    getPoints(tmp);
     free_real(tmp);
     postUpdate();
 }
@@ -1494,7 +1507,7 @@ void Filament::resegment(unsigned ns)
     // resize filament:
     setNbPoints(ns+1);
     setSegmentation(cut);
-    setPoints(tmp);
+    getPoints(tmp);
     free_real(tmp);
 }
 
