@@ -181,26 +181,6 @@ namespace sMath
         y[2] = ss * z[1];
     }
     
-#if ( 0 )
-    /// bit-hack absolute value
-    inline float absf(float a)
-    {
-        union { uint32_t u; float f; } tmp;
-        tmp.f = a;
-        tmp.u &= 0x7FFFFFFFUL;
-        return tmp.f;
-    }
-    
-    /// bit-hack absolute value
-    inline double absf(double a)
-    {
-        union { uint64_t u; double f; } tmp;
-        tmp.f = a;
-        tmp.u &= 0x7FFFFFFFFFFFFFFFULL;
-        return tmp.f;
-    }
-#endif
-    
     /// square of a number
     template <typename T> 
     inline T square(const T& a)

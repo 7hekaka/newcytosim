@@ -1544,24 +1544,29 @@ void Meca::solve(SimulProp const* prop, const int precond)
     //fprintf(stderr, "Solve precond %i size %6i\n", precond, dimension());
 
     /*
-     GMRES generally converges faster than BCGGS, but requires more memory
-     hence for a very large system, biCGGS may be advantageous.
+     GMRES may converge faster than BCGGS, but has overheads and uses more memory
+     hence for large systems, biCGGS is often advantageous.
      */
-#if ( 1 )
+
     if ( precond )
-        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+    {
+        //LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        LinearSolvers::GMRES(*this, vRHS, vSOL, 4, monitor, allocator, mH, mV, temporary);
+    }
     else
+    {
         LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-#else
+        //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
+    }
+    
+#if ( 0 )
     //size_t mem = dimension() * (64+2) * sizeof(real);
     //std::clog << "GMRES mem " << (mem >> 20) << "MB\n";
-    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
+    fprintf(stderr, "System size %6i precondition %i", dimension(), precond);
+    fprintf(stderr, "    Solver count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #endif
-    
-    //std::clog << "Solve size " << dimension() << "  precondition " << precond << "  " << residual << "\n";
-    //fprintf(stderr, "    GMRES     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #if ( 0 )
-    // enable this to compare with another GMRES
+    // enable this to compare with GMRES
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
@@ -1582,7 +1587,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs  count %4i residual %10.6f\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    bcgs      count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #endif
     
     //------- in case the solver did not converge, we try other methods:
@@ -1673,7 +1678,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     if ( prop->verbose )
     {
         std::stringstream oss;
-        oss << "Meca " << DIM << "x" << nbPts;
+        oss << "Meca " << DIM << "*" << nbPts;
         oss << " block " << largestMecable();
         oss << " " << mB.what();
         if ( useMatrixC ) oss << " " << mC.what();
@@ -1852,6 +1857,7 @@ void Meca::dumpMobility(FILE * file) const
 
 /**
  Save matrix associated with the preconditionner, in binary format
+ This relies on `Meca::precondition()`, which may apply a dummy preconditionner
  */
 void Meca::dumpPreconditionner(FILE * file) const
 {

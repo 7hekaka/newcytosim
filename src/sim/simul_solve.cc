@@ -423,7 +423,7 @@ void Simul::dump() const
     FilePath::change_dir(path);
     sMeca.dump();
     FilePath::change_dir(cwd);
-    std::clog << "cytosim dumped a system of size " << sMeca.dimension() << "in " << path << std::endl;
+    std::clog << "cytosim dumped a system of size " << sMeca.dimension() << " in `" << path << "'" << std::endl;
 }
 
 
