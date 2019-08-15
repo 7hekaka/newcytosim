@@ -746,18 +746,21 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     
     bool has_code = opt.set(code, "nb_frames", 1);
 #ifdef BACKWARD_COMPATIBILITY
+    // check if 'event' is specified within the 'run' command,
+    // and convert to a registered Event object
     Event * event = nullptr;
     if ( opt.has_key("event") )
     {
         event = new Event();
         opt.set(event->rate, "event");
-        opt.set(event->code, "event", 1);
+        opt.set(event->activity, "event", 1);
         event->reset(simul.time());
         simul.events.add(event);
     }
 #endif
     opt.set(solve,  "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
     
+    // setting a pointer to the 'solve' function
     void (Simul::* solveFunc)() = &Simul::solve_not;
     switch ( solve )
     {

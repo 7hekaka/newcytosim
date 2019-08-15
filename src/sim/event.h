@@ -9,10 +9,11 @@ class Meca;
 class Simul;
 class Glossary;
 
-/// Performs actions on the simulation
+/// an Event performs action on the simulation by executing code
 /**
  An Event is a class that can perform some action in the simulation world,
  at regular interval or at stochastic time with a specified rate.
+ The action is specified code interpreted by cytosim's parser.
  This can be used for example to add or remove objects.
  
  It is a special class that is not associated with a Property,
@@ -25,10 +26,20 @@ class Event: public Object
     
     friend class EventSet;
     
+    /// clear member variables
+    void clear();
+    
 public:
     
+    /**
+     @defgroup EventPar Parameters of Event
+     @ingroup Parameters
+     These are the parameters for an Event
+     @{
+     */
+
     /// code to be executed
-    std::string code;
+    std::string activity;
     
     /// true if event executes at every time step
     bool        recurrent;
@@ -36,13 +47,15 @@ public:
     /// rate at which code is executed
     real        rate;
     
+    ///@}
+    
     /// time of next event
-    real        nextEvent;
+    real        nextTime;
     
 public:
 
     /// default constructor
-    Event();
+    Event() { clear(); }
     
     /// constructor
     Event(real time, Glossary&);
