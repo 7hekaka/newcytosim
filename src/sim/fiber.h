@@ -34,9 +34,9 @@ typedef Lattice<uint64_t> FiberLattice;
 typedef Lattice<real> FiberLattice;
 #endif
 
-/// a Mecafil to which many Hand may bind
+/// a Mecafil to which Hands may bind
 /**
- The Fiber extends the Mecafil (itself build on Filament), adding in particular
+ The Fiber extends the Mecafil (itself build on Chain), adding in particular
  methods that are necessary to simulate the attachment/detachment of Hand.
  It also adds a Lattice object and a FiberProp to hold parameters.
  
@@ -168,7 +168,7 @@ public:
     void           chew(const real x, FiberEnd end) { if ( end == PLUS_END ) frChewP += x; else frChewM += x; }
 #endif
 
-    /// call Filament::join(), and transfer Hands (caller should delete `fib`).
+    /// call Chain::join(), and transfer Hands (caller should delete `fib`).
     virtual void   join(Fiber * fib);
     
     /// simulation step

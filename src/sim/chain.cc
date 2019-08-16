@@ -2,7 +2,7 @@
 
 #include "dim.h"
 #include "assert_macro.h"
-#include "filament.h"
+#include "chain.h"
 #include "iowrapper.h"
 #include "messages.h"
 #include "mecapoint.h"
@@ -25,14 +25,14 @@ extern Modulo const* modulo;
  This returns N+1, where N is the integer that minimizes
      fabs( length / N - segmentation ),
  */
-unsigned Filament::bestNumberOfPoints(const real ratio)
+unsigned Chain::bestNumberOfPoints(const real ratio)
 {
     real n = 1 + std::floor(ratio);
     return n + ( ratio*(n-0.5) >= n*(n-1) );
 }
 
 
-real Filament::contourLength(const real* pts, unsigned n_pts)
+real Chain::contourLength(const real* pts, unsigned n_pts)
 {
     real len = 0;
     Vector a(pts), b;
@@ -50,7 +50,7 @@ real Filament::contourLength(const real* pts, unsigned n_pts)
  also number of states over which curvature information is averaged */
 #define RECUT_PERIOD 8
 
-Filament::Filament()
+Chain::Chain()
 {
     fnNormal.set(0, 0, 1);
     fnCut          = 0;
@@ -74,7 +74,7 @@ Filament::Filament()
 /**
 This does not change length or segmentation
 */
-void Filament::setStraight(Vector const& pos, Vector const& dir)
+void Chain::setStraight(Vector const& pos, Vector const& dir)
 {
     assert_true( dir.norm() > 0.1 );
     // 'dir' is normalized for safety:
@@ -85,7 +85,7 @@ void Filament::setStraight(Vector const& pos, Vector const& dir)
 }
 
 
-void Filament::setStraight(Vector const& pos, Vector const& dir, real len, const FiberEnd ref)
+void Chain::setStraight(Vector const& pos, Vector const& dir, real len, const FiberEnd ref)
 {
     assert_true( fnSegmentation > REAL_EPSILON );
 
@@ -132,7 +132,7 @@ void Filament::setStraight(Vector const& pos, Vector const& dir, real len, const
  However, the length of the segments will only be approximately equal to each other,
  and reshape() should be called to equalize them if necessary.
  */
-void Filament::setShape(const real pts[], unsigned n_pts, unsigned np)
+void Chain::setShape(const real pts[], unsigned n_pts, unsigned np)
 {
     assert_true(n_pts > 1);
     Vector a(pts), b;
@@ -186,7 +186,7 @@ void Filament::setShape(const real pts[], unsigned n_pts, unsigned np)
  This return a filament in a random direction, with the center of gravity at zero
  and the average orientation aligned with (1, 0, 0)
  */
-void Filament::setEquilibrated(real len, real persistence_length)
+void Chain::setEquilibrated(real len, real persistence_length)
 {
     unsigned np = bestNumberOfPoints(len/fnSegmentation);
     assert_true( np > 1 );
@@ -225,7 +225,7 @@ void Filament::setEquilibrated(real len, real persistence_length)
  This adjusts the current `normal` or makes a new one if necessary
  (used for display)
  */
-Vector3 Filament::adjustedNormal(Vector3 const& d) const
+Vector3 Chain::adjustedNormal(Vector3 const& d) const
 {
     if ( fnNormal.normSqr() < 0.8 || dot(fnNormal, d) > 0.5 )
         fnNormal = d.orthogonal(1.0);
@@ -235,7 +235,7 @@ Vector3 Filament::adjustedNormal(Vector3 const& d) const
 }
 
 
-real Filament::age() const
+real Chain::age() const
 {
     return simul().time() - fnBirthTime;
 }
@@ -248,7 +248,7 @@ real Filament::age() const
  This deals with Fiber having one segment only,
  for which the procedure is trivial
  */
-void Filament::reshape_two(const real* src, real* dst, real cut)
+void Chain::reshape_two(const real* src, real* dst, real cut)
 {
     real X = src[  DIM] - src[0];
 #if ( DIM == 1 )
@@ -326,7 +326,7 @@ void Filament::reshape_two(const real* src, real* dst, real cut)
  FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
  */
 
-int Filament::reshape_calculate(const unsigned ns, real cutSqr,
+int Chain::reshape_calculate(const unsigned ns, real cutSqr,
                                 real const* mag, real const* pri, real const* sec,
                                 real* mem, size_t chk)
 {
@@ -460,7 +460,7 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr,
  except for the edges, this is:
  P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) + sca[i-1] * ( P[i-1] - P[i] )
  */
-void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
+void Chain::reshape_apply(const unsigned ns, const real* src, real* dst,
                              const real * sca)
 {
     assert_true( ns > 1 );
@@ -484,7 +484,7 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
 
 #if 1
 /// old version (2018)
-int Filament::reshape_calculate(const unsigned ns, real cutSqr, Vector const* dif,
+int Chain::reshape_calculate(const unsigned ns, real cutSqr, Vector const* dif,
                                 real* mem, size_t chk)
 {
     real * sca = mem;
@@ -589,7 +589,7 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr, Vector const* di
 #else
 
 /// older version 22.02.2015
-int Filament::reshape_calculate(const unsigned ns, real cutSqr,
+int Chain::reshape_calculate(const unsigned ns, real cutSqr,
                                 Vector const* dif, real* mem, size_t chk)
 {
     real * sca = mem;
@@ -667,7 +667,7 @@ int Filament::reshape_calculate(const unsigned ns, real cutSqr,
 /**
  Apply correction (old version)
  */
-void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
+void Chain::reshape_apply(const unsigned ns, const real* src, real* dst,
                              const real * sca, const Vector* dif)
 {
     assert_true( ns > 1 );
@@ -711,7 +711,7 @@ void Filament::reshape_apply(const unsigned ns, const real* src, real* dst,
  here ns = nbSegments() and tmp_size >= ns
  `tmp` should be of size (5+3)*tmp_size
  */
-int Filament::reshape_local(const unsigned ns, const real* src, real* dst,
+int Chain::reshape_local(const unsigned ns, const real* src, real* dst,
                             real cut, real* tmp, size_t tmp_size)
 {
     int res;
@@ -779,7 +779,7 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst,
  of the fiber, irrespective of the length of this section.
  */
 
-#if ( 1 )   // 1 = optimized version of Filament::reshape_global()
+#if ( 1 )   // 1 = optimized version of Chain::reshape_global()
 
 /**
  Move the vertices relative to each other, such that when this is done,
@@ -792,7 +792,7 @@ int Filament::reshape_local(const unsigned ns, const real* src, real* dst,
  likely, the Brownian motion will push the points appart soon.
  */
 
-void Filament::reshape_global(const unsigned ns, const real* src, real* dst, real cut)
+void Chain::reshape_global(const unsigned ns, const real* src, real* dst, real cut)
 {
     Vector inc(0,0,0), sum(0,0,0);
     Vector seg = diffPoints(src, 0);
@@ -839,7 +839,7 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
  This is operation does not change the center of gravity of the fiber.
  */
 
-void Filament::reshape_global(const unsigned ns, const real* src, real* dst, real cut)
+void Chain::reshape_global(const unsigned ns, const real* src, real* dst, real cut)
 {
     Vector off, sum(0,0,0);
 
@@ -868,7 +868,7 @@ void Filament::reshape_global(const unsigned ns, const real* src, real* dst, rea
  Replace coordinates by the ones provided in `ptr`
  A reshape operation is done
  */
-void Filament::getPoints(real const* ptr)
+void Chain::getPoints(real const* ptr)
 {
 #if 1
     // use here static memory (that is not thread safe)
@@ -921,7 +921,7 @@ void Filament::getPoints(real const* ptr)
  Flip all the points. This does not change fnAscissa,
  and the abscissa of center thus stays as it is.
 */
-void Filament::flipPolarity()
+void Chain::flipPolarity()
 {
     unsigned ii = 0;
     unsigned jj = lastPoint();
@@ -952,10 +952,10 @@ void Filament::flipPolarity()
  Note 1: This works nicely if `delta` is small compared to segmentation().
  For large decrease in length, use cutM().
  
- Note 2: Unless the Filament is straight, the length of the segments after this
+ Note 2: Unless the Chain is straight, the length of the segments after this
  will not exactly match `segmentation()`.
 */
-void Filament::growM(const real delta)
+void Chain::growM(const real delta)
 {
     assert_true( length() + delta > 0 );
     real a = -delta / length();
@@ -1004,7 +1004,7 @@ void Filament::growM(const real delta)
  This extends the fiber by adding one segment at the MINUS_END.
  Thus `segmentation()` is not changed, and the existing points are not displaced.
  */
-void Filament::addSegmentM()
+void Chain::addSegmentM()
 {
     unsigned pp = 1+nPoints;
     setNbPoints(pp);
@@ -1029,7 +1029,7 @@ void Filament::addSegmentM()
  Note: after cutM(), the distance between the points is not exactly
  equal to segmentation(). This is true only if the fiber is straight.
  */
-void Filament::cutM(const real delta)
+void Chain::cutM(const real delta)
 {
     real len = length();
     assert_true( 0 <= delta );
@@ -1067,10 +1067,10 @@ void Filament::cutM(const real delta)
  Note 1: This works nicely if `delta` is small compared to segmentation().
  For large decrease in length, use cutP().
 
- Note 2: Unless the Filament is straight, the length of the segments after this
+ Note 2: Unless the Chain is straight, the length of the segments after this
  will not exactly match `segmentation()`.
  */
-void Filament::growP(const real delta)
+void Chain::growP(const real delta)
 {
     assert_true( length() + delta > 0 );
     real a = delta / length();
@@ -1118,7 +1118,7 @@ void Filament::growP(const real delta)
  This extends the fiber by adding one segment at the PLUS_END.
  Thus `segmentation()` is not changed, and the existing points are not displaced.
  */
-void Filament::addSegmentP()
+void Chain::addSegmentP()
 {
     unsigned pp = nPoints;
     setNbPoints(pp+1);
@@ -1140,7 +1140,7 @@ void Filament::addSegmentP()
  Note: after cutP(), the distance between the points is not exactly
  equal to segmentation(). This is true only if the fiber is straight.
 */
-void Filament::cutP(const real delta)
+void Chain::cutP(const real delta)
 {
     real len = length();
     assert_true( 0 <= delta );
@@ -1170,7 +1170,7 @@ void Filament::cutP(const real delta)
 
 //------------------------------------------------------------------------------
 
-void Filament::grow(FiberEnd end, const real delta)
+void Chain::grow(FiberEnd end, const real delta)
 {
     if ( end == PLUS_END )
         growP(delta);
@@ -1179,7 +1179,7 @@ void Filament::grow(FiberEnd end, const real delta)
 }
 
 
-void Filament::adjustLength(real len, FiberEnd ref)
+void Chain::adjustLength(real len, FiberEnd ref)
 {
     assert_true( len > 0 );
     
@@ -1200,7 +1200,7 @@ void Filament::adjustLength(real len, FiberEnd ref)
 }
 
 
-void Filament::truncateM(unsigned p)
+void Chain::truncateM(unsigned p)
 {
     Mecable::truncateM(p);
     fnAbscissaM = abscissaPoint(p);
@@ -1208,7 +1208,7 @@ void Filament::truncateM(unsigned p)
 }
 
 
-void Filament::truncateP(unsigned p)
+void Chain::truncateP(unsigned p)
 {
     Mecable::truncateP(p);
     postUpdate();
@@ -1220,11 +1220,11 @@ void Filament::truncateP(unsigned p)
  
  The vertex are reinterpolated linearly, and the length of the
  segments will not fullfil the constraints of segmentation.
- If this is a problem, Filament::reshape() should be called.
+ If this is a problem, Chain::reshape() should be called.
  
  `fib` should usually be destroyed afterward.
  */
-void Filament::join(Filament const* fib)
+void Chain::join(Chain const* fib)
 {
     const real len1 = length();
     const real lenT = len1 + fib->length();
@@ -1263,7 +1263,7 @@ void Filament::join(Filament const* fib)
 /**
  Returns the minimum and maximum distance between consecutive points
  */
-void Filament::segmentationMinMax(real& mn, real& mx) const
+void Chain::segmentationMinMax(real& mn, real& mx) const
 {
     mn = diffPoints(0).norm();
     mx = mn;
@@ -1278,7 +1278,7 @@ void Filament::segmentationMinMax(real& mn, real& mx) const
 /**
  Returns the average and variances of segment length
  */
-void Filament::segmentationVariance(real& avg, real& var) const
+void Chain::segmentationVariance(real& avg, real& var) const
 {
     avg = 0;
     var = 0;
@@ -1315,7 +1315,7 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C)
 }
 
 
-real Filament::curvature(unsigned p) const
+real Chain::curvature(unsigned p) const
 {
     assert_true( 0 < p && p < lastPoint() );
     return curvature3(posP(p-1), posP(p), posP(p+1));
@@ -1345,7 +1345,7 @@ real Filament::curvature(unsigned p) const
      1/2 * sum( curvature^2 * ds ) = sum( 1 - cos(angle) ) / segmentation
  
  */
-real Filament::bendingEnergy0() const
+real Chain::bendingEnergy0() const
 {
     real e = 0;
     
@@ -1373,7 +1373,7 @@ real Filament::bendingEnergy0() const
 }
 
 
-real Filament::minCosinus() const
+real Chain::minCosinus() const
 {
     real result;
     Vector dir1, dir2;
@@ -1408,7 +1408,7 @@ real Filament::minCosinus() const
 /**
  Returns the minimum and maximum distance between consecutive points
  */
-unsigned Filament::nbKinks(real threshold) const
+unsigned Chain::nbKinks(real threshold) const
 {
     threshold *= fnCut * fnCut;
     unsigned res = 0;
@@ -1439,7 +1439,7 @@ unsigned Filament::nbKinks(real threshold) const
  The position of the cut is `interpolatePoints(s, s+1, a)`
  */
 
-real Filament::planarIntersect(unsigned s, Vector const& n, const real a) const
+real Chain::planarIntersect(unsigned s, Vector const& n, const real a) const
 {
     assert_true( s < nbSegments() );
     
@@ -1462,15 +1462,15 @@ real Filament::planarIntersect(unsigned s, Vector const& n, const real a) const
 #pragma mark -
 
 /**
- Recalculate the vertices of the Filament for 'ns' segments.
+ Recalculate the vertices of the Chain for 'ns' segments.
  
- @todo 2d-order interpolation in Filament::resegment()
+ @todo 2d-order interpolation in Chain::resegment()
  
- Note: Unless the Filament is straight, the length of the segments after
+ Note: Unless the Chain is straight, the length of the segments after
  an interpolation will not exactly match `segmentation()`, and we therefore
  call reshape() here to correct for the problem.
  */
-void Filament::resegment(unsigned ns)
+void Chain::resegment(unsigned ns)
 {
     assert_true( ns > 0 );
     real cut = nbSegments() * fnCut / ns;
@@ -1526,7 +1526,7 @@ void Filament::resegment(unsigned ns)
      length / NS > 2/3 * segmentation
 
  */
-void Filament::adjustSegmentation()
+void Chain::adjustSegmentation()
 {
     assert_true( fnSegmentation > REAL_EPSILON );
     
@@ -1558,7 +1558,7 @@ static constexpr real RECUT_PRECISION = 0.05;
  Only one new segmentation is done every time step at maximum,
  to allow the solver to equilibrate the new vertices.
  */
-void Filament::adjustSegmentation()
+void Chain::adjustSegmentation()
 {
     PRINT_ONCE("adjustSegmentation() is using the fiber curvature\n");
     
@@ -1641,7 +1641,7 @@ clear_counter:
 /**
  return the abscissa with respect to the ORIGIN.
  */
-real Filament::abscissaEnd(const FiberEnd end) const
+real Chain::abscissaEnd(const FiberEnd end) const
 {
     switch( end )
     {
@@ -1658,7 +1658,7 @@ real Filament::abscissaEnd(const FiberEnd end) const
  returns the abscissa (from the ORIGIN) of a point that is specified
  by a distance from the given reference.
  */
-real Filament::abscissaFrom(const real dis, const FiberEnd ref) const
+real Chain::abscissaFrom(const real dis, const FiberEnd ref) const
 {
     switch( ref )
     {
@@ -1696,7 +1696,7 @@ real Filament::abscissaFrom(const real dis, const FiberEnd ref) const
      }
 
 */
-real Filament::someAbscissa(std::string const& key, Glossary& opt, real alpha) const
+real Chain::someAbscissa(std::string const& key, Glossary& opt, real alpha) const
 {
     const real len = length();
     real abs = len;
@@ -1750,7 +1750,7 @@ real Filament::someAbscissa(std::string const& key, Glossary& opt, real alpha) c
  Note that a Fiber shorter than `2*lambda` does not have a central region,
  and is composed of PLUS_END and MINUS_END parts of equal size.
  */    
-FiberEnd Filament::whichEndDomain(const real ab, const real lambda) const
+FiberEnd Chain::whichEndDomain(const real ab, const real lambda) const
 {
     const real abs = ab - fnAbscissaM;
     const real len = length();
@@ -1773,7 +1773,7 @@ FiberEnd Filament::whichEndDomain(const real ab, const real lambda) const
 #pragma mark -
 
 
-Mecapoint Filament::exactEnd(const FiberEnd end) const
+Mecapoint Chain::exactEnd(const FiberEnd end) const
 {
     if ( end == MINUS_END )
         return Mecapoint(this, 0);
@@ -1785,7 +1785,7 @@ Mecapoint Filament::exactEnd(const FiberEnd end) const
 }
 
 
-Interpolation Filament::interpolateEnd(const FiberEnd end) const
+Interpolation Chain::interpolateEnd(const FiberEnd end) const
 {
     if ( end == MINUS_END )
         return interpolateEndM();
@@ -1797,7 +1797,7 @@ Interpolation Filament::interpolateEnd(const FiberEnd end) const
 }
 
 
-Interpolation Filament::interpolateCenter() const
+Interpolation Chain::interpolateCenter() const
 {
     unsigned int n = lastPoint() / 2;
     if ( 2*n == lastPoint() )
@@ -1818,7 +1818,7 @@ Interpolation Filament::interpolateCenter() const
  When `ab` is above the PLUS_END, an interpolation of the last point is returned.
  
  */
-Interpolation Filament::interpolateM(const real ab) const
+Interpolation Chain::interpolateM(const real ab) const
 {
     real a = std::max(ab, 0.0) / fnCut;
     //beyond the last point, we interpolate the PLUS_END
@@ -1827,7 +1827,7 @@ Interpolation Filament::interpolateM(const real ab) const
 }
 
 
-Interpolation Filament::interpolate(const real ab, const FiberEnd end) const
+Interpolation Chain::interpolate(const real ab, const FiberEnd end) const
 {
     switch( end )
     {
@@ -1853,7 +1853,7 @@ Interpolation Filament::interpolate(const real ab, const FiberEnd end) const
 #pragma mark -
 
 #if ( DIM > 1 )
-Vector Filament::posM(const real ab) const
+Vector Chain::posM(const real ab) const
 {
     // return MINUS_END
     if ( ab <= 0 )
@@ -1869,7 +1869,7 @@ Vector Filament::posM(const real ab) const
         return posP(lastPoint());
 }
 
-Vector Filament::dirM(const real ab) const
+Vector Chain::dirM(const real ab) const
 {
     // at MINUS_END
     if ( ab <= 0 )
@@ -1887,7 +1887,7 @@ Vector Filament::dirM(const real ab) const
 #endif
 
 
-Vector Filament::posEnd(FiberEnd end) const
+Vector Chain::posEnd(FiberEnd end) const
 {
     if ( end == MINUS_END )
         return posEndM();
@@ -1898,7 +1898,7 @@ Vector Filament::posEnd(FiberEnd end) const
 }
 
 
-Vector Filament::dirEnd(const FiberEnd end) const
+Vector Chain::dirEnd(const FiberEnd end) const
 {
     if ( end == MINUS_END )
         return dirSegment(0);
@@ -1910,13 +1910,13 @@ Vector Filament::dirEnd(const FiberEnd end) const
 
 
 /// force on the PLUS_END projected on the direction of elongation
-real Filament::projectedForceEndM() const
+real Chain::projectedForceEndM() const
 {
     return -dot(netForce(0), dirSegment(0));
 }
 
 /// force on the PLUS_END projected on the direction of elongation
-real Filament::projectedForceEndP() const
+real Chain::projectedForceEndP() const
 {
     unsigned p = lastSegment();
     return dot(netForce(p+1), dirSegment(p));
@@ -1927,7 +1927,7 @@ real Filament::projectedForceEndP() const
  The returned value is negative when the force antagonizes elongation,
  and this is true at both ends. 
  */
-real Filament::projectedForceEnd(const FiberEnd end) const
+real Chain::projectedForceEnd(const FiberEnd end) const
 {
     if ( end == PLUS_END )
         return projectedForceEndP();
@@ -1942,7 +1942,7 @@ real Filament::projectedForceEnd(const FiberEnd end) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-int Filament::checkLength(real len, bool arg) const
+int Chain::checkLength(real len, bool arg) const
 {
     assert_small( length() - len );
     real con = contourLength(pPos, nPoints);
@@ -1956,7 +1956,7 @@ int Filament::checkLength(real len, bool arg) const
 }
 
 
-real Filament::checkSegmentation(real tol, bool arg) const
+real Chain::checkSegmentation(real tol, bool arg) const
 {
     real mn, mx;
     segmentationMinMax(mn, mx);
@@ -1974,9 +1974,9 @@ real Filament::checkSegmentation(real tol, bool arg) const
 /**
  Prints info on the length of Segments, which can be useful for debugging
  */
-void Filament::dump(std::ostream& os) const
+void Chain::dump(std::ostream& os) const
 {
-    os << "\n Filament " << std::setw(7) << reference();
+    os << "\n Chain " << std::setw(7) << reference();
     os << "  " << std::left << std::setw(6) << fnCut << " {";
     real d = checkSegmentation(0.01, false);
     os << " deviation " << std::fixed << 100*d << " %";
@@ -1984,7 +1984,7 @@ void Filament::dump(std::ostream& os) const
 }
 
 
-void Filament::write(Outputter& out) const
+void Chain::write(Outputter& out) const
 {
     out.writeUInt32(signature());
     out.writeFloat(length());
@@ -1999,9 +1999,9 @@ void Filament::write(Outputter& out) const
  The fiber will be re-segmented if its current desired segmentation 
  does not match the one stored in the file.
  */
-void Filament::read(Inputter& in, Simul& sim, ObjectTag tag)
+void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    //Cytosim::log << "  reading Filament at " << in.pos() << '\n';
+    //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
     
     ObjectSignature s = in.readUInt32();
     if ( s ) signature(s);

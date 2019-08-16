@@ -1155,7 +1155,7 @@ The axial stiffness is `infinite` in cytosim, and that kind of built-in. It woul
 It depends on your levelin programming, but you could start for example by 
 
 - Math concepts: Vector3, Solver, Random, Polygon, Quaternion, Rasterizer
-- Simulation objects: Movable, Space, Mecable, Mecafil, Hand, Single
+- Simulation objects: Movable, Space, Mecable, Chain, Mecafil, Fiber, Hand, Single
 
 To do this, I recommend printing the .h and .cc files on paper (yes, paper), and to read the code from top to bottom, in a quiet time and away from your computer. This will allow you to examine the structure of the code in detail. 
 
