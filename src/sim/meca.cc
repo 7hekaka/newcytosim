@@ -1524,7 +1524,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     // NOTE: the tolerance to solve the system should be such that the solution
     // found does not depend on the initial guess.
     
-    real residual = noiseLevel * prop->tolerance;
+    real abstol = noiseLevel * prop->tolerance;
 
     /*
      With exact arithmetic, biConjugate Gradient should converge at most
@@ -1532,7 +1532,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
      each iteration involving 2 matrix-vector multiplications.
      We set here the max limit to the number of matrix-vector multiplication:
      */
-    LinearSolvers::Monitor monitor(2*dimension(), residual);
+    LinearSolvers::Monitor monitor(2*dimension(), abstol);
 
     //------- call the iterative solver:
 
@@ -1541,7 +1541,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     else if ( precond == 2 )
         computePreconditionnerAlt();
 
-    //fprintf(stderr, "Solve precond %i size %6i\n", precond, dimension());
+    //fprintf(stderr, "Solve precond %i size %6i absolute tolerance %f\n", precond, dimension(), abstol);
 
     /*
      GMRES may converge faster than BCGGS, but has overheads and uses more memory
@@ -1551,7 +1551,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     if ( precond )
     {
         //LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-        LinearSolvers::GMRES(*this, vRHS, vSOL, 4, monitor, allocator, mH, mV, temporary);
+        LinearSolvers::GMRES(*this, vRHS, vSOL, 8, monitor, allocator, mH, mV, temporary);
     }
     else
     {
@@ -1566,21 +1566,29 @@ void Meca::solve(SimulProp const* prop, const int precond)
     fprintf(stderr, "    Solver count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
-    // enable this to compare with GMRES
-    monitor.reset();
-    zero_real(dimension(), vSOL);
-    LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
-    fprintf(stderr, "    GMRES-32  count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+    // enable this to compare with GMRES using different restart parameters
+    for ( int RS : {8, 16, 32} )
+    {
+        monitor.reset();
+        zero_real(dimension(), vSOL);
+        LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator, mH, mV, temporary);
+        fprintf(stderr, "    GMRES-%i  count %4i  residual %10.6f\n", RS, monitor.count(), monitor.residual());
+    }
 #endif
 #if ( 0 )
     // enable this to compare BCGS and GMRES
     monitor.reset();
     zero_real(dimension(), vSOL);
     if ( precond )
+    {
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        fprintf(stderr, "    BCGS     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+    }
     else
-        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    BCGS     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+    {
+        LinearSolvers::GMRES(*this, vRHS, vSOL, 8, monitor, allocator, mH, mV, temporary);
+
+    }
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
@@ -1686,10 +1694,9 @@ void Meca::solve(SimulProp const* prop, const int precond)
         oss << " count " << monitor.count();
         //oss << " flag " << monitor.flag();
         oss << " residual " << monitor.residual() << "\n";
+        Cytosim::out << oss.str();
         if ( prop->verbose > 1 )
             std::clog << oss.str();
-        else
-            Cytosim::out << oss.str();
     }
 }
 

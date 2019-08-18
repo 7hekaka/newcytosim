@@ -23,7 +23,7 @@ void Fork::setInteractions(Meca & meca) const
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
     
-    meca.interLink(pt1, pt2, prop->stiffness);
+    meca.addLink(pt1, pt2, prop->stiffness);
     
 #if ( DIM == 2 )
     // flip the angle to match the current configuration of the bond
@@ -32,11 +32,11 @@ void Fork::setInteractions(Meca & meca) const
     else
         sinus = prop->sinus;
     
-    meca.interTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
-    //meca.interTorquePoliti(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
+    meca.addTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
+    //meca.addTorquePoliti(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
 #elif ( DIM == 3 )
     sinus = fabs(prop->sinus);
-    meca.interTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
+    meca.addTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
 #endif
 }
 

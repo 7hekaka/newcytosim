@@ -370,10 +370,16 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
 /**
  Calculate intersection between all fibers,
  and report the corresponding abscissa in arrays 'res1' and 'res2'.
+ This version is using the FiberGrid for faster results
  */
 void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                                 const real max_distance) const
 {
+    FiberGrid & grid = simul.fiberGrid;
+
+    if ( ! grid.hasGrid() )
+        return allIntersections0(res1, res2, max_distance);
+    
 #if ( 0 )
     // check what other method gives:
     allIntersections0(res1, res2, max_distance);
@@ -392,7 +398,6 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     res1.clear();
     res2.clear();
     
-    FiberGrid & grid = simul.fiberGrid;
     // distribute segments
     grid.paintGrid(first(), nullptr, sqrt(sup));
     

@@ -92,7 +92,7 @@ void Couple::setInteractions(Meca & meca) const
 {
     assert_true( attached1() && attached2() );
     
-    meca.interLink(cHand1->interpolation(), cHand2->interpolation(), prop->stiffness);
+    meca.addLink(cHand1->interpolation(), cHand2->interpolation(), prop->stiffness);
     
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )

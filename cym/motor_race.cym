@@ -81,22 +81,22 @@ set single blue_motor
 new 76 actin
 {
     length = 11;
-    distribute = 0 -1.9, 0 1.9
+    range = 0 -1.9, 0 1.9
     orientation = 1 0 0;
 }
 
 
 new 888 red_motor
 {
-    distribute = -5 0.6, -5 1.8
+    range = -5 0.6, -5 1.8
 }
 new 888 green_motor
 {
-    distribute = -5 -0.6, -5 0.6
+    range = -5 -0.6, -5 0.6
 }
 new 888 blue_motor
 {
-    distribute = -5 -1.8, -5 -0.6
+    range = -5 -1.8, -5 -0.6
 }
 
 % ----- allow time for binding:

@@ -816,6 +816,7 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
             check = (int)( ++frame * delta );
         }
 
+        //fprintf(stderr, "> step %6i\n", sss);
         simul.step();
         (simul.*solveFunc)();
         
@@ -842,6 +843,7 @@ void Interface::execute_run(unsigned nb_steps)
     
     for ( unsigned sss = 0; sss < nb_steps; ++sss )
     {
+        //fprintf(stderr, "> step %6i\n", sss);
         simul.step();
         simul.solve();
         hold();

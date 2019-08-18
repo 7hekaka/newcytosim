@@ -128,12 +128,12 @@ new linker
 
 new 100 complex
 {
-    distribute = -4.2 0.2 0, 5 0.2 0
+    range = -4.2 0.2 0, 5 0.2 0
 }
 
 new 100 complex
 {
-    distribute = -4.175 -0.2 0, 5 -0.2 0
+    range = -4.175 -0.2 0, 5 -0.2 0
 }
 
 run 50 system

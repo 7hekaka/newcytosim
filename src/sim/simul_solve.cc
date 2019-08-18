@@ -276,28 +276,90 @@ void Simul::setInteractions(Meca & meca) const
         setStericInteractions(meca);
     
     
-    // ALL THE FORCES BELOW WERE DONE FOR TESTING PURPOSES:
+    // ALL THE FORCES BELOW ARE FOR DEVELOPMENT/TESTING PURPOSES:
 #if ( 0 )
     PRINT_ONCE("AD-HOC FUNKY REPULSIVE FORCE ENABLED\n");
     // add pairwise repulsive force:
-    for ( Bead * ii=beads.first(); ii ; ii=ii->next() )
-    for ( Bead * jj=ii->next()   ; jj ; jj=jj->next() )
-        meca.interCoulomb(Mecapoint(ii,0), Mecapoint(jj, 0), 0.1);
+    for ( Bead * i=beads.first(); i ; i=i->next() )
+    for ( Bead * j=i->next()    ; j ; j=j->next() )
+        meca.addCoulomb(Mecapoint(i,0), Mecapoint(j,0), 0.1);
 #endif
 #if ( 0 )
-    PRINT_ONCE("AD-HOC FUNKY TEST FORCES ENABLED\n");
-    // attach beads together in a string:
-    Bead * bd = beads.firstID();
-    while ( bd )
+    if ( beads.size() > 1 )
     {
-        Bead * nx = beads.nextID(bd);
-        if ( nx )
+        PRINT_ONCE("AD-HOC BEAD-STRING FORCES ENABLED\n");
+        // attach beads together into a open string:
+        Bead * p = beads.firstID();
+        if ( p )
         {
-            //real d = bd->radius() + nx->radius();
-            //meca.interLongLink(Mecapoint(bd,0), Mecapoint(nx, 0), d, 1);
-            meca.interLink(Mecapoint(bd, 0), Mecapoint(nx, 0), 1);
+            Bead * n = beads.nextID(p);
+            while ( p )
+            {
+                meca.addLongLink(Mecapoint(n,0), Mecapoint(p,0), 1, 1000);
+                n = p;
+                p = beads.nextID(p);
+            }
         }
-        bd = nx;
+    }
+#endif
+#if ( 0 )
+    if ( beads.size() > 2 )
+    {
+        PRINT_ONCE("AD-HOC BEAD-LOOP FORCES ENABLED\n");
+        const real len = 1;
+        const real sti = 1000;
+        const real ang = 2 * M_PI / beads.size();
+        real co = cos(ang), si = sin(ang);
+        // attach beads together in a string:
+        Bead * a = beads.firstID();
+        Bead * b = beads.nextID(a);
+        Bead * c = beads.nextID(b);
+        while ( c )
+        {
+            meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+            a = b;
+            b = c;
+            c = beads.nextID(c);
+        }
+        c = beads.firstID();
+        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        a = b; b = c; c = beads.nextID(c);
+        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+    }
+#endif
+#if ( 0 )
+    if ( beads.size() > 2 )
+    {
+        PRINT_ONCE("AD-HOC HYPERFUN TEST FORCES ENABLED\n");
+        const real len = 1;
+        const real sti = 100;
+        const real ang = 2 * M_PI / beads.size();
+        real co = cos(ang), si = sin(ang);
+        // attach beads together in a closed loop:
+        Bead * a = beads.firstID();
+        Bead * b = beads.nextID(a);
+        Bead * c = beads.nextID(b);
+        while ( c )
+        {
+            meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+            a = b;
+            b = c;
+            c = beads.nextID(c);
+        }
+        c = beads.firstID();
+        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        a = b; b = c; c = beads.nextID(c);
+        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+    }
+#endif
+#if ( 0 )
+    PRINT_ONCE("AD-HOC FUNKY RADIAL FORCES ENABLED\n");
+    // attach beads together in a string:
+    for( Bead * b=beads.first(); b; b=b->next() )
+    {
+        real x = ( b->identity() - 2 ) * ang;
+        Vector pos(5*cos(x), 5*sin(x), 0);
+        meca.addPointClamp(Mecapoint(b, 0), pos, 1);
     }
 #endif
 #if ( 0 )

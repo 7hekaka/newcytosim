@@ -58,11 +58,25 @@ public:
         val[0xF] = p;
     }
 
-    /// construct Matrix with all values equal to `a`
-    Matrix44(real a)
+    /// construct Matrix with `d` on the diagonal and other values equal to `a`
+    Matrix44(real z, real d)
     {
-        for ( int u = 0; u < 16; ++u )
-            val[u] = a;
+        val[0x0] = d;
+        val[0x1] = z;
+        val[0x2] = z;
+        val[0x3] = z;
+        val[0x4] = z;
+        val[0x5] = d;
+        val[0x6] = z;
+        val[0x7] = z;
+        val[0x8] = z;
+        val[0x9] = z;
+        val[0xA] = d;
+        val[0xB] = z;
+        val[0xC] = z;
+        val[0xD] = z;
+        val[0xE] = z;
+        val[0xF] = d;
     }
 
     ~Matrix44() {}
@@ -402,7 +416,7 @@ public:
     }
 
     /// add lower triangle of matrix including diagonal: this <- this + M
-    void add_diag(Matrix44 const& M)
+    void add_half(Matrix44 const& M)
     {
         real const* src = M.val;
 #if ( 1 )
@@ -416,7 +430,7 @@ public:
     }
     
     /// add lower triangle of matrix including diagonal: this <- this + alpha * M
-    void add_diag(const real alpha, Matrix44 const& M)
+    void add_half(const real alpha, Matrix44 const& M)
     {
         real const* src = M.val;
 #if ( 1 )
@@ -430,7 +444,7 @@ public:
     }
     
     /// subtract lower triangle of matrix including diagonal: this <- this - M
-    void sub_diag(Matrix44 const& M)
+    void sub_half(Matrix44 const& M)
     {
         real const* src = M.val;
 #if ( 1 )

@@ -88,12 +88,12 @@ new crosslinker ( -3.7 0 0 )
 
 new 77 motor
 {
-    distribute = -3.7 0.2 0, 6 0.2 0
+    range = -3.7 0.2 0, 6 0.2 0
 }
 
 new 77 motor
 {
-    distribute = -3.7 -0.2 0, 6 -0.2 0
+    range = -3.7 -0.2 0, 6 -0.2 0
 }
 
 run 100 system
