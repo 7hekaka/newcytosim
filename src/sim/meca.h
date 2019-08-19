@@ -535,10 +535,15 @@ public:
     void computeForces();
     
     
-    
+    //Count number of non-zero entries in the entire system
+    size_t nbNonZeros(real threshold) const;
+
     /// Extract the complete dynamic matrix in a standard array
     void getSystem(unsigned order, real * matrix) const;
     
+    /// Save complete matrix in Matrix Market format
+    void saveSystem(FILE *, real threshold) const;
+
     /// Save complete matrix in binary format
     void dumpSystem(FILE *) const;
     

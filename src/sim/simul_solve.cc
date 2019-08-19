@@ -331,25 +331,23 @@ void Simul::setInteractions(Meca & meca) const
     if ( beads.size() > 2 )
     {
         PRINT_ONCE("AD-HOC HYPERFUN TEST FORCES ENABLED\n");
-        const real len = 1;
-        const real sti = 100;
-        const real ang = 2 * M_PI / beads.size();
+        const real len = 1.5;
+        const real sti = 1000000;
+        const real ang = 2 * M_PI / 12;//beads.size();
         real co = cos(ang), si = sin(ang);
         // attach beads together in a closed loop:
         Bead * a = beads.firstID();
         Bead * b = beads.nextID(a);
         Bead * c = beads.nextID(b);
-        while ( c )
+        if ( 0 )
         {
-            meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
-            a = b;
-            b = c;
-            c = beads.nextID(c);
+            meca.addLongLink(Mecapoint(a,0), Mecapoint(b,0), len, sti);
+            meca.addLongLink(Mecapoint(b,0), Mecapoint(c,0), len, sti);
+            meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, sti);
         }
-        c = beads.firstID();
-        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
-        a = b; b = c; c = beads.nextID(c);
-        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        meca.addTorqueHalf(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        //meca.addTorqueHalf(Mecapoint(c,0), Mecapoint(b,0), Mecapoint(a,0), co, si, len, sti);
+        //meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
     }
 #endif
 #if ( 0 )
@@ -485,9 +483,20 @@ void Simul::dump() const
     FilePath::change_dir(path);
     sMeca.dump();
     FilePath::change_dir(cwd);
-    std::clog << "cytosim dumped a system of size " << sMeca.dimension() << " in `" << path << "'" << std::endl;
+    fprintf(stderr, "Cytosim dumped its matrices in directory `%s'\n", path);
 }
 
+
+void Simul::dump_system() const
+{
+    FILE * f = fopen("system.mtx", "w");
+    if ( f && ~ferror(f) )
+    {
+        sMeca.saveSystem(f, 0);
+        fprintf(stderr, "Cytosim saved its matrix in `system.mtx'\n");
+    }
+    fclose(f);
+}
 
 //==============================================================================
 //                              SOLVE-X 1D

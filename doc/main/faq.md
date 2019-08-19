@@ -967,6 +967,17 @@ If you need to run many conditions, you can trivially parallelize the task, and 
 </details>
 
 
+<details>
+<summary>
+** I've noticed that only one core is used by sim... so I'm wondering if there is any fix for this.**
+</summary>
+
+Cytosim can be linked with a multithreaded version of BLAS/LAPACK, but in my experience, this will not increase performance much. For a good use of multiple cores, the calculation needs to be parallelized at a higher level, changing the C++ code. I this direction, we obtained [~3x gain using 4 cores, for some problems](compile/multithreading.md).
+In principle, this can be scaled to a higher number of cores, but I do not have any machine to do the development. Nearly always, I run sequential simulations, using single-core, in parallel on the machine, and this anyway is a better use of the hardware, than multithreaded code, which has overheads. I hope this helps!
+
+</details>
+
+
 # Advanced topics ###########################################
 
 <details>

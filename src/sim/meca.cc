@@ -1738,6 +1738,33 @@ void Meca::apply()
 //------------------------------------------------------------------------------
 #pragma mark - Debug/Output Functions
 
+
+/**
+ Count number of non-zero entries in the entire system
+ */
+size_t Meca::nbNonZeros(real threshold) const
+{
+    const size_t dim = dimension();
+    real * src = new_real(dim);
+    real * dst = new_real(dim);
+    
+    zero_real(dim, src);
+    
+    size_t cnt = 0;
+    for ( index_t j = 0; j < dim; ++j )
+    {
+        src[j] = 1.0;
+        multiply(src, dst);
+        for ( index_t i = 0; i < dim; ++i )
+            cnt += ( std::abs(dst[i]) > threshold );
+        src[j] = 0.0;
+    }
+    
+    free_real(dst);
+    free_real(src);
+    return cnt;
+}
+
 /**
  Extract the full matrix associated with matVect, in `mat[]`
  The matrix should be preallocated of size `dim`, which should be equal
@@ -1754,15 +1781,50 @@ void Meca::getSystem(index_t dim, real * mat) const
     zero_real(dim, src);
     zero_real(dim, res);
     
-    for ( index_t ii = 0; ii < dim; ++ii )
+    for ( index_t j = 0; j < dim; ++j )
     {
-        src[ii] = 1.0;
+        src[j] = 1.0;
         multiply(src, res);
-        blas::xcopy(dim, res, 1, mat+ii*dim, 1);
-        src[ii] = 0.0;
+        blas::xcopy(dim, res, 1, mat+j*dim, 1);
+        src[j] = 0.0;
     }
     
     free_real(res);
+    free_real(src);
+}
+
+
+/**
+ Save a sparse matrix in Matrix Market format
+ https://math.nist.gov/MatrixMarket/formats.html
+ This is a Sparse text format
+ */
+void Meca::saveSystem(FILE * file, real threshold) const
+{
+    fprintf(file, "%%%%MatrixMarket matrix coordinate real general\n");
+    fprintf(file, "%% This is a matrix produced by Cytosim\n");
+    fprintf(file, "%% author: FJ Nedelec\n");
+    fprintf(file, "%% kind: biological cell simulation (cytoskeleton)\n");
+
+    const size_t dim = dimension();
+    real * src = new_real(dim);
+    real * dst = new_real(dim);
+    zero_real(dim, src);
+    
+    const size_t cnt = nbNonZeros(threshold);
+    fprintf(file, "%lu %lu %lu\n", dim, dim, cnt);
+    
+    for ( index_t j = 0; j < dim; ++j )
+    {
+        src[j] = 1.0;
+        multiply(src, dst);
+        for ( index_t i = 0; i < dim; ++i )
+            if ( std::abs(dst[i]) > threshold )
+                fprintf(file, "%u %u %f\n", i, j, dst[i]);
+        src[j] = 0.0;
+    }
+    
+    free_real(dst);
     free_real(src);
 }
 
@@ -1956,7 +2018,7 @@ void Meca::dumpDrag(FILE * file) const
 void Meca::dump() const
 {
     FILE * f = fopen("ord.txt", "w");
-    fprintf(f, "%u\n", dimension());
+    fprintf(f, "%lu\n", dimension());
     fclose(f);
     
     f = fopen("stp.txt", "w");

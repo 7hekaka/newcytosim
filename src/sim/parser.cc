@@ -1180,6 +1180,11 @@ void Parser::evaluate(std::istream& is)
             if ( do_write && do_run )
                 simul.dump();
         }
+        else if ( tok == "dump_system" )
+        {
+            if ( do_write && do_run )
+                simul.dump_system();
+        }
         else {
             throw InvalidSyntax("unknown command `"+tok+"'");
         }
