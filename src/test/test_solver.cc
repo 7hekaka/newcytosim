@@ -70,12 +70,12 @@ public:
     {
         constexpr size_t MAX = 1024;
         char str[MAX], * ptr;
-        // skip comments
         do {
             if ( 0 == fgets(str, MAX, file) ) return 1;
+            // skip comments:
         } while ( str[0] == '%' );
         // parse dimension line:
-        printf(" reading sparse matrix > %s\n", str);
+        printf(" reading matrix > %s", str);
         size_t lin = strtoul(str, &ptr, 10);
         size_t col = strtoul(ptr, &ptr, 10);
         size_t cnt = strtoul(ptr, &ptr, 10);
@@ -110,14 +110,50 @@ public:
 };
 
 
+int readVector(FILE * file, size_t dim, real * vec)
+{
+    constexpr size_t MAX = 1024;
+    char str[MAX];
+    do {
+        if ( 0 == fgets(str, MAX, file) ) return 1;
+        // skip comments:
+    } while ( str[0] == '%' );
+    // parse dimension line:
+    printf(" reading vector > %s", str);
+    size_t cnt = strtoul(str, 0, 10);
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        if ( 0 == fgets(str, MAX, file) ) return 3;
+        real val = strtof(str, 0);
+        if ( i < dim ) vec[i] = val;
+    }
+    return 0;
+}
+
+
+int readVector(const char filename[], size_t dim, real * vec)
+{
+    int err = 0;
+    FILE * f = fopen(filename, "r");
+    if ( f && ~ferror(f) )
+    {
+        err = readVector(f, dim, vec);
+        if ( err )
+            fprintf(stderr, "failed to read vector (error %i)\n", err);
+    }
+    fclose(f);
+    return err;
+}
+
+
 int main(int argc, char* argv[])
 {
     System sys;
-    sys.read("system.mtx");
+    sys.read("matrix.mtx");
     const int dim = sys.dimension();
 
-    LinearSolvers::Allocator alc, tmp;      // memory allocation class
     LinearSolvers::Matrix mH, mV;           // Matrices used for GMRES
+    LinearSolvers::Allocator alc, tmp;      // memory allocation class
     LinearSolvers::Monitor mon(2*dim, 0.001); // max_iteration, absolute_tolerance
 
     // create vectors
@@ -125,9 +161,9 @@ int main(int argc, char* argv[])
     real * sol = new_real(dim);
     real * vec = new_real(dim);
 
-    for ( int i = 0; i < dim; ++i )
-        rhs[i] = ( i % 4 );
-    
+    // get system's right-hand-side
+    zero_real(dim, rhs);
+    readVector("rhs.mtx", dim, rhs);
     print_real(stdout, std::min(16, dim), rhs, " rhs\n");
 
     for ( int RS : {2, 4, 8, 16, 32} )

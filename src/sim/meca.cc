@@ -1829,6 +1829,19 @@ void Meca::saveSystem(FILE * file, real threshold) const
 }
 
 
+void Meca::saveRHS(FILE * file) const
+{
+    fprintf(file, "%% This is a vector produced by Cytosim\n");
+    fprintf(file, "%% author: FJ Nedelec\n");
+    fprintf(file, "%% kind: biological cell simulation (cytoskeleton)\n");
+    
+    const size_t dim = dimension();
+    fprintf(file, "%lu\n", dim);
+    
+    for ( index_t i = 0; i < dim; ++i )
+        fprintf(file, "%f\n", vRHS[i]);
+}
+
 /**
  Save the full matrix associated with multiply(), in binary format
  */

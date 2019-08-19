@@ -543,6 +543,9 @@ public:
     
     /// Save complete matrix in Matrix Market format
     void saveSystem(FILE *, real threshold) const;
+    
+    /// Save right-hand-side matrix
+    void saveRHS(FILE *) const;
 
     /// Save complete matrix in binary format
     void dumpSystem(FILE *) const;

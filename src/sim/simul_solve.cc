@@ -489,13 +489,19 @@ void Simul::dump() const
 
 void Simul::dump_system() const
 {
-    FILE * f = fopen("system.mtx", "w");
+    FILE * f = fopen("matrix.mtx", "w");
     if ( f && ~ferror(f) )
     {
         sMeca.saveSystem(f, 0);
-        fprintf(stderr, "Cytosim saved its matrix in `system.mtx'\n");
+        fprintf(stderr, "Cytosim saved its matrix in `matrix.mtx'\n");
+        fclose(f);
     }
-    fclose(f);
+    f = fopen("rhs.mtx", "w");
+    if ( f && ~ferror(f) )
+    {
+        sMeca.saveRHS(f);
+        fclose(f);
+    }
 }
 
 //==============================================================================
