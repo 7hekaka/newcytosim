@@ -1032,6 +1032,7 @@
 		BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_polygonZ.h; path = src/sim/spaces/space_polygonZ.h; sourceTree = SOURCE_ROOT; };
 		BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_site.cc; path = src/sim/fiber_site.cc; sourceTree = SOURCE_ROOT; };
 		BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fiber_site.h; path = src/sim/fiber_site.h; sourceTree = SOURCE_ROOT; };
+		BB2EFCAD230AAF7100073B5A /* test_solver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_solver.cc; sourceTree = "<group>"; };
 		BB30391F16FB42C700CDF586 /* reportF.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reportF.cc; sourceTree = "<group>"; };
 		BB3092282164BAC300C6DEE4 /* grid_display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = grid_display.h; sourceTree = "<group>"; };
 		BB3092292164BAC300C6DEE4 /* grid_display.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_display.cc; sourceTree = "<group>"; };
@@ -2256,6 +2257,7 @@
 				BB73591005B98DA3006956D5 /* test_random.cc */,
 				BB73591105B98DA3006956D5 /* test_rasterizer.cc */,
 				BB73591405B98DA3006956D5 /* test_solve.cc */,
+				BB2EFCAD230AAF7100073B5A /* test_solver.cc */,
 				BB73591705B98DA3006956D5 /* test_sphere.cc */,
 				BBE151DF05E574F300F782A8 /* test_space.cc */,
 				BB9EC3912091D6B000EF00E7 /* test_asm.cc */,
