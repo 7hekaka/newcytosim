@@ -82,7 +82,7 @@ void setRandom(int np, real * vec, real mag)
         vec[p] = mag * RNG.sreal();
 }
 
-void new_real(real*& x, real*& y, real*& z, real mag)
+void new_reals(real*& x, real*& y, real*& z, real mag)
 {
     x = new_real(ALOC);
     y = new_real(ALOC);
@@ -422,7 +422,7 @@ void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
 inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*, real, real*), char const* str)
 {
     real * x = nullptr, * y = nullptr, * z = nullptr;
-    new_real(x, y, z, 1.0);
+    new_reals(x, y, z, 1.0);
     
     unsigned nbt = DIM * ( NBS - 1 );
     TicToc::tic();
@@ -879,7 +879,7 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha, 
 inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    new_real(x, y, z, 1.0);
+    new_reals(x, y, z, 1.0);
 
     TicToc::tic();
     for ( unsigned ii=0; ii<cnt; ++ii )
@@ -902,7 +902,7 @@ inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*,
 inline void testD(unsigned cnt, void (*func)(unsigned, const real*, real, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    new_real(x, y, z, 1.0);
+    new_reals(x, y, z, 1.0);
 
     TicToc::tic();
     for ( unsigned ii=0; ii<cnt; ++ii )
@@ -957,7 +957,7 @@ int main(int argc, char* argv[])
     RNG.seed();
 
     pos = new_real(ALOC);
-    new_real(force, lagmul, diff, 0.0);
+    new_reals(force, lagmul, diff, 0.0);
     
     setFilament(NBS+1, pos, 1.0, 2.0);
     setRandom(NBS+1, force, 1.0);

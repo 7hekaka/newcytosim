@@ -310,10 +310,10 @@ public:
     bool     empty() const { return nbPts == 0; }
     
     /// number of points in the system
-    index_t nb_points() const { return nbPts; }
+    size_t nb_points() const { return nbPts; }
     
     /// Implementation of LinearOperator::size()
-    index_t dimension() const { return DIM * nbPts; }
+    size_t dimension() const { return DIM * nbPts; }
     
     /// calculate Y = M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;

@@ -113,6 +113,11 @@ test_gillespie: test_gillespie.cc random.o SFMT.o backtrace.o
 	$(DONE)
 vpath test_gillespie bin
 
+test_solver: test_solver.cc monitor.o
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+vpath test_solver bin
+
 #----------------------------Targets with Graphics------------------------------
 
 #LINKGL :=-L /usr/local/Cellar/mesa/18.3.1/lib -lGL -lglut

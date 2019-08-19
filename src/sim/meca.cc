@@ -1739,7 +1739,9 @@ void Meca::apply()
 #pragma mark - Debug/Output Functions
 
 /**
- Extract the full matrix associated with matVect, in `mat` of size `sz`.
+ Extract the full matrix associated with matVect, in `mat[]`
+ The matrix should be preallocated of size `dim`, which should be equal
+ to the system's dimension().
  */
 void Meca::getSystem(index_t dim, real * mat) const
 {

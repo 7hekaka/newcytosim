@@ -105,6 +105,20 @@ inline void zero_real(size_t size, real * ptr)
 }
 
 
+/// print 'size' components of 'ptr' on a line
+inline void print_real(FILE* out, size_t size, real * ptr, const char end[])
+{
+    if ( !ptr || size == 0 )
+        fprintf(out, "void");
+    else
+    {
+        for ( size_t i = 0; i < size; ++i )
+            fprintf(out, " %9.4f", ptr[i]);
+        fprintf(out, "%s", end);
+    }
+}
+
+
 /// square of the argument: `x * x`
 inline real square(const real x) { return x * x; }
 

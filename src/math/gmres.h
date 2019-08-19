@@ -23,14 +23,14 @@
 namespace LinearSolvers
 {
 
-    void gmres_rotate(real& dx, real& dy, real cs, real sn)
+    inline void gmres_rotate(real& dx, real& dy, real cs, real sn)
     {
         real tmp = cs * dx + sn * dy;
         dy = -sn * dx + cs * dy;
         dx = tmp;
     }
     
-    void gmres_make_rotation(real dx, real dy, real& cs, real& sn)
+    inline void gmres_make_rotation(real dx, real dy, real& cs, real& sn)
     {
         if ( dy == 0.0 )
         {
@@ -50,7 +50,7 @@ namespace LinearSolvers
         }
     }
     
-    void gmres_make_rotation(Matrix& H, real cs[], real sn[], real ss[], int i)
+    inline void gmres_make_rotation(Matrix& H, real cs[], real sn[], real ss[], int i)
     {
         for ( int k = 0; k < i; ++k )
             gmres_rotate(H(k,i), H(k+1,i), cs[k], sn[k]);
