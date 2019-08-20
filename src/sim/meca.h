@@ -180,61 +180,20 @@ public:
     /// base for force
     real&   base(index_t i) { return vBAS[i]; }
     
-    /// position of point stored at vPTS[i]
-    Vector  position1(const index_t inx) const
-    {
-        return Vector(vPTS+inx);
-    }
-    
     /// position interpolated from two points in vPTS[]
-    Vector  position2(const index_t inx[2], const real coef[2]) const
-    {
-        Vector P0(vPTS+inx[0]);
-        Vector P1(vPTS+inx[1]);
-        return coef[0] * P0 + coef[1] * P1;
-    }
+    Vector  position2(const index_t inx[2], const real coef[2]) const;
 
     /// position interpolated from three points in vPTS[]
-    Vector  position3(const index_t inx[3], const real coef[3]) const
-    {
-        Vector P0(vPTS+inx[0]);
-        Vector P1(vPTS+inx[1]);
-        Vector P2(vPTS+inx[2]);
-        return ( coef[0] * P0 + coef[1] * P1 ) + coef[2] * P2;
-   }
+    Vector  position3(const index_t inx[3], const real coef[3]) const;
 
     /// position interpolated from four points in vPTS[]
-    Vector  position4(const index_t inx[4], const real coef[4]) const
-    {
-        Vector P0(vPTS+inx[0]);
-        Vector P1(vPTS+inx[1]);
-        Vector P2(vPTS+inx[2]);
-        Vector P3(vPTS+inx[3]);
-        return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 );
-    }
+    Vector  position4(const index_t inx[4], const real coef[4]) const;
     
     /// position interpolated from five points in vPTS[]
-    Vector  position5(const index_t inx[5], const real coef[5]) const
-    {
-        Vector P0(vPTS+inx[0]);
-        Vector P1(vPTS+inx[1]);
-        Vector P2(vPTS+inx[2]);
-        Vector P3(vPTS+inx[3]);
-        Vector P4(vPTS+inx[4]);
-        return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + coef[4] * P4;
-    }
+    Vector  position5(const index_t inx[5], const real coef[5]) const;
     
     /// position interpolated from six points in vPTS[]
-    Vector  position6(const index_t inx[6], const real coef[6]) const
-    {
-        Vector P0(vPTS+inx[0]);
-        Vector P1(vPTS+inx[1]);
-        Vector P2(vPTS+inx[2]);
-        Vector P3(vPTS+inx[3]);
-        Vector P4(vPTS+inx[4]);
-        Vector P5(vPTS+inx[5]);
-        return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + ( coef[4] * P4 + coef[5] * P5 );
-    }
+    Vector  position6(const index_t inx[6], const real coef[6]) const;
 
     /// add block 'T' to mC at position (i, j)
     void add_block(index_t i, index_t j, MatrixBlock const& T);
@@ -244,6 +203,30 @@ public:
  
     /// add block 'alpha*T' to mC at position (i, j)
     void add_block(index_t i, index_t j, real alpha, MatrixBlock const& T);
+
+    /// add block 'T' to mC at position (i, j)
+    void add_diag_block(index_t i, MatrixBlock const& T);
+    
+    /// subtract block 'T' to mC at position (i, j)
+    void sub_diag_block(index_t i, MatrixBlock const& T);
+    
+    /// add block 'alpha*T' to mC at position (i, j)
+    void add_diag_block(index_t i, real alpha, MatrixBlock const& T);
+
+    /// add value to mB at position (i, j)
+    void add_iso(index_t i, index_t j, real val);
+
+    /// add value to mB at position (i, j)
+    void sub_iso(index_t i, index_t j, real val);
+
+    /// add value to vBAS at index `i`
+    void add_base(index_t i, Vector const&);
+
+    /// add value to vBAS at index `i`
+    void add_base(index_t i, Vector const&, real);
+
+    /// sub value to vBAS at index `i`
+    void sub_base(index_t i, Vector const&);
 
 private:
     
