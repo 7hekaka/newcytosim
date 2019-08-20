@@ -4,11 +4,11 @@
 
 #include <cstdio>
 #include "real.h"
-#include "allocator.h"
+#include "cblas.h"
 #include "monitor.h"
+#include "allocator.h"
 #include "bicgstab.h"
 #include "gmres.h"
-#include "cblas.h"
 
 /// interface for a linear system
 class System
@@ -165,6 +165,20 @@ int main(int argc, char* argv[])
     zero_real(dim, rhs);
     readVector("rhs.mtx", dim, rhs);
     print_real(stdout, std::min(16, dim), rhs, " rhs\n");
+
+    if ( 1 )
+    {
+        mon.reset();
+        zero_real(dim, sol);
+        LinearSolvers::BCGS(sys, rhs, sol, mon, alc);
+        print_real(stdout, std::min(16, dim), sol, " sol |");
+        
+        // calculate true residual:
+        sys.multiply(sol, vec);
+        blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
+        real res = blas::nrm2(dim, vec);
+        fprintf(stdout, " BCGS  count %4i  residual %10.6f\n", mon.count(), res);
+    }
 
     for ( int RS : {2, 4, 8, 16, 32} )
     {

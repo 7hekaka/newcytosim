@@ -1,4 +1,4 @@
-function check_dump(path)
+function [sys, rhs] = cytosim_dump(path)
 
 % This is used to explore Cytosim's linear system in matlab
 % - load the matrices and vector from Cytosim's dump
@@ -134,13 +134,6 @@ if 1 %% without preconditionning
     ylabel('Relative residual');
     title('Solver Convergence');
     hold on;
-
-    if ( 0 )
-        % QMR
-        [vec,flg,res,itr,rv0] = qmr(sss, rhs, tol, maxit);
-        semilogy(rv0/rv0(1),'m:', 'Linewidth', 2);
-        report('QMR', 2*itr, vec);
-    end
     
     % GMRES
     for i = 4:6
@@ -162,7 +155,7 @@ if 1 %% without preconditionning
     % IDRS-STAB
     for i = 0:3
         RS = 2^i;
-        [vec,flg,res,itr] = IDRstabg4(sss, rhs, RS, tol, maxit, [], [], []);
+        [vec,flg,res,itr,rv0] = IDRstabg5(sss, rhs, RS, tol, maxit, [], [], []);
         semilogy(rv0/rv0(1),'m', 'Linewidth', 2);
         report(sprintf('IDRSTAB %03i', RS), itr, vec);
     end
@@ -199,19 +192,10 @@ if 1 %% WITH PRECONDITIONNING
 
     for i = 2:6
         RS = 2^i;
-        [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol/5, maxit, [], @mfun1);
+        [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol/2, maxit, [], @mfun1);
         semilogy(rv0/rv0(1),'g', 'Linewidth', 2);
         report(sprintf('P GMRES %03i', RS), itr(1)*RS+itr(2), vec);
-    end
-    
-    
-    if ( 0 )
-        % QMR method
-        [vec,flg,res,itr,rv0] = qmr(sss, rhs, tol, maxit, @mfun2);
-        semilogy(rv0/rv0(1),'m-', 'Linewidth', 2);
-        report('P QMR', 2*itr, vec);
-    end
-    
+    end    
     
     % IDRS 
     OPT.smoothing = 1;
@@ -226,7 +210,7 @@ if 1 %% WITH PRECONDITIONNING
     % IDRS-STAB
     for i = 0:3
         RS = 2^i;
-        [vec,flg,res,itr] = IDRstabg4(sss, rhs, RS, tol/5, maxit, @mfun1, [], []);
+        [vec,flg,res,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/2, maxit, @mfun1, [], []);
         semilogy(rv0/rv0(1),'m', 'Linewidth', 2);
         report(sprintf('P IDRSTAB %03i', RS), itr, vec);
     end

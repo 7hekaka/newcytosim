@@ -15,7 +15,7 @@ ifeq ($(Flags$(MODE)),)
    $(error No compiler-options defined for $$(MACHINE)=$(MACHINE) in mode $(MODE))
 endif
 
-CXXFLAGS=$(CXX) $(CXXFLG) $(Flags$(MODE))
+COMPILE=$(CXX) $(CXXFLG) $(Flags$(MODE))
 
 ifneq ($(HAS_PNG), 0)
     IMAGE_DEF = -DHAS_PNG $(INC_PNG)
@@ -39,7 +39,7 @@ OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
 #----------------------------targets--------------------------------------------
 
 mechoui: $(OBJ) SFMT.o saveimage.o
-	$(CXXFLAGS) $(addprefix build/, $(notdir $^)) $(LINKGL) $(IMAGE_LIB) -o $@
+	$(COMPILE) $(addprefix build/, $(notdir $^)) $(LINKGL) $(IMAGE_LIB) -o $@
 	@printf "\x1B[35m >>>>>> made %s\x1B[0m\n" $@
 vpath mechoui .
 
@@ -56,10 +56,10 @@ tar: clean
 INCLUDE=$(addprefix -I, $(INCDIR))
 
 $(OBJ): %.o: %.cc
-	$(CXXFLAGS) -c $(INCLUDE) $< -o build/$@
+	$(COMPILE) -c $(INCLUDE) $< -o build/$@
 
 build/saveimage.o: saveimage.cc saveimage.h
-	$(CXXFLAGS) -c $(IMAGE_DEF) $< -o $@
+	$(COMPILE) -c $(IMAGE_DEF) $< -o $@
 
 # Attention: Mersenne-Twister is coded in C-language,
 # and we must provide this with '-x c' to the compiler:

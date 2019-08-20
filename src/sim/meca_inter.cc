@@ -124,6 +124,7 @@ void Meca::addTorque(const Interpolation & pti, const Torque & torque)
  
  This code assumes norm(dir) == 1
  This is explicit and all contributions go in the force vector vBAS[]
+ \todo update addTorqueClamp to implicit form
 */
 void Meca::addTorqueClamp(const Interpolation & pti,
                           Vector const& dir,
@@ -344,6 +345,8 @@ void Meca::addTorqueExplicit(const Interpolation & ptA,
  Delta_angle is the difference between actual angle and resting angle between AB and CD
  
  Antonio Politi, 2013
+ 
+ This code is outdated, and one should use addTorque() instead
  */
 void Meca::addTorquePoliti(const Interpolation & pt1,
                            const Interpolation & pt2,
@@ -697,9 +700,12 @@ void Meca::addTorque(const Mecapoint & ptA,
     const index_t iiB = DIM * ptB.matIndex();
     const index_t iiC = DIM * ptC.matIndex();
     
+    // the term (R+W)+(T+W) is diagonal
+    MatrixBlock D(0, 2 * ( weight * cosinus + weight ));
+    
 #if USE_MATRIX_BLOCK
     mC.diag_block(iiA).sub_half(W);
-    mC.diag_block(iiB).sub_half((W+R)+(W+T));
+    mC.diag_block(iiB).sub_half(D); //(R+W)+(T+W)
     mC.diag_block(iiC).sub_half(W);
     if ( iiB > iiA )
         mC.block(iiB, iiA).add_full(W+R);
@@ -861,19 +867,23 @@ void Meca::addTorqueHalf(const Mecapoint & ptA,
 }
 #endif
 
-/*
+#if ( 0 )
 void Meca::addTorque(const Mecapoint & ptA,
                      const Mecapoint & ptB,
                      const Mecapoint & ptC,
                      const real cosinus, const real sinus,
                      const real len, const real weight)
 {
-    addTorqueHalf(ptA, ptB, ptC, cosinus, sinus, len, weight);
-    addTorqueHalf(ptC, ptB, ptA, cosinus, sinus, len, weight);
+    addLongLink(ptA, ptB, len, weight);
+    //addLongLink(ptB, ptC, len, weight);
+    addTorque(ptA, ptB, ptC, cosinus, sinus, weight);
+    //addTorqueHalf(ptA, ptB, ptC, cosinus, sinus, len, weight);
+    //addTorqueHalf(ptC, ptB, ptA, cosinus, sinus, len, weight);
 }
-*/
+#endif
 
-#if ( 1 )
+#if ( 0 )
+//this is variation 2
 void Meca::addTorque(const Mecapoint & ptA,
                      const Mecapoint & ptB,
                      const Mecapoint & ptC,
@@ -949,11 +959,13 @@ void Meca::addTorque(const Mecapoint & ptA,
     
     //std::clog << "R " << std::setw(12) << R << "\n";
 }
+#endif
 
 
-#else
-
- // This is variation 1
+#if ( 1 )
+/** This is variation 3, 20.08.2019
+ It combines addTorque() without length with a LongLink(ptA, ptB);
+ */
 void Meca::addTorque(const Mecapoint & ptA,
                      const Mecapoint & ptB,
                      const Mecapoint & ptC,
@@ -963,54 +975,70 @@ void Meca::addTorque(const Mecapoint & ptA,
     assert_true( weight >= 0 );
     const MatrixBlock W(0, weight);
     const Vector AB = ptB.pos() - ptA.pos();
-    const Vector CB = ptB.pos() - ptC.pos();
-
+    
 #if ( DIM == 3 )
-    Vector axis = normalize(cross(CB,AB));
-    const Matrix33 rot = Matrix33::rotationAroundAxis(axis, cosinus, sinus);
+    const Vector BC = ptC.pos() - ptB.pos();
+    Vector axis = normalize(cross(AB,BC));
+    const Matrix33 R = Matrix33::rotationAroundAxis(axis, cosinus, sinus) * weight;
+#elif ( DIM == 2 )
+    const Matrix22 R = weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
-    const Matrix22 rot(cosinus, sinus,-sinus, cosinus);
+    const Matrix11 R(1);  //should not be used!
 #endif
- 
-    const real sa = std::max(1.0, len/AB.norm());
-    const real sc = std::max(1.0, len/CB.norm());
-
-    const MatrixBlock R = ( weight * ( sa + sc ) ) * rot;
+    
     const MatrixBlock T = R.transposed();
-    const MatrixBlock aW = ( 1.0 + sa * sa ) * W;
-    const MatrixBlock cW = ( 1.0 + sc * sc ) * W;
-
+    
     // indices in matrix mC:
     const index_t iiA = DIM * ptA.matIndex();
     const index_t iiB = DIM * ptB.matIndex();
     const index_t iiC = DIM * ptC.matIndex();
- 
+    
+    // this is a LongLink(A, B):
+    MatrixBlock P(0,0);
+    const real ab2 = AB.normSqr();
+    if ( ab2 > REAL_EPSILON )
+    {
+        real ab = sqrt(ab2);
+        const real wla = weight * len / ab;
+        AB.add_to(-wla, vBAS+iiA);
+        AB.add_to( wla, vBAS+iiB);
+
+        if ( ab < len )
+            P = MatrixBlock::outerProduct(AB, weight/ab2);
+        else
+            P = MatrixBlock::offsetOuterProduct(weight-wla, AB, wla/ab2);
+    }    
+    
+    // the term (R+W)+(T+W) is diagonal
+    MatrixBlock D(0, 2 * ( weight * cosinus + weight ));
+    
 #if USE_MATRIX_BLOCK
-    mC.diag_block(iiA).sub_half(aW);
-    mC.diag_block(iiB).sub_half((R+aW)+(T+cW));
-    mC.diag_block(iiC).sub_half(cW);
+    mC.diag_block(iiA).sub_half(W+P);
+    mC.diag_block(iiB).sub_half(D+P); //(R+W)+(T+W)+P
+    mC.diag_block(iiC).sub_half(W);
     if ( iiB > iiA )
-        mC.block(iiB, iiA).add_full(R+aW);
+        mC.block(iiB, iiA).add_full(W+R+P);
     else
-        mC.block(iiA, iiB).add_full(T+aW);
+        mC.block(iiA, iiB).add_full(W+T+P);
     if ( iiC > iiA )
         mC.block(iiC, iiA).sub_full(R);
     else
         mC.block(iiA, iiC).sub_full(T);
     if ( iiC > iiB )
-        mC.block(iiC, iiB).add_full(R+cW);
+        mC.block(iiC, iiB).add_full(W+R);
     else
-        mC.block(iiB, iiC).add_full(T+cW);
+        mC.block(iiB, iiC).add_full(W+T);
 #else
-    sub_block(iiA, iiA, aW);
-    sub_block(iiB, iiB, (R+aW)+(T+cW));
-    sub_block(iiC, iiC, cW);
-    add_block(iiB, iiA, R+aW);
+    sub_block(iiA, iiA, W+P);
+    sub_block(iiB, iiB, D+P);
+    sub_block(iiC, iiC, W);
+    add_block(iiB, iiA, W+R+P);
     sub_block(iiC, iiA, R);
-    add_block(iiC, iiB, R+cW);
+    add_block(iiC, iiB, W+R);
 #endif
- 
-    //std::clog << "R " << std::setw(12) << R << "\n";
+    
+    if ( modulo )
+        throw Exception("addTorque(A,B,C) is not usable with periodic boundary conditions");
 }
 #endif
 
@@ -2278,7 +2306,7 @@ void Meca::addSideLink3D(const Interpolation & ptA,
 #endif
     
     if ( modulo )
-        throw Exception("interSideLink3D is not usable with periodic boundary conditions");
+        throw Exception("addSideLink3D is not usable with periodic boundary conditions");
 }
 
 
@@ -2359,7 +2387,7 @@ void Meca::addSideLinkS(const Interpolation & ptA,
 #endif
     
     if ( modulo )
-        throw Exception("interSideLinkS is not usable with periodic boundary conditions");
+        throw Exception("addSideLinkS is not usable with periodic boundary conditions");
 }
 #endif
 
@@ -2585,7 +2613,7 @@ void Meca::addSideLinkS(const Interpolation & ptA,
 #endif
     
     if ( modulo )
-        throw Exception("interSideLinkS is not usable with periodic boundary conditions");
+        throw Exception("addSideLinkS is not usable with periodic boundary conditions");
 }
 
 #endif
@@ -2800,7 +2828,7 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
 #endif
     
     if ( modulo )
-        throw Exception("interSideSideLink2D is not usable with periodic boundary conditions");
+        throw Exception("addSideSideLink2D is not usable with periodic boundary conditions");
 }
 
 #endif
@@ -3186,7 +3214,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
 #endif
 
     if ( modulo )
-        throw Exception("interSideSlidingLinkS is not usable with periodic boundary conditions");
+        throw Exception("addSideSlidingLinkS is not usable with periodic boundary conditions");
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )

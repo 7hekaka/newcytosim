@@ -306,7 +306,6 @@ void Simul::setInteractions(Meca & meca) const
     if ( beads.size() > 2 )
     {
         PRINT_ONCE("AD-HOC BEAD-LOOP FORCES ENABLED\n");
-        const real len = 1;
         const real sti = 1000;
         const real ang = 2 * M_PI / beads.size();
         real co = cos(ang), si = sin(ang);
@@ -314,6 +313,7 @@ void Simul::setInteractions(Meca & meca) const
         Bead * a = beads.firstID();
         Bead * b = beads.nextID(a);
         Bead * c = beads.nextID(b);
+        const real len = 2 * a->radius();
         while ( c )
         {
             meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
@@ -330,24 +330,16 @@ void Simul::setInteractions(Meca & meca) const
 #if ( 0 )
     if ( beads.size() > 2 )
     {
-        PRINT_ONCE("AD-HOC HYPERFUN TEST FORCES ENABLED\n");
-        const real len = 1.5;
-        const real sti = 1000000;
-        const real ang = 2 * M_PI / 12;//beads.size();
+        PRINT_ONCE("AD-HOC BEAD TORQUES ENABLED\n");
+        const real sti = 10000;
+        const real ang = 2 * M_PI / 12;
         real co = cos(ang), si = sin(ang);
         // attach beads together in a closed loop:
         Bead * a = beads.firstID();
         Bead * b = beads.nextID(a);
         Bead * c = beads.nextID(b);
-        if ( 0 )
-        {
-            meca.addLongLink(Mecapoint(a,0), Mecapoint(b,0), len, sti);
-            meca.addLongLink(Mecapoint(b,0), Mecapoint(c,0), len, sti);
-            meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, sti);
-        }
-        meca.addTorqueHalf(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
-        //meca.addTorqueHalf(Mecapoint(c,0), Mecapoint(b,0), Mecapoint(a,0), co, si, len, sti);
-        //meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        const real len = 2 * a->radius();
+        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
     }
 #endif
 #if ( 0 )
