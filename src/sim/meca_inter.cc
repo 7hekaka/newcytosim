@@ -1108,16 +1108,62 @@ void Meca::addTorque(const Mecapoint & ptA,
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Links between Mecables
+#pragma mark - Interpolation over position vector
 //------------------------------------------------------------------------------
 
-/// position interpolated from two points in vPTS[]
+
 Vector Meca::position2(const index_t inx[2], const real coef[2]) const
 {
     Vector P0(vPTS+inx[0]);
     Vector P1(vPTS+inx[1]);
     return coef[0] * P0 + coef[1] * P1;
 }
+
+
+Vector Meca::position3(const index_t inx[3], const real coef[3]) const
+{
+    Vector P0(vPTS+inx[0]);
+    Vector P1(vPTS+inx[1]);
+    Vector P2(vPTS+inx[2]);
+    return ( coef[0] * P0 + coef[1] * P1 ) + coef[2] * P2;
+}
+
+
+Vector Meca::position4(const index_t inx[4], const real coef[4]) const
+{
+    Vector P0(vPTS+inx[0]);
+    Vector P1(vPTS+inx[1]);
+    Vector P2(vPTS+inx[2]);
+    Vector P3(vPTS+inx[3]);
+    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 );
+}
+
+
+Vector Meca::position5(const index_t inx[5], const real coef[5]) const
+{
+    Vector P0(vPTS+inx[0]);
+    Vector P1(vPTS+inx[1]);
+    Vector P2(vPTS+inx[2]);
+    Vector P3(vPTS+inx[3]);
+    Vector P4(vPTS+inx[4]);
+    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + coef[4] * P4;
+}
+
+
+Vector Meca::position6(const index_t inx[6], const real coef[6]) const
+{
+    Vector P0(vPTS+inx[0]);
+    Vector P1(vPTS+inx[1]);
+    Vector P2(vPTS+inx[2]);
+    Vector P3(vPTS+inx[3]);
+    Vector P4(vPTS+inx[4]);
+    Vector P5(vPTS+inx[5]);
+    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + ( coef[4] * P4 + coef[5] * P5 );
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Links between Mecables
+//------------------------------------------------------------------------------
 
 /**
  Link `ptA` (A) and `ptB` (B)
@@ -1310,16 +1356,6 @@ void Meca::addLink(const Mecapoint & ptA,
         gle::drawLink(ptB.pos(), ptA.pos());
     }
 #endif
-}
-
-/// position interpolated from four points in vPTS[]
-Vector Meca::position4(const index_t inx[4], const real coef[4]) const
-{
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    Vector P3(vPTS+inx[3]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 );
 }
 
 
@@ -1556,14 +1592,6 @@ void Meca::addLink2(const Interpolation & pti,
     }
 }
 
-/// position interpolated from three points in vPTS[]
-Vector Meca::position3(const index_t inx[3], const real coef[3]) const
-{
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + coef[2] * P2;
-}
 
 /**
  Link vertex (A) and interpolated point (B)
@@ -1622,16 +1650,6 @@ void Meca::addLink3(const Mecapoint & ptA,
     }
 }
 
-/// position interpolated from five points in vPTS[]
-Vector Meca::position5(const index_t inx[5], const real coef[5]) const
-{
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    Vector P3(vPTS+inx[3]);
-    Vector P4(vPTS+inx[4]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + coef[4] * P4;
-}
 
 /**
  Link `pti` (A) and interpolated point (B)
@@ -1763,18 +1781,6 @@ void Meca::addLink4(const Mecapoint & ptA,
     }
 }
 
-
-/// position interpolated from six points in vPTS[]
-Vector Meca::position6(const index_t inx[6], const real coef[6]) const
-{
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    Vector P3(vPTS+inx[3]);
-    Vector P4(vPTS+inx[4]);
-    Vector P5(vPTS+inx[5]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + ( coef[4] * P4 + coef[5] * P5 );
-}
 
 /**
  Link `pti` (A) and interpolated point (B)
