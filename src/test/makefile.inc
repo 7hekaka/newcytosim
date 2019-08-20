@@ -113,7 +113,7 @@ test_gillespie: test_gillespie.cc random.o SFMT.o backtrace.o
 	$(DONE)
 vpath test_gillespie bin
 
-test_solver: test_solver.cc monitor.o
+test_solver: test_solver.cc
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_solver bin
