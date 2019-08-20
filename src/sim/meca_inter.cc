@@ -18,7 +18,7 @@ extern Modulo const* modulo;
 
 /// set TRUE to update matrix mC using block directives
 /** This is significantly faster */
-#define USE_MATRIX_BLOCK ( DIM > 1 )
+#define USE_MATRIX_BLOCK 1
 
 //------------------------------------------------------------------------------
 #pragma mark - Accessory functions
@@ -69,10 +69,10 @@ bool any_equal(const index_t a, const index_t b,
 
 inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 {
-#if USE_MATRIX_BLOCK
+#if ( DIM == 1 )
+    mB(i,j) += T.value();
+#elif USE_MATRIX_BLOCK
     mC.block(i, j).add_full(T);
-#elif ( DIM == 1 )
-    mC(i,j) += T.value();
 #else
     assert_true( i != j );
     for ( int x = 0; x < DIM; ++x )
@@ -83,10 +83,10 @@ inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 
 inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const& T)
 {
-#if USE_MATRIX_BLOCK
+#if ( DIM == 1 )
+    mB(i,j) += alpha * T.value();
+#elif USE_MATRIX_BLOCK
     mC.block(i, j).add_full(alpha, T);
-#elif ( DIM == 1 )
-    mC(i,j) += alpha * T.value();
 #else
     assert_true( i != j );
     for ( int x = 0; x < DIM; ++x )
@@ -97,10 +97,10 @@ inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const&
 
 inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 {
-#if USE_MATRIX_BLOCK
+#if ( DIM == 1 )
+    mB(i,j) -= T.value();
+#elif USE_MATRIX_BLOCK
     mC.block(i, j).sub_full(T);
-#elif ( DIM == 1 )
-    mC(i,j) -= T.value();
 #else
     assert_true( i != j );
     for ( int x = 0; x < DIM; ++x )
@@ -109,12 +109,13 @@ inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 #endif
 }
 
+
 inline void Meca::add_diag_block(index_t i, MatrixBlock const& T)
 {
-#if USE_MATRIX_BLOCK
+#if ( DIM == 1 )
+    mB(i,i) += T.value();
+#elif USE_MATRIX_BLOCK
     mC.diag_block(i).add_half(T);
-#elif ( DIM == 1 )
-    mC(i,j) += T.value();
 #else
     // add lower part of block
     for ( int x = 0; x < DIM; ++x )
@@ -125,10 +126,10 @@ inline void Meca::add_diag_block(index_t i, MatrixBlock const& T)
 
 inline void Meca::add_diag_block(index_t i, real alpha, MatrixBlock const& T)
 {
-#if USE_MATRIX_BLOCK
+#if ( DIM == 1 )
+    mB(i,i) += alpha * T.value();
+#elif USE_MATRIX_BLOCK
     mC.diag_block(i).add_half(alpha, T);
-#elif ( DIM == 1 )
-    mC(i,j) += alpha * T.value();
 #else
     // add lower part of block
     for ( int x = 0; x < DIM; ++x )
@@ -139,10 +140,10 @@ inline void Meca::add_diag_block(index_t i, real alpha, MatrixBlock const& T)
 
 inline void Meca::sub_diag_block(index_t i, MatrixBlock const& T)
 {
-#if USE_MATRIX_BLOCK
+#if ( DIM == 1 )
+    mB(i,i) -= T.value();
+#elif USE_MATRIX_BLOCK
     mC.diag_block(i).sub_half(T);
-#elif ( DIM == 1 )
-    mC(i,j) -= T.value();
 #else
     // add lower part of block
     for ( int x = 0; x < DIM; ++x )
@@ -151,7 +152,7 @@ inline void Meca::sub_diag_block(index_t i, MatrixBlock const& T)
 #endif
 }
 
-/// add value to mB at position (i, j)
+
 inline void Meca::add_iso(index_t i, index_t j, real val)
 {
 #if ( 1 )
@@ -161,7 +162,6 @@ inline void Meca::add_iso(index_t i, index_t j, real val)
 #endif
 }
 
-/// sub value to mB at position (i, j)
 inline void Meca::sub_iso(index_t i, index_t j, real val)
 {
 #if ( 1 )
@@ -170,6 +170,7 @@ inline void Meca::sub_iso(index_t i, index_t j, real val)
     mC.block(DIM*i, DIM*j).sub_diag(val);
 #endif
 }
+
 
 inline void Meca::add_base(index_t i, Vector const& vec)
 {
