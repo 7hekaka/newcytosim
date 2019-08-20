@@ -675,6 +675,22 @@ public:
             val[y+BLD*x] -= src[y+BLD*x];
 #endif
     }
+    
+    /// add alpha to diagonal
+    void add_diag(real alpha)
+    {
+        val[0]       += alpha;
+        val[1+BLD]   += alpha;
+        val[2+BLD*2] += alpha;
+    }
+    
+    /// add -alpha to diagonal
+    void sub_diag(real alpha)
+    {
+        val[0]       -= alpha;
+        val[1+BLD]   -= alpha;
+        val[2+BLD*2] -= alpha;
+    }
 
     /// add all elements of block 'S' to array 'M'
     void addto(real * M, unsigned ldd) const

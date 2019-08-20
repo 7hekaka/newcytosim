@@ -443,6 +443,24 @@ public:
 #endif
     }
     
+    /// add alpha to diagonal
+    void add_diag(real alpha)
+    {
+        val[0x0] += alpha;
+        val[0x5] += alpha;
+        val[0xA] += alpha;
+        val[0xF] += alpha;
+    }
+    
+    /// add -alpha to diagonal
+    void sub_diag(real alpha)
+    {
+        val[0x0] -= alpha;
+        val[0x5] -= alpha;
+        val[0xA] -= alpha;
+        val[0xF] -= alpha;
+    }
+
     /// subtract lower triangle of matrix including diagonal: this <- this - M
     void sub_half(Matrix44 const& M)
     {

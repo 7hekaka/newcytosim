@@ -366,7 +366,6 @@
 		BB8BBD05215284C70033BC7A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB8BBD0621537DD50033BC7A /* player.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358C805B98DA3006956D5 /* player.cc */; };
 		BB8CB8571523147900505E89 /* bicgstab.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8CB8551523147900505E89 /* bicgstab.h */; };
-		BB8CB85C152314AB00505E89 /* monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8CB8541523147900505E89 /* monitor.cc */; };
 		BB90E7EE12CA635C000DF711 /* wrist.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB90E7EC12CA635C000DF711 /* wrist.cc */; };
 		BB90E7EF12CA635C000DF711 /* wrist.h in Headers */ = {isa = PBXBuildFile; fileRef = BB90E7ED12CA635C000DF711 /* wrist.h */; };
 		BB92D7D4110E0D0500727008 /* property_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD8A4B70FF253B8005A6615 /* property_list.cc */; };
@@ -1262,7 +1261,6 @@
 		BB89A3F11A6410CF00D724F4 /* event_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event_set.h; sourceTree = "<group>"; };
 		BB89A3F21A6410CF00D724F4 /* event.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event.cc; sourceTree = "<group>"; };
 		BB89A3F31A6410CF00D724F4 /* event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event.h; sourceTree = "<group>"; };
-		BB8CB8541523147900505E89 /* monitor.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = monitor.cc; path = src/math/monitor.cc; sourceTree = SOURCE_ROOT; };
 		BB8CB8551523147900505E89 /* bicgstab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bicgstab.h; path = src/math/bicgstab.h; sourceTree = SOURCE_ROOT; };
 		BB8CE30705DFF9140031D3B4 /* isometry.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = isometry.h; path = src/math/isometry.h; sourceTree = SOURCE_ROOT; };
 		BB90E7EC12CA635C000DF711 /* wrist.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wrist.cc; path = singles/wrist.cc; sourceTree = "<group>"; };
@@ -1966,7 +1964,6 @@
 				BB2185620B4084CC00B75436 /* linear_solvers.cc */,
 				BB8CB8551523147900505E89 /* bicgstab.h */,
 				BB6485F1205803BB005F2CD1 /* gmres.h */,
-				BB8CB8541523147900505E89 /* monitor.cc */,
 				BB6485EF2057FDD5005F2CD1 /* monitor.h */,
 				BB6485EB2057FD1B005F2CD1 /* allocator.h */,
 				BB6485ED2057FD30005F2CD1 /* linear_operator.h */,
@@ -3886,7 +3883,6 @@
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
-				BB8CB85C152314AB00505E89 /* monitor.cc in Sources */,
 				BB61CA8416D6310100A0F6A5 /* linear_solvers.cc in Sources */,
 				BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */,
 				BB749D661793645D00B43298 /* polygon.cc in Sources */,
