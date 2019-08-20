@@ -196,7 +196,7 @@ inline void xscal(int N, real alpha, real*X, int incX)
         FORTRAN(axpby)(&N, &alpha, X, &incX, &beta, Y, &incY);
     }
 #else
-    inline void xaxpby(int N, real alpha, const real*X, int incX, real beta, real*Y, int incY)
+    inline void xaxpby(int N, real alpha, const real* X, int incX, real beta, real* Y, int incY)
     {
         if ( incX == 1  &&  incY == 1 )
         {
@@ -208,23 +208,34 @@ inline void xscal(int N, real alpha, real*X, int incX)
             for ( int i = 0; i < N; ++i )
                 Y[i*incY] = alpha * X[i*incX] + beta * Y[i*incY];
         }
-        //FORTRAN(scal)(&N, &beta, Y, &incY);
-        //FORTRAN(axpy)(&N, &alpha, X, &incX, Y, &incY);
     }
 #endif
 
-/// addition Y[i] <- Y[i] + X[i], for i in [0, N[; equivalent to xaxpy(N, 1.0, X, 1, Y, 1);
+    
+/// calculates Y <- alpha * Y + X
+inline void xpay(int N, const real* X, real alpha, real* Y)
+{
+    #pragma ivdep
+    #pragma vector always
+    for ( int i = 0; i < N; ++i )
+        Y[i] = alpha * Y[i] + X[i];
+}
+
+
+/// addition Y[] <- Y[] + X[], for array of size N
 inline void add(int N, const real* X, real* Y)
 {
+    //xaxpy(N, 1.0, X, 1, Y, 1);
     #pragma ivdep
     #pragma vector always
     for ( int i = 0; i < N; ++i )
         Y[i] = Y[i] + X[i];
 }
     
-/// subtraction Y[i] <- Y[i] - X[i], for i in [0, N[; equivalent to xaxpy(N, -1.0, X, 1, Y, 1);
+/// subtraction Y[] <- Y[] - X[], for array of size N
 inline void sub(int N, const real* X, real* Y)
 {
+    //xaxpy(N, -1.0, X, 1, Y, 1);
     #pragma ivdep
     #pragma vector always
     for ( int i = 0; i < N; ++i )

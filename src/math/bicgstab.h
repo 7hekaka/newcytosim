@@ -69,12 +69,7 @@ namespace LinearSolvers
             beta = ( rho / rho_old ) * ( alpha / omega );
             // p = r + beta * ( p - omega * v )
             blas::xaxpy(dim, -omega, v, 1, p, 1);
-#ifdef __INTEL_MKL__
-            blas::xaxpby(dim, 1.0, r, 1, beta, p, 1);
-#else
-            blas::xscal(dim, beta, p, 1);
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);
-#endif
+            blas::xpay(dim, r, beta, p);
         start:
             
             mat.multiply(p, v);                     // v = A * p;
@@ -176,12 +171,7 @@ namespace LinearSolvers
             beta = ( rho / rho_old ) * ( alpha / omega );
             // p = r + beta * ( p - omega * v )
             blas::xaxpy(dim, -omega, v, 1, p, 1);
-#ifdef __INTEL_MKL__
-            blas::xaxpby(dim, 1.0, r, 1, beta, p, 1);
-#else
-            blas::xscal(dim, beta, p, 1);
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);
-#endif
+            blas::xpay(dim, r, beta, p);
         start:
             
             mat.precondition(p, phat);                // phat = PC * p;

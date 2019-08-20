@@ -189,12 +189,7 @@ void LinearSolvers::BCGS(const LinearOperator& mat, const real* rhs, real* x, Mo
         else {
             // p = r + beta * ( p - omega * v )
             blas::xaxpy(dim, -omega, v, 1, p, 1);
-#ifdef __INTEL_MKL__
-            blas::xaxpby(dim, 1.0, r, 1, beta, p, 1);
-#else
-            blas::xscal(dim, beta, p, 1);
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);
-#endif
+            blas::xpay(dim, r, beta, p);
         }
         
         mat.multiply( p, v );                      // v = A * p;
@@ -264,12 +259,7 @@ void LinearSolvers::BCGSP(const LinearOperator& mat, const real* rhs, real* x, M
         else {
             // p = r + beta * ( p - omega * v )
             blas::xaxpy(dim, -omega, v, 1, p, 1);
-#ifdef __INTEL_MKL__
-            blas::xaxpby(dim, 1.0, r, 1, beta, p, 1);
-#else
-            blas::xscal(dim, beta, p, 1);
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);
-#endif
+            blas::xpay(dim, r, beta, p);
         }
         
         mat.precondition( p, phat );                // phat = PC * p;
