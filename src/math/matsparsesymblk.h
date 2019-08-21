@@ -175,17 +175,14 @@ public:
         assert_true( jj < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );
         assert_true( jj % BLOCK_SIZE == 0 );
-        // switch to address lower triangle of matrix
 #if ( 1 )
-        // branchless code:
+        // safe swap, with branchless code:
         index_t i = std::max(ii, jj);
         index_t j = std::min(ii, jj);
         return column_[j].block(i, j);
 #else
-        if ( ii >= jj )
-            return column_[jj].block(ii, jj);
-        else
-            return column_[ii].block(jj, ii);
+        assert_true( ii > jj );
+        return column_[jj].block(ii, jj);
 #endif
     }
     

@@ -211,7 +211,7 @@ inline void xscal(int N, real alpha, real*X, int incX)
     }
 #endif
 
-    
+
 /// calculates Y <- alpha * Y + X
 inline void xpay(int N, const real* X, real alpha, real* Y)
 {

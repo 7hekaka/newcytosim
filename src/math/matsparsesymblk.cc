@@ -207,22 +207,17 @@ SquareBlock& MatrixSparseSymmetricBlock::diag_block(index_t ii)
 }
 
 
-real& MatrixSparseSymmetricBlock::operator()(index_t ii, index_t jj)
+real& MatrixSparseSymmetricBlock::operator()(index_t iii, index_t jjj)
 {
+    // branchless code to address lower triangle
+    index_t ii = std::max(iii, jjj);
+    index_t jj = std::min(iii, jjj);
 #if ( BLOCK_SIZE == 1 )
-    if ( ii > jj )
-        return column_[jj].block(ii, jj).value();
-    else
-        return column_[ii].block(jj, ii).value();
+    return column_[jj].block(ii, jj).value();
 #else
     index_t i = ii % BLOCK_SIZE;
     index_t j = jj % BLOCK_SIZE;
-
-    // switch to address lower triangle
-    if ( ii >= jj )
-        return column_[jj-j].block(ii-i, jj-j)(i, j);
-    else
-        return column_[ii-i].block(jj-j, ii-i)(j, i);
+    return column_[jj-j].block(ii-i, jj-j)(i, j);
 #endif
 }
 
