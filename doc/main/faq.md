@@ -1076,11 +1076,11 @@ There is a parameter `solve` in `run simul`. If you set it to zero, objects are 
 It should however be possible to modify cytosim to do have some object mobile while others are not.
 There is a function that calculates the speed, as a function of the force:
 
-	virtual void Mecable::setSpeedsFromForces(const real* X, real S, real* Y)
+	virtual void Mecable::projectForces(const real* X, real* Y)
 
 To make the corresponding object immobile, set `Y` to zero like this:
 	
-	void setSpeedsFromForces(const real*, real, real* Y) const
+	void projectForces(const real*, real* Y) const
 	{
 	   for(int i=0; i < DIM*nbPoints(); ++i)
 	   		Y[i] = 0;

@@ -1,0 +1,92 @@
+% Dispersion of melanosomes in a mamallian cell
+% A model of Aliston N. Hume, University of Nottingham, UK
+% FJN, Cambridge 21.08.2019
+
+set simul system
+{
+    viscosity = 0.5       % educated guess
+    time_step = 0.005     % in seconds
+    steric = 1, 100       % enable steric interaction, with stiffness 100
+    steric_max_range = 1
+}
+
+set space cell
+{
+    shape = circle
+}
+
+new cell
+{
+    radius = 8              % radius in micrometers
+}
+
+set solid melanosome
+{
+    steric = 1
+    confine = inside, 100
+    display = ( coloring=1; style=6; size=2; width=0.5; )
+}
+
+set fiber actin
+{
+    rigidity = 0.1          % usual rigidity of actin is 0.06
+    segmentation = 0.1      % precision at which filaments are calculated
+    confine = inside, 100   % confinement inside cell, stiffness of confinement
+	hydrodynamic_radius = 0.005
+
+	activity = classic
+	growing_speed = 0.1     % guess, but average_length = growing_speed / catastrophe_rate 
+	shrinking_speed = -0.5  % guess, but should be higher than 'growing_speed'
+	catastrophe_rate = 0.1  % guess, defines lifetime of filament
+	persistent = 0
+    display = ( width=1; )
+}
+
+set hand myosin 
+{
+    binding_rate = 10       % reasonable guess (1/s)
+    binding_range = 0.01    % distance of reach
+    unbinding_rate = 0.3    % from Pierobon et al. BiophysJ 2009 (1/s)
+    unbinding_force = 3     % reasonable guess (pN)
+    
+    activity = move
+    unloaded_speed = 0.3    % from Pierobon et al. BiophysJ 2009 (um/s)
+    stall_force = 3         % reasonable guess (pN)
+    display = ( size=4; color=green; )
+}
+
+set hand nucleator
+{
+    unbinding = 0, inf      % never detach
+    activity = nucleate
+    nucleate = 0.1, actin, ( length=0; plus_end=grow; )  % rate of nucleation... is is known?
+    display = { size=4; color=orange; }
+}
+
+set single mel_nucleator
+{
+    hand = nucleator
+    stiffness = 200         % reasonable
+}
+
+set single mel_myosin
+{
+    hand = myosin
+    stiffness = 200         % reasonable
+}
+
+new 50 melanosome
+{
+% in the line below: 0.25 is the radius of melanophore.
+% the integer before 'mel_nucleator' is the number of nucleator per melanosome
+% the integer before 'mel_myosin' is the number of myosin per melanosome
+% these numbers are guessed
+    sphere1 = center, 0.25, 2 mel_nucleator, 15 mel_myosin
+	position = disc 1      % placed initially near the center
+}
+
+run system
+{
+    nb_steps = 100000
+    nb_frames = 500
+}
