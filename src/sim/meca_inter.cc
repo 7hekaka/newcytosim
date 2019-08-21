@@ -17,7 +17,7 @@
 extern Modulo const* modulo;
 
 /// set TRUE to update matrix mC using block directives
-/** This is significantly faster */
+/** This is significantly faster on machine with the AVX instruction set */
 #define USE_MATRIX_BLOCK 1
 
 //------------------------------------------------------------------------------
@@ -174,16 +174,19 @@ inline void Meca::sub_iso(index_t i, index_t j, real val)
 
 inline void Meca::add_base(index_t i, Vector const& vec)
 {
+    assert_true( i % DIM == 0 );
     vec.add_to(vBAS+i);
 }
 
 inline void Meca::add_base(index_t i, Vector const& vec, real alpha)
 {
+    assert_true( i % DIM == 0 );
     vec.add_to(alpha, vBAS+i);
 }
 
 inline void Meca::sub_base(index_t i, Vector const& vec)
 {
+    assert_true( i % DIM == 0 );
     vec.sub_to(vBAS+i);
 }
 
@@ -1509,14 +1512,14 @@ void Meca::addLink2(const Mecapoint & ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
 
-    const real cc[] = {    1.0,      -coef[0],     -coef[1] };
-    const real ww[] = { weight,  weight*cc[1], weight*cc[2] };
+    const real cc[] = {   -1.0,      coef[0],      coef[1] };
+    const real ww[] = {-weight, weight*cc[1], weight*cc[2] };
     
     assert_small(coef[0]+coef[1]-1.0);
     
-    sub_iso(ii0, ii0, ww[0]); // since cc[0] == 1.0
-    sub_iso(ii1, ii0, ww[1]); // since cc[0] == 1.0
-    sub_iso(ii2, ii0, ww[2]); // since cc[0] == 1.0
+    add_iso(ii0, ii0, ww[0]); // since cc[0] == -1.0
+    add_iso(ii1, ii0, ww[1]); // since cc[0] == -1.0
+    add_iso(ii2, ii0, ww[2]); // since cc[0] == -1.0
     
     sub_iso(ii1, ii1, ww[1] * cc[1]);
     sub_iso(ii2, ii1, ww[2] * cc[1]);
@@ -1618,15 +1621,15 @@ void Meca::addLink3(const Mecapoint & ptA,
     const index_t ii2 = pts[1];
     const index_t ii3 = pts[2];
 
-    const real cc[] = {    1.0,     -coef[0],     -coef[1],     -coef[2] };
-    const real ww[] = { weight, weight*cc[1], weight*cc[2], weight*cc[3] };
+    const real cc[] = {   -1.0,      coef[0],      coef[1],      coef[2] };
+    const real ww[] = {-weight, weight*cc[1], weight*cc[2], weight*cc[3] };
 
     assert_small(coef[0]+coef[1]+coef[2]-1.0);
     
-    sub_iso(ii0, ii0, ww[0]);
-    sub_iso(ii1, ii0, ww[1]);
-    sub_iso(ii2, ii0, ww[2]);
-    sub_iso(ii3, ii0, ww[3]);
+    add_iso(ii0, ii0, ww[0]);  // since cc[0] = -1
+    add_iso(ii1, ii0, ww[1]);
+    add_iso(ii2, ii0, ww[2]);
+    add_iso(ii3, ii0, ww[3]);
     
     sub_iso(ii1, ii1, ww[1] * cc[1]);
     sub_iso(ii2, ii1, ww[2] * cc[1]);
@@ -1742,16 +1745,16 @@ void Meca::addLink4(const Mecapoint & ptA,
     const index_t ii3 = pts[2];
     const index_t ii4 = pts[3];
 
-    const real cc[] = {    1.0,     -coef[0],     -coef[1],     -coef[2],     -coef[3] };
-    const real ww[] = { weight, weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4] };
+    const real cc[] = {   -1.0,      coef[0],      coef[1],      coef[2],      coef[3] };
+    const real ww[] = {-weight, weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4] };
     
     assert_small(coef[0]+coef[1]+coef[2]+coef[3]-1.0);
     
-    sub_iso(ii0, ii0, ww[0]);
-    sub_iso(ii1, ii0, ww[1]);
-    sub_iso(ii2, ii0, ww[2]);
-    sub_iso(ii3, ii0, ww[3]);
-    sub_iso(ii4, ii0, ww[4]);
+    add_iso(ii0, ii0, ww[0]);
+    add_iso(ii1, ii0, ww[1]);
+    add_iso(ii2, ii0, ww[2]);
+    add_iso(ii3, ii0, ww[3]);
+    add_iso(ii4, ii0, ww[4]);
     
     sub_iso(ii1, ii1, ww[1] * cc[1]);
     sub_iso(ii2, ii1, ww[2] * cc[1]);
@@ -3715,7 +3718,7 @@ void Meca::addSphereClamp(Vector const& pos,
         // point is inside sphere
         T = MatrixBlock::outerProduct(dir, weight);
         real facX = weight * ( rad + dot(dir, center) );
-        add_base(inx, facX * dir);
+        add_base(inx, dir, facX);
     }
     
     sub_diag_block(inx, T);

@@ -20,7 +20,7 @@ class Matrix;
 /**
  Implements the methods of a Mecable for the Chain:
  
- -# setSpeedsFromForces() includes longitudinal incompressibility,
+ -# projectForces() includes longitudinal incompressibility,
  which means keeping successive points equidistants:
  norm( point(p+1) - point(p) ) = segmentation()
  
@@ -126,7 +126,7 @@ public:
     /// compute Lagrange multiplier corresponding to the longitudinal tensions in the segments
     void        computeTensions(const real* force);
     
-    /// save Lagrange multipliers computed in setSpeedsFromForces()
+    /// save Lagrange multipliers computed in projectForces()
     void        storeTensions(const real* force);
 
     /// longitudinal force along segment `p`
@@ -144,7 +144,7 @@ public:
     real        dragCoefficient() const { return  nPoints * rfDragPoint; }
     
     /// drag coefficient of one point
-    real        dragPoint() const { return rfDragPoint; }
+    real        leftoverDrag() const { return rfDragPoint; }
     
     //--------------------- Projection  / Dynamics
     
@@ -164,7 +164,7 @@ public:
     real        addBrownianForces(real const* rnd, real alpha, real* rhs) const;
     
     /// calculate the speeds from the forces, including projection
-    void        setSpeedsFromForces(const real* X, real alpha, real* Y) const;
+    void        projectForces(const real* X, real* Y) const;
     
     /// print projection matrix
     void        printProjection(std::ostream&) const;

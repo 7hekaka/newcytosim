@@ -117,12 +117,12 @@ void Mecafil::makeProjection()
 /**
  Attention, the vector 'X' and 'Y' may point to the same address!
  */
-void Mecafil::setSpeedsFromForces(const real* X, real alpha, real* Y) const
+void Mecafil::projectForces(const real* X, real* Y) const
 {
     const unsigned nbv = DIM * nbPoints();
     copy_real(nbv, X, rfLLG);
-    blas::xsymv('U', nbv, alpha/rfDragPoint, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
-    //blas::xgemv('N', nbv, nbv, alpha/rfDragPoint, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
+    blas::xsymv('U', nbv, 1.0, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
+    //blas::xgemv('N', nbv, nbv, 1.0, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
 }
 
 
@@ -130,15 +130,7 @@ void Mecafil::printProjection(std::ostream& os) const
 {
     const unsigned nbv = DIM * nbPoints();
     os << reference() << '\n';
-#if ( 0 )
-    real * mem = new_real(nbv*nbv);
-    copy_real(nbv*nbv, mtProj, mem);
-    blas::xscal(nbv*nbv, 1.0/rfDragPoint, mem, 1);
-    VecPrint::print(os, nbv, nbv, mem, nbv);
-    free_real(mem);
-#else
     VecPrint::print(os, nbv, nbv, mtProj, nbv);
-#endif
 }
 
 

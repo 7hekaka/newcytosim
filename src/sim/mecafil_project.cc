@@ -4,23 +4,13 @@
 #include "vecprint.h"
 #include "dpttrf.h"
 
-/**
-Enable the optimized version of setSpeedsFromForces, which only works in 2D.
-It is built on the custom factorization 'alsatian_xpttrf'
-should be defined as ZERO
-*/
-#define NEW_CUSTOM_XPTTRF 0 //( DIM == 2 )
-
 /*
  Selection of LAPACK routines
  The LAPACK implementation is the safest choice
  The Alsatian version may be faster as it avoids divisions
  */
 
-#if NEW_CUSTOM_XPTTRF
-#  define DPTTRF alsatian_xpttrf
-#  define DPTTS2 alsatian_xptts2
-#elif ( 1 )
+#if ( 1 )
 #  define DPTTRF alsatian_xpttrf
 #  define DPTTS2 alsatian_xptts2
 #elif ( 0 )
@@ -52,7 +42,7 @@ void Mecafil::allocateProjection(const size_t ms)
     free_real(mtJJt);
     real * mem = new_real(4*ms);
     //zero_real(4*ms, mem);
-    mtJJt        = mem;
+    mtJJt        = mem;  // can hold '2*ms', as needed by alsatian_xpttrf()
     mtJJtU       = mem + ms * 2;
     mtJJtiJforce = mem + ms * 3;
 }
@@ -108,7 +98,7 @@ void Mecafil::makeProjection()
 
     if ( info )
     {
-        std::clog << "Mecafil::makeProjection failed (info = " << info << ")\n";
+        std::clog << "Mecafil::makeProjection failed (" << info << ")\n";
         throw Exception("could not build Fiber's projection matrix");
     }
 }
@@ -164,7 +154,7 @@ void Mecafil::makeProjection()
 
     if ( info )
     {
-        std::clog << "Mecafil::makeProjection failed (info = " << info << ")\n";
+        std::clog << "Mecafil::makeProjection failed (" << info << ")\n";
         throw Exception("could not build Fiber's projection matrix");
     }
 }
@@ -197,29 +187,30 @@ void projectForcesU_(unsigned nbs, const real* dif, const real* vec, real* mul)
  Perform second calculation needed by projectForces:
  Y <- s * ( X + Jt * tmp )
  */
-void projectForcesD_(unsigned nbs, const real* dif, const real alpha, const real* X, const real* mul, real* Y)
+void projectForcesD_(unsigned nbs, const real* dif, const real* X, const real* mul, real* Y)
 {
     for ( unsigned d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
     {
-        Y[d] = alpha * ( X[d] + dif[d    ] * mul[    0] );
-        Y[e] = alpha * ( X[e] - dif[e-DIM] * mul[nbs-1] );
+        Y[d] = X[d] + dif[d    ] * mul[    0];
+        Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
     }
     
     for ( unsigned jj = 1; jj < nbs; ++jj )
     {
         const unsigned kk = DIM*jj;
-        Y[kk  ] = alpha * ( X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1] );
-        Y[kk+1] = alpha * ( X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1] );
+        Y[kk  ] = X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
+        Y[kk+1] = X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
 #if ( DIM > 2 )
-        Y[kk+2] = alpha * ( X[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1] );
+        Y[kk+2] = X[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
 #endif
     }
 }
 
+
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD__(unsigned nbs, const real* dif, const real alpha,
+void projectForcesD__(unsigned nbs, const real* dif,
                       const real* X, const real* mul, real* Y)
 {
     real a0 = dif[0] * mul[0];
@@ -228,74 +219,38 @@ void projectForcesD__(unsigned nbs, const real* dif, const real alpha,
     real a2 = dif[2] * mul[0];
 #endif
     
-    Y[0] = alpha * ( X[0] + a0 );
-    Y[1] = alpha * ( X[1] + a1 );
+    Y[0] = X[0] + a0;
+    Y[1] = X[1] + a1;
 #if ( DIM > 2 )
-    Y[2] = alpha * ( X[2] + a2 );
+    Y[2] = X[2] + a2;
 #endif
     
     for ( unsigned jj = 1; jj < nbs; ++jj )
     {
         const unsigned kk = DIM * jj;
         real b0 = dif[kk  ] * mul[jj];
-        Y[kk  ] = alpha * ( X[kk  ] + b0 - a0 );
+        Y[kk  ] = X[kk  ] + b0 - a0;
         a0 = b0;
         
         real b1 = dif[kk+1] * mul[jj];
-        Y[kk+1] = alpha * ( X[kk+1] + b1 - a1 );
+        Y[kk+1] = X[kk+1] + b1 - a1;
         a1 = b1;
         
 #if ( DIM > 2 )
         real b2 = dif[kk+2] * mul[jj];
-        Y[kk+2] = alpha * ( X[kk+2] + b2 - a2 );
+        Y[kk+2] = X[kk+2] + b2 - a2;
         a2 = b2;
 #endif
     }
     
     const unsigned ee = DIM * nbs;
-    Y[ee  ] = alpha * ( X[ee  ] - a0 );
-    Y[ee+1] = alpha * ( X[ee+1] - a1 );
+    Y[ee  ] = X[ee  ] - a0;
+    Y[ee+1] = X[ee+1] - a1;
 #if ( DIM > 2 )
-    Y[ee+2] = alpha * ( X[ee+2] - a2 );
+    Y[ee+2] = X[ee+2] - a2;
 #endif
 }
 
-
-void projectForcesD___(unsigned nbs, const real* dif, const real alpha,
-                       const real* X, const real* mul, real* Y)
-{
-    // set Y, using values in X and lag
-    //projectForcesD(nbs, rfDiff, alpha, X, mul, Y);
-    long nn = DIM * nbs;
-    long pp = nn - DIM;
-    
-    real d0 = dif[pp  ] * mul[nbs-1];
-    real d1 = dif[pp+1] * mul[nbs-1];
-    
-    Y[nn  ] = alpha * ( X[nn  ] - d0 );
-    Y[nn+1] = alpha * ( X[nn+1] - d1 );
-    
-    real p0 = X[pp  ] - d0;
-    real p1 = X[pp+1] - d1;
-    
-    for ( long n = nbs-1; n > 0; --n )
-    {
-        nn = DIM * n;
-        pp = nn - DIM;
-        
-        d0 = dif[pp  ] * mul[n-1];
-        d1 = dif[pp+1] * mul[n-1];
-
-        Y[nn  ] = alpha * ( p0 - d0 );
-        Y[nn+1] = alpha * ( p1 - d1 );
-
-        p0 = X[pp  ] + d0;
-        p1 = X[pp+1] + d1;
-    }
-
-    Y[0] = alpha * p0;
-    Y[1] = alpha * p1;
-}
 
 #if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 
@@ -335,7 +290,7 @@ inline void projectForcesU_SSE(unsigned nbs, const real* dif, const real* X, rea
 /**
  Perform second calculation needed by projectForces:
  */
-inline void projectForcesD_SSE(unsigned nbs, const real* dif, const real alpha,
+inline void projectForcesD_SSE(unsigned nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -343,7 +298,6 @@ inline void projectForcesD_SSE(unsigned nbs, const real* dif, const real alpha,
     const real* pD = dif;
     
     vec2 cc = load2(X);
-    vec2 ss = set2(alpha);
     
     real const* pM = mul;
     real const*const end = mul + nbs;
@@ -353,11 +307,11 @@ inline void projectForcesD_SSE(unsigned nbs, const real* dif, const real alpha,
         vec2 d = mul2(load2(pD), loaddup2(pM));
         ++pM;
         pD += DIM;
-        store2(pY, mul2(ss, add2(cc, d)));
+        store2(pY, add2(cc, d));
         pY += DIM;
         cc = sub2(load2(pX), d);
     }
-    store2(pY, mul2(ss, cc));
+    store2(pY, cc);
 }
 
 #endif
@@ -415,7 +369,7 @@ inline void projectForcesU_AVX(unsigned nbs, const real* dif, const real* X, rea
  an array containing contiguous coordinates
  F. Nedelec, 9.12.2016, 23.03.2018
  */
-inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha,
+inline void projectForcesD_AVX(unsigned nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -423,7 +377,6 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha,
     const real* pD = dif;
     
     vec4 cc = setzero4();
-    vec4 ss = set4(alpha);
     
     const bool odd = nbs & 1;
     real const* pM = mul;
@@ -441,7 +394,7 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha,
         cc = d;
         vec4 z = add4(x, sub4(d, n));
         pX += 4;
-        storeu4(pY, mul4(ss, z));
+        storeu4(pY, z);
         pY += 4;
     }
     
@@ -453,14 +406,14 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif, const real alpha,
         vec2 m = loaddup2(pM);
         vec2 x = mul2(m, load2(pD));
         vec2 z = add2(load2(pX), sub2(x, c));
-        storeu2(pY, mul2(set2(alpha), z));
+        storeu2(pY, z);
         c = x;
         pY += 2;
         pX += 2;
     }
     
     vec2 z = sub2(load2(pX), c);
-    storeu2(pY, mul2(set2(alpha), z));
+    storeu2(pY, z);
     assert( pY == Y + DIM * nbs );
     assert( pX == X + DIM * nbs );
 }
@@ -568,7 +521,7 @@ inline void projectForcesU_PTR2(unsigned nbs, const real* dif, const real* X, re
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD_PTR(unsigned nbs, const real* dif, const real alpha,
+void projectForcesD_PTR(unsigned nbs, const real* dif,
                         const real* X, const real* mul, real* Y)
 {
     // Y <- X + Jt * tmp :
@@ -590,10 +543,10 @@ void projectForcesD_PTR(unsigned nbs, const real* dif, const real alpha,
         real y2 = *pT * pM[2];
 #endif
         pM  += DIM;
-        pY[0]  = alpha * ( x0 + y0 );
-        pY[1]  = alpha * ( x1 + y1 );
+        pY[0]  = x0 + y0;
+        pY[1]  = x1 + y1;
 #if ( DIM > 2 )
-        pY[2]  = alpha * ( x2 + y2 );
+        pY[2]  = x2 + y2;
 #endif
         pY  += DIM;
         x0     = pX[0] - y0;
@@ -603,10 +556,10 @@ void projectForcesD_PTR(unsigned nbs, const real* dif, const real alpha,
 #endif
         pX  += DIM;
     }
-    pY[0] = alpha * x0;
-    pY[1] = alpha * x1;
+    pY[0] = x0;
+    pY[1] = x1;
 #if ( DIM > 2 )
-    pY[2] = alpha * x2;
+    pY[2] = x2;
 #endif
 }
 
@@ -633,9 +586,8 @@ void projectForcesD_PTR(unsigned nbs, const real* dif, const real alpha,
 #  define projectForcesD projectForcesD_
 #endif
 
-#if ( NEW_CUSTOM_XPTTRF == 0 )
 
-void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) const
+void Mecafil::projectForces(const real* X, real* Y) const
 {
     const unsigned nbs = nbSegments();
     //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
@@ -652,158 +604,13 @@ void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) cons
     DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
     
     // set Y, using values in X and rfLLG
-    projectForcesD(nbs, rfDiff, alpha/rfDragPoint, X, rfLLG, Y);
+    projectForcesD(nbs, rfDiff, X, rfLLG, Y);
 
 #if NEW_ANISOTROPIC_FIBER_DRAG
     scaleTangentially(nPoints, Y, rfDir, Y);
 #endif
     //printf("Y  "); VecPrint::print(std::clog, DIM*nbPoints(), Y);
 }
-
-#else
-
-/**
-This optimized setSpeedsFromForces() works only in 2D,
-and only with the 'alsatian' factorization.
-This merges the operations done in:
-     DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
-     projectForcesD(nbs, rfDiff, alpha/rfDragPoint, X, rfLLG, Y);
-*/
-void Mecafil::setSpeedsFromForces(const real* X, const real alpha, real* Y) const
-{
-    const long nbs = nbSegments();
-    vec2 LL;
-    const real* pF = rfDiff;
-    real* pM = rfLLG;
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, X, rfDir, rfVTP);
-    real const* pX = rfVTP;
-#else
-    real const* pX = X;
-#endif
-
-    {
-    //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
-    real const* D = mtJJt;
-    real const* DEL = mtJJt + nbs;
-
-    // calculate `lag` without modifying `X`
-    //projectForcesU(nbs, rfDiff, X, mul);
-    real L0, L1 = 0.0;
-    vec2 LL = setzero2();
-    
-    real const*const end = rfLLG + nbs;
-    
-    long n = 0;
-    while ( pM <= end )
-    {
-        vec4 d = mul4(sub4(loadu4(pX+2), loadu4(pX)), load4(pF));
-        pX += 4;
-        pF += 4;
-        vec2 h = gethi(d);
-        vec2 a = add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h));
-        //mul[jj] = dif[0] * ( X[DIM] - X[0] ) + dif[1] * ( X[DIM+1] - X[1] )
-        a = mul2(load2(D), a);
-        D += 2;
-#if 1
-        //L0 = D[n  ] * a[0] - DEL[n  ] * L1;
-        //L1 = D[n+1] * a[1] - DEL[n+1] * L0;
-        L0 = a[0] - DEL[0] * L1;
-        L1 = a[1] - DEL[1] * L0;
-        pM[0] = L0;
-        pM[1] = L1;
-#else
-        h = load2(DEL);
-        // assuming LL contains old value in higher register
-        vec2 N = fnmadd1(unpackhi2(LL, LL), h, a);
-        LL = fnmadd2(shuffle2(LL, N, 1), h, a);
-        store2(pM, LL);
-#endif
-        DEL += 2;
-        pM += 2;
-    }
-    }
-
-#if ( 1 )
-    real const* E = mtJJtU;
-    real * mul = rfLLG;
-    // downward recursion
-    for ( long n = nbs-2; n >= 0; --n )
-        mul[n] = mul[n] - E[n] * mul[n+1];
-
-    projectForcesD(nbs, rfDiff, alpha/rfDragPoint, X, mul, Y);
-#else
-    // set Y, using values in X and lag
-    const vec2 aa = set2(alpha/rfDragPoint);
-
-    long e = DIM * nbs - DIM;
-    pM = rfLLG + nbs - 1;
-    pX = X + e;
-    pF = rfDiff + e;
-    real * pY = Y + DIM * nbs;
-
-    LL = loaddup2(pM);
-    //real d0 = rfDiff[p  ] * mul[nbs-1];
-    //real d1 = rfDiff[p+1] * mul[nbs-1];
-    vec2 x = mul2(load2(pF), LL);
-    pF -= 2;
-    pM -= 1;
-    
-    //Y[n  ] = alpha * ( X[n  ] - d0 );
-    //Y[n+1] = alpha * ( X[n+1] - d1 );
-    store2(pY, mul2(aa, sub2(load2(pX+DIM), x)));
-    pY -= 2;
-    
-    //real p0 = X[p  ] - d0;
-    //real p1 = X[p+1] - d1;
-    x = sub2(load2(pX), x);
-    pX -= 2;
-
-    real const* pE = mtJJtU + nbs - 2;
-
-    // nbs-1 iterations going downward:
-    //for ( long n = nbs-2; n >= 0; --n )
-    while ( pX >= X )
-    {
-    //IACA_START
-        // mul[n] = mul[n] - E[n] * mul[n+1];
-        // assuming LL contains the old value in the two registers
-        //assert_true(pM==rfLLG+n);
-        LL = fnmadd2(loaddup2(pE), LL, loaddup2(pM));
-        storelo(pM, LL);
-        pM -= 1;
-        pE -= 1;
-
-        //d0 = rfDiff[p  ] * L;
-        //d1 = rfDiff[p+1] * L;
-        //assert_true(pF==rfDiff+DIM*n);
-        vec2 dd = mul2(load2(pF), LL);
-        pF -= 2;
-        
-        //Y[p+DIM  ] = alpha * ( p0 - d0 );
-        //Y[p+DIM+1] = alpha * ( p1 - d1 );
-        //assert_true(pY==Y+DIM*n+DIM);
-        store2(pY, mul2(aa, sub2(x, dd)));
-        pY -= 2;
-        
-        //p0 = X[p  ] + d0;
-        //p1 = X[p+1] + d1;
-        //assert_true(pX==X+DIM*n);
-        x = add2(load2(pX), dd);
-        pX -= 2;
-    }
-    //IACA_END
-
-    //Y[0] = alpha * p0;
-    //Y[1] = alpha * p1;
-    store2(Y, mul2(aa, x));
-#endif
-
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, Y, rfDir, Y);
-#endif
-}
-#endif
 
 
 void Mecafil::computeTensions(const real* force)
@@ -842,7 +649,7 @@ void Mecafil::printProjection(std::ostream& os) const
     for ( unsigned i = 0; i < nbv; ++i )
     {
         src[i] = 1.0;
-        setSpeedsFromForces(src, 1.0, dst);
+        projectForces(src, dst);
         copy_real(nbv, dst, res+nbv*i);
         src[i] = 0.0;
     }

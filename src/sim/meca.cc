@@ -373,18 +373,10 @@ inline void multiply1(Mecable const* mec, real alpha, const real* xxx, real* yyy
         mec->addProjectionDiff(xxx, yyy);
 #endif
 
-    mec->setSpeedsFromForces(yyy, alpha, yyy);
-    
-    /*
-     Bypass the Projection (NEVER ENABLE THIS!):
-     real alpha = mec->nbPoints() * time_step / mec->dragCoefficient();
-     blas::xaxpy(bs, -alpha, tmp, 1, yyy, 1);
-     PRINT_ONCE("CRAZY: Projection is bypassed!!!");
-     */
+    mec->projectForces(yyy, yyy);
 
-    // Y <- Y + X
-    //blas::xaxpy(DIM * mec->nbPoints(), 1.0, xxx, 1, yyy, 1);
-    blas::add(DIM*mec->nbPoints(), xxx, yyy);
+    // Y <- X + alpha * Y
+    blas::xpay(DIM*mec->nbPoints(), xxx, alpha/mec->leftoverDrag(), yyy);
 }
 
 
@@ -421,29 +413,25 @@ void Meca::multiply( const real* X, real* Y ) const
 
 
 /**
- calculate the matrix vector product corresponding to 'mec'
- 
-     X <- PRECOND * [ X + alpha * speed( Y + meca_forces ) ]
- 
+ calculates the multiplyP(real* X, real* T) for block corresponding to 'mec'
  */
-inline void multiply1P(Mecable const* mec, real alpha, real* xxx, real* yyy)
+inline void multiply1P(Mecable const* mec, real alpha, real* xxx, real* ttt)
 {
     const int bks = DIM * mec->nbPoints();
 
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
-    mec->addRigidity(xxx, yyy);
+    mec->addRigidity(xxx, ttt);
 #endif
 
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
-        mec->addProjectionDiff(xxx, yyy);
+        mec->addProjectionDiff(xxx, ttt);
 #endif
 
-    mec->setSpeedsFromForces(yyy, alpha, yyy);
+    mec->projectForces(ttt, ttt);
     
-    // X <- Y + X
-    //blas::xaxpy(bks, 1.0, yyy, 1, xxx, 1);
-    blas::add(bks, yyy, xxx);
+    // X <- X + alpha * T
+    blas::xaxpy(bks, alpha/mec->leftoverDrag(), ttt, 1, xxx, 1);
     
     if ( mec->useBlock() )
     {
@@ -866,15 +854,20 @@ void Meca::extractBlock(real* res, const Mecable * mec) const
     
     //compute the projection, by applying it to each column vector:
     /*
-     This could be vectorized by having setSpeedsFromForces()
+     This could be vectorized by having projectForces()
      accept multiple vectors as arguments, using SIMD instructions
      */
-    for ( unsigned ii = 0; ii < bs; ++ii )
-        mec->setSpeedsFromForces(res+bs*ii, -time_step, res+bs*ii);
+    for ( unsigned i = 0; i < bs; ++i )
+        mec->projectForces(res+bs*i, res+bs*i);
     
+    // scale
+    real beta = -time_step / mec->leftoverDrag();
+    //blas::xscal(bs*bs, beta, res, 1);
+    for ( unsigned n = 0; n < bs*bs; ++n )
+        res[n] = beta * res[n];
     // add Identity matrix:
-    for ( unsigned ii = 0; ii < bs; ++ii )
-        res[bs*ii+ii] += 1.0;
+    for ( unsigned i = 0; i < bs; ++i )
+        res[i+bs*i] += 1.0;
 }
 
 
@@ -1344,13 +1337,16 @@ This preforms:
 
  'rhs' and 'fff' are output. Input 'rnd' is a set of independent random numbers
 */
-real browian1(Mecable* mec, real const* rnd, real alpha, real* fff, real time_step, real* rhs)
+real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, real* rhs)
 {
     real n = mec->addBrownianForces(rnd, alpha, fff);
     
     // Calculate the right-hand-side of the system in vRHS:
-    mec->setSpeedsFromForces(fff, time_step, rhs);
+    mec->projectForces(fff, rhs);
     
+    // rhs <- beta * rhs, resulting in time_step * P * vFOR:
+    blas::xscal(DIM*mec->nbPoints(), beta/mec->leftoverDrag(), rhs, 1);
+
     /*
      In this case, `fff` contains the true force in each vertex of the system
      and the Lagrange multipliers will represent the tension in the filaments
@@ -1438,7 +1434,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     /*
      Add Brownian contributions and calculate Minimum value of it
       vFOR <- vFOR + Noise
-      vRHS <- time_step * P * vFOR:
+      vRHS <- P * vFOR:
      */
 #if NUM_THREADS > 1
     #pragma omp parallel num_threads(NUM_THREADS)
@@ -1448,7 +1444,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
         while ( mci < objs.end() )
         {
             const index_t inx = DIM * (*mci)->matIndex();
-            real n = browian1(*mci, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
+            real n = brownian1(*mci, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
             local_res = std::min(local_res, n);
             mci += NUM_THREADS;
         }
@@ -1460,11 +1456,11 @@ void Meca::solve(SimulProp const* prop, const int precond)
     for ( Mecable * mec : objs )
     {
         const index_t inx = DIM * mec->matIndex();
-        real n = browian1(mec, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
+        real n = brownian1(mec, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
         noiseLevel = std::min(noiseLevel, n);
     }
 #endif
-    
+
     if ( noiseLevel > 0 )
         noiseLevel *= time_step;
     else
@@ -1550,8 +1546,8 @@ void Meca::solve(SimulProp const* prop, const int precond)
 
     if ( precond )
     {
-        //LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-        LinearSolvers::GMRES(*this, vRHS, vSOL, 8, monitor, allocator, mH, mV, temporary);
+        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
     }
     else
     {
@@ -1671,8 +1667,8 @@ void Meca::solve(SimulProp const* prop, const int precond)
 #endif
     
     //add the solution of the system (=dPTS) to the points coordinates
-    //blas::xaxpy(dimension(), 1.0, vSOL, 1, vPTS, 1);
     blas::add(dimension(), vSOL, vPTS);
+    
     /*
      Re-calculate forces with the new coordinates, excluding bending elasticity
      and Brownian terms on the vertices.
@@ -1927,7 +1923,8 @@ void Meca::dumpMobility(FILE * file) const
         {
             const index_t inx = DIM * mec->matIndex();
             // this includes the mobility, but not the time_step:
-            mec->setSpeedsFromForces(src+inx, 1.0, res+inx);
+            mec->projectForces(src+inx, res+inx);
+            blas::xscal(DIM*mec->nbPoints(), mec->leftoverDrag(), res+inx, 1);
         }
         // write column to file directly:
         fwrite(res, sizeof(real), dim, file);

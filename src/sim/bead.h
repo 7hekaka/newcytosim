@@ -79,7 +79,7 @@ public:
     
     /// the total drag-coefficient of object (force = drag * speed)
     real        dragCoefficient()      const { return paDrag; }
-    
+
     /// sets the mobility (called at every step)
     /**
      setDragCoefficient() is called when the Bead is created,
@@ -88,7 +88,7 @@ public:
     void        prepareMecable() {}
     
     /// calculates the speed of points in Y, for the forces given in X
-    void        setSpeedsFromForces(const real* X, real, real* Y) const;
+    void        projectForces(const real* X, real* Y) const;
     
     /// add contribution of Brownian forces
     real        addBrownianForces(real const* rnd, real sc, real* rhs) const;

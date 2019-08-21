@@ -664,14 +664,9 @@ real Fiber::dragCoefficientVolume()
     assert_true( len > 0 );
     
     // hydrodynamic cut-off on length:
-    real lenc = len;
-    assert_true( prop->hydrodynamic_radius[1] > 0 );
-    
-    if ( lenc > prop->hydrodynamic_radius[1] )
-        lenc = prop->hydrodynamic_radius[1];
-    
-    if ( lenc < prop->hydrodynamic_radius[0] )
-        lenc = prop->hydrodynamic_radius[0];
+    assert_true( prop->hydrodynamic_radius[1] > REAL_EPSILON );
+    real lenc = std::min(len, prop->hydrodynamic_radius[1]);
+    lenc = std::max(lenc, prop->hydrodynamic_radius[0]);
     
     //Stoke's for a sphere:
     assert_true( prop->hydrodynamic_radius[0] > 0 );
@@ -726,7 +721,7 @@ real Fiber::dragCoefficientVolume()
     }
     
     //Cytosim::log("Drag coefficient of Fiber in infinite fluid = %.1e\n", drag);
-    //Cytosim::log << "Fiber L = " << len << "  bulk_drag = " << drag << std::endl;
+    //std::cerr << "Fiber with length " << len << " has bulk_drag = " << drag << '\n';
 
     return M_PI * prop->viscosity * drag;
 }
@@ -778,7 +773,7 @@ real Fiber::dragCoefficientSurface()
     real drag = 2 * M_PI * prop->viscosity * len / acosh( 1 + prop->cylinder_height/prop->hydrodynamic_radius[0] );
     
     //Cytosim::log("Drag coefficient of Fiber near a planar surface = %.1e\n", drag);
-    //Cytosim::log << "Drag coefficient of Fiber near a planar surface = " << drag << std::endl;
+    //std::cerr << "Fiber with length " << len << " has surface_drag = " << drag << '\n';
 
     return drag;
 }

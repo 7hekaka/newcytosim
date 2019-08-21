@@ -89,7 +89,7 @@ The equation is formulated using linear-algebra:
    For Mecafil, this maintains the distance between neighboring points (longitudinal incompressibility). 
    mP is symmetric of size DIM*nbPoints(), diagonal by blocks, each block corresponding to a Fiber.
    mP is not actually calculated as a matrix:
-   its application on each block is done by Mecable::setSpeedsFromForces()
+   its application on each block is done by Mecable::projectForces()
  
  - mdiffP is a term coming from the derivative of the projection P.
    It can provide better numerical stability in some situations where the filament are stretched.

@@ -219,7 +219,7 @@ void Nucleator::detach()
 {
     if ( prop->addictive )
         fiber()->setDynamicState(nearestEnd(), STATE_RED);
-        
+    
     Hand::detach();
 }
 

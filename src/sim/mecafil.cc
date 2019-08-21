@@ -207,13 +207,13 @@ void Mecafil::makeProjection()    {}  //DIM == 1
 void Mecafil::destroyProjection() {}  //DIM == 1
 void Mecafil::allocateProjection(size_t) {}  //DIM == 1
 
-void Mecafil::setSpeedsFromForces(const real* X, real alpha, real* Y) const
+void Mecafil::projectForces(const real* X, real* Y) const
 {
     real sum = X[0];
     for ( unsigned int ii = 1; ii < nPoints; ++ii )
         sum += X[ii];
     
-    sum = alpha * sum / ( rfDragPoint * nPoints );
+    sum = sum / nPoints;
 #if NEW_ANISOTROPIC_FIBER_DRAG
     sum *= 2;
 #endif

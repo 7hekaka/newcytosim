@@ -957,7 +957,7 @@ void Chain::flipPolarity()
 */
 void Chain::growM(const real delta)
 {
-    assert_true( length() + delta > 0 );
+    assert_true( length() + delta > REAL_EPSILON );
     real a = -delta / length();
     
     if ( delta > 0 )
@@ -996,7 +996,7 @@ void Chain::growM(const real delta)
     }
     
     fnAbscissaM -= delta;
-    setSegmentation(fnCut + delta/nbSegments());
+    setSegmentation(std::max(fnCut+delta/nbSegments(), REAL_EPSILON));
     postUpdate();
 }
 
@@ -1072,7 +1072,7 @@ void Chain::cutM(const real delta)
  */
 void Chain::growP(const real delta)
 {
-    assert_true( length() + delta > 0 );
+    assert_true( length() + delta > REAL_EPSILON );
     real a = delta / length();
     
     if ( delta > 0 )
@@ -1108,7 +1108,7 @@ void Chain::growP(const real delta)
             movePoint(p, ( a * p ) * diffPoints(p-1));
     }
     
-    setSegmentation(fnCut + delta/nbSegments());
+    setSegmentation(std::max(fnCut+delta/nbSegments(), REAL_EPSILON));
     fnAbscissaP += delta;
     postUpdate();
 }
