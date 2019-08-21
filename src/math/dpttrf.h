@@ -73,7 +73,7 @@ void italian_xpttrf(int size, real* D, real* E, int* INFO)
     D[0] = 1.0 / D[0];
     
     for ( int n = 1; n < size; ++n )
-        D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
+        D[n] = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * D[n-1] );
 }
 
 
@@ -100,7 +100,7 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
     
     // downward recursion on B[]
     for ( int n = size-2; n >= 0; --n )
-        B[n] = B[n] - D[n] * E[n] * B[n+1];
+        B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
 }
 
 
@@ -110,27 +110,25 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 /**
  Based on the 'Italian' version, precalculating constant products:
  
-     DEL[n] <-  D[n] * E[n-1]
-     E[n]   <-  D[n] * E[n]
+     DE[n] <-  D[n] * E[n]
+
+ D[] needs to be allocated to hold 2*size
  */
-void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
+void alsatian_xpttrf(int size, real* D, real const* E, int* INFO)
 {
-    real * DEL = D + size;
+    real * DE = D + size;
+    
     D[0] = 1.0 / D[0];
+    DE[0] = D[0] * E[0];
     
     real x = D[0];
     for ( int n = 1; n < size; ++n )
     {
         //D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
-        x = 1.0 / ( D[n] - E[n-1] * E[n-1] * x );
+        x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
         D[n] = x;
-        // precalculate product that is constant:
-        DEL[n] = x * E[n-1];
+        DE[n] = x * E[n];
     }
-    
-    // precalculate two products that are constant:
-    for ( int n = 0; n < size-1; ++n )
-        E[n] = D[n] * E[n];
 }
 
 
@@ -140,22 +138,19 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
 void alsatian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int LDB)
 {
     assert_true(nrhs == 1); // in this case, LDB is not used
-    real const* DEL = D + size;
+    real const* DE = D + size;
 
     B[0] = D[0] * B[0];
     
     // upward recursion on B[]
     for ( int n = 1; n < size; ++n )
-    {
-        // B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
-        B[n] = D[n] * B[n] - DEL[n] * B[n-1];
-    }
+        B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
     
     // downward recursion on B[]
     for ( int n = size-2; n >= 0; --n )
     {
         // B[n] = B[n] - D[n] * E[n] * B[n+1];
-        B[n] = B[n] - E[n] * B[n+1];
+        B[n] = B[n] - DE[n] * B[n+1];
     }
 }
 
