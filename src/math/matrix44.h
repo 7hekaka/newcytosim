@@ -219,9 +219,24 @@ public:
     Matrix44 transposed() const
     {
         Matrix44 res;
+#if MATRIX44_USES_AVX
+        vec4 v0 = load4(val);
+        vec4 v1 = load4(val+4);
+        vec4 v2 = load4(val+8);
+        vec4 v3 = load4(val+12);
+        vec4 t0 = unpacklo4(v0, v1);
+        vec4 t1 = unpackhi4(v0, v1);
+        vec4 t2 = unpacklo4(v2, v3);
+        vec4 t3 = unpackhi4(v2, v3);
+        store4(res.val   , permute2f128(t0, t2, 0x20));
+        store4(res.val+4 , permute2f128(t1, t3, 0x20));
+        store4(res.val+8 , permute2f128(t0, t2, 0x31));
+        store4(res.val+12, permute2f128(t1, t3, 0x31));
+#else
         for ( int x = 0; x < 4; ++x )
         for ( int y = 0; y < 4; ++y )
             res.val[y+4*x] = val[x+4*y];
+#endif
         return res;
     }
     

@@ -1,6 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-
 /**
  Calculate the grid size automatically for dynamic Fiber,
  Bead, Sphere and Solid.
@@ -500,9 +499,15 @@ void Simul::dump_system() const
 //                              SOLVE-X 1D
 //==============================================================================
 
+#include "meca1d.h"
 
 void Simul::solveX()
 {
+    if ( !pMeca1D )
+        pMeca1D = new Meca1D();
+    
+    Meca1D & sMeca1D = *pMeca1D;
+
     //-----initialize-----
     
     sMeca1D.clear();

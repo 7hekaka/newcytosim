@@ -832,213 +832,8 @@ void Meca::addTorque(const Mecapoint & ptA,
         add_block(iiB, iiC, W+T);
 }
 
-#if ( 0 )
-void Meca::addTorqueHalf(const Mecapoint & ptA,
-                         const Mecapoint & ptB,
-                         const Mecapoint & ptC,
-                         const real cosinus, const real sinus,
-                         const real len, const real weight)
-{
-    assert_true( weight >= 0 );
-    const MatrixBlock W(0, weight);
-    const Vector AB = ptB.pos() - ptA.pos();
-    const real sa = std::max(1.0, len/AB.norm());
-
-#if ( DIM == 3 )
-    Vector axis(0,0,1);// = normalize(cross(AB,BC));
-    const Matrix33 R = weight * Matrix33::rotationAroundAxis(axis, cosinus*sa, sinus*sa);
-#elif ( DIM == 2 )
-    const Matrix22 R = ( weight * sa ) * Matrix22(cosinus, sinus,-sinus, cosinus);
-#else
-    const Matrix11 R(1);  //should not be used!
-#endif
-
-    const MatrixBlock T = R.transposed();
-    const MatrixBlock aW = ( sa * sa ) * W;
-    
-    // indices in matrix mC:
-    const index_t iiA = DIM * ptA.matIndex();
-    const index_t iiB = DIM * ptB.matIndex();
-    const index_t iiC = DIM * ptC.matIndex();
-    
-    sub_diag_block(iiA, aW);
-    sub_diag_block(iiB, (W+R)+(aW+T));
-    sub_diag_block(iiC, W);
-    if ( iiB > iiA )
-        add_block(iiB, iiA, R+aW);
-    else
-        add_block(iiA, iiB, T+aW);
-    if ( iiC > iiA )
-        sub_block(iiC, iiA, R);
-    else
-        sub_block(iiA, iiC, T);
-    if ( iiC > iiB )
-        add_block(iiC, iiB, R+W);
-    else
-        add_block(iiB, iiC, T+W);
-    
-    std::clog << " R " << std::setw(12) << R << "\n";
-}
-
-#else
-
-/**
- Add Torque between 3 points, and impose the distance between the points
- to be 'len'. The angle described by ABC is set by (cosinus, sinus)
- */
-void Meca::addTorqueHalf(const Mecapoint & ptA,
-                         const Mecapoint & ptB,
-                         const Mecapoint & ptC,
-                         const real cosinus, const real sinus,
-                         const real len, const real weight)
-{
-    assert_true( weight >= 0 );
-    const MatrixBlock W(0, weight);
-    const Vector AB = ptB.pos() - ptA.pos();
-    const real sa = std::max(1.0, len/AB.norm());
-    
-#if ( DIM == 3 )
-    const Vector CB = ptB.pos() - ptC.pos();
-    Vector axis = normalize(cross(CB,AB));
-    const Matrix33 R = weight * Matrix33::rotationAroundAxis(axis, cosinus*sa, sinus*sa);
-    //const Matrix33 R = ( weight * sa ) * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
-#elif ( DIM == 2 )
-    const Matrix22 R = ( weight * sa ) * Matrix22(cosinus, sinus,-sinus, cosinus);
-#else
-    const Matrix11 R(1);  //should not be used!
-#endif
-    
-    const MatrixBlock R1 = sa * ( W + R );
-    const MatrixBlock T1 = R1.transposed();
-    const real dd = sa * ( 2 * weight ) * ( 1.0 + sa * cosinus );
-#if 0
-    const MatrixBlock TR = ( sa * sa ) * ( (W+R)+(W+R.transposed()) );
-    std::clog << " TR " << std::setw(12) << TR << "\n";
-    std::clog << " tr " << std::setw(12) << sa * dd << "\n";
-#else
-    const MatrixBlock TR(0, sa * dd);
-#endif
-    
-#if 0
-    std::clog << " D1 " << std::setw(12) << (TR+W)-(T1+R1) << "\n";
-    std::clog << " d1 " << std::setw(12) << weight + dd * sa - dd << "\n";
-#endif
-    MatrixBlock DD(0, weight + dd * sa - dd);
-    
-    // indices in matrix mC:
-    const index_t iiA = DIM * ptA.matIndex();
-    const index_t iiB = DIM * ptB.matIndex();
-    const index_t iiC = DIM * ptC.matIndex();
-    
-    // the first three matrix blocks below are diagonal
-    sub_diag_block(iiA, DD); //(TR+W)-(T1+R1));
-    sub_diag_block(iiB, TR);
-    sub_diag_block(iiC, W);
-    // the block below are anti-symmetric
-    if ( iiB > iiA )
-        add_block(iiB, iiA, TR-T1);
-    else
-        add_block(iiA, iiB, TR-R1);
-    if ( iiC > iiA )
-        add_block(iiC, iiA, W-R1);
-    else
-        add_block(iiA, iiC, W-T1);
-    if ( iiC > iiB )
-        add_block(iiC, iiB, R1);
-    else
-        add_block(iiB, iiC, T1);
-    
-    //std::clog << " R " << std::setw(12) << R << "\n";
-}
-#endif
-
-#if ( 0 )
-void Meca::addTorque(const Mecapoint & ptA,
-                     const Mecapoint & ptB,
-                     const Mecapoint & ptC,
-                     const real cosinus, const real sinus,
-                     const real len, const real weight)
-{
-    addLongLink(ptA, ptB, len, weight);
-    //addLongLink(ptB, ptC, len, weight);
-    addTorque(ptA, ptB, ptC, cosinus, sinus, weight);
-    //addTorqueHalf(ptA, ptB, ptC, cosinus, sinus, len, weight);
-    //addTorqueHalf(ptC, ptB, ptA, cosinus, sinus, len, weight);
-}
-#endif
-
-#if ( 0 )
-//this is variation 2
-void Meca::addTorque(const Mecapoint & ptA,
-                     const Mecapoint & ptB,
-                     const Mecapoint & ptC,
-                     const real cosinus, const real sinus,
-                     const real len, const real weight)
-{
-    assert_true( weight >= 0 );
-    const MatrixBlock W(0, weight);
-    const Vector AB = ptB.pos() - ptA.pos();
-    const Vector CB = ptB.pos() - ptC.pos();
-
-    const real sa = std::max(1.0, len/AB.norm());
-    const real sc = std::max(1.0, len/CB.norm());
-
-#if ( DIM == 3 )
-    Vector axis = normalize(cross(CB,AB));
-    const Matrix33 R = weight * Matrix33::rotationAroundAxis(axis, cosinus*sa, sinus*sa);
-    const Matrix33 T = weight * Matrix33::rotationAroundAxis(axis, cosinus*sc, sinus*sc);
-    //const Matrix33 R = ( weight * sa ) * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
-    //const Matrix33 R = ( weight * sc ) * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
-#elif ( DIM == 2 )
-    const Matrix22 rot(cosinus, sinus,-sinus, cosinus);
-    const Matrix22 R = ( weight * sa ) * rot;
-    const Matrix22 T = ( weight * sc ) * rot;
-#else
-    const Matrix11 R(1);  //should not be used!
-    const Matrix11 T(1);  //should not be used!
-#endif
-    
-    const MatrixBlock R1 = sa * ( W + R );
-    const MatrixBlock Rt = R1.transposed();
-    const real da = sa * ( 2 * weight ) * ( 1.0 + sa * cosinus );
-    const MatrixBlock TRa(0, da * sa);
-    const MatrixBlock DDa(0, 2 * weight + da * sa - da);
-
-    const MatrixBlock T1 = sc * ( W + T );
-    const MatrixBlock Tt = T1.transposed();
-    const real dc = sc * ( 2 * weight ) * ( 1.0 + sc * cosinus );
-    const MatrixBlock TRc(0, dc * sc);
-    const MatrixBlock DDc(0, 2 * weight + dc * sc - dc);
-
-    // indices in matrix mC:
-    const index_t iiA = DIM * ptA.matIndex();
-    const index_t iiB = DIM * ptB.matIndex();
-    const index_t iiC = DIM * ptC.matIndex();
-    
-    // the first three matrix blocks below are diagonal
-    sub_diag_block(iiA, DDa);
-    sub_diag_block(iiB, TRc+TRa);
-    sub_diag_block(iiC, DDc);
-    // the block below are anti-symmetric
-    if ( iiB > iiA )
-        add_block(iiB, iiA, T1+TRa-Rt);
-    else
-        add_block(iiA, iiB, Tt+TRa-R1);
-    if ( iiC > iiA )
-        add_block(iiC, iiA, (W-T1)+(W-R1));
-    else
-        add_block(iiA, iiC, (W-Tt)+(W-Rt));
-    if ( iiC > iiB )
-        add_block(iiC, iiB, TRc-Tt+R1);
-    else
-        add_block(iiB, iiC, TRc-T1+Rt);
-    
-    //std::clog << "R " << std::setw(12) << R << "\n";
-}
-#endif
 
 
-#if ( 1 )
 /** This is variation 3, 20.08.2019
  It combines addTorque() without length with a LongLink(ptA, ptB);
  */
@@ -1108,7 +903,6 @@ void Meca::addTorque(const Mecapoint & ptA,
     if ( modulo )
         throw Exception("addTorque(A,B,C) is not usable with periodic boundary conditions");
 }
-#endif
 
 
 //------------------------------------------------------------------------------
@@ -2172,6 +1966,7 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     const real epsw = weight * eps;
     const real e2sw = eps * epsw;
     
+    //\todo put all terms in blocks (mC)
     //we put the isotropic terms in mB
     sub_iso(ii0, ii0, ca1w * ca1 + e2sw);
     sub_iso(ii0, ii1, ca1w * ca2 - e2sw);
@@ -2489,7 +2284,6 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     add_iso(ib3, ib3, ww3 * cc3);
     add_iso(ib3, ib2, ww3 * cc2);
 
-#if USE_MATRIX_BLOCK
     add_block(ii1, ii0, w, B.trans_mul(A));
     if ( ii2 > ii0 )
     {
@@ -2507,33 +2301,6 @@ void Meca::addSideLink2D(const Interpolation & ptA,
         add_block(ii0, ii3, ww3, At);
         add_block(ii1, ii3, ww3, Bt);
     }
-#else
-    // isotropic terms go in matrix mB:
-    add_iso(ia0, ia1, ww0 * cc1 - we * ee);
-    add_iso(ia0, ib2, ww0 * cc2);
-    add_iso(ia0, ib3, ww0 * cc3);
-    add_iso(ia1, ib2, ww1 * cc2);
-    add_iso(ia1, ib3, ww1 * cc3);
-    
-    // anistropic terms go in the matrix mC:
-    mC(ii0  , ii1+1) -= we;
-    mC(ii0+1, ii1  ) += we;
-    
-    const real wecc2 = we * cc2;
-    const real wecc3 = we * cc3;
-    
-    mC(ii0, ii2+1) -= wecc2;
-    mC(ii0, ii3+1) -= wecc3;
-    
-    mC(ii0+1, ii2) += wecc2;
-    mC(ii0+1, ii3) += wecc3;
-    
-    mC(ii1, ii2+1) += wecc2;
-    mC(ii1, ii3+1) += wecc3;
-    
-    mC(ii1+1, ii2) -= wecc2;
-    mC(ii1+1, ii3) -= wecc3;
-#endif
     
     if ( modulo )
     {
@@ -3045,8 +2812,6 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     // the (symmetric) projection matrix:
     // P = -weight * [ I - dir (x) dir ]
     MatrixBlock P = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
-
-#if USE_MATRIX_BLOCK
     
     // anti-symmetric matrix blocks:
     const Matrix22 A( -aa,  ee, -ee, -aa );
@@ -3097,38 +2862,6 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
             add_base(ii2, off);
         }
     }
-    
-#else
-
-    // here we multiply whole matrices
-    real TPT[6*6];
-    {
-        // matrix of coefficients 2x6:
-        real PT[2*6], T[2*6] = { -aa,  ee, -ee, -aa,
-                                 -bb, -ee,  ee, -bb,
-                                 1.0, 0.0, 0.0, 1.0 };
-        blas::xgemm('N','N', 2, 6, 2, 1.0, P.val, 2, T, 2, 0.0, PT, 2);
-        blas::xgemm('T','N', 6, 6, 2, 1.0, T, 2, PT, 2, 0.0, TPT, 6);
-    }
-    
-    //printf("\n"); VecPrint::print(std::clog, 6, 6, TPT, 6);
-    
-    const index_t ixx[] = { ii0, ii0+1, ii1, ii1+1, ii2, ii2+1 };
-    
-    for ( int x=0; x<6; ++x )
-    for ( int y=x; y<6; ++y )
-        mC(ixx[y], ixx[x]) += TPT[y+6*x];
-    
-    if ( modulo )
-    {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
-        if ( !off.null() )
-        {
-            for ( int n=0; n<6; ++n )
-                vBAS[ixx[n]] -= TPT[n+6*4] * off.XX + TPT[n+6*5] * off.YY;
-        }
-     }
-#endif
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )
@@ -3329,9 +3062,9 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
 // @todo interSideSlidingLink2D should use block operations
 
 void Meca::addSideSlidingLink2D(const Interpolation & ptA,
-                                  const Interpolation & ptB,
-                                  const real arm,
-                                  const real weight)
+                                const Interpolation & ptB,
+                                const real arm,
+                                const real weight)
 {
     assert_true( weight >= 0 );
 

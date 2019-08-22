@@ -13,7 +13,9 @@
 #define CBLAS_H
 
 #include "real.h"
-#include "string.h"
+#include "simd.h"
+#include <cstdio>
+
 
 #ifdef __cplusplus
 namespace blas {
@@ -399,18 +401,69 @@ inline real nrm8(const int N, const real* X, int inc)
 #endif
 }
 
+    
+inline real nrm8seq(const int N, const real* X)
+{
+    real r = std::abs(X[0]);
+#pragma ivdep
+#pragma vector always
+    for ( int i = 1; i < N; ++i )
+        r = std::max(r, std::abs(X[i]));
+    return r;
+}
 
+#ifdef __AVX__
+
+inline double nrm8(const size_t siz, const double* X)
+{
+    double const* ptr = X;
+    double const* end = X + siz;
+    double const* stop = end - 11;
+    vec4 u = setzero4();
+    while ( ptr < stop )
+    {
+        vec4 a = abs4(load4(ptr));
+        vec4 b = abs4(load4(ptr+4));
+        vec4 c = abs4(load4(ptr+8));
+        u = max4(max4(u,a), max4(b,c));
+        ptr += 12;
+    }
+    while ( ptr < end - 3 )
+    {
+        u = max4(u, abs4(load4(ptr)));
+        ptr += 4;
+    }
+    vec2 v = getlo(max4(u, permute2f128(u, u, 0x01)));
+    while ( ptr < end - 1 )
+    {
+        v = max2(v, abs2(load2(ptr)));
+        ptr += 2;
+    }
+    v = max2(v, permute2(v, 0b01));
+    double res = v[0];
+    while ( ptr < end )
+        res = std::max(res, std::abs(*ptr++));
+#if 0
+    real x = std::abs(X[0]);
+    for ( size_t i = 1; i < siz; ++i )
+        x = std::max(x, std::abs(X[i]));
+    if ( x != res )
+        printf("ERROR blas::nrm8 %f %f\n", x, res);
+#endif
+    return res;
+}
+    
+#else
 inline real nrm8(const int N, const real* X)
 {
-    if ( N == 0 )
-        return 0;
-    real u = std::abs(X[0]);
+    real r = 0;
     #pragma ivdep
     #pragma vector always
-    for ( int i = 1; i < N; ++i )
-        u = std::max(u, std::abs(X[i]));
-    return u;
+    for ( int i = 0; i < N; ++i )
+        r = std::max(r, std::abs(X[i]));
+    return r;
 }
+#endif
 
     
 /**

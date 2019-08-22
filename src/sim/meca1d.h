@@ -6,6 +6,8 @@
 #include "array.h"
 #include "mecable.h"
 #include "matsparsesym1.h"
+#include "monitor.h"
+#include "allocator.h"
 #include "bicgstab.h"
 
 
