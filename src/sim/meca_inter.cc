@@ -1935,7 +1935,6 @@ void Meca::addLongLink(const Interpolation & ptA,
      force_S = weight * ( S - B )
      force_B = weight * ( B - S )
  
- @todo interSideLink2D should use block operations
  */
 
 
@@ -1947,47 +1946,54 @@ void Meca::addSideLink2D(const Interpolation & ptA,
                          const real weight)
 {
     assert_true( weight >= 0 );
-    
-    //index in the matrix mB:
-    index_t ii0 = ptA.matIndex1();
-    index_t ii1 = ptA.matIndex2();
-    index_t ii2 = ptB.matIndex();
+  
+    //index in the matrix mB and mC:
+    const index_t ia0 = ptA.matIndex1(),  ii0 = DIM * ia0;
+    const index_t ia1 = ptA.matIndex2(),  ii1 = DIM * ia1;
+    const index_t ib2 = ptB.matIndex(),   ii2 = DIM * ib2;
 
     if ( any_equal(ii0, ii1, ii2) )
         return;
-
-    //force coefficients on the points:
-    const real ca1 = ptA.coef2();
-    const real ca2 = ptA.coef1();
-    const real eps = arm / ptA.len();
     
-    const real ca1w = weight * ca1;
-    const real ca2w = weight * ca2;
-    const real epsw = weight * eps;
-    const real e2sw = eps * epsw;
+    // weights and indices:
+    const real cc0 =  ptA.coef2(),  ww0 = weight * cc0;
+    const real cc1 =  ptA.coef1(),  ww1 = weight * cc1;
+    const real ee = arm / ptA.len(), we = weight * ee;
     
-    //\todo put all terms in blocks (mC)
-    //we put the isotropic terms in mB
-    sub_iso(ii0, ii0, ca1w * ca1 + e2sw);
-    sub_iso(ii0, ii1, ca1w * ca2 - e2sw);
-    sub_iso(ii1, ii1, ca2w * ca2 + e2sw);
+    sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
+    sub_iso(ia1, ia1, ww1 * cc1 + we * ee);
+    sub_iso(ib2, ib2, weight);
     
-    sub_iso(ii2, ii2, weight);
-    add_iso(ii0, ii2, ca1w);
-    add_iso(ii1, ii2, ca2w);
+    real wd = ww0 * cc1 - we * ee;
+    sub_block(ii1, ii0, Matrix22(wd, -we, we, wd));
     
-    //index in the matrix mC:
-    ii0 *= DIM;
-    ii1 *= DIM;
-    ii2 *= DIM;
+    if ( ii2 > ii0 )
+    {
+        Matrix22 A(ww0, -we,  we, ww0);
+        Matrix22 B(ww1,  we, -we, ww1);
+        add_block(ii2, ii0, A);
+        add_block(ii2, ii1, B);
+    }
+    else
+    {
+        Matrix22 At(ww0,  we, -we, ww0);
+        Matrix22 Bt(ww1, -we,  we, ww1);
+        add_block(ii0, ii2, At);
+        add_block(ii1, ii2, Bt);
+    }
     
-    mC(ii0  , ii1+1) += epsw;
-    mC(ii0+1, ii1  ) -= epsw;
-    
-    mC(ii0  , ii2+1) -= epsw;
-    mC(ii0+1, ii2  ) += epsw;
-    mC(ii1,   ii2+1) += epsw;
-    mC(ii1+1, ii2  ) -= epsw;
+    if ( modulo )
+    {
+        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        if ( !off.null() )
+        {
+            Matrix22 Aw(ww0,  we, -we, ww0);
+            Matrix22 Bw(ww1, -we,  we, ww1);
+            sub_base(ii0, Aw.vecmul(off));
+            sub_base(ii1, Bw.vecmul(off));
+            add_base(ii2, off, weight);
+        }
+    }
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )
@@ -1996,30 +2002,6 @@ void Meca::addSideLink2D(const Interpolation & ptA,
         drawLink(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
-    
-    if ( modulo )
-    {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
-        
-        real offx = off.XX;
-        if ( offx != 0 )
-        {
-            vBAS[ii0  ] += ca1w * offx;
-            vBAS[ii0+1] += epsw * offx;
-            vBAS[ii1  ] += ca2w * offx;
-            vBAS[ii1+1] -= epsw * offx;
-            vBAS[ii2  ] += offx;
-        }
-        real offy = off.YY;
-        if ( offy != 0 )
-        {
-            vBAS[ii0  ] -= epsw * offy;
-            vBAS[ii0+1] += ca1w * offy;
-            vBAS[ii1  ] += epsw * offy;
-            vBAS[ii1+1] += ca2w * offy;
-            vBAS[ii2+1] += offy;
-        }
-    }
 }
 
 #elif ( DIM >= 3 )
@@ -2263,7 +2245,7 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     const index_t ib2 = ptB.matIndex1(),  ii2 = DIM * ib2;
     const index_t ib3 = ptB.matIndex2(),  ii3 = DIM * ib3;
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ia0, ia1, ib2, ib3) )
         return;
 
     // weights and indices:
@@ -2446,6 +2428,7 @@ void Meca::addSideLink(const Interpolation & ptA,
 #if ( DIM == 2 )
 
 /*
+ // new style code, but untested
 void Meca::addSideSideLink2D(const Interpolation & ptA,
                              const Interpolation & ptB,
                              const real len,
@@ -2478,10 +2461,10 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
     Matrix22 C(cc2, -ee2,  ee2, cc2);
     Matrix22 D(cc3,  ee2, -ee2, cc3);
     
-    Matrix22 Aw(ww0, -ew1,  ew1, ww0);
-    Matrix22 Bw(ww1,  ew1, -ew1, ww1);
-    Matrix22 Cw(ww2, -ew2,  ew2, ww2);
-    Matrix22 Dw(ww3,  ew2, -ew2, ww3);
+    Matrix22 Aw(ww0, -we1,  we1, ww0);
+    Matrix22 Bw(ww1,  we1, -we1, ww1);
+    Matrix22 Cw(ww2, -we2,  we2, ww2);
+    Matrix22 Dw(ww3,  we2, -we2, ww3);
     
     add_diag_block(ii0, A.trans_mul(Aw));
     add_diag_block(ii1, B.trans_mul(Bw));
@@ -2528,6 +2511,7 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
 }
 */
 
+// this is old style code, but it works!
 void Meca::addSideSideLink2D(const Interpolation & ptA,
                              const Interpolation & ptB,
                              const real len,
@@ -2613,8 +2597,8 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
         throw Exception("addSideSideLink2D is not usable with periodic boundary conditions");
 }
 
-#endif
 
+#endif
 
 /**
  Link `ptA` (A) and `ptB` (B),
@@ -3869,20 +3853,20 @@ void Meca::addLineClamp(const Interpolation & ptA,
     const index_t ii1 = DIM * ptA.matIndex2();
 
     //force coefficients on the points:
-    const real A = ptA.coef2();
-    const real B = ptA.coef1();
+    const real cc0 = ptA.coef2();
+    const real cc1 = ptA.coef1();
 
     // T = -weight * [ I - dir (x) dir ]
     MatrixBlock T = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
-    add_diag_block(ii0, A*A, T);
-    add_diag_block(ii1, B*B, T);
-    add_block(ii0, ii1, A*B, T);
+    add_diag_block(ii0, cc0*cc0, T);
+    add_diag_block(ii1, cc1*cc1, T);
+    add_block(ii0, ii1, cc0*cc1, T);
     
     //add the constant term:
     Vector off = weight * ( pos - dot(pos, dir) * dir );
-    add_base(ii0, off, A);
-    add_base(ii1, off, B);
+    add_base(ii0, off, cc0);
+    add_base(ii1, off, cc1);
 }
 
 
