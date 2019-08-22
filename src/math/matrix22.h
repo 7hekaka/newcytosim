@@ -764,14 +764,14 @@ public:
 };
 
 
-/// output operator to std::ostream
+/// output matrix lines to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix22 const& M)
 {
     std::streamsize w = os.width();
     os << std::setw(2) << "[ ";
     os << std::setw(w) << M[0] << " ";
-    os << std::setw(w) << M[1] << " | ";
-    os << std::setw(w) << M[2] << " ";
+    os << std::setw(w) << M[2] << " ; ";
+    os << std::setw(w) << M[1] << " ";
     os << std::setw(w) << M[3] << " ]";
     return os;
 }

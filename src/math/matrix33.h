@@ -947,20 +947,20 @@ public:
 };
 
 
-/// output operator to std::ostream
+/// output matrix lines to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix33 const& M)
 {
     std::streamsize w = os.width();
     os << std::setw(2) << "[ ";
-    for ( int x = 0; x < 3; ++x )
+    for ( int i = 0; i < 3; ++i )
     {
-        for ( int y = 0; y < 3; ++y )
+        for ( int j = 0; j < 3; ++j )
         {
             os.width(w);
-            os << std::fixed << M(y,x) << " ";
+            os << std::fixed << M(i,j) << " ";
         }
-        if ( x < 2 )
-            os << "| ";
+        if ( i < 2 )
+            os << "; ";
         else
             os << "]";
     }

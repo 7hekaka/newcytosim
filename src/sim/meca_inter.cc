@@ -2267,39 +2267,46 @@ void Meca::addSideLink2D(const Interpolation & ptA,
         return;
 
     // weights and indices:
-    const real w = -weight;
-    const real cc0 =  ptA.coef2(),  ww0 = w * cc0;
-    const real cc1 =  ptA.coef1(),  ww1 = w * cc1;
-    const real cc2 = -ptB.coef2(),  ww2 = w * cc2;
-    const real cc3 = -ptB.coef1(),  ww3 = w * cc3;
+    const real cc0 =  ptA.coef2(),  ww0 = weight * cc0;
+    const real cc1 =  ptA.coef1(),  ww1 = weight * cc1;
+    const real cc2 = -ptB.coef2(),  ww2 = weight * cc2;
+    const real cc3 = -ptB.coef1(),  ww3 = weight * cc3;
     
-    const real ee = arm / ptA.len(),  we = w * ee;
+    const real ee = arm / ptA.len(), we = weight * ee;
 
+    sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
+    sub_iso(ia1, ia1, ww1 * cc1 + we * ee);
+    sub_iso(ib2, ib2, ww2 * cc2);
+    sub_iso(ib3, ib3, ww3 * cc3);
+    sub_iso(ib3, ib2, ww3 * cc2);
+
+#if ( 1 )
+    //add_block(ii1, ii0, w, B.trans_mul(A));
+    real wd = ww0 * cc1 - we * ee;
+    sub_block(ii1, ii0, Matrix22(wd, -we, we, wd));
+#else
     Matrix22 A(cc0, -ee,  ee, cc0);
     Matrix22 B(cc1,  ee, -ee, cc1);
-
-    add_iso(ia0, ia0, ww0 * cc0 + we * ee);
-    add_iso(ia1, ia1, ww1 * cc1 + we * ee);
-    add_iso(ib2, ib2, ww2 * cc2);
-    add_iso(ib3, ib3, ww3 * cc3);
-    add_iso(ib3, ib2, ww3 * cc2);
-
-    add_block(ii1, ii0, w, B.trans_mul(A));
+    add_block(ii1, ii0, -weight, B.trans_mul(A));
+#endif
+    
     if ( ii2 > ii0 )
     {
-        add_block(ii2, ii0, ww2, A);
-        add_block(ii3, ii0, ww3, A);
-        add_block(ii2, ii1, ww2, B);
-        add_block(ii3, ii1, ww3, B);
+        Matrix22 A(ww0, -we,  we, ww0);
+        Matrix22 B(ww1,  we, -we, ww1);
+        add_block(ii2, ii0, -cc2, A);
+        add_block(ii3, ii0, -cc3, A);
+        add_block(ii2, ii1, -cc2, B);
+        add_block(ii3, ii1, -cc3, B);
     }
     else
     {
-        Matrix22 At = A.transposed();
-        Matrix22 Bt = B.transposed();
-        add_block(ii0, ii2, ww2, At);
-        add_block(ii1, ii2, ww2, Bt);
-        add_block(ii0, ii3, ww3, At);
-        add_block(ii1, ii3, ww3, Bt);
+        Matrix22 At(ww0,  we, -we, ww0);
+        Matrix22 Bt(ww1, -we,  we, ww1);
+        add_block(ii0, ii2, -cc2, At);
+        add_block(ii1, ii2, -cc2, Bt);
+        add_block(ii0, ii3, -cc3, At);
+        add_block(ii1, ii3, -cc3, Bt);
     }
     
     if ( modulo )
@@ -2307,11 +2314,12 @@ void Meca::addSideLink2D(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off *= -weight;
-            add_base(ii0, A.trans_vecmul(off));
-            add_base(ii1, B.trans_vecmul(off));
-            add_base(ii2, off, cc2);
-            add_base(ii3, off, cc3);
+            Matrix22 Aw(ww0,  we, -we, ww0);
+            Matrix22 Bw(ww1, -we,  we, ww1);
+            sub_base(ii0, Aw.vecmul(off));
+            sub_base(ii1, Bw.vecmul(off));
+            add_base(ii2, off, -ww2);
+            add_base(ii3, off, -ww3);
         }
     }
     

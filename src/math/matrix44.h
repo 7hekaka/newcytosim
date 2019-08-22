@@ -642,17 +642,17 @@ public:
 };
 
 
-/// output operator to std::ostream
+/// output matrix lines to std::ostream
 inline std::ostream& operator << (std::ostream& os, Matrix44 const& M)
 {
     std::streamsize w = os.width();
     os << std::setw(2) << "[ ";
-    for ( int x = 0; x < 4; ++x )
+    for ( int i = 0; i < 4; ++i )
     {
-        for ( int y = 0; y < 4; ++y )
-            os << std::setw(w) << std::fixed << M(y,x) << " ";
-        if ( x < 3 )
-            os << "| ";
+        for ( int j = 0; j < 4; ++j )
+            os << std::setw(w) << std::fixed << M(i,j) << " ";
+        if ( i < 3 )
+            os << "; ";
         else
             os << "]";
     }

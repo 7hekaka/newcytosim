@@ -402,14 +402,14 @@ inline real nrm8(const int N, const real* X, int inc)
 }
 
     
-inline real nrm8seq(const int N, const real* X)
+inline real nrm8seq(const int siz, const real* X)
 {
-    real r = std::abs(X[0]);
+    real res = std::abs(X[0]);
 #pragma ivdep
 #pragma vector always
-    for ( int i = 1; i < N; ++i )
-        r = std::max(r, std::abs(X[i]));
-    return r;
+    for ( int i = 1; i < siz; ++i )
+        res = std::max(res, std::abs(X[i]));
+    return res;
 }
 
 #ifdef __AVX__
