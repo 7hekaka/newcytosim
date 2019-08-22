@@ -48,7 +48,7 @@ void Simul::setFiberGrid(Space const* spc) const
         step *= 2;
     }
     prop->binding_grid_step = step;
-    //std::clog << "simul:binding_grid_step = " << prop->binding_grid_step << "\n";
+    std::clog << "simul:binding_grid_step = " << prop->binding_grid_step << "\n";
 
     // create the grid cells:
     fiberGrid.createCells();

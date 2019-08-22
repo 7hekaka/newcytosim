@@ -20,6 +20,12 @@ extern Modulo const* modulo;
 /** This is significantly faster on machine with the AVX instruction set */
 #define USE_MATRIX_BLOCK 1
 
+
+/// set TRUE to use matrix mB and mC (the traditional way)
+/** This should be normally enabled */
+#define USE_ISO_MATRIX 1
+
+
 //------------------------------------------------------------------------------
 #pragma mark - Accessory functions
 
@@ -155,7 +161,7 @@ inline void Meca::sub_diag_block(index_t i, MatrixBlock const& T)
 
 inline void Meca::add_iso(index_t i, index_t j, real val)
 {
-#if ( 1 )
+#if USE_ISO_MATRIX
     mB(i,j) += val;
 #else
     mC.block(DIM*i, DIM*j).add_diag(val);
@@ -164,7 +170,7 @@ inline void Meca::add_iso(index_t i, index_t j, real val)
 
 inline void Meca::sub_iso(index_t i, index_t j, real val)
 {
-#if ( 1 )
+#if USE_ISO_MATRIX
     mB(i,j) -= val;
 #else
     mC.block(DIM*i, DIM*j).sub_diag(val);
@@ -1947,18 +1953,18 @@ void Meca::addSideLink2D(const Interpolation & ptA,
 {
     assert_true( weight >= 0 );
   
-    //index in the matrix mB and mC:
+    // indices in the matrix mB and mC:
     const index_t ia0 = ptA.matIndex1(),  ii0 = DIM * ia0;
     const index_t ia1 = ptA.matIndex2(),  ii1 = DIM * ia1;
     const index_t ib2 = ptB.matIndex(),   ii2 = DIM * ib2;
 
     if ( any_equal(ii0, ii1, ii2) )
         return;
-    
-    // weights and indices:
+    const real ee = arm / ptA.len(), we = weight * ee;
+
+    // coefficients and weights:
     const real cc0 =  ptA.coef2(),  ww0 = weight * cc0;
     const real cc1 =  ptA.coef1(),  ww1 = weight * cc1;
-    const real ee = arm / ptA.len(), we = weight * ee;
     
     sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
     sub_iso(ia1, ia1, ww1 * cc1 + we * ee);
@@ -2215,7 +2221,8 @@ void Meca::addSideLink(const Interpolation & ptA,
     
 #elif ( DIM == 2 )
     
-    real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos()));
+    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos()));
+    real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos()));
     addSideLink2D(ptA, ptB, arm, weight);
 
 #else
@@ -2239,7 +2246,7 @@ void Meca::addSideLink2D(const Interpolation & ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB and mC:
+    // indices in the matrix mB and mC:
     const index_t ia0 = ptA.matIndex1(),  ii0 = DIM * ia0;
     const index_t ia1 = ptA.matIndex2(),  ii1 = DIM * ia1;
     const index_t ib2 = ptB.matIndex1(),  ii2 = DIM * ib2;
@@ -2247,14 +2254,14 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     
     if ( any_equal(ia0, ia1, ib2, ib3) )
         return;
+    
+    const real ee = arm / ptA.len(), we = weight * ee;
 
-    // weights and indices:
+    // coefficients and weights:
     const real cc0 =  ptA.coef2(),  ww0 = weight * cc0;
     const real cc1 =  ptA.coef1(),  ww1 = weight * cc1;
     const real cc2 = -ptB.coef2(),  ww2 = weight * cc2;
     const real cc3 = -ptB.coef1(),  ww3 = weight * cc3;
-    
-    const real ee = arm / ptA.len(), we = weight * ee;
 
     sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
     sub_iso(ia1, ia1, ww1 * cc1 + we * ee);
@@ -2408,7 +2415,8 @@ void Meca::addSideLink(const Interpolation & ptA,
 
 #elif ( DIM == 2 )
     
-    real arm = len * RNG.sign_exc( cross(ptA.diff(), ptB.pos()-ptA.pos()) );
+    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos()));
+    real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos()));
     addSideLink2D(ptA, ptB, arm, weight);
     
 #else
@@ -2447,14 +2455,14 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
         return;
 
     // weights and indices:
-    const real w = -weight;
-    const real cc0 =  ptA.coef2(),  ww0 = w * cc0;
-    const real cc1 =  ptA.coef1(),  ww1 = w * cc1;
-    const real cc2 = -ptB.coef2(),  ww2 = w * cc2;
-    const real cc3 = -ptB.coef1(),  ww3 = w * cc3;
+    const real W = -weight;
+    const real cc0 =  ptA.coef2(),  ww0 = W * cc0;
+    const real cc1 =  ptA.coef1(),  ww1 = W * cc1;
+    const real cc2 = -ptB.coef2(),  ww2 = W * cc2;
+    const real cc3 = -ptB.coef1(),  ww3 = W * cc3;
 
-    const real ee1 = side1 / ( 2 * ptA.len() ), we1 = w * ee1;
-    const real ee2 = side2 / ( 2 * ptB.len() ), we2 = w * ee2;
+    const real ee1 = side1 / ( 2 * ptA.len() ), we1 = W * ee1;
+    const real ee2 = side2 / ( 2 * ptB.len() ), we2 = W * ee2;
 
     Matrix22 A(cc0, -ee1,  ee1, cc0);
     Matrix22 B(cc1,  ee1, -ee1, cc1);
@@ -2628,8 +2636,10 @@ void Meca::addSideSideLink(const Interpolation & ptA,
 #elif ( DIM == 2 )
     
     Vector dir = ptB.pos() - ptA.pos();
-    real side1 = RNG.sign_exc( cross(ptA.diff(), dir) );
-    real side2 = RNG.sign_exc( cross(dir, ptB.diff()) );
+    //real side1 = RNG.sign_exc(cross(ptA.diff(), dir));
+    //real side2 = RNG.sign_exc(cross(dir, ptB.diff()));
+    real side1 = std::copysign(1.0, cross(ptA.diff(), dir));
+    real side2 = std::copysign(1.0, cross(dir, ptB.diff()));
     addSideSideLink2D(ptA, ptB, len, weight, side1, side2);
     
 #else
@@ -2796,10 +2806,16 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
-    Vector dir = ptA.dir();
+    /*
+     The length of fiber's segment is known, so we could spare the calculation
+     of `seg` below, which involves a square root
+     */
+    const real seg = ptA.len();
+    const real ee = arm / seg;
+    Vector dir = ptA.diff() / seg;
+    
     const real aa = ptA.coef2();
     const real bb = ptA.coef1();
-    const real ee = arm / ptA.len();
     
     // the (symmetric) projection matrix:
     // P = -weight * [ I - dir (x) dir ]
@@ -2884,7 +2900,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
         return;
     
     // set vector 'axi' perpendicular to Fiber:
-    Vector axi = cross(1.0, ptA.dir());
+    Vector2 axi = cross(1.0, ptA.dir());
     
     MatrixBlock T = MatrixBlock::outerProduct(axi);
     
@@ -2963,10 +2979,9 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     
     MatrixBlock T = MatrixBlock::outerProduct(axi);
     
-    // weights and indices:
-    const real w = -weight;
-    const real cc[3] = { ptA.coef2(), ptA.coef1(),  -1.0 };
-    const real ww[3] = { w * cc[0], w * cc[1], w * cc[2] };
+    // coefficients and weights:
+    const real cc[3] = { ptA.coef2(),     ptA.coef1(),   -1.0 };
+    const real ww[3] = { -weight*cc[0], -weight*cc[1], weight };
     
     Matrix33 W = Matrix33::outerProduct(cc, ww);
     
@@ -3031,10 +3046,11 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     
 #elif ( DIM == 2 )
     
-    Vector as = ptB.pos()-ptA.pos();
+    Vector ab = ptB.pos()-ptA.pos();
     if ( modulo )
-        modulo->fold(as);
-    real arm  = len * RNG.sign_exc( cross(ptA.diff(), as) );
+        modulo->fold(ab);
+    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ab));
+    real arm = std::copysign(len, cross(ptA.diff(), ab));
     addSideSlidingLink2D(ptA, ptB, arm, weight);
     
 #else
@@ -3051,8 +3067,6 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
 
 #if ( DIM == 2 )
 
-// @todo interSideSlidingLink2D should use block operations
-
 void Meca::addSideSlidingLink2D(const Interpolation & ptA,
                                 const Interpolation & ptB,
                                 const real arm,
@@ -3067,12 +3081,17 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
 
     if ( any_equal(inx[0], inx[2], inx[4], inx[6]) )
         return;
-
-    Vector dir = ptA.dir();
+    
+    /*
+     The length of fiber's segment is known, so we could spare the calculation
+     of `seg` below, which involves a square root
+     */
+    const real seg = ptA.len();
+    const real ee = arm / seg;
+    Vector dir = ptA.diff() / seg;
+    
     const real A1 =  ptA.coef2(), A2 =  ptA.coef1();
     const real B1 = -ptB.coef2(), B2 = -ptB.coef1();
-    
-    const real ee = arm / ptA.len();
 
     //this is done the 'hard' way by multiplying all matrices
     //coefficient matrix:
@@ -3136,7 +3155,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
         return;
 
     // set vector 'axi' perpendicular to Fiber:
-    Vector axi = cross(1.0, ptA.dir());
+    Vector2 axi = cross(1.0, ptA.dir());
     
     MatrixBlock T = MatrixBlock::outerProduct(axi);
     
@@ -3306,7 +3325,8 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     
 #elif ( DIM == 2 )
     
-    real arm = len * RNG.sign_exc( cross(ptA.diff(), ptB.pos()-ptA.pos()) );
+    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos()));
+    real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos()));
     addSideSlidingLink2D(ptA, ptB, arm, weight);
     
 #else
@@ -3781,7 +3801,8 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 #elif ( DIM == 2 )
     
     // 'arm' is a vector in the Z direction
-    real arm = len * RNG.sign_exc( cross(ptA.diff(), pos-ptA.pos()));
+    //real arm = len * RNG.sign_exc(cross(ptA.diff(), pos-ptA.pos()));
+    real arm = std::copysign(len, cross(ptA.diff(), pos-ptA.pos()));
     addSidePointClamp2D(ptA, pos, arm, weight);
    
 #else

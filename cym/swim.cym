@@ -6,6 +6,9 @@ set simul system
     time_step = 0.001
     viscosity = 0.2
     steric = 1, 500, 500
+    binding_grid_step = 1
+    precondition = 0
+    verbose = 0
 }
 
 set system display
