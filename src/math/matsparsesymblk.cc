@@ -222,24 +222,18 @@ real& MatrixSparseSymmetricBlock::operator()(index_t iii, index_t jjj)
 }
 
 
-real* MatrixSparseSymmetricBlock::addr(index_t ii, index_t jj) const
+real* MatrixSparseSymmetricBlock::addr(index_t iii, index_t jjj) const
 {
+    // branchless code to address lower triangle
+    index_t ii = std::max(iii, jjj);
+    index_t jj = std::min(iii, jjj);
 #if ( BLOCK_SIZE == 1 )
-    if ( ii >= jj )
-        return &column_[jj].block(ii, jj).value();
-    else
-        return &column_[ii].block(jj, ii).value();
+    return &column_[jj].block(ii, jj).value();
 #else
     index_t i = ii % BLOCK_SIZE;
     index_t j = jj % BLOCK_SIZE;
-
-    // switch to address lower triangle
-    if ( ii >= jj )
-        return column_[jj-j].block(ii-i, jj-j).addr(i, j);
-    else
-        return column_[ii-i].block(jj-j, ii-i).addr(j, i);
+    return column_[jj-j].block(ii-i, jj-j).addr(i, j);
 #endif
-    
 }
 
 

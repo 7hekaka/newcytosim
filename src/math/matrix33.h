@@ -782,12 +782,24 @@ public:
     /// return a symmetric matrix: alpha * [ dir (x) transpose(dir) ]
     static Matrix33 outerProduct(Vector3 const& dir, real alpha)
     {
+#if MATRIX33_USES_AVX && ( BLD == 4 )
+        Matrix33 res;
+        vec4 p = permute2f128(dir, dir, 0x01);
+        vec4 l = blend4(dir, p, 0b1100);
+        vec4 u = blend4(dir, p, 0b0011);
+        vec4 d = mul4(dir, set4(alpha));
+        store4(res.val  , mul4(d, duplo4(l)));
+        store4(res.val+4, mul4(d, duphi4(l)));
+        store4(res.val+8, mul4(d, duplo4(u)));
+        return res;
+#else
         real XX = dir.XX * alpha;
         real YY = dir.YY * alpha;
         real ZZ = dir.ZZ * alpha;
         return symmetric(dir.XX*XX, dir.YY*XX, dir.ZZ*XX,
                          dir.YY*YY, dir.YY*ZZ,
                          dir.ZZ*ZZ );
+#endif
     }
     
     /// return outer product: [ dir (x) transpose(vec) ]
@@ -795,14 +807,12 @@ public:
     {
 #if MATRIX33_USES_AVX && ( BLD == 4 )
         Matrix33 res;
-        vec4 v = vec;
-        vec4 p = permute2f128(v, v, 0x01);
-        vec4 l = blend4(v, p, 0b1100);
-        vec4 u = blend4(v, p, 0b0011);
-        vec4 d = dir;
-        store4(res.val  , mul4(d, duplo4(l)));
-        store4(res.val+4, mul4(d, duphi4(l)));
-        store4(res.val+8, mul4(d, duplo4(u)));
+        vec4 p = permute2f128(vec, vec, 0x01);
+        vec4 l = blend4(vec, p, 0b1100);
+        vec4 u = blend4(vec, p, 0b0011);
+        store4(res.val  , mul4(dir, duplo4(l)));
+        store4(res.val+4, mul4(dir, duphi4(l)));
+        store4(res.val+8, mul4(dir, duplo4(u)));
         return res;
 #else
         return Matrix33(dir.XX*vec.XX, dir.YY*vec.XX, dir.ZZ*vec.XX,

@@ -870,7 +870,7 @@ void Chain::reshape_global(const unsigned ns, const real* src, real* dst, real c
  */
 void Chain::getPoints(real const* ptr)
 {
-#if 1
+#if 0
     // use here static memory (that is not thread safe)
     static size_t alc = 0;
     static real* mem = nullptr;

@@ -1232,7 +1232,7 @@ void Meca::addLink(const Interpolation & ptA,
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Links between Mecable (higher order interpolation)
+#pragma mark - Links between Mecables (higher order interpolation)
 //------------------------------------------------------------------------------
 
 /**
@@ -1927,7 +1927,7 @@ void Meca::addLongLink(const Interpolation & ptA,
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Off-axis links between Mecable
+#pragma mark - Off-axis links between Mecables
 //------------------------------------------------------------------------------
 
 /**
@@ -2341,15 +2341,15 @@ void Meca::addSideLinkS(const Interpolation & ptA,
     if ( any_equal(ii0, ii1, ii2, ii3) )
         return;
 
-    MatrixBlock T;
+    Matrix33 T;
     {
-        Vector a = ptA.diff();
-        Vector v = a / a.normSqr();
-        Vector b = arm / len;
+        Vector3 a = ptA.diff();
+        Vector3 v = a / a.normSqr();
+        Vector3 b = arm / len;
         // Vector c = cross(a, b);
         
         // we can set directly the interaction coefficient matrix:
-        T = MatrixBlock::outerProduct(a, v) + MatrixBlock::outerProduct(b);
+        T = Matrix33::outerProduct(a, v) + Matrix33::outerProduct(b);
     }
     
     // weights and indices:
@@ -2384,7 +2384,7 @@ void Meca::addSideLinkS(const Interpolation & ptA,
 #endif
     
     if ( modulo )
-        throw Exception("addSideLinkS is not usable with periodic boundary conditions");
+        throw Exception("addSideLinkS() is not usable with periodic boundary conditions");
 }
 
 #endif
@@ -2902,7 +2902,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     // set vector 'axi' perpendicular to Fiber:
     Vector2 axi = cross(1.0, ptA.dir());
     
-    MatrixBlock T = MatrixBlock::outerProduct(axi);
+    Matrix22 T = Matrix22::outerProduct(axi);
     
     // we set directly the transformed offset vector:
     axi *= arm;
@@ -2976,8 +2976,66 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
      */
     
     Vector axi = arm / len;
+    Vector3 warm = -weight * arm;
+    Matrix33 wT = Matrix33::outerProduct(axi, -weight);
     
-    MatrixBlock T = MatrixBlock::outerProduct(axi);
+    // coefficients:
+    const real cc0 = ptA.coef2();
+    const real cc1 = ptA.coef1();
+
+    add_base(ii0, warm, cc0);
+    add_base(ii1, warm, cc1);
+    sub_base(ii2, warm);
+
+    // fill the matrix mC
+    add_diag_block(ii0, cc0*cc0, wT);
+    add_block(ii1, ii0, cc1*cc0, wT);
+    add_block(ii2, ii0,    -cc0, wT);
+    add_diag_block(ii1, cc1*cc1, wT);
+    add_block(ii2, ii1,    -cc1, wT);
+    add_diag_block(ii2, wT);
+
+    if ( modulo )
+    {
+        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        if ( !off.null() )
+        {
+            off = ( -weight * dot(axi, off) ) * axi;
+            add_base(ii0, off, cc0);
+            add_base(ii1, off, cc1);
+            sub_base(ii2, off);
+        }
+    }
+    
+#if DRAW_MECA_LINKS
+    if ( drawLinks )
+    {
+        gle::bright_color(ptA.mecable()->signature()).load();
+        drawLink(ptA.pos(), arm, ptB.pos());
+    }
+#endif
+}
+
+
+// this is equivalent to addSideSlidingLinkS(ptA, ptB), older implementation
+void Meca::addSideSlidingLinkS(const Mecapoint & ptB,
+                               const Interpolation & ptA,
+                               Vector const& arm,
+                               const real len,
+                               const real weight)
+{
+    assert_true( weight >= 0 );
+    assert_true( len > REAL_EPSILON );
+    
+    const index_t ii0 = DIM * ptA.matIndex1();
+    const index_t ii1 = DIM * ptA.matIndex2();
+    const index_t ii2 = DIM * ptB.matIndex();
+    
+    if ( any_equal(ii0, ii1, ii2) )
+        return;
+    
+    Vector axi = arm / len;
+    Matrix33 T = Matrix33::outerProduct(axi);
     
     // coefficients and weights:
     const real cc[3] = { ptA.coef2(),     ptA.coef1(),   -1.0 };
@@ -2988,7 +3046,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     add_base(ii0, arm, ww[0]);
     add_base(ii1, arm, ww[1]);
     add_base(ii2, arm, ww[2]);
-
+    
     // fill the matrix mC
     add_diag_block(ii0, W(0,0), T);
     add_block(ii1, ii0, W(1,0), T);
@@ -2996,7 +3054,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     add_diag_block(ii1, W(1,1), T);
     add_block(ii2, ii1, W(2,1), T);
     add_diag_block(ii2, W(2,2), T);
-
+    
     if ( modulo )
     {
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
@@ -3016,7 +3074,6 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
         drawLink(ptA.pos(), arm, ptB.pos());
     }
 #endif
-    
 }
 #endif
 
@@ -3058,11 +3115,12 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     // set 'arm' perpendicular to direction of the Fiber associated with `ptA`:
     Vector arm = calculateArm(ptB.pos()-ptA.pos(), ptA.diff(), len);
     addSideSlidingLinkS(ptA, ptB, arm, len, weight);
-    
+
 #endif
 }
 
-#pragma mark -
+
+#pragma mark - More off-axis frictionless links
 
 
 #if ( DIM == 2 )
@@ -3157,7 +3215,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     // set vector 'axi' perpendicular to Fiber:
     Vector2 axi = cross(1.0, ptA.dir());
     
-    MatrixBlock T = MatrixBlock::outerProduct(axi);
+    Matrix22 T = Matrix22::outerProduct(axi);
     
     // we set directly the transformed offset vector:
     axi *= arm;
@@ -3246,9 +3304,9 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
      equivalently, we can set directly the interaction coefficient matrix: 
      */
     
-    Vector axi = arm / len;
+    Vector3 axi = arm / len;
     
-    MatrixBlock T = MatrixBlock::outerProduct(axi);
+    Matrix33 T = Matrix33::outerProduct(axi);
     
     // weights and indices:
     const real cc[4] = {   ptA.coef2(),   ptA.coef1(),   -ptB.coef2(), -ptB.coef1() };
@@ -3817,7 +3875,7 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Links to lines and planes
+#pragma mark - Links to fixed lines and planes
 //------------------------------------------------------------------------------
 
 /**
@@ -3839,7 +3897,6 @@ void Meca::addLineClamp(const Mecapoint & ptA,
     assert_true( weight >= 0 );
     
     const index_t inx = DIM * ptA.matIndex();
-    
     
     // T = -weight * [ I - dir (x) dir ]
     MatrixBlock T = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
