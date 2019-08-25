@@ -89,11 +89,14 @@ public:
     /// Index of point 2 in object
     unsigned int    point2()   const { return pt2_; }
 
+    /// interpolation coefficient on first point
+    real            coef0()    const { return 1.0-coef_; }
+
     /// interpolation coefficient on second point
     real            coef1()    const { return coef_; }
 
-    /// interpolation coefficient on first point
-    real            coef2()    const { return 1.0-coef_; }
+    /// interpolation coefficient on first point (historical function)
+    //real          coef2()    const { return 1.0-coef_; }
 
     /// Set interpolation coefficient
     void            coef(real c)     { coef_ = c; }

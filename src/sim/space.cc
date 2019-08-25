@@ -377,7 +377,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Mec
  */
 void Space::setInteraction(Vector const& pos, Interpolation const& pi, Meca & meca, real stiff) const
 {
-    setInteraction(pos, pi.exact1(), meca, pi.coef2()*stiff);
+    setInteraction(pos, pi.exact1(), meca, pi.coef0()*stiff);
     setInteraction(pos, pi.exact2(), meca, pi.coef1()*stiff);
 }
 

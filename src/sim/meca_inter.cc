@@ -231,7 +231,7 @@ void Meca::addForce(const Interpolation & pti, Vector const& force)
     const index_t ii0 = DIM * pti.matIndex1();
     const index_t ii1 = DIM * pti.matIndex2();
     
-    add_base(ii0, force, pti.coef2());
+    add_base(ii0, force, pti.coef0());
     add_base(ii1, force, pti.coef1());
 }
 
@@ -1158,7 +1158,7 @@ void Meca::addLink(const Interpolation & ptA,
         return;
 
     //coefficients on the points:
-    const real cc[] = { ptA.coef2(),   ptA.coef1(),    -1.0 };
+    const real cc[] = { ptA.coef0(),   ptA.coef1(),    -1.0 };
     const real ww[] = { weight*cc[0], weight*cc[1], -weight };
     
     sub_iso(ii0, ii0, ww[0] * cc[0]);
@@ -1217,7 +1217,7 @@ void Meca::addLink(const Mecapoint & ptA,
         return;
     
     //coefficients on the points:
-    const real cc[] = {    1.0, -ptB.coef2(), -ptB.coef1() };
+    const real cc[] = {    1.0, -ptB.coef0(), -ptB.coef1() };
     const real ww[] = { weight, weight*cc[1], weight*cc[2] };
     
     sub_iso(ii0, ii0, ww[0]);  // since cc[0]==1
@@ -1279,7 +1279,7 @@ void Meca::addLink(const Interpolation & ptA,
         return;
     
     //interpolation coefficients:
-    const real cc[] = {  ptA.coef2(),  ptA.coef1(), -ptB.coef2(), -ptB.coef1() };
+    const real cc[] = {  ptA.coef0(),  ptA.coef1(), -ptB.coef0(), -ptB.coef1() };
     const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3] };
     
     sub_iso(ii0, ii0, ww[0] * cc[0]);
@@ -1352,7 +1352,7 @@ void Meca::addLink1(const Interpolation & pti,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
-    const real cc[] = {    1.0, -pti.coef2(), -pti.coef1() };
+    const real cc[] = {    1.0, -pti.coef0(), -pti.coef1() };
     const real ww[] = { weight, weight*cc[1], weight*cc[2] };
     
     sub_iso(ii0, ii0, ww[0]); // since cc[0] == 1.0
@@ -1455,7 +1455,7 @@ void Meca::addLink2(const Interpolation & pti,
     const index_t ii2 = pts[0];
     const index_t ii3 = pts[1];
     
-    const real cc[] = { -pti.coef2(), -pti.coef1(),      coef[0],      coef[1] };
+    const real cc[] = { -pti.coef0(), -pti.coef1(),      coef[0],      coef[1] };
     const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3] };
 
     assert_small(coef[0]+coef[1]-1.0);
@@ -1572,7 +1572,7 @@ void Meca::addLink3(const Interpolation & pti,
     const index_t ii3 = pts[1];
     const index_t ii4 = pts[2];
 
-    const real cc[] = { -pti.coef2(), -pti.coef1(),      coef[0],      coef[1],      coef[2] };
+    const real cc[] = { -pti.coef0(), -pti.coef1(),      coef[0],      coef[1],      coef[2] };
     const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4] };
     
     assert_small(coef[0]+coef[1]+coef[2]-1.0);
@@ -1704,7 +1704,7 @@ void Meca::addLink4(const Interpolation & pti,
     const index_t ii4 = pts[2];
     const index_t ii5 = pts[3];
 
-    const real cc[] = { -pti.coef2(), -pti.coef1(),      coef[0],      coef[1],      coef[2],      coef[3] };
+    const real cc[] = { -pti.coef0(), -pti.coef1(),      coef[0],      coef[1],      coef[2],      coef[3] };
     const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4], weight*cc[5] };
     
     assert_small(coef[0]+coef[1]+coef[2]+coef[3]-1.0);
@@ -1872,7 +1872,7 @@ void Meca::addLongLink(const Mecapoint & ptA,
     real wla = weight * len / abn;
 
     // coefficients:
-    const real cc0 = ptB.coef2();
+    const real cc0 = ptB.coef0();
     const real cc1 = ptB.coef1();
 
     add_base(ii0, axi, -cc0 * wla);
@@ -1935,9 +1935,9 @@ void Meca::addLongLink(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
 
     Vector off, axi = ptB.pos() - ptA.pos();
@@ -2035,7 +2035,7 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     const real ee = arm / ptA.len(), we = weight * ee;
 
     // coefficients and weights:
-    const real cc0 = ptA.coef2(),  ww0 = weight * cc0;
+    const real cc0 = ptA.coef0(),  ww0 = weight * cc0;
     const real cc1 = ptA.coef1(),  ww1 = weight * cc1;
     
     sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
@@ -2106,7 +2106,7 @@ void Meca::addSideLink3D(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 = ptA.coef2();
+    const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
     real eps = -1.0 / ptA.len();
@@ -2220,9 +2220,9 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     const real ee = arm / ptA.len(), we = weight * ee;
 
     // coefficients and weights:
-    const real cc0 =  ptA.coef2(),  ww0 = weight * cc0;
+    const real cc0 =  ptA.coef0(),  ww0 = weight * cc0;
     const real cc1 =  ptA.coef1(),  ww1 = weight * cc1;
-    const real cc2 = -ptB.coef2(),  ww2 = weight * cc2;
+    const real cc2 = -ptB.coef0(),  ww2 = weight * cc2;
     const real cc3 = -ptB.coef1(),  ww3 = weight * cc3;
 
     sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
@@ -2301,9 +2301,9 @@ void Meca::addSideLink3D(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
     real eps = -1.0 / ptA.len();
@@ -2437,9 +2437,9 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
 
     // weights and indices:
     const real W = -weight;
-    const real cc0 =  ptA.coef2(),  ww0 = W * cc0;
+    const real cc0 =  ptA.coef0(),  ww0 = W * cc0;
     const real cc1 =  ptA.coef1(),  ww1 = W * cc1;
-    const real cc2 = -ptB.coef2(),  ww2 = W * cc2;
+    const real cc2 = -ptB.coef0(),  ww2 = W * cc2;
     const real cc3 = -ptB.coef1(),  ww3 = W * cc3;
 
     const real ee1 = side1 / ( 2 * ptA.len() ), we1 = W * ee1;
@@ -2517,8 +2517,8 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
     if ( any_equal(ia1, ia2, ib1, ib2) )
         return;
 
-    const real ca1 =  ptA.coef2(), ca2 =  ptA.coef1();
-    const real cb1 = -ptB.coef2(), cb2 = -ptB.coef1();
+    const real ca1 =  ptA.coef0(), ca2 =  ptA.coef1();
+    const real cb1 = -ptB.coef0(), cb2 = -ptB.coef1();
     
     const real ee1 = side1 * len / ( 2 * ptA.len() );
     const real ee2 = side2 * len / ( 2 * ptB.len() );
@@ -2661,7 +2661,7 @@ void Meca::addSlidingLink(const Interpolation & ptA,
         return;
     
     //force coefficients on the points:
-    const real A = ptA.coef2();
+    const real A = ptA.coef0();
     const real B = ptA.coef1();
     const real AA = A * A, AB = A * B, BB = B * B;
     
@@ -2728,9 +2728,9 @@ void Meca::addSlidingLink(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
     // on points (a, b, e), (ab) being the Interpolation, and e the Mecapoint,
@@ -2797,7 +2797,7 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     const real ee = arm / seg;
     Vector dir = ptA.diff() / seg;
     
-    const real aa = ptA.coef2();
+    const real aa = ptA.coef0();
     const real bb = ptA.coef1();
     
     // the (symmetric) projection matrix:
@@ -2888,7 +2888,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     Matrix22 wT = Matrix22::outerProduct(axi, -weight);
     
     // coefficients:
-    const real cc0 = ptA.coef2();
+    const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
     real wa = -weight * arm;
@@ -2944,7 +2944,7 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 = ptA.coef2();
+    const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
     real eps = -1.0 / ptA.len();
@@ -3040,7 +3040,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     Matrix33 wT = Matrix33::outerProduct(axi, -weight);
     
     // coefficients:
-    const real cc0 = ptA.coef2();
+    const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
 
     add_base(ii0, warm, cc0);
@@ -3162,9 +3162,9 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
     real eps = -1.0 / ptA.len();
@@ -3223,72 +3223,6 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
 #endif
 }
 
-#if ( 0 )
-/// outdated code
-void Meca::addSideSlidingLink2DH(const Interpolation & ptA,
-                                 const Interpolation & ptB,
-                                 const real arm,
-                                 const real weight)
-{
-    assert_true( weight >= 0 );
-
-    const index_t inx[] = { DIM*ptA.matIndex1(),  DIM*ptA.matIndex1()+1,
-                            DIM*ptA.matIndex2(),  DIM*ptA.matIndex2()+1,
-                            DIM*ptB.matIndex1(),  DIM*ptB.matIndex1()+1,
-                            DIM*ptB.matIndex2(),  DIM*ptB.matIndex2()+1 };
-
-    if ( any_equal(inx[0], inx[2], inx[4], inx[6]) )
-        return;
-    
-    const real seg = ptA.len();
-    const real ee = arm / seg;
-    Vector dir = ptA.diff() / seg;
-    
-    const real A1 =  ptA.coef2(), A2 =  ptA.coef1();
-    const real B1 = -ptB.coef2(), B2 = -ptB.coef1();
-
-    //this is done the 'hard' way by multiplying all matrices
-    //coefficient matrix:
-    real T[2*8] = { A1, -ee, ee, A1, A2, ee, -ee,  A2,
-                    B1,   0,  0, B1, B2,  0,   0,  B2 };
-    
-    //the projection matrix:
-    const real P[4] = { 1-dir.XX*dir.XX, -dir.XX*dir.YY, -dir.XX*dir.YY, 1-dir.YY*dir.YY };
-    
-    real PT[2*8], TPT[8*8];
-    blas::xgemm('N','N', 2, 8, 2, -weight, P, 2, T, 2, 0.0, PT, 2);
-    blas::xgemm('T','N', 8, 8, 2, 1.0, T, 2, PT, 2, 0.0, TPT, 8);
-    
-    //printf("\n");  VecPrint::print(8,8, TPT);
-    
-    for ( int ii=0; ii<8; ++ii )
-    for ( int jj=ii; jj<8; ++jj )
-        mC(inx[ii], inx[jj]) += TPT[ii+8*jj];
-    
-    if ( modulo )
-    {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
-        if ( !off.null() )
-        {
-            for ( int ii=0; ii<8; ++ii )
-            {
-                vBAS[inx[ii]] -= TPT[ii+8*4] * off.XX;
-                vBAS[inx[ii]] -= TPT[ii+8*5] * off.YY;
-                vBAS[inx[ii]] -= TPT[ii+8*6] * off.XX;
-                vBAS[inx[ii]] -= TPT[ii+8*7] * off.YY;
-            }
-        }
-    }
-    
-#if DRAW_MECA_LINKS
-    if ( drawLinks )
-    {
-        gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
-    }
-#endif
-}
-#endif
 
 /**
  Alternative 2D method in which we add an offset to vBAS
@@ -3315,9 +3249,9 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     Matrix22 wT = Matrix22::outerProduct(axi, -weight);
 
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
     Vector warm = axi * ( -weight / arm );
@@ -3382,9 +3316,9 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
         return;
     
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
     real eps = -1.0 / ptA.len();
@@ -3484,9 +3418,9 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
      */
     
     // coefficients:
-    const real cc0 =  ptA.coef2();
+    const real cc0 =  ptA.coef0();
     const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef2();
+    const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
    
     Vector3 warm = -weight * arm;
@@ -3625,7 +3559,7 @@ void Meca::addPointClamp(Interpolation const& pti,
     const index_t ii0 = pti.matIndex1();
     const index_t ii1 = pti.matIndex2();
     
-    const real c1 = pti.coef2();
+    const real c1 = pti.coef0();
     const real c2 = pti.coef1();
     
     assert_true( 0 <= c1  &&  c1 <= 1 );
@@ -3728,7 +3662,7 @@ void Meca::addSphereClamp(Interpolation const& pti,
                           const real weight)
 {
     // interpolate on the two flanking vertices using coefficients:
-    addSphereClamp(pti.pos(), pti.exact1(), center, rad, weight*pti.coef2());
+    addSphereClamp(pti.pos(), pti.exact1(), center, rad, weight*pti.coef0());
     addSphereClamp(pti.pos(), pti.exact2(), center, rad, weight*pti.coef1());
 }
 
@@ -3859,7 +3793,7 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
                                const real weight)
 {
     //force coefficients on the points:
-    const real A = ptA.coef2(),  wA = weight * A;
+    const real A = ptA.coef0(),  wA = weight * A;
     const real B = ptA.coef1(),  wB = weight * B;
     
     const real E = arm / ptA.len();
@@ -3921,7 +3855,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
                                Vector const& arm,
                                real const weight)
 {
-    real aa = ptA.coef2();
+    real aa = ptA.coef0();
     real bb = ptA.coef1();
     
     real s = 1.0 / ptA.len();
@@ -4113,7 +4047,7 @@ void Meca::addLineClamp(const Interpolation & ptA,
     const index_t ii1 = DIM * ptA.matIndex2();
 
     //force coefficients on the points:
-    const real cc0 = ptA.coef2();
+    const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
 
     // T = -weight * [ I - dir (x) dir ]
@@ -4186,7 +4120,7 @@ void Meca::addPlaneClamp(const Interpolation & ptA,
     const index_t ii1 = DIM * ptA.matIndex2();
 
     //force coefficients on the points:
-    const real cc0 = ptA.coef2();
+    const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
     //add the constant term:
