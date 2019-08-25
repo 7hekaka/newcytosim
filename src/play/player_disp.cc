@@ -262,7 +262,7 @@ void Player::displayCytosim()
             mDisplay->display(simul);
 
 #if DRAW_MECA_LINKS
-        if ( DP.meca_links )
+        if ( DP.draw_links )
         {
             glPushAttrib(GL_LIGHTING_BIT);
             glDisable(GL_LIGHTING);
