@@ -62,7 +62,7 @@ public:
     void         fold(Vector & pos) const;
     
     /// shift `pos` to its image which is closest to `ref`
-    void         fold(Vector & pos, Vector const& ref) const;
+    Vector       image(Vector const& pos, Vector const& ref) const;
     
     /// return translation necessary to bring `pos` to its canonical image
     const Vector offset(Vector const& pos) const;

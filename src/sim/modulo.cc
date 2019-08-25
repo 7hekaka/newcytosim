@@ -56,11 +56,11 @@ void Modulo::fold(Vector& vec) const
 
 
 //this makes modulo around the center 'ref'
-void Modulo::fold(Vector & pos, Vector const& ref) const
+Vector Modulo::image(Vector const& pos, Vector const& ref) const
 {
-    pos -= ref;
-    fold(pos);
-    pos += ref;
+    Vector img = pos - ref;
+    fold(img);
+    return img + ref;
 }
 
 
