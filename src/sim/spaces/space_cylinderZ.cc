@@ -22,17 +22,26 @@ void SpaceCylinderZ::resize(Glossary& opt)
 {
     real rad = radius_, top = top_, bot = bot_;
 
-    if ( opt.set(rad, "width") )
+    if ( opt.set(rad, "diameter") )
         rad *= 0.5;
     else opt.set(rad, "radius");
-    opt.set(bot, "bottom");
-    opt.set(top, "top");
     
     if ( rad < 0 )
         throw InvalidParameter("cylinderZ:radius must be >= 0");
 
+    if ( opt.set(top, "length") )
+    {
+        bot = -0.5 * top;
+        top =  0.5 * top;
+    }
+    else
+    {
+        opt.set(bot, "bottom");
+        opt.set(top, "top");
+    }
+
     if ( top < bot )
-        throw InvalidParameter("cylinerZ:bottom must be <= top");
+        throw InvalidParameter("cylinderZ:bottom must be <= top");
     
     bot_ = bot;
     top_ = top;

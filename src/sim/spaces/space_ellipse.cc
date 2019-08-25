@@ -42,7 +42,7 @@ void SpaceEllipse::resize(Glossary& opt)
     for ( int d = 0; d < DIM; ++d )
     {
         real len = length_[d];
-        if ( opt.set(len, "length", d) )
+        if ( opt.set(len, "diameter", d) )
             len *= 0.5;
         else opt.set(len, "radius", d);
         if ( len < REAL_EPSILON )

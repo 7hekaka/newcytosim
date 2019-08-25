@@ -21,7 +21,7 @@ void SpaceTee::resize(Glossary& opt)
     real arm = tArmLength, jun = tJunction;
     real len = tLength, rad = tRadius;
     
-    if ( opt.set(rad, "width") )
+    if ( opt.set(rad, "diameter") )
         rad *= 0.5;
     else opt.set(rad, "radius");
     opt.set(len, "length");
