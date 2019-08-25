@@ -274,14 +274,113 @@ void Simul::setInteractions(Meca & meca) const
     if ( prop->steric )
         setStericInteractions(meca);
     
+    addExperimentalInteractions(meca);
+}
+
+
+/// solve the system
+void Simul::solve()
+{
+    //auto rdtsc = __rdtsc();
+    setInteractions(sMeca);
+    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    sMeca.solve(prop, prop->precondition);
+    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    sMeca.apply();
+    //printf("     ::apply    %16llu\n", (__rdtsc()-rdtsc)>>5);
+}
+
+
+/*
+ Solve the system, and automatically select the fastest preconditionning method
+ */
+void Simul::solve_auto()
+{
+    setInteractions(sMeca);
     
+    // solve the system, recording time:
+    long cpu = TicToc::centiseconds();
+    sMeca.solve(prop, precondMethod);
+    cpu = TicToc::centiseconds() - cpu;
+    
+    sMeca.apply();
+
+    // Automatic selection of preconditionning method:
+    const unsigned N_TEST = 6;
+    const unsigned PERIOD = 32;
+    
+    //automatically select the preconditionning mode:
+    //by trying each methods N_STEP steps, adding CPU time and use fastest.
+    if ( precondCounter++ < N_TEST )
+    {
+        precondCPU[precondMethod] += cpu;
+        
+        //std::clog << " precond "<<precondMethod<<" iter " << iter << " CPU " << cpu << "\n";
+        
+        if ( precondCounter == N_TEST )
+        {
+            // if the differential of times is significant, use the fastest method
+            // but otherwise, select the simplest method:
+            precondMethod = 0;
+            if ( precondCPU[0] > precondCPU[1] + 10 )
+                precondMethod = 1;
+            if ( precondCPU[precondMethod] > precondCPU[2] + 10 )
+                precondMethod = 2;
+            
+            if ( prop->verbose )
+            {
+                std::clog << " precond 0 time " << precondCPU[0] << "\n";
+                std::clog << "         1 time " << precondCPU[1] << "\n";
+                std::clog << "         2 time " << precondCPU[2] << "\n";
+                std::clog << " ----> " << precondMethod << std::endl;
+            }
+        }
+        else
+        {
+            //alternate betwen methods { 0, 1, 2 }
+            precondMethod = ( 1 + precondMethod ) % 3;
+        }
+    }
+    else if ( precondCounter > PERIOD )
+    {
+        precondCPU[0] = 0;
+        precondCPU[1] = 0;
+        precondCPU[2] = 0;
+        precondCPU[3] = 0;
+        precondCounter = 0;
+    }
+}
+
+
+void Simul::computeForces() const
+{
+    // we could use here an accessory Meca mec;
+    try {
+        prop->complete(*this);
+        setInteractions(sMeca);
+        sMeca.computeForces();
+    }
+    catch ( Exception & e )
+    {
+        std::clog << "cytosim could not compute the forces:\n";
+        std::clog << "   " << e.what() << std::endl;
+    }
+}
+
+
+//==============================================================================
+//                           EXPERIMENTAL-DEBUG
+//==============================================================================
+
+void Simul::addExperimentalInteractions(Meca& meca) const
+{
     // ALL THE FORCES BELOW ARE FOR DEVELOPMENT/TESTING PURPOSES:
 #if ( 0 )
     PRINT_ONCE("AD-HOC FUNKY REPULSIVE FORCE ENABLED\n");
     // add pairwise repulsive force:
     for ( Bead * i=beads.first(); i ; i=i->next() )
-    for ( Bead * j=i->next()    ; j ; j=j->next() )
-        meca.addCoulomb(Mecapoint(i,0), Mecapoint(j,0), 0.1);
+        for ( Bead * j=i->next()    ; j ; j=j->next() )
+            meca.addCoulomb(Mecapoint(i,0), Mecapoint(j,0), 0.1);
 #endif
 #if ( 0 )
     if ( beads.size() > 1 )
@@ -341,7 +440,7 @@ void Simul::setInteractions(Meca & meca) const
         meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
     }
 #endif
-#if ( 0 )
+#if ( 1 )
     if ( 0 == fibers.size() % 12 )
     {
         PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
@@ -439,96 +538,6 @@ void Simul::setInteractions(Meca & meca) const
         meca.addForce(Mecapoint(sph, 2), +force);
     }
 #endif
-}
-
-
-/// solve the system
-void Simul::solve()
-{
-    //auto rdtsc = __rdtsc();
-    setInteractions(sMeca);
-    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
-    sMeca.solve(prop, prop->precondition);
-    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
-    sMeca.apply();
-    //printf("     ::apply    %16llu\n", (__rdtsc()-rdtsc)>>5);
-}
-
-
-/*
- Solve the system, and automatically select the fastest preconditionning method
- */
-void Simul::solve_auto()
-{
-    setInteractions(sMeca);
-    
-    // solve the system, recording time:
-    long cpu = TicToc::centiseconds();
-    sMeca.solve(prop, precondMethod);
-    cpu = TicToc::centiseconds() - cpu;
-    
-    sMeca.apply();
-
-    // Automatic selection of preconditionning method:
-    const unsigned N_TEST = 6;
-    const unsigned PERIOD = 32;
-    
-    //automatically select the preconditionning mode:
-    //by trying each methods N_STEP steps, adding CPU time and use fastest.
-    if ( precondCounter++ < N_TEST )
-    {
-        precondCPU[precondMethod] += cpu;
-        
-        //std::clog << " precond "<<precondMethod<<" iter " << iter << " CPU " << cpu << "\n";
-        
-        if ( precondCounter == N_TEST )
-        {
-            // if the differential of times is significant, use the fastest method
-            // but otherwise, select the simplest method:
-            precondMethod = 0;
-            if ( precondCPU[0] > precondCPU[1] + 10 )
-                precondMethod = 1;
-            if ( precondCPU[precondMethod] > precondCPU[2] + 10 )
-                precondMethod = 2;
-            
-            if ( prop->verbose )
-            {
-                std::clog << " precond 0 time " << precondCPU[0] << "\n";
-                std::clog << "         1 time " << precondCPU[1] << "\n";
-                std::clog << "         2 time " << precondCPU[2] << "\n";
-                std::clog << " ----> " << precondMethod << std::endl;
-            }
-        }
-        else
-        {
-            //alternate betwen methods { 0, 1, 2 }
-            precondMethod = ( 1 + precondMethod ) % 3;
-        }
-    }
-    else if ( precondCounter > PERIOD )
-    {
-        precondCPU[0] = 0;
-        precondCPU[1] = 0;
-        precondCPU[2] = 0;
-        precondCPU[3] = 0;
-        precondCounter = 0;
-    }
-}
-
-
-void Simul::computeForces() const
-{
-    // we could use here an accessory Meca mec;
-    try {
-        prop->complete(*this);
-        setInteractions(sMeca);
-        sMeca.computeForces();
-    }
-    catch ( Exception & e )
-    {
-        std::clog << "cytosim could not compute the forces:\n";
-        std::clog << "   " << e.what() << std::endl;
-    }
 }
 
 

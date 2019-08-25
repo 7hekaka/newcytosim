@@ -208,6 +208,9 @@ public:
     
     /// dump system matrix in sparse text format
     void            dump_system() const;
+    
+    /// this is used for development
+    void            addExperimentalInteractions(Meca&) const;
 
 private:
     
