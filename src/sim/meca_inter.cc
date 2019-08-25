@@ -2118,7 +2118,7 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
     Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
 
-#if 1
+#if 0
     std::cerr.precision(3);
     // check that image D calculated from (AB) is near its target C
     Vector D = aR * ptA.pos1() + bR * ptA.pos2();
@@ -2691,10 +2691,10 @@ void Meca::addSlidingLink(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = weight * ( off - dot(dir, off) * dir );
-            sub_base(ii0, A*off);
-            sub_base(ii1, B*off);
-            add_base(ii2, off);
+            off = wT * off;
+            add_base(ii0, A*off);
+            add_base(ii1, B*off);
+            sub_base(ii2, off);
         }
     }
 }
@@ -2805,8 +2805,8 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     // anti-symmetric matrix blocks:
-    const Matrix22 A( -aa,  ee, -ee, -aa );
-    const Matrix22 B( -bb, -ee,  ee, -bb );
+    const Matrix22 A( aa, -ee,  ee, aa );
+    const Matrix22 B( bb,  ee, -ee, bb );
 
     /*
      We use block operations to set the matrix block by block:
@@ -2847,10 +2847,10 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = weight * ( off - dot(off, dir) * dir );
+            off = wP * off;
             add_base(ii0, A.trans_vecmul(off));
             add_base(ii1, B.trans_vecmul(off));
-            add_base(ii2, off);
+            sub_base(ii2, off);
         }
     }
     
@@ -2885,6 +2885,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     // set vector 'axi' perpendicular to Fiber:
     const Vector2 axi = cross(1.0, ptA.dir());
     
+    // P = -weight * [ I - dir (x) dir ]
     Matrix22 wT = Matrix22::outerProduct(axi, -weight);
     
     // coefficients:
@@ -2909,7 +2910,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = ( -weight * dot(axi, off) ) * axi;
+            off = wT * off;
             add_base(ii0, off, cc0);
             add_base(ii1, off, cc1);
             sub_base(ii2, off);
@@ -3007,11 +3008,9 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
 void Meca::addSideSlidingLinkS(const Interpolation & ptA,
                                const Mecapoint & ptB,
                                Vector3 const& arm,
-                               const real len,
                                const real weight)
 {    
     assert_true( weight >= 0 );
-    assert_true( len > REAL_EPSILON );
     
     const index_t ii0 = DIM * ptA.matIndex1();
     const index_t ii1 = DIM * ptA.matIndex2();
@@ -3035,9 +3034,8 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
      equivalently, we can set directly the interaction coefficient matrix: 
      */
     
-    Vector axi = arm / len;
     Vector3 warm = -weight * arm;
-    Matrix33 wT = Matrix33::outerProduct(axi, -weight);
+    Matrix33 wT = Matrix33::outerProduct(arm, -weight/arm.normSqr());
     
     // coefficients:
     const real cc0 = ptA.coef0();
@@ -3060,7 +3058,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = ( -weight * dot(axi, off) ) * axi;
+            off = wT * off;
             add_base(ii0, off, cc0);
             add_base(ii1, off, cc1);
             sub_base(ii2, off);
@@ -3126,14 +3124,15 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     addSideSlidingLink2D(ptA, ptB, arm, weight);
     
 #else
-    
+    /*
     // old version for steric interactions
-    //Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
-    //addSideSlidingLinkS(ptA, ptB, arm, len, weight);
+    Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
+    addSideSlidingLinkS(ptA, ptB, arm, weight);
+    */
     Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
     real n = arm.norm();
     if ( n > REAL_EPSILON )
-        addSideSlidingLink3D(ptA, ptB, arm/n, weight);
+        addSideSlidingLink3D(ptA, ptB, arm*(len/n), weight);
 
 #endif
 }
@@ -3387,11 +3386,9 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
 void Meca::addSideSlidingLinkS(const Interpolation & ptA,
                                const Interpolation & ptB,
                                Vector3 const& arm,
-                               const real len,
                                const real weight)
 {
     assert_true( weight >= 0 );
-    assert_true( len > REAL_EPSILON );
     
     //index in the matrix mC:
     const index_t ii0 = DIM * ptA.matIndex1();
@@ -3424,7 +3421,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     const real cc3 = -ptB.coef1();
    
     Vector3 warm = -weight * arm;
-    Matrix33 wT = Matrix33::outerProduct(arm, -weight/(len*len));
+    Matrix33 wT = Matrix33::outerProduct(arm, -weight/arm.normSqr());
 
     add_base(ii0, warm, cc0);
     add_base(ii1, warm, cc1);
@@ -3503,11 +3500,11 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     
     // old version for steric interactions
     //Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
-    //addSideSlidingLinkS(ptA, ptB, arm, len, weight);
+    //addSideSlidingLinkS(ptA, ptB, arm, weight);
     Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
     real n = arm.norm();
     if ( n > REAL_EPSILON )
-        addSideSlidingLink3D(ptA, ptB, arm/n, weight);
+        addSideSlidingLink3D(ptA, ptB, arm*(len/n), weight);
 
 #endif
 }
@@ -3985,7 +3982,7 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
     Vector arm = cross(ptA.diff(), pos-ptA.pos1());
     real n = arm.norm();
     if ( n > REAL_EPSILON )
-        addSidePointClamp3D(ptA, pos, arm * ( len / n ), weight);
+        addSidePointClamp3D(ptA, pos, arm*(len/n), weight);
 
 #endif  
 }
@@ -4018,9 +4015,7 @@ void Meca::addLineClamp(const Mecapoint & ptA,
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
     add_diag_block(inx, wT);
-    
-    Vector off = weight * ( pos - dot(pos, dir) * dir );
-    add_base(inx, off);
+    sub_base(inx, wT*pos);
 }
 
 
@@ -4058,9 +4053,8 @@ void Meca::addLineClamp(const Interpolation & ptA,
     add_block(ii0, ii1, cc0*cc1, wT);
     
     //add the constant term:
-    Vector off = weight * ( pos - dot(pos, dir) * dir );
-    add_base(ii0, off, cc0);
-    add_base(ii1, off, cc1);
+    add_base(ii0, wT*pos, -cc0);
+    add_base(ii1, wT*pos, -cc1);
 }
 
 
@@ -4123,16 +4117,15 @@ void Meca::addPlaneClamp(const Interpolation & ptA,
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
-    //add the constant term:
-    Vector off = ( weight * dot(pos, dir)) * dir;
-    add_base(ii0, off, cc0);
-    add_base(ii1, off, cc1);
-    
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);
     
     add_diag_block(ii0, cc0*cc0, wT);
     add_diag_block(ii1, cc1*cc1, wT);
     add_block(ii0, ii1, cc0*cc1, wT);
+    
+    //add the constant term:
+    add_base(ii0, wT*pos, -cc0);
+    add_base(ii1, wT*pos, -cc1);
 }
 
 

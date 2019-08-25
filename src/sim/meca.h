@@ -479,7 +479,7 @@ public:
     void addSideSlidingLink3D(Interpolation const&, Mecapoint const&, Vector3 const& arm, real weight);
     
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
-    void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, Vector const& arm, real len, real weight);
+    void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, Vector const& arm, real weight);
 #endif
 
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
@@ -497,7 +497,7 @@ public:
     void addSideSlidingLink3D(Interpolation const&, Interpolation const&, Vector3 const&, real weight);
     
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
-    void addSideSlidingLinkS(Interpolation const&, Interpolation const&, Vector const& arm, real len, real weight);
+    void addSideSlidingLinkS(Interpolation const&, Interpolation const&, Vector const& arm, real weight);
 #endif
     
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment

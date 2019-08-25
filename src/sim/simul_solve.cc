@@ -347,7 +347,7 @@ void Simul::setInteractions(Meca & meca) const
         PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
         const real sti = 100000;
         const real ang = 2 * M_PI / 12;
-        const real len = 0.004;
+        const real len = 0.0045;  // distance between protofilaments
         real co = cos(ang), si = sin(ang);
         // connect fibers together into a tube:
         Fiber * f = fibers.firstID(), *a, *b, *c;
@@ -365,7 +365,7 @@ void Simul::setInteractions(Meca & meca) const
                     b = c;
                     c = fibers.nextID(c);
                 }
-                c = fibers.firstID();
+                c = f;
                 meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
                 a = b; b = c; c = fibers.nextID(c);
                 meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
@@ -379,19 +379,32 @@ void Simul::setInteractions(Meca & meca) const
     {
         PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
         const real sti = 100000;
-        const real len = 0.2;
+        const real len = 0.020;
         // connect fibers together into a tube:
         Fiber * a = fibers.firstID();
         Fiber * b = fibers.nextID(a);
         std::cerr.precision(3);
         for ( unsigned i = 0; i < a->nbPoints()-1; ++i )
         {
-            Interpolation ptA(b,i,i+1,0);
-            //Interpolation ptB(a,i,i+1,0);
-            Mecapoint ptB(a,i);
+            Interpolation ptA(b,i,i+1,0.5);
+            Interpolation ptB(a,i,i+1,0.5);
+            //Mecapoint ptB(a,i);
 #if ( DIM == 3 )
-            Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1()).normalized(len);
-            meca.addSideSlidingLink3D(ptA, ptB, arm, sti);
+            if ( 0 ) {
+                Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+                real n = arm.norm();
+                if ( n > REAL_EPSILON )
+                    meca.addSideSlidingLink3D(ptA, ptB, arm*(len/n), sti);
+            }
+            meca.addSideSlidingLink(ptA, ptB, len, sti);
+            if ( 0 ) {
+                Vector arm = ptB.pos()-ptA.pos();
+                Vector dir = ptA.dir();
+                arm -= dot(arm, dir) * dir;
+                real n = arm.norm();
+                if ( n > REAL_EPSILON )
+                    meca.addSideSlidingLinkS(ptA, ptB, arm*(len/n), sti);
+            }
 #elif ( DIM == 2 )
             real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
             meca.addSideSlidingLink2D(ptA, ptB, arm, sti);

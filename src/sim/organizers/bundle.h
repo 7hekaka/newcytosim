@@ -33,6 +33,9 @@ private:
     /// add interactions to a Meca
     void       linkParallel(Meca &, Fiber *, Fiber *) const;
     
+    /// add interactions to a Meca
+    void       linkTubule(Meca &, Fiber *, Fiber *) const;
+
 public:
 
     /// Property

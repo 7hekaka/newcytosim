@@ -23,7 +23,7 @@ which is implemented in the derived classes, eg. Bundle, Aster & Nucleus.
 class Organizer: public Object, private Buddy
 {
 
-private:
+protected:
 
     typedef std::vector<Mecable*> MecableList;
     
