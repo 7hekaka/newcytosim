@@ -810,7 +810,7 @@ void Meca::addTorque(const Mecapoint & ptA,
                      const real weight)
 {
     assert_true( weight >= 0 );
-    const MatrixBlock W(0, weight);
+    const MatrixBlock W(0, -weight);
 
 #if ( DIM == 3 )
     const Vector3 AB = ptB.pos() - ptA.pos();
@@ -818,11 +818,11 @@ void Meca::addTorque(const Mecapoint & ptA,
     Vector3 axis = normalize(cross(AB, BC));
     if ( axis != axis )
         return;
-    const Matrix33 R = Matrix33::rotationAroundAxis(axis, cosinus, sinus) * weight;
+    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
 #elif ( DIM == 2 )
-    const Matrix22 R = weight * Matrix22(cosinus, sinus,-sinus, cosinus);
+    const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
-    const Matrix11 R(weight);  //should not be used!
+    const Matrix11 R(-weight);  //should not be used!
 #endif
 
     const MatrixBlock T = R.transposed();
@@ -839,29 +839,29 @@ void Meca::addTorque(const Mecapoint & ptA,
     Vector fC = weight * CD;
      */
     
-    sub_diag_block(iiA, W);
+    add_diag_block(iiA, W);
     if ( iiB > iiA )
-        add_block(iiB, iiA, W+R);
+        sub_block(iiB, iiA, W+R);
     else
-        add_block(iiA, iiB, W+T);
+        sub_block(iiA, iiB, W+T);
     if ( iiC > iiA )
-        sub_block(iiC, iiA, R);
+        add_block(iiC, iiA, R);
     else
-        sub_block(iiA, iiC, T);
+        add_block(iiA, iiC, T);
     
 #if ( DIM == 2 )
     // small optimization in 2D, as the term (R+W)+(T+W) is diagonal
-    real dd = 2 * ( weight * cosinus + weight );
-    sub_diag_block(iiB, MatrixBlock(0, dd));
+    real dd = -2 * ( weight * cosinus + weight );
+    add_diag_block(iiB, MatrixBlock(0, dd));
 #else
-    sub_diag_block(iiB, (R+W)+(T+W));
+    add_diag_block(iiB, (R+W)+(T+W));
 #endif
     
     if ( iiC > iiB )
-        add_block(iiC, iiB, W+R);
+        sub_block(iiC, iiB, W+R);
     else
-        add_block(iiB, iiC, W+T);
-    sub_diag_block(iiC, W);
+        sub_block(iiB, iiC, W+T);
+    add_diag_block(iiC, W);
 }
 
 
@@ -935,7 +935,7 @@ void Meca::addTorque(const Mecapoint & ptA,
                      const real len, const real weight)
 {
     assert_true( weight >= 0 );
-    const MatrixBlock W(0, weight);
+    const MatrixBlock W(0, -weight);
     const Vector AB = ptB.pos() - ptA.pos();
     
 #if ( DIM == 3 )
@@ -943,11 +943,11 @@ void Meca::addTorque(const Mecapoint & ptA,
     Vector3 axis = normalize(cross(AB, BC));
     if ( axis != axis )
         return;
-    const Matrix33 R = Matrix33::rotationAroundAxis(axis, cosinus, sinus) * weight;
+    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
 #elif ( DIM == 2 )
-    const Matrix22 R = weight * Matrix22(cosinus, sinus,-sinus, cosinus);
+    const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
-    const Matrix11 R(1);  //should not be used!
+    const Matrix11 R(-weight);  //should not be used!
 #endif
     
     const MatrixBlock T = R.transposed();
@@ -969,34 +969,34 @@ void Meca::addTorque(const Mecapoint & ptA,
 
         // regularize interaction to avoid creating negative eigen values
         if ( ab < len )
-            L = MatrixBlock::outerProduct(AB, weight/ab2);
+            L = MatrixBlock::outerProduct(AB, -weight/ab2);
         else
-            L = MatrixBlock::offsetOuterProduct(weight-wla, AB, wla/ab2);
+            L = MatrixBlock::offsetOuterProduct(wla-weight, AB, -wla/ab2);
     }    
     
-    sub_diag_block(iiA, W+L);
+    add_diag_block(iiA, W+L);
     if ( iiB > iiA )
-        add_block(iiB, iiA, W+R+L);
+        sub_block(iiB, iiA, W+R+L);
     else
-        add_block(iiA, iiB, W+T+L);
+        sub_block(iiA, iiB, W+T+L);
     if ( iiC > iiA )
-        sub_block(iiC, iiA, R);
+        add_block(iiC, iiA, R);
     else
-        sub_block(iiA, iiC, T);
+        add_block(iiA, iiC, T);
 
 #if ( DIM == 2 )
     // in 2D, the term (R+W)+(T+W) is diagonal
-    MatrixBlock D(0, 2 * ( weight * cosinus + weight ));
-    sub_diag_block(iiB, D+L);
+    real dd = -2 * ( weight * cosinus + weight );
+    add_diag_block(iiB, L+MatrixBlock(0,dd));
 #else
-    sub_diag_block(iiB, (R+W)+(T+W)+L);
+    add_diag_block(iiB, (R+W)+(T+W)+L);
 #endif
     if ( iiC > iiB )
-        add_block(iiC, iiB, W+R);
+        sub_block(iiC, iiB, W+R);
     else
-        add_block(iiB, iiC, W+T);
+        sub_block(iiB, iiC, W+T);
 
-    sub_diag_block(iiC, W);
+    add_diag_block(iiC, W);
 
     if ( modulo )
         throw Exception("addTorque(A,B,C) is not usable with periodic boundary conditions");
@@ -1808,22 +1808,22 @@ void Meca::addLongLink(const Mecapoint & ptA,
      than the desired target. */
 
     if ( len > abn )
-        wT = MatrixBlock::outerProduct(axi, weight/ab2);
+        wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
-        wT = MatrixBlock::offsetOuterProduct(weight-wla, axi, wla/ab2);
+        wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
-    sub_diag_block(ia, wT);
-    sub_diag_block(ib, wT);
+    add_diag_block(ia, wT);
+    add_diag_block(ib, wT);
     if ( ia > ib )
-        add_block(ia, ib, wT);
+        sub_block(ia, ib, wT);
     else
-        add_block(ib, ia, wT);
+        sub_block(ib, ia, wT);
     
     if ( modulo && !off.null() )
     {
         off = wT * off;
-        sub_base(ia, off);
-        add_base(ib, off);
+        add_base(ia, off);
+        sub_base(ib, off);
     }
 }
 
@@ -1869,7 +1869,7 @@ void Meca::addLongLink(const Mecapoint & ptA,
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = sqrt(ab2);
 
-    real wla = weight * len / abn;
+    const real wla = weight * len / abn;
 
     // coefficients:
     const real cc0 = ptB.coef0();
@@ -1957,7 +1957,7 @@ void Meca::addLongLink(const Interpolation & ptA,
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = sqrt(ab2);
 
-    real wla = weight * len / abn;
+    const real wla = weight * len / abn;
 
     add_base(ii0, axi, -cc0 * wla);
     add_base(ii1, axi, -cc1 * wla);
@@ -1971,7 +1971,7 @@ void Meca::addLongLink(const Interpolation & ptA,
     MatrixBlock wT;
     
     if ( len > abn )
-        wT = MatrixBlock::outerProduct(axi, weight/ab2);
+        wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
@@ -2947,8 +2947,6 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
-    Matrix33 aR, bR, wP;
-    {
     real eps = -1.0 / ptA.len();
     
     // coefficients:
@@ -2959,12 +2957,11 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
     
-     aR = Matrix33(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-     bR = Matrix33(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
-
+    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
-     wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
-    }
+    Matrix33 wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
     
     Matrix33 aTwP = aR.trans_mul(wP);
     Matrix33 bTwP = bR.trans_mul(wP);
@@ -3618,38 +3615,28 @@ void Meca::addSphereClamp(Vector const& pos,
     const index_t inx = DIM * pte.matIndex();
     
     Vector dir = pos - center;
-    
     real len = dir.norm();
     
     if ( len > REAL_EPSILON )
+    {
         dir /= len;
-    else
-    {
-        dir = Vector::randU();
-        len = rad;
-    }
-
-    MatrixBlock wT;
-    if ( rad < len )
-    {
-        // point is outside sphere
-        real wR = weight * rad / len;
-        // T = dia * I - len * [ I - dir (x) dir ]
-        wT = MatrixBlock::offsetOuterProduct(weight-wR, dir, wR);
+        MatrixBlock T;
+        if ( rad < len )
+        {
+            // point is outside sphere
+            // T = dia * I - [ I - dir (x) dir ] * len
+            real rat = rad / len;
+            T = MatrixBlock::offsetOuterProduct(1.0-rat, dir, rat);
+        }
+        else
+        {
+            // point is inside sphere
+            T = MatrixBlock::outerProduct(dir);
+        }
         
-        real facX = weight * rad + wR * dot(dir, center);
-        real facC = weight - wR;
-        add_base(inx, facX * dir + facC * center);
+        add_diag_block(inx, -weight, T);
+        add_base(inx, rad * dir + T * center, weight);
     }
-    else
-    {
-        // point is inside sphere
-        wT = MatrixBlock::outerProduct(dir, weight);
-        real facX = weight * ( rad + dot(dir, center) );
-        add_base(inx, dir, facX);
-    }
-    
-    sub_diag_block(inx, wT);
     
     if ( modulo )
         throw Exception("addSphereClamp is not usable with periodic boundary conditions");
