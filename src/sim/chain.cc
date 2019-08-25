@@ -887,7 +887,7 @@ void Chain::getPoints(real const* ptr)
     
     auto delete_real = [](real * x)
     {
-        printf("> del real[%lu] %p %p\n", alc, x, pthread_self());
+        //printf("> del real[%lu] %p %p\n", alc, x, pthread_self());
         free_real(x);
         alc = 0;
     };
@@ -899,7 +899,7 @@ void Chain::getPoints(real const* ptr)
         alc = allocated();
         free_real(uptr.release());
         uptr.reset(new_real(alc*8));
-        printf("> new real[%lu] %p %p\n", alc, uptr.get(), pthread_self());
+        //printf("> new real[%lu] %p %p\n", alc, uptr.get(), pthread_self());
     }
     real * mem = uptr.get();
 #endif
