@@ -1219,7 +1219,7 @@ void Display::drawFilament(Fiber const& fib,
     // axial translation between two sucessive monomers:
     const real dab = 0.004;
     // enlarge radius of monomers to make them overlap
-    const real rad = 0.6 * dab;
+    const real rad = 0.65 * dab;
     
     real ab = 0;
     
