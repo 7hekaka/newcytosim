@@ -151,7 +151,22 @@ public:
         for ( int u = 0; u < 16; ++u )
             val[u] *= alpha;
     }
-
+    
+    /// scale matrix
+    void operator *=(const real alpha)
+    {
+        scale(alpha);
+    }
+    
+    /// return opposite matrix (i.e. -M)
+    const Matrix44 operator -() const
+    {
+        Matrix44 M;
+        for ( int u = 0; u < 16; ++u )
+            M.val[u] = -val[u];
+        return M;
+    }
+    
     /// returns alpha * M
     const Matrix44 operator *(const real alpha) const
     {
@@ -535,17 +550,11 @@ public:
     {
         return Matrix44(a, 0, 0, 0, 0, b, 0, 0, 0, 0, c, 0, 0, 0, 0, d);
     }
-
-    /// return `a * Identity`
-    static Matrix44 diagonal(real a)
-    {
-        return Matrix44(a, 0, 0, 0, 0, a, 0, 0, 0, 0, a, 0, 0, 0, 0, a);
-    }
     
     /// identity matrix
     static Matrix44 identity()
     {
-        return diagonal(1);
+        return Matrix44(0, 1);
     }
 
     /// construct Matrix from coordinates (column-major)
@@ -646,16 +655,18 @@ public:
 inline std::ostream& operator << (std::ostream& os, Matrix44 const& M)
 {
     std::streamsize w = os.width();
-    os << std::setw(2) << "[ ";
+    os.width(1);
+    os << "[";
     for ( int i = 0; i < 4; ++i )
     {
         for ( int j = 0; j < 4; ++j )
-            os << std::setw(w) << std::fixed << M(i,j) << " ";
-        if ( i < 3 )
-            os << "; ";
+            os << " " << std::fixed << std::setw(w) << M(i,j);
+        if ( i < 2 )
+            os << ";";
         else
-            os << "]";
+            os << " ]";
     }
+    os.width(w);
     return os;
 }
 
