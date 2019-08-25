@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
 
     if ( arg.use_key("info") || arg.use_key("--version")  )
     {
+        splash(std::cout);
         print_version(std::cout);
         std::cout << "    DIM = " << DIM << '\n';
 #if NEW_ANISOTROPIC_FIBER_DRAG

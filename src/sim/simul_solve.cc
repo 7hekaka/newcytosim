@@ -304,6 +304,21 @@ void Simul::setInteractions(Meca & meca) const
 #if ( 0 )
     if ( beads.size() > 2 )
     {
+        PRINT_ONCE("AD-HOC BEAD TORQUES ENABLED\n");
+        const real sti = 10000;
+        const real ang = 2 * M_PI / 12;
+        real co = cos(ang), si = sin(ang);
+        // attach beads together in a closed loop:
+        Bead * a = beads.firstID();
+        Bead * b = beads.nextID(a);
+        Bead * c = beads.nextID(b);
+        const real len = 2 * a->radius();
+        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+    }
+#endif
+#if ( 0 )
+    if ( beads.size() > 2 )
+    {
         PRINT_ONCE("AD-HOC BEAD-LOOP FORCES ENABLED\n");
         const real sti = 1000;
         const real ang = 2 * M_PI / beads.size();
@@ -327,18 +342,61 @@ void Simul::setInteractions(Meca & meca) const
     }
 #endif
 #if ( 0 )
-    if ( beads.size() > 2 )
+    if ( 0 == fibers.size() % 12 )
     {
-        PRINT_ONCE("AD-HOC BEAD TORQUES ENABLED\n");
-        const real sti = 10000;
+        PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
+        const real sti = 100000;
         const real ang = 2 * M_PI / 12;
+        const real len = 0.004;
         real co = cos(ang), si = sin(ang);
-        // attach beads together in a closed loop:
-        Bead * a = beads.firstID();
-        Bead * b = beads.nextID(a);
-        Bead * c = beads.nextID(b);
-        const real len = 2 * a->radius();
-        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        // connect fibers together into a tube:
+        Fiber * f = fibers.firstID(), *a, *b, *c;
+        while ( f )
+        {
+            for ( unsigned i = 0; i < f->nbPoints(); ++i )
+            {
+                a = f;
+                b = fibers.nextID(a);
+                c = fibers.nextID(b);
+                for ( int m = 0; m < 10; ++m )
+                {
+                    meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
+                    a = b;
+                    b = c;
+                    c = fibers.nextID(c);
+                }
+                c = fibers.firstID();
+                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
+                a = b; b = c; c = fibers.nextID(c);
+                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
+            }
+            f = fibers.nextID(a);
+        }
+    }
+#endif
+#if ( 0 )
+    if ( fibers.size() > 1 )
+    {
+        PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
+        const real sti = 100000;
+        const real len = 0.2;
+        // connect fibers together into a tube:
+        Fiber * a = fibers.firstID();
+        Fiber * b = fibers.nextID(a);
+        std::cerr.precision(3);
+        for ( unsigned i = 0; i < a->nbPoints()-1; ++i )
+        {
+            Interpolation ptA(b,i,i+1,0);
+            //Interpolation ptB(a,i,i+1,0);
+            Mecapoint ptB(a,i);
+#if ( DIM == 3 )
+            Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1()).normalized(len);
+            meca.addSideSlidingLink3D(ptA, ptB, arm, sti);
+#elif ( DIM == 2 )
+            real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
+            meca.addSideSlidingLink2D(ptA, ptB, arm, sti);
+#endif
+        }
     }
 #endif
 #if ( 0 )
@@ -444,12 +502,6 @@ void Simul::solve_auto()
 }
 
 
-void Simul::apply() const
-{
-    sMeca.apply();
-}
-
-
 void Simul::computeForces() const
 {
     // we could use here an accessory Meca mec;
@@ -505,17 +557,15 @@ void Simul::solveX()
 {
     if ( !pMeca1D )
         pMeca1D = new Meca1D();
-    
-    Meca1D & sMeca1D = *pMeca1D;
 
     //-----initialize-----
     
-    sMeca1D.clear();
+    pMeca1D->clear();
     
     for(Fiber * fib = fibers.first(); fib; fib=fib->next())
-        sMeca1D.add(fib);
+        pMeca1D->add(fib);
 
-    sMeca1D.prepare(prop->time_step, prop->kT);
+    pMeca1D->prepare(prop->time_step, prop->kT);
     
     //-----set matrix-----
 
@@ -528,7 +578,7 @@ void Simul::solveX()
         const index_t i2 = h2->fiber()->matIndex();
         assert_true( i1 != i2 );
         
-        sMeca1D.addLink(i1, i2, co->stiffness(), h2->pos().XX - h1->pos().XX);
+        pMeca1D->addLink(i1, i2, co->stiffness(), h2->pos().XX - h1->pos().XX);
     }
     
     for ( Single * gh = singles.firstA(); gh ; gh=gh->next() )
@@ -536,14 +586,14 @@ void Simul::solveX()
         Hand const* h = gh->hand();
         const index_t ii = h->fiber()->matIndex();
         
-        sMeca1D.addClamp(ii, gh->prop->stiffness, gh->position().XX - h->pos().XX);
+        pMeca1D->addClamp(ii, gh->prop->stiffness, gh->position().XX - h->pos().XX);
     }
     
     //-----resolution-----
 
-    real noise = sMeca1D.setRightHandSide(prop->kT);
+    real noise = pMeca1D->setRightHandSide(prop->kT);
     
-    sMeca1D.solve(prop->tolerance * noise);
-    sMeca1D.apply();
+    pMeca1D->solve(prop->tolerance * noise);
+    pMeca1D->apply();
 }
 

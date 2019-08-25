@@ -186,7 +186,7 @@ public:
     void            solve_auto();
 
     /// replace coordinates of Mecables by the ones calculated in solve()
-    void            apply() const;
+    void            apply() const { sMeca.apply(); }
 
     /// perform nothing
     void            solve_not() {};
