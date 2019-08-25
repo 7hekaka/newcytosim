@@ -35,9 +35,10 @@ extern Modulo const* modulo;
 #  include "gle_color_list.h"
 
 /// this performs the modulo on `c`
-void drawLink(Vector const& a, Vector const& ab, Vector c)
+void drawLinkM(Vector const& a, Vector const& ab, Vector c)
 {
-    if ( modulo ) modulo->fold(c, a);
+    if ( modulo )
+        c = modulo->image(c, a);
     gle::drawLink(a, ab, c);
 }
 
@@ -1856,7 +1857,7 @@ void Meca::addLongLink(const Mecapoint & ptA,
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
-        gle::bright_color(pti.mecable()->signature()).load();
+        gle::bright_color(ptB.mecable()->signature()).load();
         gle::drawLink(ptB.pos(), axi, len);
     }
 #endif
@@ -2275,7 +2276,7 @@ void Meca::addSideLink2D(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLink(ptA.pos(), cross(arm, ptA.diff()), ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.diff()), ptB.pos());
     }
 #endif
 }
@@ -2357,7 +2358,7 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), arm, ptB.pos());
+        drawLinkM(ptA.pos(), arm, ptB.pos());
     }
 #endif
 }
@@ -2697,6 +2698,13 @@ void Meca::addSlidingLink(const Interpolation & ptA,
             sub_base(ii2, off);
         }
     }
+#if DRAW_MECA_LINKS
+    if ( drawLinks )
+    {
+        gle::bright_color(ptA.mecable()->signature()).load();
+        gle::drawLink(ptA.pos(), ptB.pos());
+    }
+#endif
 }
 
 
@@ -2767,6 +2775,13 @@ void Meca::addSlidingLink(const Interpolation & ptA,
             add_base(ii3, off, cc3);
         }
     }
+#if DRAW_MECA_LINKS
+    if ( drawLinks )
+    {
+        gle::bright_color(ptA.mecable()->signature()).load();
+        gle::drawLink(ptA.pos(), ptB.pos());
+    }
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -2857,7 +2872,7 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
 }
@@ -3219,7 +3234,7 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(arm, ptA.diff()), ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.diff()), ptB.pos());
     }
 #endif
 }
@@ -3291,7 +3306,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), axi, ptB.pos());
+        drawLinkM(ptA.pos(), axi, ptB.pos());
     }
 #endif
 }
@@ -3375,7 +3390,7 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), arm, ptB.pos());
+        drawLinkM(ptA.pos(), arm, ptB.pos());
     }
 #endif
 }
@@ -3458,7 +3473,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), arm, ptB.pos());
+        drawLinkM(ptA.pos(), arm, ptB.pos());
     }
 #endif
     
@@ -3537,9 +3552,17 @@ void Meca::addPointClamp(Mecapoint const& ptA,
     sub_iso(inx, inx, weight);
     
     if ( modulo )
-        modulo->fold(pos, ptA.pos());
+        pos = modulo->image(pos, ptA.pos());
 
     add_base(DIM*inx, pos, weight);
+    
+#if DRAW_MECA_LINKS
+    if ( drawLinks )
+    {
+        gle::bright_color(ptA.mecable()->signature()).load();
+        gle::drawLink(ptA.pos(), pos);
+    }
+#endif
 }
 
 
@@ -3575,10 +3598,18 @@ void Meca::addPointClamp(Interpolation const& pti,
     sub_iso(ii1, ii1, c2w * c2);
     
     if ( modulo )
-        modulo->fold(pos, pti.pos());
+        pos = modulo->image(pos, pti.pos());
     
     add_base(DIM*ii0, pos, c1w);
     add_base(DIM*ii1, pos, c2w);
+    
+#if DRAW_MECA_LINKS
+    if ( drawLinks )
+    {
+        gle::bright_color(pti.mecable()->signature()).load();
+        gle::drawLink(pti.pos(), pos);
+    }
+#endif
 }
 
 
@@ -3807,20 +3838,20 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     
     mC(ii0  , ii1+1) += wE;
     mC(ii0+1, ii1  ) -= wE;
-    
-    //it seems to works also fine without the term in eew* below:
-    Vector off = wE * Vector(-pos.YY, pos.XX);
+
+    if ( modulo )
+        pos += modulo->offset( ptA.pos() - pos );
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), pos);
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), pos);
     }
 #endif
 
-    if ( modulo )
-        pos += modulo->offset( pos - ptA.pos() );
+    //it seems to works also fine without the term in eew* below:
+    Vector off = wE * Vector(-pos.YY, pos.XX);
 
     add_base(ii0, wA*pos+off);
     add_base(ii1, wB*pos-off);
@@ -3872,17 +3903,17 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     add_diag_block(ii0, waT*aR); //this is diagonal
     add_block(ii1, ii0, wbT*aR);
     add_diag_block(ii1, wbT*bR); //this is diagonal
+
+    if ( modulo )
+        pos += modulo->offset( pos - ptA.pos() );
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), pos);
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), pos);
     }
 #endif
-
-    if ( modulo )
-        pos += modulo->offset( pos - ptA.pos() );
 
     sub_base(ii0, waT*pos);
     sub_base(ii1, wbT*pos);
