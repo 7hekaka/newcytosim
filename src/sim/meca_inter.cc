@@ -45,27 +45,21 @@ void drawLink(Vector const& a, Vector const& ab, Vector c)
 
 
 /// true if any two values are equal
-bool any_equal(const index_t a, const index_t b,
+inline bool any_equal(const index_t a, const index_t b,
                const index_t c)
 {
     //if ( a == b ) return true;
-    if ( a == c ) return true;
-    if ( b == c ) return true;
-    return false;
+    return ( a == c ) || ( b == c );
 }
 
 
 /// true if any two values are equal
-bool any_equal(const index_t a, const index_t b,
+inline bool any_equal(const index_t a, const index_t b,
                const index_t c, const index_t d)
 {
     //if ( a == b ) return true;
-    if ( a == c ) return true;
-    if ( a == d ) return true;
-    if ( b == c ) return true;
-    if ( b == d ) return true;
     //if ( c == d ) return true;
-    return false;
+    return ( a == c ) || ( a == d ) || ( b == c ) || ( b == d );
 }
 
 
@@ -932,9 +926,11 @@ void Meca::addTorque(const Mecapoint & ptA,
                      const Mecapoint & ptB,
                      const Mecapoint & ptC,
                      const real cosinus, const real sinus,
-                     const real len, const real weight)
+                     const real weight,
+                     const real len, const real weightL)
 {
     assert_true( weight >= 0 );
+    assert_true( weightL >= 0 );
     const MatrixBlock W(0, -weight);
     const Vector AB = ptB.pos() - ptA.pos();
     
@@ -963,15 +959,15 @@ void Meca::addTorque(const Mecapoint & ptA,
     if ( ab2 > REAL_EPSILON )
     {
         real ab = sqrt(ab2);
-        const real wla = weight * len / ab;
+        const real wla = weightL * len / ab;
         add_base(iiA, AB, -wla);
         add_base(iiB, AB,  wla);
 
         // regularize interaction to avoid creating negative eigen values
         if ( ab < len )
-            L = MatrixBlock::outerProduct(AB, -weight/ab2);
+            L = MatrixBlock::outerProduct(AB, -weightL/ab2);
         else
-            L = MatrixBlock::offsetOuterProduct(wla-weight, AB, -wla/ab2);
+            L = MatrixBlock::offsetOuterProduct(wla-weightL, AB, -wla/ab2);
     }    
     
     add_diag_block(iiA, W+L);
@@ -3784,7 +3780,7 @@ void Meca::addCylinderClampZ(const Mecapoint & pte,
 #if ( DIM == 2 )
 
 void Meca::addSidePointClamp2D(Interpolation const& ptA,
-                               Vector const& pos,
+                               Vector pos,
                                const real arm,
                                const real weight)
 {
@@ -3813,11 +3809,8 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     mC(ii0+1, ii1  ) -= wE;
     
     //it seems to works also fine without the term in eew* below:
-    vBAS[ii0  ] += wA * pos.XX - wE * pos.YY;
-    vBAS[ii0+1] += wA * pos.YY + wE * pos.XX;
-    vBAS[ii1  ] += wB * pos.XX + wE * pos.YY;
-    vBAS[ii1+1] += wB * pos.YY - wE * pos.XX;
-
+    Vector off = wE * Vector(-pos.YY, pos.XX);
+    
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
@@ -3825,9 +3818,12 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
         gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), pos);
     }
 #endif
-    
+
     if ( modulo )
-        throw Exception("addSidePointClamp2D is not usable with periodic boundary conditions");
+        pos += modulo->offset( pos - ptA.pos() );
+
+    add_base(ii0, wA*pos+off);
+    add_base(ii1, wB*pos-off);
 }
 
 #elif ( DIM >= 3 )
@@ -3847,93 +3843,36 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
  @todo addSidePointClamp3D should use block operations
  */
 void Meca::addSidePointClamp3D(Interpolation const& ptA,
-                               Vector const& pos,
+                               Vector pos,
                                Vector const& arm,
                                real const weight)
 {
-    real aa = ptA.coef0();
-    real bb = ptA.coef1();
-    
-    real s = 1.0 / ptA.len();
-
-    real ex = s * arm.XX;
-    real ey = s * arm.YY;
-    real ez = s * arm.ZZ;
-    
-    // indices to mC:
+    assert_true( weight >= 0 );
+    // indices in the matrix mC:
     const index_t ii0 = DIM * ptA.matIndex1();
     const index_t ii1 = DIM * ptA.matIndex2();
-    const index_t inx[6] = { ii0, ii0+1, ii0+2, ii1, ii1+1, ii1+2 };
     
-    /* The transfer matrix transforms the two Mecapoint in ptA,
-     to the side point S:
-     S = aa * pt1 + bb * pt2 + cross(arm, normalize( pt2 - pt1 ))
-     
-     It was generated in Maxima:
-     MVP: matrix([0, -ez, ey], [ez, 0, -ex], [-ey, ex, 0]);
-     MD: addcol(-ident(3), ident(3));
-     MC: addcol(aa*ident(3), bb*ident(3));
-     T: MC+MVP.MD;
-     */
-    const real T[18] = {
-         aa,  ez, -ey,  bb, -ez,  ey,
-        -ez,  aa,  ex,  ez,  bb, -ex,
-         ey, -ex,  aa, -ey,  ex,  bb
-    };
+    // coefficients:
+    const real cc0 = ptA.coef0();
+    const real cc1 = ptA.coef1();
     
-#if ( 0 )
+    real eps = -1.0 / ptA.len();
     
-    real TT[36];
-    // TT = transpose(T) * T
-    blas::xsyrk('U','N', 6, 3, 1.0, T, 6, 0.0, TT, 6);
+    real ex = eps * arm.XX;
+    real ey = eps * arm.YY;
+    real ez = eps * arm.ZZ;
     
-#else
+    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
     
-    real a2 = aa * aa;
-    real b2 = bb * bb;
-    real ab = aa * bb;
+    Matrix33 waT = -weight * aR.transposed();
+    Matrix33 wbT = -weight * bR.transposed();
     
-    real exx = ex * ex, exy = ex*ey, exz = ex*ez;
-    real eyy = ey * ey, eyz = ey*ez;
-    real ezz = ez * ez;
+    // fill the matrix mC
+    add_diag_block(ii0, waT*aR); //this is diagonal
+    add_block(ii1, ii0, wbT*aR);
+    add_diag_block(ii1, wbT*bR); //this is diagonal
     
-    // TT = transpose(T) * T is symmetric, and thus we only set half of it:
-    /* Maxima code:
-    TT: expand(transpose(T) . T);
-     */
-    real TT[36] = {
-        eyy+ezz+a2,  0,           0,           0,           0,           0,
-        -exy,        exx+ezz+a2,  0,           0,           0,           0,
-        -exz,       -eyz,         exx+eyy+a2,  0,           0,           0,
-        -ezz-eyy+ab, ez+exy,      exz-ey,      eyy+ezz+b2,  0,           0,
-        -ez+exy,    -ezz-exx+ab,  eyz+ex,     -exy,         exx+ezz+b2,  0,
-        exz+ey,      eyz-ex,     -eyy-exx+ab, -exz,        -eyz,         exx+eyy+b2
-    };
-    
-#endif
-    
-    // we project to bring all forces in the plane perpendicular to 'arm'
-    real sca = arm.inv_norm();
-    real aan = aa * sca;
-    real bbn = bb * sca;
-    real TP[6] = { aan*ex, aan*ey, aan*ez, bbn*ex, bbn*ey, bbn*ez };
-    
-    //blas::xgemm('N','N', 6, 1, 3, sca, T, 6, arm, 3, 0.0, TP, 6);
-    blas::xsyrk('U','N', 6, 1, weight, TP, 6, -weight, TT, 6);
-    
-    for ( int ii=0; ii<6; ++ii )
-    for ( int jj=ii; jj<6; ++jj )
-        mC(inx[ii], inx[jj]) += TT[ii+6*jj];
-    
-    // { gx, gy, gz } is the projection of `pos` in the plane perpendicular to 'arm'
-    real ws = dot(arm, pos) * sca * sca;
-    real gx = weight * ( pos.XX - ws * arm.XX );
-    real gy = weight * ( pos.YY - ws * arm.YY );
-    real gz = weight * ( pos.ZZ - ws * arm.ZZ );
-    
-    for ( int ii=0; ii<6; ++ii )
-        vBAS[inx[ii]] += T[ii] * gx + T[ii+6] * gy + T[ii+12] * gz;
-                 
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
@@ -3941,9 +3880,12 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
         gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), pos);
     }
 #endif
-    
+
     if ( modulo )
-        throw Exception("addSidePointClamp3D is not usable with periodic boundary conditions");
+        pos += modulo->offset( pos - ptA.pos() );
+
+    sub_base(ii0, waT*pos);
+    sub_base(ii1, wbT*pos);
 }
 
 #endif  

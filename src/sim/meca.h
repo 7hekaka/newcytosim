@@ -340,7 +340,7 @@ public:
     void addTorqueP(Mecapoint const&, Mecapoint const&, Mecapoint const&, real cosinus, real sinus, real weight);
 
     /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
-    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, real cosinus, real sinus, real len, real weight);
+    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, real cosinus, real sinus, real weight, real len, real weightL);
 
     /// Link of stiffness `weight` from fixed position `g`
     void addPointClamp(Mecapoint const&, Vector, real weight);
@@ -365,10 +365,10 @@ public:
     
 #if ( DIM == 2 )
     /// Link of stiffness `weight` and resting length `len`, on the side of first segment
-    void addSidePointClamp2D(Interpolation const&, Vector const&, real arm, real weight);
+    void addSidePointClamp2D(Interpolation const&, Vector, real arm, real weight);
 #elif ( DIM >= 3 )
     /// Link of stiffness `weight` and resting length `len`, on the side of first segment
-    void addSidePointClamp3D(Interpolation const&, Vector const&, Vector const& arm, real weight);
+    void addSidePointClamp3D(Interpolation const&, Vector, Vector const& arm, real weight);
 #endif
     /// Link of stiffness `weight` with fixed position `g`, on the side of the segment
     void addSidePointClamp(Interpolation const&, Vector const&, real len, real weight);

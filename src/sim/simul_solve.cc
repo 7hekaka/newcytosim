@@ -345,7 +345,8 @@ void Simul::setInteractions(Meca & meca) const
     if ( 0 == fibers.size() % 12 )
     {
         PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
-        const real sti = 100000;
+        const real sti = 10000;
+        const real nes = 100000;
         const real ang = 2 * M_PI / 12;
         const real len = 0.0045;  // distance between protofilaments
         real co = cos(ang), si = sin(ang);
@@ -360,15 +361,15 @@ void Simul::setInteractions(Meca & meca) const
                 c = fibers.nextID(b);
                 for ( int m = 0; m < 10; ++m )
                 {
-                    meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
+                    meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, sti, len, nes);
                     a = b;
                     b = c;
                     c = fibers.nextID(c);
                 }
                 c = f;
-                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
+                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, sti, len, nes);
                 a = b; b = c; c = fibers.nextID(c);
-                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, len, sti);
+                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, sti, len, nes);
             }
             f = fibers.nextID(a);
         }
