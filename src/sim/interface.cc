@@ -810,17 +810,18 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
                 reportCPUtime(frame, simul.time());
                 if ( has_code )
                     evaluate(code, ", in run:write:code");
+                simul.unrelax();
             }
             if ( sss >= nb_steps )
                 break;
             check = (int)( ++frame * delta );
         }
 
+        hold();
         //fprintf(stderr, "> step %6i\n", sss);
         simul.step();
         (simul.*solveFunc)();
         
-        hold();
         ++sss;
     }
 #ifdef BACKWARD_COMPATIBILITY
@@ -843,10 +844,10 @@ void Interface::execute_run(unsigned nb_steps)
     
     for ( unsigned sss = 0; sss < nb_steps; ++sss )
     {
+        hold();
         //fprintf(stderr, "> step %6i\n", sss);
         simul.step();
         simul.solve();
-        hold();
     }
     
     simul.relax();
