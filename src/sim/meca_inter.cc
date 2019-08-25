@@ -3180,8 +3180,8 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
     Matrix22 wP = Matrix22::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
     
-    Matrix33 aTwP = aR.trans_mul(wP);
-    Matrix33 bTwP = bR.trans_mul(wP);
+    Matrix22 aTwP = aR.trans_mul(wP);
+    Matrix22 bTwP = bR.trans_mul(wP);
 
     // fill the matrix mC
     add_diag_block(ii0, aTwP*aR);
