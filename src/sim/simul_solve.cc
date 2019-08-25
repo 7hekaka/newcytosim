@@ -274,7 +274,7 @@ void Simul::setInteractions(Meca & meca) const
     if ( prop->steric )
         setStericInteractions(meca);
     
-    addExperimentalInteractions(meca);
+    //addExperimentalInteractions(meca);
 }
 
 
@@ -440,7 +440,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
         meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
     }
 #endif
-#if ( 1 )
+#if ( 0 )
     if ( 0 == fibers.size() % 12 )
     {
         PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
