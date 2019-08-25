@@ -2135,8 +2135,8 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     add_diag_block(ii1, wbT*bR); //this is diagonal
     if ( ii2 > ii0 )
     {
-        add_block(ii2, ii0, weight, aR);
-        add_block(ii2, ii1, weight, bR);
+        sub_block(ii2, ii0, waT.transposed());
+        sub_block(ii2, ii1, wbT.transposed());
     }
     else
     {
@@ -2147,13 +2147,11 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     
     if ( modulo )
     {
-        throw Exception("addSideLink3D untested with periodic boundary conditions");
-
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            add_base(ii0, waT.vecmul(off));
-            add_base(ii1, wbT.vecmul(off));
+            add_base(ii0, waT*off);
+            add_base(ii1, wbT*off);
             add_base(ii2, off, weight);
         }
     }
@@ -2188,7 +2186,11 @@ void Meca::addSideLink(const Interpolation & ptA,
 #else
     
     // set 'arm' perpendicular to Fiber and link:
-    Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    //Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    Vector arm = ptB.pos()-ptA.pos1();
+    if ( modulo )
+        modulo->fold(arm);
+    arm = cross(ptA.diff(), arm);
     real n = arm.norm();
     if ( n > REAL_EPSILON )
         addSideLink3D(ptA, ptB, arm*(len/n), weight);
@@ -2264,10 +2266,10 @@ void Meca::addSideLink2D(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            Matrix22 Aw(ww0,  we, -we, ww0);
-            Matrix22 Bw(ww1, -we,  we, ww1);
-            sub_base(ii0, Aw*off);
-            sub_base(ii1, Bw*off);
+            Matrix22 wA(ww0,  we, -we, ww0);
+            Matrix22 wB(ww1, -we,  we, ww1);
+            sub_base(ii0, wA*off);
+            sub_base(ii1, wB*off);
             add_base(ii2, off, -ww2);
             add_base(ii3, off, -ww3);
         }
@@ -2345,13 +2347,11 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     
     if ( modulo )
     {
-        throw Exception("addSideLink3D untested with periodic boundary conditions");
-        
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            add_base(ii0, waT.vecmul(off));
-            add_base(ii1, wbT.vecmul(off));
+            add_base(ii0, waT*off);
+            add_base(ii1, wbT*off);
             add_base(ii2, off, wcc2);
             add_base(ii3, off, wcc3);
         }
@@ -2401,7 +2401,11 @@ void Meca::addSideLink(const Interpolation & ptA,
 #else
 
     // set 'arm' perpendicular to Fiber and link:
-    Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    //Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    Vector arm = ptB.pos()-ptA.pos1();
+    if ( modulo )
+        modulo->fold(arm);
+    arm = cross(ptA.diff(), arm);
     real n = arm.norm();
     if ( n > REAL_EPSILON )
         addSideLink3D(ptA, ptB, arm*(len/n), weight);
@@ -2800,8 +2804,7 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     const real aa = ptA.coef0();
     const real bb = ptA.coef1();
     
-    // the (symmetric) projection matrix:
-    // P = -weight * [ I - dir (x) dir ]
+    // the projection matrix: P = -weight * [ I - dir (x) dir ]
     MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     // anti-symmetric matrix blocks:
@@ -2944,51 +2947,52 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
+    Matrix33 aR, bR, wP;
+    {
+    real eps = -1.0 / ptA.len();
+    
     // coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    
-    real eps = -1.0 / ptA.len();
     
     real ex = eps * arm.XX;
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
     
-    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+     aR = Matrix33(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+     bR = Matrix33(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
 
-    Matrix33 wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
-
-    Matrix33 aT = aR.transposed();
-    Matrix33 bT = bR.transposed();
+    // the projection matrix: P = -weight * [ I - dir (x) dir ]
+     wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
+    }
+    
+    Matrix33 aTwP = aR.trans_mul(wP);
+    Matrix33 bTwP = bR.trans_mul(wP);
     
     // fill the matrix mC
-    add_diag_block(ii0, aT*wP*aR);
-    add_block(ii1, ii0, bT*wP*aR);
-    add_diag_block(ii1, bT*wP*bR);
+    add_diag_block(ii0, aTwP*aR);
+    add_block(ii1, ii0, bTwP*aR);
+    add_diag_block(ii1, bTwP*bR);
     if ( ii2 > ii0 )
     {
-        sub_block(ii2, ii0, wP*aR);
-        sub_block(ii2, ii1, wP*bR);
+        sub_block(ii2, ii0, aTwP.transposed());
+        sub_block(ii2, ii1, bTwP.transposed());
     }
     else
     {
-        sub_block(ii2, ii0, aT*wP);
-        sub_block(ii2, ii1, bT*wP);
+        sub_block(ii0, ii2, aTwP);
+        sub_block(ii1, ii2, bTwP);
     }
     add_diag_block(ii2, wP);
     
     if ( modulo )
     {
-        throw Exception("addSideSlidingLink3D untested with periodic boundary conditions");
-        
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = wP * off;
-            add_base(ii0, aT*off);
-            add_base(ii1, bT*off);
-            add_base(ii2, off);
+            add_base(ii0, aTwP*off);
+            add_base(ii1, bTwP*off);
+            sub_base(ii2, wP*off);
         }
     }
     
@@ -3001,10 +3005,10 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
 #endif
 }
 
+
 /**
  Vector 'arm' must be parallel to the link and orthogonal to 'ptA'
  */
-
 void Meca::addSideSlidingLinkS(const Interpolation & ptA,
                                const Mecapoint & ptB,
                                Vector3 const& arm,
@@ -3129,7 +3133,11 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
     addSideSlidingLinkS(ptA, ptB, arm, weight);
     */
-    Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    //Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    Vector arm = ptB.pos()-ptA.pos1();
+    if ( modulo )
+        modulo->fold(arm);
+    arm = cross(ptA.diff(), arm);
     real n = arm.norm();
     if ( n > REAL_EPSILON )
         addSideSlidingLink3D(ptA, ptB, arm*(len/n), weight);
@@ -3172,28 +3180,29 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     Matrix22 aR(cc0, ee,-ee, cc0);  // aR = alpha - len * R
     Matrix22 bR(cc1,-ee, ee, cc1);  // bR = beta + len * R
     
+    // the projection matrix: P = -weight * [ I - dir (x) dir ]
     Matrix22 wP = Matrix22::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
     
-    Matrix22 aT = aR.transposed();
-    Matrix22 bT = bR.transposed();
-    
+    Matrix33 aTwP = aR.trans_mul(wP);
+    Matrix33 bTwP = bR.trans_mul(wP);
+
     // fill the matrix mC
-    add_diag_block(ii0, aT*wP*aR);
-    add_block(ii1, ii0, bT*wP*aR);
-    add_diag_block(ii1, bT*wP*bR);
+    add_diag_block(ii0, aTwP*aR);
+    add_block(ii1, ii0, bTwP*aR);
+    add_diag_block(ii1, bTwP*bR);
     if ( ii2 > ii0 )
     {
-        add_block(ii2, ii0, cc2, wP*aR);
-        add_block(ii3, ii0, cc3, wP*aR);
-        add_block(ii2, ii1, cc2, wP*bR);
-        add_block(ii3, ii1, cc3, wP*bR);
+        add_block(ii2, ii0, cc2, aTwP.transposed());
+        add_block(ii3, ii0, cc3, aTwP.transposed());
+        add_block(ii2, ii1, cc2, bTwP.transposed());
+        add_block(ii3, ii1, cc3, bTwP.transposed());
     }
     else
     {
-        add_block(ii2, ii0, cc2, aT*wP);
-        add_block(ii3, ii0, cc3, aT*wP);
-        add_block(ii2, ii1, cc2, bT*wP);
-        add_block(ii3, ii1, cc3, bT*wP);
+        add_block(ii0, ii2, cc2, aTwP);
+        add_block(ii0, ii3, cc3, aTwP);
+        add_block(ii1, ii2, cc2, bTwP);
+        add_block(ii1, ii3, cc3, bTwP);
     }
     add_diag_block(ii2, cc2*cc2, wP);
     add_block(ii3, ii2, cc3*cc2, wP);
@@ -3201,18 +3210,18 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
 
     if ( modulo )
     {
-        throw Exception("addSideSlidingLink3D untested with periodic boundary conditions");
+        throw Exception("addSideSlidingLink2D untested with periodic boundary conditions");
         
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = wP * off;
-            add_base(ii0, aT*off);
-            add_base(ii1, bT*off);
-            add_base(ii2, off, cc2);
-            add_base(ii3, off, cc3);
+            add_base(ii0, aTwP*off);
+            add_base(ii1, bTwP*off);
+            add_base(ii2, wP*off, cc2);
+            add_base(ii3, wP*off, cc3);
         }
     }
+    
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
@@ -3329,28 +3338,29 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
     Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
     
+    // the projection matrix: P = -weight * [ I - dir (x) dir ]
     Matrix33 wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
 
-    Matrix33 aT = aR.transposed();
-    Matrix33 bT = bR.transposed();
+    Matrix33 aTwP = aR.trans_mul(wP);
+    Matrix33 bTwP = bR.trans_mul(wP);
     
     // fill the matrix mC
-    add_diag_block(ii0, aT*wP*aR);
-    add_block(ii1, ii0, bT*wP*aR);
-    add_diag_block(ii1, bT*wP*bR);
+    add_diag_block(ii0, aTwP*aR);
+    add_block(ii1, ii0, bTwP*aR);
+    add_diag_block(ii1, bTwP*bR);
     if ( ii2 > ii0 )
     {
-        add_block(ii2, ii0, cc2, wP*aR);
-        add_block(ii3, ii0, cc3, wP*aR);
-        add_block(ii2, ii1, cc2, wP*bR);
-        add_block(ii3, ii1, cc3, wP*bR);
+        add_block(ii2, ii0, cc2, aTwP.transposed());
+        add_block(ii3, ii0, cc3, aTwP.transposed());
+        add_block(ii2, ii1, cc2, bTwP.transposed());
+        add_block(ii3, ii1, cc3, bTwP.transposed());
     }
     else
     {
-        add_block(ii2, ii0, cc2, aT*wP);
-        add_block(ii3, ii0, cc3, aT*wP);
-        add_block(ii2, ii1, cc2, bT*wP);
-        add_block(ii3, ii1, cc3, bT*wP);
+        add_block(ii0, ii2, cc2, aTwP);
+        add_block(ii0, ii3, cc3, aTwP);
+        add_block(ii1, ii2, cc2, bTwP);
+        add_block(ii1, ii3, cc3, bTwP);
     }
     add_diag_block(ii2, cc2*cc2, wP);
     add_block(ii3, ii2, cc3*cc2, wP);
@@ -3358,16 +3368,13 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     
     if ( modulo )
     {
-        throw Exception("addSideSlidingLink3D untested with periodic boundary conditions");
-        
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
-            off = wP * off;
-            add_base(ii0, aT*off);
-            add_base(ii1, bT*off);
-            add_base(ii2, off, cc2);
-            add_base(ii3, off, cc3);
+            add_base(ii0, aTwP*off);
+            add_base(ii1, bTwP*off);
+            add_base(ii2, wP*off, cc2);
+            add_base(ii3, wP*off, cc3);
         }
     }
     
@@ -3379,6 +3386,7 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     }
 #endif
 }
+
 
 /**
  Vector 'arm' must be parallel to the link and orthogonal to 'ptA'
@@ -3501,7 +3509,11 @@ void Meca::addSideSlidingLink(const Interpolation & ptA,
     // old version for steric interactions
     //Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
     //addSideSlidingLinkS(ptA, ptB, arm, weight);
-    Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    //Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
+    Vector arm = ptB.pos()-ptA.pos1();
+    if ( modulo )
+        modulo->fold(arm);
+    arm = cross(ptA.diff(), arm);
     real n = arm.norm();
     if ( n > REAL_EPSILON )
         addSideSlidingLink3D(ptA, ptB, arm*(len/n), weight);
@@ -3979,7 +3991,11 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 #else
     
     // 'arm' perpendicular to link and fiber is obtained by vector product:
-    Vector arm = cross(ptA.diff(), pos-ptA.pos1());
+    //Vector arm = cross(ptA.diff(), pos-ptA.pos1());
+    Vector arm = pos-ptA.pos1();
+    if ( modulo )
+        modulo->fold(arm);
+    arm = cross(ptA.diff(), arm);
     real n = arm.norm();
     if ( n > REAL_EPSILON )
         addSidePointClamp3D(ptA, pos, arm*(len/n), weight);
