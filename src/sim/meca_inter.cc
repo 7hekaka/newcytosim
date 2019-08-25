@@ -3846,7 +3846,7 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), pos);
+        gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), pos);
     }
 #endif
 
@@ -3911,7 +3911,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), pos);
+        gle::drawLink(ptA.pos(), cross(arm, ptA.dir()), pos);
     }
 #endif
 
