@@ -6,7 +6,7 @@
 
 extern Modulo const* modulo;
 
-//------------------------------------------------------------------------------
+
 ShackleLong::ShackleLong(ShackleProp const* p, Vector const& w)
 : Shackle(p, w), mArm(nullTorque)
 {
@@ -14,41 +14,25 @@ ShackleLong::ShackleLong(ShackleProp const* p, Vector const& w)
 
 
 //------------------------------------------------------------------------------
-#if ( DIM == 2 )
 
-/**
- Returns -len or +len
- */
-real ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
         modulo->fold(off);
-    return std::copysign(len, cross(off, pt.diff()));
-}
-
-#elif ( DIM >= 3 )
-
-/**
- Return a vector of norm `len`, perpendicular to the Fiber referenced by `pt` and aligned with the link.
- */
-Vector ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
-{
-    Vector off = pt.pos1() - pos;
-    if ( modulo )
-        modulo->fold(off);
-    //return cross(off, pt.diff()).normalized(len);
+#if ( DIM >= 3 )
     off = cross(off, pt.diff());
     real n = off.norm();
     if ( n > REAL_EPSILON )
         return off * ( len / n );
     else
         return pt.diff().randOrthoU(len);
+#else
+    return std::copysign(len, cross(off, pt.diff()));
+#endif
 }
 
-#endif
 
-//------------------------------------------------------------------------------
 Vector ShackleLong::posSide() const
 {
 #if ( DIM > 1 )
@@ -72,7 +56,7 @@ Vector ShackleLong::force() const
     return prop->stiffness * d;
 }
 
-//------------------------------------------------------------------------------
+
 /**
  The interaction is slipery on hand1
  */

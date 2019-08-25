@@ -8,8 +8,6 @@
 extern Modulo const* modulo;
 
 
-//------------------------------------------------------------------------------
-
 PicketLong::PicketLong(SingleProp const* p, Vector const& w)
 : Picket(p, w), mArm(nullTorque)
 {
@@ -27,39 +25,22 @@ PicketLong::~PicketLong()
 
 //------------------------------------------------------------------------------
 
-#if ( DIM == 2 )
-
-/**
- Returns -len or +len
- */
-real PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
         modulo->fold(off);
-    return std::copysign(len, cross(off, pt.diff()));
-}
-
-#elif ( DIM >= 3 )
-
-/**
- Return a vector of norm `len`, perpendicular to the Fiber referenced by `pt` and aligned with the link.
- */
-Vector PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
-{
-    Vector off = pt.pos1() - pos;
-    if ( modulo )
-        modulo->fold(off);
-    //return cross(off, pt.diff()).normalized(len);
+#if ( DIM >= 3 )
     off = cross(off, pt.diff());
     real n = off.norm();
     if ( n > REAL_EPSILON )
         return off * ( len / n );
     else
         return pt.diff().randOrthoU(len);
-}
-
+#else
+    return std::copysign(len, cross(off, pt.diff()));
 #endif
+}
 
 //------------------------------------------------------------------------------
 Vector PicketLong::posSide() const
