@@ -32,12 +32,6 @@ void BridgeProp::read(Glossary& glos)
 void BridgeProp::complete(Simul const& sim)
 {
     CoupleProp::complete(sim);
-    
-#if ( DIM > 2 )
-    //@todo: the obligation for length > 0 can be removed, once interSideLink3D() is implemented
-    if ( length <= 0 )
-        throw InvalidParameter("bridge:length should be defined and > 0");
-#endif
 }
 
 

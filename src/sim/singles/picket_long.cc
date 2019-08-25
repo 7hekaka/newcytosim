@@ -34,27 +34,27 @@ PicketLong::~PicketLong()
  */
 real PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 {
-    Vector vec = pt.pos() - pos;
+    Vector off = pt.pos1() - pos;
     if ( modulo )
-        modulo->fold(vec);
-    return len * RNG.sign_exc( cross(vec, pt.diff()) );
+        modulo->fold(off);
+    return std::copysign(len, cross(off, pt.diff()));
 }
 
 #elif ( DIM >= 3 )
 
 /**
  Return a vector of norm `len`, perpendicular to the Fiber referenced by `pt` and aligned with the link.
- @todo update to match interSideLink3D when available
  */
 Vector PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 {
-    Vector vec = pt.pos() - pos;
+    Vector off = pt.pos1() - pos;
     if ( modulo )
-        modulo->fold(vec);
-    Vector a = cross( vec, pt.diff() );
-    real an = a.normSqr();
-    if ( an > REAL_EPSILON )
-        return a * ( len / sqrt(an) );
+        modulo->fold(off);
+    //return cross(off, pt.diff()).normalized(len);
+    off = cross(off, pt.diff());
+    real n = off.norm();
+    if ( n > REAL_EPSILON )
+        return off * ( len / n );
     else
         return pt.diff().randOrthoU(len);
 }
@@ -66,8 +66,9 @@ Vector PicketLong::posSide() const
 {
 #if ( DIM > 1 )
     return sHand->pos() + cross(mArm, sHand->dirFiber());
-#endif
+#else
     return sHand->pos();
+#endif
 }
 
 //------------------------------------------------------------------------------

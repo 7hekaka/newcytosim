@@ -30,31 +30,29 @@ CoupleLong::~CoupleLong()
  */
 real CoupleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 {
-    Vector vec = pt.pos() - pos;
+    Vector off = pt.pos1() - pos;
     if ( modulo )
-        modulo->fold(vec);
-    return len * RNG.sign_exc( cross(vec, pt.diff()) );
+        modulo->fold(off);
+    return std::copysign(len, cross(off, pt.diff()));
 }
 
 #elif ( DIM >= 3 )
 
 /**
  Return a vector of norm `len`, perpendicular to the Fiber referenced by `pt` and aligned with the link.
- @todo update to match interSideLink3D when available
  */
 Vector CoupleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 {
-    Vector a  = pt.diff();
-    Vector as = pos - pt.pos();
+    Vector off = pt.pos1() - pos;
     if ( modulo )
-        modulo->fold(as);
-    Vector p = ( as - ( dot(as, a) / a.normSqr() ) * a );
-    real pn = p.normSqr();
-    if ( pn > REAL_EPSILON )
-        return p * ( len / sqrt(pn) );
+        modulo->fold(off);
+    //return cross(off, pt.diff()).normalized(len);
+    off = cross(off, pt.diff());
+    real n = off.norm();
+    if ( n > REAL_EPSILON )
+        return off * ( len / n );
     else
-        return a.randOrthoU(len);
-    //return cross( pt.pos()-pos, pt.diff() ).normalized(len);
+        return pt.diff().randOrthoU(len);
 }
 
 #endif
@@ -63,19 +61,10 @@ Vector CoupleLong::calcArm(const Interpolation & pt, Vector const& pos, real len
 
 Vector CoupleLong::posSide() const
 {
-#if ( DIM == 1 )
-    
-    return cHand1->pos();
-    
-#elif ( DIM == 2 )
-    
+#if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
-    
 #else
-    
-    ///\todo: change formula to match interSideLink3D
-    return cHand1->pos() + mArm;
-
+    return cHand1->pos();
 #endif
 }
 
@@ -120,8 +109,7 @@ void CoupleLong::setInteractions(Meca & meca) const
 #elif ( DIM >= 3 )
 
     mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideLinkS(pt1, pt2, mArm, prop->length, prop->stiffness);
-    //@todo Couple::setInteractions() use interSideLink3D()
+    meca.addSideLink3D(pt1, pt2, mArm, prop->stiffness);
     
 #endif
     
