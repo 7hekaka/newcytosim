@@ -185,7 +185,7 @@ void Simul::setStericInteractions(Meca& meca) const
     }
     
     /// create parameters
-    PointGridParam pam(prop->steric_stiffness_push[0], prop->steric_stiffness_pull[0]);
+    StericParam pam(prop->steric_stiffness_push[0], prop->steric_stiffness_pull[0]);
     
 #if ( NB_STERIC_PANES == 1 )
     
