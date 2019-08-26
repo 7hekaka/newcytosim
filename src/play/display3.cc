@@ -363,7 +363,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
     {
         fib.disp->color.load_front();
         disp->back_color.load_back();
-#if ( 1 )
+#if ( 0 )
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_not, 1.0);
 #else
         // this is the basic rendering where segments may overlap:
@@ -389,6 +389,22 @@ void Display3::drawFiberLines(Fiber const& fib) const
         disp->back_color.load_back();
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_direction, 1.0);
     }
+}
+
+
+// this is for display with transparency:
+void Display3::drawFiberLines(Fiber const& fib, unsigned i) const
+{
+    FiberDisp const*const disp = fib.prop->disp;
+    const real rad = disp->line_width * sFactor;
+ 
+    fib.disp->color.load_both();
+
+    if ( i == 0 )
+        drawCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
+    gleTube(fib.posP(i), fib.posP(i+1), rad, gleTube1B);
+    if ( i == fib.lastPoint() )
+        drawCap(fib.prop->disp->line_caps, fib.posEndP(), fib.dirEndP(), rad);
 }
 
 

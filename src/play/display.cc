@@ -40,7 +40,7 @@ void Display::setPixelFactors(GLfloat ps, GLfloat u)
      the 0.5 below comes from the fact that glPointSize uses diameter
      while most gle::primitives use radius as arguments
      */
-    sFactor   = u * 0.5f * pixelSize;
+    sFactor = 0.5f * u * ps;
 }
 
 
@@ -85,7 +85,7 @@ void Display::display(Simul const& sim)
 
 #if ( DIM >= 3 )
     
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glDepthMask(GL_FALSE);
     
@@ -464,28 +464,24 @@ void Display::bodyColor2(PointDisp const* disp, unsigned s) const
 }
 
 /**
+ This is used for transparent objects.
  if `coloring` is enabled, this loads the N-th bright color,
  with an alpha value matched to the one of the object's display color.
  */
 void Display::bodyColorT(PointDisp const* disp, unsigned s) const
 {
+    //assert_true(disp->color.transparent());
+    
     if ( disp->coloring )
     {
         gle_color col = gle::bright_color(s).match_a(disp->color);
-        col.load_load();
-        col.load_back();
+        col.load();
+        col.load_both();
     }
     else
     {
-        disp->color2.load();
-        //disp->color.load_emission();
-        if ( disp->color.transparent() )
-            disp->color.load_both();
-        else
-        {
-            disp->color.load_front();
-            disp->color2.load_back();
-        }
+        disp->color.load();
+        disp->color.load_both();
     }
 }
 
@@ -501,19 +497,21 @@ void Display::drawSpace(Space const* obj, bool opaque)
 {
     const PointDisp * disp = obj->prop->disp;
     
-    lineWidth(disp->width);
-
     glEnable(GL_CULL_FACE);
-    if ( disp->visible & 1 && disp->color.opaque() == opaque )
-    {
-        glCullFace(GL_BACK);
-        disp->color.load_front();
-        obj->draw();
-    }
+    // draw back side
     if ( disp->visible & 2 && disp->color2.opaque() == opaque )
     {
+        lineWidth(disp->width);
         glCullFace(GL_FRONT);
         disp->color2.load_back();
+        obj->draw();
+    }
+    // draw front side
+    if ( disp->visible & 1 && disp->color.opaque() == opaque )
+    {
+        lineWidth(disp->width);
+        glCullFace(GL_BACK);
+        disp->color.load_front();
         obj->draw();
     }
 }
@@ -780,6 +778,7 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
     }
 }
 
+
 void Display::drawFiberLines(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -857,6 +856,21 @@ void Display::drawFiberLines(Fiber const& fib) const
         }
         glEnd();
     }
+}
+
+
+void Display::drawFiberLines(Fiber const& fib, unsigned i) const
+{
+    FiberDisp const*const disp = fib.prop->disp;
+    
+    fib.disp->color.load_load();
+    // display plain lines:
+    lineWidth(disp->line_width);
+    
+    glBegin(GL_LINES);
+    gle::gleVertex(fib.posP(i));
+    gle::gleVertex(fib.posP(i+1));
+    glEnd();
 }
 
 
@@ -1438,7 +1452,8 @@ void Display::drawFiber(Fiber const& fib)
 #if ( DIM == 3 )
     if ( fib.disp->color.transparent() )
     {
-        zObjects.push_back(zObject(&fib, fib.nbPoints()/2));
+        for ( unsigned i = 0; i < fib.lastPoint(); ++i )
+        zObjects.push_back(zObject(&fib, i));
     }
     else
 #endif
@@ -1665,11 +1680,9 @@ void Display::zObject::draw(Display * disp) const
     Mecable const * mec = point_.mecable();
     switch( mec->tag() )
     {
-        case Fiber::TAG: {
-            //\todo we should depth-sort segments of the fibers independently
-            Fiber const* fib = static_cast<const Fiber*>(mec);
-            disp->drawFiberLines(*fib);
-        } break;
+        case Fiber::TAG:
+            disp->drawFiberLines(*static_cast<const Fiber*>(mec), point_.point());
+        break;
             
         case Solid::TAG:
             disp->drawSolidT(*static_cast<const Solid*>(mec), point_.point());
