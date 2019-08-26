@@ -73,9 +73,17 @@ void PRINT_BLOCK(index_t i, index_t j, MatrixBlock const& T)
     std::cerr << std::setw(2) << i << " " << j << " " << std::setw(10) << T << '\n';
 }
 
+index_t oldi=0, oldj=0;
 
 inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 {
+#if 0
+    if ( j > i )
+        printf("+off-side %i %i\n", i, j);
+    if ( i == oldi && j == oldj )
+        printf("+duplicate %i %i\n", i, j);
+    oldi = i; oldj = j;
+#endif
 #if ( DIM == 1 )
     mB(i,j) += T.value();
 #elif USE_MATRIX_BLOCK
@@ -91,6 +99,13 @@ inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 
 inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const& T)
 {
+#if 0
+    if ( j > i )
+        printf(" off-side %i %i\n", i, j);
+    if ( i == oldi && j == oldj )
+        printf(" duplicate %i %i\n", i, j);
+    oldi = i; oldj = j;
+#endif
 #if ( DIM == 1 )
     mB(i,j) += alpha * T.value();
 #elif USE_MATRIX_BLOCK
@@ -106,6 +121,13 @@ inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const&
 
 inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 {
+#if 0
+    if ( j > i )
+        printf("-off-side %i %i\n", i, j);
+    if ( i == oldi && j == oldj )
+        printf("-duplicate %i %i\n", i, j);
+    oldi = i; oldj = j;
+#endif
 #if ( DIM == 1 )
     mB(i,j) -= T.value();
 #elif USE_MATRIX_BLOCK
@@ -955,7 +977,7 @@ void Meca::addTorque(const Mecapoint & ptA,
     const index_t iiC = DIM * ptC.matIndex();
     
     // this is a LongLink(A, B):
-    MatrixBlock L(0,0);
+    MatrixBlock wL(0,0);
     const real ab2 = AB.normSqr();
     if ( ab2 > REAL_EPSILON )
     {
@@ -966,16 +988,16 @@ void Meca::addTorque(const Mecapoint & ptA,
 
         // regularize interaction to avoid creating negative eigen values
         if ( ab < len )
-            L = MatrixBlock::outerProduct(AB, -weightL/ab2);
+            wL = MatrixBlock::outerProduct(AB, -weightL/ab2);
         else
-            L = MatrixBlock::offsetOuterProduct(wla-weightL, AB, -wla/ab2);
+            wL = MatrixBlock::offsetOuterProduct(wla-weightL, AB, -wla/ab2);
     }    
     
-    add_diag_block(iiA, W+L);
+    add_diag_block(iiA, W+wL);
     if ( iiB > iiA )
-        sub_block(iiB, iiA, W+R+L);
+        sub_block(iiB, iiA, W+R+wL);
     else
-        sub_block(iiA, iiB, W+T+L);
+        sub_block(iiA, iiB, W+T+wL);
     if ( iiC > iiA )
         add_block(iiC, iiA, R);
     else
@@ -984,9 +1006,9 @@ void Meca::addTorque(const Mecapoint & ptA,
 #if ( DIM == 2 )
     // in 2D, the term (R+W)+(T+W) is diagonal
     real dd = -2 * ( weight * cosinus + weight );
-    add_diag_block(iiB, L+MatrixBlock(0,dd));
+    add_diag_block(iiB, wL+MatrixBlock(0,dd));
 #else
-    add_diag_block(iiB, (R+W)+(T+W)+L);
+    add_diag_block(iiB, (R+W)+(T+W)+wL);
 #endif
     if ( iiC > iiB )
         sub_block(iiC, iiB, W+R);
@@ -994,9 +1016,6 @@ void Meca::addTorque(const Mecapoint & ptA,
         sub_block(iiB, iiC, W+T);
 
     add_diag_block(iiC, W);
-
-    if ( modulo )
-        throw Exception("addTorque(A,B,C) is not usable with periodic boundary conditions");
 }
 
 
@@ -2333,10 +2352,10 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     }
     else
     {
-        add_block(ii2, ii0, cc2, waT);
-        add_block(ii3, ii0, cc3, waT);
-        add_block(ii2, ii1, cc2, wbT);
-        add_block(ii3, ii1, cc3, wbT);
+        add_block(ii0, ii2, cc2, waT);
+        add_block(ii0, ii3, cc3, waT);
+        add_block(ii1, ii2, cc2, wbT);
+        add_block(ii1, ii3, cc3, wbT);
     }
     add_diag_block(ii2, Matrix33(0, wcc2*cc2));
     add_block(ii3, ii2, Matrix33(0, wcc3*cc2));
@@ -2676,7 +2695,7 @@ void Meca::addSlidingLink(const Interpolation & ptA,
      we set only the upper part of this symmetric matrix:
      */
 
-    // T = -weight * [ I - dir (x) dir ]
+    // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
     add_diag_block(ii0, AA, wT);
@@ -2748,7 +2767,7 @@ void Meca::addSlidingLink(const Interpolation & ptA,
     
     Vector dir = ptA.dir();
 
-    // T = -weight * [ I - dir (x) dir ]
+    // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     // fill the matrix mC
@@ -3631,62 +3650,100 @@ void Meca::addPointClamp(Interpolation const& pti,
  There is no force on the center C, which is an immobile position.
  */
 
-void Meca::addSphereClamp(Vector const& pos,
-                          Mecapoint const& pte,
+void Meca::addSphereClamp(Vector const& off,
+                          Mecapoint const& ptA,
                           Vector const& center,
                           real rad,
                           const real weight)
 {
     assert_true( rad >= 0 );
     assert_true( weight >= 0 );
-    const index_t inx = DIM * pte.matIndex();
     
-    Vector dir = pos - center;
-    real len = dir.norm();
+    const index_t inx = DIM * ptA.matIndex();
+    
+    real len = off.norm();
     
     if ( len > REAL_EPSILON )
     {
-        dir /= len;
-        MatrixBlock T;
+        real wla = weight * rad / len;
+        MatrixBlock wT;
+        /* To stabilize the matrix with compression, we remove negative eigenvalues
+         This is done by using len = 1 in the formula for links that are shorter
+         than the desired target. */
         if ( rad < len )
-        {
-            // point is outside sphere
-            // T = dia * I - [ I - dir (x) dir ] * len
-            real rat = rad / len;
-            T = MatrixBlock::offsetOuterProduct(1.0-rat, dir, rat);
-        }
+            wT = MatrixBlock::offsetOuterProduct(wla-weight, off/len, -wla);
         else
-        {
-            // point is inside sphere
-            T = MatrixBlock::outerProduct(dir);
-        }
+            wT = MatrixBlock::outerProduct(off/len, -weight);
         
-        add_diag_block(inx, -weight, T);
-        add_base(inx, rad * dir + T * center, weight);
+        add_diag_block(inx, wT);
+        add_base(inx, wla*off-wT*center);
     }
+}
+
+
+void Meca::addSphereClamp(Vector const& off,
+                          Interpolation const& ptA,
+                          Vector const& center,
+                          real rad,
+                          const real weight)
+{
+    assert_true( rad >= 0 );
+    assert_true( weight >= 0 );
     
-    if ( modulo )
-        throw Exception("addSphereClamp is not usable with periodic boundary conditions");
+    real len = off.norm();
+    
+    if ( len > REAL_EPSILON )
+    {
+        real wla = weight * rad / len;
+        
+        const index_t ii0 = DIM * ptA.matIndex1();
+        const index_t ii1 = DIM * ptA.matIndex2();
+        
+        MatrixBlock wT;
+        /* To stabilize the matrix with compression, we remove negative eigenvalues
+         This is done by using len = 1 in the formula for links that are shorter
+         than the desired target. */
+        if ( rad < len )
+            wT = MatrixBlock::offsetOuterProduct(wla-weight, off/len, -wla);
+        else
+            wT = MatrixBlock::outerProduct(off/len, -weight);
+
+        // coefficients:
+        const real cc0 = ptA.coef0();
+        const real cc1 = ptA.coef1();
+
+        add_diag_block(ii0, cc0*cc0, wT);
+        add_block(ii1, ii0, cc1*cc0, wT);
+        add_diag_block(ii1, cc1*cc1, wT);
+        
+        Vector vec = wla*off-wT*center;
+        add_base(ii0, vec, cc0);
+        add_base(ii1, vec, cc1);
+    }
 }
 
 
 void Meca::addSphereClamp(Mecapoint const& pte,
-                          Vector const& center,
+                          Vector center,
                           real rad,
                           const real weight)
 {
-    addSphereClamp(pte.pos(), pte, center, rad, weight);
+    Vector pos = pte.pos();
+    if ( modulo )
+        center = modulo->image(center, pos);
+    addSphereClamp(pos-center, pte, center, rad, weight);
 }
 
 
 void Meca::addSphereClamp(Interpolation const& pti,
-                          Vector const& center,
+                          Vector center,
                           real rad,
                           const real weight)
 {
-    // interpolate on the two flanking vertices using coefficients:
-    addSphereClamp(pti.pos(), pti.exact1(), center, rad, weight*pti.coef0());
-    addSphereClamp(pti.pos(), pti.exact2(), center, rad, weight*pti.coef1());
+    Vector pos = pti.pos();
+    if ( modulo )
+        center = modulo->image(center, pos);
+    addSphereClamp(pos-center, pti, center, rad, weight);
 }
 
 
@@ -3987,7 +4044,7 @@ void Meca::addLineClamp(const Mecapoint & ptA,
     
     const index_t inx = DIM * ptA.matIndex();
     
-    // T = -weight * [ I - dir (x) dir ]
+    // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
     add_diag_block(inx, wT);
@@ -4021,7 +4078,7 @@ void Meca::addLineClamp(const Interpolation & ptA,
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
 
-    // T = -weight * [ I - dir (x) dir ]
+    // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
     add_diag_block(ii0, cc0*cc0, wT);

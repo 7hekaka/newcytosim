@@ -152,7 +152,10 @@ Vector SpaceCapsule::randomPlace() const
 void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff, const real len, const real rad)
 {
     if ( fabs(pos.XX) > len )
-        meca.addSphereClamp(pos, pe, Vector(std::copysign(len, pos.XX),0,0), rad, stiff);
+    {
+        Vector cen(std::copysign(len, pos.XX),0,0);
+        meca.addSphereClamp(pos-cen, pe, cen, rad, stiff);
+    }
     else
         meca.addCylinderClampX(pe, rad, stiff);
 }

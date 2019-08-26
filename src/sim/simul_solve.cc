@@ -277,8 +277,8 @@ void Simul::setInteractions(Meca & meca) const
     //addExperimentalInteractions(meca);
 }
 
+#pragma mark -
 
-/// solve the system
 void Simul::solve()
 {
     //auto rdtsc = __rdtsc();
@@ -291,7 +291,7 @@ void Simul::solve()
 }
 
 
-/*
+/**
  Solve the system, and automatically select the fastest preconditionning method
  */
 void Simul::solve_auto()
@@ -371,6 +371,8 @@ void Simul::computeForces() const
 //==============================================================================
 //                           EXPERIMENTAL-DEBUG
 //==============================================================================
+#pragma mark - Experimental
+
 
 void Simul::addExperimentalInteractions(Meca& meca) const
 {
@@ -444,8 +446,8 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     if ( 0 == fibers.size() % 12 )
     {
         PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
-        const real sti = 10000;
-        const real nes = 100000;
+        const real sti = 1000000;
+        const real nes = 10000;
         const real ang = 2 * M_PI / 12;
         const real len = 0.0045;  // distance between protofilaments
         real co = cos(ang), si = sin(ang);
@@ -573,6 +575,7 @@ void Simul::dump_system() const
 //==============================================================================
 //                              SOLVE-X 1D
 //==============================================================================
+#pragma mark -
 
 #include "meca1d.h"
 

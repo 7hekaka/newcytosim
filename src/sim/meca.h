@@ -349,13 +349,16 @@ public:
     void addPointClamp(Interpolation const&, Vector, real weight);
     
     /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
-    void addSphereClamp(Vector const& pos, Mecapoint const&, Vector const& cen, real rad, real weight);
+    void addSphereClamp(Vector const& off, Mecapoint const&, Vector const& cen, real rad, real weight);
     
     /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
-    void addSphereClamp(Mecapoint const&, Vector const& cen, real rad, real weight);
+    void addSphereClamp(Vector const& off, Interpolation const&, Vector const& cen, real rad, real weight);
+
+    /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
+    void addSphereClamp(Mecapoint const&, Vector cen, real rad, real weight);
     
     /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
-    void addSphereClamp(Interpolation const&, Vector const& cen, real rad, real weight);
+    void addSphereClamp(Interpolation const&, Vector  cen, real rad, real weight);
     
     /// Link of stiffness `weight` with cylinder of axis Z and radius `len`
     void addCylinderClampZ(Mecapoint const&, real len, real weight);
