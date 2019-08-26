@@ -351,8 +351,11 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, unsigned& origin)
 void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
 {
     real dis = 0;
-    if ( opt.set(dis, "radius", 1) && dis > asRadius )
+    opt.set(dis, "radius", 1) ;
+    if ( dis > asRadius )
         throw InvalidParameter("aster:radius[1] must be smaller than aster:radius[0]");
+    if ( dis < 0 )
+        throw InvalidParameter("aster:radius[1] must be specified and >= 0");
 
     const real alpha = dis / asRadius;
     
@@ -377,16 +380,16 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
             std::clog << "with aster:seed_diameter = " << sep << '\n';
         }
         //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
-        real d = dis * 0.5;
+        dis *= 0.5;
         for ( size_t n = 0; n < cnt; ++n )
         {
             // orient anchors by default along the X-axis:
             real y = pts[n].YY;
 #if ( DIM == 2 )
-            placeAnchor(Vector2(-d,y), Vector2(+d,y), origin);
+            placeAnchor(Vector2(-dis,y), Vector2(dis,y), origin);
 #elif ( DIM == 3 )
             real x = pts[n].XX;
-            placeAnchor(Vector3(-d,x,y), Vector3(+d,x,y), origin);
+            placeAnchor(Vector3(-dis,x,y), Vector3(dis,x,y), origin);
 #endif
         }
     }
@@ -473,8 +476,6 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
          For type 'astral' we put fibers randomly on the surface,
          with a constrain based on the scalar product: position*direction > 0
          */
-        if ( dis <= 0 )
-            throw InvalidParameter("aster:radius[1] must be specified and >= 0");
         for ( unsigned n = 0; n < nbf; ++n )
         {
             Vector P = Vector::randB();

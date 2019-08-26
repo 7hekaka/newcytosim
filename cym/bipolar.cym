@@ -130,7 +130,7 @@ new 2 centrosome
 new 1000 kinesin5
 
 
-run 100000 system 
+run 1000000 system
 {
-    nb_frames = 500
+    nb_frames = 100
 }

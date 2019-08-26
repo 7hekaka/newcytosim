@@ -77,6 +77,6 @@ new 10000 complex
 
 run system
 {
-    nb_steps = 5000
+    nb_steps = 50000
     nb_frames = 50
 }

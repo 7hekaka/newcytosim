@@ -251,6 +251,22 @@ bool Couple::allowAttachment(FiberSite const& sit)
         fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
         return false;
     
+#if ( 0 )
+    /*
+     Test here if binding would create a link inside an aster, near the center:
+     i.e. a link between two Fibers from the same aster, very close to the center
+     of this aster. Such links would be improductive, and would trap the Couples.
+     */
+    const Buddy * bud = that->fiber()->buddy(0);
+    if ( bud  &&  bud == sit.fiber()->buddy(0) )
+    {
+        real a = that->abscissa();
+        real b = sit.abscissa();
+        if ( a < 1 && b < 1 )
+            return false;
+    }
+#endif
+
     /*
      Allow or disallow binding based on the angle made between the two Fibers.
      The threshold on the cosine of the angle are here somewhat arbitrary

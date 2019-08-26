@@ -12,6 +12,9 @@ set simul system
 
 set system display
 {
+    point_size = 5
+    point_value = 0.001
+    window_size = 1024, 512
     %rotation = 0.707107 0 0.707107 0;
 }
 
@@ -144,7 +147,7 @@ set hand kinesin1
     unloaded_speed = 0.8
     stall_force = 5
 
-    display = ( color=green; size=7; width=7; )
+    display = ( color=green; size=7; width=5; )
     binding_key = 1
 }
 
@@ -158,7 +161,7 @@ set hand kinesin2
     unloaded_speed = 0.8
     stall_force = 5
 
-    display = ( color=orange; size=7; width=7; )
+    display = ( color=orange; size=7; width=5; )
     binding_key = 2
 }
 
@@ -174,9 +177,8 @@ set couple complex
 
 new 1000 complex
 
-run system
+run 10000 system
 {
-    nb_steps = 0
     nb_frames = 10
 }
 
