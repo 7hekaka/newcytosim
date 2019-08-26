@@ -27,8 +27,8 @@ void load(unsigned index)
     if ( index < file_list.size() )
     {
         file_index = index;
-        if ( pam.dir != "." )
-            pam.file = pam.dir + "/" + file_list[index];
+        if ( pam.directory != "." )
+            pam.file = pam.directory + "/" + file_list[index];
         else
             pam.file = file_list[index];
         mesh.read(pam.file.c_str());
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
     glApp::createWindow(display);
     gle::initialize();
     
-    file_list = FilePath::list_dir(pam.dir, "rec");
+    file_list = FilePath::list_dir(pam.directory, "rec");
     load(file_index);
     timer(0);
     

@@ -24,7 +24,7 @@ endif
 
 #----------------------------objects--------------------------------------------
 
-INCDIR=$(addprefix ../, SFMT base math gl disp)
+INCDIR=$(addprefix ../../, SFMT base math gl disp)
 
 vpath %.h  $(INCDIR) .
 vpath %.cc $(INCDIR) .

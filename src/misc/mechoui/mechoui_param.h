@@ -35,8 +35,8 @@ public:
     /// input file containing mesh
     std::string  file;
     
-    /// patter for files
-    std::string  dir;
+    /// path for files
+    std::string  directory;
     
     /// parameter
     std::string  config;

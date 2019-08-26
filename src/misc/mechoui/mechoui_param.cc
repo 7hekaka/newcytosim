@@ -14,7 +14,7 @@ void MechouiParam::clear()
     point_size  = 1;
     point_style = 0;
     file        = "";
-    dir         = ".";
+    directory   = ".";
     config      = "";
     delay       = 250;
     selected    = 0;
@@ -30,7 +30,7 @@ void MechouiParam::read(Glossary& glos)
     glos.set(point_style,   "point_style");
 
     glos.set(file,          "file");
-    glos.set(dir,           "dir");
+    glos.set(directory,     "directory");
     glos.set(config,        "config");
     glos.set(delay,         "delay");
 }
@@ -52,7 +52,7 @@ void MechouiParam::write(std::ostream& os) const
     write_param(os, "point_color", point_color);
     write_param(os, "point_style", point_style);
     write_param(os, "file",        file);
-    write_param(os, "dir",         dir);
+    write_param(os, "directory",   directory);
     write_param(os, "config",      config);
     write_param(os, "delay",       delay);
 }
