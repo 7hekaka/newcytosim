@@ -64,7 +64,7 @@ set couple complex
 
 %----------------------------------
 
-new cell { length = 3.2, 3.2, 0.8; }
+new cell { diameter = 3.2, 3.2, 0.8; }
 new 100 complex
 new microtubule { length=0.012; plus_end=grow; }
 

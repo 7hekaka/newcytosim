@@ -16,7 +16,7 @@ set space cell
 
 new cell
 {
-    length = 24, 20, 20
+    diameter = 24, 20, 20
 }
 
 

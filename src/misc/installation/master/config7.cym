@@ -32,7 +32,7 @@ new cell
 }
 new plate
 {
-    length = 1, 5, 5
+    diameter = 1, 5, 5
 }
 
 

@@ -122,10 +122,10 @@ set couple gamma
 
 %----------------------------------
 
-new cell { length = 1.7, 1.7, 0.42; }
+new cell { diameter = 1.7, 1.7, 0.42; }
 new 8 gamma
 new 1523 complex
-new envelope { length = 1.84, 1.84, 0.54; }
+new envelope { diameter = 1.84, 1.84, 0.54; }
 
 run 1000000 system 
 {

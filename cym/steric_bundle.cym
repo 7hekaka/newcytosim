@@ -38,7 +38,7 @@ confine = inside, 10000, cell
     growing_speed = 0.1
     max_length = 1
 
-    display = ( line=2, 1; point=2.5, 0; color=red, dark_red; )
+    display = ( line=2, 1; point=2.5, 0; color=0xFF000033; )
 }
 
 new cell

@@ -66,6 +66,6 @@ new 2500 complex
 
 run 10000 system
 {
-    nb_frames = 50
+    nb_frames = 30
 }
 

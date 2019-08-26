@@ -2,7 +2,7 @@
  @example radial.cym
  A static radial array of filaments, with motors moving inward
 
- Enabling `fast_diffusion` can make the simulation is a bit faster when there
+ Enabling `fast_diffusion` can make the simulation a bit faster when there
  are a lot of Couple, but another reason to use this is that it also makes 
  the model simpler, since the fraction of bound/free can be then calculated
  analytically.

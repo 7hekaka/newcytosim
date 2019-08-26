@@ -19,7 +19,7 @@ set space spindle
 }
 new spindle
 {
-    length = 12, 10, 10
+    diameter = 12, 10, 10
 }
 
 %-------------------------MICROTUBULES
