@@ -361,8 +361,6 @@ void Display3::drawFiberLines(Fiber const& fib) const
     
     if ( disp->line_style == 1 )
     {
-        fib.disp->color.load_front();
-        disp->back_color.load_back();
 #if ( 0 )
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_not, 1.0);
 #else
@@ -375,18 +373,15 @@ void Display3::drawFiberLines(Fiber const& fib) const
     }
     else if ( disp->line_style == 2 )
     {
-        disp->back_color.load_back();
         real beta = 1.0 / disp->tension_scale;
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_tension, beta);
     }
     else if ( disp->line_style == 3 )
     {
-        disp->back_color.load_back();
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_curvature, 1.0);
     }
     else if ( disp->line_style == 4 )
     {
-        disp->back_color.load_back();
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_direction, 1.0);
     }
 }

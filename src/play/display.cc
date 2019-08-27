@@ -441,8 +441,10 @@ void Display::bodyColor(PointDisp const* disp, unsigned s) const
 {
     if ( disp->coloring )
     {
-        gle::bright_color(s).load_both();
-        gle::bright_color(s).load();
+        gle_color col = gle::bright_color(s);
+        col.load();
+        col.load_front();
+        col.darken(0.5).load_back();
     }
     else
     {
@@ -786,7 +788,6 @@ void Display::drawFiberLines(Fiber const& fib) const
 
     if ( disp->line_style == 1 )
     {
-        fib.disp->color.load();
         // display plain lines:
         lineWidth(disp->line_width);
 #if ( DIM > 1 ) && REAL_IS_DOUBLE
@@ -803,6 +804,7 @@ void Display::drawFiberLines(Fiber const& fib) const
     }
     else if ( disp->line_style == 2 )
     {
+        gle_color col = fib.disp->color;
         // display segments with color indicating internal tension
         lineWidth(disp->line_width);
         glBegin(GL_LINES);
@@ -813,12 +815,12 @@ void Display::drawFiberLines(Fiber const& fib) const
 #if ( 1 )
             // adjust transparency, to make tense fibers more visible:
             if ( x > 0 )  // invert color for extension
-                fib.disp->color.inverted().load(x);
+                col.inverted().load(x);
             else          // compression
-                fib.disp->color.load(-x);
+                col.load(-x);
 #else
             // use rainbow coloring, where Lagrange multipliers are negative under compression
-            gle_color::jet_color(1-x, fib.disp->color.a()).load();
+            gle_color::jet_color(1-x, alpha).load();
 #endif
             gle::gleVertex(fib.posP(ii));
             gle::gleVertex(fib.posP(ii+1));
@@ -1477,6 +1479,13 @@ void Display::drawFiber(Fiber const& fib)
             gle_color col1 = fib.disp->color;
             gle_color col2 = fib.disp->color.darken(0.625);
             gle_color colE = fib.disp->end_color[0];
+            
+            // adjust colors for front and back surfaces:
+            col1.load_load();
+            if ( fib.prop->disp->coloring )
+                col1.load_back();
+            else
+                fib.prop->disp->back_color.load_back();
             
             if ( disp->line_style != 1 || disp->style == 0 )
                 drawFiberLines(fib);

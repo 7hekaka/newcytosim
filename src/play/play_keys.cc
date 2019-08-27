@@ -909,7 +909,7 @@ void processKey(unsigned char key)
                 changeSingleSelect();
             break;
             
-        case '&':
+        case '&': case '^':
             shufflePointDispVisible(player.allSpaceDisp());
             break;
 
