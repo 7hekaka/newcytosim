@@ -15,7 +15,7 @@
 
 typedef Vector1 Vector;
 typedef real    Torque;
-/Users/nedelec/code/cytosim-dev/src/sim/couples/fork.cc:    meca.addTorque(pt1, pt2, prop->cosinus, prop->sinus, prop->angular_stiffness);const   Torque  nullTorque(0);
+const   Torque  nullTorque(0);
 
 /// helper function to normalize a 'Torque'
 inline real normalize(Torque x) { return std::copysign(1.0, x); }
