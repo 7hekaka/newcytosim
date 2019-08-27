@@ -15,7 +15,7 @@ set space cell
 
 new cell
 {
-    length = 50, 24, 24
+    length = 50, 24, 5
 }
 
 set field blue
@@ -111,47 +111,47 @@ new 1000 gamma
     
 new 150 filament
 {
-    position = ( rectangle 3 3 )
+    position = rectangle 3 3 1
     length = 6
-    orientation = horizontal
+    orientation = X
     plus_end = grow
 }
 
 new 100 filament
 {
-    position = ( rectangle 3 2.5 at -6 0 )
+    position = rectangle 3 2.5 1 at -6 0
     length = 7
-    orientation = ( 1 0 0 )
+    orientation = 1 0 0
     plus_end = grow
 }
 
 new 100 filament
 {
-    position = ( rectangle 3 2.5 at 6 0 )
+    position = rectangle 3 2.5 1 at 6 0
     length = 7
-    orientation = ( -1 0 0 )
+    orientation = -1 0 0
     plus_end = grow
 }
 
 new 50 filament
 {
-    position = ( rectangle 2 1.5 at -11 0 )
+    position = rectangle 2 1.5 1 at -11 0
     length = 8
-    orientation = ( 1 0 0 )
+    orientation = 1 0 0
     plus_end = grow
 }
 
 new 50 filament
 {
-    position = ( rectangle 2 1.5 at 11 0 )
+    position = rectangle 2 1.5 1 at 11 0
     length = 8
-    orientation = ( -1 0 0 )
+    orientation = -1 0 0
     plus_end = grow
 }
 
 run 2000 system
 {
     nb_frames = 10
-    event = 4, ( new filament { position=(rectangle 2 5); length=0.05; plus_end=grow; } )
+    event = 4, ( new filament { position=rectangle 2 5; length=0.05; plus_end=grow; } )
 }
 
