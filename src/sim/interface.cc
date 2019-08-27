@@ -136,7 +136,8 @@ void warn_trail(std::istream& is, std::string const& msg)
 {
     std::string str;
     std::getline(is, str);
-    std::cerr << "Warning: ignored trailing `" << str << "' in: " << msg << "\n";
+    std::cerr << "Error: unexpected tokens `" << str;
+    throw InvalidSyntax("syntax error `"+msg+"'");
 }
 
 /**
