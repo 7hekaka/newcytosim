@@ -414,72 +414,55 @@ void Simul::addExperimentalInteractions(Meca& meca) const
         Bead * b = beads.nextID(a);
         Bead * c = beads.nextID(b);
         const real len = 2 * a->radius();
-        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
+        Torque dir = normalize(cross(b->pos()-a->pos(), c->pos()-b->pos()));
+        MatrixBlock mat = Meca::torqueMatrix(sti, dir, co, si);
+        meca.addTorqueLong(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), mat, sti, len, sti);
     }
 #endif
-#if ( 0 )
-    if ( beads.size() > 2 )
+#if 0 && ( DIM == 3 )
+    const int NFIL = 12;
+    if ( 0 == fibers.size() % NFIL )
     {
-        PRINT_ONCE("AD-HOC BEAD-LOOP FORCES ENABLED\n");
-        const real sti = 1000;
-        const real ang = 2 * M_PI / beads.size();
-        real co = cos(ang), si = sin(ang);
-        // attach beads together in a string:
-        Bead * a = beads.firstID();
-        Bead * b = beads.nextID(a);
-        Bead * c = beads.nextID(b);
-        const real len = 2 * a->radius();
-        while ( c )
-        {
-            meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
-            a = b;
-            b = c;
-            c = beads.nextID(c);
-        }
-        c = beads.firstID();
-        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
-        a = b; b = c; c = beads.nextID(c);
-        meca.addTorque(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), co, si, len, sti);
-    }
-#endif
-#if ( 0 )
-    if ( 0 == fibers.size() % 12 )
-    {
-        PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
-        const real sti = 1000000;
+        PRINT_ONCE("AD-HOC N-TUBULE LINKS ENABLED\n");
+        MatrixBlock mat;
+        const real sti = 100000;
         const real nes = 10000;
-        const real ang = 2 * M_PI / 12;
-        const real len = 0.0045;  // distance between protofilaments
+        const real ang = 2 * M_PI / NFIL;
         real co = cos(ang), si = sin(ang);
+        const real len = 0.0045;  // distance between protofilaments
         // connect fibers together into a tube:
-        Fiber * f = fibers.firstID(), *a, *b, *c;
+        Fiber * f = fibers.firstID();
+        Fiber * ptr[NFIL+2] = { nullptr };
         while ( f )
         {
+            ptr[0] = f;
+            for ( int n=0; n < NFIL; ++n )
+                ptr[n+1] = fibers.nextID(ptr[n]);
+            ptr[NFIL] = ptr[0];
+            ptr[NFIL+1] = ptr[1];
             for ( unsigned i = 0; i < f->nbPoints(); ++i )
             {
-                a = f;
-                b = fibers.nextID(a);
-                c = fibers.nextID(b);
-                for ( int m = 0; m < 10; ++m )
+                if ( i < f->lastPoint() )
                 {
-                    meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, sti, len, nes);
-                    a = b;
-                    b = c;
-                    c = fibers.nextID(c);
+                    // get average direction of the Tubule at this location:
+                    Vector dir(0,0,0);
+                    for ( int n=0; n < NFIL; ++n )
+                        dir += ptr[n]->diffPoints(i);
+                    dir.normalize();
+                    mat = Meca::torqueMatrix(sti, dir, co, si);
                 }
-                c = f;
-                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, sti, len, nes);
-                a = b; b = c; c = fibers.nextID(c);
-                meca.addTorque(Mecapoint(a,i), Mecapoint(b,i), Mecapoint(c,i), co, si, sti, len, nes);
+                for ( int n=0; n < NFIL; ++n )
+                    meca.addTorqueLong(Mecapoint(ptr[n],i), Mecapoint(ptr[n+1],i),
+                                       Mecapoint(ptr[n+2],i), mat, sti, len, nes);
             }
-            f = fibers.nextID(a);
+            f = fibers.nextID(ptr[NFIL-1]);
         }
     }
 #endif
 #if ( 0 )
     if ( fibers.size() > 1 )
     {
-        PRINT_ONCE("AD-HOC TUBULE LINKS ENABLED\n");
+        PRINT_ONCE("AD-HOC FIBER TEST LINKS ENABLED\n");
         const real sti = 100000;
         const real len = 0.020;
         // connect fibers together into a tube:

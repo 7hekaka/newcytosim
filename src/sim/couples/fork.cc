@@ -35,8 +35,7 @@ void Fork::setInteractions(Meca & meca) const
     meca.addTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
     //meca.addTorquePoliti(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
 #elif ( DIM == 3 )
-    sinus = fabs(prop->sinus);
-    meca.addTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
+    meca.addTorque(pt1, pt2, prop->cosinus, prop->sinus, prop->angular_stiffness);
 #endif
 }
 

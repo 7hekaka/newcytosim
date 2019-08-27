@@ -204,13 +204,13 @@ public:
     /// add block 'alpha*T' to mC at position (i, j)
     void add_block(index_t i, index_t j, real alpha, MatrixBlock const& T);
 
-    /// add block 'T' to mC at position (i, j)
+    /// add block 'T' to mC at position (i, i)
     void add_diag_block(index_t i, MatrixBlock const& T);
     
-    /// subtract block 'T' to mC at position (i, j)
+    /// subtract block 'T' to mC at position (i, i)
     void sub_diag_block(index_t i, MatrixBlock const& T);
     
-    /// add block 'alpha*T' to mC at position (i, j)
+    /// add block 'alpha*T' to mC at position (i, i)
     void add_diag_block(index_t i, real alpha, MatrixBlock const& T);
 
     /// add value to mB at position (i, j)
@@ -307,7 +307,7 @@ public:
     /// calculate X = P*M*X, using T as temporary vector
     void multiplyP(real* X, real* T) const;
     
-    //--------------------------- FORCE ELEMENTS -------------------------------
+    //---------------------- EXPLICIT FORCE ELEMENTS ---------------------------
 
     /// Add a constant force on Mecapoint
     void addForce(Mecapoint const&, Vector const& force);
@@ -327,20 +327,25 @@ public:
     /// Add an explicit torque to constrain two segments to an angle defined by (sinus, cosinus)
     void addTorqueExplicit(Interpolation const&, Interpolation const&, real cosinus, real sinus, real weight);
     
+    //------------------------- IMPLICIT ELEMENTS ------------------------------
+
+    /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
+    static MatrixBlock torqueMatrix(real weight, Torque const& axis, real cosinus, real sinus);
+
     /// this has been replaced by interTorque()
     void addTorquePoliti(Interpolation const&, Interpolation const&, real cosinus, real sinus, real weight);
 
     /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
     void addTorque(Interpolation const&, Interpolation const&, real cosinus, real sinus, real weight);
 
-    /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
-    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, real cosinus, real sinus, real weight);
+    /// Add a torque on 3 points with equilibrium angle defined by (sinus, cosinus)
+    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight);
 
-    /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
-    void addTorqueP(Mecapoint const&, Mecapoint const&, Mecapoint const&, real cosinus, real sinus, real weight);
+    /// Add a torque on 3 points with equilibrium angle defined by (sinus, cosinus)
+    void addTorquePlane(Mecapoint const&, Mecapoint const&, Mecapoint const&, Torque const&, real cosinus, real sinus, real weight);
 
-    /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
-    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, real cosinus, real sinus, real weight, real len, real weightL);
+    /// Add a torque on 3 points with equilibrium angle defined by (sinus, cosinus), add LongLink on two points
+    void addTorqueLong(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
 
     /// Link of stiffness `weight` from fixed position `g`
     void addPointClamp(Mecapoint const&, Vector, real weight);

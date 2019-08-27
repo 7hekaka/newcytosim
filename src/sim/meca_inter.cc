@@ -65,7 +65,7 @@ inline bool any_equal(const index_t a, const index_t b,
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Matrix access functions
+#pragma mark - Functions to set matrix elements
 //------------------------------------------------------------------------------
 
 void PRINT_BLOCK(index_t i, index_t j, MatrixBlock const& T)
@@ -73,7 +73,7 @@ void PRINT_BLOCK(index_t i, index_t j, MatrixBlock const& T)
     std::cerr << std::setw(2) << i << " " << j << " " << std::setw(10) << T << '\n';
 }
 
-index_t oldi=0, oldj=0;
+//index_t oldi=0, oldj=0;
 
 inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 {
@@ -648,11 +648,11 @@ void Meca::addTorque(const Interpolation & pt1,
     Vector axis = normalize(cross(AB,CD));
     const Matrix33 R = Matrix33::rotationAroundAxis(axis, cosinus, sinus);
     //const Matrix33 T = R.transposed();
-    const Matrix33 Id(1,0,0,0,1,0,0,0,1);  // identity matrix
+    const Matrix33 Id(0,1);  // identity matrix
 #else
     const Matrix22 R(cosinus, sinus, -sinus, cosinus);
     //const Matrix22 T(cosinus, -sinus, sinus, cosinus);
-    const Matrix22 Id(1,0,0,1);  // identity matrix
+    const Matrix22 Id(0,1);  // identity matrix
 #endif
 
     Vector Ru = R.vecmul(u);
@@ -815,6 +815,20 @@ void Meca::addTorque(const Interpolation & pt1,
 #endif
 
 
+
+MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, real cosinus, real sinus)
+{
+#if ( DIM == 3 )
+    return -weight * Matrix33::rotationAroundAxis(axi, cosinus, sinus);
+#elif ( DIM == 2 )
+    return -weight * Matrix22(cosinus, axi*sinus, -axi*sinus, cosinus);
+#else
+    return Matrix11(-weight);  //should not be used!
+#endif
+}
+
+
+
 /**
  Add Torque between 3 points.
  This version does not impose any particular distance between the points,
@@ -823,25 +837,26 @@ void Meca::addTorque(const Interpolation & pt1,
 void Meca::addTorque(const Mecapoint & ptA,
                      const Mecapoint & ptB,
                      const Mecapoint & ptC,
-                     const real cosinus, const real sinus,
+                     const MatrixBlock & R, //already multiplied by -weight
                      const real weight)
 {
     assert_true( weight >= 0 );
     const MatrixBlock W(0, -weight);
 
+/*
 #if ( DIM == 3 )
     const Vector3 AB = ptB.pos() - ptA.pos();
     const Vector3 BC = ptC.pos() - ptB.pos();
-    Vector3 axis = normalize(cross(AB, BC));
-    if ( axis != axis )
+    Vector3 axi = normalize(cross(AB, BC));
+    if ( axi != axi )
         return;
-    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
+    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axi, cosinus, sinus);
 #elif ( DIM == 2 )
     const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
     const Matrix11 R(-weight);  //should not be used!
 #endif
-
+*/
     const MatrixBlock T = R.transposed();
 
     // indices in matrix mC:
@@ -868,7 +883,7 @@ void Meca::addTorque(const Mecapoint & ptA,
     
 #if ( DIM == 2 )
     // small optimization in 2D, as the term (R+W)+(T+W) is diagonal
-    real dd = -2 * ( weight * cosinus + weight );
+    real dd = R.trace() - 2.0 * weight;
     add_diag_block(iiB, MatrixBlock(0, dd));
 #else
     add_diag_block(iiB, (R+W)+(T+W));
@@ -887,20 +902,23 @@ void Meca::addTorque(const Mecapoint & ptA,
  This version does not impose any particular distance between the points,
  and just move them to enforce the angle described by ABC
  */
-void Meca::addTorqueP(const Mecapoint & ptA,
-                      const Mecapoint & ptB,
-                      const Mecapoint & ptC,
-                      const real cosinus, const real sinus,
-                      const real weight)
+void Meca::addTorquePlane(const Mecapoint & ptA,
+                          const Mecapoint & ptB,
+                          const Mecapoint & ptC,
+                          const Torque & axi,
+                          const real cosinus, const real sinus,
+                          const real weight)
 {
     assert_true( weight >= 0 );
     
 #if ( DIM == 3 )
+    /*
     const Vector3 AB = ptB.pos() - ptA.pos();
     const Vector3 BC = ptC.pos() - ptB.pos();
     Vector3 axi = normalize(cross(AB, BC));
     if ( axi != axi )
         return;
+     */
     const Matrix33 X = Matrix33::outerProduct(axi);
     const Matrix33 R = Matrix33::rotationAroundAxis(axi, cosinus, sinus) - X;
     const Matrix33 P = MatrixBlock(0,1) - X;
@@ -945,30 +963,32 @@ void Meca::addTorqueP(const Mecapoint & ptA,
 /** This is variation 3, 20.08.2019
  It combines addTorque() without length with a LongLink(ptA, ptB);
  */
-void Meca::addTorque(const Mecapoint & ptA,
-                     const Mecapoint & ptB,
-                     const Mecapoint & ptC,
-                     const real cosinus, const real sinus,
-                     const real weight,
-                     const real len, const real weightL)
+void Meca::addTorqueLong(const Mecapoint & ptA,
+                         const Mecapoint & ptB,
+                         const Mecapoint & ptC,
+                         const MatrixBlock & R,
+                         const real weight,
+                         const real len, const real weightL)
 {
     assert_true( weight >= 0 );
     assert_true( weightL >= 0 );
     const MatrixBlock W(0, -weight);
     const Vector AB = ptB.pos() - ptA.pos();
     
+/*
 #if ( DIM == 3 )
     const Vector3 BC = ptC.pos() - ptB.pos();
-    Vector3 axis = normalize(cross(AB, BC));
-    if ( axis != axis )
+    Vector3 axi = normalize(cross(AB, BC));
+    if ( axi != axi )
         return;
-    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axis, cosinus, sinus);
+    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axi, cosinus, sinus);
 #elif ( DIM == 2 )
     const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
     const Matrix11 R(-weight);  //should not be used!
 #endif
-    
+*/
+
     const MatrixBlock T = R.transposed();
     
     // indices in matrix mC:
@@ -991,7 +1011,7 @@ void Meca::addTorque(const Mecapoint & ptA,
             wL = MatrixBlock::outerProduct(AB, -weightL/ab2);
         else
             wL = MatrixBlock::offsetOuterProduct(wla-weightL, AB, -wla/ab2);
-    }    
+    }
     
     add_diag_block(iiA, W+wL);
     if ( iiB > iiA )
@@ -1005,7 +1025,7 @@ void Meca::addTorque(const Mecapoint & ptA,
 
 #if ( DIM == 2 )
     // in 2D, the term (R+W)+(T+W) is diagonal
-    real dd = -2 * ( weight * cosinus + weight );
+    real dd = R.trace() - 2.0 * weight;
     add_diag_block(iiB, wL+MatrixBlock(0,dd));
 #else
     add_diag_block(iiB, (R+W)+(T+W)+wL);
@@ -3928,7 +3948,6 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
 
  F. Nedelec, March 2011
  
- @todo addSidePointClamp3D should use block operations
  */
 void Meca::addSidePointClamp3D(Interpolation const& ptA,
                                Vector pos,

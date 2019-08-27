@@ -48,8 +48,11 @@ void ForkProp::complete(Simul const& sim)
     CoupleProp::complete(sim);
     
     cosinus = cos(angle);
-    sinus   = sin(angle);
-    
+#if ( DIM == 3 )
+    sinus = fabs(sin(angle));
+#else
+    sinus = sin(angle);
+#endif
 #if ( 0 )
     if ( angle < 0 || sinus < 0 )
         throw InvalidParameter("The equilibrium angle should be defined in [0, pi]");
