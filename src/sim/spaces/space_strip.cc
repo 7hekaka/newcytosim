@@ -127,28 +127,20 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {
-    index_t inx = DIM-1 + DIM * pe.matIndex();
-    
-    meca.mC(inx, inx) -= stiff;
-
 #if ( DIM == 2 )
-    meca.base(inx) += stiff * std::copysign(length_[1], pos.YY);
+    meca.addLineClampX(pe, 1, std::copysign(length_[1], pos.YY), stiff);
 #elif ( DIM > 2 )
-    meca.base(inx) += stiff * std::copysign(length_[2], pos.ZZ);
+    meca.addLineClampX(pe, 2, std::copysign(length_[2], pos.ZZ), stiff);
 #endif
 }
 
 
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
-    index_t inx = DIM-1 + DIM * pe.matIndex();
-    
-    meca.mC(inx, inx) -= stiff;
-
 #if ( DIM == 2 )
-    meca.base(inx) += stiff * std::copysign(length_[1]-rad, pos.YY);
+    meca.addLineClampX(pe, 1, std::copysign(length_[1]-rad, pos.YY), stiff);
 #elif ( DIM > 2 )
-    meca.base(inx) += stiff * std::copysign(length_[2]-rad, pos.ZZ);
+    meca.addLineClampX(pe, 2, std::copysign(length_[2]-rad, pos.ZZ), stiff);
 #endif
 }
 

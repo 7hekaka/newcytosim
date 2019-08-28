@@ -56,25 +56,10 @@ void SpaceForce::setInteraction(Vector const& pos, Mecapoint const&, real rad, M
 
 void SpaceForce::setInteractions(Meca & meca, FiberSet const&) const
 {
-    real *const base = meca.base();
-
     if ( stiffness > 0 )
-    {
-        Vector sc = stiffness * center;
-        const unsigned nbp = meca.nb_points();
-        // generate an isotropic squeezing force:
-        for ( unsigned p = 0; p < nbp; ++p )
-        {
-            meca.mB(p,p) -= stiffness;
-            sc.add_to(base+DIM*p);
-        }
-    }
+        meca.addPointClampToAll(center, stiffness);
     else
-    {
-        const unsigned nbu = meca.dimension();
-        for ( unsigned u = 0; u < nbu; u += DIM )
-            force.add_to(base+u);
-    }
+        meca.addForceToAll(force);
 }
 
 

@@ -181,7 +181,6 @@ Vector SpacePolygon::project(Vector const& w) const
 void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
 {    
 #if ( DIM > 1 )
-    index_t inx = DIM * pe.matIndex();
     
     int hit;
     real pX, pY;
@@ -194,8 +193,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
 
     if ( fabs(pos.ZZ) >= height_ )
     {
-        meca.mC(inx+2, inx+2) -= stiff;
-        meca.base(inx+2)      += stiff * std::copysign(height_, pos.ZZ);
+        meca.addLineClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
         if ( in ) return;
     }
     else if ( in )
@@ -206,38 +204,15 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
         real hh = (pos.XX-pX)*(pos.XX-pX) + (pos.YY-pY)*(pos.YY-pY);
         
         if ( v * v < hh )
-        {
-            meca.mC(inx+2, inx+2) -= stiff;
-            meca.base(inx+2)      += stiff * std::copysign(height_, pos.ZZ);
-        }
+            meca.addLineClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
         return;
     }
 #endif
 
     if ( edg )
-    {
-        // projection on an edge of normal (nX, nY) already normalized
-        const real pr = ( pX * nX + pY * nY ) * stiff;
-        
-        meca.mC(inx  , inx  ) -= nX * nX * stiff;
-        meca.mC(inx  , inx+1) -= nX * nY * stiff;
-        meca.mC(inx+1, inx+1) -= nY * nY * stiff;
-        
-        meca.base(inx  )  += nX * pr;
-        meca.base(inx+1)  += nY * pr;
-    }
+        meca.addPlaneClamp(pe, Vector(pX,pY,0), Vector(nX,nY,0), stiff);
     else
-    {
-        // projection on a vertex:
-#if ( DIM == 2 )
-        meca.mB(pe.matIndex(), pe.matIndex()) -= stiff;
-#elif ( DIM > 2 )
-        meca.mC(inx,   inx  ) -= stiff;
-        meca.mC(inx+1, inx+1) -= stiff;
-#endif
-        meca.base(inx  )  += stiff * pX;
-        meca.base(inx+1)  += stiff * pY;
-    }
+        meca.addPointClampXY(pe, Vector(pX,pY,0), stiff);
 #endif
 }
 

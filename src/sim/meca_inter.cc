@@ -16,6 +16,14 @@
 
 extern Modulo const* modulo;
 
+/**
+ Note that you can disable all the modulo code with this definition.
+ The code under 'if ( modulo )' will never be executed, and should even
+ be discarded during compilation if optimizations are enabled.
+ */
+//constexpr Modulo * modulo = nullptr;
+
+
 /// set TRUE to update matrix mC using block directives
 /** This is significantly faster on machine with the AVX instruction set */
 #define USE_MATRIX_BLOCK 1
@@ -259,6 +267,12 @@ void Meca::addForce(const Interpolation & pti, Vector const& force)
     add_base(ii1, force, pti.coef1());
 }
 
+
+void Meca::addForceToAll(Vector const& force)
+{
+    for ( unsigned p = 0; p < nb_points(); ++p )
+        add_base(DIM*p, force);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Explicit (constant) Torque
@@ -3658,6 +3672,37 @@ void Meca::addPointClamp(Interpolation const& pti,
 #endif
 }
 
+/**
+ This creates Hookean links only in the X and Y dimension
+ in 2D this is equivalent to addPointClamp()
+ in 3D there is no force in the Z, if pos.ZZ = 0
+ */
+void Meca::addPointClampXY(Mecapoint const& ptA,
+                           Vector pos,
+                           const real weight)
+{
+    const index_t inx = DIM * ptA.matIndex();
+
+#if ( DIM == 2 )
+    mB(ptA.matIndex(), ptA.matIndex()) -= weight;
+#elif ( DIM > 2 )
+    mC(inx,   inx  ) -= weight;
+    mC(inx+1, inx+1) -= weight;
+    assert_true( pos.ZZ == 0 );
+#endif
+    add_base(inx, pos, weight);
+}
+
+
+void Meca::addPointClampToAll(Vector const& pos, const real weight)
+{
+    Vector vec = weight * pos;
+    for ( unsigned p = 0; p < nb_points(); ++p )
+    {
+        sub_iso(p, p, weight);
+        add_base(p, vec);
+    }
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Links to fixed sphere and cylinder
@@ -4050,6 +4095,17 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 #pragma mark - Links to fixed lines and planes
 //------------------------------------------------------------------------------
 
+
+void Meca::addLineClampX(Mecapoint const& pte,
+                         index_t axi,
+                         real pos,
+                         const real weight)
+{
+    index_t inx = DIM * pte.matIndex() + axi;
+    mC(inx, inx) -= weight;
+    vBAS[inx] += weight * pos;
+}
+
 /**
  Link `ptA` (X) to the line defined by `G` and tangent vector `dir`.
  The force is linear with position with a stiffness `weight`, and its
@@ -4142,8 +4198,9 @@ void Meca::addPlaneClamp(const Mecapoint & ptA,
     add_base(inx, dir, weight*dot(pos, dir));
     
 #if ( DIM == 1 )
-    mC(inx, inx) -= weight;
+    mB(inx, inx) -= weight;
 #else
+    // wT = -weight * [ dir (x) dir ]
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);
     add_block_diag(inx, wT);
 #endif
@@ -4176,6 +4233,7 @@ void Meca::addPlaneClamp(const Interpolation & ptA,
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
+    // wT = -weight * [ dir (x) dir ]
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);
     
     add_block_diag(ii0, cc0*cc0, wT);

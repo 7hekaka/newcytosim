@@ -118,10 +118,11 @@ Vector SpaceLid::project(Vector const& pos) const
 void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
                               Meca & meca, real stiff) const
 {
-    index_t inx = DIM-1 + DIM * pe.matIndex();
-    
-    meca.mC(inx, inx) -= stiff;
-    meca.base(inx)    += stiff * top_;
+#if ( DIM == 2 )
+    meca.addLineClampX(pe, 1, top_, stiff);
+#elif ( DIM > 2 )
+    meca.addLineClampX(pe, 2, top_, stiff);
+#endif
     
 #if ( DIM == 2 )
     force_ += stiff * ( pos.YY - top_ );
@@ -134,10 +135,11 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
 void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
                               Meca & meca, real stiff) const
 {
-    index_t inx = DIM-1 + DIM * pe.matIndex();
-    
-    meca.mC(inx, inx) -= stiff;
-    meca.base(inx)    += stiff * ( top_ - rad );
+#if ( DIM == 2 )
+    meca.addLineClampX(pe, 1, top_-rad, stiff);
+#elif ( DIM > 2 )
+    meca.addLineClampX(pe, 2, top_-rad, stiff);
+#endif
     
 #if ( DIM == 2 )
     force_ += stiff * ( pos.YY - top_ + rad );

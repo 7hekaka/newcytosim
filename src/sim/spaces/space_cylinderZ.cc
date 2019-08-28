@@ -185,11 +185,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
     }
     
     if ( cap )
-    {
-        const index_t inx = 2 + DIM * pe.matIndex();
-        meca.mC(inx, inx) -= stiff;
-        meca.base(inx)    += stiff * zzz;
-    }
+        meca.addLineClampX(pe, 2, zzz, stiff);
     
     if ( cyl )
         meca.addCylinderClampZ(pe, rad, stiff);

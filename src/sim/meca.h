@@ -156,7 +156,7 @@ private:
     /// Matrices used for GMRES
     LinearSolvers::Matrix mH, mV;
 
-public:
+private:
 
     /// isotropic symmetric part of the dynamic
     /** 
@@ -181,6 +181,7 @@ public:
     real&   base(index_t i) { return vBAS[i]; }
     
 private:
+    
     /// position interpolated from two points in vPTS[]
     Vector  position2(const index_t inx[2], const real coef[2]) const;
 
@@ -316,6 +317,9 @@ public:
     /// Add a constant force on Interpolated point
     void addForce(Interpolation const&, Vector const& force);
     
+    /// Add a constant force to every points
+    void addForceToAll(Vector const& force);
+    
     /// Add a torque to the segment indicated by Interpolation
     void addTorque(Interpolation const&, Torque const& torque);
     
@@ -354,6 +358,12 @@ public:
     /// Link of stiffness `weight` from fixed position `g`
     void addPointClamp(Interpolation const&, Vector, real weight);
     
+    /// Link of stiffness `weight` from fixed position `g`, in the XY plane
+    void addPointClampXY(Mecapoint const&, Vector, real weight);
+
+    /// A Hookean force linking all vertices to `cen`
+    void addPointClampToAll(Vector const& cen, real weight);
+
     /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
     void addSphereClamp(Vector const& off, Mecapoint const&, Vector const& cen, real rad, real weight);
     
@@ -388,6 +398,9 @@ public:
     /// Link of stiffness `weight` with a line defined by `g` and its tangent `dir`
     void addLineClamp(Interpolation const&, Vector const& g, Vector const& dir, real weight);
     
+    /// Link of stiffness `weight` to a line that is X if axi=0, Y if axi=1, Z if axi=2
+    void addLineClampX(Mecapoint const&, index_t axi, real, real weight);
+
     /// Link of stiffness `weight` with a plane defined by `g` and its normal `dir`
     void addPlaneClamp(Mecapoint const&, Vector const& g, Vector const& dir, real weight);
     

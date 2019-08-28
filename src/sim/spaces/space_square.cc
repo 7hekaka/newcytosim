@@ -187,15 +187,12 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
 {
     bool in = true;
     
-    index_t inx = DIM * pe.matIndex();
-    
     for ( int d = 0; d < DIM; ++d )
     {
         assert_true( dim[d] >= 0 );
         if ( fabs(pos[d]) > dim[d] )
         {
-            meca.mC(inx+d, inx+d) -= stiff;
-            meca.base(inx+d)      += stiff * std::copysign(dim[d], pos[d]);
+            meca.addLineClampX(pe, d, std::copysign(dim[d], pos[d]), stiff);
             in = false;
         }
     }
@@ -214,8 +211,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
         u = dim[2] - fabs(pos[2]);
         if ( u < l )  dip = 2;
 #endif
-        meca.mC(inx+dip, inx+dip) -= stiff;
-        meca.base(inx+dip) += stiff * std::copysign(dim[dip], pos[dip]);
+        meca.addLineClampX(pe, dip, std::copysign(dim[dip], pos[dip]), stiff);
     }
 }
 

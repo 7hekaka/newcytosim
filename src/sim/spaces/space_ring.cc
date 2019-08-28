@@ -130,18 +130,8 @@ Vector SpaceRing::project(Vector const& w) const
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff, const real len, const real rad)
 {
-    const index_t inx = DIM * pe.matIndex();
-
-    if ( pos.XX > len )
-    {
-        meca.mC(inx, inx) -= stiff;
-        meca.base(inx)    += stiff * len;
-    }
-    else if ( pos.XX < -len )
-    {
-        meca.mC(inx, inx) -= stiff;
-        meca.base(inx)    -= stiff * len;
-    }
+    if ( std::abs(pos.XX) > len )
+        meca.addLineClampX(pe, 0, std::copysign(len, pos.XX), stiff);
     
     meca.addCylinderClampX(pe, rad, stiff);
 }
