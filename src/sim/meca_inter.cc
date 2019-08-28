@@ -75,6 +75,7 @@ void PRINT_BLOCK(index_t i, index_t j, MatrixBlock const& T)
 
 //index_t oldi=0, oldj=0;
 
+// add alpha * T to mC.
 inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 {
 #if 0
@@ -97,6 +98,7 @@ inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 #endif
 }
 
+// add T to mC.
 inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const& T)
 {
 #if 0
@@ -119,6 +121,7 @@ inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const&
 #endif
 }
 
+// subtract T to mC.
 inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 {
 #if 0
@@ -141,8 +144,8 @@ inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 #endif
 }
 
-
-inline void Meca::add_diag_block(index_t i, MatrixBlock const& T)
+// add T to the diagonal of mC. `T` should be symmetric
+inline void Meca::add_block_diag(index_t i, MatrixBlock const& T)
 {
 #if ( DIM == 1 )
     mB(i,i) += T.value();
@@ -157,7 +160,8 @@ inline void Meca::add_diag_block(index_t i, MatrixBlock const& T)
 #endif
 }
 
-inline void Meca::add_diag_block(index_t i, real alpha, MatrixBlock const& T)
+// add alpha * T to the diagonal of mC. `T` should be symmetric
+inline void Meca::add_block_diag(index_t i, real alpha, MatrixBlock const& T)
 {
 #if ( DIM == 1 )
     mB(i,i) += alpha * T.value();
@@ -172,7 +176,8 @@ inline void Meca::add_diag_block(index_t i, real alpha, MatrixBlock const& T)
 #endif
 }
 
-inline void Meca::sub_diag_block(index_t i, MatrixBlock const& T)
+// add -T to the diagonal of mC. `T` should be symmetric
+inline void Meca::sub_block_diag(index_t i, MatrixBlock const& T)
 {
 #if ( DIM == 1 )
     mB(i,i) -= T.value();
@@ -188,6 +193,7 @@ inline void Meca::sub_diag_block(index_t i, MatrixBlock const& T)
 }
 
 
+// add val to mB, the XYZ-isometric component
 inline void Meca::add_iso(index_t i, index_t j, real val)
 {
 #if USE_ISO_MATRIX
@@ -197,6 +203,7 @@ inline void Meca::add_iso(index_t i, index_t j, real val)
 #endif
 }
 
+// add -val to mB, the XYZ-isometric component
 inline void Meca::sub_iso(index_t i, index_t j, real val)
 {
 #if USE_ISO_MATRIX
@@ -772,9 +779,9 @@ void Meca::addTorque(const Interpolation & pt1,
 
 #endif
 
-    add_diag_block(iiA, duFu);
+    add_block_diag(iiA, duFu);
     sub_block(iiB, iiA, duFu);
-    add_diag_block(iiB, duFu);
+    add_block_diag(iiB, duFu);
     if ( iiC > iiA )
     {
         add_block(iiC, iiA, duFv);
@@ -790,9 +797,9 @@ void Meca::addTorque(const Interpolation & pt1,
         sub_block(iiB, iiC, dvFu);
         add_block(iiB, iiD, dvFu);
     }
-    add_diag_block(iiC, dvFv);
+    add_block_diag(iiC, dvFv);
     sub_block(iiD, iiC, dvFv);
-    add_diag_block(iiD, dvFv);
+    add_block_diag(iiD, dvFv);
     
     // remaining part of the force (these vectors should be small near equilibrium)
     Vector Fu0 = Fu - duFu.vecmul(AB) - duFv.trans_vecmul(CD);
@@ -871,7 +878,7 @@ void Meca::addTorque(const Mecapoint & ptA,
     Vector fC = weight * CD;
      */
     
-    add_diag_block(iiA, W);
+    add_block_diag(iiA, W);
     if ( iiB > iiA )
         sub_block(iiB, iiA, W+R);
     else
@@ -884,16 +891,16 @@ void Meca::addTorque(const Mecapoint & ptA,
 #if ( DIM == 2 )
     // small optimization in 2D, as the term (R+W)+(T+W) is diagonal
     real dd = R.trace() - 2.0 * weight;
-    add_diag_block(iiB, MatrixBlock(0, dd));
+    add_block_diag(iiB, MatrixBlock(0, dd));
 #else
-    add_diag_block(iiB, (R+W)+(T+W));
+    add_block_diag(iiB, (R+W)+(T+W));
 #endif
     
     if ( iiC > iiB )
         sub_block(iiC, iiB, W+R);
     else
         sub_block(iiB, iiC, W+T);
-    add_diag_block(iiC, W);
+    add_block_diag(iiC, W);
 }
 
 
@@ -939,7 +946,7 @@ void Meca::addTorquePlane(const Mecapoint & ptA,
     const MatrixBlock wR = -weight * R;
     const MatrixBlock wT = wR.transposed();
 
-    add_diag_block(iiA, wP);
+    add_block_diag(iiA, wP);
     if ( iiB > iiA )
         sub_block(iiB, iiA, wR+wP);
     else
@@ -949,13 +956,13 @@ void Meca::addTorquePlane(const Mecapoint & ptA,
     else
         add_block(iiA, iiC, wT);
 
-    add_diag_block(iiB, (wP+wR)+(wP+wT));
+    add_block_diag(iiB, (wP+wR)+(wP+wT));
     if ( iiC > iiB )
         sub_block(iiC, iiB, wP+wR);
     else
         sub_block(iiB, iiC, wP+wT);
 
-    add_diag_block(iiC, wP);
+    add_block_diag(iiC, wP);
 }
 
 
@@ -1013,7 +1020,7 @@ void Meca::addTorqueLong(const Mecapoint & ptA,
             wL = MatrixBlock::offsetOuterProduct(wla-weightL, AB, -wla/ab2);
     }
     
-    add_diag_block(iiA, W+wL);
+    add_block_diag(iiA, W+wL);
     if ( iiB > iiA )
         sub_block(iiB, iiA, W+R+wL);
     else
@@ -1026,16 +1033,16 @@ void Meca::addTorqueLong(const Mecapoint & ptA,
 #if ( DIM == 2 )
     // in 2D, the term (R+W)+(T+W) is diagonal
     real dd = R.trace() - 2.0 * weight;
-    add_diag_block(iiB, wL+MatrixBlock(0,dd));
+    add_block_diag(iiB, wL+MatrixBlock(0,dd));
 #else
-    add_diag_block(iiB, (R+W)+(T+W)+wL);
+    add_block_diag(iiB, (R+W)+(T+W)+wL);
 #endif
     if ( iiC > iiB )
         sub_block(iiC, iiB, W+R);
     else
         sub_block(iiB, iiC, W+T);
 
-    add_diag_block(iiC, W);
+    add_block_diag(iiC, W);
 }
 
 
@@ -1848,8 +1855,8 @@ void Meca::addLongLink(const Mecapoint & ptA,
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
-    add_diag_block(ia, wT);
-    add_diag_block(ib, wT);
+    add_block_diag(ia, wT);
+    add_block_diag(ib, wT);
     if ( ia > ib )
         sub_block(ia, ib, wT);
     else
@@ -1927,12 +1934,12 @@ void Meca::addLongLink(const Mecapoint & ptA,
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
 
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0,    -cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1,    -cc1, wT);
-    add_diag_block(ii2, wT);
+    add_block_diag(ii2, wT);
 
     if ( modulo && !off.null() )
     {
@@ -2012,16 +2019,16 @@ void Meca::addLongLink(const Interpolation & ptA,
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0, cc2*cc0, wT);
     add_block(ii3, ii0, cc3*cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1, cc2*cc1, wT);
     add_block(ii3, ii1, cc3*cc1, wT);
-    add_diag_block(ii2, cc2*cc2, wT);
+    add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
-    add_diag_block(ii3, cc3*cc3, wT);
+    add_block_diag(ii3, cc3*cc3, wT);
 
     if ( modulo && !off.null() )
     {
@@ -2166,9 +2173,9 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     Matrix33 wbT = -weight * bR.transposed();
     
     // fill the matrix mC
-    add_diag_block(ii0, waT*aR); //this is diagonal
+    add_block_diag(ii0, waT*aR); //this is diagonal
     add_block(ii1, ii0, wbT*aR);
-    add_diag_block(ii1, wbT*bR); //this is diagonal
+    add_block_diag(ii1, wbT*bR); //this is diagonal
     if ( ii2 > ii0 )
     {
         sub_block(ii2, ii0, waT.transposed());
@@ -2179,7 +2186,7 @@ void Meca::addSideLink3D(const Interpolation & ptA,
         sub_block(ii2, ii0, waT);
         sub_block(ii2, ii1, wbT);
     }
-    add_diag_block(ii2, Matrix33(0, -weight));
+    add_block_diag(ii2, Matrix33(0, -weight));
     
     if ( modulo )
     {
@@ -2360,9 +2367,9 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     Matrix33 wbT = -weight * bR.transposed();
     
     // fill the matrix mC
-    add_diag_block(ii0, waT*aR);  //this is diagonal
+    add_block_diag(ii0, waT*aR);  //this is diagonal
     add_block(ii1, ii0, wbT*aR);
-    add_diag_block(ii1, wbT*bR);  //this is diagonal
+    add_block_diag(ii1, wbT*bR);  //this is diagonal
     if ( ii2 > ii0 )
     {
         add_block(ii2, ii0, wcc2, aR);
@@ -2377,9 +2384,9 @@ void Meca::addSideLink3D(const Interpolation & ptA,
         add_block(ii1, ii2, cc2, wbT);
         add_block(ii1, ii3, cc3, wbT);
     }
-    add_diag_block(ii2, Matrix33(0, wcc2*cc2));
+    add_block_diag(ii2, Matrix33(0, wcc2*cc2));
     add_block(ii3, ii2, Matrix33(0, wcc3*cc2));
-    add_diag_block(ii3, Matrix33(0, wcc3*cc3));
+    add_block_diag(ii3, Matrix33(0, wcc3*cc3));
     
     if ( modulo )
     {
@@ -2495,10 +2502,10 @@ void Meca::addSideSideLink2D(const Interpolation & ptA,
     Matrix22 Cw(ww2, -we2,  we2, ww2);
     Matrix22 Dw(ww3,  we2, -we2, ww3);
     
-    add_diag_block(ii0, A.trans_mul(Aw));
-    add_diag_block(ii1, B.trans_mul(Bw));
-    add_diag_block(ii2, C.trans_mul(Cw));
-    add_diag_block(ii3, D.trans_mul(Dw));
+    add_block_diag(ii0, A.trans_mul(Aw));
+    add_block_diag(ii1, B.trans_mul(Bw));
+    add_block_diag(ii2, C.trans_mul(Cw));
+    add_block_diag(ii3, D.trans_mul(Dw));
  
     add_block(ii1, ii0, B.trans_mul(Aw));
     add_block(ii3, ii2, D.trans_mul(Cw));
@@ -2718,9 +2725,9 @@ void Meca::addSlidingLink(const Interpolation & ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
-    add_diag_block(ii0, AA, wT);
-    add_diag_block(ii1, BB, wT);
-    add_diag_block(ii2, wT);
+    add_block_diag(ii0, AA, wT);
+    add_block_diag(ii1, BB, wT);
+    add_block_diag(ii2, wT);
 
     add_block(ii0, ii1, AB, wT);
     add_block(ii0, ii2, -A, wT);
@@ -2791,16 +2798,16 @@ void Meca::addSlidingLink(const Interpolation & ptA,
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0, cc2*cc0, wT);
     add_block(ii3, ii0, cc3*cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1, cc2*cc1, wT);
     add_block(ii3, ii1, cc3*cc1, wT);
-    add_diag_block(ii2, cc2*cc2, wT);
+    add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
-    add_diag_block(ii3, cc3*cc3, wT);
+    add_block_diag(ii3, cc3*cc3, wT);
 
     if ( modulo )
     {
@@ -2875,24 +2882,24 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     {
         const Matrix22 PA = wP.mul(A);
         const Matrix22 PB = wP.mul(B);
-        add_diag_block(ii0, A.trans_mul(PA));
+        add_block_diag(ii0, A.trans_mul(PA));
         add_block(ii1, ii0, B.trans_mul(PA));
         add_block(ii2, ii0, PA);
-        add_diag_block(ii1, B.trans_mul(PB));
+        add_block_diag(ii1, B.trans_mul(PB));
         add_block(ii2, ii1, PB);
-        add_diag_block(ii2, wP);
+        add_block_diag(ii2, wP);
     }
     else
     {
         // in this case, swap indices to address lower triangle
         const Matrix22 AtP = A.trans_mul(wP);
         const Matrix22 BtP = B.trans_mul(wP);
-        add_diag_block(ii2, wP);
+        add_block_diag(ii2, wP);
         add_block(ii0, ii2, AtP);
         add_block(ii1, ii2, BtP);
-        add_diag_block(ii0, AtP.mul(A));
+        add_block_diag(ii0, AtP.mul(A));
         add_block(ii1, ii0, BtP.mul(A));
-        add_diag_block(ii1, BtP.mul(B));
+        add_block_diag(ii1, BtP.mul(B));
     }
     
     if ( modulo )
@@ -2951,12 +2958,12 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     add_base(ii2, axi, wa);
     
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0,    -cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1,    -cc1, wT);
-    add_diag_block(ii2, wT);
+    add_block_diag(ii2, wT);
 
     if ( modulo )
     {
@@ -3017,9 +3024,9 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     Matrix33 bTwP = bR.trans_mul(wP);
     
     // fill the matrix mC
-    add_diag_block(ii0, aTwP*aR);
+    add_block_diag(ii0, aTwP*aR);
     add_block(ii1, ii0, bTwP*aR);
-    add_diag_block(ii1, bTwP*bR);
+    add_block_diag(ii1, bTwP*bR);
     if ( ii2 > ii0 )
     {
         sub_block(ii2, ii0, aTwP.transposed());
@@ -3030,7 +3037,7 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
         sub_block(ii0, ii2, aTwP);
         sub_block(ii1, ii2, bTwP);
     }
-    add_diag_block(ii2, wP);
+    add_block_diag(ii2, wP);
     
     if ( modulo )
     {
@@ -3097,12 +3104,12 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     sub_base(ii2, warm);
 
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0,    -cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1,    -cc1, wT);
-    add_diag_block(ii2, wT);
+    add_block_diag(ii2, wT);
 
     if ( modulo )
     {
@@ -3234,9 +3241,9 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     Matrix22 bTwP = bR.trans_mul(wP);
 
     // fill the matrix mC
-    add_diag_block(ii0, aTwP*aR);
+    add_block_diag(ii0, aTwP*aR);
     add_block(ii1, ii0, bTwP*aR);
-    add_diag_block(ii1, bTwP*bR);
+    add_block_diag(ii1, bTwP*bR);
     if ( ii2 > ii0 )
     {
         add_block(ii2, ii0, cc2, aTwP.transposed());
@@ -3251,9 +3258,9 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
         add_block(ii1, ii2, cc2, bTwP);
         add_block(ii1, ii3, cc3, bTwP);
     }
-    add_diag_block(ii2, cc2*cc2, wP);
+    add_block_diag(ii2, cc2*cc2, wP);
     add_block(ii3, ii2, cc3*cc2, wP);
-    add_diag_block(ii3, cc3*cc3, wP);
+    add_block_diag(ii3, cc3*cc3, wP);
 
     if ( modulo )
     {
@@ -3317,16 +3324,16 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     add_base(ii3, warm, cc3);
     
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0, cc2*cc0, wT);
     add_block(ii3, ii0, cc3*cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1, cc2*cc1, wT);
     add_block(ii3, ii1, cc3*cc1, wT);
-    add_diag_block(ii2, cc2*cc2, wT);
+    add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
-    add_diag_block(ii3, cc3*cc3, wT);
+    add_block_diag(ii3, cc3*cc3, wT);
     
     if ( modulo )
     {
@@ -3392,9 +3399,9 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     Matrix33 bTwP = bR.trans_mul(wP);
     
     // fill the matrix mC
-    add_diag_block(ii0, aTwP*aR);
+    add_block_diag(ii0, aTwP*aR);
     add_block(ii1, ii0, bTwP*aR);
-    add_diag_block(ii1, bTwP*bR);
+    add_block_diag(ii1, bTwP*bR);
     if ( ii2 > ii0 )
     {
         add_block(ii2, ii0, cc2, aTwP.transposed());
@@ -3409,9 +3416,9 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
         add_block(ii1, ii2, cc2, bTwP);
         add_block(ii1, ii3, cc3, bTwP);
     }
-    add_diag_block(ii2, cc2*cc2, wP);
+    add_block_diag(ii2, cc2*cc2, wP);
     add_block(ii3, ii2, cc3*cc2, wP);
-    add_diag_block(ii3, cc3*cc3, wP);
+    add_block_diag(ii3, cc3*cc3, wP);
     
     if ( modulo )
     {
@@ -3484,16 +3491,16 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     add_base(ii3, warm, cc3);
     
     // fill the matrix mC
-    add_diag_block(ii0, cc0*cc0, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block(ii2, ii0, cc2*cc0, wT);
     add_block(ii3, ii0, cc3*cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii2, ii1, cc2*cc1, wT);
     add_block(ii3, ii1, cc3*cc1, wT);
-    add_diag_block(ii2, cc2*cc2, wT);
+    add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
-    add_diag_block(ii3, cc3*cc3, wT);
+    add_block_diag(ii3, cc3*cc3, wT);
     
     if ( modulo )
     {
@@ -3695,7 +3702,7 @@ void Meca::addSphereClamp(Vector const& off,
         else
             wT = MatrixBlock::outerProduct(off/len, -weight);
         
-        add_diag_block(inx, wT);
+        add_block_diag(inx, wT);
         add_base(inx, wla*off-wT*center);
     }
 }
@@ -3732,9 +3739,9 @@ void Meca::addSphereClamp(Vector const& off,
         const real cc0 = ptA.coef0();
         const real cc1 = ptA.coef1();
 
-        add_diag_block(ii0, cc0*cc0, wT);
+        add_block_diag(ii0, cc0*cc0, wT);
         add_block(ii1, ii0, cc1*cc0, wT);
-        add_diag_block(ii1, cc1*cc1, wT);
+        add_block_diag(ii1, cc1*cc1, wT);
         
         Vector vec = wla*off-wT*center;
         add_base(ii0, vec, cc0);
@@ -3976,9 +3983,9 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     Matrix33 wbT = -weight * bR.transposed();
     
     // fill the matrix mC
-    add_diag_block(ii0, waT*aR); //this is diagonal
+    add_block_diag(ii0, waT*aR); //this is diagonal
     add_block(ii1, ii0, wbT*aR);
-    add_diag_block(ii1, wbT*bR); //this is diagonal
+    add_block_diag(ii1, wbT*bR); //this is diagonal
 
     if ( modulo )
         pos += modulo->offset( pos - ptA.pos() );
@@ -4066,7 +4073,7 @@ void Meca::addLineClamp(const Mecapoint & ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
-    add_diag_block(inx, wT);
+    add_block_diag(inx, wT);
     sub_base(inx, wT*pos);
 }
 
@@ -4100,8 +4107,8 @@ void Meca::addLineClamp(const Interpolation & ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
-    add_diag_block(ii0, cc0*cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii0, ii1, cc0*cc1, wT);
     
     //add the constant term:
@@ -4138,7 +4145,7 @@ void Meca::addPlaneClamp(const Mecapoint & ptA,
     mC(inx, inx) -= weight;
 #else
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);
-    add_diag_block(inx, wT);
+    add_block_diag(inx, wT);
 #endif
 }
 
@@ -4171,8 +4178,8 @@ void Meca::addPlaneClamp(const Interpolation & ptA,
     
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);
     
-    add_diag_block(ii0, cc0*cc0, wT);
-    add_diag_block(ii1, cc1*cc1, wT);
+    add_block_diag(ii0, cc0*cc0, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
     add_block(ii0, ii1, cc0*cc1, wT);
     
     //add the constant term:

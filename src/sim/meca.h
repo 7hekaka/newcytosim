@@ -180,6 +180,7 @@ public:
     /// base for force
     real&   base(index_t i) { return vBAS[i]; }
     
+private:
     /// position interpolated from two points in vPTS[]
     Vector  position2(const index_t inx[2], const real coef[2]) const;
 
@@ -205,13 +206,13 @@ public:
     void add_block(index_t i, index_t j, real alpha, MatrixBlock const& T);
 
     /// add block 'T' to mC at position (i, i)
-    void add_diag_block(index_t i, MatrixBlock const& T);
+    void add_block_diag(index_t i, MatrixBlock const& T);
     
     /// subtract block 'T' to mC at position (i, i)
-    void sub_diag_block(index_t i, MatrixBlock const& T);
+    void sub_block_diag(index_t i, MatrixBlock const& T);
     
     /// add block 'alpha*T' to mC at position (i, i)
-    void add_diag_block(index_t i, real alpha, MatrixBlock const& T);
+    void add_block_diag(index_t i, real alpha, MatrixBlock const& T);
 
     /// add value to mB at position (i, j)
     void add_iso(index_t i, index_t j, real val);
