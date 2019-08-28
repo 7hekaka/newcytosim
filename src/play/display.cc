@@ -861,7 +861,7 @@ void Display::drawFiberLines(Fiber const& fib) const
 }
 
 
-void Display::drawFiberLines(Fiber const& fib, unsigned i) const
+void Display::drawFiberLinesT(Fiber const& fib, unsigned i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     
@@ -1690,7 +1690,7 @@ void Display::zObject::draw(Display * disp) const
     switch( mec->tag() )
     {
         case Fiber::TAG:
-            disp->drawFiberLines(*static_cast<const Fiber*>(mec), point_.point());
+            disp->drawFiberLinesT(*static_cast<const Fiber*>(mec), point_.point());
         break;
             
         case Solid::TAG:
