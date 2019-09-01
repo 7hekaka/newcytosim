@@ -274,9 +274,9 @@ void MatrixSparseSymmetricBlock::scale(const real alpha)
 
 
 void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const unsigned ldd,
-                                                const index_t si,
-                                                const unsigned nb,
-                                                const unsigned dim) const
+                                                    const index_t si,
+                                                    const unsigned nb,
+                                                    const unsigned dim) const
 {
     if ( si % BLOCK_SIZE )  ABORT_NOW("index incompatible with matrix block size");
     if ( nb % BLOCK_SIZE )  ABORT_NOW("size incompatible with matrix block size");
@@ -550,7 +550,7 @@ void MatrixSparseSymmetricBlock::prepareForMultiply(int)
         
         // diagonal element should be first:
         assert_true( col.inx_[0] == jj );
-        col.blk_[0].copy_lower();
+        col.blk_[0].copy_half();
 #ifndef NDEBUG
         for ( unsigned n = 1 ; n < col.size_ ; ++n )
         {

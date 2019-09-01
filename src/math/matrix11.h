@@ -59,7 +59,7 @@ public:
     }
 
     /// copy values from lower triangle to upper triangle
-    void copy_lower()
+    void copy_half()
     {
     }
 
@@ -106,7 +106,7 @@ public:
     }
     
     /// output operator to std::ostream
-    std::ostream& operator << (std::ostream& os)
+    std::ostream& operator << (std::ostream& os) const
     {
         os << "[ " << value() << " ]";
         return os;
@@ -187,7 +187,7 @@ public:
     }
     
     /// maximum of all component's absolute values
-    real norm() const
+    real norm_inf() const
     {
         return fabs(val_);
     }

@@ -129,7 +129,7 @@ public:
     }
     
     /// maximum of the absolute value of all elements
-    real norm() const;
+    real norm_inf() const;
     
     /// printf debug function in sparse mode: i, j : value
     void printSparse(std::ostream&) const;

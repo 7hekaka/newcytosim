@@ -130,7 +130,7 @@ public:
     }
 
     /// copy values from lower triangle to upper triangle
-    void copy_lower()
+    void copy_half()
     {
         val[2] = val[1];
     }
@@ -178,7 +178,7 @@ public:
     }
     
     /// output matrix lines to std::ostream
-    std::ostream& operator << (std::ostream& os)
+    std::ostream& operator << (std::ostream& os) const
     {
         std::streamsize w = os.width();
         os << std::setw(2) << "[ ";
@@ -312,7 +312,7 @@ public:
     }
     
     /// maximum of all component's absolute values
-    real norm() const
+    real norm_inf() const
     {
         real a = std::max(fabs(val[0]), fabs(val[1]));
         real b = std::max(fabs(val[2]), fabs(val[3]));

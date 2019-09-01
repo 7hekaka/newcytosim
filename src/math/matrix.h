@@ -95,7 +95,7 @@ public:
     //----------------------------------------------------------------------
     
     /// maximum absolute value among all the elements
-    virtual real norm() const;
+    virtual real norm_inf() const;
     
     /// true if the matrix is non-zero
     virtual bool nonZero() const;

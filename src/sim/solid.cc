@@ -1097,7 +1097,7 @@ void Solid::makeProjection()
     soMomentum.symmetricInverse();
 
 #if ( 0 )
-    mat.copy_lower();
+    mat.copy_half();
     mat.inverse();
     real dif = ( mat - soMomentum ).norm();
     if ( dif > 0.01 )

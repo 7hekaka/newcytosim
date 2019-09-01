@@ -15,7 +15,7 @@ real Matrix::value(const index_t x, const index_t y) const
         return *v;
 }
 
-real Matrix::norm() const
+real Matrix::norm_inf() const
 {
     const index_t Z = size();
     real result = 0;

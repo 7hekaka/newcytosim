@@ -179,7 +179,7 @@ public:
     }
     
     /// output matrix lines to std::ostream
-    std::ostream& operator << (std::ostream& os)
+    std::ostream& operator << (std::ostream& os) const
     {
         std::streamsize w = os.width();
         os.width(1);
@@ -316,7 +316,7 @@ public:
     }
     
     /// maximum of all component's absolute values
-    real norm() const
+    real norm_inf() const
     {
         real res = fabs(val[0]);
         for ( unsigned i = 1; i < 3*BLD; ++i )
@@ -359,6 +359,7 @@ public:
     /** This methods uses a L*D*L^t factorization with:
      L = ( 1 0 0; a 1 0; b c 1 )
      D = ( u 0 0; 0 v 0; 0 0 w )
+     The result is a symetric matrix
      */
     int symmetricInverse()
     {
@@ -404,7 +405,7 @@ public:
     }
 
     /// copy values from lower triangle to upper triangle
-    void copy_lower()
+    void copy_half()
     {
         val[0+BLD  ] = val[1];
         val[0+BLD*2] = val[2];
