@@ -1,4 +1,4 @@
-function [sys, rhs] = cytosim_dump(path)
+function [sys, rhs, con] = cytosim_dump(path)
 
 % This is used to explore Cytosim's linear system in matlab
 % - load the matrices and vector from Cytosim's dump
@@ -20,25 +20,25 @@ if isfolder(path)
     cwd = pwd;
     cd(path);
     
-    ord = load('ord.txt');
+    dim = load('ord.txt');
     time_step = load('stp.txt');
     
-    obj = fread(fopen('obj.bin'), ord, 'double');    
-    drg = fread(fopen('drg.bin'), ord, 'double');
-    sys = fread(fopen('sys.bin'), [ord, ord], 'double');
-    ela = fread(fopen('ela.bin'), [ord, ord], 'double');  %elasticity matrix
-    mob = fread(fopen('mob.bin'), [ord, ord], 'double');  %projection matrix
-    con = fread(fopen('con.bin'), [ord, ord], 'double');  %preconditionner
-    pts = fread(fopen('pts.bin'), ord, 'double');
-    rhs = fread(fopen('rhs.bin'), ord, 'double');
-    sol = fread(fopen('sol.bin'), ord, 'double');
+    obj = fread(fopen('obj.bin'), dim, 'double');    
+    drg = fread(fopen('drg.bin'), dim, 'double');
+    sys = fread(fopen('sys.bin'), [dim, dim], 'double');
+    ela = fread(fopen('ela.bin'), [dim, dim], 'double');  %elasticity matrix
+    mob = fread(fopen('mob.bin'), [dim, dim], 'double');  %projection matrix
+    con = fread(fopen('con.bin'), [dim, dim], 'double');  %preconditionner
+    pts = fread(fopen('pts.bin'), dim, 'double');
+    rhs = fread(fopen('rhs.bin'), dim, 'double');
+    sol = fread(fopen('sol.bin'), dim, 'double');
     
     cd(cwd);
 else
     error(['cannot find dump directory ',path]);
 end
 
-    fprintf(1, 'loaded system of size %i with time_step %f\n', ord, time_step);
+    fprintf(1, 'loaded system of size %i with time_step %f\n', dim, time_step);
 
 %% Check matrix
 
@@ -48,13 +48,13 @@ end
 
 if ( 1 )
     
-    mat = eye(ord) - time_step * mob * ela;
+    mat = eye(dim) - time_step * mob * ela;
     err0 = max(max(abs(mat-sys)));
        
     nbo = 0;
     nbv = 0;
-    PRC = zeros(ord);
-    BLK = zeros(ord);
+    PRC = zeros(dim);
+    BLK = zeros(dim);
     for o = 0:max(max(obj))
         i = find(obj==o);
         if ~isempty(i)
@@ -90,7 +90,7 @@ end
 
 if ( 0 )
     figure('Position', [50 50 1000 1000]);
-    plot(reshape(mat,1,ord*ord), reshape(sys,1,ord*ord), '.')
+    plot(reshape(mat,1,dim*dim), reshape(sys,1,dim*dim), '.')
     xl = xlim;
     ylim(xl);
     xlabel('Reconstituted matrix');
@@ -106,18 +106,18 @@ if ( 0 )
     spy(mat)
     drawnow;
 end
+   
+tol = abstol / norm(rhs);
+
+maxit = dim;
+sss = sparse(sys);
 
 if 1 %% without preconditionning
-    
-    tol = abstol / norm(rhs);
-
-    maxit = ord;
-    sss = sparse(sys);
-    
+     
     % BCGS
     [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit);
     
-    if 1
+    if 0
         figure;
         plot(vec, sol, 'k.');
         xlabel('matlab solution');
@@ -126,38 +126,48 @@ if 1 %% without preconditionning
         ylim(xl);
         drawnow;
     end
-    report('BCGS', 2*itr, vec);
-    
+    report('BCGS', 2*itr, vec, rv0(end));
+
     figure;
     semilogy(rv0/rv0(1),'k', 'Linewidth', 2);
     xlabel('Mat*vec operations');
     ylabel('Relative residual');
     title('Solver Convergence');
     hold on;
-    
+        
+    % BiCGStab(L)
+    for i = 1:4
+        OPT.Tol = tol;
+        OPT.ell = min(2^i, dim);
+        OPT.MaxIt = maxit;
+        [vec,rv0,itr] = cgstab(sss, rhs, [], [], OPT);
+        semilogy(rv0(:,2), rv0(:,1)/rv0(1,1),'m', 'Linewidth', 1);
+        report(sprintf('BiCGS(%i)', OPT.ell), itr, vec, rv0(end,1));
+    end
+
     % GMRES
-    for i = 4:6
-        RS = 2^i;
+    for i = 2:6
+        RS = min(2^i, dim);
         [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol, maxit);
         semilogy(rv0/rv0(1),'g', 'Linewidth', 2);
-        report(sprintf('GMRES %03i', RS), itr(1)*RS+itr(2), vec);
+        report(sprintf('GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
     end
     
     % IDRS
     OPT.smoothing = 0;
     for i = 0:3
-        RS = 2^i;
+        RS = min(2^i, dim);
         [vec,flg,res,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, [], [], [], OPT);
         semilogy(rv0/rv0(1),'r', 'Linewidth', 2);
-        report(sprintf('IDRS %03i', RS), itr, vec);
+        report(sprintf('IDRS %03i', RS), itr, vec, rv0(end));
     end
 
     % IDRS-STAB
     for i = 0:3
-        RS = 2^i;
+        RS = min(2^i, dim);
         [vec,flg,res,itr,rv0] = IDRstabg5(sss, rhs, RS, tol, maxit, [], [], []);
         semilogy(rv0/rv0(1),'m', 'Linewidth', 2);
-        report(sprintf('IDRSTAB %03i', RS), itr, vec);
+        report(sprintf('IDRSTAB %03i', RS), itr, vec, rv0(end));
     end
 end
 
@@ -166,7 +176,7 @@ end
     fprintf(2, 'Mobility           has %i non-zero elements\n', nnz(mob));
     fprintf(2, 'Block conditionner has %i non-zero elements\n', nnz(con));
 
-    function y = mfun1(x)
+    function y = solve(x)
         y = con * x;
     end
 
@@ -178,10 +188,10 @@ end
         end
     end
 
-if 1 %% WITH PRECONDITIONNING
+if 0 %% WITH PRECONDITIONNING
 
-    [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit, @mfun1);
-    report('P BCGS', 2*itr, vec);
+    [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit, @solve);
+    report('P BCGS', 2*itr, vec, rv0(end));
 
     figure;
     semilogy(rv0/rv0(1),'k', 'Linewidth', 2);
@@ -189,30 +199,42 @@ if 1 %% WITH PRECONDITIONNING
     ylabel('Relative residual');
     title('Convergence with Preconditionning');
     hold on;
-
-    for i = 2:6
-        RS = 2^i;
-        [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol/2, maxit, [], @mfun1);
+    
+    if ( 0 )
+        % BiCGStab(L)
+        for i = 1:4
+            OPT.Tol = tol;
+            OPT.ell = min(2^i, dim);
+            OPT.MaxIt = maxit;
+            OPT.TypePrecond = 'right';
+            [vec,rv0,itr] = cgstab(sss, rhs, OPT, @solve);
+            semilogy(rv0(:,2), rv0(:,1)/rv0(1, 1),'m', 'Linewidth', 1);
+            report(sprintf('P BiCGS(%i)', OPT.ell), itr, vec, rv0(end));
+        end
+    end
+    
+    for i = 1:6
+        RS = min(2^i, dim);
+        [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol/3, maxit, [], @solve);
         semilogy(rv0/rv0(1),'g', 'Linewidth', 2);
-        report(sprintf('P GMRES %03i', RS), itr(1)*RS+itr(2), vec);
-    end    
+        report(sprintf('P GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
+    end
     
     % IDRS 
     OPT.smoothing = 1;
-
     for i = 0:3
-        RS = 2^i;
-        [vec,flg,res,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, @mfun1, [], [], OPT);
+        RS = min(2^i, dim);
+        [vec,flg,res,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, @solve, [], [], OPT);
         semilogy(rv0/rv0(1),'r-', 'Linewidth', 2);
-        report(sprintf('P IDRS %03i', RS), itr, vec);
-    end    
+        report(sprintf('P IDRS %03i', RS), itr, vec, rv0(end));
+    end
   
     % IDRS-STAB
     for i = 0:3
-        RS = 2^i;
-        [vec,flg,res,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/2, maxit, @mfun1, [], []);
+        RS = min(2^i, dim);
+        [vec,flg,res,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/3, maxit, @solve, [], []);
         semilogy(rv0/rv0(1),'m', 'Linewidth', 2);
-        report(sprintf('P IDRSTAB %03i', RS), itr, vec);
+        report(sprintf('P IDRSTAB %03i', RS), itr, vec, rv0(end));
     end
 
 end
@@ -225,20 +247,20 @@ if 0 %% check different preconditionners
 
     [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit, L, U);
     semilogy(rv0/rv0(1),'b--', 'Linewidth', 2);
-    report('i BCGS', 2*itr, vec);
+    report('i BCGS', 2*itr, vec, rv0(end));
 
-    for i = 2:6
-        RS = 2^i;
+    for i = 1:5
+        RS = min(2^i, dim);
         [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol, maxit, L, U);
         semilogy(rv0/rv0(1),'k--', 'Linewidth', 2);
-        report(sprintf('i GMRES %03i', RS), itr(1)*RS+itr(2), vec);
+        report(sprintf('i GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
     end
     
     for i = 1:3
-        RS = 2^i;
+        RS = min(2^i, dim);
         [vec,flg,res,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, L, U, [], OPT);
         semilogy(rv0/rv0(1),'r--', 'Linewidth', 2);
-        report(sprintf('i IDRS %03i', RS), itr, vec);
+        report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
     end
 
     
@@ -251,20 +273,21 @@ if 0 %% check different preconditionners
         M = (D+L)*diag(1./V)*(D+U);
         [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit, M);
         semilogy(rv0/rv0(1),'b--', 'Linewidth', 2);
-        fprintf(1, 'BCGS-SSOR     converged after %4i vecmuls %f\n', 2*itr, res);
-        
+        report('s BCGS', 2*itr, vec);
+
         for i = 2:7
-            RS = 2^i;
+            RS = min(2^i, dim);
             [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol, maxit, M);
             semilogy(rv0/rv0(1),'k--', 'Linewidth', 2);
-            fprintf(1, 'GMRES-SSOR %03i converged after %4i vecmuls %f\n', RS, (itr(1)-1)*RS+itr(2), res);
+            report(sprintf('s GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
         end
     end
   
  end
 
-    function report(s, i, v)
-        fprintf(1, '%-14s     converged after %4i vecmuls residual %f error %e\n', s, i, norm(sss*v-rhs), norm(v-sol));
+    function report(s, i, v, r)
+        tr = norm(sss*v-rhs);
+        fprintf(1, '%-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-sol));
     end
 
 end
