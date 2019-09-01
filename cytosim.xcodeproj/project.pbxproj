@@ -66,6 +66,8 @@
 		BB18BBC11DFD7C0E00567023 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB18BBC21DFD7DD900567023 /* test_simd.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */; };
 		BB18BBCF1DFD7E4A00567023 /* test_code.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */; };
+		BB19DA9E231BF792001488A5 /* matrix34.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19DA9C231BF792001488A5 /* matrix34.h */; };
+		BB19DA9F231BF792001488A5 /* matrix34.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB19DA9D231BF792001488A5 /* matrix34.cc */; };
 		BB19FEF612F352A400ACEA12 /* inventoried.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB19FEF212F352A400ACEA12 /* inventoried.cc */; };
 		BB19FEF712F352A400ACEA12 /* inventoried.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19FEF312F352A400ACEA12 /* inventoried.h */; };
 		BB19FEF812F352A400ACEA12 /* inventory.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB19FEF412F352A400ACEA12 /* inventory.cc */; };
@@ -1004,6 +1006,8 @@
 		BB1749A507D798E600BC7BDC /* lattice.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = lattice.h; path = src/sim/lattice.h; sourceTree = SOURCE_ROOT; };
 		BB18BBB71DFD78F600567023 /* test_simd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_simd; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB18BBC71DFD7E3400567023 /* test_code */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_code; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB19DA9C231BF792001488A5 /* matrix34.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix34.h; sourceTree = "<group>"; };
+		BB19DA9D231BF792001488A5 /* matrix34.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix34.cc; sourceTree = "<group>"; };
 		BB19DAA206964B9900093FA2 /* simul_solve.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = simul_solve.cc; path = src/sim/simul_solve.cc; sourceTree = SOURCE_ROOT; };
 		BB19FEF212F352A400ACEA12 /* inventoried.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inventoried.cc; sourceTree = "<group>"; };
 		BB19FEF312F352A400ACEA12 /* inventoried.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inventoried.h; sourceTree = "<group>"; };
@@ -1914,6 +1918,8 @@
 				BB089A082228A26D00C070E7 /* matrix22.cc */,
 				BB6D309720CA754B009C5C7C /* matrix33.h */,
 				BB089A092228A26D00C070E7 /* matrix33.cc */,
+				BB19DA9C231BF792001488A5 /* matrix34.h */,
+				BB19DA9D231BF792001488A5 /* matrix34.cc */,
 				BB89999320CECB5C00498F48 /* matrix44.h */,
 				BB73588505B98DA3006956D5 /* matrix.h */,
 				BB0E75E505E1440E00BC9B7A /* matrix.cc */,
@@ -3086,6 +3092,7 @@
 				BB71918B0EF1CD9900CED9E2 /* vector1.h in Headers */,
 				BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */,
 				BB6D309A20CABF96009C5C7C /* matrix11.h in Headers */,
+				BB19DA9E231BF792001488A5 /* matrix34.h in Headers */,
 				BB71918D0EF1CD9900CED9E2 /* vector3.h in Headers */,
 				BB7191960EF1CD9900CED9E2 /* vector.h in Headers */,
 				BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */,
@@ -3883,6 +3890,7 @@
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
+				BB19DA9F231BF792001488A5 /* matrix34.cc in Sources */,
 				BB61CA8416D6310100A0F6A5 /* linear_solvers.cc in Sources */,
 				BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */,
 				BB749D661793645D00B43298 /* polygon.cc in Sources */,
