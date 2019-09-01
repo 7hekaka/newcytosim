@@ -212,7 +212,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( int u = 0; u < 12 ++u )
+        for ( int u = 0; u < 12; ++u )
             val[u] *= alpha;
     }
 
@@ -641,7 +641,7 @@ public:
         store4(val  , add4(load4(val  ), load4(src  )));
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
-#else
+#elif ( 1 )
         for ( int u = 0; u < 12; ++u )
             val[u] += src[u];
 #else

@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#include "Matrix34.h"
+#include "matrix34.h"
 #include "vector2.h"
 #include "random.h"
 
@@ -116,7 +116,7 @@ Matrix34 Matrix34::rotationAroundAxisEuler(const real a[3])
     real ccccca1   = cc * cc * ca1,   ccscca1 = cc * sc * ca1;
     real cbccccca1 = cb * ccccca1;
     
-    Matrix33 res;
+    Matrix34 res;
     res(0,0) = cb * cbccccca1 + ca;
     res(0,1) = sb * cbccccca1 - sasc;
     res(0,2) = cb * ccscca1   + saccsb;

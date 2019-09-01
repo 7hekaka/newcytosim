@@ -308,7 +308,7 @@ void SpaceDynamicEllipse::step()
             real theta = prop->mobility_rot_dt * n;
             if ( theta > REAL_EPSILON )
             {
-                Matrix33 rot = Matrix33::rotationAroundAxis(Torques/n, cos(theta), sin(theta));
+                MatrixD rot = MatrixD::rotationAroundAxis(Torques/n, cos(theta), sin(theta));
                 mat = rot * mat;
             }
 #endif
