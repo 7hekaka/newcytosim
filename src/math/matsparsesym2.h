@@ -57,10 +57,10 @@ private:
    
 #if MATRIX2_OPTIMIZED_MULTIPLY
     
-    /// col_next_[ii] is the index of the first non-empty column of index >= ii
-    index_t * col_next_;
+    /// next_[ii] is the index of the first non-empty column of index >= ii
+    index_t * next_;
     
-    /// update col_next_[], a pointer to the next non-empty column
+    /// update next_[], a pointer to the next non-empty column
     void setNextColumn();
 
     ///array of index for the optmized multiplication

@@ -35,8 +35,8 @@ MatrixSparseSymmetric1::MatrixSparseSymmetric1()
     sa_        = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-    col_next_  = new index_t[1];
-    col_next_[0] = 0;
+    next_  = new index_t[1];
+    next_[0] = 0;
 #endif
 }
 
@@ -84,8 +84,8 @@ void MatrixSparseSymmetric1::allocate(size_t alc)
         }
         
 #if MATRIX1_USES_COLNEXT
-        delete[] col_next_;
-        col_next_ = new index_t[allocated_+1];
+        delete[] next_;
+        next_ = new index_t[allocated_+1];
 #endif
     }
 }
@@ -107,7 +107,7 @@ void MatrixSparseSymmetric1::deallocate()
         sa_ = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-        delete[] col_next_;  col_next_ = nullptr;
+        delete[] next_;  next_ = nullptr;
 #endif
     }
     allocated_ = 0;
@@ -457,7 +457,7 @@ void MatrixSparseSymmetric1::printColumns(std::ostream& os)
     {
         os << "\n   " << jj << "   " << col_size_[jj];
 #if MATRIX1_USES_COLNEXT
-        os << " " << col_next_[jj];
+        os << " " << next_[jj];
 #endif
     }
     std::endl(os);
@@ -633,7 +633,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y) const
 #if MATRIX1_USES_COLNEXT
 void MatrixSparseSymmetric1::setNextColumn()
 {
-    col_next_[size_] = size_;
+    next_[size_] = size_;
 
     if ( size_ > 0 )
     {
@@ -643,12 +643,12 @@ void MatrixSparseSymmetric1::setNextColumn()
         {
             if ( col_size_[inx] > 0 )
                 nxt = inx;
-            col_next_[inx] = nxt;
+            next_[inx] = nxt;
         }
         if ( col_size_[0] > 0 )
-            col_next_[0] = 0;
+            next_[0] = 0;
         else
-            col_next_[0] = nxt;
+            next_[0] = nxt;
     }
 }
 #endif
@@ -1041,7 +1041,7 @@ void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, index_t start, in
     assert_true( end <= size_ );
 
 #if MATRIX1_USES_COLNEXT
-    for ( index_t jj = col_next_[start]; jj < end; jj = col_next_[jj+1] )
+    for ( index_t jj = next_[start]; jj < end; jj = next_[jj+1] )
 #else
     for ( index_t jj = start; jj < end; ++jj )
 #endif
@@ -1057,7 +1057,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t star
     assert_true( end <= size_ );
 
 #if MATRIX1_USES_COLNEXT
-    for ( index_t jj = col_next_[start]; jj < end; jj = col_next_[jj+1] )
+    for ( index_t jj = next_[start]; jj < end; jj = next_[jj+1] )
 #else
     for ( index_t jj = start; jj < end; ++jj )
 #endif
@@ -1079,7 +1079,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t star
     assert_true( end <= size_ );
 
 #if MATRIX1_USES_COLNEXT
-    for ( index_t jj = col_next_[start]; jj < end; jj = col_next_[jj+1] )
+    for ( index_t jj = next_[start]; jj < end; jj = next_[jj+1] )
 #else
     for ( index_t jj = start; jj < end; ++jj )
 #endif
