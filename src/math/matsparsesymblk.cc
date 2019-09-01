@@ -377,14 +377,13 @@ size_t MatrixSparseSymmetricBlock::nbElements(index_t start, index_t end) const
 
 std::string MatrixSparseSymmetricBlock::what() const
 {
-    int nbe = SquareBlock::dimension() * SquareBlock::stride();
     std::ostringstream msg;
 #if MATRIXSSB_USES_AVX
-    msg << "MSSBx (" << nbe << "*" << nbElements() << ")";
+    msg << "MSSBx (" << SquareBlock::what() << "*" << nbElements() << ")";
 #elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "MSSBe (" << nbe << "*" << nbElements() << ")";
+    msg << "MSSBe (" << SquareBlock::what() << "*" << nbElements() << ")";
 #else
-    msg << "MSSB (" << nbe << "*" << nbElements() << ")";
+    msg << "MSSB (" << SquareBlock::what() << "*" << nbElements() << ")";
 #endif
     return msg.str();
 }

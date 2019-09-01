@@ -20,6 +20,12 @@
 /// 4x4 matrix class with 16 'real' elements
 class alignas(32) Matrix44
 {
+    /// access to modifiable element by index
+    real& operator[](int i)       { return val[i]; }
+    
+    /// access element value by index
+    real  operator[](int i) const { return val[i]; }
+
 public:
 
     /// values of the elements
@@ -80,12 +86,9 @@ public:
     }
 
     ~Matrix44() {}
-    
-    /// dimensionality
-    static int dimension() { return 4; }
-    
-    /// leading dimension
-    static int stride() { return 4; }
+
+    /// human-readible identifier
+    static std::string what() { return "4*4"; }
 
     /// set all elements to zero
     void reset()
@@ -107,12 +110,8 @@ public:
     operator real const*() const { return val; }
 
     /// conversion to array of 'real'
-    real* data()             { return val; }
+    //real* data()             { return val; }
     real* addr(int i, int j) { return val + ( i + 4*j ); }
-
-    /// access operator to elements by index
-    real& operator[](int i)       { return val[i]; }
-    real  operator[](int i) const { return val[i]; }
 
     /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val[i+4*j]; }
@@ -151,6 +150,34 @@ public:
         fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n",  val[0x3], val[0x7], val[0xB], val[0xF]);
     }
     
+    /// output matrix lines to std::ostream
+    std::ostream& operator << (std::ostream& os)
+    {
+        std::streamsize w = os.width();
+        os.width(1);
+        os << "[";
+        for ( int i = 0; i < 4; ++i )
+        {
+            for ( int j = 0; j < 4; ++j )
+                os << " " << std::fixed << std::setw(w) << (*this)(i,j);
+            if ( i < 2 )
+                os << ";";
+            else
+                os << " ]";
+        }
+        os.width(w);
+        return os;
+    }
+
+    /// conversion to string
+    std::string to_string(int w, int p) const
+    {
+        std::ostringstream os;
+        os.precision(p);
+        os << *this;
+        return os.str();
+    }
+
     /// scale all elements
     void scale(const real alpha)
     {
@@ -656,25 +683,6 @@ public:
     }
 };
 
-
-/// output matrix lines to std::ostream
-inline std::ostream& operator << (std::ostream& os, Matrix44 const& M)
-{
-    std::streamsize w = os.width();
-    os.width(1);
-    os << "[";
-    for ( int i = 0; i < 4; ++i )
-    {
-        for ( int j = 0; j < 4; ++j )
-            os << " " << std::fixed << std::setw(w) << M(i,j);
-        if ( i < 2 )
-            os << ";";
-        else
-            os << " ]";
-    }
-    os.width(w);
-    return os;
-}
 
 #endif
 

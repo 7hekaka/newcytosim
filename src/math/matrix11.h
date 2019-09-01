@@ -15,9 +15,17 @@
  */
 class Matrix11
 {
-public:
-
+private:
+    
     real val_;
+    
+    /// access to modifiable element by index
+    real& operator[](int i)       { return val_; }
+    
+    /// access element value by index
+    real  operator[](int i) const { return val_; }
+
+public:
     
     Matrix11() {}
     
@@ -34,13 +42,10 @@ public:
     }
 
     ~Matrix11() {}
-    
-    /// dimensionality
-    static int dimension() { return 1; }
-    
-    /// leading dimension
-    static int stride() { return 1; }
 
+    /// human-readible identifier
+    static std::string what() { return "1"; }
+    
     /// set all elements to zero
     void reset()
     {
@@ -65,10 +70,6 @@ public:
     /// conversion to array of 'real'
     real* data()             { return &val_; }
     real* addr(int i, int j) { return &val_; }
-
-    /// access functions to element by index
-    real& operator[](int i)       { return val_; }
-    real  operator[](int i) const { return val_; }
     
     /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val_; }
@@ -104,12 +105,19 @@ public:
         fprintf(f, "[ %9.3f ]\n", val_);
     }
     
+    /// output operator to std::ostream
+    std::ostream& operator << (std::ostream& os)
+    {
+        os << "[ " << value() << " ]";
+        return os;
+    }
+
     /// conversion to string
     std::string to_string(int w, int p) const
     {
-        std::ostringstream os("[ ");
+        std::ostringstream os;
         os.precision(p);
-        os << std::setw(w) << std::fixed << val_ << " ]";
+        os << "[ " << value() << " ]";
         return os.str();
     }
 
@@ -353,14 +361,6 @@ public:
     static Matrix11 randomRotation();
 
 };
-
-
-/// output operator to std::ostream
-inline std::ostream& operator << (std::ostream& os, Matrix11 const& M)
-{
-    os << "[ " << M.value() << " ]";
-    return os;
-}
 
 #endif
 

@@ -386,17 +386,18 @@ void SpaceDynamicEllipse::read(Inputter& in, Simul& sim, ObjectTag tag)
     prop->volume = vol;
     // read 3x3 orientation matrix:
 #if ( DIM > 2 )
-    for ( unsigned i = 0; i < 9; ++i )
-        mat[i] = in.readFloat();
+    for ( unsigned j = 0; j < 3; ++j )
+    for ( unsigned i = 0; i < 3; ++i )
+        mat(i,j) = in.readFloat();
 #else
     real m[9] = { 0 };
     for ( unsigned i = 0; i < 9; ++i )
         m[i] = in.readFloat();
 #if ( DIM == 2 )
-    mat[0] = m[0];
-    mat[1] = m[1];
-    mat[2] = m[3];
-    mat[3] = m[4];
+    mat(0,0) = m[0];
+    mat(1,0) = m[1];
+    mat(0,1) = m[3];
+    mat(1,1) = m[4];
 #endif
 #endif
 }
@@ -408,15 +409,17 @@ void SpaceDynamicEllipse::write(Outputter& out) const
     out.writeUInt16(10);
     out.writeFloat(prop->volume);
 #if ( DIM > 2 )
-    for ( unsigned i = 0; i < 9; ++i )
-        out.writeFloat(mat[i]);
+    // write matrix in column-major format
+    for ( unsigned j = 0; j < 3; ++j )
+    for ( unsigned i = 0; i < 3; ++i )
+        out.writeFloat(mat(i,j));
 #else
     real m[9] = { 0 };
 #if ( DIM == 2 )
-    m[0] = mat[0];
-    m[1] = mat[1];
-    m[3] = mat[2];
-    m[4] = mat[3];
+    m[0] = mat(0,0);
+    m[1] = mat(1,0);
+    m[3] = mat(0,1);
+    m[4] = mat(1,1);
 #endif
     for ( unsigned i = 0; i < 9; ++i )
         out.writeFloat(m[i]);

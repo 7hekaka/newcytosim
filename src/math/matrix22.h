@@ -23,14 +23,22 @@
 /// 2x2 matrix class with 4 'real' elements
 class alignas(32) Matrix22
 {
-public:
-
+private:
+        
     union {
         real val[4];
 #if MATRIX22_USES_AVX
         vec4 mat;
 #endif
     };
+
+    /// access to modifiable element by index
+    real& operator[](int i)       { return val[i]; }
+    
+    /// access element value by index
+    real  operator[](int i) const { return val[i]; }
+
+public:
     
     Matrix22() {}
     
@@ -98,11 +106,8 @@ public:
     /// destructor
     ~Matrix22() {}
     
-    /// dimensionality
-    static int dimension() { return 2; }
-    
-    /// leading dimension
-    static int stride() { return 2; }
+    /// human-readible identifier
+    static std::string what() { return "2*2"; }
 
     /// set all elements to zero
     void reset()
@@ -134,12 +139,8 @@ public:
     operator real const*() const { return val; }
 
     /// conversion to array of 'real'
-    real* data()             { return val; }
+    //real* data()             { return val; }
     real* addr(int i, int j) { return val + ( i + 2*j ); }
-
-    /// access operator to elements by index
-    real& operator[](int i)       { return val[i]; }
-    real  operator[](int i) const { return val[i]; }
     
     /// access functions to element by line and column indices
     real& operator()(int i, int j)       { return val[i+2*j]; }
@@ -176,15 +177,24 @@ public:
         fprintf(f, "\\ %9.3f %9.3f /\n", val[1], val[3]);
     }
     
+    /// output matrix lines to std::ostream
+    std::ostream& operator << (std::ostream& os)
+    {
+        std::streamsize w = os.width();
+        os << std::setw(2) << "[ ";
+        os << std::setw(w) << (*this)(0,0) << " ";
+        os << std::setw(w) << (*this)(0,1) << "; ";
+        os << std::setw(w) << (*this)(1,0) << " ";
+        os << std::setw(w) << (*this)(1,1) << " ]";
+        return os;
+    }
+
     /// conversion to string
     std::string to_string(int w, int p) const
     {
-        std::ostringstream os("[ ");
+        std::ostringstream os;
         os.precision(p);
-        os << std::setw(w) << std::fixed << val[0] << " ";
-        os << std::setw(w) << std::fixed << val[2] << " | ";
-        os << std::setw(w) << std::fixed << val[1] << " ";
-        os << std::setw(w) << std::fixed << val[3] << " ]";
+        os << *this;
         return os.str();
     }
 
@@ -777,19 +787,6 @@ public:
     static Matrix22 randomRotation();
 
 };
-
-
-/// output matrix lines to std::ostream
-inline std::ostream& operator << (std::ostream& os, Matrix22 const& M)
-{
-    std::streamsize w = os.width();
-    os << std::setw(2) << "[ ";
-    os << std::setw(w) << M[0] << " ";
-    os << std::setw(w) << M[2] << "; ";
-    os << std::setw(w) << M[1] << " ";
-    os << std::setw(w) << M[3] << " ]";
-    return os;
-}
 
 #endif
 

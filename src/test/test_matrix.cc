@@ -439,7 +439,7 @@ void testMatrixBlock(const int size, const int fill)
     }
     if ( 0 )
     {
-        printf("\ntest_matrix BLOCK_SIZE %i  (BLD %i)\n", SquareBlock::dimension(), SquareBlock::stride());
+        printf("\ntest_matrix BLOCK_SIZE %i (%s)\n", SquareBlock::msg());
         size_t siz = DIM;
         for ( int i = 0; i < 14; ++i )
         {
