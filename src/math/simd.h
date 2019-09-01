@@ -29,13 +29,17 @@ inline void print(vec2 v, vec2 w, char const* s)
 }
 
 /*
-inline void print(__m128i v, char const* s)
+inline void print8(__m128i v, char const* s)
 {
-    int a = _mm_extract_epi32(v, 0);
-    int b = _mm_extract_epi32(v, 1);
-    int c = _mm_extract_epi32(v, 2);
-    int d = _mm_extract_epi32(v, 3);
-    printf("veci %s ( %8i %8i %8i %8i )\n", s, d, c, b, a);
+    uint16_t a = _mm_extract_epi16(v, 0);
+    uint16_t b = _mm_extract_epi16(v, 1);
+    uint16_t c = _mm_extract_epi16(v, 2);
+    uint16_t d = _mm_extract_epi16(v, 3);
+    uint16_t e = _mm_extract_epi16(v, 5);
+    uint16_t f = _mm_extract_epi16(v, 6);
+    uint16_t g = _mm_extract_epi16(v, 7);
+    uint16_t h = _mm_extract_epi16(v, 8);
+    printf("veci %s ( %3i %3i %3i %3i %3i %3i %3i %3i )\n", s, h, g, f, e, d, c, b, a);
 }
 */
 
@@ -160,6 +164,17 @@ inline void print(vec4 v, vec4 w, char const* s)
     printf("vec4 %s ( %5.2f %5.2f %5.2f %5.2f )( %5.2f %5.2f %5.2f %5.2f )\n",
            s, v[3], v[2], v[1], v[0], w[3], w[2], w[1], w[0]);
 }
+
+/*
+inline void print4(__m128i v, char const* s)
+{
+    uint32_t a = _mm_extract_epi32(v, 0);
+    uint32_t b = _mm_extract_epi32(v, 1);
+    uint32_t c = _mm_extract_epi32(v, 2);
+    uint32_t d = _mm_extract_epi32(v, 3);
+    printf("veci %s ( %5i %5i %5i %5i )\n", s, d, c, b, a);
+}
+*/
 
 #define set64x(a,b,c,d)     _mm256_setr_epi64x(a,b,c,d)
 
