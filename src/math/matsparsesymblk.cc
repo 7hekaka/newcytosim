@@ -19,7 +19,7 @@ MatrixSparseSymmetricBlock::MatrixSparseSymmetricBlock()
     allocated_ = 0;
     column_    = nullptr;
     
-    next_  = new index_t[1];
+    next_ = new index_t[1];
     next_[0] = 0;
 }
 
@@ -40,7 +40,7 @@ void MatrixSparseSymmetricBlock::allocate(size_t alc)
        
         if ( column_ )
         {
-            for (size_t  n = 0; n < allocated_; ++n )
+            for (size_t n = 0; n < allocated_; ++n )
                 col_new[n] = column_[n];
             delete[] column_;
         }

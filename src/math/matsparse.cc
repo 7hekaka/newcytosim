@@ -60,7 +60,7 @@ void MatrixSparse::deallocate()
 {
     if ( mxCol )
     {
-        for ( size_t  ii = 0; ii < allocated_; ++ii )
+        for ( size_t ii = 0; ii < allocated_; ++ii )
             if ( mxCol[ii] )
             {
                 delete[] mxCol[ii];
