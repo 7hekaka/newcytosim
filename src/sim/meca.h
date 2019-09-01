@@ -10,6 +10,7 @@
 //#include "matsparse.h"
 #include "matsparsesym1.h"
 #include "matsparsesymblk.h"
+//#include "matsparseblk.h"
 #include "allocator.h"
 
 
@@ -173,13 +174,7 @@ private:
      arising from interactions which link coordinates from different subspaces.
     */
     MatrixSparseSymmetricBlock  mC;
-    
-    /// base for force
-    real*   base()             { return vBAS; }
 
-    /// base for force
-    real&   base(index_t i) { return vBAS[i]; }
-    
 private:
     
     /// position interpolated from two points in vPTS[]
@@ -355,13 +350,13 @@ public:
     /// Add a torque on 3 points with equilibrium angle defined by (sinus, cosinus), add LongLink on two points
     void addTorqueLong(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
 
-    /// Link of stiffness `weight` from fixed position `g`
+    /// Link of stiffness `weight` from fixed position
     void addPointClamp(Mecapoint const&, Vector, real weight);
     
-    /// Link of stiffness `weight` from fixed position `g`
+    /// Link of stiffness `weight` from fixed position
     void addPointClamp(Interpolation const&, Vector, real weight);
     
-    /// Link of stiffness `weight` from fixed position `g`, in the XY plane
+    /// Link of stiffness `weight` from fixed position, in the XY plane
     void addPointClampXY(Mecapoint const&, Vector, real weight);
 
     /// A Hookean force linking all vertices to `cen`
@@ -392,23 +387,23 @@ public:
     /// Link of stiffness `weight` and resting length `len`, on the side of first segment
     void addSidePointClamp3D(Interpolation const&, Vector, Vector const& arm, real weight);
 #endif
-    /// Link of stiffness `weight` with fixed position `g`, on the side of the segment
-    void addSidePointClamp(Interpolation const&, Vector const&, real len, real weight);
+    /// Link of stiffness `weight` with fixed position `pos`, on the side of the segment
+    void addSidePointClamp(Interpolation const&, Vector const& pos, real len, real weight);
     
-    /// Link of stiffness `weight` with a line defined by `g` and its tangent `dir`
-    void addLineClamp(Mecapoint const&, Vector const& g, Vector const& dir, real weight);
+    /// Link of stiffness `weight` with a line defined by `pos` and its tangent `dir`
+    void addLineClamp(Mecapoint const&, Vector const& pos, Vector const& dir, real weight);
     
-    /// Link of stiffness `weight` with a line defined by `g` and its tangent `dir`
-    void addLineClamp(Interpolation const&, Vector const& g, Vector const& dir, real weight);
+    /// Link of stiffness `weight` with a line defined by `pos` and its tangent `dir`
+    void addLineClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
     
     /// Link of stiffness `weight` to a line that is X if axi=0, Y if axi=1, Z if axi=2
     void addLineClampX(Mecapoint const&, index_t axi, real, real weight);
 
-    /// Link of stiffness `weight` with a plane defined by `g` and its normal `dir`
-    void addPlaneClamp(Mecapoint const&, Vector const& g, Vector const& dir, real weight);
+    /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`
+    void addPlaneClamp(Mecapoint const&, Vector const& pos, Vector const& dir, real weight);
     
-    /// Link of stiffness `weight` with a plane defined by `g` and its normal `dir`
-    void addPlaneClamp(Interpolation const&, Vector const& g, Vector const& dir, real weight);
+    /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`
+    void addPlaneClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
 
     //------------ ZERO-RESTING LENGTH ELEMENTS LINKING POINTS -----------------
     

@@ -847,30 +847,13 @@ void Fiber::setInteractions(Meca & meca) const
         // squeezing force in the YZ-plane:
         const real f = prop->squeeze_force;
         const real r = prop->squeeze_range;
-        for ( unsigned pp = 0; pp < nPoints; ++pp )
+        for ( unsigned p = 0; p < nPoints; ++p )
         {
-#if ( DIM == 2 )
-            unsigned ii = DIM * ( matIndex() + pp ) + 1;
-            real p = posP(pp).YY;
-            if ( fabs(p) > r )
-                meca.base(ii) -= std::copysign(f, p);
-            else
-                meca.mC(ii, ii) -= f / r;
-#elif ( DIM == 3 )
-            unsigned jj = DIM * ( matIndex() + pp );
             Vector p = posP(pp);
-            if ( p.norm() < r )
-            {
-                meca.mC(jj+1, jj+1) -= f / r;
-                meca.mC(jj+2, jj+2) -= f / r;
-            }
+            if ( p.normYZ() < r )
+                meca.addLineClamp(Mecapoint(this, p), Vector(p.XX, 0, 0), Vector(1,0,0), f/r);
             else
-            {
-                Vector n = p.normalized(f);
-                meca.base(jj+1) -= n.YY;
-                meca.base(jj+2) -= n.ZZ;
-            }
-#endif
+                meca.addForce(Mecapoint(this, p), f);
         }
     }
 #endif

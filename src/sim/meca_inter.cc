@@ -81,21 +81,17 @@ void PRINT_BLOCK(index_t i, index_t j, MatrixBlock const& T)
     std::cerr << std::setw(2) << i << " " << j << " " << std::setw(10) << T << '\n';
 }
 
-//index_t oldi=0, oldj=0;
-
 // add alpha * T to mC.
 inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
 {
 #if 0
     if ( j > i )
         printf("+off-side %i %i\n", i, j);
-    if ( i == oldi && j == oldj )
-        printf("+duplicate %i %i\n", i, j);
-    oldi = i; oldj = j;
 #endif
 #if ( DIM == 1 )
     mB(i,j) += T.value();
 #elif USE_MATRIX_BLOCK
+    assert_true( i > j );
     mC.block(i, j).add_full(T);
     //PRINT_BLOCK(i,j,T);
 #else
@@ -112,13 +108,11 @@ inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const&
 #if 0
     if ( j > i )
         printf(" off-side %i %i\n", i, j);
-    if ( i == oldi && j == oldj )
-        printf(" duplicate %i %i\n", i, j);
-    oldi = i; oldj = j;
 #endif
 #if ( DIM == 1 )
     mB(i,j) += alpha * T.value();
 #elif USE_MATRIX_BLOCK
+    assert_true( i > j );
     mC.block(i, j).add_full(alpha, T);
     //PRINT_BLOCK(i,j,alpha*T);
 #else
@@ -135,13 +129,11 @@ inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 #if 0
     if ( j > i )
         printf("-off-side %i %i\n", i, j);
-    if ( i == oldi && j == oldj )
-        printf("-duplicate %i %i\n", i, j);
-    oldi = i; oldj = j;
 #endif
 #if ( DIM == 1 )
     mB(i,j) -= T.value();
 #elif USE_MATRIX_BLOCK
+    assert_true( i > j );
     mC.block(i, j).sub_full(T);
     //PRINT_BLOCK(i,j,-T);
 #else
@@ -158,6 +150,7 @@ inline void Meca::add_block_diag(index_t i, MatrixBlock const& T)
 #if ( DIM == 1 )
     mB(i,i) += T.value();
 #elif USE_MATRIX_BLOCK
+    assert_small(T.asymmetry());
     mC.diag_block(i).add_half(T);
     //PRINT_BLOCK(i,i,T);
 #else
@@ -174,6 +167,7 @@ inline void Meca::add_block_diag(index_t i, real alpha, MatrixBlock const& T)
 #if ( DIM == 1 )
     mB(i,i) += alpha * T.value();
 #elif USE_MATRIX_BLOCK
+    assert_small(T.asymmetry());
     mC.diag_block(i).add_half(alpha, T);
     //PRINT_BLOCK(i,i,alpha*T);
 #else
@@ -190,6 +184,7 @@ inline void Meca::sub_block_diag(index_t i, MatrixBlock const& T)
 #if ( DIM == 1 )
     mB(i,i) -= T.value();
 #elif USE_MATRIX_BLOCK
+    assert_small(T.asymmetry());
     mC.diag_block(i).sub_half(T);
     //PRINT_BLOCK(i,i,-T);
 #else
@@ -667,13 +662,13 @@ void Meca::addTorque(const Interpolation & pt1,
 
 #if ( DIM == 3 )
     Vector axis = normalize(cross(AB,CD));
-    const Matrix33 R = Matrix33::rotationAroundAxis(axis, cosinus, sinus);
-    //const Matrix33 T = R.transposed();
-    const Matrix33 Id(0,1);  // identity matrix
+    const MatrixBlock R = MatrixBlock::rotationAroundAxis(axis, cosinus, sinus);
+    //const MatrixBlock T = R.transposed();
+    const MatrixBlock Id(0,1);  // identity matrix
 #else
-    const Matrix22 R(cosinus, sinus, -sinus, cosinus);
+    const MatrixBlock R(cosinus, sinus, -sinus, cosinus);
     //const Matrix22 T(cosinus, -sinus, sinus, cosinus);
-    const Matrix22 Id(0,1);  // identity matrix
+    const MatrixBlock Id(0,1);  // identity matrix
 #endif
 
     Vector Ru = R.vecmul(u);
@@ -840,11 +835,11 @@ void Meca::addTorque(const Interpolation & pt1,
 MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, real cosinus, real sinus)
 {
 #if ( DIM == 3 )
-    return -weight * Matrix33::rotationAroundAxis(axi, cosinus, sinus);
+    return -weight * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
 #elif ( DIM == 2 )
-    return -weight * Matrix22(cosinus, axi*sinus, -axi*sinus, cosinus);
+    return -weight * MatrixBlock(cosinus, axi*sinus, -axi*sinus, cosinus);
 #else
-    return Matrix11(-weight);  //should not be used!
+    return MatrixBlock(-weight);  //should not be used!
 #endif
 }
 
@@ -871,7 +866,7 @@ void Meca::addTorque(const Mecapoint & ptA,
     Vector3 axi = normalize(cross(AB, BC));
     if ( axi != axi )
         return;
-    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axi, cosinus, sinus);
+    const MatrixBlock R = -weight * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
 #elif ( DIM == 2 )
     const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
@@ -940,15 +935,15 @@ void Meca::addTorquePlane(const Mecapoint & ptA,
     if ( axi != axi )
         return;
      */
-    const Matrix33 X = Matrix33::outerProduct(axi);
-    const Matrix33 R = Matrix33::rotationAroundAxis(axi, cosinus, sinus) - X;
-    const Matrix33 P = MatrixBlock(0,1) - X;
+    const MatrixBlock X = MatrixBlock::outerProduct(axi);
+    const MatrixBlock R = MatrixBlock::rotationAroundAxis(axi, cosinus, sinus) - X;
+    const MatrixBlock P = MatrixBlock(0,1) - X;
 #elif ( DIM == 2 )
-    const Matrix22 R = Matrix22(cosinus, sinus,-sinus, cosinus);
-    const Matrix22 P(0,1);
+    const MatrixBlock R = MatrixBlock(cosinus, sinus,-sinus, cosinus);
+    const MatrixBlock P(0,1);
 #else
-    const Matrix11 R(1.0);  //should not be used!
-    const Matrix11 P(0,1);
+    const MatrixBlock R(1.0);  //should not be used!
+    const MatrixBlock P(0,1);
 #endif
     
     // indices in matrix mC:
@@ -1002,7 +997,7 @@ void Meca::addTorqueLong(const Mecapoint & ptA,
     Vector3 axi = normalize(cross(AB, BC));
     if ( axi != axi )
         return;
-    const Matrix33 R = -weight * Matrix33::rotationAroundAxis(axi, cosinus, sinus);
+    const MatrixBlock R = -weight * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
 #elif ( DIM == 2 )
     const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
 #else
@@ -2172,8 +2167,8 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
 
-    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
 
 #if 0
     std::cerr.precision(3);
@@ -2183,8 +2178,8 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     std::cerr << "C: " << std::setw(9) << ptB.pos() << std::endl;
 #endif
     
-    Matrix33 waT = -weight * aR.transposed();
-    Matrix33 wbT = -weight * bR.transposed();
+    MatrixBlock waT = -weight * aR.transposed();
+    MatrixBlock wbT = -weight * bR.transposed();
     
     // fill the matrix mC
     add_block_diag(ii0, waT*aR); //this is diagonal
@@ -2200,7 +2195,7 @@ void Meca::addSideLink3D(const Interpolation & ptA,
         sub_block(ii2, ii0, waT);
         sub_block(ii2, ii1, wbT);
     }
-    add_block_diag(ii2, Matrix33(0, -weight));
+    add_block_diag(ii2, MatrixBlock(0, -weight));
     
     if ( modulo )
     {
@@ -2371,14 +2366,14 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
     
-    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
     
     const real wcc2 = -weight * cc2;
     const real wcc3 = -weight * cc3;
 
-    Matrix33 waT = -weight * aR.transposed();
-    Matrix33 wbT = -weight * bR.transposed();
+    MatrixBlock waT = -weight * aR.transposed();
+    MatrixBlock wbT = -weight * bR.transposed();
     
     // fill the matrix mC
     add_block_diag(ii0, waT*aR);  //this is diagonal
@@ -2398,9 +2393,9 @@ void Meca::addSideLink3D(const Interpolation & ptA,
         add_block(ii1, ii2, cc2, wbT);
         add_block(ii1, ii3, cc3, wbT);
     }
-    add_block_diag(ii2, Matrix33(0, wcc2*cc2));
-    add_block(ii3, ii2, Matrix33(0, wcc3*cc2));
-    add_block_diag(ii3, Matrix33(0, wcc3*cc3));
+    add_block_diag(ii2, MatrixBlock(0, wcc2*cc2));
+    add_block(ii3, ii2, MatrixBlock(0, wcc3*cc2));
+    add_block_diag(ii3, MatrixBlock(0, wcc3*cc3));
     
     if ( modulo )
     {
@@ -3028,14 +3023,14 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
     
-    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
     
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
-    Matrix33 wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
+    MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
     
-    Matrix33 aTwP = aR.trans_mul(wP);
-    Matrix33 bTwP = bR.trans_mul(wP);
+    MatrixBlock aTwP = aR.trans_mul(wP);
+    MatrixBlock bTwP = bR.trans_mul(wP);
     
     // fill the matrix mC
     add_block_diag(ii0, aTwP*aR);
@@ -3107,7 +3102,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
      */
     
     Vector3 warm = -weight * arm;
-    Matrix33 wT = Matrix33::outerProduct(arm, -weight/arm.normSqr());
+    MatrixBlock wT = MatrixBlock::outerProduct(arm, -weight/arm.normSqr());
     
     // coefficients:
     const real cc0 = ptA.coef0();
@@ -3403,14 +3398,14 @@ void Meca::addSideSlidingLink3D(const Interpolation & ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
     
-    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
     
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
-    Matrix33 wP = Matrix33::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
+    MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
 
-    Matrix33 aTwP = aR.trans_mul(wP);
-    Matrix33 bTwP = bR.trans_mul(wP);
+    MatrixBlock aTwP = aR.trans_mul(wP);
+    MatrixBlock bTwP = bR.trans_mul(wP);
     
     // fill the matrix mC
     add_block_diag(ii0, aTwP*aR);
@@ -3497,7 +3492,7 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     const real cc3 = -ptB.coef1();
    
     Vector3 warm = -weight * arm;
-    Matrix33 wT = Matrix33::outerProduct(arm, -weight/arm.normSqr());
+    MatrixBlock wT = MatrixBlock::outerProduct(arm, -weight/arm.normSqr());
 
     add_base(ii0, warm, cc0);
     add_base(ii1, warm, cc1);
@@ -4021,11 +4016,11 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
     
-    Matrix33 aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    Matrix33 bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
+    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
     
-    Matrix33 waT = -weight * aR.transposed();
-    Matrix33 wbT = -weight * bR.transposed();
+    MatrixBlock waT = -weight * aR.transposed();
+    MatrixBlock wbT = -weight * bR.transposed();
     
     // fill the matrix mC
     add_block_diag(ii0, waT*aR); //this is diagonal
