@@ -38,8 +38,6 @@ typedef Matrix33 SquareBlock;
 typedef Matrix44 SquareBlock;
 #endif
 
-class Element;
-
 ///real symmetric sparse Matrix
 /**
  MatrixSparseSymmetricBlock uses a sparse storage, with arrays of elements for each column.
@@ -52,6 +50,12 @@ class Element;
  */
 class MatrixSparseSymmetricBlock
 {
+public:
+    
+    class Element;
+    
+    static size_t newElements(Element*& ptr, size_t size);
+    
 private:
     
     /// size of matrix

@@ -445,7 +445,7 @@ void MatrixSparseSymmetricBlock::Column::print(std::ostream& os) const
 
 
 /// A block element of the sparse matrix suitable for qsort()
-class Element
+class MatrixSparseSymmetricBlock::Element
 {
 public:
     /// block element
@@ -459,8 +459,8 @@ public:
 /// function for qsort, comparing line indices
 int compareElement(const void * p, const void * q)
 {
-    Element const* a = (Element const*)(p);
-    Element const* b = (Element const*)(q);
+    MatrixSparseSymmetricBlock::Element const* a = (MatrixSparseSymmetricBlock::Element const*)(p);
+    MatrixSparseSymmetricBlock::Element const* b = (MatrixSparseSymmetricBlock::Element const*)(q);
     
     if ( a->inx > b->inx ) return  1;
     if ( a->inx < b->inx ) return -1;
@@ -470,7 +470,7 @@ int compareElement(const void * p, const void * q)
 /**
  This copies the data to the provided temporary array
  */
-void MatrixSparseSymmetricBlock::Column::sort(Element*& tmp, size_t tmp_size)
+void MatrixSparseSymmetricBlock::Column::sort(MatrixSparseSymmetricBlock::Element*& tmp, size_t tmp_size)
 {
     assert_true( size_ <= tmp_size );
     for ( unsigned i = 1; i < size_; ++i )
@@ -490,11 +490,11 @@ void MatrixSparseSymmetricBlock::Column::sort(Element*& tmp, size_t tmp_size)
 }
 
 
-size_t newElements(Element*& ptr, size_t size)
+size_t MatrixSparseSymmetricBlock::newElements(Element*& ptr, size_t size)
 {
     constexpr size_t chunk = 16;
     size_t all = ( size + chunk - 1 ) & ~( chunk - 1 );
-    free(ptr);  // there is no destructor with Element
+    free(ptr);  // Element has no destructor
     void* tmp = nullptr;
     if ( size > 0 )
     {
