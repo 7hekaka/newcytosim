@@ -30,11 +30,11 @@ namespace LinearSolvers
             copy_real(dimension(), X, Y);
         }
         
-        /// multiply vector and apply preconditionner ( Y <- P * M * X )
-        virtual void multiplyP(real* X, real* Y) const
+        /// apply preconditionner and multiply ( T <- P * X and Y <- M * T  )
+        virtual void precondition_multiply(real const* X, real * T, real* Y) const
         {
-            multiply(X, Y);       // Y <- M*X
-            precondition(Y, X);   // X <- P*Y
+            precondition(X, T);   // T <- P*X
+            multiply(T, Y);       // Y <- M*T
         }
 
     };

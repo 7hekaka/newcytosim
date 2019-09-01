@@ -14,7 +14,7 @@
  where M is the matrix and P the preconditionner.
  In both cases, the solution to M*sol = rhs is returned.
 */
-#define RIGHTSIDED_PRECONDITIONNER 0
+#define RIGHTSIDED_PRECONDITIONNER 1
 
 /// GMRES method to solve a system of linear equations
 /**
@@ -133,9 +133,8 @@ namespace LinearSolvers
                 mat.precondition(ww, tt);      // tt = P*ww
                 mat.multiply(tt, ww);          // ww = M*tt = M*P*ww
 #else
-                mat.multiplyP(ww, tt);         // tt = P*M*ww
-                //mat.multiply(ww, tt);        // tt = M*ww
-                //mat.precondition(tt, ww);    // ww = P*tt = P*M*ww
+                mat.multiply(ww, tt);          // tt = M*ww
+                mat.precondition(tt, ww);      // ww = P*tt = P*M*ww
 #endif
                 /*
                  The next loop has a dependency for 'ww', but because the columns
@@ -197,8 +196,7 @@ namespace LinearSolvers
         }
 #if RIGHTSIDED_PRECONDITIONNER
         // we have calculated the solution to M*P*sol = rhs, and we need P*sol:
-        mat.precondition(sol, tt);
-        blas::xcopy(dim, tt, 1, sol, 1);
+        mat.precondition(sol, sol);
 #endif
 #if ( 0 )
         // calculate true residual = rhs - M * x
