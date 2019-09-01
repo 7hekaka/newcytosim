@@ -204,8 +204,8 @@ public:
     /// clear values in the 4-th column
     void clear_shadow()
     {
-        val[4 ] = 0.0;
-        val[8 ] = 0.0;
+        val[3 ] = 0.0;
+        val[7 ] = 0.0;
         val[11] = 0.0;
     }
     
@@ -859,7 +859,7 @@ public:
         val[2    ] += dir[2]*vec[0];
         val[0+4  ] += dir[0]*vec[1];
         val[1+4  ] += dir[1]*vec[1];
-        val[2+4  ] += dir[2]*vec[1],
+        val[2+4  ] += dir[2]*vec[1];
         val[0+4*2] += dir[0]*vec[2];
         val[1+4*2] += dir[1]*vec[2];
         val[2+4*2] += dir[2]*vec[2];
