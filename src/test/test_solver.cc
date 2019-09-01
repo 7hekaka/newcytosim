@@ -56,13 +56,6 @@ public:
     {
         copy_real(dim, X, Y);
     }
-    
-    /// multiply vector and apply preconditionner ( Y <- P * M * X )
-    void multiplyP(real* X, real* Y) const
-    {
-        multiply(X, Y);       // Y <- M*X
-        precondition(Y, X);   // X <- P*Y
-    }
 
     
     /// read MatrixMarket format
@@ -180,7 +173,7 @@ int main(int argc, char* argv[])
         fprintf(stdout, " BCGS  count %4i  residual %10.6f\n", mon.count(), res);
     }
 
-    for ( int RS : {2, 4, 8, 16, 32} )
+    for ( int RS : {2, 4, 8, 16, 32, 64} )
     {
         mon.reset();
         zero_real(dim, sol);
