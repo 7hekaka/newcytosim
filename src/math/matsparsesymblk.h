@@ -54,16 +54,8 @@ public:
     
     class Element;
     
-    static size_t newElements(Element*& ptr, size_t size);
-    
 private:
     
-    /// size of matrix
-    index_t  size_;
-    
-    /// amount of memory which has been allocated
-    size_t   allocated_;
-
     /// A column of the sparse matrix
     class Column
     {
@@ -141,8 +133,20 @@ private:
         void vecMulAdd4D_AVX(const real* X, real* Y, index_t j) const;
     };
     
+    /// create Elements
+    static size_t newElements(Element*& ptr, size_t);
+    
+    /// sort matrix block in increasing index order
+    void sortElements();
+
 private:
     
+    /// size of matrix
+    index_t  size_;
+    
+    /// amount of memory which has been allocated
+    size_t   allocated_;
+
     /// array col_[c][] holds Elements of column 'c'
     Column *  column_;
     

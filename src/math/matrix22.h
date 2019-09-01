@@ -198,10 +198,10 @@ public:
         return os.str();
     }
 
-    /// true if matrix is symmetric
-    bool is_symmetric() const
+    /// zero if matrix is symmetric
+    real asymmetry() const
     {
-        return ( val[1] == val[2] );
+        return std::abs(val[2]-val[1]);
     }
     
     /// scale all elements

@@ -309,14 +309,14 @@ public:
     }
 
     /// true if matrix is symmetric
-    bool is_symmetric() const
+    real asymmetry() const
     {
-        return ( val[0x4] == val[0x1]
-                && val[0x8] == val[0x2]
-                && val[0xC] == val[0x3]
-                && val[0x9] == val[0x6]
-                && val[0xD] == val[0x7]
-                && val[0xE] == val[0xB] );
+        return ( std::fabs(val[0x4]-val[0x1])
+                + std::fabs(val[0x8]-val[0x2])
+                + std::fabs(val[0xC]-val[0x3])
+                + std::fabs(val[0x9]-val[0x6])
+                + std::fabs(val[0xD]-val[0x7])
+                + std::fabs(val[0xE]-val[0xB]) );
     }
 
 #if MATRIX44_USES_AVX

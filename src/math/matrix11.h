@@ -121,10 +121,10 @@ public:
         return os.str();
     }
 
-    /// true is matrix is symmetric
-    bool is_symmetric() const
+    /// always zero
+    real asymmetry() const
     {
-        return true;
+        return 0;
     }
     
     /// scale all elements

@@ -359,11 +359,11 @@ int MatrixSparseSymmetricBlock::bad() const
 }
 
 
+/** all allocated elements are counted, even if zero */
 size_t MatrixSparseSymmetricBlock::nbElements(index_t start, index_t end) const
 {
     assert_true( start <= end );
     assert_true( end <= size_ );
-    //all allocated elements are counted, even if zero
     size_t cnt = 0;
     for ( index_t jj = start; jj < end; ++jj )
         cnt += column_[jj].size_;
@@ -507,6 +507,47 @@ size_t MatrixSparseSymmetricBlock::newElements(Element*& ptr, size_t size)
 }
 
 
+void MatrixSparseSymmetricBlock::sortElements()
+{
+    //unsigned cnt = 0;
+    size_t tmp_size = 0;
+    Element * tmp = nullptr;
+    
+    for ( index_t j = next_[0]; j < size_; j = next_[j+1] )
+    {
+        assert_true( j < size_ );
+        Column & col = column_[j];
+        assert_true( col.size_ > 0 );
+        //std::clog << "MSSB column " << j << " has " << col.size_ << " elements\n";
+        
+        // order the elements within the column:
+        if ( col.size_ > 2 )
+        {
+            if ( tmp_size < col.size_ )
+                tmp_size = newElements(tmp, col.size_);
+            col.sort(tmp, tmp_size);
+        }
+        
+        //++cnt;
+        
+        // diagonal element should be first:
+        assert_true( col.inx_[0] == j );
+        col.blk_[0].copy_half();
+#ifndef NDEBUG
+        for ( unsigned n = 1 ; n < col.size_ ; ++n )
+        {
+            const index_t i = col.inx_[n];
+            assert_true( i < size_ );
+            assert_true( i != j );
+        }
+#endif
+    }
+    
+    newElements(tmp, 0);
+    //std::clog << "MatrixSparseSymmetricBlock " << size_ << " with " << cnt << " non-empty columns\n";
+}
+
+
 void MatrixSparseSymmetricBlock::prepareForMultiply(int)
 {
     next_[size_] = size_;
@@ -526,43 +567,7 @@ void MatrixSparseSymmetricBlock::prepareForMultiply(int)
         else
             next_[0] = nxt;
     }
-    
-    //unsigned cnt = 0;
-    size_t tmp_size = 0;
-    Element * tmp = nullptr;
-
-    for ( index_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
-    {
-        Column & col = column_[jj];
-        //std::clog << "MSSB column " << jj << " has " << col.size_ << " elements\n";
-
-        // order the elements within the column:
-        if ( col.size_ > 2 )
-        {
-            if ( tmp_size < col.size_ )
-                tmp_size = newElements(tmp, col.size_);
-            col.sort(tmp, tmp_size);
-        }
-        
-        //++cnt;
-        assert_true( jj < size_ );
-        assert_true( col.size_ > 0 );
-        
-        // diagonal element should be first:
-        assert_true( col.inx_[0] == jj );
-        col.blk_[0].copy_half();
-#ifndef NDEBUG
-        for ( unsigned n = 1 ; n < col.size_ ; ++n )
-        {
-            const index_t ii = col.inx_[n];
-            assert_true( ii < size_ );
-            assert_true( ii != jj );
-        }
-#endif
-    }
-    
-    newElements(tmp, 0);
-    //std::clog << "MatrixSparseSymmetricBlock " << size_ << " with " << cnt << " non-empty columns\n";
+    sortElements();
 }
 
 
@@ -596,7 +601,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D(const real* X, real* Y, ind
     assert_true( size_ > 0 );
     const Vector2 xx(X+jj);
     assert_true(inx_[0]==jj);
-    assert_true(blk_[0].is_symmetric());
+    assert_small(blk_[0].asymmetry());
     Vector2 yy = blk_[0].vecmul(xx);
     for ( index_t n = 1; n < size_; ++n )
     {
@@ -615,7 +620,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D(const real* X, real* Y, ind
     assert_true( size_ > 0 );
     const Vector3 xxx(X+jj);
     assert_true(inx_[0]==jj);
-    assert_true(blk_[0].is_symmetric());
+    assert_small(blk_[0].asymmetry());
     Vector3 yyy = blk_[0].vecmul(xxx);
     for ( index_t n = 1; n < size_; ++n )
     {
@@ -635,7 +640,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D(const real* X, real* Y, ind
     assert_true( size_ > 0 );
     const vec4 xxxx = load4(X+jj);
     assert_true(inx_[0]==jj);
-    assert_true(blk_[0].is_symmetric());
+    assert_small(blk_[0].asymmetry());
     vec4 yyyy = blk_[0].vecmul4(xxxx);
     for ( index_t n = 1; n < size_; ++n )
     {

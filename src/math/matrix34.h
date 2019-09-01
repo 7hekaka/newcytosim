@@ -405,12 +405,11 @@ public:
         val[9] = val[6];
     }
 
-    /// true if matrix is symmetric
-    bool is_symmetric() const
+    /// true if 3x3 subset of matrix is symmetric
+    real asymmetry() const
     {
-        return ( val[4] == val[1]
-                && val[8] == val[2]
-                && val[9] == val[6] );
+        return std::abs(val[4]-val[1])
+        + std::abs(val[8]-val[2]) + std::abs(val[9]-val[6]);
     }
 
 #if MATRIX34_USES_AVX
@@ -524,17 +523,17 @@ public:
     const Matrix34 mul(Matrix34 const& M) const
     {
         Matrix34 res;
-        res[0] = val[4*0] * M[0] + val[1+4*0] * M[4] + val[2+4*0] * M[8];
-        res[1] = val[4*1] * M[0] + val[1+4*1] * M[4] + val[2+4*1] * M[8];
-        res[2] = val[4*2] * M[0] + val[1+4*2] * M[4] + val[2+4*2] * M[8];
+        res[0  ] = val[4*0] * M[0] + val[1+4*0] * M[4] + val[2+4*0] * M[8];
+        res[0+4] = val[4*1] * M[0] + val[1+4*1] * M[4] + val[2+4*1] * M[8];
+        res[0+8] = val[4*2] * M[0] + val[1+4*2] * M[4] + val[2+4*2] * M[8];
         
-        res[0+4] = val[4*0] * M[1] + val[1+4*0] * M[5] + val[2+4*0] * M[9];
+        res[1  ] = val[4*0] * M[1] + val[1+4*0] * M[5] + val[2+4*0] * M[9];
         res[1+4] = val[4*1] * M[1] + val[1+4*1] * M[5] + val[2+4*1] * M[9];
-        res[2+4] = val[4*2] * M[1] + val[1+4*2] * M[5] + val[2+4*2] * M[9];
+        res[1+8] = val[4*2] * M[1] + val[1+4*2] * M[5] + val[2+4*2] * M[9];
         
-        res[0+4*2] = val[4*0] * M[2] + val[1+4*0] * M[6] + val[2+4*0] * M[10];
-        res[1+4*2] = val[4*1] * M[2] + val[1+4*1] * M[6] + val[2+4*1] * M[10];
-        res[2+4*2] = val[4*2] * M[2] + val[1+4*2] * M[6] + val[2+4*2] * M[10];
+        res[2  ] = val[4*0] * M[2] + val[1+4*0] * M[6] + val[2+4*0] * M[10];
+        res[2+4] = val[4*1] * M[2] + val[1+4*1] * M[6] + val[2+4*1] * M[10];
+        res[2+8] = val[4*2] * M[2] + val[1+4*2] * M[6] + val[2+4*2] * M[10];
         return res;
     }
     
@@ -548,17 +547,17 @@ public:
     const Matrix34 trans_mul(Matrix34 const& M) const
     {
         Matrix34 res;
-        res[0] = val[0] * M[0] + val[0+4] * M[4] + val[0+4*2] * M[8];
-        res[1] = val[1] * M[0] + val[1+4] * M[4] + val[1+4*2] * M[8];
-        res[2] = val[2] * M[0] + val[2+4] * M[4] + val[2+4*2] * M[8];
+        res[0  ] = val[0] * M[0] + val[0+4] * M[4] + val[0+4*2] * M[8];
+        res[0+4] = val[1] * M[0] + val[1+4] * M[4] + val[1+4*2] * M[8];
+        res[0+8] = val[2] * M[0] + val[2+4] * M[4] + val[2+4*2] * M[8];
         
-        res[0+4] = val[0] * M[1] + val[0+4] * M[5] + val[0+4*2] * M[9];
+        res[1  ] = val[0] * M[1] + val[0+4] * M[5] + val[0+4*2] * M[9];
         res[1+4] = val[1] * M[1] + val[1+4] * M[5] + val[1+4*2] * M[9];
-        res[2+4] = val[2] * M[1] + val[2+4] * M[5] + val[2+4*2] * M[9];
+        res[1+8] = val[2] * M[1] + val[2+4] * M[5] + val[2+4*2] * M[9];
         
-        res[0+4*2] = val[0] * M[2] + val[0+4] * M[6] + val[0+4*2] * M[10];
-        res[1+4*2] = val[1] * M[2] + val[1+4] * M[6] + val[1+4*2] * M[10];
-        res[2+4*2] = val[2] * M[2] + val[2+4] * M[6] + val[2+4*2] * M[10];
+        res[2  ] = val[0] * M[2] + val[0+4] * M[6] + val[0+4*2] * M[10];
+        res[2+4] = val[1] * M[2] + val[1+4] * M[6] + val[1+4*2] * M[10];
+        res[2+8] = val[2] * M[2] + val[2+4] * M[6] + val[2+4*2] * M[10];
         return res;
     }
     

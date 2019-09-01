@@ -413,11 +413,10 @@ public:
     }
 
     /// true if matrix is symmetric
-    bool is_symmetric() const
+    real asymmetry() const
     {
-        return ( val[BLD] == val[1]
-                && val[BLD*2] == val[2]
-                && val[1+BLD*2] == val[2+BLD] );
+        return ( std::abs(val[BLD]-val[1])
+                + std::abs(val[BLD*2]-val[2]) + std::abs(val[1+BLD*2]-val[2+BLD]) );
     }
 
 #if MATRIX33_USES_AVX
