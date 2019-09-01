@@ -415,56 +415,58 @@ void Meca::multiply( const real* X, real* Y ) const
 #endif
 }
 
-
+#if ( 0 )
 /**
- calculates the multiplyP(real* X, real* T) for block corresponding to 'mec'
+ performs precondition(X, T); multiply(T, Y) for the block corresponding to 'mec'
  */
-inline void multiply1P(Mecable const* mec, real alpha, real* xxx, real* ttt)
+inline void precondition_multiply1(Mecable const* mec, real alpha, real const* xxx, real* ttt, real* yyy)
 {
     const int bks = DIM * mec->nbPoints();
+    
+    blas::xcopy(bks, xxx, 1, ttt, 1);
+
+    if ( mec->useBlock() )
+    {
+        int info = 0;
+        lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), ttt, bks, &info);
+    }
+    
+    // X <- X + alpha * T
+    blas::xaxpy(bks, alpha/mec->leftoverDrag(), ttt, 1, yyy, 1);
+    
+    // T <- ( mB + mC ) * X
+    calculateForces(X, nullptr, T);
 
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
-    mec->addRigidity(xxx, ttt);
+    mec->addRigidity(ttt, yyy);
 #endif
 
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
-        mec->addProjectionDiff(xxx, ttt);
+        mec->addProjectionDiff(ttt, yyy);
 #endif
 
-    mec->projectForces(ttt, ttt);
-    
-    // X <- X + alpha * T
-    blas::xaxpy(bks, alpha/mec->leftoverDrag(), ttt, 1, xxx, 1);
-    
-    if ( mec->useBlock() )
-    {
-        int info = 0;
-        lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), xxx, bks, &info);
-    }
+    mec->projectForces(yyy, yyy);
 }
 
+
 /**
- This is similar to
+ This is equivalent to
  
-     multiply(X, T);       // T <- M*X
-     precondition(T, X);   // X <- P*T
+ precondition(X, T);   // T <- P*X
+ multiply(T, Y);       // Y <- M*T
  
- if the value of 'T' is not used
  */
-void Meca::multiplyP(real* X, real* T) const
+void Meca::precondition_multiply(real const* X, real* T, real* Y) const
 {
-    // T <- ( mB + mC ) * X
-    calculateForces(X, nullptr, T);
-    
 #if NUM_THREADS > 1
-    #pragma omp parallel num_threads(NUM_THREADS)
+#pragma omp parallel num_threads(NUM_THREADS)
     {
         Mecable ** mci = objs.begin() + omp_get_thread_num();
         while ( mci < objs.end() )
         {
             const index_t inx = DIM * (*mci)->matIndex();
-            multiply1P(*mci, -time_step, X+inx, T+inx);
+            precondition_multiply1(*mci, -time_step, X+inx, T+inx, Y+inx);
             mci += NUM_THREADS;
         }
     }
@@ -472,7 +474,83 @@ void Meca::multiplyP(real* X, real* T) const
     for ( Mecable * mec : objs )
     {
         const index_t inx = DIM * mec->matIndex();
-        multiply1P(mec, -time_step, X+inx, T+inx);
+        precondition_multiply1(mec, -time_step, X+inx, T+inx, Y+inx);
+    }
+#endif
+    
+    // T <- ( mB + mC ) * X
+    calculateForces(X, nullptr, T);
+}
+#endif
+
+/**
+ performs multiply(X, T); precondition(T, Y); for the block corresponding to 'mec'
+ */
+inline void multiply_precondition1(Mecable const* mec, real alpha, real const* xxx, real* ttt, real* yyy)
+{
+    const int bks = DIM * mec->nbPoints();
+    
+#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+    mec->addRigidity(xxx, ttt);
+#endif
+    
+#if ADD_PROJECTION_DIFF
+    if ( mec->hasProjectionDiff() )
+        mec->addProjectionDiff(xxx, ttt);
+#endif
+    
+    if ( yyy == xxx )
+    {
+        // T <- P * T
+        mec->projectForces(ttt, ttt);
+        // X <- X + alpha * T = X + alpha * P * FORCE
+        blas::xaxpy(bks, alpha/mec->leftoverDrag(), ttt, 1, yyy, 1);
+    }
+    else
+    {
+        // Y <- P * T
+        mec->projectForces(ttt, yyy);
+        // Y <- X + alpha * Y = X + alpha * P * FORCE
+        blas::xpay(bks, xxx, alpha/mec->leftoverDrag(), yyy);
+    }
+
+    if ( mec->useBlock() )
+    {
+        int info = 0;
+        lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), yyy, bks, &info);
+    }
+}
+
+
+/**
+ This is equivalent to
+ 
+     multiply(X, T);       // T <- M*X
+     precondition(T, X);   // X <- P*T
+ 
+ if the value of 'T' is not used
+ */
+void Meca::multiply_precondition(real const* X, real* T, real* Y) const
+{
+    // T <- ( mB + mC ) * X
+    calculateForces(X, nullptr, T);
+    
+#if NUM_THREADS > 1
+#pragma omp parallel num_threads(NUM_THREADS)
+    {
+        Mecable ** mci = objs.begin() + omp_get_thread_num();
+        while ( mci < objs.end() )
+        {
+            const index_t inx = DIM * (*mci)->matIndex();
+            multiply_precondition1(*mci, -time_step, X+inx, T+inx, Y+inx);
+            mci += NUM_THREADS;
+        }
+    }
+#else
+    for ( Mecable * mec : objs )
+    {
+        const index_t inx = DIM * mec->matIndex();
+        multiply_precondition1(mec, -time_step, X+inx, T+inx, Y+inx);
     }
 #endif
 }
@@ -1159,9 +1237,7 @@ void Meca::computePreconditionner()
 
 
 void Meca::precondition(const real* X, real* Y) const
-{
-    assert_true( X != Y );
-    
+{    
 #if NUM_THREADS > 1
     #pragma omp parallel num_threads(NUM_THREADS)
     {

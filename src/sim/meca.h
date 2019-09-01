@@ -300,15 +300,18 @@ public:
     /// Implementation of LinearOperator::size()
     size_t dimension() const { return DIM * nbPts; }
     
-    /// calculate Y = M*X, where M is the matrix associated with the system
+    /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;
 
-    /// apply preconditionner: Y = P*X
+    /// apply preconditionner: Y <- P*X (note that X maybe equal to Y)
     void precondition(const real* X, real* Y) const;
     
-    /// calculate X = P*M*X, using T as temporary vector
-    void multiplyP(real* X, real* T) const;
+    /// equivalent to: precondition(X, T); multiply(T, Y);
+    void precondition_multiply(real const* X, real* T, real* Y) const;
     
+    /// equivalent to: multiply(X, T); precondition(T, Y);
+    void multiply_precondition(real const* X, real* T, real* Y) const;
+
     //---------------------- EXPLICIT FORCE ELEMENTS ---------------------------
 
     /// Add a constant force on Mecapoint
