@@ -86,7 +86,10 @@ public:
     }
 
     ~Matrix44() {}
-
+    
+    /// dimensionality
+    static int dimension() { return 4; }
+    
     /// human-readible identifier
     static std::string what() { return "4*4"; }
 

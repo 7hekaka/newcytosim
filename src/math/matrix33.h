@@ -84,7 +84,10 @@ public:
     }
 
     ~Matrix33() {}
-
+    
+    /// dimensionality
+    static int dimension() { return 3; }
+    
     /// human-readible identifier
 #if ( BLD == 3 )
     static std::string what() { return "3*3"; }

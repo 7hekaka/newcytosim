@@ -29,6 +29,9 @@ matsparsesymblkD3.o: matsparsesymblk.cc matsparsesymblk.h
 	$(COMPILE) $(INC_BM) -DBLOCK_SIZE=3 -c $< -o build/$@
 
 
+matsparseblk.o: matsparseblk.cc matsparseblk.h
+	$(COMPILE) $(INC_BM) -c $< -o build/$@
+
 matsparseblkD1.o: matsparseblk.cc matsparseblk.h
 	$(COMPILE) $(INC_BM) -DBLOCK_SIZE=1 -c $< -o build/$@
 
@@ -39,19 +42,19 @@ matsparseblkD3.o: matsparseblk.cc matsparseblk.h
 	$(COMPILE) $(INC_BM) -DBLOCK_SIZE=3 -c $< -o build/$@
 
 
-cytomath.a: $(OBJ_MATH) matsparsesymblk.o | lib
+cytomath.a: $(OBJ_MATH) matsparsesymblk.o matsparseblk.o | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD1.a: $(OBJ_MATH) matsparsesymblkD1.o
+cytomathD1.a: $(OBJ_MATH) matsparsesymblkD1.o matsparseblkD1.o
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD2.a: $(OBJ_MATH) matsparsesymblkD2.o
+cytomathD2.a: $(OBJ_MATH) matsparsesymblkD2.o matsparseblkD2.o
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD3.a: $(OBJ_MATH) matsparsesymblkD3.o
+cytomathD3.a: $(OBJ_MATH) matsparsesymblkD3.o matsparseblkD3.o
 	$(MAKELIB)
 	$(DONE)
 

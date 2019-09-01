@@ -42,7 +42,10 @@ public:
     }
 
     ~Matrix11() {}
-
+    
+    /// dimensionality
+    static int dimension() { return 1; }
+    
     /// human-readible identifier
     static std::string what() { return "1"; }
     

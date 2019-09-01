@@ -106,6 +106,9 @@ public:
     /// destructor
     ~Matrix22() {}
     
+    /// dimensionality
+    static int dimension() { return 2; }
+    
     /// human-readible identifier
     static std::string what() { return "2*2"; }
 
