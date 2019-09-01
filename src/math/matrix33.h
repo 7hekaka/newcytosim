@@ -34,7 +34,7 @@ public:
     /// values of the elements
     real val[BLD*3];
     
-    Matrix33() { clear_extra(); }
+    Matrix33() { clear_shadow(); }
     
     /// copy constructor
     Matrix33(Matrix33 const& M)
@@ -57,7 +57,7 @@ public:
         val[0+BLD*2] = g;
         val[1+BLD*2] = h;
         val[2+BLD*2] = i;
-        clear_extra();
+        clear_shadow();
     }
 
     /// construct Matrix with `d` on the diagonal and other values equal to `a`
@@ -72,8 +72,7 @@ public:
         val[0+BLD*2] = z;
         val[1+BLD*2] = z;
         val[2+BLD*2] = d;
-
-        clear_extra();
+        clear_shadow();
     }
 
     ~Matrix33() {}
@@ -192,7 +191,7 @@ public:
     }
 
     /// clear values that do not represent matrix elements
-    void clear_extra()
+    void clear_shadow()
     {
 #if ( BLD == 4 )
         val[3      ] = 0.0;
