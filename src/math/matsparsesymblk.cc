@@ -394,6 +394,8 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
     char str[256];
     std::streamsize p = os.precision();
     os.precision(8);
+    if ( ! column_ )
+        return;
     for ( index_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];

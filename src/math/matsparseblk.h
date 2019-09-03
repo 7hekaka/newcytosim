@@ -137,6 +137,9 @@ private:
     ///
     void symmetrize();
     
+    ///
+    bool already_symmetric;
+    
 private:
     
     /// number of lines in the matrix
@@ -177,6 +180,7 @@ public:
     /// returns element stored at line ii and column jj, if ( ii > jj )
     SubBlock& block(const index_t ii, const index_t jj)
     {
+        assert_true( ii >= jj );
         assert_true( ii < size_ );
         assert_true( jj < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );

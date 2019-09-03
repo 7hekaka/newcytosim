@@ -13,6 +13,7 @@
 #include "matsparsesym1.h"
 #include "matsparsesym2.h"
 #include "matsparsesymblk.h"
+#include "matsparseblk.h"
 
 using namespace TicToc;
 
@@ -55,10 +56,13 @@ void setIndices(int fill, int*& ii, int*& jj, int mx, int bs)
     
     for ( int n = 0; n < fill; ++n )
     {
-        int i = RNG.pint(mx);
-        int j = RNG.pint(mx);
-        ii[n] = bs * ( std::max(i,j) / bs );
-        jj[n] = bs * ( std::min(i,j) / bs );
+        int i, j;
+        do {
+            i = RNG.pint(mx) / bs;
+            j = RNG.pint(mx) / bs;
+        } while ( i == j );
+        ii[n] = bs * std::max(i,j);
+        jj[n] = bs * std::min(i,j);
     }
 }
 
@@ -151,61 +155,86 @@ void compare(unsigned size,  MATRIXA & mat1, MATRIXB& mat2, unsigned fill)
 }
 
 
+
 template <typename MATRIX>
-void fillMatrix3D(MATRIX& mat, const int ii, const int jj)
+void fillMatrix3D(MATRIX& mat, const int i, const int j)
 {
-    mat(ii  , ii  ) += alpha;
-    mat(ii+1, ii  ) -= beta;
-    mat(ii+2, ii  ) -= beta;
-    mat(jj  , ii  ) -= beta;
-    mat(jj+1, ii  ) -= beta;
-    mat(jj+2, ii  ) -= beta;
+    mat(i  , i  ) += alpha;
+    mat(i+1, i  ) -= beta;
+    mat(i+2, i  ) -= beta;
+    mat(i+1, i+1) += alpha;
+    mat(i+2, i+1) -= beta;
+    mat(i+2, i+2) += alpha;
+
+    if ( i > j )
+    {
+        mat(i  , j  ) -= beta;
+        mat(i+1, j  ) -= beta;
+        mat(i+2, j  ) -= beta;
+        mat(i  , j+1) -= beta;
+        mat(i+1, j+1) -= beta;
+        mat(i+2, j+1) -= beta;
+        mat(i  , j+2) -= beta;
+        mat(i+1, j+2) -= beta;
+        mat(i+2, j+2) -= beta;
+    }
+    else
+    {
+        mat(j  , i  ) -= beta;
+        mat(j+1, i  ) -= beta;
+        mat(j+2, i  ) -= beta;
+        mat(j  , i+1) -= beta;
+        mat(j+1, i+1) -= beta;
+        mat(j+2, i+1) -= beta;
+        mat(j  , i+2) -= beta;
+        mat(j+1, i+2) -= beta;
+        mat(j+2, i+2) -= beta;
+    }
     
-    mat(ii+1, ii+1) += alpha;
-    mat(ii+2, ii+1) -= beta;
-    mat(jj  , ii+1) -= beta;
-    mat(jj+1, ii+1) -= beta;
-    mat(jj+2, ii+1) -= beta;
-    
-    mat(ii+2, ii+2) += alpha;
-    mat(jj  , ii+2) -= beta;
-    mat(jj+1, ii+2) -= beta;
-    mat(jj+2, ii+2) -= beta;
-    
-    mat(jj  , jj  ) += alpha;
-    mat(jj+1, jj  ) -= beta;
-    mat(jj+2, jj  ) -= beta;
-    
-    mat(jj+1, jj+1) += alpha;
-    mat(jj+2, jj+1) -= beta;
-    
-    mat(jj+2, jj+2) += alpha;
+    mat(j  , j  ) += alpha;
+    mat(j+1, j  ) -= beta;
+    mat(j+2, j  ) -= beta;
+    mat(j+1, j+1) += alpha;
+    mat(j+2, j+1) -= beta;
+    mat(j+2, j+2) += alpha;
 }
 
 template <typename MATRIX>
-void fillMatrix2D(MATRIX& mat, const int ii, const int jj)
+void fillMatrix2D(MATRIX& mat, const int i, const int j)
 {
-    mat(ii  , ii  ) += alpha;
-    mat(ii+1, ii  ) -= beta;
-    mat(jj  , ii  ) -= beta;
-    mat(jj+1, ii  ) -= beta;
+    mat(i  , i  ) += alpha;
+    mat(i+1, i  ) -= beta;
+    mat(i+1, i+1) += alpha;
     
-    mat(ii+1, ii+1) += alpha;
-    mat(jj  , ii+1) -= beta;
-    mat(jj+1, ii+1) -= beta;
+    if ( i > j )
+    {
+        mat(i  , j  ) -= beta;
+        mat(i+1, j  ) -= beta;
+        mat(i  , j+1) -= beta;
+        mat(i+1, j+1) -= beta;
+    }
+    else
+    {
+        mat(j  , i  ) -= beta;
+        mat(j+1, i  ) -= beta;
+        mat(j  , i+1) -= beta;
+        mat(j+1, i+1) -= beta;
+    }
     
-    mat(jj  , jj  ) += alpha;
-    mat(jj+1, jj  ) -= beta;
-    
-    mat(jj+1, jj+1) += alpha;
+    mat(j  , j  ) += alpha;
+    mat(j+1, j  ) -= beta;
+    mat(j+1, j+1) += alpha;
 }
 
 template <typename MATRIX>
-void fillMatrix1D(MATRIX& mat, const int ii, const int jj)
+void fillMatrix1D(MATRIX& mat, const int i, const int j)
 {
-    mat(ii, ii) += alpha;
-    mat(jj, ii) -= beta;
-    mat(jj, jj) += alpha;
+    mat(i, i) += alpha;
+    if ( i > j )
+        mat(i, j) -= beta;
+    else
+        mat(j, i) -= beta;
+    mat(j, j) += alpha;
 }
 
 
@@ -232,11 +261,11 @@ void testMatrix(MATRIX & mat,
         }
     }
     double ts = toc();
+    mat.prepareForMultiply(1);
 
     tic();
     for ( int ii=0; ii<N_RUN; ++ii )
     {
-        mat.prepareForMultiply(1);
         for ( int n=0; n<N_MUL; ++n )
             mat.vecMulAdd(x, z);
     }
@@ -284,7 +313,8 @@ void testMatrices(const int size, const int fill)
     MatrixSparseSymmetric1 mat1;
     MatrixSparseSymmetric2 mat2;
     MatrixSparseSymmetricB mat3;
-    
+    MatrixSparseBlock      mat4;
+
     int * inx = nullptr;
     int * iny = nullptr;
     
@@ -296,13 +326,14 @@ void testMatrices(const int size, const int fill)
 
     setVectors(DIM*size, x, y, z);
     alpha = RNG.sreal();
-   
+    
     testMatrix(mat0, size, x, y, z, fill, inx, iny);
     testMatrix(mat1, size, x, y, z, fill, inx, iny);
     testMatrix(mat2, size, x, y, z, fill, inx, iny);
     testMatrix(mat3, size, x, y, z, fill, inx, iny);
-    
-    if ( 1 )
+    testMatrix(mat4, size, x, y, z, fill, inx, iny);
+
+    if ( 0 )
     {
         std::ofstream os1("mat1.txt");
         std::ofstream os3("mat3.txt");
@@ -424,10 +455,16 @@ void testMatrixBlock(const int size, const int fill)
         // small tests to check correctness:
         MatrixSparseSymmetric1 mat1;
         MatrixSparseSymmetricB mat3;
+        MatrixSparseBlock mat4;
+        
         compare(4*3, mat1, mat3, 1<<4);
         compare(4*7, mat1, mat3, 1<<5);
         compare(4*11, mat1, mat3, 1<<6);
         compare(4*33, mat1, mat3, 1<<16);
+        compare(4*3, mat1, mat4, 1<<16);
+        compare(4*7, mat1, mat4, 1<<16);
+        compare(4*11, mat1, mat4, 1<<16);
+        compare(4*33, mat1, mat4, 1<<16);
     }
     if ( 0 )
     {
@@ -439,7 +476,7 @@ void testMatrixBlock(const int size, const int fill)
     }
     if ( 0 )
     {
-        printf("\ntest_matrix BLOCK_SIZE %i (%s)\n", SquareBlock::msg());
+        printf("\ntest_matrix BLOCK_SIZE %i (%s)\n", DIM, SquareBlock::what().c_str());
         size_t siz = DIM;
         for ( int i = 0; i < 14; ++i )
         {

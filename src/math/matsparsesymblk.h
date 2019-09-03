@@ -228,6 +228,12 @@ public:
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_SCAL(const real* X, real* Y) const;
 
+    /// 2D isotropic multiplication (not implemented)
+    void vecMulAddIso2D(const real* X, real* Y) const {};
+    
+    /// 3D isotropic multiplication (not implemented)
+    void vecMulAddIso3D(const real*, real*) const {};
+
     /// true if matrix is non-zero
     bool nonZero() const;
     

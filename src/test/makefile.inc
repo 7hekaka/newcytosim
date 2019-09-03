@@ -38,7 +38,7 @@ test_code: test_code.cc random.o SFMT.o tictoc.o
 	$(DONE)
 vpath test_code bin
 
-test_matrix: test_matrix.cc matsparsesymblk.o matsparsesym.o matsparsesym1.o matsparsesym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o
+test_matrix: test_matrix.cc matsparsesymblk.o matsparseblk.o matsparsesym.o matsparsesym1.o matsparsesym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o
 	$(TEST_MAKE)
 	$(DONE)
 vpath test_matrix bin

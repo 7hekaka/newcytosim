@@ -60,6 +60,9 @@ public:
     {
         return ( val_ != zero );
     }
+    
+    /// conversion to real
+    operator real() const { return val_; }
 
     /// copy values from lower triangle to upper triangle
     void copy_half()

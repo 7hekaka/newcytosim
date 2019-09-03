@@ -163,6 +163,7 @@ void MatrixSparseBlock::Line::reset()
 
 real& MatrixSparseBlock::operator()(index_t ii, index_t jj)
 {
+    assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )
     return line_[ii].block(jj).value();
 #else
@@ -175,6 +176,7 @@ real& MatrixSparseBlock::operator()(index_t ii, index_t jj)
 
 real* MatrixSparseBlock::addr(index_t ii, index_t jj) const
 {
+    assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )
     return &line_[ii].block(jj).value();
 #else
@@ -190,6 +192,7 @@ real* MatrixSparseBlock::addr(index_t ii, index_t jj) const
 
 void MatrixSparseBlock::reset()
 {
+    already_symmetric = false;
     for ( index_t n = 0; n < size_; ++n )
         line_[n].reset();
 }
@@ -319,6 +322,8 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
     char str[256];
     std::streamsize p = os.precision();
     os.precision(8);
+    if ( ! line_ )
+        return;
     for ( index_t jj = 0; jj < size_; ++jj )
     {
         Line & lin = line_[jj];
@@ -443,7 +448,7 @@ void MatrixSparseBlock::sortElements()
         assert_true( i < size_ );
         Line & lin = line_[i];
         assert_true( lin.size_ > 0 );
-        //std::clog << "MSB column " << jj << " has " << lin.size_ << " elements\n";
+        //std::clog << "MSB line " << jj << " has " << lin.size_ << " elements\n";
         
         // order the elements in each line:
         if ( lin.size_ > 1 )
@@ -469,7 +474,7 @@ void MatrixSparseBlock::symmetrize()
     for ( index_t i = next_[0]; i < size_; i = next_[i+1] )
     {
         Line & lin = line_[i];
-        //std::clog << "MSB column " << jj << " has " << lin.size_ << " elements\n";
+        //std::clog << "MSB line " << i << " has " << lin.size_ << " elements\n";
         
         for ( unsigned n = 0 ; n < lin.size_ ; ++n )
         {
@@ -509,7 +514,11 @@ void MatrixSparseBlock::prepareForMultiply(int)
     
     //std::cerr << "MSB symmetrize " << nbElements();
     sortElements();
-    symmetrize();
+    if ( !already_symmetric )
+    {
+        symmetrize();
+        already_symmetric = true;
+    }
     //std::cerr << "  after " << nbElements() << "\n";
 }
 
