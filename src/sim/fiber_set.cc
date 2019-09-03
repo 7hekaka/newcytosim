@@ -138,6 +138,10 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
     Fiber * fib = p->newFiber(opt);
     assert_true( fib->tag()==Fiber::TAG );
     fib->birthTime(simul.time());
+    
+#if FIBER_HAS_FAMILY
+    opt.set(fib->family, "family");
+#endif
 
     ObjectList res(2);
     res.push_back(fib);

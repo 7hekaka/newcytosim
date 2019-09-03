@@ -23,6 +23,15 @@ class LineDisp;
 /// Flag to associate a Lattice to the Fiber {-1, 0, 1}
 #define FIBER_HAS_LATTICE 1
 
+
+/// Flag to allow `family` member variable to control Couple's binding
+#define FIBER_HAS_FAMILY 1
+
+
+/// Flag to allow dynamic Single creation/binding
+#define FIBER_HAS_GLUE 0
+
+
 /**
  The type of Lattice associated with each Fiber is defined here:
  */
@@ -76,14 +85,14 @@ private:
         real operator < (SeverPos const&b) const { return abs > b.abs; }
     };
     
-    /// ordered list of future severing positions
-    std::set<SeverPos>  pendingCuts;
-
     /// Pointer to hold a list of attached Hands
     mutable Hand *      handListFront;
     
     /// Pointer to hold a list of attached Hands
     mutable Hand *      handListBack;
+
+    /// ordered list of future severing positions
+    std::set<SeverPos>  pendingCuts;
 
 #if FIBER_HAS_LATTICE
     /// Associated Lattice
@@ -114,6 +123,15 @@ protected:
     
 public:
     
+#if FIBER_HAS_FAMILY
+    /// if set, no connection can be made to another fiber of the same `family`
+    /** This option limits the binding of Hands that are part of a Couple
+     A Hand may not bind to a fiber, if the other Hand of the Couple is already
+     attached to a fiber with the same value of `family`, if ( family > 0 ).
+     */
+    unsigned            family;
+#endif
+
     /// the Property of this object
     FiberProp const*    prop;
     

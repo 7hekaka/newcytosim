@@ -24,7 +24,6 @@ class Space;
 #define NEW_FIBER_CONFINE_RANGE 0
 #define NEW_AGING_LATTICE       0
 #define NEW_FIBER_LOOP          0
-#define NEW_HAS_FAMILY          0
 
 /// Property for a Fiber
 /**
@@ -181,15 +180,6 @@ public:
      With the example above, a Hand with `binding_key=3` can bind to both type of fibers.
      */
     unsigned int binding_key;
-
-#if NEW_HAS_FAMILY
-    /// if set, no connection can be made to another fiber of the same `family`
-    /** This option limits the binding of Hands that are part of a Couple
-     A Hand may not bind to a fiber, if the other Hand of the Couple is already
-     attached to a fiber with the same value of `family`, if ( family > 0 ).
-     */
-    unsigned int family;
-#endif
     
     /// if true, a Lattice is associated to this fiber
     int          lattice;

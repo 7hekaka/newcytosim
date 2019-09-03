@@ -148,6 +148,9 @@ Fiber::Fiber(FiberProp const* p)
 #endif
         }
     }
+#if FIBER_HAS_FAMILY
+    family  = 0;
+#endif
 #if NEW_FIBER_CHEW
     frChewM = 0;
     frChewP = 0;
