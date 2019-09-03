@@ -534,7 +534,7 @@ void MatrixSparseSymmetricBlock::sortElements()
         
         // diagonal element should be first:
         assert_true( col.inx_[0] == j );
-        col.blk_[0].copy_half();
+        col.blk_[0].copy_lower();
 #ifndef NDEBUG
         for ( unsigned n = 1 ; n < col.size_ ; ++n )
         {

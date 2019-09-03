@@ -402,11 +402,19 @@ public:
     }
 
     /// copy values from upper triangle to lower triangle
-    void copy_half()
+    void copy_upper()
     {
         val[4] = val[1];
         val[8] = val[2];
         val[9] = val[6];
+    }
+    
+    /// copy values from lower triangle to upper triangle
+    void copy_lower()
+    {
+        val[1] = val[4];
+        val[2] = val[8];
+        val[6] = val[9];
     }
 
     /// true if 3x3 subset of matrix is symmetric

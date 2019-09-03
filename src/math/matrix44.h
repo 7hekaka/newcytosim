@@ -301,7 +301,7 @@ public:
     }
 
     /// copy values from lower triangle to upper triangle
-    void copy_half()
+    void copy_lower()
     {
         val[0x4] = val[0x1];
         val[0x8] = val[0x2];

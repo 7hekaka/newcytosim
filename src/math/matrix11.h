@@ -65,7 +65,7 @@ public:
     operator real() const { return val_; }
 
     /// copy values from lower triangle to upper triangle
-    void copy_half()
+    void copy_lower()
     {
     }
 

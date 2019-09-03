@@ -133,7 +133,7 @@ public:
     }
 
     /// copy values from lower triangle to upper triangle
-    void copy_half()
+    void copy_lower()
     {
         val[2] = val[1];
     }

@@ -487,6 +487,8 @@ void MatrixSparseBlock::symmetrize()
                 assert_true( line_[j].size_ > 0 );
                 line_[j].block(i) = lin.blk_[n].transposed();
             }
+            else if ( i == j )
+                lin.blk_[n].copy_lower();
         }
     }
 }
