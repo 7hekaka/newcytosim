@@ -126,7 +126,7 @@ public:
     /// compute Lagrange multiplier corresponding to the longitudinal tensions in the segments
     void        computeTensions(const real* force);
     
-    /// save Lagrange multipliers computed in projectForces()
+    /// copy Lagrange multipliers computed in projectForces()
     void        storeTensions(const real* force);
 
     /// longitudinal force along segment `p`

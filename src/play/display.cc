@@ -814,10 +814,10 @@ void Display::drawFiberLines(Fiber const& fib) const
             real x = fib.tension(ii) / disp->tension_scale;
 #if ( 1 )
             // adjust transparency, to make tense fibers more visible:
-            if ( x > 0 )  // invert color for extension
-                col.inverted().load(x);
-            else          // compression
-                col.load(-x);
+            if ( x <= 0 )
+                col.load(-x);           // compression
+            else
+                col.inverted().load(x); // invert color for extension
 #else
             // use rainbow coloring, where Lagrange multipliers are negative under compression
             gle_color::jet_color(1-x, alpha).load();
