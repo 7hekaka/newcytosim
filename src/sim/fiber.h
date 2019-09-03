@@ -25,7 +25,7 @@ class LineDisp;
 
 
 /// Flag to allow `family` member variable to control Couple's binding
-#define FIBER_HAS_FAMILY 1
+#define FIBER_HAS_FAMILY 0
 
 
 /// Flag to allow dynamic Single creation/binding
@@ -98,10 +98,10 @@ private:
     /// Associated Lattice
     FiberLattice        frLattice;
 #endif
-    
+#if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
     Single *            frGlue;
-    
+#endif
 protected:
 #if NEW_FIBER_CHEW
     /// stored chewing at the end

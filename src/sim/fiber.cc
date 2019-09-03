@@ -19,12 +19,13 @@
 
 void Fiber::step()
 {
+#if FIBER_HAS_GLUE
     //add single that act like glue
     if ( prop->glue )
     {
         setGlue(frGlue, PLUS_END, prop->confine_space_ptr);
     }
-    
+#endif
 #if NEW_FIBER_CHEW
     if ( frChewP > 0 )
     {
@@ -133,7 +134,7 @@ void Fiber::step()
  and other newFiber() functions where the initial length is known.
  */
 Fiber::Fiber(FiberProp const* p)
-: handListFront(nullptr), handListBack(nullptr), frGlue(nullptr), prop(p), disp(nullptr)
+: handListFront(nullptr), handListBack(nullptr), prop(p), disp(nullptr)
 {
     if ( prop )
     {
@@ -148,6 +149,9 @@ Fiber::Fiber(FiberProp const* p)
 #endif
         }
     }
+#if FIBER_HAS_GLUE
+    frGlue = nullptr;
+#endif
 #if FIBER_HAS_FAMILY
     family  = 0;
 #endif
@@ -167,12 +171,13 @@ Fiber::~Fiber()
         releaseLattice(frLattice, prop->field_ptr);
 #endif
 
+#if FIBER_HAS_GLUE
     if ( frGlue )
     {
         delete(frGlue);
         frGlue = nullptr;
     }
-    
+#endif
     if ( disp )
     {
         /*
@@ -1746,8 +1751,9 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             Cytosim::log << "Warning: fiber length < fiber:min_length";
             Cytosim::log << " ( " << length() << " < " << prop->min_length << " )" << std::endl;
         }
-
+#if FIBER_HAS_GLUE
         frGlue = nullptr;
+#endif
     }
     else if ( tag == TAG_LATTICE )
     {
