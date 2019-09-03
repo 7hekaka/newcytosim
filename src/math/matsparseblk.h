@@ -101,31 +101,24 @@ private:
         /// return block located at column 'j'
         SubBlock& block(index_t j);
         
-        /// multiplication of a vector: Y <- M * X
-        Vector vecMul(const real* X) const;
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd(const real* X, real * Y) const;
 
-        /*
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_SSE(const real* X, real* Y, index_t j) const;
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd2D(const real* X, real * Y) const;
         
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVX(const real* X, real* Y, index_t j) const;
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd2DU(const real* X, real * Y) const;
         
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVXU(const real* X, real* Y, index_t j) const;
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd3DU(const real* X, real * Y) const;
+
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd3D(const real* X, real * Y) const;
         
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVXU4(const real* X, real* Y, index_t j) const;
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd4D(const real* X, real * Y) const;
 
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_AVX(const real* X, real* Y, index_t j) const;
-
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_AVXU(const real* X, real* Y, index_t j) const;
-
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 4
-        void vecMulAdd4D_AVX(const real* X, real* Y, index_t j) const;
-         */
     };
     
     /// create Elements
@@ -134,10 +127,10 @@ private:
     /// sort matrix block in increasing index order
     void sortElements();
     
-    ///
+    /// copy lower triangle into upper side
     void symmetrize();
     
-    ///
+    /// this is 'true' if symmetrize() was called
     bool already_symmetric;
     
 private:
@@ -149,7 +142,7 @@ private:
     size_t   allocated_;
     
     /// array col_[c][] holds Elements of column 'c'
-    Line *  line_;
+    Line *  row_;
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
     index_t * next_;
@@ -185,7 +178,7 @@ public:
         assert_true( jj < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );
         assert_true( jj % BLOCK_SIZE == 0 );
-        return line_[ii].block(jj);
+        return row_[ii].block(jj);
     }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
@@ -193,7 +186,7 @@ public:
     {
         assert_true( ii < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );
-        return line_[ii].block(ii);
+        return row_[ii].block(ii);
     }
 
     /// returns the address of element at (x, y), no allocation is done
@@ -219,13 +212,28 @@ public:
     void vecMulAdd(const real*, real* Y, index_t start, index_t end) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd_SCAL(const real* X, real* Y, index_t start, index_t end) const;
+
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd2D(const real* X, real* Y, index_t start, index_t end) const;
+
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd3D(const real* X, real* Y, index_t start, index_t end) const;
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t end) const;
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t end) const;
+
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd_ALT(X, Y, 0, size_); }
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_SIMD(const real* X, real* Y) const;
-
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_SCAL(const real* X, real* Y) const;
+    void vecMulAdd_SCAL(const real* X, real* Y) const { vecMulAdd_SCAL(X, Y, 0, size_); }
 
     /// 2D isotropic multiplication (not implemented)
     void vecMulAddIso2D(const real* X, real* Y) const {};

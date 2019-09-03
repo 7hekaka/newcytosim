@@ -343,9 +343,9 @@ public:
         vec4 s1 = mul4(load4(val+4 ), vec);
         vec4 s2 = mul4(load4(val+8 ), vec);
         vec4 s3 = mul4(load4(val+12), vec);
-        vec4 xy = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        vec4 zt = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(xy, zt, 0x20), permute2f128(xy, zt, 0x31));
+        s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+        s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+        return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
     }
 
     /// multiplication by a vector: this * V

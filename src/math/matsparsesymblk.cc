@@ -959,10 +959,10 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
     Y[jj+2] += s2[0] + s2[1] + s2[2];
 #else
     vec4 s3 = setzero4();
-    vec4 xy = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    vec4 zt = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s3 = add4(permute2f128(xy, zt, 0x20), permute2f128(xy, zt, 0x31));
-    storeu4(Y+jj, add4(loadu4(Y+jj), s3));
+    s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 #endif
 #endif
 }
@@ -1125,9 +1125,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y,
         store4(Y+ii, z);
     }
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
-    vec4 xy = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    vec4 zt = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(permute2f128(xy, zt, 0x20), permute2f128(xy, zt, 0x31));
+    s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
     store4(Y+jj, add4(load4(Y+jj), s0));
 #endif
 }
@@ -1178,7 +1178,7 @@ void MatrixSparseSymmetricBlock::vecMulAdd(const real* X, real* Y, index_t start
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseSymmetricBlock::vecMulAdd_SCAL(const real* X, real* Y) const
+void MatrixSparseSymmetricBlock::vecMulAdd_ALT(const real* X, real* Y) const
 {
     for ( index_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
     {

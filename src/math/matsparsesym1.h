@@ -175,7 +175,9 @@ public:
     /// 3D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 3 * dim(M)
     void vecMulAddIso3D(const real* X, real* Y) const { vecMulAddIso3D(X, Y, 0, size_); }
 
-    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd(X, Y, 0, size_); }
+
     /// true if matrix is non-zero
     bool nonZero() const;
     
