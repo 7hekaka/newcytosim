@@ -222,70 +222,51 @@ void MatrixSparseBlock::scale(const real alpha)
 
 
 void MatrixSparseBlock::addTriangularBlock(real* mat, const unsigned ldd,
-                                                    const index_t si,
-                                                    const unsigned nb,
-                                                    const unsigned dim) const
+                                           const index_t start,
+                                           const unsigned cnt,
+                                           const unsigned dim) const
 {
-    if ( si % BLOCK_SIZE )  ABORT_NOW("index incompatible with matrix block size");
-    if ( nb % BLOCK_SIZE )  ABORT_NOW("size incompatible with matrix block size");
+    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
+    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
 
-    index_t up = si + nb;
-    index_t off = si + ldd * si;
-    assert_true( up <= size_ );
+    index_t end = start + cnt;
+    index_t off = start + ldd * start;
+    assert_true( end <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( index_t i = start; i < end; ++i )
     {
-        Line & lin = line_[jj];
-        if ( lin.size_ > 0 )
+        Line & lin = line_[i];
+        for ( index_t n = 1; n < lin.size_; ++n )
         {
-            assert_true(lin.inx_[0] == jj);
-            lin[0].addto_upper(mat + ( jj + ldd*jj ) - off, ldd);
-            for ( index_t n = 1; n < lin.size_; ++n )
-            {
-                index_t ii = lin.inx_[n];
-                // assuming lower triangle is stored:
-                assert_true( ii > jj );
-                if ( ii < up )
-                {
-                    //fprintf(stderr, "`B %4i %4i % .4f\n", ii, jj, a);
-                    lin[n].addto_trans(mat + ( jj + ldd*ii ) - off, ldd);
-                }
-            }
+            index_t j = lin.inx_[n];
+            if ( start <= j && j < end )
+                lin[n].addto(mat+(i+ldd*j)-off, ldd);
         }
     }
 }
 
-
+/**
+ Assuming this is called with a full matrix (after symmetrize() has been called)
+ */
 void MatrixSparseBlock::addDiagonalBlock(real* mat, unsigned ldd,
-                                              const index_t si,
-                                              const unsigned nb) const
+                                         const index_t start,
+                                         const unsigned cnt) const
 {
-    if ( si % BLOCK_SIZE )  ABORT_NOW("index incompatible with matrix block size");
-    if ( nb % BLOCK_SIZE )  ABORT_NOW("size incompatible with matrix block size");
+    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
+    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
     
-    index_t up = si + nb;
-    index_t off = si + ldd * si;
-    assert_true( up <= size_ );
+    index_t end = start + cnt;
+    index_t off = start + ldd * start;
+    assert_true( end <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( index_t i = start; i < end; ++i )
     {
-        Line & lin = line_[jj];
-        if ( lin.size_ > 0 )
+        Line & lin = line_[i];
+        for ( index_t n = 0; n < lin.size_; ++n )
         {
-            assert_true(lin.inx_[0] == jj);
-            lin[0].addto_symm(mat+( jj + ldd*jj )-off, ldd);
-            for ( index_t n = 1; n < lin.size_; ++n )
-            {
-                index_t ii = lin.inx_[n];
-                // assuming lower triangle is stored:
-                assert_true( ii > jj );
-                if ( ii < up )
-                {
-                    //fprintf(stderr, "MSB %4i %4i % .4f\n", ii, jj, a);
-                    lin[n].addto(mat + ( ii + ldd*jj ) - off, ldd);
-                    lin[n].addto_trans(mat + ( jj + ldd*ii ) - off, ldd);
-                }
-            }
+            index_t j = lin.inx_[n];
+            if ( start <= j && j < end )
+                lin[n].addto(mat+(j+ldd*i)-off, ldd);
         }
     }
 }
@@ -1047,9 +1028,11 @@ void MatrixSparseBlock::Line::vecMulAdd4D_AVX(const real* X, real* Y, index_t jj
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd(const real* X, real* Y) const
+void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t end) const
 {
-    for ( index_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
+    assert_true( start <= end );
+    assert_true( end <= size_ );
+    for ( index_t jj = next_[start]; jj < end; jj = next_[jj+1] )
     {
         Vector vec = line_[jj].vecMul(X);
         vec.add_to(Y+jj);

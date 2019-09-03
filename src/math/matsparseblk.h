@@ -201,18 +201,21 @@ public:
     /// scale the matrix by a scalar factor
     void scale(real);
     
-    /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
-    void addDiagonalBlock(real* mat, unsigned ldd, index_t si, unsigned nb) const;
+    /// add the diagonal block ( start, start+nb ) from this matrix to M
+    void addDiagonalBlock(real* mat, unsigned ldd, index_t start, unsigned nb) const;
     
-    /// add upper triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
-    void addTriangularBlock(real* mat, index_t ldd, index_t si, unsigned nb, unsigned dim) const;
+    /// add upper triangular half of 'this' block ( start, start+nb ) to `mat`
+    void addTriangularBlock(real* mat, index_t ldd, index_t start, unsigned nb, unsigned dim) const;
     
     
     ///optional optimization that may accelerate multiplications by a vector
     void prepareForMultiply(int dim);
 
+    /// multiplication of a vector, for columns within [start, end[
+    void vecMulAdd(const real*, real* Y, index_t start, index_t end) const;
+    
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd(const real* X, real* Y) const;
+    void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_SIMD(const real* X, real* Y) const;

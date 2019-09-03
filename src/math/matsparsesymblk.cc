@@ -274,18 +274,18 @@ void MatrixSparseSymmetricBlock::scale(const real alpha)
 
 
 void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const unsigned ldd,
-                                                    const index_t si,
-                                                    const unsigned nb,
+                                                    const index_t start,
+                                                    const unsigned cnt,
                                                     const unsigned dim) const
 {
-    if ( si % BLOCK_SIZE )  ABORT_NOW("index incompatible with matrix block size");
-    if ( nb % BLOCK_SIZE )  ABORT_NOW("size incompatible with matrix block size");
+    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
+    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
 
-    index_t up = si + nb;
-    index_t off = si + ldd * si;
-    assert_true( up <= size_ );
+    index_t end = start + cnt;
+    index_t off = start + ldd * start;
+    assert_true( end <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( index_t jj = start; jj < end; ++jj )
     {
         Column & col = column_[jj];
         if ( col.size_ > 0 )
@@ -297,10 +297,10 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const unsigned ld
                 index_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
                 assert_true( ii > jj );
-                if ( ii < up )
+                if ( ii < end )
                 {
                     //fprintf(stderr, "`B %4i %4i % .4f\n", ii, jj, a);
-                    col[n].addto_trans(mat + ( jj + ldd*ii ) - off, ldd);
+                    col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd);
                 }
             }
         }
@@ -309,17 +309,17 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const unsigned ld
 
 
 void MatrixSparseSymmetricBlock::addDiagonalBlock(real* mat, unsigned ldd,
-                                              const index_t si,
-                                              const unsigned nb) const
+                                              const index_t start,
+                                              const unsigned cnt) const
 {
-    if ( si % BLOCK_SIZE )  ABORT_NOW("index incompatible with matrix block size");
-    if ( nb % BLOCK_SIZE )  ABORT_NOW("size incompatible with matrix block size");
+    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
+    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
     
-    index_t up = si + nb;
-    index_t off = si + ldd * si;
-    assert_true( up <= size_ );
+    index_t end = start + cnt;
+    index_t off = start + ldd * start;
+    assert_true( end <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( index_t jj = start; jj < end; ++jj )
     {
         Column & col = column_[jj];
         if ( col.size_ > 0 )
@@ -331,11 +331,11 @@ void MatrixSparseSymmetricBlock::addDiagonalBlock(real* mat, unsigned ldd,
                 index_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
                 assert_true( ii > jj );
-                if ( ii < up )
+                if ( ii < end )
                 {
                     //fprintf(stderr, "MSSB %4i %4i % .4f\n", ii, jj, a);
-                    col[n].addto(mat + ( ii + ldd*jj ) - off, ldd);
-                    col[n].addto_trans(mat + ( jj + ldd*ii ) - off, ldd);
+                    col[n].addto(mat+(ii+ldd*jj)-off, ldd);
+                    col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd);
                 }
             }
         }

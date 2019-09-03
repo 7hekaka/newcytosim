@@ -206,11 +206,11 @@ public:
     /// scale the matrix by a scalar factor
     void scale(real);
     
-    /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
-    void addDiagonalBlock(real* mat, unsigned ldd, index_t si, unsigned nb) const;
+    /// add the diagonal block ( start, start+nb ) from this matrix to M
+    void addDiagonalBlock(real* mat, unsigned ldd, index_t start, unsigned nb) const;
     
-    /// add upper triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
-    void addTriangularBlock(real* mat, index_t ldd, index_t si, unsigned nb, unsigned dim) const;
+    /// add upper triangular half of 'this' block ( start, start+nb ) to `mat`
+    void addTriangularBlock(real* mat, index_t ldd, index_t start, unsigned nb, unsigned dim) const;
     
     
     ///optional optimization that may accelerate multiplications by a vector
@@ -227,12 +227,6 @@ public:
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_SCAL(const real* X, real* Y) const;
-
-    /// 2D isotropic multiplication (not implemented)
-    void vecMulAddIso2D(const real* X, real* Y) const {};
-    
-    /// 3D isotropic multiplication (not implemented)
-    void vecMulAddIso3D(const real*, real*) const {};
 
     /// true if matrix is non-zero
     bool nonZero() const;
