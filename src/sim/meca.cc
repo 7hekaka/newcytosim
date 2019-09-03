@@ -885,13 +885,14 @@ real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, r
 
 
 /**
- Return the total diagonal block corresponding to an Object, which is:
+ Get the total diagonal block corresponding to an Object, which is:
  
      I - time_step * P ( mB + mC + P' )
  
+ The result is constructed by using functions from mB and mC
  This block is square but not symmetric!
  */
-void Meca::extractBlock(real* res, const Mecable * mec) const
+void Meca::getBlock(real* res, const Mecable * mec) const
 {
     const unsigned ps = mec->nbPoints();
     const unsigned bs = DIM * ps;
@@ -954,13 +955,13 @@ void Meca::extractBlock(real* res, const Mecable * mec) const
 
 
 /**
- This version builds the diagonal block directly from Meca:multiply().
- This is a very slow method that calls 'multiply()' n-times, where
- 'n' is the size of the block. It does not use any of the Meca vectors.
+ This version builds the diagonal block indirectly using Meca:multiply().
+ This is a slow method that calls 'multiply()' n-times, where
+ 'n' is the size of the block.
  
- It should be used for validation only.
+ This should be used for validation only.
 */
-void Meca::extractBlockSlow(real* res, const Mecable* mec) const
+void Meca::extractBlock(real* res, const Mecable* mec) const
 {
     const unsigned dim = dimension();
     const unsigned bks = DIM * mec->nbPoints();
@@ -988,26 +989,26 @@ void Meca::extractBlockSlow(real* res, const Mecable* mec) const
 
 
 // DEBUG: compare `blk` with block extracted using extractBlockSlow()
-void Meca::compareBlocks(const Mecable * mec, const real* blk)
+void Meca::verifyBlock(const Mecable * mec, const real* blk)
 {
     const unsigned bs = DIM * mec->nbPoints();
     real * wrk = new_real(bs*bs);
     
-    extractBlockSlow(wrk, mec);
+    extractBlock(wrk, mec);
     
     blas::xaxpy(bs*bs, -1.0, blk, 1, wrk, 1);
     real err = blas::nrm2(bs*bs, wrk);
  
-    std::clog << "compareBlocks ";
+    std::clog << "verifyBlock ";
     std::clog << std::setw(10) << mec->reference() << " " << std::setw(6) << bs;
     std::clog << "  | B - K | = " << std::setprecision(3) << err << std::endl;
     
-    if ( err > 100 * REAL_EPSILON )
+    if ( err > bs * bs * REAL_EPSILON )
     {
         VecPrint::sparse(std::clog, bs, bs, wrk, bs, 3, (real)0.1);
         
         int s = std::min(16U, bs);
-        extractBlockSlow(wrk, mec);
+        extractBlock(wrk, mec);
         std::clog << " blockS\n";
         VecPrint::print(std::clog, s, s, wrk, bs, 3);
         
@@ -1023,7 +1024,7 @@ void Meca::compareBlocks(const Mecable * mec, const real* blk)
  Multiply here `blk` with the dynamic block extracted by extractBlockSlow()
  and check that we recover the identity matrix
  */
-void Meca::testBlock(const Mecable * mec, const real* blk)
+void Meca::checkBlock(const Mecable * mec, const real* blk)
 {
     const unsigned bs = DIM * mec->nbPoints();
     
@@ -1040,7 +1041,7 @@ void Meca::testBlock(const Mecable * mec, const real* blk)
     real * tmp = new_real(bs*bs);
     real * vec = new_real(bs);
     
-    extractBlockSlow(wrk, mec);
+    extractBlock(wrk, mec);
    
     int info = 0;
     blas::xcopy(bs*bs, wrk, 1, tmp, 1);
@@ -1109,7 +1110,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     if ( may_keep )
     {
         // extract diagonal matrix block corresponding to this Mecable:
-        extractBlock(wrk, mec);
+        getBlock(wrk, mec);
         
         // chose initial vector for power iteration
         blas::xcopy(bs, vRHS+DIM*mec->matIndex(), 1, vec, 1);
@@ -1133,10 +1134,10 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     else
     {
         // extract diagonal matrix block corresponding to this Mecable:
-        extractBlock(blk, mec);
+        getBlock(blk, mec);
     }
     
-    //compareBlocks(mec, blk);
+    //verifyBlock(mec, blk);
 
     int info = 0;
     
@@ -1190,9 +1191,9 @@ void Meca::computePreconditionner(Mecable* mec)
     real* blk = mec->block();
  
     // extract diagonal matrix block corresponding to this Mecable:
-    extractBlock(blk, mec);
+    getBlock(blk, mec);
 
-    //compareBlocks(mec, blk);
+    //verifyBlock(mec, blk);
 
     // calculate LU factorization:
     int info = 0;
@@ -2202,7 +2203,7 @@ void Meca::dumpSparse()
     for ( Mecable * mec : objs )
     {
         unsigned int bs = DIM * mec->nbPoints();
-        extractBlockSlow(tmp2, mec);
+        extractBlock(tmp2, mec);
         VecPrint::sparse_off(os, bs, bs, tmp2, bs, DIM*mec->matIndex());
     }
     os.close();

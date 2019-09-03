@@ -10,7 +10,7 @@
 //#include "matsparse.h"
 #include "matsparsesym1.h"
 #include "matsparsesymblk.h"
-//#include "matsparseblk.h"
+#include "matsparseblk.h"
 #include "allocator.h"
 
 
@@ -242,17 +242,17 @@ private:
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
 
-    /// extract the matrix diagonal block corresponding to a Mecable
+    /// compute the matrix diagonal block corresponding to a Mecable
+    void getBlock(real* res, const Mecable*) const;
+    
+    /// DEBUG: extract the matrix diagonal block corresponding to a Mecable using 'multiply()'
     void extractBlock(real* res, const Mecable*) const;
     
-    /// DEBUG: extract the matrix diagonal block corresponding to a Mecable
-    void extractBlockSlow(real* res, const Mecable*) const;
-    
     /// DEBUG: compare `blk` with block extracted using extractBlockSlow()
-    void compareBlocks(const Mecable*, const real*);
+    void verifyBlock(const Mecable*, const real*);
     
     /// DEBUG: test if `blk` is inverse of block extracted using extractBlockSlow()
-    void testBlock(const Mecable*, const real*);
+    void checkBlock(const Mecable*, const real*);
     
     /// compute the preconditionner block corresponding to given Mecable
     void computePreconditionnerAlt(Mecable*, real*, real*, size_t);

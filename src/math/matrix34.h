@@ -85,8 +85,12 @@ public:
     ~Matrix34() {}
     
     /// human-readible identifier
+#if MATRIX34_USES_AVX
+    static std::string what() { return "12"; }
+#else
     static std::string what() { return "3*4"; }
-
+#endif
+    
     /// set all elements to zero
     void reset()
     {
