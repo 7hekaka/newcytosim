@@ -251,7 +251,10 @@ void FiberProp::clear()
     cylinder_height     = 0;
     
     binding_key         = ~0U;  //all bits at 1
-
+#if NEW_HAS_FAMILY
+    family              = 0;
+#endif
+    
     lattice             = 0;
     lattice_unit        = 0;
     lattice_cut_fiber   = 0;
@@ -342,7 +345,10 @@ void FiberProp::read(Glossary& glos)
     glos.set(cylinder_height,   "surface_effect", 1);
     
     glos.set(binding_key,       "binding_key");
-    
+#if NEW_HAS_FAMILY
+    glos.set(family,            "family");
+#endif
+
     glos.set(lattice,           "lattice");
     glos.set(lattice_unit,      "lattice", 1);
     glos.set(lattice_unit,      "lattice_unit");
@@ -587,6 +593,9 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "squeeze",             squeeze, squeeze_force, squeeze_range);
 #endif
     write_value(os, "binding_key",         binding_key);
+#if NEW_HAS_FAMILY
+    write_value(os, "family",              family);
+#endif
     write_value(os, "lattice",             lattice, lattice_unit);
     write_value(os, "lattice_cut_fiber",   lattice_cut_fiber);
     write_value(os, "lattice_flux_speed",  lattice_flux_speed);

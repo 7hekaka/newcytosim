@@ -247,10 +247,17 @@ bool Couple::allowAttachment(FiberSite const& sit)
     if ( !that )
         return true;
     
+    // prevent binding to the same fiber if the segments are adjacent:
     if ( prop->stiff && that->fiber() == sit.fiber() &&
         fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
         return false;
     
+#if FIBER_HAS_FAMILY
+    // prevent binding if fibers are from the same family
+    if ( that->fiber()->prop->family &&
+        that->fiber()->prop->family == sit.fiber()->prop->family )
+        return false;
+#endif
 #if ( 0 )
     /*
      Test here if binding would create a link inside an aster, near the center:

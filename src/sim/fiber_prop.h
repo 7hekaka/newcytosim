@@ -24,6 +24,7 @@ class Space;
 #define NEW_FIBER_CONFINE_RANGE 0
 #define NEW_AGING_LATTICE       0
 #define NEW_FIBER_LOOP          0
+#define NEW_HAS_FAMILY          0
 
 /// Property for a Fiber
 /**
@@ -164,19 +165,32 @@ public:
     
     /// can be set to control which Hands may bind
     /**
-     To decide if a Hand may bind to a Fiber, the two binding_keys are compared:
+     This option limits the binding of Hands to this class of Fiber. To decide
+     if a Hand may bind or not, the `binding_keys` of the Hand is compared to
+     the `binding_key` of the Fiber, using a BITWISE AND:
 
-         allowed = ( fiber:binding_key & hand:binding_key )
+         allowed = ( fiber:binding_key BITWISE_AND hand:binding_key )
 
-     Attachement is forbiden if the bitwise AND returns false, which is true if the two binding_key do not share any common digit in base 2. For most usage, you would thus use powers of 2 to distinguish fibers:
-     - microtubule: binding_key = 1,
-     - actin: binding_key = 2,
+     Hence attachement if the two `binding_key` do not share any common digit
+     in base 2. For most usage, one can thus use powers of 2 to distinguish fibers:
+     - microtubule: `binding_key = 1`,
+     - actin: `binding_key = 2`,
      - etc.
      .
-     More complex combinations can be created by using all the bits of binding_key.
+     However, more complex combinations can be created by using all the bits of binding_key.
+     With the example above, a Hand with `binding_key=3` can bind to both type of fibers.
      */
     unsigned int binding_key;
 
+#if NEW_HAS_FAMILY
+    /// if set, no connection can be made to another fiber of the same `family`
+    /** This option limits the binding of Hands that are part of a Couple
+     A Hand may not bind to a fiber, if the other Hand of the Couple is already
+     attached to a fiber with the same value of `family`, if ( family > 0 ).
+     */
+    unsigned int family;
+#endif
+    
     /// if true, a Lattice is associated to this fiber
     int          lattice;
     

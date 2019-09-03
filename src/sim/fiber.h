@@ -49,6 +49,7 @@ typedef Lattice<real> FiberLattice;
  which can be used by Digit and derived Hands, and other features.
  
  Fibers are stored in a FiberSet.
+ @todo Fiber should be called Filament
  */
 class Fiber: public Mecafil
 {
