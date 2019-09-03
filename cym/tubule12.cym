@@ -1,6 +1,6 @@
 % protofilaments assembled into a microtubule
 
-% FJN, Cambridge 25.08.2019
+% FJN, Cambridge 25.08.2019, 3.09.2019
 
 set simul system
 {
@@ -38,18 +38,6 @@ set fiber fil
     segmentation = 0.032
     confine = inside, 1000
     display = ( coloring=1; style=1; back_color=dark_gray )
-    binding_key = 1
-}
-
-set fiber fil2
-{
-    steric = 0
-    rigidity = 1
-    lattice = 1, 0.008
-    segmentation = 0.032
-    confine = inside, 1000
-    display = ( coloring=1; style=1; back_color=dark_gray )
-    binding_key = 2
 }
 
 new 0 fil
@@ -89,56 +77,64 @@ new 3 fil
 % First tubule aligned with X
 new 3 fil
 {
+	family = 1
     length = 1
     direction = 1
     range = 0 0.01 -0.005, 0 0.01 0.005
 }
 new 3 fil
 {
+	family = 1
     length = 1
     direction = 1
     range = 0 0.005 0.01, 0 -0.005 0.01
 }
 new 3 fil
 {
+	family = 1
     length = 1
     direction = 1
     range = 0 -0.01 0.005, 0 -0.01 -0.005
 }
 new 3 fil
 {
+	family = 1
     length = 1
     direction = 1
     range = 0 -0.005 -0.01, 0 0.005 -0.01
 }
 
 %------------------- Second Microtubule
-new 3 fil2
+new 3 fil
 {
+	family = 2
     length = 1
     direction = -1
     range = 0 0.045 0.005, 0 0.045 -0.005
 }
-new 3 fil2
+new 3 fil
 {
+	family = 2
     length = 1
     direction = -1
     range = 0 0.04 -0.01, 0 0.03 -0.01
 }
-new 3 fil2
+new 3 fil
 {
+	family = 2
     length = 1
     direction = -1
     range = 0 0.025 -0.005, 0 0.025 0.005
 }
-new 3 fil2
+new 3 fil
 {
+	family = 2
     length = 1
     direction = -1
     range = 0 0.03 0.01, 0 0.04 0.01
 }
 
-set hand kinesin1
+set hand kinesin
 {
     binding = 9, 0.022
     unbinding = 0.5, 3
@@ -152,25 +148,10 @@ set hand kinesin1
     binding_key = 1
 }
 
-set hand kinesin2
-{
-    binding = 9, 0.022
-    unbinding = 0.5, 3
-
-    activity = walk
-    step_size = 0.008
-    unloaded_speed = 0.8
-    stall_force = 5
-
-    display = ( color=orange; size=7; width=5; )
-    binding_key = 2
-}
-
-
 set couple complex
 {
-    hand1 = kinesin1
-    hand2 = kinesin2
+    hand1 = kinesin
+    hand2 = kinesin
     stiffness = 500
     diffusion = 10
     length = 0.020
