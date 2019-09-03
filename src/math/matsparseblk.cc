@@ -226,8 +226,8 @@ void MatrixSparseBlock::addTriangularBlock(real* mat, const unsigned ldd,
                                            const unsigned cnt,
                                            const unsigned dim) const
 {
-    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
-    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
 
     index_t end = start + cnt;
     index_t off = start + ldd * start;
@@ -245,16 +245,14 @@ void MatrixSparseBlock::addTriangularBlock(real* mat, const unsigned ldd,
     }
 }
 
-/**
- Assuming this is called with a full matrix (after symmetrize() has been called)
- */
+
 void MatrixSparseBlock::addDiagonalBlock(real* mat, unsigned ldd,
                                          const index_t start,
                                          const unsigned cnt) const
 {
-    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
-    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
-    
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
+
     index_t end = start + cnt;
     index_t off = start + ldd * start;
     assert_true( end <= size_ );
@@ -266,7 +264,7 @@ void MatrixSparseBlock::addDiagonalBlock(real* mat, unsigned ldd,
         {
             index_t j = lin.inx_[n];
             if ( start <= j && j < end )
-                lin[n].addto(mat+(j+ldd*i)-off, ldd);
+                lin[n].addto(mat+(i+ldd*j)-off, ldd);
         }
     }
 }

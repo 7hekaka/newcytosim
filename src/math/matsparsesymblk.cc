@@ -278,8 +278,8 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const unsigned ld
                                                     const unsigned cnt,
                                                     const unsigned dim) const
 {
-    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
-    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
 
     index_t end = start + cnt;
     index_t off = start + ldd * start;
@@ -312,9 +312,9 @@ void MatrixSparseSymmetricBlock::addDiagonalBlock(real* mat, unsigned ldd,
                                               const index_t start,
                                               const unsigned cnt) const
 {
-    if ( start % BLOCK_SIZE ) ABORT_NOW("index incompatible with matrix block size");
-    if ( cnt % BLOCK_SIZE )   ABORT_NOW("size incompatible with matrix block size");
-    
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
+
     index_t end = start + cnt;
     index_t off = start + ldd * start;
     assert_true( end <= size_ );
