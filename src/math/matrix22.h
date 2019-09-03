@@ -142,7 +142,7 @@ public:
     operator real const*() const { return val; }
 
     /// conversion to array of 'real'
-    //real* data()             { return val; }
+    real* data()             { return val; }
     real* addr(int i, int j) { return val + ( i + 2*j ); }
     
     /// access functions to element by line and column indices
