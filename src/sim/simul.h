@@ -250,7 +250,7 @@ public:
     /// read an Object reference and return the corresponding Object (`tag` is set)
     Object*         readReference(Inputter&, ObjectTag& tag);
 
-    /// check if `name` corresponds to a property class (eg. `simul`)
+    /// check if `name` corresponds to a property class (eg. `simul`, `fiber')
     bool            isPropertyClass(const std::string& name) const;
     
     /// return existing property of given class and name, or return zero

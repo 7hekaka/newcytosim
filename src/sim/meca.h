@@ -33,6 +33,11 @@ typedef Matrix22 MatrixBlock;
 typedef Matrix33 MatrixBlock;
 #endif
 
+
+/// set TRUE to use matrix mB and mC (the traditional way)
+/** This should be normally enabled */
+#define USE_ISO_MATRIX 1
+
 /**
  Option to allow the user to see Links made by Meca in 'play'.
  This option affects display speed since it requires two calls to setInteractions()
@@ -144,9 +149,6 @@ private:
     real*  vMEM;         ///< another temporary array
     
     //--------------------------------------------------------------------------
-    
-    /// true if the matrix mC is non-zero
-    bool   useMatrixC;
 
     /// working memory allocator for BCGS and GMRES used in solve()
     LinearSolvers::Allocator allocator;
@@ -156,16 +158,19 @@ private:
     
     /// Matrices used for GMRES
     LinearSolvers::Matrix mH, mV;
+    
+    /// true if the matrix mC is non-zero
+    bool   useMatrixC;
 
 private:
-
+#if USE_ISO_MATRIX
     /// isotropic symmetric part of the dynamic
     /** 
      This is a symmetric square matrix of size `nbPoints()`
      It contains terms which have identical coefficients on the X, Y, Z subspaces
     */
     MatrixSparseSymmetric1  mB;
-
+#endif
     
     /// non-isotropic symmetric part of the dynamic
     /** 

@@ -29,11 +29,6 @@ extern Modulo const* modulo;
 #define USE_MATRIX_BLOCK 1
 
 
-/// set TRUE to use matrix mB and mC (the traditional way)
-/** This should be normally enabled */
-#define USE_ISO_MATRIX 1
-
-
 //------------------------------------------------------------------------------
 #pragma mark - Accessory functions
 
@@ -95,7 +90,7 @@ inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
     mC.block(i, j).add_full(T);
     //PRINT_BLOCK(i,j,T);
 #else
-    assert_true( i != j );
+    assert_true( i > j );
     for ( int x = 0; x < DIM; ++x )
     for ( int y = 0; y < DIM; ++y )
         mC(i+y, j+x) += T(y,x);
@@ -116,7 +111,7 @@ inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const&
     mC.block(i, j).add_full(alpha, T);
     //PRINT_BLOCK(i,j,alpha*T);
 #else
-    assert_true( i != j );
+    assert_true( i > j );
     for ( int x = 0; x < DIM; ++x )
     for ( int y = 0; y < DIM; ++y )
         mC(i+y, j+x) += alpha * T(y,x);
@@ -137,7 +132,7 @@ inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
     mC.block(i, j).sub_full(T);
     //PRINT_BLOCK(i,j,-T);
 #else
-    assert_true( i != j );
+    assert_true( i > j );
     for ( int x = 0; x < DIM; ++x )
     for ( int y = 0; y < DIM; ++y )
         mC(i+y, j+x) -= T(y,x);
@@ -620,7 +615,7 @@ void Meca::addTorquePoliti(const Interpolation & pt1,
                 mm = int(jj*(7.5-0.5*jj)+ii);
             else {
                 mm = int(ii*(7.5-0.5*ii)+jj);
-                mC( index[ii], index[jj] ) += m[mm];
+                mC(index[ii], index[jj]) += m[mm];
             }
             vBAS[index[ii]] -= m[mm]*coord[jj];
         }
@@ -3853,7 +3848,7 @@ void Meca::addCylinderClampX(const Mecapoint & pte,
         facX = weight * rad * dir_n;
         
         mC(inx+1, inx+1) -= weight * ( 1.0 - rad * ( 1.0 - dir.YY * dir.YY ) );
-        mC(inx+1, inx+2) -= weight * rad * dir.YY * dir.ZZ;
+        mC(inx+2, inx+1) -= weight * rad * dir.YY * dir.ZZ;
         mC(inx+2, inx+2) -= weight * ( 1.0 - rad * ( 1.0 - dir.ZZ * dir.ZZ ) );
     }
     else
@@ -3861,7 +3856,7 @@ void Meca::addCylinderClampX(const Mecapoint & pte,
         facX = weight * rad;
 
         mC(inx+1, inx+1) -= weight * dir.YY * dir.YY;
-        mC(inx+1, inx+2) -= weight * dir.YY * dir.ZZ;
+        mC(inx+2, inx+1) -= weight * dir.YY * dir.ZZ;
         mC(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
     }
     
@@ -3907,7 +3902,7 @@ void Meca::addCylinderClampZ(const Mecapoint & pte,
         facX = weight * rad * dir_n;
         
         mC(inx  , inx  ) -= weight * ( 1.0 - rad * ( 1.0 - dir.XX * dir.XX ) );
-        mC(inx  , inx+1) -= weight * rad * dir.XX * dir.YY;
+        mC(inx+1, inx  ) -= weight * rad * dir.XX * dir.YY;
         mC(inx+1, inx+1) -= weight * ( 1.0 - rad * ( 1.0 - dir.YY * dir.YY ) );
     }
     else
@@ -3915,7 +3910,7 @@ void Meca::addCylinderClampZ(const Mecapoint & pte,
         facX = weight * rad;
         
         mC(inx  , inx  ) -= weight * dir.XX * dir.XX;
-        mC(inx  , inx+1) -= weight * dir.XX * dir.YY;
+        mC(inx+1, inx  ) -= weight * dir.XX * dir.YY;
         mC(inx+1, inx+1) -= weight * dir.YY * dir.YY;
     }
     
