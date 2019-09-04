@@ -554,9 +554,9 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
 
 #include "simd.h"
 
+#if ( BLOCK_SIZE == -2 )
 void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == -2 )
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(load4(blk_[0]), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
@@ -593,13 +593,13 @@ void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
     return add2(load2(Y+jj), h);
-#endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == -2 )
 void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == -2 )
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(load4(blk_[0]), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
@@ -648,13 +648,13 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
     store2(Y+jj, add2(load2(Y+jj), h));
-#endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 3 )
 void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 )
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
@@ -677,53 +677,58 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
     s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
     s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
     storeu4(Y, add4(loadu4(Y), s0));
-#endif
 }
+#endif
 
 
+//#include "iacaMarks.h"
+
+#if ( BLOCK_SIZE == 3 )
 void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 )
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
-    
-    unsigned n = 0;
+    vec4 t0 = setzero4();
+    vec4 t1 = setzero4();
+    vec4 t2 = setzero4();
+
+    assert_true( sizeof(SubBlock) == 12 * sizeof(real) );
+    const real* M = blk_[0];
+    const real* stop = blk_[size_-size_%2];
+    const index_t * inx = inx_;
     {
-        const unsigned stop = size_ - size_ % 2;
-        vec4 t0 = setzero4();
-        vec4 t1 = setzero4();
-        vec4 t2 = setzero4();
         /*
          Unrolling will reduce the dependency chain, which is here limiting the overall
          throughput. However the number of registers (16 for AVX CPU) may limit
          the unrolling that can be done
          */
         // process blocks 2 by 2:
-        for ( ; n < stop; n += 2 )
+        for ( ; M < stop; M += 24 )
         {
-            //printf("--- %4i %4i\n", i0, i1);
-            real const* MA = blk_[n  ];
-            real const* MB = blk_[n+1];
-            vec4 xyzA = loadu4(X+inx_[n  ]);
-            vec4 xyzB = loadu4(X+inx_[n+1]);
+            //IACA_START
+            vec4 A = loadu4(X+inx[0]);
+            vec4 B = loadu4(X+inx[1]);
+            inx += 2;
             // multiply each line of the two blocks:
-            s0 = fmadd4(load4(MA), xyzA, s0);
-            t0 = fmadd4(load4(MB), xyzB, t0);
-            s1 = fmadd4(load4(MA+4), xyzA, s1);
-            t1 = fmadd4(load4(MB+4), xyzB, t1);
-            s2 = fmadd4(load4(MA+8), xyzA, s2);
-            t2 = fmadd4(load4(MB+8), xyzB, t2);
+            s0 = fmadd4(load4(M   ), A, s0);
+            s1 = fmadd4(load4(M+4 ), A, s1);
+            s2 = fmadd4(load4(M+8 ), A, s2);
+            t0 = fmadd4(load4(M+12), B, t0);
+            t1 = fmadd4(load4(M+16), B, t1);
+            t2 = fmadd4(load4(M+20), B, t2);
         }
+        //IACA_END
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
         s2 = add4(s2, t2);
     }
     // process remaining blocks:
-    for ( ; n < size_; ++n )
+    stop = blk_[size_];
+    for ( ; M < stop; M += 12 )
     {
-        real const* M = blk_[n];
-        vec4 xyz = loadu4(X+inx_[n]);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
+        ++inx;
         // multiply with the block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
@@ -733,78 +738,65 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
         s2 = fmadd4(load4(M+8), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
-    vec4 s3 = setzero4();
+    t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s1 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
     s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
     storeu4(Y, add4(loadu4(Y), s0));
-#endif
 }
+#endif
 
 
-
+#if ( BLOCK_SIZE == 3 )
 void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 )
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
-    
-    unsigned n = 0;
+    vec4 t0 = setzero4();
+    vec4 t1 = setzero4();
+    vec4 t2 = setzero4();
+    vec4 u0 = setzero4();
+    vec4 u1 = setzero4();
+    vec4 u2 = setzero4();
+
+    const real* M = blk_[0];
+    const real* stop = blk_[size_-size_%3];
+    const index_t * inx = inx_;
     {
-        const unsigned stop = size_ - size_ % 4;
-        vec4 t0 = setzero4();
-        vec4 t1 = setzero4();
-        vec4 t2 = setzero4();
-        
-        vec4 u0 = setzero4();
-        vec4 u1 = setzero4();
-        vec4 u2 = setzero4();
-        
-        vec4 v0 = setzero4();
-        vec4 v1 = setzero4();
-        vec4 v2 = setzero4();
         /*
          Unrolling will reduce the dependency chain, which is here limiting the overall
          throughput. However the number of registers (16 for AVX CPU) may limit
          the unrolling that can be done
          */
-        // process blocks 4 by 4:
-        for ( ; n < stop; n += 4 )
+        // process blocks 2 by 2:
+        for ( ; M < stop; M += 36 )
         {
-            //printf("--- %4i %4i\n", i0, i1);
-            real const* MA = blk_[n  ];
-            real const* MB = blk_[n+1];
-            real const* MC = blk_[n+2];
-            real const* MD = blk_[n+3];
-            vec4 xyzA = loadu4(X+inx_[n  ]);
-            vec4 xyzB = loadu4(X+inx_[n+1]);
-            vec4 xyzC = loadu4(X+inx_[n+2]);
-            vec4 xyzD = loadu4(X+inx_[n+3]);
+            vec4 A = loadu4(X+inx[0]);
+            vec4 B = loadu4(X+inx[1]);
+            vec4 C = loadu4(X+inx[2]);
+            inx += 3;
             // multiply each line of the two blocks:
-            s0 = fmadd4(load4(MA), xyzA, s0);
-            t0 = fmadd4(load4(MB), xyzB, t0);
-            s1 = fmadd4(load4(MA+4), xyzA, s1);
-            t1 = fmadd4(load4(MB+4), xyzB, t1);
-            s2 = fmadd4(load4(MA+8), xyzA, s2);
-            t2 = fmadd4(load4(MB+8), xyzB, t2);
-            
-            u0 = fmadd4(load4(MC), xyzC, u0);
-            v0 = fmadd4(load4(MD), xyzD, v0);
-            u1 = fmadd4(load4(MC+4), xyzC, u1);
-            v1 = fmadd4(load4(MD+4), xyzD, v1);
-            u2 = fmadd4(load4(MC+8), xyzC, u2);
-            v2 = fmadd4(load4(MD+8), xyzD, v2);
+            s0 = fmadd4(load4(M   ), A, s0);
+            s1 = fmadd4(load4(M+4 ), A, s1);
+            s2 = fmadd4(load4(M+8 ), A, s2);
+            t0 = fmadd4(load4(M+12), B, t0);
+            t1 = fmadd4(load4(M+16), B, t1);
+            t2 = fmadd4(load4(M+20), B, t2);
+            u0 = fmadd4(load4(M+24), C, u0);
+            u1 = fmadd4(load4(M+28), C, u1);
+            u2 = fmadd4(load4(M+32), C, u2);
         }
-        s0 = add4(add4(s0, t0), add4(u0, v0));
-        s1 = add4(add4(s1, t1), add4(u1, v1));
-        s2 = add4(add4(s2, t2), add4(u2, v2));
+        s0 = add4(s0, add4(t0, u0));
+        s1 = add4(s1, add4(t1, u1));
+        s2 = add4(s2, add4(t2, u2));
     }
     // process remaining blocks:
-    for ( ; n < size_; ++n )
+    stop = blk_[size_];
+    for ( ; M < stop; M += 12 )
     {
-        real const* M = blk_[n];
-        vec4 xyz = loadu4(X+inx_[n]);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
+        ++inx;
         // multiply with the block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
@@ -814,18 +806,17 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
         s2 = fmadd4(load4(M+8), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
-    vec4 s3 = setzero4();
+    t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s1 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
     s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
     storeu4(Y, add4(loadu4(Y), s0));
-#endif
 }
+#endif
 
-
+#if ( BLOCK_SIZE == 4 )
 void MatrixSparseBlock::Line::vecMulAdd4D(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 4 )
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
@@ -846,8 +837,8 @@ void MatrixSparseBlock::Line::vecMulAdd4D(const real* X, real* Y) const
     s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
     s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
     store4(Y, add4(load4(Y), s0));
-#endif
 }
+#endif
 #endif
 
 //------------------------------------------------------------------------------
@@ -884,7 +875,7 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 #elif ( DIM == 2 )
         row_[i].vecMulAdd2D(X, Y+i);
 #elif ( DIM == 3 )
-        row_[i].vecMulAdd3DU4(X, Y+i);
+        row_[i].vecMulAdd3DU(X, Y+i);
 #endif
 #else
         row_[i].vecMulAdd(X, Y+i);
