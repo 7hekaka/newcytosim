@@ -112,6 +112,9 @@ private:
         
         /// multiplication of a vector: Y <- Y + M * X
         void vecMulAdd3DU(const real* X, real * Y) const;
+        
+        /// multiplication of a vector: Y <- Y + M * X
+        void vecMulAdd3DU4(const real* X, real * Y) const;
 
         /// multiplication of a vector: Y <- Y + M * X
         void vecMulAdd3D(const real* X, real * Y) const;

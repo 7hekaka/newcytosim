@@ -680,8 +680,6 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
 #endif
 }
 
-#include "iacaMarks.h"
-
 
 void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
 {
@@ -720,6 +718,87 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
         s2 = add4(s2, t2);
+    }
+    // process remaining blocks:
+    for ( ; n < size_; ++n )
+    {
+        real const* M = blk_[n];
+        vec4 xyz = loadu4(X+inx_[n]);  // xyz = { X0 X1 X2 - }
+        // multiply with the block:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
+        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
+        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+        s0 = fmadd4(load4(M  ), xyz, s0);
+        s1 = fmadd4(load4(M+4), xyz, s1);
+        s2 = fmadd4(load4(M+8), xyz, s2);
+    }
+    // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
+    vec4 s3 = setzero4();
+    s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    storeu4(Y, add4(loadu4(Y), s0));
+#endif
+}
+
+
+
+void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
+{
+#if ( BLOCK_SIZE == 3 )
+    vec4 s0 = setzero4();
+    vec4 s1 = setzero4();
+    vec4 s2 = setzero4();
+    
+    unsigned n = 0;
+    {
+        const unsigned stop = size_ - size_ % 4;
+        vec4 t0 = setzero4();
+        vec4 t1 = setzero4();
+        vec4 t2 = setzero4();
+        
+        vec4 u0 = setzero4();
+        vec4 u1 = setzero4();
+        vec4 u2 = setzero4();
+        
+        vec4 v0 = setzero4();
+        vec4 v1 = setzero4();
+        vec4 v2 = setzero4();
+        /*
+         Unrolling will reduce the dependency chain, which is here limiting the overall
+         throughput. However the number of registers (16 for AVX CPU) may limit
+         the unrolling that can be done
+         */
+        // process blocks 4 by 4:
+        for ( ; n < stop; n += 4 )
+        {
+            //printf("--- %4i %4i\n", i0, i1);
+            real const* MA = blk_[n  ];
+            real const* MB = blk_[n+1];
+            real const* MC = blk_[n+2];
+            real const* MD = blk_[n+3];
+            vec4 xyzA = loadu4(X+inx_[n  ]);
+            vec4 xyzB = loadu4(X+inx_[n+1]);
+            vec4 xyzC = loadu4(X+inx_[n+2]);
+            vec4 xyzD = loadu4(X+inx_[n+3]);
+            // multiply each line of the two blocks:
+            s0 = fmadd4(load4(MA), xyzA, s0);
+            t0 = fmadd4(load4(MB), xyzB, t0);
+            s1 = fmadd4(load4(MA+4), xyzA, s1);
+            t1 = fmadd4(load4(MB+4), xyzB, t1);
+            s2 = fmadd4(load4(MA+8), xyzA, s2);
+            t2 = fmadd4(load4(MB+8), xyzB, t2);
+            
+            u0 = fmadd4(load4(MC), xyzC, u0);
+            v0 = fmadd4(load4(MD), xyzD, v0);
+            u1 = fmadd4(load4(MC+4), xyzC, u1);
+            v1 = fmadd4(load4(MD+4), xyzD, v1);
+            u2 = fmadd4(load4(MC+8), xyzC, u2);
+            v2 = fmadd4(load4(MD+8), xyzD, v2);
+        }
+        s0 = add4(add4(s0, t0), add4(u0, v0));
+        s1 = add4(add4(s1, t1), add4(u1, v1));
+        s2 = add4(add4(s2, t2), add4(u2, v2));
     }
     // process remaining blocks:
     for ( ; n < size_; ++n )
@@ -805,7 +884,7 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 #elif ( DIM == 2 )
         row_[i].vecMulAdd2D(X, Y+i);
 #elif ( DIM == 3 )
-        row_[i].vecMulAdd3DU(X, Y+i);
+        row_[i].vecMulAdd3DU4(X, Y+i);
 #endif
 #else
         row_[i].vecMulAdd(X, Y+i);
