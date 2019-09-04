@@ -193,7 +193,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     
     // set abscissa of minus-end
     real a = 0;
-    if ( opt.set(a, "abscissa") )
+    if ( opt.set(a, "origin") )
         fib->setOrigin(a);
     
     // possible dynamic states of the ends
@@ -207,7 +207,6 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
                                    {"growing",   STATE_GREEN},
                                    {"shrink",    STATE_RED},
                                    {"shrinking", STATE_RED}});
-    
     
     // set state of plus ends:
     int p = STATE_WHITE;
