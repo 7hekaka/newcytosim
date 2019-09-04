@@ -191,6 +191,11 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             fib->setStraight(Vector(0,0,0), Vector(1,0,0), len, ref);
     }
     
+    // set abscissa of minus-end
+    real a = 0;
+    if ( opt.set(a, "abscissa") )
+        fib->setOrigin(a);
+    
     // possible dynamic states of the ends
     Glossary::dict_type<int> keys({{"white",     STATE_WHITE},
                                    {"green",     STATE_GREEN},

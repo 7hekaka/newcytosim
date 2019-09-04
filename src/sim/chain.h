@@ -139,6 +139,12 @@ public:
     
     /// Destructor
     ~Chain() {}
+    
+    /// Number of segments = nbPoints() - 1
+    unsigned     nbSegments()  const { return nPoints - 1; }
+    
+    /// Index of the last segment = nbPoints() - 2
+    unsigned     lastSegment() const { return nPoints - 2; }
 
     //---------------------
 
@@ -157,7 +163,7 @@ public:
 
     /// change the current segmentation to force `length()==len` (normally not needed)
     void         imposeLength(real len) { setSegmentation( len / ( nbPoints() - 1 )); fnAbscissaP = fnAbscissaM + len; }
-
+    
     /// return updated `normal` that is orthogonal to `d` (used for display)
     Vector3      adjustedNormal(Vector3 const& d) const;
     
@@ -228,22 +234,25 @@ public:
 
     //---------------------
     
+    /// displace the ORIGIN of abscissa
+    void         setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut*nbSegments() - a; }
+
     /// signed distance from ORIGIN to MINUS_END (abscissa of MINUS_END)
-    real         abscissaM()             const { return fnAbscissaM; }
+    real         abscissaM() const { return fnAbscissaM; }
     
     /// abscissa of center, midway between MINUS_END and PLUS_END
     //real       abscissaC()             const { return fnAbscissaM + 0.5 * length(); }
-    real         abscissaC()             const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
+    real         abscissaC() const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
 
     /// signed distance from ORIGIN to PLUS_END (abscissa of PLUS_END)
     //real       abscissaP()             const { return fnAbscissaM + length(); }
-    real         abscissaP()             const { return fnAbscissaP; }
+    real         abscissaP() const { return fnAbscissaP; }
 
     /// signed distance from ORIGIN to vertex specified with index (or intermediate position)
     real         abscissaPoint(const real n) const { return fnAbscissaM + fnCut * n; }
 
     /// signed distance from the ORIGIN to the specified FiberEnd
-    real         abscissaEnd(FiberEnd end)  const;
+    real         abscissaEnd(FiberEnd end) const;
     
     /// converts distance from the specified FiberEnd, to abscissa from the ORIGIN
     real         abscissaFrom(real dis, FiberEnd ref) const;

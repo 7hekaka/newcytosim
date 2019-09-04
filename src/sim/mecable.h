@@ -98,12 +98,6 @@ public:
     /// Index of the last point = nbPoints() - 1
     unsigned        lastPoint()    const { return nPoints - 1; }
     
-    /// Number of segments = nbPoints() - 1
-    unsigned        nbSegments()   const { return nPoints - 1; }
-    
-    /// Index of the last segment = nbPoints() - 2
-    unsigned        lastSegment()  const { return nPoints - 2; }
-    
     /// size currently allocated
     size_t          allocated()    const { return pAllocated; }
 

@@ -76,7 +76,7 @@ void ViewProp::read(Glossary& glos)
     glos.set(perspective, "perspective");
     glos.set(slice, "slice", {{"off", 0},{"front", 1},{"back", 2},{"slice", 3}});
 
-    glos.set(back_color, "background_color");
+    glos.set(back_color, "background");
     if ( glos.set(back_color, "back_color") )
     {
         fog_color = back_color;
