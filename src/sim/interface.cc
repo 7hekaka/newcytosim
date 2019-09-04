@@ -42,7 +42,7 @@ Interface::Interface(Simul& s)
  */
 Property* Interface::execute_set(std::string const& cat, std::string const& name, Glossary& def)
 {
-    VLOG("-SET " << cat << " `" << name << "'\n");
+    VLOG("+SET " << cat << " `" << name << "'\n");
     
     /* mostly for historical reason, we do not allow for name that are class name,
     but this should also limit confusions in the config file */
@@ -89,15 +89,24 @@ void Interface::execute_change(Property * pp, Glossary& def)
 
 
 // in this form, 'name' designates the property name
-Property * Interface::execute_change(std::string const& name, Glossary& def)
+Property * Interface::execute_change(std::string const& name, Glossary& def, bool strict)
 {
     Property * pp = simul.findProperty(name);
     
     if ( pp )
+    {
+        VLOG("-CHANGE " << pp->category() << " `" << name << "'\n");
         execute_change(pp, def);
+    }
     else
-        throw InvalidSyntax("unknown property `"+name+"'");
-    
+    {
+        if ( strict )
+            throw InvalidSyntax("unknown property `"+name+"'");
+        else
+        {
+            VLOG("unknown change |" << name << "|\n");
+        }
+    }
     return pp;
 }
 
@@ -106,11 +115,15 @@ void Interface::execute_change_all(std::string const& cat, Glossary& def)
 {
     PropertyList plist = simul.findAllProperties(cat);
     
+    for ( Property * i : plist )
+    {
+        VLOG("+CHANGE " << i->category() << " `" << i->name() << "'\n");
+        execute_change(i, def);
+    }
+    /*
     if ( plist.size() == 0 )
         throw InvalidSyntax("could not find any property of class `"+cat+"'");
-    
-    for ( Property * i : plist )
-        execute_change(i, def);
+     */
 }
 
 
@@ -385,7 +398,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
     
     //hold();
 
-    VLOG("-NEW `" << name << "' made " << res.size() << " objects\n");
+    VLOG("+NEW `" << name << "' made " << res.size() << " objects\n");
     
     return res;
 }
