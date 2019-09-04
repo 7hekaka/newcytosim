@@ -24,45 +24,6 @@ private:
         on PC from mac, or vice et versa.
         */
     int       binary_;
-    
-    /// reverse order of bytes in c[2]
-    /**
-     Can use the Intel SIMD function _bswap() and _bswap64()
-     */
-    inline void swap2(unsigned char* c)
-    {
-        unsigned char s(c[0]);
-        c[0] = c[1];
-        c[1] = s;
-    }
- 
-    /// reverse order of bytes in c[4]
-    inline void swap4(unsigned char* c)
-    {
-        unsigned char s(c[0]);
-        unsigned char t(c[1]);
-        c[0] = c[3];
-        c[1] = c[2];
-        c[3] = s;
-        c[2] = t;
-    }
-
-    /// reverse order of bytes in c[8]
-    inline void swap8(unsigned char* c)
-    {
-        unsigned char s(c[0]);
-        unsigned char t(c[1]);
-        unsigned char u(c[2]);
-        unsigned char v(c[3]);
-        c[0] = c[7];
-        c[1] = c[6];
-        c[2] = c[5];
-        c[3] = c[4];
-        c[7] = s;
-        c[6] = t;
-        c[5] = u;
-        c[4] = v;
-    }
 
 public:
     

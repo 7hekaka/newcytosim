@@ -2,6 +2,7 @@
 
 #include "iowrapper.h"
 #include "exceptions.h"
+#include "byteswap.h"
 
 
 ///check the size of the type, as we rely on them to write byte-by-byte
@@ -53,7 +54,7 @@ int16_t Inputter::readInt16()
         if ( 1 != fread(&v, 2, 1, mFile) )
             throw InvalidIO("readInt16 failed");
         if ( binary_ == 2 )
-            swap2(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -76,7 +77,7 @@ int32_t Inputter::readInt32()
         if ( 1 != fread(&v, 4, 1, mFile) )
             throw InvalidIO("readInt32 failed");
         if ( binary_ == 2 )
-            swap4(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -119,7 +120,7 @@ uint16_t Inputter::readUInt16()
         if ( 1 != fread(&v, 2, 1, mFile) )
             throw InvalidIO("readUInt16 failed");
         if ( binary_ == 2 )
-            swap2(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -142,7 +143,7 @@ uint32_t Inputter::readUInt32()
         if ( 1 != fread(&v, 4, 1, mFile) )
             throw InvalidIO("readUInt32 failed");
         if ( binary_ == 2 )
-            swap4(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -165,7 +166,7 @@ uint64_t Inputter::readUInt64()
         if ( 1 != fread(&v, 8, 1, mFile) )
             throw InvalidIO("readUInt64 failed");
         if ( binary_ == 2 )
-            swap8(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -188,7 +189,7 @@ float Inputter::readFloat()
         if ( 1 != fread(&v, 4, 1, mFile) )
             throw InvalidIO("readFloat failed");
         if ( binary_ == 2 )
-            swap4(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -207,7 +208,7 @@ double Inputter::readDouble()
         if ( 1 != fread(&v, 8, 1, mFile) )
             throw InvalidIO("readDouble failed");
         if ( binary_ == 2 )
-            swap8(reinterpret_cast<unsigned char*>(&v));
+            v = byteswap(v);
     }
     else
     {
@@ -281,8 +282,10 @@ void Inputter::readFloatVector(double a[], const unsigned n, const unsigned D)
             throw InvalidIO("readFloatVector(double) failed");
         }
         if ( binary_ == 2 )
-            for ( unsigned u = 0; u < nd; ++u )
-                swap4(reinterpret_cast<unsigned char*>(v+u));
+        {
+            for ( unsigned i = 0; i < nd; ++i )
+                v[i] = byteswap(v[i]);
+        }
     }
     else
     {
