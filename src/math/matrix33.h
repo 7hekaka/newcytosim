@@ -885,7 +885,7 @@ public:
         val[2      ] += dir[2]*vec[0];
         val[0+BLD  ] += dir[0]*vec[1];
         val[1+BLD  ] += dir[1]*vec[1];
-        val[2+BLD  ] += dir[2]*vec[1],
+        val[2+BLD  ] += dir[2]*vec[1];
         val[0+BLD*2] += dir[0]*vec[2];
         val[1+BLD*2] += dir[1]*vec[2];
         val[2+BLD*2] += dir[2]*vec[2];

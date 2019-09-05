@@ -182,7 +182,8 @@ void fillMatrix3D(MatrixSparseBlock& mat, const int i, const int j)
 }
 
 
-void fillMatrix3D(MatrixSparseSymmetric1& mat, const int i, const int j)
+template <typename MATRIX>
+void fillMatrix3D(MATRIX& mat, const int i, const int j)
 {
     Matrix33 M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
     for ( int x = 0; x < 3; ++x )
@@ -534,15 +535,15 @@ int main( int argc, char* argv[] )
         testMatrixBlock(DIM*2311, 231111);
         //testMatrixBlock(DIM*3217, 671234);
     }
-    if ( 0 )
+    if ( 1 )
     {
         //testMatrices(DIM*17, 23);
-        testMatrices(DIM*91, 1<<12);
+        //testMatrices(DIM*91, 1<<12);
         testMatrices(DIM*197, 1<<14);
         testMatrices(DIM*437, 1<<17);
         testMatrices(DIM*713, 1<<18);
     }
-    if ( 1 )
+    if ( 0 )
     {
         //testMatrices(DIM*17, 23);
         int dim[5] = { 0 };

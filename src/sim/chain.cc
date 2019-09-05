@@ -1820,10 +1820,10 @@ Interpolation Chain::interpolateCenter() const
  */
 Interpolation Chain::interpolateM(const real ab) const
 {
-    real a = std::max(ab, 0.0) / fnCut;
+    real a = std::max(ab, (real)0) / fnCut;
     //beyond the last point, we interpolate the PLUS_END
     unsigned s = std::min((unsigned)a, nPoints-2);
-    return Interpolation(this, s, s+1, std::min(a-s, 1.0));
+    return Interpolation(this, s, s+1, std::min(a-s, (real)1));
 }
 
 

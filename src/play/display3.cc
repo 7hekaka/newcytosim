@@ -1106,8 +1106,8 @@ void Display3::drawCoupleB(Couple const* cx) const
     Vector p2 = cx->posHand2();
     if ( modulo ) p2 = modulo->image(p2, p1);
     
-    Vector dir = p2 - p1;
-    real dns = dir.normSqr();
+    Vector dif = p2 - p1;
+    real dns = dif.normSqr();
     
 #if ( 1 )
     if ( dns > 1e-6 )
@@ -1116,9 +1116,8 @@ void Display3::drawCoupleB(Couple const* cx) const
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width;
         const real rad2 = cx->fiber2()->prop->disp->line_width;
-        p1 += dir * ( rad1 * dns );
-        if ( pd1 == pd2 )
-        p2 -= dir * ( rad2 * dns );
+        p1 += dif * std::min((real)0.5, rad1*dns);
+        p2 -= dif * std::min((real)0.5, rad2*dns);
     }
 #endif
     
@@ -1150,7 +1149,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         glEnable(GL_CLIP_PLANE5);
         if ( pd1->visible )
         {
-            setClipPlane(GL_CLIP_PLANE5, -dir, mid);
+            setClipPlane(GL_CLIP_PLANE5, -dif, mid);
             pd1->color.load_front();
             gleTube(p1, p2, pd1->width*sFactor, gleTube1B);
             drawHand(p1, pd1);
@@ -1158,7 +1157,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         
         if ( pd2->visible )
         {
-            setClipPlane(GL_CLIP_PLANE5,  dir, mid);
+            setClipPlane(GL_CLIP_PLANE5,  dif, mid);
             pd2->color.load_front();
             gleTube(p2, p1, pd2->width*sFactor, gleTube1B);
             drawHand(p2, pd2);

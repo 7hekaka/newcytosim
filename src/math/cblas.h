@@ -420,6 +420,7 @@ inline double nrm8(const size_t siz, const double* X)
     double const* end = X + siz;
     double const* stop = end - 11;
     vec4 u = setzero4();
+    #pragma nounroll
     while ( ptr < stop )
     {
         vec4 a = abs4(load4(ptr));
@@ -428,6 +429,7 @@ inline double nrm8(const size_t siz, const double* X)
         u = max4(max4(u,a), max4(b,c));
         ptr += 12;
     }
+    #pragma nounroll
     while ( ptr < end - 3 )
     {
         u = max4(u, abs4(load4(ptr)));
@@ -452,7 +454,40 @@ inline double nrm8(const size_t siz, const double* X)
 #endif
     return res;
 }
+
     
+inline float nrm8(const size_t siz, const float* X)
+{
+    float const* ptr = X;
+    float const* end = X + siz;
+    float const* stop = end - 24;
+    vec8f u = setzero8f();
+    while ( ptr <= stop )
+    {
+        vec8f a = abs8f(load8f(ptr));
+        vec8f b = abs8f(load8f(ptr+8));
+        vec8f c = abs8f(load8f(ptr+16));
+        u = max8f(max8f(u,a), max8f(b,c));
+        ptr += 24;
+    }
+    while ( ptr <= end - 8 )
+    {
+        u = max8f(u, abs8f(load8f(ptr)));
+        ptr += 8;
+    }
+    vec4f v = _mm256_castps256_ps128(max8f(u, _mm256_permute2f128_ps(u, u, 0x01)));
+    while ( ptr <= end - 4 )
+    {
+        v = max4f(v, abs4f(load4f(ptr)));
+        ptr += 4;
+    }
+    v = max4f(v, permute4f(v, 0b01));
+    float res = v[0];
+    while ( ptr < end )
+        res = std::max(res, std::abs(*ptr++));
+    return res;
+}
+
 #else
 inline real nrm8(const int N, const real* X)
 {

@@ -975,10 +975,10 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y, index_t jj) const
 {
+#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     constexpr size_t BS = sizeof(SquareBlock)/sizeof(real);
     const real* M = blk_[0];
 
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     vec4 sa, sb, sc;
     vec4 xa, xb, xc;
     vec4 ta = setzero4();

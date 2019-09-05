@@ -140,8 +140,14 @@ inline void print(vec4f v, char const* s)
     printf("vec4f %s ( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
-inline vec4f load4f(float const* a)          { return _mm_load_ps(a); }
-inline void store4f(float* a, vec4f b)       { return _mm_store_ps(a, b); }
+inline vec4f load4f(float const* a)      { return _mm_load_ps(a); }
+inline void store4f(float* a, vec4f b)   { return _mm_store_ps(a, b); }
+inline vec4f max4f(vec4f a, vec4f b)     { return _mm_max_ps(a,b); }
+inline vec4f min4f(vec4f a, vec4f b)     { return _mm_min_ps(a,b); }
+inline vec4f and4f(vec4f a, vec4f b)     { return _mm_and_ps(a,b); }
+inline vec4f andnot4f(vec4f a, vec4f b)  { return _mm_andnot_ps(a,b); }
+inline vec4f abs4f(vec4f a)              { return _mm_andnot_ps(_mm_set1_ps(-0.0), a); }
+#define permute4f(a,b)       _mm_permute_ps(a,b)       // same as shuffle2(a,a,b)
 
 #endif
 
@@ -325,11 +331,20 @@ inline void print(vec8f v, char const* x)
 inline vec8f load8f(float const* a)     { return _mm256_load_ps(a); }
 inline void store8f(float* a, vec8f b)  { return _mm256_store_ps(a, b); }
 
+inline vec8f setzero8f()                { return _mm256_setzero_ps(); }
 inline vec8f set8f(float const& a)      { return _mm256_set1_ps(a); }
 inline vec8f mulf(vec8f a, vec8f b)     { return _mm256_mul_ps(a,b); }
 inline vec8f divf(vec8f a, vec8f b)     { return _mm256_div_ps(a,b); }
 inline vec8f addf(vec8f a, vec8f b)     { return _mm256_add_ps(a,b); }
 inline vec8f subf(vec8f a, vec8f b)     { return _mm256_sub_ps(a,b); }
+
+inline vec8f max8f(vec8f a, vec8f b)    { return _mm256_max_ps(a,b); }
+inline vec8f min8f(vec8f a, vec8f b)    { return _mm256_min_ps(a,b); }
+inline vec8f and8f(vec8f a, vec8f b)    { return _mm256_and_ps(a,b); }
+inline vec8f andnot8f(vec8f a, vec8f b) { return _mm256_andnot_ps(a,b); }
+inline vec8f abs8f(vec8f a)             { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
+
+#define permute8f128(a,b,c)  _mm256_permute4f128_ps(a,b,c)
 
 /// approximate inverse
 inline vec8f rcpf(vec8f a)              { return _mm256_rcp_ps(a); }

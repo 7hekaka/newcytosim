@@ -420,7 +420,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     }
 #endif
 #if 0 && ( DIM == 3 )
-    const int NFIL = 12;
+    const int NFIL = 13;
     if ( 0 == fibers.size() % NFIL )
     {
         PRINT_ONCE("AD-HOC N-TUBULE LINKS ENABLED\n");
