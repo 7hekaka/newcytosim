@@ -975,6 +975,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y, index_t jj) const
 {
+    constexpr size_t BS = sizeof(SquareBlock)/sizeof(real);
+    const real* M = blk_[0];
+
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     vec4 sa, sb, sc;
     vec4 xa, xb, xc;
@@ -983,12 +986,11 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     vec4 tc = setzero4();
     // load 3x3 matrix element into 3 vectors:
     {
-        real const* D = blk_[0];
         vec4 tt = loadu4(X+jj);
         // multiply by diagonal elements:
-        sa = mul4(load4(D  ), tt);
-        sb = mul4(load4(D+4), tt);
-        sc = mul4(load4(D+8), tt);
+        sa = mul4(load4(M  ), tt);
+        sb = mul4(load4(M+4), tt);
+        sc = mul4(load4(M+8), tt);
         // prepare broadcasted vectors:
         vec4 p = permute2f128(tt, tt, 0x01);
         vec4 l = blend4(tt, p, 0b1100);
@@ -997,9 +999,10 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
         xb = duphi4(l);
         xc = duplo4(u);
     }
+    M += BS;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    unsigned n = 1;
-    const unsigned stop = 1 + 2 * ( ( size_ - 1 ) / 2 );
+    const real* stop = blk_[1+2*((size_-1)/2)];
+    const index_t * inx = inx_+1;
     /*
      Unrolling will reduce the dependency chain, which may be limiting the
      throughput here. However the number of registers (16 for AVX CPU) limits
@@ -1007,15 +1010,14 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
      */
     //process 2 by 2:
     #pragma nounroll
-    for ( ; n < stop; n += 2 )
+    for ( ; M < stop; M += 2*BS )
     {
-        const index_t i0 = inx_[n  ];
-        const index_t i1 = inx_[n+1];
+        const index_t i0 = inx[0];
+        const index_t i1 = inx[1];
+        inx += 2;
         //printf("--- %4i %4i\n", i0, i1);
-        real const* M0 = blk_[n  ];
-        real const* M1 = blk_[n+1];
-        vec4 ma0 = load4(M0);
-        vec4 ma1 = load4(M1);
+        vec4 ma0 = load4(M);
+        vec4 ma1 = load4(M+BS);
         vec4 z0 = fmadd4(ma0, xa, loadu4(Y+i0));
         vec4 z1 = fmadd4(ma1, xa, loadu4(Y+i1));
         vec4 xyz0 = loadu4(X+i0);
@@ -1023,14 +1025,14 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
         sa = fmadd4(ma0, xyz0, sa);
         ta = fmadd4(ma1, xyz1, ta);
         // multiply with the full block:
-        vec4 mb0 = load4(M0+4);
-        vec4 mb1 = load4(M1+4);
+        vec4 mb0 = load4(M+4);
+        vec4 mb1 = load4(M+(BS+4));
         z0 = fmadd4(mb0, xb, z0);
         z1 = fmadd4(mb1, xb, z1);
         sb = fmadd4(mb0, xyz0, sb);
         tb = fmadd4(mb1, xyz1, tb);
-        vec4 mc0 = load4(M0+8);
-        vec4 mc1 = load4(M1+8);
+        vec4 mc0 = load4(M+8);
+        vec4 mc1 = load4(M+(BS+8));
         z0 = fmadd4(mc0, xc, z0);
         z1 = fmadd4(mc1, xc, z1);
         sc = fmadd4(mc0, xyz0, sc);
@@ -1052,12 +1054,13 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     sc = add4(sc, tc);
     
     // process remaining blocks:
+    stop = blk_[size_];
     #pragma nounroll
-    for ( ; n < size_; ++n )
+    for ( ; M < stop; M += BS )
     {
-        const index_t ii = inx_[n];
+        const index_t ii = inx[0];
+        ++inx;
         //printf("--- %4i\n", ii);
-        real const* M = blk_[n];
         vec4 ma = load4(M);
         vec4 z = fmadd4(ma, xa, loadu4(Y+ii));
         vec4 xyz = loadu4(X+ii);

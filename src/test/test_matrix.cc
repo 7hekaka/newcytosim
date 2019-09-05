@@ -184,44 +184,27 @@ void fillMatrix3D(MatrixSparseBlock& mat, const int i, const int j)
 
 void fillMatrix3D(MatrixSparseSymmetric1& mat, const int i, const int j)
 {
-    mat(i  , i  ) += alpha;
-    mat(i+1, i  ) -= beta;
-    mat(i+2, i  ) -= beta;
-    mat(i+1, i+1) += alpha;
-    mat(i+2, i+1) -= beta;
-    mat(i+2, i+2) += alpha;
+    Matrix33 M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
+    for ( int x = 0; x < 3; ++x )
+    for ( int y = x; y < 3; ++y )
+        mat(i+y, i+x) += M(y,x);
     
     if ( i > j )
     {
-        mat(i  , j  ) -= beta;
-        mat(i+1, j  ) -= beta;
-        mat(i+2, j  ) -= beta;
-        mat(i  , j+1) -= beta;
-        mat(i+1, j+1) -= beta;
-        mat(i+2, j+1) -= beta;
-        mat(i  , j+2) -= beta;
-        mat(i+1, j+2) -= beta;
-        mat(i+2, j+2) -= beta;
+        for ( int x = 0; x < 3; ++x )
+        for ( int y = 0; y < 3; ++y )
+            mat(i+y, j+x) += M(y,x);
     }
     else
     {
-        mat(j  , i  ) -= beta;
-        mat(j+1, i  ) -= beta;
-        mat(j+2, i  ) -= beta;
-        mat(j  , i+1) -= beta;
-        mat(j+1, i+1) -= beta;
-        mat(j+2, i+1) -= beta;
-        mat(j  , i+2) -= beta;
-        mat(j+1, i+2) -= beta;
-        mat(j+2, i+2) -= beta;
+        for ( int x = 0; x < 3; ++x )
+        for ( int y = 0; y < 3; ++y )
+            mat(j+y, i+x) += M(x,y);
     }
     
-    mat(j  , j  ) += alpha;
-    mat(j+1, j  ) -= beta;
-    mat(j+2, j  ) -= beta;
-    mat(j+1, j+1) += alpha;
-    mat(j+2, j+1) -= beta;
-    mat(j+2, j+2) += alpha;
+    for ( int x = 0; x < 3; ++x )
+    for ( int y = x; y < 3; ++y )
+        mat(j+y, j+x) += M(y,x);
 }
 
 template <typename MATRIX>
