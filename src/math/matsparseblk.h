@@ -145,10 +145,10 @@ private:
     size_t   allocated_;
     
     /// array col_[c][] holds Elements of column 'c'
-    Line *  row_;
+    Line *   row_;
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
-    index_t * next_;
+    index_t* next_;
 
 public:
     

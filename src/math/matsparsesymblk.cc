@@ -780,6 +780,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y
     unsigned n = 1;
     const unsigned stop = 1 + 2 * ( ( size_ - 1 ) / 2 );
     // process 4 by 4:
+    #pragma nounroll
     for ( ; n < stop; n += 2 )
     {
 #if ( 0 )
@@ -810,6 +811,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y
     // collapse 'ss'
     ss = add4(ss, s1);
     // process remaining blocks:
+    #pragma nounroll
     for ( ; n < size_; ++n )
         multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
@@ -833,6 +835,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* 
     unsigned n = 1;
     const unsigned stop = 1 + 4 * ( ( size_ - 1 ) / 4 );
     // process 4 by 4:
+    #pragma nounroll
     for ( ; n < stop; n += 4 )
     {
 #if ( 0 )
@@ -875,6 +878,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* 
     // collapse 'ss'
     ss = add4(add4(ss,s1), add4(s2,s3));
     // process remaining blocks:
+    #pragma nounroll
     for ( ; n < size_; ++n )
         multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
     /* finally sum ss = { S0 S0 S1 S1 } */
@@ -921,6 +925,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
     const vec4 x2 = duplo4(u);
 #endif
     // There is a dependency in the loop for 's0', 's1' and 's2'.
+    #pragma nounroll
     for ( index_t n = 1; n < size_; ++n )
     {
         const index_t ii = inx_[n];
@@ -1001,6 +1006,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
      the level of unrolling that can be done.
      */
     //process 2 by 2:
+    #pragma nounroll
     for ( ; n < stop; n += 2 )
     {
         const index_t i0 = inx_[n  ];
@@ -1046,6 +1052,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     sc = add4(sc, tc);
     
     // process remaining blocks:
+    #pragma nounroll
     for ( ; n < size_; ++n )
     {
         const index_t ii = inx_[n];
@@ -1101,6 +1108,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y,
     const vec4 x3 = duphi4(u);
 #endif
     // There is a dependency in the loop for 's0', 's1' and 's2'.
+    #pragma nounroll
     for ( index_t n = 1; n < size_; ++n )
     {
         const index_t ii = inx_[n];

@@ -19,6 +19,8 @@ using namespace TicToc;
 
 typedef MatrixSparseSymmetricBlock MatrixSparseSymmetricB;
 
+typedef Matrix34 MatrixBlock;
+
 const int N_RUN = 16;
 const int N_MUL = 64;
 
@@ -154,10 +156,23 @@ void compare(unsigned size,  MATRIXA & mat1, MATRIXB& mat2, unsigned fill)
     free_real(tmp2);
 }
 
+template <typename MATRIX>
+void fillMatrix3D(MATRIX& mat, const int i, const int j)
+{
+    MatrixBlock M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
+    
+    mat.diag_block(i).add_half(M);
+    mat.diag_block(j).add_half(M);
+
+    if ( i > j )
+        mat.block(i,j).add_full(M);
+    else
+        mat.block(j,i).add_full(M.transposed());
+}
 
 
 template <typename MATRIX>
-void fillMatrix3D(MATRIX& mat, const int i, const int j)
+void fillMatrix3Dalt(MATRIX& mat, const int i, const int j)
 {
     mat(i  , i  ) += alpha;
     mat(i+1, i  ) -= beta;
@@ -165,7 +180,7 @@ void fillMatrix3D(MATRIX& mat, const int i, const int j)
     mat(i+1, i+1) += alpha;
     mat(i+2, i+1) -= beta;
     mat(i+2, i+2) += alpha;
-
+    
     if ( i > j )
     {
         mat(i  , j  ) -= beta;
@@ -347,9 +362,9 @@ void testMatrices(const int size, const int fill)
     alpha = RNG.sreal();
     
     //testMatrix(mat0, size, x, y, z, fill, inx, iny);
-    testMatrix(mat1, size, x, y, z, fill, inx, iny);
+    //testMatrix(mat1, size, x, y, z, fill, inx, iny);
     //testMatrix(mat2, size, x, y, z, fill, inx, iny);
-    testMatrix(mat3, size, x, y, z, fill, inx, iny);
+    //testMatrix(mat3, size, x, y, z, fill, inx, iny);
     testMatrix(mat4, size, x, y, z, fill, inx, iny);
     printf("\n");
     

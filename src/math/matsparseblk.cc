@@ -662,6 +662,7 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
     const real* M = blk_[0];
     const real* stop = blk_[size_];
     const index_t * inx = inx_;
+    #pragma nounroll
     for ( ; M < stop; M += 12 )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
@@ -708,6 +709,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
          to advance the calculation. AVX-512 loads & muls would work well here.
          */
         // process blocks 2 by 2:
+        #pragma nounroll
         for ( ; M < stop; M += 24 )
         {
             //IACA_START
@@ -729,6 +731,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
     }
     // process remaining blocks:
     stop = blk_[size_];
+    #pragma nounroll
     for ( ; M < stop; M += 12 )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
@@ -774,7 +777,8 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
          Moreover, the bottleneck here is the high number of loads needed
          to advance the calculation. AVX-512 loads & muls would work well here.
          */
-        // process blocks 2 by 2:
+        // process blocks 3 by 3:
+        #pragma nounroll
         for ( ; M < stop; M += 36 )
         {
             vec4 A = loadu4(X+inx[0]);
@@ -798,6 +802,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
     }
     // process remaining blocks:
     stop = blk_[size_];
+    #pragma nounroll
     for ( ; M < stop; M += 12 )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
