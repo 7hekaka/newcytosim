@@ -281,6 +281,7 @@
 		BB74F41A231C334D0019D68E /* matsparseblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F418231C334D0019D68E /* matsparseblk.h */; };
 		BB74F41B231C334D0019D68E /* matsparseblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74F419231C334D0019D68E /* matsparseblk.cc */; };
 		BB74F41C231E7E0F0019D68E /* matsparseblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74F419231C334D0019D68E /* matsparseblk.cc */; };
+		BB74F420232024AB0019D68E /* byteswap.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F41F232024AB0019D68E /* byteswap.h */; };
 		BB7662C510E923A200C93DF6 /* frame_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7662C310E923A200C93DF6 /* frame_reader.cc */; };
 		BB7662C610E923A200C93DF6 /* frame_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7662C410E923A200C93DF6 /* frame_reader.h */; };
 		BB770B6E12FF3E1900D018A0 /* fork_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770B6C12FF3E1900D018A0 /* fork_prop.cc */; };
@@ -1214,6 +1215,7 @@
 		BB749D651793645D00B43298 /* polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = polygon.h; path = src/math/polygon.h; sourceTree = SOURCE_ROOT; };
 		BB74F418231C334D0019D68E /* matsparseblk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matsparseblk.h; sourceTree = "<group>"; };
 		BB74F419231C334D0019D68E /* matsparseblk.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matsparseblk.cc; sourceTree = "<group>"; };
+		BB74F41F232024AB0019D68E /* byteswap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = byteswap.h; sourceTree = "<group>"; };
 		BB7662C310E923A200C93DF6 /* frame_reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_reader.cc; path = src/play/frame_reader.cc; sourceTree = SOURCE_ROOT; };
 		BB7662C410E923A200C93DF6 /* frame_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_reader.h; path = src/play/frame_reader.h; sourceTree = SOURCE_ROOT; };
 		BB770B6C12FF3E1900D018A0 /* fork_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fork_prop.cc; path = couples/fork_prop.cc; sourceTree = "<group>"; };
@@ -1997,6 +1999,7 @@
 				BB20484A0AF203A0004EDA21 /* filewrapper.cc */,
 				BB73587A05B98DA3006956D5 /* messages.h */,
 				BB73587905B98DA3006956D5 /* messages.cc */,
+				BB74F41F232024AB0019D68E /* byteswap.h */,
 				BB73587D05B98DA3006956D5 /* iowrapper.h */,
 				BB73587B05B98DA3006956D5 /* iowrapper.cc */,
 			);
@@ -3071,6 +3074,7 @@
 				BB7191710EF1CD9900CED9E2 /* platonic.h in Headers */,
 				BB6485EE2057FD30005F2CD1 /* linear_operator.h in Headers */,
 				BB9D224620C5D30200CBB0B1 /* simd.h in Headers */,
+				BB74F420232024AB0019D68E /* byteswap.h in Headers */,
 				BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */,
 				BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */,
 				BBA27AEB211EC31600A7E184 /* vector4.h in Headers */,
