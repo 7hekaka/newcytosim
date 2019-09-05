@@ -996,9 +996,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     unsigned n = 1;
     const unsigned stop = 1 + 2 * ( ( size_ - 1 ) / 2 );
     /*
-     Unrolling will reduce the dependency chain, which is here limiting the overall
-     throughput. However the number of registers in the CPU limits the unrolling at
-     most by a factor 2, as this already uses all the 16 registers of AVX CPU
+     Unrolling will reduce the dependency chain, which may be limiting the
+     throughput here. However the number of registers (16 for AVX CPU) limits
+     the level of unrolling that can be done.
      */
     //process 2 by 2:
     for ( ; n < stop; n += 2 )

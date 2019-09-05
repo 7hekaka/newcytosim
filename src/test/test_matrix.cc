@@ -31,18 +31,18 @@ real beta = 1.0;
 real checksum(int size, real const* vec, real const* ptr)
 {
     real s = 0;
-    for ( int kk=0; kk<size; ++kk )
-        s += vec[kk] * ptr[kk];
+    for ( int i=0; i<size; ++i )
+        s += vec[i] * ptr[i];
     return s;
 }
 
 
-bool equal(int size, real const* a, real const* b)
+real diff(int size, real const* a, real const* b)
 {
-    for ( int kk=0; kk<size; ++kk )
-        if ( a != b )
-            return false;
-    return true;
+    real s = 0;
+    for ( int i=0; i<size; ++i )
+        s += std::abs( a[i] - b[i] );
+    return s;
 }
 
 // fill lower triangle of matrix
@@ -265,22 +265,33 @@ void testMatrix(MATRIX & mat,
 
     tic();
     for ( int n=0; n<N_RUN*N_MUL; ++n )
+    {
+        mat.vecMulAdd(y, z);
         mat.vecMulAdd(x, z);
+    }
     double t1 = toc();
     
-    copy_real(size, y, z);
+    zero_real(size, z);
     mat.vecMulAdd(x, z);
-    real sum = checksum(size, z, x);
+    real sum1 = checksum(size, y, z);
     
     tic();
     for ( int n=0; n<N_RUN*N_MUL; ++n )
+    {
         mat.vecMulAdd_ALT(x, z);
+        mat.vecMulAdd_ALT(y, z);
+    }
     double t2 = toc();
+    
+    zero_real(size, z);
+    mat.vecMulAdd_ALT(x, z);
+    real sum2 = checksum(size, y, z);
 
     printf("\n %20s : ", mat.what().c_str());
     printf("set %8.3f  mul %8.3f  alt %8.3f", ts, t1, t2);
-    printf("  checksum %+32.16f  ", sum);
+    printf("  check %+16.6f  %+16.6f ", sum1, sum2);
 }
+
 
 template <typename MATRIX>
 void testMatrixIso(MATRIX & mat,

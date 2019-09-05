@@ -659,10 +659,13 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    for ( index_t n = 0; n < size_; ++n )
+    const real* M = blk_[0];
+    const real* stop = blk_[size_];
+    const index_t * inx = inx_;
+    for ( ; M < stop; M += 12 )
     {
-        real const* M = blk_[n];
-        vec4 xyz = loadu4(X+inx_[n]);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
+        ++inx;
         // multiply with the block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
@@ -699,9 +702,10 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
     const index_t * inx = inx_;
     {
         /*
-         Unrolling will reduce the dependency chain, which is here limiting the overall
-         throughput. However the number of registers (16 for AVX CPU) may limit
-         the unrolling that can be done
+         Unrolling will reduce the dependency chain but the number of registers
+         (16 for AVX CPU) may limit the level of unrolling that can be done.
+         Moreover, the bottleneck here is the high number of loads needed
+         to advance the calculation. AVX-512 loads & muls would work well here.
          */
         // process blocks 2 by 2:
         for ( ; M < stop; M += 24 )
@@ -765,9 +769,10 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
     const index_t * inx = inx_;
     {
         /*
-         Unrolling will reduce the dependency chain, which is here limiting the overall
-         throughput. However the number of registers (16 for AVX CPU) may limit
-         the unrolling that can be done
+         Unrolling will reduce the dependency chain but the number of registers
+         (16 for AVX CPU) may limit the level of unrolling that can be done.
+         Moreover, the bottleneck here is the high number of loads needed
+         to advance the calculation. AVX-512 loads & muls would work well here.
          */
         // process blocks 2 by 2:
         for ( ; M < stop; M += 36 )
