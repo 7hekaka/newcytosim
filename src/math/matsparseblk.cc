@@ -420,16 +420,16 @@ size_t MatrixSparseBlock::newElements(MatrixSparseBlock::Element*& ptr, size_t s
 void MatrixSparseBlock::Line::sort(Element*& tmp, size_t tmp_size)
 {
     assert_true( size_ <= tmp_size );
-    for ( unsigned i = 1; i < size_; ++i )
+    for ( unsigned i = 0; i < size_; ++i )
     {
         tmp[i].blk = blk_[i];
         tmp[i].inx = inx_[i];
     }
     
     //std::clog << "sizeof(Element) " << sizeof(Element) << "\n";
-    qsort(tmp+1, size_-1, sizeof(Element), &compareMSBElement);
+    qsort(tmp, size_, sizeof(Element), &compareMSBElement);
     
-    for ( unsigned i = 1; i < size_; ++i )
+    for ( unsigned i = 0; i < size_; ++i )
     {
          blk_[i] = tmp[i].blk;
          inx_[i] = tmp[i].inx;
@@ -861,7 +861,7 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t
     {
 #if MATRIXSB_USES_AVX
 #if ( DIM == 1 )
-        row_[i].vecMulAdd1D(X, Y+i);
+        row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 2 )
         row_[i].vecMulAdd2D(X, Y+i);
 #elif ( DIM == 3 )
@@ -881,7 +881,7 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
     {
 #if MATRIXSB_USES_AVX
 #if ( DIM == 1 )
-        row_[i].vecMulAdd1D(X, Y+i);
+        row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 2 )
         row_[i].vecMulAdd2D(X, Y+i);
 #elif ( DIM == 3 )
