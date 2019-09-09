@@ -1732,7 +1732,7 @@ real Chain::someAbscissa(std::string const& key, Glossary& opt, real alpha) cons
         abs = abscissaFrom(abs, ref);
 
         if ( !betweenMP(abs) )
-            throw InvalidParameter("hand::abscissa is out of range");
+            throw InvalidParameter("hand:abscissa is out of range");
         
         return abs;
     }

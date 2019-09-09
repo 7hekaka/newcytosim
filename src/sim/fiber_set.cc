@@ -172,7 +172,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         
         for ( unsigned n = 0; n < cnt; ++n )
         {
-            FiberSite fs(fib, fib->someAbscissa(var, opt, n/real(cnt-1)));
+            FiberSite fs(fib, fib->someAbscissa(var, opt, n/std::max(1U, cnt-1)));
             Object * cs = nullptr;
             Hand * h = nullptr;
             if ( sip )
@@ -1165,6 +1165,7 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs,
 
 /**
  Sum tension of all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
+ (the vector `n` is orthogonal to the plane)
  
  The intersecting segments are determined by testing all Fibers.
  The tension dipole along a segment is obtained from the Lagrange multiplier 

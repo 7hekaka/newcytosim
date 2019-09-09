@@ -402,7 +402,7 @@ void Parser::parse_new(std::istream& is)
                     throw InvalidParameter("cannot specify `position' if `range' is defined");
                 if ( cnt > 1 )
                 {
-                    Vector dAB = ( B - A ) / ( cnt - 1.0 );
+                    Vector dAB = ( B - A ) / real(cnt-1);
                     for ( unsigned n = 0; n < cnt; ++n )
                     {
                         opt.define("position", 0, A + n * dAB);
