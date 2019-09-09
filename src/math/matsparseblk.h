@@ -48,7 +48,7 @@ typedef Matrix44 SubBlock;
  Elements are stored in random order in the column.
  The lower triangle of the matrix is stored.
  
- F. Nedelec, 17--27 March 2017, revised entirely June 2018
+ FJN @ Cambridge, August-September 2019
  */
 class MatrixSparseBlock
 {
@@ -64,15 +64,16 @@ private:
     {
         friend class MatrixSparseBlock;
 
-        size_t      allo_;
-        unsigned    size_;
-        index_t     * inx_;
+        size_t     size_;
+        size_t     allo_;
         SubBlock * blk_;
+        SubBlock * sbk_;
+        index_t  * inx_;
         
     public:
         
         /// constructor
-        Line() { size_ = 0; allo_ = 0; inx_ = nullptr; blk_ = nullptr; }
+        Line() { size_=0; allo_=0; inx_=nullptr; blk_=nullptr; sbk_=nullptr; }
         
         /// the assignment operator will transfer memory
         void operator =(Line&);
@@ -130,6 +131,9 @@ private:
     /// sort matrix block in increasing index order
     void sortElements();
     
+    /// reallocate to use contiguous memory
+    void consolidate();
+    
     /// copy lower triangle into upper side
     void symmetrize();
     
@@ -139,17 +143,20 @@ private:
 private:
     
     /// number of lines in the matrix
-    index_t  size_;
+    index_t   size_;
     
     /// amount of memory which has been allocated
-    size_t   allocated_;
+    size_t    allocated_;
     
     /// array col_[c][] holds Elements of column 'c'
-    Line *   row_;
+    Line *    row_;
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
-    index_t* next_;
+    index_t * next_;
 
+    /// memory for consolidated version
+    SubBlock* blocks_;
+    
 public:
     
     /// return the size of the matrix

@@ -16,10 +16,11 @@
 MatrixSparseBlock::MatrixSparseBlock()
 {
     allocated_ = 0;
-    row_      = nullptr;
+    row_       = nullptr;
+    blocks_    = nullptr;
     
-    next_ = new index_t[1];
-    next_[0] = 0;
+    next_      = new index_t[1];
+    next_[0]   = 0;
 }
 
 
@@ -35,17 +36,17 @@ void MatrixSparseBlock::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
         //fprintf(stderr, "MSB allocates %u\n", alc);
-        Line * lin_new = new Line[alc];
+        Line * row_new = new Line[alc];
        
         if ( row_ )
         {
             // using the specialy defined '=' for a Line object
             for (size_t n = 0; n < allocated_; ++n )
-                lin_new[n] = row_[n];
+                row_new[n] = row_[n];
             delete[] row_;
         }
         
-        row_      = lin_new;
+        row_       = row_new;
         allocated_ = alc;
         
         delete[] next_;
@@ -60,6 +61,7 @@ void MatrixSparseBlock::deallocate()
     delete[] next_;
     row_ = nullptr;
     next_ = nullptr;
+    free_real(blocks_);
     allocated_ = 0;
 }
 
@@ -127,7 +129,8 @@ void MatrixSparseBlock::Line::operator =(MatrixSparseBlock::Line & row)
     allo_ = row.allo_;
     inx_ = row.inx_;
     blk_ = row.blk_;
-    
+    sbk_ = nullptr;
+
     row.size_ = 0;
     row.allo_ = 0;
     row.inx_ = nullptr;
@@ -466,6 +469,34 @@ void MatrixSparseBlock::sortElements()
 }
 
 
+void MatrixSparseBlock::consolidate()
+{
+    size_t cnt = 0;
+    
+    for ( index_t i = next_[0]; i < size_; i = next_[i+1] )
+    {
+        cnt += row_[i].size_;
+        //std::cerr << "\nMatrixSparseBlock line " << i << "  " << row.size_ << "  " << row.blk_ << "";
+    }
+    
+    std::cerr << "\nMatrixSparseBlock::consolidate with " << cnt << " blocks";
+
+    free_real(blocks_);
+    real * ptr = new_real(cnt*sizeof(SubBlock)/sizeof(real));
+    blocks_ = new(ptr) SubBlock[cnt];
+    
+    cnt = 0;
+    for ( index_t i = 0; i < size_; ++i )
+    {
+        Line & row = row_[i];
+        row.sbk_ = blocks_ + cnt;
+        cnt += row.size_;
+        for ( size_t j = 0; j < row.size_; ++j )
+            row.sbk_[j] = row.blk_[j];
+    }
+}
+
+
 /**
  Copy data from the lower triangle to the upper triangle
  */
@@ -522,6 +553,8 @@ void MatrixSparseBlock::prepareForMultiply(int)
         already_symmetric = true;
     }
     //std::cerr << "  after " << nbElements() << "\n";
+    
+    consolidate();
 }
 
 
@@ -698,8 +731,8 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
     vec4 t2 = setzero4();
 
     assert_true( sizeof(SubBlock) == 12 * sizeof(real) );
-    const real* M = blk_[0];
-    const real* stop = blk_[size_-size_%2];
+    const real* M = sbk_[0];
+    const real* stop = sbk_[size_-size_%2];
     const index_t * inx = inx_;
     {
         /*
@@ -730,7 +763,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
         s2 = add4(s2, t2);
     }
     // process remaining blocks:
-    stop = blk_[size_];
+    stop = sbk_[size_];
     #pragma nounroll
     for ( ; M < stop; M += 12 )
     {
@@ -767,8 +800,8 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
     vec4 u1 = setzero4();
     vec4 u2 = setzero4();
 
-    const real* M = blk_[0];
-    const real* stop = blk_[size_-size_%3];
+    const real* M = sbk_[0];
+    const real* stop = sbk_[size_-size_%3];
     const index_t * inx = inx_;
     {
         /*
@@ -801,7 +834,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
         s2 = add4(s2, add4(t2, u2));
     }
     // process remaining blocks:
-    stop = blk_[size_];
+    stop = sbk_[size_];
     #pragma nounroll
     for ( ; M < stop; M += 12 )
     {
@@ -885,7 +918,7 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 #elif ( DIM == 2 )
         row_[i].vecMulAdd2D(X, Y+i);
 #elif ( DIM == 3 )
-        row_[i].vecMulAdd3DU(X, Y+i);
+        row_[i].vecMulAdd3DU4(X, Y+i);
 #endif
 #else
         row_[i].vecMulAdd(X, Y+i);
