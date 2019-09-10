@@ -3,13 +3,15 @@
 #ifndef MATSPARSESYMBLK_H
 #define MATSPARSESYMBLK_H
 
-#include "matrix.h"
+#include "real.h"
 #include <cstdio>
+#include <iostream>
 #include "assert_macro.h"
+
 
 /**
  The block size 'BLOCK_SIZE' can be defined on the command line during compilation,
- and is otherwise set here, depending on the dimensionality of the simulation
+ and is otherwise set here, to match the dimensionality of the simulation
  */
 
 #ifndef BLOCK_SIZE
@@ -31,6 +33,9 @@ typedef Matrix33 SquareBlock;
 #   include "matrix44.h"
 typedef Matrix44 SquareBlock;
 #endif
+
+/// type for indices
+typedef unsigned index_t;
 
 ///real symmetric sparse Matrix
 /**

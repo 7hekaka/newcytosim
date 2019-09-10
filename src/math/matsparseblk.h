@@ -3,13 +3,14 @@
 #ifndef MATSPARSEBLK_H
 #define MATSPARSEBLK_H
 
-#include "matrix34.h"
+#include "real.h"
 #include <cstdio>
+#include <iostream>
 #include "assert_macro.h"
 
 /**
  The block size 'BLOCK_SIZE' can be defined on the command line during compilation,
- and is otherwise set here, depending on the dimensionality of the simulation
+ and is otherwise set here, to match the dimensionality of the simulation
  */
 
 #ifndef BLOCK_SIZE
