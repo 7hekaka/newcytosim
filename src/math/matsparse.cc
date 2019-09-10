@@ -292,7 +292,7 @@ size_t MatrixSparse::nbElements(index_t start, index_t end) const
 std::string MatrixSparse::what() const
 {
     std::ostringstream msg;
-    msg << "mS (" << nbElements() << ")";
+    msg << "mS " << nbElements();
     return msg.str();
 }
 

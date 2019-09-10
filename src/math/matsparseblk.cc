@@ -32,7 +32,7 @@ void MatrixSparseBlock::allocate(size_t alc)
          'chunk' can be increased to gain performance:
           more memory will be used, but reallocation will be less frequent
         */
-        constexpr size_t chunk = 64;
+        constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
         //fprintf(stderr, "MSB allocates %u\n", alc);
@@ -76,7 +76,7 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
          'chunk' can be increased, to possibly gain performance:
          more memory will be used, but reallocation will be less frequent
          */
-        constexpr size_t chunk = 16;
+        constexpr size_t chunk = 32;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
@@ -310,11 +310,11 @@ std::string MatrixSparseBlock::what() const
 {
     std::ostringstream msg;
 #if MATRIXSB_USES_AVX
-    msg << "MSBx (" << SubBlock::what() << "*" << nbElements() << ")";
+    msg << "MSBx " << SubBlock::what() << "*" << nbElements();
 #elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "MSBe (" << SubBlock::what() << "*" << nbElements() << ")";
+    msg << "MSBe " << SubBlock::what() << "*" << nbElements();
 #else
-    msg << "MSB (" << SubBlock::what() << "*" << nbElements() << ")";
+    msg << "MSB " << SubBlock::what() << "*" << nbElements();
 #endif
     return msg.str();
 }
@@ -479,7 +479,7 @@ void MatrixSparseBlock::consolidate()
         //std::cerr << "\nMatrixSparseBlock line " << i << "  " << row.size_ << "  " << row.blk_ << "";
     }
     
-    std::cerr << "\nMatrixSparseBlock::consolidate with " << cnt << " blocks";
+    //std::cerr << "\nMatrixSparseBlock:consolidate with " << cnt << " blocks";
 
     free_real(blocks_);
     real * ptr = new_real(cnt*sizeof(SubBlock)/sizeof(real));
@@ -522,6 +522,22 @@ void MatrixSparseBlock::symmetrize()
                 row.blk_[n].copy_lower();
         }
     }
+    
+#if 0
+    /// check that indices are in ascending order:
+    for ( index_t i = 0; i < size_; ++i )
+    {
+        Line & row = row_[i];
+        //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
+        index_t j = 0;
+        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+        {
+            if ( row.inx_[n] < j )
+                std::clog << "MSB line " << i << " is disordered\n";
+            j = row.inx_[n];
+        }
+    }
+#endif
 }
 
 
@@ -545,14 +561,14 @@ void MatrixSparseBlock::prepareForMultiply(int)
             next_[0] = nxt;
     }
     
-    //std::cerr << "MSB symmetrize " << nbElements();
     sortElements();
     if ( !already_symmetric )
     {
+        //std::cerr << "\nMatrixSparseBlock:symmetrize " << nbElements();
         symmetrize();
+        //std::cerr << " -> " << nbElements() << "  ";
         already_symmetric = true;
     }
-    //std::cerr << "  after " << nbElements() << "\n";
     
     consolidate();
 }
@@ -856,6 +872,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
     storeu4(Y, add4(loadu4(Y), s0));
 }
 #endif
+
 
 #if ( BLOCK_SIZE == 4 )
 void MatrixSparseBlock::Line::vecMulAdd4D(const real* X, real* Y) const

@@ -334,9 +334,9 @@ std::string MatrixSparseSymmetric2::what() const
 {
     std::ostringstream msg;
 #if MATRIX2_USES_SSE
-    msg << "MSS2e (" << nbElements() << ")";
+    msg << "MSS2e " << nbElements();
 #else
-    msg << "MSS2 (" << nbElements() << ")";
+    msg << "MSS2 " << nbElements();
 #endif
     return msg.str();
 }

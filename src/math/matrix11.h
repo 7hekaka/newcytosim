@@ -65,9 +65,7 @@ public:
     operator real() const { return val_; }
 
     /// copy values from lower triangle to upper triangle
-    void copy_lower()
-    {
-    }
+    void copy_lower() { }
 
     /// direct access to 'unique' scalar
     real& value()            { return val_; }

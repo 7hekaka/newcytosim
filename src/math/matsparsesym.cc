@@ -282,7 +282,7 @@ size_t MatrixSparseSymmetric::nbElements(index_t start, index_t end) const
 std::string MatrixSparseSymmetric::what() const
 {
     std::ostringstream msg;
-    msg << "MSS (" << nbElements() << ")";
+    msg << "MSS " << nbElements();
     return msg.str();
 }
 

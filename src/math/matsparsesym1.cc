@@ -420,11 +420,11 @@ std::string MatrixSparseSymmetric1::what() const
 {
     std::ostringstream msg;
 #if MATRIX1_USES_AVX
-    msg << "MSS1x (" << nbElements() << ")";
+    msg << "MSS1x " << nbElements();
 #elif MATRIX1_USES_SSE
-    msg << "MSS1e (" << nbElements() << ")";
+    msg << "MSS1e " << nbElements();
 #else
-    msg << "MSS1 (" << nbElements() << ")";
+    msg << "MSS1 " << nbElements();
 #endif
     return msg.str();
 }

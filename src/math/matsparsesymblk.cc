@@ -379,11 +379,11 @@ std::string MatrixSparseSymmetricBlock::what() const
 {
     std::ostringstream msg;
 #if MATRIXSSB_USES_AVX
-    msg << "MSSBx (" << SquareBlock::what() << "*" << nbElements() << ")";
+    msg << "MSSBx " << SquareBlock::what() << "*" << nbElements();
 #elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "MSSBe (" << SquareBlock::what() << "*" << nbElements() << ")";
+    msg << "MSSBe " << SquareBlock::what() << "*" << nbElements();
 #else
-    msg << "MSSB (" << SquareBlock::what() << "*" << nbElements() << ")";
+    msg << "MSSB " << SquareBlock::what() << "*" << nbElements();
 #endif
     return msg.str();
 }
