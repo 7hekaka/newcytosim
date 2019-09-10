@@ -316,13 +316,13 @@ int MatrixSparseSymmetric2::bad() const
 }
 
 
-size_t MatrixSparseSymmetric2::nbElements(index_t start, index_t end) const
+size_t MatrixSparseSymmetric2::nbElements(index_t start, index_t stop) const
 {
-    assert_true( start <= end );
-    assert_true( end <= size_ );
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
     //all allocated elements are counted, even if zero
     size_t cnt = 0;
-    for ( index_t jj = start; jj < end; ++jj )
+    for ( index_t jj = start; jj < stop; ++jj )
         cnt += col_size_[jj];
     return cnt;
 }
@@ -610,7 +610,7 @@ void MatrixSparseSymmetric2::vecMulAddIso2D(const real* X, real* Y) const
         real X1 = X[Djj+1];
         real Y0 = Y[Djj  ] + sa_[jj] * X0;
         real Y1 = Y[Djj+1] + sa_[jj] * X1;
-        const index_t end = ija_[jj+1];
+        const index_t stop = ija_[jj+1];
         for ( index_t kk = ija_[jj]; kk < end; ++kk )
         {
             index_t Dii = 2 * ija_[kk];

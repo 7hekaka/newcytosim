@@ -600,11 +600,11 @@ void MatrixSparseBlock::Line::vecMulAdd(const real* X, real* Y) const
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, index_t end) const
+void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, index_t stop) const
 {
-    assert_true( start <= end );
-    assert_true( end <= size_ );
-    for ( index_t i = next_[start]; i < end; i = next_[i+1] )
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
+    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
         row_[i].vecMulAdd(X, Y+i);
 }
 
@@ -620,10 +620,10 @@ void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
 {
     vec4 ss = setzero4();
     const real* M = blk_[0];
-    const real* stop = blk_[size_];
+    const real* end = blk_[size_];
     const index_t * inx = inx_;
     #pragma nounroll
-    for ( ; M < stop; M += 4 )
+    for ( ; M < end; M += 4 )
     {
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
         ++inx;
@@ -648,10 +648,10 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
     vec4 uu = setzero4();
     vec4 vv = setzero4();
     const real* M = sbk_[0];
-    const real* stop = sbk_[size_-size_%4];
+    const real* end = sbk_[size_-size_%4];
     const index_t * inx = inx_;
     #pragma nounroll
-    for ( ; M < stop; M += 16 )
+    for ( ; M < end; M += 16 )
     {
         vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
         vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
@@ -675,9 +675,9 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
 #endif
     }
     ss = add4(add4(ss, tt), add4(uu, vv));
-    stop = sbk_[size_];
+    end = sbk_[size_];
     #pragma nounroll
-    for ( ; M < stop; M += 4 )
+    for ( ; M < end; M += 4 )
     {
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
         ++inx;
@@ -705,10 +705,10 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
     vec4 s2 = setzero4();
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     const real* M = blk_[0];
-    const real* stop = blk_[size_];
+    const real* end = blk_[size_];
     const index_t * inx = inx_;
     #pragma nounroll
-    for ( ; M < stop; M += 12 )
+    for ( ; M < end; M += 12 )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
@@ -744,7 +744,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
 
     assert_true( sizeof(SubBlock) == 12 * sizeof(real) );
     const real* M = sbk_[0];
-    const real* stop = sbk_[size_-size_%2];
+    const real* end = sbk_[size_-size_%2];
     const index_t * inx = inx_;
     {
         /*
@@ -755,7 +755,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
          */
         // process blocks 2 by 2:
         #pragma nounroll
-        for ( ; M < stop; M += 24 )
+        for ( ; M < end; M += 24 )
         {
             //IACA_START
             vec4 A = loadu4(X+inx[0]);
@@ -775,9 +775,9 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
         s2 = add4(s2, t2);
     }
     // process remaining blocks:
-    stop = sbk_[size_];
+    end = sbk_[size_];
     #pragma nounroll
-    for ( ; M < stop; M += 12 )
+    for ( ; M < end; M += 12 )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
@@ -813,7 +813,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
     vec4 u2 = setzero4();
 
     const real* M = sbk_[0];
-    const real* stop = sbk_[size_-size_%3];
+    const real* end = sbk_[size_-size_%3];
     const index_t * inx = inx_;
     {
         /*
@@ -824,7 +824,7 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
          */
         // process blocks 3 by 3:
         #pragma nounroll
-        for ( ; M < stop; M += 36 )
+        for ( ; M < end; M += 36 )
         {
             vec4 A = loadu4(X+inx[0]);
             vec4 B = loadu4(X+inx[1]);
@@ -846,9 +846,9 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
         s2 = add4(s2, add4(t2, u2));
     }
     // process remaining blocks:
-    stop = sbk_[size_];
+    end = sbk_[size_];
     #pragma nounroll
-    for ( ; M < stop; M += 12 )
+    for ( ; M < end; M += 12 )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
@@ -901,9 +901,9 @@ void MatrixSparseBlock::Line::vecMulAdd4D(const real* X, real* Y) const
 #pragma mark - Vector Multiplication
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t end) const
+void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const
 {
-    for ( index_t i = next_[start]; i < end; i = next_[i+1] )
+    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if MATRIXSB_USES_AVX
 #if ( DIM == 1 )
@@ -921,9 +921,9 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t end) const
+void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const
 {
-    for ( index_t i = next_[start]; i < end; i = next_[i+1] )
+    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if MATRIXSB_USES_AVX
 #if ( DIM == 1 )
@@ -940,11 +940,11 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 }
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t end) const
+void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t stop) const
 {
     unsigned long cnt = 0, row = 0;
     unsigned long long time = __rdtsc();
-    for ( index_t i = next_[start]; i < end; i = next_[i+1] )
+    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
     {
         row++;
         cnt += row_[i].size_;

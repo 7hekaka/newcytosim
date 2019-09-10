@@ -125,7 +125,7 @@ public:
     bool nonZero() const;
     
     /// number of element which are not null
-    size_t nbElements(index_t start, index_t end) const;
+    size_t nbElements(index_t start, index_t stop) const;
     
     /// number of blocks which are not null
     size_t nbElements() const { return nbElements(0, size_); }

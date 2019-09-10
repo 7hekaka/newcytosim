@@ -330,7 +330,7 @@ void testMatrices(const int size, const int fill)
     alpha = RNG.sreal();
     
     //testMatrix(mat0, size, x, y, z, fill, inx, iny);
-    //testMatrix(mat1, size, x, y, z, fill, inx, iny);
+    testMatrix(mat1, size, x, y, z, fill, inx, iny);
     //testMatrix(mat2, size, x, y, z, fill, inx, iny);
     testMatrix(mat3, size, x, y, z, fill, inx, iny);
     testMatrix(mat4, size, x, y, z, fill, inx, iny);
@@ -513,10 +513,10 @@ int main( int argc, char* argv[] )
     {
         //testMatrices(DIM*17, 23);
         //testMatrices(DIM*91, 1<<12);
-        //testMatrices(DIM*197, 1<<14);
+        testMatrices(DIM*197, 1<<14);
         testMatrices(DIM*437, 1<<16);
         testMatrices(DIM*713, 1<<16);
-        testMatrices(DIM*713, 1<<18);
+        testMatrices(DIM*1359, 1<<18);
     }
     if ( 0 )
     {

@@ -216,22 +216,22 @@ public:
     void prepareForMultiply(int dim);
 
     /// multiplication of a vector, for columns within [start, end[
-    void vecMulAdd(const real*, real* Y, index_t start, index_t end) const;
+    void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_SCAL(const real* X, real* Y, index_t start, index_t end) const;
+    void vecMulAdd_SCAL(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd2D(const real* X, real* Y, index_t start, index_t end) const;
+    void vecMulAdd2D(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd3D(const real* X, real* Y, index_t start, index_t end) const;
+    void vecMulAdd3D(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t end) const;
+    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t end) const;
+    void vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }

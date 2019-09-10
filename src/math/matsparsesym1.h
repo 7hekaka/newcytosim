@@ -90,26 +90,26 @@ private:
 
 
     /// One column multiplication of a vector
-    void vecMulAdd(const real* X, real* Y, index_t, real const* dia, index_t start, index_t end) const;
+    void vecMulAdd(const real* X, real* Y, index_t, real const* dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t end) const;
+    void vecMulAddIso2D(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_SSE(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t end) const;
+    void vecMulAddIso2D_SSE(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_SSEU(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t end) const;
+    void vecMulAddIso2D_SSEU(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_AVX(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t end) const;
+    void vecMulAddIso2D_AVX(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_AVXU(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t end) const;
+    void vecMulAddIso2D_AVXU(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t stop) const;
 
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddIso3D(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t end) const;
+    void vecMulAddIso3D(const real* X, real* Y, index_t jj, real const* dia, index_t start, index_t stop) const;
 
 public:
     
@@ -182,7 +182,7 @@ public:
     bool nonZero() const;
     
     /// number of element which are not null
-    size_t nbElements(index_t start, index_t end) const;
+    size_t nbElements(index_t start, index_t stop) const;
     
     /// number of blocks which are not null
     size_t nbElements() const { return nbElements(0, size_); }

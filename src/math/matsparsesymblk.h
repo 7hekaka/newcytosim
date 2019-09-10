@@ -216,10 +216,10 @@ public:
     void prepareForMultiply(int dim);
 
     /// multiplication of a vector, for columns within [start, end[
-    void vecMulAdd(const real*, real* Y, index_t start, index_t end) const;
+    void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t end) const;
+    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
@@ -240,7 +240,7 @@ public:
     bool nonZero() const;
     
     /// number of blocks in columns within [start, end[
-    size_t nbElements(index_t start, index_t end) const;
+    size_t nbElements(index_t start, index_t stop) const;
     
     /// number of blocks which are not null
     size_t nbElements() const { return nbElements(0, size_); }

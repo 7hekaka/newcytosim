@@ -360,12 +360,12 @@ int MatrixSparseSymmetricBlock::bad() const
 
 
 /** all allocated elements are counted, even if zero */
-size_t MatrixSparseSymmetricBlock::nbElements(index_t start, index_t end) const
+size_t MatrixSparseSymmetricBlock::nbElements(index_t start, index_t stop) const
 {
-    assert_true( start <= end );
-    assert_true( end <= size_ );
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
     size_t cnt = 0;
-    for ( index_t jj = start; jj < end; ++jj )
+    for ( index_t jj = start; jj < stop; ++jj )
         cnt += column_[jj].size_;
     return cnt;
 }
@@ -1163,14 +1163,14 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y,
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseSymmetricBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t end) const
+void MatrixSparseSymmetricBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const
 {
-    assert_true( start <= end );
-    assert_true( end <= size_ );
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
 #if ( 1 )
-    for ( index_t jj = next_[start]; jj < end; jj = next_[jj+1] )
+    for ( index_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
 #else
-    for ( index_t jj = start; jj < end; jj += BLOCK_SIZE )
+    for ( index_t jj = start; jj < stop; jj += BLOCK_SIZE )
         if ( column_[jj].size_ > 0 )
 #endif
             {
