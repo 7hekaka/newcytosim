@@ -608,102 +608,67 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
 
 #include "simd.h"
 
-#if ( BLOCK_SIZE == -2 )
+
 void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
 {
-    vec4 xyxy = broadcast2(X+jj);
-    vec4 ss = mul4(load4(blk_[0]), xyxy);
-    const vec4 xxyy = permute4(xyxy, 0b1100);
-    vec4 s1 = setzero4();
-
-    unsigned n = 1;
-    const unsigned stop = 1 + 2 * ( ( size_ - 1 ) / 2 );
-    // process 4 by 4:
-    for ( ; n < stop; n += 2 )
+    vec4 ss = setzero4();
+    const real* M = blk_[0];
+    const real* stop = blk_[size_];
+    const index_t * inx = inx_;
+    #pragma nounroll
+    for ( ; M < stop; M += 4 )
     {
-        /*
-         Since all the indices are different, the blocks can be processed in
-         parallel, and micro-operations can be interleaved to avoid latency.
-         The compiler however cannot assume this, because the indices of the
-         blocks are not known at compile time.
-         */
-        const index_t i0 = inx_[n  ];
-        const index_t i1 = inx_[n+1];
-        vec4 mat0 = load4(blk_[n  ]);
-        vec4 mat1 = load4(blk_[n+1]);
-        vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
-        vec4 u1 = fmadd4(mat1, xxyy, cast4(load2(Y+i1)));
-        ss = fmadd4(mat0, broadcast2(X+i0), ss);
-        s1 = fmadd4(mat1, broadcast2(X+i1), s1);
-        store2(Y+i0, add2(getlo(u0), gethi(u0)));
-        store2(Y+i1, add2(getlo(u1), gethi(u1)));
+        vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
+        ++inx;
+        //SX += M[0] * X + M[2] * Y;
+        //SY += M[1] * X + M[3] * Y;
+        //ss[0] += M[0] * xy[0];
+        //ss[1] += M[1] * xy[0];
+        //ss[2] += M[2] * xy[1];
+        //ss[3] += M[3] * xy[1];
+        ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
     }
-    // collapse 'ss'
-    ss = add4(ss, s1);
-    // process remaining blocks:
-    for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
-    /* finally horizontally sum ss = { SX SX SY SY } */
-    vec2 h = gethi(ss);
-    h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
-    return add2(load2(Y+jj), h);
+    // collapse result:
+    store2(Y, add2(load2(Y), add2(getlo(ss), gethi(ss))));
 }
-#endif
 
 
-#if ( BLOCK_SIZE == -2 )
 void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
 {
-    vec4 xyxy = broadcast2(X+jj);
-    vec4 ss = mul4(load4(blk_[0]), xyxy);
-    const vec4 xxyy = permute4(xyxy, 0b1100);
-    vec4 s1 = setzero4();
-    vec4 s2 = setzero4();
-    vec4 s3 = setzero4();
-
-    unsigned n = 1;
-    const unsigned stop = 1 + 4 * ( ( size_ - 1 ) / 4 );
-    // process 4 by 4:
-    for ( ; n < stop; n += 4 )
+    vec4 ss = setzero4();
+    vec4 tt = setzero4();
+    vec4 uu = setzero4();
+    vec4 vv = setzero4();
+    const real* M = blk_[0];
+    const real* stop = blk_[size_-size_%4];
+    const index_t * inx = inx_;
+    #pragma nounroll
+    for ( ; M < stop; M += 16 )
     {
-        /*
-         Since all the indices are different, the blocks can be processed in
-         parallel, and micro-operations can be interleaved to avoid latency.
-         The compiler however cannot assume this, because the indices of the
-         blocks are not known at compile time.
-         */
-        const index_t i0 = inx_[n  ];
-        const index_t i1 = inx_[n+1];
-        const index_t i2 = inx_[n+2];
-        const index_t i3 = inx_[n+3];
-        vec4 mat0 = load4(blk_[n  ]);
-        vec4 mat1 = load4(blk_[n+1]);
-        vec4 mat2 = load4(blk_[n+2]);
-        vec4 mat3 = load4(blk_[n+3]);
-        vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
-        vec4 u1 = fmadd4(mat1, xxyy, cast4(load2(Y+i1)));
-        vec4 u2 = fmadd4(mat2, xxyy, cast4(load2(Y+i2)));
-        vec4 u3 = fmadd4(mat3, xxyy, cast4(load2(Y+i3)));
-        ss = fmadd4(mat0, broadcast2(X+i0), ss);
-        s1 = fmadd4(mat1, broadcast2(X+i1), s1);
-        s2 = fmadd4(mat2, broadcast2(X+i2), s2);
-        s3 = fmadd4(mat3, broadcast2(X+i3), s3);
-        store2(Y+i0, add2(getlo(u0), gethi(u0)));
-        store2(Y+i1, add2(getlo(u1), gethi(u1)));
-        store2(Y+i2, add2(getlo(u2), gethi(u2)));
-        store2(Y+i3, add2(getlo(u3), gethi(u3)));
+        vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
+        vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
+        vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
+        vec4 xy3 = broadcast2(X+inx[3]);  // xy = { X Y }
+        inx += 4;
+        //SX += M[0] * X + M[2] * Y;
+        //SY += M[1] * X + M[3] * Y;
+        ss = fmadd4(load4(M   ), permute4(xy0, 0b1100), ss);
+        tt = fmadd4(load4(M+4 ), permute4(xy1, 0b1100), tt);
+        uu = fmadd4(load4(M+8 ), permute4(xy2, 0b1100), uu);
+        vv = fmadd4(load4(M+12), permute4(xy3, 0b1100), vv);
     }
-    // collapse 'ss'
-    ss = add4(add4(ss,s1), add4(s2,s3));
-    // process remaining blocks:
-    for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
-    /* finally sum ss = { S0 S0 S1 S1 } */
-    vec2 h = gethi(ss);
-    h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
-    store2(Y+jj, add2(load2(Y+jj), h));
+    ss = add4(add4(ss, tt), add4(uu, vv));
+    stop = blk_[size_];
+    #pragma nounroll
+    for ( ; M < stop; M += 4 )
+    {
+        vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
+        ++inx;
+        ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
+    }
+    // collapse result:
+    store2(Y, add2(load2(Y), add2(getlo(ss), gethi(ss))));
 }
-#endif
 
 
 #if ( BLOCK_SIZE == 3 )
@@ -918,7 +883,7 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t
 #if ( DIM == 1 )
         row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 2 )
-        row_[i].vecMulAdd2D(X, Y+i);
+        row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 3 )
         row_[i].vecMulAdd3D(X, Y+i);
 #endif
@@ -938,7 +903,7 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 #if ( DIM == 1 )
         row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 2 )
-        row_[i].vecMulAdd2D(X, Y+i);
+        row_[i].vecMulAdd2DU(X, Y+i);
 #elif ( DIM == 3 )
         row_[i].vecMulAdd3DU4(X, Y+i);
 #endif

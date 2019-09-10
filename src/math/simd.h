@@ -58,7 +58,7 @@ inline vec2 load2(double const* a)           { return _mm_load_pd(a); }
 // unaligned load
 inline vec2 loadu2(double const* a)          { return _mm_loadu_pd(a); }
 
-// load 1 and duplicate
+// load 1 double and duplicate
 inline vec2 loaddup2(double const* a)        { return _mm_load1_pd(a); }
 
 inline vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
@@ -224,8 +224,9 @@ inline vec4 setzero4()                   { return _mm256_setzero_pd(); }
 inline vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); }
 inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); }
 
-/// load one value into 4 positions
+/// load one double into all 4 positions
 inline vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a); }
+/// load two double and duplicate: X, Y, X, Y
 inline vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d const*)a); }
 
 inline vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
