@@ -3,7 +3,6 @@
 #ifndef MATSPARSEBLK_H
 #define MATSPARSEBLK_H
 
-#include "matrix.h"
 #include "matrix34.h"
 #include <cstdio>
 #include "assert_macro.h"
@@ -40,7 +39,11 @@ typedef Matrix34 SubBlock;
 typedef Matrix44 SubBlock;
 #endif
 
-///real symmetric sparse Matrix
+/// type for indices
+typedef unsigned index_t;
+
+
+/// Sparse Matrix with block elements
 /**
  MatrixSparseBlock uses a sparse storage, with arrays of elements for each column.
  Each element is a full square block of size DIM x DIM.

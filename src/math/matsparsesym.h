@@ -10,7 +10,7 @@
 
 ///real symmetric sparse Matrix
 /**
- MatrixSparseSymmetric1 uses a sparse storage, with arrays of elements for each column.
+ MatrixSparseSymmetric uses a sparse storage, with arrays of elements for each column.
  */
 class MatrixSparseSymmetric
 {

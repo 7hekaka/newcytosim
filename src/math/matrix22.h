@@ -179,25 +179,17 @@ public:
         fprintf(f, "/ %9.3f %9.3f \\\n", val[0], val[2]);
         fprintf(f, "\\ %9.3f %9.3f /\n", val[1], val[3]);
     }
-    
-    /// output matrix lines to std::ostream
-    std::ostream& operator << (std::ostream& os) const
-    {
-        std::streamsize w = os.width();
-        os << std::setw(2) << "[ ";
-        os << std::setw(w) << (*this)(0,0) << " ";
-        os << std::setw(w) << (*this)(0,1) << "; ";
-        os << std::setw(w) << (*this)(1,0) << " ";
-        os << std::setw(w) << (*this)(1,1) << " ]";
-        return os;
-    }
 
     /// conversion to string
     std::string to_string(int w, int p) const
     {
         std::ostringstream os;
         os.precision(p);
-        os << *this;
+        os << std::setw(2) << "[ ";
+        os << std::setw(w) << (*this)(0,0) << " ";
+        os << std::setw(w) << (*this)(0,1) << "; ";
+        os << std::setw(w) << (*this)(1,0) << " ";
+        os << std::setw(w) << (*this)(1,1) << " ]";
         return os.str();
     }
 
@@ -790,6 +782,18 @@ public:
     static Matrix22 randomRotation();
 
 };
+
+/// output a Matrix22
+inline std::ostream& operator << (std::ostream& os, Matrix22 const& mat)
+{
+    std::streamsize w = os.width();
+    os << std::setw(2) << "[ ";
+    os << std::setw(w) << mat(0,0) << " ";
+    os << std::setw(w) << mat(0,1) << "; ";
+    os << std::setw(w) << mat(1,0) << " ";
+    os << std::setw(w) << mat(1,1) << " ]";
+    return os;
+}
 
 #endif
 

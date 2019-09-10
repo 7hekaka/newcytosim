@@ -153,11 +153,11 @@ public:
         fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n",  val[0x3], val[0x7], val[0xB], val[0xF]);
     }
     
-    /// output matrix lines to std::ostream
-    std::ostream& operator << (std::ostream& os) const
+    /// conversion to string
+    std::string to_string(int w, int p) const
     {
-        std::streamsize w = os.width();
-        os.width(1);
+        std::ostringstream os;
+        os.precision(p);
         os << "[";
         for ( int i = 0; i < 4; ++i )
         {
@@ -168,16 +168,6 @@ public:
             else
                 os << " ]";
         }
-        os.width(w);
-        return os;
-    }
-
-    /// conversion to string
-    std::string to_string(int w, int p) const
-    {
-        std::ostringstream os;
-        os.precision(p);
-        os << *this;
         return os.str();
     }
 
@@ -686,6 +676,25 @@ public:
     }
 };
 
+
+/// output a Matrix44
+inline std::ostream& operator << (std::ostream& os, Matrix44 const& mat)
+{
+    std::streamsize w = os.width();
+    os.width(1);
+    os << "[";
+    for ( int i = 0; i < 4; ++i )
+    {
+        for ( int j = 0; j < 4; ++j )
+            os << " " << std::fixed << std::setw(w) << mat(i,j);
+        if ( i < 2 )
+            os << ";";
+        else
+            os << " ]";
+    }
+    os.width(w);
+    return os;
+}
 
 #endif
 

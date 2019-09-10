@@ -62,7 +62,7 @@ public:
     }
     
     /// conversion to real
-    operator real() const { return val_; }
+    //operator real() const { return val_; }
 
     /// copy values from lower triangle to upper triangle
     void copy_lower() { }
@@ -107,13 +107,6 @@ public:
     void print(FILE * f) const
     {
         fprintf(f, "[ %9.3f ]\n", val_);
-    }
-    
-    /// output operator to std::ostream
-    std::ostream& operator << (std::ostream& os) const
-    {
-        os << "[ " << value() << " ]";
-        return os;
     }
 
     /// conversion to string
@@ -365,6 +358,14 @@ public:
     static Matrix11 randomRotation();
 
 };
+
+
+/// output a Matrix11
+inline std::ostream& operator << (std::ostream& os, Matrix11 const& mat)
+{
+    os << "[ " << mat.value() << " ]";
+    return os;
+}
 
 #endif
 
