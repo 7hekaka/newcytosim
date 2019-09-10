@@ -173,11 +173,11 @@ unsigned Meca::largestMecable() const
 // shortcut
 
 #if ( DIM == 1 )
-#   define VECMULADDISO  vecMulAdd
+#   define VECMULADDISO vecMulAdd
 #elif ( DIM == 2 )
-#   define VECMULADDISO  vecMulAddIso2D
+#   define VECMULADDISO vecMulAddIso2D
 #elif ( DIM == 3 )
-#   define VECMULADDISO  vecMulAddIso3D
+#   define VECMULADDISO vecMulAddIso3D
 #endif
 
 
@@ -1764,7 +1764,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     {
         std::stringstream oss;
         oss << "Meca " << DIM << "*" << nbPts;
-        oss << " block " << largestMecable();
+        oss << " brick " << largestMecable();
         oss << " " << mB.what();
         if ( useMatrixC ) oss << " " << mC.what();
         oss << " precond " << precond;
