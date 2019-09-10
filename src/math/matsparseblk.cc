@@ -17,6 +17,8 @@
 #  define MATRIXSB_USES_AVX 0
 #endif
 
+#define TRANSPOSED_BLOCKS 0
+
 
 MatrixSparseBlock::MatrixSparseBlock()
 {
@@ -496,8 +498,13 @@ void MatrixSparseBlock::consolidate()
         Line & row = row_[i];
         row.sbk_ = blocks_ + cnt;
         cnt += row.size_;
+#if TRANSPOSED_BLOCKS
+        for ( size_t j = 0; j < row.size_; ++j )
+            row.sbk_[j] = row.blk_[j].transposed();
+#else
         for ( size_t j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j];
+#endif
     }
 }
 
@@ -633,14 +640,15 @@ void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
 }
 
 
+
 void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
 {
     vec4 ss = setzero4();
     vec4 tt = setzero4();
     vec4 uu = setzero4();
     vec4 vv = setzero4();
-    const real* M = blk_[0];
-    const real* stop = blk_[size_-size_%4];
+    const real* M = sbk_[0];
+    const real* stop = sbk_[size_-size_%4];
     const index_t * inx = inx_;
     #pragma nounroll
     for ( ; M < stop; M += 16 )
@@ -650,24 +658,42 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
         vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
         vec4 xy3 = broadcast2(X+inx[3]);  // xy = { X Y }
         inx += 4;
+#if TRANSPOSED_BLOCKS
+        //SX += M[0] * X + M[1] * Y;
+        //SY += M[2] * X + M[3] * Y;
+        ss = fmadd4(load4(M   ), xy0, ss);
+        tt = fmadd4(load4(M+4 ), xy1, tt);
+        uu = fmadd4(load4(M+8 ), xy2, uu);
+        vv = fmadd4(load4(M+12), xy3, vv);
+#else
         //SX += M[0] * X + M[2] * Y;
         //SY += M[1] * X + M[3] * Y;
         ss = fmadd4(load4(M   ), permute4(xy0, 0b1100), ss);
         tt = fmadd4(load4(M+4 ), permute4(xy1, 0b1100), tt);
         uu = fmadd4(load4(M+8 ), permute4(xy2, 0b1100), uu);
         vv = fmadd4(load4(M+12), permute4(xy3, 0b1100), vv);
+#endif
     }
     ss = add4(add4(ss, tt), add4(uu, vv));
-    stop = blk_[size_];
+    stop = sbk_[size_];
     #pragma nounroll
     for ( ; M < stop; M += 4 )
     {
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
         ++inx;
+#if TRANSPOSED_BLOCKS
+        ss = fmadd4(load4(M), xy, ss);
+#else
         ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
+#endif
     }
     // collapse result:
+#if TRANSPOSED_BLOCKS
+    vec2 h = gethi(ss);
+    store2(Y, add2(load2(Y), add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h))));
+#else
     store2(Y, add2(load2(Y), add2(getlo(ss), gethi(ss))));
+#endif
 }
 
 
