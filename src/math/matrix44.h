@@ -680,7 +680,7 @@ public:
 /// output a Matrix44
 inline std::ostream& operator << (std::ostream& os, Matrix44 const& mat)
 {
-    std::streamsize w = os.width();
+    int w = (int)os.width();
     os.width(1);
     os << "[";
     for ( int i = 0; i < 4; ++i )

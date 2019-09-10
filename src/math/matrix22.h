@@ -110,8 +110,12 @@ public:
     static int dimension() { return 2; }
     
     /// human-readible identifier
+#if MATRIX22_USES_AVX
+    static std::string what() { return "4"; }
+#else
     static std::string what() { return "2*2"; }
-
+#endif
+    
     /// set all elements to zero
     void reset()
     {
@@ -786,7 +790,7 @@ public:
 /// output a Matrix22
 inline std::ostream& operator << (std::ostream& os, Matrix22 const& mat)
 {
-    std::streamsize w = os.width();
+    int w = (int)os.width();
     os << std::setw(2) << "[ ";
     os << std::setw(w) << mat(0,0) << " ";
     os << std::setw(w) << mat(0,1) << "; ";

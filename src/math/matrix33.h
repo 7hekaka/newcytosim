@@ -987,7 +987,7 @@ public:
 /// output a Matrix33
 inline std::ostream& operator << (std::ostream& os, Matrix33 const& mat)
 {
-    std::streamsize w = os.width();
+    int w = (int)os.width();
     os.width(1);
     os << "[";
     for ( int i = 0; i < 3; ++i )
