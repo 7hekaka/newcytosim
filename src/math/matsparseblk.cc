@@ -2,8 +2,13 @@
 
 #include "matsparseblk.h"
 #include "assert_macro.h"
-#include "vector.h"
 #include <sstream>
+
+#ifndef DIM
+#  define DIM BLOCK_SIZE
+#endif
+
+#include "vector.h"
 
 // Flag to enable AVX implementation
 #ifdef __AVX2__

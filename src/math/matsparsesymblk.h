@@ -13,14 +13,8 @@
  */
 
 #ifndef BLOCK_SIZE
-#   include "dim.h"
-#   if ( DIM == 1 )
-#      define BLOCK_SIZE 1
-#   elif ( DIM == 2 )
-#      define BLOCK_SIZE 2
-#   else
-#      define BLOCK_SIZE 3
-#   endif
+#  include "dim.h"
+#  define BLOCK_SIZE DIM
 #endif
 
 
@@ -33,7 +27,7 @@ typedef Matrix22 SquareBlock;
 #elif ( BLOCK_SIZE == 3 )
 #   include "matrix33.h"
 typedef Matrix33 SquareBlock;
-#else
+#elif ( BLOCK_SIZE == 4 )
 #   include "matrix44.h"
 typedef Matrix44 SquareBlock;
 #endif

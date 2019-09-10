@@ -6,7 +6,6 @@
 #include "matrix34.h"
 #include <cstdio>
 #include "assert_macro.h"
-#include "vector.h"
 
 /**
  The block size 'BLOCK_SIZE' can be defined on the command line during compilation,
@@ -14,28 +13,22 @@
  */
 
 #ifndef BLOCK_SIZE
-#   include "dim.h"
-#   if ( DIM == 1 )
-#      define BLOCK_SIZE 1
-#   elif ( DIM == 2 )
-#      define BLOCK_SIZE 2
-#   else
-#      define BLOCK_SIZE 3
-#   endif
+#  include "dim.h"
+#  define BLOCK_SIZE DIM
 #endif
 
 
 #if ( BLOCK_SIZE == 1 )
-#   include "matrix11.h"
+#  include "matrix11.h"
 typedef Matrix11 SubBlock;
 #elif ( BLOCK_SIZE == 2 )
-#   include "matrix22.h"
+#  include "matrix22.h"
 typedef Matrix22 SubBlock;
 #elif ( BLOCK_SIZE == 3 )
-#   include "matrix33.h"
+#  include "matrix34.h"
 typedef Matrix34 SubBlock;
-#else
-#   include "matrix44.h"
+#elif ( BLOCK_SIZE == 4 )
+#  include "matrix44.h"
 typedef Matrix44 SubBlock;
 #endif
 
