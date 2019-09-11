@@ -225,7 +225,7 @@ public:
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_SIMD(const real* X, real* Y) const;
+    void vecMulAdd_TIME(const real* X, real* Y) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y) const;

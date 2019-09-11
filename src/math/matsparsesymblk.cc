@@ -1206,21 +1206,16 @@ void MatrixSparseSymmetricBlock::vecMulAdd_ALT(const real* X, real* Y) const
     }
 }
 
-#define TIME_PRINTOUT 0
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseSymmetricBlock::vecMulAdd_SIMD(const real* X, real* Y) const
+void MatrixSparseSymmetricBlock::vecMulAdd_TIME(const real* X, real* Y) const
 {
-#if TIME_PRINTOUT
     unsigned long cnt = 0, col = 0;
     unsigned long long time = __rdtsc();
-#endif
     for ( index_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
     {
-#if TIME_PRINTOUT
         col++;
         cnt += column_[jj].size_;
-#endif
         //std::clog << "MatrixSparseSymmetricBlock column " << jj << "  " << size_ << " \n";
 #if ( BLOCK_SIZE == 1 )
         column_[jj].vecMulAdd1D(X, Y, jj);
@@ -1232,9 +1227,8 @@ void MatrixSparseSymmetricBlock::vecMulAdd_SIMD(const real* X, real* Y) const
         column_[jj].vecMulAdd4D_AVX(X, Y, jj);
 #endif
     }
-#if TIME_PRINTOUT
     if ( cnt > 0 )
-        fprintf(stderr, "MSSB %6u with %6lu blocks/column  cycles/block: %6llu\n", size_, cnt/col, (__rdtsc()-time)/cnt);
-#endif
+        fprintf(stderr, "MSSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
+                col, cnt, real(__rdtsc()-time)/cnt);
 }
 

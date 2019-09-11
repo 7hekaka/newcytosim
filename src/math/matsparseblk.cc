@@ -614,7 +614,7 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
 #if MATRIXSB_USES_AVX
 
 #include "simd.h"
-
+//#include "iacaMarks.h"
 
 void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
 {
@@ -653,6 +653,7 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
     #pragma nounroll
     for ( ; M < end; M += 16 )
     {
+        //IACA_START
         vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
         vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
         vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
@@ -674,6 +675,7 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
         vv = fmadd4(load4(M+12), permute4(xy3, 0b1100), vv);
 #endif
     }
+    //IACA_END
     ss = add4(add4(ss, tt), add4(uu, vv));
     end = sbk_[size_];
     #pragma nounroll
@@ -730,8 +732,6 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
 #endif
 
 
-//#include "iacaMarks.h"
-
 #if ( BLOCK_SIZE == 3 )
 void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
 {
@@ -757,7 +757,6 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
         #pragma nounroll
         for ( ; M < end; M += 24 )
         {
-            //IACA_START
             vec4 A = loadu4(X+inx[0]);
             vec4 B = loadu4(X+inx[1]);
             inx += 2;
@@ -769,7 +768,6 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
             t1 = fmadd4(load4(M+16), B, t1);
             t2 = fmadd4(load4(M+20), B, t2);
         }
-        //IACA_END
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
         s2 = add4(s2, t2);
@@ -948,9 +946,20 @@ void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, index_t start, in
     {
         row++;
         cnt += row_[i].size_;
+#if MATRIXSB_USES_AVX
+#if ( DIM == 1 )
         row_[i].vecMulAdd(X, Y+i);
+#elif ( DIM == 2 )
+        row_[i].vecMulAdd2DU(X, Y+i);
+#elif ( DIM == 3 )
+        row_[i].vecMulAdd3DU4(X, Y+i);
+#endif
+#else
+        row_[i].vecMulAdd(X, Y+i);
+#endif
     }
     if ( cnt > 0 )
-        fprintf(stderr, "MSB %6u with %6lu blocks/column  cycles/block: %6llu\n", size_, cnt/row, (__rdtsc()-time)/cnt);
+        fprintf(stderr, "MSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
+                row, cnt, real(__rdtsc()-time)/cnt);
 }
 
