@@ -829,6 +829,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
     index_t n = start;
 #if ( 0 )
     // unrolling by 8 may exceed the number of registers in the CPU
+#pragma nounroll
     if ( end >= n + 8 )
     {
         vec2 s4 = setzero2();
@@ -890,6 +891,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
     
     index_t end = n + 4 * ( ( stop - n ) / 4 );
     // process 4 by 4:
+#pragma nounroll
     for ( ; n < end; n += 4 )
     {
 #if ( 0 )
@@ -932,6 +934,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
     // collapse 's0'
     s0 = add2(add2(s0,s1), add2(s2,s3));
     // process remaining blocks:
+#pragma nounroll
     for ( ; n < stop; ++n )
         multiply2(X, Y, ija_[n], sa_+n, xx, s0);
     store2(Y+jj, s0);
@@ -981,6 +984,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, index_t
     const real * val = sa_ + start;
     const real * end = val + 4 * ((stop-start)/4);
     // process 4 by 4:
+#pragma nounroll
     for ( ; val < end; val += 4 )
     {
 #if ( 0 )
@@ -1027,6 +1031,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, index_t
     s0 = add4(add4(s0,s1), add4(s2,s3));
     // process remaining values:
     end = sa_ + stop;
+#pragma nounroll
     for ( ; val < end; ++val, ++inx )
         multiply4(X, Y, inx[0], val, xx, s0);
     store2(Y+jj, gethi(s0));

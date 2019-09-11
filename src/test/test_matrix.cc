@@ -310,7 +310,7 @@ void testMatrixIso(MATRIX & mat,
 
 void testMatrices(const int size, const int fill)
 {
-    printf("------- size %i  filled %.1f %% :", size, fill*100.0/size/size);
+    printf("------%iD size %i  filled %.1f %% :", DIM, size, fill*100.0/size/size);
     //MatrixSparseSymmetric  mat0;
     MatrixSparseSymmetric1 mat1;
     //MatrixSparseSymmetric2 mat2;
@@ -517,6 +517,7 @@ int main( int argc, char* argv[] )
         testMatrices(DIM*437, 1<<16);
         testMatrices(DIM*713, 1<<16);
         testMatrices(DIM*1359, 1<<18);
+        testMatrices(DIM*2100, 1<<16);
     }
     if ( 0 )
     {
