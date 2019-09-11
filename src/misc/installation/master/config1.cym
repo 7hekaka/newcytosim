@@ -84,12 +84,12 @@ set solid core
     display = ( style=3; color=blue; )
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 2000, 1000
 }
 
-new centrosome
+new star
 {
     type = regular
     solid = core
