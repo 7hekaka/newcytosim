@@ -679,9 +679,9 @@ void Display::drawMisc(Simul const& sim)
     for ( Property * i : sim.properties.find_all("fiber") )
     {
         FiberProp* fp = static_cast<FiberProp*>(i);
-        if ( fp->disp->show_average == 1 )
+        if ( fp->disp->draw_average == 1 )
             drawAverageFiber1(sim.fibers, fp);
-        else if ( fp->disp->show_average == 2 )
+        else if ( fp->disp->draw_average == 2 )
             drawAverageFiber2(sim.fibers, fp);
     }
 }
@@ -1452,21 +1452,30 @@ void Display::drawFiber(Fiber const& fib)
     else
 #endif
     {
+        int line_style = disp->line_style;
 #if FIBER_HAS_LATTICE
-        if ( disp->lattice_style && fib.lattice().ready() )
+        FiberLattice const& lat = fib.lattice();
+        if ( lat.ready() )
         {
-            FiberLattice const& lat = fib.lattice();
-
-            if ( disp->lattice_style == 1 )
-                drawFiberLattice1(fib, lat, disp->line_width);
-            else if ( disp->lattice_style == 2 )
-                drawFiberLattice2(fib, lat, disp->line_width);
-            if ( disp->lattice_style == 3 )
-                drawFiberLatticeEdges(fib, lat, disp->line_width);
+            // if the Lattice is displayed, do not draw backbone:
+            switch ( disp->lattice_style )
+            {
+                case 1:
+                    drawFiberLattice1(fib, lat, disp->line_width);
+                    line_style = 0;
+                    break;
+                case 2:
+                    drawFiberLattice2(fib, lat, disp->line_width);
+                    line_style = 0;
+                    break;
+                case 3:
+                    drawFiberLatticeEdges(fib, lat, disp->line_width);
+                    line_style = 0;
+                    break;
+            }
         }
-        else
 #endif
-        if ( disp->line_style )
+        if ( line_style )
         {
             gle_color col1 = fib.disp->color;
             gle_color col2 = fib.disp->color.darken(0.625);
