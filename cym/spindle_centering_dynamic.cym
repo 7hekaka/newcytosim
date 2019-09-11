@@ -53,13 +53,13 @@ set solid core
     display = ( style=1; coloring=1; size=6; )
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 1000, 500
     nucleate = 0.5, microtubule, (end_state=green; length=1)
 }
 
-new centrosome
+new star
 {
     solid = core
     radius = 1
@@ -68,7 +68,7 @@ new centrosome
     position = -5 3 0
 }
 
-new centrosome
+new star
 {
     solid = core
     radius = 1

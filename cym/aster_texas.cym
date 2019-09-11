@@ -41,12 +41,12 @@ set solid core
     display = ( style = 1; )
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 1000, 500
 }
 
-new centrosome
+new star
 {
     solid = core
     radius = 0.5

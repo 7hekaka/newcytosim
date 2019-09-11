@@ -63,7 +63,7 @@ set solid core
     display = ( style=3 )
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 1000, 500
 }
@@ -107,7 +107,7 @@ new 22 chromosome
     position = exponential -30 30
 }
 
-new centrosome
+new star
 {
     solid = core
     radius = 1

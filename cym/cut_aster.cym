@@ -37,7 +37,7 @@ set solid core
     display = ( style=4 )
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 1000, 500
 }
@@ -62,7 +62,7 @@ set single katanin
 }
 new 100 katanin
 
-new centrosome
+new star
 {
     solid = core
     point1 = center, 0.5

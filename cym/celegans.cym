@@ -40,7 +40,7 @@ set solid core
     display = ( style=1; coloring=1 )
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 1000, 500
 }
@@ -50,7 +50,7 @@ set fake spindle
     stiffness = 500
 }
 
-new 1 centrosome
+new star
 {
     solid = core
     radius = 1
@@ -59,7 +59,7 @@ new 1 centrosome
     position = -4 0 0
 }
 
-new 1 centrosome
+new star
 {
     solid = core
     radius = 1

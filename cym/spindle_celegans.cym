@@ -123,13 +123,13 @@ set solid core
     display = { color=0x00880044; }
 }
 
-set aster centrosome
+set aster star
 {
     stiffness = 500, 500   %% ancrage des MTs sur les poles (position, rotation)
 }
 
 
-new centrosome
+new star
 {
     solid = core
     type = astral
@@ -141,7 +141,7 @@ new centrosome
     fibers = 500, microtubule, ( length = 0.5, 0.1; plus_end = grow; )
 }
 
-new centrosome
+new star
 {
     solid = core
     type = astral
