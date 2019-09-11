@@ -2865,7 +2865,7 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
     const real aa = ptA.coef0();
     const real bb = ptA.coef1();
     
-    // the projection matrix: P = -weight * [ I - dir (x) dir ]
+    // the projection matrix: wP = -weight * [ I - dir (x) dir ]
     MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     // anti-symmetric matrix blocks:
@@ -2878,32 +2878,32 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
      | B'PA  B'PB  B'P |
      |   PA    PB    P |
      This matrix has symmetric and anti-symmetric blocks,
-     since P' = P but A and B are not symmetric
+     since P' = P whereas A and B are anti-symmetric
      */
     assert_true( ii0 < ii1 );
     
     if ( ii2 > ii0 )
     {
-        const Matrix22 PA = wP.mul(A);
-        const Matrix22 PB = wP.mul(B);
-        add_block_diag(ii0, A.trans_mul(PA));
-        add_block(ii1, ii0, B.trans_mul(PA));
-        add_block(ii2, ii0, PA);
-        add_block_diag(ii1, B.trans_mul(PB));
-        add_block(ii2, ii1, PB);
+        const Matrix22 wPA = wP.mul(A);
+        const Matrix22 wPB = wP.mul(B);
+        add_block_diag(ii0, A.trans_mul(wPA));
+        add_block(ii1, ii0, B.trans_mul(wPA));
+        sub_block(ii2, ii0, wPA);
+        add_block_diag(ii1, B.trans_mul(wPB));
+        sub_block(ii2, ii1, wPB);
         add_block_diag(ii2, wP);
     }
     else
     {
         // in this case, swap indices to address lower triangle
-        const Matrix22 AtP = A.trans_mul(wP);
-        const Matrix22 BtP = B.trans_mul(wP);
+        const Matrix22 AtwP = A.trans_mul(wP);
+        const Matrix22 BtwP = B.trans_mul(wP);
         add_block_diag(ii2, wP);
-        add_block(ii0, ii2, AtP);
-        add_block(ii1, ii2, BtP);
-        add_block_diag(ii0, AtP.mul(A));
-        add_block(ii1, ii0, BtP.mul(A));
-        add_block_diag(ii1, BtP.mul(B));
+        sub_block(ii0, ii2, AtwP);
+        sub_block(ii1, ii2, BtwP);
+        add_block_diag(ii0, AtwP.mul(A));
+        add_block(ii1, ii0, BtwP.mul(A));
+        add_block_diag(ii1, BtwP.mul(B));
     }
     
     if ( modulo )
@@ -2911,6 +2911,7 @@ void Meca::addSideSlidingLink2D(const Interpolation & ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( !off.null() )
         {
+            //off = -weight * ( off - dot(off, dir) * dir );
             off = wP * off;
             add_base(ii0, A.trans_vecmul(off));
             add_base(ii1, B.trans_vecmul(off));
