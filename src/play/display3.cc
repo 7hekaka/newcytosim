@@ -361,10 +361,10 @@ void Display3::drawFiberLines(Fiber const& fib) const
     
     if ( disp->line_style == 1 )
     {
-#if ( 0 )
+#if ( 1 )
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_not, 1.0);
 #else
-        // this is the basic rendering where segments may overlap:
+        // this is a basic rendering where tubes would not join properly:
         drawCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
         for ( unsigned s = 0; s < fib.nbSegments(); ++s )
             gleTube(fib.posP(s), fib.posP(s+1), rad, gleTube2B);
