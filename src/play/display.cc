@@ -1692,7 +1692,7 @@ void Display::zObject::draw(Display * disp) const
     {
         case Fiber::TAG:
             disp->drawFiberLinesT(*static_cast<const Fiber*>(mec), point_.point());
-        break;
+            break;
             
         case Solid::TAG:
             disp->drawSolidT(*static_cast<const Solid*>(mec), point_.point());

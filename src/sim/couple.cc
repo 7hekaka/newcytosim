@@ -288,6 +288,11 @@ bool Couple::allowAttachment(FiberSite const& sit)
     if ( that->fiber()->family && that->fiber()->family == sit.fiber()->family )
         return false;
 #endif
+#if 0
+    // prevent binding if fibers have the same mark
+    if ( that->fiber()->mark() && that->fiber()->mark() == sit.fiber()->mark() )
+        return false;
+#endif
 #if ( 0 )
     /*
      Test here if binding would create a link inside an aster, near the center:

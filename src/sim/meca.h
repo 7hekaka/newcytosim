@@ -158,12 +158,12 @@ private:
     
     /// Matrices used for GMRES
     LinearSolvers::Matrix mH, mV;
-    
+
+private:
+#if USE_ISO_MATRIX    
     /// true if the matrix mC is non-zero
     bool   useMatrixC;
 
-private:
-#if USE_ISO_MATRIX
     /// isotropic symmetric part of the dynamic
     /** 
      This is a symmetric square matrix of size `nbPoints()`

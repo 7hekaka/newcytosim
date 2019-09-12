@@ -98,7 +98,9 @@ Meca::Meca()
     vFOR = nullptr;
     vTMP = nullptr;
     vMEM = nullptr;
+#if USE_ISO_MATRIX
     useMatrixC = false;
+#endif
     drawLinks = false;
 }
 
@@ -320,15 +322,12 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
         zero_real(dimension(), F);
     
     // F <- F + mB * X
-#if ( DIM == 1 )
-    mB.vecMulAdd(X, F);
-#elif ( DIM == 2 )
-    mB.vecMulAddIso2D(X, F);
-#elif ( DIM == 3 )
-    mB.vecMulAddIso3D(X, F);
-#endif
+    
+#if USE_ISO_MATRIX
+    mB.VECMULADDISO(X, F);
 
     if ( useMatrixC )
+#endif
     {
         // F <- F + mC * X
         mC.vecMulAdd(X, F);
@@ -905,12 +904,14 @@ void Meca::getBlock(real* res, const Mecable * mec) const
     //std::clog<<"Rigidity block " << mec->reference() << "\n";
     //VecPrint::print(std::clog, bs, bs, res, bs, 0);
 #endif
-    
+#if USE_ISO_MATRIX
     mB.addTriangularBlock(res, bs, mec->matIndex(), ps, DIM);
-    
+#endif
     expand_matrix(bs, res);
     
+#if USE_ISO_MATRIX
     if ( useMatrixC )
+#endif
         mC.addDiagonalBlock(res, bs, DIM*mec->matIndex(), bs);
     
 #if ( 0 )
@@ -1319,10 +1320,12 @@ void Meca::prepare(SimulProp const* prop)
     nbPts = cnt;
     allocate(cnt);
     
+#if USE_ISO_MATRIX
     //allocate the sparse matrices:
     mB.resize(cnt);
     mB.reset();
-
+#endif
+    
     mC.resize(DIM*cnt);
     mC.reset();
     
@@ -1370,6 +1373,7 @@ void Meca::prepare(SimulProp const* prop)
  */
 void Meca::prepareMatrices()
 {
+#if USE_ISO_MATRIX
     mB.prepareForMultiply(DIM);
     
     if ( mC.nonZero() )
@@ -1379,6 +1383,9 @@ void Meca::prepareMatrices()
     }
     else
         useMatrixC = false;
+#else
+    mC.prepareForMultiply(1);
+#endif
 }
 
 
@@ -1765,8 +1772,11 @@ void Meca::solve(SimulProp const* prop, const int precond)
         std::stringstream oss;
         oss << "Meca " << DIM << "*" << nbPts;
         oss << " brick " << largestMecable();
+#if USE_ISO_MATRIX
         oss << " " << mB.what();
-        if ( useMatrixC ) oss << " " << mC.what();
+        if ( useMatrixC )
+#endif
+        oss << " " << mC.what();
         oss << " precond " << precond;
         oss << " count " << monitor.count();
         //oss << " flag " << monitor.flag();
@@ -2187,9 +2197,11 @@ void Meca::dumpSparse()
     VecPrint::dump(os, dimension(), vRHS);
     os.close();
     
+#if USE_ISO_MATRIX
     os.open("d_matB.txt");
     mB.printSparse(os);
     os.close();
+#endif
     
     os.open("d_matC.txt");
     mC.printSparse(os);

@@ -3676,7 +3676,7 @@ void Meca::addPointClampXY(Mecapoint const& ptA,
     const index_t inx = DIM * ptA.matIndex();
 
 #if ( DIM == 2 )
-    mB(ptA.matIndex(), ptA.matIndex()) -= weight;
+    sub_iso(ptA.matIndex(), ptA.matIndex(), weight);
 #elif ( DIM > 2 )
     mC(inx,   inx  ) -= weight;
     mC(inx+1, inx+1) -= weight;
