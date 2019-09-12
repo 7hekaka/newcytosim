@@ -116,9 +116,9 @@ set couple complex
 
 new 1000 complex
 
-run 10000 system
+run 1000 system
 {
 	solve = 1
-    nb_frames = 10
+    nb_frames = 100
 }
 

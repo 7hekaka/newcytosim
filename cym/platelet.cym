@@ -64,7 +64,7 @@ set fiber filament
     growing_force = inf
     total_polymer = 80.0
     
-    display = ( color=light_blue; line=2.5; lattice=8, 1; )
+    display = ( color=light_blue; line=2.5; lattice=3, 1; )
 }
 
 %----------------------------------

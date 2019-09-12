@@ -7,7 +7,7 @@ set simul system
     dim = 3
     time_step = 0.00001
     viscosity = 10
-    steric = 1, 100
+    steric = 1, 5000
     display = ( point_value=0.001; style=3; tile=0; zoom=0.5; stencil=1; )
 }
 
@@ -25,9 +25,9 @@ new cell
 set fiber actin
 {
     rigidity = 0.1
-    steric = 1, 0.0035
-    segmentation = 0.0028
-    display = ( line=7, 1; color=red, blue; interval=0.074; point_style=0; )
+    steric = 1, 0.005
+    segmentation = 0.005
+    display = ( line=7, 1; color=red, red; interval=0.074; point_style=0; )
 }
 
 new 200 actin
