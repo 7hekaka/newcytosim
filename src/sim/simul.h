@@ -191,7 +191,7 @@ public:
     /// replace coordinates of Mecables by the ones calculated in solve()
     void            apply() const { sMeca.apply(); }
 
-    /// perform nothing
+    /// do nothing
     void            solve_not() {};
     
     /// calculate the motion of objects, but only in the X-direction

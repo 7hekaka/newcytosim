@@ -2177,9 +2177,10 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     MatrixBlock wbT = -weight * bR.transposed();
     
     // fill the matrix mC
-    add_block_diag(ii0, waT*aR); //this is diagonal
+    add_block_diag(ii0, waT*aR); //this term is symmetric but not diagonal
     add_block(ii1, ii0, wbT*aR);
-    add_block_diag(ii1, wbT*bR); //this is diagonal
+    add_block_diag(ii1, wbT*bR); //this term is symmetric but not diagonal
+
     if ( ii2 > ii0 )
     {
         sub_block(ii2, ii0, waT.transposed());
@@ -2187,8 +2188,8 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     }
     else
     {
-        sub_block(ii2, ii0, waT);
-        sub_block(ii2, ii1, wbT);
+        sub_block(ii0, ii2, waT);
+        sub_block(ii1, ii2, wbT);
     }
     add_block_diag(ii2, MatrixBlock(0, -weight));
     
@@ -2371,9 +2372,9 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     MatrixBlock wbT = -weight * bR.transposed();
     
     // fill the matrix mC
-    add_block_diag(ii0, waT*aR);  //this is diagonal
+    add_block_diag(ii0, waT*aR);  //this term is symmetric but not diagonal
     add_block(ii1, ii0, wbT*aR);
-    add_block_diag(ii1, wbT*bR);  //this is diagonal
+    add_block_diag(ii1, wbT*bR);  //this term is symmetric but not diagonal
     if ( ii2 > ii0 )
     {
         add_block(ii2, ii0, wcc2, aR);
@@ -4019,9 +4020,9 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     MatrixBlock wbT = -weight * bR.transposed();
     
     // fill the matrix mC
-    add_block_diag(ii0, waT*aR); //this is diagonal
+    add_block_diag(ii0, waT*aR); //this term is symmetric but not diagonal
     add_block(ii1, ii0, wbT*aR);
-    add_block_diag(ii1, wbT*bR); //this is diagonal
+    add_block_diag(ii1, wbT*bR); //this term is symmetric but not diagonal
 
     if ( modulo )
         pos += modulo->offset( pos - ptA.pos() );
