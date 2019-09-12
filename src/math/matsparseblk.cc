@@ -616,6 +616,7 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
 #include "simd.h"
 //#include "iacaMarks.h"
 
+#if ( BLOCK_SIZE == 2 )
 void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
 {
     vec4 ss = setzero4();
@@ -697,6 +698,7 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
     store2(Y, add2(load2(Y), add2(getlo(ss), gethi(ss))));
 #endif
 }
+#endif
 
 
 #if ( BLOCK_SIZE == 3 )
