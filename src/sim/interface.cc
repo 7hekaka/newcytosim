@@ -565,7 +565,14 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned 
     else
         set = simul.findSet(name);
     if ( !set )
+    {
+        if ( name == "objects" )
+        {
+            simul.erase();     // deletes everything
+            return;
+        }
         throw InvalidSyntax("could not determine the class of `"+name+"'");
+    }
     
     Filter filter;
     filter.set(simul, pp, opt);
@@ -772,7 +779,7 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
         simul.events.add(event);
     }
 #endif
-    opt.set(solve,  "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
+    opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
     
     // setting a pointer to the 'solve' function
     void (Simul::* solveFunc)() = &Simul::solve_not;
