@@ -197,7 +197,9 @@ inline void Meca::add_iso(index_t i, index_t j, real val)
 #if USE_ISO_MATRIX
     mB(i,j) += val;
 #else
-    mC.block(DIM*i, DIM*j).add_diag(val);
+    index_t ii = DIM * std::max(i, j);
+    index_t jj = DIM * std::min(i, j);
+    mC.block(ii, jj).add_diag(val);
 #endif
 }
 
@@ -207,7 +209,9 @@ inline void Meca::sub_iso(index_t i, index_t j, real val)
 #if USE_ISO_MATRIX
     mB(i,j) -= val;
 #else
-    mC.block(DIM*i, DIM*j).sub_diag(val);
+    index_t ii = DIM * std::max(i, j);
+    index_t jj = DIM * std::min(i, j);
+    mC.block(ii, jj).sub_diag(val);
 #endif
 }
 
