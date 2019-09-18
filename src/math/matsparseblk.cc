@@ -11,7 +11,7 @@
 #include "vector.h"
 
 // Flag to enable AVX implementation
-#ifdef __AVX2__
+#ifdef __AVX__
 #  define MATRIXSB_USES_AVX REAL_IS_DOUBLE
 #else
 #  define MATRIXSB_USES_AVX 0
@@ -909,9 +909,9 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t
 #if ( DIM == 1 )
         row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 2 )
-        row_[i].vecMulAdd(X, Y+i);
+        row_[i].vecMulAdd2DU(X, Y+i);
 #elif ( DIM == 3 )
-        row_[i].vecMulAdd3D(X, Y+i);
+        row_[i].vecMulAdd3DU4(X, Y+i);
 #endif
 #else
         row_[i].vecMulAdd(X, Y+i);
@@ -929,9 +929,9 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 #if ( DIM == 1 )
         row_[i].vecMulAdd(X, Y+i);
 #elif ( DIM == 2 )
-        row_[i].vecMulAdd2DU(X, Y+i);
+        row_[i].vecMulAdd2D(X, Y+i);
 #elif ( DIM == 3 )
-        row_[i].vecMulAdd3DU4(X, Y+i);
+        row_[i].vecMulAdd3D(X, Y+i);
 #endif
 #else
         row_[i].vecMulAdd(X, Y+i);
