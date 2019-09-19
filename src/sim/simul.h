@@ -322,7 +322,7 @@ public:
     //-------------------------------------------------------------------------------
 
     /// call `Simul::report0`, adding lines before and after with 'start' and 'end' tags.
-    void      report(std::ostream&, std::string const&, Glossary&) const;
+    void      report(std::ostream&, std::string, Glossary&) const;
     
     /// call one of the report function
     void      report0(std::ostream&, std::string const&, Glossary&) const;
@@ -397,7 +397,7 @@ public:
     void      reportFiberHands(std::ostream&) const;
     
     /// print summary of Fiber's lattice quantities
-    void      reportFiberLattice(std::ostream&) const;
+    void      reportFiberLattice(std::ostream&, bool density) const;
 
     /// print interection abscissa between fibers
     void      reportFiberConnectors(std::ostream&, Glossary&) const;
