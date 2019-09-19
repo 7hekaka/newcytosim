@@ -5,6 +5,7 @@
 #include "cblas.h"
 #include "clapack.h"
 #include "matsym.h"
+#include "matsparsesym1.h"
 #include "random.h"
 //#include "vecprint.h"
 
