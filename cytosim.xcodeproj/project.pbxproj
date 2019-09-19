@@ -1328,7 +1328,6 @@
 		BBA005AF163495BF0026FCB1 /* digit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = digit.h; path = hands/digit.h; sourceTree = "<group>"; };
 		BBA005B3163496170026FCB1 /* digit_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = digit_prop.cc; path = hands/digit_prop.cc; sourceTree = "<group>"; };
 		BBA005B4163496170026FCB1 /* digit_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = digit_prop.h; path = hands/digit_prop.h; sourceTree = "<group>"; };
-		BBA0E42E10B4A7E90080783F /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; lineEnding = 0; name = makefile.inc; path = src/sim/spaces/makefile.inc; sourceTree = SOURCE_ROOT; };
 		BBA1014D126CC7E600D28A55 /* walker_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = walker_prop.cc; path = hands/walker_prop.cc; sourceTree = "<group>"; };
 		BBA1014E126CC7E600D28A55 /* walker_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = walker_prop.h; path = hands/walker_prop.h; sourceTree = "<group>"; };
 		BBA1014F126CC7E600D28A55 /* walker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = walker.cc; path = hands/walker.cc; sourceTree = "<group>"; };
@@ -2372,7 +2371,6 @@
 		BB8838BE10B48EF900A4028F /* spaces */ = {
 			isa = PBXGroup;
 			children = (
-				BBA0E42E10B4A7E90080783F /* makefile.inc */,
 				BBA176EC22103C5C0046E858 /* space_mesh.cc */,
 				BBA176EB22103C5C0046E858 /* space_mesh.h */,
 				BB48AB001B42BABD008540D1 /* space_banana.cc */,
