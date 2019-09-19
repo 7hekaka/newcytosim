@@ -291,7 +291,7 @@ public:
     
     
     /// read Field from file using VAL::read()
-    void   readFieldData(Inputter& in, Simul&)
+    void   readData(Inputter& in, Simul&)
     {
         int  size[DIM] = { 0 };
         real minB[DIM] = { 0 }, maxB[DIM] = { 0 };
@@ -316,7 +316,7 @@ public:
             printf("file: %u field:%lu\n", nbc, mGrid.nbCells());
             throw InvalidIO("mismatch in Field::size");
         }
-        //std::clog << "Field::read() nb_cells=" << nbc << std::endl;
+        //std::clog << "readData() nb_cells=" << nbc << std::endl;
         
         for ( FieldGrid::index_t c = 0; c < nbc; ++c )
             mGrid.icell(c).read(in);
@@ -325,15 +325,7 @@ public:
     /// read Field and checks that the Grid::step has not changed
     void   read(Inputter& in, Simul& sim, ObjectTag)
     {
-        try
-        {
-            readFieldData(in, sim);
-        }
-        catch( Exception & e )
-        {
-            e << ", in Field::read()";
-            throw;
-        }
+        readData(in, sim);
         
         if ( prop )
         {
