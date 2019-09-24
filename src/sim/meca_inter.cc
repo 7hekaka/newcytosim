@@ -2819,11 +2819,21 @@ void Meca::addSlidingLink(const Interpolation & ptA,
     // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
-    add_block(ii2, ii0, cc2*cc0, wT);
-    add_block(ii3, ii0, cc3*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
-    add_block(ii2, ii1, cc2*cc1, wT);
-    add_block(ii3, ii1, cc3*cc1, wT);
+    if ( ii2 > ii0 )
+    {
+        add_block(ii2, ii0, cc2*cc0, wT);
+        add_block(ii3, ii0, cc3*cc0, wT);
+        add_block(ii2, ii1, cc2*cc1, wT);
+        add_block(ii3, ii1, cc3*cc1, wT);
+    }
+    else
+    {
+        add_block(ii0, ii2, cc2*cc0, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
+        add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii1, ii3, cc3*cc1, wT);
+    }
     add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
     add_block_diag(ii3, cc3*cc3, wT);
@@ -3346,11 +3356,21 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
-    add_block(ii2, ii0, cc2*cc0, wT);
-    add_block(ii3, ii0, cc3*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
-    add_block(ii2, ii1, cc2*cc1, wT);
-    add_block(ii3, ii1, cc3*cc1, wT);
+    if ( ii2 > ii0 )
+    {
+        add_block(ii2, ii0, cc2*cc0, wT);
+        add_block(ii3, ii0, cc3*cc0, wT);
+        add_block(ii2, ii1, cc2*cc1, wT);
+        add_block(ii3, ii1, cc3*cc1, wT);
+    }
+    else
+    {
+        add_block(ii0, ii2, cc2*cc0, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
+        add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii1, ii3, cc3*cc1, wT);
+    }
     add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
     add_block_diag(ii3, cc3*cc3, wT);
@@ -3513,11 +3533,21 @@ void Meca::addSideSlidingLinkS(const Interpolation & ptA,
     // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
-    add_block(ii2, ii0, cc2*cc0, wT);
-    add_block(ii3, ii0, cc3*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
-    add_block(ii2, ii1, cc2*cc1, wT);
-    add_block(ii3, ii1, cc3*cc1, wT);
+    if ( ii2 > ii0 )
+    {
+        add_block(ii2, ii0, cc2*cc0, wT);
+        add_block(ii3, ii0, cc3*cc0, wT);
+        add_block(ii2, ii1, cc2*cc1, wT);
+        add_block(ii3, ii1, cc3*cc1, wT);
+    }
+    else
+    {
+        add_block(ii0, ii2, cc2*cc0, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
+        add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii1, ii3, cc3*cc1, wT);
+    }
     add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
     add_block_diag(ii3, cc3*cc3, wT);
