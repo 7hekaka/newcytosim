@@ -483,7 +483,10 @@ void Field::step(FiberSet& fibers)
 #pragma mark - Display
 
 #ifdef DISPLAY
-    
+
+#include "gle.h"
+#include "grid_display.h"
+
     class FieldDisplayParameters
     {
     public:

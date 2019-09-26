@@ -18,11 +18,6 @@
 
 class FiberSet;
 
-#ifdef DISPLAY
-#  include "gle.h"
-#  include "grid_display.h"
-#endif
-
 
 /// the type of Grid contained in a Field
 typedef Grid<FieldScalar, DIM> FieldGrid;

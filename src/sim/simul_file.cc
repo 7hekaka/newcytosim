@@ -7,8 +7,9 @@
 #include "messages.h"
 #include "parser.h"
 
-/// Current format version number used for writing object-files.
+
 /**
+ A number `currentFormatID` is used to define the format of trajectory files
  This is the initial value to Inputter::formatID()
  History of changes in file format:
 

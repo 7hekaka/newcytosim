@@ -86,9 +86,7 @@
 		BB2A470314F3D4AD008434C6 /* bead_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2A470114F3D4AD008434C6 /* bead_prop.h */; };
 		BB2A470414F3D4AD008434C6 /* bead_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2A470214F3D4AD008434C6 /* bead_prop.cc */; };
 		BB2BFFDE184640D800EBE4EC /* space_polygonZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2BFFDC184640D800EBE4EC /* space_polygonZ.cc */; };
-		BB2BFFDF184640D800EBE4EC /* space_polygonZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2BFFDC184640D800EBE4EC /* space_polygonZ.cc */; };
 		BB2BFFE0184640D800EBE4EC /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
-		BB2BFFE1184640D800EBE4EC /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
 		BB2EBF470FCF1F3F00CCA721 /* fiber_site.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */; };
 		BB2EBF480FCF1F3F00CCA721 /* fiber_site.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */; };
 		BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
@@ -101,15 +99,11 @@
 		BB39EC26153806070047768E /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
 		BB39EC27153806070047768E /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
 		BB3A4AE719351389005CD868 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; };
-		BB3A4AE819351389005CD868 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; };
 		BB3A4AE919351389005CD868 /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
-		BB3A4AEA19351389005CD868 /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4737BC2024B39300FE6CEC /* accumulator.h */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
-		BB48AB031B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
-		BB48AB051B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
 		BB4CFFE3130539740049C585 /* classic_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB4CFFDF130539740049C585 /* classic_fiber_prop.cc */; };
 		BB4CFFE4130539740049C585 /* classic_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4CFFE0130539740049C585 /* classic_fiber_prop.h */; };
@@ -118,7 +112,6 @@
 		BB4DB5990C69D5F8001E5E4F /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73586D05B98DA3006956D5 /* array.h */; };
 		BB4DB5A50C69D625001E5E4F /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB4DB5B20C69D6B2001E5E4F /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB4DB6030C69D8CE001E5E4F /* libcytospaceGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5CE0C69D7E9001E5E4F /* libcytospaceGL.a */; };
 		BB5000421269BDC9005E925C /* nucleator_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50003E1269BDC9005E925C /* nucleator_prop.cc */; };
 		BB5000431269BDC9005E925C /* nucleator_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50003F1269BDC9005E925C /* nucleator_prop.h */; };
 		BB5000441269BDC9005E925C /* nucleator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5000401269BDC9005E925C /* nucleator.cc */; };
@@ -157,9 +150,7 @@
 		BB51BC6F05FA587900D4869F /* node.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589405B98DA3006956D5 /* node.cc */; };
 		BB51BC7105FA587F00D4869F /* node_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589605B98DA3006956D5 /* node_list.cc */; };
 		BB51D59C2051D4A9002B4E76 /* space_lid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB51D59A2051D4A9002B4E76 /* space_lid.cc */; };
-		BB51D59D2051D4A9002B4E76 /* space_lid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB51D59A2051D4A9002B4E76 /* space_lid.cc */; };
 		BB51D59E2051D4A9002B4E76 /* space_lid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB51D59B2051D4A9002B4E76 /* space_lid.h */; };
-		BB51D59F2051D4A9002B4E76 /* space_lid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB51D59B2051D4A9002B4E76 /* space_lid.h */; };
 		BB537E3711131B110059D9AA /* field_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB537E3311131B110059D9AA /* field_prop.cc */; };
 		BB537E3811131B110059D9AA /* field_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB537E3411131B110059D9AA /* field_prop.h */; };
 		BB53F5780DCB467000ED38EB /* point_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB53F5760DCB467000ED38EB /* point_grid.cc */; };
@@ -185,9 +176,7 @@
 		BB5A0CB021C38BF7000DBC0E /* interpolation4.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD89B2F214FEABB00DB4ECA /* interpolation4.cc */; };
 		BB5CDDCA06AC4C4B008296B1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB5CF1F916DD2D5A00EF0FE3 /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; };
-		BB5CF1FA16DD2D5A00EF0FE3 /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; };
 		BB5CF1FB16DD2D5A00EF0FE3 /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
-		BB5CF1FC16DD2D5A00EF0FE3 /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
 		BB5D4A9612BC035600A1312F /* common.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4A9512BC035600A1312F /* common.cc */; };
 		BB5D4CA112BCBE2900A1312F /* parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4C9F12BCBE2900A1312F /* parser.cc */; };
 		BB5D4CA212BCBE2900A1312F /* parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5D4CA012BCBE2900A1312F /* parser.h */; };
@@ -220,6 +209,240 @@
 		BB669ACC0FE2E9FA00E5AC10 /* single_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669AC80FE2E9FA00E5AC10 /* single_set.h */; };
 		BB669ACD0FE2E9FA00E5AC10 /* single.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB669AC90FE2E9FA00E5AC10 /* single.cc */; };
 		BB669ACE0FE2E9FA00E5AC10 /* single.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669ACA0FE2E9FA00E5AC10 /* single.h */; };
+		BB692132233D349E00F528D2 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
+		BB692133233D34A100F528D2 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
+		BB692134233D34C300F528D2 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
+		BB692135233D350300F528D2 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
+		BB692136233D351900F528D2 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
+		BB692139233D359F00F528D2 /* mecapoint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA27C06B0539000638608 /* mecapoint.h */; };
+		BB69213A233D359F00F528D2 /* interpolation.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA27E06B0539000638608 /* interpolation.h */; };
+		BB69213B233D359F00F528D2 /* chain.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA3E906B05D3C00638608 /* chain.h */; };
+		BB69213C233D359F00F528D2 /* lattice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1749A507D798E600BC7BDC /* lattice.h */; };
+		BB69213D233D359F00F528D2 /* mecable.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD852EA0808699F00BB5949 /* mecable.h */; };
+		BB69213E233D359F00F528D2 /* sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7020AA0823C4B100B2AA50 /* sphere.h */; };
+		BB69213F233D359F00F528D2 /* mecafil.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9D992608D6281100DBD2BF /* mecafil.h */; };
+		BB692140233D359F00F528D2 /* solid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73590305B98DA3006956D5 /* solid.h */; };
+		BB692141233D359F00F528D2 /* simul.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358FC05B98DA3006956D5 /* simul.h */; };
+		BB692142233D359F00F528D2 /* hand.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358E205B98DA3006956D5 /* hand.h */; };
+		BB692143233D359F00F528D2 /* meca.h in Headers */ = {isa = PBXBuildFile; fileRef = BB98FE900B35F66300796DAE /* meca.h */; };
+		BB692144233D359F00F528D2 /* fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB171C310B3DEBE700CFFC3B /* fiber.h */; };
+		BB692145233D359F00F528D2 /* fiber_grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB60C69F0B6022FE00596D88 /* fiber_grid.h */; };
+		BB692146233D359F00F528D2 /* hand_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */; };
+		BB692147233D359F00F528D2 /* point_grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB53F5770DCB467000ED38EB /* point_grid.h */; };
+		BB692148233D359F00F528D2 /* movable.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE87DFF0DD33655002B3A3C /* movable.h */; };
+		BB692149233D359F00F528D2 /* event.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89A3F31A6410CF00D724F4 /* event.h */; };
+		BB69214A233D359F00F528D2 /* object_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA8BD720E1FBDE8009C7F93 /* object_set.h */; };
+		BB69214B233D359F00F528D2 /* sphere_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9402EB0E236778007410D7 /* sphere_set.h */; };
+		BB69214C233D359F00F528D2 /* field_values.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE60B940EE9684000FFAB27 /* field_values.h */; };
+		BB69214D233D359F00F528D2 /* chewer_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DB1B28DF950002B9FE /* chewer_prop.h */; };
+		BB69214E233D359F00F528D2 /* fiber_site.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */; };
+		BB69214F233D359F00F528D2 /* hand_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAF2B2E0FD01048006E8E27 /* hand_prop.h */; };
+		BB692150233D359F00F528D2 /* couple_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669A970FE2E79C00E5AC10 /* couple_set.h */; };
+		BB692151233D359F00F528D2 /* couple.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669A990FE2E79C00E5AC10 /* couple.h */; };
+		BB692152233D359F00F528D2 /* single_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669AC80FE2E9FA00E5AC10 /* single_set.h */; };
+		BB692153233D359F00F528D2 /* single.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669ACA0FE2E9FA00E5AC10 /* single.h */; };
+		BB692154233D359F00F528D2 /* single_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD8A4A60FF25159005A6615 /* single_prop.h */; };
+		BB692155233D359F00F528D2 /* couple_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFDB4650FF2589B00C9541B /* couple_prop.h */; };
+		BB692156233D359F00F528D2 /* simul_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFDB9D70FF35FD200C9541B /* simul_prop.h */; };
+		BB692157233D359F00F528D2 /* solid_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDBF9DA0FF74835003E94D0 /* solid_prop.h */; };
+		BB692158233D359F00F528D2 /* organizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDBF9EC0FF7515A003E94D0 /* organizer.h */; };
+		BB692159233D359F00F528D2 /* organizer_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5DA770FF7956C0010D08D /* organizer_set.h */; };
+		BB69215A233D359F00F528D2 /* sphere_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50CEF10FFA0AAD00278580 /* sphere_prop.h */; };
+		BB69215B233D359F00F528D2 /* object.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA938620FFEAAB200741444 /* object.h */; };
+		BB69215C233D359F00F528D2 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7D839510274A4500C1DC38 /* common.h */; };
+		BB69215D233D359F00F528D2 /* field_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB537E3411131B110059D9AA /* field_prop.h */; };
+		BB69215E233D359F00F528D2 /* fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB07F48911627E2200A15828 /* fiber_prop.h */; };
+		BB69215F233D359F00F528D2 /* fiber_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB07F522116291E800A15828 /* fiber_set.h */; };
+		BB692160233D359F00F528D2 /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
+		BB692161233D359F00F528D2 /* bead.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA2954911A1C16600FDCD2E /* bead.h */; };
+		BB692162233D359F00F528D2 /* bead_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA295CD11A1CDEB00FDCD2E /* bead_set.h */; };
+		BB692163233D359F00F528D2 /* motor_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50FE841268FB00005E925C /* motor_prop.h */; };
+		BB692164233D359F00F528D2 /* motor.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50FE861268FB00005E925C /* motor.h */; };
+		BB692165233D359F00F528D2 /* nucleator_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50003F1269BDC9005E925C /* nucleator_prop.h */; };
+		BB692166233D359F00F528D2 /* nucleator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5000411269BDC9005E925C /* nucleator.h */; };
+		BB692167233D359F00F528D2 /* regulator_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD720D51C69C7AC008D9B4F /* regulator_prop.h */; };
+		BB692168233D359F00F528D2 /* mighty_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5001E31269FCE1005E925C /* mighty_prop.h */; };
+		BB692169233D359F00F528D2 /* mighty.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5001E51269FCE1005E925C /* mighty.h */; };
+		BB69216A233D359F00F528D2 /* slider_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50020D126A066B005E925C /* slider_prop.h */; };
+		BB69216B233D359F00F528D2 /* slider.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50020F126A066B005E925C /* slider.h */; };
+		BB69216C233D359F00F528D2 /* tracker_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50045E126A332E005E925C /* tracker_prop.h */; };
+		BB69216D233D359F00F528D2 /* tracker.h in Headers */ = {isa = PBXBuildFile; fileRef = BB500460126A332E005E925C /* tracker.h */; };
+		BB69216E233D359F00F528D2 /* chewer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DD1B28DF950002B9FE /* chewer.h */; };
+		BB69216F233D359F00F528D2 /* walker_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA1014E126CC7E600D28A55 /* walker_prop.h */; };
+		BB692170233D359F00F528D2 /* walker.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA10150126CC7E600D28A55 /* walker.h */; };
+		BB692171233D359F00F528D2 /* cutter_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA10156126CC7FD00D28A55 /* cutter_prop.h */; };
+		BB692172233D359F00F528D2 /* cutter.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA10158126CC7FD00D28A55 /* cutter.h */; };
+		BB692173233D359F00F528D2 /* actor_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47A126DC70B00B19D26 /* actor_prop.h */; };
+		BB692174233D359F00F528D2 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
+		BB692175233D359F00F528D2 /* parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5D4CA012BCBE2900A1312F /* parser.h */; };
+		BB692176233D359F00F528D2 /* picket.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFCC8D412C74C7700F62176 /* picket.h */; };
+		BB692177233D359F00F528D2 /* wrist.h in Headers */ = {isa = PBXBuildFile; fileRef = BB90E7ED12CA635C000DF711 /* wrist.h */; };
+		BB692178233D359F00F528D2 /* bundle_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5BE12D9D16400A5F99B /* bundle_prop.h */; };
+		BB692179233D359F00F528D2 /* bundle.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5C012D9D16400A5F99B /* bundle.h */; };
+		BB69217A233D359F00F528D2 /* aster_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5C612D9D17A00A5F99B /* aster_prop.h */; };
+		BB69217B233D359F00F528D2 /* aster.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5C812D9D17A00A5F99B /* aster.h */; };
+		BB69217C233D359F00F528D2 /* nucleus_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5CE12D9D18D00A5F99B /* nucleus_prop.h */; };
+		BB69217D233D359F00F528D2 /* nucleus.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5D012D9D18D00A5F99B /* nucleus.h */; };
+		BB69217E233D359F00F528D2 /* fake_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5F512D9D37800A5F99B /* fake_prop.h */; };
+		BB69217F233D359F00F528D2 /* fake.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5F712D9D37800A5F99B /* fake.h */; };
+		BB692180233D359F00F528D2 /* fork.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEB846312FF339500F9D717 /* fork.h */; };
+		BB692181233D359F00F528D2 /* fork_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB770B6D12FF3E1900D018A0 /* fork_prop.h */; };
+		BB692182233D359F00F528D2 /* shackle_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB770C0212FF44D100D018A0 /* shackle_prop.h */; };
+		BB692183233D359F00F528D2 /* shackle.h in Headers */ = {isa = PBXBuildFile; fileRef = BB770C0412FF44D100D018A0 /* shackle.h */; };
+		BB692184233D359F00F528D2 /* dynamic_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA49EFA12FF5331008A7D33 /* dynamic_fiber.h */; };
+		BB692185233D359F00F528D2 /* dynamic_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA49F1D12FF5589008A7D33 /* dynamic_fiber_prop.h */; };
+		BB692186233D359F00F528D2 /* classic_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4CFFE0130539740049C585 /* classic_fiber_prop.h */; };
+		BB692187233D359F00F528D2 /* classic_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4CFFE2130539740049C585 /* classic_fiber.h */; };
+		BB692188233D359F00F528D2 /* event_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89A3F11A6410CF00D724F4 /* event_set.h */; };
+		BB692189233D359F00F528D2 /* crosslink_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98684132245DB0031200B /* crosslink_prop.h */; };
+		BB69218A233D359F00F528D2 /* crosslink.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98686132245DB0031200B /* crosslink.h */; };
+		BB69218B233D359F00F528D2 /* bridge_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98697132246870031200B /* bridge_prop.h */; };
+		BB69218C233D359F00F528D2 /* bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98699132246870031200B /* bridge.h */; };
+		BB69218D233D359F00F528D2 /* fiber_segment.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD74E161366CA6500B50C62 /* fiber_segment.h */; };
+		BB69218E233D359F00F528D2 /* treadmilling_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4269714437BA4003795C4 /* treadmilling_fiber_prop.h */; };
+		BB69218F233D359F00F528D2 /* treadmilling_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4269914437BA4003795C4 /* treadmilling_fiber.h */; };
+		BB692190233D359F00F528D2 /* picket_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDE7FF914E2609B00A23E0C /* picket_long.h */; };
+		BB692191233D359F00F528D2 /* wrist_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDE7FFD14E260B400A23E0C /* wrist_long.h */; };
+		BB692192233D359F00F528D2 /* bead_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2A470114F3D4AD008434C6 /* bead_prop.h */; };
+		BB692193233D359F00F528D2 /* regulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD720D71C69C7AC008D9B4F /* regulator.h */; };
+		BB692194233D359F00F528D2 /* crosslink_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB06D6BC152F0A5300AD8355 /* crosslink_long.h */; };
+		BB692195233D359F00F528D2 /* duo.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD7A90215373A390056A06B /* duo.h */; };
+		BB692196233D359F00F528D2 /* duo_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD7A90615373A7A0056A06B /* duo_prop.h */; };
+		BB692197233D359F00F528D2 /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
+		BB692198233D359F00F528D2 /* field.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5DE215429BF400C0B9B6 /* field.h */; };
+		BB692199233D359F00F528D2 /* shackle_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1121831549B72B0031CC48 /* shackle_long.h */; };
+		BB69219A233D359F00F528D2 /* couple_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8481B1158348E80076C8C2 /* couple_long.h */; };
+		BB69219B233D359F00F528D2 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6662D415A1A75A0028AA2E /* interface.h */; };
+		BB69219C233D359F00F528D2 /* rescuer_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA8C47B15FB6AE000F52094 /* rescuer_prop.h */; };
+		BB69219D233D359F00F528D2 /* rescuer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA8C47D15FB6AE000F52094 /* rescuer.h */; };
+		BB69219E233D359F00F528D2 /* digit.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA005AF163495BF0026FCB1 /* digit.h */; };
+		BB69219F233D359F00F528D2 /* digit_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA005B4163496170026FCB1 /* digit_prop.h */; };
+		BB6921A0233D359F00F528D2 /* myosin_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF313A16F3583800C09B51 /* myosin_prop.h */; };
+		BB6921A1233D359F00F528D2 /* myosin.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF313C16F3583800C09B51 /* myosin.h */; };
+		BB6921A2233D359F00F528D2 /* dynein_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF314416F364AD00C09B51 /* dynein_prop.h */; };
+		BB6921A3233D359F00F528D2 /* dynein.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF314616F364AD00C09B51 /* dynein.h */; };
+		BB6921A4233D359F00F528D2 /* splash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF0385F18BCF7A3002E8568 /* splash.h */; };
+		BB6921A5233D359F00F528D2 /* kinesin_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF314C16F364C000C09B51 /* kinesin_prop.h */; };
+		BB6921A6233D359F00F528D2 /* kinesin.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF314E16F364C000C09B51 /* kinesin.h */; };
+		BB6921A7233D359F00F528D2 /* growing_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB650A97182E475900A7998B /* growing_fiber_prop.h */; };
+		BB6921A8233D359F00F528D2 /* growing_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB650A99182E475900A7998B /* growing_fiber.h */; };
+		BB6921AA233D359F00F528D2 /* mecapoint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCAA27B06B0539000638608 /* mecapoint.cc */; };
+		BB6921AB233D359F00F528D2 /* interpolation.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCAA27D06B0539000638608 /* interpolation.cc */; };
+		BB6921AC233D359F00F528D2 /* chain.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCAA3E806B05D3C00638608 /* chain.cc */; };
+		BB6921AD233D359F00F528D2 /* hand.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358E105B98DA3006956D5 /* hand.cc */; };
+		BB6921AE233D359F00F528D2 /* solid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73590205B98DA3006956D5 /* solid.cc */; };
+		BB6921AF233D359F00F528D2 /* simul.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358FB05B98DA3006956D5 /* simul.cc */; };
+		BB6921B0233D359F00F528D2 /* mecable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD852E90808699F00BB5949 /* mecable.cc */; };
+		BB6921B1233D359F00F528D2 /* sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7020A90823C4B100B2AA50 /* sphere.cc */; };
+		BB6921B2233D359F00F528D2 /* mecafil.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9D992508D6281100DBD2BF /* mecafil.cc */; };
+		BB6921B3233D359F00F528D2 /* meca.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB98FE910B35F66300796DAE /* meca.cc */; };
+		BB6921B4233D359F00F528D2 /* fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB171C320B3DEBE700CFFC3B /* fiber.cc */; };
+		BB6921B5233D359F00F528D2 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; };
+		BB6921B6233D359F00F528D2 /* hand_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */; };
+		BB6921B7233D359F00F528D2 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
+		BB6921B8233D359F00F528D2 /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
+		BB6921B9233D359F00F528D2 /* point_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB53F5760DCB467000ED38EB /* point_grid.cc */; };
+		BB6921BA233D359F00F528D2 /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
+		BB6921BB233D359F00F528D2 /* object_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA8BD730E1FBDE8009C7F93 /* object_set.cc */; };
+		BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402E60E236764007410D7 /* solid_set.cc */; };
+		BB6921BD233D359F00F528D2 /* splash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF0385D18BCF207002E8568 /* splash.cc */; };
+		BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402EA0E236778007410D7 /* sphere_set.cc */; };
+		BB6921BF233D359F00F528D2 /* fiber_site.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */; };
+		BB6921C0233D359F00F528D2 /* hand_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAF2B2F0FD01048006E8E27 /* hand_prop.cc */; };
+		BB6921C1233D359F00F528D2 /* regulator_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD720D41C69C7AC008D9B4F /* regulator_prop.cc */; };
+		BB6921C2233D359F00F528D2 /* couple_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB669A960FE2E79C00E5AC10 /* couple_set.cc */; };
+		BB6921C3233D359F00F528D2 /* couple.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB669A980FE2E79C00E5AC10 /* couple.cc */; };
+		BB6921C4233D359F00F528D2 /* single_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB669AC70FE2E9FA00E5AC10 /* single_set.cc */; };
+		BB6921C5233D359F00F528D2 /* single.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB669AC90FE2E9FA00E5AC10 /* single.cc */; };
+		BB6921C6233D359F00F528D2 /* single_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD8A4A70FF25159005A6615 /* single_prop.cc */; };
+		BB6921C7233D359F00F528D2 /* couple_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFDB4640FF2589B00C9541B /* couple_prop.cc */; };
+		BB6921C8233D359F00F528D2 /* simul_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFDB9D80FF35FD200C9541B /* simul_prop.cc */; };
+		BB6921C9233D359F00F528D2 /* solid_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDBF9D90FF74835003E94D0 /* solid_prop.cc */; };
+		BB6921CA233D359F00F528D2 /* organizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDBF9EB0FF7515A003E94D0 /* organizer.cc */; };
+		BB6921CB233D359F00F528D2 /* organizer_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5DA760FF7956C0010D08D /* organizer_set.cc */; };
+		BB6921CC233D359F00F528D2 /* sphere_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50CEF00FFA0AAD00278580 /* sphere_prop.cc */; };
+		BB6921CD233D359F00F528D2 /* chewer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DC1B28DF950002B9FE /* chewer.cc */; };
+		BB6921CE233D359F00F528D2 /* object.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA938610FFEAAB200741444 /* object.cc */; };
+		BB6921CF233D359F00F528D2 /* field_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB537E3311131B110059D9AA /* field_prop.cc */; };
+		BB6921D0233D359F00F528D2 /* fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB07F48811627E2200A15828 /* fiber_prop.cc */; };
+		BB6921D1233D359F00F528D2 /* fiber_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB07F521116291E800A15828 /* fiber_set.cc */; };
+		BB6921D2233D359F00F528D2 /* field_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB537E3511131B110059D9AA /* field_set.cc */; };
+		BB6921D3233D359F00F528D2 /* space_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955C4B116FBF4C000E70A6 /* space_set.cc */; };
+		BB6921D4233D359F00F528D2 /* bead.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA2954811A1C16600FDCD2E /* bead.cc */; };
+		BB6921D5233D359F00F528D2 /* event_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3F01A6410CF00D724F4 /* event_set.cc */; };
+		BB6921D6233D359F00F528D2 /* bead_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA295CC11A1CDEB00FDCD2E /* bead_set.cc */; };
+		BB6921D7233D359F00F528D2 /* motor_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50FE831268FB00005E925C /* motor_prop.cc */; };
+		BB6921D8233D359F00F528D2 /* motor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50FE851268FB00005E925C /* motor.cc */; };
+		BB6921D9233D359F00F528D2 /* nucleator_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50003E1269BDC9005E925C /* nucleator_prop.cc */; };
+		BB6921DA233D359F00F528D2 /* nucleator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5000401269BDC9005E925C /* nucleator.cc */; };
+		BB6921DB233D359F00F528D2 /* mighty_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5001E21269FCE1005E925C /* mighty_prop.cc */; };
+		BB6921DC233D359F00F528D2 /* mighty.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5001E41269FCE1005E925C /* mighty.cc */; };
+		BB6921DD233D359F00F528D2 /* slider_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50020C126A066B005E925C /* slider_prop.cc */; };
+		BB6921DE233D359F00F528D2 /* slider.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50020E126A066B005E925C /* slider.cc */; };
+		BB6921DF233D359F00F528D2 /* tracker_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50045D126A332E005E925C /* tracker_prop.cc */; };
+		BB6921E0233D359F00F528D2 /* tracker.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50045F126A332E005E925C /* tracker.cc */; };
+		BB6921E1233D359F00F528D2 /* walker_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA1014D126CC7E600D28A55 /* walker_prop.cc */; };
+		BB6921E2233D359F00F528D2 /* walker.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA1014F126CC7E600D28A55 /* walker.cc */; };
+		BB6921E3233D359F00F528D2 /* cutter_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA10155126CC7FD00D28A55 /* cutter_prop.cc */; };
+		BB6921E4233D359F00F528D2 /* cutter.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA10157126CC7FD00D28A55 /* cutter.cc */; };
+		BB6921E5233D359F00F528D2 /* actor_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E479126DC70B00B19D26 /* actor_prop.cc */; };
+		BB6921E6233D359F00F528D2 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
+		BB6921E7233D359F00F528D2 /* common.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4A9512BC035600A1312F /* common.cc */; };
+		BB6921E8233D359F00F528D2 /* parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4C9F12BCBE2900A1312F /* parser.cc */; };
+		BB6921E9233D359F00F528D2 /* picket.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFCC8D312C74C7700F62176 /* picket.cc */; };
+		BB6921EA233D359F00F528D2 /* wrist.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB90E7EC12CA635C000DF711 /* wrist.cc */; };
+		BB6921EB233D359F00F528D2 /* bundle_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */; };
+		BB6921EC233D359F00F528D2 /* bundle.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5BF12D9D16400A5F99B /* bundle.cc */; };
+		BB6921ED233D359F00F528D2 /* aster_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5C512D9D17A00A5F99B /* aster_prop.cc */; };
+		BB6921EE233D359F00F528D2 /* aster.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5C712D9D17A00A5F99B /* aster.cc */; };
+		BB6921EF233D359F00F528D2 /* regulator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD720D61C69C7AC008D9B4F /* regulator.cc */; };
+		BB6921F0233D359F00F528D2 /* nucleus_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5CD12D9D18D00A5F99B /* nucleus_prop.cc */; };
+		BB6921F1233D359F00F528D2 /* nucleus.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5CF12D9D18D00A5F99B /* nucleus.cc */; };
+		BB6921F2233D359F00F528D2 /* fake_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5F412D9D37800A5F99B /* fake_prop.cc */; };
+		BB6921F3233D359F00F528D2 /* fake.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5F612D9D37800A5F99B /* fake.cc */; };
+		BB6921F4233D359F00F528D2 /* fork.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEB846212FF339500F9D717 /* fork.cc */; };
+		BB6921F5233D359F00F528D2 /* fork_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770B6C12FF3E1900D018A0 /* fork_prop.cc */; };
+		BB6921F6233D359F00F528D2 /* shackle_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770C0112FF44D100D018A0 /* shackle_prop.cc */; };
+		BB6921F7233D359F00F528D2 /* shackle.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770C0312FF44D100D018A0 /* shackle.cc */; };
+		BB6921F8233D359F00F528D2 /* dynamic_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA49EF912FF5331008A7D33 /* dynamic_fiber.cc */; };
+		BB6921F9233D359F00F528D2 /* dynamic_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA49F1C12FF5589008A7D33 /* dynamic_fiber_prop.cc */; };
+		BB6921FA233D359F00F528D2 /* classic_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB4CFFDF130539740049C585 /* classic_fiber_prop.cc */; };
+		BB6921FB233D359F00F528D2 /* classic_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB4CFFE1130539740049C585 /* classic_fiber.cc */; };
+		BB6921FC233D359F00F528D2 /* crosslink_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98683132245DB0031200B /* crosslink_prop.cc */; };
+		BB6921FD233D359F00F528D2 /* crosslink.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98685132245DB0031200B /* crosslink.cc */; };
+		BB6921FE233D359F00F528D2 /* bridge_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98696132246870031200B /* bridge_prop.cc */; };
+		BB6921FF233D359F00F528D2 /* bridge.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98698132246870031200B /* bridge.cc */; };
+		BB692200233D359F00F528D2 /* fiber_segment.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD74E151366CA6500B50C62 /* fiber_segment.cc */; };
+		BB692201233D359F00F528D2 /* chewer_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DA1B28DF950002B9FE /* chewer_prop.cc */; };
+		BB692202233D359F00F528D2 /* treadmilling_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4269614437BA4003795C4 /* treadmilling_fiber_prop.cc */; };
+		BB692203233D359F00F528D2 /* treadmilling_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4269814437BA4003795C4 /* treadmilling_fiber.cc */; };
+		BB692204233D359F00F528D2 /* picket_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDE7FF814E2609B00A23E0C /* picket_long.cc */; };
+		BB692205233D359F00F528D2 /* wrist_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDE7FFC14E260B400A23E0C /* wrist_long.cc */; };
+		BB692206233D359F00F528D2 /* bead_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2A470214F3D4AD008434C6 /* bead_prop.cc */; };
+		BB692207233D359F00F528D2 /* interpolation4.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD89B2F214FEABB00DB4ECA /* interpolation4.cc */; };
+		BB692208233D359F00F528D2 /* crosslink_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB06D6BB152F0A5300AD8355 /* crosslink_long.cc */; };
+		BB692209233D359F00F528D2 /* duo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD7A90115373A390056A06B /* duo.cc */; };
+		BB69220A233D359F00F528D2 /* duo_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD7A90515373A7A0056A06B /* duo_prop.cc */; };
+		BB69220B233D359F00F528D2 /* event.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3F21A6410CF00D724F4 /* event.cc */; };
+		BB69220C233D359F00F528D2 /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
+		BB69220D233D359F00F528D2 /* field.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5E0C15429ED100C0B9B6 /* field.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BB69220E233D359F00F528D2 /* shackle_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1121821549B72B0031CC48 /* shackle_long.cc */; };
+		BB69220F233D359F00F528D2 /* simul_solvef.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAE3DD3155B102600BE1914 /* simul_solvef.cc */; };
+		BB692210233D359F00F528D2 /* couple_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8481B0158348E80076C8C2 /* couple_long.cc */; };
+		BB692211233D359F00F528D2 /* interface.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6662D315A1A75A0028AA2E /* interface.cc */; };
+		BB692212233D359F00F528D2 /* rescuer_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA8C47A15FB6AE000F52094 /* rescuer_prop.cc */; };
+		BB692213233D359F00F528D2 /* rescuer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA8C47C15FB6AE000F52094 /* rescuer.cc */; };
+		BB692214233D359F00F528D2 /* digit.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA005AE163495BF0026FCB1 /* digit.cc */; };
+		BB692215233D359F00F528D2 /* digit_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA005B3163496170026FCB1 /* digit_prop.cc */; };
+		BB692216233D359F00F528D2 /* myosin_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF313916F3583800C09B51 /* myosin_prop.cc */; };
+		BB692217233D359F00F528D2 /* myosin.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF313B16F3583800C09B51 /* myosin.cc */; };
+		BB692218233D359F00F528D2 /* dynein_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF314316F364AD00C09B51 /* dynein_prop.cc */; };
+		BB692219233D359F00F528D2 /* dynein.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF314516F364AD00C09B51 /* dynein.cc */; };
+		BB69221A233D359F00F528D2 /* kinesin_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF314B16F364C000C09B51 /* kinesin_prop.cc */; };
+		BB69221B233D359F00F528D2 /* kinesin.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF314D16F364C000C09B51 /* kinesin.cc */; };
+		BB69221C233D359F00F528D2 /* growing_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB650A96182E475900A7998B /* growing_fiber_prop.cc */; };
+		BB69221D233D359F00F528D2 /* growing_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB650A98182E475900A7998B /* growing_fiber.cc */; };
+		BB692223233D366F00F528D2 /* libcytosimG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB692222233D359F00F528D2 /* libcytosimG.a */; };
 		BB69D0B9209C668800445716 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6D309520CA5B12009C5C7C /* matrix22.h */; };
 		BB6D309820CA754B009C5C7C /* matrix33.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6D309720CA754B009C5C7C /* matrix33.h */; };
@@ -293,7 +516,7 @@
 		BB786AF20AF62C8B005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB786AF30AF62C90005AF9A2 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
-		BB7C2B8105F93FC3002C69A9 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; settings = {COMPILER_FLAGS = "-DVISUAL_DEBUG"; }; };
+		BB7C2B8105F93FC3002C69A9 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591105B98DA3006956D5 /* test_rasterizer.cc */; };
 		BB7D839610274A4500C1DC38 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7D839510274A4500C1DC38 /* common.h */; };
 		BB7DC19C2200DCE400DB779E /* test_glos.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7DC19B2200DCE400DB779E /* test_glos.cc */; };
@@ -315,11 +538,6 @@
 		BB88388F10B48EC400A4028F /* space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388910B48EC400A4028F /* space_prop.cc */; };
 		BB88389010B48EC400A4028F /* space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388A10B48EC400A4028F /* space_prop.h */; };
 		BB88389110B48EC400A4028F /* space.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388B10B48EC400A4028F /* space.cc */; };
-		BB88389310B48EC400A4028F /* modulo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388710B48EC400A4028F /* modulo.cc */; };
-		BB88389410B48EC400A4028F /* modulo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388810B48EC400A4028F /* modulo.h */; };
-		BB88389510B48EC400A4028F /* space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388910B48EC400A4028F /* space_prop.cc */; };
-		BB88389610B48EC400A4028F /* space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388A10B48EC400A4028F /* space_prop.h */; };
-		BB88389710B48EC400A4028F /* space.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388B10B48EC400A4028F /* space.cc */; };
 		BB8838DF10B48EF900A4028F /* space_cylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C110B48EF900A4028F /* space_cylinder.cc */; };
 		BB8838E010B48EF900A4028F /* space_cylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C210B48EF900A4028F /* space_cylinder.h */; };
 		BB8838E110B48EF900A4028F /* space_cylinderZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C310B48EF900A4028F /* space_cylinderZ.cc */; };
@@ -340,30 +558,8 @@
 		BB8838F610B48EF900A4028F /* space_strip.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D810B48EF900A4028F /* space_strip.h */; };
 		BB8838F910B48EF900A4028F /* space_torus.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838DB10B48EF900A4028F /* space_torus.cc */; };
 		BB8838FA10B48EF900A4028F /* space_torus.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838DC10B48EF900A4028F /* space_torus.h */; };
-		BB8838FD10B48EF900A4028F /* space_cylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C110B48EF900A4028F /* space_cylinder.cc */; };
-		BB8838FE10B48EF900A4028F /* space_cylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C210B48EF900A4028F /* space_cylinder.h */; };
-		BB8838FF10B48EF900A4028F /* space_cylinderZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C310B48EF900A4028F /* space_cylinderZ.cc */; };
-		BB88390010B48EF900A4028F /* space_cylinderZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C410B48EF900A4028F /* space_cylinderZ.h */; };
-		BB88390110B48EF900A4028F /* space_dice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C510B48EF900A4028F /* space_dice.cc */; };
-		BB88390210B48EF900A4028F /* space_dice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C610B48EF900A4028F /* space_dice.h */; };
-		BB88390310B48EF900A4028F /* space_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C710B48EF900A4028F /* space_ellipse.cc */; };
-		BB88390410B48EF900A4028F /* space_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C810B48EF900A4028F /* space_ellipse.h */; };
-		BB88390910B48EF900A4028F /* space_polygon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838CD10B48EF900A4028F /* space_polygon.cc */; };
-		BB88390A10B48EF900A4028F /* space_polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838CE10B48EF900A4028F /* space_polygon.h */; };
-		BB88390B10B48EF900A4028F /* space_rotate.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838CF10B48EF900A4028F /* space_rotate.cc */; };
-		BB88390C10B48EF900A4028F /* space_rotate.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D010B48EF900A4028F /* space_rotate.h */; };
-		BB88390D10B48EF900A4028F /* space_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838D110B48EF900A4028F /* space_sphere.cc */; };
-		BB88390E10B48EF900A4028F /* space_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D210B48EF900A4028F /* space_sphere.h */; };
-		BB88391110B48EF900A4028F /* space_square.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838D510B48EF900A4028F /* space_square.cc */; };
-		BB88391210B48EF900A4028F /* space_square.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D610B48EF900A4028F /* space_square.h */; };
-		BB88391310B48EF900A4028F /* space_strip.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838D710B48EF900A4028F /* space_strip.cc */; };
-		BB88391410B48EF900A4028F /* space_strip.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D810B48EF900A4028F /* space_strip.h */; };
-		BB88391710B48EF900A4028F /* space_torus.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838DB10B48EF900A4028F /* space_torus.cc */; };
-		BB88391810B48EF900A4028F /* space_torus.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838DC10B48EF900A4028F /* space_torus.h */; };
 		BB88394D10B4912A00A4028F /* space_capsule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88394B10B4912A00A4028F /* space_capsule.cc */; };
 		BB88394E10B4912A00A4028F /* space_capsule.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88394C10B4912A00A4028F /* space_capsule.h */; };
-		BB88394F10B4912A00A4028F /* space_capsule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88394B10B4912A00A4028F /* space_capsule.cc */; };
-		BB88395010B4912A00A4028F /* space_capsule.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88394C10B4912A00A4028F /* space_capsule.h */; };
 		BB89999420CECB5C00498F48 /* matrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89999320CECB5C00498F48 /* matrix44.h */; };
 		BB89A3FC1A6410E000D724F4 /* event_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3F01A6410CF00D724F4 /* event_set.cc */; };
 		BB89A3FD1A6410E000D724F4 /* event_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89A3F11A6410CF00D724F4 /* event_set.h */; };
@@ -382,7 +578,6 @@
 		BB9402EC0E236778007410D7 /* sphere_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402EA0E236778007410D7 /* sphere_set.cc */; };
 		BB9402ED0E236778007410D7 /* sphere_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9402EB0E236778007410D7 /* sphere_set.h */; };
 		BB955CF6116FCB39000E70A6 /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
-		BB955CF8116FCB40000E70A6 /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
@@ -396,8 +591,6 @@
 		BB98FE930B35F66300796DAE /* meca.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB98FE910B35F66300796DAE /* meca.cc */; };
 		BB9B5CAB1541C01800C0B9B6 /* space_beads.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5CA91541C01800C0B9B6 /* space_beads.cc */; };
 		BB9B5CAC1541C01800C0B9B6 /* space_beads.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5CAA1541C01800C0B9B6 /* space_beads.h */; };
-		BB9B5CAD1541C01800C0B9B6 /* space_beads.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5CA91541C01800C0B9B6 /* space_beads.cc */; };
-		BB9B5CAE1541C01800C0B9B6 /* space_beads.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5CAA1541C01800C0B9B6 /* space_beads.h */; };
 		BB9B5DE315429BF400C0B9B6 /* field.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5DE215429BF400C0B9B6 /* field.h */; };
 		BB9B5E0D15429ED100C0B9B6 /* field.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5E0C15429ED100C0B9B6 /* field.cc */; };
 		BB9D224620C5D30200CBB0B1 /* simd.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9D224520C5D30200CBB0B1 /* simd.h */; };
@@ -434,9 +627,7 @@
 		BBA1015B126CC7FD00D28A55 /* cutter.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA10157126CC7FD00D28A55 /* cutter.cc */; };
 		BBA1015C126CC7FD00D28A55 /* cutter.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA10158126CC7FD00D28A55 /* cutter.h */; };
 		BBA176ED22103C5C0046E858 /* space_mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA176EB22103C5C0046E858 /* space_mesh.h */; };
-		BBA176EE22103C5C0046E858 /* space_mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA176EB22103C5C0046E858 /* space_mesh.h */; };
 		BBA176EF22103C5C0046E858 /* space_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA176EC22103C5C0046E858 /* space_mesh.cc */; };
-		BBA176F022103C5C0046E858 /* space_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA176EC22103C5C0046E858 /* space_mesh.cc */; };
 		BBA27AEB211EC31600A7E184 /* vector4.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA27AEA211EC31600A7E184 /* vector4.h */; };
 		BBA2954A11A1C16600FDCD2E /* bead.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA2954811A1C16600FDCD2E /* bead.cc */; };
 		BBA2954B11A1C16600FDCD2E /* bead.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA2954911A1C16600FDCD2E /* bead.h */; };
@@ -453,7 +644,6 @@
 		BBA5790905FA6259009AE66E /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BBA5790C05FA625D009AE66E /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BBA5795D05FA652D009AE66E /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
-		BBA5795E05FA652D009AE66E /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BBA5E5820E8EBA620009F6D0 /* tictoc.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA5E5800E8EBA620009F6D0 /* tictoc.h */; };
 		BBA75855139CFBA40098FBAF /* sieve.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCD6993126F818F00D19DDF /* sieve.cc */; };
 		BBA75887139CFC6F0098FBAF /* frame_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7662C410E923A200C93DF6 /* frame_reader.h */; };
@@ -482,7 +672,6 @@
 		BBAE3DD4155B102600BE1914 /* simul_solvef.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAE3DD3155B102600BE1914 /* simul_solvef.cc */; };
 		BBAEC4F80EF1D1DD00955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BBAEC4FE0EF1D20000955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
-		BBAEC5080EF1D22300955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BBAEC50B0EF1D22B00955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BBAEC50D0EF1D23000955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BBAEC50F0EF1D23400955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
@@ -499,7 +688,6 @@
 		BBB1E47E126DC70B00B19D26 /* actor_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47A126DC70B00B19D26 /* actor_prop.h */; };
 		BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
 		BBB1E480126DC70B00B19D26 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
-		BBB750840D15CFCA00B79171 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
 		BBBD34DE1AAB444000819326 /* grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588005B98DA3006956D5 /* grid.cc */; };
 		BBBD34E01AABA5BE00819326 /* grid_base.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* grid_base.h */; };
 		BBBD34E21AABA6C300819326 /* grid_base.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBBD34E11AABA6C300819326 /* grid_base.cc */; };
@@ -514,9 +702,7 @@
 		BBCAA3EA06B05D3C00638608 /* chain.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCAA3E806B05D3C00638608 /* chain.cc */; };
 		BBCAA3EB06B05D3C00638608 /* chain.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA3E906B05D3C00638608 /* chain.h */; };
 		BBCEB79A1E3E8E0200443F77 /* space_dynamic_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCEB7981E3E8E0200443F77 /* space_dynamic_sphere.cc */; };
-		BBCEB79B1E3E8E0200443F77 /* space_dynamic_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCEB7981E3E8E0200443F77 /* space_dynamic_sphere.cc */; };
 		BBCEB79C1E3E8E0200443F77 /* space_dynamic_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEB7991E3E8E0200443F77 /* space_dynamic_sphere.h */; };
-		BBCEB79D1E3E8E0200443F77 /* space_dynamic_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEB7991E3E8E0200443F77 /* space_dynamic_sphere.h */; };
 		BBD025DE1B28DF950002B9FE /* chewer_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DA1B28DF950002B9FE /* chewer_prop.cc */; };
 		BBD025DF1B28DF950002B9FE /* chewer_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DB1B28DF950002B9FE /* chewer_prop.h */; };
 		BBD025E01B28DF950002B9FE /* chewer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DC1B28DF950002B9FE /* chewer.cc */; };
@@ -568,13 +754,9 @@
 		BBDE7FFE14E260B400A23E0C /* wrist_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDE7FFC14E260B400A23E0C /* wrist_long.cc */; };
 		BBDE7FFF14E260B400A23E0C /* wrist_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDE7FFD14E260B400A23E0C /* wrist_long.h */; };
 		BBDF81791E677D620032906A /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF81771E677D620032906A /* space_disc.cc */; };
-		BBDF817A1E677D620032906A /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF81771E677D620032906A /* space_disc.cc */; };
 		BBDF817B1E677D620032906A /* space_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF81781E677D620032906A /* space_disc.h */; };
-		BBDF817C1E677D620032906A /* space_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF81781E677D620032906A /* space_disc.h */; };
 		BBDF817F1E677FDD0032906A /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF817D1E677FDD0032906A /* space_dynamic_ellipse.cc */; };
-		BBDF81801E677FDD0032906A /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF817D1E677FDD0032906A /* space_dynamic_ellipse.cc */; };
 		BBDF81811E677FDD0032906A /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF817E1E677FDD0032906A /* space_dynamic_ellipse.h */; };
-		BBDF81821E677FDD0032906A /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF817E1E677FDD0032906A /* space_dynamic_ellipse.h */; };
 		BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF9AA3228BFBD3005018BD /* dpttrf.h */; };
 		BBDFE3BF0C6A37FF00CD333A /* hand_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */; };
 		BBDFE3C00C6A37FF00CD333A /* hand_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */; };
@@ -583,19 +765,72 @@
 		BBE4269C14437BA4003795C4 /* treadmilling_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4269814437BA4003795C4 /* treadmilling_fiber.cc */; };
 		BBE4269D14437BA4003795C4 /* treadmilling_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4269914437BA4003795C4 /* treadmilling_fiber.h */; };
 		BBE447DB2064ED200058ADAC /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
-		BBE4B5EB13E04D2400CBE163 /* space_periodic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4B5E913E04D2400CBE163 /* space_periodic.cc */; };
-		BBE4B5EC13E04D2400CBE163 /* space_periodic.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4B5EA13E04D2400CBE163 /* space_periodic.h */; };
 		BBE4B5ED13E04D2400CBE163 /* space_periodic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4B5E913E04D2400CBE163 /* space_periodic.cc */; };
 		BBE4B5EE13E04D2400CBE163 /* space_periodic.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4B5EA13E04D2400CBE163 /* space_periodic.h */; };
 		BBE60B950EE9684000FFAB27 /* field_values.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE60B940EE9684000FFAB27 /* field_values.h */; };
+		BBE82A29233D15EB00BE44DF /* modulo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388810B48EC400A4028F /* modulo.h */; };
+		BBE82A2A233D15EB00BE44DF /* space_lid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB51D59B2051D4A9002B4E76 /* space_lid.h */; };
+		BBE82A2B233D15EB00BE44DF /* space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388A10B48EC400A4028F /* space_prop.h */; };
+		BBE82A2C233D15EB00BE44DF /* space_dynamic_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEB7991E3E8E0200443F77 /* space_dynamic_sphere.h */; };
+		BBE82A2D233D15EB00BE44DF /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
+		BBE82A2E233D15EB00BE44DF /* space_cylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C210B48EF900A4028F /* space_cylinder.h */; };
+		BBE82A2F233D15EB00BE44DF /* space_cylinderZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C410B48EF900A4028F /* space_cylinderZ.h */; };
+		BBE82A30233D15EB00BE44DF /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
+		BBE82A31233D15EB00BE44DF /* space_dice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C610B48EF900A4028F /* space_dice.h */; };
+		BBE82A32233D15EB00BE44DF /* space_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C810B48EF900A4028F /* space_ellipse.h */; };
+		BBE82A33233D15EB00BE44DF /* space_mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA176EB22103C5C0046E858 /* space_mesh.h */; };
+		BBE82A34233D15EB00BE44DF /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
+		BBE82A35233D15EB00BE44DF /* space_polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838CE10B48EF900A4028F /* space_polygon.h */; };
+		BBE82A36233D15EB00BE44DF /* space_rotate.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D010B48EF900A4028F /* space_rotate.h */; };
+		BBE82A37233D15EB00BE44DF /* space_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D210B48EF900A4028F /* space_sphere.h */; };
+		BBE82A38233D15EB00BE44DF /* space_square.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D610B48EF900A4028F /* space_square.h */; };
+		BBE82A39233D15EB00BE44DF /* space_strip.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D810B48EF900A4028F /* space_strip.h */; };
+		BBE82A3A233D15EB00BE44DF /* space_torus.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838DC10B48EF900A4028F /* space_torus.h */; };
+		BBE82A3B233D15EB00BE44DF /* space_capsule.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88394C10B4912A00A4028F /* space_capsule.h */; };
+		BBE82A3C233D15EB00BE44DF /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
+		BBE82A3D233D15EB00BE44DF /* space_periodic.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4B5EA13E04D2400CBE163 /* space_periodic.h */; };
+		BBE82A3E233D15EB00BE44DF /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF817E1E677FDD0032906A /* space_dynamic_ellipse.h */; };
+		BBE82A3F233D15EB00BE44DF /* space_beads.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5CAA1541C01800C0B9B6 /* space_beads.h */; };
+		BBE82A40233D15EB00BE44DF /* space_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF81781E677D620032906A /* space_disc.h */; };
+		BBE82A41233D15EB00BE44DF /* space_ring.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE9D38C158500BA00FF944A /* space_ring.h */; };
+		BBE82A42233D15EB00BE44DF /* space_cylinderP.h in Headers */ = {isa = PBXBuildFile; fileRef = E2F6428815D01466009B7C31 /* space_cylinderP.h */; };
+		BBE82A43233D15EB00BE44DF /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
+		BBE82A45233D15EB00BE44DF /* modulo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388710B48EC400A4028F /* modulo.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A46233D15EB00BE44DF /* space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388910B48EC400A4028F /* space_prop.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A47233D15EB00BE44DF /* space.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388B10B48EC400A4028F /* space.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A48233D15EB00BE44DF /* space_cylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C110B48EF900A4028F /* space_cylinder.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A49233D15EB00BE44DF /* space_cylinderZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C310B48EF900A4028F /* space_cylinderZ.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A4A233D15EB00BE44DF /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF817D1E677FDD0032906A /* space_dynamic_ellipse.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A4B233D15EB00BE44DF /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF81771E677D620032906A /* space_disc.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A4C233D15EB00BE44DF /* space_dynamic_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCEB7981E3E8E0200443F77 /* space_dynamic_sphere.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A4D233D15EB00BE44DF /* space_dice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C510B48EF900A4028F /* space_dice.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A4E233D15EB00BE44DF /* space_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838C710B48EF900A4028F /* space_ellipse.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A4F233D15EB00BE44DF /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A50233D15EB00BE44DF /* space_polygon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838CD10B48EF900A4028F /* space_polygon.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A51233D15EB00BE44DF /* space_rotate.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838CF10B48EF900A4028F /* space_rotate.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A52233D15EB00BE44DF /* space_polygonZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2BFFDC184640D800EBE4EC /* space_polygonZ.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A53233D15EB00BE44DF /* space_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838D110B48EF900A4028F /* space_sphere.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A54233D15EB00BE44DF /* space_square.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838D510B48EF900A4028F /* space_square.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A55233D15EB00BE44DF /* space_strip.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838D710B48EF900A4028F /* space_strip.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A56233D15EB00BE44DF /* space_lid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB51D59A2051D4A9002B4E76 /* space_lid.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A57233D15EB00BE44DF /* space_torus.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8838DB10B48EF900A4028F /* space_torus.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A58233D15EB00BE44DF /* space_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA176EC22103C5C0046E858 /* space_mesh.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A59233D15EB00BE44DF /* space_capsule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88394B10B4912A00A4028F /* space_capsule.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A5A233D15EB00BE44DF /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A5B233D15EB00BE44DF /* space_periodic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4B5E913E04D2400CBE163 /* space_periodic.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A5C233D15EB00BE44DF /* space_beads.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5CA91541C01800C0B9B6 /* space_beads.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A5D233D15EB00BE44DF /* space_ring.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE9D38B158500BA00FF944A /* space_ring.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A5E233D15EB00BE44DF /* space_cylinderP.cc in Sources */ = {isa = PBXBuildFile; fileRef = E2F6428715D01466009B7C31 /* space_cylinderP.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A5F233D15EB00BE44DF /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBE82A65233D163C00BE44DF /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
+		BBE82A67233D167A00BE44DF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A66233D167900BE44DF /* OpenGL.framework */; };
+		BBE82A68233D1A5E00BE44DF /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BBE87E000DD33655002B3A3C /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
 		BBE87E010DD33655002B3A3C /* movable.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE87DFF0DD33655002B3A3C /* movable.h */; };
 		BBE8E6D110C199F4006527D4 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BBE8E70310C19D1B006527D4 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
 		BBE9D38D158500BA00FF944A /* space_ring.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE9D38B158500BA00FF944A /* space_ring.cc */; };
 		BBE9D38E158500BA00FF944A /* space_ring.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE9D38C158500BA00FF944A /* space_ring.h */; };
-		BBE9D38F158500BA00FF944A /* space_ring.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE9D38B158500BA00FF944A /* space_ring.cc */; };
-		BBE9D390158500BA00FF944A /* space_ring.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE9D38C158500BA00FF944A /* space_ring.h */; };
 		BBEB846412FF339500F9D717 /* fork.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEB846212FF339500F9D717 /* fork.cc */; };
 		BBEB846512FF339500F9D717 /* fork.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEB846312FF339500F9D717 /* fork.h */; };
 		BBEF3A87118318AE000F2EED /* backtrace.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEF3A85118318AE000F2EED /* backtrace.h */; };
@@ -603,7 +838,6 @@
 		BBF0385E18BCF207002E8568 /* splash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF0385D18BCF207002E8568 /* splash.cc */; };
 		BBF0386018BCF7A3002E8568 /* splash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF0385F18BCF7A3002E8568 /* splash.h */; };
 		BBF2FBC521AD36FD00A07E95 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF2FBC421AD36FD00A07E95 /* GLUT.framework */; };
-		BBF2FBC721AD376200A07E95 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF2FBC621AD376200A07E95 /* OpenGL.framework */; };
 		BBF2FBC821AD37A900A07E95 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF2FBC421AD36FD00A07E95 /* GLUT.framework */; };
 		BBF7BB1A10CD44E00089F5B1 /* display2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF7BB1810CD44E00089F5B1 /* display2.cc */; };
 		BBF7BB1B10CD44E00089F5B1 /* display2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF7BB1910CD44E00089F5B1 /* display2.h */; };
@@ -628,9 +862,7 @@
 		BBFF315216F364C000C09B51 /* kinesin.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF314E16F364C000C09B51 /* kinesin.h */; };
 		D3CB8F8C1398E0F30003E45B /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		E2F6428915D01466009B7C31 /* space_cylinderP.cc in Sources */ = {isa = PBXBuildFile; fileRef = E2F6428715D01466009B7C31 /* space_cylinderP.cc */; };
-		E2F6428A15D01466009B7C31 /* space_cylinderP.cc in Sources */ = {isa = PBXBuildFile; fileRef = E2F6428715D01466009B7C31 /* space_cylinderP.cc */; };
 		E2F6428B15D01466009B7C31 /* space_cylinderP.h in Headers */ = {isa = PBXBuildFile; fileRef = E2F6428815D01466009B7C31 /* space_cylinderP.h */; };
-		E2F6428C15D01466009B7C31 /* space_cylinderP.h in Headers */ = {isa = PBXBuildFile; fileRef = E2F6428815D01466009B7C31 /* space_cylinderP.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -638,6 +870,8 @@
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.gcc;
 			fileType = sourcecode.cpp;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 			);
@@ -646,6 +880,8 @@
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.gcc;
 			fileType = sourcecode.cpp;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 			);
@@ -653,20 +889,6 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
-		BB17070E0F30F74800E5DE24 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BB51BC5B05FA559800D4869F;
-			remoteInfo = cytobase;
-		};
-		BB1707100F30F74E00E5DE24 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
-			remoteInfo = cytomath;
-		};
 		BB1707120F30F76000E5DE24 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
@@ -736,13 +958,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = BB4DB5940C69D5A2001E5E4F;
 			remoteInfo = glapp;
-		};
-		BB4DB6010C69D8C6001E5E4F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BB4DB5CD0C69D7E9001E5E4F;
-			remoteInfo = cytospaceGL;
 		};
 		BB55C0E70A261402003333C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -933,13 +1148,6 @@
 			remoteGlobalIDString = BB6403D705FBC28C00DF7BFF;
 			remoteInfo = sieve;
 		};
-		BBF7B9FA10CD34F50089F5B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
-			remoteInfo = cytomath;
-		};
 		BBF7B9FD10CD350F0089F5B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
@@ -1062,7 +1270,6 @@
 		BB4CFFE1130539740049C585 /* classic_fiber.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = classic_fiber.cc; path = fibers/classic_fiber.cc; sourceTree = "<group>"; };
 		BB4CFFE2130539740049C585 /* classic_fiber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = classic_fiber.h; path = fibers/classic_fiber.h; sourceTree = "<group>"; };
 		BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytodisp.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB4DB5CE0C69D7E9001E5E4F /* libcytospaceGL.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceGL.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB4EDF01162CB0DA001C3FE8 /* config.cym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = config.cym; sourceTree = SOURCE_ROOT; };
 		BB50003E1269BDC9005E925C /* nucleator_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nucleator_prop.cc; path = hands/nucleator_prop.cc; sourceTree = "<group>"; };
 		BB50003F1269BDC9005E925C /* nucleator_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nucleator_prop.h; path = hands/nucleator_prop.h; sourceTree = "<group>"; };
@@ -1145,6 +1352,7 @@
 		BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparsesym1.cc; path = src/math/matsparsesym1.cc; sourceTree = SOURCE_ROOT; };
 		BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparsesym1.h; path = src/math/matsparsesym1.h; sourceTree = SOURCE_ROOT; };
 		BB66EA66068D95AD001934AF /* test_space */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_space; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB692222233D359F00F528D2 /* libcytosimG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytosimG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB69D0B8209C666100445716 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		BB6D309520CA5B12009C5C7C /* matrix22.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix22.h; path = src/math/matrix22.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB6D309720CA754B009C5C7C /* matrix33.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix33.h; path = src/math/matrix33.h; sourceTree = SOURCE_ROOT; };
@@ -1495,6 +1703,8 @@
 		BBE4B5EA13E04D2400CBE163 /* space_periodic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_periodic.h; path = src/sim/spaces/space_periodic.h; sourceTree = SOURCE_ROOT; };
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
 		BBE60C250EE979ED00FFAB27 /* simul_step.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_step.cc; path = src/sim/simul_step.cc; sourceTree = SOURCE_ROOT; };
+		BBE82A64233D15EB00BE44DF /* libcytospaceG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceG.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBE82A66233D167900BE44DF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		BBE87DFE0DD33655002B3A3C /* movable.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = movable.cc; path = src/sim/movable.cc; sourceTree = SOURCE_ROOT; };
 		BBE87DFF0DD33655002B3A3C /* movable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = movable.h; path = src/sim/movable.h; sourceTree = SOURCE_ROOT; };
 		BBE9D38B158500BA00FF944A /* space_ring.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_ring.cc; path = src/sim/spaces/space_ring.cc; sourceTree = SOURCE_ROOT; };
@@ -1507,7 +1717,6 @@
 		BBF0385D18BCF207002E8568 /* splash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = splash.cc; path = src/sim/splash.cc; sourceTree = SOURCE_ROOT; };
 		BBF0385F18BCF7A3002E8568 /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = splash.h; path = src/sim/splash.h; sourceTree = SOURCE_ROOT; };
 		BBF2FBC421AD36FD00A07E95 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
-		BBF2FBC621AD376200A07E95 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		BBF7BB1810CD44E00089F5B1 /* display2.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = display2.cc; path = src/play/display2.cc; sourceTree = SOURCE_ROOT; };
 		BBF7BB1910CD44E00089F5B1 /* display2.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = display2.h; path = src/play/display2.h; sourceTree = SOURCE_ROOT; };
 		BBF9A315208C8C9700A9E5E5 /* test_omp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_omp.cc; sourceTree = "<group>"; };
@@ -1553,7 +1762,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBF2FBC721AD376200A07E95 /* OpenGL.framework in Frameworks */,
+				BBE82A67233D167A00BE44DF /* OpenGL.framework in Frameworks */,
 				BBF2FBC521AD36FD00A07E95 /* GLUT.framework in Frameworks */,
 				BB55C0E30A2613D5003333C9 /* libcytobase.a in Frameworks */,
 				BB4DB5B20C69D6B2001E5E4F /* libcytodisp.a in Frameworks */,
@@ -1568,19 +1777,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BB4DB5CC0C69D7E9001E5E4F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BB55C0A10A260E9C003333C9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				BB55C0AB0A260F3F003333C9 /* libcytobase.a in Frameworks */,
-				BBAEC5080EF1D22300955B64 /* libcytomath.a in Frameworks */,
 				BB33E9E41003566600B44F1E /* libcytodisp.a in Frameworks */,
 				BB97B7D720DE3B7E004D659C /* GLUT.framework in Frameworks */,
 				BB55C0A90A260F19003333C9 /* OpenGL.framework in Frameworks */,
@@ -1649,10 +1850,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBA5795E05FA652D009AE66E /* libcytosim.a in Frameworks */,
+				BB692223233D366F00F528D2 /* libcytosimG.a in Frameworks */,
+				BBE82A65233D163C00BE44DF /* libcytospaceG.a in Frameworks */,
 				BB4DB5A50C69D625001E5E4F /* libcytodisp.a in Frameworks */,
 				BB69D0B9209C668800445716 /* GLUT.framework in Frameworks */,
-				BB4DB6030C69D8CE001E5E4F /* libcytospaceGL.a in Frameworks */,
 				BBA5795D05FA652D009AE66E /* libcytobase.a in Frameworks */,
 				BB71926B0EF1D10600CED9E2 /* libcytomath.a in Frameworks */,
 				BB840881193490300088C07B /* Accelerate.framework in Frameworks */,
@@ -1704,6 +1905,8 @@
 				BB18BBB71DFD78F600567023 /* test_simd */,
 				BB18BBC71DFD7E3400567023 /* test_code */,
 				BB9D87A01E76BAE500DD0F00 /* test_matrix */,
+				BBE82A64233D15EB00BE44DF /* libcytospaceG.a */,
+				BB692222233D359F00F528D2 /* libcytosimG.a */,
 			);
 			name = build;
 			sourceTree = SOURCE_ROOT;
@@ -2613,7 +2816,6 @@
 				BB7191C50EF1CD9900CED9E2 /* libcytomath.a */,
 				BB51BC5C05FA559800D4869F /* libcytobase.a */,
 				BBE0993E0869D87F005FF210 /* libcytospace.a */,
-				BB4DB5CE0C69D7E9001E5E4F /* libcytospaceGL.a */,
 				BB51BD1405FA5FAA00D4869F /* libcytosim.a */,
 				BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */,
 			);
@@ -2635,7 +2837,7 @@
 		BBB7ED3A06933C7700E2B49B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BBF2FBC621AD376200A07E95 /* OpenGL.framework */,
+				BBE82A66233D167900BE44DF /* OpenGL.framework */,
 				BB69D0B8209C666100445716 /* GLUT.framework */,
 				BBF2FBC421AD36FD00A07E95 /* GLUT.framework */,
 				BB84087F193490130088C07B /* Accelerate.framework */,
@@ -2850,40 +3052,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BB4DB5CA0C69D7E9001E5E4F /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BB88389410B48EC400A4028F /* modulo.h in Headers */,
-				BB51D59F2051D4A9002B4E76 /* space_lid.h in Headers */,
-				BB88389610B48EC400A4028F /* space_prop.h in Headers */,
-				BBCEB79D1E3E8E0200443F77 /* space_dynamic_sphere.h in Headers */,
-				BB2BFFE1184640D800EBE4EC /* space_polygonZ.h in Headers */,
-				BB8838FE10B48EF900A4028F /* space_cylinder.h in Headers */,
-				BB88390010B48EF900A4028F /* space_cylinderZ.h in Headers */,
-				BB48AB051B42BABD008540D1 /* space_banana.h in Headers */,
-				BB88390210B48EF900A4028F /* space_dice.h in Headers */,
-				BB88390410B48EF900A4028F /* space_ellipse.h in Headers */,
-				BBA176EE22103C5C0046E858 /* space_mesh.h in Headers */,
-				BB3A4AEA19351389005CD868 /* space_tee.h in Headers */,
-				BB88390A10B48EF900A4028F /* space_polygon.h in Headers */,
-				BB88390C10B48EF900A4028F /* space_rotate.h in Headers */,
-				BB88390E10B48EF900A4028F /* space_sphere.h in Headers */,
-				BB88391210B48EF900A4028F /* space_square.h in Headers */,
-				BB88391410B48EF900A4028F /* space_strip.h in Headers */,
-				BB88391810B48EF900A4028F /* space_torus.h in Headers */,
-				BB88395010B4912A00A4028F /* space_capsule.h in Headers */,
-				BB955CF8116FCB40000E70A6 /* space_set.h in Headers */,
-				BBE4B5EC13E04D2400CBE163 /* space_periodic.h in Headers */,
-				BBDF81821E677FDD0032906A /* space_dynamic_ellipse.h in Headers */,
-				BB9B5CAE1541C01800C0B9B6 /* space_beads.h in Headers */,
-				BBDF817C1E677D620032906A /* space_disc.h in Headers */,
-				BBE9D390158500BA00FF944A /* space_ring.h in Headers */,
-				E2F6428C15D01466009B7C31 /* space_cylinderP.h in Headers */,
-				BB5CF1FC16DD2D5A00EF0FE3 /* space_force.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BB51BC2005FA534000D4869F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3058,6 +3226,125 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BB692138233D359F00F528D2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB692139233D359F00F528D2 /* mecapoint.h in Headers */,
+				BB69213A233D359F00F528D2 /* interpolation.h in Headers */,
+				BB69213B233D359F00F528D2 /* chain.h in Headers */,
+				BB69213C233D359F00F528D2 /* lattice.h in Headers */,
+				BB69213D233D359F00F528D2 /* mecable.h in Headers */,
+				BB69213E233D359F00F528D2 /* sphere.h in Headers */,
+				BB69213F233D359F00F528D2 /* mecafil.h in Headers */,
+				BB692140233D359F00F528D2 /* solid.h in Headers */,
+				BB692141233D359F00F528D2 /* simul.h in Headers */,
+				BB692142233D359F00F528D2 /* hand.h in Headers */,
+				BB692143233D359F00F528D2 /* meca.h in Headers */,
+				BB692144233D359F00F528D2 /* fiber.h in Headers */,
+				BB692145233D359F00F528D2 /* fiber_grid.h in Headers */,
+				BB692146233D359F00F528D2 /* hand_monitor.h in Headers */,
+				BB692147233D359F00F528D2 /* point_grid.h in Headers */,
+				BB692148233D359F00F528D2 /* movable.h in Headers */,
+				BB692149233D359F00F528D2 /* event.h in Headers */,
+				BB69214A233D359F00F528D2 /* object_set.h in Headers */,
+				BB69214B233D359F00F528D2 /* sphere_set.h in Headers */,
+				BB69214C233D359F00F528D2 /* field_values.h in Headers */,
+				BB69214D233D359F00F528D2 /* chewer_prop.h in Headers */,
+				BB69214E233D359F00F528D2 /* fiber_site.h in Headers */,
+				BB69214F233D359F00F528D2 /* hand_prop.h in Headers */,
+				BB692150233D359F00F528D2 /* couple_set.h in Headers */,
+				BB692151233D359F00F528D2 /* couple.h in Headers */,
+				BB692152233D359F00F528D2 /* single_set.h in Headers */,
+				BB692153233D359F00F528D2 /* single.h in Headers */,
+				BB692154233D359F00F528D2 /* single_prop.h in Headers */,
+				BB692155233D359F00F528D2 /* couple_prop.h in Headers */,
+				BB692156233D359F00F528D2 /* simul_prop.h in Headers */,
+				BB692157233D359F00F528D2 /* solid_prop.h in Headers */,
+				BB692158233D359F00F528D2 /* organizer.h in Headers */,
+				BB692159233D359F00F528D2 /* organizer_set.h in Headers */,
+				BB69215A233D359F00F528D2 /* sphere_prop.h in Headers */,
+				BB69215B233D359F00F528D2 /* object.h in Headers */,
+				BB69215C233D359F00F528D2 /* common.h in Headers */,
+				BB69215D233D359F00F528D2 /* field_prop.h in Headers */,
+				BB69215E233D359F00F528D2 /* fiber_prop.h in Headers */,
+				BB69215F233D359F00F528D2 /* fiber_set.h in Headers */,
+				BB692160233D359F00F528D2 /* space_set.h in Headers */,
+				BB692161233D359F00F528D2 /* bead.h in Headers */,
+				BB692162233D359F00F528D2 /* bead_set.h in Headers */,
+				BB692163233D359F00F528D2 /* motor_prop.h in Headers */,
+				BB692164233D359F00F528D2 /* motor.h in Headers */,
+				BB692165233D359F00F528D2 /* nucleator_prop.h in Headers */,
+				BB692166233D359F00F528D2 /* nucleator.h in Headers */,
+				BB692167233D359F00F528D2 /* regulator_prop.h in Headers */,
+				BB692168233D359F00F528D2 /* mighty_prop.h in Headers */,
+				BB692169233D359F00F528D2 /* mighty.h in Headers */,
+				BB69216A233D359F00F528D2 /* slider_prop.h in Headers */,
+				BB69216B233D359F00F528D2 /* slider.h in Headers */,
+				BB69216C233D359F00F528D2 /* tracker_prop.h in Headers */,
+				BB69216D233D359F00F528D2 /* tracker.h in Headers */,
+				BB69216E233D359F00F528D2 /* chewer.h in Headers */,
+				BB69216F233D359F00F528D2 /* walker_prop.h in Headers */,
+				BB692170233D359F00F528D2 /* walker.h in Headers */,
+				BB692171233D359F00F528D2 /* cutter_prop.h in Headers */,
+				BB692172233D359F00F528D2 /* cutter.h in Headers */,
+				BB692173233D359F00F528D2 /* actor_prop.h in Headers */,
+				BB692174233D359F00F528D2 /* actor.h in Headers */,
+				BB692175233D359F00F528D2 /* parser.h in Headers */,
+				BB692176233D359F00F528D2 /* picket.h in Headers */,
+				BB692177233D359F00F528D2 /* wrist.h in Headers */,
+				BB692178233D359F00F528D2 /* bundle_prop.h in Headers */,
+				BB692179233D359F00F528D2 /* bundle.h in Headers */,
+				BB69217A233D359F00F528D2 /* aster_prop.h in Headers */,
+				BB69217B233D359F00F528D2 /* aster.h in Headers */,
+				BB69217C233D359F00F528D2 /* nucleus_prop.h in Headers */,
+				BB69217D233D359F00F528D2 /* nucleus.h in Headers */,
+				BB69217E233D359F00F528D2 /* fake_prop.h in Headers */,
+				BB69217F233D359F00F528D2 /* fake.h in Headers */,
+				BB692180233D359F00F528D2 /* fork.h in Headers */,
+				BB692181233D359F00F528D2 /* fork_prop.h in Headers */,
+				BB692182233D359F00F528D2 /* shackle_prop.h in Headers */,
+				BB692183233D359F00F528D2 /* shackle.h in Headers */,
+				BB692184233D359F00F528D2 /* dynamic_fiber.h in Headers */,
+				BB692185233D359F00F528D2 /* dynamic_fiber_prop.h in Headers */,
+				BB692186233D359F00F528D2 /* classic_fiber_prop.h in Headers */,
+				BB692187233D359F00F528D2 /* classic_fiber.h in Headers */,
+				BB692188233D359F00F528D2 /* event_set.h in Headers */,
+				BB692189233D359F00F528D2 /* crosslink_prop.h in Headers */,
+				BB69218A233D359F00F528D2 /* crosslink.h in Headers */,
+				BB69218B233D359F00F528D2 /* bridge_prop.h in Headers */,
+				BB69218C233D359F00F528D2 /* bridge.h in Headers */,
+				BB69218D233D359F00F528D2 /* fiber_segment.h in Headers */,
+				BB69218E233D359F00F528D2 /* treadmilling_fiber_prop.h in Headers */,
+				BB69218F233D359F00F528D2 /* treadmilling_fiber.h in Headers */,
+				BB692190233D359F00F528D2 /* picket_long.h in Headers */,
+				BB692191233D359F00F528D2 /* wrist_long.h in Headers */,
+				BB692192233D359F00F528D2 /* bead_prop.h in Headers */,
+				BB692193233D359F00F528D2 /* regulator.h in Headers */,
+				BB692194233D359F00F528D2 /* crosslink_long.h in Headers */,
+				BB692195233D359F00F528D2 /* duo.h in Headers */,
+				BB692196233D359F00F528D2 /* duo_prop.h in Headers */,
+				BB692197233D359F00F528D2 /* duo_long.h in Headers */,
+				BB692198233D359F00F528D2 /* field.h in Headers */,
+				BB692199233D359F00F528D2 /* shackle_long.h in Headers */,
+				BB69219A233D359F00F528D2 /* couple_long.h in Headers */,
+				BB69219B233D359F00F528D2 /* interface.h in Headers */,
+				BB69219C233D359F00F528D2 /* rescuer_prop.h in Headers */,
+				BB69219D233D359F00F528D2 /* rescuer.h in Headers */,
+				BB69219E233D359F00F528D2 /* digit.h in Headers */,
+				BB69219F233D359F00F528D2 /* digit_prop.h in Headers */,
+				BB6921A0233D359F00F528D2 /* myosin_prop.h in Headers */,
+				BB6921A1233D359F00F528D2 /* myosin.h in Headers */,
+				BB6921A2233D359F00F528D2 /* dynein_prop.h in Headers */,
+				BB6921A3233D359F00F528D2 /* dynein.h in Headers */,
+				BB6921A4233D359F00F528D2 /* splash.h in Headers */,
+				BB6921A5233D359F00F528D2 /* kinesin_prop.h in Headers */,
+				BB6921A6233D359F00F528D2 /* kinesin.h in Headers */,
+				BB6921A7233D359F00F528D2 /* growing_fiber_prop.h in Headers */,
+				BB6921A8233D359F00F528D2 /* growing_fiber.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB7191640EF1CD9900CED9E2 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3125,6 +3412,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB692132233D349E00F528D2 /* random_vector.h in Headers */,
 				BB1037F810B8121300CEC5C6 /* rasterizer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3203,6 +3491,40 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BBE82A28233D15EB00BE44DF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBE82A29233D15EB00BE44DF /* modulo.h in Headers */,
+				BBE82A2A233D15EB00BE44DF /* space_lid.h in Headers */,
+				BBE82A2B233D15EB00BE44DF /* space_prop.h in Headers */,
+				BBE82A2C233D15EB00BE44DF /* space_dynamic_sphere.h in Headers */,
+				BBE82A2D233D15EB00BE44DF /* space_polygonZ.h in Headers */,
+				BBE82A2E233D15EB00BE44DF /* space_cylinder.h in Headers */,
+				BBE82A2F233D15EB00BE44DF /* space_cylinderZ.h in Headers */,
+				BBE82A30233D15EB00BE44DF /* space_banana.h in Headers */,
+				BBE82A31233D15EB00BE44DF /* space_dice.h in Headers */,
+				BBE82A32233D15EB00BE44DF /* space_ellipse.h in Headers */,
+				BBE82A33233D15EB00BE44DF /* space_mesh.h in Headers */,
+				BBE82A34233D15EB00BE44DF /* space_tee.h in Headers */,
+				BBE82A35233D15EB00BE44DF /* space_polygon.h in Headers */,
+				BBE82A36233D15EB00BE44DF /* space_rotate.h in Headers */,
+				BBE82A37233D15EB00BE44DF /* space_sphere.h in Headers */,
+				BBE82A38233D15EB00BE44DF /* space_square.h in Headers */,
+				BBE82A39233D15EB00BE44DF /* space_strip.h in Headers */,
+				BBE82A3A233D15EB00BE44DF /* space_torus.h in Headers */,
+				BBE82A3B233D15EB00BE44DF /* space_capsule.h in Headers */,
+				BBE82A3C233D15EB00BE44DF /* space_set.h in Headers */,
+				BBE82A3D233D15EB00BE44DF /* space_periodic.h in Headers */,
+				BBE82A3E233D15EB00BE44DF /* space_dynamic_ellipse.h in Headers */,
+				BBE82A3F233D15EB00BE44DF /* space_beads.h in Headers */,
+				BBE82A40233D15EB00BE44DF /* space_disc.h in Headers */,
+				BBE82A41233D15EB00BE44DF /* space_ring.h in Headers */,
+				BBE82A42233D15EB00BE44DF /* space_cylinderP.h in Headers */,
+				BBE82A43233D15EB00BE44DF /* space_force.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -3256,23 +3578,6 @@
 			name = cytodisp;
 			productName = glapp;
 			productReference = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		BB4DB5CD0C69D7E9001E5E4F /* cytospaceGL */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BB4DB5FA0C69D887001E5E4F /* Build configuration list for PBXNativeTarget "cytospaceGL" */;
-			buildPhases = (
-				BB4DB5CA0C69D7E9001E5E4F /* Headers */,
-				BB4DB5CB0C69D7E9001E5E4F /* Sources */,
-				BB4DB5CC0C69D7E9001E5E4F /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = cytospaceGL;
-			productName = cytospaceGL;
-			productReference = BB4DB5CE0C69D7E9001E5E4F /* libcytospaceGL.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		BB51BC2205FA534000D4869F /* test_glapp */ = {
@@ -3386,6 +3691,22 @@
 			productReference = BB66EA66068D95AD001934AF /* test_space */;
 			productType = "com.apple.product-type.tool";
 		};
+		BB692137233D359F00F528D2 /* cytosimG */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB69221E233D359F00F528D2 /* Build configuration list for PBXNativeTarget "cytosimG" */;
+			buildPhases = (
+				BB692138233D359F00F528D2 /* Headers */,
+				BB6921A9233D359F00F528D2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = cytosimG;
+			productName = cytosim;
+			productReference = BB692222233D359F00F528D2 /* libcytosimG.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		BB7191630EF1CD9900CED9E2 /* cytomath */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BB7191C10EF1CD9900CED9E2 /* Build configuration list for PBXNativeTarget "cytomath" */;
@@ -3414,7 +3735,6 @@
 			);
 			dependencies = (
 				BB3416DE0C328F6E0016CF18 /* PBXTargetDependency */,
-				BBF7B9FB10CD34F50089F5B1 /* PBXTargetDependency */,
 				BBF7B9FE10CD350F0089F5B1 /* PBXTargetDependency */,
 			);
 			name = test_rasterizer;
@@ -3495,7 +3815,6 @@
 				BBA579BF05FA6907009AE66E /* PBXTargetDependency */,
 				BBA579C105FA690C009AE66E /* PBXTargetDependency */,
 				BB4DB5C10C69D725001E5E4F /* PBXTargetDependency */,
-				BB4DB6020C69D8C6001E5E4F /* PBXTargetDependency */,
 			);
 			name = play;
 			productName = play;
@@ -3553,12 +3872,26 @@
 			buildRules = (
 			);
 			dependencies = (
-				BB17070F0F30F74800E5DE24 /* PBXTargetDependency */,
-				BB1707110F30F74E00E5DE24 /* PBXTargetDependency */,
 			);
 			name = cytospace;
 			productName = cytospace;
 			productReference = BBE0993E0869D87F005FF210 /* libcytospace.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		BBE82A27233D15EB00BE44DF /* cytospaceG */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBE82A60233D15EB00BE44DF /* Build configuration list for PBXNativeTarget "cytospaceG" */;
+			buildPhases = (
+				BBE82A28233D15EB00BE44DF /* Headers */,
+				BBE82A44233D15EB00BE44DF /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = cytospaceG;
+			productName = cytospace;
+			productReference = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -3597,8 +3930,9 @@
 				BB7191630EF1CD9900CED9E2 /* cytomath */,
 				BB51BC5B05FA559800D4869F /* cytobase */,
 				BBE0993D0869D87F005FF210 /* cytospace */,
-				BB4DB5CD0C69D7E9001E5E4F /* cytospaceGL */,
+				BBE82A27233D15EB00BE44DF /* cytospaceG */,
 				BB51BD1305FA5FAA00D4869F /* cytosim */,
+				BB692137233D359F00F528D2 /* cytosimG */,
 				BB4DB5940C69D5A2001E5E4F /* cytodisp */,
 				BBA578EF05FA61DE009AE66E /* sim */,
 				BBA5793305FA64A3009AE66E /* play */,
@@ -3653,40 +3987,6 @@
 				BB97116D1DECDBA300352630 /* gle_color_list.cc in Sources */,
 				BB9711681DECDB8200352630 /* view_prop.cc in Sources */,
 				BB97116E1DECDBE500352630 /* gle.cc in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BB4DB5CB0C69D7E9001E5E4F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BB88389310B48EC400A4028F /* modulo.cc in Sources */,
-				BB88389510B48EC400A4028F /* space_prop.cc in Sources */,
-				BB51D59D2051D4A9002B4E76 /* space_lid.cc in Sources */,
-				BB48AB031B42BABD008540D1 /* space_banana.cc in Sources */,
-				BB2BFFDF184640D800EBE4EC /* space_polygonZ.cc in Sources */,
-				BB88389710B48EC400A4028F /* space.cc in Sources */,
-				BBCEB79B1E3E8E0200443F77 /* space_dynamic_sphere.cc in Sources */,
-				BBDF817A1E677D620032906A /* space_disc.cc in Sources */,
-				BB8838FD10B48EF900A4028F /* space_cylinder.cc in Sources */,
-				BB8838FF10B48EF900A4028F /* space_cylinderZ.cc in Sources */,
-				BB88390110B48EF900A4028F /* space_dice.cc in Sources */,
-				BB88390310B48EF900A4028F /* space_ellipse.cc in Sources */,
-				BBA176F022103C5C0046E858 /* space_mesh.cc in Sources */,
-				BB3A4AE819351389005CD868 /* space_tee.cc in Sources */,
-				BB88390910B48EF900A4028F /* space_polygon.cc in Sources */,
-				BB88390B10B48EF900A4028F /* space_rotate.cc in Sources */,
-				BB88390D10B48EF900A4028F /* space_sphere.cc in Sources */,
-				BB88391110B48EF900A4028F /* space_square.cc in Sources */,
-				BB88391310B48EF900A4028F /* space_strip.cc in Sources */,
-				BB88391710B48EF900A4028F /* space_torus.cc in Sources */,
-				BBDF81801E677FDD0032906A /* space_dynamic_ellipse.cc in Sources */,
-				BB88394F10B4912A00A4028F /* space_capsule.cc in Sources */,
-				BBE4B5EB13E04D2400CBE163 /* space_periodic.cc in Sources */,
-				BB9B5CAD1541C01800C0B9B6 /* space_beads.cc in Sources */,
-				BBE9D38F158500BA00FF944A /* space_ring.cc in Sources */,
-				E2F6428A15D01466009B7C31 /* space_cylinderP.cc in Sources */,
-				BB5CF1FA16DD2D5A00EF0FE3 /* space_force.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3869,6 +4169,129 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BB6921A9233D359F00F528D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB6921AA233D359F00F528D2 /* mecapoint.cc in Sources */,
+				BB6921AB233D359F00F528D2 /* interpolation.cc in Sources */,
+				BB6921AC233D359F00F528D2 /* chain.cc in Sources */,
+				BB6921AD233D359F00F528D2 /* hand.cc in Sources */,
+				BB6921AE233D359F00F528D2 /* solid.cc in Sources */,
+				BB6921AF233D359F00F528D2 /* simul.cc in Sources */,
+				BB6921B0233D359F00F528D2 /* mecable.cc in Sources */,
+				BB6921B1233D359F00F528D2 /* sphere.cc in Sources */,
+				BB6921B2233D359F00F528D2 /* mecafil.cc in Sources */,
+				BB6921B3233D359F00F528D2 /* meca.cc in Sources */,
+				BB6921B4233D359F00F528D2 /* fiber.cc in Sources */,
+				BB6921B5233D359F00F528D2 /* fiber_grid.cc in Sources */,
+				BB6921B6233D359F00F528D2 /* hand_monitor.cc in Sources */,
+				BB6921B7233D359F00F528D2 /* meca1d.h in Sources */,
+				BB6921B8233D359F00F528D2 /* lattice.cc in Sources */,
+				BB6921B9233D359F00F528D2 /* point_grid.cc in Sources */,
+				BB6921BA233D359F00F528D2 /* movable.cc in Sources */,
+				BB6921BB233D359F00F528D2 /* object_set.cc in Sources */,
+				BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */,
+				BB6921BD233D359F00F528D2 /* splash.cc in Sources */,
+				BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */,
+				BB6921BF233D359F00F528D2 /* fiber_site.cc in Sources */,
+				BB6921C0233D359F00F528D2 /* hand_prop.cc in Sources */,
+				BB6921C1233D359F00F528D2 /* regulator_prop.cc in Sources */,
+				BB6921C2233D359F00F528D2 /* couple_set.cc in Sources */,
+				BB6921C3233D359F00F528D2 /* couple.cc in Sources */,
+				BB6921C4233D359F00F528D2 /* single_set.cc in Sources */,
+				BB6921C5233D359F00F528D2 /* single.cc in Sources */,
+				BB6921C6233D359F00F528D2 /* single_prop.cc in Sources */,
+				BB6921C7233D359F00F528D2 /* couple_prop.cc in Sources */,
+				BB6921C8233D359F00F528D2 /* simul_prop.cc in Sources */,
+				BB6921C9233D359F00F528D2 /* solid_prop.cc in Sources */,
+				BB6921CA233D359F00F528D2 /* organizer.cc in Sources */,
+				BB6921CB233D359F00F528D2 /* organizer_set.cc in Sources */,
+				BB6921CC233D359F00F528D2 /* sphere_prop.cc in Sources */,
+				BB6921CD233D359F00F528D2 /* chewer.cc in Sources */,
+				BB6921CE233D359F00F528D2 /* object.cc in Sources */,
+				BB6921CF233D359F00F528D2 /* field_prop.cc in Sources */,
+				BB6921D0233D359F00F528D2 /* fiber_prop.cc in Sources */,
+				BB6921D1233D359F00F528D2 /* fiber_set.cc in Sources */,
+				BB6921D2233D359F00F528D2 /* field_set.cc in Sources */,
+				BB6921D3233D359F00F528D2 /* space_set.cc in Sources */,
+				BB6921D4233D359F00F528D2 /* bead.cc in Sources */,
+				BB6921D5233D359F00F528D2 /* event_set.cc in Sources */,
+				BB6921D6233D359F00F528D2 /* bead_set.cc in Sources */,
+				BB6921D7233D359F00F528D2 /* motor_prop.cc in Sources */,
+				BB6921D8233D359F00F528D2 /* motor.cc in Sources */,
+				BB6921D9233D359F00F528D2 /* nucleator_prop.cc in Sources */,
+				BB6921DA233D359F00F528D2 /* nucleator.cc in Sources */,
+				BB6921DB233D359F00F528D2 /* mighty_prop.cc in Sources */,
+				BB6921DC233D359F00F528D2 /* mighty.cc in Sources */,
+				BB6921DD233D359F00F528D2 /* slider_prop.cc in Sources */,
+				BB6921DE233D359F00F528D2 /* slider.cc in Sources */,
+				BB6921DF233D359F00F528D2 /* tracker_prop.cc in Sources */,
+				BB6921E0233D359F00F528D2 /* tracker.cc in Sources */,
+				BB6921E1233D359F00F528D2 /* walker_prop.cc in Sources */,
+				BB6921E2233D359F00F528D2 /* walker.cc in Sources */,
+				BB6921E3233D359F00F528D2 /* cutter_prop.cc in Sources */,
+				BB6921E4233D359F00F528D2 /* cutter.cc in Sources */,
+				BB6921E5233D359F00F528D2 /* actor_prop.cc in Sources */,
+				BB6921E6233D359F00F528D2 /* actor.cc in Sources */,
+				BB6921E7233D359F00F528D2 /* common.cc in Sources */,
+				BB6921E8233D359F00F528D2 /* parser.cc in Sources */,
+				BB6921E9233D359F00F528D2 /* picket.cc in Sources */,
+				BB6921EA233D359F00F528D2 /* wrist.cc in Sources */,
+				BB6921EB233D359F00F528D2 /* bundle_prop.cc in Sources */,
+				BB6921EC233D359F00F528D2 /* bundle.cc in Sources */,
+				BB6921ED233D359F00F528D2 /* aster_prop.cc in Sources */,
+				BB6921EE233D359F00F528D2 /* aster.cc in Sources */,
+				BB6921EF233D359F00F528D2 /* regulator.cc in Sources */,
+				BB6921F0233D359F00F528D2 /* nucleus_prop.cc in Sources */,
+				BB6921F1233D359F00F528D2 /* nucleus.cc in Sources */,
+				BB6921F2233D359F00F528D2 /* fake_prop.cc in Sources */,
+				BB6921F3233D359F00F528D2 /* fake.cc in Sources */,
+				BB6921F4233D359F00F528D2 /* fork.cc in Sources */,
+				BB6921F5233D359F00F528D2 /* fork_prop.cc in Sources */,
+				BB6921F6233D359F00F528D2 /* shackle_prop.cc in Sources */,
+				BB6921F7233D359F00F528D2 /* shackle.cc in Sources */,
+				BB6921F8233D359F00F528D2 /* dynamic_fiber.cc in Sources */,
+				BB6921F9233D359F00F528D2 /* dynamic_fiber_prop.cc in Sources */,
+				BB6921FA233D359F00F528D2 /* classic_fiber_prop.cc in Sources */,
+				BB6921FB233D359F00F528D2 /* classic_fiber.cc in Sources */,
+				BB6921FC233D359F00F528D2 /* crosslink_prop.cc in Sources */,
+				BB6921FD233D359F00F528D2 /* crosslink.cc in Sources */,
+				BB6921FE233D359F00F528D2 /* bridge_prop.cc in Sources */,
+				BB6921FF233D359F00F528D2 /* bridge.cc in Sources */,
+				BB692200233D359F00F528D2 /* fiber_segment.cc in Sources */,
+				BB692201233D359F00F528D2 /* chewer_prop.cc in Sources */,
+				BB692202233D359F00F528D2 /* treadmilling_fiber_prop.cc in Sources */,
+				BB692203233D359F00F528D2 /* treadmilling_fiber.cc in Sources */,
+				BB692204233D359F00F528D2 /* picket_long.cc in Sources */,
+				BB692205233D359F00F528D2 /* wrist_long.cc in Sources */,
+				BB692206233D359F00F528D2 /* bead_prop.cc in Sources */,
+				BB692207233D359F00F528D2 /* interpolation4.cc in Sources */,
+				BB692208233D359F00F528D2 /* crosslink_long.cc in Sources */,
+				BB692209233D359F00F528D2 /* duo.cc in Sources */,
+				BB69220A233D359F00F528D2 /* duo_prop.cc in Sources */,
+				BB69220B233D359F00F528D2 /* event.cc in Sources */,
+				BB69220C233D359F00F528D2 /* duo_long.cc in Sources */,
+				BB69220D233D359F00F528D2 /* field.cc in Sources */,
+				BB69220E233D359F00F528D2 /* shackle_long.cc in Sources */,
+				BB69220F233D359F00F528D2 /* simul_solvef.cc in Sources */,
+				BB692210233D359F00F528D2 /* couple_long.cc in Sources */,
+				BB692211233D359F00F528D2 /* interface.cc in Sources */,
+				BB692212233D359F00F528D2 /* rescuer_prop.cc in Sources */,
+				BB692213233D359F00F528D2 /* rescuer.cc in Sources */,
+				BB692214233D359F00F528D2 /* digit.cc in Sources */,
+				BB692215233D359F00F528D2 /* digit_prop.cc in Sources */,
+				BB692216233D359F00F528D2 /* myosin_prop.cc in Sources */,
+				BB692217233D359F00F528D2 /* myosin.cc in Sources */,
+				BB692218233D359F00F528D2 /* dynein_prop.cc in Sources */,
+				BB692219233D359F00F528D2 /* dynein.cc in Sources */,
+				BB69221A233D359F00F528D2 /* kinesin_prop.cc in Sources */,
+				BB69221B233D359F00F528D2 /* kinesin.cc in Sources */,
+				BB69221C233D359F00F528D2 /* growing_fiber_prop.cc in Sources */,
+				BB69221D233D359F00F528D2 /* growing_fiber.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB7191980EF1CD9900CED9E2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3912,8 +4335,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB692134233D34C300F528D2 /* SFMT.c in Sources */,
+				BB692135233D350300F528D2 /* platonic.cc in Sources */,
 				BB7C2B8105F93FC3002C69A9 /* rasterizer.cc in Sources */,
+				BB692136233D351900F528D2 /* vector3.cc in Sources */,
+				BBE82A68233D1A5E00BE44DF /* random.cc in Sources */,
 				BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */,
+				BB692133233D34A100F528D2 /* random_vector.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4010,7 +4438,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBB750840D15CFCA00B79171 /* exceptions.cc in Sources */,
 				BB88388D10B48EC400A4028F /* modulo.cc in Sources */,
 				BB88388F10B48EC400A4028F /* space_prop.cc in Sources */,
 				BB88389110B48EC400A4028F /* space.cc in Sources */,
@@ -4041,19 +4468,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BBE82A44233D15EB00BE44DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBE82A45233D15EB00BE44DF /* modulo.cc in Sources */,
+				BBE82A46233D15EB00BE44DF /* space_prop.cc in Sources */,
+				BBE82A47233D15EB00BE44DF /* space.cc in Sources */,
+				BBE82A48233D15EB00BE44DF /* space_cylinder.cc in Sources */,
+				BBE82A49233D15EB00BE44DF /* space_cylinderZ.cc in Sources */,
+				BBE82A4A233D15EB00BE44DF /* space_dynamic_ellipse.cc in Sources */,
+				BBE82A4B233D15EB00BE44DF /* space_disc.cc in Sources */,
+				BBE82A4C233D15EB00BE44DF /* space_dynamic_sphere.cc in Sources */,
+				BBE82A4D233D15EB00BE44DF /* space_dice.cc in Sources */,
+				BBE82A4E233D15EB00BE44DF /* space_ellipse.cc in Sources */,
+				BBE82A4F233D15EB00BE44DF /* space_tee.cc in Sources */,
+				BBE82A50233D15EB00BE44DF /* space_polygon.cc in Sources */,
+				BBE82A51233D15EB00BE44DF /* space_rotate.cc in Sources */,
+				BBE82A52233D15EB00BE44DF /* space_polygonZ.cc in Sources */,
+				BBE82A53233D15EB00BE44DF /* space_sphere.cc in Sources */,
+				BBE82A54233D15EB00BE44DF /* space_square.cc in Sources */,
+				BBE82A55233D15EB00BE44DF /* space_strip.cc in Sources */,
+				BBE82A56233D15EB00BE44DF /* space_lid.cc in Sources */,
+				BBE82A57233D15EB00BE44DF /* space_torus.cc in Sources */,
+				BBE82A58233D15EB00BE44DF /* space_mesh.cc in Sources */,
+				BBE82A59233D15EB00BE44DF /* space_capsule.cc in Sources */,
+				BBE82A5A233D15EB00BE44DF /* space_banana.cc in Sources */,
+				BBE82A5B233D15EB00BE44DF /* space_periodic.cc in Sources */,
+				BBE82A5C233D15EB00BE44DF /* space_beads.cc in Sources */,
+				BBE82A5D233D15EB00BE44DF /* space_ring.cc in Sources */,
+				BBE82A5E233D15EB00BE44DF /* space_cylinderP.cc in Sources */,
+				BBE82A5F233D15EB00BE44DF /* space_force.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		BB17070F0F30F74800E5DE24 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB51BC5B05FA559800D4869F /* cytobase */;
-			targetProxy = BB17070E0F30F74800E5DE24 /* PBXContainerItemProxy */;
-		};
-		BB1707110F30F74E00E5DE24 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
-			targetProxy = BB1707100F30F74E00E5DE24 /* PBXContainerItemProxy */;
-		};
 		BB1707130F30F76000E5DE24 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBE0993D0869D87F005FF210 /* cytospace */;
@@ -4103,11 +4554,6 @@
 			isa = PBXTargetDependency;
 			target = BB4DB5940C69D5A2001E5E4F /* cytodisp */;
 			targetProxy = BB4DB5C00C69D725001E5E4F /* PBXContainerItemProxy */;
-		};
-		BB4DB6020C69D8C6001E5E4F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB4DB5CD0C69D7E9001E5E4F /* cytospaceGL */;
-			targetProxy = BB4DB6010C69D8C6001E5E4F /* PBXContainerItemProxy */;
 		};
 		BB55C0E80A261402003333C9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4243,11 +4689,6 @@
 			isa = PBXTargetDependency;
 			target = BB51BD1305FA5FAA00D4869F /* cytosim */;
 			targetProxy = BBE8E6CF10C199EA006527D4 /* PBXContainerItemProxy */;
-		};
-		BBF7B9FB10CD34F50089F5B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
-			targetProxy = BBF7B9FA10CD34F50089F5B1 /* PBXContainerItemProxy */;
 		};
 		BBF7B9FE10CD350F0089F5B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4537,59 +4978,36 @@
 			};
 			name = Default;
 		};
-		BB4DB5FB0C69D887001E5E4F /* Development */ = {
+		BB69221F233D359F00F528D2 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-DDISPLAY",
-				);
-				PRODUCT_NAME = cytospaceGL;
-				ZERO_LINK = YES;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Development;
 		};
-		BB4DB5FC0C69D887001E5E4F /* Deployment */ = {
+		BB692220233D359F00F528D2 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-DDISPLAY",
-				);
-				PRODUCT_NAME = cytospaceGL;
-				ZERO_LINK = NO;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Deployment;
 		};
-		BB4DB5FD0C69D887001E5E4F /* Default */ = {
+		BB692221233D359F00F528D2 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-DDISPLAY",
-				);
-				PRODUCT_NAME = cytospaceGL;
-				ZERO_LINK = YES;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Default;
 		};
@@ -5520,6 +5938,36 @@
 			};
 			name = Default;
 		};
+		BBE82A61233D15EB00BE44DF /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
+		};
+		BBE82A62233D15EB00BE44DF /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Deployment;
+		};
+		BBE82A63233D15EB00BE44DF /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Default;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -5553,12 +6001,12 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		BB4DB5FA0C69D887001E5E4F /* Build configuration list for PBXNativeTarget "cytospaceGL" */ = {
+		BB69221E233D359F00F528D2 /* Build configuration list for PBXNativeTarget "cytosimG" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BB4DB5FB0C69D887001E5E4F /* Development */,
-				BB4DB5FC0C69D887001E5E4F /* Deployment */,
-				BB4DB5FD0C69D887001E5E4F /* Default */,
+				BB69221F233D359F00F528D2 /* Development */,
+				BB692220233D359F00F528D2 /* Deployment */,
+				BB692221233D359F00F528D2 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
@@ -5739,6 +6187,16 @@
 				BBB1C6E10CB2CAA300679ADC /* Development */,
 				BBB1C6E20CB2CAA300679ADC /* Deployment */,
 				BBB1C6E30CB2CAA300679ADC /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		BBE82A60233D15EB00BE44DF /* Build configuration list for PBXNativeTarget "cytospaceG" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBE82A61233D15EB00BE44DF /* Development */,
+				BBE82A62233D15EB00BE44DF /* Deployment */,
+				BBE82A63233D15EB00BE44DF /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;

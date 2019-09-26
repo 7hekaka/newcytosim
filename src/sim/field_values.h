@@ -1,14 +1,15 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+
 #ifndef FIELD_VALUES_H
 #define FIELD_VALUES_H
 
+#include "real.h"
 #include "iowrapper.h"
 
 #ifdef DISPLAY
-   #include "opengl.h"
-   #include "gle_color.h"
+#  include "opengl.h"
+#  include "gle_color.h"
 #endif
-
 
 /// Scalar type (real) for a Field
 /**
@@ -25,15 +26,19 @@ public:
     
     /// constructor
     FieldScalar()                     { val = 0; }
+    
     /// implicit conversion from real
-    FieldScalar(real a)        { val = a; }
+    FieldScalar(real a)               { val = a; }
+    
     /// implicit conversion to real
     operator real&()                  { return val; }
 
     /// set to zero
     void clear()                      { val = 0; }
+    
     /// write
     void write(Outputter& out) const  { out.writeFloat(val); }
+    
     /// read
     void read(Inputter& in)           { val = in.readFloat(); }
     
@@ -71,8 +76,10 @@ public:
 
     /// set to zero
     void clear()                      { for (int n=0; n<N; ++n) val[n] = 0; }
+    
     /// write
     void write(Outputter& out) const  { for (int n=0; n<N; ++n) out.writeFloat(val[n]); }
+    
     /// read
     void read(Inputter& in)           { for (int n=0; n<N; ++n) val[n] = in.readFloat(); }
 
