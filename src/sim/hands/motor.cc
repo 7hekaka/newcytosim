@@ -5,6 +5,7 @@
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"
+#include "messages.h"
 #include "simul.h"
 
 
