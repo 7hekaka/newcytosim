@@ -92,7 +92,7 @@ void Couple::setProperty(CoupleProp * p)
      - V
  by Jamie Li Rickman, ~2017
  */
-int Couple::linkConfiguration(FiberEnd end, real len) const
+int Couple::configuration(FiberEnd end, real len) const
 {
     int e = (cHand1->abscissaFrom(end) < len) + (cHand2->abscissaFrom(end) < len);
     switch ( e )
@@ -110,7 +110,6 @@ int Couple::linkConfiguration(FiberEnd end, real len) const
     }
     return 5; //should not happen!
 }
-
 
 
 real Couple::stiffness() const

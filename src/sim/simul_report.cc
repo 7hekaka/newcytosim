@@ -1889,7 +1889,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, std::string const& whic
     for ( Couple * obj=couples.firstAA(); obj ; obj=obj->next() )
     {
         if ( !selected || obj->prop == selected )
-            ++T[obj->linkConfiguration(end, threshold)];
+            ++T[obj->configuration(end, threshold)];
     }
     size_t sum = T[0]+T[1]+T[2]+T[3]+T[4]+T[5];
     
