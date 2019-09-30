@@ -185,9 +185,13 @@ namespace LinearSolvers
 #endif
         start:
             
+#if ( 0 )
             mat.precondition(p, phat);                // phat = PC * p;
             mat.multiply(phat, v);                    // v = M * PC * p;
-
+#else
+            mat.precondition_multiply(p, phat, v);
+#endif
+            
             delta = blas::dot(dim, r0, v);
             if ( delta == 0.0 )
             {
@@ -200,8 +204,12 @@ namespace LinearSolvers
             blas::xaxpy(dim, -alpha,    v, 1,   r, 1);// r = r - alpha * v;
             blas::xaxpy(dim,  alpha, phat, 1, sol, 1);// x = x + alpha * phat;
 
+#if ( 0 )
             mat.precondition(r, shat);                // shat = PC * r
             mat.multiply(shat, t);                    // t = M * PC * r
+#else
+            mat.precondition_multiply(r, shat, t);
+#endif
             monitor+=2;
 
             double tdt = blas::dot(dim, t, t);

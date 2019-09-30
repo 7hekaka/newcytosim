@@ -20,10 +20,10 @@ namespace VecPrint
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
-            for ( size_t ii = 0; ii < m; ++ii )
+            for ( size_t i = 0; i < m; ++i )
             {
-                snprintf(str, sizeof(str), fmt, vec[ii]);
-                if ( ii % 4 )
+                snprintf(str, sizeof(str), fmt, vec[i]);
+                if ( i % 4 )
                     os << str;
                 else
                     os << "  " << str;
@@ -43,9 +43,9 @@ namespace VecPrint
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%ie", 9, digits);
-            for ( size_t ii = 0; ii < m; ++ii )
+            for ( size_t i = 0; i < m; ++i )
             {
-                snprintf(str, sizeof(str), fmt, vec[ii]);
+                snprintf(str, sizeof(str), fmt, vec[i]);
                 os << str << '\n';
             }
         }

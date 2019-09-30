@@ -17,7 +17,7 @@
 #  define MATRIXSB_USES_AVX 0
 #endif
 
-#define TRANSPOSED_BLOCKS 0
+#define TRANSPOSE_2D_BLOCKS 0
 
 
 MatrixSparseBlock::MatrixSparseBlock()
@@ -498,7 +498,7 @@ void MatrixSparseBlock::consolidate()
         Line & row = row_[i];
         row.sbk_ = blocks_ + cnt;
         cnt += row.size_;
-#if TRANSPOSED_BLOCKS
+#if ( DIM == 2 ) && TRANSPOSE_2D_BLOCKS
         for ( size_t j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j].transposed();
 #else
@@ -660,7 +660,7 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
         vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
         vec4 xy3 = broadcast2(X+inx[3]);  // xy = { X Y }
         inx += 4;
-#if TRANSPOSED_BLOCKS
+#if TRANSPOSE_2D_BLOCKS
         //SX += M[0] * X + M[1] * Y;
         //SY += M[2] * X + M[3] * Y;
         ss = fmadd4(load4(M   ), xy0, ss);
@@ -684,14 +684,14 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
     {
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
         ++inx;
-#if TRANSPOSED_BLOCKS
+#if TRANSPOSE_2D_BLOCKS
         ss = fmadd4(load4(M), xy, ss);
 #else
         ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
 #endif
     }
     // collapse result:
-#if TRANSPOSED_BLOCKS
+#if TRANSPOSE_2D_BLOCKS
     vec2 h = gethi(ss);
     store2(Y, add2(load2(Y), add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h))));
 #else

@@ -170,10 +170,10 @@ int main(int argc, char* argv[])
         sys.multiply(sol, vec);
         blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
         real res = blas::nrm2(dim, vec);
-        fprintf(stdout, " BCGS  count %4i  residual %10.6f\n", mon.count(), res);
+        fprintf(stdout, " BiCGStab count %4i  residual %10.6f\n", mon.count(), res);
     }
 
-    for ( int RS : {2, 4, 8, 16, 32, 64} )
+    for ( int RS : {2, 4, 8, 16, 32, 64, 128} )
     {
         mon.reset();
         zero_real(dim, sol);
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
         sys.multiply(sol, vec);
         blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
         real res = blas::nrm2(dim, vec);
-        fprintf(stdout, " GMRES-%02i  count %4i  residual %10.6f\n", RS, mon.count(), res);
+        fprintf(stdout, " GMRES%03i count %4i  residual %10.6f\n", RS, mon.count(), res);
     }
 
     free_real(sol);
