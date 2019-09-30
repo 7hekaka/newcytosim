@@ -30,7 +30,7 @@ typedef Matrix11 MatrixBlock;
 #elif ( DIM == 2 )
 typedef Matrix22 MatrixBlock;
 #else
-typedef Matrix33 MatrixBlock;
+typedef Matrix34 MatrixBlock;
 #endif
 
 
@@ -128,7 +128,7 @@ private:
     real            time_step;
     
     /// list of Mecable containing points to simulate
-    Array<Mecable*> objs;
+    Array<Mecable*> mecables;
     
     /// total number of points in the system
     index_t         nbPts;
@@ -178,7 +178,7 @@ private:
      It contains terms which are different in the X, Y, Z subspaces,
      arising from interactions which link coordinates from different subspaces.
     */
-    MatrixSparseSymmetricBlock  mC;
+    MatrixSparseBlock  mC;
 
 private:
     
@@ -240,10 +240,19 @@ private:
     
     /// prepare matrices for 'solve'
     void prepareMatrices();
+    
+    /// calculate forces for one Mecable
+    void multiply1(Mecable const*, const real* X, real* Y) const;
+    
+    /// implements precondition()+multiply for one Mecable
+    void precondition_multiply1(Mecable const*, real const*, real*, real*) const;
+    
+    /// implements precondition()+multiply for one Mecable
+    void multiply_precondition1(Mecable const*, real const*, real*, real*) const;
 
     /// calculate the linear part of forces:  Y <- B + ( mB + mC ) * X
     void calculateForces(const real* X, const real* B, real* Y) const;
-    
+
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
 
@@ -280,13 +289,13 @@ public:
     ~Meca() { release(); }
     
     /// Clear list of Mecable
-    void clear() { objs.clear(); }
+    void clear() { mecables.clear(); }
     
     /// Add a Mecable to the list of objects to be simulated
-    void add(Mecable* p) { objs.push_back(p); }
+    void add(Mecable* p) { mecables.push_back(p); }
     
     /// Number of Mecable
-    size_t   nbMecables() const { return objs.size(); }
+    size_t   nbMecables() const { return mecables.size(); }
     
     /// Number of points in the Mecable that has the most number of points
     unsigned largestMecable() const;
@@ -295,10 +304,10 @@ public:
     bool     empty() const { return nbPts == 0; }
     
     /// number of points in the system
-    size_t nb_points() const { return nbPts; }
+    size_t   nb_points() const { return nbPts; }
     
     /// Implementation of LinearOperator::size()
-    size_t dimension() const { return DIM * nbPts; }
+    size_t   dimension() const { return DIM * nbPts; }
     
     /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;
