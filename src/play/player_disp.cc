@@ -99,21 +99,24 @@ std::string Player::buildReport(std::string arg) const
 {
     try
     {
-        Glossary glos;
-        // separate options:
-        std::string::size_type pos = arg.find(' ');
-        if ( pos != std::string::npos )
+        if ( ! arg.empty() )
         {
-            glos.read_string(arg.substr(pos+1).c_str(), 2);
-            arg = arg.substr(0, pos);
+            Glossary glos;
+            // separate options:
+            std::string::size_type pos = arg.find(' ');
+            if ( pos != std::string::npos )
+            {
+                glos.read_string(arg.substr(pos+1).c_str(), 2);
+                arg = arg.substr(0, pos);
+            }
+            // get report:
+            std::stringstream ss;
+            simul.report(ss, arg, glos);
+            std::string res = ss.str();
+            if ( res.size() > 1  &&  res.at(0) == '\n' )
+                return res.substr(1);
+            return res;
         }
-        // get report:
-        std::stringstream ss;
-        simul.report(ss, arg, glos);
-        std::string res = ss.str();
-        if ( res.size() > 1  &&  res.at(0) == '\n' )
-            return res.substr(1);
-        return res;
     }
     catch ( Exception & e )
     {
