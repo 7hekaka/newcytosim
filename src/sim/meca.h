@@ -556,7 +556,7 @@ public:
     size_t nbNonZeros(real threshold) const;
 
     /// Extract the complete dynamic matrix in column-major format in a C-array
-    void getSystem(unsigned order, real * matrix) const;
+    void getSystem(size_t, real * matrix) const;
     
     /// Save complete matrix in Matrix Market format
     void saveSystem(FILE *, real threshold) const;

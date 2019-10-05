@@ -62,7 +62,7 @@ private:
     size_t      pBlockAlc;
     
     /// Current size of pBlock[]
-    unsigned    pBlockSize;
+    size_t      pBlockSize;
     
     /// Flag that pBlock[] is used for preconditionning
     int         pBlockUse;
@@ -279,7 +279,7 @@ public:
     void            useBlock(int b)            { pBlockUse = b; }
     
     /// Returns current size of block allocated for preconditionning
-    unsigned        blockSize()          const { return pBlockSize; }
+    size_t          blockSize()          const { return pBlockSize; }
     
     /// Returns address of memory allocated for preconditionning
     real *          block()              const { return pBlock; }

@@ -269,9 +269,9 @@ calculate the matrix vector product corresponding to 'mec'
 void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 {
     const index_t inx = DIM * mec->matIndex();
-    const index_t dim = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
 
-    mC.vecMul(X, Y, inx, inx+dim);
+    mC.vecMul(X, Y, inx, inx+bks);
 
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
     mec->addRigidity(X+inx, Y+inx);
@@ -285,7 +285,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     mec->projectForces(Y+inx, Y+inx);
 
     // Y <- X + alpha * Y
-    blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
 }
 
 
@@ -340,9 +340,9 @@ void Meca::multiply(const real* X, real* Y) const
 void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, real* Y) const
 {
     const index_t inx = DIM * mec->matIndex();
-    const index_t dim = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
 
-    mC.vecMul(X, T, inx, inx+dim);
+    mC.vecMul(X, T, inx, inx+bks);
     
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
     mec->addRigidity(X+inx, T+inx);
@@ -358,20 +358,20 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
         // T <- P * T
         mec->projectForces(T+inx, T+inx);
         // X <- X + alpha * T = X + alpha * P * FORCE
-        blas::xaxpy(dim, -time_step/mec->leftoverDrag(), T+inx, 1, Y+inx, 1);
+        blas::xaxpy(bks, -time_step/mec->leftoverDrag(), T+inx, 1, Y+inx, 1);
     }
     else
     {
         // Y <- P * T
         mec->projectForces(T+inx, Y+inx);
         // Y <- X + alpha * Y = X + alpha * P * FORCE
-        blas::xpay(dim, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
     }
 
     if ( mec->useBlock() )
     {
         int info = 0;
-        lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), Y+inx, dim, &info);
+        lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
         assert_true(info==0);
     }
 }
@@ -474,16 +474,16 @@ void expand_matrix(unsigned siz, real * mat)
         {
             real val = mat[ii+siz*jj];
             // expand term in other dimensions:
-            for ( int d = 1; d < DIM; ++d )
+            for ( unsigned d = 1; d < DIM; ++d )
                 mat[ii+d+siz*(jj+d)] = val;
             
             // symmetrize matrix:
-            for ( int d = 0; d < DIM; ++d )
+            for ( unsigned d = 0; d < DIM; ++d )
                 mat[jj+d+siz*(ii+d)] = val;
         }
         // expand diagonal term in other dimensions:
         real val = mat[jj+siz*jj];
-        for ( int d = 1; d < DIM; ++d )
+        for ( unsigned d = 1; d < DIM; ++d )
             mat[jj+d+siz*(jj+d)] = val;
     }
 
@@ -841,29 +841,29 @@ void Meca::extractBlock(real* res, const Mecable* mec) const
 // DEBUG: compare `blk` with block extracted using extractBlockSlow()
 void Meca::verifyBlock(const Mecable * mec, const real* blk)
 {
-    const unsigned bs = DIM * mec->nbPoints();
-    real * wrk = new_real(bs*bs);
+    const size_t bks = DIM * mec->nbPoints();
+    real * wrk = new_real(bks*bks);
     
     extractBlock(wrk, mec);
     
-    blas::xaxpy(bs*bs, -1.0, blk, 1, wrk, 1);
-    real err = blas::nrm2(bs*bs, wrk);
+    blas::xaxpy(bks*bks, -1.0, blk, 1, wrk, 1);
+    real err = blas::nrm2(bks*bks, wrk);
  
     std::clog << "verifyBlock ";
-    std::clog << std::setw(10) << mec->reference() << " " << std::setw(6) << bs;
+    std::clog << std::setw(10) << mec->reference() << " " << std::setw(6) << bks;
     std::clog << "  | B - K | = " << std::setprecision(3) << err << std::endl;
     
-    if ( err > bs * bs * REAL_EPSILON )
+    if ( err > bks * bks * REAL_EPSILON )
     {
-        VecPrint::sparse(std::clog, bs, bs, wrk, bs, 3, (real)0.1);
+        VecPrint::sparse(std::clog, bks, bks, wrk, bks, 3, (real)0.1);
         
-        int s = std::min(16U, bs);
+        size_t s = std::min(16UL, bks);
         extractBlock(wrk, mec);
         std::clog << " blockS\n";
-        VecPrint::print(std::clog, s, s, wrk, bs, 3);
+        VecPrint::print(std::clog, s, s, wrk, bks, 3);
         
         std::clog << " block \n";
-        VecPrint::print(std::clog, s, s, blk, bs, 3);
+        VecPrint::print(std::clog, s, s, blk, bks, 3);
     }
     
     free_real(wrk);
@@ -876,10 +876,10 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
  */
 void Meca::checkBlock(const Mecable * mec, const real* blk)
 {
-    const unsigned bs = DIM * mec->nbPoints();
+    const size_t bks = DIM * mec->nbPoints();
     
     std::clog << "  checkBlock " << mec->useBlock() << " ";
-    std::clog << std::setw(10) << mec->reference() << " " << std::setw(6) << bs;
+    std::clog << std::setw(10) << mec->reference() << " " << std::setw(6) << bks;
  
     if ( !mec->useBlock() )
     {
@@ -887,34 +887,34 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         return;
     }
     
-    real * wrk = new_real(bs*bs);
-    real * mat = new_real(bs*bs);
-    real * vec = new_real(bs);
+    real * wrk = new_real(bks*bks);
+    real * mat = new_real(bks*bks);
+    real * vec = new_real(bks);
     
     extractBlock(wrk, mec);
    
-    blas::xcopy(bs*bs, wrk, 1, mat, 1);
+    copy_real(bks*bks, wrk, mat);
     if ( mec->useBlock() )
     {
         int info = 0;
-        lapack::xgetrs('N', bs, bs, blk, bs, mec->pivot(), mat, bs, &info);
+        lapack::xgetrs('N', bks, bks, blk, bks, mec->pivot(), mat, bks, &info);
         assert_true(info==0);
     }
     
-    for ( unsigned k=0; k < bs*bs; k += 1+bs )
+    for ( unsigned k=0; k < bks*bks; k += 1+bks )
         mat[k] -= 1.0;
     
-    real err = blas::nrm2(bs*bs, mat) / bs;
+    real err = blas::nrm2(bks*bks, mat) / bks;
     std::clog << " | 1 - PM | = " << std::setprecision(3) << err;
     
     if ( 1 )
     {
         // chose initial vector for power iteration
-        blas::xcopy(bs, vRHS+DIM*mec->matIndex(), 1, vec, 1);
+        blas::xcopy(bks, vRHS+DIM*mec->matIndex(), 1, vec, 1);
         //this is not valid for triangular preconditionner
         real eig = -1;
         if ( mec->useBlock() )
-            eig = largest_eigenvalue(bs, blk, mec->pivot(), wrk, -1.0, vec, mat);
+            eig = largest_eigenvalue(bks, blk, mec->pivot(), wrk, -1.0, vec, mat);
         std::clog << "  eigen(1-PM) = " << eig;
     }
     
@@ -923,13 +923,13 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     if ( err > 1 )
     {
         // print preconditionner block for visual inspection:
-        unsigned s = std::min(16U, bs);
+        unsigned s = std::min(16UL, bks);
         std::clog << " matrix: \n";
-        VecPrint::print(std::clog, s, s, wrk, bs);
+        VecPrint::print(std::clog, s, s, wrk, bks);
         std::clog << "\nprecond: \n";
-        VecPrint::print(std::clog, s, s, blk, bs);
+        VecPrint::print(std::clog, s, s, blk, bks);
         std::clog << "\nprecond * matrix:\n";
-        VecPrint::print(std::clog, s, s, mat, bs);
+        VecPrint::print(std::clog, s, s, mat, bks);
         std::clog << "\n";
     }
     free_real(vec);
@@ -947,12 +947,12 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
  */
 void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
 {
-    unsigned bs = DIM * mec->nbPoints();
-    assert_true( bs*bs <= wrksize );
+    size_t bks = DIM * mec->nbPoints();
+    assert_true( bks*bks <= wrksize );
 
     bool may_keep = false;
     
-    if ( mec->blockSize() == bs )
+    if ( mec->blockSize() == bks )
         may_keep = true;
     else
         mec->allocateBlock();
@@ -966,10 +966,10 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
         getBlock(wrk, mec);
         
         // chose initial vector for power iteration
-        blas::xcopy(bs, vRHS+DIM*mec->matIndex(), 1, vec, 1);
+        blas::xcopy(bks, vRHS+DIM*mec->matIndex(), 1, vec, 1);
         
         // power iterations scale like (bs^2)
-        real eig = largest_eigenvalue(bs, blk, mec->pivot(), wrk, -1.0, vec, tmp);
+        real eig = largest_eigenvalue(bks, blk, mec->pivot(), wrk, -1.0, vec, tmp);
  
         //std::clog << "mec " << std::setw(4) << mec->identity();
         if ( eig < 1.0 )
@@ -981,7 +981,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
         else
         {
             //std::clog << "    RENEW    eigen(1-PM) = " << eig << std::endl;
-            blas::xcopy(bs*bs, wrk, 1, blk, 1);
+            blas::xcopy(bks*bks, wrk, 1, blk, 1);
         }
     }
     else
@@ -1001,7 +1001,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     //TEST truncate_matrix(bs, blk, 3*DIM-1);
     
     // calculate LU factorization:
-    lapack::xgetf2(bs, bs, blk, bs, mec->pivot(), &info);
+    lapack::xgetf2(bks, bks, blk, bks, mec->pivot(), &info);
     
     if ( info )
     {
@@ -1038,7 +1038,7 @@ Compute block of the preconditionner corresponding to 'mec'
  */
 void Meca::computePreconditionner(Mecable* mec)
 {
-    unsigned bs = DIM * mec->nbPoints();
+    const size_t bks = DIM * mec->nbPoints();
 
     mec->allocateBlock();
     real* blk = mec->block();
@@ -1050,7 +1050,7 @@ void Meca::computePreconditionner(Mecable* mec)
 
     // calculate LU factorization:
     int info = 0;
-    lapack::xgetf2(bs, bs, blk, bs, mec->pivot(), &info);
+    lapack::xgetf2(bks, bks, blk, bks, mec->pivot(), &info);
     
     if ( info == 0 )
     {
@@ -1100,12 +1100,12 @@ void Meca::precondition(const real* X, real* Y) const
         {
             Mecable const* mec = *mci;
             const int inx = DIM * mec->matIndex();
-            const int dim = DIM * mec->nbPoints();
-            blas::xcopy(dim, X+inx, 1, Y+inx, 1);
+            const int bks = DIM * mec->nbPoints();
+            blas::xcopy(bks, X+inx, 1, Y+inx, 1);
             if ( mec->useBlock() )
             {
                 int info = 0;
-                lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), Y+inx, dim, &info);
+                lapack::xgetrs('N', bks, 1, mec->block(), dim, mec->pivot(), Y+inx, bks, &info);
                 assert_true(info==0);
             }
             mci += NUM_THREADS;
@@ -1118,9 +1118,9 @@ void Meca::precondition(const real* X, real* Y) const
         if ( mec->useBlock() )
         {
             int info = 0;
-            const int inx = DIM * mec->matIndex();
-            const int dim = DIM * mec->nbPoints();
-            lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), Y+inx, dim, &info);
+            const size_t inx = DIM * mec->matIndex();
+            const size_t bks = DIM * mec->nbPoints();
+            lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
         }
     }
 #endif
@@ -1720,7 +1720,7 @@ size_t Meca::nbNonZeros(real threshold) const
  The matrix should be preallocated of size `dim`, which should be equal
  to the system's dimension().
  */
-void Meca::getSystem(index_t dim, real * mat) const
+void Meca::getSystem(size_t dim, real * mat) const
 {
     if ( dim != dimension() )
         throw InvalidIO("wrong matrix dimension");
@@ -2074,9 +2074,9 @@ void Meca::dumpSparse()
     
     for ( Mecable * mec : mecables )
     {
-        unsigned int bs = DIM * mec->nbPoints();
+        size_t bks = DIM * mec->nbPoints();
         extractBlock(tmp2, mec);
-        VecPrint::sparse_off(os, bs, bs, tmp2, bs, DIM*mec->matIndex());
+        VecPrint::sparse_off(os, bks, bks, tmp2, bks, DIM*mec->matIndex());
     }
     os.close();
     
