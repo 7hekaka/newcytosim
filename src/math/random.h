@@ -6,16 +6,16 @@
 #include <cmath>
 
 #ifndef REAL_H
-#include "real.h"
+#  include "real.h"
 #endif
 
 #define SFMT_MEXP 19937
 
 #include "SFMT.h"
 
-#define TWO_POWER_MINUS_32 0x1p-32
-#define TWO_POWER_MINUS_31 0x1p-31
-#define TWO_POWER_MINUS_64 0x1p-64
+constexpr real TWO_POWER_MINUS_31 = 0x1p-31;
+constexpr real TWO_POWER_MINUS_32 = 0x1p-32;
+constexpr real TWO_POWER_MINUS_64 = 0x1p-64;
 
 
 /// Random Number Generator

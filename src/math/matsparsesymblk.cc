@@ -1147,6 +1147,12 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y,
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
+void MatrixSparseSymmetricBlock::vecMul(const real* X, real* Y, index_t start, index_t stop) const
+{
+    zero_real(stop-start, Y+start);
+    vecMulAdd(X, Y, start, stop);
+}
+
 #if MATRIXSSB_USES_AVX
 #   define VECMULADD2D vecMulAdd2D_AVXU
 #   define VECMULADD3D vecMulAdd3D_AVXU
@@ -1211,7 +1217,7 @@ void MatrixSparseSymmetricBlock::vecMulAdd_ALT(const real* X, real* Y) const
 void MatrixSparseSymmetricBlock::vecMulAdd_TIME(const real* X, real* Y) const
 {
     unsigned long cnt = 0, col = 0;
-    unsigned long long time = __rdtsc();
+    //unsigned long long time = __rdtsc();
     for ( index_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
     {
         col++;
@@ -1227,8 +1233,10 @@ void MatrixSparseSymmetricBlock::vecMulAdd_TIME(const real* X, real* Y) const
         column_[jj].vecMulAdd4D_AVX(X, Y, jj);
 #endif
     }
+    /*
     if ( cnt > 0 )
         fprintf(stderr, "MSSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
                 col, cnt, real(__rdtsc()-time)/cnt);
+     */
 }
 

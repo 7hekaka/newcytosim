@@ -4,19 +4,6 @@
 #include "assert_macro.h"
 #include <sstream>
 
-#ifndef DIM
-#  define DIM BLOCK_SIZE
-#endif
-
-#include "vector.h"
-
-// Flag to enable AVX implementation
-#ifdef __AVX__
-#  define MATRIXSB_USES_AVX REAL_IS_DOUBLE
-#else
-#  define MATRIXSB_USES_AVX 0
-#endif
-
 #define TRANSPOSE_2D_BLOCKS 0
 
 
@@ -318,8 +305,6 @@ std::string MatrixSparseBlock::what() const
     std::ostringstream msg;
 #if MATRIXSB_USES_AVX
     msg << "MSBx " << SubBlock::what() << "*" << nbElements();
-#elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "MSBe " << SubBlock::what() << "*" << nbElements();
 #else
     msg << "MSB " << SubBlock::what() << "*" << nbElements();
 #endif
@@ -498,7 +483,7 @@ void MatrixSparseBlock::consolidate()
         Line & row = row_[i];
         row.sbk_ = blocks_ + cnt;
         cnt += row.size_;
-#if ( DIM == 2 ) && TRANSPOSE_2D_BLOCKS
+#if ( BLOCK_SIZE == 2 ) && TRANSPOSE_2D_BLOCKS
         for ( size_t j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j].transposed();
 #else
@@ -589,13 +574,12 @@ void MatrixSparseBlock::prepareForMultiply(int)
 //------------------------------------------------------------------------------
 #pragma mark - Basic Vector Multiplication
 
-
-void MatrixSparseBlock::Line::vecMulAdd(const real* X, real* Y) const
+Vector MatrixSparseBlock::Line::vecMul(const real* X) const
 {
     Vector res(0,0,0);
     for ( index_t n = 0; n < size_; ++n )
         res += blk_[n] * Vector(X+inx_[n]);
-    res.add_to(Y);
+    return res;
 }
 
 
@@ -605,11 +589,22 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
     assert_true( start <= stop );
     assert_true( stop <= size_ );
     for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
-        row_[i].vecMulAdd(X, Y+i);
+        row_[i].vecMul(X).add_to(Y+i);
 }
 
+
+#if ( BLOCK_SIZE == 1 )
+real MatrixSparseBlock::Line::vecMul1D(const real* X) const
+{
+    real res = 0;
+    for ( index_t n = 0; n < size_; ++n )
+        res += blk_[n] * X[inx_[n]];
+    return res;
+}
+#endif
+
 //------------------------------------------------------------------------------
-#pragma mark - Manually Optimized Vector Multiplication
+#pragma mark - SIMD Optimized Vector Multiplication
 
 #if MATRIXSB_USES_AVX
 
@@ -617,7 +612,7 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
 //#include "iacaMarks.h"
 
 #if ( BLOCK_SIZE == 2 )
-void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
+vec2 MatrixSparseBlock::Line::vecMul2D(const real* X) const
 {
     vec4 ss = setzero4();
     const real* M = blk_[0];
@@ -637,12 +632,13 @@ void MatrixSparseBlock::Line::vecMulAdd2D(const real* X, real* Y) const
         ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
     }
     // collapse result:
-    store2(Y, add2(load2(Y), add2(getlo(ss), gethi(ss))));
+    return add2(getlo(ss), gethi(ss));
 }
+#endif
 
 
-
-void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
+#if ( BLOCK_SIZE == 2 )
+vec2 MatrixSparseBlock::Line::vecMul2DU(const real* X) const
 {
     vec4 ss = setzero4();
     vec4 tt = setzero4();
@@ -693,16 +689,16 @@ void MatrixSparseBlock::Line::vecMulAdd2DU(const real* X, real* Y) const
     // collapse result:
 #if TRANSPOSE_2D_BLOCKS
     vec2 h = gethi(ss);
-    store2(Y, add2(load2(Y), add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h))));
+    return add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
 #else
-    store2(Y, add2(load2(Y), add2(getlo(ss), gethi(ss))));
+    return add2(getlo(ss), gethi(ss));
 #endif
 }
 #endif
 
 
 #if ( BLOCK_SIZE == 3 )
-void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
+vec4 MatrixSparseBlock::Line::vecMul3D(const real* X) const
 {
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
@@ -728,14 +724,13 @@ void MatrixSparseBlock::Line::vecMulAdd3D(const real* X, real* Y) const
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    storeu4(Y, add4(loadu4(Y), s0));
+    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
 }
 #endif
 
 
 #if ( BLOCK_SIZE == 3 )
-void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
+vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
 {
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
@@ -793,14 +788,13 @@ void MatrixSparseBlock::Line::vecMulAdd3DU(const real* X, real* Y) const
     t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s1 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
-    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    storeu4(Y, add4(loadu4(Y), s0));
+    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
 }
 #endif
 
 
 #if ( BLOCK_SIZE == 3 )
-void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
+vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
 {
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
@@ -864,14 +858,13 @@ void MatrixSparseBlock::Line::vecMulAdd3DU4(const real* X, real* Y) const
     t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s1 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
-    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    storeu4(Y, add4(loadu4(Y), s0));
+    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
 }
 #endif
 
 
 #if ( BLOCK_SIZE == 4 )
-void MatrixSparseBlock::Line::vecMulAdd4D(const real* X, real* Y) const
+vec4 MatrixSparseBlock::Line::vecMul4D(const real* X) const
 {
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
@@ -891,8 +884,7 @@ void MatrixSparseBlock::Line::vecMulAdd4D(const real* X, real* Y) const
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    store4(Y, add4(load4(Y), s0));
+    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
 }
 #endif
 #endif
@@ -905,16 +897,15 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t
 {
     for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
     {
-#if MATRIXSB_USES_AVX
-#if ( DIM == 1 )
-        row_[i].vecMulAdd(X, Y+i);
-#elif ( DIM == 2 )
-        row_[i].vecMulAdd2DU(X, Y+i);
-#elif ( DIM == 3 )
-        row_[i].vecMulAdd3DU4(X, Y+i);
-#endif
+#if ( BLOCK_SIZE == 1 )
+        Y[i] += row_[i].vecMul1D(X);
+#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+        store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
+#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+        // we need to use store3 only for the last line, if multithreaded
+        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DU4(X)));
 #else
-        row_[i].vecMulAdd(X, Y+i);
+        row_[i].vecMul(X).add_to(Y+i);
 #endif
     }
 }
@@ -925,43 +916,68 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 {
     for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
     {
-#if MATRIXSB_USES_AVX
-#if ( DIM == 1 )
-        row_[i].vecMulAdd(X, Y+i);
-#elif ( DIM == 2 )
-        row_[i].vecMulAdd2D(X, Y+i);
-#elif ( DIM == 3 )
-        row_[i].vecMulAdd3D(X, Y+i);
-#endif
+#if ( BLOCK_SIZE == 1 )
+        Y[i] += row_[i].vecMul1D(X);
+#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+        store2(Y+i, add2(load2(Y+i), row_[i].vecMul2D(X)));
+#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+        // we need to use store3 only for the last line, if multithreaded
+        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3D(X)));
 #else
-        row_[i].vecMulAdd(X, Y+i);
+        row_[i].vecMul(X).add_to(Y+i);
 #endif
     }
 }
+
 
 // multiplication of a vector: Y = Y + M * X
 void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t stop) const
 {
     unsigned long cnt = 0, row = 0;
-    unsigned long long time = __rdtsc();
+    //unsigned long long time = __rdtsc();
     for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
     {
         row++;
         cnt += row_[i].size_;
-#if MATRIXSB_USES_AVX
-#if ( DIM == 1 )
-        row_[i].vecMulAdd(X, Y+i);
-#elif ( DIM == 2 )
-        row_[i].vecMulAdd2DU(X, Y+i);
-#elif ( DIM == 3 )
-        row_[i].vecMulAdd3DU4(X, Y+i);
-#endif
+#if ( BLOCK_SIZE == 1 )
+        Y[i] += row_[i].vecMul1D(X);
+#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+        store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
+#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+        // we need to use store3 only for the last line, if multithreaded
+        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DU4(X)));
 #else
-        row_[i].vecMulAdd(X, Y+i);
+        row_[i].vecMul(X).add_to(Y+i);
 #endif
     }
+    /*
     if ( cnt > 0 )
         fprintf(stderr, "MSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
                 row, cnt, real(__rdtsc()-time)/cnt);
+     */
 }
 
+
+
+// multiplication of a vector: Y = M * X
+void MatrixSparseBlock::vecMul(const real* X, real* Y, index_t start, index_t stop) const
+{
+    //printf("msb %6i %6i : %p\n", start, stop, pthread_self());
+    /** All values need to be reset since as the matrix is sparse,
+     not every line will be addressed below */
+    zero_real(stop-start, Y+start);
+    
+    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
+    {
+#if ( BLOCK_SIZE == 1 )
+        Y[i] = row_[i].vecMul1D(X);
+#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+        store2(Y+i, row_[i].vecMul2DU(X));
+#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+        // we need to use store3 only for the last line, if multithreaded
+        store3(Y+i, row_[i].vecMul3DU4(X));
+#else
+        row_[i].vecMul(X).store(Y+i);
+#endif
+    }
+}

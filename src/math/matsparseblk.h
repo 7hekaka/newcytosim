@@ -18,6 +18,7 @@
 #  define BLOCK_SIZE DIM
 #endif
 
+#include "vector.h"
 
 #if ( BLOCK_SIZE == 1 )
 #  include "matrix11.h"
@@ -36,6 +37,12 @@ typedef Matrix44 SubBlock;
 /// type for indices
 typedef unsigned index_t;
 
+// Flag to enable AVX implementation
+#ifdef __AVX__
+#  define MATRIXSB_USES_AVX 0 //REAL_IS_DOUBLE
+#else
+#  define MATRIXSB_USES_AVX 0
+#endif
 
 /// Sparse Matrix with block elements
 /**
@@ -61,11 +68,11 @@ private:
     {
         friend class MatrixSparseBlock;
 
-        size_t     size_;
-        size_t     allo_;
-        SubBlock * blk_;
-        SubBlock * sbk_;
-        index_t  * inx_;
+        size_t     size_;   ///< number of elements
+        size_t     allo_;   ///< allocated size
+        SubBlock * blk_;    ///< block elements
+        SubBlock * sbk_;    ///< pointer for consolidate elements
+        index_t  * inx_;    ///< column indices for each element
         
     public:
         
@@ -99,27 +106,31 @@ private:
         /// return block located at column 'j'
         SubBlock& block(index_t j);
         
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd(const real* X, real * Y) const;
+        /// multiplication of a vector: L * X
+        Vector vecMul(const real* X) const;
+        
+        /// multiplication of a vector: L * X
+        real vecMul1D(const real* X) const;
 
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd2D(const real* X, real * Y) const;
+#if MATRIXSB_USES_AVX
+        /// multiplication of a vector: L * X
+        vec2 vecMul2D(const real* X) const;
         
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd2DU(const real* X, real * Y) const;
+        /// multiplication of a vector: L * X
+        vec2 vecMul2DU(const real* X) const;
         
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd3DU(const real* X, real * Y) const;
+        /// multiplication of a vector: L * X
+        vec4 vecMul3DU(const real* X) const;
         
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd3DU4(const real* X, real * Y) const;
+        /// multiplication of a vector: L * X
+        vec4 vecMul3DU4(const real* X) const;
 
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd3D(const real* X, real * Y) const;
+        /// multiplication of a vector: L * X
+        vec4 vecMul3D(const real* X) const;
         
-        /// multiplication of a vector: Y <- Y + M * X
-        void vecMulAdd4D(const real* X, real * Y) const;
-
+        /// multiplication of a vector: L * X
+        vec4 vecMul4D(const real* X) const;
+#endif
     };
     
     /// create Elements
@@ -215,7 +226,7 @@ public:
     ///optional optimization that may accelerate multiplications by a vector
     void prepareForMultiply(int dim);
 
-    /// multiplication of a vector, for columns within [start, end[
+    /// multiplication of a vector, for columns within [start, stop[
     void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
@@ -233,6 +244,17 @@ public:
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t stop) const;
 
+    
+    /// multiplication of a vector, for columns within [start, stop[
+    void vecMul(const real*, real* Y, index_t start, index_t stop) const;
+
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMul2D(const real* X, real* Y, index_t start, index_t stop) const;
+
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMul3D(const real* X, real* Y, index_t start, index_t stop) const;
+
+    
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
     
@@ -247,6 +269,9 @@ public:
     
     /// 3D isotropic multiplication (not implemented)
     void vecMulAddIso3D(const real*, real*) const {};
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
     bool nonZero() const;

@@ -503,6 +503,12 @@ void MatrixSparseSymmetric1::printSparseArray(std::ostream& os) const
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
+void MatrixSparseSymmetric1::vecMul(const real* X, real* Y, index_t start, index_t stop) const
+{
+    zero_real(stop-start, Y+start);
+    vecMulAdd(X, Y, start, stop);
+}
+
 #if !MATRIX1_OPTIMIZED_MULTIPLY
 
 void MatrixSparseSymmetric1::prepareForMultiply(int)

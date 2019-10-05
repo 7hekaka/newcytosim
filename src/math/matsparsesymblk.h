@@ -215,11 +215,14 @@ public:
     ///optional optimization that may accelerate multiplications by a vector
     void prepareForMultiply(int dim);
 
-    /// multiplication of a vector, for columns within [start, end[
+    /// multiplication of a vector, for columns within [start, stop[
     void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
+    
+    /// multiplication of a vector, for columns within [start, stop[
+    void vecMul(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
@@ -235,11 +238,14 @@ public:
     
     /// 3D isotropic multiplication (not implemented)
     void vecMulAddIso3D(const real*, real*) const {};
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
     bool nonZero() const;
     
-    /// number of blocks in columns within [start, end[
+    /// number of blocks in columns within [start, stop[
     size_t nbElements(index_t start, index_t stop) const;
     
     /// number of blocks which are not null

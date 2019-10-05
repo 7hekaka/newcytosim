@@ -157,14 +157,16 @@ public:
 
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMulAdd(const real* X, real* Y, index_t, index_t) const;
+    void vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// 2D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 2 * dim(M)
-    void vecMulAddIso2D(const real* X, real* Y, index_t, index_t) const;
+    void vecMulAddIso2D(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// 3D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 3 * dim(M)
-    void vecMulAddIso3D(const real* X, real* Y, index_t, index_t) const;
+    void vecMulAddIso3D(const real* X, real* Y, index_t start, index_t stop) const;
 
+    /// multiplication of a vector, for columns within [start, stop[
+    void vecMul(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMulAdd(const real* X, real* Y)      const { vecMulAdd(X, Y, 0, size_); }
@@ -177,6 +179,9 @@ public:
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd(X, Y, 0, size_); }
+    
+    /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
+    void vecMul(const real* X, real* Y)      const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
     bool nonZero() const;
