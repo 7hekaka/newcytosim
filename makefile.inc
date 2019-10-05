@@ -63,7 +63,7 @@ endif
 # common options for all C++ objects:
 CXXFLG := -std=gnu++11 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
 CXXFLG := -std=gnu++11 -fno-rtti -fopenmp #-g -fno-inline
-CXXFLG := -std=gnu++11 -fopenmp -fno-rtti
+CXXFLG := -std=gnu++11 -fno-rtti
 
 # option concerning memory alignment:
 ALIGN  := -malign-double -falign-loops -falign-jumps -falign-functions
