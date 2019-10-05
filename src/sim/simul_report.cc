@@ -702,12 +702,12 @@ void Simul::reportFiberPoints(std::ostream& out) const
  */
 void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
 {
-    const real ONE_OVER_32 = 0x1p-32;
     real spread = 1;
     if ( opt.set(spread, "density") )
         spread = 1.0 / spread;
     else
         opt.set(spread, "interval");
+    constexpr real TINY = 0x1p-32;
 
     Fiber * fib = fibers.first();
     while ( fib )
@@ -718,34 +718,34 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
         if ( fib->abscissaM() < 0 )
         {
             uint32_t z = fib->signature();
-            real a = spread * log(z*ONE_OVER_32);
+            real a = spread * log(z*TINY);
             while ( a > fib->abscissaP() )
             {
                 z = lcrng2(z);
-                a += spread * log(z*ONE_OVER_32);
+                a += spread * log(z*TINY);
             }
             while ( a >= fib->abscissaM() )
             {
                 out << '\n' << fib->pos(a);
                 z = lcrng2(z);
-                a += spread * log(z*ONE_OVER_32);
+                a += spread * log(z*TINY);
             }
         }
         // generate speckles above the origin of abscissa
         if ( fib->abscissaP() > 0 )
         {
             uint32_t z = ~fib->signature();
-            real a = -spread * log(z*ONE_OVER_32);
+            real a = -spread * log(z*TINY);
             while ( a < fib->abscissaM() )
             {
                 z = lcrng1(z);
-                a -= spread * log(z*ONE_OVER_32);
+                a -= spread * log(z*TINY);
             }
             while ( a <= fib->abscissaP() )
             {
                 out << '\n' << fib->pos(a);
                 z = lcrng1(z);
-                a -= spread * log(z*ONE_OVER_32);
+                a -= spread * log(z*TINY);
             }
         }
         
