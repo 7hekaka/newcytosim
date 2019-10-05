@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <iostream>
 
+#include "dim.h"
 #include "real.h"
 #include "vector.h"
 #include "assert_macro.h"

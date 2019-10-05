@@ -3,6 +3,7 @@
 #ifndef MATSPARSESYMBLK_H
 #define MATSPARSESYMBLK_H
 
+#include "dim.h"
 #include "real.h"
 #include <cstdio>
 #include <iostream>
