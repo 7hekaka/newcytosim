@@ -660,39 +660,39 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
          */
         
         const real spread = disp->speckle_interval;
-        const real S = 0x1p-32;
+        constexpr real TINY = 0x1p-32;
         // draw speckles below the origin of abscissa:
         if ( fib.abscissaM() < 0 )
         {
             uint32_t z = fib.signature();
-            real a = spread * log(z*S);
+            real a = spread * log(z*TINY);
             while ( a > fib.abscissaP() )
             {
                 z = lcrng2(z);
-                a += spread * log(z*S);
+                a += spread * log(z*TINY);
             }
             while ( a >= fib.abscissaM() )
             {
                 gleObject(fib.pos(a), rad, gleSphere1B);
                 z = lcrng2(z);
-                a += spread * log(z*S);
+                a += spread * log(z*TINY);
             }
         }
         // draw speckles above the origin of abscissa:
         if ( fib.abscissaP() > 0 )
         {
             uint32_t z = ~fib.signature();
-            real a = -spread * log(z*S);
+            real a = -spread * log(z*TINY);
             while ( a < fib.abscissaM() )
             {
                 z = lcrng1(z);
-                a -= spread * log(z*S);
+                a -= spread * log(z*TINY);
             }
             while ( a <= fib.abscissaP() )
             {
                 gleObject(fib.pos(a), rad, gleSphere1B);
                 z = lcrng1(z);
-                a -= spread * log(z*S);
+                a -= spread * log(z*TINY);
             }
         }
     }
