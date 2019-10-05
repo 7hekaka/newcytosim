@@ -75,7 +75,7 @@
 /*
  Parallelization uses Intel's OpenMP.
  This requires a specific flag for the compiler, so adjust the makefile.inc
- CXXFLG := -std=c++11 -fopenmp
+ CXXFLG := -std=gnu++11 -fopenmp
  */
 #include <omp.h>
 #endif
@@ -97,7 +97,6 @@ Meca::Meca()
     vRHS = nullptr;
     vFOR = nullptr;
     vTMP = nullptr;
-    vMEM = nullptr;
 #if USE_ISO_MATRIX
     useMatrixC = false;
 #endif
@@ -131,9 +130,6 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vRHS, 1);
         allocate_vector(alc, vFOR, 1);
         allocate_vector(alc, vTMP, 0);
-#if NUM_THREADS > 1
-        allocate_vector(alc, vMEM, 0);
-#endif
     }
 }
 
@@ -148,7 +144,6 @@ void Meca::release()
     free_real(vRHS);
     free_real(vFOR);
     free_real(vTMP);
-    free_real(vMEM);
     vPTS = nullptr;
     vSOL = nullptr;
     vBAS = nullptr;
@@ -156,7 +151,6 @@ void Meca::release()
     vRHS = nullptr;
     vFOR = nullptr;
     vTMP = nullptr;
-    vMEM = nullptr;
 }
 
 
@@ -277,8 +271,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     const index_t inx = DIM * mec->matIndex();
     const index_t dim = DIM * mec->nbPoints();
 
-    zero_real(dim, Y+inx);
-    mC.vecMulAdd(X, Y, inx, inx+dim);
+    mC.vecMul(X, Y, inx, inx+dim);
 
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
     mec->addRigidity(X+inx, Y+inx);
@@ -314,89 +307,29 @@ void Meca::multiply(const real* X, real* Y) const
             mci += NUM_THREADS;
         }
     }
-#else
+#elif ( 0 )
     for ( Mecable * mec : mecables )
         multiply1(mec, X, Y);
-#endif
-}
-#endif
-
-
-#if USE_ISO_MATRIX
-
-void Meca::precondition_multiply(real const* X, real* T, real* Y) const
-{
-    precondition(X, T);
-    multiply(T, Y);
-}
-
 #else
+    mC.vecMul(X, Y);
 
-/**
- This is equivalent to:
-     precondition(X, T);
-     multiply(T, Y);
- for the block corresponding to 'mec'
- */
-inline void Meca::precondition_multiply1(Mecable const* mec, real const* X, real* T, real* Y) const
-{
-    const index_t inx = DIM * mec->matIndex();
-    const index_t dim = DIM * mec->nbPoints();
-    
-    blas::xcopy(dim, X+inx, 1, T+inx, 1);
-
-    if ( mec->useBlock() )
-    {
-        int info = 0;
-        lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), T+inx, dim, &info);
-    }
-
-    // T <- ( mB + mC ) * X
-    zero_real(dim, Y+inx);
-    mC.vecMulAdd(T, Y, inx, inx+dim);
-
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
-    mec->addRigidity(T+inx, Y+inx);
-#endif
-
-#if ADD_PROJECTION_DIFF
-    if ( mec->hasProjectionDiff() )
-        mec->addProjectionDiff(T+inx, Y+inx);
-#endif
-
-    mec->projectForces(Y+inx, Y+inx);
-    
-    // Y <- Y + alpha * T
-    blas::xpay(dim, T+inx, -time_step/mec->leftoverDrag(), Y+inx);
-}
-
-
-/**
- This is equivalent to
- 
-     precondition(X, T);   // T <- P*X
-     multiply(T, Y);       // Y <- M*T
-     
- */
-void Meca::precondition_multiply(real const* X, real* T, real* Y) const
-{
-#if NUM_THREADS > 1
-#pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            precondition_multiply1(*mci, X, T, Y);
-            mci += NUM_THREADS;
-        }
-    }
-#else
     for ( Mecable * mec : mecables )
-        precondition_multiply1(mec, X, T, Y);
+    {
+        const index_t inx = DIM * mec->matIndex();
+    #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+        mec->addRigidity(X+inx, Y+inx);
+    #endif
+    #if ADD_PROJECTION_DIFF
+        if ( mec->hasProjectionDiff() )
+            mec->addProjectionDiff(X+inx, Y+inx);
+    #endif
+        mec->projectForces(Y+inx, Y+inx);
+        // Y <- X + alpha * Y
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    }
 #endif
 }
 #endif
-
 
 /**
  This is equivalent to
@@ -409,8 +342,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
     const index_t inx = DIM * mec->matIndex();
     const index_t dim = DIM * mec->nbPoints();
 
-    zero_real(dim, T+inx);
-    mC.vecMulAdd(X, T, inx, inx+dim);
+    mC.vecMul(X, T, inx, inx+dim);
     
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
     mec->addRigidity(X+inx, T+inx);
@@ -440,6 +372,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
     {
         int info = 0;
         lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), Y+inx, dim, &info);
+        assert_true(info==0);
     }
 }
 
@@ -809,8 +742,8 @@ real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, r
  */
 void Meca::getBlock(real* res, const Mecable * mec) const
 {
-    const unsigned ps = mec->nbPoints();
-    const unsigned bs = DIM * ps;
+    const size_t np = mec->nbPoints();
+    const size_t bs = DIM * np;
     
     zero_real(bs*bs, res);
     
@@ -821,7 +754,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
     //VecPrint::print(std::clog, bs, bs, res, bs, 0);
 #endif
 #if USE_ISO_MATRIX
-    mB.addTriangularBlock(res, bs, mec->matIndex(), ps, DIM);
+    mB.addTriangularBlock(res, bs, mec->matIndex(), np, DIM);
 #endif
     expand_matrix(bs, res);
     
@@ -841,7 +774,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
         // Include the corrections P' in preconditioner, vector by vector.
         real* tmp = vTMP + DIM * mec->matIndex();
         zero_real(bs, tmp);
-        for ( unsigned ii = 0; ii < bs; ++ii )
+        for ( size_t ii = 0; ii < bs; ++ii )
         {
             tmp[ii] = 1.0;
             mec->addProjectionDiff(tmp, res+bs*ii);
@@ -857,16 +790,16 @@ void Meca::getBlock(real* res, const Mecable * mec) const
      This could be vectorized by having projectForces()
      accept multiple vectors as arguments, using SIMD instructions
      */
-    for ( unsigned i = 0; i < bs; ++i )
+    for ( size_t i = 0; i < bs; ++i )
         mec->projectForces(res+bs*i, res+bs*i);
     
     // scale
     real beta = -time_step / mec->leftoverDrag();
     //blas::xscal(bs*bs, beta, res, 1);
-    for ( unsigned n = 0; n < bs*bs; ++n )
+    for ( size_t n = 0; n < bs*bs; ++n )
         res[n] = beta * res[n];
     // add Identity matrix:
-    for ( unsigned i = 0; i < bs; ++i )
+    for ( size_t i = 0; i < bs; ++i )
         res[i+bs*i] += 1.0;
 }
 
@@ -880,9 +813,9 @@ void Meca::getBlock(real* res, const Mecable * mec) const
 */
 void Meca::extractBlock(real* res, const Mecable* mec) const
 {
-    const unsigned dim = dimension();
-    const unsigned bks = DIM * mec->nbPoints();
-    const unsigned off = DIM * mec->matIndex();
+    const size_t dim = dimension();
+    const size_t bks = DIM * mec->nbPoints();
+    const size_t off = DIM * mec->matIndex();
     
     assert_true( off+bks <= dim );
     real * vec = new_real(dim);
@@ -892,7 +825,7 @@ void Meca::extractBlock(real* res, const Mecable* mec) const
     //zero_real(bs*bs, res);
     
     // proceed column by column:
-    for ( unsigned jj = 0; jj < bks; ++jj )
+    for ( size_t jj = 0; jj < bks; ++jj )
     {
         vec[jj+off] = 1.0;
         multiply(vec, tmp);
@@ -945,7 +878,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
 {
     const unsigned bs = DIM * mec->nbPoints();
     
-    std::clog << "  testBlock " << mec->useBlock() << " ";
+    std::clog << "  checkBlock " << mec->useBlock() << " ";
     std::clog << std::setw(10) << mec->reference() << " " << std::setw(6) << bs;
  
     if ( !mec->useBlock() )
@@ -955,20 +888,23 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     }
     
     real * wrk = new_real(bs*bs);
-    real * tmp = new_real(bs*bs);
+    real * mat = new_real(bs*bs);
     real * vec = new_real(bs);
     
     extractBlock(wrk, mec);
    
-    int info = 0;
-    blas::xcopy(bs*bs, wrk, 1, tmp, 1);
+    blas::xcopy(bs*bs, wrk, 1, mat, 1);
     if ( mec->useBlock() )
-        lapack::xgetrs('N', bs, bs, blk, bs, mec->pivot(), tmp, bs, &info);
+    {
+        int info = 0;
+        lapack::xgetrs('N', bs, bs, blk, bs, mec->pivot(), mat, bs, &info);
+        assert_true(info==0);
+    }
     
     for ( unsigned k=0; k < bs*bs; k += 1+bs )
-        tmp[k] -= 1.0;
+        mat[k] -= 1.0;
     
-    real err = blas::nrm2(bs*bs,tmp) / bs;
+    real err = blas::nrm2(bs*bs, mat) / bs;
     std::clog << " | 1 - PM | = " << std::setprecision(3) << err;
     
     if ( 1 )
@@ -978,8 +914,8 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         //this is not valid for triangular preconditionner
         real eig = -1;
         if ( mec->useBlock() )
-            eig = largest_eigenvalue(bs, blk, mec->pivot(), wrk, -1.0, vec, tmp);
-        std::clog << "  eigen(PM) = " << eig;
+            eig = largest_eigenvalue(bs, blk, mec->pivot(), wrk, -1.0, vec, mat);
+        std::clog << "  eigen(1-PM) = " << eig;
     }
     
     std::clog << std::endl;
@@ -993,11 +929,11 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         std::clog << "\nprecond: \n";
         VecPrint::print(std::clog, s, s, blk, bs);
         std::clog << "\nprecond * matrix:\n";
-        VecPrint::print(std::clog, s, s, tmp, bs);
+        VecPrint::print(std::clog, s, s, mat, bs);
         std::clog << "\n";
     }
     free_real(vec);
-    free_real(tmp);
+    free_real(mat);
     free_real(wrk);
 }
 
@@ -1075,7 +1011,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     }
     
     mec->useBlock(1);
-    //testBlock(mec, blk);
+    //checkBlock(mec, blk);
 }
 
 
@@ -1119,7 +1055,7 @@ void Meca::computePreconditionner(Mecable* mec)
     if ( info == 0 )
     {
         mec->useBlock(1);
-        //testBlock(mec, blk);
+        //checkBlock(mec, blk);
         //std::clog << "Meca::computePreconditionner(" << mec->reference() << ")\n";
     }
     else
@@ -1159,7 +1095,6 @@ void Meca::precondition(const real* X, real* Y) const
 #if NUM_THREADS > 1
     #pragma omp parallel num_threads(NUM_THREADS)
     {
-        int info;
         Mecable ** mci = mecables.begin() + omp_get_thread_num();
         while ( mci < mecables.end() )
         {
@@ -1168,7 +1103,11 @@ void Meca::precondition(const real* X, real* Y) const
             const int dim = DIM * mec->nbPoints();
             blas::xcopy(dim, X+inx, 1, Y+inx, 1);
             if ( mec->useBlock() )
+            {
+                int info = 0;
                 lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), Y+inx, dim, &info);
+                assert_true(info==0);
+            }
             mci += NUM_THREADS;
         }
     }
@@ -1176,13 +1115,22 @@ void Meca::precondition(const real* X, real* Y) const
     blas::xcopy(dimension(), X, 1, Y, 1);
     for ( Mecable const* mec : mecables )
     {
-        const int inx = DIM * mec->matIndex();
-        const int dim = DIM * mec->nbPoints();
-        int info = 0;
         if ( mec->useBlock() )
+        {
+            int info = 0;
+            const int inx = DIM * mec->matIndex();
+            const int dim = DIM * mec->nbPoints();
             lapack::xgetrs('N', dim, 1, mec->block(), dim, mec->pivot(), Y+inx, dim, &info);
+        }
     }
 #endif
+}
+
+
+void Meca::precondition_multiply(real const* X, real* T, real* Y) const
+{
+    precondition(X, T);
+    multiply(T, Y);
 }
 
 
@@ -1648,7 +1596,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
                 {
                     // no method could converge... this is really bad!
                     std::stringstream oss;
-                    oss << "Solve() failed to converge (" << monitor.count() << " iterations, " << monitor.residual() << ")";
+                    oss << "Solve() failed to converge (" << monitor.count() << " iterations, residual " << monitor.residual() << ")";
                     throw Exception(oss.str());
                 }
             }
@@ -2080,7 +2028,7 @@ void Meca::dump() const
 
 
 /**
- output of matrices in a text-based sparse format
+ output vectors and matrices in a text-based sparse format
  */
 void Meca::dumpSparse()
 {
@@ -2088,14 +2036,7 @@ void Meca::dumpSparse()
     std::clog << "incorrect dump since RIGIDITY_IN_MATRIX is not defined\n";
 #endif
     std::clog << "dumping matrices in binary format\n";
-    
-    unsigned ms = 0;
-    for ( Mecable const* mec : mecables )
-    {
-        if ( ms < mec->nbPoints() )
-            ms = mec->nbPoints();
-    }
-    
+        
     FILE * f = fopen("d_drg.bin", "wb");
     dumpDrag(f);
     fclose(f);
@@ -2121,9 +2062,13 @@ void Meca::dumpSparse()
     os.open("d_matC.txt");
     mC.printSparse(os);
     os.close();
-    
-    real * tmp1 = new_real(DIM*ms);
-    real * tmp2 = new_real(DIM*ms*DIM*ms);
+        
+    unsigned alc = 0;
+    for ( Mecable const* mec : mecables )
+        alc = std::max(alc, mec->nbPoints());
+
+    real * tmp1 = new_real(DIM*alc);
+    real * tmp2 = new_real(DIM*DIM*alc*alc);
     
     os.open("diagonal.txt");
     

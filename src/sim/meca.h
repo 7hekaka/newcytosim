@@ -14,11 +14,11 @@
 #include "allocator.h"
 
 
+class Modulo;
 class Mecable;
 class Mecapoint;
 class Interpolation;
 class SimulProp;
-class Modulo;
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM
 class Matrix11;
@@ -30,12 +30,11 @@ typedef Matrix11 MatrixBlock;
 #elif ( DIM == 2 )
 typedef Matrix22 MatrixBlock;
 #else
-typedef Matrix34 MatrixBlock;
+typedef Matrix33 MatrixBlock;
 #endif
 
 
 /// set TRUE to use matrix mB and mC (the traditional way)
-/** This should be normally enabled */
 #define USE_ISO_MATRIX 1
 
 /**
@@ -146,7 +145,6 @@ private:
     real*  vRHS;         ///< right hand side of the dynamic system
     real*  vFOR;         ///< the calculated forces, with Brownian components
     real*  vTMP;         ///< intermediate of calculus
-    real*  vMEM;         ///< another temporary array
     
     //--------------------------------------------------------------------------
 
@@ -167,7 +165,7 @@ private:
     /// isotropic symmetric part of the dynamic
     /** 
      This is a symmetric square matrix of size `nbPoints()`
-     It contains terms which have identical coefficients on the X, Y, Z subspaces
+     It contains terms which have identical coefficients on the X, Y, Z subspaces, such as addLink()
     */
     MatrixSparseSymmetric1  mB;
 #endif
@@ -176,9 +174,9 @@ private:
     /** 
      This is a symmetric square matrix of size `DIM*nbPoints()`
      It contains terms which are different in the X, Y, Z subspaces,
-     arising from interactions which link coordinates from different subspaces.
+     arising from addSideLink() addSideSlidingLink(), etc.
     */
-    MatrixSparseBlock  mC;
+    MatrixSparseSymmetricBlock  mC;
 
 private:
     
@@ -243,9 +241,6 @@ private:
     
     /// calculate forces for one Mecable
     void multiply1(Mecable const*, const real* X, real* Y) const;
-    
-    /// implements precondition()+multiply for one Mecable
-    void precondition_multiply1(Mecable const*, real const*, real*, real*) const;
     
     /// implements precondition()+multiply for one Mecable
     void multiply_precondition1(Mecable const*, real const*, real*, real*) const;
