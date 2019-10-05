@@ -23,10 +23,10 @@ private:
      1 = link fiber-end with coef1, fiber-side with coef2
      2 = the interpolation corresponds exactly to point 'ref'
      */
-    int      ord;
+    unsigned rank;
 
-    /// index of reference point on the Solid
-    unsigned ref;
+    /// index of first point on the Solid
+    unsigned prime;
     
     /// interpolation coefficient for Fiber end
     real     coef1[4];
@@ -50,8 +50,8 @@ public:
     
     void reset()
     {
-        ord = 0;
-        ref = 0;
+        rank = 0;
+        prime = 0;
         len = 0;
         for ( int i = 0; i < 4; ++i )
         {
@@ -90,14 +90,14 @@ public:
         coef2[0] = 1.0 - B.XX - B.YY - B.ZZ;
 #endif
         if ( A.norm_inf() < REAL_EPSILON )
-            ord = 1;
+            rank = 1;
         else
-            ord = 1+DIM;
+            rank = 1+DIM;
     }
 
     void write(Outputter& out) const
     {
-        out.writeUInt16(ref);
+        out.writeUInt16(prime);
         for ( int d = 1; d < 4; ++d )
             out.writeFloat(coef1[d]);
         for ( int d = 1; d < 4; ++d )
@@ -106,7 +106,7 @@ public:
     
     void read(Inputter& in)
     {
-        ref = in.readUInt16();
+        prime = in.readUInt16();
         
         for ( int d = 1; d < 4; ++d )
             coef1[d] = in.readFloat();
@@ -119,9 +119,9 @@ public:
         len = (Vector3(coef1+1)-Vector3(coef2+1)).norm();
         
         if ( fabs(coef1[1]) + fabs(coef1[2]) + fabs(coef1[3]) < REAL_EPSILON )
-            ord = 1;
+            rank = 1;
         else
-            ord = DIM;
+            rank = DIM;
     }
     
     void print(std::ostream& out) const

@@ -71,16 +71,16 @@ void Aster::setInteractions(Meca & meca) const
         {
             AsterLink const& link = asLinks[n];
             
-            if ( link.ord == 0 )
+            if ( link.rank == 0 )
                 continue;
             
-            unsigned off = sol->matIndex() + link.ref;
+            unsigned off = sol->matIndex() + link.prime;
             unsigned pts[] = { off, off+1, off+2, off+3 };
 
 #ifdef BACKWARD_COMPATIBILITY
             if ( link.alt > 0 )
             {
-                meca.addLink(Mecapoint(sol, link.ref), fib->exactEnd(prop->focus), prop->stiffness[0]);
+                meca.addLink(Mecapoint(sol, link.prime), fib->exactEnd(prop->focus), prop->stiffness[0]);
                 if ( fib->length() > link.len )
                 {
                     meca.addLink(Mecapoint(sol, link.alt), fib->interpolate(link.len, prop->focus), prop->stiffness[1]);
@@ -90,13 +90,13 @@ void Aster::setInteractions(Meca & meca) const
                     FiberEnd tip = ( prop->focus == PLUS_END ? MINUS_END : PLUS_END );
                     // link the opposite end to an interpolation of the two solid-points:
                     real c = fib->length() / link.len;
-                    meca.addLink(fib->exactEnd(tip), Interpolation(sol, link.ref, link.alt, c), prop->stiffness[1]);
+                    meca.addLink(fib->exactEnd(tip), Interpolation(sol, link.prime, link.alt, c), prop->stiffness[1]);
                 }
                 continue;
             }
 #endif
-            if ( link.ord == 1 )
-                meca.addLink(fib->exactEnd(prop->focus), Mecapoint(sol, link.ref), prop->stiffness[0]);
+            if ( link.rank == 1 )
+                meca.addLink(fib->exactEnd(prop->focus), Mecapoint(sol, link.prime), prop->stiffness[0]);
             else
                 meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef1, prop->stiffness[0]);
             
@@ -285,7 +285,7 @@ void Aster::placeAnchor(Vector const& A, Vector const& B, unsigned ref)
     //std::clog << "Aster::placeAnchor(" << asLinks.size() << ")\n";
     link.set(A, B);
     link.len *= asRadius;
-    link.ref = ref;
+    link.prime = ref;
     //link.print(std::clog);
 }
 
@@ -566,7 +566,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
             unsigned b = in.readUInt16();
             if ( b >= sol->nbPoints() )
                 throw InvalidIO("invalid AsterLink index");
-            asLinks[i].ref = a;
+            asLinks[i].prime = a;
             asLinks[i].coef1[0] = 1.0;
             asLinks[i].alt = b;
             asLinks[i].len = (sol->posPoint(a)-sol->posPoint(b)).norm();
@@ -575,13 +575,13 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
         asLinks[i].read(in);
         asLinks[i].len *= asRadius;
-        if ( asLinks[i].ref + asLinks[i].ord >= sol->nbPoints() )
+        if ( asLinks[i].prime + asLinks[i].rank >= sol->nbPoints() )
             throw InvalidIO("invalid AsterLink index");
     }
     
     if ( nbf > 0 )
     {
-        unsigned ref = asLinks[0].ref;
+        unsigned ref = asLinks[0].prime;
         asRadius = ( sol->posPoint(ref) - sol->posPoint(ref) ).norm();
     }
 }
@@ -594,16 +594,16 @@ Vector Aster::posLink1(size_t inx) const
 {
     Solid const* sol = solid();
     real const* coef = asLinks[inx].coef1;
-    const unsigned ref = asLinks[inx].ref;
+    const unsigned ref = asLinks[inx].prime;
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( asLinks[inx].alt > 0 )
         return sol->posPoint(ref);
 #endif
 
-    int top = std::min(DIM+1u, sol->nbPoints());
+    unsigned top = std::min(DIM+1u, sol->nbPoints());
     Vector res = coef[0] * sol->posPoint(ref);
-    for ( int i = 1; i < top; ++i )
+    for ( unsigned i = 1; i < top; ++i )
         res += coef[i] * sol->posPoint(i+ref);
     
     return res;
@@ -613,16 +613,16 @@ Vector Aster::posLink2(size_t inx) const
 {
     Solid const* sol = solid();
     real const* coef = asLinks[inx].coef2;
-    const unsigned ref = asLinks[inx].ref;
+    const unsigned ref = asLinks[inx].prime;
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( asLinks[inx].alt > 0 )
         return sol->posPoint(asLinks[inx].alt);
 #endif
 
-    int top = std::min(DIM+1u, sol->nbPoints());
+    unsigned top = std::min(DIM+1u, sol->nbPoints());
     Vector res = coef[0] * sol->posPoint(ref);
-    for ( int i = 1; i < top; ++i )
+    for ( unsigned i = 1; i < top; ++i )
         res += coef[i] * sol->posPoint(i+ref);
     
     return res;
@@ -655,7 +655,7 @@ bool Aster::getLink(size_t inx, Vector& pos1, Vector& pos2) const
 {
     size_t n = inx / 2;
     
-    if ( n < asLinks.size() && asLinks[n].ord > 0 )
+    if ( n < asLinks.size() && asLinks[n].rank > 0 )
     {
         Fiber const* fib = fiber(n);
         
