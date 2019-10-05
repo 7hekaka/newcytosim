@@ -300,10 +300,10 @@ public:
     template <typename T> 
     void shuffle(T val[], uint32_t size)
     {
-        int  jj = size, kk;
+        uint32_t jj = size, kk;
         while ( jj > 1 )
         {
-            kk = URAND32() % jj;
+            kk = pint(jj);
             --jj;
             T tmp   = val[jj];
             val[jj] = val[kk];

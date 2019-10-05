@@ -43,8 +43,8 @@ void MatrixOfBlocks::allocate(size_t nbb)
         //printf("new block-matrix sz %i\n", nbblock );
         real** block_new = new real*[nba];
         
-        size_t  * block_alc_new  = new size_t[nba];
-        index_t * block_size_new = new index_t[nba];
+        size_t * block_alc_new  = new size_t[nba];
+        size_t * block_size_new = new size_t[nba];
         
         index_t ii = 0;
         
@@ -76,27 +76,27 @@ void MatrixOfBlocks::allocate(size_t nbb)
 }
 
 //------------------------------------------------------------------------------
-void MatrixOfBlocks::setBlockSize( const unsigned int bb, unsigned int sz )
+void MatrixOfBlocks::setBlockSize( const size_t inx, size_t arg )
 {
     assert_true( block_ != nullptr );
-    assert_true( bb < block_cnt );
+    assert_true( inx < block_cnt );
     
-    block_size[bb] = sz;
+    block_size[inx] = arg;
     
-    if ( block_alc[bb] < sz )
+    if ( block_alc[inx] < arg )
     {
         constexpr size_t chunk = 32;
-        sz = ( sz + chunk - 1 ) & ~( chunk -1 );
+        arg = ( arg + chunk - 1 ) & ~( chunk -1 );
 
         //printf("MatrixOfBlocks::new block %i size %i\n", bb, sz );
-        block_alc[bb] = sz;
-        free_real(block_[bb]);
-        block_[bb] = new_real(sz*sz);
+        block_alc[inx] = arg;
+        free_real(block_[inx]);
+        block_[inx] = new_real(arg*arg);
     }
 }
 
 //------------------------------------------------------------------------------
-index_t MatrixOfBlocks::calculateSize()
+size_t MatrixOfBlocks::calculateSize()
 {
     size_ = 0;
     for ( unsigned int ii = 0; ii < block_cnt; ++ii )

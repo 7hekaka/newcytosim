@@ -123,7 +123,7 @@ namespace VecPrint
     
     /// print a matrix in sparse format, but adding `off` to all line and column indices
     template< typename T >
-    void sparse_off(std::ostream& os, size_t m, size_t n, const T* mat, size_t ldd, int off, int digits = 8)
+    void sparse_off(std::ostream& os, size_t m, size_t n, const T* mat, size_t ldd, size_t off, int digits = 8)
     {
         if ( !mat || m == 0 || n == 0 )
             os << " void";

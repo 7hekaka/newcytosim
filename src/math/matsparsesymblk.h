@@ -14,11 +14,7 @@
  and is otherwise set here, to match the dimensionality of the simulation
  */
 
-#ifndef BLOCK_SIZE
-#  include "dim.h"
-#  define BLOCK_SIZE DIM
-#endif
-
+#define BLOCK_SIZE DIM
 
 #if ( BLOCK_SIZE == 1 )
 #   include "matrix11.h"
@@ -93,7 +89,7 @@ private:
         void print(std::ostream&) const;
 
         /// return n-th block (not necessarily, located at line inx_[n]
-        SquareBlock& operator[](int n) { return blk_[n]; }
+        SquareBlock& operator[](size_t n) { return blk_[n]; }
 
         /// return block located at line 'i' and column 'j'
         SquareBlock& block(index_t i, index_t j);

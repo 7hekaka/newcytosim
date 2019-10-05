@@ -3,9 +3,11 @@
 #ifndef MATSPARSEBLK_H
 #define MATSPARSEBLK_H
 
-#include "real.h"
 #include <cstdio>
 #include <iostream>
+
+#include "real.h"
+#include "vector.h"
 #include "assert_macro.h"
 
 /**
@@ -13,12 +15,7 @@
  and is otherwise set here, to match the dimensionality of the simulation
  */
 
-#ifndef BLOCK_SIZE
-#  include "dim.h"
-#  define BLOCK_SIZE DIM
-#endif
-
-#include "vector.h"
+#define BLOCK_SIZE DIM
 
 #if ( BLOCK_SIZE == 1 )
 #  include "matrix11.h"
@@ -101,7 +98,7 @@ private:
         void print(std::ostream&) const;
 
         /// return n-th block (not necessarily, located at line inx_[n]
-        SubBlock& operator[](int n) { return blk_[n]; }
+        SubBlock& operator[](size_t n) { return blk_[n]; }
 
         /// return block located at column 'j'
         SubBlock& block(index_t j);

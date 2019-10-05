@@ -24,13 +24,13 @@ private:
     size_t     allocated_;
     
     /// number of blocks
-    index_t    block_cnt;
+    size_t     block_cnt;
     
     /// array of pointers to the blocks
     real**     block_;
     
     /// array containing the size of each block
-    index_t*   block_size;
+    size_t*    block_size;
     
     /// array specifying the allocated size of each block
     size_t*    block_alc;
@@ -53,7 +53,7 @@ public:
     void allocate(size_t nb_block);
     
     /// allocate block b (arg 1) to be capable of holding (size*size) (arg 2)
-    void setBlockSize( unsigned int b, unsigned int size);
+    void setBlockSize(size_t inx, size_t size);
     
     /// default destructor
     virtual ~MatrixOfBlocks() { deallocate(); }
@@ -70,16 +70,16 @@ public:
     }
     
     /// returns the number of blocks
-    unsigned int nbBlocks() const 
+    size_t nbBlocks() const
     {
         return block_cnt;
     }
     
     /// calculate and return the total size of the matrix
-    unsigned int calculateSize();
+    size_t calculateSize();
         
     /// returns the size of block ii
-    unsigned int blockSize( const unsigned int ii ) const 
+    size_t blockSize( const unsigned int ii ) const
     {
         assert_true( block_ );
         assert_true( ii < block_cnt );

@@ -215,32 +215,32 @@ inline void xscal(int N, real alpha, real*X, int incX)
 
 
 /// calculates Y <- X + alpha * Y
-inline void xpay(int N, const real* X, real alpha, real* Y)
+inline void xpay(size_t N, const real* X, real alpha, real* Y)
 {
     #pragma ivdep
     #pragma vector always
-    for ( int i = 0; i < N; ++i )
+    for ( size_t i = 0; i < N; ++i )
         Y[i] = alpha * Y[i] + X[i];
 }
 
 
 /// addition Y[] <- Y[] + X[], for array of size N
-inline void add(int N, const real* X, real* Y)
+inline void add(size_t N, const real* X, real* Y)
 {
     //xaxpy(N, 1.0, X, 1, Y, 1);
     #pragma ivdep
     #pragma vector always
-    for ( int i = 0; i < N; ++i )
+    for ( size_t i = 0; i < N; ++i )
         Y[i] = Y[i] + X[i];
 }
     
 /// subtraction Y[] <- Y[] - X[], for array of size N
-inline void sub(int N, const real* X, real* Y)
+inline void sub(size_t N, const real* X, real* Y)
 {
     //xaxpy(N, -1.0, X, 1, Y, 1);
     #pragma ivdep
     #pragma vector always
-    for ( int i = 0; i < N; ++i )
+    for ( size_t i = 0; i < N; ++i )
         Y[i] = Y[i] - X[i];
 }
 

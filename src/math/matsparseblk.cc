@@ -328,9 +328,9 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
         {
             index_t ii = row.inx_[n];
             SubBlock blk = row.blk_[n];
-            int d = ( ii == jj );
-            for ( int x = 0  ; x < BLOCK_SIZE; ++x )
-            for ( int y = x*d; y < BLOCK_SIZE; ++y )
+            index_t d = ( ii == jj );
+            for ( index_t x = 0  ; x < BLOCK_SIZE; ++x )
+            for ( index_t y = x*d; y < BLOCK_SIZE; ++y )
             {
                 real v = blk(y, x);
                 if ( v != 0 )
@@ -598,7 +598,7 @@ real MatrixSparseBlock::Line::vecMul1D(const real* X) const
 {
     real res = 0;
     for ( index_t n = 0; n < size_; ++n )
-        res += blk_[n] * X[inx_[n]];
+        res += blk_[n].value() * X[inx_[n]];
     return res;
 }
 #endif
