@@ -37,7 +37,7 @@ typedef unsigned index_t;
 
 // Flag to enable AVX implementation
 #ifdef __AVX__
-#  define MATRIXSB_USES_AVX 0 //REAL_IS_DOUBLE
+#  define MATRIXSB_USES_AVX REAL_IS_DOUBLE
 #else
 #  define MATRIXSB_USES_AVX 0
 #endif
