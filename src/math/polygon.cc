@@ -21,7 +21,7 @@ Polygon::~Polygon()
 }
 
 
-void Polygon::allocate(unsigned s)
+void Polygon::allocate(size_t s)
 {
     delete[] pts_;
     pts_  = new Point2D[s+1];
@@ -29,11 +29,11 @@ void Polygon::allocate(unsigned s)
 }
 
 
-void Polygon::set(unsigned ord, real rad, real ang)
+void Polygon::set(size_t ord, real rad, real ang)
 {
     allocate(ord);
     real a = 2 * M_PI / ord;
-    for ( unsigned i = 0; i < ord; ++i )
+    for ( size_t i = 0; i < ord; ++i )
     {
         pts_[i].xx = rad * cos(i*a+ang);
         pts_[i].yy = rad * sin(i*a+ang);
@@ -42,7 +42,7 @@ void Polygon::set(unsigned ord, real rad, real ang)
 }
 
 
-void Polygon::setPoint(unsigned i, real x, real y, long c)
+void Polygon::setPoint(size_t i, real x, real y, long c)
 {
     if ( pts_ && i < npts_ )
     {
@@ -62,9 +62,9 @@ void Polygon::setPoint(unsigned i, real x, real y, long c)
  - allocate an appropriate array
  - read the coordinates
  */
-unsigned Polygon::read(std::istream& in, Point2D* pts, unsigned pts_size)
+size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
 {
-    unsigned i = 0;
+    size_t i = 0;
     char str[2048];
     real x, y;
     long k;
@@ -116,7 +116,7 @@ unsigned Polygon::read(std::istream& in, Point2D* pts, unsigned pts_size)
 
 void Polygon::read(std::istream& in)
 {
-    unsigned n = read(in, nullptr, 0);
+    size_t n = read(in, nullptr, 0);
     allocate(n);
     in.clear();
     in.seekg(0);
@@ -149,7 +149,7 @@ void Polygon::write(std::ostream& os) const
 {
     os.precision(6);
     os << std::fixed;
-    for ( unsigned i = 1; i < npts_; ++i )
+    for ( size_t i = 1; i < npts_; ++i )
     {
         os << std::setw(12) << pts_[i].xx << "  " << std::setw(12) << pts_[i].yy;
         if ( pts_[i].info )
@@ -164,8 +164,8 @@ void Polygon::write(std::ostream& os) const
  */
 void Polygon::flip()
 {
-    unsigned n = 1;
-    unsigned p = npts_-1;
+    size_t n = 1;
+    size_t p = npts_-1;
     
     while ( n < p )
     {
@@ -180,7 +180,7 @@ void Polygon::flip()
 
 void Polygon::translate(real dx, real dy)
 {
-    for ( unsigned n = 0; n <= npts_; ++n )
+    for ( size_t n = 0; n <= npts_; ++n )
     {
         pts_[n].xx += dx;
         pts_[n].yy += dy;
@@ -190,7 +190,7 @@ void Polygon::translate(real dx, real dy)
 
 void Polygon::scale(real sx, real sy)
 {
-    for ( unsigned n = 0; n <= npts_; ++n )
+    for ( size_t n = 0; n <= npts_; ++n )
     {
         pts_[n].xx *= sx;
         pts_[n].yy *= sy;
@@ -216,7 +216,7 @@ void Polygon::inflate(real eps)
     real px = pts_[npts_-1].xx + eps * ty;
     real py = pts_[npts_-1].yy - eps * tx;
 
-    for ( unsigned n = 0; n < npts_; ++n )
+    for ( size_t n = 0; n < npts_; ++n )
     {
         // normal 'N' to current segment
         real nx =  pts_[n].dy;
@@ -273,7 +273,7 @@ void Polygon::find_extremes(real box[4]) const
         box[3] = pts_[0].yy;
     }
     
-    for ( unsigned i = 1; i < npts_; ++i )
+    for ( size_t i = 1; i < npts_; ++i )
     {
         if ( pts_[i].xx < box[0] )  box[0] = pts_[i].xx;
         if ( pts_[i].xx > box[1] )  box[1] = pts_[i].xx;
@@ -300,7 +300,7 @@ int Polygon::complete(real epsilon)
     {
         pts_[npts_] = pts_[0];
    
-        unsigned i = 0, n = 0, p = 0;
+        size_t i = 0, n = 0, p = 0;
         do {
             real dx = 0, dy = 0, d = 1;
             // skip consecutive points that are too close from each other:
@@ -351,7 +351,7 @@ real Polygon::surface() const
         return 0;
     
     real S = pts_[npts_-1].xx * ( pts_[0].yy - pts_[npts_-2].yy );
-    for ( unsigned ii = 2; ii < npts_; ++ii )
+    for ( size_t ii = 2; ii < npts_; ++ii )
         S += pts_[ii-1].xx * ( pts_[ii].yy - pts_[ii-2].yy );
     
     return S * 0.5;
@@ -376,7 +376,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
     Point2D p1, p2 = pts_[0];
     
     //check all edges of polygon
-    for ( unsigned ii = 1; ii <= npts_; ++ii )
+    for ( size_t ii = 1; ii <= npts_; ++ii )
     {
         p1 = p2;
         p2 = pts_[ii];
@@ -456,7 +456,7 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, int& hit) const
     
     real dis = ( xx - pX ) * ( xx - pX ) + ( yy - pY ) * ( yy - pY );
     
-    for ( unsigned ii = 0; ii < npts_; ++ii )
+    for ( size_t ii = 0; ii < npts_; ++ii )
     {
         real x = xx - pts_[ii].xx;
         real y = yy - pts_[ii].yy;
@@ -502,7 +502,7 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, int& hit) const
 void Polygon::dump(std::ostream& os) const
 {
     os << "polygon " << npts_ << "\n";
-    for ( unsigned n = 0; n <= npts_; ++n )
+    for ( size_t n = 0; n <= npts_; ++n )
     {
         os << " " << std::setw(10) << pts_[n].xx << " " << std::setw(10) << pts_[n].yy << " " << pts_[n].info;
         os << " " << std::setw(10) << pts_[n].dx << " " << std::setw(10) << pts_[n].dy << "\n";
@@ -512,8 +512,8 @@ void Polygon::dump(std::ostream& os) const
 
 void Polygon::print(FILE * f) const
 {
-    fprintf(f, "polygon %i\n", npts_);
-    for ( unsigned n = 0; n <= npts_; ++n )
+    fprintf(f, "polygon %lu\n", npts_);
+    for ( size_t n = 0; n <= npts_; ++n )
     {
         fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].info);
         fprintf(f, "  %10.2f %10.2f\n", pts_[n].dx, pts_[n].dy);
