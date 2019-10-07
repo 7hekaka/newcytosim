@@ -587,6 +587,9 @@ void projectForcesD_PTR(unsigned nbs, const real* dif,
 #endif
 
 
+/*
+ Note that this works fine if ( X == Y )
+ */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
     const unsigned nbs = nbSegments();

@@ -508,7 +508,7 @@ void Sphere::reshape()
 
 #if ( DIM == 1 )
 
-//this is unsafe, don't use the sphere in 1D!
+//this is unsafe, don't use Sphere in 1D!
 void Sphere::makeProjection() { ABORT_NOW("Sphere is not implemented in 1D"); }
 void Sphere::projectForces(const real* X, real* Y) const {}
 

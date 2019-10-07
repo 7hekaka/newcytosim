@@ -29,7 +29,7 @@ class Meca1D
     
 public:
    
-    Array<Mecable *> objs;       ///< list of mobile objects
+    Array<Mecable *> mecables;   ///< list of mobile objects
 
     real * vSOL;                 ///< position of the points
     real * vBAS;                 ///< base points of forces and intermediate of calculus
@@ -73,18 +73,18 @@ public:
     
     void clear()
     {
-        objs.clear();
+        mecables.clear();
     }
     
     /// register a Mecable
     void add(Mecable * fib)
     {
-        objs.push_back(fib);
+        mecables.push_back(fib);
     }
 
     void prepare(real time_step, real kT)
     {
-        size_t dim = objs.size();
+        size_t dim = mecables.size();
         if ( dim > allocated_ )
         {
             // make a multiple of chunk to align memory:
@@ -108,7 +108,7 @@ public:
         zero_real(dim, vRHS);
 
         unsigned ii = 0;
-        for ( Mecable * mec : objs )
+        for ( Mecable * mec : mecables )
         {
             mec->matIndex(ii);
             mec->setDragCoefficient();
@@ -140,7 +140,7 @@ public:
     real setRightHandSide(real kT)
     {
         real res = INFINITY;
-        for ( unsigned ii = 0; ii < objs.size(); ++ii )
+        for ( unsigned ii = 0; ii < mecables.size(); ++ii )
         {
             real b = sqrt( 2 * kT * vMOB[ii] );
             vRHS[ii] = vMOB[ii] * vBAS[ii] + b * RNG.gauss();
@@ -193,7 +193,7 @@ public:
         {
             ready_ = false;
             unsigned ii = 0;
-            for ( Mecable * mec : objs )
+            for ( Mecable * mec : mecables )
             {
                 // Move the Mecable along the X direction as calculated
                 mec->translate(Vector(vSOL[ii], 0, 0));
@@ -203,17 +203,17 @@ public:
     }
     
     /// Implements the LinearOperator
-    unsigned dimension() const { return objs.size(); }
+    unsigned dimension() const { return mecables.size(); }
     
     /// Implements the LinearOperator:  Y <- X - vMOB * mA * X
     void multiply(const real * X, real * Y) const
     {
         assert_true( X != Y  &&  X != vBAS  &&  Y != vBAS );
         
-        zero_real(objs.size(), vBAS);
+        zero_real(mecables.size(), vBAS);
         mA.vecMulAdd(X, vBAS);
         
-        for( size_t ii = 0; ii < objs.size(); ++ii )
+        for( size_t ii = 0; ii < mecables.size(); ++ii )
             Y[ii] = X[ii] - vMOB[ii] * vBAS[ii];
     }
 };
