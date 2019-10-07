@@ -253,7 +253,7 @@ bool MatrixSparseSymmetricBlock::nonZero() const
     for ( index_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];
-        for ( unsigned n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.size_ ; ++n )
             if ( col[n] != 0.0 )
                 return true;
     }
@@ -267,7 +267,7 @@ void MatrixSparseSymmetricBlock::scale(const real alpha)
     for ( index_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];
-        for ( unsigned n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.size_ ; ++n )
             col[n].scale(alpha);
     }
 }
@@ -309,8 +309,8 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const unsigned ld
 
 
 void MatrixSparseSymmetricBlock::addDiagonalBlock(real* mat, unsigned ldd,
-                                              const index_t start,
-                                              const unsigned cnt) const
+                                                  const index_t start,
+                                                  const unsigned cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -349,7 +349,7 @@ int MatrixSparseSymmetricBlock::bad() const
     for ( index_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];
-        for ( unsigned n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.size_ ; ++n )
         {
             if ( col.inx_[n] >= size_ ) return 2;
             if ( col.inx_[n] <= jj )    return 3;
@@ -401,7 +401,7 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
         Column & col = column_[jj];
         if ( col.size_ > 0 )
             os << "% column " << jj << "\n";
-        for ( unsigned n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.size_ ; ++n )
         {
             index_t ii = col.inx_[n];
             SquareBlock blk = col.blk_[n];
@@ -425,11 +425,12 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
 void MatrixSparseSymmetricBlock::printColumns(std::ostream& os)
 {
     os << "MSSB size " << size_ << ":";
-    for ( index_t jj = 0; jj < size_; ++jj )
-    {
-        os << "\n   " << jj << "   " << column_[jj].size_;
-        os << " " << next_[jj];
-    }
+    for ( index_t j = 0; j < size_; ++j )
+        if ( column_[j].size_ > 0 )
+        {
+            os << "\n   " << j << "   " << column_[j].size_;
+            os << " " << next_[j];
+        }
     std::endl(os);
 }
 
@@ -472,10 +473,10 @@ int compareElement(const void * p, const void * q)
 /**
  This copies the data to the provided temporary array
  */
-void MatrixSparseSymmetricBlock::Column::sort(MatrixSparseSymmetricBlock::Element*& tmp, size_t tmp_size)
+void MatrixSparseSymmetricBlock::Column::sortElements(Element tmp[], size_t tmp_size)
 {
     assert_true( size_ <= tmp_size );
-    for ( unsigned i = 1; i < size_; ++i )
+    for ( size_t i = 1; i < size_; ++i )
     {
         tmp[i].blk = blk_[i];
         tmp[i].inx = inx_[i];
@@ -484,7 +485,7 @@ void MatrixSparseSymmetricBlock::Column::sort(MatrixSparseSymmetricBlock::Elemen
     //std::clog << "sizeof(Element) " << sizeof(Element) << "\n";
     qsort(tmp+1, size_-1, sizeof(Element), &compareElement);
     
-    for ( unsigned i = 1; i < size_; ++i )
+    for ( size_t i = 1; i < size_; ++i )
     {
          blk_[i] = tmp[i].blk;
          inx_[i] = tmp[i].inx;
@@ -511,7 +512,7 @@ size_t MatrixSparseSymmetricBlock::newElements(Element*& ptr, size_t size)
 
 void MatrixSparseSymmetricBlock::sortElements()
 {
-    //unsigned cnt = 0;
+    //size_t cnt = 0;
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
@@ -527,7 +528,7 @@ void MatrixSparseSymmetricBlock::sortElements()
         {
             if ( tmp_size < col.size_ )
                 tmp_size = newElements(tmp, col.size_);
-            col.sort(tmp, tmp_size);
+            col.sortElements(tmp, tmp_size);
         }
         
         //++cnt;
@@ -550,7 +551,7 @@ void MatrixSparseSymmetricBlock::sortElements()
 }
 
 
-void MatrixSparseSymmetricBlock::prepareForMultiply(int)
+bool MatrixSparseSymmetricBlock::prepareForMultiply(int)
 {
     next_[size_] = size_;
     
@@ -569,7 +570,14 @@ void MatrixSparseSymmetricBlock::prepareForMultiply(int)
         else
             next_[0] = nxt;
     }
+    
+    // check if matrix is empty:
+    if ( next_[0] == size_ )
+        return false;
+    
     sortElements();
+    //printColumns(std::cout);
+    return true;
 }
 
 
@@ -579,8 +587,8 @@ void MatrixSparseSymmetricBlock::prepareForMultiply(int)
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd1D(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 1 )
-    assert_true( size_ > 0 );
     const real X0 = X[jj];
     real D = blk_[0].value();
     real Y0 = Y[jj] + D * X0;
@@ -599,8 +607,8 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd1D(const real* X, real* Y, ind
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 )
-    assert_true( size_ > 0 );
     const Vector2 xx(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
@@ -618,8 +626,8 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D(const real* X, real* Y, ind
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 3 )
-    assert_true( size_ > 0 );
     const Vector3 xxx(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
@@ -638,8 +646,8 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D(const real* X, real* Y, ind
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd4D(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 4 )
-    assert_true( size_ > 0 );
     const vec4 xxxx = load4(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
@@ -662,6 +670,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D(const real* X, real* Y, ind
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_SSE(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
     vec2 x0, x1;
     vec2 yy = load2(Y+jj);
@@ -714,6 +723,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_SSE(const real* X, real* Y,
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVX(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     // xy = { X0 X1 X0 X1 }
     vec4 xy = broadcast2(X+jj);
@@ -769,19 +779,26 @@ inline void multiply2D(real const* X, real* Y, unsigned ii, vec4 const& mat, vec
 }
 #endif
 
+
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(load4(blk_[0]), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
 
-    unsigned n = 1;
-    const unsigned stop = 1 + 2 * ( ( size_ - 1 ) / 2 );
+    size_t n = 1;
+    const size_t stop = 1 + ( size_ - 1 ) % 4;
+    // process odd number of blocks:
+    #pragma nounroll
+    for ( ; n < size_; ++n )
+        multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
+
     // process 4 by 4:
     #pragma nounroll
-    for ( ; n < stop; n += 2 )
+    for ( ; n < size_; n += 2 )
     {
 #if ( 0 )
         /*
@@ -810,10 +827,6 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y
     }
     // collapse 'ss'
     ss = add4(ss, s1);
-    // process remaining blocks:
-    #pragma nounroll
-    for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -824,6 +837,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(load4(blk_[0]), xyxy);
@@ -891,6 +905,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* 
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     // load 3x3 matrix element into 3 vectors:
     real const* D = blk_[0];
@@ -975,6 +990,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     constexpr size_t BS = sizeof(SquareBlock)/sizeof(real);
     const real* M = blk_[0];
@@ -1087,6 +1103,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y, index_t jj) const
 {
+    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
     real const* D = blk_[0];
     //multiply with the symmetrized block, assuming it has been symmetrized:
@@ -1147,10 +1164,10 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y,
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
-void MatrixSparseSymmetricBlock::vecMul(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseSymmetricBlock::vecMul(const real* X, real* Y) const
 {
-    zero_real(stop-start, Y+start);
-    vecMulAdd(X, Y, start, stop);
+    zero_real(size_, Y);
+    vecMulAdd(X, Y, 0, size_);
 }
 
 #if MATRIXSSB_USES_AVX

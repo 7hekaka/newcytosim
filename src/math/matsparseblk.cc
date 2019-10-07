@@ -348,11 +348,12 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
 void MatrixSparseBlock::printLines(std::ostream& os)
 {
     os << "MSB size " << size_ << ":";
-    for ( index_t jj = 0; jj < size_; ++jj )
-    {
-        os << "\n   " << jj << "   " << row_[jj].size_;
-        os << " " << next_[jj];
-    }
+    for ( index_t i = 0; i < size_; ++i )
+        if (  row_[i].size_ > 0 )
+        {
+            os << "\n   " << i << "   " << row_[i].size_;
+            os << " " << next_[i];
+        }
     std::endl(os);
 }
 
@@ -412,7 +413,7 @@ size_t MatrixSparseBlock::newElements(MatrixSparseBlock::Element*& ptr, size_t s
 /**
  This copies the data to the provided temporary array
  */
-void MatrixSparseBlock::Line::sort(Element*& tmp, size_t tmp_size)
+void MatrixSparseBlock::Line::sortElements(Element tmp[], size_t tmp_size)
 {
     assert_true( size_ <= tmp_size );
     for ( unsigned i = 0; i < size_; ++i )
@@ -450,7 +451,7 @@ void MatrixSparseBlock::sortElements()
         {
             if ( tmp_size < row.size_ )
                 tmp_size = newElements(tmp, row.size_);
-            row.sort(tmp, tmp_size);
+            row.sortElements(tmp, tmp_size);
         }
         
         //++cnt;
@@ -538,7 +539,7 @@ void MatrixSparseBlock::symmetrize()
 }
 
 
-void MatrixSparseBlock::prepareForMultiply(int)
+bool MatrixSparseBlock::prepareForMultiply(int)
 {
     next_[size_] = size_;
     
@@ -557,7 +558,11 @@ void MatrixSparseBlock::prepareForMultiply(int)
         else
             next_[0] = nxt;
     }
-    
+        
+    // check if matrix is empty:
+    if ( next_[0] == size_ )
+        return false;
+
     sortElements();
     if ( !already_symmetric )
     {
@@ -568,6 +573,8 @@ void MatrixSparseBlock::prepareForMultiply(int)
     }
     
     consolidate();
+    //printLines(std::cout);
+    return true;
 }
 
 

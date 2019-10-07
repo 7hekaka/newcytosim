@@ -244,6 +244,9 @@ private:
     
     /// implements precondition()+multiply for one Mecable
     void multiply_precondition1(Mecable const*, real const*, real*, real*) const;
+    
+    /// implements precondition()+multiply for one Mecable
+    void multiplyP1(Mecable const*, real const*, real*) const;
 
     /// calculate the linear part of forces:  Y <- B + ( mB + mC ) * X
     void calculateForces(const real* X, const real* B, real* Y) const;
@@ -310,8 +313,8 @@ public:
     /// apply preconditionner: Y <- P*X (note that X maybe equal to Y)
     void precondition(const real* X, real* Y) const;
     
-    /// equivalent to: precondition(X, T); multiply(T, Y);
-    void precondition_multiply(real const* X, real* T, real* Y) const;
+    /// calculates Y <- P*M*X, where M is the matrix associated with the system
+    void multiplyP(const real* X, real* Y) const;
     
     /// equivalent to: multiply(X, T); precondition(T, Y);
     void multiply_precondition(real const* X, real* T, real* Y) const;

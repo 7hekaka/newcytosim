@@ -38,6 +38,12 @@
 
 
 /**
+ Assumes that Matrix Vector-multiplication can be distributed
+ */
+#define PARALELLIZE_MATRIX 0
+
+
+/**
  The forces are usually:
  
      force = vBAS + ( mB + mC + mR + mdiffP ) * vPTS
@@ -234,31 +240,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 }
 
 
-#if USE_ISO_MATRIX
-
-/// Y <- X - time_step * speed( mB + mC + P' ) * X;
-void Meca::multiply(const real* X, real* Y) const
-{
-    // Y <- ( mB + mC ) * X
-    calculateForces(X, nullptr, Y);
-    
-    for ( Mecable * mec : mecables )
-    {
-        const index_t inx = DIM * mec->matIndex();
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
-        mec->addRigidity(X+inx, Y+inx);
-#endif
-#if ADD_PROJECTION_DIFF
-        if ( mec->hasProjectionDiff() )
-            mec->addProjectionDiff(X+inx, Y+inx);
-#endif
-        mec->projectForces(Y+inx, Y+inx);
-        // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
-    }
-}
-
-#else
+#if PARALLELIZE_MATRIX
 
 /**
 calculate the matrix vector product corresponding to 'mec'
@@ -329,7 +311,6 @@ void Meca::multiply(const real* X, real* Y) const
     }
 #endif
 }
-#endif
 
 /**
  This is equivalent to
@@ -402,6 +383,88 @@ void Meca::multiply_precondition(real const* X, real* T, real* Y) const
         multiply_precondition1(mec, X, T, Y);
 #endif
 }
+
+
+void Meca::multiplyP1(Mecable const* mec, real const* X, real* Y) const
+{
+    assert_true(X!=Y);
+    
+    const index_t inx = DIM * mec->matIndex();
+    const index_t bks = DIM * mec->nbPoints();
+
+    mC.vecMul(X, Y, inx, inx+bks);
+    
+#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+    mec->addRigidity(X+inx, Y+inx);
+#endif
+    
+#if ADD_PROJECTION_DIFF
+    if ( mec->hasProjectionDiff() )
+        mec->addProjectionDiff(X+inx, Y+inx);
+#endif
+    
+    // Y <- P * Y
+    mec->projectForces(Y+inx, Y+inx);
+    // Y <- X + alpha * Y = X + alpha * P * FORCE
+    blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    
+    if ( mec->useBlock() )
+    {
+        int info = 0;
+        lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
+        assert_true(info==0);
+    }
+}
+
+/**
+ This calculates
+ 
+     Y <- P*M*X
+ 
+ as needed for left-sided preconditionning
+ */
+void Meca::multiplyP(real const* X, real* Y) const
+{
+#if NUM_THREADS > 1
+#pragma omp parallel num_threads(NUM_THREADS)
+    {
+        Mecable ** mci = mecables.begin() + omp_get_thread_num();
+        while ( mci < mecables.end() )
+        {
+            multiplyP1(*mci, X, Y);
+            mci += NUM_THREADS;
+        }
+    }
+#else
+    for ( Mecable * mec : mecables )
+        multiplyP1(mec, X, Y);
+#endif
+}
+
+#else
+
+/// Y <- X - time_step * speed( mB + mC + P' ) * X;
+void Meca::multiply(const real* X, real* Y) const
+{
+    // Y <- ( mB + mC ) * X
+    calculateForces(X, nullptr, Y);
+    
+    for ( Mecable * mec : mecables )
+    {
+        const index_t inx = DIM * mec->matIndex();
+#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+        mec->addRigidity(X+inx, Y+inx);
+#endif
+#if ADD_PROJECTION_DIFF
+        if ( mec->hasProjectionDiff() )
+            mec->addProjectionDiff(X+inx, Y+inx);
+#endif
+        mec->projectForces(Y+inx, Y+inx);
+        // Y <- X + alpha * Y
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    }
+}
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Helper functions
@@ -1112,7 +1175,8 @@ void Meca::precondition(const real* X, real* Y) const
         }
     }
 #else
-    blas::xcopy(dimension(), X, 1, Y, 1);
+    if ( Y != X )
+        blas::xcopy(dimension(), X, 1, Y, 1);
     for ( Mecable const* mec : mecables )
     {
         if ( mec->useBlock() )
@@ -1124,13 +1188,6 @@ void Meca::precondition(const real* X, real* Y) const
         }
     }
 #endif
-}
-
-
-void Meca::precondition_multiply(real const* X, real* T, real* Y) const
-{
-    precondition(X, T);
-    multiply(T, Y);
 }
 
 
@@ -1238,14 +1295,7 @@ void Meca::prepareMatrices()
 {
 #if USE_ISO_MATRIX
     mB.prepareForMultiply(DIM);
-    
-    if ( mC.nonZero() )
-    {
-        useMatrixC = true;
-        mC.prepareForMultiply(1);
-    }
-    else
-        useMatrixC = false;
+    useMatrixC = mC.prepareForMultiply(1);
 #else
     mC.prepareForMultiply(1);
 #endif
@@ -1497,7 +1547,9 @@ void Meca::solve(SimulProp const* prop, const int precond)
 
     if ( precond )
     {
-        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        precondition(vRHS, vRHS);
+        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
+        //LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
     }
     else
@@ -1510,7 +1562,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     //size_t mem = dimension() * (64+2) * sizeof(real);
     //std::clog << "GMRES mem " << (mem >> 20) << "MB\n";
     fprintf(stderr, "System size %6i precondition %i", dimension(), precond);
-    fprintf(stderr, "    Solver count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    Solver count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with GMRES using different restart parameters
@@ -1519,7 +1571,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
         monitor.reset();
         zero_real(dimension(), vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator, mH, mV, temporary);
-        fprintf(stderr, "    GMRES-%i  count %4i  residual %10.6f\n", RS, monitor.count(), monitor.residual());
+        fprintf(stderr, "    GMRES-%i  count %4i  residual %.3e\n", RS, monitor.count(), monitor.residual());
     }
 #endif
 #if ( 0 )
@@ -1529,7 +1581,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
     if ( precond )
     {
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-        fprintf(stderr, "    BCGS     count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+        fprintf(stderr, "    BCGS     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
     }
     else
     {
@@ -1542,21 +1594,21 @@ void Meca::solve(SimulProp const* prop, const int precond)
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs      count %4i  residual %10.6f\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    bcgs      count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
     
     //------- in case the solver did not converge, we try other methods:
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("Solver failed: precond %i flag %i count %4i residual %.2e\n",
+        Cytosim::out("Solver failed: precond %i flag %i count %4i residual %.3e\n",
             precond, monitor.flag(), monitor.count(), monitor.residual());
         
         // try with different initial seed: vRHS
         monitor.reset();
         copy_real(dimension(), vRHS, vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-        Cytosim::out("     seed: count %4i residual %.2e\n", monitor.count(), monitor.residual());
+        Cytosim::out("     seed: count %4i residual %.3e\n", monitor.count(), monitor.residual());
         
         if ( !monitor.converged() )
         {
@@ -1567,14 +1619,14 @@ void Meca::solve(SimulProp const* prop, const int precond)
             {
                 // try with the other method:
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP: count %4i residual %.2e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGSP: count %4i residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {
                 // try with a preconditioner
                 computePreconditionner();
                 LinearSolvers::GMRES(*this, vRHS, vSOL, 127, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES: count %4i residual %.2e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    GMRES: count %4i residual %.3e\n", monitor.count(), monitor.residual());
                 if ( !monitor.converged() )
                 {
                     // try with other method:
@@ -1590,7 +1642,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
                 monitor.reset();
                 zero_real(dimension(), vSOL);
                 LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES(256): count %4i residual %.2e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    GMRES(256): count %4i residual %.3e\n", monitor.count(), monitor.residual());
                 
                 if ( !monitor.converged() )
                 {

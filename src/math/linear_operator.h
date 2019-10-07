@@ -29,13 +29,6 @@ namespace LinearSolvers
         {
             copy_real(dimension(), X, Y);
         }
-        
-        /// apply preconditionner and multiply ( T <- P * X and Y <- M * T  )
-        virtual void precondition_multiply(real const* X, real * T, real* Y) const
-        {
-            precondition(X, T);   // T <- P*X
-            multiply(T, Y);       // Y <- M*T
-        }
 
     };
 }

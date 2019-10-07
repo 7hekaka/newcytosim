@@ -92,8 +92,8 @@ private:
         /// set as zero
         void reset();
         
-        /// sort element by increasing indices, using provided temporary array
-        void sort(Element*&, size_t);
+        /// sort element by increasing indices, using given temporary array
+        void sortElements(Element[], size_t);
         
         /// print
         void print(std::ostream&) const;
@@ -149,7 +149,7 @@ private:
 private:
     
     /// number of lines in the matrix
-    index_t   size_;
+    size_t    size_;
     
     /// amount of memory which has been allocated
     size_t    allocated_;
@@ -221,8 +221,8 @@ public:
     void addTriangularBlock(real* mat, index_t ldd, index_t start, unsigned nb, unsigned dim) const;
     
     
-    ///optional optimization that may accelerate multiplications by a vector
-    void prepareForMultiply(int dim);
+    /// prepare matrix for multiplications by a vector (must be called)
+    bool prepareForMultiply(int);
 
     /// multiplication of a vector, for columns within [start, stop[
     void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;

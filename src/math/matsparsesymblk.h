@@ -57,11 +57,10 @@ private:
     {
         friend class MatrixSparseSymmetricBlock;
 
-        size_t   allo_;
-        unsigned size_;
-        //Element* elem_;
-        index_t     * inx_;
-        SquareBlock * blk_;
+        size_t   allo_;       ///< allocated size of array
+        size_t   size_;       ///< number of blocks in column
+        index_t     * inx_;   ///< line index for each element
+        SquareBlock * blk_;   ///< block
         
     public:
         
@@ -83,8 +82,8 @@ private:
         /// set as zero
         void reset();
         
-        /// sort element by increasing indices, using provided temporary array
-        void sort(Element*&, size_t);
+        /// sort element by increasing indices, using given temporary array
+        void sortElements(Element[], size_t);
         
         /// print
         void print(std::ostream&) const;
@@ -138,7 +137,7 @@ private:
 private:
     
     /// size of matrix
-    index_t  size_;
+    size_t   size_;
     
     /// amount of memory which has been allocated
     size_t   allocated_;
@@ -209,17 +208,14 @@ public:
     void addTriangularBlock(real* mat, index_t ldd, index_t start, unsigned nb, unsigned dim) const;
     
     
-    ///optional optimization that may accelerate multiplications by a vector
-    void prepareForMultiply(int dim);
+    /// prepare matrix for multiplications by a vector (must be called)
+    bool prepareForMultiply(int);
 
     /// multiplication of a vector, for columns within [start, stop[
     void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
-    
-    /// multiplication of a vector, for columns within [start, stop[
-    void vecMul(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
@@ -237,7 +233,7 @@ public:
     void vecMulAddIso3D(const real*, real*) const {};
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, size_); }
+    void vecMul(const real* X, real* Y) const;
 
     /// true if matrix is non-zero
     bool nonZero() const;
