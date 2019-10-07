@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -3901,7 +3901,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1020;
-				ORGANIZATIONNAME = EMBL;
+				ORGANIZATIONNAME = "Cambridge University";
 				TargetAttributes = {
 					BB18BBB61DFD78F600567023 = {
 						CreatedOnToolsVersion = 7.2;
@@ -3915,7 +3915,7 @@
 				};
 			};
 			buildConfigurationList = BB87B9D608CDC50600A05F58 /* Build configuration list for PBXProject "cytosim" */;
-			compatibilityVersion = "Xcode 8.0";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
