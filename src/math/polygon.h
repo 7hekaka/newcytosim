@@ -44,7 +44,7 @@ public:
     Point2D* pts_;
     
     /// number of points
-    unsigned npts_;
+    size_t   npts_;
     
 public:
     
@@ -55,22 +55,22 @@ public:
     ~Polygon();
     
     /// number of points
-    unsigned nbPoints() const { return npts_; }
+    size_t   nbPoints() const { return npts_; }
     
     /// set number of points and allocate memory
-    void     allocate(unsigned s);
+    void     allocate(size_t s);
     
     /// set as regular polygon with `ord` sides (4 : square)
-    void     set(unsigned ord, real radius, real angle = 0);
+    void     set(size_t ord, real radius, real angle = 0);
 
     /// return copy of point at index `inx`
-    Point2D  point(unsigned inx) { assert_true( inx < npts_ ); return pts_[inx]; }
+    Point2D  point(size_t inx) { assert_true( inx < npts_ ); return pts_[inx]; }
 
     /// set coordinates of point at index `inx`:
-    void     setPoint(unsigned inx, real x, real y, long c = 0);
+    void     setPoint(size_t inx, real x, real y, long c = 0);
     
     /// subfunction
-    static unsigned read(std::istream&, Point2D *pts, unsigned pts_size);
+    static size_t read(std::istream&, Point2D *pts, size_t pts_size);
     
     /// read polygon from stream
     void     read(std::istream&);
