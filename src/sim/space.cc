@@ -453,14 +453,7 @@ void Space::read_data(Inputter& in, real len[8])
 #endif
     
     // read the 'shape' stored as a space-terminated string
-    std::string str;
-    int c = in.get_char();
-    if ( c == ' ' )
-        c = in.get_char();
-    do {
-        str.push_back(c);
-        c = in.get_char();
-    } while ( c != ' ' );
+    std::string str = in.get_word();
 
     // check that this matches current Space:
     if ( str.compare(0, prop->shape.size(), prop->shape) )
