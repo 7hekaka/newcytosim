@@ -122,7 +122,6 @@ std::string Player::buildReport(std::string arg) const
         }
     }
     return "";
-
 }
 
 /**
