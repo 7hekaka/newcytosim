@@ -53,19 +53,19 @@ public:
     PointsOnSphere();
     
     /// constructor that also calls distributePoints(),
-    PointsOnSphere(unsigned nbp);
+    PointsOnSphere(size_t nbp);
     
     /// constructor that also calls distributePoints(), 
-    PointsOnSphere(unsigned nbp, real precision, unsigned mx_nb_iterations);
+    PointsOnSphere(size_t nbp, real precision, size_t mx_nb_iterations);
     
     /// distribute the nbp points on the sphere and store their coordinates
-    unsigned distributePoints(unsigned nbp, real precision, unsigned mx_nb_iterations);
+    unsigned distributePoints(size_t nbp, real precision, size_t mx_nb_iterations);
 
     /// default destructor
     virtual ~PointsOnSphere();
     
     /// number of points in the configuration
-    unsigned nbPoints()  const { return num_points_;  }
+    size_t nbPoints()  const { return num_points_;  }
     
     /// the 'virtual' total energy of the configuration
     real   finalEnergy() const { return energy_; }
@@ -77,16 +77,16 @@ public:
     void   scale(real factor);
     
     /// address where the coordinates for point `inx` are
-    const real* addr(const unsigned inx) const { return &coord_[3 * inx]; }
+    const real* addr(const size_t inx) const { return &coord_[3 * inx]; }
     
     /// copy the coordinates from point `inx` onto the given 3-dim array x
-    void   copyPoint(real x[3], unsigned inx);
+    void   copyPoint(real x[3], size_t inx);
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void   copyPoint(real* x, real* y, real* z, unsigned inx);
+    void   copyPoint(real* x, real* y, real* z, size_t inx);
     
     /// copy the points coordinates onto `x`
-    void   copyPoints(real x[], const unsigned x_size);
+    void   copyPoints(real x[], const size_t x_size);
     
     /// write points coordinates
     void   printAllPositions(FILE* file = stdout);
@@ -95,10 +95,10 @@ public:
 private:
 
     /// This number affects convergence speed but not the result
-    static constexpr unsigned SEVEN = 7;
+    static constexpr size_t SEVEN = 7;
     
     /// number of point on the sphere
-    unsigned num_points_;
+    size_t num_points_;
     
     /// coordinates of the points in a array
     /** in the array all the coordinates are together (x,y,z) point 1, (x,y,z) point 2, etc.

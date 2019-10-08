@@ -10,14 +10,14 @@ PointsOnSphere::PointsOnSphere()
 }
 
 
-PointsOnSphere::PointsOnSphere(unsigned nbp, real precision, unsigned mx_nb_iterations)
+PointsOnSphere::PointsOnSphere(size_t nbp, real precision, size_t mx_nb_iterations)
 : num_points_(0), coord_(nullptr)
 {
     distributePoints(nbp, precision, mx_nb_iterations);
 }
 
 
-PointsOnSphere::PointsOnSphere(unsigned nbp)
+PointsOnSphere::PointsOnSphere(size_t nbp)
 : num_points_(0), coord_(nullptr)
 {
     distributePoints(nbp, 1e-4, 1<<14);
@@ -29,7 +29,7 @@ PointsOnSphere::~PointsOnSphere( )
 }
 
 
-void PointsOnSphere::copyPoint( real x[3], const unsigned ii )
+void PointsOnSphere::copyPoint( real x[3], const size_t ii )
 {
     x[0] = coord_[3*ii+0];
     x[1] = coord_[3*ii+1];
@@ -37,7 +37,7 @@ void PointsOnSphere::copyPoint( real x[3], const unsigned ii )
 }
 
 
-void PointsOnSphere::copyPoint( real* x, real* y, real* z, const unsigned ii )
+void PointsOnSphere::copyPoint( real* x, real* y, real* z, const size_t ii )
 {
     *x = coord_[3*ii+0];
     *y = coord_[3*ii+1];
@@ -45,7 +45,7 @@ void PointsOnSphere::copyPoint( real* x, real* y, real* z, const unsigned ii )
 }
 
 
-void PointsOnSphere::copyPoints( real x[], const unsigned x_size )
+void PointsOnSphere::copyPoints( real x[], const size_t x_size )
 {
     for ( unsigned ii = 0; ii < 3*num_points_ && ii < x_size; ++ii )
         x[ii] = coord_[ii];
@@ -255,7 +255,7 @@ void PointsOnSphere::refinePoints( real Pnew[], const real Pold[], real forces[]
  create a relatively even distribution of nbp points on the sphere
  the coordinates are stored in real array coord_[]
  */
-unsigned PointsOnSphere::distributePoints(unsigned nbp, real precision, unsigned mx_nb_iterations)
+unsigned PointsOnSphere::distributePoints(size_t nbp, real precision, size_t mx_nb_iterations)
 {
     //reallocate the array if needed:
     if ( num_points_ != nbp || ! coord_ )
