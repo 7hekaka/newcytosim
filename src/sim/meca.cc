@@ -1547,9 +1547,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
 
     if ( precond )
     {
-        precondition(vRHS, vRHS);
-        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-        //LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
     }
     else
