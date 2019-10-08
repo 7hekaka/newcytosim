@@ -446,8 +446,12 @@ void Meca::multiplyP(real const* X, real* Y) const
 /// Y <- X - time_step * speed( mB + mC + P' ) * X;
 void Meca::multiply(const real* X, real* Y) const
 {
+#if USE_ISO_MATRIX
     // Y <- ( mB + mC ) * X
     calculateForces(X, nullptr, Y);
+#else
+    mC.vecMul(X, Y);
+#endif
     
     for ( Mecable * mec : mecables )
     {
@@ -1164,11 +1168,12 @@ void Meca::precondition(const real* X, real* Y) const
             Mecable const* mec = *mci;
             const int inx = DIM * mec->matIndex();
             const int bks = DIM * mec->nbPoints();
-            blas::xcopy(bks, X+inx, 1, Y+inx, 1);
+            if ( Y != X )
+                blas::xcopy(bks, X+inx, 1, Y+inx, 1);
             if ( mec->useBlock() )
             {
                 int info = 0;
-                lapack::xgetrs('N', bks, 1, mec->block(), dim, mec->pivot(), Y+inx, bks, &info);
+                lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
                 assert_true(info==0);
             }
             mci += NUM_THREADS;
