@@ -35,6 +35,18 @@ Hand * Hand::otherHand() const
 }
 
 
+Vector Hand::otherPosition() const
+{
+    return haMonitor->otherPosition(this);
+}
+
+
+real Hand::interactionStiffness() const
+{
+    return haMonitor->interactionStiffness();
+}
+
+
 void Hand::resetTimers()
 {
     // initialize the Gillespie counters:
