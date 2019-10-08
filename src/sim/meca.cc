@@ -40,7 +40,7 @@
 /**
  Assumes that Matrix Vector-multiplication can be distributed
  */
-#define PARALELLIZE_MATRIX 0
+#define PARALLELIZE_MATRIX 0
 
 
 /**
