@@ -241,14 +241,16 @@ void Display2::drawSolid(Solid const& obj)
                 gleObject(obj.posP(ii), obj.radius(ii), gleCircleB);
         }
 #elif ( DIM == 3 )
-        //special display for ParM simulations (DYCHE 2006; SPINDLE 2019)
+        //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
+            bodyColor(disp, obj.signature());
             //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
             glPushMatrix();
-            Vector dir = obj.diffPoints(1, 0);
+            Vector A = obj.posP(0), B = obj.posP(1);
+            Vector dir = A - B;
             real len = dir.norm();
-            gleTransAlignZ(dir/len, obj.posP(0), len, obj.radius(0));
+            gleTransAlignZ(dir/len, (A+B)*0.5, len, obj.radius(0));
             gleCylinderZ();
             glPopMatrix();
         }
