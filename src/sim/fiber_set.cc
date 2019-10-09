@@ -388,7 +388,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
 #if ( 0 )
     // check what other method gives:
     allIntersections0(res1, res2, max_distance);
-    std::clog << "FiberSet::allIntersections0() found " << res1.size() << " intersections \n";
+    std::clog << "FiberSet::allIntersections0() found " << res1.size() << " intersections\n";
     for ( unsigned i = 0; i < res1.size(); ++i )
         std::clog << res1[i] << " " << res2[i] << "\n";
 #endif

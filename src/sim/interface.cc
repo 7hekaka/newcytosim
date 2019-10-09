@@ -514,8 +514,8 @@ public:
         }
         
         opt.set(mrk, "mark");
-        opt.set(st1, "state")    || opt.set(st1, "state1") || opt.set(st1, "stateP");
-        opt.set(st2, "state", 1) || opt.set(st2, "state2") || opt.set(st2, "stateM");
+        opt.set(st1, "state1") || opt.set(st1, "stateP") || opt.set(st1, "state");
+        opt.set(st2, "state2") || opt.set(st2, "stateM") || opt.set(st1, "state", 1);
     }
     
     /// return `true` if given object fulfills all the conditions specified
@@ -541,7 +541,7 @@ public:
         if ( st2 != ~0U )
         {
             if ( obj->tag()==Single::TAG )
-                throw InvalidParameter("to select Single, 'state[1]' is irrelevant");
+                throw InvalidParameter("to select Single, `state2' is irrelevant");
             if ( obj->tag()==Couple::TAG && static_cast<Couple const*>(obj)->attached2() != st2 )
                 return false;
             if ( obj->tag()==Fiber::TAG && static_cast<Fiber const*>(obj)->dynamicStateM() != st2 )
