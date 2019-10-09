@@ -18,8 +18,8 @@ endif
 COMPILE=$(CXX) $(CXXFLG) $(Flags$(MODE))
 
 ifneq ($(HAS_PNG), 0)
-    IMAGE_DEF = -DHAS_PNG $(INC_PNG)
-    IMAGE_LIB = $(LIB_PNG)
+    IMAGES_DEF = -DHAS_PNG $(INC_PNG)
+    IMAGES = $(LIB_PNG)
 endif
 
 #----------------------------objects--------------------------------------------
@@ -39,7 +39,7 @@ OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
 #----------------------------targets--------------------------------------------
 
 mechoui: $(OBJ) SFMT.o saveimage.o
-	$(COMPILE) $(addprefix build/, $(notdir $^)) $(LINKGL) $(IMAGE_LIB) -o $@
+	$(COMPILE) $(addprefix build/, $(notdir $^)) $(GRAFIX) $(IMAGES) -o $@
 	@printf "\x1B[35m >>>>>> made %s\x1B[0m\n" $@
 vpath mechoui .
 
@@ -59,7 +59,7 @@ $(OBJ): %.o: %.cc
 	$(COMPILE) -c $(INCLUDE) $< -o build/$@
 
 build/saveimage.o: saveimage.cc saveimage.h
-	$(COMPILE) -c $(IMAGE_DEF) $< -o $@
+	$(COMPILE) -c $(IMAGES_DEF) $< -o $@
 
 # Attention: Mersenne-Twister is coded in C-language,
 # and we must provide this with '-x c' to the compiler:
