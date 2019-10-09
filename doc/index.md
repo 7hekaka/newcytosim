@@ -1,6 +1,6 @@
 # Cytosim's Documentation
 
-*work in progress*
+*This is work in progress*
 
 *  [**Overview**](main/overview.md)
 *  [The configuration file](sim/config.md)
@@ -25,7 +25,7 @@ Cytosim is distributed as source code and [must be compiled](compile/index.md) b
 
 To compile, enter these commands in a terminal window:
 
-	git clone https://gitlab.com/f.nedelec/cytosim-dev
+	git clone https://gitlab.com/f.nedelec/cytosim
 	cd cytosim
 	make
 

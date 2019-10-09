@@ -426,6 +426,7 @@ void Meca::addTorqueExplicit(const Interpolation & ptA,
                              const real weight)
 {
     assert_true( weight >= 0 );
+    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
 
     //index in the matrix mC:
     const index_t ii0 = DIM * ptA.matIndex1();
@@ -531,6 +532,8 @@ void Meca::addTorquePoliti(const Interpolation & pt1,
                            const real weight)
 {
     assert_true( weight >= 0 );
+    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+
     if ( pt1.overlapping(pt2) )
         return;
     
@@ -650,6 +653,9 @@ void Meca::addTorque(const Interpolation & pt1,
                      const real cosinus, const real sinus,
                      const real weight)
 {
+    assert_true( weight >= 0 );
+    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+
     const Vector AB = pt1.diff();
     const Vector CD = pt2.diff();
     const real iU = AB.inv_norm();
@@ -925,7 +931,8 @@ void Meca::addTorquePlane(const Mecapoint & ptA,
                           const real weight)
 {
     assert_true( weight >= 0 );
-    
+    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+
 #if ( DIM == 3 )
     /*
     const Vector3 AB = ptB.pos() - ptA.pos();

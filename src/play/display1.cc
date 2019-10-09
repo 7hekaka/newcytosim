@@ -189,9 +189,17 @@ void Display1::drawSolid(Solid const& obj)
                 gleObject(obj.posP(ii), obj.radius(ii), gleCircleB);
         }
 #elif ( DIM == 3 )
-        //special display for ParM simulations (DYCHE)
-        if ( obj.mark()  &&  obj.nbPoints() >= 3 )
-            gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
+        //special display for ParM simulations (DYCHE 2006; SPINDLE 2019)
+        if ( obj.mark()  &&  obj.nbPoints() > 1 )
+        {
+            //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
+            glPushMatrix();
+            Vector dir = obj.diffPoints(1, 0);
+            real len = dir.norm();
+            gleTransAlignZ(dir/len, obj.posP(0), len, obj.radius(0));
+            gleCylinderZ();
+            glPopMatrix();
+        }
 #endif
     }
     
@@ -329,7 +337,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
 
     /**
      This display the Solid connecting two Aster as a spindle.
-     Used for Cleo Kozlowski simulation of C. elegans
+     Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
     if ( disp->style & 1 && obj.tag() == Fake::TAG )
     {
