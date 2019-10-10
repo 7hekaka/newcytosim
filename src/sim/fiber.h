@@ -25,7 +25,7 @@ class LineDisp;
 
 
 /// Flag to allow `family` member variable to control Couple's binding
-#define FIBER_HAS_FAMILY 0
+#define FIBER_HAS_FAMILY 1
 
 
 /// Flag to allow dynamic Single creation/binding
@@ -129,7 +129,7 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    unsigned            family;
+    size_t              family;
 #endif
 
     /// the Property of this object

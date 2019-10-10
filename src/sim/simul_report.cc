@@ -1356,6 +1356,7 @@ void Simul::reportInventory(std::ostream& out) const
     singles.report(out);
     couples.report(out);
     organizers.report(out);
+    tubules.report(out);
     events.report(out);
 }
 

@@ -9,6 +9,7 @@
 #include "backtrace.h"
 #include "modulo.h"
 #include "tictoc.h"
+#include "tubule.h"
 
 extern Modulo const* modulo;
 
@@ -68,7 +69,7 @@ void signal_handler(int sig)
 Simul::Simul()
 : prop(nullptr), spaces(*this), fields(*this),
 fibers(*this), spheres(*this), beads(*this), solids(*this),
-singles(*this), couples(*this), organizers(*this), events(*this)
+singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 {
     pMeca1D       = nullptr;
     sReady        = false;
@@ -145,6 +146,7 @@ void Simul::erase()
 {
     //std::cerr << "Simul::erase()\n";
     relax();
+    tubules.erase();
     organizers.erase();
     fibers.erase();
     singles.erase();
@@ -307,6 +309,7 @@ ObjectSet * Simul::findSet(const std::string& cat)
     if ( cat == "sphere" )       return &spheres;
     if ( cat == "single" )       return &singles;
     if ( cat == "couple" )       return &couples;
+    if ( cat == "tubule" )       return &tubules;
     if ( cat == "organizer" )    return &organizers;
     if ( cat == "aster" )        return &organizers;
     if ( cat == "bundle" )       return &organizers;
@@ -336,6 +339,7 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case        Sphere::TAG:    return &spheres;
         case         Field::TAG:    return &fields;
         case         Space::TAG:    return &spaces;
+        case        Tubule::TAG:    return &tubules;
         case       Nucleus::TAG:    return &organizers;
         case        Bundle::TAG:    return &organizers;
         case         Aster::TAG:    return &organizers;

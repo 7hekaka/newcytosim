@@ -234,7 +234,7 @@ public:
 
     //---------------------
     
-    /// displace the ORIGIN of abscissa
+    /// displace the ORIGIN of abscissa at distance `a` from the MINUS_END
     void         setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut*nbSegments() - a; }
 
     /// signed distance from ORIGIN to MINUS_END (abscissa of MINUS_END)

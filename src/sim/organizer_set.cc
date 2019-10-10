@@ -79,10 +79,10 @@ Object * OrganizerSet::newObject(const ObjectTag tag, unsigned num)
 }
 
 
-ObjectList OrganizerSet::newObjects(const std::string& nom, Glossary& opt)
+ObjectList OrganizerSet::newObjects(const std::string& name, Glossary& opt)
 {
     Organizer * obj = nullptr;
-    Property * p = simul.properties.find_or_die(nom);
+    Property * p = simul.properties.find_or_die(name);
     
     if ( p->category() == "aster" )
         obj = new Aster(static_cast<AsterProp*>(p));

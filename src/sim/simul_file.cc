@@ -86,6 +86,7 @@ void Simul::writeObjects(Outputter& out) const
     singles.write(out);
     couples.write(out);
     organizers.write(out);
+    tubules.write(out);
     //events.write(out);
     
     out.put_line("\n#section end");
@@ -281,6 +282,7 @@ public:
         sim->beads.freeze(FLAG);
         sim->solids.freeze(FLAG);
         sim->spheres.freeze(FLAG);
+        sim->tubules.freeze(FLAG);
         sim->organizers.freeze(FLAG);
         sim->fields.freeze(FLAG);
         sim->spaces.freeze(FLAG);
@@ -293,6 +295,7 @@ public:
     {
         //sim->events.prune(FLAG);
         sim->organizers.prune(FLAG);
+        sim->tubules.prune(FLAG);
         sim->couples.prune(FLAG);
         sim->singles.prune(FLAG);
         sim->beads.prune(FLAG);
@@ -318,6 +321,7 @@ public:
         {
             //sim->events.thaw();
             sim->organizers.thaw();
+            sim->tubules.thaw();
             sim->couples.thaw();
             sim->singles.thaw();
             sim->beads.thaw();

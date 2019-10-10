@@ -266,6 +266,9 @@ void Simul::setInteractions(Meca & meca) const
     
     for ( Organizer * a = organizers.first(); a; a=a->next() )
         a->setInteractions(meca);
+    
+    for ( Tubule * t = tubules.first(); t; t=t->next() )
+        t->setInteractions(meca);
 
     //for ( Event * e = events.first(); e; e=e->next() )
     //    e->setInteractions(meca);
@@ -417,111 +420,6 @@ void Simul::addExperimentalInteractions(Meca& meca) const
         Torque dir = normalize(cross(b->pos()-a->pos(), c->pos()-b->pos()));
         MatrixBlock mat = Meca::torqueMatrix(sti, dir, co, si);
         meca.addTorqueLong(Mecapoint(a,0), Mecapoint(b,0), Mecapoint(c,0), mat, sti, len, sti);
-    }
-#endif
-#if 0 && ( DIM == 3 )
-    const int NFIL = 13;
-    if ( 0 == fibers.size() % NFIL )
-    {
-        PRINT_ONCE("AD-HOC N-TUBULE LINKS ENABLED\n");
-        MatrixBlock mat;
-        const real sti = 100000;
-        const real nes = 10000;
-        const real ang = 2 * M_PI / NFIL;
-        real co = cos(ang), si = sin(ang);
-        const real len = 0.0045;  // distance between protofilaments
-        // connect fibers together into a tube:
-        Fiber * f = fibers.firstID();
-        Fiber * ptr[NFIL+2] = { nullptr };
-        while ( f )
-        {
-            ptr[0] = f;
-            for ( int n=0; n < NFIL; ++n )
-                ptr[n+1] = fibers.nextID(ptr[n]);
-            ptr[NFIL] = ptr[0];
-            ptr[NFIL+1] = ptr[1];
-            for ( unsigned i = 0; i < f->nbPoints(); ++i )
-            {
-                // get centerline
-                Vector cen(0,0,0);
-                for ( int n=0; n < NFIL; ++n )
-                    cen += ptr[n]->posPoint(i);
-                cen /= NFIL;
-
-                if ( i < f->lastPoint() )
-                {
-                    // get average direction of the Tubule at this location:
-                    Vector dir(0,0,0);
-                    for ( int n=0; n < NFIL; ++n )
-                        dir += ptr[n]->diffPoints(i);
-                    dir.normalize();
-                    mat = Meca::torqueMatrix(sti, dir, co, si);
-                    
-                    for ( int n=0; n < NFIL; ++n )
-                    {
-                        Vector arm = (2*cen - ptr[n]->posPoint(i)- ptr[n+1]->posPoint(i)).normalized(len);
-                        meca.addSideLink3D(Interpolation(ptr[n],i,i+1,0), Mecapoint(ptr[n+1],i), arm, nes);
-                        //meca.addSideLink(Interpolation(ptr[n],i,i+1,0), Mecapoint(ptr[n+1],i), len, nes);
-                    }
-                }
-                else
-                {
-                    for ( int n=0; n < NFIL; ++n )
-                    {
-                        Vector arm = (2*cen - ptr[n]->posPoint(i) - ptr[n+1]->posPoint(i)).normalized(len);
-                        meca.addSideLink3D(Interpolation(ptr[n],i-1,i,1), Mecapoint(ptr[n+1],i), arm, nes);
-                        //meca.addSideLink(Interpolation(ptr[n],i-1,i,1), Mecapoint(ptr[n+1],i), len, nes);
-                    }
-                }
-
-                for ( int n=0; n < NFIL; ++n )
-                {
-                    meca.addTorque(Mecapoint(ptr[n],i), Mecapoint(ptr[n+1],i),
-                                   Mecapoint(ptr[n+2],i), mat, sti);
-                }
-            }
-            f = fibers.nextID(ptr[NFIL-1]);
-        }
-    }
-#endif
-#if 0 && ( DIM == 3 )
-    const int NFIL = 13;
-    if ( 0 == fibers.size() % NFIL )
-    {
-        PRINT_ONCE("AD-HOC N-TUBULE LINKS ENABLED\n");
-        MatrixBlock mat;
-        const real sti = 100000;
-        const real nes = 10000;
-        const real ang = 2 * M_PI / NFIL;
-        real co = cos(ang), si = sin(ang);
-        const real len = 0.0045;  // distance between protofilaments
-        // connect fibers together into a tube:
-        Fiber * f = fibers.firstID();
-        Fiber * ptr[NFIL+2] = { nullptr };
-        while ( f )
-        {
-            ptr[0] = f;
-            for ( int n=0; n < NFIL; ++n )
-                ptr[n+1] = fibers.nextID(ptr[n]);
-            ptr[NFIL] = ptr[0];
-            ptr[NFIL+1] = ptr[1];
-            for ( unsigned i = 0; i < f->nbPoints(); ++i )
-            {
-                if ( i < f->lastPoint() )
-                {
-                    // get average direction of the Tubule at this location:
-                    Vector dir(0,0,0);
-                    for ( int n=0; n < NFIL; ++n )
-                        dir += ptr[n]->diffPoints(i);
-                    dir.normalize();
-                    mat = Meca::torqueMatrix(sti, dir, co, si);
-                }
-                for ( int n=0; n < NFIL; ++n )
-                    meca.addTorqueLong(Mecapoint(ptr[n],i), Mecapoint(ptr[n+1],i),
-                                       Mecapoint(ptr[n+2],i), mat, sti, len, nes);
-            }
-            f = fibers.nextID(ptr[NFIL-1]);
-        }
     }
 #endif
 #if ( 0 )

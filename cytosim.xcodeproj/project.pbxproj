@@ -645,6 +645,18 @@
 		BBA5790C05FA625D009AE66E /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BBA5795D05FA652D009AE66E /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BBA5E5820E8EBA620009F6D0 /* tictoc.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA5E5800E8EBA620009F6D0 /* tictoc.h */; };
+		BBA61CBF234E891F00D6A81F /* tubule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CBD234E891F00D6A81F /* tubule.cc */; };
+		BBA61CC0234E891F00D6A81F /* tubule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CBD234E891F00D6A81F /* tubule.cc */; };
+		BBA61CC1234E891F00D6A81F /* tubule.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CBE234E891F00D6A81F /* tubule.h */; };
+		BBA61CC2234E891F00D6A81F /* tubule.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CBE234E891F00D6A81F /* tubule.h */; };
+		BBA61CC6234E8DC800D6A81F /* tubule_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CC4234E8DC700D6A81F /* tubule_set.h */; };
+		BBA61CC7234E8DC800D6A81F /* tubule_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CC4234E8DC700D6A81F /* tubule_set.h */; };
+		BBA61CC8234E8DC800D6A81F /* tubule_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CC5234E8DC800D6A81F /* tubule_set.cc */; };
+		BBA61CC9234E8DC800D6A81F /* tubule_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CC5234E8DC800D6A81F /* tubule_set.cc */; };
+		BBA61CCC234F158300D6A81F /* tubule_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CCA234F158300D6A81F /* tubule_prop.h */; };
+		BBA61CCD234F158300D6A81F /* tubule_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CCA234F158300D6A81F /* tubule_prop.h */; };
+		BBA61CCE234F158300D6A81F /* tubule_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CCB234F158300D6A81F /* tubule_prop.cc */; };
+		BBA61CCF234F158300D6A81F /* tubule_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CCB234F158300D6A81F /* tubule_prop.cc */; };
 		BBA75855139CFBA40098FBAF /* sieve.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCD6993126F818F00D19DDF /* sieve.cc */; };
 		BBA75887139CFC6F0098FBAF /* frame_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7662C410E923A200C93DF6 /* frame_reader.h */; };
 		BBA75888139CFC700098FBAF /* frame_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7662C310E923A200C93DF6 /* frame_reader.cc */; };
@@ -1562,6 +1574,12 @@
 		BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_matrix.cc; path = src/test/test_matrix.cc; sourceTree = SOURCE_ROOT; };
 		BBA5E5800E8EBA620009F6D0 /* tictoc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tictoc.h; path = src/base/tictoc.h; sourceTree = SOURCE_ROOT; };
 		BBA5E5810E8EBA620009F6D0 /* tictoc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tictoc.cc; path = src/base/tictoc.cc; sourceTree = SOURCE_ROOT; };
+		BBA61CBD234E891F00D6A81F /* tubule.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tubule.cc; sourceTree = "<group>"; };
+		BBA61CBE234E891F00D6A81F /* tubule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tubule.h; sourceTree = "<group>"; };
+		BBA61CC4234E8DC700D6A81F /* tubule_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tubule_set.h; sourceTree = "<group>"; };
+		BBA61CC5234E8DC800D6A81F /* tubule_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tubule_set.cc; sourceTree = "<group>"; };
+		BBA61CCA234F158300D6A81F /* tubule_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tubule_prop.h; sourceTree = "<group>"; };
+		BBA61CCB234F158300D6A81F /* tubule_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tubule_prop.cc; sourceTree = "<group>"; };
 		BBA721BB1462C3B900ACF26D /* report.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = report.cc; sourceTree = "<group>"; };
 		BBA8BD720E1FBDE8009C7F93 /* object_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = object_set.h; path = src/sim/object_set.h; sourceTree = SOURCE_ROOT; };
 		BBA8BD730E1FBDE8009C7F93 /* object_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_set.cc; path = src/sim/object_set.cc; sourceTree = SOURCE_ROOT; };
@@ -2288,10 +2306,10 @@
 		BB6D1DDB1022F4BF00DB0AFD /* aster */ = {
 			isa = PBXGroup;
 			children = (
-				BBD6F5C612D9D17A00A5F99B /* aster_prop.h */,
-				BBD6F5C512D9D17A00A5F99B /* aster_prop.cc */,
 				BBD6F5C812D9D17A00A5F99B /* aster.h */,
 				BBD6F5C712D9D17A00A5F99B /* aster.cc */,
+				BBD6F5C612D9D17A00A5F99B /* aster_prop.h */,
+				BBD6F5C512D9D17A00A5F99B /* aster_prop.cc */,
 			);
 			name = aster;
 			sourceTree = "<group>";
@@ -2299,10 +2317,10 @@
 		BB6D1DDC1022F4CE00DB0AFD /* nucleus */ = {
 			isa = PBXGroup;
 			children = (
-				BBD6F5CE12D9D18D00A5F99B /* nucleus_prop.h */,
-				BBD6F5CD12D9D18D00A5F99B /* nucleus_prop.cc */,
 				BBD6F5D012D9D18D00A5F99B /* nucleus.h */,
 				BBD6F5CF12D9D18D00A5F99B /* nucleus.cc */,
+				BBD6F5CE12D9D18D00A5F99B /* nucleus_prop.h */,
+				BBD6F5CD12D9D18D00A5F99B /* nucleus_prop.cc */,
 			);
 			name = nucleus;
 			sourceTree = "<group>";
@@ -2430,6 +2448,7 @@
 				BB62247E12ABB215003D8C0F /* Mecable */,
 				BB88388610B48E6900A4028F /* Space */,
 				BBCAA48F06B0653500638608 /* Fibers */,
+				BBA61CC3234E894500D6A81F /* Tubule */,
 				BBCAA7B806B07B6000638608 /* Hands */,
 				BB614D9A05BE8F150048FA70 /* Singles */,
 				BB614D9705BE8EFC0048FA70 /* Couples */,
@@ -2532,10 +2551,10 @@
 		BB7D7CA41026FEA500C1DC38 /* bundle */ = {
 			isa = PBXGroup;
 			children = (
-				BBD6F5BE12D9D16400A5F99B /* bundle_prop.h */,
-				BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */,
 				BBD6F5C012D9D16400A5F99B /* bundle.h */,
 				BBD6F5BF12D9D16400A5F99B /* bundle.cc */,
+				BBD6F5BE12D9D16400A5F99B /* bundle_prop.h */,
+				BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */,
 			);
 			name = bundle;
 			sourceTree = "<group>";
@@ -2758,6 +2777,19 @@
 			name = DynamicFiber;
 			sourceTree = "<group>";
 		};
+		BBA61CC3234E894500D6A81F /* Tubule */ = {
+			isa = PBXGroup;
+			children = (
+				BBA61CBE234E891F00D6A81F /* tubule.h */,
+				BBA61CBD234E891F00D6A81F /* tubule.cc */,
+				BBA61CC4234E8DC700D6A81F /* tubule_set.h */,
+				BBA61CC5234E8DC800D6A81F /* tubule_set.cc */,
+				BBA61CCA234F158300D6A81F /* tubule_prop.h */,
+				BBA61CCB234F158300D6A81F /* tubule_prop.cc */,
+			);
+			name = Tubule;
+			sourceTree = "<group>";
+		};
 		BBA8C0BD0E20CA8A009C7F93 /* Objects */ = {
 			isa = PBXGroup;
 			children = (
@@ -2919,10 +2951,10 @@
 		BBD6F5D512D9D1A200A5F99B /* fake */ = {
 			isa = PBXGroup;
 			children = (
-				BBD6F5F512D9D37800A5F99B /* fake_prop.h */,
-				BBD6F5F412D9D37800A5F99B /* fake_prop.cc */,
 				BBD6F5F712D9D37800A5F99B /* fake.h */,
 				BBD6F5F612D9D37800A5F99B /* fake.cc */,
+				BBD6F5F512D9D37800A5F99B /* fake_prop.h */,
+				BBD6F5F412D9D37800A5F99B /* fake_prop.cc */,
 			);
 			name = fake;
 			sourceTree = "<group>";
@@ -3098,6 +3130,7 @@
 				BB7020AE0823C4B100B2AA50 /* sphere.h in Headers */,
 				BB9D992A08D6281100DBD2BF /* mecafil.h in Headers */,
 				BB55C21D0A261FC1003333C9 /* solid.h in Headers */,
+				BBA61CCC234F158300D6A81F /* tubule_prop.h in Headers */,
 				BB55C2230A261FC8003333C9 /* simul.h in Headers */,
 				BB55C2250A261FC9003333C9 /* hand.h in Headers */,
 				BB98FE920B35F66300796DAE /* meca.h in Headers */,
@@ -3144,6 +3177,7 @@
 				BB500462126A332E005E925C /* tracker_prop.h in Headers */,
 				BB500464126A332E005E925C /* tracker.h in Headers */,
 				BBD025E11B28DF950002B9FE /* chewer.h in Headers */,
+				BBA61CC1234E891F00D6A81F /* tubule.h in Headers */,
 				BBA10152126CC7E600D28A55 /* walker_prop.h in Headers */,
 				BBA10154126CC7E600D28A55 /* walker.h in Headers */,
 				BBA1015A126CC7FD00D28A55 /* cutter_prop.h in Headers */,
@@ -3169,6 +3203,7 @@
 				BBA49F1F12FF5589008A7D33 /* dynamic_fiber_prop.h in Headers */,
 				BB4CFFE4130539740049C585 /* classic_fiber_prop.h in Headers */,
 				BB4CFFE6130539740049C585 /* classic_fiber.h in Headers */,
+				BBA61CC6234E8DC800D6A81F /* tubule_set.h in Headers */,
 				BB89A3FD1A6410E000D724F4 /* event_set.h in Headers */,
 				BBA98688132245DB0031200B /* crosslink_prop.h in Headers */,
 				BBA9868A132245DB0031200B /* crosslink.h in Headers */,
@@ -3238,6 +3273,7 @@
 				BB69213E233D359F00F528D2 /* sphere.h in Headers */,
 				BB69213F233D359F00F528D2 /* mecafil.h in Headers */,
 				BB692140233D359F00F528D2 /* solid.h in Headers */,
+				BBA61CCD234F158300D6A81F /* tubule_prop.h in Headers */,
 				BB692141233D359F00F528D2 /* simul.h in Headers */,
 				BB692142233D359F00F528D2 /* hand.h in Headers */,
 				BB692143233D359F00F528D2 /* meca.h in Headers */,
@@ -3284,6 +3320,7 @@
 				BB69216C233D359F00F528D2 /* tracker_prop.h in Headers */,
 				BB69216D233D359F00F528D2 /* tracker.h in Headers */,
 				BB69216E233D359F00F528D2 /* chewer.h in Headers */,
+				BBA61CC2234E891F00D6A81F /* tubule.h in Headers */,
 				BB69216F233D359F00F528D2 /* walker_prop.h in Headers */,
 				BB692170233D359F00F528D2 /* walker.h in Headers */,
 				BB692171233D359F00F528D2 /* cutter_prop.h in Headers */,
@@ -3309,6 +3346,7 @@
 				BB692185233D359F00F528D2 /* dynamic_fiber_prop.h in Headers */,
 				BB692186233D359F00F528D2 /* classic_fiber_prop.h in Headers */,
 				BB692187233D359F00F528D2 /* classic_fiber.h in Headers */,
+				BBA61CC7234E8DC800D6A81F /* tubule_set.h in Headers */,
 				BB692188233D359F00F528D2 /* event_set.h in Headers */,
 				BB692189233D359F00F528D2 /* crosslink_prop.h in Headers */,
 				BB69218A233D359F00F528D2 /* crosslink.h in Headers */,
@@ -4047,6 +4085,7 @@
 				BB9402E80E236764007410D7 /* solid_set.cc in Sources */,
 				BBF0385E18BCF207002E8568 /* splash.cc in Sources */,
 				BB9402EC0E236778007410D7 /* sphere_set.cc in Sources */,
+				BBA61CC8234E8DC800D6A81F /* tubule_set.cc in Sources */,
 				BB2EBF470FCF1F3F00CCA721 /* fiber_site.cc in Sources */,
 				BBAF2B310FD01048006E8E27 /* hand_prop.cc in Sources */,
 				BBD720D81C69C7AC008D9B4F /* regulator_prop.cc in Sources */,
@@ -4105,6 +4144,7 @@
 				BB770C0512FF44D100D018A0 /* shackle_prop.cc in Sources */,
 				BB770C0712FF44D100D018A0 /* shackle.cc in Sources */,
 				BBA49EFB12FF5331008A7D33 /* dynamic_fiber.cc in Sources */,
+				BBA61CBF234E891F00D6A81F /* tubule.cc in Sources */,
 				BBA49F1E12FF5589008A7D33 /* dynamic_fiber_prop.cc in Sources */,
 				BB4CFFE3130539740049C585 /* classic_fiber_prop.cc in Sources */,
 				BB4CFFE5130539740049C585 /* classic_fiber.cc in Sources */,
@@ -4141,6 +4181,7 @@
 				BBFF314F16F364C000C09B51 /* kinesin_prop.cc in Sources */,
 				BBFF315116F364C000C09B51 /* kinesin.cc in Sources */,
 				BB650A9A182E475900A7998B /* growing_fiber_prop.cc in Sources */,
+				BBA61CCE234F158300D6A81F /* tubule_prop.cc in Sources */,
 				BB650A9C182E475900A7998B /* growing_fiber.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4194,6 +4235,7 @@
 				BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */,
 				BB6921BD233D359F00F528D2 /* splash.cc in Sources */,
 				BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */,
+				BBA61CC9234E8DC800D6A81F /* tubule_set.cc in Sources */,
 				BB6921BF233D359F00F528D2 /* fiber_site.cc in Sources */,
 				BB6921C0233D359F00F528D2 /* hand_prop.cc in Sources */,
 				BB6921C1233D359F00F528D2 /* regulator_prop.cc in Sources */,
@@ -4252,6 +4294,7 @@
 				BB6921F6233D359F00F528D2 /* shackle_prop.cc in Sources */,
 				BB6921F7233D359F00F528D2 /* shackle.cc in Sources */,
 				BB6921F8233D359F00F528D2 /* dynamic_fiber.cc in Sources */,
+				BBA61CC0234E891F00D6A81F /* tubule.cc in Sources */,
 				BB6921F9233D359F00F528D2 /* dynamic_fiber_prop.cc in Sources */,
 				BB6921FA233D359F00F528D2 /* classic_fiber_prop.cc in Sources */,
 				BB6921FB233D359F00F528D2 /* classic_fiber.cc in Sources */,
@@ -4288,6 +4331,7 @@
 				BB69221A233D359F00F528D2 /* kinesin_prop.cc in Sources */,
 				BB69221B233D359F00F528D2 /* kinesin.cc in Sources */,
 				BB69221C233D359F00F528D2 /* growing_fiber_prop.cc in Sources */,
+				BBA61CCF234F158300D6A81F /* tubule_prop.cc in Sources */,
 				BB69221D233D359F00F528D2 /* growing_fiber.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

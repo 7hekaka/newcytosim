@@ -107,6 +107,7 @@ void Simul::step()
     // mix object lists
     events.shuffle();
     organizers.shuffle();
+    tubules.shuffle();
     beads.shuffle();
     solids.shuffle();
     fibers.shuffle();
@@ -120,6 +121,7 @@ void Simul::step()
     // Monte-Carlo step for all objects
     events.step();
     organizers.step();
+    tubules.step();
     fields.step();
     spaces.step();
     spheres.step();
