@@ -129,7 +129,7 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    size_t              family;
+    unsigned            family;
 #endif
 
     /// the Property of this object

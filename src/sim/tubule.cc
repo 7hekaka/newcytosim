@@ -29,7 +29,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     fil_[NFIL+1] = fil_[1];
     
 #if ( DIM >= 3 )
-    Vector E(0,1,0), F(0,0,1);
+    Vector E(0,tube_radius,0), F(0,0,tube_radius);
     {
         // find average direction
         Vector dir(0,0,0);
@@ -41,12 +41,15 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         F *= tube_radius;
     }
     // adjust protofilaments to form a tube:
+    real a = M_PI * RNG.sreal();
+    real da = 2 * M_PI / NFIL;
     for ( size_t i = 0; i < NFIL; ++i )
     {
-        real a = i * ( 2 * M_PI / NFIL );
         fil_[i]->translate(cos(a)*E+sin(a)*F);
+        a += da;
     }
 #endif
+    
     // set as left-handed helix:
     assert_true(signature());
     for ( size_t i = 0; i < NFIL; ++i )

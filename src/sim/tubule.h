@@ -14,19 +14,23 @@ class Fiber;
 class Simul;
 class Meca;
 
-
+/*
+ 13 fibers arranged in a tubular configurations into a Microtubule
+ 
+ FJN, Cambridge, Sept--Oct 2019
+ */
 class Tubule : public Object
 {
 private:
     
     /// number of protofilaments
-    constexpr static size_t NFIL = 13;
+    static constexpr size_t NFIL = 13;
     
     /// initial radius of tubule
-    constexpr static real tube_radius = 0.010;
+    static constexpr real tube_radius = 0.010;
     
     /// distance between protofilaments
-    constexpr static real fil_offset = 0.0045;
+    static constexpr real fil_offset = 0.0045;
 
     
     /// constitutive filaments

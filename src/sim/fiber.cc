@@ -15,8 +15,6 @@
 #include "sim.h"
 
 
-#pragma mark - Step
-
 
 void Fiber::step()
 {
@@ -154,7 +152,7 @@ Fiber::Fiber(FiberProp const* p)
     frGlue = nullptr;
 #endif
 #if FIBER_HAS_FAMILY
-    family  = 0;
+    family = RNG.pint();
 #endif
 #if NEW_FIBER_CHEW
     frChewM = 0;

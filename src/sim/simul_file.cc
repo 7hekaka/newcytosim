@@ -267,7 +267,7 @@ private:
     bool  frozen;
     
     /// value of flag
-    constexpr static ObjectFlag FLAG = 777;
+    static constexpr ObjectFlag FLAG = 777;
     
 public:
     
