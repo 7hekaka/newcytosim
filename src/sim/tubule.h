@@ -28,9 +28,6 @@ private:
     
     /// initial radius of tubule
     static constexpr real tube_radius = 0.010;
-    
-    /// distance between protofilaments
-    static constexpr real fil_offset = 0.0045;
 
     
     /// constitutive filaments

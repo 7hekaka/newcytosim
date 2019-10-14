@@ -84,59 +84,111 @@ void Tubule::step(Simul&)
 ///
 void Tubule::setInteractions(Meca& meca)
 {
-    const real stiffL = prop->stiffness[0];
-    const real stiffA = prop->stiffness[1];
-    const real len = fil_offset;  // distance between protofilaments
+    const real stiff = prop->stiffness[0];
+    //const real stiffA = prop->stiffness[1];
+    
+    const real ang = M_PI / NFIL;
+    const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
 #if ( DIM >= 3 )
-    const real ang = 2 * M_PI / NFIL;
     real co = cos(ang), si = sin(ang);
     
     assert_true(fil_[0]);
     const size_t end = fil_[0]->nbPoints() - 1;
     
     MatrixBlock mat;
-    for ( size_t i = 0; i <= end; ++i )
+    Vector cen, dir;
+    
+    for ( size_t i = 0; i < end; ++i )
     {
         // get centerline
-        Vector cen(0,0,0);
+        cen.reset();
         for ( size_t n = 0; n < NFIL; ++n )
             cen += fil_[n]->posPoint(i);
         cen /= NFIL;
         
-        if ( i < end )
-        {
-            // get average direction of the Tubule at this location:
-            Vector dir(0,0,0);
-            for ( size_t n = 0; n < NFIL; ++n )
-                dir += fil_[n]->diffPoints(i);
-            dir.normalize();
-            
-            // create rotation matrix for torque:
-            mat = Meca::torqueMatrix(stiffA, dir, co, si);
-            
-            for ( size_t n = 0; n < NFIL; ++n )
-            {
-                Vector arm = (2*cen - fil_[n]->posPoint(i)- fil_[n+1]->posPoint(i)).normalized(len);
-                meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
-            }
-        }
-        else
-        {
-            for ( size_t n = 0; n < NFIL; ++n )
-            {
-                Vector arm = (2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(len);
-                meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), arm, stiffL);
-            }
-        }
+        // get average direction of the Tubule at this location:
+        dir.reset();
+        for ( size_t n = 0; n < NFIL; ++n )
+            dir += fil_[n]->diffPoints(i);
+        dir.normalize();
         
         for ( size_t n = 0; n < NFIL; ++n )
         {
-            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i),
-                           Mecapoint(fil_[n+2],i), mat, stiffA);
+            Vector arm = ( 2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i) ).normalized(len);
+            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiff);
         }
+    }
+
+    // get centerline
+    cen.reset();
+    for ( size_t n = 0; n < NFIL; ++n )
+        cen += fil_[n]->posPoint(end);
+    cen /= NFIL;
+    
+    for ( size_t n = 0; n < NFIL; ++n )
+    {
+        Vector arm = ( 2*cen - fil_[n]->posPoint(end) - fil_[n+1]->posPoint(end) ).normalized(len);
+        meca.addSideLink3D(Interpolation(fil_[n],end-1,end,1), Mecapoint(fil_[n+1],end), arm, stiff);
     }
 #endif
 }
+
+/*
+ void Tubule::setInteractions(Meca& meca)
+ {
+     const real stiffL = prop->stiffness[0];
+     const real stiffA = prop->stiffness[1];
+     const real len = fil_offset;  // distance between protofilaments
+ #if ( DIM >= 3 )
+     const real ang = 2 * M_PI / NFIL;
+     real co = cos(ang), si = sin(ang);
+     
+     assert_true(fil_[0]);
+     const size_t end = fil_[0]->nbPoints() - 1;
+     
+     MatrixBlock mat;
+     for ( size_t i = 0; i <= end; ++i )
+     {
+         // get centerline
+         Vector cen(0,0,0);
+         for ( size_t n = 0; n < NFIL; ++n )
+             cen += fil_[n]->posPoint(i);
+         cen /= NFIL;
+         
+         if ( i < end )
+         {
+             // get average direction of the Tubule at this location:
+             Vector dir(0,0,0);
+             for ( size_t n = 0; n < NFIL; ++n )
+                 dir += fil_[n]->diffPoints(i);
+             dir.normalize();
+             
+             // create rotation matrix for torque:
+             mat = Meca::torqueMatrix(stiffA, dir, co, si);
+             
+             for ( size_t n = 0; n < NFIL; ++n )
+             {
+                 Vector arm = (2*cen - fil_[n]->posPoint(i)- fil_[n+1]->posPoint(i)).normalized(len);
+                 meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
+             }
+         }
+         else
+         {
+             for ( size_t n = 0; n < NFIL; ++n )
+             {
+                 Vector arm = (2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(len);
+                 meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), arm, stiffL);
+             }
+         }
+         
+         for ( size_t n = 0; n < NFIL; ++n )
+         {
+             meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i),
+                            Mecapoint(fil_[n+2],i), mat, stiffA);
+         }
+     }
+ #endif
+ }*/
 
 
 void Tubule::write(Outputter& out) const
