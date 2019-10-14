@@ -90,48 +90,49 @@ void Tubule::setInteractions(Meca& meca)
     const real ang = M_PI / NFIL;
     const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
 #if ( DIM >= 3 )
-    real co = cos(ang), si = sin(ang);
+    real c = cos(ang), s = sin(ang);
     
     assert_true(fil_[0]);
     const size_t end = fil_[0]->nbPoints() - 1;
     
-    MatrixBlock mat;
-    Vector cen, dir;
-    
+    Rotation mat(0,1);
+
     for ( size_t i = 0; i < end; ++i )
     {
         // get centerline
-        cen.reset();
+        Vector cen(0,0,0);
         for ( size_t n = 0; n < NFIL; ++n )
             cen += fil_[n]->posPoint(i);
         cen /= NFIL;
         
         // get average direction of the Tubule at this location:
-        dir.reset();
+        Vector dir(0,0,0);
         for ( size_t n = 0; n < NFIL; ++n )
             dir += fil_[n]->diffPoints(i);
         dir.normalize();
+        mat = Rotation::rotationAroundAxis(dir, c, s);
         
         for ( size_t n = 0; n < NFIL; ++n )
         {
-            Vector arm = ( 2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i) ).normalized(len);
+            Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(i) ).normalized(len));
             meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiff);
         }
     }
 
     // get centerline
-    cen.reset();
+    Vector cen(0,0,0);
     for ( size_t n = 0; n < NFIL; ++n )
         cen += fil_[n]->posPoint(end);
     cen /= NFIL;
     
     for ( size_t n = 0; n < NFIL; ++n )
     {
-        Vector arm = ( 2*cen - fil_[n]->posPoint(end) - fil_[n+1]->posPoint(end) ).normalized(len);
+        Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(end) ).normalized(len));
         meca.addSideLink3D(Interpolation(fil_[n],end-1,end,1), Mecapoint(fil_[n+1],end), arm, stiff);
     }
 #endif
 }
+
 
 /*
  void Tubule::setInteractions(Meca& meca)
