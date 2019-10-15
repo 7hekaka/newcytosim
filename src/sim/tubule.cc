@@ -8,6 +8,18 @@
 #include "meca.h"
 
 
+Tubule::Tubule(TubuleProp * p) : prop(p)
+{
+    reset();
+}
+
+
+Tubule::~Tubule()
+{
+    prop = nullptr;
+}
+
+
 void Tubule::reset()
 {
     for ( size_t i = 0; i < NFIL+2; ++i )
@@ -54,6 +66,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     assert_true(signature());
     for ( size_t i = 0; i < NFIL; ++i )
     {
+        Buddy::connect(fil_[i]);
         fil_[i]->setOrigin(i*(-0.012/NFIL));
 #if FIBER_HAS_FAMILY
         fil_[i]->family = signature();
@@ -64,15 +77,19 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
 }
 
 
-Tubule::Tubule(TubuleProp * p) : prop(p)
+void Tubule::goodbye(Buddy * b)
 {
-    reset();
-}
-
-
-Tubule::~Tubule()
-{
-    prop = nullptr;
+    std::cerr << "ERROR: Tubule's filaments cannot be deleted\n";
+    if ( b )
+    {
+        for ( size_t i = 0; i < NFIL+2; ++i )
+            if ( fil_[i] == b )
+            {
+                fil_[i] = nullptr;
+                return;
+            }
+        std::cerr << "CYTOSIM ERROR: unknown buddy" << b << std::endl;
+    }
 }
 
 

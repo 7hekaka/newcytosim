@@ -123,6 +123,8 @@ void Parser::parse_set(std::istream& is)
             // adjust the name of the 'simul' property:
             if ( simul.prop->name() == "undefined" )
                 simul.prop->rename(name);
+            else if ( simul.prop->name() != name )
+                throw InvalidSyntax("only one `simul' can be defined");
             VLOG(" simul is named `" << name << "'\n");
             opt.read(blok);
             execute_change(name, opt);

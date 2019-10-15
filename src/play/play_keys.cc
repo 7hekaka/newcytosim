@@ -301,7 +301,7 @@ void changeScale(FiberDisp* p, int d)
 
 void changeColoring(FiberDisp* p, int)
 {
-    p->coloring = ( p->coloring + 1 ) % 7;
+    p->coloring = ( p->coloring + 1 ) % 8;
     switch( p->coloring )
     {
         case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");           break;
@@ -309,6 +309,7 @@ void changeColoring(FiberDisp* p, int)
         case FiberDisp::COLORING_DIRECTION: flashText("Fibers: coloring by direction"); break;
         case FiberDisp::COLORING_MARK:      flashText("Fibers: coloring by mark");      break;
         case FiberDisp::COLORING_FLAG:      flashText("Fibers: coloring by flag");      break;
+        case FiberDisp::COLORING_FAMILY:    flashText("Fibers: coloring by family");    break;
         case FiberDisp::COLORING_CLUSTER:   flashText("Fibers: coloring by cluster");   break;
         case FiberDisp::COLORING_AGE:       flashText("Fibers: coloring by age");       break;
     }

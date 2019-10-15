@@ -2183,8 +2183,8 @@ void Meca::addSideLink3D(const Interpolation & ptA,
     real ey = eps * arm.YY;
     real ez = eps * arm.ZZ;
 
-    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = alpha - len * R
-    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = beta + len * R
+    MatrixBlock aR(cc0, ez,-ey,-ez, cc0, ex, ey,-ex, cc0);  // aR = cc0 - len * R
+    MatrixBlock bR(cc1,-ez, ey, ez, cc1,-ex,-ey, ex, cc1);  // bR = cc1 + len * R
 
 #if 0
     std::cerr.precision(3);

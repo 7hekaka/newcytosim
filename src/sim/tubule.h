@@ -8,6 +8,7 @@
 #include "tubule_prop.h"
 #include "glossary.h"
 #include "object.h"
+#include "buddy.h"
 #include "real.h"
 
 class Fiber;
@@ -19,7 +20,7 @@ class Meca;
  
  FJN, Cambridge, Sept--Oct 2019
  */
-class Tubule : public Object
+class Tubule : public Object, private Buddy
 {
 private:
     
@@ -52,6 +53,10 @@ public:
     
     /// create filaments
     ObjectList build(Glossary&, Simul&);
+    
+    /// handles the disapearance of one of the filament
+    void       goodbye(Buddy *);
+
     
     /// a unique character identifying the class
     static const ObjectTag TAG = 't';

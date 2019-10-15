@@ -220,6 +220,11 @@ void Display::prepareLineDisp(const Fiber * fib)
         case FiberDisp::COLORING_FLAG:
             self->color = gle::std_color(fib->flag());
             break;
+        case FiberDisp::COLORING_FAMILY:
+#if FIBER_HAS_FAMILY
+            self->color = gle::nice_color(fib->family);
+#endif
+            break;
         case FiberDisp::COLORING_CLUSTER:
             self->color = gle::std_color(fib->flag());
             break;

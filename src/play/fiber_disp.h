@@ -26,6 +26,7 @@ public:
         COLORING_DIRECTION,
         COLORING_MARK,
         COLORING_FLAG,
+        COLORING_FAMILY,
         COLORING_CLUSTER,
         COLORING_AGE
     };

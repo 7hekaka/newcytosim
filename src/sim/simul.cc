@@ -190,7 +190,6 @@ void Simul::foldPosition() const
         spheres.foldPosition(modulo);
         singles.foldPosition(modulo);
         couples.foldPosition(modulo);
-        organizers.foldPosition(modulo);
     }
 }
 
