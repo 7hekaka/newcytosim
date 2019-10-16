@@ -180,14 +180,21 @@ public:
     /// rewind file
     void       rewind()          { lock(); reader.rewind(); unlock(); }
  
-    /// index of current frame
-    int        currFrame() const { return reader.currFrame(); }
     
     /// attempt to load specified frame from file (0 = first frame; -1 = last frame)
-    int        loadFrame(int f)  { lock(); int r=reader.loadFrame(simul, f); unlock(); return r; }
+    int        loadFrame(long f) { lock(); int r=reader.loadFrame(simul, f); unlock(); return r; }
 
     /// load next frame in file
     int        loadNextFrame()   { lock(); int r=reader.loadNextFrame(simul); unlock(); return r; }
+    
+    /// attempt to load last frame from file
+    int        loadLastFrame()   { lock(); int r=reader.loadLastFrame(simul); unlock(); return r; }
+        
+    /// true if current frame is valid
+    bool       hasFrame() const { return reader.hasFrame(); }
+
+    /// index of current frame
+    long       currentFrame() const { return reader.currentFrame(); }
 
     
     /// return the Single that is manipulated by the User
