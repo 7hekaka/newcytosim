@@ -24,7 +24,7 @@ set fiber actin
     rigidity = 0.06
     segmentation = 0.05
     confine = surface, 50
-    display = { display_shift=0.1; color=0xFFFFFFAA; interval=1; line=2,1; coloring=0,50; tension=-10 }
+    display = { display_shift=0.1; color=0xFFFFFFAA; interval=1; line=2,1; coloring=0,50; tension_scale=-10 }
     
     activity = treadmill
     growing_speed = 0.03, 0

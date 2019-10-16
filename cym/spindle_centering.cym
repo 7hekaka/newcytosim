@@ -43,7 +43,7 @@ set fiber microtubule
 % make filaments shrink if they are outside the Space:
     shrink_outside = 1
     
-    display = ( line=5,2; tension=5 )
+    display = ( line=5,2; tension_scale=5 )
 }
 
 set solid core

@@ -26,7 +26,7 @@ set fiber filament
     binding_key = 1
     rigidity = 1
     segmentation = 0.1
-    display = ( line=1, 1; color=white; tension=10;)
+    display = ( line=1, 1; color=white; tension_scale=10;)
 }
 
 set fiber myofilament
@@ -35,7 +35,7 @@ set fiber myofilament
     confine = inside, 1
     rigidity = 100
     segmentation = 1
-    display = ( line=3; color=dark_green; tension=1; )
+    display = ( line=3; color=dark_green; tension_scale=1; )
 }
 
 set hand binder

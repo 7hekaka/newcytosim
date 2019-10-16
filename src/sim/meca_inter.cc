@@ -83,12 +83,12 @@ inline void Meca::add_block(index_t i, index_t j, MatrixBlock const& T)
     if ( j > i )
         printf("+off-side %i %i\n", i, j);
 #endif
-#if ( DIM == 1 )
-    mB(i,j) += T.value();
-#elif USE_MATRIX_BLOCK
+#if USE_MATRIX_BLOCK
     assert_true( i > j );
     mC.block(i, j).add_full(T);
     //PRINT_BLOCK(i,j,T);
+#elif ( DIM == 1 )
+    mB(i,j) += T.value();
 #else
     assert_true( i > j );
     for ( int x = 0; x < DIM; ++x )
@@ -104,12 +104,12 @@ inline void Meca::add_block(index_t i, index_t j, real alpha, MatrixBlock const&
     if ( j > i )
         printf(" off-side %i %i\n", i, j);
 #endif
-#if ( DIM == 1 )
-    mB(i,j) += alpha * T.value();
-#elif USE_MATRIX_BLOCK
+#if USE_MATRIX_BLOCK
     assert_true( i > j );
     mC.block(i, j).add_full(alpha, T);
     //PRINT_BLOCK(i,j,alpha*T);
+#elif ( DIM == 1 )
+    mB(i,j) += alpha * T.value();
 #else
     assert_true( i > j );
     for ( int x = 0; x < DIM; ++x )
@@ -125,12 +125,12 @@ inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
     if ( j > i )
         printf("-off-side %i %i\n", i, j);
 #endif
-#if ( DIM == 1 )
-    mB(i,j) -= T.value();
-#elif USE_MATRIX_BLOCK
+#if USE_MATRIX_BLOCK
     assert_true( i > j );
     mC.block(i, j).sub_full(T);
     //PRINT_BLOCK(i,j,-T);
+#elif ( DIM == 1 )
+    mB(i,j) -= T.value();
 #else
     assert_true( i > j );
     for ( int x = 0; x < DIM; ++x )
@@ -142,12 +142,12 @@ inline void Meca::sub_block(index_t i, index_t j, MatrixBlock const& T)
 // add T to the diagonal of mC. `T` should be symmetric
 inline void Meca::add_block_diag(index_t i, MatrixBlock const& T)
 {
-#if ( DIM == 1 )
-    mB(i,i) += T.value();
-#elif USE_MATRIX_BLOCK
+#if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mC.diag_block(i).add_half(T);
     //PRINT_BLOCK(i,i,T);
+#elif ( DIM == 1 )
+    mB(i,i) += T.value();
 #else
     // add lower part of block
     for ( int x = 0; x < DIM; ++x )
@@ -159,12 +159,12 @@ inline void Meca::add_block_diag(index_t i, MatrixBlock const& T)
 // add alpha * T to the diagonal of mC. `T` should be symmetric
 inline void Meca::add_block_diag(index_t i, real alpha, MatrixBlock const& T)
 {
-#if ( DIM == 1 )
-    mB(i,i) += alpha * T.value();
-#elif USE_MATRIX_BLOCK
+#if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mC.diag_block(i).add_half(alpha, T);
     //PRINT_BLOCK(i,i,alpha*T);
+#elif ( DIM == 1 )
+    mB(i,i) += alpha * T.value();
 #else
     // add lower part of block
     for ( int x = 0; x < DIM; ++x )
@@ -176,12 +176,12 @@ inline void Meca::add_block_diag(index_t i, real alpha, MatrixBlock const& T)
 // add -T to the diagonal of mC. `T` should be symmetric
 inline void Meca::sub_block_diag(index_t i, MatrixBlock const& T)
 {
-#if ( DIM == 1 )
-    mB(i,i) -= T.value();
-#elif USE_MATRIX_BLOCK
+#if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mC.diag_block(i).sub_half(T);
     //PRINT_BLOCK(i,i,-T);
+#elif ( DIM == 1 )
+    mB(i,i) -= T.value();
 #else
     // add lower part of block
     for ( int x = 0; x < DIM; ++x )
@@ -4240,7 +4240,7 @@ void Meca::addPlaneClamp(const Mecapoint & ptA,
     // vBAS[inx] += dir * ( weigth * dot(pos,dir) );
     add_base(inx, dir, weight*dot(pos, dir));
     
-#if ( DIM == 1 )
+#if ( DIM == 1 ) && USE_ISO_MATRIX
     mB(inx, inx) -= weight;
 #else
     // wT = -weight * [ dir (x) dir ]

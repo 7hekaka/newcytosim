@@ -28,7 +28,7 @@ set fiber filament
     confine = inside, 100
     segmentation = 0.2
     steric = 1, 0.05
-    display = { line_width=6; tension=10 }
+    display = { line_width=6; tension_scale=10 }
 }
 
 new filament
