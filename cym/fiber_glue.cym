@@ -57,7 +57,7 @@ set fiber microtubule
     rebirth_rate    = 1
     min_length      = 0.5
     
-    display = { line=8, 2; point=1; speckles=7, 2, 0.25; tension=-10 }
+    display = { line=8, 2; point=1; speckles=7, 2, 0.25; tension_scale=-10 }
 }
 
 set solid core

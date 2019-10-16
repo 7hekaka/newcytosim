@@ -49,7 +49,7 @@ set fiber microtubule
 {
     rigidity = 20
     segmentation = 0.1
-    display = ( line=10, 2; tension=-20; )
+    display = ( line=10, 2; tension_scale=-20; )
 }
 
 new 1 microtubule

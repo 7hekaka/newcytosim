@@ -124,6 +124,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(end_length, 2,    "end_section");
     glos.set(lattice_style,    "draw_lattice");
     glos.set(lattice_scale,    "lattice_max");
+    glos.set(tension_scale,    "tension");
 #endif
     
     glos.set(lattice_scale,    "lattice_scale");

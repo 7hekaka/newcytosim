@@ -80,12 +80,14 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     
     // define two orthogonal directions:
     Vector dir1, dir2;
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     Vector dir0 = normalize( apos - bpos );
     dir0.orthonormal(dir1, dir2);
-#else
+#elif ( DIM == 2 )
     dir1 = ( apos - bpos ).orthogonal(1);
     dir2 = dir1;
+#else
+    throw InvalidParameter("the Fake class is not valid in 1D");
 #endif
     
     asterPoints.clear();

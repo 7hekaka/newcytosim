@@ -34,7 +34,7 @@ set fiber filament
     growing_speed = 0.2
     total_polymer = 250
 
-    display = { line=6,2; tension=4 }
+    display = { line=6,2; tension_scale=4 }
 }
 
 

@@ -243,6 +243,12 @@ public:
         val_ += alpha * M.val_;
     }
     
+    /// subtract full matrix: this <- this + M
+    void sub_full(Matrix11 const& M)
+    {
+        val_ -= M.val_;
+    }
+
     /// add lower triangle of matrix including diagonal: this <- this + M
     void add_half(Matrix11 const& M)
     {
