@@ -88,7 +88,7 @@ void new_reals(real*& x, real*& y, real*& z, real mag)
     y = new_real(ALOC);
     z = new_real(ALOC);
     
-    for ( unsigned ii=0; ii<ALOC; ++ii )
+    for ( size_t ii=0; ii<ALOC; ++ii )
     {
         x[ii] = mag * RNG.sreal();
         y[ii] = mag * RNG.sreal();
@@ -110,10 +110,10 @@ void free_real(real* x, real* y, real* z)
 /*
  This is the simple implementation
  */
-void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
 #pragma vector unaligned
-    for ( unsigned jj = 0; jj < nbt; ++jj )
+    for ( size_t jj = 0; jj < nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
         Y[jj      ] -=   f;
@@ -125,12 +125,12 @@ void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
 /*
  This an implementation for 2D
  */
-void add_rigidity2(const unsigned nbt, const real* vec, const real rigid, real* Y)
+void add_rigidity2(const size_t nbt, const real* vec, const real rigid, real* Y)
 {
     real fx = 0;
     real fy = 0;
 #pragma vector unaligned
-    for ( unsigned jj = 0; jj < nbt; jj += 2 )
+    for ( size_t jj = 0; jj < nbt; jj += 2 )
     {
         real const* X = vec + jj;
         real gx = rigid * ( X[4] - X[2] - X[2] + X[0] );
@@ -152,7 +152,7 @@ void add_rigidity2(const unsigned nbt, const real* vec, const real rigid, real* 
  In this version for 2D or 3D, the loop is unrolled, pointers are used,
  and ( a0 -2*a1 + a2 ) is replaced by (a2-a1)-(a1-a0).
  */
-void add_rigidity3(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     const real * xn = X + DIM;
     
@@ -231,7 +231,7 @@ void add_rigidity3(const unsigned nbt, const real* X, const real rigid, real* Y)
 #endif
 }
 
-void add_rigidity_SSE(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -259,7 +259,7 @@ void add_rigidity_SSE(const unsigned nbt, const real* X, const real rigid, real*
 }
 
 /// older implementation
-void add_rigidity_SSO(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity_SSO(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -292,7 +292,7 @@ void add_rigidity_SSO(const unsigned nbt, const real* X, const real rigid, real*
 
 #ifdef __AVX__
 
-void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
@@ -356,7 +356,7 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
 
 #endif
 
-void add_rigidityE(const unsigned nbt, const real* X, const real R1, real* Y)
+void add_rigidityE(const size_t nbt, const real* X, const real R1, real* Y)
 {
     real const* E = X + nbt + DIM;  //index to last point
     
@@ -378,12 +378,12 @@ void add_rigidityE(const unsigned nbt, const real* X, const real R1, real* Y)
         const real R6 = R1 * 6;
         
         // this is where the bulk of the calculation takes place:
-        const int end = nbt;
+        const size_t end = nbt;
         #pragma ivdep
-        for ( int i = DIM*2; i < end; ++i )
+        for ( size_t i = DIM*2; i < end; ++i )
             Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
         
-        for ( int d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
             Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
@@ -394,22 +394,22 @@ void add_rigidityE(const unsigned nbt, const real* X, const real R1, real* Y)
 }
 
 
-void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
+void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
     const real R6 = R1 * 6;
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 
-    const int end = nbt;
+    const size_t end = nbt;
     #pragma ivdep
-    for ( int i = DIM*2; i < end; ++i )
+    for ( size_t i = DIM*2; i < end; ++i )
         Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
     
     // special cases near the edges:
     real      * Z = Y + nbt + DIM;
     real const* E = X + nbt + DIM;
     #pragma ivdep
-    for ( int d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
         Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
@@ -419,14 +419,14 @@ void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
 }
 
 
-inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*, real, real*), char const* str)
+inline void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
 {
     real * x = nullptr, * y = nullptr, * z = nullptr;
     new_reals(x, y, z, 1.0);
     
-    unsigned nbt = DIM * ( NBS - 1 );
+    size_t nbt = DIM * ( NBS - 1 );
     TicToc::tic();
-    for ( unsigned int i=0; i<cnt; ++i )
+    for ( size_t i=0; i<cnt; ++i )
     {
         func(nbt, y, scalar, x);
         func(nbt, x, scalar, z);
@@ -446,7 +446,7 @@ inline void testRigidity(unsigned cnt, void (*func)(const unsigned, const real*,
 }
 
 
-void testRigidity(unsigned cnt)
+void testRigidity(size_t cnt)
 {
     std::cout << "addRigidity " << DIM << "D " << NBS << "\n";
     testRigidity(cnt, add_rigidity0,    "0  ");
@@ -470,10 +470,10 @@ void testRigidity(unsigned cnt)
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP
 
-void projectForcesU_(unsigned nbs, const real* dif, const real* vec, real* mul)
+void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
 {
     #pragma vector unaligned
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const real * X = vec + DIM * jj;
         const real * d = dif + DIM * jj;
@@ -493,7 +493,7 @@ void projectForcesU_(unsigned nbs, const real* dif, const real* vec, real* mul)
  Perform first calculation needed by projectForces:
  tmp <- J * X
  */
-inline void projectForcesU_SSE(unsigned nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pM = dif;
     const real* pX = X;
@@ -537,7 +537,7 @@ __m256i make_mask(long i)
  tmp <- J * X
  F. Nedelec, 9.12.2016
  */
-inline void projectForcesU_AVX(unsigned nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pM = dif;
     const real* pX = X;
@@ -595,7 +595,7 @@ inline void projectForcesU_AVX(unsigned nbs, const real* dif, const real* X, rea
  nbs-th point of tmp, which should be allocated accordingly.
  F. Nedelec, 11.01.2018
  */
-inline void projectForcesU_AVY(unsigned nbs, const real* dif, const real* X, real* tmp)
+inline void projectForcesU_AVY(size_t nbs, const real* dif, const real* X, real* tmp)
 {
     const real* pM = dif;
     const real* pX = X;
@@ -629,17 +629,17 @@ inline void projectForcesU_AVY(unsigned nbs, const real* dif, const real* X, rea
  Perform second calculation needed by projectForces:
  Y <- X + Jt * tmp
  */
-void projectForcesD_(unsigned nbs, const real* dif, const real* X, const real* mul, real* Y)
+void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
 {
-    for ( unsigned d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
+    for ( size_t d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
     {
         Y[d] = X[d] + dif[d    ] * mul[    0];
         Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
     }
     
-    for ( unsigned jj = 1; jj < nbs; ++jj )
+    for ( size_t jj = 1; jj < nbs; ++jj )
     {
-        const unsigned kk = DIM*jj;
+        const size_t kk = DIM*jj;
         Y[kk  ] = X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
         Y[kk+1] = X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
 #if ( DIM > 2 )
@@ -652,7 +652,7 @@ void projectForcesD_(unsigned nbs, const real* dif, const real* X, const real* m
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD__(unsigned nbs, const real* dif,
+void projectForcesD__(size_t nbs, const real* dif,
                       const real* X, const real* mul, real* Y)
 {
     real a0 = dif[0] * mul[0];
@@ -667,9 +667,9 @@ void projectForcesD__(unsigned nbs, const real* dif,
     Y[2] = X[2] + a2;
 #endif
     
-    for ( unsigned jj = 1; jj < nbs; ++jj )
+    for ( size_t jj = 1; jj < nbs; ++jj )
     {
-        const unsigned kk = DIM * jj;
+        const size_t kk = DIM * jj;
         real b0 = dif[kk  ] * mul[jj];
         Y[kk  ] = X[kk  ] + b0 - a0;
         a0 = b0;
@@ -685,7 +685,7 @@ void projectForcesD__(unsigned nbs, const real* dif,
 #endif
     }
     
-    const unsigned ee = DIM * nbs;
+    const size_t ee = DIM * nbs;
     Y[ee  ] = X[ee  ] - a0;
     Y[ee+1] = X[ee+1] - a1;
 #if ( DIM > 2 )
@@ -697,7 +697,7 @@ void projectForcesD__(unsigned nbs, const real* dif,
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD___(unsigned nbs, const real* dif, const real* X, const real* lag, real* Y)
+void projectForcesD___(size_t nbs, const real* dif, const real* X, const real* lag, real* Y)
 {
     real a0 = X[0];
     real a1 = X[1];
@@ -705,9 +705,9 @@ void projectForcesD___(unsigned nbs, const real* dif, const real* X, const real*
     real a2 = X[2];
 #endif
     
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        const unsigned kk = DIM * jj;
+        const size_t kk = DIM * jj;
         real b0 = dif[kk  ] * lag[jj];
         real b1 = dif[kk+1] * lag[jj];
 #if ( DIM > 2 )
@@ -727,7 +727,7 @@ void projectForcesD___(unsigned nbs, const real* dif, const real* X, const real*
 #endif
     }
     
-    const unsigned ee = DIM * nbs;
+    const size_t ee = DIM * nbs;
     Y[ee  ] = a0;
     Y[ee+1] = a1;
 #if ( DIM > 2 )
@@ -739,7 +739,7 @@ void projectForcesD___(unsigned nbs, const real* dif, const real* X, const real*
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD_PTR(unsigned nbs, const real* dif,
+void projectForcesD_PTR(size_t nbs, const real* dif,
                         const real* X, const real* mul, real* Y)
 {
     // Y <- X + Jt * tmp :
@@ -786,7 +786,7 @@ void projectForcesD_PTR(unsigned nbs, const real* dif,
 /**
  Perform second calculation needed by projectForces:
  */
-inline void projectForcesD_SSE(unsigned nbs, const real* dif,
+inline void projectForcesD_SSE(size_t nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -820,7 +820,7 @@ inline void projectForcesD_SSE(unsigned nbs, const real* dif,
  Y <- X + Jt * tmp
  F. Nedelec, 9.12.2016
  */
-inline void projectForcesD_AVX(unsigned nbs, const real* dif,
+inline void projectForcesD_AVX(size_t nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -876,13 +876,13 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif,
 #pragma mark - Test
 
 
-inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*, real*), char const* str)
+inline void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_reals(x, y, z, 1.0);
 
     TicToc::tic();
-    for ( unsigned ii=0; ii<cnt; ++ii )
+    for ( size_t ii=0; ii<cnt; ++ii )
     {
         func(NBS, diff, y, z);
         // check the code with unaligned memory:
@@ -899,13 +899,13 @@ inline void testU(unsigned cnt, void (*func)(unsigned, const real*, const real*,
 }
 
 
-inline void testD(unsigned cnt, void (*func)(unsigned, const real*, const real*, const real*, real*), char const* str)
+inline void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_reals(x, y, z, 1.0);
 
     TicToc::tic();
-    for ( unsigned ii=0; ii<cnt; ++ii )
+    for ( size_t ii=0; ii<cnt; ++ii )
     {
         func(NBS, diff, x, y, z);
         // check the code with unaligned memory:
@@ -922,7 +922,7 @@ inline void testD(unsigned cnt, void (*func)(unsigned, const real*, const real*,
 }
 
 
-void testProjectionU(unsigned cnt)
+void testProjectionU(size_t cnt)
 {
     std::cout << "ProjectForces\n";
     testU(cnt, projectForcesU_,    "U_   ");
@@ -935,7 +935,7 @@ void testProjectionU(unsigned cnt)
 #endif
 }
 
-void testProjectionD(unsigned cnt)
+void testProjectionD(size_t cnt)
 {
     std::cout << "ProjectForces\n";
     testD(cnt, projectForcesD_,    "D_   ");

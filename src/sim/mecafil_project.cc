@@ -167,10 +167,10 @@ void Mecafil::makeProjection()
  Perform first calculation needed by projectForces:
  tmp <- J * X
  */
-void projectForcesU_(unsigned nbs, const real* dif, const real* vec, real* mul)
+void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
 {
     #pragma vector unaligned
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const real * X = vec + DIM * jj;
         const real * d = dif + DIM * jj;
@@ -187,17 +187,17 @@ void projectForcesU_(unsigned nbs, const real* dif, const real* vec, real* mul)
  Perform second calculation needed by projectForces:
  Y <- s * ( X + Jt * tmp )
  */
-void projectForcesD_(unsigned nbs, const real* dif, const real* X, const real* mul, real* Y)
+void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
 {
-    for ( unsigned d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
+    for ( size_t d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
     {
         Y[d] = X[d] + dif[d    ] * mul[    0];
         Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
     }
     
-    for ( unsigned jj = 1; jj < nbs; ++jj )
+    for ( size_t jj = 1; jj < nbs; ++jj )
     {
-        const unsigned kk = DIM*jj;
+        const size_t kk = DIM*jj;
         Y[kk  ] = X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
         Y[kk+1] = X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
 #if ( DIM > 2 )
@@ -210,7 +210,7 @@ void projectForcesD_(unsigned nbs, const real* dif, const real* X, const real* m
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD__(unsigned nbs, const real* dif,
+void projectForcesD__(size_t nbs, const real* dif,
                       const real* X, const real* mul, real* Y)
 {
     real a0 = dif[0] * mul[0];
@@ -225,9 +225,9 @@ void projectForcesD__(unsigned nbs, const real* dif,
     Y[2] = X[2] + a2;
 #endif
     
-    for ( unsigned jj = 1; jj < nbs; ++jj )
+    for ( size_t jj = 1; jj < nbs; ++jj )
     {
-        const unsigned kk = DIM * jj;
+        const size_t kk = DIM * jj;
         real b0 = dif[kk  ] * mul[jj];
         Y[kk  ] = X[kk  ] + b0 - a0;
         a0 = b0;
@@ -243,7 +243,7 @@ void projectForcesD__(unsigned nbs, const real* dif,
 #endif
     }
     
-    const unsigned ee = DIM * nbs;
+    const size_t ee = DIM * nbs;
     Y[ee  ] = X[ee  ] - a0;
     Y[ee+1] = X[ee+1] - a1;
 #if ( DIM > 2 )
@@ -259,7 +259,7 @@ void projectForcesD__(unsigned nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_SSE(unsigned nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pD = dif;
     const real* pX = X;
@@ -290,7 +290,7 @@ inline void projectForcesU_SSE(unsigned nbs, const real* dif, const real* X, rea
 /**
  Perform second calculation needed by projectForces:
  */
-inline void projectForcesD_SSE(unsigned nbs, const real* dif,
+inline void projectForcesD_SSE(size_t nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -325,7 +325,7 @@ inline void projectForcesD_SSE(unsigned nbs, const real* dif,
  tmp <- J * X
  F. Nedelec, 9.12.2016, 6.9.2018
  */
-inline void projectForcesU_AVX(unsigned nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pD = dif;
     const real* pX = X;
@@ -369,7 +369,7 @@ inline void projectForcesU_AVX(unsigned nbs, const real* dif, const real* X, rea
  an array containing contiguous coordinates
  F. Nedelec, 9.12.2016, 23.03.2018
  */
-inline void projectForcesD_AVX(unsigned nbs, const real* dif,
+inline void projectForcesD_AVX(size_t nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -424,7 +424,7 @@ inline void projectForcesD_AVX(unsigned nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_PTR(unsigned nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real * pX = X + DIM;
     const real * pM = dif;
@@ -458,7 +458,7 @@ inline void projectForcesU_PTR(unsigned nbs, const real* dif, const real* X, rea
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_PTR2(unsigned nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_PTR2(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real * pX = X + DIM;
     const real * pM = dif;
@@ -521,7 +521,7 @@ inline void projectForcesU_PTR2(unsigned nbs, const real* dif, const real* X, re
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD_PTR(unsigned nbs, const real* dif,
+void projectForcesD_PTR(size_t nbs, const real* dif,
                         const real* X, const real* mul, real* Y)
 {
     // Y <- X + Jt * tmp :
@@ -690,7 +690,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     
     //----- we remove compressive forces ( negative Lagrange-multipliers )
     useProjectionDiff = false;
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         if ( rfLag[jj] > 0 )
         {
@@ -704,7 +704,7 @@ void Mecafil::makeProjectionDiff(const real* force)
         const real th = 0.0;
         const real sc = 1.0 / segmentation();
         #pragma vector unaligned
-        for ( unsigned jj = 0; jj < nbs; ++jj )
+        for ( size_t jj = 0; jj < nbs; ++jj )
             mtJJtiJforce[jj] = std::max(th, rfLag[jj] * sc);
         
         //std::clog << "projectionDiff: " << blas::nrm2(nbs, mtJJtiJforce) << std::endl;
@@ -716,11 +716,11 @@ void Mecafil::makeProjectionDiff(const real* force)
 //------------------------------------------------------------------------------
 
 ///straightforward implementation:
-inline void add_projectiondiff(const unsigned nbs, const real* mul, const real* X, real* Y)
+inline void add_projectiondiff(const size_t nbs, const real* mul, const real* X, real* Y)
 {
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             const real w = mul[jj] * ( X[DIM*jj+DIM+d] - X[DIM*jj+d] );
             Y[DIM*jj    +d] += w;
@@ -730,10 +730,10 @@ inline void add_projectiondiff(const unsigned nbs, const real* mul, const real* 
 }
 
 ///expanded implementation:
-inline void add_projectiondiffR(const unsigned nbs, const real* mul, const real* X, real* Y)
+inline void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     // this loop cannot be unrolled as there is an OUTPUT dependency in Y
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const real x = mul[jj] * ( X[DIM*jj+DIM  ] - X[DIM*jj  ] );
         Y[DIM*jj      ] += x;
@@ -753,7 +753,7 @@ inline void add_projectiondiffR(const unsigned nbs, const real* mul, const real*
 
 
 ///scalar implementation
-inline void add_projectiondiffF(const unsigned nbs, const real* mul, const real* X, real* Y)
+inline void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     real px0 = X[0];
     real px1 = X[1];
@@ -764,7 +764,7 @@ inline void add_projectiondiffF(const unsigned nbs, const real* mul, const real*
     real pw2 = 0;
 #endif
     
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const real m = mul[jj];
         real x0 = X[DIM*jj+DIM  ];
@@ -804,12 +804,12 @@ inline void add_projectiondiffF(const unsigned nbs, const real* mul, const real*
 
 #include "simd.h"
 
-inline void add_projectiondiffSSE(const unsigned nbs, const real* mul, const real* X, real* Y)
+inline void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     vec2 px = load2(X);
     vec2 pw = setzero2();
     
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         vec2 m = loaddup2(mul+jj);
         vec2 x = load2(X+DIM*jj+DIM);
@@ -828,7 +828,7 @@ inline void add_projectiondiffSSE(const unsigned nbs, const real* mul, const rea
 
 #include "simd.h"
 
-inline void add_projectiondiffAVX(const unsigned nbs, const real* mul, const real* X, real* Y)
+inline void add_projectiondiffAVX(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     real * pY = Y;
     real const* pX = X;

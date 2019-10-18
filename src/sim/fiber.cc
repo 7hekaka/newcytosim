@@ -57,7 +57,7 @@ void Fiber::step()
     //assert_false(hasKink(0));
 #if ( 0 )
     // Cut kinked filaments
-    unsigned p = hasKink(0);
+    size_t p = hasKink(0);
     if ( p )
     {
         PRINT_ONCE("SEVER_KINKED_FIBERS\n");
@@ -198,7 +198,7 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
     real abs = 0, len = segmentation();
     
     // try all segments
-    for ( unsigned int ii = 0; ii < nbSegments(); ++ii )
+    for ( size_t ii = 0; ii < nbSegments(); ++ii )
     {
         //check the segment:
         FiberSegment s(this, ii);
@@ -298,7 +298,7 @@ void Fiber::cutP(real len)
  .
  @return zero, if `pti` is not an internal point
  */
-Fiber* Fiber::severPoint(unsigned int pti)
+Fiber* Fiber::severPoint(size_t pti)
 {
     if ( pti == 0  ||  pti >= lastPoint() )
         return nullptr;
@@ -515,10 +515,10 @@ void Fiber::severNow()
  returns index of first point for which ( cos(angle) < max_cosine ),
  or zero
  */
-unsigned Fiber::hasKink(const real max_cosine) const
+size_t Fiber::hasKink(const real max_cosine) const
 {
-    unsigned end = nPoints - 2;
-    for ( unsigned p = 0; p < end; ++p )
+    size_t end = nPoints - 2;
+    for ( size_t p = 0; p < end; ++p )
     {
         if ( dot(diffPoints(p), diffPoints(p+1)) < max_cosine )
             return p+1;
@@ -854,7 +854,7 @@ void Fiber::setInteractions(Meca & meca) const
         // squeezing force in the YZ-plane:
         const real f = prop->squeeze_force;
         const real r = prop->squeeze_range;
-        for ( unsigned p = 0; p < nPoints; ++p )
+        for ( size_t p = 0; p < nPoints; ++p )
         {
             Vector p = posP(pp);
             if ( p.normYZ() < r )
@@ -875,7 +875,7 @@ void Fiber::setInteractions(Meca & meca) const
     if ( prop->colinear_force )
     {
         real s = 0.5 * prop->colinear_force * segmentation();
-        for ( unsigned i = 0; i < nbSegments(); ++i )
+        for ( size_t i = 0; i < nbSegments(); ++i )
         {
             Vector f = s * dirSegment(i);
             meca.addForce(Mecapoint(this, i  ), f);
@@ -890,7 +890,7 @@ void Fiber::setInteractions(Meca & meca) const
         switch ( prop->confine )
         {
             case CONFINE_INSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     Vector pos = posP(i);
                     if ( spc->outside(pos) )
@@ -899,7 +899,7 @@ void Fiber::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     Vector pos = posP(i);
                     if ( spc->inside(pos) )
@@ -908,7 +908,7 @@ void Fiber::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_ON:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                     spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
                 break;
                 
@@ -940,9 +940,9 @@ void Fiber::setInteractions(Meca & meca) const
             case CONFINE_RANGE:
             {
                 // we use here the MINUS_END as a reference... which maybe problematic
-                unsigned S = clampedIndexM(prop->confine_range[0]);
-                unsigned E = clampedIndexM(prop->confine_range[1]);
-                for ( unsigned i = S; i < E; ++i )
+                size_t S = clampedIndexM(prop->confine_range[0]);
+                size_t E = clampedIndexM(prop->confine_range[1]);
+                for ( size_t i = S; i < E; ++i )
                     spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
             } break;
 #endif
@@ -960,7 +960,7 @@ void Fiber::setInteractions(Meca & meca) const
         switch ( prop->confine2 )
         {
             case CONFINE_INSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     Vector pos = posP(i);
                     if ( spc->outside(pos) )
@@ -969,7 +969,7 @@ void Fiber::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     Vector pos = posP(i);
                     if ( spc->inside(pos) )
@@ -978,7 +978,7 @@ void Fiber::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_ON:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                     spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine2_stiffness);
                 break;
                 
@@ -1103,9 +1103,9 @@ void Fiber::sortHands() const
 }
 
 
-unsigned Fiber::nbHands() const
+size_t Fiber::nbHands() const
 {
-    unsigned res = 0;
+    size_t res = 0;
     
     for ( Hand const* ha = handListFront; ha; ha = ha->next() )
         ++res;
@@ -1126,9 +1126,9 @@ int Fiber::nbHands(int (*count)(Hand const*)) const
 }
 
 
-unsigned Fiber::nbHandsInRange(real a, real b, const FiberEnd ref) const
+size_t Fiber::nbHandsInRange(real a, real b, const FiberEnd ref) const
 {
-    unsigned res = 0;
+    size_t res = 0;
     if ( b > a )
     {
         // Convert to absolute abscissa:
@@ -1145,9 +1145,9 @@ unsigned Fiber::nbHandsInRange(real a, real b, const FiberEnd ref) const
 }
 
 
-unsigned Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
+size_t Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
 {
-    unsigned res = 0;
+    size_t res = 0;
     real i = -INFINITY, s = INFINITY;
     
     if ( len > 0 )
@@ -1516,7 +1516,7 @@ void Fiber::printLattice(std::ostream& os, FiberLattice const& lat) const
 }
 
 
-void Fiber::infoLattice(FiberLattice const& lat, unsigned& cnt, real& sm, real& mn, real& mx, bool density) const
+void Fiber::infoLattice(FiberLattice const& lat, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
 {
     const real scale = ( density ? 1.0/lat.unit() : 1.0 );
     const auto sup = lat.indexP();
@@ -1613,7 +1613,7 @@ void Fiber::setGlue3(Single* glue, Space const* spc)
             return;
         
         // find a vertex that is on the other side of the Space edge:
-        for ( unsigned i = 1; i < nPoints; ++i )
+        for ( size_t i = 1; i < nPoints; ++i )
         {
             if ( spc->inside(posP(i)) != in )
             {
@@ -1723,7 +1723,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         if ( in.formatID()==31 )
         {
-            unsigned p = in.readUInt16();
+            size_t p = in.readUInt16();
             prop = sim.findProperty<FiberProp>("fiber", p);
         }
         //tag = TAG;

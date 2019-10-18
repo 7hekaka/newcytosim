@@ -101,7 +101,7 @@ real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 {
     real b = sqrt( 2 * sc * rfDragPoint );
 
-    for ( unsigned jj = 0; jj < DIM*nPoints; ++jj )
+    for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];
     
     return b / rfDragPoint;
@@ -127,11 +127,11 @@ void Mecafil::storeDirections()
      not the case, but the error is usually small
      */
     const real sc  = 1.0 / segmentation();
-    const unsigned end = DIM * lastPoint();
-    for ( unsigned p = 0; p < end; ++p )
+    const size_t end = DIM * lastPoint();
+    for ( size_t p = 0; p < end; ++p )
         rfDiff[p] = sc * ( pPos[p+DIM] - pPos[p] );
 #else
-    for ( unsigned p = 0; p < lastPoint(); ++p )
+    for ( size_t p = 0; p < lastPoint(); ++p )
         normalize(diffPoints(p)).store(rfDiff+DIM*p);
 #endif
     
@@ -142,14 +142,14 @@ void Mecafil::storeDirections()
      */
     
     // for the extremities, the direction of the nearby segment is used.
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         rfDir[d]     = rfDiff[d];
         rfDir[d+end] = rfDiff[d+end-DIM];
     }
     
     // for intermediate points, the directions of the two flanking segments are averaged
-    for ( unsigned p = DIM ; p < end; ++p )
+    for ( size_t p = DIM ; p < end; ++p )
         rfDir[p] = 0.5 * ( rfDiff[p-DIM] + rfDiff[p] );
 
     //VecPrint::print(std::clog, last+DIM, rfDir);
@@ -168,9 +168,9 @@ void Mecafil::storeDirections()
  This is used to multiply the tangential component of X by a factor 2,
  without changing the orthogonal components
  */
-void scaleTangentially(unsigned nbp, const real* X, const real* dir, real * Y)
+void scaleTangentially(size_t nbp, const real* X, const real* dir, real * Y)
 {
-    for ( unsigned p = 0; p < nbp; ++p )
+    for ( size_t p = 0; p < nbp; ++p )
     {
         real const* xxx = X   + DIM * p;
         real const* ddd = dir + DIM * p;
@@ -211,14 +211,14 @@ void Mecafil::allocateProjection(size_t) {}  //DIM == 1
 void Mecafil::projectForces(const real* X, real* Y) const
 {
     real sum = X[0];
-    for ( unsigned int ii = 1; ii < nPoints; ++ii )
+    for ( size_t ii = 1; ii < nPoints; ++ii )
         sum += X[ii];
     
     sum = sum / nPoints;
 #if NEW_ANISOTROPIC_FIBER_DRAG
     sum *= 2;
 #endif
-    for ( unsigned int ii = 0; ii < nPoints; ++ii )
+    for ( size_t ii = 0; ii < nPoints; ++ii )
         Y[ii] = sum;
 }
 
@@ -332,9 +332,9 @@ void add_rigidity_upper(size_t cnt, real* mat, size_t ldd, const real R1)
     const real R5 = R1 * 5;
     const real R6 = R1 * 6;
 
-    constexpr unsigned D = DIM, T = DIM*2, V = DIM*3;
-    const unsigned e = DIM * ( cnt - 2 );
-    const unsigned f = DIM * ( cnt - 1 );
+    constexpr size_t D = DIM, T = DIM*2, V = DIM*3;
+    const size_t e = DIM * ( cnt - 2 );
+    const size_t f = DIM * ( cnt - 1 );
     
     mat[0      ] -= R1;
     mat[  ldd*D] += R2;
@@ -355,7 +355,7 @@ void add_rigidity_upper(size_t cnt, real* mat, size_t ldd, const real R1)
         mat[D+ldd*D] -= R4;
     }
     
-    for ( unsigned n = T; n < e; n += D )
+    for ( size_t n = T; n < e; n += D )
     {
         mat[n+ldd* n   ] -= R6;
         mat[n+ldd*(n+D)] += R4;
@@ -386,7 +386,7 @@ void Mecafil::addRigidityUpper(real * mat, size_t ldd) const
 void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     assert_true( X != Y );
-    for ( unsigned jj = 0; jj < nbt; ++jj )
+    for ( size_t jj = 0; jj < nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
         Y[jj      ] -=   f;
@@ -666,16 +666,16 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     const real R4 = R1 * 4;
     const real R6 = R1 * 6;
     
-    const int end = nbt;
+    const size_t end = nbt;
     #pragma ivdep
-    for ( int i = DIM*2; i < end; ++i )
+    for ( size_t i = DIM*2; i < end; ++i )
         Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
     
     // special cases near the edges:
     real      * Z = Y + nbt + DIM;
     real const* E = X + nbt + DIM;
     #pragma ivdep
-    for ( int d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
         Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
@@ -690,7 +690,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
  */
 void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
 {
-    for ( unsigned d = 0; d < DIM; ++ d )
+    for ( size_t d = 0; d < DIM; ++ d )
     {
         real x = 2*X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
         Y[A*DIM+d] += x * R1;
@@ -717,7 +717,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #endif
     if ( nPoints > 3 )
     {
-        unsigned nbt = DIM * ( nPoints - 2 );  // number of triplet values
+        size_t nbt = DIM * ( nPoints - 2 );  // number of triplet values
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
         add_rigidityF(nbt, X, rfRigidity, Y);

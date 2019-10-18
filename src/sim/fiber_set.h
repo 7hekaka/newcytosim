@@ -117,7 +117,7 @@ public:
     static void  infoSegments(ObjectList const&, size_t& cnt, size_t& joints, real&, real&);
     
     /// calculate: number of fibers, number of joints and number of kinks
-    static unsigned nbKinks(ObjectList const&);
+    static size_t nbKinks(ObjectList const&);
 
     /// calculate center of gravity G, average of MINUS_END and PLUS_END
     static real  infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector& P);
@@ -150,7 +150,7 @@ public:
     void  infoRadius(size_t&, real& rad, FiberEnd) const;
 
     /// Calculate averaged characteristics on all Fiber's Lattices
-    void  infoLattice(real& len, unsigned& cnt, real& sm, real& mn, real& mx, bool density) const;
+    void  infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const;
 
 };
 

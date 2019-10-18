@@ -109,10 +109,10 @@ protected:
 #endif
 
     /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
-    virtual Fiber* severPoint(unsigned int pti);
+    virtual Fiber* severPoint(size_t pti);
     
     /// return index of point where there is a kink
-    unsigned       hasKink(real) const;
+    size_t         hasKink(real) const;
 
     
     /// viscous drag coefficient for a cylinder moving close to a surface
@@ -129,7 +129,7 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    unsigned            family;
+    size_t              family;
 #endif
 
     /// the Property of this object
@@ -263,16 +263,16 @@ public:
     Hand *         firstHand() const { return handListFront; }
    
     /// number of attached Hands
-    unsigned       nbHands() const;
+    size_t         nbHands() const;
     
     /// a function to count Hands using a custom criteria
     int            nbHands(int (*count)(Hand const*)) const;
 
     /// number of Hands attached within a range of abscissa
-    unsigned       nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;
+    size_t         nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;
     
     /// number of Hands attached at a distance less than 'len' from the specified FiberEnd
-    unsigned       nbHandsNearEnd(real len, FiberEnd end) const;
+    size_t         nbHandsNearEnd(real len, FiberEnd end) const;
     
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
@@ -310,7 +310,7 @@ public:
     void           writeLattice(FiberLattice const&, Outputter& out) const;
     
     /// record minium, maximum and sum of lattice values
-    void           infoLattice(FiberLattice const&, unsigned&, real& sm, real& mn, real& mx, bool density) const;
+    void           infoLattice(FiberLattice const&, size_t&, real& sm, real& mn, real& mx, bool density) const;
 
     /// print Lattice data (for debugging purpose)
     void           printLattice(std::ostream&, FiberLattice const&) const;

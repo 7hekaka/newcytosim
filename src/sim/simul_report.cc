@@ -608,7 +608,7 @@ void Simul::reportFiberLattice(std::ostream& out, bool density) const
     out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
     
     // report substance on Fiber Lattices
-    unsigned cnt;
+    size_t cnt;
     real len, sm, mn, mx;
     fibers.infoLattice(len, cnt, sm, mn, mx, density);
     out << LIN << ljust("fiber:lattice", 2);
@@ -1702,7 +1702,7 @@ void Simul::reportSingle(std::ostream& out) const
     for ( Single * si = singles.firstF(); si ; si = si->next() )
     {
         assert_true(!si->attached());
-        unsigned ix = si->prop->number();
+        size_t ix = si->prop->number();
         if ( ix < mx )
             ++free[ix];
     }
@@ -1710,7 +1710,7 @@ void Simul::reportSingle(std::ostream& out) const
     for ( Single * sig=singles.firstA(); sig ; sig=sig->next() )
     {
         assert_true(sig->attached());
-        unsigned ix = sig->prop->number();
+        size_t ix = sig->prop->number();
         if ( ix < mx )
             ++bound[ix];
     }
@@ -1726,7 +1726,7 @@ void Simul::reportSingle(std::ostream& out) const
     for ( Property * i : properties.find_all("single") )
     {
         out << LIN << ljust(i->name(), 2);
-        unsigned ix = i->number();
+        size_t ix = i->number();
         if ( ix < mx )
         {
             out << SEP << free[ix] + bound[ix];
@@ -1953,7 +1953,7 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
     // accumulate counts:
     for ( Couple * cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
     {
-        unsigned ix = cxi->prop->number();
+        size_t ix = cxi->prop->number();
         if ( ix < IMAX )
         {
             unsigned f = (unsigned)( cxi->force().norm() / delta );
@@ -2008,7 +2008,7 @@ void Simul::reportCouple(std::ostream& out) const
     for ( Couple * cxi=couples.firstFF(); cxi ; cxi = cxi->next() )
     {
         assert_true(!cxi->attached1() && !cxi->attached2());
-        unsigned ix = cxi->prop->number();
+        size_t ix = cxi->prop->number();
         if ( ix < mx )
         {
             if ( cxi->active() ) ++act[ix];
@@ -2019,7 +2019,7 @@ void Simul::reportCouple(std::ostream& out) const
     for ( Couple * cxi=couples.firstAF(); cxi ; cxi = cxi->next() )
     {
         assert_true(cxi->attached1() && !cxi->attached2());
-        unsigned ix = cxi->prop->number();
+        size_t ix = cxi->prop->number();
         if ( ix < mx )
         {
             if ( cxi->active() ) ++act[ix];
@@ -2029,7 +2029,7 @@ void Simul::reportCouple(std::ostream& out) const
     for ( Couple * cxi=couples.firstFA(); cxi ; cxi = cxi->next() )
     {
         assert_true(!cxi->attached1() && cxi->attached2());
-        unsigned ix = cxi->prop->number();
+        size_t ix = cxi->prop->number();
         if ( ix < mx )
         {
             if ( cxi->active() ) ++act[ix];
@@ -2040,7 +2040,7 @@ void Simul::reportCouple(std::ostream& out) const
     for ( Couple * cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
     {
         assert_true(cxi->attached1() && cxi->attached2());
-        unsigned ix = cxi->prop->number();
+        size_t ix = cxi->prop->number();
         if ( ix < mx )
         {
             if ( cxi->active() ) ++act[ix];
@@ -2062,7 +2062,7 @@ void Simul::reportCouple(std::ostream& out) const
     for ( Property * i : properties.find_all("couple") )
     {
         out << LIN << ljust(i->name(), 2);
-        unsigned ix = i->number();
+        size_t ix = i->number();
         if ( ix < mx )
         {
             out << SEP << cnt[ix][0]+cnt[ix][1]+cnt[ix][2]+cnt[ix][3];

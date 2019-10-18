@@ -759,9 +759,9 @@ void FiberSet::infoSegments(ObjectList const& objs,
 }
 
 
-unsigned FiberSet::nbKinks(ObjectList const& objs)
+size_t FiberSet::nbKinks(ObjectList const& objs)
 {
-    unsigned cnt = 0;
+    size_t cnt = 0;
     
     for ( Object * i : objs )
         cnt += Fiber::toFiber(i)->nbKinks();
@@ -1253,7 +1253,7 @@ void FiberSet::infoRadius(size_t& cnt, real& rad, FiberEnd end) const
 }
 
 
-void FiberSet::infoLattice(real& len, unsigned& cnt, real& sm, real& mn, real& mx, bool density) const
+void FiberSet::infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
 {
     len = 0;
     cnt = 0;

@@ -60,7 +60,7 @@ public:
     }
     
     /// Set to interpolate p1 and p2 on ps, with coefficient c, on the same Mecable
-    void set(unsigned p, unsigned q, const real c)
+    void set(size_t p, size_t q, const real c)
     {
         pt1_ = p;  pt2_ = q;  coef_ = c;
     }

@@ -1411,8 +1411,8 @@ real Chain::minCosinus() const
  */
 size_t Chain::nbKinks(real threshold) const
 {
-    threshold *= fnCut * fnCut;
     size_t res = 0;
+    threshold *= fnCut * fnCut;
     Vector d = diffPoints(0);
     
     for ( size_t n = 1; n < lastPoint(); ++n )
