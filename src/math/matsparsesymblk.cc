@@ -793,7 +793,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y
     const size_t stop = 1 + ( size_ - 1 ) % 4;
     // process odd number of blocks:
     #pragma nounroll
-    for ( ; n < size_; ++n )
+    for ( ; n < stop; ++n )
         multiply2D(X, Y, inx_[n], load4(blk_[n]), xxyy, ss);
 
     // process 4 by 4:
