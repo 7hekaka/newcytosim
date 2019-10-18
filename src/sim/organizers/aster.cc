@@ -74,8 +74,8 @@ void Aster::setInteractions(Meca & meca) const
             if ( link.rank == 0 )
                 continue;
             
-            size_t off = sol->matIndex() + link.prime;
-            size_t pts[] = { off, off+1, off+2, off+3 };
+            const size_t off = sol->matIndex() + link.prime;
+            const size_t pts[] = { off, off+1, off+2, off+3 };
 
 #ifdef BACKWARD_COMPATIBILITY
             if ( link.alt > 0 )
@@ -581,7 +581,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     if ( nbf > 0 )
     {
-        unsigned ref = asLinks[0].prime;
+        const size_t ref = asLinks[0].prime;
         asRadius = ( sol->posPoint(ref) - sol->posPoint(ref) ).norm();
     }
 }
@@ -594,7 +594,7 @@ Vector Aster::posLink1(size_t inx) const
 {
     Solid const* sol = solid();
     real const* coef = asLinks[inx].coef1;
-    const unsigned ref = asLinks[inx].prime;
+    const size_t ref = asLinks[inx].prime;
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( asLinks[inx].alt > 0 )

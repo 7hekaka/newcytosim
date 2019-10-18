@@ -536,7 +536,7 @@ size_t Solid::addTriad(real arm)
 }
 
 
-void Solid::radius(const unsigned indx, real rad)
+void Solid::setRadius(const size_t indx, real rad)
 {
     assert_true( indx < nPoints );
     if ( rad < 0 )
@@ -592,9 +592,9 @@ void Solid::fixShape()
     //we store the current points:
     soShapeSize = nPoints;
     // set reference to current shape translated to be centered:
-    for ( unsigned p = 0; p < soShapeSize; ++p )
+    for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
             soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
     
@@ -613,15 +613,15 @@ void Solid::fixShape()
 void Solid::scaleShape(const real scale[DIM])
 {
     //scale in only in the specified dimension
-    for ( unsigned p = 0; p < soShapeSize; ++p )
+    for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( int d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
             soShape[DIM*p+d] *= scale[d];
     }
     
     //recalculate the momentum needed in rescale():
     soShapeSqr = 0;
-    for ( unsigned i = 0; i < DIM * soShapeSize; ++i )
+    for ( size_t i = 0; i < DIM * soShapeSize; ++i )
         soShapeSqr += soShape[i] * soShape[i];
     
     setDragCoefficient();

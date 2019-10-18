@@ -64,7 +64,7 @@ private:
     real     *     soShape;
     
     /// the number of points when fixShape() was last called, used for verifications.
-    unsigned int   soShapeSize;
+    size_t         soShapeSize;
     
     /// a counter used in reshape()
     unsigned int   soReshapeTimer;
@@ -151,7 +151,7 @@ public:
     size_t      addSphere(Vector const&, real radius);
     
     /// change radius of the sphere around point `i`
-    void        radius(unsigned i, real radius);
+    void        setRadius(size_t i, real val);
 
     /// add DIM points separated by `len`, to make a coordinate system around the last point
     size_t      addTriad(real len);
@@ -162,7 +162,7 @@ public:
     void        setInteractions(Meca &) const;
     
     /// radius of the sphere around point `i`
-    real        radius(const unsigned i) const { return soRadius[i]; }
+    real        radius(const size_t i) const { return soRadius[i]; }
     
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
     Vector      centroid() const;

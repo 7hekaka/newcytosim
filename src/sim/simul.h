@@ -267,7 +267,7 @@ public:
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& cat, unsigned ix) const
+    T* findProperty(std::string const& cat, size_t ix) const
     {
         Property * p = properties.find(cat, ix);
         if ( !p )
