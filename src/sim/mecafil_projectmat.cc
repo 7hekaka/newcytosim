@@ -58,8 +58,8 @@ void Mecafil::destroyProjection()
  */
 void Mecafil::makeProjection()
 {
-    const unsigned int nbc = nbSegments();             //number of constraints
-    const unsigned int nbv = DIM * nbPoints();         //number of variables
+    const size_t nbc = nbSegments();             //number of constraints
+    const size_t nbv = DIM * nbPoints();         //number of variables
     assert_true( nbc > 0 );
     
     //----- allocate needed temporaries:
@@ -74,7 +74,7 @@ void Mecafil::makeProjection()
     //set up the Jacobian matrix J and the diagonals of J * Jt
     w  = posP(0);
     dw.set(0,0,0);
-    for ( unsigned jj = 0; jj < nbc ; ++jj )
+    for ( size_t jj = 0; jj < nbc ; ++jj )
     {
         //set J:
         v = w;
@@ -105,7 +105,7 @@ void Mecafil::makeProjection()
     blas::xgemm('T', 'N', nbv, nbv, nbc, -1.0, J, nbc, mtJJtiJ, nbc, 0., mtProj, nbv );
     
     // mtProj <- mtProj + I
-    for (unsigned j = 0; j < nbv*nbv; j += nbv+1 )
+    for ( size_t j = 0; j < nbv*nbv; j += nbv+1 )
         mtProj[j] += 1.0;
     
     free_real(J);
@@ -119,7 +119,7 @@ void Mecafil::makeProjection()
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-    const unsigned nbv = DIM * nbPoints();
+    const size_t nbv = DIM * nbPoints();
     copy_real(nbv, X, rfLLG);
     blas::xsymv('U', nbv, 1.0, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
     //blas::xgemv('N', nbv, nbv, 1.0, mtProj, nbv, rfLLG, 1, 0.0, Y, 1);
@@ -128,7 +128,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
 
 void Mecafil::printProjection(std::ostream& os) const
 {
-    const unsigned nbv = DIM * nbPoints();
+    const size_t nbv = DIM * nbPoints();
     os << reference() << '\n';
     VecPrint::print(os, nbv, nbv, mtProj, nbv);
 }
@@ -136,8 +136,8 @@ void Mecafil::printProjection(std::ostream& os) const
 
 void Mecafil::computeTensions(const real* force)
 {
-    const unsigned nbs = nbSegments();
-    const unsigned nbv = DIM * nbPoints();
+    const size_t nbs = nbSegments();
+    const size_t nbv = DIM * nbPoints();
     
     // calculate the lagrangian coefficients:
     blas::xgemv('N', nbs, nbv, 1., mtJJtiJ, nbs, force, 1, 0., rfLag, 1);
@@ -154,8 +154,8 @@ void Mecafil::storeTensions(const real* force)
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
-    const unsigned nbs = nbSegments();             //number of constraints
-    const unsigned nbv = DIM * nbPoints();         //number of variables
+    const size_t nbs = nbSegments();             //number of constraints
+    const size_t nbv = DIM * nbPoints();         //number of variables
     
     // calculate the lagrangian coefficients:
     blas::xgemv('N', nbs, nbv, 1., mtJJtiJ, nbs, force, 1, 0., rfLag, 1);
@@ -164,7 +164,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     
     // select expensive forces ( lagrangian > 0 )
     useProjectionDiff = false;
-    for ( unsigned ii = 0; ii < nbs; ++ii )
+    for ( size_t ii = 0; ii < nbs; ++ii )
     {
         if ( rfLag[ii] > 0 )
         {
@@ -179,7 +179,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     
     //set up the first term in the derivative of J with respect to variable x[ii]
     //set up term  P * (DJ)t (JJti) J force:
-    for ( unsigned jj = 0; jj < nbv; ++jj )
+    for ( size_t jj = 0; jj < nbv; ++jj )
     {
         real* coljj = mtDiffP + nbv * jj;
         zero_real(nbv, coljj);
@@ -206,7 +206,7 @@ void Mecafil::makeProjectionDiff(const real* force)
 void Mecafil::addProjectionDiff( const real* X, real* Y ) const
 {
     assert_true(useProjectionDiff);
-    unsigned int nbv = DIM * nbPoints();
+    size_t nbv = DIM * nbPoints();
     blas::xsymv('U', nbv, 1.0, mtDiffP, nbv, X, 1, 1.0, Y, 1);
 }
 

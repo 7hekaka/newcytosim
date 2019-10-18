@@ -178,8 +178,8 @@ This draws the model-segments from `inx` to `last`.
 The function `set_color` is used to set the color of the segments
 */
 void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_cap, real rad,
-                                    unsigned inx, const unsigned last,
-                                    void (*set_color)(Fiber const&, unsigned, real), real beta) const
+                                    size_t inx, const size_t last,
+                                    void (*set_color)(Fiber const&, size_t, real), real beta) const
 {
     Vector pos = fib.posPoint(inx), old;
     Vector nxt = fib.posPoint(inx+1);
@@ -318,11 +318,11 @@ void set_color_not(Fiber const&, long, real)
 {
 }
 
-void set_color_not(Fiber const&, unsigned, real)
+void set_color_not(Fiber const&, size_t, real)
 {
 }
 
-void set_color_tension(Fiber const& fib, unsigned seg, real beta)
+void set_color_tension(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
 #if ( 1 )
@@ -336,11 +336,11 @@ void set_color_tension(Fiber const& fib, unsigned seg, real beta)
 #endif
 }
 
-void set_color_curvature(Fiber const& fib, unsigned seg, real)
+void set_color_curvature(Fiber const& fib, size_t seg, real)
 {
     if ( fib.nbPoints() > 2 )
     {
-        real c = fib.curvature(std::max(seg, 1u));
+        real c = fib.curvature(std::max(seg, 1LU));
         real d = fib.curvature(std::min(seg+1, fib.lastSegment()));
         gle_color::jet_color(0.5*(c+d)).load_front();
     }
@@ -348,7 +348,7 @@ void set_color_curvature(Fiber const& fib, unsigned seg, real)
         gle_color::jet_color(0).load_front();
 }
 
-void set_color_direction(Fiber const& fib, unsigned seg, real)
+void set_color_direction(Fiber const& fib, size_t seg, real)
 {
     gle::radial_color(fib.dirSegment(seg)).load_front();
 }
@@ -431,7 +431,7 @@ void Display3::drawFiberLinesM(Fiber const& fib, real len, real width) const
     if ( len > 0 )
     {
         real rad = width * sFactor;
-        unsigned inx = fib.clampedIndexM(len);
+        size_t inx = fib.clampedIndexM(len);
         real cut = fib.segmentation() * inx;
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(-1.0, -1.0);
@@ -455,7 +455,7 @@ void Display3::drawFiberLinesP(Fiber const& fib, real len, real width) const
     {
         real rad = width * sFactor;
         real abs = fib.length() - len;
-        unsigned inx = 1 + fib.clampedIndexM(abs);
+        size_t inx = 1 + fib.clampedIndexM(abs);
         real cut = fib.segmentation() * inx;
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(-1.0, -1.0);
@@ -859,7 +859,7 @@ void Display3::drawSphere(Sphere const& obj)
     {
         bodyColor(disp, obj.signature());
         drawPoint(obj.posP(0), disp);
-        for ( unsigned ii = obj.nbRefPoints(); ii < obj.nbPoints(); ++ii )
+        for ( size_t ii = obj.nbRefPoints; ii < obj.nbPoints(); ++ii )
             drawPoint(obj.posP(ii), disp);
     }
 
@@ -867,7 +867,7 @@ void Display3::drawSphere(Sphere const& obj)
     if ( disp->size > 0  &&  disp->style & 8 )
     {
         bodyColor(disp, obj.signature());
-        for ( unsigned ii = 1; ii < obj.nbRefPoints(); ii++ )
+        for ( size_t ii = 1; ii < obj.nbRefPoints; ii++ )
             drawPoint(obj.posP(ii), disp);
     }
 }

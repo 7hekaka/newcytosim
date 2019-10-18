@@ -47,7 +47,7 @@ class PointsOnSphere
 public:
     
     /// a-priori expected distance between neighboring points, as a function of number of points
-    static real expectedDistance(unsigned);
+    static real expectedDistance(size_t);
 
     /// default constructor, does nothing
     PointsOnSphere();
@@ -59,7 +59,7 @@ public:
     PointsOnSphere(size_t nbp, real precision, size_t mx_nb_iterations);
     
     /// distribute the nbp points on the sphere and store their coordinates
-    unsigned distributePoints(size_t nbp, real precision, size_t mx_nb_iterations);
+    size_t distributePoints(size_t nbp, real precision, size_t mx_nb_iterations);
 
     /// default destructor
     virtual ~PointsOnSphere();

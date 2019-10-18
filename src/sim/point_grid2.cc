@@ -82,7 +82,7 @@ void PointGrid::createCells()
 
 #if ( NB_STERIC_PANES != 1 )
 
-void PointGrid::add(unsigned pan, Mecapoint const& pe, real rd, real rg) const
+void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
         throw InvalidParameter("object:steric is out-of-range");
@@ -104,7 +104,7 @@ void PointGrid::add(unsigned pan, Mecapoint const& pe, real rd, real rg) const
 }
 
 
-void PointGrid::add(unsigned pan, FiberSegment const& fl, real rd, real rg) const
+void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
         throw InvalidParameter("object:steric is out-of-range");
@@ -508,7 +508,7 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
     //std::clog << "----" << std::endl;
 
     // scan all cells to examine each pair of particles:
-    for ( unsigned inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int * region;
         int nr = pGrid.getRegion(region, inx);
@@ -538,13 +538,13 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
  Check interactions between the FatPoints contained in Pane `pan`.
  */
 void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                 const unsigned pan) const
+                                 const size_t pan) const
 {
     assert_true(pam.stiff_push >= 0);
     assert_true(pam.stiff_pull >= 0);
     
     // scan all cells to examine each pair of particles:
-    for ( unsigned inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int * region;
         int nr = pGrid.getRegion(region, inx);
@@ -573,14 +573,14 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
  where ( pan1 != pan2 )
  */
 void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                 const unsigned pan1, const unsigned pan2) const
+                                 const size_t pan1, const size_t pan2) const
 {
     assert_true(pam.stiff_push >= 0);
     assert_true(pam.stiff_pull >= 0);
     assert_true(pan1 != pan2);
     
     // scan all cells to examine each pair of particles:
-    for ( unsigned inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int * region;
         int nr = pGrid.getRegion(region, inx);

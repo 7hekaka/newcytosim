@@ -101,13 +101,11 @@ void Tubule::step(Simul&)
 ///
 void Tubule::setInteractions(Meca& meca)
 {
+#if ( DIM >= 3 )
     const real stiff = prop->stiffness[0];
-    //const real stiffA = prop->stiffness[1];
-    
     const real ang = M_PI / NFIL;
     const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
-#if ( DIM >= 3 )
-    real c = cos(ang), s = sin(ang);
+    const real c = cos(ang), s = sin(ang);
     
     assert_true(fil_[0]);
     const size_t end = fil_[0]->nbPoints() - 1;

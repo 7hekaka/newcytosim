@@ -22,7 +22,7 @@ void Fake::setInteractions(Meca & meca) const
     assert_true( linked() );
     assert_true( asterPoints.size() == solidPoints.size() );
     
-    for (unsigned n = 0; n < asterPoints.size(); ++n )
+    for ( size_t n = 0; n < asterPoints.size(); ++n )
         meca.addLink(asterPoints[n], solidPoints[n], prop->stiffness);
 }
 

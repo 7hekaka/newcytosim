@@ -100,7 +100,7 @@ public:
     int      inside(real x, real y, int edge, real threshold = REAL_EPSILON) const;
     
     /// calculate the projection (pX, pY) of the point (x,y) on a polygon
-    int      project(real x, real y, real& pX, real& pY, int& hit) const;
+    int      project(real x, real y, real& pX, real& pY, size_t& hit) const;
     
     /// calculate the bounding box [xmin, xmax, ymin, ymax] of a polygon
     void     find_extremes(real box[4]) const;

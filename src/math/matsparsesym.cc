@@ -29,7 +29,7 @@ void MatrixSparseSymmetric::allocate(size_t alc)
         unsigned * col_size_new = new unsigned[alc];
         size_t   * col_max_new  = new size_t[alc];
         
-        index_t ii = 0;
+        size_t ii = 0;
         if ( col_ )
         {
             for ( ; ii < allocated_; ++ii )
@@ -80,11 +80,11 @@ void copy(unsigned cnt, MatrixSparseSymmetric::Element * src, MatrixSparseSymmet
 }
 
 
-void MatrixSparseSymmetric::allocateColumn(const index_t jj, size_t alc)
+void MatrixSparseSymmetric::allocateColumn(const size_t jj, size_t alc)
 {
     if ( jj >= size_ )
     {
-        fprintf(stderr, "out of range index %i for matrix of size %u\n", jj, size_);
+        fprintf(stderr, "out of range index %lu for matrix of size %lu\n", jj, size_);
         exit(1);
     }
 
@@ -112,15 +112,15 @@ void MatrixSparseSymmetric::allocateColumn(const index_t jj, size_t alc)
 /**
  This allocate to be able to hold the matrix element if necessary
  */
-real& MatrixSparseSymmetric::operator()(index_t i, index_t j)
+real& MatrixSparseSymmetric::operator()(size_t i, size_t j)
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
     //fprintf(stderr, "MSS( %6i %6i )\n", i, j);
     
     // swap to get ii > jj (address lower triangle)
-    index_t ii = std::max(i, j);
-    index_t jj = std::min(i, j);
+    size_t ii = std::max(i, j);
+    size_t jj = std::min(i, j);
 
     assert_true(jj < size_);
     Element * col = col_[jj];
@@ -156,11 +156,11 @@ real& MatrixSparseSymmetric::operator()(index_t i, index_t j)
 }
 
 
-real* MatrixSparseSymmetric::addr(index_t i, index_t j) const
+real* MatrixSparseSymmetric::addr(size_t i, size_t j) const
 {
     // swap to get ii > jj (address lower triangle)
-    index_t ii = std::max(i, j);
-    index_t jj = std::min(i, j);
+    size_t ii = std::max(i, j);
+    size_t jj = std::min(i, j);
 
     for ( unsigned kk = 0; kk < col_size_[jj]; ++kk )
         if ( col_[jj][kk].inx == ii )
@@ -175,7 +175,7 @@ real* MatrixSparseSymmetric::addr(index_t i, index_t j) const
 
 void MatrixSparseSymmetric::reset()
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         col_size_[jj] = 0;
 }
 
@@ -183,7 +183,7 @@ void MatrixSparseSymmetric::reset()
 bool MatrixSparseSymmetric::nonZero() const
 {
     //check for any non-zero sparse term:
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
             if ( col_[jj][kk].val != 0 )
                 return true;
@@ -195,25 +195,25 @@ bool MatrixSparseSymmetric::nonZero() const
 
 void MatrixSparseSymmetric::scale(const real alpha)
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
             col_[jj][n].val *= alpha;
 }
 
 
-void MatrixSparseSymmetric::addTriangularBlock(real* mat, const unsigned ldd,
-                                               const index_t si,
-                                               const unsigned nb,
-                                               const unsigned dim) const
+void MatrixSparseSymmetric::addTriangularBlock(real* mat, const size_t ldd,
+                                               const size_t si,
+                                               const size_t nb,
+                                               const size_t dim) const
 {
-    index_t up = si + nb;
+    size_t up = si + nb;
     assert_true( up <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( size_t jj = si; jj < up; ++jj )
     {
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
         {
-            index_t ii = col_[jj][n].inx;
+            size_t ii = col_[jj][n].inx;
             if ( si <= ii && ii < up )
             {
                 if ( ii < jj )
@@ -226,18 +226,18 @@ void MatrixSparseSymmetric::addTriangularBlock(real* mat, const unsigned ldd,
 }
 
 
-void MatrixSparseSymmetric::addDiagonalBlock(real* mat, unsigned ldd,
-                                             const index_t si,
-                                             const unsigned nb) const
+void MatrixSparseSymmetric::addDiagonalBlock(real* mat, size_t ldd,
+                                             const size_t si,
+                                             const size_t nb) const
 {
-    index_t up = si + nb;
+    size_t up = si + nb;
     assert_true( up <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( size_t jj = si; jj < up; ++jj )
     {
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
         {
-            index_t ii = col_[jj][n].inx;
+            size_t ii = col_[jj][n].inx;
             if ( si <= ii && ii < up )
             {
                 //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
@@ -253,7 +253,7 @@ void MatrixSparseSymmetric::addDiagonalBlock(real* mat, unsigned ldd,
 int MatrixSparseSymmetric::bad() const
 {
     if ( size_ <= 0 ) return 1;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
@@ -265,13 +265,13 @@ int MatrixSparseSymmetric::bad() const
 }
 
 
-size_t MatrixSparseSymmetric::nbElements(index_t start, index_t stop) const
+size_t MatrixSparseSymmetric::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
     //all allocated elements are counted, even if zero
     size_t cnt = 0;
-    for ( index_t jj = start; jj < stop; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
         cnt += col_size_[jj];
     return cnt;
 }
@@ -291,7 +291,7 @@ void MatrixSparseSymmetric::printSparse(std::ostream& os) const
 {
     std::streamsize p = os.precision();
     os.precision(8);
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         for ( unsigned n = 0 ; n < col_size_[jj] ; ++n )
         {
@@ -306,7 +306,7 @@ void MatrixSparseSymmetric::printSparse(std::ostream& os) const
 void MatrixSparseSymmetric::printColumns(std::ostream& os)
 {
     os << "MSS size " << size_ << ":";
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         os << "\n   " << jj << "   " << col_size_[jj];
     }
@@ -314,7 +314,7 @@ void MatrixSparseSymmetric::printColumns(std::ostream& os)
 }
 
 
-void MatrixSparseSymmetric::printColumn(std::ostream& os, const index_t jj)
+void MatrixSparseSymmetric::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = col_[jj];
     os << "MSS col " << jj << ":";
@@ -337,11 +337,11 @@ void MatrixSparseSymmetric::prepareForMultiply(int)
 
 void MatrixSparseSymmetric::vecMulAdd(const real* X, real* Y) const
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
-            const index_t ii = col_[jj][kk].inx;
+            const size_t ii = col_[jj][kk].inx;
             const real a = col_[jj][kk].val;
             Y[ii] += a * X[jj];
             if ( ii != jj )
@@ -353,12 +353,12 @@ void MatrixSparseSymmetric::vecMulAdd(const real* X, real* Y) const
 
 void MatrixSparseSymmetric::vecMulAddIso2D(const real* X, real* Y) const
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
-        const index_t Djj = 2 * jj;
+        const size_t Djj = 2 * jj;
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
-            const index_t Dii = 2 * col_[jj][kk].inx;
+            const size_t Dii = 2 * col_[jj][kk].inx;
             const real  a = col_[jj][kk].val;
             Y[Dii  ] += a * X[Djj  ];
             Y[Dii+1] += a * X[Djj+1];
@@ -374,12 +374,12 @@ void MatrixSparseSymmetric::vecMulAddIso2D(const real* X, real* Y) const
 
 void MatrixSparseSymmetric::vecMulAddIso3D(const real* X, real* Y) const
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
-        const index_t Djj = 3 * jj;
+        const size_t Djj = 3 * jj;
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
-            const index_t Dii = 3 * col_[jj][kk].inx;
+            const size_t Dii = 3 * col_[jj][kk].inx;
             const real  a = col_[jj][kk].val;
             Y[Dii  ] += a * X[Djj  ];
             Y[Dii+1] += a * X[Djj+1];

@@ -64,10 +64,10 @@ class Glossary;
 class Chain : public Mecable
 {
     /// the ideal number of points for ratio = length / segmentation
-    static unsigned bestNumberOfPoints(real ratio);
+    static size_t bestNumberOfPoints(real ratio);
 
     /// calculate length of given string of points
-    static real contourLength(const real* pts, unsigned n_pts);
+    static real contourLength(const real* pts, size_t n_pts);
     
 private:
         
@@ -85,7 +85,7 @@ private:
     real         fnCutErrorCnt;
     
     /// index into the fnCutError[]
-    unsigned int fnCutErrorIdx;
+    size_t       fnCutErrorIdx;
 #endif
     
     /// abscissa of the minus-end (equal to zero initially)
@@ -112,22 +112,22 @@ protected:
     static void  reshape_two(const real*, real*, real cut);
 
     /// oldest method to restore the distance between successive vertices
-    static void  reshape_global(unsigned, const real*, real*, real cut);
+    static void  reshape_global(size_t, const real*, real*, real cut);
 
     /// apply the forces movements needed to the distance between two points
-    static void  reshape_apply(unsigned, const real*, real*, const real*, const Vector*);
+    static void  reshape_apply(size_t, const real*, real*, const real*, const Vector*);
 
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_calculate(unsigned, real cut, Vector const*, real*, size_t);
+    static int   reshape_calculate(size_t, real cut, Vector const*, real*, size_t);
 
     /// apply the forces movements needed to the distance between two points
-    static void  reshape_apply(unsigned, const real*, real*, const real*);
+    static void  reshape_apply(size_t, const real*, real*, const real*);
 
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_calculate(unsigned, real cut, real const*, real const*, real const*, real*, size_t);
+    static int   reshape_calculate(size_t, real cut, real const*, real const*, real const*, real*, size_t);
 
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_local(unsigned, const real*, real*, real cut, real* tmp, size_t);
+    static int   reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
 
     /// change segmentation
     void         setSegmentation(real c) { fnCut = c; }
@@ -141,10 +141,10 @@ public:
     ~Chain() {}
     
     /// Number of segments = nbPoints() - 1
-    unsigned     nbSegments()  const { return nPoints - 1; }
+    size_t       nbSegments()  const { return nPoints - 1; }
     
     /// Index of the last segment = nbPoints() - 2
-    unsigned     lastSegment() const { return nPoints - 2; }
+    size_t       lastSegment() const { return nPoints - 2; }
 
     //---------------------
 
@@ -156,13 +156,13 @@ public:
     void         setStraight(Vector const& pos, Vector const& dir, real len, FiberEnd ref);
     
     /// set shape with `np` points from the given array of size DIM*n_pts
-    void         setShape(const real pts[], unsigned n_pts, unsigned np);
+    void         setShape(const real pts[], size_t n_pts, size_t np);
 
     /// set shape as a random walk with given parameters
     void         setEquilibrated(real length, real persistence_length);
 
     /// change the current segmentation to force `length()==len` (normally not needed)
-    void         imposeLength(real len) { setSegmentation(len/nbSegments()); fnAbscissaP = fnAbscissaM + len; }
+    void         imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
     
     /// return updated `normal` that is orthogonal to `d` (used for fake 3D display)
     Vector3      adjustedNormal(Vector3 const& d) const;
@@ -230,12 +230,12 @@ public:
     
     /// return P where segment [ P, P+1 [ contains point at distance `a` from the MINUS_END
     /** returns 0 if ( a < 0 ) and last point index if ( a > lastSegment() ) */
-    unsigned     clampedIndexM(const real a) const { return std::min((unsigned)(std::max(a,(real)0)/fnCut), lastSegment()); }
+    size_t       clampedIndexM(const real a) const { return std::min((size_t)(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
     
     /// displace the ORIGIN of abscissa at distance `a` from the MINUS_END
-    void         setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut*nbSegments() - a; }
+    void         setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut*real(nbSegments()) - a; }
 
     /// signed distance from ORIGIN to MINUS_END (abscissa of MINUS_END)
     real         abscissaM() const { return fnAbscissaM; }
@@ -290,16 +290,16 @@ public:
     //---------------------
     
     /// vector between two consecutive points `p` and `p+1` (alias to diffPoints())
-    Vector       diffP(unsigned p) const { return diffPoints(p); }
+    Vector       diffP(size_t p) const { return diffPoints(p); }
 
 #if ( 1 )
     /// normalized tangent vector to the fiber within segment [p, p+1]
     /** We divide by fnCut, which should be the distance between points */
-    Vector       dirSegment(unsigned p)  const { return diffPoints(p) / fnCut; }
+    Vector       dirSegment(size_t p)  const { return diffPoints(p) / fnCut; }
 #else
     /// normalized tangent vector to the fiber within segment [p, p+1]
     /** Normalizing the difference between points is slow due to sqrt() */
-    Vector       dirSegment(unsigned p)  const { return normalize(diffPoints(p)); }
+    Vector       dirSegment(size_t p)  const { return normalize(diffPoints(p)); }
 #endif
 #if ( DIM == 1 )
     /// direction at distance `ab` from the MINUS_END
@@ -347,7 +347,7 @@ public:
     real         segmentationCube() const { return fnCut*fnCut*fnCut; }
     
     /// reinterpolate vertices and adjust fiber to have `ns` segments
-    void         resegment(unsigned ns);
+    void         resegment(size_t ns);
     
     /// automatically select the number of points if needed, and resegment the fiber
     void         adjustSegmentation();
@@ -370,7 +370,7 @@ public:
     void         segmentationVariance(real&, real&) const;
 
     /// curvature calculated at joint `p`, where `0 < p < nbPoints()-1`
-    real         curvature(unsigned p) const;
+    real         curvature(size_t p) const;
     
     /// normalized energy associated with bending
     real         bendingEnergy0() const;
@@ -379,10 +379,10 @@ public:
     real         minCosinus() const;
     
     /// number of joints at which ( cosine(angle) < threshold )
-    unsigned     nbKinks(real threshold = 0) const;
+    size_t       nbKinks(real threshold = 0) const;
     
     /// calculate intersection between segment `s` and the plane defined by <em> n.pos + a = 0 </em>
-    real         planarIntersect(unsigned s, Vector const& n, const real a) const;
+    real         planarIntersect(size_t s, Vector const& n, const real a) const;
 
     //--------------------- Growing/Shrinking
     
@@ -414,10 +414,10 @@ public:
     void         adjustLength(real len, FiberEnd ref);
 
     /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
-    void         truncateM(unsigned p);
+    void         truncateM(size_t p);
 
     /// Keep vertices [ 0, P ] and discard the others
-    void         truncateP(unsigned p);
+    void         truncateP(size_t p);
 
     //---------------------
     

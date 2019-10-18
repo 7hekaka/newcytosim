@@ -125,7 +125,7 @@ public:
     Single * newSingle() const;
     
     /// create a Write with this property
-    Wrist * newWrist(Mecable const*, unsigned) const;
+    Wrist * newWrist(Mecable const*, size_t) const;
     
     /// identifies the property
     std::string category() const { return "single"; }

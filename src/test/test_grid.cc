@@ -26,7 +26,7 @@ int   size[] = { 2*range,   range,  1 };
 typedef Grid<real, DIM> grid_type;
 grid_type myGrid;
 
-grid_type::index_t cell_indx;
+size_t cell_indx;
 int coord[DIM];
 Vector3 pos(0,0,0);
 Vector3 nod(0,0,0);
@@ -116,12 +116,12 @@ void processMouseClick(int, int, const Vector3 & a, int)
     if ( myGrid.hasRegions() )
     {
         real num = myGrid.sumValuesInRegion(cell_indx);
-        snprintf(str, sizeof(str), "cell %u : coord %i %i : %.0f marbles",
+        snprintf(str, sizeof(str), "cell %lu : coord %i %i : %.0f marbles",
                  cell_indx, coord[0], coord[1], num);
     } 
     else
     {
-        snprintf(str, sizeof(str), "cell %u : coord %i %i", cell_indx, coord[0], coord[1]);
+        snprintf(str, sizeof(str), "cell %lu : coord %i %i", cell_indx, coord[0], coord[1]);
     }
     
     glApp::setMessage(str);
@@ -168,7 +168,7 @@ void display(View&, int)
 
     //--------------draw content of cells
     glColor3f(0.5,0.5,1);
-    for ( grid_type::index_t c = 0 ; c < myGrid.nbCells(); ++c )
+    for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
     {
         int val = myGrid.icell(c);
         if ( val > 0 )
@@ -209,7 +209,7 @@ void display(View&, int)
     else
     {
         real vi = myGrid.interpolate(pos);
-        snprintf(str, sizeof(str), "cell %u %f", cell_indx, vi);
+        snprintf(str, sizeof(str), "cell %lu %f", cell_indx, vi);
         glApp::setMessage(str);
     }
 }

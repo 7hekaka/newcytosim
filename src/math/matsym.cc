@@ -36,19 +36,19 @@ void MatrixSymmetric::deallocate()
 //------------------------------------------------------------------------------
 void MatrixSymmetric::reset()
 {
-    for ( index_t i = 0; i < size_ * size_; ++i )
+    for ( size_t i = 0; i < size_ * size_; ++i )
         val[i] = 0;
 }
 
 //------------------------------------------------------------------------------
 void MatrixSymmetric::scale( real alpha )
 {
-    for ( index_t i = 0; i < size_ * size_; ++i )
+    for ( size_t i = 0; i < size_ * size_; ++i )
         val[i] *= alpha;
 }
 
 //------------------------------------------------------------------------------
-real& MatrixSymmetric::operator()( index_t x, index_t y)
+real& MatrixSymmetric::operator()( size_t x, size_t y)
 {
     assert_true( x < size_ );
     assert_true( y < size_ );
@@ -56,7 +56,7 @@ real& MatrixSymmetric::operator()( index_t x, index_t y)
 }
 
 //------------------------------------------------------------------------------
-real* MatrixSymmetric::addr( index_t x, index_t y) const
+real* MatrixSymmetric::addr( size_t x, size_t y) const
 {
     assert_true( x < size_ );
     assert_true( y < size_ );
@@ -70,7 +70,7 @@ bool MatrixSymmetric::nonZero() const
 }
 
 //------------------------------------------------------------------------------
-size_t MatrixSymmetric::nbElements(index_t start, index_t stop) const
+size_t MatrixSymmetric::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );

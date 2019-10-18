@@ -206,7 +206,7 @@ real Space::estimateVolume(unsigned long cnt) const
         in += inside(pos);
     }
     
-    real vol = in / real(cnt);
+    real vol = real(in) / real(cnt);
     for ( int d = 0; d < DIM; ++d )
         vol *= dif[d];
 

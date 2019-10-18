@@ -60,7 +60,7 @@ Single * SingleProp::newSingle() const
 /**
  The Wrist requires a anchor point to be created
  */
-Wrist * SingleProp::newWrist(Mecable const* mec, const unsigned point) const
+Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 {
     //std::clog << "SingleProp::newWrist" << std::endl;
     if ( length > 0 )

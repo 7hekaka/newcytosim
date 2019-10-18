@@ -50,8 +50,7 @@ public:
     Sphere *      sphere()   const { return static_cast<Sphere*>(organized(0)); }
     
     /// i-th fiber attached to the nucleus
-    Fiber *       fiber(int i) const { return static_cast<Fiber*>(organized(i+1)); }
-    
+    Fiber *       fiber(size_t i) const { return static_cast<Fiber*>(organized(i+1)); }
     
     
     /// retrieve links end-points for display

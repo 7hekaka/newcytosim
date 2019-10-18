@@ -8,10 +8,6 @@
 #include "real.h"
 
 
-/// type of an index into a matrix (unsigned)
-typedef unsigned index_t;
-
-
 /// The interface for all the large matrices
 class Matrix
 {
@@ -20,7 +16,7 @@ public:
 protected:
 
     /// size of matrix
-    index_t   size_;
+    size_t   size_;
     
 private:
     
@@ -36,13 +32,13 @@ public:
     Matrix() { size_ = 0; }
 
     /// constructor
-    Matrix(index_t s) { size_ = s; }
+    Matrix(size_t s) { size_ = s; }
     
     /// return the size of the matrix
-    index_t size() const { return size_; }
+    size_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(index_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { allocate(s); size_=s; }
 
     //----------------------------------------------------------------------
     
@@ -50,13 +46,13 @@ public:
     virtual void allocate(size_t alc) = 0;
         
     /// returns the address of element at (x, y), no allocation is done
-    virtual real*  addr(index_t x, index_t y) const = 0;
+    virtual real*  addr(size_t x, size_t y) const = 0;
     
     /// returns the address of element at (x, y), allocating if necessary
-    virtual real&  operator()(index_t x, index_t y) = 0;
+    virtual real&  operator()(size_t x, size_t y) = 0;
     
     /// returns the value of element at (x, y) or zero if not allocated
-    real value(index_t x, index_t y) const;
+    real value(size_t x, size_t y) const;
     
     //----------------------------------------------------------------------
     
@@ -67,13 +63,13 @@ public:
     virtual void scale(real) = 0;
     
     /// copy the block ( x, y, x+sx, y+sy ) into `mat`
-    void copyBlock(real* mat, unsigned ldd, index_t sx, unsigned nx, index_t sy, unsigned ny) const;
+    void copyBlock(real* mat, unsigned ldd, size_t sx, size_t nx, size_t sy, size_t ny) const;
     
     /// add the block ( x, x, x+sx, x+sx ) from this matrix to `mat`
-    virtual void addDiagonalBlock(real* mat, index_t ldd, index_t si, unsigned nb) const;
+    virtual void addDiagonalBlock(real* mat, size_t ldd, size_t si, size_t nb) const;
     
     /// add upper triangular half of ( idx, idx, idx+siz, idx+siz ) to `mat`
-    virtual void addTriangularBlock(real* mat, index_t ldd, index_t si, unsigned nb, unsigned dim) const;
+    virtual void addTriangularBlock(real* mat, size_t ldd, size_t si, size_t nb, size_t dim) const;
     
     //----------------------------------------------------------------------
     
@@ -101,7 +97,7 @@ public:
     virtual bool nonZero() const;
     
     /// number of element which are not null
-    virtual size_t nbElements(index_t start, index_t stop) const;
+    virtual size_t nbElements(size_t start, size_t stop) const;
     
     /// number of blocks which are not null
     size_t nbElements() const { return nbElements(0, size_); }

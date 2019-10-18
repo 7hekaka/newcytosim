@@ -43,7 +43,7 @@ void drawValues(Grid<CELL, 1> const& grid,
     float e = 2;
     
     // paint all cells one by one
-    for ( typename Grid<CELL, 1>::index_t c = 0; c < grid.breadth(0); ++c )
+    for ( size_t c = 0; c < grid.breadth(0); ++c )
     {
         float x = grid.position(0, c);
         if ( set_color(arg, grid[c], Vector1(x)) )
@@ -74,7 +74,7 @@ void drawValues(Grid<CELL, 2> const& grid,
     real e = 0.5 * grid.cellWidth(1);
     
     // paint all cells one by one
-    for ( typename Grid<CELL, 2>::index_t c = 0; c < grid.nbCells(); ++c )
+    for ( size_t c = 0; c < grid.nbCells(); ++c )
     {
         Vector2 w;
         grid.setPositionFromIndex(w, c, 0.5);
@@ -108,10 +108,10 @@ void drawValues(Grid<CELL, 3> const& grid,
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(1);
     
-    typename Grid<CELL, 3>::index_t z = grid.index(2, z_pos);
+    size_t z = grid.index(2, z_pos);
     
-    for ( typename Grid<CELL, 3>::index_t y = 0; y < grid.breadth(1); ++y )
-    for ( typename Grid<CELL, 3>::index_t x = 0; x < grid.breadth(0); ++x )
+    for ( size_t y = 0; y < grid.breadth(1); ++y )
+    for ( size_t x = 0; x < grid.breadth(0); ++x )
     {
         Vector3 w(grid.position(0, x+0.5), grid.position(1, y+0.5), z_pos);
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
@@ -144,10 +144,10 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(2);
     
-    typename Grid<CELL, 3>::index_t y = grid.index(1, pos);
+    size_t y = grid.index(1, pos);
     
-    for ( typename Grid<CELL, 3>::index_t z = 0; z < grid.breadth(2); ++z )
-    for ( typename Grid<CELL, 3>::index_t x = 0; x < grid.breadth(0); ++x )
+    for ( size_t z = 0; z < grid.breadth(2); ++z )
+    for ( size_t x = 0; x < grid.breadth(0); ++x )
     {
         Vector3 w(grid.position(0, x+0.5), pos, grid.position(2, y+0.5));
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
@@ -180,10 +180,10 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(2);
     
-    typename Grid<CELL, 3>::index_t x = grid.index(0, pos);
+    size_t x = grid.index(0, pos);
     
-    for ( typename Grid<CELL, 3>::index_t z = 0; z < grid.breadth(2); ++z )
-    for ( typename Grid<CELL, 3>::index_t y = 0; y < grid.breadth(1); ++y )
+    for ( size_t z = 0; z < grid.breadth(2); ++z )
+    for ( size_t y = 0; y < grid.breadth(1); ++y )
     {
         Vector3 w(pos, grid.position(1, y+0.5), grid.position(2, z+0.5));
         if ( set_color(arg, grid.icell3D(x,y,z), w) )

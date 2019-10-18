@@ -21,14 +21,14 @@ private:
     Mecable const* mec_;
 
     /// index of first interpolated point
-    unsigned       ref_;
+    size_t         ref_;
     
     /// interpolation coefficients for points [ref, ref+1, ref+2, ref+3]
     /** The sum of these 4 coefficients is equal to one */
     real       coef_[4];
     
     /// number of interpolated points (order)
-    unsigned       ord_;
+    size_t         ord_;
 
 public:
     
@@ -40,13 +40,13 @@ public:
     }
     
     /// set as pointing to vertex `p` of `mec`
-    void set(Mecable const* mec, unsigned p);
+    void set(Mecable const* mec, size_t p);
     
     /// set as interpolated between vertices `p` and `q` of `mec`
-    void set(Mecable const* mec, unsigned p, unsigned q, real coef);
+    void set(Mecable const* mec, size_t p, size_t q, real coef);
 
     /// set as interpolated over 4 vertices, defined by position 'vec'
-    void set(Mecable const*, unsigned, Vector const& vec);
+    void set(Mecable const*, size_t, Vector const& vec);
 
     /// attachment mecable
     Mecable const* base() const { return mec_; }

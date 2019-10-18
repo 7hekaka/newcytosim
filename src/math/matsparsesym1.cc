@@ -35,7 +35,7 @@ MatrixSparseSymmetric1::MatrixSparseSymmetric1()
     sa_        = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-    next_  = new index_t[1];
+    next_    = new size_t[1];
     next_[0] = 0;
 #endif
 }
@@ -57,7 +57,7 @@ void MatrixSparseSymmetric1::allocate(size_t alc)
         unsigned * col_size_new = new unsigned[alc];
         size_t   * col_max_new  = new size_t[alc];
         
-        index_t ii = 0;
+        size_t ii = 0;
         if ( column_ )
         {
             for ( ; ii < allocated_; ++ii )
@@ -85,7 +85,7 @@ void MatrixSparseSymmetric1::allocate(size_t alc)
         
 #if MATRIX1_USES_COLNEXT
         delete[] next_;
-        next_ = new index_t[allocated_+1];
+        next_ = new size_t[allocated_+1];
 #endif
     }
 }
@@ -115,21 +115,21 @@ void MatrixSparseSymmetric1::deallocate()
 
 
 /// copy `cnt` elements from `src` to `dst`
-void copy(unsigned cnt, MatrixSparseSymmetric1::Element * src, MatrixSparseSymmetric1::Element * dst)
+void copy(size_t cnt, MatrixSparseSymmetric1::Element * src, MatrixSparseSymmetric1::Element * dst)
 {
-    for ( unsigned ii = 0; ii < cnt; ++ii )
+    for ( size_t ii = 0; ii < cnt; ++ii )
         dst[ii] = src[ii];
 }
 
 /// move `cnt` elements to the next index, starting at vec[0]
-void shift(unsigned cnt, MatrixSparseSymmetric1::Element * vec)
+void shift(size_t cnt, MatrixSparseSymmetric1::Element * vec)
 {
-    for ( unsigned ii = cnt; ii > 0; --ii )
+    for ( size_t ii = cnt; ii > 0; --ii )
         vec[ii] = vec[ii-1];
 }
 
 
-void MatrixSparseSymmetric1::allocateColumn(const index_t jj, size_t alc)
+void MatrixSparseSymmetric1::allocateColumn(const size_t jj, size_t alc)
 {
     assert_true( jj < size_ );
     if ( alc > col_max_[jj] )
@@ -153,7 +153,7 @@ void MatrixSparseSymmetric1::allocateColumn(const index_t jj, size_t alc)
 }
 
 
-MatrixSparseSymmetric1::Element * MatrixSparseSymmetric1::insertElement(const index_t jj, index_t inx)
+MatrixSparseSymmetric1::Element * MatrixSparseSymmetric1::insertElement(const size_t jj, size_t inx)
 {
     assert_true( jj < size_ );
     // allocate space for new Element if necessary:
@@ -181,7 +181,7 @@ MatrixSparseSymmetric1::Element * MatrixSparseSymmetric1::insertElement(const in
 }
 
 
-real& MatrixSparseSymmetric1::diagonal(index_t ix)
+real& MatrixSparseSymmetric1::diagonal(size_t ix)
 {
     assert_true( ix < size_ );
     
@@ -207,7 +207,7 @@ real& MatrixSparseSymmetric1::diagonal(index_t ix)
 /**
  This allocate to be able to hold the matrix element if necessary
 */
-real& MatrixSparseSymmetric1::operator()(index_t i, index_t j)
+real& MatrixSparseSymmetric1::operator()(size_t i, size_t j)
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
@@ -235,8 +235,8 @@ real& MatrixSparseSymmetric1::operator()(index_t i, index_t j)
     }
  
     // swap to get ii > jj (address lower triangle)
-    index_t ii = std::max(i, j);
-    index_t jj = std::min(i, j);
+    size_t ii = std::max(i, j);
+    size_t jj = std::min(i, j);
 
     //check if the column is empty:
     if ( col_size_[jj] < 2 )
@@ -279,7 +279,7 @@ real& MatrixSparseSymmetric1::operator()(index_t i, index_t j)
     if ( e->inx == ii )
         return e->val;
     
-    index_t n = e - col;
+    size_t n = e - col;
 
     assert_true( col[n].inx > ii );
     col = insertElement(jj, n);
@@ -293,11 +293,11 @@ real& MatrixSparseSymmetric1::operator()(index_t i, index_t j)
 }
 
 
-real* MatrixSparseSymmetric1::addr(index_t i, index_t j) const
+real* MatrixSparseSymmetric1::addr(size_t i, size_t j) const
 {
     // swap to get ii <= jj (address lower triangle)
-    index_t ii = std::max(i, j);
-    index_t jj = std::min(i, j);
+    size_t ii = std::max(i, j);
+    size_t jj = std::min(i, j);
 
     for ( unsigned kk = 0; kk < col_size_[jj]; ++kk )
         if ( column_[jj][kk].inx == ii )
@@ -312,7 +312,7 @@ real* MatrixSparseSymmetric1::addr(index_t i, index_t j) const
 
 void MatrixSparseSymmetric1::reset()
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         col_size_[jj] = 0;
 }
 
@@ -320,7 +320,7 @@ void MatrixSparseSymmetric1::reset()
 bool MatrixSparseSymmetric1::nonZero() const
 {
     //check for any non-zero sparse term:
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
             if ( column_[jj][kk].val != 0 )
                 return true;
@@ -332,25 +332,25 @@ bool MatrixSparseSymmetric1::nonZero() const
 
 void MatrixSparseSymmetric1::scale(const real alpha)
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
             column_[jj][n].val *= alpha;
 }
 
 
-void MatrixSparseSymmetric1::addTriangularBlock(real* mat, const unsigned ldd,
-                                                const index_t si,
-                                                const unsigned nb,
-                                                const unsigned dim) const
+void MatrixSparseSymmetric1::addTriangularBlock(real* mat, const size_t ldd,
+                                                const size_t si,
+                                                const size_t nb,
+                                                const size_t dim) const
 {
-    index_t up = si + nb;
+    size_t up = si + nb;
     assert_true( up <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( size_t jj = si; jj < up; ++jj )
     {
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
         {
-            index_t ii = column_[jj][n].inx;
+            size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
             assert_true( ii >= jj );
             if ( ii < up )
@@ -363,18 +363,18 @@ void MatrixSparseSymmetric1::addTriangularBlock(real* mat, const unsigned ldd,
 }
 
 
-void MatrixSparseSymmetric1::addDiagonalBlock(real* mat, unsigned ldd,
-                                              const index_t si,
-                                              const unsigned nb) const
+void MatrixSparseSymmetric1::addDiagonalBlock(real* mat, size_t ldd,
+                                              const size_t si,
+                                              const size_t nb) const
 {
-    index_t up = si + nb;
+    size_t up = si + nb;
     assert_true( up <= size_ );
     
-    for ( index_t jj = si; jj < up; ++jj )
+    for ( size_t jj = si; jj < up; ++jj )
     {
         for ( unsigned n = 0; n < col_size_[jj]; ++n )
         {
-            index_t ii = column_[jj][n].inx;
+            size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
             assert_true( ii >= jj );
             if ( ii < up )
@@ -392,7 +392,7 @@ void MatrixSparseSymmetric1::addDiagonalBlock(real* mat, unsigned ldd,
 int MatrixSparseSymmetric1::bad() const
 {
     if ( size_ <= 0 ) return 1;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
@@ -404,13 +404,13 @@ int MatrixSparseSymmetric1::bad() const
 }
 
 
-size_t MatrixSparseSymmetric1::nbElements(index_t start, index_t stop) const
+size_t MatrixSparseSymmetric1::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
     //all allocated elements are counted, even if zero
     size_t cnt = 0;
-    for ( index_t jj = start; jj < stop; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
         cnt += col_size_[jj];
     return cnt;
 }
@@ -433,7 +433,7 @@ std::string MatrixSparseSymmetric1::what() const
 void MatrixSparseSymmetric1::printSparse(std::ostream& os) const
 {
     char str[256];
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( col_size_[jj] > 0 )
             os << "% column " << jj << "\n";
@@ -442,7 +442,7 @@ void MatrixSparseSymmetric1::printSparse(std::ostream& os) const
             real v = column_[jj][n].val;
             if ( v != 0 )
             {
-                snprintf(str, sizeof(str), "%6i %6i %16.6f\n", column_[jj][n].inx, jj, v);
+                snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", column_[jj][n].inx, jj, v);
                 os << str;
             }
         }
@@ -453,7 +453,7 @@ void MatrixSparseSymmetric1::printSparse(std::ostream& os) const
 void MatrixSparseSymmetric1::printColumns(std::ostream& os)
 {
     os << "MSS1 size " << size_ << ":";
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         os << "\n   " << jj << "   " << col_size_[jj];
 #if MATRIX1_USES_COLNEXT
@@ -464,7 +464,7 @@ void MatrixSparseSymmetric1::printColumns(std::ostream& os)
 }
 
 
-void MatrixSparseSymmetric1::printColumn(std::ostream& os, const index_t jj)
+void MatrixSparseSymmetric1::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = column_[jj];
     os << "MSS1 col " << jj << ":";
@@ -480,17 +480,17 @@ void MatrixSparseSymmetric1::printColumn(std::ostream& os, const index_t jj)
 void MatrixSparseSymmetric1::printSparseArray(std::ostream& os) const
 {
 #if MATRIX1_OPTIMIZED_MULTIPLY
-    unsigned end = ija_[size_];
+    size_t end = ija_[size_];
     
     os << "ija ";
-    for ( index_t n = 0; n < end; ++n )
+    for ( size_t n = 0; n < end; ++n )
         os << " " << std::setw(6) << ija_[n];
     os << "\n";
     
     std::streamsize p = os.precision();
     os.precision(2);
     os << "sa  ";
-    for ( index_t n = 0; n < end; ++n )
+    for ( size_t n = 0; n < end; ++n )
         os << " " << std::setw(6) << sa_[n];
     os << "\n";
     os.precision(p);
@@ -503,7 +503,7 @@ void MatrixSparseSymmetric1::printSparseArray(std::ostream& os) const
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
-void MatrixSparseSymmetric1::vecMul(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMul(const real* X, real* Y, size_t start, size_t stop) const
 {
     zero_real(stop-start, Y+start);
     vecMulAdd(X, Y, start, stop);
@@ -518,13 +518,13 @@ void MatrixSparseSymmetric1::prepareForMultiply(int)
 /*
  Using the primary storage in 'col_' and 'col_size_'
  */
-void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, index_t jj, Element col[], size_t size) const
+void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, size_t jj, Element col[], size_t size) const
 {
     const real X0 = X[jj];
     real Y0 = Y[jj] + col[0].val * X0;
     for ( unsigned n = 1 ; n < size ; ++n )
     {
-        const index_t ii = col[n].inx;
+        const size_t ii = col[n].inx;
         const real a = col[n].val;
         Y[ii] += a * X0;
         assert_true( ii > jj );
@@ -538,7 +538,7 @@ void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, index_t jj, Eleme
  */
 void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y) const
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( col_size_[jj] > 0 )
         {
@@ -551,7 +551,7 @@ void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y) const
 /*
  Using the primary storage in 'col_' and 'col_size_'
  */
-void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t jj, Element col[], size_t size) const
+void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, size_t jj, Element col[], size_t size) const
 {
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
@@ -559,7 +559,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t jj, 
     real Y1 = Y[jj+1] + col[0].val * X1;
     for ( unsigned n = 1 ; n < size ; ++n )
     {
-        const index_t ii = 2 * col[n].inx;
+        const size_t ii = 2 * col[n].inx;
         const real  a = col[n].val;
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
@@ -577,7 +577,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t jj, 
  */
 void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y) const
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( col_size_[jj] > 0 )
         {
@@ -591,7 +591,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y) const
 /*
  Using the primary storage in 'col_' and 'col_size_'
  */
-void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj, Element col[], size_t size) const
+void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, size_t jj, Element col[], size_t size) const
 {
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
@@ -601,7 +601,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj, 
     real Y2 = Y[jj+2] + col[0].val * X2;
     for ( unsigned n = 1 ; n < size ; ++n )
     {
-        const index_t ii = 3 * col[n].inx;
+        const size_t ii = 3 * col[n].inx;
         const real  a = col[n].val;
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
@@ -622,7 +622,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj, 
  */
 void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y) const
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( col_size_[jj] > 0 )
         {
@@ -643,8 +643,8 @@ void MatrixSparseSymmetric1::setNextColumn()
 
     if ( size_ > 0 )
     {
-        index_t inx = size_;
-        index_t nxt = size_;
+        size_t inx = size_;
+        size_t nxt = size_;
         while ( --inx > 0 )
         {
             if ( col_size_[inx] > 0 )
@@ -670,14 +670,14 @@ void MatrixSparseSymmetric1::prepareForMultiply(int dim)
     
 #if ( 0 )
     unsigned cnt = 0;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         cnt += ( col_size_[jj] == 0 );
     std::clog << "MatrixSparseSymmetric1 has " << cnt << " / " << size_ << " empty columns\n";
 #endif
 
     //count number of non-zero elements, including diagonal
-    unsigned nbe = 1;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    size_t nbe = 1;
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( col_size_[jj] > 0 )
             nbe += col_size_[jj];
@@ -692,7 +692,7 @@ void MatrixSparseSymmetric1::prepareForMultiply(int dim)
         free_real(sa_);
 
         nmax_  = nbe + size_;
-        ija_   = new index_t[nmax_];
+        ija_   = new size_t[nmax_];
         sa_    = new_real(nmax_);
     }
     
@@ -704,8 +704,8 @@ void MatrixSparseSymmetric1::prepareForMultiply(int dim)
      */
     ija_[0] = size_+1;
     sa_[size_] = 42; // this is the arbitrary value
-    index_t inx = size_;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    size_t inx = size_;
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( col_size_[jj] > 0 )
         {
@@ -733,31 +733,31 @@ void MatrixSparseSymmetric1::prepareForMultiply(int dim)
 }
 
 
-void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, index_t jj,
-                                       real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, size_t jj,
+                                       real const* dia, size_t start, size_t stop) const
 {
     real X0 = X[jj];
     real Y0 = Y[jj] + dia[0] * X0;
-    for ( index_t n = start; n < stop; ++n )
+    for ( size_t n = start; n < stop; ++n )
     {
         real a = sa_[n];
-        index_t ii = ija_[n];
+        size_t ii = ija_[n];
         Y[ii] += a * X0;
         Y0    += a * X[ii];
     }
     Y[jj] = Y0;
 }
 
-void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t jj,
-                                            real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, size_t jj,
+                                            real const* dia, size_t start, size_t stop) const
 {    
     real X0 = X[jj  ];
     real X1 = X[jj+1];
     real Y0 = Y[jj  ] + dia[0] * X0;
     real Y1 = Y[jj+1] + dia[0] * X1;
-    for ( index_t n = start; n < stop; ++n )
+    for ( size_t n = start; n < stop; ++n )
     {
-        index_t ii = ija_[n];
+        size_t ii = ija_[n];
         assert_true( ii > jj );
         real a = sa_[n];
         Y0      += a * X[ii  ];
@@ -770,8 +770,8 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t jj,
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj,
-                                            real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, size_t jj,
+                                            real const* dia, size_t start, size_t stop) const
 {
     real X0 = X[jj  ];
     real X1 = X[jj+1];
@@ -779,9 +779,9 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj,
     real Y0 = Y[jj  ] + dia[0] * X0;
     real Y1 = Y[jj+1] + dia[0] * X1;
     real Y2 = Y[jj+2] + dia[0] * X2;
-    for ( index_t n = start; n < stop; ++n )
+    for ( size_t n = start; n < stop; ++n )
     {
-        index_t ii = ija_[n];
+        size_t ii = ija_[n];
         assert_true( ii > jj );
         real a = sa_[n];
         Y0      += a * X[ii  ];
@@ -802,7 +802,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t jj,
 
 #if MATRIX1_USES_SSE
 
-inline void multiply2(const real* X, real* Y, index_t ii,
+inline void multiply2(const real* X, real* Y, size_t ii,
                       const real* val, vec2 const& xx, vec2& ss)
 {
     vec2 aa = loaddup2(val);
@@ -811,20 +811,20 @@ inline void multiply2(const real* X, real* Y, index_t ii,
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso2D_SSE(const real* X, real* Y, index_t jj,
-                                                real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso2D_SSE(const real* X, real* Y, size_t jj,
+                                                real const* dia, size_t start, size_t stop) const
 {
     const vec2 xx = load2(X+jj);
     vec2 ss = fmadd2(loaddup2(dia), xx, load2(Y+jj));
     // there is a dependence here for 'ss'
-    for ( index_t n = start; n < stop; ++n )
+    for ( size_t n = start; n < stop; ++n )
         multiply2(X, Y, ija_[n], sa_+n, xx, ss);
     store2(Y+jj, ss);
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t jj,
-                                                 real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, size_t jj,
+                                                 real const* dia, size_t start, size_t stop) const
 {
     const vec2 xx = load2(X+jj);
     vec2 s0 = mul2(loaddup2(dia), xx);
@@ -832,7 +832,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
     vec2 s2 = setzero2();
     vec2 s3 = setzero2();
     
-    index_t n = start;
+    size_t n = start;
 #if ( 0 )
     // unrolling by 8 may exceed the number of registers in the CPU
 #pragma nounroll
@@ -842,18 +842,18 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
         vec2 s5 = setzero2();
         vec2 s6 = setzero2();
         vec2 s7 = setzero2();
-        index_t end = n + 8 * ( ( stop - n ) / 8 );
+        size_t end = n + 8 * ( ( stop - n ) / 8 );
         // process 8 by 8:
         for ( ; n < end; n += 8 )
         {
-            const index_t i0 = ija_[n  ];
-            const index_t i1 = ija_[n+1];
-            const index_t i2 = ija_[n+2];
-            const index_t i3 = ija_[n+3];
-            const index_t i4 = ija_[n+4];
-            const index_t i5 = ija_[n+5];
-            const index_t i6 = ija_[n+6];
-            const index_t i7 = ija_[n+7];
+            const size_t i0 = ija_[n  ];
+            const size_t i1 = ija_[n+1];
+            const size_t i2 = ija_[n+2];
+            const size_t i3 = ija_[n+3];
+            const size_t i4 = ija_[n+4];
+            const size_t i5 = ija_[n+5];
+            const size_t i6 = ija_[n+6];
+            const size_t i7 = ija_[n+7];
             vec2 y0 = load2(Y+i0);
             vec2 y1 = load2(Y+i1);
             vec2 y2 = load2(Y+i2);
@@ -895,7 +895,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
     }
 #endif
     
-    index_t end = n + 4 * ( ( stop - n ) / 4 );
+    size_t end = n + 4 * ( ( stop - n ) / 4 );
     // process 4 by 4:
 #pragma nounroll
     for ( ; n < end; n += 4 )
@@ -915,10 +915,10 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, index_t
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const index_t i0 = ija_[n  ];
-        const index_t i1 = ija_[n+1];
-        const index_t i2 = ija_[n+2];
-        const index_t i3 = ija_[n+3];
+        const size_t i0 = ija_[n  ];
+        const size_t i1 = ija_[n+1];
+        const size_t i2 = ija_[n+2];
+        const size_t i3 = ija_[n+3];
         vec2 y0 = load2(Y+i0);
         vec2 y1 = load2(Y+i1);
         vec2 y2 = load2(Y+i2);
@@ -955,7 +955,7 @@ Accumulation is done here in the higher part of 'ss'
 The high position of 'xx' is not used
 The low position of 'ss' is used locally
 */
-inline void multiply4(const real* X, real* Y, index_t ii,
+inline void multiply4(const real* X, real* Y, size_t ii,
                       const real* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend4(xx, broadcast2(X+ii), 0b1100);  // hi <- X , lo <- xx
@@ -965,20 +965,20 @@ inline void multiply4(const real* X, real* Y, index_t ii,
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso2D_AVX(const real* X, real* Y, index_t jj,
-                                                real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso2D_AVX(const real* X, real* Y, size_t jj,
+                                                real const* dia, size_t start, size_t stop) const
 {
     const vec4 xx = broadcast2(X+jj);  // hi position
     vec4 ss = fmadd4(broadcast1(dia), xx, broadcast2(Y+jj));
     // there is a dependence here for 'ss'
-    for ( index_t n = start; n < stop; ++n )
+    for ( size_t n = start; n < stop; ++n )
         multiply4(X, Y, ija_[n], sa_+n, xx, ss);
     store2(Y+jj, gethi(ss));
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, index_t jj,
-                                                 real const* dia, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, size_t jj,
+                                                 real const* dia, size_t start, size_t stop) const
 {
     const vec4 xx = broadcast2(X+jj);  // hi and lo position
     vec4 s0 = mul4(broadcast1(dia), xx);
@@ -986,7 +986,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, index_t
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
     
-    index_t * inx = ija_ + start;
+    size_t * inx = ija_ + start;
     const real * val = sa_ + start;
     const real * end = val + 4 * ((stop-start)/4);
     // process 4 by 4:
@@ -1010,10 +1010,10 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, index_t
          The compiler can reorder instructions to avoid lattencies */
         //__m128i ii = _mm_slli_epi32(_mm_loadu_si128((__m128i*)(ija_+n)), 0x1);
         //printi(ii, "indx");
-        const index_t i0 = inx[0];
-        const index_t i1 = inx[1];
-        const index_t i2 = inx[2];
-        const index_t i3 = inx[3];
+        const size_t i0 = inx[0];
+        const size_t i1 = inx[1];
+        const size_t i2 = inx[2];
+        const size_t i3 = inx[3];
         s0 = blend4(cast4(load2(Y+i0)),s0,0b1100);    // lo = Y
         s1 = blend4(cast4(load2(Y+i1)),s1,0b1100);    // lo = Y
         s2 = blend4(cast4(load2(Y+i2)),s2,0b1100);    // lo = Y
@@ -1049,15 +1049,15 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, index_t
 #pragma mark - Matrix-Vector multiplication
 
 
-void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
 
 #if MATRIX1_USES_COLNEXT
-    for ( index_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
 #else
-    for ( index_t jj = start; jj < stop; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
 #endif
     {
         vecMulAdd(X, Y, jj, sa_+jj, ija_[jj], ija_[jj+1]);
@@ -1065,15 +1065,15 @@ void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, index_t start, in
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
 
 #if MATRIX1_USES_COLNEXT
-    for ( index_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
 #else
-    for ( index_t jj = start; jj < stop; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
 #endif
     {
 #if MATRIX1_USES_AVX
@@ -1087,15 +1087,15 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, index_t star
 }
 
 
-void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
 
 #if MATRIX1_USES_COLNEXT
-    for ( index_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
 #else
-    for ( index_t jj = start; jj < stop; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
 #endif
     {
         vecMulAddIso3D(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);

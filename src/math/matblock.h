@@ -18,7 +18,7 @@ class MatrixOfBlocks
 private:
     
     /// size of matrix
-    index_t    size_;
+    size_t     size_;
 
     /// size of memory which has been allocated
     size_t     allocated_;
@@ -38,10 +38,10 @@ private:
 public:
     
     /// return the size of the matrix
-    index_t size() const { return size_; }
+    size_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(index_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { allocate(s); size_=s; }
     
     /// default constructor
     MatrixOfBlocks();
@@ -60,7 +60,7 @@ public:
     
     
     /// return the address of first element in block ii
-    real* block( const unsigned int ii ) const
+    real* block(const size_t ii) const
     {
         assert_true( block_ );
         assert_true( ii < block_cnt );
@@ -79,7 +79,7 @@ public:
     size_t calculateSize();
         
     /// returns the size of block ii
-    size_t blockSize( const unsigned int ii ) const
+    size_t blockSize(const size_t ii) const
     {
         assert_true( block_ );
         assert_true( ii < block_cnt );
@@ -87,19 +87,19 @@ public:
     }
     
     /// the address holding element (ii, jj)
-    real* addr( index_t ii, index_t jj ) const;
+    real* addr(size_t ii, size_t jj) const;
     
     /// returns the address of element at (x, y), allocating if necessary
-    virtual real& operator()( index_t x, index_t y );
+    virtual real& operator()(size_t x, size_t y);
     
     /// reset all the values in block ii
-    void setBlockToZero( unsigned int ii );
+    void setBlockToZero(size_t ii);
     
     /// reset the entire matrix
     void reset();
     
     /// scale block ii
-    void scaleBlock( unsigned int ii, real a );
+    void scaleBlock(size_t ii, real a);
     
     /// scale the entire matrix
     void scale( real a );
@@ -111,16 +111,16 @@ public:
     size_t maxBlockSize() const;
     
     /// vector multiplication: Y <- M * X
-    void vecMulAdd( const real* X, real* Y) const;
+    void vecMulAdd(const real* X, real* Y) const;
     
     /// vector multiplication: Y <- M * X
-    void vecMul( const real* X, real* Y) const;
+    void vecMul(const real* X, real* Y) const;
     
     /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)
-    void vecMulAddIso2D( const real* X, real* Y ) const { }
+    void vecMulAddIso2D(const real* X, real* Y) const { }
     
     /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 3 * size(M)
-    void vecMulAddIso3D( const real* X, real* Y ) const { }
+    void vecMulAddIso3D(const real* X, real* Y) const { }
     
     /// maximum of the absolute value of all elements
     real norm_inf() const;

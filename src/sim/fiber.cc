@@ -535,7 +535,7 @@ void Fiber::planarCut(Vector const& n, const real a, int stateP, int stateM)
      The cuts should be processed in order of decreasing abscissa,
      hence we check intersections from PLUS_END to MINUS_END
     */
-    for ( int s = lastSegment(); s >=0 ; --s )
+    for ( long s = lastSegment(); s >=0 ; --s )
     {
         real abs = planarIntersect(s, n, a);
         if ( 0 <= abs  &&  abs < 1 )
@@ -918,20 +918,20 @@ void Fiber::setInteractions(Meca & meca) const
 
             case CONFINE_PLUS_END:
             {
-                unsigned L = lastPoint();
+                const size_t L = lastPoint();
                 spc->setInteraction(posP(L), Mecapoint(this, L), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_BOTH_ENDS:
             {
+                const size_t L = lastPoint();
                 spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
-                const unsigned L = lastPoint();
                 spc->setInteraction(posP(L), Mecapoint(this, L), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_PLUS_OUT:
             {
-                unsigned L = lastPoint();
+                const size_t L = lastPoint();
                 Vector pos = posP(L);
                 if ( spc->inside(pos) )
                     spc->setInteraction(pos, Mecapoint(this, L), meca, prop->confine_stiffness);

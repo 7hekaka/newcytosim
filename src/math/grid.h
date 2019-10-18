@@ -112,9 +112,6 @@ public:
     
     /// Type of the parent class
     typedef GridBase<ORD> GRID;
-    
-    /// index
-    typedef typename GRID::index_t index_t;
 
     /// The type of cells (=CELL)
     typedef CELL value_type;
@@ -205,7 +202,7 @@ public:
     }
     
     /// return cell at index 'indx'
-    CELL & icell(const index_t indx) const
+    CELL & icell(const size_t indx) const
     {
         assert_true( indx < GRID::gAllocated );
         assert_true( indx < GRID::nCells );
@@ -215,7 +212,7 @@ public:
     /// reference to CELL whose center is closest to w[]
     CELL & cell(const real w[ORD]) const
     {
-        index_t inx = GRID::index(w);
+        size_t inx = GRID::index(w);
         assert_true( inx < GRID::nCells );
         return gCell[ inx ];
     }
@@ -228,7 +225,7 @@ public:
     }
    
     /// operator access to a cell by index
-    CELL & operator[](const index_t indx) const
+    CELL & operator[](const size_t indx) const
     {
         assert_true( indx < GRID::nCells );
         return gCell[ indx ];
@@ -310,7 +307,7 @@ public:
     {
         //we have 2^ORD corner cells
         const int sz = 1 << ORD;
-        index_t inx[sz];   //incides of the corner cells
+        size_t inx[sz];   //incides of the corner cells
         real    alp[sz];   //coefficients of interpolation
         
         int nb = 0;
@@ -368,8 +365,8 @@ public:
         
         ax -= ix;
         
-        index_t lx = GRID::image(0, ix-1);
-        index_t ux = GRID::image(0, ix  );
+        size_t lx = GRID::image(0, ix-1);
+        size_t ux = GRID::image(0, ix  );
         
         return gCell[lx] + ax * ( gCell[ux] - gCell[lx] );
     }
@@ -394,11 +391,11 @@ public:
         ax -= ix;
         ay -= iy;
         
-        index_t lx = GRID::image(0, ix-1);
-        index_t ux = GRID::image(0, ix  );
+        size_t lx = GRID::image(0, ix-1);
+        size_t ux = GRID::image(0, ix  );
         
-        index_t ly = GRID::image(1, iy-1) * GRID::breadth(0);
-        index_t uy = GRID::image(1, iy  ) * GRID::breadth(0);
+        size_t ly = GRID::image(1, iy-1) * GRID::breadth(0);
+        size_t uy = GRID::image(1, iy  ) * GRID::breadth(0);
         
         //sum weighted cells to get interpolation
         CELL  rl = gCell[lx+ly] + ay * ( gCell[lx+uy] - gCell[lx+ly] );
@@ -431,14 +428,14 @@ public:
         ay -= iy;
         az -= iz;
 
-        index_t lx = GRID::image(0, ix-1);
-        index_t ux = GRID::image(0, ix  );
+        size_t lx = GRID::image(0, ix-1);
+        size_t ux = GRID::image(0, ix  );
         
-        index_t ly = GRID::image(1, iy-1) * GRID::breadth(0);
-        index_t uy = GRID::image(1, iy  ) * GRID::breadth(0);
+        size_t ly = GRID::image(1, iy-1) * GRID::breadth(0);
+        size_t uy = GRID::image(1, iy  ) * GRID::breadth(0);
         
-        index_t lz = GRID::image(2, iz-1) * GRID::breadth(1) * GRID::breadth(0);
-        index_t uz = GRID::image(2, iz  ) * GRID::breadth(1) * GRID::breadth(0);
+        size_t lz = GRID::image(2, iz-1) * GRID::breadth(1) * GRID::breadth(0);
+        size_t uz = GRID::image(2, iz  ) * GRID::breadth(1) * GRID::breadth(0);
 
         CELL * cul = gCell + (uy+lz), rul = cul[lx] + ax * ( cul[ux] - cul[lx] );
         CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ax * ( cuu[ux] - cuu[lx] );
@@ -458,7 +455,7 @@ public:
     void setValues(const CELL val)
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
             gCell[ii] = val;
     }
     
@@ -466,7 +463,7 @@ public:
     void scaleValues(const CELL val)
     {
         assert_true ( GRID::nCells <= GRID::gAllocated );
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
             gCell[ii] *= val;
     }
     
@@ -477,7 +474,7 @@ public:
         sum = 0;
         mn = gCell[0];
         mx = gCell[0];
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
         {
             if ( gCell[ii] < mn ) mn = gCell[ii];
             if ( gCell[ii] > mx ) mx = gCell[ii];
@@ -490,7 +487,7 @@ public:
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
         CELL result = 0;
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
             result += gCell[ii];
         return result;
     }
@@ -500,7 +497,7 @@ public:
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
         CELL res = gCell[0];
-        for ( index_t ii = 1; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 1; ii < GRID::nCells; ++ii )
         {
             if ( res < gCell[ii] )
                 res = gCell[ii];
@@ -513,7 +510,7 @@ public:
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
         CELL res = gCell[0];
-        for ( index_t ii = 1; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 1; ii < GRID::nCells; ++ii )
         {
             if ( res > gCell[ii] )
                 res = gCell[ii];
@@ -525,7 +522,7 @@ public:
     bool hasNegativeValue() const
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
             if ( gCell[ii] < 0 )
                 return true;
         return false;
@@ -534,7 +531,7 @@ public:
 #pragma mark -
     
     /// the sum of the values in the region around cell referred by 'indx'
-    CELL sumValuesInRegion(const index_t indx) const
+    CELL sumValuesInRegion(const size_t indx) const
     {
         CELL result = 0;
         int * offsets = nullptr;
@@ -546,7 +543,7 @@ public:
     }
     
     /// the sum of the values in the region around cell referred by 'indx'
-    CELL avgValueInRegion(const index_t indx) const
+    CELL avgValueInRegion(const size_t indx) const
     {
         CELL result = 0;
         int * offsets = nullptr;
@@ -558,7 +555,7 @@ public:
     }
     
     /// the maximum of the values in the region around cell referred by 'indx'
-    CELL maxValueInRegion(const index_t indx) const
+    CELL maxValueInRegion(const size_t indx) const
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
         CELL result = gCell[indx];
@@ -578,7 +575,7 @@ public:
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
         real w[ORD];
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
         {
             GRID::setPositionFromIndex(w, ii, offset);
             for ( int d=0; d < ORD; ++d )
@@ -592,7 +589,7 @@ public:
     {
         assert_true( GRID::nCells <= GRID::gAllocated );
         real l[ORD], r[ORD];
-        for ( index_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
         {
             GRID::setPositionFromIndex(l, ii, 0.0);
             GRID::setPositionFromIndex(r, ii, 1.0);

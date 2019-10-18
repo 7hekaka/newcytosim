@@ -184,21 +184,21 @@ public:
     /// clear all panes
     void clear()
     {
-        for ( unsigned p = 1; p <= NB_STERIC_PANES; ++p )
+        for ( size_t p = 1; p <= NB_STERIC_PANES; ++p )
         {
             point_panes[p].clear();
             locus_panes[p].clear();
         }
     }
     
-    FatPointList& point_list(unsigned p)
+    FatPointList& point_list(size_t p)
     {
         assert_true( 0 < p && p <= NB_STERIC_PANES );
         return point_panes[p];
     }
     
     
-    FatLocusList& locus_list(unsigned p)
+    FatLocusList& locus_list(size_t p)
     {
         assert_true( 0 < p && p <= NB_STERIC_PANES );
         return locus_panes[p];
@@ -284,13 +284,13 @@ private:
     }
     
     /// cell corresponding to index `w`, and pane `p`
-    FatPointList& point_list(const unsigned w) const
+    FatPointList& point_list(const size_t w) const
     {
         return pGrid.icell(w).point_pane;
     }
     
     /// cell corresponding to index `w`, and pane `p`
-    FatLocusList& locus_list(const unsigned w) const
+    FatLocusList& locus_list(const size_t w) const
     {
         return pGrid.icell(w).locus_pane;
     }
@@ -298,28 +298,28 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    FatPointList& point_list(Vector const& w, const unsigned p) const
+    FatPointList& point_list(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= NB_STERIC_PANES );
         return pGrid.cell(w).point_panes[p];
     }
     
     /// cell corresponding to position `w`, and pane `p`
-    FatLocusList& locus_list(Vector const& w, const unsigned p) const
+    FatLocusList& locus_list(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= NB_STERIC_PANES );
         return pGrid.cell(w).locus_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatPointList& point_list(const unsigned c, const unsigned p) const
+    FatPointList& point_list(const size_t c, const size_t p) const
     {
         assert_true( 0 < p && p <= NB_STERIC_PANES );
         return pGrid.icell(c).point_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatLocusList& locus_list(const unsigned c, const unsigned p) const
+    FatLocusList& locus_list(const size_t c, const size_t p) const
     {
         assert_true( 0 < p && p <= NB_STERIC_PANES );
         return pGrid.icell(c).locus_panes[p];
@@ -367,16 +367,16 @@ public:
 #else
     
     /// place Mecapoint on the grid
-    void add(unsigned pane, Mecapoint const&, real radius, real extra_range) const;
+    void add(size_t pane, Mecapoint const&, real radius, real extra_range) const;
     
     /// place FiberSegment on the grid
-    void add(unsigned pane, FiberSegment const&, real radius, real extra_range) const;
+    void add(size_t pane, FiberSegment const&, real radius, real extra_range) const;
     
     /// enter interactions into Meca in one panes with given parameters
-    void setInteractions(Meca&, StericParam const& pam, unsigned pan) const;
+    void setInteractions(Meca&, StericParam const& pam, size_t pan) const;
     
     /// enter interactions into Meca between two panes with given parameters
-    void setInteractions(Meca&, StericParam const& pam, unsigned pan1, unsigned pan2) const;
+    void setInteractions(Meca&, StericParam const& pam, size_t pan1, size_t pan2) const;
     
 #endif
     

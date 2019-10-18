@@ -142,7 +142,7 @@ public:
     real        tension(unsigned p) const { assert_true(p+1<nPoints); return rfLag[p]; }
     
     /// total drag-coefficient of object (force = drag * speed)
-    real        dragCoefficient() const { return  nPoints * rfDragPoint; }
+    real        dragCoefficient() const { return real(nPoints) * rfDragPoint; }
     
     /// drag coefficient of one point
     real        leftoverDrag() const { return rfDragPoint; }
@@ -176,10 +176,10 @@ public:
     void        addRigidity(const real* X, real* Y) const;
     
     /// add rigidity terms to a symmetric matrix
-    void        addRigidityMatrix(MatrixSparseSymmetric1&, int inx, int dim) const;
+    void        addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx, size_t dim) const;
     
     /// add rigidity terms to upper side of matrix
-    void        addRigidityUpper(real*, unsigned) const;
+    void        addRigidityUpper(real*, size_t) const;
 
 };
 

@@ -60,7 +60,7 @@ real Simul::estimateStericRange() const
     {
         if ( so->prop->steric )
         {
-            for ( unsigned p = 0; p < so->nbPoints(); ++p )
+            for ( size_t p = 0; p < so->nbPoints(); ++p )
                 ran = std::max(ran, 2 * so->radius(p) + so->prop->steric_range);
         }
     }
@@ -172,7 +172,7 @@ void Simul::setStericInteractions(Meca& meca) const
     {
         if ( so->prop->steric )
         {
-            for ( unsigned i = 0; i < so->nbPoints(); ++i )
+            for ( size_t i = 0; i < so->nbPoints(); ++i )
             {
                 if ( so->radius(i) > REAL_EPSILON )
 #if ( NB_STERIC_PANES == 1 )
@@ -423,44 +423,6 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     }
 #endif
 #if ( 0 )
-    if ( fibers.size() > 1 )
-    {
-        PRINT_ONCE("AD-HOC FIBER TEST LINKS ENABLED\n");
-        const real sti = 100000;
-        const real len = 0.020;
-        // connect fibers together into a tube:
-        Fiber * a = fibers.firstID();
-        Fiber * b = fibers.nextID(a);
-        std::cerr.precision(3);
-        for ( unsigned i = 0; i < a->nbPoints()-1; ++i )
-        {
-            Interpolation ptA(b,i,i+1,0.5);
-            Interpolation ptB(a,i,i+1,0.5);
-            //Mecapoint ptB(a,i);
-#if ( DIM == 3 )
-            if ( 0 ) {
-                Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
-                real n = arm.norm();
-                if ( n > REAL_EPSILON )
-                    meca.addSideSlidingLink3D(ptA, ptB, arm*(len/n), sti);
-            }
-            meca.addSideSlidingLink(ptA, ptB, len, sti);
-            if ( 0 ) {
-                Vector arm = ptB.pos()-ptA.pos();
-                Vector dir = ptA.dir();
-                arm -= dot(arm, dir) * dir;
-                real n = arm.norm();
-                if ( n > REAL_EPSILON )
-                    meca.addSideSlidingLinkS(ptA, ptB, arm*(len/n), sti);
-            }
-#elif ( DIM == 2 )
-            real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
-            meca.addSideSlidingLink2D(ptA, ptB, arm, sti);
-#endif
-        }
-    }
-#endif
-#if ( 0 )
     PRINT_ONCE("AD-HOC FUNKY RADIAL FORCES ENABLED\n");
     // attach beads together in a string:
     for( Bead * b=beads.first(); b; b=b->next() )
@@ -546,8 +508,8 @@ void Simul::solveX()
         Hand const* h1 = co->hand1();
         Hand const* h2 = co->hand2();
         
-        const index_t i1 = h1->fiber()->matIndex();
-        const index_t i2 = h2->fiber()->matIndex();
+        const size_t i1 = h1->fiber()->matIndex();
+        const size_t i2 = h2->fiber()->matIndex();
         assert_true( i1 != i2 );
         
         pMeca1D->addLink(i1, i2, co->stiffness(), h2->pos().XX - h1->pos().XX);
@@ -556,7 +518,7 @@ void Simul::solveX()
     for ( Single * gh = singles.firstA(); gh ; gh=gh->next() )
     {
         Hand const* h = gh->hand();
-        const index_t ii = h->fiber()->matIndex();
+        const size_t ii = h->fiber()->matIndex();
         
         pMeca1D->addClamp(ii, gh->prop->stiffness, gh->position().XX - h->pos().XX);
     }

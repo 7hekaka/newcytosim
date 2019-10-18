@@ -144,7 +144,7 @@ ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
         if ( !mec )
             throw InvalidParameter("Could not find Mecable specified in single:base");
         // get index of point in second argument
-        unsigned ip = 0;
+        size_t ip = 0;
         if ( opt.set(str, "base", 1) )
             ip = Mecable::point_index(str, mec->nbPoints());
          
@@ -385,10 +385,10 @@ unsigned SingleSet::count(bool (*func)(Object const*, void const*), void const* 
  
  This is used to decorate Solid and Sphere
  */
-ObjectList SingleSet::makeWrists(Mecable const* obj, unsigned fip, unsigned nbp, std::string& arg)
+ObjectList SingleSet::makeWrists(Mecable const* obj, size_t fip, size_t nbp, std::string& arg)
 {
     ObjectList res;
-    unsigned num = 1;
+    size_t num = 1;
 
     std::istringstream iss(arg);
     iss >> num;
@@ -409,15 +409,15 @@ ObjectList SingleSet::makeWrists(Mecable const* obj, unsigned fip, unsigned nbp,
 
     if ( mod == "each" )
     {
-        for ( unsigned u = 0; u < num; ++u )
+        for ( size_t u = 0; u < num; ++u )
         {
-            for ( unsigned i = 0; i < nbp; ++i )
+            for ( size_t i = 0; i < nbp; ++i )
                 res.push_back(sip->newWrist(obj, fip+i));
         }
     }
     else
     {
-        for ( unsigned u = 0; u < num; ++u )
+        for ( size_t u = 0; u < num; ++u )
         {
             res.push_back(sip->newWrist(obj, fip+RNG.pint(nbp)));
         }
@@ -602,7 +602,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 bool SingleSet::uniPrepare(PropertyList const& properties)
 {
     bool res = false;
-    unsigned last = 0;
+    size_t last = 0;
 
     for ( Property const* i : properties.find_all("single") )
     {

@@ -120,14 +120,14 @@ public:
     }
     
     /// add a clamp between point at index 'ii' to position 'dx'
-    void addClamp(index_t ii, real w, real dx)
+    void addClamp(size_t ii, real w, real dx)
     {
         mA(ii, ii) -= w;
         vBAS[ii]   += w * dx;
     }
     
     /// add a link between points 'ii' and 'jj' with a position shift 'dx'
-    void addLink(index_t ii, index_t jj, real w, real dx)
+    void addLink(size_t ii, size_t jj, real w, real dx)
     {
         mA(ii, ii) -= w;
         mA(ii, jj) += w;
@@ -203,7 +203,7 @@ public:
     }
     
     /// Implements the LinearOperator
-    unsigned dimension() const { return mecables.size(); }
+    size_t dimension() const { return mecables.size(); }
     
     /// Implements the LinearOperator:  Y <- X - vMOB * mA * X
     void multiply(const real * X, real * Y) const

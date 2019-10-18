@@ -13,7 +13,7 @@ MatrixSparseBlock::MatrixSparseBlock()
     row_       = nullptr;
     blocks_    = nullptr;
     
-    next_      = new index_t[1];
+    next_      = new size_t[1];
     next_[0]   = 0;
 }
 
@@ -44,7 +44,7 @@ void MatrixSparseBlock::allocate(size_t alc)
         allocated_ = alc;
         
         delete[] next_;
-        next_ = new index_t[allocated_+1];
+        next_ = new size_t[allocated_+1];
     }
 }
 
@@ -77,19 +77,19 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
         void * ptr = new_real(alc*sizeof(SubBlock)/sizeof(real));
         SubBlock * blk_new  = new(ptr) SubBlock[alc];
 
-        posix_memalign(&ptr, 32, alc*sizeof(index_t));
-        index_t * inx_new = (index_t*)ptr;
+        posix_memalign(&ptr, 32, alc*sizeof(size_t));
+        size_t * inx_new = (size_t*)ptr;
 
         if ( inx_ )
         {
-            for ( index_t n = 0; n < size_; ++n )
+            for ( size_t n = 0; n < size_; ++n )
                 inx_new[n] = inx_[n];
             free(inx_);
         }
 
         if ( blk_ )
         {
-            for ( index_t n = 0; n < size_; ++n )
+            for ( size_t n = 0; n < size_; ++n )
                 blk_new[n] = blk_[n];
             free_real(blk_);
         }
@@ -134,9 +134,9 @@ void MatrixSparseBlock::Line::operator =(MatrixSparseBlock::Line & row)
 /**
  This allocate to be able to hold the matrix element if necessary
  */
-SubBlock& MatrixSparseBlock::Line::block(index_t jj)
+SubBlock& MatrixSparseBlock::Line::block(size_t jj)
 {
-    index_t n = 0;
+    size_t n = 0;
     /* This is a silly search that could be optimized */
     for ( n = 0; n < size_; ++n )
         if ( inx_[n] == jj )
@@ -158,27 +158,27 @@ void MatrixSparseBlock::Line::reset()
 }
 
 
-real& MatrixSparseBlock::operator()(index_t ii, index_t jj)
+real& MatrixSparseBlock::operator()(size_t ii, size_t jj)
 {
     assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )
     return row_[ii].block(jj).value();
 #else
-    index_t i = ii % BLOCK_SIZE;
-    index_t j = jj % BLOCK_SIZE;
+    size_t i = ii % BLOCK_SIZE;
+    size_t j = jj % BLOCK_SIZE;
     return row_[ii-i].block(jj-j)(i, j);
 #endif
 }
 
 
-real* MatrixSparseBlock::addr(index_t ii, index_t jj) const
+real* MatrixSparseBlock::addr(size_t ii, size_t jj) const
 {
     assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )
     return &row_[ii].block(jj).value();
 #else
-    index_t i = ii % BLOCK_SIZE;
-    index_t j = jj % BLOCK_SIZE;
+    size_t i = ii % BLOCK_SIZE;
+    size_t j = jj % BLOCK_SIZE;
     return row_[ii-i].block(jj-j).addr(i, j);
 #endif
 }
@@ -190,7 +190,7 @@ real* MatrixSparseBlock::addr(index_t ii, index_t jj) const
 void MatrixSparseBlock::reset()
 {
     already_symmetric = false;
-    for ( index_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < size_; ++n )
         row_[n].reset();
 }
 
@@ -198,7 +198,7 @@ void MatrixSparseBlock::reset()
 bool MatrixSparseBlock::nonZero() const
 {
     //check for any non-zero sparse term:
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
         for ( unsigned n = 0 ; n < row.size_ ; ++n )
@@ -212,7 +212,7 @@ bool MatrixSparseBlock::nonZero() const
 
 void MatrixSparseBlock::scale(const real alpha)
 {
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
         for ( unsigned n = 0 ; n < row.size_ ; ++n )
@@ -221,24 +221,24 @@ void MatrixSparseBlock::scale(const real alpha)
 }
 
 
-void MatrixSparseBlock::addTriangularBlock(real* mat, const unsigned ldd,
-                                           const index_t start,
-                                           const unsigned cnt,
-                                           const unsigned dim) const
+void MatrixSparseBlock::addTriangularBlock(real* mat, const size_t ldd,
+                                           const size_t start,
+                                           const size_t cnt,
+                                           const size_t dim) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
 
-    index_t end = start + cnt;
-    index_t off = start + ldd * start;
+    size_t end = start + cnt;
+    size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( index_t i = start; i < end; ++i )
+    for ( size_t i = start; i < end; ++i )
     {
         Line & row = row_[i];
-        for ( index_t n = 1; n < row.size_; ++n )
+        for ( size_t n = 1; n < row.size_; ++n )
         {
-            index_t j = row.inx_[n];
+            size_t j = row.inx_[n];
             if ( start <= j && j < end )
                 row[n].addto(mat+(i+ldd*j)-off, ldd);
         }
@@ -246,23 +246,23 @@ void MatrixSparseBlock::addTriangularBlock(real* mat, const unsigned ldd,
 }
 
 
-void MatrixSparseBlock::addDiagonalBlock(real* mat, unsigned ldd,
-                                         const index_t start,
-                                         const unsigned cnt) const
+void MatrixSparseBlock::addDiagonalBlock(real* mat, size_t ldd,
+                                         const size_t start,
+                                         const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
 
-    index_t end = start + cnt;
-    index_t off = start + ldd * start;
+    size_t end = start + cnt;
+    size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( index_t i = start; i < end; ++i )
+    for ( size_t i = start; i < end; ++i )
     {
         Line & row = row_[i];
-        for ( index_t n = 0; n < row.size_; ++n )
+        for ( size_t n = 0; n < row.size_; ++n )
         {
-            index_t j = row.inx_[n];
+            size_t j = row.inx_[n];
             if ( start <= j && j < end )
                 row[n].addto(mat+(i+ldd*j)-off, ldd);
         }
@@ -273,7 +273,7 @@ void MatrixSparseBlock::addDiagonalBlock(real* mat, unsigned ldd,
 int MatrixSparseBlock::bad() const
 {
     if ( size_ <= 0 ) return 1;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
         for ( unsigned n = 0 ; n < row.size_ ; ++n )
@@ -290,7 +290,7 @@ int MatrixSparseBlock::bad() const
 size_t MatrixSparseBlock::nbElements() const
 {
     size_t cnt = 0;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
         cnt += row_[jj].size_;
     return cnt;
 }
@@ -319,23 +319,23 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
     os.precision(8);
     if ( ! row_ )
         return;
-    for ( index_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
         if ( row.size_ > 0 )
             os << "% column " << jj << "\n";
         for ( unsigned n = 0 ; n < row.size_ ; ++n )
         {
-            index_t ii = row.inx_[n];
+            size_t ii = row.inx_[n];
             SubBlock blk = row.blk_[n];
-            index_t d = ( ii == jj );
-            for ( index_t x = 0  ; x < BLOCK_SIZE; ++x )
-            for ( index_t y = x*d; y < BLOCK_SIZE; ++y )
+            size_t d = ( ii == jj );
+            for ( size_t x = 0  ; x < BLOCK_SIZE; ++x )
+            for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
             {
                 real v = blk(y, x);
                 if ( v != 0 )
                 {
-                    snprintf(str, sizeof(str), "%6i %6i %16.6f\n", ii+y, jj+x, blk(y, x));
+                    snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, blk(y, x));
                     os << str;
                 }
             }
@@ -348,7 +348,7 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
 void MatrixSparseBlock::printLines(std::ostream& os)
 {
     os << "MSB size " << size_ << ":";
-    for ( index_t i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
         if (  row_[i].size_ > 0 )
         {
             os << "\n   " << i << "   " << row_[i].size_;
@@ -360,7 +360,7 @@ void MatrixSparseBlock::printLines(std::ostream& os)
 
 void MatrixSparseBlock::Line::print(std::ostream& os) const
 {
-    for ( index_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < size_; ++n )
         os << "\n" << inx_[n] << " : " << blk_[n] << "\n";
     std::endl(os);
 }
@@ -378,7 +378,7 @@ public:
     SubBlock blk;
     
     /// index
-    index_t inx;
+    size_t inx;
 };
 
 
@@ -439,7 +439,7 @@ void MatrixSparseBlock::sortElements()
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
-    for ( index_t i = next_[0]; i < size_; i = next_[i+1] )
+    for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
     {
         assert_true( i < size_ );
         Line & row = row_[i];
@@ -466,7 +466,7 @@ void MatrixSparseBlock::consolidate()
 {
     size_t cnt = 0;
     
-    for ( index_t i = next_[0]; i < size_; i = next_[i+1] )
+    for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
     {
         cnt += row_[i].size_;
         //std::cerr << "\nMatrixSparseBlock line " << i << "  " << row.size_ << "  " << row.blk_ << "";
@@ -479,7 +479,7 @@ void MatrixSparseBlock::consolidate()
     blocks_ = new(ptr) SubBlock[cnt];
     
     cnt = 0;
-    for ( index_t i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
     {
         Line & row = row_[i];
         row.sbk_ = blocks_ + cnt;
@@ -500,7 +500,7 @@ void MatrixSparseBlock::consolidate()
  */
 void MatrixSparseBlock::symmetrize()
 {
-    for ( index_t i = next_[0]; i < size_; i = next_[i+1] )
+    for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
     {
         Line & row = row_[i];
         //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
@@ -508,7 +508,7 @@ void MatrixSparseBlock::symmetrize()
         for ( unsigned n = 0 ; n < row.size_ ; ++n )
         {
             /// we duplicate blocks from the lower triangle
-            index_t j = row.inx_[n];
+            size_t j = row.inx_[n];
             assert_true( j <= i );
             if ( j < i )
             {
@@ -523,11 +523,11 @@ void MatrixSparseBlock::symmetrize()
     
 #if 0
     /// check that indices are in ascending order:
-    for ( index_t i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
     {
         Line & row = row_[i];
         //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
-        index_t j = 0;
+        size_t j = 0;
         for ( unsigned n = 0 ; n < row.size_ ; ++n )
         {
             if ( row.inx_[n] < j )
@@ -545,8 +545,8 @@ bool MatrixSparseBlock::prepareForMultiply(int)
     
     if ( size_ > 0 )
     {
-        index_t inx = size_;
-        index_t nxt = size_;
+        size_t inx = size_;
+        size_t nxt = size_;
         while ( --inx > 0 )
         {
             if ( row_[inx].size_ > 0 )
@@ -584,18 +584,18 @@ bool MatrixSparseBlock::prepareForMultiply(int)
 Vector MatrixSparseBlock::Line::vecMul(const real* X) const
 {
     Vector res(0,0,0);
-    for ( index_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < size_; ++n )
         res += blk_[n] * Vector(X+inx_[n]);
     return res;
 }
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
-    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
         row_[i].vecMul(X).add_to(Y+i);
 }
 
@@ -604,7 +604,7 @@ void MatrixSparseBlock::vecMulAdd_SCAL(const real* X, real* Y, index_t start, in
 real MatrixSparseBlock::Line::vecMul1D(const real* X) const
 {
     real res = 0;
-    for ( index_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < size_; ++n )
         res += blk_[n].value() * X[inx_[n]];
     return res;
 }
@@ -624,7 +624,7 @@ vec2 MatrixSparseBlock::Line::vecMul2D(const real* X) const
     vec4 ss = setzero4();
     const real* M = blk_[0];
     const real* end = blk_[size_];
-    const index_t * inx = inx_;
+    const size_t * inx = inx_;
     #pragma nounroll
     for ( ; M < end; M += 4 )
     {
@@ -653,7 +653,7 @@ vec2 MatrixSparseBlock::Line::vecMul2DU(const real* X) const
     vec4 vv = setzero4();
     const real* M = sbk_[0];
     const real* end = sbk_[size_-size_%4];
-    const index_t * inx = inx_;
+    const size_t * inx = inx_;
     #pragma nounroll
     for ( ; M < end; M += 16 )
     {
@@ -713,7 +713,7 @@ vec4 MatrixSparseBlock::Line::vecMul3D(const real* X) const
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     const real* M = blk_[0];
     const real* end = blk_[size_];
-    const index_t * inx = inx_;
+    const size_t * inx = inx_;
     #pragma nounroll
     for ( ; M < end; M += 12 )
     {
@@ -749,7 +749,7 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
     assert_true( sizeof(SubBlock) == 12 * sizeof(real) );
     const real* M = sbk_[0];
     const real* end = sbk_[size_-size_%2];
-    const index_t * inx = inx_;
+    const size_t * inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
@@ -815,7 +815,7 @@ vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
 
     const real* M = sbk_[0];
     const real* end = sbk_[size_-size_%3];
-    const index_t * inx = inx_;
+    const size_t * inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
@@ -879,7 +879,7 @@ vec4 MatrixSparseBlock::Line::vecMul4D(const real* X) const
     vec4 s3 = setzero4();
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    for ( index_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < size_; ++n )
     {
         real const* M = blk_[n];
         const vec4 xyz = load4(X+inx_[n]);  // xyzt = { X0 X1 X2 X3 }
@@ -900,9 +900,9 @@ vec4 MatrixSparseBlock::Line::vecMul4D(const real* X) const
 #pragma mark - Vector Multiplication
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
-    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
@@ -919,9 +919,9 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, index_t start, index_t
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
 {
-    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
@@ -938,11 +938,11 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, index_t start, ind
 
 
 // multiplication of a vector: Y = Y + M * X
-void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t stop) const
 {
     unsigned long cnt = 0, row = 0;
     //unsigned long long time = __rdtsc();
-    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
         row++;
         cnt += row_[i].size_;
@@ -967,14 +967,14 @@ void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, index_t start, in
 
 
 // multiplication of a vector: Y = M * X
-void MatrixSparseBlock::vecMul(const real* X, real* Y, index_t start, index_t stop) const
+void MatrixSparseBlock::vecMul(const real* X, real* Y, size_t start, size_t stop) const
 {
     //printf("msb %6i %6i : %p\n", start, stop, pthread_self());
     /** All values need to be reset since as the matrix is sparse,
      not every line will be addressed below */
     zero_real(stop-start, Y+start);
     
-    for ( index_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] = row_[i].vecMul1D(X);

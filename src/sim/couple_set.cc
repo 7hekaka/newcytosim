@@ -771,7 +771,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 bool CoupleSet::uniPrepare(PropertyList const& properties)
 {
     bool res = false;
-    unsigned last = 0;
+    size_t last = 0;
     
     for ( Property const* i : properties.find_all("couple") )
     {

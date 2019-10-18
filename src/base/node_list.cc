@@ -330,8 +330,8 @@ void NodeList::shuffle()
     }
     else
     {
-        pp = RNG.pint(nSize);
-        qq = RNG.pint(nSize);
+        pp = RNG.pint((uint32_t)nSize);
+        qq = RNG.pint((uint32_t)nSize);
     }
 
     size_t n = 0;
@@ -373,9 +373,9 @@ void NodeList::shuffle3()
 }
 
 
-unsigned int NodeList::count() const
+size_t NodeList::count() const
 {
-    unsigned int cnt = 0;
+    size_t cnt = 0;
     Node * p = nFront;
     while ( p )
     {

@@ -662,7 +662,7 @@ real FiberSet::totalLength(FiberProp const* p) const
 
 
 void FiberSet::infoLength(ObjectList const& objs,
-                          unsigned& cnt, real& avg, real& dev, real& mn, real& mx)
+                          size_t& cnt, real& avg, real& dev, real& mn, real& mx)
 {
     cnt = 0;
     avg = 0;
@@ -697,7 +697,7 @@ void FiberSet::infoLength(ObjectList const& objs,
 }
 
 
-void FiberSet::infoBirthtime(ObjectList const& objs, unsigned& cnt,
+void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
                              real& avg, real& dev, real& mn, real& mx)
 {
     cnt = 0;
@@ -734,7 +734,7 @@ void FiberSet::infoBirthtime(ObjectList const& objs, unsigned& cnt,
 
 
 void FiberSet::infoSegments(ObjectList const& objs,
-                            unsigned& cnt, unsigned& joints, real& mn, real& mx)
+                            size_t& cnt, size_t& joints, real& mn, real& mx)
 {
     cnt = 0;
     joints = 0;
@@ -948,7 +948,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
        if ( fib )
         {
             const real w = fib->length() / fib->nbPoints();
-            for ( unsigned n = 0; n < fib->nbPoints(); ++n )
+            for ( size_t n = 0; n < fib->nbPoints(); ++n )
             {
                 Vector p = fib->posP(n);
                 avg[0] += w * p.XX;
@@ -1134,7 +1134,7 @@ void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& n, real a, real m
  Sum elastic bending energy of all the fibers `fib` for which func(fib, arg) == true
  */
 void FiberSet::infoBendingEnergy(ObjectList const& objs,
-                                 unsigned& cnt, real& avg, real& dev)
+                                 size_t& cnt, real& avg, real& dev)
 {
     cnt = 0;
     avg = 0;
@@ -1177,7 +1177,7 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs,
  @return cnt = number of segments intersecting the plane
  @return ten = sum of tension in these segments
  */
-void FiberSet::infoTension(unsigned& cnt, real& ten, Vector const& n, real a) const
+void FiberSet::infoTension(size_t& cnt, real& ten, Vector const& n, real a) const
 {
     cnt = 0;
     ten = 0;
@@ -1204,7 +1204,7 @@ void FiberSet::infoTension(unsigned& cnt, real& ten, Vector const& n, real a) co
  @return cnt = total number of segments
  @return ten = sum of tension
  */
-void FiberSet::infoTension(unsigned& cnt, real& ten) const
+void FiberSet::infoTension(size_t& cnt, real& ten) const
 {
     cnt = 0;
     ten = 0;
@@ -1220,14 +1220,14 @@ void FiberSet::infoTension(unsigned& cnt, real& ten) const
 }
 
 
-void FiberSet::infoRadius(unsigned& cnt, real& rad) const
+void FiberSet::infoRadius(size_t& cnt, real& rad) const
 {
     real r = 0;
     cnt = 0;
     
     for ( Fiber const* f=first(); f; f=f->next() )
     {
-        for ( unsigned p = 0; p < f->nbPoints() ; ++p )
+        for ( size_t p = 0; p < f->nbPoints() ; ++p )
         {
             r += f->posP(p).norm();
             ++cnt;
@@ -1238,7 +1238,7 @@ void FiberSet::infoRadius(unsigned& cnt, real& rad) const
 }
 
 
-void FiberSet::infoRadius(unsigned& cnt, real& rad, FiberEnd end) const
+void FiberSet::infoRadius(size_t& cnt, real& rad, FiberEnd end) const
 {
     real r = 0;
     cnt = 0;

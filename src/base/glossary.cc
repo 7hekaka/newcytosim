@@ -156,7 +156,7 @@ size_t Glossary::nb_values(key_type const& k) const
 }
 
 
-bool Glossary::has_value(key_type const& key, unsigned indx) const
+bool Glossary::has_value(key_type const& key, size_t indx) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
@@ -179,7 +179,7 @@ Glossary::rec_type const* Glossary::values(key_type const& key) const
 }
 
 
-std::string Glossary::value(key_type const& key, unsigned inx) const
+std::string Glossary::value(key_type const& key, size_t inx) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
@@ -198,7 +198,7 @@ std::string Glossary::value(key_type const& key, unsigned inx) const
  This is equivalement to value(key, indx) == val, except
  that the counter is incremented only if there is a match
  */
-bool Glossary::value_is(key_type const& key, unsigned inx, std::string const& val) const
+bool Glossary::value_is(key_type const& key, size_t inx, std::string const& val) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
@@ -386,7 +386,7 @@ void Glossary::add_entry(Glossary::pair_type& pair, int no_overwrite)
 
 
 /// define one value for the key at specified index: `key[inx]=val`.
-void Glossary::define(key_type const& key, unsigned inx, const std::string& str)
+void Glossary::define(key_type const& key, size_t inx, const std::string& str)
 {
     std::string val = Tokenizer::trim(str);
     map_type::iterator w = mTerms.find(key);
@@ -667,7 +667,7 @@ std::ostream& operator << (std::ostream& os, Glossary const& glos)
  - 0 otherwise
  .
  */
-int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, unsigned threshold, std::string const& msg)
+int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, size_t threshold, std::string const& msg)
 {
     int used = 0, exhausted = 1, overused = 0;
     const rec_type& rec = pair.second;
@@ -717,7 +717,7 @@ int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, unsign
 /**
  @returns total number of warnings associated with entire set of terms
  */
-int Glossary::warnings(std::ostream& os, unsigned threshold, std::string const& msg) const
+int Glossary::warnings(std::ostream& os, size_t threshold, std::string const& msg) const
 {
     int res = 0;
     for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )

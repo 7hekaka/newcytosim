@@ -18,7 +18,7 @@ namespace LinearSolvers
         int      flag_;
         
         /// counter for iterations or number of matrix-vector operations
-        unsigned cnt_,  cntMax_, cntOld_;
+        size_t   cnt_, cntMax_, cntOld_;
         
         /// desired residual
         real     resMax_;
@@ -29,7 +29,7 @@ namespace LinearSolvers
     public:
         
         /// set the maximum number of iterations, and the residual threshold
-        Monitor(unsigned i, real r) { reset(); cntMax_ = i; resMax_ = r; }
+        Monitor(size_t i, real r) { reset(); cntMax_ = i; resMax_ = r; }
         
         /// reset state variables (counters, flags and residual)
         void reset() { flag_ = 0; cnt_ = 0; res_ = INFINITY; cntOld_ = 32; }
@@ -38,7 +38,7 @@ namespace LinearSolvers
         void operator ++() { ++cnt_; }
         
         /// increment counter by `i`
-        void operator +=(unsigned i) { cnt_ += i; }
+        void operator +=(size_t i) { cnt_ += i; }
        
         /// value of return flag
         int flag()       const { return flag_; }
@@ -47,7 +47,7 @@ namespace LinearSolvers
         void flag(const int f) { flag_ = f; }
 
         /// iteration count
-        unsigned count() const { return cnt_; }
+        size_t count() const { return cnt_; }
         
         /// last achieved residual
         real residual()  const { return res_; }
@@ -67,7 +67,7 @@ namespace LinearSolvers
         }
 
         /// calculate residual from `x` and return true if threshold is achieved
-        bool finished(unsigned size, const real* x)
+        bool finished(size_t size, const real* x)
         {
             //fprintf(stderr, "Solver %3u residual %9.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
             
@@ -84,7 +84,7 @@ namespace LinearSolvers
                 if ( res > 2*res_ )
                 {
                     printf("Warning: slow convergence (time_step may be too big)");
-                    printf(" residual %.3e at iteration %3u, %.3e at %3u\n", res_, cntOld_, res, cnt_);
+                    printf(" residual %.3e at iteration %lu, %.3e at %lu\n", res_, cntOld_, res, cnt_);
                 }
                 cntOld_ = cnt_;
             }
@@ -92,7 +92,7 @@ namespace LinearSolvers
             
             if ( res != res )
             {
-                fprintf(stderr, "Solver diverged at step %3u (residual is not a number)\n", cnt_);
+                fprintf(stderr, "Solver diverged at step %3lu (residual is not a number)\n", cnt_);
                 return true;
             }
             
@@ -100,7 +100,7 @@ namespace LinearSolvers
         }
 
         /// calculate residual from `x` and set flag to `f`
-        void finish(int f, unsigned size, const real* x) { flag_ = f; finished(size, x); }
+        void finish(int f, size_t size, const real* x) { flag_ = f; finished(size, x); }
     };
 }
 

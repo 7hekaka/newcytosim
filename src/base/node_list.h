@@ -118,7 +118,7 @@ public:
     void            shuffle3();
 
     /// count number of elements in the list
-    unsigned int    count() const;
+    size_t          count() const;
     
     /// return `true` if element appears in the list
     bool            check(Node const* n) const;

@@ -22,7 +22,7 @@ namespace LinearSolvers
     template < typename LinearOperator, typename Monitor, typename Allocator >
     void QMR(const LinearOperator& mat, const real* rhs, real* sol, Monitor& monitor, Allocator& allocator)
     {
-        const int dim = mat.dimension();
+        const size_t dim = mat.dimension();
         real resid, eta, delta, ep, beta;
         real rho, rho_1, xi, gamma, gamma_1, theta, theta_1;
         

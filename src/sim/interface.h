@@ -71,13 +71,13 @@ public:
     ObjectList execute_new(std::string const& name, Glossary&);
     
     /// create `cnt` objects of type `name`, randomly placed in space (no option)
-    void       execute_new(std::string const& name, unsigned cnt);
+    void       execute_new(std::string const& name, size_t cnt);
     
     /// delete `cnt` objects of type `name`, following options in Glossary
-    void       execute_delete(std::string const& name, Glossary&, unsigned cnt);
+    void       execute_delete(std::string const& name, Glossary&, size_t cnt);
     
     /// mark `cnt`  objects of type `name`, following options in Glossary
-    void       execute_mark(std::string const& name, Glossary&, unsigned cnt);
+    void       execute_mark(std::string const& name, Glossary&, size_t cnt);
 
     /// cut fibers of type `name`, following different options in Glossary
     void       execute_cut(std::string const& name, Glossary&);
@@ -92,10 +92,10 @@ public:
     void       execute_report(std::string& file, std::string const& what, Glossary&);
     
     /// perform `cnt` simulation steps
-    void       execute_run(unsigned cnt, Glossary&);
+    void       execute_run(size_t cnt, Glossary&);
     
     /// perform `cnt` simulation steps, with no option
-    void       execute_run(unsigned cnt);
+    void       execute_run(size_t cnt);
 
     /// execute miscellaneous functions
     void       execute_call(std::string& func, Glossary&);

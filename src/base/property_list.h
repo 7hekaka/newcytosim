@@ -81,7 +81,7 @@ public:
     size_t       size()  const    { return vec_.size(); }
 
     /// number of Property of given category
-    unsigned int size(std::string const& cat) const;
+    size_t       size(std::string const& cat) const;
     
     /// return property stored at index `n`
     Property *   operator[] (size_t n) const;

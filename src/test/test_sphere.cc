@@ -112,7 +112,7 @@ void display(View&, int)
         glColor3f(0.0, 0.7, 0.0);
 
     glBegin(GL_POINTS);
-    for ( unsigned ii=0; ii < front->nbPoints(); ++ii )
+    for ( size_t ii=0; ii < front->nbPoints(); ++ii )
     {
 #if REAL_IS_DOUBLE
         glVertex3dv( front->addr(ii) );
@@ -125,7 +125,7 @@ void display(View&, int)
 #if ( 0 )
     glLineWidth(5);
     glBegin(GL_LINES);
-    for ( unsigned ii=0; ii < front->nbPoints(); ++ii )
+    for ( size_t ii=0; ii < front->nbPoints(); ++ii )
     {
         Vector3 p(front->addr(ii));
         Vector3 n = p.orthogonal();
@@ -139,7 +139,7 @@ void display(View&, int)
     const real e = 0.05;
     glLineWidth(4);
     glBegin(GL_LINES);
-    for ( unsigned ii=0; ii < front->nbPoints(); ++ii )
+    for ( size_t ii=0; ii < front->nbPoints(); ++ii )
     {
         Vector3 a(front->addr(ii));
         Vector3 b, c;
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
         unsigned min = (unsigned)strtoul(argv[1], 0, 10);
         unsigned max = (unsigned)strtoul(argv[2], 0, 10);
         
-        for (unsigned nbp = min; nbp < max; nbp += 7)
+        for ( size_t nbp = min; nbp < max; nbp += 7)
             batch(nbp, 16);
         
         return EXIT_SUCCESS;

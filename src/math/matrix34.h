@@ -110,21 +110,21 @@ public:
     operator real const*() const { return val; }
 
     /// conversion to array of 'real'
-    real* data()             { return val; }
-    real* addr(int i, int j) { return val + ( 4*i + j ); }
+    real* data() { return val; }
+    real* addr(const size_t i, const size_t j) { return val + ( 4*i + j ); }
 
     /// access functions to element by line and column indices
-    real& operator()(int i, int j)       { return val[4*i+j]; }
-    real  operator()(int i, int j) const { return val[4*i+j]; }
+    real& operator()(const size_t i, const size_t j)       { return val[4*i+j]; }
+    real  operator()(const size_t i, const size_t j) const { return val[4*i+j]; }
     
     /// extract column vector at given index
-    Vector3 column(const unsigned i) const
+    Vector3 column(const size_t i) const
     {
         return Vector3(val[i], val[4+i], val[4*2+i]);
     }
     
     /// extract line vector at given index
-    Vector3 line(const unsigned i) const
+    Vector3 line(const size_t i) const
     {
         return Vector3(val+4*i);
     }
@@ -707,7 +707,7 @@ public:
     }
 
     /// add all elements of block 'S' to array 'M'
-    void addto(real * M, unsigned ldd) const
+    void addto(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
         M[1      ] += val[4];
@@ -721,7 +721,7 @@ public:
     }
     
     /// add upper elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, unsigned ldd) const
+    void addto_upper(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
         M[  ldd  ] += val[1];
@@ -732,7 +732,7 @@ public:
     }
     
     /// add upper elements of this block to both upper and lower triangles of 'M'
-    void addto_symm(real * M, unsigned ldd) const
+    void addto_symm(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
         M[1      ] += val[1];
@@ -746,7 +746,7 @@ public:
     }
     
     /// add all elements of this block to 'M', with transposition
-    void addto_trans(real * M, unsigned ldd) const
+    void addto_trans(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
         M[1      ] += val[1];

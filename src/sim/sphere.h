@@ -21,8 +21,8 @@ class Wrist;
  - mobile points on the surface.
  .
 
- nbRefPts 'fixed' points provide a reference frame for the sphere:
- nbRefPts=2 in 2D and  nbRefPts=4 in 3D.
+ nbRefPoints 'fixed' points provide a reference frame for the sphere:
+ nbRefPoints=2 in 2D and  nbRefPoints=4 in 3D.
 
  The sphere can move as a solid body by rotation and translation.
  In addition, the surface-points can move on the surface. This motion includes
@@ -37,10 +37,7 @@ class Sphere : public Mecable
 public:
     
     /// number of reference points, including center: 1, 2, 4 for DIM = 1, 2 and 3
-    static constexpr unsigned nbRefPts = DIM+(DIM==3);
-
-    /// number of reference points
-    static unsigned  nbRefPoints() { return nbRefPts; }
+    static constexpr size_t nbRefPoints = DIM+(DIM==3);
 
 private:
     
@@ -128,10 +125,10 @@ public:
     void        getPoints(real const* x) { Mecable::getPoints(x); reshape(); }
 
     /// normalize point and add center
-    unsigned    addSurfacePoint(Vector const&);
+    size_t      addSurfacePoint(Vector const&);
     
     /// number of points on the surface
-    unsigned    nbSurfacePoints() const { return nPoints - nbRefPts; }
+    size_t      nbSurfacePoints() const { return nPoints - nbRefPoints; }
     
     /// initialize according to options given in Glossary
     ObjectList  build(Glossary&, Simul&);

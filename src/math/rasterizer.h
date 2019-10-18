@@ -38,9 +38,9 @@ namespace Rasterizer
          With a long integer, this limits the number of edges to 64.
          A bigger integer could be used if needed.
         */
-        unsigned long UU;
+        size_t UU;
         
-        void set(Vector3 const& vec, unsigned long u)
+        void set(Vector3 const& vec, size_t u)
         {
             XX = vec.XX;
             YY = vec.YY;
@@ -100,14 +100,14 @@ namespace Rasterizer
      @returns The number of points in the convex hull (at most n_pts).
      */
     template<typename VEC>
-    unsigned convexHull2D(unsigned n_pts, VEC pts[])
+    size_t convexHull2D(size_t n_pts, VEC pts[])
     {
         //---------- find bottom and top points:
-        unsigned inx = 0, top = 0;
+        size_t inx = 0, top = 0;
         real y_bot = pts[0].YY;
         real y_top = pts[0].YY;
         
-        for ( unsigned n = 1; n < n_pts; ++n )
+        for ( size_t n = 1; n < n_pts; ++n )
         {
             if ( pts[n].YY < y_bot || ( pts[n].YY == y_bot  &&  pts[n].XX > pts[inx].XX ) )
             {
@@ -135,7 +135,7 @@ namespace Rasterizer
         inx = 0;
         
         // wrap upward on the right side of the hull
-        unsigned nxt;
+        size_t nxt;
         while ( 1 )
         {
             real pX = pts[inx].XX;
@@ -146,7 +146,7 @@ namespace Rasterizer
             real dx = pts[top].XX - pX;
             real dy = pts[top].YY - pY;
             
-            for ( unsigned n = inx; n < n_pts; ++n )
+            for ( size_t n = inx; n < n_pts; ++n )
             {
                 real dxt = pts[n].XX - pX;
                 real dyt = pts[n].YY - pY;
@@ -200,7 +200,7 @@ namespace Rasterizer
      */  
     void paintPolygon2D(void (*paint)(int, int, int, int, void*),
                         void * arg,           ///< last argument to paint
-                        unsigned n_pts,       ///< number of points
+                        size_t n_pts,         ///< number of points
                         const Vector2[],      ///< the 2D points ( x0 y0 x1 y1 ...)
                         int zz                ///< third coordinate, passed as argument to paint()
                         );
@@ -251,7 +251,7 @@ namespace Rasterizer
     /// Polygon rasterizer function in 2D, for Vertex2
     void paintPolygon2D(void (*paint)(int, int, int, int, void*),
                         void * arg,           ///< last argument to paint
-                        unsigned nbpts,       ///< number of points
+                        size_t nbpts,         ///< number of points
                         const Vertex2[],      ///< points containing additional data
                         int zz = 0            ///< third coordinate, passed as argument to paint()
                         );
@@ -265,7 +265,7 @@ namespace Rasterizer
      */
     void paintPolygon3D(void (*paint)(int, int, int, int, void*),
                         void * arg,           ///< last argument to paint
-                        unsigned n_pts,       ///< number of points
+                        size_t n_pts,         ///< number of points
                         Vertex3 pts[]         ///< coordinates + connectivity
                         );
     

@@ -25,11 +25,11 @@ int main(int argc, char* argv[])
     RNG.seed();
     Array<int> a;
     
-    for( unsigned cnt = 0; cnt < 10; ++cnt )
+    for( size_t cnt = 0; cnt < 10; ++cnt )
     {
         a.clear();
-        unsigned n = RNG.poisson(8);
-        for( int i=0; i < n; ++i )
+        size_t n = RNG.poisson(8);
+        for( size_t i=0; i < n; ++i )
             a.push_back(RNG.pint(2));
         
         printf("\nsize %lu", a.size());
@@ -39,19 +39,19 @@ int main(int argc, char* argv[])
             a.deallocate();
             
             printf("\n   copy %2lu :", b.size());
-            for( unsigned i=0; i < b.size(); ++i )
+            for( size_t i=0; i < b.size(); ++i )
                 printf(" %i", b[i]);
 
             b.remove_pack(0);
             
             printf("\n   pack %2lu :", b.size());
-            for( unsigned i=0; i < b.size(); ++i )
+            for( size_t i=0; i < b.size(); ++i )
                 printf(" %i", b[i]);
             
             b.sort(comp);
             
             printf("\n   sort %2lu :", b.size());
-            for( unsigned i=0; i < b.size(); ++i )
+            for( size_t i=0; i < b.size(); ++i )
                 printf(" %i", b[i]);
         }
     }

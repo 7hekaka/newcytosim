@@ -46,7 +46,7 @@ void Rasterizer::paintFatLine1D(void (*paint)(int, int, int, int, void*), void *
 #pragma mark - 2D
 
 void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const unsigned int n_pts, const Vector2 pts[],
+                                const size_t n_pts, const Vector2 pts[],
                                 const int zz)
 {
 #ifdef DISPLAY
@@ -55,7 +55,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
         glLineWidth(1);
         glColor3f(0.0, 0.0, 1.0);
         glBegin(GL_LINE_LOOP);
-        for ( unsigned n = 0; n < n_pts; ++n )
+        for ( size_t n = 0; n < n_pts; ++n )
             glVertex3d(pts[n].XX, pts[n].YY, zz);
         glEnd();
 
@@ -67,8 +67,8 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
     }
 #endif
     
-    int iR = 0;
-    int iL = n_pts;
+    size_t iR = 0;
+    size_t iL = n_pts;
     
     Vector2 R = pts[0];
     Vector2 L = pts[0];
@@ -132,8 +132,11 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
 }
 
 
+/*
+ pts[] is an anti-clockwise polygon, starting with the point of lowest Y.
+ */
 void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const unsigned int n_pts, const Vertex2 pts[],
+                                const size_t n_pts, const Vertex2 pts[],
                                 const int zz)
 {
 #ifdef DISPLAY
@@ -142,7 +145,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
         glLineWidth(1);
         glColor3f(0.0, 0.0, 1.0);
         glBegin(GL_LINE_LOOP);
-        for ( unsigned n = 0; n < n_pts; ++n )
+        for ( size_t n = 0; n < n_pts; ++n )
             glVertex3d(pts[n].XX, pts[n].YY, zz);
         glEnd();
         
@@ -157,12 +160,12 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
 #if ( 0 )
     // print polygon:
     std::clog << std::endl << zz << " ";
-    for ( unsigned n = 0; n < n_pts; ++n )
+    for ( size_t n = 0; n < n_pts; ++n )
         pts[n].print(std::clog);
 #endif
     
-    int iR = 0;
-    int iL = n_pts;
+    size_t iR = 0;
+    size_t iL = n_pts;
 
     Vertex2 R = pts[0];
     Vertex2 L = pts[0];
@@ -373,7 +376,7 @@ int Rasterizer::compareVertex3(const void * a, const void * b)
 
 
 void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const unsigned n_pts, Vertex3 pts[])
+                                const size_t n_pts, Vertex3 pts[])
 {
     assert_true( n_pts > 1 );
     
@@ -408,10 +411,10 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
     
     //we can normally only cross four sides of a parallelogram in 3D
     //but in some degenerate cases, it can be more
-    const unsigned max = 16;
+    const size_t max = 16;
     Vertex2 xy[max];
     
-    unsigned above = 0;
+    size_t above = 0;
     int zz  = (int) ceil( pts[0].ZZ );
     
     while ( ++above < n_pts )
@@ -431,11 +434,11 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         int zzn = (int)ceil( pts[above].ZZ );
         
         //number of edges crossing the plane at Z=zz;
-        unsigned nbl = 0;
+        size_t nbl = 0;
         //set-up all the lines, which join any point below the plane
         //to any point above the plane, being a edge of the solid polygon:
-        for ( unsigned ii = 0;     ii < above; ++ii )
-        for ( unsigned jj = above; jj < n_pts; ++jj )
+        for ( size_t ii = 0;     ii < above; ++ii )
+        for ( size_t jj = above; jj < n_pts; ++jj )
         {
             //test if [ii, jj] are joined:
             if ( pts[ii].UU  &  pts[jj].UU )
@@ -458,7 +461,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         // the edges of the convex solid polygon should not intersect,
         // so we can take the convex hull only once here:
         bool need_hull = true;
-        unsigned nbp; //number of points in the hull.
+        size_t nbp; //number of points in the hull.
         
         for ( ; zz < zzn; ++zz )
         {
@@ -476,7 +479,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
             paintPolygon2D(paint, arg, nbp, xy, zz);
             
             //update the coordinates according to the slopes, for the next zz:
-            for ( unsigned ii = 0; ii < nbl; ++ii )
+            for ( size_t ii = 0; ii < nbl; ++ii )
                 xy[ii].move();
         }
     }

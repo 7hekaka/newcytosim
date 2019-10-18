@@ -37,6 +37,6 @@ namespace StreamFunc
     unsigned line_number(std::istream&, std::streampos pos = -1);
 
     /// replace all occurences of `fnd` by `rep` in `src`. Returns number of replacements done
-    int  find_and_replace(std::string & src, std::string const& fnd, std::string const& rep);
+    size_t find_and_replace(std::string & src, std::string const& fnd, std::string const& rep);
 }
 

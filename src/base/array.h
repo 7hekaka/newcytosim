@@ -511,7 +511,7 @@ public:
     {
         assert_true( nbo_ <= UINT32_MAX );
         assert_true( val_ || nbo_==0 );
-        unsigned jj = nbo_, kk;
+        size_t jj = nbo_, kk;
         while ( jj > 1 )
         {
             kk = RNG.pint(jj);  // in [0, j-1]

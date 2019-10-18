@@ -115,7 +115,7 @@ bool SpacePolygonZ::inside(Vector const& w) const
 Vector SpacePolygonZ::project(Vector const& w) const
 {
     real P, Z, R = w.normXY();
-    int hit;
+    size_t hit;
     poly_.project(R, w.z(), P, Z, hit);
     
     real n = P / R;
@@ -134,7 +134,7 @@ void SpacePolygonZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
     //Space::setInteraction(pos, pe, meca, stiff); return;
 #if ( DIM > 2 )
     real P, R = pos.normXY();
-    int hit;
+    size_t hit;
     
     Vector prj;
 
@@ -195,7 +195,7 @@ void SpacePolygonZ::setInteractions(Meca & meca, FiberSet const& fibers) const
 
 void SpacePolygonZ::drawZ(bool rings) const
 {
-    const unsigned npts = poly_.nbPoints();
+    const size_t npts = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
 
     // that is a dummy way to initialize a circle:

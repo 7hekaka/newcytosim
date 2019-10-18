@@ -129,7 +129,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     assert_true(prop);
     ObjectList res;
     
-    unsigned cnt = 0;
+    size_t cnt = 0;
     std::string type, spec;
     opt.set(cnt,  "fibers");
     opt.set(type, "fibers", 1);
@@ -140,7 +140,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     
     nbOrganized(cnt);
     
-    for ( unsigned inx = 0; inx < cnt; ++inx )
+    for ( size_t inx = 0; inx < cnt; ++inx )
     {
         Glossary fiber_opt(spec);
         ObjectList objs = sim.fibers.newObjects(type, fiber_opt);

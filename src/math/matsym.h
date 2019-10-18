@@ -18,10 +18,10 @@ class MatrixSymmetric
 private:
     
     /// leading dimension of array
-    index_t   msLDD;
+    size_t   msLDD;
     
     /// size of matrix
-    index_t   size_;
+    size_t   size_;
 
     /// size of memory which has been allocated
     size_t    allocated_;
@@ -35,10 +35,10 @@ private:
 public:
     
     /// return the size of the matrix
-    index_t size() const { return size_; }
+    size_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(index_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { allocate(s); size_=s; }
 
     /// base for destructor
     void deallocate();
@@ -48,7 +48,7 @@ public:
     
     
     /// constructor from an existing array
-    MatrixSymmetric(index_t s)
+    MatrixSymmetric(size_t s)
     {
         resize(s);
         msLDD = s;
@@ -58,7 +58,7 @@ public:
     }
 
     /// constructor from an existing array
-    MatrixSymmetric(index_t s, real* array, int ldd)
+    MatrixSymmetric(size_t s, real* array, int ldd)
     {
         resize(s);
         msLDD = ldd;
@@ -79,10 +79,10 @@ public:
     real* data() const { return val; }
 
     /// returns the address of element at (x, y), no allocation is done
-    real* addr(index_t x, index_t y) const;
+    real* addr(size_t x, size_t y) const;
     
     /// returns the address of element at (x, y), allocating if necessary
-    real& operator()(index_t i, index_t j);
+    real& operator()(size_t i, size_t j);
     
     /// scale the matrix by a scalar factor
     void scale(real a);
@@ -100,7 +100,7 @@ public:
     bool nonZero() const;
     
     /// number of element which are non-zero
-    size_t nbElements(index_t start, index_t stop) const;
+    size_t nbElements(size_t start, size_t stop) const;
     
     /// returns a string which a description of the type of matrix
     std::string what() const;

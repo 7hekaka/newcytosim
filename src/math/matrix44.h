@@ -113,21 +113,21 @@ public:
     operator real const*() const { return val; }
 
     /// conversion to array of 'real'
-    real* data()             { return val; }
-    real* addr(int i, int j) { return val + ( i + 4*j ); }
+    real* data() { return val; }
+    real* addr(const size_t i, const size_t j) { return val + ( i + 4*j ); }
 
     /// access functions to element by line and column indices
-    real& operator()(int i, int j)       { return val[i+4*j]; }
-    real  operator()(int i, int j) const { return val[i+4*j]; }
+    real& operator()(const size_t i, const size_t j)       { return val[i+4*j]; }
+    real  operator()(const size_t i, const size_t j) const { return val[i+4*j]; }
     
     /// extract column vector at given index
-    Vector4 column(const unsigned i) const
+    Vector4 column(const size_t i) const
     {
         return Vector4(val+4*i);
     }
     
     /// extract line vector at given index
-    Vector4 line(const unsigned i) const
+    Vector4 line(const size_t i) const
     {
         return Vector4(val[i], val[4+i], val[8+i], val[12+i]);
     }
@@ -533,7 +533,7 @@ public:
 
     
     /// add all elements of block 'S' to array 'M'
-    void addto(real * M, unsigned ldd) const
+    void addto(real * M, size_t ldd) const
     {
         for ( int x = 0; x < 4; ++x )
         for ( int y = 0; y < 4; ++y )
@@ -541,7 +541,7 @@ public:
     }
     
     /// add lower elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, unsigned ldd) const
+    void addto_upper(real * M, size_t ldd) const
     {
         for ( int x = 0; x < 4; ++x )
         for ( int y = x; y < 4; ++y )
@@ -549,7 +549,7 @@ public:
     }
     
     /// add all elements of this block to 'M', with transposition
-    void addto_trans(real * M, unsigned ldd) const
+    void addto_trans(real * M, size_t ldd) const
     {
         for ( int x = 0; x < 4; ++x )
         for ( int y = 0; y < 4; ++y )
@@ -557,7 +557,7 @@ public:
     }
     
     /// add lower elements of this block to both upper and lower triangles of 'M'
-    void addto_symm(real * M, unsigned ldd) const
+    void addto_symm(real * M, size_t ldd) const
     {
         for ( int x = 0; x < 4; ++x )
         {

@@ -21,7 +21,7 @@ void MatrixOfBlocks::deallocate()
 {
     if ( block_ == nullptr ) return;
     
-    for ( unsigned int ii=0; ii < block_cnt; ++ii )
+    for ( size_t ii=0; ii < block_cnt; ++ii )
         delete[] block_[ii];
     
     delete[] block_;
@@ -46,7 +46,7 @@ void MatrixOfBlocks::allocate(size_t nbb)
         size_t * block_alc_new  = new size_t[nba];
         size_t * block_size_new = new size_t[nba];
         
-        index_t ii = 0;
+        size_t ii = 0;
         
         if ( block_ )
         {
@@ -99,17 +99,17 @@ void MatrixOfBlocks::setBlockSize( const size_t inx, size_t arg )
 size_t MatrixOfBlocks::calculateSize()
 {
     size_ = 0;
-    for ( unsigned int ii = 0; ii < block_cnt; ++ii )
+    for ( size_t ii = 0; ii < block_cnt; ++ii )
         size_ += block_size[ii];
     return size_;
 }
 
 
 //------------------------------------------------------------------------------
-real* MatrixOfBlocks::addr(index_t ii, index_t jj) const
+real* MatrixOfBlocks::addr(size_t ii, size_t jj) const
 {
-    unsigned int bx = 0;  //block index on x
-    unsigned int by = 0;  //block index on y
+    size_t bx = 0;  //block index on x
+    size_t by = 0;  //block index on y
     
     while ( ii >= block_size[bx] ) ii -= block_size[bx++];
     while ( jj >= block_size[by] ) jj -= block_size[by++];
@@ -128,7 +128,7 @@ real* MatrixOfBlocks::addr(index_t ii, index_t jj) const
 }
 
 //------------------------------------------------------------------------------
-real& MatrixOfBlocks::operator()( index_t x, index_t y )
+real& MatrixOfBlocks::operator()( size_t x, size_t y )
 {
     return * addr( x, y );
 }
@@ -152,12 +152,12 @@ size_t MatrixOfBlocks::maxBlockSize()  const
 }
 
 //------------------------------------------------------------------------------
-void MatrixOfBlocks::setBlockToZero( const unsigned int bb )
+void MatrixOfBlocks::setBlockToZero( const size_t bb )
 {
     real* BS = block_[bb];
     if ( BS )
     {
-        for ( unsigned int kk = 0; kk < block_size[bb] * block_size[bb]; ++kk )
+        for ( size_t kk = 0; kk < block_size[bb] * block_size[bb]; ++kk )
             BS[kk] = 0;
     }
 }
@@ -165,16 +165,16 @@ void MatrixOfBlocks::setBlockToZero( const unsigned int bb )
 //------------------------------------------------------------------------------
 void MatrixOfBlocks::reset()
 {
-    for ( unsigned int ii = 0; ii < block_cnt ; ++ii )
+    for ( size_t ii = 0; ii < block_cnt ; ++ii )
         setBlockToZero( ii );
 }
 
 //------------------------------------------------------------------------------
-void MatrixOfBlocks::scaleBlock( const unsigned int bb, const real a )
+void MatrixOfBlocks::scaleBlock( const size_t bb, const real a )
 {
     real* BS = block_[bb];
     if ( BS ) {
-        for ( unsigned int kk = 0; kk < block_size[bb] * block_size[bb]; ++kk )
+        for ( size_t kk = 0; kk < block_size[bb] * block_size[bb]; ++kk )
             BS[kk] = a * BS[kk];
     }
 }
@@ -182,15 +182,15 @@ void MatrixOfBlocks::scaleBlock( const unsigned int bb, const real a )
 //------------------------------------------------------------------------------
 void MatrixOfBlocks::scale(const real a)
 {
-    for ( unsigned int bb = 0; bb < block_cnt ; ++bb )
+    for ( size_t bb = 0; bb < block_cnt ; ++bb )
         scaleBlock( bb, a );
 }
 
 //------------------------------------------------------------------------------
 void MatrixOfBlocks::vecMulAdd( const real* X, real* Y )  const
 {
-    index_t xx = 0;
-    for ( unsigned int bb = 0; bb < block_cnt; ++bb )
+    size_t xx = 0;
+    for ( size_t bb = 0; bb < block_cnt; ++bb )
     {
         assert_true( block_[bb] );
         blas::xgemv('N', block_size[bb], block_size[bb], 1.0, 
@@ -202,8 +202,8 @@ void MatrixOfBlocks::vecMulAdd( const real* X, real* Y )  const
 //------------------------------------------------------------------------------
 void MatrixOfBlocks::vecMul( const real* X, real* Y )  const
 {
-    index_t xx = 0;
-    for ( unsigned int bb = 0; bb < block_cnt; ++bb )
+    size_t xx = 0;
+    for ( size_t bb = 0; bb < block_cnt; ++bb )
     {
         assert_true( block_[bb] );
         blas::xgemv('N', block_size[bb], block_size[bb], 1.0, 
@@ -216,11 +216,11 @@ void MatrixOfBlocks::vecMul( const real* X, real* Y )  const
 real MatrixOfBlocks::norm_inf() const
 {
     real mx = 0;
-    for ( unsigned int bb=0; bb < block_cnt; ++bb )
+    for ( size_t bb=0; bb < block_cnt; ++bb )
     {
         real* X = block_[bb];
-        index_t m = block_size[bb];
-        for ( index_t ii = 0; ii < m*m; ++ii )
+        size_t m = block_size[bb];
+        for ( size_t ii = 0; ii < m*m; ++ii )
             mx = std::max(mx, X[ii]);
     }
     return mx;
@@ -231,13 +231,13 @@ real MatrixOfBlocks::norm_inf() const
 /// printf debug function in sparse mode: i, j : value
 void MatrixOfBlocks::printSparse(std::ostream& os) const
 {
-    int offset=0;
+    size_t offset=0;
     os.precision(8);
-    for ( unsigned int bb=0; bb < block_cnt; ++bb )
+    for ( size_t bb=0; bb < block_cnt; ++bb )
     {
-        const unsigned int bsize = block_size[bb];
-        for ( unsigned int ii=0; ii < bsize; ++ii )
-            for ( unsigned int jj=0; jj < bsize; ++jj )
+        const size_t bsize = block_size[bb];
+        for ( size_t ii=0; ii < bsize; ++ii )
+            for ( size_t jj=0; jj < bsize; ++jj )
             {
                 os << ii+offset << " " << jj+offset << " ";
                 os << std::setw(16) << block_[bb][ii + bsize * jj] << std::endl;

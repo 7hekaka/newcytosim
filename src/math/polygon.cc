@@ -32,11 +32,12 @@ void Polygon::allocate(size_t s)
 void Polygon::set(size_t ord, real rad, real ang)
 {
     allocate(ord);
-    real a = 2 * M_PI / ord;
+    real a = 2 * M_PI / (real)ord;
     for ( size_t i = 0; i < ord; ++i )
     {
-        pts_[i].xx = rad * cos(i*a+ang);
-        pts_[i].yy = rad * sin(i*a+ang);
+        pts_[i].xx = rad * cos(ang);
+        pts_[i].yy = rad * sin(ang);
+        ang += a;
     }
     pts_[ord] = pts_[0];
 }
@@ -445,7 +446,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
  or the segment where the projection landed
 
  */
-int Polygon::project(real xx, real yy, real& pX, real& pY, int& hit) const
+int Polygon::project(real xx, real yy, real& pX, real& pY, size_t& hit) const
 {
     int res = 0;
     

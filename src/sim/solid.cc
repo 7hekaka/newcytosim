@@ -339,10 +339,10 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             if ( rad < 0 )
                 throw InvalidParameter("the radius of solid:sphere must be >= 0");
 
-            unsigned fip = nPoints;
+            size_t fip = nPoints;
             str = opt.value(var, inx);
             // add 'nbp' points:
-            for ( unsigned n = 0; n < nbp; ++n )
+            for ( size_t n = 0; n < nbp; ++n )
             {
                 std::istringstream iss(str);
                 Vector vec = Movable::readPosition(iss, nullptr);
@@ -384,7 +384,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         Vector vec = Movable::readPosition(iss, nullptr);
         
         // add a bead with a local coordinate system
-        unsigned ref = addSphere(vec, rad);
+        size_t ref = addSphere(vec, rad);
         addTriad(rad);
 
 #if ( DIM > 1 )
@@ -414,7 +414,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             while ( opt.set(str, var, inx++) )
             {
                 // get a number and the name of a class:
-                unsigned num = 1;
+                unsigned long num = 1;
                 Tokenizer::get_integer(str, num);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
@@ -422,7 +422,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                  we use unit vectors here since the Triad is build with 'rad' */
                 // we use unit vectors here since the Triad is build with 'rad'
                 Vector pos = pts[inx-3];
-                for ( unsigned i = 0; i < num; ++i )
+                for ( size_t i = 0; i < num; ++i )
                 {
                     vec = normalize(pos+pos.randOrthoB(dev/rad));
                     res.push_back(new Wrist(sip, this, ref, vec));
@@ -437,13 +437,13 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             while ( opt.set(str, var, inx++) )
             {
                 // get a number and the name of a class:
-                unsigned num = 1;
+                unsigned long num = 1;
                 Tokenizer::get_integer(str, num);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
                 /* add Wrists anchored on the local coordinate system:
                  we use unit vectors here since the Triad is build with 'rad' */
-                for ( unsigned i = 0; i < num; ++i )
+                for ( size_t i = 0; i < num; ++i )
                     res.push_back(new Wrist(sip, this, ref, Vector::randU()));
             }
         }
@@ -467,7 +467,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        unsigned a = 0, b = 0;
+        size_t a = 0, b = 0;
         real c = 0.0;
         
         // get index of point A
@@ -504,26 +504,26 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 }
 
 
-unsigned Solid::addSphere(Vector const& vec, real rad)
+size_t Solid::addSphere(Vector const& vec, real rad)
 {
     if ( rad < 0 )
         throw InvalidParameter("solid:sphere's radius should be >= 0");
 
-    unsigned inx = addPoint(vec);
+    size_t inx = addPoint(vec);
     soRadius[inx] = rad;
     //std::clog << "addSphere(" << vec << ", " << rad << ") for " << reference() << " index " << inx << "\n";
     return inx;
 }
 
 
-unsigned Solid::addTriad(real arm)
+size_t Solid::addTriad(real arm)
 {
     assert_true(arm > 0);
     
     if ( nPoints < 1 )
         throw InvalidParameter("cannot add Triad to solid without point");
     
-    unsigned inx = lastPoint();
+    size_t inx = lastPoint();
 
     //std::clog << "Solid::addTriad(" << arm << ") at index " << inx << "\n";
     Vector vec = posP(inx);
@@ -1185,9 +1185,9 @@ void Solid::read(Inputter& in, Simul&, ObjectTag)
 {
     try
     {
-        unsigned nbp = in.readUInt16();
+        size_t nbp = in.readUInt16();
         setNbPoints(nbp);
-        for ( unsigned i = 0; i < nbp ; ++i )
+        for ( size_t i = 0; i < nbp ; ++i )
         {
             in.readFloatVector(pPos+DIM*i, DIM);
             soRadius[i] = in.readFloat();

@@ -74,8 +74,8 @@ void Aster::setInteractions(Meca & meca) const
             if ( link.rank == 0 )
                 continue;
             
-            unsigned off = sol->matIndex() + link.prime;
-            unsigned pts[] = { off, off+1, off+2, off+3 };
+            size_t off = sol->matIndex() + link.prime;
+            size_t pts[] = { off, off+1, off+2, off+3 };
 
 #ifdef BACKWARD_COMPATIBILITY
             if ( link.alt > 0 )
@@ -183,7 +183,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     assert_true(nbOrganized()==0);
     
     // get number of fibers:
-    unsigned nbf = 0;
+    size_t nbf = 0;
     std::string type, spec;
     
     opt.set(asRadius, "radius");
@@ -206,14 +206,14 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     if ( asRadius <= 0 )
         throw InvalidParameter("aster:radius must be specified and > 0");
 
-    unsigned origin = 0;
+    size_t origin = 0;
     ObjectList res = makeSolid(sim, opt, origin);
     
     if ( !solid() )
         throw InvalidParameter("could not make aster:solid");
     
     // fibers anchor points can be specified directly:
-    unsigned cnt = 0;
+    size_t cnt = 0;
     Vector pos1, pos2;
     std::string var = "fiber1";
     while ( opt.set(pos1, var) && opt.set(pos2, var, 1) )
@@ -279,7 +279,7 @@ ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_typ
  Anchor a Fiber between positions A and B, specified in a local reference frame
  associated with the Aster. Dimensions will be scaled by 'asRadius' eventually.
  */
-void Aster::placeAnchor(Vector const& A, Vector const& B, unsigned ref)
+void Aster::placeAnchor(Vector const& A, Vector const& B, size_t ref)
 {
     AsterLink & link = asLinks.new_val();
     //std::clog << "Aster::placeAnchor(" << asLinks.size() << ")\n";
@@ -290,7 +290,7 @@ void Aster::placeAnchor(Vector const& A, Vector const& B, unsigned ref)
 }
 
 
-ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, unsigned& origin)
+ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
 {
     ObjectList res(2);
     Solid * sol = nullptr;
@@ -347,7 +347,7 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, unsigned& origin)
  - `angular` where all fibers are restricted within an specified solid angle,
  .
  */
-void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
+void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
 {
     real dis = 0;
     opt.set(dis, "radius", 1) ;
@@ -405,7 +405,7 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
             throw InvalidParameter("aster::angle must be > 0");
 #if ( DIM == 1 )
         // No effect of angle in 1D, same as default
-        for ( unsigned n = 0; n < nbf; ++n )
+        for ( size_t n = 0; n < nbf; ++n )
         {
             Vector D(n%2?1:-1);
             placeAnchor(Vector(0.0), D, origin);
@@ -414,7 +414,7 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
         real delta = 2 * angle / real(nbf);
         // points are evenly distributed from -aster_angle to aster_angle
         real ang = -angle;
-        for ( unsigned n = 0; n < nbf; ++n )
+        for ( size_t n = 0; n < nbf; ++n )
         {
             Vector P(cos(ang), sin(ang));
             placeAnchor(alpha*P, P, origin);
@@ -445,14 +445,14 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
          For type 'regular' we put fibers regularly on the surface,
          */
 #if ( DIM == 1 )
-        for ( unsigned n = 0; n < nbf; ++n )
+        for ( size_t n = 0; n < nbf; ++n )
         {
             Vector D(n%2?1:-1);
             placeAnchor(Vector(0.0), D, origin);
         }
 #elif ( DIM == 2 )
         real ang = 0, delta = 2 * M_PI / real(nbf);
-        for ( unsigned n = 0; n < nbf; ++n )
+        for ( size_t n = 0; n < nbf; ++n )
         {
             Vector P(cos(ang), sin(ang));
             placeAnchor(alpha*P, P, origin);
@@ -462,7 +462,7 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
         //we use PointsOnSphere to distribute points 'equally' on the sphere
         PointsOnSphere sphere(nbf);
         Vector P;
-        for ( unsigned n = 0; n < nbf; ++n )
+        for ( size_t n = 0; n < nbf; ++n )
         {
             sphere.copyPoint(P, n);
             placeAnchor(alpha*P, P, origin);
@@ -475,7 +475,7 @@ void Aster::placeAnchors(Glossary & opt, unsigned origin, unsigned nbf)
          For type 'astral' we put fibers randomly on the surface,
          with a constrain based on the scalar product: position*direction > 0
          */
-        for ( unsigned n = 0; n < nbf; ++n )
+        for ( size_t n = 0; n < nbf; ++n )
         {
             Vector P = Vector::randB();
             Vector D = Vector::randU();
@@ -548,10 +548,10 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
     
 #ifdef BACKWARD_COMPATIBILITY
     // usual number of fiber links:
-    unsigned nbf = nbOrganized() - 1;
+    size_t nbf = nbOrganized() - 1;
     if ( in.formatID() > 50 )
 #else
-    unsigned
+    size_t
 #endif
         nbf = in.readUInt16();
     asLinks.resize(nbf);
@@ -601,9 +601,9 @@ Vector Aster::posLink1(size_t inx) const
         return sol->posPoint(ref);
 #endif
 
-    unsigned top = std::min(DIM+1u, sol->nbPoints());
+    size_t top = std::min(DIM+1LU, sol->nbPoints());
     Vector res = coef[0] * sol->posPoint(ref);
-    for ( unsigned i = 1; i < top; ++i )
+    for ( size_t i = 1; i < top; ++i )
         res += coef[i] * sol->posPoint(i+ref);
     
     return res;
@@ -613,16 +613,16 @@ Vector Aster::posLink2(size_t inx) const
 {
     Solid const* sol = solid();
     real const* coef = asLinks[inx].coef2;
-    const unsigned ref = asLinks[inx].prime;
+    const size_t ref = asLinks[inx].prime;
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( asLinks[inx].alt > 0 )
         return sol->posPoint(asLinks[inx].alt);
 #endif
 
-    unsigned top = std::min(DIM+1u, sol->nbPoints());
+    size_t top = std::min(DIM+1LU, sol->nbPoints());
     Vector res = coef[0] * sol->posPoint(ref);
-    for ( unsigned i = 1; i < top; ++i )
+    for ( size_t i = 1; i < top; ++i )
         res += coef[i] * sol->posPoint(i+ref);
     
     return res;

@@ -23,10 +23,10 @@ private:
      1 = link fiber-end with coef1, fiber-side with coef2
      2 = the interpolation corresponds exactly to point 'ref'
      */
-    unsigned rank;
+    size_t   rank;
 
     /// index of first point on the Solid
-    unsigned prime;
+    size_t   prime;
     
     /// interpolation coefficient for Fiber end
     real     coef1[4];
@@ -38,7 +38,7 @@ private:
     real     len;
     
     /// index used for backward compatibility
-    unsigned alt;
+    size_t   alt;
     
 public:
     
@@ -163,16 +163,16 @@ private:
     Array<AsterLink> asLinks;
 
     /// create and configure the Solid
-    ObjectList makeSolid(Simul&, Glossary& opt, unsigned& origin);
+    ObjectList makeSolid(Simul&, Glossary& opt, size_t& origin);
 
     /// create a Fiber for position 'inx'
     ObjectList makeFiber(Simul&, size_t inx, std::string const&, Glossary& opt);
 
     /// define the attachment position of fiber 'inx'
-    void       placeAnchor(Vector const&, Vector const&, unsigned origin);
+    void       placeAnchor(Vector const&, Vector const&, size_t origin);
 
     /// define the anchor points of Fibers
-    void       placeAnchors(Glossary& opt, unsigned origin, unsigned nbf);
+    void       placeAnchors(Glossary& opt, size_t origin, size_t nbf);
     
     /// Property
     AsterProp const* prop;

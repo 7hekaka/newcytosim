@@ -317,7 +317,7 @@ int main(int argc, char* argv[])
 
         if ( mode == OFFSCREEN_IMAGE )
         {
-            unsigned inx = 0;
+            size_t inx = 0;
             // it is possible to specify multiple frame indices:
             do {
                 thread.loadFrame(frm);

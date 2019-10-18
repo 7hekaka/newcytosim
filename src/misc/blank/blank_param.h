@@ -15,15 +15,15 @@ public:
     
     //--------------------------------------------------------------------------
 
-    unsigned int max;
-    real         diffusion, diffusion_dt;
+    size_t  max;
+    real    diffusion, diffusion_dt;
     
-    real         time_step;
-    real         time;
+    real    time_step;
+    real    time;
     
-    unsigned int delay;
-    unsigned int repeat;
-    std::string  config;     //the parameter file
+    unsigned    delay;
+    unsigned    repeat;
+    std::string config;     //the parameter file
     
 
     //--------------------------------------------------------------------------

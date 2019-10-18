@@ -14,16 +14,16 @@
  */
 void Field::prepareDiffusion(real theta)
 {
-    const FieldGrid::index_t nbc = mGrid.nbCells();
+    const size_t nbc = mGrid.nbCells();
     
     fiDiffusionMatrix.resize(nbc);
     fiDiffusionMatrix.reset();
     
-    for ( FieldGrid::index_t c = 0; c < nbc; ++c )
+    for ( size_t c = 0; c < nbc; ++c )
     {
         for ( int d = 0; d < DIM; ++d )
         {
-            FieldGrid::index_t n = mGrid.next(c, d);
+            size_t n = mGrid.next(c, d);
                 
             if ( n != c )
             {
@@ -51,18 +51,18 @@ void Field::prepareDiffusion(real theta)
  */
 void Field::prepareDiffusion(real theta, unsigned char * domain)
 {
-    const FieldGrid::index_t nbc = mGrid.nbCells();
+    const size_t nbc = mGrid.nbCells();
     
     fiDiffusionMatrix.resize(nbc);
     fiDiffusionMatrix.reset();
     
-    for ( FieldGrid::index_t c = 0; c < nbc; ++c )
+    for ( size_t c = 0; c < nbc; ++c )
     {
         if ( domain[c] )
         {
             for ( int d = 0; d < DIM; ++d )
             {
-                FieldGrid::index_t n = c + mGrid.stride(d);
+                size_t n = c + mGrid.stride(d);
                 
                 if ( n < nbc  &&  domain[c] == domain[n] )
                 {
@@ -92,7 +92,7 @@ void Field::prepare()
     if ( !spc )
         throw InvalidParameter("A Space must be created before the field");
 
-    const FieldGrid::index_t nbc = mGrid.nbCells();
+    const size_t nbc = mGrid.nbCells();
     assert_true( nbc > 0 );
     
     free_real(fiTMP);
@@ -111,7 +111,7 @@ void Field::prepare()
             
             // determine which cell is inside the space:
 #if ( 1 )
-            for ( FieldGrid::index_t c = 0; c < nbc; ++c )
+            for ( size_t c = 0; c < nbc; ++c )
             {
                 Vector pos;
                 mGrid.setPositionFromIndex(pos, c, 0.5);
@@ -120,7 +120,7 @@ void Field::prepare()
 #else
             // extended covered area:
             const real range = 2 * cellWidth();
-            for ( FieldGrid::index_t c = 0; c < nbc; ++c )
+            for ( size_t c = 0; c < nbc; ++c )
             {
                 Vector pos;
                 mGrid.setPositionFromIndex(pos, c, 0.5);
@@ -144,16 +144,16 @@ void Field::diffuseX(real * field, real c)
 {
     const auto nbc = mGrid.nbCells();
 
-    FieldGrid::index_t nx = mGrid.breadth(0);
-    FieldGrid::index_t nyz = nbc / nx;
-    FieldGrid::index_t ide = mGrid.stride(1);
+    size_t nx = mGrid.breadth(0);
+    size_t nyz = nbc / nx;
+    size_t ide = mGrid.stride(1);
     
     real * a = new_real(nyz);
     real * b = new_real(nyz);
     
     // diffusion in X-direction:
     zero_real(nyz, a);
-    for ( FieldGrid::index_t x = 1; x < nx; ++x )
+    for ( size_t x = 1; x < nx; ++x )
     {
         real * h = field + x - 1;
         real * n = field + x;
@@ -188,17 +188,17 @@ void Field::diffuseX(real * field, real c)
 
 void Field::laplacian(const real* field, real * mat) const
 {
-    const FieldGrid::index_t nbc = mGrid.nbCells();
+    const size_t nbc = mGrid.nbCells();
     const real sc = 2 * DIM;
 
-    for ( FieldGrid::index_t c = 0; c < nbc; ++c )
+    for ( size_t c = 0; c < nbc; ++c )
         mat[c] = sc * field[c];
     
-    const FieldGrid::index_t nx = mGrid.breadth(0);
+    const size_t nx = mGrid.breadth(0);
 #if ( 1 )
     // derivative in the X-direction:
-    const FieldGrid::index_t nyz = nbc / nx;
-    for ( FieldGrid::index_t xx = 1; xx < nx; ++xx )
+    const size_t nyz = nbc / nx;
+    for ( size_t xx = 1; xx < nx; ++xx )
     {
         blas::xaxpy(nyz, -1, field+xx-1, nx, mat+xx  , nx);
         blas::xaxpy(nyz, -1, field+xx  , nx, mat+xx-1, nx);
@@ -223,7 +223,7 @@ void Field::laplacian(const real* field, real * mat) const
     blas::xaxpy(nbc-nx, -1, field,    1, mat+nx, 1);
     blas::xaxpy(nbc-nx, -1, field+nx, 1, mat,    1);
     
-    FieldGrid::index_t yy = mGrid.breadth(1) - 1;
+    size_t yy = mGrid.breadth(1) - 1;
     if ( prop->periodic )
     {
         blas::xaxpy(nx, -1, field+nx*yy, 1, mat      , 1);
@@ -238,9 +238,9 @@ void Field::laplacian(const real* field, real * mat) const
 
 #if ( DIM == 3 )
     // derivative in the Y-direction:
-    const FieldGrid::index_t ss = mGrid.stride(2);
-    for ( FieldGrid::index_t yy = 1; yy < mGrid.breadth(1); ++yy )
-    for ( FieldGrid::index_t zz = 0; zz < mGrid.breadth(2); ++zz )
+    const size_t ss = mGrid.stride(2);
+    for ( size_t yy = 1; yy < mGrid.breadth(1); ++yy )
+    for ( size_t zz = 0; zz < mGrid.breadth(2); ++zz )
     {
         blas::xaxpy(nx, -1, field+nx*(yy-1)+ss*zz, 1, mat+nx*(yy  )+ss*zz, 1);
         blas::xaxpy(nx, -1, field+nx*(yy  )+ss*zz, 1, mat+nx*(yy-1)+ss*zz, 1);
@@ -249,7 +249,7 @@ void Field::laplacian(const real* field, real * mat) const
     
     if ( prop->periodic )
     {
-        for ( FieldGrid::index_t zz = 0; zz < mGrid.breadth(2); ++zz )
+        for ( size_t zz = 0; zz < mGrid.breadth(2); ++zz )
         {
             blas::xaxpy(nx, -1, field+nx*yy+ss*zz, 1, mat      +ss*zz, 1);
             blas::xaxpy(nx, -1, field      +ss*zz, 1, mat+nx*yy+ss*zz, 1);
@@ -257,7 +257,7 @@ void Field::laplacian(const real* field, real * mat) const
     }
     else
     {
-        for ( FieldGrid::index_t zz = 0; zz < mGrid.breadth(2); ++zz )
+        for ( size_t zz = 0; zz < mGrid.breadth(2); ++zz )
         {
             blas::xaxpy(nx, -1, field      +ss*zz, 1, mat      +ss*zz, 1);
             blas::xaxpy(nx, -1, field+nx*yy+ss*zz, 1, mat+nx*yy+ss*zz, 1);
@@ -267,11 +267,11 @@ void Field::laplacian(const real* field, real * mat) const
 
 #if ( DIM == 3 )
     // derivative in the Z-direction:
-    const FieldGrid::index_t nxy = nbc / mGrid.breadth(2);
+    const size_t nxy = nbc / mGrid.breadth(2);
     assert_true( nxy == ss );
     blas::xaxpy(nbc-nxy, -1, field,     1, mat+nxy, 1);
     blas::xaxpy(nbc-nxy, -1, field+nxy, 1, mat,     1);
-    FieldGrid::index_t zz = mGrid.breadth(2) - 1;
+    size_t zz = mGrid.breadth(2) - 1;
     
     if ( prop->periodic )
     {
@@ -289,13 +289,13 @@ void Field::laplacian(const real* field, real * mat) const
 
 void Field::setEdgesX(real * field, real val)
 {
-    const FieldGrid::index_t nbc = mGrid.nbCells();
+    const size_t nbc = mGrid.nbCells();
     
     // set X-edges:
-    const FieldGrid::index_t nx = mGrid.breadth(0);
+    const size_t nx = mGrid.breadth(0);
     
     real * lastf = field + nx - 1;
-    for ( FieldGrid::index_t xx = 0; xx < nbc; xx += nx )
+    for ( size_t xx = 0; xx < nbc; xx += nx )
     {
         field[xx] = val;
         lastf[xx] = val;
@@ -306,14 +306,14 @@ void Field::setEdgesX(real * field, real val)
 void Field::setEdgesY(real * field, real val)
 {
 #if ( DIM > 1 )
-    const FieldGrid::index_t nbc = mGrid.nbCells();
-    const FieldGrid::index_t nx = mGrid.breadth(0);
+    const size_t nbc = mGrid.nbCells();
+    const size_t nx = mGrid.breadth(0);
 #endif
     
 #if ( DIM == 2 )
     // set Y-edges:
     real * lastf = field + nbc - nx;
-    for ( FieldGrid::index_t xx = 0; xx < nx; ++xx )
+    for ( size_t xx = 0; xx < nx; ++xx )
     {
         field[xx] = val;
         lastf[xx] = val;
@@ -322,13 +322,13 @@ void Field::setEdgesY(real * field, real val)
     
 #if ( DIM == 3 )
     // set Y-edges:
-    const FieldGrid::index_t nz = mGrid.breadth(2);
-    const FieldGrid::index_t nxy = nbc / nz;
+    const size_t nz = mGrid.breadth(2);
+    const size_t nxy = nbc / nz;
     
     real * lastf = field + nxy - nx;
-    for ( FieldGrid::index_t zz = 0; zz < nz; ++zz )
+    for ( size_t zz = 0; zz < nz; ++zz )
     {
-        for ( FieldGrid::index_t xx = 0; xx < nx; ++xx )
+        for ( size_t xx = 0; xx < nx; ++xx )
         {
             field[xx+zz*nxy] = val;
             lastf[xx+zz*nxy] = val;
@@ -341,13 +341,13 @@ void Field::setEdgesY(real * field, real val)
 void Field::setEdgesZ(real * field, real val)
 {
 #if ( DIM == 3 )
-    const FieldGrid::index_t nbc = mGrid.nbCells();
+    const size_t nbc = mGrid.nbCells();
     
-    const FieldGrid::index_t nz = mGrid.breadth(2);
-    const FieldGrid::index_t nxy = nbc / nz;
+    const size_t nz = mGrid.breadth(2);
+    const size_t nxy = nbc / nz;
     
     real * lastf = field + nxy * ( nz - 1 );
-    for ( FieldGrid::index_t xy = 0; xy < nxy; ++xy )
+    for ( size_t xy = 0; xy < nxy; ++xy )
     {
         field[xy] = val;
         lastf[xy] = val;
@@ -526,12 +526,12 @@ void Field::step(FiberSet& fibers)
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         drawValues(mGrid, field_set_color, &fdp);
-        if ( 0 )
-        {
-            glColor4f(1, 0, 1, 1);
-            glLineWidth(0.5);
-            drawEdges(mGrid);
-        }
+#if ( 0 )
+        // draw edges of cells
+        glColor4f(1, 0, 1, 1);
+        glLineWidth(0.5);
+        drawEdges(mGrid);
+#endif
         glPopAttrib();
     }
     

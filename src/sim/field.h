@@ -60,7 +60,7 @@ private:
     real*    fiTMP;
     
     /// allocated size of fiTMP
-    unsigned fiTMPSize;
+    size_t   fiTMPSize;
     
     /// matrix for diffusion
     MatrixSparseSymmetric1 fiDiffusionMatrix;
@@ -170,7 +170,7 @@ public:
     value_type& cell(const real w[]) const { return mGrid.cell(w); }
     
     /// access to data
-    index_t nbCells() const { return mGrid.nbCells(); }
+    size_t nbCells() const { return mGrid.nbCells(); }
 
     /// info
     void infoValues(value_type& s, value_type& n, value_type& x) const { return mGrid.infoValues(s, n, x); }
@@ -191,7 +191,7 @@ public:
         real i = in * mGrid.cellVolume();
         real o = ou * mGrid.cellVolume();
         
-        for ( FieldGrid::index_t c = 0; c < mGrid.nbCells(); ++c )
+        for ( size_t c = 0; c < mGrid.nbCells(); ++c )
         {
             Vector w;
             mGrid.setPositionFromIndex(w, c, 0.5);
@@ -275,7 +275,7 @@ public:
             }
             out.writeSoftSpace();
             out.writeUInt32(mGrid.nbCells());
-            for ( FieldGrid::index_t c = 0; c < mGrid.nbCells(); ++c )
+            for ( size_t c = 0; c < mGrid.nbCells(); ++c )
                 mGrid.icell(c).write(out);
             out.writeSoftNewline();
         }
@@ -294,11 +294,11 @@ public:
         int  size[DIM] = { 0 };
         real minB[DIM] = { 0 }, maxB[DIM] = { 0 };
         
-        unsigned int dim = in.readUInt16();
+        size_t dim = in.readUInt16();
         if ( dim != DIM )
             throw InvalidIO("cannot read field due to dimensionality mismatch");
         
-        for ( unsigned int d = 0; d < dim; ++d )
+        for ( size_t d = 0; d < dim; ++d )
         {
             size[d] = in.readUInt32();
             minB[d] = in.readFloat();
@@ -308,15 +308,15 @@ public:
         mGrid.setDimensions(minB, maxB, size);
         createCells();
         
-        FieldGrid::index_t nbc = in.readUInt32();
+        size_t nbc = in.readUInt32();
         if ( nbc != mGrid.nbCells() )
         {
-            printf("file: %u field:%lu\n", nbc, mGrid.nbCells());
+            printf("file: %lu field:%lu\n", nbc, mGrid.nbCells());
             throw InvalidIO("mismatch in Field::size");
         }
         //std::clog << "readData() nb_cells=" << nbc << std::endl;
         
-        for ( FieldGrid::index_t c = 0; c < nbc; ++c )
+        for ( size_t c = 0; c < nbc; ++c )
             mGrid.icell(c).read(in);
     }
     

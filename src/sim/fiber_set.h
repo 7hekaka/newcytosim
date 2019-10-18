@@ -108,13 +108,13 @@ public:
     real         totalLength(FiberProp const *) const;
     
     /// calculate: number of fibers, mean, standard-deviation, min and max of fiber length
-    static void  infoLength(ObjectList const&, unsigned& cnt, real& avg, real& dev, real& mn, real& mx);
+    static void  infoLength(ObjectList const&, size_t& cnt, real& avg, real& dev, real& mn, real& mx);
     
     /// calculate: number of fibers, mean, standard-deviation, min and max of fiber length
-    static void  infoBirthtime(ObjectList const&, unsigned& cnt, real& avg, real& dev, real& mn, real& mx);
+    static void  infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& dev, real& mn, real& mx);
 
     /// calculate: number of fibers, number of joints and number of kinks
-    static void  infoSegments(ObjectList const&, unsigned& cnt, unsigned& joints, real&, real&);
+    static void  infoSegments(ObjectList const&, size_t& cnt, size_t& joints, real&, real&);
     
     /// calculate: number of fibers, number of joints and number of kinks
     static unsigned nbKinks(ObjectList const&);
@@ -132,22 +132,22 @@ public:
     void         infoPlane(int& np, int& na, Vector const& n, real a) const;
     
     /// Calculate characteristics of bendingEnergy()
-    static void  infoBendingEnergy(ObjectList const&, unsigned& cnt, real& avg, real& dev);
+    static void  infoBendingEnergy(ObjectList const&, size_t& cnt, real& avg, real& dev);
     
     /// sum Lagrange multipliers for segments that intersect the plane <em> n.pos + a = 0 </em>
-    void  infoTension(unsigned&, real& hten, Vector const& n, real a) const;
+    void  infoTension(size_t&, real& hten, Vector const& n, real a) const;
     
     /// sum Lagrange multipliers for all fibers
-    void  infoTension(unsigned&, real& hten) const;
+    void  infoTension(size_t&, real& hten) const;
 
     /// Calculate spindle indices
     void  infoSpindle(real& ixa, real& ixs, Vector const& n, real a, real m, real da) const;
 
     /// Calculate averaged distance from origin - for all vertices
-    void  infoRadius(unsigned&, real& rad) const;
+    void  infoRadius(size_t&, real& rad) const;
     
     /// Calculate averaged distance from origin - for fiber ends
-    void  infoRadius(unsigned&, real& rad, FiberEnd) const;
+    void  infoRadius(size_t&, real& rad, FiberEnd) const;
 
     /// Calculate averaged characteristics on all Fiber's Lattices
     void  infoLattice(real& len, unsigned& cnt, real& sm, real& mn, real& mx, bool density) const;

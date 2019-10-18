@@ -240,14 +240,14 @@ void Mecafil::addProjectionDiff(const real*, real*) const {} //DIM == 1
  for a filament with 'cnt' points (and thus with 'cnt/DIM-2' triplets).
  */
 template<typename MATRIX>
-void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R1, const int dim)
+void add_rigidity_matrix(const size_t cnt, MATRIX& mat, const size_t inx, const real R1, const size_t dim)
 {
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
 
-    const int end = dim * ( inx + cnt - 1 );
+    const size_t end = dim * ( inx + cnt - 1 );
     
-    for ( int i = dim*(inx+1); i < end; ++i )
+    for ( size_t i = dim*(inx+1); i < end; ++i )
     {
         mat(i-dim, i-dim) -= R1;
         mat(i    , i-dim) += R2;
@@ -265,16 +265,16 @@ void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R
  for a filament with 'cnt' points (and thus with 'cnt-2' triplets).
  */
 template<typename MATRIX>
-void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R1, const int dim)
+void add_rigidity_matrix(const size_t cnt, MATRIX& mat, const size_t inx, const real R1, const size_t dim)
 {
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
     const real R5 = R1 * 5;
     const real R6 = R1 * 6;
 
-    const int D = dim, T = dim*2, V = dim*3;
-    const int s = dim * inx;
-    const int e = s + dim * ( cnt - 2 );
+    const size_t D = dim, T = dim*2, V = dim*3;
+    const size_t s = dim * inx;
+    const size_t e = s + dim * ( cnt - 2 );
 
     mat(s  , s  ) -= R1;
     mat(s+D, s  ) += R2;
@@ -295,7 +295,7 @@ void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R
         mat(s+D, s+D) -= R4;
     }
     
-    for ( int n = s+T; n < e ; n += D )
+    for ( size_t n = s+T; n < e ; n += D )
     {
         mat(n,   n) -= R6;
         mat(n+D, n) += R4;
@@ -305,13 +305,13 @@ void add_rigidity_matrix(const int cnt, MATRIX& mat, const int inx, const real R
 
 #endif
 
-void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const int inx, int dim) const
+void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const size_t inx, size_t dim) const
 {
     if ( nPoints > 2 )
     {
         add_rigidity_matrix(nPoints, mat, inx, rfRigidity, dim);
 #if ( 0 )
-        int N = nPoints;
+        size_t N = nPoints;
         MatrixSymmetric m(N);
         add_rigidity_matrix(N, m, 0, 1.0, 1);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
@@ -325,7 +325,7 @@ void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const int inx, int 
  The array `mat` must be square of dimension `dim * this->nPoints`
  Only terms above the diagonal and corresponding to the first subspace are set
  */
-void add_rigidity_upper(unsigned cnt, real* mat, unsigned ldd, const real R1)
+void add_rigidity_upper(size_t cnt, real* mat, size_t ldd, const real R1)
 {
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
@@ -364,7 +364,7 @@ void add_rigidity_upper(unsigned cnt, real* mat, unsigned ldd, const real R1)
 }
 
 
-void Mecafil::addRigidityUpper(real * mat, unsigned ldd) const
+void Mecafil::addRigidityUpper(real * mat, size_t ldd) const
 {
     if ( nPoints > 2 )
     {
@@ -383,7 +383,7 @@ void Mecafil::addRigidityUpper(real * mat, unsigned ldd) const
 /*
  This is the reference implementation
  */
-void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     assert_true( X != Y );
     for ( unsigned jj = 0; jj < nbt; ++jj )
@@ -398,7 +398,7 @@ void add_rigidity0(const unsigned nbt, const real* X, const real rigid, real* Y)
 /*
  In this version the loop is unrolled
  */
-void add_rigidity2(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2(const size_t nbt, const real* X, const real rigid, real* Y)
 {    
     assert_true( X != Y );
     real dx = X[DIM  ] - X[0];
@@ -450,7 +450,7 @@ void add_rigidity2(const unsigned nbt, const real* X, const real rigid, real* Y)
  and further optimization are made by replacing
  ( a0 -2*a1 + a2 ) by (a2-a1)-(a1-a0).
  */
-void add_rigidity3(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     assert_true( X != Y );
     const real * xn = X + DIM;
@@ -539,7 +539,7 @@ void add_rigidity3(const unsigned nbt, const real* X, const real rigid, real* Y)
 /**
  2D implemention using SSE 128bit vector instructions with double precision
  */
-void add_rigidity_SSE(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -575,7 +575,7 @@ void add_rigidity_SSE(const unsigned nbt, const real* X, const real rigid, real*
  
  Note that the vectors X and Y are not aligned to memory!
  */
-void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real* Y)
+void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
@@ -659,7 +659,7 @@ void add_rigidity_AVX(const unsigned nbt, const real* X, const real rigid, real*
 /*
  This is an optimized implementation
  */
-void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
+void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
     assert_true(nbt > DIM);
     const real R2 = R1 * 2;
@@ -688,7 +688,7 @@ void add_rigidityF(const unsigned nbt, const real* X, const real R1, real* Y)
  Add rigidity terms between three points {A, B, C}
  Done with Serge DMITRIEFF, 2015
  */
-void add_rigidity(unsigned A, unsigned B, unsigned C, const real* X, const real R1, real* Y)
+void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
 {
     for ( unsigned d = 0; d < DIM; ++ d )
     {
@@ -735,9 +735,8 @@ void Mecafil::addRigidity(const real* X, real* Y) const
              Link first and last point in the same way as all other points,
              making the fiber mechanically homogeneous and all points equivalent
              */
-            const unsigned L = lastPoint();
-            add_rigidity(L,   0, 1, X, rfRigidity, Y);
-            add_rigidity(L-1, L, 0, X, rfRigidity, Y);
+            add_rigidity(L,             0, 1, X, rfRigidity, Y);
+            add_rigidity(L-1, lastPoint(), 0, X, rfRigidity, Y);
         }
 #endif
     }
@@ -747,7 +746,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
     }
     
 #if CHECK_RIGIDITY
-    static int cnt = 0;
+    static size_t cnt = 0;
     real err = blas::max_diff(DIM*nPoints, tmp, Y);
     if ( err > 1.0e-6 || ++cnt > 1<<14 )
     {

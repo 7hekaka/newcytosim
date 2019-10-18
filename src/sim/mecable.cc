@@ -124,35 +124,35 @@ void Mecable::release()
 //------------------------------------------------------------------------------
 #pragma mark - Modifying points
 
-unsigned Mecable::addPoint(Vector const& vec)
+size_t Mecable::addPoint(Vector const& vec)
 {
     allocateMecable(nPoints+1);
-    unsigned p = nPoints++;
+    size_t p = nPoints++;
     //std::clog << "mecable " << reference() << " point" << p+1 << " = " << vec << "\n";
     vec.store(pPos+DIM*p);
     return p;
 }
 
 
-void Mecable::removePoints(const unsigned inx, const unsigned nbp)
+void Mecable::removePoints(const size_t inx, const size_t nbp)
 {
     assert_true( inx + nbp <= nPoints );
     
     nPoints -= nbp;
     
     //move part of the array down, to erase 'nbp' points from index 'inx'
-    for ( unsigned ii = DIM*inx; ii < DIM*nPoints; ++ii )
-        pPos[ii] = pPos[ii+DIM*nbp];
+    for ( size_t i = DIM*inx; i < DIM*nPoints; ++i )
+        pPos[i] = pPos[i+DIM*nbp];
 }
 
 
-void Mecable::shiftPoints(const unsigned inx, const unsigned nbp)
+void Mecable::shiftPoints(const size_t inx, const size_t nbp)
 {
     allocateMecable(nPoints+nbp);
     
     //move part of the array up, making space for 'nbp' points from index 'inx'
-    for ( unsigned ii = DIM*inx; ii < DIM*nPoints; ++ii )
-        pPos[ii+DIM*nbp] = pPos[ii];
+    for ( size_t i = DIM*inx; i < DIM*nPoints; ++i )
+        pPos[i+DIM*nbp] = pPos[i];
     
     nPoints += nbp;
 }
@@ -161,13 +161,13 @@ void Mecable::shiftPoints(const unsigned inx, const unsigned nbp)
 /**
  shifts ending-part of the array to indices starting at 0.
  */
-void Mecable::truncateM(const unsigned int p)
+void Mecable::truncateM(const size_t p)
 {
     assert_true( p < nPoints - 1 );
     
-    unsigned int np = nPoints - p;
+    size_t np = nPoints - p;
     
-    for ( unsigned int ii = 0; ii < DIM*np; ++ii )
+    for ( size_t ii = 0; ii < DIM*np; ++ii )
         pPos[ii] = pPos[ii+DIM*p];
     
     nPoints = np;
@@ -176,7 +176,7 @@ void Mecable::truncateM(const unsigned int p)
 /**
  erase higher indices of array
  */
-void Mecable::truncateP(const unsigned int p)
+void Mecable::truncateP(const size_t p)
 {
     assert_true( p < nPoints );
     assert_true( p > 0 );
@@ -190,7 +190,7 @@ void Mecable::resetPoints()
 {
     if ( pPos )
     {
-        for ( unsigned int p = 0; p < DIM*pAllocated; ++p )
+        for ( size_t p = 0; p < DIM*pAllocated; ++p )
             pPos[p] = 0;
     }
 }
@@ -198,21 +198,21 @@ void Mecable::resetPoints()
 
 void Mecable::addNoise(const real amount)
 {
-    for ( unsigned int p = 0; p < DIM*nPoints; ++p )
+    for ( size_t p = 0; p < DIM*nPoints; ++p )
         pPos[p] += amount * RNG.sreal();
 }
 
 
 void Mecable::translate(Vector const& T)
 {
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
         T.add_to(pPos+DIM*p);
 }
 
 
 void Mecable::rotate(Rotation const& T)
 {
-    for ( unsigned p = 0; p < nPoints; ++p)
+    for ( size_t p = 0; p < nPoints; ++p)
         ( T.vecmul(pPos+DIM*p) ).store(pPos+DIM*p);
 }
 
@@ -233,7 +233,7 @@ void Mecable::getPoints(const real * ptr)
 }
 
 
-Vector Mecable::netForce(const unsigned p) const
+Vector Mecable::netForce(const size_t p) const
 {
     assert_true( !pForce || nPoints==pForceMax );
     
@@ -250,7 +250,7 @@ Vector Mecable::netForce(const unsigned p) const
 Vector Mecable::position() const
 {
     Vector sum = posP(0);
-    for ( unsigned p = 1; p < nPoints; ++p )
+    for ( size_t p = 1; p < nPoints; ++p )
         sum += posP(p);
     return sum / real(nPoints);
 }
@@ -269,7 +269,7 @@ void Mecable::calculateMomentum(Vector& avg, Vector& sec, bool sub)
     sec.reset();
     
     // calculate first and second moments:
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         avg += posP(p);
         sec += posP(p).e_squared();
@@ -309,7 +309,7 @@ void Mecable::foldPosition(Modulo const* s)
 
 bool Mecable::allInside(Space const* spc) const
 {
-    for ( unsigned ii = 0; ii < nPoints; ++ii )
+    for ( size_t ii = 0; ii < nPoints; ++ii )
     {
         if ( spc->outside(posP(ii)) )
             return false;
@@ -324,7 +324,7 @@ bool Mecable::allInside(Space const* spc) const
 void Mecable::write(Outputter& out) const
 {
     out.writeUInt16(nPoints);
-    for ( unsigned int p = 0; p < nPoints ; ++p )
+    for ( size_t p = 0; p < nPoints ; ++p )
         out.writeFloatVector(pPos+DIM*p, DIM, '\n');
 }
 
@@ -333,13 +333,13 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
 {
     try
     {
-        unsigned nb = in.readUInt16();
+        size_t nb = in.readUInt16();
         allocateMecable(nb);
         //we reset the point for a clean start:
         resetPoints();
         nPoints = nb;
 #if ( 1 )
-        for ( unsigned p = 0; p < nb ; ++p )
+        for ( size_t p = 0; p < nb ; ++p )
             in.readFloatVector(pPos+DIM*p, DIM);
 #else
         in.readFloatVector(pPos, nb, DIM);
@@ -357,7 +357,7 @@ void Mecable::print(std::ostream& os, real const* ptr) const
 {
     os << "new mecable " << reference() << "\n{\n";
     os << " nb_points = " << nPoints << '\n';
-    for ( unsigned i = 0; i < nPoints ; ++i )
+    for ( size_t i = 0; i < nPoints ; ++i )
     {
         os << " point" << i+1 << " = " << Vector(ptr+DIM*i) << '\n';
     }
@@ -372,12 +372,12 @@ std::ostream& operator << (std::ostream& os, Mecable const& obj)
 }
 
 
-unsigned Mecable::point_index(std::string const& str, unsigned X)
+size_t Mecable::point_index(std::string const& str, size_t X)
 {
     if ( str.size() > 5  &&  str.compare(0,5,"point") == 0 )
     {
         errno = 0;
-        unsigned i = (unsigned)strtoul(str.c_str()+5, nullptr, 10);
+        size_t i = strtoul(str.c_str()+5, nullptr, 10);
         if ( errno ) throw InvalidParameter("a point index must be specified, eg. `point1`");
         if ( i < 1 ) throw InvalidParameter("a point index must must be >= 1");
         if ( i > X ) throw InvalidParameter("point index is out of range");

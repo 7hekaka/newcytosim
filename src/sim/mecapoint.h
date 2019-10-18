@@ -19,7 +19,7 @@ private:
     Mecable const* mec_;
     
     /// Index of the point-of-interest in the Mecable
-    unsigned int   pti_;
+    size_t         pti_;
     
 public:
         
@@ -30,10 +30,10 @@ public:
     Mecapoint() : mec_(nullptr), pti_(0) { }
 
     /// Build to refer to point p in ps
-    Mecapoint(const Mecable * m, unsigned p) : mec_(m), pti_(p) { }
+    Mecapoint(const Mecable * m, size_t p) : mec_(m), pti_(p) { }
     
     /// Set to refer to point p in ps
-    void   set(const Mecable * m, unsigned p) { mec_ = m; pti_ = p; }
+    void   set(const Mecable * m, size_t p) { mec_ = m; pti_ = p; }
     
     /// Constant pointer to the Mecable 
     Mecable const* mecable()       const { return mec_; }
@@ -42,13 +42,13 @@ public:
     bool           valid()         const { return mec_ == nullptr || pti_ < mec_->nbPoints(); }
     
     /// Index of point in object
-    unsigned int   point()         const { return pti_; }
+    size_t         point()         const { return pti_; }
         
     /// Position of the point-of-interest in space
     Vector         pos()           const { return mec_->posPoint(pti_); }
     
     /// Index of the point-of-interest in the big matrix
-    index_t        matIndex()      const { return mec_->matIndex() + pti_; }
+    size_t         matIndex()      const { return mec_->matIndex() + pti_; }
     
     /// Write to file
     void           write(Outputter&) const;

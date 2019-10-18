@@ -144,9 +144,9 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     // specify the vertices directly:
     if ( opt.has_key("points") )
     {
-        unsigned nbp = opt.nb_values("points");
+        size_t nbp = opt.nb_values("points");
         fib->setNbPoints(nbp);
-        for ( unsigned p = 0; p < nbp; ++p )
+        for ( size_t p = 0; p < nbp; ++p )
         {
             Vector vec(0,0,0);
             if ( ! opt.set(vec, "points", p) )
@@ -160,13 +160,13 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 #endif
     if ( opt.has_key("shape") )
     {
-        unsigned nbp = opt.nb_values("shape");
+        size_t nbp = opt.nb_values("shape");
         
         if ( nbp < 2 )
             throw InvalidParameter("fiber:shape must be a list of comma-separated vectors");
 
         real* tmp = new_real(DIM*nbp);
-        for ( unsigned p = 0; p < nbp; ++p )
+        for ( size_t p = 0; p < nbp; ++p )
         {
             Vector vec(0,0,0);
             if ( ! opt.set(vec, "shape", p) )

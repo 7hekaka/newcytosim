@@ -92,9 +92,9 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
 /**
  The alignment of the vertical bar should match the one in PREF
  */
-void print_line(std::ostream& os, int line_nb, std::string const& line)
+void print_line(std::ostream& os, size_t num, std::string const& line)
 {
-    os << std::setw(7) << line_nb << " | " << line << '\n';
+    os << std::setw(7) << num << " | " << line << '\n';
 }
 
 /**
@@ -172,7 +172,7 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
     is.seekg(0);
     std::string line;
     
-    unsigned int cnt = 0;
+    size_t cnt = 0;
     while ( is.good()  &&  is.tellg() <= start  )
     {
         std::getline(is, line);
@@ -226,10 +226,10 @@ unsigned StreamFunc::line_number(std::istream& is, std::streampos pos)
 }
 
 
-int StreamFunc::find_and_replace(std::string & src,
+size_t StreamFunc::find_and_replace(std::string & src,
                                  std::string const& fnd, std::string const& rep)
 {
-    int num = 0;
+    size_t num = 0;
     std::string::size_type fLen = fnd.size();
     std::string::size_type rLen = rep.size();
     std::string::size_type pos = src.find(fnd, 0);

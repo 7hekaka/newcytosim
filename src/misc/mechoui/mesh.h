@@ -13,10 +13,10 @@ class Mesh
 private:
 
     /// number of points
-    unsigned   n_points;
+    size_t   n_points;
     
     /// number of faces
-    unsigned   n_faces;
+    size_t   n_faces;
     
     /// coordinates of points
     float    * points;
@@ -36,7 +36,7 @@ public:
     ~Mesh();
     
     /// number of points
-    unsigned nbPoints() { return n_points; }
+    size_t nbPoints() { return n_points; }
     
     /// release memory
     void release();

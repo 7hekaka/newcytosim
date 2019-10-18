@@ -26,6 +26,7 @@ private:
     /// adjust 'x' to canonical image within periodicity 'p':
     static inline void fold(real& x, const real p)
     {
+        ///@todo use remainder() function for branchless code?
         if ( fabs(x) > p )
         {
             real i = std::copysign(p, x);

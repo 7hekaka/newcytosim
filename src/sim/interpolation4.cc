@@ -9,7 +9,7 @@
 /**
 Set a point of index 'P' on Mecable
 */
-void Interpolation4::set(Mecable const* m, unsigned p)
+void Interpolation4::set(Mecable const* m, size_t p)
 {
     assert_true( !m || p < m->nbPoints() );
     
@@ -29,7 +29,7 @@ Coefficient 'c' determines the position between 'P' and 'Q':
 - with ( c == 1 ) the point is equal to P
 .
 */
-void Interpolation4::set(Mecable const* m, unsigned p, unsigned q, real c)
+void Interpolation4::set(Mecable const* m, size_t p, size_t q, real c)
 {
     assert_true(m);
     assert_true(q == p+1);
@@ -56,7 +56,7 @@ This is used when the four vertices [P ... P+3] define a orthonormal reference,
 as the components of 'vec' are then simply the coordinates of the position of the
 interpolation in this reference frame.
 */
-void Interpolation4::set(Mecable const* m, unsigned p, Vector const& vec)
+void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
 {
     assert_true(m);
     
@@ -90,7 +90,7 @@ void Interpolation4::set(Mecable const* m, unsigned p, Vector const& vec)
 
 Vector Interpolation4::position() const
 {
-    unsigned top = std::min(ord_, mec_->nbPoints());
+    size_t top = std::min(ord_, mec_->nbPoints());
     Vector res = coef_[0] * mec_->posPoint(ref_);
     for ( unsigned i = 1; i < top; ++i )
         res += coef_[i] * mec_->posPoint(ref_+i);
@@ -100,8 +100,8 @@ Vector Interpolation4::position() const
 
 void Interpolation4::interLink(Meca & meca, Interpolation const& arg, const real stiffness) const
 {
-    unsigned off = mec_->matIndex() + ref_;
-    unsigned pts[] = { off, off+1, off+2, off+3 };
+    size_t off = mec_->matIndex() + ref_;
+    size_t pts[] = { off, off+1, off+2, off+3 };
     
     switch ( ord_ )
     {
@@ -125,8 +125,8 @@ void Interpolation4::interLink(Meca & meca, Interpolation const& arg, const real
 
 void Interpolation4::interLink(Meca & meca, Mecapoint const& arg, const real stiffness) const
 {
-    unsigned off = mec_->matIndex() + ref_;
-    unsigned pts[] = { off, off+1, off+2, off+3 };
+    size_t off = mec_->matIndex() + ref_;
+    size_t pts[] = { off, off+1, off+2, off+3 };
     
     switch ( ord_ )
     {

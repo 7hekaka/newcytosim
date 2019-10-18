@@ -17,7 +17,7 @@ class MatrixSparse
 private:
     
     /// size of matrix
-    index_t size_;
+    size_t  size_;
 
     /// size of memory which has been allocated
     size_t  allocated_;
@@ -26,18 +26,18 @@ private:
     real ** mxCol;
     
     // array [ size ][ ? ] holding the line index for each column
-    int  ** mxRow;
+    size_t ** mxRow;
     
     // allocate column to hold nb values
-    void allocateColumn(index_t column_index, size_t nb_values);
+    void allocateColumn(size_t column_index, size_t nb_values);
     
 public:
     
     /// return the size of the matrix
-    index_t size() const { return size_; }
+    size_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(index_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { allocate(s); size_=s; }
 
     /// base for destructor
     void deallocate();
@@ -55,19 +55,19 @@ public:
     void allocate(size_t sz);
         
     /// returns the address of element at (x, y), no allocation is done
-    real* addr( index_t x, index_t y ) const;
+    real* addr( size_t x, size_t y ) const;
     
     /// returns the address of element at (x, y), allocating if necessary
-    real& operator()( index_t x, index_t y );
+    real& operator()( size_t x, size_t y );
     
     /// scale the matrix by a scalar factor
     void scale( real a );
     
     /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
-    void addDiagonalBlock(real* mat, unsigned ldd, index_t si, unsigned nb) const;
+    void addDiagonalBlock(real* mat, unsigned ldd, size_t si, size_t nb) const;
     
     /// add this' data block ( idx, idx, idx+siz, idx+siz ) to upper triangular half of `mat`
-    void addTriangularBlock(real* mat, index_t ldd, index_t si, unsigned nb, unsigned dim) const;
+    void addTriangularBlock(real* mat, size_t ldd, size_t si, size_t nb, size_t dim) const;
     
     /// multiplication of a vector: Y = Y + M * X, dim(X) = dim(M)
     void vecMulAdd( const real* X, real* Y ) const;
@@ -82,7 +82,7 @@ public:
     bool nonZero() const;
     
     /// number of element which are non-zero
-    size_t nbElements(index_t start, index_t stop) const;
+    size_t nbElements(size_t start, size_t stop) const;
     
     /// number of blocks which are not null
     size_t nbElements() const { return nbElements(0, size_); }

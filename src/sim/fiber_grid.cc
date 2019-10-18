@@ -205,7 +205,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
         Vector P, Q = fib->posP(0);
         const real S = fib->segmentation();
 
-        for ( unsigned n = 1; n < fib->nbPoints(); ++n )
+        for ( size_t n = 1; n < fib->nbPoints(); ++n )
         {
             P = Q;
             Q = fib->posP(n);

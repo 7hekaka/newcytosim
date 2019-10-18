@@ -63,7 +63,7 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     ObjectList res;
     // get sphere radius:
     real rad = -1;
-    unsigned inx = 2;
+    size_t inx = 2;
 
     std::string var = "point1";
     if ( opt.has_key(var) )

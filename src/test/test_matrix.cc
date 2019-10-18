@@ -28,35 +28,35 @@ real alpha = 2.0;
 real beta = 1.0;
 
 
-real checksum(int size, real const* vec, real const* ptr)
+real checksum(size_t size, real const* vec, real const* ptr)
 {
     real s = 0;
-    for ( int i=0; i<size; ++i )
+    for ( size_t i=0; i<size; ++i )
         s += vec[i] * ptr[i];
     return s;
 }
 
 
-real diff(int size, real const* a, real const* b)
+real diff(size_t size, real const* a, real const* b)
 {
     real s = 0;
-    for ( int i=0; i<size; ++i )
+    for ( size_t i=0; i<size; ++i )
         s += std::abs( a[i] - b[i] );
     return s;
 }
 
 // fill lower triangle of matrix
-void setIndices(int fill, int*& ii, int*& jj, int mx, int bs)
+void setIndices(size_t fill, size_t*& ii, size_t*& jj, size_t mx, size_t bs)
 {
     delete[] ii;
     delete[] jj;
     
-    ii = new int[fill];
-    jj = new int[fill];
+    ii = new size_t[fill];
+    jj = new size_t[fill];
     
-    for ( int n = 0; n < fill; ++n )
+    for ( size_t n = 0; n < fill; ++n )
     {
-        int i, j;
+        size_t i, j;
         do {
             i = RNG.pint(mx) / bs;
             j = RNG.pint(mx) / bs;
@@ -93,7 +93,7 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
 //------------------------------------------------------------------------------
 
 template <typename MATRIXA, typename MATRIXB>
-void compare(unsigned size,  MATRIXA & mat1, MATRIXB& mat2, unsigned fill)
+void compare(size_t size,  MATRIXA & mat1, MATRIXB& mat2, size_t fill)
 {
     real * tmp1 = new_real(size*size);
     real * tmp2 = new_real(size*size);
@@ -104,18 +104,18 @@ void compare(unsigned size,  MATRIXA & mat1, MATRIXB& mat2, unsigned fill)
     mat1.resize(size);
     mat2.resize(size);
     
-    for ( unsigned n = 0; n < fill; ++n )
+    for ( size_t n = 0; n < fill; ++n )
     {
         real a = 10.0 * RNG.preal();
-        unsigned ii = RNG.pint(size);
-        unsigned jj = RNG.pint(size);
+        size_t ii = RNG.pint(size);
+        size_t jj = RNG.pint(size);
         mat1(ii, jj) += a;
         mat2(ii, jj) += a;
     }
     
-    for ( unsigned nbc = DIM; nbc < size; nbc+=DIM )
+    for ( size_t nbc = DIM; nbc < size; nbc+=DIM )
     {
-        unsigned inx = DIM * ( RNG.pint(size-nbc) / DIM );
+        size_t inx = DIM * ( RNG.pint(size-nbc) / DIM );
         std::clog << "Comparing matrices: size " << size << " inx " << inx << " nbc " << nbc << " ";
         
         zero_real(size*size, tmp1);
@@ -231,8 +231,8 @@ void fillMatrixIso(MATRIX& mat, const int i, const int j)
 
 template <typename MATRIX>
 void testMatrix(MATRIX & mat,
-                const int size, real const* x, real const* y, real * z,
-                const int fill, int inx[], int iny[])
+                const size_t size, real const* x, real const* y, real * z,
+                const size_t fill, size_t inx[], size_t iny[])
 {
     mat.resize(size);
 
@@ -240,7 +240,7 @@ void testMatrix(MATRIX & mat,
     for ( int ii=0; ii<N_RUN; ++ii )
     {
         mat.reset();
-        for ( int n=0; n<fill; ++n )
+        for ( size_t n=0; n<fill; ++n )
             fillMatrix(mat, iny[n], inx[n]);
     }
     double ts = toc();
@@ -278,21 +278,21 @@ void testMatrix(MATRIX & mat,
 
 template <typename MATRIX>
 void testMatrixIso(MATRIX & mat,
-                   const int size, real const* x, real const* y, real * z,
-                   const int fill, int inx[], int iny[])
+                   const size_t size, real const* x, real const* y, real * z,
+                   const size_t fill, size_t inx[], size_t iny[])
 {
     //---- multidimensional isotropic multiplication
     tic();
-    for ( int ii=0; ii<N_RUN; ++ii )
+    for ( size_t ii=0; ii<N_RUN; ++ii )
     {
         mat.reset();
-        for ( int n=0; n<fill; ++n )
+        for ( size_t n=0; n<fill; ++n )
             fillMatrixIso(mat, inx[n], iny[n]);
     }
     double t2 = toc();
     
     tic();
-    for ( int ii=0; ii<N_RUN; ++ii )
+    for ( size_t ii=0; ii<N_RUN; ++ii )
     {
         mat.prepareForMultiply(DIM);
         for ( int n=0; n<N_MUL; ++n )
@@ -308,17 +308,17 @@ void testMatrixIso(MATRIX & mat,
 }
 
 
-void testMatrices(const int size, const int fill)
+void testMatrices(const size_t size, const size_t fill)
 {
-    printf("------%iD size %i  filled %.1f %% :", DIM, size, fill*100.0/size/size);
+    printf("------%iD size %lu  filled %.1f %% :", DIM, size, fill*100.0/size/size);
     //MatrixSparseSymmetric  mat0;
     MatrixSparseSymmetric1 mat1;
     //MatrixSparseSymmetric2 mat2;
     MatrixSparseSymmetricB mat3;
     MatrixSparseBlock      mat4;
 
-    int * inx = nullptr;
-    int * iny = nullptr;
+    size_t * inx = nullptr;
+    size_t * iny = nullptr;
     
     setIndices(fill, iny, inx, size, DIM);
     
@@ -355,15 +355,15 @@ void testMatrices(const int size, const int fill)
 const real dir[4] = {  2, 1, -1, 3 };
 const real vec[4] = { -1, 3,  1, 2 };
 
-void fillMatrixBlock(MatrixSparseSymmetricBlock& mat, const int fill, int inx[], int iny[])
+void fillMatrixBlock(MatrixSparseSymmetricBlock& mat, const size_t fill, size_t inx[], size_t iny[])
 {
     SquareBlock S = SquareBlock::outerProduct(dir);
     SquareBlock U = SquareBlock::outerProduct(dir, vec);
     
-    for ( int n=0; n<fill; ++n )
+    for ( size_t n=0; n<fill; ++n )
     {
-        int ii = inx[n] - inx[n] % SquareBlock::dimension();
-        int jj = iny[n] - iny[n] % SquareBlock::dimension();
+        size_t ii = inx[n] - inx[n] % SquareBlock::dimension();
+        size_t jj = iny[n] - iny[n] % SquareBlock::dimension();
         mat.diag_block(ii).sub_half(S);
         mat.diag_block(jj).add_half(S);
         mat.block(ii, jj).add_full(U);
@@ -374,8 +374,8 @@ void fillMatrixBlock(MatrixSparseSymmetricBlock& mat, const int fill, int inx[],
 This compares the Scalar and SIMD implementations of one matrix
 */
  void testMatrixBlock(MatrixSparseSymmetricBlock & mat,
-                     const int size, real const* x, real const* y, real * z,
-                     const int fill, int inx[], int iny[])
+                     const size_t size, real const* x, real const* y, real * z,
+                     const size_t fill, size_t inx[], size_t iny[])
 {
     mat.resize(size);
     
@@ -417,7 +417,7 @@ This compares the Scalar and SIMD implementations of one matrix
     }
     double t2 = ( __rdtsc() - time ) / nop;
     
-    printf("%6i %18s ", size, mat.what().c_str());
+    printf("%6lu %18s ", size, mat.what().c_str());
     printf("set %8.1f mul %8.1f  alt %8.1f", ts, t1, t2);
     printf(" :  checksum  %+24.16f %+24.16f", sum, res);
     if ( sum != res )
@@ -427,10 +427,10 @@ This compares the Scalar and SIMD implementations of one matrix
 }
 
 
-void testMatrixBlock(const int size, const int fill)
+void testMatrixBlock(const size_t size, const size_t fill)
 {
-    int * inx = nullptr;
-    int * iny = nullptr;
+    size_t * inx = nullptr;
+    size_t * iny = nullptr;
     real * x = nullptr;
     real * y = nullptr;
     real * z = nullptr;
@@ -449,7 +449,7 @@ void testMatrixBlock(const int size, const int fill)
     delete[] iny;
 }
 
-int compare_int(const void* i, const void* j) { return ( *(int*)i > *(int*)j ); }
+int compare_int(const void* i, const void* j) { return ( *(size_t*)i > *(size_t*)j ); }
 
 int main( int argc, char* argv[] )
 {
@@ -485,7 +485,7 @@ int main( int argc, char* argv[] )
         for ( int i = 0; i < 14; ++i )
         {
             siz = 1 + ( 2 << i ) * RNG.preal();
-            size_t fill = 1 + siz * siz * 0.01 * RNG.preal();
+            size_t fill = 1 + siz * siz * ( 0.01 * RNG.preal() );
             testMatrixBlock(siz, fill);
         }
     }

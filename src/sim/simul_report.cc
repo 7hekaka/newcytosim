@@ -386,7 +386,7 @@ void Simul::reportFiberAge(std::ostream& out) const
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
     out << SEP << "dev_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
-    unsigned cnt;
+    size_t cnt;
     real avg, dev, mn, mx;
     const real now = prop->time;
 
@@ -413,7 +413,7 @@ void Simul::reportFiberLengths(std::ostream& out) const
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "std_dev";
     out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
 
-    unsigned cnt;
+    size_t cnt;
     real avg, dev, mn, mx;
     
     std::streamsize p = out.precision();
@@ -538,7 +538,7 @@ void Simul::reportFiberSegments(std::ostream& out) const
     {
         FiberProp * fp = static_cast<FiberProp*>(i);
         
-        unsigned cnt, joints;
+        size_t cnt, joints;
         real mn = 0, mx = 0;
         
         ObjectList objs = fibers.collect(fp);
@@ -711,7 +711,7 @@ void Simul::reportFiberPoints(std::ostream& out) const
     {
         out << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
         
-        for ( unsigned p = 0; p < fib->nbPoints(); ++p )
+        for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
             out << SEP << fib->posP(p);
@@ -907,7 +907,7 @@ void Simul::reportFiberForces(std::ostream& out) const
     {
         out << COM << "fiber " << fib->reference();
             
-        for ( unsigned p = 0; p < fib->nbPoints(); ++p )
+        for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
             out << SEP << fib->posP(p);
@@ -937,7 +937,7 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
 
     Vector n(1,0,0);
     real ten = 0;
-    unsigned cnt = 0;
+    size_t cnt = 0;
     if ( opt.value_is("plane", 0, "all") )
     {
         // extending the comments:
@@ -982,7 +982,7 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
 {
     out << COM << ljust("class",2,2) << SEP << "count" << SEP << "sum" << SEP << "avg" << SEP << "dev";
     
-    unsigned cnt;
+    size_t cnt;
     real avg, dev;
     
     for ( Property * i : properties.find_all("fiber") )
@@ -1018,7 +1018,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
         Space const* spc = findSpace(fib->prop->confine_space);
         const real stiff = fib->prop->confine_stiffness;
         
-        for ( unsigned p = 0; p < fib->nbPoints(); ++p )
+        for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             Vector w, pos = fib->posP(p);
             if ( spc->outside(pos) )
@@ -2485,7 +2485,7 @@ void Simul::reportRing(std::ostream& out) const
  */
 void Simul::reportPlatelet(std::ostream& out) const
 {
-    unsigned nfib;
+    size_t nfib;
     real pol, dev, mn, mx;
     fibers.infoLength(fibers.collect(), nfib, pol, dev, mn, mx);
     pol *= nfib;
@@ -2493,7 +2493,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     computeForces();
 
     real t, ten = 0;
-    unsigned c, cnt = 0;
+    size_t c, cnt = 0;
 
     // rotate plane around the Z-axis and find intersecting fibers
     for ( unsigned a = 0; a < 180; a += 10 )

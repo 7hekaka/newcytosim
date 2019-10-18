@@ -71,7 +71,7 @@ namespace LinearSolvers
                Monitor& monitor, Allocator& allocator, Matrix& H, Matrix& V,
                Allocator& temporary)
     {
-        const int dim = mat.dimension();
+        const size_t dim = mat.dimension();
         real beta, resid, ratio = 1.0;
         
         //allocate workspace

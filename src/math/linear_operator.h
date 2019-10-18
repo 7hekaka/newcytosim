@@ -13,7 +13,7 @@ namespace LinearSolvers
     {
     public:
         /// size of the matrix M
-        virtual int dimension() const = 0;
+        virtual size_t dimension() const = 0;
         
         /// multiply a vector ( Y <- M * X )
         virtual void multiply(const real* X, real* Y) const = 0;

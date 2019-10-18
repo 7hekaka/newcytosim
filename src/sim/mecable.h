@@ -45,7 +45,7 @@ protected:
     size_t      pForceMax;
     
     /// Number of points in the Mecable
-    unsigned    nPoints;
+    size_t      nPoints;
 
 private:
 
@@ -68,7 +68,7 @@ private:
     int         pBlockUse;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    index_t     pIndex;
+    size_t      pIndex;
 
     /// Clear pointers
     void        clearMecable();
@@ -90,13 +90,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// Set the number of points of the object
-    void            setNbPoints(const unsigned n) { allocateMecable(n); nPoints = n; }
+    void            setNbPoints(const size_t n) { allocateMecable(n); nPoints = n; }
     
     /// Returns number of points
-    unsigned        nbPoints()     const { return nPoints; }
+    size_t          nbPoints()     const { return nPoints; }
     
     /// Index of the last point = nbPoints() - 1
-    unsigned        lastPoint()    const { return nPoints - 1; }
+    size_t          lastPoint()    const { return nPoints - 1; }
     
     /// size currently allocated
     size_t          allocated()    const { return pAllocated; }
@@ -105,22 +105,22 @@ public:
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
-    const Vector    posP(unsigned p)      const { return Vector(pPos+DIM*p); }
+    const Vector    posP(size_t p)      const { return Vector(pPos+DIM*p); }
     
     /// Position of vertex number 'p' (indices starting at zero)
-    Vector          posPoint(unsigned p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
+    Vector          posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
     /// Address of coordinate array
     const real*     data()                const { return pPos; }
     
     /// Address of point `p`
-    const real*     addrPoint(unsigned p) const { return pPos + DIM*p; }
+    const real*     addrPoint(size_t p) const { return pPos + DIM*p; }
     
     /// Set position of point `i` to `x`
-    void            setPoint(unsigned i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
+    void            setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
     
     /// Shift point at index `i` by `x`
-    void            movePoint(unsigned i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
+    void            movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
 
     /// copy current vertex coordinates to given array
     void            putPoints(real*) const;
@@ -129,22 +129,22 @@ public:
     virtual void    getPoints(real const*);
     
     /// Add a point and expand the object, returning the array index that was used
-    unsigned        addPoint(Vector const& w);
+    size_t          addPoint(Vector const& w);
     
     /// Remove `nbp` points starting from index `inx`
-    void            removePoints(unsigned inx, unsigned nbp);
+    void            removePoints(size_t inx, size_t nbp);
     
     /// Remove all points
     void            clearPoints()  { nPoints = 0; }
     
     /// Shift `nbp` points starting from index `inx`
-    void            shiftPoints(unsigned inx, unsigned nbp);
+    void            shiftPoints(size_t inx, size_t nbp);
     
     /// Remove all points with indices [ 0, p-1 ], keep [ p, nbPoints() ]
-    virtual void    truncateM(unsigned int p);
+    virtual void    truncateM(size_t p);
     
     /// Keep points [ 0, p ], remove other points
-    virtual void    truncateP(unsigned int p);
+    virtual void    truncateP(size_t p);
     
     /// Set all coordinates to zero (nicer for debug/testing)
     void            resetPoints();
@@ -160,7 +160,7 @@ public:
     
     
     /// Difference of two points = src[P+1] - src[P]
-    static inline Vector diffPoints(const real* src, const unsigned P)
+    static inline Vector diffPoints(const real* src, const size_t P)
     {
         const real * p = src + DIM*P;
         const real * q = src + DIM*P + DIM;
@@ -174,7 +174,7 @@ public:
     }
     
     /// Difference of two points = src[Q] - src[P]
-    static inline Vector diffPoints(const real* src, const unsigned P, const unsigned Q)
+    static inline Vector diffPoints(const real* src, const size_t P, const size_t Q)
     {
         const real * p = src + DIM*P;
         const real * q = src + DIM*Q;
@@ -188,14 +188,14 @@ public:
     }
     
     /// Difference of two consecutive points: (P+1) - (P)
-    Vector diffPoints(const unsigned P) const
+    Vector diffPoints(const size_t P) const
     {
         assert_true( P+1 < nPoints );
         return diffPoints(pPos, P);
     }
     
     /// Difference of two points = Q - P = vector PQ
-    Vector diffPoints(const unsigned P, const unsigned Q) const
+    Vector diffPoints(const size_t P, const size_t Q) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
@@ -203,7 +203,7 @@ public:
     }
     
     /// Calculate intermediate position = P + a ( Q - P )
-    Vector interpolatePoints(const unsigned P, const unsigned Q, const real a) const
+    Vector interpolatePoints(const size_t P, const size_t Q, const real a) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
@@ -261,13 +261,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// Store the index where coordinates are located in Meca
-    void            matIndex(index_t inx) { pIndex = inx; }
+    void            matIndex(size_t inx) { pIndex = inx; }
     
     /// Index in mB of the first point. the index in the vectors is DIM*matIndex()
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */
-    index_t         matIndex()           const { return pIndex; }
+    size_t         matIndex()           const { return pIndex; }
     
     /// Allocates pBlock[] to hold a `N x N` full matrix, where N = DIM * nbPoints()
     void            allocateBlock();
@@ -290,7 +290,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// returns the force on point `p` calculated at the previous Meca::solve()
-    Vector          netForce(const unsigned p) const;
+    Vector          netForce(const size_t p) const;
     
     /// replaces current forces by the ones provided as argument
     void            getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
@@ -317,7 +317,7 @@ public:
      It should fill at maximum the upper part of the diagonal block corresponding to indices [offset, offset+dim*nbPoints()].
      It should be consistent with addRigidity(), adding exactly the same terms.
      */
-    virtual void    addRigidityMatrix(MatrixSparseSymmetric1&, int inx, int dim) const {}
+    virtual void    addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx, size_t dim) const {}
 
     /// Fill upper diagonal of `mat` with matrix elements
     /**
@@ -326,7 +326,7 @@ public:
      This version is used to build the preconditionner in Meca.
      It should be consistent with addRigidity(), adding exactly the same terms.
      */
-    virtual void    addRigidityUpper(real * mat, unsigned ldd) const {}
+    virtual void    addRigidityUpper(real * mat, size_t ldd) const {}
 
     /// Calculate speeds for given forces: Y <- forces(X)
     /**
@@ -394,7 +394,7 @@ public:
     void            print(std::ostream&, real const*) const;
     
     /// return index encoded in `str`
-    static unsigned point_index(std::string const& str, unsigned max);
+    static size_t   point_index(std::string const& str, size_t max);
 
 };
 

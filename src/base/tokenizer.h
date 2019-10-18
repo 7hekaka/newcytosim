@@ -28,19 +28,19 @@ namespace Tokenizer
     int get_character(std::istream& is, bool eat_space=true, bool eat_line=false);
     
     /// read one signed integer, and throw exception if spacing character does not follow
-    bool get_integer(std::istream&, int&);
+    bool get_integer(std::istream&, long&);
     
     /// read one unsigned integer, and throw exception if spacing character does not follow
-    bool get_integer(std::istream&, unsigned&);
+    bool get_integer(std::istream&, unsigned long&);
     
     /// split string using the given separator.
     std::vector<std::string> split(std::string& str, char sep, bool get_empty_fields);
     
     /// read integer from `str` if possible, truncating `str`
-    bool get_integer(std::string& str, int&);
+    bool get_integer(std::string& str, long&);
     
     /// read unsigned integer from `str` if possible, truncating `str`
-    bool get_integer(std::string& str, unsigned&);
+    bool get_integer(std::string& str, unsigned long&);
 
     
     /// read multiple forms of integer numbers

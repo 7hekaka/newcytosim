@@ -39,9 +39,9 @@ void SpacePolygon::resize(Glossary& opt)
     else if ( opt.has_key("points") )
     {
         // specify vertices directly:
-        unsigned nbp = opt.nb_values("points");
+        size_t nbp = opt.nb_values("points");
         poly_.allocate(nbp);
-        for ( unsigned p = 0; p < nbp; ++p )
+        for ( size_t p = 0; p < nbp; ++p )
         {
             Vector2 vec(0,0);
             if ( ! opt.set(vec, "points", p) )
@@ -128,7 +128,7 @@ Vector SpacePolygon::project(Vector const& w) const
     
 #elif ( DIM == 2 )
     
-    int hit;
+    size_t hit;
     poly_.project(w.XX, w.YY, p.XX, p.YY, hit);
     
 #elif ( DIM > 2 )
@@ -144,14 +144,14 @@ Vector SpacePolygon::project(Vector const& w) const
         else
         {
             // outside in Z and XY
-            int hit;
+            size_t hit;
             poly_.project(w.XX, w.YY, p.XX, p.YY, hit);
         }
         p.ZZ = std::copysign(height_, w.ZZ);
     }
     else
     {
-        int hit;
+        size_t hit;
         poly_.project(w.XX, w.YY, p.XX, p.YY, hit);
         if ( poly_.inside(w.XX, w.YY, 1) )
         {
@@ -182,7 +182,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
 {    
 #if ( DIM > 1 )
     
-    int hit;
+    size_t hit;
     real pX, pY;
     int edg = poly_.project(pos.XX, pos.YY, pX, pY, hit);
     real nX = -poly_.pts_[hit].dy;
@@ -269,7 +269,7 @@ void SpacePolygon::setInteractions(Meca & meca, FiberSet const& fibers) const
 
 bool SpacePolygon::draw() const
 {
-    const unsigned npts = poly_.nbPoints();
+    const size_t npts = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
 
 #if ( DIM == 2 )

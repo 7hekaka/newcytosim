@@ -69,7 +69,7 @@ void checkQuartic(real a, real b, real c, real d, real e, cplx x)
 }
 
 
-void testQuartic(unsigned cnt, const int DEG)
+void testQuartic(size_t cnt, const int DEG)
 {
     real res = 0;
     unsigned miss = 0;
@@ -80,7 +80,7 @@ void testQuartic(unsigned cnt, const int DEG)
     real x1, x2, x3, x4;
     cplx z1, z2, z3, z4;
     
-    for( unsigned u = 0; u < cnt; ++u )
+    for ( size_t u = 0; u < cnt; ++u )
     {
         x1 = RNG.sreal();
         x2 = RNG.test(p) ? x1 : RNG.sreal();

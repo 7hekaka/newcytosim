@@ -236,10 +236,10 @@ std::string Tokenizer::get_integer(std::istream& is)
  
  Note that the value of `what` will not change, if the input fails.
  */
-bool Tokenizer::get_integer(std::istream& is, unsigned& var)
+bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
 {
     std::streampos isp = is.tellg();
-    unsigned num;
+    unsigned long num;
     is >> num;
     if ( is.fail() )
     {
@@ -262,10 +262,10 @@ bool Tokenizer::get_integer(std::istream& is, unsigned& var)
  
  Note that the value of `what` will not change, if the input fails.
  */
-bool Tokenizer::get_integer(std::istream& is, int& var)
+bool Tokenizer::get_integer(std::istream& is, long& var)
 {
     std::streampos isp = is.tellg();
-    int num;
+    long num;
     is >> num;
     if ( is.fail() )
     {
@@ -302,7 +302,7 @@ std::vector<std::string> Tokenizer::split(std::string& str, char sep, bool get_e
  Split string `arg` into an integer, a space, and the remaining string.
  Any space after the integer is discarded. `arg` is truncated.
  */
-bool Tokenizer::get_integer(std::string& arg, int& val)
+bool Tokenizer::get_integer(std::string& arg, long& val)
 {
     char const* ptr = arg.c_str();
     char * end;
@@ -325,7 +325,7 @@ bool Tokenizer::get_integer(std::string& arg, int& val)
  Split string `arg` into an integer, a space, and the remaining string.
  Any space after the integer is discarded. `arg` is truncated.
  */
-bool Tokenizer::get_integer(std::string& arg, unsigned int& val)
+bool Tokenizer::get_integer(std::string& arg, unsigned long& val)
 {
     char const* ptr = arg.c_str();
     char * end;

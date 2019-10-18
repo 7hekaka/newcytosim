@@ -41,7 +41,7 @@ private:
     Interpolation inter;
     
     /// the abscissa of the interpolated point, which should be equal to `abscissa()`
-    real abscissaInter() const { return fbFiber->abscissaPoint(inter.point1()+inter.coef1()); }
+    real abscissaInter() const { return fbFiber->abscissaPoint(real(inter.point1())+inter.coef1()); }
 
 protected:
     

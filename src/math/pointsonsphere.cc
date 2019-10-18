@@ -47,21 +47,21 @@ void PointsOnSphere::copyPoint( real* x, real* y, real* z, const size_t ii )
 
 void PointsOnSphere::copyPoints( real x[], const size_t x_size )
 {
-    for ( unsigned ii = 0; ii < 3*num_points_ && ii < x_size; ++ii )
+    for ( size_t ii = 0; ii < 3*num_points_ && ii < x_size; ++ii )
         x[ii] = coord_[ii];
 }
 
 
 void PointsOnSphere::scale(const real factor)
 {
-    for ( unsigned ii = 0; ii < 3*num_points_; ++ii )
+    for ( size_t ii = 0; ii < 3*num_points_; ++ii )
         coord_[ii] *= factor;
 }
 
 
 void PointsOnSphere::printAllPositions( FILE* file )
 {
-    for ( unsigned ii = 0; ii < num_points_; ++ii )
+    for ( size_t ii = 0; ii < num_points_; ++ii )
         fprintf( file, "%f %f %f\n", coord_[3*ii], coord_[3*ii+1], coord_[3*ii+2]);
 }
 
@@ -125,9 +125,9 @@ void PointsOnSphere::randomize(real P[3])
  each of ~2N triangles should occupy an area of S = 4*PI/2*N, 
  and the distance between points should be ~2 * sqrt(S/sqrt(3)).
  */
-real PointsOnSphere::expectedDistance(unsigned n)
+real PointsOnSphere::expectedDistance(size_t n)
 {
-    real surface = 2 * M_PI / n;
+    real surface = 2 * M_PI / (real)n;
     return 2 * sqrt( surface / sqrt(3) );
 }
 
@@ -135,9 +135,9 @@ real PointsOnSphere::expectedDistance(unsigned n)
 real PointsOnSphere::minimumDistance()
 {
     real res = INFINITY;
-    for ( unsigned ii = 1; ii < num_points_; ++ii )
+    for ( size_t ii = 1; ii < num_points_; ++ii )
     {
-        for ( unsigned jj = 0; jj < ii; ++jj )
+        for ( size_t jj = 0; jj < ii; ++jj )
         {
             real dis = distance3Sqr(&coord_[3*ii], &coord_[3*jj]);
             if ( dis < res )
@@ -151,9 +151,9 @@ real PointsOnSphere::minimumDistance()
 real PointsOnSphere::coulombEnergy( const real P[] )
 {
     real dist, result = 0;
-    for ( unsigned ii = 1; ii < num_points_; ++ii )
+    for ( size_t ii = 1; ii < num_points_; ++ii )
     {
-        for ( unsigned jj = 0; jj < ii; ++jj )
+        for ( size_t jj = 0; jj < ii; ++jj )
         {
             dist = distance3( P + 3 * ii, P + 3 * jj );
             if ( dist > 0 ) result += 1.0 / dist;
@@ -170,14 +170,14 @@ void PointsOnSphere::setForces( real forces[], real threshold )
     real dist;
     
     //--------- reset forces:
-    for ( unsigned ii = 0; ii < 3 * num_points_; ++ii )
+    for ( size_t ii = 0; ii < 3 * num_points_; ++ii )
         forces[ii] = 0.0;
     
     //--------- calculate Coulomb pair interactions:
     // first particle is ii, second one is jj:
-    for ( unsigned ii = 1; ii < num_points_; ++ii )
+    for ( size_t ii = 1; ii < num_points_; ++ii )
     {
-        for ( unsigned jj = 0; jj < ii; ++jj )
+        for ( size_t jj = 0; jj < ii; ++jj )
         {
             //calculate vector and distance^2 between from jj to ii
             dist = 0;
@@ -202,7 +202,7 @@ void PointsOnSphere::setForces( real forces[], real threshold )
                 //force = vector / r^3, but here dist = r^2
                 dist = 1.0 / ( dist * sqrt(dist) );
                 //update forces for jj and ii:
-                for ( unsigned dd = 0 ; dd < 3; ++dd )
+                for ( size_t dd = 0 ; dd < 3; ++dd )
                 {
                     dx[dd] *= dist;
                     forces[3*ii+dd] += dx[dd];
@@ -219,7 +219,7 @@ void PointsOnSphere::setForces( real forces[], real threshold )
      assuming here that points are already on the sphere (norm=1)
      ( the algorithm converge even without this, but slower )
      */
-    for ( unsigned ii = 0; ii < num_points_; ++ii )
+    for ( size_t ii = 0; ii < num_points_; ++ii )
     {
         dist = 0;
         for ( int dd = 0; dd < 3; ++dd )
@@ -237,7 +237,7 @@ void PointsOnSphere::setForces( real forces[], real threshold )
  */
 void PointsOnSphere::refinePoints( real Pnew[], const real Pold[], real forces[], real S )
 {
-    for ( unsigned ii = 0; ii < num_points_; ++ii )
+    for ( size_t ii = 0; ii < num_points_; ++ii )
     {
         real W[3];
         
@@ -255,7 +255,7 @@ void PointsOnSphere::refinePoints( real Pnew[], const real Pold[], real forces[]
  create a relatively even distribution of nbp points on the sphere
  the coordinates are stored in real array coord_[]
  */
-unsigned PointsOnSphere::distributePoints(size_t nbp, real precision, size_t mx_nb_iterations)
+size_t PointsOnSphere::distributePoints(size_t nbp, real precision, size_t mx_nb_iterations)
 {
     //reallocate the array if needed:
     if ( num_points_ != nbp || ! coord_ )
@@ -266,18 +266,18 @@ unsigned PointsOnSphere::distributePoints(size_t nbp, real precision, size_t mx_
     }
     
     // the precision is rescaled with the expected distance:
-    real distance = expectedDistance(nbp);
+    real len = expectedDistance(nbp);
     
     /* 
      Threshold cut-off for repulsive force:
      The best results are obtained for threshold > 2
      */
-    real threshold = 10 * distance;
-    real mag = 0.1 * distance * distance * distance * distance / num_points_;
+    real threshold = 10 * len;
+    real mag = 0.1 * len * len * len * len / (real)num_points_;
     precision *= mag;
 
     //------------ distribute the points randomly on the sphere:
-    for ( unsigned ii = 0; ii < num_points_; ++ii )
+    for ( size_t ii = 0; ii < num_points_; ++ii )
         randomize(coord_+ii*3);
     
     //--------- for one point only, we return:
@@ -297,7 +297,7 @@ unsigned PointsOnSphere::distributePoints(size_t nbp, real precision, size_t mx_
     //make an initial guess for the step size:
     unsigned history = 0;
     
-    unsigned step = 0;
+    size_t step = 0;
     for ( step = 0; step < mx_nb_iterations; ++step )
     {
         setForces(force, threshold);

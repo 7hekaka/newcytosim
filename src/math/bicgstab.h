@@ -24,7 +24,7 @@ namespace LinearSolvers
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
         
-        const int dim = mat.dimension();
+        const size_t dim = mat.dimension();
         allocator.allocate(dim, 5);
         real * r  = allocator.bind(0);
         real * r0 = allocator.bind(1);
@@ -130,7 +130,7 @@ namespace LinearSolvers
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0, delta;
         
-        const int dim = mat.dimension();
+        const size_t dim = mat.dimension();
         allocator.allocate(dim, 7);
         real * r    = allocator.bind(0);
         real * r0   = allocator.bind(1);
@@ -243,7 +243,7 @@ namespace LinearSolvers
     void bicgstab(const LinearOperator& mat, const real* rhs, real* sol,
                   Monitor& monitor, Allocator& allocator)
     {
-        const int dim = mat.dimension();
+        const size_t dim = mat.dimension();
         
         allocator.allocate(dim, 8);
         real * p     = allocator.bind(0);

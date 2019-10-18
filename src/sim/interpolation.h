@@ -30,10 +30,10 @@ private:
     Mecable const*  mec_;
 
     /// index of interpolated point 1 in mec_
-    unsigned int    pt1_;
+    size_t          pt1_;
 
     /// index of interpolated point 2 in mec_
-    unsigned int    pt2_;
+    size_t          pt2_;
     
     /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_
     real           coef_;
@@ -46,7 +46,7 @@ public:
     Interpolation() : mec_(nullptr), pt1_(0), pt2_(0), coef_(0) { }
     
     /// set to interpolate p1 and p2 on ps, with coefficient `c`
-    Interpolation(const Mecable * m, unsigned p, unsigned q, real c)
+    Interpolation(const Mecable * m, size_t p, size_t q, real c)
     : mec_(m), pt1_(p), pt2_(q), coef_(c) { }
 
     /// set to interpolate given fiber segment, with abscissa `c` 
@@ -66,10 +66,10 @@ public:
     }
     
     /// Index of point 1 in the matrix of dynamics (Meca)
-    index_t         matIndex1() const { return mec_->matIndex() + pt1_; }
+    size_t          matIndex1() const { return mec_->matIndex() + pt1_; }
     
     /// Index of point 2 in the matrix of dynamics (Meca)
-    index_t         matIndex2() const { return mec_->matIndex() + pt2_; }
+    size_t          matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.
     bool            valid()    const { return mec_ == nullptr || ( pt1_ < mec_->nbPoints() && pt2_ < mec_->nbPoints() ); }
@@ -84,10 +84,10 @@ public:
     Mecapoint       exact2()   const { return Mecapoint(mec_, pt2_); }
     
     /// Index of point 1 in object
-    unsigned int    point1()   const { return pt1_; }
+    size_t          point1()   const { return pt1_; }
   
     /// Index of point 2 in object
-    unsigned int    point2()   const { return pt2_; }
+    size_t          point2()   const { return pt2_; }
 
     /// interpolation coefficient on first point
     real            coef0()    const { return 1.0-coef_; }

@@ -390,7 +390,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
         // calculate Fiber::age() range and set color scaling factor:
         if ( fiber_prep & 4 )
         {
-            unsigned cnt;
+            size_t cnt;
             real avg, dev, mn, mx;
             FiberSet::infoBirthtime(sim.fibers.collect(), cnt, avg, dev, mn, mx);
             if ( mx > mn )
@@ -789,7 +789,7 @@ void Display::drawFiberLines(Fiber const& fib) const
         glDisableClientState(GL_VERTEX_ARRAY);
 #else
         glBegin(GL_LINE_STRIP);
-        for ( unsigned ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
             gle::gleVertex(fib.posP(ii));
         glEnd();
 #endif

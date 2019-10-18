@@ -43,7 +43,7 @@ public:
     }
     
     /// size of the matrix M
-    int dimension() const { return dim; };
+    size_t dimension() const { return dim; };
     
     /// multiply a vector ( Y <- M * X )
     void multiply(const real* X, real* Y) const

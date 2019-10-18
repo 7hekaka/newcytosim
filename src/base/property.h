@@ -45,7 +45,7 @@ private:
     std::string  name_;
     
     /// numerical identifier used in output file
-    unsigned     number_;
+    size_t       number_;
 
 public:
     
@@ -77,10 +77,10 @@ public:
     //-------------------------------------------------------------------------------
     
     /// index, unique among all Property of similar category()
-    unsigned     number()                 const { return number_; }
+    size_t       number()     const { return number_; }
     
     /// set index in the array of Properties
-    void         renumber(unsigned x)           { number_ = x; }
+    void         renumber(size_t x) { number_ = x; }
     
     //-------------------------------------------------------------------------------
     

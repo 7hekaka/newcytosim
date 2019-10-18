@@ -51,7 +51,7 @@ int Mesh::read_ascii(FILE * file)
     n_points = strtol(str, 0, 10);
     points = new float[3*n_points];
     
-    for ( unsigned n = 0; n < n_points; ++n )
+    for ( size_t n = 0; n < n_points; ++n )
     {
         if ( 0 == fgets(str, sizeof(str), file) )
             return 1;
@@ -67,7 +67,7 @@ int Mesh::read_ascii(FILE * file)
     faces = new unsigned[3*n_faces];
     labels = new int[2*n_faces];
 
-    for ( unsigned n = 0; n < n_faces; ++n )
+    for ( size_t n = 0; n < n_faces; ++n )
     {
         if ( 0 == fgets(str, sizeof(str), file) )
             return 1;
@@ -97,7 +97,7 @@ int Mesh::read_binary(FILE * file)
     n_points = s[0];
     points = new float[3*n_points];
     
-    for ( unsigned n = 0; n < n_points; ++n )
+    for ( size_t n = 0; n < n_points; ++n )
     {
         if ( 3 != fread(d, sizeof(double), 3, file) )
             return 2;
@@ -114,7 +114,7 @@ int Mesh::read_binary(FILE * file)
     faces = new unsigned[3*n_faces];
     labels = new int[2*n_faces];
     
-    for ( unsigned n = 0; n < n_faces; ++n )
+    for ( size_t n = 0; n < n_faces; ++n )
     {
         fread(s, sizeof(size_t), 3, file);
         if ( 2 != fread(i, sizeof(int), 2, file) )
@@ -228,7 +228,7 @@ void Mesh::display(MechouiParam const& pam) const
     Triangle * tris = new Triangle[n_faces];
     unsigned n_tris = 0;
     
-    for ( unsigned n = 0; n < n_faces; ++n )
+    for ( size_t n = 0; n < n_faces; ++n )
     {
         float * a = points+3*faces[3*n  ];
         float * b = points+3*faces[3*n+1];
@@ -286,7 +286,7 @@ void Mesh::display(MechouiParam const& pam) const
     qsort(tris, n_tris, sizeof(Triangle), &closer);
     
     // render transparent triangles
-    for ( unsigned i = 0; i < n_tris; ++i )
+    for ( size_t i = 0; i < n_tris; ++i )
     {
         float * a = points + 3*tris[i].a;
         float * b = points + 3*tris[i].b;
@@ -323,7 +323,7 @@ unsigned Mesh::pick() const
     glInitNames();
     glPushName(0);
     
-    for ( unsigned n = 0; n < n_faces; ++n )
+    for ( size_t n = 0; n < n_faces; ++n )
     {
         glLoadName(labels[2*n]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, faces+3*n);
@@ -335,7 +335,7 @@ unsigned Mesh::pick() const
     GLint n_hits = glRenderMode(GL_RENDER);
     GLuint z_min = buf[1];
     GLuint hit = buf[3];
-    for ( unsigned i=0; i < n_hits && 4*i < buf_size; ++i )
+    for ( size_t i=0; i < n_hits && 4*i < buf_size; ++i )
     {
         GLuint z = buf[4*i+1];
         if ( z < z_min )

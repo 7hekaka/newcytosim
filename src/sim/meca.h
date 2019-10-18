@@ -130,7 +130,7 @@ private:
     Array<Mecable*> mecables;
     
     /// total number of points in the system
-    index_t         nbPts;
+    size_t         nbPts;
     
     /// size of the currently allocated memory
     size_t          allocated_;
@@ -181,52 +181,52 @@ private:
 private:
     
     /// position interpolated from two points in vPTS[]
-    Vector  position2(const index_t inx[2], const real coef[2]) const;
+    Vector  position2(const size_t inx[2], const real coef[2]) const;
 
     /// position interpolated from three points in vPTS[]
-    Vector  position3(const index_t inx[3], const real coef[3]) const;
+    Vector  position3(const size_t inx[3], const real coef[3]) const;
 
     /// position interpolated from four points in vPTS[]
-    Vector  position4(const index_t inx[4], const real coef[4]) const;
+    Vector  position4(const size_t inx[4], const real coef[4]) const;
     
     /// position interpolated from five points in vPTS[]
-    Vector  position5(const index_t inx[5], const real coef[5]) const;
+    Vector  position5(const size_t inx[5], const real coef[5]) const;
     
     /// position interpolated from six points in vPTS[]
-    Vector  position6(const index_t inx[6], const real coef[6]) const;
+    Vector  position6(const size_t inx[6], const real coef[6]) const;
 
     /// add block 'T' to mC at position (i, j)
-    void add_block(index_t i, index_t j, MatrixBlock const& T);
+    void add_block(size_t i, size_t j, MatrixBlock const& T);
     
     /// subtract block 'T' to mC at position (i, j)
-    void sub_block(index_t i, index_t j, MatrixBlock const& T);
+    void sub_block(size_t i, size_t j, MatrixBlock const& T);
  
     /// add block 'alpha*T' to mC at position (i, j)
-    void add_block(index_t i, index_t j, real alpha, MatrixBlock const& T);
+    void add_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
 
     /// add block 'T' to mC at position (i, i)
-    void add_block_diag(index_t i, MatrixBlock const& T);
+    void add_block_diag(size_t i, MatrixBlock const& T);
     
     /// subtract block 'T' to mC at position (i, i)
-    void sub_block_diag(index_t i, MatrixBlock const& T);
+    void sub_block_diag(size_t i, MatrixBlock const& T);
     
     /// add block 'alpha*T' to mC at position (i, i)
-    void add_block_diag(index_t i, real alpha, MatrixBlock const& T);
+    void add_block_diag(size_t i, real alpha, MatrixBlock const& T);
 
     /// add value to mB at position (i, j)
-    void add_iso(index_t i, index_t j, real val);
+    void add_iso(size_t i, size_t j, real val);
 
     /// add value to mB at position (i, j)
-    void sub_iso(index_t i, index_t j, real val);
+    void sub_iso(size_t i, size_t j, real val);
 
     /// add value to vBAS at index `i`
-    void add_base(index_t i, Vector const&);
+    void add_base(size_t i, Vector const&);
 
     /// add value to vBAS at index `i`
-    void add_base(index_t i, Vector const&, real);
+    void add_base(size_t i, Vector const&, real);
 
     /// sub value to vBAS at index `i`
-    void sub_base(index_t i, Vector const&);
+    void sub_base(size_t i, Vector const&);
 
 private:
     
@@ -296,7 +296,7 @@ public:
     size_t   nbMecables() const { return mecables.size(); }
     
     /// Number of points in the Mecable that has the most number of points
-    unsigned largestMecable() const;
+    size_t   largestMecable() const;
 
     /// true if system does not contain any object
     bool     empty() const { return nbPts == 0; }
@@ -409,7 +409,7 @@ public:
     void addLineClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
     
     /// Link of stiffness `weight` to a line that is X if axi=0, Y if axi=1, Z if axi=2
-    void addLineClampX(Mecapoint const&, index_t axi, real, real weight);
+    void addLineClampX(Mecapoint const&, size_t axi, real, real weight);
 
     /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`
     void addPlaneClamp(Mecapoint const&, Vector const& pos, Vector const& dir, real weight);
@@ -433,26 +433,26 @@ public:
     
     
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink2(Mecapoint const&, const unsigned[], const real[], real weight);
+    void addLink2(Mecapoint const&, const size_t[], const real[], real weight);
     
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink3(Mecapoint const&, const unsigned[], const real[], real weight);
+    void addLink3(Mecapoint const&, const size_t[], const real[], real weight);
 
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink4(Mecapoint const&, const unsigned[], const real[], real weight);
+    void addLink4(Mecapoint const&, const size_t[], const real[], real weight);
     
     
     /// Link of stiffness `weight` between Interpolation and vertex
-    void addLink1(Interpolation const&, index_t, real weight);
+    void addLink1(Interpolation const&, size_t, real weight);
 
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink2(Interpolation const&, const index_t[], const real[], real weight);
+    void addLink2(Interpolation const&, const size_t[], const real[], real weight);
     
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink3(Interpolation const&, const index_t[], const real[], real weight);
+    void addLink3(Interpolation const&, const size_t[], const real[], real weight);
 
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink4(Interpolation const&, const index_t[], const real[], real weight);
+    void addLink4(Interpolation const&, const size_t[], const real[], real weight);
 
     //----------------------- ELEMENTS LINKING POINTS --------------------------
 

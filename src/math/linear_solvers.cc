@@ -16,7 +16,7 @@
 
 void LinearSolvers::CG(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
 {
-    const int dim = mat.dimension();
+    const size_t dim = mat.dimension();
     allocator.allocate(dim, 4);
     real * d = allocator.bind(0);
     real * s = allocator.bind(1);
@@ -57,7 +57,7 @@ Conjugate Gradient, with Preconditioning
 
 void LinearSolvers::CGP(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
 {    
-    const int dim = mat.dimension();
+    const size_t dim = mat.dimension();
     allocator.allocate(dim, 4);
     real * d  = allocator.bind(0);
     real * s  = allocator.bind(1);
@@ -102,7 +102,7 @@ void LinearSolvers::CGP(const LinearOperator& mat, const real* rhs, real* x, Mon
 
 void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
 {
-    const int dim = mat.dimension();
+    const size_t dim = mat.dimension();
     allocator.allocate(dim, 6);
     real * r  = allocator.bind(0);
     real * rb = allocator.bind(1);
@@ -154,7 +154,7 @@ void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Mon
 
 void LinearSolvers::BCGS(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
 {
-    const int dim = mat.dimension();
+    const size_t dim = mat.dimension();
     allocator.allocate(dim, 5);
     real * r      = allocator.bind(0);
     real * rtilde = allocator.bind(1);
@@ -222,7 +222,7 @@ void LinearSolvers::BCGS(const LinearOperator& mat, const real* rhs, real* x, Mo
 
 void LinearSolvers::BCGSP(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
 {
-    const int dim = mat.dimension();
+    const size_t dim = mat.dimension();
     allocator.allocate(dim, 7);
     real * r      = allocator.bind(0);
     real * rtilde = allocator.bind(1);

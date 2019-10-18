@@ -68,25 +68,25 @@ public:
     void copy_lower() { }
 
     /// direct access to 'unique' scalar
-    real& value()            { return val_; }
-    real  value() const      { return val_; }
+    real& value()       { return val_; }
+    real  value() const { return val_; }
     
     /// conversion to array of 'real'
-    real* data()             { return &val_; }
-    real* addr(int i, int j) { return &val_; }
+    real* data() { return &val_; }
+    real* addr(const size_t i, const size_t j) { return &val_; }
     
     /// access functions to element by line and column indices
-    real& operator()(int i, int j)       { return val_; }
-    real  operator()(int i, int j) const { return val_; }
+    real& operator()(const size_t i, const size_t j)       { return val_; }
+    real  operator()(const size_t i, const size_t j) const { return val_; }
     
     /// extract column vector at given index
-    Vector1 column(const unsigned) const
+    Vector1 column(const size_t) const
     {
         return Vector1(val_);
     }
     
     /// extract line vector at given index
-    Vector1 line(const unsigned) const
+    Vector1 line(const size_t) const
     {
         return Vector1(val_);
     }
@@ -280,25 +280,25 @@ public:
     }
     
     /// add all elements of block 'S' to array 'M'
-    void addto(real * M, unsigned ldd) const
+    void addto(real * M, size_t ldd) const
     {
         M[0] += val_;
     }
     
     /// add lower elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, unsigned ldd) const
+    void addto_upper(real * M, size_t ldd) const
     {
         M[0] += val_;
     }
     
     /// add lower elements of this block to both upper and lower triangles of 'M'
-    void addto_symm(real * M, unsigned ldd) const
+    void addto_symm(real * M, size_t ldd) const
     {
         M[0] += val_;
     }
     
     /// add all elements of this block to 'M', with transposition
-    void addto_trans(real * M, unsigned ldd) const
+    void addto_trans(real * M, size_t ldd) const
     {
         M[0] += val_;
     }

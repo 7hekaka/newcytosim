@@ -96,7 +96,7 @@ public:
     void          deleteA(Single *);
     
     /// create Wrists anchored on given Mecable
-    ObjectList    makeWrists(Mecable const*, unsigned, unsigned, std::string&);
+    ObjectList    makeWrists(Mecable const*, size_t, size_t, std::string&);
 
     /// return all Wrists anchored on `obj`
     SingleList    collectWrists(Object const*) const;

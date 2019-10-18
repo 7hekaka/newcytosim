@@ -58,9 +58,6 @@ public:
     /// type of grid
     typedef Grid<SegmentList, DIM> grid_type;
     
-    /// type of index
-    typedef grid_type::index_t index_t;
-    
 private:
     
     /// grid for divide-and-conquer strategies:
@@ -72,7 +69,7 @@ public:
     FiberGrid()  { }
    
     /// number of cells in grid
-    index_t      nbCells() const { return fGrid.nbCells(); }
+    size_t       nbCells() const { return fGrid.nbCells(); }
 
     /// set a grid to cover the specified Space with cells of width `max_step` at most
     unsigned     setGrid(Space const*, real max_step);
@@ -96,7 +93,7 @@ public:
     SegmentList& segments(Vector const& pos) const
     {
         // get the cell index from the position in space:
-        const index_t indx = fGrid.index(pos, 0.5);
+        const size_t indx = fGrid.index(pos, 0.5);
         // get the list of rods associated with this cell:
         return fGrid.icell(indx);
     }

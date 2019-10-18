@@ -66,11 +66,11 @@ void Mecafil::makeProjection()
     assert_true( nbPoints() >= 2 );
 
     //set the diagonal and off-diagonal of J*J'
-    const unsigned nbu = nbPoints() - 2;
+    const size_t nbu = nbPoints() - 2;
     const real*const dif = rfDiff;
    real b = 1;
 
-    for ( unsigned jj = 0; jj < nbu; ++jj )
+    for ( size_t jj = 0; jj < nbu; ++jj )
     {
         const real* X = dif + DIM * jj;
 #if ( DIM == 2 )
@@ -111,10 +111,10 @@ void Mecafil::makeProjection()
     assert_true( nbPoints() >= 2 );
 
     //set the diagonal and off-diagonal of J*J'
-    const unsigned nbu = nbPoints() - 2;
+    const size_t nbu = nbPoints() - 2;
     const real*const dif = rfDiff;
 
-    for ( unsigned jj = 0; jj < nbu; ++jj )
+    for ( size_t jj = 0; jj < nbu; ++jj )
     {
         const real* X = dif + DIM * jj;
 #if ( DIM == 2 )
@@ -592,7 +592,7 @@ void projectForcesD_PTR(unsigned nbs, const real* dif,
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-    const unsigned nbs = nbSegments();
+    const size_t nbs = nbSegments();
     //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
 
     // calculate `rfLLG` without modifying `X`
@@ -618,7 +618,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
 
 void Mecafil::computeTensions(const real* force)
 {
-    const unsigned nbs = nbSegments();
+    const size_t nbs = nbSegments();
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     
@@ -643,13 +643,13 @@ void Mecafil::storeTensions(const real*)
 
 void Mecafil::printProjection(std::ostream& os) const
 {
-    const unsigned nbv = DIM * nbPoints();
+    const size_t nbv = DIM * nbPoints();
     real * res = new_real(nbv*nbv);
     real * src = new_real(nbv);
     real * dst = new_real(nbv);
     zero_real(nbv, src);
     zero_real(nbv, dst);
-    for ( unsigned i = 0; i < nbv; ++i )
+    for ( size_t i = 0; i < nbv; ++i )
     {
         src[i] = 1.0;
         projectForces(src, dst);
@@ -671,7 +671,7 @@ void Mecafil::printProjection(std::ostream& os) const
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
-    const unsigned nbs = nbSegments();
+    const size_t nbs = nbSegments();
     assert_true( nbs > 0 );
     
 #if ( 0 )
@@ -871,7 +871,7 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     assert_true(useProjectionDiff);
 #if ( 0 )
     // debug code to compare with default implementation
-    unsigned nbp = nbPoints()*DIM;
+    size_t nbp = nbPoints()*DIM;
     real * vec = new_real(nbp);
     copy_real(nbp, Y, vec);
     add_projectiondiff(nbSegments(), mtJJtiJforce, X, vec);

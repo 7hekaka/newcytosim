@@ -81,7 +81,7 @@ void Parser::parse_set(std::istream& is)
     
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017 ('set hand 2 kinesin')
-    unsigned inx = 0;
+    unsigned long inx = 0;
     Tokenizer::get_integer(is, inx);
 #endif
     
@@ -349,7 +349,7 @@ void Parser::parse_change(std::istream& is)
 void Parser::parse_new(std::istream& is)
 {
     Glossary opt;
-    unsigned cnt = 1;
+    size_t cnt = 1;
     Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
     
@@ -508,7 +508,7 @@ void Parser::parse_new(std::istream& is)
 
 void Parser::parse_delete(std::istream& is)
 {
-    unsigned cnt = 1;
+    size_t cnt = 1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
@@ -560,7 +560,7 @@ void Parser::parse_delete(std::istream& is)
 
 void Parser::parse_mark(std::istream& is)
 {
-    unsigned cnt = -1;
+    size_t cnt = -1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
@@ -641,7 +641,7 @@ void Parser::parse_cut(std::istream& is)
  */
 void Parser::parse_run(std::istream& is)
 {
-    unsigned cnt = 1;
+    size_t cnt = 1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
     
@@ -945,7 +945,7 @@ void Parser::parse_call(std::istream& is)
 
 void Parser::parse_repeat(std::istream& is)
 {
-    unsigned cnt = 1;
+    size_t cnt = 1;
     
     if ( ! Tokenizer::get_integer(is, cnt) )
         throw InvalidSyntax("missing integer number after 'repeat'");
@@ -977,7 +977,7 @@ void Parser::parse_repeat(std::istream& is)
  */
 void Parser::parse_for(std::istream& is)
 {
-    unsigned int start = 0, end = 1;
+    size_t start = 0, end = 1;
     
     std::string var = Tokenizer::get_symbol(is);
     

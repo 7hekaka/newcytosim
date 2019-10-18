@@ -413,7 +413,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
  
  This is meant to be faster than calling execute_new(name, opt) `cnt` times.
  */
-void Interface::execute_new(std::string const& name, unsigned cnt)
+void Interface::execute_new(std::string const& name, size_t cnt)
 {
     Property * pp = simul.properties.find_or_die(name);
     ObjectSet * set = simul.findSet(pp->category());
@@ -424,7 +424,7 @@ void Interface::execute_new(std::string const& name, unsigned cnt)
 
     Glossary opt;
 
-    for ( unsigned n = 0; n < cnt; ++n )
+    for ( size_t n = 0; n < cnt; ++n )
     {
         ObjectList objs = set->newObjects(name, opt);
         
@@ -558,7 +558,7 @@ bool pass_filter(Object const* obj, void const* val)
 }
 
 
-void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned cnt)
+void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cnt)
 {
     Property * pp = simul.properties.find(name);
     ObjectSet * set = nullptr;
@@ -605,7 +605,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, unsigned 
 }
 
 
-void Interface::execute_mark(std::string const& name, Glossary& opt, unsigned cnt)
+void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
 {
     Property * pp = simul.properties.find(name);
     ObjectSet * set = nullptr;
@@ -759,9 +759,9 @@ void reportCPUtime(int frame, real simtime)
      }
  
  */
-void Interface::execute_run(unsigned nb_steps, Glossary& opt)
+void Interface::execute_run(size_t nb_steps, Glossary& opt)
 {
-    unsigned     nb_frames  = 0;
+    size_t       nb_frames  = 0;
     std::string  code;
     int          solve      = 1;
     bool         prune      = true;
@@ -796,9 +796,9 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     opt.set(prune,  "prune");
     opt.set(binary, "binary");
     
-    unsigned int  frame = 1;
-    real          delta = nb_steps;
-    unsigned long check = nb_steps;
+    size_t  frame = 1;
+    real    delta = nb_steps;
+    size_t  check = nb_steps;
     
     VLOG("+RUN START " << nb_steps << '\n');
     
@@ -821,7 +821,7 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
     
     simul.prepare();
     
-    unsigned sss = 0;
+    size_t sss = 0;
     while ( 1 )
     {
         if ( sss >= check )
@@ -860,12 +860,12 @@ void Interface::execute_run(unsigned nb_steps, Glossary& opt)
  Perform plain simulation steps, without any option:
  alternating step() and solve()
 */
-void Interface::execute_run(unsigned nb_steps)
+void Interface::execute_run(size_t nb_steps)
 {
     VLOG("-RUN START " << nb_steps << '\n');
     simul.prepare();
     
-    for ( unsigned sss = 0; sss < nb_steps; ++sss )
+    for ( size_t sss = 0; sss < nb_steps; ++sss )
     {
         hold();
         //fprintf(stderr, "> step %6i\n", sss);
@@ -912,7 +912,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
         throw InvalidIO("Could not open file `"+file+"'");
     
     bool append = false;
-    unsigned cnt = 0, frm = 0;
+    size_t cnt = 0, frm = 0;
 
     opt.set(frm, "frame");
     opt.set(append, "append");

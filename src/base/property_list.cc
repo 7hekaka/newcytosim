@@ -54,9 +54,9 @@ void PropertyList::remove(Property const* val)
 }
 
 
-unsigned int PropertyList::size(std::string const& cat) const
+size_t PropertyList::size(std::string const& cat) const
 {
-    unsigned res = 0;
+    size_t res = 0;
     
     for ( Property* i : vec_ )
         if ( i->category() == cat )

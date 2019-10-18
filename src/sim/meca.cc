@@ -160,9 +160,9 @@ void Meca::release()
 }
 
 
-unsigned Meca::largestMecable() const
+size_t Meca::largestMecable() const
 {
-    unsigned res = 0;
+    size_t res = 0;
     for ( Mecable * mec : mecables )
         res = std::max(res, mec->nbPoints());
     return res;
@@ -225,7 +225,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
         Mecable ** mci = mecables.begin() + omp_get_thread_num();
         while ( mci < mecables.end() )
         {
-            const index_t inx = DIM * (*mci)->matIndex();
+            const size_t inx = DIM * (*mci)->matIndex();
             (*mci)->addRigidity(X+inx, Y+inx);
             mci += NUM_THREADS;
         }
@@ -233,7 +233,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 #else
     for ( Mecable * mec : mecables )
     {
-        const index_t inx = DIM * mec->matIndex();
+        const size_t inx = DIM * mec->matIndex();
         mec->addRigidity(X+inx, Y+inx);
     }
 #endif
@@ -250,8 +250,8 @@ calculate the matrix vector product corresponding to 'mec'
 */
 void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 {
-    const index_t inx = DIM * mec->matIndex();
-    const index_t bks = DIM * mec->nbPoints();
+    const size_t inx = DIM * mec->matIndex();
+    const size_t bks = DIM * mec->nbPoints();
 
     mC.vecMul(X, Y, inx, inx+bks);
 
@@ -297,7 +297,7 @@ void Meca::multiply(const real* X, real* Y) const
 
     for ( Mecable * mec : mecables )
     {
-        const index_t inx = DIM * mec->matIndex();
+        const size_t inx = DIM * mec->matIndex();
     #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
         mec->addRigidity(X+inx, Y+inx);
     #endif
@@ -320,8 +320,8 @@ void Meca::multiply(const real* X, real* Y) const
  */
 void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, real* Y) const
 {
-    const index_t inx = DIM * mec->matIndex();
-    const index_t bks = DIM * mec->nbPoints();
+    const size_t inx = DIM * mec->matIndex();
+    const size_t bks = DIM * mec->nbPoints();
 
     mC.vecMul(X, T, inx, inx+bks);
     
@@ -389,8 +389,8 @@ void Meca::multiplyP1(Mecable const* mec, real const* X, real* Y) const
 {
     assert_true(X!=Y);
     
-    const index_t inx = DIM * mec->matIndex();
-    const index_t bks = DIM * mec->nbPoints();
+    const size_t inx = DIM * mec->matIndex();
+    const size_t bks = DIM * mec->nbPoints();
 
     mC.vecMul(X, Y, inx, inx+bks);
     
@@ -455,7 +455,7 @@ void Meca::multiply(const real* X, real* Y) const
     
     for ( Mecable * mec : mecables )
     {
-        const index_t inx = DIM * mec->matIndex();
+        const size_t inx = DIM * mec->matIndex();
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
         mec->addRigidity(X+inx, Y+inx);
 #endif
@@ -1236,7 +1236,7 @@ void Meca::prepare(SimulProp const* prop)
     /*
      Attributes a position in the vector/matrix to each Mecable
      */
-    index_t cnt = 0;
+    size_t cnt = 0;
     for ( Mecable * mec : mecables )
     {
         mec->matIndex(cnt);
@@ -1449,7 +1449,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
         Mecable ** mci = mecables.begin() + omp_get_thread_num();
         while ( mci < mecables.end() )
         {
-            const index_t inx = DIM * (*mci)->matIndex();
+            const size_t inx = DIM * (*mci)->matIndex();
             real n = brownian1(*mci, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
             local_res = std::min(local_res, n);
             mci += NUM_THREADS;
@@ -1461,7 +1461,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
 #else
     for ( Mecable * mec : mecables )
     {
-        const index_t inx = DIM * mec->matIndex();
+        const size_t inx = DIM * mec->matIndex();
         real n = brownian1(mec, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
         noiseLevel = std::min(noiseLevel, n);
     }
@@ -1661,7 +1661,7 @@ void Meca::solve(SimulProp const* prop, const int precond)
 #ifndef NDEBUG
     
     //check validity of the data:
-    for( index_t ii = 0; ii < dimension(); ++ii )
+    for( size_t ii = 0; ii < dimension(); ++ii )
     {
         if ( not_a_number(vSOL[ii]) )
         {
@@ -1756,11 +1756,11 @@ size_t Meca::nbNonZeros(real threshold) const
     zero_real(dim, src);
     
     size_t cnt = 0;
-    for ( index_t j = 0; j < dim; ++j )
+    for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, dst);
-        for ( index_t i = 0; i < dim; ++i )
+        for ( size_t i = 0; i < dim; ++i )
             cnt += ( std::abs(dst[i]) > threshold );
         src[j] = 0.0;
     }
@@ -1786,7 +1786,7 @@ void Meca::getSystem(size_t dim, real * mat) const
     zero_real(dim, src);
     zero_real(dim, res);
     
-    for ( index_t j = 0; j < dim; ++j )
+    for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, res);
@@ -1819,13 +1819,13 @@ void Meca::saveSystem(FILE * file, real threshold) const
     const size_t cnt = nbNonZeros(threshold);
     fprintf(file, "%lu %lu %lu\n", dim, dim, cnt);
     
-    for ( index_t j = 0; j < dim; ++j )
+    for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, dst);
-        for ( index_t i = 0; i < dim; ++i )
+        for ( size_t i = 0; i < dim; ++i )
             if ( std::abs(dst[i]) > threshold )
-                fprintf(file, "%u %u %f\n", i, j, dst[i]);
+                fprintf(file, "%lu %lu %f\n", i, j, dst[i]);
         src[j] = 0.0;
     }
     
@@ -1843,7 +1843,7 @@ void Meca::saveRHS(FILE * file) const
     const size_t dim = dimension();
     fprintf(file, "%lu\n", dim);
     
-    for ( index_t i = 0; i < dim; ++i )
+    for ( size_t i = 0; i < dim; ++i )
         fprintf(file, "%f\n", vRHS[i]);
 }
 
@@ -1852,13 +1852,13 @@ void Meca::saveRHS(FILE * file) const
  */
 void Meca::dumpSystem(FILE * file) const
 {
-    const index_t dim = dimension();
+    const size_t dim = dimension();
     real * src = new_real(dim);
     real * res = new_real(dim);
     
     zero_real(dim, src);
     
-    for ( index_t ii = 0; ii < dim; ++ii )
+    for ( size_t ii = 0; ii < dim; ++ii )
     {
         src[ii] = 1.0;
         multiply(src, res);
@@ -1876,13 +1876,13 @@ void Meca::dumpSystem(FILE * file) const
  */
 void Meca::dumpElasticity(FILE * file) const
 {
-    const index_t dim = dimension();
+    const size_t dim = dimension();
     real * src = new_real(dim);
     real * res = new_real(dim);
     
     zero_real(dim, src);
     
-    for ( index_t ii = 0; ii < dim; ++ii )
+    for ( size_t ii = 0; ii < dim; ++ii )
     {
         src[ii] = 1.0;
         
@@ -1897,7 +1897,7 @@ void Meca::dumpElasticity(FILE * file) const
         {
             if ( mec->hasProjectionDiff() )
             {
-                const index_t inx = DIM * mec->matIndex();
+                const size_t inx = DIM * mec->matIndex();
                 mec->addProjectionDiff(src+inx, res+inx);
             }
         }
@@ -1917,20 +1917,20 @@ void Meca::dumpElasticity(FILE * file) const
  */
 void Meca::dumpMobility(FILE * file) const
 {
-    const index_t dim = dimension();
+    const size_t dim = dimension();
     real * src = new_real(dim);
     real * res = new_real(dim);
     
     zero_real(dim, src);
     
-    for ( index_t i = 0; i < dim; ++i )
+    for ( size_t i = 0; i < dim; ++i )
     {
         src[i] = 1.0;
         zero_real(dim, res); // this should not be necessary
         
         for ( Mecable const* mec : mecables )
         {
-            const index_t inx = DIM * mec->matIndex();
+            const size_t inx = DIM * mec->matIndex();
             // this includes the mobility, but not the time_step:
             mec->projectForces(src+inx, res+inx);
             blas::xscal(DIM*mec->nbPoints(), mec->leftoverDrag(), res+inx, 1);
@@ -1951,13 +1951,13 @@ void Meca::dumpMobility(FILE * file) const
  */
 void Meca::dumpPreconditionner(FILE * file) const
 {
-    const index_t dim = dimension();
+    const size_t dim = dimension();
     real * src = new_real(dim);
     real * res = new_real(dim);
     
     zero_real(dim, src);
     
-    for ( index_t ii = 0; ii < dim; ++ii )
+    for ( size_t ii = 0; ii < dim; ++ii )
     {
         src[ii] = 1.0;
         precondition(src, res);
@@ -1976,8 +1976,8 @@ void Meca::dumpObjectID(FILE * file) const
     
     for ( size_t ii = 0; ii < mecables.size(); ++ii )
     {
-        const unsigned nbp = mecables[ii]->nbPoints();
-        for ( unsigned p=0; p < nbp; ++p )
+        const size_t nbp = mecables[ii]->nbPoints();
+        for ( size_t p=0; p < nbp; ++p )
             vec[p] = ii;
         for ( int d = 0; d < DIM; ++ d )
             fwrite(vec, sizeof(real), nbp, file);
@@ -1993,9 +1993,9 @@ void Meca::dumpDrag(FILE * file) const
     
     for ( Mecable const* mec : mecables )
     {
-        const unsigned nbp = mec->nbPoints();
+        const size_t nbp = mec->nbPoints();
         const real drag = mec->dragCoefficient() / nbp;
-        for ( unsigned p=0; p < nbp; ++p )
+        for ( size_t p=0; p < nbp; ++p )
             vec[p] = drag;
         for ( int d = 0; d < DIM; ++ d )
             fwrite(vec, sizeof(real), nbp, file);
@@ -2118,7 +2118,7 @@ void Meca::dumpSparse()
     mC.printSparse(os);
     os.close();
         
-    unsigned alc = 0;
+    size_t alc = 0;
     for ( Mecable const* mec : mecables )
         alc = std::max(alc, mec->nbPoints());
 

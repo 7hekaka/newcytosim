@@ -32,8 +32,8 @@ private:
     inline void drawHand2(Vector const& p, PointDisp const* d) const { if ( d->visible ) { d->color2.load_both(); drawPoint(p, d); } }
     
     /// draw Fiber linear features
-    void drawJoinedFiberLines(Fiber const&, bool minus_cap, bool plus_cap, real rad, unsigned seg, unsigned last,
-                              void (*set_color)(Fiber const&, unsigned, real), real) const;
+    void drawJoinedFiberLines(Fiber const&, bool minus_cap, bool plus_cap, real rad, size_t seg, size_t last,
+                              void (*set_color)(Fiber const&, size_t, real), real) const;
     
     /// draw Fiber liner features
     void drawJoinedFiberLinesL(Fiber const&, bool minus_cap, bool plus_cap, real rad, long inx, long last, real abs, real inc,
