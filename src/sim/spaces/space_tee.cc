@@ -387,7 +387,7 @@ Vector SpaceTee::project(Vector const& w) const
 
 void SpaceTee::write(Outputter& out) const
 {
-    out.put_line(" "+prop->shape+" ");
+    out.put_characters("tee", 16);
     out.writeUInt16(4);
     out.writeFloat(tLength);
     out.writeFloat(tRadius);
@@ -399,7 +399,7 @@ void SpaceTee::write(Outputter& out) const
 void SpaceTee::setLengths(const real len[])
 {
     tLength    = len[0];
-    tRadius     = len[1];
+    tRadius    = len[1];
     tJunction  = len[2];
     tArmLength = len[3];
     update();
@@ -408,7 +408,7 @@ void SpaceTee::setLengths(const real len[])
 void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len);
+    read_data(in, len, "tee");
     setLengths(len);
 }
 

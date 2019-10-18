@@ -172,13 +172,14 @@ void SpaceLid::step()
 
 void SpaceLid::write(Outputter& out) const
 {
-    out.put_line(" "+prop->shape+" ");
-    out.writeUInt16(3);
+    out.put_characters("lid", 16);
+    out.writeUInt16(6);
     out.writeFloat(length_[0]);
     out.writeFloat(length_[1]);
     out.writeFloat(length_[2]);
     out.writeFloat(top_);
     out.writeFloat(force_);
+    out.writeFloat(0.f);
 }
 
 
@@ -194,7 +195,7 @@ void SpaceLid::setLengths(const real len[])
 void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len);
+    read_data(in, len, "lid");
     setLengths(len);
 }
 

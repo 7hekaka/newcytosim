@@ -297,7 +297,7 @@ public:
     //-------------------------------------------------------------------------------
     
     /// current file format
-    const static int currentFormatID = 51;
+    const static int currentFormatID = 52;
     
     /// class for reading trajectory file
     class     InputLock;
