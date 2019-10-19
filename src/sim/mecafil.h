@@ -139,7 +139,7 @@ public:
      .
      It is given in units of force (pico-Newton, if all quantitites use our units).
      */
-    real        tension(unsigned p) const { assert_true(p+1<nPoints); return rfLag[p]; }
+    real        tension(size_t p) const { assert_true(p+1<nPoints); return rfLag[p]; }
     
     /// total drag-coefficient of object (force = drag * speed)
     real        dragCoefficient() const { return real(nPoints) * rfDragPoint; }

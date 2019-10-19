@@ -155,7 +155,7 @@ Property * PropertyList::find(std::string const& cat, std::string const& nom) co
 }
 
 
-Property * PropertyList::find(std::string const& cat, const unsigned num) const
+Property * PropertyList::find(std::string const& cat, const size_t num) const
 {
     //std::clog << this << "->find(" << cat << ", " << idx << ")" << std::endl;
     if ( num <= 0 )
@@ -185,7 +185,7 @@ Property * PropertyList::find_or_die(std::string const& cat, std::string const& 
 }
 
 
-Property * PropertyList::find_or_die(std::string const& cat, const unsigned num) const
+Property * PropertyList::find_or_die(std::string const& cat, const size_t num) const
 {
     Property * res = find(cat, num);
     
