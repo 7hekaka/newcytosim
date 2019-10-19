@@ -41,7 +41,7 @@ void TubuleProp::complete(Simul const& sim)
 
 void TubuleProp::write_values(std::ostream& os) const
 {
-    write_value(os, "filament",  fiber_type);
+    write_value(os, "fiber",     fiber_type);
     write_value(os, "stiffness", stiffness[0], stiffness[1]);
 }
 
