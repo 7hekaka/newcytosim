@@ -40,7 +40,6 @@ void processMenuFiber(int item)
         }
         glApp::postRedisplay();
     }
-    buildMenus();
 }
 
 
@@ -95,7 +94,6 @@ void processMenuCouple(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
             return;
     }
-    buildMenus();
     glApp::postRedisplay();
 }
 
@@ -134,7 +132,6 @@ void processMenuDisplay(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
             return;
     }
-    buildMenus();
     glApp::postRedisplay();
 }
 
@@ -197,7 +194,6 @@ void processMenuFiberSelect(int item)
                 std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
                 return;
         }
-        buildMenus();
         glApp::postRedisplay();
     }
 }
@@ -235,7 +231,6 @@ void processMenuCoupleSelect(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
             return;
     }
-    buildMenus();
     glApp::postRedisplay();
 }
 
@@ -268,7 +263,6 @@ void processMenuSingleSelect(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
             return;
     }
-    buildMenus();
     glApp::postRedisplay();
 }
 
@@ -345,7 +339,7 @@ int buildMenuAnimation()
     if ( menuID == 0 )
     {
         menuID = glutCreateMenu(processMenuAnimation);
-        glutAddMenuEntry("(z) New State",        1);
+        glutAddMenuEntry("(z) Reset State",      1);
         glutAddMenuEntry("(a) Start Live",       2);
         glutAddMenuEntry("(s) One Step & Stop",  4);
         glutAddMenuEntry("(r) Read Parameters",  5);
@@ -373,7 +367,6 @@ void processMenuReplay(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
             return;
     }
-    buildMenus();
     glApp::postRedisplay();
 }
 
@@ -426,7 +419,6 @@ void processMenuExport(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
             return;
     }
-    buildMenus();
     glApp::postRedisplay();
 }
 
@@ -491,7 +483,14 @@ void buildMenus()
     glutAddSubMenu("Export",            m5);
     glutAddSubMenu("More",              m6);
     glutAddMenuEntry("Quit",             9);
+}
+
+
+void menuCallback(int status, int x, int y)
+{
+    //printf("menu status(%i, %i, %i)\n", status, x, y);
     
-    glutAttachMenu(GLUT_RIGHT_BUTTON);
+    if ( GLUT_MENU_NOT_IN_USE )
+        buildMenus();
 }
 
