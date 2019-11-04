@@ -77,7 +77,8 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
         void * ptr = new_real(alc*sizeof(SubBlock)/sizeof(real));
         SubBlock * blk_new  = new(ptr) SubBlock[alc];
 
-        posix_memalign(&ptr, 32, alc*sizeof(size_t));
+        if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
+            throw std::bad_alloc();
         size_t * inx_new = (size_t*)ptr;
 
         if ( inx_ )
@@ -402,7 +403,8 @@ size_t MatrixSparseBlock::newElements(MatrixSparseBlock::Element*& ptr, size_t s
     void* tmp = nullptr;
     if ( size > 0 )
     {
-        posix_memalign(&tmp, 32, all * sizeof(MatrixSparseBlock::Element));
+        if ( posix_memalign(&tmp, 32, all*sizeof(MatrixSparseBlock::Element)) )
+            throw std::bad_alloc();
         ptr = new(tmp) MatrixSparseBlock::Element[all];
     }
     else
