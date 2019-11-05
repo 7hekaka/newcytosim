@@ -91,7 +91,7 @@ private:
             if ( fabs(dif) > 1e-3 )
             {
                 Cytosim::warn << "Field:step[" << d << "] is not as expected:\n";
-                Cytosim::warn << "  field: " << mGrid.cellWidth(d) << "  prop: " << step << std::endl;
+                Cytosim::warn << "  field: " << mGrid.cellWidth(d) << "  prop: " << step << "\n";
             }
         }
     }
@@ -333,7 +333,7 @@ public:
                 if ( fabs(dif) > 1e-3 )
                 {
                     Cytosim::warn << "Field:step["<<d<<"] has changed:\n";
-                    Cytosim::warn << "  file: " << mGrid.cellWidth(d) << " prop: " << prop->step << std::endl;
+                    Cytosim::warn << "  file: " << mGrid.cellWidth(d) << " prop: " << prop->step << "\n";
                 }
             }
             

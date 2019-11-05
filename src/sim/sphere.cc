@@ -327,7 +327,7 @@ void Sphere::setDragCoefficient()
         if ( prop->confine_space_ptr )
             setDragCoefficientPiston();
         else
-            Cytosim::warn << "Piston effect ignored because space is undefined" << std::endl;
+            Cytosim::warn << "Piston effect ignored because space is undefined\n";
     }
 }
 

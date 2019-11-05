@@ -46,7 +46,7 @@ Vector Space::randomPlace() const
 
         if ( ++ouf > nb_trials )
         {
-            Cytosim::warn << "placement failed in Space::randomPlace()" << std::endl;
+            Cytosim::warn << "placement failed in Space::randomPlace()\n";
             return Vector(0,0,0);
             //throw InvalidParameter("placement failed in Space::randomPlace()");
         }

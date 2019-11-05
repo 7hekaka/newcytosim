@@ -258,7 +258,7 @@ void FiberSet::step()
         
         if ( p->free_polymer < 0 )
         {
-            Cytosim::warn << "The free monomer concentration would be negative !!!" << std::endl;
+            Cytosim::warn << "The free monomer concentration would be negative !!!\n";
             //this should not happen
             p->free_polymer = 0;
         }
