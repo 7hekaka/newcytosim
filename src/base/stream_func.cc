@@ -94,7 +94,7 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
  */
 void print_line(std::ostream& os, size_t num, std::string const& line)
 {
-    os << std::setw(7) << num << " | " << line << '\n';
+    os << std::setw(9) << num << " | " << line << '\n';
 }
 
 /**
@@ -184,7 +184,8 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
     {
         std::getline(is, line);
         ++cnt;
-        print_line(os, cnt, line);
+        if ( !std::all_of(line.begin(),line.end(),isspace) )
+            print_line(os, cnt, line);
     }
 
     is.clear();
