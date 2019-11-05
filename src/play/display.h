@@ -61,7 +61,7 @@ protected:
         
         zObject(Mecable const* m) : point_(m, 0), depth_(0.0) { }
 
-        zObject(Mecable const* m, unsigned i) : point_(m, i), depth_(0.0) { }
+        zObject(Mecable const* m, size_t i) : point_(m, i), depth_(0.0) { }
         
         /// position
         Vector position() const { return point_.pos(); }
@@ -115,7 +115,7 @@ protected:
     
     
     /// flag used to calculate clusterAnalysis only once
-    unsigned       fiber_prep;
+    size_t         fiber_prep;
     
     /// used to calculate clusterAnalysis only once
     real           prep_time;
@@ -157,13 +157,13 @@ public:
     
         
     /// find an individual color
-    void bodyColor(PointDisp const*, unsigned) const;
+    void bodyColor(PointDisp const*, size_t) const;
     
     /// find an individual color
-    void bodyColor2(PointDisp const*, unsigned) const;
+    void bodyColor2(PointDisp const*, size_t) const;
 
     /// find an individual color that may be transparent
-    void bodyColorT(PointDisp const*, unsigned) const;
+    void bodyColorT(PointDisp const*, size_t) const;
 
     /// set OpenGL line width
     void lineWidth(real w) const { glLineWidth(std::max((GLfloat)(w*uFactor), 0.25f)); }
@@ -196,7 +196,7 @@ public:
     virtual void drawFiberLines(Fiber const&) const;
     
     /// draw one segment of a Fiber (used to display transparent fibers)
-    virtual void drawFiberLinesT(Fiber const&, unsigned) const;
+    virtual void drawFiberLinesT(Fiber const&, size_t) const;
 
     /// draw Fiber linear features over length `len` near the MINUS_END
     virtual void drawFiberLinesM(Fiber const&, real len, real width) const;
@@ -264,7 +264,7 @@ public:
     virtual void drawSolid(Solid const&) = 0;
     
     /// draw translucent elements of a Solid
-    virtual void drawSolidT(Solid const&, unsigned int) = 0;
+    virtual void drawSolidT(Solid const&, size_t) = 0;
     
     /// draw the Solids
     void drawSolids(SolidSet const&);

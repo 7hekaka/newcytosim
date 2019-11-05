@@ -228,7 +228,7 @@ void Display1::drawSolid(Solid const& obj)
 /**
  Display a semi-transparent disc / sphere
  */
-void Display1::drawSolidT(Solid const& obj, unsigned int ii)
+void Display1::drawSolidT(Solid const& obj, size_t ii)
 {
     const PointDisp * disp = obj.prop->disp;
 

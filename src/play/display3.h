@@ -65,7 +65,7 @@ public:
     void drawFiberLines(Fiber const&) const;
     
     /// draw one segment of a Fiber
-    void drawFiberLinesT(Fiber const&, unsigned) const;
+    void drawFiberLinesT(Fiber const&, size_t) const;
 
     /// draw Fiber linear features over length `len` near the MINUS_END
     void drawFiberLinesM(Fiber const&, real len, real width) const;
@@ -92,7 +92,7 @@ public:
     void drawSolid(Solid const&);
  
     /// draw the transparent parts of Solid
-    void drawSolidT(Solid const&, unsigned int);
+    void drawSolidT(Solid const&, size_t);
 
     /// draw a Bead
     void drawBead(Bead const&);

@@ -388,7 +388,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
 
 
 // this is for display with transparency:
-void Display3::drawFiberLinesT(Fiber const& fib, unsigned i) const
+void Display3::drawFiberLinesT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
@@ -835,7 +835,7 @@ void Display3::drawSolid(Solid const& obj)
 /**
  Display a semi-transparent disc / sphere
  */
-void Display3::drawSolidT(Solid const& obj, unsigned int ii)
+void Display3::drawSolidT(Solid const& obj, size_t ii)
 {
     const PointDisp * disp = obj.prop->disp;
 

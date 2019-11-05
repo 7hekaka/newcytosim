@@ -41,7 +41,7 @@ public:
     void drawSolid(Solid const&);
  
     /// draw the transparent part for the Solids
-    void drawSolidT(Solid const&, unsigned int);
+    void drawSolidT(Solid const&, size_t);
     
     /// draw a Bead
     void drawBead(Bead const&);

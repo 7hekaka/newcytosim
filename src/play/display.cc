@@ -367,7 +367,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
         sim.foldPosition();
     
     // counter to give different colors to the objects
-    unsigned int idx = 0;
+    size_t idx = 0;
     
     PropertyList plist = sim.properties.find_all("fiber");
     
@@ -434,7 +434,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
  if `coloring` is enabled, this loads the N-th bright color,
  otherwise load the object' display color
  */
-void Display::bodyColor(PointDisp const* disp, unsigned s) const
+void Display::bodyColor(PointDisp const* disp, size_t s) const
 {
     if ( disp->coloring )
     {
@@ -454,7 +454,7 @@ void Display::bodyColor(PointDisp const* disp, unsigned s) const
  if `coloring` is enabled, this loads the N-th bright color,
  otherwise load the object' display color
  */
-void Display::bodyColor2(PointDisp const* disp, unsigned s) const
+void Display::bodyColor2(PointDisp const* disp, size_t s) const
 {
     if ( disp->coloring )
         gle::bright_color(s).match_a(disp->color).load();
@@ -467,7 +467,7 @@ void Display::bodyColor2(PointDisp const* disp, unsigned s) const
  if `coloring` is enabled, this loads the N-th bright color,
  with an alpha value matched to the one of the object's display color.
  */
-void Display::bodyColorT(PointDisp const* disp, unsigned s) const
+void Display::bodyColorT(PointDisp const* disp, size_t s) const
 {
     //assert_true(disp->color.transparent());
     
@@ -800,7 +800,7 @@ void Display::drawFiberLines(Fiber const& fib) const
         // display segments with color indicating internal tension
         lineWidth(disp->line_width);
         glBegin(GL_LINES);
-        for ( unsigned ii = 0; ii < fib.lastPoint(); ++ii )
+        for ( size_t ii = 0; ii < fib.lastPoint(); ++ii )
         {
             // the Lagrange multipliers are negative under compression
             real x = fib.tension(ii) / disp->tension_scale;
@@ -829,7 +829,7 @@ void Display::drawFiberLines(Fiber const& fib) const
         else
             gle_color::jet_color(0, alpha).load();
         gle::gleVertex(fib.posP(0));
-        for ( unsigned ii = 1; ii < fib.lastPoint(); ++ii )
+        for ( size_t ii = 1; ii < fib.lastPoint(); ++ii )
         {
             gle_color::jet_color(fib.curvature(ii), alpha).load();
             gle::gleVertex(fib.posP(ii));
@@ -842,7 +842,7 @@ void Display::drawFiberLines(Fiber const& fib) const
         // color according to the angle with respect to the XY-plane:
         lineWidth(disp->line_width);
         glBegin(GL_LINES);
-        for ( unsigned n = 0; n < fib.lastPoint(); ++n )
+        for ( size_t n = 0; n < fib.lastPoint(); ++n )
         {
             gle::radial_color(fib.dirSegment(n)).load();
             gle::gleVertex(fib.posP(n));
@@ -853,7 +853,7 @@ void Display::drawFiberLines(Fiber const& fib) const
 }
 
 
-void Display::drawFiberLinesT(Fiber const& fib, unsigned i) const
+void Display::drawFiberLinesT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     
@@ -874,7 +874,7 @@ void Display::drawFiberLinesM(Fiber const& fib, real len, real width) const
     {
         lineWidth(width);
         glBegin(GL_LINE_STRIP);
-        unsigned ii = 0;
+        size_t ii = 0;
         real a = 0;
         while ( a < len  &&  ii < fib.nbPoints() )
         {
@@ -989,7 +989,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         // display vertices:
         pointSize(disp->point_size);
         glBegin(GL_POINTS);
-        for ( unsigned ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
             gle::gleVertex( fib.posP(ii) );
         glEnd();
     }
@@ -1153,9 +1153,9 @@ void Display::drawFiberLabels(Fiber const& fib, void* font) const
     {
         // draw fiber name and vertex indices
         int n = snprintf(str, sizeof(str), " %u ", fib.identity());
-        for ( unsigned ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
         {
-            snprintf(str+n, sizeof(str)-n, "%i", ii);
+            snprintf(str+n, sizeof(str)-n, "%lu", ii);
             gle::gleDrawText(fib.posP(ii), str, font);
         }
     }
@@ -1163,7 +1163,7 @@ void Display::drawFiberLabels(Fiber const& fib, void* font) const
     {
         // draw fiber name and abscissa value at vertices
         int n = snprintf(str, sizeof(str), " %u ", fib.identity());
-        for ( unsigned ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
         {
             snprintf(str+n, sizeof(str)-n, "%.3f", fib.abscissaPoint(ii));
             gle::gleDrawText(fib.posP(ii), str, font);
@@ -1196,7 +1196,7 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
     glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    for ( unsigned ii = 0; ii < fib.nbPoints(); ++ii )
+    for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
     {
         Vector p = fib.posP(ii);
         Vector q = p + scale * fib.netForce(ii);
@@ -1447,7 +1447,7 @@ void Display::drawFiber(Fiber const& fib)
 #if ( DIM == 3 )
     if ( fib.disp->color.transparent() )
     {
-        for ( unsigned i = 0; i < fib.lastPoint(); ++i )
+        for ( size_t i = 0; i < fib.lastPoint(); ++i )
         zObjects.push_back(zObject(&fib, i));
     }
     else
@@ -1624,13 +1624,13 @@ void Display::drawSolids(SolidSet const& set)
 #if ( DIM == 3 )
             if ( obj->prop->disp->color.transparent() )
             {
-                for ( unsigned ii = 0; ii < obj->nbPoints(); ++ii )
+                for ( size_t ii = 0; ii < obj->nbPoints(); ++ii )
                     zObjects.push_back(zObject(obj, ii));
             }
             else
 #endif
             {
-                for ( unsigned ii = 0; ii < obj->nbPoints(); ++ii )
+                for ( size_t ii = 0; ii < obj->nbPoints(); ++ii )
                     drawSolidT(*obj, ii);
             }
         }
