@@ -17,7 +17,7 @@ class ObjectSet;
 class Display;
 
 /// Type for unique class identifier used to read/write objects from file
-typedef int ObjectTag;
+typedef char ObjectTag;
 
 /// Type used to mark objects
 typedef unsigned long ObjectMark;

@@ -129,22 +129,26 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
  */
 Object * Simul::readReference(Inputter& in, ObjectTag & tag)
 {
+    int c = 0;
     do
-        tag = in.get_char();
-    while ( tag == ' ' );
+        c = in.get_char();
+    while ( c == ' ' );
     
+    if ( c == EOF )
+        throw InvalidIO("unexpected end of file");
+
+    tag = c & 127;
     // detect fat reference:
-    int fat = ( tag & 128 );
+    int fat = ( c & 128 );
 #ifdef BACKWARD_COMPATIBILITY  // formatID() < 50
-    if ( tag == '$' )
+    if ( c == '$' )
     {
         tag = in.get_char();
+        if ( tag == EOF )
+            throw InvalidIO("unexpected end of file");
         fat = 1;
     }
 #endif
-
-    if ( tag == EOF )
-        throw InvalidIO("unexpected end of file");
     
     // Object::TAG is the 'void' reference
     if ( tag == Object::TAG )
@@ -220,24 +224,21 @@ Object * Simul::readReference(Inputter& in, ObjectTag & tag)
         if ( in.formatID() < 49 )
         {
             // skip ObjectMark which is not used
-            int c = in.get_char();
-            if ( c == ':' )
+            int h = in.get_char();
+            if ( h == ':' )
             {
                 unsigned long u;
                 if ( 1 != fscanf(file, "%lu", &u) )
                 throw InvalidIO("readReference (compatibility) failed");
             }
             else
-            in.unget(c);
+            in.unget(h);
         }
 #endif
     }
 
     if ( id == 0 )
         return nullptr;
-    
-    // keep ASCII part
-    tag &= 127;
     
     if ( !isalpha(tag) )
         throw InvalidIO("`"+std::string(1,tag)+"' is not a valid class TAG");

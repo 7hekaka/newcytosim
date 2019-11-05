@@ -465,7 +465,7 @@ std::string Tokenizer::get_token(std::istream& is, bool eat_line)
     int d = is.peek();
 
     if ( d == EOF )
-        return std::string(1,c);
+        return std::string(1,(char)c);
     
     if ( c == '0' && d == 'x' )
     {
@@ -481,7 +481,7 @@ std::string Tokenizer::get_token(std::istream& is, bool eat_line)
     
     // anything else is one character long:
     VLOG(" ASCII |" << c << "|\n");
-    return std::string(1,c);
+    return std::string(1,(char)c);
 }
 
 //------------------------------------------------------------------------------
