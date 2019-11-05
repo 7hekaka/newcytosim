@@ -686,8 +686,8 @@ void FiberSet::infoLength(ObjectList const& objs,
     
     if ( cnt )
     {
-        avg /= cnt;
-        real v = dev/cnt - avg*avg;
+        avg /= (real)cnt;
+        real v = dev/(real)cnt - avg*avg;
         // the variance can be numerically negative, which is mathematically impossible
         if ( v > 0 )
             dev = sqrt(v);
@@ -722,8 +722,8 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
     
     if ( cnt )
     {
-        avg /= cnt;
-        real v = dev/cnt - avg*avg;
+        avg /= (real)cnt;
+        real v = dev/(real)cnt - avg*avg;
         // the variance can be numerically negative, which is mathematically impossible
         if ( v > 0 )
             dev = sqrt(v);
@@ -1154,8 +1154,8 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs,
     
     if ( cnt )
     {
-        avg /= cnt;
-        real v = dev/cnt - avg*avg;
+        avg /= (real)cnt;
+        real v = dev/(real)cnt - avg*avg;
         // the variance can be numerically negative, which is mathematically impossible
         if ( v > 0 )
             dev = sqrt(v);
@@ -1234,7 +1234,7 @@ void FiberSet::infoRadius(size_t& cnt, real& rad) const
         }
     }
     if ( cnt )
-        rad = r / cnt;
+        rad = r / (real)cnt;
 }
 
 
@@ -1249,7 +1249,7 @@ void FiberSet::infoRadius(size_t& cnt, real& rad, FiberEnd end) const
         ++cnt;
     }
     if ( cnt )
-        rad = r / cnt;
+        rad = r / (real)cnt;
 }
 
 

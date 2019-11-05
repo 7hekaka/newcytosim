@@ -613,7 +613,7 @@ void Simul::reportFiberLattice(std::ostream& out, bool density) const
     fibers.infoLattice(len, cnt, sm, mn, mx, density);
     out << LIN << ljust("fiber:lattice", 2);
     out << SEP << sm;
-    out << SEP << std::setprecision(4) << sm / cnt;
+    out << SEP << std::setprecision(4) << sm / (real)cnt;
     out << SEP << std::fixed << std::setprecision(6) << mn;
     out << SEP << std::fixed << std::setprecision(6) << mx;
     out << SEP << std::setprecision(3) << len;
@@ -845,7 +845,7 @@ void Simul::reportFiberDisplacement(std::ostream& out) const
     }
     
     if ( cnt > 0 )
-        out << LIN << time() - old_time << SEP << cnt << SEP << sum / cnt;
+        out << LIN << time() - old_time << SEP << cnt << SEP << sum / (real)cnt;
     else
         out << LIN << time() - old_time << SEP << 0 << SEP << 0;
     
@@ -2504,7 +2504,7 @@ void Simul::reportPlatelet(std::ostream& out) const
         cnt += 2;  // every plane should intersect the ring twice
         ten += t;
     }
-    ten /= cnt;
+    ten /= (real)cnt;
     
     std::ofstream nos("/dev/null");
     real force = reportFiberConfinement(nos);

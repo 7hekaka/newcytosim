@@ -108,12 +108,12 @@ Recompile Cytosim entirely:
 Compilation is specified in `makefile` and `makefile.inc`, and these files may need to be adjusted manually.
 Check  `makefile.inc` first and verify the [compile options](options.md).
 
-Makefile attempts to automatically detect the platforms:
+Make attempts to automatically detect the platform:
 
 	#---------------- MACHINE = {mac, linux, cygwin, auto}
 	MACHINE := auto
 
-Manually set `MACHINE` to `mac`, `linux` or `cygwin` depending on your platform,
+But you may manually set `MACHINE` to `mac`, `linux` or `cygwin` depending on your platform,
 and check the parameters set lower in the `makefile.inc`, for this platform, for example:
 
 	ifeq ($(MACHINE),linux)
@@ -124,7 +124,7 @@ To pinpoint the problem, try to build objects that have fewer depencies first:
 
 #### Check your compiler for C++11 support and compilation switches
 
-    make test_cxx
+	make test_cxx
 
 #### Check your BLAS/LAPACK directly:
 
@@ -134,12 +134,24 @@ If you get an error at this stage, check that the compiler is linking the correc
 To find the libraries on your system, this command may help:
 
 	find /usr/lib -name libblas.*
-	
+
+For example, if the result is:
+
+	/usr/lib/libblas.so
+
+You should adjust `makefile.inc` to specify the corresponding path:
+
+	USRLIB := /usr/lib
+
+Ensure that no other line changes the value of `USRLIB`. For example, this one is commented out with the `#`:
+
+	#USRLIB := /usr/lib/x86_64-linux-gnu
+
 #### Check if it can read a configuration file:
 
 	make test_glos
 
-#### At this stage, you can compile `sim`:
+#### At this stage, you can attempt to compile `sim`:
 
 	make sim
 

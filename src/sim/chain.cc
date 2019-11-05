@@ -1290,8 +1290,8 @@ void Chain::segmentationVariance(real& avg, real& var) const
         avg += r;
         var += r*r;
     }
-    avg /= cnt;
-    var = var / cnt - avg * avg;
+    avg /= (real)cnt;
+    var = var / (real)cnt - avg * avg;
 }
 
 /**

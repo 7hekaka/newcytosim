@@ -38,7 +38,7 @@ namespace gle
     */
     void circle(size_t cnt, GLfloat co[], GLfloat si[], GLfloat rad, double start)
     {
-        const double theta = 2.0 * M_PI / cnt;
+        const double theta = 2.0 * M_PI / (double)cnt;
         const double c = cos(theta);
         const double s = sin(theta);
     
@@ -63,7 +63,7 @@ namespace gle
     void arc(size_t cnt, GLfloat co[], GLfloat si[], GLfloat rad,
              double start, double end, GLfloat cx, GLfloat cy )
     {
-        const double theta = ( end - start ) / cnt;
+        const double theta = ( end - start ) / (double)cnt;
         const double c = cos(theta);
         const double s = sin(theta);
     
@@ -89,7 +89,7 @@ namespace gle
     // This works only if 'GLfloat == float'
     void circle(size_t cnt, float cosi[], float rad)
     {
-        const double theta = 2.0 * M_PI / cnt;
+        const double theta = 2.0 * M_PI / (double)cnt;
         const double c = cos(theta);
         const double s = sin(theta);
         const double c2 = c * c - s * s;
@@ -116,7 +116,7 @@ namespace gle
 #else
     void circle(size_t cnt, GLfloat cosi[], GLfloat rad)
     {
-        const double theta = 2.0 * M_PI / cnt;
+        const double theta = 2.0 * M_PI / (double)cnt;
         const double c = cos(theta);
         const double s = sin(theta);
     

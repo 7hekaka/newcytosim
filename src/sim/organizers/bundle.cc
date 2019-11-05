@@ -111,7 +111,7 @@ Vector Bundle::position() const
         Fiber const* fib = Fiber::toFiber(organized(ii));
         res += fib->posEnd(prop->focus);
     }
-    return res / nbOrganized();
+    return res / (real)nbOrganized();
 }
 
 
