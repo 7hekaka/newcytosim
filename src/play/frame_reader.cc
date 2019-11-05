@@ -184,7 +184,7 @@ int FrameReader::seekFrame(const long frm)
 {        
     VLOG("FrameReader: seekFrame("<< frm <<")\n");
     
-    int inx = seekPos(frm);
+    long inx = seekPos(frm);
     
     if ( inx == frm )
         return 0;
@@ -329,7 +329,7 @@ int FrameReader::loadLastFrame(Simul& sim)
         return 7;
     
     /// seek last known position:
-    int frm = lastKnownFrame();
+    long frm = lastKnownFrame();
     if ( frm > 0 )
         inputter.set_pos(framePos[frm].position);
     else

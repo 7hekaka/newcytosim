@@ -1014,7 +1014,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
  */
 void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
 {
-    size_t bks = DIM * mec->nbPoints();
+    const size_t bks = DIM * mec->nbPoints();
     assert_true( bks*bks <= wrksize );
 
     bool may_keep = false;
@@ -1166,8 +1166,8 @@ void Meca::precondition(const real* X, real* Y) const
         while ( mci < mecables.end() )
         {
             Mecable const* mec = *mci;
-            const int inx = DIM * mec->matIndex();
-            const int bks = DIM * mec->nbPoints();
+            const size_t inx = DIM * mec->matIndex();
+            const size_t bks = DIM * mec->nbPoints();
             if ( Y != X )
                 blas::xcopy(bks, X+inx, 1, Y+inx, 1);
             if ( mec->useBlock() )
@@ -2129,7 +2129,7 @@ void Meca::dumpSparse()
     
     for ( Mecable * mec : mecables )
     {
-        size_t bks = DIM * mec->nbPoints();
+        const size_t bks = DIM * mec->nbPoints();
         extractBlock(tmp2, mec);
         VecPrint::sparse_off(os, bks, bks, tmp2, bks, DIM*mec->matIndex());
     }

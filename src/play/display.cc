@@ -893,18 +893,20 @@ void Display::drawFiberLinesP(Fiber const& fib, real len, real width) const
 {
     if ( len > 0 )
     {
+        const real seg = fib.segmentation();
         lineWidth(width);
         glBegin(GL_LINE_STRIP);
-        int ii = fib.lastPoint();
-        real a = 0;
-        while ( a < len  &&  ii >= 0 )
+        size_t ii = fib.lastPoint();
+        while ( len > 0  &&  ii > 0 )
         {
             gle::gleVertex(fib.posP(ii));
-            a += fib.segmentation();
+            len -= seg;
             --ii;
         }
-        if ( ii >= 0 )
-            gle::gleVertex(fib.posM(fib.length()-len));
+        if ( ii > 0 )
+            gle::gleVertex(fib.interpolatePoints(ii, ii+1, -len/seg));
+        else
+            gle::gleVertex(fib.posP(0));
         glEnd();
     }
 }

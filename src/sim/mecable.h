@@ -202,11 +202,12 @@ public:
         return diffPoints(pPos, P, Q);
     }
     
-    /// Calculate intermediate position = P + a ( Q - P )
+    /// Calculate intermediate position = P + a * ( Q - P )
     Vector interpolatePoints(const size_t P, const size_t Q, const real a) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
+        //assert_true( 0 <= a && a <= 1 );
 #if ( DIM == 1 )
         return Vector(pPos[P]+a*(pPos[Q]-pPos[P]));
 #elif ( DIM == 2 )

@@ -289,7 +289,7 @@ void extractLast(FILE* in)
 
 void split(FILE * in)
 {
-    int frm = 0;
+    long frm = 0;
     int  code = 0;
     char name[128] = { 0 };
     snprintf(name, sizeof(name), "objects%04i.cmo", frm);
