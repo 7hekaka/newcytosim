@@ -27,7 +27,7 @@ class WristLong : public Wrist
 public:
      
     /// constructor
-    WristLong(SingleProp const*, Mecable const*, unsigned point);
+    WristLong(SingleProp const*, Mecable const*, size_t point);
 
     /// destructor
     ~WristLong();

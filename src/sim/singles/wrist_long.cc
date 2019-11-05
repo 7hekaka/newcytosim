@@ -8,7 +8,7 @@
 extern Modulo const* modulo;
 
 
-WristLong::WristLong(SingleProp const* sp, Mecable const* mec, const unsigned pti)
+WristLong::WristLong(SingleProp const* sp, Mecable const* mec, const size_t pti)
 : Wrist(sp, mec, pti), mArm(nullTorque)
 {
 }

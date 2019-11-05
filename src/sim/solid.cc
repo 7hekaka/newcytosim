@@ -935,7 +935,7 @@ real Solid::addBrownianForces(real const* rnd, real sc, real* rhs) const
 {    
     // Brownian amplitude
     const real drag = prop->viscosity * soDrag;
-    real b = sqrt( 2 * sc * drag / nPoints );
+    real b = sqrt( 2 * sc * drag / (real)nPoints );
 
     for ( unsigned jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];

@@ -214,7 +214,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
     for ( size_t ii = 1; ii < nPoints; ++ii )
         sum += X[ii];
     
-    sum = sum / nPoints;
+    sum = sum / (real)nPoints;
 #if NEW_ANISOTROPIC_FIBER_DRAG
     sum *= 2;
 #endif

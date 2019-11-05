@@ -8,7 +8,7 @@
 extern Modulo const* modulo;
 
 
-Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const unsigned pti)
+Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
 : Single(sp)
 {
     anchor.set(mec, pti);
@@ -20,7 +20,7 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const unsigned pti)
 }
 
 
-Wrist::Wrist(SingleProp const* sp, Mecable const* mec, unsigned a, unsigned b, real c)
+Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t a, size_t b, real c)
 : Single(sp)
 {
     assert_true(mec);
@@ -33,7 +33,7 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, unsigned a, unsigned b, r
 }
 
 
-Wrist::Wrist(SingleProp const* sp, Mecable const* mec, unsigned ref, Vector pos)
+Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t ref, Vector pos)
 : Single(sp)
 {
     assert_true(mec);

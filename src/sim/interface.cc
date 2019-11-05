@@ -799,7 +799,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
     opt.set(binary, "binary");
     
     size_t  frame = 1;
-    real    delta = nb_steps;
+    real    delta = (real)nb_steps;
     size_t  check = nb_steps;
     
     VLOG("+RUN START " << nb_steps << '\n');

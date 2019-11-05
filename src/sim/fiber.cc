@@ -812,7 +812,7 @@ void Fiber::setDragCoefficient()
 
     //the forces are distributed equally on all points, hence we multiply by nPoints
     assert_true( nPoints > 0 );
-    rfDragPoint = drag / nPoints;
+    rfDragPoint = drag / (real)nPoints;
     
 #if ( 0 )
     Cytosim::log << "Fiber L = " << std::setw(7) << length();

@@ -21,13 +21,13 @@ protected:
 public:
      
     /// Construct object anchored at one Mecapoint
-    Wrist(SingleProp const*, Mecable const*, unsigned point);
+    Wrist(SingleProp const*, Mecable const*, size_t point);
     
     /// Construct object anchored between two Mecapoint
-    Wrist(SingleProp const*, Mecable const*, unsigned, unsigned, real);
+    Wrist(SingleProp const*, Mecable const*, size_t, size_t, real);
    
     /// Constructor object interpolated over a triad of Mecapoint
-    Wrist(SingleProp const*, Mecable const*, unsigned ref, Vector pos);
+    Wrist(SingleProp const*, Mecable const*, size_t ref, Vector pos);
 
     /// destructor
     ~Wrist();
