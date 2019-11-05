@@ -675,7 +675,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     real      * Z = Y + nbt + DIM;
     real const* E = X + nbt + DIM;
     #pragma ivdep
-    for ( size_t d = 0; d < DIM; ++d )
+    for ( int d = 0; d < DIM; ++d )
     {
         Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
         Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
