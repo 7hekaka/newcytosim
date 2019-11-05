@@ -656,7 +656,7 @@ void processKey(unsigned char key)
                 flashText("Reloaded %s", file.c_str());
             }
             catch( Exception & e ) {
-                flashText("Error in config: %s", e.what());
+                flashText("Error in config: %s", e.c_str());
             }
         } break;
 
