@@ -77,28 +77,28 @@ new 3 fil
 % First tubule aligned with X
 new 3 fil
 {
-	family = 1
+    family = 1
     length = 1
     direction = 1
     range = 0 0.01 -0.005, 0 0.01 0.005
 }
 new 3 fil
 {
-	family = 1
+    family = 1
     length = 1
     direction = 1
     range = 0 0.005 0.01, 0 -0.005 0.01
 }
 new 3 fil
 {
-	family = 1
+    family = 1
     length = 1
     direction = 1
     range = 0 -0.01 0.005, 0 -0.01 -0.005
 }
 new 3 fil
 {
-	family = 1
+    family = 1
     length = 1
     direction = 1
     range = 0 -0.005 -0.01, 0 0.005 -0.01
@@ -107,28 +107,28 @@ new 3 fil
 %------------------- Second Microtubule
 new 3 fil
 {
-	family = 2
+    family = 2
     length = 1
     direction = -1
     range = 0 0.045 0.005, 0 0.045 -0.005
 }
 new 3 fil
 {
-	family = 2
+    family = 2
     length = 1
     direction = -1
     range = 0 0.04 -0.01, 0 0.03 -0.01
 }
 new 3 fil
 {
-	family = 2
+    family = 2
     length = 1
     direction = -1
     range = 0 0.025 -0.005, 0 0.025 0.005
 }
 new 3 fil
 {
-	family = 2
+    family = 2
     length = 1
     direction = -1
     range = 0 0.03 0.01, 0 0.04 0.01
