@@ -212,7 +212,7 @@ ifeq ($(MACHINE),linux)
     FlagsF := -O3 -finline-functions $(ALIGN) $(FAST)
 
     # specify the lib path:
-    USRLIB := /usr/lib
+    LIBDIR := /usr/lib
 
     ### For 64bit Centos 5.8 March 2012:
     # Centos  blas: yum install blas-devel
@@ -222,9 +222,9 @@ ifeq ($(MACHINE),linux)
     # Ubuntu lapack : apt-get install liblapack.dev
 
     #### For dynamic linking:
-    LINK := -L$(USRLIB) -llapack -lblas -lpthread
+    LINK := -L$(LIBDIR) -llapack -lblas -lpthread
     #### For static linking specify the objects directly:
-    LINK := -L$(USRLIB) $(USRLIB)/liblapack.so $(USRLIB)/libblas.so -lpthread
+    LINK := -L$(LIBDIR) $(LIBDIR)/liblapack.so $(LIBDIR)/libblas.so -lpthread
 
     ### Install libraries needed for graphical executables:
     # Centos freglut: yum install freeglut-devel
@@ -237,11 +237,11 @@ ifeq ($(MACHINE),linux)
 
     ### linkage options for programs using graphics:
     #   check for correct library libname.so otherwise give full path
-    GRAFIX := -L$(USRLIB) -lglut -lGL -lGLU -lXt -lX11 -lGLEW
+    GRAFIX := -L$(LIBDIR) -lglut -lGL -lGLU -lXt -lX11 -lGLEW
 
     ifneq ($(HAS_PNG), 0)
 
-        LIB_PNG := $(USRLIB)/libpng.a $(USRLIB)/libz.a
+        LIB_PNG := $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
         ING_PNG :=
 
     endif

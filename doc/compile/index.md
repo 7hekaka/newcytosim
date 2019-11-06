@@ -141,11 +141,11 @@ For example, if the result is:
 
 You should adjust `makefile.inc` to specify the corresponding path:
 
-	USRLIB := /usr/lib
+	LIBDIR := /usr/lib
 
-Ensure that no other line changes the value of `USRLIB`. For example, this one is commented out with the `#`:
+Ensure that no other line changes the value of `LIBDIR`. For example, this one is commented out with the `#`:
 
-	#USRLIB := /usr/lib/x86_64-linux-gnu
+	#LIBDIR := /usr/lib/x86_64-linux-gnu
 
 #### Check if it can read a configuration file:
 

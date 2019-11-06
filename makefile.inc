@@ -70,7 +70,7 @@ ALIGN  := -malign-double -falign-loops -falign-jumps -falign-functions
 ALIGN  :=
 
 # options concerning warnings:
-WARN   := -Wundef -Wall -Wno-unknown-pragmas# -Wno-unused
+WARN   := -Wundef -Wall -Wno-unknown-pragmas# -Wno-unused -Wconversion
 
 ifeq ($(MACHINE),mac)
     LIBTOOL := /usr/bin/libtool -static -o
@@ -84,8 +84,8 @@ endif
 ifeq ($(COMPILER),gcc)
 
 # Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2)
-# You can use g++-8 to support Intel OMP directives
-    CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
+# You can use g++-9 to support Intel OMP directives
+    CXX      := g++-9 -Wfatal-errors -Wno-deprecated-declarations
     FAST     :=-O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
     FAST     :=-O3 -fno-trapping-math -ffast-math -funroll-loops -march=native -ffp-contract=fast
 
@@ -211,9 +211,13 @@ ifeq ($(MACHINE),linux)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
     FlagsF := -O3 -finline-functions $(ALIGN) $(FAST)
 
+    # trying to automatically detect the directory with BLAS & LAPACK:
+    BLASLIB := $(wildcard /usr/lib/libblas.*) $(wildcard /usr/lib/*/libblas.*)
+    BLADIR := $(word 1, $(dir $(BLASLIB)))
+
     # specify the lib path:
-    USRLIB := /usr/lib
-    USRLIB := /usr/lib/x86_64-linux-gnu
+    LIBDIR := /usr/lib
+    LIBDIR := /usr/lib/x86_64-linux-gnu
 
     ### For 64bit Centos 5.8 March 2012:
     # Centos  blas: yum install blas-devel
@@ -223,9 +227,9 @@ ifeq ($(MACHINE),linux)
     # Ubuntu lapack : apt-get install liblapack.dev
 
     #### For dynamic linking:
-    LINK := -L$(USRLIB) -llapack -lblas -lpthread
+    LINK := -L$(BLADIR) -llapack -lblas -lpthread
     #### For static linking specify the objects directly:
-    LINK := -L$(USRLIB) $(USRLIB)/liblapack.so $(USRLIB)/libblas.so -lpthread
+    #LINK := -L$(BLADIR) $(BLADIR)/liblapack.so $(BLADIR)/libblas.so -lpthread
 
     ### Install libraries needed for graphical executables:
     # Centos freglut: yum install freeglut-devel
@@ -238,11 +242,11 @@ ifeq ($(MACHINE),linux)
 
     ### linkage options for programs using graphics:
     #   check for correct library libname.so otherwise give full path
-    GRAFIX := -L$(USRLIB) -lglut -lGL -lGLU -lXt -lX11 -lGLEW
+    GRAFIX := -L$(LIBDIR) -lglut -lGL -lGLU -lXt -lX11 -lGLEW
 
     ifneq ($(HAS_PNG), 0)
 
-        LIB_PNG := $(USRLIB)/libpng.a $(USRLIB)/libz.a
+        LIB_PNG := $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
         ING_PNG :=
 
     endif
