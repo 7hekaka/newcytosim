@@ -21,8 +21,8 @@ class Wrist;
  - mobile points on the surface.
  .
 
- nbRefPoints 'fixed' points provide a reference frame for the sphere:
- nbRefPoints=2 in 2D and  nbRefPoints=4 in 3D.
+ A set of 'fixed' points provide a reference frame for the sphere:
+ nbRefPoints = 2 in 2D and 4 in 3D.
 
  The sphere can move as a solid body by rotation and translation.
  In addition, the surface-points can move on the surface. This motion includes
