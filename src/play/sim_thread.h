@@ -179,7 +179,6 @@ public:
     
     /// rewind file
     void       rewind()          { lock(); reader.rewind(); unlock(); }
- 
     
     /// attempt to load specified frame from file (0 = first frame; -1 = last frame)
     int        loadFrame(long f) { lock(); int r=reader.loadFrame(simul, f); unlock(); return r; }
