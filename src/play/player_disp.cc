@@ -73,7 +73,7 @@ std::string Player::buildLabel() const
     if ( sh && sh->attached() )
         oss << "\nHandle: " << sh->force().norm() << "pN";
 
-    if ( thread.alive() )
+    if ( thread.alive() && goLive )
     {
         oss << "\nLive";
         //display ratio number-of-time-step / frame
