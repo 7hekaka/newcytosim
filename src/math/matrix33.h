@@ -348,7 +348,7 @@ public:
         return res;
     }
     
-    /// inversion of a symmetric matrix, addressing lower triangle
+    /// inversion of a symmetric matrix, using values in lower triangle
     /** This methods uses a L*D*L^t factorization with:
      L = ( 1 0 0; a 1 0; b c 1 )
      D = ( u 0 0; 0 v 0; 0 0 w )
@@ -358,15 +358,15 @@ public:
     {
         /*
          // solving mat =  L * D * L^t:
-         val[0+BLD*0] = u;
-         val[1+BLD*0] = a * u;
-         val[2+BLD*0] = b * u;
-         val[0+BLD*1] = a * u;
-         val[1+BLD*1] = a * a * u + v;
-         val[2+BLD*1] = a * b * u + c * v;
-         val[0+BLD*2] = b * u;
-         val[1+BLD*2] = a * b * u + c * v;
-         val[2+BLD*2] = b * b * u + c * c * v + w;
+         val[0,0] = u;
+         val[1,0] = a * u;
+         val[2,0] = b * u;
+         val[0,1] = a * u;
+         val[1,1] = a * a * u + v;
+         val[2,1] = a * b * u + c * v;
+         val[0,2] = b * u;
+         val[1,2] = a * b * u + c * v;
+         val[2,2] = b * b * u + c * c * v + w;
          */
         real u = val[0];
         real iu = 1.0 / u;

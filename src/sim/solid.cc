@@ -56,7 +56,7 @@ void Solid::setInteractions(Meca & meca) const
         switch ( prop->confine )
         {
             case CONFINE_INSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     const real rad = soRadius[i];
                     // confine all massive points:
@@ -70,7 +70,7 @@ void Solid::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     const real rad = soRadius[i];
                     // confine all massive points:
@@ -84,7 +84,7 @@ void Solid::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_ALL_INSIDE:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     const real rad = soRadius[i];
                     // confine all massive points:
@@ -98,7 +98,7 @@ void Solid::setInteractions(Meca & meca) const
                 break;
                 
             case CONFINE_ON:
-                for ( unsigned i = 0; i < nPoints; ++i )
+                for ( size_t i = 0; i < nPoints; ++i )
                 {
                     // only confine massive points:
                     if ( soRadius[i] > 0 )
@@ -146,7 +146,7 @@ Solid::Solid(const Solid & o)
     reset();
     prop = o.prop;
     allocateMecable(o.nPoints);
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
         soRadius[p] = o.soRadius[p];
     fixShape();
 }
@@ -158,7 +158,7 @@ Solid & Solid::operator =(const Solid & o)
     prop = o.prop;
     allocateMecable(o.nPoints);
     Mecable::operator=(o);
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
         soRadius[p] = o.soRadius[p];
     fixShape();
     return *this;
@@ -189,13 +189,13 @@ size_t Solid::allocateMecable(const size_t nbp)
         real  *  rad = new_real(ms);
         
         //set the radii to zero (no drag) by default:
-        for ( unsigned p = 0; p < ms; ++p )
+        for ( size_t p = 0; p < ms; ++p )
             rad[p] = 0;
         
         // copy the current values in the new array:
         if ( soShape )
         {
-            for ( unsigned p = 0; p < nPoints; ++p )
+            for ( size_t p = 0; p < nPoints; ++p )
             {
                 rad[p] = soRadius[p];
                 for ( int d = 0; d < DIM; ++d )
@@ -314,7 +314,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
     ObjectList res;
     std::string str;
-    unsigned inp, inx, nbp;
+    size_t inp, inx, nbp;
 
     if ( opt.has_key("point0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
@@ -555,7 +555,7 @@ Vector Solid::centroid() const
     
     real sum = 0;
     Vector res(0,0,0);
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         if ( soRadius[i] > 0 )
         {
@@ -647,7 +647,7 @@ void Solid::rescale()
         real scale = sqrt( soShapeSqr / M );
     
         // scale the shape around the center of gravity:
-        for ( unsigned p = 0; p < nPoints; ++p )
+        for ( size_t p = 0; p < nPoints; ++p )
         {
             real * pos = pPos + DIM * p;
             for ( int d = 0; d < DIM; ++d )
@@ -678,7 +678,7 @@ void Solid::reshape()
         ABORT_NOW("mismatch with current number of points: forgot to call fixShape()?");
          
     real cc = 0, a = 0;
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         a  += pPos[i] * soShape[i];
         cc += pPos[i];
@@ -687,7 +687,7 @@ void Solid::reshape()
     cc /= real( nPoints );
     real s = a / fabs(a);
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
         pPos[i] = s * soShape[i] + cc;
 }
 
@@ -708,7 +708,7 @@ void Solid::reshape()
     
     real a = 0, b = 0;
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         a += pPos[DIM*i] * soShape[DIM*i  ] + pPos[DIM*i+1] * soShape[DIM*i+1];
         b += soShape[DIM*i] * pPos[DIM*i+1] - soShape[DIM*i+1] * pPos[DIM*i  ];
@@ -727,7 +727,7 @@ void Solid::reshape()
     
     // apply transformation = rotation + translation:
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         pPos[DIM*i  ] = c * soShape[DIM*i] - s * soShape[DIM*i+1] + avg.XX;
         pPos[DIM*i+1] = s * soShape[DIM*i] + c * soShape[DIM*i+1] + avg.YY;
@@ -751,7 +751,7 @@ void Solid::reshape()
     Vector avg = Mecable::position();
     
     Matrix33 S(0,0);
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
         S.addOuterProduct(soShape+DIM*i, pPos+DIM*i);
     
     // scale to keep the magnitude of the matrix in range
@@ -801,13 +801,13 @@ void Solid::reshape()
         quat.setMatrix3(S);
 
         // apply rotation + translation:
-        for ( unsigned i = 0; i < nPoints; ++i )
+        for ( size_t i = 0; i < nPoints; ++i )
             (avg+S*Vector3(soShape+DIM*i)).store(pPos+DIM*i);
     }
     else
     {
         // apply translation:
-        for ( unsigned i = 0; i < nPoints; ++i )
+        for ( size_t i = 0; i < nPoints; ++i )
             (avg+Vector3(soShape+DIM*i)).store(pPos+DIM*i);
         
         printf("Solid::reshape(): lapack::xsyevx() failed with code %i\n", info);
@@ -854,7 +854,7 @@ real Solid::dragCoefficient() const
 {
     real sumR = 0;
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
         sumR += soRadius[i];
     
     return ( 6 * M_PI ) * prop->viscosity * sumR;
@@ -880,7 +880,7 @@ void Solid::setDragCoefficient()
     real roti = 0;     //in 2D, the total rotational inertia
 #endif
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         real R = soRadius[i];
         if ( R > 0 )
@@ -937,7 +937,7 @@ real Solid::addBrownianForces(real const* rnd, real sc, real* rhs) const
     const real drag = prop->viscosity * soDrag;
     real b = sqrt( 2 * sc * drag / (real)nPoints );
 
-    for ( unsigned jj = 0; jj < DIM*nPoints; ++jj )
+    for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];
     
     return b / drag;
@@ -959,12 +959,12 @@ void Solid::makeProjection()
 void Solid::projectForces(const real* X, real* Y) const
 {
     real T = 0;
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
         T += X[p];
     
     T *= 1.0 / ( prop->viscosity * soDrag );
     
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
         Y[p] = T;
 }
 
@@ -989,7 +989,7 @@ void Solid::makeProjection()
     real sumR = 0;
     real sumR3 = 0;
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         real R = soRadius[i];
         if ( R > 0 )
@@ -1013,7 +1013,7 @@ void Solid::projectForces(const real* X, real* Y) const
     Vector T(0.0,0.0);  // Translation
     real R = 0;         // Infinitesimal Rotation (a vector in Z)
     
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
         real const* xxx = X + DIM * p;
@@ -1030,7 +1030,7 @@ void Solid::projectForces(const real* X, real* Y) const
     R = A * ( R + cross(T,soCenter) );
     T = B * T + cross(soCenter,R);
     
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
         real * yyy = Y + DIM * p;
@@ -1053,11 +1053,11 @@ void Solid::makeProjection()
     ///\todo: from reshape, we know the rotation matrix from the stored shape
     //to the current shape. We could use it to transform the inertia matrix
     real sum = 0;
-    unsigned cnt = 0;
+    size_t cnt = 0;
     Vector cen(0,0,0);
     real mXX=0, mXY=0, mXZ=0, mYY=0, mYZ=0, mZZ=0;
     
-    for ( unsigned i = 0; i < nPoints; ++i )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
         const real R = soRadius[i];
         if ( R > 0 )
@@ -1089,6 +1089,7 @@ void Solid::makeProjection()
     const real D = soDragRot - soDrag*soCenter.normSqr();
     
     // finally set the matrix in front of R in projectForces()
+    // the matrix is symmetric, and we only set the lower diagonal:
     soMomentum(0,0) = D + A * (mYY+mZZ) + B * soCenter.XX * soCenter.XX;
     soMomentum(1,0) =   - A *  mXY      + B * soCenter.XX * soCenter.YY;
     soMomentum(2,0) =   - A *  mXZ      + B * soCenter.XX * soCenter.ZZ;
@@ -1098,7 +1099,7 @@ void Solid::makeProjection()
     //Matrix33 mat = soMomentum;
     soMomentum.symmetricInverse();
 
-#if ( 0 )
+#if ( 1 )
     mat.copy_lower();
     mat.inverse();
     real dif = ( mat - soMomentum ).norm();
@@ -1125,7 +1126,7 @@ void Solid::projectForces(const real* X, real* Y) const
     Vector T(0,0,0);    //Translation
     Vector R(0,0,0);    //Rotation
     
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         real * pos = pPos + DIM * p;
         real const* xxx = X + DIM * p;
@@ -1146,12 +1147,12 @@ void Solid::projectForces(const real* X, real* Y) const
     const real A = 1.0 / ( prop->viscosity );
     const real B = 1.0 / ( prop->viscosity * soDrag );
 
-    R = A * ( soMomentum * V );
+    R = A * soMomentum.vecmul(V);
 
     // reduce Torque to center of mobility:
     T = B * T + cross(soCenter, R);
     
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
         real * yyy = Y + DIM * p;
@@ -1172,7 +1173,7 @@ void Solid::projectForces(const real* X, real* Y) const
 void Solid::write(Outputter& out) const
 {
     out.writeUInt16(nPoints);
-    for ( unsigned p = 0; p < nPoints ; ++p )
+    for ( size_t p = 0; p < nPoints ; ++p )
     {
         out.writeFloatVector(pPos + DIM * p, DIM, '\n');
         out.writeSoftSpace(2);
@@ -1210,7 +1211,7 @@ void Solid::print(std::ostream& os, bool write_shape) const
     os << "new solid " << reference() << '\n';
     os << "{\n";
     os << " nb_points = " << nPoints << '\n';
-    for ( unsigned n = 0; n < nPoints ; ++n )
+    for ( size_t n = 0; n < nPoints ; ++n )
     {
         os << " point" << n+1 << " = ";
         if ( write_shape )

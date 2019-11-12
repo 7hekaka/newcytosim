@@ -366,7 +366,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
 #else
         // this is a basic rendering where tubes would not join properly:
         drawCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
-        for ( unsigned s = 0; s < fib.nbSegments(); ++s )
+        for ( size_t s = 0; s < fib.nbSegments(); ++s )
             gleTube(fib.posP(s), fib.posP(s+1), rad, gleTube2B);
         drawCap(fib.prop->disp->line_caps, fib.posEndP(), fib.dirEndP(), rad);
 #endif
@@ -722,7 +722,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     if ( disp->point_style == 1 )
     {
         // display vertices:
-        for ( unsigned ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
             gleObject(fib.posP(ii), rad, gleSphere2B);
     }
     else if ( disp->point_style == 2 )
@@ -792,7 +792,7 @@ void Display3::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0 )
     {
         bodyColor(disp, obj.signature());
-        for ( unsigned ii = 0; ii < obj.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             drawPoint(obj.posP(ii), disp);
     }
     
@@ -826,7 +826,7 @@ void Display3::drawSolid(Solid const& obj)
     {
         const real rad = disp->width * sFactor;
         bodyColor(disp, obj.signature());
-        for ( unsigned ii = 1; ii < obj.nbPoints(); ++ii )
+        for ( size_t ii = 1; ii < obj.nbPoints(); ++ii )
             gleTube(obj.posPoint(ii-1), obj.posPoint(ii), rad, gleTube2B);
     }
 }
@@ -960,7 +960,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gleDualPass(gleBarrel1);
             glPopMatrix();
 #else
-            for ( unsigned ii = 0; ii < so->nbPoints(); ii+=2 )
+            for ( size_t ii = 0; ii < so->nbPoints(); ii+=2 )
                 gleTube(so->posPoint(ii), so->posPoint(ii+1), w, gleHexTube1B);
 #endif
         }

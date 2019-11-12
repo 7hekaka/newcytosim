@@ -870,14 +870,14 @@ void Simul::reportFiberMoments(std::ostream& out) const
         FiberProp * fp = static_cast<FiberProp*>(i);
         
         accum.reset();
-       
+        
         for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
         {
             if ( fib->prop == fp )
             {
                 const real w = fib->segmentation();
                 accum.add(0.5*w, fib->posEndM());
-                for ( unsigned n = 1; n < fib->lastPoint(); ++n )
+                for ( size_t n = 1; n < fib->lastPoint(); ++n )
                     accum.add(w, fib->posP(n));
                 accum.add(0.5*w, fib->posEndP());
             }
@@ -906,7 +906,7 @@ void Simul::reportFiberForces(std::ostream& out) const
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         out << COM << "fiber " << fib->reference();
-            
+        
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
@@ -1064,10 +1064,10 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
         unsigned cnt = 0;
         for ( Fiber * fob = fibers.nextID(fib); fob; fob = fibers.nextID(fob) )
         {
-            for ( unsigned ii = 0; ii < fib->nbSegments(); ++ii )
+            for ( size_t ii = 0; ii < fib->nbSegments(); ++ii )
             {
                 FiberSegment seg1(fib, ii);
-                for ( unsigned jj = 0; jj < fob->nbSegments(); ++jj )
+                for ( size_t jj = 0; jj < fob->nbSegments(); ++jj )
                 {
                     FiberSegment seg2(fob, jj);
                     if ( seg1.shortestDistance(seg2, abs1, abs2, dis) )
@@ -2347,7 +2347,7 @@ size_t Simul::flagRing() const
         list_t sec;
         for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
         {
-            for ( unsigned s = 0; s < fib->nbSegments(); ++s )
+            for ( size_t s = 0; s < fib->nbSegments(); ++s )
             {
                 // check that fiber intersect with plane:
                 real abs = fib->planarIntersect(s, nor, 0);
@@ -2428,7 +2428,7 @@ void Simul::analyzeRing(ObjectFlag flg, real& length, real& radius) const
             // only consider fiber that are part of the ring:
             if ( fib->flag() == flg )
             {
-                for ( unsigned s = 0; s < fib->nbSegments(); ++s )
+                for ( size_t s = 0; s < fib->nbSegments(); ++s )
                 {
                     // check that fiber intersect with plane:
                     real abs = fib->planarIntersect(s, nor, 0);

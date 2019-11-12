@@ -246,7 +246,7 @@ void SpacePolygon::setInteractions(Meca & meca, FiberSet const& fibers) const
     for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
     {
         real ls = fib->segmentation();
-        for ( unsigned seg = 0; seg < fib->nbSegments() ; ++seg )
+        for ( size_t seg = 0; seg < fib->nbSegments() ; ++seg )
         {
             FiberSegment loc(fib, seg);
             for ( int i = 0; i < n_pik; ++i )
