@@ -680,8 +680,8 @@ void Simul::reportFiber(std::ostream& out) const
 void Simul::reportFiberEnds(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity" << SEP << "length";
-    out << SEP << "stateM" << SEP << "posM" << SEP << "dirM";
-    out << SEP << "stateP" << SEP << "pos" << SEP << "dirP";
+    out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
+    out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
     
     for ( Fiber * obj=fibers.first(); obj; obj=obj->next() )
     {
