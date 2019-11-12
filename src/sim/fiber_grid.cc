@@ -388,7 +388,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
     //check all the segments to find those close enough from pos:
     for ( Fiber const* fib=set.first(); fib; fib=fib->next() )
     {
-        for ( unsigned p = 0; p < fib->nbSegments(); ++p )
+        for ( size_t p = 0; p < fib->nbSegments(); ++p )
         {
             FiberSegment seg(fib, p);
             real dis = INFINITY;

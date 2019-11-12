@@ -144,7 +144,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
 {
     ObjectList res;
     std::string str;
-    unsigned inp = 1, inx = 0, nbp = 1;
+    size_t inp = 1, inx = 0, nbp = 1;
 
     if ( opt.has_key("point0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
@@ -490,7 +490,7 @@ void Sphere::reshape()
     Vector axis;
     Vector cen(pPos);
     
-    for ( unsigned j = 1; j < nPoints; ++j )
+    for ( size_t j = 1; j < nPoints; ++j )
     {
         axis = ( posP(j) - cen ).normalized(spRadius);
         setPoint(j, cen + axis);
@@ -546,7 +546,7 @@ void Sphere::projectForces(const real* X, real* Y) const
     Vector T(0,0,0);
 #endif
     
-    for ( unsigned p = 0; p < nPoints; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         real * pos = pPos + DIM * p;
         real const* xxx = X + DIM * p;

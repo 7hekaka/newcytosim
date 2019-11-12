@@ -28,7 +28,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last)
     // add all segments
     for ( const Fiber * f = first ; f != last ; f=f->next() )
     {
-        for ( unsigned s = 0; s < f->nbSegments(); ++s )
+        for ( size_t s = 0; s < f->nbSegments(); ++s )
             allSegments.push_back(FiberSegment(f,s));
     }
 }

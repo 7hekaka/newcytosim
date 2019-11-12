@@ -173,7 +173,7 @@ void Display1::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0  && disp->perceptible )
     {
         bodyColor(disp, obj.signature());
-        for ( unsigned ii = 0; ii < obj.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             drawPoint(obj.posP(ii), disp);
     }
     
@@ -183,7 +183,7 @@ void Display1::drawSolid(Solid const& obj)
         lineWidth(disp->width);
         bodyColor(disp, obj.signature());
 #if ( DIM == 2 )
-        for ( unsigned ii = 0; ii < obj.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
         {
             if ( obj.radius(ii) > 0 )
                 gleObject(obj.posP(ii), obj.radius(ii), gleCircleB);
@@ -219,7 +219,7 @@ void Display1::drawSolid(Solid const& obj)
         lineWidth(disp->width);
         bodyColor(disp, obj.signature());
         glBegin(GL_LINE_LOOP);
-        for ( unsigned ii = 0; ii < obj.nbPoints(); ++ii )
+        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             gleVertex(obj.posPoint(ii));
         glEnd();
     }
@@ -251,7 +251,7 @@ void Display1::drawSphere(Sphere const& obj)
     {
         bodyColor(disp, obj.signature());
         drawPoint(obj.posP(0), disp);
-        for ( unsigned ii = obj.nbRefPoints; ii < obj.nbPoints(); ii++ )
+        for ( size_t ii = obj.nbRefPoints; ii < obj.nbPoints(); ii++ )
             drawPoint(obj.posP(ii), disp);
     }
     
@@ -259,7 +259,7 @@ void Display1::drawSphere(Sphere const& obj)
     if ( disp->style & 8  &&  disp->perceptible  )
     {
         bodyColor(disp, obj.signature());
-        for ( unsigned ii = 1; ii < obj.nbRefPoints; ii++ )
+        for ( size_t ii = 1; ii < obj.nbRefPoints; ii++ )
             drawPoint(obj.posP(ii), disp);
     }
 }
@@ -357,7 +357,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
             glDisable(GL_LIGHTING);
 #else
             glBegin(GL_LINES);
-            for ( unsigned ii = 0; ii < so->nbPoints(); ++ii )
+            for ( size_t ii = 0; ii < so->nbPoints(); ++ii )
                 gleVertex(so->posPoint(ii));
             glEnd();
 #endif
