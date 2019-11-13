@@ -1099,7 +1099,7 @@ void Solid::makeProjection()
     //Matrix33 mat = soMomentum;
     soMomentum.symmetricInverse();
 
-#if ( 1 )
+#if ( 0 )
     mat.copy_lower();
     mat.inverse();
     real dif = ( mat - soMomentum ).norm();
