@@ -6,34 +6,36 @@ If a stochastic event occurs at a constant rate, its time of occurence in genera
 
 	time = -log(random()) / rate
 
-where `random()` returns a random number uniformly distributed in ]0,1] (zero is excluded). This applies the [inverse transform sampling](https://en.wikipedia.org/wiki/Inverse_transform_sampling) method to generate exponential variates. The resulting variable `time` is exponentially distributed with expectancy `1/rate`.
+where `random()` returns a random number uniformly distributed in ]0,1] (zero is excluded). This applies [inverse transform sampling](https://en.wikipedia.org/wiki/Inverse_transform_sampling) to generate exponential variates. The resulting variable `time` is exponentially distributed with expectancy `1/rate`.
 
 
 # Bell's Law and Kramers' Reaction Rate Theory
 
-The detachment of a molecular link follows Bell's law. Essentially, the detachment rate `off_rate` varies exponentially with the magnitude of the force experienced by the link:
+The detachment of a molecular link is promoted by force experienced by the link. The dependence is assumed to be exponential and the detachment rate reads:
 
 	off_rate = unbinding_rate * exp( force / unbinding_force )
  
-where `force` is the norm of the force vector calculated by `cytosim`, while `unbinding_rate` and `unbinding_force` are constant parameters associated with the bound state. In cytosim, these parameters are specified in the definitions of `Hands`.
+where `unbinding_rate` and `unbinding_force` are constant parameters associated with the bound state. In cytosim, these parameters are specified in the definitions of `Hands`. The `force` is the norm of the force vector calculated by `cytosim`, at every time step. Thus, `off_rate` varies with time. 
 
-> [Models for the specific adhesion of cells to cells](http://dx.doi.org/10.1126/science.347575)  
-> Bell, G. I. (1978) - Science, 200(4342), 618–627. 
-
-This law was explained by the theory of Hendrik Kramers:
-
->  [Brownian motion in a field of force and the diffusion model of chemical reactions ](https://www.sciencedirect.com/science/article/pii/S0031891440900982)  
->  H.A. Kramers - Physica VII, no 4, pp284-304 - 1940
-
-The same law can be expressed differently:
+The same relationship can be expressed as:
 
 	off_rate = unbinding_rate * exp( force * molecular_scale / ( kB * temperature ) )
 
-Where `kB` is [Boltzman's constant](https://en.wikipedia.org/wiki/Boltzmann_constant).
+Where `molecular_scale` is a distance that is supposed to reflect some dimension of the link, and `kB` is [Boltzman's constant](https://en.wikipedia.org/wiki/Boltzmann_constant).
+This law is sometimes called Bell's law:
+
+> [Models for the specific adhesion of cells to cells](http://dx.doi.org/10.1126/science.347575)  
+> Bell, G. I. - Science, 200(4342), 618–627 - 1978
+
+It comes as a particular limit in the theory of Hendrik Kramers:
+
+>  [Brownian motion in a field of force and the diffusion model of chemical reactions ](https://doi.org/10.1016/S0031-8914(40)90098-2)  
+>  H.A. Kramers - Physica VII, no 4, pp284-304 - 1940
+
 For more information, see:
 
-> The load dependence of rate constants.  
-> Sam Walcott - J Chem Phys - 2008
+> [The load dependence of rate constants](https://doi.org/10.1063/1.2920475)  
+> Sam Walcott - J. Chem Phys 128, 215101 - 2008
 
 # Time-varying Rates
 
@@ -41,7 +43,7 @@ Using Kramers rate theory implies that the rate of the event is varying in time.
 The Gillespie approach needs to be modified, and we follow the procedure described in:
  
 >  [A Dynamical Monte Carlo Algorithm for Master Equations with Time-Dependent Transition Rates](http://dx.doi.org/10.1007/BF02765541)  
->  A. Prados et al. Journal of Statistical Physics, Vol. 89, Nos. 3/4, 1997  
+>  A. Prados et al. Journal of Statistical Physics, Vol. 89, Nos. 3/4 - 1997  
  
 In practice, a normalized time `esp` is first generated,
 again using a random number uniformly distributed in [0,1] provided by `random()`.
