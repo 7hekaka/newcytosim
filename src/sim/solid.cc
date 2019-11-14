@@ -414,7 +414,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             while ( opt.set(str, var, inx++) )
             {
                 // get a number and the name of a class:
-                unsigned long num = 1;
+                size_t num = 1;
                 Tokenizer::get_integer(str, num);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
@@ -437,7 +437,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             while ( opt.set(str, var, inx++) )
             {
                 // get a number and the name of a class:
-                unsigned long num = 1;
+                size_t num = 1;
                 Tokenizer::get_integer(str, num);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
