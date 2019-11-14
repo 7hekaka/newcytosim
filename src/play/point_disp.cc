@@ -527,9 +527,8 @@ void PointDisp::read(Glossary& glos)
     // if 'size' is specified, width is set accordingly:
     if ( glos.set(size,    "size") )
         width = 2 * size / 3;
-
-    // alternative syntax:
-    glos.set(size,         "point_size");
+    else
+        glos.set(size,     "point_size");
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(size,         "points");
     glos.set(shape,        "points", 1);

@@ -108,7 +108,7 @@ void Parser::parse_set(std::istream& is)
             opt.read(blok);
             pp = execute_set(cat, name, opt);
             
-            unsigned ix;
+            size_t ix;
 #ifdef BACKWARD_COMPATIBILITY
             // name changed to `property_number` on 10.12.2017
             if ( opt.set(ix, "property_number") || opt.set(ix, "property_index") )
@@ -408,7 +408,7 @@ void Parser::parse_new(std::istream& is)
                 if ( cnt > 1 )
                 {
                     Vector dAB = ( B - A ) / real(cnt-1);
-                    for ( unsigned n = 0; n < cnt; ++n )
+                    for ( size_t n = 0; n < cnt; ++n )
                     {
                         opt.define("position", 0, A + n * dAB);
                         execute_new(name, opt);
@@ -423,7 +423,7 @@ void Parser::parse_new(std::istream& is)
             else
             {
                 // place each object independently from the others:
-                for ( unsigned n = 0; n < cnt; ++n )
+                for ( size_t n = 0; n < cnt; ++n )
                     execute_new(name, opt);
             }
             
@@ -692,7 +692,7 @@ void Parser::parse_run(std::istream& is)
                 {
                     if ( span <= 0 )
                         throw InvalidParameter("duration must be >= 0'");
-                    cnt = (unsigned)ceil(span/simul.prop->time_step);
+                    cnt = (size_t)ceil(span/simul.prop->time_step);
                 }
             }
         }
@@ -954,7 +954,7 @@ void Parser::parse_repeat(std::istream& is)
 
     std::string code = Tokenizer::get_block(is, '{');
     
-    for ( unsigned c = 0; c < cnt; ++c )
+    for ( size_t c = 0; c < cnt; ++c )
     {
         evaluate(code, ", inside `repeat'");
     }
