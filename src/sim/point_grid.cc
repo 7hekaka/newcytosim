@@ -85,7 +85,7 @@ void PointGrid::createCells()
 void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
-        throw InvalidParameter("object:steric is out-of-range");
+        throw InvalidParameter("point:steric is out-of-range");
     
     Vector w = pe.pos();
     point_list(w, pan).new_val().set(pe, rd, rg, w);
@@ -107,7 +107,7 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
-        throw InvalidParameter("object:steric is out-of-range");
+        throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
