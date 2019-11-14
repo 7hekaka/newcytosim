@@ -239,7 +239,7 @@ std::string Tokenizer::get_integer(std::istream& is)
 bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
 {
     std::streampos isp = is.tellg();
-    unsigned long num;
+    unsigned long num = 0;
     is >> num;
     if ( is.fail() )
     {
@@ -247,14 +247,14 @@ bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
         is.seekg(isp);
         return false;
     }
-    if ( isspace(is.peek()) )
+    if ( !isspace(is.peek()) )
     {
-        var = num;
-        return true;
+        // declare error, if there is no spacing character:
+        is.seekg(isp);
+        throw InvalidParameter("an integer is expected");
     }
-    // declare error, if there is no spacing character:
-    is.seekg(isp);
-    throw InvalidParameter("an integer is expected");
+    var = num;
+    return true;
 }
 
 /**
@@ -265,7 +265,7 @@ bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
 bool Tokenizer::get_integer(std::istream& is, long& var)
 {
     std::streampos isp = is.tellg();
-    long num;
+    long num = 0;
     is >> num;
     if ( is.fail() )
     {
@@ -273,14 +273,14 @@ bool Tokenizer::get_integer(std::istream& is, long& var)
         is.seekg(isp);
         return false;
     }
-    if ( isspace(is.peek()) )
+    if ( !isspace(is.peek()) )
     {
-        var = num;
-        return true;
+        // declare error, if there is no spacing character:
+        is.seekg(isp);
+        throw InvalidParameter("an integer is expected");
     }
-    // declare error, if there is no spacing character:
-    is.seekg(isp);
-    throw InvalidParameter("an integer is expected");
+    var = num;
+    return true;
 }
 
 
@@ -308,7 +308,7 @@ bool Tokenizer::get_integer(std::string& arg, long& val)
     char * end;
     errno = 0;
     long num = strtol(ptr, &end, 10);
-    if ( !errno && end > ptr && isspace(*end) )
+    if ( !errno && end > ptr && ( *end==0 || isspace(*end) ))
     {
         val = num;
         // skip any additional space characters:
@@ -331,7 +331,7 @@ bool Tokenizer::get_integer(std::string& arg, unsigned long& val)
     char * end;
     errno = 0;
     unsigned long num = strtoul(ptr, &end, 10);
-    if ( !errno && end > ptr && isspace(*end) )
+    if ( !errno && end > ptr && ( *end==0 || isspace(*end) ))
     {
         val = num;
         // skip any additional space characters:
