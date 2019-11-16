@@ -489,7 +489,7 @@ void Fiber::severNow()
                 }
                 catch ( Exception & e )
                 {
-                    e << ", when cutting fiber " << reference();
+                    e << "while cutting fiber " << reference();
                     throw;
                 }
             
@@ -1769,7 +1769,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
         }
         catch( Exception & e ) {
-            e << ", Reading Lattice for " << reference();
+            e << "reading Lattice for " << reference();
             throw;
         }
     }

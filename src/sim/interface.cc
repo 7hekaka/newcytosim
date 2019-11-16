@@ -815,7 +815,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
             simul.prop->clear_trajectory = false;
         }
         if ( has_code )
-            evaluate(code, ", in run:code");
+            evaluate(code, "in run:code");
 
         delta = real(nb_steps) / real(nb_frames);
         check = (int)delta;
@@ -834,7 +834,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
                 simul.writeObjects(TRAJECTORY, true, binary);
                 reportCPUtime(frame, simul.time());
                 if ( has_code )
-                    evaluate(code, ", in run:write:code");
+                    evaluate(code, "in run:write:code");
                 simul.unrelax();
             }
             if ( sss >= nb_steps )
@@ -847,7 +847,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
         simul.step();
         (simul.*solveFunc)();
         
-        ++sss;
+        sss+=4;
     }
 #ifdef BACKWARD_COMPATIBILITY
     if ( event )
@@ -867,7 +867,7 @@ void Interface::execute_run(size_t nb_steps)
     VLOG("-RUN START " << nb_steps << '\n');
     simul.prepare();
     
-    for ( size_t sss = 0; sss < nb_steps; ++sss )
+    for ( size_t sss = 0; sss < nb_steps; sss+=4 )
     {
         hold();
         //fprintf(stderr, "> step %6i\n", sss);
