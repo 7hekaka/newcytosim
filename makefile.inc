@@ -70,7 +70,7 @@ ALIGN  := -malign-double -falign-loops -falign-jumps -falign-functions
 ALIGN  :=
 
 # options concerning warnings:
-WARN   := -Wundef -Wall -Wno-unknown-pragmas# -Wno-unused -Wconversion
+WARN   := -Wundef -Wall -Wno-unknown-pragmas #-Wconversion -Wno-unused
 
 ifeq ($(MACHINE),mac)
     LIBTOOL := /usr/bin/libtool -static -o
@@ -85,7 +85,7 @@ ifeq ($(COMPILER),gcc)
 
 # Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2)
 # You can use g++-9 to support Intel OMP directives
-    CXX      := g++-9 -Wfatal-errors -Wno-deprecated-declarations
+    CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
     FAST     :=-O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
     FAST     :=-O3 -fno-trapping-math -ffast-math -funroll-loops -march=native -ffp-contract=fast
 
