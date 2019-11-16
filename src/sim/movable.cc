@@ -235,7 +235,6 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
                 throw InvalidParameter("you must specify a radius R >= 0 in `circle R T`");
             if ( T < 0 )
                 throw InvalidParameter("the thickness T must be >= 0 in `circle R T`");
-            //StreamFunc::mark_line(std::cout, is, is.tellg(), ">>>>");
 #if ( DIM >= 3 )
             Vector2 XY = Vector2::randU(R);
             return Vector3(XY.XX, XY.YY, 0) + (0.5*T) * Vector3::randU();
@@ -516,6 +515,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
                 int c = is.peek();
                 if ( c=='a' || c=='b' )
                     continue;
+                is.seekg(1, std::ios_base::cur);
 #endif
                 break;
                 //throw InvalidParameter("unexpected `"+tok+"'");
@@ -742,17 +742,6 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
                 // unget last token
                 is.clear();
                 is.seekg(isp);
-#if 1
-                /*
-                We need to work around a bug in the stream extraction operator,
-                which eats extra characters ('a','n','e','E') if a double is read
-                19.10.2015
-                */
-                is.seekg(-1, std::ios_base::cur);
-                int c = is.peek();
-                if ( c=='a' || c=='b' )
-                    continue;
-#endif
                 break;
                 //throw InvalidParameter("unexpected `"+tok+"'");
             }

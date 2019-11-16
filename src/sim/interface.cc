@@ -147,12 +147,11 @@ bool has_trail(std::istream& is)
 }
 
 /// report warning
-void warn_trail(std::istream& is, std::string const& msg)
+void warn_trail(std::istream& is)
 {
     std::string str;
     std::getline(is, str);
-    std::cerr << "Error: unexpected tokens `" << str;
-    throw InvalidSyntax("syntax error `"+msg+"'");
+    throw InvalidSyntax("unexpected tokens `"+str+"'");
 }
 
 /**
@@ -174,7 +173,7 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         iso.mov = Movable::readPosition(iss, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "position = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
     }
     else if ( spc )
     {
@@ -186,13 +185,13 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         iso.rot = Movable::readRotation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
     }
     else if ( opt.set(str, "direction") )
     {
         std::istringstream iss(str);
         Vector vec = Movable::readDirection(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "direction = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
         iso.rot = Rotation::randomRotationToVector(vec);
     }
     else
@@ -203,7 +202,7 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         Rotation rot = Movable::readRotation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
         iso.rotate(rot);
     }
     
