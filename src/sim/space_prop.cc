@@ -150,6 +150,7 @@ Space * SpaceProp::newSpace() const
     std::cerr << "Warning: substituting unbounded Space for unknown `"+s+"'\n";
     return new Space(this);
 #endif
+    throw InvalidParameter("unknown space:shape `"+s+"'");
     return nullptr;
 }
 
