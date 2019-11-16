@@ -120,7 +120,7 @@ namespace LinearSolvers
     }
     
     
-    /// Bi-Conjugate Gradient Stabilized with Preconditionning
+    /// Bi-Conjugate Gradient Stabilized with right-sided Preconditionning
     /*
      This solves `mat * x = rhs` with a tolerance specified in 'monitor'
      */
