@@ -847,7 +847,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
         simul.step();
         (simul.*solveFunc)();
         
-        sss+=4;
+        ++sss;
     }
 #ifdef BACKWARD_COMPATIBILITY
     if ( event )
@@ -867,7 +867,7 @@ void Interface::execute_run(size_t nb_steps)
     VLOG("-RUN START " << nb_steps << '\n');
     simul.prepare();
     
-    for ( size_t sss = 0; sss < nb_steps; sss+=4 )
+    for ( size_t sss = 0; sss < nb_steps; ++sss )
     {
         hold();
         //fprintf(stderr, "> step %6i\n", sss);
