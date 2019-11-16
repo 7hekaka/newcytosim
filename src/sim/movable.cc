@@ -743,7 +743,6 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
                 is.clear();
                 is.seekg(isp);
                 break;
-                //throw InvalidParameter("unexpected `"+tok+"'");
             }
         }
     }

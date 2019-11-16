@@ -51,11 +51,12 @@ int main(int argc, char* argv[])
     std::string what = argv[1];
     
     Glossary arg;
-    arg.read_strings(argc-2, argv+2);
-
     Simul simul;
     FrameReader reader;
-    
+
+    if ( arg.read_strings(argc-2, argv+2) )
+        return EXIT_FAILURE;
+
     try
     {
         simul.loadProperties();

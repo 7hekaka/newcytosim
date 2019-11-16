@@ -211,8 +211,9 @@ int main(int argc, char* argv[])
         ++n;
     }
      
-    arg.read_strings(argc-n, argv+n);
-    
+    if ( arg.read_strings(argc-n, argv+n) )
+        return EXIT_FAILURE;
+
     arg.set(mag,    "mag");
     arg.set(pix,    "pix");
     arg.set(bck,    "back");
