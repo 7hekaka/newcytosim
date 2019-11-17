@@ -467,8 +467,8 @@ void Space::read_data(Inputter& in, real len[8], std::string const& expected)
     // compare with expected shape:
     if ( str.compare(0, expected.size(), expected) )
     {
-        InvalidIO e("space:shape mismatch");
-        e << "found space:shape `" << str << "' in file but `" << expected << "' was expected";
+        InvalidIO e("shape mismatch\n");
+        e << "found shape `" << str << "' in file but `" << expected << "' was expected";
         throw e;
     }
     
