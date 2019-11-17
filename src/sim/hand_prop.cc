@@ -154,7 +154,7 @@ void HandProp::clear()
     unbinding_force    = INFINITY;
     unbinding_force_inv = 0;
 
-    bind_also_end      = 0;
+    bind_also_end      = NO_END;
     bind_only_end      = NO_END;
     bind_end_range     = 0;
 #if NEW_BIND_ONLY_FREE_END

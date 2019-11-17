@@ -37,7 +37,7 @@ set hand kinesin
     unloaded_speed = 0.8
     stall_force = 5
 
-    bind_also_end = 1
+    bind_also_end = plus_end
     hold_growing_ends = 0.999
 
     display = ( color=green; size=7; width=7; )
@@ -57,7 +57,7 @@ set hand dynein
     unloaded_speed = -0.8
     stall_force = 5
 
-    bind_also_end = 1
+    bind_also_end = plus_end
     hold_growing_ends = 0.999
 
     display = ( color=light_blue; size=7; width=7; )

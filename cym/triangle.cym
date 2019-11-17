@@ -70,7 +70,7 @@ new filament
 
 new 32 complex
 {
-    attach1 = flament
+    attach1 = filament
 }
 
 % give some time to allow for binding
