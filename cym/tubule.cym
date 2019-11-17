@@ -4,6 +4,7 @@
 
 set simul system
 {
+    dim = 3
     steric = 0, 100
     time_step = 0.001
     viscosity = 1
@@ -118,7 +119,7 @@ new 1000 complex
 
 run 1000 system
 {
-	solve = 1
+    solve = 1
     nb_frames = 100
 }
 

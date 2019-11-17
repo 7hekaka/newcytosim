@@ -32,13 +32,13 @@ set fiber actin
     rigidity = 0.1          % usual rigidity of actin is 0.06
     segmentation = 0.1      % precision at which filaments are calculated
     confine = inside, 100   % confinement inside cell, stiffness of confinement
-	hydrodynamic_radius = 0.005
+    hydrodynamic_radius = 0.005
 
-	activity = classic
-	growing_speed = 0.1     % guess, but average_length = growing_speed / catastrophe_rate 
-	shrinking_speed = -0.5  % guess, but should be higher than 'growing_speed'
-	catastrophe_rate = 0.1  % guess, defines lifetime of filament
-	persistent = 0
+    activity = classic
+    growing_speed = 0.1     % guess, but average_length = growing_speed / catastrophe_rate
+    shrinking_speed = -0.5  % guess, but should be higher than 'growing_speed'
+    catastrophe_rate = 0.1  % guess, defines lifetime of filament
+    persistent = 0
     display = ( width=1; )
 }
 
@@ -82,7 +82,7 @@ new 50 melanosome
 % the integer before 'mel_myosin' is the number of myosin per melanosome
 % these numbers are guessed
     sphere1 = center, 0.25, 2 mel_nucleator, 15 mel_myosin
-	position = disc 1      % placed initially near the center
+    position = disc 1      % placed initially near the center
 }
 
 run system

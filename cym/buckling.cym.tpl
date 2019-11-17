@@ -27,7 +27,7 @@ set hand binder
 {
     binding = 10, 0.05
     unbinding = 0, inf
-	bind_also_end = 1
+    bind_also_end = 1
 }
 
 set single link
