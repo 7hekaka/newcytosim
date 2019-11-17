@@ -150,13 +150,13 @@ void OrganizerSet::report(std::ostream& os) const
         os << '\n' << title();
         for ( Property * i : simul.properties.find_all("aster", "bundle") )
         {
-            unsigned cnt = count(match_property, i);
+            size_t cnt = count(match_property, i);
             os << '\n' << std::setw(10) << cnt << " " << i->name();
             ++total;
         }
         for ( Property * i : simul.properties.find_all("nucleus", "fake") )
         {
-            unsigned cnt = count(match_property, i);
+            size_t cnt = count(match_property, i);
             os << '\n' << std::setw(10) << cnt << " " << i->name();
             ++total;
         }

@@ -62,7 +62,7 @@ protected:
     static void       prune(NodeList const&, ObjectFlag f, ObjectFlag g);
     
     /// collect objects from NodeList for which func(obj, val) == true
-    static unsigned   count(NodeList const&, bool (*func)(Object const*, void const*), void const*);
+    static size_t     count(NodeList const&, bool (*func)(Object const*, void const*), void const*);
 
     /// collect all objects
     static ObjectList collect(NodeList const&);
@@ -183,7 +183,7 @@ public:
     //--------------------------
     
     /// number of objects for which ( func(obj, val) == true )
-    virtual unsigned   count(bool (*func)(Object const*, void const*), void const*) const;
+    virtual size_t     count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// collect all objects
     virtual ObjectList collect() const;

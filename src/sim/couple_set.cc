@@ -524,7 +524,7 @@ void CoupleSet::report(std::ostream& os) const
         for ( Property * i : plist )
         {
             CoupleProp * p = static_cast<CoupleProp*>(i);
-            unsigned cnt = count(match_property, p);
+            size_t cnt = count(match_property, p);
             os << '\n' << std::setw(10) << cnt << " " << p->name();
             os << " ( " << p->hand1 << " | " << p->hand2 << " )";
         }
@@ -554,12 +554,12 @@ ObjectList CoupleSet::collect(bool (*func)(Object const*, void const*), void con
 }
 
 
-unsigned CoupleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
+size_t CoupleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    unsigned ff = ObjectSet::count(ffList, func, arg);
-    unsigned af = ObjectSet::count(afList, func, arg);
-    unsigned fa = ObjectSet::count(faList, func, arg);
-    unsigned aa = ObjectSet::count(aaList, func, arg);
+    size_t ff = ObjectSet::count(ffList, func, arg);
+    size_t af = ObjectSet::count(afList, func, arg);
+    size_t fa = ObjectSet::count(faList, func, arg);
+    size_t aa = ObjectSet::count(aaList, func, arg);
     return ff + af + fa + aa;
 }
 

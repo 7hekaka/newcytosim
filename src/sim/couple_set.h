@@ -185,7 +185,7 @@ public:
     ObjectList   collect(bool (*func)(Object const*, void const*), void const*) const;
     
     /// number of objects for which func(this, val) == true
-    unsigned     count(bool (*func)(Object const*, void const*), void const*) const;
+    size_t       count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// erase all Object and all Property
     void         erase();

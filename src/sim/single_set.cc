@@ -334,7 +334,7 @@ void SingleSet::report(std::ostream& os) const
         for ( Property * i : plist )
         {
             SingleProp * p = static_cast<SingleProp*>(i);
-            unsigned cnt = count(match_property, p);
+            size_t cnt = count(match_property, p);
             os << '\n' << std::setw(10) << cnt << ' ' << p->name();
             os << " ( " << p->hand << " )";
         }
@@ -360,10 +360,10 @@ ObjectList SingleSet::collect(bool (*func)(Object const*, void const*), void con
 }
 
 
-unsigned SingleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
+size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    unsigned f = ObjectSet::count(fList, func, arg);
-    unsigned a = ObjectSet::count(aList, func, arg);
+    size_t f = ObjectSet::count(fList, func, arg);
+    size_t a = ObjectSet::count(aList, func, arg);
     return f + a;
 }
 

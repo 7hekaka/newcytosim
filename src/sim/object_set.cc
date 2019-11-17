@@ -342,10 +342,10 @@ Object * ObjectSet::findObject(Property const* prop) const
 }
 
 
-unsigned ObjectSet::count(const NodeList & list,
-                          bool (*func)(Object const*, void const*), void const* arg)
+size_t ObjectSet::count(const NodeList & list,
+                        bool (*func)(Object const*, void const*), void const* arg)
 {
-    unsigned res = 0;
+    size_t res = 0;
     Node const* n = list.front();
     while ( n )
     {
@@ -400,7 +400,7 @@ ObjectList ObjectSet::collect(Property * prop) const
 }
 
 
-unsigned ObjectSet::count(bool (*func)(Object const*, void const*), void const* arg) const
+size_t ObjectSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
     return count(nodes, func, arg);
 }

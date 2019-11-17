@@ -202,9 +202,9 @@ Inventoried* Inventory::next(Inventoried const* i) const
 }
 
 //------------------------------------------------------------------------------
-unsigned Inventory::count() const
+size_t Inventory::count() const
 {
-    unsigned cnt = 0;
+    size_t cnt = 0;
     for ( ObjectID n = 0; n < allocated_; ++n )
         if ( byNames[n] ) ++cnt;
     return cnt;

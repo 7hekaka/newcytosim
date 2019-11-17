@@ -133,7 +133,7 @@ public:
     ObjectList    collect(bool (*func)(Object const*, void const*), void const*) const;
 
     /// collect objects for which func(obj, val) == true
-    unsigned      count(bool (*func)(Object const*, void const*), void const*) const;
+    size_t        count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// erase all Object and all Property
     void          erase();
