@@ -220,10 +220,10 @@ Mecable* Simul::toMecable(Object * obj)
  */
 Mecable * Simul::findMecable(const std::string& arg) const
 {
-    Object  * obj = fibers.findObject(arg);
-    if (!obj) obj = solids.findObject(arg);
-    if (!obj) obj = spheres.findObject(arg);
-    if (!obj) obj = beads.findObject(arg);
+    Object  * obj = fibers.findObject(arg, fibers.title());
+    if (!obj) obj = solids.findObject(arg, solids.title());
+    if (!obj) obj = spheres.findObject(arg, spheres.title());
+    if (!obj) obj = beads.findObject(arg, beads.title());
     return static_cast<Mecable*>(obj);
 }
 
