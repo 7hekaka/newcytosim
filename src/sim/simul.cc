@@ -300,21 +300,21 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 ObjectSet * Simul::findSet(const std::string& cat)
 {
     //std::clog << "findSet("<<kind<<")"<<std::endl;
-    if ( cat == "space" )        return &spaces;
-    if ( cat == "field" )        return &fields;
-    if ( cat == "fiber" )        return &fibers;
-    if ( cat == "bead" )         return &beads;
-    if ( cat == "solid" )        return &solids;
-    if ( cat == "sphere" )       return &spheres;
-    if ( cat == "single" )       return &singles;
-    if ( cat == "couple" )       return &couples;
-    if ( cat == "tubule" )       return &tubules;
-    if ( cat == "organizer" )    return &organizers;
-    if ( cat == "aster" )        return &organizers;
-    if ( cat == "bundle" )       return &organizers;
-    if ( cat == "nucleus" )      return &organizers;
-    if ( cat == "fake" )         return &organizers;
-    if ( cat == "event" )        return &events;
+    if ( cat == spaces.title() )     return &spaces;
+    if ( cat == fields.title() )     return &fields;
+    if ( cat == fibers.title() )     return &fibers;
+    if ( cat == beads.title() )      return &beads;
+    if ( cat == solids.title() )     return &solids;
+    if ( cat == spheres.title() )    return &spheres;
+    if ( cat == singles.title() )    return &singles;
+    if ( cat == couples.title() )    return &couples;
+    if ( cat == tubules.title() )    return &tubules;
+    if ( cat == organizers.title() ) return &organizers;
+    if ( cat == "aster" )            return &organizers;
+    if ( cat == "bundle" )           return &organizers;
+    if ( cat == "nucleus" )          return &organizers;
+    if ( cat == "fake" )             return &organizers;
+    if ( cat == events.title() )     return &events;
     return nullptr;
 }
 
