@@ -150,8 +150,11 @@ bool has_trail(std::istream& is)
 void warn_trail(std::istream& is)
 {
     std::string str;
+    std::streampos pos = is.tellg();
     std::getline(is, str);
-    throw InvalidSyntax("unexpected tokens `"+str+"'");
+    InvalidSyntax e("unexpected tokens `"+str+"'");
+    e << "in `" << StreamFunc::get_line(is, pos) << "'";
+    throw e;
 }
 
 /**
