@@ -33,7 +33,7 @@ SpacePolygon::~SpacePolygon()
  */
 void SpacePolygon::resize(Glossary& opt)
 {
-    int ord = 6;
+    size_t ord = 6;
     std::string file;
     
     if ( opt.set(file, "file") )

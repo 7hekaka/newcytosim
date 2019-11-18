@@ -507,7 +507,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             // info line "#format 48 dim 2"
             else if ( tok == "format" )
             {
-                int d = 0, f = 0;
+                unsigned d = 0, f = 0;
                 iss >> f >> tok >> d;
                 in.formatID(f);
                 in.vectorSize(d);
@@ -524,7 +524,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 // old format info line "#time 14.000000, dim 2, format 47"
                 if ( iss.get() == ',' )
                 {
-                    int i = 0;
+                    unsigned i = 0;
                     iss >> tok >> i;
                     if ( tok == "dim" )
                     {
@@ -582,7 +582,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     }
                     else
                     {
-                        int pi = 0;
+                        size_t pi = 0;
                         if ( tag!='i'  &&  ( tag!='m' || in.formatID()!=31 ))
                             pi = in.readUInt16();
                         obj = set->newObject(tolower(tag), pi);

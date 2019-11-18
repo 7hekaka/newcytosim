@@ -16,13 +16,13 @@
 
 //-------all purpose allocation function:
 
-void SolverC::allocate(int dim,
+void SolverC::allocate(size_t dim,
                        real** vec1, real** vec2, real** vec3, real** vec4,
                        real** vec5, real** vec6, real** vec7, real** vec8)
 {
     real ** vec[] = { vec1, vec2, vec3, vec4, vec5, vec6, vec7, vec8 };
     
-    for ( int ii = 0; ii < 8; ++ii )
+    for ( size_t ii = 0; ii < 8; ++ii )
     {
         if ( vec[ii] )
         {
@@ -38,7 +38,7 @@ void SolverC::release(real** vec1, real** vec2, real** vec3, real** vec4,
 {
     real* * vec[] = { vec1, vec2, vec3, vec4, vec5, vec6, vec7, vec8 };
     
-    for ( int ii = 0; ii < 8; ++ii )
+    for ( size_t ii = 0; ii < 8; ++ii )
     {
         if ( vec[ii] )
             free_real(*vec[ii]);
