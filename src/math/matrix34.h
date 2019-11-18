@@ -949,7 +949,7 @@ public:
     static Matrix34 rotationAroundZ(real angle);
     
     /// a rotation around one the axis X if `x==0`, Y if `x==1` or Z if `x==2`
-    static Matrix34 rotationAroundPrincipalAxis(unsigned x, real angle);
+    static Matrix34 rotationAroundPrincipalAxis(size_t x, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix34 rotationToVector(const Vector3&);
