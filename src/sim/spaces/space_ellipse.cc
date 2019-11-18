@@ -19,7 +19,7 @@ SpaceEllipse::SpaceEllipse(SpaceProp const* p)
 
 void SpaceEllipse::update()
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
         lengthSqr_[d] = square(length_[d]);
     
 #if ( DIM > 2 ) && defined HAS_SPHEROID
@@ -39,7 +39,7 @@ void SpaceEllipse::update()
 
 void SpaceEllipse::resize(Glossary& opt)
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "diameter", d) || opt.set(len, "length", d) )

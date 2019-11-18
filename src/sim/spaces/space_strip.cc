@@ -20,7 +20,7 @@ SpaceStrip::SpaceStrip(SpaceProp const* p)
 
 void SpaceStrip::resize(Glossary& opt)
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "length", d) )
@@ -43,7 +43,7 @@ void SpaceStrip::resize(Glossary& opt)
 Modulo * SpaceStrip::makeModulo() const
 {
     Modulo * mod = new Modulo();
-    for ( int d = 0; d < DIM-1; ++d )
+    for ( unsigned d = 0; d < DIM-1; ++d )
         mod->enable(d, length_[d]);
     return mod;
 }

@@ -16,7 +16,7 @@ SpacePeriodic::SpacePeriodic(SpaceProp const* p)
 
 void SpacePeriodic::resize(Glossary& opt)
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "length", d) )
@@ -31,7 +31,7 @@ void SpacePeriodic::resize(Glossary& opt)
 Modulo * SpacePeriodic::makeModulo() const
 {
     Modulo * mod = new Modulo();
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
         mod->enable(d, length_[d]);
     return mod;
 }
