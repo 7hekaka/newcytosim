@@ -44,7 +44,7 @@ unsigned FiberGrid::setGrid(Space const* space, real max_step)
     
     size_t n_cell[3] = { 1, 1, 1 };
     
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / max_step;
         
@@ -363,7 +363,7 @@ FiberSegment FiberGrid::closestSegment(Vector const& place) const
 /// used for debugging
 unsigned mingle(FiberSegment const& seg)
 {
-    return ( seg.fiber()->identity() << 10 ) | seg.point();
+    return ( seg.fiber()->identity() << 16 ) | seg.point();
 }
 
 /**
@@ -441,8 +441,8 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
         //report for all the segments that were targeted:
         for ( auto const& hit : hits )
         {
-            ObjectID id = hit.first >> 10;
-            int pt = hit.first & 1023;
+            ObjectID id = hit.first >> 16;    // opposite of mingle()
+            unsigned pt = hit.first & 65535;  // opposite of mingle()
             Fiber const* fib = set.findID(id);
             FiberSegment seg(fib, pt);
             real dis = INFINITY;
