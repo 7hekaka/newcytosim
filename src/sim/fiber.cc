@@ -527,7 +527,7 @@ size_t Fiber::hasKink(const real max_cosine) const
 }
 
 
-void Fiber::planarCut(Vector const& n, const real a, int stateP, int stateM)
+void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
 {
     Array<real> cuts;
     
@@ -1169,7 +1169,7 @@ size_t Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
 //------------------------------------------------------------------------------
 #pragma mark - Dynamic ends
 
-unsigned Fiber::dynamicState(FiberEnd end) const
+state_t Fiber::dynamicState(FiberEnd end) const
 {
     if ( end == PLUS_END )
         return dynamicStateP();
@@ -1180,7 +1180,7 @@ unsigned Fiber::dynamicState(FiberEnd end) const
 }
 
 
-void Fiber::setDynamicState(const FiberEnd end, const unsigned s)
+void Fiber::setDynamicState(const FiberEnd end, const state_t s)
 {
     if ( end == PLUS_END )
         setDynamicStateP(s);
