@@ -957,7 +957,6 @@ public:
     /// return a random rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     /**
      In 3D, this rotation is chosen uniformly among all the rotation transforming (1,0,0) into `vec`.
-     The function will fail if ( vec == 0 ).
      */
     static Matrix34 randomRotationToVector(const Vector3&);
     
