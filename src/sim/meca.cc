@@ -1412,7 +1412,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
      'vSOL' is `Xnew - Xold`, the solution to the system
  
  */
-void Meca::solve(SimulProp const* prop, const int precond)
+void Meca::solve(SimulProp const* prop, const unsigned precond)
 {
     assert_true( time_step == prop->time_step );
     
@@ -1763,7 +1763,7 @@ size_t Meca::nbNonZeros(real threshold) const
     zero_real(dim, src);
     
     size_t cnt = 0;
-    for ( size_t j = 0; j < dim; ++j )
+    for ( unsigned j = 0;  j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, dst);
@@ -1793,7 +1793,7 @@ void Meca::getSystem(size_t dim, real * mat) const
     zero_real(dim, src);
     zero_real(dim, res);
     
-    for ( size_t j = 0; j < dim; ++j )
+    for ( unsigned j = 0;  j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, res);

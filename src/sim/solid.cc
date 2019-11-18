@@ -198,7 +198,7 @@ size_t Solid::allocateMecable(const size_t nbp)
             for ( size_t p = 0; p < nPoints; ++p )
             {
                 rad[p] = soRadius[p];
-                for ( int d = 0; d < DIM; ++d )
+                for ( unsigned d = 0; d < DIM; ++d )
                     shp[DIM*p+d] = soShape[DIM*p+d];
             }
             // delete the 'current' array:
@@ -599,7 +599,7 @@ void Solid::fixShape()
     // set reference to current shape translated to be centered:
     for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
             soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
     
@@ -620,7 +620,7 @@ void Solid::scaleShape(const real scale[DIM])
     //scale in only in the specified dimension
     for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
             soShape[DIM*p+d] *= scale[d];
     }
     
@@ -655,7 +655,7 @@ void Solid::rescale()
         for ( size_t p = 0; p < nPoints; ++p )
         {
             real * pos = pPos + DIM * p;
-            for ( int d = 0; d < DIM; ++d )
+            for ( unsigned d = 0; d < DIM; ++d )
                 pos[d] = scale * ( pos[d] - avg[d] ) + avg[d];
         }
     }

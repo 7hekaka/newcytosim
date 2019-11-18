@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
                 // if EOF is reached, reload last frame in file:
                 thread.loadLastFrame();
                 if ( thread.hasFrame() )
-                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << '\n';
+                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << ' ';
             }
             frm = thread.currentFrame();
         }

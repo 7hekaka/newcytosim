@@ -21,10 +21,10 @@ void Field::prepareDiffusion(real theta)
     
     for ( size_t c = 0; c < nbc; ++c )
     {
-        for ( int d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
         {
             size_t n = mGrid.next(c, d);
-                
+            
             if ( n != c )
             {
                 fiDiffusionMatrix(c, n) += theta;
@@ -60,7 +60,7 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
     {
         if ( domain[c] )
         {
-            for ( int d = 0; d < DIM; ++d )
+            for ( unsigned d = 0; d < DIM; ++d )
             {
                 size_t n = c + mGrid.stride(d);
                 
@@ -245,7 +245,7 @@ void Field::laplacian(const real* field, real * mat) const
         blas::xaxpy(nx, -1, field+nx*(yy-1)+ss*zz, 1, mat+nx*(yy  )+ss*zz, 1);
         blas::xaxpy(nx, -1, field+nx*(yy  )+ss*zz, 1, mat+nx*(yy-1)+ss*zz, 1);
     }
-    int yy = mGrid.breadth(1) - 1;
+    size_t yy = mGrid.breadth(1) - 1;
     
     if ( prop->periodic )
     {

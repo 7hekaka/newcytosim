@@ -535,11 +535,11 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
      The cuts should be processed in order of decreasing abscissa,
      hence we check intersections from PLUS_END to MINUS_END
     */
-    for ( long s = lastSegment(); s >=0 ; --s )
+    for ( size_t s = nbSegments(); s >0 ; --s )
     {
-        real abs = planarIntersect(s, n, a);
+        real abs = planarIntersect(s-1, n, a);
         if ( 0 <= abs  &&  abs < 1 )
-            cuts.push_back(abscissaPoint(s+abs));
+            cuts.push_back(abscissaPoint(s-1+abs));
     }
     
     for ( real s : cuts )

@@ -546,7 +546,7 @@ public:
     void prepare(SimulProp const*);
     
     /// Calculate motion of all Mecables in the system
-    void solve(SimulProp const*, int precondition);
+    void solve(SimulProp const*, unsigned precondition);
     
     /// transfer newly calculated point coordinates back to Mecables
     void apply();

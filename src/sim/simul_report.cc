@@ -25,7 +25,7 @@ int column_width = 10;
 /// pad string by adding white-space on the right up to size 'n * column_width - p'
 std::string ljust(std::string const& str, unsigned n, unsigned p = 0)
 {
-    size_t s = n * column_width - p;
+    size_t s = n * (unsigned)column_width - p;
     if ( str.size() < s )
         return str + std::string(s-str.size(), ' ');
     else
@@ -35,7 +35,7 @@ std::string ljust(std::string const& str, unsigned n, unsigned p = 0)
 /// pad string by adding white-space on the left up to size 'n * column_width - p'
 std::string rjust(std::string const& str, unsigned n, unsigned p = 1)
 {
-    size_t s = n * column_width - p;
+    size_t s = n * (unsigned)column_width - p;
     if ( str.size() < s )
         return std::string(s-str.size(), ' ') + str;
     else
@@ -43,7 +43,7 @@ std::string rjust(std::string const& str, unsigned n, unsigned p = 1)
 }
 
 /// repeat string DIM times with X, Y, Z endings as appropriate
-std::string repeatXYZ(std::string const& str, size_t s = column_width)
+std::string repeatXYZ(std::string const& str)
 {
     std::string res(rjust(str+"X", 1, 1));
 #if ( DIM > 1 )
@@ -1937,7 +1937,7 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
 {
     const size_t IMAX = 8;
     const size_t BMAX = 256;
-    int  cnt[IMAX][BMAX+1];
+    size_t cnt[IMAX][BMAX+1];
 
     real delta = 0.5;
     size_t nbin = 64;
@@ -1946,8 +1946,8 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
     nbin = std::min(nbin, BMAX);
 
     // reset counts:
-    for ( unsigned ii = 0; ii <  IMAX; ++ii )
-    for ( unsigned jj = 0; jj <= nbin; ++jj )
+    for ( size_t ii = 0; ii <  IMAX; ++ii )
+    for ( size_t jj = 0; jj <= nbin; ++jj )
         cnt[ii][jj] = 0;
     
     // accumulate counts:
@@ -1972,16 +1972,16 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
             out << " " << std::setw(5) << delta * ( u + 0.5 );
     }
     
-    for ( unsigned ii = 0; ii < IMAX; ++ii )
+    for ( size_t ii = 0; ii < IMAX; ++ii )
     {
-        unsigned sum = 0;
-        for ( unsigned jj = 0; jj <= nbin; ++jj )
+        size_t sum = 0;
+        for ( size_t jj = 0; jj <= nbin; ++jj )
             sum += cnt[ii][jj];
         if ( sum )
         {
             Property const* ip = properties.find_or_die("couple", ii);
             out << LIN << ljust(ip->name(), 2);
-            for ( unsigned jj = 0; jj <= nbin; ++jj )
+            for ( size_t jj = 0; jj <= nbin; ++jj )
                 out << ' ' << std::setw(5) << cnt[ii][jj];
         }
     }
@@ -2252,7 +2252,7 @@ int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
             clusters.insert(ClusterInfo(c->first, c->second.size()));
     
     // consider clusters by decreasing size:
-    int idx = 0;
+    size_t idx = 0;
     for ( set_t::const_iterator cc = clusters.begin(); cc != clusters.end(); ++cc )
     {
         ++idx;
