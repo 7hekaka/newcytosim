@@ -34,10 +34,10 @@ private:
     real val[12];
     
     /// access to modifiable element by index
-    real& operator[](int i)       { return val[i]; }
+    real& operator[](size_t i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](int i) const { return val[i]; }
+    real  operator[](size_t i) const { return val[i]; }
 
 public:
     
@@ -46,7 +46,7 @@ public:
     /// copy constructor
     Matrix34(Matrix34 const& M)
     {
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] = M.val[u];
     }
 
@@ -94,13 +94,13 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( int u = 0; u < 4*3; ++u )
+        for ( unsigned u = 0;  u < 4*3; ++u )
             val[u] = 0.0;
     }
     
     bool operator != (real zero) const
     {
-        for ( int u = 0; u < 4*3; ++u )
+        for ( unsigned u = 0;  u < 4*3; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -183,9 +183,9 @@ public:
         std::ostringstream os;
         os.precision(p);
         os << "[";
-        for ( int i = 0; i < 3; ++i )
+        for ( unsigned i = 0;  i < 3; ++i )
         {
-            for ( int j = 0; j < 3; ++j )
+            for ( unsigned j = 0;  j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
             if ( i < 2 )
                 os << ";";
@@ -206,7 +206,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] *= alpha;
     }
 
@@ -220,7 +220,7 @@ public:
     const Matrix34 operator -() const
     {
         Matrix34 M;
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -229,7 +229,7 @@ public:
     const Matrix34 operator *(const real alpha) const
     {
         Matrix34 res;
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -244,7 +244,7 @@ public:
     const Matrix34 operator +(Matrix34 const& M) const
     {
         Matrix34 res;
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -253,7 +253,7 @@ public:
     const Matrix34 operator -(Matrix34 const& M) const
     {
         Matrix34 res;
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -266,7 +266,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(M.val+4)));
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
 #else
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -279,7 +279,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(M.val+4)));
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
 #else
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -296,8 +296,8 @@ public:
     Matrix34 transposed() const
     {
         Matrix34 res;
-        for ( int x = 0; x < 3; ++x )
-        for ( int y = 0; y < 3; ++y )
+        for ( unsigned x = 0;  x < 3; ++x )
+        for ( unsigned y = 0;  y < 3; ++y )
             res[y+4*x] = val[x+4*y];
         return res;
     }
@@ -573,7 +573,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #else
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] += src[u];
 #endif
     }
@@ -588,7 +588,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -602,7 +602,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #else
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -611,8 +611,8 @@ public:
     void sub_trans(Matrix34 const& M)
     {
         real const* src = M.val;
-        for ( int x = 0; x < 3; ++x )
-        for ( int y = 0; y < 3; ++y )
+        for ( unsigned x = 0;  x < 3; ++x )
+        for ( unsigned y = 0;  y < 3; ++y )
             val[y+4*x] -= src[x+4*y];
     }
     
@@ -620,8 +620,8 @@ public:
     void add_trans(Matrix34 const& M)
     {
         real const* src = M.val;
-        for ( int x = 0; x < 3; ++x )
-        for ( int y = 0; y < 3; ++y )
+        for ( unsigned x = 0;  x < 3; ++x )
+        for ( unsigned y = 0;  y < 3; ++y )
             val[y+4*x] += src[x+4*y];
     }
     
@@ -629,8 +629,8 @@ public:
     void add_trans(const real alpha, Matrix34 const& M)
     {
         real const* src = M.val;
-        for ( int x = 0; x < 3; ++x )
-        for ( int y = 0; y < 3; ++y )
+        for ( unsigned x = 0;  x < 3; ++x )
+        for ( unsigned y = 0;  y < 3; ++y )
             val[y+4*x] += alpha * src[x+4*y];
     }
 
@@ -643,11 +643,11 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] += src[u];
 #else
-        for ( int i = 0; i < 3; ++i )
-        for ( int j = i; j < 3; ++j )
+        for ( unsigned i = 0;  i < 3; ++i )
+        for ( unsigned j = i; j < 3; ++j )
             val[4*i+j] += src[4*i+j];
 #endif
     }
@@ -663,11 +663,11 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #elif ( 1 )
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] += alpha * src[u];
 #else
-        for ( int i = 0; i < 3; ++i )
-        for ( int j = i; j < 3; ++j )
+        for ( unsigned i = 0;  i < 3; ++i )
+        for ( unsigned j = i; j < 3; ++j )
             val[4*i+j] += alpha * src[4*i+j];
 #endif
     }
@@ -681,11 +681,11 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( int u = 0; u < 12; ++u )
+        for ( unsigned u = 0;  u < 12; ++u )
             val[u] -= src[u];
 #else
-        for ( int i = 0; i < 3; ++i )
-        for ( int j = i; j < 3; ++j )
+        for ( unsigned i = 0; i < 3; ++i )
+        for ( unsigned j = i; j < 3; ++j )
             val[4*i+j] -= src[4*i+j];
 #endif
     }
@@ -974,9 +974,9 @@ inline std::ostream& operator << (std::ostream& os, Matrix34 const& mat)
     int w = (int)os.width();
     os.width(1);
     os << "[";
-    for ( int i = 0; i < 3; ++i )
+    for ( unsigned i = 0;  i < 3; ++i )
     {
-        for ( int j = 0; j < 3; ++j )
+        for ( unsigned j = 0;  j < 3; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
         if ( i < 2 )
             os << ";";

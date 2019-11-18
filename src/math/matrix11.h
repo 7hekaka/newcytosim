@@ -20,10 +20,10 @@ private:
     real val_;
     
     /// access to modifiable element by index
-    real& operator[](int i)       { return val_; }
+    real& operator[](size_t i)       { return val_; }
     
     /// access element value by index
-    real  operator[](int i) const { return val_; }
+    real  operator[](size_t i) const { return val_; }
 
 public:
     

@@ -181,19 +181,19 @@ void PointsOnSphere::setForces( real forces[], real threshold )
         {
             //calculate vector and distance^2 between from jj to ii
             dist = 0;
-            for ( int dd = 0; dd < 3 ; ++dd )
+            for ( unsigned d = 0;  d < 3 ; ++d )
             {
-                dx[dd] = coord_[3*ii+dd] - coord_[3*jj+dd];
-                dist += dx[dd] * dx[dd];
+                dx[d] = coord_[3*ii+d] - coord_[3*jj+d];
+                dist += dx[d] * dx[d];
             }
             
             if ( dist == 0 )
             {   //if ii and jj overlap, we use a random force
-                for ( int dd = 0 ; dd < 3; ++dd )
+                for ( size_t d = 0 ; d < 3; ++d )
                 {
-                    dx[dd] = 0.1 * RNG.sreal();
-                    forces[3*ii+dd] += dx[dd];
-                    forces[3*jj+dd] -= dx[dd];
+                    dx[d] = 0.1 * RNG.sreal();
+                    forces[3*ii+d] += dx[d];
+                    forces[3*jj+d] -= dx[d];
                 }
             }
             else if ( dist < threshold )
@@ -202,11 +202,11 @@ void PointsOnSphere::setForces( real forces[], real threshold )
                 //force = vector / r^3, but here dist = r^2
                 dist = 1.0 / ( dist * sqrt(dist) );
                 //update forces for jj and ii:
-                for ( size_t dd = 0 ; dd < 3; ++dd )
+                for ( size_t d = 0 ; d < 3; ++d )
                 {
-                    dx[dd] *= dist;
-                    forces[3*ii+dd] += dx[dd];
-                    forces[3*jj+dd] -= dx[dd];
+                    dx[d] *= dist;
+                    forces[3*ii+d] += dx[d];
+                    forces[3*jj+d] -= dx[d];
                 }
             }
         }
@@ -222,11 +222,11 @@ void PointsOnSphere::setForces( real forces[], real threshold )
     for ( size_t ii = 0; ii < num_points_; ++ii )
     {
         dist = 0;
-        for ( int dd = 0; dd < 3; ++dd )
-            dist += coord_[3*ii+dd] * forces[3*ii+dd];
+        for ( unsigned d = 0;  d < 3; ++d )
+            dist += coord_[3*ii+d] * forces[3*ii+d];
         
-        for ( int dd = 0; dd < 3; ++dd )
-            forces[3*ii+dd] -= dist * coord_[3*ii+dd];
+        for ( unsigned d = 0;  d < 3; ++d )
+            forces[3*ii+d] -= dist * coord_[3*ii+d];
     }
 #endif
 }
