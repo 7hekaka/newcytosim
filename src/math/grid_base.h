@@ -261,14 +261,14 @@ public:
      the edges of the area are specified in dimension `d` by 'infs[d]' and 'sups[d]',
      and the number of cells by 'nbcells[d]'.
      */
-    void setDimensions(const real infs[ORD], real sups[ORD], const int nbcells[ORD])
+    void setDimensions(const real infs[ORD], real sups[ORD], const size_t cells[ORD])
     {
         nCells = 1;
         cVolume = 1;
         
         for ( unsigned d = 0; d < ORD; ++d )
         {
-            if ( nbcells[d] <= 0 )
+            if ( cells[d] <= 0 )
                 throw InvalidParameter("Cannot build grid as nbcells[] is <= 0");
             
             if ( infs[d] > sups[d] )
@@ -282,8 +282,8 @@ public:
                 throw InvalidParameter("Cannot build grid as sup[] == inf[]");
             
             gStride[d] = nCells;
-            nCells    *= nbcells[d];
-            gDim[d]    = nbcells[d];
+            nCells    *= cells[d];
+            gDim[d]    = cells[d];
             gInf[d]    = infs[d];
             gSup[d]    = sups[d];
             cWidth[d]  = ( gSup[d] - gInf[d] ) / real( gDim[d] );

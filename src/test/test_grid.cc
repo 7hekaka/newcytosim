@@ -18,9 +18,9 @@ using namespace gle;
 
 //area of the grid
 const int range = 5;
-real  left[] = {  -range,  -range,  0 };
-real right[] = {   range,   range,  1 };
-int   size[] = { 2*range,   range,  1 };
+real     left[] = {  -range,  -range,  0 };
+real    right[] = {   range,   range,  1 };
+size_t n_cell[] = { 2*range,   range,  1 };
 
 
 typedef Grid<real, DIM> grid_type;
@@ -195,14 +195,14 @@ void display(View&, int)
     if ( myGrid.hasRegions() )
     {
         int * offset = nullptr;
-        int nb = myGrid.getRegion(offset, cell_indx);
+        size_t nb = myGrid.getRegion(offset, cell_indx);
 
         glColor4f(1,1,1,0.7);
-        for ( int ii = 0; ii < nb; ++ii )
+        for ( size_t i = 0; i < nb; ++i )
         {
             Vector x;
-            myGrid.setPositionFromIndex(x, cell_indx+offset[ii], 0.4);
-            snprintf(str, sizeof(str), "%i", ii);
+            myGrid.setPositionFromIndex(x, cell_indx+offset[i], 0.4);
+            snprintf(str, sizeof(str), "%lu", i);
             gleDrawText(x, str, GLUT_BITMAP_HELVETICA_10);
         }
     }
@@ -219,9 +219,9 @@ void speedTest()
 {
     printf("Real test...");
 
-    real L[] = { 0, 0, 0};
-    real R[] = { 1, 1, 1};
-    int  S[] = { 10, 10, 10};
+    real   L[] = { 0, 0, 0};
+    real   R[] = { 1, 1, 1};
+    size_t S[] = { 10, 10, 10};
 
     Grid<float, 3> map;
     map.setDimensions(L, R, S);
@@ -258,9 +258,9 @@ void speedTest()
 
 void testInterpolate()
 {
-    real L[] = { 0, 0, 0};
-    real R[] = { 1, 1, 1};
-    int  S[] = { 100, 100, 100 };
+    real   L[] = { 0, 0, 0};
+    real   R[] = { 1, 1, 1};
+    size_t S[] = { 100, 100, 100 };
     
     const int MAX = 1 << 14;
     real  rand[MAX+3] = { 0 };
@@ -313,7 +313,7 @@ int main(int argc, char* argv[])
     }
 
     //initialize the grid:
-    myGrid.setDimensions(left, right, size);
+    myGrid.setDimensions(left, right, n_cell);
     myGrid.createCells();
     //myGrid.setPeriodic(0, true);
     //myGrid.setPeriodic(1, true);

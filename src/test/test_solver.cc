@@ -34,7 +34,7 @@ public:
     }
     
     /// allocate for given size
-    void allocate(int d)
+    void allocate(size_t d)
     {
         dim = d;
         free_real(mat);

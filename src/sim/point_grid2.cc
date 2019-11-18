@@ -25,7 +25,7 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
     Vector inf, sup;
     spc->boundaries(inf, sup);
     
-    int n_cell[3];
+    size_t n_cell[3] = { 1, 1, 1 };
     for ( int d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / min_step;
@@ -36,15 +36,13 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges
-            n_cell[d] = (int)floor(n);
-            if ( n_cell[d] <= 0 )
-                n_cell[d] = 1;
+            n_cell[d] = std::max((size_t)1, (size_t)floor(n));
             pGrid.setPeriodic(d, true);
         }
         else
         {
             //add a border in any dimension which is not periodic
-            n_cell[d] = (int)ceil(n) + 2;
+            n_cell[d] = (size_t)ceil(n) + 2;
             n = n_cell[d] * 0.5 * min_step;
             real mid = inf[d] + sup[d];
             inf[d] = mid - n;

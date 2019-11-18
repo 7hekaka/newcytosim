@@ -42,30 +42,28 @@ unsigned FiberGrid::setGrid(Space const* space, real max_step)
     Vector inf, sup;
     space->boundaries(inf, sup);
     
-    int n_cell[3] = { 1, 1, 1 };
+    size_t n_cell[3] = { 1, 1, 1 };
     
     for ( int d = 0; d < DIM; ++d )
     {
-        n_cell[d] = (int) ceil( ( sup[d] - inf[d] ) / max_step );
+        real n = ( sup[d] - inf[d] ) / max_step;
         
-        if ( n_cell[d] < 0 )
+        if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
-        
+
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges exactly
+            n_cell[d] = std::max((size_t)1, (size_t)ceil(n));
             fGrid.setPeriodic(d, true);
         }
         else
         {
             //extend the grid by one cell on each side
-            inf[d]    -= max_step;
-            sup[d]    += max_step;
-            n_cell[d] += 2;
+            n_cell[d] = (size_t)ceil(n) + 2;
+            inf[d]   -= max_step;
+            sup[d]   += max_step;
         }
-        
-        if ( n_cell[d] <= 0 )
-            n_cell[d] = 1;
     }
 
     //create the grid using the calculated dimensions:

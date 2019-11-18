@@ -250,7 +250,7 @@ public:
 #pragma mark -
     
     /// create a 1D-map
-    void create1D(real i, real s, int d)
+    void create1D(real i, real s, size_t d)
     {
         assert_true( ORD == 1 );
         GRID::setDimensions(&i, &s, &d);
