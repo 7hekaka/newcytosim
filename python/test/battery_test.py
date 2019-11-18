@@ -46,7 +46,7 @@ def run(file, executable):
         print('skipping  '+file)
         return
     shutil.copyfile(file, os.path.join(wdir, 'config.cym'))
-    print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '+name)
+    print(name.ljust(80, '-'))
     os.chdir(wdir)
     outfile = open("out.txt", 'w')
     errfile = open("err.txt", 'w')
