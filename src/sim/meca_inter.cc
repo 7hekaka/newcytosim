@@ -4072,7 +4072,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     add_block_diag(ii1, wbT*bR); //this term is symmetric but not diagonal
 
     if ( modulo )
-        pos += modulo->offset( pos - ptA.pos() );
+        pos += modulo->offset( ptA.pos() - pos );
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )
