@@ -358,8 +358,6 @@ void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y
 
 void add_rigidityE(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    real const* E = X + nbt + DIM;  //index to last point
-    
     const real R2 = R1 * 2;
     
     if ( nbt == DIM )
@@ -374,6 +372,7 @@ void add_rigidityE(const size_t nbt, const real* X, const real R1, real* Y)
     }
     else
     {
+        real const* E = X + nbt + DIM;  //index to last point
         const real R4 = R1 * 4;
         const real R6 = R1 * 6;
         
@@ -383,7 +382,7 @@ void add_rigidityE(const size_t nbt, const real* X, const real R1, real* Y)
         for ( size_t i = DIM*2; i < end; ++i )
             Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
         
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( int d = 0; d < DIM; ++d )
         {
             Y[    d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) - R4 * (X[d+DIM*2]-X[d+DIM]) - R2 * X[d];
             Y[nbt+d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) - R4 * (E[d-DIM*2]-E[d-DIM]) - R2 * E[d];
@@ -406,15 +405,40 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
         Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
     
     // special cases near the edges:
-    real      * Z = Y + nbt + DIM;
+    real      * Z = Y + nbt;
     real const* E = X + nbt + DIM;
+    #pragma ivdep
+    for ( int d = 0; d < DIM; ++d )
+    {
+        Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
+        Z[d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
+        Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Z[d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+    }
+}
+
+void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
+{
+    const real R6 = R1 * 6;
+    const real R4 = R1 * 4;
+    const real R2 = R1 * 2;
+
+    const size_t end = nbt;
+    #pragma ivdep
+    for ( size_t i = DIM*2; i < end; ++i )
+        Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
+    
+    // special cases near the edges:
+    real      * Z = Y + nbt;
+    real const* E = X + nbt + DIM;
+
     #pragma ivdep
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-        Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
-        Z[d-DIM] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
-        Z[d    ] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+        Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];
+        Z[d    ] -= R1 * ((E-DIM)[d]+(E-DIM*3)[d]) + R4 * ((E-DIM)[d]-(E-DIM*2)[d]) - R2 * E[d];
+        Y[d    ] -= R1 * ((X+DIM*2)[d]+X[d]) - R2 * (X+DIM)[d];
+        Z[d+DIM] -= R1 * ((E-DIM*2)[d]+E[d]) - R2 * (E-DIM)[d];
     }
 }
 
@@ -456,7 +480,9 @@ void testRigidity(size_t cnt)
     testRigidity(cnt, add_rigidity3,    "3  ");
     testRigidity(cnt, add_rigidityE,    "E  ");
     testRigidity(cnt, add_rigidityF,    "F  ");
-    testRigidity(cnt, add_rigidityE,    "E  ");
+    testRigidity(cnt, add_rigidityG,    "G  ");
+    testRigidity(cnt, add_rigidityF,    "F  ");
+    testRigidity(cnt, add_rigidityG,    "G  ");
 #if defined __SSE__ & ( DIM == 2 )
     testRigidity(cnt, add_rigidity_SSO, "SSO");
     testRigidity(cnt, add_rigidity_SSE, "SSE");
@@ -962,9 +988,9 @@ int main(int argc, char* argv[])
     setFilament(NBS+1, pos, 1.0, 2.0);
     setRandom(NBS+1, force, 1.0);
 
-    //testRigidity(1<<18);
-    testProjectionU(1<<20);
-    testProjectionD(1<<20);
+    testRigidity(1<<18);
+    //testProjectionU(1<<20);
+    //testProjectionD(1<<20);
 
     free_real(pos);
     free_real(diff, lagmul, force);
