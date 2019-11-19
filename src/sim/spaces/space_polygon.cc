@@ -282,7 +282,7 @@ bool SpacePolygon::draw() const
     glEnable(GL_STENCIL_TEST);
     glClearStencil(1);
     glClear(GL_STENCIL_BUFFER_BIT);
-    glStencilFunc(GL_EQUAL, 1, ~0);
+    glStencilFunc(GL_EQUAL, 1, ~0U);
     glStencilOp(GL_KEEP, GL_ZERO, GL_ZERO);
     
     //display points

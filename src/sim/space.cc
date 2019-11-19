@@ -465,11 +465,16 @@ void Space::read_data(Inputter& in, real len[8], std::string const& expected)
     }
     
     // compare with expected shape:
-    if ( str.compare(0, expected.size(), expected) )
+    if ( str != expected )
     {
+#if 0
         InvalidIO e("shape mismatch\n");
-        e << "found shape `" << str << "' in file but `" << expected << "' was expected";
+        e << "found `" << str << "' in file but `" << expected << "' was expected";
         throw e;
+#else
+        std::cerr << "Error: shape mismatch: ";
+        std::cerr << "found `" << str << "' in file but `" << expected << "' was expected\n";
+#endif
     }
     
     // read the dimensions:
