@@ -117,7 +117,7 @@ public:
     //-----------------------------DISPLAY--------------------------------------
   
     /// initialize display with given style
-    void setStyle(int);
+    void setStyle(unsigned);
 
     /// build message that appears on top
     std::string buildReport(std::string) const;

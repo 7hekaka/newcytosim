@@ -271,7 +271,7 @@ public:
         glClearColor(col_[0], col_[1], col_[2], col_[3]);
     }
     
-    static void no_emission(GLint face)
+    static void no_emission(GLenum face)
     {
         GLfloat blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(face, GL_EMISSION, blk);

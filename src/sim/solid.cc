@@ -337,7 +337,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             opt.set(rad, var, inx+1);
             
             if ( rad < 0 )
-                throw InvalidParameter("the radius of solid:sphere must be >= 0");
+                throw InvalidParameter("radius of solid:sphere must be >= 0");
 
             size_t fip = nPoints;
             str = opt.value(var, inx);
@@ -377,7 +377,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         opt.set(rad, var, 1);
         
         if ( rad <= 0 )
-            throw InvalidParameter("the radius of sphere specified in solid must be > 0");
+            throw InvalidParameter("radius of sphere specified in solid must be > 0");
 
         // get position:
         std::istringstream iss(opt.value(var, 0));

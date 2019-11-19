@@ -69,7 +69,7 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     if ( opt.has_key(var) )
     {
         if ( opt.value(var, 0) != "center" )
-            throw InvalidParameter("the position of `point1` must be `center'");
+            throw InvalidParameter("position of `point1` must be `center'");
         opt.set(rad, var, 1);
     }
     else
