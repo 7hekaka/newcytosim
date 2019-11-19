@@ -82,7 +82,7 @@ set single graftedA
 new 1 microtubule
 {
     length = 5
-    position = ( 0 0 0 )
+    position = 0 0 0
     orientation = ( 1 0 0 )
 }
 

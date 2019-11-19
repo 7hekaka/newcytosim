@@ -26,13 +26,13 @@ set fiber microtubule
     rigidity = 30
     segmentation = 0.5
     confine = inside, 500
-    display = { line_width=2; minus_end=8; }
+    display = ( line_width=2; minus_end=8; )
 }
 
 new 1 microtubule
 {
     length = 19
-    position = ( 0 0 0 )
+    position = 0 0 0
 }
 
 set hand motor
@@ -46,7 +46,7 @@ set hand motor
     activity = move
     unloaded_speed = 1
     stall_force = 5
-    display = { width=3; size=12; color=green }
+    display = ( width=3; size=12; color=green; )
 }
 
 set single simplex

@@ -37,7 +37,7 @@ set hand binder1
     binding_rate    = 1
     binding_range   = 5
     unbinding       = 0, inf
-    display = { color=blue, 0x0000FF77; width=0 }
+    display = ( color=blue, 0x0000FF77; width=1; )
 }
 
 set single simplex1
@@ -61,7 +61,7 @@ set hand binder2
     binding_range   = 5
     bind_also_end   = plus_end
     unbinding       = 0, inf
-    display = { color=yellow, 0xFFFF0077; width=0 }
+    display = ( color=yellow, 0xFFFF0077; width=1; )
 }
 
 set single simplex2

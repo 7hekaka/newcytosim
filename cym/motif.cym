@@ -40,7 +40,7 @@ set hand kinesin
     unloaded_speed = 0.8
     stall_force = 6
 
-    display = { color=0x0000FFFF }
+    display = ( color=0x0000FFFF; )
 }
 
 set single gKinesin
@@ -62,7 +62,7 @@ set hand dynein
     unloaded_speed = -0.8
     stall_force = 6
 
-    display = { color=0xFFFFFFFF }
+    display = ( color=0xFFFFFFFF; )
 }
 
 

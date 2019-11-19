@@ -39,7 +39,7 @@ set fiber microtubule
 new 1 microtubule
 {
     length = 10
-    position = ( 0 0 0 )
+    position = 0 0 0
     end_state = 1, 1
 }
 

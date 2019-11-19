@@ -212,7 +212,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     if ( !solid() )
         throw InvalidParameter("could not make aster:solid");
     
-    // fibers anchor points can be specified directly:
+    // fiber's anchor points can be specified directly:
     size_t cnt = 0;
     Vector pos1, pos2;
     std::string var = "fiber1";

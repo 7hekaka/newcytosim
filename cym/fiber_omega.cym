@@ -48,7 +48,7 @@ set hand holder
     binding = 10, 0.05
     unbinding = 0, inf
  
-    display = { width=3; size=5; color=green }
+    display = ( width=3; size=5; color=green; )
 }
 
 set couple link

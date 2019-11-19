@@ -31,14 +31,14 @@ set bead ball
 new 100 ball
 {
     radius = 0.1
-    position = ( 0 0 0 )
+    position = 0 0 0
     mark = 1
 }
 
 new 100 ball
 {
     radius = 0.1
-    position = ( 0 0 0 )
+    position = 0 0 0
     mark = 2
 }
 

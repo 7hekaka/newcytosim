@@ -39,7 +39,7 @@ set hand binder
 {
     binding = 100, 0.02
     unbinding = 1, 3
-    display = { size = 2; color=green }
+    display = ( size = 2; color=green; )
 }
 
 set couple crosslink

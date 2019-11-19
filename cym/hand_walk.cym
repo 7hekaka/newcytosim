@@ -13,7 +13,7 @@ set simul system
 {
     time_step = 0.001
     viscosity = 0.1
-    display = { window_size=1024,256 }
+    display = ( window_size=1024,256; )
 }
 
 
@@ -73,7 +73,7 @@ set hand motor1
     unbinding_chance = 0.01;
     hold_growing_end = 0
 
-    display = { size=10; color=orange; }
+    display = ( size=10; color=orange; )
 }
 
 set hand motor2
@@ -92,7 +92,7 @@ set hand motor2
     unbinding_chance = 0.01;
     hold_growing_end = 1
 
-    display = { size=10; color=sky_blue }
+    display = ( size=10; color=sky_blue; )
 }
 
 

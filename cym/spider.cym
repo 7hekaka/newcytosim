@@ -32,7 +32,7 @@ set hand nucleator
     unbinding_force = 3
     activity = nucleate
     nucleate = 1, microtubule, ( length=0.5 )
-    display = { size=8; color=green; }
+    display = ( size=8; color=green; )
 }
 
 set single leg
@@ -45,7 +45,7 @@ set solid blob
 {
     confine = inside, 100
     steric = 1
-    display = { style=7 }
+    display = ( style=7; )
 }
 
 new 1 blob

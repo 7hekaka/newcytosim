@@ -41,7 +41,7 @@ set hand nucleator
     unbinding = 0, 3
     activity = nucleate
     nucleate = 0.1, microtubule, ( length=0.1; )
-    display = { size=5; color=blue, gray; }
+    display = ( size=5; color=blue, gray; )
 }
 
 set single simplex
@@ -61,7 +61,7 @@ set hand motor
     activity = move
     unloaded_speed = -0.2
     stall_force = 5
-    display = { width=3; size=24; color=green; }
+    display = ( width=3; size=24; color=green; )
 }
 
 set single cargo
