@@ -1763,7 +1763,7 @@ size_t Meca::nbNonZeros(real threshold) const
     zero_real(dim, src);
     
     size_t cnt = 0;
-    for ( unsigned j = 0;  j < dim; ++j )
+    for ( unsigned j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, dst);
@@ -1793,7 +1793,7 @@ void Meca::getSystem(size_t dim, real * mat) const
     zero_real(dim, src);
     zero_real(dim, res);
     
-    for ( unsigned j = 0;  j < dim; ++j )
+    for ( unsigned j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, res);

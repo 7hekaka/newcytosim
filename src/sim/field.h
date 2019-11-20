@@ -298,7 +298,7 @@ public:
         if ( dim != DIM )
             throw InvalidIO("cannot read field due to dimensionality mismatch");
         
-        for ( unsigned d = 0;  d < dim; ++d )
+        for ( unsigned d = 0; d < dim; ++d )
         {
             size[d] = in.readUInt32();
             minB[d] = in.readFloat();
