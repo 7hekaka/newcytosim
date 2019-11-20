@@ -418,6 +418,33 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
     }
 }
 
+/// only valid if ( nbt > DIM )
+#define FOR 4
+void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
+{
+    const real R6 = R1 * 6;
+    const real R4 = R1 * 4;
+    const real R2 = R1 * 2;
+    
+    const size_t end = nbt;
+    #pragma ivdep
+    for ( size_t i = FOR*2; i < end; ++i )
+        Y[i] += R4 * ((X-FOR)[i]+(X+FOR)[i]) - R1 * ((X-FOR*2)[i]+(X+FOR*2)[i]) - R6 * X[i];
+    
+    // special cases near the edges:
+    real      * Z = Y + nbt;
+    real const* E = X + nbt + FOR;
+    
+    #pragma ivdep
+    for ( unsigned d = 0; d < FOR; ++d )
+    {
+        Y[d+FOR] -= R1 * ((X+FOR)[d]+(X+FOR*3)[d]) + R4 * ((X+FOR)[d]-(X+FOR*2)[d]) - R2 * X[d];
+        Z[d    ] -= R1 * ((E-FOR)[d]+(E-FOR*3)[d]) + R4 * ((E-FOR)[d]-(E-FOR*2)[d]) - R2 * E[d];
+        Y[d    ] -= R1 * ((X+FOR*2)[d]+X[d]) - R2 * (X+FOR)[d];
+        Z[d+FOR] -= R1 * ((E-FOR*2)[d]+E[d]) - R2 * (E-FOR)[d];
+    }
+}
+
 
 inline void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
 {
@@ -458,6 +485,7 @@ void testRigidity(size_t cnt)
     testRigidity(cnt, add_rigidityG,    "G  ");
     testRigidity(cnt, add_rigidityF,    "F  ");
     testRigidity(cnt, add_rigidityG,    "G  ");
+    testRigidity(cnt, add_rigidity4,    "4  ");
 #if defined __SSE__ & ( DIM == 2 )
     testRigidity(cnt, add_rigidity_SSO, "SSO");
     testRigidity(cnt, add_rigidity_SSE, "SSE");
