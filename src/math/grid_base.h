@@ -610,7 +610,7 @@ private:
     int * newRectangularGrid(size_t& cmx, const size_t range[ORD])
     {
         cmx = 1;
-        for ( unsigned d = 0;  d < ORD; ++d )
+        for ( unsigned d = 0; d < ORD; ++d )
             cmx *= ( 2 * range[d] + 1 );
         int * ccc = new int[ORD*cmx];
         
@@ -649,7 +649,7 @@ private:
         int ori_indx = (int)pack(ori);
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
-            for ( unsigned d = 0;  d < ORD; ++d )
+            for ( unsigned d = 0; d < ORD; ++d )
                 cc[d] = ori[d] + shift[ORD*ii+d];
             int off = (int)pack(cc) - ori_indx;
             
@@ -810,7 +810,7 @@ public:
     void createSideRegions(const unsigned radius)
     {
         size_t range[ORD];
-        for ( unsigned d = 0;  d < ORD; ++d )
+        for ( unsigned d = 0; d < ORD; ++d )
             range[d] = radius;
         size_t cmx = 0;
         int * ccc = newRectangularGrid(cmx, range);

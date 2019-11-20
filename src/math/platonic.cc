@@ -186,7 +186,7 @@ namespace Platonic
 
         unsigned* line = new unsigned[div+1];
         
-        for ( unsigned jj = 0;  jj <= div;  ++jj )
+        for ( unsigned jj = 0; jj <= div;  ++jj )
             line[jj] = getVertex(Vertex(A, div-jj, B, jj, nullptr, 0));
         
         for ( unsigned ii = 1;  ii <= div;  ++ii )

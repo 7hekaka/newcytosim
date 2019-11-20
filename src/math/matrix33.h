@@ -35,10 +35,10 @@ private:
     real val[BLD*3];
 
     /// access to modifiable element by index
-    real& operator[](size_t i)       { return val[i]; }
+    real& operator[](unsigned i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](size_t i) const { return val[i]; }
+    real  operator[](unsigned i) const { return val[i]; }
     
 public:
     
@@ -115,20 +115,20 @@ public:
 
     /// conversion to array of 'real'
     real* data() { return val; }
-    real* addr(const size_t i, const size_t j) { return val + ( i + BLD*j ); }
+    real* addr(const unsigned i, const unsigned j) { return val + ( i + BLD*j ); }
     
     /// access functions to element by line and column indices
-    real& operator()(const size_t i, const size_t j)       { return val[i+BLD*j]; }
-    real  operator()(const size_t i, const size_t j) const { return val[i+BLD*j]; }
+    real& operator()(const unsigned i, const unsigned j)       { return val[i+BLD*j]; }
+    real  operator()(const unsigned i, const unsigned j) const { return val[i+BLD*j]; }
     
     /// extract column vector at given index
-    Vector3 column(const size_t i) const
+    Vector3 column(const unsigned i) const
     {
         return Vector3(val+BLD*i);
     }
     
     /// extract line vector at given index
-    Vector3 line(const size_t i) const
+    Vector3 line(const unsigned i) const
     {
         return Vector3(val[i], val[BLD+i], val[BLD*2+i]);
     }
@@ -187,9 +187,9 @@ public:
         std::ostringstream os;
         os.precision(p);
         os << "[";
-        for ( unsigned i = 0;  i < 3; ++i )
+        for ( unsigned i = 0; i < 3; ++i )
         {
-            for ( unsigned j = 0;  j < 3; ++j )
+            for ( unsigned j = 0; j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
             if ( i < 2 )
                 os << ";";
@@ -302,8 +302,8 @@ public:
     Matrix33 transposed() const
     {
         Matrix33 res;
-        for ( unsigned x = 0;  x < 3; ++x )
-        for ( unsigned y = 0;  y < 3; ++y )
+        for ( unsigned x = 0; x < 3; ++x )
+        for ( unsigned y = 0; y < 3; ++y )
             res[y+BLD*x] = val[x+BLD*y];
         return res;
     }
@@ -964,7 +964,7 @@ public:
     static Matrix33 rotationAroundZ(real angle);
     
     /// a rotation around one the axis X if `x==0`, Y if `x==1` or Z if `x==2`
-    static Matrix33 rotationAroundPrincipalAxis(size_t x, real angle);
+    static Matrix33 rotationAroundPrincipalAxis(unsigned x, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix33 rotationToVector(const Vector3&);
@@ -990,9 +990,9 @@ inline std::ostream& operator << (std::ostream& os, Matrix33 const& mat)
     int w = (int)os.width();
     os.width(1);
     os << "[";
-    for ( unsigned i = 0;  i < 3; ++i )
+    for ( unsigned i = 0; i < 3; ++i )
     {
-        for ( unsigned j = 0;  j < 3; ++j )
+        for ( unsigned j = 0; j < 3; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
         if ( i < 2 )
             os << ";";

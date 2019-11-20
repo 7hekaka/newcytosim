@@ -34,10 +34,10 @@ private:
     real val[12];
     
     /// access to modifiable element by index
-    real& operator[](size_t i)       { return val[i]; }
+    real& operator[](unsigned i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](size_t i) const { return val[i]; }
+    real  operator[](unsigned i) const { return val[i]; }
 
 public:
     
@@ -46,7 +46,7 @@ public:
     /// copy constructor
     Matrix34(Matrix34 const& M)
     {
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] = M.val[u];
     }
 
@@ -94,13 +94,13 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( unsigned u = 0;  u < 4*3; ++u )
+        for ( unsigned u = 0; u < 4*3; ++u )
             val[u] = 0.0;
     }
     
     bool operator != (real zero) const
     {
-        for ( unsigned u = 0;  u < 4*3; ++u )
+        for ( unsigned u = 0; u < 4*3; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -111,20 +111,20 @@ public:
 
     /// conversion to array of 'real'
     real* data() { return val; }
-    real* addr(const size_t i, const size_t j) { return val + ( 4*i + j ); }
+    real* addr(const unsigned i, const unsigned j) { return val + ( 4*i + j ); }
 
     /// access functions to element by line and column indices
-    real& operator()(const size_t i, const size_t j)       { return val[4*i+j]; }
-    real  operator()(const size_t i, const size_t j) const { return val[4*i+j]; }
+    real& operator()(const unsigned i, const unsigned j)       { return val[4*i+j]; }
+    real  operator()(const unsigned i, const unsigned j) const { return val[4*i+j]; }
     
     /// extract column vector at given index
-    Vector3 column(const size_t i) const
+    Vector3 column(const unsigned i) const
     {
         return Vector3(val[i], val[4+i], val[4*2+i]);
     }
     
     /// extract line vector at given index
-    Vector3 line(const size_t i) const
+    Vector3 line(const unsigned i) const
     {
         return Vector3(val+4*i);
     }
@@ -183,9 +183,9 @@ public:
         std::ostringstream os;
         os.precision(p);
         os << "[";
-        for ( unsigned i = 0;  i < 3; ++i )
+        for ( unsigned i = 0; i < 3; ++i )
         {
-            for ( unsigned j = 0;  j < 3; ++j )
+            for ( unsigned j = 0; j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
             if ( i < 2 )
                 os << ";";
@@ -206,7 +206,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] *= alpha;
     }
 
@@ -220,7 +220,7 @@ public:
     const Matrix34 operator -() const
     {
         Matrix34 M;
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -229,7 +229,7 @@ public:
     const Matrix34 operator *(const real alpha) const
     {
         Matrix34 res;
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -244,7 +244,7 @@ public:
     const Matrix34 operator +(Matrix34 const& M) const
     {
         Matrix34 res;
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -253,7 +253,7 @@ public:
     const Matrix34 operator -(Matrix34 const& M) const
     {
         Matrix34 res;
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -266,7 +266,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(M.val+4)));
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
 #else
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -279,7 +279,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(M.val+4)));
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
 #else
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -296,8 +296,8 @@ public:
     Matrix34 transposed() const
     {
         Matrix34 res;
-        for ( unsigned x = 0;  x < 3; ++x )
-        for ( unsigned y = 0;  y < 3; ++y )
+        for ( unsigned x = 0; x < 3; ++x )
+        for ( unsigned y = 0; y < 3; ++y )
             res[y+4*x] = val[x+4*y];
         return res;
     }
@@ -573,7 +573,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #else
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] += src[u];
 #endif
     }
@@ -588,7 +588,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -602,7 +602,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #else
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -611,8 +611,8 @@ public:
     void sub_trans(Matrix34 const& M)
     {
         real const* src = M.val;
-        for ( unsigned x = 0;  x < 3; ++x )
-        for ( unsigned y = 0;  y < 3; ++y )
+        for ( unsigned x = 0; x < 3; ++x )
+        for ( unsigned y = 0; y < 3; ++y )
             val[y+4*x] -= src[x+4*y];
     }
     
@@ -620,8 +620,8 @@ public:
     void add_trans(Matrix34 const& M)
     {
         real const* src = M.val;
-        for ( unsigned x = 0;  x < 3; ++x )
-        for ( unsigned y = 0;  y < 3; ++y )
+        for ( unsigned x = 0; x < 3; ++x )
+        for ( unsigned y = 0; y < 3; ++y )
             val[y+4*x] += src[x+4*y];
     }
     
@@ -629,8 +629,8 @@ public:
     void add_trans(const real alpha, Matrix34 const& M)
     {
         real const* src = M.val;
-        for ( unsigned x = 0;  x < 3; ++x )
-        for ( unsigned y = 0;  y < 3; ++y )
+        for ( unsigned x = 0; x < 3; ++x )
+        for ( unsigned y = 0; y < 3; ++y )
             val[y+4*x] += alpha * src[x+4*y];
     }
 
@@ -643,10 +643,10 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] += src[u];
 #else
-        for ( unsigned i = 0;  i < 3; ++i )
+        for ( unsigned i = 0; i < 3; ++i )
         for ( unsigned j = i; j < 3; ++j )
             val[4*i+j] += src[4*i+j];
 #endif
@@ -663,10 +663,10 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #elif ( 1 )
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] += alpha * src[u];
 #else
-        for ( unsigned i = 0;  i < 3; ++i )
+        for ( unsigned i = 0; i < 3; ++i )
         for ( unsigned j = i; j < 3; ++j )
             val[4*i+j] += alpha * src[4*i+j];
 #endif
@@ -681,7 +681,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( unsigned u = 0;  u < 12; ++u )
+        for ( unsigned u = 0; u < 12; ++u )
             val[u] -= src[u];
 #else
         for ( unsigned i = 0; i < 3; ++i )
@@ -949,7 +949,7 @@ public:
     static Matrix34 rotationAroundZ(real angle);
     
     /// a rotation around one the axis X if `x==0`, Y if `x==1` or Z if `x==2`
-    static Matrix34 rotationAroundPrincipalAxis(size_t x, real angle);
+    static Matrix34 rotationAroundPrincipalAxis(unsigned x, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix34 rotationToVector(const Vector3&);
@@ -974,9 +974,9 @@ inline std::ostream& operator << (std::ostream& os, Matrix34 const& mat)
     int w = (int)os.width();
     os.width(1);
     os << "[";
-    for ( unsigned i = 0;  i < 3; ++i )
+    for ( unsigned i = 0; i < 3; ++i )
     {
-        for ( unsigned j = 0;  j < 3; ++j )
+        for ( unsigned j = 0; j < 3; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
         if ( i < 2 )
             os << ";";

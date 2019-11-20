@@ -20,10 +20,10 @@ private:
     real val_;
     
     /// access to modifiable element by index
-    real& operator[](size_t i)       { return val_; }
+    real& operator[](unsigned i)       { return val_; }
     
     /// access element value by index
-    real  operator[](size_t i) const { return val_; }
+    real  operator[](unsigned i) const { return val_; }
 
 public:
     
@@ -73,20 +73,20 @@ public:
     
     /// conversion to array of 'real'
     real* data() { return &val_; }
-    real* addr(const size_t i, const size_t j) { return &val_; }
+    real* addr(const unsigned i, const unsigned j) { return &val_; }
     
     /// access functions to element by line and column indices
-    real& operator()(const size_t i, const size_t j)       { return val_; }
-    real  operator()(const size_t i, const size_t j) const { return val_; }
+    real& operator()(const unsigned i, const unsigned j)       { return val_; }
+    real  operator()(const unsigned i, const unsigned j) const { return val_; }
     
     /// extract column vector at given index
-    Vector1 column(const size_t) const
+    Vector1 column(const unsigned) const
     {
         return Vector1(val_);
     }
     
     /// extract line vector at given index
-    Vector1 line(const size_t) const
+    Vector1 line(const unsigned) const
     {
         return Vector1(val_);
     }

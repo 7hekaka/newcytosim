@@ -487,10 +487,10 @@ void MatrixSparseBlock::consolidate()
         row.sbk_ = blocks_ + cnt;
         cnt += row.size_;
 #if ( BLOCK_SIZE == 2 ) && TRANSPOSE_2D_BLOCKS
-        for ( unsigned j = 0;  j < row.size_; ++j )
+        for ( unsigned j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j].transposed();
 #else
-        for ( unsigned j = 0;  j < row.size_; ++j )
+        for ( unsigned j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j];
 #endif
     }

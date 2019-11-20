@@ -426,7 +426,7 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
 void MatrixSparseSymmetricBlock::printColumns(std::ostream& os)
 {
     os << "MSSB size " << size_ << ":";
-    for ( unsigned j = 0;  j < size_; ++j )
+    for ( unsigned j = 0; j < size_; ++j )
         if ( column_[j].size_ > 0 )
         {
             os << "\n   " << j << "   " << column_[j].size_;

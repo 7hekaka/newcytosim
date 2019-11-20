@@ -181,7 +181,7 @@ void PointsOnSphere::setForces( real forces[], real threshold )
         {
             //calculate vector and distance^2 between from jj to ii
             dist = 0;
-            for ( unsigned d = 0;  d < 3 ; ++d )
+            for ( unsigned d = 0; d < 3 ; ++d )
             {
                 dx[d] = coord_[3*ii+d] - coord_[3*jj+d];
                 dist += dx[d] * dx[d];
@@ -222,10 +222,10 @@ void PointsOnSphere::setForces( real forces[], real threshold )
     for ( size_t ii = 0; ii < num_points_; ++ii )
     {
         dist = 0;
-        for ( unsigned d = 0;  d < 3; ++d )
+        for ( unsigned d = 0; d < 3; ++d )
             dist += coord_[3*ii+d] * forces[3*ii+d];
         
-        for ( unsigned d = 0;  d < 3; ++d )
+        for ( unsigned d = 0; d < 3; ++d )
             forces[3*ii+d] -= dist * coord_[3*ii+d];
     }
 #endif

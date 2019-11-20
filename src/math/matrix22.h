@@ -33,10 +33,10 @@ private:
     };
 
     /// access to modifiable element by index
-    real& operator[](size_t i)       { return val[i]; }
+    real& operator[](unsigned i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](size_t i) const { return val[i]; }
+    real  operator[](unsigned i) const { return val[i]; }
 
 public:
     
@@ -147,20 +147,20 @@ public:
 
     /// conversion to array of 'real'
     real* data() { return val; }
-    real* addr(const size_t i, const size_t j) { return val + ( i + 2*j ); }
+    real* addr(const unsigned i, const unsigned j) { return val + ( i + 2*j ); }
     
     /// access functions to element by line and column indices
-    real& operator()(const size_t i, const size_t j)       { return val[i+2*j]; }
-    real  operator()(const size_t i, const size_t j) const { return val[i+2*j]; }
+    real& operator()(const unsigned i, const unsigned j)       { return val[i+2*j]; }
+    real  operator()(const unsigned i, const unsigned j) const { return val[i+2*j]; }
     
     /// extract column vector at given index
-    Vector2 column(const size_t i) const
+    Vector2 column(const unsigned i) const
     {
         return Vector2(val+2*i);
     }
     
     /// extract line vector at given index
-    Vector2 line(const size_t i) const
+    Vector2 line(const unsigned i) const
     {
         return Vector2(val[i], val[2+i]);
     }

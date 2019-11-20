@@ -83,7 +83,7 @@ uint32_t hash(long t, int32_t c)
     }
     uint32_t h2 = 0;
     p = (unsigned char*) &c;
-    for ( unsigned j = 0;  j < sizeof(c); ++j )
+    for ( unsigned j = 0; j < sizeof(c); ++j )
     {
         h2 *= UCHAR_MAX + 2U;
         h2 += p[j];

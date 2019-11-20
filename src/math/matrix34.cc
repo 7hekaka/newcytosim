@@ -63,14 +63,14 @@ Matrix34 Matrix34::rotationAroundZ(const real angle)
 }
 
 
-Matrix34 Matrix34::rotationAroundPrincipalAxis(size_t i, const real angle)
+Matrix34 Matrix34::rotationAroundPrincipalAxis(unsigned i, const real angle)
 {
     real c = cos(angle);
     real s = sin(angle);
     
     i %= 3;
-    size_t j = (i+1)%3;
-    size_t k = (i+2)%3;
+    unsigned j = (i+1)%3;
+    unsigned k = (i+2)%3;
     
     Matrix34 res(0, 1);
     res(j,j) = c;
