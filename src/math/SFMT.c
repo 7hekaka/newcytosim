@@ -43,13 +43,13 @@ extern "C" {
 /*----------------
   STATIC FUNCTIONS
   ----------------*/
-inline static int idxof(int i);
-inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size);
+inline static unsigned idxof(unsigned i);
+inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, unsigned size);
 inline static uint32_t func1(uint32_t x);
 inline static uint32_t func2(uint32_t x);
 static void period_certification(sfmt_t * sfmt);
 #if defined(BIG_ENDIAN64) && !defined(ONLY64)
-inline static void swap(w128_t *array, int size);
+inline static void swap(w128_t *array, unsigned size);
 #endif
 
 #if defined(HAVE_ALTIVEC)
@@ -73,11 +73,11 @@ inline static void swap(w128_t *array, int size);
  * in BIG ENDIAN machine.
  */
 #ifdef ONLY64
-inline static int idxof(int i) {
+inline static unsigned idxof(unsigned i) {
     return i ^ 1;
 }
 #else
-inline static int idxof(int i) {
+inline static unsigned idxof(unsigned i) {
     return i;
 }
 #endif
@@ -168,7 +168,7 @@ static uint32_t func2(uint32_t x) {
  */
 static void period_certification(sfmt_t * sfmt) {
     uint32_t inner = 0;
-    int i, j;
+    unsigned i, j;
     uint32_t work;
     uint32_t *psfmt32 = &sfmt->state[0].u[0];
     const uint32_t parity[4] = {SFMT_PARITY1, SFMT_PARITY2,
@@ -287,7 +287,7 @@ void sfmt_gen_rand_all(sfmt_t * sfmt) {
  * memory. Mac OSX doesn't have these functions, but \b malloc of OSX
  * returns the pointer to the aligned memory block.
  */
-void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, int size) {
+void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, unsigned size) {
     assert(sfmt->idx == SFMT_N32);
     assert(size % 4 == 0);
     assert(size >= SFMT_N32);
@@ -323,7 +323,7 @@ void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, int size) {
  * memory. Mac OSX doesn't have these functions, but \b malloc of OSX
  * returns the pointer to the aligned memory block.
  */
-void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, int size) {
+void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, unsigned size) {
     assert(sfmt->idx == SFMT_N32);
     assert(size % 2 == 0);
     assert(size >= SFMT_N64);
@@ -344,7 +344,7 @@ void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, int size) {
  * @param seed a 32-bit integer used as the seed.
  */
 void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed) {
-    int i;
+    unsigned i;
 
     uint32_t *psfmt32 = &sfmt->state[0].u[0];
 
@@ -364,12 +364,12 @@ void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed) {
  * @param init_key the array of 32-bit integers, used as a seed.
  * @param key_length the length of init_key.
  */
-void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, int key_length) {
-    int i, j, count;
+void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, unsigned key_length) {
+    unsigned i, j, count;
     uint32_t r;
-    int lag;
-    int mid;
-    int size = SFMT_N * 4;
+    unsigned lag;
+    unsigned mid;
+    unsigned size = SFMT_N * 4;
     uint32_t *psfmt32 = &sfmt->state[0].u[0];
 
     if (size >= 623) {
