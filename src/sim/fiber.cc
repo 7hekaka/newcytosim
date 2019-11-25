@@ -650,20 +650,23 @@ APPROXIMATE FORMULA FOR ELLIPSOIDAL PARTICLE
  The formula for a cylinder were calculated numerically in:
  > Tirado and de la Torre. J. Chem. Phys 71(6) 1979
  > http://link.aip.org/link/doi/10.1063/1.438613
- 
+ > Page 2584, Table 1, last column, last line for infinite aspect ratio
+
  The translational drag coefficient is averaged over all possible configurations:
  
-     Ct =  0.312 + 0.565/shape - 0.100/(aspect*shape);
-     drag_cylinder = 3*M_PI*viscosity*length / ( log(shape) + Ct );
+     drag_cylinder = 3 * PI * viscosity * length / ( log(shape) + 0.312 );
  
  If the length is shorter than the diameter, the formula above fails and may
  even give negative result. Hence we also calculate the drag of a sphere with
  the same radius as the cylinder:
 
-       drag_sphere = 6*PI*visc*R
+       drag_sphere = 6 * PI * viscosity * radius
 
  We use the maximum value between 'drag_sphere' and 'drag_cylinder'.
- 
+ */
+/*
+ Ct =  0.312 + 0.565/shape - 0.100/(shape*shape);
+
  The rotational diffusion coefficient is given by:
  > Tirado and de la Torre. J. Chem. Phys 73(4) 1980
  
