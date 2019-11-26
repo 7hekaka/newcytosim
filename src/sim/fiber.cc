@@ -649,7 +649,7 @@ APPROXIMATE FORMULA FOR ELLIPSOIDAL PARTICLE
 
  The formula for a cylinder were calculated numerically in:
  > Tirado and de la Torre. J. Chem. Phys 71(6) 1979
- > http://link.aip.org/link/doi/10.1063/1.438613
+ > http://doi.org/10.1063/1.438613
  > Page 2584, Table 1, last column, last line for infinite aspect ratio
 
  The translational drag coefficient is averaged over all possible configurations:
@@ -715,9 +715,9 @@ real Fiber::dragCoefficientVolume()
 #else
     /*
      Tirado and de la Torre. J. Chem. Phys 71(6) 1979
-     given the averaged translational friction coefficient for a cylinder:
-     (Page 2584, Table 1, last column, last line for infinite aspect ratio)
+     give the averaged translational friction coefficient for a cylinder:
      3*PI*length*viscosity / ( log(length/diameter) + 0.32 )
+     (Page 2584, Table 1, last column, last line for infinite aspect ratio)
      */
     
     // length below which the formula is not valid anymore ( ~ 3.94 * radius )
