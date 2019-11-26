@@ -3,11 +3,11 @@
 *This is work in progress*
 
 *  [**Overview**](main/overview.md)
+*  [**Tutorials**](tutorials/index.md)
 *  [The configuration file](sim/config.md)
+*  [Introduction to the command line](main/starter.md)
 *  [Units in Cytosim `(s, um, pN)`](sim/units.md)
 *  [Set of standard config files](main/examples.md)
-*  [Introduction to the command line](main/starter.md)
-*  [**Tutorials**](tutorials/index.md)
 *  [Simulation engine](sim/index.md)
 *  [The different executables](main/executables.md)
 *  [Running simulations on your computer](main/runs.md)
@@ -41,7 +41,7 @@ cytosimATcytosimDOTorg
 # Advanced matter
 
 *  [Code documentation](code/index.md)
-*  [Doxygen documentation](doc/code/doxygen/index.html)
+*  [Doxygen's generated documentation](doc/code/doxygen/index.html)
 
 # Credits
 
