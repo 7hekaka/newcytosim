@@ -17,7 +17,7 @@ inline uint16_t byteswap(uint16_t i)
 /// reverse byte order
 inline int16_t byteswap(int16_t i)
 {
-    return ( i & 0xff ) << 8 | ( i & 0xff00 ) >> 8;
+    return (int16_t)byteswap((uint16_t)i);
 }
 
 /// reverse byte order
@@ -32,10 +32,7 @@ inline uint32_t byteswap(uint32_t i)
 /// reverse byte order
 inline int32_t byteswap(int32_t i)
 {
-    return (i & 0xff) << 24 |
-    (i & 0xff00) << 8 |
-    (i & 0xff0000) >> 8 |
-    (i & 0xff000000) >> 24;
+    return (int32_t)byteswap((uint32_t)i);
 }
 
 /// reverse byte order

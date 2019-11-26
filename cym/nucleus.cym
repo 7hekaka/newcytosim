@@ -23,7 +23,7 @@ set fiber microtubule
     segmentation = 1
     confine = inside, 100
 
-    display = { line_width=3; }
+    display = ( line_width=3; )
 }
 
 set hand dynein 
@@ -35,7 +35,7 @@ set hand dynein
     unloaded_speed = -1
     stall_force = 4
 
-    display = { size=7; color=pink; }
+    display = ( size=7; color=pink; )
 }
 
 set single grafted

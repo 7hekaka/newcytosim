@@ -19,7 +19,7 @@ extern Modulo const* modulo;
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Player::setStyle(const int style)
+void Player::setStyle(const unsigned style)
 {
     if ( mDisplay )
     {

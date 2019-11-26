@@ -26,7 +26,7 @@ set hand molecule
 {
     binding = 10, 0.05
     unbinding = 0, 3
-    display = { size=10; color=green, green; }
+    display = ( size=10; color=green, green; )
 }
 
 set single grafted

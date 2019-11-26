@@ -453,8 +453,8 @@ bool SpaceDynamicEllipse::draw() const
     MM[ 5]=1.0f;
     MM[10]=1.0f;
     MM[15]=1.0f;
-    for ( int i=0; i<DIM; ++i )
-    for ( int j=0; j<DIM; ++j )
+    for ( unsigned i=0; i<DIM; ++i )
+    for ( unsigned j=0; j<DIM; ++j )
         MM[i+4*j] = mat(i,j);
     glPushMatrix();
     gle::gleMultMatrix(MM);

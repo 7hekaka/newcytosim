@@ -25,7 +25,7 @@ SpaceLid::SpaceLid(SpaceProp const* p)
 
 void SpaceLid::resize(Glossary& opt)
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "length", d) )

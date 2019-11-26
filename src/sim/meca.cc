@@ -34,7 +34,7 @@
  Add correction term to the constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
 */
-#define ADD_PROJECTION_DIFF 0
+#define ADD_PROJECTION_DIFF 1
 
 
 /**
@@ -351,6 +351,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
 
     if ( mec->useBlock() )
     {
+        // Y <- PRECONDITIONNER_BLOCK * Y
         int info = 0;
         lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
         assert_true(info==0);
@@ -385,7 +386,7 @@ void Meca::multiply_precondition(real const* X, real* T, real* Y) const
 }
 
 
-void Meca::multiplyP1(Mecable const* mec, real const* X, real* Y) const
+void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) const
 {
     assert_true(X!=Y);
     
@@ -410,6 +411,7 @@ void Meca::multiplyP1(Mecable const* mec, real const* X, real* Y) const
     
     if ( mec->useBlock() )
     {
+        // Y <- PRECONDITIONNER_BLOCK * Y
         int info = 0;
         lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
         assert_true(info==0);
@@ -417,13 +419,15 @@ void Meca::multiplyP1(Mecable const* mec, real const* X, real* Y) const
 }
 
 /**
- This calculates
+ This calculates `Y <- P * M * X`, and is equivalent to
  
-     Y <- P*M*X
- 
- as needed for left-sided preconditionning
+     multiply(X, TEMP);
+     precondition(TEMP, Y);
+
+ as needed for left-sided preconditionning.
+ But it does so using only one pass, when multi-threaded
  */
-void Meca::multiplyP(real const* X, real* Y) const
+void Meca::multiply_precondition(real const* X, real* Y) const
 {
 #if NUM_THREADS > 1
 #pragma omp parallel num_threads(NUM_THREADS)
@@ -431,13 +435,13 @@ void Meca::multiplyP(real const* X, real* Y) const
         Mecable ** mci = mecables.begin() + omp_get_thread_num();
         while ( mci < mecables.end() )
         {
-            multiplyP1(*mci, X, Y);
+            multiply_precondition1(*mci, X, Y);
             mci += NUM_THREADS;
         }
     }
 #else
     for ( Mecable * mec : mecables )
-        multiplyP1(mec, X, Y);
+        multiply_precondition1(mec, X, Y);
 #endif
 }
 
@@ -958,12 +962,13 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     real * mat = new_real(bks*bks);
     real * vec = new_real(bks);
     
-    extractBlock(wrk, mec);
+    extractBlock(wrk, mec);   // wrk <- PRECONDITIONNER_BLOCK
    
-    copy_real(bks*bks, wrk, mat);
+    copy_real(bks*bks, wrk, mat);  // mat <- wrk
     if ( mec->useBlock() )
     {
         int info = 0;
+        // mat <- PRECONDITIONNER_BLOCK * mat
         lapack::xgetrs('N', bks, bks, blk, bks, mec->pivot(), mat, bks, &info);
         assert_true(info==0);
     }
@@ -1169,10 +1174,11 @@ void Meca::precondition(const real* X, real* Y) const
             const size_t inx = DIM * mec->matIndex();
             const size_t bks = DIM * mec->nbPoints();
             if ( Y != X )
-                blas::xcopy(bks, X+inx, 1, Y+inx, 1);
+                blas::xcopy(bks, X+inx, 1, Y+inx, 1);  // Y <- X
             if ( mec->useBlock() )
             {
                 int info = 0;
+                // Y <- PRECONDITIONNER_BLOCK * Y
                 lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
                 assert_true(info==0);
             }
@@ -1189,6 +1195,7 @@ void Meca::precondition(const real* X, real* Y) const
             int info = 0;
             const size_t inx = DIM * mec->matIndex();
             const size_t bks = DIM * mec->nbPoints();
+            // Y <- PRECONDITIONNER_BLOCK * Y
             lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
         }
     }
@@ -1405,7 +1412,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
      'vSOL' is `Xnew - Xold`, the solution to the system
  
  */
-void Meca::solve(SimulProp const* prop, const int precond)
+void Meca::solve(SimulProp const* prop, const unsigned precond)
 {
     assert_true( time_step == prop->time_step );
     
@@ -1650,9 +1657,9 @@ void Meca::solve(SimulProp const* prop, const int precond)
                 if ( !monitor.converged() )
                 {
                     // no method could converge... this is really bad!
-                    std::stringstream oss;
-                    oss << "Solve() failed to converge (" << monitor.count() << " iterations, residual " << monitor.residual() << ")";
-                    throw Exception(oss.str());
+                    Exception e("Solve() failed to converge\n");
+                    e << monitor.count() << " iterations, residual " << monitor.residual();
+                    throw e;
                 }
             }
         }
@@ -1756,7 +1763,7 @@ size_t Meca::nbNonZeros(real threshold) const
     zero_real(dim, src);
     
     size_t cnt = 0;
-    for ( size_t j = 0; j < dim; ++j )
+    for ( unsigned j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, dst);
@@ -1786,7 +1793,7 @@ void Meca::getSystem(size_t dim, real * mat) const
     zero_real(dim, src);
     zero_real(dim, res);
     
-    for ( size_t j = 0; j < dim; ++j )
+    for ( unsigned j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, res);

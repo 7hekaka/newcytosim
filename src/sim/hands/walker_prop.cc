@@ -34,9 +34,7 @@ void WalkerProp::read(Glossary& glos)
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(unloaded_speed,   "max_speed");
 #endif
-    glos.set(unbinding_chance, "unbinding_chance");
-    //alternative syntax:
-    glos.set(unbinding_chance, "unbinding", 2);
+    glos.set(unbinding_chance, "unbinding_chance") || glos.set(unbinding_chance, "unbinding", 2);
     
     if ( glos.has_key("dangling_chance") )
         Cytosim::warn << "use `hold_growing_end` instead of `dangling_chance`\n";

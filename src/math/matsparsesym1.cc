@@ -175,7 +175,7 @@ MatrixSparseSymmetric1::Element * MatrixSparseSymmetric1::insertElement(const si
     {
         shift(col_size_[jj]-inx, column_[jj]+inx);
     }
-    column_[jj][inx].reset(-1);
+    column_[jj][inx].reset(0);
     ++col_size_[jj];
     return column_[jj]+inx;
 }
@@ -279,7 +279,7 @@ real& MatrixSparseSymmetric1::operator()(size_t i, size_t j)
     if ( e->inx == ii )
         return e->val;
     
-    size_t n = e - col;
+    size_t n = (size_t)( e - col );
 
     assert_true( col[n].inx > ii );
     col = insertElement(jj, n);

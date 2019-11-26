@@ -50,7 +50,7 @@ set hand binder
     binding_rate    = 1
     binding_range   = 5
     unbinding       = 0, inf
-    display = { color=0x0000FF88; width=0 }
+    display = ( color=0x0000FF88; width=0.5; )
 }
 
 set single simplex

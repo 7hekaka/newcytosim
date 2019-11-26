@@ -108,8 +108,8 @@ size_t MatrixOfBlocks::calculateSize()
 //------------------------------------------------------------------------------
 real* MatrixOfBlocks::addr(size_t ii, size_t jj) const
 {
-    size_t bx = 0;  //block index on x
-    size_t by = 0;  //block index on y
+    size_t bx = 0; //block index on x
+    size_t by = 0; //block index on y
     
     while ( ii >= block_size[bx] ) ii -= block_size[bx++];
     while ( jj >= block_size[by] ) jj -= block_size[by++];

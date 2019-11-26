@@ -521,15 +521,14 @@ void PointDisp::read(Glossary& glos)
     // set 'color2' as a darker tone of 'color':
     if ( glos.set(color,   "color") )
         color2 = color.alpha(0.5);
-    glos.set(color2,       "color", 1);
+    glos.set(color2,       "color", 1) || glos.set(color2, "back_color");
     glos.set(coloring,     "coloring");
     
     // if 'size' is specified, width is set accordingly:
     if ( glos.set(size,    "size") )
         width = 2 * size / 3;
-
-    // alternative syntax:
-    glos.set(size,         "point_size");
+    else
+        glos.set(size,     "point_size");
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(size,         "points");
     glos.set(shape,        "points", 1);

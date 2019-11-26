@@ -142,7 +142,7 @@ void Mecafil::storeDirections()
      */
     
     // for the extremities, the direction of the nearby segment is used.
-    for ( size_t d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         rfDir[d]     = rfDiff[d];
         rfDir[d+end] = rfDiff[d+end-DIM];
@@ -669,18 +669,18 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     const size_t end = nbt;
     #pragma ivdep
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
-    
+        Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
+
     // special cases near the edges:
-    real      * Z = Y + nbt + DIM;
+    real      * Z = Y + nbt;
     real const* E = X + nbt + DIM;
     #pragma ivdep
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
-        Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-        Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
-        Z[d-DIM] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
-        Z[d    ] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
+        Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];
+        Z[d    ] -= R1 * ((E-DIM)[d]+(E-DIM*3)[d]) + R4 * ((E-DIM)[d]-(E-DIM*2)[d]) - R2 * E[d];
+        Y[d    ] -= R1 * ((X+DIM*2)[d]+X[d]) - R2 * (X+DIM)[d];
+        Z[d+DIM] -= R1 * ((E-DIM*2)[d]+E[d]) - R2 * (E-DIM)[d];
     }
 }
 
@@ -690,7 +690,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
  */
 void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
 {
-    for ( size_t d = 0; d < DIM; ++ d )
+    for ( unsigned d = 0; d < DIM; ++ d )
     {
         real x = 2*X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
         Y[A*DIM+d] += x * R1;

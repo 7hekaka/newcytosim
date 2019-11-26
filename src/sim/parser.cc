@@ -80,9 +80,11 @@ void Parser::parse_set(std::istream& is)
     std::string name, para, blok;
     
 #ifdef BACKWARD_COMPATIBILITY
-    // Read formats anterior to 3.11.2017 ('set hand 2 kinesin')
-    unsigned long inx = 0;
-    Tokenizer::get_integer(is, inx);
+    {
+        // Read formats anterior to 3.11.2017 ('set hand 2 kinesin')
+        size_t inx = 0;
+        Tokenizer::get_integer(is, inx);
+    }
 #endif
     
     Glossary opt;
@@ -106,7 +108,7 @@ void Parser::parse_set(std::istream& is)
             opt.read(blok);
             pp = execute_set(cat, name, opt);
             
-            unsigned ix;
+            size_t ix;
 #ifdef BACKWARD_COMPATIBILITY
             // name changed to `property_number` on 10.12.2017
             if ( opt.set(ix, "property_number") || opt.set(ix, "property_index") )
@@ -292,7 +294,7 @@ void Parser::parse_change(std::istream& is)
         else
             execute_change(name, opt);
  
-        if ( opt.warnings(std::cerr, ~0) )
+        if ( opt.warnings(std::cerr, ~0U) )
             show_lines(is, spos);
     }
     else if ( para == "display" )
@@ -406,7 +408,7 @@ void Parser::parse_new(std::istream& is)
                 if ( cnt > 1 )
                 {
                     Vector dAB = ( B - A ) / real(cnt-1);
-                    for ( unsigned n = 0; n < cnt; ++n )
+                    for ( size_t n = 0; n < cnt; ++n )
                     {
                         opt.define("position", 0, A + n * dAB);
                         execute_new(name, opt);
@@ -421,7 +423,7 @@ void Parser::parse_new(std::istream& is)
             else
             {
                 // place each object independently from the others:
-                for ( unsigned n = 0; n < cnt; ++n )
+                for ( size_t n = 0; n < cnt; ++n )
                     execute_new(name, opt);
             }
             
@@ -440,7 +442,7 @@ void Parser::parse_new(std::istream& is)
             if ( opt.has_key("display") )
                 throw InvalidParameter("display parameters should be specified within `set'");
             
-            if ( opt.warnings(std::cerr, ~0) )
+            if ( opt.warnings(std::cerr, ~0U) )
                 show_lines(is, spos);
         }
     }
@@ -522,7 +524,7 @@ void Parser::parse_delete(std::istream& is)
 #endif
     if ( !has_cnt  &&  name == "all" )
     {
-        cnt = ~0; // this is very large
+        cnt = ~0U; // this is very large
         name = Tokenizer::get_symbol(is);
     }
     std::string blok = Tokenizer::get_block(is, '{');
@@ -560,7 +562,7 @@ void Parser::parse_delete(std::istream& is)
 
 void Parser::parse_mark(std::istream& is)
 {
-    size_t cnt = -1;
+    size_t cnt = 0;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
@@ -690,7 +692,7 @@ void Parser::parse_run(std::istream& is)
                 {
                     if ( span <= 0 )
                         throw InvalidParameter("duration must be >= 0'");
-                    cnt = (unsigned)ceil(span/simul.prop->time_step);
+                    cnt = (size_t)ceil(span/simul.prop->time_step);
                 }
             }
         }
@@ -952,7 +954,7 @@ void Parser::parse_repeat(std::istream& is)
 
     std::string code = Tokenizer::get_block(is, '{');
     
-    for ( unsigned c = 0; c < cnt; ++c )
+    for ( size_t c = 0; c < cnt; ++c )
     {
         evaluate(code, ", inside `repeat'");
     }
@@ -1003,7 +1005,7 @@ void Parser::parse_for(std::istream& is)
         // substitute Variable name for this iteration:
         StreamFunc::find_and_replace(sub, var, std::to_string(c));
         //we use a fresh stream and Parser for each instance:
-        Parser(*this).evaluate(sub, ", inside `for'");
+        Parser(*this).evaluate(sub, "in `for' loop");
         //hold();
     }
 }
@@ -1164,8 +1166,8 @@ void Parser::evaluate(std::istream& is)
             parse_for(is);
         else if ( tok == "restart" )
         {
-            static unsigned long cnt = 0;
-            unsigned long num = 1;
+            static size_t cnt = 0;
+            size_t num = 1;
             Tokenizer::get_integer(is, num);
             if ( do_run && cnt++ < num )
             {
@@ -1206,7 +1208,8 @@ void Parser::evaluate(std::istream& is, std::string const& msg)
     }
     catch( Exception & e )
     {
-        e << msg + ":\n";
+        //e << ", " + msg + ":\n";
+        e << ":\n";
         e << StreamFunc::get_lines(is, spos, is.tellg());
         spos = saved;
         throw;

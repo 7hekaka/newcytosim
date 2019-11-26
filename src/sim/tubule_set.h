@@ -33,6 +33,12 @@ public:
     /// create a new object (used for reading trajectory file)
     Object *    newObject(ObjectTag, unsigned);
     
+    /// write all Objects to file
+    void        write(Outputter& out) const;
+        
+    /// print a summary of the content (nb of objects, class)
+    void        report(std::ostream& out) const { writeAssets(out, title()); }
+
     //--------------------------
 
     /// first object

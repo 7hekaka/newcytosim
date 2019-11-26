@@ -154,7 +154,7 @@ void help_keys()
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-    Glossary glos;
+    Glossary arg;
     int ax = 1;
     
     if ( argc > 1 && FilePath::is_dir(argv[1]) )
@@ -163,16 +163,17 @@ int main(int argc, char* argv[])
         ++ax;
     }
     
-    glos.read_strings(argc-ax, argv+ax);
-    
-    if ( glos.use_key("help") )
+    if ( arg.read_strings(argc-ax, argv+ax) )
+        return EXIT_FAILURE;
+
+    if ( arg.use_key("help") )
     {
         help();
         help_keys();
         return EXIT_SUCCESS;
     }
     
-    if ( glos.use_key("parameters") )
+    if ( arg.use_key("parameters") )
     {
         pam.write(std::cout);
         return EXIT_SUCCESS;
@@ -187,11 +188,11 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseDrag);
 
     if ( pam.config.size() )
-        glos.read_file(pam.config);
+        arg.read_file(pam.config);
     
-    pam.read(glos);
-    glApp::currentView().read(glos);
-    glos.warnings(std::clog);
+    pam.read(arg);
+    glApp::currentView().read(arg);
+    arg.warnings(std::clog);
     
     glApp::createWindow(display);
     gle::initialize();

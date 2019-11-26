@@ -105,7 +105,7 @@ void Mecafil::makeProjection()
     blas::xgemm('T', 'N', nbv, nbv, nbc, -1.0, J, nbc, mtJJtiJ, nbc, 0., mtProj, nbv );
     
     // mtProj <- mtProj + I
-    for ( size_t j = 0; j < nbv*nbv; j += nbv+1 )
+    for ( unsigned j = 0; j < nbv*nbv; j += nbv+1 )
         mtProj[j] += 1.0;
     
     free_real(J);

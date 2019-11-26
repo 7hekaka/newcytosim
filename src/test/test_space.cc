@@ -189,7 +189,7 @@ void setGeometry()
     }
     catch( Exception & e )
     {
-        printf("Error: `%s'\n", e.c_str());
+        printf("Error: `%s'\n", e.msg());
     }
     
     try {
@@ -198,7 +198,7 @@ void setGeometry()
     }
     catch( Exception & e )
     {
-        printf("Error: `%s'\n", e.c_str());
+        printf("Error: `%s'\n", e.msg());
     }
 
     glutPostRedisplay();
@@ -548,7 +548,8 @@ int main(int argc, char* argv[])
 
     if ( argc > 1 )
     {
-        opt.read_strings(argc-1, argv+1);
+        if ( opt.read_strings(argc-1, argv+1) )
+            return EXIT_FAILURE;
         setGeometry();
     }
     

@@ -23,13 +23,13 @@ set fiber microtubule
     segmentation = 1
     confine = inside, 100, cell
 
-    display = { line_width=3; }
+    display = ( line_width=3; )
 }
 
 set space rail
 {
     shape = rectangle
-    display = ( color = red )
+    display = ( color=red; )
 }
 
 new rail
@@ -39,7 +39,7 @@ new rail
 
 set solid core
 {
-    display = ( style=3 )
+    display = ( style=3; )
     confine = surface, 1000, rail
 }
 

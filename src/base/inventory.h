@@ -98,7 +98,7 @@ public:
     Inventoried*   operator[](ObjectID n) const { assert_true(n<allocated_); return byNames[n]; }
 
     /// number of non-zero entries in the registry
-    unsigned int   count() const;
+    size_t         count() const;
 
     /// reattribute all serial numbers consecutively and pack the array
     void           reassign();

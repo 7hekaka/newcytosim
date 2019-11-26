@@ -189,7 +189,7 @@ public:
      With many filaments, trying `precondition = [0, 1]' is the recommended strategy.
      <em>default value = 0</em>
      */
-    int       precondition;
+    unsigned  precondition;
 
     
     /// A flag to control the engine that implement steric interactions between objects

@@ -13,7 +13,7 @@ set simul system
 {
     time_step = 0.001
     viscosity = 0.1
-    display = { window_size=1024,256 }
+    display = ( window_size=1024,256; )
 }
 
 
@@ -34,7 +34,7 @@ set fiber fiber1
     segmentation = 1
     lattice = 1, 0.010
     binding_key = 1
-    display = ( show_lattice=1; line=10, 0; )
+    display = ( lattice=1; line=10, 0; )
 }
 
 set fiber fiber2
@@ -43,7 +43,7 @@ set fiber fiber2
     segmentation = 1
     lattice = 1, 0.010
     binding_key = 2 
-    display = ( show_lattice=1; line=10, 0; )
+    display = ( lattice=1; line=10, 0; )
 }
 
 set fiber fiber3
@@ -52,7 +52,7 @@ set fiber fiber3
     segmentation = 1
     lattice = 1, 0.010
     binding_key = 3  % this means both key=1 and key=2 can bind
-    display = ( show_lattice=1; line=10, 0; )
+    display = ( lattice=1; line=10, 0; )
 }
 
 set hand motor1
@@ -73,7 +73,7 @@ set hand motor1
     unbinding_chance = 0.01;
     hold_growing_end = 0
 
-    display = { size=10; color=orange; }
+    display = ( size=10; color=orange; )
 }
 
 set hand motor2
@@ -92,7 +92,7 @@ set hand motor2
     unbinding_chance = 0.01;
     hold_growing_end = 1
 
-    display = { size=10; color=sky_blue }
+    display = ( size=10; color=sky_blue; )
 }
 
 

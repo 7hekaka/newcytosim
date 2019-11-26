@@ -25,8 +25,8 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
     Vector inf, sup;
     spc->boundaries(inf, sup);
     
-    int n_cell[3];
-    for ( int d = 0; d < DIM; ++d )
+    size_t n_cell[3] = { 1, 1, 1 };
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / min_step;
         
@@ -36,15 +36,13 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges
-            n_cell[d] = (int)floor(n);
-            if ( n_cell[d] <= 0 )
-                n_cell[d] = 1;
+            n_cell[d] = std::max((size_t)1, (size_t)floor(n));
             pGrid.setPeriodic(d, true);
         }
         else
         {
             //add a border in any dimension which is not periodic
-            n_cell[d] = (int)ceil(n) + 2;
+            n_cell[d] = (size_t)ceil(n) + 2;
             n = n_cell[d] * 0.5 * min_step;
             real mid = inf[d] + sup[d];
             inf[d] = mid - n;
@@ -85,7 +83,7 @@ void PointGrid::createCells()
 void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
-        throw InvalidParameter("object:steric is out-of-range");
+        throw InvalidParameter("point:steric is out of range");
 
     Vector w = pe.pos();
     point_list(w, pan).new_val().set(pe, rd, rg, w);
@@ -94,11 +92,10 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
     //we check that the grid would correctly detect collision of two particles
     if ( max_diameter < 2 * rg - REAL_EPSILON )
     {
-        std::ostringstream oss;
-        oss << "simul:steric_max_range is too short" << std::endl;
-        oss << PREF << "steric_max_range should be greater than 2 * ( particle_radius + extra_range )" << std::endl;
-        oss << PREF << "= " << 2 * rg << " for some particles" << std::endl;
-        throw InvalidParameter(oss.str());
+        InvalidParameter e("simul:steric_max_range is too short\n");
+        e << PREF << "steric_max_range should be greater than 2 * ( particle_radius + extra_range )\n";
+        e << PREF << "= " << 2 * rg << " for some particles\n";
+        throw e;
     }
 #endif
 }
@@ -107,7 +104,7 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
-        throw InvalidParameter("object:steric is out-of-range");
+        throw InvalidParameter("line:steric is out of range");
 
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
@@ -119,12 +116,11 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
     real diag = sqrt( fl.len() * fl.len() + 4 * rg * rg );
     if ( max_diameter < diag - REAL_EPSILON )
     {
-        std::ostringstream oss;
-        oss << "simul:steric_max_range is too short" << std::endl;
-        oss << PREF << "steric_max_range should be greater than sqrt( sqr(segment_length) + 4*sqr(range) )" << std::endl;
-        oss << PREF << "where normally segment_length ~ 4/3 segmentation" << std::endl;
-        oss << PREF << "= " << diag << " for some fibers" << std::endl;
-        throw InvalidParameter(oss.str());
+        InvalidParameter("simul:steric_max_range is too short\n");
+        e << PREF << "steric_max_range should be greater than sqrt( sqr(segment_length) + 4*sqr(range) )\n";
+        e << PREF << "where normally segment_length ~ 4/3 segmentation\n";
+        e << PREF << "= " << diag << " for some fibers\n";
+        throw e;
     }
 #endif
 }

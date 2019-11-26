@@ -240,13 +240,13 @@ private:
     void prepareMatrices();
     
     /// calculate forces for one Mecable
-    void multiply1(Mecable const*, const real* X, real* Y) const;
+    void multiply1(const Mecable*, const real* X, real* Y) const;
     
-    /// implements precondition()+multiply for one Mecable
-    void multiply_precondition1(Mecable const*, real const*, real*, real*) const;
-    
-    /// implements precondition()+multiply for one Mecable
-    void multiplyP1(Mecable const*, real const*, real*) const;
+    /// implements multiply() followed by precondition() for one Mecable
+    void multiply_precondition1(const Mecable*, const real*, real*) const;
+
+    /// implements multiply() followed by precondition() for one Mecable
+    void multiply_precondition1(const Mecable*, const real*, real*, real*) const;
 
     /// calculate the linear part of forces:  Y <- B + ( mB + mC ) * X
     void calculateForces(const real* X, const real* B, real* Y) const;
@@ -313,11 +313,11 @@ public:
     /// apply preconditionner: Y <- P*X (note that X maybe equal to Y)
     void precondition(const real* X, real* Y) const;
     
-    /// calculates Y <- P*M*X, where M is the matrix associated with the system
-    void multiplyP(const real* X, real* Y) const;
+    /// calculates Y <- P*M*X, for left-sided preconditinning
+    void multiply_precondition(const real* X, real* Y) const;
     
     /// equivalent to: multiply(X, T); precondition(T, Y);
-    void multiply_precondition(real const* X, real* T, real* Y) const;
+    void multiply_precondition(const real* X, real* T, real* Y) const;
 
     //---------------------- EXPLICIT FORCE ELEMENTS ---------------------------
 
@@ -546,7 +546,7 @@ public:
     void prepare(SimulProp const*);
     
     /// Calculate motion of all Mecables in the system
-    void solve(SimulProp const*, int precondition);
+    void solve(SimulProp const*, unsigned precondition);
     
     /// transfer newly calculated point coordinates back to Mecables
     void apply();

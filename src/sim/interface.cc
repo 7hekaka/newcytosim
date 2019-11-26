@@ -147,12 +147,14 @@ bool has_trail(std::istream& is)
 }
 
 /// report warning
-void warn_trail(std::istream& is, std::string const& msg)
+void warn_trail(std::istream& is)
 {
     std::string str;
+    std::streampos pos = is.tellg();
     std::getline(is, str);
-    std::cerr << "Error: unexpected tokens `" << str;
-    throw InvalidSyntax("syntax error `"+msg+"'");
+    InvalidSyntax e("unexpected tokens `"+str+"'");
+    e << "in `" << StreamFunc::get_line(is, pos) << "'";
+    throw e;
 }
 
 /**
@@ -174,7 +176,7 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         iso.mov = Movable::readPosition(iss, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "position = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
     }
     else if ( spc )
     {
@@ -186,13 +188,13 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         iso.rot = Movable::readRotation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
     }
     else if ( opt.set(str, "direction") )
     {
         std::istringstream iss(str);
         Vector vec = Movable::readDirection(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "direction = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
         iso.rot = Rotation::randomRotationToVector(vec);
     }
     else
@@ -203,7 +205,7 @@ Isometry Interface::read_placement(Glossary& opt)
     {
         std::istringstream iss(str);
         Rotation rot = Movable::readRotation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss, "orientation = "+str);
+        if ( has_trail(iss) ) warn_trail(iss);
         iso.rotate(rot);
     }
     
@@ -234,7 +236,7 @@ enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  By default, the specifications are relative to the last Space that was defined,
  but a different space can be specified as second argument of PLACEMENT.
  
- You can set the density of objects by setting `nb_trials=1`:
+ You can set the density of objects with `nb_trials=1`:
  
      new 100 grafted
      {
@@ -243,8 +245,8 @@ enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
      }
  
  In this way an object will be created only if its randomly chosen position falls
- inside the Space, and the density will be exactly what is specified from the 
- `position` range (here 100/10*10 = 1).
+ inside the Space, and the density will thus be exactly what is specified from the
+ `position` range (here 100/10*10 = 1 object per squared micrometer).
  */
 Isometry Interface::find_placement(Glossary& opt, int placement)
 {
@@ -310,7 +312,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
         }
     }
     
-    Cytosim::warn << "placement failed\n";
+    //Cytosim::warn << "could not fulfill `position=" + opt.value("position", 0) + "'\n";
+    throw InvalidParameter("could not fulfill `position=" + opt.value("position", 0) + "'");
     iso.reset();
     return iso;
 }
@@ -646,7 +649,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
     opt.set(n, "plane");
     opt.set(a, "plane", 1);
     
-    int stateP = STATE_RED, stateM = STATE_GREEN;
+    state_t stateP = STATE_RED, stateM = STATE_GREEN;
     opt.set(stateP, "new_end_state");
     opt.set(stateM, "new_end_state", 1);
     
@@ -815,10 +818,10 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
             simul.prop->clear_trajectory = false;
         }
         if ( has_code )
-            evaluate(code, ", in run:code");
+            evaluate(code, "in run:code");
 
         delta = real(nb_steps) / real(nb_frames);
-        check = (int)delta;
+        check = delta;
     }
     
     simul.prepare();
@@ -834,12 +837,12 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
                 simul.writeObjects(TRAJECTORY, true, binary);
                 reportCPUtime(frame, simul.time());
                 if ( has_code )
-                    evaluate(code, ", in run:write:code");
+                    evaluate(code, "in run:write:code");
                 simul.unrelax();
             }
             if ( sss >= nb_steps )
                 break;
-            check = (int)( ++frame * delta );
+            check = ( ++frame * delta );
         }
 
         hold();

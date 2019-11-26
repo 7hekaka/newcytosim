@@ -25,7 +25,7 @@ void SpaceDice::resize(Glossary& opt)
     if ( rad < 0 )
         throw InvalidParameter("dice:radius must be >= 0");
 
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "length", d) )
@@ -72,7 +72,7 @@ real SpaceDice::volume() const
 bool  SpaceDice::inside(Vector const& w) const
 {
     real dis = 0;
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real a = fabs(w[d]) - length_[d];
         if ( a > 0 )
@@ -100,7 +100,7 @@ Vector SpaceDice::project(Vector const& w) const
     bool in = true;
     
     //calculate projection on the inner cube obtained by subtracting radius
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real test = length_[d] - radius_;
         if ( fabs(w[d]) > test )
@@ -137,7 +137,7 @@ Vector SpaceDice::project(Vector const& w) const
 
     //normalize to radius(), and add to p to get the real projection
     real dis = radius_ / sqrt((w-p).normSqr());
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
         p[d] += dis * ( w[d] - p[d] );
     
     return p;

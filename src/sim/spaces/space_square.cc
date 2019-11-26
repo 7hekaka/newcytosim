@@ -17,7 +17,7 @@ SpaceSquare::SpaceSquare(SpaceProp const* p)
 
 void SpaceSquare::resize(Glossary& opt)
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "length", d) )
@@ -187,7 +187,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
 {
     bool in = true;
     
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         assert_true( dim[d] >= 0 );
         if ( fabs(pos[d]) > dim[d] )
@@ -200,7 +200,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
     if ( in ) 
     {
         // find the dimensionality 'dip' corresponding to the closest face
-        int  dip = 0;
+        size_t dip = 0;
         
         real l = dim[0] - fabs(pos[0]);
 #if ( DIM > 1 )
@@ -225,7 +225,7 @@ void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & 
 void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
 {
     real dim[DIM];
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
         dim[d] = std::max((real)0, length_[d] - rad);
 
     setInteraction(pos, pe, meca, stiff, dim);

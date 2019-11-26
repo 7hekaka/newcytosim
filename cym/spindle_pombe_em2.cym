@@ -19,7 +19,7 @@ set simul system
 set space cell
 {
     shape = sphere
-    display = ( visible = 0 )
+    display = ( visible=0; )
 }
 
 new cell
@@ -32,7 +32,7 @@ set fiber microtubule
     rigidity = 30
     segmentation = 0.025
 
-    display = { line_width=3; }
+    display = ( line_width=3; )
 }
 
 

@@ -5,7 +5,7 @@ set simul system
 {
     time_step = 0.01
     viscosity = 0.2
-	display = ( delay = 10 )
+    display = ( delay = 10 )
 }
 
 set space cell
@@ -70,7 +70,7 @@ new filament
 
 new 32 complex
 {
-    attach1 = flament
+    attach1 = filament
 }
 
 % give some time to allow for binding

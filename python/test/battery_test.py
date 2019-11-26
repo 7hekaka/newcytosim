@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # battery_test.py
 #
@@ -18,7 +18,7 @@ Example - runs:
     battery_test.py bin/sim cym/*.cym
     make_image.py 'play frame=100 window_size=512,512' *_cym
 
-F. Nedelec, March-June 2011 - Feb 2013
+F. Nedelec, March-June 2011 - Feb 2013 - Nov 2019
 """
 
 import shutil, sys, os, subprocess
@@ -40,21 +40,25 @@ def run(file, executable):
     cdir = os.getcwd()
     name = os.path.split(file)[1]
     wdir = 'run_'+name.partition('.')[0];
-    
     try:
         os.mkdir(wdir)
     except OSError:
         print('skipping  '+file)
         return
-    
     shutil.copyfile(file, os.path.join(wdir, 'config.cym'))
+    print(name.ljust(80, '-'))
     os.chdir(wdir)
-    print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '+name)
-    
-    val = subprocess.call(executable)
-    if val != 0:
+    outfile = open("out.txt", 'w')
+    errfile = open("err.txt", 'w')
+    val = subprocess.call(executable, stdout=outfile, stderr=errfile)
+    errfile.close()
+    outfile.close()
+    if val:
         print('returned %i' % val)
-    
+    # copy standard-error:
+    with open("err.txt", 'r') as f:
+        for line in f:
+            print("> "+line, end='');
     os.chdir(cdir);
 
 #------------------------------------------------------------------------

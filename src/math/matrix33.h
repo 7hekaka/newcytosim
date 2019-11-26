@@ -35,10 +35,10 @@ private:
     real val[BLD*3];
 
     /// access to modifiable element by index
-    real& operator[](int i)       { return val[i]; }
+    real& operator[](unsigned i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](int i) const { return val[i]; }
+    real  operator[](unsigned i) const { return val[i]; }
     
 public:
     
@@ -47,7 +47,7 @@ public:
     /// copy constructor
     Matrix33(Matrix33 const& M)
     {
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] = M.val[u];
     }
 
@@ -98,13 +98,13 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] = 0.0;
     }
     
     bool operator != (real zero) const
     {
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -115,20 +115,20 @@ public:
 
     /// conversion to array of 'real'
     real* data() { return val; }
-    real* addr(const size_t i, const size_t j) { return val + ( i + BLD*j ); }
+    real* addr(const unsigned i, const unsigned j) { return val + ( i + BLD*j ); }
     
     /// access functions to element by line and column indices
-    real& operator()(const size_t i, const size_t j)       { return val[i+BLD*j]; }
-    real  operator()(const size_t i, const size_t j) const { return val[i+BLD*j]; }
+    real& operator()(const unsigned i, const unsigned j)       { return val[i+BLD*j]; }
+    real  operator()(const unsigned i, const unsigned j) const { return val[i+BLD*j]; }
     
     /// extract column vector at given index
-    Vector3 column(const size_t i) const
+    Vector3 column(const unsigned i) const
     {
         return Vector3(val+BLD*i);
     }
     
     /// extract line vector at given index
-    Vector3 line(const size_t i) const
+    Vector3 line(const unsigned i) const
     {
         return Vector3(val[i], val[BLD+i], val[BLD*2+i]);
     }
@@ -187,9 +187,9 @@ public:
         std::ostringstream os;
         os.precision(p);
         os << "[";
-        for ( int i = 0; i < 3; ++i )
+        for ( unsigned i = 0; i < 3; ++i )
         {
-            for ( int j = 0; j < 3; ++j )
+            for ( unsigned j = 0; j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
             if ( i < 2 )
                 os << ";";
@@ -212,7 +212,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] *= alpha;
     }
 
@@ -226,7 +226,7 @@ public:
     const Matrix33 operator -() const
     {
         Matrix33 M;
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -235,7 +235,7 @@ public:
     const Matrix33 operator *(const real alpha) const
     {
         Matrix33 res;
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -250,7 +250,7 @@ public:
     const Matrix33 operator +(Matrix33 const& M) const
     {
         Matrix33 res;
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -259,7 +259,7 @@ public:
     const Matrix33 operator -(Matrix33 const& M) const
     {
         Matrix33 res;
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -272,7 +272,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(M.val+4)));
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
 #else
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -285,7 +285,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(M.val+4)));
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
 #else
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -302,8 +302,8 @@ public:
     Matrix33 transposed() const
     {
         Matrix33 res;
-        for ( int x = 0; x < 3; ++x )
-        for ( int y = 0; y < 3; ++y )
+        for ( unsigned x = 0; x < 3; ++x )
+        for ( unsigned y = 0; y < 3; ++y )
             res[y+BLD*x] = val[x+BLD*y];
         return res;
     }
@@ -588,7 +588,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #else
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] += src[u];
 #endif
     }
@@ -603,7 +603,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -617,7 +617,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #else
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -658,7 +658,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] += src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -678,7 +678,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #elif ( 1 )
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -696,7 +696,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( int u = 0; u < BLD*3; ++u )
+        for ( unsigned u = 0; u < BLD*3; ++u )
             val[u] -= src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -990,9 +990,9 @@ inline std::ostream& operator << (std::ostream& os, Matrix33 const& mat)
     int w = (int)os.width();
     os.width(1);
     os << "[";
-    for ( int i = 0; i < 3; ++i )
+    for ( unsigned i = 0; i < 3; ++i )
     {
-        for ( int j = 0; j < 3; ++j )
+        for ( unsigned j = 0; j < 3; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
         if ( i < 2 )
             os << ";";

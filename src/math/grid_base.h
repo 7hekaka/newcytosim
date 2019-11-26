@@ -167,7 +167,7 @@ protected:
     }
     
     /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
-    inline size_t image(const int d, long c) const
+    inline size_t image(const unsigned d, long c) const
     {
 #if GRID_HAS_PERIODIC
         if ( gPeriodic[d] )
@@ -261,14 +261,14 @@ public:
      the edges of the area are specified in dimension `d` by 'infs[d]' and 'sups[d]',
      and the number of cells by 'nbcells[d]'.
      */
-    void setDimensions(const real infs[ORD], real sups[ORD], const int nbcells[ORD])
+    void setDimensions(const real infs[ORD], real sups[ORD], const size_t cells[ORD])
     {
         nCells = 1;
         cVolume = 1;
         
         for ( unsigned d = 0; d < ORD; ++d )
         {
-            if ( nbcells[d] <= 0 )
+            if ( cells[d] <= 0 )
                 throw InvalidParameter("Cannot build grid as nbcells[] is <= 0");
             
             if ( infs[d] > sups[d] )
@@ -282,8 +282,8 @@ public:
                 throw InvalidParameter("Cannot build grid as sup[] == inf[]");
             
             gStride[d] = nCells;
-            nCells    *= nbcells[d];
-            gDim[d]    = nbcells[d];
+            nCells    *= cells[d];
+            gDim[d]    = cells[d];
             gInf[d]    = infs[d];
             gSup[d]    = sups[d];
             cWidth[d]  = ( gSup[d] - gInf[d] ) / real( gDim[d] );
@@ -301,7 +301,7 @@ public:
     }
     
     /// true if dimension `d` has periodic boundary conditions
-    bool isPeriodic(int d) const
+    bool isPeriodic(unsigned d) const
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
@@ -311,7 +311,7 @@ public:
     }
     
     /// change boundary conditions
-    void setPeriodic(int d, bool p)
+    void setPeriodic(unsigned d, bool p)
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
@@ -337,37 +337,37 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    size_t          nbCells()           const { return nCells; }
+    size_t       nbCells()           const { return nCells; }
 
     /// number of cells in dimensionality `d`
-    size_t          breadth(int d)      const { return gDim[d]; }
+    size_t       breadth(size_t d)   const { return gDim[d]; }
     
     /// offset to the next cell in the direction `d`
-    size_t          stride(int d)       const { return gStride[d]; }
+    size_t       stride(size_t d)    const { return gStride[d]; }
     
     /// position of the inferior (left/bottom/etc) edge
-    const real*     inf()               const { return gInf;    }
-    real            inf(int d)          const { return gInf[d]; }
+    const real*  inf()               const { return gInf;    }
+    real         inf(size_t d)       const { return gInf[d]; }
     
     /// position of the superior (right/top/etc) edge
-    const real*     sup()               const { return gSup;    }
-    real            sup(int d)          const { return gSup[d]; }
+    const real*  sup()               const { return gSup;    }
+    real         sup(size_t d)       const { return gSup[d]; }
     
     /// the widths of a cell
-    const real*     delta()             const { return cDelta;    }
-    real            delta(int d)        const { return cDelta[d]; }
+    const real*  delta()             const { return cDelta;    }
+    real         delta(size_t d)     const { return cDelta[d]; }
     
-    const real*     cellWidth()         const { return cWidth;    }
-    real            cellWidth(int d)    const { return cWidth[d]; }
-
-    /// position in dimension `d`, of the cell of index `c`
-    real            position(int d, real c) const { return gInf[d] + c * cWidth[d]; }
-    
-    /// index in dimension `d` corresponding to position `w`
-    int             index(int d, real w) const { return (int)map(d, w); }
+    const real*  cellWidth()         const { return cWidth;    }
+    real         cellWidth(size_t d) const { return cWidth[d]; }
     
     /// the volume of a cell
-    real            cellVolume()        const { return cVolume; }
+    real         cellVolume()        const { return cVolume; }
+
+    /// position in dimension `d`, of the cell of index `c`
+    real         position(size_t d, real c) const { return gInf[d] + c * cWidth[d]; }
+    
+    /// index in dimension `d` corresponding to position `w`
+    int          index(size_t d, real w) const { return (int)map(d, w); }
 
     /// the length of the diagonal of a cell = sqrt( sum(cWidth[d]^2) )
     real diagonalLength() const
@@ -465,7 +465,7 @@ public:
     /// conversion from Coordinates to Position (offset should be in [0,1])
     void setPositionFromCoordinates(real w[ORD], const int coord[ORD], real offset=0) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( unsigned d = 0; d < ORD; ++d )
             w[d] = gInf[d] + cWidth[d] * ( offset + coord[d] );
     }
 
@@ -475,7 +475,7 @@ public:
         size_t inx = image(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + image(d, coord[d]);
+            inx = gDim[d] * inx + image((unsigned)d, coord[d]);
         
         return inx;
     }
@@ -505,17 +505,17 @@ public:
     }
 
     
-    /// return cell that is next to `c` in the direction `d`
-    size_t next(size_t c, int dd) const
+    /// return cell that is next to `c` in the direction `dir`
+    size_t next(size_t c, unsigned dir) const
     {
-        int coord[ORD];
-        for ( unsigned int d = 0; d < ORD; ++d )
+        size_t coord[ORD];
+        for ( unsigned d = 0; d < ORD; ++d )
         {
             coord[d] = c % gDim[d];
             c       /= gDim[d];
         }
 
-        coord[dd] = image(dd, coord[dd]+1);
+        coord[dir] = image(dir, coord[dir]+1);
 
         size_t inx = coord[ORD-1];
         
@@ -587,49 +587,51 @@ private:
     static size_t edge_signature(const size_t s, const int r, const int c)
     {
         if ( c < r )
-            return r - c;
+            return (size_t)( r - c );
         else if ( (size_t)( c + r + 1 ) > s )
-            return 2 * r + c - s + 1;
+            return (size_t)( 2 * r + c + 1 ) - s;
         else
             return 0;
     }
     
     /// caculate the edge characteristic from the coordinates of a cell and the range vector
-    size_t edgeFromCoordinates(const int coord[ORD], const int range[ORD]) const
+    size_t edgeFromCoordinates(const int coord[ORD], const size_t range[ORD]) const
     {
         size_t e = 0;
-        for ( int d = ORD-1; d >= 0; --d )
+        for ( int d = ORD; d > 0; --d )
         {
-            e *= 2 * range[d] + 1;
-            e += edge_signature(gDim[d], range[d], coord[d]);
+            e *= 2 * range[d-1] + 1;
+            e += edge_signature(gDim[d-1], range[d-1], coord[d-1]);
         }
         return e;
     }
     
     
-    int * makeRectangularGrid(int& cmx, const int range[ORD])
+    int * newRectangularGrid(size_t& cmx, const size_t range[ORD])
     {
         cmx = 1;
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( unsigned d = 0; d < ORD; ++d )
             cmx *= ( 2 * range[d] + 1 );
         int * ccc = new int[ORD*cmx];
         
-        int nb = 1;
-        for ( unsigned int d = 0; d < ORD; ++d )
+        size_t nb = 1;
+        for ( unsigned d = 0; d < ORD; ++d )
         {
-            int h = 0;
+            size_t h = 0;
             for ( ; h < nb && h < cmx; ++h )
                 ccc[ORD*h+d] = 0;
-            for ( int s = -range[d]; s <= range[d]; ++s )
+            for ( size_t s = 1; s <= range[d]; ++s )
             {
-                if ( s != 0 )
+                for ( size_t n = 0; n < nb; ++n )
                 {
-                    for ( int n = 0; n < nb && h < cmx; ++n, ++h )
-                    {
-                        for ( unsigned int e = 0; e < d; ++e )
-                            ccc[ORD*h+e] = ccc[ORD*n+e];
-                        ccc[ORD*h+d] = s;
-                    }
+                    for ( size_t e = 0; e < d; ++e )
+                        ccc[ORD*h+e] = ccc[ORD*n+e];
+                    ccc[ORD*h+d] = s;
+                    ++h;
+                    for ( size_t e = 0; e < d; ++e )
+                        ccc[ORD*h+e] = ccc[ORD*n+e];
+                    ccc[ORD*h+d] = -s;
+                    ++h;
                 }
             }
             nb = h;
@@ -640,14 +642,14 @@ private:
     
     
     /// calculate cell index offsets between 'ori' and 'ori+shift'
-    int calculateOffsets(int offsets[], int shift[], int cnt, int ori[], bool positive)
+    int calculateOffsets(int offsets[], int shift[], size_t cnt, int ori[], bool positive)
     {
         int nb = 0;
         int cc[ORD];
         int ori_indx = (int)pack(ori);
-        for ( int ii = 0; ii < cnt; ++ii )
+        for ( size_t ii = 0; ii < cnt; ++ii )
         {
-            for ( unsigned int d = 0; d < ORD; ++d )
+            for ( unsigned d = 0; d < ORD; ++d )
                 cc[d] = ori[d] + shift[ORD*ii+d];
             int off = (int)pack(cc) - ori_indx;
             
@@ -677,7 +679,7 @@ private:
      Note: the range is taken specified in units of cells: 1 = 1 cell
      @todo: specify range in calculateRegion() as real distance!
      */
-    void createRegions(int * ccc, const int regMax, const int range[ORD], bool positive)
+    void createRegions(int * ccc, const size_t regMax, const size_t range[ORD], bool positive)
     {
         size_t edgeMax = 0;
         for ( int d = ORD-1; d >= 0; --d )
@@ -743,12 +745,12 @@ private:
     }
     
     /// used to remove ORD coordinates in array `ccc`
-    void remove_entry(int * ccc, int& cmx, const int s)
+    void remove_entry(int * ccc, const size_t s, size_t& cmx)
     {
         --cmx;
-        for ( int x = ORD*s; x < ORD*cmx; ++x )
+        for ( size_t x = ORD*s; x < ORD*cmx; ++x )
             ccc[x] = ccc[x+ORD];
-    }        
+    }
     
 public:
     
@@ -759,15 +761,15 @@ public:
      */
     void createSquareRegions(const real radius)
     {
-        int range[ORD];
-        for ( int d = 0; d < ORD; ++d )
+        size_t range[ORD];
+        for ( unsigned d = 0; d < ORD; ++d )
             range[d] = ceil( radius / cWidth[d] );
-        int cmx = 0;
-        int * ccc = makeRectangularGrid(cmx, range);
+        size_t cmx = 0;
+        int * ccc = newRectangularGrid(cmx, range);
         
-        for ( int s = cmx-1; s >= 0 ; --s )
-            if ( reject_square(ccc+ORD*s, radius) )
-                remove_entry(ccc, cmx, s);
+        for ( size_t s = cmx; s > 0 ; --s )
+            if ( reject_square(ccc+ORD*(s-1), radius) )
+                remove_entry(ccc, s-1, cmx);
         
         createRegions(ccc, cmx, range, false);
         delete[] ccc;
@@ -780,18 +782,18 @@ public:
      */
     void createRoundRegions(const real radius)
     {
-        int range[ORD];
-        for ( int d = 0; d < ORD; ++d )
+        size_t range[ORD];
+        for ( unsigned d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > 0 );
             range[d] = ceil( radius / cWidth[d] );
         }
-        int cmx = 0;
-        int * ccc = makeRectangularGrid(cmx, range);
+        size_t cmx = 0;
+        int * ccc = newRectangularGrid(cmx, range);
        
-        for ( int s = cmx-1; s >= 0 ; --s )
-            if ( reject_disc(ccc+ORD*s, radius) )
-                remove_entry(ccc, cmx, s);
+        for ( size_t s = cmx; s > 0 ; --s )
+            if ( reject_disc(ccc+ORD*(s-1), radius) )
+                remove_entry(ccc, s-1, cmx);
         
         createRegions(ccc, cmx, range, false);
         delete[] ccc;
@@ -805,13 +807,13 @@ public:
 
      Note: the radius is taken specified in units of cells: 1 = 1 cell
      */
-    void createSideRegions(const int radius)
+    void createSideRegions(const unsigned radius)
     {
-        int range[ORD];
-        for ( unsigned int d = 0; d < ORD; ++d )
+        size_t range[ORD];
+        for ( unsigned d = 0; d < ORD; ++d )
             range[d] = radius;
-        int cmx = 0;
-        int * ccc = makeRectangularGrid(cmx, range);
+        size_t cmx = 0;
+        int * ccc = newRectangularGrid(cmx, range);
         createRegions(ccc, cmx, range, true);
         delete[] ccc;
     }
@@ -831,13 +833,13 @@ public:
 
          CELL * cell = & myGrid.icell(indx);
          n_offset = myGrid.getRegion(offset, indx);
-         for ( int n = 1; n < n_offset; ++n )
+         for ( unsigned n = 1; n < n_offset; ++n )
          {
              Cell & neighbor = cell[offset[n]];
              ...
          }
      
-     Note: you must call createRegions() first
+     Note: createRegions() must be called first
     */
     int getRegion(int*& offsets, const size_t indx) const
     {

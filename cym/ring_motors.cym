@@ -5,7 +5,7 @@ set simul system
 {
     time_step = 0.001
     viscosity = 1.0
-    display = { zoom=0.8 }
+    display = ( zoom=0.8 )
 }
 
 
@@ -24,7 +24,7 @@ set fiber microtubule
     rigidity = 20
     segmentation = 0.15
     confine = inside, 1000
-    display = { line_width=0.5 }
+    display = ( line_width=0.5 )
 }
 
 set hand kinesin

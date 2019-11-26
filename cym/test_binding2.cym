@@ -51,7 +51,7 @@ set hand plus_binder
     binding_rate  = 1
     binding_range = 5
     unbinding     = 0, inf
-    display = { color=blue; width=0 }
+    display = ( color=blue; width=0.5; )
 }
 
 set hand minus_binder
@@ -60,7 +60,7 @@ set hand minus_binder
     binding_rate  = 1
     binding_range = 5
     unbinding     = 0, inf
-    display = { color=orange; width=0 }
+    display = ( color=orange; width=0.5; )
 }
 
 set couple complex

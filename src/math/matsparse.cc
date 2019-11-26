@@ -10,8 +10,8 @@
 
 #define MATRIX_OPTIMIZED_MULTIPLY 1
 
-const size_t AVAILABLE_CELL = ~0 >> 1;
-const size_t LAST_IN_COLUMN = ~0;
+const size_t AVAILABLE_CELL = ~0U >> 1;
+const size_t LAST_IN_COLUMN = ~0U;
 
 
 MatrixSparse::MatrixSparse()

@@ -607,6 +607,7 @@
 		BB9D87B41E76BBF100DD0F00 /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
 		BB9D992908D6281100DBD2BF /* mecafil.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9D992508D6281100DBD2BF /* mecafil.cc */; };
 		BB9D992A08D6281100DBD2BF /* mecafil.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9D992608D6281100DBD2BF /* mecafil.h */; };
+		BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */; };
 		BB9EC393209235CC00EF00E7 /* SFMT-common.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE447D920646A420058ADAC /* SFMT-common.h */; };
 		BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE447CE2064697D0058ADAC /* SFMT-params.h */; };
 		BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE447CF2064697D0058ADAC /* SFMT-params19937.h */; };
@@ -835,7 +836,6 @@
 		BBE82A5E233D15EB00BE44DF /* space_cylinderP.cc in Sources */ = {isa = PBXBuildFile; fileRef = E2F6428715D01466009B7C31 /* space_cylinderP.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5F233D15EB00BE44DF /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A65233D163C00BE44DF /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
-		BBE82A67233D167A00BE44DF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A66233D167900BE44DF /* OpenGL.framework */; };
 		BBE82A68233D1A5E00BE44DF /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BBE87E000DD33655002B3A3C /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
 		BBE87E010DD33655002B3A3C /* movable.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE87DFF0DD33655002B3A3C /* movable.h */; };
@@ -849,8 +849,6 @@
 		BBEF3A88118318AE000F2EED /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
 		BBF0385E18BCF207002E8568 /* splash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF0385D18BCF207002E8568 /* splash.cc */; };
 		BBF0386018BCF7A3002E8568 /* splash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF0385F18BCF7A3002E8568 /* splash.h */; };
-		BBF2FBC521AD36FD00A07E95 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF2FBC421AD36FD00A07E95 /* GLUT.framework */; };
-		BBF2FBC821AD37A900A07E95 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF2FBC421AD36FD00A07E95 /* GLUT.framework */; };
 		BBF7BB1A10CD44E00089F5B1 /* display2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF7BB1810CD44E00089F5B1 /* display2.cc */; };
 		BBF7BB1B10CD44E00089F5B1 /* display2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF7BB1910CD44E00089F5B1 /* display2.h */; };
 		BBFAB112116F20CD0009FD97 /* field_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB537E3511131B110059D9AA /* field_set.cc */; };
@@ -1543,6 +1541,7 @@
 		BB9D87A01E76BAE500DD0F00 /* test_matrix */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_matrix; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB9D992508D6281100DBD2BF /* mecafil.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = mecafil.cc; path = src/sim/mecafil.cc; sourceTree = SOURCE_ROOT; };
 		BB9D992608D6281100DBD2BF /* mecafil.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = mecafil.h; path = src/sim/mecafil.h; sourceTree = SOURCE_ROOT; };
+		BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_dispatch.cc; sourceTree = "<group>"; };
 		BB9EC3912091D6B000EF00E7 /* test_asm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_asm.cc; sourceTree = "<group>"; };
 		BBA005AE163495BF0026FCB1 /* digit.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = digit.cc; path = hands/digit.cc; sourceTree = "<group>"; };
 		BBA005AF163495BF0026FCB1 /* digit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = digit.h; path = hands/digit.h; sourceTree = "<group>"; };
@@ -1722,7 +1721,6 @@
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
 		BBE60C250EE979ED00FFAB27 /* simul_step.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_step.cc; path = src/sim/simul_step.cc; sourceTree = SOURCE_ROOT; };
 		BBE82A64233D15EB00BE44DF /* libcytospaceG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceG.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BBE82A66233D167900BE44DF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		BBE87DFE0DD33655002B3A3C /* movable.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = movable.cc; path = src/sim/movable.cc; sourceTree = SOURCE_ROOT; };
 		BBE87DFF0DD33655002B3A3C /* movable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = movable.h; path = src/sim/movable.h; sourceTree = SOURCE_ROOT; };
 		BBE9D38B158500BA00FF944A /* space_ring.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_ring.cc; path = src/sim/spaces/space_ring.cc; sourceTree = SOURCE_ROOT; };
@@ -1734,7 +1732,6 @@
 		BBEF3A86118318AE000F2EED /* backtrace.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = backtrace.cc; sourceTree = "<group>"; };
 		BBF0385D18BCF207002E8568 /* splash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = splash.cc; path = src/sim/splash.cc; sourceTree = SOURCE_ROOT; };
 		BBF0385F18BCF7A3002E8568 /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = splash.h; path = src/sim/splash.h; sourceTree = SOURCE_ROOT; };
-		BBF2FBC421AD36FD00A07E95 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		BBF7BB1810CD44E00089F5B1 /* display2.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = display2.cc; path = src/play/display2.cc; sourceTree = SOURCE_ROOT; };
 		BBF7BB1910CD44E00089F5B1 /* display2.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = display2.h; path = src/play/display2.h; sourceTree = SOURCE_ROOT; };
 		BBF9A315208C8C9700A9E5E5 /* test_omp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_omp.cc; sourceTree = "<group>"; };
@@ -1780,8 +1777,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBE82A67233D167A00BE44DF /* OpenGL.framework in Frameworks */,
-				BBF2FBC521AD36FD00A07E95 /* GLUT.framework in Frameworks */,
 				BB55C0E30A2613D5003333C9 /* libcytobase.a in Frameworks */,
 				BB4DB5B20C69D6B2001E5E4F /* libcytodisp.a in Frameworks */,
 				BBAEC50D0EF1D23000955B64 /* libcytomath.a in Frameworks */,
@@ -1888,7 +1883,6 @@
 				BBA758B1139CFD3F0098FBAF /* libcytomath.a in Frameworks */,
 				BBA758B2139CFD430098FBAF /* libcytobase.a in Frameworks */,
 				BBB1C6DE0CB2CAA300679ADC /* OpenGL.framework in Frameworks */,
-				BBF2FBC821AD37A900A07E95 /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2476,6 +2470,7 @@
 				BB1227AE114FB8640042589A /* test_blas.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */,
 				BB940AB8164BCDDF00542F06 /* test_cxx.cc */,
+				BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */,
 				BBDAA458152C648F0099FD2D /* test_gillespie.cc */,
 				BB73590905B98DA3006956D5 /* test_glapp.cc */,
 				BB7DC19B2200DCE400DB779E /* test_glos.cc */,
@@ -2869,9 +2864,7 @@
 		BBB7ED3A06933C7700E2B49B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BBE82A66233D167900BE44DF /* OpenGL.framework */,
 				BB69D0B8209C666100445716 /* GLUT.framework */,
-				BBF2FBC421AD36FD00A07E95 /* GLUT.framework */,
 				BB84087F193490130088C07B /* Accelerate.framework */,
 				BBB7ED2906933C6700E2B49B /* AGL.framework */,
 				BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */,
@@ -4358,6 +4351,7 @@
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
 				BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */,
+				BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */,
 				BB7191B50EF1CD9900CED9E2 /* platonic.cc in Sources */,
 				BB003F3020EDEDA4007C9593 /* vector4.cc in Sources */,
 				BB7191B80EF1CD9900CED9E2 /* matsparsesymblk.cc in Sources */,

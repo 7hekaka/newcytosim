@@ -84,7 +84,7 @@ bool splitNumber(std::string& arg, unsigned& num)
         num = (unsigned)var;
         while ( isspace(*end) )
             ++end;
-        arg.erase(0, end-ptr);
+        arg.erase(0, (size_t)(end-ptr));
         return true;
     }
     return false;
@@ -229,6 +229,16 @@ Object * FiberSet::newObject(const ObjectTag tag, unsigned num)
     return nullptr;
 }
 
+
+void FiberSet::write(Outputter& out) const
+{
+    if ( size() > 0 )
+    {
+        out.put_line("\n#section "+title(), out.binary());
+        writeNodes(out, nodes);
+    }
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -283,7 +293,7 @@ void FiberSet::step()
 /**
  Cut all Fibers along the plane defined by n.pos + a = 0.
  */
-void FiberSet::planarCut(Vector const& n, const real a, int stateP, int stateM)
+void FiberSet::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
 {
     /*
      We must ensure here that each Fiber is processed only once.
@@ -302,7 +312,7 @@ void FiberSet::planarCut(Vector const& n, const real a, int stateP, int stateM)
 /**
  Cut given Fibers along the plane defined by n.pos + a = 0.
  */
-void FiberSet::planarCut(ObjectList& objs, Vector const& n, const real a, int stateP, int stateM)
+void FiberSet::planarCut(ObjectList& objs, Vector const& n, const real a, state_t stateP, state_t stateM)
 {
     for ( Object * i : objs )
     {
@@ -551,7 +561,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
             return randomSite();
         else
         {
-            Fiber* fib = Fiber::toFiber(findObject(str));
+            Fiber* fib = Fiber::toFiber(findObject(str, title()));
             
             if ( !fib )
             {

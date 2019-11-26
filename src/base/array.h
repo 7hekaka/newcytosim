@@ -15,7 +15,7 @@
  added as needed:
  - remove_pack() will pack the array removing 'zero' values,
  - sort() will sort the array given a order function,
- - allocate(int s) ensures that array[s-1] can then be accessed, as with C-arrays.
+ - allocate() ensures that array[s-1] can then be accessed, as with C-arrays.
  - operator[](int) returns the object stored at a particular index.
  - shuffle() permutes the values to produce a random ordering.
  - data() returns a pointer to the underlying C-array.

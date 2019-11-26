@@ -198,7 +198,7 @@ size_t Solid::allocateMecable(const size_t nbp)
             for ( size_t p = 0; p < nPoints; ++p )
             {
                 rad[p] = soRadius[p];
-                for ( int d = 0; d < DIM; ++d )
+                for ( unsigned d = 0; d < DIM; ++d )
                     shp[DIM*p+d] = soShape[DIM*p+d];
             }
             // delete the 'current' array:
@@ -337,7 +337,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             opt.set(rad, var, inx+1);
             
             if ( rad < 0 )
-                throw InvalidParameter("the radius of solid:sphere must be >= 0");
+                throw InvalidParameter("radius of solid:sphere must be >= 0");
 
             size_t fip = nPoints;
             str = opt.value(var, inx);
@@ -377,7 +377,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         opt.set(rad, var, 1);
         
         if ( rad <= 0 )
-            throw InvalidParameter("the radius of sphere specified in solid must be > 0");
+            throw InvalidParameter("radius of sphere specified in solid must be > 0");
 
         // get position:
         std::istringstream iss(opt.value(var, 0));
@@ -388,33 +388,38 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         addTriad(rad);
 
 #if ( DIM > 1 )
-        real sep = 1.0, dev = 0.0;
-        if ( opt.set(dev, "deviation") && opt.set(sep, "separation") )
+        real sep = 1.0;
+        if ( opt.set(sep, "separation") )
         {
             // attach Single on the surface of this sphere:
             size_t nbs = opt.nb_values(var) - 2;
             // 'pts' is a set of unit vectors:
             std::vector<Vector> pts(nbs, Vector(0,0,0));
 
-            // we decrease gradually the separation, until all points can fit:
+            // separation should not be greater than diameter:
+            sep = std::min(sep, 2*rad);
+            // decrease separation gradually, until all points can fit:
             real dis = sep;
             size_t ouf = 0;
-            while ( tossPointsSphere(pts, dis/rad, 1024) < nbs )
+            while ( tossPointsSphere(pts, dis/rad, 128) < nbs )
             {
-                if ( ++ouf > 1024 )
+                if ( ++ouf > 128 )
                 {
                     ouf = 0;
-                    dis /= 1.1892;
+                    dis /= 1.0905044; // sqrt(sqrt(sqrt(2)))
                 }
             }
             if ( dis < sep )
                 std::cerr << "Warning: solid:separation reduced to " << dis << "\n";
+            real dev = 0.0;
+            if ( opt.set(dev, "deviation") && dev > rad )
+                throw InvalidParameter("solid:deviation should be <= radius\n");
             
             inx = 2;
             while ( opt.set(str, var, inx++) )
             {
                 // get a number and the name of a class:
-                unsigned long num = 1;
+                size_t num = 1;
                 Tokenizer::get_integer(str, num);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
@@ -437,7 +442,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             while ( opt.set(str, var, inx++) )
             {
                 // get a number and the name of a class:
-                unsigned long num = 1;
+                size_t num = 1;
                 Tokenizer::get_integer(str, num);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
@@ -594,7 +599,7 @@ void Solid::fixShape()
     // set reference to current shape translated to be centered:
     for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
             soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
     
@@ -615,7 +620,7 @@ void Solid::scaleShape(const real scale[DIM])
     //scale in only in the specified dimension
     for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
             soShape[DIM*p+d] *= scale[d];
     }
     
@@ -650,7 +655,7 @@ void Solid::rescale()
         for ( size_t p = 0; p < nPoints; ++p )
         {
             real * pos = pPos + DIM * p;
-            for ( int d = 0; d < DIM; ++d )
+            for ( unsigned d = 0; d < DIM; ++d )
                 pos[d] = scale * ( pos[d] - avg[d] ) + avg[d];
         }
     }
@@ -1099,7 +1104,7 @@ void Solid::makeProjection()
     //Matrix33 mat = soMomentum;
     soMomentum.symmetricInverse();
 
-#if ( 1 )
+#if ( 0 )
     mat.copy_lower();
     mat.inverse();
     real dif = ( mat - soMomentum ).norm();

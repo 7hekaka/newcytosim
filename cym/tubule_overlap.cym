@@ -7,17 +7,18 @@ set simul system
     viscosity = 1
     time_step = 0.001
     steric = 1, 1000
+    precondition = 0
 }
 
 set system display
 {
-	window_size = 1792, 768; point_value=0.001; style=3; back_color=white;
+    window_size = 1792, 768; point_value=0.001; style=3; back_color=white;
 }
 
 set space cell 
 {
     shape = capsule
-	display = ( visible = 0 )
+    display = ( visible = 0 )
 }
 
 new cell
@@ -32,13 +33,20 @@ set fiber filament
     segmentation = 0.128
     steric = 1, 0.005
     lattice = 1, 0.008
-    display = ( style=line; width=5; )
+}
+
+set filament display
+{
+    color      = 0xFFFFFFFF, 0x7F7F7FFF, 0xFFFFFF00;
+    coloring   = 5;
+    lines      = 5, 1, 1;
+    lattice    = 3, 1, 0;
 }
 
 set tubule microtubule
 {
     stiffness = 10000, 5000
-	fiber = filament
+    fiber = filament
 }
 
 set hand kinesin
@@ -53,8 +61,13 @@ set hand kinesin
     stall_force = 6
     step_size = 0.008
     hold_growing_end = 1
-    
-    display = ( color=dark_blue; size=7; width=5; )
+}
+
+set kinesin display
+{
+    color   = 0x000080FF;
+    size    = 6;
+    width   = 3.5;
 }
 
 set couple complex
@@ -69,7 +82,7 @@ set couple complex
 
 new 2 microtubule
 {
-    length = 0.256
+    length = 0.512
     range = 0 0.025 -0.025, 0 -0.025 0.025
     orientation = +1 0 0
     mark = 2
@@ -77,7 +90,7 @@ new 2 microtubule
 
 new 2 microtubule
 {
-    length = 0.256
+    length = 0.512
     range = 0 -0.025 -0.025, 0 0.025 0.025
     orientation = -1 0 0
     mark = 4
@@ -90,14 +103,14 @@ new 0 microtubule
     orientation = 1 0 0
 }
 
-new 128 complex
+new 384 complex
 
-run 1000 system
+run 250 system
 {
     solve = 0
 }
 
-run 1000 system
+run 250 system
 {
 }
 
@@ -107,3 +120,4 @@ run 10000 system
 {
     nb_frames = 25
 }
+

@@ -67,17 +67,23 @@ public:
     //--------------------------
 
     /// identifies the class
-    std::string   title() const { return "single"; }
+    static std::string title() { return "single"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property *    newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList    newObjects(const std::string& name, Glossary& opt);
+    ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *      newObject(ObjectTag, unsigned);
+    Object *    newObject(ObjectTag, unsigned);
     
+    /// print a summary of the content (nb of objects, class)
+    void        report(std::ostream&) const;
+
+    /// write
+    void        write(Outputter&) const;
+
     //--------------------------
 
     /// add object
@@ -127,7 +133,7 @@ public:
     ObjectList    collect(bool (*func)(Object const*, void const*), void const*) const;
 
     /// collect objects for which func(obj, val) == true
-    unsigned      count(bool (*func)(Object const*, void const*), void const*) const;
+    size_t        count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// erase all Object and all Property
     void          erase();
@@ -166,12 +172,6 @@ public:
     
     /// unmark objects after import
     void          thaw();
-
-    /// print a summary of the content (nb of objects, class)
-    void          report(std::ostream&) const;
-
-    /// write
-    void          write(Outputter&) const;
     
     /// check internal consistency, returns 0 if everything is OK
     int           bad() const;

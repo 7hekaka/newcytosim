@@ -30,7 +30,7 @@ set fiber microtubule
 new 1 microtubule
 {
     length = 12
-    position = ( 0 0 0 )
+    position = 0 0 0
 }
 
 set hand binder

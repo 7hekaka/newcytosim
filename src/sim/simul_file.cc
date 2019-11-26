@@ -396,7 +396,6 @@ int Simul::loadObjects(Inputter& in, ObjectSet* subset)
     }
     catch(Exception & e)
     {
-        std::cerr << "Error: " << e.what() << std::endl;
         in.unlock();
         throw;
     }
@@ -508,7 +507,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             // info line "#format 48 dim 2"
             else if ( tok == "format" )
             {
-                int d = 0, f = 0;
+                unsigned d = 0, f = 0;
                 iss >> f >> tok >> d;
                 in.formatID(f);
                 in.vectorSize(d);
@@ -525,7 +524,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 // old format info line "#time 14.000000, dim 2, format 47"
                 if ( iss.get() == ',' )
                 {
-                    int i = 0;
+                    unsigned i = 0;
                     iss >> tok >> i;
                     if ( tok == "dim" )
                     {
@@ -583,7 +582,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     }
                     else
                     {
-                        int pi = 0;
+                        size_t pi = 0;
                         if ( tag!='i'  &&  ( tag!='m' || in.formatID()!=31 ))
                             pi = in.readUInt16();
                         obj = set->newObject(tolower(tag), pi);
@@ -597,29 +596,22 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
 #endif
             try
             {
-                Object * obj = nullptr;
                 if ( objset )
                 {
                     // check that we are using the correct ObjectSet:
                     assert_true( objset == findSetT(tag) );
-                    obj = objset->readObject(in, tag, fat);
+                    bool skip = ( subset && subset!=objset );
+                    objset->loadObject(in, tag, fat, skip);
                 }
                 else
                 {
+                    // this is the 'older' pathway
                     ObjectSet * set = findSetT(tag);
                     if ( set )
                     {
-                        obj = set->readObject(in, tag, fat);
-                        if ( !obj->linked() )
-                            set->add(obj);
+                        bool skip = ( subset && subset!=set );
+                        set->loadObject(in, tag, fat, skip);
                     }
-                }
-                if ( !obj->linked() )
-                {
-                    if ( !subset || subset==objset )
-                        objset->add(obj);
-                    else
-                        delete(obj);
                 }
             }
             catch( Exception & e )

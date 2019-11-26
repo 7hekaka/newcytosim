@@ -33,7 +33,7 @@ set fiber microtubule
 new 2 microtubule
 {
     length = 4
-    position = ( 0 0 0 )
+    position = 0 0 0
 }
 
 set hand motor

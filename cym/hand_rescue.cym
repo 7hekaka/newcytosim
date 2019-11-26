@@ -34,7 +34,7 @@ set fiber microtubule
     shrinking_speed = -0.15
     hydrolysis_rate = 0.25
     growing_force   = 1.7
-    display = { line_width=2; plus_end=16, 2; }
+    display = ( line_width=2; plus_end=16, 2; )
 }
 
 new 5 microtubule
@@ -52,7 +52,7 @@ set hand rescuer
     
     activity = rescue
     rescue_prob = 0.1
-    display = { width=3; size=6; color=green }
+    display = ( width=3; size=6; color=green )
 }
 
 set single simplex

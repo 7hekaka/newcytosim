@@ -39,7 +39,7 @@ private:
 public:
     
     /// constructor
-    Modulo() { mMode = 0; }
+    Modulo() { mMode = 0; for (int d=0; d<DIM; ++d) mSize[d] = 0; }
 
     /// destructor
     ~Modulo() {}
@@ -48,16 +48,16 @@ public:
     void disable() { mMode = 0; }
     
     /// enable periodicity in dimension 'd'
-    void enable(int d, real size) { mMode |= 1<<d; mSize[d] = size; }
+    void enable(unsigned d, real size);
     
     /// true if at least one direction has periodic boundaries
     bool isPeriodic() const { return mMode; }
 
     /// true if direction `d` has periodic boundaries
-    bool isPeriodic(int d) const { return mMode & (1<<d); }
+    bool isPeriodic(unsigned d) const { return mMode & (1<<d); }
     
     /// return the d-th direction of periodicity
-    const Vector periodicity(int d) const;
+    const Vector periodicity(unsigned d) const;
     
     /// shift `pos` to its canonical image, which is the one closest to the origin
     void         fold(Vector & pos) const;

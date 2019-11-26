@@ -143,8 +143,8 @@ private:
             char const* chr = val.c_str() + iss.tellg();
             if ( not_space(chr) )
             {
-                std::cerr << "Warning: ignored trailing `" << val.substr(iss.tellg()) << "' in ";
-                std::cerr << key << " = " << val << '\n';
+                std::cerr << "Warning: ignored trailing `" << chr;
+                std::cerr << "' in `" << key << " = " << val << "'\n";
             }
         }
     }
@@ -164,12 +164,11 @@ private:
             }
         }
  
-        std::ostringstream oss;
-        oss << "could not set `"+key+"' from `"+val+"'\n";
-        oss << "  Known values are:\n";
+        InvalidParameter e("could not set `"+key+"' from `"+val+"'\n");
+        e << "  Known values are:\n";
         for ( auto const& kv : dict )
-            oss << PREF << kv.first << " = " << kv.second << '\n';
-        throw InvalidParameter(oss.str());
+            e << PREF << kv.first << " = " << kv.second << '\n';
+        throw e;
     }
     
     //-------------------------------------------------------------------------------
@@ -278,16 +277,8 @@ public:
     /// read a C-style argument
     void         read_string(const char arg[], int no_overwrite = 2);
 
-    /// read C-style command-line arguments
-    void         read_strings(int argc, char* argv[], int no_overwrite = 2);
-
-    //-------------------------------------------------------------------------------
-
-    /// write [ key = value1, value2, ... ]
-    static void  write(std::ostream&, std::string const& prefix, pair_type const&);
-
-    /// write the number of time each value has been used
-    static void  write_counts(std::ostream&, std::string const& prefix, pair_type const&);
+    /// read C-style command-line arguments, return 0 if success
+    int          read_strings(int argc, char* argv[], int no_overwrite = 2);
 
     /// write all [key, values]
     void         write(std::ostream&, std::string const& prefix = "") const;

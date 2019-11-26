@@ -41,7 +41,7 @@ set hand nucleator
     unbinding = 0, 3
     activity = nucleate
     nucleate = 0.1, microtubule, ( length=0.1; plus_end=grow; )
-    display = { size=5; color=green, gray; }
+    display = ( size=5; color=green, gray; )
 }
 
 set single simplex

@@ -32,12 +32,8 @@ void ForkProp::read(Glossary& glos)
     CoupleProp::read(glos);
     
     // compact syntax
-    glos.set(angular_stiffness, "torque");
-    glos.set(angle,             "torque", 1);
-
-    // alternative syntax:
-    glos.set(angle,             "angle");
-    glos.set(angular_stiffness, "angular_stiffness");
+    glos.set(angular_stiffness, "torque") || glos.set(angle, "angle");
+    glos.set(angle,          "torque", 1) || glos.set(angular_stiffness, "angular_stiffness");
     
     glos.set(flip, "flip");
 }

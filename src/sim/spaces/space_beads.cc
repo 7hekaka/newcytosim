@@ -61,7 +61,7 @@ void SpaceBeads::resize(Glossary& opt)
  */
 void SpaceBeads::setBoundaries()
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         bbMin[d] =  INFINITY;
         bbMax[d] = -INFINITY;
@@ -71,7 +71,7 @@ void SpaceBeads::setBoundaries()
     {
         real rad = i->radius();
         Vector pos = i->position();
-        for ( int d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
         {
             bbMin[d] = std::min(bbMin[d], pos[d]-rad);
             bbMax[d] = std::max(bbMax[d], pos[d]+rad);
@@ -109,7 +109,7 @@ real SpaceBeads::volume() const
 
 bool SpaceBeads::inside(Vector const& point) const
 {
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         if ( point[d] < bbMin[d] ) return false;
         if ( bbMax[d] < point[d] ) return false;

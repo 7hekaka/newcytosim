@@ -23,7 +23,7 @@ void Mecable::clearMecable()
     pBlockSize = 0;
     pPos       = nullptr;
     pForce     = nullptr;
-    pIndex     = -1;  // that is an invalid value
+    pIndex     = 0;
 }
 
 

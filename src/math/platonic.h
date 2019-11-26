@@ -54,9 +54,9 @@ namespace Platonic
         
         ~Vertex() {}
         
-        int      weight(int x) const { return weight_[x]; }
+        unsigned weight(int x) const { return weight_[x]; }
         
-        int      sum_weights() const { return weight_[0]+weight_[1]+weight_[2]; }
+        unsigned sum_weights() const { return weight_[0]+weight_[1]+weight_[2]; }
         
         void     print(unsigned, std::ostream&) const;
     };

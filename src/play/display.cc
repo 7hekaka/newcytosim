@@ -119,7 +119,7 @@ void Display::displayTiled(Simul const& sim, int arg)
     int l[3] = { 0 };
     int u[3] = { 0 };
     
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
     {
         if ( modulo->isPeriodic(d) )
         {

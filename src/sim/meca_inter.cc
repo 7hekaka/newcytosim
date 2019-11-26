@@ -4072,7 +4072,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     add_block_diag(ii1, wbT*bR); //this term is symmetric but not diagonal
 
     if ( modulo )
-        pos += modulo->offset( pos - ptA.pos() );
+        pos += modulo->offset( ptA.pos() - pos );
     
 #if DRAW_MECA_LINKS
     if ( drawLinks )
@@ -4350,9 +4350,9 @@ void Meca::addCoulomb( const Mecapoint & ptA, const Mecapoint & ptB, real weight
     add_base(inxA, ab,-3*abn3);
     add_base(inxB, ab, 3*abn3);
     
-    for ( int ii = 0; ii < DIM; ++ii )
+    for ( unsigned ii = 0; ii < DIM; ++ii )
     {
-        for ( int jj = ii; jj < DIM; ++jj )
+        for ( unsigned jj = ii; jj < DIM; ++jj )
         {
             real m = abn5 * ( (ii==jj) - 3 * ab[ii] * ab[jj] );
             

@@ -65,8 +65,9 @@ int main(int argc, char* argv[])
     Glossary arg;
 
     //parse the command line:
-    arg.read_strings(argc-1, argv+1);
-    
+    if ( arg.read_strings(argc-1, argv+1) )
+        return EXIT_FAILURE;
+
     if ( arg.use_key("help") || arg.use_key("--help") )
     {
         splash(std::cout);
@@ -119,12 +120,12 @@ int main(int argc, char* argv[])
         simul.initialize(arg);
     }
     catch( Exception & e ) {
-        print_magenta(std::cerr, "Error: ");
-        std::cerr << e.what() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief());
+        std::cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     catch(...) {
-        std::cerr << "Error: an unknown exception occured during initialization\n";
+        print_red(std::cerr, "Error: an unknown exception occured during initialization\n");
         return EXIT_FAILURE;
     }
     
@@ -136,8 +137,8 @@ int main(int argc, char* argv[])
             std::cerr << "You must specify a config file\n";
     }
     catch( Exception & e ) {
-        print_magenta(std::cerr, "Error: ");
-        std::cerr << e.what() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief());
+        std::cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     catch(...) {

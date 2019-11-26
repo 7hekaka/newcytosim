@@ -79,8 +79,8 @@ new 1000 actin
     length = 5
 }
 
-new 50 anchor ( rectangle 0 4 at  10 0 )
-new 50 anchor ( rectangle 0 4 at -10 0 )
+new 50 anchor { range =  10 -5,  10 5 }
+new 50 anchor { range = -10 -5, -10 5 }
 
 % give some time to let things bind:
 run 1000 system
@@ -88,7 +88,7 @@ run 1000 system
 new 5000 motor
 new 5000 crosslinker
 
-run 1000 system
+run 10000 system
 {   
     nb_frames = 10
 }

@@ -136,7 +136,7 @@ void Bead::projectForces(const real* X, real* Y) const
 {
     assert_true( paDrag > 0 );
     real s = 1.0 / paDrag;
-    for ( int d = 0; d < DIM; ++d )
+    for ( unsigned d = 0; d < DIM; ++d )
         Y[d] = s * X[d];
 }
 

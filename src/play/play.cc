@@ -135,13 +135,8 @@ int main(int argc, char* argv[])
     Cytosim::all_silent();
     std::atexit(goodbye);
 
-    try {
-        arg.read_strings(argc-1, argv+1);
-    }
-    catch( Exception & e ) {
-        std::cerr << "Error: " << e.what() << '\n';
+    if ( arg.read_strings(argc-1, argv+1) )
         return EXIT_FAILURE;
-    }
     
     // check for major options:
     
@@ -161,7 +156,7 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     
-    if ( arg.use_key("live") )
+    if ( arg.use_key("live") || arg.has_key(".cym") )
         player.goLive = true;
     
     if ( arg.use_key("image") )
@@ -198,7 +193,8 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::cerr << "Error: " << e.what() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief());
+        std::cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     
@@ -240,7 +236,8 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::cerr << "Error: " << e.what() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief());
+        std::cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     
@@ -269,14 +266,15 @@ int main(int argc, char* argv[])
                 // if EOF is reached, reload last frame in file:
                 thread.loadLastFrame();
                 if ( thread.hasFrame() )
-                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << '\n';
+                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << ' ';
             }
             frm = thread.currentFrame();
         }
         catch( Exception & e )
         {
             arg.warnings(std::cerr);
-            std::cerr << "\nError: " << e.what() << '\n';
+            print_magenta(std::cerr, "Error: "+e.brief());
+            std::cerr << e.info() << '\n';
             return EXIT_FAILURE;
         }
     }
@@ -397,7 +395,8 @@ int main(int argc, char* argv[])
     }
     catch ( Exception & e )
     {
-        std::cerr << "\nInitialization Error: " << e.what() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief());
+        std::cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     
@@ -414,7 +413,8 @@ int main(int argc, char* argv[])
         }
         catch( Exception & e )
         {
-            std::cerr << "\nError: " << e.what() << '\n';
+            print_magenta(std::cerr, "Error: "+e.brief());
+            std::cerr << e.info() << '\n';
             return EXIT_FAILURE;
         }
     }

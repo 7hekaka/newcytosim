@@ -186,7 +186,7 @@ namespace Platonic
 
         unsigned* line = new unsigned[div+1];
         
-        for ( unsigned jj = 0;  jj <= div;  ++jj )
+        for ( unsigned jj = 0; jj <= div;  ++jj )
             line[jj] = getVertex(Vertex(A, div-jj, B, jj, nullptr, 0));
         
         for ( unsigned ii = 1;  ii <= div;  ++ii )
@@ -237,7 +237,7 @@ namespace Platonic
             {1, 2, 3}
         };
         
-        for ( int v = 0; v < 4; ++v )
+        for ( unsigned v = 0; v < 4; ++v )
             setCorner(v, vex[v][0], vex[v][1], vex[v][2]);
         
         for ( int f = 0; f < 4; ++f )
@@ -284,7 +284,7 @@ namespace Platonic
         };
 
         
-        for ( int v = 0; v < 6; ++v )
+        for ( unsigned v = 0; v < 6; ++v )
             setCorner(v, vex[v][0], vex[v][1], vex[v][2]);
         
         for ( int f = 0; f < 8; ++f )
@@ -357,7 +357,7 @@ namespace Platonic
             {4,  7, 10},
         };
         
-        for ( int v = 0; v < 12; ++v )
+        for ( unsigned v = 0; v < 12; ++v )
             setCorner(v, vex[v][0], vex[v][1], vex[v][2]);
 
         for ( int f = 0; f < 20; ++f )
@@ -481,7 +481,7 @@ namespace Platonic
         if ( weight_[ii] < weight_[jj] || ( weight_[ii] == weight_[jj] && vertex_[ii] < vertex_[jj]) )
         {
             Corner  * p = vertex_[jj];
-            int w = weight_[jj];
+            unsigned w = weight_[jj];
             vertex_[jj] = vertex_[ii];
             weight_[jj] = weight_[ii];
             vertex_[ii] = p;
@@ -506,8 +506,8 @@ namespace Platonic
      */
     bool Vertex::equal(const Vertex & X) const
     {
-        int s =   sum_weights();
-        int t = X.sum_weights();
+        unsigned s =   sum_weights();
+        unsigned t = X.sum_weights();
         return (   ((vertex_[0]==X.vertex_[0] && t*weight_[0]==s*X.weight_[0]) || (weight_[0]==0 && X.weight_[0]==0))
                 && ((vertex_[1]==X.vertex_[1] && t*weight_[1]==s*X.weight_[1]) || (weight_[1]==0 && X.weight_[1]==0))
                 && ((vertex_[2]==X.vertex_[2] && t*weight_[2]==s*X.weight_[2]) || (weight_[2]==0 && X.weight_[2]==0)));

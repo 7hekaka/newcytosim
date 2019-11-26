@@ -48,7 +48,7 @@ namespace SolverC
     
     
     /// Memory allocation function
-    void allocate(int size,
+    void allocate(size_t size,
                   real**v1=nullptr, real**v2=nullptr, real**v3=nullptr, real**v4=nullptr,
                   real**v5=nullptr, real**v6=nullptr, real**v7=nullptr, real**v8=nullptr);
     

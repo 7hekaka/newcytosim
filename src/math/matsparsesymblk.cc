@@ -406,9 +406,9 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
         {
             size_t ii = col.inx_[n];
             SquareBlock blk = col.blk_[n];
-            int d = ( ii == jj );
-            for ( int x = 0  ; x < BLOCK_SIZE; ++x )
-            for ( int y = x*d; y < BLOCK_SIZE; ++y )
+            size_t d = ( ii == jj );
+            for ( size_t x = 0  ; x < BLOCK_SIZE; ++x )
+            for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
             {
                 real v = blk(y, x);
                 if ( v != 0 )
@@ -426,7 +426,7 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
 void MatrixSparseSymmetricBlock::printColumns(std::ostream& os)
 {
     os << "MSSB size " << size_ << ":";
-    for ( size_t j = 0; j < size_; ++j )
+    for ( unsigned j = 0; j < size_; ++j )
         if ( column_[j].size_ > 0 )
         {
             os << "\n   " << j << "   " << column_[j].size_;

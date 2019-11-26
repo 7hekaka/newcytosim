@@ -21,7 +21,7 @@ set fiber microtubule
 {
     rigidity = 20
     segmentation = 0.5
-    display = { line_width=0.5 }
+    display = ( line_width=0.5; )
 }
 
 set hand dynein 

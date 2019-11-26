@@ -72,20 +72,20 @@ private:
         // we add a safety border (in micro-meters)
         const real extra = tight ? 0 : 1;
         
-        int size[3] = { 0, 0, 0 };
+        size_t n_cell[3] = { 0, 0, 0 };
         // we use square cells:
-        for ( int d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
         {
-            size[d] = (int)ceil( (sup[d]-inf[d]+extra) / step );
+            n_cell[d] = (size_t)ceil( (sup[d]-inf[d]+extra) / step );
             real mid = 0.5 * ( inf[d] + sup[d] );
-            inf[d] = mid - 0.5 * step * size[d];
-            sup[d] = mid + 0.5 * step * size[d];
+            inf[d] = mid - 0.5 * step * n_cell[d];
+            sup[d] = mid + 0.5 * step * n_cell[d];
         }
         
-        mGrid.setDimensions(inf, sup, size);
+        mGrid.setDimensions(inf, sup, n_cell);
         
         //verify the cell size:
-        for ( int d = 0; d < DIM; ++d )
+        for ( unsigned d = 0; d < DIM; ++d )
         {
             real dif = fabs( step - mGrid.cellWidth(d) );
             if ( fabs(dif) > 1e-3 )
@@ -142,7 +142,7 @@ public:
             
             if ( prop->periodic )
             {
-                for ( int d = 0; d < DIM; ++d )
+                for ( unsigned d = 0; d < DIM; ++d )
                     mGrid.setPeriodic(d, true);
                 setGrid(inf, sup, prop->step, true);
             }
@@ -266,7 +266,7 @@ public:
         if ( mGrid.hasCells() && prop->save )
         {
             out.writeUInt16(DIM);
-            for ( int d = 0; d < DIM; ++d )
+            for ( unsigned d = 0; d < DIM; ++d )
             {
                 out.writeSoftSpace();
                 out.writeUInt32(mGrid.breadth(d));
@@ -291,14 +291,14 @@ public:
     /// read Field from file using VAL::read()
     void   readData(Inputter& in, Simul&)
     {
-        int  size[DIM] = { 0 };
-        real minB[DIM] = { 0 }, maxB[DIM] = { 0 };
+        size_t size[DIM] = { 0 };
+        real   minB[DIM] = { 0 }, maxB[DIM] = { 0 };
         
         size_t dim = in.readUInt16();
         if ( dim != DIM )
             throw InvalidIO("cannot read field due to dimensionality mismatch");
         
-        for ( size_t d = 0; d < dim; ++d )
+        for ( unsigned d = 0; d < dim; ++d )
         {
             size[d] = in.readUInt32();
             minB[d] = in.readFloat();

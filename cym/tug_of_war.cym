@@ -69,7 +69,7 @@ set couple crosslinker
 
 new crosslinker
 {
-    position = ( 0 0 0 )
+    position = 0 0 0
     mark = 1
 }
 

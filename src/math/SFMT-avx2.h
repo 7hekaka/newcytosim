@@ -99,7 +99,7 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
 #if ( 0 )
-static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
+static void gen_rand_array(sfmt_t * sfmt, w128_t * array, unsigned size)
 {
     int i, j;
     __m256i r;
@@ -149,12 +149,12 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, int size)
     }
 }
 #else
-static void gen_rand_array(sfmt_t * sfmt, w128_t * input, int double_size)
+static void gen_rand_array(sfmt_t * sfmt, w128_t * input, unsigned double_size)
 {
     //printf("AVX2 gen_rand_array\n");
-    int size = double_size / 2;
-    int pos = SFMT_POS1 / 2;
-    int i, j;
+    unsigned size = double_size / 2;
+    unsigned pos = SFMT_POS1 / 2;
+    unsigned i, j;
     __m256i r;
     __m256i * pstate = sfmt->state_y;
     __m256i * array = (__m256i*)input;

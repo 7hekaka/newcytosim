@@ -91,16 +91,34 @@ public:
     //--------------------------
     
     /// identifies the set
-    std::string  title() const { return "couple"; }
+    static std::string title() { return "couple"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property *   newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList   newObjects(const std::string& name, Glossary& opt);
+    ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *     newObject(ObjectTag, unsigned);
+    Object *    newObject(ObjectTag, unsigned);
+    
+    /// save free Couples
+    void        writeFF(Outputter& out) const;
+    
+    /// save attached Couples
+    void        writeAF(Outputter& out) const;
+    
+    /// save attached Couples
+    void        writeFA(Outputter& out) const;
+
+    /// save bridging Couples
+    void        writeAA(Outputter& out) const;
+
+    /// save Couples
+    void        write(Outputter&) const;
+    
+    /// print a summary of the content (nb of objects, class)
+    void        report(std::ostream&) const;
 
     //--------------------------
 
@@ -167,7 +185,7 @@ public:
     ObjectList   collect(bool (*func)(Object const*, void const*), void const*) const;
     
     /// number of objects for which func(this, val) == true
-    unsigned     count(bool (*func)(Object const*, void const*), void const*) const;
+    size_t       count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// erase all Object and all Property
     void         erase();
@@ -216,24 +234,6 @@ public:
     
     /// unmark objects after import
     void         thaw();
-
-    /// save free Couples
-    void         writeFF(Outputter& out) const;
-    
-    /// save attached Couples
-    void         writeAF(Outputter& out) const;
-    
-    /// save attached Couples
-    void         writeFA(Outputter& out) const;
-
-    /// save bridging Couples
-    void         writeAA(Outputter& out) const;
-
-    /// save Couples
-    void         write(Outputter&) const;
-    
-    /// print a summary of the content (nb of objects, class)
-    void         report(std::ostream&) const;
     
     ///debug function
     int          bad() const;

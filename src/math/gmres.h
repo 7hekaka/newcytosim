@@ -50,9 +50,9 @@ namespace LinearSolvers
         }
     }
     
-    inline void gmres_make_rotation(Matrix& H, real C[], real S[], real ss[], int i)
+    inline void gmres_make_rotation(Matrix& H, real C[], real S[], real ss[], size_t i)
     {
-        for ( int k = 0; k < i; ++k )
+        for ( size_t k = 0; k < i; ++k )
             gmres_rotate(H(k,i), H(k+1,i), C[k], S[k]);
         gmres_make_rotation(H(i,i), H(i+1,i), C[i], S[i]);
         gmres_rotate(H(i,i), H(i+1,i), C[i], S[i]);
@@ -67,7 +67,7 @@ namespace LinearSolvers
      The matrix and its preconditionner are specified by functions of LinearOperator
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
-    void GMRES(const LinearOperator& mat, const real* rhs, real* sol, int restart,
+    void GMRES(const LinearOperator& mat, const real* rhs, real* sol, size_t restart,
                Monitor& monitor, Allocator& allocator, Matrix& H, Matrix& V,
                Allocator& temporary)
     {
@@ -123,11 +123,10 @@ namespace LinearSolvers
             zero_real(restart+1, ss);            // ss = 0
 
             ss[0] = beta;
-            int it = -1;
+            size_t it = 0;
             //fprintf(stderr, "GMRES   %4i residual %10.6f\n", monitor.count(), resid);
 
             do {
-                ++it;
                 ++monitor;
 #if RIGHTSIDED_PRECONDITIONNER
                 mat.precondition(ww, tt);      // tt = P*ww
@@ -141,7 +140,7 @@ namespace LinearSolvers
                  of V are orthogonal to each other, the scalar products H(k,it)
                  could be calculated independently in parallel
                 */
-                for (int k = 0; k <= it; ++k)
+                for (size_t k = 0; k <= it; ++k)
                 {
                     // H(k,i) = <V(i+1), V(k)>
                     H(k,it) = blas::dot(dim, ww, V.column(k));
@@ -172,21 +171,21 @@ namespace LinearSolvers
                     //fprintf(stderr, " %4i finished?  %10.6f   est. %10.6f\n", monitor.count(), fabs(ss[it+1]), resid);
                     break;
                 }
-                
-            } while ( it+1 < restart );
+
+            } while ( ++it < restart );
             
             // solve upper triangular system in place
-            for (int j = it; j >= 0; --j)
+            for (size_t j = it+1; j > 0; --j)
             {
-                ss[j] /= H(j,j);
+                ss[j-1] /= H(j,j-1);
                 // S(0:j) = S(0:j) - ss[j] * H(0:j,j)
-                blas::xaxpy(j, -ss[j], H.column(j), 1, ss, 1);
+                blas::xaxpy(j, -ss[j-1], H.column(j-1), 1, ss, 1);
                 //for (int k = 0; k < j; ++k)
                 //    ss[k] -= H(k,j) * ss[j];
             }
 
             // update the solution `sol`: can be parallelized
-            for (int j = 0; j <= it; ++j)
+            for (size_t j = 0; j <= it; ++j)
             {
                 // sol = sol + ss[j] * V(j)
                 blas::xaxpy(dim, ss[j], V.column(j), 1, sol, 1);

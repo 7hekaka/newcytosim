@@ -40,7 +40,7 @@ set hand map
     binding = 10, 0.05
     unbinding = 0, inf
  
-    display = { width=3; size=12; color=green }
+    display = ( width=3; size=12; color=green; )
 }
 
 set couple link

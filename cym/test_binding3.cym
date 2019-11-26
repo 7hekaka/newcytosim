@@ -31,20 +31,13 @@ set fiber microtubule1
     rigidity     = 1
 }
 
-new microtubule1
-{
-    position = 0 0 0
-    orientation = vertical
-    length = 20
-}
-
 set hand binder1
 {
     binding_key     = 1
     binding_rate    = 1
     binding_range   = 5
     unbinding       = 0, inf
-    display = { color=blue, 0x0000FF77; width=0 }
+    display = ( color=blue, 0x0000FF77; width=1; )
 }
 
 set single simplex1
@@ -54,9 +47,6 @@ set single simplex1
     stiffness = 0
 }
 
-new 10000 simplex1
-
-
 set fiber microtubule2
 {
     binding_key  = 2
@@ -64,21 +54,14 @@ set fiber microtubule2
     rigidity     = 1
 }
 
-new microtubule2
-{
-    position = 0 0 0
-    orientation = horizontal
-    length = 20
-}
-
 set hand binder2
 {
     binding_key     = 2
     binding_rate    = 1
     binding_range   = 5
-    bind_also_end   = 1
+    bind_also_end   = plus_end
     unbinding       = 0, inf
-    display = { color=red, 0x0000FF77; width=0 }
+    display = ( color=yellow, 0xFFFF0077; width=1; )
 }
 
 set single simplex2
@@ -88,12 +71,26 @@ set single simplex2
     stiffness = 0
 }
 
+
+new microtubule1
+{
+    position = 0 0 0
+    orientation = vertical
+    length = 20
+}
+
+new microtubule2
+{
+    position = 0 0 0
+    orientation = horizontal
+    length = 20
+}
+
+new 10000 simplex1
 new 10000 simplex2
 
-
-run system
+run 1000 system
 {
-    nb_steps = 1000
     nb_frames = 10
     solve = 0
 }

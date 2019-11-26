@@ -34,7 +34,7 @@ set hand dynein
     unloaded_speed = -1
     stall_force = 6
 
-    display = { size=8; color=0xFF00FFFF; }
+    display = ( size=8; color=0xFF00FFFF; )
 }
 
 set hand kinesin 
@@ -47,7 +47,7 @@ set hand kinesin
     activity = move
     unloaded_speed = 0.8
     stall_force = 6
-    display = { size=8; color=0x00FF00FF; }
+    display = ( size=8; color=0x00FF00FF; )
 }
 
 set couple complex 

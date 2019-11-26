@@ -110,7 +110,7 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
                 real R = 0;
                 is >> R;
                 if ( R < REAL_EPSILON )
-                    throw InvalidParameter("you must specify a distance R > 0 in `edge R`");
+                    throw InvalidParameter("distance R must be > 0 in `edge R`");
                 return spc->randomPlaceNearEdge(R);
             }
             
@@ -126,7 +126,7 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
                 real R = 0;
                 is >> R;
                 if ( R < 0 )
-                    throw InvalidParameter("you must specify a radius R >= 0 in `outside_sphere R`");
+                    throw InvalidParameter("distance R must be >= 0 in `outside_sphere R`");
                 Vector P;
                 do
                     P = spc->randomPlace();
@@ -163,8 +163,8 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
 #if ( DIM < 3 )
                 return Vector(S+(E-S)*x, R*RNG.sreal(), 0);
 #else
-                Vector2 h = Vector2::randU();
-                return Vector(S+(E-S)*x, R*h.XX, R*h.YY);
+                const Vector2 V = Vector2::randU();
+                return Vector(S+(E-S)*x, R*V.XX, R*V.YY);
 #endif
             }
         
@@ -186,8 +186,8 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
 #if ( DIM < 3 )
                 return Vector(S+E*x, R*RNG.sreal(), 0);
 #else
-                Vector2 h = Vector2::randU();
-                return Vector(S+E*x, R*h.XX, R*h.YY);
+                const Vector2 V = Vector2::randU();
+                return Vector(S+E*x, R*V.XX, R*V.YY);
 #endif
             }
         }
@@ -197,9 +197,9 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = -1, T = 0;
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `sphere R`");
+                throw InvalidParameter("radius R must be >= 0 in `sphere R`");
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `sphere R T`");
+                throw InvalidParameter("thickness T must be >= 0 in `sphere R T`");
             return Vector::randU(R) + Vector::randU(T*0.5);
         }
         
@@ -208,11 +208,11 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = 0, T = 0;
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `equator R T`");
+                throw InvalidParameter("radius R must be >= 0 in `equator R T`");
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `equator R T`");
-            Vector2 vec2 = Vector2::randU();
-            return Vector(R*vec2.XX, R*vec2.YY, T*RNG.sreal_half());
+                throw InvalidParameter("thickness T must be >= 0 in `equator R T`");
+            const Vector2 V = Vector2::randU();
+            return Vector(R*V.XX, R*V.YY, T*RNG.shalf());
         }
        
         if ( tok == "cylinder" )
@@ -220,11 +220,11 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real L = -1, R = -1;
             is >> L >> R;
             if ( L < 0 )
-                throw InvalidParameter("you must specify a length L >= 0 in `cylinder L R`");
+                throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `cylinder L R`");
-            Vector2 YZ = Vector2::randB(R);
-            return Vector(L*RNG.sreal_half(), YZ.XX, YZ.YY);
+                throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
+            const Vector2 V = Vector2::randB(R);
+            return Vector(L*RNG.shalf(), V.XX, V.YY);
         }
         
         if ( tok == "circle" )
@@ -232,13 +232,12 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = -1, T = 0;
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `circle R T`");
+                throw InvalidParameter("radius R must be >= 0 in `circle R T`");
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `circle R T`");
-            //StreamFunc::mark_line(std::cout, is, is.tellg(), ">>>>");
+                throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
 #if ( DIM >= 3 )
-            Vector2 XY = Vector2::randU(R);
-            return Vector3(XY.XX, XY.YY, 0) + (0.5*T) * Vector3::randU();
+            const Vector2 V = Vector2::randU(R);
+            return Vector3(V.XX, V.YY, 0) + (0.5*T) * Vector3::randU();
 #endif
             return Vector::randU(R) + Vector::randU(T*0.5);
         }
@@ -248,7 +247,7 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = -1;
             is >> R;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `ball R`");
+                throw InvalidParameter("radius R must be >= 0 in `ball R`");
             return Vector::randB(R);
         }
         
@@ -257,13 +256,13 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = -1, T = 0;
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `disc R`");
+                throw InvalidParameter("radius R must be >= 0 in `disc R`");
 #if ( DIM >= 3 )
             //in 3D, a disc in the XY-plane of thickness T in Z-direction
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `disc R T`");
-            Vector2 V = Vector2::randB(R);
-            return Vector(V.XX, V.YY, T*RNG.sreal_half());
+                throw InvalidParameter("thickness T must be >= 0 in `disc R T`");
+            const Vector2 V = Vector2::randB(R);
+            return Vector(V.XX, V.YY, T*RNG.shalf());
 #endif
             //in 2D, a disc in the XY-plane
             return Vector::randB(R);
@@ -274,11 +273,11 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = -1, T = 0;
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `discXZ R`");
+                throw InvalidParameter("radius R must be >= 0 in `discXZ R`");
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `discXZ R T`");
-            Vector2 V = Vector2::randB(R);
-            return Vector(V.XX, T*RNG.sreal_half(), V.YY);
+                throw InvalidParameter("thickness T must be >= 0 in `discXZ R T`");
+            const Vector2 V = Vector2::randB(R);
+            return Vector(V.XX, T*RNG.shalf(), V.YY);
         }
         
         if ( tok == "discYZ"  )
@@ -286,11 +285,11 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real R = -1, T = 0;
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("you must specify a radius R >= 0 in `discYZ R`");
+                throw InvalidParameter("radius R must be >= 0 in `discYZ R`");
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `discYZ R T`");
-            Vector2 V = Vector2::randB(R);
-            return Vector(T*RNG.sreal_half(), V.XX, V.YY);
+                throw InvalidParameter("thickness T must be >= 0 in `discYZ R T`");
+            const Vector2 V = Vector2::randB(R);
+            return Vector(T*RNG.shalf(), V.XX, V.YY);
         }
         
         if ( tok == "ellipse" )
@@ -312,14 +311,14 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             real L = -1, T = 0;
             is >> L >> T;
             if ( L < 0 )
-                throw InvalidParameter("you must specify a length L >= 0 in `line L`");
+                throw InvalidParameter("length L must be >= 0 in `line L`");
             if ( T < 0 )
-                throw InvalidParameter("the thickness T must be >= 0 in `line L T`");
+                throw InvalidParameter("thickness T must be >= 0 in `line L T`");
 #if ( DIM >= 3 )
-            Vector2 V = Vector2::randB(T);
-            return Vector(L*RNG.sreal_half(), V.XX, V.YY);
+            const Vector2 V = Vector2::randB(T);
+            return Vector(L*RNG.shalf(), V.XX, V.YY);
 #endif
-            return Vector(L*RNG.sreal_half(), T*RNG.sreal_half(), 0);
+            return Vector(L*RNG.shalf(), T*RNG.shalf(), 0);
         }
         
         if ( tok == "arc" )
@@ -328,26 +327,20 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             is >> L >> A;
             
             if ( L <= 0 )
-                throw InvalidParameter("you must specify a length L >= 0 in `arc L`");
+                throw InvalidParameter("length L must be >= 0 in `arc L`");
             
             real x = 0, y = 0;
             if ( A == 0 ) {
                 x = 0;
-                y = L * RNG.sreal_half();
+                y = L * RNG.shalf();
             }
             else {
                 real R = L / A;
-                real angle = A * RNG.sreal_half();
-                x = R * cos(angle) - R; // origin centered on arc
-                y = R * sin(angle);
+                real a = A * RNG.shalf();
+                x = R * cos(a) - R; // origin centered on arc
+                y = R * sin(a);
             }
-#if ( DIM < 3 )
             return Vector(x, y, 0);
-#else
-            // in 3D this distributes on a portion of the sphere, with a gradient
-            real a = RNG.sreal() * M_PI;
-            return Vector(x, y*cos(a), y*sin(a));
-#endif
         }
         
         if ( tok == "square" )
@@ -361,7 +354,7 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
         {
             real x = 0, y = 0, z = 0;
             is >> x >> y >> z;
-            return Vector(x,y,z).e_mul(Vector::randS());
+            return Vector(x,y,z).e_mul(Vector::randH());
         }
 
 #if ( 1 )
@@ -374,7 +367,7 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             
             // straight
             if ( bending == 0 ) {
-                x = thickness * RNG.sreal_half();
+                x = thickness * RNG.shalf();
                 y = length * RNG.preal();
             } else {
                 real radius = length / (bending * M_PI);
@@ -482,6 +475,11 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
                 Rotation rot = readRotation(is, pos, spc);
                 pos = rot * pos;
             }
+            // apply central symmetry with 'flip'
+            else if ( tok == "flip" )
+            {
+                pos = -pos;
+            }
             // Gaussian noise specified with 'blur'
             else if ( tok == "blur" )
             {
@@ -506,7 +504,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
                 // unget last token:
                 is.clear();
                 is.seekg(isp);
-#if 0
+#if 1
                 /*
                 We need to work around a bug in the stream extraction operator,
                 which eats extra characters ('a','n','e','E') if a double is read
@@ -516,6 +514,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
                 int c = is.peek();
                 if ( c=='a' || c=='b' )
                     continue;
+                is.seekg(1, std::ios_base::cur);
 #endif
                 break;
                 //throw InvalidParameter("unexpected `"+tok+"'");
@@ -585,21 +584,21 @@ Vector Movable::readDirection0(std::istream& is, Vector const& pos, Space const*
             return Vector(0, RNG.sflip(), 0);
         if ( tok == "XY" )
         {
-            Vector2 h = Vector2::randU();
-            return Vector(h.XX, h.YY, 0);
+            const Vector2 V = Vector2::randU();
+            return Vector(V.XX, V.YY, 0);
         }
 #if ( DIM >= 3 )
         if ( tok == "Z" )
             return Vector(0, 0, RNG.sflip());
         if ( tok == "XZ" )
         {
-            Vector2 h = Vector2::randU();
-            return Vector(h.XX, 0, h.YY);
+            const Vector2 V = Vector2::randU();
+            return Vector(V.XX, 0, V.YY);
         }
         if ( tok == "YZ" )
         {
-            Vector2 h = Vector2::randU();
-            return Vector(0, h.XX, h.YY);
+            const Vector2 V = Vector2::randU();
+            return Vector(0, V.XX, V.YY);
         }
 #endif
 
@@ -742,19 +741,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
                 // unget last token
                 is.clear();
                 is.seekg(isp);
-#if 0
-                /*
-                We need to work around a bug in the stream extraction operator,
-                which eats extra characters ('a','n','e','E') if a double is read
-                19.10.2015
-                */
-                is.seekg(-1, std::ios_base::cur);
-                int c = is.peek();
-                if ( c=='a' || c=='b' )
-                    continue;
-#endif
                 break;
-                //throw InvalidParameter("unexpected `"+tok+"'");
             }
         }
     }
@@ -816,7 +803,10 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const*
             if ( tok == "axis" )
                 is >> dir;
             else
+            {
+                is.clear();
                 is.seekg(isp);
+            }
             return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
             return Rotation::rotation(cos(ang), sin(ang));
@@ -829,12 +819,14 @@ Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const*
             ang *= M_PI/180.0;
 #if ( DIM >= 3 )
             Vector dir(0,0,1);
-            isp = is.tellg();
-            tok = Tokenizer::get_symbol(is);
-            if ( tok == "axis" )
-                is >> dir;
-            else
-                is.seekg(isp);
+            if ( is.good() )
+            {
+                isp = is.tellg();
+                if ( Tokenizer::get_symbol(is) == "axis" )
+                    is >> dir;
+                else
+                    is.seekg(isp);
+            }
             return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
             return Rotation::rotation(cos(ang), sin(ang));

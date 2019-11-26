@@ -103,6 +103,16 @@ ObjectList OrganizerSet::newObjects(const std::string& name, Glossary& opt)
     return res;
 }
 
+
+void OrganizerSet::write(Outputter& out) const
+{
+    if ( size() > 0 )
+    {
+        out.put_line("\n#section "+title(), out.binary());
+        writeNodes(out, nodes);
+    }
+}
+
 //------------------------------------------------------------------------------
 
 void OrganizerSet::add(Object * obj)
@@ -137,21 +147,21 @@ void OrganizerSet::report(std::ostream& os) const
     if ( size() > 0 )
     {
         unsigned total = 0;
-        os << title() << "\n";
+        os << '\n' << title();
         for ( Property * i : simul.properties.find_all("aster", "bundle") )
         {
-            unsigned cnt = count(match_property, i);
-            os << std::setw(10) << cnt << " " << i->name() << '\n';
+            size_t cnt = count(match_property, i);
+            os << '\n' << std::setw(10) << cnt << " " << i->name();
             ++total;
         }
         for ( Property * i : simul.properties.find_all("nucleus", "fake") )
         {
-            unsigned cnt = count(match_property, i);
-            os << std::setw(10) << cnt << " " << i->name() << '\n';
+            size_t cnt = count(match_property, i);
+            os << '\n' << std::setw(10) << cnt << " " << i->name();
             ++total;
         }
         if ( total > 1 )
-            os << std::setw(10) << size() << " total\n";
+            os << '\n' << std::setw(10) << size() << " total";
     }
 }
 

@@ -289,12 +289,12 @@ void SingleSet::write(Outputter& out) const
     if ( sizeA() > 0 )
     {
         out.put_line("\n#section single A", out.binary());
-        ObjectSet::write(aList, out);
+        writeNodes(out, aList);
     }
     if ( sizeF() > 0 )
     {
         out.put_line("\n#section single F", out.binary());
-        ObjectSet::write(fList, out);
+        writeNodes(out, fList);
     }
 }
 
@@ -329,17 +329,17 @@ void SingleSet::report(std::ostream& os) const
 {
     if ( size() > 0 )
     {
-        os << title() << "\n";
+        os << '\n' << title();
         PropertyList plist = simul.properties.find_all(title());
         for ( Property * i : plist )
         {
             SingleProp * p = static_cast<SingleProp*>(i);
-            unsigned cnt = count(match_property, p);
-            os << std::setw(10) << cnt << " " << p->name();
-            os << " ( " << p->hand << " )\n";
+            size_t cnt = count(match_property, p);
+            os << '\n' << std::setw(10) << cnt << ' ' << p->name();
+            os << " ( " << p->hand << " )";
         }
         if ( plist.size() > 1 )
-            os << std::setw(10) << size() << " total\n";
+            os << '\n' << std::setw(10) << size() << " total";
     }
 }
 
@@ -360,10 +360,10 @@ ObjectList SingleSet::collect(bool (*func)(Object const*, void const*), void con
 }
 
 
-unsigned SingleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
+size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    unsigned f = ObjectSet::count(fList, func, arg);
-    unsigned a = ObjectSet::count(aList, func, arg);
+    size_t f = ObjectSet::count(fList, func, arg);
+    size_t a = ObjectSet::count(aList, func, arg);
     return f + a;
 }
 

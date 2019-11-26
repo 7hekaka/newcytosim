@@ -12,6 +12,7 @@
 #pragma mark - 1D Vectors
 
 const Vector1 Vector1::randS()        { return Vector1(  RNG.sreal()); }
+const Vector1 Vector1::randH()        { return Vector1(  RNG.shalf()); }
 const Vector1 Vector1::randS(real n)  { return Vector1(n*RNG.sreal()); }
 const Vector1 Vector1::randP()        { return Vector1(  RNG.preal()); }
 const Vector1 Vector1::randP(real n)  { return Vector1(n*RNG.preal()); }
@@ -30,6 +31,7 @@ const Vector1 Vector1::randOrthoU(real len) const { return Vector1(0.0); }
 #pragma mark - 2D Vectors
 
 const Vector2 Vector2::randS()        { return Vector2(  RNG.sreal(),   RNG.sreal()); }
+const Vector2 Vector2::randH()        { return Vector2(  RNG.shalf(),   RNG.shalf()); }
 const Vector2 Vector2::randS(real n)  { return Vector2(n*RNG.sreal(), n*RNG.sreal()); }
 const Vector2 Vector2::randP()        { return Vector2(  RNG.preal(),   RNG.preal()); }
 const Vector2 Vector2::randP(real n)  { return Vector2(n*RNG.preal(), n*RNG.preal()); }
@@ -134,6 +136,7 @@ const Vector2 Vector2::randOrthoB(const real len) const
 #pragma mark - 3D Vectors
 
 const Vector3 Vector3::randS()        { return Vector3(RNG.sreal(),     RNG.sreal(),   RNG.sreal()); }
+const Vector3 Vector3::randH()        { return Vector3(RNG.shalf(),     RNG.shalf(),   RNG.shalf()); }
 const Vector3 Vector3::randS(real n)  { return Vector3(n*RNG.sreal(), n*RNG.sreal(), n*RNG.sreal()); }
 const Vector3 Vector3::randP()        { return Vector3(RNG.preal(),     RNG.preal(),   RNG.preal()); }
 const Vector3 Vector3::randP(real n)  { return Vector3(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
@@ -270,10 +273,10 @@ const Vector3 Vector3::randOrthoU(const real len) const
     real n = normSqr();
     if ( n > REAL_EPSILON )
     {
-        Vector2 d = Vector2::randU();
+        const Vector2 V = Vector2::randU();
         Vector3 x, y, z = *this / sqrt(n);
         z.orthonormal(x, y);
-        return x * ( len * d.XX ) + y * ( len * d.YY );
+        return x * ( len * V.XX ) + y * ( len * V.YY );
     }
     return randU(len);
 }
@@ -285,10 +288,10 @@ const Vector3 Vector3::randOrthoU(const real len) const
  */
 const Vector3 Vector3::randOrthoU(const real len) const
 {
-    Vector2 d = Vector2::randU();
+    const Vector2 V = Vector2::randU();
     Vector3 b = orthogonal(1);
     Vector3 c = normalize(cross(*this, b));
-    return b * ( len * d.XX ) + c * ( len * d.YY );
+    return b * ( len * V.XX ) + c * ( len * V.YY );
 }
 
 #endif
@@ -296,16 +299,17 @@ const Vector3 Vector3::randOrthoU(const real len) const
 const Vector3 Vector3::randOrthoB(const real len) const
 {
     //this assumes norm(*this) == 1
-    Vector2 d = Vector2::randB();
+    const Vector2 V = Vector2::randB();
     Vector3 x, y;
     orthonormal(x, y);
-    return x * ( len * d.XX ) + y * ( len * d.YY );
+    return x * ( len * V.XX ) + y * ( len * V.YY );
 }
 
 //------------------------------------------------------------------------------
 #pragma mark - 4D Vectors
 
 const Vector4 Vector4::randS()        { return Vector4(RNG.sreal(),     RNG.sreal(),   RNG.sreal()); }
+const Vector4 Vector4::randH()        { return Vector4(RNG.shalf(),     RNG.shalf(),   RNG.shalf()); }
 const Vector4 Vector4::randS(real n)  { return Vector4(n*RNG.sreal(), n*RNG.sreal(), n*RNG.sreal()); }
 const Vector4 Vector4::randP()        { return Vector4(RNG.preal(),     RNG.preal(),   RNG.preal()); }
 const Vector4 Vector4::randP(real n)  { return Vector4(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
@@ -334,13 +338,13 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials)
         if ( ++ouf > limit_trials )
             break;
         
-        Vector2 xy = Vector2::randB();
+        const Vector2 V = Vector2::randB();
         
         for ( size_t i = 0; i < n; ++i )
-            if ( distanceSqr(xy, pts[i]) < ss )
+            if ( distanceSqr(V, pts[i]) < ss )
                 goto toss;
         
-        vec = xy;
+        vec = V;
         ouf = 0;
         ++n;
     }

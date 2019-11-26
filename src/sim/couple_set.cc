@@ -481,25 +481,25 @@ void CoupleSet::thaw()
 void CoupleSet::writeAA(Outputter& out) const
 {
     out.put_line("\n#section couple AA", out.binary());
-    ObjectSet::write(aaList, out);
+    writeNodes(out, aaList);
 }
 
 void CoupleSet::writeAF(Outputter& out) const
 {
     out.put_line("\n#section couple AF", out.binary());
-    ObjectSet::write(afList, out);
+    writeNodes(out, afList);
 }
 
 void CoupleSet::writeFA(Outputter& out) const
 {
     out.put_line("\n#section couple FA", out.binary());
-    ObjectSet::write(faList, out);
+    writeNodes(out, faList);
 }
 
 void CoupleSet::writeFF(Outputter& out) const
 {
     out.put_line("\n#section couple FF", out.binary());
-    ObjectSet::write(ffList, out);
+    writeNodes(out, ffList);
 }
 
 void CoupleSet::write(Outputter& out) const
@@ -519,17 +519,17 @@ void CoupleSet::report(std::ostream& os) const
 {
     if ( size() > 0 )
     {
-        os << title() << "\n";
+        os << '\n' << title();
         PropertyList plist = simul.properties.find_all(title());
         for ( Property * i : plist )
         {
             CoupleProp * p = static_cast<CoupleProp*>(i);
-            unsigned cnt = count(match_property, p);
-            os << std::setw(10) << cnt << " " << p->name();
-            os << " ( " << p->hand1 << " | " << p->hand2 << " )\n";
+            size_t cnt = count(match_property, p);
+            os << '\n' << std::setw(10) << cnt << " " << p->name();
+            os << " ( " << p->hand1 << " | " << p->hand2 << " )";
         }
         if ( plist.size() > 1 )
-            os << std::setw(10) << size() << " total\n";
+            os << '\n' << std::setw(10) << size() << " total";
     }
 }
 
@@ -554,12 +554,12 @@ ObjectList CoupleSet::collect(bool (*func)(Object const*, void const*), void con
 }
 
 
-unsigned CoupleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
+size_t CoupleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    unsigned ff = ObjectSet::count(ffList, func, arg);
-    unsigned af = ObjectSet::count(afList, func, arg);
-    unsigned fa = ObjectSet::count(faList, func, arg);
-    unsigned aa = ObjectSet::count(aaList, func, arg);
+    size_t ff = ObjectSet::count(ffList, func, arg);
+    size_t af = ObjectSet::count(afList, func, arg);
+    size_t fa = ObjectSet::count(faList, func, arg);
+    size_t aa = ObjectSet::count(aaList, func, arg);
     return ff + af + fa + aa;
 }
 

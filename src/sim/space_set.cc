@@ -134,6 +134,17 @@ ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
     Space * obj = p->newSpace(opt);
 
     ObjectList res(2);
-    res.push_back(obj);
+    if ( obj )
+        res.push_back(obj);
     return res;
+}
+
+
+void SpaceSet::write(Outputter& out) const
+{
+    if ( size() > 0 )
+    {
+        out.put_line("\n#section "+title(), out.binary());
+        writeNodes(out, nodes);
+    }
 }

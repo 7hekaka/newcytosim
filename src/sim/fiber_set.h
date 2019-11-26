@@ -32,7 +32,7 @@ public:
     //--------------------------
     
     /// identifies the class
-    std::string title() const { return "fiber"; }
+    static std::string title() { return "fiber"; }
     
     /// create a new property of category `cat` for a class `name`
     Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
@@ -43,6 +43,12 @@ public:
     /// create a new object (used for reading trajectory file)
     Object *    newObject(ObjectTag, unsigned);
     
+    /// write all Objects to file
+    void        write(Outputter& out) const;
+        
+    /// print a summary of the content (nb of objects, class)
+    void        report(std::ostream& out) const { writeAssets(out, title()); }
+
     //--------------------------
 
     /// first Fiber
@@ -61,10 +67,10 @@ public:
     Fiber * findID(ObjectID n) const { return static_cast<Fiber*>(inventory.get(n)); }
 
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
-    void planarCut(Vector const& n, real a, int stateP, int stateM);
+    void planarCut(Vector const& n, real a, state_t stateP, state_t stateM);
 
     /// Cut fibers in the list
-    void planarCut(ObjectList&, Vector const& n, real a, int stateP, int stateM);
+    void planarCut(ObjectList&, Vector const& n, real a, state_t stateP, state_t stateM);
     
     /// Monte-Carlo step for every Fiber
     void step();
