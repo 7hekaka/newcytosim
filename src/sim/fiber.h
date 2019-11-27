@@ -20,11 +20,9 @@ class FiberSegment;
 class LineDisp;
 
 
-/// Flag to associate a Lattice of integers to the Fiber class {0, 1}
+/// Flag to associate a Lattice to the Fiber {-1, 0, 1}
 #define FIBER_HAS_LATTICE 1
 
-/// Flag to associate a Lattice of reals to the Fiber class {0, 1}
-#define FIBER_HAS_ANALOG_LATTICE 1
 
 /// Flag to allow `family` member variable to control Couple's binding
 #define FIBER_HAS_FAMILY 0
@@ -97,14 +95,9 @@ private:
     std::set<SeverPos>  pendingCuts;
 
 #if FIBER_HAS_LATTICE
-    /// Associated Lattice used for occupancy
-    FiberLattice        digLattice;
+    /// Associated Lattice
+    FiberLattice        frLattice;
 #endif
-#if FIBER_HAS_ANALOG_LATTICE
-    /// Associated Lattice of reals
-    Lattice<real>       anaLattice;
-#endif
-
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
     Single *            frGlue;
@@ -284,23 +277,17 @@ public:
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
     /// modifiable reference to Fiber's Lattice
-    FiberLattice&  lattice() { return digLattice; }
+    FiberLattice&  lattice() { return frLattice; }
     
     /// const reference to Fiber's Lattice
-    FiberLattice const& lattice() const { return digLattice; }
-#endif
-    
-#if FIBER_HAS_ANALOG_LATTICE
-    /// modifiable reference to Fiber's Lattice
-    Lattice<real>& analogLattice() { return anaLattice; }
-    
-    /// const reference to Fiber's Lattice
-    Lattice<real> const& analogLattice() const { return anaLattice; }
+    FiberLattice const&  lattice() const { return frLattice; }
     
     /// value of analog Lattice at given abscissa
-    real          analogLatticeValue(real a) const { if ( anaLattice.ready() ) return anaLattice.cell(a); return 0; }
+    real           analogLatticeValue(real a) const { if ( frLattice.ready() ) return frLattice.cell(a); return 0; }
+#else
+    real  unit_;
 #endif
-    
+
     /// initialize lattice sites to represent a constant linear density
     void           setLattice(Lattice<real>&, real density) const;
 
