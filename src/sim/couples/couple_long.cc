@@ -40,6 +40,10 @@ Torque CoupleLong::calcArm(const Interpolation & pt, Vector const& pos, real len
 }
 
 
+/**
+ Note that, as `mArm` is calculated by setInteraction(),
+ the result of posSide will be incorrect if 'solve=0'
+ */
 Vector CoupleLong::posSide() const
 {
 #if ( DIM > 1 )

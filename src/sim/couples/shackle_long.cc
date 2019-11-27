@@ -33,6 +33,10 @@ Torque ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real le
 }
 
 
+/**
+ Note that, as `mArm` is calculated by setInteraction(),
+ the result of posSide will be incorrect if 'solve=0'
+ */
 Vector ShackleLong::posSide() const
 {
 #if ( DIM > 1 )
