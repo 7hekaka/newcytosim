@@ -177,8 +177,8 @@ int main(int argc, char* argv[])
     arg.set(magnify, "magnify") || arg.set(magnify, "magnification");
 
     // The user can specify a frame index to be loaded:
-    size_t frm = 1;
-    arg.set(frm, "frame");
+    size_t frm = 0;
+    bool has_frame = arg.set(frm, "frame");
 
     // change working directory if specified:
     if ( arg.has_key("directory") )
@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
     
     //---------Open trajectory file and read state
 
-    if ( ! player.goLive || frm > 1 )
+    if ( ! player.goLive || has_frame )
     {
         try
         {
@@ -263,9 +263,8 @@ int main(int argc, char* argv[])
             // load requested frame from trajectory file:
             if ( thread.loadFrame(frm) )
             {
-                // if EOF is reached, reload last frame in file:
-                thread.loadLastFrame();
-                if ( thread.hasFrame() )
+                // load last frame in file:
+                if ( thread.loadLastFrame() )
                     std::cerr << "Warning: could only load frame " << thread.currentFrame() << ' ';
             }
             frm = thread.currentFrame();
@@ -406,7 +405,7 @@ int main(int argc, char* argv[])
         {
             thread.period(PP.period);
             
-            if ( frm > 1 )
+            if ( has_frame )
                 thread.extend();
             else
                 thread.start();
