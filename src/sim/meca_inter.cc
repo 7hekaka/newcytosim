@@ -2437,10 +2437,12 @@ void Meca::addSideLink3D(const Interpolation & ptA,
 /**
  Link `ptA` (A) and `ptB` (B),
  Which is taken between B and a point S located on the side of A:
- S = A + len * N,
- where N is a normalized vector orthogonal to the fiber in an.
+ 
+     S = A + len * N
+ 
+ where N is a normalized vector orthogonal to the fiber in A.
  S is linearly related to the two vertices on the sides of A, P1 and P2
- In 3D S is choosen in the plane of P1, P2 and B.
+ In 3D, S is choosen in the plane of P1, P2 and B.
  The force is linear of zero resting length:
  
      force_S = weight * ( S - B )
