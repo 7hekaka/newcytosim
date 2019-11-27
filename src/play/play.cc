@@ -176,19 +176,20 @@ int main(int argc, char* argv[])
     // get image over-sampling:
     arg.set(magnify, "magnify") || arg.set(magnify, "magnification");
 
-    // The user can specify a frame index to be loaded:
-    size_t frm = 0;
-    bool has_frame = arg.set(frm, "frame");
-
     // change working directory if specified:
     if ( arg.has_key("directory") )
     {
         FilePath::change_dir(arg.value("directory", 0));
         //std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
+    
+    // The user can specify a frame index to be loaded:
+    size_t frm = 0;
+    bool has_frame = false;
 
     try
     {
+        has_frame = arg.set(frm, "frame");
         simul.initialize(arg);
     }
     catch( Exception & e )
