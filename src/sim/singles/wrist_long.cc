@@ -52,6 +52,10 @@ Vector WristLong::force() const
 
 #if ( 1 )
 
+/**
+ Note that, as `mArm` is calculated by setInteraction(),
+ the result of posSide will be incorrect if 'solve=0'
+ */
 Vector WristLong::posSide() const
 {
 #if ( DIM > 1 )
