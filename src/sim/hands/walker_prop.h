@@ -5,7 +5,7 @@
 #include "digit_prop.h"
 
 /// enable lattice-dependent speed of walkers
-#define NEW_VARIABLE_SPEED 1
+#define NEW_VARIABLE_SPEED 0
 
 
 /// Additional Property for Walker
