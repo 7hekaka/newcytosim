@@ -117,7 +117,7 @@ void Fiber::step()
          with a time-scale given by 'lattice_aging_rate'.
          */
         real cst = prop->lattice_aging_rate * prop->time_step;
-        evolveLattice(frLattice, cst, 1.0-cst);
+        evolveLatticeValues(frLattice, cst, 1.0-cst);
         //std::clog << reference() << " lattice avg = " << frLattice->sum()*frLattice->unit()/length() << std::endl;
     }
 #endif
@@ -167,7 +167,7 @@ Fiber::~Fiber()
     
 #if FIBER_HAS_LATTICE < 0
     if ( prop->field_ptr )
-        releaseLattice(frLattice, prop->field_ptr);
+        releaseLatticeValues(frLattice, prop->field_ptr);
 #endif
 
 #if FIBER_HAS_GLUE
@@ -1264,7 +1264,7 @@ void Fiber::update()
 
 /**
  */
-void Fiber::setLattice(Lattice<real>& lat, real density) const
+void Fiber::setLatticeValues(Lattice<real>& lat, real density) const
 {
     const real uni = lat.unit();
     const auto inf = lat.indexM();
@@ -1297,7 +1297,7 @@ Update all Lattice sites according to:
     site[i] <- cst + fac * site[i]
 
  */
-void Fiber::evolveLattice(Lattice<real>& lat, real cst, real fac) const
+void Fiber::evolveLatticeValues(Lattice<real>& lat, real cst, real fac) const
 {
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1430,7 +1430,7 @@ void Fiber::fluxLattice(Lattice<real>& lat, Field * fld, real speed) const
  The subtance in each Lattice site is released in a cell
  corresponding to a random position within this site.
  */
-void Fiber::releaseLattice(Lattice<real>& lat, Field * fld) const
+void Fiber::releaseLatticeValues(Lattice<real>& lat, Field * fld) const
 {
     const real uni = lat.unit();
     const auto inf = lat.indexM();
@@ -1499,15 +1499,6 @@ void Fiber::cutFiberLattice(Lattice<real>& lat)
 }
 
 
-void Fiber::writeLattice(FiberLattice const& lat, Outputter& out) const
-{
-    writeHeader(out, TAG_LATTICE);
-    // lat.write(out);
-    // only write information corresponding to actual Fiber abscissa range:
-    lat.write(out, lat.indexM(), lat.indexP()+1);
-}
-
-
 void Fiber::printLattice(std::ostream& os, FiberLattice const& lat) const
 {
     using std::setw;
@@ -1522,18 +1513,25 @@ void Fiber::printLattice(std::ostream& os, FiberLattice const& lat) const
 }
 
 
-void Fiber::infoLattice(FiberLattice const& lat, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
+void Fiber::infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
 {
-    const real scale = ( density ? 1.0/lat.unit() : 1.0 );
-    const auto sup = lat.indexP();
-    for ( auto i = lat.indexM(); i <= sup; ++i )
+#if FIBER_HAS_LATTICE < 0
+    Lattice<real> const& lat = valueLattice;
+    if ( lat.ready() )
     {
-        ++cnt;
-        sm += lat.data(i);
-        real x = lat.data(i) * scale;
-        mn = std::min(mn, x);
-        mx = std::max(mx, x);
+        len += length();
+        const real scale = ( density ? 1.0/lat.unit() : 1.0 );
+        const auto sup = lat.indexP();
+        for ( auto i = lat.indexM(); i <= sup; ++i )
+        {
+            ++cnt;
+            sm += lat.data(i);
+            real x = lat.data(i) * scale;
+            mn = std::min(mn, x);
+            mx = std::max(mx, x);
+        }
     }
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -1712,7 +1710,12 @@ void Fiber::write(Outputter& out) const
 
 #if FIBER_HAS_LATTICE
     if ( frLattice.ready() )
-        writeLattice(frLattice, out);
+    {
+        writeHeader(out, TAG_LATTICE);
+        // frLattice.write(out);
+        // only write information corresponding to actual Fiber abscissa range:
+        frLattice.write(out, frLattice.indexM(), frLattice.indexP()+1);
+    }
 #endif
 }
 

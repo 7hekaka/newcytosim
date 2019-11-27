@@ -46,7 +46,7 @@ public:
     bool          outsideMP(lati_t s) const { return fbLattice->outsideMP(s); }
 
     /// true if given Lattice's site is occupied
-    bool          unavailable(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop->footprint; }
+    bool          occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop->footprint; }
 
     /// true if given Lattice's site is unoccupied (check footprint bits)
     bool          vacant(lati_t s) const { return 0 == (fbLattice->data(s) & prop->footprint); }
@@ -63,7 +63,7 @@ public:
     bool          outsideMP(lati_t s) const { return fbLattice->outsideMP(s); }
 
     /// true if given Lattice's site is occupied
-    bool          unavailable(FiberLattice* lat, lati_t s) const { return lat->data(s) != 0.0; }
+    bool          occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
     bool          vacant(lati_t s) const { return fbLattice->data(s) == 0.0; }

@@ -607,10 +607,13 @@ void Simul::reportFiberLattice(std::ostream& out, bool density) const
     out << COM << ljust("class", 2, 2);
     out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
     
-    // report substance on Fiber Lattices
-    size_t cnt;
-    real len, sm, mn, mx;
-    fibers.infoLattice(len, cnt, sm, mn, mx, density);
+    // report substance on Fiber's analog Lattice
+    size_t cnt = 0;
+    real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
+    
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+        fib->infoLattice(len, cnt, sm, mn, mx, density);
+
     out << LIN << ljust("fiber:lattice", 2);
     out << SEP << sm;
     out << SEP << std::setprecision(4) << sm / (real)cnt;
@@ -695,7 +698,6 @@ void Simul::reportFiberEnds(std::ostream& out) const
         out << SEP << obj->posEndP();
         out << SEP << obj->dirEndP();
     }
-    out << std::endl;
 }
 
 
@@ -1546,6 +1548,8 @@ void Simul::reportSpaceForce(std::ostream& out) const
  */
 void Simul::reportField(std::ostream& out) const
 {
+    if ( fields.size() == 0 )
+        return;
     out << COM << ljust("class", 2, 2);
     out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max";
     

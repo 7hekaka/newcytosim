@@ -26,10 +26,10 @@ public:
     /// size of one step
     real   step_size;
     
-    /// list of bits occupied on the lattice
+    /// list of cell's bits covered upon binding on the lattice
     FiberLattice::cell_t footprint;
     
-    /// specifies the position occupied within the Lattice site
+    /// specifies the position of binding within the Lattice cell
     /**
      `site_shift` should be in [0, step_size]:
      - at `0.0`, the attachment position is at the start of the site

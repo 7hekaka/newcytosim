@@ -283,19 +283,22 @@ public:
     FiberLattice const&  lattice() const { return frLattice; }
     
     /// value of analog Lattice at given abscissa
-    real           analogLatticeValue(real a) const { if ( frLattice.ready() ) return frLattice.cell(a); return 0; }
+    real           latticeValue(real a) const { if ( frLattice.ready() ) return frLattice.cell(a); return 0; }
+
+    /// recalculate occupancy lattice from bound Digits
+    void           resetLattice();
 #else
     real  unit_;
 #endif
 
     /// initialize lattice sites to represent a constant linear density
-    void           setLattice(Lattice<real>&, real density) const;
+    void           setLatticeValues(Lattice<real>&, real density) const;
 
     /// transfer all lattice substance to the Field
-    void           releaseLattice(Lattice<real>&, Field*) const;
+    void           releaseLatticeValues(Lattice<real>&, Field*) const;
 
     /// update lattice values as `value <- cst + fac * value`
-    void           evolveLattice(Lattice<real>&, real cst, real fac) const;
+    void           evolveLatticeValues(Lattice<real>&, real cst, real fac) const;
 
     /// transfer from Field to Lattice at rate `on` and back at rate `off`
     void           equilibrateLattice(Lattice<real>&, Field*, real on, real off) const;
@@ -308,18 +311,12 @@ public:
     
     /// sever fiber proportionally to the quantity stored in the Lattice
     void           cutFiberLattice(Lattice<real>&);
-
-    /// write Fiber's Lattice
-    void           writeLattice(FiberLattice const&, Outputter& out) const;
     
     /// record minium, maximum and sum of lattice values
-    void           infoLattice(FiberLattice const&, size_t&, real& sm, real& mn, real& mx, bool density) const;
+    void           infoLattice(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
 
     /// print Lattice data (for debugging purpose)
     void           printLattice(std::ostream&, FiberLattice const&) const;
-    
-    /// recalculate occupancy lattice from bound Hands
-    void           resetLattice();
 
     //--------------------------------------------------------------------------
     

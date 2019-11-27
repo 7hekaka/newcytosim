@@ -45,7 +45,7 @@ void Walker::stepUnloaded()
 
 #if NEW_VARIABLE_SPEED
     PRINT_ONCE("Walker's speed is affected by Fiber's Lattice\n");
-    R += prop->variable_walking_rate_dt * fiber()->analogLatticeValue(abscissa());
+    R += prop->variable_walking_rate_dt * fiber()->latticeValue(abscissa());
 #endif
     
     nextStep -= std::max((real)0, R);
@@ -93,7 +93,7 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
 
 #if NEW_VARIABLE_SPEED
     PRINT_ONCE("Walker's speed is affected by Fiber's Lattice\n");
-    R += prop->variable_walking_rate_dt * fiber()->analogLatticeValue(abscissa());
+    R += prop->variable_walking_rate_dt * fiber()->latticeValue(abscissa());
 #endif
 
     nextStep -= std::max((real)0, R);

@@ -23,12 +23,12 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
         FiberLattice * lat = &sit.fiber()->lattice();
         
         if ( !lat->ready() )
-            throw InvalidParameter("fiber:lattice was not defined");
+            throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
         
         // index to site containing given abscissa:
         lati_t s = lat->index(sit.abscissa());
 
-        if ( lat->outsideMP(s) || unavailable(lat, s) )
+        if ( lat->outsideMP(s) || occupied(lat, s) )
             return false;
         
         // adjust to match selected lattice site:
@@ -196,9 +196,9 @@ std::ostream& operator << (std::ostream& os, Digit const& obj)
 }
 
 
+#if FIBER_HAS_LATTICE
 void Fiber::resetLattice()
 {
-#if FIBER_HAS_LATTICE
     frLattice.clear();
     
     for ( Hand * ha = handListFront; ha; ha = ha->next() )
@@ -206,6 +206,6 @@ void Fiber::resetLattice()
         if ( ha->lattice() == &frLattice )
             static_cast<Digit*>(ha)->inc();
     }
-#endif
 }
+#endif
 

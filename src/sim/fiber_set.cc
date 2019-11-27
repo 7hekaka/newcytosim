@@ -644,6 +644,27 @@ void FiberSet::flipAllFibers()
         fib->flipPolarity();
 }
 
+
+void FiberSet::prune(ObjectFlag f)
+{
+    /* After reading from file, the Hands should not
+     update any Fiber, Single or Couple as they will be deleted */
+    for (Fiber* fib=first(), *n; fib; fib=n)
+    {
+        n = fib->next();
+        if ( fib->flag() == f )
+            delete(fib);
+        else
+            {
+#if FIBER_HAS_LATTICE
+                fib->resetLattice();
+#endif
+                fib->flag(0);
+            }
+    }
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -1262,25 +1283,4 @@ void FiberSet::infoRadius(size_t& cnt, real& rad, FiberEnd end) const
         rad = r / (real)cnt;
 }
 
-
-void FiberSet::infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
-{
-    len = 0;
-    cnt = 0;
-    sm = 0;
-    mn = INFINITY;
-    mx = -INFINITY;
-    
-#if FIBER_HAS_LATTICE
-    for ( Fiber const* fib=first(); fib; fib=fib->next() )
-    {
-        FiberLattice const& lat = fib->lattice();
-        if ( lat.ready() )
-        {
-            len += fib->length();
-            fib->infoLattice(lat, cnt, sm, mn, mx, density);
-        }
-    }
-#endif
-}
 

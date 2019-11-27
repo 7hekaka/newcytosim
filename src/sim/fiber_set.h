@@ -105,6 +105,9 @@ public:
     /// reverse the polarity of all fibers
     void flipAllFibers();
     
+    /// delete marked object after import
+    void prune(ObjectFlag f);
+
     //--------------------------------------------------------------------------
     
     /// total length of Fiber 
@@ -154,9 +157,6 @@ public:
     
     /// Calculate averaged distance from origin - for fiber ends
     void  infoRadius(size_t&, real& rad, FiberEnd) const;
-
-    /// Calculate averaged characteristics on all Fiber's Lattices
-    void  infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const;
 
 };
 
