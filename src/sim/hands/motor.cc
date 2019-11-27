@@ -21,8 +21,8 @@ void Motor::stepUnloaded()
     
 #if NEW_VARIABLE_SPEED
     PRINT_ONCE("Motor speed is affected by Fiber's Lattice\n");
-    real c = fiber()->analogLatticeValue(abscissa());
-    real a = fbAbs + prop->set_speed_dt + prop->variable_speed_dt * c;
+    real C = fiber()->analogLatticeValue(abscissa());
+    real a = fbAbs + prop->set_speed_dt + prop->variable_speed_dt * C;
 #else
     real a = fbAbs + prop->set_speed_dt;
 #endif
@@ -68,8 +68,8 @@ void Motor::stepLoaded(Vector const& force, real force_norm)
     // calculate load-dependent displacement:
 #if NEW_VARIABLE_SPEED
     PRINT_ONCE("Motor speed is affected by Fiber's Lattice\n");
-    real c = fiber()->analogLatticeValue(abscissa());
-    real s = prop->set_speed_dt + prop->variable_speed_dt * c;
+    real C = fiber()->analogLatticeValue(abscissa());
+    real s = prop->set_speed_dt + prop->variable_speed_dt * C;
     real dab = s * ( 1.0 + load / prop->stall_force );
 #else
     real dab = prop->set_speed_dt + load * prop->var_speed_dt;

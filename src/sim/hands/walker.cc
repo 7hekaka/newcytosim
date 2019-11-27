@@ -3,6 +3,7 @@
 #include "walker.h"
 #include "walker_prop.h"
 #include "glossary.h"
+#include "messages.h"
 #include "lattice.h"
 #include "simul.h"
 
@@ -11,7 +12,7 @@ Walker::Walker(WalkerProp const* p, HandMonitor* h)
 : Digit(p,h), nextStep(0), prop(p)
 {
     // works if digit:step_size == lattice:step_size
-    stride = ( prop->unloaded_speed > 0 ? 1 : -1);
+    stride = ( prop->unloaded_speed > 0 ? 1 : -1 );
 }
 
 
@@ -40,8 +41,15 @@ void Walker::stepUnloaded()
 {
     assert_true( attached() );
     
-    nextStep -= prop->stepping_rate_dt;
+    real R = prop->walking_rate_dt;
+
+#if NEW_VARIABLE_SPEED
+    PRINT_ONCE("Walker's speed is affected by Fiber's Lattice\n");
+    R += prop->variable_walking_rate_dt * fiber()->analogLatticeValue(abscissa());
+#endif
     
+    nextStep -= std::max((real)0, R);
+
     while ( nextStep <= 0 )
     {
         // test detachment due to stepping
@@ -81,9 +89,14 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
     assert_true( attached() );
     
     // calculate displacement, dependent on the load along the desired direction of displacement
-    real rate_step = prop->stepping_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
+    real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
-    nextStep -= rate_step;
+#if NEW_VARIABLE_SPEED
+    PRINT_ONCE("Walker's speed is affected by Fiber's Lattice\n");
+    R += prop->variable_walking_rate_dt * fiber()->analogLatticeValue(abscissa());
+#endif
+
+    nextStep -= std::max((real)0, R);
     
     while ( nextStep <= 0 )
     {

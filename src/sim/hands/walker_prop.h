@@ -4,6 +4,9 @@
 
 #include "digit_prop.h"
 
+/// enable lattice-dependent speed of walkers
+#define NEW_VARIABLE_SPEED 1
+
 
 /// Additional Property for Walker
 /**
@@ -42,7 +45,18 @@ public:
      */
     real    unbinding_chance;
     
+#if NEW_VARIABLE_SPEED
+    /// portion of the speed that depends on position
+    real    variable_speed;
+#endif
+
     /// @}
+    
+#if NEW_VARIABLE_SPEED
+    /// portion of the speed that depends on position
+    real    variable_walking_rate_dt;
+#endif
+    
     
 private:
     
@@ -50,7 +64,7 @@ private:
     real    var_rate_dt;
     
     /// derived variable
-    real    stepping_rate, stepping_rate_dt;
+    real    walking_rate_dt;
     
 public:
 

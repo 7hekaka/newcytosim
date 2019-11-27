@@ -26,6 +26,7 @@ void MotorProp::clear()
     limit_speed       = true;
 #if NEW_VARIABLE_SPEED
     variable_speed    = 0;
+    variable_speed_dt = 0;
 #endif
 #if NEW_UNBINDING_DENSITY
     unbinding_density = 0;
