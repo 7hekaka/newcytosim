@@ -144,8 +144,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
             fbAbs = ( fbSite + 0.5 ) * fbLattice->unit();
 #else
             lati_t t = in.readUInt32();
-            // relying on the lattice_unit being correct at this stage:
-            fbAbs = ( t + 0.5 ) * fbFiber->prop->lattice_unit;
+            fbAbs = ( t + 0.5 ) * fbFiber->unit_;
             //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }

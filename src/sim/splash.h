@@ -22,12 +22,9 @@ inline void print_version(std::ostream& os)
     os << "    Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON;
     
 #ifdef FIBER_HAS_LATTICE
-    os << "    Fiber has integer lattice\n";
+    os << "    Fiber Lattice " << FIBER_HAS_LATTICE << "\n";
 #endif
-#ifdef FIBER_HAS_ANALOG_LATTICE
-    os << "    Fiber has analog lattice\n";
-#endif
-
+    
     os << "    Built on " <<__DATE__<< " at " <<__TIME__;
     
 #ifdef COMPILER_VERSION
