@@ -32,7 +32,7 @@ void Myosin::stepUnloaded()
     if ( testDetachment() )
         return;
     
-    nextStep -= prop->stepping_rate_dt;
+    nextStep -= prop->walking_rate_dt;
     
     while ( nextStep <= 0 )
     {
@@ -61,10 +61,10 @@ void Myosin::stepLoaded(Vector const& force, real force_norm)
     assert_true( attached() );
     
     // calculate displacement, dependent on the load along the desired direction of displacement
-    real rate_step = prop->stepping_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
+    real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
-    nextStep -= rate_step;
-    
+    nextStep -= std::max((real)0, R);
+
     while ( nextStep <= 0 )
     {
         assert_true( attached() );

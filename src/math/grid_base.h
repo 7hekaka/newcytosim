@@ -21,11 +21,11 @@
 
 ///Divides a rectangle of dimensionality ORD into regular voxels
 /** 
-Grid<int ORD> creates a regular lattice over a rectangular
-region of space of dimensionality ORD, initialized by setDimensions().
+Grid<int ORD> creates a regular grid over a rectangular region
+of space of dimensionality ORD, initialized by setDimensions().
 
-Functions are provided to convert from the real space coordinates (of type real)
-into an index usable to access a one-dimensional C-array.
+Functions are provided to convert from the space coordinates (of type real)
+into an index usable to access the one-dimensional C-array of cells.
 The cells are ordered successively, the first dimension (X) varying the fastest
 i.e. cell[ii+1] will in most cases be located on the right of cell[ii], although
 if cell[ii] is on the right edge, then cell[ii+1] is on the symmetric edge. 

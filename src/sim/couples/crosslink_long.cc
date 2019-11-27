@@ -40,6 +40,10 @@ Torque CrosslinkLong::calcArm(const Interpolation & pt, Vector const& pos, real 
 }
 
 
+/**
+ Note that, as `mArm` is calculated by setInteraction(),
+ the result of posSide will be incorrect if 'solve=0'
+ */
 Vector CrosslinkLong::posSide() const
 {
 #if ( DIM > 1 )

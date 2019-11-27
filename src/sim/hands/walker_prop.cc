@@ -22,6 +22,12 @@ void WalkerProp::clear()
     stall_force       = 0;
     unloaded_speed    = 0;
     unbinding_chance  = 0;
+    walking_rate_dt   = 0;
+    var_rate_dt       = 0;
+#if NEW_VARIABLE_SPEED
+    variable_speed    = 0;
+    variable_walking_rate_dt = 0;
+#endif
 }
 
 
@@ -36,6 +42,10 @@ void WalkerProp::read(Glossary& glos)
 #endif
     glos.set(unbinding_chance, "unbinding_chance") || glos.set(unbinding_chance, "unbinding", 2);
     
+#if NEW_VARIABLE_SPEED
+    glos.set(variable_speed, "variable_speed");
+#endif
+
     if ( glos.has_key("dangling_chance") )
         Cytosim::warn << "use `hold_growing_end` instead of `dangling_chance`\n";
     
@@ -59,9 +69,15 @@ void WalkerProp::complete(Simul const& sim)
     if ( unbinding_chance > 1 )
         throw InvalidParameter("walker:unbinding_chance must be <= 1");
     
-    stepping_rate     = fabs(unloaded_speed) / step_size;
-    stepping_rate_dt  = sim.prop->time_step * stepping_rate;
-    var_rate_dt       = std::copysign(stepping_rate_dt/stall_force, unloaded_speed);
+    walking_rate_dt = sim.prop->time_step * fabs(unloaded_speed) / step_size;
+    var_rate_dt     = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
+    
+#if NEW_VARIABLE_SPEED
+    real S = std::copysign(1.0, unloaded_speed * variable_speed);
+    variable_walking_rate_dt = S * sim.prop->time_step * fabs(variable_speed) / step_size;
+    if ( ( unloaded_speed + variable_speed ) * unloaded_speed < 0 )
+        throw InvalidParameter("walker:unloaded_speed and (unloaded_speed+variable_speed) must have the same sign");
+#endif
 }
 
 
@@ -122,5 +138,8 @@ void WalkerProp::write_values(std::ostream& os) const
     write_value(os, "stall_force",      stall_force);
     write_value(os, "unloaded_speed",   unloaded_speed);
     write_value(os, "unbinding_chance", unbinding_chance);
+#if NEW_VARIABLE_SPEED
+    write_value(os, "variable_speed",    variable_speed);
+#endif
 }
 

@@ -42,7 +42,11 @@ Torque PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len
 #endif
 }
 
-//------------------------------------------------------------------------------
+
+/**
+ Note that, as `mArm` is calculated by setInteraction(),
+ the result of posSide will be incorrect if 'solve=0'
+ */
 Vector PicketLong::posSide() const
 {
 #if ( DIM > 1 )
@@ -52,7 +56,7 @@ Vector PicketLong::posSide() const
 #endif
 }
 
-//------------------------------------------------------------------------------
+
 /**
  This calculates the force corresponding to the interSideLink()
  */
@@ -67,7 +71,7 @@ Vector PicketLong::force() const
     return prop->stiffness * d;
 }
 
-//------------------------------------------------------------------------------
+
 void PicketLong::setInteractions(Meca & meca) const
 {
 #if ( DIM == 1 )

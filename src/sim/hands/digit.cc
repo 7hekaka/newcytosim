@@ -199,11 +199,11 @@ std::ostream& operator << (std::ostream& os, Digit const& obj)
 void Fiber::resetLattice()
 {
 #if FIBER_HAS_LATTICE
-    frLattice.clear();
+    digLattice.clear();
     
     for ( Hand * ha = handListFront; ha; ha = ha->next() )
     {
-        if ( ha->lattice() == &frLattice )
+        if ( ha->lattice() == &digLattice )
             static_cast<Digit*>(ha)->inc();
     }
 #endif

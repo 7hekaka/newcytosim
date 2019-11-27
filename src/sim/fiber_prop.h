@@ -22,7 +22,7 @@ class Space;
 #define NEW_FIBER_CHEW          0
 #define NEW_FIBER_CONFINE2      0
 #define NEW_FIBER_CONFINE_RANGE 0
-#define NEW_AGING_LATTICE       0
+#define NEW_AGING_LATTICE       1
 #define NEW_FIBER_LOOP          0
 
 /// Property for a Fiber

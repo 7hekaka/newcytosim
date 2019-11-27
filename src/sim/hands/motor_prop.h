@@ -6,7 +6,7 @@
 #include "hand_prop.h"
 
 /// enable lattice-dependent speed of motors
-#define NEW_VARIABLE_SPEED 0
+#define NEW_VARIABLE_SPEED 1
 
 /// enable movement-dependent detachment of motors
 #define NEW_UNBINDING_DENSITY 0
@@ -50,8 +50,7 @@ public:
     
 #if NEW_VARIABLE_SPEED
     /// portion of the speed that depends on position
-    real    variable_speed, variable_speed_dt;
-;
+    real    variable_speed;
 #endif
     
     /// if true, the speed is limited to the range [0, 2*unloaded_speed]
@@ -89,7 +88,12 @@ public:
 #endif
 
     /// @}
-    
+
+#if NEW_VARIABLE_SPEED
+    /// portion of the speed that depends on position
+    real  variable_speed_dt;
+#endif
+
 private:
     
     /// limits for a displacement in one time_step apply if ( limit_speed = true )

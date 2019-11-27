@@ -124,8 +124,6 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 - pombe_bundle.cym : bundle formation
   New:
 - some DNA binding/unbinding
-- dynamic ring of growing filaments
-- slider that does not detach + Jam on lattice (Marcel Janson)
 
 # Input/Output:
 
@@ -172,7 +170,6 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 
 - Glossary could record the queries and use this information for error reporting:
   the parameter 'confined' was unused, but a query was made for 'confine'
-- select the type of lattice in Fiber: latticeReal() or latticeInt()
 
 # Graphics:
 
