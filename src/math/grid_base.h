@@ -145,7 +145,7 @@ protected:
     /// gStart[d] = gInf[d] / cWidth[d]
     real    gStart[ORD];
 
-    /// The volume occupied by one cell
+    /// The volume of one cell
     real    cVolume;
     
 protected:
@@ -849,7 +849,7 @@ public:
         return regions[indx][0];
     }
     
-    /// free memory occupied by the regions
+    /// free memory claimed by the regions
     void deleteRegions()
     {
         delete[] regions;

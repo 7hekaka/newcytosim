@@ -448,18 +448,24 @@ void CoupleSet::prune(ObjectFlag f)
         n = c->next();
         if ( c->flag() == f )
             deleteAF(c);
+        else
+            c->flag(0);
     }
     for (Couple* c=firstFA(), *n; c; c=n)
     {
         n = c->next();
         if ( c->flag() == f )
             deleteFA(c);
+        else
+            c->flag(0);
     }
     for (Couple* c=firstAA(), *n; c; c=n)
     {
         n = c->next();
         if ( c->flag() == f )
             deleteAA(c);
+        else
+            c->flag(0);
     }
 
     //ObjectSet::prune(aaList, f, 0);

@@ -267,7 +267,7 @@ public:
         }
     }
     
-    /// Release occupied memory
+    /// Release allocated memory
     void deallocate()
     {
         //printf("Array %p deallocate %i\n", this, allocated);

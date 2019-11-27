@@ -270,6 +270,8 @@ void SingleSet::prune(ObjectFlag f)
         n = s->next();
         if ( s->flag() == f )
             deleteA(s);
+        else
+            s->flag(0);
     }
 
     //ObjectSet::prune(aList, f, 0);

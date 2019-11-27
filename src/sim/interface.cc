@@ -874,8 +874,8 @@ void Interface::execute_run(size_t nb_steps)
     {
         hold();
         //fprintf(stderr, "> step %6i\n", sss);
-        simul.step();
         simul.solve();
+        simul.step();
     }
     
     simul.relax();

@@ -3,13 +3,19 @@
 #include "sim.h"
 #include "simul.h"
 #include "messages.h"
+#include "glossary.h"
+#include "iowrapper.h"
 #include "exceptions.h"
 #include "hand_prop.h"
 #include "simul_prop.h"
 #include "backtrace.h"
 #include "modulo.h"
 #include "tictoc.h"
+
 #include "tubule.h"
+#include "fiber.h"
+#include "aster.h"
+#include "field.h"
 
 extern Modulo const* modulo;
 
@@ -21,16 +27,13 @@ extern Modulo const* modulo;
 #include "simul_solvef.cc"
 
 #include "nucleus.h"
-#include "aster.h"
 #include "fake.h"
 #include "wrist.h"
 #include "bundle.h"
 #include "space_strip.h"
 #include "space_periodic.h"
 #include "space_cylinderP.h"
-#include "fiber.h"
 #include "event.h"
-#include "field.h"
 
 #include <csignal>
 
@@ -333,6 +336,7 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case         Fiber::TAG:    return &fibers;
         case Fiber::TAG_DYNAMIC:    return &fibers;
         case Fiber::TAG_LATTICE:    return &fibers;
+        case  Fiber::TAG_VALUES:    return &fibers;
         case          Bead::TAG:    return &beads;
         case         Solid::TAG:    return &solids;
         case        Sphere::TAG:    return &spheres;

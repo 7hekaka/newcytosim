@@ -126,7 +126,7 @@ private:
     }
     
     
-    /// free all occupied memory
+    /// free all claimed memory
     void deallocate()
     {
         //std::clog<<"Lattice realeased\n";
@@ -205,7 +205,7 @@ public:
             throw InvalidParameter("lattice:unit must be > 0");
         if ( laUnit != u )
         {
-            std::clog << "Lattice::unit " << laUnit << " -> " << u << "\n";
+            std::clog << "lattice:unit changed " << laUnit << " -> " << u << "\n";
             //preserve the same abscissa range, with the new lattice unit
             real s = laUnit * laInf;
             real e = laUnit * laSup + laUnit;

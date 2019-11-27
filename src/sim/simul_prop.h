@@ -207,7 +207,7 @@ public:
      close enough to interact, based on a dividing the Space with a rectangular grid (see PointGrid).
      
      `steric_max_range` defines the minimum size of the cells in the grid.
-     A finer grid reduces false positives, but increases the amount of memory occupied by the grid,
+     A finer grid reduces false positives, but increases the amount of memory used by the grid,
      and the number calculations that are necessary to maintain and clear the grid.
      
      Thus optimal performance is usually obtained for an intermediate value of `steric_max_range`.
