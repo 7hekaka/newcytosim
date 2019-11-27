@@ -847,8 +847,8 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
 
         hold();
         //fprintf(stderr, "> step %6i\n", sss);
-        simul.step();
         (simul.*solveFunc)();
+        simul.step();
         
         ++sss;
     }
