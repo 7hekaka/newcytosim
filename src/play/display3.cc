@@ -1119,12 +1119,19 @@ void Display3::drawCoupleB(Couple const* cx) const
 #if ( 1 )
     if ( dns > 1e-6 )
     {
+        // moving the 'hands' to the surface of the fiber:
         dns = sFactor / sqrt(dns);
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width;
         const real rad2 = cx->fiber2()->prop->disp->line_width;
-        p1 += dif * std::min((real)0.5, rad1*dns);
-        p2 -= dif * std::min((real)0.5, rad2*dns);
+        // move points along the link
+        //p1 += dif * std::min((real)0.45, rad1*dns);
+        //p2 -= dif * std::min((real)0.45, rad2*dns);
+        // move points orthogonal to the fiber's axis
+        Vector dir1 = cx->dirFiber1();
+        Vector dir2 = cx->dirFiber2();
+        p1 += ( dif - dot(dif,dir1) * dir1 ) * std::min((real)0.45, rad1*dns);
+        p2 -= ( dif - dot(dif,dir2) * dir2 ) * std::min((real)0.45, rad2*dns);
     }
 #endif
     
