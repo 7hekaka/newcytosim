@@ -141,7 +141,9 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
     fib->birthTime(simul.time());
     
 #if FIBER_HAS_FAMILY
-    opt.set(fib->family, "family");
+    std::string str;
+    if ( opt.set(str, "family") )
+        fib->family = simul.findFiber(str);
 #endif
 
     ObjectList res(2);

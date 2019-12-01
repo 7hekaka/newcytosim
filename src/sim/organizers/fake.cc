@@ -49,7 +49,7 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     }
     else if ( opt.set(str, "solid1") )
     {
-        as = Solid::toSolid(sim.solids.findObject(str, "solid"));
+        as = sim.findSolid(str);
         if ( !as )
             throw InvalidParameter("could not find Solid `"+str+"'");
     }
@@ -66,7 +66,7 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     }
     else if ( opt.set(str, "solid2") )
     {
-        bs = Solid::toSolid(sim.solids.findObject(str, "solid"));
+        bs = sim.findSolid(str);
         if ( !bs )
             throw InvalidParameter("could not find Solid `"+str+"'");
     }

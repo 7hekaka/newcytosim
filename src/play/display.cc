@@ -222,7 +222,7 @@ void Display::prepareLineDisp(const Fiber * fib)
             break;
         case FiberDisp::COLORING_FAMILY:
 #if FIBER_HAS_FAMILY
-            self->color = gle::nice_color(fib->family);
+            self->color = gle::nice_color(fib->family->signature());
 #endif
             break;
         case FiberDisp::COLORING_CLUSTER:

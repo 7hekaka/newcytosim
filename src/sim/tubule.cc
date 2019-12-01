@@ -70,7 +70,9 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         Buddy::connect(fil_[i]);
         fil_[i]->setOrigin(i*(-0.012/NFIL));
 #if FIBER_HAS_FAMILY
-        fil_[i]->family = signature();
+        fil_[i]->family = fil_[0];
+        fil_[i]->sister = fil_[(i+NFIL-1)%NFIL];
+        fil_[i]->brother = fil_[(i+1)%NFIL];
 #endif
     }
 
@@ -234,7 +236,9 @@ void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
         {
             fil_[i] = Fiber::toFiber(w);
 #if FIBER_HAS_FAMILY
-            fil_[i]->family = signature();
+            fil_[i]->family = fil_[0];
+            fil_[i]->sister = fil_[(i+NFIL-1)%NFIL];
+            fil_[i]->brother = fil_[(i+1)%NFIL];
 #endif
         }
     }
