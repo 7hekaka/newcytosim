@@ -3,16 +3,21 @@
 # PRECONFIG, a versatile configuration file generator
 #
 # Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--
-# This is PRECONFIG version 1.1.0, last modified on 28.11.2019
+# This is PRECONFIG version 1.2, last modified on 30.11.2019
 
 __VERSION__="1.2"
 
-__DATE__   ="24.06.2019"
+__DATE__   ="30.11.2019"
 
 """
 # SYNOPSIS
 
    Preconfig generates files from a template by evaluating doubly-bracketed Python code.
+   
+# Article:
+
+   preconfig: A Versatile Configuration File Generator for Varying Parameters
+   https://openresearchsoftware.metajnl.com/articles/10.5334/jors.156/
 
 # DESCRIPTION
 
@@ -72,9 +77,6 @@ __DATE__   ="24.06.2019"
 
    - if '--help' is specified, this documentation will be printed.
 
-   - if no_expand=ARRAY_NAME is specified, then the preconfig array ARRAY_NAME
-   will not be expanded, allowing to work with arrays in the config file.
-
 # CODE SNIPPETS
 
    Any plain python code can be embedded in the file, and functions from the
@@ -82,6 +84,8 @@ __DATE__   ="24.06.2019"
    It is possible to use multiple bracketed expressions in the same file, and
    to define variables in the python environment. An integer 'n', starting at
    zero and corresponding to the file being generated is automatically defined.
+   Note that variables defined in embedded code are not expanded when they appear
+   alone in another code (eg. [[vec]]).
 
 ## Example 1
 
@@ -164,10 +168,21 @@ __DATE__   ="24.06.2019"
 
    Quotations can be used to aggregate values:
 
-    [[ vector = ['-1 0 1', '0 1 1', '-1 0 -1'] ]]
+    [[ vec = ['-1 0 1', '0 1 1', '-1 0 -1'] ]]
     new microtubule
     {
-        position = [[vector]]
+        position = [[vec]]
+    }
+
+## Example 9
+
+   Cartesian sampling with filtering:
+
+    [[ (x,y) = [ (x,y) for x in range(10) for y in range(10) if x>y ] ]]
+
+    new particle
+    {
+        position = [[x]] [[y]]
     }
 
 ## Acknowledgments:
@@ -176,7 +191,7 @@ We wish to thank the members of the Nedelec group, and all users of
 Cytosim for their feedback which has contributed greatly to this development.
 We thanks Shaun Jackman and Steven Andrews for valuable feedback!
 
-Copyright Francois J. Nedelec,
+Copyright Francois J. Nedelec and Serge Dmitrieff
 EMBL 2010--2018
 Cambridge University 2019--
 This is Free Software with absolutely no WARANTY.
@@ -223,56 +238,59 @@ def pop_sequence(dic):
     return ('', [])
 
 
-def try_assignment(cmd):
+def try_assignment(arg):
     """
-        Check if `cmd` follows the format of a variable assignent,
+        Check if `arg` follows the format of a variable assignent,
         and if that succeeds, return the key and value strings in a tuple.
     """
     try:
-        k, v = cmd.split("=")
+        k, v = arg.split('=',1)
         if k and v:
             k = k.strip()
             v = v.strip()
             return (k, v)
     except ValueError:
         pass
-    return ('', cmd)
+    return ('', arg)
 
 
 
-def get_block(file, s, e):
+def get_block(file, S, E):
     """
-    Extract the next block starting with DOUBLE delimiters 'ss' and ending with 'ee'
+    Extract from `file` the next block starting with DOUBLE delimiters 'SS'
+        and ending with matching 'EE'.
     Returns a set with 3 values:
         - the text found before the block start
         - the block with its delimiters
         - a boolean EOF indicator
     """
     ch = file.read(1)
+    sec = 0
     pre = ''
     blk = ''
-    dep = 0
+    lev = 0
     while file and ch:
         pc = ch
         ch = file.read(1)
-        if ch == s:
-            if pc == s and dep == 0:
-                dep = 1
-            if dep > 0:
-                dep += 1
-        if dep > 0:
+        if ch == S:
+            if sec:
+                lev += 1
+            if pc == S:
+                sec += 1
+        if sec:
             blk += pc
+            #print("%c%c >  lev %i sec %i" %(pc, ch, lev, sec))
         else:
             pre += pc
-        #print("%c%c dep %i" %(pc, ch, dep))
-        if ch == e:
-            if pc == e and dep == 1:
-                return (pre, blk+ch, False)
-            if dep > 0:
-                dep -= 1
-    if blk:
-        out.write("Error: unclosed bracketted block in:%s\n" % pre);
-    return (pre, '', True)
+        if ch == E:
+            if sec:
+                lev -= 1
+            if pc == E:
+                #print("%c%c EE lev %i sec %i" %(pc, ch, lev, sec))
+                if lev == -2:
+                    return (pre, blk+ch, False)
+    # reaching end of file:
+    return (pre, blk, True)
 
 
 #-------------------------------------------------------------------------------
@@ -286,7 +304,7 @@ class Preconfig:
         self.repeat = 1
         self.verbose = 1
         self.destination = ''
-        self.do_assignment=[]
+        self.assignments=[]
         self.values={}
         # streams for output (all output is hidden by default):
         self.out = open(os.devnull, 'w')
@@ -299,8 +317,6 @@ class Preconfig:
         self.file_index = 0
         # list of files generated
         self.files_made = []
-        # arguments that shouldn't be expanded (e.g. : arrays)
-        self.no_expand=[]
         # name of current input file being processed (used for error reporting)
         self.template = ''
 
@@ -320,46 +336,21 @@ class Preconfig:
                 self.log = open('log.csv', 'w')
             elif arg[0] == '-' and arg[1:].isdigit():
                 self.nb_digits = int(arg[1:])
-            elif arg.startswith('no_expand='):
-                self.no_expand.append(arg[10:])
             else:
-                self.do_assignment.append(arg)
+                self.assignments.append(arg)
 
-
-    def main(self):
-        for arg in self.do_assignment:
-            (k,v) = try_assignment(arg)
-            if k:
-                self.locals[k] = self.evaluate(v)
-            else:
-                sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
-                sys.exit()
-
-        if not self.inputs:
-            sys.stderr.write("  Error: you must specify an input template file\n")
-            sys.exit()
-
-        for i in self.inputs:
-            #out.write("Reading %s\n" % i)
-            res = self.parse(i)
-            if self.verbose == 1:
-                #print("%i files generated from %s:" % (len(res), i))
-                for f in res:
-                    print(f)
-
-
-    def evaluate(self, cmd):
+    def evaluate(self, arg):
         """
-            Evaluate `cmd` and return the result
+            Evaluate `arg` and return result
         """
-        res = cmd
+        res = arg
+        #print("evaluating `"+arg+"'")
         try:
-            res = eval(cmd, __GLOBALS__, self.locals)
+            res = eval(arg, __GLOBALS__, self.locals)
         except Exception as e:
             sys.stderr.write("\033[95m")
-            sys.stderr.write("Error in `%s`:\n" % self.template)
+            sys.stderr.write("Error evaluating '%s' in `%s`:\n" % (arg, self.template))
             sys.stderr.write("\033[0m")
-            sys.stderr.write("    Could not evaluate [[%s]]\n" % cmd)
             sys.stderr.write("    "+str(e)+'\n')
             sys.exit(1)
         try:
@@ -367,10 +358,8 @@ class Preconfig:
                 res = list(res)
         except Exception:
             pass
-        #print("evaluated [["+cmd+"]] = " + repr(res))
+        #print("evaluated `"+arg+"' = " + repr(res))
         return res
-
-    #-------------------------------------------------------------------------------
 
     def process(self, file, text):
         """
@@ -380,22 +369,25 @@ class Preconfig:
         output = text
 
         while file:
-            (pre, code, eof) = get_block(file, __SNIPPET_OPEN__, __SNIPPET_CLOSE__ )
-            #print("text `", pre[0:32], "' of size ", len(pre))
-            #print("code [["+pre+"]] EOF=%i" % eof)
+            (pre, block, eof) = get_block(file, __SNIPPET_OPEN__, __SNIPPET_CLOSE__ )
+            #print("%i characters... block = '%s'" % (len(pre), block))
             output += pre
             if eof:
+                if block:
+                    sys.stderr.write("Error: unclosed bracketted block in:\n");
+                    sys.stderr.write("    "+block.split('\n', 1)[0]+'\n');
+                    sys.exit(1)
                 # having exhausted the input, we generate a file:
                 self.make_file(output)
                 return
             # remove outer brackets:
-            cmd = code[2:-2]
-            #print("embedded code '%s'" % code)
+            cmd = block[2:-2]
+            #print("%i characters... code block '%s'" % (len(pre), cmd))
             # interpret command:
             (key, vals) = try_assignment(cmd)
             vals = self.evaluate(vals)
             #print("`"+key+"' is "+repr(vals))
-            if key not in self.no_expand:
+            if not cmd.strip() in self.locals:
                 try:
                     # use 'pop()' to test if multiple values were specified...
                     # keep last value aside for later:
@@ -405,12 +397,12 @@ class Preconfig:
                         # fork recursively for all subsequent values:
                         #print("forking", v)
                         if key:
-                            self.locals[key] = v
+                            exec(key+'='+repr(v), __GLOBALS__, self.locals)  #self.locals[key] = v
                             self.out.write("|%50s <-- %s\n" % (key, str(v)) )
                             self.process(file, output)
                         else:
-                            self.out.write("|%50s --> %s\n" % (code, str(v)) )
-                            self.process(file, output+str(v))
+                            self.out.write("|%50s --> %s\n" % (block, str(v)) )
+                            self.process(file, output+repr(v))
                         file.seek(ipos)
                 except (AttributeError, IndexError):
                     # a single value was specified:
@@ -420,12 +412,11 @@ class Preconfig:
             # handle remaining value:
             # print("handling", key, val)
             if key:
-                self.locals[key] = val
+                exec(key+'='+repr(val), __GLOBALS__, self.locals)  #self.locals[key] = val
                 self.out.write("|%50s <-- %s\n" % (key, str(val)) )
             else:
-                output += str(val)
-                self.out.write("|%50s --> %s\n" % (code, str(val)) )
-
+                output += repr(val)
+                self.out.write("|%50s --> %s\n" % (block, str(val)) )
 
     def expand_values(self, file, text):
         """
@@ -445,7 +436,6 @@ class Preconfig:
         else:
             self.process(file, text)
 
-
     def parse(self, name):
         """
             process one file, and return the list of files generated
@@ -459,7 +449,6 @@ class Preconfig:
                 self.expand_values(f,'')
         return self.files_made
 
-
     def set_pattern(self, name):
         """
         Extract the root and the extension of the file
@@ -467,11 +456,10 @@ class Preconfig:
         [main, ext] = os.path.splitext(os.path.basename(name))
         if '.' in main:
             [main, ext] = os.path.splitext(main)
-        self.pattern = main + '%0' + str(self.nb_digits) + 'i' + ext
+        self.pattern = main + '%0' + repr(self.nb_digits) + 'i' + ext
         if self.destination:
             self.pattern = os.path.join(self.destination, self.pattern)
         self.file_index = 0
-
 
     def next_file_name(self):
         """
@@ -480,7 +468,6 @@ class Preconfig:
         n = self.pattern % self.file_index
         self.file_index += 1
         return n
-
 
     def make_file(self, text):
         """
@@ -506,6 +493,25 @@ class Preconfig:
                 self.log.write(', %10s' % repr(self.values[k]))
             self.log.write('\n')
         self.values['n'] = self.file_index
+
+    def main(self):
+        for arg in self.assignments:
+            (k,v) = try_assignment(arg)
+            if k:
+                self.locals[k] = self.evaluate(v)
+            else:
+                sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
+                sys.exit()
+
+        if not self.inputs:
+            sys.stderr.write("  Error: you must specify an input template file\n")
+            sys.exit()
+
+        for i in self.inputs:
+            #out.write("Reading %s\n" % i)
+            res = self.parse(i)
+            if self.verbose == 1:
+                print("%i files generated: %s ... %s" % (len(res), res[0], res[-1]))
 
 
 #-------------------------------------------------------------------------------

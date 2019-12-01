@@ -187,8 +187,7 @@ public:
     /// set distance betwen adjacent sites (the size of a site)
     void setUnit(real u)
     {
-        if ( u < REAL_EPSILON )
-            throw InvalidParameter("lattice:unit must be > 0");
+        assert_true( u >= REAL_EPSILON );
         laUnit = u;
     }
     

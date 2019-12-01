@@ -141,7 +141,9 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
     fib->birthTime(simul.time());
     
 #if FIBER_HAS_FAMILY
-    opt.set(fib->family, "family");
+    std::string str;
+    if ( opt.set(str, "family") )
+        fib->family = simul.findFiber(str);
 #endif
 
     ObjectList res(2);
@@ -645,22 +647,23 @@ void FiberSet::flipAllFibers()
 }
 
 
+/**
+ After reading from file, the fiber structure need to be updated,
+ as well as the Hands bound to them.
+ */
 void FiberSet::prune(ObjectFlag f)
 {
-    /* After reading from file, the Hands should not
-     update any Fiber, Single or Couple as they will be deleted */
     for (Fiber* fib=first(), *n; fib; fib=n)
     {
         n = fib->next();
         if ( fib->flag() == f )
             delete(fib);
         else
-            {
-#if FIBER_HAS_LATTICE
-                fib->resetLattice();
-#endif
-                fib->flag(0);
-            }
+        {
+            fib->update();
+            fib->resetLattice();
+            fib->flag(0);
+        }
     }
 }
 
@@ -1282,5 +1285,4 @@ void FiberSet::infoRadius(size_t& cnt, real& rad, FiberEnd end) const
     if ( cnt )
         rad = r / (real)cnt;
 }
-
 

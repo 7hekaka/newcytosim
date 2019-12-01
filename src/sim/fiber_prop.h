@@ -22,7 +22,6 @@ class Space;
 #define NEW_FIBER_CHEW          0
 #define NEW_FIBER_CONFINE2      0
 #define NEW_FIBER_CONFINE_RANGE 0
-#define NEW_AGING_LATTICE       0
 #define NEW_FIBER_LOOP          0
 
 /// Property for a Fiber
@@ -184,25 +183,29 @@ public:
     /// unit length associated with Lattice
     real         lattice_unit;
     
+    /// if true, associate an analog lattice
+    int          mesh;
+    
+    /// unit length associated with the analog Lattice
+    real         mesh_unit;
+    
     /// if true, the quantities in the lattice can cut the fiber
-    int          lattice_cut_fiber;
+    int          mesh_cut_fiber;
 
     /// flux speed of substance on Lattice (speed<0 is MINUS_END directed)
-    real         lattice_flux_speed;
+    real         mesh_flux_speed;
     
     /// loading rate of substance from Field to Lattice
     /**
      This is a binding rate per unit time and per unit length of Fiber.
      Binding is proportional to the concentration of substance in the field.
      */
-    real         lattice_binding_rate;
+    real         mesh_binding_rate;
 
     /// unloading rate of substance from Lattice to Field (unit is 1/second)
-    real         lattice_unbinding_rate;
+    real         mesh_unbinding_rate;
     
-#if NEW_AGING_LATTICE
-    real         lattice_aging_rate;
-#endif
+    real         mesh_aging_rate;
     
     /// flag controlling the forces exerted by Space on fiber points
     /**

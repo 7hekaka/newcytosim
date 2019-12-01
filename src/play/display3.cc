@@ -487,27 +487,21 @@ void set_color_alternate(Fiber const& fib, long ix, real)
 
 void set_color_lattice(Fiber const& fib, long ix, real scale)
 {
-#if FIBER_HAS_LATTICE
-    fib.disp->color.darken(scale * fib.lattice().data(ix)).load_front();
-#else
-    fib.disp->color.load_front();
-#endif
+    fib.disp->color.darken(scale*fib.drawableLattice()->data(ix)).load_front();
 }
 
 
 void set_rainbow_lattice(Fiber const& fib, long ix, real scale)
 {
-#if FIBER_HAS_LATTICE
-    gle_color::jet_color(scale * fib.lattice().data(ix)).load_front();
-#else
-    fib.disp->color.load_front();
-#endif
+    gle_color::jet_color(scale*fib.drawableLattice()->data(ix)).load_front();
 }
 
 
-void Display3::drawFiberLattice(Fiber const& fib, FiberLattice const& lat, real width,
-                                 void (*set_color)(Fiber const&, long, real)) const
+void Display3::drawFiberLattice(Fiber const& fib, real width,
+                                void (*set_color)(Fiber const&, long, real)) const
 {
+    FiberLattice const& lat = *fib.drawableLattice();
+
     glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);
     GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  blk);
@@ -548,19 +542,19 @@ void Display3::drawFiberLattice(Fiber const& fib, FiberLattice const& lat, real 
 }
 
 
-void Display3::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display3::drawFiberLattice1(Fiber const& fib, real width) const
 {
-    drawFiberLattice(fib, lat, width, set_color_lattice);
+    drawFiberLattice(fib, width, set_color_lattice);
 }
 
-void Display3::drawFiberLattice2(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display3::drawFiberLattice2(Fiber const& fib, real width) const
 {
-    drawFiberLattice(fib, lat, width, set_rainbow_lattice);
+    drawFiberLattice(fib, width, set_rainbow_lattice);
 }
 
-void Display3::drawFiberLatticeEdges(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display3::drawFiberLatticeEdges(Fiber const& fib, real width) const
 {
-    drawFiberLattice(fib, lat, width, set_color_alternate);
+    drawFiberLattice(fib, width, set_color_alternate);
 }
 
 //------------------------------------------------------------------------------

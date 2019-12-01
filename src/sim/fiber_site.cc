@@ -143,8 +143,9 @@ void FiberSite::read(Inputter& in, Simul& sim)
             ///@todo: we should use digit:site_shift here:
             fbAbs = ( fbSite + 0.5 ) * fbLattice->unit();
 #else
-            lati_t t = in.readUInt32();
-            fbAbs = ( t + 0.5 ) * fbFiber->unit_;
+            lati_t t = in.readInt32();
+            // relying on the lattice_unit being correct at this stage:
+            fbAbs = ( t + 0.5 ) * fbFiber->prop->lattice_unit;
             //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }

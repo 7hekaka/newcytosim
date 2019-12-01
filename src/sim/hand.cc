@@ -191,7 +191,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
     }
 
 #if NEW_BIND_ONLY_FREE_END
-    // check occupancy near the end (should be done with FiberLattice)
+    // check occupancy near the end (should be done with DigitLattice)
     if ( end != NO_END && prop->bind_only_free_end )
     {
         if ( 0 < sit.fiber()->nbHandsNearEnd(prop->bind_end_range, end) )

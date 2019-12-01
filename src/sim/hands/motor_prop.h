@@ -5,7 +5,7 @@
 
 #include "hand_prop.h"
 
-/// enable lattice-dependent speed of motors
+/// enable mesh-dependent speed of motors (requires FIBER_HAS_MESH=1)
 #define NEW_VARIABLE_SPEED 0
 
 /// enable movement-dependent detachment of motors

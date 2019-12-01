@@ -201,7 +201,7 @@ public:
     /// Stiffness for attractive steric interaction
     real      steric_stiffness_pull[2];
     
-    /// Lattice size used to determine steric interactions
+    /// Grid size used to determine steric interactions
     /**
      Cytosim uses a divide-and-conquer approach to find pairs of objects that are 
      close enough to interact, based on a dividing the Space with a rectangular grid (see PointGrid).
@@ -226,7 +226,7 @@ public:
     real      steric_max_range;
     
     
-    /// Lattice size used to determine the attachment of Hand to Fiber
+    /// Grid size used to determine the attachment of Hand to Fiber
     /**
      Cytosim uses a divide-and-conquer approach to detect which Fibers are near a given point,
      witout testing every Fiber. This is necessary to determine onto which Fiber a Hand may bind.

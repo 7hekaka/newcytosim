@@ -4,7 +4,7 @@
 
 #include "digit_prop.h"
 
-/// enable lattice-dependent speed of walkers
+/// enable mesh-dependent speed of walkers (requires FIBER_HAS_MESH=1)
 #define NEW_VARIABLE_SPEED 0
 
 

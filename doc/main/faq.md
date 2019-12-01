@@ -570,6 +570,17 @@ It is important to do this in a fresh directory, as `sim` will create a new `obj
 You can later merge two object files later if you want to display them continuously in play. Make sure you copy all the files before you start experimenting, but normally this works with the standard unix `cat`.
 </details>
 
+<details>
+<summary>
+**Is there a way run the exact same simulation again, for debugging or other purpose?**
+</summary>
+
+*My HPC team suggested that in order to debug the code, they would need to know if there is a way to make it run with the same seed for the random number generator to make reproducible simulation results. Could you please help me with that?*
+
+There is a parameter `random_seed` in `simul`. By default, it is set to zero, and then cytosim seeds using the timer. The value that is used is then reported in `properties.cmo`.
+So you can rerun the same simulation by copy-pasting that value into config.cym (and using the same machine). However, you can also set `random_seed=1` from the start.
+</details>
+
 
 <details>
 <summary>

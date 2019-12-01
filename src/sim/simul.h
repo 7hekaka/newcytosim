@@ -250,6 +250,15 @@ public:
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
     Mecable*        findMecable(const std::string& spec) const;
     
+    /// find a Solid
+    Solid *         findSolid(std::string s) { return Solid::toSolid(solids.findObject(s, "solid")); }
+    
+    /// find a Fiber
+    Fiber *         findFiber(std::string s) { return Fiber::toFiber(fibers.findObject(s, "fiber")); }
+    
+    /// find a Fiber
+    Sphere *        findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
+
     /// read an Object reference and return the corresponding Object (`tag` is set)
     Object*         readReference(Inputter&, ObjectTag& tag);
 
@@ -404,8 +413,11 @@ public:
     void      reportFiberLinks(std::ostream&) const;
 
     /// print summary of Fiber's lattice quantities
-    void      reportFiberLattice(std::ostream&, bool density) const;
-
+    void      reportFiberLattice(std::ostream&) const;
+    
+    /// print summary of Fiber's lattice quantities
+    void      reportFiberMesh(std::ostream&, bool density) const;
+    
     /// print interection abscissa between fibers
     void      reportFiberConnectors(std::ostream&, Glossary&) const;
 
