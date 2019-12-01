@@ -20,7 +20,7 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
     if ( Hand::attachmentAllowed(sit) )
     {
 #if FIBER_HAS_LATTICE
-        FiberLattice * lat = &sit.fiber()->lattice();
+        DigitLattice * lat = &sit.fiber()->lattice();
         
         if ( !lat->ready() )
             throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
@@ -47,7 +47,6 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
 void Digit::attach(FiberSite const& sit)
 {
     Hand::attach(sit);
-    assert_true(vacant(site()));
     inc();
 }
 
@@ -55,12 +54,6 @@ void Digit::attach(FiberSite const& sit)
 void Digit::detach()
 {
     dec();
-#if 0
-    // testing the value of the lattice after detachment:
-    FiberLattice::cell_t c = lattice()->data(site());
-    if ( c & prop->footprint )
-        std::clog << *this << " detach " << (int)c << "\n";
-#endif
     Hand::detach();
 }
 
@@ -199,13 +192,12 @@ std::ostream& operator << (std::ostream& os, Digit const& obj)
 #if FIBER_HAS_LATTICE
 void Fiber::resetLattice()
 {
-    frLattice.clear();
+    digitLattice.clear();
     
     for ( Hand * ha = handListFront; ha; ha = ha->next() )
     {
-        if ( ha->lattice() == &frLattice )
+        if ( ha->lattice() == &digitLattice )
             static_cast<Digit*>(ha)->inc();
     }
 }
 #endif
-

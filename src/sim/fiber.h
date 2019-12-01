@@ -20,9 +20,11 @@ class FiberSegment;
 class LineDisp;
 
 
-/// Flag to associate a Lattice to the Fiber {-1, 0, 1}
-#define FIBER_HAS_LATTICE 1
+/// Flag to associate a Lattice of integers to the Fiber class {0, 1}
+#define FIBER_HAS_LATTICE 0
 
+/// Flag to associate a Lattice of reals to the Fiber class {0, 1}
+#define FIBER_HAS_MESH 0
 
 /// Flag to allow `family` member variable to control Couple's binding
 #define FIBER_HAS_FAMILY 0
@@ -37,11 +39,20 @@ class LineDisp;
  */
 #if FIBER_HAS_LATTICE > 0
 // Lattice composed of integers, appropriate for discrete occupancy
-typedef Lattice<uint64_t> FiberLattice;
+typedef Lattice<uint64_t> DigitLattice;
 #else
 // Lattice composed of floating point values, for continuous values
-typedef Lattice<real> FiberLattice;
+typedef Lattice<real> DigitLattice;
 #endif
+
+
+/// type of lattice that will be displayed in play:
+#if FIBER_HAS_MESH
+typedef Lattice<real> FiberLattice;
+#else
+typedef DigitLattice FiberLattice;
+#endif
+
 
 /// a Mecafil to which Hands may bind
 /**
@@ -54,8 +65,8 @@ typedef Lattice<real> FiberLattice;
  - `handListFront` and `handListBack` keep track of all attached Hands.
  .
  
- if prop->lattice is true, the Fiber will have a Lattice,
- which can be used by Digit and derived Hands, and other features.
+ The Fiber may have a Lattice of integers, used by Digit and derived Hands.
+ It can also have a Lattice of reals, for other features.
  
  Fibers are stored in a FiberSet.
  @todo Fiber should be called Filament
@@ -91,13 +102,15 @@ private:
     /// Pointer to hold a list of attached Hands
     mutable Hand *      handListBack;
 
-    /// ordered list of future severing positions
-    std::set<SeverPos>  pendingCuts;
-
 #if FIBER_HAS_LATTICE
-    /// Associated Lattice
-    FiberLattice        frLattice;
+    /// Associated Lattice used for occupancy of Digit
+    DigitLattice        digitLattice;
 #endif
+#if FIBER_HAS_MESH
+    /// Associated Lattice of reals
+    Lattice<real>       valueMesh;
+#endif
+
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
     Single *            frGlue;
@@ -107,7 +120,11 @@ protected:
     /// stored chewing at the end
     real                frChewM, frChewP;
 #endif
+    
+    /// ordered list of future severing positions
+    std::set<SeverPos>  pendingCuts;
 
+    
     /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
     virtual Fiber* severPoint(size_t pti);
     
@@ -277,47 +294,63 @@ public:
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
     /// modifiable reference to Fiber's Lattice
-    FiberLattice&  lattice() { return frLattice; }
+    DigitLattice&  lattice() { return digitLattice; }
     
     /// const reference to Fiber's Lattice
-    FiberLattice const&  lattice() const { return frLattice; }
-    
-    /// value of analog Lattice at given abscissa
-    real           latticeValue(real a) const { if ( frLattice.ready() ) return frLattice.cell(a); return 0; }
-
+    DigitLattice const& lattice() const { return digitLattice; }
+        
     /// recalculate occupancy lattice from bound Digits
     void           resetLattice();
 #else
-    real  unit_;
+    /// does nothing
+    void           resetLattice() {}
 #endif
-
-    /// initialize lattice sites to represent a constant linear density
-    void           setLatticeValues(Lattice<real>&, real density) const;
-
-    /// transfer all lattice substance to the Field
-    void           releaseLatticeValues(Lattice<real>&, Field*) const;
-
-    /// update lattice values as `value <- cst + fac * value`
-    void           evolveLatticeValues(Lattice<real>&, real cst, real fac) const;
-
-    /// transfer from Field to Lattice at rate `on` and back at rate `off`
-    void           equilibrateLattice(Lattice<real>&, Field*, real on, real off) const;
-    
-    /// transfer from Field to Lattice at rate `on`
-    void           bindLattice(Lattice<real>&, Field*, real rate) const;
-    
-    /// transfer from Field to Lattice at rate `on`
-    void           fluxLattice(Lattice<real>&, Field*, real speed) const;
-    
-    /// sever fiber proportionally to the quantity stored in the Lattice
-    void           cutFiberLattice(Lattice<real>&);
     
     /// record minium, maximum and sum of lattice values
-    void           infoLattice(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
+    void           infoLattice(real& len, size_t&, real& sm, real& mn, real& mx) const;
 
     /// print Lattice data (for debugging purpose)
-    void           printLattice(std::ostream&, FiberLattice const&) const;
+    void           printLattice(std::ostream&) const;
 
+    
+#if FIBER_HAS_MESH
+
+    /// modifiable reference to Fiber's Lattice
+    Lattice<real> const&  mesh() const { return valueMesh; }
+
+    /// value of the valueMesh at given abscissa
+    real           meshValue(real a) const { if ( valueMesh.ready() ) return valueMesh.cell(a); return 0; }
+
+#endif
+    
+    /// initialize lattice sites to represent a constant linear density
+    void           setMeshValues(Lattice<real>&, real density) const;
+
+    /// transfer all lattice substance to the Field
+    void           releaseMeshValues(Lattice<real>&, Field*) const;
+
+    /// update lattice values as `value <- cst + fac * value`
+    void           evolveMeshValues(Lattice<real>&, real cst, real fac) const;
+
+    /// transfer from Field to Lattice at rate `on` and back at rate `off`
+    void           equilibrateMesh(Lattice<real>&, Field*, real on, real off) const;
+    
+    /// transfer from Field to Lattice at rate `on`
+    void           bindMesh(Lattice<real>&, Field*, real rate) const;
+    
+    /// transfer from Field to Lattice at rate `on`
+    void           fluxMesh(Lattice<real>&, Field*, real speed) const;
+    
+    /// sever fiber proportionally to the quantity stored in the Lattice
+    void           cutFiberMesh(Lattice<real>&);
+
+    
+    /// find minium, maximum and sum of mesh values
+    void           infoMesh(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
+
+    /// lattice to be displayed
+    FiberLattice const* drawableLattice() const;
+    
     //--------------------------------------------------------------------------
     
     /// set the box glue for pure pushing
@@ -351,9 +384,12 @@ public:
     /// identifies data for dynamic ends of fibers
     static const ObjectTag TAG_DYNAMIC = 'F';
     
-    /// identifies FiberLattice data
+    /// identifies DigitLattice data
     static const ObjectTag TAG_LATTICE = 'l';
     
+    /// identifies Lattice<real> data
+    static const ObjectTag TAG_FIBMESH = 'L';
+
     /// return unique character identifying the class
     ObjectTag       tag() const { return TAG; }
     

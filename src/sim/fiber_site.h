@@ -9,13 +9,13 @@
 #include "sim.h"
 
 
-/// FiberSite indicates a location on a Fiber by its abscissa from the Fiber's origin
+/// FiberSite indicates a location on a Fiber by its curvilinear abscissa
 /**
- The key variable is a pointer to a Fiber, `fbFiber`, which can be NULL for instance
+ The key variable is a pointer to a Fiber, `fbFiber`, which can be NULL
  if the state is `unattached`.
  
- In the `attached` state, the precise location on the Fiber is recorded using the
- curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
+ In the `attached` state, the precise location on the Fiber is recorded using
+ the curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
  that is fixed on the Fiber, called the Fiber's origin. This origin is virtual
  and may reside outside the Fiber ends.
  
@@ -23,10 +23,11 @@
  represent the Fiber's position, and also unaffected by assembly/disassembly
  at the tips of the Fiber.
  
- The `FiberSite` also support discrete binding, if the Fiber have a Lattice,
+ The `FiberSite` also support discrete binding, if the Fiber has a Lattice,
  and in this case uses an integer `fbSite` to keep track of the position.
  
- A `FiberSite` uses Interpolation to calculate its position in space.
+ A `FiberSite` uses Interpolation to calculate its position in space from
+ the fiber's vertices.
 */
 class FiberSite
 {
@@ -52,13 +53,13 @@ protected:
     real          fbAbs;
     
     /// propagate Lattice cell index type
-    typedef FiberLattice::lati_t lati_t;
-    
+    typedef DigitLattice::lati_t lati_t;
+
 #if FIBER_HAS_LATTICE
     /// pointer to the Lattice of the Fiber, or NULL if not in use
-    FiberLattice* fbLattice;
+    DigitLattice* fbLattice;
     
-    /// index in the Fiber's Lattice
+    /// index in the Fiber's Lattice (a signed integer)
     lati_t        fbSite;
 #endif
 
@@ -80,13 +81,13 @@ public:
 #if FIBER_HAS_LATTICE
     
     /// return Lattice if engaged
-    FiberLattice* lattice() const { return fbLattice; }
+    DigitLattice* lattice() const { return fbLattice; }
     
     /// index of Lattice's site
     lati_t        site()    const { return fbSite; }
     
-    /// set FiberLattice pointer at site `s` and abscissa `a`
-    void engageLattice(FiberLattice* l, lati_t s, real a)
+    /// set DigitLattice pointer at site `s` and abscissa `a`
+    void engageLattice(DigitLattice* l, lati_t s, real a)
     {
         fbLattice = l;
         fbSite    = s;
@@ -97,7 +98,7 @@ public:
 
 #else
     
-    FiberLattice* lattice() const { return nullptr; }
+    DigitLattice* lattice() const { return nullptr; }
 
 #endif
     //--------------------------------------------------------------------------

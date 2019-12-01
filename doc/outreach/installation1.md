@@ -71,8 +71,7 @@ For the 2D executable:
 For the 3D Platelet simulation:
 
 	#define DIM 3
-	#define FIBER_HAS_LATTICE -1
-	#define NEW_AGING_LATTICE 1
+	#define FIBER_HAS_MESH 1
 	#define NEW_VARIABLE_SPEED 1
 	#define ADD_PROJECTION_DIFF 0
 

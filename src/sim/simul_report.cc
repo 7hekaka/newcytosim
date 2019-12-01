@@ -1,8 +1,4 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-#include "glossary.h"
-#include "iowrapper.h"
-#include "aster.h"
-#include "field.h"
 #include <iostream>
 #include <numeric>
 #include <list>
@@ -132,6 +128,7 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
  `fiber:confinement`     | Force applied by fibers on their confinement Space
  `fiber:binder`          | Positions of bridging hands along each fiber
  `fiber:lattice`         | Total quantity on fiber's lattices
+ `fiber:mesh`            | Total quantity on fiber's meshes
  `fiber:intersection`    | Intersections point of fibers
  `fiber:hand`            | Position of hands attached to fibers
  `fiber:link`            | Positions of attached hands for which stiffness > 0
@@ -229,9 +226,11 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
         if ( what == "link" )
             return reportFiberLinks(out);
         if ( what == "lattice" )
-            return reportFiberLattice(out, false);
-        if ( what == "lattice_density" )
-            return reportFiberLattice(out, true);
+            return reportFiberLattice(out);
+        if ( what == "mesh" )
+            return reportFiberMesh(out, false);
+        if ( what == "mesh_density" )
+            return reportFiberMesh(out, true);
         if ( what == "connector" )
             return reportFiberConnectors(out, opt);
 
@@ -600,21 +599,43 @@ void Simul::reportFiberLinks(std::ostream& out) const
 
 
 /**
- Report quantity of substance in Field
+ Report quantity of substance in the fiber's Lattice
  */
-void Simul::reportFiberLattice(std::ostream& out, bool density) const
+void Simul::reportFiberLattice(std::ostream& out) const
 {
     out << COM << ljust("class", 2, 2);
     out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
     
-    // report substance on Fiber's analog Lattice
     size_t cnt = 0;
     real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
     
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
-        fib->infoLattice(len, cnt, sm, mn, mx, density);
+        fib->infoLattice(len, cnt, sm, mn, mx);
 
     out << LIN << ljust("fiber:lattice", 2);
+    out << SEP << sm;
+    out << SEP << std::setprecision(4) << sm / (real)cnt;
+    out << SEP << std::fixed << std::setprecision(6) << mn;
+    out << SEP << std::fixed << std::setprecision(6) << mx;
+    out << SEP << std::setprecision(3) << len;
+}
+
+
+/**
+ Report quantity of substance in the fiber's Lattice
+ */
+void Simul::reportFiberMesh(std::ostream& out, bool density) const
+{
+    out << COM << ljust("class", 2, 2);
+    out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    
+    size_t cnt = 0;
+    real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
+    
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+        fib->infoMesh(len, cnt, sm, mn, mx, density);
+
+    out << LIN << ljust("fiber:mesh", 2);
     out << SEP << sm;
     out << SEP << std::setprecision(4) << sm / (real)cnt;
     out << SEP << std::fixed << std::setprecision(6) << mn;
@@ -648,7 +669,6 @@ void Simul::reportFiber(std::ostream& out, FiberProp const* selected) const
             out << SEP << (fib->posEndM()-fib->posEndP()).norm();
             out << SEP << dot(fib->dirEndM(), fib->dirEndP());
         }
-        
     }
 }
 

@@ -27,7 +27,7 @@ public:
     real   step_size;
     
     /// list of cell's bits covered upon binding on the lattice
-    FiberLattice::cell_t footprint;
+    DigitLattice::cell_t footprint;
     
     /// specifies the position of binding within the Lattice cell
     /**
@@ -44,7 +44,7 @@ public:
 public:
 
     /// constructor
-    DigitProp(const std::string& n) : HandProp(n)  { footprint=0; clear(); }
+    DigitProp(const std::string& n) : HandProp(n)  { clear(); }
     
     /// destructor
     ~DigitProp() { }

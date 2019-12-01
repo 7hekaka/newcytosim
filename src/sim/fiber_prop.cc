@@ -264,13 +264,14 @@ void FiberProp::clear()
 
     lattice             = 0;
     lattice_unit        = 0;
-    lattice_cut_fiber   = 0;
-    lattice_flux_speed  = 0;
-    lattice_binding_rate = 0;
-    lattice_unbinding_rate = 0;
-#if NEW_AGING_LATTICE
-    lattice_aging_rate  = 0;
-#endif
+    
+    mesh                = 0;
+    mesh_unit           = 0;
+    mesh_cut_fiber      = 0;
+    mesh_flux_speed     = 0;
+    mesh_binding_rate   = 0;
+    mesh_unbinding_rate = 0;
+    mesh_aging_rate     = 0;
 
     confine             = CONFINE_OFF;
     confine_stiffness   = -1;
@@ -350,19 +351,23 @@ void FiberProp::read(Glossary& glos)
     glos.set(surface_effect,    "surface_effect");
     glos.set(cylinder_height,   "surface_effect", 1);
     
-    glos.set(binding_key,       "binding_key");
+    glos.set(binding_key,  "binding_key");
     
-    glos.set(lattice,           "lattice");
-    glos.set(lattice_unit,      "lattice", 1);
-    glos.set(lattice_unit,      "lattice_unit");
+    glos.set(lattice,      "lattice");
+    glos.set(lattice_unit, "lattice", 1) || glos.set(lattice_unit, "lattice_unit");
     
-    glos.set(lattice_cut_fiber, "lattice_cut_fiber");
-    glos.set(lattice_flux_speed, "lattice_flux_speed");
-    glos.set(lattice_binding_rate, "lattice_binding_rate");
-    glos.set(lattice_unbinding_rate, "lattice_unbinding_rate");
+#if FIBER_HAS_MESH
+    // the analog lattice containing 'real' values was named 'mesh' on 28.11.2019
+    glos.set(mesh,         "mesh");
+    glos.set(mesh_unit,    "mesh", 1) || glos.set(mesh_unit, "mesh_unit");
+
+    // parameters `lattice_*' were renamed `mesh_*' on 28.11.2019
+    glos.set(mesh_cut_fiber,      "mesh_cut_fiber")      || glos.set(mesh_cut_fiber, "lattice_cut_fiber");
+    glos.set(mesh_flux_speed,     "mesh_flux_speed")     || glos.set(mesh_flux_speed, "lattice_flux_speed");
+    glos.set(mesh_binding_rate,   "mesh_binding_rate")   || glos.set(mesh_binding_rate, "lattice_binding_rate");
+    glos.set(mesh_unbinding_rate, "mesh_unbinding_rate") || glos.set(mesh_unbinding_rate, "lattice_unbinding_rate");
     
-#if NEW_AGING_LATTICE
-    glos.set(lattice_aging_rate,  "lattice_aging_rate");
+    glos.set(mesh_aging_rate, "mesh_aging_rate") || glos.set(mesh_aging_rate, "lattice_aging_rate");
 #endif
 
     glos.set(confine,           "confine", {{"off",       CONFINE_OFF},
@@ -500,26 +505,38 @@ void FiberProp::complete(Simul const& sim)
     
     if ( lattice && sim.ready() )
     {
+#if FIBER_HAS_LATTICE
         if ( lattice_unit <= 0 )
-            throw InvalidParameter("fiber:lattice_unit (known as fiber:lattice[1]) must be specified and > 0");
-
-        if ( lattice_flux_speed != 0 || lattice_binding_rate != 0 || lattice_unbinding_rate != 0 )
-        {
-            if ( field.empty() )
-                throw InvalidParameter("fiber:lattice features require fiber:field to be specified");
-
-            if ( !field_ptr )
-                throw InvalidParameter("fiber:field not found");
-        }
-#if !FIBER_HAS_LATTICE
+            throw InvalidParameter("fiber:lattice_unit (known as lattice[1]) must be specified and > 0");
+#else
         throw InvalidParameter("cytosim cannot run with fiber:lattice");
 #endif
     }
 
-#if NEW_AGING_LATTICE
-    if ( lattice_aging_rate < 0 )
-        throw InvalidParameter("fiber:lattice_aging_rate must be >= 0");
+    if ( mesh && sim.ready() )
+    {
+#if FIBER_HAS_MESH
+        if ( mesh_unit <= 0 )
+            throw InvalidParameter("fiber:mesh_unit (known as mesh[1]) must be specified and > 0");
+        
+        if ( mesh_flux_speed != 0 || mesh_binding_rate != 0 || mesh_unbinding_rate != 0 )
+        {
+            if ( field.empty() )
+                throw InvalidParameter("fiber:mesh features require fiber:field to be specified");
+
+            if ( !field_ptr )
+                throw InvalidParameter("fiber:field not found");
+        }
+        
+        if ( mesh_aging_rate < 0 )
+            throw InvalidParameter("fiber:mesh_aging_rate must be >= 0");
+#else
+        throw InvalidParameter("cytosim cannot run with fiber:mesh");
 #endif
+    }
+    
+    if ( mesh_aging_rate > 0 && !mesh )
+        throw InvalidParameter("for `mesh_aging_rate', the mesh must be defined");
 
     if ( rigidity < 0 )
         throw InvalidParameter("fiber:rigidity must be specified and >= 0");
@@ -593,12 +610,13 @@ void FiberProp::write_values(std::ostream& os) const
 #endif
     write_value(os, "binding_key",         binding_key);
     write_value(os, "lattice",             lattice, lattice_unit);
-    write_value(os, "lattice_cut_fiber",   lattice_cut_fiber);
-    write_value(os, "lattice_flux_speed",  lattice_flux_speed);
-    write_value(os, "lattice_binding_rate", lattice_binding_rate);
-    write_value(os, "lattice_unbinding_rate", lattice_unbinding_rate);
-#if NEW_AGING_LATTICE
-    write_value(os, "lattice_aging_rate",  lattice_aging_rate);
+#if FIBER_HAS_MESH
+    write_value(os, "mesh",                mesh, mesh_unit);
+    write_value(os, "mesh_cut_fiber",      mesh_cut_fiber);
+    write_value(os, "mesh_flux_speed",     mesh_flux_speed);
+    write_value(os, "mesh_binding_rate",   mesh_binding_rate);
+    write_value(os, "mesh_unbinding_rate", mesh_unbinding_rate);
+    write_value(os, "mesh_aging_rate",     mesh_aging_rate);
 #endif
     write_value(os, "confine",             confine, confine_stiffness, confine_space);
 #if NEW_FIBER_CONFINE2

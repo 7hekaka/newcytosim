@@ -1034,8 +1034,9 @@ void set_lattice_color(Fiber const& fib, FiberLattice const& lat, real val, real
  This style uses one vertex for each site, positionned at the center of the range
  OpenGL will interpolate the colors, and each site will be covered by a gradient.
  */
-void Display::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display::drawFiberLattice1(Fiber const& fib, real width) const
 {
+    FiberLattice const& lat = *fib.drawableLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1083,8 +1084,9 @@ void Display::drawFiberLattice1(Fiber const& fib, FiberLattice const& lat, real 
  This style, uses two vertices for each site, positionned at the extremity of the range,
  and each site is entirely covered by the color corresponding to the value.
  */
-void Display::drawFiberLattice2(Fiber const& fib, FiberLattice const& lat, real width) const
+void Display::drawFiberLattice2(Fiber const& fib, real width) const
 {
+    FiberLattice const& lat = *fib.drawableLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1129,8 +1131,9 @@ void Display::drawFiberLattice2(Fiber const& fib, FiberLattice const& lat, real 
 /**
  Indicate the edges between sites with small dots
  */
-void Display::drawFiberLatticeEdges(Fiber const& fib, FiberLattice const& lat, real) const
+void Display::drawFiberLatticeEdges(Fiber const& fib, real) const
 {
+    FiberLattice const& lat = *fib.drawableLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1456,28 +1459,26 @@ void Display::drawFiber(Fiber const& fib)
 #endif
     {
         int line_style = disp->line_style;
-#if FIBER_HAS_LATTICE
-        FiberLattice const& lat = fib.lattice();
-        if ( lat.ready() )
+        FiberLattice const* lat = fib.drawableLattice();
+        if ( lat && lat->ready() )
         {
             // if the Lattice is displayed, do not draw backbone:
             switch ( disp->lattice_style )
             {
                 case 1:
-                    drawFiberLattice1(fib, lat, disp->line_width);
+                    drawFiberLattice1(fib, disp->line_width);
                     line_style = 0;
                     break;
                 case 2:
-                    drawFiberLattice2(fib, lat, disp->line_width);
+                    drawFiberLattice2(fib, disp->line_width);
                     line_style = 0;
                     break;
                 case 3:
-                    drawFiberLatticeEdges(fib, lat, disp->line_width);
+                    drawFiberLatticeEdges(fib, disp->line_width);
                     line_style = 0;
                     break;
             }
         }
-#endif
         if ( line_style )
         {
             gle_color col1 = fib.disp->color;

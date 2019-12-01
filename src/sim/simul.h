@@ -404,8 +404,11 @@ public:
     void      reportFiberLinks(std::ostream&) const;
 
     /// print summary of Fiber's lattice quantities
-    void      reportFiberLattice(std::ostream&, bool density) const;
-
+    void      reportFiberLattice(std::ostream&) const;
+    
+    /// print summary of Fiber's lattice quantities
+    void      reportFiberMesh(std::ostream&, bool density) const;
+    
     /// print interection abscissa between fibers
     void      reportFiberConnectors(std::ostream&, Glossary&) const;
 

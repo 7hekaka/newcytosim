@@ -40,9 +40,14 @@ inline void print_version(std::ostream& os)
 #else
     os << " with assertions\n";
 #endif
-        
-    #ifdef FIBER_HAS_LATTICE
-        os << "    Fiber Lattice " << FIBER_HAS_LATTICE << "\n";
-    #endif
+            
+#if FIBER_HAS_LATTICE > 0
+    os << "    Fiber has digital lattice\n";
+#elif FIBER_HAS_LATTICE < 0
+    os << "    Fiber has <real> lattice\n";
+#endif
+#if FIBER_HAS_MESH
+    os << "    Fiber has analog mesh\n";
+#endif
 }
 
