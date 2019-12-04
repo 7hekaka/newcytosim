@@ -284,7 +284,7 @@ bool Couple::allowAttachment(FiberSite const& sit)
     
 #if FIBER_HAS_FAMILY
     // prevent binding if fibers are from the same family
-    if ( that->fiber()->family == sit.fiber()->family )
+    if ( that->fiber()->family_ == sit.fiber()->family_ )
         return false;
 #endif
 #if ( 0 )

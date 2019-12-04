@@ -166,9 +166,9 @@ Fiber::Fiber(FiberProp const* p)
     frGlue = nullptr;
 #endif
 #if FIBER_HAS_FAMILY
-    family = this;
-    sister = this;
-    brother = this;
+    family_ = this;
+    sister_ = this;
+    brother_ = this;
 #endif
 #if NEW_FIBER_CHEW
     frChewM = 0;

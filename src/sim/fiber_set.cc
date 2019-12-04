@@ -143,7 +143,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
 #if FIBER_HAS_FAMILY
     std::string str;
     if ( opt.set(str, "family") )
-        fib->family = simul.findFiber(str);
+        fib->family_ = simul.findFiber(str);
 #endif
 
     ObjectList res(2);

@@ -268,7 +268,7 @@ public:
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */
-    size_t         matIndex()           const { return pIndex; }
+    size_t         matIndex()            const { return pIndex; }
     
     /// Allocates pBlock[] to hold a `N x N` full matrix, where N = DIM * nbPoints()
     void            allocateBlock();

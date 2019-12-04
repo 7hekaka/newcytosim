@@ -28,6 +28,23 @@ void Tubule::reset()
 }
 
 
+void Tubule::setFamily(Fiber const* fam)
+{
+    // wrap array values for convenience
+    fil_[NFIL  ] = fil_[0];
+    fil_[NFIL+1] = fil_[1];
+
+#if FIBER_HAS_FAMILY
+    for ( size_t i = 0; i < NFIL+2; ++i )
+    {
+        fil_[i]->family_ = fam;
+        fil_[i]->sister_ = fil_[(i+NFIL-1)%NFIL];
+        fil_[i]->brother_ = fil_[(i+1)%NFIL];
+    }
+#endif
+}
+
+
 ObjectList Tubule::build(Glossary& opt, Simul& sim)
 {
     ObjectList res;
@@ -37,9 +54,6 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         res.append(objs);
         fil_[i] = Fiber::toFiber(objs[0]);
     }
-    // wrap array values for convenience
-    fil_[NFIL  ] = fil_[0];
-    fil_[NFIL+1] = fil_[1];
     
 #if ( DIM >= 3 )
     Vector E(0,tube_radius,0), F(0,0,tube_radius);
@@ -69,13 +83,10 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     {
         Buddy::connect(fil_[i]);
         fil_[i]->setOrigin(i*(-0.012/NFIL));
-#if FIBER_HAS_FAMILY
-        fil_[i]->family = fil_[0];
-        fil_[i]->sister = fil_[(i+NFIL-1)%NFIL];
-        fil_[i]->brother = fil_[(i+1)%NFIL];
-#endif
     }
 
+    setFamily(fil_[0]);
+    
     return res;
 }
 
@@ -233,14 +244,8 @@ void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         Object * w = sim.readReference(in, g);
         if ( i < NFIL )
-        {
             fil_[i] = Fiber::toFiber(w);
-#if FIBER_HAS_FAMILY
-            fil_[i]->family = fil_[0];
-            fil_[i]->sister = fil_[(i+NFIL-1)%NFIL];
-            fil_[i]->brother = fil_[(i+1)%NFIL];
-#endif
-        }
     }
+    setFamily(fil_[0]);
 }
 

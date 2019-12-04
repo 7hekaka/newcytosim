@@ -21,13 +21,13 @@ class LineDisp;
 
 
 /// Flag to associate a Lattice of integers to the Fiber class {0, 1}
-#define FIBER_HAS_LATTICE 0
+#define FIBER_HAS_LATTICE 1
 
 /// Flag to associate a Lattice of reals to the Fiber class {0, 1}
 #define FIBER_HAS_MESH 0
 
 /// Flag to allow `family` member variable to control Couple's binding
-#define FIBER_HAS_FAMILY 0
+#define FIBER_HAS_FAMILY 1
 
 
 /// Flag to allow dynamic Single creation/binding
@@ -146,9 +146,9 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    Fiber*              family;
-    Fiber*              sister;
-    Fiber*              brother;
+    Fiber const*        family_;
+    Fiber const*        sister_;
+    Fiber const*        brother_;
 #endif
 
     /// the Property of this object

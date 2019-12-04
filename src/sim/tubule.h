@@ -51,6 +51,9 @@ public:
     /// initialize
     void reset();
     
+    /// initialize sister[] and brother[]
+    void setFamily(Fiber const*);
+
     /// create filaments
     ObjectList build(Glossary&, Simul&);
     
