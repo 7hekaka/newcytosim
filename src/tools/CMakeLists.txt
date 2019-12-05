@@ -1,3 +1,7 @@
+set(SOURCES_TOOL
+    "${PROJECT_SOURCE_DIR}/src/play/frame_reader.cc"
+)
+
 set(TOOL_INCLUDES
     "${SFMT_SRC_DIR}"
     "${MATH_SRC_DIR}"
@@ -17,10 +21,6 @@ set(TOOL_LIBS
     Threads::Threads
 )
 
-set(TOOL_OBJS
-    "${PROJECT_BINARY_DIR}/src/play/CMakeFiles/play.dir/frame_reader.cc.o"
-)
-
 set(TOOL_LIST
     "frametool"
     "sieve"
@@ -32,9 +32,8 @@ set(TOOL_LIST
 
 # Build the Tools
 foreach(TOOL_NAME ${TOOL_LIST})
-    add_executable("${TOOL_NAME}" ${TOOL_OBJS} "${PROJECT_SOURCE_DIR}/src/tools/${TOOL_NAME}.cc")
+    add_executable("${TOOL_NAME}" ${SOURCES_TOOL} "${PROJECT_SOURCE_DIR}/src/tools/${TOOL_NAME}.cc")
     set_source_files_properties(
-        ${TOOL_OBJS}
         PROPERTIES
         EXTERNAL_OBJECT true
         GENERATED true

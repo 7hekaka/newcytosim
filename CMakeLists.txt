@@ -51,7 +51,6 @@ set(MATH_LIB_TARGET "cytomath")
 set(SPACES_LIB_TARGET "cytospaceD${DIMENSION}")
 set(SPACES_G_LIB_TARGET "cytospaceD${DIMENSION}G")
 set(DISP_LIB_TARGET "cytodisp")
-set(SFMT_LIB_TARGET "sfmt")
 
 # Use this to link against the Cytosim Libraries
 set(CYTOSIM_LIBRARIES

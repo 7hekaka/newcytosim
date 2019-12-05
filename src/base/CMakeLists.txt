@@ -16,17 +16,12 @@ set(BASE_SOURCES
     "${PROJECT_SOURCE_DIR}/src/base/property_list.cc"
     "${PROJECT_SOURCE_DIR}/src/base/backtrace.cc"
     "${PROJECT_SOURCE_DIR}/src/base/ansi_colors.cc"
+    "${PROJECT_SOURCE_DIR}/src/sfmt/SFMT.c"
 )
 
-set(BASE_OBJS
-    "${PROJECT_BINARY_DIR}/src/SFMT/CMakeFiles/${SFMT_LIB_TARGET}.dir/SFMT.c.o"
-)
-
-add_library(${BASE_LIB_TARGET} STATIC ${BASE_OBJS} ${BASE_SOURCES})
-add_dependencies(${BASE_LIB_TARGET} ${SFMT_LIB_TARGET})
+add_library(${BASE_LIB_TARGET} STATIC ${BASE_SOURCES})
 
 set_source_files_properties(
-    ${BASE_OBJS}
     PROPERTIES
     EXTERNAL_OBJECT true
     GENERATED true
