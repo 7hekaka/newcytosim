@@ -31,10 +31,10 @@ public:
     ~Picket();
     
     ///return the position in space of the object
-    Vector  position()           const  { return sPos; }
+    Vector  position() const { return sPos; }
 
     /// Picket accepts translation
-    int     mobile()             const  { return 1; }
+    int     mobile()   const { return 1; }
     
     /// translate object's position by the given vector
     void    translate(Vector const& w)  { sPos += w; }
