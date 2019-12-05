@@ -7,63 +7,64 @@
 #include "assert_macro.h"
 
 /**
- Calculate the projection P = (pX, pY) of the point W = (wX, wY) on the ellipse that
- is aligned with the X and Y axis, and has radii (lenX, lenY).
+ Calculate the projection P = (pX, pY) of the point W = (wX, wY) on the ellipse
+ that is aligned with the X and Y axis, with radii (radX, radY).
  
  Method:
  
  A vector orthogonal to the ellipse at position (X, Y) is
  
-     N = ( X / lenX^2, Y / lenY^2 ),
+     N = ( X / radX^2, Y / radY^2 ),
  
  and we can thus write W = P + h * N, leading to:
 
-     pX = wX * lenX^2 / ( lenX^2 + h );
-     pY = wY * lenY^2 / ( lenY^2 + h );
+     pX = wX * radX^2 / ( radX^2 + h );
+     pY = wY * radY^2 / ( radY^2 + h );
 
  if wX and wY are not both null.
  
  Moreover, the projection should be on the ellipse and thus `h` should be a zero of:
  
-     F(h) = ( pX / lenX )^2 + ( pY / lenY )^2 - 1
+     F(h) = ( pX / radX )^2 + ( pY / radY )^2 - 1
  
- We follow Newton's rule to find the root of F(h), and use the formula above to
- calculate the projection.
+ We follow Newton's rule to find the root of F(h), using however bounds on `h`
+ to avoid problematic behavior. Finally, we use the formula above to calculate
+ the projection.
  */
 void projectEllipse(real&   pX, real&  pY,
                     real    wX, real   wY,
-                    real  lenX, real lenY)
+                    real  radX, real radY)
 {
-    assert_true( lenX > REAL_EPSILON );
-    assert_true( lenY > REAL_EPSILON );
+    assert_true( radX > REAL_EPSILON );
+    assert_true( radY > REAL_EPSILON );
     
     // handle the pathological cases:
     if ( wX == 0 )
     {
         pX = 0;
-        pY = std::copysign(lenY, wY);
+        pY = std::copysign(radY, wY);
         return;
     }
     if ( wY == 0 )
     {
-        pX = std::copysign(lenX, wX);
+        pX = std::copysign(radX, wX);
         pY = 0;
         return;
     }
     
-    real aa = lenX * lenX;
-    real bb = lenY * lenY;
+    real aa = radX * radX;
+    real bb = radY * radY;
     
-    // we derive a lower limit for 'h' from  pX^2 + pY^2 > max(lenX,lenY)^2
+    // we derive a lower limit for 'h' from  pX^2 + pY^2 > max(radX,radY)^2
     real RR = std::max(aa, bb);
     // 'hmin' is the minimum value that 'h' could have
     real hmin = sqrt( ( wX*wX*aa*aa + wY*wY*bb*bb ) / RR ) - RR;
     
-    // we derive another lower limit for 'h' from  |pX| < lenX
-    hmin = std::max(hmin, ( fabs(wX) - lenX ) * lenX);
+    // we derive another lower limit for 'h' from  |pX| < radX
+    hmin = std::max(hmin, ( fabs(wX) - radX ) * radX);
 
-    // we derive another lower limit for 'h' from  |pY| < lenY
-    hmin = std::max(hmin, ( fabs(wY) - lenY ) * lenY);
+    // we derive another lower limit for 'h' from  |pY| < radY
+    hmin = std::max(hmin, ( fabs(wY) - radY ) * radY);
 
     // if the point is outside, then 'h' should be positive:
     if ( wX*wX/aa + wY*wY/bb > 1  &&  hmin < 0 )
@@ -139,72 +140,72 @@ void projectEllipse(real&   pX, real&  pY,
 
 /**
  Calculates the projection P = (pX, pY, pZ) of the point W = (wX, wY, wZ) on the ellipse that
- is aligned with the X and Y axis, and has radii (lenX, lenY, lenZ).
+ is aligned with the X and Y axis, and has radii (radX, radY, radZ).
  
  Method:
  
  A vector orthogonal to the ellipse at position ( X, Y, Z ) is
  
-    N = ( X / lenX^2, Y / lenY^2, Z / lenZ^2 ),
+    N = ( X / radX^2, Y / radY^2, Z / radZ^2 ),
  
  and we can thus write W = P + h * N, for some scalar `h` leading to:
 
-    pX = wX / ( 1 + h / lenX^2 );
-    pY = wY / ( 1 + h / lenY^2 );
-    pZ = wZ / ( 1 + h / lenZ^2 );
+    pX = wX / ( 1 + h / radX^2 );
+    pY = wY / ( 1 + h / radY^2 );
+    pZ = wZ / ( 1 + h / radZ^2 );
  
  Moreover, the projection should be on the ellipse and thus `h` should be a zero of:
 
-     F(h) = ( pX / lenX )^2 + ( pY / lenY )^2 + ( pZ / lenZ )^2 - 1
+     F(h) = ( pX / radX )^2 + ( pY / radY )^2 + ( pZ / radZ )^2 - 1
  
  We follow Newton's rule to find the root of F(h), and use the formula above to
  calculate the projection.
  */
 void projectEllipsoid(real  p[3],
                       const real w[3],
-                      const real len[3])
+                      const real rad[3])
 {
-    assert_true( len[0]==len[0] && len[0] > REAL_EPSILON );
-    assert_true( len[1]==len[1] && len[1] > REAL_EPSILON );
-    assert_true( len[2]==len[2] && len[2] > REAL_EPSILON );
+    assert_true( rad[0]==rad[0] && rad[0] > REAL_EPSILON );
+    assert_true( rad[1]==rad[1] && rad[1] > REAL_EPSILON );
+    assert_true( rad[2]==rad[2] && rad[2] > REAL_EPSILON );
     
     // handle the pathological cases:
     if ( w[0] == 0 )
     {
         p[0] = 0;
-        projectEllipse(p[1], p[2], w[1], w[2], len[1], len[2]);
+        projectEllipse(p[1], p[2], w[1], w[2], rad[1], rad[2]);
         return;
     }
     if ( w[1] == 0 )
     {
         p[1] = 0;
-        projectEllipse(p[0], p[2], w[0], w[2], len[0], len[2]);
+        projectEllipse(p[0], p[2], w[0], w[2], rad[0], rad[2]);
         return;
     }
     if ( w[2] == 0 )
     {
         p[2] = 0;
-        projectEllipse(p[0], p[1], w[0], w[1], len[0], len[1]);
+        projectEllipse(p[0], p[1], w[0], w[1], rad[0], rad[1]);
         return;
     }
 
-    real aa = len[0] * len[0];
-    real bb = len[1] * len[1];
-    real cc = len[2] * len[2];
+    real aa = rad[0] * rad[0];
+    real bb = rad[1] * rad[1];
+    real cc = rad[2] * rad[2];
 
-    // we derive a lower limit for 'h' from  pX^2 + pY^2 + pZ^2 < max(lenX,lenY,lenZ)^2
+    // we derive a lower limit for 'h' from  pX^2 + pY^2 + pZ^2 < max(radX,radY,radZ)^2
     real RR = std::max(aa, std::max(bb,cc));
     // 'hmin' is the minimum value that 'h' can have
     real hmin = sqrt( ( w[0]*w[0]*aa*aa + w[1]*w[1]*bb*bb + w[2]*w[2]*cc*cc ) / RR ) - RR;
 
-    // we derive another lower limit for 'h' from  |pX| < lenX
-    hmin = std::max(hmin, ( fabs(w[0]) - len[0] ) * len[0]);
+    // we derive another lower limit for 'h' from  |pX| < radX
+    hmin = std::max(hmin, ( fabs(w[0]) - rad[0] ) * rad[0]);
 
-    // we derive another lower limit for 'h' from  |pY| < lenY
-    hmin = std::max(hmin, ( fabs(w[1]) - len[1] ) * len[1]);
+    // we derive another lower limit for 'h' from  |pY| < radY
+    hmin = std::max(hmin, ( fabs(w[1]) - rad[1] ) * rad[1]);
     
-    // we derive another lower limit for 'h' from  |pZ| < lenZ
-    hmin = std::max(hmin, ( fabs(w[2]) - len[2] ) * len[2]);
+    // we derive another lower limit for 'h' from  |pZ| < radZ
+    hmin = std::max(hmin, ( fabs(w[2]) - rad[2] ) * rad[2]);
 
     if ( w[0]*w[0]/aa + w[1]*w[1]/bb + w[2]*w[2]/cc > 1  &&  hmin < 0 )
     {
@@ -302,7 +303,7 @@ dh = -F * ( dF * dF - 0.5 * F * ddF ) / ( dF * dF * dF - F * dF * ddF + dddF * F
 // modified 4th order method:
 dh = -F / dF * ( 1 + 0.5 * F * ddF / ( dF * dF ) + F * F * ( 3 * ddF * ddF - dF * dddF ) / ( 6 * dF * dF * dF * dF ));
 
-// or equivalently:
+// or equivaradtly:
 real R = F / dF;
 real T = ddF / dF;
 dh = -R * ( 1 + 0.5 * R * T + R * R * ( 0.5 * T * T - dddF / ( 6 * dF ) ));
