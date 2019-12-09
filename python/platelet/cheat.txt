@@ -6,7 +6,6 @@ F. Nedelec, 11.07.2017 -- 18.11.2018
 
 #define DIM 3
 #define GRID_HAS_PERIODIC 0
-#define NEW_AGING_LATTICE 1
 #define NEW_VARIABLE_SPEED 1
 
 makefile.inc:
