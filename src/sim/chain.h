@@ -206,8 +206,10 @@ public:
     
     //---------------------
     
-    /// the total length of the Fiber, estimated from the segmentation and number of segment
-    //real         length()                const { return nbSegments() * fnCut; }
+    /// length of the Fiber, estimated from the segmentation and number of segments
+    real         length1()               const { return nPoints * fnCut - fnCut; }
+    
+    /// length of the Fiber, estimated from the difference of abscissa at the ends
     real         length()                const { return fnAbscissaP - fnAbscissaM; }
     
     /// the sum of the distance between vertices (used for debugging)
@@ -420,10 +422,10 @@ public:
     void         adjustLength(real len, FiberEnd ref);
 
     /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
-    void         truncateM(size_t p);
+    virtual void truncateM(size_t p);
 
     /// Keep vertices [ 0, P ] and discard the others
-    void         truncateP(size_t p);
+    virtual void truncateP(size_t p);
 
     //---------------------
     

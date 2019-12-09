@@ -159,7 +159,7 @@ void Mecable::shiftPoints(const size_t inx, const size_t nbp)
 
 //------------------------------------------------------------------------------
 /**
- shifts ending-part of the array to indices starting at 0.
+ shifts array to keep only points within [p, last]
  */
 void Mecable::truncateM(const size_t p)
 {
@@ -174,7 +174,7 @@ void Mecable::truncateM(const size_t p)
 }
 
 /**
- erase higher indices of array
+ erase higher indices of array to keep [0, p]
  */
 void Mecable::truncateP(const size_t p)
 {
