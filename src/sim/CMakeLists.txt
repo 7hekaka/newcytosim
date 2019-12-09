@@ -149,7 +149,6 @@ set(SOURCES_CYTOSIM
 add_library(${SIM_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
 
 target_include_directories(${SIM_LIB_TARGET} PUBLIC
-    "${SFMT_SRC_DIR}"
     "${MATH_SRC_DIR}"
     "${BASE_SRC_DIR}"
     "${SIM_SRC_DIR}"

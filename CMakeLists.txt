@@ -29,7 +29,7 @@ set(DOC_SRC_DIR "${PROJECT_SOURCE_DIR}/src/doc")
 set(DISP_SRC_DIR "${PROJECT_SOURCE_DIR}/src/disp")
 set(MATH_SRC_DIR "${PROJECT_SOURCE_DIR}/src/math")
 set(PLAY_SRC_DIR "${PROJECT_SOURCE_DIR}/src/play")
-set(SFMT_SRC_DIR "${PROJECT_SOURCE_DIR}/src/SFMT")
+
 set(SIM_SRC_DIR
 "${PROJECT_SOURCE_DIR}/src/sim"
 "${PROJECT_SOURCE_DIR}/src/sim/fibers"

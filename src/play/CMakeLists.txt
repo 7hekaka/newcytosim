@@ -30,7 +30,6 @@ if(BUILD_PLAY_EXECUTABLE)
     )
 
     target_include_directories(${PLAY_EXE_TARGET} PUBLIC
-        "${SFMT_SRC_DIR}"
         "${MATH_SRC_DIR}"
         "${BASE_SRC_DIR}"
         "${SIM_SRC_DIR}"

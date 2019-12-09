@@ -13,7 +13,6 @@ set(SOURCES_DISP
 add_library(${DISP_LIB_TARGET} STATIC ${SOURCES_DISP})
 
 target_include_directories(${DISP_LIB_TARGET} PUBLIC
-    "${SFMT_SRC_DIR}"
     "${MATH_SRC_DIR}"
     "${BASE_SRC_DIR}"
 )

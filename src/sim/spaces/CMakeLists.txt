@@ -31,7 +31,6 @@ set(SPACES_SOURCES
 
 add_library(${SPACES_LIB_TARGET} STATIC ${SPACES_SOURCES})
 target_include_directories(${SPACES_LIB_TARGET} PUBLIC
-    "${SFMT_SRC_DIR}"
     "${MATH_SRC_DIR}"
     "${BASE_SRC_DIR}"
     "${SIM_SRC_DIR}"
@@ -41,7 +40,6 @@ target_include_directories(${SPACES_LIB_TARGET} PUBLIC
 add_library(${SPACES_G_LIB_TARGET} STATIC ${SPACES_SOURCES})
 target_compile_definitions(${SPACES_G_LIB_TARGET} PRIVATE -DDISPLAY)
 target_include_directories(${SPACES_G_LIB_TARGET} PUBLIC
-    "${SFMT_SRC_DIR}"
     "${MATH_SRC_DIR}"
     "${BASE_SRC_DIR}"
     "${SIM_SRC_DIR}"

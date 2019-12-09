@@ -16,7 +16,6 @@ set(BASE_SOURCES
     "${PROJECT_SOURCE_DIR}/src/base/property_list.cc"
     "${PROJECT_SOURCE_DIR}/src/base/backtrace.cc"
     "${PROJECT_SOURCE_DIR}/src/base/ansi_colors.cc"
-    "${PROJECT_SOURCE_DIR}/src/sfmt/SFMT.c"
 )
 
 add_library(${BASE_LIB_TARGET} STATIC ${BASE_SOURCES})
@@ -28,7 +27,6 @@ set_source_files_properties(
 )
 
 target_include_directories(${BASE_LIB_TARGET} PUBLIC
-    "${SFMT_SRC_DIR}"
     "${BASE_SRC_DIR}"
     "${MATH_SRC_DIR}"
 )

@@ -3,7 +3,6 @@ set(SOURCES_TOOL
 )
 
 set(TOOL_INCLUDES
-    "${SFMT_SRC_DIR}"
     "${MATH_SRC_DIR}"
     "${BASE_SRC_DIR}"
     "${SIM_SRC_DIR}"
