@@ -750,7 +750,7 @@ Gives points that are distributed randomly over the filaments, but which are fix
 <summary>
 **In what referential is this data? What are the units?**
 </summary>
-The origin (0,0) is in the centre of the simulation volume. 
+The origin (0,0) is in the centre of the simulation volume. The reference frame can be displayed in 'play' by pressing 'x'. A scale bar appears if you press 'b'. Press these keys again to make the items disapear.
 The position and length are given in micro-metres.
 </details>
 
