@@ -37,7 +37,7 @@ void ObjectSet::unlink(Object * obj)
 
 
 /**
- Translate all listed movable objects ( Object::mobile()==true ) by `vec`
+ Translate all listed movable objects ( Object::mobile() & 1 ) by `vec`
  */
 void ObjectSet::translateObjects(ObjectList const& objs, Vector const& vec)
 {

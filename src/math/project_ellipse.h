@@ -7,16 +7,16 @@
 #include "real.h"
 
 
-/// calculate `(pX, pY)`, the projection of `(wX, wY)` on the ellipse of axes `lenX, lenY`
+/// calculate `(pX, pY)`, the projection of `(wX, wY)` on the ellipse of axes `radX, radY`
 void projectEllipse(real&  pX, real&  pY,
                     real   wX, real   wY,
-                    real lenX, real lenY);
+                    real radX, real radY);
 
 
-/// calculate `p[]`, the projection of `w[]` on the ellipse of axes given in `len[]`
+/// calculate `p[]`, the projection of `w[]` on the ellipse of axes given in `rad[]`
 void projectEllipsoid(real         p[3],
                       const real   w[3],
-                      const real len[3]);
+                      const real rad[3]);
 
 
 #endif

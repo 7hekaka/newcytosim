@@ -19,8 +19,7 @@ The actual operations need to be implemented by redefining the virtual functions
         the object has no position defined
 
     if ( mobile() == 1 ):
-        position() is implemented
-        translate() is implemented
+        position() and translate() are implemented
 
     if ( mobile() == 2 ):
         rotate() is implemented

@@ -18,6 +18,7 @@
 
 void Fiber::step()
 {
+    assert_small( length1() - length() );
 #if FIBER_HAS_GLUE
     //add single that act like glue
     if ( prop->glue )

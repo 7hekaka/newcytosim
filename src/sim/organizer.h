@@ -39,66 +39,66 @@ public:
     virtual ~Organizer();
     
     /// create all the Objects of the Organizer, and return in list
-    virtual ObjectList    build(Glossary&, Simul&) = 0;
+    virtual ObjectList build(Glossary&, Simul&) = 0;
 
     //--------------------------------------------------------------------------
 
     /// number of objects currently organized
-    size_t                nbOrganized() const  { return mObjects.size(); }
+    size_t             nbOrganized() const  { return mObjects.size(); }
     
     /// set number of objects
-    void                  nbOrganized(size_t n) { mObjects.resize(n, nullptr); }
+    void               nbOrganized(size_t n) { mObjects.resize(n, nullptr); }
     
     /// return Mecable at index `n`
-    Mecable *             organized(size_t n) const { assert_true(n<mObjects.size()); return mObjects[n]; }
+    Mecable *          organized(size_t n) const { assert_true(n<mObjects.size()); return mObjects[n]; }
     
     /// add Mecable at end of list
-    void                  grasp(Mecable *);
+    void               grasp(Mecable *);
 
     /// add Mecable at index `n`
-    void                  grasp(Mecable *, size_t);
+    void               grasp(Mecable *, size_t);
 
     /// handles the disapearance of one of the organized object
-    void                  goodbye(Buddy *);
+    void               goodbye(Buddy *);
     
     /// add objects to Simul if they are not already linked
-    virtual void          addOrganized(Simul&);
+    virtual void       addOrganized(Simul&);
     
     /// delete all objects
-    virtual void          eraseOrganized();
+    virtual void       eraseOrganized();
     
     /// move all associated objects
-    void                  moveOrganized(Isometry const&);
+    void               moveOrganized(Isometry const&);
 
     //--------------------------------------------------------------------------
 
     /// Organizer cannot be moved
-    int                   mobile() const { return 0; }
+    int                mobile() const { return 0; }
     
     /// return the center of gravity
-    virtual Vector        position() const;
+    virtual Vector     position() const;
 
     /// return the average of all vertices
-    virtual Vector        positionP(unsigned) const;
+    virtual Vector     positionP(unsigned) const;
 /*
     /// move all associated objects
-    void                  translate(Vector const& T);
+    void               translate(Vector const& T);
     
     /// rotate all associated objects
-    void                  rotate(Rotation const& T);
+    void               rotate(Rotation const& T);
 */
     /// monte-carlo simulation step
-    virtual void          step() {}
+    virtual void       step() {}
     
     /// add interactions to a Meca
-    virtual void          setInteractions(Meca &) const {}
+    virtual void       setInteractions(Meca &) const {}
     
     /// sum the drag coefficient of all objects
-    real                  dragCoefficient() const;
+    real               dragCoefficient() const;
     
     
     /// retrieve ends link number `inx`, or returns zero if this link does not exist
-    virtual bool          getLink(size_t inx, Vector&, Vector&) const { return false; }
+    virtual bool       getLink(size_t inx, Vector&, Vector&) const { return false; }
     
     /// display parameters 
     virtual PointDisp const* disp() const { return nullptr; }
