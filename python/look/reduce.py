@@ -19,7 +19,7 @@ A file 'reduced' is created in each processed directory.
 If such a file already exists, the directory is not processed.
 This is a safety mechanism to ensure each directory is processed once only.
 
-F. Nedelec, 28.04.2011 - 20.12.2013
+F. Nedelec, 28.04.2011 - 20.12.2013 - 11.12.2019
 """
 
 import sys, os, subprocess
@@ -48,9 +48,9 @@ def process(path):
     files = os.listdir('.')
 
     print('- '*32+path)
+    if 'reduced' in files:
+        return
     if commit:
-        if 'reduced' in files:
-            return
         if 'reduced.cmo' in files:
             stat = os.stat('reduced.cmo')
             if stat.st_size > 10000:
@@ -86,6 +86,9 @@ def main(args):
             min_frames = int(arg[4:])
         elif os.path.isdir(arg):
             paths.append(arg)
+        elif arg.endswith('*'):
+            import glob
+            paths.extend(glob.glob(arg))
         else:
             err.write("ignored '%s' on command line\n" % arg)
 

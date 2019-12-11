@@ -16,6 +16,8 @@
  
  Another tool 'sieve' can be used to read/write object-files,
  allowing finer manipulation of the simulation frames.
+ 
+ Last updated 11.12.2019
 */
 
 #include <errno.h>
