@@ -484,7 +484,10 @@ int main(int argc, char* argv[])
         else if ( mode == SPLIT )
             split(file);
         if ( output != stdout )
+        {
+            fprintf(stderr, "> %s\n", fileout);
             fclose(output);
+        }
     }
     
     funlockfile(file);

@@ -25,24 +25,21 @@ F. Nedelec, 28.04.2011 - 20.12.2013
 import sys, os, subprocess
 
 commit = 0
-min_cnt = 0
+min_frames = 2
 
 err = sys.stderr
 
 #------------------------------------------------------------------------
 
 def nbFrames(file='objects.cmo'):
+    """count number of frame using frametool"""
     try:
-        str = subprocess.check_output(['frametool', file])
+        child = subprocess.Popen(['frametool', file], stdout=subprocess.PIPE)
+        str = child.stdout.readline().strip().split(' ')
+        child.stdout.close()
+        return int(str[1])
     except:
-        proc = subprocess.Popen(['frametool', file], stdout=subprocess.PIPE)
-        line = proc.stdout.readline().split()
-        proc.stdout.close()
-    try:
-        return int(line[0])
-    except:
-        return int(line[1])
-    return 0
+        return 0
 
 
 def process(path):
@@ -51,38 +48,33 @@ def process(path):
     files = os.listdir('.')
 
     print('- '*32+path)
-    if min_cnt > 0:
-        cnt = nbFrames()
-        if cnt <= min_cnt:
-            print(' > objects.cmo has %i frames' % cnt)
-            return
-
     if commit:
         if 'reduced' in files:
             return
-        if 'objects.cmo' in files:
-            out = open('objectsR.cmo', 'w')
-            subprocess.call(['frametool', 'objects.cmo', '0:10:'], stdout=out)
-            os.rename('objectsR.cmo', 'objects.cmo');
-            print('reduced > objects.cmo')
-        if 'messages.cmo' in files:
-            out = open('messagesR.cmo', 'w')
-            subprocess.call(['grep', '-v', '^F[0-9]*[123456789] ', 'messages.cmo'], stdout=out);
-            os.rename('messagesR.cmo', 'messages.cmo');
-            print('reduced > messages.cmo')
-        subprocess.call(['touch', 'reduced'])
+        if 'reduced.cmo' in files:
+            stat = os.stat('reduced.cmo')
+            if stat.st_size > 10000:
+                os.remove('objects.cmo')
+                os.rename('reduced.cmo', 'objects.cmo')
+                subprocess.call(['touch', 'reduced'])
+                if 'messagesR.cmo' in files:
+                    os.rename('messagesR.cmo', 'messages.cmo');
+                print('reduced.cmo > objects.cmo')
     else:
         if 'objects.cmo' in files:
             cnt = nbFrames('objects.cmo')
-            print('  > objects.cmo  : %i frames' % cnt)
-        if 'messages.cmo' in files:
-            print('  > messages.cmo')
-
+            if cnt > min_frames:
+                subprocess.call(['frametool', 'objects.cmo', '0:10:', 'reduced.cmo'])
+                if 'messages.cmo' in files:
+                    out = open('messagesR.cmo', 'w')
+                    subprocess.call(['grep', '-v', '^F[0-9]*[123456789] ', 'messages.cmo'], stdout=out);
+            else:
+                print(' skip (objects.cmo has %i frames)' % cnt)
 
 #------------------------------------------------------------------------
 
 def main(args):
-    global commit, min_cnt
+    global commit, min_frames
     paths = []
     
     for arg in args:
@@ -91,7 +83,7 @@ def main(args):
         elif arg.startswith('commit='):
             commit = int(arg[7:])
         elif arg.startswith('min='):
-            min_cnt = int(arg[4:])
+            min_frames = int(arg[4:])
         elif os.path.isdir(arg):
             paths.append(arg)
         else:
@@ -102,15 +94,12 @@ def main(args):
 
     cdir = os.getcwd()
     for path in paths:
+        process(path)
         os.chdir(cdir)
-        try:
-            process(path)
-        except Exception as e:
-            print(" Error in `%s': %s" % (path, repr(e)));
-
 
 if __name__ == "__main__":
     if len(sys.argv)>1 and sys.argv[1].endswith("help"):
         print(__doc__)
     else:
         main(sys.argv[1:])
+
