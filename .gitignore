@@ -9,6 +9,7 @@ bin2
 bin3
 *.cmo
 *.cym
+*.tar
 
 # OSX stuff
 **/.DS_Store
