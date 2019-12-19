@@ -1,5 +1,5 @@
-% Steric fibers on the surface of a cylinder
-% F. Nedelec, March 2015
+% Growing microtubules on the surface of a cylinder
+% FJN, Cambridge 2019.12.19 with Maud Formanek
 
 set simul system
 {
