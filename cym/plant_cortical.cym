@@ -1,0 +1,72 @@
+% Growing microtubules on the surface of a cylinder
+% FJN, Cambridge 2019.12.19 with Maud Formanek
+
+set simul system
+{
+    dim = 3
+    time_step = 0.01
+    viscosity = 1
+    steric = 1, 100
+    display = ( style=3; back_color=white; )
+}
+
+set space cell
+{
+    shape = ring
+    display = ( color=light_blue, dark_blue; visible=3 )
+}
+
+new cell
+{
+    length = 4
+    radius = 2
+}
+
+set fiber microtubule
+{
+    steric = 1, 0.02
+    rigidity = 1
+    segmentation = 0.25
+    confine = surface, 1000
+    activity = dynamic
+    growing_speed = 0.5
+    shrinking_speed = -2.0
+    growing_force = 0.5
+    hydrolysis_rate = 0.2
+    max_length = 12.0
+    min_length = 0.01
+    persistent = 1
+    rebirth_rate = 1
+    display = ( color=black; line=5; minus_end=5; )
+}
+
+set hand binder
+{
+    binding = 10, 0.05
+    unbinding = 0, inf 
+}
+
+set single anchor
+{
+    hand = binder
+    stiffness = 100
+    activity = fixed
+}
+
+new 5000 anchor
+{
+    position = surface
+} 
+
+
+new 50 microtubule
+{
+    length = 0.1
+    position = surface
+    direction = 0 0 1
+}
+
+run 10000 system
+{
+    nb_frames = 10
+}
