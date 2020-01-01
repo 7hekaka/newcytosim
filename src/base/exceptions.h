@@ -115,8 +115,9 @@ public:
     /// append string to info
     Exception& operator << (const std::string m)
     {
-        if ( msg_.size() > 0 && !isspace(*msg_.rbegin()) )
-            msg_.push_back(' ');
+        if (( info_.empty() && msg_.size() > 0 && isalnum(*msg_.rbegin()))
+            || ( info_.size() > 0 && isalnum(*info_.rbegin()) ))
+            info_.push_back(' ');
         info_.append(m);
         return *this;
     }
@@ -125,11 +126,9 @@ public:
     template<typename T>
     Exception& operator << (const T& x)
     {
-        if ( msg_.size() > 0 && !isspace(*msg_.rbegin()) )
-            msg_.push_back(' ');
         std::ostringstream oss;
         oss << x;
-        info_.append(oss.str());
+        *this << oss.str();
         return *this;
     }
 };
