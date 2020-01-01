@@ -45,59 +45,59 @@ public:
     
     //-------------------------------------------------------------------------------
     
-    /// parse command \b set
+    /// parse command `set
     void      parse_set(std::istream&);
     
-    /// parse command \b change
+    /// parse command `change`
     void      parse_change(std::istream&);
     
-    /// parse command \b new
+    /// parse command `new`
     void      parse_new(std::istream&);
     
-    /// parse command \b delete
+    /// parse command `delete`
     void      parse_delete(std::istream&);
     
-    /// parse command \b mark
+    /// parse command `mark`
     void      parse_mark(std::istream&);
 
-    /// parse command \b cut
+    /// parse command `cut`
     void      parse_cut(std::istream&);
 
-    /// parse command \b run
+    /// parse command `run`
     void      parse_run(std::istream&);
     
-    /// parse command \b read
+    /// parse command `read`
     void      parse_read(std::istream&);
     
-    /// parse command \b write
+    /// parse command `write`
     void      parse_report(std::istream&);
     
-    /// parse command \b import
+    /// parse command `import`
     void      parse_import(std::istream&);
     
-    /// parse command \b export
+    /// parse command `export`
     void      parse_export(std::istream&);
     
-    /// parse command \b call
+    /// parse command `call`
     void      parse_call(std::istream&);
     
-    /// parse command \b repeat
+    /// parse command `repeat`
     void      parse_repeat(std::istream&);
 
-    /// parse command \b for
+    /// parse command `for`
     void      parse_for(std::istream&);
     
-    /// parse command \b end
+    /// parse command `end`
     void      parse_end(std::istream&);
 
     
     /// Parse content of stream
     void      evaluate0(std::istream&);
 
-    /// Parse stream, using `msg` to report errors
+    /// Parse stream, and report errors
     void      evaluate(std::istream&);
 
-    /// Parse code, using `msg` to report errors
+    /// Parse code in string, and report errors
     void      evaluate(std::string const&);
 
     //-------------------------------------------------------------------------------
