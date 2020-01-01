@@ -507,14 +507,14 @@ public:
      This produces uniform shuffling in linear time.
      see Knuth's The Art of Programming, Vol 2 chp. 3.4.2 
      */
-    void shuffle_low()
+    void shuffle32()
     {
         assert_true( nbo_ <= UINT32_MAX );
         assert_true( val_ || nbo_==0 );
-        size_t jj = nbo_, kk;
+        uint32_t jj = nbo_, kk;
         while ( jj > 1 )
         {
-            kk = RNG.pint(jj);  // in [0, j-1]
+            kk = RNG.pint(jj);  // 32 bits in [0, j-1]
             --jj;
             swap(val_+jj, val_+kk);
         }
@@ -526,13 +526,13 @@ public:
      This produces uniform shuffling in linear time.
      see Knuth's The Art of Programming, Vol 2 chp. 3.4.2
      */
-    void shuffle_high()
+    void shuffle64()
     {
         assert_true( val_ || nbo_==0 );
-        size_t jj = nbo_, kk;
+        uint64_t jj = nbo_, kk;
         while ( jj > 1 )
         {
-            kk = RNG.plong(jj);  // in [0, j-1]
+            kk = RNG.plong(jj);  // 64 bits in [0, j-1]
             --jj;
             swap(val_+jj, val_+kk);
         }
@@ -541,9 +541,9 @@ public:
     void shuffle()
     {
         if ( nbo_ > UINT32_MAX )
-            shuffle_high();
+            shuffle64();
         else
-            shuffle_low();
+            shuffle32();
     }
     
     /// return a randomly picked object in the array
