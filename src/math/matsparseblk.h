@@ -68,7 +68,7 @@ private:
         size_t     allo_;   ///< allocated size
         SubBlock * blk_;    ///< block elements
         SubBlock * sbk_;    ///< pointer for consolidate elements
-        size_t  * inx_;    ///< column indices for each element
+        size_t   * inx_;    ///< column indices for each element
         
     public:
         
@@ -156,7 +156,7 @@ private:
     Line *    row_;
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
-    size_t * next_;
+    size_t *  next_;
 
     /// memory for consolidated version
     SubBlock* blocks_;

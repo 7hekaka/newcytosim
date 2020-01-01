@@ -1565,7 +1565,7 @@ namespace gle
                 Vector2 const& b, Vector2 const& db)
     {
         Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        assert_true(sizeof(pts)==12*sizeof(double));
+        static_assert(sizeof(pts)==12*sizeof(double), "unexpected size of Vector2");
 #if REAL_IS_DOUBLE
         glVertexPointer(2, GL_DOUBLE, 0, pts);
 #else
@@ -1584,7 +1584,7 @@ namespace gle
                 Vector2 const& b, Vector2 const& db, gle_color cb)
     {
         Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        assert_true(sizeof(pts)==12*sizeof(double));
+        static_assert(sizeof(pts)==12*sizeof(double), "unexpected size of Vector2");
         GLfloat col[24];
         cb.store(col);
         cb.store(col+4);

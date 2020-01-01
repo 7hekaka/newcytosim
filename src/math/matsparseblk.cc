@@ -748,7 +748,7 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
     vec4 t1 = setzero4();
     vec4 t2 = setzero4();
 
-    assert_true( sizeof(SubBlock) == 12 * sizeof(real) );
+    static_assert(sizeof(SubBlock) == 12*sizeof(real), "unexpected SubBlock size");
     const real* M = sbk_[0];
     const real* end = sbk_[size_-size_%2];
     const size_t * inx = inx_;
