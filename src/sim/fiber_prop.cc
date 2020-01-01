@@ -477,6 +477,9 @@ void FiberProp::complete(Simul const& sim)
         if ( confine_stiffness < 0 )
             throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
     }
+    
+    if ( sim.ready() && steric && !sim.prop->steric )
+        throw InvalidParameter(name()+":steric is set but simul::steric = 0");
 
     if ( min_length < 0 )
         throw InvalidParameter("fiber:min_length should be >= 0");

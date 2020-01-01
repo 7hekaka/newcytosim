@@ -106,6 +106,9 @@ void SolidProp::complete(Simul const& sim)
         if ( confine_stiffness < 0 )
             throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
     }
+    
+    if ( sim.ready() && steric && !sim.prop->steric )
+        throw InvalidParameter(name()+":steric is set but simul::steric = 0");
 }
 
 

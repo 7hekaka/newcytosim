@@ -364,7 +364,7 @@ void Field::step(FiberSet& fibers)
     assert_true( prop );
     
     // we cast FieldScalar to floating-point type :
-    assert_true( sizeof(FieldScalar) == sizeof(real) );
+    static_assert(sizeof(FieldScalar) == sizeof(real), "unexpected FieldScalar type");
     real * field = reinterpret_cast<real*>(mGrid.data());
     const auto nbc = mGrid.nbCells();
     

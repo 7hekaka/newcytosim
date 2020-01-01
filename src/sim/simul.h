@@ -163,7 +163,7 @@ public:
     
     //-------------------------------------------------------------------------------
     
-    /// ready the engine for a call to `step()` and `solve()`
+    /// ready the engine for a subsequent call to `step()` and `solve()`
     void            prepare();
     
     /// perform one Monte-Carlo step, corresponding to `time_step`
@@ -172,7 +172,7 @@ public:
     /// this is called after a sequence of `step()` have been done
     void            relax();
     
-    /// this is called after a sequence of `step()` have been done
+    /// this is called to signal that engine is ready to proceed
     void            unrelax() { sReady = true; }
 
     /// true if engine is ready to go (between `prepare()` and `relax()`)

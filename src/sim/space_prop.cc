@@ -146,11 +146,7 @@ Space * SpaceProp::newSpace() const
     if ( s=="contractile" )                    return new SpaceDynamicEllipse(this);
 #endif
     
-#if ( 1 )
-    std::cerr << "Warning: substituting unbounded Space for unknown `"+s+"'\n";
-    return new Space(this);
-#endif
-    throw InvalidParameter("unknown space:shape `"+s+"'");
+    //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
     return nullptr;
 }
 

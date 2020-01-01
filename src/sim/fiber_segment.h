@@ -106,7 +106,7 @@ public:
     void         print(std::ostream&) const;
 
     /// true if segments are adjacent on the same fiber
-    /** This is used to exclude certain segments from steric interactions */
+    /** This is used to exclude certain segment pairs from steric interactions */
     friend bool  adjacent(FiberSegment const& a, FiberSegment const& b)
     {
         #if FIBER_HAS_FAMILY

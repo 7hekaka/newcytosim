@@ -343,7 +343,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         res = set->newObjects(name, opt);
         
 #if ( 0 )
-        // check for zero value in list, which should not happen:
+        // check for `nullptr` in list, which should not happen:
         if ( res.count(nullptr) )
         {
             std::clog << "cytosim found empty slots in newObjects(" << name << ")\n";
@@ -591,22 +591,15 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
         return;
     }
     
-    if ( cnt == 1 )
+    // optionally limit the list to a random subset
+    if ( cnt < objs.size() )
     {
-        simul.erase(objs.random_pick());
+        objs.shuffle();
+        objs.truncate(cnt);
     }
-    else
-    {
-        // optionally limit the list to a random subset
-        if ( cnt < objs.size() )
-        {
-            objs.shuffle();
-            objs.truncate(cnt);
-        }
-        
-        //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
-        simul.erase(objs);
-    }
+    
+    //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
+    simul.erase(objs);
 }
 
 
@@ -818,7 +811,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
             simul.prop->clear_trajectory = false;
         }
         if ( has_code )
-            evaluate(code, "in run:code");
+            evaluate(code);
 
         delta = real(nb_steps) / real(nb_frames);
         check = delta;
@@ -837,7 +830,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
                 simul.writeObjects(TRAJECTORY, true, binary);
                 reportCPUtime(frame, simul.time());
                 if ( has_code )
-                    evaluate(code, "in run:write:code");
+                    evaluate(code);
                 simul.unrelax();
             }
             if ( sss >= nb_steps )

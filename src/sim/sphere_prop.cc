@@ -88,6 +88,9 @@ void SphereProp::complete(Simul const& sim)
             throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
     }
     
+    if ( sim.ready() && steric && !sim.prop->steric )
+        throw InvalidParameter(name()+":steric is set but simul::steric = 0");
+
     if ( point_mobility < 0 )
         throw InvalidParameter("sphere:point_mobility must be specified and >= 0");
 }

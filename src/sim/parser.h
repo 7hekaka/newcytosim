@@ -92,13 +92,13 @@ public:
 
     
     /// Parse content of stream
-    void      evaluate(std::istream&);
+    void      evaluate0(std::istream&);
 
     /// Parse stream, using `msg` to report errors
-    void      evaluate(std::istream&, std::string const& msg);
+    void      evaluate(std::istream&);
 
     /// Parse code, using `msg` to report errors
-    void      evaluate(std::string const&, std::string const& msg);
+    void      evaluate(std::string const&);
 
     //-------------------------------------------------------------------------------
 

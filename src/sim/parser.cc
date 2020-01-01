@@ -749,7 +749,7 @@ void Parser::parse_read(std::istream& is)
     if ( ! fis.fail() )
     {
         VLOG("-EVAL " << file << "\n");
-        evaluate(fis, "in `"+file+"'");
+        evaluate(fis);
     }
     else
     {
@@ -956,7 +956,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
-        evaluate(code, ", inside `repeat'");
+        evaluate(code);
     }
 }
 
@@ -1005,7 +1005,7 @@ void Parser::parse_for(std::istream& is)
         // substitute Variable name for this iteration:
         StreamFunc::find_and_replace(sub, var, std::to_string(c));
         //we use a fresh stream and Parser for each instance:
-        Parser(*this).evaluate(sub, "in `for' loop");
+        Parser(*this).evaluate(sub);
         //hold();
     }
 }
@@ -1083,7 +1083,7 @@ void Parser::parse_end(std::istream& is)
  `call`         | Call a custom function
 
  */
-void Parser::evaluate(std::istream& is)
+void Parser::evaluate0(std::istream& is)
 {
     std::string tok;
 
@@ -1200,15 +1200,14 @@ void Parser::evaluate(std::istream& is)
 }
 
 
-void Parser::evaluate(std::istream& is, std::string const& msg)
+void Parser::evaluate(std::istream& is)
 {
     std::streampos saved = spos;
     try {
-        evaluate(is);
+        evaluate0(is);
     }
     catch( Exception & e )
     {
-        //e << ", " + msg + ":\n";
         e << ":\n";
         e << StreamFunc::get_lines(is, spos, is.tellg());
         spos = saved;
@@ -1218,10 +1217,10 @@ void Parser::evaluate(std::istream& is, std::string const& msg)
 }
 
 
-void Parser::evaluate(std::string const& code, std::string const& msg)
+void Parser::evaluate(std::string const& code)
 {
     std::istringstream iss(code);
-    evaluate(iss, msg);
+    evaluate(iss);
 }
 
 
@@ -1234,7 +1233,7 @@ int Parser::readConfig(std::string const& file)
         VLOG("  ( set " << do_set << " change " << do_change << " new " << do_new);
         VLOG(" run " << do_run << " write " << do_write << " )\n");
         
-        evaluate(is, "in `"+file+"'");
+        evaluate(is);
         return 0;
     }
     return 1;
