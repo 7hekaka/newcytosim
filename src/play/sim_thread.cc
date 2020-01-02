@@ -439,7 +439,7 @@ size_t SimThread::readInput(size_t max_nb_lines)
             //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
             std::stringstream iss(str);
             try {
-                parser.evaluate(iss);
+                parser.evaluate(iss, nullptr);
                 glApp::flashText0(str);
             }
             catch ( Exception & e ) {
@@ -486,7 +486,7 @@ int SimThread::execute(std::string const& code, std::string const& msg)
     lock();
     try {
         std::istringstream iss(code);
-        Parser(simul, 1, 1, 1, 1, 1).evaluate(iss);
+        Parser(simul, 1, 1, 1, 1, 1).evaluate(iss, nullptr);
     }
     catch( Exception & e ) {
         std::cerr << "Error : " << e.what();

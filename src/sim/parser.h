@@ -33,10 +33,10 @@ private:
     bool      do_write;
  
     /// position of stream at the start of current parsing task
-    std::streampos spos;
+    std::streampos saved_pos;
     
     /// print the lines located between `pos` and current position
-    void show_lines(std::istream&, std::streampos pos);
+    void show_lines(std::istream&);
 
 public:
     
@@ -89,14 +89,11 @@ public:
     
     /// parse command `end`
     void      parse_end(std::istream&);
-
     
-    /// Parse content of stream
-    void      evaluate0(std::istream&);
-
-    /// Parse stream, and report errors
-    void      evaluate(std::istream&);
-
+    
+    /// Parse content of stream, recording position if pointer is given
+    void      evaluate(std::istream&, std::streampos*);
+    
     /// Parse code in string, and report errors
     void      evaluate(std::string const&);
 
