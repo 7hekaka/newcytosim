@@ -19,24 +19,24 @@
 //------------------------------------------------------------------------------
 /**
  The permission of the parser are:
- - allow_change: existing Property or Object can be modified
- - allow_set: new Properties can be created
- - allow_new: new Object can be created
- - allow_write: can write to disc
+ - do_set: new Properties can be created
+ - do_change: existing Property or Object can be modified
+ - do_new: new Object can be created
+ - do_run: can perform simulation steps
+ - do_write: can write to disc
  .
  */
 Parser::Parser(Simul& s, bool ds, bool dc, bool dn, bool dr, bool dw)
 : Interface(s), do_set(ds), do_change(dc), do_new(dn), do_run(dr), do_write(dw)
 {
-    spos = 0;
     //std::clog << " set " << ds << " change " << dc << " new " << dn << " run " << dr << " write " << dw << "\n";
 }
 
 
-void Parser::show_lines(std::istream& is, std::streampos start)
+void Parser::show_lines(std::istream& is, std::streampos pos)
 {
     std::cerr << "  in\n";
-    StreamFunc::print_lines(std::cerr, is, start, is.tellg());
+    StreamFunc::print_lines(std::cerr, is, pos, is.tellg());
 }
 
 
@@ -76,6 +76,7 @@ void Parser::show_lines(std::istream& is, std::streampos start)
 
 void Parser::parse_set(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     std::string cat = Tokenizer::get_symbol(is);
     std::string name, para, blok;
     
@@ -187,7 +188,7 @@ void Parser::parse_set(std::istream& is)
     }
 
     if ( pp && opt.warnings(std::cerr) )
-        show_lines(is, spos);
+        show_lines(is, ipos);
 }
 
 //------------------------------------------------------------------------------
@@ -226,6 +227,7 @@ Examples:
 
 void Parser::parse_change(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     bool change_all = false;
     
     std::string name = Tokenizer::get_symbol(is);
@@ -295,7 +297,7 @@ void Parser::parse_change(std::istream& is)
             execute_change(name, opt);
  
         if ( opt.warnings(std::cerr, ~0U) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
     else if ( para == "display" )
     {
@@ -350,6 +352,7 @@ void Parser::parse_change(std::istream& is)
 
 void Parser::parse_new(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     Glossary opt;
     size_t cnt = 1;
     Tokenizer::get_integer(is, cnt);
@@ -443,7 +446,7 @@ void Parser::parse_new(std::istream& is)
                 throw InvalidParameter("display parameters should be specified within `set'");
             
             if ( opt.warnings(std::cerr, ~0U) )
-                show_lines(is, spos);
+                show_lines(is, ipos);
         }
     }
 }
@@ -510,6 +513,7 @@ void Parser::parse_new(std::istream& is)
 
 void Parser::parse_delete(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     size_t cnt = 1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
@@ -534,7 +538,7 @@ void Parser::parse_delete(std::istream& is)
         Glossary opt(blok);
         execute_delete(name, opt, cnt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -562,6 +566,7 @@ void Parser::parse_delete(std::istream& is)
 
 void Parser::parse_mark(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     size_t cnt = 0;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
@@ -583,7 +588,7 @@ void Parser::parse_mark(std::istream& is)
         Glossary opt(blok);
         execute_mark(name, opt, cnt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -608,6 +613,7 @@ void Parser::parse_mark(std::istream& is)
 
 void Parser::parse_cut(std::istream& is)
 {    
+    std::streampos ipos = is.tellg();
     std::string name = Tokenizer::get_token(is);
  
     if ( name == "all" )
@@ -631,7 +637,7 @@ void Parser::parse_cut(std::istream& is)
         Glossary opt(blok);
         execute_cut(name, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -643,6 +649,7 @@ void Parser::parse_cut(std::istream& is)
  */
 void Parser::parse_run(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     size_t cnt = 1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
@@ -708,7 +715,7 @@ void Parser::parse_run(std::istream& is)
             execute_run(cnt, opt);
 
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -722,14 +729,15 @@ void Parser::parse_run(std::istream& is)
      }
  
  By default, `required = 1`, and execution will terminate if the file is not found.
- If `required=0`, the file will be executed if it is found, but execution will continue
- in any case.
+ However, if `required=0`, the file will be executed if it is found, but execution
+ will continue otherwise.
  
- \todo: able to specify do_set and do_new for command 'include' 
+ \todo: able to specify `do_set` and `do_new` for command 'read'
 */
 
 void Parser::parse_read(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     bool required = true;
     std::string file = Tokenizer::get_filename(is);
     
@@ -742,14 +750,15 @@ void Parser::parse_read(std::istream& is)
         Glossary opt(blok);
         opt.set(required, "required");
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
     
     std::ifstream fis(file.c_str(), std::ifstream::in);
     if ( ! fis.fail() )
     {
+        std::streampos fpos = 0;
         VLOG("-EVAL " << file << "\n");
-        evaluate(fis);
+        evaluate(fis, fpos);
     }
     else
     {
@@ -795,6 +804,7 @@ void Parser::parse_read(std::istream& is)
 
 void Parser::parse_import(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_token(is);
     std::string file = Tokenizer::get_filename(is);
     
@@ -811,9 +821,10 @@ void Parser::parse_import(std::istream& is)
         Glossary opt(blok);
         execute_import(file, what, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
+
 
 /**
  Export state to file. The general syntax is:
@@ -842,6 +853,7 @@ void Parser::parse_import(std::istream& is)
 
 void Parser::parse_export(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_token(is);
     std::string file = Tokenizer::get_filename(is);
     
@@ -859,7 +871,7 @@ void Parser::parse_export(std::istream& is)
         Glossary opt(blok);
         execute_export(file, what, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -891,6 +903,7 @@ void Parser::parse_export(std::istream& is)
 
 void Parser::parse_report(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_symbols(is);
     std::string file = Tokenizer::get_filename(is);
 
@@ -904,7 +917,7 @@ void Parser::parse_report(std::istream& is)
         Glossary opt(blok);
         execute_report(file, what, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -921,6 +934,7 @@ void Parser::parse_report(std::istream& is)
  */
 void Parser::parse_call(std::istream& is)
 {
+    std::streampos ipos = is.tellg();
     std::string str = Tokenizer::get_symbol(is);
     
     if ( str.empty() )
@@ -933,7 +947,7 @@ void Parser::parse_call(std::istream& is)
         Glossary opt(blok);
         execute_call(str, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, spos);
+            show_lines(is, ipos);
     }
 }
 
@@ -950,7 +964,7 @@ void Parser::parse_repeat(std::istream& is)
     size_t cnt = 1;
     
     if ( ! Tokenizer::get_integer(is, cnt) )
-        throw InvalidSyntax("missing integer number after 'repeat'");
+        throw InvalidSyntax("expected positive integer after 'repeat'");
 
     std::string code = Tokenizer::get_block(is, '{');
     
@@ -1083,14 +1097,14 @@ void Parser::parse_end(std::istream& is)
  `call`         | Call a custom function
 
  */
-void Parser::evaluate0(std::istream& is)
+void Parser::evaluate(std::istream& is, std::streampos& ipos)
 {
     std::string tok;
 
     while ( is.good() )
     {
         do {
-            spos = is.tellg();
+            ipos = is.tellg();
             tok = Tokenizer::get_token(is);
             if ( is.fail() ) return;
         } while ( tok.length() < 1 || isspace(tok[0]) );
@@ -1124,8 +1138,8 @@ void Parser::evaluate0(std::istream& is)
             continue;
         }
         
-        //StreamFunc::print_lines(std::clog, is, spos, spos);
-        
+        //if (spos) StreamFunc::print_lines(std::clog, is, *spos, *spos);
+
         if ( tok == "set" )
             parse_set(is);
         else if ( tok == "change" )
@@ -1193,47 +1207,50 @@ void Parser::evaluate0(std::istream& is)
                 simul.dump_system();
         }
         else {
-            throw InvalidSyntax("unknown command `"+tok+"'");
+            throw InvalidSyntax("unexpected command `"+tok+"'");
         }
         //hold();
     }
 }
 
 
-void Parser::evaluate(std::istream& is)
-{
-    std::streampos saved = spos;
-    try {
-        evaluate0(is);
-    }
-    catch( Exception & e )
-    {
-        e << ":\n";
-        e << StreamFunc::get_lines(is, spos, is.tellg());
-        spos = saved;
-        throw;
-    }
-    spos = saved;
-}
-
-
 void Parser::evaluate(std::string const& code)
 {
     std::istringstream iss(code);
-    evaluate(iss);
+    std::streampos ipos(0);
+    try {
+        evaluate(iss, ipos);
+    }
+    catch( Exception & e )
+    {
+        //e << ", " + msg + ":\n";
+        e << ":\n";
+        e << StreamFunc::get_lines(iss, ipos, iss.tellg());
+        throw;
+    }
 }
 
 
-int Parser::readConfig(std::string const& file)
+int Parser::readConfig(std::string const& filename)
 {
-    std::ifstream is(file.c_str(), std::ifstream::in);
+    std::ifstream is(filename.c_str(), std::ifstream::in);
+    std::streampos ipos(0);
     if ( is.good() )
     {
-        VLOG("-----------  Cytosim reads `" << file << "'");
+        VLOG("-----------  Cytosim reads `" << filename << "'");
         VLOG("  ( set " << do_set << " change " << do_change << " new " << do_new);
         VLOG(" run " << do_run << " write " << do_write << " )\n");
         
-        evaluate(is);
+        try {
+            evaluate(is, ipos);
+        }
+        catch( Exception & e )
+        {
+            //e << ", " + msg + ":\n";
+            e << ":\n";
+            e << StreamFunc::get_lines(is, ipos, is.tellg());
+            throw;
+        }
         return 0;
     }
     return 1;

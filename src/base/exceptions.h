@@ -113,12 +113,15 @@ public:
     }
 
     /// append string to info
-    Exception& operator << (const std::string m)
+    Exception& operator << (const std::string arg)
     {
-        if (( info_.empty() && msg_.size() > 0 && isalnum(*msg_.rbegin()))
-            || ( info_.size() > 0 && isalnum(*info_.rbegin()) ))
-            info_.push_back(' ');
-        info_.append(m);
+        if ( arg.size() > 0 && isalnum(arg[0]) )
+        {
+            std::string s = msg_ + info_;
+            if ( s.empty() || isalnum(s.back()) )
+                info_.push_back(' ');
+        }
+        info_.append(arg);
         return *this;
     }
     
