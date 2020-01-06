@@ -753,14 +753,7 @@ void Parser::parse_read(std::istream& is)
             show_lines(is, ipos);
     }
     
-    std::ifstream fis(file.c_str(), std::ifstream::in);
-    if ( ! fis.fail() )
-    {
-        std::streampos fpos = 0;
-        VLOG("-EVAL " << file << "\n");
-        evaluate(fis, fpos);
-    }
-    else
+    if ( readConfig(file) )
     {
         if ( required )
             throw InvalidSyntax("could not open file `"+file+"'");
@@ -1097,160 +1090,156 @@ void Parser::parse_end(std::istream& is)
  `call`         | Call a custom function
 
  */
-void Parser::evaluate(std::istream& is, std::streampos& ipos)
+int Parser::evaluate_one(std::istream& is)
 {
-    std::string tok;
-
-    while ( is.good() )
+    std::string tok = Tokenizer::get_token(is);
+    
+    if ( is.fail() )
+        return 1;
+    
+    // empty lines
+    if ( tok.length() < 1 || isspace(tok[0]) )
+        return 0;
+    
+    // matlab-style comments (%{ })
+    if ( tok[0] == '%' )
     {
-        do {
-            ipos = is.tellg();
-            tok = Tokenizer::get_token(is);
-            if ( is.fail() ) return;
-        } while ( tok.length() < 1 || isspace(tok[0]) );
-        
-        
-        // skip matlab-style comments (%{ })
-        if ( tok[0] == '%' )
+        int c = is.get();
+        if ( c == '{' )
+            Tokenizer::get_block_text(is, 0, '}');
+        else
+            Tokenizer::get_line(is);
+        return 0;
+    }
+    
+    /*
+     skip C-style comments:
+     - single-line comment start with '/' and '/'
+     - multi-line comments start with '/' and '*'
+     */
+    if ( tok[0] == '/' )
+    {
+        int c = is.get();
+        if ( '/' == c )
+            Tokenizer::get_line(is);
+        else if ( '*' == c )
+            Tokenizer::get_until(is, "*/");
+        else
+            throw InvalidSyntax("unexpected token after / `"+tok+"'");
+        return 0;
+    }
+    
+    //if (spos) StreamFunc::print_lines(std::clog, is, *spos, *spos);
+    
+    if ( tok == "set" )
+        parse_set(is);
+    else if ( tok == "change" )
+        parse_change(is);
+    else if ( tok == "new" || tok == "add" )
+        parse_new(is);
+    else if ( tok == "delete" )
+        parse_delete(is);
+    else if ( tok == "mark" )
+        parse_mark(is);
+    else if ( tok == "run" )
+        parse_run(is);
+    else if ( tok == "read" )
+        parse_read(is);
+#ifdef BACKWARD_COMPATIBILITY
+    else if ( tok == "include" )
+        parse_read(is);
+#endif
+    else if ( tok == "cut" )
+        parse_cut(is);
+    else if ( tok == "report" )
+        parse_report(is);
+#ifdef BACKWARD_COMPATIBILITY
+    else if ( tok == "write" )
+        parse_report(is);
+#endif
+    else if ( tok == "import" )
+        parse_import(is);
+    else if ( tok == "export" )
+        parse_export(is);
+    else if ( tok == "call" )
+        parse_call(is);
+    else if ( tok == "repeat" )
+        parse_repeat(is);
+    else if ( tok == "skip" )
+        Tokenizer::get_block(is, '{');
+    else if ( tok == "for" )
+        parse_for(is);
+    else if ( tok == "restart" )
+    {
+        static size_t cnt = 0;
+        size_t num = 1;
+        Tokenizer::get_integer(is, num);
+        if ( do_run && cnt++ < num )
         {
-            int c = is.get();
-            if ( c == '{' )
-                Tokenizer::get_block_text(is, 0, '}');
-            else
-                Tokenizer::get_line(is);
-            continue;
+            // reset simulation and rewind config file
+            simul.erase();
+            is.clear();
+            is.seekg(0);
+            return 0;
         }
-        
-        /*
-         skip C-style comments:
-         - single-line comment start with '/' and '/'
-         - multi-line comments start with '/' and '*'
-         */
-        if ( tok[0] == '/' )
-        {
-            int c = is.get();
-            if ( '/' == c )
-                Tokenizer::get_line(is);
-            else if ( '*' == c )
-                Tokenizer::get_until(is, "*/");
-            else
-                throw InvalidSyntax("unexpected token after / `"+tok+"'");
-            continue;
-        }
-        
-        //if (spos) StreamFunc::print_lines(std::clog, is, *spos, *spos);
+    }
+    else if ( tok == "end" )
+        return 2; //parse_end(is);
+    else if ( tok == ";" )
+        return 0;
+    else if ( tok == "dump" )
+    {
+        if ( do_write && do_run )
+            simul.dump();
+    }
+    else if ( tok == "dump_system" )
+    {
+        if ( do_write && do_run )
+            simul.dump_system();
+    }
+    else {
+        throw InvalidSyntax("unexpected command `"+tok+"'");
+    }
+    return 0;
+}
 
-        if ( tok == "set" )
-            parse_set(is);
-        else if ( tok == "change" )
-            parse_change(is);
-        else if ( tok == "new" || tok == "add" )
-            parse_new(is);
-        else if ( tok == "delete" )
-            parse_delete(is);
-        else if ( tok == "mark" )
-            parse_mark(is);
-        else if ( tok == "run" )
-            parse_run(is);
-        else if ( tok == "read" )
-            parse_read(is);
-#ifdef BACKWARD_COMPATIBILITY
-        else if ( tok == "include" )
-            parse_read(is);
-#endif
-        else if ( tok == "cut" )
-            parse_cut(is);
-        else if ( tok == "report" )
-            parse_report(is);
-#ifdef BACKWARD_COMPATIBILITY
-        else if ( tok == "write" )
-            parse_report(is);
-#endif
-        else if ( tok == "import" )
-            parse_import(is);
-        else if ( tok == "export" )
-            parse_export(is);
-        else if ( tok == "call" )
-            parse_call(is);
-        else if ( tok == "repeat" )
-            parse_repeat(is);
-        else if ( tok == "skip" )
-            Tokenizer::get_block(is, '{');
-        else if ( tok == "for" )
-            parse_for(is);
-        else if ( tok == "restart" )
+
+void Parser::evaluate(std::istream& is)
+{
+    std::streampos ipos(0);
+    try {
+        while ( is.good() )
         {
-            static size_t cnt = 0;
-            size_t num = 1;
-            Tokenizer::get_integer(is, num);
-            if ( do_run && cnt++ < num )
-            {
-                // reset simulation and rewind config file
-                simul.erase();
-                is.clear();
-                is.seekg(0);
-                continue;
-            }
+            ipos = is.tellg();
+            if ( evaluate_one(is) )
+                return;
         }
-        else if ( tok == "end" )
-            return;//parse_end(is);
-        else if ( tok == ";" )
-            continue;
-        else if ( tok == "dump" )
-        {
-            if ( do_write && do_run )
-                simul.dump();
-        }
-        else if ( tok == "dump_system" )
-        {
-            if ( do_write && do_run )
-                simul.dump_system();
-        }
-        else {
-            throw InvalidSyntax("unexpected command `"+tok+"'");
-        }
-        //hold();
+    }
+    catch( Exception & e )
+    {
+        //e << ", " + msg + ":\n";
+        e << ":\n";
+        e << StreamFunc::get_lines(is, ipos, is.tellg());
+        throw;
     }
 }
 
 
 void Parser::evaluate(std::string const& code)
 {
-    std::istringstream iss(code);
-    std::streampos ipos(0);
-    try {
-        evaluate(iss, ipos);
-    }
-    catch( Exception & e )
-    {
-        //e << ", " + msg + ":\n";
-        e << ":\n";
-        e << StreamFunc::get_lines(iss, ipos, iss.tellg());
-        throw;
-    }
+    std::istringstream is(code);
+    evaluate(is);
 }
 
 
 int Parser::readConfig(std::string const& filename)
 {
     std::ifstream is(filename.c_str(), std::ifstream::in);
-    std::streampos ipos(0);
     if ( is.good() )
     {
-        VLOG("-----------  Cytosim reads `" << filename << "'");
-        VLOG("  ( set " << do_set << " change " << do_change << " new " << do_new);
-        VLOG(" run " << do_run << " write " << do_write << " )\n");
-        
-        try {
-            evaluate(is, ipos);
-        }
-        catch( Exception & e )
-        {
-            //e << ", " + msg + ":\n";
-            e << ":\n";
-            e << StreamFunc::get_lines(is, ipos, is.tellg());
-            throw;
-        }
+        VLOG(" Parsing `" << filename << "' set " << do_set << " change " << do_change);
+        VLOG(" new " << do_new << " run " << do_run << " write " << do_write << " )\n");
+        evaluate(is);
         return 0;
     }
     return 1;
