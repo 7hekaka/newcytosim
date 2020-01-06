@@ -405,8 +405,9 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
     
     //hold();
 
-    VLOG("+NEW `" << name << "' made " << res.size() << " objects\n");
-    
+    VLOG("+NEW `" << name << "' made " << res.size() << " objects");
+    VLOG(" (simul now has " << simul.nbObjects() << " objects)\n");
+
     return res;
 }
 
@@ -591,15 +592,22 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
         return;
     }
     
-    // optionally limit the list to a random subset
-    if ( cnt < objs.size() )
+    if ( cnt == 1 )
     {
-        objs.shuffle();
-        objs.truncate(cnt);
+        simul.erase(objs.pick_one());
     }
-    
-    //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
-    simul.erase(objs);
+    else
+    {
+        if ( cnt < objs.size() )
+        {
+            // limit the list to a random subset
+            objs.shuffle();
+            objs.truncate(cnt);
+        }
+        
+        //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
+        simul.erase(objs);
+    }
 }
 
 

@@ -17,15 +17,15 @@
  It works in 2D and 3D, but each Mecable is represented here by only one coordinate X.
  The Mecables are then translated in the X direction by the solution of the system.
  
- If you are curious about understanding how cytosim works, this is a good place to start!
+ If you are curious about knowning how cytosim works, this is a good place to start!
  This is a bare-bone solver, which should be easy to understand.
- Meca does essentially the same in N-dimension.
+ Meca does essentially the same work in higher dimension, with bending elasticity.
  */
 class Meca1D
 {
-    size_t allocated_;            ///< allocated size of vectors
+    size_t allocated_;           ///< allocated size of vectors
     
-    bool   ready_;                ///< true if the solution is contained in 'vSOL'
+    bool   ready_;               ///< true if the solution is contained in 'vSOL'
     
 public:
    

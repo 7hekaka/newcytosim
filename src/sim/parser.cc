@@ -29,7 +29,6 @@
 Parser::Parser(Simul& s, bool ds, bool dc, bool dn, bool dr, bool dw)
 : Interface(s), do_set(ds), do_change(dc), do_new(dn), do_run(dr), do_write(dw)
 {
-    //std::clog << " set " << ds << " change " << dc << " new " << dn << " run " << dr << " write " << dw << "\n";
 }
 
 
@@ -1199,8 +1198,8 @@ int Parser::readConfig(std::string const& filename)
     std::ifstream is(filename.c_str(), std::ifstream::in);
     if ( is.good() )
     {
-        VLOG(" Parsing `" << filename << "' set " << do_set << " change " << do_change);
-        VLOG(" new " << do_new << " run " << do_run << " write " << do_write << " )\n");
+        VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
+        VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
         evaluate(is);
         return 0;
     }

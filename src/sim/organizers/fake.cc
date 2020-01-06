@@ -73,6 +73,9 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     else
         throw InvalidParameter("fake:solid1 must be specified");
     
+    if ( as == bs )
+        throw InvalidParameter("fake cannot be made with only one Solid");
+    
     Solid * so = new Solid(as->prop);
     
     Vector apos = as->posP(0);
