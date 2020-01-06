@@ -545,12 +545,6 @@ public:
         else
             shuffle32();
     }
-    
-    /// return a randomly picked object in the array
-    VAL& random_pick()
-    {
-        return val_[RNG.plong(nbo_)];
-    }
 
 };
 
