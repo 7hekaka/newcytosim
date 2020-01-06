@@ -118,7 +118,7 @@ public:
         if ( arg.size() > 0 && isalnum(arg[0]) )
         {
             std::string s = msg_ + info_;
-            if ( s.empty() || isalnum(*s.rbegin()) )
+            if ( s.empty() || isalnum(s.back()) )
                 info_.push_back(' ');
         }
         info_.append(arg);

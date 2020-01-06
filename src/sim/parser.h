@@ -31,12 +31,9 @@ private:
     
     /// control switch to enable command 'write' (write files)
     bool      do_write;
- 
-    /// position of stream at the start of current parsing task
-    std::streampos saved_pos;
     
     /// print the lines located between `pos` and current position
-    void show_lines(std::istream&);
+    void      show_lines(std::istream&, std::streampos);
 
 public:
     
@@ -90,14 +87,13 @@ public:
     /// parse command `end`
     void      parse_end(std::istream&);
     
-    
+    //-------------------------------------------------------------------------------
+
     /// Parse content of stream, recording position if pointer is given
-    void      evaluate(std::istream&, std::streampos*);
+    void      evaluate(std::istream&, std::streampos&);
     
     /// Parse code in string, and report errors
     void      evaluate(std::string const&);
-
-    //-------------------------------------------------------------------------------
 
     /// Open and parse the config file with the given name
     int       readConfig(std::string const& name);
