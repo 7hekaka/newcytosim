@@ -13,6 +13,7 @@
  With this option set to 1, GMRES iterates with M*P instead of P*M,
  where M is the matrix and P the preconditionner.
  In both cases, the solution to M*sol = rhs is returned.
+ With Right-sided preconditionner, the residual is calculated correctly
 */
 #define RIGHTSIDED_PRECONDITIONNER 1
 
@@ -123,10 +124,11 @@ namespace LinearSolvers
             zero_real(restart+1, ss);            // ss = 0
 
             ss[0] = beta;
-            int it = 0;
+            int it = -1;
             //fprintf(stderr, "GMRES   %4i residual %10.6f\n", monitor.count(), resid);
 
             do {
+                ++it;
                 ++monitor;
 #if RIGHTSIDED_PRECONDITIONNER
                 mat.precondition(ww, tt);      // tt = P*ww
@@ -172,7 +174,6 @@ namespace LinearSolvers
                     //fprintf(stderr, " %4i finished?  %10.6f   est. %10.6f\n", monitor.count(), fabs(ss[it+1]), resid);
                     break;
                 }
-                ++it;
             } while ( it+1 < restart );
 
             // solve upper triangular system in place
@@ -180,9 +181,8 @@ namespace LinearSolvers
             {
                 ss[j] /= H(j,j);
                 // S(0:j) = S(0:j) - ss[j] * H(0:j,j)
-                blas::xaxpy(j-1, -ss[j], H.column(j), 1, ss, 1);
-                //for (int k = 0; k < j; ++k)
-                //    ss[k] -= H(k,j) * ss[j];
+                blas::xaxpy(j, -ss[j], H.column(j), 1, ss, 1);
+                //for (int k = 0; k < j; ++k) ss[k] -= ss[j] * H(k,j);
             }
 
             // update the solution `sol`: can be parallelized
@@ -190,8 +190,7 @@ namespace LinearSolvers
             {
                 // sol = sol + ss[j] * V(j)
                 blas::xaxpy(dim, ss[j], V.column(j), 1, sol, 1);
-                //for (int k = 0; k < dim; ++k)
-                //    sol[k] += V(k,j) * ss[j];
+                //for (int k = 0; k < dim; ++k) sol[k] += V(k,j) * ss[j];
             }
         }
 #if RIGHTSIDED_PRECONDITIONNER
