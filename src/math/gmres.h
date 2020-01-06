@@ -67,11 +67,11 @@ namespace LinearSolvers
      The matrix and its preconditionner are specified by functions of LinearOperator
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
-    void GMRES(const LinearOperator& mat, const real* rhs, real* sol, size_t restart,
+    void GMRES(const LinearOperator& mat, const real* rhs, real* sol, int restart,
                Monitor& monitor, Allocator& allocator, Matrix& H, Matrix& V,
                Allocator& temporary)
     {
-        const size_t dim = mat.dimension();
+        const int dim = mat.dimension();
         real beta, resid, ratio = 1.0;
         
         //allocate workspace
@@ -83,8 +83,8 @@ namespace LinearSolvers
         V.resize(dim, restart);
         
         temporary.allocate(restart+1, 3);
-        real * sn = temporary.bind(0);
-        real * cs = temporary.bind(1);
+        real * S = temporary.bind(0);
+        real * C = temporary.bind(1);
         real * ss = temporary.bind(2);  // vector of dim 'restart+1'
         
         // Hessenberg matrix
@@ -123,7 +123,7 @@ namespace LinearSolvers
             zero_real(restart+1, ss);            // ss = 0
 
             ss[0] = beta;
-            size_t it = 0;
+            int it = 0;
             //fprintf(stderr, "GMRES   %4i residual %10.6f\n", monitor.count(), resid);
 
             do {
@@ -140,7 +140,7 @@ namespace LinearSolvers
                  of V are orthogonal to each other, the scalar products H(k,it)
                  could be calculated independently in parallel
                 */
-                for (size_t k = 0; k <= it; ++k)
+                for (int k = 0; k <= it; ++k)
                 {
                     // H(k,i) = <V(i+1), V(k)>
                     H(k,it) = blas::dot(dim, ww, V.column(k));
@@ -156,7 +156,8 @@ namespace LinearSolvers
                 if ( it+1 < restart )
                     blas::xcopy(dim, ww, 1, V.column(it+1), 1);
                 
-                gmres_make_rotation(H, cs, sn, ss, it);
+                // set ss[it] and ss[it+1]:
+                gmres_make_rotation(H, C, S, ss, it);
                 
                 /*
                  here fabs(ss[it+1]) = norm(P*residual)
@@ -165,27 +166,27 @@ namespace LinearSolvers
                 resid = fabs(ss[it+1]) * ratio;
                 
                 //fprintf(stderr, " |ss[it+1]| = %10.6f   est. %10.6f\n", fabs(ss[it+1]), resid);
-
+                
                 if ( monitor.finished(resid) )
                 {
                     //fprintf(stderr, " %4i finished?  %10.6f   est. %10.6f\n", monitor.count(), fabs(ss[it+1]), resid);
                     break;
                 }
+                ++it;
+            } while ( it+1 < restart );
 
-            } while ( ++it < restart );
-            
             // solve upper triangular system in place
-            for (size_t j = it+1; j > 0; --j)
+            for (int j = it; j >= 0; --j)
             {
-                ss[j-1] /= H(j,j-1);
+                ss[j] /= H(j,j);
                 // S(0:j) = S(0:j) - ss[j] * H(0:j,j)
-                blas::xaxpy(j, -ss[j-1], H.column(j-1), 1, ss, 1);
+                blas::xaxpy(j-1, -ss[j], H.column(j), 1, ss, 1);
                 //for (int k = 0; k < j; ++k)
                 //    ss[k] -= H(k,j) * ss[j];
             }
 
             // update the solution `sol`: can be parallelized
-            for (size_t j = 0; j <= it; ++j)
+            for (int j = 0; j <= it; ++j)
             {
                 // sol = sol + ss[j] * V(j)
                 blas::xaxpy(dim, ss[j], V.column(j), 1, sol, 1);
