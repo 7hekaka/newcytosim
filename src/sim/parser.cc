@@ -1045,50 +1045,12 @@ void Parser::parse_end(std::istream& is)
 #pragma mark -
 
 /**
- The configuration file should contain a succession of commands.
- 
- Most of them follow the same syntax:
- 
-     COMMAND CLASS OBJECT_NAME
-     {
-         PARAMETER = VALUE1, VALUE2, ...;
-         ...
-     }
-
- Where `COMMAND` is the name of the command, `CLASS` is an predefined class name,
- and `OBJECT_NAME` can be chosen by the user. The name of the Parameters and
- their possible values is different for each class.
- 
- Essential commands:
- 
- Command        | Effect                                                 |
- ---------------|---------------------------------------------------------
- `set`          | Create a new Property, and set its parameter values
- `new`          | Create objects of a certain Property
- `run`          | Simulate the system to advance in time
- 
- Additional commands:
- 
- Command        | Effect                                                 |
- ---------------|---------------------------------------------------------
- `change`       | Change parameter values in an existing Property
- `read`         | Read another file and excutes the commands it contains
- `delete`       | Delete objects from the simulation
- `import`       | Import objects from a trajectory file
- `export`       | Export all simulated objects to a file
- `report`       | generate file or text with formatted information
-
- Other commands:
- 
- Command        | Effect                                                 |
- ---------------|---------------------------------------------------------
- `mark`         | Mark objects
- `cut`          | Cut fibers along a plane
- `repeat`       | Execute code a number of times
- `for`          | Execute code a number of times (disabled)
- `end`          | Terminates simulation
- `call`         | Call a custom function
-
+ Read and execute the next command to be found in the stream.
+ Returns:
+ - 0 if successfull
+ - 1 if file is exhausted, or has error
+ - 2 if 'end' was found.
+ Thus parsing should be repeated while the return value is 0.
  */
 int Parser::evaluate_one(std::istream& is)
 {
