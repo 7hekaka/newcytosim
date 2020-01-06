@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
         osp = &ofs;
     }
     
-    Cytosim::all_silent();
+    Cytosim::silence_all();
     
     // get arguments:
     if ( arg.set(frame, "frame") )

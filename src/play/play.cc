@@ -132,7 +132,9 @@ int main(int argc, char* argv[])
     int  magnify = 1;
     Glossary arg;
     
-    Cytosim::all_silent();
+    Cytosim::out.silent();
+    Cytosim::log.silent();
+    
     std::atexit(goodbye);
 
     if ( arg.read_strings(argc-1, argv+1) )

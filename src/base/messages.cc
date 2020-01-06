@@ -27,7 +27,7 @@ namespace Cytosim
     }
     
     /// turn all output off
-    void all_silent()
+    void silence_all()
     {
         Cytosim::out.silent();
         Cytosim::log.silent();

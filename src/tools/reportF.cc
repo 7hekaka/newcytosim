@@ -57,7 +57,7 @@ void report(Simul const& simul, std::ostream& os, std::string const& what, Gloss
 
 int main(int argc, char* argv[])
 {
-    Cytosim::all_silent();
+    Cytosim::silence_all();
     
     if ( argc < 2 || strstr(argv[1], "help") )
     {

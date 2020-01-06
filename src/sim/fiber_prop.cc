@@ -479,7 +479,7 @@ void FiberProp::complete(Simul const& sim)
     }
     
     if ( sim.ready() && steric && !sim.prop->steric )
-        throw InvalidParameter(name()+":steric is set but simul::steric = 0");
+        Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( min_length < 0 )
         throw InvalidParameter("fiber:min_length should be >= 0");

@@ -102,7 +102,7 @@ void Tubule::goodbye(Buddy * b)
                 fil_[i] = nullptr;
                 return;
             }
-        std::cerr << "CYTOSIM ERROR: unknown buddy" << b << std::endl;
+        std::cerr << "Error: unknown cytosim buddy" << b << '\n';
     }
 }
 

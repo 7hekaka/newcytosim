@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    Cytosim::all_silent();
+    Cytosim::silence_all();
     unsigned frm = 0;
     
     // multiple frame indices can be specified:

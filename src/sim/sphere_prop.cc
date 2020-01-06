@@ -1,6 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+
 #include "sphere_prop.h"
 #include "glossary.h"
+#include "messages.h"
 #include "sphere.h"
 #include "space.h"
 #include "sim.h"
@@ -89,7 +91,7 @@ void SphereProp::complete(Simul const& sim)
     }
     
     if ( sim.ready() && steric && !sim.prop->steric )
-        throw InvalidParameter(name()+":steric is set but simul::steric = 0");
+        Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( point_mobility < 0 )
         throw InvalidParameter("sphere:point_mobility must be specified and >= 0");

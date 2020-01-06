@@ -2,6 +2,7 @@
 
 #include "solid_prop.h"
 #include "glossary.h"
+#include "messages.h"
 #include "property_list.h"
 #include "simul_prop.h"
 #include "sim.h"
@@ -108,7 +109,7 @@ void SolidProp::complete(Simul const& sim)
     }
     
     if ( sim.ready() && steric && !sim.prop->steric )
-        throw InvalidParameter(name()+":steric is set but simul::steric = 0");
+        Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 }
 
 

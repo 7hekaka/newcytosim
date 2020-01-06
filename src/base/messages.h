@@ -27,12 +27,13 @@ namespace Cytosim
         std::ofstream nul_;
 
         /// remaining number of output that will be performed
-        unsigned cnt_;
+        size_t cnt_;
 
     public:
         
         /// create stream directed to given stream with `max_output` allowed
-        Output(std::ostream& os, unsigned n_out = 1<<16, std::string const& p = "") : pref_(p), out_(&os), cnt_(n_out)
+        Output(std::ostream& os, size_t n_out = 1<<16, std::string const& p = "")
+        : pref_(p), out_(&os), cnt_(n_out)
         {
             nul_.open("/dev/null");
         }
@@ -85,7 +86,7 @@ namespace Cytosim
         
         /// std::ostream style output operator
         template < typename T >
-        std::ostream& operator <<(T const& x)
+        std::ostream& operator << (T const& x)
         {
             if ( out_->good() && cnt_ )
             {
@@ -111,7 +112,7 @@ namespace Cytosim
     extern Output warn;
 
     /// suppress all output
-    void all_silent();
+    void silence_all();
 }
 
 
