@@ -20,6 +20,12 @@ class Space;
 #define NEW_CYTOPLASMIC_FLOW 0
 
 /**
+Enables code to simulate spindle flux by moving fibers
+Option normally OFF
+*/
+#define OLD_SPINDLE_FLUX 0
+
+/**
  @defgroup Parameters All object parameters
  List of parameters for user-accessible objects.
  */
@@ -99,10 +105,10 @@ public:
     /// uniform and constant fluid flow
     Vector    flow;
 #endif
-
+#if OLD_SPINDLE_FLUX
     /// special parameter for Spindle simulation (solve=flux)
     real      flux_speed;
-
+#endif
     /// Level of Brownian motion in the system = temperature * Boltzman constant
     /**
      <em>kT</em> is the product of the Boltzmann constant k by the absolute temperature in Kelvin:

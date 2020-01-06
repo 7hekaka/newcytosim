@@ -11,6 +11,7 @@
  */
 void Simul::solve_flux()
 {
+#if OLD_SPINDLE_FLUX
     if ( prop->flux_speed > 0 )
         throw InvalidParameter("simul:flux_speed should be <= 0");
     real shift = prop->flux_speed * prop->time_step;
@@ -23,6 +24,9 @@ void Simul::solve_flux()
         else
             fib->translate( Vector( shift, 0, 0) );
     }
+#else
+    throw InvalidParameter("simul:flux_speed is not emabled");
+#endif
 }
 
 

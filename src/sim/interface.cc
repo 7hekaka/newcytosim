@@ -736,7 +736,7 @@ void reportCPUtime(int frame, real simtime)
  `off`        | Objects are immobile.
  `on`         | The mechanics is solved fully (default).
  `auto`       | Same as 'on' but preconditionning method is set automatically.
- `horizontal` | Objects can move in the X-direction. The mechanics is solved partly.
+ `horizontal` | The mechanics is solved only allowing motion in the X-direction.
  `flux`       | Fibers are translated at `flux_speed` according to their orientation.
  
  If set, `event` defines an event occuring at a rate specified by the positive real `RATE`.
