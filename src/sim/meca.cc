@@ -267,7 +267,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     mec->projectForces(Y+inx, Y+inx);
 
     // Y <- X + alpha * Y
-    blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
 }
 
 
@@ -307,7 +307,7 @@ void Meca::multiply(const real* X, real* Y) const
     #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 #endif
 }
@@ -339,14 +339,14 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
         // T <- P * T
         mec->projectForces(T+inx, T+inx);
         // X <- X + alpha * T = X + alpha * P * FORCE
-        blas::xaxpy(bks, -time_step/mec->leftoverDrag(), T+inx, 1, Y+inx, 1);
+        blas::xaxpy(bks, -time_step*mec->leftoverMobility(), T+inx, 1, Y+inx, 1);
     }
     else
     {
         // Y <- P * T
         mec->projectForces(T+inx, Y+inx);
         // Y <- X + alpha * Y = X + alpha * P * FORCE
-        blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 
     if ( mec->useBlock() )
@@ -407,7 +407,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
     // Y <- P * Y
     mec->projectForces(Y+inx, Y+inx);
     // Y <- X + alpha * Y = X + alpha * P * FORCE
-    blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     
     if ( mec->useBlock() )
     {
@@ -469,7 +469,7 @@ void Meca::multiply(const real* X, real* Y) const
 #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 }
 #endif
@@ -865,7 +865,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
         mec->projectForces(res+bs*i, res+bs*i);
     
     // scale
-    real beta = -time_step / mec->leftoverDrag();
+    real beta = -time_step * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < bs*bs; ++n )
         res[n] = beta * res[n];
@@ -1358,7 +1358,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
     mec->projectForces(fff, rhs);
     
     // rhs <- beta * rhs, resulting in time_step * P * vFOR:
-    blas::xscal(DIM*mec->nbPoints(), beta/mec->leftoverDrag(), rhs, 1);
+    blas::xscal(DIM*mec->nbPoints(), beta*mec->leftoverMobility(), rhs, 1);
 
     /*
      In this case, `fff` contains the true force in each vertex of the system
@@ -1934,7 +1934,7 @@ void Meca::dumpMobility(FILE * file) const
             const size_t inx = DIM * mec->matIndex();
             // this includes the mobility, but not the time_step:
             mec->projectForces(src+inx, res+inx);
-            blas::xscal(DIM*mec->nbPoints(), 1.0/mec->leftoverDrag(), res+inx, 1);
+            blas::xscal(DIM*mec->nbPoints(), mec->leftoverMobility(), res+inx, 1);
         }
         // write column to file directly:
         fwrite(res, sizeof(real), dim, file);
