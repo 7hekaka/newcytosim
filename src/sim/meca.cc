@@ -188,7 +188,7 @@ size_t Meca::largestMecable() const
      F <- B + mB * X + mC * X
 
  If `B == 0`, this term is ommited. With `B = vBAS` and `X = vPTS`, this
- effectively calculates the forces in the system in `F`:
+ function calculates the forces in the system in `F`:
  
      F <- vBAS + mB * vPTS + mC * vPTS
 
@@ -1586,18 +1586,11 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
 #endif
 #if ( 0 )
     // enable this to compare BCGS and GMRES
+    fprintf(stderr, "    BCGS     count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
     monitor.reset();
     zero_real(dimension(), vSOL);
-    if ( precond )
-    {
-        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-        fprintf(stderr, "    BCGS     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
-    }
-    else
-    {
-        LinearSolvers::GMRES(*this, vRHS, vSOL, 8, monitor, allocator, mH, mV, temporary);
-
-    }
+    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
+    fprintf(stderr, "    GMRES-64 count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
@@ -1782,7 +1775,7 @@ size_t Meca::nbNonZeros(real threshold) const
  The matrix should be preallocated of size `dim`, which should be equal
  to the system's dimension().
  */
-void Meca::getSystem(size_t dim, real * mat) const
+void Meca::getMatrix(size_t dim, real * mat) const
 {
     if ( dim != dimension() )
         throw InvalidIO("wrong matrix dimension");
@@ -1811,7 +1804,7 @@ void Meca::getSystem(size_t dim, real * mat) const
  https://math.nist.gov/MatrixMarket/formats.html
  This is a Sparse text format
  */
-void Meca::saveSystem(FILE * file, real threshold) const
+void Meca::saveMatrix(FILE * file, real threshold) const
 {
     fprintf(file, "%%%%MatrixMarket matrix coordinate real general\n");
     fprintf(file, "%% This is a matrix produced by Cytosim\n");
@@ -1854,10 +1847,11 @@ void Meca::saveRHS(FILE * file) const
         fprintf(file, "%f\n", vRHS[i]);
 }
 
+
 /**
  Save the full matrix associated with multiply(), in binary format
  */
-void Meca::dumpSystem(FILE * file) const
+void Meca::dumpMatrix(FILE * file) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -1940,7 +1934,7 @@ void Meca::dumpMobility(FILE * file) const
             const size_t inx = DIM * mec->matIndex();
             // this includes the mobility, but not the time_step:
             mec->projectForces(src+inx, res+inx);
-            blas::xscal(DIM*mec->nbPoints(), mec->leftoverDrag(), res+inx, 1);
+            blas::xscal(DIM*mec->nbPoints(), 1.0/mec->leftoverDrag(), res+inx, 1);
         }
         // write column to file directly:
         fwrite(res, sizeof(real), dim, file);
@@ -2072,7 +2066,7 @@ void Meca::dump() const
     fclose(f);
     
     f = fopen("sys.bin", "wb");
-    dumpSystem(f);
+    dumpMatrix(f);
     fclose(f);
     
     f = fopen("ela.bin", "wb");
