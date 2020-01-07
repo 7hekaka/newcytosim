@@ -523,7 +523,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
     }
     catch ( InvalidParameter& e )
     {
-        e << "\n" << StreamFunc::marked_line(is, isp, PREF);
+        e << StreamFunc::marked_line(is, isp, PREF);
         throw;
     }
     return pos;
@@ -747,7 +747,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
     }
     catch ( InvalidParameter& e )
     {
-        e << "\n" << StreamFunc::marked_line(is, isp, PREF);
+        e << StreamFunc::marked_line(is, isp, PREF);
         throw;
     }
     return dir;

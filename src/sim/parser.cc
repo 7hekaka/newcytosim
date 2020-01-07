@@ -1171,7 +1171,6 @@ void Parser::evaluate(std::istream& is)
     }
     catch( Exception & e )
     {
-        e << ":\n";
         e << StreamFunc::get_lines(is, ipos, is.tellg());
         throw;
     }

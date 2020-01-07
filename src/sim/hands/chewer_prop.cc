@@ -72,7 +72,7 @@ void ChewerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     real a = mobility_dt * stiff * mul;
     if ( a > 1.0 )
     {
-        InvalidParameter e("unstable chewer\n");
+        InvalidParameter e("unstable chewer");
         e << "simulating `" << name() << "' may fail as:\n";
         e << PREF << "mobility = " << diffusion / kT << '\n';
         e << PREF << "mobility * stiffness * time_step = " << a << '\n';

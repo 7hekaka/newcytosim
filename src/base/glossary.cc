@@ -426,9 +426,9 @@ void Glossary::add_entry(Glossary::pair_type& pair, int no_overwrite)
                     rec[i] = pair.second[i];
                 else if ( pair.second[i].value_ != rec[i].value_  &&  no_overwrite > 1 )
                 {
-                    InvalidSyntax e("conflicting definitions:\n");
-                    e << PREF << format(*w) << "\n";
-                    e << PREF << format(pair) << "\n";
+                    InvalidSyntax e("conflicting definitions");
+                    e << PREF << format(*w) << '\n';
+                    e << PREF << format(pair) << '\n';
                     throw e;
                 }
             }
@@ -541,7 +541,7 @@ void Glossary::read_entry(std::istream& is, int no_overwrite)
     }
     catch( Exception& e )
     {
-        e << "\n" << StreamFunc::marked_line(is, isp, PREF);
+        e << StreamFunc::marked_line(is, isp, PREF);
         throw;
     }
     
@@ -661,8 +661,8 @@ int Glossary::read_strings(int argc, char* argv[], int no_overwrite)
         }
         catch( Exception & e )
         {
-            print_magenta(std::cerr, "Error: "+e.brief());
-            std::cerr << e.info() << '\n';
+            print_magenta(std::cerr, "Error: "+e.brief()+":");
+            std::cerr << '\n' << e.info() << '\n';
             res = 1;
         }
     }

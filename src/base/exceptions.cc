@@ -3,6 +3,6 @@
 #include "exceptions.h"
 
 
-/// This is used to align text in the error messages
-const char PREF[] = "          | ";
+/// This is used to align text in error messages
+const char PREF[] = "          : ";
 

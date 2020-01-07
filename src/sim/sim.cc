@@ -120,8 +120,8 @@ int main(int argc, char* argv[])
         simul.initialize(arg);
     }
     catch( Exception & e ) {
-        print_magenta(std::cerr, "Error: "+e.brief());
-        std::cerr << e.info() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief()+":");
+        std::cerr << '\n' << e.info() << '\n';
         return EXIT_FAILURE;
     }
     catch(...) {
@@ -137,8 +137,8 @@ int main(int argc, char* argv[])
             std::cerr << "You must specify a config file\n";
     }
     catch( Exception & e ) {
-        print_magenta(std::cerr, "Error: "+e.brief());
-        std::cerr << e.info() << '\n';
+        print_magenta(std::cerr, "Error: "+e.brief()+":");
+        std::cerr << '\n' << e.info() << '\n';
         return EXIT_FAILURE;
     }
     catch(...) {

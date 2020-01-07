@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         }
         catch( Exception & e ) {
             std::clog << "Error in frame " << frm << ":\n";
-            std::clog << "    " << e.what() << std::endl;
+            std::clog << "    " << e.what() << '\n';
         }
 
         if ( skip_set )
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         }
         catch( Exception & e ) {
             std::clog << "Error writing `" << output << "' :\n";
-            std::clog << "    " << e.what() << std::endl;
+            std::clog << "    " << e.what() << '\n';
             return EXIT_FAILURE;
         }
         if ( has_frame && frm == frame )

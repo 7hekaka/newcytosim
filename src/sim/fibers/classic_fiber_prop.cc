@@ -80,7 +80,7 @@ void ClassicFiberProp::read(Glossary& glos)
             catastrophe_rate[1] = 0;
         }
         if ( glos.peek(x, "growing_speed", 1) && x != 0 )
-            throw InvalidParameter("fiber:growing_speed[1] was renamed growing_off_speed[0]\n");
+            throw InvalidParameter("fiber:growing_speed[1] was renamed growing_off_speed[0]");
     }
 
     int f = 0;
