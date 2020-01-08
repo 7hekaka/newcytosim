@@ -10,8 +10,9 @@
  The parameters BeadSet and BeadProp define the inner volume for this Space
 */
 SpaceBeads::SpaceBeads(SpaceProp const* p)
-: Space(p)
+: Space(p), mBeadProp(nullptr)
 {
+    mBeadName = "undefined";
     for ( int d = 0; d < 3; ++d )
     {
         bbMin[d] = 0;
@@ -19,41 +20,28 @@ SpaceBeads::SpaceBeads(SpaceProp const* p)
     }
 }
 
+
+void SpaceBeads::setBeads()
+{
+    Simul const& sim = simul();
+    mBeadProp = sim.findProperty<BeadProp>("bead", mBeadName);
+
+    mBeads.clear();
+    for ( Bead * b = sim.beads.first(); b; b=b->next() )
+    {
+        if ( b->property() == mBeadProp )
+            mBeads.push_back(b);
+    }
+    std::clog << "SpaceBeads has " << mBeads.size() << " beads\n";
+}
+
+
 /**
  refresh the list of Beads 
  */
 void SpaceBeads::resize(Glossary& opt)
 {
-    if ( objset() )
-    {
-        std::string name;
-        opt.set(name, "bead");
-        Simul const& sim = simul();
-        Property * bip = sim.properties.find("bead", name);
-
-        mBeads.clear();
-        if ( !bip )
-        {
-            for ( Bead * bd = sim.beads.first(); bd; bd=bd->next() )
-                mBeads.push_back(bd);
-        }
-        else
-        {
-            for ( Bead * bd = sim.beads.first(); bd; bd=bd->next() )
-            {
-                if ( bd->property() == bip )
-                    mBeads.push_back(bd);
-            }
-        }
-#if ( 1 )
-        static size_t nb = 0;
-        if ( nb != mBeads.size() )
-        {
-            nb = mBeads.size();
-            std::clog << "SpaceBeads has " << nb << " beads\n";
-        }
-#endif
-    }
+    opt.set(mBeadName, "bead") || opt.set(mBeadName, "beads");
 }
 
 /**
@@ -77,12 +65,13 @@ void SpaceBeads::setBoundaries()
             bbMax[d] = std::max(bbMax[d], pos[d]+rad);
         }
     }
-    //std::clog << "SpaceBeads::bounding " << bbMin[0] << "  " << bbMax[0] << std::endl;
+    //std::clog << "SpaceBeads::boundaries " << bbMin[0] << "  " << bbMax[0] << std::endl;
 }
 
 
 void SpaceBeads::step()
 {
+    if ( !mBeadProp ) setBeads();
     setBoundaries();
 }
 
