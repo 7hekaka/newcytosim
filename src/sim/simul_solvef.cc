@@ -25,7 +25,8 @@ void Simul::solve_flux()
             fib->translate( Vector( shift, 0, 0) );
     }
 #else
-    throw InvalidParameter("simul:flux_speed is not emabled");
+    std::cerr << "ERROR: simul:flux_speed is not enabled\n";
+    throw InvalidParameter("simul:flux_speed is not enabled");
 #endif
 }
 
