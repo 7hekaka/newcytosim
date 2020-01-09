@@ -25,7 +25,7 @@ void Simul::solve_flux()
             fib->translate( Vector( shift, 0, 0) );
     }
 #else
-    std::cerr << "ERROR: simul:flux_speed is not enabled\n";
+    std::cerr << "ERROR: OLD_SPINDLE_FLUX is not enabled\n";
     throw InvalidParameter("simul:flux_speed is not enabled");
 #endif
 }

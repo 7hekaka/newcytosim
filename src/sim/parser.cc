@@ -893,7 +893,7 @@ void Parser::parse_report(std::istream& is)
     std::string file = Tokenizer::get_filename(is);
 
     if ( file.empty() )
-        throw InvalidSyntax("missing/invalid file name after 'report'");
+        throw InvalidSyntax("missing file name. Expected 'report WHAT FILE'");
     
     std::string blok = Tokenizer::get_block(is, '{');
     
