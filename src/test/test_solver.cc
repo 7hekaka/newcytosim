@@ -68,7 +68,7 @@ public:
             // skip comments:
         } while ( str[0] == '%' );
         // parse dimension line:
-        printf(" reading matrix > %s", str);
+        printf(" reading matrix: %s", str);
         size_t lin = strtoul(str, &ptr, 10);
         size_t col = strtoul(ptr, &ptr, 10);
         size_t cnt = strtoul(ptr, &ptr, 10);
@@ -112,7 +112,7 @@ int readVector(FILE * file, size_t dim, real * vec)
         // skip comments:
     } while ( str[0] == '%' );
     // parse dimension line:
-    printf(" reading vector > %s", str);
+    printf(" reading vector: %s", str);
     size_t cnt = strtoul(str, 0, 10);
     for ( size_t i = 0; i < cnt; ++i )
     {
