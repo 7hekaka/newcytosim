@@ -75,10 +75,11 @@ new 200 complex
 new event
 {
     delay = 1;
-    code = "report fiber:tension *"
+    code = "report fiber:tension tension.txt"
 }
 
 run 100000 system
 {
+	nb_frames = 100
 }
 
