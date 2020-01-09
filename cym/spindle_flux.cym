@@ -68,7 +68,7 @@ new chromosomes
 
 set fiber microtubule
 {
-    length = 0.1
+    min_length = 0.1
     rigidity = 20
     segmentation = 1
     steric = 1, 0.04, 0.01

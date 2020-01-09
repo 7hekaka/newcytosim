@@ -1,5 +1,5 @@
-% A contractile network
-% Dec 2015
+% A contractile network in half_periodic box
+% FJN, 01.2020
 
 set simul system
 {
@@ -11,18 +11,19 @@ set system display { style=2; point_size=5; }
 
 set space cell
 {
-    shape = circle
+    shape = half_periodic
 }
 
 new cell
 {
-    radius = 7
+    length = 10, 2
 }
 
 set fiber filament
 {
     rigidity = 0.5
     segmentation = 0.25
+    confine = inside, 100
     display = ( line=0.5, 1; color=gray; )
 }
 
@@ -62,16 +63,22 @@ set couple crosslinker
     fast_diffusion = 1
 }
 
-new 250 filament
+new 125 filament
 {
     length = 5
+    placement = all_inside
 }
 
 new 2000 crosslinker
 new 1000 complex
 
+new event
+{
+    delay = 1;
+    code = "report fiber:tension *"
+}
+
 run 100000 system
-{   
-    nb_frames = 50
+{
 }
 
