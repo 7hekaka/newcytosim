@@ -1,10 +1,10 @@
 % A contractile network in half_periodic box
-% FJN, 01.2020
+% FJN, 09.01.2020
 
 set simul system
 {
     time_step = 0.001
-    viscosity = 0.2
+    viscosity = 0.5
 }
 
 set system display { style=2; point_size=5; }
@@ -22,7 +22,7 @@ new cell
 set fiber filament
 {
     rigidity = 0.5
-    segmentation = 0.25
+    segmentation = 0.1
     confine = inside, 100
     display = ( line=0.5, 1; color=gray; )
 }
@@ -50,7 +50,7 @@ set couple complex
 set hand binder
 {
     binding = 10, 0.02
-    unbinding = 0.2, inf
+    unbinding = 0.1, inf
     display = ( width=0.5; color=blue; )
 }
 
@@ -63,14 +63,14 @@ set couple crosslinker
     fast_diffusion = 1
 }
 
-new 125 filament
+new 60 filament
 {
-    length = 5
+    length = 4
     placement = all_inside
 }
 
-new 2000 crosslinker
-new 1000 complex
+new 200 crosslinker
+new 200 complex
 
 new event
 {
