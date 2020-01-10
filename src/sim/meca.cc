@@ -1572,7 +1572,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     //size_t mem = dimension() * (64+2) * sizeof(real);
     //std::clog << "GMRES mem " << (mem >> 20) << "MB\n";
     fprintf(stderr, "System size %6i precondition %i", dimension(), precond);
-    fprintf(stderr, "    Solver count %4i  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    Solver count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with GMRES using different restart parameters
@@ -1581,7 +1581,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         monitor.reset();
         zero_real(dimension(), vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator, mH, mV, temporary);
-        fprintf(stderr, "    GMRES-%i  count %4i  residual %.3e\n", RS, monitor.count(), monitor.residual());
+        fprintf(stderr, "    GMRES-%i  count %4lu  residual %.3e\n", RS, monitor.count(), monitor.residual());
     }
 #endif
 #if ( 0 )
@@ -1597,21 +1597,21 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs      count %4i  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    bcgs      count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
     
     //------- in case the solver did not converge, we try other methods:
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("Solver failed: precond %i flag %i count %4i residual %.3e\n",
+        Cytosim::out("Solver failed: precond %i flag %i count %4lu residual %.3e\n",
             precond, monitor.flag(), monitor.count(), monitor.residual());
         
         // try with different initial seed: vRHS
         monitor.reset();
         copy_real(dimension(), vRHS, vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-        Cytosim::out("     seed: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+        Cytosim::out("     seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
         
         if ( !monitor.converged() )
         {
@@ -1622,14 +1622,14 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             {
                 // try with the other method:
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGSP: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {
                 // try with a preconditioner
                 computePreconditionner();
                 LinearSolvers::GMRES(*this, vRHS, vSOL, 127, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    GMRES: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
                 if ( !monitor.converged() )
                 {
                     // try with other method:
@@ -1645,7 +1645,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
                 monitor.reset();
                 zero_real(dimension(), vSOL);
                 LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES(256): count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    GMRES(256): count %4lu residual %.3e\n", monitor.count(), monitor.residual());
                 
                 if ( !monitor.converged() )
                 {
