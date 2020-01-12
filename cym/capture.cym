@@ -5,7 +5,6 @@ set simul system
 {
     time_step = 0.02
     viscosity = 1
-    steric = 0, 500
 }
 
 set space cell
@@ -36,7 +35,6 @@ set single kinetochore
 set solid chromosome
 {
     confine = inside, 100
-    steric = 1
     display = ( style=7; color=0xFFFFFF44; width=1; )
 }
 
