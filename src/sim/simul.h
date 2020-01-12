@@ -38,7 +38,7 @@ class Simul
 public:
     
     /// Meca used to set and integrate the equations of motion of Mecables
-    mutable Meca    sMeca;
+    mutable Meca      sMeca;
     
     /// grid used for attachment of Hand to Fiber
     mutable FiberGrid fiberGrid;
@@ -47,7 +47,7 @@ public:
     mutable PointGrid pointGrid;
     
     /// Meca used to solve the system with option 'solve=horizontal'
-    Meca1D *        pMeca1D;
+    Meca1D *          pMeca1D;
 
 private:
     
@@ -108,7 +108,7 @@ public:
     /// list of Events in the Simulation
     EventSet        events;
     
-    //-------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     
     /// constructor
     Simul();
@@ -116,7 +116,7 @@ public:
     /// destructor
     virtual ~Simul();
         
-    //-------------------------------------------------------------------------------
+    //----------------------------- POPULATING ---------------------------------
     
     /// add Object to Simulation
     void            add(Object *);
@@ -141,34 +141,24 @@ public:
 
     /// reset simulation world (clear all sub-lists and variables)
     void            erase();
-    
-    //-------------------------------------------------------------------------------
 
     /// total number of objects in the Simulation
     size_t          nbObjects() const;
 
-    /// time in the simulated world
-    real            time()   const;
-    
-    //-------------------------------------------------------------------------------
+    //----------------------------- SIMULATING ---------------------------------
    
     /// perform basic initialization; register callbacks
     void            initialize(Glossary&);
-    
-    /// return first Space with given name
-    Space const*    findSpace(std::string const& name) const;
-
-    /// call foldPosition() for all objects (implements periodic boundary conditions)
-    void            foldPosition() const;
-    
-    //-------------------------------------------------------------------------------
     
     /// ready the engine for a subsequent call to `step()` and `solve()`
     void            prepare();
     
     /// perform one Monte-Carlo step, corresponding to `time_step`
     void            step();
-    
+
+    /// time in the simulated world
+    real            time()   const;
+
     /// this is called after a sequence of `step()` have been done
     void            relax();
     
@@ -185,6 +175,9 @@ public:
     /// display Meca's links
     void            drawLinks();
     
+    /// call foldPosition() for all objects (implements periodic boundary conditions)
+    void            foldPosition() const;
+
     /// simulate the mechanics of the system and move Mecables accordingly, corresponding to `time_step`
     void            solve();
     
@@ -206,7 +199,7 @@ public:
     /// calculate Forces and Lagrange multipliers on the Mecables, but do not move them
     void            computeForces() const;
     
-    /// dump matrix and vector from Meca
+    /// dump matrix and vector from Meca in a format that can be read in MATLAB
     void            dump() const;
     
     /// dump system matrix in sparse text format
@@ -232,21 +225,22 @@ private:
     /// add steric interactions between spheres, solids and fibers to Meca
     void            setStericInteractions(Meca&) const;
     
-    //-------------------------------------------------------------------------------
-    /// Function used to parse the config file, and to read state from a file:
-    //-------------------------------------------------------------------------------
-
+    //----------------------------- PARSING ------------------------------------
+    
     /// return the ObjectSet corresponding to this Tag in the simulation (used for IO)
     ObjectSet*      findSetT(const ObjectTag);
-    
+
 public:
     
-    /// convert Object to Mecable* if the conversion seems valid; returns 0 otherwise
-    static Mecable* toMecable(Object *);
-    
+    /// Parse a text containing cytosim commands
+    void            evaluate(std::string const&);
+
     /// return the ObjectSet corresponding to a class
     ObjectSet*      findSet(const std::string& cat);
     
+    /// convert Object to Mecable* if the conversion seems valid; returns 0 otherwise
+    static Mecable* toMecable(Object *);
+
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
     Mecable*        findMecable(const std::string& spec) const;
     
@@ -258,6 +252,11 @@ public:
     
     /// find a Fiber
     Sphere *        findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
+    
+    /// return first Space with given name
+    Space const*    findSpace(std::string const& name) const;
+    
+    //---------------------------- PROPERTIES ----------------------------------
 
     /// read an Object reference and return the corresponding Object (`tag` is set)
     Object*         readReference(Inputter&, ObjectTag& tag);
@@ -302,17 +301,17 @@ public:
     
     /// export all Properties to a new file with specified name
     void      writeProperties(char const* filename, bool prune) const;
+    
+    /// load the properties contained in the standard output property file
+    void      loadProperties();
 
-    //-------------------------------------------------------------------------------
+    //---------------------------- LOAD OBJECTS --------------------------------
     
     /// current file format
     const static int currentFormatID = 52;
     
     /// class for reading trajectory file
     class     InputLock;
-    
-    /// load the properties contained in the standard output property file
-    void      loadProperties();
     
     /// read objects from file, and add them to the simulation state
     int       readObjects(Inputter&, ObjectSet* subset);
@@ -332,7 +331,7 @@ public:
     /// write sim-world in binary or text mode, appending to existing file or creating new file
     void      writeObjects(std::string const& filename, bool append, bool binary) const;
     
-    //-------------------------------------------------------------------------------
+    //----------------------------- REPORTING ----------------------------------
 
     /// call `Simul::report0`, adding lines before and after with 'start' and 'end' tags.
     void      report(std::ostream&, std::string, Glossary&) const;
@@ -497,7 +496,7 @@ public:
     /// print something about Fields
     void      reportField(std::ostream&) const;
     
-    //-------------------------------------------------------------------------------
+    //------------------------------ CUSTOM ------------------------------------
     
     /// flag fibers according to connectivity defined by Couple of given type
     void      flagClustersCouples(Property const*) const;

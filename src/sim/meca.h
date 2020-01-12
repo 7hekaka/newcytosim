@@ -559,16 +559,16 @@ public:
     size_t nbNonZeros(real threshold) const;
 
     /// Extract the complete dynamic matrix in column-major format in a C-array
-    void getSystem(size_t, real * matrix) const;
+    void getMatrix(size_t, real * matrix) const;
     
     /// Save complete matrix in Matrix Market format
-    void saveSystem(FILE *, real threshold) const;
+    void saveMatrix(FILE *, real threshold) const;
     
     /// Save right-hand-side vector
     void saveRHS(FILE *) const;
 
     /// Save complete matrix in binary format
-    void dumpSystem(FILE *) const;
+    void dumpMatrix(FILE *) const;
     
     /// Save elasticity matrix in binary format
     void dumpElasticity(FILE *) const;

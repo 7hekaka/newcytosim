@@ -100,6 +100,14 @@ void print_line(std::ostream& os, size_t num, std::string const& line)
 /**
  The alignment of the vertical bar should match the one in PREF
  */
+void print_first_line(std::ostream& os, size_t num, std::string const& line)
+{
+    os << " in" << std::setw(6) << num << " | " << line << '\n';
+}
+
+/**
+ The alignment of the vertical bar should match the one in PREF
+ */
 void print_line(std::ostream& os, const char prefix[], std::string const& line)
 {
     if ( prefix && *prefix )
@@ -183,7 +191,7 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
         ++cnt;
     }
 
-    print_line(os, cnt, line);
+    print_first_line(os, cnt, line);
     while ( is.good() &&  is.tellg() < end )
     {
         std::getline(is, line);

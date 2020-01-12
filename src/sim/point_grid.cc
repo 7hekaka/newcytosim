@@ -92,7 +92,7 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
     //we check that the grid would correctly detect collision of two particles
     if ( max_diameter < 2 * rg - REAL_EPSILON )
     {
-        InvalidParameter e("simul:steric_max_range is too short\n");
+        InvalidParameter e("simul:steric_max_range is too short");
         e << PREF << "steric_max_range should be greater than 2 * ( particle_radius + extra_range )\n";
         e << PREF << "= " << 2 * rg << " for some particles\n";
         throw e;
@@ -116,9 +116,9 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
     real diag = sqrt( fl.len() * fl.len() + 4 * rg * rg );
     if ( max_diameter < diag - REAL_EPSILON )
     {
-        InvalidParameter("simul:steric_max_range is too short\n");
+        InvalidParameter("simul:steric_max_range is too short");
         e << PREF << "steric_max_range should be greater than sqrt( sqr(segment_length) + 4*sqr(range) )\n";
-        e << PREF << "where normally segment_length ~ 4/3 segmentation\n";
+        e << PREF << "with segment_length ~ 4/3 segmentation\n";
         e << PREF << "= " << diag << " for some fibers\n";
         throw e;
     }

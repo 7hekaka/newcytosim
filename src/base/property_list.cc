@@ -129,7 +129,7 @@ Property * PropertyList::find_or_die(std::string const& nom) const
 
     if ( !p )
     {
-        InvalidSyntax e("unknown class `"+nom+"'\n");
+        InvalidSyntax e("unknown class `"+nom+"'");
         e << all_names(PREF);
         throw e;
     }
@@ -174,7 +174,7 @@ Property * PropertyList::find_or_die(std::string const& cat, std::string const& 
     
     if ( !res )
     {
-        InvalidSyntax e("unknown "+cat+" class `"+nom+"'\n");
+        InvalidSyntax e("unknown "+cat+" class `"+nom+"'");
         e << all_names(PREF);
         throw e;
     }
@@ -189,7 +189,7 @@ Property * PropertyList::find_or_die(std::string const& cat, const size_t num) c
     
     if ( !res )
     {
-        InvalidSyntax e("unknown class `"+cat+std::to_string(num)+"'\n");
+        InvalidSyntax e("unknown class `"+cat+std::to_string(num)+"'");
         e << all_names(PREF);
         throw e;
     }

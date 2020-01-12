@@ -31,7 +31,7 @@ protected:
 public:
     
     /// construct and associates with given Simul
-    Interface(Simul& s);
+    Interface(Simul&);
     
     //-------------------------------------------------------------------------------
     
@@ -40,12 +40,6 @@ public:
      It provides an opportunity to stop or to display the simulation world
      */
     virtual void hold() {}
-    
-    /// Parse a text containing cytosim commands
-    /**
-     This is defined in the derived class Parser
-     */
-    virtual void evaluate(std::string const&) = 0;
     
     //-------------------------------------------------------------------------------
     

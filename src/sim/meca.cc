@@ -188,7 +188,7 @@ size_t Meca::largestMecable() const
      F <- B + mB * X + mC * X
 
  If `B == 0`, this term is ommited. With `B = vBAS` and `X = vPTS`, this
- effectively calculates the forces in the system in `F`:
+ function calculates the forces in the system in `F`:
  
      F <- vBAS + mB * vPTS + mC * vPTS
 
@@ -267,7 +267,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     mec->projectForces(Y+inx, Y+inx);
 
     // Y <- X + alpha * Y
-    blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
 }
 
 
@@ -307,7 +307,7 @@ void Meca::multiply(const real* X, real* Y) const
     #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 #endif
 }
@@ -339,14 +339,14 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
         // T <- P * T
         mec->projectForces(T+inx, T+inx);
         // X <- X + alpha * T = X + alpha * P * FORCE
-        blas::xaxpy(bks, -time_step/mec->leftoverDrag(), T+inx, 1, Y+inx, 1);
+        blas::xaxpy(bks, -time_step*mec->leftoverMobility(), T+inx, 1, Y+inx, 1);
     }
     else
     {
         // Y <- P * T
         mec->projectForces(T+inx, Y+inx);
         // Y <- X + alpha * Y = X + alpha * P * FORCE
-        blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 
     if ( mec->useBlock() )
@@ -407,7 +407,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
     // Y <- P * Y
     mec->projectForces(Y+inx, Y+inx);
     // Y <- X + alpha * Y = X + alpha * P * FORCE
-    blas::xpay(bks, X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+    blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     
     if ( mec->useBlock() )
     {
@@ -469,7 +469,7 @@ void Meca::multiply(const real* X, real* Y) const
 #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step/mec->leftoverDrag(), Y+inx);
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 }
 #endif
@@ -865,7 +865,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
         mec->projectForces(res+bs*i, res+bs*i);
     
     // scale
-    real beta = -time_step / mec->leftoverDrag();
+    real beta = -time_step * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < bs*bs; ++n )
         res[n] = beta * res[n];
@@ -1358,7 +1358,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
     mec->projectForces(fff, rhs);
     
     // rhs <- beta * rhs, resulting in time_step * P * vFOR:
-    blas::xscal(DIM*mec->nbPoints(), beta/mec->leftoverDrag(), rhs, 1);
+    blas::xscal(DIM*mec->nbPoints(), beta*mec->leftoverMobility(), rhs, 1);
 
     /*
      In this case, `fff` contains the true force in each vertex of the system
@@ -1572,7 +1572,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     //size_t mem = dimension() * (64+2) * sizeof(real);
     //std::clog << "GMRES mem " << (mem >> 20) << "MB\n";
     fprintf(stderr, "System size %6i precondition %i", dimension(), precond);
-    fprintf(stderr, "    Solver count %4i  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    Solver count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with GMRES using different restart parameters
@@ -1581,44 +1581,37 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         monitor.reset();
         zero_real(dimension(), vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator, mH, mV, temporary);
-        fprintf(stderr, "    GMRES-%i  count %4i  residual %.3e\n", RS, monitor.count(), monitor.residual());
+        fprintf(stderr, "    GMRES-%i  count %4lu  residual %.3e\n", RS, monitor.count(), monitor.residual());
     }
 #endif
 #if ( 0 )
     // enable this to compare BCGS and GMRES
+    fprintf(stderr, "    BCGS     count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
     monitor.reset();
     zero_real(dimension(), vSOL);
-    if ( precond )
-    {
-        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-        fprintf(stderr, "    BCGS     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
-    }
-    else
-    {
-        LinearSolvers::GMRES(*this, vRHS, vSOL, 8, monitor, allocator, mH, mV, temporary);
-
-    }
+    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
+    fprintf(stderr, "    GMRES-64 count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs      count %4i  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    bcgs      count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
     
     //------- in case the solver did not converge, we try other methods:
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("Solver failed: precond %i flag %i count %4i residual %.3e\n",
+        Cytosim::out("Solver failed: precond %i flag %i count %4lu residual %.3e\n",
             precond, monitor.flag(), monitor.count(), monitor.residual());
         
         // try with different initial seed: vRHS
         monitor.reset();
         copy_real(dimension(), vRHS, vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-        Cytosim::out("     seed: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+        Cytosim::out("     seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
         
         if ( !monitor.converged() )
         {
@@ -1629,14 +1622,14 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             {
                 // try with the other method:
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGSP: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {
                 // try with a preconditioner
                 computePreconditionner();
                 LinearSolvers::GMRES(*this, vRHS, vSOL, 127, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    GMRES: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
                 if ( !monitor.converged() )
                 {
                     // try with other method:
@@ -1652,7 +1645,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
                 monitor.reset();
                 zero_real(dimension(), vSOL);
                 LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES(256): count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    GMRES(256): count %4lu residual %.3e\n", monitor.count(), monitor.residual());
                 
                 if ( !monitor.converged() )
                 {
@@ -1782,7 +1775,7 @@ size_t Meca::nbNonZeros(real threshold) const
  The matrix should be preallocated of size `dim`, which should be equal
  to the system's dimension().
  */
-void Meca::getSystem(size_t dim, real * mat) const
+void Meca::getMatrix(size_t dim, real * mat) const
 {
     if ( dim != dimension() )
         throw InvalidIO("wrong matrix dimension");
@@ -1811,7 +1804,7 @@ void Meca::getSystem(size_t dim, real * mat) const
  https://math.nist.gov/MatrixMarket/formats.html
  This is a Sparse text format
  */
-void Meca::saveSystem(FILE * file, real threshold) const
+void Meca::saveMatrix(FILE * file, real threshold) const
 {
     fprintf(file, "%%%%MatrixMarket matrix coordinate real general\n");
     fprintf(file, "%% This is a matrix produced by Cytosim\n");
@@ -1854,10 +1847,11 @@ void Meca::saveRHS(FILE * file) const
         fprintf(file, "%f\n", vRHS[i]);
 }
 
+
 /**
  Save the full matrix associated with multiply(), in binary format
  */
-void Meca::dumpSystem(FILE * file) const
+void Meca::dumpMatrix(FILE * file) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -1940,7 +1934,7 @@ void Meca::dumpMobility(FILE * file) const
             const size_t inx = DIM * mec->matIndex();
             // this includes the mobility, but not the time_step:
             mec->projectForces(src+inx, res+inx);
-            blas::xscal(DIM*mec->nbPoints(), mec->leftoverDrag(), res+inx, 1);
+            blas::xscal(DIM*mec->nbPoints(), mec->leftoverMobility(), res+inx, 1);
         }
         // write column to file directly:
         fwrite(res, sizeof(real), dim, file);
@@ -2072,7 +2066,7 @@ void Meca::dump() const
     fclose(f);
     
     f = fopen("sys.bin", "wb");
-    dumpSystem(f);
+    dumpMatrix(f);
     fclose(f);
     
     f = fopen("ela.bin", "wb");

@@ -829,11 +829,11 @@ void Fiber::setDragCoefficient()
 
     //the forces are distributed equally on all points, hence we multiply by nPoints
     assert_true( nPoints > 0 );
-    rfDragPoint = drag / (real)nPoints;
+    rfPointMobility = nPoints / drag;
     
 #if ( 0 )
     Cytosim::log << "Fiber L = " << std::setw(7) << length();
-    Cytosim::log << " drag = " << drag << " drag_point " << rfDragPoint << std::endl;
+    Cytosim::log << " drag = " << drag << " point_mobility " << rfPointMobility << std::endl;
 #endif
 }
 
@@ -845,7 +845,7 @@ void Fiber::prepareMecable()
     makeProjection();
     //printProjection(std::clog);
     
-    assert_true( rfDragPoint > REAL_EPSILON );
+    assert_true( rfPointMobility > REAL_EPSILON );
 
     // the scaling of the bending elasticity depends on the length of the segments
     rfRigidity = prop->rigidity / segmentationCube();

@@ -68,7 +68,7 @@ public:
             // skip comments:
         } while ( str[0] == '%' );
         // parse dimension line:
-        printf(" reading matrix > %s", str);
+        printf(" reading matrix: %s", str);
         size_t lin = strtoul(str, &ptr, 10);
         size_t col = strtoul(ptr, &ptr, 10);
         size_t cnt = strtoul(ptr, &ptr, 10);
@@ -112,7 +112,7 @@ int readVector(FILE * file, size_t dim, real * vec)
         // skip comments:
     } while ( str[0] == '%' );
     // parse dimension line:
-    printf(" reading vector > %s", str);
+    printf(" reading vector: %s", str);
     size_t cnt = strtoul(str, 0, 10);
     for ( size_t i = 0; i < cnt; ++i )
     {
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
         sys.multiply(sol, vec);
         blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
         real res = blas::nrm2(dim, vec);
-        fprintf(stdout, " BiCGStab count %4i  residual %10.6f\n", mon.count(), res);
+        fprintf(stdout, " BiCGStab count %4lu  residual %10.6f\n", mon.count(), res);
     }
 
     for ( int RS : {2, 4, 8, 16, 32, 64, 128} )
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
         sys.multiply(sol, vec);
         blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
         real res = blas::nrm2(dim, vec);
-        fprintf(stdout, " GMRES%03i count %4i  residual %10.6f\n", RS, mon.count(), res);
+        fprintf(stdout, " GMRES%03i count %4lu  residual %10.6f\n", RS, mon.count(), res);
     }
 
     free_real(sol);

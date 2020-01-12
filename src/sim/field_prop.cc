@@ -93,7 +93,7 @@ void FieldProp::complete(Simul const& sim)
     
     if ( sim.ready()  &&  theta > 0.5 )
     {
-        InvalidParameter e("field:diffusion is too fast\n");
+        InvalidParameter e("field:diffusion is too fast");
         e << "The CFL condition ( diffusion * time_step / step^2 ) must be below 1/2,";
         e << "\n  but it is " + std::to_string(theta) + "\n";
         throw e;

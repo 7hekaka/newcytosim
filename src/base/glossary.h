@@ -164,7 +164,7 @@ private:
             }
         }
  
-        InvalidParameter e("could not set `"+key+"' from `"+val+"'\n");
+        InvalidParameter e("could not set `"+key+"' from `"+val+"'");
         e << "Known values are:\n";
         for ( auto const& kv : dict )
             e << PREF << kv.first << " = " << kv.second << '\n';

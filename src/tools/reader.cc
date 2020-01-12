@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::clog << "Aborted: " << e.what() << std::endl;
+        std::clog << "Aborted: " << e.what() << '\n';
         return EXIT_FAILURE;
     }
     

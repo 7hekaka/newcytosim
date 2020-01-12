@@ -390,7 +390,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::cerr << "Aborted: " << e.what() << std::endl;
+        std::cerr << "Aborted: " << e.what() << '\n';
         return EXIT_FAILURE;
     }
     

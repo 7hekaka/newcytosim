@@ -5,7 +5,7 @@
 
 #include "space.h"
 #include "array.h"
-
+#include "bead_prop.h"
 
 class Bead;
 
@@ -18,6 +18,7 @@ class Bead;
  
     bead = BEAD_NAME
  
+ This code in inherited from an old (unfinished) mitotic spindle project.
  The implementation is quite incomplete, as only inside() works.
  */
 
@@ -25,13 +26,19 @@ class SpaceBeads : public Space
 {    
     typedef Array<Bead*> BeadList;
     
-    BeadList        mBeads;
+    BeadProp *  mBeadProp;
     
-    real            bbMin[3];
-    real            bbMax[3];
+    BeadList    mBeads;
+    
+    real        bbMin[3];
+    real        bbMax[3];
 
+    std::string mBeadName;
+    
     /// set bounding box
     void        setBoundaries();
+    /// set mBeads
+    void        setBeads();
     
 public:
 

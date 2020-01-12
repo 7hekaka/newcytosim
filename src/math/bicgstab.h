@@ -114,7 +114,7 @@ namespace LinearSolvers
         mat.multiply(sol, r0);
         blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
         real resid = blas::nrm2(dim, r0);
-        fprintf(stderr, "BCGS  %4i count %4i residual %10.6f\n", dim, monitor.count(), resid);
+        fprintf(stderr, "BCGS  %4i count %4lu residual %10.6f\n", dim, monitor.count(), resid);
 #endif
         allocator.release();
     }
@@ -228,7 +228,7 @@ namespace LinearSolvers
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
         real resid = blas::nrm2(dim, r);
-        fprintf(stderr, "BCGSP count %4i residual %10.6f\n", monitor.count(), resid);
+        fprintf(stderr, "BCGSP count %4lu residual %10.6f\n", monitor.count(), resid);
 #endif
         
         allocator.release();
@@ -326,7 +326,7 @@ namespace LinearSolvers
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
         real resid = blas::nrm2(dim, r);
-        fprintf(stderr, "bicgs %4i count %4i residual %10.6f\n", dim, monitor.count(), resid);
+        fprintf(stderr, "bicgs %4i count %4lu residual %10.6f\n", dim, monitor.count(), resid);
 #endif
         allocator.release();
     }

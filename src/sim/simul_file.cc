@@ -618,12 +618,12 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             {
                 if ( section.size() )
                 {
-                    std::cerr << "Error in section " << section << ": " << e.what() << std::endl;
+                    std::cerr << "Error in section " << section << ": " << e.what() << '\n';
                     if ( objset )
                         in.skip_until("#section ");
                 }
                 else
-                    std::cerr << "Error : " << e.what() << std::endl;
+                    std::cerr << "Error : " << e.what() << '\n';
             }
         }
     }

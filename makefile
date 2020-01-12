@@ -151,14 +151,13 @@ cleaner:
 
 
 sterile:
-	rm -rf build/*
-	rm -rf lib/*
-	rm -f  dep/*.dep
-	rm -rf bin/*.dSYM
-	rm -rf bin/*
-	rm -rf bin1/*
-	rm -rf bin2/*
-	rm -rf bin3/*
+	rm -rf build
+	rm -rf lib
+	rm -rf dep
+	rm -rf bin
+	rm -rf bin1
+	rm -rf bin2
+	rm -rf bin3
 	rm -f *.cmo
 	rm -f log.txt;
 

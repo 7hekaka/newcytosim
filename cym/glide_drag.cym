@@ -115,7 +115,7 @@ repeat 100
 {
     run 100 system
     {
-        nb_frames = 10
+        nb_frames = 1
     }
     report fiber:force fiber.txt
     report bead bead.txt

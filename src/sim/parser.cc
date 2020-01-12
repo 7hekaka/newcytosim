@@ -26,16 +26,9 @@
  - do_write: can write to disc
  .
  */
-Parser::Parser(Simul& s, bool ds, bool dc, bool dn, bool dr, bool dw)
-: Interface(s), do_set(ds), do_change(dc), do_new(dn), do_run(dr), do_write(dw)
+Parser::Parser(Simul& arg, bool s, bool c, bool n, bool r, bool w)
+: Interface(arg), do_set(s), do_change(c), do_new(n), do_run(r), do_write(w)
 {
-}
-
-
-void Parser::show_lines(std::istream& is, std::streampos pos)
-{
-    std::cerr << "  in\n";
-    StreamFunc::print_lines(std::cerr, is, pos, is.tellg());
 }
 
 
@@ -187,7 +180,7 @@ void Parser::parse_set(std::istream& is)
     }
 
     if ( pp && opt.warnings(std::cerr) )
-        show_lines(is, ipos);
+        StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
 }
 
 //------------------------------------------------------------------------------
@@ -296,7 +289,7 @@ void Parser::parse_change(std::istream& is)
             execute_change(name, opt);
  
         if ( opt.warnings(std::cerr, ~0U) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
     else if ( para == "display" )
     {
@@ -445,7 +438,7 @@ void Parser::parse_new(std::istream& is)
                 throw InvalidParameter("display parameters should be specified within `set'");
             
             if ( opt.warnings(std::cerr, ~0U) )
-                show_lines(is, ipos);
+                StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
         }
     }
 }
@@ -537,7 +530,7 @@ void Parser::parse_delete(std::istream& is)
         Glossary opt(blok);
         execute_delete(name, opt, cnt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -587,7 +580,7 @@ void Parser::parse_mark(std::istream& is)
         Glossary opt(blok);
         execute_mark(name, opt, cnt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -636,7 +629,7 @@ void Parser::parse_cut(std::istream& is)
         Glossary opt(blok);
         execute_cut(name, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -714,7 +707,7 @@ void Parser::parse_run(std::istream& is)
             execute_run(cnt, opt);
 
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -749,7 +742,7 @@ void Parser::parse_read(std::istream& is)
         Glossary opt(blok);
         opt.set(required, "required");
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
     
     if ( readConfig(file) )
@@ -813,7 +806,7 @@ void Parser::parse_import(std::istream& is)
         Glossary opt(blok);
         execute_import(file, what, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -863,7 +856,7 @@ void Parser::parse_export(std::istream& is)
         Glossary opt(blok);
         execute_export(file, what, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -900,7 +893,7 @@ void Parser::parse_report(std::istream& is)
     std::string file = Tokenizer::get_filename(is);
 
     if ( file.empty() )
-        throw InvalidSyntax("missing/invalid file name after 'report'");
+        throw InvalidSyntax("missing file name. Expected 'report WHAT FILE'");
     
     std::string blok = Tokenizer::get_block(is, '{');
     
@@ -909,7 +902,7 @@ void Parser::parse_report(std::istream& is)
         Glossary opt(blok);
         execute_report(file, what, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -939,7 +932,7 @@ void Parser::parse_call(std::istream& is)
         Glossary opt(blok);
         execute_call(str, opt);
         if ( opt.warnings(std::cerr) )
-            show_lines(is, ipos);
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }
 }
 
@@ -1010,8 +1003,8 @@ void Parser::parse_for(std::istream& is)
         std::string sub = code;
         // substitute Variable name for this iteration:
         StreamFunc::find_and_replace(sub, var, std::to_string(c));
-        //we use a fresh stream and Parser for each instance:
-        Parser(*this).evaluate(sub);
+        // execute code:
+        evaluate(sub);
         //hold();
     }
 }
@@ -1132,17 +1125,11 @@ int Parser::evaluate_one(std::istream& is)
         parse_for(is);
     else if ( tok == "restart" )
     {
-        static size_t cnt = 0;
-        size_t num = 1;
-        Tokenizer::get_integer(is, num);
-        if ( do_run && cnt++ < num )
-        {
-            // reset simulation and rewind config file
-            simul.erase();
-            is.clear();
-            is.seekg(0);
-            return 0;
-        }
+        // reset simulation and rewind config file
+        simul.erase();
+        is.clear();
+        is.seekg(0);
+        return 0;
     }
     else if ( tok == "end" )
         return 2; //parse_end(is);
@@ -1178,8 +1165,6 @@ void Parser::evaluate(std::istream& is)
     }
     catch( Exception & e )
     {
-        //e << ", " + msg + ":\n";
-        e << ":\n";
         e << StreamFunc::get_lines(is, ipos, is.tellg());
         throw;
     }

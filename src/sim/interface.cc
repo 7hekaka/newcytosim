@@ -768,12 +768,10 @@ void reportCPUtime(int frame, real simtime)
 void Interface::execute_run(size_t nb_steps, Glossary& opt)
 {
     size_t       nb_frames  = 0;
-    std::string  code;
     int          solve      = 1;
     bool         prune      = true;
     bool         binary     = true;
     
-    bool has_code = opt.set(code, "nb_frames", 1);
 #ifdef BACKWARD_COMPATIBILITY
     // check if 'event' is specified within the 'run' command,
     // and convert to a registered Event object
@@ -818,9 +816,6 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
             simul.writeObjects(TRAJECTORY, false, binary);
             simul.prop->clear_trajectory = false;
         }
-        if ( has_code )
-            evaluate(code);
-
         delta = real(nb_steps) / real(nb_frames);
         check = delta;
     }
@@ -837,8 +832,6 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
                 simul.relax();
                 simul.writeObjects(TRAJECTORY, true, binary);
                 reportCPUtime(frame, simul.time());
-                if ( has_code )
-                    evaluate(code);
                 simul.unrelax();
             }
             if ( sss >= nb_steps )
