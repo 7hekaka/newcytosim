@@ -962,10 +962,11 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
 {
     computeForces();
     
-    out << COM << "count" << SEP << "force";
+    out << COM << "count" << SEP << "sum_force" << SEP << "max_force";
 
     Vector n(1,0,0);
     real ten = 0;
+    real max = 0;
     size_t cnt = 0;
     if ( opt.value_is("plane", 0, "all") )
     {
@@ -974,17 +975,17 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
             out << SEP << "count" << SEP << "force";
         
         // plane orthogonal to X:
-        fibers.infoTension(cnt, ten, Vector(1,0,0), 0);
-        out << LIN << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, max, Vector(1,0,0), 0);
+        out << LIN << cnt << SEP << ten << SEP << max;
 #if ( DIM > 1 )
         // plane orthogonal to Y:
-        fibers.infoTension(cnt, ten, Vector(0,1,0), 0);
-        out << SEP << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, max, Vector(0,1,0), 0);
+        out << SEP << cnt << SEP << ten << SEP << max;
 #endif
 #if ( DIM > 2 )
         // plane orthogonal to Z:
-        fibers.infoTension(cnt, ten, Vector(0,0,1), 0);
-        out << SEP << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, max, Vector(0,0,1), 0);
+        out << SEP << cnt << SEP << ten << SEP << max;
 #endif
     }
     else if ( opt.set(n, "plane") )
@@ -992,14 +993,14 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
         real a = 0;
         opt.set(a, "plane", 1);
         out << COM << "fiber tension orthogonal to plane: (" << n << ").pos = " << -a;
-        fibers.infoTension(cnt, ten, n, a);
-        out << LIN << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, max, n, a);
+        out << LIN << cnt << SEP << ten << SEP << max;
     }
     else
     {
         // if no plane is specified, sum all tension from all segments
-        fibers.infoTension(cnt, ten);
-        out << LIN << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, max);
+        out << LIN << cnt << SEP << ten << SEP << max;
     }
 }
 
@@ -2557,7 +2558,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     
     computeForces();
 
-    real t, ten = 0;
+    real t, ten = 0, max = 0;
     size_t c, cnt = 0;
 
     // rotate plane around the Z-axis and find intersecting fibers
@@ -2565,7 +2566,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     {
         real ang = a * M_PI / 180.0;
         Vector dir(cos(ang), sin(ang), 0);
-        fibers.infoTension(c, t, dir, 0);
+        fibers.infoTension(c, t, max, dir, 0);
         cnt += 2;  // every plane should intersect the ring twice
         ten += t;
     }
