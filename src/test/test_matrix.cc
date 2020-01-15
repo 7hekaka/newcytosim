@@ -453,6 +453,10 @@ int compare_int(const void* i, const void* j) { return ( *(size_t*)i > *(size_t*
 
 int main( int argc, char* argv[] )
 {
+#ifdef COMPILER_VERSION
+    printf("Compiled with %s\n", COMPILER_VERSION);
+#endif
+
     RNG.seed();
     if ( 0 )
     {
@@ -517,7 +521,7 @@ int main( int argc, char* argv[] )
         testMatrices(DIM*437, 1<<16);
         testMatrices(DIM*713, 1<<16);
         testMatrices(DIM*1359, 1<<18);
-        testMatrices(DIM*2100, 1<<16);
+        testMatrices(DIM*2100, 1<<18);
     }
     if ( 0 )
     {
