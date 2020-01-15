@@ -1213,12 +1213,13 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs,
  @return ten = sum of tension in these segments
  @return max = maximum of tension
 */
-void FiberSet::infoTension(size_t& cnt, real& ten, real& max, Vector const& n, real a) const
+void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const
 {
     cnt = 0;
-    ten = 0;
-    max = 0;
-    
+    sum = 0;
+    inf = 0;
+    sup = 0;
+
     Vector dir = normalize(n);
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
@@ -1228,8 +1229,9 @@ void FiberSet::infoTension(size_t& cnt, real& ten, real& max, Vector const& n, r
             if ( 0 <= abs  &&  abs < 1 )
             {
                 real h = fabs(dot(dir, fib->dirSegment(s))) * fib->tension(s);
-                ten += h;
-                max = std::max(max, h);
+                sum += h;
+                inf = std::min(inf, h);
+                sup = std::max(sup, h);
                 ++cnt;
             }
         }
@@ -1244,18 +1246,21 @@ void FiberSet::infoTension(size_t& cnt, real& ten, real& max, Vector const& n, r
  @return ten = sum of tension
  @return max = maximum of tension
  */
-void FiberSet::infoTension(size_t& cnt, real& ten, real& max) const
+void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup) const
 {
     cnt = 0;
-    ten = 0;
-    max = 0;
+    sum = 0;
+    inf = 0;
+    sup = 0;
     
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
         {
-            ten += fib->tension(s);
-            max = std::max(max, fib->tension(s));
+            real h = fib->tension(s);
+            sum += h;
+            inf = std::min(inf, h);
+            sup = std::max(sup, h);
             ++cnt;
         }
     }
