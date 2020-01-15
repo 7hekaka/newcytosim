@@ -139,7 +139,7 @@ void Mecafil::computeTensions(const real* force)
     const size_t nbs = nbSegments();
     const size_t nbv = DIM * nbPoints();
     
-    // calculate the lagrangian coefficients:
+    // calculate the lagrangian multipliers:
     blas::xgemv('N', nbs, nbv, 1., mtJJtiJ, nbs, force, 1, 0., rfLag, 1);
 }
 

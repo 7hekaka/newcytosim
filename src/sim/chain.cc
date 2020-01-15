@@ -912,7 +912,7 @@ void Chain::getPoints(real const* ptr)
 #endif
     {
         reshape_global(nbSegments(), ptr, pPos, fnCut);
-        //std::cerr << "A crude method was used to reshape " << reference() << '\n';
+        std::cerr << "Warning: a crude method was used to reshape " << reference() << '\n';
     }
     //dump(std::cerr);
 }

@@ -232,10 +232,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// Allocate memory to store given number of vertices
-    virtual size_t   allocateMecable(size_t);
+    virtual size_t  allocateMecable(size_t);
     
     /// free allocated memory
-    void             release();
+    void            release();
     
     /// prepare the Mecable to solve the mechanics in Meca::solve()
     /**
@@ -268,7 +268,7 @@ public:
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */
-    size_t         matIndex()            const { return pIndex; }
+    size_t          matIndex()            const { return pIndex; }
     
     /// Allocates pBlock[] to hold a `N x N` full matrix, where N = DIM * nbPoints()
     void            allocateBlock();
