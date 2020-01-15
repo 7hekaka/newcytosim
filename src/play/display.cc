@@ -335,7 +335,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
         alldisp.push_back(disp);
         // set default:
         disp->color  = col;
-        disp->color2 = col.alpha(0.5);
+        disp->color2 = col.alpha_scaled(0.25);
         disp->size   = prop->point_size;
         if ( p->category() == "hand" )
             disp->width = prop->link_width;

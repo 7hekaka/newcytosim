@@ -4,7 +4,7 @@
 set simul system
 {
     time_step = 0.001
-    viscosity = 0.01
+    viscosity = 1
     precondition = 0
 }
 
@@ -38,7 +38,7 @@ set hand binder
 new 1 microtubule
 {
     length = 10
-    position = 0 0 0
+    position = 0 -0.5 0
     orientation = align 1 0 0 
 }
 
@@ -70,13 +70,16 @@ new link
 }
 
 
-run 1000 system
+run 10000 system
 {
     nb_frames = 10
 }
 
 % report forces in the `link`:
 report single:force *
+
+% report internal tensions all fibers
+report fiber:force *
 
 % report internal tensions in the fiber accross a virtual plane:
 report fiber:tension * { plane = 1 0 0, 0; }

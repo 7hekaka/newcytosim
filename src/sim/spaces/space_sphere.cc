@@ -116,6 +116,8 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "point_disp.h"
+
 
 bool SpaceSphere::draw() const
 {
@@ -125,14 +127,23 @@ bool SpaceSphere::draw() const
     //number of sections in the quarter-circle
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     
-    GLfloat cir[2*fin+2];
-    gle::circle(fin, cir, (GLfloat)radius_);
+    GLfloat cir[2*fin+6];
+    cir[2] = 0;
+    cir[3] = 0;
+    gle::circle(fin, cir+4, (GLfloat)radius_);
     
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(2, GL_FLOAT, 0, cir);
+    glVertexPointer(2, GL_FLOAT, 0, cir+4);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
     glDisableClientState(GL_VERTEX_ARRAY);
 
+    prop->disp->color2.load_load();
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, cir+2);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, fin+2);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    
 #else
     
     GLfloat R = (GLfloat)radius_;
