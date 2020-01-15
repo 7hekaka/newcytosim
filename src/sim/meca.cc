@@ -1315,10 +1315,9 @@ void Meca::prepareMatrices()
 
 
 /**
- Calculates the force in the objects, that can be accessed by Mecable::netForce()
- and calculate the speed of the objects in vRHS, in the abscence of Thermal motion,
- ie. the motion is purely due to external forces.
-
+ Calculates forces due to external links, without adding Thermal motion,
+ and also excluding bending elasticity of Fibers.
+ 
  This also sets the Lagrange multipliers for the Fiber.
  
  The function will not change the position of the Mecables.
@@ -1327,15 +1326,26 @@ void Meca::computeForces()
 {
     prepareMatrices();
     
-    // calculate forces in vFOR, but without adding Rigidity and Brownian noise:
+    // calculate forces in vFOR, but without Brownian noise:
     calculateForces(vPTS, vBAS, vFOR);
     
-    // return forces to Mecable, and compute Lagrange multipliers:
+    // add rigidity, and calculate the Lagrange Multiplier with this:
     for ( Mecable * mec : mecables )
     {
         real * fff = vFOR + DIM * mec->matIndex();
+        real * ttt = vTMP + DIM * mec->matIndex();
+        
+        copy_real(DIM * mec->nbPoints(), fff, ttt);
+        
+        // add bending rigidity:
+#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+        real * xxx = vPTS + DIM * mec->matIndex();
+        mec->addRigidity(xxx, ttt);
+#endif
+        
+        mec->projectForces(ttt, ttt);
+        mec->storeTensions(ttt);
         mec->getForces(fff);
-        mec->computeTensions(fff);
     }
 }
 
@@ -1452,18 +1462,18 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
 #if NUM_THREADS > 1
     #pragma omp parallel num_threads(NUM_THREADS)
     {
-        real local_res = INFINITY;
+        real local = INFINITY;
         Mecable ** mci = mecables.begin() + omp_get_thread_num();
         while ( mci < mecables.end() )
         {
             const size_t inx = DIM * (*mci)->matIndex();
             real n = brownian1(*mci, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
-            local_res = std::min(local_res, n);
+            local = std::min(local, n);
             mci += NUM_THREADS;
         }
-        //printf("thread %i min: %f\n", omp_get_thread_num(), local_res);
+        //printf("thread %i min: %f\n", omp_get_thread_num(), local);
     #pragma omp critical
-        noiseLevel = std::min(noiseLevel, local_res);
+        noiseLevel = std::min(noiseLevel, local);
     }
 #else
     for ( Mecable * mec : mecables )
@@ -1474,10 +1484,8 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     }
 #endif
 
-    if ( noiseLevel > 0 )
-        noiseLevel *= time_step;
-    else
-        noiseLevel = 1.0;
+    // scale minimum noise level to serve as a measure of required precision
+    noiseLevel *= time_step;
     
     //printf("noiseLeveld = %8.2e   variance(vRHS) / estimate = %8.4f\n",
     //       noiseLevel, blas::nrm2(dimension(), vRHS) / (noiseLevel * sqrt(dimension())) );
