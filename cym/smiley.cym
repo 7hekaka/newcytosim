@@ -4,15 +4,15 @@
 set simul system
 {
     time_step = 0.001
-    viscosity = 0.1
+    viscosity = 0.5
 }
 
-set system display { size = 400 }
+set system display { size=512; }
 
 set space cell
 {
     shape = sphere
-	display = ( color=blue; width=12; )
+	display = ( color=sky_blue; width=12; )
 }
 
 new cell
@@ -24,12 +24,12 @@ set fiber filament
 {
     rigidity = 10
     segmentation = 0.1
-    display = ( point=16,1; line=12,2; )
+    display = ( line=10; point=16,1; )
 }
 
 set hand binder
 {
-    binding = 10, 0.01
+    binding = 10, 0.001
     unbinding = 0, inf
     bind_also_end = both_ends
  
@@ -46,31 +46,31 @@ set single link
 % mouth
 new filament
 {
-    length = 7
+    length = 6
     position = 0 -1 0
     orientation = 1 0 0
 }
 new link
 {
-    position = -2.9 -1 0 
+    position = -2.5 -1 0
     attach = fiber1, 0
 }
 new link
 {
-    position = +2.9 -1 0 
-    attach = fiber1, 7
+    position = +2.5 -1 0
+    attach = fiber1, 6
 }
 new link
 {
-    position = 2.7 -1.2 0 
-    attach = fiber1, 6.5
+    position = 2.3 -1.3 0
+    attach = fiber1, 5.5
 }
 
 % right eye
 new filament
 {
     length = 3
-    position = 1.5 1.3 0
+    position = 1 1.2 0
     orientation = 0 1 0
 }
 new link
@@ -88,17 +88,17 @@ new link
 new filament
 {
     length = 3
-    position = -1.5 1.2 0
-    orientation = 0 -1 0
+    position = -1 1.2 0
+    orientation = 0 1 0
 }
 new link
 {
-    position = -2 1.3 0 
+    position = -2 1.2 0
     attach = fiber3, 0
 }
 new link
 {
-    position = -2 1.2 0 
+    position = -2 1.3 0
     attach = fiber3, 3
 }
 
