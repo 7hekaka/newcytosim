@@ -219,7 +219,7 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
         if ( what == "force" )
             return reportFiberForces(out);
         if ( what == "confine_force" )
-            { reportFiberConfineForce(out); return; }
+            return reportFiberConfineForce(out);
         if ( what == "confinement" )
             { reportFiberConfinement(out); return; }
         if ( what == "cluster" )
