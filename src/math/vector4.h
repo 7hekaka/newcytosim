@@ -313,15 +313,15 @@ public:
     }
     
     /// true if no component is NaN
-    bool valid() const
+    bool is_valid() const
     {
         return ( XX == XX ) && ( YY == YY ) && ( ZZ == ZZ ) && ( TT == TT );
     }
     
-    /// true if all components are zero
-    bool null() const
+    /// true if some component is not zero
+    bool is_not_zero() const
     {
-        return ( XX == 0.0 ) && ( YY == 0.0 ) && ( ZZ == 0.0 ) && ( TT == 0.0 );
+        return ( XX || YY || ZZ || TT );
     }
     
     /// scale to unit norm
