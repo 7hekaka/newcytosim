@@ -940,7 +940,7 @@ You can call the 3D executable `sim3` and then you run this one to get a 3D simu
 
 <details>
 <summary>
-**I need to compile lapack locally for our server, any idea which cmake command should I use?**
+**I need to have Lapack on our server to compile Cytosim, any idea how to install it?**
 </summary>
 You can find a precompiled BLAS/LAPACK distributions for Linux. Ask you system administrator to deploy it. If you really need to compile BLAS/LAPACK, the [reference code is on netlib](http://www.netlib.org/lapack/index.html).
 </details>

@@ -3,11 +3,11 @@
 *This is work in progress*
 
 *  [**Overview**](main/overview.md)
-*  [**Tutorials**](tutorials/index.md)
 *  [The configuration file](sim/config.md)
-*  [Introduction to the command line](main/starter.md)
 *  [Units in Cytosim `(s, um, pN)`](sim/units.md)
 *  [Set of standard config files](main/examples.md)
+*  [Introduction to the command line](main/starter.md)
+*  [**Tutorials**](tutorials/index.md)
 *  [Simulation engine](sim/index.md)
 *  [The different executables](main/executables.md)
 *  [Running simulations on your computer](main/runs.md)
@@ -33,15 +33,14 @@ Once cytosim is running on your machine, check the tutorials, the page on [runni
 
 #### Troubleshooting
 
-For more information, please check [the dedicated pages](compile/index.md).  
-You may need to manually edit the makefiles depending on your platform.
+For more information, please check the [compilation guideline](compile/index.md).  
 
 cytosimATcytosimDOTorg
 
 # Advanced matter
 
 *  [Code documentation](code/index.md)
-*  [Doxygen's generated documentation](doc/code/doxygen/index.html)
+*  [Automatically generated documentation](doc/code/doxygen/index.html)
 
 # Credits
 

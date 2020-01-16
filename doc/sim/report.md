@@ -129,7 +129,7 @@ It is relatively easy to extend the report functions, declared in `src/sim/simul
  `fiber:force`           | Position of vertices and Forces acting on vertices
  `fiber:tension`         | Internal stress along fibers
  `fiber:energy`          | Fiber's elastic bending energy
- `fiber:confine_force`   | Position of vertices and Forces acting on vertices
+ `fiber:confine_force`   | Position of vertices and confinement forces acting on vertices
  `fiber:confinement`     | Sum of force applied by fibers on their confinement Space
  `fiber:binder`          | Positions of bridging hands along each fiber
  `fiber:lattice`         | Total quantity on fiber's lattices
