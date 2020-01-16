@@ -248,7 +248,7 @@ void MatrixSparseSymmetricBlock::reset()
 }
 
 
-bool MatrixSparseSymmetricBlock::nonZero() const
+bool MatrixSparseSymmetricBlock::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )

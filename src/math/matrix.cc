@@ -31,7 +31,7 @@ real Matrix::norm_inf() const
     return result;
 }
 
-bool Matrix::nonZero() const
+bool Matrix::isNotZero() const
 {
     const size_t Z = size();
     for ( size_t ii = 0; ii < Z; ++ii )

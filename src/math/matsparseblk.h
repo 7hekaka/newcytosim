@@ -270,7 +270,7 @@ public:
     void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
-    bool nonZero() const;
+    bool isNotZero() const;
     
     /// number of blocks which are not null
     size_t nbElements() const;

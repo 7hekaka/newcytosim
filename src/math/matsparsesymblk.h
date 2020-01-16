@@ -233,7 +233,7 @@ public:
     void vecMul(const real* X, real* Y) const;
 
     /// true if matrix is non-zero
-    bool nonZero() const;
+    bool isNotZero() const;
     
     /// number of blocks in columns within [start, stop[
     size_t nbElements(size_t start, size_t stop) const;

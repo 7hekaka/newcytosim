@@ -196,7 +196,7 @@ void MatrixSparseBlock::reset()
 }
 
 
-bool MatrixSparseBlock::nonZero() const
+bool MatrixSparseBlock::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
