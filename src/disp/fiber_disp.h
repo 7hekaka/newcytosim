@@ -6,7 +6,7 @@
 #include "assert_macro.h"
 #include "gle_color.h"
 #include "property.h"
-#include "vector.h"
+#include "vector3.h"
 
 
 /// Display parameters for a class of Fiber
@@ -229,7 +229,7 @@ public:
     int          exclude;
     
     /// the direction used for hiding left- or right-pointing fibers, etc. (known as `exclude[1]`)
-    Vector       exclude_axis;
+    Vector3      exclude_axis;
     
     
     
