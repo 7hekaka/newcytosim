@@ -446,7 +446,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
             isp = is.tellg();
             tok = Tokenizer::get_symbol(is);
 
-            if ( tok.size() == 0 )
+            if ( tok.empty() )
                 return pos;
             
             // Translation is specified with 'at' or 'move'
@@ -720,7 +720,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
             isp = is.tellg();
             tok = Tokenizer::get_symbol(is);
 
-            if ( tok.size() == 0 )
+            if ( tok.empty() )
                 return dir;
             
             // Gaussian noise specified with 'blur'
