@@ -151,14 +151,14 @@ inline vec4 load4(double const* a)
     return _mm256_load_pd(a);
 }
 #else
-inline vec4 load4(double const* a)              { return _mm256_load_pd(a); }
+inline vec4 load4(double const* a)       { return _mm256_load_pd(a); }
 #endif
-inline vec4 loadu4(double const* a)             { return _mm256_loadu_pd(a); }
+inline vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
 
-inline void store3(double* a, vec4 b)           { _mm256_maskstore_pd(a, msk3, b); }
-inline void store4(double* a, vec4 b)           { _mm256_store_pd(a,b); }
-inline void storeu4(double* a, vec4 b)          { _mm256_storeu_pd(a,b); }
+inline void store3(double* a, vec4 b)    { _mm256_maskstore_pd(a, msk3, b); }
+inline void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
+inline void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
 
 inline vec4 maskload4(double const* a, __m256i b)     { return _mm256_maskload_pd(a,b); }
 inline void maskstore4(double* a, __m256i b, vec4 c)  { _mm256_maskstore_pd(a,b,c); }
