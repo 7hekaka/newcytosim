@@ -201,7 +201,7 @@ public:
     void          step();
     
     /// add interactions to a Meca
-    void          setInteractions(Meca &) const;
+    void          setInteractions(Meca&) const;
     
     /// position of first clamp for Fiber n
     Vector        posLink1(size_t n) const;

@@ -116,7 +116,7 @@ Vector SpaceLid::project(Vector const& pos) const
 
 
 void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
-                              Meca & meca, real stiff) const
+                              Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
     meca.addLineClampX(pe, 1, top_, stiff);
@@ -133,7 +133,7 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
 
 
 void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
-                              Meca & meca, real stiff) const
+                              Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
     meca.addLineClampX(pe, 1, top_-rad, stiff);

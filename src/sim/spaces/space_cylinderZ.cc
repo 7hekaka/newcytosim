@@ -147,7 +147,7 @@ Vector SpaceCylinderZ::project(Vector const& w) const
  This applies the correct forces in the cylindrical and spherical parts.
  */
 void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
-                                    Meca & meca, real stiff,
+                                    Meca& meca, real stiff,
                                     const real rad, const real B, const real T)
 {
 #if ( DIM >= 3 )
@@ -196,7 +196,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, radius_, bot_, top_);
 }
@@ -204,7 +204,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real R = std::max((real)0, radius_ - rad);
     real T = top_ - rad;

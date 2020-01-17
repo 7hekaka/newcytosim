@@ -213,7 +213,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
 
 
 //------------------------------------------------------------------------------
-void Sphere::setInteractions(Meca & meca) const
+void Sphere::setInteractions(Meca& meca) const
 {
     if ( prop->confine != CONFINE_OFF )
     {

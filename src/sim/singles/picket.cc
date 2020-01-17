@@ -66,7 +66,7 @@ Vector Picket::force() const
 }
 
 
-void Picket::setInteractions(Meca & meca) const
+void Picket::setInteractions(Meca& meca) const
 {
     assert_true( prop->length == 0 );
     meca.addPointClamp(sHand->interpolation(), sPos, prop->stiffness);

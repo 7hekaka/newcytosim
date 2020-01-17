@@ -257,7 +257,7 @@ public:
     virtual real    addBrownianForces(real const* rnd, real alpha, real* rhs) const { return INFINITY; }
     
     /// add the interactions (for example due to confinements)
-    virtual void    setInteractions(Meca &) const {}
+    virtual void    setInteractions(Meca&) const {}
     
     //--------------------------------------------------------------------------
     

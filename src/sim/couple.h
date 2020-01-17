@@ -97,13 +97,13 @@ public:
     void           setProperty(CoupleProp *);
     
     /// add interactions to a Meca
-    virtual void   setInteractions(Meca &) const;
+    virtual void   setInteractions(Meca&) const;
     
     /// add interactions to a Meca (experimental)
-    virtual void   setInteractionsAF(Meca &) const;
+    virtual void   setInteractionsAF(Meca&) const;
     
     /// add interactions to a Meca (experimental)
-    virtual void   setInteractionsFA(Meca &) const;
+    virtual void   setInteractionsFA(Meca&) const;
     
     //--------------------------------------------------------------------------
     

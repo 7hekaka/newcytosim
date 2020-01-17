@@ -79,7 +79,7 @@ void Wrist::stepA()
 }
 
 
-void Wrist::setInteractions(Meca & meca) const
+void Wrist::setInteractions(Meca& meca) const
 {
     anchor.interLink(meca, sHand->interpolation(), prop->stiffness);
 }

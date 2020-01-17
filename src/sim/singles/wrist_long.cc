@@ -68,7 +68,7 @@ Vector WristLong::posSide() const
 /**
  Using a Meca::interSideLink()
  */
-void WristLong::setInteractions(Meca & meca) const
+void WristLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt = sHand->interpolation();
     
@@ -100,7 +100,7 @@ Vector WristLong::posSide() const
 /** 
  This uses Meca::interLongLink() 
  */
-void WristLong::setInteractions(Meca & meca) const
+void WristLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt = sHand->interpolation();
     mArm = ( sBase.pos() - sHand->pos() ).normalized(prop->length);

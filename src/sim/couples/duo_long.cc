@@ -73,7 +73,7 @@ Vector DuoLong::force() const
  
  Another possibility would be SideSideLink, which is fully symmetric.
  */
-void DuoLong::setInteractions(Meca & meca) const
+void DuoLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();

@@ -97,7 +97,7 @@ public:
     real        addBrownianForces(real const* rnd, real sc, real* rhs) const;
 
     /// add the interactions due to confinement
-    void        setInteractions(Meca &) const;
+    void        setInteractions(Meca&) const;
     
     //--------------------------------------------------------------------------
 

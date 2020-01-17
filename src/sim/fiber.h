@@ -174,7 +174,7 @@ public:
     void           prepareMecable();
     
     /// add interactions to a Meca
-    void           setInteractions(Meca &) const;
+    void           setInteractions(Meca&) const;
     
 
     /// invert polarity and adjust abscissa of Hands to keep them at the same place

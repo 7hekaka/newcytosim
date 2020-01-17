@@ -32,7 +32,7 @@ public:
     virtual void  stepFF(FiberGrid const&);
     
     /// add interactions to a Meca
-    void          setInteractions(Meca &) const;
+    void          setInteractions(Meca&) const;
 
 };
 

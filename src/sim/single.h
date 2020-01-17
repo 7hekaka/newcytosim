@@ -160,7 +160,7 @@ public:
     virtual void    stepA();
     
     /// add interactions to a Meca
-    virtual void    setInteractions(Meca &) const;
+    virtual void    setInteractions(Meca&) const;
     
     //--------------------------------------------------------------------------
     

@@ -74,7 +74,7 @@ Vector CrosslinkLong::force() const
  
  Another possibility would be SideSideLink, which is fully symmetric.
  */
-void CrosslinkLong::setInteractions(Meca & meca) const
+void CrosslinkLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();

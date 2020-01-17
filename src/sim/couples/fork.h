@@ -34,7 +34,7 @@ public:
     virtual ~Fork();
 
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
 
 };
 

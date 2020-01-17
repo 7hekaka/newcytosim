@@ -38,7 +38,7 @@ void Bundle::step()
 /*
  Parallel connection near the 'prop->focus' end of the fibers
 */
-void Bundle::linkParallel(Meca & meca, Fiber * mt1, Fiber * mt2) const
+void Bundle::linkParallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
 {
     const real stiff = prop->stiffness;
     const real dis = prop->overlap;
@@ -51,7 +51,7 @@ void Bundle::linkParallel(Meca & meca, Fiber * mt1, Fiber * mt2) const
 /**
  Antiparallel connection near the 'prop->focus' end of the fibers
 */
-void Bundle::linkAntiparallel(Meca & meca, Fiber * mt1, Fiber * mt2) const
+void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
 {
     const real stiff = prop->stiffness;
     const real dis = prop->overlap;
@@ -70,7 +70,7 @@ void Bundle::linkAntiparallel(Meca & meca, Fiber * mt1, Fiber * mt2) const
  1. connect fibers with their neighbors,
  2. close the ring by connecting first and last fibers.
  */
-void Bundle::setInteractions(Meca & meca) const
+void Bundle::setInteractions(Meca& meca) const
 {
     assert_true( linked() );
     

@@ -107,7 +107,7 @@ public:
     void        resize(real);
     
     /// add the interactions due to confinement
-    void        setInteractions(Meca &) const;
+    void        setInteractions(Meca&) const;
     
     //------------------- technical functions and mathematics ------------------
         

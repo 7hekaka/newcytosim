@@ -45,7 +45,7 @@ public:
     void       step();
     
     /// add interactions to a Meca
-    void       setInteractions(Meca &) const;
+    void       setInteractions(Meca&) const;
     
     /// return pointer to central Solid
     Solid *    solid() const { return static_cast<Solid*>(organized(0)); }

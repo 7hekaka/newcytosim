@@ -217,7 +217,7 @@ void Simul::setStericInteractions(Meca& meca) const
  - call setStericInteractions() if prop->steric is true.
  .
  */
-void Simul::setInteractions(Meca & meca) const
+void Simul::setInteractions(Meca& meca) const
 {
     // prepare the meca, and register Mecables
     meca.clear();

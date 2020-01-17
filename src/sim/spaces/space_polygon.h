@@ -75,13 +75,13 @@ public:
     Vector      project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca &, real stiff) const;
+    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca &, real stiff) const;
+    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void        setInteractions(Meca &, FiberSet const&) const;
+    void        setInteractions(Meca&, FiberSet const&) const;
 
     /// OpenGL display function; returns true if successful
     bool        draw() const;

@@ -49,7 +49,7 @@ void Crosslink::stepFF(const FiberGrid& grid)
 }
 
 
-void Crosslink::setInteractions(Meca & meca) const
+void Crosslink::setInteractions(Meca& meca) const
 {
     assert_true( attached1() && attached2() );
     

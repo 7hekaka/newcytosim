@@ -68,14 +68,14 @@ public:
     
     
     /// apply a force directed towards the edge of the Space
-    void       setInteraction(Vector const& pos, Mecapoint const&, Meca &, real stiff) const;
+    void       setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void       setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca &, real stiff) const;
+    void       setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     
     /// add interactions to a Meca
-    void       setInteractions(Meca &, FiberSet const&) const;
+    void       setInteractions(Meca&, FiberSet const&) const;
     
     /// one Monte-Carlo simulation step
     void       step();

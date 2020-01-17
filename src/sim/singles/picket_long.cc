@@ -72,7 +72,7 @@ Vector PicketLong::force() const
 }
 
 
-void PicketLong::setInteractions(Meca & meca) const
+void PicketLong::setInteractions(Meca& meca) const
 {
 #if ( DIM == 1 )
     meca.addPointClamp(sHand->interpolation(), sPos, prop->stiffness);

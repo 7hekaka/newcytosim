@@ -152,7 +152,7 @@ void Single::stepA()
 /**
  Add confinement force to the bound fiber
  */
-void Single::setInteractions(Meca & meca) const
+void Single::setInteractions(Meca& meca) const
 {
     assert_true( sHand->attached() );
     

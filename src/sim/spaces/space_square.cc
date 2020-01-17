@@ -183,7 +183,7 @@ Vector SpaceSquare::project(Vector const& w) const
 
  */
 
-void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & meca, real stiff, const real dim[])
+void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& meca, real stiff, const real dim[])
 {
     bool in = true;
     
@@ -216,13 +216,13 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
 }
 
 
-void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_);
 }
 
 
-void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real dim[DIM];
     for ( unsigned d = 0; d < DIM; ++d )

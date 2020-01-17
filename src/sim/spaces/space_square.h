@@ -22,7 +22,7 @@ class SpaceSquare : public Space
 private:
     
     /// apply a force directed towards the edge of the Space
-    static void setInteraction(const real pos[], Mecapoint const&, Meca &, real stiff, const real dim[]);
+    static void setInteraction(const real pos[], Mecapoint const&, Meca&, real stiff, const real dim[]);
     
 public:
     
@@ -48,10 +48,10 @@ public:
     Vector      project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca &, real stiff) const;
+    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca &, real stiff) const;
+    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     
     /// OpenGL display function; returns true if successful

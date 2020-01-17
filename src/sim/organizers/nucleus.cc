@@ -18,7 +18,7 @@ void Nucleus::step()
 }
 
 
-void Nucleus::setInteractions(Meca & meca) const
+void Nucleus::setInteractions(Meca& meca) const
 {
     Sphere * sph = sphere();
     

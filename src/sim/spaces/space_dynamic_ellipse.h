@@ -74,10 +74,10 @@ public:
     void    resize(Glossary& opt);
 
     /// add interactions to a Meca
-    void    setInteractions(Meca &, FiberSet const&) const;
+    void    setInteractions(Meca&, FiberSet const&) const;
 
     /// setInteraction and changes the forces the ellipse undergoes
-    void    setInteraction(Vector const &pos, Mecapoint const& pe, Meca & meca, real stiff) const;
+    void    setInteraction(Vector const &pos, Mecapoint const& pe, Meca& meca, real stiff) const;
 
     ///    ContractEllipse has a step function to adjust shape
     void    step();

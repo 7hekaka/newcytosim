@@ -33,7 +33,7 @@ public:
     void    stepAA();
     
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

@@ -118,7 +118,7 @@ real Couple::stiffness() const
 }
 
 
-void Couple::setInteractions(Meca & meca) const
+void Couple::setInteractions(Meca& meca) const
 {
     assert_true( attached1() && attached2() );
     
@@ -135,7 +135,7 @@ void Couple::setInteractions(Meca & meca) const
 }
 
 
-void Couple::setInteractionsAF(Meca & meca) const
+void Couple::setInteractionsAF(Meca& meca) const
 {
     assert_true( attached1() && !attached2() );
     
@@ -149,7 +149,7 @@ void Couple::setInteractionsAF(Meca & meca) const
 }
 
 
-void Couple::setInteractionsFA(Meca & meca) const
+void Couple::setInteractionsFA(Meca& meca) const
 {
     assert_true( !attached1() && attached2() );
     

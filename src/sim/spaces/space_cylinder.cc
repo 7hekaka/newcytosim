@@ -136,7 +136,7 @@ Vector SpaceCylinder::project(Vector const& w) const
 /**
  This applies the correct forces in the cylindrical part and the caps.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca,
+void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca,
                                    real stiff, const real len, const real rad)
 {
     bool cap = ( fabs(pos.XX) > len );
@@ -174,7 +174,7 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
@@ -183,7 +183,7 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
  This applies the correct forces in the cylindrical and spherical parts.
  */
 void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe,
-                                   real rad, Meca & meca, real stiff) const
+                                   real rad, Meca& meca, real stiff) const
 {
     real eRadius = radius_ - rad;
     if ( eRadius < 0 ) eRadius = 0;

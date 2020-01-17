@@ -98,7 +98,7 @@ Vector Interpolation4::position() const
 }
 
 
-void Interpolation4::interLink(Meca & meca, Interpolation const& arg, const real stiffness) const
+void Interpolation4::interLink(Meca& meca, Interpolation const& arg, const real stiffness) const
 {
     size_t off = mec_->matIndex() + ref_;
     size_t pts[] = { off, off+1, off+2, off+3 };
@@ -123,7 +123,7 @@ void Interpolation4::interLink(Meca & meca, Interpolation const& arg, const real
 }
 
 
-void Interpolation4::interLink(Meca & meca, Mecapoint const& arg, const real stiffness) const
+void Interpolation4::interLink(Meca& meca, Mecapoint const& arg, const real stiffness) const
 {
     size_t off = mec_->matIndex() + ref_;
     size_t pts[] = { off, off+1, off+2, off+3 };

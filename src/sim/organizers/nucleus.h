@@ -39,7 +39,7 @@ public:
     void          step();
     
     ///add interactions for this object to a Meca
-    void          setInteractions(Meca &) const;
+    void          setInteractions(Meca&) const;
 
     //------------------- querying the nucleus ---------------------------------    
     

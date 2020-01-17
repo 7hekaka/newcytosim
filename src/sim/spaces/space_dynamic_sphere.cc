@@ -11,14 +11,14 @@ SpaceDynamicSphere::SpaceDynamicSphere(SpaceProp const* p)
 }
 
 
-void SpaceDynamicSphere::setInteractions(Meca &, FiberSet const&) const
+void SpaceDynamicSphere::setInteractions(Meca&, FiberSet const&) const
 {
     force_ = 0;
 }
 
 
 void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
-                                        Meca & meca, real stiff) const
+                                        Meca& meca, real stiff) const
 {
     meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
     force_ += stiff * ( pos.norm() - radius_ );
@@ -26,7 +26,7 @@ void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
 
 
 void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
-                                        real rad, Meca & meca, real stiff) const
+                                        real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )
     {

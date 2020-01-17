@@ -28,10 +28,10 @@ class Bundle : public Organizer
 private:
     
     /// add interactions to a Meca
-    void       linkAntiparallel(Meca &, Fiber *, Fiber *) const;
+    void       linkAntiparallel(Meca&, Fiber *, Fiber *) const;
     
     /// add interactions to a Meca
-    void       linkParallel(Meca &, Fiber *, Fiber *) const;
+    void       linkParallel(Meca&, Fiber *, Fiber *) const;
 
 public:
 
@@ -51,7 +51,7 @@ public:
     void       step();
     
     /// add interactions to a Meca
-    void       setInteractions(Meca &) const;
+    void       setInteractions(Meca&) const;
     
     /// return the center of gravity from all MT central ends
     Vector     position() const;

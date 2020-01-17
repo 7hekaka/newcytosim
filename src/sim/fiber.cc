@@ -863,7 +863,7 @@ void Fiber::prepareMecable()
 
 //------------------------------------------------------------------------------
 
-void Fiber::setInteractions(Meca & meca) const
+void Fiber::setInteractions(Meca& meca) const
 {
 #if OLD_SQUEEZE_FORCE
     if ( prop->squeeze == 1 )
