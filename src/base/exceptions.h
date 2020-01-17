@@ -115,12 +115,19 @@ public:
     }
 
     /// append string to info
-    Exception& operator << (const std::string arg)
+    Exception& operator << (const std::string& arg)
     {
         info_.append(arg);
         return *this;
     }
     
+    /// append C-string to info
+    Exception& operator << (const char arg[])
+    {
+        info_.append(arg);
+        return *this;
+    }
+
     /// append string-representation of `x` to info
     template<typename T>
     Exception& operator << (const T& x)
