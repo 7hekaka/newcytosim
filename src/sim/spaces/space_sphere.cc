@@ -137,12 +137,14 @@ bool SpaceSphere::draw() const
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
     glDisableClientState(GL_VERTEX_ARRAY);
 
-    prop->disp->color2.load_load();
-    
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(2, GL_FLOAT, 0, cir+2);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, fin+2);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    if ( prop->disp->visible & 2 )
+    {
+        prop->disp->color2.load_load();
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 0, cir+2);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, fin+2);
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
     
 #else
     
