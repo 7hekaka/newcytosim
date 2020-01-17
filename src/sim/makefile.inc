@@ -70,11 +70,11 @@ OBJ_CYTOSIMD3:=$(OBJ_CYTOSIM:%.o=%D3.o)
 
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
-OBJ_CYTOSIMG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOSIM)) $(OBJ_NEEDG:%.o=%G.o)
+OBJ_CYTOSIMG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOSIM)) $(OBJ_GRAFIX:%.o=%G.o)
 
 #----------------------------targets--------------------------------------------
 
-INC_BM=$(addprefix -Isrc/, base math)
+INC_BM:=-Isrc/base -Isrc/math
 INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 INC_BMD=$(addprefix -Isrc/, base math sim sim/spaces disp)
 
