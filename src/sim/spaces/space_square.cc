@@ -192,7 +192,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& me
         assert_true( dim[d] >= 0 );
         if ( fabs(pos[d]) > dim[d] )
         {
-            meca.addLineClampX(pe, d, std::copysign(dim[d], pos[d]), stiff);
+            meca.addPlaneClampX(pe, d, std::copysign(dim[d], pos[d]), stiff);
             in = false;
         }
     }
@@ -211,7 +211,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& me
         u = dim[2] - fabs(pos[2]);
         if ( u < l )  dip = 2;
 #endif
-        meca.addLineClampX(pe, dip, std::copysign(dim[dip], pos[dip]), stiff);
+        meca.addPlaneClampX(pe, dip, std::copysign(dim[dip], pos[dip]), stiff);
     }
 }
 

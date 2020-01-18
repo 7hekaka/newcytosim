@@ -136,10 +136,9 @@ void SpaceCylinderP::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
  */
 void SpaceCylinderP::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    real eRadius = radius_ - rad;
-    if ( eRadius < 0 ) eRadius = 0;
-    
-    meca.addCylinderClampX(pe, eRadius, stiff);
+    real R = std::max((real)0, radius_ - rad);
+
+    meca.addCylinderClampX(pe, R, stiff);
 }
 
 //------------------------------------------------------------------------------

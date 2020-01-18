@@ -32,13 +32,13 @@ public:
     real      length_[3];
     
     /// the radius by which the corners are smoothed
-    real      radius_;
+    real      edge_;
     
     /// the square of the radius
-    real      radiusSqr_;
+    real      edgeSqr_;
     
-    /// calculate radiusSqr
-    void  update() { radiusSqr_ = square(radius_); }
+    /// calculate edgeSqr_
+    void  update() { edgeSqr_ = square(edge_); }
 
 public:
         
@@ -57,6 +57,9 @@ public:
     /// true if the point is inside the Space
     bool        inside(Vector const&) const;
     
+    /// true if the bead is inside the Space
+    bool        allInside(Vector const&, real rad) const;
+
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
 

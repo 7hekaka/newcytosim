@@ -18,6 +18,8 @@
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
+#include "gle_color.h"
+
 
 using namespace gle;
 
@@ -31,9 +33,9 @@ SpaceProp prop("test_space");
 Space * spc = nullptr;
 
 // number of points
-const int maxpts = 1<<17;
-int nbpts  = 1024;
-int scan   = 100;
+const size_t maxpts = 1<<17;
+size_t nbpts = 1024;
+size_t scan  = 100;
 
 // INFLATION of the rectangle containing point to be projected
 const real INFLATION = 1;
@@ -64,12 +66,12 @@ Vector edge[maxpts];
 real  max_error_projection;
 
 //slicing parameters
-bool slicing = false;
-const real sliceStep = 0.2;
-real thickness = sliceStep;
+int slicing = 0;
+const real grain = 0.1;
+real thickness = grain;
 
-Vector slicePos(0, 0, 0);
-Vector sliceDir(1, 0, 0);
+Vector origin(0, 0, 0);
+Vector axis(1, 0, 0);
 
 //show or hide points in or outside
 int showInside    = true;
@@ -101,11 +103,11 @@ void generatePoints(real len)
     if ( regular_distribution )
     {
         dif /= scan;
-        int kk = 0;
+        size_t kk = 0;
         nbpts = 0;
         //follow a regular lattice:
-        for ( int ii = 0; ii <= scan; ++ii )
-            for ( int jj = 0; jj <= scan; ++jj )
+        for ( size_t ii = 0; ii <= scan; ++ii )
+            for ( size_t jj = 0; jj <= scan; ++jj )
 #if ( DIM >= 3 )
                 for ( kk = 0; kk <= scan; ++kk )
 #endif
@@ -127,12 +129,10 @@ void generatePoints(real len)
 
 void distributePoints(real len = INFLATION)
 {
-    if ( !spc ) return;
-    
     generatePoints(len);
     max_error_projection = 0;
     
-    for ( int ii = 0; ii < nbpts; ++ii )
+    for ( size_t ii = 0; ii < nbpts; ++ii )
     {
         //see if space finds it inside:
         inside[ii] = spc->inside(point[ii]);
@@ -179,13 +179,12 @@ void setGeometry()
     try {
         delete(spc);
         spc = prop.newSpace(opt);
-        if ( 1 )
+        if ( spc )
         {
             fprintf(stdout, " >>> ");
             Outputter out(stdout, false);
             spc->write(out);
             fprintf(stdout, "\n");
-
         }
     }
     catch( Exception & e )
@@ -231,6 +230,20 @@ enum MENUS_ID {
     MENU_EDGES = 111
 };
 
+
+void toggleSlicing(int d)
+{
+    slicing = ( slicing == d ? 0 : d % 4 );
+    switch ( d )
+    {
+        case 0: break;
+        case 1: axis.set(1,0,0); break;
+        case 2: axis.set(0,1,0); break;
+        case 3: axis.set(0,0,1); break;
+    }
+}
+
+
 void processMenu(int item)
 {
     switch( item )
@@ -253,16 +266,13 @@ void processMenu(int item)
             showProject = ! showProject;
             break;
         case MENU_XSLICING:
-            slicing = !slicing;
-            sliceDir.set(1,0,0);
+            toggleSlicing(1);
             break;
         case MENU_YSLICING:
-            slicing = !slicing;
-            sliceDir.set(0,1,0);
+            toggleSlicing(2);
             break;
         case MENU_ZSLICING:
-            slicing = !slicing;
-            sliceDir.set(0,0,1);
+            toggleSlicing(3);
             break;
     }
     glutPostRedisplay();
@@ -296,17 +306,16 @@ void processSpecialKey(int key, int x=0, int y=0)
     switch (key)
     {
         case GLUT_KEY_LEFT:
-            slicePos.XX -= 0.2;
+            origin -= grain * axis;
             break;
         case GLUT_KEY_RIGHT:
-            slicePos.XX += 0.2;
+            origin += grain * axis;
             break;
         case GLUT_KEY_UP:
-            thickness += sliceStep;
+            thickness += grain;
             break;
         case GLUT_KEY_DOWN:
-            thickness -= sliceStep;
-            if ( thickness < sliceStep ) thickness = sliceStep;
+            thickness = std::max(grain, thickness-grain);
             break;
         default:
             break;
@@ -345,21 +354,26 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             distributePoints();
             break;
             
+        case 'X':
+            glApp::processNormalKey('x',x,y);
+            break;
+            
         case 'x':
-            slicing = !slicing;
-            sliceDir.set(1,0,0);
+            toggleSlicing(1);
             break;
             
         case 'y':
-            slicing = !slicing;
-            sliceDir.set(0,1,0);
+            toggleSlicing(2);
             break;
             
         case 'z':
-            slicing = !slicing;
-            sliceDir.set(0,0,1);
+            toggleSlicing(3);
             break;
-            
+                
+        case 'c':
+            toggleSlicing(slicing+1);
+            break;
+
         case 'i':
             showInside = ! showInside;
             break;
@@ -426,19 +440,12 @@ bool showPoint(int i)
             return false;
     }
     
-    if ( ! slicing )
-        return true;
-    
-    Vector & pos = project[i];
-    
-    return (( (slicing & 0x01) &&  fabs(pos.XX-slicePos.XX) < thickness )
-#if ( DIM > 1 )
-            || ( (slicing & 0x02) &&  fabs(pos.YY-slicePos.YY) < thickness )
-#endif
-#if ( DIM > 2 )
-            || ( (slicing & 0x04) &&  fabs(pos.ZZ-slicePos.ZZ) < thickness )
-#endif
-            );
+    if ( slicing )
+    {
+        //return ( fabs(dot(project[i]-origin, axis)) < thickness );
+        return ( fabs(dot(point[i]-origin, axis)) < thickness );
+    }
+    return true;
 }
 
 
@@ -446,7 +453,20 @@ void display(View&, int)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    spc->draw();
+    if ( spc )
+    {
+        glEnable(GL_CULL_FACE);
+        // draw back side
+        glCullFace(GL_FRONT);
+        gle_color(0.2, 0.2, 0.2).load_back();
+        spc->draw();
+
+        // draw front side
+        glCullFace(GL_BACK);
+        gle_color(0.5, 0.5, 0.5).load_front();
+        spc->draw();
+        glDisable(GL_CULL_FACE);
+    }
     
     //plot a gren dot for points inside, a red dot for point outside:
     glPointSize(2.0);
@@ -558,7 +578,8 @@ int main(int argc, char* argv[])
     }
 
     checkVolume();
-    
+    gle::initialize();
+
     glutMainLoop();
     
     return EXIT_SUCCESS;

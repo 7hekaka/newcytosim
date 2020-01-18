@@ -119,9 +119,9 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    meca.addLineClampX(pe, 1, top_, stiff);
+    meca.addPlaneClampX(pe, 1, top_, stiff);
 #elif ( DIM > 2 )
-    meca.addLineClampX(pe, 2, top_, stiff);
+    meca.addPlaneClampX(pe, 2, top_, stiff);
 #endif
     
 #if ( DIM == 2 )
@@ -136,9 +136,9 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    meca.addLineClampX(pe, 1, top_-rad, stiff);
+    meca.addPlaneClampX(pe, 1, top_-rad, stiff);
 #elif ( DIM > 2 )
-    meca.addLineClampX(pe, 2, top_-rad, stiff);
+    meca.addPlaneClampX(pe, 2, top_-rad, stiff);
 #endif
     
 #if ( DIM == 2 )

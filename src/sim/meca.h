@@ -409,7 +409,7 @@ public:
     void addLineClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
     
     /// Link of stiffness `weight` to a line that is X if axi=0, Y if axi=1, Z if axi=2
-    void addLineClampX(Mecapoint const&, size_t axi, real, real weight);
+    void addPlaneClampX(Mecapoint const&, size_t axi, real, real weight);
 
     /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`
     void addPlaneClamp(Mecapoint const&, Vector const& pos, Vector const& dir, real weight);

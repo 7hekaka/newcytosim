@@ -13,14 +13,18 @@
      - radius = radius of cylinder
      - bottom = smallest Z
      - top = highest Z
+     - edge = radius of smoothing of the edge
      .
 
+ Added edge smoothing 09.12.2019
  @ingroup SpaceGroup
  */
 class SpaceCylinderZ : public Space
 {    
     /// apply a force directed towards the edge of the Space
     static void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff, real, real, real);
+    /// apply a force directed towards the edge of the Space
+    static void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff, real, real, real, real);
 
 private:
     
@@ -33,6 +37,15 @@ private:
     /// position in Z of the top limit
     real        top_;
     
+    /// the radius of smoothing of the edges
+    real        edge_;
+    
+    /// square of edge_
+    real        edgeSqr_;
+    
+    /// calculate radiusSqr
+    void  update() { edgeSqr_ = square(edge_); }
+
 public:
         
     ///creator

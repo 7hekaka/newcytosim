@@ -6,21 +6,26 @@
 #include "glossary.h"
 #include "meca.h"
 
+/// keyword to allow smooth edges on the Cylinder
+#define HAS_SMOOTH_EDGES 1
+
 
 SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
 : Space(p)
 {
     if ( DIM < 3 )
-        throw InvalidParameter("cylinderZ is only valid in 3D: use sphere instead");
+        throw InvalidParameter("cylinderZ is only valid in 3D");
     bot_ = 0;
     top_ = 0;
     radius_ = 0;
+    edge_ = 0;
+    update();
 }
 
 
 void SpaceCylinderZ::resize(Glossary& opt)
 {
-    real rad = radius_, top = top_, bot = bot_;
+    real rad = radius_, top = top_, bot = bot_, edg = edge_;
 
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
@@ -43,9 +48,23 @@ void SpaceCylinderZ::resize(Glossary& opt)
     if ( top < bot )
         throw InvalidParameter("cylinderZ:bottom must be <= top");
     
+#if HAS_SMOOTH_EDGES
+    if ( opt.set(edg, "edge") )
+    {
+        if ( edg < 0 )
+            throw InvalidParameter("cylinderZ:edge must be >= 0");
+        if ( rad < edg )
+            throw InvalidParameter("cylinderZ:edge must be <= radius");
+        if ( top - bot < 2 * edg )
+            throw InvalidParameter("cylinderZ:edge must be <= length / 2");
+    }
+#endif
+    
     bot_ = bot;
     top_ = top;
     radius_ = rad;
+    edge_ = edg;
+    update();
 }
 
 
@@ -55,88 +74,137 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
     sup.set( radius_, radius_, top_);
 }
 
-
-real  SpaceCylinderZ::volume() const
+/**
+ Pappus's (2nd) Centroid Theorem: the volume of a planar area of revolution is
+ the product of the area A and the length of the path traced by its centroid R,
+ i.e., 2 M_PI R.
+ 
+ https://en.wikipedia.org/wiki/Pappus%27s_centroid_theorem
+ */
+real SpaceCylinderZ::volume() const
 {
+#if HAS_SMOOTH_EDGES
+    const real R0 = radius_ - edge_;
+    return M_PI * (( top_ - bot_ - 2 * edge_ ) * radius_ * radius_  //central cylindrical part
+                   + 2 * edge_ * R0 * R0                            //top and bottom central cylinders
+                   + ( R0 * M_PI + 4/3.0 * edge_ ) * edgeSqr_ );
+#else
     return M_PI * ( top_ - bot_ ) * radius_ * radius_;
+#endif
 }
 
 
-bool  SpaceCylinderZ::inside(Vector const& w) const
+bool SpaceCylinderZ::inside(Vector const& w) const
 {
 #if ( DIM > 2 )
-    if ( w.ZZ < bot_ ) return false;
-    if ( w.ZZ > top_ ) return false;
-#endif
-#if ( DIM > 1 )
-    return ( w.XX*w.XX + w.YY*w.YY <= radius_ * radius_ );
-#else
-    return ( fabs(w.XX) <= radius_ );
+    const real RT = w.XX * w.XX + w.YY * w.YY;
+# if HAS_SMOOTH_EDGES
+    const real R = std::max((real)0, sqrt(RT)-radius_+edge_);
+    const real Z = std::max((real)0, std::max(bot_+edge_-w.ZZ, w.ZZ-top_+edge_));
+    return ( R*R + Z*Z <= edgeSqr_ );
+# else
+    return ( bot_ <= w.ZZ  &&  w.ZZ <= top_  &&  RT <= radius_ * radius_ );
+# endif
+#elif ( DIM == 2 )
+    ABORT_NOW("cylinderZ is only valid in 3D");
+    return true;
 #endif
 }
 
-bool  SpaceCylinderZ::allInside(Vector const& w, const real rad ) const
+
+bool SpaceCylinderZ::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    if ( w.ZZ - rad < bot_ ) return false;
-    if ( w.ZZ + rad > top_ ) return false;
-#endif
-#if ( DIM > 1 )
-    return ( w.XX*w.XX + w.YY*w.YY <= square(radius_-rad) );
-#else
-    return ( fabs(w.XX) <= radius_-rad );
+    const real RT = w.XX * w.XX + w.YY * w.YY;
+# if HAS_SMOOTH_EDGES
+    const real E = edge_ + rad;
+    const real R = std::max((real)0, sqrt(RT)-E);
+    const real Z = std::max((real)0, std::max(bot_+E-w.ZZ, w.ZZ-top_+E));
+    return ( R*R + Z*Z <= edgeSqr_ );
+# else
+    return ( bot_ + rad <= w.ZZ  &&  w.ZZ + rad <= top_
+            && RT <= square(radius_-rad) );
+# endif
+#elif ( DIM == 2 )
+    ABORT_NOW("cylinderZ is only valid in 3D");
+    return true;
 #endif
 }
 
+
 Vector SpaceCylinderZ::randomPlace() const
 {
+#if HAS_SMOOTH_EDGES
+    Vector w;
+    do {
+        const Vector2 V = Vector2::randB(radius_);
+        w.set(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
+    } while ( !inside(w) );
+    return w;
+#else
     const Vector2 V = Vector2::randB(radius_);
     return Vector(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
+#endif
 }
 
 //------------------------------------------------------------------------------
 Vector SpaceCylinderZ::project(Vector const& w) const
 {
     Vector p = w;
-#if ( DIM >= 3 )
-    bool inZ = true;
-    
-    if ( w.ZZ > top_ )
-    {
-        p.ZZ = top_;
-        inZ = false;
-    }
-    else if ( w.ZZ < bot_ )
-    {
-        p.ZZ = bot_;
-        inZ = false;
-    }
+#if ( DIM > 2 )
+# if HAS_SMOOTH_EDGES
+    const real T = top_ - edge_;
+    const real B = bot_ + edge_;
+    const real R = radius_ - edge_;
+#else
+    real const& T = top_;
+    real const& B = bot_;
+    real const& R = radius_;
+# endif
+    bool in = true;
 
+    if ( T < w.ZZ )
+    {
+        p.ZZ = T;
+        in = false;
+    }
+    else if ( w.ZZ < B )
+    {
+        p.ZZ = B;
+        in = false;
+    }
+    
     real n = w.normXY();
     
-    if ( n > radius_ )
+    if ( n > R )
     {
-        n = radius_ / n;
+        n = R / n;
         p.XX = n * w.XX;
         p.YY = n * w.YY;
     }
-    else
+    else if ( in )
     {
-        if ( inZ )
+        real ZT = top_ - w.ZZ;
+        real ZB = w.ZZ - bot_;
+        // check which cap is closer:
+        if ( radius_ - n < ZT  &&  radius_ - n < ZB )
         {
-            if ( top_ - w.ZZ < radius_ - n )
-                p.ZZ = top_;
-            else if ( w.ZZ - bot_ < radius_ - n )
-                p.ZZ = bot_;
-            else
-            {
-                n = radius_ / n;
-                p.XX = n * w.XX;
-                p.YY = n * w.YY;
-            }
+            n = radius_ / n;
+            p.XX = n * w.XX;
+            p.YY = n * w.YY;
         }
+        else if ( ZT < ZB )
+            p.ZZ = top_;
+        else
+            p.ZZ = bot_;
+        return p;
     }
+# if HAS_SMOOTH_EDGES
+    //normalize to radius(), and add to p to get the projection
+    real dis = edge_ / norm(w-p);
+    return dis * ( w - p ) + p;
+# endif
 #endif
     return p;
 }
@@ -146,30 +214,29 @@ Vector SpaceCylinderZ::project(Vector const& w) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
-                                    Meca& meca, real stiff,
-                                    const real rad, const real B, const real T)
+void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, 
+                                    real stiff, real R, real B, real T)
 {
 #if ( DIM >= 3 )
     bool cap = false;
     bool cyl = false;
-    real zzz;
+    real Z;
 
     // inside cylinder radius_
-    if ( 2 * pos.ZZ - B > T )
+    if ( 2*pos.ZZ-B > T )
     {
-        zzz = T;
+        Z = T;
         cap = ( pos.ZZ > T );
     }
     else
     {
-        zzz = B;
+        Z = B;
         cap = ( pos.ZZ < B );
     }
     
     real dis = pos.XX*pos.XX + pos.YY*pos.YY;
     
-    if ( rad*rad < dis )
+    if ( R*R < dis )
     {
         // outside cylinder in XY plane
         cyl = true;
@@ -177,7 +244,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
     else if ( ! cap )
     {
         // inside cylinder in XY plane and also inside in Z:
-        if ( fabs(pos.ZZ-zzz) > rad - sqrt(dis) )
+        if ( fabs(pos.ZZ-Z) > R - sqrt(dis) )
         //if ( dis > rad*rad + square(pos.ZZ-p) - 2 * rad * fabs(pos.ZZ-p) )
             cyl = true;
         else
@@ -185,20 +252,79 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe,
     }
     
     if ( cap )
-        meca.addLineClampX(pe, 2, zzz, stiff);
+        meca.addPlaneClampX(pe, 2, Z, stiff);
     
     if ( cyl )
-        meca.addCylinderClampZ(pe, rad, stiff);
+        meca.addCylinderClampZ(pe, R, stiff);
 #endif
 }
 
+
+void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca,
+                                    real stiff, real R, real B, real T, real E)
+{
+#if ( DIM >= 3 )
+    real n = pos.normXY();
+    bool in = true;
+    real Z;
+    
+    // inside cylinder radius_
+    if ( 2*pos.ZZ-B > T )
+    {
+        Z = T-E;
+        if ( pos.ZZ > T-E )
+        {
+            in = false;
+            if ( n < R-E ) {
+                meca.addPlaneClampX(pe, 2, T, stiff);
+                return;
+            }
+        }
+    }
+    else
+    {
+        Z = B+E;
+        if ( pos.ZZ < B+E )
+        {
+            in = false;
+            if ( n < R-E ) {
+                meca.addPlaneClampX(pe, 2, B, stiff);
+                return;
+            }
+        }
+    }
+    
+    if ( in )
+    {
+        if ( n > R-E  ||  R-E-n < std::fabs(pos.ZZ-Z) )
+            meca.addCylinderClampZ(pe, R, stiff);
+        else
+            meca.addPlaneClampX(pe, 2, Z, stiff);
+        return;
+    }
+    
+    /*
+     we add interaction to the tangent plane, which is okay
+     if the edge radius is not too small
+     */
+    real S = ( R - E ) / n;
+    Vector3 rim(S*pos.XX, S*pos.YY, Z);  // on the reduced cylinder rim
+    Vector dir = normalize(pos-rim);
+    meca.addPlaneClamp(pe, rim+E*dir, dir, stiff);
+
+#endif
+}
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
 void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
+#if HAS_SMOOTH_EDGES
+    setInteraction(pos, pe, meca, stiff, radius_, bot_, top_, edge_);
+#else
     setInteraction(pos, pe, meca, stiff, radius_, bot_, top_);
+#endif
 }
 
 /**
@@ -216,7 +342,11 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real
         T = B;
     }
     
+#if HAS_SMOOTH_EDGES
+    setInteraction(pos, pe, meca, stiff, R, B, T, edge_);
+#else
     setInteraction(pos, pe, meca, stiff, R, B, T);
+#endif
 }
 
 
@@ -229,7 +359,7 @@ void SpaceCylinderZ::write(Outputter& out) const
     out.writeFloat(radius_);
     out.writeFloat(bot_);
     out.writeFloat(top_);
-    out.writeFloat(0.f);
+    out.writeFloat(edge_);
 }
 
 
@@ -238,7 +368,9 @@ void SpaceCylinderZ::setLengths(const real len[])
     radius_ = len[0];
     bot_    = len[1];
     top_    = len[2];
+    edge_   = len[3];
 }
+
 
 void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 {
@@ -258,10 +390,12 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 bool SpaceCylinderZ::draw() const
 {
 #if ( DIM > 2 )
-    
     GLfloat T = top_;
     GLfloat B = bot_;
     GLfloat R = radius_;
+    GLfloat RE = radius_ - edge_;
+    GLfloat TE = top_ - edge_;
+    GLfloat BE = bot_ + edge_;
     
     const size_t fin = 512;
     GLfloat c[fin+1], s[fin+1];
@@ -272,8 +406,8 @@ bool SpaceCylinderZ::draw() const
     for ( size_t n = 0; n <= fin; ++n )
     {
         glNormal3f(c[n], s[n], 0);
-        glVertex3f(R*c[n], R*s[n], T);
-        glVertex3f(R*c[n], R*s[n], B);
+        glVertex3f(R*c[n], R*s[n], TE);
+        glVertex3f(R*c[n], R*s[n], BE);
     }
     glEnd();
     
@@ -282,7 +416,7 @@ bool SpaceCylinderZ::draw() const
     glNormal3f(0, 0, +1);
     glVertex3f(0, 0,  T);
     for ( size_t n = 0; n <= fin; ++n )
-        glVertex3f(R*c[n], R*s[n], T);
+        glVertex3f(RE*c[n], RE*s[n], T);
     glEnd();
     
     // draw bottom cap:
@@ -290,7 +424,7 @@ bool SpaceCylinderZ::draw() const
     glNormal3f(0, 0, -1);
     glVertex3f(0, 0,  B);
     for ( size_t n = 0; n <= fin; ++n )
-        glVertex3f(-R*c[n], R*s[n], B);
+        glVertex3f(-RE*c[n], RE*s[n], B);
     glEnd();
     
 #endif

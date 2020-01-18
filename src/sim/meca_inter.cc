@@ -4137,7 +4137,7 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 //------------------------------------------------------------------------------
 
 
-void Meca::addLineClampX(Mecapoint const& pte,
+void Meca::addPlaneClampX(Mecapoint const& pte,
                          size_t axi,
                          real pos,
                          const real weight)
