@@ -25,7 +25,7 @@ PicketLong::~PicketLong()
 
 //------------------------------------------------------------------------------
 
-Torque PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque PicketLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )

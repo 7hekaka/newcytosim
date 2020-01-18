@@ -28,7 +28,7 @@ public:
     ForkProp const* prop;
     
     /// constructor
-    Fork(ForkProp const*, Vector const & w = Vector(0,0,0));
+    Fork(ForkProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Fork();

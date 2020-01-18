@@ -126,10 +126,10 @@ public:
     bool            inside()   const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }
 
     /// test if `this` has a common point with argument
-    bool            overlapping(const Mecapoint &) const;
+    bool            overlapping(Mecapoint const&) const;
     
     /// test if `this` has a common point with argument
-    bool            overlapping(const Interpolation &) const;
+    bool            overlapping(Interpolation const&) const;
 
     /// Human friendly ouput
     void            print(std::ostream&) const;

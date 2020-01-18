@@ -30,13 +30,13 @@ void Mecapoint::write(Outputter& out) const
 }
 
 
-bool Mecapoint::overlapping(const Mecapoint & p) const
+bool Mecapoint::overlapping(Mecapoint const& p) const
 {
     return ( mec_ == p.mec_  &&  pti_ == p.pti_ );
 }
 
 
-bool Mecapoint::near(const Mecapoint & p) const
+bool Mecapoint::near(Mecapoint const& p) const
 {
     return ( mec_ == p.mec_  &&
             ( pti_ == p.pti_ || pti_ == p.pti_+1 || pti_+1 == p.pti_ ));

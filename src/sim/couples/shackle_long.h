@@ -23,12 +23,12 @@ class ShackleLong : public Shackle
     mutable Torque mArm;
     
     /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
     
     /// constructor
-    ShackleLong(ShackleProp const*, Vector const & w = Vector(0,0,0));
+    ShackleLong(ShackleProp const*, Vector const& w = Vector(0,0,0));
     
     //--------------------------------------------------------------------------
     

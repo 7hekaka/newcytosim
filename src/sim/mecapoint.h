@@ -57,10 +57,10 @@ public:
     void           read(Inputter&, Simul&);
     
     /// test if `this` shares one point with the argument
-    bool           overlapping(const Mecapoint &) const;
+    bool           overlapping(Mecapoint const&) const;
 
     /// test if `this` is one point away from the argument
-    bool           near(const Mecapoint &) const;
+    bool           near(Mecapoint const&) const;
 
     /// Human friendly ouput
     void           print(std::ostream&) const;

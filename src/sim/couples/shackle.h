@@ -22,7 +22,7 @@ public:
     ShackleProp const* prop;
     
     /// constructor
-    Shackle(ShackleProp const* p, Vector const & w = Vector(0,0,0));
+    Shackle(ShackleProp const* p, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Shackle();

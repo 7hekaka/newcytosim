@@ -25,12 +25,12 @@ class DuoLong : public Duo
     mutable Torque mArm;
     
     /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
     
     /// constructor
-    DuoLong(DuoProp const*, Vector const & w = Vector(0,0,0));
+    DuoLong(DuoProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~DuoLong();

@@ -21,7 +21,7 @@ DuoLong::~DuoLong()
 
 //------------------------------------------------------------------------------
 
-Torque DuoLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque DuoLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )

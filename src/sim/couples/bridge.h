@@ -33,7 +33,7 @@ public:
     BridgeProp const* prop;
     
     /// constructor
-    Bridge(BridgeProp const*, Vector const & w = Vector(0,0,0));
+    Bridge(BridgeProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Bridge();

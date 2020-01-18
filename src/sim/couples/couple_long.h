@@ -19,12 +19,12 @@ class CoupleLong : public Couple
     mutable Torque mArm;
     
     /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
     
     /// constructor
-    CoupleLong(CoupleProp const*, Vector const & w = Vector(0,0,0));
+    CoupleLong(CoupleProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~CoupleLong();
