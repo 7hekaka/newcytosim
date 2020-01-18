@@ -81,7 +81,7 @@
 /*
  Parallelization uses Intel's OpenMP.
  This requires a specific flag for the compiler, so adjust the makefile.inc
- CXXFLG := -std=gnu++11 -fopenmp
+ CXXFLG := -std=gnu++14 -fopenmp
  */
 #include <omp.h>
 #endif
