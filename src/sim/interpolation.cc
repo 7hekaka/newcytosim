@@ -14,13 +14,13 @@ Interpolation::Interpolation(FiberSegment const& loc, real abs)
 }
 
 
-bool Interpolation::overlapping(const Mecapoint & p) const
+bool Interpolation::overlapping(Mecapoint const& p) const
 {
     return ( mec_==p.mecable() && ( pt1_==p.point() || pt2_==p.point() ));
 }
 
 
-bool Interpolation::overlapping(const Interpolation & p) const
+bool Interpolation::overlapping(Interpolation const& p) const
 {
     return ( mec_==p.mec_ &&
             ( pt1_==p.pt1_ || pt1_==p.pt2_ || pt2_==p.pt1_ || pt2_==p.pt2_ ));

@@ -15,7 +15,7 @@ ShackleLong::ShackleLong(ShackleProp const* p, Vector const& w)
 
 //------------------------------------------------------------------------------
 
-Torque ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque ShackleLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )

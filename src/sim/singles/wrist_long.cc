@@ -20,7 +20,7 @@ WristLong::~WristLong()
 
 //------------------------------------------------------------------------------
 
-Torque WristLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque WristLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
