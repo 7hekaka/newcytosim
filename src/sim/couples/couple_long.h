@@ -24,7 +24,7 @@ class CoupleLong : public Couple
 public:
     
     /// constructor
-    CoupleLong(CoupleProp const*, Vector const & w = Vector(0,0,0));
+    CoupleLong(CoupleProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~CoupleLong();

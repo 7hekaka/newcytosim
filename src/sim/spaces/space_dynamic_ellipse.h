@@ -43,13 +43,13 @@ private:
     void        reset_forces() const;
     
     /// Decompose forces between radial and circular components
-    void        decompose_force(Vector const &, Vector const &, Vector const &) const;
+    void        decompose_force(Vector const&, Vector const&, Vector const&) const;
     
     /// Add radial component
-    void        add_radial_force(Vector const &, Vector const &) const;
+    void        add_radial_force(Vector const&, Vector const&) const;
     
     /// Find the optimal value of the pressure
-    real        compute_pressure(Vector const &, Vector const&) const;
+    real        compute_pressure(Vector const&, Vector const&) const;
     
     /// Return forces corresponding to given pressure
     Vector      pressure_forces(real pressure) const;
@@ -77,7 +77,7 @@ public:
     void    setInteractions(Meca&, FiberSet const&) const;
 
     /// setInteraction and changes the forces the ellipse undergoes
-    void    setInteraction(Vector const &pos, Mecapoint const& pe, Meca& meca, real stiff) const;
+    void    setInteraction(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;
 
     ///    ContractEllipse has a step function to adjust shape
     void    step();

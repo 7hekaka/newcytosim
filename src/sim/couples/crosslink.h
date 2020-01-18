@@ -23,7 +23,7 @@ public:
     CrosslinkProp const* prop;
     
     /// constructor
-    Crosslink(CrosslinkProp const*, Vector const & w = Vector(0,0,0));
+    Crosslink(CrosslinkProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual      ~Crosslink();

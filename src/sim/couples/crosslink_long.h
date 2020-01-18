@@ -24,7 +24,7 @@ class CrosslinkLong : public Crosslink
 public:
     
     /// constructor
-    CrosslinkLong(CrosslinkProp const*, Vector const & w = Vector(0,0,0));
+    CrosslinkLong(CrosslinkProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~CrosslinkLong();

@@ -30,7 +30,7 @@ class DuoLong : public Duo
 public:
     
     /// constructor
-    DuoLong(DuoProp const*, Vector const & w = Vector(0,0,0));
+    DuoLong(DuoProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~DuoLong();

@@ -27,7 +27,7 @@ class LineDisp;
 #define FIBER_HAS_MESH 0
 
 /// Flag to allow `family` member variable to control Couple's binding
-#define FIBER_HAS_FAMILY 0
+#define FIBER_HAS_FAMILY 1
 
 
 /// Flag to allow dynamic Single creation/binding

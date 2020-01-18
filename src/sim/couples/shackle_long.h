@@ -28,7 +28,7 @@ class ShackleLong : public Shackle
 public:
     
     /// constructor
-    ShackleLong(ShackleProp const*, Vector const & w = Vector(0,0,0));
+    ShackleLong(ShackleProp const*, Vector const& w = Vector(0,0,0));
     
     //--------------------------------------------------------------------------
     

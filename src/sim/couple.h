@@ -83,7 +83,7 @@ protected:
 public:
     
     /// constructor
-    Couple(CoupleProp const*, Vector const & w = Vector(0,0,0));
+    Couple(CoupleProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Couple();

@@ -4,7 +4,7 @@
 #include "meca.h"
 
 
-Shackle::Shackle(ShackleProp const* p, Vector const & w)
+Shackle::Shackle(ShackleProp const* p, Vector const& w)
 : Couple(p, w), prop(p)
 {
 }

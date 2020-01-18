@@ -295,7 +295,7 @@ void Hand::handleDisassemblyP()
 /**
  Test for attachment to nearby Fibers
  */
-void Hand::stepUnattached(const FiberGrid& grid, Vector const & pos)
+void Hand::stepUnattached(const FiberGrid& grid, Vector const& pos)
 {
     assert_true( unattached() );
 

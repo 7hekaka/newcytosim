@@ -44,7 +44,7 @@ public:
     DuoProp const* prop;
     
     /// constructor
-    Duo(DuoProp const*, Vector const & w = Vector(0,0,0));
+    Duo(DuoProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Duo();
