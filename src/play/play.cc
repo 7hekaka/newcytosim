@@ -21,11 +21,14 @@ Simul&      simul = thread.sim();
 PlayerProp&  prop = player.prop;
 DisplayProp& disp = player.disp;
 
+void displayLive(View& view, int mag);
+
 /// enable to create a player for command-line-only offscreen rendering
 //#define HEADLESS_PLAYER
 
 #ifdef HEADLESS_PLAYER
-void helpKeys(std::ostream& os) {}
+void helpKeys(std::ostream& os) { os << "This is a headless display\n"; }
+}
 #else
 #  include "glut.h"
 #  include "glapp.h"

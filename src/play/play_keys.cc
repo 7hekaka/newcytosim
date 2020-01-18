@@ -621,6 +621,10 @@ void processKey(unsigned char key)
             view.memo = player.buildMemo(view.draw_memo);
         } break;
         
+        case 'N':
+            glApp::createWindow(displayLive);
+            break;
+
 #if ENABLE_WRITE
             
         case 'y':
