@@ -146,9 +146,9 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    Fiber const*        family_;
-    Fiber const*        sister_;
-    Fiber const*        brother_;
+    Fiber const*  family_;
+    Fiber const*  sister_;
+    Fiber const*  brother_;
 #endif
 
     /// the Property of this object

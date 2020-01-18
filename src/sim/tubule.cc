@@ -7,6 +7,7 @@
 #include "simul.h"
 #include "meca.h"
 #include "exceptions.h"
+#include "messages.h"
 
 
 Tubule::Tubule(TubuleProp * p) : prop(p)
@@ -41,6 +42,8 @@ void Tubule::setFamily(Fiber const* fam)
         fil_[i]->sister_ = fil_[(i+NFIL-1)%NFIL];
         fil_[i]->brother_ = fil_[(i+1)%NFIL];
     }
+#else
+    PRINT_ONCE("WARNING: Tubule requires FIBER_HAS_FAMILY\n");
 #endif
 }
 
