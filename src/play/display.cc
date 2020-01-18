@@ -205,6 +205,7 @@ void Display::prepareLineDisp(const Fiber * fib)
     // change body color depending on coloring mode:
     switch ( disp->coloring )
     {
+        default:
         case FiberDisp::COLORING_OFF:
             self->color = disp->color;
             break;
@@ -220,11 +221,11 @@ void Display::prepareLineDisp(const Fiber * fib)
         case FiberDisp::COLORING_FLAG:
             self->color = gle::std_color(fib->flag());
             break;
-        case FiberDisp::COLORING_FAMILY:
 #if FIBER_HAS_FAMILY
+        case FiberDisp::COLORING_FAMILY:
             self->color = gle::nice_color(fib->family_->signature());
-#endif
             break;
+#endif
         case FiberDisp::COLORING_CLUSTER:
             self->color = gle::std_color(fib->flag());
             break;
