@@ -132,6 +132,9 @@ public:
     /// position in space (using current interpolation)
     Vector       pos()           const { return inter.pos(); }
     
+    /// the position around which attachment is seeked
+    Vector       remote_pos()    const;
+    
     /// position (recalculated on the fly)
     Vector       posHand()       const { return fbFiber->pos(fbAbs); }
     

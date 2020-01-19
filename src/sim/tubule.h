@@ -26,13 +26,16 @@ private:
     
     /// number of protofilaments
     static constexpr size_t NFIL = 13;
+    static constexpr size_t FILM = NFIL+2;
     
     /// initial radius of tubule
     static constexpr real tube_radius = 0.010;
 
+    /// central backbone if present
+    Fiber* bone_;
     
     /// constitutive filaments
-    Fiber* fil_[NFIL+2];
+    Fiber* fil_[FILM];
     
     /// the Property of this object
     TubuleProp const* prop;
@@ -65,7 +68,7 @@ public:
     static const ObjectTag TAG = 't';
 
     /// an ASCII character identifying the class of this object
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
 
     /// returns 0, since Event have no Property
     Property const* property() const { return prop; }
@@ -75,6 +78,10 @@ public:
     
     ///
     void setInteractions(Meca&);
+    ///
+    void setInteractionsB(Meca&);
+    ///
+    void setInteractionsC(Meca&);
     
     
     /// a static_cast<> of Node::next()

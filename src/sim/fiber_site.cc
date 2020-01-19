@@ -44,6 +44,20 @@ void FiberSite::relocateP()
 #pragma mark -
 
 
+#if FIBER_HAS_FAMILY
+Vector FiberSite::remote_pos() const
+{
+    assert_true(fbFiber);
+    if ( fbFiber->family_ )
+    {
+        Vector pos = fbFiber->pos(fbAbs);
+        return 2 * pos - fbFiber->family_->pos(fbAbs);
+    }
+    return inter.pos();
+}
+#endif
+
+
 FiberEnd FiberSite::nearestEnd() const
 {
     assert_true(fbFiber);

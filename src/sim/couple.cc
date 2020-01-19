@@ -219,7 +219,11 @@ void Couple::stepFF(const FiberGrid& grid)
 void Couple::stepAF(const FiberGrid& grid)
 {
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
+#if FIBER_HAS_FAMILY
+    cHand2->stepUnattached(grid, cHand1->remote_pos());
+#else
     cHand2->stepUnattached(grid, cHand1->pos());
+#endif
     cHand1->stepUnloaded();
 }
 
@@ -233,7 +237,11 @@ void Couple::stepAF(const FiberGrid& grid)
 void Couple::stepFA(const FiberGrid& grid)
 {
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
+#if FIBER_HAS_FAMILY
+    cHand1->stepUnattached(grid, cHand2->remote_pos());
+#else
     cHand1->stepUnattached(grid, cHand2->pos());
+#endif
     cHand2->stepUnloaded();
 }
 
@@ -282,8 +290,8 @@ bool Couple::allowAttachment(FiberSite const& sit)
         fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
         return false;
     
-#if FIBER_HAS_FAMILY
-    // prevent binding if fibers are from the same family
+#if 0 && FIBER_HAS_FAMILY
+    // prevent binding if that would induce link inside the same family
     if ( that->fiber()->family_ == sit.fiber()->family_ )
         return false;
 #endif

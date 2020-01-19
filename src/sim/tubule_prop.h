@@ -38,7 +38,9 @@ public:
     
     /// name of Fiber that make up the Tubule (know as `filament[1]`)
     std::string   fiber_type;
-    
+
+    /// name of Fiber used to make the backbone
+    std::string   bone_type;
     /// @}
     
 public:
