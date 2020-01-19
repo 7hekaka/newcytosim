@@ -276,10 +276,10 @@ bool Couple::allowAttachment(FiberSite const& sit)
     
     if ( !that )
         return true;
-        
+    
 #if FIBER_HAS_FAMILY
     // prevent binding if that would induce link inside the same family
-    if ( that->fiber()->family_ == sit.fiber()->family_ )
+    if ( that->fiber()->family_ && that->fiber()->family_ == sit.fiber()->family_ )
         return false;
 #endif
 

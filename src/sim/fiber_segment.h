@@ -110,7 +110,7 @@ public:
     friend bool  adjacent(FiberSegment const& a, FiberSegment const& b)
     {
 #if FIBER_HAS_FAMILY
-        if ( a.fib_->family_ && a.fib_->family_ == b.fib_->family_ )
+        if ( a.fib_->family_==b.fib_->family_  &&  a.pti_ < 2 + b.pti_  &&  b.pti_ < 2 + a.pti_ )
             return true;
 #endif
         return ( a.fib_==b.fib_  &&  a.pti_ < 2 + b.pti_  &&  b.pti_ < 2 + a.pti_ );
