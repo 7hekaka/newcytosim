@@ -295,13 +295,13 @@ void Hand::handleDisassemblyP()
 /**
  Test for attachment to nearby Fibers
  */
-void Hand::stepUnattached(const FiberGrid& grid, Vector const& pos)
+void Hand::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_true( unattached() );
 
 #if !TRICKY_HAND_ATTACHMENT
     // this does NOT use the Gillespie time nextAttach
-    grid.tryToAttach(pos, *this);
+    sim.fiberGrid.tryToAttach(pos, *this);
 #else
     assert_true( nextAttach >= 0 );
     // we test attachement with a rate that is 8x higher than the binding rate:
@@ -317,7 +317,7 @@ void Hand::stepUnattached(const FiberGrid& grid, Vector const& pos)
          in the case of very high number of targets, with the TRICKY_HAND_ATTACHMENT
          saturating at 8x the given binding rate.
          */
-        grid.tryToAttach(pos, *this);
+        sim.fiberGrid.tryToAttach(pos, *this);
             
         if ( attached() )
             break;
