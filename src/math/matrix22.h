@@ -765,6 +765,12 @@ public:
         return Matrix22(xl * dir.XX + dia, xy, xy, yl * dir.YY + dia);
     }
     
+    /// build the matrix `dia * Id + vec (x) Id`
+    static Matrix22 vectorProduct(const real dia, const real off)
+    {
+        return Matrix22(dia, off, -off, dia);
+    }
+
     /// return rotation matrix of angle defined by cosinus and sinus
     static Matrix22 rotation(const real c, const real s)
     {

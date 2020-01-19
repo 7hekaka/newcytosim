@@ -912,6 +912,15 @@ public:
                          Z * Z2 - 1.0);
     }
 
+    /// build the matrix `M = dia * Id + vec (x) Id`
+    /** thus applying M to V results in `dia * V + vec (x) V */
+    static Matrix34 vectorProduct(const real dia, const Vector3& vec)
+    {
+        return Matrix34(    dia,  vec.ZZ, -vec.YY,
+                        -vec.ZZ,     dia,  vec.XX,
+                         vec.YY, -vec.XX,     dia);
+    }
+
     /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
     /** The values of 'c' and 's' can be scaled to obtain a matrix where the
      rotation components is also scaling. Vectors along the axis remain unchanged */

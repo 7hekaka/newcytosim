@@ -78,7 +78,6 @@ void CrosslinkLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
-    
     /* 
      The 'arm' is recalculated each time, but in 2D at least,
      this maybe not necessary, as switching should be rare.
