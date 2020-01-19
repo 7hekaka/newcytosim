@@ -140,7 +140,7 @@ public:
     virtual Vector  posFoot()     const { return sPos; }
     
     /// position on the side of fiber used for sideInteractions
-    virtual Vector  posSide()     const { return sHand->pos(); }
+    virtual Vector  sidePos()     const { return sHand->pos(); }
     
     /// the Mecable to which this is anchored, or zero
     virtual Mecable const* base() const { return nullptr; }

@@ -42,9 +42,9 @@ Torque CrosslinkLong::calcArm(Interpolation const& pt, Vector const& pos, real l
 
 /**
  Note that, as `mArm` is calculated by setInteraction(),
- the result of posSide will be incorrect if 'solve=0'
+ the result of sidePos will be incorrect if 'solve=0'
  */
-Vector CrosslinkLong::posSide() const
+Vector CrosslinkLong::sidePos() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
@@ -59,7 +59,7 @@ Vector CrosslinkLong::posSide() const
  */
 Vector CrosslinkLong::force() const
 {
-    Vector d = cHand2->pos() - CrosslinkLong::posSide();
+    Vector d = cHand2->pos() - CrosslinkLong::sidePos();
     
     //correct for periodic space:
     if ( modulo )
@@ -78,7 +78,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
-    /* 
+    /*
      The 'arm' is recalculated each time, but in 2D at least,
      this maybe not necessary, as switching should be rare.
      */

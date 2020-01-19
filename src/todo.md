@@ -150,7 +150,7 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 
 - remove variadic functions (#include <stdarg>)
 - option to pull on beads with mouse
-- use posSide() for display more systematically
+- use sidePos() for display more systematically
 - Crank-Nicholson diffusion in Field (Jonathan did this)
 - class Event to control the value of a parameter in time, or execute arbitrary code
    can replace the 'event' parameter of command 'run'.
