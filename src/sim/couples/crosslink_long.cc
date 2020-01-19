@@ -64,9 +64,9 @@ void CrosslinkLong::setInteractions(Meca& meca) const
 
 #if ( DIM == 2 )
     
-    Vector dir = ptB.pos() - ptA.pos();
-    mArm1 = std::copysign(len, cross(ptA.diff(), dir));
-    mArm2 = std::copysign(len, cross(dir, ptB.diff()));
+    Vector dir = pt2.pos() - pt1.pos();
+    mArm1 = std::copysign(len, cross(pt1.diff(), dir));
+    mArm2 = std::copysign(len, cross(dir, pt2.diff()));
     meca.addSideSideLink2D(pt1, pt2, mArm1, mArm2, prop->stiffness);
 
 #elif ( DIM >= 3 )

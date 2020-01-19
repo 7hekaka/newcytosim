@@ -105,7 +105,7 @@ bool SpaceCylinderZ::inside(Vector const& w) const
 # else
     return ( bot_ <= w.ZZ  &&  w.ZZ <= top_  &&  RT <= radius_ * radius_ );
 # endif
-#elif ( DIM == 2 )
+#else
     ABORT_NOW("cylinderZ is only valid in 3D");
     return true;
 #endif
@@ -126,7 +126,7 @@ bool SpaceCylinderZ::allInside(Vector const& w, const real rad) const
     return ( bot_ + rad <= w.ZZ  &&  w.ZZ + rad <= top_
             && RT <= square(radius_-rad) );
 # endif
-#elif ( DIM == 2 )
+#else
     ABORT_NOW("cylinderZ is only valid in 3D");
     return true;
 #endif
