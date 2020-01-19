@@ -177,6 +177,17 @@ Fiber::Fiber(FiberProp const* p)
 #endif
 }
 
+#if FIBER_HAS_FAMILY
+/*
+This defines the position of the display centerline
+*/
+Vector Fiber::displayPos(real ab) const
+{
+    Vector I = family_->posM(ab);
+    Vector O = posM(ab);
+    return I + 0.7 * ( O - I );
+}
+#endif
 
 Fiber::~Fiber()
 {

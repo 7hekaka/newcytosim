@@ -884,7 +884,7 @@ void Display::drawFiberLinesM(Fiber const& fib, real len, real width) const
             ++ii;
         }
         if ( ii < fib.nbPoints() )
-            gle::gleVertex(fib.posM(len));
+            gle::gleVertex(fib.displayPos(len));
         glEnd();
     }
 }
@@ -975,7 +975,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         const real grad = disp->speckle_interval;
         real ab = grad * ceil( fib.abscissaM() / grad );
         while ( ab <= fib.abscissaP() ) {
-            gle::gleVertex( fib.pos(ab) );
+            gle::gleVertex(fib.pos(ab));
             ab += grad;
         }
         glEnd();
@@ -993,7 +993,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         pointSize(disp->point_size);
         glBegin(GL_POINTS);
         for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gle::gleVertex( fib.posP(ii) );
+            gle::gleVertex(fib.posP(ii));
         glEnd();
     }
     else if ( disp->point_style == 2 )
@@ -1143,7 +1143,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, real) const
     pointSize(fib.prop->disp->speckle_size);
     glBegin(GL_POINTS);
     for ( auto h = inf+1; h <= sup; ++h )
-        gle::gleVertex(fib.pos(uni*h));
+        gle::gleVertex(fib.displayPos(uni*h-fib.abscissaM()));
     glEnd();
 }
 

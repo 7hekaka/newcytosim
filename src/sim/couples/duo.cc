@@ -103,11 +103,7 @@ void Duo::stepAF(const FiberGrid& grid)
         deactivation();
     
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
-#if FIBER_HAS_FAMILY
-    cHand2->stepUnattached(grid, cHand1->remote_pos());
-#else
-    cHand2->stepUnattached(grid, cHand1->pos());
-#endif
+    cHand2->stepUnattached(grid, cHand1->outerPos());
     cHand1->stepUnloaded();
 }
 
@@ -124,11 +120,7 @@ void Duo::stepFA(const FiberGrid& grid)
         deactivation();
     
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
-#if FIBER_HAS_FAMILY
-    cHand1->stepUnattached(grid, cHand2->remote_pos());
-#else
-    cHand1->stepUnattached(grid, cHand2->pos());
-#endif
+    cHand1->stepUnattached(grid, cHand2->outerPos());
     cHand2->stepUnloaded();
 }
 

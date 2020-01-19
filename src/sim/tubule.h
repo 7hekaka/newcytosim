@@ -30,7 +30,7 @@ private:
     
     /// initial radius of tubule
     /* defines the distance between the centerline of the protofilaments */
-    static constexpr real tube_radius = 0.011;
+    static constexpr real tube_radius = 0.0145;
 
     /// central backbone if present
     Fiber* bone_;

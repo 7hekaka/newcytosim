@@ -132,8 +132,13 @@ public:
     /// position in space (using current interpolation)
     Vector       pos()           const { return inter.pos(); }
     
+#if FIBER_HAS_FAMILY
     /// the position around which attachment is seeked
-    Vector       remote_pos()    const;
+    Vector       outerPos()      const;
+#else
+    /// the position around which attachment is seeked
+    Vector       outerPos()      const { return inter.pos(); }
+#endif
     
     /// position (recalculated on the fly)
     Vector       posHand()       const { return fbFiber->pos(fbAbs); }

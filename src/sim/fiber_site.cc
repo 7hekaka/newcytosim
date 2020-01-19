@@ -45,9 +45,8 @@ void FiberSite::relocateP()
 
 
 #if FIBER_HAS_FAMILY
-Vector FiberSite::remote_pos() const
+Vector FiberSite::outerPos() const
 {
-    assert_true(fbFiber);
     if ( fbFiber->family_ )
     {
         Vector pos = fbFiber->pos(fbAbs);

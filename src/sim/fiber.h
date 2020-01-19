@@ -149,6 +149,15 @@ public:
     Fiber const*  family_;
     Fiber const*  sister_;
     Fiber const*  brother_;
+    
+    /// position of a point specified by abscissa from the ORIGIN
+    Vector  displayPos(real a) const;
+
+#else
+    
+    /// position of a point specified by abscissa from the ORIGIN
+    Vector  displayPos(real a) const { return posM(a); }
+
 #endif
 
     /// the Property of this object

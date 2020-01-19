@@ -242,8 +242,8 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
                                      void (*set_color)(Fiber const&, long, real), real beta) const
 {
     // draw MINUS_END
-    Vector pos = fib.posM(abs), old;
-    Vector nxt = fib.posM(abs+inc);
+    Vector pos = fib.displayPos(abs), old;
+    Vector nxt = fib.displayPos(abs+inc);
     Vector dir = normalize(nxt-pos);
 
     set_color(fib, inx, beta);
@@ -260,7 +260,7 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
     {
         old = pos;
         pos = nxt;
-        nxt = fib.posM(abs+2*inc);
+        nxt = fib.displayPos(abs+2*inc);
         dir = normalize(nxt-old);
         set_color(fib, inx, beta);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
@@ -283,7 +283,7 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
     for ( ; inx < last; ++inx )
     {
         pos = nxt;
-        nxt = fib.posM(abs+inc);
+        nxt = fib.displayPos(abs+inc);
         set_color(fib, inx, beta);
         gleTube(pos, nxt, rad, gleTube2B);
         abs += inc;
@@ -302,8 +302,8 @@ void Display3::drawFiberSegment(Fiber const& fib, bool minus_cap, bool plus_cap,
                                 const real abs1, const real abs2) const
 {
     // draw MINUS_END
-    Vector pos = fib.posM(abs1);
-    Vector nxt = fib.posM(abs2);
+    Vector pos = fib.displayPos(abs1);
+    Vector nxt = fib.displayPos(abs2);
     Vector dir = normalize(nxt-pos);
 
     if ( minus_cap )
@@ -1110,7 +1110,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     Vector dif = p2 - p1;
     real dns = dif.normSqr();
     
-#if ( 1 )
+#if !FIBER_HAS_FAMILY
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
