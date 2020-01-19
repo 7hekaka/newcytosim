@@ -46,7 +46,7 @@ void Tubule::setFamily(Fiber const* fam)
     if ( bone_ )
         bone_->family_ = fam;
 #else
-    PRINT_ONCE("WARNING: Tubule requires FIBER_HAS_FAMILY\n");
+    LOG_ONCE("WARNING: Tubule requires FIBER_HAS_FAMILY\n");
 #endif
 }
 

@@ -1562,7 +1562,7 @@ static constexpr real RECUT_PRECISION = 0.05;
  */
 void Chain::adjustSegmentation()
 {
-    PRINT_ONCE("adjustSegmentation() is using the fiber curvature\n");
+    LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
     
     const int upLimit = 8;
     size_t nbs = nbSegments();
