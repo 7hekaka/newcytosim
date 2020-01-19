@@ -130,7 +130,7 @@ private:
     Array<Mecable*> mecables;
     
     /// total number of points in the system
-    size_t         nbPts;
+    size_t          nbPts;
     
     /// size of the currently allocated memory
     size_t          allocated_;

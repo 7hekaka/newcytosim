@@ -33,11 +33,11 @@ typedef Matrix44 SquareBlock;
 
 ///real symmetric sparse Matrix
 /**
+ The lower triangle of the matrix is stored.
+ Elements are stored in no particular order in each column.
+
  MatrixSparseSymmetricBlock uses a sparse storage, with arrays of elements for each column.
  Each element is a full square block of size DIM x DIM.
- 
- Elements are stored in random order in the column.
- The lower triangle of the matrix is stored.
  
  F. Nedelec, 17--27 March 2017, revised entirely June 2018
  */
@@ -54,8 +54,8 @@ private:
     {
         friend class MatrixSparseSymmetricBlock;
 
-        size_t   allo_;       ///< allocated size of array
-        size_t   size_;       ///< number of blocks in column
+        size_t       allo_;   ///< allocated size of array
+        size_t       size_;   ///< number of blocks in column
         size_t      * inx_;   ///< line index for each element
         SquareBlock * blk_;   ///< block
         

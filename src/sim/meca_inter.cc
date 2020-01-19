@@ -71,22 +71,21 @@ inline bool any_equal(const size_t a, const size_t b,
 #pragma mark - Functions to set matrix elements
 //------------------------------------------------------------------------------
 
-void PRINT_BLOCK(size_t i, size_t j, MatrixBlock const& T)
-{
-    std::cerr << std::setw(2) << i << " " << j << " " << std::setw(10) << T << '\n';
-}
+#define CHECK_INDICES(I,J,C) ((void) 0)
+//#define CHECK_INDICES(I,J,C) { if (J>I) printf(" wrong-sided %s %lu %lu\n",C,I,J); }
+
+#define PRINT_BLOCK(I,J,B) ((void) 0)
+//#define PRINT_BLOCK(I,J,B) { std::clog<<std::setw(3)<<I<<" "<<J<<" "<<std::setw(10)<<B<<'\n'; }
+
 
 // add alpha * T to mC.
 inline void Meca::add_block(size_t i, size_t j, MatrixBlock const& T)
 {
-#if 0
-    if ( j > i )
-        printf("+off-side %i %i\n", i, j);
-#endif
+    CHECK_INDICES(i,j,"add");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
     mC.block(i, j).add_full(T);
-    //PRINT_BLOCK(i,j,T);
+    PRINT_BLOCK(i,j,T);
 #elif ( DIM == 1 )
     mB(i,j) += T.value();
 #else
@@ -100,14 +99,11 @@ inline void Meca::add_block(size_t i, size_t j, MatrixBlock const& T)
 // add T to mC.
 inline void Meca::add_block(size_t i, size_t j, real alpha, MatrixBlock const& T)
 {
-#if 0
-    if ( j > i )
-        printf(" off-side %i %i\n", i, j);
-#endif
+    CHECK_INDICES(i,j,"add_alpha");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
     mC.block(i, j).add_full(alpha, T);
-    //PRINT_BLOCK(i,j,alpha*T);
+    PRINT_BLOCK(i,j,alpha*T);
 #elif ( DIM == 1 )
     mB(i,j) += alpha * T.value();
 #else
@@ -121,14 +117,11 @@ inline void Meca::add_block(size_t i, size_t j, real alpha, MatrixBlock const& T
 // subtract T to mC.
 inline void Meca::sub_block(size_t i, size_t j, MatrixBlock const& T)
 {
-#if 0
-    if ( j > i )
-        printf("-off-side %i %i\n", i, j);
-#endif
+    CHECK_INDICES(i,j,"sub");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
     mC.block(i, j).sub_full(T);
-    //PRINT_BLOCK(i,j,-T);
+    PRINT_BLOCK(i,j,-T);
 #elif ( DIM == 1 )
     mB(i,j) -= T.value();
 #else
@@ -145,7 +138,7 @@ inline void Meca::add_block_diag(size_t i, MatrixBlock const& T)
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mC.diag_block(i).add_half(T);
-    //PRINT_BLOCK(i,i,T);
+    PRINT_BLOCK(i,i,T);
 #elif ( DIM == 1 )
     mB(i,i) += T.value();
 #else
@@ -162,7 +155,7 @@ inline void Meca::add_block_diag(size_t i, real alpha, MatrixBlock const& T)
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mC.diag_block(i).add_half(alpha, T);
-    //PRINT_BLOCK(i,i,alpha*T);
+    PRINT_BLOCK(i,i,alpha*T);
 #elif ( DIM == 1 )
     mB(i,i) += alpha * T.value();
 #else
@@ -179,7 +172,7 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mC.diag_block(i).sub_half(T);
-    //PRINT_BLOCK(i,i,-T);
+    PRINT_BLOCK(i,i,-T);
 #elif ( DIM == 1 )
     mB(i,i) -= T.value();
 #else
@@ -194,6 +187,7 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
 // add val to mB, the XYZ-isometric component
 inline void Meca::add_iso(size_t i, size_t j, real val)
 {
+    CHECK_INDICES(i,j,"add_iso");
 #if USE_ISO_MATRIX
     mB(i,j) += val;
 #else
@@ -206,6 +200,7 @@ inline void Meca::add_iso(size_t i, size_t j, real val)
 // add -val to mB, the XYZ-isometric component
 inline void Meca::sub_iso(size_t i, size_t j, real val)
 {
+    CHECK_INDICES(i,j,"sub_iso");
 #if USE_ISO_MATRIX
     mB(i,j) -= val;
 #else
@@ -2127,8 +2122,8 @@ void Meca::addSideLink2D(Interpolation const& ptA,
         {
             Matrix22 waT(ww0,  we, -we, ww0);
             Matrix22 wbT(ww1, -we,  we, ww1);
-            sub_base(ii0, waT.vecmul(off));
-            sub_base(ii1, wbT.vecmul(off));
+            sub_base(ii0, waT*off);
+            sub_base(ii1, wbT*off);
             add_base(ii2, off, weight);
         }
     }
@@ -2295,8 +2290,8 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     sub_iso(ia0, ia0, ww0 * cc0 + we * ee);
     sub_iso(ia1, ia1, ww1 * cc1 + we * ee);
     sub_iso(ib2, ib2, ww2 * cc2);
-    sub_iso(ib3, ib3, ww3 * cc3);
     sub_iso(ib3, ib2, ww3 * cc2);
+    sub_iso(ib3, ib3, ww3 * cc3);
 
 #if ( 1 )
     real wd = ww0 * cc1 - we * ee;
@@ -2358,7 +2353,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
 
-    //index in the matrix mC:
+    //indices in the matrix mC:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2493,7 +2488,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
                              Interpolation const& ptB,
                              const real len,
                              const real weight,
-                             real side1, real side2 )
+                             real side1, real side2)
 {
     assert_true( weight >= 0 );
  
@@ -2576,7 +2571,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
                              Interpolation const& ptB,
                              const real len,
                              const real weight,
-                             real side1, real side2 )
+                             real side1, real side2)
 {
     assert_true( weight >= 0 );
     assert_true( len >= 0 );
@@ -2668,7 +2663,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
      SA = A + len * N_A,
      SB = B + len * N_B,
  
- N_X is a normalized vector orthogonal to the fiber carrying X, in X:
+ N_{A/B} is a normalized vector orthogonal to the fiber carrying each point:
  The force is linear of zero resting length,
  
      force_SA = weight * ( SA - SB )

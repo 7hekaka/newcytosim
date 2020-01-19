@@ -42,11 +42,11 @@ typedef Matrix44 SubBlock;
 
 /// Sparse Matrix with block elements
 /**
+ The lower triangle of the matrix is stored.
+ Elements are stored in no particular order in each column.
+
  MatrixSparseBlock uses a sparse storage, with arrays of elements for each column.
  Each element is a full square block of size DIM x DIM.
- 
- Elements are stored in random order in the column.
- The lower triangle of the matrix is stored.
  
  FJN @ Cambridge, August-September 2019
  */
@@ -64,8 +64,8 @@ private:
     {
         friend class MatrixSparseBlock;
 
-        size_t     size_;   ///< number of elements
-        size_t     allo_;   ///< allocated size
+        size_t    size_;    ///< number of elements
+        size_t    allo_;    ///< allocated size
         SubBlock * blk_;    ///< block elements
         SubBlock * sbk_;    ///< pointer for consolidate elements
         size_t   * inx_;    ///< column indices for each element
