@@ -29,7 +29,8 @@ private:
     static constexpr size_t FILM = NFIL+2;
     
     /// initial radius of tubule
-    static constexpr real tube_radius = 0.010;
+    /* defines the distance between the centerline of the protofilaments */
+    static constexpr real tube_radius = 0.011;
 
     /// central backbone if present
     Fiber* bone_;

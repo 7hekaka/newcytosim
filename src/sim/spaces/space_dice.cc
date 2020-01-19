@@ -69,7 +69,7 @@ real SpaceDice::volume() const
 
 //------------------------------------------------------------------------------
 
-bool  SpaceDice::inside(Vector const& w) const
+bool SpaceDice::inside(Vector const& w) const
 {
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
@@ -78,8 +78,9 @@ bool  SpaceDice::inside(Vector const& w) const
 }
 
 
-bool  SpaceDice::allInside(Vector const& w, real rad) const
+bool SpaceDice::allInside(Vector const& w, real rad) const
 {
+    assert_true( rad >= 0 );
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
         dis += square(std::max((real)0, fabs(w[d]) - length_[d] + edge_ + rad));

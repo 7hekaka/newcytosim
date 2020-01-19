@@ -118,6 +118,8 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             {
                 real e = 0.1;
                 is >> e;
+                if ( e < REAL_EPSILON )
+                    throw InvalidParameter("distance R must be > 0 in `surface R`");
                 return spc->randomPlaceOnEdge(e);
             }
 
