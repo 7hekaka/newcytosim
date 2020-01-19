@@ -162,7 +162,7 @@ public:
     /// default destructor
     virtual ~MatrixSparseSymmetricBlock()  { deallocate(); }
     
-    /// set all the element to zero
+    /// set to zero
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )
@@ -247,7 +247,7 @@ public:
     /// printf debug function in sparse mode: i, j : value
     void printSparse(std::ostream&) const;
 
-    /// print content of one column
+    /// print size of columns
     void printColumns(std::ostream&);
     
     /// debug function

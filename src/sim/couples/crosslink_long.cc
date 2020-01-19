@@ -96,7 +96,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     
 #endif
     
-    //meca.addSideSideLink( cHand1->interpolation(), cHand2->interpolation(), prop->length, prop->stiffness );
+    //meca.addSideSideLink(pt1, pt2, prop->length, prop->stiffness);
 }
 
 

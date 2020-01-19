@@ -48,7 +48,7 @@ public:
     /// default destructor
     virtual ~MatrixSparse()  { deallocate(); }
     
-    /// set all the element to zero
+    /// set to zero
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )

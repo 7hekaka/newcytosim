@@ -488,7 +488,8 @@ public:
 
 #if ( DIM == 2 )
     /// Link of stiffness `weight` and resting length `arm`, on the sides of both fibers
-    void addSideSideLink2D(Interpolation const&, Interpolation const&, real arm, real weight, real side1, real side2);
+    void addSideSideLink2D(Interpolation const&, Interpolation const&, real weight, real arm1, real arm2);
+    void addSideSideLink2Dalt(Interpolation const&, Interpolation const&, real weight, real arm1, real arm2);
 #endif
     /// Link of stiffness `weight` and resting length `arm`, on the sides of both fibers
     void addSideSideLink(Interpolation const&, Interpolation const&, real arm, real weight);

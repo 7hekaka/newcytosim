@@ -454,7 +454,7 @@ void test_mat()
 void test_transpose2()
 {
     printf("------ test_transpose2\n");
-    vec4 m{0, 1, 2, 3};
+    vec4 m{1, 2, 3, 4};
     vec4 t = blend4(m, permute4(permute2f128(m,m,0x01),0b1100), 0b0110);
     dump(m, "m");
     dump(t, "t");
@@ -462,6 +462,7 @@ void test_transpose2()
     vec4 s = permute4x64(m, 0b11011000);
     dump(s, "s");
     dump(permute4x64(m, 0x88), "permute4x64(m, 0x88)");
+    dump(permute4x64(m, 0xD8), "permute4x64(m, 0xD8)");
     dump(permute4x64(m, 0xDD), "permute4x64(m, 0xDD)");
     dump(permute4x64(m, 0x50), "permute4x64(m, 0x50)");
 #endif
@@ -472,9 +473,9 @@ void test_transpose3()
 {
     printf("------ test_transpose3\n");
     // matrix:
-    vec4 m012{0, 1, 2, -6};
-    vec4 m345{3, 4, 5, -1};
-    vec4 m678{6, 7, 8, -1};
+    vec4 m012{1, 2, 3, 0};
+    vec4 m345{4, 5, 6, 0};
+    vec4 m678{7, 8, 9, 0};
 
     dump(m012, "m012");
     dump(m345, "m345");
@@ -483,14 +484,16 @@ void test_transpose3()
     // symmetrized matrix:
     vec4 z = shuffle4(m012, m345, 0b0011);
     vec4 u = permute2f128(m678, z, 0x03);
+    vec4 t = shuffle4(m012, m345, 0b1000);
     dump(z, "z");
     dump(u, "u");
-    
+    dump(t, "t");
+    dump(shuffle4(u, m345, 0b1110), "tmp");
     // transposed matrix:
-    vec4 m036 = blend4(u, shuffle4(m012, m345, 0b1000), 0b1011);
+    vec4 m036 = blend4(u, t, 0b1011);
+    vec4 m147 = blend4(z, shuffle4(u, m345, 0b1100), 0b1100);
     vec4 m258 = blend4(u, m678, 0b1100);
-    vec4 m147 = blend4(z, permute4(u, 0b0101), 0b0100);
-
+    
     dump(m036, "m036");
     dump(m147, "m147");
     dump(m258, "m258");
@@ -569,9 +572,9 @@ void test_swap7()
 
 int main(int argc, char * argv[])
 {
-    test_swapSSE();
+    //test_swapSSE();
 #ifdef __AVX__
-    if ( 1 )
+    if ( 0 )
     {
         test_cat();
         test_deswizzle();
@@ -579,7 +582,7 @@ int main(int argc, char * argv[])
         test_broadcast();
         test_store();
     }
-    if ( 1 )
+    if ( 0 )
     {
         //test_swap1();
         //test_swap2();
@@ -594,7 +597,7 @@ int main(int argc, char * argv[])
         test_swap7();
     }
 #endif
-    if ( 1 )
+    if ( 0 )
     {
         init();
         run(scalar,  "scalar ");
