@@ -8,7 +8,7 @@
 /// A specialized kind of Couple
 /**
  The Shackle creates a connection that is slipery on Hand1
- by using Meca:interSlidingLink().
+ it uses Meca::addSlidingLink().
  
  Note: this is highly experimental!
  @ingroup CoupleGroup

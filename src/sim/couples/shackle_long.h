@@ -7,7 +7,7 @@
 /// A Shackle with a non-zero resting length
 /**
  The ShackleLong adds a non-zero resting length to Duo,
- using Meca:interSideSlidingLink()
+ it uses Meca::addSideSlidingLink()
  
  For zero-resting length, use Shackle
  

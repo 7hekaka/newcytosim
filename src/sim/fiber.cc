@@ -187,6 +187,12 @@ Vector Fiber::displayPos(real ab) const
     Vector O = posM(ab);
     return I + 0.7 * ( O - I );
 }
+
+Vector Fiber::radialDir(real ab) const
+{
+    return posM(ab) - family_->posM(ab);
+}
+
 #endif
 
 Fiber::~Fiber()

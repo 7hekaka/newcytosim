@@ -8,7 +8,7 @@
 /// A Couple with a non-zero resting length
 /**
  The CoupleLong adds a non-zero resting length to Couple,
- using Meca:interSideLink()
+ it uses Meca::addSideLink()
 
  CoupleLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup

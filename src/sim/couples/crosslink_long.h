@@ -8,7 +8,7 @@
 /// A Crosslink with a non-zero resting length
 /**
  The CrosslinkLong adds a non-zero resting length to Crosslink,
- using Meca:interSideLink()
+ it uses Meca::addSideSideLink()
  
  CrosslinkLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup
@@ -16,10 +16,10 @@
 class CrosslinkLong : public Crosslink
 {
     /// the side (top/bottom) of the interaction
-    mutable Torque mArm;
-    
-    /// used to calculate `mArm`
-    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
+    mutable Torque mArm1;
+
+    /// the side (top/bottom) of the interaction
+    mutable Torque mArm2;
     
 public:
     

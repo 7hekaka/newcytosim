@@ -153,6 +153,9 @@ public:
     /// position of a point specified by abscissa from the ORIGIN
     Vector  displayPos(real a) const;
 
+    /// radial direction at the specified abscissa
+    Vector  radialDir(real a) const;
+
 #else
     
     /// position of a point specified by abscissa from the ORIGIN

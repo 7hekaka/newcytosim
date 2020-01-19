@@ -14,7 +14,7 @@
  See Duo
 
  The DuoLong differs from Duo in that is uses a non-zero resting length,
- and creates its interaction using Meca:interSideLink()
+ and creates its interaction using Meca::addSideLink()
  
  DuoLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup
