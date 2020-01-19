@@ -75,7 +75,7 @@ set couple complex
     hand1 = kinesin
     hand2 = kinesin
     stiffness = 250
-    diffusion = 20
+    diffusion = 5
     length = 0.030
     specificity = antiparallel
 }

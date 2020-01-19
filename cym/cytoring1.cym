@@ -76,7 +76,7 @@ set couple motor
     hand1 = myosin
     hand2 = myosin
     stiffness = 200
-    diffusion = 20
+    diffusion = 2
 }
 
 new 600 node

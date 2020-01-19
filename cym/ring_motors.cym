@@ -56,7 +56,7 @@ set couple complex
     hand1 = kinesin
     hand2 = dynein
     stiffness = 200
-    diffusion = 10
+    diffusion = 2
 }
 
 new 12 microtubule

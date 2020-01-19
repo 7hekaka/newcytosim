@@ -47,7 +47,7 @@ set couple crosslinker
     hand1 = binder
     hand2 = binder
     stiffness = 250
-    diffusion = 100
+    diffusion = 2
 }
 
 set couple motor
@@ -55,7 +55,7 @@ set couple motor
     hand1 = plus_motor
     hand2 = plus_motor
     stiffness = 250
-    diffusion = 100
+    diffusion = 2
 }
 
 
