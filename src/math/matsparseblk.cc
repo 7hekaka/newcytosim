@@ -64,8 +64,8 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
 {
     if ( alc > allo_ )
     {
-        //fprintf(stderr, "MSB reallocates column %i for %u: %p\n", inx_[0], alc);
-        //else fprintf(stderr, "MSB allocates column for %u: %p\n", alc);
+        //fprintf(stderr, "MSB reallocates line %i for %u: %p\n", inx_[0], alc);
+        //else fprintf(stderr, "MSB allocates line for %u: %p\n", alc);
         /*
          'chunk' can be increased, to possibly gain performance:
          more memory will be used, but reallocation will be less frequent
@@ -106,7 +106,7 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
 
 void MatrixSparseBlock::Line::deallocate()
 {
-    //if ( inx_ ) fprintf(stderr, "MSB deallocates column %i\n", inx_[0]);
+    //if ( inx_ ) fprintf(stderr, "MSB deallocates line %i\n", inx_[0]);
     free(inx_);
     free_real(blk_);
     inx_ = nullptr;
@@ -116,7 +116,7 @@ void MatrixSparseBlock::Line::deallocate()
 
 void MatrixSparseBlock::Line::operator =(MatrixSparseBlock::Line & row)
 {
-    //if ( inx_ ) fprintf(stderr, "MSB transfers column %u\n", inx_[0]);
+    //if ( inx_ ) fprintf(stderr, "MSB transfers line %u\n", inx_[0]);
     free(inx_);
     free_real(blk_);
 
@@ -202,7 +202,7 @@ bool MatrixSparseBlock::isNotZero() const
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
-        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+        for ( size_t n = 0 ; n < row.size_ ; ++n )
             if ( row[n] != 0.0 )
                 return true;
     }
@@ -216,7 +216,7 @@ void MatrixSparseBlock::scale(const real alpha)
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
-        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+        for ( size_t n = 0 ; n < row.size_ ; ++n )
             row[n].scale(alpha);
     }
 }
@@ -277,7 +277,7 @@ int MatrixSparseBlock::bad() const
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
-        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+        for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
             if ( row.inx_[n] >= size_ ) return 2;
             if ( row.inx_[n] <= jj )    return 3;
@@ -324,8 +324,8 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
     {
         Line & row = row_[jj];
         if ( row.size_ > 0 )
-            os << "% column " << jj << "\n";
-        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+            os << "% line " << jj << "\n";
+        for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
             size_t ii = row.inx_[n];
             SubBlock blk = row.blk_[n];
@@ -421,7 +421,7 @@ size_t MatrixSparseBlock::newElements(MatrixSparseBlock::Element*& ptr, size_t s
 void MatrixSparseBlock::Line::sortElements(Element tmp[], size_t tmp_size)
 {
     assert_true( size_ <= tmp_size );
-    for ( unsigned i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
     {
         tmp[i].blk = blk_[i];
         tmp[i].inx = inx_[i];
@@ -430,7 +430,7 @@ void MatrixSparseBlock::Line::sortElements(Element tmp[], size_t tmp_size)
     //std::clog << "sizeof(Element) " << sizeof(Element) << "\n";
     qsort(tmp, size_, sizeof(Element), &compareMSBElement);
     
-    for ( unsigned i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
     {
          blk_[i] = tmp[i].blk;
          inx_[i] = tmp[i].inx;
@@ -438,11 +438,11 @@ void MatrixSparseBlock::Line::sortElements(Element tmp[], size_t tmp_size)
 }
 
 /**
- Sort elements in each column by increasing line index
+ Sort elements in each line in order of increasing column index
  */
 void MatrixSparseBlock::sortElements()
 {
-    //unsigned cnt = 0;
+    //size_t cnt = 0;
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
@@ -465,12 +465,12 @@ void MatrixSparseBlock::sortElements()
     }
     
     newElements(tmp, 0);
-    //std::clog << "MatrixSparseBlock " << size_ << " with " << cnt << " non-empty columns\n";
+    //std::clog << "MatrixSparseBlock " << size_ << " with " << cnt << " non-empty lines\n";
 }
 
 
 /**
- allocates a single chunk of memory to hold all the column consecutively
+ allocates a single chunk of memory to hold all the lines consecutively
  */
 void MatrixSparseBlock::consolidate()
 {
@@ -495,10 +495,10 @@ void MatrixSparseBlock::consolidate()
         row.sbk_ = blocks_ + cnt;
         cnt += row.size_;
 #if ( BLOCK_SIZE == 2 ) && TRANSPOSE_2D_BLOCKS
-        for ( unsigned j = 0; j < row.size_; ++j )
+        for ( size_t j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j].transposed();
 #else
-        for ( unsigned j = 0; j < row.size_; ++j )
+        for ( size_t j = 0; j < row.size_; ++j )
             row.sbk_[j] = row.blk_[j];
 #endif
     }
@@ -515,7 +515,7 @@ void MatrixSparseBlock::symmetrize()
         Line & row = row_[i];
         //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
         
-        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+        for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
             /// we duplicate blocks from the lower triangle
             size_t j = row.inx_[n];
@@ -538,7 +538,7 @@ void MatrixSparseBlock::symmetrize()
         Line & row = row_[i];
         //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
         size_t j = 0;
-        for ( unsigned n = 0 ; n < row.size_ ; ++n )
+        for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
             if ( row.inx_[n] < j )
                 std::clog << "MSB line " << i << " is disordered\n";
@@ -950,7 +950,7 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, size_t start, size
 // multiplication of a vector: Y = Y + M * X
 void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t stop) const
 {
-    unsigned long cnt = 0, row = 0;
+    size_t cnt = 0, row = 0;
     //unsigned long long time = __rdtsc();
     for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
