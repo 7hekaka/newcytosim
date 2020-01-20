@@ -427,18 +427,6 @@ public:
     }
 
 #if MATRIX34_USES_AVX
-    /// multiplication by a vector: this * V
-    const vec4 vecmul3(double const* V) const
-    {
-        vec4 vec = loadu4(V); // { x, y, z, garbage }
-        vec4 s0 = mul4(load4(val  ), vec);
-        vec4 s1 = mul4(load4(val+4), vec);
-        vec4 s2 = mul4(load4(val+8), vec);
-        vec4 s3 = setzero4();
-        s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    }
     
     /// multiplication by a vector: this * V
     const vec4 vecmul4(const vec4 vec) const
@@ -447,9 +435,17 @@ public:
         vec4 s1 = mul4(load4(val+4), vec);
         vec4 s2 = mul4(load4(val+8), vec);
         vec4 s3 = setzero4();
+        /* summing the components below requires a lot of shuffling
+        but this is required only once when doing a lot of vecmul */
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
         return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    }
+    
+    /// multiplication by a vector: this * V
+    const vec4 vecmul3(double const* V) const
+    {
+        return vecmul4(loadu4(V)); // { x, y, z, garbage }
     }
 
     /// multiplication by a vector: transpose(M) * V

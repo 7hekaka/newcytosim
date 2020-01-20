@@ -20,11 +20,11 @@ CrosslinkLong::~CrosslinkLong()
 {
 }
 
-/**
- Note that, as `mArm` is calculated by setInteraction(),
- the result of sidePos will be incorrect if 'solve=0'
- */
-Vector CrosslinkLong::sidePos() const
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result of sidePos() will be incorrect if 'solve=0'
+*/
+ector CrosslinkLong::sidePos() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm1, cHand1->dirFiber());

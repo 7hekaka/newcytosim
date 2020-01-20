@@ -52,10 +52,10 @@ Vector WristLong::force() const
 
 #if ( 1 )
 
-/**
- Note that, as `mArm` is calculated by setInteraction(),
- the result of sidePos will be incorrect if 'solve=0'
- */
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result of sidePos() will be incorrect if 'solve=0'
+*/
 Vector WristLong::sidePos() const
 {
 #if ( DIM > 1 )

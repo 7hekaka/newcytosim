@@ -412,6 +412,9 @@ size_t MatrixSparseBlock::newElements(MatrixSparseBlock::Element*& ptr, size_t s
     return all;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Preparing operations
+
 /**
  This copies the data to the provided temporary array
  */
@@ -434,7 +437,9 @@ void MatrixSparseBlock::Line::sortElements(Element tmp[], size_t tmp_size)
     }
 }
 
-
+/**
+ Sort elements in each column by increasing line index
+ */
 void MatrixSparseBlock::sortElements()
 {
     //unsigned cnt = 0;
@@ -464,6 +469,9 @@ void MatrixSparseBlock::sortElements()
 }
 
 
+/**
+ allocates a single chunk of memory to hold all the column consecutively
+ */
 void MatrixSparseBlock::consolidate()
 {
     size_t cnt = 0;

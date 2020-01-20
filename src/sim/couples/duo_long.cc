@@ -39,10 +39,10 @@ Torque DuoLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 }
 
 
-/**
- Note that, as `mArm` is calculated by setInteraction(),
- the result of sidePos will be incorrect if 'solve=0'
- */
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result of sidePos() will be incorrect if 'solve=0'
+*/
 Vector DuoLong::sidePos() const
 {
 #if ( DIM > 1 )
