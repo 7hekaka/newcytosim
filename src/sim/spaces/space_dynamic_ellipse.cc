@@ -65,7 +65,7 @@ void SpaceDynamicEllipse::report(std::ostream& out) const
 //        Set interactions and update forces felt by ellipse.
 //-------------------------------------------------------------------------------------
 
-void SpaceDynamicEllipse::setInteractions(Meca&, FiberSet const&) const
+void SpaceDynamicEllipse::setInteractions(Meca&) const
 {
     reset_forces();
 }

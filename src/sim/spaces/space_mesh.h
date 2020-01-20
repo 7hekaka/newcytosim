@@ -54,7 +54,7 @@ public:
     void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void        setInteractions(Meca&, FiberSet const&) const;
+    void        setInteractions(Meca&) const;
 
     /// change dimensions
     void        resize(Glossary& opt);

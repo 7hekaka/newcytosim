@@ -74,7 +74,7 @@ public:
     void    resize(Glossary& opt);
 
     /// add interactions to a Meca
-    void    setInteractions(Meca&, FiberSet const&) const;
+    void    setInteractions(Meca&) const;
 
     /// setInteraction and changes the forces the ellipse undergoes
     void    setInteraction(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;

@@ -75,7 +75,7 @@ public:
 
     
     /// add interactions to a Meca
-    void       setInteractions(Meca&, FiberSet const&) const;
+    void       setInteractions(Meca&) const;
     
     /// one Monte-Carlo simulation step
     void       step();

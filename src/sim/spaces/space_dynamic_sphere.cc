@@ -11,7 +11,7 @@ SpaceDynamicSphere::SpaceDynamicSphere(SpaceProp const* p)
 }
 
 
-void SpaceDynamicSphere::setInteractions(Meca&, FiberSet const&) const
+void SpaceDynamicSphere::setInteractions(Meca&) const
 {
     force_ = 0;
 }

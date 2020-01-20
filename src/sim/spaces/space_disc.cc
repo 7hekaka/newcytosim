@@ -90,7 +90,7 @@ Vector SpaceDisc::project(Vector const& pos) const
 //------------------------------------------------------------------------------
 
 /// add interactions to a Meca
-void SpaceDisc::setInteractions(Meca&, FiberSet const&) const
+void SpaceDisc::setInteractions(Meca&) const
 {
     force_ = 0;
 }

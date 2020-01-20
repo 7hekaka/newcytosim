@@ -236,7 +236,7 @@ void Simul::setInteractions(Meca& meca) const
     // add interactions for all objects:
     
     for ( Space * s=spaces.first(); s; s=s->next() )
-        s->setInteractions(meca, fibers);
+        s->setInteractions(meca);
     
     for ( Fiber * f=fibers.first(); f ; f=f->next() )
         f->setInteractions(meca);

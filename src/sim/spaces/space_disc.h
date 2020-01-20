@@ -58,7 +58,7 @@ public:
 
     
     /// add interactions to a Meca
-    void        setInteractions(Meca&, FiberSet const&) const;
+    void        setInteractions(Meca&) const;
 
     /// apply a force directed towards the edge of the Space
     void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;

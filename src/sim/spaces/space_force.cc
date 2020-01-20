@@ -54,7 +54,7 @@ void SpaceForce::setInteraction(Vector const& pos, Mecapoint const&, real rad, M
 }
 
 
-void SpaceForce::setInteractions(Meca& meca, FiberSet const&) const
+void SpaceForce::setInteractions(Meca& meca) const
 {
     if ( stiffness > 0 )
         meca.addPointClampToAll(center, stiffness);

@@ -231,7 +231,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, real r
 #include "fiber_segment.h"
 #include "fiber_set.h"
 
-void SpacePolygon::setInteractions(Meca& meca, FiberSet const& fibers) const
+void SpacePolygon::setInteractions(Meca& meca) const
 {
 #if ( 0 )
     /// WORK IN PROGRESS

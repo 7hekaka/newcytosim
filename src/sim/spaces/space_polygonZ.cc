@@ -166,7 +166,7 @@ void SpacePolygonZ::setInteraction(Vector const& pos, Mecapoint const& pe, real 
 }
 
 
-void SpacePolygonZ::setInteractions(Meca& meca, FiberSet const& fibers) const
+void SpacePolygonZ::setInteractions(Meca& meca) const
 {
     /// @todo add interactions between fibers and reentrant corners!
 #if ( 0 )

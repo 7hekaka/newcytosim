@@ -151,7 +151,7 @@ public:
     virtual void   step() {}
     
     /// add interactions to a Meca
-    virtual void   setInteractions(Meca&, FiberSet const&) const {}
+    virtual void   setInteractions(Meca&) const {}
 
     //------------------------------ READ/WRITE --------------------------------
     

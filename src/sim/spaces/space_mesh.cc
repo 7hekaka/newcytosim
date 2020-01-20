@@ -88,7 +88,7 @@ void SpaceMesh::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
 }
 
 
-void SpaceMesh::setInteractions(Meca& meca, FiberSet const& fibers) const
+void SpaceMesh::setInteractions(Meca& meca) const
 {
 }
 

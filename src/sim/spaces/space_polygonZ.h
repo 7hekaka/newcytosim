@@ -66,7 +66,7 @@ public:
     void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void        setInteractions(Meca&, FiberSet const&) const;
+    void        setInteractions(Meca&) const;
 
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
     real        estimateVolumeZ(unsigned long cnt) const;

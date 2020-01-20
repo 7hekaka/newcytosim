@@ -148,7 +148,7 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
 #endif
 }
 
-void SpaceLid::setInteractions(Meca& meca, FiberSet const&) const
+void SpaceLid::setInteractions(Meca& meca) const
 {
     force_ = 0;
 }
