@@ -77,9 +77,9 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     mArm1 = cross(pt1.diff(), rad1).normalized(len);
     mArm2 = cross(pt2.diff(), rad2).normalized(len);
 # else
-    Vector dir = ptB.pos() - ptA.pos();
-    mArm1 = cross(ptA.diff(), dir).normalized(len);
-    mArm2 = cross(dir, ptB.diff()).normalized(len);
+    Vector dir = pt2.pos() - pt1.pos();
+    mArm1 = cross(pt1.diff(), dir).normalized(len);
+    mArm2 = cross(dir, pt2.diff()).normalized(len);
 # endif
     meca.addSideSideLink3D(pt1, pt2, mArm1, mArm2, prop->stiffness);
     

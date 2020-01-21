@@ -18,7 +18,9 @@
  while `shape` and `symbol` are only implemented for Hands.
  */
 class PointDisp : public Property
-{    
+{
+private:
+    
     /// used to differentiate between different uses of the class
     std::string mKind;
     

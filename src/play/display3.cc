@@ -1116,8 +1116,8 @@ void Display3::drawCoupleB(Couple const* cx) const
         // moving the 'hands' to the surface of the fiber:
         dns = sFactor / sqrt(dns);
         // position the heads at the surface of the filaments:
-        const real rad1 = cx->fiber1()->prop->disp->line_width;
-        const real rad2 = cx->fiber2()->prop->disp->line_width;
+        const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
+        const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
         // move points along the link
         //p1 += dif * std::min((real)0.45, rad1*dns);
         //p2 -= dif * std::min((real)0.45, rad2*dns);

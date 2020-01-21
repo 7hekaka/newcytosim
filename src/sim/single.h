@@ -82,7 +82,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// associated Hand
-    Hand*  hand()                              { return sHand; }
+    Hand*   hand()                             { return sHand; }
     
     /// sHand->attached()
     bool    attached()                  const  { return sHand->attached(); }

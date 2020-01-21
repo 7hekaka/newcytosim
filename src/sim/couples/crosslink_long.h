@@ -8,7 +8,8 @@
 /// A Crosslink with a non-zero resting length
 /**
  The CrosslinkLong adds a non-zero resting length to Crosslink,
- it uses Meca::addSideSideLink()
+ it uses Meca::addSideSideLink() which is a symmetric interaction with non-zero
+ resting length.
  
  CrosslinkLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup
