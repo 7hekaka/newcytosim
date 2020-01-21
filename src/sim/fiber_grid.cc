@@ -265,7 +265,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     for ( FiberSegment const& seg : segments )
     {
 #if !TRICKY_HAND_ATTACHMENT
-        if ( RNG.test(ha.prop->binding_rate_prob) )
+        if ( RNG.test(ha.prop->binding_prob) )
 #else
         if ( RNG.flip_8th() )
 #endif

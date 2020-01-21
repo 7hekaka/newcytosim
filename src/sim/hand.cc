@@ -300,7 +300,7 @@ void Hand::stepUnattached(Simul& sim, Vector const& pos)
     assert_true( unattached() );
 
 #if !TRICKY_HAND_ATTACHMENT
-    // this does NOT use the Gillespie time nextAttach
+    // test for attachment at every time_step, ignoring `nextAttach`
     sim.fiberGrid.tryToAttach(pos, *this);
 #else
     assert_true( nextAttach >= 0 );
