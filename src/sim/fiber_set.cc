@@ -2,6 +2,7 @@
 
 #include "fiber_set.h"
 #include "fiber_segment.h"
+#include "tokenizer.h"
 #include "iowrapper.h"
 #include "messages.h"
 #include "glossary.h"
@@ -68,27 +69,6 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
     return nullptr;
 }
 
-
-/**
- Split string `arg` into an integer, a space, and the remaining string.
- Any space after the integer is discarded. `arg` is truncated.
- */
-bool splitNumber(std::string& arg, size_t& num)
-{
-    char const* ptr = arg.c_str();
-    char * end;
-    errno = 0;
-    size_t var = strtoul(ptr, &end, 10);
-    if ( !errno && end > ptr && isspace(*end) )
-    {
-        num = var;
-        while ( isspace(*end) )
-            ++end;
-        arg.erase(0, (size_t)(end-ptr));
-        return true;
-    }
-    return false;
-}
 
 /**
  The initialization options depend on the type of fiber: Fiber, DynamicFiber, ClassicFiber, etc.
@@ -162,7 +142,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
     while ( opt.set(spe, var) )
     {
         size_t cnt = 1;
-        splitNumber(spe, cnt);
+        Tokenizer::split_integer(cnt, spe);
         
         // search for Single and Couple:
         SingleProp * sip = static_cast<SingleProp*>(simul.properties.find("single", spe));

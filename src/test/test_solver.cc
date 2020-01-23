@@ -69,9 +69,9 @@ public:
         } while ( str[0] == '%' );
         // parse dimension line:
         printf(" reading matrix: %s", str);
-        size_t lin = strtoul(str, &ptr, 10);
-        size_t col = strtoul(ptr, &ptr, 10);
-        size_t cnt = strtoul(ptr, &ptr, 10);
+        unsigned long lin = strtoul(str, &ptr, 10);
+        unsigned long col = strtoul(ptr, &ptr, 10);
+        unsigned long cnt = strtoul(ptr, &ptr, 10);
         if ( lin != col )
             return 2;
         allocate(lin);
@@ -113,7 +113,7 @@ int readVector(FILE * file, size_t dim, real * vec)
     } while ( str[0] == '%' );
     // parse dimension line:
     printf(" reading vector: %s", str);
-    size_t cnt = strtoul(str, 0, 10);
+    unsigned long cnt = strtoul(str, 0, 10);
     for ( size_t i = 0; i < cnt; ++i )
     {
         if ( 0 == fgets(str, MAX, file) ) return 3;
