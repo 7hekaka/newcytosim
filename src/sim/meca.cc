@@ -253,6 +253,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     const size_t inx = DIM * mec->matIndex();
     const size_t bks = DIM * mec->nbPoints();
 
+    // multiply the columns corresponding to this Mecable:
     mC.vecMul(X, Y, inx, inx+bks);
 
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
@@ -445,7 +446,7 @@ void Meca::multiply_precondition(real const* X, real* Y) const
 #endif
 }
 
-#else
+#else  // PARALLELIZE_MATRIX
 
 /// Y <- X - time_step * speed( mB + mC + P' ) * X;
 void Meca::multiply(const real* X, real* Y) const
@@ -472,7 +473,8 @@ void Meca::multiply(const real* X, real* Y) const
         blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     }
 }
-#endif
+
+#endif  // PARALLELIZE_MATRIX
 
 //------------------------------------------------------------------------------
 #pragma mark - Helper functions

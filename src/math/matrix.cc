@@ -85,7 +85,7 @@ void Matrix::addTriangularBlock(real* mat, const size_t ldd, const size_t si, co
 }
 
 //------------------------------------------------------------------------------
-void Matrix::vecMul( const real* X, real* Y ) const
+void Matrix::vecMul(const real* X, real* Y) const
 {
     zero_real(size(), Y);
     vecMulAdd( X, Y );
