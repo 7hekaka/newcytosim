@@ -922,7 +922,7 @@ inline void testU(size_t cnt, void (*func)(size_t, const real*, const real*, rea
     
     zero_real(ALOC, lagmul);
     func(NBS, diff, force, lagmul);
-    VecPrint::print(std::cout, std::min(20ul,NBS+1), lagmul) << std::endl;
+    VecPrint::print(std::cout, std::min(20UL,NBS+1), lagmul) << std::endl;
     
     free_real(x,y,z);
 }
@@ -945,7 +945,7 @@ inline void testD(size_t cnt, void (*func)(size_t, const real*, const real*, con
     
     zero_real(ALOC, x);
     func(NBS, diff, pos, lagmul, x);
-    VecPrint::print(std::cout, std::min(20ul,NBR+2), x) << std::endl;
+    VecPrint::print(std::cout, std::min(20UL,NBR+2), x) << std::endl;
     
     free_real(x,y,z);
 }
