@@ -170,9 +170,9 @@ void View::drawInteractiveFeatures() const
     // display FPS = frames per seconds
     static char buf[16];
     static unsigned cnt = 0;
-    static double sec = TicToc::seconds_today();
+    static double sec = TicToc::seconds_since_1970();
     ++cnt;
-    double now = TicToc::seconds_today();
+    double now = TicToc::seconds_since_1970();
     if ( now > sec + 1.0 )
     {
         double fps = cnt / ( now - sec );

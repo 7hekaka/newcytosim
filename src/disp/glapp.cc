@@ -1166,7 +1166,7 @@ void glApp::processPassiveMouseMotion(int mx, int my)
 void glApp::flashText0(const char* str)
 {
     flashString = str;
-    flashEndTime = TicToc::seconds_today() + 3.0;
+    flashEndTime = TicToc::seconds_since_1970() + 3.0;
     
     if ( views.size() > 1  &&  views[1].window()==1 )
         glutPostWindowRedisplay(1);
@@ -1252,7 +1252,7 @@ void glApp::displayMain()
     if ( flashString.size() )
     {
         /// check time
-        if ( TicToc::seconds_today() > flashEndTime )
+        if ( TicToc::seconds_since_1970() > flashEndTime )
             flashString = "";
         else
         {
