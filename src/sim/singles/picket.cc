@@ -34,11 +34,11 @@ void Picket::beforeDetachment(Hand const*)
 }
 
 
-void Picket::stepF(const FiberGrid& grid)
+void Picket::stepF(Simul& sim)
 {
     assert_false( sHand->attached() );
 
-    sHand->stepUnattached(grid, sPos);
+    sHand->stepUnattached(sim, sPos);
 }
 
 
@@ -66,7 +66,7 @@ Vector Picket::force() const
 }
 
 
-void Picket::setInteractions(Meca & meca) const
+void Picket::setInteractions(Meca& meca) const
 {
     assert_true( prop->length == 0 );
     meca.addPointClamp(sHand->interpolation(), sPos, prop->stiffness);

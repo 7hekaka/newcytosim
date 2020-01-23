@@ -18,14 +18,6 @@ Yes, of course, your feedback is essential to improve Cytosim. Please send it to
 
 <details>
 <summary>
-**Can I install Cytosim on Windows?**
-</summary>
-Compiling "natively" on windows would require dealing with `/` becoming `\` and different end-of-lines, and other annoying issues. You can however run Cytosim on your Windows computer, within [Cygwin](https://cygwin.com) which is a Unix emulator for Windows. We provide [instructions to compile on Cygwin](compile/cygwin.md).
-</details>
-
-
-<details>
-<summary>
 **Is there a detailed explanation of what the different parameters in the code mean (including units)?**
 </summary>
 The parameters associated with the objects are defined in a dedicated file, which includes documentation for each parameter.
@@ -55,9 +47,9 @@ Please, check the examples in `cym`.
 
 <details>
 <summary>
-**My simulations take several hours. Can I monitor the progress of `sim` while it is running?**
+**Can I install Cytosim on Windows?**
 </summary>
-When `sim` is running, it continuously writes to `messages.cmo` and you can read this file to check progression (we recommand using the command line, for example with `cat` or `tail`)
+Compiling "natively" on windows would require dealing with `/` becoming `\` and different end-of-lines, and other annoying issues. You can however run Cytosim on your Windows computer, within [Cygwin](https://cygwin.com) which is a Unix emulator for Windows. We provide [instructions to compile on Cygwin](compile/cygwin.md).
 </details>
 
 
@@ -164,6 +156,33 @@ No, this is not possible currently, and it is a very challenging programming tas
 Cytosim has no deformable generic Space, only static ones. You can do discrete changes, like changing the radius of the sphere, the same way you can change any parameter.
 </details>
 
+<details>
+<summary>
+**When I add filaments by default they are located everywhere in the box. Can I place them close to the bottom Z surface?**
+</summary>
+Yes, there are different ways to specify the initial position of the filaments. For example, this will place the filament perpendicular to the Z axis, and close to the bottom at Z = -1
+
+	new cell
+	{
+	    length = 20, 20, 2
+	}
+	
+	new 200 filament
+	{
+	    length = 8
+	    orientation = orthogonal 0 0 1
+	    position = rectangle 20 20 0 at 0 0 -1
+	}
+
+This would place them over a 1-um wide Z-range:
+	
+	new 200 filament
+	{
+	    length = 8
+	    orientation = orthogonal 0 0 1
+	    position = rectangle 20 20 1 at 0 0 -0.5
+	}
+</details>
 
 ### Fibers #############################################
 
@@ -273,7 +292,7 @@ If you must enable confinement, the filaments we be brought inside, but this tak
 
 <details>
 <summary>
-**Can I do a simulation in which filaments spontaneously spawn in time to simulate the addition of microtubules to the system? (it can be after a fixed time or stochastically)**
+**Can I do a simulation in which filaments spontaneously spawn in time to simulate the addition of microtubules to the system?**
 </summary>
 Yes, you can do this in three ways:
 
@@ -291,12 +310,12 @@ Yes, you can do this in three ways:
 		}
 
 
-2. use the event parameter of `run` to create objects:
+2. create an Event object create objects:
 
-		run 100000 system
+		new event
 		{
-		    nb_frames = 10
-		    event = 2, ( new microtubule { position=(rectangle 2 5); length=0.05; plus_end=grow; } )
+		    rate = 2
+		    activity = ( new microtubule { position=(rectangle 2 5); length=0.05; plus_end=grow; } )
 		}
 
 3. use Hand's `activity=nucleate` to create fibers:
@@ -940,7 +959,7 @@ You can call the 3D executable `sim3` and then you run this one to get a 3D simu
 
 <details>
 <summary>
-**I need to compile lapack locally for our server, any idea which cmake command should I use?**
+**I need to have Lapack on our server to compile Cytosim, any idea how to install it?**
 </summary>
 You can find a precompiled BLAS/LAPACK distributions for Linux. Ask you system administrator to deploy it. If you really need to compile BLAS/LAPACK, the [reference code is on netlib](http://www.netlib.org/lapack/index.html).
 </details>
@@ -1028,6 +1047,15 @@ You can do this at every time step, for example, by changing ‘execute_run’ i
 
 
 # Performance #################################################
+
+
+<details>
+<summary>
+**My simulations take several hours. Can I monitor the progress of `sim`?**
+</summary>
+When `sim` is running, it continuously writes to `messages.cmo` and you can read this file to check progression (we recommand using the command line, for example with `cat` or `tail`)
+</details>
+
 
 <details>
 <summary>
@@ -1224,7 +1252,7 @@ It is possible however to do what you describe, by modifying the code to do two 
  
 You can add a boolean parameter “mobile" into these classes, and test for it when you build the Meca:
 
-	void Simul::setInteractions(Meca & meca) const
+	void Simul::setInteractions(Meca& meca) const
 
  Not having these fibers included in the Meca would speed up things certainly.
 </details>
@@ -1303,7 +1331,7 @@ Tu ajoute un
 
 dans
 
-	void Solid::setInteractions(Meca & meca) const
+	void Solid::setInteractions(Meca& meca) const
 
 Il faudra ajouter un parametre dans SolidProp, pour controller cela.
 Tu pourra alors obtenir la force sur le lien qui retient le `core`:

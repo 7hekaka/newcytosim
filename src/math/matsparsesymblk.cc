@@ -248,7 +248,7 @@ void MatrixSparseSymmetricBlock::reset()
 }
 
 
-bool MatrixSparseSymmetricBlock::nonZero() const
+bool MatrixSparseSymmetricBlock::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
@@ -426,7 +426,7 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
 void MatrixSparseSymmetricBlock::printColumns(std::ostream& os)
 {
     os << "MSSB size " << size_ << ":";
-    for ( unsigned j = 0; j < size_; ++j )
+    for ( size_t j = 0; j < size_; ++j )
         if ( column_[j].size_ > 0 )
         {
             os << "\n   " << j << "   " << column_[j].size_;
@@ -539,7 +539,7 @@ void MatrixSparseSymmetricBlock::sortElements()
         assert_true( col.inx_[0] == j );
         col.blk_[0].copy_lower();
 #ifndef NDEBUG
-        for ( unsigned n = 1 ; n < col.size_ ; ++n )
+        for ( size_t n = 1 ; n < col.size_ ; ++n )
         {
             const size_t i = col.inx_[n];
             assert_true( i < size_ );
@@ -772,7 +772,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVX(const real* X, real* Y,
 
 
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
-inline void multiply2D(real const* X, real* Y, unsigned ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
+inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
     vec4 u = fmadd4(mat, xxxx, cast4(load2(Y+ii)));
@@ -848,8 +848,8 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* 
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
 
-    unsigned n = 1;
-    const unsigned stop = 1 + 4 * ( ( size_ - 1 ) / 4 );
+    size_t n = 1;
+    const size_t stop = 1 + 4 * ( ( size_ - 1 ) / 4 );
     // process 4 by 4:
     #pragma nounroll
     for ( ; n < stop; n += 4 )
@@ -1235,7 +1235,7 @@ void MatrixSparseSymmetricBlock::vecMulAdd_ALT(const real* X, real* Y) const
 // multiplication of a vector: Y = Y + M * X
 void MatrixSparseSymmetricBlock::vecMulAdd_TIME(const real* X, real* Y) const
 {
-    unsigned long cnt = 0, col = 0;
+    size_t cnt = 0, col = 0;
     //unsigned long long time = __rdtsc();
     for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
     {

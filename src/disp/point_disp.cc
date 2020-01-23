@@ -324,9 +324,8 @@ void PointDisp::savePixelmap(GLubyte* bitmap, unsigned dim, unsigned id) const
 #endif
 
 
-void PointDisp::drawPixelmap(Vector const& pos, unsigned ii) const
+void PointDisp::drawPixelmap(unsigned ii) const
 {
-    gle::gleRasterPos(pos);
     //translate to center the bitmap:
     glBitmap(0,0,0,0,mOffs,mOffs,nullptr);
 #if POINTDISP_USES_PIXEL_BUFFERS
@@ -434,50 +433,6 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
     glPopAttrib();
 }
 
-#else
-
-/// draw inactive state
-void PointDisp::drawI(Vector const& pos) const
-{
-    if ( perceptible )
-    {
-        glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(realSize);
-        color2.load();
-        gle::gleDisc();
-        glPopMatrix();
-    }
-}
-
-/// draw active state, unattached
-void PointDisp::drawF(Vector const& pos) const
-{
-    if ( perceptible )
-    {
-        glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(realSize);
-        color2.load();
-        strokeA();
-        glPopMatrix();
-    }
-}
-
-/// draw active state, attached
-void PointDisp::drawA(Vector const& pos) const
-{
-    if ( perceptible )
-    {
-        glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(realSize);
-        color.load();
-        strokeA();
-        glPopMatrix();
-    }
-}
-
 #endif
 
 
@@ -520,7 +475,7 @@ void PointDisp::read(Glossary& glos)
     
     // set 'color2' as a darker tone of 'color':
     if ( glos.set(color,   "color") )
-        color2 = color.alpha(0.5);
+        color2 = color.alpha_scaled(0.25);
     glos.set(color2,       "color", 1) || glos.set(color2, "back_color");
     glos.set(coloring,     "coloring");
     
@@ -552,7 +507,7 @@ void PointDisp::read(Glossary& glos)
 void PointDisp::write_values(std::ostream& os) const
 {
     write_value(os, "visible",     visible);
-    if ( color2 != color.alpha(0.5) )
+    if ( color2 != color.alpha_scaled(0.25) )
         write_value(os, "color",   color, color2);
     else
         write_value(os, "color",   color);

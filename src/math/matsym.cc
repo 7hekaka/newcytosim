@@ -64,7 +64,7 @@ real* MatrixSymmetric::addr( size_t x, size_t y) const
 }
 
 //------------------------------------------------------------------------------
-bool MatrixSymmetric::nonZero() const
+bool MatrixSymmetric::isNotZero() const
 {
     return true;
 }

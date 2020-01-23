@@ -16,10 +16,25 @@
  */
 
 #include <iostream>
+#include <cmath>
+
+
+// hexadecimal floating point literal is a C++17 feature
+constexpr double CONSTANT = 0x1p-31;
+
+#ifndef __STRICT_ANSI__
+// constexpr initialization is a GNU extension
+constexpr double SQ3 = std::sqrt(3);
+#else
+const double SQ3 = std::sqrt(3);
+#endif
 
 int main ()
 {
     std::clog << "C++ version " << __cplusplus << std::endl;
+
+    std::clog << "Constant = " << CONSTANT << std::endl;
+    std::clog << "sqrt(3) = " << SQ3 << std::endl;
 
     int my_array[] = { 1, 2, 3, 5, 7, 11, 13, 17, 23 };
     for (int &x : my_array) {

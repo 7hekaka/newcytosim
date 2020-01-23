@@ -180,7 +180,7 @@ void MatrixSparseSymmetric::reset()
 }
 
 
-bool MatrixSparseSymmetric::nonZero() const
+bool MatrixSparseSymmetric::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )

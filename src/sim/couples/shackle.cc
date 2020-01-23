@@ -4,7 +4,7 @@
 #include "meca.h"
 
 
-Shackle::Shackle(ShackleProp const* p, Vector const & w)
+Shackle::Shackle(ShackleProp const* p, Vector const& w)
 : Couple(p, w), prop(p)
 {
 }
@@ -19,7 +19,7 @@ Shackle::~Shackle()
 /**
  The interaction is slipery on hand1
  */
-void Shackle::setInteractions(Meca & meca) const
+void Shackle::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();

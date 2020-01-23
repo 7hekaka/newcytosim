@@ -14,7 +14,7 @@
  See Duo
 
  The DuoLong differs from Duo in that is uses a non-zero resting length,
- and creates its interaction using Meca:interSideLink()
+ and creates its interaction using Meca::addSideLink()
  
  DuoLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup
@@ -25,24 +25,24 @@ class DuoLong : public Duo
     mutable Torque mArm;
     
     /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
     
     /// constructor
-    DuoLong(DuoProp const*, Vector const & w = Vector(0,0,0));
+    DuoLong(DuoProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~DuoLong();
      
     /// position on the side of fiber1 used for sideInteractions
-    Vector  posSide() const;
+    Vector  sidePos() const;
  
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
     Vector  force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

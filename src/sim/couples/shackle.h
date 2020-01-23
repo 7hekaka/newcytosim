@@ -8,7 +8,7 @@
 /// A specialized kind of Couple
 /**
  The Shackle creates a connection that is slipery on Hand1
- by using Meca:interSlidingLink().
+ it uses Meca::addSlidingLink().
  
  Note: this is highly experimental!
  @ingroup CoupleGroup
@@ -22,7 +22,7 @@ public:
     ShackleProp const* prop;
     
     /// constructor
-    Shackle(ShackleProp const* p, Vector const & w = Vector(0,0,0));
+    Shackle(ShackleProp const* p, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Shackle();
@@ -33,7 +33,7 @@ public:
     void    stepAA();
     
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

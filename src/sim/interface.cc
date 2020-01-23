@@ -13,7 +13,7 @@
 #include "sim.h"
 #include <fstream>
 
-#include "../math/evaluator.cc"
+#include "evaluator.h"
 
 // Use the second definition to get some verbose reports:
 #define VLOG(ARG) ((void) 0)
@@ -152,9 +152,7 @@ void warn_trail(std::istream& is)
     std::string str;
     std::streampos pos = is.tellg();
     std::getline(is, str);
-    InvalidSyntax e("unexpected tokens `"+str+"'");
-    e << "in `" << StreamFunc::get_line(is, pos) << "'";
-    throw e;
+    throw InvalidSyntax("unexpected `"+str+"' in `"+StreamFunc::get_line(is, pos)+"'");
 }
 
 /**
@@ -765,12 +763,12 @@ void reportCPUtime(int frame, real simtime)
      }
  
  */
-void Interface::execute_run(size_t nb_steps, Glossary& opt)
+void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 {
-    size_t       nb_frames  = 0;
-    int          solve      = 1;
-    bool         prune      = true;
-    bool         binary     = true;
+    size_t nb_frames = 0;
+    int    solve     = 1;
+    bool   prune     = true;
+    bool   binary    = true;
     
 #ifdef BACKWARD_COMPATIBILITY
     // check if 'event' is specified within the 'run' command,
@@ -797,16 +795,17 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt)
         case 4: solveFunc = &Simul::solve_flux; break;
     }
 
-    opt.set(prune,  "prune");
-    opt.set(binary, "binary");
+    opt.set(prune,     "prune");
+    opt.set(binary,    "binary");
+    opt.set(nb_frames, "nb_frames");
     
-    size_t  frame = 1;
-    real    delta = (real)nb_steps;
-    size_t  check = nb_steps;
+    do_write &= ( nb_frames > 0 );
+
+    size_t frame = 1;
+    real   delta = (real)nb_steps;
+    size_t check = nb_steps;
     
     VLOG("+RUN START " << nb_steps << '\n');
-    
-    bool do_write = ( opt.set(nb_frames, "nb_frames") && nb_frames > 0 );
 
     if ( do_write )
     {

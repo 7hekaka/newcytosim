@@ -264,7 +264,7 @@ void MatrixSparse::printSparse(std::ostream& os) const
 }
 
 
-bool MatrixSparse::nonZero() const
+bool MatrixSparse::isNotZero() const
 {
     for ( size_t jj = 0; jj < size_; ++jj )
         if ( mxRow[jj] )

@@ -50,8 +50,7 @@ OBJ_ORGANIZERS := organizer.o organizer_set.o \
 
 OBJ_SIM := modulo.o movable.o mecable.o object.o object_set.o\
            sphere_prop.o sphere.o sphere_set.o\
-           bead_prop.o bead.o bead_set.o\
-           solid_prop.o solid.o solid_set.o\
+           solid_prop.o solid.o solid_set.o bead.o bead_set.o\
            field.o field_prop.o field_set.o\
            tubule_prop.o tubule.o tubule_set.o\
            event.o event_set.o\
@@ -69,14 +68,14 @@ OBJ_CYTOSIMD3:=$(OBJ_CYTOSIM:%.o=%D3.o)
 
 
 # objects containing graphical code under the DISPLAY keyword:
-OBJ_NEEDG:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
-OBJ_CYTOSIMG:=$(filter-out $(OBJ_NEEDG),$(OBJ_CYTOSIM)) $(OBJ_NEEDG:%.o=%G.o)
+OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
+OBJ_CYTOSIMG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOSIM)) $(OBJ_GRAFIX:%.o=%G.o)
 
 #----------------------------targets--------------------------------------------
 
-INC_BM=$(addprefix -Isrc/, base math)
-INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
+INC_BM:=-Isrc/base -Isrc/math
 INC_BMD=$(addprefix -Isrc/, base math sim sim/spaces disp)
+INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 
 #--- normal build:
 
@@ -160,15 +159,15 @@ $(OBJ_CYTOSIMD3): %D3.o: %.cc %.h | build
 
 # builds with DISPLAY enabled:
 
-$(OBJ_NEEDG:%.o=%G.o): %G.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%G.o): %G.o: %.cc %.h | build
 	$(COMPILE) -DDISPLAY $(INC_BMD) -c $< -o build/$@
 
-$(OBJ_NEEDG:%.o=%GD1.o): %GD1.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%GD1.o): %GD1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMD) -c $< -o build/$@
 
-$(OBJ_NEEDG:%.o=%GD2.o): %GD2.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%GD2.o): %GD2.o: %.cc %.h | build
 	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMD) -c $< -o build/$@
 
-$(OBJ_NEEDG:%.o=%GD3.o): %GD3.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%GD3.o): %GD3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMD) -c $< -o build/$@
 

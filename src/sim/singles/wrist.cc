@@ -63,11 +63,11 @@ Vector Wrist::force() const
 }
 
 
-void Wrist::stepF(const FiberGrid& grid)
+void Wrist::stepF(Simul& sim)
 {
     assert_false( sHand->attached() );
 
-    sHand->stepUnattached(grid, posFoot());
+    sHand->stepUnattached(sim, posFoot());
 }
 
 
@@ -79,7 +79,7 @@ void Wrist::stepA()
 }
 
 
-void Wrist::setInteractions(Meca & meca) const
+void Wrist::setInteractions(Meca& meca) const
 {
     anchor.interLink(meca, sHand->interpolation(), prop->stiffness);
 }

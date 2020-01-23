@@ -7,7 +7,7 @@
 /// A Shackle with a non-zero resting length
 /**
  The ShackleLong adds a non-zero resting length to Duo,
- using Meca:interSideSlidingLink()
+ it uses Meca::addSideSlidingLink()
  
  For zero-resting length, use Shackle
  
@@ -23,23 +23,23 @@ class ShackleLong : public Shackle
     mutable Torque mArm;
     
     /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
     
     /// constructor
-    ShackleLong(ShackleProp const*, Vector const & w = Vector(0,0,0));
+    ShackleLong(ShackleProp const*, Vector const& w = Vector(0,0,0));
     
     //--------------------------------------------------------------------------
     
     /// position on the side of fiber1 used for sideInteractions
-    Vector  posSide() const;
+    Vector  sidePos() const;
 
     /// force between hands
     Vector  force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

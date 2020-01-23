@@ -118,7 +118,7 @@ real Couple::stiffness() const
 }
 
 
-void Couple::setInteractions(Meca & meca) const
+void Couple::setInteractions(Meca& meca) const
 {
     assert_true( attached1() && attached2() );
     
@@ -135,7 +135,7 @@ void Couple::setInteractions(Meca & meca) const
 }
 
 
-void Couple::setInteractionsAF(Meca & meca) const
+void Couple::setInteractionsAF(Meca& meca) const
 {
     assert_true( attached1() && !attached2() );
     
@@ -149,7 +149,7 @@ void Couple::setInteractionsAF(Meca & meca) const
 }
 
 
-void Couple::setInteractionsFA(Meca & meca) const
+void Couple::setInteractionsFA(Meca& meca) const
 {
     assert_true( !attached1() && attached2() );
     
@@ -171,7 +171,7 @@ void Couple::setInteractionsFA(Meca & meca) const
  - attachment
  .
  */
-void Couple::stepFF(const FiberGrid& grid)
+void Couple::stepFF(Simul& sim)
 {
     diffuse();
     
@@ -200,12 +200,12 @@ void Couple::stepFF(const FiberGrid& grid)
      */
     if ( RNG.flip() )
     {
-        cHand1->stepUnattached(grid, cPos);
+        cHand1->stepUnattached(sim, cPos);
     }
     else
     {
         if ( !prop->trans_activated )
-            cHand2->stepUnattached(grid, cPos);
+            cHand2->stepUnattached(sim, cPos);
     }
 }
 
@@ -216,10 +216,10 @@ void Couple::stepFF(const FiberGrid& grid)
  - attached activity of cHand1
  .
  */
-void Couple::stepAF(const FiberGrid& grid)
+void Couple::stepAF(Simul& sim)
 {
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
-    cHand2->stepUnattached(grid, cHand1->pos());
+    cHand2->stepUnattached(sim, cHand1->outerPos());
     cHand1->stepUnloaded();
 }
 
@@ -230,10 +230,10 @@ void Couple::stepAF(const FiberGrid& grid)
  - attached activity of cHand2
  .
  */
-void Couple::stepFA(const FiberGrid& grid)
+void Couple::stepFA(Simul& sim)
 {
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
-    cHand1->stepUnattached(grid, cHand2->pos());
+    cHand1->stepUnattached(sim, cHand2->outerPos());
     cHand2->stepUnloaded();
 }
 
@@ -277,16 +277,17 @@ bool Couple::allowAttachment(FiberSite const& sit)
     if ( !that )
         return true;
     
+#if FIBER_HAS_FAMILY
+    // prevent binding if that would induce link inside the same family
+    if ( that->fiber()->family_ && that->fiber()->family_ == sit.fiber()->family_ )
+        return false;
+#endif
+
     // prevent binding to the same fiber if the segments are adjacent:
     if ( prop->stiff && that->fiber() == sit.fiber() &&
         fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
         return false;
     
-#if FIBER_HAS_FAMILY
-    // prevent binding if fibers are from the same family
-    if ( that->fiber()->family_ == sit.fiber()->family_ )
-        return false;
-#endif
 #if ( 0 )
     /*
      Test here if binding would create a link inside an aster, near the center:

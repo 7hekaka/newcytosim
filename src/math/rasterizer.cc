@@ -541,15 +541,15 @@ void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void *
 /**
  Paint a cylinder of Hexagonal base.
  The hexagon covering the unit disc has vertices:
- A (  0, -2*a )
- B (  b,   -a )
- C (  b,    a )
- D (  0,  2*a ) = -A
- E ( -b,    a ) = -B
- F ( -b,   -a ) = -C
+     A (  0, -2*a )
+     B (  b,   -a )
+     C (  b,    a )
+     D (  0,  2*a ) = -A
+     E ( -b,    a ) = -B
+     F ( -b,   -a ) = -C
  with b = sqrt(3) * a
- b = 1
- a = 1 / sqrt(3)
+     b = 1
+     a = 1 / sqrt(3)
  */
 void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void * arg,
                                 const Vector3& P, const Vector3& Q, const real length,

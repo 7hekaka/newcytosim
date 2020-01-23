@@ -32,7 +32,7 @@ Crosslink::~Crosslink()
  - attachment
  .
  */
-void Crosslink::stepFF(const FiberGrid& grid)
+void Crosslink::stepFF(Simul& sim)
 {
     diffuse();
     
@@ -44,12 +44,12 @@ void Crosslink::stepFF(const FiberGrid& grid)
         modulo->fold(cPos);
     
     // activity:
-    cHand1->stepUnattached(grid, cPos);
-    cHand2->stepUnattached(grid, cPos);
+    cHand1->stepUnattached(sim, cPos);
+    cHand2->stepUnattached(sim, cPos);
 }
 
 
-void Crosslink::setInteractions(Meca & meca) const
+void Crosslink::setInteractions(Meca& meca) const
 {
     assert_true( attached1() && attached2() );
     

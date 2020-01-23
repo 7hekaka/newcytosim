@@ -91,7 +91,7 @@ public:
     virtual void       step() {}
     
     /// add interactions to a Meca
-    virtual void       setInteractions(Meca &) const {}
+    virtual void       setInteractions(Meca&) const {}
     
     /// sum the drag coefficient of all objects
     real               dragCoefficient() const;

@@ -339,6 +339,12 @@ public:
         return Matrix11(len * dir.XX * dir.XX + dia);
     }
     
+    /// build the matrix `dia * Id`
+    static Matrix11 vectorProduct(const real dia, const real)
+    {
+        return Matrix11(dia);
+    }
+
     /// return rotation matrix of angle defined by cosinus and sinus
     static Matrix11 rotation(real c, real s)
     {

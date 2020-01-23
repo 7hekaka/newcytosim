@@ -205,6 +205,7 @@ void Display::prepareLineDisp(const Fiber * fib)
     // change body color depending on coloring mode:
     switch ( disp->coloring )
     {
+        default:
         case FiberDisp::COLORING_OFF:
             self->color = disp->color;
             break;
@@ -220,11 +221,11 @@ void Display::prepareLineDisp(const Fiber * fib)
         case FiberDisp::COLORING_FLAG:
             self->color = gle::std_color(fib->flag());
             break;
-        case FiberDisp::COLORING_FAMILY:
 #if FIBER_HAS_FAMILY
+        case FiberDisp::COLORING_FAMILY:
             self->color = gle::nice_color(fib->family_->signature());
-#endif
             break;
+#endif
         case FiberDisp::COLORING_CLUSTER:
             self->color = gle::std_color(fib->flag());
             break;
@@ -297,7 +298,7 @@ void Display::prepareLineDisp(const Fiber * fib)
     // hide fibers which are not growing
     if ( fib->dynamicStateP() == STATE_WHITE )
     {
-        PRINT_ONCE("non-growing fibers made invisible\n");
+        LOG_ONCE("non-growing fibers made invisible\n");
         self->visible = -1;
         self->color = disp->hide_color;
         self->end_color[0] = self->color.transparency(1.0);
@@ -335,7 +336,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
         alldisp.push_back(disp);
         // set default:
         disp->color  = col;
-        disp->color2 = col.alpha(0.5);
+        disp->color2 = col.alpha_scaled(0.25);
         disp->size   = prop->point_size;
         if ( p->category() == "hand" )
             disp->width = prop->link_width;
@@ -807,9 +808,9 @@ void Display::drawFiberLines(Fiber const& fib) const
 #if ( 1 )
             // adjust transparency, to make tense fibers more visible:
             if ( x <= 0 )
-                col.load(-x);           // compression
+                col.inverted().load(-x);  // invert color for compression
             else
-                col.inverted().load(x); // invert color for extension
+                col.load(x);  // extension
 #else
             // use rainbow coloring, where Lagrange multipliers are negative under compression
             gle_color::jet_color(1-x, alpha).load();
@@ -883,7 +884,7 @@ void Display::drawFiberLinesM(Fiber const& fib, real len, real width) const
             ++ii;
         }
         if ( ii < fib.nbPoints() )
-            gle::gleVertex(fib.posM(len));
+            gle::gleVertex(fib.displayPos(len));
         glEnd();
     }
 }
@@ -974,7 +975,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         const real grad = disp->speckle_interval;
         real ab = grad * ceil( fib.abscissaM() / grad );
         while ( ab <= fib.abscissaP() ) {
-            gle::gleVertex( fib.pos(ab) );
+            gle::gleVertex(fib.pos(ab));
             ab += grad;
         }
         glEnd();
@@ -992,7 +993,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         pointSize(disp->point_size);
         glBegin(GL_POINTS);
         for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gle::gleVertex( fib.posP(ii) );
+            gle::gleVertex(fib.posP(ii));
         glEnd();
     }
     else if ( disp->point_style == 2 )
@@ -1142,7 +1143,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, real) const
     pointSize(fib.prop->disp->speckle_size);
     glBegin(GL_POINTS);
     for ( auto h = inf+1; h <= sup; ++h )
-        gle::gleVertex(fib.pos(uni*h));
+        gle::gleVertex(fib.displayPos(uni*h-fib.abscissaM()));
     glEnd();
 }
 

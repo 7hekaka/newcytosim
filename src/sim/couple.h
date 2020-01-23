@@ -32,7 +32,7 @@ class Meca;
  .
  
  The default Couple has:
- - a zero resting length (it uses Meca:interLink())
+ - a zero resting length (it uses it uses Meca::addLink())
  - no specificity
  .
 
@@ -47,14 +47,15 @@ public:
     
 protected:
     
-    /// position and position in previous step of complex
-    Vector   cPos;
+    /// position of complex when detached
+    Vector cPos;
     
     /// first Hand
-    Hand    * cHand1;
+    Hand * cHand1;
 
     /// second Hand
-    Hand    * cHand2;
+    Hand * cHand2;
+    
     
     /// specialization of HandMonitor
     bool      allowAttachment(FiberSite const&);
@@ -64,8 +65,6 @@ protected:
     void      beforeDetachment(Hand const*);
     /// specialization of HandMonitor
     ObjectID  nucleatorID() const { return Object::identity(); }
-    /// Simul pointer
-    Simul*    simul() const { return &Object::simul(); }
     /// specialization of HandMonitor
     Hand *    otherHand(Hand const*) const;
     /// specialization of HandMonitor
@@ -83,7 +82,7 @@ protected:
 public:
     
     /// constructor
-    Couple(CoupleProp const*, Vector const & w = Vector(0,0,0));
+    Couple(CoupleProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Couple();
@@ -97,13 +96,13 @@ public:
     void           setProperty(CoupleProp *);
     
     /// add interactions to a Meca
-    virtual void   setInteractions(Meca &) const;
+    virtual void   setInteractions(Meca&) const;
     
     /// add interactions to a Meca (experimental)
-    virtual void   setInteractionsAF(Meca &) const;
+    virtual void   setInteractionsAF(Meca&) const;
     
     /// add interactions to a Meca (experimental)
-    virtual void   setInteractionsFA(Meca &) const;
+    virtual void   setInteractionsFA(Meca&) const;
     
     //--------------------------------------------------------------------------
     
@@ -152,7 +151,7 @@ public:
     real           cosAngle()             const { return dot(cHand1->dirFiber(), cHand2->dirFiber()); }
    
     /// position on the side of fiber1 used for sideInteractions
-    virtual Vector posSide()              const { return cHand1->pos(); }
+    virtual Vector sidePos()              const { return cHand1->pos(); }
     
     /// the position of the complex if it is unattached
     Vector         posFree()              const { return cPos; }
@@ -160,13 +159,13 @@ public:
     //--------------------------------------------------------------------------
 
     /// simulation step for a free Couple: diffusion
-    virtual void   stepFF(const FiberGrid&);
+    virtual void   stepFF(Simul&);
     
     /// simulation step for a Couple attached by Hand1
-    virtual void   stepAF(const FiberGrid&);
+    virtual void   stepAF(Simul&);
     
     /// simulation step for a Couple attached by Hand2
-    virtual void   stepFA(const FiberGrid&);
+    virtual void   stepFA(Simul&);
     
     /// simulation step for a doubly-attached Couple
     virtual void   stepAA();
@@ -175,6 +174,9 @@ public:
 
     /// pointer to Hand1
     Hand*    hand1()                            { return cHand1; }
+   
+    /// pointer to constant Hand1
+    Hand const* hand1()                   const { return cHand1; }
     
     /// true if Hand1 is attached
     bool     attached1()                  const { return cHand1->attached(); }
@@ -205,6 +207,9 @@ public:
     /// pointer to Hand2
     Hand*    hand2()                            { return cHand2; }
     
+    /// pointer to constant Hand2
+    Hand const* hand2()                   const { return cHand2; }
+
     /// true if Hand2 is attached
     bool     attached2()                  const { return cHand2->attached(); }
     

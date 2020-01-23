@@ -55,7 +55,7 @@ set couple complex
     hand1 = kinesin
     hand2 = kinesin
     stiffness = 100
-    diffusion = 20
+    diffusion = 2
     length = 0.05
 }
 

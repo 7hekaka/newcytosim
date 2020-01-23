@@ -144,10 +144,10 @@ public:
     static void  infoBendingEnergy(ObjectList const&, size_t& cnt, real& avg, real& dev);
     
     /// sum Lagrange multipliers for segments that intersect the plane <em> n.pos + a = 0 </em>
-    void  infoTension(size_t&, real& hten, Vector const& n, real a) const;
+    void  infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const;
     
     /// sum Lagrange multipliers for all fibers
-    void  infoTension(size_t&, real& hten) const;
+    void  infoTension(size_t& cnt, real& sum, real& inf, real& sup) const;
 
     /// Calculate spindle indices
     void  infoSpindle(real& ixa, real& ixs, Vector const& n, real a, real m, real da) const;

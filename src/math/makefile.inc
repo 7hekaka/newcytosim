@@ -1,14 +1,14 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-OBJ_MATH:=smath.o vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
-    	rasterizer.o project_ellipse.o platonic.o matrix.o matsparse.o matsparsesym.o\
+OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
+    	rasterizer.o platonic.o matrix.o matsparse.o matsparsesym.o\
     	matsparsesym1.o polygon.o pointsonsphere.o random.o random_vector.o\
-        matrix34.o quartic_solver.o matsym.o matblock.o
+        matrix34.o matsym.o matblock.o project_ellipse.o quartic_solver.o
 
 #----------------------------rules----------------------------------------------
 
-INC_BM:=$(addprefix -Isrc/, base math)
+INC_BM:=-Isrc/base -Isrc/math
 
 
 $(OBJ_MATH): %.o: %.cc %.h | build
@@ -60,10 +60,4 @@ cytomathD2.a: $(OBJ_MATH) matsparsesymblkD2.o matsparseblkD2.o
 cytomathD3.a: $(OBJ_MATH) matsparsesymblkD3.o matsparseblkD3.o
 	$(MAKELIB)
 	$(DONE)
-
-
-# build the rasterizer with display enabled:
-rasterizerG.o: rasterizer.cc rasterizer.h
-	$(COMPILE) $(INC_BM) -Isrc/disp -DDISPLAY -c $< -o build/$@
-vpath rasterizerG.o build
 

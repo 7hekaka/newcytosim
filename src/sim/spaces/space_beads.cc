@@ -136,13 +136,13 @@ Vector SpaceBeads::project(Vector const& pos) const
 
 //------------------------------------------------------------------------------
 
-void SpaceBeads::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceBeads::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     ABORT_NOW("SpaceBeads is incomplete");
 }
 
 
-void SpaceBeads::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceBeads::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     ABORT_NOW("SpaceBeads is incomplete");
 }

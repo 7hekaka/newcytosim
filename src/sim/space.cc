@@ -61,9 +61,6 @@ Vector Space::randomPlace() const
  */
 Vector Space::randomPlaceNearEdge(real rad, size_t nb_trials) const
 {
-    if ( rad <= 0 )
-        throw InvalidParameter("a distance must be > 0");
-
     size_t ouf = 0;
     Vector res;
     do {
@@ -85,24 +82,21 @@ Vector Space::randomPlaceNearEdge(real rad, size_t nb_trials) const
  */
 Vector Space::randomPlaceOnEdge(real rad, size_t nb_trials) const
 {
-    if ( rad <= 0 )
-        throw InvalidParameter("a distance must be > 0");
-
     size_t ouf = 0;
-    real d, rr = rad * rad;
+    real D = std::fabs(rad), RR = rad * rad;
     Vector pos, res, inf, dif;
     
     boundaries(inf, dif);
-    inf -= Vector(rad, rad, rad);
-    dif += Vector(rad, rad, rad) - inf;
+    inf -= Vector(D, D, D);
+    dif += Vector(D, D, D) - inf;
     
     do {
         pos = inf + dif.e_mul(Vector::randP());
         res = project(pos);
-        d = ( pos - res ).normSqr();
+        D = ( pos - res ).normSqr();
         if ( ++ouf > nb_trials )
             throw InvalidParameter("edge placement failed for space `"+prop->name()+"'");
-    } while ( d > rr );
+    } while ( D > RR );
     
     return res;
 }
@@ -236,12 +230,12 @@ Vector Space::bounce(Vector pos) const
     do {
         p = project(pos);
         pos = 2*p - pos;
-        q = project(pos);
-        pos = 2*q - pos;
         if ( inside(pos) )
             return pos;
-        else if ( distanceSqr(p, q) < REAL_EPSILON )
-            return p;
+        q = project(pos);
+        pos = 2*q - pos;
+        if ( inside(pos) || distanceSqr(p, q) < REAL_EPSILON )
+            return pos;
     } while ( ++cnt < 8 );
     
     static size_t msg = 0;
@@ -342,7 +336,7 @@ real  Space::signedDistanceToEdge(Vector const& pos) const
  This generates a friction-less potential centered on the edge.
  */
 
-void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     Vector prj = project(pos);
     Vector dir = pos - prj;
@@ -360,7 +354,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, 
  This generates a friction-less potential centered on the edge.
  */
 
-void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     Vector prj = projectDeflated(pos, rad);
     Vector dir = pos - prj;
@@ -375,7 +369,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Mec
  This calls Space::setInteraction(pos, Mecapoint, meca, stiff) twice,
  to generate a force on `pi` (which is at position `pos`) toward the surface.
  */
-void Space::setInteraction(Vector const& pos, Interpolation const& pi, Meca & meca, real stiff) const
+void Space::setInteraction(Vector const& pos, Interpolation const& pi, Meca& meca, real stiff) const
 {
     setInteraction(pos, pi.exact1(), meca, pi.coef0()*stiff);
     setInteraction(pos, pi.exact2(), meca, pi.coef1()*stiff);
@@ -389,7 +383,7 @@ void Space::setInteraction(Vector const& pos, Interpolation const& pi, Meca & me
  - ( conf == surface )
  .
  */
-void Space::setInteraction(Interpolation const& pi, Meca & meca, real stiff, Confinement conf) const
+void Space::setInteraction(Interpolation const& pi, Meca& meca, real stiff, Confinement conf) const
 {
     if ( conf == CONFINE_ON )
     {

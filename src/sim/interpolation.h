@@ -72,7 +72,7 @@ public:
     size_t          matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.
-    bool            valid()    const { return mec_ == nullptr || ( pt1_ < mec_->nbPoints() && pt2_ < mec_->nbPoints() ); }
+    bool            is_valid() const { return mec_ == nullptr || ( pt1_ < mec_->nbPoints() && pt2_ < mec_->nbPoints() ); }
 
     /// Constant pointer to the Mecable
     Mecable const*  mecable()  const { return mec_; }
@@ -126,10 +126,10 @@ public:
     bool            inside()   const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }
 
     /// test if `this` has a common point with argument
-    bool            overlapping(const Mecapoint &) const;
+    bool            overlapping(Mecapoint const&) const;
     
     /// test if `this` has a common point with argument
-    bool            overlapping(const Interpolation &) const;
+    bool            overlapping(Interpolation const&) const;
 
     /// Human friendly ouput
     void            print(std::ostream&) const;

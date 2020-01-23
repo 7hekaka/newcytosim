@@ -1,6 +1,6 @@
 # How to compile Cytosim
 
-The core of Cytosim is written in C++11 and it is necessary to recompile the programs after each modification of the source code. Some of the accessory tools use [Python](https://www.python.org).
+The core of Cytosim is written in C++14 and it is necessary to recompile the programs after each modification of the source code. Some of the accessory tools use [Python](https://www.python.org).
  
 Compilation requires a C++ compiler: e.g. [gcc](http://gcc.gnu.org/), [Clang](http://clang.llvm.org) or the [Intel compiler](http://en.wikipedia.org/wiki/Intel_C%2B%2B_Compiler), together with a few libraries.
 Compilation is started from a terminal, with a program called [make](http://www.gnu.org/software/make/).
@@ -73,14 +73,23 @@ Please, [refer to the dedicated page](cygwin.md).
 
 # Compilation
 
-After installing a compiler and `gnu's make`, 
+After installing a compiler and [gnu's make ](http://www.gnu.org/software/make/)
 you are ready to compile from a terminal, with the following commands in the root directory of cytosim:
 
 	make sim
 	make play
 
 The command `make` without arguments will build `sim` and `play`.  
-You can then check the resulting executables, that should be located in subdirectory `bin`:
+If this does not work, you may need to manually edit `makefile.in` to adjust to your platform.
+
+It is also possible to use [cmake](https://cmake.org), which should require no adjustment:
+
+	mkdir build
+	cd build
+	cmake ..
+	make sim play report
+
+You can then check the resulting executables, normally located in subdirectory `bin`:
 
 	bin/sim info
 	bin/sim
@@ -98,7 +107,7 @@ Turn off assertions by defining `NDEBUG` in `src/base/assert.h`:
 
 	#define NDEBUG
 
-Recompile Cytosim entirely:
+Recompile Cytosim from scratch:
 
 	make clean
 	make
@@ -122,7 +131,7 @@ and check the parameters set lower in the `makefile.inc`, for this platform, for
 
 To pinpoint the problem, try to build objects that have fewer depencies first:
 
-#### Check your compiler for C++11 support and compilation switches
+#### Check your compiler for C++14 support and compilation switches
 
 	make test_cxx
 

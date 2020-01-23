@@ -55,8 +55,6 @@ private:
     Vector    otherPosition(Hand const*) const { return posFoot(); }
     /// = identity() of the Object on which a Wrist is attached, or Single::identity()
     ObjectID  nucleatorID()              const { return base()?base()->identity():Object::identity(); }
-    /// Simul pointer
-    Simul*    simul()                    const { return &Object::simul(); }
     /// specialization of HandMonitor
     real      interactionLength()        const { return prop->length; }
     /// stiffness of the interaction
@@ -84,7 +82,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// associated Hand
-    Hand*  hand()                              { return sHand; }
+    Hand*   hand()                             { return sHand; }
     
     /// sHand->attached()
     bool    attached()                  const  { return sHand->attached(); }
@@ -142,7 +140,7 @@ public:
     virtual Vector  posFoot()     const { return sPos; }
     
     /// position on the side of fiber used for sideInteractions
-    virtual Vector  posSide()     const { return sHand->pos(); }
+    virtual Vector  sidePos()     const { return sHand->pos(); }
     
     /// the Mecable to which this is anchored, or zero
     virtual Mecable const* base() const { return nullptr; }
@@ -154,13 +152,13 @@ public:
     virtual Vector  force()       const { return Vector(0,0,0); }
 
     /// Monte-Carlo step if the Hand is not attached
-    virtual void    stepF(const FiberGrid&);
+    virtual void    stepF(Simul&);
     
     /// Monte-Carlo step if the Hand is attached
     virtual void    stepA();
     
     /// add interactions to a Meca
-    virtual void    setInteractions(Meca &) const;
+    virtual void    setInteractions(Meca&) const;
     
     //--------------------------------------------------------------------------
     

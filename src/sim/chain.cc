@@ -912,7 +912,7 @@ void Chain::getPoints(real const* ptr)
 #endif
     {
         reshape_global(nbSegments(), ptr, pPos, fnCut);
-        //std::cerr << "A crude method was used to reshape " << reference() << '\n';
+        std::cerr << "Warning: a crude method was used to reshape " << reference() << '\n';
     }
     //dump(std::cerr);
 }
@@ -1562,7 +1562,7 @@ static constexpr real RECUT_PRECISION = 0.05;
  */
 void Chain::adjustSegmentation()
 {
-    PRINT_ONCE("adjustSegmentation() is using the fiber curvature\n");
+    LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
     
     const int upLimit = 8;
     size_t nbs = nbSegments();

@@ -1,4 +1,5 @@
-# Cytosim was created by Francois Nedelec. Copyright 2007-2018 EMBL.
+# Cytosim was created by Francois Nedelec.
+# Copyright 2007-2017 EMBL; 2019-2020 Sainsbury Laboratory, Cambridge University
 
 
 #---------------- MACHINE = {mac, linux, cluster, cygwin, auto}
@@ -44,7 +45,7 @@ ifeq ($(MACHINE), auto)
 
     ifeq ($(shell uname), Darwin)
        MACHINE := mac
-    else ifeq ($(shell uname -n), login.cluster.embl.de)
+    else ifeq ($(shell uname -n), login.cluster)
        MACHINE := cluster
     else ifeq ($(shell uname), Linux)
        MACHINE := linux
@@ -61,9 +62,9 @@ endif
 #-------------------------------------------------------------------------------
 
 # common options for all C++ objects:
-CXXFLG := -std=gnu++11 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
-CXXFLG := -std=gnu++11 -fno-rtti -fopenmp #-g -fno-inline
-CXXFLG := -std=gnu++11 -fno-rtti
+CXXFLG := -std=gnu++14 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
+CXXFLG := -std=gnu++14 -fno-rtti -fopenmp #-g -fno-inline
+CXXFLG := -std=gnu++14 -fno-rtti
 
 # option concerning memory alignment:
 ALIGN  := -malign-double -falign-loops -falign-jumps -falign-functions
@@ -80,6 +81,8 @@ else
     LIBTOOL := ar -rcs
 endif
 
+
+#-------------------------------------------------------------------------------
 
 ifeq ($(COMPILER),gcc)
 
@@ -211,14 +214,11 @@ ifeq ($(MACHINE),linux)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
     FlagsF := -O3 -finline-functions $(ALIGN) $(FAST)
 
-    # trying to automatically detect the directory with BLAS & LAPACK:
-    BLASLIB := $(wildcard /usr/lib/libblas.*) $(wildcard /usr/lib/*/libblas.*)
-    BLADIR := $(word 1, $(dir $(BLASLIB)))
-
-    # specify the lib path:
+    # specify the library path:
     LIBDIR := /usr/lib
     LIBDIR := /usr/lib/x86_64-linux-gnu
 
+    ############## BLAS/LAPACK Libraries ###############
     ### For 64bit Centos 5.8 March 2012:
     # Centos  blas: yum install blas-devel
     # Centos  lapack: yum install lapack-devel
@@ -226,12 +226,22 @@ ifeq ($(MACHINE),linux)
     # Ubuntu   blas : apt-get install libblas.dev
     # Ubuntu lapack : apt-get install liblapack.dev
 
+    # trying to automatically detect BLAS library:
+    BLASLIB := $(wildcard /usr/lib/libblas.*) $(wildcard /usr/lib/*/libblas.*)
+    # extracting path for libraries:
+    BLADIR := $(word 1, $(dir $(BLASLIB)))
+    ifndef BLADIR
+       $(error Error: the path for the BLAS/LAPACK library `BLADIR` is undefined)
+    else
+       $(warning Using BLAS library in $(BLADIR))
+    endif
+
     #### For dynamic linking:
     LINK := -L$(BLADIR) -llapack -lblas -lpthread
     #### For static linking specify the objects directly:
     #LINK := -L$(BLADIR) $(BLADIR)/liblapack.so $(BLADIR)/libblas.so -lpthread
 
-    ### Install libraries needed for graphical executables:
+    ########### Install libraries needed for graphics ############
     # Centos freglut: yum install freeglut-devel
     # Centos libXi:   yum install libXi-devel
     # Centos libXmu:  yum install libXmu-devel
@@ -317,8 +327,10 @@ endif
 #------------------ linking with Intel Math Kernel Library ---------------------
 #-------------------------------------------------------------------------------
 
-# The Intel MKL provides LAPACK and BLAS implementations optimized for Intel chips
-
+# The Intel MKL provides BLAS/LAPACK libraries optimized for Intel's CPU
+# and it is free: https://software.intel.com/en-us/mkl
+# For help with the linking, check:
+# https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
 
 ifeq ($(HAS_MKL),1)
 
@@ -339,11 +351,11 @@ ifeq ($(HAS_MKL),2)
     # This are options for the compiler:
     MKLOPT := -m64 -I${MKLROOT}/include
 
-    # sequential static linking (newer GCC):
-    MKLLIB := -Wl,--start-group $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a -Wl,--end-group
-
     # sequential static linking (older GCC):
     MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a
+
+    # sequential static linking (newer GCC):
+    MKLLIB := -Wl,--start-group $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a -Wl,--end-group
 
     # threaded static linking:
     #MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_thread.a $(MKLDIR)/libmkl_core.a /opt/intel/lib/libiomp5.a

@@ -44,7 +44,7 @@ Vector Bridge::force() const
 /**
  This uses interLongLink().
  */
-void Bridge::setInteractions(Meca & meca) const
+void Bridge::setInteractions(Meca& meca) const
 {
     meca.addLongLink(cHand1->interpolation(), cHand2->interpolation(), prop->length, prop->stiffness);
 }

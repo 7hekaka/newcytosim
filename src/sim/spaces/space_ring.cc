@@ -124,10 +124,10 @@ Vector SpaceRing::project(Vector const& w) const
 /**
  This applies a force directed to the surface of the cylinder
  */
-void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff, const real len, const real rad)
+void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
     if ( std::abs(pos.XX) > len )
-        meca.addLineClampX(pe, 0, std::copysign(len, pos.XX), stiff);
+        meca.addPlaneClampX(pe, 0, std::copysign(len, pos.XX), stiff);
     
     meca.addCylinderClampX(pe, rad, stiff);
 }
@@ -136,7 +136,7 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & me
 /**
  This applies a force directed to the surface of the cylinder
  */
-void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
@@ -144,7 +144,7 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & me
 /**
  This applies a force directed to the surface of the cylinder
  */
-void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_, radius_);
 }

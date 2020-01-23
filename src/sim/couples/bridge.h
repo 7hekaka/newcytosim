@@ -33,7 +33,7 @@ public:
     BridgeProp const* prop;
     
     /// constructor
-    Bridge(BridgeProp const*, Vector const & w = Vector(0,0,0));
+    Bridge(BridgeProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~Bridge();
@@ -44,7 +44,7 @@ public:
     Vector  force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

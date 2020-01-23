@@ -183,7 +183,7 @@ Vector SpacePolygon::project(Vector const& w) const
  
  @todo Also project re-entrant polygon corners on the segments of the Fiber.
  */
-void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {    
 #if ( DIM > 1 )
     
@@ -198,7 +198,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
 
     if ( fabs(pos.ZZ) >= height_ )
     {
-        meca.addLineClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
+        meca.addPlaneClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
         if ( in ) return;
     }
     else if ( in )
@@ -209,7 +209,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
         real hh = (pos.XX-pX)*(pos.XX-pX) + (pos.YY-pY)*(pos.YY-pY);
         
         if ( v * v < hh )
-            meca.addLineClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
+            meca.addPlaneClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
         return;
     }
 #endif
@@ -222,7 +222,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
 }
 
 
-void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     //setInteraction(pos, pe, meca, stiff);
     std::cerr << "unfinished SpacePolygon::setInteraction(with radius)\n";
@@ -231,7 +231,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, real r
 #include "fiber_segment.h"
 #include "fiber_set.h"
 
-void SpacePolygon::setInteractions(Meca & meca, FiberSet const& fibers) const
+void SpacePolygon::setInteractions(Meca& meca) const
 {
 #if ( 0 )
     /// WORK IN PROGRESS

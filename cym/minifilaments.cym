@@ -73,7 +73,7 @@ set couple myosin
     hand1 = binder
     hand2 = motor
     stiffness = 400
-    diffusion = 100
+    diffusion = 2
 }
 
 new 2 filament

@@ -81,7 +81,7 @@ public:
     void      step(Simul&);
     
     /// add interactions to a Meca
-    void      setInteractions(Meca &) const {}
+    void      setInteractions(Meca&) const {}
     
     
     /// a static_cast<> of Node::next()

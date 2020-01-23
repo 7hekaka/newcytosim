@@ -14,7 +14,7 @@
  Conjugate Gradient, no Preconditionning
  */
 
-void LinearSolvers::CG(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
+void LinearSolvers::CG(const LinearOperator& mat, const real* rhs, real* x, Monitor& monitor, Allocator& allocator)
 {
     const size_t dim = mat.dimension();
     allocator.allocate(dim, 4);
@@ -55,7 +55,7 @@ void LinearSolvers::CG(const LinearOperator& mat, const real* rhs, real* x, Moni
 Conjugate Gradient, with Preconditioning
 */
 
-void LinearSolvers::CGP(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
+void LinearSolvers::CGP(const LinearOperator& mat, const real* rhs, real* x, Monitor& monitor, Allocator& allocator)
 {    
     const size_t dim = mat.dimension();
     allocator.allocate(dim, 4);
@@ -100,7 +100,7 @@ void LinearSolvers::CGP(const LinearOperator& mat, const real* rhs, real* x, Mon
  Bi-Conjugate Gradient
 */
 
-void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
+void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Monitor& monitor, Allocator& allocator)
 {
     const size_t dim = mat.dimension();
     allocator.allocate(dim, 6);
@@ -152,7 +152,7 @@ void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Mon
  Bi-Conjugate Gradient Stabilized
 */
 
-void LinearSolvers::BCGS(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
+void LinearSolvers::BCGS(const LinearOperator& mat, const real* rhs, real* x, Monitor& monitor, Allocator& allocator)
 {
     const size_t dim = mat.dimension();
     allocator.allocate(dim, 5);
@@ -220,7 +220,7 @@ void LinearSolvers::BCGS(const LinearOperator& mat, const real* rhs, real* x, Mo
  Bi-Conjugate Gradient Stabilized with Preconditionning
 */
 
-void LinearSolvers::BCGSP(const LinearOperator& mat, const real* rhs, real* x, Monitor & monitor, Allocator & allocator)
+void LinearSolvers::BCGSP(const LinearOperator& mat, const real* rhs, real* x, Monitor& monitor, Allocator& allocator)
 {
     const size_t dim = mat.dimension();
     allocator.allocate(dim, 7);

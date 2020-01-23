@@ -159,7 +159,7 @@ public:
     //--------------------------------------------------------------------------
 
     /// add the interactions due to confinement
-    void        setInteractions(Meca &) const;
+    void        setInteractions(Meca&) const;
     
     /// radius of the sphere around point `i`
     real        radius(const size_t i) const { return soRadius[i]; }

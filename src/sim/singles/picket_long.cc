@@ -25,7 +25,7 @@ PicketLong::~PicketLong()
 
 //------------------------------------------------------------------------------
 
-Torque PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque PicketLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
@@ -43,11 +43,11 @@ Torque PicketLong::calcArm(const Interpolation & pt, Vector const& pos, real len
 }
 
 
-/**
- Note that, as `mArm` is calculated by setInteraction(),
- the result of posSide will be incorrect if 'solve=0'
- */
-Vector PicketLong::posSide() const
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result of sidePos() will be incorrect if 'solve=0'
+*/
+Vector PicketLong::sidePos() const
 {
 #if ( DIM > 1 )
     return sHand->pos() + cross(mArm, sHand->dirFiber());
@@ -63,7 +63,7 @@ Vector PicketLong::posSide() const
 Vector PicketLong::force() const
 {
     assert_true( sHand->attached() );
-    Vector d = sPos - PicketLong::posSide();
+    Vector d = sPos - PicketLong::sidePos();
  
     if ( modulo )
         modulo->fold(d);
@@ -72,7 +72,7 @@ Vector PicketLong::force() const
 }
 
 
-void PicketLong::setInteractions(Meca & meca) const
+void PicketLong::setInteractions(Meca& meca) const
 {
 #if ( DIM == 1 )
     meca.addPointClamp(sHand->interpolation(), sPos, prop->stiffness);

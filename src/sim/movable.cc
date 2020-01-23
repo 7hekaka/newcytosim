@@ -118,6 +118,8 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             {
                 real e = 0.1;
                 is >> e;
+                if ( e < REAL_EPSILON )
+                    throw InvalidParameter("distance R must be > 0 in `surface R`");
                 return spc->randomPlaceOnEdge(e);
             }
 
@@ -446,7 +448,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
             isp = is.tellg();
             tok = Tokenizer::get_symbol(is);
 
-            if ( tok.size() == 0 )
+            if ( tok.empty() )
                 return pos;
             
             // Translation is specified with 'at' or 'move'
@@ -720,7 +722,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
             isp = is.tellg();
             tok = Tokenizer::get_symbol(is);
 
-            if ( tok.size() == 0 )
+            if ( tok.empty() )
                 return dir;
             
             // Gaussian noise specified with 'blur'

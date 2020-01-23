@@ -56,7 +56,7 @@ set couple arp23
 {
     hand1 = binder
     hand2 = nucleator
-    diffusion = 10
+    diffusion = 1
     stiffness = 1000
     activity = fork
     torque = 0.5, 1.22     % 1.22 radian is 70 degrees

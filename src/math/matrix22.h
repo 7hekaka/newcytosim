@@ -307,7 +307,11 @@ public:
     /// return transposed matrix
     Matrix22 transposed() const
     {
+#if MATRIX22_USES_AVX && defined __AVX2__
+        return Matrix22(permute4x64(mat, 0xD8));
+#else
         return Matrix22(val[0], val[2], val[1], val[3]);
+#endif
     }
     
     /// maximum of all component's absolute values
@@ -761,6 +765,12 @@ public:
         return Matrix22(xl * dir.XX + dia, xy, xy, yl * dir.YY + dia);
     }
     
+    /// build the matrix `dia * Id + vec (x) Id`
+    static Matrix22 vectorProduct(const real dia, const real off)
+    {
+        return Matrix22(dia, off, -off, dia);
+    }
+
     /// return rotation matrix of angle defined by cosinus and sinus
     static Matrix22 rotation(const real c, const real s)
     {

@@ -14,6 +14,7 @@ void TubuleProp::clear()
     stiffness[0] = 0;
     stiffness[1] = 0;
     fiber_type   = "";
+    bone_type    = "";
 }
 
 
@@ -21,6 +22,7 @@ void TubuleProp::read(Glossary& glos)
 {
     glos.set(stiffness, 2, "stiffness");
     glos.set(fiber_type, "fiber");
+    glos.set(bone_type, "bone");
 }
 
 

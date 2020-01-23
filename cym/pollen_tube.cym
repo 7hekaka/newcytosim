@@ -56,7 +56,7 @@ set couple basketer
     hand1 = binder
     hand2 = binder
     stiffness = 1000
-    diffusion = 10
+    diffusion = 2
 }
 
 set space template

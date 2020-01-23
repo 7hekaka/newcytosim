@@ -61,7 +61,7 @@ void Fiber::step()
     size_t p = hasKink(0);
     if ( p )
     {
-        PRINT_ONCE("SEVER_KINKED_FIBERS\n");
+        LOG_ONCE("SEVER_KINKED_FIBERS\n");
         objset()->add(severPoint(p));
     }
 #endif
@@ -69,7 +69,7 @@ void Fiber::step()
     // Delete kinked filaments
     if ( hasKink(0) )
     {
-        PRINT_ONCE("DELETE_KINKED_FIBERS\n");
+        LOG_ONCE("DELETE_KINKED_FIBERS\n");
         delete(this);
         return;
     }
@@ -167,9 +167,9 @@ Fiber::Fiber(FiberProp const* p)
     frGlue = nullptr;
 #endif
 #if FIBER_HAS_FAMILY
-    family_ = this;
-    sister_ = this;
-    brother_ = this;
+    family_ = nullptr;
+    sister_ = nullptr;
+    brother_ = nullptr;
 #endif
 #if NEW_FIBER_CHEW
     frChewM = 0;
@@ -177,6 +177,23 @@ Fiber::Fiber(FiberProp const* p)
 #endif
 }
 
+#if FIBER_HAS_FAMILY
+/*
+This defines the position of the display centerline
+*/
+Vector Fiber::displayPos(real ab) const
+{
+    Vector I = family_->posM(ab);
+    Vector O = posM(ab);
+    return I + 0.7 * ( O - I );
+}
+
+Vector Fiber::radialDir(real ab) const
+{
+    return posM(ab) - family_->posM(ab);
+}
+
+#endif
 
 Fiber::~Fiber()
 {
@@ -863,7 +880,7 @@ void Fiber::prepareMecable()
 
 //------------------------------------------------------------------------------
 
-void Fiber::setInteractions(Meca & meca) const
+void Fiber::setInteractions(Meca& meca) const
 {
 #if OLD_SQUEEZE_FORCE
     if ( prop->squeeze == 1 )

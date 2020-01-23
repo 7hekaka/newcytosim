@@ -61,6 +61,10 @@ void remove_plural(std::string & str)
 
 /** 
  @copydetails Simul::report0
+ This can report multiple data, separated by ';', for example:
+ 
+     report fiber:force;fiber:length
+ 
  */
 void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
 {
@@ -71,6 +75,7 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
 
     //out << "\n% start   " << prop->time; // historical
     out << "\n% time " << std::fixed << std::setprecision(3) << prop->time;
+    out << "\n% report " << arg;
     try {
         std::string::size_type pos = arg.find(';');
         while ( pos != std::string::npos )
@@ -213,6 +218,8 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
             return reportFiberDynamic(out);
         if ( what == "force" )
             return reportFiberForces(out);
+        if ( what == "confine_force" )
+            return reportFiberConfineForce(out);
         if ( what == "confinement" )
             { reportFiberConfinement(out); return; }
         if ( what == "cluster" )
@@ -955,10 +962,10 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
 {
     computeForces();
     
-    out << COM << "count" << SEP << "force";
+    out << COM << "count" << SEP << "sum_force" << SEP << "min_force" << SEP << "max_force";
 
     Vector n(1,0,0);
-    real ten = 0;
+    real ten = 0, inf = 0, sup = 0;
     size_t cnt = 0;
     if ( opt.value_is("plane", 0, "all") )
     {
@@ -967,17 +974,17 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
             out << SEP << "count" << SEP << "force";
         
         // plane orthogonal to X:
-        fibers.infoTension(cnt, ten, Vector(1,0,0), 0);
-        out << LIN << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, inf, sup, Vector(1,0,0), 0);
+        out << LIN << cnt << SEP << ten << SEP << inf << SEP << sup;
 #if ( DIM > 1 )
         // plane orthogonal to Y:
-        fibers.infoTension(cnt, ten, Vector(0,1,0), 0);
-        out << SEP << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, inf, sup, Vector(0,1,0), 0);
+        out << SEP << cnt << SEP << ten << SEP << inf << SEP << sup;
 #endif
 #if ( DIM > 2 )
         // plane orthogonal to Z:
-        fibers.infoTension(cnt, ten, Vector(0,0,1), 0);
-        out << SEP << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, inf, sup, Vector(0,0,1), 0);
+        out << SEP << cnt << SEP << ten << SEP << inf << SEP << sup;
 #endif
     }
     else if ( opt.set(n, "plane") )
@@ -985,14 +992,14 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
         real a = 0;
         opt.set(a, "plane", 1);
         out << COM << "fiber tension orthogonal to plane: (" << n << ").pos = " << -a;
-        fibers.infoTension(cnt, ten, n, a);
-        out << LIN << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, inf, sup, n, a);
+        out << LIN << cnt << SEP << ten << SEP << inf << SEP << sup;
     }
     else
     {
         // if no plane is specified, sum all tension from all segments
-        fibers.infoTension(cnt, ten);
-        out << LIN << cnt << SEP << ten;
+        fibers.infoTension(cnt, ten, inf, sup);
+        out << LIN << cnt << SEP << ten << SEP << inf << SEP << sup;
     }
 }
 
@@ -1021,6 +1028,40 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
             out << SEP << dev;
         }
     }
+}
+
+
+/**
+ Export total magnitude of force exerted by Fiber on the confinement
+ */
+void Simul::reportFiberConfineForce(std::ostream& out) const
+{
+    out << COM << "confinement forces";
+    out << COM << "identity" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
+     
+     // list fibers in the order of the inventory:
+     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+     {
+         out << COM << "fiber " << fib->reference();
+         Space const* spc = findSpace(fib->prop->confine_space);
+         const real stiff = fib->prop->confine_stiffness;
+
+         for ( size_t p = 0; p < fib->nbPoints(); ++p )
+         {
+             out << LIN << fib->identity();
+             Vector w, pos = fib->posP(p);
+             out << SEP << pos;
+             if ( spc->outside(pos) )
+             {
+                 w = spc->project(pos);
+                 out << SEP << stiff * ( w - pos );
+             }
+             else
+             {
+                 out << SEP << Vector(0,0,0);
+             }
+         }
+     }
 }
 
 
@@ -2516,7 +2557,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     
     computeForces();
 
-    real t, ten = 0;
+    real t, ten = 0, inf = 0, sup = 0;
     size_t c, cnt = 0;
 
     // rotate plane around the Z-axis and find intersecting fibers
@@ -2524,7 +2565,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     {
         real ang = a * M_PI / 180.0;
         Vector dir(cos(ang), sin(ang), 0);
-        fibers.infoTension(c, t, dir, 0);
+        fibers.infoTension(c, t, inf, sup, dir, 0);
         cnt += 2;  // every plane should intersect the ring twice
         ten += t;
     }

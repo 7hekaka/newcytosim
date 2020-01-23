@@ -13,16 +13,16 @@ SpaceDice::SpaceDice(SpaceProp const* p)
 
     for ( int d = 0; d < 3; ++d )
         length_[d] = 0;
-    radius_ = 0;
+    edge_ = 0;
 }
 
 
 void SpaceDice::resize(Glossary& opt)
 {
-    real rad = radius_;
+    real edg = edge_;
     
-    opt.set(rad, "radius");
-    if ( rad < 0 )
+    opt.set(edg, "edge");
+    if ( edg < 0 )
         throw InvalidParameter("dice:radius must be >= 0");
 
     for ( unsigned d = 0; d < DIM; ++d )
@@ -30,12 +30,12 @@ void SpaceDice::resize(Glossary& opt)
         real len = length_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
-        if ( len < rad )
+        if ( len < edg )
             throw InvalidParameter("dice:length[] must be >= 2 * radius");
         length_[d] = len;
     }
     
-    radius_ = rad;
+    edge_ = edg;
     update();
 }
 
@@ -58,30 +58,34 @@ real SpaceDice::volume() const
 #if ( DIM == 1 )
     return 2 * length_[0];
 #elif ( DIM == 2 )
-    return 4 * length_[0]*length_[1] + (M_PI-4)*radius_*radius_;
+    return 4 * length_[0]*length_[1] + (M_PI-4) * square(edge_);
 #else
     return 8 * length_[0]*length_[1]*length_[2]
-    + 2 * (M_PI-4) * ( length_[0] + length_[1] + length_[2] - 3 * radius_ ) * radius_ * radius_
-    + (4*M_PI/3.0 - 8) * radius_ * radius_ * radius_;
+    + 2 * (M_PI-4) * ( length_[0] + length_[1] + length_[2] - 3 * edge_ ) * square(edge_)
+    + (4*M_PI/3.0 - 8) * cube(edge_);
 #endif
 }
 
 
 //------------------------------------------------------------------------------
 
-bool  SpaceDice::inside(Vector const& w) const
+bool SpaceDice::inside(Vector const& w) const
 {
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-    {
-        real a = fabs(w[d]) - length_[d];
-        if ( a > 0 )
-            return false;
-        dis += square(std::max((real)0, a+radius_));
-    }
-    return ( dis <= radiusSqr_ );
+        dis += square(std::max((real)0, fabs(w[d]) - length_[d] + edge_));
+    return ( dis <= edgeSqr_ );
 }
 
+
+bool SpaceDice::allInside(Vector const& w, real rad) const
+{
+    assert_true( rad >= 0 );
+    real dis = 0;
+    for ( unsigned d = 0; d < DIM; ++d )
+        dis += square(std::max((real)0, fabs(w[d]) - length_[d] + edge_ + rad));
+    return ( dis <= edgeSqr_ );
+}
 
 //------------------------------------------------------------------------------
 
@@ -98,28 +102,25 @@ Vector SpaceDice::project(Vector const& w) const
 {
     Vector p = w;
     bool in = true;
+
+    real X = length_[0] - fabs(w.XX);
+    if ( X < edge_ ) { p.XX = std::copysign(length_[0]-edge_, w.XX); in=false; }
     
-    //calculate projection on the inner cube obtained by subtracting radius
-    for ( unsigned d = 0; d < DIM; ++d )
-    {
-        real test = length_[d] - radius_;
-        if ( fabs(w[d]) > test )
-        {
-            p[d] = std::copysign(test, w[d]);
-            in = false;
-        }
-    }
+    real Y = length_[1] - fabs(w.YY);
+    if ( Y < edge_ ) { p.YY = std::copysign(length_[1]-edge_, w.YY); in=false; }
+
+#if ( DIM > 2 )
+    real Z = length_[2] - fabs(w.ZZ);
+    if ( Z < edge_ ) { p.ZZ = std::copysign(length_[2]-edge_, w.ZZ); in=false; }
+#endif
     
     if ( in )
     {
         // find the dimensionality corresponding to the closest face
-        real d0 = length_[0] - fabs(w.XX);
-        real d1 = length_[1] - fabs(w.YY);
 #if ( DIM > 2 )
-        real d2 = length_[2] - fabs(w.ZZ);
-        if ( d2 < d1 )
+        if ( Z < Y )
         {
-            if ( d2 < d0 )
+            if ( Z < X )
                 p.ZZ = std::copysign(length_[2], w.ZZ);
             else
                 p.XX = std::copysign(length_[0], w.XX);
@@ -127,7 +128,7 @@ Vector SpaceDice::project(Vector const& w) const
         else
 #endif
         {
-            if ( d1 < d0 )
+            if ( Y < X )
                 p.YY = std::copysign(length_[1], w.YY);
             else
                 p.XX = std::copysign(length_[0], w.XX);
@@ -136,11 +137,8 @@ Vector SpaceDice::project(Vector const& w) const
     }
 
     //normalize to radius(), and add to p to get the real projection
-    real dis = radius_ / sqrt((w-p).normSqr());
-    for ( unsigned d = 0; d < DIM; ++d )
-        p[d] += dis * ( w[d] - p[d] );
-    
-    return p;
+    real dis = edge_ / norm(w-p);
+    return dis * ( w - p ) + p;
 }
 #endif
 
@@ -153,7 +151,7 @@ void SpaceDice::write(Outputter& out) const
     out.writeFloat(length_[0]);
     out.writeFloat(length_[1]);
     out.writeFloat(length_[2]);
-    out.writeFloat(radius_);
+    out.writeFloat(edge_);
 }
 
 
@@ -162,7 +160,7 @@ void SpaceDice::setLengths(const real len[])
     length_[0] = len[0];
     length_[1] = len[1];
     length_[2] = len[2];
-    radius_ = len[4];
+    edge_ = len[4];
     update();
 }
 
@@ -186,9 +184,9 @@ bool SpaceDice::draw() const
 {
 #if ( DIM > 2 )
     
-    const real X = length_[0] - radius_;
-    const real Y = length_[1] - radius_;
-    const real Z = length_[2] - radius_;
+    const real X = length_[0] - edge_;
+    const real Y = length_[1] - edge_;
+    const real Z = length_[2] - edge_;
  
     const real XR = length_[0];
     const real YR = length_[1];

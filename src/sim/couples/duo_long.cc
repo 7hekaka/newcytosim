@@ -21,7 +21,7 @@ DuoLong::~DuoLong()
 
 //------------------------------------------------------------------------------
 
-Torque DuoLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque DuoLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
@@ -39,11 +39,11 @@ Torque DuoLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
 }
 
 
-/**
- Note that, as `mArm` is calculated by setInteraction(),
- the result of posSide will be incorrect if 'solve=0'
- */
-Vector DuoLong::posSide() const
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result of sidePos() will be incorrect if 'solve=0'
+*/
+Vector DuoLong::sidePos() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
@@ -58,7 +58,7 @@ Vector DuoLong::posSide() const
  */
 Vector DuoLong::force() const
 {
-    Vector d = cHand2->pos() - DuoLong::posSide();
+    Vector d = cHand2->pos() - DuoLong::sidePos();
     
     //correct for periodic space:
     if ( modulo )
@@ -73,7 +73,7 @@ Vector DuoLong::force() const
  
  Another possibility would be SideSideLink, which is fully symmetric.
  */
-void DuoLong::setInteractions(Meca & meca) const
+void DuoLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();

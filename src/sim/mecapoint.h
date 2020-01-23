@@ -39,7 +39,7 @@ public:
     Mecable const* mecable()       const { return mec_; }
     
     /// true if the pointer seems to be valid.
-    bool           valid()         const { return mec_ == nullptr || pti_ < mec_->nbPoints(); }
+    bool           is_valid()      const { return mec_ == nullptr || pti_ < mec_->nbPoints(); }
     
     /// Index of point in object
     size_t         point()         const { return pti_; }
@@ -57,10 +57,10 @@ public:
     void           read(Inputter&, Simul&);
     
     /// test if `this` shares one point with the argument
-    bool           overlapping(const Mecapoint &) const;
+    bool           overlapping(Mecapoint const&) const;
 
     /// test if `this` is one point away from the argument
-    bool           near(const Mecapoint &) const;
+    bool           near(Mecapoint const&) const;
 
     /// Human friendly ouput
     void           print(std::ostream&) const;

@@ -18,7 +18,7 @@ Fork::~Fork()
 }
 
 
-void Fork::setInteractions(Meca & meca) const
+void Fork::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();

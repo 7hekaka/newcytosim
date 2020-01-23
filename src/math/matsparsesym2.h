@@ -88,7 +88,7 @@ public:
     /// default destructor
     virtual ~MatrixSparseSymmetric2()  { deallocate(); }
     
-    /// set all the element to zero
+    /// set to zero
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )
@@ -134,7 +134,7 @@ public:
     void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
-    bool nonZero() const;
+    bool isNotZero() const;
     
     /// number of element which are not null
     size_t nbElements(size_t start, size_t stop) const;

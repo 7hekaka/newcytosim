@@ -4,7 +4,7 @@
 set simul system
 {
     time_step = 0.001
-    viscosity = 0.01
+    viscosity = 1
     precondition = 0
 }
 
@@ -15,14 +15,14 @@ set space cell
 
 new cell
 {
-    radius = 4.5
+    radius = 4.8
 }
 
 set fiber microtubule
 {
-    rigidity = 10
+    rigidity = 100
     segmentation = 0.5
-    confine = inside, 100
+    confine = inside, 1000
     display = ( color=blue; point=3,1; line=10,2; tension_scale=10; )
 }
 
@@ -33,12 +33,12 @@ set hand binder
     display = ( width=5; size=12; color=green; )
 }
 
-% with a length of 10 um, and a elasticity of 10, the buckling force is
-% PI^2 * 100 / 10^2 ~= 9.98 pN
+% with a length of 10 um, and a rigidity of 10, the Euler buckling is
+% PI^2 * 100 / 10^2 ~ 10 pN
 new 1 microtubule
 {
     length = 10
-    position = 0 0 0
+    position = 0 -0.5 0
     orientation = align 1 0 0 
 }
 
@@ -49,7 +49,7 @@ new 1 microtubule
     orientation = 1 0 0
 }
 
-% with an extension of 1um and a stiffness of 10, the tension is ~10 pN
+% with an extension of 1um and a stiffness of 1, the tension is ~10 pN
 set single link
 {
     hand = binder
@@ -78,9 +78,12 @@ run 10000 system
 % report forces in the `link`:
 report single:force *
 
+% report internal tensions all fibers
+report fiber:force *
+
 % report internal tensions in the fiber accross a virtual plane:
 report fiber:tension * { plane = 1 0 0, 0; }
 
 % report forces in the points
-report fiber:forces *
+report fiber:confine_forces *
 

@@ -229,7 +229,7 @@ void MatrixSparseSymmetric2::reset()
 }
 
 
-bool MatrixSparseSymmetric2::nonZero() const
+bool MatrixSparseSymmetric2::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )

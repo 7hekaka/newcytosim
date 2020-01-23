@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include "vecprint.h"
 #include "simd.h"
+#include "simd_print.h"
 
 
 typedef double real;
@@ -28,7 +29,7 @@ void init()
     }
 }
 
-void print(size_t len, const real* vec)
+void dump(size_t len, const real* vec)
 {
     for ( size_t n = 0; n < len; ++n )
     {
@@ -55,7 +56,7 @@ real vector2()
         s = add2(s, mul2( load2(x+ii), load2(y+ii) ));
     _mm_empty();
     
-    return esum(s)[0];
+    return esum2(s)[0];
 }
 
 #ifdef __AVX__
@@ -67,7 +68,7 @@ real vector4()
         s = add4(s, mul4( load4(x+ii), load4(y+ii) ));
     _mm_empty();
     
-    return esum(s)[0];
+    return esum4(s)[0];
 }
 
 
@@ -89,7 +90,7 @@ real vectorU()
     vec4 s = add4(add4(v0, v1), add4(v2, v3));
     _mm_empty();
     
-    return esum(s)[0];
+    return esum4(s)[0];
 }
 
 #endif
@@ -123,24 +124,24 @@ void test_swapSSE()
 {
     vec2 a = set2(0, 1);
     vec2 b = set2(2, 3);
-    print(a, "a");
-    print(b, "b");
+    dump(a, "a");
+    dump(b, "b");
     
 #ifdef __AVX__
-    print(permute2(b,0b00), "permute 0b00");
-    print(permute2(b,0b01), "permute 0b01");
-    print(permute2(b,0b10), "permute 0b10");
-    print(permute2(b,0b11), "permute 0b11");
+    dump(permute2(b,0b00), "permute 0b00");
+    dump(permute2(b,0b01), "permute 0b01");
+    dump(permute2(b,0b10), "permute 0b10");
+    dump(permute2(b,0b11), "permute 0b11");
 #endif
     
-    print(shuffle2(a,b,0b00), "0b00");
-    print(shuffle2(a,b,0b01), "0b01");
-    print(shuffle2(a,b,0b10), "0b10");
-    print(shuffle2(a,b,0b11), "0b11");
-    print(unpacklo2(a,b), "unpacklo");
-    print(unpackhi2(a,b), "unpackhi");
-    print(movedup2(a),  "movedup(a)");
-    print(movedup2(b),  "movedup(b)");
+    dump(shuffle2(a,b,0b00), "0b00");
+    dump(shuffle2(a,b,0b01), "0b01");
+    dump(shuffle2(a,b,0b10), "0b10");
+    dump(shuffle2(a,b,0b11), "0b11");
+    dump(unpacklo2(a,b), "unpacklo");
+    dump(unpackhi2(a,b), "unpackhi");
+    dump(movedup2(a),  "movedup(a)");
+    dump(movedup2(b),  "movedup(b)");
 }
 
 #ifdef __AVX__
@@ -186,8 +187,8 @@ void test_deswizzle()
     for ( int n = 0; n < 4*SIZE; ++n )
         b[4*n+3] = 0;
     
-    print(12, a);
-    print(16, b);
+    dump(12, a);
+    dump(16, b);
 }
 
 void test_cat()
@@ -196,12 +197,12 @@ void test_cat()
     vec2 y{1.0, 2.0};
     vec2 x{3.0, 4.0};
     
-    print(cat4(x, y), "cat4(x, y)");
+    dump(cat4(x, y), "cat4(x, y)");
     
     x = set2(1.0, 2.0);
     y = set2(3.0, 4.0);
     
-    print(cat4(x, y), "cat4(x, y)");
+    dump(cat4(x, y), "cat4(x, y)");
 }
 
 void test_load()
@@ -209,37 +210,37 @@ void test_load()
     printf("------ test_load\n");
     double mem[4] = { 1, 2, 3, 4 };
     vec4 x{1.0, 2.0, 3.0, 4.0};
-    print(x, "set ");
+    dump(x, "set ");
     
     vec4 y = load4(mem);
-    print(y, "load");
+    dump(y, "load");
     
-    print(cast4(load1(mem)), "cast4(load1)");
-    print(cast4(load2(mem)), "cast4(load2)");
+    dump(cast4(load1(mem)), "cast4(load1)");
+    dump(cast4(load2(mem)), "cast4(load2)");
 
-    print(load3(mem), "load3");
-    print(cat4(load1(mem+2), load2(mem)), "cat4(load1, load2)");
+    dump(load3(mem), "load3");
+    dump(cat4(load1(mem+2), load2(mem)), "cat4(load1, load2)");
 
     vec4 t = blend4(load4(mem), setzero4(), 0b1000);
-    print(t, "blend(load4, zero)");
+    dump(t, "blend(load4, zero)");
 
 
     vec2 u = load2(mem);
     vec4 a = broadcast2(mem);
     vec4 n = permute4(a, 0b1100);
 
-    print(u, "src");
-    print(n, "permute4(broadcast2)");
-    print(interleave4(u), "interleave4");
-    print(cat4(u,u), "cat4");
-    print(_mm256_set_m128d(u,u),    "set_m128d");
-    print(insertf128(cast4(u),u,1), "insertf128");
-    print(permute4(cat4(u,u), 0b1100), "permute4(cat4, 0b1100)");
+    dump(u, "src");
+    dump(n, "permute4(broadcast2)");
+    dump(interleave4(u), "interleave4");
+    dump(cat4(u,u), "cat4");
+    dump(_mm256_set_m128d(u,u),    "set_m128d");
+    dump(insertf128(cast4(u),u,1), "insertf128");
+    dump(permute4(cat4(u,u), 0b1100), "permute4(cat4, 0b1100)");
     
     vec4 p{-1.0, -2.0, -3.0, -4.0};
     _mm_storeu_pd(mem, _mm256_castpd256_pd128(p));
     _mm_store_sd(mem+2,_mm256_extractf128_pd(p,1));
-    print(load4(mem), "load(store3)");
+    dump(load4(mem), "load(store3)");
 }
 
 
@@ -249,27 +250,27 @@ void test_broadcast()
     double mem[4] = { 1, 2, 3, 4 };
     
     // using 4 loads
-    print(broadcast1(mem  ), "mem[0]");
-    print(broadcast1(mem+1), "mem[1]");
-    print(broadcast1(mem+2), "mem[2]");
-    print(broadcast1(mem+3), "mem[3]");
+    dump(broadcast1(mem  ), "mem[0]");
+    dump(broadcast1(mem+1), "mem[1]");
+    dump(broadcast1(mem+2), "mem[2]");
+    dump(broadcast1(mem+3), "mem[3]");
     
     // using 2 loads
     vec4 xyxy = broadcast2(mem);
     vec4 ztzt = broadcast2(mem+2);
-    print(duplo4(xyxy), "x");
-    print(duphi4(xyxy), "y");
-    print(duplo4(ztzt), "z");
-    print(duphi4(ztzt), "t");
+    dump(duplo4(xyxy), "x");
+    dump(duphi4(xyxy), "y");
+    dump(duplo4(ztzt), "z");
+    dump(duphi4(ztzt), "t");
     
     // using 1 load
     vec4 xyzt = load4(mem);
     xyxy = permute2f128(xyzt, xyzt, 0x00);
     ztzt = permute2f128(xyzt, xyzt, 0x11);
-    print(duplo4(xyxy), "X");
-    print(duphi4(xyxy), "T");
-    print(duplo4(ztzt), "Z");
-    print(duphi4(ztzt), "T");
+    dump(duplo4(xyxy), "X");
+    dump(duphi4(xyxy), "T");
+    dump(duplo4(ztzt), "Z");
+    dump(duphi4(ztzt), "T");
 }
 
 __m256i make_mask2(long i)
@@ -295,12 +296,12 @@ void test_store()
     printf("------ test_store\n");
     double mem[4] = { 0, 0, 0, 0 };
     vec4 x{1.0, 2.0, 3.0, 4.0};
-    print(x, "value");
+    dump(x, "value");
     for ( int i = 0; i < 5; ++i )
     {
         __m256i k = make_mask(i);
         maskstore4(mem, k, x);
-        print(load4(mem), "store");
+        dump(load4(mem), "store");
     }
 }
 
@@ -310,27 +311,27 @@ void test_swap1()
     printf("------ test_swap1\n");
     vec4 a{ 1, 2, 3, 4};
     vec4 b{-1,-2,-3,-4};
-    print(a, "a = ");
-    print(b, "b = ");
+    dump(a, "a = ");
+    dump(b, "b = ");
     
-    print(permute4(a,0x05), "permute(a,0x05)");
-    print(permute4(b,0x05), "permute(b,0x05)");
+    dump(permute4(a,0x05), "permute(a,0x05)");
+    dump(permute4(b,0x05), "permute(b,0x05)");
     
-    print(permute2f128(a,b,0x20), "permute2f128(a,b,0x20)");
-    print(permute2f128(a,b,0x31), "permute2f128(a,b,0x31)");
-    print(permute2f128(a,b,0x01), "permute2f128(a,b,0x01)");
+    dump(permute2f128(a,b,0x20), "permute2f128(a,b,0x20)");
+    dump(permute2f128(a,b,0x31), "permute2f128(a,b,0x31)");
+    dump(permute2f128(a,b,0x01), "permute2f128(a,b,0x01)");
 
     vec4 x = permute2f128(a, a, 0b00100001);
-    print(shuffle4(a, x, 0b0101), "rotate >");
-    print(shuffle4(x, a, 0b0101), "rotate <");
+    dump(shuffle4(a, x, 0b0101), "rotate >");
+    dump(shuffle4(x, a, 0b0101), "rotate <");
     
 #if 0 //def __AVX2__
-    print(rotater4(a), "rotate >");
-    print(rotatel4(a), "rotate <");
+    dump(rotater4(a), "rotate >");
+    dump(rotatel4(a), "rotate <");
 #endif
     
     vec4 u = shuffle4(a, x, 0b0101);
-    print(blend4(u, x, 0b1100), "rotate 3");
+    dump(blend4(u, x, 0b1100), "rotate 3");
 }
 
 
@@ -339,15 +340,15 @@ void test_swap2()
     printf("------ test_swap2\n");
     vec4 a{ 1,  2,  3,  4};
     vec4 b{-1, -2, -3, -4};
-    print(a, "a");
-    print(b, "b");
+    dump(a, "a");
+    dump(b, "b");
     
-    print(permute2f128(a,a,0x08), "permute2f128(a,a,0x08)");
-    print(permute2f128(a,a,0x21), "permute2f128(a,a,0x21)");
-    print(permute2f128(a,a,0x81), "permute2f128(a,a,0x81)");
+    dump(permute2f128(a,a,0x08), "permute2f128(a,a,0x08)");
+    dump(permute2f128(a,a,0x21), "permute2f128(a,a,0x21)");
+    dump(permute2f128(a,a,0x81), "permute2f128(a,a,0x81)");
     
-    print(permute2f128(a,a,0x28), "permute2f128(a,a,0x28)");
-    print(permute2f128(a,a,0x81), "permute2f128(a,a,0x81)");
+    dump(permute2f128(a,a,0x28), "permute2f128(a,a,0x28)");
+    dump(permute2f128(a,a,0x81), "permute2f128(a,a,0x81)");
 }
 
 
@@ -363,14 +364,14 @@ void test_swap4()
         vec4 z = unpacklo4(s, s);
         vec4 u = unpackhi4(s, s);
         
-        print(s, "src");
-        print(z, "lo ");
-        print(u, "hi ");
+        dump(s, "src");
+        dump(z, "lo ");
+        dump(u, "hi ");
         
-        print(permute2f128(z, z, 0x00), "permute2f128(z,z) 0x00");
-        print(permute2f128(u, u, 0x00), "permute2f128(u,u) 0x00");
-        print(permute2f128(z, z, 0x11), "permute2f128(z,z) 0x11");
-        print(permute2f128(u, u, 0x11), "permute2f128(u,u) 0x11");
+        dump(permute2f128(z, z, 0x00), "permute2f128(z,z) 0x00");
+        dump(permute2f128(u, u, 0x00), "permute2f128(u,u) 0x00");
+        dump(permute2f128(z, z, 0x11), "permute2f128(z,z) 0x11");
+        dump(permute2f128(u, u, 0x11), "permute2f128(u,u) 0x11");
     }
     {
         vec4 p = permute2f128(s, s, 0x01);
@@ -381,11 +382,11 @@ void test_swap4()
         vec4 x2 = unpacklo4(u,u);
         vec4 x3 = unpackhi4(u,u);
 
-        print(s, "src");
-        print(x0, "xxxx");
-        print(x1, "yyyy");
-        print(x2, "zzzz");
-        print(x3, "tttt");
+        dump(s, "src");
+        dump(x0, "xxxx");
+        dump(x1, "yyyy");
+        dump(x2, "zzzz");
+        dump(x3, "tttt");
     }
     {
         vec4 p = permute2f128(s, s, 0x01);
@@ -393,9 +394,9 @@ void test_swap4()
         vec4 u = blend4(s, p, 0b0011);
         vec4 z = unpacklo4(u,u);
         
-        print(s, "xyzt");
-        print(l, "xyxy");
-        print(z, "zzzz");
+        dump(s, "xyzt");
+        dump(l, "xyxy");
+        dump(z, "zzzz");
     }
 }
 
@@ -404,19 +405,19 @@ void test_hadd()
     printf("------ test_hadd\n");
     vec4 a{1, -1, 2, -2};
     vec4 b{3, -3, 4, -4};
-    print(a, "a");
-    print(b, "b");
+    dump(a, "a");
+    dump(b, "b");
 
     vec4 p = permute2f128(a, b, 0x20);
     vec4 q = permute2f128(a, b, 0x31);
-    print(p, "p ");
-    print(q, "q ");
+    dump(p, "p ");
+    dump(q, "q ");
 
     vec4 z = unpacklo4(p, q);
     vec4 u = unpackhi4(p, q);
 
-    print(z, "z ");
-    print(u, "u ");
+    dump(z, "z ");
+    dump(u, "u ");
 }
 
 void test_mat()
@@ -426,43 +427,44 @@ void test_mat()
     vec4 m012{0, 1, 2, -1};
     vec4 m345{3, 4, 5, -1};
     vec4 m678{6, 7, 8, -1};
-    print(m012, "m012");
-    print(m345, "m345");
-    print(m678, "m678");
+    dump(m012, "m012");
+    dump(m345, "m345");
+    dump(m678, "m678");
     
     // symmetrized matrix:
     vec4 z = shuffle4(m012, m345, 0b0011);
     vec4 u = permute2f128(m678, z, 0x03);
-    print(z, "z");
-    print(u, "u");
+    dump(z, "z");
+    dump(u, "u");
     
     vec4 m145 = blend4(z, m345, 0b1100);
     vec4 m258 = blend4(u, m678, 0b1100);
-    print(m145, "m145");
-    print(m258, "m258");
+    dump(m145, "m145");
+    dump(m258, "m258");
     
     // transposed matrix:
     vec4 m036 = blend4(u, shuffle4(m012, m345, 0b1000), 0b1011);
     vec4 m147 = blend4(m145, permute4(u, 0b0101), 0b0100);
     
-    print(m036, "m036");
-    print(m147, "m147");
+    dump(m036, "m036");
+    dump(m147, "m147");
 }
 
 
 void test_transpose2()
 {
     printf("------ test_transpose2\n");
-    vec4 m{0, 1, 2, 3};
+    vec4 m{1, 2, 3, 4};
     vec4 t = blend4(m, permute4(permute2f128(m,m,0x01),0b1100), 0b0110);
-    print(m, "m");
-    print(t, "t");
+    dump(m, "m");
+    dump(t, "t");
 #ifdef __AVX2__
     vec4 s = permute4x64(m, 0b11011000);
-    print(s, "s");
-    print(permute4x64(m, 0x88), "permute4x64(m, 0x88)");
-    print(permute4x64(m, 0xDD), "permute4x64(m, 0xDD)");
-    print(permute4x64(m, 0x50), "permute4x64(m, 0x50)");
+    dump(s, "s");
+    dump(permute4x64(m, 0x88), "permute4x64(m, 0x88)");
+    dump(permute4x64(m, 0xD8), "permute4x64(m, 0xD8)");
+    dump(permute4x64(m, 0xDD), "permute4x64(m, 0xDD)");
+    dump(permute4x64(m, 0x50), "permute4x64(m, 0x50)");
 #endif
 }
 
@@ -471,28 +473,30 @@ void test_transpose3()
 {
     printf("------ test_transpose3\n");
     // matrix:
-    vec4 m012{0, 1, 2, -6};
-    vec4 m345{3, 4, 5, -1};
-    vec4 m678{6, 7, 8, -1};
+    vec4 m012{1, 2, 3, 0};
+    vec4 m345{4, 5, 6, 0};
+    vec4 m678{7, 8, 9, 0};
 
-    print(m012, "m012");
-    print(m345, "m345");
-    print(m678, "m678");
+    dump(m012, "m012");
+    dump(m345, "m345");
+    dump(m678, "m678");
     
     // symmetrized matrix:
     vec4 z = shuffle4(m012, m345, 0b0011);
     vec4 u = permute2f128(m678, z, 0x03);
-    print(z, "z");
-    print(u, "u");
-    
+    vec4 t = shuffle4(m012, m345, 0b1000);
+    dump(z, "z");
+    dump(u, "u");
+    dump(t, "t");
+    dump(shuffle4(u, m345, 0b1110), "tmp");
     // transposed matrix:
-    vec4 m036 = blend4(u, shuffle4(m012, m345, 0b1000), 0b1011);
+    vec4 m036 = blend4(u, t, 0b1011);
+    vec4 m147 = blend4(z, shuffle4(u, m345, 0b1100), 0b1100);
     vec4 m258 = blend4(u, m678, 0b1100);
-    vec4 m147 = blend4(z, permute4(u, 0b0101), 0b0100);
-
-    print(m036, "m036");
-    print(m147, "m147");
-    print(m258, "m258");
+    
+    dump(m036, "m036");
+    dump(m147, "m147");
+    dump(m258, "m258");
 }
 
 void test_transpose4()
@@ -504,10 +508,10 @@ void test_transpose4()
     vec4 m2{ 8,  9, 10, 11};
     vec4 m3{12, 13, 14, 15};
 
-    print(m0, "m0");
-    print(m1, "m1");
-    print(m2, "m2");
-    print(m3, "m3");
+    dump(m0, "m0");
+    dump(m1, "m1");
+    dump(m2, "m2");
+    dump(m3, "m3");
     printf("\n");
 
     // symmetrized matrix:
@@ -516,10 +520,10 @@ void test_transpose4()
     vec4 u2 = unpacklo4(m2, m3);
     vec4 u3 = unpackhi4(m3, m2);
 
-    print(u0, "u0");
-    print(u1, "u1");
-    print(u2, "u2");
-    print(u3, "u3");
+    dump(u0, "u0");
+    dump(u1, "u1");
+    dump(u2, "u2");
+    dump(u3, "u3");
     printf("\n");
     
     vec4 t0 = permute2f128(u0, u2, 0x20);
@@ -527,40 +531,40 @@ void test_transpose4()
     vec4 t2 = blend4(u0, permute4(u2, 0b0101), 0b0100);
     vec4 t3 = blend4(u1, permute4(u3, 0b0101), 0b0100);
 
-    print(t0, "t0");
-    print(t1, "t1");
-    print(t2, "t2");
-    print(t3, "t3");
+    dump(t0, "t0");
+    dump(t1, "t1");
+    dump(t2, "t2");
+    dump(t3, "t3");
 }
 
 void test_swap7()
 {
     printf("------ test_swap7\n");
     vec4 s{1, 2, 3, 4};
-    print(s, "source");
+    dump(s, "source");
 
-    print(permute4(s, 0b1010), "permute 0b1010");
-    print(permute4(s, 0b0101), "permute 0b0101");
+    dump(permute4(s, 0b1010), "permute 0b1010");
+    dump(permute4(s, 0b0101), "permute 0b0101");
 
-    print(shuffle4(s, s, 0b1100), "shuffle 0b1100");
-    print(shuffle4(s, s, 0b0011), "shuffle 0b0011");
+    dump(shuffle4(s, s, 0b1100), "shuffle 0b1100");
+    dump(shuffle4(s, s, 0b0011), "shuffle 0b0011");
     
-    print(permute4(s, 0b1100), "permute 0b1100");
-    print(permute4(s, 0b0011), "permute 0b0011");
+    dump(permute4(s, 0b1100), "permute 0b1100");
+    dump(permute4(s, 0b0011), "permute 0b0011");
 
-    print(permute4(s, 0b0000), "permute 0b0000");
-    print(permute4(s, 0b1111), "permute 0b1111");
+    dump(permute4(s, 0b0000), "permute 0b0000");
+    dump(permute4(s, 0b1111), "permute 0b1111");
 
-    print(unpacklo4(s, s), "unpacklo");
-    print(unpackhi4(s, s), "unpackhi");
+    dump(unpacklo4(s, s), "unpacklo");
+    dump(unpackhi4(s, s), "unpackhi");
 
 #ifdef __AVX2__
-    print(permute4x64(s, 0xDD), "permute4x64 0xDD");
-    print(permute4x64(s, 0x88), "permute4x64 0x88");
-    print(permute4x64(s, 0xD8), "permute4x64 0xD8");
-    print(permute4x64(s, 0xC9), "permute4x64 0xC9");
-    print(permute4x64(s, 0xD2), "permute4x64 0xD2"); // Z X Y T
-    print(permute4x64(s, 0xC9), "permute4x64 0xC9"); // Y Z X T
+    dump(permute4x64(s, 0xDD), "permute4x64 0xDD");
+    dump(permute4x64(s, 0x88), "permute4x64 0x88");
+    dump(permute4x64(s, 0xD8), "permute4x64 0xD8");
+    dump(permute4x64(s, 0xC9), "permute4x64 0xC9");
+    dump(permute4x64(s, 0xD2), "permute4x64 0xD2"); // Z X Y T
+    dump(permute4x64(s, 0xC9), "permute4x64 0xC9"); // Y Z X T
 #endif
 }
 
@@ -568,9 +572,9 @@ void test_swap7()
 
 int main(int argc, char * argv[])
 {
-    test_swapSSE();
+    //test_swapSSE();
 #ifdef __AVX__
-    if ( 1 )
+    if ( 0 )
     {
         test_cat();
         test_deswizzle();
@@ -578,7 +582,7 @@ int main(int argc, char * argv[])
         test_broadcast();
         test_store();
     }
-    if ( 1 )
+    if ( 0 )
     {
         //test_swap1();
         //test_swap2();
@@ -593,7 +597,7 @@ int main(int argc, char * argv[])
         test_swap7();
     }
 #endif
-    if ( 1 )
+    if ( 0 )
     {
         init();
         run(scalar,  "scalar ");

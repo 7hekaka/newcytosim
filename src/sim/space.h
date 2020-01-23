@@ -86,17 +86,17 @@ public:
     virtual Vector project(Vector const& pos) const { ABORT_NOW("base Space is unbounded"); };
     
     /// apply a force directed towards the edge of this Space, for a point located at `pos`
-    virtual void   setInteraction(Vector const& pos, Mecapoint const&, Meca &, real stiff) const;
+    virtual void   setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of this Space deflated by `radius`
-    virtual void   setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca &, real stiff) const;
+    virtual void   setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
 #if ( 0 )
     /// apply a force directed towards the edge of this Space
-    virtual void   setInteraction(Vector const&, Interpolation const&, Meca &, real stiff) const;
+    virtual void   setInteraction(Vector const&, Interpolation const&, Meca&, real stiff) const;
 
     /// apply a force directed towards the edge of this Space
-    virtual void   setInteraction(Interpolation const&, Meca &, real stiff, Confinement conf) const;
+    virtual void   setInteraction(Interpolation const&, Meca&, real stiff, Confinement conf) const;
 #endif
     
     /// true if all points of the sphere (`center`, `radius`) are inside this Space
@@ -151,7 +151,7 @@ public:
     virtual void   step() {}
     
     /// add interactions to a Meca
-    virtual void   setInteractions(Meca &, FiberSet const&) const {}
+    virtual void   setInteractions(Meca&) const {}
 
     //------------------------------ READ/WRITE --------------------------------
     

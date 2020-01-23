@@ -88,7 +88,7 @@ namespace Cytosim
         template < typename T >
         std::ostream& operator << (T const& x)
         {
-            if ( out_->good() && cnt_ )
+            if ( out_!=&nul_ && out_->good() && cnt_ )
             {
                 --cnt_;
                 (*out_) << pref_ << x;
@@ -117,6 +117,6 @@ namespace Cytosim
 
 
 /// a macro to print some text only once
-#define PRINT_ONCE(a) { static bool virgin=true; if (virgin) { virgin=false; Cytosim::out << a; } }
+#define LOG_ONCE(a) { static bool V=1; if (V) { V=0; Cytosim::log << a; } }
 
 #endif

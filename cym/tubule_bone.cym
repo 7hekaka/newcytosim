@@ -7,33 +7,63 @@ set simul system
     viscosity = 1
     time_step = 0.001
     steric = 1, 1000
-    display = ( window_size = 768, 256; point_value=0.01; style=3; )
+    precondition = 0
+}
+
+set system display
+{
+    window_size = 1792, 768; point_value=0.001; style=3; back_color=black;
 }
 
 set space cell 
 {
     shape = capsule
+    display = ( visible = 0 )
 }
 
 new cell
 {
-    length = 2
-    radius = 0.25
+    length = 1.0
+    radius = 0.1
 }
 
-set fiber microtubule
+
+set fiber filament
 {
     rigidity = 20
     segmentation = 0.128
-    steric = 1, 0.025
     lattice = 1, 0.008
-    display = ( style=line; width=2.5; )
+}
+
+
+set fiber backbone
+{
+    rigidity = 20
+    segmentation = 0.128
+    steric = 1, 0.0125
+    binding_key = 0
+}
+
+
+set filament display
+{
+    color      = 0xFFFFFFFF, 0x7F7F7FFF, 0xFFFFFF00;
+    coloring   = 5;
+    lines      = 5, 1, 1;
+    lattice    = 3, 1, 0;
+}
+
+set tubule microtubule
+{
+    stiffness = 10000, 5000
+    fiber = filament
+    bone = backbone
 }
 
 set hand kinesin
 {
     binding_rate = 10
-    binding_range = 0.06
+    binding_range = 0.010
     unbinding_rate = 0.1
     unbinding_force = 3
     
@@ -42,8 +72,13 @@ set hand kinesin
     stall_force = 6
     step_size = 0.008
     hold_growing_end = 1
-    
-    display = ( size=1.0; width=0.5; )
+}
+
+set kinesin display
+{
+    color   = 0x000080FF;
+    size    = 6;
+    width   = 3.5;
 }
 
 set couple complex
@@ -51,46 +86,49 @@ set couple complex
     hand1 = kinesin
     hand2 = kinesin
     stiffness = 250
-    diffusion = 2
-    length = 0.05
+    diffusion = 5
+    length = 0.030
     specificity = antiparallel
 }
 
 new 2 microtubule
 {
     length = 0.512
-    range = 0 0.025 -0.025, 0 -0.025 0.025
+    range = 0 0.020 -0.020, 0 -0.020 0.020
     orientation = +1 0 0
+    mark = 2
 }
 
 new 2 microtubule
 {
     length = 0.512
-    range = 0 -0.025 -0.025, 0 0.025 0.025
+    range = 0 -0.020 -0.020, 0 0.020 0.020
     orientation = -1 0 0
+    mark = 4
 }
 
-new microtubule
+new 0 microtubule
 {
-    length = 0.512
+    length = 0.384
     position = 0 0.025 0.075
     orientation = 1 0 0
 }
 
-new 128 complex
+new 590 complex
 
-run 1000 system
+run 250 system
 {
     solve = 0
 }
 
-run 2000 system 
+run 250 system
 {
 }
 
 change kinesin { unloaded_speed = 0.1 }
 
-run 1000 system
+run 10000 system
 {
     nb_frames = 25
 }
+

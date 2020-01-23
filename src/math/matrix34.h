@@ -296,9 +296,21 @@ public:
     Matrix34 transposed() const
     {
         Matrix34 res;
+#if MATRIX34_USES_AVX
+        vec4 m012 = load4(val  );
+        vec4 m345 = load4(val+4);
+        vec4 m678 = load4(val+8);
+        vec4 z = shuffle4(m012, m345, 0b0011);
+        vec4 u = permute2f128(m678, z, 0x03);
+        vec4 t = shuffle4(m012, m345, 0b1000);
+        store4(res.val  , blend4(u, t, 0b1011));
+        store4(res.val+4, blend4(z, shuffle4(u, m345, 0b1100), 0b1100));
+        store4(res.val+8, blend4(u, m678, 0b1100));
+#else
         for ( unsigned x = 0; x < 3; ++x )
         for ( unsigned y = 0; y < 3; ++y )
             res[y+4*x] = val[x+4*y];
+#endif
         return res;
     }
     
@@ -415,18 +427,6 @@ public:
     }
 
 #if MATRIX34_USES_AVX
-    /// multiplication by a vector: this * V
-    const vec4 vecmul3(double const* V) const
-    {
-        vec4 vec = loadu4(V); // { x, y, z, garbage }
-        vec4 s0 = mul4(load4(val  ), vec);
-        vec4 s1 = mul4(load4(val+4), vec);
-        vec4 s2 = mul4(load4(val+8), vec);
-        vec4 s3 = setzero4();
-        s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    }
     
     /// multiplication by a vector: this * V
     const vec4 vecmul4(const vec4 vec) const
@@ -435,9 +435,17 @@ public:
         vec4 s1 = mul4(load4(val+4), vec);
         vec4 s2 = mul4(load4(val+8), vec);
         vec4 s3 = setzero4();
+        /* summing the components below requires a lot of shuffling
+        but this is required only once when doing a lot of vecmul */
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
         return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    }
+    
+    /// multiplication by a vector: this * V
+    const vec4 vecmul3(double const* V) const
+    {
+        return vecmul4(loadu4(V)); // { x, y, z, garbage }
     }
 
     /// multiplication by a vector: transpose(M) * V
@@ -898,6 +906,15 @@ public:
         return symmetric(X * X2 - 1.0, X * Y2, X * Z2,
                          Y * Y2 - 1.0, Y * Z2,
                          Z * Z2 - 1.0);
+    }
+
+    /// build the matrix `M = dia * Id + vec (x) Id`
+    /** thus applying M to V results in `dia * V + vec (x) V */
+    static Matrix34 vectorProduct(const real dia, const Vector3& vec)
+    {
+        return Matrix34(    dia,  vec.ZZ, -vec.YY,
+                        -vec.ZZ,     dia,  vec.XX,
+                         vec.YY, -vec.XX,     dia);
     }
 
     /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values

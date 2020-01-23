@@ -18,7 +18,7 @@ SegmentVector allSegments;
 
 unsigned FiberGrid::setGrid(Space const*, real)
 {
-    PRINT_ONCE("Cytosim is using a crude method to localize fibers!\n");
+    LOG_ONCE("Cytosim is using a crude method to localize fibers!\n");
     return 0;
 }
 
@@ -53,7 +53,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     for ( FiberSegment const& seg : allSegments )
     {
 #if !TRICKY_HAND_ATTACHMENT
-        if ( RNG.test(ha.prop->binding_rate_prob) )
+        if ( RNG.test(ha.prop->binding_prob) )
 #else
         if ( RNG.flip_8th() )
 #endif

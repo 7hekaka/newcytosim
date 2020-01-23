@@ -22,7 +22,7 @@ class WristLong : public Wrist
     mutable Torque  mArm;
     
     /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
      
@@ -35,13 +35,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// position on the side of fiber used for sideInteractions
-    Vector  posSide() const;
+    Vector  sidePos() const;
     
     /// force = stiffness * ( posFoot() - posHand() )
     Vector  force() const;
         
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

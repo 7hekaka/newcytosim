@@ -95,12 +95,11 @@ Vector SpaceCylinder::project(Vector const& w) const
 {
     Vector p = w;
 #if ( DIM >= 3 )
-    bool inX = 1;
-    
+    bool in = true;
     if ( fabs(w.XX) > length_ )
     {
         p.XX = std::copysign(length_, w.XX);
-        inX = 0;
+        in = false;
     }
     
     real n = w.normYZ();
@@ -111,20 +110,17 @@ Vector SpaceCylinder::project(Vector const& w) const
         p.YY = n * w.YY;
         p.ZZ = n * w.ZZ;
     }
-    else
+    else if ( in )
     {
-        if ( inX )
+        if ( length_ - fabs(w.XX) < radius_ - n )
         {
-            if ( length_ - fabs(w.XX) < radius_ - n )
-            {
-                p.XX = std::copysign(length_, w.XX);
-            }
-            else
-            {
-                n = radius_ / n;
-                p.YY = n * w.YY;
-                p.ZZ = n * w.ZZ;
-            }
+            p.XX = std::copysign(length_, w.XX);
+        }
+        else
+        {
+            n = radius_ / n;
+            p.YY = n * w.YY;
+            p.ZZ = n * w.ZZ;
         }
     }
 #endif
@@ -136,7 +132,7 @@ Vector SpaceCylinder::project(Vector const& w) const
 /**
  This applies the correct forces in the cylindrical part and the caps.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca,
+void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca,
                                    real stiff, const real len, const real rad)
 {
     bool cap = ( fabs(pos.XX) > len );
@@ -164,7 +160,7 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
 #endif
 
     if ( cap )
-        meca.addLineClampX(pe, 0, p, stiff);
+        meca.addPlaneClampX(pe, 0, p, stiff);
   
     if ( cyl )
         meca.addCylinderClampX(pe, rad, stiff);
@@ -174,7 +170,7 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
@@ -183,14 +179,12 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca 
  This applies the correct forces in the cylindrical and spherical parts.
  */
 void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe,
-                                   real rad, Meca & meca, real stiff) const
+                                   real rad, Meca& meca, real stiff) const
 {
-    real eRadius = radius_ - rad;
-    if ( eRadius < 0 ) eRadius = 0;
-    real eLength = length_ - rad;
-    if ( eLength < 0 ) eLength = 0;
+    real R = std::max((real)0, radius_ - rad);
+    real L = std::max((real)0, length_ - rad);
     
-    setInteraction(pos, pe, meca, stiff, eLength, eRadius);
+    setInteraction(pos, pe, meca, stiff, L, R);
 }
 
 //------------------------------------------------------------------------------

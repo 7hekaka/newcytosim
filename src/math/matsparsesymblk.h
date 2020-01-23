@@ -33,11 +33,11 @@ typedef Matrix44 SquareBlock;
 
 ///real symmetric sparse Matrix
 /**
+ The lower triangle of the matrix is stored.
+ Elements are stored in no particular order in each column.
+
  MatrixSparseSymmetricBlock uses a sparse storage, with arrays of elements for each column.
  Each element is a full square block of size DIM x DIM.
- 
- Elements are stored in random order in the column.
- The lower triangle of the matrix is stored.
  
  F. Nedelec, 17--27 March 2017, revised entirely June 2018
  */
@@ -54,8 +54,8 @@ private:
     {
         friend class MatrixSparseSymmetricBlock;
 
-        size_t   allo_;       ///< allocated size of array
-        size_t   size_;       ///< number of blocks in column
+        size_t       allo_;   ///< allocated size of array
+        size_t       size_;   ///< number of blocks in column
         size_t      * inx_;   ///< line index for each element
         SquareBlock * blk_;   ///< block
         
@@ -162,7 +162,7 @@ public:
     /// default destructor
     virtual ~MatrixSparseSymmetricBlock()  { deallocate(); }
     
-    /// set all the element to zero
+    /// set to zero
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )
@@ -233,7 +233,7 @@ public:
     void vecMul(const real* X, real* Y) const;
 
     /// true if matrix is non-zero
-    bool nonZero() const;
+    bool isNotZero() const;
     
     /// number of blocks in columns within [start, stop[
     size_t nbElements(size_t start, size_t stop) const;
@@ -247,7 +247,7 @@ public:
     /// printf debug function in sparse mode: i, j : value
     void printSparse(std::ostream&) const;
 
-    /// print content of one column
+    /// print size of columns
     void printColumns(std::ostream&);
     
     /// debug function

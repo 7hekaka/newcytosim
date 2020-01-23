@@ -15,7 +15,7 @@ ShackleLong::ShackleLong(ShackleProp const* p, Vector const& w)
 
 //------------------------------------------------------------------------------
 
-Torque ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real len)
+Torque ShackleLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
@@ -33,11 +33,11 @@ Torque ShackleLong::calcArm(const Interpolation & pt, Vector const& pos, real le
 }
 
 
-/**
- Note that, as `mArm` is calculated by setInteraction(),
- the result of posSide will be incorrect if 'solve=0'
- */
-Vector ShackleLong::posSide() const
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result of sidePos() will be incorrect if 'solve=0'
+*/
+Vector ShackleLong::sidePos() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
@@ -51,7 +51,7 @@ Vector ShackleLong::posSide() const
  */
 Vector ShackleLong::force() const
 {
-    Vector d = cHand2->pos() - ShackleLong::posSide();
+    Vector d = cHand2->pos() - ShackleLong::sidePos();
         
     //correct for periodic space:
     if ( modulo )
@@ -64,7 +64,7 @@ Vector ShackleLong::force() const
 /**
  The interaction is slipery on hand1
  */
-void ShackleLong::setInteractions(Meca & meca) const
+void ShackleLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();

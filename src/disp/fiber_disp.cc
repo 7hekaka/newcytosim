@@ -114,7 +114,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(tension_scale,    "tension");
 #endif
     
-    glos.set(lattice_style,    "lattice") || glos.set(lattice_style, "show_lattice");
+    glos.set(lattice_style,    "lattice") || glos.set(lattice_style, "lattice_style");
     glos.set(lattice_scale,    "lattice_scale") || glos.set(lattice_scale, "lattice", 1);
     glos.set(lattice_rescale,  "lattice", 2);
 
@@ -136,7 +136,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(exclude_axis,     "exclude_axis");
     
     if ( glos.set(mask, "mask") )
-        mask_bitfield = RNG.number_of_bits(mask);
+        mask_bitfield = RNG.distributed_bits(mask);
     glos.set(mask_bitfield, "mask", 1);
 
     glos.set(tension_scale,    "tension_scale");

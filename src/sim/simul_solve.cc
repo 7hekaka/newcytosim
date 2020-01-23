@@ -66,7 +66,7 @@ real Simul::estimateStericRange() const
     }
     
     if ( ran < REAL_EPSILON )
-        PRINT_ONCE("Warning: could not estimate simul:steric_max_range automatically!\n");
+        LOG_ONCE("Warning: could not estimate simul:steric_max_range automatically!\n");
     
     return ran;
 }
@@ -217,7 +217,7 @@ void Simul::setStericInteractions(Meca& meca) const
  - call setStericInteractions() if prop->steric is true.
  .
  */
-void Simul::setInteractions(Meca & meca) const
+void Simul::setInteractions(Meca& meca) const
 {
     // prepare the meca, and register Mecables
     meca.clear();
@@ -236,7 +236,7 @@ void Simul::setInteractions(Meca & meca) const
     // add interactions for all objects:
     
     for ( Space * s=spaces.first(); s; s=s->next() )
-        s->setInteractions(meca, fibers);
+        s->setInteractions(meca);
     
     for ( Fiber * f=fibers.first(); f ; f=f->next() )
         f->setInteractions(meca);
@@ -359,9 +359,24 @@ void Simul::computeForces() const
 {
     // we could use here an accessory Meca mec;
     try {
-        prop->complete(*this);
-        setInteractions(sMeca);
-        sMeca.computeForces();
+        if ( !ready() )
+        {
+            prop->complete(*this);
+            setInteractions(sMeca);
+            sMeca.computeForces();
+        }
+        else
+        {
+#if ( 0 )
+            /* if the simulation is running live, the force are already available
+            and we can check here that the result are similar */
+            fibers.first()->printTensions(std::clog);
+            setInteractions(sMeca);
+            sMeca.computeForces();
+            fibers.first()->printTensions(std::clog);
+            std::clog<<"\n";
+#endif
+        }
     }
     catch ( Exception & e )
     {
@@ -381,7 +396,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 {
     // ALL THE FORCES BELOW ARE FOR DEVELOPMENT/TESTING PURPOSES:
 #if ( 0 )
-    PRINT_ONCE("AD-HOC FUNKY REPULSIVE FORCE ENABLED\n");
+    LOG_ONCE("AD-HOC FUNKY REPULSIVE FORCE ENABLED\n");
     // add pairwise repulsive force:
     for ( Bead * i=beads.first(); i ; i=i->next() )
         for ( Bead * j=i->next()    ; j ; j=j->next() )
@@ -390,7 +405,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 #if ( 0 )
     if ( beads.size() > 1 )
     {
-        PRINT_ONCE("AD-HOC BEAD-STRING FORCES ENABLED\n");
+        LOG_ONCE("AD-HOC BEAD-STRING FORCES ENABLED\n");
         // attach beads together into a open string:
         Bead * p = beads.firstID();
         if ( p )
@@ -408,7 +423,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 #if ( 0 )
     if ( beads.size() > 2 )
     {
-        PRINT_ONCE("AD-HOC BEAD TORQUES ENABLED\n");
+        LOG_ONCE("AD-HOC BEAD TORQUES ENABLED\n");
         const real sti = 10000;
         const real ang = 2 * M_PI / 12;
         real co = cos(ang), si = sin(ang);
@@ -423,7 +438,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     }
 #endif
 #if ( 0 )
-    PRINT_ONCE("AD-HOC FUNKY RADIAL FORCES ENABLED\n");
+    LOG_ONCE("AD-HOC FUNKY RADIAL FORCES ENABLED\n");
     // attach beads together in a string:
     for( Bead * b=beads.first(); b; b=b->next() )
     {
@@ -433,13 +448,13 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     }
 #endif
 #if ( 0 )
-    PRINT_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
+    LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated forces, for testing rotation
     for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
         meca.addTorqueClamp(fib->interpolateCenter(), Vector(0,1,0), 1);
 #endif
 #if ( 0 )
-    PRINT_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
+    LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated force to test rotation of spheres:
     Vector force(0,1,0);
     for ( Sphere * sph = spheres.first(); sph; sph = sph->next() )
@@ -451,25 +466,26 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 }
 
 
-void Simul::dump() const
+void Simul::dump(const char dirname[]) const
 {
     std::string cwd = FilePath::get_cwd();
-    const char path[] = "dump";
-    FilePath::make_dir(path);
-    FilePath::change_dir(path);
+    FilePath::make_dir(dirname);
+    FilePath::change_dir(dirname);
     sMeca.dump();
     FilePath::change_dir(cwd);
-    fprintf(stderr, "Cytosim dumped its matrices in directory `%s'\n", path);
+    fprintf(stderr, "Cytosim dumped its matrices in directory `%s'\n", dirname);
 }
 
 
-void Simul::dump_system() const
+void Simul::saveSystem(const char dirname[]) const
 {
+    std::string cwd = FilePath::get_cwd();
+    FilePath::make_dir(dirname);
+    FilePath::change_dir(dirname);
     FILE * f = fopen("matrix.mtx", "w");
     if ( f && ~ferror(f) )
     {
         sMeca.saveMatrix(f, 0);
-        fprintf(stderr, "Cytosim saved its matrix in `matrix.mtx'\n");
         fclose(f);
     }
     f = fopen("rhs.mtx", "w");
@@ -478,6 +494,8 @@ void Simul::dump_system() const
         sMeca.saveRHS(f);
         fclose(f);
     }
+    fprintf(stderr, "Cytosim saved its matrix in `%s'\n", dirname);
+    FilePath::change_dir(cwd);
 }
 
 //==============================================================================

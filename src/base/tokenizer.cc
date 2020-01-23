@@ -444,13 +444,15 @@ std::string Tokenizer::get_hexadecimal(std::istream& is)
 
 std::string Tokenizer::get_token(std::istream& is, bool eat_line)
 {
-    int c = skip_space(is, eat_line);
+    int c = skip_space(is, false);
  
     if ( c == EOF )
         return "";
     
     if ( c == '\n' )
     {
+        if ( !eat_line )
+            return "";
         is.get();
         return "\n";
     }

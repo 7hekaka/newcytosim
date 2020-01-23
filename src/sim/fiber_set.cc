@@ -1211,12 +1211,15 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs,
  
  @return cnt = number of segments intersecting the plane
  @return ten = sum of tension in these segments
- */
-void FiberSet::infoTension(size_t& cnt, real& ten, Vector const& n, real a) const
+ @return max = maximum of tension
+*/
+void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const
 {
     cnt = 0;
-    ten = 0;
-    
+    sum = 0;
+    inf = 0;
+    sup = 0;
+
     Vector dir = normalize(n);
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
@@ -1225,7 +1228,10 @@ void FiberSet::infoTension(size_t& cnt, real& ten, Vector const& n, real a) cons
             real abs = fib->planarIntersect(s, n, a);
             if ( 0 <= abs  &&  abs < 1 )
             {
-                ten += fabs(dot(dir, fib->dirSegment(s))) * fib->tension(s);
+                real h = fabs(dot(dir, fib->dirSegment(s))) * fib->tension(s);
+                sum += h;
+                inf = std::min(inf, h);
+                sup = std::max(sup, h);
                 ++cnt;
             }
         }
@@ -1238,17 +1244,23 @@ void FiberSet::infoTension(size_t& cnt, real& ten, Vector const& n, real a) cons
  
  @return cnt = total number of segments
  @return ten = sum of tension
+ @return max = maximum of tension
  */
-void FiberSet::infoTension(size_t& cnt, real& ten) const
+void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup) const
 {
     cnt = 0;
-    ten = 0;
+    sum = 0;
+    inf = 0;
+    sup = 0;
     
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
         {
-            ten += fib->tension(s);
+            real h = fib->tension(s);
+            sum += h;
+            inf = std::min(inf, h);
+            sup = std::max(sup, h);
             ++cnt;
         }
     }

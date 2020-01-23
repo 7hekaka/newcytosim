@@ -10,7 +10,7 @@ class CrosslinkProp;
 /**
  The Crosslink is a simpler kind of Couple, which does not support `trans_activated`
  
- It has a zero resting length, and uses Meca:interLink()
+ It has a zero resting length, and uses it uses Meca::addLink()
  
  CrosslinkLong has a non-zero resting length, and is selected automatically 
  @ingroup CoupleGroup
@@ -23,16 +23,16 @@ public:
     CrosslinkProp const* prop;
     
     /// constructor
-    Crosslink(CrosslinkProp const*, Vector const & w = Vector(0,0,0));
+    Crosslink(CrosslinkProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual      ~Crosslink();
     
     /// simulation step for a free Couple: diffusion
-    virtual void  stepFF(FiberGrid const&);
+    virtual void  stepFF(Simul&);
     
     /// add interactions to a Meca
-    void          setInteractions(Meca &) const;
+    void          setInteractions(Meca&) const;
 
 };
 

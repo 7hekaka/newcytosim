@@ -107,7 +107,7 @@ void Single::randomizePosition()
 }
 
 
-void Single::stepF(const FiberGrid& grid)
+void Single::stepF(Simul& sim)
 {
     assert_false( sHand->attached() );
 
@@ -132,7 +132,7 @@ void Single::stepF(const FiberGrid& grid)
         sPos = prop->confine_space_ptr->project(sPos);
     }
     
-    sHand->stepUnattached(grid, sPos);
+    sHand->stepUnattached(sim, sPos);
 }
 
 
@@ -152,7 +152,7 @@ void Single::stepA()
 /**
  Add confinement force to the bound fiber
  */
-void Single::setInteractions(Meca & meca) const
+void Single::setInteractions(Meca& meca) const
 {
     assert_true( sHand->attached() );
     

@@ -44,7 +44,7 @@ real Bead::volume() const
 
 //------------------------------------------------------------------------------
 
-void Bead::setInteractions(Meca & meca) const
+void Bead::setInteractions(Meca& meca) const
 {
 #if NEW_SOLID_CLAMP
     if ( prop->clamp_stiff > 0 )

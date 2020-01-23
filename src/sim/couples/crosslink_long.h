@@ -8,7 +8,8 @@
 /// A Crosslink with a non-zero resting length
 /**
  The CrosslinkLong adds a non-zero resting length to Crosslink,
- using Meca:interSideLink()
+ it uses Meca::addSideSideLink() which is a symmetric interaction with non-zero
+ resting length.
  
  CrosslinkLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup
@@ -16,27 +17,27 @@
 class CrosslinkLong : public Crosslink
 {
     /// the side (top/bottom) of the interaction
-    mutable Torque mArm;
-    
-    /// used to calculate `mArm`
-    static Torque calcArm(const Interpolation & pt, Vector const& pos, real len);
+    mutable Torque mArm1;
+
+    /// the side (top/bottom) of the interaction
+    mutable Torque mArm2;
     
 public:
     
     /// constructor
-    CrosslinkLong(CrosslinkProp const*, Vector const & w = Vector(0,0,0));
+    CrosslinkLong(CrosslinkProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
     virtual ~CrosslinkLong();
     
     /// position on the side of fiber1 used for sideInteractions
-    Vector  posSide() const;
+    Vector  sidePos() const;
  
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
     Vector  force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca &) const;
+    void    setInteractions(Meca&) const;
     
 };
 

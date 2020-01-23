@@ -59,7 +59,7 @@ set couple complex
 {
     hand1 = kinesin
     hand2 = kinesin
-    diffusion = 10
+    diffusion = 2
     stiffness = 100
 }
 

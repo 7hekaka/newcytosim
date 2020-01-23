@@ -183,7 +183,7 @@ Vector SpaceSquare::project(Vector const& w) const
 
  */
 
-void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & meca, real stiff, const real dim[])
+void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& meca, real stiff, const real dim[])
 {
     bool in = true;
     
@@ -192,7 +192,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
         assert_true( dim[d] >= 0 );
         if ( fabs(pos[d]) > dim[d] )
         {
-            meca.addLineClampX(pe, d, std::copysign(dim[d], pos[d]), stiff);
+            meca.addPlaneClampX(pe, d, std::copysign(dim[d], pos[d]), stiff);
             in = false;
         }
     }
@@ -211,18 +211,18 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca & m
         u = dim[2] - fabs(pos[2]);
         if ( u < l )  dip = 2;
 #endif
-        meca.addLineClampX(pe, dip, std::copysign(dim[dip], pos[dip]), stiff);
+        meca.addPlaneClampX(pe, dip, std::copysign(dim[dip], pos[dip]), stiff);
     }
 }
 
 
-void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_);
 }
 
 
-void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real dim[DIM];
     for ( unsigned d = 0; d < DIM; ++d )

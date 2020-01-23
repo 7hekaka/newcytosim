@@ -149,7 +149,7 @@ Vector SpaceCapsule::randomPlace() const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff, const real len, const real rad)
+void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
     if ( fabs(pos.XX) > len )
     {
@@ -164,7 +164,7 @@ void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca & meca, real stiff) const
+void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     setInteraction(pos, pe, meca, stiff, length_, radius_);
 }
@@ -172,7 +172,7 @@ void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca &
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca & meca, real stiff) const
+void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     if ( rad < radius_ )
         setInteraction(pos, pe, meca, stiff, length_, radius_-rad);

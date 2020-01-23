@@ -71,7 +71,7 @@ set couple myosinP
     hand1 = binder
     hand2 = motor
     stiffness = 400
-    diffusion = 100
+    diffusion = 2
     specificity = parallel
 }
 
@@ -80,7 +80,7 @@ set couple myosinA
     hand1 = binder
     hand2 = motor
     stiffness = 400
-    diffusion = 100
+    diffusion = 2
     specificity = antiparallel
 }
 

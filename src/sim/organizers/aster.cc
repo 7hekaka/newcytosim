@@ -54,7 +54,7 @@ void Aster::step()
      Y <- Y + ( mB + mC + mK ) * X
 
  */
-void Aster::setInteractions(Meca & meca) const
+void Aster::setInteractions(Meca& meca) const
 {
     assert_true( linked() );
 

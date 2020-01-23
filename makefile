@@ -33,7 +33,7 @@ MAKELIB = $(LIBTOOL) lib/$@ $(addprefix build/, $(notdir $^))
 OBJECTS = $(filter %.cc, $^) $(addprefix build/, $(notdir $(filter %.o, $^))) $(addprefix lib/, $(notdir $(filter %.a, $^)))
 
 # macro to notify that a task was completed:
-DONE = @tput setaf 11; printf ">>>>>>> made %s\n" $@; tput setaf 15;
+DONE = printf "> > > > > > > made %s\n" $@;
 
 
 SRCDIR1 := $(addprefix src/, math base sim disp play)
@@ -166,7 +166,7 @@ sterile:
 .PHONY: dep
 
 #command used to build the dependencies files automatically
-MAKEDEP := g++ -std=gnu++11 -MM $(addprefix -I, $(SRCDIR))
+MAKEDEP := g++ -std=gnu++14 -MM $(addprefix -I, $(SRCDIR))
 
 dep:
 	if ! test -d dep; then mkdir dep; else rm -f dep/*; fi

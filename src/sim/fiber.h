@@ -146,9 +146,21 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    Fiber const*        family_;
-    Fiber const*        sister_;
-    Fiber const*        brother_;
+    Fiber const*  family_;
+    Fiber const*  sister_;
+    Fiber const*  brother_;
+    
+    /// position of a point specified by abscissa from the ORIGIN
+    Vector  displayPos(real a) const;
+
+    /// radial direction at the specified abscissa
+    Vector  radialDir(real a) const;
+
+#else
+    
+    /// position of a point specified by abscissa from the ORIGIN
+    Vector  displayPos(real a) const { return posM(a); }
+
 #endif
 
     /// the Property of this object
@@ -174,7 +186,7 @@ public:
     void           prepareMecable();
     
     /// add interactions to a Meca
-    void           setInteractions(Meca &) const;
+    void           setInteractions(Meca&) const;
     
 
     /// invert polarity and adjust abscissa of Hands to keep them at the same place
