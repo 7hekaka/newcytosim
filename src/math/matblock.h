@@ -4,7 +4,6 @@
 #define MATBLOCK_H
 
 #include "real.h"
-#include "matrix.h"
 #include "assert_macro.h"
 #include <cstdio>
 #include <string>

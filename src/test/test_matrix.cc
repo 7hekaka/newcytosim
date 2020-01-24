@@ -9,6 +9,7 @@
 #include "tictoc.h"
 #include "vecprint.h"
 
+#include "dim.h"
 #include "matsparsesym.h"
 #include "matsparsesym1.h"
 #include "matsparsesym2.h"

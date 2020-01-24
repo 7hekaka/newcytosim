@@ -5,7 +5,6 @@
 
 #include "vector.h"
 #include "mecable.h"
-#include "matrix.h"
 
 /// Indicates one Vertex of a Mecable
 /**

@@ -5,7 +5,6 @@
 
 #include "real.h"
 #include "vector.h"
-#include "matrix.h"
 #include "mecable.h"
 #include "mecapoint.h"
 

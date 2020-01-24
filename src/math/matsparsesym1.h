@@ -4,7 +4,6 @@
 #define MATSPARSESYM1_H
 
 #include "real.h"
-#include "matrix.h"
 #include <cstdio>
 #include <string>
 

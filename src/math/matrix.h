@@ -8,16 +8,13 @@
 #include "real.h"
 
 
-/// The interface for all the large matrices
+/// Matrix is a model for all the large matrices
+/**
+ This interface is a model for all the large matrices, that is not enforced
+ by the compiler, as Matrices are their own class and do not derive from this.
+ */
 class Matrix
 {
-public:
-    
-protected:
-
-    /// size of matrix
-    size_t   size_;
-    
 private:
     
     /// Disabled copy constructor (@todo: write copy constructor)
@@ -25,6 +22,11 @@ private:
     
     /// Disabled copy assignment (@todo: write copy assignement)
     Matrix& operator=(Matrix const&);
+
+protected:
+
+    /// size of matrix
+    size_t   size_;
 
 public:
     

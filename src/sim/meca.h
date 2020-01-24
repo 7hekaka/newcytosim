@@ -6,7 +6,6 @@
 #include "dim.h"
 #include "array.h"
 #include "vector.h"
-#include "matrix.h"
 //#include "matsparse.h"
 #include "matsparsesym1.h"
 #include "matsparsesymblk.h"
