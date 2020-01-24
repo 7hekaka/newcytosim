@@ -912,6 +912,8 @@ vec4 MatrixSparseBlock::Line::vecMul4D(const real* X) const
 // multiplication of a vector: Y = Y + M * X
 void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
     for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
@@ -931,6 +933,8 @@ void MatrixSparseBlock::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 // multiplication of a vector: Y = Y + M * X
 void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
 {
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
     for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
@@ -950,6 +954,8 @@ void MatrixSparseBlock::vecMulAdd_ALT(const real* X, real* Y, size_t start, size
 // multiplication of a vector: Y = Y + M * X
 void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t stop) const
 {
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
     size_t cnt = 0, row = 0;
     //unsigned long long time = __rdtsc();
     for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
@@ -979,6 +985,8 @@ void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, size_t start, siz
 // multiplication of a vector: Y = M * X
 void MatrixSparseBlock::vecMul(const real* X, real* Y, size_t start, size_t stop) const
 {
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
     //printf("msb %6i %6i : %p\n", start, stop, pthread_self());
     /** All values need to be reset since as the matrix is sparse,
      not every line will be addressed below */
