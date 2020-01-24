@@ -293,7 +293,7 @@ void testMatrix(MATRIX & mat,
 #ifdef _OPENMP
 #include <omp.h>
 
-constexpr size_t CHK = 4;
+constexpr size_t CHK = DIM*2;
 
 
 template <typename MATRIX>

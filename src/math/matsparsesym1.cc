@@ -35,8 +35,7 @@ MatrixSparseSymmetric1::MatrixSparseSymmetric1()
     sa_        = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-    next_    = new size_t[1];
-    next_[0] = 0;
+    next_      = nullptr;
 #endif
 }
 

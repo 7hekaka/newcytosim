@@ -26,8 +26,7 @@ MatrixSparseSymmetric2::MatrixSparseSymmetric2()
     nmax_      = 0;
     ija_       = nullptr;
     sa_        = nullptr;
-    next_    = new size_t[1];
-    next_[0] = 0;
+    next_      = nullptr;
 #endif
 }
 
