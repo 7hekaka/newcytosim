@@ -41,9 +41,9 @@ Torque DuoLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 
 /*
  Note that, since `mArm` is calculated by setInteraction(),
- the result of sidePos() will be incorrect if 'solve=0'
+ the result will be incorrect if 'solve=0'
 */
-Vector DuoLong::sidePos() const
+Vector DuoLong::sidePos1() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
@@ -58,7 +58,7 @@ Vector DuoLong::sidePos() const
  */
 Vector DuoLong::force() const
 {
-    Vector d = cHand2->pos() - DuoLong::sidePos();
+    Vector d = cHand2->pos() - DuoLong::sidePos1();
     
     //correct for periodic space:
     if ( modulo )

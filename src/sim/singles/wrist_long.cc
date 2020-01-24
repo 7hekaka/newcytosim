@@ -54,7 +54,7 @@ Vector WristLong::force() const
 
 /*
  Note that, since `mArm` is calculated by setInteraction(),
- the result of sidePos() will be incorrect if 'solve=0'
+ the result will be incorrect if 'solve=0'
 */
 Vector WristLong::sidePos() const
 {

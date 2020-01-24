@@ -35,9 +35,9 @@ Torque ShackleLong::calcArm(Interpolation const& pt, Vector const& pos, real len
 
 /*
  Note that, since `mArm` is calculated by setInteraction(),
- the result of sidePos() will be incorrect if 'solve=0'
+ the result will be incorrect if 'solve=0'
 */
-Vector ShackleLong::sidePos() const
+Vector ShackleLong::sidePos1() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
@@ -51,7 +51,7 @@ Vector ShackleLong::sidePos() const
  */
 Vector ShackleLong::force() const
 {
-    Vector d = cHand2->pos() - ShackleLong::sidePos();
+    Vector d = cHand2->pos() - ShackleLong::sidePos1();
         
     //correct for periodic space:
     if ( modulo )

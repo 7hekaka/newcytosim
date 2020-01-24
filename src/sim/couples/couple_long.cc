@@ -42,9 +42,9 @@ Torque CoupleLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 
 /*
  Note that, since `mArm` is calculated by setInteraction(),
- the result of sidePos() will be incorrect if 'solve=0'
+ the result will be incorrect if 'solve=0'
 */
-Vector CoupleLong::sidePos() const
+Vector CoupleLong::sidePos1() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm, cHand1->dirFiber());
@@ -59,7 +59,7 @@ Vector CoupleLong::sidePos() const
  */
 Vector CoupleLong::force() const
 {
-    Vector d = cHand2->pos() - CoupleLong::sidePos();
+    Vector d = cHand2->pos() - CoupleLong::sidePos1();
     
     //correct for periodic space:
     if ( modulo )

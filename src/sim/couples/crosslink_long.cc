@@ -22,9 +22,9 @@ CrosslinkLong::~CrosslinkLong()
 
 /*
  Note that, since `mArm` is calculated by setInteraction(),
- the result of sidePos() will be incorrect if 'solve=0'
+ the result will be incorrect if 'solve=0'
 */
-Vector CrosslinkLong::sidePos() const
+Vector CrosslinkLong::sidePos1() const
 {
 #if ( DIM > 1 )
     return cHand1->pos() + cross(mArm1, cHand1->dirFiber());
@@ -34,12 +34,26 @@ Vector CrosslinkLong::sidePos() const
 }
 
 
+/*
+ Note that, since `mArm` is calculated by setInteraction(),
+ the result will be incorrect if 'solve=0'
+*/
+Vector CrosslinkLong::sidePos2() const
+{
+#if ( DIM > 1 )
+    return cHand2->pos() + cross(mArm2, cHand2->dirFiber());
+#else
+    return cHand2->pos();
+#endif
+}
+
+
 /**
  Calculates the force for the interSideLink()
  */
 Vector CrosslinkLong::force() const
 {
-    Vector d = cHand2->pos() - CrosslinkLong::sidePos();
+    Vector d = CrosslinkLong::sidePos2() - CrosslinkLong::sidePos1();
     
     //correct for periodic space:
     if ( modulo )
@@ -72,10 +86,10 @@ void CrosslinkLong::setInteractions(Meca& meca) const
 #elif ( DIM >= 3 )
 
 # if FIBER_HAS_FAMILY
-    Vector rad1 = fiber1()->radialDir(abscissa1());
-    Vector rad2 = fiber2()->radialDir(abscissa2());
-    mArm1 = cross(pt1.diff(), rad1).normalized(len);
-    mArm2 = cross(pt2.diff(), rad2).normalized(len);
+    /* calculate the Arms to offset the position along the radial direction
+    of the microtubules */
+    mArm1 = cross(pt1.diff(), fiber1()->radialDir(abscissa1())).normalized(len);
+    mArm2 = cross(pt2.diff(), fiber2()->radialDir(abscissa2())).normalized(len);
 # else
     Vector dir = pt2.pos() - pt1.pos();
     mArm1 = cross(pt1.diff(), dir).normalized(len);

@@ -149,13 +149,16 @@ public:
      
     /// cosine of the angle between the two Fibers attached by the hands
     real           cosAngle()             const { return dot(cHand1->dirFiber(), cHand2->dirFiber()); }
-   
-    /// position on the side of fiber1 used for sideInteractions
-    virtual Vector sidePos()              const { return cHand1->pos(); }
     
     /// the position of the complex if it is unattached
     Vector         posFree()              const { return cPos; }
    
+    /// position on the side of fiber1 used in setInteractions()
+    virtual Vector sidePos1()             const { return cHand1->pos(); }
+    
+    /// position on the side of fiber2 used in sideInteractions()
+    virtual Vector sidePos2()             const { return cHand2->pos(); }
+
     //--------------------------------------------------------------------------
 
     /// simulation step for a free Couple: diffusion

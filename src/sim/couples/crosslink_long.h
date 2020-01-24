@@ -31,8 +31,11 @@ public:
     virtual ~CrosslinkLong();
     
     /// position on the side of fiber1 used for sideInteractions
-    Vector  sidePos() const;
- 
+    Vector  sidePos1() const;
+    
+    /// position on the side of fiber2 used for sideInteractions
+    Vector  sidePos2() const;
+
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
     Vector  force() const;
     
