@@ -91,6 +91,8 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
+
 
 template <typename MATRIXA, typename MATRIXB>
 void compare(size_t size,  MATRIXA & mat1, MATRIXB& mat2, size_t fill)
@@ -228,6 +230,25 @@ void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
     mat(j, j) += alpha;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
+template <typename MATRIX>
+void checkMatrix(MATRIX & mat, const size_t size,
+                 real const* x, real const* y, real * z)
+{
+    assert_true(mat.size() == size);
+    zero_real(size, z);
+    mat.vecMulAdd(x, z);
+    real sum1 = checksum(size, y, z);
+    
+    zero_real(size, z);
+    mat.vecMulAdd_ALT(x, z);
+    real sum2 = checksum(size, y, z);
+
+    printf("  check %+16.6f  %+16.6f ", sum1, sum2);
+}
+
 
 template <typename MATRIX>
 void testMatrix(MATRIX & mat,
@@ -254,10 +275,6 @@ void testMatrix(MATRIX & mat,
     }
     double t1 = toc();
     
-    zero_real(size, z);
-    mat.vecMulAdd(x, z);
-    real sum1 = checksum(size, y, z);
-    
     tic();
     for ( int n=0; n<N_RUN*N_MUL; ++n )
     {
@@ -265,14 +282,10 @@ void testMatrix(MATRIX & mat,
         mat.vecMulAdd_ALT(y, z);
     }
     double t2 = toc();
-    
-    zero_real(size, z);
-    mat.vecMulAdd_ALT(x, z);
-    real sum2 = checksum(size, y, z);
 
     printf("\n %20s : ", mat.what().c_str());
     printf("set %8.3f  mul %8.3f  alt %8.3f", ts, t1, t2);
-    printf("  check %+16.6f  %+16.6f ", sum1, sum2);
+    checkMatrix(mat, size, x, y, z);
 }
 
 
@@ -280,6 +293,28 @@ void testMatrix(MATRIX & mat,
 #include <omp.h>
 
 constexpr size_t CHK = 4;
+
+
+template <typename MATRIX>
+void checkMatrixParallel(MATRIX & mat, const size_t size,
+                         real const* x, real const* y, real * z)
+{
+    assert_true(mat.size() == size);
+    zero_real(size, z);
+    #pragma omp parallel for num_threads(4)
+    for ( int i = 0; i < size; i += CHK )
+        mat.vecMulAdd(x, z, i, i+CHK);
+    real sum1 = checksum(size, y, z);
+
+    zero_real(size, z);
+    #pragma omp parallel for num_threads(8)
+    for ( int i = 0; i < size; i += CHK )
+        mat.vecMulAdd(x, z, i, i+CHK);
+    real sum2 = checksum(size, y, z);
+
+    printf("  check %+16.6f  %+16.6f", sum1, sum2);
+}
+
 
 template <typename MATRIX>
 void testMatrixParallel(MATRIX & mat,
@@ -309,12 +344,6 @@ void testMatrixParallel(MATRIX & mat,
         }
     }
     double t2 = toc();
-    
-    zero_real(size, z);
-    #pragma omp parallel for num_threads(2)
-    for ( int i = 0; i < size; i += CHK )
-        mat.vecMulAdd(x, z, i, i+CHK);
-    real sum1 = checksum(size, y, z);
 
     tic();
     for ( int n=0; n<N_RUN*N_MUL; ++n )
@@ -328,15 +357,10 @@ void testMatrixParallel(MATRIX & mat,
     }
     double t4 = toc();
 
-    zero_real(size, z);
-    #pragma omp parallel for num_threads(4)
-    for ( int i = 0; i < size; i += CHK )
-        mat.vecMulAdd(x, z, i, i+CHK);
-    real sum2 = checksum(size, y, z);
-
     printf("\n %20s threaded mul :  x2  %8.3f  x4  %8.3f", mat.what().c_str(), t2, t4);
-    printf("  check %+16.6f  %+16.6f", sum1, sum2);
+    checkMatrixParallel(mat, size, x, y, z);
 }
+
 #endif
 
 
@@ -417,6 +441,9 @@ void testMatrices(const size_t size, const size_t fill)
     delete[] iny;
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 const real dir[4] = {  2, 1, -1, 3 };
 const real vec[4] = { -1, 3,  1, 2 };
@@ -576,11 +603,12 @@ int main( int argc, char* argv[] )
 #if ( 1 )
         //testMatrices(DIM*17, 23);
         //testMatrices(DIM*91, 1<<12);
-        testMatrices(DIM*196, 1<<14);
-        testMatrices(DIM*436, 1<<16);
-        testMatrices(DIM*714, 1<<16);
-        testMatrices(DIM*1358, 1<<18);
-        testMatrices(DIM*2130, 1<<18);
+        testMatrices(DIM*196, 1<<11);
+        testMatrices(DIM*436, 1<<13);
+        testMatrices(DIM*714, 1<<14);
+        testMatrices(DIM*1358, 1<<15);
+        testMatrices(DIM*2130, 1<<14);
+        testMatrices(DIM*2130, 1<<15);
 #endif
 #if ( 0 )
         //testMatrices(DIM*17, 23);
