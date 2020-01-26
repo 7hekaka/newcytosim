@@ -31,9 +31,6 @@ public:
     
     /// position on the side of fiber1 used for sideInteractions
     Vector  sidePos1() const;
-    
-    /// position on the side of fiber1 used for sideInteractions
-    Vector  sidePos2() const;
 
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
     Vector  force() const;

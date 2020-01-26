@@ -1145,9 +1145,18 @@ void Display3::drawCoupleB(Couple const* cx) const
         if ( pd1->visible )
         {
             pd1->color.load_both();
-            gleTube(p1, p2, pd2->width*sFactor, gleHexTube1B);
             drawPoint(p1, pd1);
             drawPoint(p2, pd2);
+#if FIBER_HAS_FAMILY
+            // accurate rendering of Couple's composite link
+            drawPoint(cx->sidePos1(), pd1);
+            drawPoint(cx->sidePos2(), pd2);
+            gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gleHexTube1B);
+            gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gleHexTube1B);
+            gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gleHexTube1B);
+#else
+            gleTube(p1, p2, pd2->width*sFactor, gleHexTube1B);
+#endif
         }
     }
     else if ( dns > 1e-6 )
