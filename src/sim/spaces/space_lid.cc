@@ -81,7 +81,7 @@ real SpaceLid::volume() const
 }
 
 
-bool  SpaceLid::inside(Vector const& point) const
+bool SpaceLid::inside(Vector const& point) const
 {
     return ( point[DIM-1] < top_ );
 }
