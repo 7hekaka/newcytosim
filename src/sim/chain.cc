@@ -1319,7 +1319,8 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C)
 
 real Chain::curvature(size_t p) const
 {
-    assert_true( 0 < p && p < lastPoint() );
+    if ( p < 1 || lastPoint() <= p )
+        return 0;
     return curvature3(posP(p-1), posP(p), posP(p+1));
 }
 
