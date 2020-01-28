@@ -42,9 +42,10 @@ HAS_PNG := 0
 #-------------------------------------------------------------------------------
 
 ifeq ($(MACHINE), auto)
-
     ifeq ($(shell uname), Darwin)
        MACHINE := mac
+    else ifeq (login-e, $(findstring login-e, $(shell uname -n)))
+       MACHINE := cluster
     else ifeq ($(shell uname -n), login.cluster)
        MACHINE := cluster
     else ifeq ($(shell uname), Linux)
@@ -54,7 +55,6 @@ ifeq ($(MACHINE), auto)
     else
        $(error Unknown platform)
     endif
-
 endif
 
 #-------------------------------------------------------------------------------
