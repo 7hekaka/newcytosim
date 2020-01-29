@@ -12,7 +12,8 @@ MatrixSparseBlock::MatrixSparseBlock()
     allocated_ = 0;
     row_       = nullptr;
     blocks_    = nullptr;
-    next_      = nullptr;
+    next_      = new size_t[1];
+    next_[0] = 0;
 }
 
 

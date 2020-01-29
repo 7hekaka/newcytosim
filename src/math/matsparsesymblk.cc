@@ -18,7 +18,8 @@ MatrixSparseSymmetricBlock::MatrixSparseSymmetricBlock()
 {
     allocated_ = 0;
     column_    = nullptr;
-    next_      = nullptr;
+    next_      = new size_t[1];
+    next_[0] = 0;
 }
 
 
