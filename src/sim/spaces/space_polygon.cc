@@ -198,7 +198,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
 
     if ( fabs(pos.ZZ) >= height_ )
     {
-        meca.addPlaneClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
+        meca.addPlaneClampZ(pe, std::copysign(height_, pos.ZZ), stiff);
         if ( in ) return;
     }
     else if ( in )
@@ -209,7 +209,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
         real hh = (pos.XX-pX)*(pos.XX-pX) + (pos.YY-pY)*(pos.YY-pY);
         
         if ( v * v < hh )
-            meca.addPlaneClampX(pe, 2, std::copysign(height_, pos.ZZ), stiff);
+            meca.addPlaneClampZ(pe, std::copysign(height_, pos.ZZ), stiff);
         return;
     }
 #endif

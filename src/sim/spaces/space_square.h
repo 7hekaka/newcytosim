@@ -18,8 +18,6 @@ class SpaceSquare : public Space
 {
     /// dimensions
     real   length_[3];
-
-private:
     
     /// apply a force directed towards the edge of the Space
     static void setInteraction(const real pos[], Mecapoint const&, Meca&, real stiff, const real dim[]);

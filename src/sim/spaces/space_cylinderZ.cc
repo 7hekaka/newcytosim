@@ -244,15 +244,15 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     else if ( ! cap )
     {
         // inside cylinder in XY plane and also inside in Z:
-        if ( fabs(pos.ZZ-Z) > R - sqrt(dis) )
-        //if ( dis > rad*rad + square(pos.ZZ-p) - 2 * rad * fabs(pos.ZZ-p) )
+        //if ( fabs(pos.ZZ-Z) > R - sqrt(dis) )
+        if ( dis > square( R - fabs(pos.ZZ-Z) ) )
             cyl = true;
         else
             cap = true;
     }
     
     if ( cap )
-        meca.addPlaneClampX(pe, 2, Z, stiff);
+        meca.addPlaneClampZ(pe, Z, stiff);
     
     if ( cyl )
         meca.addCylinderClampZ(pe, R, stiff);
@@ -276,7 +276,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
         {
             in = false;
             if ( n < R-E ) {
-                meca.addPlaneClampX(pe, 2, T, stiff);
+                meca.addPlaneClampZ(pe, T, stiff);
                 return;
             }
         }
@@ -288,7 +288,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
         {
             in = false;
             if ( n < R-E ) {
-                meca.addPlaneClampX(pe, 2, B, stiff);
+                meca.addPlaneClampZ(pe, B, stiff);
                 return;
             }
         }
@@ -299,7 +299,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
         if ( n > R-E  ||  R-E-n < std::fabs(pos.ZZ-Z) )
             meca.addCylinderClampZ(pe, R, stiff);
         else
-            meca.addPlaneClampX(pe, 2, Z, stiff);
+            meca.addPlaneClampZ(pe, Z, stiff);
         return;
     }
     

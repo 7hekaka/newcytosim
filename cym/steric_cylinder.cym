@@ -12,14 +12,15 @@ set simul system
 
 set space cell
 {
-    shape = ring
+    shape = cylinderZ
     display = ( color=0x0000FFAA; visible=3 )
 }
 
 new cell
 {
-    length = 3
+    length = 4
     radius = 2
+    edge = 1
 }
 
 set fiber microtubule

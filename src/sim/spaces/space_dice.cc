@@ -3,6 +3,7 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "glossary.h"
+#include "meca.h"
 
 
 SpaceDice::SpaceDice(SpaceProp const* p)
@@ -139,6 +140,97 @@ Vector SpaceDice::project(Vector const& w) const
     //normalize to radius(), and add to p to get the real projection
     real dis = edge_ / norm(w-p);
     return dis * ( w - p ) + p;
+}
+#endif
+
+//------------------------------------------------------------------------------
+
+#if ( 0 )
+ 
+void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real E) const
+{
+    real pX = std::copysign(length_[0], w.XX), dX = length_[0] - fabs(w.XX);
+    real pY = std::copysign(length_[1], w.YY), dY = length_[1] - fabs(w.YY);
+#if ( DIM > 2 )
+    real pZ = std::copysign(length_[2], w.ZZ), dZ = length_[2] - fabs(w.ZZ);
+#endif
+    
+#if ( DIM > 2 )
+    if ( dX > edge_ && dY > edge_ && dZ > edge_ )
+#else
+    if ( dX > edge_ && dY > edge_ )
+#endif
+    {
+        // find the dimensionality corresponding to the closest face
+#if ( DIM > 2 )
+        if ( dZ < dY )
+        {
+            if ( dZ < dX )
+                meca.addPlaneClampZ(pe, pZ, stiff);
+            else
+                meca.addPlaneClampX(pe, pX, stiff);
+        }
+        else
+#endif
+        {
+            if ( dY < dX )
+                meca.addPlaneClampY(pe, pY, stiff);
+            else
+                meca.addPlaneClampX(pe, pX, stiff);
+        }
+    }
+    else if ( dY > edge_ && dZ > edge_ )
+    {
+        meca.addPlaneClampX(pe, pX, stiff);
+    }
+    else if ( dX > edge_ && dZ > edge_ )
+    {
+        meca.addPlaneClampY(pe, pY, stiff);
+    }
+#if ( DIM > 2 )
+    else if ( dX > edge_ && dY > edge_ )
+    {
+        meca.addPlaneClampZ(pe, pZ, stiff);
+    }
+#endif
+    else if ( dX > edge_ )
+    {
+        meca.addCylinderClampX(pe, edge_, Vector(0, pY, pZ), stiff);
+    }
+    else if ( dY > edge_ )
+    {
+        meca.addCylinderClampY(pe, edge_, Vector(pX, 0, pZ), stiff);
+    }
+#if ( DIM > 2 )
+    else if ( dZ > edge_ )
+    {
+        meca.addCylinderClampZ(pe, edge_, Vector(pX, pY, 0), stiff);
+    }
+#endif
+    else
+    {
+        meca.addSphereClamp(pe, Vector(pX, pY, pZ), edge_, stiff);
+    }
+}
+
+
+void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+{
+    setInteraction(pos, pe, meca, stiff, length_, edge_);
+}
+
+
+void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+{
+    
+    real R = std::max((real)0, edge_-rad);
+    real E = std::min((real)0, edge_-rad);
+
+    real dim[DIM];
+    for ( unsigned d = 0; d < DIM; ++d )
+        dim[d] = std::max((real)0, length_[d]+E);
+
+    setInteraction(pos, pe, meca, stiff, dim, R);
 }
 #endif
 
