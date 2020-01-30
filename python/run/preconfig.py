@@ -222,15 +222,14 @@ def version():
 
 #-------------------------------------------------------------------------------
 
-def pop_sequence(dic):
+def pop_sequence(dic, protected):
     """
         Remove an entry in the dictionary that has multiple values
     """
-    for k in dic:
-        v = dic[k]
+    for k, v in dic.items():
         try:
             len(v)
-            if not isinstance(v, str):
+            if not isinstance(v, str) and not k in protected:
                 dic.pop(k)
                 return (k, v)
         except:
@@ -300,7 +299,7 @@ class Preconfig:
     def __init__(self):
         # initialization
         self.locals = {}
-        self.values = {}
+        self.protected = []
         # streams for output (all output is hidden by default):
         self.out = open(os.devnull, 'w')
         self.log = []
@@ -348,6 +347,8 @@ class Preconfig:
             return ''
         else:
             self.out.write("|%50s --> %s\n" % (block, str(val)) )
+            if isinstance(val, str):
+                return val
             return repr(val)
 
     def process(self, file, text):
@@ -375,48 +376,26 @@ class Preconfig:
             # interpret command:
             (key, vals) = try_assignment(cmd)
             vals = self.evaluate(vals)
-            #print("`"+key+"' is "+repr(vals))
-            # do not expand variables defined on the command line:
-            if cmd in self.locals:
+            #print("    "+cmd+" <--- "+repr(vals))
+            try:
+                # use 'pop()' to test if multiple values were specified...
+                # put last value aside for later:
+                val = vals.pop()
+                ipos = file.tell()
+                for v in vals:
+                    self.process(file, output+self.operate(key, v, block))
+                    file.seek(ipos)
+            except (AttributeError, IndexError):
+                # a single value was specified:
                 val = vals
-            else:
-                try:
-                    # use 'pop()' to test if multiple values were specified...
-                    # put last value aside for later:
-                    val = vals.pop()
-                    ipos = file.tell()
-                    for v in vals:
-                        self.process(file, output+self.operate(key, v, block))
-                        file.seek(ipos)
-                except (AttributeError, IndexError):
-                    # a single value was specified:
-                    val = vals
             # handle remaining value:
             output += self.operate(key, val, block)
-
-    def expand_values(self, file, text):
-        """
-            Call self recursively to remove all entries of the
-            dictionary 'values' that are associated with multiple keys.
-        """
-        (key, vals) = pop_sequence(self.values)
-        if key:
-            ipos = file.tell()
-            for v in vals:
-                self.values[key] = v
-                #out.write("|%50s <-- %s\n" % (key, str(v)) )
-                self.expand_values(file, text)
-                file.seek(ipos)
-            # restore multiple values on upward recursion
-            self.values[key] = vals
-        else:
-            self.process(file, text)
 
     def set_template(self, name, path):
         """
         Initialize variable to process template file 'name'
         """
-        self.values['n'] = 0
+        self.locals['n'] = 0
         self.file_index = 0
         self.files_made = []
         self.template = name
@@ -434,7 +413,7 @@ class Preconfig:
         n = self.pattern % self.file_index
         self.file_index += 1
         # update variable
-        self.values['n'] = self.file_index
+        self.locals['n'] = self.file_index
         return n
 
     def make_file(self, text):
@@ -446,11 +425,11 @@ class Preconfig:
             f.write(text)
             self.files_made.extend([name])
         # fancy ouput:
-        self.out.write("\\"+repr(self.values)+'\n')
+        self.out.write("\\"+repr(self.locals)+'\n')
         self.out.write(" \\"+('> '+name).rjust(78, '-')+'\n')
         # write log:
         if self.log:
-            keys = sorted(self.values.keys())
+            keys = sorted(self.locals.keys())
             if self.file_index == 1:
                 self.log.write('%20s' % 'file')
                 for k in keys:
@@ -458,8 +437,26 @@ class Preconfig:
                 self.log.write('\n')
             self.log.write('%20s' % name)
             for k in keys:
-                self.log.write(', %10s' % repr(self.values[k]))
+                self.log.write(', %10s' % repr(self.locals[k]))
             self.log.write('\n')
+
+    def expand_values(self, file, text):
+        """
+            Call self recursively to remove all entries of the dictionary
+            that are associated with multiple values.
+        """
+        (key, vals) = pop_sequence(self.locals, self.protected)
+        if key:
+            ipos = file.tell()
+            for v in vals:
+                self.locals[key] = v
+                #self.out.write("|%50s <-- %s\n" % (key, str(v)) )
+                self.expand_values(file, text)
+                file.seek(ipos);
+            # restore multiple values on upward recursion
+            self.locals[key] = vals
+        else:
+            self.process(file, text)
 
     def parse(self, name, repeat=1, path=''):
         """
@@ -481,6 +478,7 @@ class Preconfig:
         path = ''
         
         for arg in args:
+            #print("preconfig argument `%s'" % arg)
             if os.path.isdir(arg):
                 path = arg
             elif os.path.isfile(arg):
@@ -499,7 +497,12 @@ class Preconfig:
             else:
                 (k,v) = try_assignment(arg)
                 if k:
-                    self.locals[k] = self.evaluate(v)
+                    # a double '==' will prevent expansion of the variable
+                    if v[0] == '=':
+                        self.locals[k] = v[1:]
+                        self.protected.append(k)
+                    else:
+                        self.locals[k] = self.evaluate(v)
                 else:
                     sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
                     sys.exit()
