@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     
-    if ( ! arg.use_key("*") )
+    if ( ! arg.use_key("+") )
     {
         Cytosim::out.open("messages.cmo");
         Cytosim::log.redirect(Cytosim::out);
