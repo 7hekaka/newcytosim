@@ -24,7 +24,7 @@ set space cell
 new cell
 {
     bottom = 0
-	top = 0.2
+    top = 0.2
     radius = 0.5
 }
 
@@ -37,7 +37,7 @@ set space floor
 new floor
 {
     bottom = -0.01
-	top = 0.2
+    top = 0.2
     radius = 0.5
 }
 
@@ -50,7 +50,7 @@ set space force
 
 new force
 {
-	force = 0 0 -1
+    force = 0 0 -1
 }
 
 set fiber filament
@@ -59,7 +59,7 @@ set fiber filament
     segmentation = 0.032
     steric = 1, 0.007
     lattice = 1, 0.008
-	confine = inside, 10000, cell
+    confine = inside, 10000, cell
 }
 
 set filament display
