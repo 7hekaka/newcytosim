@@ -394,6 +394,9 @@ public:
     /// Link of stiffness `weight` with cylinder of axis Z and radius `len`
     void addCylinderClampZ(Mecapoint const&, real rad, real weight);
     
+    /// Link of stiffness `weight` with cylinder of axis X and radius `len`
+    void addCylinderClamp(Mecapoint const&, Vector const&, Vector const&, real rad, real weight);
+
 #if ( DIM == 2 )
     /// Link of stiffness `weight` and resting length `len`, on the side of first segment
     void addSidePointClamp2D(Interpolation const&, Vector, real arm, real weight);

@@ -3849,7 +3849,7 @@ void Meca::addPointClampToAll(Vector const& pos, const real weight)
  Link `pte` (P) and a fixed sphere of radius `rad` and center `center` (C)
  The force is affine with non-zero resting length:
 
-     force = weight * ( C - P ) * ( 1 - rad / |PC| )
+      force = weight * ( C - P ) * ( 1 - rad / |PC| )
 
  The constant part is:
  
@@ -4109,6 +4109,45 @@ void Meca::addCylinderClampZ(Mecapoint const& pte,
     vBAS[inx+1] += fac * dir.YY;
     // there should be no ZZ component here!
 
+#endif
+}
+
+/**
+ Link `pte` (P) to a cylinder of axis Z and radius `rad`
+ The force is affine with non-zero resting length:
+ 
+     G = Vector(0, 0, P.ZZ)
+     force = weight * ( G - P ) * ( rad / |PG| - 1 )
+ 
+ The force resides in the XY plane.
+ */
+void Meca::addCylinderClamp(Mecapoint const& pte,
+                            Vector const& axis, Vector const& center,
+                            const real rad, const real weight)
+{
+#if ( DIM > 2 )
+    
+    assert_true( weight >= 0 );
+    const size_t inx = DIM * pte.matIndex();
+
+    //Projection matrix along the cylinder axis:  P = [ I - dir (x) dir ]
+    MatrixBlock P = MatrixBlock::offsetOuterProduct(1.0, axis, -1.0/axis.normSqr());
+    
+    Vector dir = P * ( pte.pos() - center );
+    real len = dir.norm();
+    
+    if ( len > REAL_EPSILON )
+    {
+        real wla = weight * rad / len;
+        
+        if ( rad < len )
+            P = P * MatrixBlock::offsetOuterProduct(wla-weight, dir/len, -wla);
+        else
+            P = P * MatrixBlock::outerProduct(dir/len, -weight);
+        
+        add_block_diag(inx, P);
+        add_base(inx, wla*dir - P*center);
+    }
 #endif
 }
 

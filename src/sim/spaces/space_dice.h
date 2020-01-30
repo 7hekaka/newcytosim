@@ -4,6 +4,8 @@
 
 #include "space.h"
 
+#define ADVANCED_DICE 1
+
 /// A rectangle ( or a cube ) with rounded edges. 
 /**
  Space `dice` is a cube with smooth edges.
@@ -66,7 +68,7 @@ public:
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
     
-#if ( 0 )
+#if ADVANCED_DICE
     /// apply a force directed towards the edge of the Space
     void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     

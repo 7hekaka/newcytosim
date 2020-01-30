@@ -145,7 +145,7 @@ Vector SpaceDice::project(Vector const& w) const
 
 //------------------------------------------------------------------------------
 
-#if ( 0 )
+#if ADVANCED_DICE
  
 void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real E) const
 {
@@ -166,50 +166,59 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
         if ( dZ < dY )
         {
             if ( dZ < dX )
-                meca.addPlaneClampZ(pe, pZ, stiff);
+                meca.addPlaneClampZ(pe, std::copysign(length_[2], w.ZZ), stiff);
             else
-                meca.addPlaneClampX(pe, pX, stiff);
+                meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
         }
         else
 #endif
         {
             if ( dY < dX )
-                meca.addPlaneClampY(pe, pY, stiff);
+                meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
             else
-                meca.addPlaneClampX(pe, pX, stiff);
+                meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
         }
     }
     else if ( dY > edge_ && dZ > edge_ )
     {
-        meca.addPlaneClampX(pe, pX, stiff);
+        meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
     }
     else if ( dX > edge_ && dZ > edge_ )
     {
-        meca.addPlaneClampY(pe, pY, stiff);
+        meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
     }
 #if ( DIM > 2 )
     else if ( dX > edge_ && dY > edge_ )
     {
-        meca.addPlaneClampZ(pe, pZ, stiff);
+        meca.addPlaneClampZ(pe, std::copysign(length_[2], w.ZZ), stiff);
     }
 #endif
     else if ( dX > edge_ )
     {
-        meca.addCylinderClampX(pe, edge_, Vector(0, pY, pZ), stiff);
+        real cY = std::copysign(length_[1]-edge_, w.YY);
+        real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+        meca.addCylinderClamp(pe, Vector(1, 0, 0), Vector(0, cY, cZ), edge_, stiff);
     }
     else if ( dY > edge_ )
     {
-        meca.addCylinderClampY(pe, edge_, Vector(pX, 0, pZ), stiff);
+        real cX = std::copysign(length_[0]-edge_, w.XX);
+        real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+        meca.addCylinderClamp(pe, Vector(0, 1, 0), Vector(cX, 0, cZ), edge_, stiff);
     }
 #if ( DIM > 2 )
     else if ( dZ > edge_ )
     {
-        meca.addCylinderClampZ(pe, edge_, Vector(pX, pY, 0), stiff);
+        real cX = std::copysign(length_[0]-edge_, w.XX);
+        real cY = std::copysign(length_[1]-edge_, w.YY);
+        meca.addCylinderClamp(pe, Vector(0, 0, 1), Vector(cX, cY, 0), edge_, stiff);
     }
 #endif
     else
     {
-        meca.addSphereClamp(pe, Vector(pX, pY, pZ), edge_, stiff);
+        real cX = std::copysign(length_[0]-edge_, w.XX);
+        real cY = std::copysign(length_[1]-edge_, w.YY);
+        real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+        meca.addSphereClamp(pe, Vector(cX, cY, cZ), edge_, stiff);
     }
 }
 
