@@ -458,10 +458,11 @@ class Preconfig:
         else:
             self.process(file, text)
 
-    def parse(self, name, repeat=1, path=''):
+    def parse(self, name, values, repeat=1, path=''):
         """
             process one file, and return the list of files generated
         """
+        self.locals = values;
         self.set_template(name, path)
         for x in range(repeat):
             with open(name, 'r') as f:
