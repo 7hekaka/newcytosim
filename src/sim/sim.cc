@@ -93,6 +93,13 @@ int main(int argc, char* argv[])
         Cytosim::warn.redirect(Cytosim::out);
     }
     
+    if ( arg.use_key("-") )
+    {
+        Cytosim::out.silent();
+        Cytosim::log.silent();
+        Cytosim::warn.silent();
+    }
+
     // change working directory if specified:
     if ( arg.has_key("directory") )
     {
