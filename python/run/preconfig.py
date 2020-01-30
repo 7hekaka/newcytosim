@@ -3,11 +3,11 @@
 # PRECONFIG, a versatile configuration file generator
 #
 # Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--
-# This is PRECONFIG version 1.2, last modified on 30.11.2019
+# This is PRECONFIG version 1.3, last modified on 20.01.2020
 
-__VERSION__="1.2"
+__VERSION__="1.21"
 
-__DATE__   ="30.11.2019"
+__DATE__   ="30.01.2020"
 
 """
 # SYNOPSIS
@@ -62,7 +62,7 @@ __DATE__   ="30.11.2019"
    - DEFINITIONS can be specified on the command line as 'name=value' or
    'name=sequence', with no space around the '='. They are added to the
    dictionary used to evaluate the code snippets found inside the template file,
-   for example: `preconfig n_molecules=100 config.cym.tpl`
+   for example: `preconfig rate=7.2 config.cym.tpl`
 
    - if a negative integer is specified, this will set the width of the integer
    that is used to build the file namess.
@@ -297,15 +297,10 @@ def get_block(file, S, E):
 class Preconfig:
     """ A class container for preconfig,
     contains inner variables and methods """
-    def __init__(self,*args):
+    def __init__(self):
         # initialization
-        self.inputs = []
         self.locals = {}
-        self.repeat = 1
-        self.verbose = 1
-        self.destination = ''
-        self.assignments=[]
-        self.values={}
+        self.values = {}
         # streams for output (all output is hidden by default):
         self.out = open(os.devnull, 'w')
         self.log = []
@@ -319,25 +314,6 @@ class Preconfig:
         self.files_made = []
         # name of current input file being processed (used for error reporting)
         self.template = ''
-
-        for arg in args:
-            if os.path.isdir(arg):
-                self.destination = arg
-            elif os.path.isfile(arg):
-                self.inputs.append(arg)
-            elif arg.isdigit():
-                self.repeat = int(arg)
-            elif arg == '-':
-                self.verbose = 0
-            elif arg == '+':
-                self.out = sys.stderr
-                self.verbose = 0
-            elif arg == '++' or arg == 'log':
-                self.log = open('log.csv', 'w')
-            elif arg[0] == '-' and arg[1:].isdigit():
-                self.nb_digits = int(arg[1:])
-            else:
-                self.assignments.append(arg)
 
     def evaluate(self, arg):
         """
@@ -361,6 +337,19 @@ class Preconfig:
         #print("evaluated `"+arg+"' = " + repr(res))
         return res
 
+    def operate(self, key, val, block):
+        """
+            either define a variable 'key'
+            or return the value 'val'
+        """
+        if key:
+            exec(key+'='+repr(val), __GLOBALS__, self.locals)  #self.locals[key] = v
+            self.out.write("|%50s <-- %s\n" % (key, str(val)) )
+            return ''
+        else:
+            self.out.write("|%50s --> %s\n" % (block, str(val)) )
+            return repr(val)
+
     def process(self, file, text):
         """
             `process()` will identify and substitute bracketed code blocks
@@ -381,42 +370,29 @@ class Preconfig:
                 self.make_file(output)
                 return
             # remove outer brackets:
-            cmd = block[2:-2]
+            cmd = (block[2:-2]).strip()
             #print("%i characters... code block '%s'" % (len(pre), cmd))
             # interpret command:
             (key, vals) = try_assignment(cmd)
             vals = self.evaluate(vals)
             #print("`"+key+"' is "+repr(vals))
-            if not cmd.strip() in self.locals:
+            # do not expand variables defined on the command line:
+            if cmd in self.locals:
+                val = vals
+            else:
                 try:
                     # use 'pop()' to test if multiple values were specified...
-                    # keep last value aside for later:
+                    # put last value aside for later:
                     val = vals.pop()
                     ipos = file.tell()
                     for v in vals:
-                        # fork recursively for all subsequent values:
-                        #print("forking", v)
-                        if key:
-                            exec(key+'='+repr(v), __GLOBALS__, self.locals)  #self.locals[key] = v
-                            self.out.write("|%50s <-- %s\n" % (key, str(v)) )
-                            self.process(file, output)
-                        else:
-                            self.out.write("|%50s --> %s\n" % (block, str(v)) )
-                            self.process(file, output+repr(v))
+                        self.process(file, output+self.operate(key, v, block))
                         file.seek(ipos)
                 except (AttributeError, IndexError):
                     # a single value was specified:
                     val = vals
-            else:
-                val=vals
             # handle remaining value:
-            # print("handling", key, val)
-            if key:
-                exec(key+'='+repr(val), __GLOBALS__, self.locals)  #self.locals[key] = val
-                self.out.write("|%50s <-- %s\n" % (key, str(val)) )
-            else:
-                output += repr(val)
-                self.out.write("|%50s --> %s\n" % (block, str(val)) )
+            output += self.operate(key, val, block)
 
     def expand_values(self, file, text):
         """
@@ -436,30 +412,20 @@ class Preconfig:
         else:
             self.process(file, text)
 
-    def parse(self, name):
+    def set_template(self, name, path):
         """
-            process one file, and return the list of files generated
+        Initialize variable to process template file 'name'
         """
         self.values['n'] = 0
-        self.template = name
-        self.set_pattern(name)
+        self.file_index = 0
         self.files_made = []
-        for x in range(self.repeat):
-            with open(name, 'r') as f:
-                self.expand_values(f,'')
-        return self.files_made
-
-    def set_pattern(self, name):
-        """
-        Extract the root and the extension of the file
-        """
+        self.template = name
         [main, ext] = os.path.splitext(os.path.basename(name))
         if '.' in main:
             [main, ext] = os.path.splitext(main)
         self.pattern = main + '%0' + repr(self.nb_digits) + 'i' + ext
-        if self.destination:
-            self.pattern = os.path.join(self.destination, self.pattern)
-        self.file_index = 0
+        if path:
+            self.pattern = os.path.join(path, self.pattern)
 
     def next_file_name(self):
         """
@@ -467,6 +433,8 @@ class Preconfig:
         """
         n = self.pattern % self.file_index
         self.file_index += 1
+        # update variable
+        self.values['n'] = self.file_index
         return n
 
     def make_file(self, text):
@@ -492,26 +460,62 @@ class Preconfig:
             for k in keys:
                 self.log.write(', %10s' % repr(self.values[k]))
             self.log.write('\n')
-        self.values['n'] = self.file_index
 
-    def main(self):
-        for arg in self.assignments:
-            (k,v) = try_assignment(arg)
-            if k:
-                self.locals[k] = self.evaluate(v)
+    def parse(self, name, repeat=1, path=''):
+        """
+            process one file, and return the list of files generated
+        """
+        self.set_template(name, path)
+        for x in range(repeat):
+            with open(name, 'r') as f:
+                self.expand_values(f, '')
+        return self.files_made
+
+    def main(self, args):
+        """
+            process arguments and perform corresponding task
+        """
+        verbose = 1
+        repeat = 1
+        inputs = []
+        path = ''
+        
+        for arg in args:
+            if os.path.isdir(arg):
+                path = arg
+            elif os.path.isfile(arg):
+                inputs.append(arg)
+            elif arg.isdigit():
+                repeat = int(arg)
+            elif arg == '-':
+                verbose = 0
+            elif arg == '+':
+                self.out = sys.stderr
+                verbose = 0
+            elif arg == '++' or arg == 'log':
+                self.log = open('log.csv', 'w')
+            elif arg[0] == '-' and arg[1:].isdigit():
+                self.nb_digits = int(arg[1:])
             else:
-                sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
-                sys.exit()
+                (k,v) = try_assignment(arg)
+                if k:
+                    self.locals[k] = self.evaluate(v)
+                else:
+                    sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
+                    sys.exit()
 
-        if not self.inputs:
+        if not inputs:
             sys.stderr.write("  Error: you must specify an input template file\n")
             sys.exit()
 
-        for i in self.inputs:
+        for i in inputs:
             #out.write("Reading %s\n" % i)
-            res = self.parse(i)
-            if self.verbose == 1:
-                print("%i files generated: %s ... %s" % (len(res), res[0], res[-1]))
+            res = self.parse(i, repeat, path)
+            if verbose == 1:
+                if len(res) == 1:
+                    print("generated %s" % res[0])
+                else:
+                    print("%i files generated: %s ... %s" % (len(res), res[0], res[-1]))
 
 
 #-------------------------------------------------------------------------------
@@ -524,6 +528,6 @@ if __name__ == "__main__":
     elif sys.argv[1]=='--version':
         print("This is PRECONFIG version %s (%s)" %(__VERSION__,__DATE__))
     else:
-        preconf=Preconfig(*sys.argv[1:])
-        preconf.main()
+        preconf=Preconfig()
+        preconf.main(sys.argv[1:])
 
