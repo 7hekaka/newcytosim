@@ -5,7 +5,7 @@
 # Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--
 # This is PRECONFIG version 1.3, last modified on 20.01.2020
 
-__VERSION__="1.21"
+__VERSION__="1.3"
 
 __DATE__   ="30.01.2020"
 
@@ -229,7 +229,7 @@ def pop_sequence(dic, protected):
     for k, v in dic.items():
         try:
             len(v)
-            if not isinstance(v, str) and not k in protected:
+            if not k in protected:
                 dic.pop(k)
                 return (k, v)
         except:
@@ -328,12 +328,12 @@ class Preconfig:
             sys.stderr.write("\033[0m")
             sys.stderr.write("    "+str(e)+'\n')
             sys.exit(1)
-        try:
-            if not isinstance(v, str):
+        if not isinstance(res, str):
+            try:
                 res = list(res)
-        except Exception:
-            pass
-        #print("evaluated `"+arg+"' = " + repr(res))
+            except Exception:
+                pass
+        #print("evaluate("+arg+") = " + repr(res))
         return res
 
     def operate(self, key, val, block):
