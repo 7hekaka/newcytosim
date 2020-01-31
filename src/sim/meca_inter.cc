@@ -4058,8 +4058,8 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
         mC(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
     }
     
-    // there should be no XX component here!
     vBAS[inx  ] += fac * dir.XX;
+    // there should be no YY component here!
     vBAS[inx+2] += fac * dir.ZZ;
     
 #endif
@@ -4130,7 +4130,7 @@ void Meca::addCylinderClamp(Mecapoint const& pte,
     assert_true( weight >= 0 );
     const size_t inx = DIM * pte.matIndex();
 
-    //Projection matrix along the cylinder axis:  P = [ I - dir (x) dir ]
+    //Projection matrix along the cylinder axis:  P = [ I - axis (x) axis ]
     MatrixBlock P = MatrixBlock::offsetOuterProduct(1.0, axis, -1.0/axis.normSqr());
     
     Vector dir = P * ( pte.pos() - center );

@@ -149,10 +149,10 @@ Vector SpaceDice::project(Vector const& w) const
  
 void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real E) const
 {
-    real pX = std::copysign(length_[0], w.XX), dX = length_[0] - fabs(w.XX);
-    real pY = std::copysign(length_[1], w.YY), dY = length_[1] - fabs(w.YY);
+    real dX = length_[0] - fabs(w.XX);
+    real dY = length_[1] - fabs(w.YY);
 #if ( DIM > 2 )
-    real pZ = std::copysign(length_[2], w.ZZ), dZ = length_[2] - fabs(w.ZZ);
+    real dZ = length_[2] - fabs(w.ZZ);
 #endif
     
 #if ( DIM > 2 )
@@ -179,6 +179,7 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
                 meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
         }
     }
+#if ( DIM > 2 )
     else if ( dY > edge_ && dZ > edge_ )
     {
         meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
@@ -187,7 +188,6 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
     {
         meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
     }
-#if ( DIM > 2 )
     else if ( dX > edge_ && dY > edge_ )
     {
         meca.addPlaneClampZ(pe, std::copysign(length_[2], w.ZZ), stiff);
@@ -195,15 +195,23 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
 #endif
     else if ( dX > edge_ )
     {
+#if ( DIM > 2 )
         real cY = std::copysign(length_[1]-edge_, w.YY);
         real cZ = std::copysign(length_[2]-edge_, w.ZZ);
         meca.addCylinderClamp(pe, Vector(1, 0, 0), Vector(0, cY, cZ), edge_, stiff);
+#else
+        meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
+#endif
     }
     else if ( dY > edge_ )
     {
+#if ( DIM > 2 )
         real cX = std::copysign(length_[0]-edge_, w.XX);
         real cZ = std::copysign(length_[2]-edge_, w.ZZ);
         meca.addCylinderClamp(pe, Vector(0, 1, 0), Vector(cX, 0, cZ), edge_, stiff);
+#else
+        meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+#endif
     }
 #if ( DIM > 2 )
     else if ( dZ > edge_ )
@@ -217,7 +225,11 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
     {
         real cX = std::copysign(length_[0]-edge_, w.XX);
         real cY = std::copysign(length_[1]-edge_, w.YY);
+#if ( DIM > 2 )
         real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+#else
+        real cZ = 0;
+#endif
         meca.addSphereClamp(pe, Vector(cX, cY, cZ), edge_, stiff);
     }
 }
@@ -231,15 +243,14 @@ void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& mec
 
 void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    
-    real R = std::max((real)0, edge_-rad);
-    real E = std::min((real)0, edge_-rad);
+    real E = std::max((real)0, edge_-rad);  // remaining edge
+    real R = std::min((real)0, edge_-rad);  // size reduction
 
     real dim[DIM];
     for ( unsigned d = 0; d < DIM; ++d )
-        dim[d] = std::max((real)0, length_[d]+E);
+        dim[d] = std::max((real)0, length_[d]+R);
 
-    setInteraction(pos, pe, meca, stiff, dim, R);
+    setInteraction(pos, pe, meca, stiff, dim, E);
 }
 #endif
 
