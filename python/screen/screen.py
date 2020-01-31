@@ -8,20 +8,20 @@
  
 Syntax:
 
-    screen.py executable templat_config_file [repeat]
+    screen.py executable template_config_file [repeat]
     
     [repeat] is an optional integer specifying the number of run for each config file.
     
     This will uses 'preconfig.py' to vary the parameters, and the template
-    file should be written accordingly (see `pre_config.py' documentation)
+    file should be written accordingly (see `preconfig.py' documentation)
     Copy `preconfig.py' into the directory.
  
-F. Nedelec, 22.03.2019
+F. Nedelec, 30.01.2020
 """
 
 # Loading modules 
 try:
-    import os, sys, subprocess
+    import os, sys, math, random, subprocess
 except ImportError:
     sys.stderr.write("could not load essential python modules\n")
     sys.exit()
@@ -41,7 +41,7 @@ err = sys.stderr
 def job(execut, config, values, repeat):
     res = []
     # Vary parameters and generate files in current folder:
-    confs = preconfig.parse(config, values, repeat)
+    confs = preconfig.Preconfig().parse(config, values, repeat, '')
     # Run simulation:
     for conf in confs:
         sub = subprocess.Popen([execut, '-', conf], stdout=subprocess.PIPE)
@@ -49,20 +49,15 @@ def job(execut, config, values, repeat):
         val = []
         for data in sub.stdout:
             line = data.decode("utf-8").split()
-            if len(line) == 8:
-                val.append(float(line[7]));
+            #print(line)
+            if len(line) == 9:
+                if line[1] == '1':
+                    val.append(float(line[4]));
+                else:
+                    val.append(-float(line[4]));    
         sub.stdout.close()
-        # calculate mean and variance:
-        n = 0
-        m = 0
-        v = 0
-        for x in val:
-            n += 1
-            m += x
-            v += x * x
-        m = m / n
-        v = v / n - m * m
-        res.append([m, v])
+        # calculate mean of the values:
+        res.append(sum(val)/len(val))
     return res
 
 
@@ -88,7 +83,7 @@ def main(args):
             execut = os.path.abspath(os.path.expanduser(arg))
         elif os.path.isfile(arg):
             if config:
-                err.write("Error: config `%s' was already specified\n" % config)
+                err.write("Error: duplicate `%s' specified\n" % arg)
                 sys.exit()
             config = arg
         else:
@@ -104,11 +99,16 @@ def main(args):
         sys.exit()
 
     # run the simulations varying the parameter
-    for k in range(100):
-        dic = {'stiffness': 10*k}
-        res = job(execut, config, dic, repeat)
+    for k in range(1000):
+        R = round(random.uniform(1,10),3)
+        L = 10 #round(random.uniform(2,10),3)
+        H = round(random.uniform(0,10),3)
+        # rescaling factor:
+        X = L * L / ( math.pi * math.pi * R );
+        res = job(execut, config, {'L':L, 'H':H, 'R':R}, repeat)
+        out.write("\n%9.3f %9.3f %9.3f    " % (L, H, H/L))
         for val in res:
-            out.write("%20s %9.3f %9.3f\n" % (k, val[0], val[1]))
+            out.write(" %9.3f" % (val*X))
         out.flush()
 
 
