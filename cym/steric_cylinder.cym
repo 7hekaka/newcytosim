@@ -3,7 +3,6 @@
 
 set simul system
 {
-    dim = 3
     time_step = 0.01
     viscosity = 0.5
     steric = 1, 100
@@ -30,16 +29,17 @@ set fiber microtubule
     segmentation = 0.2
     confine = surface, 1000
     activity = grow
-    growing_speed = 0.5
+    growing_speed = 0.1
     max_length = 1.0
     display = ( line=5 )
 }
 
-new 300 microtubule
+new 500 microtubule
 {
-    length = 0.1
+    length = 0.01
     position = surface
-    direction = 0 0 1
+    direction = tangent
+    plus_end = grow
 }
 
 run 10000 system
