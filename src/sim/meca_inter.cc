@@ -3842,14 +3842,14 @@ void Meca::addPointClampToAll(Vector const& pos, const real weight)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Links to fixed sphere and cylinder
+#pragma mark - Links to fixed sphere
 //------------------------------------------------------------------------------
 
 /**
  Link `pte` (P) and a fixed sphere of radius `rad` and center `center` (C)
  The force is affine with non-zero resting length:
 
-     force = weight * ( C - P ) * ( 1 - rad / |PC| )
+      force = weight * ( C - P ) * ( 1 - rad / |PC| )
 
  The constant part is:
  
@@ -3956,6 +3956,10 @@ void Meca::addSphereClamp(Interpolation const& pti,
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - Links to fixed cylinder
+//------------------------------------------------------------------------------
+
 /**
  Link `pte` (P) to a cylinder of axis X and radius `rad`
  The force is affine with non-zero resting length:
@@ -3963,12 +3967,10 @@ void Meca::addSphereClamp(Interpolation const& pti,
      G = Vector(P.XX, 0, 0)
      force = weight * ( G - P ) * ( rad / |PG| - 1 )
  
- The force is only in the YZ plane.
+ The force resides in the YZ plane.
  */
-
 void Meca::addCylinderClampX(Mecapoint const& pte,
-                             real  rad,
-                             const real weight)
+                             real rad, const real weight)
 {
     assert_true( weight >= 0 );
     const size_t inx = DIM * pte.matIndex();
@@ -3981,26 +3983,23 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
 #elif ( DIM >= 3 )
 
     Vector pos = pte.pos();
-    real dir_n = pos.normYZ();
-    if ( dir_n < REAL_EPSILON )
+    real fac = weight * rad;
+    real len = pos.normYZ();
+    if ( len < REAL_EPSILON )
         return;
     
-    Vector dir(0, pos.YY/dir_n, pos.ZZ/dir_n);
+    Vector dir(0, pos.YY/len, pos.ZZ/len);
     
-    real facX;
-    
-    if ( rad < dir_n )
+    if ( rad < len )
     {
-        rad /= dir_n;
-        facX = weight * rad * dir_n;
-        
-        mC(inx+1, inx+1) -= weight * ( 1.0 - rad * ( 1.0 - dir.YY * dir.YY ) );
-        mC(inx+2, inx+1) -= weight * rad * dir.YY * dir.ZZ;
-        mC(inx+2, inx+2) -= weight * ( 1.0 - rad * ( 1.0 - dir.ZZ * dir.ZZ ) );
+        real wla = weight * rad / len;
+        mC(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
+        mC(inx+2, inx+1) -= wla * dir.YY * dir.ZZ;
+        mC(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
     }
     else
     {
-        facX = weight * rad;
+        fac = weight * rad;
 
         mC(inx+1, inx+1) -= weight * dir.YY * dir.YY;
         mC(inx+2, inx+1) -= weight * dir.YY * dir.ZZ;
@@ -4008,8 +4007,60 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
     }
     
     // there should be no XX component here!
-    vBAS[inx+1] += facX * dir.YY;
-    vBAS[inx+2] += facX * dir.ZZ;
+    vBAS[inx+1] += fac * dir.YY;
+    vBAS[inx+2] += fac * dir.ZZ;
+    
+#endif
+}
+
+
+/**
+ Link `pte` (P) to a cylinder of axis Y and radius `rad`
+ The force is affine with non-zero resting length:
+ 
+     G = Vector(0, P.YY, 0)
+     force = weight * ( G - P ) * ( rad / |PG| - 1 )
+ 
+ The force resides in the XZ plane.
+ */
+void Meca::addCylinderClampY(Mecapoint const& pte,
+                             real rad, const real weight)
+{
+    assert_true( weight >= 0 );
+    const size_t inx = DIM * pte.matIndex();
+    
+#if ( DIM == 2 )
+    
+    mC(inx, inx) -= weight;
+    vBAS[inx]    += weight * std::copysign(rad, pte.pos().XX);
+    
+#elif ( DIM >= 3 )
+
+    Vector pos = pte.pos();
+    real fac = weight * rad;
+    real len = pos.normXZ();
+    if ( len < REAL_EPSILON )
+        return;
+    
+    Vector dir(pos.XX/len, 0, pos.ZZ/len);
+    
+    if ( rad < len )
+    {
+        real wla = weight * rad / len;
+        mC(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
+        mC(inx+2, inx  ) -= wla * dir.XX * dir.ZZ;
+        mC(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+    }
+    else
+    {
+        mC(inx  , inx  ) -= weight * dir.XX * dir.XX;
+        mC(inx+2, inx  ) -= weight * dir.XX * dir.ZZ;
+        mC(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
+    }
+    
+    vBAS[inx  ] += fac * dir.XX;
+    // there should be no YY component here!
+    vBAS[inx+2] += fac * dir.ZZ;
     
 #endif
 }
@@ -4022,12 +4073,10 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
      G = Vector(0, 0, P.ZZ)
      force = weight * ( G - P ) * ( rad / |PG| - 1 )
  
- The force is constrained in the XY plane.
+ The force resides in the XY plane.
  */
-
 void Meca::addCylinderClampZ(Mecapoint const& pte,
-                             real  rad,
-                             const real weight)
+                             const real rad, const real weight)
 {
     assert_true( weight >= 0 );
     
@@ -4035,36 +4084,70 @@ void Meca::addCylinderClampZ(Mecapoint const& pte,
 
     const size_t inx = DIM * pte.matIndex();
     Vector pos = pte.pos();
-    real dir_n = pos.normXY();
-    if ( dir_n < REAL_EPSILON )
+    real fac = weight * rad;
+    real len = pos.normXY();
+    if ( len < REAL_EPSILON )
         return;
     
-    Vector dir(pos.XX/dir_n, pos.YY/dir_n, 0);
-
-    real facX;
+    Vector dir(pos.XX/len, pos.YY/len, 0);
     
-    if ( rad < dir_n )
+    if ( rad < len )
     {
-        rad /= dir_n;
-        facX = weight * rad * dir_n;
-        
-        mC(inx  , inx  ) -= weight * ( 1.0 - rad * ( 1.0 - dir.XX * dir.XX ) );
-        mC(inx+1, inx  ) -= weight * rad * dir.XX * dir.YY;
-        mC(inx+1, inx+1) -= weight * ( 1.0 - rad * ( 1.0 - dir.YY * dir.YY ) );
+        real wla = weight * rad / len;
+        mC(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
+        mC(inx+1, inx  ) -= wla * dir.XX * dir.YY;
+        mC(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
     }
     else
     {
-        facX = weight * rad;
-        
         mC(inx  , inx  ) -= weight * dir.XX * dir.XX;
         mC(inx+1, inx  ) -= weight * dir.XX * dir.YY;
         mC(inx+1, inx+1) -= weight * dir.YY * dir.YY;
     }
     
-    vBAS[inx  ] += facX * dir.XX;
-    vBAS[inx+1] += facX * dir.YY;
+    vBAS[inx  ] += fac * dir.XX;
+    vBAS[inx+1] += fac * dir.YY;
     // there should be no ZZ component here!
 
+#endif
+}
+
+/**
+ Link `pte` (P) to a cylinder of axis Z and radius `rad`
+ The force is affine with non-zero resting length:
+ 
+     G = Vector(0, 0, P.ZZ)
+     force = weight * ( G - P ) * ( rad / |PG| - 1 )
+ 
+ The force resides in the XY plane.
+ */
+void Meca::addCylinderClamp(Mecapoint const& pte,
+                            Vector const& axis, Vector const& center,
+                            const real rad, const real weight)
+{
+#if ( DIM > 2 )
+    
+    assert_true( weight >= 0 );
+    const size_t inx = DIM * pte.matIndex();
+
+    //Projection matrix along the cylinder axis:  P = [ I - axis (x) axis ]
+    MatrixBlock P = MatrixBlock::offsetOuterProduct(1.0, axis, -1.0/axis.normSqr());
+    
+    Vector dir = P * ( pte.pos() - center );
+    real len = dir.norm();
+    
+    if ( len > REAL_EPSILON )
+    {
+        real wla = weight * rad / len;
+        
+        if ( rad < len )
+            P = P * MatrixBlock::offsetOuterProduct(wla-weight, dir/len, -wla);
+        else
+            P = P * MatrixBlock::outerProduct(dir/len, -weight);
+        
+        add_block_diag(inx, P);
+        add_base(inx, wla*dir - P*center);
+    }
 #endif
 }
 
@@ -4227,18 +4310,36 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 //------------------------------------------------------------------------------
 
 /**
- This constrains a single degree of freedom, representing a planar constraint in 3D
- It applies to the X component if `axi=0`, the Y component if `axi=1` and Z if `axi=2`
- Hence 'pos' is the corresponding component of the plane.
+ This constrains a single degree of freedom indicated by 'inx', representing a
+ planar constraint in 3D. Hence 'pos' is the X, Y or Z component of the plane.
 */
-void Meca::addPlaneClampX(Mecapoint const& pte,
-                         size_t axi,
-                         real pos,
+void Meca::addPlaneClamp(size_t inx,
+                         real off,
                          const real weight)
 {
-    size_t inx = DIM * pte.matIndex() + axi;
     mC(inx, inx) -= weight;
-    vBAS[inx] += weight * pos;
+    vBAS[inx] += weight * off;
+}
+
+void Meca::addPlaneClampX(Mecapoint const& P, real off, real weight)
+{
+    size_t inx = DIM * P.matIndex();
+    mC(inx, inx) -= weight;
+    vBAS[inx] += weight * off;
+}
+
+void Meca::addPlaneClampY(Mecapoint const& P, real off, real weight)
+{
+    size_t inx = DIM * P.matIndex() + 1;
+    mC(inx, inx) -= weight;
+    vBAS[inx] += weight * off;
+}
+
+void Meca::addPlaneClampZ(Mecapoint const& P, real off, real weight)
+{
+    size_t inx = DIM * P.matIndex() + 2;
+    mC(inx, inx) -= weight;
+    vBAS[inx] += weight * off;
 }
 
 /**

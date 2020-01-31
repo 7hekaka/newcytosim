@@ -102,7 +102,7 @@ Vector SpaceRing::project(Vector const& w) const
         p.XX = w.XX;
     
 #if ( DIM > 2 )
-    real n = sqrt( w.YY*w.YY+ w.ZZ*w.ZZ );
+    real n = w.normYZ();
     
     if ( n > 0 )
     {
@@ -127,7 +127,7 @@ Vector SpaceRing::project(Vector const& w) const
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
     if ( std::abs(pos.XX) > len )
-        meca.addPlaneClampX(pe, 0, std::copysign(len, pos.XX), stiff);
+        meca.addPlaneClampX(pe, std::copysign(len, pos.XX), stiff);
     
     meca.addCylinderClampX(pe, rad, stiff);
 }

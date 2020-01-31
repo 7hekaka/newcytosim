@@ -385,12 +385,18 @@ public:
     /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
     void addSphereClamp(Interpolation const&, Vector  cen, real rad, real weight);
     
+    /// Link of stiffness `weight` with cylinder of axis X and radius `len`
+    void addCylinderClampX(Mecapoint const&, real rad, real weight);
+    
+    /// Link of stiffness `weight` with cylinder of axis T and radius `len`
+    void addCylinderClampY(Mecapoint const&, real rad, real weight);
+
     /// Link of stiffness `weight` with cylinder of axis Z and radius `len`
-    void addCylinderClampZ(Mecapoint const&, real len, real weight);
+    void addCylinderClampZ(Mecapoint const&, real rad, real weight);
     
     /// Link of stiffness `weight` with cylinder of axis X and radius `len`
-    void addCylinderClampX(Mecapoint const&, real len, real weight);
-    
+    void addCylinderClamp(Mecapoint const&, Vector const&, Vector const&, real rad, real weight);
+
 #if ( DIM == 2 )
     /// Link of stiffness `weight` and resting length `len`, on the side of first segment
     void addSidePointClamp2D(Interpolation const&, Vector, real arm, real weight);
@@ -407,12 +413,22 @@ public:
     /// Link of stiffness `weight` with a line defined by `pos` and its tangent `dir`
     void addLineClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
     
-    /// Link of stiffness `weight` to a line that is X if axi=0, Y if axi=1, Z if axi=2
-    void addPlaneClampX(Mecapoint const&, size_t axi, real, real weight);
+    /// Link of stiffness `weight` to coordinate corresponding to `inx`
+    void addPlaneClamp(size_t inx, real off, real weight);
+    
+    /// Link of stiffness `weight` with a plane parallel to YZ offset by `off`
+    void addPlaneClampX(Mecapoint const&, real off, real weight);
+    
+    /// Link of stiffness `weight` with a plane parallel to XZ offset by `off`
+    void addPlaneClampY(Mecapoint const&, real off, real weight);
+    
+    /// Link of stiffness `weight` with a plane parallel to XY offset by `off`
+    void addPlaneClampZ(Mecapoint const&, real off, real weight);
 
+    
     /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`
     void addPlaneClamp(Mecapoint const&, Vector const& pos, Vector const& dir, real weight);
-    
+
     /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`
     void addPlaneClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
 
@@ -544,7 +560,8 @@ public:
     /// Linearized Coulomb repulsive force (experimental)
     void addCoulomb(Mecapoint const&, Mecapoint const&, real weight);
     
-    
+    //-------------------------- COMPUTING METHODS -----------------------------
+
     /// Allocate the memory necessary to solve(). This must be called after the last add()
     void prepare(SimulProp const*);
     

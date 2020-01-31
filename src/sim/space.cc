@@ -342,7 +342,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, r
     Vector dir = pos - prj;
     real n = dir.normSqr();
     if ( n > 0 )
-        meca.addPlaneClamp( pe, prj, dir, stiff/n );
+        meca.addPlaneClamp(pe, prj, dir, stiff/n);
 }
 
 /**
@@ -360,7 +360,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Mec
     Vector dir = pos - prj;
     real n = dir.normSqr();
     if ( n > 0 )
-        meca.addPlaneClamp( pe, prj, dir, stiff/n );
+        meca.addPlaneClamp(pe, prj, dir, stiff/n);
 }
 
 #if ( 0 )

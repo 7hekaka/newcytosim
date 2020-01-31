@@ -4,6 +4,8 @@
 
 #include "space.h"
 
+#define ADVANCED_DICE 1
+
 /// A rectangle ( or a cube ) with rounded edges. 
 /**
  Space `dice` is a cube with smooth edges.
@@ -26,7 +28,7 @@
  */
 class SpaceDice : public Space
 {
-public:
+private:
     
     /// dimensions
     real      length_[3];
@@ -38,7 +40,10 @@ public:
     real      edgeSqr_;
     
     /// calculate edgeSqr_
-    void  update() { edgeSqr_ = square(edge_); }
+    void      update() { edgeSqr_ = square(edge_); }
+    
+    /// apply a force directed towards the edge of the Space
+    void      setInteraction(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real) const;
 
 public:
         
@@ -62,7 +67,14 @@ public:
 
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
-
+    
+#if ADVANCED_DICE
+    /// apply a force directed towards the edge of the Space
+    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    
+    /// apply a force directed towards the edge of the Space
+    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+#endif
     
     /// OpenGL display function; returns true if successful
     bool        draw() const;
