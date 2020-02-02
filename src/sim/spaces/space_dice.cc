@@ -149,6 +149,9 @@ Vector SpaceDice::project(Vector const& w) const
  
 void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real E) const
 {
+#if ( DIM == 1 )
+    meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+#else
     real dX = length_[0] - fabs(w.XX);
     real dY = length_[1] - fabs(w.YY);
 #if ( DIM > 2 )
@@ -232,6 +235,7 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
 #endif
         meca.addSphereClamp(pe, Vector(cX, cY, cZ), edge_, stiff);
     }
+#endif
 }
 
 
