@@ -22,12 +22,9 @@
 // hexadecimal floating point literal is a C++17 feature
 constexpr double CONSTANT = 0x1p-31;
 
-#ifndef __STRICT_ANSI__
-// constexpr initialization is a GNU extension
-constexpr double SQ3 = std::sqrt(3);
-#else
+// constexpr initialization is a GNU extension:
+// constexpr double SQ3 = std::sqrt(3);
 const double SQ3 = std::sqrt(3);
-#endif
 
 int main ()
 {
