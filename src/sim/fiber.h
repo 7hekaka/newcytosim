@@ -150,7 +150,7 @@ public:
     Fiber const*  sister_;
     Fiber const*  brother_;
     
-    /// position of a point specified by abscissa from the ORIGIN
+    /// position of a point specified by distance from the MINUS_END
     Vector  displayPos(real a) const;
 
     /// radial direction at the specified abscissa
@@ -158,7 +158,7 @@ public:
 
 #else
     
-    /// position of a point specified by abscissa from the ORIGIN
+    /// position of a point specified by distance from the MINUS_END
     Vector  displayPos(real a) const { return posM(a); }
 
 #endif
