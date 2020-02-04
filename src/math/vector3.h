@@ -57,13 +57,13 @@ public:
     Vector3() { TT = 0; }
     
     /// construct from 3 values
-    Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z), TT(0) {}
+    Vector3(real x, real y, real z) : vec(setr4(x, y, z, 0)) {}
     
     /// construct from address
-    Vector3(const real v[]) : XX(v[0]), YY(v[1]), ZZ(v[2]), TT(0) {}
+    Vector3(const real v[]) : vec(load3(v)) {}
 #else
     /// by default, coordinates are not initialized
-    Vector3() { }
+    Vector3() {}
 
     /// construct from 3 values
     Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
@@ -250,11 +250,12 @@ public:
     /// change coordinates
     void set(const real x, const real y, const real z)
     {
+#if VECTOR3_USES_AVX
+        vec = setr4(x, y, z, 0);
+#else
         XX = x;
         YY = y;
         ZZ = z;
-#if VECTOR3_USES_AVX
-        TT = 0;
 #endif
     }
     

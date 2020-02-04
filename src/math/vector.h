@@ -15,7 +15,7 @@
 
 typedef Vector1 Vector;
 typedef real    Torque;
-const   Torque  nullTorque(0);
+#define nullTorque 0
 
 /// helper function to normalize a 'Torque'
 inline Torque normalize(Torque x) { return std::copysign(1.0, x); }
@@ -24,7 +24,7 @@ inline Torque normalize(Torque x) { return std::copysign(1.0, x); }
 
 typedef Vector2 Vector;
 typedef real    Torque;
-const   Torque  nullTorque(0);
+#define nullTorque 0
 
 /// helper function to normalize a 'Torque'
 inline Torque normalize(Torque x) { return std::copysign(1.0, x); }
@@ -33,13 +33,13 @@ inline Torque normalize(Torque x) { return std::copysign(1.0, x); }
 
 typedef Vector3 Vector;
 typedef Vector3 Torque;
-const   Torque  nullTorque(0,0,0);
+#define nullTorque Vector3(0,0,0)
 
 #else
 
 typedef Vector4 Vector;
 typedef Vector4 Torque;
-const   Torque  nullTorque(0,0,0,0);
+#define nullTorque Vector4(0,0,0,0)
 
 #endif
 
