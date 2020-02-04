@@ -30,12 +30,6 @@ TreadmillingFiber::~TreadmillingFiber()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-state_t TreadmillingFiber::dynamicStateM() const
-{
-    return mStateM;
-}
-
-
 void TreadmillingFiber::setDynamicStateM(state_t s)
 {
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )

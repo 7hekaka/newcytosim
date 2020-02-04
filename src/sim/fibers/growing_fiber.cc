@@ -29,17 +29,6 @@ GrowingFiber::~GrowingFiber()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-state_t GrowingFiber::dynamicStateM() const
-{
-    return mStateM;
-}
-
-
-state_t GrowingFiber::dynamicStateP() const
-{
-    return mStateP;
-}
-
 
 void GrowingFiber::setDynamicStateM(state_t s)
 {

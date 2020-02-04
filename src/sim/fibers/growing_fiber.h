@@ -75,7 +75,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// return assembly/disassembly state of MINUS_END
-    state_t     dynamicStateM() const;
+    state_t     dynamicStateM() const { return mStateM; };
     
     /// change state of MINUS_END
     void        setDynamicStateM(state_t s);
@@ -85,7 +85,7 @@ public:
 
     
     /// return assembly/disassembly state of PLUS_END
-    state_t     dynamicStateP() const;
+    state_t     dynamicStateP() const { return mStateP; };
     
     /// change state of PLUS_END
     void        setDynamicStateP(state_t s);
