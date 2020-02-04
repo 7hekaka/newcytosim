@@ -21,15 +21,17 @@ namespace LinearSolvers
         size_t   cnt_, cntMax_, cntOld_;
         
         /// desired residual
-        real     resMax_;
+        real     target_;
 
         /// achieved residual
         real     res_;
         
+        ///
+        
     public:
         
         /// set the maximum number of iterations, and the residual threshold
-        Monitor(size_t i, real r) { reset(); cntMax_ = i; resMax_ = r; }
+        Monitor(size_t i, real r) { reset(); cntMax_ = i; target_ = r; }
         
         /// reset state variables (counters, flags and residual)
         void reset() { flag_ = 0; cnt_ = 0; res_ = INFINITY; cntOld_ = 32; }
@@ -53,7 +55,7 @@ namespace LinearSolvers
         real residual()  const { return res_; }
         
         /// true if achieve residual < residual threshold
-        bool converged() const { return res_ < resMax_; }
+        bool converged() const { return res_ < target_; }
         
         /// check given residual and return true if threshold is achieved
         bool finished(real res)
@@ -63,7 +65,7 @@ namespace LinearSolvers
             if ( cnt_ > cntMax_ )
                 return true;
             
-            return ( res < resMax_ );
+            return ( res < target_ );
         }
 
         /// calculate residual from `x` and return true if threshold is achieved
@@ -83,7 +85,7 @@ namespace LinearSolvers
             {
                 if ( res > 2*res_ )
                 {
-                    printf("Warning: slow convergence (time_step may be too big)");
+                    printf("Warning: slow convergence (reduce time_step?)");
                     printf(" residual %.3e at iteration %lu, %.3e at %lu\n", res_, cntOld_, res, cnt_);
                 }
                 cntOld_ = cnt_;
