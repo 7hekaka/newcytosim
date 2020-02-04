@@ -22,21 +22,22 @@ extern Modulo const* modulo;
  It is assumed here that len() returns the distance between the two points of the FiberSegment
  Attention: `dis` is not set if ( abs < 0 ) or ( abs > len() )
  */
-real FiberSegment::projectPoint0(Vector const& w, real& dis) const
+real FiberSegment::projectPoint0(Vector aw, real& dis) const
 {
     assert_true( fib_ );
     
-    Vector dx = dir();
-    Vector aw = w - pos1();
+    Vector A = pos1();
+    real ls = len();
+    aw -= A;
     
     if ( modulo )
         modulo->fold(aw);
     
     // project with the scalar product:
-    real abs = dot(aw, dx);
+    real abs = dot(aw, pos2()-A) / ls;
     
     // calculate distance to projection that fall inside the segment
-    if ( 0 <= abs  &&  abs <= len() )
+    if ( 0 <= abs  &&  abs <= ls )
     {
 #if ( DIM == 1 )
         dis = 0;
@@ -62,14 +63,15 @@ real FiberSegment::projectPoint(Vector const& w, real& dis) const
 {
     assert_true( fib_ );
     
-    Vector dx = dir();
-    Vector aw = w - pos1();
+    Vector A = pos1();
+    real ls = len();
+    Vector aw = w - A;
     
     if ( modulo )
         modulo->fold(aw);
     
     // project with the scalar product:
-    real abs = dot(aw, dx);
+    real abs = dot(aw, pos2()-A) / ls;
     
     // test boundaries of filament:
     if ( abs < 0 )

@@ -91,7 +91,7 @@ public:
 
     
     /// calculate the projection of `w` on the line supporting the segment
-    real         projectPoint0(Vector const& w, real& dist) const;
+    real         projectPoint0(Vector w, real& dist) const;
 
     /// calculate the projection of `w` on the line supporting the segment
     real         projectPoint(Vector const& w, real& dist) const;
