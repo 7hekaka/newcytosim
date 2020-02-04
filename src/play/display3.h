@@ -32,14 +32,14 @@ private:
     inline void drawHand2(Vector const& p, PointDisp const* d) const { if ( d->visible ) { d->color2.load_both(); drawPoint(p, d); } }
     
     /// draw Fiber linear features
-    void drawJoinedFiberLines(Fiber const&, bool minus_cap, bool plus_cap, real rad, size_t seg, size_t last,
+    void drawJoinedFiberLines(Fiber const&, bool capM, bool capP, real rad, size_t seg, size_t last,
                               void (*set_color)(Fiber const&, size_t, real), real) const;
     
     /// draw Fiber liner features
-    void drawJoinedFiberLinesL(Fiber const&, bool minus_cap, bool plus_cap, real rad, long inx, long last, real abs, real inc,
-                               void (*set_color)(Fiber const&, long, real), real) const;
+    void drawJoinedFiberLinesL(Fiber const&, real rad, long inx, long last, real abs, real inc,
+                               void (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
-    void drawFiberSegment(Fiber const&, bool minus_cap, bool plus_cap, real rad, real abs1, real abs2) const;
+    void drawFiberSegment(Fiber const&, bool capM, bool capP, real rad, real abs1, real abs2) const;
     
     /// display lattice subtance using specified color function
     void drawFiberLattice(Fiber const&, real width, void (*set_color)(Fiber const&, long, real)) const;

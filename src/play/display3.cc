@@ -156,7 +156,7 @@ void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
 }
 
 
-void drawCap(int sty, Vector const& pos, Vector const& dir, real rad)
+void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
 {
     if ( sty == 1 )
         gleObject(pos, dir, rad, gleDiscB);
@@ -164,7 +164,20 @@ void drawCap(int sty, Vector const& pos, Vector const& dir, real rad)
     {
         glEnable(GL_CLIP_PLANE4);
         setClipPlane(GL_CLIP_PLANE4, dir, pos);
+#if 1
         gleObject(pos, rad, gleSphere4);
+#else
+        // dual pass
+        glEnable(GL_CULL_FACE);
+        glPushMatrix();
+        gleTranslate(pos);
+        gleScale(rad);
+        glCullFace(GL_FRONT);
+        gleSphere2B();
+        glCullFace(GL_BACK);
+        gleSphere4B();
+        glPopMatrix();
+#endif
         glDisable(GL_CLIP_PLANE4);
     }
 }
@@ -177,7 +190,7 @@ void drawCap(int sty, Vector const& pos, Vector const& dir, real rad)
 This draws the model-segments from `inx` to `last`.
 The function `set_color` is used to set the color of the segments
 */
-void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_cap, real rad,
+void Display3::drawJoinedFiberLines(Fiber const& fib, bool capM, bool capP, real rad,
                                     size_t inx, const size_t last,
                                     void (*set_color)(Fiber const&, size_t, real), real beta) const
 {
@@ -188,8 +201,8 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_
     assert_true( last <= fib.lastSegment() );
     
     set_color(fib, inx, beta);
-    if ( minus_cap )
-        drawCap(fib.prop->disp->line_caps, pos, -dir, rad);
+    if ( capM )
+        drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
     
 #if ( DIM > 1 )
     glEnable(GL_CLIP_PLANE4);
@@ -227,8 +240,8 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool minus_cap, bool plus_
     dir = fib.dirEndP();
 #endif
     
-    if ( plus_cap )
-        drawCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    if ( capP )
+        drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
 }
 
 
@@ -237,19 +250,19 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is with respect to the MINUS_END.
 The function `set_color` is used to set the color of the segments.
 */
-void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus_cap, real rad,
-                                     long inx, const long last, real abs, const real inc,
-                                     void (*set_color)(Fiber const&, long, real), real beta) const
+void Display3::drawJoinedFiberLinesL(Fiber const& fib, real rad, long inx, const long last,
+                                     real abs, const real inc,
+                                     void (*set_color)(Fiber const&, long, real),
+                                     real fac, real facM, real facP) const
 {
-    // draw MINUS_END
+    // start at MINUS_END
     Vector pos = fib.displayPos(abs), old;
     Vector nxt = fib.displayPos(abs+inc);
-    Vector dir = normalize(nxt-pos);
+    Vector dir = fib.dirEndM();
 
-    set_color(fib, inx, beta);
-    if ( minus_cap )
-        drawCap(fib.prop->disp->line_caps, pos, -dir, rad);
-
+    set_color(fib, inx, facM);
+    drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
+    
 #if ( DIM > 1 )
     glEnable(GL_CLIP_PLANE4);
     glEnable(GL_CLIP_PLANE5);
@@ -262,7 +275,7 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
         pos = nxt;
         nxt = fib.displayPos(abs+2*inc);
         dir = normalize(nxt-old);
-        set_color(fib, inx, beta);
+        set_color(fib, inx, fac);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         gleTube(old, pos, rad, gleLongTube2B);
         // draw a circle to obturate the tube
@@ -272,9 +285,9 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
         ++inx;
     }
     
-    // draw last segment:
-    dir = normalize(nxt-pos);
-    set_color(fib, last, beta);
+    // draw last full segment:
+    dir = fib.dirEndP();
+    set_color(fib, last, facP);
     setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
     gleTube(pos, nxt, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
@@ -291,14 +304,14 @@ void Display3::drawJoinedFiberLinesL(Fiber const& fib, bool minus_cap, bool plus
     dir = fib.dirEndP();
 #endif
     
-    if ( plus_cap )
-        drawCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    // draw PLUS_END:
+    drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
 }
 
 /**
 This draws a segment from 'abs1' to 'abs2', with respect to the MINUS_END.
 */
-void Display3::drawFiberSegment(Fiber const& fib, bool minus_cap, bool plus_cap, real rad,
+void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad,
                                 const real abs1, const real abs2) const
 {
     // draw MINUS_END
@@ -306,11 +319,11 @@ void Display3::drawFiberSegment(Fiber const& fib, bool minus_cap, bool plus_cap,
     Vector nxt = fib.displayPos(abs2);
     Vector dir = normalize(nxt-pos);
 
-    if ( minus_cap )
-        drawCap(fib.prop->disp->line_caps, pos, -dir, rad);
+    if ( capM )
+        drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
     gleTube(pos, nxt, rad, gleTube2B);
-    if ( plus_cap )
-        drawCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    if ( capP )
+        drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
 }
 
 
@@ -365,10 +378,10 @@ void Display3::drawFiberLines(Fiber const& fib) const
         drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_not, 1.0);
 #else
         // this is a basic rendering where tubes would not join properly:
-        drawCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
+        drawFiberCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
         for ( size_t s = 0; s < fib.nbSegments(); ++s )
             gleTube(fib.posP(s), fib.posP(s+1), rad, gleTube2B);
-        drawCap(fib.prop->disp->line_caps, fib.posEndP(), fib.dirEndP(), rad);
+        drawFiberCap(fib.prop->disp->line_caps, fib.posEndP(), fib.dirEndP(), rad);
 #endif
     }
     else if ( disp->line_style == 2 )
@@ -400,7 +413,7 @@ void Display3::drawFiberLinesT(Fiber const& fib, size_t i) const
     
     if ( i == 0 )
     {
-        drawCap(fib.prop->disp->line_caps, A, normalize(A-B), rad);
+        drawFiberCap(fib.prop->disp->line_caps, A, normalize(A-B), rad);
         setClipPlane(GL_CLIP_PLANE5, normalize(B-A), A);
     }
     else
@@ -410,7 +423,7 @@ void Display3::drawFiberLinesT(Fiber const& fib, size_t i) const
     
     if ( i == fib.lastSegment() )
     {
-        drawCap(fib.prop->disp->line_caps, B, normalize(B-A), rad);
+        drawFiberCap(fib.prop->disp->line_caps, B, normalize(B-A), rad);
         setClipPlane(GL_CLIP_PLANE4, normalize(A-B), B);
     }
     else
@@ -519,25 +532,13 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
     auto inf = lat.indexM();
     auto sup = lat.indexP();
 
-    real lenM = uni * inf - fib.abscissaM();
-    real lenP = fib.abscissaP() - uni * sup;
-    
-    bool capM = ( lenM > 0 );
-    bool capP = ( lenP > 0 );
+    real lenM = fib.abscissaM() - uni * inf;  // should be positive!
+    real lenP = fib.abscissaP() - uni * sup;  // should be positive!
 
-    if ( capM )
-    {
-        set_color(fib, inf-1, disp->lattice_rescale ? fac*uni/lenM : fac);
-        drawFiberSegment(fib, 1, 0, rad, 0, lenM);
-    }
+    real facM = ( disp->lattice_rescale && lenM > 0.001*uni ? fac*uni/lenM : fac );
+    real facP = ( disp->lattice_rescale && lenP > 0.001*uni ? fac*uni/lenP : fac );
 
-    drawJoinedFiberLinesL(fib, !capM, !capP, rad, inf, sup, lenM, uni, set_color, fac);
-    
-    if ( capP )
-    {
-        set_color(fib, sup, disp->lattice_rescale ? fac*uni/lenP : fac);
-        drawFiberSegment(fib, 0, 1, rad, uni*sup-fib.abscissaM(), fib.length());
-    }
+    drawJoinedFiberLinesL(fib, rad, inf, sup, -lenM, uni, set_color, fac, facM, facP);
     glPopAttrib();
 }
 
