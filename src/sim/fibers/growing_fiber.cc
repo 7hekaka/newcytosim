@@ -58,18 +58,6 @@ void GrowingFiber::setDynamicStateP(state_t s)
         throw InvalidParameter("invalid AssemblyState for a GrowingFiber");
 }
 
-
-real GrowingFiber::freshAssemblyM() const
-{
-    return mGrowthM;
-}
-
-
-real GrowingFiber::freshAssemblyP() const
-{
-    return mGrowthP;
-}
-
 //------------------------------------------------------------------------------
 
 void GrowingFiber::step()

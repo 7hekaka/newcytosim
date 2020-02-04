@@ -54,8 +54,8 @@ public:
     /// change state of MINUS_END
     void        setDynamicStateM(state_t s);
     
-    /// the amount of freshly assembled polymer during the last time step
-    real        freshAssemblyM() const;
+    /// length increment at MINUS_END during last time-step
+    real        freshAssemblyM() const { return mGrowthM; }
 
     
     /// return assembly/disassembly state of PLUS_END
@@ -64,8 +64,8 @@ public:
     /// change state of PLUS_END
     void        setDynamicStateP(state_t s);
     
-    /// the amount of freshly assembled polymer during the last time step
-    real        freshAssemblyP() const;
+    /// length increment at PLUS_END during last time-step
+    real        freshAssemblyP() const { return mGrowthP; }
     
     //--------------------------------------------------------------------------
     

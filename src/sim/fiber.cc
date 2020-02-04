@@ -114,7 +114,8 @@ void Fiber::step()
     if ( prop->mesh_aging_rate > 0 )
     {
         /*
-         This implements an evolution toward equilibrium, reached for a value of 1,
+         This implements an evolution toward equilibrium,
+         starting from a value of 0, and reached for a value of 1,
          with a time-scale given by 'mesh_aging_rate'.
          */
         real cst = prop->mesh_aging_rate * prop->time_step;

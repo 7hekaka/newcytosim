@@ -45,30 +45,12 @@ void TreadmillingFiber::setDynamicStateM(state_t s)
 }
 
 
-real TreadmillingFiber::freshAssemblyM() const
-{
-    return mGrowthM;
-}
-
-
-state_t TreadmillingFiber::dynamicStateP() const
-{
-    return mStateP;
-}
-
-
 void TreadmillingFiber::setDynamicStateP(state_t s)
 {
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateP = s;
     else
         throw InvalidParameter("Invalid AssemblyState for TreadmillingFiber PLUS_END");
-}
-
-
-real TreadmillingFiber::freshAssemblyP() const
-{
-    return mGrowthP;
 }
 
 
