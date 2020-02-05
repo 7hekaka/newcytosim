@@ -119,7 +119,7 @@ public:
     
     
     /// move the reference points such as to restore a orthogonal reference
-    void        orthogonalize(unsigned i);
+    void        orthogonalize(size_t i);
 
     /// set position
     void        getPoints(real const* x) { Mecable::getPoints(x); reshape(); }

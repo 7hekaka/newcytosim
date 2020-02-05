@@ -88,7 +88,7 @@ Vector Organizer::position() const
 }
 
 
-Vector Organizer::positionP(unsigned ix) const
+Vector Organizer::positionP(size_t ix) const
 {
     Vector res(0,0,0);
     for ( Mecable const* i : mObjects )

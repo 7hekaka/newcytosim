@@ -901,7 +901,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     {
         selected = simul.findSet(what);
         if ( !selected )
-            throw InvalidIO("expected class specifier (i.e. import all)");
+            throw InvalidIO("expected class specifier (or `import all')");
     }
 
     Inputter in(DIM, file.c_str(), true);

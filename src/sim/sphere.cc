@@ -449,12 +449,12 @@ real Sphere::addBrownianForces(real const* rnd, real sc, real* res) const
  Here we start from the i-th Vector and make the other ones orthogonal.
  There must be a better way to do this...
  */
-void Sphere::orthogonalize(unsigned i)
+void Sphere::orthogonalize(size_t i)
 {
 #if ( DIM == 3 )
-    const unsigned ix = 1 + i;
-    const unsigned iy = 1 + (i+1)%3;
-    const unsigned iz = 1 + (i+2)%3;
+    const size_t ix = 1 + i;
+    const size_t iy = 1 + (i+1)%3;
+    const size_t iz = 1 + (i+2)%3;
     
     Vector cen(pPos);
     assert_true( nPoints >= nbRefPoints );

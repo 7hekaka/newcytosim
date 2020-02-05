@@ -79,7 +79,7 @@ public:
     virtual Vector     position() const;
 
     /// return the average of all vertices
-    virtual Vector     positionP(unsigned) const;
+    virtual Vector     positionP(size_t) const;
 /*
     /// move all associated objects
     void               translate(Vector const& T);
