@@ -154,13 +154,6 @@ public:
      */
     real         end_size[2];
     
-    /// length of a section displayed near the fiber tips
-    /**
-     if `end_length[0] > 0`, a section near the PLUS_END is drawn with the color of the PLUS_END.
-     if `end_length[1] > 0`, a section near the MINUS_END is drawn with the color of the MINUS_END.
-     */
-    real         end_length[2];
-    
     /// colors of the different FiberTip states
     /**
      This determines the set of color that are used to display the fiber tips,
@@ -252,6 +245,9 @@ public:
     unsigned int mask_bitfield;
     
     
+    /// conversion coefficient from length to color, for `line_style==6`
+    real         length_scale;
+
     /// conversion coefficient from tension to color, for `line_style==2`
     /**
      The values of `tension_scale` determines how longitudinal tensions are displayed:
@@ -263,7 +259,7 @@ public:
      Lower tension_scale values will yield brighter colors for the same force in the fiber.
      */
     real         tension_scale;
-    
+
     /// ( if > 0 ) display the net forces FP acting on vertices
     /**
      A force F acting on a vertex is displayed as segments of length `force_scale * F`.

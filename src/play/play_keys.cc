@@ -289,6 +289,11 @@ void changeScale(FiberDisp* p, int d)
         changeScale(p->tension_scale, d);
         flashText("fiber:tension_scale = %.3f", p->tension_scale);
     }
+    else if ( p->line_style == 5 || p->line_style == 6 )
+    {
+        changeScale(p->length_scale, d);
+        flashText("fiber:length_scale = %.3f", p->length_scale);
+    }
     else if ( p->force_scale > 0 )
     {
         changeScale(p->force_scale, d);
@@ -345,14 +350,16 @@ void changePointStyle(FiberDisp* p, int)
 
 void changeLineStyle(FiberDisp* p, int)
 {
-    p->line_style = ( p->line_style + 1 ) % 5;
+    p->line_style = ( p->line_style + 1 ) % 7;
     switch ( p->line_style )
     {
-        case 0:  flashText("Fibers: no lines");       break;
-        case 1:  flashText("Fibers: lines");          break;
-        case 2:  flashText("Fibers: axial tensions"); break;
-        case 3:  flashText("Fibers: curvature");      break;
-        case 4:  flashText("Fibers: orientation");    break;
+        case 0:  flashText("Fibers: no lines");          break;
+        case 1:  flashText("Fibers: lines");             break;
+        case 2:  flashText("Fibers: axial tensions");    break;
+        case 3:  flashText("Fibers: curvature");         break;
+        case 4:  flashText("Fibers: orientation");       break;
+        case 5:  flashText("Fibers: distance minus-end");break;
+        case 6:  flashText("Fibers: distance plus-end"); break;
     }
 }
 

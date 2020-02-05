@@ -31,14 +31,15 @@ private:
     /// draw a point with a small sphere
     inline void drawHand2(Vector const& p, PointDisp const* d) const { if ( d->visible ) { d->color2.load_both(); drawPoint(p, d); } }
     
-    /// draw Fiber linear features
-    void drawJoinedFiberLines(Fiber const&, bool capM, bool capP, real rad, size_t seg, size_t last,
-                              void (*set_color)(Fiber const&, size_t, real), real) const;
+    /// draw Fiber model segments
+    void drawFiberSegments(Fiber const&, real rad, size_t seg, size_t last,
+                           void (*set_color)(Fiber const&, size_t, real), real) const;
     
-    /// draw Fiber liner features
-    void drawJoinedFiberLinesL(Fiber const&, real rad, long inx, long last, real abs, real inc,
-                               void (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+    /// draw Fiber segments not necessarily aligned with the vertices
+    void drawFiberSubSegments(Fiber const&, real rad, long inx, long last, real abs, real inc,
+                              void (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
+    /// not used
     void drawFiberSegment(Fiber const&, bool capM, bool capP, real rad, real abs1, real abs2) const;
     
     /// display lattice subtance using specified color function
@@ -65,13 +66,7 @@ public:
     void drawFiberLines(Fiber const&) const;
     
     /// draw one segment of a Fiber
-    void drawFiberLinesT(Fiber const&, size_t) const;
-
-    /// draw Fiber linear features over length `len` near the MINUS_END
-    void drawFiberLinesM(Fiber const&, real len, real width) const;
-    
-    /// draw Fiber linear features over length `len` near the PLUS_END
-    void drawFiberLinesP(Fiber const&, real len, real width) const;
+    void drawFiberSegmentT(Fiber const&, size_t) const;
 
     /// display lattice subtance using color
     void drawFiberLattice1(Fiber const&, real width) const;

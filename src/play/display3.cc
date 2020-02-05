@@ -73,8 +73,8 @@ void Display3::drawSimul(Simul const& sim)
          If the display is 'cut', we might see the inner sides,
          but rendering would be faster with Culling enabled
         */
-        //glEnable(GL_CULL_FACE);
-        //glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         drawFibers(sim.fibers);
     }
     
@@ -168,7 +168,7 @@ void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
         gleObject(pos, rad, gleSphere4);
 #else
         // dual pass
-        glEnable(GL_CULL_FACE);
+        assert_true(glIsEnabled(GL_CULL_FACE));
         glPushMatrix();
         gleTranslate(pos);
         gleScale(rad);
@@ -184,15 +184,14 @@ void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Advanced Fiber Rendering
+#pragma mark - Nicely Joined Fiber Rendering
 
 /**
 This draws the model-segments from `inx` to `last`.
 The function `set_color` is used to set the color of the segments
 */
-void Display3::drawJoinedFiberLines(Fiber const& fib, bool capM, bool capP, real rad,
-                                    size_t inx, const size_t last,
-                                    void (*set_color)(Fiber const&, size_t, real), real beta) const
+void Display3::drawFiberSegments(Fiber const& fib, real rad, size_t inx, const size_t last,
+                                 void (*set_color)(Fiber const&, size_t, real), real beta) const
 {
     Vector pos = fib.posPoint(inx), old;
     Vector nxt = fib.posPoint(inx+1);
@@ -201,8 +200,7 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool capM, bool capP, real
     assert_true( last <= fib.lastSegment() );
     
     set_color(fib, inx, beta);
-    if ( capM )
-        drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
+    drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
     
 #if ( DIM > 1 )
     glEnable(GL_CLIP_PLANE4);
@@ -240,8 +238,7 @@ void Display3::drawJoinedFiberLines(Fiber const& fib, bool capM, bool capP, real
     dir = fib.dirEndP();
 #endif
     
-    if ( capP )
-        drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
 }
 
 
@@ -250,10 +247,10 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is with respect to the MINUS_END.
 The function `set_color` is used to set the color of the segments.
 */
-void Display3::drawJoinedFiberLinesL(Fiber const& fib, real rad, long inx, const long last,
-                                     real abs, const real inc,
-                                     void (*set_color)(Fiber const&, long, real),
-                                     real fac, real facM, real facP) const
+void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const long last,
+                                    real abs, const real inc,
+                                    void (*set_color)(Fiber const&, long, real),
+                                    real fac, real facM, real facP) const
 {
     // start at MINUS_END
     Vector pos = fib.displayPos(abs), old;
@@ -327,10 +324,6 @@ void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad
 }
 
 
-void set_color_not(Fiber const&, long, real)
-{
-}
-
 void set_color_not(Fiber const&, size_t, real)
 {
 }
@@ -366,6 +359,18 @@ void set_color_direction(Fiber const& fib, size_t seg, real)
     gle::radial_color(fib.dirSegment(seg)).load_front();
 }
 
+// distance from the minus_end
+void set_color_abscissaM(Fiber const& fib, size_t seg, real beta)
+{
+    fib.disp->color.load_front((real)seg*beta);
+}
+
+// distance from the plus_end
+void set_color_abscissaP(Fiber const& fib, size_t seg, real beta)
+{
+    fib.disp->color.load_front((real)(fib.lastSegment()-seg)*beta);
+}
+
 
 void Display3::drawFiberLines(Fiber const& fib) const
 {
@@ -375,7 +380,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
     if ( disp->line_style == 1 )
     {
 #if ( 1 )
-        drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_not, 1.0);
+        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_not, 1.0);
 #else
         // this is a basic rendering where tubes would not join properly:
         drawFiberCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
@@ -387,21 +392,31 @@ void Display3::drawFiberLines(Fiber const& fib) const
     else if ( disp->line_style == 2 )
     {
         real beta = 1.0 / disp->tension_scale;
-        drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_tension, beta);
+        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_tension, beta);
     }
     else if ( disp->line_style == 3 )
     {
-        drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_curvature, 1.0);
+        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_curvature, 1.0);
     }
     else if ( disp->line_style == 4 )
     {
-        drawJoinedFiberLines(fib, true, true, rad, 0, fib.lastSegment(), set_color_direction, 1.0);
+        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_direction, 1.0);
+    }
+    else if ( disp->line_style == 5 )
+    {
+        real beta = fib.segmentation() / disp->length_scale;
+        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_abscissaM, beta);
+    }
+    else if ( disp->line_style == 6 )
+    {
+        real beta = fib.segmentation() / disp->length_scale;
+        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_abscissaP, beta);
     }
 }
 
 
-// this is for display with transparency:
-void Display3::drawFiberLinesT(Fiber const& fib, size_t i) const
+// displays segment 'i' with transparency
+void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
@@ -439,55 +454,13 @@ void Display3::drawFiberLinesT(Fiber const& fib, size_t i) const
 }
 
 
-void Display3::drawFiberLinesM(Fiber const& fib, real len, real width) const
-{
-    if ( len > 0 )
-    {
-        real rad = width * sFactor;
-        size_t inx = fib.clampedIndexM(len);
-        real cut = fib.segmentation() * inx;
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(-1.0, -1.0);
-        if ( 0 < inx )
-        {
-            drawJoinedFiberLines(fib, 1, 0, rad, 0, inx, set_color_not, 1.0);
-            drawFiberSegment(fib, 0, 0, rad, cut, len);
-        }
-        else
-        {
-            drawFiberSegment(fib, 1, 0, rad, 0, len);
-        }
-        glDisable(GL_POLYGON_OFFSET_FILL);
-    }
-}
-
-
-void Display3::drawFiberLinesP(Fiber const& fib, real len, real width) const
-{
-    if ( 0 < len )
-    {
-        real rad = width * sFactor;
-        real abs = fib.length() - len;
-        size_t inx = 1 + fib.clampedIndexM(abs);
-        real cut = fib.segmentation() * inx;
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(-1.0, -1.0);
-        if ( inx < fib.lastSegment() )
-        {
-            drawFiberSegment(fib, 0, 0, rad, abs, cut);
-            drawJoinedFiberLines(fib, 0, 1, rad, inx, fib.lastSegment(), set_color_not, 1.0);
-        }
-        else
-        {
-            drawFiberSegment(fib, 0, 1, rad, abs, fib.length());
-        }
-        glDisable(GL_POLYGON_OFFSET_FILL);
-    }
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark -
+
+void set_color_not(Fiber const&, long, real)
+{
+}
+
 
 void set_color_alternate(Fiber const& fib, long ix, real)
 {
@@ -538,7 +511,7 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
     real facM = ( disp->lattice_rescale && lenM > 0.001*uni ? fac*uni/lenM : fac );
     real facP = ( disp->lattice_rescale && lenP > 0.001*uni ? fac*uni/lenP : fac );
 
-    drawJoinedFiberLinesL(fib, rad, inf, sup, -lenM, uni, set_color, fac, facM, facP);
+    drawFiberSubSegments(fib, rad, inf, sup, -lenM, uni, set_color, fac, facM, facP);
     glPopAttrib();
 }
 

@@ -854,7 +854,7 @@ void Display::drawFiberLines(Fiber const& fib) const
 }
 
 
-void Display::drawFiberLinesT(Fiber const& fib, size_t i) const
+void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     
@@ -866,50 +866,6 @@ void Display::drawFiberLinesT(Fiber const& fib, size_t i) const
     gle::gleVertex(fib.posP(i));
     gle::gleVertex(fib.posP(i+1));
     glEnd();
-}
-
-
-void Display::drawFiberLinesM(Fiber const& fib, real len, real width) const
-{
-    if ( len > 0 )
-    {
-        lineWidth(width);
-        glBegin(GL_LINE_STRIP);
-        size_t ii = 0;
-        real a = 0;
-        while ( a < len  &&  ii < fib.nbPoints() )
-        {
-            gle::gleVertex(fib.posP(ii));
-            a += fib.segmentation();
-            ++ii;
-        }
-        if ( ii < fib.nbPoints() )
-            gle::gleVertex(fib.posM(len));
-        glEnd();
-    }
-}
-
-
-void Display::drawFiberLinesP(Fiber const& fib, real len, real width) const
-{
-    if ( len > 0 )
-    {
-        const real seg = fib.segmentation();
-        lineWidth(width);
-        glBegin(GL_LINE_STRIP);
-        size_t ii = fib.lastPoint();
-        while ( len > 0  &&  ii > 0 )
-        {
-            gle::gleVertex(fib.posP(ii));
-            len -= seg;
-            --ii;
-        }
-        if ( ii > 0 )
-            gle::gleVertex(fib.interpolatePoints(ii, ii+1, -len/seg));
-        else
-            gle::gleVertex(fib.posP(0));
-        glEnd();
-    }
 }
 
 
@@ -1504,20 +1460,6 @@ void Display::drawFiber(Fiber const& fib)
         else if ( disp->style == 3 )
             drawMicrotubule(fib, col1, col2, colE);
     }
-    
-    if ( disp->end_length[0] > 0 )
-    {
-        fib.disp->end_color[0].load_load();
-        disp->back_color.load_back();
-        drawFiberLinesP(fib, disp->end_length[0], disp->end_size[0]);
-    }
-
-    if ( disp->end_length[1] > 0 )
-    {
-        fib.disp->end_color[1].load_load();
-        disp->back_color.load_back();
-        drawFiberLinesM(fib, disp->end_length[1], disp->end_size[1]);
-    }
 
     if ( disp->point_style > 0 )
     {
@@ -1697,7 +1639,7 @@ void Display::zObject::draw(Display * disp) const
     switch( mec->tag() )
     {
         case Fiber::TAG:
-            disp->drawFiberLinesT(*static_cast<const Fiber*>(mec), point_.point());
+            disp->drawFiberSegmentT(*static_cast<const Fiber*>(mec), point_.point());
             break;
             
         case Solid::TAG:
