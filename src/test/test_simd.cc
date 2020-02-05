@@ -196,13 +196,13 @@ void test_cat()
     printf("------ test_cat\n");
     vec2 y{1.0, 2.0};
     vec2 x{3.0, 4.0};
-    
+    x = setr2(1.0, 2.0);
+    y = setr2(3.0, 4.0);
+    dump(x, "x");
+    dump(y, "y");
+
     dump(cat4(x, y), "cat4(x, y)");
-    
-    x = set2(1.0, 2.0);
-    y = set2(3.0, 4.0);
-    
-    dump(cat4(x, y), "cat4(x, y)");
+    dump(cat4(y, x), "cat4(y, x)");
 }
 
 void test_load()
