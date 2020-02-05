@@ -107,6 +107,7 @@ Meca::Meca()
     useMatrixC = false;
 #endif
     drawLinks = false;
+    time_step = 0;
 }
 
 
@@ -1225,7 +1226,7 @@ int smaller_mecable(const void * ap, const void * bp)
  Allocate and reset matrices and vectors necessary for Meca::solve(),
  copy coordinates of Mecables into vPTS[]
  */
-void Meca::prepare(SimulProp const* prop)
+void Meca::prepare()
 {
 #if NUM_THREADS > 1
     /*
@@ -1265,9 +1266,6 @@ void Meca::prepare(SimulProp const* prop)
     
     // reset base:
     zero_real(DIM*cnt, vBAS);
-    
-    // get global time step
-    time_step = prop->time_step;
     
 #if NUM_THREADS > 1
     #pragma omp parallel num_threads(NUM_THREADS)
@@ -1332,7 +1330,7 @@ void Meca::computeForces()
     calculateForces(vPTS, vBAS, vFOR);
     copy_real(dimension(), vFOR, vTMP);
 
-    // add rigidity, and calculate the Lagrange Multiplier with this:
+    // add rigidity, and calculate Lagrange Multipliers:
     for ( Mecable * mec : mecables )
     {
         real * fff = vFOR + DIM * mec->matIndex();
@@ -1426,8 +1424,9 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
  */
 void Meca::solve(SimulProp const* prop, const unsigned precond)
 {
-    assert_true( time_step == prop->time_step );
-    
+    // get global time step
+    time_step = prop->time_step;
+
     prepareMatrices();
     
     // calculate forces before constraints in vFOR:
@@ -1455,6 +1454,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
      */
     
     real noiseLevel = INFINITY;
+    const real alpha = prop->kT/time_step;
     
     /*
      Add Brownian contributions and calculate Minimum value of it
@@ -1469,7 +1469,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         while ( mci < mecables.end() )
         {
             const size_t inx = DIM * (*mci)->matIndex();
-            real n = brownian1(*mci, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
+            real n = brownian1(*mci, vRND+inx, alpha, vFOR+inx, time_step, vRHS+inx);
             local = std::min(local, n);
             mci += NUM_THREADS;
         }
@@ -1481,7 +1481,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-        real n = brownian1(mec, vRND+inx, prop->kT/time_step, vFOR+inx, time_step, vRHS+inx);
+        real n = brownian1(mec, vRND+inx, alpha, vFOR+inx, time_step, vRHS+inx);
         noiseLevel = std::min(noiseLevel, n);
     }
 #endif

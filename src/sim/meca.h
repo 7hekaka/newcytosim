@@ -563,7 +563,7 @@ public:
     //-------------------------- COMPUTING METHODS -----------------------------
 
     /// Allocate the memory necessary to solve(). This must be called after the last add()
-    void prepare(SimulProp const*);
+    void prepare();
     
     /// Calculate motion of all Mecables in the system
     void solve(SimulProp const*, unsigned precondition);

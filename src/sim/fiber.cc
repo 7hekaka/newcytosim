@@ -100,8 +100,8 @@ void Fiber::step()
     
     if ( prop->mesh_binding_rate > 0 || prop->mesh_unbinding_rate > 0 )
     {
-        real on  = prop->mesh_binding_rate * prop->time_step;
-        real off = -std::expm1( -prop->mesh_unbinding_rate * prop->time_step );
+        real on  = prop->mesh_binding_rate * simul().prop->time_step;
+        real off = -std::expm1( -prop->mesh_unbinding_rate * simul().prop->time_step );
         equilibrateMesh(valueMesh, prop->field_ptr, on, off);
     }
     
@@ -118,7 +118,7 @@ void Fiber::step()
          starting from a value of 0, and reached for a value of 1,
          with a time-scale given by 'mesh_aging_rate'.
          */
-        real cst = prop->mesh_aging_rate * prop->time_step;
+        real cst = prop->mesh_aging_rate * simul().prop->time_step;
         evolveMeshValues(valueMesh, cst, 1.0-cst);
         //std::clog << reference() << " lattice avg = " << valueMesh->sum()*valueMesh->unit()/length() << std::endl;
     }
@@ -1411,7 +1411,7 @@ void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real binding_rate) const
     const real rate = binding_rate * spread / fld->cellVolume();
     
     // fraction of the cell content that will bind in one time_step:
-    const real frac = -std::expm1( -rate * prop->time_step );
+    const real frac = -std::expm1( -rate * simul().prop->time_step );
     
     real abs = spread * RNG.exponential();
     const real len = length();
@@ -1494,7 +1494,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
     assert_true( inf <= sup );
     auto * site = lat.data();
 
-    const real fac = speed * prop->time_step / lat.unit();
+    const real fac = speed * simul().prop->time_step / lat.unit();
     
     if ( fabs(fac) > 1 )
         throw InvalidParameter("mesh_flux_speed * time_step / lattice_unit is too high");
@@ -1554,7 +1554,7 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
     assert_true( inf <= sup );
     auto * site = lat.data();
 
-    const real fac = 1.0 / prop->time_step;
+    const real fac = 1.0 / simul().prop->time_step;
     
     assert_true( inf >= lat.inf() );
     assert_true( sup <  lat.sup() );
