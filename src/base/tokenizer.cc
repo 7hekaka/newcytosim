@@ -600,7 +600,7 @@ std::string Tokenizer::get_until(std::istream& is, std::string what)
 {
     std::string res;
     res.reserve(16384);
-    unsigned d = 0;
+    size_t d = 0;
     char c = 0;
     is.get(c);
     

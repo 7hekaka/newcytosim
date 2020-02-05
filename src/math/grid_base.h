@@ -167,7 +167,7 @@ protected:
     }
     
     /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
-    inline size_t image(const unsigned d, long c) const
+    inline size_t image(const size_t d, long c) const
     {
 #if GRID_HAS_PERIODIC
         if ( gPeriodic[d] )
@@ -266,7 +266,7 @@ public:
         nCells = 1;
         cVolume = 1;
         
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             if ( cells[d] <= 0 )
                 throw InvalidParameter("Cannot build grid as nbcells[] is <= 0");
@@ -301,7 +301,7 @@ public:
     }
     
     /// true if dimension `d` has periodic boundary conditions
-    bool isPeriodic(unsigned d) const
+    bool isPeriodic(int d) const
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
@@ -311,7 +311,7 @@ public:
     }
     
     /// change boundary conditions
-    void setPeriodic(unsigned d, bool p)
+    void setPeriodic(int d, bool p)
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
@@ -373,19 +373,19 @@ public:
     real diagonalLength() const
     {
         real res = cWidth[0] * cWidth[0];
-        for ( unsigned int d = 1; d < ORD; ++d )
+        for ( int d = 1; d < ORD; ++d )
             res += cWidth[d] * cWidth[d];
         return sqrt( res );
     }
     
     /// the smallest cell width, along dimensions that have more than `min_size` cells
-    real minimumWidth(unsigned int min_size) const
+    real minimumWidth(size_t min_size) const
     {
         real res = 0;
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             if ( gDim[d] > min_size )
                 res = cWidth[d];
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             if ( gDim[d] > min_size  &&  cWidth[d] < res )
                 res = cWidth[d];
         return res;
@@ -395,7 +395,7 @@ public:
     real radius() const
     {
         real res = 0;
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             real m = std::max(gSup[d], -gInf[d]);
             res += m * m;
@@ -409,7 +409,7 @@ public:
     /// checks if coordinates are inside the box
     bool inside(const int coord[ORD]) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             if ( coord[d] < 0 || (size_t)coord[d] >= gDim[d] )
                 return false;
@@ -420,7 +420,7 @@ public:
     /// checks if point is inside the box
     bool inside(const real w[ORD]) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             if ( w[d] < gInf[d] || w[d] >= gSup[d] )
                 return false;
@@ -431,14 +431,14 @@ public:
     /// periodic image
     void bringInside(int coord[ORD]) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             coord[d] = image(d, coord[d]);
     }
     
     /// conversion from index to coordinates
     void setCoordinatesFromIndex(int coord[ORD], size_t indx) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             coord[d] = indx % gDim[d];
             indx    /= gDim[d];
@@ -448,14 +448,14 @@ public:
     /// conversion from Position to coordinates (offset should be in [0,1])
     void setCoordinatesFromPosition(int coord[ORD], const real w[ORD], const real offset=0) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             coord[d] = imagef(d, w[d], offset);
     }
 
     /// conversion from Index to Position (offset should be in [0,1])
     void setPositionFromIndex(real w[ORD], size_t indx, real offset) const
     {
-        for ( unsigned int d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             w[d] = gInf[d] + cWidth[d] * ( offset + indx % gDim[d] );
             indx /= gDim[d];
@@ -465,7 +465,7 @@ public:
     /// conversion from Coordinates to Position (offset should be in [0,1])
     void setPositionFromCoordinates(real w[ORD], const int coord[ORD], real offset=0) const
     {
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             w[d] = gInf[d] + cWidth[d] * ( offset + coord[d] );
     }
 
@@ -475,7 +475,7 @@ public:
         size_t inx = image(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + image((unsigned)d, coord[d]);
+            inx = gDim[d] * inx + image(d, coord[d]);
         
         return inx;
     }
@@ -506,10 +506,10 @@ public:
 
     
     /// return cell that is next to `c` in the direction `dir`
-    size_t next(size_t c, unsigned dir) const
+    size_t next(size_t c, size_t dir) const
     {
         size_t coord[ORD];
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             coord[d] = c % gDim[d];
             c       /= gDim[d];
@@ -610,12 +610,12 @@ private:
     int * newRectangularGrid(size_t& cmx, const size_t range[ORD])
     {
         cmx = 1;
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             cmx *= ( 2 * range[d] + 1 );
         int * ccc = new int[ORD*cmx];
         
         size_t nb = 1;
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             size_t h = 0;
             for ( ; h < nb && h < cmx; ++h )
@@ -649,7 +649,7 @@ private:
         int ori_indx = (int)pack(ori);
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
-            for ( unsigned d = 0; d < ORD; ++d )
+            for ( int d = 0; d < ORD; ++d )
                 cc[d] = ori[d] + shift[ORD*ii+d];
             int off = (int)pack(cc) - ori_indx;
             
@@ -762,7 +762,7 @@ public:
     void createSquareRegions(const real radius)
     {
         size_t range[ORD];
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             range[d] = ceil( radius / cWidth[d] );
         size_t cmx = 0;
         int * ccc = newRectangularGrid(cmx, range);
@@ -783,7 +783,7 @@ public:
     void createRoundRegions(const real radius)
     {
         size_t range[ORD];
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > 0 );
             range[d] = ceil( radius / cWidth[d] );
@@ -807,10 +807,10 @@ public:
 
      Note: the radius is taken specified in units of cells: 1 = 1 cell
      */
-    void createSideRegions(const unsigned radius)
+    void createSideRegions(const int radius)
     {
         size_t range[ORD];
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             range[d] = radius;
         size_t cmx = 0;
         int * ccc = newRectangularGrid(cmx, range);
@@ -833,7 +833,7 @@ public:
 
          CELL * cell = & myGrid.icell(indx);
          n_offset = myGrid.getRegion(offset, indx);
-         for ( unsigned n = 1; n < n_offset; ++n )
+         for ( int n = 1; n < n_offset; ++n )
          {
              Cell & neighbor = cell[offset[n]];
              ...
@@ -865,7 +865,7 @@ public:
     void printSummary(std::ostream& os, std::string str)
     {
         os << str << " of dim " << ORD << " has " << gAllocated << " cells:" << std::endl;
-        for ( unsigned d = 0; d < ORD; ++d )
+        for ( int d = 0; d < ORD; ++d )
             os << "     [ " << gInf[d] << " " << gSup[d] << " ] / " << gDim[d] << " = " << cWidth[d] << std::endl;
     }
 };
