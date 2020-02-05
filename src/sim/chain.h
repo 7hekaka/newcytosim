@@ -72,7 +72,7 @@ class Chain : public Mecable
 private:
         
     /// actual section length: distance between consecutive points
-    real         fnCut;
+    real         fnCut, iCut;
     
     /// target segmentation length (equal to parameter 'fiber:segmentation')
     real         fnSegmentation;
@@ -130,7 +130,7 @@ protected:
     static int   reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
 
     /// change segmentation
-    void         setSegmentation(real c) { fnCut = c; }
+    void         setSegmentation(real c) { fnCut = c; iCut = 1.0/fnCut; }
     
 public:
     
@@ -351,6 +351,9 @@ public:
     /// the current segment length (distance between successive vertices)
     real         segmentation() const { return fnCut; }
     
+    /// the current segment length (distance between successive vertices)
+    real         segmentationInv() const { return iCut; }
+
     /// returns third power of segmentation()
     real         segmentationCube() const { return fnCut*fnCut*fnCut; }
     

@@ -22,10 +22,10 @@ class FiberSegment
 private:
     
     /// Fiber to which the segment belongs to
-    Fiber const*   fib_;
+    Fiber const*  fib_;
     
     /// index of segment's first point
-    unsigned int   pti_;
+    size_t        pti_;
     
 public:
     
@@ -33,16 +33,16 @@ public:
     FiberSegment() {}
     
     /// constructor
-    FiberSegment(Fiber const* f, unsigned p) : fib_(f), pti_(p) {}
+    FiberSegment(Fiber const* f, size_t p) : fib_(f), pti_(p) {}
     
     /// setter
-    void     set(Fiber const* f, unsigned p) { fib_ = f; pti_ = p; }
+    void     set(Fiber const* f, size_t p) { fib_ = f; pti_ = p; }
 
     /// the Fiber
     Fiber const* fiber()       const { return fib_; }
     
     /// index of segment
-    unsigned int point()       const { return pti_; }
+    size_t       point()       const { return pti_; }
     
     /// abscissa at start of segment (i.e. corresponding to point())
     real         abscissa1()   const { return fib_->abscissaPoint(pti_); }

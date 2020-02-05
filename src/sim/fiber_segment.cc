@@ -27,14 +27,13 @@ real FiberSegment::projectPoint0(Vector aw, real& dis) const
     assert_true( fib_ );
     
     Vector A = pos1();
-    real ls = len();
     aw -= A;
     
     if ( modulo )
         modulo->fold(aw);
     
     // project with the scalar product:
-    real abs = dot(aw, pos2()-A) / ls;
+    real abs = dot(aw, pos2()-A) * fib_->segmentationInv();
     
     // calculate distance to projection
 #if ( DIM == 1 )
