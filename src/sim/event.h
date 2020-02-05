@@ -12,20 +12,22 @@ class Glossary;
 /// an Event performs action on the simulation by executing code
 /**
  An Event is a class that can perform some action in the simulation world,
- at regular interval or at stochastic time with a specified rate.
- The action is specified code interpreted by cytosim's parser.
+ specified as a line of code interpreted by Cytosim.
  This can be used for example to add or remove objects.
  
- It is a special class that is not associated with a Property,
- and can be created with 'new' without a preceeding 'set'.
+ The firing time can be specified to occur:
+     - only once at a given time with `time`,
+     - at regular interval  with `delay`,
+     - at stochastic time with `rate`.
+ .
+ 
+ It is a special class in the sense that is not associated with a Property,
+ and can be created with 'new' without a 'set' beforehand.
  
  Events are not saved to trajectory files.
 */
 class Event: public Object
 {
-    
-    friend class EventSet;
-    
     /// clear member variables
     void clear();
     
@@ -47,6 +49,9 @@ public:
     /// delay in unit time between firing events (used if `rate` is not set)
     real        delay;
 
+    /// true if event will fire multiple times
+    bool        recurrent;
+    
     ///@}
     
     /// time of next event
@@ -62,8 +67,11 @@ public:
 
     /// destructor
     virtual ~Event();
-    
-    /// recalculate next firing time
+
+    /// set next firing time
+    void fire_once(real time);
+
+    /// recalculate next firing time, given current time
     void reset(real time);
     
     /// a unique character identifying the class

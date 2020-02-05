@@ -6,7 +6,7 @@ set simul system
     steric = 1, 100
     steric_max_range = 0.5
     
-    time_step = 0.001
+    time_step = 0.01
     viscosity = 0.1
     precondition = 0
 }
@@ -44,15 +44,22 @@ new 100 ball
 
 new event
 {
-   rate = 30
-   code = ( change system display { back_color=dark_blue } )
+   rate = 10
+   code = ( change system display { back_color=darker_blue } )
    mark = 2
 }
 
 new event
 {
-   rate = 100
+   rate = 10
    code = ( change system display { back_color=black } )
+   mark = 2
+}
+
+new event
+{
+   time = 1
+   code = ( change system display { back_color=red } )
    mark = 2
 }
 

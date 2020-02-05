@@ -183,6 +183,7 @@ void Simul::foldPosition() const
 void Simul::evaluate(std::string const& code)
 {
     /*
+     @todo: restrict rights for Event's code
      The code is executed with all rights, but this should not be
      when this is executed from `play`
      */
