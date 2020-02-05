@@ -307,7 +307,6 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
         /*
          bb.point2() projects inside segment 'aa'
          */
-        assert_true(  );
         const real len = aa.radius + bb.radius;
         Interpolation ai(aa.seg, abs);
         if ( dis2 > len*len )
