@@ -182,7 +182,7 @@ void Display::prepareFiberDisp(FiberProp * p, PropertyList& alldisp, gle_color c
     if ( disp->coloring == FiberDisp::COLORING_CLUSTER )
         fiber_prep |= 1;
     
-    if ( disp->line_style == 2 )
+    if ( disp->line_style == 2 || disp->line_style == 3 )
         fiber_prep |= 2;
 
     if ( disp->coloring == FiberDisp::COLORING_AGE )
@@ -790,8 +790,8 @@ void Display::drawFiberLines(Fiber const& fib) const
         glDisableClientState(GL_VERTEX_ARRAY);
 #else
         glBegin(GL_LINE_STRIP);
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gle::gleVertex(fib.posP(ii));
+        for ( size_t n = 0; n < fib.nbPoints(); ++n )
+            gle::gleVertex(fib.posP(n));
         glEnd();
 #endif
     }
@@ -801,26 +801,37 @@ void Display::drawFiberLines(Fiber const& fib) const
         // display segments with color indicating internal tension
         lineWidth(disp->line_width);
         glBegin(GL_LINES);
-        for ( size_t ii = 0; ii < fib.lastPoint(); ++ii )
+        for ( size_t n = 0; n < fib.lastPoint(); ++n )
         {
             // the Lagrange multipliers are negative under compression
-            real x = fib.tension(ii) / disp->tension_scale;
-#if ( 1 )
+            real x = fib.tension(n) / disp->tension_scale;
             // adjust transparency, to make tense fibers more visible:
             if ( x <= 0 )
                 col.inverted().load(-x);  // invert color for compression
             else
                 col.load(x);  // extension
-#else
-            // use rainbow coloring, where Lagrange multipliers are negative under compression
-            gle_color::jet_color(1-x, alpha).load();
-#endif
-            gle::gleVertex(fib.posP(ii));
-            gle::gleVertex(fib.posP(ii+1));
+            gle::gleVertex(fib.posP(n));
+            gle::gleVertex(fib.posP(n+1));
         }
         glEnd();
     }
     else if ( disp->line_style == 3 )
+    {
+        // display segments with color indicating internal tension
+        lineWidth(disp->line_width);
+        glBegin(GL_LINE_STRIP);
+        for ( size_t n = 0; n < fib.lastPoint(); ++n )
+        {
+            // the Lagrange multipliers are negative under compression
+            real x = fib.tension(n) / disp->tension_scale;
+            // use rainbow coloring, where Lagrange multipliers are negative under compression
+            gle_color::jet_color(1-x, alpha).load();
+            gle::gleVertex(fib.posP(n));
+        }
+        gle::gleVertex(fib.posEndP());
+        glEnd();
+    }
+    else if ( disp->line_style == 4 )
     {
         // display segments with color indicating the curvature
         lineWidth(disp->line_width);
@@ -829,16 +840,16 @@ void Display::drawFiberLines(Fiber const& fib) const
             gle_color::jet_color(fib.curvature(1), alpha).load();
         else
             gle_color::jet_color(0, alpha).load();
-        gle::gleVertex(fib.posP(0));
-        for ( size_t ii = 1; ii < fib.lastPoint(); ++ii )
+        gle::gleVertex(fib.posEndM());
+        for ( size_t n = 1; n < fib.lastPoint(); ++n )
         {
-            gle_color::jet_color(fib.curvature(ii), alpha).load();
-            gle::gleVertex(fib.posP(ii));
+            gle_color::jet_color(fib.curvature(n), alpha).load();
+            gle::gleVertex(fib.posP(n));
         }
-        gle::gleVertex(fib.posP(fib.lastPoint()));
+        gle::gleVertex(fib.posEndP());
         glEnd();
     }
-    else if ( disp->line_style == 4 )
+    else if ( disp->line_style == 5 )
     {
         // color according to the angle with respect to the XY-plane:
         lineWidth(disp->line_width);
@@ -848,6 +859,32 @@ void Display::drawFiberLines(Fiber const& fib) const
             gle::radial_color(fib.dirSegment(n)).load();
             gle::gleVertex(fib.posP(n));
             gle::gleVertex(fib.posP(n+1));
+        }
+        glEnd();
+    }
+    else if ( disp->line_style == 6 )
+    {
+        // color according to the distance from the minus-end
+        const real beta = fib.segmentation() / disp->length_scale;
+        lineWidth(disp->line_width);
+        glBegin(GL_LINE_STRIP);
+        for ( size_t n = 0; n < fib.nbPoints(); ++n )
+        {
+            fib.disp->color.load(n*beta);
+            gle::gleVertex(fib.posP(n));
+        }
+        glEnd();
+    }
+    else if ( disp->line_style == 7 )
+    {
+        // color according to the distance from the minus-end
+        const real beta = fib.segmentation() / disp->length_scale;
+        lineWidth(disp->line_width);
+        glBegin(GL_LINE_STRIP);
+        for ( size_t n = 0; n < fib.nbPoints(); ++n )
+        {
+            fib.disp->color.load((fib.lastPoint()-n)*beta);
+            gle::gleVertex(fib.posP(n));
         }
         glEnd();
     }

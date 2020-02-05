@@ -190,16 +190,14 @@ void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
 This draws the model-segments from `inx` to `last`.
 The function `set_color` is used to set the color of the segments
 */
-void Display3::drawFiberSegments(Fiber const& fib, real rad, size_t inx, const size_t last,
+void Display3::drawFiberSegments(Fiber const& fib, real rad,
                                  void (*set_color)(Fiber const&, size_t, real), real beta) const
 {
-    Vector pos = fib.posPoint(inx), old;
-    Vector nxt = fib.posPoint(inx+1);
+    Vector pos = fib.posPoint(0), old;
+    Vector nxt = fib.posPoint(1);
     Vector dir = normalize(nxt-pos);  // could use _mm_rsqrt_ss
-
-    assert_true( last <= fib.lastSegment() );
     
-    set_color(fib, inx, beta);
+    set_color(fib, 0, beta);
     drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
     
 #if ( DIM > 1 )
@@ -208,13 +206,14 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad, size_t inx, const s
     setClipPlane(GL_CLIP_PLANE4, dir, pos);
     
     // draw inner segments
-    while ( inx < last )
+    const size_t last = fib.lastSegment();
+    for ( size_t inx = 0; inx < last; ++inx )
     {
         old = pos;
         pos = nxt;
         nxt = fib.posPoint(inx+2);
         dir = normalize(nxt-old);
-        set_color(fib, inx++, beta);
+        set_color(fib, inx, beta);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         gleTube(old, pos, rad, gleLongTube2B);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
@@ -228,10 +227,12 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad, size_t inx, const s
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
 #else
-    for ( ; inx < last; ++inx )
+    // this is a basic rendering where tubes would not join properly:
+    const size_t last = fib.lastSegment();
+    for ( size_t inx = 0; inx < last; ++inx )
     {
         pos = nxt;
-        nxt = fib.posP(inx+1);
+        nxt = fib.posPoint(inx+1);
         set_color(fib, inx, beta);
         gleTube(pos, nxt, rad, gleTube2B);
     }
@@ -290,11 +291,12 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
 #else
+    // this is a basic rendering where tubes would not join properly:
     for ( ; inx < last; ++inx )
     {
         pos = nxt;
         nxt = fib.displayPos(abs+inc);
-        set_color(fib, inx, beta);
+        set_color(fib, inx, fac);
         gleTube(pos, nxt, rad, gleTube2B);
         abs += inc;
     }
@@ -306,7 +308,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
 }
 
 /**
-This draws a segment from 'abs1' to 'abs2', with respect to the MINUS_END.
+Draw a segment from 'abs1' to 'abs2', counted from the MINUS_END.
 */
 void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad,
                                 const real abs1, const real abs2) const
@@ -331,15 +333,17 @@ void set_color_not(Fiber const&, size_t, real)
 void set_color_tension(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
-#if ( 1 )
     if ( x > 0 )  // invert color for extended fibers
         fib.disp->color.inverted().load_front(x);
     else          // use normal color compressed fibers
         fib.disp->color.load_front(-x);
-#else
+}
+
+void set_color_tensionR(Fiber const& fib, size_t seg, real beta)
+{
+    real x = beta * fib.tension(seg);
     // use rainbow coloring, where Lagrange multipliers are negative under compression
     gle_color::jet_color(1-x, fib.disp->color.a()).load_front();
-#endif
 }
 
 void set_color_curvature(Fiber const& fib, size_t seg, real)
@@ -379,38 +383,35 @@ void Display3::drawFiberLines(Fiber const& fib) const
     
     if ( disp->line_style == 1 )
     {
-#if ( 1 )
-        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_not, 1.0);
-#else
-        // this is a basic rendering where tubes would not join properly:
-        drawFiberCap(fib.prop->disp->line_caps, fib.posEndM(), -fib.dirEndM(), rad);
-        for ( size_t s = 0; s < fib.nbSegments(); ++s )
-            gleTube(fib.posP(s), fib.posP(s+1), rad, gleTube2B);
-        drawFiberCap(fib.prop->disp->line_caps, fib.posEndP(), fib.dirEndP(), rad);
-#endif
+        drawFiberSegments(fib, rad, set_color_not, 1.0);
     }
     else if ( disp->line_style == 2 )
     {
         real beta = 1.0 / disp->tension_scale;
-        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_tension, beta);
+        drawFiberSegments(fib, rad, set_color_tension, beta);
     }
     else if ( disp->line_style == 3 )
     {
-        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_curvature, 1.0);
+        real beta = 1.0 / disp->tension_scale;
+        drawFiberSegments(fib, rad, set_color_tensionR, beta);
     }
     else if ( disp->line_style == 4 )
     {
-        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_direction, 1.0);
+        drawFiberSegments(fib, rad, set_color_curvature, 1.0);
     }
     else if ( disp->line_style == 5 )
     {
-        real beta = fib.segmentation() / disp->length_scale;
-        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_abscissaM, beta);
+        drawFiberSegments(fib, rad, set_color_direction, 1.0);
     }
     else if ( disp->line_style == 6 )
     {
         real beta = fib.segmentation() / disp->length_scale;
-        drawFiberSegments(fib, rad, 0, fib.lastSegment(), set_color_abscissaP, beta);
+        drawFiberSegments(fib, rad, set_color_abscissaM, beta);
+    }
+    else if ( disp->line_style == 7 )
+    {
+        real beta = fib.segmentation() / disp->length_scale;
+        drawFiberSegments(fib, rad, set_color_abscissaP, beta);
     }
 }
 

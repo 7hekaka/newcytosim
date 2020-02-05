@@ -32,7 +32,7 @@ private:
     inline void drawHand2(Vector const& p, PointDisp const* d) const { if ( d->visible ) { d->color2.load_both(); drawPoint(p, d); } }
     
     /// draw Fiber model segments
-    void drawFiberSegments(Fiber const&, real rad, size_t seg, size_t last,
+    void drawFiberSegments(Fiber const&, real rad,
                            void (*set_color)(Fiber const&, size_t, real), real) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
