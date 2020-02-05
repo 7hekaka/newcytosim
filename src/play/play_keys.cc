@@ -28,9 +28,9 @@ void setVisible(T* p, int val)
 }
 
 template< typename T >
-void flipVisible(T* p)
+void flipVisible(T* p, int val)
 {
-    p->visible = !p->visible;
+    p->visible = ( p->visible ? 0 : val );
     flashText("%s:visible = %i", p->name_str(), p->visible);
 }
 
@@ -153,14 +153,14 @@ void setPointDispVisible(PropertyList const& plist, int val)
 }
 
 
-void shufflePointDispVisible(const PropertyList& plist)
+void shufflePointDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
         flashText("no relevant object");
 
     if ( plist.size() == 1 )
     {
-        flipVisible(toPointDisp(plist.front()));
+        flipVisible(toPointDisp(plist.front()), val);
     }
     else
     {
@@ -173,12 +173,12 @@ void shufflePointDispVisible(const PropertyList& plist)
         if ( p )
         {
             setPointDispVisible(plist, 0);
-            p->visible = 1;
+            p->visible = val;
             flashText("Only `%s' is visible", p->name_str());
         }
         else
         {
-            setPointDispVisible(plist, 1);
+            setPointDispVisible(plist, val);
             flashText("All are visible");
         }
     }
@@ -531,11 +531,11 @@ void setFiberDispVisible(PropertyList const& plist, int val)
 }
 
 
-void shuffleFiberDispVisible(const PropertyList& plist)
+void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.size() == 1 )
     {
-        flipVisible(toFiberDisp(plist.front()));
+        flipVisible(toFiberDisp(plist.front()), val);
     }
     else
     {
@@ -548,12 +548,12 @@ void shuffleFiberDispVisible(const PropertyList& plist)
         if ( p )
         {
             setFiberDispVisible(plist, 0);
-            p->visible = 1;
+            p->visible = val;
             flashText("Only `%s' is visible", p->name_str());
         }
         else
         {
-            setFiberDispVisible(plist, 1);
+            setFiberDispVisible(plist, val);
             flashText("All fibers are visible");
         }
     }
@@ -801,7 +801,7 @@ void processKey(unsigned char key)
         //------------------------------ Fibers --------------------------------
            
         case '`':
-            shuffleFiberDispVisible(player.allFiberDisp());
+            shuffleFiberDispVisible(player.allFiberDisp(), 1);
             break;
             
         case 't':
@@ -901,7 +901,7 @@ void processKey(unsigned char key)
   
         case '5':
             if ( altKeyDown )
-                shufflePointDispVisible(player.allSphereDisp());
+                shufflePointDispVisible(player.allSphereDisp(), 1);
             else
                 setPointDisp(player.allSphereDisp(), changeStyle, 0);
             break;
@@ -923,7 +923,7 @@ void processKey(unsigned char key)
             break;
             
         case '&': case '^':
-            shufflePointDispVisible(player.allSpaceDisp());
+            shufflePointDispVisible(player.allSpaceDisp(), 3);
             break;
 
         case '7':
@@ -945,7 +945,7 @@ void processKey(unsigned char key)
             if ( altKeyDown )
                 setPointDispVisible(player.allHandDisp(), 1);
             else
-                shufflePointDispVisible(player.allHandDisp());
+                shufflePointDispVisible(player.allHandDisp(), 1);
             break;
         
 #if 0
