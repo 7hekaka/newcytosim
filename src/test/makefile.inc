@@ -36,6 +36,11 @@ test_code: test_code.cc random.o SFMT.o tictoc.o | bin
 	$(DONE)
 vpath test_code bin
 
+test_size: test_size.cc cytosim.a cytomath.a cytobase.a | bin
+	$(COMPILE) -Isrc/math -Isrc/base -Isrc/sim $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+vpath test_sizeof bin
+
 test_matrix: test_matrix.cc matsparsesymblk.o matsparseblk.o matsparsesym.o matsparsesym1.o matsparsesym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
