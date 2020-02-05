@@ -29,7 +29,7 @@ public:
     /// Stiffness of the angular link, in Torque per radians (pN.um/radian) (set as `torque[1]`)
     real angular_stiffness;
     
-    /// Allow the angle to flip in 2D (currently unused)
+    /// Allow the angle to flip in 2D
     bool flip;
     
     /// @}

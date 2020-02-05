@@ -75,9 +75,9 @@ real FiberSegment::projectPoint(Vector const& w, real& dis) const
     if ( abs < 0 )
     {
         if ( isFirst() )
-            dis = distanceSqr(w, pos1());
+            dis = distanceSqr(w, A);
     }
-    else if ( abs > len() )
+    else if ( abs > ls )
     {
         if ( isLast() )
             dis = distanceSqr(w, pos2());
