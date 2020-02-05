@@ -36,7 +36,7 @@ Property* TubuleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-Object * TubuleSet::newObject(const ObjectTag tag, unsigned num)
+Object * TubuleSet::newObject(const ObjectTag tag, size_t num)
 {
     Tubule * o = nullptr;
     if ( tag == Tubule::TAG )

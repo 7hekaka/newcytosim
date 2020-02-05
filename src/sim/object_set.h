@@ -125,7 +125,7 @@ public:
     virtual ObjectList newObjects(const std::string& name, Glossary& opt) = 0;
    
     /// create new Object with given Tag and Property `num` (used for reading trajectory file)
-    virtual Object *   newObject(ObjectTag, unsigned num) = 0;
+    virtual Object *   newObject(ObjectTag, size_t num) = 0;
 
     //--------------------------
     

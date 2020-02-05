@@ -191,7 +191,7 @@ void CoupleSet::step()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-Object * CoupleSet::newObject(const ObjectTag tag, unsigned num)
+Object * CoupleSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Couple::TAG )
     {

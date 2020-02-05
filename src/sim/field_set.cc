@@ -61,7 +61,7 @@ Property* FieldSet::newProperty(const std::string& cat, const std::string& nom, 
 }
 
 
-Object * FieldSet::newObject(const ObjectTag tag, unsigned num)
+Object * FieldSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Field::TAG )
     {

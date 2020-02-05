@@ -49,7 +49,7 @@ Property* OrganizerSet::newProperty(const std::string& cat, const std::string& n
 }
 
 
-Object * OrganizerSet::newObject(const ObjectTag tag, unsigned num)
+Object * OrganizerSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Aster::TAG )
     {

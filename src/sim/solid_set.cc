@@ -26,7 +26,7 @@ Property* SolidSet::newProperty(const std::string& cat, const std::string& nom, 
 }
 
 
-Object * SolidSet::newObject(const ObjectTag tag, unsigned num)
+Object * SolidSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Solid::TAG )
     {

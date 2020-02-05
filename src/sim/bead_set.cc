@@ -16,7 +16,7 @@ Property* BeadSet::newProperty(const std::string& cat, const std::string& nom, G
 }
 
 
-Object * BeadSet::newObject(const ObjectTag tag, unsigned num)
+Object * BeadSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Bead::TAG )
     {

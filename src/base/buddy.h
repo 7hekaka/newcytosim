@@ -56,7 +56,7 @@ private:
     
     
     /// replace the buddy that may have been at index `ix`
-    void enlist(Buddy * b, unsigned ix)
+    void enlist(Buddy * b, size_t ix)
     {
         if ( ix < buddies_.size() )
         {

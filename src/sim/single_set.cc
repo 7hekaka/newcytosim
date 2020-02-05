@@ -74,7 +74,7 @@ void SingleSet::step()
 #pragma mark -
 
 
-Object * SingleSet::newObject(const ObjectTag tag, unsigned num)
+Object * SingleSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Single::TAG )
     {

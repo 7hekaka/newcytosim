@@ -22,7 +22,7 @@ Property* SphereSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-Object * SphereSet::newObject(const ObjectTag tag, unsigned num)
+Object * SphereSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Sphere::TAG )
     {

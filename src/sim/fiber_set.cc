@@ -194,7 +194,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
 /**
  The returned object is not initialized, since this is used for file input
  */
-Object * FiberSet::newObject(const ObjectTag tag, unsigned num)
+Object * FiberSet::newObject(const ObjectTag tag, size_t num)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( tag == Fiber::TAG || tag == 'm' )

@@ -33,7 +33,7 @@ namespace LinearSolvers
         ~Allocator() { deallocate(); }
         
         /// allocate n vectors of size `s`
-        void allocate(size_t s, unsigned n)
+        void allocate(size_t s, size_t n)
         {
             // Keep memory aligned
             // pad with 4 doubles to allow SIMD instructions overspill:

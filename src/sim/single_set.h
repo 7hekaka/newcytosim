@@ -76,7 +76,7 @@ public:
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, unsigned);
+    Object *    newObject(ObjectTag, size_t);
     
     /// print a summary of the content (nb of objects, class)
     void        report(std::ostream&) const;

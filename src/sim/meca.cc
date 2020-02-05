@@ -493,21 +493,21 @@ void Meca::multiply(const real* X, real* Y) const
  Matrix Y is specified in full.
  */
 
-void duplicate_matrix(unsigned siz, real const* src, real * dst)
+void duplicate_matrix(size_t siz, real const* src, real * dst)
 {
-    unsigned ddd = DIM * siz;
+    size_t ddd = DIM * siz;
     
     zero_real(ddd*ddd, dst);
     
-    for ( unsigned ii = 0; ii < siz; ++ii )
+    for ( size_t ii = 0; ii < siz; ++ii )
     {
         real xx = src[ii + siz * ii];
         
-        unsigned kk = ( ddd+1 ) * DIM * ii;
-        for ( unsigned d = 0; d < DIM; ++d, kk += ddd+1 )
+        size_t kk = ( ddd+1 ) * DIM * ii;
+        for ( size_t d = 0; d < DIM; ++d, kk += ddd+1 )
             dst[kk] = xx;
         
-        for ( unsigned jj = ii+1; jj < siz; ++jj )
+        for ( size_t jj = ii+1; jj < siz; ++jj )
         {
             xx = src[ii + siz * jj];
             kk = DIM * ( ii + ddd * jj );
@@ -535,29 +535,29 @@ void duplicate_matrix(unsigned siz, real const* src, real * dst)
  input: upper triangular matrix
  ouput: full symmetric matrix
  */
-void expand_matrix(unsigned siz, real * mat)
+void expand_matrix(size_t siz, real * mat)
 {
 #if ( 0 )
     std::clog << "\nOriginal:\n";
     VecPrint::print(std::clog, siz, siz, mat, siz);
 #endif
     
-    for ( unsigned jj = 0; jj < siz; jj += DIM  )
+    for ( size_t jj = 0; jj < siz; jj += DIM  )
     {
-        for ( unsigned ii = 0; ii < jj; ii += DIM  )
+        for ( size_t ii = 0; ii < jj; ii += DIM  )
         {
             real val = mat[ii+siz*jj];
             // expand term in other dimensions:
-            for ( unsigned d = 1; d < DIM; ++d )
+            for ( size_t d = 1; d < DIM; ++d )
                 mat[ii+d+siz*(jj+d)] = val;
             
             // symmetrize matrix:
-            for ( unsigned d = 0; d < DIM; ++d )
+            for ( size_t d = 0; d < DIM; ++d )
                 mat[jj+d+siz*(ii+d)] = val;
         }
         // expand diagonal term in other dimensions:
         real val = mat[jj+siz*jj];
-        for ( unsigned d = 1; d < DIM; ++d )
+        for ( size_t d = 1; d < DIM; ++d )
             mat[jj+d+siz*(jj+d)] = val;
     }
 
@@ -575,20 +575,20 @@ void expand_matrix(unsigned siz, real * mat)
  With 'diag==2', the matrix is made tri-diagonal
  etc.
  */
-void truncate_matrix(unsigned siz, real* mat, unsigned diag)
+void truncate_matrix(size_t siz, real* mat, size_t diag)
 {
 #if ( 0 )
     std::clog << "\nOriginal:\n";
     VecPrint::print(std::clog, siz, siz, mat, siz);
 #endif
     
-    for ( unsigned ii = 0; ii < siz; ++ii )
+    for ( size_t ii = 0; ii < siz; ++ii )
     {
         real * col = mat + siz * ii;
-        for ( unsigned jj = 0; jj+diag < ii; ++jj )
+        for ( size_t jj = 0; jj+diag < ii; ++jj )
             col[jj] = 0.0;
         
-        for ( unsigned kk = ii+diag+1; kk < siz; ++kk )
+        for ( size_t kk = ii+diag+1; kk < siz; ++kk )
             col[kk] = 0.0;
     }
     
@@ -599,15 +599,15 @@ void truncate_matrix(unsigned siz, real* mat, unsigned diag)
 }
 
 
-/// sim(element^2) / sum(diagonal^2)
-real off_diagonal_norm(int siz, real * mat)
+/// sum(element^2) / sum(diagonal^2)
+real off_diagonal_norm(size_t siz, real * mat)
 {
     real all = 0;
-    for ( int k = 0; k < siz*siz; ++k )
+    for ( size_t k = 0; k < siz*siz; ++k )
         all += mat[k] * mat[k];
 
     real dia = 0;
-    for ( int k = 0; k < siz*siz; k+=siz+1 )
+    for ( size_t k = 0; k < siz*siz; k+=siz+1 )
         dia += mat[k] * mat[k];
 
     return sqrt( ( all - dia ) / dia );
@@ -615,9 +615,9 @@ real off_diagonal_norm(int siz, real * mat)
 
 
 /// set all values between '-val' and 'val' to zero
-void threshold_matrix(int siz, real * mat, real val)
+void threshold_matrix(size_t siz, real * mat, real val)
 {
-    for ( int k = 0; k < siz*siz; ++k )
+    for ( size_t k = 0; k < siz*siz; ++k )
     {
         if ( fabs(mat[k]) < val )
             mat[k] = 0.0;
@@ -626,22 +626,22 @@ void threshold_matrix(int siz, real * mat, real val)
 
 
 /// set 'mat' of order `siz` to `diag * I`
-void diagonal_matrix(int siz, real * mat, real val)
+void diagonal_matrix(size_t siz, real * mat, real val)
 {
-    for ( int k = 0; k < siz*siz; ++k )
+    for ( size_t k = 0; k < siz*siz; ++k )
         mat[k] = 0.0;
-    for ( int k = 0; k < siz*siz; k+=siz+1 )
+    for ( size_t k = 0; k < siz*siz; k+=siz+1 )
         mat[k] = val;
 }
 
 
 /// erase all off-diagonal terms in `mat` of order `siz`
-void make_diagonal(int siz, real * mat)
+void make_diagonal(size_t siz, real * mat)
 {
-    for ( int j = 0; j < siz; ++j )
+    for ( size_t j = 0; j < siz; ++j )
     {
         real * col = mat + j * siz;
-        int i;
+        size_t i;
         for ( i = 0; i < j; ++i )
             col[i] = 0.0;
         for ( i = j+1; i < siz; ++i )
@@ -714,9 +714,9 @@ void banded_matrix(int siz, real const* src, int kl, int ku, real * dst, int ldd
         int sup = add + std::min(siz-1, jj+kl);
 
         real * col = dst + ldd * jj;
-        for (int ii = 0; ii < inf; ++ii )
+        for ( int ii = 0; ii < inf; ++ii )
             col[ii] = 0.0;
-        for (int ii = sup+1; ii < ldd; ++ii )
+        for ( int ii = sup+1; ii < ldd; ++ii )
             col[ii] = 0.0;
     }
 #if ( 0 )
