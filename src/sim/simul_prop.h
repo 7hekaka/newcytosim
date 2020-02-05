@@ -26,7 +26,7 @@ Option normally OFF
 #define OLD_SPINDLE_FLUX 0
 
 /**
- @defgroup Parameters All object parameters
+ @defgroup Parameters All Object parameters
  List of parameters for user-accessible objects.
  */
 

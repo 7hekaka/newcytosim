@@ -49,7 +49,7 @@ Object * TubuleSet::newObject(const ObjectTag tag, unsigned num)
 
 
 /**
- @defgroup NewTubule How to create an Tubule
+ @defgroup NewTubule How to create a Tubule
  @ingroup NewObject
 
  Specify a new Tubule:
