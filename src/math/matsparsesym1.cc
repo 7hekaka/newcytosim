@@ -754,7 +754,7 @@ void MatrixSparseSymmetric1::vecMulAddIso2D(const real* X, real* Y, size_t jj,
                                             real const* dia, size_t start, size_t stop) const
 {    
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    assert_true( stop <= 2*size_ );
     real X0 = X[jj  ];
     real X1 = X[jj+1];
     real Y0 = Y[jj  ] + dia[0] * X0;
@@ -778,7 +778,7 @@ void MatrixSparseSymmetric1::vecMulAddIso3D(const real* X, real* Y, size_t jj,
                                             real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    assert_true( stop <= 3*size_ );
     real X0 = X[jj  ];
     real X1 = X[jj+1];
     real X2 = X[jj+2];
