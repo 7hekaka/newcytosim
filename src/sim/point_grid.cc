@@ -302,7 +302,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg.projectPoint0(bb.seg.pos2(), dis2);
     
-    if ( 0 <= abs  &&  dis2 < ran*ran  &&  abs <= aa.seg.len() )
+    if ( 0 <= abs  &  dis2 < ran*ran  &  abs <= aa.seg.len() )
     {
         /*
          bb.point2() projects inside segment 'aa'
@@ -392,8 +392,9 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     
     /* in 3D, we use shortestDistance() to calculate the closest distance
      between two segments, and use the result to build an interaction */
-    real a, b, d;
-    if ( aa.seg.shortestDistance(bb.seg, a, b, d)  &&  d < ran*ran )
+    real a, b;
+    real d = aa.seg.shortestDistance(bb.seg, a, b);
+    if ( d < ran*ran )
     {
         const real len = aa.radius + bb.radius;
         

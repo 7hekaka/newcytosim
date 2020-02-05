@@ -1109,7 +1109,6 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
     opt.set(details, "details");
     
     const real mds = up * up;
-    real abs1, abs2, dis;
     
     if ( details == 2 )
     {
@@ -1128,24 +1127,22 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                 FiberSegment seg1(fib, ii);
                 for ( size_t jj = 0; jj < fob->nbSegments(); ++jj )
                 {
+                    real abs1, abs2;
                     FiberSegment seg2(fob, jj);
-                    if ( seg1.shortestDistance(seg2, abs1, abs2, dis) )
+                    if ( seg1.shortestDistance(seg2, abs1, abs2) <= mds )
                     {
-                        if ( dis <= mds )
+                        ++cnt;
+                        Vector pos1 = seg1.pos(abs1/seg1.len());
+                        //Vector pos2 = loc2.pos(abs2/loc2.len());
+                        if ( details == 2 )
                         {
-                            ++cnt;
-                            Vector pos1 = seg1.pos(abs1/seg1.len());
-                            //Vector pos2 = loc2.pos(abs2/loc2.len());
-                            if ( details == 2 )
-                            {
-                                out << LIN << fib->identity();
-                                out << SEP << abs1 + seg1.abscissa1();
-                                out << SEP << fob->identity();
-                                out << SEP << abs2 + seg2.abscissa1();
-                                out << SEP << pos1;
-                            }
-                            accum.add(pos1);
+                            out << LIN << fib->identity();
+                            out << SEP << abs1 + seg1.abscissa1();
+                            out << SEP << fob->identity();
+                            out << SEP << abs2 + seg2.abscissa1();
+                            out << SEP << pos1;
                         }
+                        accum.add(pos1);
                     }
                 }
             }

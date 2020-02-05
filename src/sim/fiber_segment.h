@@ -99,8 +99,8 @@ public:
     /// faster projectionPoint, but incompatible with periodic boundary conditions
     real         projectPointF(const real[], real& dist) const;
 
-    /// calculates the closest distance between two segments
-    int          shortestDistance(FiberSegment const&, real& a, real& b, real& dis) const;
+    /// calculates the closest distance between two segments and set abscissa
+    real         shortestDistance(FiberSegment const&, real& a, real& b) const;
 
     /// Human friendly ouput
     void         print(std::ostream&) const;
