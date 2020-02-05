@@ -36,15 +36,13 @@ real FiberSegment::projectPoint0(Vector aw, real& dis) const
     // project with the scalar product:
     real abs = dot(aw, pos2()-A) / ls;
     
-    // calculate distance to projection that fall inside the segment
-    if ( 0 <= abs  &&  abs <= ls )
-    {
+    // calculate distance to projection
 #if ( DIM == 1 )
-        dis = 0;
+    dis = 0;
 #else
-        dis = aw.normSqr() - abs * abs;
+    dis = aw.normSqr() - abs * abs;
 #endif
-    }
+
     return abs;
 }
 

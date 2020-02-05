@@ -11,6 +11,7 @@ Interpolation::Interpolation(FiberSegment const& loc, real abs)
     pt1_  = loc.point();
     pt2_  = loc.point()+1;
     coef_ = abs / loc.len();
+    assert_true( 0 <= coef_ && coef_ <= 1 );
 }
 
 

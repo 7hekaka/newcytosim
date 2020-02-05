@@ -177,7 +177,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
     const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
     
     // get position of point with respect to segment:
-    real dis2;
+    real dis2 = INFINITY;
     real abs = bb.seg.projectPoint0(aa.pos, dis2);
     
     if ( 0 <= abs )
@@ -246,12 +246,11 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg.projectPoint0(bb.seg.pos1(), dis2);
     
-    if ( dis2 < ran*ran )
+    if (  0 <= abs  &&  dis2 < ran*ran  &&  abs <= aa.seg.len() )
     {
         /*
          bb.point1() projects inside segment 'aa'
          */
-        assert_true( 0 <= abs  &&  abs <= aa.seg.len() );
         const real len = aa.radius + bb.radius;
         Interpolation ai(aa.seg, abs);
         if ( dis2 > len*len )
@@ -323,12 +322,11 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg.projectPoint0(bb.seg.pos2(), dis2);
     
-    if ( dis2 < ran*ran )
+    if ( 0 <= abs  &&  dis2 < ran*ran  &&  abs <= aa.seg.len() )
     {
         /*
          bb.point2() projects inside segment 'aa'
          */
-        assert_true( 0 <= abs  &&  abs <= aa.seg.len() );
         const real len = aa.radius + bb.radius;
         Interpolation ai(aa.seg, abs);
         if ( dis2 > len*len )
