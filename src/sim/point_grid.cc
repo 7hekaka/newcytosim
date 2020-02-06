@@ -182,10 +182,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
         if ( abs <= bb.seg.len() )
         {
             if ( dis2 < len*len )
-            {
-                Interpolation bi(bb.seg, abs);
-                meca.addSideSlidingLink(bi, aa.pnt, len, pam.stiff_push);
-            }
+                meca.addSideSlidingLink(Interpolation(bb.seg, abs), aa.pnt, len, pam.stiff_push);
         }
         else
         {
@@ -238,9 +235,8 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
          bb.point1() projects inside segment 'aa'
          */
         const real len = aa.radius + bb.radius;
-        Interpolation ai(aa.seg, abs);
         real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
-        meca.addSideSlidingLink(ai, bb.seg.exact1(), len, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg, abs), bb.seg.exact1(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -310,9 +306,8 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          bb.point2() projects inside segment 'aa'
          */
         const real len = aa.radius + bb.radius;
-        Interpolation ai(aa.seg, abs);
         real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
-        meca.addSideSlidingLink(ai, bb.seg.exact2(), len, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg, abs), bb.seg.exact2(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -395,14 +390,8 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     if ( d < ran*ran )
     {
         const real len = aa.radius + bb.radius;
-        
-        Interpolation ai(aa.seg, a);
-        Interpolation bi(bb.seg, b);
-        
-        //std::clog << "steric distance " << d << "  " << ai << " " << bi <<"\n";
-
         real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
-        meca.addSideSlidingLink(ai, bi, len, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), len, stiff);
     }
     
 #endif
