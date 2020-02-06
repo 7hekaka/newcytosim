@@ -624,11 +624,11 @@ private:
             {
                 for ( size_t n = 0; n < nb; ++n )
                 {
-                    for ( size_t e = 0; e < d; ++e )
+                    for ( int e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
                     ccc[ORD*h+d] = s;
                     ++h;
-                    for ( size_t e = 0; e < d; ++e )
+                    for ( int e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
                     ccc[ORD*h+d] = -s;
                     ++h;
