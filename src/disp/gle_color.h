@@ -22,6 +22,24 @@
 /// Color with 4 components: red, green, blue, alpha (RGBA)
 class gle_color
 {
+#pragma mark - Static methods
+    
+    /// concatenate 4 bytes into an int
+    static uint32_t combine(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
+    {
+        const uint32_t K = 0xFF;
+        return (R&K) << 24 | (G&K) << 16 | (B&K) << 8 | (A&K);
+    }
+    
+    /// concatenate 4 bytes into an int
+    static uint32_t combine(GLfloat R, GLfloat G, GLfloat B, GLfloat A)
+    {
+        return combine(uint32_t(255*R), uint32_t(255*G), uint32_t(255*B), uint32_t(255*A));
+    }
+    
+    /// return value clamped to [0, 1]
+    static GLfloat clamp(GLfloat s) { return std::max(0.0f, std::min(s, 1.0f)); }
+
 private:
     
     /// 32-bits integer containing 4 one-byte components: red, green, blue, alpha
@@ -29,25 +47,11 @@ private:
     
     /// array of 4 float components, matching the `rgba_` integer
     GLfloat col_[4];
-    
+        
+#pragma mark - Private methods
+
     /// access to float components
     GLfloat& operator [] (int i) { return col_[i]; }
-
-    /// concatenate 4 bytes into an int
-    static uint32_t combine(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
-    {
-        const uint32_t K = 0xFF;
-        return (R&K) << 24 | (G&K) << 16 | (B&K) << 8 | (A&K);
-    }
-
-    /// concatenate 4 bytes into an int
-    static uint32_t combine(GLfloat R, GLfloat G, GLfloat B, GLfloat A)
-    {
-        return combine(uint32_t(255*R), uint32_t(255*G), uint32_t(255*B), uint32_t(255*A));
-    }
-
-    /// return value clamped to [0, 1]
-    static GLfloat clamp(GLfloat s) { return std::max(0.0f, std::min(s, 1.0f)); }
 
     /// update 'rgba_' to match values in 'col_'
     void update_rgba()
@@ -64,7 +68,7 @@ private:
         col_[3] = (float)( 0xFF & rgba_ ) / 255.f;
     }
     
-#pragma mark -
+#pragma mark - Public methods
 
 public:
     
@@ -138,6 +142,8 @@ public:
         rgba_ = u;
         update_float();
     }
+    
+#pragma mark - Constructors
 
     /// default constructor
     gle_color() : rgba_(0)
@@ -165,6 +171,8 @@ public:
     {
         set_float(r,g,b,a);
     }
+    
+#pragma mark - Public methods
 
     void operator = (const uint32_t& col)
     {

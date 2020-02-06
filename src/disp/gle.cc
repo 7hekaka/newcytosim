@@ -1912,7 +1912,7 @@ namespace gle
         gleVertex(a);
         gleVertex(b);
         glEnd();
-        glLineStipple(1, 0xFFFF);
+        glLineStipple(1, 0x5555);
         glBegin(GL_LINES);
         gleVertex(b);
         gleVertex(c);
