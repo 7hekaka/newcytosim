@@ -9,12 +9,6 @@
 
 extern Modulo const* modulo;
 
-
-inline real if_select(bool c, real a, real b)
-{
-    if ( c ) return a; else return b;
-}
-
 //------------------------------------------------------------------------------
 
 PointGrid::PointGrid()

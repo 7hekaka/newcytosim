@@ -3,7 +3,6 @@
 #include <cmath>
 #include "real.h"
 #include <cstdio>
-#include <algorithm>
 #include "assert_macro.h"
 
 /**

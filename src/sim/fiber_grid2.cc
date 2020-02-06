@@ -8,8 +8,6 @@
  */
 
 
-#include <algorithm>
-
 typedef std::vector <FiberSegment> SegmentVector;
 
 /// a list containing all segments, as a global variable

@@ -16,6 +16,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdint>
+#include <algorithm>
 #include <new>
 
 /**
@@ -42,14 +43,17 @@
 #endif
 
 
+//----------------------------ALLOCATION----------------------------------------
+
+
 /// return a number greater or equal to 's' that is a multiple of 4
-inline size_t chunk_real(size_t s)
+inline size_t chunk_real(size_t cnt)
 {
     // align to 4 doubles (of size 8 bytes), hence 32 bytes
     constexpr size_t chunk = 32 / sizeof(real);
     // return a multiple of chunk greater than 's'
     // this bit trickery works if chunk is a pure power of 2
-    return ( s + chunk - 1 ) & ~( chunk - 1 );
+    return ( cnt + chunk - 1 ) & ~( chunk - 1 );
 }
 
 /// check memory alignement of a pointer for AVX load/store
@@ -63,13 +67,13 @@ inline void check_alignment(void * ptr)
 
 /// allocate a new array to hold `size` real scalars
 /** The returned pointer is aligned to a 32 byte boundary */
-inline real* new_real(size_t size)
+inline real* new_real(size_t cnt)
 {
     void* ptr = nullptr;
     // we align to 4 doubles (of size 8 bytes), hence 32 bytes
-    if ( posix_memalign(&ptr, 32, size*sizeof(real)) )
+    if ( posix_memalign(&ptr, 32, cnt*sizeof(real)) )
         throw std::bad_alloc();
-    //printf("new_real(%lu)  %lu\n", size, ((uintptr_t)ptr&63));
+    //printf("new_real(%lu)  %lu\n", cnt, ((uintptr_t)ptr&63));
     return (real*)ptr;
 }
 
@@ -81,51 +85,53 @@ inline void free_real(void * ptr)
 }
 
 
-/// copy `size` real scalars from `src` to `dst`
-inline void copy_real(size_t size, real const* src, real * dst)
+/// copy `cnt` real scalars from `src` to `dst`
+inline void copy_real(size_t cnt, real const* src, real * dst)
 {
 #if ( 0 )
-    memcpy(dst, src, size*sizeof(real));
+    memcpy(dst, src, cnt*sizeof(real));
 #else
     //#pragma vector unaligned
-    for ( size_t u = 0; u < size; ++u )
+    for ( size_t u = 0; u < cnt; ++u )
         dst[u] = src[u];
 #endif
 }
 
 
-/// set `size` values of the array `ptr` to 0 (zero).
-inline void zero_real(size_t size, real * ptr)
+/// set `cnt` values of the array `ptr` to 0 (zero).
+inline void zero_real(size_t cnt, real * ptr)
 {
 #if ( 1 )
-    memset(ptr, 0, size*sizeof(real));
+    memset(ptr, 0, cnt*sizeof(real));
 #else
     #pragma ivdep
-    for ( size_t u = 0; u < size; ++u )
+    for ( size_t u = 0; u < cnt; ++u )
         ptr[u] = 0.0;
 #endif
 }
 
 
-/// print 'size' components of 'ptr' on a line
-inline void print_real(FILE* out, size_t size, real * ptr, const char end[])
-{
-    if ( !ptr || size == 0 )
-        fprintf(out, "void");
-    else
-    {
-        for ( size_t i = 0; i < size; ++i )
-            fprintf(out, " %9.4f", ptr[i]);
-        fprintf(out, "%s", end);
-    }
-}
-
+//---------------------------------HANDY----------------------------------------
 
 /// square of the argument: `x * x`
 inline real square(const real x) { return x * x; }
 
 /// cube of the argument: `x * x * x`
 inline real cube(const real x) { return x * x * x; }
+
+/// clamp value 'x' within [i, s]
+inline real clamp(const real x, const real i, const real s)
+{
+    return std::max(i, std::min(x, s));
+}
+
+/// return `a` if `c==true` and `b` otherwise
+inline real if_select(bool c, real a, real b)
+{
+    if ( c ) return a;
+    else return b;
+}
+
 
 #if ( 0 )
 
@@ -151,6 +157,23 @@ inline real abs(const real x) { return fabs(x); }
 inline real max(const real x, const real y) { return std::max(x, y); }
 
 #endif
+
+
+//--------------------------------INPUT/OUTPUT----------------------------------
+
+
+/// print 'cnt' components of 'ptr' on a line
+inline void print_real(FILE* out, size_t cnt, real * ptr, const char end[])
+{
+    if ( !ptr || cnt == 0 )
+        fprintf(out, "void");
+    else
+    {
+        for ( size_t i = 0; i < cnt; ++i )
+            fprintf(out, " %9.4f", ptr[i]);
+        fprintf(out, "%s", end);
+    }
+}
 
 
 #if ( 0 )
