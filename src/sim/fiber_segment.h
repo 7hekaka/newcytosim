@@ -68,7 +68,7 @@ public:
     /// that is pos2() - pos1()
     Vector       diff()        const { return fib_->diffPoints(pti_); }
 
-    /// that is normalize( pos2() - pos1() )
+    /// normalized tangent to Fiber
     Vector       dir()         const { return fib_->dirSegment(pti_); }
     
     /// Mecapoint corresponding to first point

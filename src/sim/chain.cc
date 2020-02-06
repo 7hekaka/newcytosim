@@ -1449,7 +1449,7 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
     real sca = dot(diffPoints(s), n);
     
     // if segment is parallel to plane, there is no intersection:
-    if ( -REAL_EPSILON < sca  &&  sca < REAL_EPSILON )
+    if ( std::abs(sca) < REAL_EPSILON )
         return INFINITY;
     
     Vector pos = posP(s);
