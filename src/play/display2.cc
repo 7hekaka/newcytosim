@@ -466,7 +466,7 @@ inline void drawVertex2(Vector const& pos, Fiber const* fib, PointDisp const* di
     }
 }
 
-inline void drawLink(Vector const& a, Fiber const* fib, PointDisp const* disp, Vector const& b)
+inline void drawLine(Vector const& a, Fiber const* fib, PointDisp const* disp, Vector const& b)
 {
     if ( disp->visible && fib->disp->visible )
     {
@@ -480,7 +480,7 @@ inline void drawLink(Vector const& a, Fiber const* fib, PointDisp const* disp, V
 
 /**
  */
-inline void drawLink(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
+inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
                      Vector const& b, const Fiber * fibB, const PointDisp* dispB)
 {
 #if ( 1 )
@@ -536,7 +536,7 @@ inline void drawVertex2(Vector const& pos, const Fiber * fib, const PointDisp* d
 }
 
 
-inline void drawLink(Vector const& a, const Fiber * fib, const PointDisp* disp, Vector const& b)
+inline void drawLine(Vector const& a, const Fiber * fib, const PointDisp* disp, Vector const& b)
 {
     if ( disp->perceptible && fib->disp->visible )
     {
@@ -547,7 +547,7 @@ inline void drawLink(Vector const& a, const Fiber * fib, const PointDisp* disp, 
     }
 }
 
-inline void drawLink(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
+inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
                      Vector const& b, const Fiber * fibB, const PointDisp* dispB)
 {
     if (   dispA->perceptible && dispB->perceptible
@@ -608,7 +608,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 Vector ph = obj->posHand();
                 Vector pf = obj->posFoot();
                 if ( modulo ) pf = modulo->image(pf, ph);
-                drawLink(ph, obj->fiber(), obj->disp(), pf);
+                drawLine(ph, obj->fiber(), obj->disp(), pf);
             }
         glEnd();
     }
@@ -743,7 +743,7 @@ void Display2::drawCouplesB(CoupleSet const& set) const
             Vector P = cx->posHand1();
             Vector Q = cx->posHand2();
             if ( modulo ) Q = modulo->image(Q, P);
-            drawLink(P, cx->fiber1(), cx->disp1(), Q, cx->fiber2(), cx->disp2());
+            drawLine(P, cx->fiber1(), cx->disp1(), Q, cx->fiber2(), cx->disp2());
         }
         glEnd();
     }
