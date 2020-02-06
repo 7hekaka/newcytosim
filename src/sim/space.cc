@@ -501,7 +501,7 @@ void Space::drawSection(const int dim, const real pos, const real step) const
     
     real xs = sup[xx];
     real ys = sup[yy];
-    real inc = step * ( xs > ys ? xs : ys );
+    real inc = step * std::max(xs, ys);
 
     glBegin(GL_LINE_LOOP);
     p[yy] = ys;
