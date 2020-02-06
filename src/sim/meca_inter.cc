@@ -2334,7 +2334,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), cross(arm, ptA.diff()), ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
 }
@@ -2557,7 +2557,7 @@ void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(ee1, ptA.diff()), cross(ee2, ptB.diff()), ptB.pos());
+        gle::drawLink(ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
     }
 #endif
     
@@ -2651,7 +2651,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(ee1, ptA.diff()), cross(ptB.diff(),ee2), ptB.pos());
+        gle::drawLink(ptA.pos(), cross(armA, ptA.dif()), cross(armB, ptB.dir()), ptB.pos());
     }
 #endif
 }
@@ -2745,7 +2745,7 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(armA*epsA, ptA.diff()), cross(armB*epsB, ptB.diff()), ptB.pos());
+        gle::drawLink(ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
     }
 #endif
 }
@@ -3321,7 +3321,7 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
     
 #else
     /*
-    // old version for steric interactions
+    // old version used before 2020 for steric interactions
     Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
     addSideSlidingLinkS(ptA, ptB, arm, weight);
     */
@@ -3433,14 +3433,14 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), cross(arm, ptA.diff()), ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
 }
 
 
 /**
- Alternative 2D method in which we add an offset to vBAS
+ Alternative old 2D method in which we add an offset to vBAS
  */
 void Meca::addSideSlidingLinkS(Interpolation const& ptA,
                                Interpolation const& ptB,
@@ -3542,21 +3542,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     
     if ( any_equal(ii0, ii1, ii2, ii3) )
         return;
-    
-    /*
-     Without tangential force, a 'long link' is in the perpendicular direction.
-     In the local reference frame, the matrix of interaction coefficients would be:
-     real T[9] = { 0, 0, 0, 0, -weight, 0, 0, 0, 0 };
-     we could transform it with a change-of-coordinates matrix R:
-     Vector a = ptA.dir();
-     Vector b = dir;
-     Vector c = cross(a, b);
-     real R[9] = { a.XX, a.YY, a.ZZ, b.XX, b.YY, b.ZZ, c.XX, c.YY, c.ZZ };
-     real TR[3*3];
-     blas::xgemm('N','T', 3, 3, 3, 1.0, T, 3, R, 3, 0.0, TR, 3);
-     blas::xgemm('N','N', 3, 3, 3, 1.0, R, 3, TR, 3, 0.0, T, 3);
-     equivalently, we can set directly the interaction coefficient matrix:
-     */
     
     // coefficients:
     const real cc0 =  ptA.coef0();
@@ -3706,7 +3691,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), cross(arm*eps, ptA.diff()), ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
 }
