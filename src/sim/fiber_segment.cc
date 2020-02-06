@@ -205,12 +205,21 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         real d1off = dot(d11, off) / scal;
         real d2off = dot(d22, off) / scal;
         
-        //abs1 = (( d1 / len1 - beta * d2 / len2 ) * d12 ) / scal;
+        //abs1 = dot(d11-beta*d22, off) / scal;
         abs1 = d1off - beta * d2off;
         
-        //abs2 = (( beta * d1 / len1 - d2 / len2 ) * d12 ) / scal;
+        //abs2 = dot(beta*d11-d22, off) / scal;
         abs2 = beta * d1off - d2off;
         
+#if 0
+        // check that identified line path is orthogonal to both segments:
+        Vector p1 = pos1() + abs1 * dir();
+        Vector p2 = seg.pos1() + abs2 * seg.dir();
+        real n1 = dot(d11, p2-p1);
+        real n2 = dot(d22, p2-p1);
+        printf("shortestDistance %+9.6f %+9.6f\n", n1, n2);
+#endif
+
         if ( abs1 < 0 | len1 <= abs1 | abs2 < 0 | len2 <= abs2 )
             return INFINITY;
         
@@ -226,25 +235,32 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
     {
         /*
          This deals with the case where the two segments are almost parallel:
-         beta = +/- 1
-         p1 = projection of seg.pos1() on this segment
-         p2 = projection of seg.pos2()
+         beta ~ +/- 1
+         m1 = projection of seg.pos1() on this segment
+         p1 = projection of seg.pos2()
          */
-        const real pp = dot(d11, off);
-        real p2 = pp + beta * len2;
+        const real d1off = dot(d11, off);
         
-        if (( pp < 0 & p2 < 0 ) | ( pp > len1 & p2 > len1 ))
+        real m1 = d1off;
+        real p1 = d1off + beta * len2;
+        
+        if (( m1 < 0 & p1 < 0 ) | ( m1 > len1 & p1 > len1 ))
             return INFINITY;
 
-        real p1 = std::max((real)0, std::min(len1, pp));
-        p2 = std::max((real)0, std::min(len1, p2));
+        // clamp inside segment and take mid-point:
+        abs1 = 0.5 * ( clamp(m1, 0, len1) + clamp(p1, 0, len1) );
+
+        real m2 = -dot(d22, off);
+        real p2 = m2 + beta * len1;
         
-        // take the midpoint:
-        abs1 = 0.5 * ( p1 + p2 );
-        //abs2 = abs1 * beta - ( d12 * d2 ) / len2;
-        abs2 = ( abs1 - pp ) * beta;
+        if (( m2 < 0 & p2 < 0 ) | ( m2 > len2 & p2 > len2 ))
+            return INFINITY;
+
+        // clamp inside segment and take mid-point:
+        abs2 = 0.5 * ( clamp(m2, 0, len2) + clamp(p2, 0, len2) );
         
-        return off.normSqr() - pp * pp;
+        // return distance between
+        return off.normSqr() - d1off * d1off;
     }
     
     return 1;
