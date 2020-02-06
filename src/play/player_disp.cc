@@ -259,9 +259,9 @@ void Player::displayCytosim()
         else
             mDisplay->display(simul);
 
-#if DRAW_MECA_LINKS
         if ( disp.draw_links )
         {
+#if DRAW_MECA_LINKS
             glPushAttrib(GL_LIGHTING_BIT);
             glDisable(GL_LIGHTING);
             glLineWidth(4);
@@ -271,11 +271,13 @@ void Player::displayCytosim()
             glDisable(GL_LINE_STIPPLE);
             glPopAttrib();
             gle::gleReportErrors(stderr, "Simul::drawLinks()");
-        }
+#else
+            std::cerr << "Cannot display Links since DRAW_MECA_LINKS was disabled\n";
 #endif
+        }
     }
     catch(Exception & e) {
-        std::cerr<<"Error in display: " << e.what() << std::endl;
+        std::cerr << "Error in display: " << e.what() << std::endl;
     }
 }
 
