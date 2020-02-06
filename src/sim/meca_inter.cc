@@ -2745,7 +2745,7 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        gle::drawLink(ptA.pos(), cross(ee1, ptA.diff()), cross(ptB.diff(),ee2), ptB.pos());
+        gle::drawLink(ptA.pos(), cross(armA*epsA, ptA.diff()), cross(armB*epsB, ptB.diff()), ptB.pos());
     }
 #endif
 }
@@ -3283,12 +3283,15 @@ Vector calculateArm(Vector off, Vector const& diff, real len)
     else
         return diff.orthogonal(len);
 }
+
 /**
  Link `ptA` (A) and `ptB` (B),
  This is a combination of a SideLink with a Sliding Link:
  The force is linear of zero resting length, but it is taken between B,
  and another point S located on the side of A:
- S = A + len * N,
+ 
+     S = A + len * N,
+ 
  where N is a normalized vector orthogonal to the fiber in A, in the direction of B.
  In addition, the tangential part of the force is removed.
  
@@ -3340,7 +3343,22 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
 
 #if ( DIM == 2 )
 
-
+/**
+ Link `ptA` (A) and `ptB` (B),
+ This is a combination of a SideLink with a Sliding Link:
+ The force is linear of zero resting length, but it is taken between B,
+ and another point S located on the side of A:
+ 
+     S = A + len * N,
+ 
+ where N is a normalized vector orthogonal to the fiber in A, in the direction of B.
+ In addition, the tangential part of the force is removed.
+ 
+ If T is the normalized direction of the fiber in A:
+ 
+     force_S = weight * ( 1 - T T' ) ( S - B )
+     force_B = weight * ( 1 - T T' ) ( B - S )
+*/
 void Meca::addSideSlidingLink2D(Interpolation const& ptA,
                                 Interpolation const& ptB,
                                 const real arm,
@@ -3601,6 +3619,22 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 
 #endif
 
+/**
+ Link `ptA` (A) and `ptB` (B),
+ This is a combination of a SideLink with a Sliding Link:
+ The force is linear of zero resting length, but it is taken between B,
+ and another point S located on the side of A:
+ 
+     S = A + len * N,
+ 
+ where N is a normalized vector orthogonal to the fiber in A, in the direction of B.
+ In addition, the tangential part of the force is removed.
+ 
+ If T is the normalized direction of the fiber in A:
+ 
+     force_S = weight * ( 1 - T T' ) ( S - B )
+     force_B = weight * ( 1 - T T' ) ( B - S )
+*/
 
 void Meca::addSideSlidingLink3D(Interpolation const& ptA,
                                 Interpolation const& ptB,
@@ -3672,7 +3706,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), arm, ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm*eps, ptA.diff()), ptB.pos());
     }
 #endif
 }
