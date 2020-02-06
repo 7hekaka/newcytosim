@@ -9,6 +9,12 @@
 
 extern Modulo const* modulo;
 
+
+inline real if_select(bool c, real a, real b)
+{
+    if ( c ) return a; else return b;
+}
+
 //------------------------------------------------------------------------------
 
 PointGrid::PointGrid()
@@ -233,10 +239,8 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
          */
         const real len = aa.radius + bb.radius;
         Interpolation ai(aa.seg, abs);
-        if ( dis2 > len*len )
-            meca.addSideSlidingLink(ai, bb.seg.exact1(), len, pam.stiff_pull);
-        else
-            meca.addSideSlidingLink(ai, bb.seg.exact1(), len, pam.stiff_push);
+        real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
+        meca.addSideSlidingLink(ai, bb.seg.exact1(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -275,10 +279,8 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
                 if ( d < ran*ran )
                 {
                     const real len = aa.radius + bb.radius;
-                    if ( d > len*len )
-                        meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), len, pam.stiff_pull);
-                    else
-                        meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), len, pam.stiff_push);
+                    real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+                    meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), len, stiff);
                 }
             }
         }
@@ -309,10 +311,8 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          */
         const real len = aa.radius + bb.radius;
         Interpolation ai(aa.seg, abs);
-        if ( dis2 > len*len )
-            meca.addSideSlidingLink(ai, bb.seg.exact2(), len, pam.stiff_pull);
-        else
-            meca.addSideSlidingLink(ai, bb.seg.exact2(), len, pam.stiff_push);
+        real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
+        meca.addSideSlidingLink(ai, bb.seg.exact2(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -340,10 +340,8 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
                 if ( d < ran*ran )
                 {
                     const real len = aa.radius + bb.radius;
-                    if ( d > len*len )
-                        meca.addLongLink(aa.seg.exact1(), bb.seg.exact2(), len, pam.stiff_pull);
-                    else
-                        meca.addLongLink(aa.seg.exact1(), bb.seg.exact2(), len, pam.stiff_push);
+                    real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+                    meca.addLongLink(aa.seg.exact1(), bb.seg.exact2(), len, stiff);
                 }
             }
         }
@@ -402,11 +400,9 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
         Interpolation bi(bb.seg, b);
         
         //std::clog << "steric distance " << d << "  " << ai << " " << bi <<"\n";
-        
-        if ( d > len*len )
-            meca.addSideSlidingLink(ai, bi, len, pam.stiff_pull);
-        else
-            meca.addSideSlidingLink(ai, bi, len, pam.stiff_push);
+
+        real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+        meca.addSideSlidingLink(ai, bi, len, stiff);
     }
     
 #endif
