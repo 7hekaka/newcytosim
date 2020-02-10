@@ -262,7 +262,6 @@ Object* ObjectSet::findObject(std::string spec, long num, const std::string& tit
                     break;
                 inv = inventory.next(inv);
             }
-            return static_cast<Object*>(inv);
         }
         else
         {
