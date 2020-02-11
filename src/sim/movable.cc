@@ -474,7 +474,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
             // Rotation is specified with 'turn'
             else if ( tok == "turn" )
             {
-                Rotation rot = readRotation(is, pos, spc);
+                Rotation rot = readOrientation(is, pos, spc);
                 pos = rot * pos;
             }
             // apply central symmetry with 'flip'
@@ -760,13 +760,117 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
  The initial orientation of objects is defined by a rotation, which can be
  specified as follows:
  
- Keyword                 | Rotation / Result                                        |
+ Keyword                 | Rotation / Result
  ------------------------|-----------------------------------------------------------
  `random`                | A rotation selected uniformly among all possible rotations
  `identity`              | The object is not rotated
+ `X theta`               | A rotation around axis 'X' of angle `theta` in radians
+ `Y theta`               | A rotation around axis 'Y' of angle `theta` in radians
+ `Z theta`               | A rotation around axis 'Z' of angle `theta` in radians
  `angle A B C`           | As specified by 3 (or 1 in 2D) Euler angles in radians
  `degree A B C`          | As specified by 3 (or 1 in 2D) Euler angles in degrees
  `quat q0 q1 q2 q3`      | As specified by the Quaternion (q0, q1, q2, q3)
+ 
+ In the last case, a rotation will be built that transforms (1, 0, 0) into the given vector,
+ after normalization. In 3D, this does not define the rotation uniquely (eg. `horizontal`),
+ and cytosim will randomly pick one of the possible rotations that fulfill the requirements,
+ with equal probability for all.
+*/
+
+Rotation Movable::readRotation(std::istream& is)
+{
+    std::streampos isp = is.tellg();
+    std::string tok = Tokenizer::get_symbol(is);
+    
+    if ( tok == "random" )
+        return Rotation::randomRotation();
+    else if ( tok == "identity" || tok == "off" || tok == "none" )
+        return Rotation::identity();
+    else if ( tok == "angle" || tok == "angles" )
+    {
+        real ang = 0;
+        is >> ang;
+#if ( DIM >= 3 )
+        Vector dir(0,0,1);
+        isp = is.tellg();
+        tok = Tokenizer::get_symbol(is);
+        if ( tok == "axis" )
+            is >> dir;
+        else
+        {
+            is.clear();
+            is.seekg(isp);
+        }
+        return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
+#else
+        return Rotation::rotation(cos(ang), sin(ang));
+#endif
+    }
+    else if ( tok == "degree" )
+    {
+        real ang = 0;
+        is >> ang;
+        ang *= M_PI/180.0;
+#if ( DIM >= 3 )
+        Vector dir(0,0,1);
+        if ( is.good() )
+        {
+            isp = is.tellg();
+            if ( Tokenizer::get_symbol(is) == "axis" )
+                is >> dir;
+            else
+                is.seekg(isp);
+        }
+        return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
+#else
+        return Rotation::rotation(cos(ang), sin(ang));
+#endif
+    }
+#if ( DIM >= 3 )
+    else if ( tok == "quat" )
+    {
+        Quaternion<real> quat;
+        is >> quat;
+        quat.normalize();
+        Rotation rot;
+        quat.setMatrix3(rot);
+        return rot;
+    }
+    else if ( tok == "X" )
+    {
+        real ang = 0.5 * M_PI;
+        is >> ang;
+        return Rotation::rotationAroundX(ang);
+    }
+    else if ( tok == "Y" )
+    {
+        real ang = 0.5 * M_PI;
+        is >> ang;
+        return Rotation::rotationAroundY(ang);
+    }
+    else if ( tok == "Z" )
+    {
+        real ang = 0.5 * M_PI;
+        is >> ang;
+        return Rotation::rotationAroundZ(ang);
+    }
+#endif
+    
+    // rewind before token:
+    is.clear();
+    is.seekg(isp);
+    throw InvalidSyntax("unexpected `"+tok+"' in rotation");
+    return Rotation::randomRotation();
+}
+
+
+/**
+ The initial orientation of objects is defined by a rotation, which can be
+ specified as follows:
+ 
+ Keyword                 | Rotation / Result
+ ------------------------|------------------------------------------------------
+ ROTATION                | see readRotation()
  DIRECTION               | see @ref Movable::readDirection
  DIRECTION or DIRECTION  | flip randomly between two specified directions
  
@@ -776,97 +880,12 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
  with equal probability for all.
 */
 
-Rotation Movable::readRotation(std::istream& is, Vector const& pos, Space const* spc)
+Rotation Movable::readOrientation(std::istream& is, Vector const& pos, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
-    
-    if ( c == EOF )
-        return Rotation::randomRotation();
 
-    std::streampos isp = is.tellg();
     if ( isalpha(c) )
-    {
-        std::string tok = Tokenizer::get_symbol(is);
-        
-        if ( tok == "random" )
-            return Rotation::randomRotation();
-        else if ( tok == "identity" || tok == "off" || tok == "none" )
-        {
-            return Rotation::identity();
-        }
-        else if ( tok == "angle" )
-        {
-            real ang = 0;
-            is >> ang;
-#if ( DIM >= 3 )
-            Vector dir(0,0,1);
-            isp = is.tellg();
-            tok = Tokenizer::get_symbol(is);
-            if ( tok == "axis" )
-                is >> dir;
-            else
-            {
-                is.clear();
-                is.seekg(isp);
-            }
-            return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
-#else
-            return Rotation::rotation(cos(ang), sin(ang));
-#endif
-        }
-        else if ( tok == "degree" )
-        {
-            real ang = 0;
-            is >> ang;
-            ang *= M_PI/180.0;
-#if ( DIM >= 3 )
-            Vector dir(0,0,1);
-            if ( is.good() )
-            {
-                isp = is.tellg();
-                if ( Tokenizer::get_symbol(is) == "axis" )
-                    is >> dir;
-                else
-                    is.seekg(isp);
-            }
-            return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
-#else
-            return Rotation::rotation(cos(ang), sin(ang));
-#endif
-        }
-#if ( DIM >= 3 )
-        else if ( tok == "quat" )
-        {
-            Quaternion<real> quat;
-            is >> quat;
-            quat.normalize();
-            Rotation rot;
-            quat.setMatrix3(rot);
-            return rot;
-        }
-        else if ( tok == "X" )
-        {
-            real ang = 0.5 * M_PI;
-            is >> ang;
-            return Rotation::rotationAroundX(ang);
-        }
-        else if ( tok == "Y" )
-        {
-            real ang = 0.5 * M_PI;
-            is >> ang;
-            return Rotation::rotationAroundY(ang);
-        }
-        else if ( tok == "Z" )
-        {
-            real ang = 0.5 * M_PI;
-            is >> ang;
-            return Rotation::rotationAroundZ(ang);
-        }
-#endif
-        
-        is.clear();
-        is.seekg(isp);
-    }
+        return readRotation(is);
 
     // The last option is to specity a direction:
     Vector vec = readDirection(is, pos, spc);
