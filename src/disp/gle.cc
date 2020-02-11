@@ -171,7 +171,7 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    void gleAlignX(const Vector2 & v)
+    void gleAlignX(Vector2 const& v)
     {
         const real n = v.norm();
         //warning! this matrix is displayed transposed
@@ -192,7 +192,7 @@ namespace gle
      such that the upper half overwrites it and become the only visible part.
      The display is thus correct even if DEPTH_TEST is disabled.
      */
-    void gleAlignZ(const Vector2 & A, const Vector2 & B)
+    void gleAlignZ(Vector2 const& A, Vector2 const& B)
     {
         Vector2 D = B - A;
         real n = D.inv_norm();
@@ -207,13 +207,13 @@ namespace gle
     
     
     /**
-     `ts` is the transverse scaling done in the XY plane after rotation
+     `R` is the transverse scaling done in the XY plane after rotation
      */
-    void gleAlignZ(const Vector2 & A, const Vector2 & B, real ts)
+    void gleAlignZ(Vector2 const& A, Vector2 const& B, real R)
     {
         Vector2 D = B - A;
-        real S = ts;
-        real n = ts / D.norm();
+        real S = R;
+        real n = R / D.norm();
         //warning! this matrix appears here transposed
         real mat[16] = {
             D.YY*n, -D.XX*n,  0,  0,
@@ -224,7 +224,7 @@ namespace gle
     }
     
     
-    void gleRotate(const Vector3 & v1, const Vector3 & v2, const Vector3 & v3, bool inverse)
+    void gleRotate(Vector3 const& v1, Vector3 const& v2, Vector3 const& v3, bool inverse)
     {
         real mat[16];
         for ( int ii = 0; ii < 3; ++ii )
@@ -249,8 +249,8 @@ namespace gle
     }
     
     
-    void gleTransRotate(const Vector3 & v1, const Vector3 & v2,
-                        const Vector3 & v3, const Vector3 & vt)
+    void gleTransRotate(Vector3 const& v1, Vector3 const& v2,
+                        Vector3 const& v3, Vector3 const& vt)
     {
         //warning! this matrix is displayed here transposed
         real mat[16] = {
@@ -262,7 +262,7 @@ namespace gle
     }
     
     // set rotation to align Z with 'dir' and translate to 'pos'
-    void gleTransAlignZ(const Vector3& A, Vector3 const& B, real R)
+    void gleTransAlignZ(Vector3 const& A, Vector3 const& B, float R)
     {
         float x = float(B.XX-A.XX);
         float y = float(B.YY-A.YY);
@@ -274,12 +274,12 @@ namespace gle
             0, 0, 0, 0,
             x, y, z, 0,
             float(A.XX), float(A.YY), float(A.ZZ), 1};
-        sMath::orthonormal(vec, mat, mat+4, (GLfloat)R);
+        sMath::orthonormal(vec, mat, mat+4, R);
         glMultMatrixf(mat);
     }
     
     // set rotation to align Z with 'dir' and scale S along `dir` and R orthogonally
-    void gleTransAlignZ(const Vector3& dir, Vector3 const& pos, real S, real R)
+    void gleTransAlignZ(Vector3 const& dir, Vector3 const& pos, float S, float R)
     {
         float x = float(dir.XX);
         float y = float(dir.YY);
@@ -292,7 +292,7 @@ namespace gle
             0, 0, 0, 0,
             X*vec[0], X*vec[1], X*vec[2], 0,
             float(pos.XX), float(pos.YY), float(pos.ZZ), 1};
-        sMath::orthonormal(vec, mat, mat+4, (GLfloat)R);
+        sMath::orthonormal(vec, mat, mat+4, R);
         glMultMatrixf(mat);
     }
 
@@ -348,7 +348,7 @@ namespace gle
         glVertex2f( 0,  1.0);
         glVertex2f(-H, -0.5);
         glVertex2f( H, -0.5);
-       glEnd();
+        glEnd();
     }
     
     //-----------------------------------------------------------------------
@@ -974,7 +974,7 @@ namespace gle
      The band is in the XY plane. The axis of the cylinder is Z.
      The band is made of triangles indicating the clockwise direction.
      */
-    void gleArrowedBand(const unsigned nb_triangles, real width)
+    void gleArrowedBand(const size_t nb_triangles, float width)
     {
         GLfloat A = (GLfloat)(2 * M_PI / nb_triangles);
         GLfloat W = (GLfloat)width * A * invsqrt(3.0f);
@@ -984,7 +984,7 @@ namespace gle
         glNormal3f(1, 0, 0);
         glVertex3f(1, 0, W);
         glVertex3f(1, 0,-W);
-        for ( unsigned ii = 1; ii < nb_triangles; ++ii )
+        for ( size_t ii = 1; ii < nb_triangles; ++ii )
         {
             GLfloat ang = ii * A;
             GLfloat c = R * cosf(ang);
@@ -1001,7 +1001,7 @@ namespace gle
     }
     
     
-    void gleThreeBands(const unsigned nb_triangles)
+    void gleThreeBands(const size_t nb_triangles)
     {
         gleArrowedBand(nb_triangles, 0.25);
         glRotated(-90,1,0,0);
@@ -1321,7 +1321,7 @@ namespace gle
     }
     
     
-    void gleObject( const real radius, void (*obj)() )
+    void gleObject(const real radius, void (*obj)())
     {
         glPushMatrix();
         gleScale(radius);
@@ -1329,16 +1329,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject( const Vector1 & x, const real radius, void (*obj)() )
-    {
-        glPushMatrix();
-        gleTranslate(x);
-        gleScale(radius);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject( const Vector2 & x, const real radius, void (*obj)() )
+    void gleObject(Vector1 const& x, const float radius, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
@@ -1347,7 +1338,16 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject( const Vector3 & x, const real radius, void (*obj)() )
+    void gleObject(Vector2 const& x, const float radius, void (*obj)())
+    {
+        glPushMatrix();
+        gleTranslate(x);
+        gleScale(radius);
+        obj();
+        glPopMatrix();
+    }
+    
+    void gleObject(Vector3 const& x, const float radius, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
@@ -1358,7 +1358,7 @@ namespace gle
     
     
     //-----------------------------------------------------------------------
-    void gleObject(const Vector1 & a, const Vector1 & b, void (*obj)())
+    void gleObject(Vector1 const& a, Vector1 const& b, void (*obj)())
     {
         glPushMatrix();
         if ( a.XX < b.XX )
@@ -1369,7 +1369,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject(const Vector2 & a, const Vector2 & b, void (*obj)())
+    void gleObject(Vector2 const& a, Vector2 const& b, void (*obj)())
     {
         glPushMatrix();
         gleAlignZ(a, b);
@@ -1377,7 +1377,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject(const Vector3 & a, const Vector3 & b, void (*obj)())
+    void gleObject(Vector3 const& a, Vector3 const& b, void (*obj)())
     {
         glPushMatrix();
         gleTransAlignZ(a, b, 1);
@@ -1387,7 +1387,7 @@ namespace gle
     
     
     //-----------------------------------------------------------------------
-    void gleObject(const Vector1 & x, const Vector1 & d, const real R, void (*obj)() )
+    void gleObject(Vector1 const& x, Vector1 const& d, const float R, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
@@ -1398,7 +1398,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject(const Vector2 & x, const Vector2 & d, const real R, void (*obj)() )
+    void gleObject(Vector2 const& x, Vector2 const& d, const float R, void (*obj)())
     {
         glPushMatrix();
         gleAlignZ(x, x+d.normalized(R), R);
@@ -1406,7 +1406,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject(const Vector3 & x, const Vector3 & d, const real R, void (*obj)() )
+    void gleObject(Vector3 const& x, Vector3 const& d, const float R, void (*obj)())
     {
         glPushMatrix();
         gleTransAlignZ(d, x, R, R);
@@ -1415,20 +1415,20 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    void gleObject(const Vector1 & x, const Vector1 & d, const real R,
-                   const real l, void (*obj)() )
+    void gleObject(Vector1 const& x, Vector1 const& d, const real R,
+                   const real L, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
         if ( d.XX < 0 )
             glRotated(90, 0, 0, 1);
-        gleScale(l,R,R);
+        gleScale(L,R,R);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(const Vector2 & x, const Vector2 & d, const real R,
-                   const real L, void (*obj)() )
+    void gleObject(Vector2 const& x, Vector2 const& d, const real R,
+                   const real L, void (*obj)())
     {
         glPushMatrix();
         gleAlignZ(x, x+d.normalized(L), R);
@@ -1436,7 +1436,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleObject(const Vector3 & x, const Vector3 & d, const real R,
+    void gleObject(Vector3 const& x, Vector3 const& d, const real R,
                    const real L, void (*obj)() )
     {
         glPushMatrix();
@@ -1449,37 +1449,37 @@ namespace gle
 #pragma mark - Tubes
     
     
-    void gleTube(const Vector1 & a, const Vector1 & b, real radius, void (*obj)())
+    void gleTube(Vector1 const& a, Vector1 const& b, float R, void (*obj)())
     {
         glPushMatrix();
         if ( a.XX < b.XX )
-            glRotated(  90, 0.0, 1.0, 0.0 );
+            glRotated( 90, 0.0, 1.0, 0.0);
         else
-            glRotated( -90, 0.0, 1.0, 0.0 );
-        gleScale(1,radius,1);
+            glRotated(-90, 0.0, 1.0, 0.0);
+        gleScale(1, R, 1);
         obj();
         glPopMatrix();
     }
     
-    void gleTube(const Vector2 & a, const Vector2 & b, real radius, void (*obj)())
+    void gleTube(Vector2 const& a, Vector2 const& b, real R, void (*obj)())
     {
         glPushMatrix();
-        gleAlignZ(a, b, radius);
+        gleAlignZ(a, b, R);
         obj();
         glPopMatrix();
     }
     
-    void gleTube(const Vector3 & a, const Vector3 & b, real radius, void (*obj)())
+    void gleTube(Vector3 const& a, Vector3 const& b, float R, void (*obj)())
     {
         glPushMatrix();
-        gleTransAlignZ(a, b, radius);
+        gleTransAlignZ(a, b, R);
         obj();
         glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
     
-    void gleBand(const Vector2 & a, const Vector2 & b, real rad)
+    void gleBand(Vector2 const& a, Vector2 const& b, real rad)
     {
         Vector2 d = ( b - a ).orthogonal();
         real n = d.norm();
@@ -1496,8 +1496,8 @@ namespace gle
     }
     
     
-    void gleBand(const Vector1 & a, real ra,
-                 const Vector1 & b, real rb)
+    void gleBand(Vector1 const& a, real ra,
+                 Vector1 const& b, real rb)
     {
         glBegin(GL_TRIANGLE_STRIP);
         gleVertex(a.XX,+ra);
@@ -1507,8 +1507,8 @@ namespace gle
         glEnd();
     }
     
-    void gleBand(const Vector2 & a, real ra,
-                 const Vector2 & b, real rb)
+    void gleBand(Vector2 const& a, real ra,
+                 Vector2 const& b, real rb)
     {
         Vector2 d = ( b - a ).orthogonal();
         real n = d.norm();
@@ -1524,8 +1524,8 @@ namespace gle
         }
     }
     
-    void gleBand(const Vector1 & a, real ra, gle_color ca,
-                 const Vector1 & b, real rb, gle_color cb)
+    void gleBand(Vector1 const& a, real ra, gle_color ca,
+                 Vector1 const& b, real rb, gle_color cb)
     {
         glBegin(GL_TRIANGLE_STRIP);
         ca.load();
@@ -1537,8 +1537,8 @@ namespace gle
         glEnd();
     }
     
-    void gleBand(const Vector2 & a, real ra, gle_color ca,
-                 const Vector2 & b, real rb, gle_color cb)
+    void gleBand(Vector2 const& a, real ra, gle_color ca,
+                 Vector2 const& b, real rb, gle_color cb)
     {
         Vector2 d = ( b - a ).orthogonal();
         real n = d.norm();
@@ -1665,7 +1665,7 @@ namespace gle
      Two hexagons linked by a rectangle
      hexagons have the same surface as a disc of radius 1.
      */
-    void gleDumbbell(const Vector2 & a, const Vector2 & b, GLfloat diameter)
+    void gleDumbbell(Vector2 const& a, Vector2 const& b, GLfloat diameter)
     {
         const GLfloat S = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
         const GLfloat R = diameter * S;
@@ -1717,7 +1717,7 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - Arrows
     
-    void gleCone(const Vector1& pos, const Vector1 & dir, const real scale)
+    void gleCone(Vector1 const& pos, Vector1 const& dir, const real scale)
     {
         real dx = scale*dir.XX, cx = pos.XX;
         glBegin(GL_TRIANGLE_STRIP);
@@ -1728,7 +1728,7 @@ namespace gle
         glEnd();
     }
     
-    void gleCone(const Vector2& pos, const Vector2 & dir, const real scale)
+    void gleCone(Vector2 const& pos, Vector2 const& dir, const real scale)
     {
         real dx = scale*dir.XX,  cx = pos.XX;
         real dy = scale*dir.YY,  cy = pos.YY;
@@ -1740,7 +1740,7 @@ namespace gle
         glEnd();
     }
     
-    void gleCone(const Vector3 & pos, const Vector3 & dir, const real scale)
+    void gleCone(Vector3 const& pos, Vector3 const& dir, const real scale)
     {
         glPushMatrix();
         gleTransAlignZ(dir, pos, scale, scale);
@@ -1750,7 +1750,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    void gleCylinder(const Vector1 & pos, const Vector1 & dir, const real scale)
+    void gleCylinder(Vector1 const& pos, Vector1 const& dir, const real scale)
     {
         real cx = pos.XX;
         glBegin(GL_TRIANGLE_STRIP);
@@ -1762,7 +1762,7 @@ namespace gle
         glEnd();
     }
     
-    void gleCylinder(const Vector2 & pos, const Vector2 & dir, const real scale)
+    void gleCylinder(Vector2 const& pos, Vector2 const& dir, const real scale)
     {
         real dx = scale * dir.XX, cx = pos.XX - dx / 2;
         real dy = scale * dir.YY, cy = pos.YY - dy / 2;
@@ -1774,7 +1774,7 @@ namespace gle
         glEnd();
     }
     
-    void gleCylinder(const Vector3 & pos, const Vector3 & dir, const real scale)
+    void gleCylinder(Vector3 const& pos, Vector3 const& dir, const real scale)
     {
         glPushMatrix();
         //build the rotation matrix, assuming dir is normalized
@@ -1786,7 +1786,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    void gleArrowTail(const Vector1& pos, const Vector1 & dir, const real scale)
+    void gleArrowTail(Vector1 const& pos, Vector1 const& dir, const real scale)
     {
         GLfloat dx = scale * dir.XX;
         GLfloat cx = pos.XX - dx / 2;
@@ -1800,7 +1800,7 @@ namespace gle
         glEnd();
     }
     
-    void gleArrowTail(const Vector2& pos, const Vector2 & dir, const real scale)
+    void gleArrowTail(Vector2 const& pos, Vector2 const& dir, const real scale)
     {
         GLfloat dx = scale * dir.XX;
         GLfloat dy = scale * dir.YY;
@@ -1819,7 +1819,7 @@ namespace gle
         glEnd();
     }
     
-    void gleArrowTail(const Vector3& pos, const Vector3 & dir, const real scale)
+    void gleArrowTail(Vector3 const& pos, Vector3 const& dir, const real scale)
     {
         glPushMatrix();
         //assuming dir is normalized
@@ -1829,7 +1829,7 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    void gleArrow(const Vector1 & a, const Vector1 & b, real radius)
+    void gleArrow(Vector1 const& a, Vector1 const& b, float radius)
     {
         glPushMatrix();
         if ( a.XX < b.XX )
@@ -1844,7 +1844,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleArrow(const Vector2 & a, const Vector2 & b, real radius)
+    void gleArrow(Vector2 const& a, Vector2 const& b, float radius)
     {
         glPushMatrix();
         gleAlignZ(a, b, radius);
@@ -1855,7 +1855,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleArrow(const Vector3 & a, const Vector3 & b, real radius)
+    void gleArrow(Vector3 const& a, Vector3 const& b, float radius)
     {
         glPushMatrix();
         gleTransAlignZ(a, b, radius);
@@ -2035,7 +2035,7 @@ namespace gle
     /**
      set the current raster position to `w`
      */
-    void gleDrawText(const Vector3& vec, const char text[], void* font)
+    void gleDrawText(Vector3 const& vec, const char text[], void* font)
     {
         glPushAttrib(GL_CURRENT_BIT|GL_ENABLE_BIT);
         glDisable(GL_DEPTH_TEST);
@@ -2049,12 +2049,12 @@ namespace gle
         glPopAttrib();
     }
     
-    void gleDrawText(const Vector2& w, const char text[], void* font)
+    void gleDrawText(Vector2 const& w, const char text[], void* font)
     {
         gleDrawText(Vector3(w.XX, w.YY, 0), text, font);
     }
     
-    void gleDrawText(const Vector1& w, const char text[], void* font)
+    void gleDrawText(Vector1 const& w, const char text[], void* font)
     {
         gleDrawText(Vector3(w.XX, 0, 0), text, font);
     }

@@ -122,15 +122,15 @@ namespace gle
     /// translate by A, then rotate to align Z with AB (which is in the XY-plane)
     void gleAlignZ(Vector2 const& A, Vector2 const& B);
     /// translate by A, then rotate to align Z with AB, Z replaces X. The X-Y plane is scaled by ts
-    void gleAlignZ(Vector2 const& A, Vector2 const& B, real ts);
+    void gleAlignZ(Vector2 const& A, Vector2 const& B, real R);
     ///  align the view to the three orthogonal vectors given
     void gleRotate(Vector3 const& v1, Vector3 const& v2, Vector3 const& v3, bool inverse=false);
     /// translate by T, then rotate to align X with v1, Y with v2 and Z with v3
     void gleTransRotate(Vector3 const& v1, Vector3 const& v2, Vector3 const& v3, Vector3 const& T);
     /// translate by T, then rotate to align Z with dir
-    void gleTransAlignZ(Vector3 const& A, Vector3 const& B, real radius);
+    void gleTransAlignZ(Vector3 const& A, Vector3 const& B, float radius);
     /// translate by T, then rotate to align Z with dir, scaling X and Y by radis
-    void gleTransAlignZ(Vector3 const& dir, Vector3 const& pos, real scale, real radius);
+    void gleTransAlignZ(Vector3 const& dir, Vector3 const& pos, float scale, float radius);
 
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
@@ -215,9 +215,9 @@ namespace gle
     void gleArrowTail1();
 
     /// draw a circular band composed of little triangles
-    void gleArrowedBand(unsigned nb_triangles, real width);
+    void gleArrowedBand(size_t nb_triangles, float width);
     /// draw 3 Arrowed Bands defining 8 quadrants on the sphere of radius 1
-    void gleThreeBands(unsigned nb_triangles);
+    void gleThreeBands(size_t nb_triangles);
     
     /// a rectangle ( rect = [ left, bottom, right, top ] )
     void gleRectangle(const int rect[4]);
@@ -262,14 +262,14 @@ namespace gle
     void gleObject(real radius, void (*obj)());
     
     /// draw 'obj' scaled by radius at position 'x'
-    void gleObject(Vector1 const& x, real radius, void (*obj)());
-    void gleObject(Vector2 const& x, real radius, void (*obj)());
-    void gleObject(Vector3 const& x, real radius, void (*obj)());
+    void gleObject(Vector1 const& x, float radius, void (*obj)());
+    void gleObject(Vector2 const& x, float radius, void (*obj)());
+    void gleObject(Vector3 const& x, float radius, void (*obj)());
  
     /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& x, Vector1 const& d, real radius, void (*obj)());
-    void gleObject(Vector2 const& x, Vector2 const& d, real radius, void (*obj)());
-    void gleObject(Vector3 const& x, Vector3 const& d, real radius, void (*obj)());
+    void gleObject(Vector1 const& x, Vector1 const& d, float radius, void (*obj)());
+    void gleObject(Vector2 const& x, Vector2 const& d, float radius, void (*obj)());
+    void gleObject(Vector3 const& x, Vector3 const& d, float radius, void (*obj)());
 
     /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
     void gleObject(Vector1 const& a, Vector1 const& b, void (*obj)());
@@ -284,9 +284,9 @@ namespace gle
     //------------------------------------------------------------------------------
 
     /// draw 'obj' with its ends at [a,b], of specified radius
-    void gleTube(Vector1 const& a, Vector1 const& b, real radius, void (*obj)()=gleTube1B);
+    void gleTube(Vector1 const& a, Vector1 const& b, float radius, void (*obj)()=gleTube1B);
     void gleTube(Vector2 const& a, Vector2 const& b, real radius, void (*obj)()=gleTube1B);
-    void gleTube(Vector3 const& a, Vector3 const& b, real radius, void (*obj)()=gleTube1B);
+    void gleTube(Vector3 const& a, Vector3 const& b, float radius, void (*obj)()=gleTube1B);
     
     /// draw a band from A to B, with specified radius
     void gleBand(Vector2 const& a, Vector2 const& b, real);
@@ -335,9 +335,9 @@ namespace gle
     void gleArrowTail(Vector3 const& center, Vector3 const& dir, real scale);
 
     /// draw an arrow with ends [a,b], of specified radius
-    void gleArrow(Vector1 const& a, Vector1 const& b, real radius);
-    void gleArrow(Vector2 const& a, Vector2 const& b, real radius);
-    void gleArrow(Vector3 const& a, Vector3 const& b, real radius);
+    void gleArrow(Vector1 const& a, Vector1 const& b, float radius);
+    void gleArrow(Vector2 const& a, Vector2 const& b, float radius);
+    void gleArrow(Vector3 const& a, Vector3 const& b, float radius);
     
     /// Display link between 2 positions
     void drawLink(Vector const& a, Vector const& b);
