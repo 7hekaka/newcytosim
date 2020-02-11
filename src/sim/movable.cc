@@ -757,8 +757,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
 
 
 /**
- The initial orientation of objects is defined by a rotation, which can be
- specified as follows:
+ A rotation can be specified as follows:
  
  Keyword                 | Rotation / Result
  ------------------------|-----------------------------------------------------------
@@ -770,11 +769,6 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
  `angle A B C`           | As specified by 3 (or 1 in 2D) Euler angles in radians
  `degree A B C`          | As specified by 3 (or 1 in 2D) Euler angles in degrees
  `quat q0 q1 q2 q3`      | As specified by the Quaternion (q0, q1, q2, q3)
- 
- In the last case, a rotation will be built that transforms (1, 0, 0) into the given vector,
- after normalization. In 3D, this does not define the rotation uniquely (eg. `horizontal`),
- and cytosim will randomly pick one of the possible rotations that fulfill the requirements,
- with equal probability for all.
 */
 
 Rotation Movable::readRotation(std::istream& is)
@@ -865,19 +859,19 @@ Rotation Movable::readRotation(std::istream& is)
 
 
 /**
- The initial orientation of objects is defined by a rotation, which can be
- specified as follows:
+ The initial orientation of objects is defined by a rotation, but it is usually
+ sufficient to specify a unit vector:
  
  Keyword                 | Rotation / Result
  ------------------------|------------------------------------------------------
- ROTATION                | see readRotation()
+ ROTATION                | see @ref Movable::readRotation()
  DIRECTION               | see @ref Movable::readDirection
  DIRECTION or DIRECTION  | flip randomly between two specified directions
  
- In the last case, a rotation will be built that transforms (1, 0, 0) into the given vector,
- after normalization. In 3D, this does not define the rotation uniquely (eg. `horizontal`),
- and cytosim will randomly pick one of the possible rotations that fulfill the requirements,
- with equal probability for all.
+ When a DIRECTION is specified, a rotation will be built that transforms (1, 0, 0)
+ into the given vector (after normalization). In 3D, this does not define a rotation
+ uniquely, and cytosim will randomly pick one of the possible rotations, with equal
+ probability among all the possible rotation, by rotating around (1, 0, 0) beforehand.
 */
 
 Rotation Movable::readOrientation(std::istream& is, Vector const& pos, Space const* spc)
@@ -887,7 +881,7 @@ Rotation Movable::readOrientation(std::istream& is, Vector const& pos, Space con
     if ( isalpha(c) )
         return readRotation(is);
 
-    // The last option is to specity a direction:
+    // normally a unit vector is specified:
     Vector vec = readDirection(is, pos, spc);
     
     /*
