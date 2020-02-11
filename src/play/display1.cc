@@ -546,8 +546,8 @@ void Display1::drawCoupleB(Couple const* cx) const
         {
 #if ( DIM == 2 )
             //gleBand(p1, pd1->width*sFactor, pd1->color, p2, pd2->width*sFactor, pd2->color);
-            gleMan(p1, ( pd1->width * sFactor ) * cx->dirFiber1(), pd1->color,
-                   p2, ( pd2->width * sFactor ) * cx->dirFiber2(), pd2->color);
+            gleMan(p1, (pd1->width*sFactor) * cx->dirFiber1(), pd1->color,
+                   p2, (pd2->width*sFactor) * cx->dirFiber2(), pd2->color);
 #else
             lineWidth(pd1->width);
             glBegin(GL_LINES);

@@ -73,8 +73,8 @@ void Display3::drawSimul(Simul const& sim)
          If the display is 'cut', we might see the inner sides,
          but rendering would be faster with Culling enabled
         */
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+        //glEnable(GL_CULL_FACE);
+        //glCullFace(GL_BACK);
         drawFibers(sim.fibers);
     }
     
@@ -116,7 +116,7 @@ void Display3::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display3::drawBall(Vector const& pos, real radius) const
+void Display3::drawBall(Vector const& pos, float radius) const
 {
     glEnable(GL_CULL_FACE);
     assert_true(glIsEnabled(GL_LIGHTING));
@@ -127,6 +127,16 @@ void Display3::drawBall(Vector const& pos, real radius) const
     gleSphere2B();
     glCullFace(GL_BACK);
     gleSphere4B();
+    glPopMatrix();
+}
+
+
+void Display3::drawPoint(Vector const& pos, float size) const
+{
+    glPushMatrix();
+    gleTranslate(pos);
+    gleScale(size*sFactor);
+    gleSphere2B();
     glPopMatrix();
 }
 
@@ -276,7 +286,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
         set_color(fib, inx, fac);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         gleTube(old, pos, rad, gleLongTube2B);
-        // draw a circle to obturate the tube
+        // draw a circle to close the tube:
         //gleObject(0.5*(old+pos), normalize(pos-old), rad, gleDiscB);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
         abs += inc;
@@ -1124,8 +1134,13 @@ void Display3::drawCoupleB(Couple const* cx) const
             drawPoint(p2, pd2);
 #if FIBER_HAS_FAMILY
             // accurate rendering of Couple's composite link
-            drawPoint(cx->sidePos1(), pd1);
-            drawPoint(cx->sidePos2(), pd2);
+            Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
+            drawPoint(mid, pd1->width);
+            gleTube(p2, mid, pd2->width*sFactor, gleHexTube1B);
+            gleTube(p1, mid, pd1->width*sFactor, gleHexTube1B);
+#elif ( 0 )
+            drawPoint(cx->sidePos1(), pd1->width);
+            drawPoint(cx->sidePos2(), pd1->width);
             gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gleHexTube1B);
             gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gleHexTube1B);
             gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gleHexTube1B);

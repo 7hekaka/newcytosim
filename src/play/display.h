@@ -105,13 +105,13 @@ private:
 protected:
     
     /// the pixel size for this particular display
-    real           pixelSize;
+    float          pixelSize;
     
     /// scaling factors to convert 'size' parameter into pixels used in glPointSize() and glLineWidth()
-    real           uFactor;
+    float          uFactor;
     
     /// scaling factors to convert 'size' parameter into real dimensions used in glScale()
-    real           sFactor;
+    float          sFactor;
     
     
     /// flag used to calculate clusterAnalysis only once

@@ -20,10 +20,13 @@ class Display3 : public Display
 private:
     
     /// draw a fine spherical object
-    void drawBall(Vector const&, real radius) const;
+    void drawBall(Vector const&, float radius) const;
 
     /// draw a point with a small sphere
     void drawPoint(Vector const&, PointDisp const*) const;
+    
+    /// draw a point with a small sphere
+    void drawPoint(Vector const&, float) const;
 
     /// draw a point with a small sphere
     inline void drawHand(Vector const& p, PointDisp const* d) const { d->color.load_both(); drawPoint(p, d); }
