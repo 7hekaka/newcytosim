@@ -82,7 +82,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         F *= tube_radius;
     }
     // adjust protofilaments to form a tube:
-    real a = M_PI * RNG.sreal();
+    real a = 0; //M_PI * RNG.sreal();
     real da = 2 * M_PI / NFIL;
     for ( size_t i = 0; i < NFIL; ++i )
     {
