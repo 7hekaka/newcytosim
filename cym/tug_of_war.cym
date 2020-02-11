@@ -28,15 +28,15 @@ set fiber microtubule
 
 new microtubule
 {
-    position = ( 2 0 0 )
-    orientation = ( 1 0 0 )
+    position = 2 0 0
+    orientation = 1 0 0
     length = 4
 }
 
 new microtubule
 {
-    position = ( -2 0 0 )
-    orientation = ( -1 0 0 )
+    position = -2 0 0
+    orientation = -1 0 0
     length = 4
 }
 

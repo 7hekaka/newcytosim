@@ -50,21 +50,23 @@ set couple complex
 new filament
 {
     position = 0 -0.5 0
-    orientation = 1 0 0, degree 0
+    orientation = off
     length = 3
 }
 
 new filament
 {
     position = 0 -0.5 0
-    orientation = 1 0 0, degree -120
+    orientation = off
+    rotation = -120 degree, 0 0 1
     length = 3
 }
 
 new filament
 {
     position =  0 -0.5 0
-    orientation = 1 0 0, degree 120
+    orientation = off
+    rotation = 120 degree, 0 0 1
     length = 3
 }
 
