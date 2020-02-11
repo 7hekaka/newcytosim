@@ -211,11 +211,11 @@ size_t Glossary::nb_values(key_type const& k) const
 }
 
 
-bool Glossary::has_value(key_type const& key, size_t indx) const
+bool Glossary::has_value(key_type const& key, size_t inx) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
-        return indx < w->second.size();
+        return inx < w->second.size();
     return false;
 }
 
@@ -250,7 +250,7 @@ std::string Glossary::value(key_type const& key, size_t inx) const
 
 
 /**
- This is equivalement to value(key, indx) == val, except
+ This is equivalement to value(key, inx) == val, except
  that the counter is incremented only if there is a match
  */
 bool Glossary::value_is(key_type const& key, size_t inx, std::string const& val) const
