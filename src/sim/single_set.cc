@@ -142,7 +142,7 @@ ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
     {
         Mecable * mec = simul.findMecable(str);
         if ( !mec )
-            throw InvalidParameter("Could not find Mecable specified in single:base");
+            throw InvalidParameter("could not find Mecable specified in single:base `"+str+"'");
         // get index of point in second argument
         size_t ip = 0;
         if ( opt.set(str, "base", 1) )

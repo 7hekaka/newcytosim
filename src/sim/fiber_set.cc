@@ -150,7 +150,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         if ( sip && cop )
             throw InvalidParameter("ambiguous fiber:attach single/couple `"+spe+"'");
         if ( !sip && !cop )
-            throw InvalidParameter("could not find fiber:attach single/couple `"+spe+"'");
+            throw InvalidParameter("could not find single/couple specified in fiber:attach `"+spe+"'");
         
         for ( size_t n = 0; n < cnt; ++n )
         {
@@ -543,7 +543,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
                     if ( p )
                         return randomSite(static_cast<FiberProp*>(p));
                 }
-                throw InvalidParameter("Could not find fiber specified for attachment");
+                throw InvalidParameter("could not find fiber specified for attachment `"+str+"'");
             }
             
             return FiberSite(fib, fib->someAbscissa(opt, key, 1.0));

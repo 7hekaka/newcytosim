@@ -153,7 +153,7 @@ CGLContextObj createOffscreenContext()
     
     if ( err || npix == 0 )
     {
-        fprintf(stderr, "Could not find suitable pixel format\n");
+        fprintf(stderr, "could not find suitable pixel format\n");
         return nullptr;
     }
     
