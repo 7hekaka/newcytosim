@@ -294,6 +294,16 @@ void Simul::solve()
 }
 
 
+void Simul::solve_half()
+{
+    //auto rdtsc = __rdtsc();
+    setInteractions(sMeca);
+    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    sMeca.solve(prop, prop->precondition);
+    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+}
+
+
 /**
  Solve the system, and automatically select the fastest preconditionning method
  */

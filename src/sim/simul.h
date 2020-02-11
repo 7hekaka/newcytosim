@@ -190,6 +190,9 @@ public:
     /// do nothing
     void            solve_not() {};
     
+    /// calculate forces but do not apply movements
+    void            solve_half();
+
     /// calculate the motion of objects, but only in the X-direction
     void            solveX();
     

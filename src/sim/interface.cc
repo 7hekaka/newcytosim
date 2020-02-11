@@ -783,7 +783,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         simul.events.add(event);
     }
 #endif
-    opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",3}, {"flux",4}});
+    opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",4}, {"flux",5}, {"half",7}});
     
     // setting a pointer to the 'solve' function
     void (Simul::* solveFunc)() = &Simul::solve_not;
@@ -793,6 +793,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         case 2: solveFunc = &Simul::solve_auto; break;
         case 3: solveFunc = &Simul::solveX;     break;
         case 4: solveFunc = &Simul::solve_flux; break;
+        case 7: solveFunc = &Simul::solve_half; break;
     }
 
     opt.set(prune,     "prune");
