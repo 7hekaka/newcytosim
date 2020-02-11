@@ -180,7 +180,7 @@ Fiber::Fiber(FiberProp const* p)
 /*
 This defines the position of the display centerline
 */
-Vector Fiber::displayPos(real ab) const
+Vector Fiber::displayPosM(real ab) const
 {
     Vector I = family_->posM(ab);
     Vector O = posM(ab);
@@ -189,6 +189,7 @@ Vector Fiber::displayPos(real ab) const
 
 Vector Fiber::radialDir(real ab) const
 {
+    ab -= abscissaM();
     return posM(ab) - family_->posM(ab);
 }
 

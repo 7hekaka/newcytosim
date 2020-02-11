@@ -254,8 +254,8 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
                                     real fac, real facM, real facP) const
 {
     // start at MINUS_END
-    Vector pos = fib.displayPos(abs), old;
-    Vector nxt = fib.displayPos(abs+inc);
+    Vector pos = fib.displayPosM(abs), old;
+    Vector nxt = fib.displayPosM(abs+inc);
     Vector dir = fib.dirEndM();
 
     set_color(fib, inx, facM);
@@ -271,7 +271,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
     {
         old = pos;
         pos = nxt;
-        nxt = fib.displayPos(abs+2*inc);
+        nxt = fib.displayPosM(abs+2*inc);
         dir = normalize(nxt-old);
         set_color(fib, inx, fac);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
@@ -295,7 +295,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
     for ( ; inx < last; ++inx )
     {
         pos = nxt;
-        nxt = fib.displayPos(abs+inc);
+        nxt = fib.displayPosM(abs+inc);
         set_color(fib, inx, fac);
         gleTube(pos, nxt, rad, gleTube2B);
         abs += inc;
@@ -314,8 +314,8 @@ void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad
                                 const real abs1, const real abs2) const
 {
     // draw MINUS_END
-    Vector pos = fib.displayPos(abs1);
-    Vector nxt = fib.displayPos(abs2);
+    Vector pos = fib.displayPosM(abs1);
+    Vector nxt = fib.displayPosM(abs2);
     Vector dir = normalize(nxt-pos);
 
     if ( capM )
