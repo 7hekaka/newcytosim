@@ -151,7 +151,7 @@ public:
     Fiber const*  brother_;
     
     /// position of a point specified by distance from the MINUS_END
-    Vector  displayPos(real a) const;
+    Vector  displayPosM(real a) const;
 
     /// radial direction at the specified abscissa
     Vector  radialDir(real a) const;
@@ -159,7 +159,7 @@ public:
 #else
     
     /// position of a point specified by distance from the MINUS_END
-    Vector  displayPos(real a) const { return posM(a); }
+    Vector  displayPosM(real a) const { return posM(a); }
 
 #endif
 
