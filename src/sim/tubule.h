@@ -29,8 +29,11 @@ private:
     static constexpr size_t FILM = NFIL+2;
     
     /// initial radius of tubule
-    /* defines the distance between the centerline of the protofilaments */
-    static constexpr real tube_radius = 0.0145;
+    /* defines the distance between the centerline of the protofilaments
+     This gives a diameter of 25+2nm, where the 2 represents the position
+     of the center of molecules that attach to the tubulin lattice
+     */
+    static constexpr real tube_radius = 0.0135;
 
     /// central backbone if present
     Fiber* bone_;
