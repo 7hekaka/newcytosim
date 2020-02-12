@@ -1006,20 +1006,20 @@ void Display::drawFiberPoints(Fiber const& fib) const
 }
 
 
-void set_lattice_color(Fiber const& fib, FiberLattice const& lat, real val)
+void set_lattice_color(Fiber const& fib, real uni, real val)
 {
     FiberDisp const*const disp = fib.prop->disp;
     disp->color.darken( val / disp->lattice_scale ).load();
 }
 
-void set_lattice_color(Fiber const& fib, FiberLattice const& lat, real val, real len)
+void set_lattice_color(Fiber const& fib, real uni, real val, real len)
 {
     FiberDisp const*const disp = fib.prop->disp;
     const gle_color col = disp->color;
 
     if ( disp->lattice_rescale )
         // use this if the lattice cells hold a quantity:
-        col.darken( val * len / ( lat.unit() * disp->lattice_scale )).load();
+        col.darken( val * len / ( uni * disp->lattice_scale )).load();
     else // use this if the lattice cells hold a concentration:
         col.darken( val / disp->lattice_scale ).load();
 }
@@ -1042,7 +1042,7 @@ void Display::drawFiberLattice1(Fiber const& fib, real width) const
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
-        set_lattice_color(fib, lat, lat.data(inf), len);
+        set_lattice_color(fib, uni, lat.data(inf), len);
         gle::gleVertex(fib.posEndM());
         gle::gleVertex(fib.posEndP());
     }
@@ -1051,21 +1051,21 @@ void Display::drawFiberLattice1(Fiber const& fib, real width) const
         // the terminal site may be truncated
         real len = lat.abscissa(inf+1) - fib.abscissaM();
         if ( len > 0 )
-            set_lattice_color(fib, lat, lat.data(inf), len);
+            set_lattice_color(fib, uni, lat.data(inf), len);
         gle::gleVertex(fib.posEndM());
         if ( uni*(inf+0.5) > fib.abscissaM() )
             gle::gleVertex(fib.pos(uni*(inf+0.5)));
         
         for ( auto h = inf+1; h < sup; ++h )
         {
-            set_lattice_color(fib, lat, lat.data(h));
+            set_lattice_color(fib, uni, lat.data(h));
             gle::gleVertex(fib.pos(uni*(h+0.5)));
         }
         
         // the terminal site may be truncated
         len = fib.abscissaP() - lat.abscissa(sup);
         if ( len > 0 )
-            set_lattice_color(fib, lat, lat.data(sup), len);
+            set_lattice_color(fib, uni, lat.data(sup), len);
         if ( uni*(sup+0.5) < fib.abscissaP() )
             gle::gleVertex(fib.pos(uni*(sup+0.5)));
         gle::gleVertex(fib.posEndP());
@@ -1092,7 +1092,7 @@ void Display::drawFiberLattice2(Fiber const& fib, real width) const
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
-        set_lattice_color(fib, lat, lat.data(inf), len);
+        set_lattice_color(fib, uni, lat.data(inf), len);
         gle::gleVertex(fib.posEndM());
         gle::gleVertex(fib.posEndP());
     }
@@ -1101,20 +1101,20 @@ void Display::drawFiberLattice2(Fiber const& fib, real width) const
         // the terminal site may be truncated
         real len = lat.abscissa(inf+1) - fib.abscissaM();
         if ( len > 0 )
-            set_lattice_color(fib, lat, lat.data(inf), len);
+            set_lattice_color(fib, uni, lat.data(inf), len);
         gle::gleVertex(fib.posEndM());
         
         for ( auto h = inf+1; h < sup; ++h )
         {
             gle::gleVertex(fib.pos(uni*h));
-            set_lattice_color(fib, lat, lat.data(h));
+            set_lattice_color(fib, uni, lat.data(h));
             gle::gleVertex(fib.pos(uni*h));
         }
         
         // the terminal site may be truncated
         len = fib.abscissaP() - lat.abscissa(sup);
         if ( len > 0 )
-            set_lattice_color(fib, lat, lat.data(sup), len);
+            set_lattice_color(fib, uni, lat.data(sup), len);
         gle::gleVertex(fib.pos(uni*sup));
         gle::gleVertex(fib.posEndP());
     }
