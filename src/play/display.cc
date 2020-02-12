@@ -1006,22 +1006,18 @@ void Display::drawFiberPoints(Fiber const& fib) const
 }
 
 
-void set_lattice_color(Fiber const& fib, real uni, real val)
+void set_lattice_color(Fiber const& fib, real val)
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    disp->color.darken( val / disp->lattice_scale ).load();
-}
-
-void set_lattice_color(Fiber const& fib, real uni, real val, real len)
-{
-    FiberDisp const*const disp = fib.prop->disp;
-    const gle_color col = disp->color;
-
-    if ( disp->lattice_rescale )
-        // use this if the lattice cells hold a quantity:
-        col.darken( val * len / ( uni * disp->lattice_scale )).load();
-    else // use this if the lattice cells hold a concentration:
-        col.darken( val / disp->lattice_scale ).load();
+    fib.prop->disp->color.darken(val).load();
+    /*
+       FiberDisp const*const disp = fib.prop->disp;
+       const gle_color col = disp->color;
+       if ( disp->lattice_rescale )
+           // use this if the lattice cells hold a quantity:
+           col.darken( val * len / ( uni * disp->lattice_scale )).load();
+       else // use this if the lattice cells hold a concentration:
+           col.darken( val / disp->lattice_scale ).load();
+    */
 }
 
 /**
@@ -1036,36 +1032,46 @@ void Display::drawFiberLattice1(Fiber const& fib, real width) const
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
+    FiberDisp const*const disp = fib.prop->disp;
+    const real fac = 1.0 / disp->lattice_scale;
+
     lineWidth(width);
     glBegin(GL_LINE_STRIP);
     if ( inf == sup )
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
-        set_lattice_color(fib, uni, lat.data(inf), len);
+        set_lattice_color(fib, (fac*lat.data(inf))*(uni/len));
         gle::gleVertex(fib.posEndM());
         gle::gleVertex(fib.posEndP());
     }
     else
     {
+        const real lenM = uni * (inf+1) - fib.abscissaM();  // should be positive!
+        const real lenP = fib.abscissaP() - uni * sup;      // should be positive!
+
+        real facM = fac;
+        real facP = fac;
+        if ( disp->lattice_rescale )
+        {
+            facM = ( lenM > 0.01*uni ? fac*uni/lenM : fac );
+            facP = ( lenP > 0.01*uni ? fac*uni/lenP : fac );
+        }
+
         // the terminal site may be truncated
-        real len = lat.abscissa(inf+1) - fib.abscissaM();
-        if ( len > 0 )
-            set_lattice_color(fib, uni, lat.data(inf), len);
+        set_lattice_color(fib, facM*lat.data(inf));
         gle::gleVertex(fib.posEndM());
         if ( uni*(inf+0.5) > fib.abscissaM() )
             gle::gleVertex(fib.pos(uni*(inf+0.5)));
         
         for ( auto h = inf+1; h < sup; ++h )
         {
-            set_lattice_color(fib, uni, lat.data(h));
+            set_lattice_color(fib, fac*lat.data(h));
             gle::gleVertex(fib.pos(uni*(h+0.5)));
         }
         
         // the terminal site may be truncated
-        len = fib.abscissaP() - lat.abscissa(sup);
-        if ( len > 0 )
-            set_lattice_color(fib, uni, lat.data(sup), len);
+        set_lattice_color(fib, facP*lat.data(sup));
         if ( uni*(sup+0.5) < fib.abscissaP() )
             gle::gleVertex(fib.pos(uni*(sup+0.5)));
         gle::gleVertex(fib.posEndP());
@@ -1086,35 +1092,45 @@ void Display::drawFiberLattice2(Fiber const& fib, real width) const
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
+    FiberDisp const*const disp = fib.prop->disp;
+    const real fac = 1.0 / disp->lattice_scale;
+
     lineWidth(width);
     glBegin(GL_LINE_STRIP);
     if ( inf == sup )
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
-        set_lattice_color(fib, uni, lat.data(inf), len);
+        set_lattice_color(fib, (fac*lat.data(inf))*(uni/len));
         gle::gleVertex(fib.posEndM());
         gle::gleVertex(fib.posEndP());
     }
     else
     {
+        const real lenM = uni * (inf+1) - fib.abscissaM();  // should be positive!
+        const real lenP = fib.abscissaP() - uni * sup;      // should be positive!
+
+        real facM = fac;
+        real facP = fac;
+        if ( disp->lattice_rescale )
+        {
+            facM = ( lenM > 0.01*uni ? fac*uni/lenM : fac );
+            facP = ( lenP > 0.01*uni ? fac*uni/lenP : fac );
+        }
+
         // the terminal site may be truncated
-        real len = lat.abscissa(inf+1) - fib.abscissaM();
-        if ( len > 0 )
-            set_lattice_color(fib, uni, lat.data(inf), len);
+        set_lattice_color(fib, facM*lat.data(inf));
         gle::gleVertex(fib.posEndM());
         
         for ( auto h = inf+1; h < sup; ++h )
         {
             gle::gleVertex(fib.pos(uni*h));
-            set_lattice_color(fib, uni, lat.data(h));
+            set_lattice_color(fib, fac*lat.data(h));
             gle::gleVertex(fib.pos(uni*h));
         }
         
         // the terminal site may be truncated
-        len = fib.abscissaP() - lat.abscissa(sup);
-        if ( len > 0 )
-            set_lattice_color(fib, uni, lat.data(sup), len);
+        set_lattice_color(fib, facP*lat.data(sup));
         gle::gleVertex(fib.pos(uni*sup));
         gle::gleVertex(fib.posEndP());
     }

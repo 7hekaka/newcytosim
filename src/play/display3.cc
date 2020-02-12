@@ -258,14 +258,15 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is with respect to the MINUS_END.
 The function `set_color` is used to set the color of the segments.
 */
-void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const long last,
+void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
+                                    FiberLattice::lati_t inx, const FiberLattice::lati_t last,
                                     real abs, const real inc,
                                     void (*set_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
     // start at MINUS_END
-    Vector pos = fib.displayPosM(abs), old;
-    Vector nxt = fib.displayPosM(abs+inc);
+    Vector pos = fib.displayPosM(0), old;
+    Vector nxt = fib.displayPosM(abs);
     Vector dir = fib.dirEndM();
 
     set_color(fib, inx, facM);
@@ -279,9 +280,10 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
     // draw inner segments
     while ( inx < last )
     {
+        abs += inc;
         old = pos;
         pos = nxt;
-        nxt = fib.displayPosM(abs+2*inc);
+        nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
         set_color(fib, inx, fac);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
@@ -289,11 +291,10 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
         // draw a circle to close the tube:
         //gleObject(0.5*(old+pos), normalize(pos-old), rad, gleDiscB);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
-        abs += inc;
         ++inx;
     }
     
-    // draw last full segment:
+    // draw last segment, which may be truncated:
     dir = fib.dirEndP();
     set_color(fib, last, facP);
     setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
@@ -304,11 +305,11 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad, long inx, const 
     // this is a basic rendering where tubes would not join properly:
     for ( ; inx < last; ++inx )
     {
+        abs += inc;
         pos = nxt;
-        nxt = fib.displayPosM(abs+inc);
+        nxt = fib.displayPosM(abs);
         set_color(fib, inx, fac);
         gleTube(pos, nxt, rad, gleTube2B);
-        abs += inc;
     }
     dir = fib.dirEndP();
 #endif
@@ -513,16 +514,21 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
     const real uni = lat.unit();
     const real rad = width * sFactor;
     
-    auto inf = lat.indexM();
-    auto sup = lat.indexP();
+    const auto inf = lat.indexM();
+    const auto sup = lat.indexP();
 
-    real lenM = fib.abscissaM() - uni * inf;  // should be positive!
-    real lenP = fib.abscissaP() - uni * sup;  // should be positive!
+    const real lenM = uni * (inf+1) - fib.abscissaM();  // should be positive!
+    const real lenP = fib.abscissaP() - uni * sup;      // should be positive!
 
-    real facM = ( disp->lattice_rescale && lenM > 0.001*uni ? fac*uni/lenM : fac );
-    real facP = ( disp->lattice_rescale && lenP > 0.001*uni ? fac*uni/lenP : fac );
+    real facM = fac;
+    real facP = fac;
+    if ( disp->lattice_rescale )
+    {
+        facM = ( lenM > 0.001*uni ? fac*uni/lenM : fac );
+        facP = ( lenP > 0.001*uni ? fac*uni/lenP : fac );
+    }
 
-    drawFiberSubSegments(fib, rad, inf, sup, -lenM, uni, set_color, fac, facM, facP);
+    drawFiberSubSegments(fib, rad, inf, sup, lenM, uni, set_color, fac, facM, facP);
     glPopAttrib();
 }
 
