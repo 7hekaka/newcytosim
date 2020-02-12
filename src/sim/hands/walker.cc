@@ -11,8 +11,6 @@
 Walker::Walker(WalkerProp const* p, HandMonitor* h)
 : Digit(p,h), nextStep(0), prop(p)
 {
-    // works if digit:step_size == lattice:step_size
-    stride = ( prop->unloaded_speed > 0 ? 1 : -1 );
 }
 
 
@@ -27,8 +25,9 @@ void Walker::attach(FiberSite const& s)
     stride = std::copysign(n, prop->unloaded_speed);
 #else
     // here digit::step_size must be equal to fiber:step_size
-    if ( lattice()->unit() != prop->step_size  )
+    if ( lattice() && lattice()->unit() != prop->step_size  )
         throw InvalidParameter("digit:step_size must be equal to fiber:lattice_unit");
+    stride = std::copysign(1, prop->unloaded_speed);
 #endif
 }
 
