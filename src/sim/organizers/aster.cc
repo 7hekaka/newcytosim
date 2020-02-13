@@ -184,61 +184,76 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     
     // get number of fibers:
     size_t nbf = 0;
-    std::string type, spec;
+    std::string type;
     
     opt.set(asRadius, "radius");
-    opt.set(nbf,      "fibers");
-    opt.set(type,     "fibers", 1);
-    opt.set(spec,     "fibers", 2);
-    
-    Glossary fiber_opt(spec);
-    
-#ifdef BACKWARD_COMPATIBILITY
-    if ( type.empty() && opt.set(nbf, "nb_fibers") )
-    {
-        type = prop->fiber_type;
-        fiber_opt = opt;
-        spec = "unknown";
-    }
-#endif
-    nbOrganized(1+nbf);
-
     if ( asRadius <= 0 )
         throw InvalidParameter("aster:radius must be specified and > 0");
-
+    
+    nbOrganized(1);
     size_t origin = 0;
     ObjectList res = makeSolid(sim, opt, origin);
-    
     if ( !solid() )
         throw InvalidParameter("could not make aster:solid");
-    
-    // fiber's anchor points can be specified directly:
-    size_t cnt = 0;
-    Vector pos1, pos2;
-    std::string var = "fiber1";
-    while ( opt.set(pos1, var) && opt.set(pos2, var, 1) )
-    {
-        //std::clog << "direct fiber anchor " << pos1 << " and " << pos2 << "\n";
-        placeAnchor(pos1, pos2, origin);
-        ++cnt;
-        var = "fiber" + std::to_string(cnt+1);
-    }
-
-    if ( cnt < nbf )
-        placeAnchors(opt, origin, nbf-cnt);
-    
     //solid()->write(std::clog);
-    
-    if ( !spec.empty() )
+
+    if ( opt.is_positive_integer("fibers", 0) )
+        opt.set(nbf, "fibers");
+    else
+        opt.set(type, "fibers");
+
+    // fiber's anchor points can be specified directly:
+    std::string var = "fiber1";
+    if ( opt.has_key(var) )
     {
-        for ( size_t n = 0; n < asLinks.size(); ++n )
-            res.append(makeFiber(sim, n, type, fiber_opt));
-        fiber_opt.warnings(std::cerr, 1, " in aster:nucleate[1]");
+        size_t cnt = 0;
+        Vector pos1, pos2;
+        while ( opt.set(pos1, var) && opt.set(pos2, var, 1) )
+        {
+            //std::clog << "direct fiber anchor " << pos1 << " and " << pos2 << "\n";
+            placeAnchor(pos1, pos2, origin);
+            nbOrganized(2+cnt);
+            std::string str;
+            if ( opt.set(str, var, 2) )
+            {
+                Glossary fopt(str);
+                res.append(makeFiber(sim, cnt, type, fopt));
+                fopt.warnings(std::cerr, 1, " in aster:nucleate[1]");
+            }
+            ++cnt;
+            var = "fiber" + std::to_string(cnt+1);
+        }
     }
     else
     {
-        if ( prop->fiber_rate <= 0 )
-            throw InvalidParameter("you should specify aster::fiber_spec");
+        std::string str;
+        opt.set(type, "fibers", 1);
+        opt.set(str, "fibers", 2);
+    
+        Glossary fopt(str);
+    
+#ifdef BACKWARD_COMPATIBILITY
+        if ( type.empty() && opt.set(nbf, "nb_fibers") )
+        {
+            type = prop->fiber_type;
+            fopt = opt;
+            str = "unknown";
+        }
+#endif
+        nbOrganized(1+nbf);
+        placeAnchors(opt, origin, nbf);
+        
+        if ( str.empty() )
+        {
+            if ( prop->fiber_rate <= 0 )
+                throw InvalidParameter("you should specify aster::fiber_spec");
+        }
+        else
+        {
+            for ( size_t n = 0; n < nbf; ++n )
+                res.append(makeFiber(sim, n, type, fopt));
+            fopt.warnings(std::cerr, nbf, " in aster:nucleate[1]");
+        }
     }
     return res;
 }

@@ -51,11 +51,22 @@ set aster star
 
 new star
 {
+    type = disc
     solid = core1
     radius = 0.5, 0.5
-    type = disc
-
     fibers = 23, microtubule, ( length = 5 )
+}
+
+new star
+{
+    radius = 0.5
+    solid = core
+    position = 0 0 0
+    orientation = none
+    point1 = center, 0.5
+    fibers = microtubule
+    fiber1 = 0 0 0, 0 +1 0, ( length = 1 )
+    fiber2 = 0 0 0, 0 -1 0, ( length = 3 )
 }
 
 run system
