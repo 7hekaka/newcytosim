@@ -93,7 +93,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// change the property and update the two Hands
-    void           setProperty(CoupleProp *);
+    void           changeProperty(CoupleProp *);
     
     /// add interactions to a Meca
     virtual void   setInteractions(Meca&) const;

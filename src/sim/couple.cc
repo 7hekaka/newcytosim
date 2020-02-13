@@ -60,10 +60,11 @@ Couple::~Couple()
 
 //------------------------------------------------------------------------------
 
-void Couple::setProperty(CoupleProp * p)
+/** This will fail if any hand is attached */
+void Couple::changeProperty(CoupleProp * p)
 {
-    if ( !p )
-        throw Exception("Null Couple::prop");
+    assert_true( p );
+    assert_true( !cHand1->attached() && !cHand2->attached() );
     prop = p;
     
     if ( cHand1 && cHand1->prop != prop->hand1_prop )
