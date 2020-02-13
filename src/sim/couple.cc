@@ -194,9 +194,9 @@ void Couple::stepFF(Simul& sim)
     }
 
     /*
-     To attachment a Couple, we flip a coin to give equal chance to each Hand,
-     as if they were sharing the two half of a spherical cap.
-     Note that this divides by two the effective binding rate of the Hands.
+     For attachment, we select randomly one of the Hand, with equal chances,
+     as if the Hands were occupying the two halves of a sphere moving very fast.
+     Note that this divides by 2 the effective binding rate of the Hands.
      */
     if ( RNG.flip() )
     {
