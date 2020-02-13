@@ -4,6 +4,7 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "mecapoint.h"
+#include "glossary.h"
 #include "meca.h"
 
 

@@ -4,9 +4,9 @@
 
 #include "real.h"
 #include "property.h"
-#include "glossary.h"
 #include "vector.h"
 
+class Glossary;
 class PointDisp;
 class Space;
 class Simul;

@@ -4,13 +4,13 @@
 #define ORGANIZER_H
 
 #include "assert_macro.h"
-#include "glossary.h"
 #include "object.h"
 #include "buddy.h"
 
 class Meca;
 class Simul;
 class Mecable;
+class Glossary;
 class PointDisp;
 class Display;
 

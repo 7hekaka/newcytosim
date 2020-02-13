@@ -3,6 +3,7 @@
 #include "space_beads.h"
 #include "bead_prop.h"
 #include "object_set.h"
+#include "glossary.h"
 #include "simul.h"
 
 
