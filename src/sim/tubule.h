@@ -6,16 +6,15 @@
 
 #include "assert_macro.h"
 #include "tubule_prop.h"
-#include "glossary.h"
 #include "object.h"
 #include "buddy.h"
-#include "real.h"
 
+class Glossary;
 class Fiber;
 class Simul;
 class Meca;
 
-/**
+/*
  13 fibers arranged in a tubular configurations into a Microtubule
  
  FJN, Cambridge, Sept--Oct 2019

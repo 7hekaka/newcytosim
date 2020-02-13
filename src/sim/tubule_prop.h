@@ -4,9 +4,8 @@
 #ifndef TUBULE_PROP_H
 #define TUBULE_PROP_H
 
-#include "real.h"
 #include "property.h"
-#include "common.h"
+#include "real.h"
 
 class FiberSet;
 

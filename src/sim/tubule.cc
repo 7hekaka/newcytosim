@@ -2,12 +2,17 @@
 // Copyright Cambridge University, 2019
 
 #include "dim.h"
-#include "tubule.h"
 #include "fiber.h"
+#include "tubule.h"
 #include "simul.h"
 #include "meca.h"
-#include "exceptions.h"
 #include "messages.h"
+#include "exceptions.h"
+
+
+void Tubule::step(Simul&)
+{
+}
 
 
 Tubule::Tubule(TubuleProp * p) : prop(p)
@@ -120,11 +125,6 @@ void Tubule::goodbye(Buddy * b)
     }
 }
 
-
-void Tubule::step(Simul&)
-{
-}
-
     
 /**
 This uses only addSideLink() with appropriate directions
@@ -186,6 +186,8 @@ void Tubule::setInteractionsB(Meca& meca)
  */
 void Tubule::setInteractions(Meca& meca)
 {
+    if ( !bone_ )
+        throw InvalidParameter("A backbone must be defined for Tubule");
 #if ( DIM >= 3 )
     const real stiff = prop->stiffness[0];
     const real ang = M_PI / NFIL;
