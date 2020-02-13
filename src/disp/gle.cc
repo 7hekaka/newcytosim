@@ -1461,7 +1461,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleTube(Vector2 const& a, Vector2 const& b, real R, void (*obj)())
+    void gleTube(Vector2 const& a, Vector2 const& b, float R, void (*obj)())
     {
         glPushMatrix();
         gleAlignZ(a, b, R);

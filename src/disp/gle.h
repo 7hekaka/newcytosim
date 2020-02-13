@@ -285,7 +285,7 @@ namespace gle
 
     /// draw 'obj' with its ends at [a,b], of specified radius
     void gleTube(Vector1 const& a, Vector1 const& b, float radius, void (*obj)()=gleTube1B);
-    void gleTube(Vector2 const& a, Vector2 const& b, real radius, void (*obj)()=gleTube1B);
+    void gleTube(Vector2 const& a, Vector2 const& b, float radius, void (*obj)()=gleTube1B);
     void gleTube(Vector3 const& a, Vector3 const& b, float radius, void (*obj)()=gleTube1B);
     
     /// draw a band from A to B, with specified radius
