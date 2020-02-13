@@ -188,31 +188,31 @@ public:
     std::string  display;
     
     /** @} */
-    
-    /// derived variable: inverse of unbinding_force. This is a flag to Kramer
-    real unbinding_force_inv;
+
+public:
+
+    /// derived variable: 1.0/unbinding_force
+    real   unbinding_force_inv;
     
     /// oversampled binding_rate for Gillespie's method
     real   binding_rate_dt_8;
-
-public:
     
-    /// binding_prob = probability to bind in one `time_step`;
+    /// derived variable = probability to bind in one `time_step`;
     real   binding_prob;
     
-    /// binding_range_sqr = square(binding_range);
+    /// derived variable = square(binding_range);
     real   binding_range_sqr;
     
-    /// unbinding_rate_dt = unbinding_rate * time_step;
+    /// derived variable = unbinding_rate * time_step;
     real   unbinding_rate_dt;
     
     /// flag to indicate that `display` has a new value
     bool   display_fresh;
+    
+public:
 
     /// the display parameters for this category of Hand
     PointDisp * disp;
-    
-public:
     
     /// constructor
     HandProp(const std::string& n) : Property(n), disp(nullptr) { clear(); }
