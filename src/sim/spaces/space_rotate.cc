@@ -18,11 +18,8 @@ SpaceRotate::SpaceRotate(Space * spc)
 
 SpaceRotate::~SpaceRotate()
 {
-    if ( mSpace )
-    {
-        delete( mSpace );
-        mSpace = nullptr;
-    }
+    delete(mSpace);
+    mSpace = nullptr;
 }
 
 

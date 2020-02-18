@@ -212,11 +212,8 @@ Fiber::~Fiber()
 #endif
 
 #if FIBER_HAS_GLUE
-    if ( frGlue )
-    {
-        delete(frGlue);
-        frGlue = nullptr;
-    }
+    delete(frGlue);
+    frGlue = nullptr;
 #endif
     if ( disp )
     {
