@@ -292,8 +292,12 @@ void Tubule::setInteractionsC(Meca& meca)
 
 void Tubule::write(Outputter& out) const
 {
-    out.writeUInt16(NFIL);
+    out.writeUInt16(NFIL+1);
     out.writeSoftNewline();
+    if ( bone_ )
+        bone_->writeReference(out);
+    else
+        writeNullReference(out);
     for ( size_t i = 0; i < NFIL; ++i )
     {
         out.writeSoftSpace();
@@ -305,16 +309,15 @@ void Tubule::write(Outputter& out) const
 void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     size_t n = in.readUInt16();
-    if ( n != NFIL )
-        throw InvalidIO("unexpected number of filaments in Tubule");
-    
     ObjectTag g;
-    for ( size_t i = 0; i < n; ++i )
+    Object * w = sim.readReference(in, g);
+    bone_ = Fiber::toFiber(w);
+    for ( size_t i = 0; i < n-1; ++i )
     {
-        Object * w = sim.readReference(in, g);
+        w = sim.readReference(in, g);
         if ( i < NFIL )
             fil_[i] = Fiber::toFiber(w);
     }
-    setFamily(fil_[0]);
+    setFamily(bone_?bone_:fil_[0]);
 }
 

@@ -23,7 +23,7 @@ class KinesinProp;
  
  See Examples and the @ref KinesinPar.
  @ingroup HandGroup
- 
+ FJN 19.02.2020
 */
 class Kinesin : public Digit
 {

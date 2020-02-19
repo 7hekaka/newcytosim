@@ -380,6 +380,7 @@ void Couple::beforeDetachment(Hand const* h)
      that rounds of binding/unbinding should not get the Couples closer to
      the Filaments to which they bind.
      */
+    if ( ! Couple::otherHand(h)->attached() )
     cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
 #endif
     
