@@ -180,7 +180,7 @@ Fiber::Fiber(FiberProp const* p)
 /*
  returns the position of the protofilament centerline that is used for display
  Since the protofilaments are set with an effective diameter of 27nm,
- we rescale here by 23/27 = 0.8518
+ we rescale here by 19/27 = 0.703
 */
 Vector Fiber::displayPosM(real ab) const
 {
@@ -188,7 +188,7 @@ Vector Fiber::displayPosM(real ab) const
     {
         Vector I = family_->posM(ab);
         Vector O = posM(ab);
-        return I + 0.8518 * ( O - I );
+        return I + 0.703 * ( O - I );
     }
     return posM(ab);
 }
