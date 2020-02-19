@@ -55,7 +55,7 @@ Vector CoupleLong::sidePos1() const
 
 
 /**
- Calculates the force for the interSideLink()
+ Calculates the force for the addSideLink()
  */
 Vector CoupleLong::force() const
 {
@@ -70,7 +70,7 @@ Vector CoupleLong::force() const
 
 
 /**
- This uses interSideLink().
+ This uses addSideLink().
  
  Another possibility would be SideSideLink, which is fully symmetric.
  */

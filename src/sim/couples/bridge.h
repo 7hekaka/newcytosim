@@ -10,7 +10,7 @@ class BridgeProp;
 /**
  The Bridge differs from CoupleLong in the nature of the mechanical link that it
  creates betwen two filaments.
- The Bridge uses Meca::interLongLink(), whereas other CoupleLong use Meca::interSideLink().
+ The Bridge uses Meca::addLongLink(), whereas other CoupleLong use Meca::addSideLink().
  
  The "Long link" is a finite resting length Hookean spring, which can freely rotate
  at both of its ends. Hence the angle with respect to the filament is uncontrained,

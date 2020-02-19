@@ -54,7 +54,7 @@ Vector DuoLong::sidePos1() const
 
 
 /**
- Calculates the force for the interSideLink()
+ Calculates the force for the addSideLink()
  */
 Vector DuoLong::force() const
 {
@@ -69,7 +69,7 @@ Vector DuoLong::force() const
 
 
 /**
- This uses interSideLink().
+ This uses addSideLink().
  
  Another possibility would be SideSideLink, which is fully symmetric.
  */

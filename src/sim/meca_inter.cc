@@ -1888,7 +1888,8 @@ void Meca::addLongLink(Mecapoint const& ptA,
 
 void Meca::addLongLink(Mecapoint const& ptA,
                        Interpolation const& ptB,
-                       const real len, const real weight )
+                       const real len,
+                       const real weight)
 {
     assert_true( weight >= 0 );
     assert_true( len >= 0 );
@@ -1969,7 +1970,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
 void Meca::addLongLink(Interpolation const& ptA,
                        Interpolation const& ptB,
                        const real len,
-                       const real weight )
+                       const real weight)
 {
     assert_true( weight >= 0 );
     assert_true( len >= 0 );
@@ -2226,7 +2227,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 void Meca::addSideLink(Interpolation const& ptA,
                        Mecapoint const& ptB,
                        const real len,
-                       const real weight )
+                       const real weight)
 {
 #if ( DIM == 1 )
     
@@ -2770,7 +2771,7 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
 void Meca::addSideSideLink(Interpolation const& ptA,
                            Interpolation const& ptB,
                            const real len,
-                           const real weight )
+                           const real weight)
 {
 #if ( DIM == 1 )
     
@@ -4375,7 +4376,7 @@ void Meca::addPlaneClampZ(Mecapoint const& P, real off, real weight)
 void Meca::addLineClamp(Mecapoint const& pte,
                         Vector const& pos,
                         Vector const& dir,
-                        const real weight )
+                        const real weight)
 {
     assert_true( weight >= 0 );
     
@@ -4403,7 +4404,7 @@ void Meca::addLineClamp(Mecapoint const& pte,
 void Meca::addLineClamp(Interpolation const& pti,
                         Vector const& pos,
                         Vector const& dir,
-                        const real weight )
+                        const real weight)
 {
     assert_true( weight >= 0 );
     
@@ -4443,7 +4444,7 @@ void Meca::addLineClamp(Interpolation const& pti,
 void Meca::addPlaneClamp(Mecapoint const& pte,
                          Vector const& pos,
                          Vector const& dir,
-                         const real weight )
+                         const real weight)
 {
     assert_true( weight >= 0 );
     
@@ -4476,7 +4477,7 @@ void Meca::addPlaneClamp(Mecapoint const& pte,
 void Meca::addPlaneClamp(Interpolation const& pti,
                          Vector const& pos,
                          Vector const& dir,
-                         const real weight )
+                         const real weight)
 {
     assert_true( weight >= 0 );
     

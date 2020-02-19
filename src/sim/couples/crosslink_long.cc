@@ -49,7 +49,7 @@ Vector CrosslinkLong::sidePos2() const
 
 
 /**
- Calculates the force for the interSideLink()
+ Calculates the force for the addSideLink()
  */
 Vector CrosslinkLong::force() const
 {
