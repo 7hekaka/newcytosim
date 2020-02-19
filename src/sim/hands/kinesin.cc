@@ -4,6 +4,7 @@
 #include "kinesin_prop.h"
 #include "iowrapper.h"
 #include "glossary.h"
+#include "messages.h"
 #include "lattice.h"
 #include "simul.h"
 
@@ -11,7 +12,6 @@
 Kinesin::Kinesin(KinesinProp const* p, HandMonitor* h)
 : Digit(p,h), prop(p)
 {
-    ABORT_NOW("unfinished class");
 }
 
 
@@ -19,6 +19,11 @@ void Kinesin::attach(FiberSite const& s)
 {
     Digit::attach(s);
     nextStep = RNG.exponential();
+    nextBack = RNG.exponential();
+
+    // here digit::step_size must be equal to fiber:step_size
+    if ( lattice() && lattice()->unit() != prop->step_size  )
+        throw InvalidParameter("digit:step_size must be equal to fiber:lattice_unit");
 }
 
 
@@ -29,21 +34,37 @@ void Kinesin::stepUnloaded()
 {
     assert_true( attached() );
     
-    nextStep -= prop->walking_rate_dt;
-    
-    while ( nextStep <= 0 )
+    nextStep -= prop->forward_rate_dt / 2;
+    nextBack -= prop->backward_rate_dt / 1.1;
+
+    while ( std::min(nextStep, nextBack) <= 0 )
     {
-        assert_true( attached() );
-        lati_t s = site() + 1;
-        if ( outsideMP(s) )
+        // test detachment due to stepping
+        if ( RNG.test(prop->unbinding_chance) )
         {
-            //immediately detach at the end of the Fiber:
             detach();
             return;
         }
-        if ( vacant(s) )
+
+        int dir = ( nextStep < nextBack ? 1 : -1 );
+
+        lati_t s = site() + dir * prop->stride;
+        
+        if ( outsideMP(s) )
+        {
+            if ( RNG.test_not(prop->hold_growing_end) )
+            {
+                detach();
+                return;
+            }
+        }
+        else if ( vacant(s) )
             hop(s);
-        nextStep += RNG.exponential();
+    
+        if ( dir == 1 )
+            nextStep += RNG.exponential();
+        else
+            nextBack += RNG.exponential();
     }
     
     testDetachment();
@@ -59,24 +80,41 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );
     
-    // calculate displacement, dependent on the load along the desired direction of displacement
-    real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
+    real load = dot(force, dirFiber());
+    
+    // antagonistic load is negative
+    nextStep -= prop->forward_rate_dt / ( 1 + exp(-load*prop->force_inv) );
+    nextBack -= prop->backward_rate_dt / ( 0.1 + exp(load*prop->force_inv) );
 
-    nextStep -= std::max((real)0, R);
-
-    while ( nextStep <= 0 )
+    while ( std::min(nextStep, nextBack) <= 0 )
     {
-        assert_true( attached() );
-        lati_t s = site() + 1;
-        if ( outsideMP(s) )
+        // test detachment due to stepping
+        if ( RNG.test(prop->unbinding_chance) )
         {
-            //immediately detach at the end of the Fiber:
             detach();
             return;
         }
-        if ( vacant(s) )
+
+        //int dir = 2 * ( nextStep < nextBack ) - 1;
+        int dir = ( nextStep < nextBack ? 1 : -1 );
+
+        lati_t s = site() + dir * prop->stride;
+        
+        if ( outsideMP(s) )
+        {
+            if ( RNG.test_not(prop->hold_growing_end) )
+            {
+                detach();
+                return;
+            }
+        }
+        else if ( vacant(s) )
             hop(s);
-        nextStep += RNG.exponential();
+    
+        if ( dir == 1 )
+            nextStep += RNG.exponential();
+        else
+            nextBack += RNG.exponential();
     }
     
     assert_true( nextDetach >= 0 );

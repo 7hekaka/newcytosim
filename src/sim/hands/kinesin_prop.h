@@ -22,23 +22,29 @@ public:
      Inherits @ref DigitPar.
      @{
      */
-
-    /// force at which stepping rate becomes zero
-    real    stall_force;
     
-    /// speed if force=0 ( unloaded_speed = rate * step_size )
-    /**
-     A positive value specifies a plus-end directed motor.
-     A negative value specifies a minus-end directed motor.
-     */
-    real    unloaded_speed;
+    ///
+    real    force;
+
+    ///
+    real    forward_rate;
+    
+    /// backward rate
+    real    backward_rate;
+    
+    ///
+    real    unbinding_chance;
+    
+    /// directionality ( -1 / +1 )
+    int     stride;
     
     /// @}
     
 private:
     
-    real    var_rate_dt;
-    real    walking_rate_dt;
+    real    forward_rate_dt;
+    real    backward_rate_dt;
+    real    force_inv;
     
 public:
 

@@ -9,16 +9,21 @@ class KinesinProp;
 
 /// A model of the kinesin motor with discrete stepping
 /**
- THIS CLASS IS A STUB and should not be used!
+ This is a simple Kinesin stochastic model directly inspired from measurements in:
  
- Kinesin is derived from Digit, and it makes discrete jumps along the fiber.
+     Mechanics of the kinesin step, Carter & Cross, 2005
+     http://www.doi.org/10.1038/nature03528
+     
+ The Kinesin makes discrete jumps along the fiber.
  
- Stepping is stochastic.
+ Stepping is stochastic and dependent on force:
+    - antagonistic force decreases the rate of forward steps.
+    - antagonistic force increases the rate of backward steps.
+ .
  
  See Examples and the @ref KinesinPar.
  @ingroup HandGroup
  
- @todo implement Kinesin
 */
 class Kinesin : public Digit
 {
@@ -28,8 +33,8 @@ private:
     Kinesin();
     
     /// Gillespie countdown timer for stepping
-    real   nextStep;
-
+    real nextStep, nextBack;
+    
 public:
     
     /// Property

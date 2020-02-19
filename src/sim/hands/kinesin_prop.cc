@@ -16,10 +16,13 @@ void KinesinProp::clear()
 {
     DigitProp::clear();
 
-    stall_force     = 0;
-    unloaded_speed  = 0;
-    walking_rate_dt = 0;
-    var_rate_dt     = 0;
+    // based on Rob Cross measurments in:
+    
+    force            = 2;
+    forward_rate     = 277;
+    backward_rate    = 0.34;
+    unbinding_chance = 0;
+    stride           = 1;
 }
 
 
@@ -27,11 +30,11 @@ void KinesinProp::read(Glossary& glos)
 {
     DigitProp::read(glos);
     
-    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
-    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
-#ifdef BACKWARD_COMPATIBILITY
-    glos.set(unloaded_speed, "max_speed");
-#endif
+    glos.set(force,            "force");
+    glos.set(forward_rate,     "forward_rate");
+    glos.set(backward_rate,    "backward_rate");
+    glos.set(unbinding_chance, "unbinding_chance");
+    glos.set(stride,           "stride");
 }
 
 
@@ -39,21 +42,33 @@ void KinesinProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.ready() && stall_force <= 0 )
-        throw InvalidParameter("kinesin:stall_force must be > 0");
+    if ( sim.ready() && force <= 0 )
+        throw InvalidParameter("kinesin:force must be > 0");
+    force_inv = 1.0 / force;
     
-    if ( unloaded_speed < 0 )
-        throw InvalidParameter("kinesin:unloaded_speed must be >= 0");
+    if ( forward_rate < 0 )
+        throw InvalidParameter("kinesin:forward_rate must be >= 0");
+    forward_rate_dt = forward_rate * sim.prop->time_step;
+    
+    if ( backward_rate < 0 )
+        throw InvalidParameter("kinesin:backward_rate must be >= 0");
+    backward_rate_dt = backward_rate * sim.prop->time_step;
 
-    walking_rate_dt = sim.prop->time_step * fabs(unloaded_speed) / step_size;
-    var_rate_dt     = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
+    if ( abs(stride) != 1 )
+        throw InvalidParameter("kinesin:directionality must be +/- 1");
+    
+    real stall = log(forward_rate/backward_rate)*0.5/force_inv;
+    printf("Kinesin's stall force: %.4f\n", stall);
 }
 
 
 void KinesinProp::write_values(std::ostream& os) const
 {
     DigitProp::write_values(os);
-    write_value(os, "stall_force",    stall_force);
-    write_value(os, "unloaded_speed", unloaded_speed);
+    write_value(os, "force", force);
+    write_value(os, "forward_rate", forward_rate);
+    write_value(os, "backward_rate", backward_rate);
+    write_value(os, "unbinding_chance", unbinding_chance);
+    write_value(os, "stride", stride);
 }
 
