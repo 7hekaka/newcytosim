@@ -38,7 +38,7 @@ public:
     /// a flag for live simulation
     bool         goLive;
     
-    /// the Display object
+    /// the current Display object
     Display  *   mDisplay;
     
     //---------------------------------COMMANDS---------------------------------

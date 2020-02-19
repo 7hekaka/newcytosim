@@ -35,18 +35,19 @@ public:
     
     //-------------------------------------------------------------------------------
     
-    /// this is called between commands during the execution process
+    /// `hold()` is called between commands during the execution process
     /**
-     It provides an opportunity to stop or to display the simulation world
+     This callback provides an opportunity to stop/examine the simulation at regular
+     intervals. It does nothing for `sim` and it displays the system in `play`.
      */
     virtual void hold() {}
     
     //-------------------------------------------------------------------------------
     
-    /// create a new Property of category `cat` from values set in Glossary
+    /// create a new Property of category `cat` from values specified in Glossary
     Property*  execute_set(std::string const& cat, std::string const& name, Glossary&);
 
-    /// change values in Property as specified in Glossary
+    /// change values in given Property as specified in Glossary
     void       execute_change(Property*, Glossary&);
 
     /// change values in Property called `name` as specified in Glossary
@@ -76,19 +77,19 @@ public:
     /// cut fibers of type `name`, following different options in Glossary
     void       execute_cut(std::string const& name, Glossary&);
     
-    /// import objects (or `what`) from the file with specified name
-    void       execute_import(std::string const& file, std::string const& what, Glossary&);
+    /// import objects (or `what`) from a file
+    void       execute_import(std::string const& filename, std::string const& what, Glossary&);
 
-    /// export objects (or `what`) to a file with specified name
-    void       execute_export(std::string& file, std::string const& what, Glossary&);
+    /// export objects (or `what`) to a file
+    void       execute_export(std::string& filename, std::string const& what, Glossary&);
 
-    /// write information (specified in `what`) to a file with specified name
-    void       execute_report(std::string& file, std::string const& what, Glossary&);
+    /// write information (specified in `what`) to a file
+    void       execute_report(std::string& filename, std::string const& what, Glossary&);
     
-    /// perform `cnt` simulation steps
+    /// perform `cnt` simulation steps, following options specified in Glossary
     void       execute_run(size_t cnt, Glossary&, bool write_permission);
     
-    /// perform `cnt` simulation steps, with no option
+    /// perform `cnt` simulation steps
     void       execute_run(size_t cnt);
 
     /// execute miscellaneous functions
