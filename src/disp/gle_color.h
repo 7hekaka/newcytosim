@@ -50,9 +50,6 @@ private:
         
 #pragma mark - Private methods
 
-    /// access to float components
-    GLfloat& operator [] (int i) { return col_[i]; }
-
     /// update 'rgba_' to match values in 'col_'
     void update_rgba()
     {
@@ -71,7 +68,7 @@ private:
 #pragma mark - Public methods
 
 public:
-    
+
     /// set to white
     void set_white()
     {
@@ -103,7 +100,7 @@ public:
     }
     
     /// export floating point components
-    void store(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat& a)
+    void store(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat& a) const
     {
         r = col_[0];
         g = col_[1];
@@ -112,7 +109,7 @@ public:
     }
     
     /// export floating point components to array
-    void store(GLfloat c[4])
+    void store(GLfloat c[4]) const
     {
         c[0] = col_[0];
         c[1] = col_[1];
@@ -128,7 +125,7 @@ public:
     }
 
     /// export components as bytes
-    void put_bytes(GLubyte& r, GLubyte& g, GLubyte& b, GLubyte& a)
+    void put_bytes(GLubyte& r, GLubyte& g, GLubyte& b, GLubyte& a) const
     {
         r = 0xFF & (GLubyte)( rgba_ >> 24 );
         g = 0xFF & (GLubyte)( rgba_ >> 16 );
@@ -184,6 +181,9 @@ public:
     
     GLfloat const* data() const { return col_; }
     
+    /// access to float components
+    GLfloat& operator [] (int i) { return col_[i]; }
+
     GLfloat   r() const { return col_[0]; }
     GLfloat   g() const { return col_[1]; }
     GLfloat   b() const { return col_[2]; }
@@ -199,10 +199,10 @@ public:
     void      set_blue (GLfloat s) { col_[2] = s; update_rgba(); }
     void      set_alpha(GLfloat s) { col_[3] = s; update_rgba(); }
 
-    gle_color red  (GLfloat s)  const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
-    gle_color green(GLfloat s)  const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }
-    gle_color blue (GLfloat s)  const { return gle_color(col_[0], col_[1], clamp(s), col_[3]); }
-    gle_color alpha(GLfloat s)  const { return gle_color(col_[0], col_[1], col_[2], clamp(s)); }
+    gle_color red  (GLfloat s) const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
+    gle_color green(GLfloat s) const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }
+    gle_color blue (GLfloat s) const { return gle_color(col_[0], col_[1], clamp(s), col_[3]); }
+    gle_color alpha(GLfloat s) const { return gle_color(col_[0], col_[1], col_[2], clamp(s)); }
 
     gle_color match_r(gle_color c) const { return gle_color(c.col_[0], col_[1], col_[2], col_[3]); }
     gle_color match_g(gle_color c) const { return gle_color(col_[0], c.col_[1], col_[2], col_[3]); }

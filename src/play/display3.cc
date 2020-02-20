@@ -50,20 +50,38 @@ void Display3::drawSimul(Simul const& sim)
         glClearStencil(0);
         glClear(GL_STENCIL_BUFFER_BIT);
         glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_ALWAYS, 1, ~0);
+        glStencilFunc(GL_EQUAL, 0, ~0);
         
-        // draw inner surfaces of fibers:
+        // set Stencil to 1 for inner surfaces of fibers:
         glEnable(GL_CULL_FACE);
+        //drawFibers(sim.fibers);
+        FiberSet const& set = sim.fibers;
+        // display the Fiber always in the same order:
+        // set Stencil to 0 for outer surfaces:
         glCullFace(GL_FRONT);
-        
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        drawFibers(sim.fibers);
-        
-        // draw front surfaces of fibers:
+        GLint val = 0;
+        for( Fiber const* fib = set.firstID(); fib; fib=set.nextID(fib) )
+        {
+            if ( fib->disp->visible )
+            {
+                glStencilFunc(GL_ALWAYS, ++val, ~0);
+                drawFiber(*fib);
+            }
+        }
+        // set Stencil to 0 for outer surfaces:
         glCullFace(GL_BACK);
         glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
-        drawFibers(sim.fibers);
-        
+        val = 0;
+        for( Fiber const* fib = set.firstID(); fib; fib=set.nextID(fib) )
+        {
+            if ( fib->disp->visible )
+            {
+                glStencilFunc(GL_EQUAL, ++val, ~0);
+                drawFiber(*fib);
+            }
+        }
+
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         glStencilFunc(GL_EQUAL, 0, ~0);
     }
@@ -499,16 +517,19 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
                                 void (*set_color)(Fiber const&, long, real)) const
 {
     FiberLattice const& lat = *fib.drawableLattice();
+    FiberDisp const*const disp = fib.prop->disp;
 
     glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);
     GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  blk);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  blk);
+    GLfloat bak[] = { 0.0, 0.0, 0.0, 1.0 };
+    disp->back_color.store(bak);
+    glMaterialfv(GL_BACK, GL_AMBIENT,  blk);
+    glMaterialfv(GL_BACK, GL_DIFFUSE,  bak);
+    glMaterialfv(GL_FRONT, GL_AMBIENT,  blk);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,  blk);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, blk);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, blk);
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 32);
-    
-    FiberDisp const*const disp = fib.prop->disp;
 
     const real fac = 1.0 / disp->lattice_scale;
     const real uni = lat.unit();
