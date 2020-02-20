@@ -594,7 +594,7 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
                 gleObject(fib.posEndM(), width, gleSphere2B);
                 break;
             case 2:
-                gleObject(fib.posEndM(), -fib.dirEndM(), width, gleConeB);
+                gleObject(fib.posEndM(), -fib.dirEndM(), width, gleLongConeB);
                 break;
             case 3:
                 gleObject(fib.posEndM(), -fib.dirEndM(), width, gleCylinderB);
@@ -631,7 +631,7 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
                 gleObject(fib.posEndP(), width, gleSphere2B);
                 break;
             case 2:
-                gleObject(fib.posEndP(), fib.dirEndP(), width, gleConeB);
+                gleObject(fib.posEndP(), fib.dirEndP(), width, gleLongConeB);
                 break;
             case 3:
                 gleObject(fib.posEndP(), fib.dirEndP(), width, gleCylinderB);

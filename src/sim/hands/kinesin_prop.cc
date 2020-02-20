@@ -16,8 +16,11 @@ void KinesinProp::clear()
 {
     DigitProp::clear();
 
-    // based on Rob Cross measurments in:
+    /** values here are based on Rob Cross measurements of conventional kinesin:
     
+        Mechanics of the kinesin step, Carter & Cross, 2005
+        http://www.doi.org/10.1038/nature03528
+     */
     force            = 2;
     forward_rate     = 277;
     backward_rate    = 0.34;
@@ -57,8 +60,11 @@ void KinesinProp::complete(Simul const& sim)
     if ( abs(stride) != 1 )
         throw InvalidParameter("kinesin:directionality must be +/- 1");
     
-    real stall = log(forward_rate/backward_rate)*0.5/force_inv;
-    printf("Kinesin's stall force: %.4f\n", stall);
+    if ( sim.ready() )
+    {
+        real stall = log(forward_rate/backward_rate)*0.5/force_inv;
+        printf("Kinesin's stall force is %.4f pN\n", stall);
+    }
 }
 
 

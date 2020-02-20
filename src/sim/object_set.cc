@@ -560,7 +560,7 @@ Object * ObjectSet::readObject(Inputter& in, const ObjectTag tag, bool fat)
     }
     catch( Exception & e )
     {
-        e << ", while loading " << Object::reference(tag, ix, id);
+        e << "while loading " << Object::reference(tag, ix, id);
         throw;
     }
 
