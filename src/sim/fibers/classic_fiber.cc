@@ -136,9 +136,6 @@ void ClassicFiber::step()
         if ( prop->catastrophe_outside && prop->confine_space_ptr->outside(posEndP()) )
         {
             mStateP = STATE_RED;
-            
-            if ( RNG.test(prop->rescue_prob[0]) )
-                mStateP = STATE_GREEN;
         }
 #endif
         
@@ -148,6 +145,9 @@ void ClassicFiber::step()
     else if ( mStateP == STATE_RED )
     {
         mGrowthP = prop->shrinking_speed_dt[0];
+        
+        if ( RNG.test(prop->rescue_prob[0]) )
+            mStateP = STATE_GREEN;
     }
     
     real inc = mGrowthP + mGrowthM;
