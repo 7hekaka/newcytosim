@@ -122,7 +122,7 @@ void ClassicFiber::step()
         
 #if NEW_CATASTROPHE_OUTSIDE
         // Catastrophe rate is multiplied if the PLUS_END is outside
-        if ( rop->confine_space_ptr->outside(posEndP()) )
+        if ( prop->catastrophe_space_ptr->outside(posEndP()) )
             cata *= prop->catastrophe_outside;
 #endif
 
