@@ -77,7 +77,7 @@ void test1()
     const real angle = M_PI/6.0;
     Vector3 vec(0,0,0);
     
-    printf("--------------------- rotations of PI/6 -----------------\n");
+    printf("------------------ rotations of PI/6 ---------------------\n");
 
     for ( int ii = 0; ii < 16; ++ii )
     {
@@ -85,7 +85,7 @@ void test1()
         testRotation(vec, angle);
     }
     
-    printf("--------------------- identity ---------------------------\n");
+    printf("----------------------- identity -------------------------\n");
 
     mat = Matrix33::identity();
     mat.print(stdout);
@@ -112,7 +112,7 @@ void test1()
         printf("\n");
     }
     
-    printf("------------------ conversion quat-mat-quat --------------\n");
+    printf("---------------- conversion quat-mat-quat ----------------\n");
     
     real error = 0, e;
     for ( int ii = 0; ii < 1000; ++ii )

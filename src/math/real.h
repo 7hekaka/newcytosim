@@ -128,6 +128,7 @@ inline real clamp(const real x, const real i, const real s)
 /// return `a` if `c==true` and `b` otherwise
 inline real if_select(bool c, real a, real b)
 {
+    // this should be branchless, using Intel's BLENDVPD instruction
     if ( c ) return a;
     else return b;
 }
