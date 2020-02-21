@@ -161,7 +161,7 @@ void ClassicFiberProp::complete(Simul const& sim)
     catastrophe_space_ptr = sim.findSpace(catastrophe_space);
     
     if ( catastrophe_space_ptr )
-        catastrophe_space = catastrophe_space_ptr->property()->name();
+        catastrophe_space = catastrophe_space_ptr->name();
     else
         throw InvalidParameter("A space must be defined as catastrophe_outside[1]");
 #endif

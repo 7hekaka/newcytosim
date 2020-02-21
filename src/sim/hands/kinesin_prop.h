@@ -23,16 +23,16 @@ public:
      @{
      */
     
-    ///
+    /// force parameter expressing the sensitivity of stepping
     real    force;
 
-    ///
+    /// rate of forward step
     real    forward_rate;
     
     /// backward rate
     real    backward_rate;
     
-    ///
+    /// probability of unbinding at each step
     real    unbinding_chance;
     
     /// directionality ( -1 / +1 )

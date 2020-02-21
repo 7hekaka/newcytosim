@@ -164,6 +164,9 @@ public:
     /// return associated Property
     Property const* property() const { return prop; }
     
+    /// returns the name of the Property
+    std::string    name() const { return prop->name(); }
+    
     /// a static_cast<> of Node::next()
     Space*         next() const { return static_cast<Space*>(nNext); }
     

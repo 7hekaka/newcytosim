@@ -464,7 +464,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     
     if ( confine_space_ptr )
-        confine_space = confine_space_ptr->property()->name();
+        confine_space = confine_space_ptr->name();
 
     if ( sim.ready() && confine != CONFINE_OFF )
     {
