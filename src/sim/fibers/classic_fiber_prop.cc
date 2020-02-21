@@ -38,7 +38,7 @@ void ClassicFiberProp::clear()
     catastrophe_length  = 0;
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
-    catastrophe_outside = false;
+    catastrophe_outside = 0;
 #endif
 }
 
