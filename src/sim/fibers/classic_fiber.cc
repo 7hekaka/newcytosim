@@ -6,6 +6,7 @@
 #include "classic_fiber_prop.h"
 #include "exceptions.h"
 #include "iowrapper.h"
+#include "messages.h"
 #include "simul.h"
 #include "space.h"
 
@@ -123,7 +124,10 @@ void ClassicFiber::step()
 #if NEW_CATASTROPHE_OUTSIDE
         // Catastrophe rate is multiplied if the PLUS_END is outside
         if ( prop->catastrophe_space_ptr->outside(posEndP()) )
+        {
+            LOG_ONCE("Fiber's plus-end catastrophe rate is different outside the Space\n");
             cata *= prop->catastrophe_outside;
+        }
 #endif
 
 #if NEW_LENGTH_DEPENDENT_CATASTROPHE
