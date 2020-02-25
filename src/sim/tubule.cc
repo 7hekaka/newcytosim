@@ -8,6 +8,7 @@
 #include "meca.h"
 #include "messages.h"
 #include "exceptions.h"
+#include "glossary.h"
 
 
 void Tubule::step(Simul&)
@@ -59,19 +60,35 @@ void Tubule::setFamily(Fiber const* fam)
 ObjectList Tubule::build(Glossary& opt, Simul& sim)
 {
     ObjectList res;
+    FiberProp * fip = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
     
-    Property * fip = sim.properties.find("fiber", prop->bone_type);
-    if ( fip )
+    // all constitutive fibers should have the same length!
+    real len = 1.0, var = 0;
+    opt.set(len, "length");
+    if ( opt.set(var, "length", 1) )
+        len += var * RNG.sreal();
+    len = std::max(len, fip->min_length);
+    len = std::min(len, fip->max_length);
+    
+    Property * bp = sim.properties.find("fiber", prop->bone_type);
+    if ( bp )
     {
-        bone_ = static_cast<FiberProp*>(fip)->newFiber(opt);
+        bone_ = static_cast<FiberProp*>(bp)->newFiber();
+        bone_->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
+        bone_->updateFiber();
         res.push_back(bone_);
     }
-    
+
     for ( size_t i = 0; i < NFIL; ++i )
     {
-        ObjectList objs = sim.fibers.newObjects(prop->fiber_type, opt);
-        res.append(objs);
-        fil_[i] = Fiber::toFiber(objs[0]);
+        Fiber * fib = fip->newFiber();
+        fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
+        fib->updateFiber();
+        res.push_back(fib);
+        fil_[i] = fib;
+        //ObjectList objs = sim.fibers.newObjects(prop->fiber_type, opt);
+        //res.append(objs);
+        //fil_[i] = Fiber::toFiber(objs[0]);
     }
     
 #if ( DIM >= 3 )

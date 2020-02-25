@@ -493,7 +493,7 @@ FiberSite FiberSet::randomSite(FiberProp * arg) const
             abs += fib->length();
 
     if ( abs == 0 )
-        throw InvalidParameter("randomSite() called with no fibers!");
+        throw InvalidParameter("found no fibers of requested class");
 
     abs *= RNG.preal();
     
@@ -629,7 +629,7 @@ void FiberSet::prune(ObjectFlag f)
             delete(fib);
         else
         {
-            fib->update();
+            fib->updateFiber();
             fib->resetLattice();
             fib->flag(0);
         }

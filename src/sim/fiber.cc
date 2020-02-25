@@ -88,7 +88,7 @@ void Fiber::step()
     {
         needUpdate = false;
         adjustSegmentation();
-        update();
+        updateFiber();
     }
     
 #if FIBER_HAS_MESH
@@ -1239,7 +1239,7 @@ real Fiber::freshAssembly(const FiberEnd end) const
  this updates the segmentation of the fiber if needed, the position of the Hands,
  and the boundaries of the Lattice if present.
  */
-void Fiber::update()
+void Fiber::updateFiber()
 {
 #if ( 0 )
     Cytosim::log << reference() << " update [ "  << std::setw(9) << std::left << abscissaM();
@@ -1912,7 +1912,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == 'm' )
     {
         Chain::read(in, sim, tag);
-        update();
+        updateFiber();
     }
 #endif
     else
