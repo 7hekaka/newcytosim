@@ -1091,15 +1091,11 @@ void Fiber::detachHands() const
 /**
 Sort in ascending order
 */
-int comp_abscissa(const void* a, const void* b)
+int compareAbscissa(const void* a, const void* b)
 {
     real aa = static_cast<Hand const*>(a)->abscissa();
     real bb = static_cast<Hand const*>(b)->abscissa();
-    if ( aa < bb )
-        return -1;
-    if ( bb < aa )
-        return 1;
-    return 0;
+    return ( bb < aa ) - ( aa < bb );
 }
 
 /**
@@ -1122,7 +1118,7 @@ void Fiber::sortHands() const
             n = n->next();
         }
         
-        qsort(tmp, cnt, sizeof(Hand*), comp_abscissa);
+        qsort(tmp, cnt, sizeof(Hand*), compareAbscissa);
         
         n = tmp[0];
         handListFront = n;

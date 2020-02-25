@@ -369,9 +369,7 @@ int Rasterizer::compareVertex3(const void * a, const void * b)
     Vertex3 const* va = (Vertex3 const*)(a);
     Vertex3 const* vb = (Vertex3 const*)(b);
     
-    if ( va->ZZ > vb->ZZ ) return  1;
-    if ( va->ZZ < vb->ZZ ) return -1;
-    return 0;
+    return ( va->ZZ > vb->ZZ ) - ( va->ZZ < vb->ZZ );
 }
 
 

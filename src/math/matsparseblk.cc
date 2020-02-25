@@ -388,9 +388,7 @@ int compareMSBElement(const void * p, const void * q)
     MatrixSparseBlock::Element const* a = (MatrixSparseBlock::Element const*)(p);
     MatrixSparseBlock::Element const* b = (MatrixSparseBlock::Element const*)(q);
     
-    if ( a->inx > b->inx ) return  1;
-    if ( a->inx < b->inx ) return -1;
-    return 0;
+    return ( a->inx > b->inx ) - ( a->inx < b->inx );
 }
 
 

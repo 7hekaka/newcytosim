@@ -448,14 +448,14 @@ void MatrixSparseSymmetricBlock::Column::print(std::ostream& os) const
 
 
 /// A block element of the sparse matrix suitable for qsort()
-class MatrixSparseSymmetricBlock::Element
+class alignas(32) MatrixSparseSymmetricBlock::Element
 {
 public:
-    /// block element
-    SquareBlock blk;
-    
     /// index
     size_t inx;
+
+    /// block element
+    SquareBlock blk;
 };
 
 
@@ -465,9 +465,7 @@ int compareElement(const void * p, const void * q)
     MatrixSparseSymmetricBlock::Element const* a = (MatrixSparseSymmetricBlock::Element const*)(p);
     MatrixSparseSymmetricBlock::Element const* b = (MatrixSparseSymmetricBlock::Element const*)(q);
     
-    if ( a->inx > b->inx ) return  1;
-    if ( a->inx < b->inx ) return -1;
-    return 0;
+    return ( a->inx > b->inx ) - ( a->inx < b->inx );
 }
 
 /**

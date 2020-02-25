@@ -7,16 +7,11 @@
 #include "random.h"
 
 
-int comp(const void * a, const void * b)
+int compare(const void * a, const void * b)
 {
     int av = *(static_cast<const int*>(a));
     int bv = *(static_cast<const int*>(b));
-    if ( av < bv )
-        return -1;
-    else if ( av > bv )
-        return 1;
-    else
-        return 0;
+    return ( av > bv ) - ( av < bv );
 }
 
 
@@ -48,7 +43,7 @@ int main(int argc, char* argv[])
             for( size_t i=0; i < b.size(); ++i )
                 printf(" %i", b[i]);
             
-            b.sort(comp);
+            b.sort(compare);
             
             printf("\n   sort %2lu :", b.size());
             for( size_t i=0; i < b.size(); ++i )

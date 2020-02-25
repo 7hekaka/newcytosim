@@ -177,14 +177,12 @@ public:
 
 
 /// function to sort Triangles according to their 'z'
-static int closer(const void * ap, const void * bp)
+static int compareTriangle(const void * ap, const void * bp)
 {
     Triangle const* a = static_cast<const Triangle*>(ap);
     Triangle const* b = static_cast<const Triangle*>(bp);
     
-    if ( a->z > b->z ) return  1;
-    if ( a->z < b->z ) return -1;
-    return 0;
+    return ( a->z > b->z ) - ( a->z < b->z );
 }
 
 
@@ -283,7 +281,7 @@ void Mesh::display(MechouiParam const& pam) const
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 64);
     
     // depth-sort triangles:
-    qsort(tris, n_tris, sizeof(Triangle), &closer);
+    qsort(tris, n_tris, sizeof(Triangle), &compareTriangle);
     
     // render transparent triangles
     for ( size_t i = 0; i < n_tris; ++i )
