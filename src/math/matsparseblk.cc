@@ -371,14 +371,14 @@ void MatrixSparseBlock::Line::print(std::ostream& os) const
 
 
 /// A block element of the sparse matrix suitable for qsort()
-class MatrixSparseBlock::Element
+class alignas(32) MatrixSparseBlock::Element
 {
 public:
-    /// block element
-    SubBlock blk;
-    
     /// index
     size_t inx;
+
+    /// block element
+    SubBlock blk;
 };
 
 
