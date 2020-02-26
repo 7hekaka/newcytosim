@@ -80,7 +80,7 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );
     
-    real load = dot(force, dirFiber());
+    real load = dot(force, dirFiber()) * prop->directionality;
     
     // antagonistic load is negative
     nextStep -= prop->forward_rate_dt / ( 1 + exp(-load*prop->force_inv) );

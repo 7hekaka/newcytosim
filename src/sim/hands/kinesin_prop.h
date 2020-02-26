@@ -42,6 +42,7 @@ public:
     
 private:
     
+    real    directionality;
     real    forward_rate_dt;
     real    backward_rate_dt;
     real    force_inv;

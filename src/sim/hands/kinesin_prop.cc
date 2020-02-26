@@ -57,7 +57,8 @@ void KinesinProp::complete(Simul const& sim)
         throw InvalidParameter("kinesin:backward_rate must be >= 0");
     backward_rate_dt = backward_rate * sim.prop->time_step;
 
-    if ( abs(stride) != 1 )
+    directionality = std::copysign((real)1, stride);
+    if ( abs(directionality) != 1 )
         throw InvalidParameter("kinesin:directionality must be +/- 1");
     
     if ( sim.ready() )
