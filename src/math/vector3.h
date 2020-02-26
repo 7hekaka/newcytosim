@@ -520,7 +520,7 @@ public:
     }
     
     
-    /// return unit vector obtained by rotating `n` around `*this`, by angle defined by cosinus and sinus
+    /// rotate `vec` around `*this`, by angle defined by cosinus and sinus
     /**
      The result is a Vector orthogonal to *this
      */

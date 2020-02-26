@@ -26,7 +26,7 @@
 
 
 /// Switch to enable Myosin, Kinesin and Dynein
-#define NEW_HAND_TYPES 0
+#define NEW_HAND_TYPES 1
 
 #if NEW_HAND_TYPES
 #include "kinesin_prop.h"

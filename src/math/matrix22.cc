@@ -28,9 +28,8 @@ Matrix22 Matrix22::randomRotation()
 
 Matrix22 Matrix22::randomRotation(real angle)
 {
-    real a = angle*RNG.sflip();
-    real c = cos(a);
-    real s = sin(a);
+    real c = cos(angle);
+    real s = sin(angle) * RNG.sflip();
     return Matrix22(c, s, -s, c);
 }
 

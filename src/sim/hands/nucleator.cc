@@ -48,8 +48,7 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
         Vector dir = haMonitor->otherDirection(this);
         rot = Rotation::rotationToVector(dir);
 #if ( DIM == 2 )
-        real c = cos(ang), s = RNG.sflip() * sin(ang);
-        rot = rot * Rotation::rotation(c, s);
+        rot = rot * Rotation::randomRotation(ang);
 #elif ( DIM == 3 )
         rot = rot * Rotation::rotationAroundX(RNG.sreal()*M_PI) * Rotation::rotationAroundZ(ang);
 #endif

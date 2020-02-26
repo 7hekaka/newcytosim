@@ -732,7 +732,15 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
             {
                 real blur = 0;
                 is >> blur;
-                dir = Rotation::randomRotation(blur*RNG.gauss()) * dir;
+#if ( DIM == 3 )
+                Vector3 X, Y;
+                dir.orthonormal(X, Y);
+                X *= blur*RNG.gauss();
+                Y *= blur*RNG.gauss();
+                dir = normalize(dir+X+Y);
+#elif ( DIM == 2 )
+                dir = Rotation::rotation(blur*RNG.gauss()) * dir;
+#endif
             }
             // returns one of the two points specified
             else if ( tok == "or" )
