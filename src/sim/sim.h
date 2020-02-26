@@ -24,13 +24,6 @@
 #define NEW_ANISOTROPIC_FIBER_DRAG 0
 
 
-/**
- Enables Myosin, Kinesin and Dynein
- Option normally OFF
- */
-#define NEW_HANDS 0
-
-
 /** 
  Enables advanced Space
  */
