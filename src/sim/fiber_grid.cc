@@ -262,7 +262,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     //randomize the list, to make attachments more fair:
     if ( segments.size() > 1 )
     {
-#if BIND_CLOSEST_TARGET
+#if BIND_CLOSEST_FIBER
         for ( FiberSegment const& seg : segments )
         {
             real dis = INFINITY;
@@ -284,7 +284,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 
     for ( FiberSegment const& seg : segments )
     {
-#if BIND_CLOSEST_TARGET
+#if BIND_CLOSEST_FIBER
         //printf("try segment %p %lu : %.6f\n", seg.fiber(), seg.point(), seg.dis_);
         if ( seg.dis_ > ha.prop->binding_range_sqr )
             break;

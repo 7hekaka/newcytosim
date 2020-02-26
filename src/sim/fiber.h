@@ -34,6 +34,10 @@ class LineDisp;
 #define FIBER_HAS_GLUE 0
 
 
+/// If enabled, bind to closest targets more likely
+#define BIND_CLOSEST_FIBER 0
+
+
 /**
  The type of Lattice associated with each Fiber is defined here:
  */

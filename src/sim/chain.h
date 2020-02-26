@@ -357,7 +357,7 @@ public:
     /// the current segment length (distance between successive vertices)
     real         segmentation() const { return fnCut; }
     
-    /// the current segment length (distance between successive vertices)
+    /// should return 1.0 / segmentation()
     real         segmentationInv() const { return iCut; }
 
     /// returns third power of segmentation()

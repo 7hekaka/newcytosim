@@ -9,10 +9,6 @@
 #include "fiber.h"
 
 
-/// If enabled, bind to closest targets more likely
-#define BIND_CLOSEST_TARGET 0
-
-
 /// Indicates the segment of a Fiber located between two consecutive vertices
 /** 
  FiberSegment is used to refer to the section of a Fiber located between two vertices.
@@ -33,7 +29,7 @@ private:
     
 public:
     
-#if BIND_CLOSEST_TARGET
+#if BIND_CLOSEST_FIBER
     /// used to sort targets according to distance in tryToAttach()
     mutable real  dis_;
 #endif
