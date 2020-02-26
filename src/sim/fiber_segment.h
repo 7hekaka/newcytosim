@@ -58,6 +58,9 @@ public:
     /// the length of the segment
     real         len()         const { return fib_->segmentation(); }
     
+    /// should return 1.0 / len()
+    real         lenInv()      const { return fib_->segmentationInv(); }
+    
     /// position of first point
     Vector       pos1()        const { return fib_->posP(pti_); }
     

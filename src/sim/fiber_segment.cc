@@ -33,7 +33,7 @@ real FiberSegment::projectPoint0(Vector aw, real& dis) const
         modulo->fold(aw);
     
     // project with the scalar product:
-    real abs = dot(aw, pos2()-A) * fib_->segmentationInv();
+    real abs = dot(aw, pos2()-A) * lenInv();
     
     // calculate distance to projection
 #if ( DIM == 1 )
@@ -61,14 +61,13 @@ real FiberSegment::projectPoint(Vector const& w, real& dis) const
     assert_true( fib_ );
     
     Vector A = pos1();
-    real ls = len();
     Vector aw = w - A;
     
     if ( modulo )
         modulo->fold(aw);
     
     // project with the scalar product:
-    real abs = dot(aw, pos2()-A) / ls;
+    real abs = dot(aw, pos2()-A) * lenInv();
     
     // test boundaries of filament:
     if ( abs < 0 )
@@ -76,7 +75,7 @@ real FiberSegment::projectPoint(Vector const& w, real& dis) const
         if ( isFirst() )
             dis = distanceSqr(w, A);
     }
-    else if ( abs > ls )
+    else if ( abs > len() )
     {
         if ( isLast() )
             dis = distanceSqr(w, pos2());
@@ -114,15 +113,13 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
     real aZ = w[2]     - p[2];
 #endif
     
-    const real ls = len();
-    
     // project with the scalar product:
 #if ( DIM == 1 )
-    real abs = ( dX * aX ) / ls;
+    real abs = ( dX * aX ) * lenInv();
 #elif ( DIM == 2 )
-    real abs = ( dX * aX + dY * aY ) / ls;
+    real abs = ( dX * aX + dY * aY ) * lenInv();
 #elif ( DIM == 3 )
-    real abs = ( dX * aX + dY * aY + dZ * aZ ) / ls;
+    real abs = ( dX * aX + dY * aY + dZ * aZ ) * lenInv();
 #endif
     
     // test boundaries of segment:
@@ -131,7 +128,7 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
         if ( isFirst() )
             dis = distanceSqr(w, pos1());
     }
-    else if ( abs > ls )
+    else if ( abs > len() )
     {
         if ( isLast() )
             dis = distanceSqr(w, pos2());
@@ -189,8 +186,8 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
 
     Vector pos = pos1();
     Vector off = seg.pos1();
-    Vector d11 = ( pos2() - pos ) * fib_->segmentationInv();
-    Vector d22 = ( seg.pos2() - off ) * seg.fib_->segmentationInv();
+    Vector d11 = ( pos2() - pos ) * lenInv();
+    Vector d22 = ( seg.pos2() - off ) * seg.lenInv();
     off -= pos; // off = seg.pos1() - pos1()
     
     if ( modulo )
