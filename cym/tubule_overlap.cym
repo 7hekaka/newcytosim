@@ -1,5 +1,5 @@
 % An antiparallel bundle extending under the action of crosslinking motors
-% Francois Nedelec, 2017-09-20
+% Francois Nedelec, Cambridge 2020-02-20
 
 set simul system
 {
@@ -12,7 +12,11 @@ set simul system
 
 set system display
 {
-    window_size = 1792, 768; point_value=0.001; style=3; back_color=white;
+    style = 3;
+    window_size = 1280, 720;
+    point_value = 0.001;
+    back_color = black;
+    perspective = 2;
 }
 
 set space cell 
@@ -23,23 +27,33 @@ set space cell
 
 new cell
 {
-    length = 1.5
-    radius = 0.25
+    length = 0.8
+    radius = 0.1
+}
+
+
+set fiber backbone
+{
+    rigidity     = 1
+    segmentation = 0.128
+    steric       = 1, 0.015
+    binding_key  = 0
+    display = ( visible=0; )
 }
 
 set fiber filament
 {
-    rigidity = 20
+    rigidity = 1
     segmentation = 0.128
-    steric = 1, 0.005
     lattice = 1, 0.008
 }
 
+
 set filament display
 {
-    color      = 0xFFFFFFFF, 0x7F7F7FFF, 0xFFFFFF00;
+    color      = 0xFFFFFFFF, 0x333333FF, 0xFFFFFF00;
     coloring   = 5;
-    lines      = 5, 1, 1;
+    lines      = 5, 0;
     lattice    = 3, 1, 0;
 }
 
@@ -47,77 +61,116 @@ set tubule microtubule
 {
     stiffness = 10000, 5000
     fiber = filament
+    bone = backbone
+}
+
+set hand ase1
+{
+    binding_rate = 100
+    binding_range = 0.015
+    unbinding_rate = 0.2
+    unbinding_force = 10
+    
+    activity = wander
+    step_size = 0.008
+    diffusion = 0.1
+    hold_growing_end = 1
 }
 
 set hand kinesin
 {
-    binding_rate = 10
-    binding_range = 0.035
+    binding_rate = 5
+    binding_range = 0.015
     unbinding_rate = 0.1
     unbinding_force = 3
     
-    activity = walk
-    unloaded_speed = 0
-    stall_force = 6
+    activity = kinesin
+    forward_rate = 277
+    backward_rate = 0.34
+	unbinding_chance = 0.01
+    force = 2
     step_size = 0.008
-    hold_growing_end = 1
+}
+
+set ase1 display
+{
+    color = blue;
+    size  = 6;
+    width = 3.5;
 }
 
 set kinesin display
 {
-    color   = 0x000080FF;
-    size    = 6;
-    width   = 3.5;
+    color = green;
+    size  = 5;
+    width = 3.5;
+}
+
+set couple crosslinker
+{
+    activity = crosslink
+    hand1 = ase1
+    hand2 = ase1
+    stiffness = 200
+    diffusion = 1
+    length = 0.020
+    specificity = antiparallel
 }
 
 set couple complex
 {
-    hand1 = kinesin
-    hand2 = kinesin
-    stiffness = 250
-    diffusion = 5
-    length = 0.030
+    activity = menage
+    hand1 = ase1
+    hand2 = ase1
+    hand3 = kinesin
+    stiffness = 500, 400
+    diffusion = 1
+    length = 0.020
     specificity = antiparallel
 }
 
 new 2 microtubule
 {
     length = 0.512
-    range = 0 0.025 -0.025, 0 -0.025 0.025
-    orientation = +1 0 0
+    range = 0 0.022 -0.022, 0 -0.022 0.022
+    %position = 0 0.025 -0.025
+    rotation = X 0.25
     mark = 2
 }
 
 new 2 microtubule
 {
     length = 0.512
-    range = 0 -0.025 -0.025, 0 0.025 0.025
-    orientation = -1 0 0
+    range = 0 -0.022 -0.022, 0 0.022 0.022
+    %position = 0 -0.025 -0.025
+    rotation = Y 3.1415
     mark = 4
 }
 
 new 0 microtubule
 {
     length = 0.384
-    position = 0 0.025 0.075
-    orientation = 1 0 0
+    position = 0 0.022 0.069
+    rotation = off
 }
 
-new 384 complex
-
-run 250 system
+new 400 crosslinker
 {
-    solve = 0
+    attach1 = filament
 }
 
-run 250 system
+new 150 complex
 {
+    attach1 = filament
 }
 
-change kinesin { unloaded_speed = 0.1 }
-
-run 10000 system
+run 100 system
 {
-    nb_frames = 25
+    solve = half
+}
+
+run 2000 system
+{
+    nb_frames = 2000
 }
 

@@ -51,7 +51,7 @@ set couple complex
     hand1 = kinesin
     hand2 = kinesin
     stiffness = 100
-    diffusion = 10
+    diffusion = 2
 }
 
 new 100 microtubule
