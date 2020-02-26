@@ -27,10 +27,10 @@ extern Modulo const* modulo;
  the function returns 1 without building the grid.
  The return value is zero in case of success.
  
- The algorithm works with any value of `max_step` (the results are always correct),
- but `max_step` affects the efficiency (speed) of the algorithm:
- -if `max_step` is too small, paintGrid() will be slow,
- -if `max_step` is too large, tryToAttach() will be slow.
+ The results are correct with any value of `max_step`, but efficiency of the
+ algorithm is affected by `max_step`:
+     -if `max_step` is too small, paintGrid() will be slow,
+     -if `max_step` is too large, tryToAttach() will be slow.
  A good compromise is to set `max_step` equivalent to the attachment distance,
  or at least to the size of the segments of the Fibers.
  */
@@ -144,7 +144,11 @@ void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int 
     # pragma ivdep
     for ( int x = x_inf; x <= x_sup; ++x )
     {
-        //@todo write/call a specialized function for periodic: icellP1D
+        /*
+        Here icell3() will call pack3D() to calculate the index, switching
+        3 times to always select the periodic image() function, which is wastefull.
+        @todo write/call a specialized function for periodic: icellP1D
+         */
 #if   ( DIM == 1 )
         grid->icell1D( x ).push_back(seg);
 #elif ( DIM == 2 )
@@ -198,6 +202,9 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
     
     for ( const Fiber * fib = first; fib != last ; fib=fib->next() )
     {
+        // do not paint fibers on which binding is disabled:
+        if ( 0 == fib->prop->binding_key )
+            continue;
         PaintJob job;
         job.grid = &fGrid;
         Vector P, Q = fib->posP(0);
