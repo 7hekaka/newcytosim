@@ -230,6 +230,15 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 //------------------------------------------------------------------------------
 #pragma mark - Access
 
+
+int compareSegments(const void * p, const void * q)
+{
+    FiberSegment const* a = (FiberSegment const*)(p);
+    FiberSegment const* b = (FiberSegment const*)(q);
+    
+    return ( a->dis_ > b->dis_ ) - ( a->dis_ < b->dis_ );
+}
+
 /**
  This will bind the given Hand to any Fiber found within `binding_range`, with a
  probability that is encoded in `prob`.
@@ -253,17 +262,42 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     //randomize the list, to make attachments more fair:
     if ( segments.size() > 1 )
     {
+#if BIND_CLOSEST_TARGET
+        for ( FiberSegment const& seg : segments )
+        {
+            real dis = INFINITY;
+            seg.projectPoint(place, dis);
+            seg.dis_ = dis;
+        }
+        segments.sort(compareSegments);
+        //printf("tryToAttach %lu segments\n", segments.size());
+#else
         // randomize the list order
         //std::random_shuffle(segments.begin(), segments.end());
         segments.shuffle();
+#endif
     }
     else if ( segments.empty() )
         return;
     
     //std::clog << "tryToAttach has " << segments.size() << " segments\n";
-    
+
     for ( FiberSegment const& seg : segments )
     {
+#if BIND_CLOSEST_TARGET
+        //printf("try segment %p %lu : %.6f\n", seg.fiber(), seg.point(), seg.dis_);
+        if ( seg.dis_ > ha.prop->binding_range_sqr )
+            break;
+        Fiber * fib = const_cast<Fiber*>(seg.fiber());
+        //need to recalculate the abscissa:
+        real dis = INFINITY;
+        FiberSite pos(fib, seg.abscissa1()+seg.projectPoint(place, dis));
+        if ( ha.attachmentAllowed(pos) )
+        {
+            ha.attach(pos);
+            return;
+        }
+#else
 #if !TRICKY_HAND_ATTACHMENT
         if ( RNG.test(ha.prop->binding_prob) )
 #else
@@ -291,6 +325,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
                 }
             }
         }
+#endif
     }
 }
 
