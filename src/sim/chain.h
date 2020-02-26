@@ -376,7 +376,7 @@ public:
     void         reshape() { getPoints(pPos); }
 
     /// invert polarity (swap PLUS end MINUS ends in place)
-    virtual void flipPolarity();
+    void         flipChainPolarity();
     
     //--------------------- Info
     
