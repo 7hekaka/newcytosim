@@ -235,8 +235,8 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 /// used to qsort segments according to distance
 int compareSegments(const void * a, const void * b)
 {
-    real ad = ((FiberSegment const*)(p))->dis_;
-    real bd = ((FiberSegment const*)(q))->dis_;
+    real ad = ((FiberSegment const*)(a))->dis_;
+    real bd = ((FiberSegment const*)(b))->dis_;
     
     return ( ad > bd ) - ( bd > ad );
 }
