@@ -230,7 +230,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 //------------------------------------------------------------------------------
 #pragma mark - Access
 
-#if BIND_CLOSEST_FIBER
+#if ATTACH_CLOSEST_FIBER
 
 /// used to qsort segments according to distance
 int compareSegments(const void * a, const void * b)
@@ -266,7 +266,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     //randomize the list, to make attachments more fair:
     if ( segments.size() > 1 )
     {
-#if BIND_CLOSEST_FIBER
+#if ATTACH_CLOSEST_FIBER
         for ( FiberSegment const& seg : segments )
         {
             real dis = INFINITY;
@@ -288,7 +288,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 
     for ( FiberSegment const& seg : segments )
     {
-#if BIND_CLOSEST_FIBER
+#if ATTACH_CLOSEST_FIBER
         //printf("try segment %p %lu : %.6f\n", seg.fiber(), seg.point(), seg.dis_);
         if ( seg.dis_ > ha.prop->binding_range_sqr )
             break;

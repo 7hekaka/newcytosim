@@ -29,7 +29,7 @@ private:
     
 public:
     
-#if BIND_CLOSEST_FIBER
+#if ATTACH_CLOSEST_FIBER
     /// used to sort targets according to distance in tryToAttach()
     mutable real  dis_;
 #endif

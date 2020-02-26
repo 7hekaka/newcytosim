@@ -35,7 +35,7 @@ class LineDisp;
 
 
 /// If enabled, bind to closest targets more likely
-#define BIND_CLOSEST_FIBER 0
+#define ATTACH_CLOSEST_FIBER 0
 
 
 /**
