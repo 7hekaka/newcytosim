@@ -230,14 +230,18 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 //------------------------------------------------------------------------------
 #pragma mark - Access
 
+#if BIND_CLOSEST_FIBER
 
-int compareSegments(const void * p, const void * q)
+/// used to qsort segments according to distance
+int compareSegments(const void * a, const void * b)
 {
-    FiberSegment const* a = (FiberSegment const*)(p);
-    FiberSegment const* b = (FiberSegment const*)(q);
+    real ad = ((FiberSegment const*)(p))->dis_;
+    real bd = ((FiberSegment const*)(q))->dis_;
     
-    return ( a->dis_ > b->dis_ ) - ( a->dis_ < b->dis_ );
+    return ( ad > bd ) - ( bd > ad );
 }
+
+#endif
 
 /**
  This will bind the given Hand to any Fiber found within `binding_range`, with a

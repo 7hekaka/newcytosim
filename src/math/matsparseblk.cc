@@ -385,10 +385,10 @@ public:
 /// function for qsort, comparing line indices
 int compareMSBElement(const void * p, const void * q)
 {
-    MatrixSparseBlock::Element const* a = (MatrixSparseBlock::Element const*)(p);
-    MatrixSparseBlock::Element const* b = (MatrixSparseBlock::Element const*)(q);
-    
-    return ( a->inx > b->inx ) - ( a->inx < b->inx );
+    size_t a = ((MatrixSparseBlock::Element const*)(p))->inx;
+    size_t b = ((MatrixSparseBlock::Element const*)(q))->inx;
+
+    return ( a > b ) - ( b > a );
 }
 
 

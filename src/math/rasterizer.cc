@@ -363,13 +363,13 @@ void Rasterizer::paintBox2D(void (*paint)(int, int, int, int, void*), void * arg
 #pragma mark - 3D
 
 
-/// function for qsort: compares the Z component of the two points
+/// function for qsort: compares the Z component of two points
 int Rasterizer::compareVertex3(const void * a, const void * b)
 {
-    Vertex3 const* va = (Vertex3 const*)(a);
-    Vertex3 const* vb = (Vertex3 const*)(b);
+    real az = ((Vertex3 const*)(a))->ZZ;
+    real bz = ((Vertex3 const*)(b))->ZZ;
     
-    return ( va->ZZ > vb->ZZ ) - ( va->ZZ < vb->ZZ );
+    return ( az > bz ) - ( bz > az );
 }
 
 
