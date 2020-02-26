@@ -1093,9 +1093,9 @@ Sort in ascending order
 */
 int compareAbscissa(const void* a, const void* b)
 {
-    real aa = static_cast<Hand const*>(a)->abscissa();
-    real bb = static_cast<Hand const*>(b)->abscissa();
-    return ( bb < aa ) - ( aa < bb );
+    real ax = static_cast<Hand const*>(a)->abscissa();
+    real bx = static_cast<Hand const*>(b)->abscissa();
+    return ( ax > bx ) - ( bx > ax );
 }
 
 /**
