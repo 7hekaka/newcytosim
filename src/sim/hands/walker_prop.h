@@ -35,11 +35,12 @@ public:
      */
     real    unloaded_speed;
     
-    /// probability to unbind per step
+    /// probability to detach per step
     /**
      This probability in [0,1] is tested for every successful step, and thus 
-     creates an additional effective detachment that is proportional to the 
-     distance travelled by the motor, but not to the duration of the interaction.
+     creates an additionaldetachment opportunity that is proportional to the
+     distance travelled by the motor, in contrast to `unbinding_rate` which
+     gives a contribution that is proportional to the duration of the interaction.
      
      Hence, this does not contributes to the detachment of a stalled motor.
      */

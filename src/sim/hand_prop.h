@@ -41,13 +41,13 @@ public:
     
     /// rate of attachment when the Hand is within `binding_range` (also known as `binding[0]`)
     /**
-     This has units of 1/seconds.
-     According to Leduc et al. PNAS 2004 vol. 101 no. 49 17096-17101
-     the molecular binding_rate of kinesin is 4.7 +/- 2.4 /s.
-     <em>
-     http://dx.doi.org/10.1073/pnas.0406598101 \n
-     http://www.pnas.org/content/101/49/17096.abstract
-     </em>
+     This has units of 1/second.
+     The molecular binding_rate of conventional kinesin is 4.7 +/- 2.4 /s:
+         Leduc et al. PNAS 2004 vol. 101 no. 49 17096-17101
+         http://dx.doi.org/10.1073/pnas.0406598101 \n
+         http://www.pnas.org/content/101/49/17096.abstract
+     
+     <em>default value = 0</em>
      */
     real         binding_rate;
     
@@ -64,19 +64,25 @@ public:
     /// can be set to restrict binding to certain type of Fiber
     /**
      The binding to a fiber is allowed only if the keys of the Hand and Fiber match.
-     The test is a BITWISE-AND of the two keys:
+     The test uses a BITWISE-AND of the two keys:
 
          if ( fiber:binding_key & hand:binding_key )
-            allowed = true;
+             allowed = true;
          else
-            allowed = false;
+             allowed = false;
 
+     Thus, with `binding_key==0' attachment is completely disabled, and in general
+     one needs to look at the bit-pattern of the number in base 2. For example
+     `1` can bind to `3` but not to `2`.
+     
+     <em>default value = all-bits-at-1</em>
      */
     unsigned int binding_key;
     
     
     /// detachment rate in the absence of load (also known as `unbinding[0]`)
     /**
+     This defines a detachment opportunity that is proportional to time.
      Kramers theory specifies that the detachment rate depends on the force
      in the link:
      
@@ -86,21 +92,20 @@ public:
      and `unbinding_rate' and `unbinding_force' are two parameters.
      By setting `unbinding_force=inf', unbinding is made independent of load.
      
-     Various measurements:
-     <em>
-     <b>Mechanics of the kinesin step</b>
-     Carter, N. & Cross, R. Nature 435, 308–312 (2005).
-     http://dx.doi.org/doi:10.1038/nature03528
-
-     <b>Examining kinesin processivity within a general gating framework</b>
-     Andreasson et al. eLife 2015;4:e07403
-     http://dx.doi.org/10.7554/eLife.07403
-     </em>
+     Two articles:
+         Mechanics of the kinesin step
+         Carter, N. & Cross, R. Nature 435, 308–312 (2005).
+         http://dx.doi.org/doi:10.1038/nature03528
+     and
+         Examining kinesin processivity within a general gating framework
+         Andreasson et al. eLife 2015;4:e07403
+         http://dx.doi.org/10.7554/eLife.07403
      provide similar values for conventional kinesin:
 
          unbinding_rate = 1 / s
          unbinding_force ~ 2 pN
      
+     <em>default value = 0</em>
      (see @ref Stochastic)
      */
     real         unbinding_rate;
@@ -109,6 +114,8 @@ public:
     /// characteristic force of unbinding (also known as `unbinding[1]`)
     /**
      @copydetails unbinding_rate
+     
+     <em>default value = inf</em>
      */
     real         unbinding_force;
     
