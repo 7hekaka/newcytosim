@@ -39,7 +39,7 @@ private:
                            void (*set_color)(Fiber const&, size_t, real), real) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
-    void drawFiberSubSegments(Fiber const&, real rad, FiberLattice::lati_t inx, FiberLattice::lati_t last, real abs, real inc,
+    void drawFiberSubSegments(Fiber const&, real rad, VisibleLattice::lati_t inx, VisibleLattice::lati_t last, real abs, real inc,
                               void (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
     /// not used

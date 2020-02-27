@@ -277,7 +277,7 @@ used to model the Fiber. All abscissa is with respect to the MINUS_END.
 The function `set_color` is used to set the color of the segments.
 */
 void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
-                                    FiberLattice::lati_t inx, const FiberLattice::lati_t last,
+                                    VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
                                     real abs, const real inc,
                                     void (*set_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
@@ -503,20 +503,20 @@ void set_color_alternate(Fiber const& fib, long ix, real)
 
 void set_color_lattice(Fiber const& fib, long ix, real scale)
 {
-    fib.disp->color.darken(scale*fib.drawableLattice()->data(ix)).load_front();
+    fib.disp->color.darken(scale*fib.visibleLattice()->data(ix)).load_front();
 }
 
 
 void set_rainbow_lattice(Fiber const& fib, long ix, real scale)
 {
-    gle_color::jet_color(scale*fib.drawableLattice()->data(ix)).load_front();
+    gle_color::jet_color(scale*fib.visibleLattice()->data(ix)).load_front();
 }
 
 
 void Display3::drawFiberLattice(Fiber const& fib, real width,
                                 void (*set_color)(Fiber const&, long, real)) const
 {
-    FiberLattice const& lat = *fib.drawableLattice();
+    VisibleLattice const& lat = *fib.visibleLattice();
     FiberDisp const*const disp = fib.prop->disp;
 
     glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);

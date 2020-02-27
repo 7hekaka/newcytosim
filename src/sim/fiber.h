@@ -43,18 +43,18 @@ class LineDisp;
  */
 #if FIBER_HAS_LATTICE > 0
 // Lattice composed of integers, appropriate for discrete occupancy
-typedef Lattice<uint64_t> DigitLattice;
+typedef Lattice<uint64_t> FiberLattice;
 #else
 // Lattice composed of floating point values, for continuous values
-typedef Lattice<real> DigitLattice;
+typedef Lattice<real> FiberLattice;
 #endif
 
 
 /// type of lattice that will be displayed in play:
 #if FIBER_HAS_MESH
-typedef Lattice<real> FiberLattice;
+typedef Lattice<real> VisibleLattice;
 #else
-typedef DigitLattice FiberLattice;
+typedef FiberLattice VisibleLattice;
 #endif
 
 
@@ -108,11 +108,11 @@ private:
 
 #if FIBER_HAS_LATTICE
     /// Associated Lattice used for occupancy of Digit
-    DigitLattice        digitLattice;
+    FiberLattice        frLattice;
 #endif
 #if FIBER_HAS_MESH
     /// Associated Lattice of reals
-    Lattice<real>       valueMesh;
+    Lattice<real>       frMesh;
 #endif
 
 #if FIBER_HAS_GLUE
@@ -312,10 +312,10 @@ public:
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
     /// modifiable reference to Fiber's Lattice
-    DigitLattice&  lattice() { return digitLattice; }
+    FiberLattice&  lattice() { return frLattice; }
     
     /// const reference to Fiber's Lattice
-    DigitLattice const& lattice() const { return digitLattice; }
+    FiberLattice const& lattice() const { return frLattice; }
         
     /// recalculate occupancy lattice from bound Digits
     void           resetLattice();
@@ -334,10 +334,10 @@ public:
 #if FIBER_HAS_MESH
 
     /// modifiable reference to Fiber's Lattice
-    Lattice<real> const&  mesh() const { return valueMesh; }
+    Lattice<real> const&  mesh() const { return frMesh; }
 
-    /// value of the valueMesh at given abscissa
-    real           meshValue(real a) const { if ( valueMesh.ready() ) return valueMesh.cell(a); return 0; }
+    /// value of the frMesh at given abscissa
+    real           meshValue(real a) const { if ( frMesh.ready() ) return frMesh.cell(a); return 0; }
 
 #endif
     
@@ -366,7 +366,7 @@ public:
     void           infoMesh(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
 
     /// lattice to be displayed
-    FiberLattice const* drawableLattice() const;
+    VisibleLattice const* visibleLattice() const;
     
     //--------------------------------------------------------------------------
     
@@ -401,7 +401,7 @@ public:
     /// identifies data for dynamic ends of fibers
     static const ObjectTag TAG_DYNAMIC = 'F';
     
-    /// identifies DigitLattice data
+    /// identifies FiberLattice data
     static const ObjectTag TAG_LATTICE = 'l';
     
     /// identifies Lattice<real> data

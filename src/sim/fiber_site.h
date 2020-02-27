@@ -53,11 +53,11 @@ protected:
     real          fbAbs;
     
     /// propagate Lattice cell index type
-    typedef DigitLattice::lati_t lati_t;
+    typedef FiberLattice::lati_t lati_t;
 
 #if FIBER_HAS_LATTICE
     /// pointer to the Lattice of the Fiber, or NULL if not in use
-    DigitLattice* fbLattice;
+    FiberLattice* fbLattice;
     
     /// index in the Fiber's Lattice (a signed integer)
     lati_t        fbSite;
@@ -81,13 +81,13 @@ public:
 #if FIBER_HAS_LATTICE
     
     /// return Lattice if engaged
-    DigitLattice* lattice() const { return fbLattice; }
+    FiberLattice* lattice() const { return fbLattice; }
     
     /// index of Lattice's site
     lati_t        site()    const { return fbSite; }
     
-    /// set DigitLattice pointer at site `s` and abscissa `a`
-    void engageLattice(DigitLattice* l, lati_t s, real a)
+    /// set FiberLattice pointer at site `s` and abscissa `a`
+    void engageLattice(FiberLattice* l, lati_t s, real a)
     {
         fbLattice = l;
         fbSite    = s;
@@ -98,7 +98,7 @@ public:
 
 #else
     
-    DigitLattice* lattice() const { return nullptr; }
+    FiberLattice* lattice() const { return nullptr; }
 
 #endif
     //--------------------------------------------------------------------------

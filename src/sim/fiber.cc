@@ -93,21 +93,21 @@ void Fiber::step()
     
 #if FIBER_HAS_MESH
     
-    //std::clog << reference() << " mesh " << std::fixed << valueMesh->data(0) << std::endl;
-    //std::clog << reference() << " mesh sum = " << valueMesh->sum() << "     ";
+    //std::clog << reference() << " mesh " << std::fixed << frMesh->data(0) << std::endl;
+    //std::clog << reference() << " mesh sum = " << frMesh->sum() << "     ";
     
     if ( prop->mesh_binding_rate > 0 || prop->mesh_unbinding_rate > 0 )
     {
         real on  = prop->mesh_binding_rate * simul().prop->time_step;
         real off = -std::expm1( -prop->mesh_unbinding_rate * simul().prop->time_step );
-        equilibrateMesh(valueMesh, prop->field_ptr, on, off);
+        equilibrateMesh(frMesh, prop->field_ptr, on, off);
     }
     
     if ( prop->mesh_flux_speed != 0 )
-        fluxMesh(valueMesh, prop->field_ptr, prop->mesh_flux_speed);
+        fluxMesh(frMesh, prop->field_ptr, prop->mesh_flux_speed);
     
     if ( prop->mesh_cut_fiber )
-        cutFiberMesh(valueMesh);
+        cutFiberMesh(frMesh);
     
     if ( prop->mesh_aging_rate > 0 )
     {
@@ -117,10 +117,10 @@ void Fiber::step()
          with a time-scale given by 'mesh_aging_rate'.
          */
         real cst = prop->mesh_aging_rate * simul().prop->time_step;
-        evolveMeshValues(valueMesh, cst, 1.0-cst);
-        //std::clog << reference() << " lattice avg = " << valueMesh->sum()*valueMesh->unit()/length() << std::endl;
+        evolveMeshValues(frMesh, cst, 1.0-cst);
+        //std::clog << reference() << " lattice avg = " << frMesh->sum()*frMesh->unit()/length() << std::endl;
     }
-    //std::clog << valueMesh->sum() << std::endl;
+    //std::clog << frMesh->sum() << std::endl;
 #endif
 }
 
@@ -144,7 +144,7 @@ Fiber::Fiber(FiberProp const* p)
             if ( prop->lattice_unit < REAL_EPSILON )
                 throw InvalidParameter("the Lattice unit (lattice[1]) must be > 0");
             //Cytosim::log << reference() <<  " new Lattice" << std::endl;
-            digitLattice.setUnit(prop->lattice_unit);
+            frLattice.setUnit(prop->lattice_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:lattice");
 #endif
@@ -156,7 +156,7 @@ Fiber::Fiber(FiberProp const* p)
             if ( prop->mesh_unit < REAL_EPSILON )
                 throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
             //Cytosim::log << reference() <<  " new value Lattice" << std::endl;
-            valueMesh.setUnit(prop->mesh_unit);
+            frMesh.setUnit(prop->mesh_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:mesh");
 #endif
@@ -208,7 +208,7 @@ Fiber::~Fiber()
     
 #if FIBER_HAS_MESH
     if ( prop->field_ptr )
-        releaseMeshValues(valueMesh, prop->field_ptr);
+        releaseMeshValues(frMesh, prop->field_ptr);
 #endif
 
 #if FIBER_HAS_GLUE
@@ -357,11 +357,11 @@ Fiber* Fiber::severPoint(size_t pti)
     assert_true(fib->abscissaM() == abs);
     
 #if FIBER_HAS_MESH
-    if ( valueMesh.ready() )
+    if ( frMesh.ready() )
     {
-        assert_true( valueMesh.unit() == fib->valueMesh.unit() );
+        assert_true( frMesh.unit() == fib->frMesh.unit() );
         // transfer Lattice values located above the cut
-        fib->valueMesh.takeP(valueMesh, valueMesh.index_round(abs));
+        fib->frMesh.takeP(frMesh, frMesh.index_round(abs));
     }
 #endif
 
@@ -422,14 +422,14 @@ Fiber* Fiber::severP(real abs)
     fib->Chain::cutM(abs);
 
 #if FIBER_HAS_MESH
-    if ( valueMesh.ready() )
+    if ( frMesh.ready() )
     {
-        assert_true( valueMesh.unit() == fib->valueMesh.unit() );
+        assert_true( frMesh.unit() == fib->frMesh.unit() );
         // ensure valid range:
-        fib->valueMesh.setRange(abscissaM()+abs, abscissaP());
+        fib->frMesh.setRange(abscissaM()+abs, abscissaP());
         
         // transfer Lattice values located above the cut:
-        fib->valueMesh.takeP(valueMesh, valueMesh.index_round(abscissaM()+abs));
+        fib->frMesh.takeP(frMesh, frMesh.index_round(abscissaM()+abs));
     }
 #endif
     
@@ -613,14 +613,14 @@ void Fiber::join(Fiber * fib)
     setDynamicStateP(fib->dynamicStateP());
 
 #if FIBER_HAS_MESH
-    if ( valueMesh.ready() )
+    if ( frMesh.ready() )
     {
-        assert_true( valueMesh.unit() == fib->valueMesh.unit() );
+        assert_true( frMesh.unit() == fib->frMesh.unit() );
         // ensure valid range:
-        valueMesh.setRange(abscissaM(), abscissaP());
+        frMesh.setRange(abscissaM(), abscissaP());
         
         // transfer Lattice values from other fiber
-        valueMesh.takeP(fib->valueMesh, valueMesh.indexM());
+        frMesh.takeP(fib->frMesh, frMesh.indexM());
     }
 #endif
 
@@ -1263,27 +1263,27 @@ void Fiber::updateFiber()
     
 #if FIBER_HAS_LATTICE
     // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( digitLattice.ready() )
+    if ( frLattice.ready() )
     {
-        digitLattice.setRange(abscissaM(), abscissaP());
+        frLattice.setRange(abscissaM(), abscissaP());
     }
 #endif
 #if FIBER_HAS_MESH
     // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( valueMesh.ready() )
+    if ( frMesh.ready() )
     {
-        valueMesh.setRange(abscissaM(), abscissaP());
+        frMesh.setRange(abscissaM(), abscissaP());
         
         if ( prop->field_ptr )
         {
             real sumM;
             // release Lattice substance located outside the valid abscissa range
-            valueMesh.collectM(sumM);
+            frMesh.collectM(sumM);
             prop->field_ptr->cell(posEndM()) += sumM;
             //Cytosim::log << " Fiber::MINUS_END releases " << sumM << std::endl;
             
             real sumP;
-            valueMesh.collectP(sumP);
+            frMesh.collectP(sumP);
             prop->field_ptr->cell(posEndP()) += sumP;
             //Cytosim::log << " Fiber::PLUS_END releases " << sumP << std::endl;
         }
@@ -1298,7 +1298,7 @@ void Fiber::updateFiber()
 void Fiber::printLattice(std::ostream& os) const
 {
 #if FIBER_HAS_LATTICE
-    DigitLattice const& lat = digitLattice;
+    FiberLattice const& lat = frLattice;
     using std::setw;
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1315,7 +1315,7 @@ void Fiber::printLattice(std::ostream& os) const
 void Fiber::infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx) const
 {
 #if FIBER_HAS_LATTICE
-    DigitLattice const& lat = digitLattice;
+    FiberLattice const& lat = frLattice;
     if ( lat.ready() )
     {
         len += length();
@@ -1333,12 +1333,12 @@ void Fiber::infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx) co
 }
 
 
-FiberLattice const* Fiber::drawableLattice() const
+VisibleLattice const* Fiber::visibleLattice() const
 {
 #if FIBER_HAS_MESH
-    return &valueMesh;
+    return &frMesh;
 #elif FIBER_HAS_LATTICE
-    return &digitLattice;
+    return &frLattice;
 #else
     return nullptr;
 #endif
@@ -1599,7 +1599,7 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
 void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
 {
 #if FIBER_HAS_MESH
-    Lattice<real> const& lat = valueMesh;
+    Lattice<real> const& lat = frMesh;
     if ( lat.ready() )
     {
         len += length();
@@ -1796,21 +1796,21 @@ void Fiber::write(Outputter& out) const
      We can save the occupancy Lattice here, but this is not necessary
      as it can be recalculated on the fly, so we save space by skipping
      */
-    if ( digitLattice.ready() )
+    if ( frLattice.ready() )
     {
         writeHeader(out, TAG_LATTICE);
-        // digitLattice.write(out);
+        // frLattice.write(out);
         // only write information corresponding to actual Fiber abscissa range:
-        digitLattice.write(out, digitLattice.indexM(), digitLattice.indexP()+1);
+        frLattice.write(out, frLattice.indexM(), frLattice.indexP()+1);
     }
 #endif
 #if FIBER_HAS_MESH
-    if ( valueMesh.ready() )
+    if ( frMesh.ready() )
     {
         writeHeader(out, TAG_FIBMESH);
-        // valueMesh.write(out);
+        // frMesh.write(out);
         // only write information corresponding to actual Fiber abscissa range:
-        valueMesh.write(out, valueMesh.indexM(), valueMesh.indexP()+1);
+        frMesh.write(out, frMesh.indexM(), frMesh.indexP()+1);
     }
 #endif
 }
@@ -1864,9 +1864,9 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_LATTICE
-            digitLattice.read(in);
+            frLattice.read(in);
 #else
-            DigitLattice dummy;
+            FiberLattice dummy;
             dummy.read(in);
             // store unit, to get digits at the right abscissa
             const_cast<FiberProp*>(prop)->lattice_unit = dummy.unit();
@@ -1881,7 +1881,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_MESH
-            valueMesh.read(in);
+            frMesh.read(in);
 #else
             Lattice<real> dummy;
             dummy.read(in);

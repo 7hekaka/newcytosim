@@ -20,7 +20,7 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
     if ( Hand::attachmentAllowed(sit) )
     {
 #if FIBER_HAS_LATTICE
-        DigitLattice * lat = &sit.fiber()->lattice();
+        FiberLattice * lat = &sit.fiber()->lattice();
         
         if ( !lat->ready() )
             throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
@@ -192,11 +192,11 @@ std::ostream& operator << (std::ostream& os, Digit const& obj)
 #if FIBER_HAS_LATTICE
 void Fiber::resetLattice()
 {
-    digitLattice.clear();
+    frLattice.clear();
     
     for ( Hand * ha = handListFront; ha; ha = ha->next() )
     {
-        if ( ha->lattice() == &digitLattice )
+        if ( ha->lattice() == &frLattice )
             static_cast<Digit*>(ha)->inc();
     }
 }

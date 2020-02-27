@@ -1029,7 +1029,7 @@ void set_lattice_color(Fiber const& fib, real val)
  */
 void Display::drawFiberLattice1(Fiber const& fib, real width) const
 {
-    FiberLattice const& lat = *fib.drawableLattice();
+    VisibleLattice const& lat = *fib.visibleLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1089,7 +1089,7 @@ void Display::drawFiberLattice1(Fiber const& fib, real width) const
  */
 void Display::drawFiberLattice2(Fiber const& fib, real width) const
 {
-    FiberLattice const& lat = *fib.drawableLattice();
+    VisibleLattice const& lat = *fib.visibleLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1146,7 +1146,7 @@ void Display::drawFiberLattice2(Fiber const& fib, real width) const
  */
 void Display::drawFiberLatticeEdges(Fiber const& fib, real) const
 {
-    FiberLattice const& lat = *fib.drawableLattice();
+    VisibleLattice const& lat = *fib.visibleLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1463,7 +1463,7 @@ void Display::drawFiber(Fiber const& fib)
     FiberDisp const*const disp = fib.prop->disp;
     int line_style = disp->line_style;
 
-    FiberLattice const* lat = fib.drawableLattice();
+    VisibleLattice const* lat = fib.visibleLattice();
     if ( lat && lat->ready() )
     {
         // if the Lattice is displayed, do not draw backbone:

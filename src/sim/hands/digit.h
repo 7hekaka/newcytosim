@@ -46,7 +46,7 @@ public:
     bool   outsideMP(lati_t s) const { return fbLattice->outsideMP(s); }
 
     /// true if given Lattice's site has this footprint's bits set
-    bool   occupied(DigitLattice* lat, lati_t s) const { return lat->data(s) & prop->footprint; }
+    bool   occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop->footprint; }
 
     /// true if given Lattice's site is unoccupied (check all footprint bits equal to 1)
     bool   vacant(lati_t s) const { return 0 == (fbLattice->data(s) & prop->footprint); }
@@ -63,7 +63,7 @@ public:
     bool   outsideMP(lati_t s) const { return fbLattice->outsideMP(s); }
 
     /// true if given Lattice's site is occupied
-    bool   occupied(DigitLattice* lat, lati_t s) const { return lat->data(s) != 0.0; }
+    bool   occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
     bool   vacant(lati_t s) const { return fbLattice->data(s) == 0.0; }
@@ -78,7 +78,7 @@ public:
 
     lati_t site() const { return std::round(fbAbs/prop->step_size); }
     bool   outsideMP(lati_t) const { return false; }
-    bool   occupied(DigitLattice* lat, lati_t s) const { return false; }
+    bool   occupied(FiberLattice* lat, lati_t s) const { return false; }
     bool   vacant(lati_t) const { return true; }
     void   inc() {}
     void   dec() {}

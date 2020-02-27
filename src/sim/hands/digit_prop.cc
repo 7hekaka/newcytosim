@@ -37,7 +37,7 @@ void DigitProp::read(Glossary& glos)
     
     if ( glos.set(footprint, "footprint") )
     {
-        if ( std::is_same<real, DigitLattice::cell_t>::value )
+        if ( std::is_same<real, FiberLattice::cell_t>::value )
             throw InvalidParameter("`footprint` is only valid with Integer-based Lattice");
     }
 

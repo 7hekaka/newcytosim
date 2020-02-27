@@ -27,7 +27,7 @@ public:
     real   step_size;
     
     /// list of cell's bits covered upon binding on the lattice
-    DigitLattice::cell_t footprint;
+    FiberLattice::cell_t footprint;
     
     /// specifies the position of binding within the Lattice cell
     /**
