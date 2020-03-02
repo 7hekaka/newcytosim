@@ -934,7 +934,7 @@ public:
          This is using Rodrigues's formula:
              I + sinus * K + ( 1 - cosinus ) * K^2
              K = -1 (x) axis
-        Attention: this is a rotation only if norm(axis)==1
+        Attention: this is a rotation only if norm(axis)==1 and `c*c + s*s == 1`
          */
         const real  X = axis.XX  ,  Y = axis.YY  ,  Z = axis.ZZ;
         const real dX = X - c * X, dY = Y - c * Y, dZ = Z - c * Z;

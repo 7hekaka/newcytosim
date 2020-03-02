@@ -152,18 +152,18 @@ void Display::displayTiled(Simul const& sim, int arg)
 /**
  Create a FiberDisp for this Property if necessary
  */
-void Display::prepareFiberDisp(FiberProp * p, PropertyList& alldisp, gle_color col)
+void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color col)
 {
-    FiberDisp *& disp = p->disp;
+    FiberDisp *& disp = fp->disp;
     
     // recover existing property:
     if ( !disp )
-        disp = static_cast<FiberDisp*>(alldisp.find("fiber:display", p->name()));
+        disp = static_cast<FiberDisp*>(alldisp.find("fiber:display", fp->name()));
 
     // create new property with default values:
     if ( disp == nullptr )
     {
-        disp = new FiberDisp(p->name());
+        disp = new FiberDisp(fp->name());
         alldisp.push_back(disp);
         // set default:
         disp->color       = col;
@@ -173,10 +173,10 @@ void Display::prepareFiberDisp(FiberProp * p, PropertyList& alldisp, gle_color c
     }
     
     // parse user-provided values:
-    if ( p->display_fresh )
+    if ( fp->display_fresh )
     {
-        disp->read_string(p->display, " in "+p->name()+":display");
-        p->display_fresh = false;
+        disp->read_string(fp->display, " in "+fp->name()+":display");
+        fp->display_fresh = false;
     }
     
     if ( disp->coloring == FiberDisp::COLORING_CLUSTER )

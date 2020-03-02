@@ -43,7 +43,7 @@ class LineDisp;
  */
 #if FIBER_HAS_LATTICE > 0
 // Lattice composed of integers, appropriate for discrete occupancy
-typedef Lattice<uint64_t> FiberLattice;
+typedef Lattice<uint8_t> FiberLattice;
 #else
 // Lattice composed of floating point values, for continuous values
 typedef Lattice<real> FiberLattice;
@@ -132,8 +132,8 @@ protected:
     /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
     virtual Fiber* severPoint(size_t pti);
     
-    /// return index of point where there is a kink
-    size_t         hasKink(real) const;
+    /// return index of point where there is a kink with ( cos(angle) < max_cos )
+    size_t         hasKink(real max_cos) const;
 
     
     /// viscous drag coefficient for a cylinder moving close to a surface

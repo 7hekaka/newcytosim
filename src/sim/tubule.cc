@@ -59,29 +59,30 @@ void Tubule::setFamily(Fiber const* fam)
 
 ObjectList Tubule::build(Glossary& opt, Simul& sim)
 {
-    ObjectList res;
-    FiberProp * fip = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
-    
-    // all constitutive fibers should have the same length!
+    FiberProp const* fp = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
     real len = 1.0, var = 0;
-    opt.set(len, "length");
-    if ( opt.set(var, "length", 1) )
-        len += var * RNG.sreal();
-    len = std::max(len, fip->min_length);
-    len = std::min(len, fip->max_length);
-    
-    Property * bp = sim.properties.find("fiber", prop->bone_type);
-    if ( bp )
+    ObjectList res;
+
+    // get the 'bone'
+    if ( prop->bone_type.size() > 0 )
     {
-        bone_ = static_cast<FiberProp*>(bp)->newFiber();
-        bone_->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
-        bone_->updateFiber();
-        res.push_back(bone_);
+        res = sim.fibers.newObjects(prop->bone_type, opt);
+        bone_ = static_cast<Fiber*>(res[0]);
+        len = bone_->length();
+    }
+    else
+    {
+        opt.set(len, "length");
+        if ( opt.set(var, "length", 1) )
+            len += var * RNG.sreal();
+        len = std::max(len, fp->min_length);
+        len = std::min(len, fp->max_length);
     }
 
+    // all constitutive fibers should have the same length!
     for ( size_t i = 0; i < NFIL; ++i )
     {
-        Fiber * fib = fip->newFiber();
+        Fiber * fib = fp->newFiber();
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
         fib->updateFiber();
         res.push_back(fib);
@@ -206,7 +207,8 @@ void Tubule::setInteractions(Meca& meca)
     if ( !bone_ )
         throw InvalidParameter("A backbone must be defined for Tubule");
 #if ( DIM >= 3 )
-    const real stiff = prop->stiffness[0];
+    const real stiffL = prop->stiffness[0];
+    const real stiffR = prop->stiffness[1];
     const real ang = M_PI / NFIL;
     const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
     const real c = cos(ang), s = sin(ang);
@@ -229,8 +231,10 @@ void Tubule::setInteractions(Meca& meca)
         for ( size_t n = 0; n < NFIL; ++n )
         {
             Vector arm = ( cen - fil_[n]->posPoint(i) ).normalized(len);
-            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiff);
-            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(bone_,i), alpha*cross(dir,arm), stiff);
+            // orthoradial beams:
+            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
+            // radial spoke:
+            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
         }
     }
 
@@ -239,8 +243,8 @@ void Tubule::setInteractions(Meca& meca)
     for ( size_t n = 0; n < NFIL; ++n )
     {
         Vector arm = ( cen - fil_[n]->posPoint(i) ).normalized(len);
-        meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiff);
-        meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(bone_,i), alpha*cross(dir,arm), stiff);
+        meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
+        meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
     }
 #endif
 }

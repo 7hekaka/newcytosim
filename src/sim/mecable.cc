@@ -220,6 +220,12 @@ void Mecable::rotate(Rotation const& T)
 //------------------------------------------------------------------------------
 #pragma mark - Export/Inport
 
+void Mecable::copyPoints(const size_t nbp, const real pts[])
+{
+    setNbPoints(nbp);
+    copy_real(DIM*nbp, pts, pPos);
+}
+
 
 void Mecable::putPoints(real * ptr) const
 {

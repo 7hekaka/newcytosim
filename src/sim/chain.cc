@@ -32,7 +32,7 @@ size_t Chain::bestNumberOfPoints(const real ratio)
 }
 
 
-real Chain::contourLength(const real* pts, size_t n_pts)
+real Chain::contourLength(const real pts[], size_t n_pts)
 {
     real len = 0;
     Vector a(pts), b;

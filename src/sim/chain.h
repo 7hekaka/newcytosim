@@ -67,7 +67,7 @@ class Chain : public Mecable
     static size_t bestNumberOfPoints(real ratio);
 
     /// calculate length of given string of points
-    static real contourLength(const real* pts, size_t n_pts);
+    static real contourLength(const real pts[], size_t n_pts);
     
 private:
         
@@ -169,9 +169,6 @@ public:
 
     /// change the current segmentation to force `length()==len` (normally not needed)
     void         imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
-    
-    /// return updated `normal` that is orthogonal to `d` (used for fake 3D display)
-    Vector3      adjustedNormal(Vector3 const& d) const;
     
     //---------------------
 
@@ -346,9 +343,12 @@ public:
     /// dot-product (force at the end of the Fiber).(direction of Fiber growth)
     real         projectedForceEnd(FiberEnd end) const;
     
-    /// average direction
+    /// direction averaged over the entire length
     Vector       avgDirection() const { return normalize(posEndP()-posEndM()); }
     
+    /// return updated `normal` that is orthogonal to `d` (used for fake 3D display)
+    Vector3      adjustedNormal(Vector3 const& d) const;
+
     //--------------------- Segmentation / discrete representation
     
     /// set desired segmentation (the length of the segments might be different)

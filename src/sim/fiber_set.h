@@ -91,7 +91,7 @@ public:
     FiberSite randomSite() const;
     
     /// a random site on the fibers of specified class, uniformly distributed
-    FiberSite randomSite(FiberProp *) const;
+    FiberSite randomSite(FiberProp const*) const;
 
     /// a site on a fiber, as specified by Glossary[key]
     FiberSite someSite(std::string const& key, Glossary&) const;

@@ -114,12 +114,15 @@ public:
     
     /// Address of point `p`
     const real*     addrPoint(size_t p) const { return pPos + DIM*p; }
-    
+
     /// Set position of point `i` to `x`
     void            setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
     
     /// Shift point at index `i` by `x`
     void            movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
+    
+    /// Set to `n_pts` points copied from `pts[]`
+    void            copyPoints(size_t n_pts, const real pts[]);
 
     /// copy current vertex coordinates to given array
     void            putPoints(real*) const;

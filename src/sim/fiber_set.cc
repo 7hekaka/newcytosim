@@ -114,8 +114,8 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
  */
 ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
 {
-    FiberProp * p = simul.findProperty<FiberProp>("fiber", name);
-    Fiber * fib = p->newFiber(opt);
+    FiberProp * fp = simul.findProperty<FiberProp>("fiber", name);
+    Fiber * fib = fp->newFiber(opt);
     assert_true( fib->tag()==Fiber::TAG );
     fib->birthTime(simul.time());
     
@@ -202,8 +202,8 @@ Object * FiberSet::newObject(const ObjectTag tag, size_t num)
     if ( tag == Fiber::TAG )
 #endif
     {
-        FiberProp * p = simul.findProperty<FiberProp>("fiber", num);
-        Fiber * obj = p->newFiber();
+        FiberProp const* fp = simul.findProperty<FiberProp>("fiber", num);
+        Fiber * obj = fp->newFiber();
         obj->birthTime(simul.time());
         return obj;
     }
@@ -242,16 +242,16 @@ void FiberSet::step()
     // calculate the ratio of free polymer for each class of Fiber:
     for ( Property * i : plist )
     {
-        FiberProp * p = static_cast<FiberProp*>(i);
+        FiberProp * fp = static_cast<FiberProp*>(i);
 
         // update the normalized monomer concentration:
-        p->free_polymer = 1.0 - p->used_polymer / p->total_polymer;
+        fp->free_polymer = 1.0 - fp->used_polymer / fp->total_polymer;
         
-        if ( p->free_polymer < 0 )
+        if ( fp->free_polymer < 0 )
         {
             Cytosim::warn << "The free monomer concentration would be negative !!!\n";
             //this should not happen
-            p->free_polymer = 0;
+            fp->free_polymer = 0;
         }
     }
 
@@ -481,15 +481,15 @@ FiberSite FiberSet::randomSite() const
 }
 
 
-/// a random site on the fiber of class 'prop'
+/// a random site on the fibers of class 'prop'
 /**
  This method is unefficient if multiple sites are desired
  */
-FiberSite FiberSet::randomSite(FiberProp * arg) const
+FiberSite FiberSet::randomSite(FiberProp const* fp) const
 {
     real abs = 0;
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
-        if ( fib->property() == arg )
+        if ( fib->property() == fp )
             abs += fib->length();
 
     if ( abs == 0 )
@@ -498,7 +498,7 @@ FiberSite FiberSet::randomSite(FiberProp * arg) const
     abs *= RNG.preal();
     
     for ( Fiber* fib=first(); fib; fib=fib->next() )
-        if ( fib->property() == arg )
+        if ( fib->property() == fp )
         {
             real len = fib->length();
             if ( abs <= len )

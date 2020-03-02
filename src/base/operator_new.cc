@@ -6,6 +6,10 @@
 #include <cstdio>
 #include <cstdlib>
 
+/**
+ Cytosim's new() operator should replace the default operator.
+ It returns memory aligned to a 32-bytes boundary.
+ */
 void* operator new(std::size_t size)
 {
     //printf("new(%lu)\n", size);
@@ -28,14 +32,14 @@ void* operator new(std::size_t size)
 #endif
     if ( ptr == nullptr )
         throw std::bad_alloc();
-    //std::printf("Cytosim new %5zu %p\n", size, ptr);
+    //std::printf("Cytosim:new(%5zu) %p\n", size, ptr);
     return ptr;
 }
 
 
 void operator delete(void * ptr) throw()
 {
-    //std::printf("Cytosim delete    %p\n", ptr);
+    //std::printf("Cytosim:delete(%p)\n", ptr);
     std::free(ptr);
 }
 
