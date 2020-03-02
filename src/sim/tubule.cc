@@ -182,7 +182,7 @@ void Tubule::setInteractionsB(Meca& meca)
     const real c = cos(ang), s = sin(ang);
     
     assert_true(fil_[0]);
-    const size_t end = fil_[0]->nbPoints() - 1;
+    const size_t end = fil_[0]->nbSegments();
     
     Rotation mat(0,1);
 
@@ -238,8 +238,10 @@ void Tubule::setInteractions(Meca& meca)
     const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
     const real c = cos(ang), s = sin(ang);
     
-    assert_true(fil_[0]);
-    const size_t end = fil_[0]->nbPoints() - 1;
+    const size_t end = bone_->nbSegments();
+    
+    if ( fil_[0]->nbSegments() != end )
+        return;
     
     Rotation mat(0,1);
     real alpha = tube_radius / len;
@@ -289,7 +291,7 @@ void Tubule::setInteractionsC(Meca& meca)
     real co = cos(2*ang), si = sin(2*ang);
     
     assert_true(fil_[0]);
-    const size_t end = fil_[0]->nbPoints() - 1;
+    const size_t end = fil_[0]->nbSegments();
     
     MatrixBlock mat;
     for ( size_t i = 0; i <= end; ++i )

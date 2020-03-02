@@ -1480,8 +1480,9 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
  */
 void Chain::resegment(size_t ns)
 {
+    //std::clog << reference() << " resegment " << ns << "\n";
     assert_true( ns > 0 );
-    real cut = nbSegments() * fnCut / ns;
+    real cut = nbSegments() * segmentation() / ns;
     
     // calculate new intermediate points in tmp[]:
     Vector a = posP(0), b = posP(1);
