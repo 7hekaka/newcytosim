@@ -40,6 +40,9 @@ private:
     /// constitutive filaments
     Fiber* fil_[FILM];
     
+    /// offset in abscissa
+    real   offset_[FILM];
+    
     /// the Property of this object
     TubuleProp const* prop;
 

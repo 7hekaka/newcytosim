@@ -13,6 +13,19 @@
 
 void Tubule::step(Simul&)
 {
+    assert_true(bone_);
+    if ( bone_->freshAssemblyP() ||  bone_->freshAssemblyM() )
+    {
+        // copy the growth exhibited from `bone_`
+        real aP = bone_->abscissaP();
+        real aM = bone_->abscissaM();
+        for ( size_t i = 0; i < NFIL; ++i )
+        {
+            fil_[i]->growP(aP-offset_[i]-fil_[i]->abscissaP());
+            fil_[i]->growM(fil_[i]->abscissaM()-aM+offset_[i]);
+            //fil_[i]->updateFiber();
+        }
+    }
 }
 
 
@@ -32,7 +45,11 @@ void Tubule::reset()
 {
     bone_ = nullptr;
     for ( size_t i = 0; i < FILM; ++i )
+    {
         fil_[i] = nullptr;
+        // set as left-handed 3-start helix: 3 * 4 nm offset in one turn
+        offset_[i] = i * ( -0.012 / NFIL );
+    }
 }
 
 
@@ -69,6 +86,8 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         res = sim.fibers.newObjects(prop->bone_type, opt);
         bone_ = static_cast<Fiber*>(res[0]);
         len = bone_->length();
+        if ( bone_->prop->segmentation != fp->segmentation )
+            throw InvalidParameter("Tubule's bone and filament should have equal segmentation");
     }
     else
     {
@@ -84,6 +103,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     {
         Fiber * fib = fp->newFiber();
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
+        fib->copyPoints(bone_->nbPoints(), bone_->data());
         fib->updateFiber();
         res.push_back(fib);
         fil_[i] = fib;
@@ -93,18 +113,24 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     }
     
 #if ( DIM >= 3 )
-    Vector E(0,tube_radius,0), F(0,0,tube_radius);
+    Vector dir(0,0,0);
+    if ( bone_ )
+        dir = bone_->avgDirection();
+    else
     {
         // find average direction
-        Vector dir(0,0,0);
         for ( size_t i = 0; i < NFIL; ++i )
             dir += fil_[i]->diffPoints(0);
         dir.normalize();
-        dir.orthonormal(E, F);
-        E *= tube_radius;
-        F *= tube_radius;
     }
-    // adjust protofilaments to form a tube:
+    
+    // set orthonormal coordinate system
+    Vector E(0,tube_radius,0), F(0,0,tube_radius);
+    dir.orthonormal(E, F);
+    E *= tube_radius;
+    F *= tube_radius;
+    
+    // translate protofilaments to form a tube:
     real a = 0; //M_PI * RNG.sreal();
     real da = 2 * M_PI / NFIL;
     for ( size_t i = 0; i < NFIL; ++i )
@@ -114,12 +140,11 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     }
 #endif
     
-    // set as left-handed helix:
     assert_true(signature());
     for ( size_t i = 0; i < NFIL; ++i )
     {
         Buddy::connect(fil_[i]);
-        fil_[i]->setOrigin(i*(-0.012/NFIL));
+        fil_[i]->setOrigin(offset_[i]);
     }
 
     setFamily(bone_?bone_:fil_[0]);
@@ -204,8 +229,8 @@ void Tubule::setInteractionsB(Meca& meca)
  */
 void Tubule::setInteractions(Meca& meca)
 {
-    if ( !bone_ )
-        throw InvalidParameter("A backbone must be defined for Tubule");
+    assert_true(bone_);
+
 #if ( DIM >= 3 )
     const real stiffL = prop->stiffness[0];
     const real stiffR = prop->stiffness[1];
