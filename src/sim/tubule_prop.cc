@@ -7,6 +7,7 @@
 #include "solid_prop.h"
 #include "fiber_prop.h"
 #include "glossary.h"
+#include "simul.h"
 
 
 void TubuleProp::clear()
