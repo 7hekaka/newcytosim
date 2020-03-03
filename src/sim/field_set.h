@@ -35,10 +35,10 @@ public:
     Object *    newObject(ObjectTag, size_t);
     
     /// write all Objects to file
-    void        write(Outputter& out) const;
+    void        write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream& out) const { writeAssets(out, title()); }
+    void        report(std::ostream& os) const { writeAssets(os, title()); }
 
     //--------------------------
     
