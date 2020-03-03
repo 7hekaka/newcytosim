@@ -124,6 +124,11 @@ real Simul::time() const
     return prop->time;
 }
 
+real Simul::time_step() const
+{
+    return prop->time_step;
+}
+
 void Simul::erase()
 {
     //std::cerr << "Simul::erase()\n";

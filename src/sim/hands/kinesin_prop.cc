@@ -3,7 +3,7 @@
 #include "kinesin_prop.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "simul_prop.h"
+#include "simul.h"
 
 
 Hand * KinesinProp::newHand(HandMonitor* m) const
@@ -51,11 +51,11 @@ void KinesinProp::complete(Simul const& sim)
     
     if ( forward_rate < 0 )
         throw InvalidParameter("kinesin:forward_rate must be >= 0");
-    forward_rate_dt = forward_rate * sim.prop->time_step;
+    forward_rate_dt = forward_rate * sim.time_step();
     
     if ( backward_rate < 0 )
         throw InvalidParameter("kinesin:backward_rate must be >= 0");
-    backward_rate_dt = backward_rate * sim.prop->time_step;
+    backward_rate_dt = backward_rate * sim.time_step();
 
     directionality = std::copysign((real)1, stride);
     if ( abs(directionality) != 1 )

@@ -246,12 +246,12 @@ void SpaceProp::complete(Simul const& sim)
 
 #if NEW_DYNAMIC_SPACES
     if ( viscosity > 0 )
-        mobility_dt = sim.prop->time_step / viscosity;
+        mobility_dt = sim.time_step() / viscosity;
     else if ( sim.ready() )
         throw InvalidParameter("space:viscosity must be > 0");
     
     if ( viscosity_rot > 0 )
-        mobility_rot_dt = sim.prop->time_step / viscosity_rot;
+        mobility_rot_dt = sim.time_step() / viscosity_rot;
     else if ( sim.ready() )
         throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
 #endif

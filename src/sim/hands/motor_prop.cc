@@ -6,9 +6,9 @@
 #include "glossary.h"
 #include "common.h"
 #include "property_list.h"
-#include "simul_prop.h"
 #include "motor_prop.h"
 #include "motor.h"
+#include "simul.h"
 
 
 Hand * MotorProp::newHand(HandMonitor* m) const
@@ -64,7 +64,7 @@ void MotorProp::complete(Simul const& sim)
         throw InvalidParameter("motor:stall_force must be > 0");
     
 #if NEW_VARIABLE_SPEED
-    variable_speed_dt = variable_speed * sim.prop->time_step;
+    variable_speed_dt = variable_speed * sim.time_step();
 #endif
 
 #if NEW_UNBINDING_DENSITY
@@ -78,7 +78,7 @@ void MotorProp::complete(Simul const& sim)
     }
 #endif
 
-    set_speed_dt = sim.prop->time_step * unloaded_speed;
+    set_speed_dt = sim.time_step() * unloaded_speed;
     abs_speed_dt = fabs(set_speed_dt);
     var_speed_dt = abs_speed_dt / stall_force;
     
@@ -86,11 +86,11 @@ void MotorProp::complete(Simul const& sim)
     if ( unloaded_speed > 0 )
     {
         min_dab = 0;
-        max_dab = 2 * sim.prop->time_step * unloaded_speed;
+        max_dab = 2 * sim.time_step() * unloaded_speed;
     }
     else
     {
-        min_dab = 2 * sim.prop->time_step * unloaded_speed;
+        min_dab = 2 * sim.time_step() * unloaded_speed;
         max_dab = 0;
     }
 }
