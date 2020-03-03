@@ -1240,6 +1240,7 @@ real Fiber::freshAssembly(const FiberEnd end) const
  */
 void Fiber::updateFiber()
 {
+    needUpdate = false;
 #if ( 0 )
     Cytosim::log << reference() << " update [ "  << std::setw(9) << std::left << abscissaM();
     Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << std::endl;
@@ -1291,7 +1292,6 @@ void Fiber::updateFiber()
         }
     }
 #endif
-    needUpdate = false;
 }
 
 //------------------------------------------------------------------------------
