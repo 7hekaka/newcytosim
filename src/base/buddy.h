@@ -105,6 +105,23 @@ public:
             }
         }
     }
+    
+    /// this is called everytime a known buddy is destroyed
+    virtual void goodbye(Buddy *)
+    {
+    }
+    
+    /// this is called for all buddies by handshake
+    virtual void handshake(Buddy *)
+    {
+    }
+    
+    /// call `handshake(buddy)` for all buddies
+    virtual void handshake()
+    {
+        for ( Buddy * b : buddies_ )
+            b->handshake(this);
+    }
 
     /// will make `this` and `guy` mutual buddies
     void connect(Buddy * guy)
@@ -116,7 +133,7 @@ public:
         }
     }
     
-    /// will the association, without calling goodbye()
+    /// will close the association, without calling goodbye()
     void disconnect(Buddy * guy)
     {
         if ( guy )
@@ -125,12 +142,6 @@ public:
             guy->unlist(this);
         }
     }
-
-    /// this is called everytime a known buddy is destroyed
-    virtual void goodbye(Buddy *)
-    {
-    }
-    
 
     /// returns the number of registered buddies
     size_t nbBuddies() const

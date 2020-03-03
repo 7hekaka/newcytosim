@@ -13,19 +13,6 @@
 
 void Tubule::step(Simul&)
 {
-    assert_true(bone_);
-    if ( bone_->freshAssemblyP() ||  bone_->freshAssemblyM() )
-    {
-        // copy the growth exhibited from `bone_`
-        real aP = bone_->abscissaP();
-        real aM = bone_->abscissaM();
-        for ( size_t i = 0; i < NFIL; ++i )
-        {
-            fil_[i]->growP(aP-offset_[i]-fil_[i]->abscissaP());
-            fil_[i]->growM(fil_[i]->abscissaM()-aM+offset_[i]);
-            //fil_[i]->updateFiber();
-        }
-    }
 }
 
 
@@ -50,6 +37,38 @@ void Tubule::reset()
         // set as left-handed 3-start helix: 3 * 4 nm offset in one turn
         offset_[i] = i * ( -0.012 / NFIL );
     }
+}
+
+
+void Tubule::handshake(Buddy * guy)
+{
+    //std::clog << "handshake " << reference() << " from " << guy << "\n";
+    if ( guy == bone_ )
+    {
+        assert_true(bone_);
+        if ( bone_->freshAssemblyP() ||  bone_->freshAssemblyM() )
+        {
+            // copy the growth exhibited from `bone_`
+            real aP = bone_->abscissaP();
+            real aM = bone_->abscissaM();
+            for ( size_t i = 0; i < NFIL; ++i )
+            {
+                fil_[i]->growP(aP-offset_[i]-fil_[i]->abscissaP());
+                fil_[i]->growM(fil_[i]->abscissaM()-aM+offset_[i]);
+                fil_[i]->adjustSegmentation();
+                fil_[i]->updateFiber();
+            }
+            //report(std::clog);
+        }
+    }
+}
+
+
+void Tubule::report(std::ostream& os)
+{
+    os << reference() << " " << bone_->segmentation() << " " << bone_->nbPoints() << " " << bone_->length() << "\n";
+    for ( size_t i = 0; i < NFIL; ++i )
+        os << std::setw(7) << i << " " << fil_[i]->segmentation() << " " << fil_[i]->nbPoints() << " "<< fil_[i]->length() << "\n";
 }
 
 
@@ -85,6 +104,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     {
         res = sim.fibers.newObjects(prop->bone_type, opt);
         bone_ = static_cast<Fiber*>(res[0]);
+        Buddy::connect(bone_);
         len = bone_->length();
         if ( bone_->prop->segmentation != fp->segmentation )
             throw InvalidParameter("Tubule's bone and filament should have equal segmentation");

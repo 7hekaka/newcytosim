@@ -86,9 +86,11 @@ void Fiber::step()
     
     if ( needUpdate )
     {
-        needUpdate = false;
         adjustSegmentation();
         updateFiber();
+#if FIBER_HAS_FAMILY
+        handshake();
+#endif
     }
     
 #if FIBER_HAS_MESH
@@ -1289,6 +1291,7 @@ void Fiber::updateFiber()
         }
     }
 #endif
+    needUpdate = false;
 }
 
 //------------------------------------------------------------------------------

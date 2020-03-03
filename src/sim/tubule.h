@@ -63,6 +63,9 @@ public:
     /// initialize sister[] and brother[]
     void setFamily(Fiber const*);
 
+    /// update length of family members
+    void handshake(Buddy*);
+    
     /// create filaments
     ObjectList build(Glossary&, Simul&);
     
@@ -96,6 +99,8 @@ public:
     /// a static_cast<> of Node::prev()
     Tubule *  prev()  const  { return static_cast<Tubule*>(nPrev); }
     
+    /// debug printout
+    void      report(std::ostream&);
 
     /// read
     void      read(Inputter&, Simul&, ObjectTag);
