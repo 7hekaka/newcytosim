@@ -24,7 +24,7 @@ void KinesinProp::clear()
     force            = 2;
     forward_rate     = 277;
     backward_rate    = 0.34;
-    unbinding_chance = 0;
+    unbinding_chance = 0.01;
     stride           = 1;
 }
 
