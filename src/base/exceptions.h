@@ -49,7 +49,7 @@ public:
     /// return the message
     std::string brief()
     {
-        return msg_;
+        return "Error, " + msg_ + ":";
     }
     
     /// return supplementary message

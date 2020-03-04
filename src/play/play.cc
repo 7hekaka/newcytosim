@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        print_magenta(std::cerr, "Error: "+e.brief()+":");
+        print_magenta(std::cerr, e.brief());
         std::cerr << '\n' << e.info() << '\n';
         return EXIT_FAILURE;
     }
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        print_magenta(std::cerr, "Error: "+e.brief()+":");
+        print_magenta(std::cerr, e.brief());
         std::cerr << '\n' << e.info() << '\n';
         return EXIT_FAILURE;
     }
@@ -277,7 +277,7 @@ int main(int argc, char* argv[])
         catch( Exception & e )
         {
             arg.warnings(std::cerr);
-            print_magenta(std::cerr, "Error: "+e.brief()+":");
+            print_magenta(std::cerr, e.brief());
             std::cerr << '\n' << e.info() << '\n';
             return EXIT_FAILURE;
         }
@@ -399,7 +399,7 @@ int main(int argc, char* argv[])
     }
     catch ( Exception & e )
     {
-        print_magenta(std::cerr, "Error: "+e.brief()+":");
+        print_magenta(std::cerr, e.brief());
         std::cerr << '\n' << e.info() << '\n';
         return EXIT_FAILURE;
     }
@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
         }
         catch( Exception & e )
         {
-            print_magenta(std::cerr, "Error: "+e.brief()+":");
+            print_magenta(std::cerr, e.brief());
             std::cerr << '\n' << e.info() << '\n';
             return EXIT_FAILURE;
         }
