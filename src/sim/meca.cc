@@ -1544,7 +1544,10 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     // found does not depend on the initial guess.
     
     real abstol = noiseLevel * prop->tolerance;
-
+    
+    if ( prop->kT == 0 )
+        abstol = prop->tolerance;
+    
     /*
      With exact arithmetic, biConjugate Gradient should converge at most
      in a number of iterations equal to the size of the linear system, with
@@ -1661,7 +1664,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
                 {
                     // no method could converge... this is really bad!
                     Exception e("convergence failure");
-                    e << monitor.count() << " iterations, residual " << monitor.residual();
+                    e << monitor.count() << " iterations, residual " << monitor.residual() << '\n';
                     throw e;
                 }
             }
