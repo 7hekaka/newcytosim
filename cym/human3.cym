@@ -11,6 +11,18 @@ set simul system
     display = ( point_value=0.01; )
 }
 
+set space cell
+{
+    shape = cylinder
+    display = ( color=0xFFFFFF10 )
+}
+
+new cell
+{
+    length = 30
+    radius = 6
+}
+
 set space plate
 {
     shape = cylinder
@@ -30,11 +42,11 @@ set bead chromosome
     display = ( coloring=1; size=2; style=7; )
 }
 
-new 4 chromosome { radius = 0.8 }
-new 4 chromosome { radius = 0.9 }
-new 5 chromosome { radius = 1.0 }
-new 4 chromosome { radius = 1.1 }
-new 4 chromosome { radius = 1.2 }
+new 4 chromosome { radius = 0.8; position = cylinder 2 5 }
+new 4 chromosome { radius = 0.9; position = cylinder 2 5 }
+new 5 chromosome { radius = 1.0; position = cylinder 2 5 }
+new 4 chromosome { radius = 1.1; position = cylinder 2 5 }
+new 4 chromosome { radius = 1.2; position = cylinder 2 5 }
 
 run 200 system
 
@@ -47,18 +59,6 @@ set space chromosomes
 new chromosomes
 {
     bead = chromosome
-}
-
-set space cell
-{
-    shape = cylinder
-    display = ( color=0xFFFFFF10 )
-}
-
-new cell
-{
-    length = 30
-    radius = 6
 }
 
 set fiber microtubule
@@ -80,7 +80,7 @@ set fiber microtubule
 
 new 000 microtubule
 {
-    orientation = horizontal
+    direction = X
     position = ( cylinder 0 4 )
     length = 4
     plus_end = grow
@@ -177,7 +177,7 @@ new 20000 dynein_complex
 
 run system
 {
-    event = 10, ( new microtubule { position=cylinder 5 0; orientation=horizontal; length=0.05; plus_end=grow; } )
+    event = 10, ( new microtubule { position=cylinder 5 0; direction=X; length=0.05; plus_end=grow; } )
     nb_steps = 10000
     nb_frames = 100
 }

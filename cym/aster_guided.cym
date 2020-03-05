@@ -40,7 +40,7 @@ new rail
 set solid core
 {
     display = ( style=3; )
-    confine = on, 1000, rail
+    confine = point, 1000, rail
 }
 
 set aster star

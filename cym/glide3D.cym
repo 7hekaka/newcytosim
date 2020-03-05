@@ -58,7 +58,7 @@ set single grafted
 new microtubule
 {
     length = 2
-    orientation = XY
+    direction = XY
     position = 0 0 0
 }
 

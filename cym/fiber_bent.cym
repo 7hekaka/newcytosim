@@ -40,7 +40,7 @@ set fiber filament
 new filament
 {
     position = 0 0 0
-    orientation = identity
+    orientation = off
     shape = -5 -5 0, -5 5 0, 5 5 0
 }
 

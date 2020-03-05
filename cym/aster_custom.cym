@@ -62,7 +62,7 @@ new star
     radius = 0.5
     solid = core
     position = 0 0 0
-    orientation = none
+    orientation = off
     point1 = center, 0.5
     fibers = microtubule
     fiber1 = 0 0 0, 0 +1 0, ( length = 1 )

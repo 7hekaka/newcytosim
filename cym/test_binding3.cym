@@ -75,14 +75,14 @@ set single simplex2
 new microtubule1
 {
     position = 0 0 0
-    orientation = vertical
+    direction = vertical
     length = 20
 }
 
 new microtubule2
 {
     position = 0 0 0
-    orientation = horizontal
+    direction = horizontal
     length = 20
 }
 

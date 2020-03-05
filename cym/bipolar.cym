@@ -128,7 +128,7 @@ new 2 star
 new 1000 kinesin5
 
 
-run 1000000 system
+run 100000 system
 {
     nb_frames = 100
 }

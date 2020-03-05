@@ -55,7 +55,7 @@ set couple link
 new microtubule
 {
     position = 0 0 0
-    orientation = degree 90 axis 0 0 1
+    orientation = axis 0 0 1 degree 90
     shape =0.249699 0.012267 0.000000,\
     0.248796 0.024504 0.000000,\
     0.247294 0.036683 0.000000,\
@@ -189,7 +189,7 @@ new microtubule
 new actin
 {
     position = 0 0 0
-    orientation = degree -90 axis 0 0 1
+    orientation = axis 0 0 1 degree -90
     shape = 0.273209 0.013422 0.008422,\
     0.268028 0.026398 0.015860,\
     0.260008 0.038568 0.021443,\

@@ -62,7 +62,7 @@ new cell
 new 500 filament
 {
     length = 5
-    orientation = orthogonal 0 0 1  % parallel to XY
+    direction = orthogonal 0 0 1  % parallel to XY
 }
 
 set solid blob

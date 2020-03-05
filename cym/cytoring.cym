@@ -39,7 +39,7 @@ set hand nucl
     unbinding_force = 10
 
     activity = nucleate
-    nucleate = 1.0, actin, ( length=0.01; end_state=1,0; orientation=tangent )
+    nucleate = 1.0, actin, ( length=0.01; end_state=1,0; direction=tangent )
     track_end = plus_end
     hold_end = plus_end
     addictive = 1

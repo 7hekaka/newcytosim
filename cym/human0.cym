@@ -11,6 +11,20 @@ set simul system
     display = { point_value=0.01; }
 }
 
+%------------------------CELL
+
+set space cell
+{
+    shape = cylinder
+    display = ( color=0xFFFFFF10; )
+}
+
+new cell
+{
+    length = 30
+    radius = 6
+}
+
 %------------------------CHROMATIN
 
 set space plate
@@ -35,23 +49,10 @@ set bead ball
 new 21 ball
 {
     radius = 1
+	position = cylinder 2 5
 }
 
 run 200 system
-
-%------------------------CELL
-
-set space cell
-{
-    shape = cylinder
-    display = ( color=0xFFFFFF10; )
-}
-
-new cell
-{
-    length = 30
-    radius = 6
-}
 
 set fiber microtubule
 {
@@ -70,15 +71,15 @@ set fiber microtubule
     display = { line_width=2.5; coloring=2; }
 }
 
-new 500 microtubule
+new 50 microtubule
 {
-    orientation = horizontal
+    direction = X
     position = ( cylinder 0 4 )
-    length = 6
+    length = 6, 4
     plus_end = grow
 }
 
-run 200 system
+run 2 system
 
 %------------------------ASTERS
 
@@ -99,8 +100,8 @@ new star
     solid = core
     radius = 0.5
     point1 = center, 0.5
-    fibers = 64, microtubule, ( length = 4; plus_end = grow; )
-    position = ( 5 0 0 )
+    fibers = 64, microtubule, ( length = 2; plus_end = grow; )
+    position = 5 0 0
 }
 
 new star
@@ -108,8 +109,8 @@ new star
     solid = core
     radius = 0.5
     point1 = center, 0.5
-    fibers = 64, microtubule, ( length = 4; plus_end = grow; )
-    position = ( -5 0 0 )
+    fibers = 64, microtubule, ( length = 2; plus_end = grow; )
+    position = -5 0 0
 }
 
 %-------------------------RUN
