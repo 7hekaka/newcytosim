@@ -867,26 +867,26 @@ void Display::drawFiberLines(Fiber const& fib) const
     }
     else if ( disp->line_style == 6 )
     {
-        // color according to the distance from the minus-end
+        // color according to the distance from the minus end
         const real beta = fib.segmentation() / disp->length_scale;
         lineWidth(disp->line_width);
         glBegin(GL_LINE_STRIP);
         for ( size_t n = 0; n < fib.nbPoints(); ++n )
         {
-            fib.disp->color.load(n*beta);
+            fib.disp->color.load(exp(-n*beta));
             gle::gleVertex(fib.posP(n));
         }
         glEnd();
     }
     else if ( disp->line_style == 7 )
     {
-        // color according to the distance from the minus-end
+        // color according to the distance from the plus end
         const real beta = fib.segmentation() / disp->length_scale;
         lineWidth(disp->line_width);
         glBegin(GL_LINE_STRIP);
         for ( size_t n = 0; n < fib.nbPoints(); ++n )
         {
-            fib.disp->color.load((fib.lastPoint()-n)*beta);
+            fib.disp->color.load(exp((n-fib.lastPoint())*beta));
             gle::gleVertex(fib.posP(n));
         }
         glEnd();

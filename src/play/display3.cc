@@ -392,16 +392,16 @@ void set_color_direction(Fiber const& fib, size_t seg, real)
     gle::radial_color(fib.dirSegment(seg)).load_front();
 }
 
-// distance from the minus_end
+/// distance from the minus end
 void set_color_abscissaM(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front((real)seg*beta);
+    fib.disp->color.load_front(exp(-(0.5+seg)*beta));
 }
 
-// distance from the plus_end
+/// distance from the plus end
 void set_color_abscissaP(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front((real)(fib.lastSegment()-seg)*beta);
+    fib.disp->color.load_front(exp(-(fib.nbPoints()-1.5-seg)*beta));
 }
 
 
@@ -434,13 +434,19 @@ void Display3::drawFiberLines(Fiber const& fib) const
     }
     else if ( disp->line_style == 6 )
     {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         real beta = fib.segmentation() / disp->length_scale;
         drawFiberSegments(fib, rad, set_color_abscissaM, beta);
+        glDisable(GL_CULL_FACE);
     }
     else if ( disp->line_style == 7 )
     {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         real beta = fib.segmentation() / disp->length_scale;
         drawFiberSegments(fib, rad, set_color_abscissaP, beta);
+        glDisable(GL_CULL_FACE);
     }
 }
 
@@ -1163,8 +1169,8 @@ void Display3::drawCoupleB(Couple const* cx) const
             // accurate rendering of Couple's composite link
             Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
             drawPoint(mid, pd1->width);
-            gleTube(p2, mid, pd2->width*sFactor, gleHexTube1B);
-            gleTube(p1, mid, pd1->width*sFactor, gleHexTube1B);
+            gleTube(p2, mid, pd2->width*sFactor, gleTube2B); //gleHexTube1B);
+            gleTube(p1, mid, pd1->width*sFactor, gleTube2B); //gleHexTube1B);
 #elif ( 0 )
             drawPoint(cx->sidePos1(), pd1->width);
             drawPoint(cx->sidePos2(), pd1->width);
