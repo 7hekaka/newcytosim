@@ -10,11 +10,17 @@
 #include "simul.h"
 #include "sim.h"
 
+
+/// this HandMonitor does nothing
+HandMonitor Hand::dummyMonitor;
+
 //------------------------------------------------------------------------------
 
 Hand::Hand(HandProp const* p, HandMonitor* m)
  : haNext(nullptr), haPrev(nullptr), haMonitor(m), prop(p)
 {
+    if ( !m )
+        haMonitor = &dummyMonitor;
     // initialize in unattached state:
     nextAttach = RNG.exponential();
     nextDetach = 0;

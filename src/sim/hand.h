@@ -47,6 +47,8 @@ class Simul;
 class Hand : public FiberSite
 {
 
+    static HandMonitor dummyMonitor;
+    
 private:
     
     /// disabled default constructor
@@ -107,78 +109,78 @@ public:
 
     
     /// move to a different fiber, at the same abscissa
-    void           relocate(Fiber* f);
+    void         relocate(Fiber* f);
     
     /// move to a different fiber, at the given abscissa
-    void           relocate(Fiber* f, real a);
+    void         relocate(Fiber* f, real a);
 
     /// relocate to the specified tip of the current fiber
-    void           moveToEnd(FiberEnd);
+    void         moveToEnd(FiberEnd);
 
     /// bind at position `a` on Fiber `f`
-    void           locate(Fiber* f, real a);
+    void         locate(Fiber* f, real a);
 
     /// tell if attachment at given site is permitted
-    virtual bool   attachmentAllowed(FiberSite&) const;
+    virtual bool attachmentAllowed(FiberSite&) const;
     
     /// bin at position represented by FiberSite
-    virtual void   attach(FiberSite const&);
+    virtual void attach(FiberSite const&);
     
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void           attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
+    void         attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
     
     /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void           attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
+    void         attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
 
     /// detach, without updating Monitor
-    void           detachHand();
+    void         detachHand();
     
     /// detach
-    virtual void   detach();
+    virtual void detach();
 
     /// simulate when the Hand is not attached
-    virtual void   stepUnattached(Simul&, Vector const& pos);
+    virtual void stepUnattached(Simul&, Vector const& pos);
 
     /// simulate when the Hand is attached but not under load
-    virtual void   stepUnloaded();
+    virtual void stepUnloaded();
 
     /// simulate when the Hand is attached and under load
-    virtual void   stepLoaded(Vector const& force, real force_norm);
+    virtual void stepLoaded(Vector const& force, real force_norm);
     
     /// check abscissa against fiber edge, and calls handle functions if necessary.
-    void           checkFiberRange();
+    void         checkFiberRange();
 
     /// this is called when disassembly occured PLUS_END
-    virtual void   handleDisassemblyM();
+    virtual void handleDisassemblyM();
     
     /// this is called when the attachment point is below the MINUS_END
-    virtual void   handleDisassemblyP();
+    virtual void handleDisassemblyP();
 
     /// attach at abscissa of given Fiber (this calls attach(FiberSite))
-    void           attachTo(Fiber * f, real a) { attach(FiberSite(f, a)); }
+    void         attachTo(Fiber * f, real a) { attach(FiberSite(f, a)); }
     
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void           attachTo(Fiber * f, real a, FiberEnd ref) { attach(FiberSite(f, f->abscissaFrom(a, ref))); }
+    void         attachTo(Fiber * f, real a, FiberEnd ref) { attach(FiberSite(f, f->abscissaFrom(a, ref))); }
     
     /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void           attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
+    void         attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
     
     
     /// return other Hand if part of a Couple, and zero otherwise
-    Hand *         otherHand() const;
+    Hand *       otherHand() const;
 
     /// return position of other Hand, if part of a Couple, or of Single
-    Vector         otherPosition() const;
+    Vector       otherPosition() const;
     
     /// return stiffness of associated link
-    real           interactionStiffness() const;
+    real         interactionStiffness() const;
 
     
     /// read from file
-    void           read(Inputter&, Simul&);
+    void         read(Inputter&, Simul&);
     
     /// write to file
-    void           write(Outputter&) const;
+    void         write(Outputter&) const;
     
     
 protected:
