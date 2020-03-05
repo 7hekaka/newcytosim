@@ -227,7 +227,7 @@ public:
     void setRange(real a, real b)
     {
         assert_true( laUnit > REAL_EPSILON );
-        std::clog << this << " Lattice::setRange(" << a << ", " << b << ") " << laUnit << "\n";
+        //std::clog << this << " Lattice::setRange(" << a << ", " << b << ") " << laUnit << "\n";
 #if 0
         if ( !std::is_same<real, cell_t>::value && laSite )
             markEdges(0);
