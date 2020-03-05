@@ -122,14 +122,12 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     for ( size_t i = 0; i < NFIL; ++i )
     {
         Fiber * fib = fp->newFiber();
+        fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
         fib->copyPoints(bone_->nbPoints(), bone_->data());
-        fib->updateFiber();
+        Buddy::connect(fib);
         res.push_back(fib);
         fil_[i] = fib;
-        //ObjectList objs = sim.fibers.newObjects(prop->fiber_type, opt);
-        //res.append(objs);
-        //fil_[i] = Fiber::toFiber(objs[0]);
     }
     
 #if ( DIM >= 3 )
@@ -159,16 +157,8 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         a += da;
     }
 #endif
-    
-    assert_true(signature());
-    for ( size_t i = 0; i < NFIL; ++i )
-    {
-        Buddy::connect(fil_[i]);
-        fil_[i]->setOrigin(offset_[i]);
-    }
 
     setFamily(bone_?bone_:fil_[0]);
-    
     return res;
 }
 

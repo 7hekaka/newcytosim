@@ -227,13 +227,13 @@ public:
     void setRange(real a, real b)
     {
         assert_true( laUnit > REAL_EPSILON );
-        //std::clog << this << " Lattice::setRange(" << i << ", " << s << ") " << laUnit << "\n";
+        std::clog << this << " Lattice::setRange(" << a << ", " << b << ") " << laUnit << "\n";
 #if 0
         if ( !std::is_same<real, cell_t>::value && laSite )
             markEdges(0);
 #endif
         laIndexM = index(a);
-        laIndexP = index(b);
+        laIndexP = index_sup(b) - 1;
 
         /* allocate with a safety margin of 8 cells */
         allocate(laIndexM, laIndexP+1, 8);

@@ -283,19 +283,24 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     real fac, real facM, real facP) const
 {
     // start at MINUS_END
-    Vector pos = fib.displayPosM(0), old;
-    Vector nxt = fib.displayPosM(abs);
-    Vector dir = fib.dirEndM();
+    Vector pos = fib.displayPosM(abs), old;
+    Vector nxt = fib.displayPosM(abs+inc);
+    Vector dir = normalize(nxt-pos);
+    
+    if ( abs <= 0 )
+    {
+        set_color(fib, inx, facM);
+        drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
+    }
 
-    set_color(fib, inx, facM);
-    drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
+    abs += inc;
     
 #if ( DIM > 1 )
     glEnable(GL_CLIP_PLANE4);
     glEnable(GL_CLIP_PLANE5);
     setClipPlane(GL_CLIP_PLANE4, dir, pos);
     
-    // draw inner segments
+    // draw segments
     while ( inx < last )
     {
         abs += inc;
@@ -303,18 +308,17 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         pos = nxt;
         nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
-        set_color(fib, inx, fac);
+        set_color(fib, inx++, fac);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         gleTube(old, pos, rad, gleLongTube2B);
-        // draw a circle to close the tube:
+        // draw a disc to close the tube:
         //gleObject(0.5*(old+pos), normalize(pos-old), rad, gleDiscB);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
-        ++inx;
     }
     
     // draw last segment, which may be truncated:
-    dir = fib.dirEndP();
-    set_color(fib, last, facP);
+    dir = normalize(nxt-pos);
+    set_color(fib, inx, facP);
     setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
     gleTube(pos, nxt, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
@@ -329,11 +333,14 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         set_color(fib, inx, fac);
         gleTube(pos, nxt, rad, gleTube2B);
     }
-    dir = fib.dirEndP();
+    dir = normalize(nxt-pos);
 #endif
     
-    // draw PLUS_END:
-    drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    if ( abs >= fib.length() )
+    {
+        // draw PLUS_END:
+        drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    }
 }
 
 /**
@@ -544,18 +551,21 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
 
-    const real lenM = uni * (inf+1) - fib.abscissaM();  // should be positive!
-    const real lenP = fib.abscissaP() - uni * sup;      // should be positive!
+    real abs = uni * inf - fib.abscissaM();       // should be non-positive!
+    assert_true( abs <= 0 && 0 <= abs+uni );
 
     real facM = fac;
     real facP = fac;
+    
     if ( disp->lattice_rescale )
     {
+        real lenM = abs + uni;                     // should be positive!
+        real lenP = fib.abscissaP() - uni * sup;   // should be positive!
         facM = ( lenM > 0.001*uni ? fac*uni/lenM : fac );
         facP = ( lenP > 0.001*uni ? fac*uni/lenP : fac );
     }
 
-    drawFiberSubSegments(fib, rad, inf, sup, lenM, uni, set_color, fac, facM, facP);
+    drawFiberSubSegments(fib, rad, inf, sup, abs, uni, set_color, fac, facM, facP);
     glPopAttrib();
 }
 
