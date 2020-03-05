@@ -18,10 +18,10 @@ Example - runs:
     battery_test.py bin/sim cym/*.cym
     make_image.py 'play frame=100 window_size=512,512' *_cym
 
-F. Nedelec, March-June 2011 - Feb 2013 - Nov 2019
+F. Nedelec, March-June 2011 - Feb 2013 - Jan 2020
 """
 
-import shutil, sys, os, subprocess
+import shutil, sys, os, subprocess, time
 
 #------------------------------------------------------------------------
 
@@ -46,13 +46,15 @@ def run(file, executable):
         print('skipping  '+file)
         return
     shutil.copyfile(file, os.path.join(wdir, 'config.cym'))
-    print(name.ljust(80, '-'))
+    print(name.rjust(100, '-'))
     os.chdir(wdir)
     outfile = open("out.txt", 'w')
     errfile = open("err.txt", 'w')
+    start = time.time()
     val = subprocess.call(executable, stdout=outfile, stderr=errfile)
     errfile.close()
     outfile.close()
+    print('%5.2f sec' % (time.time()-start))
     if val:
         print('returned %i' % val)
     # copy standard-error:
