@@ -308,7 +308,7 @@ void speedTest(unsigned long cnt)
         Vector P = pts[n-1];
         Vector Q = pts[n];
         real len = ( P - Q ).norm();
-        for ( unsigned long ii = 0; ii < cnt; ++ii )
+        for ( size_t ii = 0; ii < cnt; ++ii )
         {
 #if ( DIM == 2 )
             Rasterizer::paintFatLine2D(paintHit, nullptr, P, Q, len, radius, shift, delta);

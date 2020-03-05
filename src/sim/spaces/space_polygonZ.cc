@@ -68,7 +68,7 @@ real SpacePolygonZ::estimateVolumeZ(unsigned long cnt) const
     real W = Ro - Ri;
     
     real in = 0, out = 0;
-    for ( unsigned long i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < cnt; ++i )
     {
         real x = box[0] + W * RNG.preal();
         real y = box[2] + H * RNG.preal();
