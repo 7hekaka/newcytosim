@@ -6,12 +6,12 @@
 #include <cmath>
 
 /**
- DISPLAY is defined for compiling test_rasterizer.cc,
- adding support for visual output
+ DISPLAY enables some code useful for visual debugging,
+ and should be defined for compiling test_rasterizer.cc
  */
 #ifdef DISPLAY
 #  include "opengl.h"
-bool rasterizer_draws = true;
+extern bool rasterizer_draws;
 #endif
 
 //==============================================================================
