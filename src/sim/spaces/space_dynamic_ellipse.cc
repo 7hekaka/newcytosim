@@ -287,7 +287,7 @@ void SpaceDynamicEllipse::step()
                 assert_true(delta[i] == delta[i]);
                 length_[i] += delta[i];
             }
-            report(std::clog);
+            //report(std::clog);
             //std::clog << "%  balance " << Rforces << "\n";
         }
         
@@ -316,6 +316,8 @@ void SpaceDynamicEllipse::step()
             inv = mat.transposed();
         }
     }
+    
+    reset_forces();
 }
 
 
@@ -325,11 +327,7 @@ void SpaceDynamicEllipse::step()
 void SpaceDynamicEllipse::resize(Glossary& opt)
 {
     SpaceEllipse::resize(opt);
-    if ( prop->volume <= 0 )
-    {
-        prop->volume = volume();
-        //std::cout << " dynamic_ellipse:volume set to " << prop->volume << std::endl;
-    }
+    prop->volume = volume();
 }
 
 
