@@ -647,7 +647,7 @@ void processKey(unsigned char key)
             // start player to save all images in file
             if ( prop.save_images == 0 )
             {
-                if ( player.startPlayback() )
+                if ( player.startPlayback() || thread.alive() )
                     prop.save_images = 1;
             }
             else
