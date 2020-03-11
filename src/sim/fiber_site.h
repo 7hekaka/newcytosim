@@ -11,23 +11,22 @@
 
 /// FiberSite indicates a location on a Fiber by its curvilinear abscissa
 /**
- The key variable is a pointer to a Fiber, `fbFiber`, which can be NULL
+ The key variable is a pointer to a Fiber, `fbFiber`, which is NULL
  if the state is `unattached`.
  
- In the `attached` state, the precise location on the Fiber is recorded using
- the curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
- that is fixed on the Fiber, called the Fiber's origin. This origin is virtual
- and may reside outside the Fiber ends.
+ In the `attached` state, the location on the Fiber is recorded using the
+ curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
+ that is fixed on the Fiber, called the Fiber's origin. `fbAbs' is a signed
+ continuous quantity that increases from Minus to Plus ends. The origin is
+ virtual and may reside outside the Fiber ends.
  
- Importantly, the value of abscissa is independent from the vertices used to
+ In this way, the value of abscissa is independent from the vertices used to
  represent the Fiber's position, and also unaffected by assembly/disassembly
  at the tips of the Fiber.
  
- The `FiberSite` also support discrete binding, if the Fiber has a Lattice,
- and in this case uses an integer `fbSite` to keep track of the position.
- 
- A `FiberSite` uses Interpolation to calculate its position in space from
- the fiber's vertices.
+ The `FiberSite` also supports binding at discrete positions, if the Fiber has
+ a Lattice, and in this case uses a pointer `fbLattice' and an integer `fbSite`
+ to keep track of the position.
 */
 class FiberSite
 {
@@ -86,14 +85,14 @@ public:
     /// index of Lattice's site
     lati_t        site()    const { return fbSite; }
     
-    /// set FiberLattice pointer at site `s` and abscissa `a`
-    void engageLattice(FiberLattice* l, lati_t s, real a)
+    /// set FiberSite at index `s` with an abscissa `off` within the site
+    void engageLattice(FiberLattice* l, lati_t s, real off)
     {
         fbLattice = l;
         fbSite    = s;
-        fbAbs     = a;
-        //assert_true(fbFiber->abscissaM() < a + REAL_EPSILON);
-        //assert_true(a < fbFiber->abscissaP() + REAL_EPSILON);
+        fbAbs     = l->unit() * s + off;
+        //assert_true(fbFiber->abscissaM() < fbAbs + REAL_EPSILON);
+        //assert_true(fbAbs < fbFiber->abscissaP() + REAL_EPSILON);
     }
 
 #else
