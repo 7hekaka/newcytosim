@@ -2138,8 +2138,9 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 #endif
 }
 
-#elif ( DIM >= 3 )
+#endif
 
+#if ( DIM > 1 )
 /**
  
  Link `ptA` (A) and `ptB` (B)
@@ -2152,7 +2153,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
  */
 void Meca::addSideLink3D(Interpolation const& ptA,
                          Mecapoint const& ptB,
-                         Vector const& arm,
+                         Torque const& arm,
                          const real weight)
 {
     assert_true( weight >= 0 );
@@ -2340,11 +2341,12 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 #endif
 }
 
-#elif ( DIM >= 3 )
+#endif
 
+#if ( DIM > 1 )
 void Meca::addSideLink3D(Interpolation const& ptA,
                          Interpolation const& ptB,
-                         Vector const& arm,
+                         Torque const& arm,
                          const real weight)
 {
     assert_true( weight >= 0 );

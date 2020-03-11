@@ -526,7 +526,6 @@ public:
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
     void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, real arm, real weight);
 #elif ( DIM >= 3 )
-    
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
     void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, Vector const& arm, real weight);
 #endif
@@ -544,7 +543,6 @@ public:
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
     void addSideSlidingLinkS(Interpolation const&, Interpolation const&, real arm, real weight);
 #elif ( DIM >= 3 )
-    
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
     void addSideSlidingLinkS(Interpolation const&, Interpolation const&, Torque const& arm, real weight);
 #endif
@@ -553,6 +551,7 @@ public:
 
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
     void addSideSlidingLink(Interpolation const&, Interpolation const&, real len, real weight);
+    
     
     /// Create a 3-way link with given weights on each branch
     void addTriLink(Interpolation const& pt1, real w1, Interpolation const& pt2, real w2, Interpolation const& pt3, real w3);
