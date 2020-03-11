@@ -91,10 +91,6 @@
 		BB2EBF480FCF1F3F00CCA721 /* fiber_site.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */; };
 		BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
 		BB30922D216543C000C6DEE4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
-		BB33E98C1003553000B44F1E /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB33E9D9100355B500B44F1E /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB33E9E01003564400B44F1E /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB33E9E41003566600B44F1E /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB3417660C3294B40016CF18 /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
 		BB39EC26153806070047768E /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
 		BB39EC27153806070047768E /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
@@ -111,7 +107,6 @@
 		BB4CFFE6130539740049C585 /* classic_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4CFFE2130539740049C585 /* classic_fiber.h */; };
 		BB4DB5990C69D5F8001E5E4F /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73586D05B98DA3006956D5 /* array.h */; };
 		BB4DB5A50C69D625001E5E4F /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB4DB5B20C69D6B2001E5E4F /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB5000421269BDC9005E925C /* nucleator_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50003E1269BDC9005E925C /* nucleator_prop.cc */; };
 		BB5000431269BDC9005E925C /* nucleator_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB50003F1269BDC9005E925C /* nucleator_prop.h */; };
 		BB5000441269BDC9005E925C /* nucleator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5000401269BDC9005E925C /* nucleator.cc */; };
@@ -155,7 +150,6 @@
 		BB548E5912CE560800C0F172 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
 		BB55BF310A25FB13003333C9 /* dim.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF300A25FB13003333C9 /* dim.h */; };
 		BB55C0A90A260F19003333C9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
-		BB55C0AB0A260F3F003333C9 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB55C0CF0A26113A003333C9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB55C0E30A2613D5003333C9 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB55C0E50A2613E1003333C9 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
@@ -518,6 +512,14 @@
 		BB7DC19C2200DCE400DB779E /* test_glos.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7DC19B2200DCE400DB779E /* test_glos.cc */; };
 		BB7F684012D0F1B100F8FC84 /* display_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7F683E12D0F1B100F8FC84 /* display_prop.cc */; };
 		BB7F684112D0F1B100F8FC84 /* display_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7F683F12D0F1B100F8FC84 /* display_prop.h */; };
+		BB805D472419630700B62699 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
+		BB805D482419635D00B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BB805D492419637700B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BB805D4A2419639500B62699 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
+		BB805D4B241963B000B62699 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
+		BB805D4C241963CB00B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BB805D4D241963E400B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BB805D4E241967B100B62699 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; };
 		BB8408801934902C0088C07B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
 		BB840881193490300088C07B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
 		BB840882193490520088C07B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
@@ -1764,8 +1766,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB805D492419637700B62699 /* libcytodisp.a in Frameworks */,
+				BB805D4A2419639500B62699 /* OpenGL.framework in Frameworks */,
 				BB55C0E30A2613D5003333C9 /* libcytobase.a in Frameworks */,
-				BB4DB5B20C69D6B2001E5E4F /* libcytodisp.a in Frameworks */,
+				BB805D4B241963B000B62699 /* GLUT.framework in Frameworks */,
 				BBAEC50D0EF1D23000955B64 /* libcytomath.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1781,9 +1785,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB55C0AB0A260F3F003333C9 /* libcytobase.a in Frameworks */,
-				BB33E9E41003566600B44F1E /* libcytodisp.a in Frameworks */,
+				BB805D472419630700B62699 /* libcytobase.a in Frameworks */,
 				BB97B7D720DE3B7E004D659C /* GLUT.framework in Frameworks */,
+				BB805D4D241963E400B62699 /* libcytodisp.a in Frameworks */,
 				BB55C0A90A260F19003333C9 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1806,8 +1810,8 @@
 			files = (
 				BB55C0E50A2613E1003333C9 /* libcytospace.a in Frameworks */,
 				BB55C0F00A26147A003333C9 /* libcytobase.a in Frameworks */,
+				BB805D482419635D00B62699 /* libcytodisp.a in Frameworks */,
 				BBAEC50F0EF1D23400955B64 /* libcytomath.a in Frameworks */,
-				BB33E9D9100355B500B44F1E /* libcytodisp.a in Frameworks */,
 				BBE8E6D110C199F4006527D4 /* libcytosim.a in Frameworks */,
 				BB8408841934905C0088C07B /* Accelerate.framework in Frameworks */,
 				BB8BBD05215284C70033BC7A /* GLUT.framework in Frameworks */,
@@ -1819,9 +1823,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB805D4C241963CB00B62699 /* libcytodisp.a in Frameworks */,
 				BB882AF80EE82C8B00E29E5C /* libcytobase.a in Frameworks */,
 				BBAEC50B0EF1D22B00955B64 /* libcytomath.a in Frameworks */,
-				BB33E9E01003564400B44F1E /* libcytodisp.a in Frameworks */,
 				BB30922D216543C000C6DEE4 /* GLUT.framework in Frameworks */,
 				BB882B1B0EE82C9700E29E5C /* OpenGL.framework in Frameworks */,
 			);
@@ -1866,7 +1870,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB33E98C1003553000B44F1E /* libcytodisp.a in Frameworks */,
 				BBA758B1139CFD3F0098FBAF /* libcytomath.a in Frameworks */,
 				BBA758B2139CFD430098FBAF /* libcytobase.a in Frameworks */,
 				BBB1C6DE0CB2CAA300679ADC /* OpenGL.framework in Frameworks */,
@@ -2816,9 +2819,9 @@
 				BB51BC5C05FA559800D4869F /* libcytobase.a */,
 				BBE0993E0869D87F005FF210 /* libcytospace.a */,
 				BBE82A64233D15EB00BE44DF /* libcytospaceG.a */,
+				BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */,
 				BB51BD1405FA5FAA00D4869F /* libcytosim.a */,
 				BB692222233D359F00F528D2 /* libcytosimG.a */,
-				BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */,
 			);
 			name = lib;
 			path = build;
@@ -4350,6 +4353,7 @@
 				BBE82A68233D1A5E00BE44DF /* random.cc in Sources */,
 				BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */,
 				BB692133233D34A100F528D2 /* random_vector.cc in Sources */,
+				BB805D4E241967B100B62699 /* rasterizer.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5480,6 +5484,10 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
@@ -5493,6 +5501,10 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
@@ -5506,6 +5518,10 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
