@@ -75,6 +75,7 @@ namespace gle
     inline void gleTranslate(Vector3 const& v)            { glTranslated(v.XX, v.YY, v.ZZ); }
     
     inline void gleMultMatrix(real mat[])                 { glMultMatrixd(mat); }
+    inline void gleLoadMatrix(real mat[])                 { glLoadMatrixd(mat); }
 
     inline void gleRasterPos(Vector1 const& v)            { glRasterPos2d(v.XX, 0); }
     inline void gleRasterPos(Vector2 const& v)            { glRasterPos2d(v.XX, v.YY); }
@@ -97,6 +98,7 @@ namespace gle
     inline void gleTranslate(Vector3 const& v)            { glTranslatef(v.XX, v.YY, v.ZZ); }
 
     inline void gleMultMatrix(real mat[])                 { glMultMatrixf(mat); }
+    inline void gleLoadMatrix(real mat[])                 { glLoadMatrixf(mat); }
 
     inline void gleRasterPos(Vector1 const& v)            { glRasterPos2f(v.XX, 0); }
     inline void gleRasterPos(Vector2 const& v)            { glRasterPos2f(v.XX, v.YY); }
@@ -207,12 +209,12 @@ namespace gle
 
     /// draw a 3-portion cylinder with a larger central section
     void gleBarrel1();
-    /// display a cone directed along Z, of radius 1 in Z=[B, T], possibly closed by a disc
-    void gleCone0(GLfloat B, GLfloat T, bool closed);
-    /// display an open cone directed along Z, of radius 1 in Z=[0, 1]
+    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
+    void gleCone0(GLfloat R, GLfloat B, GLfloat T, bool closed);
+    /// display an open cone directed along Z, of radius 1 at Z=0
     inline void gleCone1() { gleTube0(0, 1, 1, 0.25, 4); }
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
-    inline void gleLongCone1() { gleCone0(-1, 2, true); }
+    inline void gleLongCone1() { gleCone0(1, -1, 2, true); }
     /// display a cylindrical box, directed along Z, of length 1, radius 1 in Z=[-0.5, +0.5]
     void gleCylinderZ();
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1

@@ -250,14 +250,14 @@ namespace gle
     
     
     void gleTransRotate(Vector3 const& v1, Vector3 const& v2,
-                        Vector3 const& v3, Vector3 const& vt)
+                        Vector3 const& v3, Vector3 const& OF)
     {
         //warning! this matrix is displayed here transposed
         real mat[16] = {
             v1.XX, v1.YY, v1.ZZ, 0,
             v2.XX, v2.YY, v2.ZZ, 0,
             v3.XX, v3.YY, v3.ZZ, 0,
-            vt.XX, vt.YY, vt.ZZ, 1};
+            OF.XX, OF.YY, OF.ZZ, 1};
         gleMultMatrix(mat);
     }
     
@@ -1163,7 +1163,7 @@ namespace gle
     }
     
     
-    void gleCone0(GLfloat B, GLfloat T, bool closed)
+    void gleCone0(GLfloat R, GLfloat B, GLfloat T, bool closed)
     {
         if ( closed )
         {
@@ -1171,7 +1171,7 @@ namespace gle
             glNormal3f( 0, 0, B );
             glVertex3f( 0, 0, B );
             for ( size_t n = 0; n <= ncircle; ++n )
-                glVertex3f(co_[n], -si_[n], B);
+                glVertex3f(R*co_[n], -R*si_[n], B);
             glEnd();
         }
         glBegin(GL_TRIANGLE_FAN);
@@ -1182,7 +1182,7 @@ namespace gle
         for ( size_t n = 0; n <= ncircle; ++n )
         {
             glNormal3f(C*co_[n], C*si_[n], S);
-            glVertex3f(co_[n], si_[n], B);
+            glVertex3f(R*co_[n], R*si_[n], B);
         }
         glEnd();
     }
