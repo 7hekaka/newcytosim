@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cctype>
+#include <algorithm>
 
 void StreamFunc::clean_stream(std::ostream& os, std::istream& is)
 {
