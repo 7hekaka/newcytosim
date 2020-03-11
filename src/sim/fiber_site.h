@@ -24,14 +24,12 @@
  represent the Fiber's position, and also unaffected by assembly/disassembly
  at the tips of the Fiber.
  
- The `FiberSite` also supports binding at discrete positions, if the Fiber has
- a Lattice, and in this case uses a pointer `fbLattice' and an integer `fbSite`
- to keep track of the position.
+ If the Fiber has a Lattice, The `FiberSite` also supports binding at discrete
+ positions, and in this case uses a pointer `fbLattice' and a signed integer
+ `fbSite` to keep track of the position.
 */
 class FiberSite
 {
-    //friend class Hand;
-
 private:
     
     /// the interpolation on the Fiber's vertices
