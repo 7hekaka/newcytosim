@@ -2140,7 +2140,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 
 #endif
 
-#if ( DIM > 1 )
+
 /**
  
  Link `ptA` (A) and `ptB` (B)
@@ -2150,6 +2150,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
  
  arm must be perpendicular to link
  
+ This code is valid in any dimension and works in 2 and 3D
  */
 void Meca::addSideLink3D(Interpolation const& ptA,
                          Mecapoint const& ptB,
@@ -2222,7 +2223,6 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 #endif
 }
 
-#endif
 
 
 void Meca::addSideLink(Interpolation const& ptA,
@@ -2343,7 +2343,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 
 #endif
 
-#if ( DIM > 1 )
+// this code is valid in any dimension and works in 2 and 3D
 void Meca::addSideLink3D(Interpolation const& ptA,
                          Interpolation const& ptB,
                          Torque const& arm,
@@ -2418,8 +2418,6 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     }
 #endif
 }
-
-#endif
 
 
 /**
