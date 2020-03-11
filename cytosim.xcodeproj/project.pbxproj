@@ -1915,8 +1915,6 @@
 				BB18BBB71DFD78F600567023 /* test_simd */,
 				BB18BBC71DFD7E3400567023 /* test_code */,
 				BB9D87A01E76BAE500DD0F00 /* test_matrix */,
-				BBE82A64233D15EB00BE44DF /* libcytospaceG.a */,
-				BB692222233D359F00F528D2 /* libcytosimG.a */,
 			);
 			name = build;
 			sourceTree = SOURCE_ROOT;
@@ -2817,7 +2815,9 @@
 				BB7191C50EF1CD9900CED9E2 /* libcytomath.a */,
 				BB51BC5C05FA559800D4869F /* libcytobase.a */,
 				BBE0993E0869D87F005FF210 /* libcytospace.a */,
+				BBE82A64233D15EB00BE44DF /* libcytospaceG.a */,
 				BB51BD1405FA5FAA00D4869F /* libcytosim.a */,
+				BB692222233D359F00F528D2 /* libcytosimG.a */,
 				BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */,
 			);
 			name = lib;
