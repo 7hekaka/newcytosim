@@ -434,10 +434,10 @@ void SpaceDynamicEllipse::write(Outputter& out) const
  */
 void SpaceDynamicEllipse::report(std::ostream& os) const
 {
-    os << "radius_0" << length_[0];
-    os << "radius_1" << length_[1];
+    os << "  radius_0" << length_[0];
+    os << "  radius_1" << length_[1];
 #if ( DIM == 3 )
-    os << "radius_2" << length_[2];
+    os << "  radius_2" << length_[2];
 #endif
 }
 

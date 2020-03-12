@@ -11,7 +11,7 @@
  */
 #ifdef DISPLAY
 #  include "opengl.h"
-extern bool rasterizer_draws;
+bool rasterizer_draws = false;
 #endif
 
 //==============================================================================

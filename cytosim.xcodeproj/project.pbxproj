@@ -202,7 +202,6 @@
 		BB692132233D349E00F528D2 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
 		BB692133233D34A100F528D2 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
 		BB692134233D34C300F528D2 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
-		BB692135233D350300F528D2 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
 		BB692136233D351900F528D2 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BB692139233D359F00F528D2 /* mecapoint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA27C06B0539000638608 /* mecapoint.h */; };
 		BB69213A233D359F00F528D2 /* interpolation.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA27E06B0539000638608 /* interpolation.h */; };
@@ -449,7 +448,6 @@
 		BB71916E0EF1CD9900CED9E2 /* quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = BB94965A0933B75B003A32FE /* quaternion.h */; };
 		BB71916F0EF1CD9900CED9E2 /* matsparsesym1.h in Headers */ = {isa = PBXBuildFile; fileRef = BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */; };
 		BB7191700EF1CD9900CED9E2 /* dim.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF300A25FB13003333C9 /* dim.h */; };
-		BB7191710EF1CD9900CED9E2 /* platonic.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF390A25FB22003333C9 /* platonic.h */; };
 		BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
 		BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* pointsonsphere.h */; };
 		BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587205B98DA3006956D5 /* conjgradient.h */; };
@@ -480,7 +478,6 @@
 		BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588F05B98DA3006956D5 /* matsym.cc */; };
 		BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0C409E069A043600CF45A8 /* matsparsesym.cc */; };
 		BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */; };
-		BB7191B50EF1CD9900CED9E2 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
 		BB7191B80EF1CD9900CED9E2 /* matsparsesymblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */; };
 		BB7191B90EF1CD9900CED9E2 /* vector1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED30BE3DED10054838A /* vector1.cc */; };
 		BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED50BE3DED10054838A /* vector2.cc */; };
@@ -505,6 +502,8 @@
 		BB786AF20AF62C8B005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB786AF30AF62C90005AF9A2 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
+		BB7B5A9C241A81BB0063F252 /* platonic.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF390A25FB22003333C9 /* platonic.h */; };
+		BB7B5A9D241A81BF0063F252 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
 		BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591105B98DA3006956D5 /* test_rasterizer.cc */; };
 		BB7D839610274A4500C1DC38 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7D839510274A4500C1DC38 /* common.h */; };
 		BB7DC19C2200DCE400DB779E /* test_glos.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7DC19B2200DCE400DB779E /* test_glos.cc */; };
@@ -517,27 +516,27 @@
 		BB805D4B241963B000B62699 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB805D4C241963CB00B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB805D4D241963E400B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB805D4E241967B100B62699 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; };
+		BB805D4E241967B100B62699 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB805D56241A3E6600B62699 /* dynamic_space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D54241A3E6600B62699 /* dynamic_space_prop.cc */; };
-		BB805D57241A3E6600B62699 /* dynamic_space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D54241A3E6600B62699 /* dynamic_space_prop.cc */; };
+		BB805D57241A3E6600B62699 /* dynamic_space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D54241A3E6600B62699 /* dynamic_space_prop.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB805D58241A3E6600B62699 /* dynamic_space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D55241A3E6600B62699 /* dynamic_space_prop.h */; };
 		BB805D59241A3E6600B62699 /* dynamic_space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D55241A3E6600B62699 /* dynamic_space_prop.h */; };
 		BB805D62241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */; };
 		BB805D63241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */; };
 		BB805D64241A3F1500B62699 /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */; };
-		BB805D65241A3F1500B62699 /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */; };
+		BB805D65241A3F1500B62699 /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB805D66241A3F1500B62699 /* space_dynamic_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D60241A3F1500B62699 /* space_dynamic_sphere.cc */; };
-		BB805D67241A3F1500B62699 /* space_dynamic_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D60241A3F1500B62699 /* space_dynamic_sphere.cc */; };
+		BB805D67241A3F1500B62699 /* space_dynamic_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D60241A3F1500B62699 /* space_dynamic_sphere.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB805D68241A3F1500B62699 /* space_dynamic_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D61241A3F1500B62699 /* space_dynamic_sphere.h */; };
 		BB805D69241A3F1500B62699 /* space_dynamic_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D61241A3F1500B62699 /* space_dynamic_sphere.h */; };
 		BB805D6F241A5A6000B62699 /* space_lid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D6A241A5A5F00B62699 /* space_lid.h */; };
 		BB805D70241A5A6000B62699 /* space_lid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D6A241A5A5F00B62699 /* space_lid.h */; };
 		BB805D71241A5A6000B62699 /* space_lid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6B241A5A5F00B62699 /* space_lid.cc */; };
-		BB805D72241A5A6000B62699 /* space_lid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6B241A5A5F00B62699 /* space_lid.cc */; };
+		BB805D72241A5A6000B62699 /* space_lid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6B241A5A5F00B62699 /* space_lid.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB805D73241A5A6000B62699 /* space_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D6C241A5A5F00B62699 /* space_disc.h */; };
 		BB805D74241A5A6000B62699 /* space_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D6C241A5A5F00B62699 /* space_disc.h */; };
 		BB805D75241A5A6000B62699 /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6D241A5A5F00B62699 /* space_disc.cc */; };
-		BB805D76241A5A6000B62699 /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6D241A5A5F00B62699 /* space_disc.cc */; };
+		BB805D76241A5A6000B62699 /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6D241A5A5F00B62699 /* space_disc.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB8408801934902C0088C07B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
 		BB840881193490300088C07B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
 		BB840882193490520088C07B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
@@ -3069,6 +3068,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB7B5A9C241A81BB0063F252 /* platonic.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3382,7 +3382,6 @@
 				BB71916E0EF1CD9900CED9E2 /* quaternion.h in Headers */,
 				BB71916F0EF1CD9900CED9E2 /* matsparsesym1.h in Headers */,
 				BB7191700EF1CD9900CED9E2 /* dim.h in Headers */,
-				BB7191710EF1CD9900CED9E2 /* platonic.h in Headers */,
 				BB6485EE2057FD30005F2CD1 /* linear_operator.h in Headers */,
 				BB9D224620C5D30200CBB0B1 /* simd.h in Headers */,
 				BB74F420232024AB0019D68E /* byteswap.h in Headers */,
@@ -4003,6 +4002,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB109D3723D0788200805F16 /* point_disp.cc in Sources */,
+				BB7B5A9D241A81BF0063F252 /* platonic.cc in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,
 				BB97116A1DECDB8F00352630 /* saveimage.cc in Sources */,
@@ -4343,7 +4343,6 @@
 				BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */,
 				BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */,
-				BB7191B50EF1CD9900CED9E2 /* platonic.cc in Sources */,
 				BB003F3020EDEDA4007C9593 /* vector4.cc in Sources */,
 				BB7191B80EF1CD9900CED9E2 /* matsparsesymblk.cc in Sources */,
 				BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */,
@@ -4366,12 +4365,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB692134233D34C300F528D2 /* SFMT.c in Sources */,
-				BB692135233D350300F528D2 /* platonic.cc in Sources */,
 				BB692136233D351900F528D2 /* vector3.cc in Sources */,
-				BBE82A68233D1A5E00BE44DF /* random.cc in Sources */,
-				BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */,
-				BB692133233D34A100F528D2 /* random_vector.cc in Sources */,
 				BB805D4E241967B100B62699 /* rasterizer.cc in Sources */,
+				BBE82A68233D1A5E00BE44DF /* random.cc in Sources */,
+				BB692133233D34A100F528D2 /* random_vector.cc in Sources */,
+				BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4969,13 +4967,10 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = cytodisp;
 				ZERO_LINK = YES;
 			};
@@ -4986,9 +4981,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = cytodisp;
 			};
 			name = Deployment;
@@ -4998,9 +4991,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = cytodisp;
 				ZERO_LINK = YES;
 			};
@@ -5011,7 +5001,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5022,7 +5011,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5033,7 +5021,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5092,7 +5079,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytobase;
 			};
@@ -5103,7 +5089,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytobase;
 			};
@@ -5114,7 +5099,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytobase;
 			};
@@ -5124,7 +5108,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytospace;
 			};
@@ -5134,7 +5117,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytospace;
 			};
@@ -5144,7 +5126,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytospace;
 			};
@@ -5155,7 +5136,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytosim;
 			};
@@ -5166,7 +5146,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytosim;
 			};
@@ -5177,7 +5156,6 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_USE_OPTIMIZATION_PROFILE = NO;
-				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = cytosim;
 			};
@@ -6018,7 +5996,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				COMBINE_HIDPI_IMAGES = YES;
+				DEFINE_DISPLAY = "-DDISPLAY";
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -6028,7 +6006,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				COMBINE_HIDPI_IMAGES = YES;
+				DEFINE_DISPLAY = "-DDISPLAY";
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -6038,7 +6016,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				COMBINE_HIDPI_IMAGES = YES;
+				DEFINE_DISPLAY = "-DDISPLAY";
 				LIBRARY_STYLE = STATIC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
