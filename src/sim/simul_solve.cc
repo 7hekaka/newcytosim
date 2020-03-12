@@ -66,7 +66,7 @@ real Simul::estimateStericRange() const
     }
     
     if ( ran < REAL_EPSILON )
-        LOG_ONCE("Warning: could not estimate simul:steric_max_range automatically!\n");
+        Cytosim::warn << "could not estimate simul:steric_max_range automatically!\n";
     
     return ran;
 }

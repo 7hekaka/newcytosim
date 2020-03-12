@@ -917,7 +917,7 @@ void Chain::getPoints(real const* ptr)
 #endif
     {
         reshape_global(nbSegments(), ptr, pPos, fnCut);
-        Cytosim::warn << "Warning: a crude method was used to reshape " << reference() << '\n';
+        Cytosim::warn << "a crude method was used to reshape " << reference() << '\n';
     }
     //dump(std::cerr);
 }

@@ -1858,8 +1858,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 
         if ( length() + REAL_EPSILON < prop->min_length )
         {
-            Cytosim::log << "Warning: fiber length < fiber:min_length";
-            Cytosim::log << " ( " << length() << " < " << prop->min_length << " )" << std::endl;
+            Cytosim::warn << "fiber:length < min_length ( " << length() << " < " << prop->min_length << " )\n";
         }
 #if FIBER_HAS_GLUE
         frGlue = nullptr;

@@ -4,6 +4,7 @@
 #include "solid.h"
 #include "solid_prop.h"
 #include "exceptions.h"
+#include "messages.h"
 #include "hand_prop.h"
 #include "iowrapper.h"
 #include "tokenizer.h"
@@ -408,7 +409,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 }
             }
             if ( dis < sep )
-                std::cerr << "Warning: solid:separation reduced to " << dis << "\n";
+                Cytosim::warn << "solid:separation reduced to " << dis << "\n";
             real dev = 0.0;
             if ( opt.set(dev, "deviation") && dev > rad )
                 throw InvalidParameter("solid:deviation should be <= radius");

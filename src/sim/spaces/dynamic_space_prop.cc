@@ -112,8 +112,8 @@ void DynamicSpaceProp::complete(Simul const& sim)
     else if ( sim.ready() )
         throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
 
-    if (tension < 0)
-        throw InvalidParameter("tension must be positive");
+    if ( tension < 0 )
+        throw InvalidParameter("tension must be >= 0");
 }
 
 

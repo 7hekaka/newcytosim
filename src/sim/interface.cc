@@ -592,7 +592,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     
     if ( objs.size() == 0 )
     {
-        std::cerr << "Warning: found no `" << name << "' to delete\n";
+        Cytosim::warn << "found no `" << name << "' to delete\n";
         return;
     }
     
