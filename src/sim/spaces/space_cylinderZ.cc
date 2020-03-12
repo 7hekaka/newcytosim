@@ -396,11 +396,13 @@ bool SpaceCylinderZ::draw() const
     GLfloat RE = radius_ - edge_;
     GLfloat TE = top_ - edge_;
     GLfloat BE = bot_ + edge_;
+    GLfloat RS = edge_;
     
     const size_t fin = 512;
     GLfloat c[fin+1], s[fin+1];
     gle::circle(fin, c, s, 1);
-    
+
+
     glBegin(GL_TRIANGLE_STRIP);
     //display strips along the side of the volume:
     for ( size_t n = 0; n <= fin; ++n )
@@ -418,7 +420,42 @@ bool SpaceCylinderZ::draw() const
     for ( size_t n = 0; n <= fin; ++n )
         glVertex3f(RE*c[n], RE*s[n], T);
     glEnd();
-    
+
+    if (edge_ > 0) {
+    //draw top half sphere
+    size_t pi_half = fin/4.;
+    for ( size_t n_theta = 0; n_theta<=pi_half; n_theta++ )
+    {
+		GLfloat CU = c[n_theta], SU = s[n_theta];
+		GLfloat CL = c[n_theta+1], SL = s[n_theta+1];
+    	glBegin(GL_TRIANGLE_STRIP);
+    	for (size_t n_phi = 0; n_phi <= fin; n_phi++) {
+    		glNormal3f(SU*c[n_phi], SU*s[n_phi], CU);
+			glVertex3f((RE+RS*SU)*c[n_phi], (RE+RS*SU)*s[n_phi], TE+RS*CU);
+			glNormal3f(SL*c[n_phi], SL*s[n_phi], CL);
+			glVertex3f((RE+RS*SL)*c[n_phi], (RE+RS*SL)*s[n_phi], TE+RS*CL);
+    	}
+    	glEnd();
+    }
+
+    //draw bottom half sphere
+    size_t pi_once = fin/2.;
+    for ( size_t n_theta = pi_half; n_theta<=pi_once; n_theta++ )
+    {
+		GLfloat CU = c[n_theta], SU = s[n_theta];
+		GLfloat CL = c[n_theta+1], SL = s[n_theta+1];
+		glBegin(GL_TRIANGLE_STRIP);
+		for (size_t n_phi = 0; n_phi <= fin; n_phi++) {
+			glNormal3f(SU*c[n_phi], SU*s[n_phi], CU);
+			glVertex3f((RE+RS*SU)*c[n_phi], (RE+RS*SU)*s[n_phi], BE+RS*CU);
+			glNormal3f(SL*c[n_phi], SL*s[n_phi], CL);
+			glVertex3f((RE+RS*SL)*c[n_phi], (RE+RS*SL)*s[n_phi], BE+RS*CL);
+
+		}
+		glEnd();
+	}
+    }
+
     // draw bottom cap:
     glBegin(GL_TRIANGLE_FAN);
     glNormal3f(0, 0, -1);
@@ -426,7 +463,7 @@ bool SpaceCylinderZ::draw() const
     for ( size_t n = 0; n <= fin; ++n )
         glVertex3f(-RE*c[n], RE*s[n], B);
     glEnd();
-    
+
 #endif
     return true;
 }
