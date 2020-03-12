@@ -47,24 +47,20 @@ void SpaceSet::setMaster(Space const* spc)
 
 //------------------------------------------------------------------------------
 
-Property * SpaceSet::newProperty(const std::string& cat,const std::string& nom, Glossary& opt) const
+Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
 {
-    if ( cat == "space" ) {
-        
-        std::string a;
-        if ( opt.peek(a, "shape") )
-		{
-			if ( a == "disc" || a=="dynamic_sphere" || a=="lid"  ) {
-                return new DynamicSpaceProp(nom);
-            } 
-            else if ( a== "contractile" || a=="dynamic_ellipse") {
-                return new SpaceDynamicEllipseProp(nom);
-            }
-		}
-        
+    std::string s;
+    if ( cat == "space" && opt.peek(s, "shape") )
+    {
+        if ( s=="disc" )                  return new DynamicSpaceProp(nom);
+        if ( s=="dynamic_sphere" )        return new DynamicSpaceProp(nom);
+        if ( s=="lid"  )                  return new DynamicSpaceProp(nom);
+        if ( s=="dynamic_ellipse")        return new DynamicSpaceProp(nom);
+#ifdef BACKWARD_COMPATIBILITY
+        if ( s=="contractile" )           return new DynamicSpaceProp(nom);
+#endif
         return new SpaceProp(nom);
     }
-        
     return nullptr;
 }
 

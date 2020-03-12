@@ -13,6 +13,12 @@ class DynamicSpaceProp : public SpaceProp
 {
         
 public:
+    
+    /**
+     @defgroup DynamicSpacePar Parameters of Dynamic Space
+     @ingroup Parameters
+     @{
+    */
 
     /// Viscosity
     real         viscosity;
@@ -20,9 +26,17 @@ public:
     /// Viscosity for rotation
     real         viscosity_rot;
     
-      /// equal to time_step / viscosity
-    real         mobility_dt, mobility_rot_dt;
+    // tension of the ellipse
+    real         tension;
     
+    // volume of the ellipse (mutable because changed by const method)
+    mutable real volume;
+    
+    /// @}
+
+    /// derived values equal to time_step / viscosity
+    real         mobility_dt, mobility_rot_dt;
+
 public:
 
     /// constructor

@@ -8,7 +8,8 @@
 #include "simul.h"
 #include "sim.h"
 
-// To create new spaces
+
+// include spaces that use DynamicSpaceProp
 #include "space_lid.h"
 #include "space_disc.h"
 #include "space_dynamic_sphere.h"
@@ -60,10 +61,46 @@
  */
 
 //------------------------------------------------------------------------------
-void DynamicSpaceProp::complete(Simul const& sim) 
+
+Space * DynamicSpaceProp::newSpace() const
 {
-	SpaceProp::complete(sim);
-	
+    const std::string& s = SpaceProp::shape;
+    if ( s=="lid" )                   return new SpaceLid(this);
+    if ( s=="disc" )                  return new SpaceDisc(this);
+    if ( s=="dynamic_sphere" )        return new SpaceDynamicSphere(this);
+    if ( s=="dynamic_ellipse" )       return new SpaceDynamicEllipse(this);
+    //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
+    return nullptr;
+}
+
+
+void DynamicSpaceProp::clear()
+{
+    SpaceProp::clear();
+    viscosity     = INFINITY;
+    viscosity_rot = INFINITY;
+    tension       = 0;
+    volume        = 0;
+    
+    mobility_dt     = 0;
+    mobility_rot_dt = 0;
+}
+
+
+void DynamicSpaceProp::read(Glossary& glos) 
+{
+    SpaceProp::read(glos);
+    glos.set(viscosity,     "viscosity");
+    glos.set(viscosity_rot, "viscosity", 1);
+    glos.set(tension,       "tension");
+    glos.set(volume,        "volume");
+}
+
+
+void DynamicSpaceProp::complete(Simul const& sim)
+{
+    SpaceProp::complete(sim);
+    
     if ( viscosity > 0 )
         mobility_dt = sim.time_step() / viscosity;
     else if ( sim.ready() )
@@ -73,39 +110,14 @@ void DynamicSpaceProp::complete(Simul const& sim)
         mobility_rot_dt = sim.time_step() / viscosity_rot;
     else if ( sim.ready() )
         throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
-        
 }
 
-Space * DynamicSpaceProp::newSpace() const
-{
-    const std::string& s = SpaceProp::shape;
-   
-    if ( s=="lid" )                            return new SpaceLid(this);
-    if ( s=="disc" )                           return new SpaceDisc(this);
-    if ( s=="dynamic_sphere" )                 return new SpaceDynamicSphere(this);
-    //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
-    return nullptr;
-}
-
-void DynamicSpaceProp::clear()
-{
-    SpaceProp::clear();
-    viscosity     = INFINITY;
-    viscosity_rot = INFINITY;
-    mobility_dt   = 0;
-    mobility_rot_dt = 0;
-}
-
-void DynamicSpaceProp::read(Glossary& glos) 
-{
-    SpaceProp::read(glos);
-    glos.set(viscosity,     "viscosity");
-    glos.set(viscosity_rot, "viscosity", 1);
-}
 
 void DynamicSpaceProp::write_values(std::ostream& os) const
 {
     SpaceProp::write_values(os);
-    write_value(os, "viscosity",  viscosity, viscosity_rot);
+    write_value(os, "viscosity", viscosity, viscosity_rot);
+    write_value(os, "tension",   tension);
+    write_value(os, "volume",    volume);
 }
 

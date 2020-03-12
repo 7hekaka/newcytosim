@@ -46,7 +46,7 @@
       enableUBSanitizer = "YES"
       disableMainThreadChecker = "YES"
       launchStyle = "0"
-      useCustomWorkingDirectory = "NO"
+      useCustomWorkingDirectory = "YES"
       customWorkingDirectory = "~/code/cytosim"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
