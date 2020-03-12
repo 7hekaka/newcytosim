@@ -1,0 +1,52 @@
+// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+
+#ifndef DYNAMIC_SPACE_PROP_H
+#define DYNAMIC_SPACE_PROP_H
+
+#include "space_prop.h"
+#include "property.h"
+
+class SpaceProp;
+class Space;
+
+class DynamicSpaceProp : public SpaceProp 
+{
+        
+public:
+
+    /// Viscosity
+    real         viscosity;
+
+    /// Viscosity for rotation
+    real         viscosity_rot;
+    
+      /// equal to time_step / viscosity
+    real         mobility_dt, mobility_rot_dt;
+    
+public:
+
+    /// constructor
+    DynamicSpaceProp(const std::string& n) : SpaceProp(n)  { clear(); }
+    
+    /// destructor
+    ~DynamicSpaceProp() { }
+	
+    /// set from a Glossary
+    virtual void read(Glossary&);
+	
+    /// check and derive more parameters
+    virtual void complete(Simul const&);
+	
+    /// write all values
+    virtual void write_values(std::ostream&) const;
+    
+    /// set default values
+    virtual void clear();
+    
+    /// create a new, uninitialized, Space
+    virtual Space * newSpace() const;
+	
+};
+
+#endif
+

@@ -4,6 +4,7 @@
 #define SPACE_DISC_H
 
 #include "space.h"
+#include "dynamic_space_prop.h"
 
 /// A disc centered at the origin, with variable radius.
 /**
@@ -33,7 +34,10 @@ private:
 public:
     
     /// constructor
-    SpaceDisc(SpaceProp const*);
+    SpaceDisc(DynamicSpaceProp const*);
+    
+    /// properties
+    const DynamicSpaceProp* prop;
 
     /// change dimensions
     void        resize(Glossary& opt);

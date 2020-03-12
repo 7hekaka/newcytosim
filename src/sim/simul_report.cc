@@ -1587,7 +1587,7 @@ void Simul::reportSpace(std::ostream& out) const
 
 
 /**
- Report force on Space (unfinished)
+ Report force on Space
  */
 void Simul::reportSpaceForce(std::ostream& out) const
 {
@@ -1598,6 +1598,10 @@ void Simul::reportSpaceForce(std::ostream& out) const
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();
         out << SEP << obj->prop->shape;
+        
+        for (auto described_value: obj->report_values()) {
+            out << SEP << described_value.first << SEP << described_value.second;
+        }
     }
 }
 

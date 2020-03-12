@@ -4,8 +4,8 @@
 #include "meca.h"
 
 
-SpaceDynamicSphere::SpaceDynamicSphere(SpaceProp const* p)
-: SpaceSphere(p)
+SpaceDynamicSphere::SpaceDynamicSphere(DynamicSpaceProp const* p)
+: SpaceSphere(p),prop(p)
 {
     force_ = 0;
 }

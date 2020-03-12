@@ -5,6 +5,7 @@
 
 #include "dim.h"
 #include "space.h"
+#include "space_dynamic_ellipse_prop.h"
 #include "space_ellipse.h"
 #include "meca.h"
 
@@ -59,6 +60,7 @@ private:
     
     /// Gives the i-th eigenvector of the ellipsoid
     Vector      director(unsigned i) const;
+    
     /// Surface area of an ellipse of given axis length
     static real surfaceEllipse(Vector const&);
     
@@ -68,7 +70,10 @@ private:
 public:
      
     /// constructor
-    SpaceDynamicEllipse(SpaceProp const*);
+    SpaceDynamicEllipse(SpaceDynamicEllipseProp const*);
+    
+    /// properties
+    const SpaceDynamicEllipseProp* prop;
     
     /// change dimensions
     void    resize(Glossary& opt);
@@ -107,6 +112,9 @@ public:
 
     /// read from file
     void    read(Inputter&, Simul&, ObjectTag);
+    
+    /// report values
+    Space::space_values  report_values() const ;
 
 };
 

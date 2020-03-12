@@ -1,6 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "space_set.h"
 #include "space_prop.h"
+#include "dynamic_space_prop.h"
+#include "space_dynamic_ellipse_prop.h"
 #include "iowrapper.h"
 #include "glossary.h"
 #include "simul.h"
@@ -45,10 +47,24 @@ void SpaceSet::setMaster(Space const* spc)
 
 //------------------------------------------------------------------------------
 
-Property * SpaceSet::newProperty(const std::string& cat,const std::string& nom, Glossary&) const
+Property * SpaceSet::newProperty(const std::string& cat,const std::string& nom, Glossary& opt) const
 {
-    if ( cat == "space" )
+    if ( cat == "space" ) {
+        
+        std::string a;
+        if ( opt.peek(a, "shape") )
+		{
+			if ( a == "disc" || a=="dynamic_sphere" || a=="lid"  ) {
+                return new DynamicSpaceProp(nom);
+            } 
+            else if ( a== "contractile" || a=="dynamic_ellipse") {
+                return new SpaceDynamicEllipseProp(nom);
+            }
+		}
+        
         return new SpaceProp(nom);
+    }
+        
     return nullptr;
 }
 

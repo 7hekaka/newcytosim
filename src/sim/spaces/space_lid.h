@@ -5,6 +5,7 @@
 
 #include "space.h"
 #include "modulo.h"
+#include "dynamic_space_prop.h"
 
 /**
  SpaceLid is a rectangular Space with partial periodic boundary conditions in
@@ -37,7 +38,10 @@ private:
 public:
     
     /// creator
-    SpaceLid(SpaceProp const*);
+    SpaceLid(DynamicSpaceProp const*);
+    
+    /// properties
+    const DynamicSpaceProp* prop;
     
     /// change dimensions
     void       resize(Glossary& opt);

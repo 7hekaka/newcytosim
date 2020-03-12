@@ -9,8 +9,8 @@
 #include "meca.h"
 
 
-SpaceDisc::SpaceDisc(SpaceProp const* p)
-: Space(p)
+SpaceDisc::SpaceDisc(DynamicSpaceProp const* p)
+: Space(p),prop(p)
 {
     if ( DIM != 2 )
         throw InvalidParameter("disc is only usable in 2D");
