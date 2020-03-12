@@ -167,7 +167,6 @@
 		BB5CDDCA06AC4C4B008296B1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB5CF1F916DD2D5A00EF0FE3 /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; };
 		BB5CF1FB16DD2D5A00EF0FE3 /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
-		BB5D4A9612BC035600A1312F /* common.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4A9512BC035600A1312F /* common.cc */; };
 		BB5D4CA112BCBE2900A1312F /* parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4C9F12BCBE2900A1312F /* parser.cc */; };
 		BB5D4CA212BCBE2900A1312F /* parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5D4CA012BCBE2900A1312F /* parser.h */; };
 		BB60C6A10B6022FE00596D88 /* fiber_grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB60C69F0B6022FE00596D88 /* fiber_grid.h */; };
@@ -334,7 +333,6 @@
 		BB6921BA233D359F00F528D2 /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
 		BB6921BB233D359F00F528D2 /* object_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA8BD730E1FBDE8009C7F93 /* object_set.cc */; };
 		BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402E60E236764007410D7 /* solid_set.cc */; };
-		BB6921BD233D359F00F528D2 /* splash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF0385D18BCF207002E8568 /* splash.cc */; };
 		BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402EA0E236778007410D7 /* sphere_set.cc */; };
 		BB6921BF233D359F00F528D2 /* fiber_site.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */; };
 		BB6921C0233D359F00F528D2 /* hand_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAF2B2F0FD01048006E8E27 /* hand_prop.cc */; };
@@ -376,7 +374,6 @@
 		BB6921E4233D359F00F528D2 /* cutter.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA10157126CC7FD00D28A55 /* cutter.cc */; };
 		BB6921E5233D359F00F528D2 /* actor_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E479126DC70B00B19D26 /* actor_prop.cc */; };
 		BB6921E6233D359F00F528D2 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
-		BB6921E7233D359F00F528D2 /* common.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4A9512BC035600A1312F /* common.cc */; };
 		BB6921E8233D359F00F528D2 /* parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4C9F12BCBE2900A1312F /* parser.cc */; };
 		BB6921E9233D359F00F528D2 /* picket.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFCC8D312C74C7700F62176 /* picket.cc */; };
 		BB6921EA233D359F00F528D2 /* wrist.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB90E7EC12CA635C000DF711 /* wrist.cc */; };
@@ -842,7 +839,6 @@
 		BBEB846512FF339500F9D717 /* fork.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEB846312FF339500F9D717 /* fork.h */; };
 		BBEF3A87118318AE000F2EED /* backtrace.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEF3A85118318AE000F2EED /* backtrace.h */; };
 		BBEF3A88118318AE000F2EED /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
-		BBF0385E18BCF207002E8568 /* splash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF0385D18BCF207002E8568 /* splash.cc */; };
 		BBF0386018BCF7A3002E8568 /* splash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF0385F18BCF7A3002E8568 /* splash.h */; };
 		BBF7BB1A10CD44E00089F5B1 /* display2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF7BB1810CD44E00089F5B1 /* display2.cc */; };
 		BBF7BB1B10CD44E00089F5B1 /* display2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF7BB1910CD44E00089F5B1 /* display2.h */; };
@@ -4070,7 +4066,6 @@
 				BBE87E000DD33655002B3A3C /* movable.cc in Sources */,
 				BBA8BD750E1FBDE8009C7F93 /* object_set.cc in Sources */,
 				BB9402E80E236764007410D7 /* solid_set.cc in Sources */,
-				BBF0385E18BCF207002E8568 /* splash.cc in Sources */,
 				BB9402EC0E236778007410D7 /* sphere_set.cc in Sources */,
 				BBA61CC8234E8DC800D6A81F /* tubule_set.cc in Sources */,
 				BB2EBF470FCF1F3F00CCA721 /* fiber_site.cc in Sources */,
@@ -4113,7 +4108,6 @@
 				BBA1015B126CC7FD00D28A55 /* cutter.cc in Sources */,
 				BBB1E47D126DC70B00B19D26 /* actor_prop.cc in Sources */,
 				BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */,
-				BB5D4A9612BC035600A1312F /* common.cc in Sources */,
 				BB5D4CA112BCBE2900A1312F /* parser.cc in Sources */,
 				BBFCC8D512C74C7700F62176 /* picket.cc in Sources */,
 				BB90E7EE12CA635C000DF711 /* wrist.cc in Sources */,
@@ -4220,7 +4214,6 @@
 				BB6921BA233D359F00F528D2 /* movable.cc in Sources */,
 				BB6921BB233D359F00F528D2 /* object_set.cc in Sources */,
 				BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */,
-				BB6921BD233D359F00F528D2 /* splash.cc in Sources */,
 				BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */,
 				BBA61CC9234E8DC800D6A81F /* tubule_set.cc in Sources */,
 				BB6921BF233D359F00F528D2 /* fiber_site.cc in Sources */,
@@ -4263,7 +4256,6 @@
 				BB6921E4233D359F00F528D2 /* cutter.cc in Sources */,
 				BB6921E5233D359F00F528D2 /* actor_prop.cc in Sources */,
 				BB6921E6233D359F00F528D2 /* actor.cc in Sources */,
-				BB6921E7233D359F00F528D2 /* common.cc in Sources */,
 				BB6921E8233D359F00F528D2 /* parser.cc in Sources */,
 				BB6921E9233D359F00F528D2 /* picket.cc in Sources */,
 				BB6921EA233D359F00F528D2 /* wrist.cc in Sources */,
