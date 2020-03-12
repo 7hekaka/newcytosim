@@ -12,9 +12,6 @@ class Space;
 class Simul;
 
 
-#define NEW_DYNAMIC_SPACES 1
-
-
 /// Property for Space
 /**
  @ingroup Properties
