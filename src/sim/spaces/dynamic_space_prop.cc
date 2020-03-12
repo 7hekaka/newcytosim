@@ -45,6 +45,7 @@
  `lid`              | SpaceLid             | width height
  `disc`             | SpaceDisc            | radius
  `dynamic_sphere`   | SpaceDynamicSphere   | radius
+ `dynamic_ellipse`  | SpaceDynamicEllipse  | length
  
  Example:
  
@@ -110,6 +111,9 @@ void DynamicSpaceProp::complete(Simul const& sim)
         mobility_rot_dt = sim.time_step() / viscosity_rot;
     else if ( sim.ready() )
         throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
+
+    if (tension < 0)
+        throw InvalidParameter("tension must be positive");
 }
 
 

@@ -102,7 +102,10 @@ public:
         return SpaceEllipse::inside(p);
     }
     
-    /// return forces
+    /// debug printout
+    void    dump(std::ostream&) const;
+    
+    /// descriptive printout
     void    report(std::ostream&) const;
 
     /// OpenGL display function; returns true if successful
@@ -113,9 +116,6 @@ public:
 
     /// read from file
     void    read(Inputter&, Simul&, ObjectTag);
-    
-    /// report values
-    Space::space_values  report_values() const ;
 
 };
 

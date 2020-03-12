@@ -2,7 +2,6 @@
 #include "space_set.h"
 #include "space_prop.h"
 #include "dynamic_space_prop.h"
-#include "space_dynamic_ellipse_prop.h"
 #include "iowrapper.h"
 #include "glossary.h"
 #include "simul.h"

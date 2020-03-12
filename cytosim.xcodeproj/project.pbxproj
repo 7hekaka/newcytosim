@@ -522,10 +522,6 @@
 		BB805D57241A3E6600B62699 /* dynamic_space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D54241A3E6600B62699 /* dynamic_space_prop.cc */; };
 		BB805D58241A3E6600B62699 /* dynamic_space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D55241A3E6600B62699 /* dynamic_space_prop.h */; };
 		BB805D59241A3E6600B62699 /* dynamic_space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D55241A3E6600B62699 /* dynamic_space_prop.h */; };
-		BB805D5A241A3E7700B62699 /* space_dynamic_ellipse_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D51241A3E2800B62699 /* space_dynamic_ellipse_prop.h */; };
-		BB805D5B241A3E7700B62699 /* space_dynamic_ellipse_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D51241A3E2800B62699 /* space_dynamic_ellipse_prop.h */; };
-		BB805D5C241A3E7F00B62699 /* space_dynamic_ellipse_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D50241A3E2800B62699 /* space_dynamic_ellipse_prop.cc */; };
-		BB805D5D241A3E7F00B62699 /* space_dynamic_ellipse_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D50241A3E2800B62699 /* space_dynamic_ellipse_prop.cc */; };
 		BB805D62241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */; };
 		BB805D63241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */; };
 		BB805D64241A3F1500B62699 /* space_dynamic_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */; };
@@ -1446,8 +1442,6 @@
 		BB7DC19B2200DCE400DB779E /* test_glos.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_glos.cc; sourceTree = "<group>"; };
 		BB7F683E12D0F1B100F8FC84 /* display_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = display_prop.cc; sourceTree = "<group>"; };
 		BB7F683F12D0F1B100F8FC84 /* display_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = display_prop.h; sourceTree = "<group>"; };
-		BB805D50241A3E2800B62699 /* space_dynamic_ellipse_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_ellipse_prop.cc; path = Spaces/space_dynamic_ellipse_prop.cc; sourceTree = "<group>"; };
-		BB805D51241A3E2800B62699 /* space_dynamic_ellipse_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_ellipse_prop.h; path = Spaces/space_dynamic_ellipse_prop.h; sourceTree = "<group>"; };
 		BB805D54241A3E6600B62699 /* dynamic_space_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_space_prop.cc; path = Spaces/dynamic_space_prop.cc; sourceTree = "<group>"; };
 		BB805D55241A3E6600B62699 /* dynamic_space_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_space_prop.h; path = Spaces/dynamic_space_prop.h; sourceTree = "<group>"; };
 		BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_ellipse.h; path = Spaces/space_dynamic_ellipse.h; sourceTree = "<group>"; };
@@ -2552,18 +2546,16 @@
 		BB805D4F241A3DC400B62699 /* Dynamic Spaces */ = {
 			isa = PBXGroup;
 			children = (
-				BB805D6D241A5A5F00B62699 /* space_disc.cc */,
-				BB805D6C241A5A5F00B62699 /* space_disc.h */,
-				BB805D6B241A5A5F00B62699 /* space_lid.cc */,
-				BB805D6A241A5A5F00B62699 /* space_lid.h */,
 				BB805D55241A3E6600B62699 /* dynamic_space_prop.h */,
 				BB805D54241A3E6600B62699 /* dynamic_space_prop.cc */,
-				BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */,
+				BB805D6A241A5A5F00B62699 /* space_lid.h */,
+				BB805D6B241A5A5F00B62699 /* space_lid.cc */,
+				BB805D6C241A5A5F00B62699 /* space_disc.h */,
+				BB805D6D241A5A5F00B62699 /* space_disc.cc */,
 				BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */,
-				BB805D60241A3F1500B62699 /* space_dynamic_sphere.cc */,
+				BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */,
 				BB805D61241A3F1500B62699 /* space_dynamic_sphere.h */,
-				BB805D51241A3E2800B62699 /* space_dynamic_ellipse_prop.h */,
-				BB805D50241A3E2800B62699 /* space_dynamic_ellipse_prop.cc */,
+				BB805D60241A3F1500B62699 /* space_dynamic_sphere.cc */,
 			);
 			name = "Dynamic Spaces";
 			sourceTree = "<group>";
@@ -3511,7 +3503,6 @@
 				BB8838F610B48EF900A4028F /* space_strip.h in Headers */,
 				BB8838FA10B48EF900A4028F /* space_torus.h in Headers */,
 				BB805D73241A5A6000B62699 /* space_disc.h in Headers */,
-				BB805D5A241A3E7700B62699 /* space_dynamic_ellipse_prop.h in Headers */,
 				BB88394E10B4912A00A4028F /* space_capsule.h in Headers */,
 				BB955CF6116FCB39000E70A6 /* space_set.h in Headers */,
 				BBE4B5EE13E04D2400CBE163 /* space_periodic.h in Headers */,
@@ -3547,7 +3538,6 @@
 				BBE82A39233D15EB00BE44DF /* space_strip.h in Headers */,
 				BBE82A3A233D15EB00BE44DF /* space_torus.h in Headers */,
 				BB805D74241A5A6000B62699 /* space_disc.h in Headers */,
-				BB805D5B241A3E7700B62699 /* space_dynamic_ellipse_prop.h in Headers */,
 				BBE82A3B233D15EB00BE44DF /* space_capsule.h in Headers */,
 				BBE82A3C233D15EB00BE44DF /* space_set.h in Headers */,
 				BBE82A3D233D15EB00BE44DF /* space_periodic.h in Headers */,
@@ -4487,7 +4477,6 @@
 				BB8838ED10B48EF900A4028F /* space_rotate.cc in Sources */,
 				BB2BFFDE184640D800EBE4EC /* space_polygonZ.cc in Sources */,
 				BB805D75241A5A6000B62699 /* space_disc.cc in Sources */,
-				BB805D5C241A3E7F00B62699 /* space_dynamic_ellipse_prop.cc in Sources */,
 				BB8838EF10B48EF900A4028F /* space_sphere.cc in Sources */,
 				BB8838F310B48EF900A4028F /* space_square.cc in Sources */,
 				BB8838F510B48EF900A4028F /* space_strip.cc in Sources */,
@@ -4523,7 +4512,6 @@
 				BBE82A51233D15EB00BE44DF /* space_rotate.cc in Sources */,
 				BBE82A52233D15EB00BE44DF /* space_polygonZ.cc in Sources */,
 				BB805D76241A5A6000B62699 /* space_disc.cc in Sources */,
-				BB805D5D241A3E7F00B62699 /* space_dynamic_ellipse_prop.cc in Sources */,
 				BBE82A53233D15EB00BE44DF /* space_sphere.cc in Sources */,
 				BBE82A54233D15EB00BE44DF /* space_square.cc in Sources */,
 				BBE82A55233D15EB00BE44DF /* space_strip.cc in Sources */,

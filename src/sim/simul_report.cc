@@ -1598,10 +1598,7 @@ void Simul::reportSpaceForce(std::ostream& out) const
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();
         out << SEP << obj->prop->shape;
-        
-        for (auto described_value: obj->report_values()) {
-            out << SEP << described_value.first << SEP << described_value.second;
-        }
+        obj->report(out);
     }
 }
 

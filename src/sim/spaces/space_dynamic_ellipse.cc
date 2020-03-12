@@ -42,7 +42,7 @@ SpaceDynamicEllipse::SpaceDynamicEllipse(DynamicSpaceProp const* p)
 }
 
 
-void SpaceDynamicEllipse::report(std::ostream& out) const
+void SpaceDynamicEllipse::dump(std::ostream& out) const
 {
     char str[1024];
     
@@ -287,7 +287,7 @@ void SpaceDynamicEllipse::step()
                 assert_true(delta[i] == delta[i]);
                 length_[i] += delta[i];
             }
-            //report(std::clog);
+            //dump(std::clog);
             //std::clog << "%  balance " << Rforces << "\n";
         }
         
@@ -327,7 +327,11 @@ void SpaceDynamicEllipse::step()
 void SpaceDynamicEllipse::resize(Glossary& opt)
 {
     SpaceEllipse::resize(opt);
-    prop->volume = volume();
+    if ( prop->volume <= 0 )
+    {
+        prop->volume = volume();
+        //std::clog << "DynamicEllipse:volume <- " << prop->volume << std::endl;
+    }
 }
 
 
@@ -428,17 +432,13 @@ void SpaceDynamicEllipse::write(Outputter& out) const
 /**
  Reports the radii of the ellipsoid
  */
-Space::space_values SpaceDynamicEllipse::report_values() const {
-    
-    Space::space_values values;
-    
-    values.push_back( std::make_pair("radius_0",length_[0]) );
-    values.push_back( std::make_pair("radius_1",length_[1]) );
+void SpaceDynamicEllipse::report(std::ostream& os) const
+{
+    os << "radius_0" << length_[0];
+    os << "radius_1" << length_[1];
 #if ( DIM == 3 )
-    values.push_back( std::make_pair("radius_2",length_[2]) );
+    os << "radius_2" << length_[2];
 #endif
-
-    return values;
 }
 
 //------------------------------------------------------------------------------
