@@ -4,6 +4,7 @@
 #define SPACE_DYNAMIC_SPHERE_H
 
 #include "space_sphere.h"
+#include "dynamic_space_prop.h"
 
 /// A disc centered at the origin, with variable radius.
 /**
@@ -30,7 +31,10 @@ private:
 public:
     
     /// constructor
-    SpaceDynamicSphere(SpaceProp const*);
+    SpaceDynamicSphere(DynamicSpaceProp const*);
+    
+    /// properties
+    const DynamicSpaceProp* prop;
     
     /// add interactions to a Meca
     void        setInteractions(Meca&) const;

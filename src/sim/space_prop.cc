@@ -32,12 +32,6 @@
 #include "space_rotate.h"
 #endif
 
-#if NEW_DYNAMIC_SPACES
-#include "space_lid.h"
-#include "space_disc.h"
-#include "space_dynamic_sphere.h"
-#include "space_dynamic_ellipse.h"
-#endif
 
 /**
  @defgroup SpaceGroup Space and Geometry
@@ -81,15 +75,6 @@
  `ring`        | SpaceRing            | length radius
  `tee`         | SpaceTee             | length radius junction arm
  `mesh`        | SpaceMesh            | file_name
-
- Dynamic Space with variable geometry:
- 
- GEOMETRY           | Class                | PARAMETER        |
- -------------------|----------------------|--------------------
- `lid`              | SpaceLid             | width height
- `disc`             | SpaceDisc            | radius
- `dynamic_sphere`   | SpaceDynamicSphere   | radius
- `dynamic_ellipse`  | SpaceDynamicEllipse  | length
  
  Example:
  
@@ -136,14 +121,6 @@ Space * SpaceProp::newSpace() const
     if ( s=="mesh" )                           return new SpaceMesh(this);
     if ( s=="force" )                          return new SpaceForce(this);
     if ( s=="beads" )                          return new SpaceBeads(this);
-#endif
-#if NEW_DYNAMIC_SPACES
-    if ( s=="lid" )                            return new SpaceLid(this);
-    if ( s=="disc" )                           return new SpaceDisc(this);
-    if ( s=="dynamic_sphere" )                 return new SpaceDynamicSphere(this);
-    if ( s=="dynamic_ellipse" )                return new SpaceDynamicEllipse(this);
-    // backward compatibility:
-    if ( s=="contractile" )                    return new SpaceDynamicEllipse(this);
 #endif
     
     //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
@@ -193,15 +170,7 @@ void SpaceProp::clear()
     shape         = "";
     display       = "";
     display_fresh = false;
-    
-#if NEW_DYNAMIC_SPACES
-    tension       = 0;
-    volume        = 0;
-    viscosity     = INFINITY;
-    viscosity_rot = INFINITY;
-    mobility_dt   = 0;
-    mobility_rot_dt = 0;
-#endif
+
 }
 
 
@@ -226,13 +195,6 @@ void SpaceProp::read(Glossary& glos)
 #endif
     }
 
-#if NEW_DYNAMIC_SPACES
-    glos.set(tension,       "tension");
-    glos.set(volume,        "volume");
-    glos.set(viscosity,     "viscosity");
-    glos.set(viscosity_rot, "viscosity", 1);
-#endif
-    
     if ( glos.set(display, "display") )
         display_fresh = true;
 }
@@ -244,17 +206,6 @@ void SpaceProp::complete(Simul const& sim)
     if ( shape.empty() )
         throw InvalidParameter("space:shape must be defined");
 
-#if NEW_DYNAMIC_SPACES
-    if ( viscosity > 0 )
-        mobility_dt = sim.time_step() / viscosity;
-    else if ( sim.ready() )
-        throw InvalidParameter("space:viscosity must be > 0");
-    
-    if ( viscosity_rot > 0 )
-        mobility_rot_dt = sim.time_step() / viscosity_rot;
-    else if ( sim.ready() )
-        throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -263,11 +214,6 @@ void SpaceProp::write_values(std::ostream& os) const
 {
     //write_value(os, "geometry",   geometry);
     write_value(os, "shape",      shape);
-#if NEW_DYNAMIC_SPACES
-    write_value(os, "tension",    tension);
-    write_value(os, "volume",     volume);
-    write_value(os, "viscosity",  viscosity, viscosity_rot);
-#endif
     write_value(os, "display",    "("+display+")");
 }
 

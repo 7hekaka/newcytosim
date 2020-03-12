@@ -10,8 +10,8 @@
 #include "random.h"
 
 
-SpaceLid::SpaceLid(SpaceProp const* p)
-: Space(p)
+SpaceLid::SpaceLid(DynamicSpaceProp const* p)
+: Space(p), prop(p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("lid is only valid in DIM=2 or 3");

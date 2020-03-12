@@ -2,6 +2,7 @@ set(SPACES_SOURCES
     "${PROJECT_SOURCE_DIR}/src/sim/modulo.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/space.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/space_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/spaces/dynamic_space_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_square.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_sphere.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_dice.cc"
@@ -16,6 +17,7 @@ set(SPACES_SOURCES
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_periodic.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_cylinderP.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_dynamic_ellipse.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_dynamic_ellipse_prop.cc"
 	
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_force.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_beads.cc"

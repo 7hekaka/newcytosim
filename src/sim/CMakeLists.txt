@@ -5,6 +5,7 @@ set(SOURCES_SIM
     "${PROJECT_SOURCE_DIR}/src/sim/interpolation.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/interpolation4.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_segment.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/lattice.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/object.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/object_set.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_site.cc"

@@ -3,6 +3,7 @@
 #define SPACE_H
 
 #include <string>
+#include <vector>
 
 #include "sim.h"
 #include "real.h"
@@ -40,6 +41,12 @@ protected:
     static void read_data(Inputter&, real*, std::string const&);
 
 public:
+    
+    // a pair (description,value), e.g. radius,1.0
+    typedef std::pair <std::string,real> described_value;
+	
+    // a vector of such pairs e.g. radius,1.0 ; height,0.5 ; ...
+	typedef std::vector<described_value> space_values;
     
     /// parameters
     SpaceProp const* prop;
@@ -181,6 +188,9 @@ public:
     
     /// get dimensions from array `len`
     virtual void   setLengths(const real len[8]) {}
+    
+    /// returns a vector of described values 
+	virtual space_values report_values() const {  space_values reporter ; return reporter ; }
 
     //------------------------------ DISPLAY ----------------------------------
     

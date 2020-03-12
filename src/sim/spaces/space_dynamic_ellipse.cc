@@ -26,8 +26,8 @@ inline real surf_block(const real a, const real b, const real c)
 }
 
 
-SpaceDynamicEllipse::SpaceDynamicEllipse(SpaceProp const* p)
-: SpaceEllipse(p)
+SpaceDynamicEllipse::SpaceDynamicEllipse(SpaceDynamicEllipseProp const* p)
+: SpaceEllipse(p), prop(p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("dynamic_ellipse is not usable in 1D");
@@ -144,7 +144,6 @@ void SpaceDynamicEllipse::add_radial_force(Vector const& forces, Vector const& p
 // ----------------------------------------------
 //  Internal forces
 // ----------------------------------------------
-
 
 /**
  The derivative of pressure energy with respect to each ellipse parameter:
@@ -287,7 +286,7 @@ void SpaceDynamicEllipse::step()
                 assert_true(delta[i] == delta[i]);
                 length_[i] += delta[i];
             }
-            report(std::clog);
+            //report(std::clog);
             //std::clog << "%  balance " << Rforces << "\n";
         }
         
@@ -316,6 +315,8 @@ void SpaceDynamicEllipse::step()
             inv = mat.transposed();
         }
     }
+    
+    reset_forces();
 }
 
 
@@ -325,11 +326,7 @@ void SpaceDynamicEllipse::step()
 void SpaceDynamicEllipse::resize(Glossary& opt)
 {
     SpaceEllipse::resize(opt);
-    if ( prop->volume <= 0 )
-    {
-        prop->volume = volume();
-        //std::cout << " dynamic_ellipse:volume set to " << prop->volume << std::endl;
-    }
+    prop->volume = volume();
 }
 
 
@@ -427,6 +424,21 @@ void SpaceDynamicEllipse::write(Outputter& out) const
 }
 
 
+/**
+ Reports the radii of the ellipsoid
+ */
+Space::space_values SpaceDynamicEllipse::report_values() const {
+    
+    Space::space_values values;
+    
+    values.push_back( std::make_pair("radius_0",length_[0]) );
+    values.push_back( std::make_pair("radius_1",length_[1]) );
+#if ( DIM == 3 )
+    values.push_back( std::make_pair("radius_2",length_[2]) );
+#endif
+
+    return values;
+}
 
 //------------------------------------------------------------------------------
 //                         OPENGL  DISPLAY
