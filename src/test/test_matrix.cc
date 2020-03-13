@@ -618,9 +618,9 @@ int main( int argc, char* argv[] )
 #endif
 #if ( 0 )
         //testMatrices(DIM*17, 23);
-        int dim[5] = { 0 };
+        size_t dim[5] = { 0 };
         for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint(1<<(i+7));
-        qsort(dim, 5, sizeof(int), compareInt);
+        qsort(dim, 5, sizeof(size_t), compareInt);
         for ( int i = 0; i < 5; ++i )
             testMatrices(DIM*dim[i], RNG.pint(dim[i]*dim[i]));
 #endif
