@@ -290,13 +290,13 @@ bool SpacePolygon::draw() const
     glGetFloatv(GL_LINE_WIDTH, &s);
     glPointSize(s);
     glBegin(GL_POINTS);
-    for ( unsigned n=0; n < npts; ++n )
+    for ( size_t n=0; n < npts; ++n )
         gle::gleVertex(pts[n].xx, pts[n].yy);
     glEnd();
 
     //display polygon
     glBegin(GL_LINE_LOOP);
-    for ( unsigned n=0; n < npts; ++n )
+    for ( size_t n=0; n < npts; ++n )
         gle::gleVertex(pts[n].xx, pts[n].yy);
     glEnd();
     
@@ -308,20 +308,20 @@ bool SpacePolygon::draw() const
     // display bottom
     glLineWidth(2);
     glBegin(GL_LINE_LOOP);
-    for ( unsigned n=0; n < npts; ++n )
+    for ( size_t n=0; n < npts; ++n )
         gle::gleVertex(pts[n].xx, pts[n].yy, -height_);
     glEnd();
     
     // display top
     glBegin(GL_LINE_LOOP);
-    for ( unsigned n=npts; n > 0; --n )
+    for ( size_t n=npts; n > 0; --n )
         gle::gleVertex(pts[n].xx, pts[n].yy,  height_);
     glEnd();
     
     // display sides
     real Z = height_;
     glBegin(GL_TRIANGLE_STRIP);
-    for ( unsigned n=0; n <= npts; ++n )
+    for ( size_t n=0; n <= npts; ++n )
     {
         gle::gleVertex(pts[n].xx, pts[n].yy, Z);
         gle::gleVertex(pts[n].xx, pts[n].yy,-Z);
@@ -335,14 +335,14 @@ bool SpacePolygon::draw() const
     glColor3f(1,1,1);
     glPointSize(3);
     glBegin(GL_POINTS);
-    for ( unsigned n=0; n < npts; ++n )
+    for ( size_t n=0; n < npts; ++n )
         gle::gleVertex(pts[n].xx, pts[n].yy);
     glEnd();
 #endif
 #if ( 0 )
     // indicate index of each point:
     char tmp[8];
-    for ( unsigned n=0; n < npts; ++n )
+    for ( size_t n=0; n < npts; ++n )
     {
         snprintf(tmp, sizeof(tmp), "%i", n);
         Vector p(pts[n].xx, pts[n].yy, height_);

@@ -270,14 +270,14 @@ bool SpaceEllipse::draw() const
      A vector orthogonal to the ellipse at position (X, Y, Z) is
      ( X / lenX^2, Y / lenY^2, Z / lenZ^2 )
       */
-    for ( unsigned n = 0; n < fin; ++n )
+    for ( size_t n = 0; n < fin; ++n )
     {
         GLfloat uX = s[n  ]*X, uY = s[n  ]*Y, uZ = c[n  ]*Z;
         GLfloat lX = s[n+1]*X, lY = s[n+1]*Y, lZ = c[n+1]*Z;
         GLfloat uXi = uX * iX, uYi = uY * iY, uZi = uZ * iZ;
         GLfloat lXi = lX * iX, lYi = lY * iY, lZi = lZ * iZ;
         glBegin(GL_TRIANGLE_STRIP);
-        for ( unsigned p = 0; p <= 2*fin; ++p )
+        for ( size_t p = 0; p <= 2*fin; ++p )
         {
             glNormal3f(c[p]*uXi, s[p]*uYi, uZi);
             glVertex3f(c[p]*uX , s[p]*uY , uZ );
@@ -289,7 +289,7 @@ bool SpaceEllipse::draw() const
         // display normals (for checking)
         GLfloat m = 0.1;
         glBegin(GL_LINES);
-        for ( unsigned p = 0; p <= 2*fin; p+=8 )
+        for ( size_t p = 0; p <= 2*fin; p+=8 )
         {
             glVertex3f(c[p]*uX, s[p]*uY, uZ);
             glVertex3f(c[p]*(uX+m*uXi), s[p]*(uY+m*uYi), uZ+m*uZi);
@@ -306,7 +306,7 @@ bool SpaceEllipse::draw() const
         GLfloat H = u * Z;
         GLfloat R = sqrt( 1 - u*u );
         glBegin(GL_LINE_LOOP);
-        for ( unsigned n = 0; n <= 2*fin; ++n )
+        for ( size_t n = 0; n <= 2*fin; ++n )
         {
             GLfloat x = X * R * c[n], y = Y * R * s[n];
             glNormal3f(x*iX, y*iY, H*iZ);

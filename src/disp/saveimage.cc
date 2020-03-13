@@ -239,9 +239,9 @@ int SaveImage::readPixels(GLint X, GLint Y, GLsizei W, GLsizei H, GLvoid *pixels
 void SaveImage::downsampleRGB(GLubyte dst[], const GLubyte src[],
                               unsigned W, unsigned H, unsigned bin)
 {
-    const unsigned s = bin * bin;
-    const unsigned sx = W / bin;
-    const unsigned sy = H / bin;
+    const size_t s = bin * bin;
+    const size_t sx = W / bin;
+    const size_t sy = H / bin;
     
 #if ( 0 )
     //reset destination:
@@ -253,18 +253,18 @@ void SaveImage::downsampleRGB(GLubyte dst[], const GLubyte src[],
     }
 #endif
     
-    for ( unsigned x = 0; x < sx; ++x )
-        for ( unsigned y = 0; y < sy; ++y )
+    for ( size_t x = 0; x < sx; ++x )
+        for ( size_t y = 0; y < sy; ++y )
         {
-            unsigned r = 0, g = 0, b = 0;
-            for ( unsigned dx = 0; dx < bin; ++dx )
-                for ( unsigned dy = 0; dy < bin; ++dy )
-                {
-                    GLubyte const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
-                    r += p[0];
-                    g += p[1];
-                    b += p[2];
-                }
+            size_t r = 0, g = 0, b = 0;
+            for ( size_t dx = 0; dx < bin; ++dx )
+            for ( size_t dy = 0; dy < bin; ++dy )
+            {
+                GLubyte const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
+                r += p[0];
+                g += p[1];
+                b += p[2];
+            }
             
             dst[3*(x+sx*y)  ] = (GLubyte)( r / s );
             dst[3*(x+sx*y)+1] = (GLubyte)( g / s );

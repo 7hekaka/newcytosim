@@ -27,7 +27,6 @@ F. Nedelec
 - Could add color of Hands for summary obtained with 'I'
 - Implement two confinements for Mecables. That's easier than constructive geometry on Spaces
 - use 'cyo' as extension for ouput file
-- use 'cpp' extension for c++ code file
 
 # Spindles
 
@@ -39,8 +38,8 @@ F. Nedelec
 
 # v2018
 
-- rename all *.h files *.hh
-- FiberSite could incorporate the functionalities of Digit, Digit would be removed
+- use 'hh' for C++ header files
+- use 'cpp' extension for C++ code file
 - Update OpenGL code to use Shaders and eliminate immediate rendering
 
 - Replace GLUT by GLFW:  http://www.glfw.org/index.html
@@ -52,7 +51,6 @@ will fix problem for off-screen: glutBitmapCharacter() requires GLUT to be initi
 
 # To reach v4
 
-- Implement new 3D SideInteraction with vector product + include Maxima code in doxycomments
 - Extend 'properties.cmo' to be able to store multiple time-points?
 - Find a solution for 'confine = type, stiff, space' and 'confine = type, space' in Single.
 

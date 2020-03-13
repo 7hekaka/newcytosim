@@ -708,10 +708,10 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
     
     // this performs a basic verification of fibers.uniFiberSites()
     real dis = 1;
-    unsigned cnt = 1<<10;
+    size_t cnt = 1<<10;
     real avg = 0;
     real var = 0;
-    for ( unsigned i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < cnt; ++i )
     {
         fibers.uniFiberSites(loc, dis);
         real s = loc.size();

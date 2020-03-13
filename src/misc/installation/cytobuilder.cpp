@@ -448,14 +448,14 @@ void usage()
 
 void scanPorts(RtMidiIn& midi)
 {
-    unsigned np = midi.getPortCount();
+    size_t np = midi.getPortCount();
     
     if ( np < 1 )
         printf("No MIDI port detected!\n");
     else
     {
         printf("   %u MIDI ports detected:\n", np);
-        for ( unsigned p = 0; p < np; ++p )
+        for ( size_t p = 0; p < np; ++p )
         {
             midi.openPort(p);
             printf("      port %u is `%s'\n", p, midi.getPortName().c_str());

@@ -261,7 +261,7 @@ namespace gle
         gleMultMatrix(mat);
     }
     
-    // set rotation to align Z with 'dir' and translate to 'pos'
+    // set rotation to align Z with 'dir' and translate to 'A'
     void gleTransAlignZ(Vector3 const& A, Vector3 const& B, float R)
     {
         float x = float(B.XX-A.XX);

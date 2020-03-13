@@ -204,7 +204,7 @@ void SpacePolygonZ::drawZ(bool rings) const
     gle::circle(fin, c, s, 1);
     
     //display surface
-    for ( unsigned n=1; n <= npts; n++ )
+    for ( size_t n=1; n <= npts; n++ )
     {
         // do not display special edges
         if ( pts[n-1].info )
@@ -235,7 +235,7 @@ void SpacePolygonZ::drawZ(bool rings) const
     if ( rings )
     {
         glLineWidth(0.5);
-        for ( unsigned n=0; n < npts; n++ )
+        for ( size_t n=0; n < npts; n++ )
         {
             real R = pts[n].xx;
             real Z = pts[n].yy;

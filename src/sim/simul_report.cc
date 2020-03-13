@@ -460,7 +460,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
     {
         out << COM << "length_distribution (`scale` indicates the center of each bin)";
         out << LIN << ljust("scale", 2);
-        for ( unsigned u = 0; u <= nbin; ++u )
+        for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
     }
     
@@ -468,7 +468,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
     {
         FiberProp * fp = static_cast<FiberProp*>(i);
         
-        for ( unsigned u = 0; u <= nbin; ++u )
+        for ( size_t u = 0; u <= nbin; ++u )
             cnt[u] = 0;
         
         for ( Fiber * obj=fibers.first(); obj; obj=obj->next() )
@@ -484,7 +484,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
         }
 
         out << LIN << ljust(fp->name(), 2);
-        for ( unsigned u = 0; u <= nbin; ++u )
+        for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << cnt[u];
     }
     out.precision(p);
@@ -2012,7 +2012,7 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
     {
         out << COM << "force_distribution" << " (`scale` indicates the center of each bin)";
         out << LIN << ljust("scale", 2);
-        for ( unsigned u = 0; u <= nbin; ++u )
+        for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
     }
     

@@ -31,13 +31,13 @@ real        brt = 1;
 //------------------------------------------------------------------------------
 
 /** Set array with background noise */
-void clear(uint16_t array[], unsigned array_size)
+void clear(uint16_t array[], size_t array_size)
 {
     if ( bck > 0 )
     {
         if ( bck < 100 )
         {
-            for ( unsigned i = 0; i < array_size; ++i )
+            for ( size_t i = 0; i < array_size; ++i )
                 array[i] = RNG.poisson(bck);
         }
         else
@@ -46,7 +46,7 @@ void clear(uint16_t array[], unsigned array_size)
             real * g = new_real(array_size);
             RNG.gauss_set(g, array_size);
             
-            for ( unsigned u = 0; u < array_size; ++u )
+            for ( size_t u = 0; u < array_size; ++u )
             {
                 if ( g[u] > -1.0 )
                     array[u] = bck * ( 1.0 + g[u] );
@@ -59,15 +59,15 @@ void clear(uint16_t array[], unsigned array_size)
     }
     else
     {
-        for ( unsigned i = 0; i < array_size; ++i )
+        for ( size_t i = 0; i < array_size; ++i )
             array[i] = 0;
     }
 }
 
 
-void emitter(uint16_t array[], unsigned array_size, real x, real y, real z)
+void emitter(uint16_t array[], size_t array_size, real x, real y, real z)
 {
-    for ( unsigned p = 0; p < hits; ++p )
+    for ( size_t p = 0; p < hits; ++p )
     {
         real px, py;
         RNG.gauss_set(px, py, psf);
@@ -90,12 +90,12 @@ unsigned image(std::istream& is, FILE * file)
     real cx = foc[0] - 0.5 * res * dim[0];
     real cy = foc[1] - 0.5 * res * dim[1];
     
-    unsigned array_size = dim[0] * dim[1];
+    size_t array_size = dim[0] * dim[1];
     uint16_t * array = new uint16_t[array_size];
     
     clear(array, array_size);
     
-    unsigned cnt = 0;
+    size_t cnt = 0;
     std::string line;
     while ( is.good() )
     {

@@ -235,9 +235,9 @@ void PointDisp::releasePixelmap()
 /// print pixel map in ASCII
 void printPixels(GLubyte const* pix, unsigned sx, unsigned sy)
 {
-    for ( unsigned y = 0; y < sy; ++y )
+    for ( size_t y = 0; y < sy; ++y )
     {
-        for ( unsigned x = 0; x < sx; ++x )
+        for ( size_t x = 0; x < sx; ++x )
             printf("%02X", pix[4*(x+sx*y)+3]);
         printf("\n");
     }
@@ -253,11 +253,11 @@ void printPixels(GLubyte const* pix, unsigned sx, unsigned sy)
 void PointDisp::downsampleRGBA(GLubyte dst[], unsigned sx, unsigned sy,
                                GLubyte const src[], unsigned bin)
 {
-    const unsigned s = bin * bin;
+    const size_t s = bin * bin;
 
 #if ( 0 )
     //reset destination:
-    for ( unsigned u = 0; u < sx*sy; ++u )
+    for ( size_t u = 0; u < sx*sy; ++u )
     {
         dst[4*u  ] = 0xFF;
         dst[4*u+1] = 0xFF;
@@ -266,12 +266,12 @@ void PointDisp::downsampleRGBA(GLubyte dst[], unsigned sx, unsigned sy,
     }
 #endif
     
-    for ( unsigned x = 0; x < sx; ++x )
-    for ( unsigned y = 0; y < sy; ++y )
+    for ( size_t x = 0; x < sx; ++x )
+    for ( size_t y = 0; y < sy; ++y )
     {
-        unsigned r = 0, g = 0, b = 0, a = 0;
-        for ( unsigned dx = 0; dx < bin; ++dx )
-        for ( unsigned dy = 0; dy < bin; ++dy )
+        size_t r = 0, g = 0, b = 0, a = 0;
+        for ( size_t dx = 0; dx < bin; ++dx )
+        for ( size_t dy = 0; dy < bin; ++dy )
         {
             GLubyte const* p = src + 4 * ( dx+bin*(x+sx*(dy+bin*y)) );
             r += p[0];

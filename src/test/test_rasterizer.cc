@@ -33,7 +33,7 @@ int hit[2*size+1][2*size+1];
 
 void newPoints()
 {
-    for ( unsigned i = 0; i < MAX ; ++i )
+    for ( size_t i = 0; i < MAX ; ++i )
         pts[i] = (size-1) * Vector::randS();
 }
 

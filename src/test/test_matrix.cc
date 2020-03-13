@@ -547,13 +547,13 @@ int compareInt(const void* p, const void* q)
 {
     size_t i = *(size_t const*)p;
     size_t j = *(size_t const*)q;
-    return ( p > q ) - ( q > p );
+    return ( i > j ) - ( j > i );
 }
 
 int main( int argc, char* argv[] )
 {
 #ifdef COMPILER_VERSION
-    printf("Compiled with %s\n", COMPILER_VERSION);
+    printf("Matrix test and timing code, compiled with %s\n", COMPILER_VERSION);
 #endif
 
     RNG.seed();

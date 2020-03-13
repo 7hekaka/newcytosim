@@ -173,9 +173,9 @@ int main(int argc, char* argv[])
     
     if ( argc == 3 ) 
     {
-        unsigned long min = strtoul(argv[1], 0, 10);
-        unsigned long max = strtoul(argv[2], 0, 10);
-        for ( unsigned long nbp = min; nbp < max; nbp += 7)
+        size_t min = strtoul(argv[1], 0, 10);
+        size_t max = strtoul(argv[2], 0, 10);
+        for ( size_t nbp = min; nbp < max; nbp += 7)
             batch(nbp, 16);
         return EXIT_SUCCESS;
     }

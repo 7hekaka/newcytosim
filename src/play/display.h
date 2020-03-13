@@ -279,14 +279,14 @@ public:
     
     /// draw the attached Singles
     virtual void drawSinglesA(SingleSet const&) const = 0;
-
+    
     /// draw the free Couples, showing Hand1
     virtual void drawCouplesF1(CoupleSet const&) const = 0;
     
     /// draw the free Couples, showing Hand1 or Hand2
     virtual void drawCouplesF2(CoupleSet const&) const = 0;
     
-    /// draw the free Couples
+    /// calls drawCouplesF1 or drawCouplesF2
     void drawCouplesF(CoupleSet const&) const;
     
     /// draw the attached Couples

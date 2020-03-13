@@ -511,11 +511,13 @@ void duplicate_matrix(size_t siz, real const* src, real * dst)
         {
             xx = src[ii + siz * jj];
             kk = DIM * ( ii + ddd * jj );
-            unsigned ll = DIM * ( jj + ddd * ii );
-            for ( unsigned d = 0; d < DIM; ++d, kk += ddd+1, ll += ddd+1 )
+            size_t ll = DIM * ( jj + ddd * ii );
+            for ( unsigned d = 0; d < DIM; ++d )
             {
                 dst[kk] = xx;
                 dst[ll] = xx;
+                kk += ddd+1;
+                ll += ddd+1;
             }
         }
     }
@@ -976,7 +978,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         assert_true(info==0);
     }
     
-    for ( unsigned k=0; k < bks*bks; k += 1+bks )
+    for ( size_t k=0; k < bks*bks; k += 1+bks )
         mat[k] -= 1.0;
     
     real err = blas::nrm2(bks*bks, mat) / bks;

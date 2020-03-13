@@ -79,9 +79,9 @@ void Bundle::setInteractions(Meca& meca) const
         Fiber * mt0 = Fiber::toFiber(organized(0));
         Fiber * mt1 = mt0, * mt2 = nullptr;
         
-        for ( unsigned ii = 1 ; ii < nbOrganized(); ++ii )
+        for ( size_t i = 1 ; i < nbOrganized(); ++i )
         {
-            mt2 = Fiber::toFiber(organized(ii));
+            mt2 = Fiber::toFiber(organized(i));
             if ( mt1 && mt2 )
                 linkAntiparallel(meca, mt1, mt2);
             mt1 = mt2;
@@ -106,9 +106,9 @@ void Bundle::setInteractions(Meca& meca) const
 Vector Bundle::position() const
 {
     Vector res(0,0,0);
-    for ( unsigned ii = 1 ; ii < nbOrganized(); ++ii )
+    for ( size_t i = 1 ; i < nbOrganized(); ++i )
     {
-        Fiber const* fib = Fiber::toFiber(organized(ii));
+        Fiber const* fib = Fiber::toFiber(organized(i));
         res += fib->posEnd(prop->focus);
     }
     return res / (real)nbOrganized();

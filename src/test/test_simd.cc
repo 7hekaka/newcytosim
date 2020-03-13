@@ -17,12 +17,12 @@
 
 typedef double real;
 
-const unsigned SIZE = 1<<14;
+const size_t SIZE = 1<<14;
 real x[SIZE], y[SIZE];
 
 void init()
 {
-    for ( unsigned ii=0; ii<SIZE; ++ii )
+    for ( size_t ii=0; ii<SIZE; ++ii )
     {
         x[ii] = 1.0/real(SIZE-ii);
         y[ii] = real(SIZE-ii);
@@ -44,7 +44,7 @@ void dump(size_t len, const real* vec)
 real scalar()
 {
     real d = 0;
-    for ( unsigned ii=0; ii<SIZE; ++ii )
+    for ( size_t ii=0; ii<SIZE; ++ii )
         d += x[ii] * y[ii];
     return d;
 }
@@ -52,7 +52,7 @@ real scalar()
 real vector2()
 {
     vec2 s = setzero2();
-    for ( unsigned ii=0; ii<SIZE; ii+=2 )
+    for ( size_t ii=0; ii<SIZE; ii+=2 )
         s = add2(s, mul2( load2(x+ii), load2(y+ii) ));
     _mm_empty();
     
@@ -64,7 +64,7 @@ real vector2()
 real vector4()
 {
     vec4 s = setzero4();
-    for ( unsigned ii=0; ii<SIZE; ii+=4 )
+    for ( size_t ii=0; ii<SIZE; ii+=4 )
         s = add4(s, mul4( load4(x+ii), load4(y+ii) ));
     _mm_empty();
     
@@ -79,7 +79,7 @@ real vectorU()
     vec4 v2 = setzero4();
     vec4 v3 = setzero4();
     
-    for ( unsigned ii=0; ii<SIZE; ii+=16 )
+    for ( size_t ii=0; ii<SIZE; ii+=16 )
     {
         v0 = add4(v0, mul4( load4(x+ii   ), load4(y+ii   ) ));
         v1 = add4(v1, mul4( load4(x+ii+4 ), load4(y+ii+4 ) ));

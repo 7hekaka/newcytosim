@@ -6,14 +6,14 @@ typedef double real;
 /*
 void copy(real * restrict dst, real * restrict src, int n)
 {
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
         dst[i] = src[i];
 }
 */
 /*
 void projectForcesU(unsigned nbs, const real* dif, const real* X, real* mul)
 {
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         mul[jj] = dif[DIM*jj  ] * ( X[DIM*jj+DIM  ] - X[DIM*jj  ] )
                 + dif[DIM*jj+1] * ( X[DIM*jj+DIM+1] - X[DIM*jj+1] )

@@ -311,7 +311,7 @@ void glApp::setScale(GLfloat s)
     {
         int win = glutGetWindow();
         // update all window-associated views:
-        for ( unsigned n = 1; n < views.size(); ++n )
+        for ( size_t n = 1; n < views.size(); ++n )
         {
             View & view = views[n];
             if ( view.window() > 0 )
@@ -1278,7 +1278,7 @@ void glApp::displayMain()
  */
 void glApp::postRedisplay()
 {
-    for ( unsigned n = 1; n < views.size(); ++n )
+    for ( size_t n = 1; n < views.size(); ++n )
         if ( views[n].window() > 0 )
             glutPostWindowRedisplay(n);
 }
