@@ -318,6 +318,7 @@ void Player::displayScene(View& view, int mag)
     view.openDisplay();
     displayCytosim();
     view.closeDisplay();
+    glFinish();
 }
 
 //------------------------------------------------------------------------------

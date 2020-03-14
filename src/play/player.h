@@ -144,7 +144,7 @@ public:
     /// display cytosim state and message
     void displayCytosim();
     
-    /// display function calls displayCytosim
+    /// display function calling displayCytosim
     void displayScene(View&, int mag);
     
     /// export current viewport to a graphic file

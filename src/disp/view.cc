@@ -303,13 +303,13 @@ void View::setProjection()
     if ( perspective == 3 )
     {
         // this creates a stronger perspective:
-        eyePosition[2] = -1.0f * S;
+        eyePosition[2] = -1.5f * S;
         glFrustum(-X, X, -Y, Y, Z, 5.0f*Z);
     }
     else if ( perspective == 2 )
     {
         // this creates a strong perspective:
-        eyePosition[2] = -1.5f * S;
+        eyePosition[2] = -2.0f * S;
         glFrustum(-X, X, -Y, Y, Z, 6.0f*Z);
     }
     else if ( perspective )

@@ -86,7 +86,6 @@ void displayOffscreen(View & view, int mag)
 {
     //std::clog << "displayOffscreen " << glApp::views.size() << '\n';
     player.displayScene(view, mag);
-    glFinish();
 }
 
 
