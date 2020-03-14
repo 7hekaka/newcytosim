@@ -377,7 +377,7 @@ void Simul::rename(std::string const& arg)
         prop->rename(arg);
     else if ( prop->name() != arg )
         throw InvalidSyntax("only one `simul' can be defined");
-    std::clog << "Simul is named `" << arg << "'\n";
+    //std::clog << "Simul is named `" << arg << "'\n";
 }
 
 
