@@ -393,7 +393,7 @@ void Simul::reportFiberAge(std::ostream& out) const
 
     for ( Property * i : properties.find_all("fiber") )
     {
-        FiberProp * fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp*>(i);
         ObjectList objs = fibers.collect(fp);
         fibers.infoBirthtime(objs, cnt, avg, dev, mn, mx);
         out << LIN << ljust(fp->name(), 2);
@@ -420,7 +420,7 @@ void Simul::reportFiberLengths(std::ostream& out) const
     std::streamsize p = out.precision();
     for ( Property * i : properties.find_all("fiber") )
     {
-        FiberProp * fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp*>(i);
         
         ObjectList objs = fibers.collect(fp);
         fibers.infoLength(objs, cnt, avg, dev, mn, mx);
@@ -454,7 +454,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
     nbin = std::min(nbin, BMAX);
     
     std::streamsize p = out.precision();
-    out.precision(4);
+    out.precision(3);
 
     if ( 1 )
     {
@@ -466,7 +466,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
     
     for ( Property * i : properties.find_all("fiber") )
     {
-        FiberProp * fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp*>(i);
         
         for ( size_t u = 0; u <= nbin; ++u )
             cnt[u] = 0;
@@ -537,7 +537,7 @@ void Simul::reportFiberSegments(std::ostream& out) const
     
     for ( Property * i : properties.find_all("fiber") )
     {
-        FiberProp * fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp*>(i);
         
         size_t cnt, joints;
         real mn = 0, mx = 0;
@@ -897,7 +897,7 @@ void Simul::reportFiberMoments(std::ostream& out) const
     
     for ( Property * i : properties.find_all("fiber") )
     {
-        FiberProp * fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp*>(i);
         
         accum.reset();
         
@@ -1017,7 +1017,7 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
     
     for ( Property * i : properties.find_all("fiber") )
     {
-        FiberProp * fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp*>(i);
         ObjectList objs = fibers.collect(fp);
         fibers.infoBendingEnergy(objs, cnt, avg, dev);
         if ( cnt > 0 )

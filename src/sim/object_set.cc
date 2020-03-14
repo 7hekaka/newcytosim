@@ -419,7 +419,7 @@ ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void con
 }
 
 
-ObjectList ObjectSet::collect(Property * p) const
+ObjectList ObjectSet::collect(Property const* p) const
 {
     return collect(match_property, p);
 }

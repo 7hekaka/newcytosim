@@ -191,8 +191,8 @@ public:
     /// collect objects for which ( func(obj, val) == true )
     virtual ObjectList collect(bool (*func)(Object const*, void const*), void const*) const;
 
-    /// collect objects for which ( obj->property() == prop )
-    ObjectList         collect(Property* prop) const;
+    /// collect objects that have given Property
+    ObjectList         collect(Property const*) const;
 
     /// read one Object from file
     Object *           readObject(Inputter&, ObjectTag tag, bool fat);

@@ -159,10 +159,10 @@ public:
 bool match_all(Object const*, void const*);
 
 /// return 'true' if ( obj->mark() == *mark )
-bool match_mark(Object const* obj, void const* mark);
+bool match_mark(Object const* obj, void const* mrk);
 
-/// return 'true' if ( obj->property() == prop )
-bool match_property(Object const* obj, void const* prop);
+/// return 'true' if ( obj->property() == val )
+bool match_property(Object const* obj, void const* val);
 
 
 /// a list of pointers to Object
