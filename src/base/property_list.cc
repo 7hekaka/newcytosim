@@ -5,7 +5,7 @@
 
 void PropertyList::erase()
 {
-    for ( Property* i : vec_ )
+    for ( Property const* i : vec_ )
         delete(i);
     vec_.clear();
 }
@@ -58,7 +58,7 @@ size_t PropertyList::size(std::string const& cat) const
 {
     size_t res = 0;
     
-    for ( Property* i : vec_ )
+    for ( Property const* i : vec_ )
         if ( i->category() == cat )
             ++res;
     
@@ -94,7 +94,7 @@ void PropertyList::complete(Simul const& sim) const
 
 Property const* PropertyList::contains(Property const* p) const
 {
-    for ( Property* i : vec_ )
+    for ( Property const* i : vec_ )
         if ( i == p ) return p;
     return nullptr;
 }
@@ -289,7 +289,7 @@ PropertyList PropertyList::find_all_except(std::string const& cat) const
 void PropertyList::write_names(std::ostream& os, std::string const& pf) const
 {
     os << pf << "Known classes:\n";
-    for ( Property* i : vec_ )
+    for ( Property const* i : vec_ )
     {
         os << pf << std::setw(10);
         if ( i )

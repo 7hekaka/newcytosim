@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
         if ( FilePath::is_file(setup) )
             Parser(simul, 0, 0, 0, 0, 0).readConfig(setup);
         else if ( has_setup )
-            std::cerr << " warning: could not read `" << setup << "'\n";
+            Cytosim::warn << "could not find `" << setup << "'\n";
         
         // read settings from the setup file, but do not overwrite the command-line options:
         arg.read(simul.prop->display, 1);
