@@ -676,7 +676,7 @@ void Chain::reshape_apply(const size_t ns, const real* src, real* dst,
                           const real * sca, const Vector* dif)
 {
     assert_true( ns > 1 );
-    Vector d, e = sca[0] * dif[0];
+    Vector d(0,0,0), e = sca[0] * dif[0];
     
     dst[0] = src[0] + e.XX;
 #if ( DIM > 1 )

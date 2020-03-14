@@ -474,10 +474,10 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
     real d2 = x2 - X[2];
 #endif
     
-    real df0, of0 = 0, odf0 = 0;
-    real df1, of1 = 0, odf1 = 0;
+    real df0 = 0, of0 = 0, odf0 = 0;
+    real df1 = 0, of1 = 0, odf1 = 0;
 #if ( DIM >= 3 )
-    real df2, of2 = 0, odf2 = 0;
+    real df2 = 0, of2 = 0, odf2 = 0;
 #endif
     
     xn += DIM;
