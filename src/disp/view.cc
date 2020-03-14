@@ -291,33 +291,38 @@ void View::adjust()
 
 void View::setProjection()
 {
+    GLfloat X = visRegion[0] * 0.5f;
+    GLfloat Y = visRegion[1] * 0.5f;
+    GLfloat Z = visRegion[2];
+    GLfloat S = view_size;
+
     //std::clog << "View::setProjection  " << mWindowId << "\n";
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
-    if ( perspective == 2 )
+
+    if ( perspective == 3 )
     {
         // this creates a stronger perspective:
-        eyePosition[2] = -2.0f*view_size;
-        glFrustum(-0.5*visRegion[0], 0.5*visRegion[0],
-                  -0.5*visRegion[1], 0.5*visRegion[1],
-                   1.0*visRegion[2],   6*visRegion[2]);
+        eyePosition[2] = -1.0f * S;
+        glFrustum(-X, X, -Y, Y, Z, 5.0f*Z);
+    }
+    else if ( perspective == 2 )
+    {
+        // this creates a strong perspective:
+        eyePosition[2] = -1.5f * S;
+        glFrustum(-X, X, -Y, Y, Z, 6.0f*Z);
     }
     else if ( perspective )
     {
         // this creates a perspective:
-        eyePosition[2] = -2.0f*view_size;
-        glFrustum(-0.5*visRegion[0], 0.5*visRegion[0],
-                  -0.5*visRegion[1], 0.5*visRegion[1],
-                   1.0*visRegion[2],  11*visRegion[2]);
+        eyePosition[2] = -2.0f * S;
+        glFrustum(-X, X, -Y, Y, Z, 11.0f*Z);
     }
     else
     {
-        // The back-plane is set far back to avoid clipping
-        eyePosition[2] = -0.5f*view_size;
-        glOrtho(-0.5*visRegion[0], 0.5*visRegion[0],
-                -0.5*visRegion[1], 0.5*visRegion[1],
-                 0,                    visRegion[2]);
+        // The back-plane is set behind to avoid clipping
+        eyePosition[2] = -0.5f * S;
+        glOrtho(-X, X, -Y, Y, 0, Z);
     }
     
     glMatrixMode(GL_MODELVIEW);
