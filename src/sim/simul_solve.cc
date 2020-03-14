@@ -15,9 +15,9 @@ real Simul::estimateStericRange() const
     real len = 0;
     
     // check all FiberProp with enabled steric:
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         if ( fp->steric )
         {
             // The maximum length of a segment is 4/3 * segmentation

@@ -8,9 +8,9 @@ real Simul::estimateFiberGridStep() const
 {
     real res = 0.0;
     
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         res = std::max(res, fp->segmentation);
     }
     
@@ -133,7 +133,7 @@ void Simul::step()
 
     // calculate grid range from Hand's binding range:
     real range = 0.0;
-    for ( Property * i : properties.find_all("hand") )
+    for ( Property const* i : properties.find_all("hand") )
         range = std::max(range, static_cast<HandProp const*>(i)->binding_range);
 
     // distribute Fibers over a grid for binding of Hands:

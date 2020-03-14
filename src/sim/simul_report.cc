@@ -391,9 +391,9 @@ void Simul::reportFiberAge(std::ostream& out) const
     real avg, dev, mn, mx;
     const real now = prop->time;
 
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         ObjectList objs = fibers.collect(fp);
         fibers.infoBirthtime(objs, cnt, avg, dev, mn, mx);
         out << LIN << ljust(fp->name(), 2);
@@ -418,9 +418,9 @@ void Simul::reportFiberLengths(std::ostream& out) const
     real avg, dev, mn, mx;
     
     std::streamsize p = out.precision();
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         
         ObjectList objs = fibers.collect(fp);
         fibers.infoLength(objs, cnt, avg, dev, mn, mx);
@@ -464,9 +464,9 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
             out << " " << std::setw(5) << delta * ( u + 0.5 );
     }
     
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         
         for ( size_t u = 0; u <= nbin; ++u )
             cnt[u] = 0;
@@ -535,9 +535,9 @@ void Simul::reportFiberSegments(std::ostream& out) const
     out << COM << ljust("class", 2, 2) << SEP << "nb_fibers" << SEP << "nb_joints";
     out << SEP << "nb_kinks" << SEP << "min_seg" << SEP << "max_seg";
     
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         
         size_t cnt, joints;
         real mn = 0, mx = 0;
@@ -685,8 +685,8 @@ void Simul::reportFiber(std::ostream& out, FiberProp const* selected) const
  */
 void Simul::reportFiber(std::ostream& out, std::string const& which) const
 {
-    Property * p = properties.find_or_die("fiber", which);
-    reportFiber(out, static_cast<FiberProp*>(p));
+    Property const* p = properties.find_or_die("fiber", which);
+    reportFiber(out, static_cast<FiberProp const*>(p));
 }
 
 
@@ -695,9 +695,9 @@ void Simul::reportFiber(std::ostream& out, std::string const& which) const
  */
 void Simul::reportFiber(std::ostream& out) const
 {
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         out << COM << "fiber class " + std::to_string(fp->number()) + " is " + fp->name();
         reportFiber(out, fp);
     }
@@ -895,9 +895,9 @@ void Simul::reportFiberMoments(std::ostream& out) const
     
     Accumulator accum;
     
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         
         accum.reset();
         
@@ -1015,9 +1015,9 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
     size_t cnt;
     real avg, dev;
     
-    for ( Property * i : properties.find_all("fiber") )
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         ObjectList objs = fibers.collect(fp);
         fibers.infoBendingEnergy(objs, cnt, avg, dev);
         if ( cnt > 0 )
@@ -1767,7 +1767,7 @@ void Simul::reportSingle(std::ostream& out) const
         out << SEP << "bound";
     }
     
-    for ( Property * i : properties.find_all("single") )
+    for ( Property const* i : properties.find_all("single") )
     {
         out << LIN << ljust(i->name(), 2);
         size_t ix = i->number();
@@ -2103,7 +2103,7 @@ void Simul::reportCouple(std::ostream& out) const
         out << SEP << "AA";
     }
     
-    for ( Property * i : properties.find_all("couple") )
+    for ( Property const* i : properties.find_all("couple") )
     {
         out << LIN << ljust(i->name(), 2);
         size_t ix = i->number();
@@ -2111,7 +2111,7 @@ void Simul::reportCouple(std::ostream& out) const
         {
             out << SEP << cnt[ix][0]+cnt[ix][1]+cnt[ix][2]+cnt[ix][3];
             out << SEP << act[ix];
-            for ( unsigned int d = 0; d < 4; ++d )
+            for ( size_t d = 0; d < 4; ++d )
                 out << SEP << cnt[ix][d];
         }
         else
@@ -2127,9 +2127,9 @@ void Simul::reportCoupleAnatomy(std::ostream& out) const
 {
     out << COM << "hand_id" << SEP << rjust("hand_name", 2, 1);
     
-    for ( Property * i : properties.find_all("hand") )
+    for ( Property const* i : properties.find_all("hand") )
     {
-        HandProp * p = static_cast<HandProp*>(i);
+        HandProp const* p = static_cast<HandProp const*>(i);
         out << LIN << p->number();
         out << SEP << rjust(p->name(), 2);
     }
@@ -2138,9 +2138,9 @@ void Simul::reportCoupleAnatomy(std::ostream& out) const
     out << COM << "class_id" << SEP << rjust("couple_name", 2, 1);
     out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
 
-    for ( Property * i : properties.find_all("couple") )
+    for ( Property const* i : properties.find_all("couple") )
     {
-        CoupleProp * p = static_cast<CoupleProp*>(i);
+        CoupleProp const* p = static_cast<CoupleProp const*>(i);
         out << LIN << p->number();
         out << SEP << rjust(p->name(), 2);
         out << SEP << rjust(p->hand1_prop->name(), 2);

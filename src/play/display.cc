@@ -681,9 +681,9 @@ void Display::drawMisc(Simul const& sim)
     sim.pointGrid.draw();
 #endif
     
-    for ( Property * i : sim.properties.find_all("fiber") )
+    for ( Property const* i : sim.properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp*>(i);
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
         if ( fp->disp->draw_average == 1 )
             drawAverageFiber1(sim.fibers, fp);
         else if ( fp->disp->draw_average == 2 )

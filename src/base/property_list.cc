@@ -313,7 +313,7 @@ std::string PropertyList::all_names(std::string const& pf) const
  */
 void PropertyList::write(std::ostream& os, const bool prune) const
 {
-    for ( Property * i : vec_ )
+    for ( Property const* i : vec_ )
         i->write(os, prune);
 }
 

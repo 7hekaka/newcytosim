@@ -333,9 +333,9 @@ void SingleSet::report(std::ostream& os) const
     {
         os << '\n' << title();
         PropertyList plist = simul.properties.find_all(title());
-        for ( Property * i : plist )
+        for ( Property const* i : plist )
         {
-            SingleProp * p = static_cast<SingleProp*>(i);
+            SingleProp const* p = static_cast<SingleProp const*>(i);
             size_t cnt = count(match_property, p);
             os << '\n' << std::setw(10) << cnt << ' ' << p->name();
             os << " ( " << p->hand << " )";

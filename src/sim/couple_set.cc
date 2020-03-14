@@ -527,9 +527,9 @@ void CoupleSet::report(std::ostream& os) const
     {
         os << '\n' << title();
         PropertyList plist = simul.properties.find_all(title());
-        for ( Property * i : plist )
+        for ( Property const* i : plist )
         {
-            CoupleProp * p = static_cast<CoupleProp*>(i);
+            CoupleProp const* p = static_cast<CoupleProp const*>(i);
             size_t cnt = count(match_property, p);
             os << '\n' << std::setw(10) << cnt << " " << p->name();
             os << " ( " << p->hand1 << " | " << p->hand2 << " )";
@@ -1028,7 +1028,7 @@ void CoupleSet::connect(FiberSet const& fibers, PropertyList const& properties)
 {
     // calculate maximum range of Hands
     real range = 0;
-    for ( Property * i : properties.find_all("couple") )
+    for ( Property const* i : properties.find_all("couple") )
     {
         CoupleProp const* cop = static_cast<CoupleProp const*>(i);
         range = std::max(range, cop->hand1_prop->binding_range);
