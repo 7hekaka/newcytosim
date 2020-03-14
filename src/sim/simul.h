@@ -264,10 +264,13 @@ public:
     
     //---------------------------- PROPERTIES ----------------------------------
 
+    /// change the name of the simulation
+    void            rename(std::string const&);
+    
     /// read an Object reference and return the corresponding Object (`tag` is set)
     Object*         readReference(Inputter&, ObjectTag& tag);
 
-    /// check if `name` corresponds to a property class (eg. `simul`, `fiber')
+    /// check if `name` corresponds to a property class, but excluding 'simul'
     bool            isPropertyClass(const std::string& name) const;
     
     /// return existing property of given class and name, or return zero
