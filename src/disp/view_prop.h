@@ -16,6 +16,12 @@ public:
     /// number of OpenGL clipping planes
     static constexpr int NB_CLIP_PLANES = 4;
     
+    /**
+     @defgroup ViewPar Display Parameters: View
+     @ingroup DisplayParameters
+     @{
+     */
+    
     /// zoom factor = ratio between visible area and `view_size`
     GLfloat          zoom;
     
@@ -102,12 +108,6 @@ public:
     
     /// string at start of `message` (if `none` is specified, no message is shown)
     std::string      label;
-
-    /**
-     @defgroup ViewPar Display Parameters: View
-     @ingroup DisplayParameters
-     @{
-     */
     
     /// automatically adjust view to keep fibers in window
     /**
@@ -129,19 +129,19 @@ public:
     /// desired size of window in pixels (also known as `size`)
     int              window_size[2];
     
-    /// size of scale-bar in sim-world units (set as `scale_bar[0]`)
-    real             scale_bar_size;
+    /// display flag for a scalebar (default=0)
+    unsigned int     scalebar;
+
+    /// length of scale-bar in sim-world units (set as `scalebar[1]`)
+    real             scalebar_length;
     
-    /// color of scale-bar (set as `scale_bar[1]`)
-    gle_color        scale_bar_color;
-    
-    /// display flag for scale-bar (default=0, set as `scale_bar[2]`)
-    unsigned int     scale_bar_mode;
+    /// color of scale-bar (set as `scalebar[2]`)
+    gle_color        scalebar_color;
 
     /// display flag for displaying X-Y-Z axes
-    unsigned int     draw_axes;
+    unsigned int     axes;
     
-    /// length of axes (set a `draw_axes[1]`, default=1)
+    /// length of axes (set a `axes[1]`, default=1)
     real             axes_size;
 
     /// on/off flags for clipping (defined as `clip_plane?`)

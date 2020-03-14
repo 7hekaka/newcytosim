@@ -121,13 +121,13 @@ void View::closeDisplay() const
 {
     endClipping();
     
-    if ( draw_axes )
-        gleDrawAxes(axes_size, draw_axes);
+    if ( axes )
+        gleDrawAxes(axes_size, axes);
     
-    if ( scale_bar_mode )
+    if ( scalebar )
     {
-        scale_bar_color.load();
-        drawScaleBar(scale_bar_mode, scale_bar_size);
+        scalebar_color.load();
+        drawScaleBar(scalebar, scalebar_length);
     }
     
     if ( label != "off" && label != "none" )

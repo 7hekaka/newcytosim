@@ -514,7 +514,8 @@ void glApp::processNormalKey(unsigned char c, int, int)
             break;
         
         case 'b':
-            view.scale_bar_mode = ( view.scale_bar_mode + 1 ) % 4;
+            view.scalebar = ( view.scalebar + 1 ) % 4;
+            flashText("view:scalebar = %i", view.scalebar);
             break;
         
             
@@ -532,7 +533,7 @@ void glApp::processNormalKey(unsigned char c, int, int)
         
         
         case 'x':
-            view.draw_axes = ( view.draw_axes ? 0 : mDIM );
+            view.axes = ( view.axes ? 0 : mDIM );
             break;
 
 #if ( 0 )
@@ -785,8 +786,8 @@ void glApp::processMenuEvent(int item)
     {
         case 0:   return;
         case 1:   view.reset();                      break;
-        case 2:   view.scale_bar_mode = ! view.scale_bar_mode;    break;
-        case 3:   view.draw_axes = ( view.draw_axes ? 0 : mDIM ); break;
+        case 2:   view.scalebar = ! view.scalebar;    break;
+        case 3:   view.axes = ( view.axes ? 0 : mDIM ); break;
         case 4:   toggleFullScreen();                break;
         case 7:   setDimensionality(mDIM==2?3:2);    break;
         

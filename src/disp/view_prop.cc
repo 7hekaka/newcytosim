@@ -36,12 +36,13 @@ void ViewProp::clear()
     window_position[0] = 8;
     window_position[1] = 32;
     
-    scale_bar_size     = 10;
-    scale_bar_color    = 0xFFFF88AA;
-    scale_bar_mode     = 0;
-    draw_axes          = 0;
-    axes_size          = 1;
+    scalebar        = 0;
+    scalebar_length = 10;
+    scalebar_color  = 0xFFFF88AA;
     
+    axes         = 0;
+    axes_size    = 1;
+
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         clip_plane_mode[k] = 0;
@@ -49,9 +50,9 @@ void ViewProp::clear()
         clip_plane_scalar[k] = 0;
     }
     
-    fog_type           = 0;
-    fog_param          = 1;
-    fog_color          = 0x000000FF;
+    fog_type     = 0;
+    fog_param    = 1;
+    fog_color    = 0x000000FF;
 }
 
 
@@ -117,14 +118,12 @@ void ViewProp::read(Glossary& glos)
      */
     //std::clog << this << " window " << window_size[0] << "x" << window_size[1] << '\n';
     
-    glos.set(scale_bar_size,  "scale_bar");
-    glos.set(scale_bar_color, "scale_bar", 1);
-    glos.set(scale_bar_mode,  "scale_bar", 2);
-    glos.set(scale_bar_color, "scale_bar_color");
+    glos.set(scalebar,        "scalebar");
+    glos.set(scalebar_length, "scale_bar", 1);
+    glos.set(scalebar_color,  "scale_bar", 2);
 
-    glos.set(draw_axes,       "draw_axes");
-    glos.set(axes_size,       "draw_axes", 1);
-    glos.set(axes_size,       "axes_size");
+    glos.set(axes,      "axes");
+    glos.set(axes_size, "axes", 1);
 
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
@@ -139,13 +138,13 @@ void ViewProp::read(Glossary& glos)
                                      {"exponential",  2},
                                      {"exponential2", 3}});
 
-    glos.set(fog_type,     "fog_type", keys);
-    glos.set(fog_param,    "fog_param");
-    glos.set(fog_color,    "fog_color");
+    glos.set(fog_type,  "fog_type", keys);
+    glos.set(fog_param, "fog_param");
+    glos.set(fog_color, "fog_color");
  
-    glos.set(fog_type,     "fog", keys);
-    glos.set(fog_param,    "fog", 1);
-    glos.set(fog_color,    "fog", 2);
+    glos.set(fog_type,  "fog", keys);
+    glos.set(fog_param, "fog", 1);
+    glos.set(fog_color, "fog", 2);
 }
 
 //------------------------------------------------------------------------------
@@ -170,14 +169,14 @@ void ViewProp::write_values(std::ostream& os) const
     write_value(os, "track_fibers",  track_fibers);
     //write_value(os, "window_position", window_position, 2);
     write_value(os, "window_size",   window_size, 2);
-    write_value(os, "scale_bar",     scale_bar_size, scale_bar_color, scale_bar_mode);
-    write_value(os, "draw_axes",     draw_axes, axes_size);
+    write_value(os, "scalebar",      scalebar, scalebar_length, scalebar_color);
+    write_value(os, "axes",          axes, axes_size);
+    write_value(os, "fog",           fog_type, fog_param, fog_color);
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);
         write_value(os, var, clip_plane_mode[k], clip_plane_vector[k], clip_plane_scalar[k]);
     }
-    write_value(os, "fog",           fog_type, fog_param, fog_color);
 }
 
 
