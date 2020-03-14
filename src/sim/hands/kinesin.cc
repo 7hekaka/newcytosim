@@ -23,13 +23,10 @@ void Kinesin::attach(FiberSite const& s)
 
     // here digit::step_size must be equal to fiber:step_size
     if ( lattice() && lattice()->unit() != prop->step_size  )
-        throw InvalidParameter("digit:step_size must be equal to fiber:lattice_unit");
+        throw InvalidParameter("kinesin:step_size must be equal to fiber:lattice_unit");
 }
 
 
-/**
- \todo simulate occurence of backward steps
- */
 void Kinesin::stepUnloaded()
 {
     assert_true( attached() );
@@ -46,7 +43,7 @@ void Kinesin::stepUnloaded()
             return;
         }
 
-        int dir = ( nextStep < nextBack ? 1 : -1 );
+        int dir = ( nextStep <= nextBack ) - ( nextStep > nextBack );
 
         lati_t s = site() + dir * prop->stride;
         
@@ -71,11 +68,6 @@ void Kinesin::stepUnloaded()
 }
 
 
-/**
- Currently, antagonistic force only reduced the rate of forward stepping.
- However, force is also known to increase the rate of backward steps.
- \todo simulate occurence of backward steps
- */
 void Kinesin::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );
@@ -95,8 +87,7 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
             return;
         }
 
-        //int dir = 2 * ( nextStep < nextBack ) - 1;
-        int dir = ( nextStep < nextBack ? 1 : -1 );
+        int dir = ( nextStep <= nextBack ) - ( nextStep > nextBack );
 
         lati_t s = site() + dir * prop->stride;
         
