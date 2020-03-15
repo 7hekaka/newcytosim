@@ -192,7 +192,7 @@ enum FrameReaderCode { SUCCESS = 0, END_OF_FILE = 1, NOT_FOUND = 2, BAD_FILE = 4
  @return 0 if no frame was found
 */
 int FrameReader::seekFrame(size_t frm)
-{        
+{
     VLOG("FrameReader: seekFrame("<< frm <<")\n");
     
     size_t inx = seekPos(frm);
@@ -240,7 +240,7 @@ int FrameReader::seekFrame(size_t frm)
 }
 
 //------------------------------------------------------------------------------
-/** 
+/**
  returns 0 for success, an error code, or throws an exception
  */
 int FrameReader::loadFrame(Simul& sim, size_t frm, const bool reload)
@@ -290,7 +290,7 @@ int FrameReader::loadFrame(Simul& sim, size_t frm, const bool reload)
 }
 
 
-/** 
+/**
  returns 0 for success, an error code, or throws an exception
  */
 int FrameReader::loadNextFrame(Simul& sim)
@@ -317,7 +317,7 @@ int FrameReader::loadNextFrame(Simul& sim)
         if ( !inputter.get_pos(pos) )
             savePos(frameIndex+1, pos, 1);
         return SUCCESS;
-    } 
+    }
     else
     {
         VLOG("FrameReader: loadNextFrame() EOF while seeking frame " << currentFrame() << '\n');

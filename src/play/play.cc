@@ -24,11 +24,10 @@ DisplayProp& disp = player.disp;
 void displayLive(View& view, int mag);
 
 /// enable to create a player for command-line-only offscreen rendering
-//#define HEADLESS_PLAYER
+#define HEADLESS_PLAYER 0
 
-#ifdef HEADLESS_PLAYER
+#if HEADLESS_PLAYER
 void helpKeys(std::ostream& os) { os << "This is a headless display\n"; }
-}
 #else
 #  include "glut.h"
 #  include "glapp.h"
@@ -204,10 +203,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    // default configuration file for play:
-    std::string setup = player.goLive ? simul.prop->config_file : simul.prop->property_file;
-    
-#ifdef HEADLESS_PLAYER
+#if HEADLESS_PLAYER
     View view("*");
     view.setDisplayFunc(displayOffscreen);
 #else
@@ -218,11 +214,13 @@ int main(int argc, char* argv[])
     view.setDisplayFunc(displayLive);
 #endif
 
+    // default configuration file for play:
     std::string file;
     if ( ! player.goLive || has_frame )
         file = simul.prop->property_file;
     else
         file = simul.prop->config_file;
+    std::string setup = file;
     
     try
     {
@@ -230,15 +228,16 @@ int main(int argc, char* argv[])
         Parser(simul, 0, 1, 0, 0, 0).readConfig(file);
 
         // check for play's configuration file specified on the command line:
-        bool has_setup = arg.set(setup, ".cyp");
+        if ( arg.set(setup, ".cyp") )
+        {
+            // extract "simul:display" from setup
+            if ( FilePath::is_file(setup) )
+                Parser(simul, 0, 1, 0, 0, 0).readConfig(setup);
+            else
+                std::cerr << " warning: could not read `" << setup << "'\n";
+        }
         
-        // extract first specification of "simul:display" string from the setup file
-        if ( FilePath::is_file(setup) )
-            Parser(simul, 0, 1, 0, 0, 0).readConfig(setup);
-        else if ( has_setup )
-            Cytosim::warn << "could not find `" << setup << "'\n";
-        
-        // read settings from the setup file, keeping the command-line options:
+        // read settings, but keep anything set on the command-line:
         arg.read(simul.prop->display, 1);
         simul.prop->display_fresh = false;
         
@@ -371,7 +370,7 @@ int main(int argc, char* argv[])
     arg.warnings(std::cerr);
 
     //--------- initialize Window system and create Window
-#ifndef HEADLESS_PLAYER
+#if ( HEADLESS_PLAYER == 0 )
 
 #ifdef __APPLE__
     glutInit(&argc, argv);
@@ -401,7 +400,7 @@ int main(int argc, char* argv[])
         glutMenuStatusFunc(menuCallback);
         if ( glApp::isFullScreen() )
             glutFullScreen();
-        glutTimerFunc(500, timerCallback, 0);
+        glutTimerFunc(200, timerCallback, 0);
     }
     catch ( Exception & e )
     {

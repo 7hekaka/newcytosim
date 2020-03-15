@@ -374,10 +374,12 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
 void Simul::rename(std::string const& arg)
 {
     if ( prop->name() == "undefined" )
+    {
         prop->rename(arg);
+        //std::clog << "Simul is named `" << arg << "'\n";
+    }
     else if ( prop->name() != arg )
         throw InvalidSyntax("only one `simul' can be defined");
-    //std::clog << "Simul is named `" << arg << "'\n";
 }
 
 
