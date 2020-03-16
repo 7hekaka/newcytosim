@@ -2142,13 +2142,19 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 
 
 /**
+ Link `B` to an interpolated point `S` on the side of `A`:
  
- Link `ptA` (A) and `ptB` (B)
- and a point S which is on the side of `ptA`.
+     S = pos(A) + cross( arm, A.dir() )
  
-     S = pos(a) + cross( arm, dir(a) )
+ Where A.dir() is the direction of the Fiber supporting `A`, in `A`.
+ The vector `arm` should ideally be perpendicular to A.dir(), and in this case,
+ `A` and `B` are separated by norm(arm). The force is linear:
+
+     force_B = weight * ( S - B )
+     force_S = -force_B
  
- arm must be perpendicular to link
+ The `force_S` is redistributed on the vertices on each side of `A`,
+ according to the interpolation coefficients, as usual.
  
  This code is valid in any dimension and works in 2 and 3D
  */
@@ -2343,7 +2349,24 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 
 #endif
 
-// this code is valid in any dimension and works in 2 and 3D
+
+/**
+Link `B` to an interpolated point `S` on the side of `A`:
+
+    S = pos(A) + cross( arm, A.dir() )
+
+Where A.dir() is the direction of the Fiber supporting `A`, in `A`.
+The vector `arm` should ideally be perpendicular to A.dir(), and in this case,
+`A` and `B` are separated by norm(arm). The force is linear:
+
+    force_B = weight * ( S - B )
+    force_S = -force_B
+
+The `force_S` is redistributed on the vertices on each side of `A`,
+according to the interpolation coefficients, as usual.
+
+This code is valid in any dimension and works in 2 and 3D
+*/
 void Meca::addSideLink3D(Interpolation const& ptA,
                          Interpolation const& ptB,
                          Torque const& arm,
