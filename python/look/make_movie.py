@@ -61,13 +61,16 @@ Examples:
     make_movie.py 'play window_size=512,256' format=mp4 run*
     make_movie.py '~/bin/play3 zoom=2' format=mp4 run*
     make_movie.py images format=mov
+    make_movie.py imgs codec=265
 
 History:
     Created by F. Nedelec, 14.12.2007
     Improved by Beat Rupp, March 2010
     Revised on March 19 2011 and Sept-Nov 2012 by F. Nedelec.
     F. Nedelec, 10.2013: images are created in sub-directories
-    F. Nedelec, 12.2013, 9.2014, 04.2016, 03.2020: cleanup
+    F. Nedelec, 12.2013, 9.2014, 04.2016, 15.03.2020
+    
+    https://ffmpeg.org/ffmpeg.html
 """
 
 try:
@@ -238,18 +241,18 @@ def makeMovieQT(output):
     if not os.path.isfile(mov):
         err.write(prefix+"could not make Quicktime movie\n")
         return ''
-    qt_export  = '~/bin/qt_export'
+    args = ['~/bin/qt_export', '--audio=0', '--datarate='+quality]
     if not os.path.isfile(qt_export):
         err.write(prefix+"missing `qt_export' executable\n")
         os.rename(mov, output)
         return output
     if codec == 'h263':
-        cmd = [qt_export, '--audio=0', '--datarate='+quality, '--video=h263,%i,100'%rate, mov, output]
+        args.extend(['--video=h263,%i,100'%rate, mov, output])
     elif codec == 'h264':
-        cmd = [qt_export, '--audio=0', '--datarate='+quality, '--video=avc1,%i,100'%rate, mov, output]
+        args.extend(['--video=avc1,%i,100'%rate, mov, output])
     else:
         raise IOError("codec `%s' not supported" % codec)
-    subprocess.call(cmd)
+    subprocess.call(args)
     os.remove(mov)
     err.write(prefix+"created movie with datarate = %s\n" % quality)
     return output
@@ -356,7 +359,12 @@ def main(args):
                 if format == 'mov':
                     quality = '256'
             elif key=='codec':
-                codec = value
+                if value = '264':
+                    codec = 'h264'
+                elif value = '265':
+                    codec = 'h265'
+                else:
+                    codec = value
             elif key=='quality':
                 quality = value
             elif key=='lazy':
