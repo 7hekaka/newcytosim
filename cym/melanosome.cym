@@ -1,11 +1,11 @@
-% Dispersion of melanosomes in a mamallian cell
-% A model of Aliston N. Hume, University of Nottingham, UK
+% Dispersion of melanosomes in a mammalian cell
+% A model of Alistair N. Hume, University of Nottingham, UK
 % FJN, Cambridge 21.08.2019
 
 set simul system
 {
-    viscosity = 0.5       % educated guess
-    time_step = 0.005     % in seconds
+    viscosity = 0.1       % educated guess
+    time_step = 0.002     % in seconds
     steric = 1, 100       % enable steric interaction, with stiffness 100
     steric_max_range = 1
 }
@@ -17,7 +17,7 @@ set space cell
 
 new cell
 {
-    radius = 8              % radius in micrometers
+    diameter = 16           % in micrometers
 }
 
 set solid melanosome
@@ -38,6 +38,7 @@ set fiber actin
     growing_speed = 0.1     % guess, but average_length = growing_speed / catastrophe_rate
     shrinking_speed = -0.5  % guess, but should be higher than 'growing_speed'
     catastrophe_rate = 0.1  % guess, defines lifetime of filament
+    min_length = 0.010      % filaments shorter than this are deleted
     persistent = 0
     display = ( width=1; )
 }
@@ -67,6 +68,7 @@ set single mel_nucleator
 {
     hand = nucleator
     stiffness = 200         % reasonable
+    diffusion = 1
 }
 
 set single mel_myosin
@@ -81,12 +83,12 @@ new 50 melanosome
 % the integer before 'mel_nucleator' is the number of nucleator per melanosome
 % the integer before 'mel_myosin' is the number of myosin per melanosome
 % these numbers are guessed
-    sphere1 = center, 0.25, 2 mel_nucleator, 15 mel_myosin
+    sphere1 = center, 0.25, 6 mel_nucleator, 15 mel_myosin
     position = disc 1      % placed initially near the center
 }
 
 run system
 {
-    nb_steps = 100000
-    nb_frames = 500
+    nb_steps = 250000
+    nb_frames = 250
 }
