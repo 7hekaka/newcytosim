@@ -261,10 +261,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
         spc = simul.findSpace(str);
     
     // define a condition:
-    bool has_condition = false;
-    std::string condition_str;
-    if ( opt.set(condition_str, "placement", 2) )
-        has_condition = true;
+    bool has_condition = opt.set(str, "placement", 2);
     
     Isometry iso;
 
@@ -280,11 +277,10 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
             Evaluator evaluator{{'X', iso.mov.x()}, {'Y', iso.mov.y()}, {'Z', iso.mov.z()},
                                 {'R', iso.mov.norm()}, {'P', RNG.preal()}};
             try {
-                char const* ptr = condition_str.c_str();
-                condition = evaluator.inequality(ptr);
+                condition = evaluator.inequality(str.c_str());
             }
             catch( Exception& e ) {
-                e.message(e.message()+" in `"+condition_str+"'");
+                e.message(e.message()+" in `"+str+"'");
                 throw;
             }
         }

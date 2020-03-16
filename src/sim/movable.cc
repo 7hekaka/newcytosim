@@ -7,6 +7,7 @@
 #include "quaternion.h"
 #include "iowrapper.h"
 #include "tokenizer.h"
+#include "evaluator.h"
 #include "glossary.h"
 #include "modulo.h"
 #include "random.h"
@@ -433,13 +434,13 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
 {
     std::string tok;
     Vector pos(0,0,0);
-    std::streampos isp = 0;
+    std::streampos isp, start = is.tellg();
     
     try
     {
+    restart:
         if ( is.fail() )
             return pos;
-        isp = is.tellg();
         pos = readPosition0(is, spc);
         is.clear();
         
@@ -500,6 +501,22 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
             {
                 Vector alt = readPosition0(is, spc);
                 if ( RNG.flip() ) pos = alt;
+            }
+            else if ( tok == "if" )
+            {
+                tok = Tokenizer::get_token(is);
+                Evaluator evaluator{{'X', pos.x()}, {'Y', pos.y()}, {'Z', pos.z()}};
+                try {
+                    if ( !evaluator.expression(tok.c_str()) )
+                    {
+                        is.seekg(start);
+                        goto restart;
+                    }
+                }
+                catch( Exception& e ) {
+                    e.message(e.message()+" in `"+tok+"'");
+                    throw;
+                }
             }
             else
             {
@@ -709,13 +726,13 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
 {
     std::string tok;
     Vector dir(1,0,0);
-    std::streampos isp = 0;
+    std::streampos isp, start = is.tellg();
     
     try
     {
+    restart:
         if ( is.fail() )
             return dir;
-        isp = is.tellg();
         dir = readDirection0(is, pos, spc);
         is.clear();
         
@@ -747,6 +764,22 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
             {
                 Vector alt = readDirection0(is, pos, spc);
                 if ( RNG.flip() ) dir = alt;
+            }
+            else if ( tok == "if" )
+            {
+                tok = Tokenizer::get_token(is);
+                Evaluator evaluator{{'X', dir.x()}, {'Y', dir.y()}, {'Z', dir.z()}};
+                try {
+                    if ( !evaluator.expression(tok.c_str()) )
+                    {
+                        is.seekg(start);
+                        goto restart;
+                    }
+                }
+                catch( Exception& e ) {
+                    e.message(e.message()+" in `"+tok+"'");
+                    throw;
+                }
             }
             else
             {
