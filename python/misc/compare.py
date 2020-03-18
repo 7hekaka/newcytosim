@@ -12,7 +12,7 @@ Usage:
 """
 
 from __future__ import print_function
-import sys, os, shutil, time, subprocess
+import sys, os, shutil, time, subprocess, tempfile
 
 exe = "diff"
 diff="diff --side-by-side -W200 -p --suppress-common-lines"
@@ -41,13 +41,19 @@ def compareFiles(fileL, fileR):
             
             sys.stdout.write(chr(27)+"[32;2m")
             print("This was %40s" % fileL)
-            ans = raw_input('Action? return/left/right/open/q >')
-            sys.stdout.write(chr(27)+"[0m")
+            ans = raw_input('Action (return/left/right/open/q)? >'+chr(27)+'[0m')
             
             if ans == "left" or ans == "l":
                 shutil.copyfile(fileL, fileR)
             elif ans == "right" or ans == "r":
                 shutil.copyfile(fileR, fileL)
+            elif ans == "swap":
+                fid, file = tempfile.mkstemp('.txt', 'temp', '', True)
+                print(os.getcwd(), os.path.isfile(file))
+                os.close(fid);
+                os.rename(fileL, file)
+                os.rename(fileR, fileL)
+                os.rename(file, fileR)
             elif ans == "open":
                 os.system("opendiff "+fileL+" "+fileR+"&")
             elif ans == "q":
@@ -72,6 +78,8 @@ def process_dir(roots, path, files):
         return
     if path.endswith('.git'):
         return
+    if 'DerivedData/' in path:
+        return
     if 0 <= path.find('/.git/'):
         return
     if path == 'DerivedData':
@@ -84,7 +92,7 @@ def process_dir(roots, path, files):
     spacer(path)
     for file in files:
         if interesting(file):
-            compareFiles( path+"/"+file, pathR+"/"+file)
+            compareFiles(path+"/"+file, pathR+"/"+file)
 
 #------------------------------------------------------------------------
 
