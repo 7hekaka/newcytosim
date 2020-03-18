@@ -327,10 +327,23 @@ void Player::displayScene(View& view, int mag)
 /**
  Export image from the current OpenGL back buffer,
  in the format specified by 'PlayerProp::image_format',
+ in the current working directory
+ */
+int Player::saveView(const char* filename, const char* format, int downsample) const
+{
+    GLint vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    return SaveImage::saveImage(filename, format, vp, downsample);
+}
+
+
+/**
+ Export image from the current OpenGL back buffer,
+ in the format specified by 'PlayerProp::image_format',
  in the folder specified in `PlayerProp::image_dir`.
  The name of the file is formed by concatenating 'root' and 'indx'.
  */
-int Player::saveView(const char* root, unsigned indx, int verbose) const
+int Player::saveView(const char* root, unsigned indx, int downsample, int verbose) const
 {
     char cwd[1024] = { 0 };
     char name[1024];
@@ -343,11 +356,11 @@ int Player::saveView(const char* root, unsigned indx, int verbose) const
     }
     GLint vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
-    int err = SaveImage::saveImage(name, format, vp, prop.downsample);
+    int err = SaveImage::saveImage(name, format, vp, downsample);
     if ( err == 0 && verbose > 0 )
     {
-        int W = vp[2] / prop.downsample;
-        int H = vp[3] / prop.downsample;
+        int W = vp[2] / downsample;
+        int H = vp[3] / downsample;
         if ( verbose > 1 )
             printf("\r saved %ix%i snapshot %s    ", W, H, name);
         else
@@ -373,7 +386,7 @@ void displayMagnified(int mag, void * arg)
  save an image where the resolution is magnified by a factor `mag`.
  This requires access to the simulation world.
  */
-int Player::saveViewMagnified(const int mag, const char* name, const char* format, const int downsample)
+int Player::saveScene(const int mag, const char* name, const char* format, const int downsample)
 {
     if ( !SaveImage::supported(format) )
     {
@@ -410,7 +423,7 @@ int Player::saveViewMagnified(const int mag, const char* name, const char* forma
  save an image where the resolution is magnified by a factor `mag`.
  This requires access to the simulation world.
  */
-int Player::saveViewMagnified(const int mag, const char* root, unsigned indx, const int downsample)
+int Player::saveScene(const int mag, const char* root, unsigned indx, const int downsample)
 {
     char cwd[1024] = { 0 };
     char name[1024];
@@ -421,7 +434,7 @@ int Player::saveViewMagnified(const int mag, const char* root, unsigned indx, co
         if ( getcwd(cwd, sizeof(cwd)) )
             chdir(prop.image_dir.c_str());
     }
-    int err = saveViewMagnified(mag, name, format, downsample);
+    int err = saveScene(mag, name, format, downsample);
     if ( cwd[0] )
         chdir(cwd);
     glApp::postRedisplay();

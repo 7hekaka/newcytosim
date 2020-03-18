@@ -148,13 +148,16 @@ public:
     void displayScene(View&, int mag);
     
     /// export current viewport to a graphic file
-    int  saveView(const char * root, unsigned indx, int verbose = 1) const;
+    int  saveView(const char* filename, const char* format, int downsample) const;
+
+    /// export current viewport to a graphic file
+    int  saveView(const char* root, unsigned indx, int downsample, int verbose=1) const;
     
-    /// save high-resolution image using composite method
-    int  saveViewMagnified(int mag, const char* filename, const char* format, int downsample=1);
+    /// save high-resolution image of the current scene
+    int  saveScene(int mag, const char* filename, const char* format, int downsample=1);
     
-    /// save a high-resolution image using composite method
-    int  saveViewMagnified(int mag, const char* root, unsigned indx, int downsample=1);
+    /// save high-resolution image of the current scene
+    int  saveScene(int mag, const char* root, unsigned indx, int downsample=1);
 
 };
 

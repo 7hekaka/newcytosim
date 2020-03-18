@@ -300,8 +300,6 @@ int main(int argc, char* argv[])
         const int W = view.width() * magnify;
         const int H = view.height() * magnify;
         
-        //std::cerr << W << "x" << H << << " downsample " << prop.downsample << '\n';
-        
         if ( !OffScreen::openContext() )
         {
             std::cerr << "Failed to create off-screen context\n";
@@ -336,9 +334,9 @@ int main(int argc, char* argv[])
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
                     if ( magnify > 1 )
-                        player.saveView("poster", frm, 2);
+                        player.saveView("poster", frm, prop.downsample, 2);
                     else
-                        player.saveView("image", frm, 2);
+                        player.saveView("image", frm, prop.downsample, 2);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
@@ -352,7 +350,7 @@ int main(int argc, char* argv[])
                     displayOffscreen(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
-                    player.saveView("movie", frm++, 2);
+                    player.saveView("movie", frm++, prop.downsample, 2);
                     s = 0;
                 }
             } while ( 0 == thread.loadNextFrame() );

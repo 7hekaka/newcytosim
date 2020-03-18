@@ -399,12 +399,13 @@ void processMenuExport(int item)
     switch (item)
     {
         case 0:   return;
-        case 1:   player.saveView("image", prop.image_index++);                return;
-        case 2:   player.saveViewMagnified(3, "image", prop.image_index++, 3); return;
-        case 3:   player.saveViewMagnified(6, "image", prop.image_index++, 3); return;
-        case 4:   player.saveViewMagnified(9, "image", prop.image_index++, 3); return;
-        case 5:   player.saveViewMagnified(4, "poster", prop.poster_index++);  return;
-        case 6:   player.saveViewMagnified(8, "poster", prop.poster_index++);  return;
+        case 1:   player.saveView("image", prop.image_index++, 1); return;
+        case 2:   player.saveView("image", prop.image_index++, 2); return;
+        case 3:   player.saveScene(3, "image", prop.image_index++, 3); return;
+        case 4:   player.saveScene(6, "image", prop.image_index++, 3); return;
+        case 5:   player.saveScene(9, "image", prop.image_index++, 3); return;
+        case 6:   player.saveScene(4, "poster", prop.poster_index++);  return;
+        case 7:   player.saveScene(8, "poster", prop.poster_index++);  return;
 
         case 9:   prop.save_images = 1; player.startPlayback();     return;
         case 10:  prop.image_index = 0;                             return;
@@ -432,11 +433,12 @@ int buildMenuExport()
         glApp::clearMenu(menuID);
     
     glutAddMenuEntry("Save Image (y)",            1);
-    glutAddMenuEntry("Save Fine Image",           2);
-    glutAddMenuEntry("Save 2x Fine Image",        3);
-    glutAddMenuEntry("Save 3x Fine Image",        4);
-    glutAddMenuEntry("Save 4x Poster",            5);
-    glutAddMenuEntry("Save 8x Poster",            6);
+    glutAddMenuEntry("Save Downsampled Image",    2);
+    glutAddMenuEntry("Save Fine Image",           3);
+    glutAddMenuEntry("Save 2x Fine Image",        4);
+    glutAddMenuEntry("Save 3x Fine Image",        5);
+    glutAddMenuEntry("Save 4x Poster",            6);
+    glutAddMenuEntry("Save 8x Poster",            7);
     glutAddMenuEntry("Play & Save Images (Y)",    9);
     glutAddMenuEntry("Reset Image-file Index",   10);
     glutAddMenuEntry("-",                         0);

@@ -73,7 +73,7 @@ void timerCallback(const int value)
         if ( prop.save_images && 0 == thread.trylock() )
         {
             player.displayScene(glApp::views[1], 1.0);
-            player.saveView("image", prop.image_index++);
+            player.saveView("image", prop.image_index++, prop.downsample);
             thread.unlock();
         }
         
@@ -84,7 +84,7 @@ void timerCallback(const int value)
         if ( prop.save_images )
         {
             player.displayScene(glApp::views[1], 1.0);
-            player.saveView("movie", thread.currentFrame());
+            player.saveView("movie", thread.currentFrame(), prop.downsample);
         }
 
         if ( prop.play == 1 )
