@@ -40,6 +40,14 @@ public:
 
     /// name of Fiber used to make the backbone
     std::string   bone_type;
+    
+    /// distance between centerline of protofilament and central axis of tubule
+    /* defines the distance between the centerline of the protofilaments
+     `radius=0.0135` gives a diameter of 25+2nm, where the 2 represents the position
+     of the center of molecules that attach to the tubulin lattice
+     */
+    real          radius;
+    
     /// @}
     
 public:

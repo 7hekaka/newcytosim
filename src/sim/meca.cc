@@ -1713,7 +1713,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         oss << " precond " << precond;
         oss << " count " << monitor.count();
         //oss << " flag " << monitor.flag();
-        oss << " residual " << monitor.residual() << "\n";
+        oss << " residual = " << monitor.residual() << "\n";
         Cytosim::out << oss.str();
         if ( prop->verbose > 1 )
             std::clog << oss.str();

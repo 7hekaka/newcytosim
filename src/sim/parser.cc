@@ -1214,13 +1214,6 @@ void Parser::readConfig(std::string const& filename)
 
 void Parser::readConfig()
 {
-    try {
-        readConfig(simul.prop->config_file);
-    }
-    catch ( InvalidIO& e ) {
-        if ( simul.prop->config_file == "config.cym" )
-            throw InvalidIO("You must specify a config file");
-        throw;
-    }
+    readConfig(simul.prop->config_file);
 }
 

@@ -16,6 +16,7 @@ void TubuleProp::clear()
     stiffness[1] = 0;
     fiber_type   = "";
     bone_type    = "";
+    radius       = 0.0135;
 }
 
 
@@ -24,6 +25,7 @@ void TubuleProp::read(Glossary& glos)
     glos.set(stiffness, 2, "stiffness");
     glos.set(fiber_type, "fiber");
     glos.set(bone_type, "bone");
+    glos.set(radius, "radius");
 }
 
 
@@ -37,6 +39,9 @@ void TubuleProp::complete(Simul const& sim)
 
     if ( fiber_type.empty() )
         throw InvalidParameter("tubule:fiber must be specified");
+    
+    if ( radius < 0 )
+        throw InvalidParameter("tubule:radius must be specified and >= 0");
 
     sim.properties.find_or_die("fiber", fiber_type);
 }
@@ -46,5 +51,6 @@ void TubuleProp::write_values(std::ostream& os) const
 {
     write_value(os, "fiber",     fiber_type);
     write_value(os, "stiffness", stiffness[0], stiffness[1]);
+    write_value(os, "radius", radius);
 }
 

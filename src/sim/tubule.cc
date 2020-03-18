@@ -143,10 +143,10 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     }
     
     // set orthonormal coordinate system
-    Vector E(0,tube_radius,0), F(0,0,tube_radius);
+    Vector E(0,prop->radius,0), F(0,0,prop->radius);
     dir.orthonormal(E, F);
-    E *= tube_radius;
-    F *= tube_radius;
+    E *= prop->radius;
+    F *= prop->radius;
     
     // translate protofilaments to form a tube:
     real a = 0; //M_PI * RNG.sreal();
@@ -188,7 +188,7 @@ void Tubule::setInteractionsB(Meca& meca)
 #if ( DIM >= 3 )
     const real stiff = prop->stiffness[0];
     const real ang = M_PI / NFIL;
-    const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
+    const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
     const real c = cos(ang), s = sin(ang);
     
     assert_true(fil_[0]);
@@ -245,20 +245,26 @@ void Tubule::setInteractions(Meca& meca)
     const real stiffL = prop->stiffness[0];
     const real stiffR = prop->stiffness[1];
     const real ang = M_PI / NFIL;
-    const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
+    const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
     const real c = cos(ang), s = sin(ang);
     
-    const size_t end = bone_->nbSegments();
+    const size_t e = bone_->nbSegments();
     
-    if ( fil_[0]->nbSegments() != end )
-        return;
+    // check all filament length:
+    for ( size_t n = 0; n < NFIL; ++n )
+    {
+        if ( fil_[n]->nbSegments() != e )
+        {
+            Cytosim::warn << "unequal Tubule filaments";
+            return;
+        }
+    }
     
     Rotation mat(0,1);
-    real alpha = tube_radius / len;
+    real alpha = prop->radius / len;
     Vector cen, dir;
     
-    size_t i;
-    for ( i = 0; i < end; ++i )
+    for ( size_t i = 0; i < e; ++i )
     {
         // get centerline
         cen = bone_->posPoint(i);
@@ -275,13 +281,13 @@ void Tubule::setInteractions(Meca& meca)
         }
     }
 
-    // get centerline
-    cen = bone_->posPoint(i);
+    // link last point:
+    cen = bone_->posPoint(e);
     for ( size_t n = 0; n < NFIL; ++n )
     {
-        Vector arm = ( cen - fil_[n]->posPoint(i) ).normalized(len);
-        meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
-        meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
+        Vector arm = ( cen - fil_[n]->posPoint(e) ).normalized(len);
+        meca.addSideLink3D(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), mat.vecmul(arm), stiffL);
+        meca.addSideLink3D(Interpolation(fil_[n],e-1,e,1), Mecapoint(bone_,e), alpha*cross(dir,arm), stiffR);
     }
 #endif
 }
@@ -296,7 +302,7 @@ void Tubule::setInteractionsC(Meca& meca)
     const real stiffL = prop->stiffness[0];
     const real stiffA = prop->stiffness[1];
     const real ang = M_PI / NFIL;
-    const real len = 2 * tube_radius * sin(ang);  // distance between protofilaments
+    const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
 #if ( DIM >= 3 )
     real co = cos(2*ang), si = sin(2*ang);
     

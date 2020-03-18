@@ -264,8 +264,8 @@ void Simul::setInteractions(Meca& meca) const
         c->setInteractionsFA(meca);
 #endif
     
-    for ( Organizer * a = organizers.first(); a; a=a->next() )
-        a->setInteractions(meca);
+    for ( Organizer * x = organizers.first(); x; x=x->next() )
+        x->setInteractions(meca);
     
     for ( Tubule * t = tubules.first(); t; t=t->next() )
         t->setInteractions(meca);
