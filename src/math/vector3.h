@@ -522,22 +522,23 @@ public:
     
     /// rotate `vec` around `*this`, by angle defined by cosinus and sinus
     /**
-     The result is a Vector orthogonal to *this
+     It is assumed that norm(*this)==1
+     The result is a unit Vector orthogonal to *this, of norm `c*c + s*s`
      */
     const Vector3 rotateOrtho(Vector3 const& vec, real c, real s)
     {
-        //Set two orthogonal vector to 'd' to set an orientated basis
+        // set two orthogonal vector to 'd' defining an orientated basis
         Vector3 ex, ey;
         orthonormal(ex, ey);
-        // compute coordinates of n in reference frame (x, y):
+        // compute coordinates of `vec` in the reference frame (ex, ey):
         real x = dot(vec, ex);
         real y = dot(vec, ey);
         // normalization factor:
-        real n = sqrt( x * x + y * y );
-        // rotate coefficients:
-        real a = ( c * x - s * y ) / n;
-        real b = ( s * x + c * y ) / n;
-        return a * ex + b * ey;
+        real n = 1.0 / sqrt( x * x + y * y );
+        x = x * n;
+        y = y * n;
+        // rotated vector:
+        return ( c * x - s * y ) * ex + ( s * x + c * y ) * ey;
     }
     
     /// convert from cartesian to spherical coordinates ( r, theta, phi )

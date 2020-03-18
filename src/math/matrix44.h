@@ -64,7 +64,7 @@ public:
         val[0xF] = p;
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `a`
+    /// construct Matrix with `d` on the diagonal and other values equal to `z`
     Matrix44(real z, real d)
     {
         val[0x0] = d;

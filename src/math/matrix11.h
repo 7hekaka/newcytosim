@@ -35,7 +35,7 @@ public:
         val_ = v;
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `a`
+    /// construct Matrix with `d` on the diagonal and other values equal to `z`
     Matrix11(real, real d)
     {
         val_ = d;

@@ -171,8 +171,8 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
         real x = -2*sqrt(Q);
         real t = theta/3.0;
         r1 = x * cos(t)            - B3;
-        r2 = x * cos(t+2/3.0*M_PI) - B3;
-        r3 = x * cos(t-2/3.0*M_PI) - B3;
+        r2 = x * cos(t+2*M_PI/3.0) - B3;
+        r3 = x * cos(t-2*M_PI/3.0) - B3;
 
         return 3;
     }
@@ -255,8 +255,8 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
         real t = theta/3.0;
         
         r1 = cplx( x * cos(t)            - B3, 0 );
-        r2 = cplx( x * cos(t+2/3.0*M_PI) - B3, 0 );
-        r3 = cplx( x * cos(t-2/3.0*M_PI) - B3, 0 );
+        r2 = cplx( x * cos(t+2*M_PI/3.0) - B3, 0 );
+        r3 = cplx( x * cos(t-2*M_PI/3.0) - B3, 0 );
         
         return 3;
     }

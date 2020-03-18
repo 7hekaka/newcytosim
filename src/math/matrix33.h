@@ -68,7 +68,7 @@ public:
         clear_shadow();
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `a`
+    /// construct Matrix with `d` on the diagonal and other values equal to `z`
     Matrix33(real z, real d)
     {
         val[0] = d;
@@ -926,7 +926,9 @@ public:
     }
     
     /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
-    /** The values of 'c' and 's' can be scaled to obtain a matrix where the
+    /**
+     Attention: this is a rotation only if norm(axis)==1 and `c*c + s*s == 1`
+     but the values of 'c' and 's' can be scaled to obtain a matrix where the
      rotation components is also scaling. Vectors along the axis remain unchanged */
     static Matrix33 rotationAroundAxis(const Vector3& axis, const real c, const real s)
     {
@@ -934,7 +936,6 @@ public:
          This is using Rodrigues's formula:
              I + sinus * K + ( 1 - cosinus ) * K^2
              K = -1 (x) axis
-        Attention: this is a rotation only if norm(axis)==1 and `c*c + s*s == 1`
          */
         const real  X = axis.XX  ,  Y = axis.YY  ,  Z = axis.ZZ;
         const real dX = X - c * X, dY = Y - c * Y, dZ = Z - c * Z;

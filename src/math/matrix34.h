@@ -67,7 +67,7 @@ public:
         clear_shadow();
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `a`
+    /// construct Matrix with `d` on the diagonal and other values equal to `z`
     Matrix34(real z, real d)
     {
         val[0] = d;
