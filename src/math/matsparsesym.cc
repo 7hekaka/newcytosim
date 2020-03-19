@@ -73,9 +73,9 @@ void MatrixSparseSymmetric::deallocate()
 
 
 /// copy `cnt` elements from `src` to `dst`
-void copy(unsigned cnt, MatrixSparseSymmetric::Element * src, MatrixSparseSymmetric::Element * dst)
+void copy(size_t cnt, MatrixSparseSymmetric::Element * src, MatrixSparseSymmetric::Element * dst)
 {
-    for ( unsigned ii = 0; ii < cnt; ++ii )
+    for ( size_t ii = 0; ii < cnt; ++ii )
         dst[ii] = src[ii];
 }
 

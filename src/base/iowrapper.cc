@@ -592,7 +592,7 @@ void Outputter::writeDoubles(const double* a, const size_t n, char before)
     if ( before && !binary_ )
         putc(before, mFile);
     
-    for ( unsigned d = 0; d < n; ++d )
+    for ( size_t d = 0; d < n; ++d )
         writeDouble(a[d]);
 }
 

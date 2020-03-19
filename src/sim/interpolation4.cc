@@ -92,7 +92,7 @@ Vector Interpolation4::position() const
 {
     size_t top = std::min(ord_, mec_->nbPoints());
     Vector res = coef_[0] * mec_->posPoint(ref_);
-    for ( unsigned i = 1; i < top; ++i )
+    for ( size_t i = 1; i < top; ++i )
         res += coef_[i] * mec_->posPoint(ref_+i);
     return res;
 }

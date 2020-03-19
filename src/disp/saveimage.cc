@@ -245,7 +245,7 @@ void SaveImage::downsampleRGB(GLubyte dst[], const GLubyte src[],
     
 #if ( 0 )
     //reset destination:
-    for ( unsigned u = 0; u < sx*sy; ++u )
+    for ( size_t u = 0; u < sx*sy; ++u )
     {
         dst[3*u  ] = 0xFF;
         dst[3*u+1] = 0xFF;

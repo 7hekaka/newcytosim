@@ -207,13 +207,13 @@ void PointDisp::allocatePixelmap()
         if ( bmp[0] )
             delete(bmp[0]);
     
-        unsigned dd = pixSize * pixSize;
+        size_t dd = pixSize * pixSize;
         GLubyte * mem = new GLubyte[12*dd];
         bmp[0] = mem;
         bmp[1] = mem + 4*dd;
         bmp[2] = mem + 8*dd;
         
-        for ( unsigned y = 0; y < 12*dd; ++y )
+        for ( size_t y = 0; y < 12*dd; ++y )
             mem[y] = 0;
         
         nPix = pixSize;

@@ -182,7 +182,7 @@ void MatrixSparse::addTriangularBlock(real* mat, size_t ldd, size_t si, size_t n
 {
     assert_true( si + nb <= size_ );
     
-    for ( unsigned jj = 0; jj < nb; ++jj )
+    for ( size_t jj = 0; jj < nb; ++jj )
     {
         size_t* row = mxRow[jj + si];
         if ( row != nullptr )

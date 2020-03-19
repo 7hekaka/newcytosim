@@ -327,7 +327,7 @@ public:
         
         if ( prop )
         {
-            for ( unsigned int d = 0; d < DIM; ++d )
+            for ( unsigned d = 0; d < DIM; ++d )
             {
                 real dif = fabs( prop->step - mGrid.cellWidth(d) );
                 if ( fabs(dif) > 1e-3 )

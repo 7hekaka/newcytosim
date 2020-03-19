@@ -2037,11 +2037,11 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportCouple(std::ostream& out) const
 {
-    const unsigned mx = 128;
+    const size_t mx = 128;
     int act[mx] = { 0 }, cnt[mx][4];
     
     //reset counts:
-    for ( unsigned ii = 0; ii < mx; ++ii )
+    for ( size_t ii = 0; ii < mx; ++ii )
     {
         cnt[ii][0] = 0;
         cnt[ii][1] = 0;

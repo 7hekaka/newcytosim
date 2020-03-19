@@ -83,7 +83,7 @@ uint32_t hash(long t, int32_t c)
     }
     uint32_t h2 = 0;
     p = (unsigned char*) &c;
-    for ( unsigned j = 0; j < sizeof(c); ++j )
+    for ( size_t j = 0; j < sizeof(c); ++j )
     {
         h2 *= UCHAR_MAX + 2U;
         h2 += p[j];
@@ -126,7 +126,7 @@ uint32_t Random::seed()
 bool Random::seeded()
 {
     uint32_t * buf = twister_.state[0].u;
-    for ( unsigned n = 0; n < SFMT_N32; ++n )
+    for ( size_t n = 0; n < SFMT_N32; ++n )
         if ( buf[n] )
             return true;
     return false;

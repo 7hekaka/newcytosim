@@ -327,8 +327,8 @@ namespace sMath
     ///copy bytes
     inline void copyBytes( void * dest, const void * src, const unsigned cnt)
     {
-        for ( unsigned ii=0; ii < cnt; ++ii )
-            ((char*)dest)[ii] = ((char*)src)[ii];
+        for ( size_t i = 0; i < cnt; ++i )
+            ((char*)dest)[i] = ((char*)src)[i];
     }
     
 

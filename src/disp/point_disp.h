@@ -25,7 +25,7 @@ private:
     std::string mKind;
     
     /// size of feature in pixels
-    unsigned    pixSize;
+    size_t    pixSize;
     
     /// draw outline of shape
     void strokeShape() const;

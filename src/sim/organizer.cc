@@ -164,12 +164,12 @@ void Organizer::write(Outputter& out) const
 
 void Organizer::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    unsigned nbo = in.readUInt16();
+    size_t nbo = in.readUInt16();
     nbOrganized(nbo);
     
     //std::clog << " Organizer::read with " << nb << " objects" << std::endl;
     ObjectTag g;
-    for ( unsigned i = 0; i < nbo; ++i )
+    for ( size_t i = 0; i < nbo; ++i )
     {
         Object * w = sim.readReference(in, g);
         if ( w )

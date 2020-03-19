@@ -1494,7 +1494,7 @@ gle::named_color xkcd_colors[] = {
 };
 
 
-gle_color gle::std_color(unsigned indx)
+gle_color gle::std_color(size_t indx)
 {
     const size_t max = sizeof(std_colors) / sizeof(named_color);
     return std_colors[ indx % max ].hex;
@@ -1505,7 +1505,7 @@ gle_color gle::std_color(const std::string& name)
 {
     const size_t max = sizeof(std_colors) / sizeof(named_color);
     
-    for ( unsigned c = 0; c < max; ++c )
+    for ( size_t c = 0; c < max; ++c )
         if ( std_colors[c].name == name )
             return std_colors[c].hex;
     
@@ -1521,7 +1521,7 @@ void gle::print_std_colors(std::ostream& os)
 }
 
 
-gle_color gle::alt_color(unsigned indx)
+gle_color gle::alt_color(size_t indx)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);
     return crayola_colors[ indx % max ].hex;
@@ -1532,42 +1532,42 @@ gle_color gle::alt_color(unsigned indx)
  extract all colors from the crayola list, that have a brightness between `minb` and `maxb`
  */
 
-int gle::select_colors(gle_color* array, unsigned asize,
+int gle::select_colors(gle_color* list, size_t list_size,
                        const GLfloat minb, const GLfloat maxb)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);
 
-    unsigned nbc = 0;
-    for ( unsigned c = 0; c < max; ++c )
+    size_t res = 0;
+    for ( size_t c = 0; c < max; ++c )
     {
         gle_color col = crayola_colors[c].hex;
         if ( minb <= col.brightness()  &&  col.brightness() <= maxb )
-            array[nbc++] = col;
-        if ( nbc == asize )
-            return nbc;
+            list[res++] = col;
+        if ( res == list_size )
+            return res;
     }
     
     // always returns at least one color:
-    if ( nbc == 0 && asize > 0 )
+    if ( res == 0 && list_size > 0 )
     {
-        array[0] = 0xFFFFFFFF;
-        nbc = 1;
+        list[0] = 0xFFFFFFFF;
+        res = 1;
     }
     
-    return nbc;
+    return res;
 }
 
 
 /**
  return `indx`-th color from the crayola list, that has a brightness between `minb` and `maxb`
  */
-gle_color gle::bright_color(unsigned indx, const GLfloat minb, const GLfloat maxb)
+gle_color gle::bright_color(size_t indx, const GLfloat minb, const GLfloat maxb)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);
 
     static gle_color scolor[max];
     static GLfloat sminb = 0.6f, smaxb = 3;
-    static unsigned scmax = select_colors(scolor, max, sminb, smaxb);
+    static size_t scmax = select_colors(scolor, max, sminb, smaxb);
 
     if ( sminb != minb || smaxb != maxb )
     {
@@ -1580,7 +1580,7 @@ gle_color gle::bright_color(unsigned indx, const GLfloat minb, const GLfloat max
 }
 
 
-gle_color gle::nice_color(unsigned indx)
+gle_color gle::nice_color(size_t indx)
 {
     static constexpr unsigned max = sizeof(nice_colors) / sizeof(gle_color);
     
@@ -1588,9 +1588,9 @@ gle_color gle::nice_color(unsigned indx)
 }
 
 
-void gle::print_colors(std::ostream& os, named_color list[], unsigned max)
+void gle::print_colors(std::ostream& os, named_color list[], size_t max)
 {    
-    for ( unsigned c = 0; c < max; ++c )
+    for ( size_t c = 0; c < max; ++c )
     {
         os << std::setw(16) << list[c].name << "  ";
         os << gle_color( list[c].hex ) << std::endl;
