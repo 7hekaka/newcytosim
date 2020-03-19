@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# scan.py
+# scan.py executes a given command in many directories
 #
-# copyright  F. Nedelec and S. Dmitrieff 2007--2018
+# Copyright  F. Nedelec and S. Dmitrieff 2007--2018
 
 """
     Execute specified command in given directories, sequentially using a given number of processes

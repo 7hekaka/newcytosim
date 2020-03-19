@@ -83,10 +83,10 @@ You will now use a script to automate the process of varying parameters. Specifi
 
 Get a number of useful tools: `preconfig`, `collect.py` and `scan.py` from GitHub:
 
-- [preconfig](https://github.com/nedelec/preconfig) — [local copy](code/preconfig)
-- [collect.py](https://github.com/nedelec/collect.py) — [local copy](code/collect.py)
-- [scan.py](https://github.com/nedelec/scan.py) — [local copy](code/scan.py)
-- [make_page.py](https://github.com/nedelec/make_page.py) — [local copy](code/make_page.py)
+- [preconfig](https://github.com/nedelec/preconfig) — [local copy](code)
+- [collect.py](https://github.com/nedelec/collect.py) — [local copy](code)
+- [scan.py](https://github.com/nedelec/scan.py) — [local copy](codey)
+- [make_page.py](https://github.com/nedelec/make_page.py) — [local copy](code)
 
 ### Create a templated config file:
 
