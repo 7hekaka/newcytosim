@@ -3,7 +3,7 @@
 # PRECONFIG, a versatile configuration file generator
 #
 # Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--
-# This is PRECONFIG version 1.3, last modified on 20.01.2020
+# This is PRECONFIG version 1.24, last modified on 19.03.2020
 
 __VERSION__="1.24"
 
@@ -197,14 +197,14 @@ __DATE__   ="19.03.2020"
 
 ## Acknowledgments:
 
-We wish to thank the members of the Nedelec group, and all users of
-Cytosim for their feedback which has contributed greatly to this development.
+We wish to thank the members of the Nedelec group, and all users of Cytosim
+for their feedback which has contributed greatly to this development.
 We thanks Shaun Jackman and Steven Andrews for valuable feedback!
 
 Copyright Francois J. Nedelec and Serge Dmitrieff
-EMBL 2010--2018
+EMBL 2010--2017
 Cambridge University 2019--
-This is Free Software with absolutely no WARANTY.
+This is Free Software with no WARANTY, hoping to be useful.
 Preconfig is distributed under GPL3.0 Licence (see LICENCE)
 """
 
@@ -454,8 +454,8 @@ class Preconfig:
             f.write(text)
             self.files_made.extend([dst])
         # fancy ouput:
-        self.out.write("\\"+repr(self.locals)+'\n')
-        self.out.write(" \\"+('> '+dst).rjust(78, '-')+'\n')
+        self.out.write(' \\'+repr(self.locals)+'\n')
+        self.out.write('  \\'+('> '+dst+'\n').rjust(96, '-'))
         # write log:
         if self.log:
             keys = sorted(self.locals.keys())

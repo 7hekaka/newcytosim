@@ -2,7 +2,7 @@
 #
 # collect.py renames files from subdirectories
 #
-# Copyright F. Nedelec, 2007--2018
+# Copyright F. Nedelec, 2007--2020
 
 
 """
