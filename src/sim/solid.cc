@@ -1179,7 +1179,7 @@ void Solid::write(Outputter& out) const
     out.writeUInt16(nPoints);
     for ( size_t p = 0; p < nPoints ; ++p )
     {
-        out.writeFloatVector(pPos + DIM * p, DIM, '\n');
+        out.writeFloats(pPos + DIM * p, DIM, '\n');
         out.writeSoftSpace(2);
         out.writeFloat(soRadius[p]);
     }
@@ -1194,7 +1194,7 @@ void Solid::read(Inputter& in, Simul&, ObjectTag)
         setNbPoints(nbp);
         for ( size_t i = 0; i < nbp ; ++i )
         {
-            in.readFloatVector(pPos+DIM*i, DIM);
+            in.readFloats(pPos+DIM*i, DIM);
             soRadius[i] = in.readFloat();
         }
     }

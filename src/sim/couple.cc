@@ -513,7 +513,7 @@ void Couple::write(Outputter& out) const
     cHand1->write(out);
     cHand2->write(out);
     if ( !attached1() && !attached2() )
-        out.writeFloatVector(cPos, DIM);
+        out.writeFloats(cPos, DIM);
 }
 
 
@@ -528,7 +528,7 @@ void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( attached1() || attached2() )
         cPos = position();
     else
-        in.readFloatVector(cPos, DIM);
+        in.readFloats(cPos, DIM);
     
     /*
      Because the CoupleSet contains 4 sublists where Couple are stored depending

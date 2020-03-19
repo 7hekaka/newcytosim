@@ -223,9 +223,9 @@ double Inputter::readDouble()
  This will read vecsize_ floats, and store the first D ones in a[].
  VECSIZE can be changed by calling vectorSize(INT)
  */
-void Inputter::readFloatVector(float a[], const unsigned D)
+void Inputter::readFloats(float a[], const unsigned D)
 {
-    unsigned d;
+    size_t d;
     if ( vecsize_ <= D )
     {
         for ( d = 0; d < vecsize_; ++d )
@@ -246,9 +246,9 @@ void Inputter::readFloatVector(float a[], const unsigned D)
 /**
  This will read vecsize_ floats, and store the first D ones in a[].
  */
-void Inputter::readFloatVector(double a[], const unsigned D)
+void Inputter::readFloats(double a[], const unsigned D)
 {
-    unsigned d;
+    size_t d;
     if ( vecsize_ <= D )
     {
         for ( d = 0; d < vecsize_; ++d )
@@ -269,7 +269,7 @@ void Inputter::readFloatVector(double a[], const unsigned D)
 /**
  This will read `n * vecsize_` floats, and store `n * D` values in a[].
  */
-void Inputter::readFloatVector(double a[], const unsigned n, const unsigned D)
+void Inputter::readFloats(double a[], const size_t n, const unsigned D)
 {
     const size_t nd = n * vecsize_;
     float * v = new float[nd];
@@ -283,13 +283,13 @@ void Inputter::readFloatVector(double a[], const unsigned n, const unsigned D)
         }
         if ( binary_ == 2 )
         {
-            for ( unsigned i = 0; i < nd; ++i )
+            for ( size_t i = 0; i < nd; ++i )
                 v[i] = byteswap(v[i]);
         }
     }
     else
     {
-        for ( unsigned u = 0; u < nd; ++u )
+        for ( size_t u = 0; u < nd; ++u )
             if ( 1 != fscanf(mFile, " %f", v+u) )
             {
                 delete[] v;
@@ -297,11 +297,11 @@ void Inputter::readFloatVector(double a[], const unsigned n, const unsigned D)
             }
     }
 
-    const unsigned m = ( vecsize_ < D ? vecsize_ : D );
+    const size_t m = ( vecsize_ < D ? vecsize_ : D );
     
-    for ( unsigned u = 0; u < n; ++u )
+    for ( size_t u = 0; u < n; ++u )
     {
-        unsigned i = 0;
+        size_t i = 0;
         for ( ; i < m; ++i )
             a[D*u+i] = v[vecsize_*u+i];
         for ( ; i < D; ++i )
@@ -552,22 +552,22 @@ void Outputter::writeFloat(const float x)
 }
 
 
-void Outputter::writeFloatVector(const float* a, const unsigned n, char before)
+void Outputter::writeFloats(const float* a, const size_t n, char before)
 {
     if ( before && !binary_ )
         putc(before, mFile);
     
-    for ( unsigned d = 0; d < n; ++d )
+    for ( size_t d = 0; d < n; ++d )
         writeFloat(a[d]);
 }
 
 
-void Outputter::writeFloatVector(const double* a, const unsigned n, char before)
+void Outputter::writeFloats(const double* a, const size_t n, char before)
 {
     if ( before && !binary_ )
         putc(before, mFile);
     
-    for ( unsigned d = 0; d < n; ++d )
+    for ( size_t d = 0; d < n; ++d )
         writeFloat(a[d]);
 }
 
@@ -587,7 +587,7 @@ void Outputter::writeDouble(const double x)
 }
 
 
-void Outputter::writeDoubleVector(const double* a, const unsigned n, char before)
+void Outputter::writeDoubles(const double* a, const size_t n, char before)
 {
     if ( before && !binary_ )
         putc(before, mFile);
@@ -605,7 +605,7 @@ void Outputter::writeSoftNewline()
 }
 
 
-void Outputter::writeSoftSpace(int N)
+void Outputter::writeSoftSpace(size_t N)
 {
     if ( !binary_ )
     {

@@ -331,7 +331,7 @@ void Mecable::write(Outputter& out) const
 {
     out.writeUInt16(nPoints);
     for ( size_t p = 0; p < nPoints ; ++p )
-        out.writeFloatVector(pPos+DIM*p, DIM, '\n');
+        out.writeFloats(pPos+DIM*p, DIM, '\n');
 }
 
 
@@ -346,9 +346,9 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
         nPoints = nb;
 #if ( 1 )
         for ( size_t p = 0; p < nb ; ++p )
-            in.readFloatVector(pPos+DIM*p, DIM);
+            in.readFloats(pPos+DIM*p, DIM);
 #else
-        in.readFloatVector(pPos, nb, DIM);
+        in.readFloats(pPos, nb, DIM);
 #endif
     }
     catch( Exception & e )
