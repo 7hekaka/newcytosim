@@ -74,7 +74,7 @@ private:
         
         size_t n_cell[3] = { 0, 0, 0 };
         // we use square cells:
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             n_cell[d] = (size_t)ceil( (sup[d]-inf[d]+extra) / step );
             real mid = 0.5 * ( inf[d] + sup[d] );
@@ -85,7 +85,7 @@ private:
         mGrid.setDimensions(inf, sup, n_cell);
         
         //verify the cell size:
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             real dif = fabs( step - mGrid.cellWidth(d) );
             if ( fabs(dif) > 1e-3 )
@@ -142,7 +142,7 @@ public:
             
             if ( prop->periodic )
             {
-                for ( unsigned d = 0; d < DIM; ++d )
+                for ( size_t d = 0; d < DIM; ++d )
                     mGrid.setPeriodic(d, true);
                 setGrid(inf, sup, prop->step, true);
             }
@@ -266,7 +266,7 @@ public:
         if ( mGrid.hasCells() && prop->save )
         {
             out.writeUInt16(DIM);
-            for ( unsigned d = 0; d < DIM; ++d )
+            for ( size_t d = 0; d < DIM; ++d )
             {
                 out.writeSoftSpace();
                 out.writeUInt32(mGrid.breadth(d));
@@ -298,7 +298,7 @@ public:
         if ( dim != DIM )
             throw InvalidIO("cannot read field due to dimensionality mismatch");
         
-        for ( unsigned d = 0; d < dim; ++d )
+        for ( size_t d = 0; d < dim; ++d )
         {
             size[d] = in.readUInt32();
             minB[d] = in.readFloat();
@@ -327,7 +327,7 @@ public:
         
         if ( prop )
         {
-            for ( unsigned d = 0; d < DIM; ++d )
+            for ( size_t d = 0; d < DIM; ++d )
             {
                 real dif = fabs( prop->step - mGrid.cellWidth(d) );
                 if ( fabs(dif) > 1e-3 )

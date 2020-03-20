@@ -44,7 +44,7 @@ unsigned FiberGrid::setGrid(Space const* space, real max_step)
     
     size_t n_cell[3] = { 1, 1, 1 };
     
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / max_step;
         

@@ -21,7 +21,7 @@ void Field::prepareDiffusion(real theta)
     
     for ( size_t c = 0; c < nbc; ++c )
     {
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             size_t n = mGrid.next(c, d);
             
@@ -60,7 +60,7 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
     {
         if ( domain[c] )
         {
-            for ( unsigned d = 0; d < DIM; ++d )
+            for ( size_t d = 0; d < DIM; ++d )
             {
                 size_t n = c + mGrid.stride(d);
                 

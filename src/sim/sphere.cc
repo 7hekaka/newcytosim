@@ -527,7 +527,7 @@ void Sphere::makeProjection()
     {
         real * ppp = sRad + DIM * p;
         real * pos = pPos + DIM * p;
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
             ppp[d] = curv * ( pos[d] - pPos[d] );
     }
 }
@@ -577,7 +577,7 @@ void Sphere::projectForces(const real* X, real* Y) const
         real * yyy = Y + DIM * p;
         real * pos = pPos + DIM * p;
 
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
 #if   ( DIM == 2 )
         yyy[0] = F.XX - T * pos[1];
         yyy[1] = F.YY + T * pos[0];

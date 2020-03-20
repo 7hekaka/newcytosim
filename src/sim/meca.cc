@@ -512,7 +512,7 @@ void duplicate_matrix(size_t siz, real const* src, real * dst)
             xx = src[ii + siz * jj];
             kk = DIM * ( ii + ddd * jj );
             size_t ll = DIM * ( jj + ddd * ii );
-            for ( unsigned d = 0; d < DIM; ++d )
+            for ( size_t d = 0; d < DIM; ++d )
             {
                 dst[kk] = xx;
                 dst[ll] = xx;
@@ -1771,7 +1771,7 @@ size_t Meca::nbNonZeros(real threshold) const
     zero_real(dim, src);
     
     size_t cnt = 0;
-    for ( unsigned j = 0; j < dim; ++j )
+    for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, dst);
@@ -1801,7 +1801,7 @@ void Meca::getMatrix(size_t dim, real * mat) const
     zero_real(dim, src);
     zero_real(dim, res);
     
-    for ( unsigned j = 0; j < dim; ++j )
+    for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1.0;
         multiply(src, res);

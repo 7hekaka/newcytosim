@@ -27,10 +27,10 @@ void projectForcesU(unsigned nbs, const real* dif, const real* X, real* mul)
 
 
 //void projectForcesV(unsigned nbs, const real restrict* dif, const real restrict* vec, real restrict* mul)
-void projectForcesV(unsigned nbs, const real* dif, const real* vec, real* mul)
+void projectForcesV(size_t nbs, const real* dif, const real* vec, real* mul)
 {
 #pragma vector unaligned
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const real * X = vec + DIM * jj;
         const real * d = dif + DIM * jj;
@@ -44,13 +44,13 @@ void projectForcesV(unsigned nbs, const real* dif, const real* vec, real* mul)
 }
 
 
-void projectForcesSOA(unsigned nbs, const real*restrict dif, const real*restrict vec, real* mul)
+void projectForcesSOA(size_t nbs, const real*restrict dif, const real*restrict vec, real* mul)
 {
-    unsigned S = nbs, T = nbs + nbs;
+    size_t S = nbs, T = nbs + nbs;
     const real * X = vec, * Y = vec + S, * Z = vec + T;
     const real *dX = dif, *dY = dif + S, *dZ = dif + T;
     
-    for ( unsigned jj = 0; jj < nbs; ++jj )
+    for ( size_t jj = 0; jj < nbs; ++jj )
     {
         mul[jj] = dX[jj] * ( X[jj+1] - X[jj] )
                 + dY[jj] * ( Y[jj+1] - Y[jj] )

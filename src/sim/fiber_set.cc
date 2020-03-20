@@ -883,7 +883,7 @@ real FiberSet::infoNematic(ObjectList const& objs,
     if ( S == 0 )
         return 0;
     // rescale matrix:
-    for ( unsigned d = 0; d < 9; ++d )
+    for ( size_t d = 0; d < 9; ++d )
         M[d] = M[d] / S;
     
     int nv;

@@ -4590,9 +4590,9 @@ void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
     add_base(inxA, ab,-3*abn3);
     add_base(inxB, ab, 3*abn3);
     
-    for ( unsigned ii = 0; ii < DIM; ++ii )
+    for ( size_t ii = 0; ii < DIM; ++ii )
     {
-        for ( unsigned jj = ii; jj < DIM; ++jj )
+        for ( size_t jj = ii; jj < DIM; ++jj )
         {
             real m = abn5 * ( (ii==jj) - 3 * ab[ii] * ab[jj] );
             

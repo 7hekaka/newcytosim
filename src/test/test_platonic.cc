@@ -156,7 +156,7 @@ void display(View&, int)
         glColor3f(1,1,1);
         glLineWidth(0.5);
         glBegin(GL_LINES);
-        for ( unsigned int ii=0; ii < ico->nb_edges(); ++ii )
+        for ( unsigned ii=0; ii < ico->nb_edges(); ++ii )
         {
             glVertex3fv(ico->edge_data0(ii));
             glNormal3fv(ico->edge_data0(ii));

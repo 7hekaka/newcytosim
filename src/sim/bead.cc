@@ -97,7 +97,7 @@ real Bead::addBrownianForces(real const* rnd, real sc, real* rhs) const
     // Brownian amplitude:
     real b = sqrt( 2 * sc * paDrag );
 
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
         rhs[d] += b * rnd[d];
     
     //the amplitude is needed in Meca
@@ -136,7 +136,7 @@ void Bead::projectForces(const real* X, real* Y) const
 {
     assert_true( paDrag > 0 );
     real s = 1.0 / paDrag;
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
         Y[d] = s * X[d];
 }
 

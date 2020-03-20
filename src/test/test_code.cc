@@ -364,7 +364,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 /*
     if ( nbt == DIM )
     {
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             real x = 2 * X[d+DIM] - ( X[d+DIM*2] + X[d] );
             Y[d      ] += R1 * x;
@@ -409,7 +409,7 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
     real const* E = X + nbt + DIM;
 
     #pragma ivdep
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];
         Z[d    ] -= R1 * ((E-DIM)[d]+(E-DIM*3)[d]) + R4 * ((E-DIM)[d]-(E-DIM*2)[d]) - R2 * E[d];
@@ -436,7 +436,7 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
     real const* E = X + nbt + FOR;
     
     #pragma ivdep
-    for ( unsigned d = 0; d < FOR; ++d )
+    for ( size_t d = 0; d < FOR; ++d )
     {
         Y[d+FOR] -= R1 * ((X+FOR)[d]+(X+FOR*3)[d]) + R4 * ((X+FOR)[d]-(X+FOR*2)[d]) - R2 * X[d];
         Z[d    ] -= R1 * ((E-FOR)[d]+(E-FOR*3)[d]) + R4 * ((E-FOR)[d]-(E-FOR*2)[d]) - R2 * E[d];

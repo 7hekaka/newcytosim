@@ -26,7 +26,7 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
     spc->boundaries(inf, sup);
     
     size_t n_cell[3] = { 1, 1, 1 };
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / min_step;
         

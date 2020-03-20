@@ -721,7 +721,7 @@ inline void add_projectiondiff(const size_t nbs, const real* mul, const real* X,
 {
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        for ( unsigned d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
             const real w = mul[jj] * ( X[DIM*jj+DIM+d] - X[DIM*jj+d] );
             Y[DIM*jj    +d] += w;

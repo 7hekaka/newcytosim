@@ -81,7 +81,7 @@ void Mecafil::makeProjection()
         w = posP(jj+1);
         dv = -dw;
         dw = w - v;
-        for ( unsigned d = 0; d < DIM ; ++d )
+        for ( size_t d = 0; d < DIM ; ++d )
         {
             J[jj+nbc*(DIM*jj+d)    ] = -dw[d];
             J[jj+nbc*(DIM*jj+DIM+d)] =  dw[d];
