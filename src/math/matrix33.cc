@@ -61,20 +61,20 @@ Matrix33 Matrix33::rotationAroundZ(const real angle)
 }
 
 
-Matrix33 Matrix33::rotationAroundPrincipalAxis(unsigned i, const real angle)
+Matrix33 Matrix33::rotationAroundPrincipalAxis(index i, const real angle)
 {
     real c = cos(angle);
     real s = sin(angle);
     
     i %= 3;
-    unsigned j = (i+1)%3;
-    unsigned k = (i+2)%3;
+    index j = (i+1)%3;
+    index k = (i+2)%3;
     
     Matrix33 res(0, 1);
     res(j,j) = c;
-    res(k,k) = c;
-    res(j,k) = -s;
     res(k,j) = s;
+    res(j,k) = -s;
+    res(k,k) = c;
     return res;
 }
 
