@@ -10,7 +10,7 @@ constexpr int PERIODIC_X   = 1;
 
 
 /// enable periodicity in dimension 'd'
-void Modulo::enable(unsigned d, real size)
+void Modulo::enable(size_t d, real size)
 {
     if ( size <= 0 )
         throw InvalidParameter("periodic:length must be > 0");
@@ -19,7 +19,7 @@ void Modulo::enable(unsigned d, real size)
 }
 
 
-const Vector Modulo::periodicity(unsigned d) const
+const Vector Modulo::periodicity(size_t d) const
 {
     Vector vec(0,0,0);
     if ( d < DIM && ( mMode & 1<<d ))

@@ -311,7 +311,7 @@ public:
     }
     
     /// change boundary conditions
-    void setPeriodic(int d, bool p)
+    void setPeriodic(size_t d, bool p)
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
