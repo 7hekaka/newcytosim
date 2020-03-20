@@ -41,7 +41,7 @@ void MatrixSparseSymmetric2::allocate(size_t alc)
 
         //fprintf(stderr, "MSS1 allocate matrix %u\n", alc);
         Element ** col_new      = new Element*[alc];
-        unsigned * col_size_new = new unsigned[alc];
+        size_t   * col_size_new = new size_t[alc];
         size_t   * col_max_new  = new size_t[alc];
         
         size_t ii = 0;
@@ -100,14 +100,14 @@ void MatrixSparseSymmetric2::deallocate()
 /// copy `cnt` elements from `src` to `dst`
 void copy(unsigned cnt, MatrixSparseSymmetric2::Element * src, MatrixSparseSymmetric2::Element * dst)
 {
-    for ( unsigned ii = 0; ii < cnt; ++ii )
+    for ( size_t ii = 0; ii < cnt; ++ii )
         dst[ii] = src[ii];
 }
 
 /// move `cnt` elements to next index, starting at vec[0]
 void shift(unsigned cnt, MatrixSparseSymmetric2::Element * vec)
 {
-    for ( unsigned ii = cnt; ii > 0; --ii )
+    for ( size_t ii = cnt; ii > 0; --ii )
         vec[ii] = vec[ii-1];
 }
 
@@ -211,7 +211,7 @@ real* MatrixSparseSymmetric2::addr(size_t i, size_t j) const
     size_t ii = std::max(i, j);
     size_t jj = std::min(i, j);
 
-    for ( unsigned kk = 0; kk < col_size_[jj]; ++kk )
+    for ( size_t kk = 0; kk < col_size_[jj]; ++kk )
         if ( col_[jj][kk].inx == ii )
             return &( col_[jj][kk].val );
     
@@ -233,7 +233,7 @@ bool MatrixSparseSymmetric2::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
             if ( col_[jj][kk].val != 0 )
                 return true;
     
@@ -245,7 +245,7 @@ bool MatrixSparseSymmetric2::isNotZero() const
 void MatrixSparseSymmetric2::scale(const real alpha)
 {
     for ( size_t jj = 0; jj < size_; ++jj )
-        for ( unsigned n = 0; n < col_size_[jj]; ++n )
+        for ( size_t n = 0; n < col_size_[jj]; ++n )
             col_[jj][n].val *= alpha;
 }
 
@@ -260,7 +260,7 @@ void MatrixSparseSymmetric2::addTriangularBlock(real* mat, const size_t ldd,
     
     for ( size_t jj = si; jj < up; ++jj )
     {
-        for ( unsigned n = 0; n < col_size_[jj]; ++n )
+        for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             // assuming lower triangle is stored:
@@ -284,7 +284,7 @@ void MatrixSparseSymmetric2::addDiagonalBlock(real* mat, size_t ldd,
     
     for ( size_t jj = si; jj < up; ++jj )
     {
-        for ( unsigned n = 0; n < col_size_[jj]; ++n )
+        for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             // assuming lower triangle is stored:
@@ -306,7 +306,7 @@ int MatrixSparseSymmetric2::bad() const
     if ( size_ <= 0 ) return 1;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
             if ( col_[jj][kk].inx >= size_ ) return 2;
             if ( col_[jj][kk].inx <= jj )   return 3;
@@ -347,7 +347,7 @@ void MatrixSparseSymmetric2::printSparse(std::ostream& os) const
     os.precision(8);
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        for ( unsigned n = 0 ; n < col_size_[jj] ; ++n )
+        for ( size_t n = 0 ; n < col_size_[jj] ; ++n )
         {
             os << col_[jj][n].inx << " " << jj << " ";
             os << col_[jj][n].val << "\n";
@@ -375,7 +375,7 @@ void MatrixSparseSymmetric2::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = col_[jj];
     os << "MSS2 col " << jj << ":";
-    for ( unsigned n = 0; n < col_size_[jj]; ++n )
+    for ( size_t n = 0; n < col_size_[jj]; ++n )
     {
         os << "\n" << col[n].inx << " :";
         os << " " << col[n].val;
@@ -404,7 +404,7 @@ void MatrixSparseSymmetric2::vecMulAdd(const real* X, real* Y, size_t start, siz
             const real X0 = X[jj];
             assert_true( col_[jj][0].inx == jj );
             real Y0 = Y[jj] + col_[jj][0].val * X0;
-            for ( unsigned kk = 1 ; kk < col_size_[jj] ; ++kk )
+            for ( size_t kk = 1 ; kk < col_size_[jj] ; ++kk )
             {
                 const size_t ii = col_[jj][kk].inx;
                 const real a = col_[jj][kk].val;
@@ -431,7 +431,7 @@ void MatrixSparseSymmetric2::vecMulAddIso2D(const real* X, real* Y, size_t start
             assert_true( col_[jj][0].inx == jj );
             real Y0 = Y[Djj  ] + col_[jj][0].val * X0;
             real Y1 = Y[Djj+1] + col_[jj][0].val * X1;
-            for ( unsigned kk = 1 ; kk < col_size_[jj] ; ++kk )
+            for ( size_t kk = 1 ; kk < col_size_[jj] ; ++kk )
             {
                 const size_t Dii = 2 * col_[jj][kk].inx;
                 const real  a = col_[jj][kk].val;
@@ -464,7 +464,7 @@ void MatrixSparseSymmetric2::vecMulAddIso3D(const real* X, real* Y, size_t start
             real Y0 = Y[Djj  ] + col_[jj][0].val * X0;
             real Y1 = Y[Djj+1] + col_[jj][0].val * X1;
             real Y2 = Y[Djj+2] + col_[jj][0].val * X2;
-            for ( unsigned kk = 1 ; kk < col_size_[jj] ; ++kk )
+            for ( size_t kk = 1 ; kk < col_size_[jj] ; ++kk )
             {
                 const size_t Dii = 3 * col_[jj][kk].inx;
                 const real  a = col_[jj][kk].val;
@@ -539,7 +539,7 @@ void MatrixSparseSymmetric2::prepareForMultiply(int)
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         sa_[jj] = 0.0;
-        for ( unsigned cc = 0; cc < col_size_[jj]; ++cc )
+        for ( size_t cc = 0; cc < col_size_[jj]; ++cc )
         {
             if ( col_[jj][cc].inx == jj )
                 sa_[jj] = col_[jj][cc].val;

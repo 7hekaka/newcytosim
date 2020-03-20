@@ -26,7 +26,7 @@ void MatrixSparseSymmetric::allocate(size_t alc)
 
         //fprintf(stderr, "MSS allocate matrix %u\n", alc);
         Element ** col_new      = new Element*[alc];
-        unsigned * col_size_new = new unsigned[alc];
+        size_t   * col_size_new = new size_t[alc];
         size_t   * col_max_new  = new size_t[alc];
         
         size_t ii = 0;
@@ -162,7 +162,7 @@ real* MatrixSparseSymmetric::addr(size_t i, size_t j) const
     size_t ii = std::max(i, j);
     size_t jj = std::min(i, j);
 
-    for ( unsigned kk = 0; kk < col_size_[jj]; ++kk )
+    for ( size_t kk = 0; kk < col_size_[jj]; ++kk )
         if ( col_[jj][kk].inx == ii )
             return &( col_[jj][kk].val );
     
@@ -184,7 +184,7 @@ bool MatrixSparseSymmetric::isNotZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
             if ( col_[jj][kk].val != 0 )
                 return true;
     
@@ -196,7 +196,7 @@ bool MatrixSparseSymmetric::isNotZero() const
 void MatrixSparseSymmetric::scale(const real alpha)
 {
     for ( size_t jj = 0; jj < size_; ++jj )
-        for ( unsigned n = 0; n < col_size_[jj]; ++n )
+        for ( size_t n = 0; n < col_size_[jj]; ++n )
             col_[jj][n].val *= alpha;
 }
 
@@ -211,7 +211,7 @@ void MatrixSparseSymmetric::addTriangularBlock(real* mat, const size_t ldd,
     
     for ( size_t jj = si; jj < up; ++jj )
     {
-        for ( unsigned n = 0; n < col_size_[jj]; ++n )
+        for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             if ( si <= ii && ii < up )
@@ -235,7 +235,7 @@ void MatrixSparseSymmetric::addDiagonalBlock(real* mat, size_t ldd,
     
     for ( size_t jj = si; jj < up; ++jj )
     {
-        for ( unsigned n = 0; n < col_size_[jj]; ++n )
+        for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             if ( si <= ii && ii < up )
@@ -255,7 +255,7 @@ int MatrixSparseSymmetric::bad() const
     if ( size_ <= 0 ) return 1;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
             if ( col_[jj][kk].inx >= size_ ) return 2;
             if ( col_[jj][kk].inx <= jj )   return 3;
@@ -293,7 +293,7 @@ void MatrixSparseSymmetric::printSparse(std::ostream& os) const
     os.precision(8);
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        for ( unsigned n = 0 ; n < col_size_[jj] ; ++n )
+        for ( size_t n = 0 ; n < col_size_[jj] ; ++n )
         {
             os << col_[jj][n].inx << " " << jj << " ";
             os << col_[jj][n].val << "\n";
@@ -318,7 +318,7 @@ void MatrixSparseSymmetric::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = col_[jj];
     os << "MSS col " << jj << ":";
-    for ( unsigned n = 0; n < col_size_[jj]; ++n )
+    for ( size_t n = 0; n < col_size_[jj]; ++n )
     {
         os << "\n" << col[n].inx << " :";
         os << " " << col[n].val;
@@ -339,7 +339,7 @@ void MatrixSparseSymmetric::vecMulAdd(const real* X, real* Y) const
 {
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
             const size_t ii = col_[jj][kk].inx;
             const real a = col_[jj][kk].val;
@@ -356,7 +356,7 @@ void MatrixSparseSymmetric::vecMulAddIso2D(const real* X, real* Y) const
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         const size_t Djj = 2 * jj;
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
             const size_t Dii = 2 * col_[jj][kk].inx;
             const real  a = col_[jj][kk].val;
@@ -377,7 +377,7 @@ void MatrixSparseSymmetric::vecMulAddIso3D(const real* X, real* Y) const
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         const size_t Djj = 3 * jj;
-        for ( unsigned kk = 0 ; kk < col_size_[jj] ; ++kk )
+        for ( size_t kk = 0 ; kk < col_size_[jj] ; ++kk )
         {
             const size_t Dii = 3 * col_[jj][kk].inx;
             const real  a = col_[jj][kk].val;

@@ -47,7 +47,7 @@ private:
     Element ** column_;
     
     /// col_size_[c] is the number of Elements in column 'c'
-    unsigned * col_size_;
+    size_t   * col_size_;
     
     /// col_max_[c] is the number of Elements allocated in column 'c'
     size_t   * col_max_;
