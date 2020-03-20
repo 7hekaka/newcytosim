@@ -29,16 +29,21 @@
 /// 3x3 matrix class with 9 'real' elements
 class alignas(32) Matrix33
 {
+public:
+    
+    /// unsigned integer type used for indices
+    typedef size_t index;
+
 private:
     
     /// values of the elements
     real val[BLD*3];
 
     /// access to modifiable element by index
-    real& operator[](unsigned i)       { return val[i]; }
+    real& operator[](index i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](unsigned i) const { return val[i]; }
+    real  operator[](index i) const { return val[i]; }
     
 public:
     
@@ -47,7 +52,7 @@ public:
     /// copy constructor
     Matrix33(Matrix33 const& M)
     {
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] = M.val[u];
     }
 
@@ -98,13 +103,13 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] = 0.0;
     }
     
     bool operator != (real zero) const
     {
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -115,20 +120,20 @@ public:
 
     /// conversion to array of 'real'
     real* data() { return val; }
-    real* addr(const unsigned i, const unsigned j) { return val + ( i + BLD*j ); }
+    real* addr(const index i, const index j) { return val + ( i + BLD*j ); }
     
     /// access functions to element by line and column indices
-    real& operator()(const unsigned i, const unsigned j)       { return val[i+BLD*j]; }
-    real  operator()(const unsigned i, const unsigned j) const { return val[i+BLD*j]; }
+    real& operator()(const index i, const index j)       { return val[i+BLD*j]; }
+    real  operator()(const index i, const index j) const { return val[i+BLD*j]; }
     
     /// extract column vector at given index
-    Vector3 column(const unsigned i) const
+    Vector3 column(const index i) const
     {
         return Vector3(val+BLD*i);
     }
     
     /// extract line vector at given index
-    Vector3 line(const unsigned i) const
+    Vector3 line(const index i) const
     {
         return Vector3(val[i], val[BLD+i], val[BLD*2+i]);
     }
@@ -187,9 +192,9 @@ public:
         std::ostringstream os;
         os.precision(p);
         os << "[";
-        for ( unsigned i = 0; i < 3; ++i )
+        for ( index i = 0; i < 3; ++i )
         {
-            for ( unsigned j = 0; j < 3; ++j )
+            for ( index j = 0; j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
             if ( i < 2 )
                 os << ";";
@@ -212,7 +217,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] *= alpha;
     }
 
@@ -226,7 +231,7 @@ public:
     const Matrix33 operator -() const
     {
         Matrix33 M;
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -235,7 +240,7 @@ public:
     const Matrix33 operator *(const real alpha) const
     {
         Matrix33 res;
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -250,7 +255,7 @@ public:
     const Matrix33 operator +(Matrix33 const& M) const
     {
         Matrix33 res;
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -259,7 +264,7 @@ public:
     const Matrix33 operator -(Matrix33 const& M) const
     {
         Matrix33 res;
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -272,7 +277,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(M.val+4)));
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
 #else
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -285,7 +290,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(M.val+4)));
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
 #else
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -302,8 +307,8 @@ public:
     Matrix33 transposed() const
     {
         Matrix33 res;
-        for ( unsigned x = 0; x < 3; ++x )
-        for ( unsigned y = 0; y < 3; ++y )
+        for ( index x = 0; x < 3; ++x )
+        for ( index y = 0; y < 3; ++y )
             res[y+BLD*x] = val[x+BLD*y];
         return res;
     }
@@ -312,7 +317,7 @@ public:
     real norm_inf() const
     {
         real res = fabs(val[0]);
-        for ( unsigned i = 1; i < 3*BLD; ++i )
+        for ( index i = 1; i < 3*BLD; ++i )
             res = std::max(res, fabs(val[i]));
         return res;
     }
@@ -588,7 +593,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #else
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] += src[u];
 #endif
     }
@@ -603,7 +608,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -617,7 +622,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #else
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -658,7 +663,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] += src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -678,7 +683,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #elif ( 1 )
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -696,7 +701,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( unsigned u = 0; u < BLD*3; ++u )
+        for ( index u = 0; u < BLD*3; ++u )
             val[u] -= src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -975,7 +980,7 @@ public:
     static Matrix33 rotationAroundZ(real angle);
     
     /// a rotation around one the axis X if `x==0`, Y if `x==1` or Z if `x==2`
-    static Matrix33 rotationAroundPrincipalAxis(unsigned x, real angle);
+    static Matrix33 rotationAroundPrincipalAxis(index x, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix33 rotationToVector(const Vector3&);
@@ -1001,9 +1006,9 @@ inline std::ostream& operator << (std::ostream& os, Matrix33 const& mat)
     int w = (int)os.width();
     os.width(1);
     os << "[";
-    for ( unsigned i = 0; i < 3; ++i )
+    for ( Matrix33::index i = 0; i < 3; ++i )
     {
-        for ( unsigned j = 0; j < 3; ++j )
+        for ( Matrix33::index j = 0; j < 3; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
         if ( i < 2 )
             os << ";";

@@ -20,11 +20,16 @@
 /// 4x4 matrix class with 16 'real' elements
 class alignas(32) Matrix44
 {
+public:
+    
+    /// unsigned integer type used for indices
+    typedef size_t index;
+
     /// access to modifiable element by index
-    real& operator[](unsigned i)       { return val[i]; }
+    real& operator[](index i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](unsigned i) const { return val[i]; }
+    real  operator[](index i) const { return val[i]; }
 
 public:
 
@@ -36,7 +41,7 @@ public:
     /// copy constructor
     Matrix44(Matrix44 const& M)
     {
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] = M.val[u];
     }
     
@@ -96,14 +101,14 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] = 0.0;
     }
     
     /// true if any value is different from 'zero'
     bool operator != (real zero) const
     {
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -114,20 +119,20 @@ public:
 
     /// conversion to array of 'real'
     real* data() { return val; }
-    real* addr(const unsigned i, const unsigned j) { return val + ( i + 4*j ); }
+    real* addr(const index i, const index j) { return val + ( i + 4*j ); }
 
     /// access functions to element by line and column indices
-    real& operator()(const unsigned i, const unsigned j)       { return val[i+4*j]; }
-    real  operator()(const unsigned i, const unsigned j) const { return val[i+4*j]; }
+    real& operator()(const index i, const index j)       { return val[i+4*j]; }
+    real  operator()(const index i, const index j) const { return val[i+4*j]; }
     
     /// extract column vector at given index
-    Vector4 column(const unsigned i) const
+    Vector4 column(const index i) const
     {
         return Vector4(val+4*i);
     }
     
     /// extract line vector at given index
-    Vector4 line(const unsigned i) const
+    Vector4 line(const index i) const
     {
         return Vector4(val[i], val[4+i], val[8+i], val[12+i]);
     }
@@ -159,9 +164,9 @@ public:
         std::ostringstream os;
         os.precision(p);
         os << "[";
-        for ( unsigned i = 0; i < 4; ++i )
+        for ( index i = 0; i < 4; ++i )
         {
-            for ( unsigned j = 0; j < 4; ++j )
+            for ( index j = 0; j < 4; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
             if ( i < 2 )
                 os << ";";
@@ -174,7 +179,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] *= alpha;
     }
     
@@ -188,7 +193,7 @@ public:
     const Matrix44 operator -() const
     {
         Matrix44 M;
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -197,7 +202,7 @@ public:
     const Matrix44 operator *(const real alpha) const
     {
         Matrix44 M;
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             M.val[u] = val[u] * alpha;
         return M;
     }
@@ -212,7 +217,7 @@ public:
     const Matrix44 operator +(Matrix44 const& M) const
     {
         Matrix44 res;
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -226,7 +231,7 @@ public:
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
         store4(val+12, add4(load4(val+12), load4(M.val+12)));
 #else
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -240,7 +245,7 @@ public:
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
         store4(val+12, sub4(load4(val+12), load4(M.val+12)));
 #else
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -274,8 +279,8 @@ public:
         store4(res.val+8 , permute2f128(t0, t2, 0x31));
         store4(res.val+12, permute2f128(t1, t3, 0x31));
 #else
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = 0; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = 0; y < 4; ++y )
             res.val[y+4*x] = val[x+4*y];
 #endif
         return res;
@@ -285,7 +290,7 @@ public:
     real norm_inf() const
     {
         real res = fabs(val[0]);
-        for ( unsigned i = 1; i < 16; ++i )
+        for ( index i = 1; i < 16; ++i )
             res = std::max(res, fabs(val[i]));
         return res;
     }
@@ -451,7 +456,7 @@ public:
     void add_full(Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] += src[u];
     }
     
@@ -459,7 +464,7 @@ public:
     void add_full(const real alpha, Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] += alpha * src[u];
     }
     
@@ -467,7 +472,7 @@ public:
     void sub_full(Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] -= src[u];
     }
 
@@ -476,11 +481,11 @@ public:
     {
         real const* src = M.val;
 #if ( 1 )
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] += src[u];
 #else
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = x; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = x; y < 4; ++y )
             val[y+4*x] += src[y+4*x];
 #endif
     }
@@ -490,11 +495,11 @@ public:
     {
         real const* src = M.val;
 #if ( 1 )
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] += alpha * src[u];
 #else
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = x; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = x; y < 4; ++y )
             val[y+4*x] += alpha * src[y+4*x];
 #endif
     }
@@ -522,11 +527,11 @@ public:
     {
         real const* src = M.val;
 #if ( 1 )
-        for ( unsigned u = 0; u < 16; ++u )
+        for ( index u = 0; u < 16; ++u )
             val[u] -= src[u];
 #else
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = x; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = x; y < 4; ++y )
             val[y+4*x] -= src[y+4*x];
 #endif
     }
@@ -535,34 +540,34 @@ public:
     /// add all elements of block 'S' to array 'M'
     void addto(real * M, size_t ldd) const
     {
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = 0; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = 0; y < 4; ++y )
             M[y+ldd*x] = val[y+4*x];
     }
     
     /// add lower elements of this block to upper triangle of 'M'
     void addto_upper(real * M, size_t ldd) const
     {
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = x; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = x; y < 4; ++y )
             M[y+ldd*x] = val[y+4*x];
     }
     
     /// add all elements of this block to 'M', with transposition
     void addto_trans(real * M, size_t ldd) const
     {
-        for ( unsigned x = 0; x < 4; ++x )
-        for ( unsigned y = 0; y < 4; ++y )
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = 0; y < 4; ++y )
             M[x+ldd*y] = val[y+4*x];
     }
     
     /// add lower elements of this block to both upper and lower triangles of 'M'
     void addto_symm(real * M, size_t ldd) const
     {
-        for ( unsigned x = 0; x < 4; ++x )
+        for ( index x = 0; x < 4; ++x )
         {
             M[x+ldd*x] = val[x+4*x];
-            for ( unsigned y = x+1; y < 4; ++y )
+            for ( index y = x+1; y < 4; ++y )
             {
                 M[y+ldd*x] = val[y+4*x];
                 M[x+ldd*y] = val[y+4*x];
@@ -683,9 +688,9 @@ inline std::ostream& operator << (std::ostream& os, Matrix44 const& mat)
     int w = (int)os.width();
     os.width(1);
     os << "[";
-    for ( unsigned i = 0; i < 4; ++i )
+    for ( Matrix44::index i = 0; i < 4; ++i )
     {
-        for ( unsigned j = 0; j < 4; ++j )
+        for ( Matrix44::index j = 0; j < 4; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
         if ( i < 2 )
             os << ";";

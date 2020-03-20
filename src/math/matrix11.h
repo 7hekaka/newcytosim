@@ -15,15 +15,20 @@
  */
 class Matrix11
 {
+public:
+    
+    /// unsigned integer type used for indices
+    typedef size_t index;
+
 private:
     
     real val_;
     
     /// access to modifiable element by index
-    real& operator[](unsigned i)       { return val_; }
+    real& operator[](index i)       { return val_; }
     
     /// access element value by index
-    real  operator[](unsigned i) const { return val_; }
+    real  operator[](index i) const { return val_; }
 
 public:
     
@@ -73,20 +78,20 @@ public:
     
     /// conversion to array of 'real'
     real* data() { return &val_; }
-    real* addr(const unsigned i, const unsigned j) { return &val_; }
+    real* addr(const index i, const index j) { return &val_; }
     
     /// access functions to element by line and column indices
-    real& operator()(const unsigned i, const unsigned j)       { return val_; }
-    real  operator()(const unsigned i, const unsigned j) const { return val_; }
+    real& operator()(const index i, const index j)       { return val_; }
+    real  operator()(const index i, const index j) const { return val_; }
     
     /// extract column vector at given index
-    Vector1 column(const unsigned) const
+    Vector1 column(const index) const
     {
         return Vector1(val_);
     }
     
     /// extract line vector at given index
-    Vector1 line(const unsigned) const
+    Vector1 line(const index) const
     {
         return Vector1(val_);
     }
