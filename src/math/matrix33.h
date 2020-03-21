@@ -932,14 +932,15 @@ public:
     
     /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
     /**
-     Attention: this is a rotation only if norm(axis)==1 and `c*c + s*s == 1`
+     Attention: the result is a rotation only if `norm(axis)==1` and `c*c + s*s == 1`
      but the values of 'c' and 's' can be scaled to obtain a matrix where the
-     rotation components is also scaling. Vectors along the axis remain unchanged */
+     rotation components is also scaling. Vectors along the axis remain unchanged
+     */
     static Matrix33 rotationAroundAxis(const Vector3& axis, const real c, const real s)
     {
         /*
          This is using Rodrigues's formula:
-             I + sinus * K + ( 1 - cosinus ) * K^2
+             cosinus * I + sinus * K + ( 1 - cosinus ) * K^2
              K = -1 (x) axis
          */
         const real  X = axis.XX  ,  Y = axis.YY  ,  Z = axis.ZZ;

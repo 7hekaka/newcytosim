@@ -657,7 +657,12 @@ void Meca::addTorque(Interpolation const& pt1,
     const Vector v = CD * iV;
 
 #if ( DIM == 3 )
-    Vector axis = normalize(cross(AB,CD));
+    Vector axis = cross(AB, CD);
+    real n = axis.norm();
+    if ( n > REAL_EPSILON )
+        axis /= n;
+    else
+        axis = Vector::randU();
     const MatrixBlock R = MatrixBlock::rotationAroundAxis(axis, cosinus, sinus);
     //const MatrixBlock T = R.transposed();
     const MatrixBlock Id(0,1);  // identity matrix
@@ -831,9 +836,9 @@ void Meca::addTorque(Interpolation const& pt1,
 MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, real cosinus, real sinus)
 {
 #if ( DIM == 3 )
-    return -weight * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
+    return (-weight) * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
 #elif ( DIM == 2 )
-    return -weight * MatrixBlock(cosinus, axi*sinus, -axi*sinus, cosinus);
+    return (-weight) * MatrixBlock(cosinus, axi*sinus, -axi*sinus, cosinus);
 #else
     return MatrixBlock(-weight);  //should not be used!
 #endif
@@ -4590,9 +4595,9 @@ void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
     add_base(inxA, ab,-3*abn3);
     add_base(inxB, ab, 3*abn3);
     
-    for ( size_t ii = 0; ii < DIM; ++ii )
+    for ( unsigned ii = 0; ii < DIM; ++ii )
     {
-        for ( size_t jj = ii; jj < DIM; ++jj )
+        for ( unsigned jj = ii; jj < DIM; ++jj )
         {
             real m = abn5 * ( (ii==jj) - 3 * ab[ii] * ab[jj] );
             
