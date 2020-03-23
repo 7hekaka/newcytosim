@@ -128,7 +128,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
     ObjectList res(2);
     res.push_back(fib);
  
-    unsigned inp = 1;
+    size_t inp = 1;
     std::string spe, var = "attach1";
     
     if ( opt.has_key("attach") )

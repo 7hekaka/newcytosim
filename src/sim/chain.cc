@@ -133,9 +133,9 @@ void Chain::moveEnd(const FiberEnd ref)
  The MINUS_END and PLUS_END will be set to the first and last points in `pts[]`,
  and intermediate points will be interpolated at regular intervals on `pts[]`.
  
- The length of the resulting fiber will be roughly equal to the sum of all segment lengths.
- However, the length of the segments will only be approximately equal to each other,
- and reshape() should be called to equalize them if necessary.
+ The length of the resulting fiber will match the sum of given segment lengths,
+ and the segments will be approximately equal to each other.
+ Thus reshape() is called eventually to equalize the segments.
  */
 void Chain::setShape(const real pts[], size_t n_pts, size_t np)
 {
@@ -181,8 +181,8 @@ void Chain::setShape(const real pts[], size_t n_pts, size_t np)
     }
     b.load(pts+DIM*n_pts-DIM);
     setPoint(np, b);
-    updateFiber();
-    reshape();
+    //updateFiber();
+    //reshape();
 }
 
 /**

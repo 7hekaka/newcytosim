@@ -551,7 +551,9 @@ void FiberProp::complete(Simul const& sim)
         if ( fib->property() == this  &&  fib->segmentation() != segmentation )
         {
             fib->segmentation(segmentation);
+            fib->adjustSegmentation();
             fib->updateFiber();
+            fib->reshape();
         }
     }
 #endif

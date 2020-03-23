@@ -251,7 +251,7 @@ enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  */
 Isometry Interface::find_placement(Glossary& opt, int placement)
 {
-    int n = 0, nb_trials = 1<<13;
+    size_t n = 0, nb_trials = 1<<13;
     std::string str;
     
     opt.set(nb_trials, "nb_trials");

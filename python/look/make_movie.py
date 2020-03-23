@@ -3,7 +3,7 @@
 # make_movie.py:
 # create QuickTime and MPEG movies for cytosim
 #
-# Copyright F. Nedelec, 2007 - 2014
+# Copyright F. Nedelec, 2007 - 2020
 #
 # To make MP4 Quicktime movies, you need to install ffmpeg:
 # http://www.ffmpeg.org

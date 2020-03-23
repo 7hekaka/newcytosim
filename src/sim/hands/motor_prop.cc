@@ -44,12 +44,12 @@ void MotorProp::read(Glossary& glos)
     glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
     glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
 #ifdef BACKWARD_COMPATIBILITY
-    glos.set(unloaded_speed,  "max_speed");
+    glos.set(unloaded_speed, "max_speed");
 #endif
 #if NEW_VARIABLE_SPEED
     glos.set(variable_speed, "variable_speed");
 #endif
-    glos.set(limit_speed,     "limit_speed");
+    glos.set(limit_speed,    "limit_speed");
 #if NEW_UNBINDING_DENSITY
     glos.set(unbinding_density, "unbinding_density");
 #endif
