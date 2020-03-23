@@ -839,7 +839,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         }
 
         hold();
-        //fprintf(stderr, "> step %6i\n", sss);
+        //fprintf(stderr, "> step %6zu\n", sss);
         (simul.*solveFunc)();
         simul.step();
         
@@ -866,7 +866,7 @@ void Interface::execute_run(size_t nb_steps)
     for ( size_t sss = 0; sss < nb_steps; ++sss )
     {
         hold();
-        //fprintf(stderr, "> step %6i\n", sss);
+        //fprintf(stderr, "> step %6zu\n", sss);
         simul.solve();
         simul.step();
     }

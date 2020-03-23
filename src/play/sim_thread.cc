@@ -127,7 +127,7 @@ void* run_launcher(void * arg)
 
 /**
  This attempts to start the live simulation by
- calling run() in the slave thread
+ calling `run()` in a slave thread
  */
 void SimThread::start()
 {
@@ -175,7 +175,7 @@ void* extend_launcher(void * arg)
 }
 
 
-/// call extend_code() in the slave thread
+/// call `extend_run()` in a slave thread
 int SimThread::extend()
 {
     assert_false( isChild() );

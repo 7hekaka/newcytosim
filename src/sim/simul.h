@@ -343,7 +343,10 @@ public:
     //----------------------------- REPORTING ----------------------------------
 
     /// call `Simul::report0`, adding lines before and after with 'start' and 'end' tags.
-    void      report(std::ostream&, std::string, Glossary&) const;
+    void      report(std::ostream&, std::string const&, Glossary&) const;
+    
+    /// call one of the report function
+    void      report1(std::ostream&, std::string, Glossary&) const;
     
     /// call one of the report function
     void      report0(std::ostream&, std::string const&, Glossary&) const;

@@ -61,14 +61,10 @@ void remove_plural(std::string & str)
 
 /** 
  @copydetails Simul::report0
- This can report multiple data, separated by ';', for example:
- 
-     report fiber:force;fiber:length
- 
  */
-void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
+void Simul::report(std::ostream& out, std::string const& arg, Glossary& opt) const
 {
-    int p = 4;
+    std::streamsize p = 4;
     opt.set(p, "precision");
     out.precision(p);
     opt.set(column_width, "column") || opt.set(column_width, "width");
@@ -76,7 +72,22 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
     //out << "\n% start   " << prop->time; // historical
     out << "\n% time " << std::fixed << std::setprecision(3) << prop->time;
     out << "\n% report " << arg;
+    report1(out, arg, opt);
+    out << "\n% end\n";
+}
+
+
+/**
+ calls Simul::report0 multiple times, if `arg` contains multiple instructions,
+ separated by ';', for example:
+ 
+     report fiber:force;fiber:length
+ 
+ */
+void Simul::report1(std::ostream& out, std::string arg, Glossary& opt) const
+{
     try {
+        // process every string in 'arg'
         std::string::size_type pos = arg.find(';');
         while ( pos != std::string::npos )
         {
@@ -85,12 +96,10 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
             pos = arg.find(';');
         }
         report0(out, arg, opt);
-        out << "\n% end\n";
     }
     catch( Exception & e )
     {
-        out << "\n% error: " << e.what();
-        out << "\n% end\n";
+        out << "\nError, " << e.what() << '\n';
         throw;
     }
 }
@@ -373,7 +382,7 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
         return reportCustom(out);
 
     if ( !who.empty() )
-        throw InvalidSyntax("Unknown requested report `"+arg+"'");
+        throw InvalidSyntax("unknown requested report `"+arg+"'");
 }
 
 //------------------------------------------------------------------------------
@@ -698,8 +707,11 @@ void Simul::reportFiber(std::ostream& out) const
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
-        out << COM << "fiber class " + std::to_string(fp->number()) + " is " + fp->name();
-        reportFiber(out, fp);
+        if ( fibers.count(match_property, fp) > 0 )
+        {
+            out << COM << "fiber class " + std::to_string(fp->number()) + " is " + fp->name();
+            reportFiber(out, fp);
+        }
     }
 }
 
