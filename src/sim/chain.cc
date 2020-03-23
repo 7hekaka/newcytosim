@@ -1785,12 +1785,16 @@ Mecapoint Chain::exactEnd(const FiberEnd end) const
 
 Interpolation Chain::interpolateEnd(const FiberEnd end) const
 {
-    if ( end == MINUS_END )
-        return interpolateEndM();
-    else
+    switch( end )
     {
-        assert_true( end == PLUS_END );
-        return interpolateEndP();
+        case MINUS_END:
+            return Interpolation(this,0, 1, 0);
+        case PLUS_END:
+            return Interpolation(this, nPoints-2, nPoints-1, 1);
+        case CENTER:
+            return interpolateCenter();
+        default:
+            throw Exception("unexpected argument");
     }
 }
 
@@ -1798,10 +1802,7 @@ Interpolation Chain::interpolateEnd(const FiberEnd end) const
 Interpolation Chain::interpolateCenter() const
 {
     size_t n = lastPoint() / 2;
-    if ( 2*n == lastPoint() )
-        return Interpolation(this, n, n+1, 0);
-    else
-        return Interpolation(this, n, n+1, 0.5);
+    return Interpolation(this, n, n+1, 0.5 * ( lastPoint() - 2*n ));
 }
 
 

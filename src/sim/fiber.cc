@@ -903,8 +903,27 @@ void Fiber::setInteractions(Meca& meca) const
         }
     }
 #endif
-    
-    
+#if NEW_END_FORCE
+    switch( prop->end_force )
+    {
+        case MINUS_END:
+            meca.addForce(Mecapoint(this, 0), prop->end_force_vec);
+            break;
+        case PLUS_END:
+            meca.addForce(Mecapoint(this, lastPoint()), prop->end_force_vec);
+            break;
+        case CENTER:
+            meca.addForce(interpolateCenter(), prop->end_force_vec);
+            break;
+        case BOTH_ENDS:
+            meca.addForce(Mecapoint(this, 0), prop->end_force_vec);
+            meca.addForce(Mecapoint(this, lastPoint()), prop->end_force_vec);
+            meca.addForce(interpolateCenter(), -2.0 * prop->end_force_vec);
+        default:
+        break;
+    }
+#endif
+
 #if NEW_COLINEAR_FORCE
     /*
      Add a length-dependent force acting parallel to the filament.

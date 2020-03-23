@@ -322,6 +322,11 @@ void FiberProp::clear()
     squeeze_force       = 0;
     squeeze_range       = 1;
 #endif
+#if NEW_END_FORCE
+    end_force   = NO_END;
+    end_force_vec.set(0,0,0);
+#endif
+
 }
 
 //------------------------------------------------------------------------------
@@ -423,7 +428,12 @@ void FiberProp::read(Glossary& glos)
     glos.set(squeeze_force,     "squeeze", 1);
     glos.set(squeeze_range,     "squeeze", 2);
 #endif
-    
+#if NEW_END_FORCE
+   glos.set(end_force,          "end_force", {{"plus_end", PLUS_END},
+       {"minus_end", MINUS_END}, {"center", CENTER}, {"torque", BOTH_ENDS}});
+   glos.set(end_force_vec,      "end_force", 1);
+#endif
+
     glos.set(steric,            "steric");
     glos.set(steric_radius,     "steric", 1);
     glos.set(steric_range,      "steric", 2);
@@ -609,6 +619,9 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "surface_effect",      surface_effect, cylinder_height);
 #if OLD_SQUEEZE_FORCE
     write_value(os, "squeeze",             squeeze, squeeze_force, squeeze_range);
+#endif
+#if NEW_END_FORCE
+    write_value(os, "end_force",           end_force, end_force_vec);
 #endif
     write_value(os, "binding_key",         binding_key);
     write_value(os, "lattice",             lattice, lattice_unit);

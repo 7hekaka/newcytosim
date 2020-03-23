@@ -4,6 +4,7 @@
 #define FIBER_PROP
 
 #include "real.h"
+#include "vector.h"
 #include "property.h"
 #include "common.h"
 #include "sim.h"
@@ -23,6 +24,7 @@ class Space;
 #define NEW_FIBER_CONFINE2      0
 #define NEW_FIBER_CONFINE_RANGE 0
 #define NEW_FIBER_LOOP          0
+#define NEW_END_FORCE           0
 
 /// Property for a Fiber
 /**
@@ -318,6 +320,13 @@ public:
     real squeeze_force;
     /// range below which squeezing is linear (set as \c squeeze[2])
     real squeeze_range;
+#endif
+    
+#if NEW_END_FORCE
+    /// the fiber end to which a force is added
+    FiberEnd  end_force;
+    /// the force added to the end specified by `end_force` (known as end_force[1])
+    Vector end_force_vec;
 #endif
     
 #if NEW_FIBER_LOOP
