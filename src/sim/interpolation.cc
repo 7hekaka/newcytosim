@@ -10,7 +10,7 @@ Interpolation::Interpolation(FiberSegment const& loc, real abs)
     mec_  = loc.fiber();
     pt1_  = loc.point();
     pt2_  = loc.point()+1;
-    coef_ = abs / loc.len();
+    coef_ = abs * loc.lenInv(); /// loc.len();
     assert_true( 0 <= coef_ && coef_ <= 1 );
 }
 
