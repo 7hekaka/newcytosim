@@ -58,13 +58,13 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
 void PointGrid::createCells()
 {
     pGrid.createCells();
-
+    
     //Create side regions suitable for pairwise interactions:
     pGrid.createSideRegions(1);
-
+    
     //The maximum allowed diameter of particles is half the minimum cell width
     max_diameter = pGrid.minimumWidth(1);
-
+    
     //report the grid size used
     if ( pGrid.nbCells() > 4096 )
         pGrid.printSummary(std::clog, "StericGrid");
@@ -83,8 +83,8 @@ void PointGrid::createCells()
 void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
-        throw InvalidParameter("point:steric is out of range");
-
+        throw InvalidParameter("point:steric is out-of-range");
+    
     Vector w = pe.pos();
     point_list(w, pan).new_val().set(pe, rd, rg, w);
     
@@ -104,8 +104,8 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 {
     if ( pan == 0 || pan > NB_STERIC_PANES )
-        throw InvalidParameter("line:steric is out of range");
-
+        throw InvalidParameter("line:steric is out-of-range");
+    
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
     locus_list(w, pan).new_val().set(fl, rd, rg);
@@ -216,7 +216,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
                     real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
                     meca.addLongLink(aa.pnt, bb.seg.exact1(), len, stiff);
                 }
-           }
+            }
         }
     }
 }
@@ -238,7 +238,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg.projectPoint0(bb.seg.pos1(), dis2);
     
-    if (  0 <= abs  &&  dis2 < ran*ran  &&  abs <= aa.seg.len() )
+    if ( 0 <= abs  &  abs <= aa.seg.len()  &  dis2 < ran*ran )
     {
         /*
          bb.point1() projects inside segment 'aa'
@@ -309,7 +309,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg.projectPoint0(bb.seg.pos2(), dis2);
     
-    if ( 0 <= abs  &&  dis2 < ran*ran  &&  abs <= aa.seg.len() )
+    if ( 0 <= abs  &  dis2 < ran*ran  &  abs <= aa.seg.len() )
     {
         /*
          bb.point2() projects inside segment 'aa'
@@ -382,16 +382,16 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     
     if ( aa.isLast() )
         checkLL2(meca, pam, bb, aa);
-        
+    
     checkLL1(meca, pam, bb, aa);
-      
+    
     if ( bb.isLast() )
         checkLL2(meca, pam, aa, bb);
-  
+    
 #if ( DIM == 3 )
     
     const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
-
+    
     /* in 3D, we use shortestDistance() to calculate the closest distance
      between two segments, and use the result to build an interaction */
     real a, b;
@@ -461,7 +461,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             checkPL(meca, pam, *jj, *ii);
         
         for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
-            if ( !adjacent(ii->seg, jj->seg) )
+            if ( !adjacent(ii->seg, kk->seg) )
                 checkLL(meca, pam, *ii, *kk);
     }
 }
@@ -472,12 +472,12 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 /**
  Check interactions between objects contained in the grid.
  */
-void  PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
+void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
 {
     assert_true(pam.stiff_push >= 0);
     assert_true(pam.stiff_pull >= 0);
     //std::clog << "----" << std::endl;
-
+    
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -508,7 +508,7 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
 /**
  Check interactions between the FatPoints contained in Pane `pan`.
  */
-void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
+void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
                                  const size_t pan) const
 {
     assert_true(pam.stiff_push >= 0);
@@ -527,7 +527,7 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         FatLocusList & baseL = locus_list(inx, pan);
         
         setInteractions(meca, pam, baseP, baseL);
-
+        
         for ( int reg = 1; reg < nr; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan);
@@ -543,7 +543,7 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
  Check interactions between the FatPoints contained in Panes `pan1` and `pan2`,
  where ( pan1 != pan2 )
  */
-void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
+void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
                                  const size_t pan1, const size_t pan2) const
 {
     assert_true(pam.stiff_push >= 0);
@@ -556,17 +556,17 @@ void  PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         int * region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
-
+        
         // We consider each pair of objects (ii, jj) only once:
         
         FatPointList & baseP = point_list(inx, pan1);
         FatLocusList & baseL = locus_list(inx, pan1);
-
+        
         for ( int reg = 0; reg < nr; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan2);
             FatLocusList & sideL = locus_list(inx+region[reg], pan2);
-
+            
             setInteractions(meca, pam, baseP, baseL, sideP, sideL);
         }
         
