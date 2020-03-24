@@ -90,8 +90,8 @@ inline void Meca::add_block(size_t i, size_t j, MatrixBlock const& T)
     mB(i,j) += T.value();
 #else
     assert_true( i > j );
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = 0; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = 0; y < DIM; ++y )
         mC(i+y, j+x) += T(y,x);
 #endif
 }
@@ -108,8 +108,8 @@ inline void Meca::add_block(size_t i, size_t j, real alpha, MatrixBlock const& T
     mB(i,j) += alpha * T.value();
 #else
     assert_true( i > j );
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = 0; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = 0; y < DIM; ++y )
         mC(i+y, j+x) += alpha * T(y,x);
 #endif
 }
@@ -126,8 +126,8 @@ inline void Meca::sub_block(size_t i, size_t j, MatrixBlock const& T)
     mB(i,j) -= T.value();
 #else
     assert_true( i > j );
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = 0; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = 0; y < DIM; ++y )
         mC(i+y, j+x) -= T(y,x);
 #endif
 }
@@ -143,8 +143,8 @@ inline void Meca::add_block_diag(size_t i, MatrixBlock const& T)
     mB(i,i) += T.value();
 #else
     // add lower part of block
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = x; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = x; y < DIM; ++y )
         mC(i+y, i+x) += T(y,x);
 #endif
 }
@@ -160,8 +160,8 @@ inline void Meca::add_block_diag(size_t i, real alpha, MatrixBlock const& T)
     mB(i,i) += alpha * T.value();
 #else
     // add lower part of block
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = x; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = x; y < DIM; ++y )
         mC(i+y, i+x) += alpha * T(y,x);
 #endif
 }
@@ -177,8 +177,8 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
     mB(i,i) -= T.value();
 #else
     // add lower part of block
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = x; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = x; y < DIM; ++y )
         mC(i+y, i+x) -= T(y,x);
 #endif
 }
