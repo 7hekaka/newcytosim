@@ -2457,6 +2457,43 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 #endif
 }
 
+ 
+ 
+/**
+ Debug code to compare interactions in conditions where they should be identical
+ you should run this and call 'opendiff x y'
+*/
+void Meca::testSideLink(Interpolation const& ptA,
+                        Mecapoint const& ptB,
+                        Torque const& arm,
+                        const real weight)
+{
+    mC.reset();
+    addSideLink3D(ptA, ptB, arm, weight);
+    
+    {
+        std::ofstream o("x");
+        o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex() << "\n";
+        mC.printSparse(o, REAL_EPSILON);
+        o.close();
+    }
+    
+    mC.reset();
+    size_t P = ptB.point();
+    if ( P > 0 )
+        addSideLink3D(ptA, Interpolation(ptB.mecable(), P-1, P, 1), arm, weight);
+    else
+        addSideLink3D(ptA, Interpolation(ptB.mecable(), P, P+1, 0), arm, weight);
+    
+    {
+        std::ofstream o("y");
+        o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex() << "\n";
+        mC.printSparse(o, REAL_EPSILON);
+        o.close();
+    }
+}
+
+
 
 /**
  Link `ptA` (A) and `ptB` (B),
@@ -2821,20 +2858,7 @@ void Meca::addSideSideLink(Interpolation const& ptA,
     real armA = std::copysign(0.5*len, cross(ptA.diff(), dir));
     real armB = std::copysign(0.5*len, cross(dir, ptB.diff()));
     addSideSideLink2D(ptA, ptB, armA, armB, weight);
-    /*
-     //Debug code to be used with 'opendiff x y'
-     std::ofstream x("x"), y("y");
-     
-     mC.reset();
-     addSideSideLink2D(ptA, ptB, armA, armB, weight);
-     mC.printSparse(x);
-     x.close();
-     
-     mC.reset();
-     addSideSideLink2Dalt(ptA, ptB, armA, armB, weight);
-     mC.printSparse(y);
-     y.close();
-    */
+
 #else
     
     Vector dir = ptB.pos() - ptA.pos();
