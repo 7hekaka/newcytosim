@@ -389,7 +389,7 @@ std::string MatrixSparseSymmetricBlock::what() const
 }
 
 
-void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
+void MatrixSparseSymmetricBlock::printSparse(std::ostream& os, real inf) const
 {
     char str[256];
     std::streamsize p = os.precision();
@@ -406,11 +406,11 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os) const
             size_t ii = col.inx_[n];
             SquareBlock blk = col.blk_[n];
             size_t d = ( ii == jj );
-            for ( size_t x = 0  ; x < BLOCK_SIZE; ++x )
-            for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
+            for ( size_t y = 0  ; y < BLOCK_SIZE; ++y )
+            for ( size_t x = y*d; x < BLOCK_SIZE; ++x )
             {
                 real v = blk(y, x);
-                if ( v != 0 )
+                if ( std::abs(v) >= inf )
                 {
                     snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, blk(y, x));
                     os << str;

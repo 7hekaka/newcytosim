@@ -125,7 +125,7 @@ public:
     real norm_inf() const;
     
     /// printf debug function in sparse mode: i, j : value
-    void printSparse(std::ostream&) const;
+    void printSparse(std::ostream&, real) const;
     
     /// returns a string which a description of the type of matrix
     std::string what() const;

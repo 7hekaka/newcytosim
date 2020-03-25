@@ -430,7 +430,7 @@ std::string MatrixSparseSymmetric1::what() const
 }
 
 
-void MatrixSparseSymmetric1::printSparse(std::ostream& os) const
+void MatrixSparseSymmetric1::printSparse(std::ostream& os, real inf) const
 {
     char str[256];
     for ( size_t jj = 0; jj < size_; ++jj )
@@ -440,7 +440,7 @@ void MatrixSparseSymmetric1::printSparse(std::ostream& os) const
         for ( size_t n = 0 ; n < col_size_[jj] ; ++n )
         {
             real v = column_[jj][n].val;
-            if ( v != 0 )
+            if ( std::abs(v) >= inf )
             {
                 snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", column_[jj][n].inx, jj, v);
                 os << str;

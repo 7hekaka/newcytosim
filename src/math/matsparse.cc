@@ -249,7 +249,7 @@ int MatrixSparse::bad() const
 }
 
 
-void MatrixSparse::printSparse(std::ostream& os) const
+void MatrixSparse::printSparse(std::ostream& os, real) const
 {
     os.precision(8);
     for ( size_t jj = 0; jj < size_; ++jj )

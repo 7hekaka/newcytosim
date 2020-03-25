@@ -115,7 +115,7 @@ void Matrix::printFull(std::ostream& os) const
     }
 }
 
-void Matrix::printSparse(std::ostream& os) const
+void Matrix::printSparse(std::ostream& os, real) const
 {
     char str[256];
     const size_t Z = size();

@@ -287,7 +287,7 @@ std::string MatrixSparseSymmetric::what() const
 }
 
 
-void MatrixSparseSymmetric::printSparse(std::ostream& os) const
+void MatrixSparseSymmetric::printSparse(std::ostream& os, real) const
 {
     std::streamsize p = os.precision();
     os.precision(8);

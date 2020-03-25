@@ -108,7 +108,7 @@ public:
     virtual std::string what() const = 0;
     
     /// printf debug function in sparse mode: i, j : value
-    virtual void printSparse(std::ostream&) const;
+    virtual void printSparse(std::ostream&, real) const;
     
     /// printf debug function in full lines, all columns
     virtual void printFull(std::ostream&) const;

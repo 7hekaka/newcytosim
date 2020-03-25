@@ -245,7 +245,7 @@ public:
     std::string what() const;
     
     /// printf debug function in sparse mode: i, j : value
-    void printSparse(std::ostream&) const;
+    void printSparse(std::ostream&, real) const;
 
     /// print size of columns
     void printColumns(std::ostream&);

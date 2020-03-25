@@ -229,7 +229,7 @@ real MatrixOfBlocks::norm_inf() const
 
 //------------------------------------------------------------------------------
 /// printf debug function in sparse mode: i, j : value
-void MatrixOfBlocks::printSparse(std::ostream& os) const
+void MatrixOfBlocks::printSparse(std::ostream& os, real) const
 {
     size_t offset=0;
     os.precision(8);

@@ -2126,12 +2126,12 @@ void Meca::dumpSparse()
     
 #if USE_ISO_MATRIX
     os.open("d_matB.txt");
-    mB.printSparse(os);
+    mB.printSparse(os, 0);
     os.close();
 #endif
     
     os.open("d_matC.txt");
-    mC.printSparse(os);
+    mC.printSparse(os, 0);
     os.close();
         
     size_t alc = 0;

@@ -431,8 +431,8 @@ void testMatrices(const size_t size, const size_t fill)
 #if ( 0 )
     std::ofstream os1("mat1.txt");
     std::ofstream os3("mat3.txt");
-    mat1.printSparse(os1);
-    mat3.printSparse(os3);
+    mat1.printSparse(os1, 0);
+    mat3.printSparse(os3, 0);
 #endif
     
     free_real(x);

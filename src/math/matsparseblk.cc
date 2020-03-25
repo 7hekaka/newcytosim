@@ -312,7 +312,7 @@ std::string MatrixSparseBlock::what() const
 }
 
 
-void MatrixSparseBlock::printSparse(std::ostream& os) const
+void MatrixSparseBlock::printSparse(std::ostream& os, real inf) const
 {
     char str[256];
     std::streamsize p = os.precision();
@@ -333,7 +333,7 @@ void MatrixSparseBlock::printSparse(std::ostream& os) const
             for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
             {
                 real v = blk(y, x);
-                if ( v != 0 )
+                if ( std::abs(v) >= inf )
                 {
                     snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, blk(y, x));
                     os << str;
