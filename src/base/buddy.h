@@ -116,7 +116,7 @@ public:
     {
     }
     
-    /// call `handshake(buddy)` for all buddies
+    /// call `handshake(this)` for all buddies
     void handshake()
     {
         for ( Buddy * b : buddies_ )
