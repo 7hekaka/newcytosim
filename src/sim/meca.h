@@ -348,6 +348,9 @@ public:
 
     /// this has been replaced by interTorque()
     void addTorquePoliti(Interpolation const&, Interpolation const&, real cosinus, real sinus, real weight);
+    
+    /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
+    void addTorque(Interpolation const&, Interpolation const&, MatrixBlock const&, real weight);
 
     /// Add a torque to constrain two segments to an angle defined by (sinus, cosinus)
     void addTorque(Interpolation const&, Interpolation const&, real cosinus, real sinus, real weight);
@@ -500,6 +503,9 @@ public:
     
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void addSideLink(Interpolation const&, Interpolation const&, real len, real weight);
+    
+    /// Link of stiffness `weight`, at distance `arm` on the side of first segment
+    void testSideLink(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
 
 #if ( DIM == 2 )
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
