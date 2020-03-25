@@ -60,7 +60,7 @@ private:
     Vector      tension_forces() const;
     
     /// Gives the i-th eigenvector of the ellipsoid
-    Vector      director(unsigned i) const;
+    Vector      director(size_t i) const;
     
     /// Surface area of an ellipse of given axis length
     static real surfaceEllipse(Vector const&);

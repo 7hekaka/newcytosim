@@ -66,7 +66,7 @@ private:
     void makePixelmaps(GLfloat, unsigned supersampling);
     
     /// draw pixel map
-    void drawPixelmap(unsigned ii) const;
+    void drawPixelmap(size_t) const;
     
     /// save pixelmap to file
     void savePixelmap(GLubyte*, unsigned dim, GLuint) const;

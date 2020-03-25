@@ -324,7 +324,7 @@ void PointDisp::savePixelmap(GLubyte* bitmap, unsigned dim, unsigned id) const
 #endif
 
 
-void PointDisp::drawPixelmap(unsigned ii) const
+void PointDisp::drawPixelmap(size_t ii) const
 {
     //translate to center the bitmap:
     glBitmap(0,0,0,0,mOffs,mOffs,nullptr);
@@ -439,7 +439,7 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
 void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
 {
     realSize    = size * sf;
-    unsigned sz = (unsigned)ceil(uf*(size+width));
+    size_t   sz = (size_t)ceil(uf*(size+width));
     // use a multiple of 4 pixels:
     pixSize     = ( sz + 4 ) & ~3;
     perceptible = visible && ( uf*(size+width) > 0.25 );

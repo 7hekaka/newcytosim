@@ -23,10 +23,10 @@ typedef unsigned char byte;
 typedef std::vector<byte> Message;
 
 /// debug mode
-unsigned mode = 0;
+size_t mode = 0;
 
 /// which scenario is running [0 ... 8]
-unsigned config = 0;
+size_t config = 0;
 
 /// child process id:
 pid_t child = 0;
@@ -115,14 +115,14 @@ void start(const char* path, char *const args[])
 
 
 /// start cytosim child process with a pipe
-void start(unsigned conf)
+void start(size_t conf)
 {
     char path[LEN] = { 0 };
     char mem[5*LEN] = { 0 };
     char* args[5] = { mem, mem+LEN, mem+2*LEN, mem+3*LEN, mem+4*LEN };
     
-    snprintf(args[0], LEN, "play%i", conf);
-    snprintf(args[1], LEN, "config%i.cym", conf);
+    snprintf(args[0], LEN, "play%lu", conf);
+    snprintf(args[1], LEN, "config%lu.cym", conf);
     snprintf(args[2], LEN, "live");
     snprintf(args[3], LEN, "fullscreen=1");
     args[4] = nullptr;
@@ -139,7 +139,7 @@ void start(unsigned conf)
 
 
 /// stop and start new process
-void restart(unsigned arg)
+void restart(size_t arg)
 {
     stop(0);
     start(arg);
@@ -384,11 +384,11 @@ void scanPorts(RtMidiIn& midi)
         printf("No MIDI port detected!\n");
     else
     {
-        printf("%u MIDI ports detected:\n", np);
+        printf("%lu MIDI ports detected:\n", np);
         for ( size_t p = 0; p < np; ++p )
         {
             midi.openPort(p);
-            printf("   port %u is `%s'\n", p, midi.getPortName().c_str());
+            printf("   port %lu is `%s'\n", p, midi.getPortName().c_str());
             midi.closePort();
         }
     }
@@ -451,7 +451,7 @@ int main( int argc, char *argv[] )
     printf("Cytomaster is listening to `%s'... please, terminate with Ctrl-C\n", midi.getPortName().c_str());
     
     if ( 2 < argc )
-        mode = (unsigned)atoi(argv[2]);
+        mode = (size_t)atoi(argv[2]);
     
     goLive(midi, nova);
     

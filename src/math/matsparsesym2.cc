@@ -98,14 +98,14 @@ void MatrixSparseSymmetric2::deallocate()
 
 
 /// copy `cnt` elements from `src` to `dst`
-void copy(unsigned cnt, MatrixSparseSymmetric2::Element * src, MatrixSparseSymmetric2::Element * dst)
+void copy(size_t cnt, MatrixSparseSymmetric2::Element * src, MatrixSparseSymmetric2::Element * dst)
 {
     for ( size_t ii = 0; ii < cnt; ++ii )
         dst[ii] = src[ii];
 }
 
 /// move `cnt` elements to next index, starting at vec[0]
-void shift(unsigned cnt, MatrixSparseSymmetric2::Element * vec)
+void shift(size_t cnt, MatrixSparseSymmetric2::Element * vec)
 {
     for ( size_t ii = cnt; ii > 0; --ii )
         vec[ii] = vec[ii-1];

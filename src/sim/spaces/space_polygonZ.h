@@ -69,7 +69,7 @@ public:
     void        setInteractions(Meca&) const;
 
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
-    real        estimateVolumeZ(unsigned long cnt) const;
+    real        estimateVolumeZ(size_t cnt) const;
 
     /// OpenGL display function
     void        drawZ(bool show_rings) const;

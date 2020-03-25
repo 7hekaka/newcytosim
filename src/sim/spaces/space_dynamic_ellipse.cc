@@ -340,7 +340,7 @@ void SpaceDynamicEllipse::resize(Glossary& opt)
 //-------------------------------------------------------------
 
 
-Vector SpaceDynamicEllipse::director(unsigned ix) const
+Vector SpaceDynamicEllipse::director(size_t ix) const
 {
     assert_true(ix < DIM);
     return mat.column(ix);

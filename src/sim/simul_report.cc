@@ -19,9 +19,9 @@ int column_width = 10;
 #include "accumulator.h"
 
 /// pad string by adding white-space on the right up to size 'n * column_width - p'
-std::string ljust(std::string const& str, unsigned n, unsigned p = 0)
+std::string ljust(std::string const& str, size_t n, size_t p = 0)
 {
-    size_t s = n * (unsigned)column_width - p;
+    size_t s = n * (size_t)column_width - p;
     if ( str.size() < s )
         return str + std::string(s-str.size(), ' ');
     else
@@ -29,9 +29,9 @@ std::string ljust(std::string const& str, unsigned n, unsigned p = 0)
 }
 
 /// pad string by adding white-space on the left up to size 'n * column_width - p'
-std::string rjust(std::string const& str, unsigned n, unsigned p = 1)
+std::string rjust(std::string const& str, size_t n, size_t p = 1)
 {
-    size_t s = n * (unsigned)column_width - p;
+    size_t s = n * (size_t)column_width - p;
     if ( str.size() < s )
         return std::string(s-str.size(), ' ') + str;
     else
@@ -869,7 +869,7 @@ void Simul::reportFiberDisplacement(std::ostream& out) const
     out << COM << "delta_time nb_fibers mean_squared_displacement";
     
     real sum = 0;
-    unsigned cnt = 0;
+    size_t cnt = 0;
     for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
     {
         Vector pos = fib->posEndM();

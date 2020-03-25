@@ -51,7 +51,7 @@ SpacePolygonZ::~SpacePolygonZ()
  but taking into account that the volume is axisymmetric.
  The result should be more precise than Space::estimateVolume()
  */
-real SpacePolygonZ::estimateVolumeZ(unsigned long cnt) const
+real SpacePolygonZ::estimateVolumeZ(size_t cnt) const
 {
     real box[4];
     poly_.find_extremes(box);

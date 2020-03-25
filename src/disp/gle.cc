@@ -932,7 +932,7 @@ namespace gle
     void initializeIcoBuffers() { }
 
     /// using trigonometric functions to draw a ball of radius 1
-    void gleSphereF(unsigned inc)
+    void gleSphereF(size_t inc)
     {
         for ( size_t n = 0; n < ncircle/2; n += inc )
         {

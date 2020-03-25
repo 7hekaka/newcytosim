@@ -111,13 +111,13 @@ public:
     {
     }
     
-    /// this is called for all buddies by handshake
+    /// this is called for all buddies by `handshake()`
     virtual void handshake(Buddy *)
     {
     }
     
     /// call `handshake(buddy)` for all buddies
-    virtual void handshake()
+    void handshake()
     {
         for ( Buddy * b : buddies_ )
             b->handshake(this);
@@ -133,7 +133,7 @@ public:
         }
     }
     
-    /// will close the association, without calling goodbye()
+    /// remove `this` and `guy` from each other lists, without calling goodbye()
     void disconnect(Buddy * guy)
     {
         if ( guy )
@@ -151,7 +151,7 @@ public:
     
     
     /// return buddy at index `ix`
-    Buddy * buddy(unsigned ix) const
+    Buddy * buddy(size_t ix) const
     {
         if ( ix < buddies_.size() )
             return buddies_[ix];
