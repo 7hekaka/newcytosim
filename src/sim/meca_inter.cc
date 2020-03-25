@@ -641,11 +641,10 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
 #if ( DIM > 1 )
 void Meca::addTorque(Interpolation const& pt1,
                      Interpolation const& pt2,
-                     const real cosinus, const real sinus,
+                     MatrixBlock const& R,
                      const real weight)
 {
     assert_true( weight >= 0 );
-    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
 
     const Vector AB = pt1.diff();
     const Vector CD = pt2.diff();
@@ -656,21 +655,7 @@ void Meca::addTorque(Interpolation const& pt1,
     const Vector u = AB * iU;
     const Vector v = CD * iV;
 
-#if ( DIM == 3 )
-    Vector axis = cross(AB, CD);
-    real n = axis.norm();
-    if ( n > REAL_EPSILON )
-        axis /= n;
-    else
-        axis = Vector::randU();
-    const MatrixBlock R = MatrixBlock::rotationAroundAxis(axis, cosinus, sinus);
-    //const MatrixBlock T = R.transposed();
-    const MatrixBlock Id(0,1);  // identity matrix
-#else
-    const MatrixBlock R(cosinus, sinus, -sinus, cosinus);
-    //const Matrix22 T(cosinus, -sinus, sinus, cosinus);
-    const MatrixBlock Id(0,1);  // identity matrix
-#endif
+    //const MatrixBlock Id(0,1);  // identity matrix
 
     Vector Ru = R.vecmul(u);
     //Vector Tv = T.vecmul(v);
@@ -829,6 +814,31 @@ void Meca::addTorque(Interpolation const& pt1,
     std::clog << "Fu0 " << std::fixed << std::setw(12) << Fu0 << "    Fv0 " << std::setw(12) << Fv0 << "\n";
 #endif
 }
+
+
+void Meca::addTorque(Interpolation const& pt1,
+                     Interpolation const& pt2,
+                     const real cosinus, const real sinus,
+                     const real weight)
+{
+    assert_true( weight >= 0 );
+    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+    
+#if ( DIM == 3 )
+    const Vector AB = pt1.diff();
+    const Vector CD = pt2.diff();
+    Vector axis = cross(AB, CD);
+    real n = axis.norm();
+    if ( n > REAL_EPSILON )
+        axis /= n;
+    else
+        axis = Vector::randU();
+    addTorque(pt1, pt2, MatrixBlock::rotationAroundAxis(axis, cosinus, sinus), weight);
+#elif ( DIM == 2 )
+    addTorque(pt1, pt2, MatrixBlock(cosinus, sinus, -sinus, cosinus), weight);
+#endif
+}
+
 #endif
 
 
@@ -2378,8 +2388,8 @@ void Meca::addSideLink3D(Interpolation const& ptA,
                          const real weight)
 {
     assert_true( weight >= 0 );
-
-    //indices in the matrix mC:
+    
+    // indices in the matrix mC:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2433,16 +2443,16 @@ void Meca::addSideLink3D(Interpolation const& ptA,
         {
             add_base(ii0, waT*off);
             add_base(ii1, wbT*off);
-            add_base(ii2, off, wcc2);
-            add_base(ii3, off, wcc3);
+            add_base(ii2, off, -wcc2);
+            add_base(ii3, off, -wcc3);
         }
     }
-
+    
 #if DRAW_MECA_LINKS
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), arm, ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
 }
@@ -3625,7 +3635,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     if ( drawLinks )
     {
         gle::bright_color(ptA.mecable()->signature()).load();
-        drawLinkM(ptA.pos(), arm, ptB.pos());
+        drawLinkM(ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
     }
 #endif
     
