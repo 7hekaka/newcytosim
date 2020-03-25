@@ -29,7 +29,7 @@ HAS_MKL := 0
 #             brew tap homebrew/dupes
 #             brew install zlib
 #     CentOS:  yum install libpng-devel
-#     Ubuntu:  apt-get or synaptic libpng-dev
+#     Ubuntu:  `apt-get` or `synaptic libpng-dev`
 # HAS_PNG can be:
 #     0 : no PNG support
 #     1 : macports installation
@@ -89,11 +89,11 @@ ifeq ($(COMPILER),gcc)
 # Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2)
 # You can use g++-9 to support Intel OMP directives
     CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST     :=-O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST     :=-O3 -fno-trapping-math -ffast-math -funroll-loops -march=native -ffp-contract=fast
+    FAST     := -DNDEBUG -O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
+    FAST     := -DNDEBUG -O3 -fno-trapping-math -ffast-math -funroll-loops -march=native -ffp-contract=fast
 
-    DEBUG    :=-g3 -ggdb
-    COVERAGE :=-fprofile-arcs -ftest-coverage
+    DEBUG    := -g3 -ggdb
+    COVERAGE := -fprofile-arcs -ftest-coverage
     
 else ifeq ($(COMPILER),icc)
 
@@ -108,8 +108,8 @@ else ifeq ($(COMPILER),icc)
     # '-xAVX' for AVX
     # '-march=corei7-avx' for AVX
     # '-march=core-avx2' for Intel core i7 (ca. 2015)
-    FAST     := -O3 -march=core-avx2
-    FAST     := -O3 -march=core-avx2 -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
+    FAST     := -DNDEBUG -O3 -march=core-avx2
+    FAST     := -DNDEBUG -O3 -march=core-avx2 -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
     WARN     := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
     WARN     :=
 
@@ -122,8 +122,8 @@ else ifeq ($(COMPILER),clang)
 # the old library: -stdlib=libstdc++ (deprecated)
 
     CXX      := c++ -Wfatal-errors
-    FAST     := -O3 -ffast-math -funroll-loops -mavx2 -mfma
-    FAST     := -O3 -ffast-math -funroll-loops
+    FAST     := -DNDEBUG -O3 -ffast-math -funroll-loops -mavx2 -mfma
+    FAST     := -DNDEBUG -O3 -ffast-math -funroll-loops
     DEBUG    := -g3 -ggdb
     COVERAGE := -fprofile-arcs -ftest-coverage
 
