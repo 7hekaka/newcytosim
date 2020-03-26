@@ -216,10 +216,6 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
             Q = fib->posP(n);
             job.segment.set(fib, n-1);
 
-#if ( 0 )
-            if ( (P-Q).normSqr() > 4*S*S )
-                throw InvalidParameter("Erroneous filament segmentation");
-#endif
 #if   ( DIM == 1 )
             Rasterizer::paintFatLine1D(paint, &job, P, Q, width, offset, deltas);
 #elif ( DIM == 2 )

@@ -492,12 +492,12 @@ void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void *
     Vector3 PQ = ( Q - P ) * iPQ;
     Vector3 A, B;
     
-    //std::clog << std::scientific << PQ.norm() << "\n";
     // make an orthogonal basis with norm = radius:
 #if ( 1 )
+    //std::clog << std::scientific << PQ.normSqr() << '\n';
     PQ.orthonormal(A, B);
-    A  *= radius2;
-    B  *= radius2;
+    A *= radius2;
+    B *= radius2;
 #else
     A = PQ.orthogonal(radius2);
     B = cross(PQ, A);
@@ -559,12 +559,12 @@ void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void *
     PQ.orthonormal(A, C);
     
     // normalize vectors to norm = radius:
-    const real alpha = 2.0 / sqrt(3);
+    constexpr real alpha = 1.1547005383792517; // = 2.0 / sqrt(3);
     
     PQ *= radius;
 
     // build the vertices of the Hexagon
-    A  *= radius * alpha;
+    A *= radius * alpha;
     B  = C * radius + A * 0.5;
     C  = B - A;
     
