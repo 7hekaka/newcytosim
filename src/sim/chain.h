@@ -441,15 +441,12 @@ public:
 
     //---------------------
     
-    /// sum the length of the segments and compare with 'len'
-    int          checkLength(real len, bool = true) const;
+    /// check length and segmentation
+    int          check(std::ostream&, real len) const;
     
-    /// check the length of all segments, and returns deviation
-    real         checkSegmentation(real tolerance, bool = true) const;
-    
-    /// dump for debugging
+    /// print length and segmentation
     void         dump(std::ostream&) const;
-    
+
     /// write to Outputter
     void         write(Outputter&) const;
     

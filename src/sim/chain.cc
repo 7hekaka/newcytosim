@@ -1941,32 +1941,26 @@ real Chain::projectedForceEnd(const FiberEnd end) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-int Chain::checkLength(real len, bool arg) const
+int Chain::check(std::ostream& os, real len) const
 {
-    assert_small( length() - len );
-    real con = contourLength(pPos, nPoints);
-    if ( fabs( con - len ) > 0.1 )
-    {
-        if ( arg ) std::clog << reference() << "  ";
-        std::clog << " length is " << con << " but " << len << " was expected\n";
-        return 1;
-    }
-    return 0;
-}
-
-
-real Chain::checkSegmentation(real tol, bool arg) const
-{
+    int res = 0;
     real mn, mx;
     segmentationMinMax(mn, mx);
-    real d = ( mx - mn ) / segmentation();
-    if ( d > tol )
+    real dev = ( mx - mn ) / segmentation();
+    real con = contourLength(pPos, nPoints);
+    res = ( dev > 0.01 ) + ( std::abs( con - len ) > 0.1 );
+    if ( res )
     {
-        if ( arg ) std::clog << reference() << "  ";
-        std::clog << " Segments in [ " << std::fixed << mn << " " << std::fixed << mx;
-        std::clog << " ] for " << segmentation() << std::endl;
+        os << "chain " << std::setw(7) << reference() << '\n';
+        os << "{\n";
+        os << "    segmentation = " << segmentation() << '\n';
+        os << "    segments_min = " << mn << '\n';
+        os << "    segments_max = " << mx << '\n';
+        os << "    length  = " << len << '\n';
+        os << "    contour = " << con << '\n';
+        os << "}" << std::endl;
     }
-    return d;
+    return res;
 }
 
 
@@ -1975,11 +1969,19 @@ real Chain::checkSegmentation(real tol, bool arg) const
  */
 void Chain::dump(std::ostream& os) const
 {
-    os << "\n Chain " << std::setw(7) << reference();
-    os << "  " << std::left << std::setw(6) << fnCut << " {";
-    real d = checkSegmentation(0.01, false);
-    os << " deviation " << std::fixed << 100*d << " %";
-    os << " }" << std::endl;
+    real mn, mx;
+    real len = length();
+    segmentationMinMax(mn, mx);
+    real con = contourLength(pPos, nPoints);
+
+    os << "chain " << std::setw(7) << reference() << '\n';
+    os << "{\n";
+    os << "    segmentation = " << segmentation() << '\n';
+    os << "    segments_min = " << mn << '\n';
+    os << "    segments_max = " << mx << '\n';
+    os << "    length  = " << len << '\n';
+    os << "    contour = " << con << '\n';
+    os << "}" << std::endl;
 }
 
 
@@ -2049,9 +2051,6 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     // verify the length and segmentation:
     if ( in.vectorSize() == DIM )
-    {
-        checkLength(len);
-        checkSegmentation(0.01);
-    }
+        check(std::clog, len);
 }
 
