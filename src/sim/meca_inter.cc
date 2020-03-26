@@ -52,8 +52,7 @@ void drawLinkM(Vector const& a, Vector const& ab, Vector c)
 inline bool any_equal(const size_t a, const size_t b,
                       const size_t c)
 {
-    //if ( a == b ) return true;
-    return ( a == c ) || ( b == c );
+    return ( a == c ) | ( b == c );
 }
 
 
@@ -61,9 +60,7 @@ inline bool any_equal(const size_t a, const size_t b,
 inline bool any_equal(const size_t a, const size_t b,
                       const size_t c, const size_t d)
 {
-    //if ( a == b ) return true;
-    //if ( c == d ) return true;
-    return ( a == c ) || ( a == d ) || ( b == c ) || ( b == d );
+    return ( a == c ) | ( a == d ) | ( b == c ) | ( b == d );
 }
 
 

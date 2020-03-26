@@ -39,7 +39,7 @@ int Tokenizer::skip_space(std::istream& is, bool eat_line)
     int c = is.get();
     while ( isspace(c) )
     {
-        if ( c == '\n' && ! eat_line )
+        if (( c == '\n' ) & !eat_line )
             break;
         c = is.get();
     }
@@ -64,9 +64,9 @@ int Tokenizer::get_character(std::istream& is, bool eat_space, bool eat_line)
             c = '\n';
         }
 #endif
-        if ( c == '\n' && ! eat_line )
+        if (( c == '\n' ) & ! eat_line )
             break;
-    } while ( eat_space && isspace(c) );
+    } while ( eat_space & isspace(c) );
     return c;
 }
 
@@ -91,7 +91,7 @@ std::string get_stuff(std::istream& is, bool (*valid)(int))
 
 bool valid_symbol(int c)
 {
-    return isalnum(c) || c == '_';
+    return isalnum(c) | ( c == '_' );
 }
 
 
@@ -139,12 +139,12 @@ std::string Tokenizer::get_symbols(std::istream& is, bool eat_line)
 
 bool valid_filename_start(int c)
 {
-    return isalpha(c) || c=='/' || c=='\\' || c=='.';
+    return isalpha(c) | (c=='/') | (c=='\\') | (c=='.');
 }
 
 bool valid_filename(int c)
 {
-    return isalnum(c) || c=='_' || c=='-' || c=='/' || c=='\\' || c=='.' || c==':';
+    return isalnum(c) | (c=='_') | (c=='-') | (c=='/') | (c=='\\') | (c=='.') | (c==':');
 }
 
 /**
@@ -188,10 +188,10 @@ std::string Tokenizer::get_integer(std::istream& is)
     
     int c = is.get();
     
-    if ( c == '+' || c == '-' )
+    if ( c == '+' | c == '-' )
     {
         int d = is.peek();
-        if ( d == EOF || !isdigit(d) )
+        if (( d == EOF )| !isdigit(d) )
         {
             is.unget();
             return "";
@@ -204,14 +204,14 @@ std::string Tokenizer::get_integer(std::istream& is)
     {
         if ( isdigit(c) )
             res.push_back((char)c);
-        else if (( c == 'e' || c == 'E' ) && accept_expon )
+        else if (( c == 'e' | c == 'E' ) & accept_expon )
         {
             accept_expon = false;
             int d = is.peek();
             // accept an optional sign character
             if ( isdigit(d) )
                 res.push_back((char)c);
-            else if ( d == '+' || d == '-' )
+            else if ( d == '+' | d == '-' )
             {
                 res.push_back((char)c);
                 res.push_back((char)is.get());
@@ -292,7 +292,7 @@ std::vector<std::string> Tokenizer::split(std::string& str, char sep, bool get_e
     {
         std::string s;
         getline(iss, s, sep);
-        if ( get_empty_fields || !s.empty() )
+        if ( get_empty_fields | !s.empty() )
             res.push_back(s);
     }
     return res;
@@ -308,7 +308,7 @@ bool Tokenizer::split_integer(long& val, std::string& arg)
     char * end;
     errno = 0;
     long num = strtol(ptr, &end, 10);
-    if ( !errno && end > ptr && ( *end==0 || isspace(*end) ))
+    if ( !errno & (end > ptr) & ( (*end==0) | isspace(*end) ))
     {
         val = num;
         // skip any additional space characters:
@@ -331,7 +331,7 @@ bool Tokenizer::split_integer(unsigned long& val, std::string& arg)
     char * end;
     errno = 0;
     unsigned long num = strtoul(ptr, &end, 10);
-    if ( !errno && end > ptr && ( *end==0 || isspace(*end) ))
+    if ( !errno & (end > ptr) & ( (*end==0) | isspace(*end) ))
     {
         val = num;
         // skip any additional space characters:
@@ -366,10 +366,10 @@ std::string Tokenizer::get_real(std::istream& is)
 
     int c = is.get();
     
-    if ( c == '+' || c == '-' )
+    if ( c == '+' | c == '-' )
     {
         int d = is.peek();
-        if ( d == EOF || !isdigit(d) )
+        if ( (d == EOF) | !isdigit(d) )
         {
             is.unget();
             return "";
@@ -382,12 +382,12 @@ std::string Tokenizer::get_real(std::istream& is)
     {
         if ( isdigit(c) )
             res.push_back((char)c);
-        else if ( c == '.' && accept_point )
+        else if ( (c == '.') & accept_point )
         {
             res.push_back((char)c);
             accept_point = false;
         }
-        else if (( c == 'e' || c == 'E' ) && accept_expon )
+        else if (( c == 'e' | c == 'E' ) & accept_expon )
         {
             accept_expon = false;
             // only accept integer within exponent
@@ -396,7 +396,7 @@ std::string Tokenizer::get_real(std::istream& is)
             // accept an optional sign character
             if ( isdigit(d) )
                 res.push_back((char)c);
-            else if ( d == '+' || d == '-' )
+            else if ( d == '+' | d == '-' )
             {
                 res.push_back((char)c);
                 res.push_back((char)is.get());
@@ -419,7 +419,7 @@ std::string Tokenizer::get_real(std::istream& is)
 
 bool valid_hexadecimal(int c)
 {
-    return isxdigit(c) || c=='x';
+    return isxdigit(c) | ( c=='x' );
 }
 
 
@@ -469,13 +469,13 @@ std::string Tokenizer::get_token(std::istream& is, bool eat_line)
     if ( d == EOF )
         return std::string(1,(char)c);
     
-    if ( c == '0' && d == 'x' )
+    if ( c == '0' & d == 'x' )
     {
         is.unget();
         return get_hexadecimal(is);
     }
     
-    if ( isdigit(c) || (( c == '-' || c == '+' ) && isdigit(d)) )
+    if ( isdigit(c) | (( c == '-' | c == '+' ) & isdigit(d)) )
     {
         is.unget();
         return get_real(is);
@@ -518,7 +518,7 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
         }
         else if ( block_delimiter(c) )
             res.append( get_block_text(is, c, block_delimiter(c)) );
-        else if ( c == ')' || c == '}' )
+        else if ( c == ')' | c == '}' )
             throw InvalidSyntax("unclosed delimiter '"+std::string(1,c_in)+"'");
 #if ( 0 )
         else if ( c == COMMENT_START )

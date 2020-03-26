@@ -45,7 +45,7 @@ void Polygon::set(size_t ord, real rad, real ang)
 
 void Polygon::setPoint(size_t i, real x, real y, long c)
 {
-    if ( pts_ && i < npts_ )
+    if (( pts_ != nullptr ) & ( i < npts_ ))
     {
         pts_[i].xx = x;
         pts_[i].yy = y;
@@ -75,7 +75,7 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
         in.getline(str, sizeof(str));
         //std::clog << "polygone file " << in.gcount() << " " << str << "\n";
 
-        if ( in.fail() && in.gcount() )
+        if ( in.fail() & in.gcount() )
             throw InvalidIO("Could not read polygon coordinate files");
        
         char const* ptr = str;
@@ -99,7 +99,7 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
             ptr = end;
             errno = 0;
             k = strtol(ptr, &end, 10);
-            if ( errno || end == ptr )
+            if ( errno | ( end == ptr ))
                 k = 0;
         }
         
@@ -383,7 +383,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
         p2 = pts_[ii];
 
         // check if edge cannot interesect with ray
-        if (( yy <= p1.yy && yy < p2.yy ) || ( yy >= p1.yy && yy > p2.yy ))
+        if (( yy <= p1.yy & yy < p2.yy ) | ( yy >= p1.yy & yy > p2.yy ))
             continue;
         
         // ray may go through p2
@@ -392,9 +392,9 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
             // check for horizontal edge
             if ( p1.yy == p2.yy )
             {
-                if ( xx > p1.xx && xx > p2.xx )
+                if ( xx > p1.xx & xx > p2.xx )
                     continue;
-                if ( xx < p1.xx && xx < p2.xx )
+                if ( xx < p1.xx & xx < p2.xx )
                     continue;
                 return edge;
             }
@@ -409,14 +409,14 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
             const Point2D& p3 = pts_[ii+1];
          
             // check that p2 is not a corner
-            if (( p1.yy < yy && yy < p3.yy ) || ( p3.yy < yy && yy < p1.yy ))
+            if (( p1.yy < yy & yy < p3.yy ) | ( p3.yy < yy & yy < p1.yy ))
                 ++cross;
             
             continue;
         }
         
         // xx is left of edge
-        if ( xx <= p1.xx || xx <= p2.xx )
+        if ( xx <= p1.xx | xx <= p2.xx )
         {
             // intersection of ray with edge
             real xi = ( yy - p1.yy ) * ( p2.xx - p1.xx ) / ( p2.yy - p1.yy ) + p1.xx;
