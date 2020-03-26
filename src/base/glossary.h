@@ -143,7 +143,7 @@ private:
     static int is_number(std::string const& str)
     {
         char const* ptr = str.c_str();
-        char * end;
+        char * end = nullptr;
         
         errno = 0;
         long i = strtol(ptr, &end, 10);

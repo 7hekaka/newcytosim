@@ -290,7 +290,7 @@ bool splitObjectSpec(std::string& str, long& num)
     if ( pos != std::string::npos )
     {
         char const* ptr = str.c_str() + pos;
-        char * end;
+        char * end = nullptr;
         errno = 0;
         num = strtol(ptr, &end, 10);
         if ( errno || ( *end && !isspace(*end) ))
