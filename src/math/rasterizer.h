@@ -183,10 +183,10 @@ namespace Rasterizer
 
     /// Rasterizer function in 1D
     void paintFatLine1D(void (*paint)(int, int, int, int, void*),
-                        void * arg,            ///< last argument to paint()
+                        void* arg,             ///< last argument to paint()
                         const Vector1& P,      ///< segment end point
                         const Vector1& Q,      ///< other segment end point
-                        real radius,           ///< half-width of painted area
+                        real  radius,          ///< half-width of painted area
                         const Vector1& offset, ///< phase of the grid
                         const Vector1& delta   ///< period for the grid
     );
@@ -211,20 +211,20 @@ namespace Rasterizer
     
     /// Paint the inside of a rectangle with edges parallel to the segment PQ
     void paintFatLine2D(void (*paint)(int, int, int, int, void*),
-                        void * arg,           ///< last argument to paint
+                        void* arg,            ///< last argument to paint
                         const Vector2& P,     ///< segment end point [dim=3]
                         const Vector2& Q,     ///< other segment end point [dim=3]
-                        real  length,         ///< length of segment
+                        real  iPQ,            ///< 1 / (length of PQ)
                         real  radius          ///< half-width of painted area
                         );
     
     
     /// Paint the inside of a rectangle with edges parallel to the segment PQ
     void paintFatLine2D(void (*paint)(int, int, int, int, void*),
-                        void * arg,            ///< last argument to paint
+                        void* arg,             ///< last argument to paint
                         const Vector2& P,      ///< segment end point
                         const Vector2& Q,      ///< other segment end point
-                        real  length,          ///< length of segment
+                        real  iPQ,             ///< 1 / (length of PQ)
                         const real radius,     ///< radius of cylinder
                         const Vector2& offset, ///< phase of the grid
                         const Vector2& delta   ///< period for the grid
@@ -239,7 +239,7 @@ namespace Rasterizer
      and paintBox3D is then the best choice.
      */
     void paintBox2D(void (*paint)(int, int, int, int, void*),
-                    void * arg,            ///< last argument to paint
+                    void* arg,             ///< last argument to paint
                     const Vector2& P,      ///< segment end point
                     const Vector2& Q,      ///< other segment end point
                     real radius,           ///< radius of cylinder
@@ -280,10 +280,10 @@ namespace Rasterizer
      The volume is a right cylinder with a square section.
      */
     void paintFatLine3D(void (*paint)(int, int, int, int, void*),
-                        void * arg,            ///< last argument to paint
+                        void* arg,             ///< last argument to paint
                         const Vector3& P,      ///< segment end point
                         const Vector3& Q,      ///< other segment end point
-                        real  length,          ///< length of segment
+                        real  iPQ,             ///< 1 / (length of PQ)
                         real  radius,          ///< radius of cylinder
                         const Vector3& offset, ///< phase of the grid
                         const Vector3& delta   ///< period for the grid
@@ -298,11 +298,11 @@ namespace Rasterizer
      This is a tighter approximation of the cylinder than the square cylinder of paintFatLine3D.
      */
     void paintHexLine3D(void (*paint)(int, int, int, int, void*),
-                        void * arg,            ///< last argument to paint
+                        void* arg,             ///< last argument to paint
                         const Vector3& P,      ///< segment end point
                         const Vector3& Q,      ///< other segment end point
-                        real  length,          ///< length of segment
-                        real radius,           ///< radius of cylinder
+                        real  iPQ,             ///< 1 / (length of PQ)
+                        real  radius,          ///< radius of cylinder
                         const Vector3& offset, ///< phase of the grid
                         const Vector3& delta   ///< period for the grid
                         );

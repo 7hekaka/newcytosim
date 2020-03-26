@@ -91,14 +91,14 @@ void paintDraw(int x_inf, int x_sup, int y, int z, void*)
 
 void rasterize(Vector P, Vector Q, void (paint)(int, int, int, int, void*))
 {
-    real len = ( P - Q ).norm();
+    real iPQ = 1.0 / ( P - Q ).norm();
 #if ( DIM == 2 )
-    Rasterizer::paintFatLine2D(paint, nullptr, P, Q, len, radius, shift, delta);
-    //Rasterizer::paintFatLine2D(paint, nullptr, P, Q, len, radius);
+    Rasterizer::paintFatLine2D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
+    //Rasterizer::paintFatLine2D(paint, nullptr, P, Q, iPQ, radius);
     //Rasterizer::paintBox2D(paint, nullptr, P, Q, radius, shift, delta);
 #elif ( DIM == 3 )
-    //Rasterizer::paintHexLine3D(paint, nullptr, P, Q, len, radius, shift, delta);
-    Rasterizer::paintFatLine3D(paint, nullptr, P, Q, len, radius, shift, delta);
+    //Rasterizer::paintHexLine3D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
+    Rasterizer::paintFatLine3D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
     //Rasterizer::paintBox3D(paint, nullptr, P, Q, radius, shift, delta);
 #endif
 }
@@ -307,13 +307,13 @@ void speedTest(size_t cnt)
     {
         Vector P = pts[n-1];
         Vector Q = pts[n];
-        real len = ( P - Q ).norm();
+        real iPQ = 1.0 / ( P - Q ).norm();
         for ( size_t c = 0; c < cnt; ++c )
         {
 #if ( DIM == 2 )
-            Rasterizer::paintFatLine2D(paintHit, nullptr, P, Q, len, radius, shift, delta);
+            Rasterizer::paintFatLine2D(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
 #elif ( DIM == 3 )
-            Rasterizer::paintFatLine3D(paintHit, nullptr, P, Q, len, radius, shift, delta);
+            Rasterizer::paintFatLine3D(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
 #endif
         }
     }

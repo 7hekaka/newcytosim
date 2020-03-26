@@ -228,10 +228,10 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
 
 
 void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const Vector2& P, const Vector2& Q, const real length,
+                                const Vector2& P, const Vector2& Q, const real iPQ,
                                 const real radius)
 {
-    Vector2 PQ = ( radius / length ) * ( Q - P );
+    Vector2 PQ = ( radius * iPQ ) * ( Q - P );
     
     Vector2 A = PQ + Vector2(PQ.YY, -PQ.XX);
     Vector2 B = PQ + Vector2(-PQ.YY, PQ.XX);
@@ -279,10 +279,10 @@ void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void *
 
 
 void Rasterizer::paintFatLine2D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const Vector2& P, const Vector2& Q, const real length,
+                                const Vector2& P, const Vector2& Q, const real iPQ,
                                 const real radius, const Vector2& offset, const Vector2& delta )
 {
-    Vector2 PQ = ( radius / length ) * ( Q - P );
+    Vector2 PQ = ( radius * iPQ ) * ( Q - P );
     
     Vector2 A = PQ + Vector2(PQ.YY, -PQ.XX);
     Vector2 B = PQ + Vector2(-PQ.YY, PQ.XX);
@@ -485,11 +485,11 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
 
 
 void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const Vector3& P, const Vector3& Q, real length,
+                                const Vector3& P, const Vector3& Q, const real iPQ,
                                 const real radius, const Vector3& offset, const Vector3& delta )
 {
     real radius2 = radius * M_SQRT2;
-    Vector3 PQ = ( Q - P ) / length;
+    Vector3 PQ = ( Q - P ) * iPQ;
     Vector3 A, B;
     
     //std::clog << std::scientific << PQ.norm() << "\n";
@@ -550,11 +550,11 @@ void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void *
      a = 1 / sqrt(3)
  */
 void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void * arg,
-                                const Vector3& P, const Vector3& Q, const real length,
+                                const Vector3& P, const Vector3& Q, const real iPQ,
                                 const real radius, const Vector3& offset, const Vector3& delta)
 {
     Vector3 A, B, C;
-    Vector3 PQ = ( Q - P ) / length;
+    Vector3 PQ = ( Q - P ) * iPQ;
     
     PQ.orthonormal(A, C);
     
