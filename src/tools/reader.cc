@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         
         if ( isdigit(cmd[0]))
         {
-            char * end;
+            char * end = nullptr;
             frm = strtoul(cmd, &end, 10);
             if ( errno )
                 printf("Reader: error reading: %s\n", cmd);

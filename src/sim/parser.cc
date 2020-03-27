@@ -173,7 +173,7 @@ void Parser::parse_set(std::istream& is)
                 opt.read(blok);
             else
                 opt.define(para, blok);
-            pp = execute_change(name, opt, false);
+            pp = execute_change(name, opt, do_set);
         }
         else if ( para == "display" )
         {
@@ -286,7 +286,7 @@ void Parser::parse_change(std::istream& is)
         if ( change_all )
             execute_change_all(name, opt);
         else
-            execute_change(name, opt);
+            execute_change(name, opt, do_set);
  
         if ( opt.warnings(std::cerr, ~0U) )
             StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());

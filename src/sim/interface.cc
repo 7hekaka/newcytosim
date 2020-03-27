@@ -100,7 +100,11 @@ Property * Interface::execute_change(std::string const& name, Glossary& def, boo
     else
     {
         if ( strict )
-            throw InvalidSyntax("unknown property `"+name+"'");
+        {
+            InvalidParameter e("unknown property `"+name+"'");
+            e << simul.properties.all_names(PREF);
+            throw e;
+        }
         else
         {
             VLOG("unknown change |" << name << "|\n");
