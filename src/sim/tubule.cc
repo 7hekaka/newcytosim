@@ -88,7 +88,7 @@ void Tubule::setFamily(Fiber const* fam)
     if ( bone_ )
         bone_->family_ = fam;
 #else
-    LOG_ONCE("WARNING: Tubule requires FIBER_HAS_FAMILY\n");
+    std::clog << "WARNING: to use Tubule, please compile with FIBER_HAS_FAMILY\n";
 #endif
 }
 
@@ -255,7 +255,7 @@ void Tubule::setInteractions(Meca& meca)
     {
         if ( fil_[n]->nbSegments() != e )
         {
-            Cytosim::warn << "unequal Tubule filaments";
+            Cytosim::warn << "unequal Tubule filaments\n";
             return;
         }
     }
