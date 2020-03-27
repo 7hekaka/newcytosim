@@ -305,10 +305,10 @@ std::vector<std::string> Tokenizer::split(std::string& str, char sep, bool get_e
 bool Tokenizer::split_integer(long& val, std::string& arg)
 {
     char const* ptr = arg.c_str();
-    char * end;
+    char * end = nullptr;
     errno = 0;
     long num = strtol(ptr, &end, 10);
-    if ( !errno && (end > ptr) && ( (*end==0) || isspace(*end) ))
+    if ( !errno && (end > ptr) && isspace(*end) )
     {
         val = num;
         // skip any additional space characters:
@@ -328,10 +328,10 @@ bool Tokenizer::split_integer(long& val, std::string& arg)
 bool Tokenizer::split_integer(unsigned long& val, std::string& arg)
 {
     char const* ptr = arg.c_str();
-    char * end;
+    char * end = nullptr;
     errno = 0;
     unsigned long num = strtoul(ptr, &end, 10);
-    if ( !errno && (end > ptr) && ( (*end==0) || isspace(*end) ))
+    if ( !errno && (end > ptr) && isspace(*end) )
     {
         val = num;
         // skip any additional space characters:
