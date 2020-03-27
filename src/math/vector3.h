@@ -488,7 +488,6 @@ public:
      */
     void orthonormal(Vector3& E, Vector3& F) const
     {
-        assert_true(fabs(normSqr() - 1.0) < 0.01);
 #if 0
         if ( fabs(normSqr() - 1.0) > 0.01 )
         {
@@ -496,7 +495,10 @@ public:
             E = orthogonal(1);
             F = cross(*this, E).normalized();
             std::clog << "rescued orthonormal(" << toString() << ")\n";
+            return;
         }
+#else
+        assert_small(normSqr() - 1.0);
 #endif
         
         real s = std::copysign(real(1.0), ZZ);
@@ -505,15 +507,15 @@ public:
         const real a = YY / ( ZZ + s );
         const real b = YY * a;
         const real c = XX * a;
-        // below normSqr(ex) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
         E.set(-ZZ - b, c, XX);
         F.set(s * c, s * b - 1.0, s * YY);
-        //if you do not mind an inverted basis, use ey.set(c, b-s, YY);
+        //if you do not mind an inverted basis, use F.set(c, b-s, YY);
 #else
         /// original code from Duff et al.
         const real a = -1.0 / ( ZZ + s );
         const real b = XX * YY * a;
-        // below normSqr(ex) = 1 + x*x*a*a*(normSqr(this)-s*s)
+        // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-s*s)
         E.set(1.0 + s * XX * XX * a, s * b, -s * XX);
         F.set(b, s + YY * YY * a, -YY);
 #endif

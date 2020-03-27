@@ -1223,10 +1223,10 @@ void Chain::truncateP(size_t p)
 
 
 /**
- `fib` is attached at the PLUS_END of `*this`
+ `fib` is added at the PLUS_END of `*this`
  
  The vertex are reinterpolated linearly, and the length of the
- segments will not fullfil the constraints of segmentation.
+ segments will not fullfil exactly the constraints of segmentation.
  If this is a problem, Chain::reshape() should be called.
  
  `fib` should usually be destroyed afterward.

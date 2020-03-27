@@ -292,7 +292,7 @@ std::vector<std::string> Tokenizer::split(std::string& str, char sep, bool get_e
     {
         std::string s;
         getline(iss, s, sep);
-        if ( get_empty_fields | !s.empty() )
+        if ( get_empty_fields || !s.empty() )
             res.push_back(s);
     }
     return res;
