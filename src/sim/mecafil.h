@@ -176,19 +176,13 @@ public:
     //--------------------- Rigidity
     
     /// return fiber rigidity
+    int         hasRigidity() const { return ( nPoints > 2 ) & ( rfRigidity > 0 ); }
+
+    /// return fiber rigidity
     real        fiberRigidity() const { return rfRigidity; }
 
     /// add the rigidity force corresponding to configuration X into vector Y
     void        addRigidity(const real* X, real* Y) const;
-    
-    /// add rigidity terms to a symmetric matrix
-    void        addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx) const;
-    
-    /// add rigidity terms to a symmetric matrix
-    void        addRigidityMatrix(MatrixSparseSymmetricBlock&, size_t inx) const;
-
-    /// add rigidity terms to upper side of matrix
-    void        addRigidityTerms(real*, size_t) const;
 
 };
 

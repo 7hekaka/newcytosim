@@ -29,6 +29,7 @@
 #include "gmres.h"
 
 #include "meca_inter.cc"
+#include "meca_rigidity.cc"
 
 /**
  Add correction term to the constrainted dynamics
@@ -45,7 +46,7 @@
 
 /**
 Set SEPARATE_RIGIDITY_TERMS to chose how Rigidity term are calculated:
-   0. Rigidity terms are added to a Matrix using `Mecable::addRigidityTerms()`
+   0. Rigidity terms are added to Matrix 'mB' or 'mC'
    1. Rigidity values are calculated on the fly using `Mecable::addRigidity()`
 .
 With a sequential simulation, the second option is usually faster.
@@ -859,9 +860,12 @@ void Meca::getBlock(real* res, const Mecable * mec) const
     
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
-    mec->addRigidityTerms(res, bs);
-    //std::clog<<"Rigidity block " << mec->reference() << "\n";
-    //VecPrint::print(std::clog, bs, bs, res, bs, 0);
+    if ( mec->hasRigidity() )
+    {
+        addRigidityLower(res, bs, mec->nbPoints(), mec->fiberRigidity());
+        //std::clog<<"Rigidity block " << mec->reference() << "\n";
+        //VecPrint::print(std::clog, bs, bs, res, bs, 0);
+    }
 #endif
 #if USE_ISO_MATRIX
     mB.addTriangularBlock(res, bs, mec->matIndex(), np, DIM);
@@ -1313,11 +1317,14 @@ void Meca::prepare()
             mec->putPoints(vPTS+DIM*mec->matIndex());
             mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
+            if ( mec->hasRigidity() )
+            {
 #   if USE_ISO_MATRIX
-            mec->addRigidityMatrix(mB, mec->matIndex());
+                addRigidityMatrix(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   else
-            mec->addRigidityMatrix(mC, mec->matIndex());
+                addRigidityBlockMatrix(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   endif
+            }
 #endif
             mec->useBlock(0);
             mci += NUM_THREADS;
@@ -1329,11 +1336,14 @@ void Meca::prepare()
         mec->putPoints(vPTS+DIM*mec->matIndex());
         mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
+        if ( mec->hasRigidity() )
+        {
 #   if USE_ISO_MATRIX
-        mec->addRigidityMatrix(mB, mec->matIndex());
+            addRigidityMatrix(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   else
-        mec->addRigidityMatrix(mC, mec->matIndex());
+            addRigidityBlockMatrix(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   endif
+        }
 #endif
         mec->useBlock(0);
     }
