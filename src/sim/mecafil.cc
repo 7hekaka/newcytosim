@@ -269,8 +269,8 @@ void add_rigidity_matrix(const size_t cnt, MATRIX& mat, const size_t inx, const 
 #else
 
 /**
- Set rigidity terms with modulus 'R1' in upper diagonal of `mat`,
- for a filament with 'cnt' points (and thus with 'cnt-2' triplets).
+ Set rigidity terms with modulus 'R1' in diagonal and lower parts of `mat`,
+ for a filament with 'cnt' points.
  */
 template<typename MATRIX>
 void addRigidityMatrixT(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
@@ -332,41 +332,41 @@ void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const size_t inx) c
  The array `mat` must be square of dimension `dim * this->nPoints`
  Only terms above the diagonal and corresponding to the first subspace are set
  */
-void add_rigidity_upper(size_t cnt, real* mat, size_t ldd, const real R1)
+void addRigidityUpperT(real* mat, size_t ldd, size_t cnt, const real R1)
 {
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
     const real R5 = R1 * 5;
     const real R6 = R1 * 6;
 
-    constexpr size_t D = DIM, T = DIM*2, V = DIM*3;
+    constexpr size_t U = DIM, D = DIM*2, T = DIM*3;
     const size_t e = DIM * ( cnt - 2 );
     const size_t f = DIM * ( cnt - 1 );
     
     mat[0      ] -= R1;
-    mat[  ldd*D] += R2;
-    mat[  ldd*T] -= R1;
+    mat[  ldd*U] += R2;
+    mat[  ldd*D] -= R1;
     
     mat[e+ldd*f] += R2;
     mat[f+ldd*f] -= R1;
     
     if ( 3 < cnt )
     {
-        mat[D+ldd*D] -= R5;
-        mat[D+ldd*T] += R4;
-        mat[D+ldd*V] -= R1;
+        mat[U+ldd*U] -= R5;
+        mat[U+ldd*D] += R4;
+        mat[U+ldd*T] -= R1;
         mat[e+ldd*e] -= R5;
     }
     else
     {
-        mat[D+ldd*D] -= R4;
+        mat[U+ldd*U] -= R4;
     }
     
-    for ( size_t n = T; n < e; n += D )
+    for ( size_t n = D; n < e; n += U )
     {
         mat[n+ldd* n   ] -= R6;
-        mat[n+ldd*(n+D)] += R4;
-        mat[n+ldd*(n+T)] -= R1;
+        mat[n+ldd*(n+U)] += R4;
+        mat[n+ldd*(n+D)] -= R1;
     }
 }
 
@@ -375,11 +375,11 @@ void Mecafil::addRigidityUpper(real * mat, size_t ldd) const
 {
     if ( nPoints > 2 )
     {
-        add_rigidity_upper(nPoints, mat, ldd, rfRigidity);
-#if ( 0 )
-        int N = DIM*nPoints;
+        addRigidityUpperT(mat, ldd, nPoints, rfRigidity);
+#if ( 1 )
+        size_t N = DIM*nPoints;
         MatrixSymmetric m(N);
-        add_rigidity_upper(nPoints, m.data(), ldd, 1.0);
+        addRigidityUpperT(m.data(), ldd, nPoints, 1.0);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
 #endif
     }

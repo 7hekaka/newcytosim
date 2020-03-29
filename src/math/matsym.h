@@ -49,6 +49,7 @@ public:
     /// constructor from an existing array
     MatrixSymmetric(size_t s)
     {
+        val = nullptr;
         resize(s);
         msLDD = s;
         val = new_real(s*s);
@@ -59,6 +60,7 @@ public:
     /// constructor from an existing array
     MatrixSymmetric(size_t s, real* array, size_t ldd)
     {
+        val = nullptr;
         resize(s);
         msLDD = ldd;
         val = array;

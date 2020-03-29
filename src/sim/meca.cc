@@ -532,8 +532,10 @@ void duplicate_matrix(size_t siz, real const* src, real * dst)
 
 
 /**
- This should symmetrize a matrix, and also copy the terms
- that are within the first subspace `X` into the other dimensions
+ This will symmetrize matrix `mat`, by copying the upper triangle to the lower one
+ It will also copy the terms that are within the first subspace `X` into the other
+ dimensions.
+ 
  input: upper triangular matrix
  ouput: full symmetric matrix
  */

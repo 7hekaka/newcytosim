@@ -13,6 +13,8 @@
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
  MatrixSparseSymmetric1 uses a sparse storage, with arrays of elements for each column.
+ Only the lower triangle of the matrix is stored.
+ 
  For multiplication, it uses a another format, from Numerical Recipes.
  The conversion is done when prepareForMultiply() is called
  
