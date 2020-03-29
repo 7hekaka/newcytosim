@@ -215,10 +215,10 @@ void make_diagonal(size_t siz, real * mat)
 
 
 /// a test matrix with integer components
-void test_matrix(int siz, real * mat)
+void test_matrix(size_t siz, real * mat)
 {
-    for ( int i = 0; i < siz; ++i )
-    for ( int j = 0; j < siz; ++j )
+    for ( size_t i = 0; i < siz; ++i )
+    for ( size_t j = 0; j < siz; ++j )
         mat[i+siz*j] = j - i;
 }
 
@@ -299,15 +299,15 @@ void banded_matrix(int siz, real const* src, int kl, int ku, real * dst, int ldd
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real * vec, real * tmp)
+real largest_eigenvalue(size_t siz, real const* blk, int const* piv, real const* mat, real alpha, real * vec, real * tmp)
 {
     assert_true(siz > 0);
     const real TOLERANCE = 0.05;
     real oge, eig = blas::nrm2(siz, vec);
     //fprintf(stderr, "      power size %i eig %10.6f\n", siz, eig);
 
-    int n, info = 0;
-    for ( n = 0; n < siz; n += 2 )
+    int info = 0;
+    for ( size_t n = 0; n < siz; n += 2 )
     {
         blas::xcopy(siz, vec, 1, tmp, 1);
         lapack::xgetrs('N', siz, 1, blk, siz, piv, tmp, siz, &info);
@@ -340,13 +340,12 @@ real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* ma
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real * vec, real * tmp)
+real largest_eigenvalue(size_t siz, real const* mat, real const* tam, real alpha, real * vec, real * tmp)
 {
     const real TOLERANCE = 0.05;
     real oge, eig = blas::nrm2(siz, vec);
     
-    int n;
-    for ( n = 0; n < siz; n += 2 )
+    for ( size_t n = 0; n < siz; n += 2 )
     {
         blas::xgemv('N', siz, siz, 1.0/eig, mat, siz, vec, 1,       0.0, tmp, 1);
         blas::xgemv('N', siz, siz, 1.0,     tam, siz, tmp, 1, alpha/eig, vec, 1);
