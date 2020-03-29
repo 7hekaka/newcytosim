@@ -371,12 +371,56 @@ void addRigidityUpperT(real* mat, size_t ldd, size_t cnt, const real R1)
 }
 
 
-void Mecafil::addRigidityUpper(real * mat, size_t ldd) const
+/**
+ Set elements of matrix `mat` corresponding to the elastic terms of the Fiber.
+ The array `mat` must be square of dimension `dim * this->nPoints`
+ Only terms above the diagonal and corresponding to the first subspace are set
+ */
+void addRigidityLowerT(real* mat, size_t ldd, size_t cnt, const real R1)
+{
+    const real R2 = R1 * 2;
+    const real R4 = R1 * 4;
+    const real R5 = R1 * 5;
+    const real R6 = R1 * 6;
+
+    constexpr size_t U = DIM, D = DIM*2, T = DIM*3;
+    const size_t e = DIM * ( cnt - 2 );
+    const size_t f = DIM * ( cnt - 1 );
+    
+    mat[0] -= R1;
+    mat[U] += R2;
+    mat[D] -= R1;
+    
+    mat[e+ldd*f] += R2;
+    mat[f+ldd*f] -= R1;
+    
+    if ( 3 < cnt )
+    {
+        mat[U+ldd*U] -= R5;
+        mat[D+ldd*U] += R4;
+        mat[T+ldd*U] -= R1;
+        mat[e+ldd*e] -= R5;
+    }
+    else
+    {
+        mat[U+ldd*U] -= R4;
+    }
+    
+    for ( size_t n = D; n < e; n += U )
+    {
+        mat[ n   +ldd*n] -= R6;
+        mat[(n+U)+ldd*n] += R4;
+        mat[(n+D)+ldd*n] -= R1;
+    }
+}
+
+
+void Mecafil::addRigidityTerms(real * mat, size_t ldd) const
 {
     if ( nPoints > 2 )
     {
         addRigidityUpperT(mat, ldd, nPoints, rfRigidity);
-#if ( 1 )
+#if ( 0 )
         size_t N = DIM*nPoints;
         MatrixSymmetric m(N);
         addRigidityUpperT(m.data(), ldd, nPoints, 1.0);

@@ -95,8 +95,8 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
 #pragma mark -
 
 
-template <typename MATRIXA, typename MATRIXB>
-void compare(size_t size,  MATRIXA & mat1, MATRIXB& mat2, size_t fill)
+template <typename MATRIX, typename MATROX>
+void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
 {
     real * tmp1 = new_real(size*size);
     real * tmp2 = new_real(size*size);
@@ -156,6 +156,7 @@ void compare(size_t size,  MATRIXA & mat1, MATRIXB& mat2, size_t fill)
     free_real(tmp1);
     free_real(tmp2);
 }
+
 
 #if ( DIM == 3 )
 void fillMatrix(MatrixSparseSymmetricBlock& mat, const size_t i, const size_t j)

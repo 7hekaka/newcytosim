@@ -329,7 +329,7 @@ public:
      This is a substitute to `addRigidity()`, resulting in the same force, and
      used to build the preconditionner in Meca.
      */
-    virtual void    addRigidityUpper(real * mat, size_t ldd) const {}
+    virtual void    addRigidityTerms(real * mat, size_t ldd) const {}
 
     /// Calculate speeds for given forces: Y <- forces(X)
     /**

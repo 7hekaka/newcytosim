@@ -182,7 +182,7 @@ public:
     void        addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx) const;
     
     /// add rigidity terms to upper side of matrix
-    void        addRigidityUpper(real*, size_t) const;
+    void        addRigidityTerms(real*, size_t) const;
 
 };
 

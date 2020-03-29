@@ -827,7 +827,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
     
 #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
     // set the Rigidity terms:
-    mec->addRigidityUpper(res, bs);
+    mec->addRigidityTerms(res, bs);
     //std::clog<<"Rigidity block " << mec->reference() << "\n";
     //VecPrint::print(std::clog, bs, bs, res, bs, 0);
 #endif
