@@ -1280,7 +1280,7 @@ void Meca::prepare()
             mec->prepareMecable();
 #if ( DIM > 1 ) && RIGIDITY_IN_MATRIX
             //include the rigidity terms in matrix mB
-            mec->addRigidityMatrix(mB, mec->matIndex(), 1);
+            mec->addRigidityMatrix(mB, mec->matIndex());
 #endif
             mec->useBlock(0);
             mci += NUM_THREADS;
@@ -1293,7 +1293,7 @@ void Meca::prepare()
         mec->prepareMecable();
 #if ( DIM > 1 ) && RIGIDITY_IN_MATRIX
         //include the rigidity terms in matrix mB
-        mec->addRigidityMatrix(mB, mec->matIndex(), 1);
+        mec->addRigidityMatrix(mB, mec->matIndex());
 #endif
         mec->useBlock(0);
     }

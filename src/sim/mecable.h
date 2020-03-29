@@ -316,18 +316,18 @@ public:
     
     /// Add rigidity matrix elements (which should be symmetric) to provided matrix
     /**
-       The function should add terms to the upper part of matrix `mat`, at indices starting from `offset`.
-     It should fill at maximum the upper part of the diagonal block corresponding to indices [offset, offset+dim*nbPoints()].
-     It should be consistent with addRigidity(), adding exactly the same terms.
+     This will add terms to the upper part of matrix `mat`, at indices starting
+     from `inx`, specifically at indices [inx, inx+nbPoints()].
+     This is a substitute to `addRigidity()`, resulting in the same force.
      */
-    virtual void    addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx, size_t dim) const {}
+    virtual void    addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx) const {}
 
     /// Fill upper diagonal of `mat` with matrix elements
     /**
-     The function should add terms to the upper part of matrix `mat`.
-     The array `mat` should be square of size `DIM*nbPoints()`.
-     This version is used to build the preconditionner in Meca.
-     It should be consistent with addRigidity(), adding exactly the same terms.
+     The will add terms to the upper part of the matrix `mat[]`, which should
+     be square of size `DIM*nbPoints()` wit leading dimension `ldd`.
+     This is a substitute to `addRigidity()`, resulting in the same force, and
+     used to build the preconditionner in Meca.
      */
     virtual void    addRigidityUpper(real * mat, size_t ldd) const {}
 

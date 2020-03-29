@@ -1,4 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+
 #include "dim.h"
 #include "sim.h"
 #include "mecafil.h"
@@ -40,13 +41,13 @@ Mecafil::~Mecafil()
 //------------------------------------------------------------------------------
 Mecafil::Mecafil(Mecafil const&)
 {
-    ABORT_NOW("unfinished: cannot copy a Fiber");
+    ABORT_NOW("unfinished: cannot copy a Mecafil");
 }
 
 
 Mecafil& Mecafil::operator=(Mecafil const&)
 {
-    ABORT_NOW("unfinished: cannot copy a Fiber");
+    ABORT_NOW("unfinished: cannot copy a Mecafil");
 }
 
 
@@ -272,55 +273,54 @@ void add_rigidity_matrix(const size_t cnt, MATRIX& mat, const size_t inx, const 
  for a filament with 'cnt' points (and thus with 'cnt-2' triplets).
  */
 template<typename MATRIX>
-void add_rigidity_matrix(const size_t cnt, MATRIX& mat, const size_t inx, const real R1, const size_t dim)
+void addRigidityMatrixT(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
 {
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
     const real R5 = R1 * 5;
     const real R6 = R1 * 6;
 
-    const size_t D = dim, T = dim*2, V = dim*3;
-    const size_t s = dim * inx;
-    const size_t e = s + dim * ( cnt - 2 );
+    const size_t s = inx;
+    const size_t e = s + ( cnt - 2 );
 
     mat(s  , s  ) -= R1;
-    mat(s+D, s  ) += R2;
-    mat(s+T, s  ) -= R1;
+    mat(s+1, s  ) += R2;
+    mat(s+2, s  ) -= R1;
     
-    mat(e+D, e+D) -= R1;
-    mat(e+D, e  ) += R2;
+    mat(e+1, e+1) -= R1;
+    mat(e+1, e  ) += R2;
 
     if ( 3 < cnt )
     {
-        mat(s+D, s+D) -= R5;
-        mat(s+T, s+D) += R4;
-        mat(s+V, s+D) -= R1;
+        mat(s+1, s+1) -= R5;
+        mat(s+2, s+1) += R4;
+        mat(s+3, s+1) -= R1;
         mat(e  , e  ) -= R5;
     }
     else
     {
-        mat(s+D, s+D) -= R4;
+        mat(s+1, s+1) -= R4;
     }
     
-    for ( size_t n = s+T; n < e ; n += D )
+    for ( size_t n = s+2; n < e ; n += 1 )
     {
         mat(n,   n) -= R6;
-        mat(n+D, n) += R4;
-        mat(n+T, n) -= R1;
+        mat(n+1, n) += R4;
+        mat(n+2, n) -= R1;
     }
 }
 
 #endif
 
-void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const size_t inx, size_t dim) const
+void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const size_t inx) const
 {
     if ( nPoints > 2 )
     {
-        add_rigidity_matrix(nPoints, mat, inx, rfRigidity, dim);
+        addRigidityMatrixT(mat, inx, nPoints, rfRigidity);
 #if ( 0 )
         size_t N = nPoints;
         MatrixSymmetric m(N);
-        add_rigidity_matrix(N, m, 0, 1.0, 1);
+        addRigidityMatrixT(m, 0, N, 1.0);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
 #endif
     }
