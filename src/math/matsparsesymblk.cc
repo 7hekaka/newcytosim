@@ -48,7 +48,9 @@ void MatrixSparseSymmetricBlock::allocate(size_t alc)
         allocated_ = alc;
         
         delete[] next_;
-        next_ = new size_t[allocated_+1];
+        next_ = new size_t[alc+1];
+        for ( size_t n = 0; n <= alc; ++n )
+            next_[n] = alc;
     }
 }
 
@@ -57,8 +59,8 @@ void MatrixSparseSymmetricBlock::deallocate()
 {
     delete[] column_;
     delete[] next_;
-    column_   = nullptr;
-    next_ = nullptr;
+    column_ = nullptr;
+    next_   = nullptr;
     allocated_ = 0;
 }
 
@@ -429,7 +431,7 @@ void MatrixSparseSymmetricBlock::printColumns(std::ostream& os)
         if ( column_[j].size_ > 0 )
         {
             os << "\n   " << j << "   " << column_[j].size_;
-            os << " " << next_[j];
+            os << " next " << next_[j];
         }
     std::endl(os);
 }

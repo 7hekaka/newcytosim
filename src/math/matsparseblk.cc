@@ -43,7 +43,9 @@ void MatrixSparseBlock::allocate(size_t alc)
         allocated_ = alc;
         
         delete[] next_;
-        next_ = new size_t[allocated_+1];
+        next_ = new size_t[alc+1];
+        for ( size_t n = 0; n <= alc; ++n )
+            next_[n] = alc;
     }
 }
 
