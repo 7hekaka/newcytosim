@@ -11,7 +11,7 @@
 
 class Meca;
 class MatrixSparseSymmetric1;
-
+class MatrixSparseSymmetricBlock;
 
 /// Can be simulated using a Meca.
 /**
@@ -306,6 +306,9 @@ public:
 
     //--------------------------------------------------------------------------
     
+    /// return fiber rigidity
+    virtual real    fiberRigidity() const { return 0; }
+
     /// Add rigidity terms Y <- Y + Rigidity * X
     /**
         Rigidity can be any force acting internally to the objects
@@ -313,7 +316,7 @@ public:
      This version is used to calculate the Matrix * Vector in Meca.
      */
     virtual void    addRigidity(const real* X, real* Y) const {}
-    
+
     /// Add rigidity matrix elements (which should be symmetric) to provided matrix
     /**
      This will add terms to the upper part of matrix `mat`, at indices starting
@@ -321,6 +324,14 @@ public:
      This is a substitute to `addRigidity()`, resulting in the same force.
      */
     virtual void    addRigidityMatrix(MatrixSparseSymmetric1&, size_t inx) const {}
+    
+    /// Add rigidity matrix elements (which should be symmetric) to Meca
+    /**
+     This will add terms to the upper part of matrix `mat`, at indices starting
+     from `inx`, specifically at indices [inx, inx+nbPoints()].
+     This is a substitute to `addRigidity()`, resulting in the same force.
+     */
+    virtual void    addRigidityMatrix(MatrixSparseSymmetricBlock&, size_t inx) const {}
 
     /// Fill upper diagonal of `mat` with matrix elements
     /**

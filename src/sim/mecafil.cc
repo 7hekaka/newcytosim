@@ -7,6 +7,7 @@
 #include "clapack.h"
 #include "matsym.h"
 #include "matsparsesym1.h"
+#include "matsparsesymblk.h"
 #include "random.h"
 #include "vecprint.h"
 
@@ -244,25 +245,25 @@ void Mecafil::printTensions(std::ostream& os) const
 #if ( 0 )
 
 /**
- Set rigidity terms with modulus 'R1' in lower part of `mat`,
- for a filament with 'cnt' points (and thus with 'cnt/DIM-2' triplets).
+ Set rigidity terms with modulus 'R1' in diagonal and lower parts of `mat`,
+ for a filament with 'cnt' points.
  */
 template<typename MATRIX>
-void add_rigidity_matrix(const size_t cnt, MATRIX& mat, const size_t inx, const real R1, const size_t dim)
+void addRigidityMatrixT(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
 {
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
 
-    const size_t end = dim * ( inx + cnt - 1 );
+    const size_t end = inx + cnt - 1;
     
-    for ( size_t i = dim*(inx+1); i < end; ++i )
+    for ( size_t i = inx+1; i < end; ++i )
     {
-        mat(i-dim, i-dim) -= R1;
-        mat(i    , i-dim) += R2;
-        mat(i+dim, i-dim) -= R1;
-        mat(i    , i    ) -= R4;
-        mat(i+dim, i    ) += R2;
-        mat(i+dim, i+dim) -= R1;
+        mat(i-1, i-1) -= R1;
+        mat(i  , i-1) += R2;
+        mat(i+1, i-1) -= R1;
+        mat(i  , i  ) -= R4;
+        mat(i+1, i  ) += R2;
+        mat(i+1, i+1) -= R1;
     }
 }
 
@@ -323,6 +324,64 @@ void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const size_t inx) c
         MatrixSymmetric m(N);
         addRigidityMatrixT(m, 0, N, 1.0);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
+         */
+    }
+#endif
+}
+
+
+
+template<typename MATRIX>
+void addRigidityBlockMatrixT(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
+{
+    const real R2 = R1 * 2;
+    const real R4 = R1 * 4;
+    const real R5 = R1 * 5;
+    const real R6 = R1 * 6;
+    
+    constexpr size_t U = DIM, D = DIM*2, T = DIM*3;
+    const size_t s = DIM * inx;
+    const size_t e = s + DIM * ( cnt - 2 );
+    
+    mat.block(s  , s  ).sub_diag(R1);
+    mat.block(s+U, s  ).add_diag(R2);
+    mat.block(s+D, s  ).sub_diag(R1);
+    
+    mat.block(e+U, e+U).sub_diag(R1);
+    mat.block(e+U, e  ).add_diag(R2);
+    
+    if ( 3 < cnt )
+    {
+        mat.block(s+U, s+U).sub_diag(R5);
+        mat.block(s+D, s+U).add_diag(R4);
+        mat.block(s+T, s+U).sub_diag(R1);
+        mat.block(e  , e  ).sub_diag(R5);
+    }
+    else
+    {
+        mat.block(s+U, s+U).sub_diag(R4);
+    }
+    
+    for ( size_t n = s+U; n < e ; n += U )
+    {
+        mat.block(n,   n).sub_diag(R6);
+        mat.block(n+U, n).add_diag(R4);
+        mat.block(n+D, n).sub_diag(R1);
+    }
+}
+
+
+void Mecafil::addRigidityMatrix(MatrixSparseSymmetricBlock& mat, const size_t inx) const
+{
+#if ( DIM > 1 )
+    if ( nPoints > 2 )
+    {
+        addRigidityBlockMatrixT(mat, inx, nPoints, rfRigidity);
+        /*
+        MatrixSparseSymmetricBlock m;
+        m.resize(DIM*nPoints);
+        addRigidityBlockMatrixT(m, 0, nPoints, 1.0);
+        m.printColumns(std::clog);
          */
     }
 #endif

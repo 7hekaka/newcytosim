@@ -1313,8 +1313,11 @@ void Meca::prepare()
             mec->putPoints(vPTS+DIM*mec->matIndex());
             mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
-            //include the rigidity terms in matrix mB
+#   if USE_ISO_MATRIX
             mec->addRigidityMatrix(mB, mec->matIndex());
+#   else
+            mec->addRigidityMatrix(mC, mec->matIndex());
+#   endif
 #endif
             mec->useBlock(0);
             mci += NUM_THREADS;
@@ -1326,8 +1329,11 @@ void Meca::prepare()
         mec->putPoints(vPTS+DIM*mec->matIndex());
         mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
-        //include the rigidity terms in matrix mB
+#   if USE_ISO_MATRIX
         mec->addRigidityMatrix(mB, mec->matIndex());
+#   else
+        mec->addRigidityMatrix(mC, mec->matIndex());
+#   endif
 #endif
         mec->useBlock(0);
     }
