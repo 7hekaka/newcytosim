@@ -1723,6 +1723,7 @@
 		BBF0385D18BCF207002E8568 /* splash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = splash.cc; path = src/sim/splash.cc; sourceTree = SOURCE_ROOT; };
 		BBF0385F18BCF7A3002E8568 /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = splash.h; path = src/sim/splash.h; sourceTree = SOURCE_ROOT; };
 		BBF283242430C7E600FADDD8 /* meca_rigidity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_rigidity.cc; sourceTree = "<group>"; };
+		BBF283262430E10100FADDD8 /* meca_math.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_math.cc; sourceTree = "<group>"; };
 		BBF7BB1810CD44E00089F5B1 /* display2.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = display2.cc; path = src/play/display2.cc; sourceTree = SOURCE_ROOT; };
 		BBF7BB1910CD44E00089F5B1 /* display2.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = display2.h; path = src/play/display2.h; sourceTree = SOURCE_ROOT; };
 		BBF9A315208C8C9700A9E5E5 /* test_omp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_omp.cc; sourceTree = "<group>"; };
@@ -2113,6 +2114,7 @@
 				BB98FE910B35F66300796DAE /* meca.cc */,
 				BB01791906B1C05100240785 /* meca_inter.cc */,
 				BBF283242430C7E600FADDD8 /* meca_rigidity.cc */,
+				BBF283262430E10100FADDD8 /* meca_math.cc */,
 				BB7358FC05B98DA3006956D5 /* simul.h */,
 				BB7358FB05B98DA3006956D5 /* simul.cc */,
 				BB7358FD05B98DA3006956D5 /* simul_file.cc */,
