@@ -44,22 +44,14 @@
 
 
 /**
- The forces are usually:
- 
-     force = vBAS + ( mB + mC + mR + mdiffP ) * vPTS
- 
- where mR represent the bending elasticity of fibers.
- 
- The term RIGIDITY_IN_MATRIX Toggles between:
- 1- Including mR into mB with Mecable::addRigidityUpper()
-    The matrix type for mB should be able to cope with many near-diagonal terms
-
- 2- Calculating mR on the fly with Mecable::addRigidity()
-    This option is usually faster.
- 
- RIGIDITY_IN_MATRIX should be false
+Set SEPARATE_RIGIDITY_TERMS to chose how Rigidity term are calculated:
+   0. Rigidity terms are added to a Matrix using `Mecable::addRigidityTerms()`
+   1. Rigidity values are calculated on the fly using `Mecable::addRigidity()`
+.
+With a sequential simulation, the second option is usually faster.
+(in any case, with DIM==1, this should be 0)
  */
-#define RIGIDITY_IN_MATRIX 0
+#define SEPARATE_RIGIDITY_TERMS ( DIM > 1 )
 
 /// this define will enable explicit integration (should be off)
 #define EXPLICIT_INTEGRATION 0
@@ -257,7 +249,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     // multiply the columns corresponding to this Mecable:
     mC.vecMul(X, Y, inx, inx+bks);
 
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, Y+inx);
 #endif
 
@@ -300,7 +292,7 @@ void Meca::multiply(const real* X, real* Y) const
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-    #if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+    #if SEPARATE_RIGIDITY_TERMS
         mec->addRigidity(X+inx, Y+inx);
     #endif
     #if ADD_PROJECTION_DIFF
@@ -327,7 +319,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
 
     mC.vecMul(X, T, inx, inx+bks);
     
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, T+inx);
 #endif
     
@@ -397,7 +389,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
 
     mC.vecMul(X, Y, inx, inx+bks);
     
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, Y+inx);
 #endif
     
@@ -462,7 +454,7 @@ void Meca::multiply(const real* X, real* Y) const
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
         mec->addRigidity(X+inx, Y+inx);
 #endif
 #if ADD_PROJECTION_DIFF
@@ -865,7 +857,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
     
     zero_real(bs*bs, res);
     
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
     mec->addRigidityTerms(res, bs);
     //std::clog<<"Rigidity block " << mec->reference() << "\n";
@@ -1320,7 +1312,7 @@ void Meca::prepare()
             Mecable * mec = *mci;
             mec->putPoints(vPTS+DIM*mec->matIndex());
             mec->prepareMecable();
-#if ( DIM > 1 ) && RIGIDITY_IN_MATRIX
+#if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
             //include the rigidity terms in matrix mB
             mec->addRigidityMatrix(mB, mec->matIndex());
 #endif
@@ -1333,7 +1325,7 @@ void Meca::prepare()
     {
         mec->putPoints(vPTS+DIM*mec->matIndex());
         mec->prepareMecable();
-#if ( DIM > 1 ) && RIGIDITY_IN_MATRIX
+#if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
         //include the rigidity terms in matrix mB
         mec->addRigidityMatrix(mB, mec->matIndex());
 #endif
@@ -1381,7 +1373,7 @@ void Meca::computeForces()
         real * ttt = vTMP + DIM * mec->matIndex();
         
         // add bending rigidity:
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
         real * xxx = vPTS + DIM * mec->matIndex();
         mec->addRigidity(xxx, ttt);
 #endif
@@ -1476,7 +1468,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     // calculate forces before constraints in vFOR:
     calculateForces(vPTS, vBAS, vFOR);
     
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
     addAllRigidity(vPTS, vFOR);
 #endif
  
@@ -1946,7 +1938,7 @@ void Meca::dumpElasticity(FILE * file) const
         
         calculateForces(src, nullptr, res);
         
-#if ( DIM > 1 ) && !RIGIDITY_IN_MATRIX
+#if SEPARATE_RIGIDITY_TERMS
         addAllRigidity(src, res);
 #endif
 
@@ -2145,8 +2137,8 @@ void Meca::dump() const
  */
 void Meca::dumpSparse()
 {
-#if !RIGIDITY_IN_MATRIX
-    std::clog << "incorrect dump since RIGIDITY_IN_MATRIX is not defined\n";
+#if SEPARATE_RIGIDITY_TERMS
+    std::clog << "incorrect dump since SEPARATE_RIGIDITY_TERMS is defined\n";
 #endif
     std::clog << "dumping matrices in binary format\n";
         

@@ -314,16 +314,18 @@ void addRigidityMatrixT(MATRIX& mat, const size_t inx, const size_t cnt, const r
 
 void Mecafil::addRigidityMatrix(MatrixSparseSymmetric1& mat, const size_t inx) const
 {
+#if ( DIM > 1 )
     if ( nPoints > 2 )
     {
         addRigidityMatrixT(mat, inx, nPoints, rfRigidity);
-#if ( 0 )
+        /*
         size_t N = nPoints;
         MatrixSymmetric m(N);
         addRigidityMatrixT(m, 0, N, 1.0);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
-#endif
+         */
     }
+#endif
 }
 
 
@@ -417,16 +419,18 @@ void addRigidityLowerT(real* mat, size_t ldd, size_t cnt, const real R1)
 
 void Mecafil::addRigidityTerms(real * mat, size_t ldd) const
 {
+#if ( DIM > 1 )
     if ( nPoints > 2 )
     {
         addRigidityLowerT(mat, ldd, nPoints, rfRigidity);
-#if ( 0 )
+        /*
         size_t N = DIM*nPoints;
         MatrixSymmetric m(N);
         addRigidityLowerT(m.data(), ldd, nPoints, 1.0);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
-#endif
+         */
     }
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -741,6 +745,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
  */
 void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
 {
+#if ( DIM > 1 )
     for ( size_t d = 0; d < DIM; ++ d )
     {
         real x = 2*X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
@@ -748,6 +753,7 @@ void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, re
         Y[B*DIM+d] -= x * (R1+R1);
         Y[C*DIM+d] += x * R1;
     }
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -774,7 +780,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
         add_rigidityF(nbt, X, rfRigidity, Y);
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
         add_rigidity_SSE(nbt, X, rfRigidity, Y);
-#else
+#elif ( DIM > 1 )
         add_rigidityF(nbt, X, rfRigidity, Y);
 #endif
     
