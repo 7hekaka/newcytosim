@@ -268,7 +268,8 @@ void MatrixSparseSymmetric2::addTriangularBlock(real* mat, const size_t ldd,
             if ( ii < up )
             {
                 //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
-                mat[dim*( jj-si + ldd * (ii-si) )] += col_[jj][n].val;
+                // address lower triangle of 'mat'
+                mat[dim*(ii-si + ldd * (jj-si))] += col_[jj][n].val;
             }
         }
     }

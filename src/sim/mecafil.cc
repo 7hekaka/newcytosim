@@ -391,7 +391,7 @@ void addRigidityLowerT(real* mat, size_t ldd, size_t cnt, const real R1)
     mat[U] += R2;
     mat[D] -= R1;
     
-    mat[e+ldd*f] += R2;
+    mat[f+ldd*e] += R2;
     mat[f+ldd*f] -= R1;
     
     if ( 3 < cnt )
@@ -419,11 +419,11 @@ void Mecafil::addRigidityTerms(real * mat, size_t ldd) const
 {
     if ( nPoints > 2 )
     {
-        addRigidityUpperT(mat, ldd, nPoints, rfRigidity);
+        addRigidityLowerT(mat, ldd, nPoints, rfRigidity);
 #if ( 0 )
         size_t N = DIM*nPoints;
         MatrixSymmetric m(N);
-        addRigidityUpperT(m.data(), ldd, nPoints, 1.0);
+        addRigidityLowerT(m.data(), ldd, nPoints, 1.0);
         VecPrint::print(std::clog, N, N, m.data(), N, 0);
 #endif
     }

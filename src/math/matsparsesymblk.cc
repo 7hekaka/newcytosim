@@ -300,7 +300,7 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const size_t ldd,
                 if ( ii < end )
                 {
                     //fprintf(stderr, "`B %4i %4i % .4f\n", ii, jj, a);
-                    col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd);
+                    col[n].addto_trans(mat+(ii+ldd*jj)-off, ldd);
                 }
             }
         }

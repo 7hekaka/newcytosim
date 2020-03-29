@@ -216,7 +216,8 @@ void MatrixSparseSymmetric::addTriangularBlock(real* mat, const size_t ldd,
             size_t ii = col_[jj][n].inx;
             if ( si <= ii && ii < up )
             {
-                if ( ii < jj )
+                // address lower triangle of 'mat'
+                if ( jj < ii )
                     mat[dim*(ii-si+ldd*(jj-si))] += col_[jj][n].val;
                 else
                     mat[dim*(jj-si+ldd*(ii-si))] += col_[jj][n].val;

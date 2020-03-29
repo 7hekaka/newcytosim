@@ -35,7 +35,7 @@ public:
 
 private:
     
-    /// values of the elements
+    /// values of the elements, stored in line-major order
     real val[12];
     
     /// access to modifiable element by index

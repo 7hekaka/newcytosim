@@ -539,7 +539,7 @@ void duplicate_matrix(size_t siz, real const* src, real * dst)
  input: upper triangular matrix
  ouput: full symmetric matrix
  */
-void expand_matrix(size_t siz, real * mat)
+void expand_upper_matrix(size_t siz, real * mat)
 {
 #if ( 0 )
     std::clog << "\nOriginal:\n";
@@ -549,6 +549,46 @@ void expand_matrix(size_t siz, real * mat)
     for ( size_t jj = 0; jj < siz; jj += DIM  )
     {
         for ( size_t ii = 0; ii < jj; ii += DIM  )
+        {
+            real val = mat[ii+siz*jj];
+            // expand term in other dimensions:
+            for ( size_t d = 1; d < DIM; ++d )
+                mat[ii+d+siz*(jj+d)] = val;
+            
+            // symmetrize matrix:
+            for ( size_t d = 0; d < DIM; ++d )
+                mat[jj+d+siz*(ii+d)] = val;
+        }
+        // expand diagonal term in other dimensions:
+        real val = mat[jj+siz*jj];
+        for ( size_t d = 1; d < DIM; ++d )
+            mat[jj+d+siz*(jj+d)] = val;
+    }
+
+#if ( 0 )
+    std::clog << "Expanded:\n";
+    VecPrint::print(std::clog, siz, siz, mat, siz);
+#endif
+}
+
+/**
+ This will symmetrize matrix `mat`, by copying the lower triangle to the upper one
+ It will also copy the terms that are within the first subspace `X` into the other
+ dimensions.
+ 
+ input: lower triangular matrix
+ ouput: full symmetric matrix
+ */
+void expand_lower_matrix(size_t siz, real * mat)
+{
+#if ( 0 )
+    std::clog << "\nOriginal:\n";
+    VecPrint::print(std::clog, siz, siz, mat, siz);
+#endif
+    
+    for ( size_t jj = 0; jj < siz; jj += DIM  )
+    {
+        for ( size_t ii = jj; ii < siz; ii += DIM  )
         {
             real val = mat[ii+siz*jj];
             // expand term in other dimensions:
@@ -834,7 +874,7 @@ void Meca::getBlock(real* res, const Mecable * mec) const
 #if USE_ISO_MATRIX
     mB.addTriangularBlock(res, bs, mec->matIndex(), np, DIM);
 #endif
-    expand_matrix(bs, res);
+    expand_lower_matrix(bs, res);
     
 #if USE_ISO_MATRIX
     if ( useMatrixC )
