@@ -182,7 +182,7 @@ public:
     void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd(X, Y, 0, size_); }
     
     /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
-    void vecMul(const real* X, real* Y)      const { vecMul(X, Y, 0, size_); }
+    void vecMul(const real* X, real* Y)         const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
     bool isNotZero() const;

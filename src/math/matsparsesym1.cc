@@ -85,7 +85,9 @@ void MatrixSparseSymmetric1::allocate(size_t alc)
         
 #if MATRIX1_USES_COLNEXT
         delete[] next_;
-        next_ = new size_t[allocated_+1];
+        next_ = new size_t[alc+1];
+        for ( size_t n = 0; n <= alc; ++n )
+            next_[n] = n;
 #endif
     }
 }
@@ -264,7 +266,7 @@ real& MatrixSparseSymmetric1::operator()(size_t i, size_t j)
         if ( ++e > lst )
         {
             // add one element last
-            unsigned n = col_size_[jj];
+            size_t n = col_size_[jj];
             if ( n >= col_max_[jj] )
             {
                 allocateColumn(jj, n+1);
@@ -458,7 +460,7 @@ void MatrixSparseSymmetric1::printColumns(std::ostream& os)
     {
         os << "\n   " << jj << "   " << col_size_[jj];
 #if MATRIX1_USES_COLNEXT
-        os << " " << next_[jj];
+        os << " next " << next_[jj];
 #endif
     }
     std::endl(os);
@@ -670,7 +672,7 @@ void MatrixSparseSymmetric1::prepareForMultiply(int dim)
 #endif
     
 #if ( 0 )
-    unsigned cnt = 0;
+    size_t cnt = 0;
     for ( size_t jj = 0; jj < size_; ++jj )
         cnt += ( col_size_[jj] == 0 );
     std::clog << "MatrixSparseSymmetric1 has " << cnt << " / " << size_ << " empty columns\n";
@@ -738,7 +740,6 @@ void MatrixSparseSymmetric1::vecMulAdd(const real* X, real* Y, size_t jj,
                                        real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
     real X0 = X[jj];
     real Y0 = Y[jj] + dia[0] * X0;
     for ( size_t n = start; n < stop; ++n )
@@ -822,7 +823,6 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSE(const real* X, real* Y, size_t j
                                                 real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
     const vec2 xx = load2(X+jj);
     vec2 ss = fmadd2(loaddup2(dia), xx, load2(Y+jj));
     // there is a dependence here for 'ss'
@@ -836,7 +836,6 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_SSEU(const real* X, real* Y, size_t 
                                                  real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
     const vec2 xx = load2(X+jj);
     vec2 s0 = mul2(loaddup2(dia), xx);
     vec2 s1 = load2(Y+jj);
@@ -980,7 +979,6 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVX(const real* X, real* Y, size_t j
                                                 real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
     const vec4 xx = broadcast2(X+jj);  // hi position
     vec4 ss = fmadd4(broadcast1(dia), xx, broadcast2(Y+jj));
     // there is a dependence here for 'ss'
@@ -994,7 +992,6 @@ void MatrixSparseSymmetric1::vecMulAddIso2D_AVXU(const real* X, real* Y, size_t 
                                                  real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
     const vec4 xx = broadcast2(X+jj);  // hi and lo position
     vec4 s0 = mul4(broadcast1(dia), xx);
     vec4 s1 = broadcast2(Y+jj);

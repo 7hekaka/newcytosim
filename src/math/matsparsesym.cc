@@ -139,7 +139,7 @@ real& MatrixSparseSymmetric::operator()(size_t i, size_t j)
     }
     
     // add the requested term at the end:
-    unsigned n = col_size_[jj];
+    size_t n = col_size_[jj];
 
     // allocate space for new Element if necessary:
     if ( n >= col_max_[jj] )

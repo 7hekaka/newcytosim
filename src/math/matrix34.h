@@ -93,7 +93,7 @@ public:
 #if MATRIX34_USES_AVX
     static std::string what() { return "12"; }
 #else
-    static std::string what() { return "3*4"; }
+    static std::string what() { return "3x4"; }
 #endif
     
     /// set all elements to zero

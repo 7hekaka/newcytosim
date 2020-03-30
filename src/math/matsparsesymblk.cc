@@ -50,7 +50,7 @@ void MatrixSparseSymmetricBlock::allocate(size_t alc)
         delete[] next_;
         next_ = new size_t[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
-            next_[n] = alc;
+            next_[n] = n;
     }
 }
 

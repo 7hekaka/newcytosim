@@ -45,7 +45,7 @@ void MatrixSparseBlock::allocate(size_t alc)
         delete[] next_;
         next_ = new size_t[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
-            next_[n] = alc;
+            next_[n] = n;
     }
 }
 
@@ -354,7 +354,7 @@ void MatrixSparseBlock::printLines(std::ostream& os)
         if (  row_[i].size_ > 0 )
         {
             os << "\n   " << i << "   " << row_[i].size_;
-            os << " " << next_[i];
+            os << " next " << next_[i];
         }
     std::endl(os);
 }
