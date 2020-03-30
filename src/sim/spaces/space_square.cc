@@ -332,7 +332,6 @@ bool SpaceSquare::draw() const
 
     glDisable(GL_LIGHTING);
     glLineWidth(0.5);
-    glColor3f(1,1,1);
     
     glBegin(GL_LINE_LOOP);
     gleVertex(  X,  Y, Z );

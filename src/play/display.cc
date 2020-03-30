@@ -528,7 +528,10 @@ void Display::drawSpaces(SpaceSet const& set)
     for ( Space * obj = set.first(); obj; obj=obj->next() )
     {
         if ( obj->prop->disp->visible )
+        {
+            obj->prop->disp->color.load_load();
             drawSpace(obj, true);
+        }
     }
 
 #else
