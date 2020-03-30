@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#ifndef DYNAMIC_SPACE_PROP_H
-#define DYNAMIC_SPACE_PROP_H
+#ifndef SPACE_DYNAMIC_PROP_H
+#define SPACE_DYNAMIC_PROP_H
 
 #include "space_prop.h"
 #include "property.h"
@@ -9,7 +9,7 @@
 class SpaceProp;
 class Space;
 
-class DynamicSpaceProp : public SpaceProp 
+class SpaceDynamicProp : public SpaceProp
 {
         
 public:
@@ -40,10 +40,10 @@ public:
 public:
 
     /// constructor
-    DynamicSpaceProp(const std::string& n) : SpaceProp(n)  { clear(); }
+    SpaceDynamicProp(const std::string& n) : SpaceProp(n)  { clear(); }
     
     /// destructor
-    ~DynamicSpaceProp() { }
+    ~SpaceDynamicProp() { }
 	
     /// set from a Glossary
     virtual void read(Glossary&);

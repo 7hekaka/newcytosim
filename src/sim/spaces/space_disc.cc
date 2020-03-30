@@ -9,7 +9,7 @@
 #include "meca.h"
 
 
-SpaceDisc::SpaceDisc(DynamicSpaceProp const* p)
+SpaceDisc::SpaceDisc(SpaceDynamicProp const* p)
 : Space(p),prop(p)
 {
     if ( DIM != 2 )

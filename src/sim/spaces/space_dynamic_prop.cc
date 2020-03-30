@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include "space_prop.h"
+#include "space_dynamic_prop.h"
 #include "property_list.h"
 #include "glossary.h"
 #include "simul_prop.h"
@@ -9,7 +10,7 @@
 #include "sim.h"
 
 
-// include spaces that use DynamicSpaceProp
+// include spaces that use SpaceDynamicProp
 #include "space_lid.h"
 #include "space_disc.h"
 #include "space_dynamic_sphere.h"
@@ -63,7 +64,7 @@
 
 //------------------------------------------------------------------------------
 
-Space * DynamicSpaceProp::newSpace() const
+Space * SpaceDynamicProp::newSpace() const
 {
     const std::string& s = SpaceProp::shape;
     if ( s=="lid" )                   return new SpaceLid(this);
@@ -75,7 +76,7 @@ Space * DynamicSpaceProp::newSpace() const
 }
 
 
-void DynamicSpaceProp::clear()
+void SpaceDynamicProp::clear()
 {
     SpaceProp::clear();
     viscosity     = INFINITY;
@@ -88,7 +89,7 @@ void DynamicSpaceProp::clear()
 }
 
 
-void DynamicSpaceProp::read(Glossary& glos) 
+void SpaceDynamicProp::read(Glossary& glos) 
 {
     SpaceProp::read(glos);
     glos.set(viscosity,     "viscosity");
@@ -98,7 +99,7 @@ void DynamicSpaceProp::read(Glossary& glos)
 }
 
 
-void DynamicSpaceProp::complete(Simul const& sim)
+void SpaceDynamicProp::complete(Simul const& sim)
 {
     SpaceProp::complete(sim);
     
@@ -117,7 +118,7 @@ void DynamicSpaceProp::complete(Simul const& sim)
 }
 
 
-void DynamicSpaceProp::write_values(std::ostream& os) const
+void SpaceDynamicProp::write_values(std::ostream& os) const
 {
     SpaceProp::write_values(os);
     write_value(os, "viscosity", viscosity, viscosity_rot);

@@ -10,7 +10,7 @@
 #include "random.h"
 
 
-SpaceLid::SpaceLid(DynamicSpaceProp const* p)
+SpaceLid::SpaceLid(SpaceDynamicProp const* p)
 : Space(p), prop(p)
 {
     if ( DIM == 1 )

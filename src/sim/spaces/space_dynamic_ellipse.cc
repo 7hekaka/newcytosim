@@ -2,7 +2,7 @@
 
 #include "dim.h"
 #include "space_dynamic_ellipse.h"
-#include "dynamic_space_prop.h"
+#include "space_dynamic_prop.h"
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "glossary.h"
@@ -27,7 +27,7 @@ inline real surf_block(const real a, const real b, const real c)
 }
 
 
-SpaceDynamicEllipse::SpaceDynamicEllipse(DynamicSpaceProp const* p)
+SpaceDynamicEllipse::SpaceDynamicEllipse(SpaceDynamicProp const* p)
 : SpaceEllipse(p), prop(p)
 {
     if ( DIM == 1 )
