@@ -153,11 +153,8 @@ void View::drawInteractiveFeatures() const
 
     if ( top_message.size() )
     {
-        //glEnable(GL_COLOR_LOGIC_OP);
-        //glLogicOp(GL_INVERT);
         front_color.load();
         drawText(top_message, nullptr, 0x0, 3);
-        //glDisable(GL_COLOR_LOGIC_OP);
     }
     
     if ( label != "off" )

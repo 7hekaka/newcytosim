@@ -192,7 +192,7 @@ public:
     void       zoom_out(GLfloat z) { zoom_to( zoom / z ); }
     
     //---------------------------------------------------------------------------
-     
+    
     /// adjust zoom and focus to match the ROI specificed by two corner points
     void       matchROI(Vector3, Vector3);
     

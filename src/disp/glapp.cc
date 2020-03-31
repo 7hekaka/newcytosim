@@ -34,14 +34,13 @@ namespace glApp
         MOUSE_TRANSLATEZ = 3,
         MOUSE_SPIN       = 4,
         MOUSE_MAGNIFIER  = 5,
-        MOUSE_SET_ROI    = 6,
-        MOUSE_MOVE_ROI   = 7,
-        MOUSE_SELECT     = 8,
-        MOUSE_PASSIVE    = 9
+        MOUSE_EDIT_ROI   = 6,
+        MOUSE_SELECT     = 7,
+        MOUSE_PASSIVE    = 8
     };
     
     /// Specifies in which dimensionality each action is valid
-    int actionDimensionality[] = { 3, 1, 1, 3, 2, 1, 1, 1, 4, 4, 4, 0 };
+    int actionDimensionality[] = { 3, 1, 1, 3, 2, 1, 1, 4, 4, 4, 0 };
     
     /// the action controlled with the mouse
     UserMode     userMode = MOUSE_ROTATE;
@@ -49,7 +48,7 @@ namespace glApp
     /// change action
     void         switchUserMode(int dir);
 
-    View         savedView("backup");
+    View         savedView("savedView");
     UserMode     mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
     Vector3      mouseDown;                      ///< position where mouse button was pressed down
     GLint        mouseX, mouseY;                 ///< current position of mouse in pixels
@@ -68,11 +67,12 @@ namespace glApp
     double       flashEndTime;
     std::string  flashString;
 
-    Vector3      ROIdown[2];
-    void         setROI(Vector3);
+    Vector3      ROIdup[2];
+    bool         moveROI = false;
     void         setROI(Vector3, Vector3);
+    void         matchROItoView();
     bool         insideROI(Vector3);
-    void         drawROI(Vector3[2]);
+    void         drawCuboid(Vector3[2]);
 
     /// function pointer for shift-click actions
     void (*mouseClickCallback)(int, int, const Vector3 &, int) = nullptr;
@@ -375,22 +375,15 @@ void glApp::resetView()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/** Only 2D */
+/** Only check X and Y components */
 bool glApp::insideROI(Vector3 pos)
 {
-    bool inX = ( ROI[0].XX < pos.XX  &&  pos.XX < ROI[1].XX );
-    bool inY = ( ROI[0].YY < pos.YY  &&  pos.YY < ROI[1].YY );
-    return inX && inY;
+    bool inX = ((ROI[0].XX < pos.XX) & (pos.XX < ROI[1].XX));
+    bool inY = ((ROI[0].YY < pos.YY) & (pos.YY < ROI[1].YY));
+    return ( inX & inY );
 }
 
-/** Only 2D */
-void glApp::setROI(Vector3 a)
-{
-    ROI[0] = a;
-    ROI[1] = a;
-}
 
-/** Only 2D */
 void glApp::setROI(Vector3 a, Vector3 b)
 {
     ROI[0].XX = std::min(a.XX, b.XX);
@@ -399,6 +392,15 @@ void glApp::setROI(Vector3 a, Vector3 b)
     ROI[1].YY = std::max(a.YY, b.YY);
     ROI[0].ZZ = std::min(a.ZZ, b.ZZ);
     ROI[1].ZZ = std::max(a.ZZ, b.ZZ);
+}
+
+
+void glApp::matchROItoView()
+{
+    View & view = glApp::currentView();
+    view.getMatrices();
+    setROI(view.unproject(0, 0, nearZ), view.unproject(view.width(), view.height(), nearZ));
+    flashText("ROI set to current view");
 }
 
 
@@ -452,8 +454,7 @@ void glApp::switchUserMode(int dir)
         case MOUSE_TRANSLATEZ:flashText("Mouse: Translate-Z");  break;
         case MOUSE_SPIN:      flashText("Mouse: Spin & Zoom");  break;
         case MOUSE_MAGNIFIER: flashText("Mouse: Magnifier");    break;
-        case MOUSE_SET_ROI:   flashText("Mouse: Select ROI");   break;
-        case MOUSE_MOVE_ROI:  flashText("Mouse: Move ROI");     break;
+        case MOUSE_EDIT_ROI:  flashText("Mouse: Edit ROI");     break;
         case MOUSE_SELECT:    flashText("Mouse: Select");       break;
         case MOUSE_PASSIVE:   flashText("Mouse: Passive");      break;
     }
@@ -752,9 +753,10 @@ int glApp::buildMenu()
     glutAddSubMenu("Window Size",    menu2);
     glutAddSubMenu("Slice",          menu3);
     glutAddMenuEntry("Reset View",         1);
-    glutAddMenuEntry("Show/hide Scalebar", 2);
-    glutAddMenuEntry("Show/hide XYZ-axes", 3);
-    glutAddMenuEntry("Toggle fullscreen mode", 4);
+    glutAddMenuEntry("Match ROI to view",  2);
+    glutAddMenuEntry("Show/hide Scalebar", 3);
+    glutAddMenuEntry("Show/hide XYZ-axes", 4);
+    glutAddMenuEntry("Toggle fullscreen mode", 5);
     glutAddMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
     glutAddMenuEntry("Quit",         20);
     
@@ -786,9 +788,10 @@ void glApp::processMenuEvent(int item)
     {
         case 0:   return;
         case 1:   view.reset();                      break;
-        case 2:   view.scalebar = ! view.scalebar;    break;
-        case 3:   view.axes = ( view.axes ? 0 : mDIM ); break;
-        case 4:   toggleFullScreen();                break;
+        case 2:   glApp::matchROItoView();           break;
+        case 3:   view.scalebar = ! view.scalebar;   break;
+        case 4:   view.axes = (view.axes?0:mDIM );   break;
+        case 5:   toggleFullScreen();                break;
         case 7:   setDimensionality(mDIM==2?3:2);    break;
         
         case 20:  exit(EXIT_SUCCESS);                break;
@@ -923,7 +926,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     savedView = view;
     savedView.getMatrices();
     mouseDown = savedView.unproject(mouseX, mouseY, nearZ);
-    viewFocus = savedView.unproject(winX/2.0, winY/2.0, nearZ);
+    viewFocus = savedView.unproject(winX*0.5, winY*0.5, nearZ);
     
     if ( state == GLUT_UP )
     {
@@ -967,24 +970,25 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     specialKeys = glutGetModifiers();
 
     // change the mouse action if the CONTROL is pressed:
-    if ( specialKeys & GLUT_ACTIVE_CTRL )
+    if ( specialKeys & GLUT_ACTIVE_ALT )
     {
-        switch ( mouseAction )
+        switch ( userMode )
         {
             case MOUSE_TRANSLATE: mouseAction = (mDIM==2)?MOUSE_SPIN:MOUSE_ROTATE; break;
             case MOUSE_SPIN:      mouseAction = (mDIM==2)?MOUSE_TRANSLATE:MOUSE_TRANSLATEZ; break;
-            case MOUSE_SET_ROI:   mouseAction = MOUSE_TRANSLATE; break;
+            case MOUSE_EDIT_ROI:  mouseAction = MOUSE_TRANSLATE; break;
             case MOUSE_ROTATE:    mouseAction = MOUSE_TRANSLATE; break;
             case MOUSE_TRANSLATEZ:mouseAction = (mDIM==2)?MOUSE_TRANSLATE:MOUSE_ROTATE;  break;
             default: break;
         }
     }
-    
+    //std::clog << "mouseAction " << mouseAction << " modifiers " << specialKeys << "\n";
+
     // change the mouse action because the shift key is down:
     if ( specialKeys & GLUT_ACTIVE_SHIFT )
     {
         mouseAction = MOUSE_ACTIVE;
-        specialKeys -= GLUT_ACTIVE_SHIFT;
+        specialKeys ^= GLUT_ACTIVE_SHIFT;
     }
     
     switch( mouseAction )
@@ -997,7 +1001,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
         case MOUSE_TRANSLATEZ:
         {
             depthAxis  = normalize( viewFocus - savedView.focus );
-            Vector3 ud = savedView.unproject(winX/2.0, winY, nearZ);
+            Vector3 ud = savedView.unproject(winX*0.5, winY, nearZ);
             mouseAxis  = normalize( ud - viewFocus );
         } break;
             
@@ -1027,23 +1031,14 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
             glutSetCursor(GLUT_CURSOR_NONE);
         } break;
             
-        case MOUSE_SET_ROI:
-        case MOUSE_MOVE_ROI:
+        case MOUSE_EDIT_ROI:
         {
             mouseDown = savedView.unproject(mouseX, mouseY, midZ);
-            if ( insideROI(mouseDown) )
-            {
-                ROIdown[0] = ROI[0];
-                ROIdown[1] = ROI[1];
-                mouseAction = MOUSE_MOVE_ROI;
-            }
-            if ( mouseAction == MOUSE_SET_ROI )
-            {
-                setROI(mouseDown);
-                flashText("click at %.4f %.4f %.4f", ROI[0].XX, ROI[0].YY, ROI[0].ZZ);
-            }
+            ROIdup[0] = ROI[0];
+            ROIdup[1] = ROI[1];
+            moveROI = insideROI(mouseDown);
+            flashText("click at %.4f %.4f %.4f", mouseDown.XX, mouseDown.YY, mouseDown.ZZ);
         } break;
-        
             
         case MOUSE_ACTIVE:
         {
@@ -1121,20 +1116,22 @@ void glApp::processMouseDrag(int mX, int mY)
         } break;
 
         
-        case MOUSE_SET_ROI:
+        case MOUSE_EDIT_ROI:
         {
-            setROI(mouseDown, savedView.unproject(mouseX, mouseY, midZ));
-            Vector3 d = ROI[1] - ROI[0];
-            flashText("ROI %.3fx%.3f diag. %.3f", d.XX, d.YY, d.norm());
-        } break;
-        
-        
-        case MOUSE_MOVE_ROI:
-        {
-            Vector3 d = savedView.unproject(mouseX, mouseY, midZ) - mouseDown;
-            ROI[0] = ROIdown[0] + d;
-            ROI[1] = ROIdown[1] + d;
-            flashText("ROI moved %.3f %.3f", d.XX, d.YY);
+            Vector3 m = savedView.unproject(mouseX, mouseY, midZ);
+            if ( moveROI )
+            {
+                Vector3 d = m - mouseDown;
+                setROI(ROIdup[0]+d, ROIdup[1]+d);
+                d = 0.5 * ( ROI[0] + ROI[1] );
+                flashText("ROI center %.3f %.3f", d.XX, d.YY);
+            }
+            else
+            {
+                setROI(mouseDown, m);
+                Vector3 d = ROI[1] - ROI[0];
+                flashText("ROI %.3fx%.3f diagonal %.3f", d.XX, d.YY, d.norm());
+            }
         } break;
             
         
@@ -1188,11 +1185,10 @@ void glApp::flashText(const char* fmt, ...)
 
 //------------------------------------------------------------------------------
 
-void glApp::drawROI(Vector3 roi[2])
+void glApp::drawCuboid(Vector3 roi[2])
 {
-    glPushAttrib(GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
+    glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glColor3f(1,1,0);
     glLineWidth(0.5);
 
     glBegin(GL_LINE_LOOP);
@@ -1265,9 +1261,12 @@ void glApp::displayMain()
         }
     }
     
-    if ( userMode == MOUSE_SET_ROI )
-        drawROI(ROI);
-
+    if ( userMode == MOUSE_EDIT_ROI )
+    {
+        view.front_color.load();
+        drawCuboid(ROI);
+    }
+    
     if ( view.buffered )
         glutSwapBuffers();
     else

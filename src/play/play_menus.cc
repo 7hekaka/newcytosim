@@ -142,7 +142,7 @@ int buildMenuStyle()
     if ( menuID == 0 )
     {
         menuID = glutCreateMenu(processMenuDisplay);
-        glutAddMenuEntry("Detailled (style 1)", 101);
+        glutAddMenuEntry("Detailed (style 1)", 101);
         glutAddMenuEntry("Fastest (style 2)", 102);
         glutAddMenuEntry("Best Looking (style 3)", 103);
     }
