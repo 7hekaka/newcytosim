@@ -168,7 +168,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
     const real len = aa.radius + bb.radius;
     
     // get position of point with respect to segment:
-    real dis2;
+    real dis2 = INFINITY;
     real abs = bb.seg.projectPoint0(aa.pos, dis2);
     
     if ( 0 <= abs )

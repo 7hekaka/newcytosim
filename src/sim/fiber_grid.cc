@@ -272,9 +272,8 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 #if ATTACH_CLOSEST_FIBER
         for ( FiberSegment const& seg : segments )
         {
-            real dis = INFINITY;
-            seg.projectPoint(place, dis);
-            seg.dis_ = dis;
+            seg.dis_ = INFINITY;
+            seg.projectPoint(place, seg.dis_);
         }
         segments.sort(compareSegments);
         //printf("tryToAttach %lu segments\n", segments.size());
@@ -296,9 +295,8 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
         if ( seg.dis_ > ha.prop->binding_range_sqr )
             break;
         Fiber * fib = const_cast<Fiber*>(seg.fiber());
-        //need to recalculate the abscissa:
-        real dis = INFINITY;
-        FiberSite pos(fib, seg.abscissa1()+seg.projectPoint(place, dis));
+        // need to recalculate the abscissa of the projection:
+        FiberSite pos(fib, seg.abscissa1()+seg.projectPoint(place, seg.dis_));
         if ( ha.attachmentAllowed(pos) )
         {
             ha.attach(pos);

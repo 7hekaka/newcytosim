@@ -240,25 +240,24 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
     real abs = 0, len = segmentation();
     
     // try all segments
-    for ( size_t ii = 0; ii < nbSegments(); ++ii )
+    for ( size_t s = 0; s < nbSegments(); ++s )
     {
         //check the segment:
-        FiberSegment s(this, ii);
         real d = INFINITY;
-        real a = s.projectPoint0(w, d);
+        real a = FiberSegment(this, s).projectPoint0(w, d);
         if ( len < a )
         {
             // test exact point
-            real e = distanceSqr(w, posP(ii+1));
+            real e = distanceSqr(w, posP(s+1));
             if ( e < dis ) {
-                abs = abscissaPoint(ii+1);
+                abs = abscissaPoint(s+1);
                 dis = e;
             }
         }
-        else if ( 0 <= a  &&  d < dis )
+        else if (( 0 <= a ) & ( d < dis ))
         {
             //the projection is the best found so far
-            abs = abscissaPoint(ii) + a;
+            abs = abscissaPoint(s) + a;
             dis = d;
         }
     }

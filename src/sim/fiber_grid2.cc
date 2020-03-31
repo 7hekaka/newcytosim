@@ -56,8 +56,8 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
         if ( RNG.flip_8th() )
 #endif
         {
+            // Compute the distance between 'place' and segment
             real dis = INFINITY;
-            // Compute the distance from the hand to the rod, and abscissa of projection:
             real abs = seg.projectPoint(place, dis);
             
             /*
@@ -88,8 +88,8 @@ FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real
     {
         if ( seg.fiber() != exclude )
         {
+            // Compute the distance between 'place' and segment
             real dis = INFINITY;
-            // Compute the distance from the hand to the rod:
             seg.projectPoint(place, dis);
             
             if ( dis < DD )
@@ -108,8 +108,8 @@ FiberSegment FiberGrid::closestSegment(Vector const& place) const
     
     for ( FiberSegment const& seg : allSegments )
     {
+        // Compute the distance between 'place' and segment
         real dis = INFINITY;
-        // Compute the distance from the hand to the rod:
         seg.projectPoint(place, dis);
         
         if ( dis < hit )

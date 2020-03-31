@@ -30,7 +30,7 @@ void Shackle::setInteractions(Meca& meca) const
 
 void Shackle::stepAA()
 {
-    real dis;
+    real dis = INFINITY;
     
     // project the position of cHand2 to set abscissa of cHand1
     real a = cHand1->fiber()->projectPoint(cHand2->pos(), dis);

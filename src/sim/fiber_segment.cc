@@ -13,33 +13,32 @@ extern Modulo const* modulo;
 //------------------------------------------------------------------------------
 
 /**
- W is projected on the line that supports this FiberSegment
+ W is projected on the line supporting this FiberSegment
  The function calculates:
  - abs <- the signed distance from pos1() to the projection of W
  - dis <- the distance between W and its projection
  .
  
- It is assumed here that len() returns the distance between the two points of the FiberSegment
- Attention: `dis` is not set if ( abs < 0 ) or ( abs > len() )
+ This uses FiberSegment::lenInv() that should return 1.0 / segment_length
  */
-real FiberSegment::projectPoint0(Vector aw, real& dis) const
+real FiberSegment::projectPoint0(Vector W, real& dis) const
 {
     assert_true( fib_ );
     
     Vector A = pos1();
-    aw -= A;
+    W -= A;
     
     if ( modulo )
-        modulo->fold(aw);
+        modulo->fold(W);
     
     // project with the scalar product:
-    real abs = dot(aw, pos2()-A) * lenInv();
+    real abs = dot(W, pos2()-A) * lenInv();
     
     // calculate distance to projection
 #if ( DIM == 1 )
     dis = 0;
 #else
-    dis = aw.normSqr() - abs * abs;
+    dis = W.normSqr() - abs * abs;
 #endif
 
     return abs;
@@ -56,36 +55,36 @@ real FiberSegment::projectPoint0(Vector aw, real& dis) const
  It is assumed here that len() returns the distance between the two points of the FiberSegment
  Attention: `dis` may NOT be set if ( abs < 0 ) or ( abs > len() )
  */
-real FiberSegment::projectPoint(Vector const& w, real& dis) const
+real FiberSegment::projectPoint(Vector const& W, real& dis) const
 {
     assert_true( fib_ );
     
     Vector A = pos1();
-    Vector aw = w - A;
+    Vector AW = W - A;
     
     if ( modulo )
-        modulo->fold(aw);
+        modulo->fold(AW);
     
     // project with the scalar product:
-    real abs = dot(aw, pos2()-A) * lenInv();
+    real abs = dot(AW, pos2()-A) * lenInv();
     
     // test boundaries of filament:
     if ( abs < 0 )
     {
         if ( isFirst() )
-            dis = distanceSqr(w, A);
+            dis = distanceSqr(W, A);
     }
     else if ( abs > len() )
     {
         if ( isLast() )
-            dis = distanceSqr(w, pos2());
+            dis = distanceSqr(W, pos2());
     }
     else
     {
 #if ( DIM == 1 )
         dis = 0;
 #else
-        dis = aw.normSqr() - abs * abs;
+        dis = AW.normSqr() - abs * abs;
 #endif
     }
     return abs;

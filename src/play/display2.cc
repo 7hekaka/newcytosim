@@ -232,6 +232,7 @@ void Display2::drawSolid(Solid const& obj)
     //display outline of spheres
     if ( disp->style & 4 )
     {
+        //disp->color.load();
         bodyColor2(disp, obj.signature());
         lineWidth(disp->width);
 #if ( DIM == 2 )

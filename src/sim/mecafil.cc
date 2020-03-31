@@ -597,8 +597,9 @@ void Mecafil::addRigidity(const real* X, real* Y) const
              Link first and last point in the same way as all other points,
              making the fiber mechanically homogeneous and all points equivalent
              */
-            add_rigidity(L,             0, 1, X, rfRigidity, Y);
-            add_rigidity(L-1, lastPoint(), 0, X, rfRigidity, Y);
+            const size_t L = lastPoint();
+            add_rigidity(L,   0, 1, X, rfRigidity, Y);
+            add_rigidity(L-1, L, 0, X, rfRigidity, Y);
         }
 #endif
     }

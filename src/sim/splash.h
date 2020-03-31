@@ -11,7 +11,7 @@
 inline void splash(std::ostream& os)
 {
     os << " ------------------------------------------------------------- \n";
-    os << "|  CytoSIM " <<DIM<<"D -  www.cytosim.org  -  version PI  - Nov. 2019  |\n";
+    os << "|  CytoSIM " <<DIM<<"D  -  www.cytosim.org  -  version PI  -  04.2020  |\n";
     os << " ------------------------------------------------------------- \n";
 }
 
@@ -34,20 +34,17 @@ inline void print_version(std::ostream& os)
 #else
     os << "    Code version unknown";
 #endif
-
+    
 #ifdef NDEBUG
     os << " (no assertions)\n";
 #else
     os << " with assertions\n";
 #endif
-            
-#if FIBER_HAS_LATTICE > 0
-    os << "    Fiber has digital lattice\n";
-#elif FIBER_HAS_LATTICE < 0
-    os << "    Fiber has <real> lattice\n";
-#endif
-#if FIBER_HAS_MESH
-    os << "    Fiber has analog mesh\n";
-#endif
+    
+    os << "    Fiber: lattice " << FIBER_HAS_LATTICE;
+    os << " mesh " << FIBER_HAS_MESH;
+    os << " family " << FIBER_HAS_FAMILY;
+    os << " glue " << FIBER_HAS_GLUE;
+    os << " attach_closest " << ATTACH_CLOSEST_FIBER << "\n";
 }
 

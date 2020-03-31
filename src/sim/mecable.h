@@ -304,7 +304,7 @@ public:
 
     //--------------------------------------------------------------------------
     
-    /// return fiber rigidity
+    /// return type of fiber rigidity { 0 : none, 1: fiber }
     virtual int     hasRigidity() const { return 0; }
 
     /// return fiber rigidity

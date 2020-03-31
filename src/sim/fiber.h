@@ -26,16 +26,14 @@ class LineDisp;
 /// Flag to associate a Lattice of reals to the Fiber class {0, 1}
 #define FIBER_HAS_MESH 1
 
-/// Flag to allow `family` member variable to control Couple's binding
+/// Flag to allow `family` member variable to control Couple's binding {0, 1}
 #define FIBER_HAS_FAMILY 0
 
-
-/// Flag to allow dynamic Single creation/binding
+/// Flag to allow dynamic Single creation/binding at fiber's ends {0, 1}
 #define FIBER_HAS_GLUE 0
 
-
-/// If enabled, bind to closest targets more likely
-#define ATTACH_CLOSEST_FIBER 0
+/// Flag to enable the sorting of targets during attachment of Hands {0, 1}
+#define ATTACH_CLOSEST_FIBER 1
 
 
 /**
