@@ -717,10 +717,11 @@ int glApp::buildMenu()
     glutAddSubMenu("Window Size",    menu2);
     glutAddSubMenu("Slice",          menu3);
     glutAddMenuEntry("Reset View",         1);
-    glutAddMenuEntry("Match ROI to view",  2);
-    glutAddMenuEntry("Show/hide Scalebar", 3);
-    glutAddMenuEntry("Show/hide XYZ-axes", 4);
-    glutAddMenuEntry("Toggle fullscreen mode", 5);
+    glutAddMenuEntry("Match ROI to View",  2);
+    glutAddMenuEntry("Match View to ROI",  3);
+    glutAddMenuEntry("Show/hide Scalebar", 4);
+    glutAddMenuEntry("Show/hide XYZ-axes", 5);
+    glutAddMenuEntry("Toggle fullscreen mode", 6);
     glutAddMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
     glutAddMenuEntry("Quit",         20);
     
@@ -753,9 +754,10 @@ void glApp::processMenuEvent(int item)
         case 0:   return;
         case 1:   view.reset();                      break;
         case 2:   view.adjustROI(nearZ);             break;
-        case 3:   view.scalebar = ! view.scalebar;   break;
-        case 4:   view.axes = (view.axes?0:mDIM );   break;
-        case 5:   toggleFullScreen();                break;
+        case 3:   view.matchROI();                   break;
+        case 4:   view.scalebar = ! view.scalebar;   break;
+        case 5:   view.axes = (view.axes?0:mDIM );   break;
+        case 6:   toggleFullScreen();                break;
         case 7:   setDimensionality(mDIM==2?3:2);    break;
         
         case 20:  exit(EXIT_SUCCESS);                break;
