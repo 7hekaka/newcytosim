@@ -56,7 +56,6 @@ namespace glApp
     Vector3      mouseAxis;                      ///< axis of rotation for MOUSE_SPIN
     Vector3      viewFocus;                      ///< unprojected center of screen
     
-    Vector3      ROI[2] = { Vector3(0,0,0) };    ///< Regions of interest selected with the mouse
     int          savedWindowPos[4] = { 24, 24, 800, 800 };
     
     real         nearZ  = 0;       ///< normalized device Z-coordinate of front-plane
@@ -69,10 +68,6 @@ namespace glApp
 
     Vector3      ROIdup[2];
     bool         moveROI = false;
-    void         setROI(Vector3, Vector3);
-    void         matchROItoView();
-    bool         insideROI(Vector3);
-    void         drawCuboid(Vector3[2]);
 
     /// function pointer for shift-click actions
     void (*mouseClickCallback)(int, int, const Vector3 &, int) = nullptr;
@@ -370,37 +365,6 @@ void glApp::resetView()
 {
     assert_true( glutGetWindow() < (int)views.size() );
     glApp::currentView().reset();
-}
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-/** Only check X and Y components */
-bool glApp::insideROI(Vector3 pos)
-{
-    bool inX = ((ROI[0].XX < pos.XX) & (pos.XX < ROI[1].XX));
-    bool inY = ((ROI[0].YY < pos.YY) & (pos.YY < ROI[1].YY));
-    return ( inX & inY );
-}
-
-
-void glApp::setROI(Vector3 a, Vector3 b)
-{
-    ROI[0].XX = std::min(a.XX, b.XX);
-    ROI[1].XX = std::max(a.XX, b.XX);
-    ROI[0].YY = std::min(a.YY, b.YY);
-    ROI[1].YY = std::max(a.YY, b.YY);
-    ROI[0].ZZ = std::min(a.ZZ, b.ZZ);
-    ROI[1].ZZ = std::max(a.ZZ, b.ZZ);
-}
-
-
-void glApp::matchROItoView()
-{
-    View & view = glApp::currentView();
-    view.getMatrices();
-    setROI(view.unproject(0, 0, nearZ), view.unproject(view.width(), view.height(), nearZ));
-    flashText("ROI set to current view");
 }
 
 
@@ -788,7 +752,7 @@ void glApp::processMenuEvent(int item)
     {
         case 0:   return;
         case 1:   view.reset();                      break;
-        case 2:   glApp::matchROItoView();           break;
+        case 2:   view.adjustROI(nearZ);             break;
         case 3:   view.scalebar = ! view.scalebar;   break;
         case 4:   view.axes = (view.axes?0:mDIM );   break;
         case 5:   toggleFullScreen();                break;
@@ -1034,9 +998,9 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
         case MOUSE_EDIT_ROI:
         {
             mouseDown = savedView.unproject(mouseX, mouseY, midZ);
-            ROIdup[0] = ROI[0];
-            ROIdup[1] = ROI[1];
-            moveROI = insideROI(mouseDown);
+            ROIdup[0] = view.roi(0);
+            ROIdup[1] = view.roi(1);
+            moveROI = view.insideROI(mouseDown);
             flashText("click at %.4f %.4f %.4f", mouseDown.XX, mouseDown.YY, mouseDown.ZZ);
         } break;
             
@@ -1122,14 +1086,14 @@ void glApp::processMouseDrag(int mX, int mY)
             if ( moveROI )
             {
                 Vector3 d = m - mouseDown;
-                setROI(ROIdup[0]+d, ROIdup[1]+d);
-                d = 0.5 * ( ROI[0] + ROI[1] );
+                view.setROI(ROIdup[0]+d, ROIdup[1]+d);
+                d = 0.5 * ( view.roi(0) + view.roi(1) );
                 flashText("ROI center %.3f %.3f", d.XX, d.YY);
             }
             else
             {
-                setROI(mouseDown, m);
-                Vector3 d = ROI[1] - ROI[0];
+                view.setROI(mouseDown, m);
+                Vector3 d = view.roi(1) - view.roi(0);
                 flashText("ROI %.3fx%.3f diagonal %.3f", d.XX, d.YY, d.norm());
             }
         } break;
@@ -1181,33 +1145,6 @@ void glApp::flashText(const char* fmt, ...)
     vsnprintf(tmp, 1024, fmt, args);
     va_end(args);
     flashText0(tmp);
-}
-
-//------------------------------------------------------------------------------
-
-void glApp::drawCuboid(Vector3 roi[2])
-{
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glLineWidth(0.5);
-
-    glBegin(GL_LINE_LOOP);
-    glVertex3d(roi[0].XX, roi[0].YY, roi[0].ZZ);
-    glVertex3d(roi[1].XX, roi[0].YY, roi[0].ZZ);
-    glVertex3d(roi[1].XX, roi[1].YY, roi[0].ZZ);
-    glVertex3d(roi[0].XX, roi[1].YY, roi[0].ZZ);
-    glEnd();
-
-    if ( mDIM == 3 )
-    {
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(roi[0].XX, roi[0].YY, roi[1].ZZ);
-        glVertex3d(roi[1].XX, roi[0].YY, roi[1].ZZ);
-        glVertex3d(roi[1].XX, roi[1].YY, roi[1].ZZ);
-        glVertex3d(roi[0].XX, roi[1].YY, roi[1].ZZ);
-        glEnd();
-    }
-    glPopAttrib();
 }
 
 //------------------------------------------------------------------------------
@@ -1263,8 +1200,7 @@ void glApp::displayMain()
     
     if ( userMode == MOUSE_EDIT_ROI )
     {
-        view.front_color.load();
-        drawCuboid(ROI);
+        view.drawROI();
     }
     
     if ( view.buffered )

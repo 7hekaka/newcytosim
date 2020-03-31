@@ -32,6 +32,9 @@ private:
     /// window number in GLUT
     int        mWindowId;
     
+    /// Region of interest
+    Vector3    mROI[2];
+
     /// used to check that getMatrices() was called
     bool       hasMatrices;
     
@@ -193,8 +196,26 @@ public:
     
     //---------------------------------------------------------------------------
     
+    /// return ROI i-th point, i in { 0, 1 }
+    Vector3    roi(size_t i) const { return mROI[i]; }
+    
     /// adjust zoom and focus to match the ROI specificed by two corner points
-    void       matchROI(Vector3, Vector3);
+    void       matchROI();
+    
+    /// set ROI to match the current view
+    void       adjustROI(real Z);
+    
+    /// define ROI
+    void       setROI(Vector3, Vector3);
+    
+    /// return 'true' if point is inside ROI
+    bool       insideROI(Vector3) const;
+    
+    /// draw cuboid
+    static void drawCuboid(Vector3 const&, Vector3 const&);
+
+    /// draw ROI
+    void       drawROI() const;
     
     /// display zoomed in regions around position (mX, mY)
     void       displayMagnifier(GLint factor, Vector3 foc, GLint mX, GLint mY) const;

@@ -145,6 +145,8 @@ void View::closeDisplay() const
 */
 void View::drawInteractiveFeatures() const
 {
+    drawROI();
+
     if ( draw_memo && memo.size() )
     {
         glColor3f(1,1,1);
@@ -429,19 +431,6 @@ void View::zoom_to(GLfloat z)
 }
 
 
-void View::matchROI(Vector3 a, Vector3 b)
-{
-    focus = 0.5 * ( a + b );
-    real r = 0.5 * ( a - b ).norm_inf();
-    
-    // zoom only if region is 7 pixels wide:
-    if ( r > 7 * pixelSize() )
-        zoom = view_size / (GLfloat)r;
-    
-    setModelView();
-}
-
-
 void View::move_to(const Vector3& d)
 {
     focus = d;
@@ -478,6 +467,50 @@ void View::align_with(const Vector3 & dir)
         setModelView();
     }
 }
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
+void View::adjustROI(real Z)
+{
+    getMatrices();
+    setROI(unproject(0, 0, Z), unproject(width(), height(), Z));
+}
+
+
+void View::matchROI()
+{
+    focus = 0.5 * ( mROI[0] + mROI[1] );
+    real r = 0.5 * ( mROI[0] - mROI[1] ).norm_inf();
+    
+    // zoom only if region is 7 pixels wide:
+    if ( r > 7 * pixelSize() )
+        zoom = view_size / (GLfloat)r;
+    
+    setModelView();
+}
+
+
+/** Only check X and Y components */
+bool View::insideROI(Vector3 pos) const
+{
+    bool inX = ((mROI[0].XX < pos.XX) & (pos.XX < mROI[1].XX));
+    bool inY = ((mROI[0].YY < pos.YY) & (pos.YY < mROI[1].YY));
+    return ( inX & inY );
+}
+
+
+void View::setROI(Vector3 a, Vector3 b)
+{
+    mROI[0].XX = std::min(a.XX, b.XX);
+    mROI[1].XX = std::max(a.XX, b.XX);
+    mROI[0].YY = std::min(a.YY, b.YY);
+    mROI[1].YY = std::max(a.YY, b.YY);
+    mROI[0].ZZ = std::min(a.ZZ, b.ZZ);
+    mROI[1].ZZ = std::max(a.ZZ, b.ZZ);
+}
+
+
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -743,6 +776,37 @@ void View::drawText(std::string const& str, void* font, gle_color col, int pos) 
 
 //------------------------------------------------------------------------------
 #pragma mark -
+
+void View::drawCuboid(Vector3 const& A, Vector3 const& B)
+{
+    glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    glLineWidth(0.5);
+
+    glBegin(GL_LINE_LOOP);
+    glVertex3d(A.XX, A.YY, A.ZZ);
+    glVertex3d(B.XX, A.YY, A.ZZ);
+    glVertex3d(B.XX, B.YY, A.ZZ);
+    glVertex3d(A.XX, B.YY, A.ZZ);
+    glEnd();
+
+    glBegin(GL_LINE_LOOP);
+    glVertex3d(A.XX, A.YY, B.ZZ);
+    glVertex3d(B.XX, A.YY, B.ZZ);
+    glVertex3d(B.XX, B.YY, B.ZZ);
+    glVertex3d(A.XX, B.YY, B.ZZ);
+    glEnd();
+
+    glPopAttrib();
+}
+
+
+void View::drawROI() const
+{
+    front_color.load();
+    drawCuboid(mROI[0], mROI[1]);
+}
+
 
 /// draw vertical ticks over ] -10*d, +10*d [
 void View::drawScaleTicksH(GLfloat d, GLfloat a, GLfloat b) const
