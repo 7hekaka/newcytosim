@@ -4,10 +4,13 @@
 
 #define DIM 3
 
+#include "assert_macro.h"
 #include "real.h"
 #include "tictoc.h"
 #include "random.h"
 #include "vecprint.h"
+#include "clapack.h"
+#include "dpttrf.h"
 #include "cblas.h"
 #include "simd.h"
 
@@ -459,7 +462,7 @@ inline void testRigidity(size_t cnt, void (*func)(const size_t, const real*, rea
         func(nbt, x, scalar, z);
         func(nbt, z, scalar, y);
     }
-    TicToc::toc(str, nullptr);
+    TicToc::toc(str);
     zero_real(ALOC, x);
     func(nbt, pos, scalar, x);
     VecPrint::print(std::cout, std::min(16ul,NBR), x);
@@ -918,7 +921,7 @@ inline void testU(size_t cnt, void (*func)(size_t, const real*, const real*, rea
         func(NBS, diff, x+2, y);
         func(NBS, diff, z+4, y);
     }
-    TicToc::toc(str, nullptr);
+    TicToc::toc(str);
     
     zero_real(ALOC, lagmul);
     func(NBS, diff, force, lagmul);
@@ -941,7 +944,7 @@ inline void testD(size_t cnt, void (*func)(size_t, const real*, const real*, con
         func(NBS, diff, y+2, z, x+2);
         func(NBS, diff, z+4, x, y+4);
     }
-    TicToc::toc(str, nullptr);
+    TicToc::toc(str);
     
     zero_real(ALOC, x);
     func(NBS, diff, pos, lagmul, x);
@@ -980,23 +983,109 @@ void testProjectionD(size_t cnt)
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - DPTTR / DPTTS2
+
+/**
+ Test Lapack and custom implementation of routines used to factorize
+ a symmetric tri-diagonal matrix and solve the associated system.
+ */
+void testDPTT(size_t cnt)
+{
+    std::cout << "testDPTT\n";
+    
+    real * D = new_real(NBS);
+    real * U = new_real(NBS);
+    real * B = new_real(NBS);
+    real * Ds = new_real(NBS);
+    real * Us = new_real(NBS);
+    real * Bs = new_real(NBS);
+
+    for ( size_t i = 0; i < NBS; ++i )
+    {
+        Ds[i] = 2.0;
+        Us[i] = -RNG.preal();
+        Bs[i] = RNG.sreal();
+    }
+
+    int info;
+    copy_real(NBS, Ds, D);
+    copy_real(NBS, Us, U);
+    copy_real(NBS, Bs, B);
+    lapack_xpttrf(NBS, D, U, &info);
+    lapack_xptts2(NBS, 1, D, U, B, 1);
+    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        lapack_xptts2(NBS, 1, D, U, B, 1);
+    TicToc::toc("   clapack");
+    
+    copy_real(NBS, Ds, D);
+    copy_real(NBS, Us, U);
+    copy_real(NBS, Bs, B);
+    lapack::xpttrf(NBS, D, U, &info);
+    lapack::xptts2(NBS, 1, D, U, B, 1);
+    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        lapack::xptts2(NBS, 1, D, U, B, 1);
+    TicToc::toc("    lapack");
+
+    copy_real(NBS, Ds, D);
+    copy_real(NBS, Us, U);
+    copy_real(NBS, Bs, B);
+    italian_xpttrf(NBS, D, U, &info);
+    italian_xptts2(NBS, 1, D, U, B, 1);
+    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        italian_xptts2(NBS, 1, D, U, B, 1);
+    TicToc::toc("   italian");
+    
+    copy_real(NBS, Ds, D);
+    copy_real(NBS, Us, U);
+    copy_real(NBS, Bs, B);
+    alsatian_xpttrf(NBS, D, U, &info);
+    alsatian_xptts2(NBS, 1, D, U, B, 1);
+    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        alsatian_xptts2(NBS, 1, D, U, B, 1);
+    TicToc::toc("  alsatian");
+
+    free_real(D);
+    free_real(U);
+    free_real(B);
+    free_real(Ds);
+    free_real(Us);
+    free_real(Bs);
+}
+
+
 int main(int argc, char* argv[])
 {
     //re-seed the random number generator:
     RNG.seed();
 
-    pos = new_real(ALOC);
-    new_reals(force, lagmul, diff, 0.0);
-    
-    setFilament(NBS+1, pos, 1.0, 2.0);
-    setRandom(NBS+1, force, 1.0);
-
-    testRigidity(1<<18);
-    //testProjectionU(1<<20);
-    //testProjectionD(1<<20);
-
-    free_real(pos);
-    free_real(diff, lagmul, force);
+    if ( 1 )
+    {
+        testDPTT(1<<18);
+    }
+    if ( 0 )
+    {
+        pos = new_real(ALOC);
+        new_reals(force, lagmul, diff, 0.0);
+        
+        setFilament(NBS+1, pos, 1.0, 2.0);
+        setRandom(NBS+1, force, 1.0);
+        
+        testRigidity(1<<18);
+        //testProjectionU(1<<20);
+        //testProjectionD(1<<20);
+        
+        free_real(pos);
+        free_real(diff, lagmul, force);
+    }
     
     return EXIT_SUCCESS;
 }

@@ -67,7 +67,6 @@ private:
     
     /// J*J', a nbSegments^2 matrix. We store the diagonal and one off-diagonal
     real   *    mtJJt, * mtJJtU;
-    //real   *    mtJJtE, * mtJJtUE;
 
 #endif
     

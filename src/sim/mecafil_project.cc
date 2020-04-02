@@ -40,16 +40,11 @@ void Mecafil::allocateProjection(const size_t ms)
 {
     //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
     free_real(mtJJt);
-    real * mem = new_real(4*ms);
-    //zero_real(4*ms, mem);
+    real * mem = new_real(3*ms);
+    //zero_real(3*ms, mem);
     mtJJt        = mem;
     mtJJtU       = mem + ms;
     mtJJtiJforce = mem + ms * 2;
-#if ( 0 )
-    // code to debug custom DPTTS
-    mtJJtE       = new_real(2*ms);
-    mtJJtUE      = mtJJtE + ms;
-#endif
 }
 
 
@@ -73,7 +68,7 @@ void Mecafil::makeProjection()
     //set the diagonal and off-diagonal of J*J'
     const size_t nbu = nbPoints() - 2;
     const real*const dif = rfDiff;
-   real b = 1;
+    real b = 1;
 
     for ( size_t jj = 0; jj < nbu; ++jj )
     {
@@ -96,9 +91,9 @@ void Mecafil::makeProjection()
 
     if ( 0 )
     {
-        std::clog << "D "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
-        std::clog << "E "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
-        //std::clog << "X="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
+        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
+        std::clog << "\nU "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
+        //std::clog << "\nX="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
     }
 
     if ( info )
@@ -148,19 +143,13 @@ void Mecafil::makeProjection()
     //mtJJt[nbu] = 2.0;
 
     int info = 0;
-#if ( 0 )
-    // code to debug custom DPTTS
-    copy_real(nbu+1, mtJJt, mtJJtE);
-    copy_real(nbu+1, mtJJtU, mtJJtUE);
-    italian_xpttrf(nbu+1, mtJJtE, mtJJtUE, &info);
-#endif
     DPTTRF(nbu+1, mtJJt, mtJJtU, &info);
 
     if ( 0 )
     {
         std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
         std::clog << "\nU "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
-        //std::clog << "X="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
+        //std::clog << "\nX="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
     }
 
     if ( info )
@@ -629,21 +618,9 @@ void Mecafil::projectForces(const real* X, real* Y) const
 #else
     projectForcesU(nbs, rfDiff, X, rfLLG);
 #endif
-
-#if ( 0 )
-    // code to debug custom DPTTS
-    copy_real(nbs, rfLLG, rfVTP);
-    italian_xptts2(nbs, 1, mtJJtE, mtJJtUE, rfVTP, nbs);
-    std::clog << "\n I "; VecPrint::print(std::clog, nbs, rfVTP, 3);
-#endif
     
     // rfLLG <- inv( J * Jt ) * rfLLG to find the Lagrange multipliers
     DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
-
-#if ( 0 )
-    // code to debug custom DPTTS
-    std::clog << "\n A "; VecPrint::print(std::clog, nbs, rfLLG, 3);
-#endif
 
     // set Y, using values in X and rfLLG
     projectForcesD(nbs, rfDiff, X, rfLLG, Y);
