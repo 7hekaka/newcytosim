@@ -124,6 +124,9 @@ public:
     /// calculates the speed of points in Y, for the forces given in X
     void        projectForces(const real* X, real* Y) const;
     
+    /// calculates the speed of points in Y, for the forces given in X
+    void        projectForces0(const real* X, real* Y) const;
+
     /// add contribution of Brownian forces
     real        addBrownianForces(real const* rnd, real sc, real* rhs) const;
     

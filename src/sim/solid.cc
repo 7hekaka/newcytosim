@@ -1125,7 +1125,7 @@ void Solid::makeProjection()
  This calculates the total force and momentum in the center of mobility,
  scale to get speed, and distribute according to solid motion mechanics.
 */
-void Solid::projectForces(const real* X, real* Y) const
+void Solid::projectForces0(const real* X, real* Y) const
 {
     Vector T(0,0,0);    //Translation
     Vector R(0,0,0);    //Rotation
@@ -1148,14 +1148,10 @@ void Solid::projectForces(const real* X, real* Y) const
     
     Vector V = R + cross(T, soCenter);
     
-    const real A = 1.0 / ( prop->viscosity );
-    const real B = 1.0 / ( prop->viscosity * soDrag );
-
-    R = A * soMomentum.vecmul(V);
-
+    R = soMomentum.vecmul(V) / ( prop->viscosity );
     // reduce Torque to center of mobility:
-    T = B * T + cross(soCenter, R);
-    
+    T = cross(soCenter, R) + T / ( prop->viscosity * soDrag );
+
     for ( size_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
@@ -1167,8 +1163,32 @@ void Solid::projectForces(const real* X, real* Y) const
     }
 }
 
-#endif
 
+void Solid::projectForces(const real* X, real* Y) const
+{
+    Vector T(0,0,0);   //Translation
+    Vector R(0,0,0);   //Rotation
+    
+    for ( size_t p = 0; p < nPoints; ++p )
+    {
+        Vector F(X+DIM*p);
+        T += F;
+        R += cross(Vector(pPos+DIM*p), F);
+    }
+    
+    Vector V = R + cross(T, soCenter);
+
+    R = soMomentum.vecmul(V) / ( prop->viscosity );
+    // reduce Torque to center of mobility:
+    T = cross(soCenter, R) + T / ( prop->viscosity * soDrag );
+    
+    for ( size_t p = 0; p < nPoints; ++p )
+    {
+        (T+cross(R, Vector(pPos+DIM*p))).store(Y+DIM*p);
+    }
+}
+
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark -
