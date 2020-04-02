@@ -92,25 +92,16 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 {
     assert_true(nrhs == 1); // in this case, LDB is not used
  
-    real x = D[0] * B[0];
-    B[0] = x;
+    B[0] = D[0] * B[0];
     
     // upward recursion on B[]
     for ( int n = 1; n < size; ++n )
-    {
-        // B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
-        x = D[n] * ( B[n] - x * E[n-1] );
-        B[n] = x;
-    }
+        B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
     
     // downward recursion on B[]
     //x = B[size-1];
     for ( int n = size-2; n >= 0; --n )
-    {
-        // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
-        x = B[n] - ( D[n] * E[n] ) * x;
-        B[n] = x;
-    }
+        B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
 }
 
 
@@ -123,14 +114,14 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
      E'[n] <-  D[n] * E[n]
 
  */
-void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
+void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
 {
     real x = 1.0 / D[0];
     real e = E[0];
     D[0] = x;
     E[0] = x * e;
 
-    for ( int n = 1; n < size; ++n )
+    for ( size_t n = 1; n < size; ++n )
     {
         //D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
         //x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
@@ -145,13 +136,13 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
 /**
  Based on the 'Italian' version, using precalculated constant terms
  */
-void alsatian_xptts2(int size, int nrhs, real const* D, real const* DE, real* B, int LDB)
+void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, real* B, size_t LDB)
 {
     assert_true(nrhs == 1); // in this case, LDB is not used
 
     // upward recursion on B[]
     real x = B[0];
-    for ( int n = 0; n < size; ++n )
+    for ( size_t n = 0; n < size; ++n )
     {
         //B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
         B[n] = D[n] * x;
@@ -160,7 +151,7 @@ void alsatian_xptts2(int size, int nrhs, real const* D, real const* DE, real* B,
 
     // downward recursion on B[]
     x = B[size-1];
-    for ( int n = size-2; n > 0; --n )
+    for ( size_t n = size-2; n > 0; --n )
     {
         // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
         x = B[n] - DE[n] * x;
