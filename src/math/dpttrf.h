@@ -4,7 +4,7 @@
 
 /**
  This is a C-translation of the LAPACK reference implementation of dpttrf()
- (that is Thomas' algorithm to factorize a tridiagonal matrix)
+ (the method is known as Thomas' algorithm to factorize a tridiagonal matrix)
 */
 void lapack_xpttrf(int N, real* D, real* E, int* INFO)
 {
@@ -68,7 +68,7 @@ void lapack_xptts2(int N, int NRHS, const real* D, const real* E, real* B, int L
      for i = 2:N
          gamma(i) = 1.0 / ( a(i) - b(i) * gamma(i-1) * c(i-1) );
  */
-void italian_xpttrf(int size, real* D, real* E, int* INFO)
+void italian_xpttrf(int size, real* D, real const* E, int* INFO)
 {
     D[0] = 1.0 / D[0];
     
@@ -92,15 +92,25 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 {
     assert_true(nrhs == 1); // in this case, LDB is not used
  
-    B[0] = D[0] * B[0];
+    real x = D[0] * B[0];
+    B[0] = x;
     
     // upward recursion on B[]
     for ( int n = 1; n < size; ++n )
-        B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
+    {
+        // B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
+        x = D[n] * ( B[n] - x * E[n-1] );
+        B[n] = x;
+    }
     
     // downward recursion on B[]
+    //x = B[size-1];
     for ( int n = size-2; n >= 0; --n )
-        B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
+    {
+        // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
+        x = B[n] - ( D[n] * E[n] ) * x;
+        B[n] = x;
+    }
 }
 
 
@@ -108,26 +118,26 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 #pragma mark -
 
 /**
- Based on the 'Italian' version, precalculating constant products:
+ Based on the 'Italian' version, with an additional substitution:
  
-     DE[n] <-  D[n] * E[n]
+     E'[n] <-  D[n] * E[n]
 
- D[] needs to be allocated to hold 2*size
  */
-void alsatian_xpttrf(int size, real* D, real const* E, int* INFO)
+void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
 {
-    real * DE = D + size;
-    
-    D[0] = 1.0 / D[0];
-    DE[0] = D[0] * E[0];
-    
-    real x = D[0];
+    real x = 1.0 / D[0];
+    real e = E[0];
+    D[0] = x;
+    E[0] = x * e;
+
     for ( int n = 1; n < size; ++n )
     {
         //D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
-        x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
+        //x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
+        x = 1.0 / ( D[n] - ( e * e ) * x );
         D[n] = x;
-        DE[n] = x * E[n];
+        e = E[n];
+        E[n] = x * e;
     }
 }
 
@@ -135,22 +145,26 @@ void alsatian_xpttrf(int size, real* D, real const* E, int* INFO)
 /**
  Based on the 'Italian' version, using precalculated constant terms
  */
-void alsatian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int LDB)
+void alsatian_xptts2(int size, int nrhs, real const* D, real const* DE, real* B, int LDB)
 {
     assert_true(nrhs == 1); // in this case, LDB is not used
-    real const* DE = D + size;
 
-    B[0] = D[0] * B[0];
-    
     // upward recursion on B[]
-    for ( int n = 1; n < size; ++n )
-        B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
-    
+    real x = B[0];
+    for ( int n = 0; n < size; ++n )
+    {
+        //B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
+        B[n] = D[n] * x;
+        x = B[n+1] - x * DE[n];  // = B[n+1] - B[n] * E[n]
+    }
+
     // downward recursion on B[]
+    x = B[size-1];
     for ( int n = size-2; n >= 0; --n )
     {
-        // B[n] = B[n] - D[n] * E[n] * B[n+1];
-        B[n] = B[n] - DE[n] * B[n+1];
+        // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
+        x = B[n] - DE[n] * x;
+        B[n] = x;
     }
 }
 

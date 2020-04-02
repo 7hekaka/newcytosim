@@ -73,9 +73,10 @@ size_t Mecafil::allocateMecable(const size_t nbp)
         rfDir  = rfLLG + ms*DIM;
         rfVTP  = rfDir + ms*DIM;
 #else
-        rfDiff = new_real(ms*(2*DIM+1));
+        rfDiff = new_real(ms*(4*DIM+1));
         rfLag  = rfDiff + ms*DIM;
         rfLLG  = rfLag + ms;
+        rfVTP  = rfLLG + ms*DIM;
 #endif
         
         // reset Lagrange multipliers

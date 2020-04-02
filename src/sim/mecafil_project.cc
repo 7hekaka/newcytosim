@@ -42,9 +42,14 @@ void Mecafil::allocateProjection(const size_t ms)
     free_real(mtJJt);
     real * mem = new_real(4*ms);
     //zero_real(4*ms, mem);
-    mtJJt        = mem;  // can hold '2*ms', as needed by alsatian_xpttrf()
-    mtJJtU       = mem + ms * 2;
-    mtJJtiJforce = mem + ms * 3;
+    mtJJt        = mem;
+    mtJJtU       = mem + ms;
+    mtJJtiJforce = mem + ms * 2;
+#if ( 0 )
+    // code to debug custom DPTTS
+    mtJJtE       = new_real(2*ms);
+    mtJJtUE      = mtJJtE + ms;
+#endif
 }
 
 
@@ -143,12 +148,18 @@ void Mecafil::makeProjection()
     //mtJJt[nbu] = 2.0;
 
     int info = 0;
+#if ( 0 )
+    // code to debug custom DPTTS
+    copy_real(nbu+1, mtJJt, mtJJtE);
+    copy_real(nbu+1, mtJJtU, mtJJtUE);
+    italian_xpttrf(nbu+1, mtJJtE, mtJJtUE, &info);
+#endif
     DPTTRF(nbu+1, mtJJt, mtJJtU, &info);
 
     if ( 0 )
     {
-        std::clog << "D "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
-        std::clog << "E "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
+        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
+        std::clog << "\nU "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
         //std::clog << "X="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
     }
 
@@ -165,7 +176,15 @@ void Mecafil::makeProjection()
 
 /**
  Perform first calculation needed by projectForces:
- tmp <- J * X
+     mul[] <- dot(dif[], X[+DIM]-X[])
+ which is:
+     mul[i] <- dot(dif[i*DIM], X[i*DIM+DIM]-X[i*DIM])
+     for i in [ 0, nbs-1 ]
+ 
+ with 'nbs' = number of segments, and
+      dif[] of size nbs*DIM
+      vec[] of size (nbs+1)*DIM
+      mul[] of size nbs
  */
 void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
 {
@@ -185,13 +204,21 @@ void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
 
 /**
  Perform second calculation needed by projectForces:
- Y <- s * ( X + Jt * tmp )
+     Y <- X +/- dif * mul
+ which is:
+     Y[i] <- X[i] + dif[i] * mul[i] - dif[i-1] * mul[i-1]
+     for i in DIM * [ 0, nbs-1 ]
+
+ with 'nbs' = number of segments, and
+      dif[] of size nbs*DIM
+      X[] and Y[] of size (nbs+1)*DIM
+      mul[] of size nbs
  */
 void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
 {
-    for ( size_t d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
+    for ( size_t s = 0, e = DIM*nbs; s < DIM; ++s, ++e )
     {
-        Y[d] = X[d] + dif[d    ] * mul[    0];
+        Y[s] = X[s] + dif[s    ] * mul[    0];
         Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
     }
     
@@ -321,8 +348,8 @@ inline void projectForcesD_SSE(size_t nbs, const real* dif,
 #include "simd.h"
 
 /**
- Perform first calculation needed by projectForces:
- tmp <- J * X
+ Perform first calculation needed by projectForces
+
  F. Nedelec, 9.12.2016, 6.9.2018
  */
 inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
@@ -363,8 +390,8 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
 
 
 /**
- Perform second calculation needed by projectForces:
- Y <- s * ( X + Jt * tmp )
+ Perform second calculation needed by projectForces
+
  ATTENTION: memory X and Y are not necessarily aligned since they are chunck from
  an array containing contiguous coordinates
  F. Nedelec, 9.12.2016, 23.03.2018
@@ -588,7 +615,7 @@ void projectForcesD_PTR(size_t nbs, const real* dif,
 
 
 /*
- Note that this works fine if ( X == Y )
+ Note that this works fine even if ( X == Y )
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
@@ -603,9 +630,21 @@ void Mecafil::projectForces(const real* X, real* Y) const
     projectForcesU(nbs, rfDiff, X, rfLLG);
 #endif
 
+#if ( 0 )
+    // code to debug custom DPTTS
+    copy_real(nbs, rfLLG, rfVTP);
+    italian_xptts2(nbs, 1, mtJJtE, mtJJtUE, rfVTP, nbs);
+    std::clog << "\n I "; VecPrint::print(std::clog, nbs, rfVTP, 3);
+#endif
+    
     // rfLLG <- inv( J * Jt ) * rfLLG to find the Lagrange multipliers
     DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
-    
+
+#if ( 0 )
+    // code to debug custom DPTTS
+    std::clog << "\n A "; VecPrint::print(std::clog, nbs, rfLLG, 3);
+#endif
+
     // set Y, using values in X and rfLLG
     projectForcesD(nbs, rfDiff, X, rfLLG, Y);
 
