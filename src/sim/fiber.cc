@@ -686,7 +686,7 @@ APPROXIMATE FORMULA FOR ELLIPSOIDAL PARTICLE
 
  The translational drag coefficient is averaged over all possible configurations:
  
-     drag_cylinder = 3 * PI * viscosity * length / ( log(shape) + 0.312 );
+       drag_cylinder = 3 * PI * viscosity * length / ( log(shape) + 0.312 );
  
  If the length is shorter than the diameter, the formula above fails and may
  even give negative result. Hence we also calculate the drag of a sphere with

@@ -427,7 +427,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
         }
     }
 #if ( 0 )
-    // detailled debug output
+    // detailed debug output
     std::clog << "FiberSet::allIntersections()  found " << res1.size() << " intersections \n";
     for ( size_t i = 0; i < res1.size(); ++i )
         std::clog << res1[i] << " " << res2[i] << "\n";

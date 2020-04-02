@@ -104,9 +104,12 @@ void TreadmillingFiber::step()
     real inc = mGrowthP + mGrowthM;
     if ( inc < 0  &&  len + inc < prop->min_length )
     {
-        // the fiber is too short, we delete it:
-        delete(this);
-        return;
+        if ( !prop->persistent )
+        {
+            // the fiber is too short, we delete it:
+            delete(this);
+            return;
+        }
     }
     else if ( len + inc < prop->max_length )
     {
