@@ -160,12 +160,13 @@ void alsatian_xptts2(int size, int nrhs, real const* D, real const* DE, real* B,
 
     // downward recursion on B[]
     x = B[size-1];
-    for ( int n = size-2; n >= 0; --n )
+    for ( int n = size-2; n > 0; --n )
     {
         // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
         x = B[n] - DE[n] * x;
         B[n] = x;
     }
+    B[0] = B[0] - DE[0] * x;
 }
 
 #endif
