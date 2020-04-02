@@ -386,7 +386,7 @@ namespace blas
      return fabs(X[inx]);
  
  */
-inline real nrm8(const int N, const real* X, int inc)
+inline real nrm8(const size_t N, const real* X, int inc)
 {
 #if ( 1 )
     int inx = blas::ixamax(N, X, inc);
@@ -395,19 +395,19 @@ inline real nrm8(const int N, const real* X, int inc)
     if ( N == 0 )
         return 0;
     real u = std::abs(X[0]);
-    for ( int i = 1; i < N; ++i )
+    for ( size_t i = 1; i < N; ++i )
         u = std::max(u, std::abs(X[i*inc]));
     return u;
 #endif
 }
 
     
-inline real nrm8seq(const int siz, const real* X)
+inline real nrm8seq(const size_t siz, const real* X)
 {
     real res = std::abs(X[0]);
 #pragma ivdep
 #pragma vector always
-    for ( int i = 1; i < siz; ++i )
+    for ( size_t i = 1; i < siz; ++i )
         res = std::max(res, std::abs(X[i]));
     return res;
 }
@@ -489,12 +489,12 @@ inline float nrm8(const size_t siz, const float* X)
 }
 
 #else
-inline real nrm8(const int N, const real* X)
+inline real nrm8(const size_t N, const real* X)
 {
     real r = 0;
     #pragma ivdep
     #pragma vector always
-    for ( int i = 0; i < N; ++i )
+    for ( size_t i = 0; i < N; ++i )
         r = std::max(r, std::abs(X[i]));
     return r;
 }
@@ -504,12 +504,12 @@ inline real nrm8(const int N, const real* X)
 /**
  return the infinite norm of the difference between two vectors
  */
-inline real max_diff(const int N, const real* X, const real* Y)
+inline real max_diff(const size_t N, const real* X, const real* Y)
 {
     if ( N == 0 )
         return 0;
     real u = std::abs(X[0] - Y[0]);
-    for ( int i = 1; i < N; ++i )
+    for ( size_t i = 1; i < N; ++i )
         u = std::max(u, std::abs(X[i] - Y[i]));
     return u;
 }
@@ -518,18 +518,18 @@ inline real max_diff(const int N, const real* X, const real* Y)
 /**
 Set N values of `X` to value `alpha`
  */
-inline void xfill(const int N, real alpha, real* X)
+inline void xfill(const size_t N, real alpha, real* X)
 {
-    for ( int u = 0; u < N; ++u )
+    for ( size_t u = 0; u < N; ++u )
         X[u] = alpha;
 }
 
 /**
  Set N values of `X` to value `alpha`
 */
-inline void xfill(const int N, real alpha, real* X, const int inc)
+inline void xfill(const size_t N, real alpha, real* X, const int inc)
 {
-    for ( int u = 0; u < N; ++u )
+    for ( size_t u = 0; u < N; ++u )
         X[u*inc] = alpha;
 }
 
