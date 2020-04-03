@@ -107,25 +107,25 @@ inline real xsum(int N, const real*X, int incX)
 int iBLAS(amax)(int*, const real*, int*);
 inline int ixamax(int N, const real*X, int incX)
 {
-    return (iBLAS(amax)(&N, X, &incX) - 1);
+    return iBLAS(amax)(&N, X, &incX);
 }
 
 int iBLAS(max)(int*, const real*, int*);
 inline int ixmax(int N, const real*X, int incX)
 {
-    return (iBLAS(max)(&N, X, &incX) - 1);
+    return iBLAS(max)(&N, X, &incX);
 }
 
 int iBLAS(amin)(int*, const real*, int*);
 inline int ixamin(int N, const real*X, int incX)
 {
-    return (iBLAS(amin)(&N, X, &incX) - 1);
+    return iBLAS(amin)(&N, X, &incX);
 }
 
 int iBLAS(min)(int*, const real*, int*);
 inline int ixmin(int N, const real*X, int incX)
 {
-    return (iBLAS(min)(&N, X, &incX) - 1);
+    return iBLAS(min)(&N, X, &incX);
 }
 
 void BLAS(swap)(int*, real*, int*, real*, int*);
