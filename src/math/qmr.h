@@ -4,7 +4,7 @@
 #define QMR_H
 
 #include "real.h"
-#include "cblas.h"
+#include "blas.h"
 #include "allocator.h"
 #include "monitor.h"
 

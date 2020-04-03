@@ -4,7 +4,8 @@
 #define MONITOR_H
 
 #include "real.h"
-#include "cblas.h"
+#include "blas.h"
+#include "cytoblas.h"
 
 /// Iterative Solvers
 namespace LinearSolvers

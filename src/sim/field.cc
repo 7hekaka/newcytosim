@@ -4,7 +4,7 @@
 #include "field.h"
 #include "fiber_site.h"
 #include "fiber_set.h"
-#include "cblas.h"
+#include "blas.h"
 #include "sim.h"
 
 

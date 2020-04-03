@@ -4,7 +4,7 @@
 #define GMRES_H
 
 #include "real.h"
-#include "cblas.h"
+#include "blas.h"
 #include "allocator.h"
 #include "monitor.h"
 //#include "vecprint.h"

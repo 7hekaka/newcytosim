@@ -4,7 +4,7 @@
 #define BICGSTAB_H
 
 #include "real.h"
-#include "cblas.h"
+#include "blas.h"
 #include "allocator.h"
 #include "monitor.h"
 
@@ -32,17 +32,23 @@ namespace LinearSolvers
         real * t  = allocator.bind(3);
         real * v  = allocator.bind(4);
         
-        mat.multiply(sol, r0);
-        blas::xcopy(dim, rhs, 1, r, 1);
-        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * x
+#if ( 1 )
+        mat.multiply(sol, r0);                  // r0 = A * sol
+        blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
+        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * sol
         blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-        
-        rho = blas::dot(dim, r, r);
         blas::xcopy(dim, r, 1, p, 1);
+        rho = blas::dot(dim, r, r);
 
         if ( monitor.finished(dim, r) )
             return;
-
+#else
+        // assuming that 'sol == 0' initially:
+        blas::xcopy(dim, rhs, 1, r, 1);
+        blas::xcopy(dim, rhs, 1, r0, 1);
+        blas::xcopy(dim, rhs, 1, p, 1);
+        rho = blas::dot(dim, r, r);
+#endif
         goto start;
         
         while ( ! monitor.finished(dim, r) )

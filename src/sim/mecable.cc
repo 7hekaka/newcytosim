@@ -2,7 +2,7 @@
 
 #include "mecable.h"
 #include "exceptions.h"
-#include "cblas.h"
+#include "blas.h"
 #include "iowrapper.h"
 #include "organizer.h"
 #include "space.h"

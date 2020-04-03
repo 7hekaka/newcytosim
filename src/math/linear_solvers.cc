@@ -5,7 +5,7 @@
  to solve linear systems: http://www.netlib.org/templates
 */
 #include "linear_solvers.h"
-#include "cblas.h"
+#include "blas.h"
 
 
 #pragma mark - Iterative Methods

@@ -9,9 +9,10 @@
 #include "tictoc.h"
 #include "random.h"
 #include "vecprint.h"
-#include "clapack.h"
+#include "blas.h"
+#include "lapack.h"
 #include "dpttrf.h"
-#include "cblas.h"
+#include "cytoblas.h"
 #include "simd.h"
 
 
@@ -1069,7 +1070,7 @@ int main(int argc, char* argv[])
 
     if ( 1 )
     {
-        testDPTT(1<<18);
+        testDPTT(1<<17);
     }
     if ( 0 )
     {

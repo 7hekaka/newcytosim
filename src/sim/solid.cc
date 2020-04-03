@@ -17,7 +17,7 @@
 #if ( DIM >= 3 )
 #   include "quaternion.h"
 #   include "matrix33.h"
-#   include "clapack.h"
+#   include "lapack.h"
 #endif
 
 //------------------------------------------------------------------------------

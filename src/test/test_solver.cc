@@ -4,7 +4,7 @@
 
 #include <cstdio>
 #include "real.h"
-#include "cblas.h"
+#include "blas.h"
 #include "monitor.h"
 #include "allocator.h"
 #include "bicgstab.h"

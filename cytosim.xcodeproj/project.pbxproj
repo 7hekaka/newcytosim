@@ -449,9 +449,7 @@
 		BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* pointsonsphere.h */; };
 		BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587205B98DA3006956D5 /* conjgradient.h */; };
 		BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* smath.h */; };
-		BB71917B0EF1CD9900CED9E2 /* clapack.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587005B98DA3006956D5 /* clapack.h */; };
 		BB71917D0EF1CD9900CED9E2 /* matblock.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matblock.h */; };
-		BB71917E0EF1CD9900CED9E2 /* cblas.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73586F05B98DA3006956D5 /* cblas.h */; };
 		BB71917F0EF1CD9900CED9E2 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589D05B98DA3006956D5 /* random.h */; };
 		BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588A05B98DA3006956D5 /* matsparse.h */; };
 		BB7191820EF1CD9900CED9E2 /* real.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC66B209C0C3D30031048A /* real.h */; };
@@ -840,6 +838,7 @@
 		BBF2832B2431EC0F00FADDD8 /* space_dynamic_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF283282431EC0F00FADDD8 /* space_dynamic_prop.cc */; };
 		BBF2832C2431EC0F00FADDD8 /* space_dynamic_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF283292431EC0F00FADDD8 /* space_dynamic_prop.h */; };
 		BBF2832D2431EC0F00FADDD8 /* space_dynamic_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF283292431EC0F00FADDD8 /* space_dynamic_prop.h */; };
+		BBF4E87F24361FF100B9D440 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84087F193490130088C07B /* Accelerate.framework */; };
 		BBF7BB1A10CD44E00089F5B1 /* display2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF7BB1810CD44E00089F5B1 /* display2.cc */; };
 		BBF7BB1B10CD44E00089F5B1 /* display2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF7BB1910CD44E00089F5B1 /* display2.h */; };
 		BBFAB112116F20CD0009FD97 /* field_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB537E3511131B110059D9AA /* field_set.cc */; };
@@ -1368,8 +1367,6 @@
 		BB7192360EF1CEEA00CED9E2 /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; name = makefile.inc; path = src/math/makefile.inc; sourceTree = SOURCE_ROOT; };
 		BB73586D05B98DA3006956D5 /* array.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = array.h; path = src/base/array.h; sourceTree = SOURCE_ROOT; };
 		BB73586E05B98DA3006956D5 /* assert_macro.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = assert_macro.h; path = src/base/assert_macro.h; sourceTree = SOURCE_ROOT; };
-		BB73586F05B98DA3006956D5 /* cblas.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = cblas.h; path = src/math/cblas.h; sourceTree = SOURCE_ROOT; };
-		BB73587005B98DA3006956D5 /* clapack.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = clapack.h; path = src/math/clapack.h; sourceTree = SOURCE_ROOT; };
 		BB73587105B98DA3006956D5 /* conjgradient.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = conjgradient.cc; path = src/math/conjgradient.cc; sourceTree = SOURCE_ROOT; };
 		BB73587205B98DA3006956D5 /* conjgradient.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = conjgradient.h; path = src/math/conjgradient.h; sourceTree = SOURCE_ROOT; };
 		BB73587505B98DA3006956D5 /* exceptions.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = exceptions.h; path = src/base/exceptions.h; sourceTree = SOURCE_ROOT; };
@@ -1724,6 +1721,9 @@
 		BBF283262430E10100FADDD8 /* meca_math.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_math.cc; sourceTree = "<group>"; };
 		BBF283282431EC0F00FADDD8 /* space_dynamic_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_prop.cc; path = spaces/space_dynamic_prop.cc; sourceTree = "<group>"; };
 		BBF283292431EC0F00FADDD8 /* space_dynamic_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_prop.h; path = spaces/space_dynamic_prop.h; sourceTree = "<group>"; };
+		BBF4E88024372DBA00B9D440 /* cytoblas.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cytoblas.h; sourceTree = "<group>"; };
+		BBF4E88124372DFF00B9D440 /* blas.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = blas.h; sourceTree = "<group>"; };
+		BBF4E88224372DFF00B9D440 /* lapack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lapack.h; sourceTree = "<group>"; };
 		BBF7BB1810CD44E00089F5B1 /* display2.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = display2.cc; path = src/play/display2.cc; sourceTree = SOURCE_ROOT; };
 		BBF7BB1910CD44E00089F5B1 /* display2.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = display2.h; path = src/play/display2.h; sourceTree = SOURCE_ROOT; };
 		BBF9A315208C8C9700A9E5E5 /* test_omp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_omp.cc; sourceTree = "<group>"; };
@@ -1762,6 +1762,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBF4E87F24361FF100B9D440 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1928,9 +1929,10 @@
 		BB21D1F017D9BDA8005F5A8E /* BLAS */ = {
 			isa = PBXGroup;
 			children = (
+				BBF4E88124372DFF00B9D440 /* blas.h */,
+				BBF4E88224372DFF00B9D440 /* lapack.h */,
+				BBF4E88024372DBA00B9D440 /* cytoblas.h */,
 				BBDF9AA3228BFBD3005018BD /* dpttrf.h */,
-				BB73586F05B98DA3006956D5 /* cblas.h */,
-				BB73587005B98DA3006956D5 /* clapack.h */,
 			);
 			name = BLAS;
 			sourceTree = "<group>";
@@ -3391,13 +3393,11 @@
 				BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */,
 				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
 				BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */,
-				BB71917B0EF1CD9900CED9E2 /* clapack.h in Headers */,
 				BB71917D0EF1CD9900CED9E2 /* matblock.h in Headers */,
 				BB0CB11B20C170C10016D73D /* qmr.h in Headers */,
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
-				BB71917E0EF1CD9900CED9E2 /* cblas.h in Headers */,
 				BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
 				BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */,
@@ -5681,7 +5681,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ICC_FP_CHKSTK = YES;
 				ICC_OPT_REQUIRE_INTEL_ARCH = "CORE-AVX2";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wzero-as-null-pointer-constant",
@@ -5754,7 +5754,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ICC_FP_CHKSTK = YES;
 				ICC_OPT_REQUIRE_INTEL_ARCH = "CORE-AVX2";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wzero-as-null-pointer-constant",
@@ -5824,7 +5824,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ICC_FP_CHKSTK = YES;
 				ICC_OPT_REQUIRE_INTEL_ARCH = "CORE-AVX2";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wzero-as-null-pointer-constant",

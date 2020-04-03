@@ -10,7 +10,7 @@
 #include "fiber_site.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "clapack.h"
+#include "lapack.h"
 #include "modulo.h"
 #include "vector3.h"
 #include "simul.h"

@@ -13,7 +13,7 @@
 #ifndef LAPACK_H
 #define LAPACK_H
 
-#include "cblas.h"
+#include "blas.h"
 
 #ifdef __cplusplus
 namespace lapack {

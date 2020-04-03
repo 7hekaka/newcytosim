@@ -11,7 +11,7 @@
 #include "dynamic_fiber_prop.h"
 #include "classic_fiber_prop.h"
 #include "treadmilling_fiber_prop.h"
-#include "clapack.h"
+#include "lapack.h"
 #include "simul.h"
 #include "sim.h"
 

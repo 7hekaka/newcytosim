@@ -2,7 +2,7 @@
 
 #include "matrix.h"
 #include "assert_macro.h"
-#include "cblas.h"
+#include "blas.h"
 #include <iomanip>
 
 //------------------------------------------------------------------------------

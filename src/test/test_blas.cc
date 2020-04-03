@@ -3,8 +3,8 @@
 #include <cstdio>
 
 #include "real.h"
-#include "cblas.h"
-#include "clapack.h"
+#include "blas.h"
+#include "lapack.h"
 
 
 void test_blas(const int size)

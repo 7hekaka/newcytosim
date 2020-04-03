@@ -243,6 +243,7 @@ void Player::prepareDisplay(View& view, int mag)
 //------------------------------------------------------------------------------
 void Player::displayCytosim()
 {
+    //std::cerr << "displayCytosim @ " << simul.time() << '\n';
     // clear pixels:
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 

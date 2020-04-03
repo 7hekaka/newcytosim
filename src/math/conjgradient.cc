@@ -5,7 +5,7 @@
 */
 
 #include "conjgradient.h"
-#include "cblas.h"
+#include "blas.h"
 
 /*
  The linear system is defined by functions provided as arguments:
