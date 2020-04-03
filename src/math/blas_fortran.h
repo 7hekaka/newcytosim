@@ -28,10 +28,10 @@
 extern "C"
 {
 // BLAS - Level 1
+float  cblas_sdsdot(int*, float, const float*, int*, const float*, int*);
 float  cblas_sdot(int*, const float*, int*, const float*, int*);
 double cblas_ddot(int*, const double*, int*, const double*, int*);
 double cblas_dsdot(int*, const float*, int*, const float*, int*);
-double cblas_sdsdot(int*, float, const float*, int*, const float*, int*);
 
 real BLAS(nrm2)(int*, const real*, int*);
 real BLAS(asum)(int*, const real*, int*);
@@ -211,6 +211,7 @@ inline void xscal(int N, real alpha, real*X, int incX)
 
 #pragma mark - Level 2
 
+
 inline void xgemv(char TransA, int M, int N, real alpha, const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
     BLAS(gemv)(&TransA, &M, &N, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
@@ -272,6 +273,7 @@ inline void xspr2(char Uplo, int N, real alpha, const real*X, int incX, const re
 {
     BLAS(spr2)(&Uplo, &N, &alpha, X, &incX, Y, &incY, A);
 }
+
 
 #pragma mark - Level 3
 

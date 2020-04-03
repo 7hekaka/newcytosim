@@ -23,30 +23,31 @@
 #   define iBLAS(x) cblas_is##x
 #endif
 
+#define CBLAS_INDEX size_t  /* this may vary between platforms */
 
 // C-Functions from BLAS
 extern "C"
 {
 // BLAS - Level 1
+float  cblas_sdsdot(int, float, const float*, int, const float*, int);
 float  cblas_sdot(int, const float*, int, const float*, int);
 double cblas_ddot(int, const double*, int, const double*, int);
 double cblas_dsdot(int, const float*, int, const float*, int);
-double cblas_sdsdot(int, float, const float*, int, const float*, int);
 
 real BLAS(nrm2)(int, const real*, int);
 real BLAS(asum)(int, const real*, int);
 real BLAS(sum)(int, const real*, int);
-int iBLAS(amax)(int, const real*, int);
-int iBLAS(max)(int, const real*, int);
-int iBLAS(amin)(int, const real*, int);
-int iBLAS(min)(int, const real*, int);
+CBLAS_INDEX iBLAS(amax)(int, const real*, int);
+CBLAS_INDEX iBLAS(max)(int, const real*, int);
+CBLAS_INDEX iBLAS(amin)(int, const real*, int);
+CBLAS_INDEX iBLAS(min)(int, const real*, int);
 void BLAS(swap)(int, real*, int, real*, int);
 void BLAS(copy)(int, const real*, int, real*, int);
 void BLAS(axpy)(int, real, const real*, int, real*, int);
 void BLAS(rotg)(real*, real*, real*, real*);
-void BLAS(rotmg)(const real*, const real*, const real*, real, real*);
+void BLAS(rotmg)(real*, real*, real*, real, real*);
 void BLAS(rot)(int, real*, int, real*, int, real, real);
-void BLAS(rotm)(int, real*, int, real*, int, real*);
+void BLAS(rotm)(int, real*, int, real*, int, const real*);
 void BLAS(scal)(int, real, real*, int);
 
 // BLAS - Level 2
@@ -140,22 +141,22 @@ inline real xsum(int N, const real*X, int incX)
     return BLAS(sum)(N, X, incX);
 }
 
-inline int ixamax(int N, const real*X, int incX)
+inline CBLAS_INDEX ixamax(int N, const real*X, int incX)
 {
     return iBLAS(amax)(N, X, incX);
 }
 
-inline int ixmax(int N, const real*X, int incX)
+inline CBLAS_INDEX ixmax(int N, const real*X, int incX)
 {
     return iBLAS(max)(N, X, incX);
 }
 
-inline int ixamin(int N, const real*X, int incX)
+inline CBLAS_INDEX ixamin(int N, const real*X, int incX)
 {
     return iBLAS(amin)(N, X, incX);
 }
 
-inline int ixmin(int N, const real*X, int incX)
+inline CBLAS_INDEX ixmin(int N, const real*X, int incX)
 {
     return iBLAS(min)(N, X, incX);
 }
@@ -186,7 +187,7 @@ inline void xrotg(real*a, real*b, real*c, real*s)
     BLAS(rotg)(a, b, c, s);
 }
 
-inline void xrotmg(const real*d1, const real*d2, const real*b1, real b2, real*P)
+inline void xrotmg(real*d1, real*d2, real*b1, real b2, real*P)
 {
     BLAS(rotmg)(d1, d2, b1, b2, P);
 }
@@ -274,6 +275,7 @@ inline void xspr2(char Uplo, int N, real alpha, const real*X, int incX, const re
 
 
 #pragma mark - Level 3
+
 
 inline void xgemm(char TransA, char TransB, int M, int N, int K, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc)
 {
