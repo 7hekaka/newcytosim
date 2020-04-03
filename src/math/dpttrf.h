@@ -119,16 +119,18 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
     real x = 1.0 / D[0];
     real e = E[0];
     D[0] = x;
-    E[0] = x * e;
+    x = x * e;
+    E[0] = x;
 
     for ( size_t n = 1; n < size; ++n )
     {
         //D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
         //x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
-        x = 1.0 / ( D[n] - ( e * e ) * x );
-        D[n] = x;
+        x = 1.0 / ( D[n] - e * x );
         e = E[n];
-        E[n] = x * e;
+        D[n] = x;
+        x = x * e;
+        E[n] = x;
     }
 }
 
