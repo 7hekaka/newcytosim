@@ -14,7 +14,6 @@
 
 #include "real.h"
 
-
 /// macro will expand to the CBLAS function name
 #if REAL_IS_DOUBLE
 #   define BLAS(x) cblas_d##x
@@ -33,6 +32,7 @@ float  cblas_sdot(int, const float*, int, const float*, int);
 double cblas_ddot(int, const double*, int, const double*, int);
 double cblas_dsdot(int, const float*, int, const float*, int);
 double cblas_sdsdot(int, float, const float*, int, const float*, int);
+
 real BLAS(nrm2)(int, const real*, int);
 real BLAS(asum)(int, const real*, int);
 real BLAS(sum)(int, const real*, int);
@@ -48,6 +48,7 @@ void BLAS(rotmg)(const real*, const real*, const real*, real, real*);
 void BLAS(rot)(int, real*, int, real*, int, real, real);
 void BLAS(rotm)(int, real*, int, real*, int, real*);
 void BLAS(scal)(int, real, real*, int);
+
 // BLAS - Level 2
 void BLAS(gemv)(char, int, int, real, const real*, int, const real*, int, real, real*, int);
 void BLAS(trmv)(char, char, char, int, const real*, int, real*, int);
@@ -55,9 +56,9 @@ void BLAS(trmsv)(char, char, char, int, const real*, int, real*, int);
 void BLAS(gbmv)(char, int, int, int,  int, real, const real*, int, const real*, int, real, real*, int);
 void BLAS(tbmv)(char, char, char, int, int, const real*, int, real*, int);
 void BLAS(tbsv)(char, char, char, int, int, const real*, int, real*, int);
-void BLAS(tpsv)(char, char, char, int N, const real*, real*, int);
-void BLAS(tpmv)(char, char, char, int N, const real*, real*, int);
-void BLAS(ger)(int, int, real alpha, const real*, int, const real*, int, real*, int);
+void BLAS(tpsv)(char, char, char, int, const real*, real*, int);
+void BLAS(tpmv)(char, char, char, int, const real*, real*, int);
+void BLAS(ger)(int, int, real, const real*, int, const real*, int, real*, int);
 void BLAS(symv)(char, int, real, const real*, int, const real*, int, real, real*, int);
 void BLAS(sbmv)(char, int, int, real, const real*, int, const real*, int, real, real*, int);
 void BLAS(spmv)(char, int, real, const real*, const real*, int, real, real*, int);
@@ -65,6 +66,7 @@ void BLAS(syr)(char, int, real, const real*, int, real*, int);
 void BLAS(syr2)(char, int, real, const real*, int, const real*, int, real*, int);
 void BLAS(spr)(char, int, real, const real*, int, real*);
 void BLAS(spr2)(char, int, real, const real*, int, const real*, int, real*);
+
 // BLAS - Level 3
 void BLAS(gemm)(char, char, int, int, int, real, const real*, int, const real*, int, real, real*, int);
 void BLAS(symm)(char, char, int, int, real, const real*, int, const real*, int, real, real*, int);
@@ -77,7 +79,7 @@ void BLAS(trsm)(char, char, char, char, int, int, real, const real*, int, real*,
 
 namespace blas
 {
-#pragma mark - Level 1 BLAS routines
+#pragma mark - Level 1
 
 /**
  We always use double precision to accumulate the dot product of two vectors:
@@ -106,7 +108,7 @@ inline double nrm2(int N, const real* X)
     //using double precision to accumulate:
     return sqrt(blas::xdot(N, X, 1, X, 1));
 }
-    
+
 inline real ddot(int N, const double* X, int incX, const double* Y, int incY)
 {
     return cblas_ddot(N, X, incX, Y, incY);
@@ -205,11 +207,10 @@ inline void xscal(int N, real alpha, real*X, int incX)
 }
 
 
-#pragma mark - Level 2 BLAS
+#pragma mark - Level 2
 
 
-inline void xgemv(char TransA, int M, int N, real alpha, const real*A, int lda,
-                  const real*X, int incX, real beta, real*Y, int incY)
+inline void xgemv(char TransA, int M, int N, real alpha, const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
     BLAS(gemv)(TransA, M, N, alpha, A, lda, X, incX, beta, Y, incY);
 }
@@ -217,7 +218,6 @@ inline void xgemv(char TransA, int M, int N, real alpha, const real*A, int lda,
 inline void xtrmv(char Uplo, char TransA, char Diag, int N, const real*A, int lda, real*X, int incX)
 {
     BLAS(trmv)(Uplo, TransA, Diag, N, A, lda, X, incX);
-    
 }
 
 inline void xtrsv(char Uplo, char TransA, char Diag, int N, const real*A, int lda, real*X, int incX);
@@ -236,7 +236,6 @@ inline void xger(int M, int N, real alpha, const real*X, int incX, const real*Y,
 {
     BLAS(ger)(M, N, alpha, X, incX, Y, incY, A, lda);
 }
-
 
 inline void xsymv(char Uplo, int N, real alpha,  const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
@@ -263,7 +262,6 @@ inline void xsyr2(char Uplo, int N, real alpha, const real*X, int incX, const re
     BLAS(syr2)(Uplo, N, alpha, X, incX, Y, incY, A, lda);
 }
 
-    
 inline void xspr(char Uplo, int N, real alpha, const real*X, int incX, real*A)
 {
     BLAS(spr)(Uplo, N, alpha, X, incX, A);
@@ -275,17 +273,14 @@ inline void xspr2(char Uplo, int N, real alpha, const real*X, int incX, const re
 }
 
 
-#pragma mark - Level 3 BLAS
+#pragma mark - Level 3
 
-
-inline void xgemm(char TransA, char TransB, int M, int N, int K, real alpha, const real*A,
-                       int lda, const real*B, int ldb, real beta, real*C, int ldc)
+inline void xgemm(char TransA, char TransB, int M, int N, int K, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc)
 {
     BLAS(gemm)(TransA,TransB,M,N,K,alpha,A,lda,B,ldb,beta,C,ldc);
 }
 
-inline void xsymm(char Side, char Uplo, int M, int N, real alpha, const real*A, int lda,
-                       const real*B, int ldb, real beta, real*C, int ldc)
+inline void xsymm(char Side, char Uplo, int M, int N, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc)
 {
     BLAS(symm)(Side,Uplo,M,N,alpha,A,lda,B,ldb,beta,C,ldc);
 }
