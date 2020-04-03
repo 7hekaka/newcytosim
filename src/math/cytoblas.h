@@ -84,7 +84,7 @@ inline real nrm8(const size_t N, const real* X, int inc)
 {
 #if ( 1 )
     int inx = blas::ixamax(N, X, inc);
-    return fabs(X[inx]);
+    return std::abs(X[inx-1]);
 #else
     if ( N == 0 )
         return 0;
