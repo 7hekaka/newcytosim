@@ -347,6 +347,10 @@ def main(args):
         if key=='' or equal!='=' or value=='':
             if os.path.isdir(arg):
                 paths.append(arg)
+            elif arg=='+':
+                codec = 'h264'
+            elif arg=='++':
+                codec = 'h265'
             else:
                 err.write(prefix+"ignored '%s' on command line\n" % arg)
         else:
@@ -359,12 +363,7 @@ def main(args):
                 if format == 'mov':
                     quality = '256'
             elif key=='codec':
-                if value = '264':
-                    codec = 'h264'
-                elif value = '265':
-                    codec = 'h265'
-                else:
-                    codec = value
+                codec = value
             elif key=='quality':
                 quality = value
             elif key=='lazy':
