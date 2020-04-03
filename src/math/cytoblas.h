@@ -15,6 +15,64 @@
 namespace blas
 {
 
+#ifdef __INTEL_MKL__
+    /**
+     axpby() performs Y <- alpha * X + beta * Y
+     This routine is not part of BLAS, but is provided by Intel Math Kernel Library
+     */
+    void BLAS(axpby)(int*, real*, const real*, int*, real*, real*, int*);
+    inline void xaxpby(int N, real alpha, const real*X, int incX, real beta, real*Y, int incY)
+    {
+        BLAS(axpby)(&N, &alpha, X, &incX, &beta, Y, &incY);
+    }
+#else
+    inline void xaxpby(int N, real alpha, const real* X, int incX, real beta, real* Y, int incY)
+    {
+        if ( incX == 1  &&  incY == 1 )
+        {
+            for ( int i = 0; i < N; ++i )
+                Y[i] = alpha * X[i] + beta * Y[i];
+        }
+        else
+        {
+            for ( int i = 0; i < N; ++i )
+                Y[i*incY] = alpha * X[i*incX] + beta * Y[i*incY];
+        }
+    }
+#endif
+
+
+/// calculates Y <- X + alpha * Y
+inline void xpay(size_t N, const real* X, real alpha, real* Y)
+{
+    #pragma ivdep
+    #pragma vector always
+    for ( size_t i = 0; i < N; ++i )
+        Y[i] = alpha * Y[i] + X[i];
+}
+
+
+/// addition Y[] <- Y[] + X[], for array of size N
+inline void add(size_t N, const real* X, real* Y)
+{
+    //xaxpy(N, 1.0, X, 1, Y, 1);
+    #pragma ivdep
+    #pragma vector always
+    for ( size_t i = 0; i < N; ++i )
+        Y[i] = Y[i] + X[i];
+}
+    
+/// subtraction Y[] <- Y[] - X[], for array of size N
+inline void sub(size_t N, const real* X, real* Y)
+{
+    //xaxpy(N, -1.0, X, 1, Y, 1);
+    #pragma ivdep
+    #pragma vector always
+    for ( size_t i = 0; i < N; ++i )
+        Y[i] = Y[i] - X[i];
+}
+
+
 /**
  return the infinite norm of the vector
 

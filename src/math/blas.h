@@ -14,21 +14,18 @@
 
 #include "real.h"
 
+/// macro will expand to the FORTRAN function name
+#if REAL_IS_DOUBLE
+#   define BLAS(x) d##x##_
+#   define iBLAS(x) id##x##_
+#else
+#   define BLAS(x) s##x##_
+#   define iBLAS(x) is##x##_
+#endif
 
-#ifdef __cplusplus
+
 namespace blas {
 extern "C" {
-#endif
-    
-#undef FORTRAN
-    
-#if REAL_IS_DOUBLE
-#   define FORTRAN(x) d##x##_
-#   define iFORTRAN(x) id##x##_
-#else
-#   define FORTRAN(x) s##x##_
-#   define iFORTRAN(x) is##x##_
-#endif
 
 /*
  * ===========================================================================
@@ -89,58 +86,58 @@ inline double sdsdot(int N, float SB, const float* X, int incX, const float* Y, 
 
 
 // use 'blas::nrm2' defined above if applicable
-real FORTRAN(nrm2)(int*, const real*, int*);
+real BLAS(nrm2)(int*, const real*, int*);
 inline real xnrm2(int N, const real*X, int incX)
 {
-    return FORTRAN(nrm2)(&N, X, &incX);
+    return BLAS(nrm2)(&N, X, &incX);
 }
     
-real FORTRAN(asum)(int*, const real*, int*);
+real BLAS(asum)(int*, const real*, int*);
 inline real xasum(int N, const real*X, int incX)
 {
-    return FORTRAN(asum)(&N, X, &incX);
+    return BLAS(asum)(&N, X, &incX);
 }
 
-real FORTRAN(sum)(int*, const real*, int*);
+real BLAS(sum)(int*, const real*, int*);
 inline real xsum(int N, const real*X, int incX)
 {
-    return FORTRAN(sum)(&N, X, &incX);
+    return BLAS(sum)(&N, X, &incX);
 }
 
-int iFORTRAN(amax)(int*, const real*, int*);
+int iBLAS(amax)(int*, const real*, int*);
 inline int ixamax(int N, const real*X, int incX)
 {
-    return (iFORTRAN(amax)(&N, X, &incX) - 1);
+    return (iBLAS(amax)(&N, X, &incX) - 1);
 }
 
-int iFORTRAN(max)(int*, const real*, int*);
+int iBLAS(max)(int*, const real*, int*);
 inline int ixmax(int N, const real*X, int incX)
 {
-    return (iFORTRAN(max)(&N, X, &incX) - 1);
+    return (iBLAS(max)(&N, X, &incX) - 1);
 }
 
-int iFORTRAN(amin)(int*, const real*, int*);
+int iBLAS(amin)(int*, const real*, int*);
 inline int ixamin(int N, const real*X, int incX)
 {
-    return (iFORTRAN(amin)(&N, X, &incX) - 1);
+    return (iBLAS(amin)(&N, X, &incX) - 1);
 }
 
-int iFORTRAN(min)(int*, const real*, int*);
+int iBLAS(min)(int*, const real*, int*);
 inline int ixmin(int N, const real*X, int incX)
 {
-    return (iFORTRAN(min)(&N, X, &incX) - 1);
+    return (iBLAS(min)(&N, X, &incX) - 1);
 }
 
-void FORTRAN(swap)(int*, real*, int*, real*, int*);
+void BLAS(swap)(int*, real*, int*, real*, int*);
 inline void xswap(int N, real*X, int incX, real*Y, int incY)
 {
-    FORTRAN(swap)(&N, X, &incX, Y, &incY);
+    BLAS(swap)(&N, X, &incX, Y, &incY);
 }
 
-void FORTRAN(copy)(int*, const real*, int*, real*, int*);
+void BLAS(copy)(int*, const real*, int*, real*, int*);
 inline void xcopy(int N, const real*X, int incX, real*Y, int incY)
 {
-    FORTRAN(copy)(&N, X, &incX, Y, &incY);
+    BLAS(copy)(&N, X, &incX, Y, &incY);
 }
 
 inline void copy(int N, const real* X, real* Y)
@@ -149,97 +146,40 @@ inline void copy(int N, const real* X, real* Y)
     blas::xcopy(N, X, 1, Y, 1);
 }
 
-void FORTRAN(axpy)(int*, real*, const real*, int*, real*, int*);
+void BLAS(axpy)(int*, real*, const real*, int*, real*, int*);
 inline void xaxpy(int N, real alpha, const real*X, int incX, real*Y, int incY)
 {
-    FORTRAN(axpy)(&N, &alpha, X, &incX, Y, &incY);
+    BLAS(axpy)(&N, &alpha, X, &incX, Y, &incY);
 }
     
-void FORTRAN(rotg)(real*, real*, real*, real*);
+void BLAS(rotg)(real*, real*, real*, real*);
 inline void xrotg(real*a, real*b, real*c, real*s)
 {
-    FORTRAN(rotg)(a, b, c, s);
+    BLAS(rotg)(a, b, c, s);
 }
 
-void FORTRAN(rotmg)(const real*, const real*, const real*, real*, real*);
+void BLAS(rotmg)(const real*, const real*, const real*, real*, real*);
 inline void xrotmg(const real*d1, const real*d2, const real*b1, real b2, real*P)
 {
-    FORTRAN(rotmg)(d1, d2, b1, &b2, P);
+    BLAS(rotmg)(d1, d2, b1, &b2, P);
 }
 
-void FORTRAN(rot)(int*, real*, int*, real*, int*, real*, real*);
+void BLAS(rot)(int*, real*, int*, real*, int*, real*, real*);
 inline void xrot( int N, real*X, int incX, real*Y, int incY, real c, real s)
 {
-    FORTRAN(rot)(&N, X, &incX, Y, &incY, &c, &s);
+    BLAS(rot)(&N, X, &incX, Y, &incY, &c, &s);
 }
 
-void FORTRAN(rotm)(int*, real*, int*, real*, int*, real*);
+void BLAS(rotm)(int*, real*, int*, real*, int*, real*);
 inline void xrotm( int N, real*X, int incX, real*Y, int incY, real*P)
 {
-    FORTRAN(rotm)(&N, X, &incX, Y, &incY, P);
+    BLAS(rotm)(&N, X, &incX, Y, &incY, P);
 }
 
-void FORTRAN(scal)(int*, real*, real*, int*);
+void BLAS(scal)(int*, real*, real*, int*);
 inline void xscal(int N, real alpha, real*X, int incX)
 {
-    FORTRAN(scal)( &N, &alpha, X, &incX);
-}
-    
-#ifdef __INTEL_MKL__
-    /**
-     axpby() performs Y <- alpha * X + beta * Y
-     This routine is not part of BLAS, but is provided by Intel Math Kernel Library
-     */
-    void FORTRAN(axpby)(int*, real*, const real*, int*, real*, real*, int*);
-    inline void xaxpby(int N, real alpha, const real*X, int incX, real beta, real*Y, int incY)
-    {
-        FORTRAN(axpby)(&N, &alpha, X, &incX, &beta, Y, &incY);
-    }
-#else
-    inline void xaxpby(int N, real alpha, const real* X, int incX, real beta, real* Y, int incY)
-    {
-        if ( incX == 1  &&  incY == 1 )
-        {
-            for ( int i = 0; i < N; ++i )
-                Y[i] = alpha * X[i] + beta * Y[i];
-        }
-        else
-        {
-            for ( int i = 0; i < N; ++i )
-                Y[i*incY] = alpha * X[i*incX] + beta * Y[i*incY];
-        }
-    }
-#endif
-
-
-/// calculates Y <- X + alpha * Y
-inline void xpay(size_t N, const real* X, real alpha, real* Y)
-{
-    #pragma ivdep
-    #pragma vector always
-    for ( size_t i = 0; i < N; ++i )
-        Y[i] = alpha * Y[i] + X[i];
-}
-
-
-/// addition Y[] <- Y[] + X[], for array of size N
-inline void add(size_t N, const real* X, real* Y)
-{
-    //xaxpy(N, 1.0, X, 1, Y, 1);
-    #pragma ivdep
-    #pragma vector always
-    for ( size_t i = 0; i < N; ++i )
-        Y[i] = Y[i] + X[i];
-}
-    
-/// subtraction Y[] <- Y[] - X[], for array of size N
-inline void sub(size_t N, const real* X, real* Y)
-{
-    //xaxpy(N, -1.0, X, 1, Y, 1);
-    #pragma ivdep
-    #pragma vector always
-    for ( size_t i = 0; i < N; ++i )
-        Y[i] = Y[i] - X[i];
+    BLAS(scal)( &N, &alpha, X, &incX);
 }
 
 /*
@@ -250,17 +190,17 @@ inline void sub(size_t N, const real* X, real* Y)
 #pragma mark -
 
 
-void FORTRAN(gemv)(char*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
+void BLAS(gemv)(char*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
 inline void xgemv(char TransA, int M, int N, real alpha, const real*A, int lda,
                        const real*X, int incX, real beta, real*Y, int incY)
 {
-    FORTRAN(gemv)(&TransA, &M, &N, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
+    BLAS(gemv)(&TransA, &M, &N, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
 }
 
-void FORTRAN(trmv)( char*, char*, char*, int*, const real*, int*, real*, int*);
+void BLAS(trmv)( char*, char*, char*, int*, const real*, int*, real*, int*);
 inline void xtrmv( char Uplo, char TransA, char Diag, int N, const real*A, int lda, real*X, int incX)
 {
-    FORTRAN(trmv)(&Uplo, &TransA, &Diag, &N, A, &lda, X, &incX);
+    BLAS(trmv)(&Uplo, &TransA, &Diag, &N, A, &lda, X, &incX);
     
 }
 
@@ -276,48 +216,48 @@ inline void xtpsv(char Uplo, char TransA, char Diag, int N, const real*Ap, real*
 
 inline void xtpmv(char Uplo, char TransA, char Diag, int N, const real*Ap, real*X, int incX);
 
-void FORTRAN(ger)(int*, int*, real* alpha, const real*, int*, const real*, int*, real*, int*);
+void BLAS(ger)(int*, int*, real* alpha, const real*, int*, const real*, int*, real*, int*);
 inline void xger(int M, int N, real alpha, const real*X, int incX, const real*Y, int incY, real*A, int lda)
 {
-    FORTRAN(ger)(&M, &N, &alpha, X, &incX, Y, &incY, A, &lda);
+    BLAS(ger)(&M, &N, &alpha, X, &incX, Y, &incY, A, &lda);
 }
 
 
-void FORTRAN(symv)(char*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
+void BLAS(symv)(char*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
 inline void xsymv(char Uplo, int N, real alpha,  const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
-    FORTRAN(symv)(&Uplo,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+    BLAS(symv)(&Uplo,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
 }
 
-void FORTRAN(sbmv)(char*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
+void BLAS(sbmv)(char*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
 inline void xsbmv(char Uplo, int N, int K, real alpha, const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
-    FORTRAN(sbmv)(&Uplo,&N,&K,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+    BLAS(sbmv)(&Uplo,&N,&K,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
 }
 
-void FORTRAN(spmv)(char*, int*, real*, const real*, const real*, int*, real*, real*, int*);
+void BLAS(spmv)(char*, int*, real*, const real*, const real*, int*, real*, real*, int*);
 inline void xspmv(char Uplo, int N, real alpha, const real*A, const real*X, int incX, real beta, real*Y, int incY)
 {
-    FORTRAN(spmv)(&Uplo,&N,&alpha,A,X,&incX,&beta,Y,&incY);
+    BLAS(spmv)(&Uplo,&N,&alpha,A,X,&incX,&beta,Y,&incY);
 }
 
-void FORTRAN(syr)(char*, int*, real*, const real*, int*, real*, int*);
+void BLAS(syr)(char*, int*, real*, const real*, int*, real*, int*);
 inline void xsyr(char Uplo, int N, real alpha, const real*X, int incX, real*A, int lda)
 {
-    FORTRAN(syr)(&Uplo, &N, &alpha, X, &incX, A, &lda);
+    BLAS(syr)(&Uplo, &N, &alpha, X, &incX, A, &lda);
 }
 
-void FORTRAN(syr2)(char*, int*, real*, const real*, int*, const real*, int*, real*, int*);
+void BLAS(syr2)(char*, int*, real*, const real*, int*, const real*, int*, real*, int*);
 inline void xsyr2(char Uplo, int N, real alpha, const real*X, int incX, const real*Y, int incY, real* A, int lda)
 {
-    FORTRAN(syr2)(&Uplo, &N, &alpha, X, &incX, Y, &incY, A, &lda);
+    BLAS(syr2)(&Uplo, &N, &alpha, X, &incX, Y, &incY, A, &lda);
 }
 
     
-void FORTRAN(spr)(char*, int*, real*, const real*, int*, real*);
+void BLAS(spr)(char*, int*, real*, const real*, int*, real*);
 inline void xspr(char Uplo, int N, real alpha, const real*X, int incX, real*Ap)
 {
-    FORTRAN(spr)(&Uplo, &N, &alpha, X, &incX, Ap);
+    BLAS(spr)(&Uplo, &N, &alpha, X, &incX, Ap);
 }
 
 inline void xspr2(char Uplo, int N, real alpha, const real*X, int incX, const real*Y, int incY, real*A);
@@ -330,41 +270,39 @@ inline void xspr2(char Uplo, int N, real alpha, const real*X, int incX, const re
 #pragma mark -
 
 
-void FORTRAN(gemm)(char*, char*, int*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
+void BLAS(gemm)(char*, char*, int*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
 inline void xgemm(char TransA, char TransB, int M, int N, int K, real alpha, const real*A,
                        int lda, const real*B, int ldb, real beta, real*C, int ldc)
 {
-    FORTRAN(gemm)(&TransA,&TransB,&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
+    BLAS(gemm)(&TransA,&TransB,&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
 }
 
-void FORTRAN(symm)(char*, char*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
+void BLAS(symm)(char*, char*, int*, int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
 inline void xsymm(char Side, char Uplo, int M, int N, real alpha, const real*A, int lda,
                        const real*B, int ldb, real beta, real*C, int ldc)
 {
-    FORTRAN(symm)(&Side,&Uplo,&M,&N,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
+    BLAS(symm)(&Side,&Uplo,&M,&N,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
 }
 
 
-void FORTRAN(syrk)(char*, char*, int*, int*, real*, const real*, int*, real*, real*, int*);
+void BLAS(syrk)(char*, char*, int*, int*, real*, const real*, int*, real*, real*, int*);
 inline void xsyrk(char Uplo, char Trans, int N, int K, real alpha, const real*A, int lda, real beta, real*C, int ldc)
 {
-    FORTRAN(syrk)(&Uplo,&Trans,&N,&K,&alpha,A,&lda,&beta,C,&ldc);
+    BLAS(syrk)(&Uplo,&Trans,&N,&K,&alpha,A,&lda,&beta,C,&ldc);
 }
 
 inline void xsyr2k(char Uplo, char Trans, int N, int K, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc);
 
 inline void xtrmm(char Uplo, char TransA, char Diag, int M, int N, real alpha, const real*A, int lda, real*B, int ldb);
 
-void FORTRAN(trsm)(char*, char*, char*, char*, int*, int*, real*, const real*, int*, real*, int*);
+void BLAS(trsm)(char*, char*, char*, char*, int*, int*, real*, const real*, int*, real*, int*);
 inline void xtrsm(char side, char uplo, char transA, char diag, int M, int N, real alpha, const real*A, int lda, real*B, int ldb)
 {
-    FORTRAN(trsm)(&side, &uplo, &transA, &diag, &M, &N, &alpha, A, &lda, B, &ldb);
+    BLAS(trsm)(&side, &uplo, &transA, &diag, &M, &N, &alpha, A, &lda, B, &ldb);
 }
-    
-    
-#ifdef __cplusplus
+
+
 }}
-#endif
 
 
 #endif
