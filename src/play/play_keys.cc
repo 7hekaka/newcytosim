@@ -577,6 +577,7 @@ void helpKeys(std::ostream& os)
     os << "   f F         Toggle full-screen mode; maximize window size\n";
     os << "   i v b       Invert colors; toggle slice view; toggle scale bar\n";
     os << "   l L         Read parameter file; Print display parameters\n";
+    os << "   r R         Report various informations on display window\n";
 #if ENABLE_WRITE
     os << "   y Y         Save current image; Play and save all images\n";
 #endif

@@ -553,9 +553,7 @@ int compareInt(const void* p, const void* q)
 
 int main( int argc, char* argv[] )
 {
-#ifdef COMPILER_VERSION
-    printf("Matrix test and timing code, compiled with %s\n", COMPILER_VERSION);
-#endif
+    printf("Matrix test and timing code --- %s\n", __VERSION__);
 
     RNG.seed();
 #if ( 0 )

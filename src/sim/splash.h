@@ -20,14 +20,7 @@ inline void splash(std::ostream& os)
 inline void print_version(std::ostream& os)
 {
     os << "    Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON << "\n";
-    os << "    Built on " <<__DATE__<< " at " <<__TIME__;
-    
-#ifdef COMPILER_VERSION
-    os << " with " << COMPILER_VERSION << "\n";
-#else
-    os << " with unknown compiler\n";
-#endif
-    //os << "    C++ version " << __cplusplus << "\n";
+    os << "    Built on " <<__DATE__<< " at " <<__TIME__<< " with " <<__VERSION__<< "\n";
     
 #ifdef CODE_VERSION
     os << "    Code version " << CODE_VERSION;
