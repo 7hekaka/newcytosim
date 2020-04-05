@@ -44,7 +44,6 @@ int main(int argc, char* argv[])
     {
         splash(std::cout);
         print_version(std::cout);
-        std::cout << "    DIM = " << DIM << std::endl;
         return EXIT_SUCCESS;
     }
 
