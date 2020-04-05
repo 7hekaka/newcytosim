@@ -23,8 +23,10 @@
 #   define iBLAS(x) is##x##_
 #endif
 
+//#include "cblas.h"
 
-// FORTRAN Functions from BLAS
+#define CBLAS_INDEX size_t  /* this may vary between platforms */
+
 extern "C"
 {
 // BLAS - Level 1
@@ -36,10 +38,10 @@ double cblas_dsdot(int*, const float*, int*, const float*, int*);
 real BLAS(nrm2)(int*, const real*, int*);
 real BLAS(asum)(int*, const real*, int*);
 real BLAS(sum)(int*, const real*, int*);
-int iBLAS(amax)(int*, const real*, int*);
-int iBLAS(max)(int*, const real*, int*);
-int iBLAS(amin)(int*, const real*, int*);
-int iBLAS(min)(int*, const real*, int*);
+CBLAS_INDEX iBLAS(amax)(int*, const real*, int*);
+CBLAS_INDEX iBLAS(max)(int*, const real*, int*);
+CBLAS_INDEX iBLAS(amin)(int*, const real*, int*);
+CBLAS_INDEX iBLAS(min)(int*, const real*, int*);
 void BLAS(swap)(int*, real*, int*, real*, int*);
 void BLAS(copy)(int*, const real*, int*, real*, int*);
 void BLAS(axpy)(int*, real*, const real*, int*, real*, int*);
@@ -142,22 +144,22 @@ inline real xsum(int N, const real*X, int incX)
     return BLAS(sum)(&N, X, &incX);
 }
 
-inline int ixamax(int N, const real*X, int incX)
+inline CBLAS_INDEX ixamax(int N, const real*X, int incX)
 {
     return iBLAS(amax)(&N, X, &incX);
 }
 
-inline int ixmax(int N, const real*X, int incX)
+inline CBLAS_INDEX ixmax(int N, const real*X, int incX)
 {
     return iBLAS(max)(&N, X, &incX);
 }
 
-inline int ixamin(int N, const real*X, int incX)
+inline CBLAS_INDEX ixamin(int N, const real*X, int incX)
 {
     return iBLAS(amin)(&N, X, &incX);
 }
 
-inline int ixmin(int N, const real*X, int incX)
+inline CBLAS_INDEX ixmin(int N, const real*X, int incX)
 {
     return iBLAS(min)(&N, X, &incX);
 }
@@ -241,17 +243,17 @@ inline void xger(int M, int N, real alpha, const real*X, int incX, const real*Y,
 
 inline void xsymv(char Uplo, int N, real alpha,  const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
-    BLAS(symv)(&Uplo,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+    BLAS(symv)(&Uplo, &N, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
 }
 
 inline void xsbmv(char Uplo, int N, int K, real alpha, const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY)
 {
-    BLAS(sbmv)(&Uplo,&N,&K,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+    BLAS(sbmv)(&Uplo, &N, &K, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
 }
 
 inline void xspmv(char Uplo, int N, real alpha, const real*A, const real*X, int incX, real beta, real*Y, int incY)
 {
-    BLAS(spmv)(&Uplo,&N,&alpha,A,X,&incX,&beta,Y,&incY);
+    BLAS(spmv)(&Uplo, &N, &alpha, A, X, &incX, &beta, Y, &incY);
 }
 
 inline void xsyr(char Uplo, int N, real alpha, const real*X, int incX, real*A, int lda)
@@ -280,17 +282,17 @@ inline void xspr2(char Uplo, int N, real alpha, const real*X, int incX, const re
 
 inline void xgemm(char TransA, char TransB, int M, int N, int K, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc)
 {
-    BLAS(gemm)(&TransA,&TransB,&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
+    BLAS(gemm)(&TransA, &TransB, &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
 }
 
 inline void xsymm(char Side, char Uplo, int M, int N, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc)
 {
-    BLAS(symm)(&Side,&Uplo,&M,&N,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
+    BLAS(symm)(&Side, &Uplo, &M, &N, &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
 }
 
 inline void xsyrk(char Uplo, char Trans, int N, int K, real alpha, const real*A, int lda, real beta, real*C, int ldc)
 {
-    BLAS(syrk)(&Uplo,&Trans,&N,&K,&alpha,A,&lda,&beta,C,&ldc);
+    BLAS(syrk)(&Uplo, &Trans, &N, &K, &alpha, A, &lda, &beta, C, &ldc);
 }
 
 inline void xsyr2k(char Uplo, char Trans, int N, int K, real alpha, const real*A, int lda, const real*B, int ldb, real beta, real*C, int ldc);
@@ -303,5 +305,6 @@ inline void xtrsm(char side, char uplo, char transA, char diag, int M, int N, re
 }
 
 }
+#undef CBLAS_INDEX
 
 #endif
