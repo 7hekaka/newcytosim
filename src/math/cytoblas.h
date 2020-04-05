@@ -83,7 +83,7 @@ inline void sub(size_t N, const real* X, real* Y)
 inline real nrm8(const size_t N, const real* X, int inc)
 {
 #if ( 1 )
-    int inx = blas::ixamax(N, X, inc);
+    size_t inx = blas::ixamax(N, X, inc);
     return std::abs(X[inx-1]);
 #else
     if ( N == 0 )
