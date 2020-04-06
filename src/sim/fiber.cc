@@ -648,7 +648,7 @@ void Fiber::join(Fiber * fib)
  From "Random Walks in Biology" by HC. Berg, Princeton University Press,
  drag coefficients for an ellipsoid are,
 
-     drag_transverse = 2*drag_parallel = 4*PI*L*visc / log(length/radius)
+     drag_transverse = 2*drag_parallel = 4*PI*length*visc / log(length/radius)
 
  We should average the mobility coefficients:  speed = mu * f
      mu_X = mu_parallel   = 2 * mu
@@ -797,11 +797,9 @@ real Fiber::dragCoefficientCylinder(const real len, FiberProp const* prop)
 
        acosh(x) = ln[ x + sqrt(x^2-1)) ] ~ ln[2x] if x >> 1
 
- Hunt et al. also credit this reference for the formula:\n
- <em>
- The slow motion of a cylinder next to a plane wall.
- Jeffrey, D.J. & Onishi, Y. (1981) Quant. J. Mech. Appl. Math. 34, 129-137.
- </em>
+ Hunt et al. also credit this reference for the formula:
+ > The slow motion of a cylinder next to a plane wall.
+ > Jeffrey, D.J. & Onishi, Y. (1981) Quant. J. Mech. Appl. Math. 34, 129-137.
 */
 real Fiber::dragCoefficientSurface(const real len, FiberProp const* prop)
 {
