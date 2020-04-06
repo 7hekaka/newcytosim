@@ -144,10 +144,10 @@ public:
          if ( fiber:drag_model )
              drag = dragCoefficientSurface();
          else
-             drag = dragCoefficientVolume();
+             drag = dragCoefficientCylinder();
 
      <hr>
-     @copydetails Fiber::dragCoefficientVolume
+     @copydetails Fiber::dragCoefficientCylinder
      <hr>
      @copydetails Fiber::dragCoefficientSurface
      */

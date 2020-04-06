@@ -25,7 +25,7 @@ set fiber actin
     steric = 1, 0.01
     segmentation = 0.022   % 0.0055 is 2 monomers
     confine = inside, 10000, cell
-    hydrodynamic_radius = 0.004
+    drag_radius = 0.004
 
     activity = grow
     growing_speed = 0.1
