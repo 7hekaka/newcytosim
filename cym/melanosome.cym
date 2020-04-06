@@ -32,7 +32,7 @@ set fiber actin
     rigidity = 0.1          % usual rigidity of actin is 0.06
     segmentation = 0.1      % precision at which filaments are calculated
     confine = inside, 100   % confinement inside cell, stiffness of confinement
-    hydrodynamic_radius = 0.005
+    drag_radius = 0.005
 
     activity = classic
     growing_speed = 0.1     % guess, but average_length = growing_speed / catastrophe_rate
