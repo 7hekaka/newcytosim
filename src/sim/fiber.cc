@@ -666,10 +666,8 @@ APPROXIMATE FORMULA FOR ELLIPSOIDAL PARTICLE
      drag = 3.0 * M_PI * viscosity * diameter * ( 3 + 2 * length/diameter ) / 5.0;
 
  */
-real Fiber::dragCoefficientEllipsoid(real len, FiberProp const* prop)
+real Fiber::dragCoefficientEllipsoid(const real len, FiberProp const* prop)
 {
-    assert_true( len > 0 );
-    
     // hydrodynamic cut-off on length:
     assert_true( prop->drag_length > REAL_EPSILON );
     real lenc = std::min(len, prop->drag_length);
@@ -739,10 +737,8 @@ real Fiber::dragCoefficientEllipsoid(real len, FiberProp const* prop)
      drag_rotation = 1/3*M_PI*viscosity*length^3 / ( log(shape) + Cr )
 
  */
-real Fiber::dragCoefficientCylinder(real len, FiberProp const* prop)
+real Fiber::dragCoefficientCylinder(const real len, FiberProp const* prop)
 {
-    assert_true( len > 0 );
-    
     // hydrodynamic cut-off on length:
     assert_true( prop->drag_length > REAL_EPSILON );
     real lenc = std::min(len, prop->drag_length);
@@ -807,15 +803,15 @@ real Fiber::dragCoefficientCylinder(real len, FiberProp const* prop)
  Jeffrey, D.J. & Onishi, Y. (1981) Quant. J. Mech. Appl. Math. 34, 129-137.
  </em>
 */
-real Fiber::dragCoefficientSurface(real len, FiberProp const* prop)
+real Fiber::dragCoefficientSurface(const real len, FiberProp const* prop)
 {
     if ( prop->drag_gap <= 0 )
         throw InvalidParameter("fiber:drag_model[1] (height above surface) must set and > 0!");
     
     // use the higher drag: perpendicular to the cylinder (factor 2)
-    real drag = 2 * M_PI * prop->viscosity * len / acosh( 1 + prop->drag_gap/prop->drag_radius );
+    real drag = 2 * len / acosh( 1 + prop->drag_gap/prop->drag_radius );
 
-    return drag;
+    return M_PI * prop->viscosity * drag;
 }
 
 
@@ -829,7 +825,9 @@ real Fiber::dragCoefficientSurface(real len, FiberProp const* prop)
  */
 void Fiber::setDragCoefficient()
 {
-    real len = length();
+    const real len = length();
+    assert_true( len > 0 );
+    
     real drag;
     
     if ( prop->drag_model )
