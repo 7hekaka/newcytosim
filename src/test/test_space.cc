@@ -119,7 +119,7 @@ void generatePoints(real len)
     }
     else
     {
-        for ( int ii = 0; ii <= nbpts; ++ii )
+        for ( size_t ii = 0; ii <= nbpts; ++ii )
             point[ii] = inf + dif.e_mul(Vector::randP());
         //point[ii] = Vector::randU();
         //point[ii] = spc->randomPlaceNearEdge(0.1);
@@ -212,11 +212,11 @@ void checkVolume()
     real e2 = spc->estimateVolume(cnt);
     
     printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
-    printf("  %.6f +/- %.6f\n", e1, fabs(e2-e1));
+    printf("  %.6f +/- %.6f\n", e1, std::fabs(e2-e1));
     
     real v = spc->volume();
     
-    real err = fabs( e1 - v ) / v;
+    real err = abs_real( e1 - v ) / v;
     
     if ( err > 1e-3 )
         printf("    but given volume is %f  (difference %.2f %%)\n", v, 100*err);
@@ -442,8 +442,8 @@ bool showPoint(int i)
     
     if ( slicing )
     {
-        //return ( fabs(dot(project[i]-origin, axis)) < thickness );
-        return ( fabs(dot(point[i]-origin, axis)) < thickness );
+        //return ( abs_real(dot(project[i]-origin, axis)) < thickness );
+        return ( abs_real(dot(point[i]-origin, axis)) < thickness );
     }
     return true;
 }
@@ -471,7 +471,7 @@ void display(View&, int)
     //plot a gren dot for points inside, a red dot for point outside:
     glPointSize(2.0);
     glBegin(GL_POINTS);
-    for ( int ii = 0; ii < nbpts; ++ii )
+    for ( size_t ii = 0; ii < nbpts; ++ii )
     {
         if ( showPoint(ii) )
         {
@@ -489,7 +489,7 @@ void display(View&, int)
         //plot a blue line from the point to its projection:
         glLineWidth(line_width);
         glBegin(GL_LINES);
-        for ( int ii = 0; ii < nbpts; ++ii )
+        for ( size_t ii = 0; ii < nbpts; ++ii )
         {
             if ( showPoint(ii) )
             {
@@ -508,7 +508,7 @@ void display(View&, int)
     {
         glLineWidth(line_width);
         glBegin(GL_LINES);
-        for ( int ii = 0; ii < nbpts; ++ii )
+        for ( size_t ii = 0; ii < nbpts; ++ii )
         {
             glColor4f(1.0, 1.0, 1.0, 1.0);
             gleVertex(project[ii]);
@@ -522,7 +522,7 @@ void display(View&, int)
     {
         glLineWidth(2*line_width);
         glBegin(GL_LINES);
-        for ( int ii = 0; ii < nbpts; ++ii )
+        for ( size_t ii = 0; ii < nbpts; ++ii )
         {
             if ( showPoint(ii) )
             {
@@ -539,12 +539,12 @@ void display(View&, int)
         glPointSize(2.0);
         glBegin(GL_POINTS);
         glColor3f(1.0, COL, COL);
-        for ( int ii = 0; ii < nbpts; ++ii )
+        for ( size_t ii = 0; ii < nbpts; ++ii )
             gleVertex(edge[ii]);
         glEnd();
         glBegin(GL_POINTS);
         glColor3f( 0.0, COL, 0.0);
-        for ( int ii = 0; ii < nbpts; ++ii )
+        for ( size_t ii = 0; ii < nbpts; ++ii )
             gleVertex(project[ii]);
         glEnd();
     }

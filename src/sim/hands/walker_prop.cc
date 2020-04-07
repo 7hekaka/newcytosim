@@ -69,12 +69,12 @@ void WalkerProp::complete(Simul const& sim)
     if ( unbinding_chance > 1 )
         throw InvalidParameter("walker:unbinding_chance must be <= 1");
     
-    walking_rate_dt = sim.time_step() * fabs(unloaded_speed) / step_size;
+    walking_rate_dt = sim.time_step() * abs_real(unloaded_speed) / step_size;
     var_rate_dt     = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
     
 #if NEW_VARIABLE_SPEED
-    real S = std::copysign(1.0, unloaded_speed * variable_speed);
-    variable_walking_rate_dt = S * sim.time_step() * fabs(variable_speed) / step_size;
+    real S = sign_real(unloaded_speed * variable_speed);
+    variable_walking_rate_dt = S * sim.time_step() * abs_real(variable_speed) / step_size;
     if ( ( unloaded_speed + variable_speed ) * unloaded_speed < 0 )
         throw InvalidParameter("walker:unloaded_speed and (unloaded_speed+variable_speed) must have the same sign");
 #endif
@@ -114,7 +114,7 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Compare the force created by traveling during the time 1/unbinding_rate,
      and compare to stall_force. This is limit the efficiency of the motor.
      */
-    ef = fabs( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
+    ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate && unloaded_speed  &&  ef < 1 )
     {
         Cytosim::warn << "The efficiency of `" << name() << "' is low because\n"\
@@ -126,7 +126,7 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     /*
      Compare the force reached in one step with the stall force
      */
-    if ( fabs( step_size * stiff ) > 0.5 * stall_force )
+    if ( abs_real( step_size * stiff ) > 0.5 * stall_force )
         Cytosim::warn << "attention:  stiffness * digit:step > stall_force / 2\n";
 #endif
 }

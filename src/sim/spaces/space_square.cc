@@ -57,7 +57,7 @@ real SpaceSquare::volume() const
 
 bool SpaceSquare::inside(Vector const& w) const
 {
-    return fabs(w.XX) <= length_[0];
+    return abs_real(w.XX) <= length_[0];
 }
 
 bool SpaceSquare::allInside(Vector const& w, const real rad) const
@@ -89,8 +89,8 @@ real SpaceSquare::volume() const
 
 bool SpaceSquare::inside(Vector const& w) const
 {
-    return (fabs(w.XX) <= length_[0]) &
-           (fabs(w.YY) <= length_[1]);
+    return (abs_real(w.XX) <= length_[0]) &
+           (abs_real(w.YY) <= length_[1]);
 }
 
 bool SpaceSquare::allInside(Vector const& w, const real rad) const
@@ -116,9 +116,9 @@ real SpaceSquare::volume() const
 
 bool SpaceSquare::inside(Vector const& w) const
 {
-    return (fabs(w.XX) <= length_[0]) &
-           (fabs(w.YY) <= length_[1]) &
-           (fabs(w.ZZ) <= length_[2]);
+    return (abs_real(w.XX) <= length_[0]) &
+           (abs_real(w.YY) <= length_[1]) &
+           (abs_real(w.ZZ) <= length_[2]);
 }
 
 bool SpaceSquare::allInside(Vector const& w, const real rad) const
@@ -138,18 +138,18 @@ Vector SpaceSquare::project(Vector const& w) const
     Vector p = w;
     bool in = true;
     
-    if ( fabs(p.XX) > length_[0] )
+    if ( abs_real(p.XX) > length_[0] )
     {
         p.XX = std::copysign(length_[0], p.XX);
         in = false;
     }
-    if ( fabs(p.YY) > length_[1] )
+    if ( abs_real(p.YY) > length_[1] )
     {
         p.YY = std::copysign(length_[1], p.YY);
         in = false;
     }
 #if ( DIM > 2 )
-    if ( fabs(p.ZZ) > length_[2] )
+    if ( abs_real(p.ZZ) > length_[2] )
     {
         p.ZZ = std::copysign(length_[2], p.ZZ);
         in = false;
@@ -159,10 +159,10 @@ Vector SpaceSquare::project(Vector const& w) const
     if ( in )
     {
         // find the dimensionality corresponding to the closest face
-        real d0 = length_[0] - fabs(w.XX);
-        real d1 = length_[1] - fabs(w.YY);
+        real d0 = length_[0] - abs_real(w.XX);
+        real d1 = length_[1] - abs_real(w.YY);
 #if ( DIM > 2 )
-        real d2 = length_[2] - fabs(w.ZZ);
+        real d2 = length_[2] - abs_real(w.ZZ);
         if ( d2 < d1 )
         {
             if ( d0 < d2 )
@@ -201,7 +201,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& me
     
     for ( size_t d = 0; d < DIM; ++d )
     {
-        if ( fabs(pos[d]) > dim[d] )
+        if ( abs_real(pos[d]) > dim[d] )
         {
             meca.addPlaneClamp(DIM*pe.matIndex()+d, std::copysign(dim[d], pos[d]), stiff);
             in = false;
@@ -213,13 +213,13 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& me
         // find the dimensionality 'dip' corresponding to the closest face
         size_t dip = 0;
         
-        real l = dim[0] - fabs(pos[0]);
+        real l = dim[0] - abs_real(pos[0]);
 #if ( DIM > 1 )
-        real u = dim[1] - fabs(pos[1]);
+        real u = dim[1] - abs_real(pos[1]);
         if ( u < l ) { dip = 1; l = u; };
 #endif
 #if ( DIM > 2 )
-        u = dim[2] - fabs(pos[2]);
+        u = dim[2] - abs_real(pos[2]);
         if ( u < l )  dip = 2;
 #endif
         meca.addPlaneClamp(DIM*pe.matIndex()+dip, std::copysign(dim[dip], pos[dip]), stiff);
@@ -237,7 +237,7 @@ void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real ra
 {
     real dim[DIM];
     for ( size_t d = 0; d < DIM; ++d )
-        dim[d] = std::max((real)0, length_[d] - rad);
+        dim[d] = max_real(0, length_[d] - rad);
 
     setInteraction(pos, pe, meca, stiff, dim);
 }

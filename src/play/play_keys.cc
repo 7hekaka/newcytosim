@@ -15,7 +15,7 @@ FLOAT grained(FLOAT x, int inc)
     const FLOAT grain = (FLOAT)0.25;
     FLOAT dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 16 ) + 4 * ( x >= 32 ) );
     FLOAT nx = grain * std::round( x / grain + dx );
-    return std::max(abs(inc)*grain, nx);
+    return std::max(std::abs(inc)*grain, nx);
 }
 
 //------------------------------------------------------------------------------

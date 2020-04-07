@@ -15,19 +15,19 @@
 
 typedef Vector1 Vector;
 typedef real    Torque;
-#define nullTorque 0
+constexpr Torque nullTorque = 0;
 
 /// helper function to normalize a 'Torque'
-inline Torque normalize(Torque x) { return std::copysign(1.0, x); }
+inline Torque normalize(Torque x) { return sign_real(x); }
 
 #elif ( DIM == 2 )
 
 typedef Vector2 Vector;
 typedef real    Torque;
-#define nullTorque 0
+constexpr Torque nullTorque = 0;
 
 /// helper function to normalize a 'Torque'
-inline Torque normalize(Torque x) { return std::copysign(1.0, x); }
+inline Torque normalize(Torque x) { return sign_real(x); }
 
 #elif ( DIM == 3 )
 

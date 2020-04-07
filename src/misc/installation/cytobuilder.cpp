@@ -152,7 +152,7 @@ void novaWedge(RtMidiOut& nova, int Y, byte R, byte G, byte B)
     for ( int X = 1; X <= 8; ++X )
     {
         msg[ 7] = 10*Y+X;
-        float s = (fabs(X-4.5)-0.25) / 3.25;
+        float s = (std::fabs(X-4.5)-0.25) / 3.25;
         msg[ 8] = R * s;
         msg[ 9] = G * s;
         msg[10] = B * s;

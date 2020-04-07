@@ -45,7 +45,7 @@ void ForkProp::complete(Simul const& sim)
     
     cosinus = cos(angle);
 #if ( DIM == 3 )
-    sinus = fabs(sin(angle));
+    sinus = abs_real(sin(angle));
 #else
     sinus = sin(angle);
 #endif

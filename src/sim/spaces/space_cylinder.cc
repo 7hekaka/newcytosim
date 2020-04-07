@@ -55,9 +55,9 @@ bool SpaceCylinder::inside(Vector const& w) const
 {
 #if ( DIM > 2 )
     const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( fabs(w.XX) < length_  &&  RT <= radius_ * radius_ );
+    return ( abs_real(w.XX) < length_  &&  RT <= radius_ * radius_ );
 #elif ( DIM > 1 )
-    return ( fabs(w.XX) < length_  &&  fabs(w.YY) <= radius_ );
+    return ( abs_real(w.XX) < length_  &&  abs_real(w.YY) <= radius_ );
 #else
     return false;
 #endif
@@ -69,9 +69,9 @@ bool SpaceCylinder::allInside(Vector const& w, const real rad) const
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
     const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( fabs(w.XX) + rad < length_  &&  RT <= square(radius_-rad) );
+    return ( abs_real(w.XX) + rad < length_  &&  RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
-    return ( fabs(w.XX) + rad < length_  &&  fabs(w.YY) <= radius_-rad );
+    return ( abs_real(w.XX) + rad < length_  &&  abs_real(w.YY) <= radius_-rad );
 #else
     return false;
 #endif
@@ -96,7 +96,7 @@ Vector SpaceCylinder::project(Vector const& w) const
     Vector p = w;
 #if ( DIM >= 3 )
     bool in = true;
-    if ( fabs(w.XX) > length_ )
+    if ( abs_real(w.XX) > length_ )
     {
         p.XX = std::copysign(length_, w.XX);
         in = false;
@@ -112,7 +112,7 @@ Vector SpaceCylinder::project(Vector const& w) const
     }
     else if ( in )
     {
-        if ( length_ - fabs(w.XX) < radius_ - n )
+        if ( length_ - abs_real(w.XX) < radius_ - n )
         {
             p.XX = std::copysign(length_, w.XX);
         }
@@ -135,7 +135,7 @@ Vector SpaceCylinder::project(Vector const& w) const
 void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca,
                                    real stiff, const real len, const real rad)
 {
-    bool cap = ( fabs(pos.XX) > len );
+    bool cap = ( abs_real(pos.XX) > len );
     bool cyl = false;
     real X = std::copysign(len, pos.XX);
     
@@ -151,8 +151,8 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca&
     else if ( ! cap )
     {
         // inside cylinder in YZ plane and also inside in X:
-        //if ( fabs( pos.XX - p ) > rad - sqrt(dis) )
-        if ( dis > square( rad - fabs(pos.XX-X) ) )
+        //if ( abs_real( pos.XX - p ) > rad - sqrt(dis) )
+        if ( dis > square( rad - abs_real(pos.XX-X) ) )
             cyl = true;
         else
             cap = true;
@@ -182,8 +182,8 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca&
 void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe,
                                    real rad, Meca& meca, real stiff) const
 {
-    real R = std::max((real)0, radius_ - rad);
-    real L = std::max((real)0, length_ - rad);
+    real R = max_real(0, radius_ - rad);
+    real L = max_real(0, length_ - rad);
     
     setInteraction(pos, pe, meca, stiff, L, R);
 }

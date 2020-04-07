@@ -122,7 +122,7 @@ Vector SpaceBeads::project(Vector const& pos) const
 
     for ( Bead * i : mBeads )
     {
-        real d = fabs(distance(pos, i->position()) - i->radius());
+        real d = abs_real(distance(pos, i->position()) - i->radius());
         if ( d < dmin )
         {
             dmin = d;

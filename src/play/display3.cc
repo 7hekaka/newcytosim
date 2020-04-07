@@ -1147,13 +1147,13 @@ void Display3::drawCoupleB(Couple const* cx) const
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
         // move points along the link
-        //p1 += dif * std::min((real)0.45, rad1*dns);
-        //p2 -= dif * std::min((real)0.45, rad2*dns);
+        //p1 += dif * min_real(0.45, rad1*dns);
+        //p2 -= dif * min_real(0.45, rad2*dns);
         // move points orthogonal to the fiber's axis
         Vector dir1 = cx->dirFiber1();
         Vector dir2 = cx->dirFiber2();
-        p1 += ( dif - dot(dif,dir1) * dir1 ) * std::min((real)0.45, rad1*dns);
-        p2 -= ( dif - dot(dif,dir2) * dir2 ) * std::min((real)0.45, rad2*dns);
+        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
+        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
     }
 #endif
     

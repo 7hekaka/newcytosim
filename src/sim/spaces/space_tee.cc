@@ -30,7 +30,7 @@ void SpaceTee::resize(Glossary& opt)
 
     if ( len <= 0 || rad <= 0 || arm < 0 )
         throw InvalidParameter("Space tee can't have negative length, arm length or radius.");
-    if ( fabs(jun)+rad > len )
+    if ( abs_real(jun)+rad > len )
         throw InvalidParameter("Space tee: the position of the branch plus the radius must lie within the length of the T.");
     
     tLength = len;
@@ -73,7 +73,7 @@ real SpaceTee::volume() const
 bool SpaceTee::inside(Vector const& w) const
 {
     real nrmSq      = 0;
-    const real x    = fabs( w[0] );
+    const real x    = abs_real( w[0] );
     const real xRel = (w[0] - tJunction);
     
     //check if w is inside the base cylinder
@@ -143,7 +143,7 @@ real SpaceTee::projectOnBase(const Vector w, Vector& p) const
     p[2] = scale*w[2];
 #endif
     
-    return( fabs(nrm - tRadius) );
+    return( abs_real(nrm - tRadius) );
 }
 
 
@@ -188,7 +188,7 @@ real SpaceTee::projectOnArm(const Vector w, Vector& p) const
     p[2] = scale*w[2];
 #endif
     
-    return( fabs(nrm - tRadius) );
+    return( abs_real(nrm - tRadius) );
 }
 
 
@@ -267,7 +267,7 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
         
         //if |x| > a/2, the closest perpendicular projection is on the tips,
         //otherwise the closest projection is solution x3
-        if ( fabs(xTurned)*sqrt(2) > tRadius ) {
+        if ( abs_real(xTurned)*sqrt(2) > tRadius ) {
             //we set the final points, already turned back
             p[0] = std::copysign(tRadius, xTurned) + tJunction;
             p[1] = tRadius;
@@ -275,7 +275,7 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
         }
         else {
             p[0] = xTurned*sqrt(2) + tJunction;
-            p[1] = fabs(xTurned)*sqrt(2);
+            p[1] = abs_real(xTurned)*sqrt(2);
             //we randomly distribute the points to +z or -z
             p[2] = RNG.sflip()*sqrt(tRadiusSq - 2.*xTurnedSq);
         }
@@ -302,7 +302,7 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
         // turn the point back to it's original position
         xSol = xSolTurned / sqrt(2);
         p[0] = xSol + tJunction;
-        p[1] = fabs(xSol);
+        p[1] = abs_real(xSol);
         if ( w[2] > 0 )
             p[2] =  sqrt( tRadiusSq - xSol*xSol );
         else

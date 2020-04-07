@@ -52,11 +52,11 @@ void MightyProp::complete(Simul const& sim)
     if ( sim.ready() && stall_force <= 0 )
         throw InvalidParameter("mighty:stall_force must be > 0");
     
-    if ( unbinding_density * fabs(unloaded_speed) + unbinding_rate < 0 )
+    if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )
         throw InvalidParameter("mighty:unbinding_density must be >= 0");
 
     set_speed_dt = sim.time_step() * unloaded_speed;
-    abs_speed_dt = fabs(set_speed_dt);
+    abs_speed_dt = abs_real(set_speed_dt);
     var_speed_dt = abs_speed_dt / stall_force;
 
     
@@ -106,7 +106,7 @@ void MightyProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Compare the force created by traveling during the time 1/unbinding_rate,
      and compare to stall_force. This is limit the efficiency of the motor.
      */
-    ef = fabs( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
+    ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate != 0  &&  unloaded_speed != 0  &&  ef < 1 )
     {
         Cytosim::warn << "The efficiency of `" << name() << "' is low because\n"\

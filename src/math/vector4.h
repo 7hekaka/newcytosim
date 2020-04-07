@@ -307,13 +307,13 @@ public:
     /// absolute values: (|x|, |y|, |z|, |t|)
     Vector4 abs() const
     {
-        return Vector4(fabs(XX), fabs(YY), fabs(ZZ), fabs(TT));
+        return Vector4(abs_real(XX), abs_real(YY), abs_real(ZZ), abs_real(TT));
     }
 
     /// the infinite norm = max(|x|, |y|, |z|)
     real norm_inf() const
     {
-        return std::max(std::max(fabs(XX), fabs(YY)), std::max(fabs(ZZ), fabs(TT)));
+        return std::max(std::max(abs_real(XX), abs_real(YY)), std::max(abs_real(ZZ), abs_real(TT)));
     }
     
     /// true if no component is NaN

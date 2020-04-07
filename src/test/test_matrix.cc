@@ -42,7 +42,7 @@ real diff(size_t size, real const* a, real const* b)
 {
     real s = 0;
     for ( size_t i=0; i<size; ++i )
-        s += fabs( a[i] - b[i] );
+        s += abs_real( a[i] - b[i] );
     return s;
 }
 

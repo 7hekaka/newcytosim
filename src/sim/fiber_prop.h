@@ -84,7 +84,7 @@ public:
      shape of a filament is simulated. Specificially, the number of segments 
      used for a filament of length `L` is the integer `N` that minimizes:
 
-         fabs( L / N - segmentation )
+         abs_real( L / N - segmentation )
      
      As a rule of thumb, segmentation should scale with rigidity, depending on 
      the expected magnitude of the forces experienced by the filament:

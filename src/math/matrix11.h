@@ -191,7 +191,7 @@ public:
     /// maximum of all component's absolute values
     real norm_inf() const
     {
-        return fabs(val_);
+        return abs_real(val_);
     }
 
     /// multiplication by a vector: this * V
@@ -353,7 +353,7 @@ public:
     /// return rotation matrix of angle defined by cosinus and sinus
     static Matrix11 rotation(real c, real s)
     {
-        return Matrix11(std::copysign(1, c));
+        return Matrix11(sign_real(c));
     }
 
     /// rotation angle

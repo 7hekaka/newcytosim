@@ -56,7 +56,7 @@ real SpaceCapsule::volume() const
 
 bool SpaceCapsule::inside(Vector const& w) const
 {
-    real n = w.normYZSqr() + square(std::max((real)0, fabs(w.XX)-length_));
+    real n = w.normYZSqr() + square(max_real(0, abs_real(w.XX)-length_));
     
     return ( n <= radiusSqr_ );
 }
@@ -65,7 +65,7 @@ bool SpaceCapsule::inside(Vector const& w) const
 bool SpaceCapsule::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
-    real n = w.normYZSqr() + square(std::max((real)0, fabs(w.XX)-length_));
+    real n = w.normYZSqr() + square(max_real(0, abs_real(w.XX)-length_));
     
     return ( n <= square(radius_-rad) );
 }
@@ -77,7 +77,7 @@ Vector SpaceCapsule::project(Vector const& w) const
     real n = w.normYZSqr();
     
     //calculate the projection on the axis, within boundaries:
-    if ( fabs(w.XX) > length_ )
+    if ( abs_real(w.XX) > length_ )
     {
         real L = std::copysign(length_, w.XX);
         n += square( w.XX - L );
@@ -152,7 +152,7 @@ Vector SpaceCapsule::randomPlace() const
  */
 void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
-    if ( fabs(pos.XX) > len )
+    if ( abs_real(pos.XX) > len )
     {
         Vector cen(std::copysign(len, pos.XX),0,0);
         meca.addSphereClamp(pos-cen, pe, cen, rad, stiff);

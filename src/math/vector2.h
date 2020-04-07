@@ -276,7 +276,7 @@ public:
     /// the 2D norm = |y| since Z = 0
     real normYZ() const
     {
-        return fabs(YY);
+        return abs_real(YY);
     }
     
     /// the 2D norm = y^2 since Z = 0
@@ -302,13 +302,13 @@ public:
     /// absolute values: (|x|, |y|)
     Vector2 abs() const
     {
-        return Vector2(fabs(XX), fabs(YY));
+        return Vector2(abs_real(XX), abs_real(YY));
     }
 
     /// the infinite norm = max(|x|, |y|)
     real norm_inf() const
     {
-        return std::max(fabs(XX), fabs(YY));
+        return std::max(abs_real(XX), abs_real(YY));
     }
     
     /// true if no component is NaN

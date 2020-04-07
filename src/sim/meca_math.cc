@@ -183,7 +183,7 @@ void threshold_matrix(size_t siz, real * mat, real val)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
     {
-        if ( fabs(mat[k]) < val )
+        if ( abs_real(mat[k]) < val )
             mat[k] = 0.0;
     }
 }
@@ -325,7 +325,7 @@ real largest_eigenvalue(size_t siz, real const* blk, int const* piv, real const*
         
         //fprintf(stderr, "      power iter %3i: eigen %10.6f %10.6f\n", n, eig, oge);
         
-        if ( fabs(oge-eig) < TOLERANCE * ( fabs(eig) + fabs(oge) ) )
+        if ( abs_real(oge-eig) < TOLERANCE * ( abs_real(eig) + abs_real(oge) ) )
             break;
     }
     //fprintf(stderr, "      power iter %3i: eigen %10.6f %10.6f\n", n, eig, oge);
@@ -357,7 +357,7 @@ real largest_eigenvalue(size_t siz, real const* mat, real const* tam, real alpha
         eig = blas::nrm2(siz, vec);
         //VecPrint::print(std::clog, std::min(16UL, siz), vec, 3);
         //fprintf(stderr, "      power iter %3i: eigen %10.6f %10.6f\n", n, eig, oge);
-        if ( fabs(oge-eig) < TOLERANCE * ( fabs(eig) + fabs(oge) ) )
+        if ( abs_real(oge-eig) < TOLERANCE * ( abs_real(eig) + abs_real(oge) ) )
             break;
     }
     //fprintf(stderr, "      power size %4i iter %3i: eigen %10.6f %10.6f\n", siz, n, eig, oge);

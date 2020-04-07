@@ -27,12 +27,12 @@ private:
     static inline void fold(real& x, const real p)
     {
         ///@todo use remainder() function for branchless code?
-        if ( fabs(x) > p )
+        if ( abs_real(x) > p )
         {
             real i = std::copysign(p, x);
             do
                 x = x - 2.0 * i;
-            while ( fabs(x) > p );
+            while ( abs_real(x) > p );
         }
     }
 

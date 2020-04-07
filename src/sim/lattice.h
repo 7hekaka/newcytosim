@@ -497,7 +497,7 @@ public:
         //only change unit length if the difference is significant
         if ( laUnit <= 0 )
             laUnit = uni;
-        else if ( fabs( laUnit - uni ) > 1e-6 )
+        else if ( abs_real( laUnit - uni ) > 1e-6 )
             changeUnit(uni);
         
         allocate(inf, sup, 0);

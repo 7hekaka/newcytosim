@@ -901,8 +901,8 @@ real FiberSet::infoNematic(ObjectList const& objs,
 #if ( DIM > 2 )
     //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << std::endl;
     //std::clog << "Eigen value2 " << val[1] << "  vector  " << Vector(vec+3) << std::endl;
-    real u = std::copysign(1, vec[3]);
-    real v = std::copysign(1, vec[0]);
+    real u = sign_real(vec[3]);
+    real v = sign_real(vec[0]);
     // order the 2 vectors in decreasing eigenvalues (reverse order from LAPACK).
     res[0] = u * vec[3];
     res[1] = u * vec[4];
@@ -916,7 +916,7 @@ real FiberSet::infoNematic(ObjectList const& objs,
     res[8] = res[0]*res[4] - res[1]*res[3];
 #else
     //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << std::endl;
-    real u = std::copysign(1, vec[0]);
+    real u = sign_real(vec[0]);
     res[0] =  u * vec[0];
     res[1] =  u * vec[1];
     res[2] =  0;
@@ -1033,8 +1033,8 @@ int FiberSet::infoComponents(ObjectList const& objs,
                    &nv, val, vec, 3, work, 32, iwork, ifail, &info);
     
 #if ( DIM > 2 )
-    real u = std::copysign(1, vec[3]);
-    real v = std::copysign(1, vec[0]);
+    real u = sign_real(vec[3]);
+    real v = sign_real(vec[0]);
     // order the 2 vectors in decreasing eigenvalues.
     res[0] = u * vec[3];
     res[1] = u * vec[4];
@@ -1047,7 +1047,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
     res[7] = res[2]*res[3] - res[0]*res[5];
     res[8] = res[0]*res[4] - res[1]*res[3];
 #else
-    real u = std::copysign(1, vec[0]);
+    real u = sign_real(vec[0]);
     res[0] =  u * vec[0];
     res[1] =  u * vec[1];
     res[2] =  0;
@@ -1218,7 +1218,7 @@ void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector 
             real abs = fib->planarIntersect(s, n, a);
             if ( 0 <= abs  &&  abs < 1 )
             {
-                real h = fabs(dot(dir, fib->dirSegment(s))) * fib->tension(s);
+                real h = abs_real(dot(dir, fib->dirSegment(s))) * fib->tension(s);
                 sum += h;
                 inf = std::min(inf, h);
                 sup = std::max(sup, h);

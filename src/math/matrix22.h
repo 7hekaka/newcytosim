@@ -205,7 +205,7 @@ public:
     /// zero if matrix is symmetric
     real asymmetry() const
     {
-        return fabs(val[2]-val[1]);
+        return abs_real(val[2]-val[1]);
     }
     
     /// scale all elements
@@ -322,8 +322,8 @@ public:
     /// maximum of all component's absolute values
     real norm_inf() const
     {
-        real a = std::max(fabs(val[0]), fabs(val[1]));
-        real b = std::max(fabs(val[2]), fabs(val[3]));
+        real a = std::max(abs_real(val[0]), abs_real(val[1]));
+        real b = std::max(abs_real(val[2]), abs_real(val[3]));
         return std::max(a, b);
     }
 

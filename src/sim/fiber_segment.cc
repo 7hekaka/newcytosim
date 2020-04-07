@@ -244,7 +244,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
             return INFINITY;
 
         // clamp inside segment and take mid-point:
-        abs1 = 0.5 * ( clamp(m1, 0, len1) + clamp(p1, 0, len1) );
+        abs1 = 0.5 * ( clamp_real(m1, 0, len1) + clamp_real(p1, 0, len1) );
 
         real m2 = -dot(d22, off);
         real p2 = m2 + beta * len1;
@@ -253,7 +253,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
             return INFINITY;
 
         // clamp inside segment and take mid-point:
-        abs2 = 0.5 * ( clamp(m2, 0, len2) + clamp(p2, 0, len2) );
+        abs2 = 0.5 * ( clamp_real(m2, 0, len2) + clamp_real(p2, 0, len2) );
         
         // return distance between
         return off.normSqr() - d1off * d1off;

@@ -99,8 +99,8 @@ bool SpaceCylinderZ::inside(Vector const& w) const
 #if ( DIM > 2 )
     const real RT = w.XX * w.XX + w.YY * w.YY;
 # if HAS_SMOOTH_EDGES
-    const real R = std::max((real)0, sqrt(RT)-radius_+edge_);
-    const real Z = std::max((real)0, std::max(bot_+edge_-w.ZZ, w.ZZ-top_+edge_));
+    const real R = max_real(0, sqrt(RT)-radius_+edge_);
+    const real Z = max_real(0, std::max(bot_+edge_-w.ZZ, w.ZZ-top_+edge_));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
     return ( bot_ <= w.ZZ  &&  w.ZZ <= top_  &&  RT <= radius_ * radius_ );
@@ -119,8 +119,8 @@ bool SpaceCylinderZ::allInside(Vector const& w, const real rad) const
     const real RT = w.XX * w.XX + w.YY * w.YY;
 # if HAS_SMOOTH_EDGES
     const real E = edge_ + rad;
-    const real R = std::max((real)0, sqrt(RT)-E);
-    const real Z = std::max((real)0, std::max(bot_+E-w.ZZ, w.ZZ-top_+E));
+    const real R = max_real(0, sqrt(RT)-E);
+    const real Z = max_real(0, max_real(bot_+E-w.ZZ, w.ZZ-top_+E));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
     return ( bot_ + rad <= w.ZZ  &&  w.ZZ + rad <= top_
@@ -244,8 +244,8 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     else if ( ! cap )
     {
         // inside cylinder in XY plane and also inside in Z:
-        //if ( fabs(pos.ZZ-Z) > R - sqrt(dis) )
-        if ( dis > square( R - fabs(pos.ZZ-Z) ) )
+        //if ( abs_real(pos.ZZ-Z) > R - sqrt(dis) )
+        if ( dis > square( R - abs_real(pos.ZZ-Z) ) )
             cyl = true;
         else
             cap = true;
@@ -296,7 +296,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     
     if ( in )
     {
-        if ( n > R-E  ||  R-E-n < std::fabs(pos.ZZ-Z) )
+        if ( n > R-E  ||  R-E-n < abs_real(pos.ZZ-Z) )
             meca.addCylinderClampZ(pe, R, stiff);
         else
             meca.addPlaneClampZ(pe, Z, stiff);
@@ -332,7 +332,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
  */
 void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    real R = std::max((real)0, radius_ - rad);
+    real R = max_real(0, radius_ - rad);
     real T = top_ - rad;
     real B = bot_ + rad;
     

@@ -689,7 +689,7 @@ void Solid::reshape()
     }
     
     cc /= real( nPoints );
-    real s = a / fabs(a);
+    real s = a / abs_real(a);
     
     for ( size_t i = 0; i < nPoints; ++i )
         pPos[i] = s * soShape[i] + cc;
@@ -1011,7 +1011,7 @@ void Solid::makeProjection()
     
     cen /= sumR;
     real m = sumR3 * ( 8 * M_PI ) + roti * ( 6 * M_PI ) - soDrag * cen.normSqr();
-    std::clog << "Solid2D::error(rotational_drag) " << fabs(soDragRot-m) << " for " << reference() << "\n";
+    std::clog << "Solid2D::error(rotational_drag) " << abs_real(soDragRot-m) << " for " << reference() << "\n";
 #endif
 }
 

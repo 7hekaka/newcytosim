@@ -281,14 +281,14 @@ namespace sMath
     
     //------------------------------------------------------------------------------
 #pragma mark -
-    
+    /*
     /// used for periodic boundary conditions:
     inline void fold(real& x, const real p)
     {
         while ( x >  p ) x -= p+p;
         while ( x < -p ) x += p+p;
     }
-
+*/
 #ifdef WIN32
     
     //this is needed under windows:

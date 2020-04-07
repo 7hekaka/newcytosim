@@ -322,9 +322,9 @@ public:
     /// maximum of all component's absolute values
     real norm_inf() const
     {
-        real res = fabs(val[0]);
+        real res = abs_real(val[0]);
         for ( index i = 1; i < 12; ++i )
-            res = std::max(res, fabs(val[i]));
+            res = std::max(res, abs_real(val[i]));
         return res;
     }
 
@@ -427,8 +427,8 @@ public:
     /// true if 3x3 subset of matrix is symmetric
     real asymmetry() const
     {
-        return fabs(val[4]-val[1])
-        + fabs(val[8]-val[2]) + fabs(val[9]-val[6]);
+        return abs_real(val[4]-val[1])
+        + abs_real(val[8]-val[2]) + abs_real(val[9]-val[6]);
     }
 
 #if MATRIX34_USES_AVX

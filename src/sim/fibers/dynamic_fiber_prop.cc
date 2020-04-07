@@ -83,7 +83,7 @@ void DynamicFiberProp::complete(Simul const& sim)
         
         if ( growing_speed[i] < 0 )
             throw InvalidParameter("fiber:growing_speed should be >= 0");
-        growing_rate_dt[i] = sim.time_step() * fabs(growing_speed[i]) / unit_length;
+        growing_rate_dt[i] = sim.time_step() * abs_real(growing_speed[i]) / unit_length;
 
         if ( growing_off_speed[i] > 0 )
             throw InvalidParameter("growing_off_speed should be <= 0");
@@ -104,7 +104,7 @@ void DynamicFiberProp::complete(Simul const& sim)
         
         if ( shrinking_speed[i] > 0 )
             throw InvalidParameter("fiber:shrinking_speed should be <= 0");
-        shrinking_rate_dt[i] = sim.time_step() * fabs(shrinking_speed[i]) / unit_length;
+        shrinking_rate_dt[i] = sim.time_step() * abs_real(shrinking_speed[i]) / unit_length;
         
         if ( rebirth_rate[i] < 0 )
             throw InvalidParameter("fiber:rebirth_rate should be >= 0");

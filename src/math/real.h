@@ -109,12 +109,6 @@ inline real square(const real x) { return x * x; }
 /// cube of the argument: `x * x * x`
 inline real cube(const real x) { return x * x * x; }
 
-/// clamp value 'x' within [i, s]
-inline real clamp(const real x, const real i, const real s)
-{
-    return std::max(i, std::min(x, s));
-}
-
 /// return `a` if `c==true` and `b` otherwise
 inline real if_select(bool c, real a, real b)
 {
@@ -123,30 +117,30 @@ inline real if_select(bool c, real a, real b)
     else return b;
 }
 
-
-/// sign of a float: -1 or +1; result is +1 if ( x == 0 )
-inline float sign(const float x) { return std::copysign(1.0f, x); }
-
-/// sign of a double: -1 or +1; result is +1 if ( x == 0 )
-inline double sign(const double x) { return std::copysign(1.0, x); }
-
-
-
-#if ( 0 )
-
-//Functions normally not needed:
- 
-/// absolute value of `x`
-inline real abs(const real x) { return fabs(x); }
-
-/// maximum between two values
-inline real min(const real x, const real y) { return std::min(x, y); }
-
-/// maximum between two values
-inline real max(const real x, const real y) { return std::max(x, y); }
-
+/// sign of a 'real': -1 or +1; result is +1 if ( x == 0 )
+inline float sign_real(const float x)
+{
+#if REAL_IS_DOUBLE
+    return std::copysign(1.0, x);
+#else
+    return std::copysign(1.0f, x);
 #endif
+}
 
+/// absolute value of `x`
+inline real abs_real(const real x) { return std::fabs(x); }
+
+/// minimum between `x` and `y`
+inline real min_real(const real x, const real y) { return std::min(x, y); }
+
+/// maximum between `x` and `y`
+inline real max_real(const real x, const real y) { return std::max(x, y); }
+
+/// clamp value 'x' within [i, s]
+inline real clamp_real(const real x, const real i, const real s)
+{
+    return std::max(i, std::min(x, s));
+}
 
 //----------------------------------- DEBUG ------------------------------------
 

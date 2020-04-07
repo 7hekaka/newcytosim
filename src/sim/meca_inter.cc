@@ -311,7 +311,7 @@ void Meca::addTorqueClamp(Interpolation const& pti,
 #if ( DIM >= 3 )
     const real Tn = Tq.norm();
 #else
-    const real Tn = fabs(Tq);
+    const real Tn = abs_real(Tq);
 #endif
     
     // calculate current angle between segments in [0, pi]:
@@ -370,7 +370,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 #if ( DIM >= 3 )
     const real Tn = Tq.norm();
 #else
-    const real Tn = fabs(Tq);
+    const real Tn = abs_real(Tq);
 #endif
     
     // calculate current angle between segments in [0, pi]:
@@ -441,7 +441,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
      in 3D the axis of torque is perpendicular to both `da` and `db`,
      and the angle is only defined between 0 and PI,
      */
-    Vector axis = cross(db, da).normalized(std::copysign(1.0, sinus));
+    Vector axis = cross(db, da).normalized(sign_real(sinus));
     
     // rotate vector `db` around `arm` by angle specified as (cosinus, sinus):
     Vector rot = cosinus * db + sinus * cross(axis, db);
@@ -449,7 +449,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 #elif ( DIM == 2 )
 
     // this correspond to the Z-direction, up or down:
-    real dir = std::copysign(1, cross(da, db));
+    real dir = sign_real(cross(da, db));
 
     // rotate vector `db` by angle defined by (cosinus, sinus) around Z
     Vector rot( db.XX*cosinus + db.YY*sinus*dir, db.YY*cosinus - db.XX*sinus*dir );
@@ -469,7 +469,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 #if ( DIM >= 3 )
     const real Tn = Tq.norm();
 #else
-    const real Tn = fabs(Tq);
+    const real Tn = abs_real(Tq);
 #endif
     
     // calculate current angle between segments in [0, pi]:

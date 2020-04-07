@@ -1507,7 +1507,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
 
     const real fac = speed * simul().time_step() / lat.unit();
     
-    if ( fabs(fac) > 1 )
+    if ( abs_real(fac) > 1 )
         throw InvalidParameter("mesh_flux_speed * time_step / lattice_unit is too high");
 
     if ( fac < 0 )

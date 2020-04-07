@@ -69,7 +69,7 @@ bool SpaceRing::inside(Vector const& w) const
 {
 #if ( DIM > 2 )
     const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( fabs(w.XX) <= length_  &&  RT <= radiusSqr_ );
+    return ( abs_real(w.XX) <= length_  &&  RT <= radiusSqr_ );
 #else
     return false;
 #endif
@@ -81,7 +81,7 @@ bool SpaceRing::allInside(Vector const& w, const real rad ) const
 
 #if ( DIM > 2 )
     const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( fabs(w.XX) + rad <= length_  &&  RT <= square(radius_-rad) );
+    return ( abs_real(w.XX) + rad <= length_  &&  RT <= square(radius_-rad) );
 #else
     return false;
 #endif
@@ -126,7 +126,7 @@ Vector SpaceRing::project(Vector const& w) const
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
-    if ( fabs(pos.XX) > len )
+    if ( abs_real(pos.XX) > len )
         meca.addPlaneClampX(pe, std::copysign(len, pos.XX), stiff);
     
     meca.addCylinderClampX(pe, rad, stiff);

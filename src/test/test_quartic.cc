@@ -57,14 +57,14 @@ const real epsilon = 0.001;
 void checkCubic(real a, real b, real c, real d, cplx x)
 {
     cplx r = cubic(a, b, c, d, x);
-    if ( fabs(r.r) > epsilon || fabs(r.i) > epsilon )
+    if ( abs_real(r.r) > epsilon || abs_real(r.i) > epsilon )
         fprintf(stderr, "      %+f  %+f -> %+f %+f\n", x.r, x.i, r.r, r.i);
 }
 
 void checkQuartic(real a, real b, real c, real d, real e, cplx x)
 {
     cplx r = quartic(a, b, c, d, e, x);
-    if ( fabs(r.r) > epsilon || fabs(r.i) > epsilon )
+    if ( abs_real(r.r) > epsilon || abs_real(r.i) > epsilon )
         fprintf(stderr, "      %+f  %+f -> %+f %+f\n", x.r, x.i, r.r, r.i);
 }
 
@@ -155,10 +155,10 @@ void testQuartic(size_t cnt, const int DEG)
             if ( m > 3 ) checkQuartic(A, B, C, D, E, z4);
         }
   
-        real e1 = fabs( x1 - z1.r );
-        real e2 = fabs( x2 - z2.r );
-        real e3 = fabs( x3 - z3.r );
-        real e4 = fabs( x4 - z4.r );
+        real e1 = abs_real( x1 - z1.r );
+        real e2 = abs_real( x2 - z2.r );
+        real e3 = abs_real( x3 - z3.r );
+        real e4 = abs_real( x4 - z4.r );
         
         bool stop = ( DEG > 3 && e4 > 0.01 );
         if ( e1 > 0.01 ) stop = true;
@@ -184,9 +184,9 @@ void testQuartic(size_t cnt, const int DEG)
         {
             real r;
             if ( DEG == 3 )
-                r = fabs(cubic(A, B, C, D, s1));
+                r = abs_real(cubic(A, B, C, D, s1));
             else
-                r = fabs(quartic(A, B, C, D, E, s1));
+                r = abs_real(quartic(A, B, C, D, E, s1));
             
             if ( r > res )
                 res = r;

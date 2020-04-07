@@ -198,9 +198,9 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     else
     {
         // 1 real root
-        real sgn = -std::copysign(1, R);
-        real x = sgn * pow( fabs(R)+sqrt(RR-QQQ), 1.0/3.0 );
-        //real x = sgn * exp( log(fabs(R)+sqrt(RR-QQQ)) / 3.0 );
+        real sgn = -sign_real(R);
+        real x = sgn * pow( abs_real(R)+sqrt(RR-QQQ), 1.0/3.0 );
+        //real x = sgn * exp( log(abs_real(R)+sqrt(RR-QQQ)) / 3.0 );
         real y = Q / x;
 
         r1 = x + y - B3;
@@ -263,7 +263,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     else if ( RR == QQQ )
     {
         // 3 real roots
-        real sgn = std::copysign(1, R);
+        real sgn = sign_real(R);
         real x = sgn * sqrt(Q);
         
         r1 = cplx( x - B3, 0 );
@@ -275,14 +275,14 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     else
     {
         // 1 real root
-        real sgn = -std::copysign(1, R);
-        real x = sgn * pow( fabs(R)+sqrt(RR-QQQ), 1.0/3.0 );
-        //real x = sgn * exp( log(fabs(R)+sqrt(RR-QQQ)) / 3.0 );
+        real sgn = -sign_real(R);
+        real x = sgn * pow( abs_real(R)+sqrt(RR-QQQ), 1.0/3.0 );
+        //real x = sgn * exp( log(abs_real(R)+sqrt(RR-QQQ)) / 3.0 );
         real y = Q / x;
         
         r1 = cplx( x + y - B3, 0 );
-        r2 = cplx( -0.5 * ( x + y ) - B3, -0.5 * sqrt(3) * fabs( x - y ) );
-        r3 = cplx( -0.5 * ( x + y ) - B3,  0.5 * sqrt(3) * fabs( x - y ) );
+        r2 = cplx( -0.5 * ( x + y ) - B3, -0.5 * sqrt(3) * abs_real( x - y ) );
+        r3 = cplx( -0.5 * ( x + y ) - B3,  0.5 * sqrt(3) * abs_real( x - y ) );
         
         return 3;
     }
@@ -434,7 +434,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         real p = sqrt(ss);
         real w = J/p;
         // alternative formula, which has lower precision:
-        //real w = sqrt( fabs( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
+        //real w = sqrt( abs_real( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
         
         real q = ( I + ss - w ) * 0.5;
         real s = ( I + ss + w ) * 0.5;
@@ -551,8 +551,8 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
     if ( nz )
     {
         // chose root with smallest imaginary part:
-        if ( fabs(z1.i) > fabs(z2.i) ) z1 = z2;
-        if ( fabs(z1.i) > fabs(z3.i) ) z1 = z3;
+        if ( abs_real(z1.i) > abs_real(z2.i) ) z1 = z2;
+        if ( abs_real(z1.i) > abs_real(z3.i) ) z1 = z3;
         real ss = z1.r;
 
 #if ( QUARTIC_VERBOSE > 0 )
@@ -562,7 +562,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         real p = sqrt(ss);
         real w = J/p;
         // alternative formula, which has lower precision:
-        //real w = sqrt( fabs( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
+        //real w = sqrt( abs_real( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
         
         real q = ( I + ss - w ) * 0.5;
         real s = ( I + ss + w ) * 0.5;

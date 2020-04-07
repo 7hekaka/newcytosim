@@ -82,7 +82,7 @@ namespace VecPrint
                 for ( size_t jj = 0; jj < n; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
-                    if ( fabs(val) < threshold )
+                    if ( std::fabs(val) < threshold )
                         os << zer;
                     else
                     {
@@ -110,7 +110,7 @@ namespace VecPrint
                 for (size_t jj = 0; jj < n; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
-                    if ( fabs(val) > threshold )
+                    if ( std::fabs(val) > threshold )
                     {
                         snprintf(str, sizeof(str), fmt, ii, jj, val);
                         os << str;
@@ -164,7 +164,7 @@ namespace VecPrint
                         os << ' ';
                     else
                     {
-                        int x = std::max(7, 2 + log10( fabs(val) / scale ));
+                        int x = std::max(7, 2 + log10( std::fabs(val) / scale ));
                         os << str[x];
                     }
                 }

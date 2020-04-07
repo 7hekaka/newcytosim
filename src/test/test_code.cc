@@ -235,6 +235,8 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 #endif
 }
 
+#if REAL_IS_DOUBLE
+
 void add_rigidity_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
@@ -358,6 +360,7 @@ void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y
     store2(Y+2, fnmadd2(getlo(R), ee, load2(Y+2)));
 }
 
+#endif
 #endif
 
 void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
@@ -520,6 +523,7 @@ void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
 }
 
 
+#if REAL_IS_DOUBLE
 #ifdef __SSE3__
 
 /**
@@ -653,7 +657,7 @@ inline void projectForcesU_AVY(size_t nbs, const real* dif, const real* X, real*
 
 
 #endif
-
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT DOWN

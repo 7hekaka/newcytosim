@@ -63,7 +63,7 @@ void Myosin::stepLoaded(Vector const& force, real force_norm)
     // calculate displacement, dependent on the load along the desired direction of displacement
     real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
-    nextStep -= std::max((real)0, R);
+    nextStep -= max_real(0, R);
 
     while ( nextStep <= 0 )
     {

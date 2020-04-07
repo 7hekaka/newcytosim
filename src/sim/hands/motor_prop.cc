@@ -68,7 +68,7 @@ void MotorProp::complete(Simul const& sim)
 #endif
 
 #if NEW_UNBINDING_DENSITY
-    if ( unbinding_density * fabs(unloaded_speed) + unbinding_rate < 0 )
+    if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )
         throw InvalidParameter("motor:unbinding_density must be > 0");
 
     if ( sim.ready() && unbinding_density > 0 )
@@ -79,7 +79,7 @@ void MotorProp::complete(Simul const& sim)
 #endif
 
     set_speed_dt = sim.time_step() * unloaded_speed;
-    abs_speed_dt = fabs(set_speed_dt);
+    abs_speed_dt = abs_real(set_speed_dt);
     var_speed_dt = abs_speed_dt / stall_force;
     
     // The limits for a displacement in one time_step apply if ( limit_speed = true )
@@ -128,7 +128,7 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Compare the force created by traveling during the time 1/unbinding_rate,
      and compare to stall_force. This is limit the efficiency of the motor.
      */
-    ef = fabs( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
+    ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate != 0 && unloaded_speed != 0  &&  ef < 1 )
     {
         Cytosim::warn << "The efficiency of `" << name() << "' is low because\n"\

@@ -33,6 +33,6 @@ Matrix11 Matrix11::randomRotation(real)
 
 Matrix11 Matrix11::rotationToVector(const Vector1& vec)
 {
-    return Matrix11(std::copysign(1, vec.XX));
+    return Matrix11(sign_real(vec.XX));
 }
 

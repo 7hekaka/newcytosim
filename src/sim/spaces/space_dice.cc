@@ -74,7 +74,7 @@ bool SpaceDice::inside(Vector const& w) const
 {
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(std::max((real)0, fabs(w[d]) - length_[d] + edge_));
+        dis += square(max_real(0, abs_real(w[d]) - length_[d] + edge_));
     return ( dis <= edgeSqr_ );
 }
 
@@ -84,7 +84,7 @@ bool SpaceDice::allInside(Vector const& w, real rad) const
     assert_true( rad >= 0 );
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(std::max((real)0, fabs(w[d]) - length_[d] + edge_ + rad));
+        dis += square(max_real(0, abs_real(w[d]) - length_[d] + edge_ + rad));
     return ( dis <= edgeSqr_ );
 }
 
@@ -104,14 +104,14 @@ Vector SpaceDice::project(Vector const& w) const
     Vector p = w;
     bool in = true;
 
-    real X = length_[0] - fabs(w.XX);
+    real X = length_[0] - abs_real(w.XX);
     if ( X < edge_ ) { p.XX = std::copysign(length_[0]-edge_, w.XX); in=false; }
     
-    real Y = length_[1] - fabs(w.YY);
+    real Y = length_[1] - abs_real(w.YY);
     if ( Y < edge_ ) { p.YY = std::copysign(length_[1]-edge_, w.YY); in=false; }
 
 #if ( DIM > 2 )
-    real Z = length_[2] - fabs(w.ZZ);
+    real Z = length_[2] - abs_real(w.ZZ);
     if ( Z < edge_ ) { p.ZZ = std::copysign(length_[2]-edge_, w.ZZ); in=false; }
 #endif
     
@@ -152,10 +152,10 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
 #if ( DIM == 1 )
     meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
 #else
-    real dX = length_[0] - fabs(w.XX);
-    real dY = length_[1] - fabs(w.YY);
+    real dX = length_[0] - abs_real(w.XX);
+    real dY = length_[1] - abs_real(w.YY);
 #if ( DIM > 2 )
-    real dZ = length_[2] - fabs(w.ZZ);
+    real dZ = length_[2] - abs_real(w.ZZ);
 #endif
     
 #if ( DIM > 2 )
@@ -247,12 +247,12 @@ void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& mec
 
 void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    real E = std::max((real)0, edge_-rad);  // remaining edge
-    real R = std::min((real)0, edge_-rad);  // size reduction
+    real E = max_real(0, edge_-rad);  // remaining edge
+    real R = min_real(0, edge_-rad);  // size reduction
 
     real dim[DIM];
     for ( unsigned d = 0; d < DIM; ++d )
-        dim[d] = std::max((real)0, length_[d]+R);
+        dim[d] = max_real(0, length_[d]+R);
 
     setInteraction(pos, pe, meca, stiff, dim, E);
 }

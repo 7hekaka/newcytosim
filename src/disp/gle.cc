@@ -1584,7 +1584,7 @@ namespace gle
                 Vector2 const& b, Vector2 const& db)
     {
         Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        static_assert(sizeof(pts)==12*sizeof(double), "unexpected size of Vector2");
+        static_assert(sizeof(pts)==12*sizeof(real), "unexpected size of Vector2");
 #if REAL_IS_DOUBLE
         glVertexPointer(2, GL_DOUBLE, 0, pts);
 #else
@@ -1603,7 +1603,7 @@ namespace gle
                 Vector2 const& b, Vector2 const& db, gle_color cb)
     {
         Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        static_assert(sizeof(pts)==12*sizeof(double), "unexpected size of Vector2");
+        static_assert(sizeof(pts)==12*sizeof(real), "unexpected size of Vector2");
         GLfloat col[24];
         cb.store(col);
         cb.store(col+4);
@@ -2024,7 +2024,7 @@ namespace gle
         if ( !font )
         {
             font = GLUT_BITMAP_HELVETICA_12;
-            vshift = std::copysign(1, vshift) * gleLineHeight(font);
+            vshift = sign_real(vshift) * gleLineHeight(font);
         }
         if ( vshift == 0 )
             vshift = -gleLineHeight(font);

@@ -221,7 +221,7 @@ real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& ra
             return 0;
         }
 
-    } while ( fabs(err) < fabs(last_err) );
+    } while ( abs_real(err) < abs_real(last_err) );
     //std::clog << "volume error " <<  err << '\n';
 
     return P;

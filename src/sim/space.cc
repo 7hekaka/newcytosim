@@ -83,7 +83,7 @@ Vector Space::randomPlaceNearEdge(real rad, size_t nb_trials) const
 Vector Space::randomPlaceOnEdge(real rad, size_t nb_trials) const
 {
     size_t ouf = 0;
-    real D = std::fabs(rad), RR = rad * rad;
+    real D = abs_real(rad), RR = rad * rad;
     Vector pos, res, inf, dif;
     
     boundaries(inf, dif);

@@ -1,7 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "sim.h"
-#include "smath.h"
 #include "assert_macro.h"
 #include "exceptions.h"
 #include "messages.h"

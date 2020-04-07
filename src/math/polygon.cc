@@ -231,7 +231,7 @@ void Polygon::inflate(real eps)
          */
         real s = tx * nx + ty * ny;
         
-        if ( fabs(s) < REAL_EPSILON )
+        if ( abs_real(s) < REAL_EPSILON )
         {
             px = pts_[n].xx + eps * nx;
             py = pts_[n].yy + eps * ny;
@@ -422,7 +422,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
             real xi = ( yy - p1.yy ) * ( p2.xx - p1.xx ) / ( p2.yy - p1.yy ) + p1.xx;
             
             // overlies on an edge
-            if ( fabs( xx - xi ) < threshold )
+            if ( abs_real( xx - xi ) < threshold )
                 return edge;
                 
             // xx left of intersection

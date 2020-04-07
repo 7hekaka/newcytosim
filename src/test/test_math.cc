@@ -12,8 +12,6 @@
 #include <csignal>
 #include <cmath>
 
-#include "smath.h"
-
 /*
  icpc --help
  
@@ -82,11 +80,11 @@ void print_numbers()
     out << "-1.0 / 0 = " << -1.0 / 0 << '\n';
     out << " 0.0 / 0 = " <<  0.0 / 0 << '\n';
     out << "-log(0)  = " << -log(0.0) << '\n';
-#if ( 0 )
-    out << "absf(-2) = " << sMath::absf(-2.0) << '\n';
-    out << "absf(-1) = " << sMath::absf(-1.) << '\n';
-    out << "absf(+1) = " << sMath::absf(+1.) << '\n';
-    out << "absf(+2) = " << sMath::absf(+2.) << '\n';
+#if ( 1 )
+    out << "absf(-2) = " << std::fabs(-2.0) << '\n';
+    out << "absf(-1) = " << std::fabs(-1.) << '\n';
+    out << "absf(+1) = " << std::fabs(+1.) << '\n';
+    out << "absf(+2) = " << std::fabs(+2.) << '\n';
 #endif
 }
 

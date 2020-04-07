@@ -23,7 +23,7 @@ extern Modulo const* modulo;
 
 /**
  This returns N+1, where N is the integer that minimizes
-     fabs( length / N - segmentation ),
+     abs_real( length / N - segmentation ),
  */
 size_t Chain::bestNumberOfPoints(const real ratio)
 {
@@ -257,7 +257,7 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
 {
     real X = src[  DIM] - src[0];
 #if ( DIM == 1 )
-    real s = 0.5 - 0.5 * (cut/fabs(X));
+    real s = 0.5 - 0.5 * (cut/abs_real(X));
 #elif ( DIM == 2 )
     real Y = src[1+DIM] - src[1];
     real n = sqrt( X * X + Y * Y );
@@ -351,7 +351,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
     for ( size_t i = 0; i < ns; ++i )
     {
         sca[i] = mag[i] - cutSqr;
-        err0 += fabs(sca[i]);
+        err0 += abs_real(sca[i]);
         dia[i] = mag[i] * 4;
         low[i] = pri[i] * (-2);  //accessing pri[ns-1], but not used
     }
@@ -382,7 +382,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
             dia[0] = D * ( -2 );
             upe[0] = U;
         }
-        real err = fabs(val[0]);
+        real err = abs_real(val[0]);
         for( size_t i = 1; i+1 < ns; ++i )
         {
             real a = sca[i-1];
@@ -403,7 +403,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
             low[i] = L;
             dia[i] = D * ( -2 );
             upe[i] = U;
-            err += fabs(val[i]);
+            err += abs_real(val[i]);
         }
         {
             real a = sca[ns-2];
@@ -414,7 +414,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
             val[ns-1] = a * L + b * D - cutSqr;
             low[ns-1] = L;
             dia[ns-1] = D * ( -2 );
-            err += fabs(val[ns-1]);
+            err += abs_real(val[ns-1]);
         }
 #if ( 0 )
         printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
@@ -435,8 +435,8 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
         real asy = 0, sup = 0;
         for ( size_t i = 0; i < ns-1; ++i )
         {
-            sup = std::max(sup, fabs(low[i+1]+upe[i]));
-            asy += fabs(low[i+1]-upe[i]);
+            sup = std::max(sup, abs_real(low[i+1]+upe[i]));
+            asy += abs_real(low[i+1]-upe[i]);
         }
         printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
 #endif
@@ -509,7 +509,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr, Vector const* dif,
     {
         real n = dif[i].normSqr();
         sca[i] = n - cutSqr;
-        err0 += fabs(sca[i]);
+        err0 += abs_real(sca[i]);
         dia[i] = n * 4;
         low[i] = dot(dif[i], dif[i+1]) * (-2);  //using undefined value
     }
@@ -534,12 +534,12 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr, Vector const* dif,
         val[0] = vec.normSqr() - cutSqr;
         dia[0] = dot(vec, dif[0]) * ( -2 );
         upe[0] = dot(vec, dif[1]);
-        real err = fabs(val[0]);
+        real err = abs_real(val[0]);
         for( size_t i = 1; i+1 < ns; ++i )
         {
             vec = sca[i-1]*dif[i-1] + (1-2*sca[i])*dif[i] + sca[i+1]*dif[i+1];
             val[i] = vec.normSqr() - cutSqr;
-            err += fabs(val[i]);
+            err += abs_real(val[i]);
             low[i] = dot(vec, dif[i-1]);
             dia[i] = dot(vec, dif[i  ]) * ( -2 );
             upe[i] = dot(vec, dif[i+1]);
@@ -548,7 +548,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr, Vector const* dif,
         val[ns-1] = vec.normSqr() - cutSqr;
         low[ns-1] = dot(vec, dif[ns-2]);
         dia[ns-1] = dot(vec, dif[ns-1]) * ( -2 );
-        err += fabs(val[ns-1]);
+        err += abs_real(val[ns-1]);
 #if ( 0 )
         printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
         //printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
@@ -568,8 +568,8 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr, Vector const* dif,
         real asy = 0, sup = 0;
         for ( size_t i = 0; i < ns-1; ++i )
         {
-            sup = std::max(sup, fabs(low[i+1]+upe[i]));
-            asy += fabs(low[i+1]-upe[i]);
+            sup = std::max(sup, abs_real(low[i+1]+upe[i]));
+            asy += abs_real(low[i+1]-upe[i]);
         }
         printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
 #endif
@@ -618,7 +618,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
         val[0] = vec.normSqr() - cutSqr;
         dia[0] = dot(vec, dif[0]) * ( -2 );
         upe[0] = dot(vec, dif[1]);
-        real err = fabs(val[0]);
+        real err = abs_real(val[0]);
         for ( size_t i = 1; i+1 < ns; ++i )
         {
             vec = sca[i-1]*dif[i-1] + (1-2*sca[i])*dif[i] + sca[i+1]*dif[i+1];
@@ -626,7 +626,7 @@ int Chain::reshape_calculate(const size_t ns, real cutSqr,
             low[i] = dot(vec, dif[i-1]);
             dia[i] = dot(vec, dif[i]) * ( -2 );
             upe[i] = dot(vec, dif[i+1]);
-            err += fabs(val[i]);
+            err += abs_real(val[i]);
         }
         vec = sca[ns-2]*dif[ns-2] + (1-2*sca[ns-1])*dif[ns-1];
         val[ns-1] = vec.normSqr() - cutSqr;
@@ -1454,7 +1454,7 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
     real sca = dot(diffPoints(s), n);
     
     // if segment is parallel to plane, there is no intersection:
-    if ( fabs(sca) < REAL_EPSILON )
+    if ( abs_real(sca) < REAL_EPSILON )
         return INFINITY;
     
     Vector pos = posP(s);
@@ -1948,7 +1948,7 @@ int Chain::check(std::ostream& os, real len) const
     segmentationMinMax(mn, mx);
     real dev = ( mx - mn ) / segmentation();
     real con = contourLength(pPos, nPoints);
-    res = ( dev > 0.01 ) + ( fabs( con - len ) > 0.1 );
+    res = ( dev > 0.01 ) + ( abs_real( con - len ) > 0.1 );
     if ( res )
     {
         os << "chain " << std::setw(7) << reference() << '\n';

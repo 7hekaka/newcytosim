@@ -30,7 +30,7 @@ void SpaceEllipse::update()
     {
         int xx = ( zz + 1 ) % DIM;
         int yy = ( zz + 2 ) % DIM;
-        if ( fabs( (length(xx)-length(yy)) / (length(xx)+length(yy)) ) < REAL_EPSILON )
+        if ( abs_real( (length(xx)-length(yy)) / (length(xx)+length(yy)) ) < REAL_EPSILON )
             mSpheroid = zz;
     }
 #endif
@@ -87,7 +87,7 @@ real SpaceEllipse::volume() const
 
 bool SpaceEllipse::inside(Vector const& w) const
 {
-    return fabs(w.XX) < length_[0];
+    return abs_real(w.XX) < length_[0];
 }
 
 #elif ( DIM == 2 )

@@ -336,7 +336,7 @@ void MatrixSparseBlock::printSparse(std::ostream& os, real inf) const
             for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
             {
                 real v = blk(y, x);
-                if ( fabs(v) >= inf )
+                if ( abs_real(v) >= inf )
                 {
                     snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, blk(y, x));
                     os << str;

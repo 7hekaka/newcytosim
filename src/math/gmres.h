@@ -39,7 +39,7 @@ namespace LinearSolvers
             C = 1.0;
             S = 0.0;
         }
-        else if ( fabs(dy) > fabs(dx) )
+        else if ( abs_real(dy) > abs_real(dx) )
         {
             real t = dx / dy;
             S = 1.0 / sqrt(1.0 + t*t);
@@ -163,16 +163,16 @@ namespace LinearSolvers
                 gmres_make_rotation(H, C, S, ss, it);
                 
                 /*
-                 here fabs(ss[it+1]) = norm(P*residual)
+                 here abs_real(ss[it+1]) = norm(P*residual)
                  and we use `ratio` to estimate the residual of the problem
                  */
-                resid = fabs(ss[it+1]) * ratio;
+                resid = abs_real(ss[it+1]) * ratio;
                 
-                //fprintf(stderr, " |ss[it+1]| = %10.6f   est. %10.6f\n", fabs(ss[it+1]), resid);
+                //fprintf(stderr, " |ss[it+1]| = %10.6f   est. %10.6f\n", abs_real(ss[it+1]), resid);
                 
                 if ( monitor.finished(resid) )
                 {
-                    //fprintf(stderr, " %4i finished?  %10.6f   est. %10.6f\n", monitor.count(), fabs(ss[it+1]), resid);
+                    //fprintf(stderr, " %4i finished?  %10.6f   est. %10.6f\n", monitor.count(), abs_real(ss[it+1]), resid);
                     break;
                 }
             } while ( it+1 < restart );

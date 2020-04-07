@@ -27,7 +27,7 @@ void Walker::attach(FiberSite const& s)
     // here digit::step_size must be equal to fiber:step_size
     if ( lattice() && lattice()->unit() != prop->step_size  )
         throw InvalidParameter("digit:step_size must be equal to fiber:lattice_unit");
-    stride = std::copysign(1, prop->unloaded_speed);
+    stride = sign_real(prop->unloaded_speed);
 #endif
 }
 
@@ -47,7 +47,7 @@ void Walker::stepUnloaded()
     R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
     
-    nextStep -= std::max((real)0, R);
+    nextStep -= max_real(0, R);
 
     while ( nextStep <= 0 )
     {
@@ -95,7 +95,7 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
     R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
 
-    nextStep -= std::max((real)0, R);
+    nextStep -= max_real(0, R);
     
     while ( nextStep <= 0 )
     {

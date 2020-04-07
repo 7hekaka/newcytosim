@@ -60,10 +60,10 @@ void projectEllipse(real&   pX, real&  pY,
     real hmin = sqrt( ( wX*wX*aa*aa + wY*wY*bb*bb ) / RR ) - RR;
     
     // we derive another lower limit for 'h' from  |pX| < radX
-    hmin = std::max(hmin, ( fabs(wX) - radX ) * radX);
+    hmin = std::max(hmin, ( abs_real(wX) - radX ) * radX);
 
     // we derive another lower limit for 'h' from  |pY| < radY
-    hmin = std::max(hmin, ( fabs(wY) - radY ) * radY);
+    hmin = std::max(hmin, ( abs_real(wY) - radY ) * radY);
 
     // if the point is outside, then 'h' should be positive:
     if ( wX*wX/aa + wY*wY/bb > 1  &&  hmin < 0 )
@@ -198,13 +198,13 @@ void projectEllipsoid(real  p[3],
     real hmin = sqrt( ( w[0]*w[0]*aa*aa + w[1]*w[1]*bb*bb + w[2]*w[2]*cc*cc ) / RR ) - RR;
 
     // we derive another lower limit for 'h' from  |pX| < radX
-    hmin = std::max(hmin, ( fabs(w[0]) - rad[0] ) * rad[0]);
+    hmin = std::max(hmin, ( abs_real(w[0]) - rad[0] ) * rad[0]);
 
     // we derive another lower limit for 'h' from  |pY| < radY
-    hmin = std::max(hmin, ( fabs(w[1]) - rad[1] ) * rad[1]);
+    hmin = std::max(hmin, ( abs_real(w[1]) - rad[1] ) * rad[1]);
     
     // we derive another lower limit for 'h' from  |pZ| < radZ
-    hmin = std::max(hmin, ( fabs(w[2]) - rad[2] ) * rad[2]);
+    hmin = std::max(hmin, ( abs_real(w[2]) - rad[2] ) * rad[2]);
 
     if ( w[0]*w[0]/aa + w[1]*w[1]/bb + w[2]*w[2]/cc > 1  &&  hmin < 0 )
     {

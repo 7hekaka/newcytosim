@@ -90,6 +90,18 @@ protected:
         return *p;
     }
     
+    /// get positive 'real' using next 32 random bits
+    real PREAL()
+    {
+        return static_cast<real>(URAND32());
+    }
+
+    /// get 'real' using next 32 random bits
+    real SREAL()
+    {
+        return static_cast<real>(RAND32());
+    }
+
 public:
     
     /// Constructor sets the state vector to zero
@@ -193,10 +205,10 @@ public:
     
     
     /// returns true with probability (p), and false with probability (1-p)
-    bool test(real p)     { return ( URAND32() * TWO_POWER_MINUS_32 <  p ); }
+    bool test(real p)     { return ( PREAL() * TWO_POWER_MINUS_32 <  p ); }
     
     /// returns true with probability (1-p), and false with probability (p)
-    bool test_not(real p) { return ( URAND32() * TWO_POWER_MINUS_32 >= p ); }
+    bool test_not(real p) { return ( PREAL() * TWO_POWER_MINUS_32 >= p ); }
     
     /// 0  or  1  with equal chance
     int  flip()           { return URAND32() & 1U; }
@@ -226,32 +238,32 @@ public:
     double sdouble();
     
     /// positive real number in [0,1[, zero included
-    real preal()                 { return URAND32() * TWO_POWER_MINUS_32; }
+    real preal()           { return PREAL() * TWO_POWER_MINUS_32; }
     
     /// positive real number in [0,n[ = n * preal() : deprecated, use preal() * n
-    //real preal(const real n)     { return n * ( URAND32() * TWO_POWER_MINUS_32 ); }
+    real preal(real n)     { return n * ( PREAL() * TWO_POWER_MINUS_32 ); }
     
     /// signed real number in ]-1,1[, boundaries excluded
-    real sreal()                 { return RAND32() * TWO_POWER_MINUS_31; }
+    real sreal()           { return SREAL() * TWO_POWER_MINUS_31; }
     
     /// signed real number in ]-1/2, 1/2[, boundaries excluded
-    real shalf()                 { return RAND32() * TWO_POWER_MINUS_32; }
+    real shalf()           { return SREAL() * TWO_POWER_MINUS_32; }
     
     /// returns -1.0 or 1.0 with equal chance
-    real sflip()                 { return std::copysign(1.0, RAND32()); }
+    real sflip()           { return sign_real(SREAL()); }
     
     /// returns -a or a with equal chance
-    real sflip(real a)           { return std::copysign(a, RAND32()); }
+    real sflip(real a)     { return std::copysign(a, SREAL()); }
 
     /// returns the sign of `a` if `a != 0` and -1 or +1 randomly, otherwise
-    real sign_exc(real a)        { return std::copysign(1.0, (a==0)?RAND32():a); }
+    real sign_exc(real a)  { return std::copysign(1.0, (a==0)?SREAL():a); }
 
     /// non-zero real number in ]0,1]
-    real preal_exc()             { return URAND32() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32; }
+    real preal_exc()       { return PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32; }
     
     
     /// non-zero real number in ]0,n]
-    real preal_exc(const real n) { return preal_exc() * n; }
+    real preal_exc(real n) { return preal_exc() * n; }
     
     /// real number uniformly distributed in [a,b[
     real real_uniform(real a, real b) { return a + preal() * ( b - a ); }
@@ -283,10 +295,10 @@ public:
     void gauss_slow(real &, real&);
     
     /// random in [0, inf[, with P(x) = exp(-x), mean = 1.0, variance = 1.0
-    real exponential() { return -log( URAND32() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
+    real exponential() { return -log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
     
     /// exponentially distributed positive real, with P(x) = exp(-x/E) / E,  parameter E is 1/Rate
-    real exponential(const real E) { return -E * log( URAND32() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
+    real exponential(const real E) { return -E * log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
 
     /// fair choice among two given values
     template<typename T>

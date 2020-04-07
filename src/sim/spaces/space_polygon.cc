@@ -105,7 +105,7 @@ void SpacePolygon::update()
 bool SpacePolygon::inside(Vector const& w) const
 {
 #if ( DIM > 2 )
-    if ( fabs(w.ZZ) > height_ )
+    if ( abs_real(w.ZZ) > height_ )
         return false;
 #endif
 #if ( DIM > 1 )
@@ -138,7 +138,7 @@ Vector SpacePolygon::project(Vector const& w) const
     
 #elif ( DIM > 2 )
     
-    if ( fabs(w.ZZ) > height_ )
+    if ( abs_real(w.ZZ) > height_ )
     {
         if ( poly_.inside(w.XX, w.YY, 1) )
         {
@@ -164,7 +164,7 @@ Vector SpacePolygon::project(Vector const& w) const
             // to the polygonal edge in XY plane:
             real hh = (w.XX-p.XX)*(w.XX-p.XX) + (w.YY-p.YY)*(w.YY-p.YY);
             // to the top/bottom plates:
-            real v = height_ - fabs(w.ZZ);
+            real v = height_ - abs_real(w.ZZ);
             // compare distances
             if ( v * v < hh )
                 return Vector(w.XX, w.YY, std::copysign(height_, w.ZZ));
@@ -196,7 +196,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
 #if ( DIM > 2 )
     bool in = poly_.inside(pos.XX, pos.YY, 1);
 
-    if ( fabs(pos.ZZ) >= height_ )
+    if ( abs_real(pos.ZZ) >= height_ )
     {
         meca.addPlaneClampZ(pe, std::copysign(height_, pos.ZZ), stiff);
         if ( in ) return;
@@ -204,7 +204,7 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
     else if ( in )
     {
         // Compare distance to top/bottom plate:
-        real v = height_ - fabs(pos.ZZ);
+        real v = height_ - abs_real(pos.ZZ);
         // and distance to polygonal edge in XY plane:
         real hh = (pos.XX-pX)*(pos.XX-pX) + (pos.YY-pY)*(pos.YY-pY);
         

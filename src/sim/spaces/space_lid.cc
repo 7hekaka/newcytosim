@@ -157,7 +157,7 @@ void SpaceLid::step()
 {
     real dc = prop->mobility_dt * force_;
     
-    if ( fabs(dc) < 1 )
+    if ( abs_real(dc) < 1 )
         top_ += dc;
     else
         std::cerr << "Error: lid displacement is too fast: " << dc << '\n';

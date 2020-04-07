@@ -171,7 +171,7 @@ public:
     /// the standard norm = sqrt(x^2)
     real norm() const
     {
-        return fabs(XX);
+        return abs_real(XX);
     }
     
     /// the standard norm = sqrt(x^2)
@@ -183,13 +183,13 @@ public:
     /// the inversed magnitude = 1.0 / abs(x)
     real inv_norm() const
     {
-        return 1.0 / fabs(XX);
+        return 1.0 / abs_real(XX);
     }
     
     /// the 2D norm = sqrt(x^2+y^2)
     real normXY() const
     {
-        return fabs(XX);
+        return abs_real(XX);
     }
     
     /// the 2D norm = 0 since Y = Z = 0
@@ -214,19 +214,19 @@ public:
     /// distance between two points, equivalent to (a-b).norm()
     friend real distance(Vector1 const& a, Vector1 const& b)
     {
-        return fabs(a.XX-b.XX);
+        return abs_real(a.XX-b.XX);
     }
  
     /// absolute values: (|x|)
     Vector1 abs() const
     {
-        return Vector1(fabs(XX));
+        return Vector1(abs_real(XX));
     }
 
     /// the infinite norm = |x|
     real norm_inf() const
     {
-        return fabs(XX);
+        return abs_real(XX);
     }
     
     /// true if no component is NaN
@@ -244,7 +244,7 @@ public:
     /// scale to unit norm
     void normalize()
     {
-        XX = std::copysign(1.0, XX);
+        XX = sign_real(XX);
     }
 
     /// scale to obtain norm `n`
@@ -262,7 +262,7 @@ public:
     /// returns vector parallel to argument of unit norm
     friend const Vector1 normalize(Vector1 const& V)
     {
-        return Vector1(std::copysign(1.0, V.XX));
+        return Vector1(sign_real(V.XX));
     }
     
     /// returns a perpendicular vector, of comparable but unspecified norm

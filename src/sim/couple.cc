@@ -276,7 +276,7 @@ bool Couple::allowAttachment(FiberSite const& sit)
 
     // prevent binding to the same fiber if the segments are adjacent:
     if ( prop->stiff && that->fiber() == sit.fiber() &&
-        fabs(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
+        abs_real(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
         return false;
     
 #if ( 0 )
@@ -325,7 +325,7 @@ bool Couple::allowAttachment(FiberSite const& sit)
             break;
             
         case CoupleProp::BIND_ORTHOGONAL:
-            if ( fabs(dot(sit.dirFiber(), that->dirFiber())) > 0.866025 )
+            if ( abs_real(dot(sit.dirFiber(), that->dirFiber())) > 0.866025 )
                 return false;
             break;
             

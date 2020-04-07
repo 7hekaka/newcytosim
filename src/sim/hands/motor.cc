@@ -50,7 +50,7 @@ void Motor::stepUnloaded()
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * fabs(a-fbAbs);
+    nextDetach -= prop->unbinding_density * abs_real(a-fbAbs);
 #endif
 
     if ( !testDetachment() )
@@ -107,7 +107,7 @@ void Motor::stepLoaded(Vector const& force, real force_norm)
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * fabs(a-fbAbs);
+    nextDetach -= prop->unbinding_density * abs_real(a-fbAbs);
 #endif
     
     if ( testKramersDetachment(force_norm) )

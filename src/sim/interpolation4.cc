@@ -169,7 +169,7 @@ void Interpolation4::read(Inputter& in, Simul& sim)
     coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
     
     ord_ = 4;
-    while ( fabs(coef_[ord_-1]) < REAL_EPSILON )
+    while ( abs_real(coef_[ord_-1]) < REAL_EPSILON )
         --ord_;
 }
 

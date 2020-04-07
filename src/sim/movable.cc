@@ -375,7 +375,7 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             } else {
                 real radius = length / (bending * M_PI);
                 real radiusInner = radius - thickness/2.0;
-                real theta = fabs( length / radius );
+                real theta = abs_real( length / radius );
                 real angle = RNG.preal() * theta;
                 // substract R to have the arc start from 0,0:
                 x = (radiusInner + thickness * RNG.preal()) * cos( angle ) - radius;

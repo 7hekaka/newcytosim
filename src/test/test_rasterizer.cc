@@ -56,8 +56,8 @@ void paintHit(int x_inf, int x_sup, int y, int z, void*)
     if ( x_sup < x_inf )
         printf("inverted order x = %i %i at y = %i\n", x_inf, x_sup, y);
     
-    if ( fabs(y) > size ) return;
-    if ( fabs(z) > size ) return;
+    if ( std::abs(y) > size ) return;
+    if ( std::abs(z) > size ) return;
     
     for ( int x = x_inf; x <= x_sup; ++x )
     {

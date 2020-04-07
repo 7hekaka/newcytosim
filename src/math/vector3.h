@@ -343,13 +343,13 @@ public:
     /// absolute values: (|x|, |y|, |z|)
     Vector3 abs() const
     {
-        return Vector3(fabs(XX), fabs(YY), fabs(ZZ));
+        return Vector3(abs_real(XX), abs_real(YY), abs_real(ZZ));
     }
 
     /// the infinite norm = max(|x|, |y|, |z|)
     real norm_inf() const
     {
-        return std::max(std::max(fabs(XX), fabs(YY)), fabs(ZZ));
+        return std::max(std::max(abs_real(XX), abs_real(YY)), abs_real(ZZ));
     }
     
     /// true if no component is NaN
@@ -417,16 +417,16 @@ public:
     /// returns a perpendicular vector, of comparable but unspecified norm
     const Vector3 orthogonal() const
     {
-        if ( fabs(XX) < fabs(YY) )
+        if ( abs_real(XX) < abs_real(YY) )
         {
-            if ( fabs(XX) < fabs(ZZ) )
+            if ( abs_real(XX) < abs_real(ZZ) )
                 return Vector3(0.0, -ZZ,  YY); //XX is the smallest
             else
                 return Vector3( YY, -XX, 0.0); //ZZ is the smallest
         }
         else
         {
-            if ( fabs(YY) < fabs(ZZ) )
+            if ( abs_real(YY) < abs_real(ZZ) )
                 return Vector3(-ZZ, 0.0,  XX); //YY is the smallest
             else
                 return Vector3( YY, -XX, 0.0); //ZZ is the smallest
@@ -436,9 +436,9 @@ public:
     /// returns a perpendicular vector, of norm `n`
     const Vector3 orthogonal(const real n) const
     {
-        if ( fabs(XX) < fabs(YY) )
+        if ( abs_real(XX) < abs_real(YY) )
         {
-            if ( fabs(XX) < fabs(ZZ) )
+            if ( abs_real(XX) < abs_real(ZZ) )
             {
                 // XX is the smallest component
                 real s = n / sqrt(YY*YY+ZZ*ZZ);
@@ -453,7 +453,7 @@ public:
         }
         else
         {
-            if ( fabs(YY) < fabs(ZZ) )
+            if ( abs_real(YY) < abs_real(ZZ) )
             {
                 // YY is the smallest component
                 real s = n / sqrt(XX*XX+ZZ*ZZ);
@@ -489,7 +489,7 @@ public:
     void orthonormal(Vector3& E, Vector3& F) const
     {
 #if 0
-        if ( fabs(normSqr() - 1.0) > 0.01 )
+        if ( abs_real(normSqr() - 1.0) > 0.01 )
         {
             // this should not happen...
             E = orthogonal(1);

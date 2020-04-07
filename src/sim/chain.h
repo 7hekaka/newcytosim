@@ -25,7 +25,7 @@ class Glossary;
  The best number of points to describe a Chain is automatically calculated:
  It is the integer `number_of_points` that minimizes:
  
-    fabs( length() / number_of_points - FiberProp::segmentation )
+    abs_real( length() / number_of_points - FiberProp::segmentation )
  
  where segmentation is a parameter of the fiber class.
  All the segments in a fiber all have the same length
@@ -314,7 +314,7 @@ public:
 #endif
 #if ( DIM == 1 )
     /// direction at distance `ab` from the MINUS_END
-    Vector       dirM(real ab) const { return Vector(std::copysign(1.0, pPos[1]-pPos[0])); }
+    Vector       dirM(real ab) const { return Vector(sign_real(pPos[1]-pPos[0])); }
 #else
     /// direction at distance `ab` from the MINUS_END
     Vector       dirM(real ab) const;

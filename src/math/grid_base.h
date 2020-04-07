@@ -739,7 +739,7 @@ private:
     bool reject_square(const int c[ORD], real radius)
     {
         for ( int d = 0; d < ORD; ++d ) 
-            if ( fabs( cWidth[d] * c[d] ) > radius )
+            if ( abs_real( cWidth[d] * c[d] ) > radius )
                 return true;
         return false;
     }

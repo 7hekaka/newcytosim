@@ -118,7 +118,7 @@ public:
         
         len = (Vector3(coef1+1)-Vector3(coef2+1)).norm();
         
-        if ( fabs(coef1[1]) + fabs(coef1[2]) + fabs(coef1[3]) < REAL_EPSILON )
+        if ( abs_real(coef1[1]) + abs_real(coef1[2]) + abs_real(coef1[3]) < REAL_EPSILON )
             rank = 1;
         else
             rank = DIM;

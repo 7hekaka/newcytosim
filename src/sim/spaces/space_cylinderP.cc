@@ -65,7 +65,7 @@ bool SpaceCylinderP::inside(Vector const& w) const
     const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
     return ( RT <= radius_ * radius_ );
 #elif ( DIM > 1 )
-    return ( fabs(w.YY) <= radius_ );
+    return ( abs_real(w.YY) <= radius_ );
 #else
     return false;
 #endif
@@ -79,7 +79,7 @@ bool SpaceCylinderP::allInside(Vector const& w, const real rad ) const
     const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
     return ( RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
-    return ( fabs(w.YY) <= radius_-rad );
+    return ( abs_real(w.YY) <= radius_-rad );
 #else
     return false;
 #endif
@@ -136,7 +136,7 @@ void SpaceCylinderP::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
  */
 void SpaceCylinderP::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    real R = std::max((real)0, radius_ - rad);
+    real R = max_real(0, radius_ - rad);
 
     meca.addCylinderClampX(pe, R, stiff);
 }

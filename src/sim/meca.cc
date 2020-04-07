@@ -1455,7 +1455,7 @@ size_t Meca::nbNonZeros(real threshold) const
         src[j] = 1.0;
         multiply(src, dst);
         for ( size_t i = 0; i < dim; ++i )
-            cnt += ( fabs(dst[i]) > threshold );
+            cnt += ( abs_real(dst[i]) > threshold );
         src[j] = 0.0;
     }
     
@@ -1518,7 +1518,7 @@ void Meca::saveMatrix(FILE * file, real threshold) const
         src[j] = 1.0;
         multiply(src, dst);
         for ( size_t i = 0; i < dim; ++i )
-            if ( fabs(dst[i]) > threshold )
+            if ( abs_real(dst[i]) > threshold )
                 fprintf(file, "%lu %lu %f\n", i, j, dst[i]);
         src[j] = 0.0;
     }

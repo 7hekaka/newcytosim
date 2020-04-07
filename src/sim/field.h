@@ -87,8 +87,8 @@ private:
         //verify the cell size:
         for ( size_t d = 0; d < DIM; ++d )
         {
-            real dif = fabs( step - mGrid.cellWidth(d) );
-            if ( fabs(dif) > 1e-3 )
+            real dif = abs_real( step - mGrid.cellWidth(d) );
+            if ( abs_real(dif) > 1e-3 )
             {
                 Cytosim::warn << "Field:step[" << d << "] is not as expected:\n";
                 Cytosim::warn << "  field: " << mGrid.cellWidth(d) << "  prop: " << step << "\n";
@@ -329,8 +329,8 @@ public:
         {
             for ( size_t d = 0; d < DIM; ++d )
             {
-                real dif = fabs( prop->step - mGrid.cellWidth(d) );
-                if ( fabs(dif) > 1e-3 )
+                real dif = abs_real( prop->step - mGrid.cellWidth(d) );
+                if ( abs_real(dif) > 1e-3 )
                 {
                     Cytosim::warn << "Field:step["<<d<<"] has changed:\n";
                     Cytosim::warn << "  file: " << mGrid.cellWidth(d) << " prop: " << prop->step << "\n";

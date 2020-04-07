@@ -110,20 +110,20 @@ inline void sub(size_t N, const real* X, real* Y)
  return the infinite norm of the vector
 
      int inx = ixamax(N, X, inc);
-     return fabs(X[inx]);
+     return abs(X[inx]);
  
  */
 inline real nrm8(const size_t N, const real* X, int inc)
 {
 #if ( 1 )
     size_t inx = blas::ixamax(N, X, inc);
-    return fabs(X[inx-1]);
+    return abs_real(X[inx-1]);
 #else
     if ( N == 0 )
         return 0;
-    real u = fabs(X[0]);
+    real u = abs_real(X[0]);
     for ( size_t i = 1; i < N; ++i )
-        u = std::max(u, fabs(X[i*inc]));
+        u = std::max(u, abs_real(X[i*inc]));
     return u;
 #endif
 }
@@ -131,11 +131,11 @@ inline real nrm8(const size_t N, const real* X, int inc)
     
 inline real nrm8seq(const size_t siz, const real* X)
 {
-    real res = fabs(X[0]);
+    real res = abs_real(X[0]);
 #pragma ivdep
 #pragma vector always
     for ( size_t i = 1; i < siz; ++i )
-        res = std::max(res, fabs(X[i]));
+        res = std::max(res, abs_real(X[i]));
     return res;
 }
 
@@ -171,11 +171,11 @@ inline double nrm8(const size_t siz, const double* X)
     v = max2(v, permute2(v, 0b01));
     double res = v[0];
     while ( ptr < end )
-        res = std::max(res, fabs(*ptr++));
+        res = std::max(res, std::fabs(*ptr++));
 #if 0
-    real x = fabs(X[0]);
+    real x = std::fabs(X[0]);
     for ( size_t i = 1; i < siz; ++i )
-        x = std::max(x, fabs(X[i]));
+        x = std::max(x, std::fabs(X[i]));
     if ( x != res )
         printf("ERROR blas::nrm8 %f %f\n", x, res);
 #endif
@@ -211,7 +211,7 @@ inline float nrm8(const size_t siz, const float* X)
     v = max4f(v, permute4f(v, 0b01));
     float res = v[0];
     while ( ptr < end )
-        res = std::max(res, fabs(*ptr++));
+        res = std::max(res, std::fabs(*ptr++));
     return res;
 }
 
@@ -222,7 +222,7 @@ inline real nrm8(const size_t N, const real* X)
     #pragma ivdep
     #pragma vector always
     for ( size_t i = 0; i < N; ++i )
-        r = std::max(r, fabs(X[i]));
+        r = std::max(r, abs_real(X[i]));
     return r;
 }
 #endif
@@ -235,9 +235,9 @@ inline real max_diff(const size_t N, const real* X, const real* Y)
 {
     if ( N == 0 )
         return 0;
-    real u = fabs(X[0] - Y[0]);
+    real u = abs_real(X[0] - Y[0]);
     for ( size_t i = 1; i < N; ++i )
-        u = std::max(u, fabs(X[i] - Y[i]));
+        u = std::max(u, abs_real(X[i] - Y[i]));
     return u;
 }
 

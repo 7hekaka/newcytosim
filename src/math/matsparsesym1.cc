@@ -444,7 +444,7 @@ void MatrixSparseSymmetric1::printSparse(std::ostream& os, real inf) const
         for ( size_t n = 0 ; n < col_size_[jj] ; ++n )
         {
             real v = column_[jj][n].val;
-            if ( fabs(v) >= inf )
+            if ( abs_real(v) >= inf )
             {
                 snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", column_[jj][n].inx, jj, v);
                 os << str;
