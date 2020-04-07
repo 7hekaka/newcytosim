@@ -336,7 +336,7 @@ void Simul::solve_auto()
     setInteractions(sMeca);
     
     // solve the system, recording time:
-    long cpu = TicToc::centiseconds();
+    double cpu = TicToc::centiseconds();
     sMeca.solve(prop, precondMethod);
     cpu = TicToc::centiseconds() - cpu;
     

@@ -819,7 +819,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
             simul.prop->clear_trajectory = false;
         }
         delta = real(nb_steps) / real(nb_frames);
-        check = delta;
+        check = (size_t)delta;
     }
     
     simul.prepare();
@@ -838,7 +838,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
             }
             if ( sss >= nb_steps )
                 break;
-            check = ( ++frame * delta );
+            check = (size_t)( ++frame * delta );
         }
 
         hold();
