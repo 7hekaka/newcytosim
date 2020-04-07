@@ -5,6 +5,7 @@
 
 #include "real.h"
 #include "blas.h"
+#include "cytoblas.h"
 #include "allocator.h"
 #include "monitor.h"
 //#include "vecprint.h"

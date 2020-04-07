@@ -1,6 +1,6 @@
 #include <dispatch/dispatch.h>
 #include <stdio.h>
-#include <math.h>
+#include <cmath>
 
 
 const size_t CNT = 1024;

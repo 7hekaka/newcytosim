@@ -5,6 +5,7 @@
 #include <cstdio>
 #include "real.h"
 #include "blas.h"
+#include "cytoblas.h"
 #include "monitor.h"
 #include "allocator.h"
 #include "bicgstab.h"

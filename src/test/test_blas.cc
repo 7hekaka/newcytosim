@@ -5,6 +5,7 @@
 #include "real.h"
 #include "blas.h"
 #include "lapack.h"
+#include "cytoblas.h"
 
 
 void test_blas(const int size)
