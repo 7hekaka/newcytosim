@@ -11,7 +11,7 @@
 #include <cstring>
 #include <cstdio>
 #include <errno.h>
-#include <math.h>
+#include <cmath>
 #include <signal.h>
 #include <unistd.h>
 #include <vector>
