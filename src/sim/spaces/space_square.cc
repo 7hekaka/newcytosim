@@ -10,14 +10,14 @@
 SpaceSquare::SpaceSquare(SpaceProp const* p)
 : Space(p)
 {
-    for ( int d = 0; d < 3; ++d )
+    for ( size_t d = 0; d < 3; ++d )
         length_[d] = 0;
 }
 
 
 void SpaceSquare::resize(Glossary& opt)
 {
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         real len = length_[d];
         if ( opt.set(len, "length", d) )
@@ -116,18 +116,18 @@ real SpaceSquare::volume() const
 
 bool SpaceSquare::inside(Vector const& w) const
 {
-    return fabs(w.XX) <= length_[0] &
-           fabs(w.YY) <= length_[1] &
-           fabs(w.ZZ) <= length_[2];
+    return (fabs(w.XX) <= length_[0]) &
+           (fabs(w.YY) <= length_[1]) &
+           (fabs(w.ZZ) <= length_[2]);
 }
 
 bool SpaceSquare::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
     
-    return std::max(rad-w.XX, w.XX+rad) <= length_[0] &
-           std::max(rad-w.YY, w.YY+rad) <= length_[1] &
-           std::max(rad-w.ZZ, w.ZZ+rad) <= length_[2];
+    return (std::max(rad-w.XX, w.XX+rad) <= length_[0]) &
+           (std::max(rad-w.YY, w.YY+rad) <= length_[1]) &
+           (std::max(rad-w.ZZ, w.ZZ+rad) <= length_[2]);
 }
 #endif
 
@@ -199,7 +199,7 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& me
 {
     bool in = true;
     
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
     {
         if ( fabs(pos[d]) > dim[d] )
         {
@@ -236,7 +236,7 @@ void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& m
 void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real dim[DIM];
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( size_t d = 0; d < DIM; ++d )
         dim[d] = std::max((real)0, length_[d] - rad);
 
     setInteraction(pos, pe, meca, stiff, dim);
