@@ -188,7 +188,7 @@ std::string Tokenizer::get_integer(std::istream& is)
     
     int c = is.get();
     
-    if ( c == '+' | c == '-' )
+    if (( c == '+' ) | ( c == '-' ))
     {
         int d = is.peek();
         if (( d == EOF )| !isdigit(d) )
@@ -204,14 +204,14 @@ std::string Tokenizer::get_integer(std::istream& is)
     {
         if ( isdigit(c) )
             res.push_back((char)c);
-        else if (( c == 'e' | c == 'E' ) & accept_expon )
+        else if ((( c == 'e' ) | ( c == 'E' )) & accept_expon )
         {
             accept_expon = false;
             int d = is.peek();
             // accept an optional sign character
             if ( isdigit(d) )
                 res.push_back((char)c);
-            else if ( d == '+' | d == '-' )
+            else if (( d == '+' ) | ( d == '-' ))
             {
                 res.push_back((char)c);
                 res.push_back((char)is.get());
@@ -366,7 +366,7 @@ std::string Tokenizer::get_real(std::istream& is)
 
     int c = is.get();
     
-    if ( c == '+' | c == '-' )
+    if (( c == '+' ) | ( c == '-' ))
     {
         int d = is.peek();
         if ( (d == EOF) | !isdigit(d) )
@@ -387,7 +387,7 @@ std::string Tokenizer::get_real(std::istream& is)
             res.push_back((char)c);
             accept_point = false;
         }
-        else if (( c == 'e' | c == 'E' ) & accept_expon )
+        else if ((( c == 'e' ) | ( c == 'E' )) & accept_expon )
         {
             accept_expon = false;
             // only accept integer within exponent
@@ -396,7 +396,7 @@ std::string Tokenizer::get_real(std::istream& is)
             // accept an optional sign character
             if ( isdigit(d) )
                 res.push_back((char)c);
-            else if ( d == '+' | d == '-' )
+            else if (( d == '+' ) | ( d == '-' ))
             {
                 res.push_back((char)c);
                 res.push_back((char)is.get());
@@ -469,13 +469,13 @@ std::string Tokenizer::get_token(std::istream& is, bool eat_line)
     if ( d == EOF )
         return std::string(1,(char)c);
     
-    if ( c == '0' & d == 'x' )
+    if (( c == '0' ) & ( d == 'x' ))
     {
         is.unget();
         return get_hexadecimal(is);
     }
     
-    if ( isdigit(c) | (( c == '-' | c == '+' ) & isdigit(d)) )
+    if ( isdigit(c) | ((( c == '-' ) | ( c == '+' )) & isdigit(d)) )
     {
         is.unget();
         return get_real(is);
@@ -518,7 +518,7 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
         }
         else if ( block_delimiter(c) )
             res.append( get_block_text(is, c, block_delimiter(c)) );
-        else if ( c == ')' | c == '}' )
+        else if (( c == ')' ) | ( c == '}' ))
             throw InvalidSyntax("unclosed delimiter '"+std::string(1,c_in)+"'");
 #if ( 0 )
         else if ( c == COMMENT_START )

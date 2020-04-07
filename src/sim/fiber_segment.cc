@@ -216,7 +216,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         printf("shortestDistance %+9.6f %+9.6f\n", n1, n2);
 #endif
 
-        if ( abs1 < 0 | len1 <= abs1 | abs2 < 0 | len2 <= abs2 )
+        if ((abs1 < 0) | (len1 <= abs1) | (abs2 < 0) | (len2 <= abs2))
             return INFINITY;
         
 #if ( DIM > 2 )
@@ -240,7 +240,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         real m1 = d1off;
         real p1 = d1off + beta * len2;
         
-        if (( m1 < 0 & p1 < 0 ) | ( m1 > len1 & p1 > len1 ))
+        if (((m1 < 0) & (p1 < 0)) | ((m1 > len1) & (p1 > len1)))
             return INFINITY;
 
         // clamp inside segment and take mid-point:
@@ -249,7 +249,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         real m2 = -dot(d22, off);
         real p2 = m2 + beta * len1;
         
-        if (( m2 < 0 & p2 < 0 ) | ( m2 > len2 & p2 > len2 ))
+        if (((m2 < 0) & (p2 < 0)) | ((m2 > len2) & (p2 > len2)))
             return INFINITY;
 
         // clamp inside segment and take mid-point:

@@ -89,16 +89,16 @@ real SpaceSquare::volume() const
 
 bool SpaceSquare::inside(Vector const& w) const
 {
-    return fabs(w.XX) <= length_[0] &
-           fabs(w.YY) <= length_[1];
+    return (fabs(w.XX) <= length_[0]) &
+           (fabs(w.YY) <= length_[1]);
 }
 
 bool SpaceSquare::allInside(Vector const& w, const real rad) const
 {
     assert_true( rad >= 0 );
     
-    return std::max(rad-w.XX, w.XX+rad) <= length_[0] &
-           std::max(rad-w.YY, w.YY+rad) <= length_[1];
+    return (std::max(rad-w.XX, w.XX+rad) <= length_[0]) &
+           (std::max(rad-w.YY, w.YY+rad) <= length_[1]);
 }
 
 #endif
