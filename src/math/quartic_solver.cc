@@ -281,8 +281,8 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
         real y = Q / x;
         
         r1 = cplx( x + y - B3, 0 );
-        r2 = cplx( -0.5 * ( x + y ) - B3, -0.5 * sqrt(3) * std::abs( x - y ) );
-        r3 = cplx( -0.5 * ( x + y ) - B3,  0.5 * sqrt(3) * std::abs( x - y ) );
+        r2 = cplx( -0.5 * ( x + y ) - B3, -0.5 * sqrt(3) * fabs( x - y ) );
+        r3 = cplx( -0.5 * ( x + y ) - B3,  0.5 * sqrt(3) * fabs( x - y ) );
         
         return 3;
     }

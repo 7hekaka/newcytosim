@@ -6,7 +6,7 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "glossary.h"
-#include "smath.h"
+
 
 /// prefactor for volume computation: Pi in 2D and 4/3 Pi in 3D
 constexpr real VPREF = (DIM+1)*M_PI/3.0;

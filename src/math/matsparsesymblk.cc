@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
+#include <cmath>
 #include "matsparsesymblk.h"
 #include "assert_macro.h"
 #include "vector2.h"
@@ -412,7 +413,7 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os, real inf) const
             for ( size_t x = y*d; x < BLOCK_SIZE; ++x )
             {
                 real v = blk(y, x);
-                if ( std::abs(v) >= inf )
+                if ( fabs(v) >= inf )
                 {
                     snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, blk(y, x));
                     os << str;

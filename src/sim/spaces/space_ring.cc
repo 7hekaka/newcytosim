@@ -126,7 +126,7 @@ Vector SpaceRing::project(Vector const& w) const
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
-    if ( std::abs(pos.XX) > len )
+    if ( fabs(pos.XX) > len )
         meca.addPlaneClampX(pe, std::copysign(len, pos.XX), stiff);
     
     meca.addCylinderClampX(pe, rad, stiff);

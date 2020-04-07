@@ -68,7 +68,7 @@
 
   #define assert_small(expression)\
         { real e = expression;\
-        if ( std::abs(e) > 0.01 ) {\
+        if ( fabs(e) > 0.01 ) {\
             fprintf(stderr, "- - - - - - - - - - - - - - - - - - - - - - - - - -\n");\
             fprintf(stderr, "Cytosim failed assert_small(%s) with value %e\n", #expression, e);\
             fprintf(stderr, "      while executing `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\

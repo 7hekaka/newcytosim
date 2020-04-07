@@ -427,8 +427,8 @@ public:
     /// true if 3x3 subset of matrix is symmetric
     real asymmetry() const
     {
-        return std::abs(val[4]-val[1])
-        + std::abs(val[8]-val[2]) + std::abs(val[9]-val[6]);
+        return fabs(val[4]-val[1])
+        + fabs(val[8]-val[2]) + fabs(val[9]-val[6]);
     }
 
 #if MATRIX34_USES_AVX

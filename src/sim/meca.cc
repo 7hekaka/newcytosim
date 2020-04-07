@@ -21,6 +21,7 @@
 #include "simul_prop.h"
 #include "blas.h"
 #include "lapack.h"
+#include "cytoblas.h"
 #include "exceptions.h"
 #include "vecprint.h"
 #include "filepath.h"
@@ -1454,7 +1455,7 @@ size_t Meca::nbNonZeros(real threshold) const
         src[j] = 1.0;
         multiply(src, dst);
         for ( size_t i = 0; i < dim; ++i )
-            cnt += ( std::abs(dst[i]) > threshold );
+            cnt += ( fabs(dst[i]) > threshold );
         src[j] = 0.0;
     }
     
@@ -1517,7 +1518,7 @@ void Meca::saveMatrix(FILE * file, real threshold) const
         src[j] = 1.0;
         multiply(src, dst);
         for ( size_t i = 0; i < dim; ++i )
-            if ( std::abs(dst[i]) > threshold )
+            if ( fabs(dst[i]) > threshold )
                 fprintf(file, "%lu %lu %f\n", i, j, dst[i]);
         src[j] = 0.0;
     }

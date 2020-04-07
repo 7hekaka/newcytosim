@@ -100,7 +100,6 @@ inline double sdsdot(int N, float SB, const float* X, int incX, const float* Y, 
     return cblas_sdsdot(N, SB, X, incX, Y, incY);
 }
 
-// use 'blas::nrm2' defined above if applicable
 inline real xnrm2(int N, const real*X, int incX)
 {
     return BLAS1(nrm2)(N, X, incX);

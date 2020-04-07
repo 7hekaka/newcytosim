@@ -205,7 +205,7 @@ public:
     /// zero if matrix is symmetric
     real asymmetry() const
     {
-        return std::abs(val[2]-val[1]);
+        return fabs(val[2]-val[1]);
     }
     
     /// scale all elements

@@ -1454,7 +1454,7 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
     real sca = dot(diffPoints(s), n);
     
     // if segment is parallel to plane, there is no intersection:
-    if ( std::abs(sca) < REAL_EPSILON )
+    if ( fabs(sca) < REAL_EPSILON )
         return INFINITY;
     
     Vector pos = posP(s);
@@ -1948,7 +1948,7 @@ int Chain::check(std::ostream& os, real len) const
     segmentationMinMax(mn, mx);
     real dev = ( mx - mn ) / segmentation();
     real con = contourLength(pPos, nPoints);
-    res = ( dev > 0.01 ) + ( std::abs( con - len ) > 0.1 );
+    res = ( dev > 0.01 ) + ( fabs( con - len ) > 0.1 );
     if ( res )
     {
         os << "chain " << std::setw(7) << reference() << '\n';

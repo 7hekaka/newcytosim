@@ -413,8 +413,8 @@ public:
     /// true if matrix is symmetric
     real asymmetry() const
     {
-        return ( std::abs(val[BLD]-val[1])
-                + std::abs(val[BLD*2]-val[2]) + std::abs(val[1+BLD*2]-val[2+BLD]) );
+        return ( fabs(val[BLD]-val[1])
+                + fabs(val[BLD*2]-val[2]) + fabs(val[1+BLD*2]-val[2+BLD]) );
     }
 
 #if MATRIX33_USES_AVX

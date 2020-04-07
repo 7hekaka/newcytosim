@@ -34,8 +34,8 @@ void projectEllipse(real&   pX, real&  pY,
                     real    wX, real   wY,
                     real  radX, real radY)
 {
-    assert_true( radX > REAL_EPSILON );
-    assert_true( radY > REAL_EPSILON );
+    assert_true( radX > 0 );
+    assert_true( radY > 0 );
     
     // handle the pathological cases:
     if ( wX == 0 )
@@ -164,9 +164,9 @@ void projectEllipsoid(real  p[3],
                       const real w[3],
                       const real rad[3])
 {
-    assert_true( rad[0]==rad[0] && rad[0] > REAL_EPSILON );
-    assert_true( rad[1]==rad[1] && rad[1] > REAL_EPSILON );
-    assert_true( rad[2]==rad[2] && rad[2] > REAL_EPSILON );
+    assert_true( rad[0]==rad[0] && rad[0] > 0 );
+    assert_true( rad[1]==rad[1] && rad[1] > 0 );
+    assert_true( rad[2]==rad[2] && rad[2] > 0 );
     
     // handle the pathological cases:
     if ( w[0] == 0 )
