@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 /*
- * BLAS-style non-standard mathematical functions
+ * BLAS-style extensions for reals; should be included after 'blas.h'
  */
 
 #ifndef CYTOBLAS_H
@@ -9,36 +9,69 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cmath>
 #include "simd.h"
 
 
 namespace blas
 {
 
-#ifdef __INTEL_MKL__
-    /**
-     axpby() performs Y <- alpha * X + beta * Y
-     This routine is not part of BLAS, but is provided by Intel Math Kernel Library
-     */
-    void BLAS(axpby)(int*, real*, const real*, int*, real*, real*, int*);
-    inline void xaxpby(int N, real alpha, const real*X, int incX, real beta, real*Y, int incY)
-    {
-        BLAS(axpby)(&N, &alpha, X, &incX, &beta, Y, &incY);
-    }
+/**
+ We always use double precision to accumulate the dot product of two vectors:
+ */
+inline double xdot(int N, const real* X, int incX, const real* Y, int incY)
+{
+#if REAL_IS_DOUBLE
+    return cblas_ddot(N, X, incX, Y, incY);
 #else
-    inline void xaxpby(int N, real alpha, const real* X, int incX, real beta, real* Y, int incY)
+    return cblas_dsdot(N, X, incX, Y, incY);
+#endif
+}
+
+inline double dot(int N, const real* X, const real* Y)
+{
+#if REAL_IS_DOUBLE
+    return cblas_ddot(N, X, 1, Y, 1);
+#else
+    return cblas_dsdot(N, X, 1, Y, 1);
+#endif
+}
+
+/// this is the standard Euclidian norm
+inline double nrm2(int N, const real* X)
+{
+    //using double precision to accumulate:
+    return sqrt(blas::xdot(N, X, 1, X, 1));
+}
+
+
+#ifdef __INTEL_MKL__
+/**
+ axpby() performs Y <- alpha * X + beta * Y
+ as provided by Intel Math Kernel Library
+ */
+void BLAS(axpby)(int*, real*, const real*, int*, real*, real*, int*);
+inline void xaxpby(int N, real alpha, const real*X, int incX, real beta, real*Y, int incY)
+{
+    BLAS(axpby)(&N, &alpha, X, &incX, &beta, Y, &incY);
+}
+#else
+/**
+ axpby() performs Y <- alpha * X + beta * Y
+ */
+inline void xaxpby(int N, real alpha, const real* X, int incX, real beta, real* Y, int incY)
+{
+    if ( incX == 1  &&  incY == 1 )
     {
-        if ( incX == 1  &&  incY == 1 )
-        {
-            for ( int i = 0; i < N; ++i )
-                Y[i] = alpha * X[i] + beta * Y[i];
-        }
-        else
-        {
-            for ( int i = 0; i < N; ++i )
-                Y[i*incY] = alpha * X[i*incX] + beta * Y[i*incY];
-        }
+        for ( int i = 0; i < N; ++i )
+            Y[i] = alpha * X[i] + beta * Y[i];
     }
+    else
+    {
+        for ( int i = 0; i < N; ++i )
+            Y[i*incY] = alpha * X[i*incX] + beta * Y[i*incY];
+    }
+}
 #endif
 
 
@@ -84,13 +117,13 @@ inline real nrm8(const size_t N, const real* X, int inc)
 {
 #if ( 1 )
     size_t inx = blas::ixamax(N, X, inc);
-    return std::abs(X[inx-1]);
+    return fabs(X[inx-1]);
 #else
     if ( N == 0 )
         return 0;
-    real u = std::abs(X[0]);
+    real u = fabs(X[0]);
     for ( size_t i = 1; i < N; ++i )
-        u = std::max(u, std::abs(X[i*inc]));
+        u = std::max(u, fabs(X[i*inc]));
     return u;
 #endif
 }
@@ -98,11 +131,11 @@ inline real nrm8(const size_t N, const real* X, int inc)
     
 inline real nrm8seq(const size_t siz, const real* X)
 {
-    real res = std::abs(X[0]);
+    real res = fabs(X[0]);
 #pragma ivdep
 #pragma vector always
     for ( size_t i = 1; i < siz; ++i )
-        res = std::max(res, std::abs(X[i]));
+        res = std::max(res, fabs(X[i]));
     return res;
 }
 
@@ -138,11 +171,11 @@ inline double nrm8(const size_t siz, const double* X)
     v = max2(v, permute2(v, 0b01));
     double res = v[0];
     while ( ptr < end )
-        res = std::max(res, std::abs(*ptr++));
+        res = std::max(res, fabs(*ptr++));
 #if 0
-    real x = std::abs(X[0]);
+    real x = fabs(X[0]);
     for ( size_t i = 1; i < siz; ++i )
-        x = std::max(x, std::abs(X[i]));
+        x = std::max(x, fabs(X[i]));
     if ( x != res )
         printf("ERROR blas::nrm8 %f %f\n", x, res);
 #endif
@@ -178,7 +211,7 @@ inline float nrm8(const size_t siz, const float* X)
     v = max4f(v, permute4f(v, 0b01));
     float res = v[0];
     while ( ptr < end )
-        res = std::max(res, std::abs(*ptr++));
+        res = std::max(res, fabs(*ptr++));
     return res;
 }
 
@@ -189,7 +222,7 @@ inline real nrm8(const size_t N, const real* X)
     #pragma ivdep
     #pragma vector always
     for ( size_t i = 0; i < N; ++i )
-        r = std::max(r, std::abs(X[i]));
+        r = std::max(r, fabs(X[i]));
     return r;
 }
 #endif
@@ -202,9 +235,9 @@ inline real max_diff(const size_t N, const real* X, const real* Y)
 {
     if ( N == 0 )
         return 0;
-    real u = std::abs(X[0] - Y[0]);
+    real u = fabs(X[0] - Y[0]);
     for ( size_t i = 1; i < N; ++i )
-        u = std::max(u, std::abs(X[i] - Y[i]));
+        u = std::max(u, fabs(X[i] - Y[i]));
     return u;
 }
 

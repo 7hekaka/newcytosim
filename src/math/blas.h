@@ -85,34 +85,6 @@ namespace blas
 {
 #pragma mark - Level 1
 
-/**
- We always use double precision to accumulate the dot product of two vectors:
- */
-inline double xdot(int N, const real* X, int incX, const real* Y, int incY)
-{
-#if REAL_IS_DOUBLE
-    return cblas_ddot(N, X, incX, Y, incY);
-#else
-    return cblas_dsdot(N, X, incX, Y, incY);
-#endif
-}
-
-inline double dot(int N, const real* X, const real* Y)
-{
-#if REAL_IS_DOUBLE
-    return cblas_ddot(N, X, 1, Y, 1);
-#else
-    return cblas_dsdot(N, X, 1, Y, 1);
-#endif
-}
-
-/// this is the standard Euclidian norm
-inline double nrm2(int N, const real* X)
-{
-    //using double precision to accumulate:
-    return sqrt(blas::xdot(N, X, 1, X, 1));
-}
-
 inline real ddot(int N, const double* X, int incX, const double* Y, int incY)
 {
     return cblas_ddot(N, X, incX, Y, incY);

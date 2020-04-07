@@ -6,6 +6,7 @@
 
 #include "conjgradient.h"
 #include "blas.h"
+#include "cytoblas.h"
 
 /*
  The linear system is defined by functions provided as arguments:
