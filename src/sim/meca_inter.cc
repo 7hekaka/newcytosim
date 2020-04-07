@@ -2254,7 +2254,6 @@ void Meca::addSideLink(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos1()));
     real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
     addSideLink2D(ptA, ptB, arm, weight);
 
@@ -2519,7 +2518,6 @@ void Meca::addSideLink(Interpolation const& ptA,
 
 #elif ( DIM == 2 )
     
-    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos1()));
     real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
     addSideLink2D(ptA, ptB, arm, weight);
     
@@ -3375,7 +3373,6 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
     Vector ab = ptB.pos()-ptA.pos();
     if ( modulo )
         modulo->fold(ab);
-    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ab));
     real arm = std::copysign(len, cross(ptA.diff(), ab));
     addSideSlidingLink2D(ptA, ptB, arm, weight);
     
@@ -3784,7 +3781,6 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    //real arm = len * RNG.sign_exc(cross(ptA.diff(), ptB.pos()-ptA.pos1()));
     real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
     addSideSlidingLink2D(ptA, ptB, arm, weight);
     
@@ -4365,7 +4361,6 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 #elif ( DIM == 2 )
     
     // 'arm' is a vector in the Z direction
-    //real arm = len * RNG.sign_exc(cross(ptA.diff(), pos-ptA.pos1()));
     real arm = std::copysign(len, cross(ptA.diff(), pos-ptA.pos1()));
     addSidePointClamp2D(ptA, pos, arm, weight);
    
