@@ -12,10 +12,7 @@
 
 #include <cmath>
 #include <cfloat>
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
-#include <cstdint>
+#include <cstring>  // memset
 #include <algorithm>
 #include <new>
 
@@ -56,14 +53,6 @@ inline size_t chunk_real(size_t cnt)
     return ( cnt + chunk - 1 ) & ~( chunk - 1 );
 }
 
-/// check memory alignement of a pointer for AVX load/store
-inline void check_alignment(void * ptr)
-{
-    uintptr_t a = ((uintptr_t)ptr & 31);
-    if ( a )
-        fprintf(stderr, "missaligned pointer %p (%lu)\n", ptr, a);
-}
-
 
 /// allocate a new array to hold `size` real scalars
 /** The returned pointer is aligned to a 32 byte boundary */
@@ -102,6 +91,7 @@ inline void copy_real(size_t cnt, real const* src, real * dst)
 inline void zero_real(size_t cnt, real * ptr)
 {
 #if ( 1 )
+    // this works because IEEE 754 '+0.0' is represented with all bits at zero
     memset(ptr, 0, cnt*sizeof(real));
 #else
     #pragma ivdep
@@ -134,18 +124,13 @@ inline real if_select(bool c, real a, real b)
 }
 
 
-#if ( 0 )
+/// sign of a float: -1 or +1; result is +1 if ( x == 0 )
+inline float sign(const float x) { return std::copysign(1.0f, x); }
 
-/// sign of `val` in ( 0, -1 or +1 ), result is 0 if ( x == 0 )
-template <typename T> int signi(T val) { return ( T(0) < val ) - ( val < T(0) ); }
-
-/// sign of a float (-1 or +1), result is undefined +/- 1 if ( x == 0 )
-inline float sign(const float x) { return std::copysignf(1.0f, x); }
-
-/// sign of a double (-1 or +1), result is undefined +/- 1 if ( x == 0 )
+/// sign of a double: -1 or +1; result is +1 if ( x == 0 )
 inline double sign(const double x) { return std::copysign(1.0, x); }
 
-#endif
+
 
 #if ( 0 )
 
@@ -155,16 +140,22 @@ inline double sign(const double x) { return std::copysign(1.0, x); }
 inline real abs(const real x) { return fabs(x); }
 
 /// maximum between two values
+inline real min(const real x, const real y) { return std::min(x, y); }
+
+/// maximum between two values
 inline real max(const real x, const real y) { return std::max(x, y); }
 
 #endif
 
 
-//--------------------------------INPUT/OUTPUT----------------------------------
+//----------------------------------- DEBUG ------------------------------------
 
+#if ( 0 )
+
+#include <cstdio>
 
 /// print 'cnt' components of 'ptr' on a line
-inline void print_real(FILE* out, size_t cnt, real * ptr, const char end[])
+inline void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
 {
     if ( !ptr || cnt == 0 )
         fprintf(out, "void");
@@ -176,6 +167,18 @@ inline void print_real(FILE* out, size_t cnt, real * ptr, const char end[])
     }
 }
 
+
+/// check memory alignement of a pointer for AVX load/store
+inline void check_alignment(void * ptr)
+{
+    uintptr_t a = ((uintptr_t)ptr & 31);
+    if ( a )
+        fprintf(stderr, "missaligned pointer %p (%lu)\n", ptr, a);
+}
+
+#endif
+
+//--------------------------------INPUT/OUTPUT----------------------------------
 
 #if ( 0 )
 
