@@ -104,9 +104,13 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
     B[0] = B[0] - ( D[0] * E[0] ) * B[1];
 }
 
+
 /**
+ This implements Thomas's algorithm to solve a linear system
+ with a tridiagonal matrix {L, D, U} and right-hand side 'B'
+ 
  L is lower diagonal, with valid index in [0, size-2]
- D is diagonal, with valid index in  [0, size-1]
+ D is diagonal, with valid index in [0, size-1]
  U is upper diagonal, with valid index in [0, size-2]
  B is input/output, with valid index in [0, size-1]
  
@@ -115,7 +119,7 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
  Modified from:
  https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
  */
-void italian_thomas(size_t size, real*L, real* D, real* U, real* B)
+void italian_thomas(size_t size, real const*L, real const* D, real* U, real* B)
 {
     real e = L[0];
     U[0] = U[0] / D[0];
@@ -196,6 +200,10 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
 }
 
 
+/**
+This implements Thomas's algorithm to solve a linear system
+with a tridiagonal symmetric matrix {E, D, E} and right-hand side 'B'
+*/
 void alsatian_thomas(size_t size, real* D, real* E, real* B)
 {
     real x = 1.0 / D[0];
