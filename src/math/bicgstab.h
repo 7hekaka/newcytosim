@@ -9,6 +9,9 @@
 #include "allocator.h"
 #include "monitor.h"
 
+/// assumes that vector 'sol' is zero initially
+#define NULL_INITIAL_SOLUTION 0
+
 /// Bi-Conjugate Gradient Stabilized method to solve a system of linear equations
 /**
  F. Nedelec, 27.03.2012 - 13.03.2017
@@ -25,7 +28,7 @@ namespace LinearSolvers
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
         
-        const size_t dim = mat.dimension();
+        const int dim = mat.dimension();
         allocator.allocate(dim, 5);
         real * r  = allocator.bind(0);
         real * r0 = allocator.bind(1);
@@ -33,23 +36,22 @@ namespace LinearSolvers
         real * t  = allocator.bind(3);
         real * v  = allocator.bind(4);
         
-#if ( 1 )
+#if NULL_INITIAL_SOLUTION
+        //blas::xfill(dim, 0, sol);
+        // assuming that 'sol == 0' initially:
+        blas::xcopy(dim, rhs, 1, r, 1);
+        blas::xcopy(dim, rhs, 1, r0, 1);
+        blas::xcopy(dim, rhs, 1, p, 1);
+#else
         mat.multiply(sol, r0);                  // r0 = A * sol
         blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
         blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * sol
         blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
         blas::xcopy(dim, r, 1, p, 1);
-        rho = blas::dot(dim, r, r);
-
         if ( monitor.finished(dim, r) )
             return;
-#else
-        // assuming that 'sol == 0' initially:
-        blas::xcopy(dim, rhs, 1, r, 1);
-        blas::xcopy(dim, rhs, 1, r0, 1);
-        blas::xcopy(dim, rhs, 1, p, 1);
-        rho = blas::dot(dim, r, r);
 #endif
+        rho = blas::dot(dim, r, r);
         goto start;
         
         while ( ! monitor.finished(dim, r) )
@@ -147,16 +149,22 @@ namespace LinearSolvers
         real * phat = allocator.bind(5);
         real * shat = allocator.bind(6);
         
-        mat.multiply(sol, r0);
+#if NULL_INITIAL_SOLUTION
+        //blas::xfill(dim, 0, sol);
+        // assuming that 'sol == 0' initially:
         blas::xcopy(dim, rhs, 1, r, 1);
-        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * x
+        blas::xcopy(dim, rhs, 1, r0, 1);
+        blas::xcopy(dim, rhs, 1, p, 1);
+#else
+        mat.multiply(sol, r0);                  // r0 = A * sol
+        blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
+        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * sol
         blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-        
-        rho = blas::dot(dim, r, r);
         blas::xcopy(dim, r, 1, p, 1);
-
         if ( monitor.finished(dim, r) )
             return;
+#endif
+        rho = blas::dot(dim, r, r);
 
         goto start;
 

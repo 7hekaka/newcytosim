@@ -1,6 +1,11 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// A test for linear iterative solver (BCGS, GMRES, etc).
-// FJN, 19.08.2019
+/*
+ A test for linear iterative solver (BCGS, GMRES, etc):
+ Read 'A' from "matrix.mtx" and 'b' from "rhs.mtx" and solves the linear system
+     A.x = b
+ using various iterative solvers.
+ FJN, 19.08.2019
+*/
 
 #include <cstdio>
 #include "real.h"
@@ -44,7 +49,7 @@ public:
     }
     
     /// size of the matrix M
-    size_t dimension() const { return dim; };
+    int dimension() const { return dim; };
     
     /// multiply a vector ( Y <- M * X )
     void multiply(const real* X, real* Y) const
@@ -65,7 +70,7 @@ public:
         constexpr size_t MAX = 1024;
         char str[MAX], * ptr;
         do {
-            if ( 0 == fgets(str, MAX, file) ) return 1;
+            if ( nullptr == fgets(str, MAX, file) ) return 1;
             // skip comments:
         } while ( str[0] == '%' );
         // parse dimension line:
@@ -78,7 +83,7 @@ public:
         allocate(lin);
         for ( size_t i = 0; i < cnt; ++i )
         {
-            if ( 0 == fgets(str, MAX, file) ) return 3;
+            if ( nullptr == fgets(str, MAX, file) ) return 3;
             lin = strtoul(str, &ptr, 10);
             col = strtoul(ptr, &ptr, 10);
             real val = strtof(ptr, &ptr);
@@ -109,16 +114,16 @@ int readVector(FILE * file, size_t dim, real * vec)
     constexpr size_t MAX = 1024;
     char str[MAX];
     do {
-        if ( 0 == fgets(str, MAX, file) ) return 1;
+        if ( nullptr == fgets(str, MAX, file) ) return 1;
         // skip comments:
     } while ( str[0] == '%' );
     // parse dimension line:
     printf(" reading vector: %s", str);
-    unsigned long cnt = strtoul(str, 0, 10);
+    unsigned long cnt = strtoul(str, nullptr, 10);
     for ( size_t i = 0; i < cnt; ++i )
     {
-        if ( 0 == fgets(str, MAX, file) ) return 3;
-        real val = strtof(str, 0);
+        if ( nullptr == fgets(str, MAX, file) ) return 3;
+        real val = strtof(str, nullptr);
         if ( i < dim ) vec[i] = val;
     }
     return 0;
