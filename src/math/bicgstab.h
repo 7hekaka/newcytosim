@@ -28,7 +28,7 @@ namespace LinearSolvers
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
         
-        const size_t dim = mat.dimension();
+        const int dim = mat.dimension();
         allocator.allocate(dim, 5);
         real * r  = allocator.bind(0);
         real * r0 = allocator.bind(1);
