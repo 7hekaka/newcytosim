@@ -65,7 +65,7 @@ size_t PropertyList::size(std::string const& cat) const
     return res;
 }
 
-
+/*
 Property * PropertyList::operator[] (const size_t n) const
 {
     if ( n >= vec_.size() )
@@ -76,6 +76,7 @@ Property * PropertyList::operator[] (const size_t n) const
     }
     return vec_[n];
 }
+*/
 
 //-------------------------------------------------------------------------------
 
@@ -91,14 +92,6 @@ void PropertyList::complete(Simul const& sim) const
     for ( Property* i : vec_ )
         i->complete(sim);
 }
-
-Property const* PropertyList::contains(Property const* p) const
-{
-    for ( Property const* i : vec_ )
-        if ( i == p ) return p;
-    return nullptr;
-}
-
 
 //-------------------------------------------------------------------------------
 #pragma mark -

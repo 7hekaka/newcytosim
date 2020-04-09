@@ -75,16 +75,13 @@ public:
     //-------------------------------------------------------------------------------
     
     /// true if no property are known
-    bool         empty() const    { return vec_.empty(); }
+    bool         empty()   const { return vec_.empty(); }
     
     /// number of known Property
-    size_t       size()  const    { return vec_.size(); }
+    size_t       size()    const { return vec_.size(); }
 
     /// number of Property of given category
     size_t       size(std::string const& cat) const;
-    
-    /// return property stored at index `n`
-    Property *   operator[] (size_t n) const;
 
     /// apply function to all objects
     void         for_each(void func(Property *)) const;
@@ -129,9 +126,6 @@ public:
     
     /// return list of properties which are not of the given category
     PropertyList find_all_except(std::string const&) const;
-
-    /// return position where `p` is stored, end() otherwise
-    Property const* contains(Property const* p) const;
 
     //-------------------------------------------------------------------------------
 
