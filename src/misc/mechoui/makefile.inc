@@ -239,12 +239,9 @@ ifeq ($(MACHINE),linux)
     #   check for correct library libname.so otherwise give full path
     GRAFIX := -L$(LIBDIR) -lglut -lGL -lGLU -lXt -lX11 -lGLEW
 
-    ifneq ($(HAS_PNG), 0)
-
-        LIB_PNG := $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
-        ING_PNG :=
-
-    endif
+    ### Specify here the PNG library
+    LIB_PNG := $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
+    INC_PNG :=
 
 endif
 
@@ -274,12 +271,9 @@ ifeq ($(MACHINE),cygwin)
     ###  check for correct library yourlibname.so otherwise give full path
     GRAFIX := -L/usr/lib -lglut -lGL -lGLU -lXt -lX11 -lGLEW
 
-    ifneq ($(HAS_PNG), 0)
-
+    ### Specify here the PNG library
     LIB_PNG := /lib/libpng.dll.a /lib/libz.a
-    ING_PNG :=
-
-    endif
+    ING_PNC :=
 
     BINEXT :=.exe
 
