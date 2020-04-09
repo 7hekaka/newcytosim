@@ -50,29 +50,29 @@
  
  @ref HandGroup
  
- `activity`    | Class         | Parameters         | Property     |
- --------------|---------------|--------------------|---------------
- `bind`        | Hand          | @ref HandPar       | HandProp
- `move`        | Motor         | @ref MotorPar      | MotorProp
- `nucleate`    | Nucleator     | @ref NucleatorPar  | NucleatorProp
- `slide`       | Slider        | @ref SliderPar     | SliderProp
- `track`       | Tracker       | @ref TrackerPar    | TrackerProp
- `rescue`      | Rescuer       | @ref RescuerPar    | RescuerProp
- `regulate`    | Regulator     | @ref RegulatorPar  | RegulatorProp
- `cut`         | Cutter        | @ref CutterPar     | CutterProp
- `chew`        | Chewer        | @ref ChewerPar     | ChewerProp
- `mighty`      | Mighty        | @ref MightyPar     | MightyProp
- `act`         | Actor         | @ref ActorPar      | ActorProp
+ `activity`        | Class         | Parameters         | Property     |
+ ------------------|---------------|--------------------|---------------
+ `bind` (default)  | Hand          | @ref HandPar       | HandProp
+ `move`            | Motor         | @ref MotorPar      | MotorProp
+ `nucleate`        | Nucleator     | @ref NucleatorPar  | NucleatorProp
+ `slide`           | Slider        | @ref SliderPar     | SliderProp
+ `track`           | Tracker       | @ref TrackerPar    | TrackerProp
+ `rescue`          | Rescuer       | @ref RescuerPar    | RescuerProp
+ `regulate`        | Regulator     | @ref RegulatorPar  | RegulatorProp
+ `cut`             | Cutter        | @ref CutterPar     | CutterProp
+ `chew`            | Chewer        | @ref ChewerPar     | ChewerProp
+ `mighty`          | Mighty        | @ref MightyPar     | MightyProp
+ `act`             | Actor         | @ref ActorPar      | ActorProp
  
  <h2>Digital Hands:</h2>
  
- `activity`    | Class         | Parameters         | Property     |
- --------------|---------------|--------------------|---------------
- `digit`       | Digit         | @ref DigitPar      | DigitProp
- `walk`        | Walker        | @ref WalkerPar     | WalkerProp
- `kinesin`*    | Kinesin       | @ref KinesinPar    | KinesinProp
- `dynein`*     | Dynein        | @ref DyneinPar     | DyneinProp
- `myosin`*     | Myosin        | @ref MyosinPar     | MyosinProp
+ `activity`        | Class         | Parameters         | Property     |
+ ------------------|---------------|--------------------|---------------
+ `digit`           | Digit         | @ref DigitPar      | DigitProp
+ `walk`            | Walker        | @ref WalkerPar     | WalkerProp
+ `kinesin`*        | Kinesin       | @ref KinesinPar    | KinesinProp
+ `dynein`*         | Dynein        | @ref DyneinPar     | DyneinProp
+ `myosin`*         | Myosin        | @ref MyosinPar     | MyosinProp
  
  * Unfinished classes.
  

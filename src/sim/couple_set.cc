@@ -23,14 +23,14 @@
  
  List of classes accessible by specifying `couple:activity`.
 
- `activity`    | Classes                 | Parameters           | Property     |
- --------------|-------------------------|----------------------|---------------
- `diffuse`     | Couple CoupleLong       | @ref CouplePar       | CoupleProp
- `crosslink`   | Crosslink CrosslinkLong | @ref CrosslinkPar    | CrosslinkProp
- `bridge`      | Bridge                  | @ref BridgePar       | BridgeProp
- `duo`         | Duo  DuoLong            | @ref DuoPar          | DuoProp
- `slide`       | Shackle ShackleLong     | @ref ShacklePar      | ShackleProp
- `fork`        | Fork                    | @ref ForkPar         | ForkProp
+ `activity`          | Classes                 | Parameters         | Property     |
+ --------------------|-------------------------|--------------------|---------------
+ `diffuse` (default) | Couple CoupleLong       | @ref CouplePar     | CoupleProp
+ `crosslink`         | Crosslink CrosslinkLong | @ref CrosslinkPar  | CrosslinkProp
+ `bridge`            | Bridge                  | @ref BridgePar     | BridgeProp
+ `duo`               | Duo  DuoLong            | @ref DuoPar        | DuoProp
+ `slide`             | Shackle ShackleLong     | @ref ShacklePar    | ShackleProp
+ `fork`              | Fork                    | @ref ForkPar       | ForkProp
 
  Example:
 

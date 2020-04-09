@@ -21,10 +21,10 @@
 
  List of classes accessible by specifying single:activity:
  
- `activity`    | Class             | Description                               |
- --------------|-------------------|--------------------------------------------
- `diffuse`     | Single            | a single Hand that is mobile (default)
- `fixed`       | Picket PicketLong | a single Hand anchored at a fixed position
+ `activity`          | Class             | Description                               |
+ --------------------|-------------------|--------------------------------------------
+ `diffuse` (default) | Single            | a single Hand that is mobile (default)
+ `fixed`             | Picket PicketLong | a single Hand anchored at a fixed position
 
  Another class Wrist is used automatically to anchor a Single to a Mecable.
  

@@ -31,13 +31,13 @@
  
  List of classes accessible by specifying `fiber:activity`.
  
- `activity`    | Class               | Parameter                  |
- --------------|---------------------|-----------------------------
- `none`        | Fiber               | @ref FiberPar (default)
- `grow`        | GrowingFiber        | @ref GrowingFiberPar
- `classic`     | ClassicFiber        | @ref ClassicFiberPar
- `dynamic`     | DynamicFiber        | @ref DynamicFiberPar
- `treadmill`   | TreadmillingFiber   | @ref TreadmillingFiberPar
+ `activity`        | Class               | Parameters                 |
+ ------------------|---------------------|-----------------------------
+ `none` (default)  | Fiber               | @ref FiberPar
+ `grow`            | GrowingFiber        | @ref GrowingFiberPar
+ `classic`         | ClassicFiber        | @ref ClassicFiberPar
+ `dynamic`         | DynamicFiber        | @ref DynamicFiberPar
+ `treadmill`       | TreadmillingFiber   | @ref TreadmillingFiberPar
  
  */
 Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
