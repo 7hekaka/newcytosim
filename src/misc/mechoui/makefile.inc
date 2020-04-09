@@ -273,7 +273,7 @@ ifeq ($(MACHINE),cygwin)
 
     ### Specify here the PNG library
     LIB_PNG := /lib/libpng.dll.a /lib/libz.a
-    ING_PNC :=
+    INC_PNG :=
 
     BINEXT :=.exe
 
