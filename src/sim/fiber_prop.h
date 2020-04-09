@@ -320,10 +320,10 @@ public:
 #endif
     
 #if NEW_END_FORCE
-    /// the fiber end to which a force is added
-    FiberEnd  end_force;
-    /// the force added to the end specified by `end_force` (known as end_force[1])
-    Vector end_force_vec;
+    /// the force vector added to an end of the fiber
+    Vector       end_force;
+    /// the fiber end to which a force is added (set as end_force[1])
+    FiberEnd     end_force_mode;
 #endif
     
 #if NEW_FIBER_LOOP
