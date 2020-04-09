@@ -7,6 +7,11 @@
 #include "couple.h"
 #include "couple_prop.h"
 
+
+/// a list of pointers to Single
+typedef Array<Couple *> CoupleList;
+
+
 /// Set for Couple
 /**
  A Couple is stored in one of 4 NodeList, depending on its state:
@@ -50,14 +55,14 @@ private:
     }
 
 
-    /// a list to hold Couples of one class
-    typedef std::vector<Couple*> CoupleReserveList;
-    
+    /// holds the property and the list of singles
+    typedef std::pair<CoupleProp const*, CoupleList> CoupleReserve;
+
     /// an array of SingleReserveList
-    typedef std::vector<CoupleReserveList> CoupleReserve;
+    typedef std::vector<CoupleReserve> CoupleReserveList;
     
-    /// uniLists[p] contains the Couples with ( property()->number() == p ) that are diffusing
-    CoupleReserve uniLists;
+    /// uniReserves[p] contains the Couples with ( property()->number() == p ) that are diffusing
+    CoupleReserveList uniReserves;
     
     /// flag to enable couple:fast_diffusion attachment algorithm
     bool          uni;
@@ -69,18 +74,18 @@ private:
     bool          uniPrepare(PropertyList const& properties);
     
     /// attach Hand1 of Couple on locations specified by first argument
-    void          uniAttach1(Array<FiberSite>&, CoupleReserveList&);
+    void          uniAttach1(Array<FiberSite>&, CoupleList&);
     
     /// attach Hand2 of Couple on locations specified by first argument
-    void          uniAttach2(Array<FiberSite>&, CoupleReserveList&);
+    void          uniAttach2(Array<FiberSite>&, CoupleList&);
     
     /// attach both Hands of `nb` Couple at crossing points specified by first argument
-    void          uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleReserveList&, unsigned nb);
+    void          uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, unsigned nb);
     
     /// couple:fast_diffusion attachment algorithm; assumes free Couples are uniformly distributed
     void          uniAttach(FiberSet const&);
     
-    /// return Couples in uniLists to the normal lists
+    /// return Couples in uniReserves to the normal lists
     void          uniRelax();
     
 public:
@@ -194,10 +199,10 @@ public:
     void         shuffle();
 
     /// distribute the Couple on the fibers to approximate an equilibrated state
-    void         equilibrateSym(FiberSet const&, CoupleReserveList&, CoupleProp const*);
+    void         equilibrateSym(FiberSet const&, CoupleList&, CoupleProp const*);
 
     /// distribute Couples of given class on the fibers to approximate an equilibrated state
-    void         equilibrate(FiberSet const&, CoupleReserveList&, CoupleProp const*);
+    void         equilibrate(FiberSet const&, CoupleList&, CoupleProp const*);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void         equilibrate(FiberSet const&, PropertyList const&);
