@@ -17,14 +17,14 @@ void Event::clear()
 }
 
 
-void Event::fire_once(real time)
+void Event::fire_at(real time)
 {
     nextTime = time;
     recurrent = false;
 }
 
 
-void Event::reset(real now)
+void Event::reload(real now)
 {
     if ( recurrent )
     {
@@ -47,7 +47,7 @@ Event::Event(real now, Glossary& opt)
     opt.set(activity, "activity") || opt.set(activity, "code");
     if ( opt.set(t, "time") )
     {
-        fire_once(t);
+        fire_at(t);
     }
     else
     {
@@ -58,7 +58,7 @@ Event::Event(real now, Glossary& opt)
             throw InvalidParameter("event:delay must be >= 0");
         if ( rate <= 0 && delay <= 0 )
             throw InvalidParameter("event:rate or delay must be > 0");
-        reset(now);
+        reload(now);
     }
 }
 
@@ -75,7 +75,7 @@ void Event::step(Simul& sim)
     {
         sim.relax();
         do {
-            reset(nextTime);
+            reload(nextTime);
             sim.evaluate(activity);
         } while ( sim.time() >= nextTime );
         sim.unrelax();

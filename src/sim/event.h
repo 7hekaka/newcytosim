@@ -9,16 +9,16 @@ class Meca;
 class Simul;
 class Glossary;
 
-/// an Event performs action on the simulation by executing code
+/// an Event acts on the simulation world by executing code
 /**
  An Event is a class that can perform some action in the simulation world,
  specified as a line of code interpreted by Cytosim.
- This can be used for example to add or remove objects.
+ This can be used to add or remove objects or change parameter values.
  
  The firing time can be specified to occur:
-     - only once at a given time with `time`,
-     - at regular interval  with `delay`,
-     - at stochastic time with `rate`.
+     - only once at a given time by setting the parameter `time`,
+     - at regular intervals by setting `delay`,
+     - at stochastic time by setting `rate`.
  .
  
  It is a special class in the sense that is not associated with a Property,
@@ -69,10 +69,10 @@ public:
     virtual ~Event();
 
     /// set next firing time
-    void fire_once(real time);
+    void fire_at(real time);
 
     /// recalculate next firing time, given current time
-    void reset(real time);
+    void reload(real time);
     
     /// a unique character identifying the class
     static const ObjectTag TAG = 'q';
