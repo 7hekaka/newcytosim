@@ -476,13 +476,13 @@ void SingleSet::removeWrists(Object const* arg)
 /**
  Distribute Singles on the sites specified in `loc`.
  */
-void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserveList& reserve)
+void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& list)
 {
     for ( FiberSite & i : loc )
     {
-        if ( reserve.empty() )
+        if ( list.empty() )
             return;
-        Single * s = reserve.back();
+        Single * s = list.back();
         Hand const* h = s->hand();
         
         if ( h->attachmentAllowed(i) )
@@ -494,7 +494,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserveList& reserve)
             if ( spc && spc->outside(pos) )
                 continue;
 
-            if ( s->prop->fast_diffusion == 3 )
+            if ( s->prop->fast_diffusion & 8 )
             {
                 if ( ! spc )
                     continue;
@@ -517,7 +517,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserveList& reserve)
 #endif
             }
 
-            reserve.pop_back();
+            list.pop_back();
             s->setPosition(pos);
             s->attach(i);
             link(s);
@@ -559,8 +559,8 @@ void SingleSet::uniAttach(FiberSet const& fibers)
         if ( p->fast_diffusion )
         {
             unlink(obj);
-            assert_true((size_t)p->number() < uniLists.size());
-            uniLists[p->number()].push_back(obj);
+            assert_true(p->number() < uniReserves.size());
+            uniReserves[p->number()].second.push_back(obj);
         }
         obj = nxt;
     }
@@ -568,14 +568,14 @@ void SingleSet::uniAttach(FiberSet const& fibers)
     Array<FiberSite> loc(1024);
     
     // uniform attachment for the reserves:
-    for ( SingleReserveList & reserve : uniLists )
+    for ( SingleReserve & reserve : uniReserves )
     {
-        if ( !reserve.empty() )
+        SingleProp const* p = reserve.first;
+        const size_t cnt = reserve.second.size();
+
+        if (( p != nullptr ) & ( cnt > 0 ))
         {
-            SingleProp const* p = reserve.back()->prop;
-            
             const real vol = p->spaceVolume();
-            const size_t cnt = reserve.size();
             
             if ( p->fast_diffusion == 2 )
             {
@@ -588,7 +588,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            uniAttach(loc, reserve);
+            uniAttach(loc, reserve.second);
         }
     }
 }
@@ -597,7 +597,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 /**
  
  Return true if at least one single:fast_diffusion is true,
- and in this case allocate uniLists.
+ and in this case allocate uniReserves.
  
  The Volume of the Space is assumed to remain constant until the next uniPrepare()
  */
@@ -606,35 +606,44 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
     bool res = false;
     size_t last = 0;
 
-    for ( Property const* i : properties.find_all("single") )
+    PropertyList allprop = properties.find_all("single");
+    
+    for ( Property const* i : allprop )
     {
         SingleProp const* p = static_cast<SingleProp const*>(i);
-        res |= p->fast_diffusion;
         last = std::max(last, p->number());
+        res |= p->fast_diffusion;
     }
     
     if ( res )
-        uniLists.resize(last+1);
+    {
+        uniReserves.resize(last+1);
+        for ( Property const* i : allprop )
+        {
+            SingleProp const* p = static_cast<SingleProp const*>(i);
+            uniReserves[p->number()].first = p;
+        }
+    }
     
     return res;
 }
 
 
 /**
- empty uniLists, reversing all Singles in the normal lists.
+ empty uniReserves, reversing all Singles in the normal lists.
  This is useful if ( single:fast_diffusion == true )
  */
 void SingleSet::uniRelax()
 {
-    for ( SingleReserveList & reserve : uniLists )
+    for ( SingleReserve & reserve : uniReserves )
     {
-        for ( Single * s : reserve )
+        for ( Single * s : reserve.second )
         {
             assert_true(!s->attached());
             s->randomizePosition();
             link(s);
         }
-        reserve.clear();
+        reserve.second.clear();
     }
 }
 

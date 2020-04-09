@@ -355,7 +355,7 @@ real HandProp::bindingSectionRate() const
 #elif ( DIM == 3 )
     return M_PI * binding_range * binding_range * binding_rate;
 #else
-    return 0;
+    return binding_rate;
 #endif
 }
 
@@ -370,7 +370,7 @@ real HandProp::bindingSectionProb() const
 #elif ( DIM == 3 )
     return M_PI * binding_range * binding_range * binding_prob;
 #else
-    return 0;
+    return binding_prob;
 #endif
 }
 

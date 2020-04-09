@@ -205,6 +205,18 @@ public:
         return val_[ii];
     }
     
+    /// return element at index 0
+    VAL const& front() const
+    {
+        return val_[0];
+    }
+    
+    /// return last element
+    VAL const& back() const
+    {
+        return val_[nbo_-1];
+    }
+
     
 #pragma mark -
     /// Allocate to hold `s` objects: valid indices are 0 <= indx < max
@@ -324,6 +336,12 @@ public:
         val_[nbo_++] = np;
     }
     
+    /// remove last element
+    void pop_back()
+    {
+        --nbo_;
+    }
+
     /// Add the elements of `array` at the end of this Array
     void append(const Array<VAL> array)
     {

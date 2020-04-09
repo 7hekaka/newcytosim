@@ -33,16 +33,15 @@ private:
     
     /// List for attached Singles (a=attached)
     NodeList     aList;
+    
+    /// holds the property and the list of singles
+    typedef std::pair<SingleProp const*, SingleList> SingleReserve;
 
-    
-    /// a list to hold Singles of one class
-    typedef std::vector<Single*> SingleReserveList;
-    
     /// an array of SingleReserveList
-    typedef std::vector<SingleReserveList> SingleReserve;
+    typedef std::vector<SingleReserve> SingleReserveList;
     
-    /// uniLists[p] contains the Single with ( property()->number() == p ) that are diffusing
-    SingleReserve uniLists;
+    /// uniReserves[p] contains the Single with ( property()->number() == p ) that are diffusing
+    SingleReserveList uniReserves;
     
     /// flag to enable couple:fast_diffusion attachment algorithm
     bool          uni;
@@ -51,12 +50,12 @@ private:
     bool          uniPrepare(PropertyList const& properties);
     
     /// distribute Singles to fiber with average distance `spread`
-    void          uniAttach(Array<FiberSite>&, SingleReserveList&);
+    void          uniAttach(Array<FiberSite>&, SingleList&);
     
     /// couple:fast_diffusion attachment algorithm; assumes free Singles are uniformly distributed
     void          uniAttach(FiberSet const&);
     
-    /// return Couples in uniLists to the normal lists
+    /// return Couples in uniReserves to the normal lists
     void          uniRelax();
 
 public:
