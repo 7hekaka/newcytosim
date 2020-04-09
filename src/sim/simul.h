@@ -493,8 +493,8 @@ public:
     /// print position of Singles
     void      reportSinglePosition(std::ostream&, std::string const&) const;
    
-    /// print position of Singles
-    void      reportAttachedSingle(std::ostream&, std::string const&) const;
+    /// print force of attached Singles
+    void      reportSingleLink(std::ostream&, std::string const&) const;
 
     /// print state of Couples 
     void      reportSpherePosition(std::ostream&) const;

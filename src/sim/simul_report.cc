@@ -198,7 +198,6 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
     {
         if ( !which.empty() )
             return reportFiber(out, which);
-
         if ( what.empty() || what == "position" )
             return reportFiber(out);
         if ( what == "end" )
@@ -266,7 +265,7 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
     {
         if ( what == "hand" )
             return reportSolidHands(out);
-        else if ( what == "position" || what.empty() )
+        if ( what == "position" || what.empty() )
             return reportSolidPosition(out);
         throw InvalidSyntax("I only know `solid'");
     }
@@ -274,7 +273,7 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
     {
         if ( what == "force" )
             return reportSpaceForce(out);
-        else if ( what.empty() )
+        if ( what.empty() )
             return reportSpace(out);
         throw InvalidSyntax("I only know `space'");
     }
@@ -288,37 +287,35 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
     {
         if ( what.empty() )
             return reportSingle(out);
+        if ( what == "link" )
+            return reportSingleLink(out, which);
         if ( what == "state" || what == "force" )
             return reportSingleState(out, which);
         if ( what == "position" )
             return reportSinglePosition(out, which);
-        if ( what == "attached" )
-            return reportAttachedSingle(out, which);
         throw InvalidSyntax("I only know single: state, force, position, NAME");
     }
     if ( who == "couple" )
     {
         if ( what.empty() )
             return reportCouple(out);
-        else if ( what == "state" )
+        if ( what == "state" )
         {
             if ( which.empty() )
                 return reportCoupleState(out);
-            else
-                return reportCoupleState(out, which);
+            return reportCoupleState(out, which);
         }
-        else if ( what == "link" )
+        if ( what == "link" )
             return reportCoupleLink(out, which);
-        else if ( what == "configuration" )
+        if ( what == "configuration" )
             return reportCoupleConfiguration(out, which, opt);
-        else if ( what == "force" )
+        if ( what == "force" )
             return reportCoupleForce(out, opt);
-        else if ( what == "active" )
+        if ( what == "active" )
             return reportCoupleActive(out, which);
-        else if ( what == "anatomy" )
+        if ( what == "anatomy" )
             return reportCoupleAnatomy(out);
-        else
-            return reportCoupleState(out, what);
+        return reportCoupleState(out, what);
         throw InvalidSyntax("I only know couple: state, link, active, force, anatomy, NAME");
     }
     if ( who == "organizer" )
@@ -353,14 +350,13 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
     {
         if ( what.empty() )
             return writeProperties(out, false);
-        else
         {
             Property * p = findProperty(what);
             if ( !p )
                 throw InvalidSyntax("unknown Property `"+what+"'");
             p->write(out);
-            return;
         }
+        return;
     }
     if ( who == "spindle" )
     {
@@ -1727,7 +1723,7 @@ void Simul::reportSinglePosition(std::ostream& out, std::string const& which) co
 /**
  Export details of attached Singles
  */
-void Simul::reportAttachedSingle(std::ostream& out, std::string const& which) const
+void Simul::reportSingleLink(std::ostream& out, std::string const& which) const
 {
     Property * selected = nullptr;
     

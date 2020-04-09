@@ -183,19 +183,19 @@ public:
 
     //---------------------
     
-    /// return Mecapoint representation of given end
+    /// return Mecapoint of given end
     Mecapoint     exactEnd(FiberEnd) const;
 
-    /// interpolation representing MINUS_END
+    /// interpolation of MINUS_END
     Interpolation interpolateEndM() const { return Interpolation(this, 0, 1, 0); }
 
-    /// interpolation representing PLUS_END
+    /// interpolation of PLUS_END
     Interpolation interpolateEndP() const { return Interpolation(this, nPoints-2, nPoints-1, 1); }
 
-    /// interpolation representing a given end
+    /// interpolation of given end
     Interpolation interpolateEnd(FiberEnd) const;
 
-    /// interpolation representing the mid-point between the two ends
+    /// interpolation of the mid-point between the two ends
     Interpolation interpolateCenter() const;
 
     /// interpolation of the site specified by its distance from the ORIGIN

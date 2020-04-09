@@ -433,8 +433,8 @@ void FiberProp::read(Glossary& glos)
     glos.set(squeeze_range,     "squeeze", 2);
 #endif
 #if NEW_END_FORCE
-    glos.set(end_force,         "end_force", 1);
-    glos.set(end_force_mode,    "end_force", {{"off", NO_END}, {"plus_end", PLUS_END},
+    glos.set(end_force,         "end_force");
+    glos.set(end_force_mode,    "end_force", 1, {{"off", NO_END}, {"plus_end", PLUS_END},
         {"minus_end", MINUS_END}, {"center", CENTER}, {"torque", BOTH_ENDS}});
 #endif
 
