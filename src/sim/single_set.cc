@@ -618,10 +618,13 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
     if ( res )
     {
         uniReserves.resize(last+1);
+        for ( SingleReserve & reserve : uniReserves )
+            reserve.first = nullptr;
         for ( Property const* i : allprop )
         {
             SingleProp const* p = static_cast<SingleProp const*>(i);
-            uniReserves[p->number()].first = p;
+            if ( p->fast_diffusion )
+                uniReserves[p->number()].first = p;
         }
     }
     
