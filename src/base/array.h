@@ -7,6 +7,14 @@
 #include "random.h"
 #include <iostream>
 
+
+/**
+ set to 1 if Array is expected to hold more than UINT32_MAX elements.
+ This is 4 294 967 295, a huge number!
+ */
+#define HANDLE_HUGE_ARRAYS 0
+
+
 /** 
  Array<typename VAL> stores objects of class VAL.
  
@@ -147,8 +155,8 @@ public:
         return *this;
     }
     
-    
 #pragma mark -
+    
     /// Number of objects
     size_t size() const
     {
@@ -208,12 +216,14 @@ public:
     /// return element at index 0
     VAL const& front() const
     {
+        assert_true( 0 < nbo_ );
         return val_[0];
     }
     
     /// return last element
     VAL const& back() const
     {
+        assert_true( 0 < nbo_ );
         return val_[nbo_-1];
     }
 
@@ -248,9 +258,9 @@ public:
     }
     
     /// Allocate and set new values to `zero`
-    size_t allocate_zero(const size_t size, VAL const& zero)
+    size_t allocate_zero(const size_t arg, VAL const& zero)
     {
-        size_t res = allocate(size);
+        size_t res = allocate(arg);
         if ( res )
         {
             //set the newly allocated memory to zero
@@ -260,22 +270,21 @@ public:
         return res;
     }
     
-    /// truncate Array to a smaller size
-    void truncate(const size_t size)
+    /// Reduce size to min(arg, actual_size), keeping elements starting from index 0
+    void truncate(const size_t arg)
     {
-        if ( size < nbo_ )
-            nbo_ = size;
+        nbo_ = std::min(arg, nbo_);
     }
     
-    /// Set the size of this Array to `size` (allocate or truncate if necessary)
-    void resize(const size_t size)
+    /// Set size to `arg`, allocating if necessary
+    void resize(const size_t arg)
     {
-        if ( size < nbo_ )
-            nbo_ = size;
-        else if ( size > nbo_ )
+        if ( arg < nbo_ )
+            nbo_ = arg;
+        else if ( arg > nbo_ )
         {
-            allocate(size);
-            nbo_ = size;
+            allocate(arg);
+            nbo_ = arg;
         }
     }
     
@@ -329,11 +338,11 @@ public:
     }
     
     /// Add `np` at the end of this Array
-    void push_back(const VAL& np)
+    void push_back(VAL const& v)
     {
         if ( nbo_ >= alc_ )
             reallocate(chunked(nbo_+1));
-        val_[nbo_++] = np;
+        val_[nbo_++] = v;
     }
     
     /// remove last element
@@ -352,11 +361,11 @@ public:
     }
     
     /// Add the elements of `array` at the end of this Array
-    void append_except(const Array<VAL> array, const VAL& val)
+    void append_except(const Array<VAL> array, VAL const& v)
     {
         allocate(nbo_+array.nbo_);
         for ( size_t ii = 0; ii < array.nbo_; ++ii )
-            if ( array.val_[ii] != val )
+            if ( array.val_[ii] != v )
                 val_[nbo_++] = array.val_[ii];
     }
 
@@ -388,7 +397,7 @@ public:
 #pragma mark -
     
     /// set `np` at any position equal to `zero`, or at the end of the array
-    void push_pack(const VAL np, const VAL& zero)
+    void push_pack(const VAL np, VAL const& zero)
     {
         assert_true( val_ || nbo_==0 );
         for ( size_t ii = 0; ii < nbo_; ++ii )
@@ -404,24 +413,24 @@ public:
 
     
     /// Returns the number of occurence of 'val' in the array
-    size_t count(VAL const& val) const
+    size_t count(VAL const& v) const
     {
         if ( !val_ || nbo_==0 )
             return 0;
         size_t res = 0;
         for ( size_t ii = 0; ii < nbo_; ++ii )
-            if ( val_[ii] == val ) ++res;
+            if ( val_[ii] == v ) ++res;
         return res;
     }
 
     /// Number of values which are different from `val` in the array
-    size_t count_except(VAL const& val) const
+    size_t count_except(VAL const& v) const
     {
         if ( val_ == 0 || nbo_==0 )
             return 0;
         size_t res = 0;
         for ( size_t ii = 0; ii < nbo_; ++ii )
-            if ( val_[ii] != val ) ++res;
+            if ( val_[ii] != v ) ++res;
         return res;
     }
 
@@ -483,7 +492,11 @@ public:
     VAL& pick_one()
     {
         assert_true(nbo_>0);
+#if HANDLE_HUGE_ARRAYS
         return val_[RNG.plong(nbo_)];
+#else
+        return val_[RNG.pint(nbo_)];
+#endif
     }
 
     /// Move the last Object on top, push all other values down by one slot
@@ -512,8 +525,13 @@ public:
     void permute()
     {
         assert_true(val_);
+#if HANDLE_HUGE_ARRAYS
         size_t ii = RNG.plong(nbo_);
         size_t jj = RNG.plong(nbo_);
+#else
+        size_t ii = RNG.pint(nbo_);
+        size_t jj = RNG.pint(nbo_);
+#endif
         if ( ii != jj )
             swap(val_+ii, val_+jj);
     }
@@ -558,10 +576,15 @@ public:
 
     void shuffle()
     {
+#if HANDLE_HUGE_ARRAYS
+        assert_true( nbo_ < UINT32_MAX );
+        shuffle32();
+#else
         if ( nbo_ > UINT32_MAX )
             shuffle64();
         else
             shuffle32();
+#endif
     }
 
 };
