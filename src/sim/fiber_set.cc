@@ -440,6 +440,10 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
  The number of sites returned on a section of length `L` is  `L / spread`.
  `spread` is thus the average distance between sites.
  
+ Because the list of fiber is regularly shuffled, the sites will consider fibers
+ in a random order. However, the sites on one fiber will be listed in the order
+ of increasing abscissa.
+ 
  Condition: ( spread > 0 )
  */
 void FiberSet::uniFiberSites(Array<FiberSite>& res, const real spread) const
@@ -572,10 +576,16 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
 }
 
 /**
- Set a list of Locations near the tip of the fibers, on sections that were recently assembled.
- This relies on Fiber::freshAssembly() returning the length of polymer made in the last time_step
- The number of binding sites returned will thus be proportional to simul:time_step
+ Set a list of Locations on fibers, on sections that were recently assembled at
+ the PLUS_END. This relies on Fiber::freshAssemblyP() returning the length of
+ polymer made in the last time step.
+ The number of locations returned will be proportional to the total length of
+ new polymer recently made, and thus proportional to simul:time_step.
  
+ Because the list of fiber is regularly shuffled, the sites will consider fibers
+ in a random order. However, the sites on one fiber will be listed in the order
+ of increasing abscissa.
+
  This is for the PLUS_END
  */
 void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
@@ -600,10 +610,16 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
 
 
 /**
- Set a list of Locations near the tip of the fibers, on sections that were recently assembled.
- This relies on Fiber::freshAssembly() returning the length of polymer made in the last time_step
- The number of binding sites returned will thus be proportional to simul:time_step
+ Set a list of Locations on fibers, on sections that were recently assembled at
+ the MINUS_END. This relies on Fiber::freshAssemblyM() returning the length of
+ polymer made in the last time step.
+ The number of locations returned will be proportional to the total length of
+ new polymer recently made, and thus proportional to simul:time_step.
  
+ Because the list of fiber is regularly shuffled, the sites will consider fibers
+ in a random order. However, the sites on one fiber will be listed in the order
+ of increasing abscissa.
+
  This is for the MINUS_END
  */
 void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real spread) const

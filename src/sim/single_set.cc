@@ -473,16 +473,33 @@ void SingleSet::removeWrists(Object const* arg)
 #pragma mark - Fast Diffusion
 
 
+/// create enough candidates to bind to all sites:
+void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
+{
+    for ( size_t i = can.size(); i < cnt; ++i )
+    {
+        Single* s = p->newSingle();
+        inventory.assign(s);
+        can.push_back(s);
+    }
+}
+
+
 /**
  Distribute Singles on the sites specified in `loc`.
  */
-void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& list)
+void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
 {
+    // crop list to match available number of candidates:
+    if ( can.size() < loc.size() )
+    {
+        loc.shuffle();
+        loc.truncate(can.size());
+    }
+    
     for ( FiberSite & i : loc )
     {
-        if ( list.empty() )
-            return;
-        Single * s = list.back();
+        Single * s = can.back();
         Hand const* h = s->hand();
         
         if ( h->attachmentAllowed(i) )
@@ -512,12 +529,15 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& list)
                  Place the Single in the line perpendicular to the attachment point,
                  at a random distance within the range of attachment of the Hand.
                  This simulates a uniform spatial distribution of Single.
+                 
+                 This is important for certain Single such as Picket and PicketLong,
+                 since they act as link between the anchoring position and the Hand.
                  */
                 pos += i.dirFiber().randOrthoB(h->prop->binding_range);
 #endif
             }
 
-            list.pop_back();
+            can.pop_back();
             s->setPosition(pos);
             s->attach(i);
             link(s);
@@ -571,13 +591,18 @@ void SingleSet::uniAttach(FiberSet const& fibers)
     for ( SingleReserve & reserve : uniReserves )
     {
         SingleProp const* p = reserve.first;
-        const size_t cnt = reserve.second.size();
+        if ( p == nullptr )
+            continue;
+        
+        const real vol = p->spaceVolume();
+        SingleList& can = reserve.second;
+        
+        bool fixed = ( p->fast_diffusion & 4 );
+        size_t cnt = ( fixed ? p->fast_diffusion_nb : can.size());
 
-        if (( p != nullptr ) & ( cnt > 0 ))
+        if ( cnt > 0 )
         {
-            const real vol = p->spaceVolume();
-            
-            if ( p->fast_diffusion == 2 )
+            if ( p->fast_diffusion & 2 )
             {
                 real dis = vol / ( cnt * p->hand_prop->bindingSectionRate() );
                 fibers.newFiberSitesP(loc, dis);
@@ -588,7 +613,10 @@ void SingleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            uniAttach(loc, reserve.second);
+            if ( fixed & ( can.size() < loc.size() ))
+                uniRefill(can, loc.size(), p);
+
+            uniAttach(loc, can);
         }
     }
 }

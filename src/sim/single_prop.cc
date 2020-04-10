@@ -81,6 +81,7 @@ void SingleProp::clear()
     length            = 0;
     diffusion         = 0;
     fast_diffusion    = false;
+    fast_diffusion_nb = 0;
 #if NEW_MOBILE_SINGLE
     speed.reset();
 #endif
@@ -102,6 +103,7 @@ void SingleProp::read(Glossary& glos)
     else
         glos.set(diffusion,  "diffusion");
     glos.set(fast_diffusion, "fast_diffusion");
+    glos.set(fast_diffusion_nb, "fast_diffusion", 1);
 #if NEW_MOBILE_SINGLE
     glos.set(speed,          "speed");
 #endif
@@ -188,7 +190,7 @@ void SingleProp::write_values(std::ostream& os) const
     write_value(os, "stiffness",      stiffness);
     write_value(os, "length",         length);
     write_value(os, "diffusion",      diffusion);
-    write_value(os, "fast_diffusion", fast_diffusion);
+    write_value(os, "fast_diffusion", fast_diffusion, fast_diffusion_nb);
 #if NEW_MOBILE_SINGLE
     write_value(os, "speed",          speed);
 #endif

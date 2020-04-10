@@ -75,6 +75,9 @@ public:
      */
     int          fast_diffusion;
     
+    /// number of candidates for binding considered for `fast_diffusion`
+    size_t       fast_diffusion_nb;
+
 #if NEW_MOBILE_SINGLE
     /// constant drift
     Vector       speed;

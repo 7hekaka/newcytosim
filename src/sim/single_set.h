@@ -49,6 +49,9 @@ private:
     /// initialize couple:fast_diffusion attachment algorithm
     bool          uniPrepare(PropertyList const& properties);
     
+    /// add 'cnt' new Single to given list
+    void          uniRefill(SingleList&, size_t, SingleProp const*);
+
     /// distribute Singles to fiber with average distance `spread`
     void          uniAttach(Array<FiberSite>&, SingleList&);
     
