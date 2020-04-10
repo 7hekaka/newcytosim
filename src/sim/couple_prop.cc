@@ -36,6 +36,7 @@ void CoupleProp::clear()
     length            = 0;
     diffusion         = 0;
     fast_diffusion    = false;
+    fast_diffusion_nb = 0;
     trans_activated   = 0;
     stiff             = true;
     specificity       = BIND_ALWAYS;
@@ -58,8 +59,9 @@ void CoupleProp::read(Glossary& glos)
     if ( glos.value_is("diffusion", 0, "fast") )
         fast_diffusion = 1;
     else
-        glos.set(diffusion,       "diffusion");
+        glos.set(diffusion,   "diffusion");
     glos.set(fast_diffusion,  "fast_diffusion");
+    glos.set(fast_diffusion_nb, "fast_diffusion", 1);
     
     glos.set(trans_activated, "trans_activated");
     glos.set(stiff,           "stiff");
@@ -162,7 +164,7 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "stiffness",       stiffness);
     write_value(os, "length",          length);
     write_value(os, "diffusion",       diffusion);
-    write_value(os, "fast_diffusion",  fast_diffusion);
+    write_value(os, "fast_diffusion",  fast_diffusion, fast_diffusion_nb);
     write_value(os, "trans_activated", trans_activated);
     write_value(os, "stiff",           stiff);
     write_value(os, "specificity",     specificity);

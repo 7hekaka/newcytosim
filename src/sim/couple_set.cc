@@ -612,20 +612,36 @@ int CoupleSet::bad() const
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
 
+/// create enough candidates to bind to all sites:
+void CoupleSet::uniRefill(CoupleList& can, size_t cnt, CoupleProp const* p)
+{
+    for ( size_t i = can.size(); i < cnt; ++i )
+    {
+        Couple* c = p->newCouple();
+        inventory.assign(c);
+        can.push_back(c);
+    }
+}
+
 
 /**
 Distribute Hand1 of Couples on the sites specified in `loc`.
  */
-void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& list)
+void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& can)
 {
+    // crop list to match available number of candidates:
+    if ( can.size() < loc.size() )
+    {
+        loc.shuffle();
+        loc.truncate(can.size());
+    }
+
     for ( FiberSite & i : loc )
     {
-        if ( list.empty() )
-            return;
-        Couple * c = list.back();
+        Couple * c = can.back();
         if ( c->hand1()->attachmentAllowed(i) )
         {
-            list.pop_back();
+            can.pop_back();
             c->attach1(i);
             link(c);
         }
@@ -636,16 +652,21 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& list)
 /**
  Distribute Hand2 of Couples on the sites specified in `loc`.
  */
-void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& list)
+void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
 {
+    // crop list to match available number of candidates:
+    if ( can.size() < loc.size() )
+    {
+        loc.shuffle();
+        loc.truncate(can.size());
+    }
+
     for ( FiberSite & i : loc )
     {
-        if ( list.empty() )
-            return;
-        Couple * c = list.back();
+        Couple * c = can.back();
         if ( c->hand2()->attachmentAllowed(i) )
         {
-            list.pop_back();
+            can.pop_back();
             c->attach2(i);
             link(c);
         }
@@ -659,21 +680,31 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& list)
  as returned by FiberSet::allIntersections()
  */
 void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
-                            CoupleList& list, unsigned nb)
+                            CoupleList& can, size_t nb)
 {
-    size_t nbc = loc1.size();
-    for ( size_t n = 0; n < nb; ++n )
+    assert_true(loc1.size() == loc2.size());
+    
+    const size_t sup = std::min(nb, loc1.size());
+
+    // crop list to match available number of candidates:
+    if ( can.size() < sup )
     {
-        if ( list.empty() )
-            return;
-        Couple * c = list.back();
-        list.pop_back();
-        size_t p = RNG.plong(nbc);
-        c->attach1(loc1[p]);
-        c->attach2(loc2[p]);
+        loc1.shuffle();
+        loc2.shuffle();
+        loc1.truncate(sup);
+        loc2.truncate(sup);
+    }
+
+    for ( size_t n = 0; n < sup; ++n )
+    {
+        Couple * c = can.back();
+        can.pop_back();
+        c->attach1(loc1[n]);
+        c->attach2(loc2[n]);
         link(c);
     }
 }
+
 
 
 /**
@@ -728,13 +759,19 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
     for ( CoupleReserve & reserve : uniReserves )
     {
         CoupleProp const * p = reserve.first;
-        size_t cnt = reserve.second.size();
+        if ( p == nullptr )
+            continue;
+
+        CoupleList& can = reserve.second;
         
-        if (( p != nullptr ) & ( cnt > 0 ))
+        bool fixed = ( p->fast_diffusion & 4 );
+        size_t cnt = ( fixed ? p->fast_diffusion_nb : can.size());
+
+        if ( cnt > 0 )
         {
             const real alpha = 2 * p->spaceVolume() / cnt;
             
-            if ( p->fast_diffusion == 2 )
+            if ( p->fast_diffusion & 2 )
             {
                 real dis = alpha / p->hand1_prop->bindingSectionRate();
                 fibers.newFiberSitesP(loc, dis);
@@ -745,13 +782,15 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            uniAttach1(loc, reserve.second);
+            if ( fixed )
+                uniRefill(can, loc.size(), p);
+            uniAttach1(loc, can);
             
-            if ( reserve.second.empty() || p->trans_activated )
+            if ( p->trans_activated )
                 continue;
             
             // if ( couple:trans_activated == true ), Hand2 cannot bind
-            if ( p->fast_diffusion == 2 )
+            if ( p->fast_diffusion & 2 )
             {
                 real dis = alpha / p->hand2_prop->bindingSectionRate();
                 fibers.newFiberSitesP(loc, dis);
@@ -762,7 +801,9 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            uniAttach2(loc, reserve.second);
+            if ( fixed )
+                uniRefill(can, loc.size(), p);
+            uniAttach2(loc, can);
         }
     }
 }
@@ -850,8 +891,10 @@ void CoupleSet::uniRelax()
 # pragma mark - Equilibrate
 
 
-void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& list, CoupleProp const* cop)
+void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CoupleProp const* cop)
 {
+    Array<FiberSite> loc1(1024), loc2(1024);
+    
     if ( cop->hand1_prop != cop->hand2_prop )
         throw InvalidParameter("Cannot equilibrate heterogeneous Couple");
     
@@ -866,7 +909,6 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& list, CoupleP
     const real unbinding_rate = cop->hand1_prop->unbinding_rate;
     
     // get all crosspoints:
-    Array<FiberSite> loc1(1024), loc2(1024);
     fibers.allIntersections(loc1, loc2, binding_range);
     const size_t nb_crossings = loc1.size();
     //const real nb_crossings = square(total_length) / ( M_PI * space_volume );
@@ -879,7 +921,7 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& list, CoupleP
     real AsF = ( ratio_fibs - ratio_cros ) * bind;
     real GsF = ratio_cros * bind;
     
-    real popF = list.size() / ( 1 + AsF + GsF + BsG * GsF );
+    real popF = can.size() / ( 1 + AsF + GsF + BsG * GsF );
     real popA = AsF * popF;
     real popG = GsF * popF;
     real popB = BsG * popG;
@@ -896,20 +938,21 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& list, CoupleP
 #endif
     
     // create doubly-attached Couples at the crossing positions:
-    uniAttach12(loc1, loc2, list, RNG.poisson(popB));
+    
+    uniAttach12(loc1, loc2, can, RNG.poisson(popB));
     
     real dis = 2 * total_length / ( popA + popG );
 
-    if ( !list.empty() )
+    if ( !can.empty() )
     {
         fibers.uniFiberSites(loc1, dis);
-        uniAttach1(loc1, list);
+        uniAttach1(loc1, can);
     }
     
-    if ( !list.empty() )
+    if ( !can.empty() )
     {
         fibers.uniFiberSites(loc2, dis);
-        uniAttach2(loc2, list);
+        uniAttach2(loc2, can);
     }
 }
 
@@ -920,8 +963,9 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& list, CoupleP
  This assumes that the configuration of filaments does not change, and also that
  it is random, in particular without bundles. The motion of the motor is also ignored.
  */
-void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& list, CoupleProp const* cop)
+void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp const* cop)
 {
+    Array<FiberSite> loc1(1024), loc2(1024);
     if ( cop->trans_activated )
         throw InvalidParameter("Cannot equilibrate trans_activated Couple");
     
@@ -938,7 +982,6 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& list, CoupleProp
 
     
     // get all crosspoints:
-    Array<FiberSite> loc1(1024), loc2(1024);
     fibers.allIntersections(loc1, loc2, std::max(binding_range1, binding_range2));
     const size_t nb_crossings = loc1.size();
     
@@ -957,7 +1000,7 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& list, CoupleProp
     // the two should be equal
     real BsF = 0.5 * ( BsG1 * G1sF + BsG2 * G2sF );
 
-    real popF = list.size() / ( 1.0 + A1sF + A2sF + G1sF + G2sF + BsF );
+    real popF = can.size() / ( 1.0 + A1sF + A2sF + G1sF + G2sF + BsF );
     real popA1 = A1sF * popF;
     real popA2 = A2sF * popF;
     real popG1 = G1sF * popF;
@@ -976,20 +1019,20 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& list, CoupleProp
 #endif
 
     // create doubly-attached Couples at the crossing positions:
-    uniAttach12(loc1, loc2, list, RNG.poisson(popB));
+    uniAttach12(loc1, loc2, can, RNG.poisson(popB));
     
-    if ( !list.empty() )
+    if ( !can.empty() )
     {
         const real dis = total_length / ( popA1 + popG1 );
         fibers.uniFiberSites(loc1, dis);
-        uniAttach1(loc1, list);
+        uniAttach1(loc1, can);
     }
     
-    if ( !list.empty() )
+    if ( !can.empty() )
     {
         const real dis = total_length / ( popA2 + popG2 );
         fibers.uniFiberSites(loc2, dis);
-        uniAttach2(loc2, list);
+        uniAttach2(loc2, can);
     }
 }
 
@@ -1065,7 +1108,7 @@ void CoupleSet::connect(FiberSet const& fibers, PropertyList const& properties)
         while ( c )
         {
             nxt = c->next();
-            size_t p = RNG.plong(nb_crossings);
+            size_t p = RNG.pint(nb_crossings);
             c->attach1(loc1[p]);
             c->attach2(loc2[p]);
             c = nxt;

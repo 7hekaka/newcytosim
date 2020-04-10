@@ -99,7 +99,10 @@ public:
      `fast_diffusion` does not affect Couples in the attached state.
      */
     int          fast_diffusion;
-    
+
+    /// number of candidates for binding considered for `fast_diffusion`
+    size_t       fast_diffusion_nb;
+
     /// if ( trans_activated == 1 ), Hand2 is active only if Hand1 is bound
     /**
      Both Hands of a Couple are normally equally active. With this feature,

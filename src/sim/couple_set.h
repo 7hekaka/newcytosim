@@ -73,6 +73,9 @@ private:
     /// initialize couple:fast_diffusion attachment algorithm
     bool          uniPrepare(PropertyList const& properties);
     
+    /// add 'cnt' new Couple to given list
+    void          uniRefill(CoupleList&, size_t, CoupleProp const*);
+
     /// attach Hand1 of Couple on locations specified by first argument
     void          uniAttach1(Array<FiberSite>&, CoupleList&);
     
@@ -80,8 +83,8 @@ private:
     void          uniAttach2(Array<FiberSite>&, CoupleList&);
     
     /// attach both Hands of `nb` Couple at crossing points specified by first argument
-    void          uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, unsigned nb);
-    
+    void          uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, size_t nb);
+
     /// couple:fast_diffusion attachment algorithm; assumes free Couples are uniformly distributed
     void          uniAttach(FiberSet const&);
     
