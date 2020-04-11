@@ -71,7 +71,7 @@ private:
     bool          uniPrepare(PropertyList const& properties);
     
     /// gather all Couple with `fast_diffusion` in reserve lists
-    void          uniCollect();
+    Couple*       uniCollect(Couple*);
 
     /// add new Couple to given list
     void          uniRefill(CoupleList&, size_t, CoupleProp const*);

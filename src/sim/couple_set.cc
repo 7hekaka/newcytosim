@@ -164,27 +164,33 @@ void CoupleSet::step()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        uniCollect();
+        obj = uniCollect(ffHead);
         uniAttach(simul.fibers);
-        return;
+        while ( obj )
+        {
+            nxt = obj->next();
+            obj->stepFF(simul);
+            obj = nxt;
+        }
     }
-    
-    //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << std::endl;
-
-    obj = ffHead;
-    // this loop is unrolled, processing objects 2 by 2:
-    if ( ffOdd )
+    else
     {
-        nxt = obj->next();
-        obj->stepFF(simul);
-        obj = nxt;
-    }
-    while ( obj )
-    {
-        nxt = obj->next();
-        obj->stepFF(simul);
-        obj = nxt->next();
-        nxt->stepFF(simul);
+        //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << std::endl;
+        // this loop is unrolled, processing objects 2 by 2:
+        obj = ffHead;
+        if ( ffOdd )
+        {
+            nxt = obj->next();
+            obj->stepFF(simul);
+            obj = nxt;
+        }
+        while ( obj )
+        {
+            nxt = obj->next();
+            obj->stepFF(simul);
+            obj = nxt->next();
+            nxt->stepFF(simul);
+        }
     }
 }
 
@@ -845,23 +851,29 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
 
 
 /**
- Transfer free Couple with `fast_diffusion` to the reserves
+ Transfer free Couple with `fast_diffusion` to the reserves, starting from `obj`.
+ Return first Couple that was not transferred.
 */
-void CoupleSet::uniCollect()
+Couple* CoupleSet::uniCollect(Couple * obj)
 {
-    Couple * obj = firstFF(), * nxt;
+    Couple * res = nullptr;
+    Couple * nxt;
     while ( obj )
     {
         nxt = obj->next();
         CoupleProp const* p = static_cast<CoupleProp const*>(obj->property());
         if ( p->fast_diffusion )
         {
-            unlink(obj);
+            ffList.pop(obj);
+            obj->objset(nullptr);
             assert_true(p->number() < uniReserves.size());
             uniReserves[p->number()].second.push_back(obj);
         }
+        else if ( !res )
+            res = obj;
         obj = nxt;
     }
+    return res;
 }
 
 

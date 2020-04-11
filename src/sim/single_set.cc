@@ -56,12 +56,12 @@ void SingleSet::step()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        uniCollect();
+        obj = uniCollect(fHead);
         uniAttach(simul.fibers);
-        return;
     }
+    else
+        obj = fHead;
     
-    obj = fHead;
     while ( obj )
     {
         nxt = obj->next();
@@ -650,23 +650,29 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
 
 
 /**
-Transfer free Single with `fast_diffusion` to the reserves
+ Transfer free Single with `fast_diffusion` to the reserves, starting from `obj`.
+ Return first Single that was not transferred
 */
-void SingleSet::uniCollect()
+Single* SingleSet::uniCollect(Single * obj)
 {
-    Single * obj = firstF(), * nxt;
+    Single * res = nullptr;
+    Single * nxt;
     while ( obj )
     {
         nxt = obj->next();
         SingleProp const* p = obj->prop;
         if ( p->fast_diffusion )
         {
-            unlink(obj);
+            fList.pop(obj);
+            obj->objset(nullptr);
             assert_true(p->number() < uniReserves.size());
             uniReserves[p->number()].second.push_back(obj);
         }
+        else if ( !res )
+            res = obj;
         obj = nxt;
     }
+    return res;
 }
 
 

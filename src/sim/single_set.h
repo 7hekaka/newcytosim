@@ -50,7 +50,7 @@ private:
     bool          uniPrepare(PropertyList const& properties);
     
     /// gather all Single with `fast_diffusion` in reserve lists
-    void          uniCollect();
+    Single*       uniCollect(Single*);
 
     /// add new Single to given list
     void          uniRefill(SingleList&, size_t, SingleProp const*);
