@@ -43,28 +43,31 @@ private:
     /// uniReserves[p] contains the Single with ( property()->number() == p ) that are diffusing
     SingleReserveList uniReserves;
     
-    /// flag to enable couple:fast_diffusion attachment algorithm
-    bool          uni;
-    
-    /// initialize couple:fast_diffusion attachment algorithm
+    /// flag to enable `fast_diffusion` attachment algorithm
+    bool          uniEnabled;
+
+    /// initialize `fast_diffusion` attachment algorithm
     bool          uniPrepare(PropertyList const& properties);
     
-    /// add 'cnt' new Single to given list
+    /// gather all Single with `fast_diffusion` in reserve lists
+    void          uniCollect();
+
+    /// add new Single to given list
     void          uniRefill(SingleList&, size_t, SingleProp const*);
 
-    /// distribute Singles to fiber with average distance `spread`
-    void          uniAttach(Array<FiberSite>&, SingleList&);
+    /// attach Singles from `can` on locations specified in `loc`
+    void          uniAttach(Array<FiberSite>& can, SingleList& loc);
     
-    /// couple:fast_diffusion attachment algorithm; assumes free Singles are uniformly distributed
+    /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
     void          uniAttach(FiberSet const&);
     
-    /// return Couples in uniReserves to the normal lists
+    /// release Single from reserve lists
     void          uniRelax();
 
 public:
         
     ///creator
-    SingleSet(Simul& s) : ObjectSet(s) {}
+    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(false) {}
     
     //--------------------------
 

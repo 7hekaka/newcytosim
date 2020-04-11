@@ -81,19 +81,12 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 
 void CoupleSet::prepare(PropertyList const& properties)
 {
-    uni = uniPrepare(properties);
+    uniEnabled = uniPrepare(properties);
 }
 
 
 void CoupleSet::step()
 {
-    // use alternative attachment strategy:
-    if ( uni )
-    {
-        uniCollect();
-        uniAttach(simul.fibers);
-    }
-
     /*
      ATTENTION: We ensure here that step() is called exactly once for each object.
      The Couples are stored in multiple lists, and are automatically transfered
@@ -166,6 +159,14 @@ void CoupleSet::step()
         obj->stepAF(simul);
         obj = nxt->next();
         nxt->stepAF(simul);
+    }
+    
+    // use alternative attachment strategy:
+    if ( uniEnabled )
+    {
+        uniCollect();
+        uniAttach(simul.fibers);
+        return;
     }
     
     //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << std::endl;
@@ -625,7 +626,8 @@ void CoupleSet::uniRefill(CoupleList& can, size_t cnt, CoupleProp const* p)
 
 
 /**
-Distribute Hand1 of Couples on the sites specified in `loc`.
+ Attach Hand1 of exactly one Couple from `can` to each site in `loc`.
+ If `can` is not large enough, a subset of `loc` is selected.
  */
 void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& can)
 {
@@ -650,7 +652,8 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& can)
 
 
 /**
- Distribute Hand2 of Couples on the sites specified in `loc`.
+ Attach Hand2 of exactly one Couple from `can` to each site in `loc`.
+ If `can` is not large enough, a subset of `loc` is selected.
  */
 void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
 {
@@ -675,32 +678,26 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
 
 
 /**
- Distribute Couples on crossing points specified in `loc`.
- `loc` contains positions on the fibers corresponding to crossing points
- as returned by FiberSet::allIntersections()
+ Distribute up to `nb` Couples from `can` by attaching them to locations specified
+ by `loc1` and `loc2`. These positions correspond to points where 2 fibers cross,
+ as returned by FiberSet::allIntersections().
  */
 void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
                             CoupleList& can, size_t nb)
 {
     assert_true(loc1.size() == loc2.size());
     
-    const size_t sup = std::min(nb, loc1.size());
-
-    // crop list to match available number of candidates:
-    if ( can.size() < sup )
-    {
-        loc1.shuffle();
-        loc2.shuffle();
-        loc1.truncate(sup);
-        loc2.truncate(sup);
-    }
+    const size_t nbc = loc1.size();
+    const size_t sup = std::min(nb, can.size());
 
     for ( size_t n = 0; n < sup; ++n )
     {
         Couple * c = can.back();
         can.pop_back();
-        c->attach1(loc1[n]);
-        c->attach2(loc2[n]);
+        // pick a random point to attach:
+        size_t p = RNG.pint(nbc);
+        c->attach1(loc1[p]);
+        c->attach2(loc2[p]);
         link(c);
     }
 }
@@ -848,7 +845,7 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
 
 
 /**
- Transfer free complex that fast-diffuse to the reserve lists
+ Transfer free Couple with `fast_diffusion` to the reserves
 */
 void CoupleSet::uniCollect()
 {
@@ -869,8 +866,7 @@ void CoupleSet::uniCollect()
 
 
 /**
- empty uniReserves, reversing all Couples in the normal lists.
- This is useful if ( couple:fast_diffusion == true )
+ Release all Couples from the reserves
  */
 void CoupleSet::uniRelax()
 {
@@ -904,6 +900,9 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
     const real space_volume = cop->spaceVolume();
     const real total_length = fibers.totalLength();
 
+    if ( space_volume <= 0 )
+        throw InvalidParameter("Cannot equilibrate as Space:volume == 0");
+    
     const real binding_rate = cop->hand1_prop->binding_rate;
     const real binding_range = cop->hand1_prop->binding_range;
     const real unbinding_rate = cop->hand1_prop->unbinding_rate;
@@ -916,6 +915,10 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
     const real ratio_fibs = 2 * total_length * binding_range / space_volume;
     const real ratio_cros = 4 * M_PI * nb_crossings * square(binding_range) / space_volume;
     
+    /*
+     The different states are defined in Belmonte et al. 2017, supplementary:
+     Free, Bridge, Attached in location that cannot bridge, G=Attached near crosspoint
+     */
     real bind = binding_rate / unbinding_rate;
     real BsG = bind / 2;
     real AsF = ( ratio_fibs - ratio_cros ) * bind;
@@ -937,20 +940,16 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
     printf("     F %9.2f A %9.2f G %9.2f B %9.2f\n", popF, popA, popG, popB);
 #endif
     
-    // create doubly-attached Couples at the crossing positions:
-    
-    uniAttach12(loc1, loc2, can, RNG.poisson(popB));
-    
-    real dis = 2 * total_length / ( popA + popG );
-
     if ( !can.empty() )
     {
+        // distribute Couples at filament's crosspoints:
+        uniAttach12(loc1, loc2, can, RNG.poisson(popB));
+
+        real dis = 2 * total_length / ( popA + popG );
+
         fibers.uniFiberSites(loc1, dis);
         uniAttach1(loc1, can);
-    }
     
-    if ( !can.empty() )
-    {
         fibers.uniFiberSites(loc2, dis);
         uniAttach2(loc2, can);
     }
@@ -971,6 +970,9 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
     
     const real space_volume = cop->spaceVolume();
     const real total_length = fibers.totalLength();
+    
+    if ( space_volume <= 0 )
+        throw InvalidParameter("Cannot equilibrate as Space:volume == 0");
 
     const real binding_rate1 = cop->hand1_prop->binding_rate;
     const real binding_range1 = cop->hand1_prop->binding_range;
@@ -980,7 +982,6 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
     const real binding_range2 = cop->hand2_prop->binding_range;
     const real unbinding_rate2 = cop->hand2_prop->unbinding_rate;
 
-    
     // get all crosspoints:
     fibers.allIntersections(loc1, loc2, std::max(binding_range1, binding_range2));
     const size_t nb_crossings = loc1.size();
@@ -990,6 +991,10 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
     const real ratio_cros1 = 4 * M_PI * nb_crossings * square(binding_range1) / space_volume;
     const real ratio_cros2 = 4 * M_PI * nb_crossings * square(binding_range2) / space_volume;
     
+    /*
+     The different states are defined in Belmonte et al. 2017, supplementary:
+     Free, Bridge, Attached in location that cannot bridge, G=Attached near crosspoint
+     */
     real BsG1 = binding_rate1 / unbinding_rate1;
     real BsG2 = binding_rate2 / unbinding_rate2;
     real A1sF = ( ratio_fibs1 - ratio_cros1 ) * BsG1 / 2;
@@ -1017,27 +1022,24 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
     printf("     nb_crossings predicted  %9.2f   true %9i\n", nbc, nb_crossings);
     printf("     F %9.2f A %9.2f G %9.2f B %9.2f\n", popF, popA1+popA2, popG1+popG2, popB);
 #endif
+    
+    if ( !can.empty() )
+    {
+        // distribute Couples at filament's crosspoints:
+        uniAttach12(loc1, loc2, can, RNG.poisson(popB));
 
-    // create doubly-attached Couples at the crossing positions:
-    uniAttach12(loc1, loc2, can, RNG.poisson(popB));
-    
-    if ( !can.empty() )
-    {
-        const real dis = total_length / ( popA1 + popG1 );
-        fibers.uniFiberSites(loc1, dis);
+        const real dis1 = total_length / ( popA1 + popG1 );
+        fibers.uniFiberSites(loc1, dis1);
         uniAttach1(loc1, can);
-    }
-    
-    if ( !can.empty() )
-    {
-        const real dis = total_length / ( popA2 + popG2 );
-        fibers.uniFiberSites(loc2, dis);
+
+        const real dis2 = total_length / ( popA2 + popG2 );
+        fibers.uniFiberSites(loc2, dis2);
         uniAttach2(loc2, can);
     }
 }
 
 /**
-Distributes Couples for which `trans_activated==true` on the filaments
+Distributes Couples for which `trans_activated!=true` on the filaments
 */
 void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properties)
 {
@@ -1048,7 +1050,7 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
         
         if ( !cop->trans_activated )
         {
-            CoupleList list;
+            CoupleList can;
             
             // collect all Couple of this kind:
             Couple * c = firstFF(), * nxt;
@@ -1058,18 +1060,18 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
                 if ( c->property() == cop )
                 {
                     unlink(c);
-                    list.push_back(c);
+                    can.push_back(c);
                 }
                 c = nxt;
             }
-            if ( list.size() > 0 )
+            if ( can.size() > 0 )
             {
-                equilibrate(fibers, list, cop);
+                equilibrate(fibers, can, cop);
                 
                 // release all collected Couple
-                for ( Couple * cx : list )
+                for ( Couple * cx : can )
                     link(cx);
-                list.clear();
+                can.clear();
             }
         }
     }

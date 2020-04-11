@@ -24,16 +24,12 @@ Property* SingleSet::newProperty(const std::string& cat, const std::string& nom,
 
 void SingleSet::prepare(PropertyList const& properties)
 {
-    uni = uniPrepare(properties);
+    uniEnabled = uniPrepare(properties);
 }
 
 
 void SingleSet::step()
 {
-    // use alternate attachment strategy:
-    if ( uni )
-        uniAttach(simul.fibers);
-
     /*
      ATTENTION: we have multiple lists, and Objects are automatically transfered
      from one list to another if their Hands bind or unbind. We ensure here that
@@ -43,7 +39,6 @@ void SingleSet::step()
      */
     
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
-    
     
     Single *const fHead = firstF();
     Single * obj, * nxt;
@@ -56,6 +51,14 @@ void SingleSet::step()
         if ( ! nxt ) break;
         obj = nxt->next();
         nxt->stepA();
+    }
+    
+    // use alternative attachment strategy:
+    if ( uniEnabled )
+    {
+        uniCollect();
+        uniAttach(simul.fibers);
+        return;
     }
     
     obj = fHead;
@@ -486,7 +489,8 @@ void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
 
 
 /**
- Distribute Singles on the sites specified in `loc`.
+ Attach exactly one Single from `can` to each site in `loc`.
+ If `can` is not large enough, a subset of `loc` is selected.
  */
 void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
 {
@@ -570,21 +574,6 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
  */
 void SingleSet::uniAttach(FiberSet const& fibers)
 {
-    // transfer free Single that fast-diffuse to the reserve
-    Single * obj = firstF(), * nxt;
-    while ( obj )
-    {
-        nxt = obj->next();
-        SingleProp const* p = obj->prop;
-        if ( p->fast_diffusion )
-        {
-            unlink(obj);
-            assert_true(p->number() < uniReserves.size());
-            uniReserves[p->number()].second.push_back(obj);
-        }
-        obj = nxt;
-    }
-    
     Array<FiberSite> loc(1024);
     
     // uniform attachment for the reserves:
@@ -661,9 +650,29 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
 
 
 /**
- empty uniReserves, reversing all Singles in the normal lists.
- This is useful if ( single:fast_diffusion == true )
- */
+Transfer free Single with `fast_diffusion` to the reserves
+*/
+void SingleSet::uniCollect()
+{
+    Single * obj = firstF(), * nxt;
+    while ( obj )
+    {
+        nxt = obj->next();
+        SingleProp const* p = obj->prop;
+        if ( p->fast_diffusion )
+        {
+            unlink(obj);
+            assert_true(p->number() < uniReserves.size());
+            uniReserves[p->number()].second.push_back(obj);
+        }
+        obj = nxt;
+    }
+}
+
+
+/**
+Release all Singles from the reserves
+*/
 void SingleSet::uniRelax()
 {
     for ( SingleReserve & reserve : uniReserves )

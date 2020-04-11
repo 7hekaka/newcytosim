@@ -64,37 +64,37 @@ private:
     /// uniReserves[p] contains the Couples with ( property()->number() == p ) that are diffusing
     CoupleReserveList uniReserves;
     
-    /// flag to enable couple:fast_diffusion attachment algorithm
-    bool          uni;
+    /// flag to enable `fast_diffusion` attachment algorithm
+    bool          uniEnabled;
     
-    /// gather all Couple with fast_diffusion in dedicated lists
-    void          uniCollect();
-    
-    /// initialize couple:fast_diffusion attachment algorithm
+    /// initialize `fast_diffusion` attachment algorithm
     bool          uniPrepare(PropertyList const& properties);
     
-    /// add 'cnt' new Couple to given list
+    /// gather all Couple with `fast_diffusion` in reserve lists
+    void          uniCollect();
+
+    /// add new Couple to given list
     void          uniRefill(CoupleList&, size_t, CoupleProp const*);
 
-    /// attach Hand1 of Couple on locations specified by first argument
-    void          uniAttach1(Array<FiberSite>&, CoupleList&);
+    /// attach Hand1 of Couple from `can` on locations specified in `loc`
+    void          uniAttach1(Array<FiberSite>& loc, CoupleList& can);
     
-    /// attach Hand2 of Couple on locations specified by first argument
-    void          uniAttach2(Array<FiberSite>&, CoupleList&);
+    /// attach Hand2 of Couple from `can` on locations specified in `loc`
+    void          uniAttach2(Array<FiberSite>& loc, CoupleList& can);
     
     /// attach both Hands of `nb` Couple at crossing points specified by first argument
     void          uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, size_t nb);
 
-    /// couple:fast_diffusion attachment algorithm; assumes free Couples are uniformly distributed
+    /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
     void          uniAttach(FiberSet const&);
     
-    /// return Couples in uniReserves to the normal lists
+    /// release Couples from reserve lists
     void          uniRelax();
     
 public:
     
     ///creator
-    CoupleSet(Simul& s) : ObjectSet(s), uni(false) {}
+    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(false) {}
     
     //--------------------------
     
