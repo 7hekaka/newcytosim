@@ -9,18 +9,6 @@
 #include "wrist_long.h"
 
 //------------------------------------------------------------------------------
-/**
- @copydetails SingleGroup
- */
-Property* SingleSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
-{
-    if ( cat == "single" )
-        return new SingleProp(nom);
-    else
-        return nullptr;
-}
-
-//------------------------------------------------------------------------------
 
 void SingleSet::prepare(PropertyList const& properties)
 {
@@ -75,6 +63,17 @@ void SingleSet::step()
 
 //------------------------------------------------------------------------------
 #pragma mark -
+
+/**
+ @copydetails SingleGroup
+ */
+Property* SingleSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
+{
+    if ( cat == "single" )
+        return new SingleProp(nom);
+    else
+        return nullptr;
+}
 
 
 Object * SingleSet::newObject(const ObjectTag tag, size_t num)
@@ -307,22 +306,21 @@ void SingleSet::write(Outputter& out) const
 int SingleSet::bad() const
 {
     int code = 0;
-    Single * ghi;
-    code = fList.bad();
-    if ( code ) return code;
-    for ( ghi = firstF(); ghi ; ghi=ghi->next() )
+    Single * obj;
+    
+    code |= fList.bad();
+    for ( obj = firstF(); obj ; obj=obj->next() )
     {
-        if ( ghi->attached() ) return 100;
+        if ( obj->attached() )
+            code |= 8;
     }
     
-    code = aList.bad();
-    if ( !code )
+    code |= 16*aList.bad();
+    for ( obj = firstA();  obj ; obj=obj->next() )
     {
-        for ( ghi = firstA();  ghi ; ghi=ghi->next() )
-            if ( !ghi->attached() )
-                return 101;
+        if ( !obj->attached() )
+            code |= 128;
     }
-    
     return code;
 }
 

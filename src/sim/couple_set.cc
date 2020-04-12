@@ -11,72 +11,6 @@
 #include "glossary.h"
 #include "simul.h"
 
-
-/**
- @defgroup CoupleGroup Couple and related
- @ingroup ObjectGroup
- @ingroup NewObject
- @brief A Couple contains two Hand, and can thus crosslink two Fibers.
-
- The plain Couple may crosslink two Fiber irrespective of their configuration.
- Derived classes implement specificity, angular stiffness, etc.
- 
- List of classes accessible by specifying `couple:activity`.
-
- `activity`          | Classes                 | Parameters         | Property     |
- --------------------|-------------------------|--------------------|---------------
- `diffuse` (default) | Couple CoupleLong       | @ref CouplePar     | CoupleProp
- `crosslink`         | Crosslink CrosslinkLong | @ref CrosslinkPar  | CrosslinkProp
- `bridge`            | Bridge                  | @ref BridgePar     | BridgeProp
- `duo`               | Duo  DuoLong            | @ref DuoPar        | DuoProp
- `slide`             | Shackle ShackleLong     | @ref ShacklePar    | ShackleProp
- `fork`              | Fork                    | @ref ForkPar       | ForkProp
-
- Example:
-
-     set couple complex
-     {
-       hand1 = kinesin
-       hand2 = kinesin
-       stiffness = 100
-       diffusion = 10
-       activity = crosslink
-       length = 0.02
-     }
-
- */
-
-Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
-{
-    if ( cat == "couple" )
-    {
-        std::string a;
-        if ( opt.peek(a, "activity") )
-        {
-            if ( a == "fork" )
-                return new ForkProp(nom);
-            if ( a == "crosslink" )
-                return new CrosslinkProp(nom);
-            if ( a == "bridge" )
-                return new BridgeProp(nom);
-            if ( a == "duo" )
-                return new DuoProp(nom);
-            if ( a == "slide" )
-                return new ShackleProp(nom);
-            if ( a == "diffuse" )
-                return new CoupleProp(nom);
-#if ( 0 )
-            throw InvalidParameter("unknown single:activity `"+a+"'");
-#else
-        // try to proceed anyhow:
-        std::cerr << "WARNING: unknown couple:activity `" << a << "'" << std::endl;
-#endif
-        }
-        return new CoupleProp(nom);
-    }
-    return nullptr;
-}
-
 //------------------------------------------------------------------------------
 
 void CoupleSet::prepare(PropertyList const& properties)
@@ -192,11 +126,80 @@ void CoupleSet::step()
             nxt->stepFF(simul);
         }
     }
+
+    printf("  : %lu couples [ %u %u ]\n", size(), inventory.first_identity(), inventory.last_identity());
 }
 
 
 //------------------------------------------------------------------------------
 #pragma mark -
+
+
+/**
+ @defgroup CoupleGroup Couple and related
+ @ingroup ObjectGroup
+ @ingroup NewObject
+ @brief A Couple contains two Hand, and can thus crosslink two Fibers.
+
+ The plain Couple may crosslink two Fiber irrespective of their configuration.
+ Derived classes implement specificity, angular stiffness, etc.
+ 
+ List of classes accessible by specifying `couple:activity`.
+
+ `activity`          | Classes                 | Parameters         | Property     |
+ --------------------|-------------------------|--------------------|---------------
+ `diffuse` (default) | Couple CoupleLong       | @ref CouplePar     | CoupleProp
+ `crosslink`         | Crosslink CrosslinkLong | @ref CrosslinkPar  | CrosslinkProp
+ `bridge`            | Bridge                  | @ref BridgePar     | BridgeProp
+ `duo`               | Duo  DuoLong            | @ref DuoPar        | DuoProp
+ `slide`             | Shackle ShackleLong     | @ref ShacklePar    | ShackleProp
+ `fork`              | Fork                    | @ref ForkPar       | ForkProp
+
+ Example:
+
+     set couple complex
+     {
+       hand1 = kinesin
+       hand2 = kinesin
+       stiffness = 100
+       diffusion = 10
+       activity = crosslink
+       length = 0.02
+     }
+
+ */
+
+Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
+{
+    if ( cat == "couple" )
+    {
+        std::string a;
+        if ( opt.peek(a, "activity") )
+        {
+            if ( a == "fork" )
+                return new ForkProp(nom);
+            if ( a == "crosslink" )
+                return new CrosslinkProp(nom);
+            if ( a == "bridge" )
+                return new BridgeProp(nom);
+            if ( a == "duo" )
+                return new DuoProp(nom);
+            if ( a == "slide" )
+                return new ShackleProp(nom);
+            if ( a == "diffuse" )
+                return new CoupleProp(nom);
+#if ( 0 )
+            throw InvalidParameter("unknown single:activity `"+a+"'");
+#else
+        // try to proceed anyhow:
+        std::cerr << "WARNING: unknown couple:activity `" << a << "'" << std::endl;
+#endif
+        }
+        return new CoupleProp(nom);
+    }
+    return nullptr;
+}
+
 
 Object * CoupleSet::newObject(const ObjectTag tag, size_t num)
 {
@@ -375,6 +378,9 @@ void CoupleSet::relink(Object * obj, const bool s1, const bool s2)
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
 void CoupleSet::foldPosition(Modulo const* s) const
 {
     Couple * cx;
@@ -491,6 +497,10 @@ void CoupleSet::thaw()
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
+
 void CoupleSet::writeAA(Outputter& out) const
 {
     out.put_line("\n#section couple AA", out.binary());
@@ -581,36 +591,32 @@ int CoupleSet::bad() const
 {
     int code = 0;
     Couple * obj;
-    code = ffList.bad();
-    if ( code ) return 100+code;
+    code |= ffList.bad();
     for ( obj=firstFF(); obj ; obj = obj->next() )
     {
         if ( obj->attached1() || obj->attached2() )
-            return 100;
+            code |= 8;
     }
     
-    code = afList.bad();
-    if ( code ) return 200+code;
+    code |= afList.bad();
     for ( obj=firstAF(); obj ; obj = obj->next() )
     {
         if ( !obj->attached1() || obj->attached2() )
-            return 200;
+            code |= 16;
     }
     
-    code = faList.bad();
-    if ( code ) return 300+code;
+    code |= faList.bad();
     for ( obj=firstFA(); obj ; obj = obj->next() )
     {
         if ( obj->attached1() || !obj->attached2() )
-            return 300;
+            code |= 32;
     }
     
-    code = aaList.bad();
-    if ( code ) return 400+code;
+    code |= aaList.bad();
     for ( obj=firstAA(); obj ; obj = obj->next() )
     {
         if ( !obj->attached1() || !obj->attached2() )
-            return 400;
+            code |= 64;
     }
     return code;
 }
@@ -741,19 +747,18 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 #if ( 0 )
     
     // this performs a basic verification of fibers.uniFiberSites()
-    real dis = 1;
-    size_t cnt = 1<<10;
+    size_t rep = 1<<10;
     real avg = 0;
     real var = 0;
-    for ( size_t i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < rep; ++i )
     {
-        fibers.uniFiberSites(loc, dis);
+        fibers.uniFiberSites(loc, 1.0);
         real s = loc.size();
         avg += s;
         var += s*s;
     }
-    avg /= (real)cnt;
-    var = var/(real)cnt - avg * avg;
+    avg /= (real)rep;
+    var = var/(real)rep - avg * avg;
     printf("UNI-FIBER-SITES(1)  avg = %9.2f   var = %9.2f\n", avg, var);
     
 #endif

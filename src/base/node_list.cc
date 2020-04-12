@@ -405,24 +405,24 @@ int NodeList::bad() const
     Node * p = nFront, * q;
     
     if ( p  &&  p->nPrev != nullptr )
-        return 71;
+        return 1;
     while ( p )
     {
         q = p->nNext;
         if ( q == nullptr ) {
             if ( p != nBack )
-                return 73;
+                return 2;
         }
         else {
             if ( q->nPrev != p )
-                return 74;
+                return 3;
         }
         p = q;
         ++cnt;
     }
     
     if ( cnt != nSize )
-        return 75;
+        return 4;
     return 0;
 }
 

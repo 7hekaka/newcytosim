@@ -150,9 +150,9 @@ public:
 
     /// first unattached Couple
     Couple *     firstFF()     const { return static_cast<Couple*>(ffList.front()); }
-    /// first Couple attached by cHand1
+    /// first Couple attached only by cHand1
     Couple *     firstAF()     const { return static_cast<Couple*>(afList.front()); }
-    /// first Couple attached by cHand2
+    /// first Couple attached only by cHand2
     Couple *     firstFA()     const { return static_cast<Couple*>(faList.front()); }
     /// first Couple attached by both hands
     Couple *     firstAA()     const { return static_cast<Couple*>(aaList.front()); }

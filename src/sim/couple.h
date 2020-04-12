@@ -56,7 +56,6 @@ protected:
     /// second Hand
     Hand * cHand2;
     
-    
     /// specialization of HandMonitor
     bool      allowAttachment(FiberSite const&);
     /// specialization of HandMonitor

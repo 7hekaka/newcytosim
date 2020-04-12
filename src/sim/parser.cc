@@ -372,7 +372,7 @@ void Parser::parse_new(std::istream& is)
         opt.define("position", 0, blok);
     }
     
-    if ( do_new  &&  cnt > 0 )
+    if ( do_new & ( cnt > 0 ))
     {
         if ( opt.nb_keys() == 0 )
         {
