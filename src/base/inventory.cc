@@ -160,8 +160,10 @@ ObjectID Inventory::first_unassigned() const
 
 ObjectID Inventory::next_identity(ObjectID n) const
 {
-    ++n;
-    if ( n <= highest_ )
+    assert_true(n < allocated_);
+    if ( byNames[++n] )
+        return n;
+    if ( ++n <= highest_ )
     {
         while ( !byNames[n] )
             ++n;
@@ -201,8 +203,12 @@ Inventoried* Inventory::last() const
 
 Inventoried* Inventory::next(Inventoried const* i) const
 {
+    assert_true(byNames[i->identity()]==i);
     ObjectID n = i->identity() + 1;
-    if ( n <= highest_ )
+    assert_true(n <= allocated_);
+    if ( byNames[n] )
+        return byNames[n];
+    if ( ++n <= highest_ )
     {
         while ( !byNames[n] )
             ++n;
