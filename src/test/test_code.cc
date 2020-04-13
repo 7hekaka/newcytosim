@@ -19,10 +19,11 @@
 const real scalar = 2.0;
 
 /// number of segments:
-const size_t NBS = 1255;
+const size_t NBS = 12;
 const size_t NBR = DIM * ( NBS + 1 );
 const size_t ALOC = NBR + 8;
 
+const size_t DISP = 16UL;
 
 
 #ifdef __AVX__
@@ -469,7 +470,7 @@ inline void testRigidity(size_t cnt, void (*func)(const size_t, const real*, rea
     TicToc::toc(str);
     zero_real(ALOC, x);
     func(nbt, pos, scalar, x);
-    VecPrint::print(std::cout, std::min(16ul,NBR), x);
+    VecPrint::print(std::cout, std::min(DISP,NBR), x);
     
     zero_real(ALOC, y);
     add_rigidity0(nbt, pos, scalar, y);
@@ -930,7 +931,7 @@ inline void testU(size_t cnt, void (*func)(size_t, const real*, const real*, rea
     
     zero_real(ALOC, lagmul);
     func(NBS, diff, force, lagmul);
-    VecPrint::print(std::cout, std::min(20UL,NBS+1), lagmul) << std::endl;
+    VecPrint::print(std::cout, std::min(DISP,NBS+1), lagmul) << std::endl;
     
     free_real(x,y,z);
 }
@@ -953,7 +954,7 @@ inline void testD(size_t cnt, void (*func)(size_t, const real*, const real*, con
     
     zero_real(ALOC, x);
     func(NBS, diff, pos, lagmul, x);
-    VecPrint::print(std::cout, std::min(20UL,NBR+2), x) << std::endl;
+    VecPrint::print(std::cout, std::min(DISP,NBR+2), x) << std::endl;
     
     free_real(x,y,z);
 }
@@ -1019,7 +1020,7 @@ void testDPTT(size_t cnt)
     copy_real(NBS, Bs, B);
     lapack_xpttrf(NBS, D, U, &info);
     lapack_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack_xptts2(NBS, 1, D, U, B, 1);
@@ -1030,7 +1031,7 @@ void testDPTT(size_t cnt)
     copy_real(NBS, Bs, B);
     lapack::xpttrf(NBS, D, U, &info);
     lapack::xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack::xptts2(NBS, 1, D, U, B, 1);
@@ -1041,7 +1042,7 @@ void testDPTT(size_t cnt)
     copy_real(NBS, Bs, B);
     italian_xpttrf(NBS, D, U, &info);
     italian_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         italian_xptts2(NBS, 1, D, U, B, 1);
@@ -1052,7 +1053,7 @@ void testDPTT(size_t cnt)
     copy_real(NBS, Bs, B);
     alsatian_xpttrf(NBS, D, U, &info);
     alsatian_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian_xptts2(NBS, 1, D, U, B, 1);
@@ -1097,7 +1098,7 @@ void testThomas(size_t cnt)
         copy_real(NBS, Bs, B);
         italian_thomas(NBS, U, D, U, B);
     }
-    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::toc("   italian");
     
     TicToc::tic();
@@ -1108,7 +1109,7 @@ void testThomas(size_t cnt)
         copy_real(NBS, Bs, B);
         alsatian_thomas(NBS, D, U, B);
     }
-    VecPrint::print(std::clog, std::min(12UL,NBS), B, 3);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::toc("  alsatian");
     
     free_real(D);
