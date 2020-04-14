@@ -62,8 +62,9 @@ void lapack_xptts2(int N, int NRHS, const real* D, const real* E, real* B, int L
      Page 93
  
  PSEUDO code with indices starting at 1:
-     b=[0;b];
-     c=[c;0];
+     a_i = diagonal terms i in [1...N]
+     b_i = [0;b]; lower diagonal
+     c_i = [c;0]; upper diagonal
      gamma(1) = 1.0 / a(1);
      for i = 2:N
          gamma(i) = 1.0 / ( a(i) - b(i) * gamma(i-1) * c(i-1) );
@@ -94,14 +95,13 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
     assert_true(nrhs == 1); // in this case, LDB is not used
  
     B[0] = D[0] * B[0];
-    
-    // upward recursion on B[]
-    for ( int n = 1; n < size; ++n )
-        B[n] = D[n] * ( B[n] - E[n-1] * B[n-1] );
-    
-    // downward recursion on B[]
     if ( size > 1 )
     {
+        // upward recursion on B[]
+        for ( int n = 1; n < size; ++n )
+            B[n] = D[n] * ( B[n] - E[n-1] * B[n-1] );
+        
+        // downward recursion on B[]
         for ( int n = size-2; n > 0; --n )
             B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
         B[0] = B[0] - ( D[0] * E[0] ) * B[1];
@@ -125,24 +125,24 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
  */
 void italian_thomas(size_t size, real const*L, real const* D, real* U, real* B)
 {
-    real e = L[0];
     U[0] = U[0] / D[0];
     B[0] = B[0] / D[0];
     
-    // upward recursion: U is changed, D and L are not changed
-    for ( size_t i = 1; i < size; ++i )
-    {
-        //const real m = 1.0 / (D[i] - L[i-1] * U[i-1]);
-        const real m = 1.0 / ( D[i] - e * U[i-1] );
-        //B[i] = (B[i] - L[i-1] * B[i-1]) * m;
-        B[i] = ( B[i] - e * B[i-1] ) * m;
-        e = L[i];
-        U[i] = U[i] * m;
-    }
-    
-    // downward recursion: D[] and L[] are not used
     if ( size > 1 )
     {
+        real e = L[0];
+        // upward recursion: U is changed, D and L are not changed
+        for ( size_t i = 1; i < size; ++i )
+        {
+            //const real m = 1.0 / (D[i] - L[i-1] * U[i-1]);
+            const real m = 1.0 / ( D[i] - e * U[i-1] );
+            //B[i] = (B[i] - L[i-1] * B[i-1]) * m;
+            B[i] = ( B[i] - e * B[i-1] ) * m;
+            e = L[i];
+            U[i] = U[i] * m;
+        }
+        
+        // downward recursion: D[] and L[] are not used
         for ( size_t i = size-2; i > 0; --i )
             B[i] = B[i] - U[i] * B[i+1];
         B[0] = B[0] - U[0] * B[1];
@@ -236,7 +236,7 @@ void alsatian_thomas(size_t size, real* D, real* E, real* B)
     x = 1.0 / ( D[size-1] - e * x );
     D[size-1] = x;
     E[size-1] = x * E[size-1];
-    y = y * D[size-1];
+    y = D[size-1] * y;
     B[size-1] = y;
 
     if ( size > 1 )
