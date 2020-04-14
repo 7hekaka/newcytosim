@@ -127,7 +127,7 @@ void CoupleSet::step()
         }
     }
 
-    printf("  : %lu couples [ %u %u ]\n", size(), inventory.first_identity(), inventory.last_identity());
+    //printf("  : %lu couples [ %u %u ]\n", size(), inventory.first_identity(), inventory.last_identity());
 }
 
 
