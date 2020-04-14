@@ -281,7 +281,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
             Evaluator evaluator{{'X', iso.mov.x()}, {'Y', iso.mov.y()}, {'Z', iso.mov.z()},
                                 {'R', iso.mov.norm()}, {'P', RNG.preal()}};
             try {
-                condition = evaluator.inequality(str.c_str());
+                condition = evaluator.evaluate(str.c_str());
             }
             catch( Exception& e ) {
                 e.message(e.message()+" in `"+str+"'");

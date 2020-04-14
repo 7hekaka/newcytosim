@@ -181,32 +181,11 @@ public:
         //print_variables(std::clog, variables_);
     }
     
-    real expression(char const* str)
+    real evaluate(char const* str)
     {
         ptr = str;
         real res = expression_();
         //std::clog << "evaluate(" << str << ") = " << res << "\n";
         return res;
-    }
-    
-    bool inequality(char const* str)
-    {
-        ptr = str;
-        real a = expression_();
-        skip_space();
-        char op = *ptr++;
-        if ( op != '<' && op != '>' )
-            throw InvalidSyntax("missing comparison operator ('<' or '>')");
-        if ( *ptr == '=' )
-        {
-            ++ptr;
-            real b = expression_();
-            if ( op == '<' ) return ( a <= b );
-            if ( op == '>' ) return ( a >= b );
-        }
-        real b = expression_();
-        if ( op == '<' ) return ( a < b );
-        if ( op == '>' ) return ( a > b );
-        return false;
     }
 };

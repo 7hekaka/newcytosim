@@ -507,7 +507,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
                 tok = Tokenizer::get_token(is);
                 Evaluator evaluator{{'X', pos.x()}, {'Y', pos.y()}, {'Z', pos.z()}};
                 try {
-                    if ( !evaluator.expression(tok.c_str()) )
+                    if ( !evaluator.evaluate(tok.c_str()) )
                     {
                         is.seekg(start);
                         goto restart;
@@ -770,7 +770,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
                 tok = Tokenizer::get_token(is);
                 Evaluator evaluator{{'X', dir.x()}, {'Y', dir.y()}, {'Z', dir.z()}};
                 try {
-                    if ( !evaluator.expression(tok.c_str()) )
+                    if ( !evaluator.evaluate(tok.c_str()) )
                     {
                         is.seekg(start);
                         goto restart;
