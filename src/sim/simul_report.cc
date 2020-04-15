@@ -675,11 +675,7 @@ void Simul::reportFiber(std::ostream& out, FiberProp const* selected) const
             out << SEP << fib->dirEnd(CENTER);
             out << SEP << (fib->posEndM()-fib->posEndP()).norm();
             out << SEP << dot(fib->dirEndM(), fib->dirEndP());
-            Organizer * o = organizers.findOrganizer(fib);
-            if ( o )
-                out << SEP << o->identity();
-            else
-                out << SEP << "0";
+            out << SEP << organizers.findOrganizerID(fib);
         }
     }
 }
@@ -1650,11 +1646,7 @@ void write(std::ostream& out, Single const* obj, Simul const* simul)
         out << SEP << obj->force();
         out << SEP << fib->identity();
         out << SEP << obj->abscissa();
-        Organizer * o = simul->organizers.findOrganizer(fib);
-        if ( o )
-            out << SEP << o->identity();
-        else
-            out << SEP << "0";
+        out << SEP << simul->organizers.findOrganizerID(fib);
     }
     else
     {

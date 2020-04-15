@@ -123,14 +123,15 @@ void OrganizerSet::add(Object * obj)
 }
 
 
-Organizer * OrganizerSet::findOrganizer(const Mecable * m) const
+ObjectID OrganizerSet::findOrganizerID(const Mecable * m) const
 {
+    ObjectID res = 0;
     for ( Organizer * o=first(); o; o=o->next() )
         for ( size_t i = 0; i < o->nbOrganized(); ++i )
             if ( m == o->organized(i) )
-                return o;
+                res = std::max(res, o->identity());
 
-    return nullptr;
+    return res;
 }
 
 
