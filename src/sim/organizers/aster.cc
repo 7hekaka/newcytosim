@@ -57,9 +57,7 @@ void Aster::step()
 void Aster::setInteractions(Meca& meca) const
 {
     assert_true( linked() );
-
     Solid const* sol = solid();
-    
     if ( !sol )
         return;
 
@@ -130,6 +128,7 @@ void Aster::setInteractions(Meca& meca) const
 Aster::~Aster()
 {
     //Cytosim::log("destroying %c%lu\n", TAG, identity());
+    asSolid = nullptr;
     prop = nullptr;
 }
 
@@ -180,6 +179,7 @@ Aster::~Aster()
 ObjectList Aster::build(Glossary& opt, Simul& sim)
 {
     assert_true(prop);
+    assert_true(asSolid==nullptr);
     assert_true(nbOrganized()==0);
     
     // get number of fibers:
@@ -190,7 +190,6 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     if ( asRadius <= 0 )
         throw InvalidParameter("aster:radius must be specified and > 0");
     
-    nbOrganized(1);
     size_t origin = 0;
     ObjectList res = makeSolid(sim, opt, origin);
     if ( !solid() )
@@ -218,7 +217,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         {
             //std::clog << "direct fiber anchor " << pos1 << " and " << pos2 << "\n";
             placeAnchor(pos1, pos2, origin);
-            nbOrganized(2+cnt);
+            nbOrganized(1+cnt);
             std::string str = fos;
             opt.set(str, var, 2);
             Glossary fopt(str);
@@ -240,7 +239,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
             fos = "unknown";
         }
 #endif
-        nbOrganized(1+nbf);
+        nbOrganized(nbf);
         placeAnchors(opt, origin, nbf);
         nbf = std::min(nbf, asLinks.size());
 
@@ -272,7 +271,7 @@ ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_typ
     if ( !fib )
         throw InvalidParameter("unexpected object returned by fibers.newObjects()");
 
-    grasp(fib, inx+1);
+    grasp(fib, inx);
 
     Vector pos = posLink1(inx);
     Vector dir = posLink2(inx) - pos;
@@ -355,9 +354,7 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
     // add local coordinate system around the last point:
     origin = sol->addTriad(asRadius);
     sol->fixShape();
-    
-    //std::cerr << *sol << '\n';
-    grasp(sol, 0);
+    asSolid = sol;
     return res;
 }
 
@@ -543,6 +540,7 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
 
 void Aster::write(Outputter& out) const
 {
+    Object::writeReference(out, asSolid);
     Organizer::write(out);
     
     out.writeSoftNewline();
@@ -562,18 +560,30 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
         in.readUInt16();
 #endif
     
-    Organizer::read(in, sim, tag);
+    ObjectTag g;
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 53 )
+    {
+        size_t n = in.readUInt16();
+        asSolid = Solid::toSolid(sim.readReference(in, g));
+        Organizer::readOrganized(in, sim, n-1);
+        assert_true( nbOrganized() > 0 );
+    }
+    else
+#endif
+    {
+        asSolid = Solid::toSolid(sim.readReference(in, g));
+        Organizer::read(in, sim, tag);
+    }
     
-    assert_true( nbOrganized() > 0 );
-    assert_true( organized(0)->tag() == Solid::TAG );
-    
-    Solid * sol = solid();
+    Solid const* sol = solid();
+    //Buddy::connect(sol);
     if ( sol->nbPoints() > 1 )
         asRadius = ( sol->posPoint(0) - sol->posPoint(1) ).norm();
     
 #ifdef BACKWARD_COMPATIBILITY
     // usual number of fiber links:
-    size_t nbf = nbOrganized() - 1;
+    size_t nbf = nbOrganized();
     if ( in.formatID() > 50 )
 #else
     size_t

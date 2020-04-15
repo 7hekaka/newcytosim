@@ -24,11 +24,11 @@ class Fake : public Organizer
 
 private:
 
+    /// Solid on which Fake is build
+    Solid *  fkSolid;
+    
     /// Property
     FakeProp const* prop;
-    
-    /// Display parameters
-    PointDisp const* disp_ptr;
     
     /// connections
     std::vector<Mecapoint> asterPoints, solidPoints;
@@ -36,8 +36,11 @@ private:
 public:
     
     /// constructor
-    Fake(FakeProp const* p) : prop(p), disp_ptr(nullptr) { }
+    Fake(FakeProp const* p) : fkSolid(nullptr), prop(p) { }
  
+    /// destructor
+    ~Fake();
+
     /// construct all the dependent Objects of the Organizer
     ObjectList build(Glossary&, Simul&);
 
@@ -48,15 +51,14 @@ public:
     void       setInteractions(Meca&) const;
     
     /// return pointer to central Solid
-    Solid *    solid() const { return static_cast<Solid*>(organized(0)); }
+    Solid *    solid() const { return fkSolid; }
 
-    //------------------------------ read/write --------------------------------
     
     /// retrieve links end-points for display
     bool       getLink(size_t, Vector&, Vector&) const;
     
     /// return PointDisp of Solid
-    PointDisp const* disp() const { return disp_ptr; }
+    PointDisp const* disp() const { return fkSolid->prop->disp; }
 
     /// a unique character identifying the class
     static const ObjectTag TAG = 'k';

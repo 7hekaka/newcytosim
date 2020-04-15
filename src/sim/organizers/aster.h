@@ -156,6 +156,8 @@ class Aster : public Organizer
 {
 private:
     
+    Solid*     asSolid;
+    
     /// scale of local reference frame
     real       asRadius;
     
@@ -180,7 +182,7 @@ private:
 public:
     
     /// constructor
-    Aster(AsterProp const* p) : prop(p) { asRadius = 0; }
+    Aster(AsterProp const* p) : asSolid(nullptr), asRadius(0), prop(p) {}
     
     /// destructor
     virtual      ~Aster();
@@ -189,13 +191,13 @@ public:
     ObjectList    build(Glossary&, Simul&);
     
     /// return the scaffolding Solid
-    Solid *       solid() const { return static_cast<Solid*>(organized(0)); }
+    Solid *       solid() const { return asSolid; }
     
     /// return the center of the Solid
     Vector        position() const { return solid()->posP(0); }
     
     /// return Fiber `n`
-    Fiber *       fiber(size_t n) const { return Fiber::toFiber(organized(n+1)); }
+    Fiber *       fiber(size_t n) const { return Fiber::toFiber(organized(n)); }
     
     /// perform one Monte-Carlo step
     void          step();
