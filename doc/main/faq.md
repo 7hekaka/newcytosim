@@ -1248,7 +1248,7 @@ At the moment, `solve=0` applies to all mecable and simply turns all the mechani
 It is possible however to do what you describe, by modifying the code to do two things:
 
 - NOT link these objects into the Meca,  
-- mutate all the Couples effectively to call Meca::addPointClamp() instead of Meca::interLink().  
+- mutate all the Couples effectively to call Meca::addPointClamp() instead of Meca::addLink().  
  
 You can add a boolean parameter “mobile" into these classes, and test for it when you build the Meca:
 
