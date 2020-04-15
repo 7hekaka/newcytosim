@@ -42,7 +42,7 @@ void Tubule::reset()
 
 void Tubule::handshake(Buddy * guy)
 {
-    //std::clog << "handshake " << reference() << " from " << guy << "\n";
+    //std::clog << reference() << " handshake(" << guy << ")\n";
     if ( guy == bone_ )
     {
         assert_true(bone_);
@@ -358,14 +358,11 @@ void Tubule::write(Outputter& out) const
 {
     out.writeUInt16(NFIL+1);
     out.writeSoftNewline();
-    if ( bone_ )
-        bone_->writeReference(out);
-    else
-        writeNullReference(out);
+    Object::writeReference(out, bone_);
     for ( size_t i = 0; i < NFIL; ++i )
     {
         out.writeSoftSpace();
-        fil_[i]->writeReference(out);
+        Object::writeReference(out, fil_[i]);
     }
 }
 
