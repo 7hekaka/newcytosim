@@ -123,12 +123,6 @@ void OrganizerSet::add(Object * obj)
 }
 
 
-Aster * OrganizerSet::findAster(const ObjectID n) const
-{
-    return Aster::toAster(findID(n));
-}
-
-
 Organizer * OrganizerSet::findOrganizer(const Mecable * m) const
 {
     for ( Organizer * o=first(); o; o=o->next() )

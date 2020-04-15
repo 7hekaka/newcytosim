@@ -14,13 +14,14 @@ class Glossary;
 class PointDisp;
 class Display;
 
-/// an assemblage of Mecable
+/// An assemblage of Mecable
 /** 
-Organizer contains an Array of pointers of type Mecable*.
-These Mecables are organized by Organizer::setInteraction()
-which is implemented in the derived classes, eg. Bundle, Aster & Nucleus.
+ The Organizer contains an Array of pointers of type `Mecable*`, allowing
+ `setInteractions()` to create specific mechanical links and typically to arrange
+ the Mecables relative to each other in Space following a certain pattern.
+ The functions are implemented in derived classes: Bundle, Aster, Nucleus, etc.
 */
-class Organizer: public Object, private Buddy
+class Organizer: public Object, protected Buddy
 {
 
 protected:
@@ -55,11 +56,11 @@ public:
     /// add Mecable at end of list
     void               grasp(Mecable *);
 
-    /// add Mecable at index `n`
+    /// add Mecable at given index
     void               grasp(Mecable *, size_t);
 
     /// handles the disapearance of one of the organized object
-    void               goodbye(Buddy *);
+    void               goodbye(Buddy const*);
     
     /// add objects to Simul if they are not already linked
     virtual void       addOrganized(Simul&);
@@ -94,7 +95,7 @@ public:
     virtual void       setInteractions(Meca&) const {}
     
     /// sum the drag coefficient of all objects
-    real               dragCoefficient() const;
+    real               sumDragCoefficient() const;
     
     
     /// retrieve ends link number `inx`, or returns zero if this link does not exist
@@ -112,6 +113,9 @@ public:
     Organizer *   prev()  const  { return static_cast<Organizer*>(nPrev); }
     
     //--------------------------------------------------------------------------
+    
+    /// read list of Mecables
+    void          readOrganized(Inputter&, Simul&, size_t);
 
     /// read
     void          read(Inputter&, Simul&, ObjectTag);

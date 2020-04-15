@@ -28,7 +28,7 @@ protected:
     
     /// array of size DIM*pAllocated contains DIM*nPoints coordinates
     /**
-     The coordinates are organized as follows:
+     The coordinates are arranged as follows:
      X1,       X2,       etc. for DIM==1
      X1 Y1,    X2 Y2,    etc. for DIM==2
      X1 Y1 Z1, X2 Y2 Z2, etc. for DIM==3

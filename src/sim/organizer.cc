@@ -33,15 +33,12 @@ void Organizer::grasp(Mecable * m, size_t ix)
 }
 
 
-void Organizer::goodbye(Buddy * b)
+void Organizer::goodbye(Buddy const* b)
 {
-    if ( b )
-    {
-        //std::clog << this << " organizer lost " << b << "\n";
-        MecableList::iterator oi = std::find(mObjects.begin(), mObjects.end(), b);
-        if ( oi != mObjects.end() )
-            *oi = nullptr;
-    }
+    //std::clog << this << " organizer lost " << b << "\n";
+    MecableList::iterator oi = std::find(mObjects.begin(), mObjects.end(), b);
+    if ( oi != mObjects.end() )
+        *oi = nullptr;
 }
 
 
@@ -138,7 +135,7 @@ void Organizer::rotate(Rotation const& T)
 }
 */
 
-real Organizer::dragCoefficient() const
+real Organizer::sumDragCoefficient() const
 {
     real res = 0;
     for ( Mecable const* i : mObjects )
@@ -162,9 +159,8 @@ void Organizer::write(Outputter& out) const
 }
 
 
-void Organizer::read(Inputter& in, Simul& sim, ObjectTag tag)
+void Organizer::readOrganized(Inputter& in, Simul& sim, size_t nbo)
 {
-    size_t nbo = in.readUInt16();
     nbOrganized(nbo);
     
     //std::clog << " Organizer::read with " << nb << " objects" << std::endl;
@@ -181,3 +177,10 @@ void Organizer::read(Inputter& in, Simul& sim, ObjectTag tag)
             grasp(nullptr, i);
     }
 }
+
+
+void Organizer::read(Inputter& in, Simul& sim, ObjectTag)
+{
+    readOrganized(in, sim, in.readUInt16());
+}
+

@@ -57,13 +57,13 @@ public:
     void setFamily(Fiber const*);
 
     /// update length of family members
-    void handshake(Buddy*);
+    void salute(Buddy const*);
     
     /// create filaments
     ObjectList build(Glossary&, Simul&);
     
     /// handles the disapearance of one of the filament
-    void       goodbye(Buddy *);
+    void       goodbye(Buddy const*);
 
     
     /// a unique character identifying the class

@@ -91,7 +91,7 @@ void Fiber::step()
         adjustSegmentation();
         updateFiber();
 #if FIBER_HAS_FAMILY
-        handshake();
+        salute();
 #endif
     }
     

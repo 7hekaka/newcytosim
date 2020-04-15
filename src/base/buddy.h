@@ -18,7 +18,7 @@
  This class can be used when an object needs to know if another object is destroyed,
  and vice-versa.
  
- F. Nedelec 11 Aug. 2012
+ F. Nedelec 11.08.2012
  */
 class Buddy
 {
@@ -32,28 +32,6 @@ private:
     BuddyList buddies_;
     
 private:
-    
-    /// add `b` into the list of buddies, or complain if already present
-    void enlist(Buddy * b)
-    {
-#if ( 1 )
-        // complain if buddy is known already:
-        BuddyList::iterator bi = std::find(buddies_.begin(), buddies_.end(), b);
-        if ( bi != buddies_.end() )
-        {
-            std::cerr << " Warning: duplicate Buddy::enlist()\n";
-            return;
-        }
-#endif
-        
-        // find an empty spot:
-        bi = std::find(buddies_.begin(), buddies_.end(), nullptr);
-        if ( bi != buddies_.end() )
-            *bi = b;
-        else
-            buddies_.push_back(b);
-    }
-    
     
     /// replace the buddy that may have been at index `ix`
     void enlist(Buddy * b, size_t ix)
@@ -72,7 +50,56 @@ private:
         
         buddies_[ix] = b;
     }
+    
+public:
+    
+    /// constructor
+    Buddy() {}
+    
+    /// upon destruction, invoke `goodbye` for all buddies
+    virtual ~Buddy()
+    {
+        for ( Buddy * b : buddies_ )
+        {
+            if ( b )
+            {
+                b->goodbye(this);
+                b->unlist(this);
+            }
+        }
+    }
+    
+    /// this is called everytime a known buddy is destroyed
+    virtual void goodbye(Buddy const* b)
+    {
+        //std::clog << "Buddy " << this << "::goodbye(" << b << ")\n";
+    }
+    
+    /// used as a signal from a buddy
+    virtual void salute(Buddy const*)
+    {
+    }
 
+    /// add `b` into the list of buddies, or complain if already present
+    void enlist(Buddy * b)
+    {
+#if ( 1 )
+        // complain if buddy is known already:
+        BuddyList::iterator bi = std::find(buddies_.begin(), buddies_.end(), b);
+        if ( bi != buddies_.end() )
+        {
+            std::clog << " Warning: duplicate Buddy::enlist()\n";
+            return;
+        }
+#endif
+        
+        // find an empty spot:
+        bi = std::find(buddies_.begin(), buddies_.end(), nullptr);
+        if ( bi != buddies_.end() )
+            *bi = b;
+        else
+            buddies_.push_back(b);
+    }
     
     /// removes `b` from the list of known buddy, do not call goodbye()
     Buddy * unlist(Buddy * b)
@@ -83,46 +110,18 @@ private:
             *bi = nullptr;
             return b;
         }
+        else
+            std::clog << " Warning: Buddy::unlist(unlisted)\n";
         return nullptr;
     }
 
-public:
-    
-    /// constructor
-    Buddy() {}
-    
-    /// upon destruction, goodbye is called for all buddies
-    virtual ~Buddy()
+    /// invoke `salute(this)` for all buddies
+    void salute()
     {
         for ( Buddy * b : buddies_ )
-        {
-            if ( b )
-            {
-                goodbye(b);
-                b->goodbye(this);
-                b->unlist(this);
-                b = nullptr;
-            }
-        }
+            b->salute(this);
     }
     
-    /// this is called everytime a known buddy is destroyed
-    virtual void goodbye(Buddy *)
-    {
-    }
-    
-    /// this is called for all buddies by `handshake()`
-    virtual void handshake(Buddy *)
-    {
-    }
-    
-    /// call `handshake(this)` for all buddies
-    void handshake()
-    {
-        for ( Buddy * b : buddies_ )
-            b->handshake(this);
-    }
-
     /// will make `this` and `guy` mutual buddies
     void connect(Buddy * guy)
     {
@@ -149,18 +148,16 @@ public:
         return buddies_.size();
     }
     
-    
     /// return buddy at index `ix`
-    Buddy * buddy(size_t ix) const
+    Buddy * buddy(const size_t ix) const
     {
         if ( ix < buddies_.size() )
             return buddies_[ix];
         return nullptr;
     }
     
-    
     /// returns true if `guy` is a buddy
-    int check(Buddy * guy) const
+    int check(Buddy const* guy) const
     {
         BuddyList::const_iterator bi = std::find(buddies_.begin(), buddies_.end(), guy);
         

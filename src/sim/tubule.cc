@@ -40,9 +40,9 @@ void Tubule::reset()
 }
 
 
-void Tubule::handshake(Buddy * guy)
+void Tubule::salute(Buddy const* guy)
 {
-    //std::clog << reference() << " handshake(" << guy << ")\n";
+    //std::clog << reference() << " salute(" << guy << ")\n";
     if ( guy == bone_ )
     {
         assert_true(bone_);
@@ -104,7 +104,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     {
         res = sim.fibers.newObjects(prop->bone_type, opt);
         bone_ = static_cast<Fiber*>(res[0]);
-        Buddy::connect(bone_);
+        Buddy::enlist(bone_);
         len = bone_->length();
         if ( bone_->prop->segmentation != fp->segmentation )
             throw InvalidParameter("Tubule's bone and filament should have equal segmentation");
@@ -125,7 +125,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
         fib->copyPoints(bone_->nbPoints(), bone_->data());
-        Buddy::connect(fib);
+        Buddy::enlist(fib);
         res.push_back(fib);
         fil_[i] = fib;
     }
@@ -163,7 +163,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
 }
 
 
-void Tubule::goodbye(Buddy * b)
+void Tubule::goodbye(Buddy const* b)
 {
     std::cerr << "ERROR: Tubule's filaments cannot be deleted\n";
     if ( b )
