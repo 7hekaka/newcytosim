@@ -33,12 +33,19 @@ void Organizer::grasp(Mecable * m, size_t ix)
 }
 
 
+bool Organizer::check(Mecable const* m) const
+{
+    MecableList::const_iterator i = std::find(mObjects.begin(), mObjects.end(), m);
+    return ( i != mObjects.end() );
+}
+
+
 void Organizer::goodbye(Buddy const* b)
 {
     //std::clog << this << " organizer lost " << b << "\n";
-    MecableList::iterator oi = std::find(mObjects.begin(), mObjects.end(), b);
-    if ( oi != mObjects.end() )
-        *oi = nullptr;
+    MecableList::iterator i = std::find(mObjects.begin(), mObjects.end(), b);
+    if ( i != mObjects.end() )
+        *i = nullptr;
 }
 
 

@@ -157,7 +157,7 @@ public:
     }
     
     /// returns true if `guy` is a buddy
-    int check(Buddy const* guy) const
+    bool check(Buddy const* guy) const
     {
         BuddyList::const_iterator bi = std::find(buddies_.begin(), buddies_.end(), guy);
         
