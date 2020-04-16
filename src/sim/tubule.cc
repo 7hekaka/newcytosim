@@ -104,7 +104,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     {
         res = sim.fibers.newObjects(prop->bone_type, opt);
         bone_ = static_cast<Fiber*>(res[0]);
-        Buddy::enlist(bone_);
+        Buddy::connect(bone_);
         len = bone_->length();
         if ( bone_->prop->segmentation != fp->segmentation )
             throw InvalidParameter("Tubule's bone and filament should have equal segmentation");
@@ -125,7 +125,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
         fib->copyPoints(bone_->nbPoints(), bone_->data());
-        Buddy::enlist(fib);
+        Buddy::connect(fib);
         res.push_back(fib);
         fil_[i] = fib;
     }

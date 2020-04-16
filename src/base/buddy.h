@@ -18,7 +18,7 @@
  This class can be used when an object needs to know if another object is destroyed,
  and vice-versa.
  
- F. Nedelec 11.08.2012
+ F. Nedelec 11.08.2012 -- 16.04.2020
  */
 class Buddy
 {
@@ -51,6 +51,41 @@ private:
         buddies_[ix] = b;
     }
     
+    /// add `b` into the list of buddies, or complain if already present
+    void enlist(Buddy * b)
+    {
+#if ( 1 )
+        // complain if buddy is known already:
+        BuddyList::iterator i = std::find(buddies_.begin(), buddies_.end(), b);
+        if ( i != buddies_.end() )
+        {
+            std::clog << " Warning: duplicate Buddy::enlist()\n";
+            return;
+        }
+#endif
+        
+        // find an empty spot:
+        i = std::find(buddies_.begin(), buddies_.end(), nullptr);
+        if ( i != buddies_.end() )
+            *i = b;
+        else
+            buddies_.push_back(b);
+    }
+    
+    /// removes `b` from the list of known buddy, do not call goodbye()
+    Buddy * unlist(Buddy * b)
+    {
+        BuddyList::iterator i = std::find(buddies_.begin(), buddies_.end(), b);
+        if ( i != buddies_.end() )
+        {
+            *i = nullptr;
+            return b;
+        }
+        else
+            std::clog << " Warning: Buddy::unlist(unlisted)\n";
+        return nullptr;
+    }
+
 public:
     
     /// constructor
@@ -59,6 +94,7 @@ public:
     /// upon destruction, invoke `goodbye` for all buddies
     virtual ~Buddy()
     {
+        //std::clog << this << " ::~Buddy()\n";
         for ( Buddy * b : buddies_ )
         {
             if ( b )
@@ -78,41 +114,6 @@ public:
     /// used as a signal from a buddy
     virtual void salute(Buddy const*)
     {
-    }
-
-    /// add `b` into the list of buddies, or complain if already present
-    void enlist(Buddy * b)
-    {
-#if ( 1 )
-        // complain if buddy is known already:
-        BuddyList::iterator bi = std::find(buddies_.begin(), buddies_.end(), b);
-        if ( bi != buddies_.end() )
-        {
-            std::clog << " Warning: duplicate Buddy::enlist()\n";
-            return;
-        }
-#endif
-        
-        // find an empty spot:
-        bi = std::find(buddies_.begin(), buddies_.end(), nullptr);
-        if ( bi != buddies_.end() )
-            *bi = b;
-        else
-            buddies_.push_back(b);
-    }
-    
-    /// removes `b` from the list of known buddy, do not call goodbye()
-    Buddy * unlist(Buddy * b)
-    {
-        BuddyList::iterator bi = std::find(buddies_.begin(), buddies_.end(), b);
-        if ( bi != buddies_.end() )
-        {
-            *bi = nullptr;
-            return b;
-        }
-        else
-            std::clog << " Warning: Buddy::unlist(unlisted)\n";
-        return nullptr;
     }
 
     /// invoke `salute(this)` for all buddies
@@ -159,9 +160,9 @@ public:
     /// returns true if `guy` is a buddy
     bool check(Buddy const* guy) const
     {
-        BuddyList::const_iterator bi = std::find(buddies_.begin(), buddies_.end(), guy);
+        BuddyList::const_iterator i = std::find(buddies_.begin(), buddies_.end(), guy);
         
-        return ( bi != buddies_.end() );
+        return ( i != buddies_.end() );
     }
     
 };
