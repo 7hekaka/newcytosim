@@ -107,7 +107,7 @@ public:
         zero_real(dim, vBAS);
         zero_real(dim, vRHS);
 
-        unsigned ii = 0;
+        size_t ii = 0;
         for ( Mecable * mec : mecables )
         {
             mec->matIndex(ii);
@@ -192,7 +192,7 @@ public:
         if ( ready_ )
         {
             ready_ = false;
-            unsigned ii = 0;
+            size_t ii = 0;
             for ( Mecable * mec : mecables )
             {
                 // Move the Mecable along the X direction as calculated
