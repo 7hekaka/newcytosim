@@ -19,13 +19,13 @@ inline void splash(std::ostream& os)
 /// print general info about the program
 inline void print_version(std::ostream& os)
 {
-    os << "    Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON << "\n";
-    os << "    Built on " <<__DATE__<< " at " <<__TIME__<< " with " <<__VERSION__<< "\n";
+    os << "   Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON << "\n";
+    os << "   Built " <<__DATE__<< " " <<__TIME__<< " with " <<__VERSION__<< "\n";
     
 #ifdef CODE_VERSION
-    os << "    Code version " << CODE_VERSION;
+    os << "   Code version " << CODE_VERSION;
 #else
-    os << "    Code version unknown";
+    os << "   Code version unknown";
 #endif
     
 #ifdef NDEBUG
@@ -34,7 +34,7 @@ inline void print_version(std::ostream& os)
     os << " with assertions\n";
 #endif
     
-    os << "    Fiber: lattice " << FIBER_HAS_LATTICE;
+    os << "   Fiber: lattice " << FIBER_HAS_LATTICE;
     os << " mesh " << FIBER_HAS_MESH;
     os << " family " << FIBER_HAS_FAMILY;
     os << " glue " << FIBER_HAS_GLUE;
