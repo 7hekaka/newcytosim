@@ -7,7 +7,7 @@
 #include "blas.h"
 #include "cytoblas.h"
 
-/// Iterative Solvers
+/// Iterative methods to solve a system of linear equations
 namespace LinearSolvers
 {
     /// records the number of iterations, and the convergence
@@ -15,27 +15,31 @@ namespace LinearSolvers
     {
     private:
         
-        /// flag
+        /// exit flag
         int      flag_;
         
+        /// maximum allowed number of iterations
+        size_t   limit_;
+
         /// counter for iterations or number of matrix-vector operations
-        size_t   cnt_, cntMax_, cntOld_;
+        size_t   cnt_, cntOld_;
         
         /// desired residual
         real     target_;
 
-        /// achieved residual
+        /// residual achieved in last step
         real     res_;
         
-        ///
+        /// residual from the past
+        real     resOld_;
         
     public:
         
         /// set the maximum number of iterations, and the residual threshold
-        Monitor(size_t i, real r) { reset(); cntMax_ = i; target_ = r; }
+        Monitor(size_t i, real r) { reset(); limit_=i; target_=r; }
         
         /// reset state variables (counters, flags and residual)
-        void reset() { flag_ = 0; cnt_ = 0; res_ = INFINITY; cntOld_ = 32; }
+        void reset() { flag_=0; cnt_=0; res_=INFINITY; cntOld_=0; resOld_=INFINITY; }
         
         /// increment counter
         void operator ++() { ++cnt_; }
@@ -63,7 +67,7 @@ namespace LinearSolvers
         {
             res_ = res;
             
-            if ( cnt_ > cntMax_ )
+            if ( cnt_ > limit_ )
                 return true;
             
             return ( res < target_ );
@@ -72,8 +76,7 @@ namespace LinearSolvers
         /// calculate residual from `x` and return true if threshold is achieved
         bool finished(size_t size, const real* x)
         {
-            //fprintf(stderr, "Solver %3u residual %9.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
-            
+            //fprintf(stderr, "Solver %4lu residual %9.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
 #if ( 1 )
             // use the 'infinite' norm (i.e. the largest element)
             real res = blas::nrm8(size, x);
@@ -82,13 +85,15 @@ namespace LinearSolvers
             real res = blas::nrm2(size, x);
 #endif
 #if ( 1 )
-            if ( cnt_ > cntOld_+128 )
+            // monitor convergence: the residual from a linear solver may occasionally 
+            if ( 1 == (16&cnt_) )
             {
-                if ( res > 2*res_ )
+                if ( res > 2*resOld_ )
                 {
                     printf("Warning: slow convergence (reduce time_step?)");
-                    printf(" residual %.3e at iteration %lu, %.3e at %lu\n", res_, cntOld_, res, cnt_);
+                    printf(" residual %.3e at iteration %lu, %.3e at %lu\n", resOld_, cntOld_, res, cnt_);
                 }
+                resOld_ = res;
                 cntOld_ = cnt_;
             }
 #endif
