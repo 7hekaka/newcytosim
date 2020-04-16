@@ -24,7 +24,7 @@ class Space;
 #define NEW_FIBER_CONFINE2      0
 #define NEW_FIBER_CONFINE_RANGE 0
 #define NEW_FIBER_LOOP          0
-#define NEW_END_FORCE           0
+#define NEW_END_FORCE           1
 
 /// Property for a Fiber
 /**

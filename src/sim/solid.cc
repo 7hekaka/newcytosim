@@ -601,8 +601,6 @@ void Solid::fixShape()
         for ( size_t d = 0; d < DIM; ++d )
             soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
-    
-    setDragCoefficient();
 }
 
 //------------------------------------------------------------------------------
@@ -627,8 +625,6 @@ void Solid::scaleShape(const real scale[DIM])
     soShapeSqr = 0;
     for ( size_t i = 0; i < DIM * soShapeSize; ++i )
         soShapeSqr += soShape[i] * soShape[i];
-    
-    setDragCoefficient();
 }
 
 
@@ -927,14 +923,9 @@ void Solid::setDragCoefficient()
 }
 
 
-/**
- setDragCoefficient() is called by fixShape(), and it is not necessary to
- call it here again.
-*/
 void Solid::prepareMecable()
 {
-    //setDragCoefficient();
-    
+    setDragCoefficient();
     makeProjection();
 }
 

@@ -51,9 +51,6 @@ Sphere::Sphere(SphereProp const* p, real rad)
         addPoint( Vector(0,spRadius,0) );
         addPoint( Vector(0,0,spRadius) );
     }
-    
-    // this only needs to be called once:
-    setDragCoefficient();
 }
 
 
@@ -62,7 +59,6 @@ Sphere::Sphere(const Sphere & o)
 {
     prop     = o.prop;
     spRadius = o.spRadius;
-    setDragCoefficient();
 }
 
 
@@ -70,7 +66,6 @@ Sphere & Sphere::operator =(const Sphere & o)
 {
     prop     = o.prop;
     spRadius = o.spRadius;
-    setDragCoefficient();
     return *this;
 }
 
@@ -251,8 +246,6 @@ void Sphere::resize(const real R)
     {
         spRadius = R;
         reshape();
-        //recalculate drag:
-        setDragCoefficient();
     }
 }
 
@@ -305,10 +298,7 @@ void Sphere::setDragCoefficientPiston()
     real thickness = prop->confine_space_ptr->thickness();
     real eps = ( thickness - rad ) / rad;
     
-    if ( eps <= 0 )
-        throw InvalidParameter("Error: piston formula yields invalid value");
-
-    if ( eps > 1 )
+    if ( eps <= 0 || eps > 1 )
         throw InvalidParameter("Error: piston formula yields invalid value");
 
     spDrag    = 9*M_PI*M_PI * prop->viscosity * rad * M_SQRT2 / ( 4 * pow(eps,2.5) );
@@ -356,9 +346,7 @@ void Sphere::release()
 
 void Sphere::prepareMecable()
 {
-    //setDragCoefficient() was already called by the constructor
-    //setDragCoefficient();
-    
+    setDragCoefficient();
     assert_true( spDrag > 0 );
     assert_true( spDragRot > 0 );
     
