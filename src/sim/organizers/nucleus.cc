@@ -20,19 +20,18 @@ void Nucleus::step()
 
 void Nucleus::setInteractions(Meca& meca) const
 {
-    Sphere * sph = sphere();
+    Sphere const* sph = sphere();
     
     if ( sph )
     {
-        size_t nix = sphere()->nbPoints() - Sphere::nbRefPoints;
+        size_t nix = nuSphere->nbPoints() - Sphere::nbRefPoints;
         
-        for ( size_t ix = 0; ix < nix; ++ix )
+        for ( size_t i = 0; i < nix; ++i )
         {
-            const Fiber * fib = fiber(ix);
+            Fiber const* fib = fiber(i);
             if ( fib )
-                meca.addLink(Mecapoint(sph, ix+Sphere::nbRefPoints),
-                               fib->exactEnd(MINUS_END),
-                               prop->stiffness );
+                meca.addLink(Mecapoint(sph, i+Sphere::nbRefPoints),
+                             fib->exactEnd(MINUS_END), prop->stiffness);
         }
     }
 }
@@ -54,12 +53,11 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
         throw InvalidParameter("parameter `sphere` should be specified");
 
     SphereProp * sp = sim.findProperty<SphereProp>("sphere", str);
-    Sphere * sph = new Sphere(sp, rad);
-    grasp(sph);
-    res.push_back(sph);
+    nuSphere = new Sphere(sp, rad);
+    res.push_back(nuSphere);
     
     // get the center of the sphere
-    Vector c = sph->posP(0);
+    Vector c = nuSphere->posP(0);
     
     if ( opt.set(cnt, "fibers") && cnt > 0 )
     {
@@ -78,7 +76,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
                 Vector pos = c + Vector::randU(rad);
                 Vector dir = Vector::randU();
                 fib->setStraight(pos, dir, fib->length());
-                sph->addPoint(pos);
+                nuSphere->addPoint(pos);
                 res.append(objs);
                 grasp(fib);
             }
@@ -113,10 +111,10 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
             //position the bundle (initially aligned with X) tangentially:
             ObjectSet::moveObjects(objs, Isometry(pos, rot));
             
-            sph->addPoint( c + (pos-len*dir).normalized(rad) );
+            nuSphere->addPoint( c + (pos-len*dir).normalized(rad) );
             grasp(bu->organized(0));
             
-            sph->addPoint( c + (pos+len*dir).normalized(rad) );
+            nuSphere->addPoint( c + (pos+len*dir).normalized(rad) );
             grasp(bu->organized(1));
         }
     }
@@ -124,8 +122,45 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
     return res;
 }
 
+
+Nucleus::~Nucleus()
+{
+    //Cytosim::log("destroying %c%lu\n", TAG, identity());
+    nuSphere = nullptr;
+    prop = nullptr;
+}
+
 //------------------------------------------------------------------------------
 
+void Nucleus::write(Outputter& out) const
+{
+    Object::writeReference(out, nuSphere);
+    Organizer::write(out);
+}
+
+
+void Nucleus::read(Inputter& in, Simul& sim, ObjectTag tag)
+{
+    ObjectTag g;
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 53 )
+    {
+        size_t n = in.readUInt16();
+        nuSphere = Sphere::toSphere(sim.readReference(in, g));
+        Organizer::readOrganized(in, sim, n-1);
+    }
+    else
+#endif
+    {
+        nuSphere = Sphere::toSphere(sim.readReference(in, g));
+        Organizer::read(in, sim, tag);
+    }
+    assert_true( nbOrganized() > 0 );
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Display
 
 /**
  This sets the ends of the link number `inx`
@@ -138,7 +173,7 @@ bool Nucleus::getLink(size_t inx, Vector& pos1, Vector& pos2) const
     {
         pos1 = sphere()->posP(i);
         
-        Fiber const* fib = Fiber::toFiber(organized(inx+1));
+        Fiber const* fib = fiber(inx);
         if ( fib )
             pos2 = fib->posEnd(MINUS_END);
         else

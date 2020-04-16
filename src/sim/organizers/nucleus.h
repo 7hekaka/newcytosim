@@ -22,13 +22,19 @@ A Nucleus attaches Fibers to a Sphere:\n
 class Nucleus : public Organizer
 {
 public:
-    
+        
+    /// Sphere on which the Nucleus is built
+    Sphere*       nuSphere;
+
     /// Properties for the Nucleus
     NucleusProp const* prop;
         
     //------------------- construction and destruction -------------------------
     /// constructor
-    Nucleus(NucleusProp const* p) : prop(p) { }
+    Nucleus(NucleusProp const* p) : nuSphere(nullptr), prop(p) { }
+    
+    /// destructor
+    virtual      ~Nucleus();
 
     /// create a Nucleus and requested associated Objects
     ObjectList    build(Glossary&, Simul&);
@@ -44,20 +50,20 @@ public:
     //------------------- querying the nucleus ---------------------------------    
     
     ///position of center of gravity (returns the center of the sphere)
-    Vector        position() const { return sphere()->position(); }
+    Vector        position() const { return nuSphere->position(); }
     
     ///the Sphere on which the nucleus is built
-    Sphere *      sphere()   const { return static_cast<Sphere*>(organized(0)); }
+    Sphere *      sphere()   const { return nuSphere; }
     
     /// i-th fiber attached to the nucleus
-    Fiber *       fiber(size_t i) const { return static_cast<Fiber*>(organized(i+1)); }
+    Fiber *       fiber(size_t i) const { return static_cast<Fiber*>(organized(i)); }
     
     
     /// retrieve links end-points for display
     bool          getLink(size_t, Vector&, Vector&) const;
     
     /// display parameters 
-    PointDisp const* disp() const { if ( sphere() ) return sphere()->prop->disp; return nullptr; }
+    PointDisp const* disp() const { if ( nuSphere ) return nuSphere->prop->disp; return nullptr; }
     
     //------------------------------ read/write --------------------------------
     
@@ -69,6 +75,12 @@ public:
     
     /// return associated Property
     Property const* property() const { return prop; }
+    
+    /// read from IO
+    void            read(Inputter&, Simul&, ObjectTag);
+    
+    /// write to IO
+    void            write(Outputter&) const;
 
 };
 

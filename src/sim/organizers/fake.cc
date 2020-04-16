@@ -120,13 +120,20 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
      bs->write(std::clog, true);
     */
     
-    grasp(so);
+    fkSolid = so;
     res.push_back(so);
-    
-    disp_ptr = so->prop->disp;
     
     return res;
 }
+
+
+Fake::~Fake()
+{
+    //Cytosim::log("destroying %c%lu\n", TAG, identity());
+    fkSolid = nullptr;
+    prop = nullptr;
+}
+
 
 /**
  This sets the ends of the link number `inx`
