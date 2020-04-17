@@ -146,11 +146,51 @@ void test_swapSSE()
 
 #ifdef __AVX__
 
+
 /**
- This will convert src = { XYZ XYZ XYZ XYZ }
- into dst = { XYZ? XYZ? XYZ? XYZ? }
+ make
+     dX = { XXXX }
+     dY = { YYYY }
+     dZ = { ZZZZ }
+ from src = { XYZ XYZ XYZ XYZ }
  */
-inline void deswizzle4(real const* src, real * dst)
+inline void untangle4(real const* src, real* X, real* Y, real* Z)
+{
+    vec4 s0 = load4(src);
+    vec4 s1 = load4(src+4);
+    vec4 s2 = load4(src+8);
+    dump(s0, "s0");
+    dump(s1, "s1");
+    dump(s2, "s2");
+
+    vec4 d0 = blend4(s0, s2, 0b0011);
+    d0 = permute2f128(d0, d0, 0x21);
+
+    vec4 xy = blend4(s0, s1, 0b1100);
+    store4(X, blend4(d0, xy, 0b0101));
+
+    vec4 yz = blend4(s1, s2, 0b1100);
+    store4(Z, blend4(d0, yz, 0b1010));
+    
+    store4(Y, shuffle4(xy, yz, 0b0101));
+}
+
+void test_untangle()
+{
+    real src[] = { 1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3, 1.4, 2.4, 3.4 };
+    real X[4] = { 0 }, Y[4] = { 0 }, Z[4] = { 0 };
+    untangle4(src, X, Y, Z);
+    dump(4, X);
+    dump(4, Y);
+    dump(4, Z);
+}
+
+
+/**
+ make dst = { XYZ? XYZ? XYZ? XYZ? }
+ from src = { XYZ XYZ XYZ XYZ }
+ */
+inline void deswizzle4(real const* src, real* dst)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -574,6 +614,9 @@ int main(int argc, char * argv[])
 {
     //test_swapSSE();
 #ifdef __AVX__
+    test_untangle();
+    return 0;
+    
     if ( 0 )
     {
         test_cat();

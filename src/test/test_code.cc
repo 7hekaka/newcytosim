@@ -2,7 +2,7 @@
 
 #include <sys/time.h>
 
-#define DIM 2
+#define DIM 3
 
 #include "assert_macro.h"
 #include "real.h"
@@ -107,7 +107,7 @@ void setProjection()
     diag_[j] = 2.0;
 
     int info = 0;
-    lapack::xpttrf(NBS, diag_, upper_, &info);
+    alsatian_xpttrf(NBS, diag_, upper_, &info);
 }
 
 void setAnisotropy()
@@ -256,7 +256,6 @@ void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
         vec4 b = mul4(sub4(loadu4(pX+6), loadu4(pX+4)), loadc4(pM+4));
         pM += 8;
         pX += 8;
-        //store4(pT, hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
         vec4 p = permute2f128(a,b,0x20);
         vec4 q = permute2f128(a,b,0x31);
         store4(pT, add4(unpacklo4(p, q), unpackhi4(p, q)));
@@ -339,7 +338,7 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
 
 void testProjectionU(size_t cnt)
 {
-    std::cout << "testProjection " << DIM << "\n";
+    std::cout << "testProjectionU " << DIM << "D\n";
     testU(cnt, projectForcesU_,    " U_   ");
 #if defined __SSE__ & ( DIM == 2 )
     testU(cnt, projectForcesU_SSE, " U_SSE");
@@ -625,7 +624,7 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
 
 void testProjectionD(size_t cnt)
 {
-    std::cout << "testProjectionD " << DIM << "\n";
+    std::cout << "testProjectionD " << DIM << "D\n";
     testD(cnt, projectForcesD_,    " D_   ");
     testD(cnt, projectForcesD__,   " D__  ");
     testD(cnt, projectForcesD___,  " D___ ");
@@ -749,7 +748,7 @@ int main(int argc, char* argv[])
     {
         setProjection();
         setAnisotropy();
-        std::cout << "testProject " << DIM << "\n";
+        std::cout << "testProject " << DIM << "D\n";
         testProject(CNT, projectForces,  " projF");
         testProject(CNT, projectDPTTS,   " dptts");
         testProject(CNT, projectTangent, " projT");

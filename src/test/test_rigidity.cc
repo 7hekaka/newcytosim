@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#define DIM 2
+#define DIM 3
 
 #include "real.h"
 #include "vector.h"
