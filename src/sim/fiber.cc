@@ -644,6 +644,14 @@ void Fiber::join(Fiber * fib)
 //------------------------------------------------------------------------------
 #pragma mark - Mobility
 
+
+#if NEW_ANISOTROPIC_FIBER_DRAG
+    const real DRAG = 4;
+#else
+    const real DRAG = 3;
+#endif
+
+
 /**
  From "Random Walks in Biology" by HC. Berg, Princeton University Press,
  drag coefficients for an ellipsoid are,
@@ -680,11 +688,7 @@ real Fiber::dragCoefficientEllipsoid(const real len, FiberProp const* prop)
     // length below which the formula is not valid:
     const real min_len = exp( 1 + log(prop->drag_radius) );
 
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    const real drag_ellipsoid = 4 * len / log( lenc / prop->drag_radius );
-#else
-    const real drag_ellipsoid = 3 * len / log( lenc / prop->drag_radius );
-#endif
+    const real drag_ellipsoid = DRAG * len / log( lenc / prop->drag_radius );
 
     real drag = drag_sphere;
     
@@ -752,11 +756,7 @@ real Fiber::dragCoefficientCylinder(const real len, FiberProp const* prop)
     // this corresponds to the minimun point of `drag_cylinder`
     const real min_len = 2 * prop->drag_radius * exp(1.0-0.32);
     
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    const real drag_cylinder = 4 * len / ( log(0.5*lenc/prop->drag_radius) + 0.32 );
-#else
-    const real drag_cylinder = 3 * len / ( log(0.5*lenc/prop->drag_radius) + 0.32 );
-#endif
+    const real drag_cylinder = DRAG * len / ( log(0.5*lenc/prop->drag_radius) + 0.32 );
 
     real drag = drag_sphere;
     
@@ -841,12 +841,12 @@ void Fiber::setDragCoefficient()
 
     //the forces are distributed equally on all points, hence we multiply by nPoints
     assert_true( nPoints > 0 );
-    rfPointMobility = nPoints / drag;
+    iPointMobility = nPoints / drag;
     
 #if ( 0 )
     std::ostream& os = std::cerr; //Cytosim::log;
     os << "Fiber " << prop->name() << "  L = " << std::setw(7) << length();
-    os << "  has  drag " << drag << "    point_mobility " << rfPointMobility << std::endl;
+    os << "  has  drag " << drag << "    point_mobility " << iPointMobility << std::endl;
 #endif
 }
 
@@ -858,12 +858,12 @@ void Fiber::prepareMecable()
     makeProjection();
     //printProjection(std::clog);
     
-    assert_true( rfPointMobility > REAL_EPSILON );
+    assert_true( iPointMobility > REAL_EPSILON );
 
     // the scaling of the bending elasticity depends on the length of the segments
-    rfRigidity = prop->rigidity / segmentationCube();
+    iRigidity = prop->rigidity / segmentationCube();
 #if NEW_FIBER_LOOP
-    rfRigidityLoop = prop->loop;
+    iRigidityLoop = prop->loop;
 #endif
 #if ( 0 )
     real energy = bendingEnergy();

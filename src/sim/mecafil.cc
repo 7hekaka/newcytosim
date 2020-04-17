@@ -13,14 +13,14 @@
 Mecafil::Mecafil()
 {
     buildProjection();
-    rfPointMobility = 0;
-    rfRigidity = 0;
-    rfDiff = nullptr;
-    rfLag  = nullptr;
-    rfLLG  = nullptr;
-    rfVTP  = nullptr;
+    iPointMobility = 0;
+    iRigidity = 0;
+    iDir = nullptr;
+    iLag = nullptr;
+    iLLG = nullptr;
+    iVTP = nullptr;
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    rfDir  = 0;
+    iAni = nullptr;
 #endif
     useProjectionDiff = false;
 }
@@ -29,11 +29,11 @@ Mecafil::Mecafil()
 Mecafil::~Mecafil()
 {
     destroyProjection();
-    free_real(rfDiff);
-    rfDiff = nullptr;
-    rfLag  = nullptr;
-    rfLLG  = nullptr;
-    rfVTP  = nullptr;
+    free_real(iDir);
+    iDir = nullptr;
+    iLag = nullptr;
+    iLLG = nullptr;
+    iVTP = nullptr;
 }
 
 
@@ -64,31 +64,31 @@ size_t Mecafil::allocateMecable(const size_t nbp)
         allocateProjection(ms);
         
         // allocate memory:
-        free_real(rfDiff);
+        free_real(iDir);
         
 #if NEW_ANISOTROPIC_FIBER_DRAG
-        rfDiff = new_real(ms*(4*DIM+1));
-        rfLag  = rfDiff + ms*DIM;
-        rfLLG  = rfLag + ms;
-        rfDir  = rfLLG + ms*DIM;
-        rfVTP  = rfDir + ms*DIM;
+        iDir = new_real(ms*(4*DIM+1));
+        iLag  = iDir + ms*DIM;
+        iLLG  = iLag + ms;
+        iAni  = iLLG + ms*DIM;
+        iVTP  = iAni + ms*DIM;
 #else
-        rfDiff = new_real(ms*(4*DIM+1));
-        rfLag  = rfDiff + ms*DIM;
-        rfLLG  = rfLag + ms;
-        rfVTP  = rfLLG + ms*DIM;
+        iDir = new_real(ms*(4*DIM+1));
+        iLag  = iDir + ms*DIM;
+        iLLG  = iLag + ms;
+        iVTP  = iLLG + ms*DIM;
 #endif
         
         // reset Lagrange multipliers
-        zero_real(ms, rfLag);
+        zero_real(ms, iLag);
     }
     return ms;
 }
 
 void Mecafil::release()
 {
-    free_real(rfDiff);
-    rfDiff = nullptr;
+    free_real(iDir);
+    iDir = nullptr;
 }
 
 
@@ -100,12 +100,12 @@ void Mecafil::release()
  */
 real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 {
-    real b = sqrt( 2 * sc / rfPointMobility );
+    real b = sqrt( 2 * sc / iPointMobility );
 
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];
     
-    return b * rfPointMobility;
+    return b * iPointMobility;
 }
 
 
@@ -115,7 +115,7 @@ real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
  Calculate the normalized difference between successive vertices of the fiber:
 
      for ( int n = 0; n < DIM*lastPoint(); ++n )
-         rfDiff[n] = ( pPos[n+DIM] - pPos[n] ) / segmentation();
+         iDir[n] = ( pPos[n+DIM] - pPos[n] ) / segmentation();
 
  */
 
@@ -125,35 +125,35 @@ void Mecafil::storeDirections()
     //checkSegmentation(0.01);
     /*
      assume here that successive points are correctly separated, which is usally
-     not the case, but the error is usually small
+     the case, such that any error would be small
      */
     const real sc  = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
     for ( size_t p = 0; p < end; ++p )
-        rfDiff[p] = sc * ( pPos[p+DIM] - pPos[p] );
+        iDir[p] = sc * ( pPos[p+DIM] - pPos[p] );
 #else
     for ( size_t p = 0; p < lastPoint(); ++p )
-        normalize(diffPoints(p)).store(rfDiff+DIM*p);
+        normalize(diffPoints(p)).store(iDir+DIM*p);
 #endif
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     /*
-     Calculate the average filament direction at each vertex of the fiber in rfDir[].
-     Note that rfDir[] is calculated here from rfDiff[]
+     Calculate the average filament direction at each vertex of the fiber in iAni[].
+     Note that iAni[] is calculated here from iDir[]
      */
     
     // for the extremities, the direction of the nearby segment is used.
     for ( size_t d = 0; d < DIM; ++d )
     {
-        rfDir[d]     = rfDiff[d];
-        rfDir[d+end] = rfDiff[d+end-DIM];
+        iAni[d]     = iDir[d];
+        iAni[d+end] = iDir[d+end-DIM];
     }
     
-    // for intermediate points, the directions of the two flanking segments are averaged
+    // for intermediate points, the directions of the flanking segments are averaged
     for ( size_t p = DIM ; p < end; ++p )
-        rfDir[p] = 0.5 * ( rfDiff[p-DIM] + rfDiff[p] );
+        iAni[p] = 0.5 * ( iDir[p-DIM] + iDir[p] );
 
-    //VecPrint::print(std::clog, last+DIM, rfDir);
+    //VecPrint::print(std::clog, last+DIM, iAni);
 #endif
 }
 
@@ -169,7 +169,7 @@ void Mecafil::storeDirections()
  This is used to multiply the tangential component of X by a factor 2,
  without changing the orthogonal components
  */
-void scaleTangentially(size_t nbp, const real* X, const real* dir, real * Y)
+void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
 {
     for ( size_t p = 0; p < nbp; ++p )
     {
@@ -234,7 +234,7 @@ void Mecafil::addProjectionDiff(const real*, real*) const {} //DIM == 1
 void Mecafil::printTensions(std::ostream& os) const
 {
     os << "\n" << reference() << " ";
-    VecPrint::print(os, nbSegments(), rfLag, 2);
+    VecPrint::print(os, nbSegments(), iLag, 2);
     os << " end " << std::fixed << std::setprecision(2) << netForceEndM() << "   " << netForceEndP();
 }
 
@@ -576,22 +576,22 @@ void Mecafil::addRigidity(const real* X, real* Y) const
     // compare to default implementation:
     real * tmp = new_real(DIM*nPoints);
     copy_real(DIM*nPoints, Y, tmp);
-    add_rigidity0(nbt, X, rfRigidity, tmp);
+    add_rigidity0(nbt, X, iRigidity, tmp);
 #endif
     if ( nPoints > 3 )
     {
         size_t nbt = DIM * ( nPoints - 2 );  // number of triplet values
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-        add_rigidityF(nbt, X, rfRigidity, Y);
+        add_rigidityF(nbt, X, iRigidity, Y);
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
-        add_rigidity_SSE(nbt, X, rfRigidity, Y);
+        add_rigidity_SSE(nbt, X, iRigidity, Y);
 #elif ( DIM > 1 )
-        add_rigidityF(nbt, X, rfRigidity, Y);
+        add_rigidityF(nbt, X, iRigidity, Y);
 #endif
     
 #if NEW_FIBER_LOOP
-        if ( rfRigidityLoop )
+        if ( iRigidityLoop )
         {
             /*
              With Serge DMITRIEFF:
@@ -599,14 +599,14 @@ void Mecafil::addRigidity(const real* X, real* Y) const
              making the fiber mechanically homogeneous and all points equivalent
              */
             const size_t L = lastPoint();
-            add_rigidity(L,   0, 1, X, rfRigidity, Y);
-            add_rigidity(L-1, L, 0, X, rfRigidity, Y);
+            add_rigidity(L,   0, 1, X, iRigidity, Y);
+            add_rigidity(L-1, L, 0, X, iRigidity, Y);
         }
 #endif
     }
     else if ( nPoints > 2 )
     {
-        add_rigidity(0, 1, 2, X, rfRigidity, Y);
+        add_rigidity(0, 1, 2, X, iRigidity, Y);
     }
     
 #if CHECK_RIGIDITY

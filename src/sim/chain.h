@@ -158,7 +158,7 @@ public:
     /// set position of 'ref', direction and length of Fiber
     void         setStraight(Vector const& pos, Vector const& dir, real len);
 
-    /// move Fiber around to put 'ref' where the CENTER was
+    /// translate Fiber to put 'ref' where the CENTER was
     void         moveEnd(FiberEnd ref);
     
     /// set shape with `np` points from the given array of size DIM*n_pts

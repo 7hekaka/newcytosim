@@ -79,9 +79,6 @@ int main(int argc, char* argv[])
     {
         splash(std::cout);
         print_version(std::cout);
-#if NEW_ANISOTROPIC_FIBER_DRAG
-        std::cout << "    ANISOTROPIC_FIBER_DRAG = 1\n";
-#endif
         return EXIT_SUCCESS;
     }
     

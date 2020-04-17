@@ -31,30 +31,30 @@
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    mtJJt        = nullptr;
-    mtJJtiJforce = nullptr;
+    iJJt        = nullptr;
+    iJJtiJforce = nullptr;
 }
 
 
 void Mecafil::allocateProjection(const size_t ms)
 {
     //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
-    free_real(mtJJt);
+    free_real(iJJt);
     real * mem = new_real(3*ms);
     //zero_real(3*ms, mem);
-    mtJJt        = mem;
-    mtJJtU       = mem + ms;
-    mtJJtiJforce = mem + ms * 2;
+    iJJt        = mem;
+    iJJtU       = mem + ms;
+    iJJtiJforce = mem + ms * 2;
 }
 
 
 void Mecafil::destroyProjection()
 {
     //std::clog << reference() << "destroyProjection\n";
-    free_real(mtJJt);
-    mtJJt        = nullptr;
-    mtJJtU       = nullptr;
-    mtJJtiJforce = nullptr;
+    free_real(iJJt);
+    iJJt        = nullptr;
+    iJJtU       = nullptr;
+    iJJtiJforce = nullptr;
 }
 
 
@@ -67,32 +67,31 @@ void Mecafil::makeProjection()
 
     //set the diagonal and off-diagonal of J*J'
     const size_t nbu = nbPoints() - 2;
-    const real*const dif = rfDiff;
     real b = 1;
 
     for ( size_t jj = 0; jj < nbu; ++jj )
     {
-        const real* X = dif + DIM * jj;
+        const real* X = iDir + DIM * jj;
 #if ( DIM == 2 )
         real xn = X[0]*X[2] + X[1]*X[3];
 #else
         real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
 #endif
         real a = 0.25 * ( 1 + xn ) * ( 1 + xn );
-        mtJJt[jj]  = 2.0 + a + b;
-        mtJJtU[jj] = -xn - a;
+        iJJt[jj]  = 2.0 + a + b;
+        iJJtU[jj] = -xn - a;
         b = a;
     }
     
-    mtJJt[nbu] = 3.0 + b;
+    iJJt[nbu] = 3.0 + b;
     
     int info = 0;
-    DPTTRF(nbu+1, mtJJt, mtJJtU, &info);
+    DPTTRF(nbu+1, iJJt, iJJtU, &info);
 
     if ( 0 )
     {
-        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
-        std::clog << "\nU "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
+        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, iJJt, 3);
+        std::clog << "\nU "; VecPrint::print(std::clog, nbu, iJJtU, 3);
         //std::clog << "\nX="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
     }
 
@@ -112,43 +111,43 @@ void Mecafil::makeProjection()
 
     //set the diagonal and off-diagonal of J*J'
     const size_t nbu = nbPoints() - 2;
-    const real*const dif = rfDiff;
 
     for ( size_t jj = 0; jj < nbu; ++jj )
     {
-        const real* X = dif + DIM * jj;
+        const real* X = iDir + DIM * jj;
 #if ( DIM == 2 )
         real xn = X[0]*X[2] + X[1]*X[3];
 #else
         real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
 #endif
         
+        // this term should be 2, since iDir[] vectors are normalized:
 #if ( DIM == 2 )
-        mtJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
+        iJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
 #else
-        mtJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
+        iJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
 #endif
-        // the diagonal term should be nearly equal to 2, since dif[] vectors are normalized
-        //mtJJt[jj]  = 2.0;
-        mtJJtU[jj] = -xn;
+        // iJJt[jj]  = 2.0;
+        
+        iJJtU[jj] = -xn;
     }
     
-    const real* X = dif + DIM*nbu;
+    const real* X = iDir + DIM*nbu;
+    // this term should be 2, since iDir[] vectors are normalized
 #if ( DIM == 2 )
-    mtJJt[nbu] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
+    iJJt[nbu] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
 #else
-    mtJJt[nbu] = 2.0 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
+    iJJt[nbu] = 2.0 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
 #endif
-    // the diagonal term should be nearly equal to 2, since dif[] vectors are normalized
-    //mtJJt[nbu] = 2.0;
+    //iJJt[nbu] = 2.0;
 
     int info = 0;
-    DPTTRF(nbu+1, mtJJt, mtJJtU, &info);
+    DPTTRF(nbu+1, iJJt, iJJtU, &info);
 
     if ( 0 )
     {
-        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, mtJJt, 3);
-        std::clog << "\nU "; VecPrint::print(std::clog, nbu, mtJJtU, 3);
+        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, iJJt, 3);
+        std::clog << "\nU "; VecPrint::print(std::clog, nbu, iJJtU, 3);
         //std::clog << "\nX="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
     }
 
@@ -611,22 +610,22 @@ void Mecafil::projectForces(const real* X, real* Y) const
     const size_t nbs = nbSegments();
     //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
 
-    // calculate `rfLLG` without modifying `X`
+    // calculate `iLLG` without modifying `X`
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, X, rfDir, rfVTP);
-    projectForcesU(nbs, rfDiff, rfVTP, rfLLG);
+    scaleTangentially(nPoints, X, iAni, iVTP);
+    projectForcesU(nbs, iDir, iVTP, iLLG);
 #else
-    projectForcesU(nbs, rfDiff, X, rfLLG);
+    projectForcesU(nbs, iDir, X, iLLG);
 #endif
     
-    // rfLLG <- inv( J * Jt ) * rfLLG to find the Lagrange multipliers
-    DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLLG, nbs);
+    // iLLG <- inv( J * Jt ) * iLLG to find the Lagrange multipliers
+    DPTTS2(nbs, 1, iJJt, iJJtU, iLLG, nbs);
 
-    // set Y, using values in X and rfLLG
-    projectForcesD(nbs, rfDiff, X, rfLLG, Y);
+    // set Y, using values in X and iLLG
+    projectForcesD(nbs, iDir, X, iLLG, Y);
 
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, Y, rfDir, Y);
+    scaleTangentially(nPoints, Y, iAni, Y);
 #endif
     //printf("Y  "); VecPrint::print(std::clog, DIM*nbPoints(), Y);
 }
@@ -638,23 +637,23 @@ void Mecafil::computeTensions(const real* force)
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     
-    scaleTangentially(nPoints, force, rfDir, rfVTP);
-    projectForcesU(nbs, rfDiff, rfVTP, rfLag);
+    scaleTangentially(nPoints, force, iAni, iVTP);
+    projectForcesU(nbs, iDir, iVTP, iLag);
     
 #else
 
-    projectForcesU(nbs, rfDiff, force, rfLag);
+    projectForcesU(nbs, iDir, force, iLag);
     
 #endif
     
     // tmp <- inv( J * Jt ) * tmp to find the multipliers
-    DPTTS2(nbs, 1, mtJJt, mtJJtU, rfLag, nbs);
+    DPTTS2(nbs, 1, iJJt, iJJtU, iLag, nbs);
 }
 
 
 void Mecafil::storeTensions(const real*)
 {
-    copy_real(nPoints, rfLLG, rfLag);
+    copy_real(nPoints, iLLG, iLag);
 }
 
 
@@ -693,14 +692,14 @@ void Mecafil::makeProjectionDiff(const real* force)
     
 #if ( 0 )
     // verify that we have the correct Lagrange multipliers:
-    copy_real(nbs, rfLag, rfLLG);
+    copy_real(nbs, iLag, iLLG);
     computeTensions(force);
-    real n = blas::max_diff(nbs, rfLLG, rfLag);
+    real n = blas::max_diff(nbs, iLLG, iLag);
     if ( n > 1e-6 )
     {
         std::clog << "Error= \n" << n << "\n";
-        std::clog << "Lagrange: "; VecPrint::print(std::clog, std::min(20u,nbs), rfLLG);
-        std::clog << "Multipl.: "; VecPrint::print(std::clog, std::min(20u,nbs), rfLag);
+        std::clog << "Lagrange: "; VecPrint::print(std::clog, std::min(20u,nbs), iLLG);
+        std::clog << "Multipl.: "; VecPrint::print(std::clog, std::min(20u,nbs), iLag);
         std::clog << "\n";
     }
 #endif
@@ -709,7 +708,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     useProjectionDiff = false;
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        if ( rfLag[jj] > 0 )
+        if ( iLag[jj] > 0 )
         {
             useProjectionDiff = true;
             break;
@@ -722,10 +721,10 @@ void Mecafil::makeProjectionDiff(const real* force)
         const real sc = 1.0 / segmentation();
         #pragma vector unaligned
         for ( size_t jj = 0; jj < nbs; ++jj )
-            mtJJtiJforce[jj] = std::max(th, rfLag[jj] * sc);
+            iJJtiJforce[jj] = std::max(th, iLag[jj] * sc);
         
-        //std::clog << "projectionDiff: " << blas::nrm2(nbs, mtJJtiJforce) << std::endl;
-        //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), mtJJtiJforce);
+        //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtiJforce) << std::endl;
+        //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtiJforce);
     }
 }
 
@@ -891,15 +890,15 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     size_t nbp = nbPoints()*DIM;
     real * vec = new_real(nbp);
     copy_real(nbp, Y, vec);
-    add_projectiondiff(nbSegments(), mtJJtiJforce, X, vec);
+    add_projectiondiff(nbSegments(), iJJtiJforce, X, vec);
 #endif
 
 #if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-    add_projectiondiffSSE(nbSegments(), mtJJtiJforce, X, Y);
-    //add_projectiondiff(nbSegments(), mtJJtiJforce, X, Y);
-    //add_projectiondiffAVX(nbSegments(), mtJJtiJforce, X, Y);
+    add_projectiondiffSSE(nbSegments(), iJJtiJforce, X, Y);
+    //add_projectiondiff(nbSegments(), iJJtiJforce, X, Y);
+    //add_projectiondiffAVX(nbSegments(), iJJtiJforce, X, Y);
 #else
-    add_projectiondiffF(nbSegments(), mtJJtiJforce, X, Y);
+    add_projectiondiffF(nbSegments(), iJJtiJforce, X, Y);
 #endif
     
     

@@ -14,16 +14,6 @@
 #define BACKWARD_COMPATIBILITY
 
 
-/**
- If the keyword below is defined, the viscous drag of the fibers
- will be different in the transverse and parallel directions, such that
- it will be 2x easier to move a fiber along it longitudinal direction.
- 
- This is unpublished development, and you should set to zero
- */
-#define NEW_ANISOTROPIC_FIBER_DRAG 0
-
-
 /** 
  Enables advanced Space
  */

@@ -202,24 +202,24 @@ void Chain::setEquilibrated(real len, real persistence_length)
     
     real sigma = sqrt(2*fnCut/persistence_length);
     
+    Vector pos(0,0,0);
     Vector dir(1,0,0);
-    Vector vec(0,0,0);
-    setPoint(0, vec);
+    setPoint(0, pos);
     
     for ( size_t p = 1 ; p < np; ++p )
     {
-        vec += fnCut * dir;
-        setPoint(p, vec);
+        pos += fnCut * dir;
+        setPoint(p, pos);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
         dir = cos(a) * dir + dir.randOrthoU(sin(a));
     }
     
     // cancel out mean orientation and position:
-    translate(-0.5*vec);
-    if ( vec.normSqr() > 0.01 * fnCut )
+    translate(-0.5*pos);
+    if ( pos.normSqr() > 0.01 * fnCut )
     {
-        Rotation rot = Rotation::rotationToVector(vec).transposed();
+        Rotation rot = Rotation::rotationToVector(pos).transposed();
         rotate(rot);
     }
     updateFiber();

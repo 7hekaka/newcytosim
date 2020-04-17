@@ -6,6 +6,15 @@
 #include "fiber_prop.h"  // needed for NEW_FIBER_LOOP
 
 /**
+ If the keyword below is defined, the viscous drag of the fibers
+ will be different in the transverse and parallel directions, such that
+ it will be 2x easier to move a fiber along it longitudinal direction.
+ 
+ This is unpublished development, and you should set to zero
+ */
+#define NEW_ANISOTROPIC_FIBER_DRAG 1
+
+/**
  Enable this option to build the projection matrix explicitly.
  Alternatively, the projection is calculated directly using vectors only.
  Having two methods is useful for cross-validation, but the matrix version is SLOWER
@@ -34,62 +43,63 @@ class Mecafil : public Chain
 private:
     
     /// Lagrange multipliers associated with longitudinal imcompressibility
-    real   *    rfLag;
+    real   *    iLag;
     
     /// normalized differences of successive vertices (size is DIM*nbSegments)
-    real   *    rfDiff;
+    real   *    iDir;
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     /// local filament direction used to calculate anisotropic drag
-    real   *    rfDir;
+    real   *    iAni;
 #endif
     
     /// work array allocated to hold DIM*nbPoints() coordinates
-    real   *    rfLLG;
+    real   *    iLLG;
     
     /// work array allocated to hold DIM*nbPoints() coordinates
-    real   *    rfVTP;
+    real   *    iVTP;
 
 #if PROJECT_WITH_MATRIX
     
     /* variables used for projecting with a matrix ( mecafil_projectmat.cc ) */
     
     /// projection matrix
-    real   *    mtProj;
+    real   *    iProj;
     
     /// differential of projection matrix
-    real   *    mtDiffP;
+    real   *    iDProj;
     
     /// intermediate of calculus
-    real   *    mtJJtiJ;
+    real   *    iJJtiJ;
     
 #else
     
-    /// J*J', a nbSegments^2 matrix. We store the diagonal and one off-diagonal
-    real   *    mtJJt, * mtJJtU;
+    /// J*J' is a tridiagonal symmetric matrix of size (nbPoints-1).
+    /** iJJt[] holds the diagonal elements and iJJtU[] the off-diagonal ones.
+    real   *    iJJt, * iJJtU;
 
 #endif
     
     /// vector for the projection correction of size nbSegments
-    real   *    mtJJtiJforce;
+    real   *    iJJtiJforce;
     
-    /// true if all elements of mtJJtiJforce[] are null
+    /// true if all elements of iJJtiJforce[] are null
     bool        useProjectionDiff;
     
 protected:
     
     /// mobility of the points (all points have the same drag coefficient)
-    real        rfPointMobility;
+    real        iPointMobility;
     
     /// rigidity scaling factor used in addRigidity()
-    real        rfRigidity;
+    real        iRigidity;
     
 #if NEW_FIBER_LOOP
     /// link filament into a loop
-    bool        rfRigidityLoop;
+    bool        iRigidityLoop;
 #endif
     
-    /// calculate the normalized difference of successive vertices in rfDiff[]
+    /// calculate the normalized difference of successive vertices in iDir[]
     void        storeDirections();
 
 private:
@@ -142,13 +152,13 @@ public:
      .
      It is given in units of force (pico-Newton, if all quantitites use our units).
      */
-    real        tension(size_t p) const { assert_true(p+1<nPoints); return rfLag[p]; }
+    real        tension(size_t p) const { assert_true(p+1<nPoints); return iLag[p]; }
     
     /// total drag-coefficient of object (force = drag * speed)
-    real        dragCoefficient() const { return nPoints / rfPointMobility; }
+    real        dragCoefficient() const { return nPoints / iPointMobility; }
     
     /// drag coefficient of one point
-    real        leftoverMobility() const { return rfPointMobility; }
+    real        leftoverMobility() const { return iPointMobility; }
     
     //--------------------- Projection  / Dynamics
     
@@ -176,10 +186,10 @@ public:
     //--------------------- Rigidity
     
     /// return fiber rigidity
-    int         hasRigidity() const { return ( nPoints > 2 ) & ( rfRigidity > 0 ); }
+    int         hasRigidity() const { return ( nPoints > 2 ) & ( iRigidity > 0 ); }
 
     /// return fiber rigidity
-    real        fiberRigidity() const { return rfRigidity; }
+    real        fiberRigidity() const { return iRigidity; }
 
     /// add the rigidity force corresponding to configuration X into vector Y
     void        addRigidity(const real* X, real* Y) const;

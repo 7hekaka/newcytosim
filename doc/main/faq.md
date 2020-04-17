@@ -194,7 +194,7 @@ This would place them over a 1-um wide Z-range:
 Yes, the effective elastic coupling between the vertices of the filaments depends on the bending rigidity parameter, and on the distance between the points, which itself is determined by the segmentation parameter.
 The distance between points is not equal to the segmentation, because there is the constraint that a segment should be described by an integral number of points, but it is as close as it can be, given this constraint. In the code the coupling is set as:
 
-	rfRigidity = prop->rigidity / segmentationCube();
+	iRigidity = prop->rigidity / segmentationCube();
 
 (that is rigidity divided by the power 3 of the distance between points.)
 
@@ -1143,13 +1143,12 @@ For someone who knows the syntax of C++, this typically may require 1 week of wo
 <summary>
 **Is it possible to make a capping protein that attached to the plus end and halt polymerization of fibers?**
 </summary>
-We never needed a `capper` activity, and have not implemented one,
+We never needed a `capper` activity, and have not implemented one;
 but you could take the `Actor` class and modify it to do what you want.
-Either you modify `Actor` or you clone it under a different name. 
+Alternatively, you may clone the class under a different name. 
 
-You would need to copy 4 files: actor.h actor.cc actor_prop.h and actor_prop.cc,
-eg. to `capper.h`, etc.
-and then you rename all Actor to Capper,
+You would need to copy 4 files: actor.h actor.cc actor_prop.h and actor_prop.cc, to `capper.h`, etc.
+and then you replace all `Actor` to `Capper` within the new files,
 and then link these new class by editing `hand_prop.cc`
 There are only 3 lines to write (orange below), duplicating what is done with “actor”:
 
@@ -1269,14 +1268,14 @@ The Rigidity term is calculated in class `RigidFiber`:
 
 The job is done in:
 
-	add_rigidity1(X, DIM*(nbPoints()-2), Y, rfRigidity);
+	add_rigidity1(X, DIM*(nbPoints()-2), Y, iRigidity);
 
 That is essentially a second differential, multiplied by the rigidity modulus divided by the cube of the segment length.
 This correspond to standard elasticity, everywhere the same in the filament.
 
 You can already define different classes of filaments with different rigidity.
 You could make the rigidity dependent on some thing else, with a rigidity defined for each filament at each time point.
-You would just need to plug in the value instead of `rfRigidity`.
+You would just need to plug in the value instead of `iRigidity`.
 
 That`s crazy but for fun you could do this:
 
@@ -1298,7 +1297,7 @@ That`s crazy but for fun you could do this:
 	    if ( nbPoints() > 2 )
 	    {
 	        real time = simul().simTime();
-	        add_rigidity1(X, DIM*(nbPoints()-2), Y, rfRigidity * (1 + cos(time)));
+	        add_rigidity1(X, DIM*(nbPoints()-2), Y, iRigidity * (1 + cos(time)));
 	    }
 	}
 
