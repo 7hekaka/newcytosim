@@ -146,6 +146,33 @@ void test_swapSSE()
 
 #ifdef __AVX__
 
+/**
+ make
+     dst = { XYZ XYZ XYZ XYZ }
+ from
+     dX = { XXXX }
+     dY = { YYYY }
+     dZ = { ZZZZ }
+ */
+inline void tangle4(real const* X, real const* Y, real const* Z, real* dst)
+{
+    vec4 sx = load4(X);
+    vec4 sy = load4(Y);
+    vec4 sz = load4(Z);
+    dump(sx, "sx");
+    dump(sy, "sy");
+    dump(sz, "sz");
+
+    vec4 zx = blend4(sx, sz, 0b0101);
+    zx = permute2f128(zx, zx, 0x21);
+
+    vec4 xy = unpacklo4(sx, sy);
+    vec4 yz = unpackhi4(sy, sz);
+    
+    store4(dst  , blend4(xy, zx, 0b1100));
+    store4(dst+4, blend4(yz, xy, 0b1100));
+    store4(dst+8, blend4(zx, yz, 0b1100));
+}
 
 /**
  make
@@ -163,26 +190,27 @@ inline void untangle4(real const* src, real* X, real* Y, real* Z)
     dump(s1, "s1");
     dump(s2, "s2");
 
-    vec4 d0 = blend4(s0, s2, 0b0011);
-    d0 = permute2f128(d0, d0, 0x21);
-
+    vec4 zx = blend4(s0, s2, 0b0011);
+    zx = permute2f128(zx, zx, 0x21);
     vec4 xy = blend4(s0, s1, 0b1100);
-    store4(X, blend4(d0, xy, 0b0101));
-
     vec4 yz = blend4(s1, s2, 0b1100);
-    store4(Z, blend4(d0, yz, 0b1010));
     
+    store4(X,   blend4(zx, xy, 0b0101));
     store4(Y, shuffle4(xy, yz, 0b0101));
+    store4(Z,   blend4(zx, yz, 0b1010));
 }
 
 void test_untangle()
 {
-    real src[] = { 1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3, 1.4, 2.4, 3.4 };
+    real dst[12] = { 0 };
+    real src[12] = { 1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3, 1.4, 2.4, 3.4 };
     real X[4] = { 0 }, Y[4] = { 0 }, Z[4] = { 0 };
     untangle4(src, X, Y, Z);
     dump(4, X);
     dump(4, Y);
     dump(4, Z);
+    tangle4(X, Y, Z, dst);
+    dump(12, dst);
 }
 
 
