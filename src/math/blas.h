@@ -85,6 +85,18 @@ namespace blas
 {
 #pragma mark - Level 1
 
+/**
+ We always use double precision to accumulate the dot product of two vectors:
+ */
+inline double xdot(int N, const real* X, int incX, const real* Y, int incY)
+{
+#if REAL_IS_DOUBLE
+    return cblas_ddot(N, X, incX, Y, incY);
+#else
+    return cblas_dsdot(N, X, incX, Y, incY);
+#endif
+}
+
 inline real ddot(int N, const double* X, int incX, const double* Y, int incY)
 {
     return cblas_ddot(N, X, incX, Y, incY);

@@ -95,23 +95,6 @@ inline double xdot(int N, const real* X, int incX, const real* Y, int incY)
 #endif
 }
 
-inline double dot(int N, const real* X, const real* Y)
-{
-    int one = 1;
-#if REAL_IS_DOUBLE
-    return ddot_(&N, X, &one, Y, &one);
-#else
-    return dsdot_(&N, X, &one, Y, &one);
-#endif
-}
-
-/// this is the standard Euclidian norm
-inline double nrm2(int N, const real* X)
-{
-    //using double precision to accumulate:
-    return sqrt(blas::xdot(N, X, 1, X, 1));
-}
-
 inline real ddot(int N, const double* X, int incX, const double* Y, int incY)
 {
     return ddot_(&N, X, &incX, Y, &incY);
