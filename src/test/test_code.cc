@@ -2,10 +2,11 @@
 
 #include <sys/time.h>
 
-#define DIM 3
+#define DIM 2
 
 #include "assert_macro.h"
 #include "real.h"
+#include "vector.h"
 #include "tictoc.h"
 #include "random.h"
 #include "vecprint.h"
@@ -19,9 +20,9 @@
 const real scalar = 2.0;
 
 /// number of segments:
-const size_t NBS = 12;
-const size_t NBR = DIM * ( NBS + 1 );
-const size_t ALOC = NBR + 8;
+const size_t NBS = 127;
+const size_t NCO = DIM * ( NBS + 1 );
+const size_t ALOC = NCO + 8;
 
 const size_t DISP = 16UL;
 
@@ -52,33 +53,82 @@ inline void print_alignment(real const* ptr, const char msg[])
 
 //------------------------------------------------------------------------------
 
+/// vectors for one filament
+real *pos_=nullptr, *dir_=nullptr, *ani_=nullptr;
+real *lag_=nullptr, *force_=nullptr, *tmp_=nullptr;
+real *diag_=nullptr, *upper_=nullptr;
 
-real *diff = nullptr, *pos = nullptr, *lagmul = nullptr, *force = nullptr;
-
-
-void setFilament(int np, real * vec, real seg, real persistence_length)
+void setPoint(size_t n, Vector pos, Vector dir)
 {
+    pos.store(pos_+DIM*n);
+    dir.store(dir_+DIM*n);
+}
+
+void setFilament(size_t np, real seg, real persistence_length)
+{
+    np = std::min(np, NBS+1);
+    delete(pos_);
+    delete(dir_);
+    pos_ = new_real(NCO);
+    dir_ = new_real(NCO);
+
     real sigma = sqrt(2.0*seg/persistence_length);
     
-    real pX = 0, pY = 0;
-    real a = RNG.sreal() * M_PI;
-   
-    vec[0] = pX;
-    vec[1] = pY;
-
-    for ( int p = 1 ; p < np; ++p )
+    Vector pos(0,0,0);
+    Vector dir(1,0,0);
+    
+    setPoint(0, pos, dir);
+    for ( size_t p = 1 ; p < np; ++p )
     {
-        real dX = seg * cos(a);
-        real dY = seg * sin(a);
-        diff[2*p-2] = dX;
-        diff[2*p-1] = dY;
-        pX += dX;
-        pY += dY;
-        vec[2*p  ] = pX;
-        vec[2*p+1] = pY;
-
-        a += sigma * RNG.gauss();
+        pos += seg * dir;
+        setPoint(p, pos, dir);
+        //rotate dir in a random direction:
+        real a = sigma * RNG.gauss();
+        dir = cos(a) * dir + dir.randOrthoU(sin(a));
     }
+}
+
+void setProjection()
+{
+    delete(diag_);
+    delete(upper_);
+    diag_ = new_real(NBS);
+    upper_ = new_real(NBS);
+    
+    size_t j = 0;
+    for ( ; j < NBS-1; ++j )
+    {
+        const real* X = dir_ + DIM * j;
+#if ( DIM == 2 )
+        upper_[j] = -( X[0]*X[2] + X[1]*X[3] );
+#else
+        upper_[j] = -( X[0]*X[3] + X[1]*X[4] + X[2]*X[5] );
+#endif
+        diag_[j] = 2.0;
+    }
+    diag_[j] = 2.0;
+
+    int info = 0;
+    lapack::xpttrf(NBS, diag_, upper_, &info);
+}
+
+void setAnisotropy()
+{
+    delete(ani_);
+    ani_ = new_real(NCO);
+
+    const size_t end = DIM * NBS;
+
+    // for the extremities, the direction of the nearby segment is used.
+    for ( size_t d = 0; d < DIM; ++d )
+    {
+        ani_[d]     = dir_[d];
+        ani_[d+end] = dir_[d+end-DIM];
+    }
+    
+    // for intermediate points, the directions of the flanking segments are averaged
+    for ( size_t p = DIM ; p < end; ++p )
+        ani_[p] = 0.5 * ( dir_[p-DIM] + dir_[p] );
 }
 
 void setRandom(int np, real * vec, real mag)
@@ -101,7 +151,7 @@ void new_reals(real*& x, real*& y, real*& z, real mag)
     }
 }
 
-void free_real(real* x, real* y, real* z)
+void free_reals(real* x, real* y, real* z)
 {
     free_real(x);
     free_real(y);
@@ -453,6 +503,9 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
     }
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - TEST Rigidity
+
 
 inline void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
 {
@@ -469,15 +522,15 @@ inline void testRigidity(size_t cnt, void (*func)(const size_t, const real*, rea
     }
     TicToc::toc(str);
     zero_real(ALOC, x);
-    func(nbt, pos, scalar, x);
-    VecPrint::print(std::cout, std::min(DISP,NBR), x);
+    func(nbt, pos_, scalar, x);
+    VecPrint::print(std::cout, std::min(DISP,NCO), x);
     
     zero_real(ALOC, y);
-    add_rigidity0(nbt, pos, scalar, y);
+    add_rigidity0(nbt, pos_, scalar, y);
     real err = blas::max_diff(nbt+2*DIM, x, y);
     printf("  -> %e\n", err);
     
-    free_real(x, y, z);
+    free_reals(x, y, z);
 }
 
 
@@ -595,6 +648,7 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
         store4(pT+4, hadd4(permute2f128(c,d,0x20), permute2f128(c,d,0x31)));
         pT += 8;
     }
+#endif
 
     while ( pT <= end )
     {
@@ -607,7 +661,6 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
         store4(pT, add4(unpacklo4(p, q), unpackhi4(p, q)));
         pT += 4;
     }
-    #endif
 
     while ( pT <= end+2 )
     {
@@ -629,7 +682,7 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
 
 
 /**
- Attetion: this does not check the boundaries and will write beyond the
+ Attention: this does not check the boundaries and will write beyond the
  nbs-th point of tmp, which should be allocated accordingly.
  F. Nedelec, 11.01.2018
  */
@@ -659,6 +712,42 @@ inline void projectForcesU_AVY(size_t nbs, const real* dif, const real* X, real*
 
 #endif
 #endif
+
+void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
+{
+    real *x = nullptr, *y = nullptr, *z = nullptr;
+    new_reals(x, y, z, 1.0);
+    
+    zero_real(ALOC, lag_);
+    func(NBS, dir_, force_, lag_);
+    VecPrint::print(std::cout, std::min(DISP,NBS+1), lag_);
+
+    TicToc::tic();
+    for ( size_t ii=0; ii<cnt; ++ii )
+    {
+        func(NBS, dir_, y, z);
+        // check the code with unaligned memory:
+        func(NBS, dir_, x+2, y);
+        func(NBS, dir_, z+4, y);
+    }
+    TicToc::toc(str);
+    
+    free_reals(x,y,z);
+}
+
+
+void testProjectionU(size_t cnt)
+{
+    std::cout << "testProjection " << DIM << "\n";
+    testU(cnt, projectForcesU_,    " U_   ");
+#if defined __SSE__ & ( DIM == 2 )
+    testU(cnt, projectForcesU_SSE, " U_SSE");
+#endif
+#if defined __AVX__ && ( DIM == 2 )
+    testU(cnt, projectForcesU_AVX, " U_AVX");
+    testU(cnt, projectForcesU_AVY, " U_AVY");
+#endif
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT DOWN
@@ -910,241 +999,166 @@ inline void projectForcesD_AVX(size_t nbs, const real* dif,
 #endif
 
 
-//------------------------------------------------------------------------------
-#pragma mark - Test
-
-
-inline void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
+void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_reals(x, y, z, 1.0);
-
-    TicToc::tic();
-    for ( size_t ii=0; ii<cnt; ++ii )
-    {
-        func(NBS, diff, y, z);
-        // check the code with unaligned memory:
-        func(NBS, diff, x+2, y);
-        func(NBS, diff, z+4, y);
-    }
-    TicToc::toc(str);
-    
-    zero_real(ALOC, lagmul);
-    func(NBS, diff, force, lagmul);
-    VecPrint::print(std::cout, std::min(DISP,NBS+1), lagmul) << std::endl;
-    
-    free_real(x,y,z);
-}
-
-
-inline void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
-{
-    real *x = nullptr, *y = nullptr, *z = nullptr;
-    new_reals(x, y, z, 1.0);
-
-    TicToc::tic();
-    for ( size_t ii=0; ii<cnt; ++ii )
-    {
-        func(NBS, diff, x, y, z);
-        // check the code with unaligned memory:
-        func(NBS, diff, y+2, z, x+2);
-        func(NBS, diff, z+4, x, y+4);
-    }
-    TicToc::toc(str);
     
     zero_real(ALOC, x);
-    func(NBS, diff, pos, lagmul, x);
-    VecPrint::print(std::cout, std::min(DISP,NBR+2), x) << std::endl;
+    func(NBS, dir_, pos_, lag_, x);
+    VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
+
+    TicToc::tic();
+    for ( size_t ii=0; ii<cnt; ++ii )
+    {
+        func(NBS, dir_, x, y, z);
+        // check the code with unaligned memory:
+        func(NBS, dir_, y+2, z, x+2);
+        func(NBS, dir_, z+4, x, y+4);
+    }
+    TicToc::toc(str);
     
-    free_real(x,y,z);
+    free_reals(x,y,z);
 }
 
-
-void testProjectionU(size_t cnt)
-{
-    std::cout << "ProjectForces\n";
-    testU(cnt, projectForcesU_,    "U_   ");
-#if defined __SSE__ & ( DIM == 2 )
-    testU(cnt, projectForcesU_SSE, "U_SSE");
-#endif
-#if defined __AVX__ && ( DIM == 2 )
-    testU(cnt, projectForcesU_AVX, "U_AVX");
-    testU(cnt, projectForcesU_AVY, "U_AVY");
-#endif
-}
 
 void testProjectionD(size_t cnt)
 {
-    std::cout << "ProjectForces\n";
-    testD(cnt, projectForcesD_,    "D_   ");
-    testD(cnt, projectForcesD__,   "D__  ");
-    testD(cnt, projectForcesD___,  "D___ ");
+    std::cout << "testProjectionD " << DIM << "\n";
+    testD(cnt, projectForcesD_,    " D_   ");
+    testD(cnt, projectForcesD__,   " D__  ");
+    testD(cnt, projectForcesD___,  " D___ ");
     //testD(cnt, projectForcesD_PTR, "D_PTR");
 #if defined __SSE__ & ( DIM == 2 )
-    testD(cnt, projectForcesD_SSE, "D_SSE");
+    testD(cnt, projectForcesD_SSE, " D_SSE");
 #endif
 #if defined __AVX__ & ( DIM == 2 )
-    testD(cnt, projectForcesD_AVX, "D_AVX");
+    testD(cnt, projectForcesD_AVX, " D_AVX");
 #endif
 }
 
 
 //------------------------------------------------------------------------------
-#pragma mark - DPTTR / DPTTS2
+#pragma mark - Fiber::projectForces()
 
-/**
- Test Lapack and custom implementation of routines used to factorize
- a symmetric tri-diagonal matrix and solve the associated system.
- */
-void testDPTT(size_t cnt)
+void projectForces(size_t nbs, const real* X, real* Y)
 {
-    std::cout << "testDPTT " << __VERSION__ << "\n";
-
-    real * D = new_real(NBS);
-    real * U = new_real(NBS);
-    real * B = new_real(NBS);
-    real * Ds = new_real(NBS);
-    real * Us = new_real(NBS);
-    real * Bs = new_real(NBS);
-
-    for ( size_t i = 0; i < NBS; ++i )
-    {
-        Ds[i] = 2.0;
-        Us[i] = -RNG.preal();
-        Bs[i] = RNG.sreal();
-    }
-
-    int info;
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    lapack_xpttrf(NBS, D, U, &info);
-    lapack_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        lapack_xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("   clapack");
+    // calculate `iLLG` without modifying `X`
+#ifdef __AVX__
+    projectForcesU_AVX(nbs, dir_, X, lag_);
+#else
+    projectForcesU_(nbs, dir_, X, lag_);
+#endif
     
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    lapack::xpttrf(NBS, D, U, &info);
-    lapack::xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        lapack::xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("    lapack");
+    // find Lagrange multipliers
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    italian_xpttrf(NBS, D, U, &info);
-    italian_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        italian_xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("   italian");
-    
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    alsatian_xpttrf(NBS, D, U, &info);
-    alsatian_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian_xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("  alsatian");
-
-    free_real(D);
-    free_real(U);
-    free_real(B);
-    free_real(Ds);
-    free_real(Us);
-    free_real(Bs);
+    // set Y, using values in X and iLLG
+#ifdef __AVX__
+    projectForcesD_AVX(nbs, dir_, X, lag_, Y);
+#else
+    projectForcesD_(nbs, dir_, X, lag_, Y);
+#endif
 }
 
-
-/**
- Test Lapack and custom implementation of routines used to factorize
- a symmetric tri-diagonal matrix and solve the associated system.
- */
-void testThomas(size_t cnt)
+void projectDPTTS(size_t nbs, const real* X, real* Y)
 {
-    std::cout << "testDPTT " << __VERSION__ << "\n";
-
-    real * D = new_real(NBS);
-    real * U = new_real(NBS);
-    real * B = new_real(NBS);
-    real * Ds = new_real(NBS);
-    real * Us = new_real(NBS);
-    real * Bs = new_real(NBS);
-
-    for ( size_t i = 0; i < NBS; ++i )
-    {
-        Ds[i] = 2.0;
-        Us[i] = -RNG.preal();
-        Bs[i] = RNG.sreal();
-    }
-
-    TicToc::tic();
-    for ( size_t n = 0; n < cnt; ++n )
-    {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        copy_real(NBS, Bs, B);
-        italian_thomas(NBS, U, D, U, B);
-    }
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::toc("   italian");
-    
-    TicToc::tic();
-    for ( size_t n = 0; n < cnt; ++n )
-    {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        copy_real(NBS, Bs, B);
-        alsatian_thomas(NBS, D, U, B);
-    }
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::toc("  alsatian");
-    
-    free_real(D);
-    free_real(U);
-    free_real(B);
-    free_real(Ds);
-    free_real(Us);
-    free_real(Bs);
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 }
+
+void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
+{
+    for ( size_t p = 0; p < nbp; ++p )
+    {
+        real const* xxx = X   + DIM * p;
+        real const* ddd = dir + DIM * p;
+        real      * yyy = Y   + DIM * p;
+#if ( DIM == 2 )
+        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1];
+        yyy[0] = xxx[0] + s * ddd[0];
+        yyy[1] = xxx[1] + s * ddd[1];
+#elif ( DIM >= 3 )
+        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1] + xxx[2] * ddd[2];
+        yyy[0] = xxx[0] + s * ddd[0];
+        yyy[1] = xxx[1] + s * ddd[1];
+        yyy[2] = xxx[2] + s * ddd[2];
+#endif
+    }
+}
+
+void projectTangent(size_t nbs, const real* X, real* Y)
+{
+    // calculate `iLLG` without modifying `X`
+    scaleTangentially(nbs+1, X, ani_, tmp_);
+    projectForcesU_(nbs, dir_, tmp_, lag_);
+    
+    // find Lagrange multipliers
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
+
+    // set Y, using values in X and iLLG
+    projectForcesD___(nbs, dir_, X, lag_, Y);
+    scaleTangentially(nbs+1, Y, ani_, Y);
+}
+
+void projectScale(size_t nbs, const real* X, real* Y)
+{
+    scaleTangentially(nbs+1, X, ani_, Y);
+    scaleTangentially(nbs+1, Y, ani_, Y);
+}
+
+inline void testProject(size_t cnt, void (*func)(size_t, const real*, real*), char const* str)
+{
+    real *x = nullptr, *y = nullptr, *z = nullptr;
+    new_reals(x, y, z, 1.0);
+    
+    zero_real(ALOC, x);
+    func(NBS, force_, x);
+    VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
+
+    TicToc::tic();
+    for ( size_t ii=0; ii<cnt; ++ii )
+    {
+        func(NBS, x, y);
+        // check the code with unaligned memory:
+        func(NBS, y+2, z);
+        func(NBS, z, x);
+    }
+    TicToc::toc(str);
+    free_reals(x,y,z);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Main
 
 int main(int argc, char* argv[])
 {
-    //re-seed the random number generator:
     RNG.seed();
-
+    new_reals(force_, lag_, tmp_, 1.0);
+    setRandom(NBS+1, force_, 1.0);
+    setFilament(NBS+1, 1.0, 2.0);
+    
+    const size_t CNT = 1<<20;
+    
     if ( 1 )
     {
-        testThomas(1<<16);
-        testDPTT(1<<17);
+        //testRigidity(CNT);
+        testProjectionU(CNT);
+        testProjectionD(CNT);
     }
-    if ( 0 )
+    if ( 1 )
     {
-        pos = new_real(ALOC);
-        new_reals(force, lagmul, diff, 0.0);
-        
-        setFilament(NBS+1, pos, 1.0, 2.0);
-        setRandom(NBS+1, force, 1.0);
-        
-        testRigidity(1<<18);
-        //testProjectionU(1<<20);
-        //testProjectionD(1<<20);
-        
-        free_real(pos);
-        free_real(diff, lagmul, force);
+        setProjection();
+        setAnisotropy();
+        std::cout << "testProject " << DIM << "\n";
+        testProject(CNT, projectForces,  " projF");
+        testProject(CNT, projectDPTTS,   " dptts");
+        testProject(CNT, projectTangent, " projT");
+        testProject(CNT, projectScale,   " scale");
     }
     
+    free_reals(tmp_, lag_, force_);
+    free_reals(pos_, dir_, ani_);
+    free_reals(diag_, upper_, nullptr);
+
     return EXIT_SUCCESS;
 }

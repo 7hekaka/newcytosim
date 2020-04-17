@@ -441,6 +441,8 @@
 		BB7020AE0823C4B100B2AA50 /* sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7020AA0823C4B100B2AA50 /* sphere.h */; };
 		BB7085E91285A2CA00D8D79A /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
 		BB7085EA1285A2CA00D8D79A /* stream_func.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7085E81285A2CA00D8D79A /* stream_func.h */; };
+		BB7086352448BC3700C73273 /* test_dpttrs.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7086342448BC3700C73273 /* test_dpttrs.cc */; };
+		BB70863624499A7000C73273 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
 		BB71916B0EF1CD9900CED9E2 /* matsparsesym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0C409F069A043600CF45A8 /* matsparsesym.h */; };
 		BB71916C0EF1CD9900CED9E2 /* matsparsesym2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA331AF06CA7059002C3684 /* matsparsesym2.h */; };
 		BB71916E0EF1CD9900CED9E2 /* quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = BB94965A0933B75B003A32FE /* quaternion.h */; };
@@ -1380,6 +1382,7 @@
 		BB7020AA0823C4B100B2AA50 /* sphere.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sphere.h; path = src/sim/sphere.h; sourceTree = SOURCE_ROOT; };
 		BB7085E71285A2CA00D8D79A /* stream_func.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stream_func.cc; sourceTree = "<group>"; };
 		BB7085E81285A2CA00D8D79A /* stream_func.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_func.h; sourceTree = "<group>"; };
+		BB7086342448BC3700C73273 /* test_dpttrs.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_dpttrs.cc; sourceTree = "<group>"; };
 		BB7191C50EF1CD9900CED9E2 /* libcytomath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytomath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7192360EF1CEEA00CED9E2 /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; name = makefile.inc; path = src/math/makefile.inc; sourceTree = SOURCE_ROOT; };
 		BB73586D05B98DA3006956D5 /* array.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = array.h; path = src/base/array.h; sourceTree = SOURCE_ROOT; };
@@ -2486,6 +2489,7 @@
 				BB882B400EE82D6A00E29E5C /* test.cc */,
 				BB1227AE114FB8640042589A /* test_blas.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */,
+				BB7086342448BC3700C73273 /* test_dpttrs.cc */,
 				BB940AB8164BCDDF00542F06 /* test_cxx.cc */,
 				BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */,
 				BBDAA458152C648F0099FD2D /* test_gillespie.cc */,
@@ -4044,6 +4048,7 @@
 				BB18BBCF1DFD7E4A00567023 /* test_code.cc in Sources */,
 				BBE447DB2064ED200058ADAC /* SFMT.c in Sources */,
 				BB04E2761E1A4E89000BDBC9 /* random.cc in Sources */,
+				BB70863624499A7000C73273 /* random_vector.cc in Sources */,
 				BB04E2751E1A4E7B000BDBC9 /* tictoc.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4389,6 +4394,7 @@
 				BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */,
 				BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */,
 				BB9D87B01E76BBB800DD0F00 /* matsparsesym2.cc in Sources */,
+				BB7086352448BC3700C73273 /* test_dpttrs.cc in Sources */,
 				BB9EC398209235CC00EF00E7 /* SFMT.c in Sources */,
 				BB089A0C2228A26D00C070E7 /* matrix33.cc in Sources */,
 				BB089A0B2228A26D00C070E7 /* matrix22.cc in Sources */,
