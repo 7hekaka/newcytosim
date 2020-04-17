@@ -600,8 +600,8 @@ inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real*
         x = load2(pX);
         vec2 b = mul2(sub2(x, y), load2(pM+2));
         pM += 4;
-        storeu2(pT, hadd2(a, b));
-        //storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
+        //storeu2(pT, hadd2(a, b));
+        storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
         pT += 2;
     }
     
@@ -609,7 +609,8 @@ inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real*
     {
         y = load2(pX+2);
         vec2 a = mul2(sub2(y, x), load2(pM));
-        storelo(pT, hadd2(a, a));
+        //storelo(pT, hadd2(a, a));
+        storelo(pT, add2(a, unpackhi2(a, a)));
     }
 }
 
@@ -657,7 +658,8 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
         pM += 8;
         pX += 8;
         //store4(pT, hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
-        vec4 p = permute2f128(a,b,0x20), q = permute2f128(a,b,0x31);
+        vec4 p = permute2f128(a,b,0x20);
+        vec4 q = permute2f128(a,b,0x31);
         store4(pT, add4(unpacklo4(p, q), unpackhi4(p, q)));
         pT += 4;
     }
@@ -694,7 +696,7 @@ inline void projectForcesU_AVY(size_t nbs, const real* dif, const real* X, real*
     real *pT = tmp;
     real *const end = tmp + nbs;
     
-    // calculate the terms 8 by 8
+    // calculate the terms 4 by 4
     while ( pT < end )
     {
         vec4 a = mul4(sub4(loadu4(pX+2), loadu4(pX  )), loadc4(pM  ));
@@ -1044,7 +1046,7 @@ void testProjectionD(size_t cnt)
 void projectForces(size_t nbs, const real* X, real* Y)
 {
     // calculate `iLLG` without modifying `X`
-#ifdef __AVX__
+#if defined __AVX__ && ( DIM == 2 )
     projectForcesU_AVX(nbs, dir_, X, lag_);
 #else
     projectForcesU_(nbs, dir_, X, lag_);
@@ -1054,10 +1056,10 @@ void projectForces(size_t nbs, const real* X, real* Y)
     alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 
     // set Y, using values in X and iLLG
-#ifdef __AVX__
+#if defined __AVX__ && ( DIM == 2 )
     projectForcesD_AVX(nbs, dir_, X, lag_, Y);
 #else
-    projectForcesD_(nbs, dir_, X, lag_, Y);
+    projectForcesD___(nbs, dir_, X, lag_, Y);
 #endif
 }
 

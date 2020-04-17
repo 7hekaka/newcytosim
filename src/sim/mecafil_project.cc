@@ -290,7 +290,8 @@ inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real*
         x = load2(pX);
         vec2 b = mul2(sub2(x, y), load2(pD+2));
         pD += 4;
-        storeu2(pT, hadd2(a, b));
+        //storeu2(pT, hadd2(a, b));
+        storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
         pT += 2;
     }
     
@@ -298,7 +299,8 @@ inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real*
     {
         y = load2(pX+2);
         vec2 a = mul2(sub2(y, x), load2(pD));
-        storelo(pT, hadd2(a, a));
+        //storelo(pT, hadd2(a, a));
+        storelo(pT, add2(a, unpackhi2(a, a)));
     }
 }
 
@@ -354,7 +356,8 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
         pD += 8;
         pX += 8;
         //store4(pT, hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
-        vec4 p = permute2f128(a,b,0x20), q = permute2f128(a,b,0x31);
+        vec4 p = permute2f128(a,b,0x20);
+        vec4 q = permute2f128(a,b,0x31);
         store4(pT, add4(unpacklo4(p, q), unpackhi4(p, q)));
         pT += 4;
     }
@@ -372,7 +375,8 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
     if ( pT < end+4 )
     {
         vec2 a = mul2(sub2(load2(pX+2), load2(pX)), load2(pD));
-        storelo(pT, hadd2(a, a));
+        //storelo(pT, hadd2(a, a));
+        storelo(pT, add2(a, unpackhi2(a, a)));
     }
 }
 
