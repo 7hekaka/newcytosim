@@ -15,14 +15,15 @@
 #include "dpttrf.h"
 #include "cytoblas.h"
 #include "simd.h"
+#include "simd_print.h"
 
 
 /// number of segments:
-const size_t NBS = 33;
+const size_t NBS = 254;
 const size_t NCO = DIM * ( NBS + 1 );
 const size_t ALOC = NCO + 8;
 
-const size_t DISP = 16UL;
+const size_t DISP = 24UL;
 
 
 #ifdef __AVX__
@@ -73,7 +74,7 @@ void setFilament(size_t np, real seg, real persistence_length)
     real sigma = sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
-    Vector dir(1,0,0);
+    Vector dir = Vector::randU();
     
     setPoint(0, pos, dir);
     for ( size_t p = 1 ; p < np; ++p )
@@ -251,7 +252,7 @@ inline void projectForcesU_TWO(size_t nbs, const real* dif, const real* src, rea
         src += 2*DIM;
         dif += 2*DIM;
     }
-    assert_true( pT == end );
+    assert_true( dif == end );
 }
 
 
@@ -438,7 +439,6 @@ inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
 void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
     const real *const end = mul + nbs - 4;
-
     while ( mul <= end )
     {
         /*
@@ -463,7 +463,27 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         dif += 12;
         mul += 4;
     }
-    
+    while ( mul <= end+2 )
+    {
+        /*
+         *mul = dif[0] * ( src[DIM  ] - src[0] )
+              + dif[1] * ( src[DIM+1] - src[1] )
+              + dif[2] * ( src[DIM+2] - src[2] );
+         */
+        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), load4(src  )));
+        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), load4(src+4)));
+
+        vec4 xy = blend4(s0, s1, 0b1100);
+        vec4 zx = permute2f128(s0, s0, 0x21);
+        
+        vec4 mm = shuffle4(xy, s1, 0b0101);
+        mm = add4(mm, blend4(zx, xy, 0b0101));
+        store2(mul, add4(mm, blend4(zx, s1, 0b1010)));
+        
+        src += 6;
+        dif += 6;
+        mul += 2;
+    }
     while ( mul < end+4 )
     {
         /*
@@ -616,7 +636,6 @@ void projectForcesD_FMA(size_t nbs, const real* dif, const real* X, const real* 
 #if ( DIM > 2 )
         real d2 = dif[kk+2];
 #endif
-
         Y[kk  ] = a0 + d0 * m;
         Y[kk+1] = a1 + d1 * m;
 #if ( DIM > 2 )
@@ -772,6 +791,184 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
 
 #endif
 
+/*
+ void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
+ {
+     for ( size_t d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
+     {
+         Y[d] = X[d] + dif[d    ] * mul[    0];
+         Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
+     }
+     
+     for ( size_t jj = 1; jj < nbs; ++jj )
+     {
+         const size_t kk = DIM*jj;
+         Y[kk  ] = X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
+         Y[kk+1] = X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
+         Y[kk+2] = X[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
+     }
+ 
+         Y[0] = X[0] + dif[0] * mul[0] - dif[-3] * mul[-1];
+         Y[1] = X[1] + dif[1] * mul[0] - dif[-2] * mul[-1];
+         Y[2] = X[2] + dif[2] * mul[0] - dif[-1] * mul[-1];
+ 
+         Y[3] = X[3] + dif[3] * mul[1] - dif[0] * mul[0];
+         Y[4] = X[4] + dif[4] * mul[1] - dif[1] * mul[0];
+         Y[5] = X[5] + dif[5] * mul[1] - dif[2] * mul[0];
+ 
+         Y[6] = X[6] + dif[6] * mul[2] - dif[3] * mul[1];
+         Y[7] = X[7] + dif[7] * mul[2] - dif[4] * mul[1];
+         Y[8] = X[8] + dif[8] * mul[2] - dif[5] * mul[1];
+ 
+         Y[9] = X[9] + dif[9] * mul[3] - dif[6] * mul[2];
+         Y[A] = X[A] + dif[A] * mul[3] - dif[7] * mul[2];
+         Y[B] = X[B] + dif[B] * mul[3] - dif[8] * mul[2];
+
+         Y[C] = X[C] + dif[C] * mul[4] - dif[9] * mul[3];
+         Y[D] = X[D] + dif[D] * mul[4] - dif[A] * mul[3];
+         Y[E] = X[E] + dif[E] * mul[4] - dif[B] * mul[3];
+      }
+ }
+ */
+
+void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
+{
+    //vec4 mm = setzero4();
+    //store3(dst, fmadd4(broadcast1(mul), load4(dif), load4(src)));
+    const real* const end = mul + nbs - 4;
+    // for the first vector, the negative terms are not present
+    if ( mul <= end )
+    {
+        vec4 m1 = broadcast1(mul  );
+        vec4 m0 = blend4(setzero4(), m1, 0b1000);
+        vec4 m2 = broadcast1(mul+1);
+        vec4 p0 = blend4(m1, m2, 0b1000);
+        vec4 p2 = broadcast1(mul+2);
+        m1 = blend4(m1, m2, 0b1100);
+        vec4 p1 = blend4(m2, p2, 0b1100);
+        m2 = blend4(m2, p2, 0b1110);
+        p2 = blend4(p2, broadcast1(mul+3), 0b1110);
+        
+        mul += 4;
+        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+        vec4 a2 = fmadd4(p2, load4(dif+8), load4(src+8));
+
+        store4(dst  , fnmadd4(m0, broadcast1(dif), a0));
+        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+        dif += 12;
+        dst += 12;
+        src += 12;
+    }
+    while ( mul <= end )
+    {
+        vec4 m0 = broadcast1(mul-1);
+        vec4 m1 = broadcast1(mul  );
+        m0 = blend4(m0, m1, 0b1000);
+        vec4 m2 = broadcast1(mul+1);
+        vec4 p0 = blend4(m1, m2, 0b1000);
+        vec4 p2 = broadcast1(mul+2);
+        m1 = blend4(m1, m2, 0b1100);
+        vec4 p1 = blend4(m2, p2, 0b1100);
+        m2 = blend4(m2, p2, 0b1110);
+        p2 = blend4(p2, broadcast1(mul+3), 0b1110);
+        
+        mul += 4;
+        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+        vec4 a2 = fmadd4(p2, load4(dif+8), load4(src+8));
+
+        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
+        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+        dif += 12;
+        dst += 12;
+        src += 12;
+    }
+    
+    vec4 mm = ( nbs > 3 ? broadcast1(mul-1) : setzero4() );
+    // for the last vector, the positive terms are not present
+    if ( mul <= end+1 )
+    {
+        // 4 vectors remaining
+        vec4 m1 = broadcast1(mul  );
+        vec4 m0 = blend4(mm, m1, 0b1000);
+        vec4 m2 = broadcast1(mul+1);
+        vec4 p0 = blend4(m1, m2, 0b1000);
+        vec4 p2 = broadcast1(mul+2);
+        m1 = blend4(m1, m2, 0b1100);
+        vec4 p1 = blend4(m2, p2, 0b1100);
+        m2 = blend4(m2, p2, 0b1110);
+        p2 = blend4(p2, setzero4(), 0b1110);
+        
+        mul += 4;
+        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+        vec4 a2 = fmadd4(p2, broadcast1(dif+8), load4(src+8));
+
+        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
+        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+        dif += 12;
+        dst += 12;
+        src += 12;
+    }
+    else if ( mul <= end+2 )
+    {
+        // 3 vectors remaining
+        vec4 m1 = broadcast1(mul  );
+        vec4 m0 = blend4(mm, m1, 0b1000);
+        vec4 m2 = broadcast1(mul+1);
+        vec4 p0 = blend4(m1, m2, 0b1000);
+        m1 = blend4(m1, m2, 0b1100);
+        vec4 p1 = blend4(m2, setzero4(), 0b1100);
+        
+        mul += 3;
+        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+        vec4 a2 = broadcast1(src+8);
+
+        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
+        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        store1(dst+8, fnmadd4(m2, broadcast1(dif+5), a2));
+        dif += 9;
+        dst += 9;
+        src += 9;
+    }
+    else if ( mul <= end+3 )
+    {
+        // 2 vectors remaining
+        vec4 m1 = broadcast1(mul  );
+        vec4 m0 = blend4(mm, m1, 0b1000);
+        vec4 m2 = setzero4();
+        vec4 p0 = blend4(m1, m2, 0b1000);
+        m1 = blend4(m1, m2, 0b1100);
+        
+        mul += 2;
+        vec4 a0 = fmadd4(p0, load4(dif), load4(src));
+        vec4 a1 = load4(src+4);
+
+        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
+        store2(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        dif += 6;
+        dst += 6;
+        src += 6;
+    }
+    // for the last vector, the positive terms are not present
+    else if ( mul <= end+4 )
+    {
+        // 1 vector remaining
+        ++mul;
+        store3(dst, fnmadd4(mm, loadu4(dif-3), load4(src)));
+        dif += 3;
+        dst += 3;
+        src += 3;
+    }
+    assert_true(mul==end+5);
+}
+
+
 
 void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
 {
@@ -810,6 +1007,9 @@ void testProjectionD(size_t cnt)
 #if defined __AVX__
     testD(cnt, projectForcesD2D_AVX, " D_AVX");
 #endif
+#endif
+#if ( DIM == 3 ) & defined __AVX__
+    testD(cnt, projectForcesD3D_AVX, " D_AVX");
 #endif
 }
 
@@ -941,7 +1141,7 @@ int main(int argc, char* argv[])
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
-    if ( 1 )
+    if ( 0 )
     {
         setProjection();
         setAnisotropy();
