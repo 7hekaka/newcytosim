@@ -2,7 +2,7 @@
 
 #include <sys/time.h>
 
-#define DIM 3
+#define DIM 2
 
 #include "assert_macro.h"
 #include "real.h"
@@ -175,7 +175,7 @@ void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
     }
 }
 
-void projectForcesU__(size_t nbs, const real* dif, const real* src, real* mul)
+void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
 {
     const real *const end = mul + nbs;
 
@@ -196,7 +196,7 @@ void projectForcesU__(size_t nbs, const real* dif, const real* src, real* mul)
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
+inline void projectForcesU_TWO(size_t nbs, const real* dif, const real* src, real* mul)
 {
     real x3, x0 = src[0];
     real x4, x1 = src[1];
@@ -262,7 +262,7 @@ inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, rea
  Perform first calculation needed by projectForces:
  tmp <- J * X
  */
-void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real* mul)
+void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pM = dif;
     const real* pX = X;
@@ -307,7 +307,7 @@ __m256i make_mask(long i)
  tmp <- J * X
  F. Nedelec, 9.12.2016
  */
-void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
+void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pM = dif;
     const real* pX = X;
@@ -365,7 +365,7 @@ void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
  nbs-th point of tmp, which should be allocated accordingly.
  F. Nedelec, 11.01.2018
  */
-void projectForcesU_AVY(size_t nbs, const real* dif, const real* X, real* tmp)
+void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* X, real* tmp)
 {
     const real* pM = dif;
     const real* pX = X;
@@ -435,7 +435,7 @@ inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
 }
 
 
-void projectForcesU_3D(size_t nbs, const real* dif, const real* src, real* mul)
+void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
     const real *const end = mul + nbs;
 
@@ -493,17 +493,19 @@ void testProjectionU(size_t cnt)
 {
     std::cout << "testProjection UP " << DIM << "D\n";
     testU(cnt, projectForcesU_,    " U_   ");
-    testU(cnt, projectForcesU__,   " U__  ");
     testU(cnt, projectForcesU_PTR, " U_PTR");
-#if defined __SSE__ & ( DIM == 2 )
-    testU(cnt, projectForcesU_SSE, " U_SSE");
+    testU(cnt, projectForcesU_TWO, " U_TWO");
+#if ( DIM == 2 )
+#if defined __SSE__
+    testU(cnt, projectForcesU2D_SSE, " U_SSE");
 #endif
-#if defined __AVX__ && ( DIM == 2 )
-    testU(cnt, projectForcesU_AVX, " U_AVX");
-    testU(cnt, projectForcesU_AVY, " U_AVY");
+#if defined __AVX__
+    testU(cnt, projectForcesU2D_AVX, " U_AVX");
+    testU(cnt, projectForcesU2D_AVY, " U_AVY");
+#endif
 #endif
 #if defined __AVX__ && ( DIM == 3 )
-    testU(cnt, projectForcesU_3D, " U_3D ");
+    testU(cnt, projectForcesU3D_AVX, " U_AVX");
 #endif
 }
 
@@ -536,9 +538,9 @@ void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul
 
 
 /**
- Perform second calculation needed by projectForces:
+ 1xMUL 2xADD
  */
-void projectForcesD__(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
+void projectForcesD_ADD(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
 {
     real a0 = X[0];
     real a1 = X[1];
@@ -554,17 +556,58 @@ void projectForcesD__(size_t nbs, const real* dif, const real* X, const real* mu
 #if ( DIM > 2 )
         real b2 = dif[kk+2] * mul[jj];
 #endif
-
         Y[kk  ] = a0 + b0;
         Y[kk+1] = a1 + b1;
 #if ( DIM > 2 )
         Y[kk+2] = a2 + b2;
 #endif
-        
         a0 = X[DIM+kk  ] - b0;
         a1 = X[DIM+kk+1] - b1;
 #if ( DIM > 2 )
         a2 = X[DIM+kk+2] - b2;
+#endif
+    }
+    
+    const size_t ee = DIM * nbs;
+    Y[ee  ] = a0;
+    Y[ee+1] = a1;
+#if ( DIM > 2 )
+    Y[ee+2] = a2;
+#endif
+}
+
+
+
+/**
+ 2xFMA
+ */
+void projectForcesD_FMA(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
+{
+    real a0 = X[0];
+    real a1 = X[1];
+#if ( DIM > 2 )
+    real a2 = X[2];
+#endif
+    
+    for ( size_t jj = 0; jj < nbs; ++jj )
+    {
+        const size_t kk = DIM * jj;
+        real m = mul[jj];
+        real d0 = dif[kk  ];
+        real d1 = dif[kk+1];
+#if ( DIM > 2 )
+        real d2 = dif[kk+2];
+#endif
+
+        Y[kk  ] = a0 + d0 * m;
+        Y[kk+1] = a1 + d1 * m;
+#if ( DIM > 2 )
+        Y[kk+2] = a2 + d2 * m;
+#endif
+        a0 = X[DIM+kk  ] - d0 * m;
+        a1 = X[DIM+kk+1] - d1 * m;
+#if ( DIM > 2 )
+        a2 = X[DIM+kk+2] - d2 * m;
 #endif
     }
     
@@ -626,8 +669,8 @@ void projectForcesD_PTR(size_t nbs, const real* dif,
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD_SSE(size_t nbs, const real* dif,
-                               const real* X, const real* mul, real* Y)
+void projectForcesD2D_SSE(size_t nbs, const real* dif,
+                          const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
     const real* pX = X;
@@ -660,8 +703,8 @@ void projectForcesD_SSE(size_t nbs, const real* dif,
  Y <- X + Jt * tmp
  F. Nedelec, 9.12.2016
  */
-void projectForcesD_AVX(size_t nbs, const real* dif,
-                               const real* X, const real* mul, real* Y)
+void projectForcesD2D_AVX(size_t nbs, const real* dif,
+                          const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
     const real* pX = X;
@@ -739,13 +782,16 @@ void testProjectionD(size_t cnt)
 {
     std::cout << "testProjection DOWN " << DIM << "D\n";
     testD(cnt, projectForcesD_,    " D_   ");
-    testD(cnt, projectForcesD__,   " D__  ");
+    testD(cnt, projectForcesD_ADD, " D_ADD");
+    testD(cnt, projectForcesD_FMA, " D_FMA");
     testD(cnt, projectForcesD_PTR, " D_PTR");
-#if defined __SSE__ & ( DIM == 2 )
-    testD(cnt, projectForcesD_SSE, " D_SSE");
+#if ( DIM == 2 )
+#if defined __SSE__
+    testD(cnt, projectForcesD2D_SSE, " D_SSE");
 #endif
-#if defined __AVX__ & ( DIM == 2 )
-    testD(cnt, projectForcesD_AVX, " D_AVX");
+#if defined __AVX__
+    testD(cnt, projectForcesD2D_AVX, " D_AVX");
+#endif
 #endif
 }
 
@@ -757,7 +803,7 @@ void projectForces(size_t nbs, const real* X, real* Y)
 {
     // calculate `iLLG` without modifying `X`
 #if defined __AVX__ && ( DIM == 2 )
-    projectForcesU_AVX(nbs, dir_, X, lag_);
+    projectForcesU2D_AVX(nbs, dir_, X, lag_);
 #else
     projectForcesU_(nbs, dir_, X, lag_);
 #endif
@@ -767,9 +813,9 @@ void projectForces(size_t nbs, const real* X, real* Y)
 
     // set Y, using values in X and iLLG
 #if defined __AVX__ && ( DIM == 2 )
-    projectForcesD_AVX(nbs, dir_, X, lag_, Y);
+    projectForcesD2D_AVX(nbs, dir_, X, lag_, Y);
 #else
-    projectForcesD__(nbs, dir_, X, lag_, Y);
+    projectForcesD_(nbs, dir_, X, lag_, Y);
 #endif
 }
 
@@ -798,6 +844,27 @@ void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
     }
 }
 
+void scaleTangentiallyPTR(size_t nbp, const real* src, const real* dir, real* dst)
+{
+    const real* const end = src + DIM * nbp;
+    while ( src < end )
+    {
+#if ( DIM == 2 )
+        real s = src[0] * dir[0] + src[1] * dir[1];
+        dst[0] = src[0] + s * dir[0];
+        dst[1] = src[1] + s * dir[1];
+#elif ( DIM >= 3 )
+        real s = src[0] * dir[0] + src[1] * dir[1] + src[2] * dir[2];
+        dst[0] = src[0] + s * dir[0];
+        dst[1] = src[1] + s * dir[1];
+        dst[2] = src[2] + s * dir[2];
+#endif
+        src += DIM;
+        dir += DIM;
+        dst += DIM;
+    }
+}
+
 void projectTangent(size_t nbs, const real* X, real* Y)
 {
     // calculate `iLLG` without modifying `X`
@@ -808,7 +875,7 @@ void projectTangent(size_t nbs, const real* X, real* Y)
     alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 
     // set Y, using values in X and iLLG
-    projectForcesD__(nbs, dir_, X, lag_, Y);
+    projectForcesD_(nbs, dir_, X, lag_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 

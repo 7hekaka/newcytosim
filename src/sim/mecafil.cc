@@ -129,6 +129,7 @@ void Mecafil::storeDirections()
      */
     const real sc  = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
+    #pragma ivdep
     for ( size_t p = 0; p < end; ++p )
         iDir[p] = sc * ( pPos[p+DIM] - pPos[p] );
 #else

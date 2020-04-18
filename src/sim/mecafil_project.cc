@@ -276,7 +276,7 @@ void projectForcesD__(size_t nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pD = dif;
     const real* pX = X;
@@ -309,7 +309,7 @@ inline void projectForcesU_SSE(size_t nbs, const real* dif, const real* X, real*
 /**
  Perform second calculation needed by projectForces:
  */
-inline void projectForcesD_SSE(size_t nbs, const real* dif,
+inline void projectForcesD2D_SSE(size_t nbs, const real* dif,
                                const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
@@ -344,7 +344,7 @@ inline void projectForcesD_SSE(size_t nbs, const real* dif,
 
  F. Nedelec, 9.12.2016, 6.9.2018
  */
-inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, real* mul)
 {
     const real* pD = dif;
     const real* pX = X;
@@ -390,8 +390,8 @@ inline void projectForcesU_AVX(size_t nbs, const real* dif, const real* X, real*
  an array containing contiguous coordinates
  F. Nedelec, 9.12.2016, 23.03.2018
  */
-inline void projectForcesD_AVX(size_t nbs, const real* dif,
-                               const real* X, const real* mul, real* Y)
+inline void projectForcesD2D_AVX(size_t nbs, const real* dif,
+                                 const real* X, const real* mul, real* Y)
 {
     real *pY = Y;
     const real* pX = X;
@@ -528,12 +528,12 @@ void projectForcesD_PTR(size_t nbs, const real* dif,
 #if ( DIM == 2 ) && REAL_IS_DOUBLE
 #  if defined(__AVX__)
 #    warning "Using AVX implementation"
-#    define projectForcesU projectForcesU_AVX
-#    define projectForcesD projectForcesD_AVX
+#    define projectForcesU projectForcesU2D_AVX
+#    define projectForcesD projectForcesD2D_AVX
 #  elif defined(__SSE3__)
 #    warning "Using SSE3 implementation"
-#    define projectForcesU projectForcesU_SSE
-#    define projectForcesD projectForcesD_SSE
+#    define projectForcesU projectForcesU2D_SSE
+#    define projectForcesD projectForcesD2D_SSE
 #  else
 #    define projectForcesU projectForcesU_
 #    define projectForcesD projectForcesD_
