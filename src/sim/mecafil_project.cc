@@ -174,19 +174,21 @@ void Mecafil::makeProjection()
       vec[] of size (nbs+1)*DIM
       mul[] of size nbs
  */
-void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
+void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    #pragma vector unaligned
-    for ( size_t jj = 0; jj < nbs; ++jj )
+    const real *const end = mul + nbs;
+
+    while ( mul < end )
     {
-        const real * X = vec + DIM * jj;
-        const real * d = dif + DIM * jj;
-        mul[jj] = d[0] * ( X[DIM  ] - X[0] )
-                + d[1] * ( X[DIM+1] - X[1] )
+        *mul = dif[0] * ( src[DIM  ] - src[0] )
+             + dif[1] * ( src[DIM+1] - src[1] )
 #if ( DIM > 2 )
-                + d[2] * ( X[DIM+2] - X[2] )
+             + dif[2] * ( src[DIM+2] - src[2] )
 #endif
         ;
+        src += DIM;
+        dif += DIM;
+        ++mul;
     }
 }
 
@@ -443,99 +445,36 @@ inline void projectForcesD_AVX(size_t nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real * pX = X + DIM;
-    const real * pM = dif;
-    real x3, x0 = X[0];
-    real x4, x1 = X[1];
+    real x3, x0 = src[0];
+    real x4, x1 = src[1];
 #if ( DIM >= 3 )
-    real x5, x2 = X[2];
+    real x5, x2 = src[2];
 #endif
-    real *const end = mul + nbs;
-    
+    src += DIM;
+    const real *const end = mul + nbs;
+
     //normally optimized version
-    for ( real* pT = mul; pT < end; ++pT )
+    while ( mul < end )
     {
-        x3 = pX[0];
-        x4 = pX[1];
+        x3 = src[0];
+        x4 = src[1];
 #if ( DIM == 2 )
-        pT[0] = pM[0] * (x3 - x0) + pM[1] * (x4 - x1);
+        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1);
 #elif ( DIM >= 3 )
-        x5 = pX[2];
-        pT[0] = pM[0] * (x3 - x0) + pM[1] * (x4 - x1) + pM[2] * (x5 - x2);
+        x5 = src[2];
+        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1) + dif[2] * (x5 - x2);
         x2 = x5;
 #endif
-        pX += DIM;
-        pM += DIM;
+        ++mul;
+        src += DIM;
+        dif += DIM;
         x0 = x3;
         x1 = x4;
     }
 }
 
-
-/**
- Perform first calculation needed by projectForces:
- */
-inline void projectForcesU_PTR2(size_t nbs, const real* dif, const real* X, real* mul)
-{
-    const real * pX = X + DIM;
-    const real * pM = dif;
-    real x3, x0 = X[0];
-    real x4, x1 = X[1];
-#if ( DIM >= 3 )
-    real x5, x2 = X[2];
-#endif
-    real *const end = mul + nbs;
-    
-    //further optimization with manual loop-unrolling
-    real* pT = mul;
-    if ( nbs & 1 )
-    {
-        x3 = pX[0];
-        x4 = pX[1];
-#if ( DIM == 2 )
-        pT[0] = pM[0] * (x3 - x0) + pM[1] * (x4 - x1);
-#elif ( DIM >= 3 )
-        x5 = pX[2];
-        pT[0] = pM[0] * (x3 - x0) + pM[1] * (x4 - x1) + pM[2] * (x5 - x2);
-        x2 = x5;
-#endif
-        ++pT;
-        pX += DIM;
-        pM += DIM;
-        x0 = x3;
-        x1 = x4;
-    }
-    
-    while ( pT < end )
-    {
-        x3 = pX[0];
-        x4 = pX[1];
-#if ( DIM == 2 )
-        pT[0] = pM[0] * (x3 - x0) + pM[1] * (x4 - x1);
-#elif ( DIM >= 3 )
-        x5 = pX[2];
-        pT[0] = pM[0] * (x3 - x0) + pM[1] * (x4 - x1) + pM[2] * (x5 - x2);
-#endif
-        
-#if ( DIM == 2 )
-        x0 = pX[2];
-        x1 = pX[3];
-        pT[1] = pM[2] * (x0 - x3) + pM[3] * (x1 - x4);
-#elif ( DIM >= 3 )
-        x0 = pX[3];
-        x1 = pX[4];
-        x2 = pX[5];
-        pT[1] = pM[3] * (x0 - x3) + pM[4] * (x1 - x4) + pM[5] * (x2 - x5);
-#endif
-        
-        pT += 2;
-        pX += 2*DIM;
-        pM += 2*DIM;
-    }
-    assert_true( pT == end );
-}
 
 /**
  Perform second calculation needed by projectForces:
@@ -543,42 +482,41 @@ inline void projectForcesU_PTR2(size_t nbs, const real* dif, const real* X, real
 void projectForcesD_PTR(size_t nbs, const real* dif,
                         const real* X, const real* mul, real* Y)
 {
-    // Y <- X + Jt * tmp :
-    real x0 = X[0];
-    real x1 = X[1];
+    real a0 = X[0];
+    real a1 = X[1];
 #if ( DIM > 2 )
-    real x2 = X[2];
+    real a2 = X[2];
 #endif
-    
-    const real* pX = X+DIM;
-    const real* pM = dif;
-    real *pY = Y;
-    real const*const end = mul+nbs;
-    for ( real const* pT = mul; pT < end; ++pT )
+    X += DIM;
+
+    const real* const end = mul + nbs;
+    while ( mul < end )
     {
-        real y0 = *pT * pM[0];
-        real y1 = *pT * pM[1];
+        real b0 = dif[0] * mul[0];
+        real b1 = dif[1] * mul[0];
 #if ( DIM > 2 )
-        real y2 = *pT * pM[2];
+        real b2 = dif[2] * mul[0];
 #endif
-        pM  += DIM;
-        pY[0]  = x0 + y0;
-        pY[1]  = x1 + y1;
+        dif += DIM;
+        Y[0] = a0 + b0;
+        Y[1] = a1 + b1;
 #if ( DIM > 2 )
-        pY[2]  = x2 + y2;
+        Y[2] = a2 + b2;
 #endif
-        pY  += DIM;
-        x0     = pX[0] - y0;
-        x1     = pX[1] - y1;
+        Y += DIM;
+        a0 = X[0] - b0;
+        a1 = X[1] - b1;
 #if ( DIM > 2 )
-        x2     = pX[2] - y2;
+        a2 = X[2] - b2;
 #endif
-        pX  += DIM;
+        X += DIM;
+        ++mul;
     }
-    pY[0] = x0;
-    pY[1] = x1;
+    
+    Y[0] = a0;
+    Y[1] = a1;
 #if ( DIM > 2 )
-    pY[2] = x2;
+    Y[2] = a2;
 #endif
 }
 

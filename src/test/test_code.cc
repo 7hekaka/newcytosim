@@ -159,12 +159,12 @@ void free_reals(real* x, real* y, real* z)
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP
 
-void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
+void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
 {
     #pragma vector unaligned
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        const real * X = vec + DIM * jj;
+        const real * X = src + DIM * jj;
         const real * d = dif + DIM * jj;
         mul[jj] = d[0] * ( X[DIM  ] - X[0] )
                 + d[1] * ( X[DIM+1] - X[1] )
@@ -173,6 +173,85 @@ void projectForcesU_(size_t nbs, const real* dif, const real* vec, real* mul)
 #endif
         ;
     }
+}
+
+void projectForcesU__(size_t nbs, const real* dif, const real* src, real* mul)
+{
+    const real *const end = mul + nbs;
+
+    while ( mul < end )
+    {
+        *mul = dif[0] * ( src[DIM  ] - src[0] )
+             + dif[1] * ( src[DIM+1] - src[1] )
+#if ( DIM > 2 )
+             + dif[2] * ( src[DIM+2] - src[2] )
+#endif
+        ;
+        src += DIM;
+        dif += DIM;
+        ++mul;
+    }
+}
+
+/**
+ Perform first calculation needed by projectForces:
+ */
+inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
+{
+    real x3, x0 = src[0];
+    real x4, x1 = src[1];
+#if ( DIM >= 3 )
+    real x5, x2 = src[2];
+#endif
+    src += DIM;
+    real *const end = mul + nbs;
+    
+    //further optimization with manual loop-unrolling
+    if ( nbs & 1 )
+    {
+        x3 = src[0];
+        x4 = src[1];
+#if ( DIM == 2 )
+        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1);
+#elif ( DIM >= 3 )
+        x5 = src[2];
+        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1) + dif[2] * (x5 - x2);
+        x2 = x5;
+#endif
+        ++mul;
+        src += DIM;
+        dif += DIM;
+        x0 = x3;
+        x1 = x4;
+    }
+    
+    while ( mul < end )
+    {
+        x3 = src[0];
+        x4 = src[1];
+#if ( DIM == 2 )
+        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1);
+#elif ( DIM >= 3 )
+        x5 = src[2];
+        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1) + dif[2] * (x5 - x2);
+#endif
+        
+#if ( DIM == 2 )
+        x0 = src[2];
+        x1 = src[3];
+        mul[1] = dif[2] * (x0 - x3) + dif[3] * (x1 - x4);
+#elif ( DIM >= 3 )
+        x0 = src[3];
+        x1 = src[4];
+        x2 = src[5];
+        mul[1] = dif[3] * (x0 - x3) + dif[4] * (x1 - x4) + dif[5] * (x2 - x5);
+#endif
+        
+        mul += 2;
+        src += 2*DIM;
+        dif += 2*DIM;
+    }
+    assert_true( pT == end );
 }
 
 
@@ -313,6 +392,80 @@ void projectForcesU_AVY(size_t nbs, const real* dif, const real* X, real* tmp)
 #endif
 #endif
 
+//------------------------------------------------------------------------------
+#pragma mark - PROJECT UP 3D
+
+inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
+{
+    vec4 sx = load4(X);
+    vec4 sy = load4(Y);
+    vec4 sz = load4(Z);
+
+    vec4 zx = blend4(sx, sz, 0b0101);
+    zx = permute2f128(zx, zx, 0x21);
+    vec4 xy = unpacklo4(sx, sy);
+    vec4 yz = unpackhi4(sy, sz);
+    
+    store4(dst  , blend4(xy, zx, 0b1100));
+    store4(dst+4, blend4(yz, xy, 0b1100));
+    store4(dst+8, blend4(zx, yz, 0b1100));
+}
+
+/**
+ make
+     dX = { XXXX }
+     dY = { YYYY }
+     dZ = { ZZZZ }
+ from src = { XYZ XYZ XYZ XYZ }
+ */
+inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
+{
+    vec4 s0 = load4(src);
+    vec4 s1 = load4(src+4);
+    vec4 s2 = load4(src+8);
+
+    vec4 zx = blend4(s0, s2, 0b0011);
+    zx = permute2f128(zx, zx, 0x21);
+    vec4 xy = blend4(s0, s1, 0b1100);
+    vec4 yz = blend4(s1, s2, 0b1100);
+    
+    store4(X,   blend4(zx, xy, 0b0101));
+    store4(Y, shuffle4(xy, yz, 0b0101));
+    store4(Z,   blend4(zx, yz, 0b1010));
+}
+
+
+void projectForcesU_3D(size_t nbs, const real* dif, const real* src, real* mul)
+{
+    const real *const end = mul + nbs;
+
+    while ( mul < end )
+    {
+        /*
+         *mul = dif[0] * ( src[DIM  ] - src[0] )
+              + dif[1] * ( src[DIM+1] - src[1] )
+              + dif[2] * ( src[DIM+2] - src[2] );
+         */
+        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), load4(src  )));
+        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), load4(src+4)));
+        vec4 s2 = mul4(load4(dif+8), sub4(loadu4(src+11), load4(src+8)));
+
+        vec4 zx = blend4(s0, s2, 0b0011);
+        vec4 xy = blend4(s0, s1, 0b1100);
+        zx = permute2f128(zx, zx, 0x21);
+        vec4 yz = blend4(s1, s2, 0b1100);
+        
+        vec4 mm = shuffle4(xy, yz, 0b0101);
+        mm = add4(mm, blend4(zx, xy, 0b0101));
+        store4(mul, add4(mm, blend4(zx, yz, 0b1010)));
+        
+        src += 4*DIM;
+        dif += 4*DIM;
+        mul += 4;
+    }
+}
+
+
 void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
@@ -338,8 +491,10 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
 
 void testProjectionU(size_t cnt)
 {
-    std::cout << "testProjectionU " << DIM << "D\n";
+    std::cout << "testProjection UP " << DIM << "D\n";
     testU(cnt, projectForcesU_,    " U_   ");
+    testU(cnt, projectForcesU__,   " U__  ");
+    testU(cnt, projectForcesU_PTR, " U_PTR");
 #if defined __SSE__ & ( DIM == 2 )
     testU(cnt, projectForcesU_SSE, " U_SSE");
 #endif
@@ -347,7 +502,11 @@ void testProjectionU(size_t cnt)
     testU(cnt, projectForcesU_AVX, " U_AVX");
     testU(cnt, projectForcesU_AVY, " U_AVY");
 #endif
+#if defined __AVX__ && ( DIM == 3 )
+    testU(cnt, projectForcesU_3D, " U_3D ");
+#endif
 }
+
 
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT DOWN
@@ -379,52 +538,7 @@ void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD__(size_t nbs, const real* dif,
-                      const real* X, const real* mul, real* Y)
-{
-    real a0 = dif[0] * mul[0];
-    real a1 = dif[1] * mul[0];
-#if ( DIM > 2 )
-    real a2 = dif[2] * mul[0];
-#endif
-    
-    Y[0] = X[0] + a0;
-    Y[1] = X[1] + a1;
-#if ( DIM > 2 )
-    Y[2] = X[2] + a2;
-#endif
-    
-    for ( size_t jj = 1; jj < nbs; ++jj )
-    {
-        const size_t kk = DIM * jj;
-        real b0 = dif[kk  ] * mul[jj];
-        Y[kk  ] = X[kk  ] + b0 - a0;
-        a0 = b0;
-        
-        real b1 = dif[kk+1] * mul[jj];
-        Y[kk+1] = X[kk+1] + b1 - a1;
-        a1 = b1;
-        
-#if ( DIM > 2 )
-        real b2 = dif[kk+2] * mul[jj];
-        Y[kk+2] = X[kk+2] + b2 - a2;
-        a2 = b2;
-#endif
-    }
-    
-    const size_t ee = DIM * nbs;
-    Y[ee  ] = X[ee  ] - a0;
-    Y[ee+1] = X[ee+1] - a1;
-#if ( DIM > 2 )
-    Y[ee+2] = X[ee+2] - a2;
-#endif
-}
-
-
-/**
- Perform second calculation needed by projectForces:
- */
-void projectForcesD___(size_t nbs, const real* dif, const real* X, const real* lag, real* Y)
+void projectForcesD__(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
 {
     real a0 = X[0];
     real a1 = X[1];
@@ -435,10 +549,10 @@ void projectForcesD___(size_t nbs, const real* dif, const real* X, const real* l
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const size_t kk = DIM * jj;
-        real b0 = dif[kk  ] * lag[jj];
-        real b1 = dif[kk+1] * lag[jj];
+        real b0 = dif[kk  ] * mul[jj];
+        real b1 = dif[kk+1] * mul[jj];
 #if ( DIM > 2 )
-        real b2 = dif[kk+2] * lag[jj];
+        real b2 = dif[kk+2] * mul[jj];
 #endif
 
         Y[kk  ] = a0 + b0;
@@ -469,42 +583,41 @@ void projectForcesD___(size_t nbs, const real* dif, const real* X, const real* l
 void projectForcesD_PTR(size_t nbs, const real* dif,
                         const real* X, const real* mul, real* Y)
 {
-    // Y <- X + Jt * tmp :
-    real x0 = X[0];
-    real x1 = X[1];
+    real a0 = X[0];
+    real a1 = X[1];
 #if ( DIM > 2 )
-    real x2 = X[2];
+    real a2 = X[2];
 #endif
-    
-    const real* pX = X+DIM;
-    const real* pM = dif;
-    real *pY = Y;
-    real const*const end = mul+nbs;
-    for ( real const* pT = mul; pT < end; ++pT )
+    X += DIM;
+
+    const real* const end = mul + nbs;
+    while ( mul < end )
     {
-        real y0 = *pT * pM[0];
-        real y1 = *pT * pM[1];
+        real b0 = dif[0] * mul[0];
+        real b1 = dif[1] * mul[0];
 #if ( DIM > 2 )
-        real y2 = *pT * pM[2];
+        real b2 = dif[2] * mul[0];
 #endif
-        pM  += DIM;
-        pY[0]  = x0 + y0;
-        pY[1]  = x1 + y1;
+        dif += DIM;
+        Y[0] = a0 + b0;
+        Y[1] = a1 + b1;
 #if ( DIM > 2 )
-        pY[2]  = x2 + y2;
+        Y[2] = a2 + b2;
 #endif
-        pY  += DIM;
-        x0     = pX[0] - y0;
-        x1     = pX[1] - y1;
+        Y += DIM;
+        a0 = X[0] - b0;
+        a1 = X[1] - b1;
 #if ( DIM > 2 )
-        x2     = pX[2] - y2;
+        a2 = X[2] - b2;
 #endif
-        pX  += DIM;
+        X += DIM;
+        ++mul;
     }
-    pY[0] = x0;
-    pY[1] = x1;
+    
+    Y[0] = a0;
+    Y[1] = a1;
 #if ( DIM > 2 )
-    pY[2] = x2;
+    Y[2] = a2;
 #endif
 }
 
@@ -624,11 +737,10 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
 
 void testProjectionD(size_t cnt)
 {
-    std::cout << "testProjectionD " << DIM << "D\n";
+    std::cout << "testProjection DOWN " << DIM << "D\n";
     testD(cnt, projectForcesD_,    " D_   ");
     testD(cnt, projectForcesD__,   " D__  ");
-    testD(cnt, projectForcesD___,  " D___ ");
-    //testD(cnt, projectForcesD_PTR, "D_PTR");
+    testD(cnt, projectForcesD_PTR, " D_PTR");
 #if defined __SSE__ & ( DIM == 2 )
     testD(cnt, projectForcesD_SSE, " D_SSE");
 #endif
@@ -657,7 +769,7 @@ void projectForces(size_t nbs, const real* X, real* Y)
 #if defined __AVX__ && ( DIM == 2 )
     projectForcesD_AVX(nbs, dir_, X, lag_, Y);
 #else
-    projectForcesD___(nbs, dir_, X, lag_, Y);
+    projectForcesD__(nbs, dir_, X, lag_, Y);
 #endif
 }
 
@@ -696,7 +808,7 @@ void projectTangent(size_t nbs, const real* X, real* Y)
     alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 
     // set Y, using values in X and iLLG
-    projectForcesD___(nbs, dir_, X, lag_, Y);
+    projectForcesD__(nbs, dir_, X, lag_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
