@@ -75,7 +75,7 @@ private:
 #else
     
     /// J*J' is a tridiagonal symmetric matrix of size (nbPoints-1).
-    /** iJJt[] holds the diagonal elements and iJJtU[] the off-diagonal ones.
+    /** iJJt[] holds the diagonal elements and iJJtU[] the off-diagonal ones. */
     real   *    iJJt, * iJJtU;
 
 #endif
