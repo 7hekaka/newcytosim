@@ -18,14 +18,14 @@
 typedef double real;
 
 const size_t SIZE = 1<<14;
-real x[SIZE], y[SIZE];
+real vX[SIZE], vY[SIZE];
 
 void init()
 {
     for ( size_t ii=0; ii<SIZE; ++ii )
     {
-        x[ii] = 1.0/real(SIZE-ii);
-        y[ii] = real(SIZE-ii);
+        vX[ii] = 1.0/real(SIZE-ii);
+        vY[ii] = real(SIZE-ii);
     }
 }
 
@@ -45,7 +45,7 @@ real scalar()
 {
     real d = 0;
     for ( size_t ii=0; ii<SIZE; ++ii )
-        d += x[ii] * y[ii];
+        d += vX[ii] * vY[ii];
     return d;
 }
 
@@ -53,7 +53,7 @@ real vector2()
 {
     vec2 s = setzero2();
     for ( size_t ii=0; ii<SIZE; ii+=2 )
-        s = add2(s, mul2( load2(x+ii), load2(y+ii) ));
+        s = add2(s, mul2( load2(vX+ii), load2(vY+ii) ));
     _mm_empty();
     
     return esum2(s)[0];
@@ -65,7 +65,7 @@ real vector4()
 {
     vec4 s = setzero4();
     for ( size_t ii=0; ii<SIZE; ii+=4 )
-        s = add4(s, mul4( load4(x+ii), load4(y+ii) ));
+        s = add4(s, mul4( load4(vX+ii), load4(vY+ii) ));
     _mm_empty();
     
     return esum4(s)[0];
@@ -81,10 +81,10 @@ real vectorU()
     
     for ( size_t ii=0; ii<SIZE; ii+=16 )
     {
-        v0 = add4(v0, mul4( load4(x+ii   ), load4(y+ii   ) ));
-        v1 = add4(v1, mul4( load4(x+ii+4 ), load4(y+ii+4 ) ));
-        v2 = add4(v2, mul4( load4(x+ii+8 ), load4(y+ii+8 ) ));
-        v3 = add4(v3, mul4( load4(x+ii+12), load4(y+ii+12) ));
+        v0 = add4(v0, mul4( load4(vX+ii   ), load4(vY+ii   ) ));
+        v1 = add4(v1, mul4( load4(vX+ii+4 ), load4(vY+ii+4 ) ));
+        v2 = add4(v2, mul4( load4(vX+ii+8 ), load4(vY+ii+8 ) ));
+        v3 = add4(v3, mul4( load4(vX+ii+12), load4(vY+ii+12) ));
     }
     
     vec4 s = add4(add4(v0, v1), add4(v2, v3));
@@ -144,6 +144,9 @@ void test_swapSSE()
     dump(movedup2(b),  "movedup(b)");
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
 #ifdef __AVX__
 
 /**
@@ -154,7 +157,7 @@ void test_swapSSE()
      dY = { YYYY }
      dZ = { ZZZZ }
  */
-inline void tangle4(real const* X, real const* Y, real const* Z, real* dst)
+inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
 {
     vec4 sx = load4(X);
     vec4 sy = load4(Y);
@@ -165,7 +168,6 @@ inline void tangle4(real const* X, real const* Y, real const* Z, real* dst)
 
     vec4 zx = blend4(sx, sz, 0b0101);
     zx = permute2f128(zx, zx, 0x21);
-
     vec4 xy = unpacklo4(sx, sy);
     vec4 yz = unpackhi4(sy, sz);
     
@@ -181,7 +183,7 @@ inline void tangle4(real const* X, real const* Y, real const* Z, real* dst)
      dZ = { ZZZZ }
  from src = { XYZ XYZ XYZ XYZ }
  */
-inline void untangle4(real const* src, real* X, real* Y, real* Z)
+inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -200,25 +202,27 @@ inline void untangle4(real const* src, real* X, real* Y, real* Z)
     store4(Z,   blend4(zx, yz, 0b1010));
 }
 
-void test_untangle()
+void test_twine()
 {
+    printf("------ test_twine\n");
     real dst[12] = { 0 };
     real src[12] = { 1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3, 1.4, 2.4, 3.4 };
     real X[4] = { 0 }, Y[4] = { 0 }, Z[4] = { 0 };
-    untangle4(src, X, Y, Z);
+    untwine4x3(src, X, Y, Z);
     dump(4, X);
     dump(4, Y);
     dump(4, Z);
-    tangle4(X, Y, Z, dst);
+    twine3x4(X, Y, Z, dst);
     dump(12, dst);
 }
 
 
 /**
+ Change the data stride from 3 to 4, specifically:
  make dst = { XYZ? XYZ? XYZ? XYZ? }
  from src = { XYZ XYZ XYZ XYZ }
  */
-inline void deswizzle4(real const* src, real* dst)
+inline void destride3x4(real const* src, real* dst)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -239,25 +243,29 @@ inline void deswizzle4(real const* src, real* dst)
 }
 
 
-void test_deswizzle()
+void test_stride()
 {
-    const int SIZE = 1024;
-    real a[SIZE*12];
-    real b[SIZE*16];
+    printf("------ test_stride\n");
+    const size_t CNT = 1024;
+    real a[CNT*12];
+    real b[CNT*16];
     
-    for ( int n = 0; n < 12*SIZE; ++n )
+    for ( size_t n = 0; n < 12*CNT; ++n )
         a[n] = 1 + n % 12;
     
 #pragma ivdep
-    for ( int n = 0; n < SIZE; ++n )
-        deswizzle4(a+12*n, b+16*n);
+    for ( size_t n = 0; n < CNT; ++n )
+        destride3x4(a+12*n, b+16*n);
     
-    for ( int n = 0; n < 4*SIZE; ++n )
+    for ( size_t n = 0; n < 4*CNT; ++n )
         b[4*n+3] = 0;
     
     dump(12, a);
     dump(16, b);
 }
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 void test_cat()
 {
@@ -488,6 +496,9 @@ void test_hadd()
     dump(u, "u ");
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
 void test_mat()
 {
     printf("------ test_mat\n");
@@ -638,17 +649,20 @@ void test_swap7()
 
 #endif
 
+
 int main(int argc, char * argv[])
 {
     //test_swapSSE();
 #ifdef __AVX__
-    test_untangle();
-    return 0;
     
+    if ( 1 )
+    {
+        test_twine();
+        test_stride();
+    }
     if ( 0 )
     {
         test_cat();
-        test_deswizzle();
         test_load();
         test_broadcast();
         test_store();
