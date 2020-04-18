@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		BB6403B505FBC0E200DF7BFF /* test */ = {
+		BB6403B505FBC0E200DF7BFF /* tests */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = BB87B9D208CDC50600A05F58 /* Build configuration list for PBXAggregateTarget "test" */;
+			buildConfigurationList = BB87B9D208CDC50600A05F58 /* Build configuration list for PBXAggregateTarget "tests" */;
 			buildPhases = (
 			);
 			dependencies = (
@@ -18,7 +18,7 @@
 				BB6403C805FBC11400DF7BFF /* PBXTargetDependency */,
 				BB9979FC05FBDD9800C93CD0 /* PBXTargetDependency */,
 			);
-			name = test;
+			name = tests;
 			productName = test;
 		};
 		BB6403E605FBC2AC00DF7BFF /* tools */ = {
@@ -27,6 +27,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				BBCB0853244AEEF0004E7C32 /* PBXTargetDependency */,
 				BB6403EA05FBC2BC00DF7BFF /* PBXTargetDependency */,
 				BB6404E005FBD79C00DF7BFF /* PBXTargetDependency */,
 			);
@@ -1146,6 +1147,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = BBE0993D0869D87F005FF210;
 			remoteInfo = libcytospace;
+		};
+		BBCB0852244AEEF0004E7C32 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBCA9EEA06AFCB4600638608;
+			remoteInfo = report;
 		};
 		BBE8E6CD10C199E1006527D4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -4100,19 +4108,19 @@
 				BBA5793305FA64A3009AE66E /* play */,
 				BB6403E605FBC2AC00DF7BFF /* tools */,
 				BB6403D705FBC28C00DF7BFF /* sieve */,
-				BB64041405FBC58500DF7BFF /* frametool */,
 				BBCA9EEA06AFCB4600638608 /* report */,
-				BB6403B505FBC0E200DF7BFF /* test */,
-				BB51BC2205FA534000D4869F /* test_glapp */,
-				BB7C2B7E05F93FB9002C69A9 /* test_rasterizer */,
-				BB7C2BC005FA4EF8002C69A9 /* test_grid */,
-				BB6405F005FBD9CD00DF7BFF /* test_space */,
+				BB64041405FBC58500DF7BFF /* frametool */,
+				BB6403B505FBC0E200DF7BFF /* tests */,
 				BB18BBB61DFD78F600567023 /* test_simd */,
 				BB18BBC61DFD7E3400567023 /* test_code */,
 				BB7086392449CBE900C73273 /* test_dpttrs */,
 				BB7086482449CBF300C73273 /* test_rigidity */,
 				BB9D879F1E76BAE500DD0F00 /* test_matrix */,
 				BB2D09F2243DBC3400C1C0AB /* test_solver */,
+				BB51BC2205FA534000D4869F /* test_glapp */,
+				BB7C2BC005FA4EF8002C69A9 /* test_grid */,
+				BB6405F005FBD9CD00DF7BFF /* test_space */,
+				BB7C2B7E05F93FB9002C69A9 /* test_rasterizer */,
 				BBB1C6C70CB2CAA300679ADC /* blank */,
 			);
 		};
@@ -4879,6 +4887,11 @@
 			target = BBE0993D0869D87F005FF210 /* cytospace */;
 			targetProxy = BBB86ACD0B7283AC0060EE7D /* PBXContainerItemProxy */;
 		};
+		BBCB0853244AEEF0004E7C32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBCA9EEA06AFCB4600638608 /* report */;
+			targetProxy = BBCB0852244AEEF0004E7C32 /* PBXContainerItemProxy */;
+		};
 		BBE8E6CE10C199E1006527D4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
@@ -4914,7 +4927,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4959,6 +4972,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4996,7 +5010,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -6813,7 +6827,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		BB87B9D208CDC50600A05F58 /* Build configuration list for PBXAggregateTarget "test" */ = {
+		BB87B9D208CDC50600A05F58 /* Build configuration list for PBXAggregateTarget "tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BB87B9D308CDC50600A05F58 /* Development */,
