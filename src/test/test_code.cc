@@ -2,7 +2,7 @@
 
 #include <sys/time.h>
 
-#define DIM 2
+#define DIM 3
 
 #include "assert_macro.h"
 #include "real.h"
@@ -18,7 +18,7 @@
 
 
 /// number of segments:
-const size_t NBS = 127;
+const size_t NBS = 33;
 const size_t NCO = DIM * ( NBS + 1 );
 const size_t ALOC = NCO + 8;
 
@@ -278,8 +278,8 @@ void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, real* mul)
         x = load2(pX);
         vec2 b = mul2(sub2(x, y), load2(pM+2));
         pM += 4;
-        //storeu2(pT, hadd2(a, b));
-        storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
+        //storeup(pT, hadd2(a, b));
+        storeup(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
         pT += 2;
     }
     
@@ -348,7 +348,7 @@ void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, real* mul)
         pX += 4;
         pM += 4;
         vec2 h = gethi(d);
-        storeu2(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
+        storeup(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
         pT += 2;
     }
     
@@ -437,9 +437,9 @@ inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
 
 void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real *const end = mul + nbs;
+    const real *const end = mul + nbs - 4;
 
-    while ( mul < end )
+    while ( mul <= end )
     {
         /*
          *mul = dif[0] * ( src[DIM  ] - src[0] )
@@ -459,9 +459,27 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         mm = add4(mm, blend4(zx, xy, 0b0101));
         store4(mul, add4(mm, blend4(zx, yz, 0b1010)));
         
-        src += 4*DIM;
-        dif += 4*DIM;
+        src += 12;
+        dif += 12;
         mul += 4;
+    }
+    
+    while ( mul < end+4 )
+    {
+        /*
+         *mul = dif[0] * ( src[DIM  ] - src[0] )
+              + dif[1] * ( src[DIM+1] - src[1] )
+              + dif[2] * ( src[DIM+2] - src[2] );
+         */
+        vec4 x = mul4(load4(dif), sub4(loadu4(src+3), load4(src)));
+        vec4 z = permute2f128(x, x, 0x21);
+        vec4 y = permute4(x, 0b0011);
+        
+        store1(mul, add4(add4(x, y), z));
+        
+        src += 3;
+        dif += 3;
+        ++mul;
     }
 }
 
@@ -740,14 +758,14 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
         vec2 m = loaddup2(pM);
         vec2 x = mul2(m, load2(pD));
         vec2 z = add2(load2(pX), sub2(x, c));
-        storeu2(pY, z);
+        storeup(pY, z);
         c = x;
         pY += 2;
         pX += 2;
     }
     
     vec2 z = sub2(load2(pX), c);
-    storeu2(pY, z);
+    storeup(pY, z);
     assert( pY == Y + DIM * nbs );
     assert( pX == X + DIM * nbs );
 }

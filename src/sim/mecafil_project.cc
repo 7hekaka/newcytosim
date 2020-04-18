@@ -292,8 +292,8 @@ inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, rea
         x = load2(pX);
         vec2 b = mul2(sub2(x, y), load2(pD+2));
         pD += 4;
-        //storeu2(pT, hadd2(a, b));
-        storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
+        //storeup(pT, hadd2(a, b));
+        storeup(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
         pT += 2;
     }
     
@@ -370,7 +370,7 @@ inline void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, rea
         pX += 4;
         pD += 4;
         vec2 h = gethi(d);
-        storeu2(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
+        storeup(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
         pT += 2;
     }
     
@@ -427,14 +427,14 @@ inline void projectForcesD2D_AVX(size_t nbs, const real* dif,
         vec2 m = loaddup2(pM);
         vec2 x = mul2(m, load2(pD));
         vec2 z = add2(load2(pX), sub2(x, c));
-        storeu2(pY, z);
+        storeup(pY, z);
         c = x;
         pY += 2;
         pX += 2;
     }
     
     vec2 z = sub2(load2(pX), c);
-    storeu2(pY, z);
+    storeup(pY, z);
     assert( pY == Y + DIM * nbs );
     assert( pX == X + DIM * nbs );
 }
@@ -798,8 +798,8 @@ inline void add_projectiondiffAVX(const size_t nbs, const real* mul, const real*
         ++pM;
         vec2 s = mul2(sub2(load2(pX+DIM), load2(pX)), m);
         pX += DIM;
-        storeu2(pY    , add2(load2(pY    ), s));
-        storeu2(pY+DIM, sub2(load2(pY+DIM), s));
+        storeup(pY    , add2(load2(pY    ), s));
+        storeup(pY+DIM, sub2(load2(pY+DIM), s));
         pY += DIM;
     }
     

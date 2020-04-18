@@ -503,7 +503,7 @@ void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y
         vec2 dd = sub2(ff, oo);
         nn = mm;
         oo = ff;
-        storeu2(Y, fmadd2(getlo(R), sub2(yy, dd), loadu2(Y)));
+        storeup(Y, fmadd2(getlo(R), sub2(yy, dd), loadu2(Y)));
 #ifdef __FMA__
         yy = fmsub2(getlo(two), dd, ee);
 #else
@@ -512,8 +512,8 @@ void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y
         ee = dd;
         Y += 2;
     }
-    storeu2(Y  ,  fmadd2(getlo(R), yy, loadu2(Y  )));
-    storeu2(Y+2, fnmadd2(getlo(R), ee, loadu2(Y+2)));
+    storeup(Y  ,  fmadd2(getlo(R), yy, loadu2(Y  )));
+    storeup(Y+2, fnmadd2(getlo(R), ee, loadu2(Y+2)));
 }
 #endif
 #endif
