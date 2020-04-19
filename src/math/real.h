@@ -144,7 +144,7 @@ inline real clamp_real(const real x, const real i, const real s)
 
 //----------------------------------- DEBUG ------------------------------------
 
-#if ( 0 )
+#ifdef DEBUG_REAL
 
 #include <cstdio>
 
