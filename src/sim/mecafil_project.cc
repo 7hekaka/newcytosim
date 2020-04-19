@@ -513,8 +513,8 @@ inline void add_projectiondiffAVX(const size_t nbs, const real* mul, const real*
         ++pM;
         vec2 s = mul2(sub2(load2(pX+DIM), load2(pX)), m);
         pX += DIM;
-        storeup(pY    , add2(load2(pY    ), s));
-        storeup(pY+DIM, sub2(load2(pY+DIM), s));
+        storeu2(pY    , add2(load2(pY    ), s));
+        storeu2(pY+DIM, sub2(load2(pY+DIM), s));
         pY += DIM;
     }
     

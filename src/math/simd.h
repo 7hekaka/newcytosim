@@ -42,7 +42,7 @@ inline vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
 inline void store2(double* a, vec2 b)        { _mm_store_pd(a, b); }
 inline void storedup(double* a, vec2 b)      { _mm_store1_pd(a, b); }
 inline void storelo(double* a, vec2 b)       { _mm_store_sd(a, b); }
-inline void storeup(double* a, vec2 b)       { _mm_storeu_pd(a, b); }
+inline void storeu2(double* a, vec2 b)       { _mm_storeu_pd(a, b); }
 
 inline vec2 movedup2(vec2 a)                 { return _mm_movedup_pd(a); }
 
@@ -135,7 +135,7 @@ typedef __m256d vec4;
 constexpr __m256i msk3 = {-1,-1,-1,0};
 
 //#define load3(a)            blend4(cast4(load2(a)), _mm256_broadcast_sd(a+2), 0b0100)
-//#define store3(a,b)         storeup(a, getlo(b)); storelo(Y+ii+2, gethi(z));
+//#define store3(a,b)         storeu2(a, getlo(b)); storelo(Y+ii+2, gethi(z));
 
 //inline vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }
 inline vec4 load3(double const* a)     { return _mm256_maskload_pd(a, msk3); }
@@ -158,6 +158,7 @@ inline vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
 inline void store1(double* a, vec4 b)    { _mm_store_sd(a, _mm256_castpd256_pd128(b)); }
 inline void store2(double* a, vec4 b)    { _mm_store_pd(a, _mm256_castpd256_pd128(b)); }
+inline void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, _mm256_castpd256_pd128(b)); }
 inline void store3(double* a, vec4 b)    { _mm256_maskstore_pd(a, msk3, b); }
 inline void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
 inline void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }

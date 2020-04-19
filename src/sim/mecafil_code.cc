@@ -183,8 +183,8 @@ inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, rea
         x = load2(pX);
         vec2 b = mul2(sub2(x, y), load2(pD+2));
         pD += 4;
-        //storeup(pT, hadd2(a, b));
-        storeup(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
+        //storeu2(pT, hadd2(a, b));
+        storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
         pT += 2;
     }
     
@@ -261,7 +261,7 @@ inline void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, rea
         pX += 4;
         pD += 4;
         vec2 h = gethi(d);
-        storeup(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
+        storeu2(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
         pT += 2;
     }
     
@@ -318,14 +318,14 @@ inline void projectForcesD2D_AVX(size_t nbs, const real* dif,
         vec2 m = loaddup2(pM);
         vec2 x = mul2(m, load2(pD));
         vec2 z = add2(load2(pX), sub2(x, c));
-        storeup(pY, z);
+        storeu2(pY, z);
         c = x;
         pY += 2;
         pX += 2;
     }
     
     vec2 z = sub2(load2(pX), c);
-    storeup(pY, z);
+    storeu2(pY, z);
     assert( pY == Y + DIM * nbs );
     assert( pX == X + DIM * nbs );
 }
@@ -514,7 +514,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             store4(dst  , fnmadd4(m0, dd, a0));
             store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
             store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
-            dif += 12; dst += 12; src += 12;
+            //dif += 12; dst += 12; src += 12;
         } break;
         case 2: {
             // 3 vectors remaining
@@ -534,7 +534,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
             store1(dst+8, fnmadd4(m2, broadcast1(dif+5), a2));
             //storelo(dst+8, fnmadd2(getlo(m2), loaddup2(dif+5), getlo(a2)));
-            dif += 9; dst += 9; src += 9;
+            //dif += 9; dst += 9; src += 9;
         } break;
         case 3: {
             // 2 vectors remaining
@@ -547,15 +547,15 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             vec4 a1 = load4(src+4);
             
             store4(dst  , fnmadd4(m0, dd, a0));
-            store2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
+            storeu2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
             //store2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), getlo(a1)));
-            dif += 6; dst += 6; src += 6;
+            //dif += 6; dst += 6; src += 6;
         } break;
         case 4: {
             // 1 vector remaining
             ++mul;
             store3(dst, fnmadd4(mm, dd, load3(src)));
-            dif += 3; dst += 3; src += 3;
+            //dif += 3; dst += 3; src += 3;
         } break;
         default:
             printf("unexpected case in projectForcesD3D_AVX!");
