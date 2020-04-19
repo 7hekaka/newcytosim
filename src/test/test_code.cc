@@ -19,7 +19,7 @@
 
 
 /// number of segments:
-const size_t NBS = 254;
+const size_t NBS = 127;
 const size_t NCO = DIM * ( NBS + 1 );
 const size_t ALOC = NCO + 8;
 
@@ -252,7 +252,7 @@ inline void projectForcesU_TWO(size_t nbs, const real* dif, const real* src, rea
         src += 2*DIM;
         dif += 2*DIM;
     }
-    assert_true( dif == end );
+    assert_true( mul == end );
 }
 
 
@@ -831,12 +831,18 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
  }
  */
 
+/*
+ Ugly piece of code to harvest AVX power...
+ FJN 18 and 19.04.2020
+ */
 void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
 {
-    //vec4 mm = setzero4();
-    //store3(dst, fmadd4(broadcast1(mul), load4(dif), load4(src)));
     const real* const end = mul + nbs - 4;
-    // for the first vector, the negative terms are not present
+    /*
+     This follows the standard pattern defined below, except
+     that the negative terms are not present on the first vector.
+     This handles 12 scalars (4 vectors) in one round.
+     */
     if ( mul <= end )
     {
         vec4 m1 = broadcast1(mul  );
@@ -861,6 +867,10 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         dst += 12;
         src += 12;
     }
+    /*
+     This is where the bulk of the work is done, handing 12 scalars per pass.
+     The loop can be unrolled.
+     */
     while ( mul <= end )
     {
         vec4 m0 = broadcast1(mul-1);
@@ -886,86 +896,94 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         dst += 12;
         src += 12;
     }
-    
-    vec4 mm = ( nbs > 3 ? broadcast1(mul-1) : setzero4() );
-    // for the last vector, the positive terms are not present
-    if ( mul <= end+1 )
+    /*
+     We need to consider here multiple cases depending on how many vectors are
+     left, since the positive terms are not present on the last vector.
+     In addition the above code was not executed if there was less than 5 vectors
+     in total, and the first vector is still a special case.
+     We introduce: `mm` and `dd` for this reason, avoiding to load outside the
+     valid data range.
+     */
+    vec4 mm, dd;
+    if ( nbs < 4 )
     {
-        // 4 vectors remaining
-        vec4 m1 = broadcast1(mul  );
-        vec4 m0 = blend4(mm, m1, 0b1000);
-        vec4 m2 = broadcast1(mul+1);
-        vec4 p0 = blend4(m1, m2, 0b1000);
-        vec4 p2 = broadcast1(mul+2);
-        m1 = blend4(m1, m2, 0b1100);
-        vec4 p1 = blend4(m2, p2, 0b1100);
-        m2 = blend4(m2, p2, 0b1110);
-        p2 = blend4(p2, setzero4(), 0b1110);
-        
-        mul += 4;
-        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
-        vec4 a2 = fmadd4(p2, broadcast1(dif+8), load4(src+8));
-
-        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
-        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
-        dif += 12;
-        dst += 12;
-        src += 12;
+        mm = setzero4();
+        dd = broadcast1(dif);
     }
-    else if ( mul <= end+2 )
+    else
     {
-        // 3 vectors remaining
-        vec4 m1 = broadcast1(mul  );
-        vec4 m0 = blend4(mm, m1, 0b1000);
-        vec4 m2 = broadcast1(mul+1);
-        vec4 p0 = blend4(m1, m2, 0b1000);
-        m1 = blend4(m1, m2, 0b1100);
-        vec4 p1 = blend4(m2, setzero4(), 0b1100);
-        
-        mul += 3;
-        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
-        vec4 a2 = broadcast1(src+8);
-
-        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
-        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        store1(dst+8, fnmadd4(m2, broadcast1(dif+5), a2));
-        dif += 9;
-        dst += 9;
-        src += 9;
+        mm = broadcast1(mul-1);
+        dd = loadu4(dif-3);
     }
-    else if ( mul <= end+3 )
+    switch ( mul - end )
     {
-        // 2 vectors remaining
-        vec4 m1 = broadcast1(mul  );
-        vec4 m0 = blend4(mm, m1, 0b1000);
-        vec4 m2 = setzero4();
-        vec4 p0 = blend4(m1, m2, 0b1000);
-        m1 = blend4(m1, m2, 0b1100);
-        
-        mul += 2;
-        vec4 a0 = fmadd4(p0, load4(dif), load4(src));
-        vec4 a1 = load4(src+4);
-
-        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
-        store2(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        dif += 6;
-        dst += 6;
-        src += 6;
+        case 1: {
+            // 4 vectors remaining
+            vec4 m1 = broadcast1(mul  );
+            vec4 m0 = blend4(mm, m1, 0b1000);
+            vec4 m2 = broadcast1(mul+1);
+            vec4 p0 = blend4(m1, m2, 0b1000);
+            vec4 p2 = broadcast1(mul+2);
+            m1 = blend4(m1, m2, 0b1100);
+            vec4 p1 = blend4(m2, p2, 0b1100);
+            m2 = blend4(m2, p2, 0b1110);
+            p2 = blend4(p2, setzero4(), 0b1110);
+            
+            mul += 4;
+            vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
+            vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+            vec4 a2 = fmadd4(p2, broadcast1(dif+8), load4(src+8));
+            
+            store4(dst  , fnmadd4(m0, dd, a0));
+            store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+            store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+            dif += 12; dst += 12; src += 12;
+        } break;
+        case 2: {
+            // 3 vectors remaining
+            vec4 m1 = broadcast1(mul  );
+            vec4 m0 = blend4(mm, m1, 0b1000);
+            vec4 m2 = broadcast1(mul+1);
+            vec4 p0 = blend4(m1, m2, 0b1000);
+            m1 = blend4(m1, m2, 0b1100);
+            vec4 p1 = blend4(m2, setzero4(), 0b1100);
+            
+            mul += 3;
+            vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
+            vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+            vec4 a2 = broadcast1(src+8);
+            
+            store4(dst  , fnmadd4(m0, dd, a0));
+            store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+            store1(dst+8, fnmadd4(m2, broadcast1(dif+5), a2));
+            //storelo(dst+8, fnmadd2(getlo(m2), loaddup2(dif+5), getlo(a2)));
+            dif += 9; dst += 9; src += 9;
+        } break;
+        case 3: {
+            // 2 vectors remaining
+            vec4 m1 = broadcast1(mul);
+            vec4 m0 = blend4(mm, m1, 0b1000);
+            vec4 p0 = blend4(m1, setzero4(), 0b1000);
+            
+            mul += 2;
+            vec4 a0 = fmadd4(p0, load4(dif), load4(src));
+            vec4 a1 = load4(src+4);
+            
+            store4(dst  , fnmadd4(m0, dd, a0));
+            store2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
+            //store2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), getlo(a1)));
+            dif += 6; dst += 6; src += 6;
+        } break;
+        case 4: {
+            // 1 vector remaining
+            ++mul;
+            store3(dst, fnmadd4(mm, dd, load3(src)));
+            dif += 3; dst += 3; src += 3;
+        } break;
+        default:
+            printf("unexpected case in projectForcesD3D_AVX!");
     }
-    // for the last vector, the positive terms are not present
-    else if ( mul <= end+4 )
-    {
-        // 1 vector remaining
-        ++mul;
-        store3(dst, fnmadd4(mm, loadu4(dif-3), load4(src)));
-        dif += 3;
-        dst += 3;
-        src += 3;
-    }
-    assert_true(mul==end+5);
+    assert_true( mul == end+5 );
 }
 
 
