@@ -549,7 +549,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
     
-    if ( mesh_aging_rate > 0 && !mesh )
+    if ( mesh_aging_rate > 0 && !mesh && sim.ready() )
         throw InvalidParameter("for `mesh_aging_rate', the mesh must be defined");
 
     if ( rigidity < 0 )
@@ -557,7 +557,7 @@ void FiberProp::complete(Simul const& sim)
     
     if ( segmentation <= 0 )
         throw InvalidParameter("fiber:segmentation must be > 0");
- 
+
 #if ( 1 )
     // Adjust the segmentation of all Fibers with this FiberProp:
     for ( Fiber* fib = sim.fibers.first(); fib; fib=fib->next() )
