@@ -12,7 +12,7 @@
  
  This is unpublished development, and you should set to zero
  */
-#define NEW_ANISOTROPIC_FIBER_DRAG 1
+#define NEW_ANISOTROPIC_FIBER_DRAG 0
 
 /**
  Enable this option to build the projection matrix explicitly.
