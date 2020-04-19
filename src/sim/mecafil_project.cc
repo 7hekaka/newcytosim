@@ -1,13 +1,15 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
+#include "mecafil_code.cc"
 #include "exceptions.h"
 #include "vecprint.h"
 #include "dpttrf.h"
 
+
 /*
  Selection of LAPACK routines
  The LAPACK implementation is the safest choice
- The Alsatian version may be faster as it avoids divisions
+ The Alsatian version is faster as it avoids divisions
  */
 
 #if ( 1 )
@@ -23,6 +25,36 @@
 #  define DPTTRF lapack::xpttrf
 #  define DPTTS2 lapack::xptts2
 #endif
+
+
+/*
+Selection of projectForces() routines, depending on architecture
+*/
+
+#if ( DIM == 2 ) && REAL_IS_DOUBLE
+#  if defined(__AVX__)
+#    define projectForcesU projectForcesU2D_AVX
+#    define projectForcesD projectForcesD2D_AVX
+#  elif defined(__SSE3__)
+#    warning "Using SSE3 Fiber::projectForces"
+#    define projectForcesU projectForcesU2D_SSE
+#    define projectForcesD projectForcesD2D_SSE
+#  else
+#    warning "Using scalar Fiber::projectForces"
+#    define projectForcesU projectForcesU_
+#    define projectForcesD projectForcesD_
+#  endif
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE
+#  if defined(__AVX__)
+#    define projectForcesU projectForcesU3D_AVX
+#    define projectForcesD projectForcesD3D_AVX
+#  endif
+#else
+#  warning "Using scalar Fiber::projectForces"
+#  define projectForcesU projectForcesU_
+#  define projectForcesD projectForcesD_
+#endif
+
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -160,7 +192,7 @@ void Mecafil::makeProjection()
 
 #endif
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Reference (scalar) code
 
 /**
  Perform first calculation needed by projectForces:
@@ -224,325 +256,8 @@ void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul
 }
 
 
-/**
- Perform second calculation needed by projectForces:
- */
-void projectForcesD__(size_t nbs, const real* dif,
-                      const real* X, const real* mul, real* Y)
-{
-    real a0 = dif[0] * mul[0];
-    real a1 = dif[1] * mul[0];
-#if ( DIM > 2 )
-    real a2 = dif[2] * mul[0];
-#endif
-    
-    Y[0] = X[0] + a0;
-    Y[1] = X[1] + a1;
-#if ( DIM > 2 )
-    Y[2] = X[2] + a2;
-#endif
-    
-    for ( size_t jj = 1; jj < nbs; ++jj )
-    {
-        const size_t kk = DIM * jj;
-        real b0 = dif[kk  ] * mul[jj];
-        Y[kk  ] = X[kk  ] + b0 - a0;
-        a0 = b0;
-        
-        real b1 = dif[kk+1] * mul[jj];
-        Y[kk+1] = X[kk+1] + b1 - a1;
-        a1 = b1;
-        
-#if ( DIM > 2 )
-        real b2 = dif[kk+2] * mul[jj];
-        Y[kk+2] = X[kk+2] + b2 - a2;
-        a2 = b2;
-#endif
-    }
-    
-    const size_t ee = DIM * nbs;
-    Y[ee  ] = X[ee  ] - a0;
-    Y[ee+1] = X[ee+1] - a1;
-#if ( DIM > 2 )
-    Y[ee+2] = X[ee+2] - a2;
-#endif
-}
-
-
-#if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-
-#include "simd.h"
-
-/**
- Perform first calculation needed by projectForces:
- */
-inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, real* mul)
-{
-    const real* pD = dif;
-    const real* pX = X;
-    real const*const end = mul + nbs - 2;
-    real* pT = mul;
-    
-    vec2 y, x = load2(pX);
-    while ( pT <= end )
-    {
-        y = load2(pX+2);
-        pX += 4;
-        vec2 a = mul2(sub2(y, x), load2(pD));
-        x = load2(pX);
-        vec2 b = mul2(sub2(x, y), load2(pD+2));
-        pD += 4;
-        //storeup(pT, hadd2(a, b));
-        storeup(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
-        pT += 2;
-    }
-    
-    if ( pT < end+2 )
-    {
-        y = load2(pX+2);
-        vec2 a = mul2(sub2(y, x), load2(pD));
-        //storelo(pT, hadd2(a, a));
-        storelo(pT, add2(a, unpackhi2(a, a)));
-    }
-}
-
-/**
- Perform second calculation needed by projectForces:
- */
-inline void projectForcesD2D_SSE(size_t nbs, const real* dif,
-                               const real* X, const real* mul, real* Y)
-{
-    real *pY = Y;
-    const real* pX = X;
-    const real* pD = dif;
-    
-    vec2 cc = load2(X);
-    
-    real const* pM = mul;
-    real const*const end = mul + nbs;
-    while ( pM < end )
-    {
-        pX += DIM;
-        vec2 d = mul2(load2(pD), loaddup2(pM));
-        ++pM;
-        pD += DIM;
-        store2(pY, add2(cc, d));
-        pY += DIM;
-        cc = sub2(load2(pX), d);
-    }
-    store2(pY, cc);
-}
-
-#endif
-
-#if ( DIM == 2 ) && defined(__AVX__) && REAL_IS_DOUBLE
-
-#include "simd.h"
-
-/**
- Perform first calculation needed by projectForces
-
- F. Nedelec, 9.12.2016, 6.9.2018
- */
-inline void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, real* mul)
-{
-    const real* pD = dif;
-    const real* pX = X;
-    real const*const end = mul + nbs - 4;
-    real* pT = mul;
-
-    while ( pT <= end )
-    {
-        vec4 a = mul4(sub4(loadu4(pX+2), loadu4(pX  )), load4(pD  ));
-        vec4 b = mul4(sub4(loadu4(pX+6), loadu4(pX+4)), load4(pD+4));
-        pD += 8;
-        pX += 8;
-        //store4(pT, hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
-        vec4 p = permute2f128(a,b,0x20);
-        vec4 q = permute2f128(a,b,0x31);
-        store4(pT, add4(unpacklo4(p, q), unpackhi4(p, q)));
-        pT += 4;
-    }
-    
-    while ( pT <= end+2 )
-    {
-        vec4 d = mul4(sub4(loadu4(pX+2), loadu4(pX)), load4(pD));
-        pX += 4;
-        pD += 4;
-        vec2 h = gethi(d);
-        storeup(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
-        pT += 2;
-    }
-    
-    if ( pT < end+4 )
-    {
-        vec2 a = mul2(sub2(load2(pX+2), load2(pX)), load2(pD));
-        //storelo(pT, hadd2(a, a));
-        storelo(pT, add2(a, unpackhi2(a, a)));
-    }
-}
-
-
-/**
- Perform second calculation needed by projectForces
-
- ATTENTION: memory X and Y are not necessarily aligned since they are chunck from
- an array containing contiguous coordinates
- F. Nedelec, 9.12.2016, 23.03.2018
- */
-inline void projectForcesD2D_AVX(size_t nbs, const real* dif,
-                                 const real* X, const real* mul, real* Y)
-{
-    real *pY = Y;
-    const real* pX = X;
-    const real* pD = dif;
-    
-    vec4 cc = setzero4();
-    
-    const bool odd = nbs & 1;
-    real const* pM = mul;
-    real const*const end = mul + nbs - odd;
-    
-    while ( pM < end )
-    {
-        vec4 t = broadcast2(pM);
-        vec4 x = loadu4(pX);
-        pM += 2;
-        vec4 m = permute4(t, 0b1100);
-        vec4 d = mul4(m, load4(pD));
-        pD += 4;
-        vec4 n = permute2f128(cc,d,0x21);
-        cc = d;
-        vec4 z = add4(x, sub4(d, n));
-        pX += 4;
-        storeu4(pY, z);
-        pY += 4;
-    }
-    
-    vec2 c = gethi(cc);
-    
-    if ( odd )
-    {
-        assert( pM + 1 == mul + nbs );
-        vec2 m = loaddup2(pM);
-        vec2 x = mul2(m, load2(pD));
-        vec2 z = add2(load2(pX), sub2(x, c));
-        storeup(pY, z);
-        c = x;
-        pY += 2;
-        pX += 2;
-    }
-    
-    vec2 z = sub2(load2(pX), c);
-    storeup(pY, z);
-    assert( pY == Y + DIM * nbs );
-    assert( pX == X + DIM * nbs );
-}
-
-#endif
-
-
-/**
- Perform first calculation needed by projectForces:
- */
-inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
-{
-    real x3, x0 = src[0];
-    real x4, x1 = src[1];
-#if ( DIM >= 3 )
-    real x5, x2 = src[2];
-#endif
-    src += DIM;
-    const real *const end = mul + nbs;
-
-    //normally optimized version
-    while ( mul < end )
-    {
-        x3 = src[0];
-        x4 = src[1];
-#if ( DIM == 2 )
-        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1);
-#elif ( DIM >= 3 )
-        x5 = src[2];
-        mul[0] = dif[0] * (x3 - x0) + dif[1] * (x4 - x1) + dif[2] * (x5 - x2);
-        x2 = x5;
-#endif
-        ++mul;
-        src += DIM;
-        dif += DIM;
-        x0 = x3;
-        x1 = x4;
-    }
-}
-
-
-/**
- Perform second calculation needed by projectForces:
- */
-void projectForcesD_PTR(size_t nbs, const real* dif,
-                        const real* X, const real* mul, real* Y)
-{
-    real a0 = X[0];
-    real a1 = X[1];
-#if ( DIM > 2 )
-    real a2 = X[2];
-#endif
-    X += DIM;
-
-    const real* const end = mul + nbs;
-    while ( mul < end )
-    {
-        real b0 = dif[0] * mul[0];
-        real b1 = dif[1] * mul[0];
-#if ( DIM > 2 )
-        real b2 = dif[2] * mul[0];
-#endif
-        dif += DIM;
-        Y[0] = a0 + b0;
-        Y[1] = a1 + b1;
-#if ( DIM > 2 )
-        Y[2] = a2 + b2;
-#endif
-        Y += DIM;
-        a0 = X[0] - b0;
-        a1 = X[1] - b1;
-#if ( DIM > 2 )
-        a2 = X[2] - b2;
-#endif
-        X += DIM;
-        ++mul;
-    }
-    
-    Y[0] = a0;
-    Y[1] = a1;
-#if ( DIM > 2 )
-    Y[2] = a2;
-#endif
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark -
-
-
-#if ( DIM == 2 ) && REAL_IS_DOUBLE
-#  if defined(__AVX__)
-#    warning "Using AVX implementation"
-#    define projectForcesU projectForcesU2D_AVX
-#    define projectForcesD projectForcesD2D_AVX
-#  elif defined(__SSE3__)
-#    warning "Using SSE3 implementation"
-#    define projectForcesU projectForcesU2D_SSE
-#    define projectForcesD projectForcesD2D_SSE
-#  else
-#    define projectForcesU projectForcesU_
-#    define projectForcesD projectForcesD_
-#  endif
-#else
-#  define projectForcesU projectForcesU_
-#  define projectForcesD projectForcesD_
-#endif
-
 
 /*
  Note that this works fine even if ( X == Y )

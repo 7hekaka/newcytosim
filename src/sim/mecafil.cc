@@ -158,39 +158,6 @@ void Mecafil::storeDirections()
 #endif
 }
 
-
-#if NEW_ANISOTROPIC_FIBER_DRAG
-
-/**
- This will perform:
-
-     Y = X + (TT') X
-
- Where T is the local direction of the fiber given by `dir`.
- This is used to multiply the tangential component of X by a factor 2,
- without changing the orthogonal components
- */
-void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
-{
-    for ( size_t p = 0; p < nbp; ++p )
-    {
-        real const* xxx = X   + DIM * p;
-        real const* ddd = dir + DIM * p;
-        real      * yyy = Y   + DIM * p;
-#if ( DIM == 2 )
-        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1];
-        yyy[0] = xxx[0] + s * ddd[0];
-        yyy[1] = xxx[1] + s * ddd[1];
-#elif ( DIM >= 3 )
-        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1] + xxx[2] * ddd[2];
-        yyy[0] = xxx[0] + s * ddd[0];
-        yyy[1] = xxx[1] + s * ddd[1];
-        yyy[2] = xxx[2] + s * ddd[2];
-#endif
-    }
-}
-#endif
-
 //------------------------------------------------------------------------------
 #pragma mark - Project
 
