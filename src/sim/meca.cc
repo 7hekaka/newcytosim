@@ -37,7 +37,7 @@
  Add correction term to the constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
 */
-#define ADD_PROJECTION_DIFF 1
+#define ADD_PROJECTION_DIFF 0
 
 
 /**
@@ -85,7 +85,7 @@ Meca::Meca()
 : mecables(32)
 {
     ready_ = 0;
-    nbPts = 0;
+    nPoints_ = 0;
     allocated_ = 0;
     vPTS = nullptr;
     vSOL = nullptr;
@@ -97,6 +97,7 @@ Meca::Meca()
 #if USE_ISO_MATRIX
     useMatrixC = false;
 #endif
+    doNotify = false;
     drawLinks = false;
     time_step = 0;
 }
@@ -921,7 +922,7 @@ void Meca::prepare()
         mec->matIndex(cnt);
         cnt += mec->nbPoints();
     }
-    nbPts = cnt;
+    nPoints_ = cnt;
     allocate(cnt);
     
 #if USE_ISO_MATRIX
@@ -1116,7 +1117,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
 #if SEPARATE_RIGIDITY_TERMS
     addAllRigidity(vPTS, vFOR);
 #endif
- 
+    
     /* 
      Fill `vRND` with Gaussian random numbers 
      This operation can be done in parallel, in a separate thread
@@ -1298,14 +1299,14 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("Solver failed: precond %i flag %i count %4lu residual %.3e\n",
+        Cytosim::out("  no convergence: precond %i flag %i count %4lu residual %.3e\n",
             precond, monitor.flag(), monitor.count(), monitor.residual());
         
         // try with different initial seed: vRHS
         monitor.reset();
         copy_real(dimension(), vRHS, vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-        Cytosim::out("     seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+        Cytosim::out("     new seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
         
         if ( !monitor.converged() )
         {
@@ -1379,23 +1380,22 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     ready_ = 1;
     
     // report on the matrix type and size, sparsity, and the number of iterations
-    if ( prop->verbose )
+    if ( doNotify || prop->verbose )
     {
         std::stringstream oss;
-        oss << "Meca " << DIM << "*" << nbPts;
-        oss << " kern " << largestMecable();
+        oss << "  size " << DIM << "*" << nb_points() << " kern " << largestMecable();
 #if USE_ISO_MATRIX
         oss << " " << mB.what();
         if ( useMatrixC )
 #endif
         oss << " " << mC.what();
-        oss << " precond " << precond;
-        oss << " count " << monitor.count();
+        oss << " precond " << precond << " count " << monitor.count();
         //oss << " flag " << monitor.flag();
-        oss << " residual = " << monitor.residual() << "\n";
+        oss << " residual " << monitor.residual() << "\n";
         Cytosim::out << oss.str();
-        if ( prop->verbose > 1 )
+        if ( prop->verbose & 2 )
             std::clog << oss.str();
+        doNotify = false;
     }
 }
 

@@ -460,14 +460,11 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
         return;
 
     //detect segments that have been missed or mistargeted:
-    int verbose = 0;
+    bool doprint = false;
     for ( auto const& i : hits )
-    {
-        if ( i.second < 50 )
-            verbose = 1;
-    }
+        doprint |= ( i.second < 50 );
     
-    if ( verbose )
+    if ( doprint )
     {
         // print a summary of all targets:
         fprintf(out, "FiberGrid::testAttach %lu target(s) within %.3f um of", n_targets, hp->binding_range);

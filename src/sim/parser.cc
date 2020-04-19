@@ -12,7 +12,7 @@
 #include <fstream>
 
 
-// Use the second definition to get some verbose reports:
+// Use the second definition to get some reports:
 #define VLOG(ARG) ((void) 0)
 //#define VLOG(ARG) std::clog << ARG;
 

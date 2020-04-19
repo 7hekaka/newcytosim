@@ -113,6 +113,9 @@ The equation is formulated using linear-algebra:
 class Meca
 {
 public:
+    
+    /// verbose level
+    bool            doNotify;
 
     /// enables graphical display of all interactions
     bool            drawLinks;
@@ -129,7 +132,7 @@ private:
     Array<Mecable*> mecables;
     
     /// total number of points in the system
-    size_t          nbPts;
+    size_t          nPoints_;
     
     /// size of the currently allocated memory
     size_t          allocated_;
@@ -298,13 +301,13 @@ public:
     size_t   largestMecable() const;
 
     /// true if system does not contain any object
-    bool     empty() const { return nbPts == 0; }
+    bool     empty() const { return nPoints_ == 0; }
     
     /// number of points in the system
-    size_t   nb_points() const { return nbPts; }
+    size_t   nb_points() const { return nPoints_; }
     
     /// Implementation of LinearOperator::size()
-    size_t   dimension() const { return DIM * nbPts; }
+    size_t   dimension() const { return DIM * nPoints_; }
     
     /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;

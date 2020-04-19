@@ -11,7 +11,7 @@
 #include "vector2.h"
 
 
-// Use the second definition to get some verbose reports:
+// Use the second definition to get some reports:
 #define VLOG0(ARG) ((void) 0)
 //#define VLOG0(ARG) std::clog << ARG;
 

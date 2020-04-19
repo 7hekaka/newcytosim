@@ -833,6 +833,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
             {
                 simul.relax();
                 simul.writeObjects(TRAJECTORY, true, binary);
+                simul.sMeca.doNotify = true;  // to print convergence parameters
                 reportCPUtime(frame, simul.time());
                 simul.unrelax();
             }
@@ -993,8 +994,8 @@ void Interface::execute_export(std::string& file, std::string const& what, Gloss
  */
 void Interface::execute_report(std::string& file, std::string const& what, Glossary& opt)
 {
-    bool verbose = true;
-    opt.set(verbose, "verbose");
+    bool ver = true;
+    opt.set(ver, "verbose");
     std::string str;
     VLOG("-WRITE " << what << " to " << file << '\n');
     
@@ -1010,7 +1011,7 @@ void Interface::execute_report(std::string& file, std::string const& what, Gloss
         osp = &ofs;
     }
     
-    if ( verbose )
+    if ( ver )
     {
         simul.report(*osp, what, opt);
     }
