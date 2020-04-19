@@ -42,7 +42,7 @@ void Walker::stepUnloaded()
     
     real R = prop->walking_rate_dt;
 
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
     R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
@@ -90,7 +90,7 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
     // calculate displacement, dependent on the load along the desired direction of displacement
     real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
     R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif

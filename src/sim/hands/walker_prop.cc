@@ -24,7 +24,7 @@ void WalkerProp::clear()
     unbinding_chance  = 0;
     walking_rate_dt   = 0;
     var_rate_dt       = 0;
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     variable_speed    = 0;
     variable_walking_rate_dt = 0;
 #endif
@@ -42,7 +42,7 @@ void WalkerProp::read(Glossary& glos)
 #endif
     glos.set(unbinding_chance, "unbinding_chance") || glos.set(unbinding_chance, "unbinding", 2);
     
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     glos.set(variable_speed, "variable_speed");
 #endif
 
@@ -72,7 +72,7 @@ void WalkerProp::complete(Simul const& sim)
     walking_rate_dt = sim.time_step() * abs_real(unloaded_speed) / step_size;
     var_rate_dt     = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
     
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     real S = sign_real(unloaded_speed * variable_speed);
     variable_walking_rate_dt = S * sim.time_step() * abs_real(variable_speed) / step_size;
     if ( ( unloaded_speed + variable_speed ) * unloaded_speed < 0 )
@@ -138,7 +138,7 @@ void WalkerProp::write_values(std::ostream& os) const
     write_value(os, "stall_force",      stall_force);
     write_value(os, "unloaded_speed",   unloaded_speed);
     write_value(os, "unbinding_chance", unbinding_chance);
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     write_value(os, "variable_speed",    variable_speed);
 #endif
 }

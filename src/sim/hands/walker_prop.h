@@ -5,7 +5,7 @@
 #include "digit_prop.h"
 
 /// enable mesh-dependent speed of walkers (requires FIBER_HAS_MESH=1)
-#define NEW_VARIABLE_SPEED 0
+#define NEW_VARIABLE_WALK 0
 
 
 /// Additional Property for Walker
@@ -46,14 +46,14 @@ public:
      */
     real    unbinding_chance;
     
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     /// portion of the speed that depends on position
     real    variable_speed;
 #endif
 
     /// @}
     
-#if NEW_VARIABLE_SPEED
+#if NEW_VARIABLE_WALK
     /// portion of the speed that depends on position
     real    variable_walking_rate_dt;
 #endif
