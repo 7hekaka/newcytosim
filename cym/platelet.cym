@@ -53,8 +53,8 @@ set fiber filament
     min_length = 0.016
     max_length = 8
     
-    lattice = 1, 0.024
-    lattice_aging_rate = 0.01;
+    mesh = 1, 0.024
+    mesh_aging_rate = 0.01;
 
     activity = dynamic
     unit_length = 0.008

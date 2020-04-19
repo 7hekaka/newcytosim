@@ -24,9 +24,8 @@ new cell
 
 set fiber microtubule
 {
-    lattice = 1
-    lattice_unit = 0.01
-    lattice_aging_rate = 0.1
+    mesh = 1, 0.01
+    mesh_aging_rate = 0.1
 
     rigidity = 20
     segmentation = 0.5

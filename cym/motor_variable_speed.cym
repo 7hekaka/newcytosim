@@ -24,8 +24,8 @@ set fiber microtubule
     segmentation = 0.128
     confine = inside, 200, cell
 
-    lattice = 1, 0.016
-    lattice_aging_rate = 0.01;
+    mesh = 1, 0.016
+    mesh_aging_rate = 0.01;
 
     min_length = 0.032
 
