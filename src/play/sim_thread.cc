@@ -7,7 +7,7 @@
 #include <time.h>
 #include "sim_thread.h"
 #include "exceptions.h"
-#include "ansi_colors.h"
+#include "print_color.h"
 #include "picket.h"
 #include "glapp.h"
 

@@ -81,7 +81,7 @@ vpath cymart bin
 
 
 micimage: micimage.cc saveimage.cc glossary.o filepath.o tokenizer.o
-micimage: stream_func.o exceptions.o random.o SFMT.o ansi_colors.o backtrace.o
+micimage: stream_func.o exceptions.o random.o SFMT.o print_color.o backtrace.o
 	$(COMPILE) -Isrc/math -Isrc/base -Isrc/disp -DNO_OPENGL -DHAS_PNG $(OBJECTS) $(LIB_PNG) -o bin/$@
 	$(DONE)
 vpath micimage bin
