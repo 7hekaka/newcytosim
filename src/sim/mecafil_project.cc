@@ -44,11 +44,9 @@ Selection of projectForces() routines, depending on architecture
 #    define projectForcesU projectForcesU_
 #    define projectForcesD projectForcesD_
 #  endif
-#elif ( DIM == 3 ) && REAL_IS_DOUBLE
-#  if defined(__AVX__)
-#    define projectForcesU projectForcesU3D_AVX
-#    define projectForcesD projectForcesD3D_AVX
-#  endif
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
+#  define projectForcesU projectForcesU3D_AVX
+#  define projectForcesD projectForcesD3D_AVX
 #else
 #  warning "Using scalar Fiber::projectForces"
 #  define projectForcesU projectForcesU_
