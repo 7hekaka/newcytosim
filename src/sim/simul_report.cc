@@ -99,7 +99,7 @@ void Simul::report1(std::ostream& out, std::string arg, Glossary& opt) const
     }
     catch( Exception & e )
     {
-        out << "\nError, " << e.what() << '\n';
+        out << e.brief() << '\n';
         throw;
     }
 }

@@ -5,6 +5,7 @@
 #include "modulo.h"
 #include "glossary.h"
 #include "simul_prop.h"
+#include "ansi_colors.h"
 #include "display1.h"
 #include "display2.h"
 #include "display3.h"
@@ -235,8 +236,10 @@ void Player::prepareDisplay(View& view, int mag)
         mDisplay->prepareForDisplay(simul, dproperties);
         //std::clog << " dproperties.size() = " << dproperties.size() << '\n';
     }
-    catch(Exception & e) {
-        std::cerr<<"Error in prepareDisplay: " << e.what() << '\n';
+    catch(Exception & e)
+    {
+        print_blue(std::cerr, e.brief());
+        std::cerr << '\n' << e.info() << '\n';
     }
 }
 
@@ -269,8 +272,11 @@ void Player::displayCytosim()
 #endif
         }
     }
-    catch(Exception & e) {
-        std::cerr << "Error in display: " << e.what() << std::endl;
+    catch(Exception & e)
+    {
+        e << " in display";
+        print_blue(std::cerr, e.brief());
+        std::cerr << '\n' << e.info() << '\n';
     }
 }
 
@@ -290,7 +296,9 @@ void Player::readDisplayString(View& view, std::string const& str)
     }
     catch( Exception & e )
     {
-        std::cerr << "Error while reading simul:display: " << e.what();
+        e << " while reading simul:display";
+        print_blue(std::cerr, e.brief());
+        std::cerr << '\n' << e.info() << '\n';
     }
 }
 

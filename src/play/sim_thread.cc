@@ -7,6 +7,7 @@
 #include <time.h>
 #include "sim_thread.h"
 #include "exceptions.h"
+#include "ansi_colors.h"
 #include "picket.h"
 #include "glapp.h"
 
@@ -507,8 +508,11 @@ void SimThread::exportObjects(bool binary)
         snprintf(str, sizeof(str), "objects%04li.cmo", reader_.currentFrame());
         simul.writeObjects(str, false, binary);
     }
-    catch( Exception & e ) {
-        std::cerr << "Error in Simul::exportObjects(): " << e.what();
+    catch( Exception & e )
+    {
+        e << " in Simul::exportObjects()";
+        print_blue(std::cerr, e.brief());
+        std::cerr << '\n' << e.info() << '\n';
     }
     unlock();
 }
@@ -520,8 +524,11 @@ void SimThread::writeProperties(std::ostream& os, bool prune)
     try {
         simul.writeProperties(os, prune);
     }
-    catch( Exception & e ) {
-        std::cerr << "Error in Simul::writeProperties(): " << e.what();
+    catch( Exception & e )
+    {
+        e << " in Simul::writeProperties()";
+        print_blue(std::cerr, e.brief());
+        std::cerr << '\n' << e.info() << '\n';
     }
     unlock();
 }

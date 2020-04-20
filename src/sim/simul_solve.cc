@@ -414,8 +414,8 @@ void Simul::computeForces() const
     }
     catch ( Exception & e )
     {
-        std::clog << "cytosim could not compute the forces:\n";
-        std::clog << "   " << e.what() << '\n';
+        std::cerr << "Warning: cytosim could not compute forces:\n";
+        std::cerr << "   " << e.what() << '\n';
     }
 }
 

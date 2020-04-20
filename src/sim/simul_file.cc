@@ -6,6 +6,7 @@
 #include "filepath.h"
 #include "messages.h"
 #include "parser.h"
+#include "ansi_colors.h"
 
 
 /**
@@ -118,7 +119,9 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
     }
     catch( InvalidIO & e )
     {
-        std::cerr << "Error writing trajectory file: " << e.what() << '\n';
+        e << " writing trajectory file";
+        print_blue(std::cerr, e.brief());
+        std::cerr << '\n' << e.info() << '\n';
     }
 }
 
@@ -618,13 +621,11 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             catch( Exception & e )
             {
                 if ( section.size() )
-                {
-                    std::cerr << "Error in section " << section << ": " << e.what() << '\n';
-                    if ( objset )
-                        in.skip_until("#section ");
-                }
-                else
-                    std::cerr << "Error : " << e.what() << '\n';
+                    e << " in section " + section;
+                print_blue(std::cerr, e.brief());
+                std::cerr << e.info() << '\n';
+                if ( objset )
+                    in.skip_until("#section ");
             }
         }
     }
