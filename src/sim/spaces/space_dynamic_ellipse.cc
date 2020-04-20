@@ -382,25 +382,25 @@ void SpaceDynamicEllipse::read(Inputter& in, Simul& sim, ObjectTag tag)
     SpaceEllipse::read(in, sim, tag);
     unsigned n = in.readUInt16();
     if ( n != 10 )
-        throw InvalidIO("Unexpected data in SpaceDynamicEllipse::read");
-    real vol = in.readFloat();
-    // adjust volume in Property:
-    prop->volume = vol;
-    // read 3x3 orientation matrix:
+        throw InvalidIO("unexpected data in SpaceDynamicEllipse");
+    // desired volume
+    prop->volume = in.readFloat();
 #if ( DIM > 2 )
+    // read 3x3 orientation matrix:
     for ( unsigned j = 0; j < 3; ++j )
     for ( unsigned i = 0; i < 3; ++i )
         mat(i,j) = in.readFloat();
 #else
+    // read 3x3 orientation matrix:
     real m[9] = { 0 };
     for ( unsigned i = 0; i < 9; ++i )
         m[i] = in.readFloat();
-#if ( DIM == 2 )
+#  if ( DIM == 2 )
     mat(0,0) = m[0];
     mat(1,0) = m[1];
     mat(0,1) = m[3];
     mat(1,1) = m[4];
-#endif
+#  endif
 #endif
 }
 

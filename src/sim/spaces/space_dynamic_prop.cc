@@ -71,6 +71,9 @@ Space * SpaceDynamicProp::newSpace() const
     if ( s=="disc" )                  return new SpaceDisc(this);
     if ( s=="dynamic_sphere" )        return new SpaceDynamicSphere(this);
     if ( s=="dynamic_ellipse" )       return new SpaceDynamicEllipse(this);
+#ifdef BACKWARD_COMPATIBILITY
+    if ( s=="contractile" )           return new SpaceDynamicEllipse(this);
+#endif
     //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
     return nullptr;
 }
