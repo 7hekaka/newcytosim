@@ -345,7 +345,7 @@ ifeq ($(HAS_MKL),2)
     # This are options for the compiler:
     MKLOPT := -m64 -I${MKLROOT}/include
 
-    # sequential static linking (older GCC):
+    # sequential static linking (ICC and older GCC):
     MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a
 
     # sequential static linking (newer GCC):
