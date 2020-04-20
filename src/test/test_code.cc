@@ -396,6 +396,8 @@ void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* X, real* tmp)
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP 3D
 
+#if REAL_IS_DOUBLE
+
 inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
 {
     vec4 sx = load4(X);
@@ -503,6 +505,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
     }
 }
 
+#endif
 
 void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
 {
@@ -533,6 +536,7 @@ void testProjectionU(size_t cnt)
     testU(cnt, projectForcesU_,    " U_   ");
     testU(cnt, projectForcesU_PTR, " U_PTR");
     testU(cnt, projectForcesU_TWO, " U_TWO");
+#if REAL_IS_DOUBLE
 #if ( DIM == 2 )
 #if defined __SSE__
     testU(cnt, projectForcesU2D_SSE, " U_SSE");
@@ -544,6 +548,7 @@ void testProjectionU(size_t cnt)
 #endif
 #if defined __AVX__ && ( DIM == 3 )
     testU(cnt, projectForcesU3D_AVX, " U_AVX");
+#endif
 #endif
 }
 
@@ -831,6 +836,8 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
  }
  */
 
+#if REAL_IS_DOUBLE
+
 /*
  Ugly piece of code to harvest AVX power...
  FJN 18 and 19.04.2020
@@ -986,7 +993,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
     assert_true( mul == end+5 );
 }
 
-
+#endif
 
 void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
 {
@@ -1018,6 +1025,7 @@ void testProjectionD(size_t cnt)
     testD(cnt, projectForcesD_ADD, " D_ADD");
     testD(cnt, projectForcesD_FMA, " D_FMA");
     testD(cnt, projectForcesD_PTR, " D_PTR");
+#if REAL_IS_DOUBLE
 #if ( DIM == 2 )
 #if defined __SSE__
     testD(cnt, projectForcesD2D_SSE, " D_SSE");
@@ -1028,6 +1036,7 @@ void testProjectionD(size_t cnt)
 #endif
 #if ( DIM == 3 ) & defined __AVX__
     testD(cnt, projectForcesD3D_AVX, " D_AVX");
+#endif
 #endif
 }
 
