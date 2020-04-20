@@ -256,8 +256,7 @@ inline void projectForcesU_TWO(size_t nbs, const real* dif, const real* src, rea
 }
 
 
-#if REAL_IS_DOUBLE
-#ifdef __SSE3__
+#if REAL_IS_DOUBLE && defined __SSE3__
 
 /**
  Perform first calculation needed by projectForces:
@@ -389,14 +388,12 @@ void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* X, real* tmp)
     }
 }
 
-
-#endif
 #endif
 
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP 3D
 
-#if REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined __AVX__
 
 inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
 {
@@ -536,19 +533,15 @@ void testProjectionU(size_t cnt)
     testU(cnt, projectForcesU_,    " U_   ");
     testU(cnt, projectForcesU_PTR, " U_PTR");
     testU(cnt, projectForcesU_TWO, " U_TWO");
-#if REAL_IS_DOUBLE
-#if ( DIM == 2 )
-#if defined __SSE__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __SSE__
     testU(cnt, projectForcesU2D_SSE, " U_SSE");
 #endif
-#if defined __AVX__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __AVX__
     testU(cnt, projectForcesU2D_AVX, " U_AVX");
     testU(cnt, projectForcesU2D_AVY, " U_AVY");
 #endif
-#endif
-#if defined __AVX__ && ( DIM == 3 )
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __AVX__
     testU(cnt, projectForcesU3D_AVX, " U_AVX");
-#endif
 #endif
 }
 
@@ -836,7 +829,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
  }
  */
 
-#if REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined __AVX__
 
 /*
  Ugly piece of code to harvest AVX power...
@@ -1025,18 +1018,14 @@ void testProjectionD(size_t cnt)
     testD(cnt, projectForcesD_ADD, " D_ADD");
     testD(cnt, projectForcesD_FMA, " D_FMA");
     testD(cnt, projectForcesD_PTR, " D_PTR");
-#if REAL_IS_DOUBLE
-#if ( DIM == 2 )
-#if defined __SSE__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __SSE__
     testD(cnt, projectForcesD2D_SSE, " D_SSE");
 #endif
-#if defined __AVX__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __AVX__
     testD(cnt, projectForcesD2D_AVX, " D_AVX");
 #endif
-#endif
-#if ( DIM == 3 ) & defined __AVX__
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __AVX__
     testD(cnt, projectForcesD3D_AVX, " D_AVX");
-#endif
 #endif
 }
 
