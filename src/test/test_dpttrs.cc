@@ -100,7 +100,7 @@ void testDPTT(size_t cnt)
  */
 void testThomas(size_t cnt)
 {
-    std::cout << "testDPTT " << __VERSION__ << "\n";
+    std::cout << "testThomas " << __VERSION__ << "\n";
 
     real * D = new_real(NBS);
     real * U = new_real(NBS);

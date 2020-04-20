@@ -47,7 +47,7 @@ real diff(size_t size, real const* a, real const* b)
 }
 
 // fill lower triangle of matrix
-void setIndices(size_t fill, size_t*& ii, size_t*& jj, size_t mx, size_t bs)
+void setIndices(size_t fill, size_t*& ii, size_t*& jj, unsigned mx, size_t bs)
 {
     delete[] ii;
     delete[] jj;
