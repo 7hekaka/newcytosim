@@ -11,13 +11,13 @@
  This is used to multiply the tangential component of force `X` by a factor 2,
  without changing the orthogonal components
  */
-void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
+void scaleTangentially(size_t nbp, const real* src, const real* dir, real* dst)
 {
     for ( size_t p = 0; p < nbp; ++p )
     {
-        real const* xxx = X   + DIM * p;
+        real const* xxx = src + DIM * p;
         real const* ddd = dir + DIM * p;
-        real      * yyy = Y   + DIM * p;
+        real      * yyy = dst + DIM * p;
 #if ( DIM == 2 )
         real s = xxx[0] * ddd[0] + xxx[1] * ddd[1];
         yyy[0] = xxx[0] + s * ddd[0];
@@ -36,7 +36,7 @@ void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
  Perform second calculation needed by projectForces:
  */
 void projectForcesD__(size_t nbs, const real* dif,
-                      const real* X, const real* mul, real* Y)
+                      const real* src, const real* mul, real* dst)
 {
     real a0 = dif[0] * mul[0];
     real a1 = dif[1] * mul[0];
@@ -44,35 +44,35 @@ void projectForcesD__(size_t nbs, const real* dif,
     real a2 = dif[2] * mul[0];
 #endif
     
-    Y[0] = X[0] + a0;
-    Y[1] = X[1] + a1;
+    dst[0] = src[0] + a0;
+    dst[1] = src[1] + a1;
 #if ( DIM > 2 )
-    Y[2] = X[2] + a2;
+    dst[2] = src[2] + a2;
 #endif
     
     for ( size_t jj = 1; jj < nbs; ++jj )
     {
         const size_t kk = DIM * jj;
         real b0 = dif[kk  ] * mul[jj];
-        Y[kk  ] = X[kk  ] + b0 - a0;
+        dst[kk  ] = src[kk  ] + b0 - a0;
         a0 = b0;
         
         real b1 = dif[kk+1] * mul[jj];
-        Y[kk+1] = X[kk+1] + b1 - a1;
+        dst[kk+1] = src[kk+1] + b1 - a1;
         a1 = b1;
         
 #if ( DIM > 2 )
         real b2 = dif[kk+2] * mul[jj];
-        Y[kk+2] = X[kk+2] + b2 - a2;
+        dst[kk+2] = src[kk+2] + b2 - a2;
         a2 = b2;
 #endif
     }
     
     const size_t ee = DIM * nbs;
-    Y[ee  ] = X[ee  ] - a0;
-    Y[ee+1] = X[ee+1] - a1;
+    dst[ee  ] = src[ee  ] - a0;
+    dst[ee+1] = src[ee+1] - a1;
 #if ( DIM > 2 )
-    Y[ee+2] = X[ee+2] - a2;
+    dst[ee+2] = src[ee+2] - a2;
 #endif
 }
 
@@ -561,6 +561,146 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             printf("unexpected case in projectForcesD3D_AVX!");
     }
     assert_true( mul == end+5 );
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+#pragma mark - ProjectionDiff
+
+
+///expanded implementation:
+inline void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real* Y)
+{
+    // this loop cannot be unrolled as there is an OUTPUT dependency in Y
+    for ( size_t jj = 0; jj < nbs; ++jj )
+    {
+        const real x = mul[jj] * ( X[DIM*jj+DIM  ] - X[DIM*jj  ] );
+        Y[DIM*jj      ] += x;
+        Y[DIM*jj+DIM  ] -= x;
+#if ( DIM > 1 )
+        const real y = mul[jj] * ( X[DIM*jj+DIM+1] - X[DIM*jj+1] );
+        Y[DIM*jj    +1] += y;
+        Y[DIM*jj+DIM+1] -= y;
+#endif
+#if ( DIM > 2 )
+        const real z = mul[jj] * ( X[DIM*jj+DIM+2] - X[DIM*jj+2] );
+        Y[DIM*jj    +2] += z;
+        Y[DIM*jj+DIM+2] -= z;
+#endif
+    }
+}
+
+
+///scalar implementation
+inline void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real* Y)
+{
+    real px0 = X[0];
+    real px1 = X[1];
+    real pw0 = 0;
+    real pw1 = 0;
+#if ( DIM >= 3 )
+    real px2 = X[2];
+    real pw2 = 0;
+#endif
+    
+    for ( size_t jj = 0; jj < nbs; ++jj )
+    {
+        const real m = mul[jj];
+        real x0 = X[DIM*jj+DIM  ];
+        real x1 = X[DIM*jj+DIM+1];
+#if ( DIM >= 3 )
+        real x2 = X[DIM*jj+DIM+2];
+#endif
+        real w0 = m * ( x0 - px0 );
+        real w1 = m * ( x1 - px1 );
+#if ( DIM >= 3 )
+        real w2 = m * ( x2 - px2 );
+#endif
+        px0 = x0;
+        px1 = x1;
+#if ( DIM >= 3 )
+        px2 = x2;
+#endif
+        Y[DIM*jj  ] += w0 - pw0;
+        Y[DIM*jj+1] += w1 - pw1;
+#if ( DIM >= 3 )
+        Y[DIM*jj+2] += w2 - pw2;
+#endif
+        pw0 = w0;
+        pw1 = w1;
+#if ( DIM >= 3 )
+        pw2 = w2;
+#endif
+    }
+    Y[DIM*nbs  ] -= pw0;
+    Y[DIM*nbs+1] -= pw1;
+#if ( DIM >= 3 )
+    Y[DIM*nbs+2] -= pw2;
+#endif
+}
+
+#if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
+
+#include "simd.h"
+
+inline void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, real* Y)
+{
+    vec2 px = load2(X);
+    vec2 pw = setzero2();
+    
+    for ( size_t jj = 0; jj < nbs; ++jj )
+    {
+        vec2 m = loaddup2(mul+jj);
+        vec2 x = load2(X+DIM*jj+DIM);
+        vec2 y = load2(Y+DIM*jj);
+        vec2 w = mul2(m, sub2(x, px));
+        px = x;
+        store2(Y+DIM*jj, add2(y, sub2(w, pw)));
+        pw = w;
+    }
+    store2(Y+DIM*nbs, sub2(load2(Y+DIM*nbs), pw));
+}
+
+#endif
+
+#if ( DIM == 2 ) && defined(__AVX__) && REAL_IS_DOUBLE
+
+#include "simd.h"
+
+inline void add_projectiondiffAVX(const size_t nbs, const real* mul, const real* X, real* Y)
+{
+    real * pY = Y;
+    real const* pX = X;
+    real const* pM = mul;
+    
+    if ( nbs & 1 )
+    {
+        vec2 m = loaddup2(pM);
+        ++pM;
+        vec2 s = mul2(sub2(load2(pX+DIM), load2(pX)), m);
+        pX += DIM;
+        storeu2(pY    , add2(load2(pY    ), s));
+        storeu2(pY+DIM, sub2(load2(pY+DIM), s));
+        pY += DIM;
+    }
+    
+    real const*const end = mul + nbs;
+    while ( pM < end )
+    {
+        vec4 a = broadcast2(pM);
+        vec4 m = permute4(a, 0b1100);
+
+        pM += DIM;
+        vec4 s = mul4(m, sub4(loadu4(pX+2), loadu4(pX)));
+        pX += 2*DIM;
+        
+        // this will not be fast, since the two vector are not independent:
+        storeu4(pY  , add4(loadu4(pY  ), s));
+        storeu4(pY+2, sub4(loadu4(pY+2), s));
+        pY += 2*DIM;
+    }
+    assert_true(pM==end);
 }
 
 #endif

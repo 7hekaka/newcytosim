@@ -194,9 +194,9 @@ void Mecafil::makeProjection()
 
 /**
  Perform first calculation needed by projectForces:
-     mul[] <- dot(dif[], X[+DIM]-X[])
+     mul[] <- dot(dif[], src[+DIM] - src[])
  which is:
-     mul[i] <- dot(dif[i*DIM], X[i*DIM+DIM]-X[i*DIM])
+     mul[i] <- dot(dif[i*DIM], src[i*DIM+DIM] - src[i*DIM])
      for i in [ 0, nbs-1 ]
  
  with 'nbs' = number of segments, and
@@ -224,38 +224,39 @@ void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
 
 /**
  Perform second calculation needed by projectForces:
-     Y <- X +/- dif * mul
+     dst <- src +/- dif * mul
  which is:
-     Y[i] <- X[i] + dif[i] * mul[i] - dif[i-1] * mul[i-1]
+     dst[i] <- src[i] + dif[i] * mul[i] - dif[i-1] * mul[i-1]
      for i in DIM * [ 0, nbs-1 ]
 
  with 'nbs' = number of segments, and
       dif[] of size nbs*DIM
-      X[] and Y[] of size (nbs+1)*DIM
+      src[] and dst[] of size (nbs+1)*DIM
       mul[] of size nbs
+ 
+ Note that this should work even if 'dst==src'
  */
-void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
+void projectForcesD_(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
 {
     for ( size_t s = 0, e = DIM*nbs; s < DIM; ++s, ++e )
     {
-        Y[s] = X[s] + dif[s    ] * mul[    0];
-        Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
+        dst[s] = src[s] + dif[s    ] * mul[    0];
+        dst[e] = src[e] - dif[e-DIM] * mul[nbs-1];
     }
     
     for ( size_t jj = 1; jj < nbs; ++jj )
     {
         const size_t kk = DIM*jj;
-        Y[kk  ] = X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
-        Y[kk+1] = X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
+        dst[kk  ] = src[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
+        dst[kk+1] = src[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
 #if ( DIM > 2 )
-        Y[kk+2] = X[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
+        dst[kk+2] = src[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
 #endif
     }
 }
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
 
 /*
  Note that this works fine even if ( X == Y )
@@ -291,14 +292,10 @@ void Mecafil::computeTensions(const real* force)
     const size_t nbs = nbSegments();
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    
     scaleTangentially(nPoints, force, iAni, iVTP);
     projectForcesU(nbs, iDir, iVTP, iLag);
-    
 #else
-
     projectForcesU(nbs, iDir, force, iLag);
-    
 #endif
     
     // tmp <- inv( J * Jt ) * tmp to find the multipliers
@@ -384,9 +381,7 @@ void Mecafil::makeProjectionDiff(const real* force)
 }
 
 
-//------------------------------------------------------------------------------
-
-///straightforward implementation:
+/// Reference (scalar) code
 inline void add_projectiondiff(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     for ( size_t jj = 0; jj < nbs; ++jj )
@@ -399,142 +394,6 @@ inline void add_projectiondiff(const size_t nbs, const real* mul, const real* X,
         }
     }
 }
-
-///expanded implementation:
-inline void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real* Y)
-{
-    // this loop cannot be unrolled as there is an OUTPUT dependency in Y
-    for ( size_t jj = 0; jj < nbs; ++jj )
-    {
-        const real x = mul[jj] * ( X[DIM*jj+DIM  ] - X[DIM*jj  ] );
-        Y[DIM*jj      ] += x;
-        Y[DIM*jj+DIM  ] -= x;
-#if ( DIM > 1 )
-        const real y = mul[jj] * ( X[DIM*jj+DIM+1] - X[DIM*jj+1] );
-        Y[DIM*jj    +1] += y;
-        Y[DIM*jj+DIM+1] -= y;
-#endif
-#if ( DIM > 2 )
-        const real z = mul[jj] * ( X[DIM*jj+DIM+2] - X[DIM*jj+2] );
-        Y[DIM*jj    +2] += z;
-        Y[DIM*jj+DIM+2] -= z;
-#endif
-    }
-}
-
-
-///scalar implementation
-inline void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real* Y)
-{
-    real px0 = X[0];
-    real px1 = X[1];
-    real pw0 = 0;
-    real pw1 = 0;
-#if ( DIM >= 3 )
-    real px2 = X[2];
-    real pw2 = 0;
-#endif
-    
-    for ( size_t jj = 0; jj < nbs; ++jj )
-    {
-        const real m = mul[jj];
-        real x0 = X[DIM*jj+DIM  ];
-        real x1 = X[DIM*jj+DIM+1];
-#if ( DIM >= 3 )
-        real x2 = X[DIM*jj+DIM+2];
-#endif
-        real w0 = m * ( x0 - px0 );
-        real w1 = m * ( x1 - px1 );
-#if ( DIM >= 3 )
-        real w2 = m * ( x2 - px2 );
-#endif
-        px0 = x0;
-        px1 = x1;
-#if ( DIM >= 3 )
-        px2 = x2;
-#endif
-        Y[DIM*jj  ] += w0 - pw0;
-        Y[DIM*jj+1] += w1 - pw1;
-#if ( DIM >= 3 )
-        Y[DIM*jj+2] += w2 - pw2;
-#endif
-        pw0 = w0;
-        pw1 = w1;
-#if ( DIM >= 3 )
-        pw2 = w2;
-#endif
-    }
-    Y[DIM*nbs  ] -= pw0;
-    Y[DIM*nbs+1] -= pw1;
-#if ( DIM >= 3 )
-    Y[DIM*nbs+2] -= pw2;
-#endif
-}
-
-#if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-
-#include "simd.h"
-
-inline void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, real* Y)
-{
-    vec2 px = load2(X);
-    vec2 pw = setzero2();
-    
-    for ( size_t jj = 0; jj < nbs; ++jj )
-    {
-        vec2 m = loaddup2(mul+jj);
-        vec2 x = load2(X+DIM*jj+DIM);
-        vec2 y = load2(Y+DIM*jj);
-        vec2 w = mul2(m, sub2(x, px));
-        px = x;
-        store2(Y+DIM*jj, add2(y, sub2(w, pw)));
-        pw = w;
-    }
-    store2(Y+DIM*nbs, sub2(load2(Y+DIM*nbs), pw));
-}
-
-#endif
-
-#if ( DIM == 2 ) && defined(__AVX__) && REAL_IS_DOUBLE
-
-#include "simd.h"
-
-inline void add_projectiondiffAVX(const size_t nbs, const real* mul, const real* X, real* Y)
-{
-    real * pY = Y;
-    real const* pX = X;
-    real const* pM = mul;
-    
-    if ( nbs & 1 )
-    {
-        vec2 m = loaddup2(pM);
-        ++pM;
-        vec2 s = mul2(sub2(load2(pX+DIM), load2(pX)), m);
-        pX += DIM;
-        storeu2(pY    , add2(load2(pY    ), s));
-        storeu2(pY+DIM, sub2(load2(pY+DIM), s));
-        pY += DIM;
-    }
-    
-    real const*const end = mul + nbs;
-    while ( pM < end )
-    {
-        vec4 a = broadcast2(pM);
-        vec4 m = permute4(a, 0b1100);
-
-        pM += DIM;
-        vec4 s = mul4(m, sub4(loadu4(pX+2), loadu4(pX)));
-        pX += 2*DIM;
-        
-        // this will not be fast, since the two vector are not independent:
-        storeu4(pY  , add4(loadu4(pY  ), s));
-        storeu4(pY+2, sub4(loadu4(pY+2), s));
-        pY += 2*DIM;
-    }
-    assert_true(pM==end);
-}
-
-#endif
 
 
 void Mecafil::addProjectionDiff(const real* X, real* Y) const
@@ -550,10 +409,10 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
 
 #if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
     add_projectiondiffSSE(nbSegments(), iJJtiJforce, X, Y);
-    //add_projectiondiff(nbSegments(), iJJtiJforce, X, Y);
     //add_projectiondiffAVX(nbSegments(), iJJtiJforce, X, Y);
 #else
     add_projectiondiffF(nbSegments(), iJJtiJforce, X, Y);
+    //add_projectiondiff(nbSegments(), iJJtiJforce, X, Y);
 #endif
     
     
