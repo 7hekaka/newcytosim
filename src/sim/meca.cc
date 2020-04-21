@@ -37,11 +37,12 @@
  Add correction term to the constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
 */
-#define ADD_PROJECTION_DIFF 0
+#define ADD_PROJECTION_DIFF 1
 
 
 /**
- Assumes that Matrix Vector-multiplication can be distributed
+ Set to 1 if the Matrix Vector-multiplication can be distributed.
+ This will work only if the matrix mC is specifically build for that purpose
  */
 #define PARALLELIZE_MATRIX 0
 
@@ -111,16 +112,20 @@ void allocate_vector(size_t s, real *& ptr, bool reset)
         zero_real(s, ptr);
 }
 
+void free_vector(real *& ptr)
+{
+    free_real(ptr);
+    ptr = nullptr;
+}
 
 void Meca::allocate(size_t alc)
 {
-    //allocate the vectors
     if ( alc > allocated_ )
     {
-        // make a multiple of chunk to align pointers:
+        // make a multiple of chunk to keep pointers aligned:
         allocated_ = chunk_real(alc);
         
-        // pad with 4 doubles to allow SIMD instruction burr
+        // pad with 4 doubles to allow some SIMD instruction burr
         alc = DIM * allocated_ + 4;
         allocate_vector(alc, vPTS, 1);
         allocate_vector(alc, vSOL, 1);
@@ -129,6 +134,8 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vRHS, 1);
         allocate_vector(alc, vFOR, 1);
         allocate_vector(alc, vTMP, 0);
+        
+        std::clog << "Meca::allocate(" << allocated_ << ") " << vFOR << '\n';
     }
 }
 
@@ -136,20 +143,13 @@ void Meca::allocate(size_t alc)
 void Meca::release()
 {
     //std::clog << "Meca::release()\n";
-    free_real(vPTS);
-    free_real(vSOL);
-    free_real(vBAS);
-    free_real(vRND);
-    free_real(vRHS);
-    free_real(vFOR);
-    free_real(vTMP);
-    vPTS = nullptr;
-    vSOL = nullptr;
-    vBAS = nullptr;
-    vRND = nullptr;
-    vRHS = nullptr;
-    vFOR = nullptr;
-    vTMP = nullptr;
+    free_vector(vPTS);
+    free_vector(vSOL);
+    free_vector(vBAS);
+    free_vector(vRND);
+    free_vector(vRHS);
+    free_vector(vFOR);
+    free_vector(vTMP);
 }
 
 
@@ -881,14 +881,11 @@ void Meca::precondition(const real* X, real* Y) const
 
 
 /// function to sort Mecables
-int smaller_mecable(const void * ap, const void * bp)
+int compareMecables(const void * ap, const void * bp)
 {
-    Mecable const** a = (Mecable const**)(ap);
-    Mecable const** b = (Mecable const**)(bp);
-
-    if ( (*a)->nbPoints() > (*b)->nbPoints() ) return -1;
-    if ( (*a)->nbPoints() < (*b)->nbPoints() ) return  1;
-    return 0;
+    size_t a = (*((Mecable const**)ap))->nbPoints();
+    size_t b = (*((Mecable const**)bp))->nbPoints();
+    return ( a < b ) - ( a > b );
 }
 
 
@@ -905,11 +902,11 @@ void Meca::prepare()
      and for large systems random partitionning may not be so bad. Moreover for
      homogeneous systems (if all filaments have the same length) this is useless.
     */
-    mecables.sort(smaller_mecable);
+    mecables.sort(compareMecables);
     
     /*
     for ( Mecable const* mec : mecables )
-        std::clog << mec->reference() << " " << mec->nbPoints() << "\n";
+        std::clog << mec->reference() << " sorted " << mec->nbPoints() << "\n";
      */
 #endif
     

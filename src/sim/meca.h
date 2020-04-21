@@ -19,11 +19,17 @@ class Mecapoint;
 class Interpolation;
 class SimulProp;
 
-/// MatrixBlock is an alias to a matrix class of size DIM * DIM
+// known Matrix block types:
 class Matrix11;
 class Matrix22;
 class Matrix33;
+class Matrix34;
 
+/// MatrixBlock is an alias to a matrix class of size DIM * DIM
+/**
+ It is used to update the matrix mC in 'meca_inter.cc',
+ and should match the matrix block from the class used for mC.
+ */
 #if ( DIM == 1 )
 typedef Matrix11 MatrixBlock;
 #elif ( DIM == 2 )
