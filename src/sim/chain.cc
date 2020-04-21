@@ -380,7 +380,7 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
     int info = 0;
     lapack::xpttrf(ns, dia, low, &info);
     if ( info ) {
-        std::cerr << " reshape_local lapack::xpttrf failed " << info << '\n';
+        std::cerr << " reshape_local failed " << info << '\n';
         return 1;
     }
     lapack::xptts2(ns, 1, dia, low, sca, ns);
@@ -540,7 +540,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
     int info = 0;
     lapack::xpttrf(ns, dia, low, &info);
     if ( info ) {
-        std::cerr << " reshape_local lapack::xpttrf failed " << info << '\n';
+        std::cerr << " reshape_local failed " << info << '\n';
         return 1;
     }
     lapack::xptts2(ns, 1, dia, low, sca, ns);

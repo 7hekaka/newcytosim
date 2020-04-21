@@ -1,8 +1,8 @@
-% Example illustrating Lattice aging
+% Example illustrating mesh aging
 % FJN, Strasbourg 19.09.2018
 
 % Cytosim should be compiled specifically with:
-% #define NEW_AGING_LATTICE  1
+% #define FIBER_HAS_MESH  1
 
 set simul system
 {

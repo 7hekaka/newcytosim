@@ -1,10 +1,10 @@
-% Test Motor's 'variable_speed' in combination with aging lattice
+% Test Motor's 'variable_speed' in combination with aging mesh
 %
 % FJN, Strasbourg 19.09.2018
 
 % Compile to support necessary features:
 % #define NEW_VARIABLE_SPEED 1
-% #define NEW_AGING_LATTICE 1
+% #define FIBER_HAS_MESH 1
 
 set simul system
 {
