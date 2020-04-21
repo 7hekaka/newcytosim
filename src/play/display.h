@@ -78,14 +78,11 @@ protected:
     };
     
     /// function to sort zObjects according to their position 'depth'
-    static int closer(const void * ap, const void * bp)
+    static int compareZObject(const void * ap, const void * bp)
     {
-        zObject const* a = (const zObject*)(ap);
-        zObject const* b = (const zObject*)(bp);
-        
-        if ( a->depth() > b->depth() ) return  1;
-        if ( a->depth() < b->depth() ) return -1;
-        return 0;
+        real a = static_cast<const zObject*>(ap)->depth();
+        real b = static_cast<const zObject*>(bp)->depth();
+        return ( a > b ) - ( a < b );
     }
 
     /// array of transparent objects to be displayed last

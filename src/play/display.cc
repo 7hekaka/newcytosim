@@ -1740,7 +1740,7 @@ void Display::drawTransparentObjects(Array<zObject>& list)
         i.depth(dot(i.position(), vertical));
     
     // depth-sort objects:
-    list.sort(closer);
+    list.sort(compareZObject);
 
     /*
      Enable polygon offset to avoid artifacts with objects of same size,
