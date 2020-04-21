@@ -135,7 +135,7 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vFOR, 1);
         allocate_vector(alc, vTMP, 0);
         
-        std::clog << "Meca::allocate(" << allocated_ << ") " << vFOR << '\n';
+        //std::clog << "Meca::allocate(" << allocated_ << ") " << vFOR << '\n';
     }
 }
 
