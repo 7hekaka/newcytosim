@@ -212,24 +212,12 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
 
 void Meca::addAllRigidity(const real* X, real* Y) const
 {
-#if NUM_THREADS > 1
-    #pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            const size_t inx = DIM * (*mci)->matIndex();
-            (*mci)->addRigidity(X+inx, Y+inx);
-            mci += NUM_THREADS;
-        }
-    }
-#else
+    #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
         mec->addRigidity(X+inx, Y+inx);
     }
-#endif
 }
 
 
@@ -246,7 +234,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     const size_t inx = DIM * mec->matIndex();
     const size_t bks = DIM * mec->nbPoints();
 
-    // multiply the columns corresponding to this Mecable:
+    // multiply the lines corresponding to this Mecable:
     mC.vecMul(X, Y, inx, inx+bks);
 
 #if SEPARATE_RIGIDITY_TERMS
@@ -274,16 +262,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 void Meca::multiply(const real* X, real* Y) const
 {
 #if NUM_THREADS > 1
-    #pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            multiply1(*mci, X, Y);
-            mci += NUM_THREADS;
-        }
-    }
-#elif ( 0 )
+    #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable * mec : mecables )
         multiply1(mec, X, Y);
 #else
@@ -363,20 +342,9 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
  */
 void Meca::multiply_precondition(real const* X, real* T, real* Y) const
 {
-#if NUM_THREADS > 1
-#pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            multiply_precondition1(*mci, X, T, Y);
-            mci += NUM_THREADS;
-        }
-    }
-#else
+    #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable * mec : mecables )
         multiply_precondition1(mec, X, T, Y);
-#endif
 }
 
 
@@ -423,20 +391,9 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
  */
 void Meca::multiply_precondition(real const* X, real* Y) const
 {
-#if NUM_THREADS > 1
-#pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            multiply_precondition1(*mci, X, Y);
-            mci += NUM_THREADS;
-        }
-    }
-#else
+    #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable * mec : mecables )
         multiply_precondition1(mec, X, Y);
-#endif
 }
 
 #else  // PARALLELIZE_MATRIX
@@ -817,45 +774,28 @@ void Meca::computePreconditionner(Mecable* mec)
  */
 void Meca::computePreconditionner()
 {
-#if NUM_THREADS > 1
-    #pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            computePreconditionner(*mci);
-            mci += NUM_THREADS;
-        }
-        //printf("thread %i complete %i\n", omp_get_thread_num(), TicToc::microseconds());
-    }
-#else
+    #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable * mec : mecables )
         computePreconditionner(mec);
-#endif
 }
 
 
 void Meca::precondition(const real* X, real* Y) const
 {    
 #if NUM_THREADS > 1
-    #pragma omp parallel num_threads(NUM_THREADS)
+    #pragma omp parallel for num_threads(NUM_THREADS)
+    for ( Mecable const* mec : mecables )
     {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
+        const size_t inx = DIM * mec->matIndex();
+        const size_t bks = DIM * mec->nbPoints();
+        if ( Y != X )
+            blas::xcopy(bks, X+inx, 1, Y+inx, 1);  // Y <- X
+        if ( mec->useBlock() )
         {
-            Mecable const* mec = *mci;
-            const size_t inx = DIM * mec->matIndex();
-            const size_t bks = DIM * mec->nbPoints();
-            if ( Y != X )
-                blas::xcopy(bks, X+inx, 1, Y+inx, 1);  // Y <- X
-            if ( mec->useBlock() )
-            {
-                int info = 0;
-                // Y <- PRECONDITIONNER_BLOCK * Y
-                lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
-                assert_true(info==0);
-            }
-            mci += NUM_THREADS;
+            int info = 0;
+            // Y <- PRECONDITIONNER_BLOCK * Y
+            lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y+inx, bks, &info);
+            assert_true(info==0);
         }
     }
 #else
@@ -895,7 +835,7 @@ int compareMecables(const void * ap, const void * bp)
  */
 void Meca::prepare()
 {
-#if NUM_THREADS > 1
+#if 0
     /*
      Sorting Mecables can improve multithreaded performance by distributing
      the work more equally between threads. Note that his operation is not free
@@ -934,30 +874,7 @@ void Meca::prepare()
     // reset base:
     zero_real(DIM*cnt, vBAS);
     
-#if NUM_THREADS > 1
-    #pragma omp parallel num_threads(NUM_THREADS)
-    {
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
-        {
-            Mecable * mec = *mci;
-            mec->putPoints(vPTS+DIM*mec->matIndex());
-            mec->prepareMecable();
-#if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
-            if ( mec->hasRigidity() )
-            {
-#   if USE_ISO_MATRIX
-                addRigidityMatrix(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
-#   else
-                addRigidityBlockMatrix(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
-#   endif
-            }
-#endif
-            mec->useBlock(0);
-            mci += NUM_THREADS;
-        }
-    }
-#else
+    #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable * mec : mecables )
     {
         mec->putPoints(vPTS+DIM*mec->matIndex());
@@ -974,7 +891,6 @@ void Meca::prepare()
 #endif
         mec->useBlock(0);
     }
-#endif
 }
 
 
@@ -1140,30 +1056,20 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
       vFOR <- vFOR + Noise
       vRHS <- P * vFOR:
      */
-#if NUM_THREADS > 1
     #pragma omp parallel num_threads(NUM_THREADS)
     {
         real local = INFINITY;
-        Mecable ** mci = mecables.begin() + omp_get_thread_num();
-        while ( mci < mecables.end() )
+        #pragma omp for
+        for ( Mecable * mec : mecables )
         {
-            const size_t inx = DIM * (*mci)->matIndex();
-            real n = brownian1(*mci, vRND+inx, alpha, vFOR+inx, time_step, vRHS+inx);
+            const size_t inx = DIM * mec->matIndex();
+            real n = brownian1(mec, vRND+inx, alpha, vFOR+inx, time_step, vRHS+inx);
             local = std::min(local, n);
-            mci += NUM_THREADS;
+            //printf("thread %i min: %f\n", omp_get_thread_num(), local);
         }
-        //printf("thread %i min: %f\n", omp_get_thread_num(), local);
-    #pragma omp critical
+        #pragma omp critical
         noiseLevel = std::min(noiseLevel, local);
     }
-#else
-    for ( Mecable * mec : mecables )
-    {
-        const size_t inx = DIM * mec->matIndex();
-        real n = brownian1(mec, vRND+inx, alpha, vFOR+inx, time_step, vRHS+inx);
-        noiseLevel = std::min(noiseLevel, n);
-    }
-#endif
 
     // scale minimum noise level to serve as a measure of required precision
     noiseLevel *= time_step;
@@ -1403,30 +1309,16 @@ void Meca::apply()
     if ( ready_ )
     {
         ready_ = 0;
-        
-#if NUM_THREADS > 1
-#pragma omp parallel num_threads(NUM_THREADS)
-        {
-            Mecable ** mci = mecables.begin() + omp_get_thread_num();
-            while ( mci < mecables.end() )
-            {
-                Mecable * mec = *mci;
-                mec->getForces(vFOR+DIM*mec->matIndex());
-                mec->getPoints(vPTS+DIM*mec->matIndex());
-                mci += NUM_THREADS;
-            }
-        }
-#else
+        #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
             mec->getForces(vFOR+DIM*mec->matIndex());
             mec->getPoints(vPTS+DIM*mec->matIndex());
         }
-#endif
     }
     else
     {
-        //write(2, "extra Meca::apply() calls\n", 26);
+        printf("superfluous Meca::apply() call\n");
     }
 }
 
