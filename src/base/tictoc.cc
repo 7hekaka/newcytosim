@@ -8,7 +8,8 @@
 #include <cstring>
 #include <sys/time.h>
 
-#pragma mark Wall time
+//------------------------------------------------------------------------------
+#pragma mark - Wall time
 
 /**
  This get current time from the C-library functions time() and ctime_r()
@@ -120,8 +121,9 @@ double TicToc::microseconds()
     return tv.tv_usec;
 }
 
-#pragma mark CPU time
 
+//------------------------------------------------------------------------------
+#pragma mark - CPU time
 
 /**
  This calls the C-library function clock()
