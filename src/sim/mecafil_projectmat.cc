@@ -68,10 +68,10 @@ void Mecafil::makeProjection()
     const size_t nbv = DIM * nbPoints();         //number of variables
     assert_true( nbc > 0 );
     
-    //----- allocate needed temporaries:
-    real* J    = new_real(nbv*nbc);
-    real* JJt0 = new_real(nbc);
-    real* JJt1 = new_real(nbc);
+    //----- allocate temp space:
+    real* J = new_real(nbc*(nbv+2));
+    real* D = J + nbc*nbv;
+    real* E = D + nbc;
     
     //------------compute the projection matrix
     Vector v, w, dv, dw;
@@ -94,8 +94,8 @@ void Mecafil::makeProjection()
         }
         
         //set the diagonal and off-diagonal term of JJt:
-        JJt0[jj] = 2 * dw.normSqr();  // diagonal
-        JJt1[jj] = dot(dv, dw);       // off-diagonal (first term not used)
+        D[jj] = 2 * dw.normSqr();  // diagonal
+        E[jj] = dot(dv, dw);       // off-diagonal (first term not used)
     }
     
     // JJtiJ <- J
@@ -104,7 +104,7 @@ void Mecafil::makeProjection()
     
     // JJtiJ <- inv( JJt ) * J
     int info = 0;
-    lapack::xptsv(nbc, nbv, JJt0, JJt1, iJJtiJ, nbc, &info);
+    lapack::xptsv(nbc, nbv, D, E+1, iJJtiJ, nbc, &info);
     if ( info ) ABORT_NOW("lapack::ptsv() failed");
     
     // iProj <-  -Jt * JJtiJ
@@ -115,8 +115,6 @@ void Mecafil::makeProjection()
         iProj[j] += 1.0;
     
     free_real(J);
-    free_real(JJt0);
-    free_real(JJt1);
 }
 
 
