@@ -1035,7 +1035,6 @@ void testProjectionD(size_t cnt)
 
 void projectForces(size_t nbs, const real* X, real* Y)
 {
-    // calculate `iLLG` without modifying `X`
 #if defined __AVX__ && ( DIM == 2 )
     projectForcesU2D_AVX(nbs, dir_, X, lag_);
 #else
@@ -1045,7 +1044,6 @@ void projectForces(size_t nbs, const real* X, real* Y)
     // find Lagrange multipliers
     alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 
-    // set Y, using values in X and iLLG
 #if defined __AVX__ && ( DIM == 2 )
     projectForcesD2D_AVX(nbs, dir_, X, lag_, Y);
 #else
@@ -1101,14 +1099,12 @@ void scaleTangentiallyPTR(size_t nbp, const real* src, const real* dir, real* ds
 
 void projectTangent(size_t nbs, const real* X, real* Y)
 {
-    // calculate `iLLG` without modifying `X`
     scaleTangentially(nbs+1, X, ani_, tmp_);
     projectForcesU_(nbs, dir_, tmp_, lag_);
     
     // find Lagrange multipliers
     alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
 
-    // set Y, using values in X and iLLG
     projectForcesD_(nbs, dir_, X, lag_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
 }

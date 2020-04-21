@@ -20,11 +20,14 @@
 
 
 /// 3x4 matrix class with 9 'real' elements
-/*
- This matrix uses line-major storage, and is optimized for the AVX instruction
- set, with SIMD vectors that can hold 4 double-precision elements.
- It is defacto a 3x4 matrix, but can be used as a 3x3 matrix.
- The function clear_shadow() clears the last column.
+/**
+ Unlike the other matrices, this class uses line-major storage, which is the
+ order by which the values are considered when multiplying on the right with a
+ column vector. Thus, vector mulitplication can be done using SIMD instructions
+ without swap or shuffles.
+
+ Matrix34 is defacto a 3x4 matrix, but it can be used as a 3x3 matrix.
+ The function clear_shadow() clears the data that is not part of the 3x3 matrix.
  */
 class alignas(32) Matrix34
 {
