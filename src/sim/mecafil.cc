@@ -18,22 +18,27 @@ Mecafil::Mecafil()
     iDir = nullptr;
     iLag = nullptr;
     iLLG = nullptr;
-    iVTP = nullptr;
 #if NEW_ANISOTROPIC_FIBER_DRAG
     iAni = nullptr;
 #endif
     useProjectionDiff = false;
 }
 
-
-Mecafil::~Mecafil()
+void Mecafil::release()
 {
     destroyProjection();
     free_real(iDir);
     iDir = nullptr;
     iLag = nullptr;
     iLLG = nullptr;
-    iVTP = nullptr;
+#if NEW_ANISOTROPIC_FIBER_DRAG
+    iAni = nullptr;
+#endif
+}
+
+Mecafil::~Mecafil()
+{
+    release();
 }
 
 
@@ -67,28 +72,22 @@ size_t Mecafil::allocateMecable(const size_t nbp)
         free_real(iDir);
         
 #if NEW_ANISOTROPIC_FIBER_DRAG
-        iDir = new_real(ms*(4*DIM+1));
-        iLag  = iDir + ms*DIM;
-        iLLG  = iLag + ms;
-        iAni  = iLLG + ms*DIM;
-        iVTP  = iAni + ms*DIM;
+        // allocations: iDir=DIM*N  iLag=N  iLLG=DIM*N  iAni=DIM*N
+        iDir = new_real(ms*(3*DIM+1));
+        iLag = iDir + ms*DIM;
+        iLLG = iLag + ms;
+        iAni = iLLG + ms*DIM;
 #else
-        iDir = new_real(ms*(4*DIM+1));
-        iLag  = iDir + ms*DIM;
-        iLLG  = iLag + ms;
-        iVTP  = iLLG + ms*DIM;
+        // allocations: iDir=DIM*N  iLag=N  iLLG=N
+        iDir = new_real(ms*(DIM+2));
+        iLag = iDir + ms*DIM;
+        iLLG = iLag + ms;
 #endif
         
         // reset Lagrange multipliers
         zero_real(ms, iLag);
     }
     return ms;
-}
-
-void Mecafil::release()
-{
-    free_real(iDir);
-    iDir = nullptr;
 }
 
 

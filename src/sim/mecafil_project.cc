@@ -28,25 +28,18 @@
 
 
 /*
-Selection of projectForces() routines, depending on architecture
+Selection of projectForces() routines optimized for some architectures
 */
 
-#if ( DIM == 2 ) && REAL_IS_DOUBLE
-#  if defined(__AVX__)
-#    define projectForcesU projectForcesU2D_AVX
-#    define projectForcesD projectForcesD2D_AVX
-#  elif defined(__SSE3__)
-#    warning "Using SSE3 Fiber::projectForces"
-#    define projectForcesU projectForcesU2D_SSE
-#    define projectForcesD projectForcesD2D_SSE
-#  else
-#    warning "Using scalar Fiber::projectForces"
-#    define projectForcesU projectForcesU_
-#    define projectForcesD projectForcesD_
-#  endif
-#elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
 #  define projectForcesU projectForcesU3D_AVX
 #  define projectForcesD projectForcesD3D_AVX
+#elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
+#  define projectForcesU projectForcesU2D_AVX
+#  define projectForcesD projectForcesD2D_AVX
+#elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#  define projectForcesU projectForcesU2D_SSE
+#  define projectForcesD projectForcesD2D_SSE
 #else
 #  warning "Using scalar Fiber::projectForces"
 #  define projectForcesU projectForcesU_
@@ -203,6 +196,8 @@ void Mecafil::makeProjection()
       dif[] of size nbs*DIM
       vec[] of size (nbs+1)*DIM
       mul[] of size nbs
+ 
+ Note that this should work even if 'mul==src'
  */
 void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
 {
@@ -268,13 +263,14 @@ void Mecafil::projectForces(const real* X, real* Y) const
 
     // calculate `iLLG` without modifying `X`
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, X, iAni, iVTP);
-    projectForcesU(nbs, iDir, iVTP, iLLG);
+    // iLLG is used as a temporary space to store nPoints * DIM scalars:
+    scaleTangentially(nPoints, X, iAni, iLLG);
+    projectForcesU(nbs, iDir, iLLG, iLLG);
 #else
     projectForcesU(nbs, iDir, X, iLLG);
 #endif
     
-    // iLLG <- inv( J * Jt ) * iLLG to find the Lagrange multipliers
+    // Lagrange multipliers <- inv( J * Jt ) * iLLG
     DPTTS2(nbs, 1, iJJt, iJJtU, iLLG, nbs);
 
     // set Y, using values in X and iLLG
@@ -292,8 +288,9 @@ void Mecafil::computeTensions(const real* force)
     const size_t nbs = nbSegments();
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, force, iAni, iVTP);
-    projectForcesU(nbs, iDir, iVTP, iLag);
+    // iLLG is used as a temporary space to store nPoints * DIM scalars:
+    scaleTangentially(nPoints, force, iAni, iLLG);
+    projectForcesU(nbs, iDir, iLLG, iLag);
 #else
     projectForcesU(nbs, iDir, force, iLag);
 #endif

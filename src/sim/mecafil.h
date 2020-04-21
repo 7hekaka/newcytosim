@@ -42,22 +42,19 @@ class Mecafil : public Chain
 {
 private:
     
+    /// normalized differences of successive vertices
+    real   *    iDir;
+
     /// Lagrange multipliers associated with longitudinal imcompressibility
     real   *    iLag;
     
-    /// normalized differences of successive vertices (size is DIM*nbSegments)
-    real   *    iDir;
-    
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    /// local filament direction used to calculate anisotropic drag
-    real   *    iAni;
-#endif
-    
-    /// work array allocated to hold DIM*nbPoints() coordinates
+    /// work array allocated to hold `DIM*nbPoints` scalar values
     real   *    iLLG;
     
-    /// work array allocated to hold DIM*nbPoints() coordinates
-    real   *    iVTP;
+#if NEW_ANISOTROPIC_FIBER_DRAG
+    /// local filament direction vectors used to calculate anisotropic drag
+    real   *    iAni;
+#endif
 
 #if PROJECT_WITH_MATRIX
     
@@ -69,9 +66,12 @@ private:
     /// differential of projection matrix
     real   *    iDProj;
     
-    /// intermediate of calculus
+    /// part of the projection matrix
     real   *    iJJtiJ;
     
+    /// intermediate of calculus
+    real   *    iTMP;
+
 #else
     
     /// J*J' is a tridiagonal symmetric matrix of size (nbPoints-1).

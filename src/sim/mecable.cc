@@ -243,7 +243,7 @@ Vector Mecable::netForce(const size_t p) const
 {
     assert_true( !pForce || nPoints==pForceMax );
     
-    if ( pForce && p < pForceMax )
+    if (( pForce != nullptr ) & ( p < pForceMax ))
         return Vector(pForce+DIM*p);
     else
         return Vector(0,0,0);

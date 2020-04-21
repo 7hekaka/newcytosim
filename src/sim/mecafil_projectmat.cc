@@ -12,6 +12,7 @@ void Mecafil::buildProjection()
     iProj       = nullptr;
     iDProj      = nullptr;
     iJJtiJ      = nullptr;
+    iTMP        = nullptr;
     iJJtiJforce = nullptr;
 }
 
@@ -23,11 +24,13 @@ void Mecafil::allocateProjection(const size_t ms)
     free_real(iDProj);
     free_real(iJJtiJ);
     free_real(iJJtiJforce);
+    free_real(iTMP);
     const size_t N = DIM * ms;
     iProj       = new_real(N*N);
     iDProj      = new_real(N*N);
     iJJtiJ      = new_real(N*ms);
     iJJtiJforce = new_real(ms);
+    iTMP        = new_real(N);
 }
 
 
@@ -38,10 +41,12 @@ void Mecafil::destroyProjection()
     free_real(iDProj);
     free_real(iJJtiJ);
     free_real(iJJtiJforce);
+    free_real(iTMP);
     iProj       = nullptr;
     iDProj      = nullptr;
     iJJtiJ      = nullptr;
     iJJtiJforce = nullptr;
+    iTMP        = nullptr;
 }
 
 
@@ -121,9 +126,18 @@ void Mecafil::makeProjection()
 void Mecafil::projectForces(const real* X, real* Y) const
 {
     const size_t nbv = DIM * nbPoints();
-    copy_real(nbv, X, iLLG);
-    blas::xsymv('U', nbv, 1.0, iProj, nbv, iLLG, 1, 0.0, Y, 1);
-    //blas::xgemv('N', nbv, nbv, 1.0, iProj, nbv, iLLG, 1, 0.0, Y, 1);
+    if ( X == Y )
+    {
+        // the BLAS::dsymv will fail if the input and output vectors are identical
+        copy_real(nbv, X, iTMP);
+        blas::xsymv('U', nbv, 1.0, iProj, nbv, iTMP, 1, 0.0, Y, 1);
+        //blas::xgemv('N', nbv, nbv, 1.0, iProj, nbv, iTMP, 1, 0.0, Y, 1);
+    }
+    else
+    {
+        blas::xsymv('U', nbv, 1.0, iProj, nbv, X, 1, 0.0, Y, 1);
+        //blas::xgemv('N', nbv, nbv, 1.0, iProj, nbv, X, 1, 0.0, Y, 1);
+    }
 }
 
 
