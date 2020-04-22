@@ -95,7 +95,7 @@ void SimThread::run()
     }
     catch( Exception & e ) {
         simul.relax();
-        std::cerr << "\nError: " << e.what() << '\n';
+        std::cerr << e.brief() << '\n' << e.info() << '\n';
         //flashText("Error: the simulation died");
     }
     hold_callback();
@@ -154,7 +154,7 @@ void SimThread::extend_run()
         Parser::execute_run(100000);
     }
     catch( Exception & e ) {
-        std::cerr << "\nError: " << e.what() << '\n';
+        std::cerr << e.brief() << '\n' << e.info() << '\n';
         simul.relax();
         //flashText("Error: %s", e.what());
     }
@@ -487,7 +487,7 @@ void SimThread::execute(std::string const& code)
         evaluate(code);
     }
     catch( Exception & e ) {
-        std::cerr << "Error: " << e.what();
+        std::cerr << e.brief() << '\n' << e.info() << '\n';
     }
     unlock();
 }

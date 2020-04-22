@@ -91,6 +91,11 @@ test_omp: test_omp.cc | bin
 	$(DONE)
 vpath test_omp bin
 
+test_dispatch: test_dispatch.cc | bin
+	$(COMPILE) $^ -o bin/test_dispatch
+	$(DONE)
+vpath test_dispatch bin
+
 test_sizeof: test_sizeof.cc | bin
 	$(COMPILE) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)

@@ -20,11 +20,11 @@ class FiberSegment;
 class LineDisp;
 
 
-/// Flag to associate a Lattice of integers to the Fiber class {0, 1}
-#define FIBER_HAS_LATTICE 1
+/// Flag to add a Lattice of integers to each Fiber {0, 1}
+#define FIBER_HAS_LATTICE 0
 
-/// Flag to associate a Lattice of reals to the Fiber class {0, 1}
-#define FIBER_HAS_MESH 1
+/// Flag to add a Lattice of reals to each Fiber {0, 1}
+#define FIBER_HAS_MESH 0
 
 /// Flag to allow `family` member variable to control Couple's binding {0, 1}
 #define FIBER_HAS_FAMILY 0
