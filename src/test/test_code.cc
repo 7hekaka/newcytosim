@@ -2,7 +2,7 @@
 
 #include <sys/time.h>
 
-#define DIM 3
+#define DIM 2
 
 #include "assert_macro.h"
 #include "real.h"
@@ -284,8 +284,8 @@ void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mu
     {
         y = load2(src+2);
         vec2 a = mul2(sub2(y, x), load2(dif));
-        //storelo(mul, hadd2(a, a));
-        storelo(mul, add2(a, unpackhi2(a, a)));
+        //store1(mul, hadd2(a, a));
+        store1(mul, add2(a, unpackhi2(a, a)));
     }
 }
 
@@ -306,10 +306,9 @@ __m256i make_mask(long i)
  */
 void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real const*const end = mul + nbs - 3;
+    real const*const end = mul + nbs - 7;
     
-#if ( 0 )
-    while ( mul+4 < end )
+    while ( mul < end )
     {
         vec4 a = mul4(sub4(loadu4(src+2 ), loadu4(src   )), loadc4(dif   ));
         vec4 b = mul4(sub4(loadu4(src+6 ), loadu4(src+4 )), loadc4(dif+4 ));
@@ -317,13 +316,16 @@ void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         vec4 d = mul4(sub4(loadu4(src+14), loadu4(src+12)), loadc4(dif+12));
         src += 16;
         dif += 16;
-        store4(mul  , hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
-        store4(mul+4, hadd4(permute2f128(c,d,0x20), permute2f128(c,d,0x31)));
+        vec4 p = permute2f128(a,b,0x20);
+        vec4 q = permute2f128(a,b,0x31);
+        vec4 s = permute2f128(c,d,0x20);
+        vec4 t = permute2f128(c,d,0x31);
+        store4(mul  , add4(unpacklo4(p, q), unpackhi4(p, q)));
+        store4(mul+4, add4(unpacklo4(s, t), unpackhi4(s, t)));
         mul += 8;
     }
-#endif
 
-    while ( mul < end )
+    while ( mul < end+4 )
     {
         vec4 a = mul4(sub4(loadu4(src+2), loadu4(src  )), loadc4(dif  ));
         vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), loadc4(dif+4));
@@ -335,7 +337,7 @@ void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         mul += 4;
     }
 
-    while ( mul < end+2 )
+    while ( mul < end+6 )
     {
         //mul[jj] = dif[0] * ( X[DIM] - X[0] ) + dif[1] * ( X[DIM+1] - X[1] )
         vec4 d = mul4(sub4(loadu4(src+2), loadu4(src)), load4(dif));
@@ -346,10 +348,10 @@ void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         mul += 2;
     }
     
-    if ( mul < end+3 )
+    if ( mul < end+7 )
     {
         vec2 a = mul2(sub2(load2(src+2), load2(src)), load2(dif));
-        storelo(mul, add2(a, permute2(a,1)));
+        store1(mul, add2(a, permute2(a,1)));
     }
 }
 
@@ -361,7 +363,7 @@ void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mu
  */
 void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real *const end = mul + nbs;
+    real *const end = mul + nbs - 3;
     
     // calculate the terms 4 by 4
     while ( mul < end )
@@ -370,10 +372,9 @@ void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* src, real* mu
         vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), loadc4(dif+4));
         dif += 8;
         src += 8;
-        //store4(mul, hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
         vec4 p = permute2f128(a, b, 0x20);
-        a = permute2f128(a, b, 0x31);
-        store4(mul, add4(unpacklo4(p, a), unpackhi4(p, a)));
+        vec4 q = permute2f128(a, b, 0x31);
+        store4(mul, add4(unpacklo4(p, q), unpackhi4(p, q)));
         mul += 4;
     }
 }
@@ -509,8 +510,8 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
     {
         func(NBS, dir_, y, z);
         // check the code with unaligned memory:
-        func(NBS, dir_, x+2, y+4);
-        func(NBS, dir_, z+4, y+2);
+        func(NBS, dir_, x+DIM, y);
+        func(NBS, dir_, z, y);
     }
     TicToc::toc(str);
     
@@ -975,10 +976,10 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
     TicToc::tic();
     for ( size_t ii=0; ii<cnt; ++ii )
     {
-        func(NBS, dir_, x, y, z);
+        func(NBS, dir_, x, lag_, z);
         // check the code with unaligned memory:
-        func(NBS, dir_, y+2, z, x+2);
-        func(NBS, dir_, z+4, x, y+4);
+        func(NBS, dir_, y, lag_, x+DIM);
+        func(NBS, dir_, z+DIM, lag_, y);
     }
     TicToc::toc(str);
     
