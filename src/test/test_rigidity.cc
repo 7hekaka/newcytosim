@@ -471,7 +471,6 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
 
 void testRigidity(size_t cnt)
 {
-    std::cout << "addRigidity " << DIM << "D " << NBS << "\n";
     testRigidity(cnt, add_rigidity0,    "0  ");
 #if ( DIM == 2 )
     testRigidity(cnt, add_rigidity2,    "2  ");
@@ -500,6 +499,8 @@ int main(int argc, char* argv[])
     RNG.seed();
     new_reals(x, y, z, 1.0);
     setFilament(NBS+1, 1.0, 2.0);
+    std::cout << "addRigidity " << DIM << "D " << NBS;
+    std::cout << "   " << __VERSION__ << "\n";
     testRigidity(1<<20);
     free_reals(x, y, z);
     return EXIT_SUCCESS;

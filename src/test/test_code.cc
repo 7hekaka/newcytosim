@@ -19,7 +19,7 @@
 
 
 /// number of segments:
-const size_t NBS = 6;
+const size_t NBS = 126;
 const size_t NCO = DIM * ( NBS + 1 );
 const size_t ALOC = NCO + 8;
 
@@ -520,7 +520,7 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
 
 void testProjectionU(size_t cnt)
 {
-    std::cout << "testProjection UP " << DIM << "D\n";
+    std::cout << "testProjection UP " << DIM << "D " << NBS << "\n";
     testU(cnt, projectForcesU_,    " U_   ");
     testU(cnt, projectForcesU_PTR, " U_PTR");
     testU(cnt, projectForcesU_TWO, " U_TWO");
@@ -988,7 +988,7 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
 
 void testProjectionD(size_t cnt)
 {
-    std::cout << "testProjection DOWN " << DIM << "D\n";
+    std::cout << "testProjection DOWN " << DIM << "D " << NBS << "\n";
     testD(cnt, projectForcesD_,    " D_   ");
     testD(cnt, projectForcesD_ADD, " D_ADD");
     testD(cnt, projectForcesD_FMA, " D_FMA");
@@ -1120,7 +1120,7 @@ int main(int argc, char* argv[])
     new_reals(force_, lag_, tmp_, 1.0);
     setRandom(NBS+1, force_, 1.0);
     setFilament(NBS+1, 1.0, 2.0);
-    
+    std::cout << __VERSION__ << "\n";
     const size_t CNT = 1<<20;
     
     if ( 1 )
@@ -1132,7 +1132,7 @@ int main(int argc, char* argv[])
     {
         setProjection();
         setAnisotropy();
-        std::cout << "testProject " << DIM << "D\n";
+        std::cout << "testProject " << DIM << "D " << NBS << "\n";
         testProject(CNT, projectForces,  " projF");
         testProject(CNT, projectDPTTS,   " dptts");
         testProject(CNT, projectTangent, " projT");
