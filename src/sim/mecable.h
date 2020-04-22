@@ -156,42 +156,14 @@ public:
     void            calculateMomentum(Vector&, Vector&, bool sub);
     
     //--------------------------------------------------------------------------
-    // Some functions are defined here to enable inlining, which may be faster
-    
-    
-    /// Difference of two points = src[P+1] - src[P]
-    static inline Vector diffPoints(const real* src, const size_t P)
-    {
-        const real * p = src + DIM*P;
-        const real * q = src + DIM*P + DIM;
-#if ( DIM == 1 )
-        return Vector(q[0]-p[0]);
-#elif ( DIM == 2 )
-        return Vector(q[0]-p[0], q[1]-p[1]);
-#else
-        return Vector(q[0]-p[0], q[1]-p[1], q[2]-p[2]);
-#endif
-    }
-    
-    /// Difference of two points = src[Q] - src[P]
-    static inline Vector diffPoints(const real* src, const size_t P, const size_t Q)
-    {
-        const real * p = src + DIM*P;
-        const real * q = src + DIM*Q;
-#if ( DIM == 1 )
-        return Vector(q[0]-p[0]);
-#elif ( DIM == 2 )
-        return Vector(q[0]-p[0], q[1]-p[1]);
-#else
-        return Vector(q[0]-p[0], q[1]-p[1], q[2]-p[2]);
-#endif
-    }
     
     /// Difference of two consecutive points: (P+1) - (P)
     Vector diffPoints(const size_t P) const
     {
         assert_true( P+1 < nPoints );
-        return diffPoints(pPos, P);
+        Vector vec;
+        vec.load_diff(pPos+DIM*P);
+        return vec;
     }
     
     /// Difference of two points = Q - P = vector PQ
@@ -199,34 +171,30 @@ public:
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
-        return diffPoints(pPos, P, Q);
+        Vector vec;
+        vec.load_diff(pPos+DIM*Q, pPos+DIM*P);
+        return vec;
     }
     
+    /// intermediate position between P and Q=P+1 = P + A * ( Q - P )
+    Vector posPoint(size_t P, const real A) const
+    {
+        assert_true( P+1 < nPoints );
+        //assert_true( 0 <= A && A <= 1 );
+        Vector vec;
+        vec.interp(pPos+DIM*P, pPos+DIM*P+DIM, A);
+        return vec;
+    }
+
     /// Calculate intermediate position = P + a * ( Q - P )
-    Vector interpolatePoints(const size_t P, const size_t Q, const real a) const
+    Vector interpolatePoints(const size_t P, const size_t Q, const real A) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
-        //assert_true( 0 <= a && a <= 1 );
-#if ( DIM == 1 )
-        return Vector(pPos[P]+a*(pPos[Q]-pPos[P]));
-#elif ( DIM == 2 )
-#if REAL_IS_DOUBLE && ( defined __SSE3__ )
-        vec2 p = load2(pPos+2*P);
-        vec2 q = load2(pPos+2*Q);
-        return Vector(fmadd2(set2(a), sub2(q, p), p));
-#else
-        const real * p = pPos + DIM*P;
-        const real * q = pPos + DIM*Q;
-        return Vector(p[0]+a*(q[0]-p[0]), p[1]+a*(q[1]-p[1]));
-#endif
-        //return Vector(pPos+2*P) + a * ( Vector(pPos+2*Q) - Vector(pPos+2*P) );
-#else
-        const real * p = pPos + DIM*P;
-        const real * q = pPos + DIM*Q;
-        return Vector(p[0]+a*(q[0]-p[0]), p[1]+a*(q[1]-p[1]), p[2]+a*(q[2]-p[2]));
-        //return Vector(pPos+DIM*P) + a * ( Vector(pPos+DIM*Q) - Vector(pPos+DIM*P) );
-#endif
+        //assert_true( 0 <= A && A <= 1 );
+        Vector vec;
+        vec.interp(pPos+DIM*P, pPos+DIM*Q, A);
+        return vec;
     }
     
     //--------------------------------------------------------------------------

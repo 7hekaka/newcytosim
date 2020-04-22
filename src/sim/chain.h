@@ -136,7 +136,7 @@ protected:
     static int   reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
 
     /// change segmentation
-    void         setSegmentation(real c) { fnCut = c; iCut = 1.0/fnCut; }
+    void         setSegmentation(real c) { fnCut = c; iCut = 1.0 / fnCut; }
     
 public:
     
@@ -302,14 +302,11 @@ public:
     Vector       netForceEndP() const { return netForce(nPoints-1); }
 
     //---------------------
-    
-    /// vector between two consecutive points `p` and `p+1` (alias to diffPoints())
-    Vector       diffP(size_t p) const { return diffPoints(p); }
 
 #if ( 1 )
     /// normalized tangent vector to the fiber within segment [p, p+1]
     /** We divide by fnCut, which should be the distance between points */
-    Vector       dirSegment(size_t p)  const { return diffPoints(p) / fnCut; }
+    Vector       dirSegment(size_t p)  const { return diffPoints(p) * iCut; }
 #else
     /// normalized tangent vector to the fiber within segment [p, p+1]
     /** Normalizing the difference between points is slow due to sqrt() */

@@ -68,10 +68,10 @@ public:
     Vector       pos2()        const { return fib_->posP(pti_+1); }
 
     /// interpolated position, where c is in [0, 1]
-    Vector       pos(real c)   const { return fib_->interpolatePoints(pti_, pti_+1, c); }
+    Vector       pos(real c)   const { return fib_->posPoint(pti_, c); }
     
     /// that is [ pos2() + pos1() ] / 2
-    Vector       center()      const { return fib_->interpolatePoints(pti_, pti_+1, 0.5); }
+    Vector       center()      const { return fib_->posPoint(pti_, 0.5); }
 
     /// that is pos2() - pos1()
     Vector       diff()        const { return fib_->diffPoints(pti_); }

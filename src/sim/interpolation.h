@@ -28,10 +28,10 @@ private:
     /// Mecable from which the points are interpolated 
     Mecable const*  mec_;
 
-    /// index of interpolated point 1 in mec_
+    /// index of vertex 1 in mec_
     size_t          pt1_;
 
-    /// index of interpolated point 2 in mec_
+    /// index of vertex 2 in mec_
     size_t          pt2_;
     
     /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_

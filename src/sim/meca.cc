@@ -1248,9 +1248,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
                 if ( !monitor.converged() )
                 {
                     // no method could converge... this is really bad!
-                    Exception e("convergence failure");
-                    e << monitor.count() << " iterations, residual " << monitor.residual() << '\n';
-                    throw e;
+                    throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
                 }
             }
         }

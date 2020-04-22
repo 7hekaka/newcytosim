@@ -480,35 +480,6 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
 }
 
 
-/**
- Apply correction of magnitude 'sca' along the segment directions:
- 
- except for the edges, this is:
- P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) - sca[i-1] * ( P[i] - P[i-1] )
- 
- */
-void Chain::reshape_apply(const size_t nbs, const real* src,
-                          const real * sca, real* dst)
-{
-    assert_true( ns > 1 );
-    Vector A(src);
-    Vector B(src+DIM);
-    Vector old = sca[0] * ( B - A );
-    (A+old).store(dst);
-    
-    for ( size_t i = 1; i < nbs; ++i )
-    {
-        Vector C(src+DIM*(i+1));
-        Vector vec = sca[i] * ( C - B );
-        (B+(vec-old)).store(dst+DIM*i);
-        old = vec;
-        B = C;
-    }
-    
-    (B-old).store(dst+DIM*nbs);
-}
-
-
 /// old version (2018)
 int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
                                  real* mem, size_t chk)
@@ -705,13 +676,43 @@ int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
 }
 
 
+
+/**
+ Apply correction of magnitude 'sca' along the segment directions:
+ 
+ except for the edges, this is:
+ P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) - sca[i-1] * ( P[i] - P[i-1] )
+ 
+ The code is similar to projectForcesD(), with an additional difference
+ 
+ */
+void Chain::reshape_apply(const size_t nbs, const real* src,
+                          const real * sca, real* dst)
+{
+    assert_true( nbs > 1 );
+    Vector B(src);
+    Vector nxt(B);
+
+    for ( size_t i = 0; i < nbs; ++i )
+    {
+        Vector C(src+DIM*(i+1));
+        Vector add = sca[i] * ( C - B );
+        (nxt+add).store(dst+DIM*i);
+        nxt = C - add;
+        B = C;
+    }
+    
+    nxt.store(dst+DIM*nbs);
+}
+
+
 /**
  Apply correction (old version)
  */
 void Chain::reshape_apply_alt(const size_t nbs, const real* dif, const real* src,
                               const real* sca, real* dst)
 {
-    assert_true( ns > 1 );
+    assert_true( nbs > 1 );
     real nxt[DIM];
     
     for ( int d = 0; d < DIM; ++d )
@@ -751,22 +752,17 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     real * pri = tmp + tmp_size;
     real * sec = tmp + tmp_size * 2;
     real * mem = tmp + tmp_size * 3;
-    real * dif = tmp + tmp_size * 8;
-
-    // calculate differences
-    for ( size_t p = 0; p < DIM*nbs; ++p )
-        dif[p] = src[p+DIM] - src[p];
-    for ( size_t p = 0; p < DIM; ++p )
-        dif[DIM*nbs+p] = 0;
     
     // calculate terms using 'dif[]':
-    Vector A(dif), B(dif+DIM);
+    Vector A, B, C;
+    A.load_diff(src);
+    B.load_diff(src+DIM);
     mag[0] = A.normSqr();
     mag[1] = B.normSqr();
     pri[0] = dot(A, B);
     for ( size_t i = 2; i < nbs; ++i )
     {
-        Vector C(dif+DIM*i);
+        C.load_diff(src+DIM*i);
         mag[i] = C.normSqr();
         pri[i-1] = dot(B, C);
         sec[i-2] = dot(A, C);
@@ -781,13 +777,20 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     res = reshape_calculate(nbs, cut*cut, mag, pri, sec, mem, tmp_size);
     
 #if ( 0 )
+    real * dif = new_real(tmp_size*DIM);
+    // calculate differences
+    for ( size_t p = 0; p < DIM*nbs; ++p )
+        dif[p] = src[p+DIM] - src[p];
+    for ( size_t p = 0; p < DIM; ++p )
+        dif[DIM*nbs+p] = 0;
+
     // checking against older code
     copy_real(nbs, mem, mag);
     res = reshape_calculate_alt(nbs, cut*cut, dif, mem, tmp_size);
     real errS = blas::max_diff(nbs, mem, mag);
-    //printf("\n Meca::err scalar %20.16f", errS);
     if ( abs_real(errS) > 1e-8 )
     {
+        printf("\n Meca::err scalar %20.16f", errS);
         printf("\n mul "); VecPrint::print(std::cout, nbs, mag, 3);
         printf("\nLmul "); VecPrint::print(std::cout, nbs, mem, 3);
     }
@@ -799,16 +802,18 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         reshape_apply(nbs, src, mem, dst);
 #if ( 0 )
         // checking against older code
-        //reshape_apply_alt(nbs, dif, src, mem, mag);
-        projectForcesD_(nbs, dif, src, mem, mag);
-        real errP = blas::max_diff(nbs, mag, dst);
+        reshape_apply_alt(nbs, dif, src, mem, mag);
+        //projectForcesD_(nbs, dif, src, mem, mag);
+        size_t nbv = DIM*nbs+DIM;
+        real errP = blas::max_diff(nbv, mag, dst);
         //printf("\n Meca::err points %20.16f", errP);
-        printf("\n Meca::reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
         if ( abs_real(errP) > 1e-8 )
         {
-            printf("\n pts "); VecPrint::print(std::cout, nbs, dst, 2);
-            printf("\nLpts "); VecPrint::print(std::cout, nbs, dst, 2);
+            printf("\n Meca::reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
+            printf("\n pts "); VecPrint::print(std::cout, nbv, dst, 2);
+            printf("\nLpts "); VecPrint::print(std::cout, nbv, mag, 2);
         }
+        free_real(dif);
 #endif
     }
     return res;
@@ -838,8 +843,8 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 
 void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut)
 {
-    Vector inc(0,0,0), sum(0,0,0);
-    Vector seg = diffPoints(src, 0);
+    Vector inc(0,0,0), sum(0,0,0), seg;
+    seg.load_diff(src);
     real   dis = seg.norm();
     
     // translation needed to restore first segment
@@ -850,7 +855,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
 
     for ( size_t i = 1; i < ns; ++i )
     {
-        seg = diffPoints(src, i);
+        seg.load_diff(src+DIM*i);
         dis = seg.norm();
         
         //move the left point by off:
@@ -890,7 +895,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
     copy_real(DIM*(ns+1), src, dst);
     for ( size_t pp = 1; pp <= ns; ++pp )
     {
-        off      = diffPoints(dst, pp-1);
+        off.load_diff(dst+DIM*(pp-1));
         real dis = off.norm();
         if ( dis > REAL_EPSILON )
         {
@@ -924,7 +929,7 @@ void Chain::getPoints(real const* ptr)
     {
         alc = allocated();
         free_real(mem);
-        mem = new_real(alc*11);
+        mem = new_real(alc*8);
     }
 #else
     // use here thread-local static memory
@@ -943,7 +948,7 @@ void Chain::getPoints(real const* ptr)
     {
         alc = allocated();
         free_real(uptr.release());
-        uptr.reset(new_real(alc*11));
+        uptr.reset(new_real(alc*8));
         //printf("> new real[%lu] %p %p\n", alc, uptr.get(), pthread_self());
     }
     real * mem = uptr.get();
@@ -1485,7 +1490,7 @@ size_t Chain::nbKinks(real threshold) const
  .
  
  The abscissa of the intersection is `abscissaPoint(s+a)`.
- The position of the cut is `interpolatePoints(s, s+1, a)`
+ The position of the cut is `posPoint(s, a)`
  */
 
 real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
@@ -1904,7 +1909,7 @@ Vector Chain::posM(const real ab) const
     
     // check if PLUS_END is reached:
     if ( s+1 < nPoints )
-        return interpolatePoints(s, s+1, a-s);
+        return posPoint(s, a-s);
     else
         return posP(lastPoint());
 }
