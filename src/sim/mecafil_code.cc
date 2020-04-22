@@ -167,61 +167,53 @@ void projectForcesD_PTR(size_t nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* X, real* mul)
+inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real* pD = dif;
-    const real* pX = X;
-    real const*const end = mul + nbs - 2;
-    real* pT = mul;
-    
-    vec2 y, x = load2(pX);
-    while ( pT <= end )
+    real const*const end = mul + nbs - 1;
+
+    vec2 y, x = load2(src);
+    while ( mul < end )
     {
-        y = load2(pX+2);
-        pX += 4;
-        vec2 a = mul2(sub2(y, x), load2(pD));
-        x = load2(pX);
-        vec2 b = mul2(sub2(x, y), load2(pD+2));
-        pD += 4;
-        //storeu2(pT, hadd2(a, b));
-        storeu2(pT, add2(unpacklo2(a, b), unpackhi2(a, b)));
-        pT += 2;
+        y = load2(src+2);
+        src += 4;
+        vec2 a = mul2(sub2(y, x), load2(dif));
+        x = load2(src);
+        vec2 b = mul2(sub2(x, y), load2(dif+2));
+        dif += 4;
+        //storeu2(mul, hadd2(a, b));
+        storeu2(mul, add2(unpacklo2(a, b), unpackhi2(a, b)));
+        mul += 2;
     }
     
-    if ( pT < end+2 )
+    if ( mul < end+1 )
     {
-        y = load2(pX+2);
-        vec2 a = mul2(sub2(y, x), load2(pD));
-        //storelo(pT, hadd2(a, a));
-        storelo(pT, add2(a, unpackhi2(a, a)));
+        y = load2(src+2);
+        vec2 a = mul2(sub2(y, x), load2(dif));
+        //storelo(mul, hadd2(a, a));
+        storelo(mul, add2(a, unpackhi2(a, a)));
     }
 }
 
 /**
  Perform second calculation needed by projectForces:
  */
-inline void projectForcesD2D_SSE(size_t nbs, const real* dif,
-                               const real* X, const real* mul, real* Y)
+void projectForcesD2D_SSE(size_t nbs, const real* dif,
+                          const real* src, const real* mul, real* dst)
 {
-    real *pY = Y;
-    const real* pX = X;
-    const real* pD = dif;
+    vec2 cc = load2(src);
     
-    vec2 cc = load2(X);
-    
-    real const* pM = mul;
     real const*const end = mul + nbs;
-    while ( pM < end )
+    while ( mul < end )
     {
-        pX += DIM;
-        vec2 d = mul2(load2(pD), loaddup2(pM));
-        ++pM;
-        pD += DIM;
-        store2(pY, add2(cc, d));
-        pY += DIM;
-        cc = sub2(load2(pX), d);
+        src += DIM;
+        vec2 d = mul2(load2(dif), loaddup2(mul));
+        ++mul;
+        dif += DIM;
+        store2(dst, add2(cc, d));
+        dst += DIM;
+        cc = sub2(load2(src), d);
     }
-    store2(pY, cc);
+    store2(dst, cc);
 }
 
 #endif
@@ -235,44 +227,39 @@ inline void projectForcesD2D_SSE(size_t nbs, const real* dif,
 
  F. Nedelec, 9.12.2016, 6.9.2018
  */
-inline void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, real* mul)
+void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real* pD = dif;
-    const real* pX = X;
-    real const*const end = mul + nbs - 4;
-    real* pT = mul;
+    real const*const end = mul + nbs - 3;
 
-    while ( pT <= end )
+    while ( mul < end )
     {
-        vec4 a = mul4(sub4(loadu4(pX+2), loadu4(pX  )), load4(pD  ));
-        vec4 b = mul4(sub4(loadu4(pX+6), loadu4(pX+4)), load4(pD+4));
-        pD += 8;
-        pX += 8;
-        //store4(pT, hadd4(permute2f128(a,b,0x20), permute2f128(a,b,0x31)));
+        vec4 a = mul4(sub4(loadu4(src+2), loadu4(src  )), load4(dif  ));
+        vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), load4(dif+4));
+        dif += 8;
+        src += 8;
         vec4 p = permute2f128(a,b,0x20);
         vec4 q = permute2f128(a,b,0x31);
-        store4(pT, add4(unpacklo4(p, q), unpackhi4(p, q)));
-        pT += 4;
+        store4(mul, add4(unpacklo4(p, q), unpackhi4(p, q)));
+        mul += 4;
     }
-    
-    while ( pT <= end+2 )
+
+    while ( mul < end+2 )
     {
-        vec4 d = mul4(sub4(loadu4(pX+2), loadu4(pX)), load4(pD));
-        pX += 4;
-        pD += 4;
+        //mul[jj] = dif[0] * ( X[DIM] - X[0] ) + dif[1] * ( X[DIM+1] - X[1] )
+        vec4 d = mul4(sub4(loadu4(src+2), loadu4(src)), load4(dif));
+        src += 4;
+        dif += 4;
         vec2 h = gethi(d);
-        storeu2(pT, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
-        pT += 2;
+        storeu2(mul, add2(unpacklo2(getlo(d),h), unpackhi2(getlo(d),h)));
+        mul += 2;
     }
     
-    if ( pT < end+4 )
+    if ( mul < end+3 )
     {
-        vec2 a = mul2(sub2(load2(pX+2), load2(pX)), load2(pD));
-        //storelo(pT, hadd2(a, a));
-        storelo(pT, add2(a, unpackhi2(a, a)));
+        vec2 a = mul2(sub2(load2(src+2), load2(src)), load2(dif));
+        storelo(mul, add2(a, permute2(a,1)));
     }
 }
-
 
 /**
  Perform second calculation needed by projectForces
@@ -281,53 +268,46 @@ inline void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* X, rea
  an array containing contiguous coordinates
  F. Nedelec, 9.12.2016, 23.03.2018
  */
-inline void projectForcesD2D_AVX(size_t nbs, const real* dif,
-                                 const real* X, const real* mul, real* Y)
+void projectForcesD2D_AVX(size_t nbs, const real* dif,
+                          const real* src, const real* mul, real* dst)
 {
-    real *pY = Y;
-    const real* pX = X;
-    const real* pD = dif;
-    
     vec4 cc = setzero4();
     
-    const bool odd = nbs & 1;
-    real const* pM = mul;
+    const bool odd = ( nbs & 1 );
     real const*const end = mul + nbs - odd;
     
-    while ( pM < end )
+    while ( mul < end )
     {
-        vec4 t = broadcast2(pM);
-        vec4 x = loadu4(pX);
-        pM += 2;
+        vec4 t = broadcast2(mul);
+        vec4 x = loadu4(src);
+        mul += 2;
         vec4 m = permute4(t, 0b1100);
-        vec4 d = mul4(m, load4(pD));
-        pD += 4;
+        vec4 d = mul4(m, load4(dif));
+        dif += 4;
         vec4 n = permute2f128(cc,d,0x21);
         cc = d;
         vec4 z = add4(x, sub4(d, n));
-        pX += 4;
-        storeu4(pY, z);
-        pY += 4;
+        src += 4;
+        storeu4(dst, z);
+        dst += 4;
     }
     
     vec2 c = gethi(cc);
     
     if ( odd )
     {
-        assert( pM + 1 == mul + nbs );
-        vec2 m = loaddup2(pM);
-        vec2 x = mul2(m, load2(pD));
-        vec2 z = add2(load2(pX), sub2(x, c));
-        storeu2(pY, z);
+        vec2 m = loaddup2(mul);
+        vec2 x = mul2(m, load2(dif));
+        dif += 2;
+        vec2 z = add2(load2(src), sub2(x, c));
+        storeu2(dst, z);
         c = x;
-        pY += 2;
-        pX += 2;
+        dst += 2;
+        src += 2;
     }
     
-    vec2 z = sub2(load2(pX), c);
-    storeu2(pY, z);
-    assert( pY == Y + DIM * nbs );
-    assert( pX == X + DIM * nbs );
+    vec2 z = sub2(load2(src), c);
+    storeu2(dst, z);
 }
 
 #endif
@@ -342,8 +322,8 @@ inline void projectForcesD2D_AVX(size_t nbs, const real* dif,
 /// FJN @ Strasbourg, 17 and 18.04.2020
 void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real *const end = mul + nbs - 4;
-    while ( mul <= end )
+    const real *const end = mul + nbs - 3;
+    while ( mul < end )
     {
         /*
          *mul = dif[0] * ( src[DIM  ] - src[0] )
@@ -367,15 +347,15 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         dif += 12;
         mul += 4;
     }
-    while ( mul <= end+2 )
+    while ( mul < end+2 )
     {
         /*
          *mul = dif[0] * ( src[DIM  ] - src[0] )
               + dif[1] * ( src[DIM+1] - src[1] )
               + dif[2] * ( src[DIM+2] - src[2] );
          */
-        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), loadu4(src  )));
-        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), loadu4(src+4)));
+        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+3), loadu4(src)));
+        vec4 s1 = mul4(load4(dif+4), sub4(broadcast1(src+7), loadu4(src+4)));
 
         vec4 xy = blend4(s0, s1, 0b1100);
         vec4 zx = permute2f128(s0, s0, 0x21);
@@ -388,14 +368,14 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         dif += 6;
         mul += 2;
     }
-    while ( mul < end+4 )
+    while ( mul < end+3 )
     {
         /*
          *mul = dif[0] * ( src[DIM  ] - src[0] )
               + dif[1] * ( src[DIM+1] - src[1] )
               + dif[2] * ( src[DIM+2] - src[2] );
          */
-        vec4 x = mul4(load4(dif), sub4(loadu4(src+3), loadu4(src)));
+        vec4 x = mul4(load3(dif), sub4(load3(src+3), loadu4(src)));
         vec4 z = permute2f128(x, x, 0x21);
         vec4 y = permute4(x, 0b0011);
         
@@ -405,7 +385,9 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         dif += 3;
         ++mul;
     }
+    assert_true(mul==end);
 }
+
 
 
 /*
@@ -414,13 +396,13 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
  */
 void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
 {
-    const real* const end = mul + nbs - 4;
+    const real* const end = mul + nbs - 3;
     /*
      This follows the standard pattern defined below, except
      that the negative terms are not present on the first vector.
      This handles 12 scalars (4 vectors) in one round.
      */
-    if ( mul <= end )
+    if ( mul < end )
     {
         vec4 m1 = broadcast1(mul  );
         vec4 m0 = blend4(setzero4(), m1, 0b1000);
@@ -448,7 +430,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
      This is where the bulk of the work is done, handing 12 scalars per pass.
      The loop can be unrolled.
      */
-    while ( mul <= end )
+    while ( mul < end )
     {
         vec4 m0 = broadcast1(mul-1);
         vec4 m1 = broadcast1(mul  );
@@ -494,7 +476,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
     }
     switch ( mul - end )
     {
-        case 1: {
+        case 0: {
             // 4 vectors remaining
             vec4 m1 = broadcast1(mul  );
             vec4 m0 = blend4(mm, m1, 0b1000);
@@ -514,9 +496,9 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
             storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
-            //dif += 12; dst += 12; src += 12;
+            dif += 12; dst += 12; src += 12;
         } break;
-        case 2: {
+        case 1: {
             // 3 vectors remaining
             vec4 m1 = broadcast1(mul  );
             vec4 m0 = blend4(mm, m1, 0b1000);
@@ -536,7 +518,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             //storelo(dst+8, fnmadd2(getlo(m2), loaddup2(dif+5), getlo(a2)));
             //dif += 9; dst += 9; src += 9;
         } break;
-        case 3: {
+        case 2: {
             // 2 vectors remaining
             vec4 m1 = broadcast1(mul);
             vec4 m0 = blend4(mm, m1, 0b1000);
@@ -547,11 +529,11 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             vec4 a1 = loadu4(src+4);
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
-            storeu2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
+            store2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
             //store2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), getlo(a1)));
             //dif += 6; dst += 6; src += 6;
         } break;
-        case 4: {
+        case 3: {
             // 1 vector remaining
             ++mul;
             store3(dst, fnmadd4(mm, dd, load3(src)));
@@ -560,7 +542,6 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         default:
             printf("unexpected case in projectForcesD3D_AVX!");
     }
-    assert_true( mul == end+5 );
 }
 
 #endif
