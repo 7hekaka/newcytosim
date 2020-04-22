@@ -350,9 +350,9 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
               + dif[1] * ( src[DIM+1] - src[1] )
               + dif[2] * ( src[DIM+2] - src[2] );
          */
-        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), load4(src  )));
-        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), load4(src+4)));
-        vec4 s2 = mul4(load4(dif+8), sub4(loadu4(src+11), load4(src+8)));
+        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), loadu4(src  )));
+        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), loadu4(src+4)));
+        vec4 s2 = mul4(load4(dif+8), sub4(loadu4(src+11), loadu4(src+8)));
 
         vec4 zx = blend4(s0, s2, 0b0011);
         vec4 xy = blend4(s0, s1, 0b1100);
@@ -374,8 +374,8 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
               + dif[1] * ( src[DIM+1] - src[1] )
               + dif[2] * ( src[DIM+2] - src[2] );
          */
-        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), load4(src  )));
-        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), load4(src+4)));
+        vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+ 3), loadu4(src  )));
+        vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), loadu4(src+4)));
 
         vec4 xy = blend4(s0, s1, 0b1100);
         vec4 zx = permute2f128(s0, s0, 0x21);
@@ -395,7 +395,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
               + dif[1] * ( src[DIM+1] - src[1] )
               + dif[2] * ( src[DIM+2] - src[2] );
          */
-        vec4 x = mul4(load4(dif), sub4(loadu4(src+3), load4(src)));
+        vec4 x = mul4(load4(dif), sub4(loadu4(src+3), loadu4(src)));
         vec4 z = permute2f128(x, x, 0x21);
         vec4 y = permute4(x, 0b0011);
         
@@ -433,13 +433,13 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         p2 = blend4(p2, broadcast1(mul+3), 0b1110);
         
         mul += 4;
-        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
-        vec4 a2 = fmadd4(p2, load4(dif+8), load4(src+8));
+        vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
+        vec4 a2 = fmadd4(p2, load4(dif+8), loadu4(src+8));
 
-        store4(dst  , fnmadd4(m0, broadcast1(dif), a0));
-        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+        storeu4(dst  , fnmadd4(m0, broadcast1(dif), a0));
+        storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
         dif += 12;
         dst += 12;
         src += 12;
@@ -462,13 +462,13 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         p2 = blend4(p2, broadcast1(mul+3), 0b1110);
         
         mul += 4;
-        vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
-        vec4 a2 = fmadd4(p2, load4(dif+8), load4(src+8));
+        vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
+        vec4 a2 = fmadd4(p2, load4(dif+8), loadu4(src+8));
 
-        store4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
-        store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+        storeu4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
+        storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+        storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
         dif += 12;
         dst += 12;
         src += 12;
@@ -507,13 +507,13 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             p2 = blend4(p2, setzero4(), 0b1110);
             
             mul += 4;
-            vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
-            vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
-            vec4 a2 = fmadd4(p2, broadcast1(dif+8), load4(src+8));
+            vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
+            vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
+            vec4 a2 = fmadd4(p2, broadcast1(dif+8), loadu4(src+8));
             
-            store4(dst  , fnmadd4(m0, dd, a0));
-            store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-            store4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+            storeu4(dst  , fnmadd4(m0, dd, a0));
+            storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+            storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
             //dif += 12; dst += 12; src += 12;
         } break;
         case 2: {
@@ -526,12 +526,12 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             vec4 p1 = blend4(m2, setzero4(), 0b1100);
             
             mul += 3;
-            vec4 a0 = fmadd4(p0, load4(dif  ), load4(src  ));
-            vec4 a1 = fmadd4(p1, load4(dif+4), load4(src+4));
+            vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
+            vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
             vec4 a2 = broadcast1(src+8);
             
-            store4(dst  , fnmadd4(m0, dd, a0));
-            store4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
+            storeu4(dst  , fnmadd4(m0, dd, a0));
+            storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
             store1(dst+8, fnmadd4(m2, broadcast1(dif+5), a2));
             //storelo(dst+8, fnmadd2(getlo(m2), loaddup2(dif+5), getlo(a2)));
             //dif += 9; dst += 9; src += 9;
@@ -543,10 +543,10 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             vec4 p0 = blend4(m1, setzero4(), 0b1000);
             
             mul += 2;
-            vec4 a0 = fmadd4(p0, load4(dif), load4(src));
-            vec4 a1 = load4(src+4);
+            vec4 a0 = fmadd4(p0, load4(dif), loadu4(src));
+            vec4 a1 = loadu4(src+4);
             
-            store4(dst  , fnmadd4(m0, dd, a0));
+            storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
             //store2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), getlo(a1)));
             //dif += 6; dst += 6; src += 6;
