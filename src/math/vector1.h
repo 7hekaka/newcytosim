@@ -80,18 +80,54 @@ public:
         XX = ( d > 0 ) ? v[0] : 0;
     }
     
-    /// replace coordinates by the ones provided
+    /// load from memory: X = b[0]
     void load(const float b[])
     {
         XX = b[0];
     }
     
-    /// replace coordinates by the ones provided
+    /// load from memory: X = b[0]
     void load(const double b[])
     {
         XX = b[0];
     }
     
+    /// load difference: X = b[1] - b[0]
+    void load_diff(const float b[])
+    {
+        XX = b[1] - b[0];
+    }
+    
+    /// load difference: X = b[1] - b[0]
+    void load_diff(const double b[])
+    {
+        XX = b[1] - b[0];
+    }
+    
+    /// load difference: X = a[0] - b[0]
+    void load_diff(const float a[], const float b[])
+    {
+        XX = a[0] - b[0];
+    }
+
+    /// load difference: X = a[0] - b[0]
+    void load_diff(const double a[], const double b[])
+    {
+        XX = a[0] - b[0];
+    }
+        
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const float a[], const float b[], const float C)
+    {
+        XX = a[0] + C * ( b[0] - a[0] );
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const double a[], const double b[], const double C)
+    {
+        XX = a[0] + C * ( b[0] - a[0] );
+    }
+
     /// copy coordinates to given array
     void store(float b[]) const
     {

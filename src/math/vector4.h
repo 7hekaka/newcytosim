@@ -114,7 +114,7 @@ public:
         TT = ( d > 3 ) ? v[3] : 0;
     }
     
-    /// replace coordinates by the ones provided
+    /// load from memory: X = b[0]; Y = b[1]; Z = b[2]; T = b[3]
     void load(const float b[])
     {
         XX = b[0];
@@ -123,13 +123,84 @@ public:
         TT = b[3];
     }
     
-    /// replace coordinates by the ones provided
+    /// load from memory: X = b[0]; Y = b[1]; Z = b[2]; T = b[3]
     void load(const double b[])
     {
+#if VECTOR4_USES_AVX
+        vec = load4(b);
+#else
         XX = b[0];
         YY = b[1];
         ZZ = b[2];
         TT = b[3];
+#endif
+    }
+    
+    /// load difference: X = b[4] - b[0]; Y = b[5] - b[1]; Z = b[6] - b[2]; T = b[7] - b[3]
+    void load_diff(const float b[])
+    {
+        XX = b[4] - b[0];
+        YY = b[5] - b[1];
+        ZZ = b[6] - b[2];
+        TT = b[7] - b[3];
+    }
+    
+    /// load difference: X = b[4] - b[0]; Y = b[5] - b[1]; Z = b[6] - b[2]; T = b[7] - b[3]
+    void load_diff(const double b[])
+    {
+#if VECTOR4_USES_AVX
+        vec = sub4(loadu4(b+3), loadu4(b));
+#else
+        XX = b[4] - b[0];
+        YY = b[5] - b[1];
+        ZZ = b[6] - b[2];
+        TT = b[7] - b[3];
+#endif
+    }
+        
+    /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]; Z = a[2] - b[2]; T = a[3] - b[3]
+    void load_diff(const float a[], const float b[])
+    {
+        XX = a[0] - b[0];
+        YY = a[1] - b[1];
+        ZZ = a[2] - b[2];
+        TT = a[3] - b[3];
+    }
+    
+    /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]; Z = a[2] - b[2]; T = a[3] - b[3]
+    void load_diff(const double a[], const double b[])
+    {
+#if VECTOR4_USES_AVX
+        vec = sub4(loadu4(a), loadu4(b));
+#else
+        XX = a[0] - b[0];
+        YY = a[1] - b[1];
+        ZZ = a[2] - b[2];
+        TT = a[3] - b[3];
+#endif
+    }
+        
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const float a[], const float b[], const float C)
+    {
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+        TT = a[3] + C * ( b[3] - a[3] );
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const double a[], const double b[], const double C)
+    {
+#if VECTOR4_USES_AVX
+        vec4 A = loadu4(a), B = loadu4(b);
+        vec = fmadd4(set4(C), sub4(B, A), A);
+#else
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+        TT = a[3] + C * ( b[3] - a[3] );
+#endif
     }
     
     /// copy coordinates to given array

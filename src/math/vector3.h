@@ -56,34 +56,31 @@ public:
 #endif
     };
 
-#if VECTOR3_USES_AVX
     /// by default, coordinates are not initialized
-    Vector3() { TT = 0; }
-    
+    Vector3() {}
+
+#if VECTOR3_USES_AVX
     /// construct from 3 values
     Vector3(real x, real y, real z) : vec(setr4(x, y, z, 0)) {}
     
     /// construct from address
     Vector3(const real v[]) : vec(load3(v)) {}
-#else
-    /// by default, coordinates are not initialized
-    Vector3() {}
 
+    /// construct from SIMD vector
+    Vector3(vec4 const& v) { vec = v; }
+
+    /// conversion to SIMD vector
+    operator vec4 () const { return vec; }
+#else
     /// construct from 3 values
     Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
 
     /// construct from address
     Vector3(const real v[]) : XX(v[0]), YY(v[1]), ZZ(v[2]) {}
-#endif
 
-#if VECTOR3_USES_AVX
-    /// construct from SIMD vector
-    Vector3(vec4 const& v) { vec = v; }
-    /// conversion to SIMD vector
-    operator vec4 () const { return vec; }
-#elif defined(__AVX__) && REAL_IS_DOUBLE
     /// conversion to SIMD vector
     operator vec4 () const { return load3(&XX); }
+
     /// construct from SIMD vector
     Vector3(vec4 const& v) { XX = v[0]; YY = v[1]; ZZ = v[2]; }
 #endif
@@ -140,7 +137,7 @@ public:
         ZZ = ( d > 2 ) ? v[2] : 0;
     }
     
-    /// replace coordinates by the ones provided
+    /// load from array: X = b[0]; Y = b[1]; Z = b[2]
     void load(const float b[])
     {
         XX = b[0];
@@ -148,7 +145,7 @@ public:
         ZZ = b[2];
     }
     
-    /// replace coordinates by the ones provided
+    /// load from array: X = b[0]; Y = b[1]; Z = b[2]
     void load(const double b[])
     {
 #if VECTOR3_USES_AVX
@@ -157,6 +154,67 @@ public:
         XX = b[0];
         YY = b[1];
         ZZ = b[2];
+#endif
+    }
+    
+    /// load difference: X = b[3] - b[0]; Y = b[4] - b[1]; Z = b[5] - b[2]
+    void load_diff(const float b[])
+    {
+        XX = b[3] - b[0];
+        YY = b[4] - b[1];
+        ZZ = b[5] - b[2];
+    }
+    
+    /// load difference: X = b[3] - b[0]; Y = b[4] - b[1]; Z = b[5] - b[2]
+    void load_diff(const double b[])
+    {
+#if VECTOR2_USES_SSE
+        vec = sub4(load3(b+3), load3(b));
+#else
+        XX = b[3] - b[0];
+        YY = b[4] - b[1];
+        ZZ = b[5] - b[2];
+#endif
+    }
+    
+    /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]; Z = a[2] - b[2]
+    void load_diff(const float a[], const float b[])
+    {
+        XX = a[0] - b[0];
+        YY = a[1] - b[1];
+        ZZ = a[2] - b[2];
+    }
+    
+    /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]; Z = a[2] - b[2]
+    void load_diff(const double a[], const double b[])
+    {
+#if VECTOR3_USES_AVX
+        vec = sub4(load3(a), load3(b));
+#else
+        XX = a[0] - b[0];
+        YY = a[1] - b[1];
+        ZZ = a[2] - b[2];
+#endif
+    }
+        
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const float a[], const float b[], const float C)
+    {
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const double a[], const double b[], const double C)
+    {
+#if VECTOR3_USES_AVX
+        vec4 A = load3(a), B = load3(b);
+        vec = fmadd4(set4(C), sub4(B, A), A);
+#else
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
 #endif
     }
     

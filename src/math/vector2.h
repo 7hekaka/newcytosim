@@ -56,7 +56,7 @@ public:
     
     /// construct from address
     Vector2(const real v[]) : XX(v[0]), YY(v[1]) {}
-
+    
 #if VECTOR2_USES_SSE
     /// construct from SIMD vector
     Vector2(vec2 const& v) { vec = v; }
@@ -110,18 +110,81 @@ public:
         YY = ( d > 1 ) ? v[1] : 0;
     }
     
-    /// replace coordinates by the ones provided
+    /// load from memory: X = b[0]; Y = b[1]
     void load(const float b[])
     {
         XX = b[0];
         YY = b[1];
     }
     
-    /// replace coordinates by the ones provided
+    /// load from memory: X = b[0]; Y = b[1]
     void load(const double b[])
     {
+#if VECTOR2_USES_SSE
+        vec = loadu2(b);
+#else
         XX = b[0];
         YY = b[1];
+#endif
+    }
+    
+    /// load difference: X = b[2] - b[0]; Y = b[3] - b[1]
+    void load_diff(const float b[])
+    {
+        XX = b[2] - b[0];
+        YY = b[3] - b[1];
+    }
+    
+    /// load difference: X = b[2] - b[0]; Y = b[3] - b[1]
+    void load_diff(const double b[])
+    {
+#if VECTOR2_USES_SSE
+        vec = sub2(loadu2(b+2), loadu2(b));
+#else
+        XX = b[2] - b[0];
+        YY = b[3] - b[1];
+#endif
+    }
+    
+    /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]
+    void load_diff(const float a[], const float b[])
+    {
+        XX = a[0] - b[0];
+        YY = a[1] - b[1];
+    }
+    
+    /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]
+    void load_diff(const double a[], const double b[])
+    {
+#if VECTOR2_USES_SSE
+        vec = sub2(loadu2(a), loadu2(b));
+#else
+        XX = a[0] - b[0];
+        YY = a[1] - b[1];
+#endif
+    }
+    
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const float a[], const float b[], const float C)
+    {
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+    }
+    
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interp(const double a[], const double b[], const double C)
+    {
+#if VECTOR2_USES_SSE
+        vec2 A = loadu2(a), B = loadu2(b);
+#  ifdef __FMA__
+        vec = fmadd2(set2(C), sub2(B, A), A);
+#  else
+        vec = add2(mul2(set2(C), sub2(B, A)), A);
+#  endif
+#else
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+#endif
     }
     
     /// copy coordinates to given array
