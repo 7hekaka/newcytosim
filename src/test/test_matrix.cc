@@ -21,7 +21,7 @@ using namespace TicToc;
 typedef MatrixSparseSymmetricBlock MatrixSparseSymmetricB;
 
 const int N_RUN = 16;
-const int N_MUL = 64;
+const int N_MUL = 99;
 
 #define PAD 4
 
@@ -260,7 +260,7 @@ void testMatrix(MATRIX & mat,
     mat.resize(size);
 
     tic();
-    for ( int ii=0; ii<N_RUN; ++ii )
+    for ( size_t ii=0; ii<N_RUN; ++ii )
     {
         mat.reset();
         for ( size_t n=0; n<fill; ++n )
@@ -270,7 +270,7 @@ void testMatrix(MATRIX & mat,
     mat.prepareForMultiply(1);
 
     tic();
-    for ( int n=0; n<N_RUN*N_MUL; ++n )
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
     {
         mat.vecMulAdd(y, z);
         mat.vecMulAdd(x, z);
@@ -278,7 +278,7 @@ void testMatrix(MATRIX & mat,
     double t1 = toc();
     
     tic();
-    for ( int n=0; n<N_RUN*N_MUL; ++n )
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
     {
         mat.vecMulAdd_ALT(x, z);
         mat.vecMulAdd_ALT(y, z);
@@ -304,13 +304,13 @@ void checkMatrixParallel(MATRIX & mat, const size_t size,
     assert_true(mat.size() == size);
     zero_real(size, z);
     #pragma omp parallel for num_threads(4)
-    for ( int i = 0; i < size; i += CHK )
+    for ( size_t i = 0; i < size; i += CHK )
         mat.vecMulAdd(x, z, i, i+CHK);
     real sum1 = checksum(size, y, z);
 
     zero_real(size, z);
     #pragma omp parallel for num_threads(8)
-    for ( int i = 0; i < size; i += CHK )
+    for ( size_t i = 0; i < size; i += CHK )
         mat.vecMulAdd(x, z, i, i+CHK);
     real sum2 = checksum(size, y, z);
 
@@ -326,7 +326,7 @@ void testMatrixParallel(MATRIX & mat,
     mat.resize(size);
 
     tic();
-    for ( int ii=0; ii<N_RUN; ++ii )
+    for ( size_t ii=0; ii<N_RUN; ++ii )
     {
         mat.reset();
         for ( size_t n=0; n<fill; ++n )
@@ -336,10 +336,10 @@ void testMatrixParallel(MATRIX & mat,
     mat.prepareForMultiply(1);
 
     tic();
-    for ( int n=0; n<N_RUN*N_MUL; ++n )
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
     {
         #pragma omp parallel for num_threads(2)
-        for ( int i = 0; i < size; i += CHK )
+        for ( size_t i = 0; i < size; i += CHK )
         {
             mat.vecMulAdd(y, z, i, i+CHK);
             mat.vecMulAdd(x, z, i, i+CHK);
@@ -348,10 +348,10 @@ void testMatrixParallel(MATRIX & mat,
     double t2 = toc();
 
     tic();
-    for ( int n=0; n<N_RUN*N_MUL; ++n )
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
     {
         #pragma omp parallel for num_threads(4)
-        for ( int i = 0; i < size; i += CHK )
+        for ( size_t i = 0; i < size; i += CHK )
         {
             mat.vecMulAdd(y, z, i, i+CHK);
             mat.vecMulAdd(x, z, i, i+CHK);
@@ -385,7 +385,7 @@ void testMatrixIso(MATRIX & mat,
     for ( size_t ii=0; ii<N_RUN; ++ii )
     {
         mat.prepareForMultiply(DIM);
-        for ( int n=0; n<N_MUL; ++n )
+        for ( size_t n=0; n<N_MUL; ++n )
 #if ( DIM >= 3 )
             mat.vecMulAddIso3D(x, z);
 #else
@@ -475,7 +475,7 @@ This compares the Scalar and SIMD implementations of one matrix
     mat.resize(size);
     
     tic();
-    for ( int r = 0; r < N_RUN; ++r )
+    for ( size_t r = 0; r < N_RUN; ++r )
     {
         mat.reset();
         fillMatrixBlock(mat, fill, inx, iny);
@@ -494,20 +494,20 @@ This compares the Scalar and SIMD implementations of one matrix
     real res = checksum(size, z, x);
 
     unsigned long long time = __rdtsc();
-    for ( int n = 0; n < N_RUN; ++n )
+    for ( size_t n = 0; n < N_RUN; ++n )
     {
         mat.prepareForMultiply(1);
-        for ( int m=0; m<N_MUL; ++m )
+        for ( size_t m=0; m<N_MUL; ++m )
             mat.vecMulAdd_ALT(x, z);
     }
     double nop = N_MUL * N_RUN * mat.nbElements();
     double t1 = ( __rdtsc() - time ) / nop;
 
     time = __rdtsc();
-    for ( int n = 0; n < N_RUN; ++n )
+    for ( size_t n = 0; n < N_RUN; ++n )
     {
         mat.prepareForMultiply(1);
-        for ( int m = 0; m < N_MUL; ++m )
+        for ( size_t m = 0; m < N_MUL; ++m )
             mat.vecMulAdd(x, z);
     }
     double t2 = ( __rdtsc() - time ) / nop;
