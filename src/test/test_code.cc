@@ -930,12 +930,10 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             mul += 3;
             vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
             vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
-            vec4 a2 = broadcast1(src+8);
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-            store1(dst+8, fnmadd4(m2, broadcast1(dif+5), a2));
-            //storelo(dst+8, fnmadd2(getlo(m2), loaddup2(dif+5), getlo(a2)));
+             store1(dst+8, fnmadd2(getlo(m2), load1(dif+5), load1(src+8)));
             dif += 9; dst += 9; src += 9;
         } break;
         case 2: {
@@ -946,11 +944,9 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             
             mul += 2;
             vec4 a0 = fmadd4(p0, load4(dif), loadu4(src));
-            vec4 a1 = loadu4(src+4);
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
-            store2(dst+4, fnmadd4(m1, broadcast2(dif+1), a1));
-            //store2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), getlo(a1)));
+            storeu2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), loadu2(src+4)));
             dif += 6; dst += 6; src += 6;
         } break;
         case 3: {
