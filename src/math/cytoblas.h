@@ -16,15 +16,6 @@
 namespace blas
 {
 
-inline double dot(int N, const real* X, const real* Y)
-{
-#if REAL_IS_DOUBLE
-    return cblas_ddot(N, X, 1, Y, 1);
-#else
-    return cblas_dsdot(N, X, 1, Y, 1);
-#endif
-}
-
 /// this is the standard Euclidian norm
 inline double nrm2(int N, const real* X)
 {

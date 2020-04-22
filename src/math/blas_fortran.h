@@ -30,10 +30,10 @@
 extern "C"
 {
 // BLAS - Level 1
-float  cblas_sdsdot(int*, float, const float*, int*, const float*, int*);
-float  cblas_sdot(int*, const float*, int*, const float*, int*);
-double cblas_ddot(int*, const double*, int*, const double*, int*);
-double cblas_dsdot(int*, const float*, int*, const float*, int*);
+float  sdot_(int*, const float*, int*, const float*, int*);
+double ddot_(int*, const double*, int*, const double*, int*);
+double dsdot_(int*, const float*, int*, const float*, int*);
+float sdsdot_(int*, const float*, const float*, int*, const float*, int*);
 
 real BLAS(nrm2)(int*, const real*, int*);
 real BLAS(asum)(int*, const real*, int*);
@@ -105,8 +105,7 @@ inline double dsdot(int N, const float* X, int incX, const float* Y, int incY)
     return dsdot_(&N, X, &incX, Y, &incY);
 }
 
-double sdsdot_(int*, const float* s, const float*, int*, const float*, int*);
-inline double sdsdot(int N, float SB, const float* X, int incX, const float* Y, int incY)
+inline float sdsdot(int N, float SB, const float* X, int incX, const float* Y, int incY)
 {
     return sdsdot_(&N, &SB, X, &incX, Y, &incY);
 }
