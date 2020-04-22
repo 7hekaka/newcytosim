@@ -110,7 +110,6 @@ void Inventory::unassign(const Inventoried * obj)
         while ( !byNames[highest_] )
             --highest_;
     }
-    assert_true(lowest_ <= highest_);
 }
 
 
