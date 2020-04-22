@@ -39,6 +39,7 @@ inline vec2 loaddup2(double const* a)        { return _mm_load1_pd(a); }
 inline vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
 inline vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
 
+inline void store1(double* a, vec2 b)        { _mm_store_sd(a, b); }
 inline void store2(double* a, vec2 b)        { _mm_store_pd(a, b); }
 inline void storedup(double* a, vec2 b)      { _mm_store1_pd(a, b); }
 inline void storelo(double* a, vec2 b)       { _mm_store_sd(a, b); }
@@ -135,7 +136,7 @@ typedef __m256d vec4;
 constexpr __m256i msk3 = {-1,-1,-1,0};
 
 //#define load3(a)            blend4(cast4(load2(a)), _mm256_broadcast_sd(a+2), 0b0100)
-//#define store3(a,b)         storeu2(a, getlo(b)); storelo(Y+ii+2, gethi(z));
+//#define store3(a,b)         storeu2(a, getlo(b)); store1(Y+ii+2, gethi(z));
 
 //inline vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }
 inline vec4 load3(double const* a)     { return _mm256_maskload_pd(a, msk3); }
@@ -175,9 +176,9 @@ inline vec4 setzero4()                   { return _mm256_setzero_pd(); }
 inline vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); }
 inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); }
 
-/// load one double into all 4 positions
+/// load 1 double into all 4 positions
 inline vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a); }
-/// load two double and duplicate: X, Y, X, Y
+/// load 2 doubles and duplicate: X, Y, X, Y
 inline vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d const*)a); }
 
 inline vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
