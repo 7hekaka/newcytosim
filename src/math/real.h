@@ -144,6 +144,15 @@ inline real clamp_real(const real x, const real i, const real s)
 
 //----------------------------------- DEBUG ------------------------------------
 
+inline bool isnan(size_t cnt, real const* ptr)
+{
+    bool res = false;
+    for ( size_t i = 0; i < cnt; ++i )
+        res |= std::isnan(ptr[i]);
+    return res;
+}
+
+
 #ifdef DEBUG_REAL
 
 #include <cstdio>
