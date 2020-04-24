@@ -6,9 +6,9 @@
  This is a C-translation of the LAPACK reference implementation of dpttrf()
  (the method is known as Thomas' algorithm to factorize a tridiagonal matrix)
 */
-void lapack_xpttrf(int N, real* D, real* E, int* INFO)
+void lapack_xpttrf(int size, real* D, real* E, int* INFO)
 {
-    for ( int i = 0; i < N-1; ++i )
+    for ( int i = 0; i < size-1; ++i )
     {
         if ( D[i] < 0 )
         {
@@ -37,16 +37,16 @@ void lapack_xpttrf(int N, real* D, real* E, int* INFO)
          B( I ) = B( I ) / D( I ) - B( I+1 ) * E( I )
      CONTINUE
  */
-void lapack_xptts2(int N, int NRHS, const real* D, const real* E, real* B, int LDB)
+void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, int LDB)
 {
     assert_true( NRHS == 1 ); // in this case, LDB is not used
 
-    for ( int i = 1; i < N; ++i )
+    for ( int i = 1; i < size; ++i )
         B[i] = B[i] - B[i-1] * E[i-1];
     
-    B[N-1] = B[N-1] / D[N-1];
+    B[size-1] = B[size-1] / D[size-1];
     
-    for ( int i = N-2; i >= 0; --i )
+    for ( int i = size-2; i >= 0; --i )
         B[i] = B[i] / D[i] - B[i+1] * E[i];
 }
 
@@ -160,22 +160,27 @@ void italian_thomas(size_t size, real const*L, real const* D, real* U, real* B)
  */
 void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
 {
-    real x = 1.0 / D[0];
-    real e = E[0];
-    D[0] = x;
-    x = x * e;
-    E[0] = x;
+    if ( size < 1 ) return;
 
-    for ( size_t n = 1; n < size; ++n )
+    real x = 0;
+    real e = 0;
+
+    for ( size_t n = 0; n < size-1; ++n )
     {
         //D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
         //x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
+        if ( D[n] < 0 )
+        {
+            *INFO = n;
+            return;
+        }
         x = 1.0 / ( D[n] - e * x );
         e = E[n];
         D[n] = x;
         x = x * e;
         E[n] = x;
     }
+    D[size-1] = 1.0 / ( D[size-1] - e * x );
 }
 
 
