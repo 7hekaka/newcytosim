@@ -135,6 +135,9 @@ public:
         XX = ( d > 0 ) ? v[0] : 0;
         YY = ( d > 1 ) ? v[1] : 0;
         ZZ = ( d > 2 ) ? v[2] : 0;
+#if VECTOR3_USES_AVX
+        TT = 0;
+#endif
     }
     
     /// load from array: X = b[0]; Y = b[1]; Z = b[2]
@@ -143,6 +146,9 @@ public:
         XX = b[0];
         YY = b[1];
         ZZ = b[2];
+#if VECTOR3_USES_AVX
+        TT = 0;
+#endif
     }
     
     /// load from array: X = b[0]; Y = b[1]; Z = b[2]
@@ -163,12 +169,15 @@ public:
         XX = b[3] - b[0];
         YY = b[4] - b[1];
         ZZ = b[5] - b[2];
+#if VECTOR3_USES_AVX
+        TT = 0;
+#endif
     }
     
     /// load difference: X = b[3] - b[0]; Y = b[4] - b[1]; Z = b[5] - b[2]
     void load_diff(const double b[])
     {
-#if VECTOR2_USES_SSE
+#if VECTOR3_USES_AVX
         vec = sub4(load3(b+3), load3(b));
 #else
         XX = b[3] - b[0];
@@ -183,6 +192,9 @@ public:
         XX = a[0] - b[0];
         YY = a[1] - b[1];
         ZZ = a[2] - b[2];
+#if VECTOR3_USES_AVX
+        TT = 0;
+#endif
     }
     
     /// load difference: X = a[0] - b[0]; Y = a[1] - b[1]; Z = a[2] - b[2]
@@ -203,6 +215,9 @@ public:
         XX = a[0] + C * ( b[0] - a[0] );
         YY = a[1] + C * ( b[1] - a[1] );
         ZZ = a[2] + C * ( b[2] - a[2] );
+#if VECTOR3_USES_AVX
+        TT = 0;
+#endif
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
@@ -426,6 +441,7 @@ public:
     void normalize()
     {
 #if VECTOR3_USES_AVX
+        assert_true(vec[3] == 0);
         vec = normalize4(vec);
 #else
         real s = norm();
@@ -439,6 +455,7 @@ public:
     void normalize(const real n)
     {
 #if VECTOR3_USES_AVX
+        assert_true(vec[3] == 0);
         vec = normalize4(vec, n);
 #else
         real s = n / norm();
@@ -452,6 +469,7 @@ public:
     friend const Vector3 normalize(Vector3 const& V)
     {
 #if VECTOR3_USES_AVX
+        assert_true(V.vec[3] == 0);
         return Vector3(normalize4(V.vec));
 #else
         const real s = V.norm();
@@ -463,6 +481,7 @@ public:
     const Vector3 normalized(const real n = 1.0) const
     {
 #if VECTOR3_USES_AVX
+        assert_true(vec[3] == 0);
         return Vector3(normalize4(vec, n));
 #else
         real s = n / norm();
@@ -674,11 +693,7 @@ public:
     /// returns the element-by-element division
     const Vector3 e_div(Vector3 const& b) const
     {
-#if VECTOR3_USES_AVX
-        return Vector3(div4(vec, b.vec));
-#else
         return Vector3(XX/b.XX, YY/b.YY, ZZ/b.ZZ);
-#endif
     }
     
     /// returns a vector with each element squared
@@ -726,6 +741,7 @@ public:
     friend const Vector3 cross(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX && defined __AVX2__
+        assert_true(b.vec[3] == 0);
         return Vector3(cross4(a.vec, b.vec));
 #else
         return Vector3(a.YY * b.ZZ - a.ZZ * b.YY,

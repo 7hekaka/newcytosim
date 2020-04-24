@@ -5,10 +5,20 @@
 #include "vector3.h"
 
 // construct from Vector1
-Vector3::Vector3(const Vector1& vec) : XX(vec.XX), YY(0.0), ZZ(0.0) {}
+Vector3::Vector3(const Vector1& vec) : XX(vec.XX), YY(0.0), ZZ(0.0)
+{
+#if VECTOR3_USES_AVX
+    TT = 0;
+#endif
+}
 
 // construct from Vector2
-Vector3::Vector3(const Vector2& vec) : XX(vec.XX), YY(vec.YY), ZZ(0.0) {}
+Vector3::Vector3(const Vector2& vec) : XX(vec.XX), YY(vec.YY), ZZ(0.0)
+{
+#if VECTOR3_USES_AVX
+    TT = 0;
+#endif
+}
 
 /**
  This accepts 'X Y Z' but also 'X' and 'X Y'.
@@ -16,6 +26,9 @@ Vector3::Vector3(const Vector2& vec) : XX(vec.XX), YY(vec.YY), ZZ(0.0) {}
  */
 std::istream& operator >> (std::istream& is, Vector3& v)
 {
+#if VECTOR3_USES_AVX
+    v.TT = 0;
+#endif
     if ( is >> v.XX )
     {
         if ( is >> v.YY )
