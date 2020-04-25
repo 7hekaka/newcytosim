@@ -19,6 +19,7 @@
 #include "mecable.h"
 #include "messages.h"
 #include "simul_prop.h"
+#include "assert_macro.h"
 #include "blas.h"
 #include "lapack.h"
 #include "cytoblas.h"
@@ -833,8 +834,19 @@ int compareMecables(const void * ap, const void * bp)
  Allocate and reset matrices and vectors necessary for Meca::solve(),
  copy coordinates of Mecables into vPTS[]
  */
-void Meca::prepare()
+void Meca::prepare(Simul* sim)
 {
+    mecables.clear();
+
+    for ( Fiber  * f= sim->fibers.first(); f ; f=f->next() )
+        addMecable(f);
+    for ( Solid  * s= sim->solids.first(); s ; s=s->next() )
+        addMecable(s);
+    for ( Sphere * o=sim->spheres.first(); o ; o=o->next() )
+        addMecable(o);
+    for ( Bead   * b=  sim->beads.first(); b ; b=b->next() )
+        addMecable(b);
+    
 #if 0
     /*
      Sorting Mecables can improve multithreaded performance by distributing
@@ -891,6 +903,7 @@ void Meca::prepare()
 #endif
         mec->useBlock(0);
     }
+    //fprintf(stderr, "Meca::prepare() isnan %i\n", isnan(dimension(), vPTS));
 }
 
 
@@ -1137,7 +1150,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
      With exact arithmetic, biConjugate Gradient should converge at most
      in a number of iterations equal to the size of the linear system, with
      each iteration involving 2 matrix-vector multiplications.
-     We set here the max limit to the number of matrix-vector multiplication:
+     We set here this theoretical limit to the number multiplications:
      */
     LinearSolvers::Monitor monitor(2*dimension(), abstol);
 
@@ -1202,71 +1215,54 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("  no convergence: precond %i flag %i count %4lu residual %.3e\n",
-            precond, monitor.flag(), monitor.count(), monitor.residual());
-        
-        // try with different initial seed: vRHS
+        Cytosim::out("  no convergence: size %lu precond %i flag %i count %4lu residual %.3e\n",
+            dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
+
         monitor.reset();
+        // try with different seed
         copy_real(dimension(), vRHS, vSOL);
-        LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-        Cytosim::out("     new seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
-        
+        if ( precond )
+            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        else
+            LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
+        Cytosim::out("  new seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+
         if ( !monitor.converged() )
         {
             monitor.reset();
             zero_real(dimension(), vSOL);
-            
             if ( precond )
             {
-                // try with the other method:
-                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+                // try with different method
+                LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
+                Cytosim::out("    GMRES: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {
                 // try with a preconditioner
                 computePreconditionner();
-                LinearSolvers::GMRES(*this, vRHS, vSOL, 127, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
-                if ( !monitor.converged() )
-                {
-                    // try with other method:
-                    monitor.reset();
-                    zero_real(dimension(), vSOL);
-                    LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                }
-            }
-            
-            if ( !monitor.converged() )
-            {
-                // try with different GMRES parameters:
-                monitor.reset();
-                zero_real(dimension(), vSOL);
-                LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES(256): count %4lu residual %.3e\n", monitor.count(), monitor.residual());
-                
-                if ( !monitor.converged() )
-                {
-                    // no method could converge... this is really bad!
-                    throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
-                }
+                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+                Cytosim::out("    BCGSP: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
         }
-    }
-    
-#ifndef NDEBUG
-    
-    //check validity of the data:
-    for ( size_t i = 0; i < dimension(); ++i )
-    {
-        if ( std::isnan(vSOL[i]) )
+
+        if ( !monitor.converged() )
         {
-            fprintf(stderr, "Meca::solve produced NaN\n");
-            abort();
+            monitor.reset();
+            // try with different seed
+            copy_real(dimension(), vRND, vSOL);
+            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+            Cytosim::out(" another seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+        }
+        
+        if ( !monitor.converged() )
+        {
+            // no method could converge... this is really bad!
+            if ( monitor.residual() > 4*abstol )
+                throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
+            return;
         }
     }
-    
-#endif
     
     //add the solution of the system (=dPTS) to the points coordinates
     blas::add(dimension(), vSOL, vPTS);
@@ -1307,7 +1303,23 @@ void Meca::apply()
     if ( ready_ )
     {
         ready_ = 0;
-        #pragma omp parallel for num_threads(NUM_THREADS)
+#if 1
+        //check validity of the data:
+        bool a = isnan(dimension(), vPTS);
+        bool b = isnan(dimension(), vFOR);
+        //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
+        if ( a | b )
+        {
+            fprintf(stderr, "Meca::solve failed (not-a-number %i %i):\n", a, b);
+            for ( Mecable * mec : mecables )
+            {
+                b = isnan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
+                fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
+            }
+            abort();
+        }
+#endif
+        //#pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
             mec->getForces(vFOR+DIM*mec->matIndex());

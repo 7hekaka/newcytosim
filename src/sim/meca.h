@@ -18,6 +18,7 @@ class Mecable;
 class Mecapoint;
 class Interpolation;
 class SimulProp;
+class Simul;
 
 // known Matrix block types:
 class Matrix11;
@@ -294,11 +295,8 @@ public:
     /// destructor
     ~Meca() { release(); }
     
-    /// Clear list of Mecable
-    void clear() { mecables.clear(); }
-    
     /// Add a Mecable to the list of objects to be simulated
-    void add(Mecable* p) { mecables.push_back(p); }
+    void     addMecable(Mecable* p) { mecables.push_back(p); }
     
     /// Number of Mecable
     size_t   nbMecables() const { return mecables.size(); }
@@ -577,7 +575,7 @@ public:
     //-------------------------- COMPUTING METHODS -----------------------------
 
     /// Allocate the memory necessary to solve(). This must be called after the last add()
-    void prepare();
+    void prepare(Simul*);
     
     /// Calculate motion of all Mecables in the system
     void solve(SimulProp const*, unsigned precondition);

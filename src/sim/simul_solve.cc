@@ -212,29 +212,12 @@ void Simul::setStericInteractions(Meca& meca) const
 //------------------------------------------------------------------------------
 /**
  This will:
- - Register all Mecables in the Meca: Fiber Solid Bead and Sphere
  - call setInteractions() for all objects in the system,
  - call setStericInteractions() if prop->steric is true.
  .
  */
 void Simul::setInteractions(Meca& meca) const
 {
-    // prepare the meca, and register Mecables
-    meca.clear();
-    
-    for ( Fiber  * f= fibers.first(); f ; f=f->next() )
-        meca.add(f);
-    for ( Solid  * s= solids.first(); s ; s=s->next() )
-        meca.add(s);
-    for ( Sphere * o=spheres.first(); o ; o=o->next() )
-        meca.add(o);
-    for ( Bead   * b=  beads.first(); b ; b=b->next() )
-        meca.add(b);
-    
-    meca.prepare();
-    
-    // add interactions for all objects:
-    
     for ( Space * s=spaces.first(); s; s=s->next() )
         s->setInteractions(meca);
     
@@ -308,6 +291,7 @@ void Simul::setInteractions(Meca& meca) const
 
 void Simul::solve()
 {
+    sMeca.prepare(this);
     //auto rdtsc = __rdtsc();
     setInteractions(sMeca);
     //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
@@ -320,6 +304,7 @@ void Simul::solve()
 
 void Simul::solve_half()
 {
+    sMeca.prepare(this);
     //auto rdtsc = __rdtsc();
     setInteractions(sMeca);
     //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
