@@ -502,14 +502,9 @@ bool View::insideROI(Vector3 pos) const
 
 void View::setROI(Vector3 a, Vector3 b)
 {
-    mROI[0].XX = std::min(a.XX, b.XX);
-    mROI[1].XX = std::max(a.XX, b.XX);
-    mROI[0].YY = std::min(a.YY, b.YY);
-    mROI[1].YY = std::max(a.YY, b.YY);
-    mROI[0].ZZ = std::min(a.ZZ, b.ZZ);
-    mROI[1].ZZ = std::max(a.ZZ, b.ZZ);
+    mROI[0].set(std::min(a.XX, b.XX), std::min(a.YY, b.YY), std::min(a.ZZ, b.ZZ));
+    mROI[1].set(std::max(a.XX, b.XX), std::max(a.YY, b.YY), std::max(a.ZZ, b.ZZ));
 }
-
 
 
 //------------------------------------------------------------------------------

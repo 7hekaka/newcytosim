@@ -50,7 +50,7 @@ namespace glApp
 
     View         savedView("savedView");
     UserMode     mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
-    Vector3      mouseDown;                      ///< position where mouse button was pressed down
+    Vector3      mouseDown(0,0,0);               ///< position where mouse button was pressed down
     GLint        mouseX, mouseY;                 ///< current position of mouse in pixels
     Vector3      depthAxis;                      ///< vector normal to desired rotation
     Vector3      mouseAxis;                      ///< axis of rotation for MOUSE_SPIN

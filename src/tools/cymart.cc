@@ -181,7 +181,7 @@ void drawActin(Fiber const& fib)
     const real sn = sin(dan);
     
     real ab = 0;
-    Vector3 p; //position of monomer;
+    Vector3 p(0,0,0); //position of monomer;
     Vector3 d(fib.dirEndM());   // unit tangent to centerline
     Vector3 n = fib.adjustedNormal(d);
     //std::clog << fib.reference() << " " << n << "    " << n.normSqr() << " " << n*d << '\n';
