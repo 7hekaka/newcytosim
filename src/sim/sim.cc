@@ -1,5 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
+#include <csignal>
+
 #include "simul.h"
 #include "parser.h"
 #include "messages.h"
@@ -9,7 +11,6 @@
 #include "filepath.h"
 #include "splash.h"
 #include "tictoc.h"
-#include <csignal>
 #include "unistd.h"
 
 

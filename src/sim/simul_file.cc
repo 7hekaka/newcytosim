@@ -296,7 +296,7 @@ public:
         frozen = true;
     }
     
-    /// erase objects flagged with number '7'
+    /// erase objects flagged with FLAG
     void prune()
     {
         //sim->events.prune(FLAG);
@@ -360,7 +360,6 @@ public:
  */
 int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
 {
-    // set flag to erase any object that was not updated
     InputLock lock(this);
 
     // if no error occurred, erase objects that have not been updated
@@ -375,7 +374,7 @@ int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
  Read Objects from a file:
  update the ones that were already present in the simulation world,
  and otherwise create new ones. The Simulation worlds is augmented.
- If 'subset!=0' only objects from this class will be imported.
+ If 'subset != NULL' only objects from this class will be imported.
  
  @returns
  - 0 = success

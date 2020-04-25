@@ -610,7 +610,9 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     }
 }
 
-
+/**
+ This can only mark one class of objects
+ */
 void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
 {
     Property * pp = simul.properties.find(name);
@@ -905,7 +907,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     {
         selected = simul.findSet(what);
         if ( !selected )
-            throw InvalidIO("expected class specifier (or `import all')");
+            throw InvalidIO("expected class specifier (eg. `import all FILE' `import fiber FILE')");
     }
 
     Inputter in(DIM, file.c_str(), true);

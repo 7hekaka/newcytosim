@@ -97,6 +97,7 @@ This does not change length or segmentation
 */
 void Chain::setStraight(Vector const& pos, Vector const& dir)
 {
+    assert_true( pos.valid() );
     assert_true( dir.norm() > 0.1 );
     // 'dir' is normalized for safety:
     Vector dpts = dir * ( fnCut / dir.norm() );
@@ -773,7 +774,11 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     pri[nbs-1] = 0;
     sec[nbs-2] = 0;
     sec[nbs-1] = 0;
-
+    /*
+    printf("\n mag "); VecPrint::print(std::cout, nbs, mag, 3);
+    printf("\n pri "); VecPrint::print(std::cout, nbs, pri, 3);
+    printf("\n sec "); VecPrint::print(std::cout, nbs, sec, 3);
+    */
     res = reshape_calculate(nbs, cut*cut, mag, pri, sec, mem, tmp_size);
     
 #if ( 0 )
@@ -790,7 +795,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     real errS = blas::max_diff(nbs, mem, mag);
     if ( abs_real(errS) > 1e-8 )
     {
-        printf("\n Meca::err scalar %20.16f", errS);
+        printf("\n Chain:err scalar %20.16f", errS);
         printf("\n mul "); VecPrint::print(std::cout, nbs, mag, 3);
         printf("\nLmul "); VecPrint::print(std::cout, nbs, mem, 3);
     }
@@ -806,10 +811,10 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         //projectForcesD_(nbs, dif, src, mem, mag);
         size_t nbv = DIM*nbs+DIM;
         real errP = blas::max_diff(nbv, mag, dst);
-        //printf("\n Meca::err points %20.16f", errP);
+        //printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
         if ( abs_real(errP) > 1e-8 )
         {
-            printf("\n Meca::reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
+            printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
             printf("\n pts "); VecPrint::print(std::cout, nbv, dst, 2);
             printf("\nLpts "); VecPrint::print(std::cout, nbv, mag, 2);
         }

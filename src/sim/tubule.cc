@@ -46,7 +46,7 @@ void Tubule::salute(Buddy const* guy)
     if ( guy == bone_ )
     {
         assert_true(bone_);
-        if ( bone_->freshAssemblyP() ||  bone_->freshAssemblyM() )
+        if (( bone_->freshAssemblyP() != 0 ) | ( bone_->freshAssemblyM() != 0 ))
         {
             // copy the growth exhibited from `bone_`
             real aP = bone_->abscissaP();

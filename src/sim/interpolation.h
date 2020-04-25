@@ -71,7 +71,7 @@ public:
     size_t          matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.
-    bool            is_valid() const { return mec_ == nullptr || ( pt1_ < mec_->nbPoints() && pt2_ < mec_->nbPoints() ); }
+    bool            valid()    const { return (mec_!=nullptr) & (pt1_<mec_->nbPoints()) & (pt2_<mec_->nbPoints()); }
 
     /// Constant pointer to the Mecable
     Mecable const*  mecable()  const { return mec_; }

@@ -144,7 +144,7 @@ void Mecafil::makeProjection()
         real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
 #endif
         
-        // this term should be 2, since iDir[] vectors are normalized:
+        // this term should be 2.0, since iDir[] vectors are normalized:
 #if ( DIM == 2 )
         iJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
 #else

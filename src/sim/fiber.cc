@@ -840,7 +840,7 @@ void Fiber::setDragCoefficient()
         drag = dragCoefficientCylinder(len, prop);
 
     //the forces are distributed equally on all points, hence we multiply by nPoints
-    assert_true( nPoints > 0 );
+    assert_true( drag > 0 );
     iPointMobility = nPoints / drag;
     
 #if ( 0 )

@@ -113,8 +113,9 @@ real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 /**
  Calculate the normalized difference between successive vertices of the fiber:
 
+     const real alpha = 1.0 / segmentation();
      for ( int n = 0; n < DIM*lastPoint(); ++n )
-         iDir[n] = ( pPos[n+DIM] - pPos[n] ) / segmentation();
+         iDir[n] = alpha * ( pPos[n+DIM] - pPos[n] );
 
  */
 
@@ -126,11 +127,11 @@ void Mecafil::storeDirections()
      assume here that successive points are correctly separated, which is usally
      the case, such that any error would be small
      */
-    const real sc  = 1.0 / segmentation();
+    const real val = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
     #pragma ivdep
-    for ( size_t p = 0; p < end; ++p )
-        iDir[p] = sc * ( pPos[p+DIM] - pPos[p] );
+    for ( size_t i = 0; i < end; ++i )
+        iDir[i] = val * ( pPos[i+DIM] - pPos[i] );
 #else
     for ( size_t p = 0; p < lastPoint(); ++p )
         normalize(diffPoints(p)).store(iDir+DIM*p);
@@ -138,20 +139,19 @@ void Mecafil::storeDirections()
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     /*
-     Calculate the average filament direction at each vertex of the fiber in iAni[].
-     Note that iAni[] is calculated here from iDir[]
+     Calculate the average filament direction at each vertex
      */
-    
-    // for the extremities, the direction of the nearby segment is used.
+    const real* dir = iDir;
+    // for the extremities, copy direction of the nearby segment:
     for ( size_t d = 0; d < DIM; ++d )
     {
-        iAni[d]     = iDir[d];
-        iAni[d+end] = iDir[d+end-DIM];
+        iAni[d]     = dir[d];
+        iAni[d+end] = dir[d+end-DIM];
     }
     
-    // for intermediate points, the directions of the flanking segments are averaged
+    // for inner vertices, average directions of the flanking segments:
     for ( size_t p = DIM ; p < end; ++p )
-        iAni[p] = 0.5 * ( iDir[p-DIM] + iDir[p] );
+        iAni[p] = 0.5 * ( dir[p-DIM] + dir[p] );
 
     //VecPrint::print(std::clog, last+DIM, iAni);
 #endif

@@ -45,10 +45,10 @@ class Object : public Node, public Inventoried, public Movable
 {
 private:
     
-    /// integer used for custom tasks, which is recorded to file
+    /// integer used for user controlled tasks, recorded to file
     ObjectMark        mark_;
 
-    /// another integer used for various tasks, not saved to file
+    /// integer used for private tasks, not saved to file
     ObjectFlag        flag_;
     
     /// a random number associated with this object
