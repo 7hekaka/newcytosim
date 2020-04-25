@@ -294,13 +294,16 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
         //printf("trying segment F%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), seg.dis_);
         if ( seg.dis_ > ha.prop->binding_range_sqr )
             break;
-        Fiber * fib = const_cast<Fiber*>(seg.fiber());
-        // need to recalculate the abscissa of the projection:
-        FiberSite pos(fib, seg.abscissa1()+seg.projectPoint(place, seg.dis_));
-        if ( ha.attachmentAllowed(pos) )
+        if ( RNG.test(ha.prop->binding_prob) )
         {
-            ha.attach(pos);
-            return;
+            Fiber * fib = const_cast<Fiber*>(seg.fiber());
+            // need to recalculate the abscissa of the projection:
+            FiberSite pos(fib, seg.abscissa1()+seg.projectPoint(place, seg.dis_));
+            if ( ha.attachmentAllowed(pos) )
+            {
+                ha.attach(pos);
+                return;
+            }
         }
 #else
 #if !TRICKY_HAND_ATTACHMENT
