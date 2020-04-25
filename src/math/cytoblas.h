@@ -108,55 +108,54 @@ inline real nrm8(const size_t N, const real* X, int inc)
 }
 
     
-inline real nrm8seq(const size_t siz, const real* X)
+inline real nrm8seq(const size_t cnt, const real* X)
 {
     real res = abs_real(X[0]);
 #pragma ivdep
 #pragma vector always
-    for ( size_t i = 1; i < siz; ++i )
+    for ( size_t i = 1; i < cnt; ++i )
         res = std::max(res, abs_real(X[i]));
     return res;
 }
 
 #ifdef __AVX__
 
-inline double nrm8(const size_t siz, const double* X)
+inline double nrm8(const size_t cnt, const double* ptr)
 {
-    double const* ptr = X;
-    double const* end = X + siz;
-    double const* stop = end - 11;
+    //double const* adr = ptr;
+    double const* end = ptr - 11 + cnt;
+    const vec4 sign = {-0.0, -0.0, -0.0, -0.0};
     vec4 u = setzero4();
     #pragma nounroll
-    while ( ptr < stop )
+    while ( ptr < end )
     {
-        vec4 a = abs4(load4(ptr));
-        vec4 b = abs4(load4(ptr+4));
-        vec4 c = abs4(load4(ptr+8));
+        vec4 a = andnot4(sign, load4(ptr));
+        vec4 b = andnot4(sign, load4(ptr+4));
+        vec4 c = andnot4(sign, load4(ptr+8));
         u = max4(max4(u,a), max4(b,c));
         ptr += 12;
     }
     #pragma nounroll
-    while ( ptr < end - 3 )
+    while ( ptr < end + 8 )
     {
-        u = max4(u, abs4(load4(ptr)));
+        u = max4(u, andnot4(sign, load4(ptr)));
         ptr += 4;
     }
-    vec2 v = getlo(max4(u, permute2f128(u, u, 0x01)));
-    while ( ptr < end - 1 )
+    vec2 w = getlo(max4(u, permute2f128(u, u, 0x01)));
+    while ( ptr < end + 10 )
     {
-        v = max2(v, abs2(load2(ptr)));
+        w = max2(w, andnot2(getlo(sign), load2(ptr)));
         ptr += 2;
     }
-    v = max2(v, permute2(v, 0b01));
-    double res = v[0];
-    while ( ptr < end )
-        res = std::max(res, std::fabs(*ptr++));
+    double res = std::max(w[0], w[1]);
+    for ( ; ptr < end + 11; ++ptr )
+        res = std::max(res, std::fabs(*ptr));
 #if 0
-    real x = std::fabs(X[0]);
-    for ( size_t i = 1; i < siz; ++i )
-        x = std::max(x, std::fabs(X[i]));
-    if ( x != res )
-        printf("ERROR blas::nrm8 %f %f\n", x, res);
+    real z = std::fabs(adr[0]);
+    for ( size_t i = 1; i < cnt; ++i )
+        z = std::max(z, std::fabs(adr[i]));
+    if ( z != res )
+        printf("blas::nrm8 size %lu ERROR %f %f\n", cnt, z, res);
 #endif
     return res;
 }

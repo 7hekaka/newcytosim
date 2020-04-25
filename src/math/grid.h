@@ -314,7 +314,7 @@ public:
         for ( int d = ORD-1; d >= 0; --d )
         {
             real a = GRID::map(d, w[d]) + 0.5;
-            int ia = std::floor(a);
+            int ia = (int)std::floor(a);
             a     -= ia;
             int  l = GRID::image(d, ia-1);
             int  u = GRID::image(d, ia  );
@@ -358,7 +358,7 @@ public:
         real  ax = 0.5 + GRID::map(0, xx);
         
 #if GRID_HAS_PERIODIC
-        int   ix = std::floor(ax);
+        int   ix = (int)std::floor(ax);
 #else
         int   ix = (int)ax;
 #endif
@@ -381,8 +381,8 @@ public:
         real  ay = 0.5 + GRID::map(1, w[1]);
         
 #if GRID_HAS_PERIODIC
-        int   ix = std::floor(ax);
-        int   iy = std::floor(ay);
+        int   ix = (int)std::floor(ax);
+        int   iy = (int)std::floor(ay);
 #else
         int   ix = (int)ax;
         int   iy = (int)ay;
@@ -415,9 +415,9 @@ public:
         real  az = 0.5 + GRID::map(2, w[2]);
         
 #if GRID_HAS_PERIODIC
-        int   ix = std::floor(ax);
-        int   iy = std::floor(ay);
-        int   iz = std::floor(az);
+        int   ix = (int)std::floor(ax);
+        int   iy = (int)std::floor(ay);
+        int   iz = (int)std::floor(az);
 #else
         int   ix = (int)ax;
         int   iy = (int)ay;
