@@ -54,66 +54,66 @@ real SpaceCapsule::volume() const
 #endif
 }
 
-bool SpaceCapsule::inside(Vector const& w) const
+bool SpaceCapsule::inside(Vector const& W) const
 {
-    real n = w.normYZSqr() + square(max_real(0, abs_real(w.XX)-length_));
+    real n = W.normYZSqr() + square(max_real(0, abs_real(W.XX)-length_));
     
     return ( n <= radiusSqr_ );
 }
 
 
-bool SpaceCapsule::allInside(Vector const& w, const real rad) const
+bool SpaceCapsule::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
-    real n = w.normYZSqr() + square(max_real(0, abs_real(w.XX)-length_));
+    real n = W.normYZSqr() + square(max_real(0, abs_real(W.XX)-length_));
     
     return ( n <= square(radius_-rad) );
 }
 
 //------------------------------------------------------------------------------
-Vector SpaceCapsule::project(Vector const& w) const
+Vector SpaceCapsule::project(Vector const& W) const
 {
-    Vector p;
-    real n = w.normYZSqr();
+    Vector P(W);
+    real n = W.normYZSqr();
     
     //calculate the projection on the axis, within boundaries:
-    if ( abs_real(w.XX) > length_ )
+    if ( abs_real(W.XX) > length_ )
     {
-        real L = std::copysign(length_, w.XX);
-        n += square( w.XX - L );
+        real L = std::copysign(length_, W.XX);
+        n += square( W.XX - L );
         //normalize from this point on the axis
         if ( n > 0 ) n = radius_ / sqrt(n);
         
-        p.XX = L + n * ( w.XX - L );
+        P.XX = L + n * ( W.XX - L );
     }
     else
     {
         //normalize from this point on the axis
         if ( n > 0 ) n = radius_ / sqrt(n);
         
-        p.XX = w.XX;
+        P.XX = W.XX;
     }
     
     if ( n > 0 )
     {
 #if ( DIM > 1 )
-        p.YY = n * w.YY;
+        P.YY = n * W.YY;
 #endif
 #if ( DIM >= 3 )
-        p.ZZ = n * w.ZZ;
+        P.ZZ = n * W.ZZ;
 #endif
     }
     else
     {
         //we project on a arbitrary point on the cylinder
 #if ( DIM > 1 )
-        p.YY = radius_;
+        P.YY = radius_;
 #endif
 #if ( DIM >= 3 )
-        p.ZZ = 0;
+        P.ZZ = 0;
 #endif
     }
-    return p;
+    return P;
 }
 
 

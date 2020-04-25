@@ -94,16 +94,16 @@ real SpaceCylinderZ::volume() const
 }
 
 
-bool SpaceCylinderZ::inside(Vector const& w) const
+bool SpaceCylinderZ::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = w.XX * w.XX + w.YY * w.YY;
+    const real RT = W.XX * W.XX + W.YY * W.YY;
 # if HAS_SMOOTH_EDGES
     const real R = max_real(0, sqrt(RT)-radius_+edge_);
-    const real Z = max_real(0, std::max(bot_+edge_-w.ZZ, w.ZZ-top_+edge_));
+    const real Z = max_real(0, std::max(bot_+edge_-W.ZZ, W.ZZ-top_+edge_));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
-    return ( bot_ <= w.ZZ  &&  w.ZZ <= top_  &&  RT <= radius_ * radius_ );
+    return ( bot_ <= W.ZZ  &&  W.ZZ <= top_  &&  RT <= radius_ * radius_ );
 # endif
 #else
     ABORT_NOW("cylinderZ is only valid in 3D");
@@ -112,19 +112,19 @@ bool SpaceCylinderZ::inside(Vector const& w) const
 }
 
 
-bool SpaceCylinderZ::allInside(Vector const& w, const real rad) const
+bool SpaceCylinderZ::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT = w.XX * w.XX + w.YY * w.YY;
+    const real RT = W.XX * W.XX + W.YY * W.YY;
 # if HAS_SMOOTH_EDGES
     const real E = edge_ + rad;
     const real R = max_real(0, sqrt(RT)-E);
-    const real Z = max_real(0, max_real(bot_+E-w.ZZ, w.ZZ-top_+E));
+    const real Z = max_real(0, max_real(bot_+E-W.ZZ, W.ZZ-top_+E));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
-    return ( bot_ + rad <= w.ZZ  &&  w.ZZ + rad <= top_
-            && RT <= square(radius_-rad) );
+    return ((bot_ + rad <= W.ZZ ) & ( W.ZZ + rad <= top_ )
+            & ( RT <= square(radius_-rad) ));
 # endif
 #else
     ABORT_NOW("cylinderZ is only valid in 3D");
@@ -136,12 +136,12 @@ bool SpaceCylinderZ::allInside(Vector const& w, const real rad) const
 Vector SpaceCylinderZ::randomPlace() const
 {
 #if HAS_SMOOTH_EDGES
-    Vector w;
+    Vector W;
     do {
         const Vector2 V = Vector2::randB(radius_);
-        w.set(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
-    } while ( !inside(w) );
-    return w;
+        W.set(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
+    } while ( !inside(W) );
+    return W;
 #else
     const Vector2 V = Vector2::randB(radius_);
     return Vector(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
@@ -149,9 +149,9 @@ Vector SpaceCylinderZ::randomPlace() const
 }
 
 //------------------------------------------------------------------------------
-Vector SpaceCylinderZ::project(Vector const& w) const
+Vector SpaceCylinderZ::project(Vector const& W) const
 {
-    Vector p = w;
+    Vector P(W);
 #if ( DIM > 2 )
 # if HAS_SMOOTH_EDGES
     const real T = top_ - edge_;
@@ -164,49 +164,49 @@ Vector SpaceCylinderZ::project(Vector const& w) const
 # endif
     bool in = true;
 
-    if ( T < w.ZZ )
+    if ( T < W.ZZ )
     {
-        p.ZZ = T;
+        P.ZZ = T;
         in = false;
     }
-    else if ( w.ZZ < B )
+    else if ( W.ZZ < B )
     {
-        p.ZZ = B;
+        P.ZZ = B;
         in = false;
     }
     
-    real n = w.normXY();
+    real n = W.normXY();
     
     if ( n > R )
     {
         n = R / n;
-        p.XX = n * w.XX;
-        p.YY = n * w.YY;
+        P.XX = n * W.XX;
+        P.YY = n * W.YY;
     }
     else if ( in )
     {
-        real ZT = top_ - w.ZZ;
-        real ZB = w.ZZ - bot_;
+        real ZT = top_ - W.ZZ;
+        real ZB = W.ZZ - bot_;
         // check which cap is closer:
         if ( radius_ - n < ZT  &&  radius_ - n < ZB )
         {
             n = radius_ / n;
-            p.XX = n * w.XX;
-            p.YY = n * w.YY;
+            P.XX = n * W.XX;
+            P.YY = n * W.YY;
         }
         else if ( ZT < ZB )
-            p.ZZ = top_;
+            P.ZZ = top_;
         else
-            p.ZZ = bot_;
-        return p;
+            P.ZZ = bot_;
+        return P;
     }
 # if HAS_SMOOTH_EDGES
     //normalize to radius(), and add to p to get the projection
-    real dis = edge_ / norm(w-p);
-    return dis * ( w - p ) + p;
+    real dis = edge_ / norm(W-P);
+    return dis * ( W - P ) + P;
 # endif
 #endif
-    return p;
+    return P;
 }
 
 //------------------------------------------------------------------------------

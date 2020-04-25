@@ -106,20 +106,20 @@ void SpacePolygonZ::update()
 }
 
 
-bool SpacePolygonZ::inside(Vector const& w) const
+bool SpacePolygonZ::inside(Vector const& W) const
 {
-    return poly_.inside(w.normXY(), w[2], 1);
+    return poly_.inside(W.normXY(), W[2], 1);
 }
 
 
-Vector SpacePolygonZ::project(Vector const& w) const
+Vector SpacePolygonZ::project(Vector const& W) const
 {
-    real P, Z, R = w.normXY();
+    real P, Z, R = W.normXY();
     size_t hit;
-    poly_.project(R, w.z(), P, Z, hit);
+    poly_.project(R, W.z(), P, Z, hit);
     
     real n = P / R;
-    return Vector( w.XX * n, w.y() * n, Z);
+    return Vector( W.XX * n, W.y() * n, Z);
 }
 
 

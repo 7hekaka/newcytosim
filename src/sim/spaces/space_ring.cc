@@ -65,23 +65,23 @@ Vector SpaceRing::randomPlace() const
 
 
 //------------------------------------------------------------------------------
-bool SpaceRing::inside(Vector const& w) const
+bool SpaceRing::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( abs_real(w.XX) <= length_  &&  RT <= radiusSqr_ );
+    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    return ( abs_real(W.XX) <= length_  &&  RT <= radiusSqr_ );
 #else
     return false;
 #endif
 }
 
-bool SpaceRing::allInside(Vector const& w, const real rad ) const
+bool SpaceRing::allInside(Vector const& W, const real rad ) const
 {
     assert_true( rad >= 0 );
 
 #if ( DIM > 2 )
-    const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( abs_real(w.XX) + rad <= length_  &&  RT <= square(radius_-rad) );
+    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    return ( abs_real(W.XX) + rad <= length_  &&  RT <= square(radius_-rad) );
 #else
     return false;
 #endif
@@ -91,32 +91,32 @@ bool SpaceRing::allInside(Vector const& w, const real rad ) const
 /**
  Project always on the surface of the cylinder
  */
-Vector SpaceRing::project(Vector const& w) const
+Vector SpaceRing::project(Vector const& W) const
 {
-    Vector p;
-    if ( w.XX >  length_ )
-        p.XX =  length_;
-    else if ( w.XX < -length_ )
-        p.XX = -length_;
+    Vector P(W);
+    if ( W.XX >  length_ )
+        P.XX =  length_;
+    else if ( W.XX < -length_ )
+        P.XX = -length_;
     else
-        p.XX = w.XX;
+        P.XX = W.XX;
     
 #if ( DIM > 2 )
-    real n = w.normYZ();
+    real n = W.normYZ();
     
     if ( n > 0 )
     {
         n = radius_ / n;
-        p.YY = n * w.YY;
-        p.ZZ = n * w.ZZ;
+        P.YY = n * W.YY;
+        P.ZZ = n * W.ZZ;
     }
     else
     {
-        p.YY = radius_;
-        p.ZZ = 0;
+        P.YY = radius_;
+        P.ZZ = 0;
     }
 #endif
-    return p;
+    return P;
 }
 
 //------------------------------------------------------------------------------

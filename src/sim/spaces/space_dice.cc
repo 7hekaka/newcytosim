@@ -70,21 +70,21 @@ real SpaceDice::volume() const
 
 //------------------------------------------------------------------------------
 
-bool SpaceDice::inside(Vector const& w) const
+bool SpaceDice::inside(Vector const& W) const
 {
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(max_real(0, abs_real(w[d]) - length_[d] + edge_));
+        dis += square(max_real(0, abs_real(W[d]) - length_[d] + edge_));
     return ( dis <= edgeSqr_ );
 }
 
 
-bool SpaceDice::allInside(Vector const& w, real rad) const
+bool SpaceDice::allInside(Vector const& W, real rad) const
 {
     assert_true( rad >= 0 );
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(max_real(0, abs_real(w[d]) - length_[d] + edge_ + rad));
+        dis += square(max_real(0, abs_real(W[d]) - length_[d] + edge_ + rad));
     return ( dis <= edgeSqr_ );
 }
 
@@ -92,27 +92,27 @@ bool SpaceDice::allInside(Vector const& w, real rad) const
 
 #if ( DIM == 1 )
 
-Vector SpaceDice::project(Vector const& w) const
+Vector SpaceDice::project(Vector const& W) const
 {
-    return Vector(std::copysign(length_[0], w.XX), 0, 0);
+    return Vector(std::copysign(length_[0], W.XX), 0, 0);
 }
 
 #else
 
-Vector SpaceDice::project(Vector const& w) const
+Vector SpaceDice::project(Vector const& W) const
 {
-    Vector p = w;
+    Vector P(W);
     bool in = true;
 
-    real X = length_[0] - abs_real(w.XX);
-    if ( X < edge_ ) { p.XX = std::copysign(length_[0]-edge_, w.XX); in=false; }
+    real X = length_[0] - abs_real(W.XX);
+    if ( X < edge_ ) { P.XX = std::copysign(length_[0]-edge_, W.XX); in=false; }
     
-    real Y = length_[1] - abs_real(w.YY);
-    if ( Y < edge_ ) { p.YY = std::copysign(length_[1]-edge_, w.YY); in=false; }
+    real Y = length_[1] - abs_real(W.YY);
+    if ( Y < edge_ ) { P.YY = std::copysign(length_[1]-edge_, W.YY); in=false; }
 
 #if ( DIM > 2 )
-    real Z = length_[2] - abs_real(w.ZZ);
-    if ( Z < edge_ ) { p.ZZ = std::copysign(length_[2]-edge_, w.ZZ); in=false; }
+    real Z = length_[2] - abs_real(W.ZZ);
+    if ( Z < edge_ ) { P.ZZ = std::copysign(length_[2]-edge_, W.ZZ); in=false; }
 #endif
     
     if ( in )
@@ -122,24 +122,24 @@ Vector SpaceDice::project(Vector const& w) const
         if ( Z < Y )
         {
             if ( Z < X )
-                p.ZZ = std::copysign(length_[2], w.ZZ);
+                P.ZZ = std::copysign(length_[2], W.ZZ);
             else
-                p.XX = std::copysign(length_[0], w.XX);
+                P.XX = std::copysign(length_[0], W.XX);
         }
         else
 #endif
         {
             if ( Y < X )
-                p.YY = std::copysign(length_[1], w.YY);
+                P.YY = std::copysign(length_[1], W.YY);
             else
-                p.XX = std::copysign(length_[0], w.XX);
+                P.XX = std::copysign(length_[0], W.XX);
         }
-        return p;
+        return P;
     }
 
     //normalize to radius(), and add to p to get the real projection
-    real dis = edge_ / norm(w-p);
-    return dis * ( w - p ) + p;
+    real dis = edge_ / norm(W-P);
+    return dis * ( W - P ) + P;
 }
 #endif
 

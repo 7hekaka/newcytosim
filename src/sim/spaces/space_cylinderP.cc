@@ -59,27 +59,27 @@ real SpaceCylinderP::volume() const
 }
 
 
-bool SpaceCylinderP::inside(Vector const& w) const
+bool SpaceCylinderP::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
+    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
     return ( RT <= radius_ * radius_ );
 #elif ( DIM > 1 )
-    return ( abs_real(w.YY) <= radius_ );
+    return ( abs_real(W.YY) <= radius_ );
 #else
     return false;
 #endif
 }
 
 
-bool SpaceCylinderP::allInside(Vector const& w, const real rad ) const
+bool SpaceCylinderP::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
+    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
     return ( RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
-    return ( abs_real(w.YY) <= radius_-rad );
+    return ( abs_real(W.YY) <= radius_-rad );
 #else
     return false;
 #endif
@@ -99,26 +99,25 @@ Vector SpaceCylinderP::randomPlace() const
 }
 
 //------------------------------------------------------------------------------
-Vector SpaceCylinderP::project(Vector const& w) const
+Vector SpaceCylinderP::project(Vector const& W) const
 {
-    Vector p;
-    p.XX = w.XX;
+    Vector P(W);
     
 #if ( DIM > 2 )
-    real n = w.normYZ();
+    real n = W.normYZ();
     if ( n > REAL_EPSILON )
     {
-        p.YY = w.YY * ( radius_ / n );
-        p.ZZ = w.ZZ * ( radius_ / n );
+        P.YY = W.YY * ( radius_ / n );
+        P.ZZ = W.ZZ * ( radius_ / n );
     }
     else
     {
         const Vector2 V = Vector2::randU();
-        p.YY = radius_ * V.XX;
-        p.ZZ = radius_ * V.YY;
+        P.YY = radius_ * V.XX;
+        P.ZZ = radius_ * V.YY;
     }
 #endif
-    return p;
+    return P;
 }
 
 //------------------------------------------------------------------------------

@@ -218,32 +218,45 @@ real Space::estimateVolume(size_t cnt) const
 */
 Vector Space::bounce(Vector pos) const
 {
-    Vector q, p = project(pos);
-    // bounce on edge
-    pos = 2*p - pos;
-    
-    if ( inside(pos) )
-        return pos;
-
+    Vector P;
     // bounce on the edge, and return if inside
     int cnt = 0;
     do {
-        p = project(pos);
-        pos = 2*p - pos;
+        P = project(pos);
+        pos = 2*P - pos;
         if ( inside(pos) )
-            return pos;
-        q = project(pos);
-        pos = 2*q - pos;
-        if ( inside(pos) || distanceSqr(p, q) < REAL_EPSILON )
             return pos;
     } while ( ++cnt < 8 );
     
+    Vector Q;
+    do {
+        Q = project(pos);
+        pos = 2*Q - pos;
+        if ( inside(pos) )
+            return pos;
+        if ( distanceSqr(P, Q) < REAL_EPSILON )
+            return ( P + Q ) * 0.5;
+        P = project(pos);
+        pos = 2*P - pos;
+        if ( inside(pos) )
+            return pos;
+    } while ( ++cnt < 16 );
+
     static size_t msg = 0;
     if ( ++msg < 16 )
-        std::cerr << "Warning: "+prop->name()+":bounce failed?\n";
+    {
+        std::cerr << "Warning: "+prop->name()+":bounce fails?\n";
+        do {
+            P = project(pos);
+            pos = 2*P - pos;
+            std::cerr << cnt << "  " << pos << " proj " << P << '\n';
+            if ( inside(pos) )
+                return pos;
+        } while ( ++cnt < 24 );
+    }
     
-    // Place point on edge, as last resort:
-    return p;
+    // if space is convex, the midpoint should be inside
+    return ( P + Q ) * 0.5;
 }
 
 
@@ -339,9 +352,10 @@ real  Space::signedDistanceToEdge(Vector const& pos) const
 void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     Vector prj = project(pos);
+    assert_true(prj.valid());
     Vector dir = pos - prj;
     real n = dir.normSqr();
-    if ( n > 0 )
+    if ( n > REAL_EPSILON )
         meca.addPlaneClamp(pe, prj, dir, stiff/n);
 }
 

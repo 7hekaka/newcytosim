@@ -36,7 +36,7 @@ real SpaceForce::volume() const
 }
 
 
-Vector SpaceForce::project(Vector const& w) const
+Vector SpaceForce::project(Vector const&) const
 {
     throw InvalidParameter("Invalid use of space `force'");
 }

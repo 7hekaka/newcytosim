@@ -6,7 +6,7 @@
 #include "space.h"
 
 
-//#define HAS_SPHEROID
+//#define ELLIPSE_HAS_SPHEROID
 
 /// ellipse in 2D, ellipsoid or spheroid in 3D 
 /**
@@ -34,7 +34,7 @@ protected:
     /// dimensions squared
     real lengthSqr_[3];
 
-#ifdef HAS_SPHEROID
+#ifdef ELLIPSE_HAS_SPHEROID
     /// indicates that two axes are equal
     int mSpheroid;
 #endif

@@ -70,53 +70,55 @@ real SpaceTee::volume() const
 
 
 //------------------------------------------------------------------------------
-bool SpaceTee::inside(Vector const& w) const
+bool SpaceTee::inside(Vector const& W) const
 {
     real nrmSq      = 0;
-    const real x    = abs_real( w[0] );
-    const real xRel = (w[0] - tJunction);
+    const real x    = abs_real(W.XX);
+    const real xRel = (W.XX - tJunction);
     
     //check if w is inside the base cylinder
     if ( x > tLength )
         nrmSq = square(x - tLength);
 #if ( DIM == 2 )
-    nrmSq += w[1]*w[1];
-#elif ( DIM >= 3 )
-    nrmSq += w[1]*w[1] + w[2]*w[2];
+    nrmSq += square(W.YY);
+#elif ( DIM > 2 )
+    nrmSq += square(W.YY) + square(W.ZZ);
 #endif
     if ( nrmSq <= tRadiusSq ) return( true );
     
+#if ( DIM > 1 )
     //check if w is inside the arm
-    if ( w[1] >= 0)
+    if ( W.YY >= 0 )
     {
         nrmSq = 0;
-        if ( w[1] > tArmLength+tRadius )
-            nrmSq = square(w[1] - (tArmLength+tRadius));
+        if ( W.YY > tArmLength+tRadius )
+            nrmSq = square(W.YY - (tArmLength+tRadius));
 #if ( DIM == 2 )
-        nrmSq += xRel*xRel;
-#elif ( DIM >= 3 )
-        nrmSq += xRel*xRel + w[2]*w[2];
+        nrmSq += square(xRel);
+#elif ( DIM > 2 )
+        nrmSq += square(xRel) + square(W.ZZ);
 #endif
         return( nrmSq <= tRadiusSq );
     }
+#endif
     
-    return( false );
+    return false;
 }
 
 
 //------------------------------------------------------------------------------
-real SpaceTee::projectOnBase(const Vector w, Vector& p) const
+real SpaceTee::projectOnBase(const Vector W, Vector& P) const
 {
     real scale, nrm = 0;
-#if ( DIM > 2 )
-    nrm = w[1]*w[1] + w[2]*w[2];
-#elif ( DIM > 1 )
-    nrm = w[1]*w[1];
+#if ( DIM == 2 )
+    nrm = square(W.YY);
+#elif ( DIM > 2 )
+    nrm = square(W.YY) + square(W.ZZ);
 #endif
-    if ( w[0] >  tLength )
-        nrm += square(w[0] - tLength);
-    else if ( w[0] < -tLength )
-        nrm += square(w[0] + tLength);
+    if ( W.XX >  tLength )
+        nrm += square(W.XX - tLength);
+    else if ( W.XX < -tLength )
+        nrm += square(W.XX + tLength);
     
     if ( nrm > 0 ) {
         nrm   = sqrt(nrm);
@@ -127,43 +129,46 @@ real SpaceTee::projectOnBase(const Vector w, Vector& p) const
         scale = 0;
     }
     
-    if ( w[0] >  tLength )
-        p[0] =  tLength + scale*(w[0] - tLength);
-    else if ( w[0] < -tLength )
-        p[0] = -tLength + scale*(w[0] + tLength);
+    real pX, pY;
+    
+    if ( W.XX >  tLength )
+        pX =  tLength + scale*(W.XX - tLength);
+    else if ( W.XX < -tLength )
+        pX = -tLength + scale*(W.XX + tLength);
     else
-        p[0] = w[0];
+        pX = W.XX;
     
     if ( scale != 0 )
-        p[1] = scale*w[1];
+        pY = scale*W.YY;
     else
-        p[1] = tRadius;
+        pY = tRadius;
     
 #if ( DIM > 2 )
-    p[2] = scale*w[2];
+    real pZ = scale*W.ZZ;
 #endif
     
+    P.set(pX, pY, pZ);
     return( abs_real(nrm - tRadius) );
 }
 
 
 //------------------------------------------------------------------------------
-real SpaceTee::projectOnArm(const Vector w, Vector& p) const
+real SpaceTee::projectOnArm(const Vector W, Vector& P) const
 {
     real  scale, nrm = 0;
     const real totArmLength = tArmLength+tRadius;
-    const real xRel         = (w[0] - tJunction);
+    const real xRel         = (W.XX - tJunction);
     
-    //this projection is only valid for w[1] >= 0
-    assert_true( w[1] >= 0 );
+    //this projection is only valid for W.YY >= 0
+    assert_true( W.YY >= 0 );
     
 #if ( DIM == 2 )
-    nrm = xRel*xRel;
+    nrm = square(xRel);
 #elif ( DIM > 2 )
-    nrm = xRel*xRel + w[2]*w[2];
+    nrm = square(xRel) + square(W.ZZ);
 #endif
-    if ( w[1] > totArmLength )
-        nrm += square(w[1]-totArmLength);
+    if ( W.YY > totArmLength )
+        nrm += square(W.YY-totArmLength);
     
     if ( nrm > 0 ) {
         nrm   = sqrt(nrm);
@@ -174,29 +179,31 @@ real SpaceTee::projectOnArm(const Vector w, Vector& p) const
         scale = 0;
     }
     
+    real pX, pY;
     if ( scale != 0 )
-        p[0] = tJunction + scale*xRel;
+        pX = tJunction + scale*xRel;
     else
-        p[0] = tJunction + tRadius;
+        pX = tJunction + tRadius;
     
-    if ( w[1] > totArmLength )
-        p[1] = totArmLength + scale*(w[1]-totArmLength);
+    if ( W.YY > totArmLength )
+        pY = totArmLength + scale*(W.YY-totArmLength);
     else
-        p[1] = w[1];
+        pY = W.YY;
     
 #if ( DIM > 2 )
-    p[2] = scale*w[2];
+    real pZ = scale*W.ZZ;
 #endif
-    
+    P.set(pX, pY, pZ);
     return( abs_real(nrm - tRadius) );
 }
 
 
 //------------------------------------------------------------------------------
-void SpaceTee::projectOnInter(const Vector w, Vector& p) const
+void SpaceTee::projectOnInter(const Vector W, Vector& P) const
 {
-    const real xRel = (w[0] - tJunction);
-    
+    const real xRel = (W.XX - tJunction);
+    real pX, pY, pZ;
+
 #if ( DIM == 2 )
     //Points in the intersection area are projected to the corners or to the bottom.
     //The parameterisation of the line of equal distance between a line and a point
@@ -207,28 +214,28 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
     //For yl = -tRadius, yp = tRadius and xp = +-tRadius we get
     //            yi(t) = (+-tRadius - t)^2 / 4tWidth
     
-    if ( w[0] <= tJunction ) {
-        if ( w[1] >= (square(-tRadius - xRel)/(4.*tRadius)) ) {
+    if ( W.XX <= tJunction ) {
+        if ( W.YY >= (square(-tRadius - xRel)/(4.*tRadius)) ) {
             //w is projected on the corner
-            p[0] =  tJunction-tRadius;
-            p[1] =  tRadius;
+            pX =  tJunction-tRadius;
+            pY =  tRadius;
         }
         else {
             //w is projected on the bottom of the base cylinder
-            p[0] =  w[0];
-            p[1] = -tRadius;
+            pX =  W.XX;
+            pY = -tRadius;
         }
     }
     else {
-        if ( w[1] >= (square(tRadius - xRel)/(4.*tRadius)) ) {
+        if ( W.YY >= (square(tRadius - xRel)/(4.*tRadius)) ) {
             //w is projected on the corner
-            p[0] =  tJunction+tRadius;
-            p[1] =  tRadius;
+            pX =  tJunction+tRadius;
+            pY =  tRadius;
         }
         else {
             //w is projected on the bottom of the base cylinder
-            p[0] =  w[0];
-            p[1] = -tRadius;
+            pX =  W.XX;
+            pY = -tRadius;
         }
     }
 #endif
@@ -240,25 +247,18 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
     //      b = tRadius
     
     //check for pathological cases
-    if ( w[0] == 0 ) {
+    if ( W.XX == 0 ) {
         //The point lies on the short half axis "b" and is
         //always projected to x=0 and z=b or z=-b
-        p[0] = 0;
-        p[1] = 0;
-        p[2] = std::copysign(tRadius, w[2]);
+        P.set(0,0,std::copysign(tRadius, W.ZZ));
         return;
     }
-    
+    M_PI;
     //turn the point, so that the intersection ellipse is in the xz-plane
-    real   xTurned;
-    if ( xRel >= 0 )
-        xTurned   =  (xRel + w[1]) / sqrt(2);
-    else
-        xTurned   =  (xRel - w[1]) / sqrt(2);
-    
+    real xTurned = ( xRel + std::copysign(W.YY, xRel) ) * M_SQRT1_2;
     real xTurnedSq = square(xTurned);
     
-    if ( w[2] == 0 ) {
+    if ( W.ZZ == 0 ) {
         //The point lies on the long halfaxis "a".
         //In this case the quartic has exactly three solutions, two of which are
         //trivially known: x1=+a or x2=-a, since the half axis are perpendicular
@@ -267,20 +267,18 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
         
         //if |x| > a/2, the closest perpendicular projection is on the tips,
         //otherwise the closest projection is solution x3
-        if ( abs_real(xTurned)*sqrt(2) > tRadius ) {
+        if ( abs_real(xTurned)* M_SQRT2 > tRadius ) {
             //we set the final points, already turned back
-            p[0] = std::copysign(tRadius, xTurned) + tJunction;
-            p[1] = tRadius;
-            p[2] = 0;
+            pX = std::copysign(tRadius, xTurned) + tJunction;
+            pY = tRadius;
+            pZ = 0;
         }
         else {
-            p[0] = xTurned*sqrt(2) + tJunction;
-            p[1] = abs_real(xTurned)*sqrt(2);
+            pX = xTurned*M_SQRT2 + tJunction;
+            pY = abs_real(xTurned)*M_SQRT2;
             //we randomly distribute the points to +z or -z
-            p[2] = RNG.sflip()*sqrt(tRadiusSq - 2.*xTurnedSq);
+            pZ = RNG.sflip()*sqrt(tRadiusSq - 2*xTurnedSq);
         }
-        return;
-        
     }
     else {
         real s1, s2, s3, s4;     // solutions of the quartic
@@ -288,9 +286,9 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
         real   xSol, xSolTurned; // the correct solutions of the quartic and of x
         
         // solve the quartic
-        nSol = QuarticSolver::solveQuartic(1, 6, (13-   (2*xTurnedSq +   w[2]*w[2]) / tRadiusSq),
-                                                 (12- 4*(  xTurnedSq +   w[2]*w[2]) / tRadiusSq),
-                                                   4- 2*(  xTurnedSq + 2*w[2]*w[2]) / tRadiusSq,
+        nSol = QuarticSolver::solveQuartic(1, 6, (13-   (2*xTurnedSq +   W.ZZ*W.ZZ) / tRadiusSq),
+                                                 (12- 4*(  xTurnedSq +   W.ZZ*W.ZZ) / tRadiusSq),
+                                                   4- 2*(  xTurnedSq + 2*W.ZZ*W.ZZ) / tRadiusSq,
                                                   s1, s2, s3, s4);
         
         if ( nSol < 1 )
@@ -300,31 +298,29 @@ void SpaceTee::projectOnInter(const Vector w, Vector& p) const
         xSolTurned = 2.*xTurned/(s1 + 2.);
         
         // turn the point back to it's original position
-        xSol = xSolTurned / sqrt(2);
-        p[0] = xSol + tJunction;
-        p[1] = abs_real(xSol);
-        if ( w[2] > 0 )
-            p[2] =  sqrt( tRadiusSq - xSol*xSol );
-        else
-            p[2] = -sqrt( tRadiusSq - xSol*xSol );
+        xSol = xSolTurned * M_SQRT1_2;
+        pX = xSol + tJunction;
+        pY = abs_real(xSol);
+        pZ = std::copysign(sqrt(tRadiusSq-xSol*xSol), W.ZZ);
     }
+    P.set(pX,pY,pZ);
 #endif
 }
 
 
 //------------------------------------------------------------------------------
-Vector SpaceTee::project(Vector const& w) const
+Vector SpaceTee::project(Vector const& W) const
 {
-    Vector p;
-    const real xRel = (w[0] - tJunction); //the x coordinate of w
+    Vector P(W);
+    const real xRel = (W.XX - tJunction); //the x coordinate of w
                                           //relative to tJunction
-    if ( inside(w) )
+    if ( inside(W) )
     {
 #if ( DIM == 2 )
-        if ( w[1] > tRadius ) {
+        if ( W.YY > tRadius ) {
             //w is inside the arm
             projectOnArm(w, p);
-        } else if ( (xRel >= -tRadius) && (xRel <= tRadius) && (w[1] >= 0) ) {
+        } else if ( (xRel >= -tRadius) && (xRel <= tRadius) && (W.YY >= 0) ) {
             //w is inside the intersection area
             projectOnInter(w, p);
         }
@@ -335,10 +331,10 @@ Vector SpaceTee::project(Vector const& w) const
 #endif
         
 #if ( DIM > 2 )
-        if (  (xRel >  tRadius)
+        if ( (xRel >  tRadius)
               || (xRel < -tRadius)
-              || (w[1] < 0)
-              || (w[1]*w[1]*(tRadiusSq - xRel*xRel) < xRel*xRel*w[2]*w[2]) )
+              || (W.YY < 0)
+              || (W.YY*W.YY*(tRadiusSq - xRel*xRel) < square(xRel*W.ZZ)) )
         {
             //w is projected on the base cylinder, if 
             //    the point is on the right side of the arm
@@ -347,17 +343,17 @@ Vector SpaceTee::project(Vector const& w) const
             //or  the y coordinate of the point is low enough, so that it can
             //    be projected perpendicularly on the base cylinder:
             //    y < z |xRel| / sqrt( tRadius^2 - xRel^2 )
-            projectOnBase(w, p);
-        } else if ( w[1]*w[1]*(xRel*xRel + w[2]*w[2]) > xRel*xRel*tRadiusSq ) {
+            projectOnBase(W, P);
+        } else if ( square(W.YY*xRel) + square(W.YY*W.ZZ) > square(xRel*tRadius) ) {
             //w is projected on the arm, if
             //the y coordinate of the point is greater than the y coordinate of
             //the corresponding point on the intersection ellipse:
             //y > r |xRel| / sqrt( xRel^2 + z^2 )
-            projectOnArm(w, p);
+            projectOnArm(W, P);
         }
         else {
             //w is projected on the intersection ellipse
-            projectOnInter(w, p);
+            projectOnInter(W, P);
         }
 #endif
         
@@ -367,19 +363,19 @@ Vector SpaceTee::project(Vector const& w) const
         //point w is outside the tee
         
         Vector pArm;                      //projection of w on the arm
-        real dBase = projectOnBase(w, p); //distance of w to the base cylinder
+        real dBase = projectOnBase(W, P); //distance of w to the base cylinder
         
         //all points with y<0 are projected on the base cylinder
-        if ( w[1] >= 0 )
+        if ( W.YY >= 0 )
         {
             //check if w is closer to base or arm
-            if ( dBase <= projectOnArm(w, pArm) )
-                return p;
+            if ( dBase <= projectOnArm(W, pArm) )
+                return P;
             else
                 return pArm;
         }
     }
-    return p;
+    return P;
 }
 
 

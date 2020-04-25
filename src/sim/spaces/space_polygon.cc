@@ -102,14 +102,14 @@ void SpacePolygon::update()
 }
 
 
-bool SpacePolygon::inside(Vector const& w) const
+bool SpacePolygon::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    if ( abs_real(w.ZZ) > height_ )
+    if ( abs_real(W.ZZ) > height_ )
         return false;
 #endif
 #if ( DIM > 1 )
-    return poly_.inside(w.XX, w.YY, 1);
+    return poly_.inside(W.XX, W.YY, 1);
 #else
     return false;
 #endif
@@ -124,56 +124,52 @@ Vector SpacePolygon::randomPlace() const
 }
 
 
-Vector SpacePolygon::project(Vector const& w) const
+Vector SpacePolygon::project(Vector const& W) const
 {
-    Vector p;
-#if ( DIM == 1 )
-    
-    p.XX = w.XX;
-    
-#elif ( DIM == 2 )
+    Vector P(W);
+#if ( DIM == 2 )
     
     size_t hit;
-    poly_.project(w.XX, w.YY, p.XX, p.YY, hit);
+    poly_.project(W.XX, W.YY, P.XX, P.YY, hit);
     
 #elif ( DIM > 2 )
     
-    if ( abs_real(w.ZZ) > height_ )
+    if ( abs_real(W.ZZ) > height_ )
     {
-        if ( poly_.inside(w.XX, w.YY, 1) )
+        if ( poly_.inside(W.XX, W.YY, 1) )
         {
             // too high or too low in the Z axis, but inside XY
-            p.XX = w.XX;
-            p.YY = w.YY;
+            P.XX = W.XX;
+            P.YY = W.YY;
         }
         else
         {
             // outside in Z and XY
             size_t hit;
-            poly_.project(w.XX, w.YY, p.XX, p.YY, hit);
+            poly_.project(W.XX, W.YY, P.XX, P.YY, hit);
         }
-        p.ZZ = std::copysign(height_, w.ZZ);
+        P.ZZ = std::copysign(height_, W.ZZ);
     }
     else
     {
         size_t hit;
-        poly_.project(w.XX, w.YY, p.XX, p.YY, hit);
-        if ( poly_.inside(w.XX, w.YY, 1) )
+        poly_.project(W.XX, W.YY, P.XX, P.YY, hit);
+        if ( poly_.inside(W.XX, W.YY, 1) )
         {
             // inside in the Z axis and the XY polygon:
             // to the polygonal edge in XY plane:
-            real hh = (w.XX-p.XX)*(w.XX-p.XX) + (w.YY-p.YY)*(w.YY-p.YY);
+            real hh = (W.XX-P.XX)*(W.XX-P.XX) + (W.YY-P.YY)*(W.YY-P.YY);
             // to the top/bottom plates:
-            real v = height_ - abs_real(w.ZZ);
+            real v = height_ - abs_real(W.ZZ);
             // compare distances
             if ( v * v < hh )
-                return Vector(w.XX, w.YY, std::copysign(height_, w.ZZ));
+                return Vector(W.XX, W.YY, std::copysign(height_, W.ZZ));
         }
-        p.ZZ = w.ZZ;
+        P.ZZ = W.ZZ;
     }
     
 #endif
-    return p;
+    return P;
 }
 
 

@@ -51,27 +51,27 @@ real SpaceCylinder::volume() const
 }
 
 
-bool SpaceCylinder::inside(Vector const& w) const
+bool SpaceCylinder::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( abs_real(w.XX) < length_  &&  RT <= radius_ * radius_ );
+    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    return ( abs_real(W.XX) < length_  &&  RT <= radius_ * radius_ );
 #elif ( DIM > 1 )
-    return ( abs_real(w.XX) < length_  &&  abs_real(w.YY) <= radius_ );
+    return ( abs_real(W.XX) < length_  &&  abs_real(W.YY) <= radius_ );
 #else
     return false;
 #endif
 }
 
 
-bool SpaceCylinder::allInside(Vector const& w, const real rad) const
+bool SpaceCylinder::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT = w.YY * w.YY + w.ZZ * w.ZZ;
-    return ( abs_real(w.XX) + rad < length_  &&  RT <= square(radius_-rad) );
+    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    return ( abs_real(W.XX) + rad < length_  &&  RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
-    return ( abs_real(w.XX) + rad < length_  &&  abs_real(w.YY) <= radius_-rad );
+    return ( abs_real(W.XX) + rad < length_  &&  abs_real(W.YY) <= radius_-rad );
 #else
     return false;
 #endif
@@ -91,40 +91,40 @@ Vector SpaceCylinder::randomPlace() const
 }
 
 //------------------------------------------------------------------------------
-Vector SpaceCylinder::project(Vector const& w) const
+Vector SpaceCylinder::project(Vector const& W) const
 {
-    Vector p = w;
+    Vector P(W);
 #if ( DIM >= 3 )
     bool in = true;
-    if ( abs_real(w.XX) > length_ )
+    if ( abs_real(W.XX) > length_ )
     {
-        p.XX = std::copysign(length_, w.XX);
+        P.XX = std::copysign(length_, W.XX);
         in = false;
     }
     
-    real n = w.normYZ();
+    real n = W.normYZ();
     
     if ( n > radius_ )
     {
         n = radius_ / n;
-        p.YY = n * w.YY;
-        p.ZZ = n * w.ZZ;
+        P.YY = n * W.YY;
+        P.ZZ = n * W.ZZ;
     }
     else if ( in )
     {
-        if ( length_ - abs_real(w.XX) < radius_ - n )
+        if ( length_ - abs_real(W.XX) < radius_ - n )
         {
-            p.XX = std::copysign(length_, w.XX);
+            P.XX = std::copysign(length_, W.XX);
         }
         else
         {
             n = radius_ / n;
-            p.YY = n * w.YY;
-            p.ZZ = n * w.ZZ;
+            P.YY = n * W.YY;
+            P.ZZ = n * W.ZZ;
         }
     }
 #endif
-    return p;
+    return P;
 }
 
 //------------------------------------------------------------------------------

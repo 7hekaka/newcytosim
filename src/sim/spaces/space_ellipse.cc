@@ -9,7 +9,7 @@
 SpaceEllipse::SpaceEllipse(SpaceProp const* p)
 : Space(p)
 {
-#ifdef HAS_SPHEROID
+#ifdef ELLIPSE_HAS_SPHEROID
     mSpheroid = -1;
 #endif
     for ( int d = 0; d < 3; ++d )
@@ -22,7 +22,7 @@ void SpaceEllipse::update()
     for ( unsigned d = 0; d < DIM; ++d )
         lengthSqr_[d] = square(length_[d]);
     
-#if ( DIM > 2 ) && defined HAS_SPHEROID
+#if ( DIM > 2 ) && defined ELLIPSE_HAS_SPHEROID
     mSpheroid = -1;
     
     // if any two dimensions are similar, then the ellipsoid is a spheroid
@@ -85,9 +85,9 @@ real SpaceEllipse::volume() const
     return 2 * length_[0];
 }
 
-bool SpaceEllipse::inside(Vector const& w) const
+bool SpaceEllipse::inside(Vector const& W) const
 {
-    return abs_real(w.XX) < length_[0];
+    return abs_real(W.XX) < length_[0];
 }
 
 #elif ( DIM == 2 )
@@ -97,52 +97,50 @@ real SpaceEllipse::volume() const
     return M_PI * length_[0] * length_[1];
 }
 
-bool SpaceEllipse::inside(Vector const& w) const
+bool SpaceEllipse::inside(Vector const& W) const
 {
-    return square(w.XX/length_[0]) + square(w.YY/length_[1]) <= 1;
+    return square(W.XX/length_[0]) + square(W.YY/length_[1]) <= 1;
 }
 
 #else
 
 real SpaceEllipse::volume() const
 {
-    return 4*M_PI/3.0 * length_[0] * length_[1] * length_[2];
+    constexpr real C = 4 * M_PI / 3.0;
+    return (C * length_[0]) * (length_[1] * length_[2]);
 }
 
-bool SpaceEllipse::inside(Vector const& w) const
+bool SpaceEllipse::inside(Vector const& W) const
 {
-    return square(w.XX/length_[0]) + square(w.YY/length_[1]) + square(w.ZZ/length_[2]) <= 1;
+    return square(W.XX/length_[0]) + square(W.YY/length_[1]) + square(W.ZZ/length_[2]) <= 1;
 }
 
 #endif
 
 
-Vector1 SpaceEllipse::project1D(Vector1 const& w) const
+Vector1 SpaceEllipse::project1D(Vector1 const& W) const
 {
-    if ( w.XX >= 0 )
+    if ( W.XX >= 0 )
         return Vector1(length_[0], 0, 0);
     else
         return Vector1(-length_[0], 0, 0);
 }
 
 
-Vector2 SpaceEllipse::project2D(Vector2 const& w) const
+Vector2 SpaceEllipse::project2D(Vector2 const& W) const
 {
-    Vector2 p;
-    projectEllipse(p.XX, p.YY, w.XX, w.YY, length_[0], length_[1]);
-#if ( 0 )
+    Vector2 P(W);
+    projectEllipse(P.XX, P.YY, W.XX, W.YY, length_[0], length_[1]);
     // check that results are valid numbers:
-    assert_true(p[0]==p[0]);
-    assert_true(p[1]==p[1]);
-#endif
-    return p;
+    assert_true(P.valid());
+    return P;
 }
 
 
-Vector3 SpaceEllipse::project3D(Vector3 const& w) const
+Vector3 SpaceEllipse::project3D(Vector3 const& W) const
 {
-    Vector3 p;
-#if ( DIM > 2 ) && defined HAS_SPHEROID
+    Vector3 P(W);
+#if ( DIM > 2 ) && defined ELLIPSE_HAS_SPHEROID
     /*
      If the ellipsoid has two equal axes, we can reduce the problem to 2D,
      because it is symmetric by rotation around the remaining axis, which
@@ -158,31 +156,24 @@ Vector3 SpaceEllipse::project3D(Vector3 const& w) const
             throw InvalidParameter("Inconsistent mSpheroid dimensions");
         
         //rotate point around the xx axis to bring it into the yy-zz plane:
-        real pR, rr = sqrt( w[xx]*w[xx] + w[yy]*w[yy] );
-        projectEllipse(pR, p[zz], rr, w[zz], length(xx), length(zz), 8*REAL_EPSILON);
+        real pR, rr = sqrt( W[xx]*W[xx] + W[yy]*W[yy] );
+        projectEllipse(pR, P[zz], rr, W[zz], length(xx), length(zz), 8*REAL_EPSILON);
         // back-rotate to get the projection in 3D:
         if ( rr > 0 ) {
             real s = pR / rr;
-            p[xx] = w[xx] * s;
-            p[yy] = w[yy] * s;
+            P[xx] = W[xx] * s;
+            P[yy] = W[yy] * s;
         }
         else {
-            p[xx] = 0;
-            p[yy] = 0;
+            P[xx] = 0;
+            P[yy] = 0;
         }
         return;
     }
 #endif
     
-    projectEllipsoid(p.data(), w.data(), length_);
-    
-#if ( 0 )
-    // check that results are valid numbers:
-    assert_true(p[0]==p[0]);
-    assert_true(p[1]==p[1]);
-    assert_true(p[2]==p[2]);
-#endif
-    return p;
+    projectEllipsoid(P.data(), W.data(), length_);
+    return P;
 }
 
 

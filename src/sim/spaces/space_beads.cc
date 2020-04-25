@@ -97,15 +97,13 @@ real SpaceBeads::volume() const
 }
 
 
-bool SpaceBeads::inside(Vector const& point) const
+bool SpaceBeads::inside(Vector const& pos) const
 {
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        if ( point[d] < bbMin[d] ) return false;
-        if ( bbMax[d] < point[d] ) return false;
+        if ( pos[d] < bbMin[d] ) return false;
+        if ( bbMax[d] < pos[d] ) return false;
     }
-    
-    Vector pos(point);
     
     for ( Bead * i : mBeads )
         if ( distanceSqr(pos, i->position()) < i->radiusSqr() )

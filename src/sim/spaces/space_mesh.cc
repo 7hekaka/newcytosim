@@ -52,19 +52,19 @@ void SpaceMesh::resize(Glossary& opt)
 }
 
 
-bool SpaceMesh::inside(Vector const& w) const
+bool SpaceMesh::inside(Vector const& W) const
 {
 #if COMPLETE_SPACE_MESH
-    return mMesh.inside(w.XX, w.YY, w.ZZ);
+    return mMesh.inside(W.XX, W.YY, W.ZZ);
 #endif
     return true;
 }
 
 
-Vector SpaceMesh::project(Vector const& w) const
+Vector SpaceMesh::project(Vector const& W) const
 {
 #if COMPLETE_SPACE_MESH
-    return mMesh.project(w);
+    return mMesh.project(W);
 #endif
     return Vector(0,0,0);
 }

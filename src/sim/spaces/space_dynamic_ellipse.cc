@@ -235,7 +235,7 @@ real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& ra
  */
 Vector SpaceDynamicEllipse::tension_forces() const
 {
-    Vector res;
+    Vector res(0,0,0);
 
 #if ( DIM == 2 )
 
