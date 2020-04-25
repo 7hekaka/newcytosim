@@ -191,7 +191,7 @@ private:
     {
         for ( auto const& kv : dict )
         {
-            // accept both the named-value of the ascii representation of the value
+            // accept both the named-value and the representation of the value
             if ( val == kv.first || val == std::to_string(kv.second) )
             {
                 var = kv.second;

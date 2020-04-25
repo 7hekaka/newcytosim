@@ -62,21 +62,17 @@ namespace LinearSolvers
         /// true if achieve residual < residual threshold
         bool converged() const { return res_ < target_; }
         
-        /// check given residual and return true if threshold is achieved
+        /// register given residual and return true if target is achieved
         bool finished(real res)
         {
             res_ = res;
-            
-            if ( cnt_ > limit_ )
-                return true;
-            
-            return ( res < target_ );
+            return ( res < target_ ) | ( cnt_ > limit_ );
         }
 
         /// calculate residual from `x` and return true if threshold is achieved
         bool finished(size_t size, const real* x)
         {
-            //fprintf(stderr, "Solver %4lu residual %9.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
+            //fprintf(stderr, "Solver %4lu residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
 #if ( 1 )
             // use the 'infinite' norm (i.e. the largest element)
             real res = blas::nrm8(size, x);
@@ -84,6 +80,7 @@ namespace LinearSolvers
             // use the standard Euclidian norm:
             real res = blas::nrm2(size, x);
 #endif
+            //fprintf(stderr, "Solver %4lu  isnan %i residual %12.6f\n", cnt_, isnan(size, x), res);
 #if ( 1 )
             // monitor convergence: the residual from a linear solver may occasionally 
             if ( 1 == (16&cnt_) )
@@ -97,13 +94,11 @@ namespace LinearSolvers
                 cntOld_ = cnt_;
             }
 #endif
-            
             if ( res != res )
             {
                 fprintf(stderr, "Solver diverged at step %3lu (residual is not a number)\n", cnt_);
                 return true;
             }
-            
             return finished(res);
         }
 

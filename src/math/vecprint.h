@@ -19,7 +19,7 @@ namespace VecPrint
         else
         {
             char str[32], fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
             for ( size_t i = 0; i < m; ++i )
             {
                 snprintf(str, sizeof(str), fmt, vec[i]);
