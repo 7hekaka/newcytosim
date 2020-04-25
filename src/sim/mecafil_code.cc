@@ -1,7 +1,6 @@
 //  Cytosim was created by Francois Nedelec.
 //  Copyright FJN 2020 Sainsbury Laboratory, Cambridge University
 
-
 /**
  This will perform:
 
@@ -169,7 +168,7 @@ void projectForcesD_PTR(size_t nbs, const real* dif,
  */
 inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real const*const end = mul + nbs - 1;
+    real const*const end = mul - 1 + nbs;
 
     vec2 y, x = load2(src);
     while ( mul < end )
@@ -229,7 +228,7 @@ void projectForcesD2D_SSE(size_t nbs, const real* dif,
  */
 void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real const*const end = mul + nbs - 3;
+    real const*const end = mul - 3 + nbs;
 
     while ( mul < end )
     {
@@ -274,7 +273,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
     vec4 cc = setzero4();
     
     const bool odd = ( nbs & 1 );
-    real const*const end = mul + nbs - odd;
+    real const*const end = mul - odd + nbs;
     
     while ( mul < end )
     {
@@ -322,7 +321,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
 /// FJN @ Strasbourg, 17 and 18.04.2020
 void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real *const end = mul + nbs - 3;
+    const real *const end = mul - 3 + nbs;
     while ( mul < end )
     {
         /*
@@ -355,7 +354,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
               + dif[2] * ( src[DIM+2] - src[2] );
          */
         vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+3), loadu4(src)));
-        vec4 s1 = mul4(load4(dif+4), sub4(broadcast1(src+7), loadu4(src+4)));
+        vec4 s1 = mul4(load4(dif+4), sub4(cast4(loadu2(src+7)), loadu4(src+4)));
 
         vec4 xy = blend4(s0, s1, 0b1100);
         vec4 zx = permute2f128(s0, s0, 0x21);
@@ -385,7 +384,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         dif += 3;
         ++mul;
     }
-    assert_true(mul==end);
+    assert_true(mul==end+3);
 }
 
 
@@ -396,7 +395,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
  */
 void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
 {
-    const real* const end = mul + nbs - 3;
+    const real* const end = mul - 3 + nbs;
     /*
      This follows the standard pattern defined below, except
      that the negative terms are not present on the first vector.
@@ -467,7 +466,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
     if ( nbs < 4 )
     {
         mm = setzero4();
-        dd = broadcast1(dif);
+        dd = blend4(mm, broadcast1(dif), 0b1000);
     }
     else
     {
@@ -488,7 +487,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             m2 = blend4(m2, p2, 0b1110);
             p2 = blend4(p2, setzero4(), 0b1110);
             
-            mul += 4;
+            mul += 3;
             vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
             vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
             vec4 a2 = fmadd4(p2, broadcast1(dif+8), loadu4(src+8));
@@ -496,7 +495,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
             storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
-            dif += 12; dst += 12; src += 12;
+            //dif += 12; dst += 12; src += 12;
         } break;
         case 1: {
             // 3 vectors remaining
@@ -507,9 +506,9 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             m1 = blend4(m1, m2, 0b1100);
             vec4 p1 = blend4(m2, setzero4(), 0b1100);
             
-            mul += 3;
+            mul += 2;
             vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-            vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
+            vec4 a1 = fmadd4(p1, cast4(load2(dif+4)), loadu4(src+4));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
@@ -522,8 +521,8 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             vec4 m0 = blend4(mm, m1, 0b1000);
             vec4 p0 = blend4(m1, setzero4(), 0b1000);
             
-            mul += 2;
-            vec4 a0 = fmadd4(p0, load4(dif), loadu4(src));
+            mul += 1;
+            vec4 a0 = fmadd4(p0, load3(dif), loadu4(src));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), loadu2(src+4)));
@@ -531,13 +530,13 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         } break;
         case 3: {
             // 1 vector remaining
-            ++mul;
             store3(dst, fnmadd4(mm, dd, load3(src)));
             //dif += 3; dst += 3; src += 3;
         } break;
         default:
             printf("unexpected case in projectForcesD3D_AVX!");
     }
+    assert_true( mul == end+3 );
 }
 
 #endif
