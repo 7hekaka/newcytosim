@@ -29,35 +29,33 @@ class Vector2;
  allowing easy conversion operators to and from C-array.
  Although this is not guaranteed by the C-standard, this is usually the case.
  */
-#if VECTOR3_USES_AVX
-class alignas(32) Vector3
-#else
 class Vector3
-#endif
 {
     
 public:
     
     /// dimensionality is 3
-    static unsigned dimensionality() { return 3; }
+    static size_t dimensionality() { return 3; }
     
     /// coordinates are public
+#if VECTOR3_USES_AVX
     union {
         struct {
             real XX;
             real YY;
             real ZZ;
-#if VECTOR3_USES_AVX
             real TT;
         };
         vec4 vec;
-#else
-        };
-#endif
     };
+#else
+    real XX;
+    real YY;
+    real ZZ;
+#endif
 
     /// by default, coordinates are not initialized
-    Vector3() {}
+    Vector3() { }
 
 #if VECTOR3_USES_AVX
     /// construct from 3 values
@@ -65,22 +63,22 @@ public:
     
     /// construct from address
     Vector3(const real v[]) : vec(load3(v)) {}
-
-    /// construct from SIMD vector
-    Vector3(vec4 const& v) { vec = v; }
-
-    /// conversion to SIMD vector
-    operator vec4 () const { return vec; }
 #else
     /// construct from 3 values
     Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
 
     /// construct from address
     Vector3(const real v[]) : XX(v[0]), YY(v[1]), ZZ(v[2]) {}
+#endif
 
+#if VECTOR3_USES_AVX
+    /// construct from SIMD vector
+    Vector3(vec4 const& v) : vec(v) { }
+    /// conversion to SIMD vector
+    operator vec4 () const { return vec; }
+#elif defined(__AVX__) && REAL_IS_DOUBLE
     /// conversion to SIMD vector
     operator vec4 () const { return load3(&XX); }
-
     /// construct from SIMD vector
     Vector3(vec4 const& v) { XX = v[0]; YY = v[1]; ZZ = v[2]; }
 #endif
@@ -426,15 +424,18 @@ public:
     }
     
     /// true if no component is NaN
-    bool is_valid() const
+    bool valid() const
     {
-        return ( XX == XX ) && ( YY == YY ) && ( ZZ == ZZ );
+#if VECTOR3_USES_AVX
+        if ( vec[3] != 0 ) return false;
+#endif
+        return ( XX == XX ) & ( YY == YY ) & ( ZZ == ZZ );
     }
     
     /// true if some component is not zero
     bool is_not_zero() const
     {
-        return ( XX || YY || ZZ );
+        return ( XX != 0.0 ) | ( YY != 0.0 ) | ( ZZ != 0.0 );
     }
 
     /// scale to unit norm
@@ -863,6 +864,7 @@ public:
     {
         std::ostringstream oss;
         oss.precision(p);
+        oss.setf(std::ios::showpos);
         oss << std::setw(w) << XX << " ";
         oss << std::setw(w) << YY << " ";
         oss << std::setw(w) << ZZ;

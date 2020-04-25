@@ -26,19 +26,16 @@
  allowing easy conversion operators to and from C-array.
  Although this is not guaranteed by the C-standard, this is usually the case.
  */
-#if VECTOR4_USES_AVX
-class alignas(32) Vector4
-#else
 class Vector4
-#endif
 {
     
 public:
     
     /// dimensionality is 4
-    static unsigned dimensionality() { return 4; }
+    static size_t dimensionality() { return 4; }
     
     /// coordinates are public
+#if VECTOR4_USES_AVX
     union {
         struct {
             real XX;
@@ -46,11 +43,15 @@ public:
             real ZZ;
             real TT;
         };
-#if VECTOR4_USES_AVX
         vec4 vec;
-#endif
     };
-    
+#else
+    real XX;
+    real YY;
+    real ZZ;
+    real TT;
+#endif
+
     /// by default, coordinates are not initialized
     Vector4() {}
     
@@ -127,7 +128,7 @@ public:
     void load(const double b[])
     {
 #if VECTOR4_USES_AVX
-        vec = load4(b);
+        vec = loadu4(b);
 #else
         XX = b[0];
         YY = b[1];
@@ -215,10 +216,14 @@ public:
     /// copy coordinates to given array
     void store(double b[]) const
     {
+#if VECTOR4_USES_AVX
+        storeu4(b, vec);
+#else
         b[0] = (double)XX;
         b[1] = (double)YY;
         b[2] = (double)ZZ;
         b[3] = (double)TT;
+#endif
     }
     
     /// add content to given address
@@ -388,15 +393,15 @@ public:
     }
     
     /// true if no component is NaN
-    bool is_valid() const
+    bool valid() const
     {
-        return ( XX == XX ) && ( YY == YY ) && ( ZZ == ZZ ) && ( TT == TT );
+        return ( XX == XX ) & ( YY == YY ) & ( ZZ == ZZ ) & ( TT == TT );
     }
     
     /// true if some component is not zero
     bool is_not_zero() const
     {
-        return ( XX || YY || ZZ || TT );
+        return ( XX != 0.0 ) | ( YY != 0.0 ) | ( ZZ != 0.0 ) | ( TT != 0.0 );
     }
     
     /// scale to unit norm
@@ -630,6 +635,7 @@ public:
     {
         std::ostringstream oss;
         oss.precision(p);
+        oss.setf(std::ios::showpos);
         oss << std::setw(w) << XX << " ";
         oss << std::setw(w) << YY << " ";
         oss << std::setw(w) << ZZ << " ";

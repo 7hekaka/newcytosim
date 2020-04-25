@@ -32,19 +32,22 @@ class Vector2
 public:
     
     /// dimensionality is 2
-    static unsigned dimensionality() { return 2; }
+    static size_t dimensionality() { return 2; }
     
     /// coordinates are public
+#if VECTOR2_USES_SSE
     union {
         struct {
             real XX;
             real YY;
         };
-#if VECTOR2_USES_SSE
         vec2 vec;
-#endif
     };
-    
+#else
+    real XX;
+    real YY;
+#endif
+
     /// by default, coordinates are not initialized
     Vector2() {}
     
@@ -375,15 +378,15 @@ public:
     }
     
     /// true if no component is NaN
-    bool is_valid() const
+    bool valid() const
     {
-        return ( XX == XX ) && ( YY == YY );
+        return ( XX == XX ) & ( YY == YY );
     }
     
     /// true if some component is not zero
     bool is_not_zero() const
     {
-        return ( XX || YY );
+        return ( XX != 0.0 ) | ( YY != 0.0 );
     }
     
     /// scale to unit norm
@@ -656,6 +659,7 @@ public:
     {
         std::ostringstream oss;
         oss.precision(p);
+        oss.setf(std::ios::showpos);
         oss << std::setw(w) << XX << " ";
         oss << std::setw(w) << YY;
         return oss.str();

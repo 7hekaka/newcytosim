@@ -19,22 +19,22 @@ std::istream& operator >> (std::istream& is, Vector4& v)
                     ;
                 else
                 {
-                    v.TT = 0.0;
+                    v.TT = 0;
                     is.clear();
                 }
             }
             else
             {
-                v.ZZ = 0.0;
-                v.TT = 0.0;
+                v.ZZ = 0;
+                v.TT = 0;
                 is.clear();
             }
         }
         else
         {
-            v.YY = 0.0;
-            v.ZZ = 0.0;
-            v.TT = 0.0;
+            v.YY = 0;
+            v.ZZ = 0;
+            v.TT = 0;
             is.clear();
         }
     }
@@ -45,10 +45,10 @@ std::istream& operator >> (std::istream& is, Vector4& v)
 std::ostream& operator << (std::ostream& os, Vector4 const& v)
 {
     int w = (int)os.width();
-    os << v.XX << " ";
+    os << std::showpos << v.XX << " ";
     os << std::setw(w) << v.YY << " ";
     os << std::setw(w) << v.ZZ << " ";
-    os << std::setw(w) << v.TT;
+    os << std::setw(w) << v.TT << std::noshowpos;
     return os;
 }
 

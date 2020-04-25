@@ -19,7 +19,7 @@ class Vector1
 public:
     
     /// dimensionality is 1
-    static unsigned dimensionality() { return 1; }
+    static size_t dimensionality() { return 1; }
     
     /// coordinates are public
     real XX;
@@ -266,7 +266,7 @@ public:
     }
     
     /// true if no component is NaN
-    bool is_valid() const
+    bool valid() const
     {
         return ( XX == XX );
     }
