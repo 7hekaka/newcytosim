@@ -103,7 +103,7 @@ void read_numbers(std::string const& str)
     char tmp[128] = { 0 };
     is.clear();
     is.readsome(tmp, sizeof(tmp));
-    out << "remaining >" << tmp << '\n';
+    out << "leftover >" << tmp << '\n';
 }
 
 

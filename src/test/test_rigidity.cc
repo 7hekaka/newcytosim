@@ -49,11 +49,6 @@ inline void print_alignment(real const* ptr, const char msg[])
 
 //------------------------------------------------------------------------------
 
-void setPoint(size_t n, Vector pos, Vector dir)
-{
-    pos.store(pos_+DIM*n);
-}
-
 void setFilament(size_t np, real seg, real persistence_length)
 {
     np = std::min(np, NBS+1);
@@ -64,11 +59,11 @@ void setFilament(size_t np, real seg, real persistence_length)
     Vector pos(0,0,0);
     Vector dir(1,0,0);
     
-    setPoint(0, pos, dir);
+    pos.store(pos_);
     for ( size_t p = 1 ; p < np; ++p )
     {
         pos += seg * dir;
-        setPoint(p, pos, dir);
+        pos.store(pos_+DIM*p);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
         dir = cos(a) * dir + dir.randOrthoU(sin(a));
@@ -498,7 +493,7 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     new_reals(x, y, z, 1.0);
-    setFilament(NBS+1, 1.0, 2.0);
+    setFilament(NBS+1, 0.1, 20.0);
     std::cout << "addRigidity " << DIM << "D " << NBS;
     std::cout << "   " << __VERSION__ << "\n";
     testRigidity(1<<20);

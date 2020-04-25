@@ -1,8 +1,10 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include <sys/time.h>
+#include <limits>
+#include <cfenv>
 
-#define DIM 2
+#define DIM 3
 
 #include "assert_macro.h"
 #include "real.h"
@@ -24,6 +26,67 @@ const size_t NCO = DIM * ( NBS + 1 );
 const size_t ALOC = NCO + 8;
 
 const size_t DISP = 24UL;
+
+
+/// fill vector with signalling NANs
+void nan_fill(size_t cnt, real * ptr)
+{
+    real n = std::numeric_limits<real>::signaling_NaN();
+    for ( size_t u = 0; u < cnt; ++u )
+        ptr[u] = n;
+}
+
+
+void nan_real(size_t cnt, real*& ptr)
+{
+    free_real(ptr);
+    ptr = new_real(cnt);
+    nan_fill(cnt, ptr);
+}
+
+void nan_reals(size_t cnt, real*& x, real*& y, real*& z, real mag)
+{
+    nan_real(cnt, x);
+    nan_real(cnt, y);
+    nan_real(cnt, z);
+    
+    for ( size_t i=0; i<cnt; ++i )
+    {
+        x[i] = mag * RNG.sreal();
+        y[i] = mag * RNG.sreal();
+        z[i] = mag * RNG.sreal();
+    }
+}
+
+void free_reals(real* x, real* y, real* z)
+{
+    free_real(x);
+    free_real(y);
+    free_real(z);
+}
+
+
+#pragma STDC_FENV_ACCESS on
+void show_fe_exceptions(const char* str)
+{
+    int n = std::fetestexcept(FE_ALL_EXCEPT);
+    n &= ~FE_INEXACT;
+    if ( n )
+    {
+        printf(" %s(", str);
+        if (n&FE_DIVBYZERO) printf("DIVBYZERO ");
+        if (n&FE_INEXACT)   printf("INEXACT ");
+        if (n&FE_INVALID)   printf("INVALID ");
+        if (n&FE_OVERFLOW)  printf("OVERFLOW ");
+        if (n&FE_UNDERFLOW) printf("UNDERFLOW ");
+        if (n&FE_ALL_EXCEPT) printf("UNKNOWN ");
+        if ( std::feclearexcept(FE_ALL_EXCEPT) )
+            printf("unclear)");
+        else
+            printf(")");
+    }
+}
+
 
 
 #ifdef __AVX__
@@ -57,45 +120,47 @@ real *pos_=nullptr, *dir_=nullptr, *ani_=nullptr;
 real *lag_=nullptr, *force_=nullptr, *tmp_=nullptr;
 real *diag_=nullptr, *upper_=nullptr;
 
-void setPoint(size_t n, Vector pos, Vector dir)
+void setFilament(size_t nbs, real seg, real persistence_length, real mag)
 {
-    pos.store(pos_+DIM*n);
-    dir.store(dir_+DIM*n);
-}
-
-void setFilament(size_t np, real seg, real persistence_length)
-{
-    np = std::min(np, NBS+1);
-    delete(pos_);
-    delete(dir_);
-    pos_ = new_real(NCO);
-    dir_ = new_real(NCO);
+    nbs = std::min(nbs, NBS+1);
+    size_t nbv = DIM * ( nbs + 1 );
+    nan_real(nbv, pos_);
+    nan_real(nbv-DIM, dir_);
+    nan_real(nbs, lag_);
 
     real sigma = sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
     Vector dir = Vector::randU();
     
-    setPoint(0, pos, dir);
-    for ( size_t p = 1 ; p < np; ++p )
+    pos.store(pos_);
+    dir.store(dir_);
+    for ( size_t p = 1 ; p < nbs; ++p )
     {
         pos += seg * dir;
-        setPoint(p, pos, dir);
+        pos.store(pos_+DIM*p);
+        dir.store(dir_+DIM*p);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
         dir = cos(a) * dir + dir.randOrthoU(sin(a));
     }
+    pos.store(pos_+DIM*nbs);
+    
+    nan_real(nbv, force_);
+    for ( size_t i = 0 ; i < nbv; ++i )
+        force_[i] = mag * RNG.sreal();
+    
+    show_fe_exceptions("setFililament");
 }
 
-void setProjection()
+
+void setProjection(size_t nbs)
 {
-    delete(diag_);
-    delete(upper_);
-    diag_ = new_real(NBS);
-    upper_ = new_real(NBS);
+    nan_real(nbs, diag_);
+    nan_real(nbs, upper_);
     
     size_t j = 0;
-    for ( ; j < NBS-1; ++j )
+    for ( ; j < nbs-1; ++j )
     {
         const real* X = dir_ + DIM * j;
 #if ( DIM == 2 )
@@ -108,53 +173,38 @@ void setProjection()
     diag_[j] = 2.0;
 
     int info = 0;
-    alsatian_xpttrf(NBS, diag_, upper_, &info);
+    alsatian_xpttrf(nbs, diag_, upper_, &info);
+#if ( 0 )
+    std::clog << "\nD "; VecPrint::print(std::clog, nbs, diag_, 3);
+    std::clog << "\nU "; VecPrint::print(std::clog, nbs-1, upper_, 3); std::clog << '\n';
+#endif
+    show_fe_exceptions("setProjection");
 }
 
-void setAnisotropy()
-{
-    delete(ani_);
-    ani_ = new_real(NCO);
 
-    const size_t end = DIM * NBS;
+void setAnisotropy(size_t nbs)
+{
+    const size_t sup = DIM * nbs;
+    nan_real(sup+DIM, ani_);
 
     // for the extremities, the direction of the nearby segment is used.
     for ( size_t d = 0; d < DIM; ++d )
     {
         ani_[d]     = dir_[d];
-        ani_[d+end] = dir_[d+end-DIM];
+        ani_[d+sup] = dir_[d+sup-DIM];
     }
-    
     // for intermediate points, the directions of the flanking segments are averaged
-    for ( size_t p = DIM ; p < end; ++p )
+    for ( size_t p = DIM ; p < sup; ++p )
         ani_[p] = 0.5 * ( dir_[p-DIM] + dir_[p] );
+    
+    show_fe_exceptions("setAnisotroy");
 }
+
 
 void setRandom(int np, real * vec, real mag)
 {
     for ( size_t p = 0 ; p < ALOC; ++p )
         vec[p] = mag * RNG.sreal();
-}
-
-void new_reals(real*& x, real*& y, real*& z, real mag)
-{
-    x = new_real(ALOC);
-    y = new_real(ALOC);
-    z = new_real(ALOC);
-    
-    for ( size_t ii=0; ii<ALOC; ++ii )
-    {
-        x[ii] = mag * RNG.sreal();
-        y[ii] = mag * RNG.sreal();
-        z[ii] = mag * RNG.sreal();
-    }
-}
-
-void free_reals(real* x, real* y, real* z)
-{
-    free_real(x);
-    free_real(y);
-    free_real(z);
 }
 
 //------------------------------------------------------------------------------
@@ -163,14 +213,14 @@ void free_reals(real* x, real* y, real* z)
 void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
 {
     #pragma vector unaligned
-    for ( size_t jj = 0; jj < nbs; ++jj )
+    for ( size_t i = 0; i < nbs; ++i )
     {
-        const real * X = src + DIM * jj;
-        const real * d = dif + DIM * jj;
-        mul[jj] = d[0] * ( X[DIM  ] - X[0] )
-                + d[1] * ( X[DIM+1] - X[1] )
+        const real * X = src + DIM * i;
+        const real * d = dif + DIM * i;
+        mul[i] = d[0] * ( X[DIM  ] - X[0] )
+               + d[1] * ( X[DIM+1] - X[1] )
 #if ( DIM > 2 )
-                + d[2] * ( X[DIM+2] - X[2] )
+               + d[2] * ( X[DIM+2] - X[2] )
 #endif
         ;
     }
@@ -264,7 +314,7 @@ inline void projectForcesU_TWO(size_t nbs, const real* dif, const real* src, rea
  */
 void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real const*const end = mul + nbs - 1;
+    real const*const end = mul - 1 + nbs;
 
     vec2 y, x = load2(src);
     while ( mul < end )
@@ -306,7 +356,7 @@ __m256i make_mask(long i)
  */
 void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real const*const end = mul + nbs - 7;
+    real const*const end = mul - 7 + nbs;
     
     while ( mul < end )
     {
@@ -363,7 +413,7 @@ void projectForcesU2D_AVX(size_t nbs, const real* dif, const real* src, real* mu
  */
 void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    real *const end = mul + nbs - 3;
+    real *const end = mul - 3 + nbs;
     
     // calculate the terms 4 by 4
     while ( mul < end )
@@ -428,7 +478,8 @@ inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
 
 void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mul)
 {
-    const real *const end = mul + nbs - 3;
+    const real *const end = mul - 3 + nbs;
+    // bulk of the calculation, processing 4x3 scalars
     while ( mul < end )
     {
         /*
@@ -455,13 +506,8 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
     }
     while ( mul < end+2 )
     {
-        /*
-         *mul = dif[0] * ( src[DIM  ] - src[0] )
-              + dif[1] * ( src[DIM+1] - src[1] )
-              + dif[2] * ( src[DIM+2] - src[2] );
-         */
         vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+3), loadu4(src)));
-        vec4 s1 = mul4(load4(dif+4), sub4(broadcast1(src+7), loadu4(src+4)));
+        vec4 s1 = mul4(load4(dif+4), sub4(cast4(loadu2(src+7)), loadu4(src+4)));
 
         vec4 xy = blend4(s0, s1, 0b1100);
         vec4 zx = permute2f128(s0, s0, 0x21);
@@ -476,11 +522,6 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
     }
     while ( mul < end+3 )
     {
-        /*
-         *mul = dif[0] * ( src[DIM  ] - src[0] )
-              + dif[1] * ( src[DIM+1] - src[1] )
-              + dif[2] * ( src[DIM+2] - src[2] );
-         */
         vec4 x = mul4(load3(dif), sub4(load3(src+3), loadu4(src)));
         vec4 z = permute2f128(x, x, 0x21);
         vec4 y = permute4(x, 0b0011);
@@ -491,7 +532,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         dif += 3;
         ++mul;
     }
-    assert_true(mul==end);
+    assert_true(mul==end+3);
 }
 
 #endif
@@ -499,9 +540,8 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
 void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    new_reals(x, y, z, 1.0);
+    nan_reals(ALOC, x, y, z, 1.0);
     
-    zero_real(ALOC, lag_);
     func(NBS, dir_, force_, lag_);
     VecPrint::print(std::cout, std::min(DISP,NBS+1), lag_);
 
@@ -731,7 +771,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
     vec4 cc = setzero4();
     
     const bool odd = ( nbs & 1 );
-    real const*const end = mul + nbs - odd;
+    real const*const end = mul - odd + nbs;
     
     while ( mul < end )
     {
@@ -817,7 +857,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
  */
 void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
 {
-    const real* const end = mul + nbs - 3;
+    const real* const end = mul - 3 + nbs;
     /*
      This follows the standard pattern defined below, except
      that the negative terms are not present on the first vector.
@@ -888,13 +928,14 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
     if ( nbs < 4 )
     {
         mm = setzero4();
-        dd = broadcast1(dif);
+        dd = blend4(mm, broadcast1(dif), 0b1000);
     }
     else
     {
         mm = broadcast1(mul-1);
         dd = loadu4(dif-3);
     }
+    //printf("%lu case%lu", nbs, mul-end);
     switch ( mul - end )
     {
         case 0: {
@@ -909,7 +950,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             m2 = blend4(m2, p2, 0b1110);
             p2 = blend4(p2, setzero4(), 0b1110);
             
-            mul += 4;
+            mul += 3;
             vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
             vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
             vec4 a2 = fmadd4(p2, broadcast1(dif+8), loadu4(src+8));
@@ -928,9 +969,9 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             m1 = blend4(m1, m2, 0b1100);
             vec4 p1 = blend4(m2, setzero4(), 0b1100);
             
-            mul += 3;
+            mul += 2;
             vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-            vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
+            vec4 a1 = fmadd4(p1, cast4(load2(dif+4)), loadu4(src+4));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
@@ -943,8 +984,8 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             vec4 m0 = blend4(mm, m1, 0b1000);
             vec4 p0 = blend4(m1, setzero4(), 0b1000);
             
-            mul += 2;
-            vec4 a0 = fmadd4(p0, load4(dif), loadu4(src));
+            mul += 1;
+            vec4 a0 = fmadd4(p0, load3(dif), loadu4(src));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), loadu2(src+4)));
@@ -952,14 +993,14 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         } break;
         case 3: {
             // 1 vector remaining
-            ++mul;
+            dd = blend4(dd, setzero4(), 0b1000);
             store3(dst, fnmadd4(mm, dd, load3(src)));
             dif += 3; dst += 3; src += 3;
         } break;
         default:
             printf("unexpected case in projectForcesD3D_AVX!");
     }
-    assert_true( mul == end+4 );
+    assert_true( mul == end+3 );
 }
 
 #endif
@@ -967,9 +1008,8 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
 void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    new_reals(x, y, z, 1.0);
+    nan_reals(ALOC, x, y, z, 1.0);
     
-    zero_real(ALOC, x);
     func(NBS, dir_, pos_, lag_, x);
     VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
 
@@ -1011,21 +1051,35 @@ void testProjectionD(size_t cnt)
 
 void projectForces(size_t nbs, const real* X, real* Y)
 {
-#if defined __AVX__ && ( DIM == 2 )
+    projectForcesU_(nbs, dir_, X, lag_);
+    
+    // find Lagrange multipliers
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
+
+    projectForcesD_(nbs, dir_, X, lag_, Y);
+}
+
+
+#if defined __AVX__
+void projectForcesAVX(size_t nbs, const real* X, real* Y)
+{
+#if ( DIM == 2 )
     projectForcesU2D_AVX(nbs, dir_, X, lag_);
 #else
-    projectForcesU_(nbs, dir_, X, lag_);
+    projectForcesU3D_AVX(nbs, dir_, X, lag_);
 #endif
     
     // find Lagrange multipliers
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
 
-#if defined __AVX__ && ( DIM == 2 )
+#if ( DIM == 2 )
     projectForcesD2D_AVX(nbs, dir_, X, lag_, Y);
 #else
-    projectForcesD_(nbs, dir_, X, lag_, Y);
+    projectForcesD3D_AVX(nbs, dir_, X, lag_, Y);
 #endif
 }
+#endif
+
 
 void projectDPTTS(size_t nbs, const real* X, real* Y)
 {
@@ -1091,10 +1145,11 @@ void projectScale(size_t nbs, const real* X, real* Y)
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
-void testProject(size_t cnt, void (*func)(size_t, const real*, real*), char const* str)
+
+void speedProject(size_t cnt, void (*func)(size_t, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    new_reals(x, y, z, 1.0);
+    nan_reals(ALOC, x, y, z, 1.0);
     
     zero_real(ALOC, x);
     func(NBS, force_, x);
@@ -1112,32 +1167,83 @@ void testProject(size_t cnt, void (*func)(size_t, const real*, real*), char cons
     free_reals(x,y,z);
 }
 
+
+void testProject()
+{
+    real *x = nullptr, *y = nullptr, *z = nullptr;
+    nan_reals(ALOC, x, y, z, 1.0);
+
+    for ( size_t nbs = std::min(NBS,13UL); nbs > 0; --nbs )
+    {
+        size_t nbv = DIM * ( nbs + 1 );
+        setFilament(nbs, 0.1, 20.0, 1.0);
+        setProjection(nbs);
+        nan_fill(ALOC, x);
+        
+        for ( size_t i = 0; i < nbv; ++i )
+            x[i] = RNG.sreal();
+        
+        nan_fill(nbs, lag_);
+        //projectForces(nbs, x, y);
+        projectForcesU_(nbs, dir_, x, lag_);
+        alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
+        projectForcesD_(nbs, dir_, x, lag_, y);
+        printf("%2lu ", nbs);
+        //VecPrint::print(std::cout, std::min(DISP,nbv), y);
+        show_fe_exceptions("projectForces");
+        printf(" SCA ");
+        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+
+#ifdef __AVX__
+        nan_fill(nbs, lag_);
+        //projectForcesAVX(nbs, x, z);
+#if ( DIM == 3 )
+        projectForcesU3D_AVX(nbs, dir_, x, lag_);
+        alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
+        projectForcesD3D_AVX(nbs, dir_, x, lag_, z);
+#else
+        projectForcesU2D_AVX(nbs, dir_, x, lag_);
+        alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
+        projectForcesD2D_AVX(nbs, dir_, x, lag_, z);
+#endif
+        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
+        show_fe_exceptions("projectForcesAVX");
+        real err = blas::max_diff(nbv, y, z);
+        printf(" AVX err %e\n", err);
+#endif
+    }
+    
+    free_reals(x,y,z);
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark - Main
 
 int main(int argc, char* argv[])
 {
-    RNG.seed();
-    new_reals(force_, lag_, tmp_, 1.0);
-    setRandom(NBS+1, force_, 1.0);
-    setFilament(NBS+1, 1.0, 2.0);
-    std::cout << __VERSION__ << "\n";
     const size_t CNT = 1<<20;
+    RNG.seed();
+    testProject();
     
     if ( 1 )
     {
+        std::cout << __VERSION__ << "\n";
+        setFilament(NBS, 0.1, 20.0, 1.0);
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
     if ( 0 )
     {
-        setProjection();
-        setAnisotropy();
+        setProjection(NBS);
+        setAnisotropy(NBS);
         std::cout << "testProject " << DIM << "D " << NBS << "\n";
-        testProject(CNT, projectForces,  " projF");
-        testProject(CNT, projectDPTTS,   " dptts");
-        testProject(CNT, projectTangent, " projT");
-        testProject(CNT, projectScale,   " scale");
+        speedProject(CNT, projectForces,    " projF");
+        speedProject(CNT, projectForcesAVX, " prAVX");
+        speedProject(CNT, projectDPTTS,     " dptts");
+        speedProject(CNT, projectTangent,   " projT");
+        speedProject(CNT, projectScale,     " scale");
     }
     
     free_reals(tmp_, lag_, force_);
