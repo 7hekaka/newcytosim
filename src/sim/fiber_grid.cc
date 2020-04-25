@@ -265,33 +265,33 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     
     //get the list of rods associated with this cell:
     SegmentList & segments = fGrid.icell(indx);
-
+    
+    if ( segments.empty() )
+           return;
+    
     //randomize the list, to make attachments more fair:
-    if ( segments.size() > 1 )
-    {
 #if ATTACH_CLOSEST_FIBER
-        for ( FiberSegment const& seg : segments )
-        {
-            seg.dis_ = INFINITY;
-            seg.projectPoint(place, seg.dis_);
-        }
-        segments.sort(compareSegments);
-        //printf("tryToAttach %lu segments\n", segments.size());
-#else
-        // randomize the list order
-        //std::random_shuffle(segments.begin(), segments.end());
-        segments.shuffle();
-#endif
+    for ( FiberSegment const& seg : segments )
+    {
+        seg.dis_ = INFINITY;
+        seg.projectPoint(place, seg.dis_);
     }
-    else if ( segments.empty() )
-        return;
+    if ( segments.size() > 1 )
+        segments.sort(compareSegments);
+    //printf("tryToAttach %lu segments\n", segments.size());
+#else
+    // randomize the list order
+    if ( segments.size() > 1 )
+        segments.shuffle();
+    //std::random_shuffle(segments.begin(), segments.end());
+#endif
     
     //std::clog << "tryToAttach has " << segments.size() << " segments\n";
 
     for ( FiberSegment const& seg : segments )
     {
 #if ATTACH_CLOSEST_FIBER
-        //printf("try segment %p %lu : %.6f\n", seg.fiber(), seg.point(), seg.dis_);
+        //printf("trying segment F%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), seg.dis_);
         if ( seg.dis_ > ha.prop->binding_range_sqr )
             break;
         Fiber * fib = const_cast<Fiber*>(seg.fiber());
