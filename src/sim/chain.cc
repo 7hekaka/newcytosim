@@ -49,7 +49,7 @@ extern Modulo const* modulo;
 size_t Chain::bestNumberOfPoints(const real ratio)
 {
     real n = 1 + std::floor(ratio);
-    return n + real( ratio*(n-0.5) >= n*(n-1) );
+    return (size_t)( n + ( ratio*(n-0.5) >= n*(n-1) ));
 }
 
 

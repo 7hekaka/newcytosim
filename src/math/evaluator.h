@@ -161,13 +161,13 @@ private:
             {
                 ++ptr;
                 real rhs = term_();
-                return ( result && rhs );
+                return (( result != 0 ) && ( rhs != 0 ));
             }
             else if ( c == '|' )
             {
                 ++ptr;
                 real rhs = term_();
-                return ( result || rhs );
+                return (( result != 0 ) || ( rhs != 0 ));
             }
             else
                 return result;

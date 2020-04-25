@@ -76,7 +76,7 @@ public:
     
 #else
 
-    lati_t site() const { return std::round(fbAbs/prop->step_size); }
+    lati_t site() const { return (lati_t)std::round(fbAbs/prop->step_size); }
     bool   outsideMP(lati_t) const { return false; }
     bool   occupied(FiberLattice* lat, lati_t s) const { return false; }
     bool   vacant(lati_t) const { return true; }

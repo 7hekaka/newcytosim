@@ -146,7 +146,7 @@ void Digit::handleDisassemblyP()
 {
     assert_true( attached() );
     
-    if ( prop->hold_shrinking_end )
+    if ( prop->hold_shrinking_end > 0 )
     {
         jumpToEndP();
         if ( site() > lattice()->indexP() )

@@ -115,15 +115,15 @@ void GrowingFiber::step()
     }
     else if ( len + inc < prop->max_length )
     {
-        if ( mGrowthM ) growM(mGrowthM);
-        if ( mGrowthP ) growP(mGrowthP);
+        if ( mGrowthM != 0 ) growM(mGrowthM);
+        if ( mGrowthP != 0 ) growP(mGrowthP);
     }
     else if ( len < prop->max_length )
     {
         // the remaining possible growth is distributed to the two ends:
         inc = ( prop->max_length - len ) / inc;
-        if ( mGrowthM ) growM(inc*mGrowthM);
-        if ( mGrowthP ) growP(inc*mGrowthP);
+        if ( mGrowthM != 0 ) growM(inc*mGrowthM);
+        if ( mGrowthP != 0 ) growP(inc*mGrowthP);
     }
     else
     {
