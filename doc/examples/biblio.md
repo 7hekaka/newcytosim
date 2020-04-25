@@ -9,6 +9,11 @@
 
 *Please, let us know if we are missing citations here*
 
+2020
+
+- [Wrinkling instability in 3D active nematics](https://arxiv.org/abs/1908.10974)
+- [Deep learning the assembly parameters of growing cytoskeletal networks]() Kros, Maury F, Eindhoven University.
+
 2019
 
 - [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)  
