@@ -62,23 +62,6 @@ void Organizer::addOrganized(Simul & simul)
     }
 }
 
-/**
- delete all objects and clear Organizer object list
- */
-void Organizer::eraseOrganized()
-{
-    for ( Mecable * i : mObjects )
-    {
-        if ( i )
-        {
-            if ( i->linked() )
-                i->objset()->remove(i);
-            delete(i);
-        }
-    }
-    mObjects.clear();
-}
-
 //------------------------------------------------------------------------------
 #pragma mark - Placement
 
@@ -102,19 +85,6 @@ Vector Organizer::positionP(size_t ix) const
     return res / (real)mObjects.size();
 }
 
-
-void Organizer::moveOrganized(Isometry const& iso)
-{
-    for ( Mecable * mec : mObjects )
-    {
-        if ( mec )
-        {
-            if ( mec->mobile() & 2 )  mec->rotate(iso);
-            if ( mec->mobile() & 1 )  mec->translate(iso);
-            mec->flag(0);
-        }
-    }
-}
 /*
 void Organizer::translate(Vector const& T)
 {

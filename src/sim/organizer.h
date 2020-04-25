@@ -67,12 +67,6 @@ public:
     
     /// add objects to Simul if they are not already linked
     virtual void       addOrganized(Simul&);
-    
-    /// delete all objects
-    virtual void       eraseOrganized();
-    
-    /// move all associated objects
-    void               moveOrganized(Isometry const&);
 
     //--------------------------------------------------------------------------
 
