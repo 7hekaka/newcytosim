@@ -40,13 +40,13 @@ private:
     void update() { tRadiusSq = square(tRadius); }
     
     ///project on base cylinder, return distance
-    real projectOnBase(const Vector w, Vector& p)  const;
+    real projectOnBase(const Vector&, Vector& p)  const;
     
     ///project on side-arm, return distance
-    real projectOnArm(const Vector w, Vector& p)   const;
+    real projectOnArm(const Vector&, Vector& p)   const;
     
     ///project on intersection line
-    void projectOnInter(const Vector w, Vector& p) const;
+    void projectOnInter(const Vector&, Vector& p) const;
     
 public:
         

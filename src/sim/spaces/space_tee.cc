@@ -72,6 +72,7 @@ real SpaceTee::volume() const
 //------------------------------------------------------------------------------
 bool SpaceTee::inside(Vector const& W) const
 {
+#if ( DIM > 1 )
     real nrmSq      = 0;
     const real x    = abs_real(W.XX);
     const real xRel = (W.XX - tJunction);
@@ -86,7 +87,6 @@ bool SpaceTee::inside(Vector const& W) const
 #endif
     if ( nrmSq <= tRadiusSq ) return( true );
     
-#if ( DIM > 1 )
     //check if w is inside the arm
     if ( W.YY >= 0 )
     {
@@ -101,15 +101,15 @@ bool SpaceTee::inside(Vector const& W) const
         return( nrmSq <= tRadiusSq );
     }
 #endif
-    
     return false;
 }
 
 
 //------------------------------------------------------------------------------
-real SpaceTee::projectOnBase(const Vector W, Vector& P) const
+real SpaceTee::projectOnBase(const Vector& W, Vector& P) const
 {
-    real scale, nrm = 0;
+real scale, nrm = 0;
+#if ( DIM > 1 )
 #if ( DIM == 2 )
     nrm = square(W.YY);
 #elif ( DIM > 2 )
@@ -129,7 +129,7 @@ real SpaceTee::projectOnBase(const Vector W, Vector& P) const
         scale = 0;
     }
     
-    real pX, pY;
+    real pX, pY = 0, pZ = 0;
     
     if ( W.XX >  tLength )
         pX =  tLength + scale*(W.XX - tLength);
@@ -142,20 +142,21 @@ real SpaceTee::projectOnBase(const Vector W, Vector& P) const
         pY = scale*W.YY;
     else
         pY = tRadius;
-    
 #if ( DIM > 2 )
-    real pZ = scale*W.ZZ;
+    pZ = scale*W.ZZ;
 #endif
     
     P.set(pX, pY, pZ);
+#endif
     return( abs_real(nrm - tRadius) );
 }
 
 
 //------------------------------------------------------------------------------
-real SpaceTee::projectOnArm(const Vector W, Vector& P) const
+real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
 {
     real  scale, nrm = 0;
+#if ( DIM > 1 )
     const real totArmLength = tArmLength+tRadius;
     const real xRel         = (W.XX - tJunction);
     
@@ -169,7 +170,6 @@ real SpaceTee::projectOnArm(const Vector W, Vector& P) const
 #endif
     if ( W.YY > totArmLength )
         nrm += square(W.YY-totArmLength);
-    
     if ( nrm > 0 ) {
         nrm   = sqrt(nrm);
         scale = tRadius/nrm;
@@ -179,7 +179,7 @@ real SpaceTee::projectOnArm(const Vector W, Vector& P) const
         scale = 0;
     }
     
-    real pX, pY;
+    real pX, pY = 0, pZ = 0;
     if ( scale != 0 )
         pX = tJunction + scale*xRel;
     else
@@ -189,17 +189,18 @@ real SpaceTee::projectOnArm(const Vector W, Vector& P) const
         pY = totArmLength + scale*(W.YY-totArmLength);
     else
         pY = W.YY;
-    
+
 #if ( DIM > 2 )
-    real pZ = scale*W.ZZ;
+    pZ = scale*W.ZZ;
 #endif
     P.set(pX, pY, pZ);
+#endif
     return( abs_real(nrm - tRadius) );
 }
 
 
 //------------------------------------------------------------------------------
-void SpaceTee::projectOnInter(const Vector W, Vector& P) const
+void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
 {
     const real xRel = (W.XX - tJunction);
     real pX, pY, pZ;
@@ -312,6 +313,7 @@ void SpaceTee::projectOnInter(const Vector W, Vector& P) const
 Vector SpaceTee::project(Vector const& W) const
 {
     Vector P(W);
+#if ( DIM > 1 )
     const real xRel = (W.XX - tJunction); //the x coordinate of w
                                           //relative to tJunction
     if ( inside(W) )
@@ -319,24 +321,24 @@ Vector SpaceTee::project(Vector const& W) const
 #if ( DIM == 2 )
         if ( W.YY > tRadius ) {
             //w is inside the arm
-            projectOnArm(w, p);
+            projectOnArm(W, P);
         } else if ( (xRel >= -tRadius) && (xRel <= tRadius) && (W.YY >= 0) ) {
             //w is inside the intersection area
-            projectOnInter(w, p);
+            projectOnInter(W, P);
         }
         else {
             // w is inside the base cylinder
-            projectOnBase(w, p);
+            projectOnBase(W, P);
         }
 #endif
         
 #if ( DIM > 2 )
         if ( (xRel >  tRadius)
-              || (xRel < -tRadius)
-              || (W.YY < 0)
-              || (W.YY*W.YY*(tRadiusSq - xRel*xRel) < square(xRel*W.ZZ)) )
+            || (xRel < -tRadius)
+            || (W.YY < 0)
+            || (W.YY*W.YY*(tRadiusSq - xRel*xRel) < square(xRel*W.ZZ)) )
         {
-            //w is projected on the base cylinder, if 
+            //w is projected on the base cylinder, if
             //    the point is on the right side of the arm
             //or  the point is on the left side of the arm
             //or  the point is in the lower half of the base cylinder
@@ -356,15 +358,12 @@ Vector SpaceTee::project(Vector const& W) const
             projectOnInter(W, P);
         }
 #endif
-        
     }
     else 
     {
         //point w is outside the tee
-        
         Vector pArm;                      //projection of w on the arm
         real dBase = projectOnBase(W, P); //distance of w to the base cylinder
-        
         //all points with y<0 are projected on the base cylinder
         if ( W.YY >= 0 )
         {
@@ -375,6 +374,7 @@ Vector SpaceTee::project(Vector const& W) const
                 return pArm;
         }
     }
+#endif
     return P;
 }
 

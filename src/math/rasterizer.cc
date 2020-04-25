@@ -23,18 +23,11 @@ void Rasterizer::paintFatLine1D(void (*paint)(int, int, int, int, void*), void *
                                 const Vector1& P, const Vector1& Q,
                                 const real radius, const Vector1& offset, const Vector1& delta)
 {
-    int inf, sup;
+    real p = ( P.XX - radius - offset.XX ) * delta.XX;
+    real q = ( Q.XX - radius - offset.XX ) * delta.XX;
     
-    if ( P.XX > Q.XX )
-    {
-        inf = (int) ceil( ( Q.XX - radius - offset.XX ) * delta.XX );
-        sup = (int)floor( ( P.XX + radius - offset.XX ) * delta.XX );
-    }
-    else
-    {
-        inf = (int) ceil( ( P.XX - radius - offset.XX ) * delta.XX );
-        sup = (int)floor( ( Q.XX + radius - offset.XX ) * delta.XX );
-    }
+    int inf = (int) ceil(std::min(p,q));
+    int sup = (int)floor(std::max(p,q));
     
     paint(inf, sup, 0, 0, arg);
 }

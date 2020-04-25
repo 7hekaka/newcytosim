@@ -1303,22 +1303,23 @@ void Meca::apply()
     if ( ready_ )
     {
         ready_ = 0;
-#if 1
-        //check validity of the data:
-        bool a = isnan(dimension(), vPTS);
-        bool b = isnan(dimension(), vFOR);
-        //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
-        if ( a | b )
+        if ( 1 )
         {
-            fprintf(stderr, "Meca::solve failed (not-a-number %i %i):\n", a, b);
-            for ( Mecable * mec : mecables )
+            //check validity of the data:
+            bool a = isnan(dimension(), vPTS);
+            bool b = isnan(dimension(), vFOR);
+            //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
+            if ( a | b )
             {
-                b = isnan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
-                fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
+                fprintf(stderr, "Meca::solve failed (not-a-number %i %i):\n", a, b);
+                for ( Mecable * mec : mecables )
+                {
+                    b = isnan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
+                    fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
+                }
+                abort();
             }
-            abort();
         }
-#endif
         //#pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
