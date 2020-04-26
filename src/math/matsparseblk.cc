@@ -740,8 +740,8 @@ vec4 MatrixSparseBlock::Line::vecMul3D(const real* X) const
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
 }
 #endif
 
@@ -804,8 +804,8 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
-    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    s2 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
+    return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
 }
 #endif
 
@@ -874,8 +874,8 @@ vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
-    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    s2 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
+    return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
 }
 #endif
 
@@ -900,8 +900,8 @@ vec4 MatrixSparseBlock::Line::vecMul4D(const real* X) const
     }
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+    s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
 }
 #endif
 #endif

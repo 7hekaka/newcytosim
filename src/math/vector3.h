@@ -77,10 +77,10 @@ public:
     /// conversion to SIMD vector
     operator vec4 () const { assert_true(vec[3]==0); return vec; }
 #elif defined(__AVX__) && REAL_IS_DOUBLE
+    /// construct from SIMD vector
+    Vector3(vec4 const& v) XX(v[0]), YY(v[1]), ZZ(v[2]) { }
     /// conversion to SIMD vector
     operator vec4 () const { return load3(&XX); }
-    /// construct from SIMD vector
-    Vector3(vec4 const& v) { XX = v[0]; YY = v[1]; ZZ = v[2]; }
 #endif
     
     /// copy 2 coordinates from Vector2

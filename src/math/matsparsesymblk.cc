@@ -982,9 +982,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
 #else
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    storeu4(Y+jj, add4(loadu4(Y+jj), s0));
+    s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s1 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+    storeu4(Y+jj, add4(loadu4(Y+jj), s1));
 #endif
 #endif
 }
@@ -1097,7 +1097,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     xa = setzero4();
     xb = add4(unpacklo4(sa, sb), unpackhi4(sa, sb));
     xc = add4(unpacklo4(sc, xa), unpackhi4(sc, xa));
-    sa = add4(permute2f128(xb, xc, 0x20), permute2f128(xb, xc, 0x31));
+    sa = add4(permute2f128(xb, xc, 0x21), blend4(xb, xc, 0b1100));
     storeu4(Y+jj, add4(loadu4(Y+jj), sa));
 #endif
 }
@@ -1156,9 +1156,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y,
     }
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
-    store4(Y+jj, add4(load4(Y+jj), s0));
+    s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+    s1 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+    store4(Y+jj, add4(load4(Y+jj), s1));
 #endif
 }
 

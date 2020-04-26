@@ -48,8 +48,10 @@ public:
 
     ~Matrix11() {}
     
+#pragma mark -
+    
     /// dimensionality
-    static int dimension() { return 1; }
+    static size_t dimension() { return 1; }
     
     /// human-readible identifier
     static std::string what() { return "1"; }
@@ -193,6 +195,8 @@ public:
     {
         return abs_real(val_);
     }
+    
+#pragma mark -
 
     /// multiplication by a vector: this * V
     const Vector1 vecmul(Vector1 const& V) const
@@ -308,6 +312,8 @@ public:
         M[0] += val_;
     }
     
+#pragma mark -
+
     /// return `a * Identity`
     static Matrix11 diagonal(real a)
     {

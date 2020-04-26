@@ -90,8 +90,10 @@ public:
 
     ~Matrix33() {}
     
+#pragma mark -
+    
     /// dimensionality
-    static int dimension() { return 3; }
+    static size_t dimension() { return 3; }
     
     /// human-readible identifier
 #if ( BLD == 3 )
@@ -149,7 +151,9 @@ public:
     {
         return ( val[0] + val[BLD+1] + val[BLD*2+2] );
     }
-
+    
+#pragma mark -
+    
     /// set matrix by giving lines
     void setLines(Vector3 const& A, Vector3 const& B, Vector3 const& C)
     {
@@ -416,6 +420,8 @@ public:
         return ( abs_real(val[BLD]-val[1])
                 + abs_real(val[BLD*2]-val[2]) + abs_real(val[1+BLD*2]-val[2+BLD]) );
     }
+    
+#pragma mark -
 
 #if MATRIX33_USES_AVX
     /// multiplication by a vector: this * V
@@ -468,8 +474,8 @@ public:
         vec4 s2 = mul4(load4(val+BLD*2), vec);
         vec4 s3 = setzero4();
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+        s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+        return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
     }
 #endif
     
@@ -786,6 +792,8 @@ public:
     {
         return Matrix33(a, b, c, b, d, e, c, e, f);
     }
+    
+#pragma mark -
 
     /// return diagonal Matrix from diagonal terms
     static Matrix33 diagonal(real a, real b, real c)
@@ -929,6 +937,8 @@ public:
                         -vec.ZZ,     dia,  vec.XX,
                          vec.YY, -vec.XX,     dia);
     }
+    
+#pragma mark - Rotations
     
     /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
     /**

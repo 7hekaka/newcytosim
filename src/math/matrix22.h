@@ -112,7 +112,7 @@ public:
     ~Matrix22() {}
     
     /// dimensionality
-    static int dimension() { return 2; }
+    static size_t dimension() { return 2; }
     
     /// human-readible identifier
 #if MATRIX22_USES_AVX
@@ -712,6 +712,7 @@ public:
         M[1+ldd] += val[3];
     }
     
+#pragma mark -
 
     /// return diagonal Matrix from diagonal terms
     static Matrix22 diagonal(real a, real b)

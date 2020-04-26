@@ -92,6 +92,11 @@ public:
 
     ~Matrix34() {}
     
+#pragma mark -
+    
+    /// dimensionality
+    static size_t dimension() { return 4; }
+
     /// human-readible identifier
 #if MATRIX34_USES_AVX
     static std::string what() { return "12"; }
@@ -148,6 +153,8 @@ public:
     {
         return ( val[0] + val[5] + val[10] );
     }
+
+#pragma mark -
 
     /// set matrix by giving lines
     void setLines(Vector3 const& A, Vector3 const& B, Vector3 const& C)
@@ -322,6 +329,8 @@ public:
         return res;
     }
     
+#pragma mark -
+
     /// maximum of all component's absolute values
     real norm_inf() const
     {
@@ -434,6 +443,7 @@ public:
         + abs_real(val[8]-val[2]) + abs_real(val[9]-val[6]);
     }
 
+#pragma mark -
 #if MATRIX34_USES_AVX
     
     /// multiplication by a vector: this * V
@@ -446,8 +456,8 @@ public:
         /* summing the components below requires a lot of shuffling
         but this is required only once when doing a lot of vecmul */
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+        s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+        return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
     }
     
     /// multiplication by a vector: this * V
@@ -775,7 +785,8 @@ public:
         M[2+ldd*2] += val[10];
     }
     
-    
+#pragma mark -
+
     /// return symmetric Matrix from coordinates (column-major, lower triangle)
     static Matrix34 symmetric(real a, real b, real c,
                               real d, real e, real f)
@@ -924,6 +935,8 @@ public:
                         -vec.ZZ,     dia,  vec.XX,
                          vec.YY, -vec.XX,     dia);
     }
+
+#pragma mark - Rotations
 
     /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
     /**

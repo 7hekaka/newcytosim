@@ -92,8 +92,10 @@ public:
 
     ~Matrix44() {}
     
+#pragma mark -
+        
     /// dimensionality
-    static int dimension() { return 4; }
+    static size_t dimension() { return 4; }
     
     /// human-readible identifier
     static std::string what() { return "4*4"; }
@@ -168,7 +170,7 @@ public:
         {
             for ( index j = 0; j < 4; ++j )
                 os << " " << std::fixed << std::setw(w) << (*this)(i,j);
-            if ( i < 2 )
+            if ( i < 3 )
                 os << ";";
             else
                 os << " ]";
@@ -226,9 +228,9 @@ public:
     void operator +=(Matrix44 const& M)
     {
 #if MATRIX44_USES_AVX
-        store4(val  , add4(load4(val  ), load4(M.val  )));
-        store4(val+4, add4(load4(val+4), load4(M.val+4)));
-        store4(val+8, add4(load4(val+8), load4(M.val+8)));
+        store4(val   , add4(load4(val   ), load4(M.val   )));
+        store4(val+4 , add4(load4(val+4 ), load4(M.val+4 )));
+        store4(val+8 , add4(load4(val+8 ), load4(M.val+8 )));
         store4(val+12, add4(load4(val+12), load4(M.val+12)));
 #else
         for ( index u = 0; u < 16; ++u )
@@ -240,9 +242,9 @@ public:
     void operator -=(Matrix44 const& M)
     {
 #if MATRIX44_USES_AVX
-        store4(val  , sub4(load4(val  ), load4(M.val  )));
-        store4(val+4, sub4(load4(val+4), load4(M.val+4)));
-        store4(val+8, sub4(load4(val+8), load4(M.val+8)));
+        store4(val   , sub4(load4(val   ), load4(M.val   )));
+        store4(val+4 , sub4(load4(val+4 ), load4(M.val+4 )));
+        store4(val+8 , sub4(load4(val+8 ), load4(M.val+8 )));
         store4(val+12, sub4(load4(val+12), load4(M.val+12)));
 #else
         for ( index u = 0; u < 16; ++u )
@@ -270,14 +272,16 @@ public:
         vec4 v1 = load4(val+4);
         vec4 v2 = load4(val+8);
         vec4 v3 = load4(val+12);
-        vec4 t0 = unpacklo4(v0, v1);
-        vec4 t1 = unpackhi4(v0, v1);
-        vec4 t2 = unpacklo4(v2, v3);
-        vec4 t3 = unpackhi4(v2, v3);
-        store4(res.val   , permute2f128(t0, t2, 0x20));
-        store4(res.val+4 , permute2f128(t1, t3, 0x20));
-        store4(res.val+8 , permute2f128(t0, t2, 0x31));
-        store4(res.val+12, permute2f128(t1, t3, 0x31));
+        vec4 u0 = unpacklo4(v0, v1);
+        vec4 u1 = unpackhi4(v0, v1);
+        vec4 u2 = unpacklo4(v2, v3);
+        vec4 u3 = unpackhi4(v2, v3);
+        v0 = permute2f128(u0, u2, 0x21);
+        v1 = permute2f128(u1, u3, 0x21);
+        store4(res.val   , blend4(u0, v0, 0b1100));
+        store4(res.val+4 , blend4(u1, v1, 0b1100));
+        store4(res.val+8 , blend4(u2, v0, 0b0011));
+        store4(res.val+12, blend4(u3, v1, 0b0011));
 #else
         for ( index x = 0; x < 4; ++x )
         for ( index y = 0; y < 4; ++y )
@@ -316,6 +320,8 @@ public:
                 + abs_real(val[0xD]-val[0x7])
                 + abs_real(val[0xE]-val[0xB]) );
     }
+    
+#pragma mark -
 
 #if MATRIX44_USES_AVX
     /// multiplication by a vector: this * V
@@ -326,9 +332,9 @@ public:
         vec4 u = blend4(vec, p, 0b0011);
         vec4 x = mul4(load4(val   ), duplo4(l));
         vec4 y = mul4(load4(val+4 ), duphi4(l));
-        vec4 z = mul4(load4(val+8 ), duplo4(u));
-        vec4 t = mul4(load4(val+12), duphi4(u));
-        return add4(add4(x, y), add4(z, t));
+        x = fmadd4(load4(val+8 ), duplo4(u), x);
+        y = fmadd4(load4(val+12), duphi4(u), y);
+        return add4(x, y);
     }
     
     /// multiplication by a vector: transpose(this) * V
@@ -339,8 +345,9 @@ public:
         vec4 s2 = mul4(load4(val+8 ), vec);
         vec4 s3 = mul4(load4(val+12), vec);
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        s1 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(s0, s1, 0x20), permute2f128(s0, s1, 0x31));
+        s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+        //return add4(permute2f128(s0, s2, 0x20), permute2f128(s0, s2, 0x31));
+        return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
     }
 
     /// multiplication by a vector: this * V
@@ -575,7 +582,8 @@ public:
         }
     }
 
-
+#pragma mark -
+    
     /// return diagonal Matrix from diagonal terms
     static Matrix44 diagonal(real a, real b, real c, real d)
     {
@@ -692,7 +700,7 @@ inline std::ostream& operator << (std::ostream& os, Matrix44 const& mat)
     {
         for ( Matrix44::index j = 0; j < 4; ++j )
             os << " " << std::fixed << std::setw(w) << mat(i,j);
-        if ( i < 2 )
+        if ( i < 3 )
             os << ";";
         else
             os << " ]";
