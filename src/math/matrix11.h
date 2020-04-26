@@ -53,7 +53,7 @@ public:
     /// dimensionality
     static size_t dimension() { return 1; }
     
-    /// human-readible identifier
+    /// human-readable identifier
     static std::string what() { return "1"; }
     
     /// set all elements to zero

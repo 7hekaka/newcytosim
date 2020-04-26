@@ -97,7 +97,7 @@ public:
     /// dimensionality
     static size_t dimension() { return 4; }
 
-    /// human-readible identifier
+    /// human-readable identifier
 #if MATRIX34_USES_AVX
     static std::string what() { return "12"; }
 #else
@@ -184,7 +184,7 @@ public:
         val[10] = C.ZZ;
     }
 
-    /// print matrix in human readible format
+    /// print matrix in human readable format
     void print(FILE * f) const
     {
         fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n",  val[0], val[1], val[2], val[3]);

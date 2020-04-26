@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 /**
- This is a program to export simulation objects, in a format readible by Blender
+ This is a program to export simulation objects, in a format readable by Blender
  
  It stores the points of the filaments as they are generated.
  Attachment positions of Couple are relocated to the closest filament-point.

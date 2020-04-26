@@ -95,7 +95,7 @@ public:
     /// dimensionality
     static size_t dimension() { return 3; }
     
-    /// human-readible identifier
+    /// human-readable identifier
 #if ( BLD == 3 )
     static std::string what() { return "9"; }
 #else
@@ -182,7 +182,7 @@ public:
         val[2+BLD*2] = C.ZZ;
     }
 
-    /// print matrix in human readible format
+    /// print matrix in human readable format
     void print(FILE * f) const
     {
         fprintf(f, " / %9.3f %+9.3f %+9.3f \\\n",  val[0], val[0+BLD], val[0+BLD*2]);

@@ -79,7 +79,7 @@ void Display::display(Simul const& sim)
     
     /*
      Draw translucent objects:
-     - make depth buffer readible only
+     - make depth buffer readable only
      - objects are depth-sorted, from far to near
      - Dual pass is used to display back before front
      */

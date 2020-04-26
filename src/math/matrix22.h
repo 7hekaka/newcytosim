@@ -114,7 +114,7 @@ public:
     /// dimensionality
     static size_t dimension() { return 2; }
     
-    /// human-readible identifier
+    /// human-readable identifier
 #if MATRIX22_USES_AVX
     static std::string what() { return "4"; }
 #else
