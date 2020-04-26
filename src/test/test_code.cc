@@ -1240,7 +1240,9 @@ int main(int argc, char* argv[])
         setAnisotropy(NBS);
         std::cout << "testProject " << DIM << "D " << NBS << "\n";
         speedProject(CNT, projectForces,    " projF");
+#if defined __AVX__
         speedProject(CNT, projectForcesAVX, " prAVX");
+#endif
         speedProject(CNT, projectDPTTS,     " dptts");
         speedProject(CNT, projectTangent,   " projT");
         speedProject(CNT, projectScale,     " scale");
