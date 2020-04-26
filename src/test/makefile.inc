@@ -51,6 +51,11 @@ test_size: test_size.cc cytosim.a cytomath.a cytobase.a | bin
 	$(DONE)
 vpath test_sizeof bin
 
+test_block: test_block.cc matrix33.o matrix34.o vector3.o random_vector.o random.o SFMT.o backtrace.o | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
+	$(DONE)
+vpath test_block bin
+
 test_matrix: test_matrix.cc matsparsesymblk.o matsparseblk.o matsparsesym.o matsparsesym1.o matsparsesym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)

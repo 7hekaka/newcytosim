@@ -593,11 +593,11 @@ void test_transpose4()
     dump(m3, "m3");
     printf("\n");
 
-    // symmetrized matrix:
+    // transpose all 2x2 subblocks:
     vec4 u0 = unpacklo4(m0, m1);
-    vec4 u1 = unpackhi4(m1, m0);
+    vec4 u1 = unpackhi4(m0, m1);
     vec4 u2 = unpacklo4(m2, m3);
-    vec4 u3 = unpackhi4(m3, m2);
+    vec4 u3 = unpackhi4(m2, m3);
 
     dump(u0, "u0");
     dump(u1, "u1");
@@ -605,15 +605,35 @@ void test_transpose4()
     dump(u3, "u3");
     printf("\n");
     
+    // using 4 permutes
     vec4 t0 = permute2f128(u0, u2, 0x20);
     vec4 t1 = permute2f128(u1, u3, 0x20);
-    vec4 t2 = blend4(u0, permute4(u2, 0b0101), 0b0100);
-    vec4 t3 = blend4(u1, permute4(u3, 0b0101), 0b0100);
+    vec4 t2 = permute2f128(u0, u2, 0x31);
+    vec4 t3 = permute2f128(u1, u3, 0x31);
 
+    // transposed matrix:
     dump(t0, "t0");
     dump(t1, "t1");
     dump(t2, "t2");
     dump(t3, "t3");
+    printf("\n");
+
+    // using 2 permutes and 4 blend
+    vec4 x02 = permute2f128(u0, u2, 0x21);
+    vec4 x13 = permute2f128(u1, u3, 0x21);
+    dump(x02, "x02");
+    dump(x13, "x13");
+    t0 = blend4(u0, x02, 0b1100);
+    t1 = blend4(u1, x13, 0b1100);
+    t2 = blend4(u2, x02, 0b0011);
+    t3 = blend4(u3, x13, 0b0011);
+
+    // transposed matrix:
+    dump(t0, "t0");
+    dump(t1, "t1");
+    dump(t2, "t2");
+    dump(t3, "t3");
+
 }
 
 void test_swap7()
@@ -655,7 +675,7 @@ int main(int argc, char * argv[])
     //test_swapSSE();
 #ifdef __AVX__
     
-    if ( 1 )
+    if ( 0 )
     {
         test_twine();
         test_stride();

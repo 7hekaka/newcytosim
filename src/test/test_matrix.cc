@@ -10,6 +10,7 @@
 #include "vecprint.h"
 
 #include "dim.h"
+#include "matrix33.h"
 #include "matsparsesym.h"
 #include "matsparsesym1.h"
 #include "matsparsesym2.h"
@@ -20,8 +21,8 @@ using namespace TicToc;
 
 typedef MatrixSparseSymmetricBlock MatrixSparseSymmetricB;
 
-const int N_RUN = 16;
-const int N_MUL = 99;
+const size_t N_RUN = 16;
+const size_t N_MUL = 99;
 
 #define PAD 4
 
@@ -161,7 +162,7 @@ void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
 #if ( DIM == 3 )
 void fillMatrix(MatrixSparseSymmetricBlock& mat, const size_t i, const size_t j)
 {
-    Matrix33 M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
+    SquareBlock M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
     
     mat.diag_block(i).add_half(M);
     mat.diag_block(j).add_half(M);
