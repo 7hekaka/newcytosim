@@ -584,32 +584,32 @@ public:
         return a.XX * b.XX + a.YY * b.YY;
     }
     
-    /// multiplication by scalar s
+    /// multiplication by scalar
     friend const Vector2 operator *(Vector2 const& a, const real s)
     {
         return Vector2(s*a.XX, s*a.YY);
     }
     
-    /// mutiplication by scalar s
+    /// mutiplication by scalar
     friend const Vector2 operator *(const real s, Vector2 const& a)
     {
         return Vector2(s*a.XX, s*a.YY);
     }
     
-    /// division by scalar s
+    /// division by scalar
     friend const Vector2 operator /(Vector2 const& a, const real s)
     {
         return Vector2(a.XX/s, a.YY/s);
     }
     
-    /// addition of another vector b
+    /// addition of another vector
     void operator +=(Vector2 const& b)
     {
         XX += b.XX;
         YY += b.YY;
     }
     
-    /// subtraction of another vector b
+    /// subtraction of another vector
     void operator -=(Vector2 const& b)
     {
         XX -= b.XX;

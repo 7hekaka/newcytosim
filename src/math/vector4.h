@@ -552,25 +552,25 @@ public:
                        a.XX * b.YY - a.YY * b.XX);
     }
 
-    /// multiplication by scalar s
+    /// multiplication by scalar
     friend const Vector4 operator *(Vector4 const& a, const real s)
     {
         return Vector4(s*a.XX, s*a.YY, s*a.ZZ, s*a.TT);
     }
     
-    /// mutiplication by scalar s
+    /// mutiplication by scalar
     friend const Vector4 operator *(const real s, Vector4 const& a)
     {
         return Vector4(s*a.XX, s*a.YY, s*a.ZZ, s*a.TT);
     }
     
-    /// division by scalar s
+    /// division by scalar
     friend const Vector4 operator /(Vector4 const& a, const real s)
     {
         return Vector4(a.XX/s, a.YY/s, a.ZZ/s, a.TT/s);
     }
     
-    /// addition of another vector b
+    /// addition of another vector
     void operator +=(Vector4 const& b)
     {
         XX += b.XX;
@@ -579,7 +579,7 @@ public:
         TT += b.TT;
     }
     
-    /// subtraction of another vector b
+    /// subtraction of another vector
     void operator -=(Vector4 const& b)
     {
         XX -= b.XX;

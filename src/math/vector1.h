@@ -21,7 +21,7 @@ public:
     /// dimensionality is 1
     static size_t dimensionality() { return 1; }
     
-    /// coordinates are public
+    /// coordinate is public
     real XX;
     
     
@@ -438,31 +438,31 @@ public:
         return a.XX * b.XX;
     }
     
-    /// multiplication by scalar s
+    /// multiplication by scalar
     friend const Vector1 operator *(Vector1 const& a, const real s)
     {
         return Vector1(s*a.XX);
     }
     
-    /// mutiplication by scalar s
+    /// mutiplication by scalar
     friend const Vector1 operator *(const real s, Vector1 const& a)
     {
         return Vector1(s*a.XX);
     }
     
-    /// division by scalar s
+    /// division by scalar
     friend const Vector1 operator /(Vector1 const& a, const real s)
     {
         return Vector1(a.XX/s);
     }
     
-    /// addition of another vector b
+    /// addition of another vector
     void operator +=(Vector1 const& b)
     {
         XX += b.XX;
     }
     
-    /// subtraction of another vector b
+    /// subtraction of another vector
     void operator -=(Vector1 const& b)
     {
         XX -= b.XX;

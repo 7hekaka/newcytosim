@@ -44,7 +44,7 @@ public:
             real XX;
             real YY;
             real ZZ;
-            real TT;
+            real TT;  // should be zero!
         };
         vec4 vec;
     };
@@ -73,9 +73,9 @@ public:
 
 #if VECTOR3_USES_AVX
     /// construct from SIMD vector
-    Vector3(vec4 const& v) : vec(v) { }
+    Vector3(vec4 const& v) : vec(v) { } //{ assert_true(v[3]==0); }
     /// conversion to SIMD vector
-    operator vec4 () const { return vec; }
+    operator vec4 () const { assert_true(vec[3]==0); return vec; }
 #elif defined(__AVX__) && REAL_IS_DOUBLE
     /// conversion to SIMD vector
     operator vec4 () const { return load3(&XX); }
@@ -134,7 +134,7 @@ public:
         YY = ( d > 1 ) ? v[1] : 0;
         ZZ = ( d > 2 ) ? v[2] : 0;
 #if VECTOR3_USES_AVX
-        TT = 0;
+        vec[3] = 0;
 #endif
     }
     
@@ -145,7 +145,7 @@ public:
         YY = b[1];
         ZZ = b[2];
 #if VECTOR3_USES_AVX
-        TT = 0;
+        vec[3] = 0;
 #endif
     }
     
@@ -168,7 +168,7 @@ public:
         YY = b[4] - b[1];
         ZZ = b[5] - b[2];
 #if VECTOR3_USES_AVX
-        TT = 0;
+        vec[3] = 0;
 #endif
     }
     
@@ -191,7 +191,7 @@ public:
         YY = a[1] - b[1];
         ZZ = a[2] - b[2];
 #if VECTOR3_USES_AVX
-        TT = 0;
+        vec[3] = 0;
 #endif
     }
     
@@ -214,7 +214,7 @@ public:
         YY = a[1] + C * ( b[1] - a[1] );
         ZZ = a[2] + C * ( b[2] - a[2] );
 #if VECTOR3_USES_AVX
-        TT = 0;
+        vec[3] = 0;
 #endif
     }
 
@@ -742,7 +742,7 @@ public:
     friend const Vector3 cross(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX && defined __AVX2__
-        assert_true(b.vec[3] == 0);
+        assert_true((a.vec[3] == 0) & (b.vec[3] == 0));
         return Vector3(cross4(a.vec, b.vec));
 #else
         return Vector3(a.YY * b.ZZ - a.ZZ * b.YY,
@@ -757,7 +757,7 @@ public:
         return a.XX * b.XX + a.YY * b.YY + a.ZZ * b.ZZ;
     }
     
-    /// multiplication by scalar s
+    /// multiplication by scalar
     friend const Vector3 operator *(Vector3 const& a, const real s)
     {
 #if VECTOR3_USES_AVX
@@ -767,7 +767,7 @@ public:
 #endif
     }
     
-    /// mutiplication by scalar s
+    /// mutiplication by scalar
     friend const Vector3 operator *(const real s, Vector3 const& a)
     {
 #if VECTOR3_USES_AVX
@@ -777,7 +777,7 @@ public:
 #endif
     }
     
-    /// division by scalar s
+    /// division by scalar
     friend const Vector3 operator /(Vector3 const& a, const real s)
     {
 #if VECTOR3_USES_AVX
@@ -787,7 +787,7 @@ public:
 #endif
     }
     
-    /// addition of another vector b
+    /// addition of another vector
     void operator +=(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
@@ -799,7 +799,7 @@ public:
 #endif
     }
     
-    /// subtraction of another vector b
+    /// subtraction of another vector
     void operator -=(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
