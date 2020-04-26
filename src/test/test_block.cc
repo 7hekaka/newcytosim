@@ -1,0 +1,71 @@
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
+
+#include <sys/time.h>
+#include <fstream>
+
+#include "assert_macro.h"
+#include "exceptions.h"
+#include "random.h"
+
+#include "vector2.h"
+#include "vector3.h"
+#include "vector4.h"
+
+#include "matrix33.h"
+#include "matrix34.h"
+#include "matrix44.h"
+
+Vector3 dir(0, 1, 0);
+Vector3 off(0.1, 0.2, -0.3);
+Vector3 src(0, 0, 0);
+
+real diff(size_t size, real const* a, real const* b)
+{
+    real s = 0;
+    for ( size_t i=0; i<size; ++i )
+        s += abs_real( a[i] - b[i] );
+    return s;
+}
+
+
+template <typename MATRIX>
+void checkMatrix(MATRIX & mat)
+{
+    mat = MATRIX::outerProduct(dir, off);
+    Vector3 vec = mat.vecmul(src);
+    Vector3 vik = mat.trans_vecmul(src);
+
+    std::clog.precision(3);
+
+    std::clog << vec << "  |  " << vik << "  ";
+    std::clog << mat << "  " << mat.transposed() << "\n";
+
+    //printf("  check %+16.6f  %+16.6f ", diff);
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
+int main( int argc, char* argv[] )
+{
+    printf("test_block --- %s\n", __VERSION__);
+    RNG.seed();
+    
+    Matrix33 M33(1,0);
+    Matrix34 M34(1,0);
+    Matrix44 M44(1,0);
+
+    src = Vector3::randS();
+    dir = Vector3::randU();
+    off = Vector3::randU();
+    std::clog << src << "\n";
+
+    checkMatrix(M33);
+    checkMatrix(M34);
+    checkMatrix(M44);
+    
+    return EXIT_SUCCESS;
+}
+
+
