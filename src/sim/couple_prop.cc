@@ -38,7 +38,7 @@ void CoupleProp::clear()
     fast_diffusion    = false;
     fast_diffusion_nb = 0;
     trans_activated   = 0;
-    stiff             = true;
+    min_loop          = 1;
     specificity       = BIND_ALWAYS;
     activity          = "diffuse";
     
@@ -64,7 +64,9 @@ void CoupleProp::read(Glossary& glos)
     glos.set(fast_diffusion_nb, "fast_diffusion", 1);
     
     glos.set(trans_activated, "trans_activated");
-    glos.set(stiff,           "stiff");
+    // changed 'stiff' to 'min_loop' on 26.04.2020
+    glos.set(min_loop, "min_loop") || glos.set(min_loop, "stiff");
+
     glos.set(specificity,     "specificity", {{"off",          BIND_ALWAYS},
 #ifdef BACKWARD_COMPATIBILITY
                                               {"none",         BIND_ALWAYS},
@@ -166,7 +168,7 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "diffusion",       diffusion);
     write_value(os, "fast_diffusion",  fast_diffusion, fast_diffusion_nb);
     write_value(os, "trans_activated", trans_activated);
-    write_value(os, "stiff",           stiff);
+    write_value(os, "min_loop",        min_loop);
     write_value(os, "specificity",     specificity);
     write_value(os, "confine",         confine, "", confine_space);
     write_value(os, "activity",        activity);

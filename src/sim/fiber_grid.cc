@@ -244,7 +244,6 @@ int compareSegments(const void * a, const void * b)
     return ( ad > bd ) - ( bd > ad );
 }
 
-#endif
 
 /**
  This will bind the given Hand to any Fiber found within `binding_range`, with a
@@ -259,42 +258,39 @@ int compareSegments(const void * a, const void * b)
 void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 {
     assert_true( hasGrid() );
-    
-    //get the cell index closest to the position in space:
-    const auto indx = fGrid.index(place, 0.5);
-    
-    //get the list of rods associated with this cell:
-    SegmentList & segments = fGrid.icell(indx);
-    
-    if ( segments.empty() )
-           return;
-    
-    //randomize the list, to make attachments more fair:
-#if ATTACH_CLOSEST_FIBER
+    /*
+     find the cell whose center is closest to the position, and
+     get the list of segments associated with this cell in FiberGrid::paintGrid
+     */
+    SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
+    SegmentList targets;
+
+    // calculate distance to all targets
     for ( FiberSegment const& seg : segments )
     {
         seg.dis_ = INFINITY;
         seg.projectPoint(place, seg.dis_);
+        if ( seg.dis_ < ha.prop->binding_range_sqr )
+            targets.push_back(seg);
     }
-    if ( segments.size() > 1 )
-        segments.sort(compareSegments);
-    //printf("tryToAttach %lu segments\n", segments.size());
-#else
-    // randomize the list order
-    if ( segments.size() > 1 )
-        segments.shuffle();
-    //std::random_shuffle(segments.begin(), segments.end());
-#endif
     
-    //std::clog << "tryToAttach has " << segments.size() << " segments\n";
+    // sort targets within range from close to distant:
+    if ( targets.size() > 1 )
+        targets.sort(compareSegments);
+    else if ( targets.empty() )
+        return;
+    
+    //std::clog << "tryToAttachClosest has " << targets.size() << " targets\n";
 
-    for ( FiberSegment const& seg : segments )
+    /**
+     Instead of flipping a coin for each target, we could use a single random
+     number to get the index of the next target that will bind, using a Poisson
+     distribution */
+    const real prob = ha.prop->binding_prob;
+    for ( FiberSegment const& seg : targets )
     {
-#if ATTACH_CLOSEST_FIBER
-        //printf("trying segment F%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), seg.dis_);
-        if ( seg.dis_ > ha.prop->binding_range_sqr )
-            break;
-        if ( RNG.test(ha.prop->binding_prob) )
+        //printf("    trying segment F%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), seg.dis_);
+        if ( RNG.test(prob) )
         {
             Fiber * fib = const_cast<Fiber*>(seg.fiber());
             // need to recalculate the abscissa of the projection:
@@ -305,7 +301,31 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
                 return;
             }
         }
+    }
+}
+
 #else
+
+
+void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
+{
+    assert_true( hasGrid() );
+    /*
+     find the cell whose center is closest to the position, and
+     get the list of segments associated with this cell in FiberGrid::paintGrid
+     */
+    SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
+    
+    // randomize the list, to make attachments more fair:
+    if ( segments.size() > 1 )
+        segments.shuffle();
+    else if ( segments.empty() )
+        return;
+    
+    //std::clog << "tryToAttach has " << segments.size() << " targets\n";
+
+    for ( FiberSegment const& seg : segments )
+    {
 #if !TRICKY_HAND_ATTACHMENT
         if ( RNG.test(ha.prop->binding_prob) )
 #else
@@ -333,10 +353,10 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
                 }
             }
         }
-#endif
     }
 }
 
+#endif
 
 /**
  This function is limited to the range given in paintGrid();

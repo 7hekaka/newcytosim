@@ -32,7 +32,7 @@ class LineDisp;
 /// Flag to allow dynamic Single creation/binding at fiber's ends {0, 1}
 #define FIBER_HAS_GLUE 0
 
-/// Flag to enable the sorting of targets during attachment of Hands {0, 1}
+/// Flag to enable the sorting of targets for attachment of Hands {0, 1}
 #define ATTACH_CLOSEST_FIBER 1
 
 

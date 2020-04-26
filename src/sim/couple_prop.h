@@ -115,19 +115,27 @@ public:
 
     /// prevents both Hands from binding at the same position on a Fiber (default=true)
     /**
-     By default, the two Hands of a Couple may not bind at the same position on 
+     The parameter `min_loop' defines the cutoff distance that applies for allowing
+     or disallowing binding of the two hands to the same fiber.
+     By default, the two Hands of a Couple may not bind at the same position on
      the same Fiber. Such a degenerate binding may be impossible due to the molecular 
-     configuration of the complex. Note that no restriction is imposed if the Hands
-     attempt to bind to different fibers, or to the same fiber at distant positions. 
-     The exact criteria is that the Hands cannot bind onto the same segment, or 
-     to segments that have a point in common.
+     configuration of the complex. Note that no restriction apply if the Hands
+     attempt to bind to different Fibers, or to the same Fiber at distant positions.
+     to the same Fiber. `min_loop' is the cutoff abscissa distance below which
+     attachment is forbiden:
      
-     Setting `stiff==false`, however, allows the two hands from the Couple to bind 
-     nearby positions on the same fiber. In such a degenerate configuration, the 
-     link is unproductive as it cannot produce force, but the feature may be useful 
+         if hand1 is attached in abscissa `abs1`,
+         and hand2 attempts to attach to the same Fiber at `abs2`
+         allow attachment if ( |abs1-abs2| > min_loop )
+     
+     The same rule apply when hand1 attempts to bind if hand2 is attached.
+     
+     Setting `min_loop=0` allows the two hands from the Couple to bind without
+     restriction on the same fiber. In such a degenerate configuration, the link
+     is unproductive as it cannot produce force, but the feature may be useful
      to combine activities such as cutting and motors.
      */
-    bool         stiff;
+    real         min_loop;
     
     /// Specificity of binding to a pair a Fiber
     /**

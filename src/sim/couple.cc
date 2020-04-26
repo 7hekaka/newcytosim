@@ -274,9 +274,9 @@ bool Couple::allowAttachment(FiberSite const& sit)
         return false;
 #endif
 
-    // prevent binding to the same fiber if the segments are adjacent:
-    if ( prop->stiff && that->fiber() == sit.fiber() &&
-        abs_real(sit.abscissa()-that->abscissa()) <= 2*sit.fiber()->segmentation() )
+    // prevent binding to the same fiber at adjacent locations:
+    if ( ( that->fiber() == sit.fiber() ) &&
+        ( abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop ))
         return false;
     
 #if ( 0 )
