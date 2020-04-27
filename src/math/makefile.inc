@@ -4,7 +4,7 @@
 OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
     	rasterizer.o platonic.o matrix.o matsparse.o matsparsesym.o\
     	matsparsesym1.o polygon.o pointsonsphere.o random.o random_vector.o\
-        matrix34.o matsym.o matblock.o project_ellipse.o quartic_solver.o
+        matrix34.o matsym.o matfull.o project_ellipse.o quartic_solver.o
 
 #----------------------------rules----------------------------------------------
 

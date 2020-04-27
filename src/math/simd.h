@@ -167,7 +167,7 @@ inline __m256i makemask(long i)
 }
 
 inline vec4 maskload(double const* a, __m256i b) { return _mm256_maskload_pd(a, b); }
-
+inline void maskstore(double* a, __m256i b, vec4 c) { _mm256_maskstore_pd(a, b, c); }
 
 inline void store1(double* a, vec4 b)    { _mm_store_sd(a, _mm256_castpd256_pd128(b)); }
 inline void store2(double* a, vec4 b)    { _mm_store_pd(a, _mm256_castpd256_pd128(b)); }

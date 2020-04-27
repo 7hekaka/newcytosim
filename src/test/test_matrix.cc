@@ -5,9 +5,9 @@
 
 #include "assert_macro.h"
 #include "exceptions.h"
+#include "vecprint.h"
 #include "random.h"
 #include "tictoc.h"
-#include "vecprint.h"
 
 #include "dim.h"
 #include "matrix33.h"

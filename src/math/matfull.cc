@@ -135,9 +135,33 @@ void MatrixFull::vecMulAVX(const real* X, real* Y)  const
         vec4 y1 = setzero4();
         vec4 y2 = setzero4();
         vec4 y3 = setzero4();
+        vec4 s0 = setzero4();
+        vec4 s1 = setzero4();
+        vec4 s2 = setzero4();
+        vec4 s3 = setzero4();
 
         real const* ptr = mat_ + 16 * block(i, 0);
-        for ( size_t j = 0; j < last; j += 4 )
+        const size_t end = last - 4;
+        size_t j = 0;
+        for ( ; j < end; j += 8 )
+        {
+            vec4 xx = loadu4(X+j);
+            vec4 yy = loadu4(X+j+4);
+            y0 = fmadd4(load4(ptr   ), xx, y0);
+            y1 = fmadd4(load4(ptr+ 4), xx, y1);
+            y2 = fmadd4(load4(ptr+ 8), xx, y2);
+            y3 = fmadd4(load4(ptr+12), xx, y3);
+            s0 = fmadd4(load4(ptr+16), yy, s0);
+            s1 = fmadd4(load4(ptr+20), yy, s1);
+            s2 = fmadd4(load4(ptr+24), yy, s2);
+            s3 = fmadd4(load4(ptr+28), yy, s3);
+            ptr += 32;
+        }
+        y0 = add4(y0, s0);
+        y1 = add4(y1, s1);
+        y2 = add4(y2, s2);
+        y3 = add4(y3, s3);
+        for ( ; j < last; j += 4 )
         {
             vec4 xx = loadu4(X+j);
             y0 = fmadd4(load4(ptr   ), xx, y0);
@@ -146,20 +170,22 @@ void MatrixFull::vecMulAVX(const real* X, real* Y)  const
             y3 = fmadd4(load4(ptr+12), xx, y3);
             ptr += 16;
         }
-        for ( size_t j = last; j < size_; j += 4 )
+        if ( last < size_ )
         {
-            vec4 xx = maskload(X+j, msk);
+            vec4 xx = maskload(X+last, msk);
             y0 = fmadd4(load4(ptr   ), xx, y0);
             y1 = fmadd4(load4(ptr+ 4), xx, y1);
             y2 = fmadd4(load4(ptr+ 8), xx, y2);
             y3 = fmadd4(load4(ptr+12), xx, y3);
-            ptr += 16;
         }
         // sum y0 = { Y0 Y0 Y0 Y0 }, y1 = { Y1 Y1 Y1 Y1 }, y2 = { Y2 Y2 Y2 Y2 }
         y0 = add4(unpacklo4(y0, y1), unpackhi4(y0, y1));
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
         y0 = add4(permute2f128(y0, y2, 0x21), blend4(y0, y2, 0b1100));
-        store4(Y+i, y0);
+        if ( i < last )
+            store4(Y+i, y0);
+        else
+            maskstore(Y+i, msk, y0);
     }
 }
 
