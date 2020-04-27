@@ -22,19 +22,30 @@ private:
     /// size of matrix
     size_t     size_;
 
+    /// number of block on a line
+    size_t     nblk_;
+    
     /// size of memory which has been allocated
     size_t     allo_;
     
     /// array of pointers to the blocks
     real*      mat_;
-        
+    
+    /// index of block
+    size_t block(size_t i, size_t j) const
+    {
+        assert_true( i < size_ );
+        assert_true( j < size_ );
+        return ( j  >> 2 ) + nblk_ * ( i >> 2 );
+    }
+
 public:
     
     /// return the size of the matrix
     size_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { allocate(s); size_=s; nblk_= ~3&(s+3); }
     
     /// default constructor
     MatrixFull();
@@ -58,12 +69,15 @@ public:
     real& operator()(size_t i, size_t j) { return *addr(i, j); }
 
     
-    /// reset the entire matrix
+    /// reset values to zero
     void reset();
     
-    /// scale the entire matrix
+    /// scale all values
     void scale(real a);
     
+    /// transpose
+    void transpose();
+
     /// total number of elements allocated
     size_t nbElements() const { return size_ * size_; }
 
@@ -72,6 +86,10 @@ public:
     
     /// vector multiplication: Y <- M * X
     void vecMul(const real* X, real* Y) const;
+    
+    /// vector multiplication: Y <- M * X
+    void vecMulAVX(const real* X, real* Y) const;
+
 /*
     /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)
     void vecMulAddIso2D(const real* X, real* Y) const { }

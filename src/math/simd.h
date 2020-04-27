@@ -160,6 +160,15 @@ inline vec4 load4(double const* a)       { return _mm256_load_pd(a); }
 inline vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
 
+inline __m256i makemask(long i)
+{
+    constexpr __m256d ramp{0.5, 1.5, 2.5, 3.5};
+    return _mm256_castpd_si256(_mm256_cmp_pd(ramp, _mm256_set1_pd((double)i), _CMP_LT_OQ));
+}
+
+inline vec4 maskload(double const* a, __m256i b) { return _mm256_maskload_pd(a, b); }
+
+
 inline void store1(double* a, vec4 b)    { _mm_store_sd(a, _mm256_castpd256_pd128(b)); }
 inline void store2(double* a, vec4 b)    { _mm_store_pd(a, _mm256_castpd256_pd128(b)); }
 inline void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, _mm256_castpd256_pd128(b)); }

@@ -47,17 +47,18 @@ void checkMatrix(MATRIX & mat)
 void checkMatrixFull(Matrix44 const& src)
 {
     MatrixFull mat;
-    mat.resize(4);
+    mat.resize(3);
     
-    for ( size_t i = 0; i < 4; ++i )
-    for ( size_t j = 0; j < 4; ++j )
+    for ( size_t i = 0; i < 3; ++i )
+    for ( size_t j = 0; j < 3; ++j )
         mat(i,j) = src(i,j);
     
-    Vector3 vec, vik(0,0,0);
+    Vector3 vec, vik(0,0,0), vok;
     mat.vecMul(sun, vec);
     mat.vecMulAdd(sun, vik);
+    mat.vecMulAVX(sun, vok);
 
-    std::clog << vec << " | " << vik << "\n";
+    std::clog << vec << " | " << vik << " | " << vok << "\n";
     std::clog << mat << "\n";
 
     //printf("  check %+16.6f  %+16.6f ", diff);
