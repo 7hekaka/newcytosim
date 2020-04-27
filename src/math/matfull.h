@@ -95,6 +95,9 @@ public:
     
     /// vector multiplication: Y <- M * X
     void vecMul0(const real* X, real* Y) const;
+    
+    /// vector multiplication: Y <- transposed(M) * X
+    void transVecMul(const real* X, real* Y) const;
 
 /*
     /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)

@@ -159,6 +159,7 @@ inline vec4 load4(double const* a)       { return _mm256_load_pd(a); }
 #endif
 inline vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
+inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
 
 inline __m256i makemask(long i)
 {

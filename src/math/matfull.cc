@@ -157,14 +157,14 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
             {
                 vec4 xx = loadu4(X+j);
                 vec4 yy = loadu4(X+j+4);
-                y0 = fmadd4(load4(ptr   ), xx, y0);
-                y1 = fmadd4(load4(ptr+ 4), xx, y1);
-                y2 = fmadd4(load4(ptr+ 8), xx, y2);
-                y3 = fmadd4(load4(ptr+12), xx, y3);
-                s0 = fmadd4(load4(ptr+16), yy, s0);
-                s1 = fmadd4(load4(ptr+20), yy, s1);
-                s2 = fmadd4(load4(ptr+24), yy, s2);
-                s3 = fmadd4(load4(ptr+28), yy, s3);
+                y0 = fmadd4(streamload4(ptr   ), xx, y0);
+                y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
+                y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
+                y3 = fmadd4(streamload4(ptr+12), xx, y3);
+                s0 = fmadd4(streamload4(ptr+16), yy, s0);
+                s1 = fmadd4(streamload4(ptr+20), yy, s1);
+                s2 = fmadd4(streamload4(ptr+24), yy, s2);
+                s3 = fmadd4(streamload4(ptr+28), yy, s3);
                 ptr += 32;
             }
             y0 = add4(y0, s0);
@@ -175,24 +175,94 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         for ( ; j < last; j += 4 )
         {
             vec4 xx = loadu4(X+j);
-            y0 = fmadd4(load4(ptr   ), xx, y0);
-            y1 = fmadd4(load4(ptr+ 4), xx, y1);
-            y2 = fmadd4(load4(ptr+ 8), xx, y2);
-            y3 = fmadd4(load4(ptr+12), xx, y3);
+            y0 = fmadd4(streamload4(ptr   ), xx, y0);
+            y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
+            y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
+            y3 = fmadd4(streamload4(ptr+12), xx, y3);
             ptr += 16;
         }
         if ( last < size_ )
         {
             vec4 xx = maskload(X+last, msk);
-            y0 = fmadd4(load4(ptr   ), xx, y0);
-            y1 = fmadd4(load4(ptr+ 4), xx, y1);
-            y2 = fmadd4(load4(ptr+ 8), xx, y2);
-            y3 = fmadd4(load4(ptr+12), xx, y3);
+            y0 = fmadd4(streamload4(ptr   ), xx, y0);
+            y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
+            y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
+            y3 = fmadd4(streamload4(ptr+12), xx, y3);
         }
         // sum y0 = { Y0 Y0 Y0 Y0 }, y1 = { Y1 Y1 Y1 Y1 }, y2 = { Y2 Y2 Y2 Y2 }
         y0 = add4(unpacklo4(y0, y1), unpackhi4(y0, y1));
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
         y0 = add4(permute2f128(y0, y2, 0x21), blend4(y0, y2, 0b1100));
+        if ( i < last )
+            storeu4(Y+i, y0);
+        else
+            maskstore(Y+i, msk, y0);
+    }
+}
+
+
+void MatrixFull::transVecMul(const real* X, real* Y)  const
+{
+    size_t last = ~3 & size_;
+    __m256i msk = makemask(size_-last);
+    
+    for ( size_t i = 0; i < size_; i += 4 )
+    {
+        vec4 y0 = setzero4();
+        vec4 y1 = setzero4();
+        vec4 y2 = setzero4();
+        vec4 y3 = setzero4();
+        size_t j = 0;
+        {
+            vec4 s0 = setzero4();
+            vec4 s1 = setzero4();
+            vec4 s2 = setzero4();
+            vec4 s3 = setzero4();
+            
+            const size_t end = last - 4;
+            for ( ; j < end; j += 8 )
+            {
+                const real * xx = X+j;
+                real const* aaa = mat_ + 16 * block(j, i);
+                real const* bbb = mat_ + 16 * block(j+4, i);
+                y0 = fmadd4(streamload4(aaa   ), broadcast1(xx  ), y0);
+                y1 = fmadd4(streamload4(aaa+ 4), broadcast1(xx+1), y1);
+                y2 = fmadd4(streamload4(aaa+ 8), broadcast1(xx+2), y2);
+                y3 = fmadd4(streamload4(aaa+12), broadcast1(xx+3), y3);
+                s0 = fmadd4(streamload4(bbb   ), broadcast1(xx+4), s0);
+                s1 = fmadd4(streamload4(bbb+ 4), broadcast1(xx+5), s1);
+                s2 = fmadd4(streamload4(bbb+ 8), broadcast1(xx+6), s2);
+                s3 = fmadd4(streamload4(bbb+12), broadcast1(xx+7), s3);
+            }
+            y0 = add4(y0, s0);
+            y1 = add4(y1, s1);
+            y2 = add4(y2, s2);
+            y3 = add4(y3, s3);
+        }
+        for ( ; j < last; j += 4 )
+        {
+            const real * xx = X+j;
+            real const* ptr = mat_ + 16 * block(j, i);
+            y0 = fmadd4(streamload4(ptr   ), broadcast1(xx  ), y0);
+            y1 = fmadd4(streamload4(ptr+ 4), broadcast1(xx+1), y1);
+            y2 = fmadd4(streamload4(ptr+ 8), broadcast1(xx+2), y2);
+            y3 = fmadd4(streamload4(ptr+12), broadcast1(xx+3), y3);
+        }
+        y0 = add4(y0, y2);
+        y1 = add4(y1, y3);
+        {
+            real const* ptr = mat_ + 16 * block(j, i);
+            for ( ; j < last; j += 2 )
+            {
+                const real * xx = X+j;
+                y0 = fmadd4(streamload4(ptr  ), broadcast1(xx  ), y0);
+                y1 = fmadd4(streamload4(ptr+4), broadcast1(xx+1), y1);
+                ptr += 8;
+            }
+            y0 = add4(y0, y1);
+            for ( ; j < last; ++j )
+                y0 = fmadd4(streamload4(ptr), broadcast1(X+j), y0);
+        }
         if ( i < last )
             storeu4(Y+i, y0);
         else
