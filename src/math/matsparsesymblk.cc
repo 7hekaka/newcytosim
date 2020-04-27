@@ -17,16 +17,16 @@
 
 MatrixSparseSymmetricBlock::MatrixSparseSymmetricBlock()
 {
-    allocated_ = 0;
-    column_    = nullptr;
-    next_      = new size_t[1];
+    alloc_   = 0;
+    column_  = nullptr;
+    next_    = new size_t[1];
     next_[0] = 0;
 }
 
 
 void MatrixSparseSymmetricBlock::allocate(size_t alc)
 {
-    if ( alc > allocated_ )
+    if ( alc > alloc_ )
     {
         /*
          'chunk' can be increased to gain performance:
@@ -40,13 +40,13 @@ void MatrixSparseSymmetricBlock::allocate(size_t alc)
        
         if ( column_ )
         {
-            for (size_t n = 0; n < allocated_; ++n )
+            for (size_t n = 0; n < alloc_; ++n )
                 col_new[n] = column_[n];
             delete[] column_;
         }
         
-        column_    = col_new;
-        allocated_ = alc;
+        column_ = col_new;
+        alloc_  = alc;
         
         delete[] next_;
         next_ = new size_t[alc+1];
@@ -62,7 +62,7 @@ void MatrixSparseSymmetricBlock::deallocate()
     delete[] next_;
     column_ = nullptr;
     next_   = nullptr;
-    allocated_ = 0;
+    alloc_ = 0;
 }
 
 

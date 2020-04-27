@@ -10,17 +10,17 @@
 
 MatrixSparseBlock::MatrixSparseBlock()
 {
-    allocated_ = 0;
-    row_       = nullptr;
-    blocks_    = nullptr;
-    next_      = new size_t[1];
+    alloc_   = 0;
+    row_     = nullptr;
+    blocks_  = nullptr;
+    next_    = new size_t[1];
     next_[0] = 0;
 }
 
 
 void MatrixSparseBlock::allocate(size_t alc)
 {
-    if ( alc > allocated_ )
+    if ( alc > alloc_ )
     {
         /*
          'chunk' can be increased to gain performance:
@@ -35,13 +35,13 @@ void MatrixSparseBlock::allocate(size_t alc)
         if ( row_ )
         {
             // using the specialy defined '=' for a Line object
-            for (size_t n = 0; n < allocated_; ++n )
+            for (size_t n = 0; n < alloc_; ++n )
                 row_new[n] = row_[n];
             delete[] row_;
         }
         
         row_       = row_new;
-        allocated_ = alc;
+        alloc_ = alc;
         
         delete[] next_;
         next_ = new size_t[alc+1];
@@ -58,7 +58,7 @@ void MatrixSparseBlock::deallocate()
     row_ = nullptr;
     next_ = nullptr;
     free_real(blocks_);
-    allocated_ = 0;
+    alloc_ = 0;
 }
 
 

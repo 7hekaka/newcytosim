@@ -16,17 +16,17 @@ const size_t LAST_IN_COLUMN = ~0U;
 
 MatrixSparse::MatrixSparse()
 {
-    size_      = 0;
-    allocated_ = 0;
-    mxCol      = nullptr;
-    mxRow      = nullptr;
+    size_  = 0;
+    alloc_ = 0;
+    mxCol  = nullptr;
+    mxRow  = nullptr;
 }
 
 
 void MatrixSparse::allocate(size_t sz)
 {
     size_ = sz;
-    if ( size_ > allocated_ )
+    if ( size_ > alloc_ )
     {
         real   ** mxCol_new = new real*[size_];
         size_t ** mxRow_new = new size_t*[size_];
@@ -34,7 +34,7 @@ void MatrixSparse::allocate(size_t sz)
         size_t ii = 0;
         if ( mxCol )
         {
-            for ( ; ii < allocated_; ++ii )
+            for ( ; ii < alloc_; ++ii )
             {
                 mxCol_new[ii] =  mxCol[ii];
                 mxRow_new[ii] =  mxRow[ii];
@@ -51,7 +51,7 @@ void MatrixSparse::allocate(size_t sz)
         
         mxCol = mxCol_new;
         mxRow = mxRow_new;
-        allocated_ = size_;
+        alloc_ = size_;
     }
 }
 
@@ -60,7 +60,7 @@ void MatrixSparse::deallocate()
 {
     if ( mxCol )
     {
-        for ( size_t ii = 0; ii < allocated_; ++ii )
+        for ( size_t ii = 0; ii < alloc_; ++ii )
             if ( mxCol[ii] )
             {
                 delete[] mxCol[ii];
@@ -71,7 +71,7 @@ void MatrixSparse::deallocate()
         mxCol = nullptr;
         mxRow = nullptr;
     }
-    allocated_ = 0;
+    alloc_ = 0;
 }
 
 

@@ -19,7 +19,7 @@ private:
     size_t  size_;
 
     /// size of memory which has been allocated
-    size_t  allocated_;
+    size_t  alloc_;
 
     // array [ size ][ ? ] holding the values for each column
     real ** mxCol;

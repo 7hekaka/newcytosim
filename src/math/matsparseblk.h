@@ -150,7 +150,7 @@ private:
     size_t    size_;
     
     /// amount of memory which has been allocated
-    size_t    allocated_;
+    size_t    alloc_;
     
     /// array col_[c][] holds Elements of column 'c'
     Line *    row_;

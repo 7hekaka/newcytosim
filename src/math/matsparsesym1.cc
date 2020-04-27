@@ -484,6 +484,7 @@ void MatrixSparseSymmetric1::printColumn(std::ostream& os, const size_t jj)
 void MatrixSparseSymmetric1::printSparseArray(std::ostream& os) const
 {
 #if MATRIX1_OPTIMIZED_MULTIPLY
+    std::ios::fmtflags fgs = os.flags();
     size_t end = ija_[size_];
     
     os << "ija ";
@@ -498,6 +499,7 @@ void MatrixSparseSymmetric1::printSparseArray(std::ostream& os) const
         os << " " << std::setw(6) << sa_[n];
     os << "\n";
     os.precision(p);
+    os.setf(fgs);
 #else
     os << "optimized sparse matrix storage unavailable\n";
 #endif
