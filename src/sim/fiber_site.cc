@@ -196,9 +196,9 @@ void FiberSite::print(std::ostream& os) const
         os << "(null)";
 }
 
-std::ostream& operator << (std::ostream& os, FiberSite const& obj)
+std::ostream& operator << (std::ostream& os, FiberSite const& arg)
 {
-    obj.print(os);
+    arg.print(os);
     return os;
 }
 

@@ -185,10 +185,10 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
 
 
 /// print a list of objects
-std::ostream& operator << (std::ostream& os, ObjectList const& list)
+std::ostream& operator << (std::ostream& os, ObjectList const& arg)
 {
-    os << "ObjectList " << &list << " of size " << list.size() << "\n{\n";
-    for ( Object * obj : list )
+    os << "ObjectList " << &arg << " of size " << arg.size() << "\n{\n";
+    for ( Object * obj : arg )
         os << "   " << obj->property()->name() << " " << obj->reference() << '\n';
     os << "}" << '\n';
     return os;

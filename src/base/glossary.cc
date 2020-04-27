@@ -492,16 +492,16 @@ void Glossary::write(std::ostream& os, std::string const& prefix) const
 }
 
 
-std::ostream& operator << (std::ostream& os, Glossary::pair_type const& pair)
+std::ostream& operator << (std::ostream& os, Glossary::pair_type const& arg)
 {
-    os << "  " << format(pair);
+    os << "  " << format(arg);
     return os;
 }
 
 
-std::ostream& operator << (std::ostream& os, Glossary const& glos)
+std::ostream& operator << (std::ostream& os, Glossary const& arg)
 {
-    glos.write(os, "  ");
+    arg.write(os, "  ");
     return os;
 }
 

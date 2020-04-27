@@ -1246,9 +1246,9 @@ void Solid::print(std::ostream& os, bool write_shape) const
 }
 
 
-std::ostream& operator << (std::ostream& os, Solid const& obj)
+std::ostream& operator << (std::ostream& os, Solid const& arg)
 {
-    obj.print(os, false);
+    arg.print(os, false);
     return os;
 }
 

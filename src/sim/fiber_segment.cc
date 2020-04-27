@@ -273,8 +273,8 @@ void FiberSegment::print(std::ostream& os) const
 }
 
 
-std::ostream& operator << (std::ostream& os, FiberSegment const& obj)
+std::ostream& operator << (std::ostream& os, FiberSegment const& arg)
 {
-    obj.print(os);
+    arg.print(os);
     return os;
 }

@@ -253,9 +253,9 @@ void Inventory::print(std::ostream& os) const
 }
 
 
-std::ostream& operator << (std::ostream& os, Inventory const& obj)
+std::ostream& operator << (std::ostream& os, Inventory const& arg)
 {
-    obj.print(os);
+    arg.print(os);
     return os;
 }
 

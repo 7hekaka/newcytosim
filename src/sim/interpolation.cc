@@ -37,8 +37,8 @@ void Interpolation::print(std::ostream& os) const
 }
 
 
-std::ostream& operator << (std::ostream& os, Interpolation const& obj)
+std::ostream& operator << (std::ostream& os, Interpolation const& arg)
 {
-    obj.print(os);
+    arg.print(os);
     return os;
 }

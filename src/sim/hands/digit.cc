@@ -181,10 +181,10 @@ void Digit::stepLoaded(Vector const& force, real force_norm)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-std::ostream& operator << (std::ostream& os, Digit const& obj)
+std::ostream& operator << (std::ostream& os, Digit const& arg)
 {
-    os << obj.property()->name() << "(" << obj.fiber()->reference() << ", " << obj.abscissa();
-    os << ", " << obj.site() << ")";
+    os << arg.property()->name() << "(" << arg.fiber()->reference() << ", " << arg.abscissa();
+    os << ", " << arg.site() << ")";
     return os;
 }
 

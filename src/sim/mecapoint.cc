@@ -52,8 +52,8 @@ void Mecapoint::print(std::ostream& os) const
 }
 
 
-std::ostream& operator << (std::ostream& os, Mecapoint const& obj)
+std::ostream& operator << (std::ostream& os, Mecapoint const& arg)
 {
-    obj.print(os);
+    arg.print(os);
     return os;
 }

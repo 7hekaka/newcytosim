@@ -749,17 +749,17 @@ public:
 
 /// input operator
 template <typename T>
-std::istream& operator >> (std::istream& is, Quaternion<T> & q)
+std::istream& operator >> (std::istream& is, Quaternion<T> & arg)
 {
-    is >> q[0] >> q[1] >> q[2] >> q[3];
+    is >> arg[0] >> arg[1] >> arg[2] >> arg[3];
     return is;
 }
 
 /// output operator
 template <typename T>
-std::ostream& operator << (std::ostream& os, const Quaternion<T> & q)
+std::ostream& operator << (std::ostream& os, const Quaternion<T> & arg)
 {
-    q.print(os);
+    arg.print(os);
     return os;
 }
 

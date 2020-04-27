@@ -371,9 +371,9 @@ void Mecable::print(std::ostream& os, real const* ptr) const
 }
 
 
-std::ostream& operator << (std::ostream& os, Mecable const& obj)
+std::ostream& operator << (std::ostream& os, Mecable const& arg)
 {
-    obj.print(os, obj.data());
+    arg.print(os, arg.data());
     return os;
 }
 

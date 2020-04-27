@@ -153,9 +153,9 @@ std::istream& operator >> (std::istream& is, gle_color& col)
 }
 
 
-std::ostream& operator << (std::ostream& os, gle_color const& x)
+std::ostream& operator << (std::ostream& os, gle_color const& arg)
 {
-    os << x.to_string();
+    os << arg.to_string();
     return os;
 }
 

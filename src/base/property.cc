@@ -134,9 +134,9 @@ void Property::write(std::ostream& os, const bool prune) const
 }
 
 
-std::ostream& operator << (std::ostream& os, const Property& p)
+std::ostream& operator << (std::ostream& os, const Property& arg)
 {
-    p.write(os, 0);
+    arg.write(os, 0);
     return os;
 }
 
