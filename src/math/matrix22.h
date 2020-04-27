@@ -188,17 +188,24 @@ public:
         fprintf(f, "/ %9.3f %9.3f \\\n", val[0], val[2]);
         fprintf(f, "\\ %9.3f %9.3f /\n", val[1], val[3]);
     }
+    
+    /// print on one line
+    void print(std::ostream& os) const
+    {
+        const int w = (int)os.width();
+        os << std::setw(2) << "[ ";
+        os << std::setw(w) << (*this)(0,0) << " ";
+        os << std::setw(w) << (*this)(0,1) << "; ";
+        os << std::setw(w) << (*this)(1,0) << " ";
+        os << std::setw(w) << (*this)(1,1) << " ]";
+    }
 
     /// conversion to string
     std::string to_string(int w, int p) const
     {
         std::ostringstream os;
         os.precision(p);
-        os << std::setw(2) << "[ ";
-        os << std::setw(w) << (*this)(0,0) << " ";
-        os << std::setw(w) << (*this)(0,1) << "; ";
-        os << std::setw(w) << (*this)(1,0) << " ";
-        os << std::setw(w) << (*this)(1,1) << " ]";
+        print(os);
         return os.str();
     }
 
@@ -812,15 +819,12 @@ public:
 
 };
 
-/// output a Matrix22
-inline std::ostream& operator << (std::ostream& os, Matrix22 const& mat)
+/// output operator
+inline std::ostream& operator << (std::ostream& os, Matrix22 const& arg)
 {
-    int w = (int)os.width();
-    os << std::setw(2) << "[ ";
-    os << std::setw(w) << mat(0,0) << " ";
-    os << std::setw(w) << mat(0,1) << "; ";
-    os << std::setw(w) << mat(1,0) << " ";
-    os << std::setw(w) << mat(1,1) << " ]";
+    std::ios::fmtflags fgs = os.flags();
+    arg.print(os);
+    os.setf(fgs);
     return os;
 }
 

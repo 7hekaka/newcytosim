@@ -160,12 +160,11 @@ public:
         fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n",  val[0x3], val[0x7], val[0xB], val[0xF]);
     }
     
-    /// conversion to string
-    std::string to_string(int w, int p) const
+    /// print
+    void print(std::ostream& os) const
     {
-        std::ostringstream os;
-        os.precision(p);
-        os << "[";
+        const int w = (int)os.width();
+        os << std::setw(1) << "[";
         for ( index i = 0; i < 4; ++i )
         {
             for ( index j = 0; j < 4; ++j )
@@ -175,6 +174,14 @@ public:
             else
                 os << " ]";
         }
+    }
+
+    /// conversion to string
+    std::string to_string(int w, int p) const
+    {
+        std::ostringstream os;
+        os.precision(p);
+        print(os);
         return os.str();
     }
 
@@ -690,22 +697,12 @@ public:
 };
 
 
-/// output a Matrix44
-inline std::ostream& operator << (std::ostream& os, Matrix44 const& mat)
+/// output operator
+inline std::ostream& operator << (std::ostream& os, Matrix44 const& arg)
 {
-    int w = (int)os.width();
-    os.width(1);
-    os << "[";
-    for ( Matrix44::index i = 0; i < 4; ++i )
-    {
-        for ( Matrix44::index j = 0; j < 4; ++j )
-            os << " " << std::fixed << std::setw(w) << mat(i,j);
-        if ( i < 3 )
-            os << ";";
-        else
-            os << " ]";
-    }
-    os.width(w);
+    std::ios::fmtflags fgs = os.flags();
+    arg.print(os);
+    os.setf(fgs);
     return os;
 }
 

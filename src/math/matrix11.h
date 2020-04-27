@@ -386,7 +386,7 @@ public:
 };
 
 
-/// output a Matrix11
+/// output operator
 inline std::ostream& operator << (std::ostream& os, Matrix11 const& mat)
 {
     os << "[ " << mat.value() << " ]";
