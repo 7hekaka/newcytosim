@@ -99,7 +99,7 @@ void Simul::prepare()
  */
 void Simul::step()
 {
-    //auto rdtsc = __rdtsc();
+    //auto rdt = __rdtsc();
     // increment time:
     prop->time += prop->time_step;
     //printf("\n------ time is %8.3f\n", prop->time);
@@ -116,7 +116,7 @@ void Simul::step()
     singles.shuffle();
     spaces.shuffle();
     
-    //printf("Simul::shuffles %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("Simul::shuffles %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 
     // Monte-Carlo step for all objects
     events.step();
@@ -129,7 +129,7 @@ void Simul::step()
     solids.step();
     fibers.step();
     
-    //printf("     ::steps    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("     ::steps    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 
     // calculate grid range from Hand's binding range:
     real range = 0.0;
@@ -139,7 +139,7 @@ void Simul::step()
     // distribute Fibers over a grid for binding of Hands:
     fiberGrid.paintGrid(fibers.first(), nullptr, range);
     
-    //printf("     ::paint    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("     ::paint    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 
 #if ( 0 )
     
@@ -167,7 +167,7 @@ void Simul::step()
     couples.step();
     singles.step();
     
-    //printf("     ::attach   %16llu\n", (__rdtsc()-rdtsc)>>3);
+    //printf("     ::attach   %16llu\n", (__rdtsc()-rdt)>>3);
 }
 
 

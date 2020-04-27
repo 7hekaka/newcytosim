@@ -1236,7 +1236,7 @@ void MatrixSparseSymmetricBlock::vecMulAdd_ALT(const real* X, real* Y) const
 void MatrixSparseSymmetricBlock::vecMulAdd_TIME(const real* X, real* Y) const
 {
     size_t cnt = 0, col = 0;
-    //unsigned long long time = __rdtsc();
+    //auto rdt = __rdtscd();
     for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
     {
         col++;
@@ -1255,7 +1255,7 @@ void MatrixSparseSymmetricBlock::vecMulAdd_TIME(const real* X, real* Y) const
     /*
     if ( cnt > 0 )
         fprintf(stderr, "MSSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
-                col, cnt, real(__rdtsc()-time)/cnt);
+                col, cnt, real(__rdtscd()-rdt)/cnt);
      */
 }
 

@@ -6,7 +6,7 @@
 
 #include <ctime>
 
-/// import __rdtsc()
+/// this will import Intel's cycle counter rdtscp()
 #if defined(__APPLE__) || defined(__linux)
 #  include <x86intrin.h>
 #else

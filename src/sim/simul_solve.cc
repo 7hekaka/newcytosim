@@ -292,24 +292,25 @@ void Simul::setInteractions(Meca& meca) const
 void Simul::solve()
 {
     sMeca.prepare(this);
-    //auto rdtsc = __rdtsc();
+    //auto rdt = __rdtsc();
     setInteractions(sMeca);
-    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+    prop->precondition = 3 - prop->precondition;
     sMeca.solve(prop, prop->precondition);
-    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.apply();
-    //printf("     ::apply    %16llu\n", (__rdtsc()-rdtsc)>>5);
+    //printf("     ::apply    %16llu\n", (__rdtsc()-rdt)>>5);
 }
 
 
 void Simul::solve_half()
 {
     sMeca.prepare(this);
-    //auto rdtsc = __rdtsc();
+    //auto rdt = __rdtsc();
     setInteractions(sMeca);
-    //printf("     ::set      %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.solve(prop, prop->precondition);
-    //printf("     ::solve    %16llu\n", (__rdtsc()-rdtsc)>>5); rdtsc = __rdtsc();
+    //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 }
 
 

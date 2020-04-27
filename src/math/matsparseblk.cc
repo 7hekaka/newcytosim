@@ -957,7 +957,7 @@ void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, size_t start, siz
     assert_true( start <= stop );
     assert_true( stop <= size_ );
     size_t cnt = 0, row = 0;
-    //unsigned long long time = __rdtsc();
+    //auto rdt = __rdtsc();
     for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
     {
         row++;
@@ -976,7 +976,7 @@ void MatrixSparseBlock::vecMulAdd_TIME(const real* X, real* Y, size_t start, siz
     /*
     if ( cnt > 0 )
         fprintf(stderr, "MSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
-                row, cnt, real(__rdtsc()-time)/cnt);
+                row, cnt, real(__rdtsc()-rdt)/cnt);
      */
 }
 

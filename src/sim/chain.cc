@@ -746,7 +746,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 {
     int res;
     assert_true( nbs > 1 );
-    //auto rdtsc = __rdtsc();
+    //auto rdt = __rdtsc();
 
     // alias some of the memory provided for the work:
     real * mag = tmp;
@@ -800,7 +800,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         printf("\nLmul "); VecPrint::print(std::cout, nbs, mem, 3);
     }
 #endif
-    //printf("reshape %3i cycles: %16llu\n", ns, __rdtsc()-rdtsc);
+    //printf("reshape %3i cycles: %16llu\n", ns, __rdtsc()-rdt);
 
     if ( res == 0 )
     {
