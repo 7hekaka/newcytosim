@@ -14,10 +14,12 @@
 #include "matrix33.h"
 #include "matrix34.h"
 #include "matrix44.h"
+#include "matfull.h"
+
 
 Vector3 dir(0, 1, 0);
 Vector3 off(0.1, 0.2, -0.3);
-Vector3 src(0, 0, 0);
+Vector3 sun(0, 0, 0);
 
 real diff(size_t size, real const* a, real const* b)
 {
@@ -32,17 +34,34 @@ template <typename MATRIX>
 void checkMatrix(MATRIX & mat)
 {
     mat = MATRIX::outerProduct(dir, off);
-    Vector3 vec = mat.vecmul(src);
-    Vector3 vik = mat.trans_vecmul(src);
+    Vector3 vec = mat.vecmul(sun);
+    Vector3 vik = mat.trans_vecmul(sun);
 
-    std::clog.precision(3);
-
-    std::clog << vec << "  |  " << vik << "  ";
+    std::clog << vec << " | " << vik << "  ";
     std::clog << mat << "  " << mat.transposed() << "\n";
 
     //printf("  check %+16.6f  %+16.6f ", diff);
 }
 
+
+void checkMatrixFull(Matrix44 const& src)
+{
+    MatrixFull mat;
+    mat.resize(4);
+    
+    for ( size_t i = 0; i < 4; ++i )
+    for ( size_t j = 0; j < 4; ++j )
+        mat(i,j) = src(i,j);
+    
+    Vector3 vec, vik(0,0,0);
+    mat.vecMul(sun, vec);
+    mat.vecMulAdd(sun, vik);
+
+    std::clog << vec << " | " << vik << "\n";
+    std::clog << mat << "\n";
+
+    //printf("  check %+16.6f  %+16.6f ", diff);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -56,14 +75,18 @@ int main( int argc, char* argv[] )
     Matrix34 M34(1,0);
     Matrix44 M44(1,0);
 
-    src = Vector3::randS();
+    sun = Vector3::randS();
     dir = Vector3::randU();
     off = Vector3::randU();
-    std::clog << src << "\n";
+    
+    std::clog.precision(3);
+    std::clog.setf(std::ios::fixed);
 
     checkMatrix(M33);
     checkMatrix(M34);
     checkMatrix(M44);
+    
+    checkMatrixFull(M44);
     
     return EXIT_SUCCESS;
 }

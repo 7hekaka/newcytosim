@@ -462,7 +462,7 @@
 		BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* pointsonsphere.h */; };
 		BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587205B98DA3006956D5 /* conjgradient.h */; };
 		BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* smath.h */; };
-		BB71917D0EF1CD9900CED9E2 /* matblock.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matblock.h */; };
+		BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matfull.h */; };
 		BB71917F0EF1CD9900CED9E2 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589D05B98DA3006956D5 /* random.h */; };
 		BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588A05B98DA3006956D5 /* matsparse.h */; };
 		BB7191820EF1CD9900CED9E2 /* real.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC66B209C0C3D30031048A /* real.h */; };
@@ -479,7 +479,7 @@
 		BB71919E0EF1CD9900CED9E2 /* conjgradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587105B98DA3006956D5 /* conjgradient.cc */; };
 		BB7191A00EF1CD9900CED9E2 /* matsparse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* matsparse.cc */; };
 		BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E505E1440E00BC9B7A /* matrix.cc */; };
-		BB7191A30EF1CD9900CED9E2 /* matblock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matblock.cc */; };
+		BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
 		BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3D2ADA05C8396B0022ACE5 /* pointsonsphere.cc */; };
 		BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; };
@@ -692,6 +692,7 @@
 		BBA9869B132246870031200B /* bridge_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98697132246870031200B /* bridge_prop.h */; };
 		BBA9869C132246870031200B /* bridge.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98698132246870031200B /* bridge.cc */; };
 		BBA9869D132246870031200B /* bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98699132246870031200B /* bridge.h */; };
+		BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
 		BBAA7E7E2455D86300C924DB /* test_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAA7E7D2455D86300C924DB /* test_block.cc */; };
 		BBAA7E8A2455D96C00C924DB /* test_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAA7E7D2455D86300C924DB /* test_block.cc */; };
 		BBAA7E8B2455DE5500C924DB /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
@@ -1274,7 +1275,7 @@
 		BB0E4BD61002698100A96B34 /* random_vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = random_vector.h; path = src/math/random_vector.h; sourceTree = SOURCE_ROOT; };
 		BB0E4BD71002698100A96B34 /* random_vector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_vector.cc; path = src/math/random_vector.cc; sourceTree = SOURCE_ROOT; };
 		BB0E75E505E1440E00BC9B7A /* matrix.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matrix.cc; path = src/math/matrix.cc; sourceTree = SOURCE_ROOT; };
-		BB0E75E805E14D9C00BC9B7A /* matblock.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matblock.cc; path = src/math/matblock.cc; sourceTree = SOURCE_ROOT; };
+		BB0E75E805E14D9C00BC9B7A /* matfull.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matfull.cc; path = src/math/matfull.cc; sourceTree = SOURCE_ROOT; };
 		BB0E885416FBC81400451517 /* sim_thread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sim_thread.cc; sourceTree = "<group>"; };
 		BB0E885516FBC81400451517 /* sim_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sim_thread.h; sourceTree = "<group>"; };
 		BB1121821549B72B0031CC48 /* shackle_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle_long.cc; path = couples/shackle_long.cc; sourceTree = "<group>"; };
@@ -1448,7 +1449,7 @@
 		BB73587B05B98DA3006956D5 /* iowrapper.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = iowrapper.cc; path = src/base/iowrapper.cc; sourceTree = SOURCE_ROOT; };
 		BB73587D05B98DA3006956D5 /* iowrapper.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = iowrapper.h; path = src/base/iowrapper.h; sourceTree = SOURCE_ROOT; };
 		BB73588105B98DA3006956D5 /* grid.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = grid.h; path = src/math/grid.h; sourceTree = SOURCE_ROOT; };
-		BB73588405B98DA3006956D5 /* matblock.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matblock.h; path = src/math/matblock.h; sourceTree = SOURCE_ROOT; };
+		BB73588405B98DA3006956D5 /* matfull.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matfull.h; path = src/math/matfull.h; sourceTree = SOURCE_ROOT; };
 		BB73588505B98DA3006956D5 /* matrix.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matrix.h; path = src/math/matrix.h; sourceTree = SOURCE_ROOT; };
 		BB73588905B98DA3006956D5 /* matsparse.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparse.cc; path = src/math/matsparse.cc; sourceTree = SOURCE_ROOT; };
 		BB73588A05B98DA3006956D5 /* matsparse.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparse.h; path = src/math/matsparse.h; sourceTree = SOURCE_ROOT; };
@@ -2254,8 +2255,8 @@
 				BB89999320CECB5C00498F48 /* matrix44.h */,
 				BB73588505B98DA3006956D5 /* matrix.h */,
 				BB0E75E505E1440E00BC9B7A /* matrix.cc */,
-				BB73588405B98DA3006956D5 /* matblock.h */,
-				BB0E75E805E14D9C00BC9B7A /* matblock.cc */,
+				BB73588405B98DA3006956D5 /* matfull.h */,
+				BB0E75E805E14D9C00BC9B7A /* matfull.cc */,
 				BB73589005B98DA3006956D5 /* matsym.h */,
 				BB73588F05B98DA3006956D5 /* matsym.cc */,
 				BB73588A05B98DA3006956D5 /* matsparse.h */,
@@ -3505,7 +3506,7 @@
 				BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */,
 				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
 				BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */,
-				BB71917D0EF1CD9900CED9E2 /* matblock.h in Headers */,
+				BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */,
 				BB0CB11B20C170C10016D73D /* qmr.h in Headers */,
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
@@ -4547,7 +4548,7 @@
 				BB71919E0EF1CD9900CED9E2 /* conjgradient.cc in Sources */,
 				BB7191A00EF1CD9900CED9E2 /* matsparse.cc in Sources */,
 				BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */,
-				BB7191A30EF1CD9900CED9E2 /* matblock.cc in Sources */,
+				BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */,
 				BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */,
 				BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */,
 				BB9D87B01E76BBB800DD0F00 /* matsparsesym2.cc in Sources */,
@@ -4649,6 +4650,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */,
 				BBAA7E8E2455DEED00C924DB /* vector2.cc in Sources */,
 				BBAA7E8F2455DEED00C924DB /* vector3.cc in Sources */,
 				BBAA7E902455DEED00C924DB /* vector4.cc in Sources */,
