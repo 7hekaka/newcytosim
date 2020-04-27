@@ -62,6 +62,12 @@ public:
         val_ = 0.;
     }
     
+    /// set diagonal to 'dia' and other elements to 'off'
+    void reset(real dia, real)
+    {
+        val_ = dia;
+    }
+
     /// true if element is different from 'zero'
     bool operator != (real zero) const
     {

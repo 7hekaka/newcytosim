@@ -59,6 +59,9 @@ public:
     /// default destructor
     virtual ~MatrixFull() { deallocate(); }
     
+    /// return memory used to store values
+    real* data() const { return mat_; }
+    
     /// the address holding element (i, j)
     real* addr(size_t i, size_t j) const;
     
@@ -69,8 +72,11 @@ public:
     real& operator()(size_t i, size_t j) { return *addr(i, j); }
 
     
-    /// reset values to zero
-    void reset();
+    /// reset with 'dia' on diagonal and 'off' elsewhere
+    void reset(real dia, real off);
+    
+    /// import column-major matrix
+    void importMatrix(size_t size, real const*, size_t lld);
     
     /// scale all values
     void scale(real a);
@@ -88,7 +94,7 @@ public:
     void vecMul(const real* X, real* Y) const;
     
     /// vector multiplication: Y <- M * X
-    void vecMulAVX(const real* X, real* Y) const;
+    void vecMul0(const real* X, real* Y) const;
 
 /*
     /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)

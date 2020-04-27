@@ -107,6 +107,15 @@ public:
             val[u] = 0.0;
     }
     
+    /// set diagonal to 'dia' and other elements to 'off'
+    void reset(real dia, real off)
+    {
+        for ( index u = 0; u < 16; ++u )
+            val[u] = off;
+        for ( index u = 0; u < 4; ++u )
+            val[u*5] = dia;
+    }
+
     /// true if any value is different from 'zero'
     bool operator != (real zero) const
     {

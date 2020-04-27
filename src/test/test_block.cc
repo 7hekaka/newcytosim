@@ -59,9 +59,9 @@ void checkMatrixFull(Matrix44 const& src)
         mat(i,j) = src(i,j);
     
     Vector3 vec, vik(0,0,0), vok;
-    mat.vecMul(sun, vec);
+    mat.vecMul0(sun, vec);
     mat.vecMulAdd(sun, vik);
-    mat.vecMulAVX(sun, vok);
+    mat.vecMul(sun, vok);
 
     std::clog << vec << " | " << vik << " | " << vok << "\n";
     std::clog << mat << "\n";
@@ -86,7 +86,18 @@ void speedMatrix(size_t size, size_t cnt)
     for ( size_t j = 0; j < size; ++j )
         mat(i,j) = RNG.preal();
 
-    printf("%20s mul size %lu\n", mat.what().c_str(), size);
+    printf("Matrix %s size %lu\n", mat.what().c_str(), size);
+
+    mat.vecMul0(s, x);
+    VecPrint::print(std::cout, std::min(size,NCO), x);
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        mat.vecMul0(x, y);
+        mat.vecMul0(y, z);
+        mat.vecMul0(z, x);
+    }
+    toc("  SCA");
 
     mat.vecMul(s, x);
     VecPrint::print(std::cout, std::min(size,NCO), x);
@@ -97,18 +108,7 @@ void speedMatrix(size_t size, size_t cnt)
         mat.vecMul(y, z);
         mat.vecMul(z, x);
     }
-    toc("  SCA");
-
-    mat.vecMulAVX(s, x);
-    VecPrint::print(std::cout, std::min(size,NCO), x);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-    {
-        mat.vecMulAVX(x, y);
-        mat.vecMulAVX(y, z);
-        mat.vecMulAVX(z, x);
-    }
-    toc("  AVX");
+    toc(" AVX?");
     
     if ( 1 )
     {
@@ -159,7 +159,7 @@ int main( int argc, char* argv[] )
         checkMatrixFull(M44);
     }
     
-    speedMatrix(100, 1<<14);
+    speedMatrix(100, 1<<16);
 
     return EXIT_SUCCESS;
 }

@@ -131,6 +131,19 @@ public:
             val[u] = 0.;
 #endif
     }
+
+    /// set diagonal to 'dia' and other elements to 'off'
+    void reset(real dia, real off)
+    {
+#if MATRIX22_USES_AVX
+        mat = set4(dia, off, off, dia);
+#else
+        val[0] = dia;
+        val[1] = off;
+        val[2] = off;
+        val[3] = dia;
+#endif
+    }
     
     /// true if any element is different than 'zero'
     bool operator != (real zero) const

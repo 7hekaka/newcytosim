@@ -69,10 +69,21 @@ real* MatrixFull::addr(size_t i, size_t j) const
 }
 
 
-void MatrixFull::reset()
+void MatrixFull::reset(real dia, real off)
 {
     for ( size_t i = 0; i < allo_*allo_ ; ++i )
-        mat_[i] = 0;
+        mat_[i] = off;
+    for ( size_t i = 0; i < size_ ; ++i )
+        *addr(i,i) = dia;
+}
+
+
+void MatrixFull::importMatrix(size_t size, real const* ptr, size_t lld)
+{
+    resize(size);
+    for ( size_t i = 0; i < size; ++i )
+    for ( size_t j = 0; j < size; ++j )
+        *addr(i,j) = ptr[i+lld*j];
 }
 
 
@@ -109,8 +120,7 @@ void MatrixFull::vecMulAdd(const real* X, real* Y)  const
     }
 }
 
-
-void MatrixFull::vecMul(const real* X, real* Y)  const
+void MatrixFull::vecMul0(const real* X, real* Y)  const
 {
     for ( size_t i = 0; i < size_; ++i )
     {
@@ -121,10 +131,9 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
     }
 }
 
-
 #ifdef __AVX__
 
-void MatrixFull::vecMulAVX(const real* X, real* Y)  const
+void MatrixFull::vecMul(const real* X, real* Y)  const
 {
     size_t last = ~3 & size_;
     __m256i msk = makemask(size_-last);
@@ -135,32 +144,34 @@ void MatrixFull::vecMulAVX(const real* X, real* Y)  const
         vec4 y1 = setzero4();
         vec4 y2 = setzero4();
         vec4 y3 = setzero4();
-        vec4 s0 = setzero4();
-        vec4 s1 = setzero4();
-        vec4 s2 = setzero4();
-        vec4 s3 = setzero4();
-
         real const* ptr = mat_ + 16 * block(i, 0);
-        const size_t end = last - 4;
         size_t j = 0;
-        for ( ; j < end; j += 8 )
         {
-            vec4 xx = loadu4(X+j);
-            vec4 yy = loadu4(X+j+4);
-            y0 = fmadd4(load4(ptr   ), xx, y0);
-            y1 = fmadd4(load4(ptr+ 4), xx, y1);
-            y2 = fmadd4(load4(ptr+ 8), xx, y2);
-            y3 = fmadd4(load4(ptr+12), xx, y3);
-            s0 = fmadd4(load4(ptr+16), yy, s0);
-            s1 = fmadd4(load4(ptr+20), yy, s1);
-            s2 = fmadd4(load4(ptr+24), yy, s2);
-            s3 = fmadd4(load4(ptr+28), yy, s3);
-            ptr += 32;
+            vec4 s0 = setzero4();
+            vec4 s1 = setzero4();
+            vec4 s2 = setzero4();
+            vec4 s3 = setzero4();
+            
+            const size_t end = last - 4;
+            for ( ; j < end; j += 8 )
+            {
+                vec4 xx = loadu4(X+j);
+                vec4 yy = loadu4(X+j+4);
+                y0 = fmadd4(load4(ptr   ), xx, y0);
+                y1 = fmadd4(load4(ptr+ 4), xx, y1);
+                y2 = fmadd4(load4(ptr+ 8), xx, y2);
+                y3 = fmadd4(load4(ptr+12), xx, y3);
+                s0 = fmadd4(load4(ptr+16), yy, s0);
+                s1 = fmadd4(load4(ptr+20), yy, s1);
+                s2 = fmadd4(load4(ptr+24), yy, s2);
+                s3 = fmadd4(load4(ptr+28), yy, s3);
+                ptr += 32;
+            }
+            y0 = add4(y0, s0);
+            y1 = add4(y1, s1);
+            y2 = add4(y2, s2);
+            y3 = add4(y3, s3);
         }
-        y0 = add4(y0, s0);
-        y1 = add4(y1, s1);
-        y2 = add4(y2, s2);
-        y3 = add4(y3, s3);
         for ( ; j < last; j += 4 )
         {
             vec4 xx = loadu4(X+j);
@@ -183,9 +194,22 @@ void MatrixFull::vecMulAVX(const real* X, real* Y)  const
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
         y0 = add4(permute2f128(y0, y2, 0x21), blend4(y0, y2, 0b1100));
         if ( i < last )
-            store4(Y+i, y0);
+            storeu4(Y+i, y0);
         else
             maskstore(Y+i, msk, y0);
+    }
+}
+
+#else
+
+void MatrixFull::vecMul(const real* X, real* Y)  const
+{
+    for ( size_t i = 0; i < size_; ++i )
+    {
+        real val = 0;
+        for ( size_t j = 0; j < size_; ++j )
+            val += value(i,j) * X[j];
+        Y[i] = val;
     }
 }
 
@@ -221,7 +245,11 @@ void MatrixFull::print(std::ostream& os) const
 std::string MatrixFull::what() const
 {
     std::ostringstream msg;
-    msg << "mBF " << size_;
+#ifdef __AVX__
+    msg << "mFX " << size_ << "x" << size_;
+#else
+    msg << "mF " << size_ << "x" << size_;
+#endif
     return msg.str();
 }
 
