@@ -36,10 +36,3 @@ std::istream& operator >> (std::istream& is, Vector1& v)
         eatTwoZeros(is);
     return is;
 }
-
-
-std::ostream& operator << (std::ostream& os, Vector1 const& v)
-{
-    os << v.XX;
-    return os;
-}

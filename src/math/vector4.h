@@ -622,27 +622,43 @@ public:
     
     //------------------------------------------------------------------
     
+    /// output
+    void print(std::ostream& os) const
+    {
+        const int w = (int)os.width();
+        os << std::showpos << XX << " ";
+        os << std::setw(w) << YY << " ";
+        os << std::setw(w) << ZZ << " ";
+        os << std::setw(w) << TT;
+    }
+
+    /// output using width 'w' and precision 'p'
+    void print(std::ostream& os, int w, int p) const
+    {
+        os.precision(p);
+        os.setf(std::ios::showpos);
+        os << std::setw(w) << XX << " ";
+        os << std::setw(w) << YY << " ";
+        os << std::setw(w) << ZZ << " ";
+        os << std::setw(w) << TT;
+    }
+
     /// conversion to a string
     std::string toString() const
     {
         std::ostringstream oss;
-        oss << XX << " " << YY << " " << ZZ << " " << TT;
+        print(oss);
         return oss.str();
     }
     
-    /// conversion to ASCII string with given precision
+    /// conversion to a string with given precision
     std::string toString(int w, int p) const
     {
         std::ostringstream oss;
-        oss.precision(p);
-        oss.setf(std::ios::showpos);
-        oss << std::setw(w) << XX << " ";
-        oss << std::setw(w) << YY << " ";
-        oss << std::setw(w) << ZZ << " ";
-        oss << std::setw(w) << TT;
+        print(oss, w, p);
         return oss.str();
     }
-    
+
     /// print to a file
     void print(FILE * out = stdout) const
     {
@@ -708,8 +724,13 @@ public:
 /// stream input operator
 std::istream& operator >> (std::istream&, Vector4&);
 
-/// stream output operator
-std::ostream& operator << (std::ostream&, Vector4 const&);
-
+/// output operator
+inline std::ostream& operator << (std::ostream& os, Vector4 const& arg)
+{
+    std::ios::fmtflags fgs = os.flags();
+    arg.print(os);
+    os.setf(fgs);
+    return os;
+}
 
 #endif

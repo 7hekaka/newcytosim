@@ -41,14 +41,3 @@ std::istream& operator >> (std::istream& is, Vector4& v)
     return is;
 }
 
-
-std::ostream& operator << (std::ostream& os, Vector4 const& v)
-{
-    int w = (int)os.width();
-    os << std::setw(w) << std::showpos << v.XX << " ";
-    os << std::setw(w) << v.YY << " ";
-    os << std::setw(w) << v.ZZ << " ";
-    os << std::setw(w) << v.TT << std::noshowpos;
-    return os;
-}
-

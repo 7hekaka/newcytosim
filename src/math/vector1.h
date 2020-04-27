@@ -496,11 +496,24 @@ public:
     
     //------------------------------------------------------------------
     
+    /// output
+    void print(std::ostream& os) const
+    {
+        os << XX;
+    }
+    
+    /// output using width 'w' and precision 'p'
+    void print(std::ostream& os, int w, int p) const
+    {
+        os.precision(p);
+        os << std::setw(w) << XX;
+    }
+
     /// conversion to a string
     std::string toString() const
     {
         std::ostringstream oss;
-        oss << XX;
+        print(oss);
         return oss.str();
     }
     
@@ -508,11 +521,10 @@ public:
     std::string toString(int w, int p) const
     {
         std::ostringstream oss;
-        oss.precision(p);
-        oss << std::setw(w) << XX;
+        print(oss, w, p);
         return oss.str();
     }
-    
+
     /// print to a file
     void print(FILE * out = stdout) const
     {
@@ -581,9 +593,14 @@ public:
 /// stream input operator
 std::istream& operator >> (std::istream&, Vector1&);
 
-/// stream output operator
-std::ostream& operator << (std::ostream&, Vector1 const&);
-
+/// output operator
+inline std::ostream& operator << (std::ostream& os, Vector1 const& arg)
+{
+    std::ios::fmtflags fgs = os.flags();
+    arg.print(os);
+    os.setf(fgs);
+    return os;
+}
 
 #endif
 

@@ -646,11 +646,28 @@ public:
     
     //------------------------------------------------------------------
     
+    /// output
+    void print(std::ostream& os) const
+    {
+        const int w = (int)os.width();
+        os << std::showpos << XX << " ";
+        os << std::setw(w) << YY;
+    }
+    
+    /// output using width 'w' and precision 'p'
+    void print(std::ostream& os, int w, int p) const
+    {
+        os.precision(p);
+        os.setf(std::ios::showpos);
+        os << std::setw(w) << XX << " ";
+        os << std::setw(w) << YY;
+    }
+    
     /// conversion to a string
     std::string toString() const
     {
         std::ostringstream oss;
-        oss << XX << " " << YY;
+        print(oss);
         return oss.str();
     }
     
@@ -658,13 +675,10 @@ public:
     std::string toString(int w, int p) const
     {
         std::ostringstream oss;
-        oss.precision(p);
-        oss.setf(std::ios::showpos);
-        oss << std::setw(w) << XX << " ";
-        oss << std::setw(w) << YY;
+        print(oss, w, p);
         return oss.str();
     }
-    
+                    
     /// print to a file
     void print(FILE * out = stdout) const
     {
@@ -737,8 +751,14 @@ public:
 /// stream input operator
 std::istream& operator >> (std::istream&, Vector2&);
 
-/// stream output operator
-std::ostream& operator << (std::ostream&, Vector2 const&);
+/// output operator
+inline std::ostream& operator << (std::ostream& os, Vector2 const& arg)
+{
+    std::ios::fmtflags fgs = os.flags();
+    arg.print(os);
+    os.setf(fgs);
+    return os;
+}
 
 
 #endif
