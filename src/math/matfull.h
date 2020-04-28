@@ -70,6 +70,9 @@ public:
 
     /// returns the address of element at (i, j), allocating if necessary
     real& operator()(size_t i, size_t j) { return *addr(i, j); }
+    
+    /// returns the address of element at (i, j), allocating if necessary
+    real  operator()(size_t i, size_t j) const { return *addr(i, j); }
 
     
     /// reset with 'dia' on diagonal and 'off' elsewhere
@@ -97,7 +100,11 @@ public:
     void vecMul0(const real* X, real* Y) const;
     
     /// vector multiplication: Y <- transposed(M) * X
-    void transVecMul(const real* X, real* Y) const;
+    void transVecMulAdd(const real* X, real* Y) const;
+    
+    /// vector multiplication: Y <- transposed(M) * X
+    void transVecMul(const real* X, real* Y) const
+    { zero_real(size_, Y); transVecMulAdd(X, Y); }
 
 /*
     /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)

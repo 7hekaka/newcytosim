@@ -135,25 +135,22 @@ void MatrixFull::vecMul0(const real* X, real* Y)  const
 
 void MatrixFull::vecMul(const real* X, real* Y)  const
 {
-    size_t last = ~3 & size_;
-    __m256i msk = makemask(size_-last);
-
     for ( size_t i = 0; i < size_; i += 4 )
     {
+        size_t end = ~3 & size_; // last multiple of 4 <= size_
+        __m256i msk = makemask(size_-end);
         vec4 y0 = setzero4();
         vec4 y1 = setzero4();
         vec4 y2 = setzero4();
         vec4 y3 = setzero4();
         real const* ptr = mat_ + 16 * block(i, 0);
-        size_t j = 0;
+        const size_t last = ~7 & size_; // last multiple of 8 <= size_
         {
             vec4 s0 = setzero4();
             vec4 s1 = setzero4();
             vec4 s2 = setzero4();
             vec4 s3 = setzero4();
-            
-            const size_t end = last - 4;
-            for ( ; j < end; j += 8 )
+            for ( size_t j = 0; j < last; j += 8 )
             {
                 vec4 xx = loadu4(X+j);
                 vec4 yy = loadu4(X+j+4);
@@ -172,7 +169,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
             y2 = add4(y2, s2);
             y3 = add4(y3, s3);
         }
-        for ( ; j < last; j += 4 )
+        for ( size_t j = last; j < end; j += 4 )
         {
             vec4 xx = loadu4(X+j);
             y0 = fmadd4(streamload4(ptr   ), xx, y0);
@@ -181,9 +178,9 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
             y3 = fmadd4(streamload4(ptr+12), xx, y3);
             ptr += 16;
         }
-        if ( last < size_ )
+        if ( end < size_ )
         {
-            vec4 xx = maskload(X+last, msk);
+            vec4 xx = maskload(X+end, msk);
             y0 = fmadd4(streamload4(ptr   ), xx, y0);
             y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
             y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
@@ -201,72 +198,44 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
 }
 
 
-void MatrixFull::transVecMul(const real* X, real* Y)  const
+void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
 {
-    size_t last = ~3 & size_;
-    __m256i msk = makemask(size_-last);
-    
+    // as we accumulate in Y[], the columns cannot be process independently
     for ( size_t i = 0; i < size_; i += 4 )
     {
-        vec4 y0 = setzero4();
-        vec4 y1 = setzero4();
-        vec4 y2 = setzero4();
-        vec4 y3 = setzero4();
-        size_t j = 0;
+        size_t end = ~3 & size_; // last multiple of 4 <= size_
+        vec4 x0, x1, x2, x3;
         {
-            vec4 s0 = setzero4();
-            vec4 s1 = setzero4();
-            vec4 s2 = setzero4();
-            vec4 s3 = setzero4();
-            
-            const size_t end = last - 4;
-            for ( ; j < end; j += 8 )
-            {
-                const real * xx = X+j;
-                real const* aaa = mat_ + 16 * block(j, i);
-                real const* bbb = mat_ + 16 * block(j+4, i);
-                y0 = fmadd4(streamload4(aaa   ), broadcast1(xx  ), y0);
-                y1 = fmadd4(streamload4(aaa+ 4), broadcast1(xx+1), y1);
-                y2 = fmadd4(streamload4(aaa+ 8), broadcast1(xx+2), y2);
-                y3 = fmadd4(streamload4(aaa+12), broadcast1(xx+3), y3);
-                s0 = fmadd4(streamload4(bbb   ), broadcast1(xx+4), s0);
-                s1 = fmadd4(streamload4(bbb+ 4), broadcast1(xx+5), s1);
-                s2 = fmadd4(streamload4(bbb+ 8), broadcast1(xx+6), s2);
-                s3 = fmadd4(streamload4(bbb+12), broadcast1(xx+7), s3);
-            }
-            y0 = add4(y0, s0);
-            y1 = add4(y1, s1);
-            y2 = add4(y2, s2);
-            y3 = add4(y3, s3);
+            x0 = maskload(X+i, makemask(size_-i));
+            //x1 = permute2f128(x0, x0, 0x00);
+            //x3 = permute2f128(x0, x0, 0x11);
+            x2 = permute2f128(x0, x0, 0x21);
+            x1 = blend4(x0, x2, 0b1100);
+            x3 = blend4(x0, x2, 0b0011);
+            x0 = duplo4(x1); // = broadcast1(xxx  );
+            x1 = duphi4(x1); // = broadcast1(xxx+1);
+            x2 = duplo4(x3); // = broadcast1(xxx+2);
+            x3 = duphi4(x3); // = broadcast1(xxx+3);
         }
-        for ( ; j < last; j += 4 )
+        real const* ptr = mat_ + 16 * block(i, 0);
+        for ( size_t j = 0; j < end; j += 4 )
         {
-            const real * xx = X+j;
-            real const* ptr = mat_ + 16 * block(j, i);
-            y0 = fmadd4(streamload4(ptr   ), broadcast1(xx  ), y0);
-            y1 = fmadd4(streamload4(ptr+ 4), broadcast1(xx+1), y1);
-            y2 = fmadd4(streamload4(ptr+ 8), broadcast1(xx+2), y2);
-            y3 = fmadd4(streamload4(ptr+12), broadcast1(xx+3), y3);
+            vec4 s = fmadd4(streamload4(ptr), x0, load4(Y+j));
+            s = fmadd4(streamload4(ptr+ 4), x1, s);
+            s = fmadd4(streamload4(ptr+ 8), x2, s);
+            s = fmadd4(streamload4(ptr+12), x3, s);
+            store4(Y+j, s);
+            ptr += 16;
         }
-        y0 = add4(y0, y2);
-        y1 = add4(y1, y3);
+        if ( end < size_ )
         {
-            real const* ptr = mat_ + 16 * block(j, i);
-            for ( ; j < last; j += 2 )
-            {
-                const real * xx = X+j;
-                y0 = fmadd4(streamload4(ptr  ), broadcast1(xx  ), y0);
-                y1 = fmadd4(streamload4(ptr+4), broadcast1(xx+1), y1);
-                ptr += 8;
-            }
-            y0 = add4(y0, y1);
-            for ( ; j < last; ++j )
-                y0 = fmadd4(streamload4(ptr), broadcast1(X+j), y0);
+            __m256i msk = makemask(size_-end);
+            vec4 s = maskload(Y+end, msk);
+            s = fmadd4(streamload4(ptr  ), x0, s);
+            s = fmadd4(streamload4(ptr+4), x1, s);
+            s = fmadd4(streamload4(ptr+8), x2, s);
+            maskstore(Y+end, msk, s);
         }
-        if ( i < last )
-            storeu4(Y+i, y0);
-        else
-            maskstore(Y+i, msk, y0);
     }
 }
 
@@ -280,6 +249,17 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         for ( size_t j = 0; j < size_; ++j )
             val += value(i,j) * X[j];
         Y[i] = val;
+    }
+}
+
+void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
+{
+    for ( size_t i = 0; i < size_; ++i )
+    {
+        real val = 0;
+        for ( size_t j = 0; j < size_; ++j )
+            val += value(j,i) * X[j];
+        Y[i] += val;
     }
 }
 

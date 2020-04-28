@@ -332,21 +332,58 @@ void test_broadcast()
     dump(broadcast1(mem+3), "mem[3]");
     
     // using 2 loads
-    vec4 xyxy = broadcast2(mem);
-    vec4 ztzt = broadcast2(mem+2);
-    dump(duplo4(xyxy), "x");
-    dump(duphi4(xyxy), "y");
-    dump(duplo4(ztzt), "z");
-    dump(duphi4(ztzt), "t");
+    vec4 xy = broadcast2(mem);
+    vec4 zt = broadcast2(mem+2);
+    dump(duplo4(xy), " x");
+    dump(duphi4(xy), " y");
+    dump(duplo4(zt), " z");
+    dump(duphi4(zt), " t");
     
     // using 1 load
     vec4 xyzt = load4(mem);
-    xyxy = permute2f128(xyzt, xyzt, 0x00);
-    ztzt = permute2f128(xyzt, xyzt, 0x11);
-    dump(duplo4(xyxy), "X");
-    dump(duphi4(xyxy), "T");
-    dump(duplo4(ztzt), "Z");
-    dump(duphi4(ztzt), "T");
+    xy = permute2f128(xyzt, xyzt, 0x00);
+    zt = permute2f128(xyzt, xyzt, 0x11);
+    dump(duplo4(xy), "X ");
+    dump(duphi4(xy), "T ");
+    dump(duplo4(zt), "Z ");
+    dump(duphi4(zt), "T ");
+
+    // using 2 permutes and 4 blends
+    xyzt = load4(mem);
+    vec4 u0 = unpacklo4(xyzt, xyzt);
+    vec4 u1 = unpackhi4(xyzt, xyzt);
+    vec4 v0 = permute2f128(u0, u0, 0x21);
+    vec4 v1 = permute2f128(u1, u1, 0x21);
+    dump(blend4(u0, v0, 0b1100), " x");
+    dump(blend4(u1, v1, 0b1100), " y");
+    dump(blend4(u0, v0, 0b0011), " z");
+    dump(blend4(u1, v1, 0b0011), " t");
+
+    // using 1 permute and 4 blends
+    xyzt = load4(mem);
+    vec4 ztxy = permute2f128(xyzt, xyzt, 0x21);
+    u0 = unpacklo4(xyzt, xyzt);
+    u1 = unpackhi4(xyzt, xyzt);
+    v0 = unpacklo4(ztxy, ztxy);
+    v1 = unpackhi4(ztxy, ztxy);
+    //dump(u0, "u0");
+    //dump(u1, "u1");
+    //dump(v0, "v0");
+    //dump(v1, "v1");
+    dump(blend4(u0, v0, 0b1100), "X ");
+    dump(blend4(u1, v1, 0b1100), "Y ");
+    dump(blend4(u0, v0, 0b0011), "Z ");
+    dump(blend4(u1, v1, 0b0011), "T ");
+
+    // using 1 permute and 2 blends
+    xyzt = load4(mem);
+    ztxy = permute2f128(xyzt, xyzt, 0x21);
+    xy = blend4(xyzt, ztxy, 0b1100);
+    zt = blend4(xyzt, ztxy, 0b0011);
+    dump(duplo4(xy), " x");
+    dump(duphi4(xy), " y");
+    dump(duplo4(zt), " z");
+    dump(duphi4(zt), " t");
 }
 
 __m256i make_mask2(long i)
@@ -375,8 +412,8 @@ void test_store()
     dump(x, "value");
     for ( int i = 0; i < 5; ++i )
     {
-        __m256i k = make_mask(i);
-        maskstore4(mem, k, x);
+        __m256i msk = make_mask(i);
+        maskstore4(mem, msk, x);
         dump(load4(mem), "store");
     }
 }
@@ -680,7 +717,7 @@ int main(int argc, char * argv[])
         test_twine();
         test_stride();
     }
-    if ( 0 )
+    if ( 1 )
     {
         test_cat();
         test_load();
@@ -694,7 +731,7 @@ int main(int argc, char * argv[])
         test_swap4();
         test_hadd();
     }
-    if ( 1 )
+    if ( 0 )
     {
         test_transpose2();
         test_transpose3();

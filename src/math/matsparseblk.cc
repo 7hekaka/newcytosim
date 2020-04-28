@@ -646,7 +646,7 @@ vec2 MatrixSparseBlock::Line::vecMul2D(const real* X) const
         //ss[1] += M[1] * xy[0];
         //ss[2] += M[2] * xy[1];
         //ss[3] += M[3] * xy[1];
-        ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
+        ss = fmadd4(streamload4(M), permute4(xy, 0b1100), ss);
     }
     // collapse result:
     return add2(getlo(ss), gethi(ss));
@@ -676,17 +676,17 @@ vec2 MatrixSparseBlock::Line::vecMul2DU(const real* X) const
 #if TRANSPOSE_2D_BLOCKS
         //SX += M[0] * X + M[1] * Y;
         //SY += M[2] * X + M[3] * Y;
-        ss = fmadd4(load4(M   ), xy0, ss);
-        tt = fmadd4(load4(M+4 ), xy1, tt);
-        uu = fmadd4(load4(M+8 ), xy2, uu);
-        vv = fmadd4(load4(M+12), xy3, vv);
+        ss = fmadd4(streamload4(M   ), xy0, ss);
+        tt = fmadd4(streamload4(M+4 ), xy1, tt);
+        uu = fmadd4(streamload4(M+8 ), xy2, uu);
+        vv = fmadd4(streamload4(M+12), xy3, vv);
 #else
         //SX += M[0] * X + M[2] * Y;
         //SY += M[1] * X + M[3] * Y;
-        ss = fmadd4(load4(M   ), permute4(xy0, 0b1100), ss);
-        tt = fmadd4(load4(M+4 ), permute4(xy1, 0b1100), tt);
-        uu = fmadd4(load4(M+8 ), permute4(xy2, 0b1100), uu);
-        vv = fmadd4(load4(M+12), permute4(xy3, 0b1100), vv);
+        ss = fmadd4(streamload4(M   ), permute4(xy0, 0b1100), ss);
+        tt = fmadd4(streamload4(M+4 ), permute4(xy1, 0b1100), tt);
+        uu = fmadd4(streamload4(M+8 ), permute4(xy2, 0b1100), uu);
+        vv = fmadd4(streamload4(M+12), permute4(xy3, 0b1100), vv);
 #endif
     }
     //IACA_END
@@ -698,9 +698,9 @@ vec2 MatrixSparseBlock::Line::vecMul2DU(const real* X) const
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
         ++inx;
 #if TRANSPOSE_2D_BLOCKS
-        ss = fmadd4(load4(M), xy, ss);
+        ss = fmadd4(streamload4(M), xy, ss);
 #else
-        ss = fmadd4(load4(M), permute4(xy, 0b1100), ss);
+        ss = fmadd4(streamload4(M), permute4(xy, 0b1100), ss);
 #endif
     }
     // collapse result:
@@ -733,9 +733,9 @@ vec4 MatrixSparseBlock::Line::vecMul3D(const real* X) const
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        s0 = fmadd4(load4(M  ), xyz, s0);
-        s1 = fmadd4(load4(M+4), xyz, s1);
-        s2 = fmadd4(load4(M+8), xyz, s2);
+        s0 = fmadd4(streamload4(M  ), xyz, s0);
+        s1 = fmadd4(streamload4(M+4), xyz, s1);
+        s2 = fmadd4(streamload4(M+8), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     vec4 s3 = setzero4();
@@ -775,12 +775,12 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
             vec4 B = loadu4(X+inx[1]);
             inx += 2;
             // multiply each line of the two blocks:
-            s0 = fmadd4(load4(M   ), A, s0);
-            s1 = fmadd4(load4(M+4 ), A, s1);
-            s2 = fmadd4(load4(M+8 ), A, s2);
-            t0 = fmadd4(load4(M+12), B, t0);
-            t1 = fmadd4(load4(M+16), B, t1);
-            t2 = fmadd4(load4(M+20), B, t2);
+            s0 = fmadd4(streamload4(M   ), A, s0);
+            s1 = fmadd4(streamload4(M+4 ), A, s1);
+            s2 = fmadd4(streamload4(M+8 ), A, s2);
+            t0 = fmadd4(streamload4(M+12), B, t0);
+            t1 = fmadd4(streamload4(M+16), B, t1);
+            t2 = fmadd4(streamload4(M+20), B, t2);
         }
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
@@ -797,9 +797,9 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        s0 = fmadd4(load4(M  ), xyz, s0);
-        s1 = fmadd4(load4(M+4), xyz, s1);
-        s2 = fmadd4(load4(M+8), xyz, s2);
+        s0 = fmadd4(streamload4(M  ), xyz, s0);
+        s1 = fmadd4(streamload4(M+4), xyz, s1);
+        s2 = fmadd4(streamload4(M+8), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     t0 = setzero4();
@@ -842,15 +842,15 @@ vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
             vec4 C = loadu4(X+inx[2]);
             inx += 3;
             // multiply each line of the two blocks:
-            s0 = fmadd4(load4(M   ), A, s0);
-            s1 = fmadd4(load4(M+4 ), A, s1);
-            s2 = fmadd4(load4(M+8 ), A, s2);
-            t0 = fmadd4(load4(M+12), B, t0);
-            t1 = fmadd4(load4(M+16), B, t1);
-            t2 = fmadd4(load4(M+20), B, t2);
-            u0 = fmadd4(load4(M+24), C, u0);
-            u1 = fmadd4(load4(M+28), C, u1);
-            u2 = fmadd4(load4(M+32), C, u2);
+            s0 = fmadd4(streamload4(M   ), A, s0);
+            s1 = fmadd4(streamload4(M+4 ), A, s1);
+            s2 = fmadd4(streamload4(M+8 ), A, s2);
+            t0 = fmadd4(streamload4(M+12), B, t0);
+            t1 = fmadd4(streamload4(M+16), B, t1);
+            t2 = fmadd4(streamload4(M+20), B, t2);
+            u0 = fmadd4(streamload4(M+24), C, u0);
+            u1 = fmadd4(streamload4(M+28), C, u1);
+            u2 = fmadd4(streamload4(M+32), C, u2);
         }
         s0 = add4(s0, add4(t0, u0));
         s1 = add4(s1, add4(t1, u1));
@@ -867,9 +867,9 @@ vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        s0 = fmadd4(load4(M  ), xyz, s0);
-        s1 = fmadd4(load4(M+4), xyz, s1);
-        s2 = fmadd4(load4(M+8), xyz, s2);
+        s0 = fmadd4(streamload4(M  ), xyz, s0);
+        s1 = fmadd4(streamload4(M+4), xyz, s1);
+        s2 = fmadd4(streamload4(M+8), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     t0 = setzero4();
@@ -893,10 +893,10 @@ vec4 MatrixSparseBlock::Line::vecMul4D(const real* X) const
     {
         real const* M = blk_[n];
         const vec4 xyz = load4(X+inx_[n]);  // xyzt = { X0 X1 X2 X3 }
-        s0 = fmadd4(load4(M   ), xyz, s0);
-        s1 = fmadd4(load4(M+ 4), xyz, s1);
-        s2 = fmadd4(load4(M+ 8), xyz, s2);
-        s3 = fmadd4(load4(M+12), xyz, s3);
+        s0 = fmadd4(streamload4(M   ), xyz, s0);
+        s1 = fmadd4(streamload4(M+ 4), xyz, s1);
+        s2 = fmadd4(streamload4(M+ 8), xyz, s2);
+        s3 = fmadd4(streamload4(M+12), xyz, s3);
     }
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
