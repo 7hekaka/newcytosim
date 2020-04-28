@@ -190,10 +190,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         y0 = add4(unpacklo4(y0, y1), unpackhi4(y0, y1));
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
         y0 = add4(permute2f128(y0, y2, 0x21), blend4(y0, y2, 0b1100));
-        if ( i < last )
-            storeu4(Y+i, y0);
-        else
-            maskstore(Y+i, msk, y0);
+        maskstore(Y+i, makemask(size_-i), y0);
     }
 }
 
@@ -288,7 +285,7 @@ void MatrixFull::print(std::ostream& os) const
         for ( size_t j = 0; j < size_; ++j )
             os << " " << std::setw(w) << std::showpos << value(i, j);
     }
-    os << " ]";
+    os << std::noshowpos << " ]";
 }
 
 

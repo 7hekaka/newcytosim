@@ -857,7 +857,7 @@ public:
         const int w = (int)os.width();
         os << std::showpos << XX << " ";
         os << std::setw(w) << YY << " ";
-        os << std::setw(w) << ZZ;
+        os << std::setw(w) << ZZ << std::noshowpos;
     }
 
     /// output using width 'w' and precision 'p'

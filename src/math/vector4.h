@@ -629,7 +629,7 @@ public:
         os << std::showpos << XX << " ";
         os << std::setw(w) << YY << " ";
         os << std::setw(w) << ZZ << " ";
-        os << std::setw(w) << TT;
+        os << std::setw(w) << TT << std::noshowpos;
     }
 
     /// output using width 'w' and precision 'p'
