@@ -693,6 +693,8 @@
 		BBA9869C132246870031200B /* bridge.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98698132246870031200B /* bridge.cc */; };
 		BBA9869D132246870031200B /* bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98699132246870031200B /* bridge.h */; };
 		BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
+		BBA9B6A5245714A700F0EF47 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BBA9B6A62457217400F0EF47 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBAA7E7E2455D86300C924DB /* test_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAA7E7D2455D86300C924DB /* test_block.cc */; };
 		BBAA7E8A2455D96C00C924DB /* test_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAA7E7D2455D86300C924DB /* test_block.cc */; };
 		BBAA7E8B2455DE5500C924DB /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
@@ -1973,6 +1975,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBA9B6A62457217400F0EF47 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4650,6 +4653,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBA9B6A5245714A700F0EF47 /* tictoc.cc in Sources */,
 				BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */,
 				BBAA7E8E2455DEED00C924DB /* vector2.cc in Sources */,
 				BBAA7E8F2455DEED00C924DB /* vector3.cc in Sources */,
