@@ -1,8 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#include "vector1.h"
-#include "vector2.h"
 #include "vector3.h"
+#include "vector2.h"
+#include "vector1.h"
 
 // construct from Vector1
 Vector3::Vector3(const Vector1& arg) : XX(arg.XX), YY(0.0), ZZ(0.0)

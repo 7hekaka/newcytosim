@@ -83,11 +83,11 @@ public:
     operator vec4 () const { return load3(&XX); }
 #endif
     
-    /// copy 2 coordinates from Vector2
-    Vector3(const Vector2&);
-    
     /// copy 1 coordinate from Vector1
     Vector3(const Vector1&);
+
+    /// copy 2 coordinates from Vector2
+    Vector3(const Vector2&);
     
     
     /// address of coordinate array

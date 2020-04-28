@@ -391,11 +391,11 @@ public:
                     val[0xC] * V[0] + val[0xD] * V[1] + val[0xE] * V[2] + val[0xF] * V[3]};
 #endif
     }
-#endif
     
+#else
     
     /// multiplication by a vector: this * V
-    const Vector4 vecmul0(Vector4 const& V) const
+    const Vector4 vecmul(Vector4 const& V) const
     {
         return Vector4(val[0x0] * V.XX + val[0x4] * V.YY + val[0x8] * V.ZZ + val[0xC] * V.TT,
                        val[0x1] * V.XX + val[0x5] * V.YY + val[0x9] * V.ZZ + val[0xD] * V.TT,
@@ -411,15 +411,16 @@ public:
                        val[0x2] * ptr[0] + val[0x6] * ptr[1] + val[0xA] * ptr[2] + val[0xE] * ptr[3],
                        val[0x3] * ptr[0] + val[0x7] * ptr[1] + val[0xB] * ptr[2] + val[0xF] * ptr[3]);
     }
-
+#endif
+    
     /// vector multiplication
     friend Vector4 operator * (Matrix44 const& mat, Vector4 const& ptr)
     {
-        return mat.vecmul0(ptr);
+        return mat.vecmul(ptr);
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const Vector4 trans_vecmul0(Vector4 const& V) const
+    const Vector4 trans_vecmul(Vector4 const& V) const
     {
         return Vector4(val[0x0] * V.XX + val[0x1] * V.YY + val[0x2] * V.ZZ + val[0x3] * V.TT,
                        val[0x4] * V.XX + val[0x5] * V.YY + val[0x6] * V.ZZ + val[0x7] * V.TT,

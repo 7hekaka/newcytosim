@@ -159,8 +159,6 @@ inline vec4 load4(double const* a)       { return _mm256_load_pd(a); }
 #endif
 inline vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
-inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
-
 inline __m256i makemask(long i)
 {
     constexpr __m256d ramp{0.5, 1.5, 2.5, 3.5};
@@ -349,7 +347,11 @@ inline vec4 cross4(vec4 a, vec4 b)
 #endif
 }
 
+inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
+
 #else
+
+inline vec4 streamload4(double const* a) { return _mm256_load_pd(a); }
 
 #define interleave4(a)      permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100)
 

@@ -12,6 +12,10 @@
 #include <cstdio>
 #include <cmath>
 
+class Vector1;
+class Vector2;
+class Vector3;
+
 #ifdef __AVX__
 #  define VECTOR4_USES_AVX REAL_IS_DOUBLE
 #  include "simd.h"
@@ -69,6 +73,15 @@ public:
     Vector4(vec4 const& v) { XX = v[0]; YY = v[1]; ZZ = v[2]; TT = v[3]; }
 #endif
     
+    /// copy 1 coordinate from Vector1
+    Vector4(const Vector1&);
+
+    /// copy 2 coordinates from Vector2
+    Vector4(const Vector2&);
+    
+    /// copy 3 coordinates from Vector3
+    Vector4(const Vector3&);
+
     /// address of coordinate array
     real * data()                { return &XX; }
     
