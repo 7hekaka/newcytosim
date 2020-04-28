@@ -22,9 +22,9 @@
 using namespace TicToc;
 size_t NCO = 15;
 
-Vector3 dir(0, 1, 0);
-Vector3 off(0.1, 0.2, -0.3);
-Vector3 sun(0, 0, 0);
+Vector4 dir(0, 1, 0);
+Vector4 off(0.1, 0.2, -0.3);
+Vector4 sun(0, 0, 0);
 
 real diff(size_t size, real const* a, real const* b)
 {
@@ -39,8 +39,8 @@ template <typename MATRIX>
 void checkMatrix(MATRIX & mat)
 {
     mat = MATRIX::outerProduct(dir, off);
-    Vector3 vec = mat.vecmul(sun);
-    Vector3 vik = mat.trans_vecmul(sun);
+    Vector4 vec = mat.vecmul(sun);
+    Vector4 vik = mat.trans_vecmul(sun);
 
     std::clog << vec << " | " << vik << "  ";
     std::clog << mat << "  " << mat.transposed() << "\n";
