@@ -295,7 +295,6 @@ void Simul::solve()
     //auto rdt = __rdtsc();
     setInteractions(sMeca);
     //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
-    prop->precondition = 3 - prop->precondition;
     sMeca.solve(prop, prop->precondition);
     //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.apply();
