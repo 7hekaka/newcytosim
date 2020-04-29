@@ -696,23 +696,23 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     {
         val_type const& val = rec[i];
         if ( val.count_ > 0 )
-            code |= 1;  // one value used
+            code |= 4;  // one value used
         if ( !val.count_ && val.defined_ )
             code |= 2;  // one value not used
         else if ( val.count_ > threshold )
-            code |= 4;  // one value overused
+            code |= 1;  // one value overused
     }
     
-    code ^= 1;  // invert first bit
+    code ^= 4;  // invert highest bit
     
-    if ( code & 1 )
+    if ( code & 4 )
         msg = "Warning, this parameter was ignored";
     else if ( code & 2 )
         msg = "Warning, a value was ignored";
-    if ( code & 4 )
+    else if ( code & 1 )
         msg = "Warning, some value might have been overused";
     
-    if ( code & 1 )
+    if ( code & 3 )
         msg += ": " + format_counts(pair);
     else if ( code )
         msg += ": " + format(pair);
