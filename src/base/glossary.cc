@@ -64,16 +64,15 @@ std::string format_count(size_t c)
 
 std::string format(Glossary::pair_type const& pair)
 {
-    std::ostringstream os;
-    os << pair.first;
+    std::string res = pair.first;
     if ( pair.second.size() > 0 )
     {
-        os << " = " << format_value(pair.second[0].value_);
+        res += " = " + format_value(pair.second[0].value_);
         for ( size_t i = 1; i < pair.second.size(); ++i )
-            os << ", " << format_value(pair.second[i].value_);
-        os << ";";
+            res += ", " + format_value(pair.second[i].value_);
+        res += ";";
     }
-    return os.str();
+    return res;
 }
 
 /**
@@ -82,15 +81,15 @@ std::string format(Glossary::pair_type const& pair)
  */
 std::string format_counts(Glossary::pair_type const& pair)
 {
-    std::ostringstream os;
-    os << pair.first;
+    std::string res = pair.first;
     if ( pair.second.size() > 0 )
     {
-        os << " = " << pair.second[0].value_ << format_count(pair.second[0].count_);
+        res += " = " + pair.second[0].value_ + format_count(pair.second[0].count_);
         for ( size_t i = 1; i < pair.second.size(); ++i )
-            os << ", " << pair.second[i].value_ << format_count(pair.second[i].count_);
+            res += ", " + pair.second[i].value_ + format_count(pair.second[i].count_);
+        res += ";";
     }
-    return os.str();
+    return res;
 }
 
 
@@ -706,16 +705,16 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     code ^= 4;  // invert highest bit
     
     if ( code & 4 )
-        msg = "Warning, this parameter was ignored";
+        msg = "Warning, this parameter was ignored: ";
     else if ( code & 2 )
-        msg = "Warning, a value was ignored";
+        msg = "Warning, a value was ignored: ";
     else if ( code & 1 )
-        msg = "Warning, some value might have been overused";
+        msg = "Warning, some value might have been overused: ";
     
     if ( code & 4 )
-        msg += ": " + format(pair);
+        msg += format(pair);
     else if ( code )
-        msg += ": " + format_counts(pair);
+        msg += format_counts(pair);
     
     return code;
 }
