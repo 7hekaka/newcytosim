@@ -156,9 +156,9 @@ namespace LinearSolvers
         blas::xcopy(dim, rhs, 1, r0, 1);
         blas::xcopy(dim, rhs, 1, p, 1);
 #else
-        mat.multiply(sol, r0);                  // r0 = A * sol
+        mat.multiply(sol, r0);                  // r0 = MAT * sol
         blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
-        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * sol
+        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * sol
         blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
         blas::xcopy(dim, r, 1, p, 1);
         if ( monitor.finished(dim, r) )
@@ -180,7 +180,7 @@ namespace LinearSolvers
                  arbitrarily chosen direction r0, and we restart with a new r0 */
                 blas::xcopy(dim, rhs, 1, r, 1);
                 mat.multiply(sol, r0);
-                blas::xaxpy(dim, -1.0, r0, 1, r, 1);  // r = rhs - A * x
+                blas::xaxpy(dim, -1.0, r0, 1, r, 1);  // r = rhs - MAT * x
                 blas::xcopy(dim, r, 1, r0, 1);        // r0 = r
                 rho = blas::dot(dim, r0, r0);
 #else
@@ -191,17 +191,17 @@ namespace LinearSolvers
             
             beta = ( rho / rho_old ) * ( alpha / omega );
             // p = r + beta * ( p - omega * v )
-            blas::xaxpy(dim, -omega, v, 1, p, 1);
+            blas::xaxpy(dim, -omega, v, 1, p, 1);  // p = p - omega * v
 #if ( 1 )
-            blas::xpay(dim, r, beta, p);
+            blas::xpay(dim, r, beta, p);           // p = r + beta * p
 #else
-            blas::xscal(dim, beta, p, 1);
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);
+            blas::xscal(dim, beta, p, 1);          // p = beta * p
+            blas::xaxpy(dim, 1.0, r, 1, p, 1);     // p = r + p
 #endif
         start:
             
-            mat.precondition(p, phat);                // phat = PC * p;
-            mat.multiply(phat, v);                    // v = M * PC * p;
+            mat.precondition(p, phat);             // phat = PC * p;
+            mat.multiply(phat, v);                 // v = MAT * PC * p;
             
             delta = blas::dot(dim, r0, v);
             if ( delta == 0.0 )
@@ -212,11 +212,11 @@ namespace LinearSolvers
             }
             
             alpha = rho / delta;
-            blas::xaxpy(dim, -alpha,    v, 1,   r, 1);// r = r - alpha * v;
-            blas::xaxpy(dim,  alpha, phat, 1, sol, 1);// x = x + alpha * phat;
+            blas::xaxpy(dim, -alpha,    v, 1,   r, 1); // r = r - alpha * v;
+            blas::xaxpy(dim,  alpha, phat, 1, sol, 1); // x = x + alpha * phat;
 
-            mat.precondition(r, shat);                // shat = PC * r
-            mat.multiply(shat, t);                    // t = M * PC * r
+            mat.precondition(r, shat);             // shat = PC * r
+            mat.multiply(shat, t);                 // t = MAT * PC * r
 
             monitor += 2;
 
