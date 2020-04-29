@@ -31,6 +31,273 @@ void scaleTangentially(size_t nbp, const real* src, const real* dir, real* dst)
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - Rigidity
+
+/*
+ In this version the loop is unrolled
+ */
+void add_rigidity2(const size_t nbt, const real* X, const real rigid, real* Y)
+{
+    assert_true( X != Y );
+    real dx = X[DIM  ] - X[0];
+    real dy = X[DIM+1] - X[1];
+#if ( DIM > 2 )
+    real dz = X[DIM+2] - X[2];
+#endif
+    
+    real * yv = Y;
+    const real*const end = X + nbt + DIM;
+    
+    const real* xv = X+DIM;
+    while ( xv < end )
+    {
+        real d0 = xv[DIM] - xv[0];
+        real f0 = rigid * ( d0 - dx );
+        dx = d0;
+        yv[0    ] -=    f0;
+        yv[DIM  ] += f0+f0;
+        yv[DIM*2] -=    f0;
+        ++yv;
+        ++xv;
+        
+        real d1 = xv[DIM] - xv[0];
+        real f1 = rigid * ( d1 - dy );
+        dy = d1;
+        yv[0    ] -=    f1;
+        yv[DIM  ] += f1+f1;
+        yv[DIM*2] -=    f1;
+        ++yv;
+        ++xv;
+        
+#if ( DIM > 2 )
+        real d2 = xv[DIM] - xv[0];
+        real f2 = rigid * ( d2 - dz );
+        dz = d2;
+        Y[0    ] -=    f2;
+        Y[DIM  ] += f2*f2;
+        Y[DIM*2] -=    f2;
+        ++yv;
+        ++xv;
+#endif
+    }
+}
+
+
+/*
+ In this version the loop is unrolled, pointers are used
+ and further optimization are made by replacing
+ ( a0 -2*a1 + a2 ) by (a2-a1)-(a1-a0).
+ */
+void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
+{
+    assert_true( X != Y );
+    const real * xn = X + DIM;
+    
+    real x0 = xn[0];
+    real x1 = xn[1];
+#if ( DIM >= 3 )
+    real x2 = xn[2];
+#endif
+    
+    real d0 = x0 - X[0];
+    real d1 = x1 - X[1];
+#if ( DIM >= 3 )
+    real d2 = x2 - X[2];
+#endif
+    
+    real df0 = 0, of0 = 0, odf0 = 0;
+    real df1 = 0, of1 = 0, odf1 = 0;
+#if ( DIM >= 3 )
+    real df2 = 0, of2 = 0, odf2 = 0;
+#endif
+    
+    xn += DIM;
+    
+    real * yp = Y;
+    real *const end = Y + nbt;
+    while ( yp < end )
+    {
+        real e0 = *xn - x0;
+        x0 = *xn;
+        ++xn;
+        real f0 = rigid * ( e0 - d0 );
+        d0      = e0;
+        df0     = f0 - of0;
+        of0     = f0;
+        *yp    += odf0 - df0;
+        odf0    = df0;
+        ++yp;
+        
+        real e1 = *xn - x1;
+        x1 = *xn;
+        ++xn;
+        real f1 = rigid * ( e1 - d1 );
+        d1      = e1;
+        df1     = f1 - of1;
+        of1     = f1;
+        *yp    += odf1 - df1;
+        odf1    = df1;
+        ++yp;
+        
+#if ( DIM >= 3 )
+        real e2 = *xn - x2;
+        x2 = *xn;
+        ++xn;
+        real f2 = rigid * ( e2 - d2 );
+        d2      = e2;
+        df2     = f2 - of2;
+        of2     = f2;
+        *yp    += odf2 - df2;
+        odf2    = df2;
+        ++yp;
+#endif
+    }
+    
+    yp[0]   += df0 + of0;
+    yp[1]   += df1 + of1;
+#if ( DIM >= 3 )
+    yp[2]   += df2 + of2;
+#endif
+    
+    yp += DIM;
+    
+    yp[0] -= of0;
+    yp[1] -= of1;
+#if ( DIM >= 3 )
+    yp[2] -= of2;
+#endif
+}
+
+#if ( DIM == 2 ) && REAL_IS_DOUBLE
+
+#include "simd.h"
+
+#ifdef __SSE3__
+/**
+ 2D implemention using SSE 128bit vector instructions with double precision
+ */
+void add_rigiditySSE(const size_t nbt, const real* X, const real rigid, real* Y)
+{
+    vec2 R = set2(rigid);
+    real *const end = Y + nbt;
+
+    vec2 nn = load2(X+2);
+    vec2 oo = mul2(R, sub2(nn, load2(X)));
+    vec2 yy = load2(Y);
+    vec2 zz = load2(Y+2);
+    
+    while ( Y < end )
+    {
+        vec2 mm = load2(X+4);
+        X += 2;
+        vec2 dd = mul2(R, sub2(mm, nn));
+        vec2 ff = sub2(dd, oo);
+        oo = dd;
+        nn = mm;
+        store2(Y, sub2(yy, ff));
+        yy = add2(zz, add2(ff, ff));
+        zz = sub2(load2(Y+4), ff);
+        Y += 2;
+    }
+    store2(Y, yy);
+    store2(Y+2, zz);
+}
+#endif
+
+
+#ifdef __AVX__
+/**
+ 2D implemention using AVX 256bit vector instructions with double precision
+ FJN 15.09.2018 -- 17.09.2018
+ 
+ Note that the vectors X and Y are not aligned to memory!
+ */
+void add_rigidityAVX(const size_t nbt, const real* X, const real rigid, real* Y)
+{
+    vec4 R = set4(rigid);
+    vec4 two = set4(2.0);
+    
+    real *const end = Y + nbt - 8;
+    
+    vec4 xxx = loadu4(X);
+    vec4 eee = setzero4();
+
+    // process data 8 by 8:
+    while ( Y < end )
+    {
+        vec4 nnn = loadu4(X+4);
+        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
+        xxx = loadu4(X+8);
+        X += 8;
+        vec4 ppp = permute2f128(eee, ddd, 0x21);
+        vec4 jjj = permute2f128(nnn, xxx, 0x21);
+#ifdef __FMA__
+        storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
+#else
+        storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
+#endif
+        eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
+        ppp = permute2f128(ddd, eee, 0x21);
+#ifdef __FMA__
+        storeu4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), loadu4(Y+4)));
+#else
+        storeu4(Y+4, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y+4)));
+#endif
+        Y += 8;
+    }
+
+    // process data 4 by 4:
+    if ( Y < end+4 )
+    {
+        vec4 nnn = loadu4(X+4);
+        X += 4;
+        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
+        xxx = nnn;
+        vec4 ppp = permute2f128(eee, ddd, 0x21);
+#ifdef __FMA__
+        storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
+#else
+        storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
+#endif
+        eee = ddd;
+        Y += 4;
+    }
+
+    // process data 2 by 2 using SSE instructions:
+    vec2 nn = gethi(xxx);
+    vec2 oo = sub2(nn, getlo(xxx));
+    vec2 ee = gethi(eee);
+    vec2 yy = fmsub2(getlo(two), ee, getlo(eee));
+    while ( Y < end+8 )
+    {
+        vec2 mm = loadu2(X+4);
+        X += 2;
+        vec2 ff = sub2(mm, nn);
+        vec2 dd = sub2(ff, oo);
+        nn = mm;
+        oo = ff;
+        storeu2(Y, fmadd2(getlo(R), sub2(yy, dd), loadu2(Y)));
+#ifdef __FMA__
+        yy = fmsub2(getlo(two), dd, ee);
+#else
+        yy = sub2(add2(dd, dd), ee);
+#endif
+        ee = dd;
+        Y += 2;
+    }
+    storeu2(Y  ,  fmadd2(getlo(R), yy, loadu2(Y  )));
+    storeu2(Y+2, fnmadd2(getlo(R), ee, loadu2(Y+2)));
+}
+#endif
+#endif
+
+//------------------------------------------------------------------------------
+#pragma mark - ProjectForces
+
+
 /**
  Perform second calculation needed by projectForces:
  */
