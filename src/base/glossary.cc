@@ -712,10 +712,10 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     else if ( code & 1 )
         msg = "Warning, some value might have been overused";
     
-    if ( code & 3 )
-        msg += ": " + format_counts(pair);
-    else if ( code )
+    if ( code & 4 )
         msg += ": " + format(pair);
+    else if ( code )
+        msg += ": " + format_counts(pair);
     
     return code;
 }
