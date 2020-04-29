@@ -192,7 +192,8 @@ int main(int argc, char* argv[])
     
     pam.read(arg);
     glApp::currentView().read(arg);
-    arg.warnings(std::clog);
+    if ( arg.warnings(std::clog) )
+        std::clog << '\n';
     
     glApp::createWindow(display);
     gle::initialize();

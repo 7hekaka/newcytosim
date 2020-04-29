@@ -246,8 +246,8 @@ int main(int argc, char* argv[])
     if ( ofs.is_open() )
         ofs.close();
 
-    /// check if all specified parameters were used:
-    arg.warnings(std::cerr, cnt);
-    
+    if ( arg.warnings(std::cerr, cnt) )
+        std::cerr << '\n';
+
     return EXIT_SUCCESS;
 }

@@ -32,6 +32,15 @@ Parser::Parser(Simul& sim, bool s, bool c, bool n, bool r, bool w)
 {
 }
 
+/// check for unused values in Glossary and issue a warning
+void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
+{
+    if ( opt.warnings(std::cerr, cnt) )
+    {
+        std::cerr << '\n';
+        StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+    }
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Parse
@@ -182,8 +191,8 @@ void Parser::parse_set(std::istream& is)
         }
     }
 
-    if ( pp && opt.warnings(std::cerr) )
-        StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+    if ( pp )
+        check_warnings(opt, is, ipos);
 }
 
 //------------------------------------------------------------------------------
@@ -288,8 +297,7 @@ void Parser::parse_change(std::istream& is)
         else
             execute_change(name, opt, do_set);
  
-        if ( opt.warnings(std::cerr, ~0U) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos, ~0U);
     }
     else if ( para == "display" )
     {
@@ -438,8 +446,7 @@ void Parser::parse_new(std::istream& is)
             if ( opt.has_key("display") )
                 throw InvalidParameter("display parameters should be specified within `set'");
             
-            if ( opt.warnings(std::cerr, ~0U) )
-                StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+            check_warnings(opt, is, ipos, ~0U);
         }
     }
 }
@@ -530,8 +537,7 @@ void Parser::parse_delete(std::istream& is)
     {
         Glossary opt(blok);
         execute_delete(name, opt, cnt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -580,8 +586,7 @@ void Parser::parse_mark(std::istream& is)
     {
         Glossary opt(blok);
         execute_mark(name, opt, cnt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -624,8 +629,7 @@ void Parser::parse_cut(std::istream& is)
     {
         Glossary opt(blok);
         execute_cut(str, opt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -699,8 +703,7 @@ void Parser::parse_run(std::istream& is)
         else
             execute_run(cnt, opt, do_write);
 
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -734,8 +737,7 @@ void Parser::parse_read(std::istream& is)
     {
         Glossary opt(blok);
         opt.set(required, "required");
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
     
     if ( FilePath::is_file(file) )
@@ -800,8 +802,7 @@ void Parser::parse_import(std::istream& is)
     {
         Glossary opt(blok);
         execute_import(file, what, opt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -849,8 +850,7 @@ void Parser::parse_export(std::istream& is)
     {
         Glossary opt(blok);
         execute_export(file, what, opt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -895,8 +895,7 @@ void Parser::parse_report(std::istream& is)
     {
         Glossary opt(blok);
         execute_report(file, what, opt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -925,8 +924,7 @@ void Parser::parse_call(std::istream& is)
     {
         Glossary opt(blok);
         execute_call(str, opt);
-        if ( opt.warnings(std::cerr) )
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        check_warnings(opt, is, ipos);
     }
 }
 

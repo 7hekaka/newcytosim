@@ -97,7 +97,7 @@ private:
     static std::string format_count(size_t);
     
     /// report unused values and values used more than `threshold` times
-    static int   warnings(std::ostream&, pair_type const&, size_t threshold, std::string const& msg);
+    static int   warning(pair_type const&, std::string& msg, size_t threshold);
 
     /// read key and assignement operator
     static int   read_key(pair_type&, std::istream&);
@@ -272,7 +272,7 @@ public:
     bool         value_is(key_type const& key, size_t inx, std::string const& val) const;
     
     /// report unused values and values used multiple times
-    int          warnings(std::ostream&, size_t threshold=1, std::string const& msg="") const;
+    int          warnings(std::ostream&, size_t threshold = 1) const;
     
     //-------------------------------------------------------------------------------
     #pragma mark -

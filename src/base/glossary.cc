@@ -687,57 +687,59 @@ std::istream& operator >> (std::istream& is, Glossary& glos)
  - 0 otherwise
  .
  */
-int Glossary::warnings(std::ostream& os, Glossary::pair_type const& pair, size_t threshold, std::string const& msg)
+int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t threshold)
 {
-    int used = 0, exhausted = 1, overused = 0;
+    int code = 0;
     const rec_type& rec = pair.second;
         
     for ( size_t i = 0; i < rec.size(); ++i )
     {
         val_type const& val = rec[i];
         if ( val.count_ > 0 )
-            used = 1;
+            code |= 1;  // one value used
         if ( !val.count_ && val.defined_ )
-            exhausted = 0;
+            code |= 2;  // one value not used
         else if ( val.count_ > threshold )
-            overused = 1;
+            code |= 4;  // one value overused
     }
     
-    std::string warn;
+    code ^= 1;  // invert first bit
     
-    if ( !used )
-        warn = "Warning, this parameter was ignored";
-    else if ( !exhausted )
-        warn = "Warning, a value was ignored";
-    if ( overused )
-        warn = "Warning, some value might have been overused";
+    if ( code & 1 )
+        msg = "Warning, this parameter was ignored";
+    else if ( code & 2 )
+        msg = "Warning, a value was ignored";
+    if ( code & 4 )
+        msg = "Warning, some value might have been overused";
     
-    if ( warn.size() )
-    {
-        if ( used )
-            print_yellow(os, warn + msg + ": " + format_counts(pair));
-        else
-            print_yellow(os, warn + msg + ": " + format(pair));
-        std::endl(os);
-        
-        if ( ! used )
-            return 4;
-        else if ( ! exhausted )
-            return 2;
-        return 1;
-    }
-    return 0;
+    if ( code & 1 )
+        msg += ": " + format_counts(pair);
+    else if ( code )
+        msg += ": " + format(pair);
+    
+    return code;
 }
 
 
 /**
- @returns total number of warnings associated with entire set of terms
+ @returns the type of warning associated with entire set of terms
+ If the return value is not zero, a message was printed to 'os', and
+ at least a terminating '\n' should be printed to 'os' by the calling function.
  */
-int Glossary::warnings(std::ostream& os, size_t threshold, std::string const& msg) const
+int Glossary::warnings(std::ostream& os, size_t threshold) const
 {
     int res = 0;
+    std::string msg;
     for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
-        res |= warnings(os, *i, threshold, msg);
+    {
+        int val = warning(*i, msg, threshold);
+        if ( val )
+        {
+            if ( res ) os.put('\n');
+            print_yellow(os, msg);
+            res |= val;
+        }
+    }
     return res;
 }
 

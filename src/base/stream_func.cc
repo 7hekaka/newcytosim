@@ -16,13 +16,13 @@ void StreamFunc::clean_stream(std::ostream& os, std::istream& is)
         
         // terminate the line for new-line and cariage-return
         if ( c == '\r' )
-            os << '\n';
+            os.put('\n');
         // all type of spaces are substituted
         else if ( isspace(c) )
-            os << ' ';
+            os.put(' ');
         // non=printable characters are removed
         else if ( isprint(c) )
-            os << c;
+            os.put(c);
         else
             std::cerr << "unprintable ascii "<< (int)c << " found\n";
     }
