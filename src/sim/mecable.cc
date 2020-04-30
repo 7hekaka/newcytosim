@@ -21,6 +21,7 @@ void Mecable::clearMecable()
     pBlockAlc  = 0;
     pBlockUse  = false;
     pBlockSize = 0;
+    pBlockType = 0;
     pPos       = nullptr;
     pForce     = nullptr;
     pIndex     = 0;
@@ -52,9 +53,10 @@ Mecable& Mecable::operator =(const Mecable& o)
  object is probably growing.
 
  */
-void Mecable::allocateBlock()
+void Mecable::allocateBlock(size_t bks)
 {
-    pBlockSize = DIM * nPoints;
+    assert_true( bks >= DIM * nPoints );
+    pBlockSize = bks;
     
     if ( pBlockSize > pBlockAlc )
     {

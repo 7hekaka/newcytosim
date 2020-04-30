@@ -7,6 +7,7 @@
 #include "dim.h"
 #include "object.h"
 #include "buddy.h"
+#include "matfull.h"
 #include "sim.h"
 
 class Meca;
@@ -61,8 +62,14 @@ private:
     /// Current size of pBlock[]
     size_t      pBlockSize;
     
+    /// type of block
+    int         pBlockType;
+    
     /// Flag that pBlock[] is used for preconditionning
     int         pBlockUse;
+    
+    /// Matrix used for preconditionning
+    MatrixFull  pBlockMatrix;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
     size_t      pIndex;
@@ -239,7 +246,7 @@ public:
     size_t          matIndex()            const { return pIndex; }
     
     /// Allocates pBlock[] to hold a `N x N` full matrix, where N = DIM * nbPoints()
-    void            allocateBlock();
+    void            allocateBlock(size_t);
     
     /// True if preconditionner block is 'in use'
     int             useBlock()           const { return pBlockUse; }
@@ -247,14 +254,32 @@ public:
     /// Change preconditionning flag
     void            useBlock(int b)            { pBlockUse = b; }
     
+    /// Change preconditionning flag
+    void            useBlock(int b, int t)     { pBlockUse = b; pBlockType = t; }
+
     /// Returns current size of block allocated for preconditionning
     size_t          blockSize()          const { return pBlockSize; }
     
+    /// Returns current size of block allocated for preconditionning
+    void            blockSize(size_t p)        { pBlockSize = p; }
+    
+    /// True if preconditionner block is 'in use'
+    int             blockType()          const { return pBlockType; }
+    
+    /// Type of block: 0=identity; 1=full; 2=band; 3=custom
+    void            blockType(int t)           { pBlockType = t; }
+
     /// Returns address of memory allocated for preconditionning
     real *          block()              const { return pBlock; }
     
     /// Returns address of memory allocated for preconditionning (pivot)
     int *           pivot()              const { return pPivot; }
+    
+    /// Returns matrix allocated for preconditionning
+    MatrixFull&     blockMatrix()              { return pBlockMatrix; }
+    
+    /// Returns matrix allocated for preconditionning
+    void            blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
 
     //--------------------------------------------------------------------------
     

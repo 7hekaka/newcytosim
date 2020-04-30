@@ -129,6 +129,8 @@ public:
 
 private:
     
+    mutable unsigned long long accum_, start_;
+    
     /// flag to indicate that result is available
     int             ready_;
     
@@ -262,12 +264,15 @@ private:
 
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
+    
+    /// compute the matrix diagonal block corresponding to a Mecable
+    void getBand(const Mecable*, real* mat) const;
 
     /// compute the matrix diagonal block corresponding to a Mecable
-    void getBlock(real* res, const Mecable*) const;
+    void getBlock(const Mecable*, real* mat) const;
     
     /// DEBUG: extract the matrix diagonal block corresponding to a Mecable using 'multiply()'
-    void extractBlock(real* res, const Mecable*) const;
+    void extractBlock(const Mecable*, real* mat) const;
     
     /// DEBUG: compare `blk` with block extracted using extractBlockSlow()
     void verifyBlock(const Mecable*, const real*);
@@ -282,10 +287,25 @@ private:
     void computePreconditionnerAlt();
     
     /// compute the preconditionner block corresponding to given Mecable
-    void computePreconditionner(Mecable*);
+    void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);
+    
+    /// compute the preconditionner block corresponding to given Mecable
+    void renewPreconditionner(Mecable*, int, real*);
+    
+    /// compute the preconditionner block corresponding to given Mecable
+    void computePreconditionnerBand(Mecable*);
+
+    /// compute the preconditionner block corresponding to given Mecable
+    void computePreconditionnerFull(Mecable*);
+
+    /// compute all blocks of the preconditionner
+    void renewPreconditionner(Mecable*, int);
     
     /// compute all blocks of the preconditionner (method=1)
-    void computePreconditionner();
+    void computePreconditionner(int);
+    
+    /// compute all blocks of the preconditionner
+    void renewPreconditionner(int);
 
 public:
     

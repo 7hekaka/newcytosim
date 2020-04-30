@@ -133,27 +133,27 @@ void expand_lower_matrix(size_t siz, real * mat)
 
 
 /**
- Set to zero all the terms that are not within 'diag' from the diagonal.
- With 'diag==0' the entire matrix is set to zero.
- With 'diag==1', only the diagonal is kept.
- With 'diag==2', the matrix is made tri-diagonal
- etc.
+ reset terms that are below diagonal `kl`, or above diagonal `ku`
+ if 'ku==0' and 'kl==0', only the diagonal is kept.
+ if 'ku==1' and 'kl==1', the matrix is made tri-diagonal.
  */
-void truncate_matrix(size_t siz, real* mat, size_t diag)
+void truncate_matrix(size_t siz, real* mat, size_t kl, size_t ku)
 {
 #if ( 0 )
     std::clog << "\nOriginal:\n";
     VecPrint::print(std::clog, siz, siz, mat, siz);
 #endif
-    
-    for ( size_t ii = 0; ii < siz; ++ii )
+
+    for ( size_t j = 0; j < siz; ++j )
     {
-        real * col = mat + siz * ii;
-        for ( size_t jj = 0; jj+diag < ii; ++jj )
-            col[jj] = 0.0;
+        real * col = mat + siz * j;
+        //zero out terms above the diagonal:
+        for ( size_t i = 0; i+ku < j; ++i )
+            col[i] = 0;
         
-        for ( size_t kk = ii+diag+1; kk < siz; ++kk )
-            col[kk] = 0.0;
+        //zero out terms below the diagonal:
+        for ( size_t i = j+kl+1; i < siz; ++i )
+            col[i] = 0;
     }
     
 #if ( 0 )
@@ -189,13 +189,13 @@ void threshold_matrix(size_t siz, real * mat, real val)
 }
 
 
-/// set 'mat' of order `siz` to `diag * I`
-void diagonal_matrix(size_t siz, real * mat, real val)
+/// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
+void init_matrix(size_t siz, real * mat, real dia, real off)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
-        mat[k] = 0.0;
+        mat[k] = off;
     for ( size_t k = 0; k < siz*siz; k+=siz+1 )
-        mat[k] = val;
+        mat[k] = dia;
 }
 
 
@@ -222,74 +222,73 @@ void test_matrix(size_t siz, real * mat)
         mat[i+siz*j] = j - i;
 }
 
+/**
+Convert a full matrix into a LAPACK banded matrix data suitable for
+Cholesky factorization by DPBTRF() or DPBTF2().
+
+ `src` is a DOUBLE PRECISION square matrix of dimension `N * N`
+ `dst` is a DOUBLE PRECISION array, dimension `ldd * N`
+ 
+ The lower triangle of the symmetric band matrix `src`, is transferred into
+ the first KD+1 rows of `dst`.
+ 
+ The j-th column of `src` is stored in the j-th column of the array `dst`
+ as follows:
+ 
+      dst(i-j,j) = src(i,j)  for  j <= i <= min(N-1, j+KD).
+ 
+ This should work even if 'src==dst' provided `ldd <= N`
+ */
+void lower_band_storage(size_t N, real const* src, size_t kd, real* dst, size_t ldd)
+{
+    assert_true( ldd == kd+1 );
+    for ( size_t j = 0; j < N; ++j )
+    {
+        size_t sup = std::min(N-1, j+kd);
+        real const* S = src + N * j;
+        real * D = dst + ldd * j;
+        for ( size_t i = j; i <= sup; ++i )
+            D[i-j] = S[i];
+    }
+    // zero-out unused values:
+    for ( size_t j = N-kd; j < N; ++j )
+    {
+        for ( size_t i = N-j; i < ldd; ++i )
+            dst[i+ldd*j] = 0;
+    }
+}
+
 
 /**
- Convert a full matrix into a LAPACK banded matrix data suitable for LU factorization.
- `src` is a square matrix of side 'siz'
- `dst` is of size ldd * siz, with ldd > ku+2*kl+1
+ Convert a full matrix into a LAPACK banded matrix data suitable for
+ LU factorization by DGTRF() or DGTF2().
  
- with indices starting at 1 (LAPACK documentation):
- src(i,j) is stored in dst(ku+1+i-j, j) for max(1, j-ku) <= i <= min(siz, j+kl)
-
- considering that ku <- ku + kl:
- src(i,j) is stored in dst(ku+kl+1+i-j, j) for max(1, j-ku) <= i <= min(siz, j+kl)
-
- with indices starting at 0:
- src(i,j) is stored in dst(ku+kl+i-j, j) for max(0, j-ku) <= i <= min(siz-1, j+kl)
-
- */
-void banded_matrix(int siz, real const* src, int kl, int ku, real * dst, int ldd)
+ `src` is a square matrix of dimension `N * N`
+ `dst` is of dimension `ldd * N`, with `ldd > ku+2*kl+1`
+ 
+ create matrix `dst` in band storage, in rows KL+1 to  2*KL+KU+1;
+ rows 1 to KL of the array are not set.
+ 
+ The j-th column of `src` is stored in the j-th column of `dst` as follows:
+           dst(KL+KU+i-j, j) = src(i,j)
+ for max(0,j-KU) <= i <= min(N-1, j+KL)
+*/
+void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, size_t ldd)
 {
-    assert_true( ldd == kl+kl+ku+1 );
-#if ( 0 )
-    if ( siz < 64 )
+    assert_true( ldd == 2*kl+ku+1 );
+    
+    for ( size_t u = 0; u < N * ldd ; ++u )
+        dst[u] = 0;
+    
+    for ( size_t j = 0; j < N; ++j )
     {
-        std::clog << "\noriginal:\n";
-        VecPrint::print(std::clog, siz, siz, src, siz);
+        size_t inf = j - std::min(j, ku);
+        size_t sup = std::min(N-1, j+kl);
+        real * D = dst + ldd * j + kl + ku - j;
+        real const* S = src + N * j;
+        for ( size_t i = inf; i <= sup; ++i )
+            D[i] = S[i];
     }
-#endif
-    for ( int jj = 0; jj < siz; ++jj )
-    {
-        // dst[ii+ldd-kl-1-jj+ldd*jj] = src[ii+siz*jj];
-        int add = ldd - kl - 1 - jj + ldd * jj;
-        int inf = add + std::max(0, jj-ku);
-        int sup = add + std::min(siz-1, jj+kl);
-        int off = siz * jj - add;
-
-        //std::clog << " inf " << inf << " sup " << sup << " off " << off << " jj " << jj << "  shift " << shift << "\n";
-        //std::clog << " dst[ " << inf << " " << sup << " ] <- src[ " << inf+off << " " << sup+off << " ] \n";
-        
-        if ( off > 0 )
-        {
-            for (int ii = inf; ii <= sup; ++ii )
-                dst[ii] = src[ii+off];
-        }
-        else
-        {
-            for (int ii = sup; ii >= inf; --ii )
-                dst[ii] = src[ii+off];
-        }
-    }
-    // zero out values:
-    for ( int jj = 0; jj < siz; ++jj )
-    {
-        int add = ldd - kl - 1 - jj;
-        int inf = add + std::max(0, jj-ku);
-        int sup = add + std::min(siz-1, jj+kl);
-
-        real * col = dst + ldd * jj;
-        for ( int ii = 0; ii < inf; ++ii )
-            col[ii] = 0.0;
-        for ( int ii = sup+1; ii < ldd; ++ii )
-            col[ii] = 0.0;
-    }
-#if ( 0 )
-    if ( siz < 64 )
-    {
-        std::clog << " banded_matrix (size " << siz << ") :\n";
-        VecPrint::print(std::clog, ldd, siz, dst, ldd);
-    }
-#endif
 }
 
 

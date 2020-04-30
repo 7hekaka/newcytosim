@@ -28,6 +28,7 @@ void SimulProp::clear()
     tolerance         = 0.05;
     acceptable_prob   = 0.5;
     precondition      = 1;
+    precondition_span = 0;
     random_seed       = 0;
     steric            = 0;
     
@@ -81,6 +82,7 @@ void SimulProp::read(Glossary& glos)
     glos.set(tolerance,         "tolerance");
     glos.set(acceptable_prob,   "acceptable_prob");
     glos.set(precondition,      "precondition");
+    glos.set(precondition_span, "precondition", 1);
     
     glos.set(steric,                   "steric", {{"off", 0}, {"on", 1}});
     glos.set(steric_stiffness_push[0], "steric", 1);
@@ -176,7 +178,7 @@ void SimulProp::write_values(std::ostream& os) const
     std::endl(os);
     write_value(os, "tolerance",       tolerance);
     write_value(os, "acceptable_prob", acceptable_prob);
-    write_value(os, "precondition",    precondition);
+    write_value(os, "precondition",    precondition, precondition_span);
     write_value(os, "random_seed",     random_seed);
     std::endl(os);
     write_value(os, "steric", steric, steric_stiffness_push[0], steric_stiffness_pull[0]);

@@ -174,28 +174,42 @@ public:
     /// A flag to enable preconditionning when solving the system of equations
     /**
      This parameter can affect the performance greatly, and it is always a good idea
-     to try the different accepted values of `precondition`:
-     - 0 : never use preconditionning
-     - 1 : use a block preconditionner recalculated at every time step
-     - 2 : use a block preconditionner recalculated occasionally
+     to try the different possible values of `precondition`:
+     - 0 : do not use preconditionning
+     - 1 : use an simple banded preconditionner that is quick to calculate
+     - 2 : use blocks extracted from the diagonal of the full matrix of the system
+     - 3 : use same matrix as case `2`, converted to another format
      .
      
-     With `precondition = 1`, Cytosim calculates a matrix (the preconditionner)
-     that is approximately equal to the invert of the matrix that characterize the
-     dynamical system. Using this preconditionner can reduce the number of iterations
+     Preconditionning is a technique to speed up convergence of iterative methods,
+     that can be used to solve the movements of the Mecables in Cytosim.
+     It relies on finding a matrix (the preconditionner) that is approximately
+     equal to the invert of the matrix of the full system.
+     Using a good preconditionner should reduce the number of iterations
      needed to converge to a solution, resulting in a potential overall speedup.
-     However, calculating the preconditionner itself is costly, and performing an
-     iteration with preconditionning is also more expensive than without.
-     Hence there is a complex tradeoff, and the performance will vary.
-     In some cases, using `precondition=1` can degrade preformance, 
+     
+     However, calculating the preconditionner itself is costly, and performing
+     one iteration with preconditionning is also more expensive than without.
+     This generally results in a complex tradeoff, and performance will vary.
+     In some cases, using a preconditionner can even degrade preformance,
      in particular if some objects have many vertices.
      
      If there is only one filament in the system, `precondition=0` should perform best.
-     With many filaments, trying `precondition = [0, 1]' is the recommended strategy.
+     With many filaments, trying `precondition = [0, 1, 2]' is a good strategy.
      <em>default value = 0</em>
      */
     unsigned  precondition;
 
+    /// Number of times a preconditionner block can be used
+    /**
+     Calculating the preconditionner is more costly than applying it.
+     
+     Thus, for a system that does not evolve too fast, it can be advantageous
+     to keep a preconditionner calculated at some time point, for later times.
+     Trying different values, starting from `1` up is advised.
+     <em>default value = 0</em>
+     */
+    unsigned  precondition_span;
     
     /// A flag to control the engine that implement steric interactions between objects
     int       steric;
