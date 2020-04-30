@@ -221,7 +221,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 
 #if REAL_IS_DOUBLE
 
-void add_rigidity_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigiditySSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -249,7 +249,7 @@ void add_rigidity_SSE(const size_t nbt, const real* X, const real rigid, real* Y
 }
 
 /// older implementation
-void add_rigidity_SSO(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigiditySSO(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -282,7 +282,7 @@ void add_rigidity_SSO(const size_t nbt, const real* X, const real rigid, real* Y
 
 #ifdef __AVX__
 
-void add_rigidity_AVX(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidityAVX(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
@@ -477,11 +477,11 @@ void testRigidity(size_t cnt)
     testRigidity(cnt, add_rigidityG,    "G  ");
     testRigidity(cnt, add_rigidity4,    "4  ");
 #if defined __SSE__ & ( DIM == 2 )
-    testRigidity(cnt, add_rigidity_SSO, "SSO");
-    testRigidity(cnt, add_rigidity_SSE, "SSE");
+    testRigidity(cnt, add_rigiditySSO, "SSO");
+    testRigidity(cnt, add_rigiditySSE, "SSE");
 #endif
 #if defined __AVX__ & ( DIM == 2 )
-    testRigidity(cnt, add_rigidity_AVX, "AVX");
+    testRigidity(cnt, add_rigidityAVX, "AVX");
 #endif
 }
 
