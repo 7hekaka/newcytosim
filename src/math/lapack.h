@@ -133,6 +133,18 @@ inline void xpbtf2(char UPLO, int N, int KD, real* AB, int LDAB, int* INFO)
 
 inline void xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
 {
+    /*
+    if ( UPLO == 'U' && NRHS == 1 )
+    {
+        blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B, 1);
+        blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B, 1);
+    }
+    if ( UPLO == 'L' && NRHS == 1 )
+    {
+        blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B, 1);
+        blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B, 1);
+    }
+     */
     LAPACK(pbtrs)(&UPLO, &N, &KD, &NRHS, AB, &LDAB, B, &LDB, INFO);
 }
 
@@ -175,11 +187,6 @@ inline void xpptrs(char UPLO, int N, int NRHS, const real* A, real* B, int LDB, 
 inline void xpptri(char UPLO, int N, real* A, int* INFO)
 {
     LAPACK(pptri)(&UPLO, &N, A, INFO);
-}
-
-inline void xtrtrs(char UPLO, char trans, char diag, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
-{
-    LAPACK(trtrs)(&UPLO, &trans, &diag, &N, &NRHS, A, &LDA, B, &LDB, INFO);
 }
 
 inline void xgbtrf(int M, int N, int KL, int KU, real* AB, int LDAB, int* IPIV, int* INFO)
@@ -230,11 +237,6 @@ inline void xgetrs(char trans, int N, int NRHS, const real* A, int LDA, const in
 inline void xgerfs(char trans, int N, int NRHS, const real* A, int LDA, const real* AF, int LDAF, const int* IPIV, real* B, int LDB, real* X, int LDX, real* FERR, real* BERR, real* WORK, int* IWORK, int* INFO)
 {
     LAPACK(gerfs)(&trans, &N, &NRHS, A, &LDA, AF, &LDAF, IPIV, B, &LDB, X, &LDX, FERR, BERR, WORK, IWORK, INFO);
-}
-
-inline void xlaswp(int N, const real* A, int LDA, int K1, int K2, const int* IPIV, int INCX)
-{
-    LAPACK(laswp)(&N, A, &LDA, &K1, &K2, IPIV, &INCX);
 }
 
 inline void xsysv(char UPLO, int N, int NRHS, real* A, int LDA, int* IPIV, real*B, int LDB, real* WORK, int LWORK, int* INFO)
@@ -302,6 +304,16 @@ inline void xormqr(char side, char trans, int M, int N, int K, const real* A, in
                    real* C, int LDC, real* WORK, int LWORK, int* INFO)
 {
     LAPACK(ormqr)(&side, &trans, &M, &N, &K, A, &LDA, TAU, C, &LDC, WORK, &LWORK, INFO);
+}
+
+inline void xtrtrs(char UPLO, char trans, char diag, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
+{
+    LAPACK(trtrs)(&UPLO, &trans, &diag, &N, &NRHS, A, &LDA, B, &LDB, INFO);
+}
+
+inline void xlaswp(int N, const real* A, int LDA, int K1, int K2, const int* IPIV, int INCX)
+{
+    LAPACK(laswp)(&N, A, &LDA, &K1, &K2, IPIV, &INCX);
 }
 
 inline void xgels(char trans, int M, int N, int NRHS, const real* A, int LDA, const real* B, int LDB, real* WORK, int LWORK, int* INFO)

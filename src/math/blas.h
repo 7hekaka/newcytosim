@@ -58,6 +58,7 @@ void BLAS(trmsv)(char*, char*, char*, int*, const real*, int*, real*, int*);
 void BLAS(gbmv)(char*, int*, int*, int*,  int*, real*, const real*, int*, const real*, int*, real*, real*, int*);
 void BLAS(tbmv)(char*, char*, char*, int*, int*, const real*, int*, real*, int*);
 void BLAS(tbsv)(char*, char*, char*, int*, int*, const real*, int*, real*, int*);
+
 void BLAS(tpsv)(char*, char*, char*, int*, const real*, real*, int*);
 void BLAS(tpmv)(char*, char*, char*, int*, const real*, real*, int*);
 void BLAS(ger)(int*, int*, real* alpha, const real*, int*, const real*, int*, real*, int*);
@@ -220,9 +221,15 @@ inline void xtrsv(char Uplo, char TransA, char Diag, int N, const real*A, int ld
 
 inline void xgbmv(char TransA, int M, int N, int Kl,  int Ku, real alpha, const real*A, int lda, const real*X, int incX, real beta, real*Y, int incY);
 
-inline void xtbmv(char Uplo, char TransA, char Diag, int N, int K, const real*A, int lda, real*X, int incX);
+inline void xtbmv(char Uplo, char Trans, char Diag, int N, int K, const real*A, int lda, real*X, int incX)
+{
+    BLAS(tbmv)(&Uplo, &Trans, &Diag, &N, &K, A, &lda, X, &incX);
+}
 
-inline void xtbsv(char Uplo, char TransA, char Diag, int N, int K, const real*A, int lda, real*X, int incX);
+inline void xtbsv(char Uplo, char Trans, char Diag, int N, int K, const real* A, int lda, real*X, int incX)
+{
+    BLAS(tbsv)(&Uplo, &Trans, &Diag, &N, &K, A, &lda, X, &incX);
+}
 
 inline void xtpsv(char Uplo, char TransA, char Diag, int N, const real*A, real*X, int incX);
 

@@ -60,8 +60,8 @@ public:
     /// constructor from an existing array
     MatrixSymmetric(size_t s, real* array, size_t ldd)
     {
-        val = nullptr;
-        resize(s);
+        free_real(val);
+        size_ = s;
         msLDD = ldd;
         val = array;
         in_charge = false;
