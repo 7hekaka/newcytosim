@@ -221,9 +221,6 @@ void Meca::addAllRigidity(const real* X, real* Y) const
     }
 }
 
-//const int KU = 11, KL = 11, LDAB = 2*KL+KU+1;
-const int KD = 6;
-
 
 inline void applyBlock(Mecable const* mec, real* Y)
 {
@@ -239,9 +236,20 @@ inline void applyBlock(Mecable const* mec, real* Y)
             assert_true(info==0);
         } break;
         case 2: {
-            int info = 0;
-            lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info);
-            assert_true(info==0);
+            //int info = 0;
+            //lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info);
+            //assert_true(info==0);
+            int nbp = mec->nbPoints();
+            for ( int d = 0; d < DIM; ++d )
+            {
+                /*
+                 we cannot call lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
+                 because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+                 But this is essentially the same work done, eventually.
+                */
+                blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+            }
         } break;
         default:
             throw InvalidParameter("unknown precondition block type");
@@ -252,24 +260,34 @@ inline void applyBlock(Mecable const* mec, real* Y)
 
 inline void applyBlock(Mecable const* mec, real const* X, real* Y)
 {
-    int bks = mec->blockSize();
-    
+    assert_true( Y != X );
+    //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
+
     switch ( mec->blockType() )
     {
         case 0: {
-            //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
         } break;
         case 1: {
+            int bks = mec->blockSize();
             int info = 0;
-            //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
             lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
             assert_true(info==0);
         } break;
         case 2: {
-            int info = 0;
-            //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
-            lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info);
-            assert_true(info==0);
+            //int info = 0;
+            //lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info);
+            //assert_true(info==0);
+            int nbp = mec->nbPoints();
+            for ( int d = 0; d < DIM; ++d )
+            {
+                /*
+                 we cannot call lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
+                 because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+                 But this is essentially the same work done, eventually.
+                */
+                blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+            }
         } break;
         case 3: {
             mec->blockMultiply(X, Y);
@@ -508,40 +526,25 @@ void printBlock(Mecable* mec, size_t sup)
  */
 void Meca::getBand(const Mecable * mec, real* res) const
 {
+    const size_t ldd = 3;
     const size_t nbp = mec->nbPoints();
-    const size_t bks = DIM * nbp;
-    
-    zero_real(bks*bks, res);
-    
-#if SEPARATE_RIGIDITY_TERMS
-    // set the Rigidity terms:
+
     if ( mec->hasRigidity() )
     {
-        addRigidityLower(res, bks, mec->nbPoints(), mec->fiberRigidity());
-        //std::clog<<"Rigidity block " << mec->reference() << "\n";
-        //VecPrint::print(std::clog, bks, bks, res, bks, 0);
+        real beta = -time_step * mec->leftoverMobility() * mec->fiberRigidity();
+        setRigidityBanded(res, ldd, nbp, beta);
     }
-#endif
-    expand_lower_matrix(bks, res);
-    
-    // scale
-    real beta = -time_step * mec->leftoverMobility();
-    for ( size_t n = 0; n < bks*bks; ++n )
-        res[n] = beta * res[n];
-    
-    // add Identity matrix:
-    size_t bs1 = bks + 1;
-    for ( size_t i = 0; i < bks*bks; i += bs1 )
-        res[i] += 1.0;
+    else
+        zero_real(ldd*nbp, res);
 
-    //size_t S = std::min(bks, 16UL);
-    //std::clog<<"block " << bks << "\n";
-    //VecPrint::print(std::clog, S, S, res, bks, 1);
-
-    lower_band_storage(bks, res, KD, res, KD+1);
-    
-    //std::clog<<"lower_band_storage " << bks << "\n";
-    //VecPrint::print(std::clog, KD+1, S, res, KD+1, 1);
+    // add ones to the diagonal:
+    for ( size_t i = 0; i < nbp; ++i )
+        res[i*ldd] += 1.0;
+    /*
+    const size_t S = std::min(nbp, 16UL);
+    std::clog<<"lower_band " << nbp << "\n";
+    VecPrint::print(std::clog, ldd, S, res, ldd, 1);
+     */
 }
 
 /**
@@ -708,20 +711,14 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     real * mat = new_real(bks*bks);
     real * vec = new_real(bks);
     
-    extractBlock(mec, wrk);   // wrk <- PRECONDITIONNER_BLOCK
+    extractBlock(mec, wrk);   // wrk <- MEC_BLOCK
    
     copy_real(bks*bks, wrk, mat);  // mat <- wrk
-    if ( 1 == mec->blockType() )
+    for ( size_t i = 0; i < bks; ++i )
     {
-        int info = 0;
-        // mat <- PRECONDITIONNER_BLOCK * mat
-        lapack::xgetrs('N', bks, bks, blk, bks, mec->pivot(), mat, bks, &info);
-        assert_true(info==0);
+        applyBlock(mec, wrk+bks*i, mat+bks*i);
+        mat[i+bks*i] -= 1.0;
     }
-    
-    for ( size_t k=0; k < bks*bks; k += 1+bks )
-        mat[k] -= 1.0;
-    
     real err = blas::nrm2(bks*bks, mat) / bks;
     std::clog << " | 1 - PM | = " << std::setprecision(3) << err;
     
@@ -772,7 +769,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     if ( mec->blockSize() == bks )
         may_keep = true;
     else
-        mec->allocateBlock(bks);
+        mec->blockSize(bks, bks*bks);
     
     real* blk = mec->block();
     real* vec = vTMP + DIM * mec->matIndex();
@@ -857,16 +854,12 @@ Compute banded preconditionner block corresponding to 'mec'
  */
 void Meca::computePreconditionnerBand(Mecable* mec)
 {
-    const size_t bks = DIM * mec->nbPoints();
-    mec->allocateBlock(bks);
-    
-    getBand(mec, mec->block());
-    //verifyBlock(mec, mec->block());
-    
-    // calculate Cholesky factorization:
     int info = 0;
-    lapack::xpbtf2('L', bks, KD, mec->block(), KD+1, &info);
-    
+    const size_t nbp = mec->nbPoints();
+    mec->blockSize(DIM*nbp, 3*nbp);
+    getBand(mec, mec->block());
+    lapack::xpbtf2('L', nbp, 2, mec->block(), 3, &info);
+
     if ( 0 == info )
     {
         mec->useBlock(0, 2);
@@ -886,7 +879,7 @@ Compute preconditionner block corresponding to 'mec'
 void Meca::computePreconditionnerFull(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
-    mec->allocateBlock(bks);
+    mec->blockSize(bks, bks*bks);
     
     getBlock(mec, mec->block());
     //verifyBlock(mec, mec->block());
@@ -922,14 +915,30 @@ void convertPreconditionner(Mecable* mec, bool full, real* blk, int* piv, real* 
     int info = 1;
     if ( full )
         lapack::xgetrs('N', bks, bks, blk, bks, piv, wrk, bks, &info);
-    else
-        lapack::xpbtrs('L', bks, KD, bks, blk, KD+1, wrk, bks, &info);
+    else {
+        //lapack::xpbtrs('L', bks, KD, bks, blk, KD+1, wrk, bks, &info);
+        int nbp = mec->nbPoints();
+        for ( size_t i = 0; i < bks; ++i )
+        {
+            real* Y = wrk + bks * i;
+            for ( int d = 0; d < DIM; ++d )
+            {
+                /*
+                 we cannot call lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
+                 because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+                 But this is essentially the same work done, eventually.
+                */
+                blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+            }
+        }
+    }
     if ( info == 0 )
     {
         MatrixFull& mat = mec->blockMatrix();
         mat.resize(bks);
         mat.importMatrix(bks, wrk, bks);
-        mec->blockSize(bks);
+        mec->blockSize(bks, 0);
         mec->useBlock(0, 3);
         //std::clog << "R";
     }

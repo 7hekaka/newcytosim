@@ -45,24 +45,19 @@ Mecable& Mecable::operator =(const Mecable& o)
 
 //------------------------------------------------------------------------------
 
-
 /**
- 
- The first time, we allocate exactly what is demanded, but if new allocation 
- is required again, we allocate with some margin, because it means that this
- object is probably growing.
-
+Set block size and allocate if necessary to hold 'alc' scalars
  */
-void Mecable::allocateBlock(size_t bks)
+void Mecable::blockSize(size_t bks, size_t alc)
 {
-    assert_true( bks >= DIM * nPoints );
+    assert_true( bks <= DIM * nPoints );
     pBlockSize = bks;
     
-    if ( pBlockSize > pBlockAlc )
+    if ( alc > pBlockAlc )
     {
         free_real(pBlock);
         delete[] pPivot;
-        size_t bum = chunk_real(pBlockSize);
+        size_t bum = chunk_real(alc);
         //std::clog << "Mecable("<<reference()<<")::allocateBlock " << bum << "\n";
    
         pBlock = new_real(bum*bum);

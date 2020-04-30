@@ -41,7 +41,7 @@ typedef Matrix33 MatrixBlock;
 
 
 /// set TRUE to use matrix mB and mC (the traditional way)
-#define USE_ISO_MATRIX 1
+#define USE_ISO_MATRIX 0
 
 /**
  Option to allow the user to see Links made by Meca in 'play'.
@@ -265,7 +265,7 @@ private:
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
     
-    /// compute the matrix diagonal block corresponding to a Mecable
+    /// compute a preconditionner block for a Mecable
     void getBand(const Mecable*, real* mat) const;
 
     /// compute the matrix diagonal block corresponding to a Mecable

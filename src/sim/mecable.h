@@ -245,9 +245,6 @@ public:
      */
     size_t          matIndex()            const { return pIndex; }
     
-    /// Allocates pBlock[] to hold a `N x N` full matrix, where N = DIM * nbPoints()
-    void            allocateBlock(size_t);
-    
     /// True if preconditionner block is 'in use'
     int             useBlock()           const { return pBlockUse; }
     
@@ -260,8 +257,8 @@ public:
     /// Returns current size of block allocated for preconditionning
     size_t          blockSize()          const { return pBlockSize; }
     
-    /// Returns current size of block allocated for preconditionning
-    void            blockSize(size_t p)        { pBlockSize = p; }
+    /// set size of block needed for preconditionning, allocating memory 'alc'
+    void            blockSize(size_t, size_t alc);
     
     /// True if preconditionner block is 'in use'
     int             blockType()          const { return pBlockType; }
