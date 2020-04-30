@@ -242,10 +242,9 @@ namespace LinearSolvers
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        real resid = blas::nrm2(dim, r);
-        fprintf(stderr, "BCGSP count %4lu residual %10.6f\n", monitor.count(), resid);
+        real resid = blas::nrm8(dim, r);
+        fprintf(stderr, "BCGSP count %4lu norm_inf residual %10.8f\n", monitor.count(), resid);
 #endif
-        
         allocator.release();
     }
     

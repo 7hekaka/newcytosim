@@ -25,23 +25,33 @@
 extern "C"
 {
 int ilaenv_(int*, const char*, const char*, const int*, int*, int*, int*);
+
 int LAPACK(ptsv)(int*, int*, real*, real*, real*, int*, int*);
 int LAPACK(ptsvx)(char*, int*, int*, const real*, const real*, real*, real*, const real*, int*, const real*, int*, real*, real*, real*, real*, int*);
 int LAPACK(pttrf)(int*, real*, real*, int*);
 int LAPACK(pttrs)(int*, int*, const real*, const real*, real*, int*, int*);
 int LAPACK(ptts2)(int*, int*, const real*, const real*, real*, int*);
+
+int LAPACK(pbsv)(char*, int*, int*, int*, real*, int*, real*, int*, int*);
+int LAPACK(pbtrf)(char*, int*, int*, real*, int*, int*);
+int LAPACK(pbtf2)(char*, int*, int*, real*, int*, int*);
+int LAPACK(pbtrs)(char*, int*, int*, int*, const real*, const int*, real*, int*, int*);
+
 int LAPACK(posv)(char*, int*, int*, real*, int*, real*, int*, int*);
 int LAPACK(potrf)(char*, int*, real*, int*, int*);
 int LAPACK(potrs)(char*, int*, int*, const real*, int*, real*, int*, int*);
 int LAPACK(potf2)(char*, int*, real*, int*, int*);
 int LAPACK(potri)(char*, int*, real*, int*, int*);
+
+int LAPACK(ppts)(char*, int*, real*, int*, int*);
 int LAPACK(pptrf)(char*, int*, real*, int*);
 int LAPACK(pptrs)(char*, int*, int*, const real*, real*, int*, int*);
 int LAPACK(pptri)(char*, int*, real*, int*);
-int LAPACK(trtrs)(char*, char*, char*, int*, int*, const real*, int*, real*, int*, int*);
+
+int LAPACK(gbtrs)(char*, int*, int*, int*, int*, const real*, int*, const int*, real*, int*, int*);
 int LAPACK(gbtrf)(int*, int*, int*, int*, real*, int*, int*, int*);
 int LAPACK(gbtf2)(int*, int*, int*, int*, real*, int*, int*, int*);
-int LAPACK(gbtrs)(char*, int*, int*, int*, int*, const real*, int*, const int*, real*, int*, int*);
+
 int LAPACK(gesv)(int*, int*, real*, int*, int*, real*, int*, int*);
 int LAPACK(getrf)(int*, int*, real*, int*, int*, int*);
 int LAPACK(getf2)(int*, int*, real*, int*, int*, int*);
@@ -49,19 +59,25 @@ int LAPACK(getc2)(int*, real*, int*, int*, int*, int*);
 int LAPACK(getri)(int*, real*, int*, const int*, real*, const int*, int*);
 int LAPACK(getrs)(char*, int*, int*, const real*, int*, const int*, real*, int*, int*);
 int LAPACK(gerfs)(char*, int*, int*, const real*, int*, const real*, int*, const int*, real*, int*, real*, int*, real*, real*, real*, int*, int*);
-int LAPACK(laswp)(int*, const real*, int*, int*, int*, const int*, int*);
+int LAPACK(geqrf)(int*, int*, real*, int*, real*, real*, const int*, int*);
+int LAPACK(gels)(char*, int*, int*, int*, const real*, int*, const real*, int*, real*, const int*, int*);
+
 int LAPACK(sysv)(char*, int*, int*, real*, int*, int*, real*, int*, real*, int*, int*);
 int LAPACK(sytrf)(char*, int*, real*, int*, int*, real*, int*, int*);
+int LAPACK(sytf2)(char*, int*, real*, int*, int*, real*, int*, int*);
 int LAPACK(sytrs)(char*, int*, int*, real*, int*, int*, real*, int*, int*);
 int LAPACK(syev)(char*, char*, int*, real*, int*, real*, real*, int*, int*);
 int LAPACK(syevd)(char*, char*, int*, real*, int*, real*, real*, int*, int*, int*, int*);
 int LAPACK(syevx)(char*, char*, char*, int*, real*, int*, real*, real*, int*, int*, real*, int*, real*, real*, int*, real*, int*, const int*, int*, int*);
+
 int LAPACK(gtsv)(int*, int*, real*, real*, real*, real*, int*, int*);
 int LAPACK(gttrf)(int*, real*, real*, real*, real*, int*, int*);
 int LAPACK(gttrs)(char*, int*, int*, real*, real*, real*, real*, int*, real*, int*, int*);
-int LAPACK(geqrf)(int*, int*, real*, int*, real*, real*, const int*, int*);
+int LAPACK(gtts2)(int*, int*, int*, real*, real*, real*, real*, int*, real*, int*);
+
+int LAPACK(trtrs)(char*, char*, char*, int*, int*, const real*, int*, real*, int*, int*);
+int LAPACK(laswp)(int*, const real*, int*, int*, int*, const int*, int*);
 int LAPACK(ormqr)(char*, char*, int*, int*, int*, const real*, int*, const real*, real*, int*, real*, const int*, int*);
-int LAPACK(gels)(char*, int*, int*, int*, const real*, int*, const real*, int*, real*, const int*, int*);
 }
 
 
@@ -99,6 +115,28 @@ inline void xptts2(int N, int NRHS, const real* D, const real* E, real* B, int L
     LAPACK(ptts2)(&N, &NRHS, D, E, B, &LDB);
 }
 
+    
+inline void xpbsv(char UPLO, int N, int KD, int NRHS, real* AB, int LDAB, real* B, int LDB, int* INFO)
+{
+    LAPACK(pbsv)(&UPLO, &N, &KD, &NRHS, AB, &LDAB, B, &LDB, INFO);
+}
+
+inline void xpbtrf(char UPLO, int N, int KD, real* AB, int LDAB, int* INFO)
+{
+    LAPACK(pbtrf)(&UPLO, &N, &KD, AB, &LDAB, INFO);
+}
+
+inline void xpbtf2(char UPLO, int N, int KD, real* AB, int LDAB, int* INFO)
+{
+    LAPACK(pbtf2)(&UPLO, &N, &KD, AB, &LDAB, INFO);
+}
+
+inline void xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+{
+    LAPACK(pbtrs)(&UPLO, &N, &KD, &NRHS, AB, &LDAB, B, &LDB, INFO);
+}
+
+
 inline void xposv(char UPLO, int N, int NRHS, real* A, int LDA, real* B, int LDB, int* INFO)
 {
     LAPACK(posv)(&UPLO, &N, &NRHS, A, &LDA, B, &LDB, INFO);
@@ -109,14 +147,14 @@ inline void xpotrf(char UPLO, int N, real* A, int LDA, int* INFO)
     LAPACK(potrf)(&UPLO, &N, A, &LDA, INFO);
 }
 
-inline void xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
-{
-    LAPACK(potrs)(&UPLO, &N, &NRHS, A, &LDA, B, &LDB, INFO);
-}
-
 inline void xpotf2(char UPLO, int N, real* A, int LDA, int* INFO)
 {
     LAPACK(potf2)(&UPLO, &N, A, &LDA, INFO);
+}
+
+inline void xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
+{
+    LAPACK(potrs)(&UPLO, &N, &NRHS, A, &LDA, B, &LDB, INFO);
 }
 
 inline void xpotri(char UPLO, int N, real* A, int LDA, int* INFO)
@@ -209,6 +247,11 @@ inline void xsytrf(char UPLO, int N, real* A, int LDA, int* IPIV, real* WORK, in
     LAPACK(sytrf)(&UPLO, &N, A, &LDA, IPIV, WORK, &LWORK, INFO);
 }
 
+inline void xsytf2(char UPLO, int N, real* A, int LDA, int* IPIV, real* WORK, int LWORK, int* INFO)
+{
+    LAPACK(sytf2)(&UPLO, &N, A, &LDA, IPIV, WORK, &LWORK, INFO);
+}
+
 inline void xsytrs(char UPLO, int N, int NRHS, real* A, int LDA, int* IPIV, real* B, int LDB, int* INFO)
 {
     LAPACK(sytrs)(&UPLO, &N, &NRHS, A, &LDA, IPIV, B, &LDB, INFO);
@@ -243,6 +286,11 @@ inline void xgttrf(int N, real* DL, real* D, real* DU, real* DU2, int* IPIV, int
 inline void xgttrs(char TRANS, int N, int NRHS, real* DL, real* D, real* DU, real* DU2, int* IPIV, real* B, int LDB, int* INFO)
 {
     LAPACK(gttrs)(&TRANS, &N, &NRHS, DL, D, DU, DU2, IPIV, B, &LDB, INFO);
+}
+
+inline void xgtts2(int ITRANS, int N, int NRHS, real* DL, real* D, real* DU, real* DU2, int* IPIV, real* B, int LDB)
+{
+    LAPACK(gtts2)(&ITRANS, &N, &NRHS, DL, D, DU, DU2, IPIV, B, &LDB);
 }
 
 inline void xgeqrf(int M, int N, real* A, int LDA,  real* TAU, real* WORK, int LWORK, int* INFO)

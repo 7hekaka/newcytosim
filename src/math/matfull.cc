@@ -78,6 +78,21 @@ void MatrixFull::reset(real dia, real off)
 }
 
 
+void MatrixFull::truncate(size_t kl, size_t ku)
+{
+    for ( size_t j = 0; j < size_; ++j )
+    {
+        //zero out terms above the diagonal:
+        for ( size_t i = 0; i+ku < j; ++i )
+            *addr(i,j) = 0;
+        
+        //zero out terms below the diagonal:
+        for ( size_t i = j+kl+1; i < size_; ++i )
+            *addr(i,j) = 0;
+    }
+}
+
+
 void MatrixFull::importMatrix(size_t size, real const* ptr, size_t lld)
 {
     resize(size);
@@ -274,16 +289,53 @@ real MatrixFull::norm_inf() const
     return res;
 }
 
+/*
+ char str[32] = { 0 }, zer[32] = { 0 }, fmt[32] = " %4.0f";
+  
+  { // build format strings:
+      snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+      snprintf(zer, sizeof(zer), fmt, 0.0);
+      bool dot = false; char * d = zer;
+      for ( char * c = zer; *c; ++c )
+      {
+          if ( *c == '0' ) { *c = ' '; d = c; }
+          dot |= ( *c == '.' );
+      }
+      if ( !dot ) *d = '.';
+  }
+  
+  for ( size_t ii = 0; ii < m; ++ii )
+  {
+      for ( size_t jj = 0; jj < n; ++jj )
+      {
+          T val = mat[ii+ldd*jj];
+          if ( std::fabs(val) < threshold )
+              os << zer;
+          else
+          {
+              snprintf(str, sizeof(str), fmt, mat[ii+ldd*jj]);
+              os << str;
 
-void MatrixFull::print(std::ostream& os) const
+ */
+
+void MatrixFull::print(std::ostream& os, size_t imin, size_t imax, size_t jmin, size_t jmax) const
 {
-    const int w = (int)os.width();
+    imax = std::min(imax, size_);
+    jmax = std::min(jmax, size_);
+    
+    const int digits = 3;
+    char str[32] = { 0 }, fmt[32] = " %4.0f";
+    snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+
     os << "MatrixFull " << size_ << " (" << nblk_ << ") [";
-    for ( size_t i = 0; i < size_; ++i )
+    for ( size_t i = imin; i < imax; ++i )
     {
-        os << "\n   line " << std::setw(2) << i << ":";
-        for ( size_t j = 0; j < size_; ++j )
-            os << " " << std::setw(w) << std::showpos << value(i, j);
+        os << "\n" << std::setw(2) << i;
+        for ( size_t j = jmin; j < jmax; ++j )
+        {
+            snprintf(str, sizeof(str), fmt, value(i, j));
+            os << str;
+        }
     }
     os << std::noshowpos << " ]";
 }
