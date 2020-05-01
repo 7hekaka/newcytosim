@@ -12,51 +12,40 @@
 void blas_xtbsvUN(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
 {
     bool nounit = ( Diag == 'N' );
-    /* pointer adjustments for indices starting from 1 */
-    A -= 1 + lda;
-    --X;
-    int kplus1 = K + 1;
-    
-    if (incX == 1)
+    if ( incX == 1 )
     {
-        for (int j = N; j >= 1; --j)
+        for (int j = N-1; j >= 0; --j)
         {
             if (X[j] != 0.)
             {
-                int l = kplus1 - j;
-                if (nounit)
-                    X[j] /= A[kplus1 + j * lda];
+                const real * pA = A + K + j * lda;
+                if ( nounit ) X[j] /= pA[0];
                 real temp = X[j];
-                /* Computing MAX */
-                int i__2 = 1, i__3 = j - K;
-                int i__1 = std::max(i__2,i__3);
-                for (int i__ = j - 1; i__ >= i__1; --i__)
-                    X[i__] -= temp * A[l + i__ + j * lda];
+                const int inf = std::max(0, j-K);
+                for (int i = j - 1; i >= inf; --i)
+                    X[i] -= temp * pA[i-j];
             }
         }
     }
     else
     {
-        int kx = 1;
+        int kx = 0;
         if ( incX > 0 )
-            kx = 1 + (N - 1) * incX;
+            kx = (N-1) * incX;
         int jx = kx;
-        for (int j = N; j >= 1; --j)
+        for (int j = N-1; j >= 0; --j)
         {
             kx -= incX;
             if (X[jx] != 0.)
             {
                 int ix = kx;
-                int l = kplus1 - j;
-                if (nounit)
-                    X[jx] /= A[kplus1 + j * lda];
+                const real * pA = A + K + j * lda;
+                if ( nounit ) X[jx] /= pA[0];
                 real temp = X[jx];
-                /* Computing MAX */
-                int i__2 = 1, i__3 = j - K;
-                int i__1 = std::max(i__2,i__3);
-                for (int i__ = j - 1; i__ >= i__1; --i__)
+                const int inf = std::max(0, j-K);
+                for (int i = j - 1; i >= inf; --i)
                 {
-                    X[ix] -= temp * A[l + i__ + j * lda];
+                    X[ix] -= temp * pA[i-j];
                     ix -= incX;
                 }
             }
@@ -68,51 +57,40 @@ void blas_xtbsvUN(char Diag, int N, int K, const real* A, int lda, real* X, int 
 void blas_xtbsvLN(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
 {
     bool nounit = ( Diag == 'N' );
-    /* pointer adjustments for indices starting from 1 */
-    A -= 1 + lda;
-    --X;
-
-    if (incX == 1)
+    if ( incX == 1 )
     {
-        int i__1 = N;
-        for (int j = 1; j <= i__1; ++j)
+        for (int j = 0; j < N; ++j)
         {
-            if (X[j] != 0.) {
-                int l = 1 - j;
-                if (nounit)
-                    X[j] /= A[j * lda + 1];
+            if (X[j] != 0.)
+            {
+                const real * pA = A + j * lda;
+                if ( nounit ) X[j] /= pA[0];
                 real temp = X[j];
-                /* Computing MIN */
-                int i__3 = N, i__4 = j + K;
-                int i__2 = std::min(i__3,i__4);
-                for (int i__ = j + 1; i__ <= i__2; ++i__)
-                    X[i__] -= temp * A[l + i__ + j * lda];
+                const int sup = std::min(N-1, j+K);
+                for (int i = j + 1; i <= sup; ++i)
+                    X[i] -= temp * pA[i-j];
             }
         }
     }
     else
     {
-        int kx = 1;
+        int kx = 0;
         if ( incX <= 0 )
-            kx = 1 - (N - 1) * incX;
+            kx = - (N-1) * incX;
         int jx = kx;
-        int i__1 = N;
-        for (int j = 1; j <= i__1; ++j)
+        for (int j = 0; j < N; ++j)
         {
             kx += incX;
             if (X[jx] != 0.)
             {
                 int ix = kx;
-                int l = 1 - j;
-                if (nounit)
-                    X[jx] /= A[j * lda + 1];
+                const real * pA = A + j * lda;
+                if ( nounit ) X[jx] /= pA[0];
                 real temp = X[jx];
-                /* Computing MIN */
-                int i__3 = N, i__4 = j + K;
-                int i__2 = std::min(i__3,i__4);
-                for (int i__ = j + 1; i__ <= i__2; ++i__)
+                const int sup = std::min(N-1, j+K);
+                for (int i = j + 1; i <= sup; ++i)
                 {
-                    X[ix] -= temp * A[l + i__ + j * lda];
+                    X[ix] -= temp * pA[i-j];
                     ix += incX;
                 }
             }
@@ -124,53 +102,38 @@ void blas_xtbsvLN(char Diag, int N, int K, const real* A, int lda, real* X, int 
 void blas_xtbsvUT(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
 {
     bool nounit = ( Diag == 'N' );
-    /* pointer adjustments for indices starting from 1 */
-    A -= 1 + lda;
-    --X;
-    int kplus1 = K + 1;
-    
-    if (incX == 1)
+    if ( incX == 1 )
     {
-        int i__1 = N;
-        for (int j = 1; j <= i__1; ++j)
+        for (int j = 0; j < N; ++j)
         {
             real temp = X[j];
-            int l = kplus1 - j;
-            /* Computing MAX */
-            int i__2 = 1, i__3 = j - K;
-            int i__4 = j - 1;
-            for (int i__ = std::max(i__2,i__3); i__ <= i__4; ++i__)
-                temp -= A[l + i__ + j * lda] * X[i__];
-            if (nounit)
-                temp /= A[kplus1 + j * lda];
+            const real * pA = A + K + j * lda;
+            for (int i = std::max(0, j-K); i < j; ++i)
+                temp -= pA[i-j] * X[i];
+            if ( nounit ) temp /= pA[0];
             X[j] = temp;
         }
     }
     else
     {
-        int kx = 1;
+        int kx = 0;
         if ( incX <= 0 )
-            kx = 1 - (N - 1) * incX;
+            kx = - (N-1) * incX;
         int jx = kx;
-        int i__1 = N;
-        for (int j = 1; j <= i__1; ++j)
+        for (int j = 0; j < N; ++j)
         {
             real temp = X[jx];
             int ix = kx;
-            int l = kplus1 - j;
-            /* Computing MAX */
-            int i__4 = 1, i__2 = j - K;
-            int i__3 = j - 1;
-            for (int i__ = std::max(i__4,i__2); i__ <= i__3; ++i__)
+            const real * pA = A + K + j * lda;
+            for (int i = std::max(0, j-K); i < j; ++i)
             {
-                temp -= A[l + i__ + j * lda] * X[ix];
+                temp -= pA[i-j] * X[ix];
                 ix += incX;
             }
-            if (nounit)
-                temp /= A[kplus1 + j * lda];
+            if ( nounit ) temp /= pA[0];
             X[jx] = temp;
             jx += incX;
-            if (j > K)
+            if (j >= K)
                 kx += incX;
         }
     }
@@ -179,49 +142,38 @@ void blas_xtbsvUT(char Diag, int N, int K, const real* A, int lda, real* X, int 
 void blas_xtbsvLT(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
 {
     bool nounit = ( Diag == 'N' );
-    /* pointer adjustments for indices starting from 1 */
-    A -= 1 + lda;
-    --X;
-    if (incX == 1)
+    if ( incX == 1 )
     {
-        for (int j = N; j >= 1; --j)
+        for (int j = N-1; j >= 0; --j)
         {
             real temp = X[j];
-            int l = 1 - j;
-            /* Computing MIN */
-            int i__1 = N, i__3 = j + K;
-            int i__4 = j + 1;
-            for (int i__ = std::min(i__1,i__3); i__ >= i__4; --i__)
-                temp -= A[l + i__ + j * lda] * X[i__];
-            if (nounit)
-                temp /= A[j * lda + 1];
+            const real * pA = A + j * lda;
+            for (int i = std::min(N-1, j+K); i > j; --i)
+                temp -= pA[i-j] * X[i];
+            if ( nounit ) temp /= pA[0];
             X[j] = temp;
         }
     }
     else
     {
-        int kx = 1;
+        int kx = 0;
         if ( incX > 0 )
-            kx = 1 + (N - 1) * incX;
+            kx = (N-1) * incX;
         int jx = kx;
-        for (int j = N; j >= 1; --j)
+        for (int j = N-1; j >= 0; --j)
         {
             real temp = X[jx];
             int ix = kx;
-            int l = 1 - j;
-            /* Computing MIN */
-            int i__4 = N, i__1 = j + K;
-            int i__3 = j + 1;
-            for (int i__ = std::min(i__4,i__1); i__ >= i__3; --i__)
+            const real * pA = A + j * lda;
+            for (int i = std::min(N-1, j+K); i > j; --i)
             {
-                temp -= A[l + i__ + j * lda] * X[ix];
+                temp -= pA[i-j] * X[ix];
                 ix -= incX;
             }
-            if (nounit)
-                temp /= A[j * lda + 1];
+            if ( nounit ) temp /= pA[0];
             X[jx] = temp;
             jx -= incX;
-            if (N - j >= K)
+            if ( j < N-K )
                 kx -= incX;
         }
     }
