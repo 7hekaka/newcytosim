@@ -449,9 +449,10 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
             return 3;
         err0 = err;
 #if ( 0 )
-        printf("\n   lower "); VecPrint::print(std::cout, ns-1, low+1, 3);
-        printf("\n   diag. "); VecPrint::print(std::cout, ns, dia, 3);
-        printf("\n   upper "); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n diff(L,U) = %f", blas::max_diff(ns-1, upe, low+1));
+        printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
+        printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
+        printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
@@ -561,9 +562,10 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
             return 3;
         err0 = err;
 #if ( 0 )
-        printf("\n   lower "); VecPrint::print(std::cout, ns-1, low+1, 3);
-        printf("\n   diag. "); VecPrint::print(std::cout, ns, dia, 3);
-        printf("\n   upper "); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n diff(L,U) = %f", max_diff(ns-1, upe, low+1));
+        printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
+        printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
+        printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
@@ -650,9 +652,10 @@ int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
             return 3;
         err0 = err;
 #if ( 0 )
-        printf("\n   lower "); VecPrint::print(std::cout, ns-1, low+1, 3);
-        printf("\n   diag. "); VecPrint::print(std::cout, ns, dia, 3);
-        printf("\n   upper "); VecPrint::print(std::cout, ns-1, upe, 3);
+        printf("\n diff(L,U) = %f", max_diff(ns-1, upe, low+1));
+        printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
+        printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
+        printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
 #endif
         int info = 0;
         lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);
