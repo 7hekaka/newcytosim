@@ -285,8 +285,10 @@ inline void applyBlock(Mecable const* mec, real const* X, real* Y)
                  because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
                  But this is essentially the same work done, eventually.
                 */
-                blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-                blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                //blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                //blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                blas_xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+                blas_xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
             }
         } break;
         case 3: {
@@ -1378,10 +1380,12 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
 #endif
 
     // compute preconditionner:
-    start_ = __rdtsc();
+    auto start_ = __rdtsc();
     computePreconditionner(precond);
-    start_ = __rdtsc() - start_;
-    
+    auto precond_ = __rdtsc() - start_;
+    start_ = __rdtsc();
+    accum_ = 0;
+
     /*
      Choose the initial guess for the solution of the system (Xnew - Xold):
      we could use the solution at the previous step, or a vector of zeros.
@@ -1424,7 +1428,6 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
      GMRES may converge faster than BCGGS, but has overheads and uses more memory
      hence for large systems, biCGGS is often advantageous.
      */
-    accum_ = 0;
 
     //------- call the iterative solver:
     if ( precond )
@@ -1551,11 +1554,12 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         if ( prop->verbose & 4 )
         {
-            auto tot = ( start_ + accum_ ) >> 14;
+            auto total = ( __rdtsc() - start_ ) >> 10;
             int cnt = std::max(1UL, monitor.count());
-            start_ = ( start_ / cnt ) >> 12;
-            accum_ = ( accum_ / cnt ) >> 12;
-            oss << "  cycles " << std::setw(6) << start_ << std::setw(6) << accum_ << std::setw(8) << tot;
+            start_ = ( precond_ / cnt ) >> 10;
+            accum_ = ( accum_ / cnt ) >> 10;
+            oss << "  cycles " << std::setw(6) << start_;
+            oss << std::setw(6) << accum_ << std::setw(8) << total;
         }
         Cytosim::out << oss.str() << "\n";
         if ( prop->verbose & 2 )
