@@ -165,9 +165,6 @@ inline __m256i makemask(long i)
     return _mm256_castpd_si256(_mm256_cmp_pd(ramp, _mm256_set1_pd((double)i), _CMP_LT_OQ));
 }
 
-inline vec4 maskload(double const* a, __m256i b) { return _mm256_maskload_pd(a, b); }
-inline void maskstore(double* a, __m256i k, vec4 b) { _mm256_maskstore_pd(a, k, b); }
-
 inline void store1(double* a, vec4 b)    { _mm_store_sd(a, _mm256_castpd256_pd128(b)); }
 inline void store2(double* a, vec4 b)    { _mm_store_pd(a, _mm256_castpd256_pd128(b)); }
 inline void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, _mm256_castpd256_pd128(b)); }
@@ -175,8 +172,8 @@ inline void store3(double* a, vec4 b)    { _mm256_maskstore_pd(a, msk1110, b); }
 inline void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
 inline void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
 
-inline vec4 maskload4(double const* a, __m256i b)     { return _mm256_maskload_pd(a,b); }
-inline void maskstore4(double* a, __m256i b, vec4 c)  { _mm256_maskstore_pd(a,b,c); }
+inline vec4 maskload4(double const* a, __m256i k)     { return _mm256_maskload_pd(a,k); }
+inline void maskstore4(double* a, __m256i k, vec4 b)  { _mm256_maskstore_pd(a,k,b); }
 
 inline vec4 setr4(double a, double b, double c, double d) { return _mm256_setr_pd(a,b,c,d); }
 inline vec4 set4(double a, double b, double c, double d)  { return _mm256_set_pd(a,b,c,d); }

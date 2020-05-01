@@ -195,7 +195,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         }
         if ( end < size_ )
         {
-            vec4 xx = maskload(X+end, msk);
+            vec4 xx = maskload4(X+end, msk);
             y0 = fmadd4(streamload4(ptr   ), xx, y0);
             y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
             y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
@@ -205,7 +205,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         y0 = add4(unpacklo4(y0, y1), unpackhi4(y0, y1));
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
         y0 = add4(permute2f128(y0, y2, 0x21), blend4(y0, y2, 0b1100));
-        maskstore(Y+i, makemask(size_-i), y0);
+        maskstore4(Y+i, makemask(size_-i), y0);
     }
 }
 
@@ -218,7 +218,7 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
         size_t end = ~3 & size_; // last multiple of 4 <= size_
         vec4 x0, x1, x2, x3;
         {
-            x0 = maskload(X+i, makemask(size_-i));
+            x0 = maskload4(X+i, makemask(size_-i));
             //x1 = permute2f128(x0, x0, 0x00);
             //x3 = permute2f128(x0, x0, 0x11);
             x2 = permute2f128(x0, x0, 0x21);
@@ -242,11 +242,11 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
         if ( end < size_ )
         {
             __m256i msk = makemask(size_-end);
-            vec4 s = maskload(Y+end, msk);
+            vec4 s = maskload4(Y+end, msk);
             s = fmadd4(streamload4(ptr  ), x0, s);
             s = fmadd4(streamload4(ptr+4), x1, s);
             s = fmadd4(streamload4(ptr+8), x2, s);
-            maskstore(Y+end, msk, s);
+            maskstore4(Y+end, msk, s);
         }
     }
 }
