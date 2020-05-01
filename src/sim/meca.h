@@ -129,7 +129,7 @@ public:
 
 private:
     
-    mutable unsigned long long accum_, start_;
+    mutable unsigned long long accum_;
     
     /// flag to indicate that result is available
     int             ready_;

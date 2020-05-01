@@ -23,6 +23,7 @@
 #include "blas.h"
 #include "lapack.h"
 #include "cytoblas.h"
+#include "xtbsv.h"
 #include "exceptions.h"
 #include "vecprint.h"
 #include "filepath.h"
@@ -222,38 +223,46 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 }
 
 
-inline void applyBlock(Mecable const* mec, real* Y)
+/// apply preconditionner block in full storage
+inline void applyFull(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
-    
+    int info = 0;
+    lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+    assert_true(info==0);
+}
+
+
+/// apply preconditionner block in band storage
+inline void applyBand(Mecable const* mec, real* Y)
+{
+    int nbp = mec->nbPoints();
+#if ( 0 )
+    for ( int d = 0; d < DIM; ++d )
+    {
+        /*
+         we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
+         because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+         But calling DTBSV gets the same work done, eventually.
+         */
+        blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+        blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+    }
+#else
+    alsatian_xtbsvLN(nbp, 2, mec->block(), 3, Y, DIM);
+    alsatian_xtbsvLT(nbp, 2, mec->block(), 3, Y, DIM);
+#endif
+}
+
+
+inline void applyBlock(Mecable const* mec, real* Y)
+{
     switch ( mec->blockType() )
     {
-        case 0:
-            break;
-        case 1: {
-            int info = 0;
-            lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-            assert_true(info==0);
-        } break;
-        case 2: {
-            //int info = 0;
-            //lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info);
-            //assert_true(info==0);
-            int nbp = mec->nbPoints();
-            for ( int d = 0; d < DIM; ++d )
-            {
-                /*
-                 we cannot call lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
-                 because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-                 But this is essentially the same work done, eventually.
-                */
-                blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-                blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-            }
-        } break;
-        default:
-            throw InvalidParameter("unknown precondition block type");
-            break;
+        case 0: break;
+        case 1: applyFull(mec, Y); break;
+        case 2: applyBand(mec, Y); break;
+        default: throw InvalidParameter("unknown precondition block type"); break;
     }
 }
 
@@ -262,38 +271,13 @@ inline void applyBlock(Mecable const* mec, real const* X, real* Y)
 {
     assert_true( Y != X );
     //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
-
     switch ( mec->blockType() )
     {
-        case 0: {
-        } break;
-        case 1: {
-            int bks = mec->blockSize();
-            int info = 0;
-            lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-            assert_true(info==0);
-        } break;
-        case 2: {
-            //int info = 0;
-            //lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info);
-            //assert_true(info==0);
-            int nbp = mec->nbPoints();
-            for ( int d = 0; d < DIM; ++d )
-            {
-                /*
-                 we cannot call lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
-                 because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-                 But this is essentially the same work done, eventually.
-                */
-                //blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-                //blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-                blas_xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-                blas_xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-            }
-        } break;
-        case 3: {
-            mec->blockMultiply(X, Y);
-        } break;
+        case 0: break;
+        case 1: applyFull(mec, Y); break;
+        case 2: applyBand(mec, Y); break;
+        case 3: mec->blockMultiply(X, Y); break;
+        default: throw InvalidParameter("unknown precondition block type"); break;
     }
 }
 
@@ -594,7 +578,7 @@ void Meca::getBlock(const Mecable * mec, real* res) const
         // Include the corrections P' in preconditioner, vector by vector.
         real* tmp = vTMP + DIM * mec->matIndex();
         zero_real(bks, tmp);
-        for ( size_t i = 0; ii < bks; ++i )
+        for ( size_t i = 0; i < bks; ++i )
         {
             tmp[i] = 1.0;
             mec->addProjectionDiff(tmp, res+bks*i);
@@ -860,12 +844,14 @@ void Meca::computePreconditionnerBand(Mecable* mec)
     const size_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, 3*nbp);
     getBand(mec, mec->block());
-    lapack::xpbtf2('L', nbp, 2, mec->block(), 3, &info);
+    //lapack::xpbtf2('L', nbp, 2, mec->block(), 3, &info);
+    alsatian_xpbtf2L(nbp, 2, mec->block(), 3, &info);
 
     if ( 0 == info )
     {
         mec->useBlock(0, 2);
         //std::clog << "Meca::computePreconditionner(" << mec->reference() << ")\n";
+        //std::clog<<"banded-block " << nbp << "\n";
     }
     else
     {
@@ -908,33 +894,14 @@ void Meca::computePreconditionnerFull(Mecable* mec)
  Initialize Mecable::blockMatrix() as the preconditionner block,
  using the factorization stored already in mec::block()
  */
-void convertPreconditionner(Mecable* mec, bool full, real* blk, int* piv, real* wrk)
+void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
 {
     const size_t bks = DIM * mec->nbPoints();
     // create Identity matrix:
     init_matrix(bks, wrk, 1, 0);
+    int info = 0;
     // calculate matrix inverse
-    int info = 1;
-    if ( full )
-        lapack::xgetrs('N', bks, bks, blk, bks, piv, wrk, bks, &info);
-    else {
-        //lapack::xpbtrs('L', bks, KD, bks, blk, KD+1, wrk, bks, &info);
-        int nbp = mec->nbPoints();
-        for ( size_t i = 0; i < bks; ++i )
-        {
-            real* Y = wrk + bks * i;
-            for ( int d = 0; d < DIM; ++d )
-            {
-                /*
-                 we cannot call lapack::xpbtrs('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
-                 because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-                 But this is essentially the same work done, eventually.
-                */
-                blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-                blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-            }
-        }
-    }
+    lapack::xgetrs('N', bks, bks, blk, bks, piv, wrk, bks, &info);
     if ( info == 0 )
     {
         MatrixFull& mat = mec->blockMatrix();
@@ -962,7 +929,7 @@ void Meca::renewPreconditionner(Mecable* mec, int cycle, real* blk, int* piv, re
         int info = 0;
         lapack::xgetf2(bks, bks, blk, bks, piv, &info);
         if ( info == 0 )
-            convertPreconditionner(mec, 1, blk, piv, wrk);
+            convertPreconditionner(mec, blk, piv, wrk);
         else
             mec->useBlock(0, 0);
     }
@@ -1037,7 +1004,7 @@ void Meca::computePreconditionner(int precond)
                 int info = 0;
                 lapack::xgetf2(bks, bks, blk, bks, piv, &info);
                 if ( info == 0 )
-                    convertPreconditionner(mec, 1, blk, piv, wrk);
+                    convertPreconditionner(mec, blk, piv, wrk);
                 else
                     mec->useBlock(0, 0);
             }
@@ -1559,7 +1526,9 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             start_ = ( precond_ / cnt ) >> 10;
             accum_ = ( accum_ / cnt ) >> 10;
             oss << "  cycles " << std::setw(6) << start_;
-            oss << std::setw(6) << accum_ << std::setw(8) << total;
+            oss << " " << std::setw(6) << accum_;
+            oss << " " << std::setw(8) << total;
+            oss << " " << std::setw(8) << cnt * accum_;
         }
         Cytosim::out << oss.str() << "\n";
         if ( prop->verbose & 2 )

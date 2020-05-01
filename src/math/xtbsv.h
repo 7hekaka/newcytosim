@@ -203,6 +203,22 @@ void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int K, const real* A, i
 //------------------------------------------------------------------------------
 #pragma mark - ALSATIAN DPBTF2
 
+/**
+ This calls the standard lapack::pbtf2()
+ and then inverts the diagonal terms
+*/
+void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
+{
+    lapack::xpbtf2('L', N, KD, AB, LDAB, INFO);
+    if ( 0 == *INFO )
+    {
+        for ( int u = 0; u < N; ++u )
+            AB[LDAB*u] = 1.0 / AB[LDAB*u];
+    }
+}
+
+
+
 #if 0 //def __AVX__
 
 /*
