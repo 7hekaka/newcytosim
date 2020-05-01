@@ -3,7 +3,7 @@
 #include "mecafil_code.cc"
 #include "exceptions.h"
 #include "vecprint.h"
-#include "dpttrf.h"
+#include "xpttrf.h"
 
 
 /*

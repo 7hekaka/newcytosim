@@ -786,7 +786,7 @@
 		BBDE7FFB14E2609B00A23E0C /* picket_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDE7FF914E2609B00A23E0C /* picket_long.h */; };
 		BBDE7FFE14E260B400A23E0C /* wrist_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDE7FFC14E260B400A23E0C /* wrist_long.cc */; };
 		BBDE7FFF14E260B400A23E0C /* wrist_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDE7FFD14E260B400A23E0C /* wrist_long.h */; };
-		BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF9AA3228BFBD3005018BD /* dpttrf.h */; };
+		BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF9AA3228BFBD3005018BD /* xpttrf.h */; };
 		BBDFE3BF0C6A37FF00CD333A /* hand_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */; };
 		BBDFE3C00C6A37FF00CD333A /* hand_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */; };
 		BBE4269A14437BA4003795C4 /* treadmilling_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4269614437BA4003795C4 /* treadmilling_fiber_prop.cc */; };
@@ -1762,7 +1762,7 @@
 		BBDE7FFD14E260B400A23E0C /* wrist_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wrist_long.h; path = singles/wrist_long.h; sourceTree = "<group>"; };
 		BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparsesymblk.cc; path = src/math/matsparsesymblk.cc; sourceTree = SOURCE_ROOT; };
 		BBDF72AE0B5C2327007CAD2A /* matsparsesymblk.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparsesymblk.h; path = src/math/matsparsesymblk.h; sourceTree = SOURCE_ROOT; };
-		BBDF9AA3228BFBD3005018BD /* dpttrf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dpttrf.h; sourceTree = "<group>"; };
+		BBDF9AA3228BFBD3005018BD /* xpttrf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xpttrf.h; sourceTree = "<group>"; };
 		BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = hand_monitor.h; path = src/sim/hand_monitor.h; sourceTree = SOURCE_ROOT; };
 		BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = hand_monitor.cc; path = src/sim/hand_monitor.cc; sourceTree = SOURCE_ROOT; };
 		BBE0993E0869D87F005FF210 /* libcytospace.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospace.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2044,7 +2044,7 @@
 				BBF4E88124372DFF00B9D440 /* blas.h */,
 				BBF4E88224372DFF00B9D440 /* lapack.h */,
 				BBF4E88024372DBA00B9D440 /* cytoblas.h */,
-				BBDF9AA3228BFBD3005018BD /* dpttrf.h */,
+				BBDF9AA3228BFBD3005018BD /* xpttrf.h */,
 			);
 			name = BLAS;
 			sourceTree = "<group>";
@@ -3514,7 +3514,7 @@
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
-				BBDF9AA4228BFBD3005018BD /* dpttrf.h in Headers */,
+				BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
 				BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */,
 				BB7191820EF1CD9900CED9E2 /* real.h in Headers */,

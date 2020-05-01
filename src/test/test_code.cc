@@ -14,7 +14,7 @@
 #include "vecprint.h"
 #include "blas.h"
 #include "lapack.h"
-#include "dpttrf.h"
+#include "xpttrf.h"
 #include "cytoblas.h"
 #include "simd.h"
 #include "simd_print.h"

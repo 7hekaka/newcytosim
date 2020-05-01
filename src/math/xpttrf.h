@@ -1,6 +1,8 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-#ifndef DPTTRF_H
-#define DPTTRF_H
+// Cytosim was created by Francois Nedelec.
+// Copyright 2019-2020 Sainsbury Laboratory, Cambridge University
+
+#ifndef XPTTRF_H
+#define XPTTRF_H
 
 /**
  This is a C-translation of the LAPACK reference implementation of dpttrf()

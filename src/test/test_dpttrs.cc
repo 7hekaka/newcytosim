@@ -11,7 +11,7 @@
 #include "blas.h"
 #include "lapack.h"
 #include "assert_macro.h"
-#include "dpttrf.h"
+#include "xpttrf.h"
 #include "cytoblas.h"
 
 /// number of segments:
