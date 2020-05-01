@@ -133,18 +133,6 @@ inline void xpbtf2(char UPLO, int N, int KD, real* AB, int LDAB, int* INFO)
 
 inline void xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
 {
-    /*
-    if ( UPLO == 'U' && NRHS == 1 )
-    {
-        blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B, 1);
-        blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B, 1);
-    }
-    if ( UPLO == 'L' && NRHS == 1 )
-    {
-        blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B, 1);
-        blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B, 1);
-    }
-     */
     LAPACK(pbtrs)(&UPLO, &N, &KD, &NRHS, AB, &LDAB, B, &LDB, INFO);
 }
 
