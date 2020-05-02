@@ -264,9 +264,6 @@ private:
 
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
-    
-    /// compute a preconditionner block for a Mecable
-    void getBand(const Mecable*, real* mat) const;
 
     /// compute the matrix diagonal block corresponding to a Mecable
     void getBlock(const Mecable*, real* mat) const;

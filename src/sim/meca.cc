@@ -67,6 +67,9 @@ With a sequential simulation, the second option is usually faster.
 #define DEBUG_MECA 0
 
 
+/// a famous dish from Alsace
+#define CHOUCROUTE 1
+
 /// number of threads running in parallel
 #define NUM_THREADS 1
 
@@ -233,24 +236,27 @@ inline void applyFull(Mecable const* mec, real* Y)
 }
 
 
+// the leading dimension of the banded matrix used for preconditionning
+constexpr size_t BAND_LDD = 4;
+
 /// apply preconditionner block in band storage
 inline void applyBand(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
-#if ( 0 )
+#if CHOUCROUTE
+    alsatian_xtbsvLN(nbp, 2, mec->block(), BAND_LDD, Y, DIM);
+    alsatian_xtbsvLT(nbp, 2, mec->block(), BAND_LDD, Y, DIM);
+#else
+    /*
+     we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     But calling DTBSV gets the required work done.
+     */
     for ( int d = 0; d < DIM; ++d )
     {
-        /*
-         we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
-         because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-         But calling DTBSV gets the same work done, eventually.
-         */
-        blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
-        blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), 3, Y+d, DIM);
+        blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), BAND_LDD, Y+d, DIM);
+        blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), BAND_LDD, Y+d, DIM);
     }
-#else
-    alsatian_xtbsvLN(nbp, 2, mec->block(), 3, Y, DIM);
-    alsatian_xtbsvLT(nbp, 2, mec->block(), 3, Y, DIM);
 #endif
 }
 
@@ -510,26 +516,25 @@ void printBlock(Mecable* mec, size_t sup)
  
  This block is square, symmetric, definite positive and totally predictable
  */
-void Meca::getBand(const Mecable * mec, real* res) const
+void getBand(const Mecable * mec, real* res, real time_step)
 {
-    const size_t ldd = 3;
     const size_t nbp = mec->nbPoints();
 
     if ( mec->hasRigidity() )
     {
         real beta = -time_step * mec->leftoverMobility() * mec->fiberRigidity();
-        setRigidityBanded(res, ldd, nbp, beta);
+        setRigidityBanded(res, BAND_LDD, nbp, beta);
     }
     else
-        zero_real(ldd*nbp, res);
+        zero_real(BAND_LDD*nbp, res);
 
     // add ones to the diagonal:
     for ( size_t i = 0; i < nbp; ++i )
-        res[i*ldd] += 1.0;
+        res[i*BAND_LDD] += 1.0;
+
     /*
-    const size_t S = std::min(nbp, 16UL);
-    std::clog<<"lower_band " << nbp << "\n";
-    VecPrint::print(std::clog, ldd, S, res, ldd, 1);
+     std::clog<<"lower_band " << nbp << "\n";
+     VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
      */
 }
 
@@ -842,11 +847,13 @@ void Meca::computePreconditionnerBand(Mecable* mec)
 {
     int info = 0;
     const size_t nbp = mec->nbPoints();
-    mec->blockSize(DIM*nbp, 3*nbp);
-    getBand(mec, mec->block());
-    //lapack::xpbtf2('L', nbp, 2, mec->block(), 3, &info);
-    alsatian_xpbtf2L(nbp, 2, mec->block(), 3, &info);
-
+    mec->blockSize(DIM*nbp, BAND_LDD*nbp);
+    getBand(mec, mec->block(), time_step);
+#if CHOUCROUTE
+    alsatian_xpbtf2L(nbp, 2, mec->block(), BAND_LDD, &info);
+#else
+    lapack::xpbtf2('L', nbp, 2, mec->block(), BAND_LDD, &info);
+#endif
     if ( 0 == info )
     {
         mec->useBlock(0, 2);
