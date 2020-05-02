@@ -145,7 +145,7 @@ constexpr __m256d sgn1111 = {-0.0, -0.0, -0.0, -0.0};
 inline vec4 load3(double const* a)     { return _mm256_maskload_pd(a, msk1110); }
 
 /// load 4 values, and zeros out the upper one
-inline vec4 load4z(double const* a)    { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
+inline vec4 load3z(double const* a)    { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 #if CHECK_VECTOR_ALIGNMENT
 inline vec4 load4(double const* a)

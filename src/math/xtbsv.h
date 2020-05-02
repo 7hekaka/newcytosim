@@ -6,7 +6,7 @@
 
 /**
  This is a C-translation of the BLAS reference implementation of DTBSV
-
+ FJN 28.04.2020
  
  */
 void blas_xtbsvUN(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
@@ -219,7 +219,7 @@ void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
 
 
 
-#if 0 //def __AVX__
+#ifdef __AVX__
 
 /*
  This AVX code performs POORLY compared to the scalar code below,
@@ -237,26 +237,18 @@ void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
 void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
 {
     const __m256i msk = makemask(ORD);
-    int kx = 0;
-    int jx = kx;
     for ( int j = 0; j < N; ++j )
     {
-        kx += ORD;
-        //if ( X[jx] != 0. )
+        const real * pA = A + j * lda - j;
+        vec4 temp = mul4(broadcast1(pA+j), maskload4(X+ORD*j, msk));
+        maskstore4(X+ORD*j, msk, temp);
+        const int sup = std::min(N-1, j+K);
+        for ( int i = j + 1; i <= sup; ++i )
         {
-            real* pX = X + kx;
-            const real * pA = A + j * lda;
-            vec4 temp = mul4(maskload4(X+jx, msk), broadcast1(pA)); // X[jx] *= pA[0];
-            maskstore4(X+jx, msk, temp); //real temp = X[jx];
-            const int sup = std::min(N-1-j, K);
-            for ( int ij = 1; ij <= sup; ++ij )
-            {
-                vec4 s = fnmadd4(broadcast1(pA+ij), temp, maskload4(pX, msk));
-                maskstore4(pX, msk, s); // X[ix] -= temp * pA[i-j];
-                pX += ORD;
-            }
+            vec4 s = fnmadd4(broadcast1(pA+i), temp, loadu4(X+ORD*i));
+            storeu4(X+ORD*i, s);
         }
-        jx += ORD;
+        //fprintf(stderr, "%i %i\n", j, sup-j);
     }
 }
 
@@ -272,39 +264,32 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
 void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 {
     const __m256i msk = makemask(ORD);
-    int kx = (N-1) * ORD;
-    int jx = kx;
     for ( int j = N-1; j >= 0; --j )
     {
-        vec4 temp = maskload4(X+jx, msk); //real temp = X[jx];
-        real* pX = X + kx;
-        const real * pA = A + j * lda;
-        const int sup = std::min(N-1-j, K);
-        for ( int ij = sup; ij > 0; --ij )
-        {
-            temp = fnmadd4(broadcast1(pA+ij), maskload4(pX, msk), temp); // temp -= pA[i-j] * X[ix];
-            pX -= ORD;
-        }
-        maskstore4(X+jx, msk, mul4(temp, broadcast1(pA))); //X[jx] = temp * pA[0];
-        jx -= ORD;
-        if ( j < N-K )
-            kx -= ORD;
+        vec4 temp = maskload4(X+ORD*j, msk); //real temp = X[jx];
+        const real * pA = A + j * lda - j;
+        const int sup = std::min(N-1, j+K);
+        for ( int i = sup; i > j; --i )
+            temp = fnmadd4(broadcast1(pA+i), loadu4(X+ORD*i), temp); // temp -= pA[i] * X[i*ORD];
+        maskstore4(X+ORD*j, msk, mul4(temp, broadcast1(pA+j))); //X[j] = X[j] - temp * pA[j];
     }
 }
 
-#else
 
+#elif ( 0 )
+
+/// this version is fast...
 void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
 {
-    
+    assert_true(ORD<=4);
     int kx = 0;
-    int jx = kx;
+    int jx = 0;
     for ( int j = 0; j < N; ++j )
     {
         kx += ORD;
         //if ( X[jx] != 0. )
         {
-            real* pX = X + kx;
+            real* pX = X + kx; // kx == ORD*(j+1);
             const real * pA = A + j * lda;
             real temp[4];
             for ( int d = 0; d < ORD; ++d )
@@ -312,7 +297,7 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
                 temp[d] = X[jx+d] * pA[0]; // X[jx] *= pA[0];
                 X[jx+d] = temp[d]; //real temp = X[jx];
             }
-            const int sup = std::min(N-1-j, K);
+            const int sup = std::min(N-1-j, K); // ( N-1-j < K ) if ( j >= N-K )
             for ( int ij = 1; ij <= sup; ++ij )
             {
                 for ( int d = 0; d < ORD; ++d )
@@ -326,6 +311,7 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
 
 void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 {
+    assert_true(ORD<=4);
     int kx = (N-1) * ORD;
     int jx = kx;
     for ( int j = N-1; j >= 0; --j )
@@ -335,7 +321,7 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
             temp[d] = X[jx+d]; //real temp = X[jx];
         real* pX = X + kx;
         const real * pA = A + j * lda;
-        const int sup = std::min(N-1-j, K);
+        const int sup = std::min(N-1-j, K); // ( N-1-j < K ) if ( j >= N-K )
         for ( int ij = sup; ij > 0; --ij )
         {
             for ( int d = 0; d < ORD; ++d )
@@ -350,6 +336,53 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
     }
 }
 
+#else
+
+/*
+ */
+void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
+{
+    assert_true(ORD<=4);
+    for ( int j = 0; j < N; ++j )
+    {
+        const real * pA = A + j * lda - j;
+        real temp[4];
+        for ( int d = 0; d < ORD; ++d )
+        {
+            /// X[j] /= pA[0]; // temp = X[j];
+            temp[d] = X[ORD*j+d] * pA[j];
+            X[ORD*j+d] = temp[d];
+        }
+        const int sup = std::min(N-1, j+K);
+        for ( int i = j + 1; i <= sup; ++i )
+        {
+            for ( int d = 0; d < ORD; ++d )
+                X[ORD*i+d] -= temp[d] * pA[i]; // X[i] -= temp * pA[i-j];
+        }
+    }
+}
+
+void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
+{
+    assert_true(ORD<=4);
+    for ( int j = N-1; j >= 0; --j )
+    {
+        real temp[4];
+        for ( int d = 0; d < ORD; ++d )
+            temp[d] = X[ORD*j+d]; // real temp = X[j];
+        const real * pA = A + j * lda - j;
+        const int sup = std::min(N-1, j+K);
+        for ( int i = sup; i > j; --i )
+        {
+            for ( int d = 0; d < ORD; ++d )
+                temp[d] -= pA[i] * X[ORD*i+d]; //temp -= pA[i-j] * X[i];
+        }
+        for ( int d = 0; d < ORD; ++d )
+            X[ORD*j+d] = temp[d] * pA[j]; // temp /= pA[0]; X[j] = temp;
+    }
+}
+
+
 #endif
 
 //------------------------------------------------------------------------------
@@ -362,18 +395,20 @@ inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, in
     {
         for ( int i = 0; i < NRHS; ++i )
         {
-            blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
-            blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvUT('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvUN('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+
         }
     }
     else if ( UPLO == 'L' )
     {
         for ( int i = 0; i < NRHS; ++i )
         {
-            blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
-            blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvLN('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvLT('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
         }
     }
 }
+
 
 #endif
