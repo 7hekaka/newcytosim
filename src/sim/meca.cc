@@ -39,7 +39,7 @@
  Add correction term to the constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
 */
-#define ADD_PROJECTION_DIFF 1
+#define ADD_PROJECTION_DIFF 0
 
 
 /**
@@ -67,8 +67,8 @@ With a sequential simulation, the second option is usually faster.
 #define DEBUG_MECA 0
 
 
-/// a famous dish from Alsace
-#define CHOUCROUTE 1
+/// if you like this famous dish from Alsace, set this to a prime number
+#define CHOUCROUTE 7
 
 /// number of threads running in parallel
 #define NUM_THREADS 1
@@ -237,15 +237,26 @@ inline void applyFull(Mecable const* mec, real* Y)
 
 
 // the leading dimension of the banded matrix used for preconditionning
-constexpr size_t BAND_LDD = 4;
+constexpr size_t BAND_LDD = 3;
 
 /// apply preconditionner block in band storage
 inline void applyBand(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
+#  if ( DIM == 3 )
+    alsatian_xtbsvLN_3D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLT_3D(nbp, mec->block(), BAND_LDD, Y);
+#  elif ( DIM == 2 )
+    alsatian_xtbsvLN_2D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLT_2D(nbp, mec->block(), BAND_LDD, Y);
+#  elif ( DIM == 1 )
+    alsatian_xtbsvLN_1D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLT_1D(nbp, mec->block(), BAND_LDD, Y);
+#  else
     alsatian_xtbsvLN(nbp, 2, mec->block(), BAND_LDD, Y, DIM);
     alsatian_xtbsvLT(nbp, 2, mec->block(), BAND_LDD, Y, DIM);
+#  endif
 #else
     /*
      we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)

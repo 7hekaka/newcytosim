@@ -329,7 +329,7 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 
 #ifdef __AVX__
 
-// specialized version for K==2 and ORD==3
+/// specialized version for K==2 and ORD==3
 void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 3;
@@ -362,7 +362,7 @@ void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 }
 
 
-// specialized version for K==2 and ORD==3
+/// specialized version for K==2 and ORD==3
 void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 3;
@@ -440,7 +440,7 @@ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 
 #ifdef __SSE3__
 
-// specialized version for K==2 and ORD==3
+/// specialized version for K==2 and ORD==2
 void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
@@ -473,7 +473,7 @@ void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
 }
 
 
-// specialized version for K==2 and ORD==3
+/// specialized version for K==2 and ORD==2
 void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
@@ -482,8 +482,7 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
     vec2 a1 = setzero2();
     if ( N >= 1 ) // j = N-1
     {
-        vec2 a0 = load2(pX);
-        a1 = mul2(loaddup2(pA), a0);
+        a1 = mul2(loaddup2(pA), load2(pX));
         store2(pX, a1);
         pA -= lda;
         pX -= ORD;
@@ -491,8 +490,7 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
     vec2 a2 = a1;
     if ( N >= 2 ) // j = N-2
     {
-        vec2 a0 = load2(pX);
-        a0 = fnmadd2(loaddup2(pA+1), a1, a0);
+        vec2 a0 = fnmadd2(loaddup2(pA+1), a1, load2(pX));
         a1 = mul2(loaddup2(pA), a0);
         store2(pX, a1);
         pA -= lda;
@@ -500,12 +498,11 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
     }
     for ( int j = N-3; j >= 0; --j )
     {
-        vec2 a0 = load2(pX);
-        a0 = fnmadd2(loaddup2(pA+2), a2, a0);  // a2 = load3(pX+6);
-        a0 = fnmadd2(loaddup2(pA+1), a1, a0);  // a1 = load3(pX+3);
+        vec2 a0 = fnmadd2(loaddup2(pA+2), a2, load2(pX));
+        a0 = fnmadd2(loaddup2(pA+1), a1, a0);
         a2 = a1;
         a1 = mul2(loaddup2(pA), a0);
-        store2(pX, a1);  //use the original 4th position
+        store2(pX, a1);
         pA -= lda;
         pX -= ORD;
     }
@@ -513,6 +510,75 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 
 #endif
 
+
+/// specialized version for K==2 and ORD==1
+void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
+{
+    real a1 = pX[0];
+    real a2 = pX[1];
+    for ( int j = 0; j < N-2; ++j )
+    {
+        real a0 = pA[0] * a1;
+        a1 = a2 - pA[1] * a0;
+        a2 = pX[2] - pA[2] * a0;
+        pX[0] = a0;
+        pA += lda;
+        pX += 1;
+    }
+    if ( N >= 2 ) // j = N-2
+    {
+        real a0 = pA[0] * a1;
+        a1 = a2 - pA[1] * a0;
+        pX[0] = a0;
+        pA += lda;
+        pX += 1;
+    }
+    if ( N >= 1 ) // j = N-1
+    {
+        real a0 = pA[0] * a1;
+        pX[0] = a0;
+        pA += lda;
+        pX += 1;
+    }
+}
+
+
+/// specialized version for K==2 and ORD==1
+void alsatian_xtbsvLT_1D(int N, const real* pA, int lda, real* pX)
+{
+    pX += ( N - 1 );
+    pA += ( N - 1 ) * lda;
+    real a1 = 0;
+    if ( N >= 1 ) // j = N-1
+    {
+        real a0 = pX[0];
+        a1 = pA[0] * a0;
+        pX[0] = a1;
+        pA -= lda;
+        pX -= 1;
+    }
+    real a2 = a1;
+    if ( N >= 2 ) // j = N-2
+    {
+        real a0 = pX[0];
+        a0 = a0 - pA[1] * a1;
+        a1 = pA[0] * a0;
+        pX[0] = a1;
+        pA -= lda;
+        pX -= 1;
+    }
+    for ( int j = N-3; j >= 0; --j )
+    {
+        real a0 = pX[0];
+        a0 = a0 - pA[2] * a2;
+        a0 = a0 - pA[1] * a1;
+        a2 = a1;
+        a1 = pA[0] * a0;
+        pX[0] = a1;
+        pA -= lda;
+        pX -= 1;
+    }
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK DPBTRS
