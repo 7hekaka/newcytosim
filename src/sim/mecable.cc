@@ -19,6 +19,7 @@ void Mecable::clearMecable()
     pBlock     = nullptr;
     pPivot     = nullptr;
     pBlockAlc  = 0;
+    pPivotAlc  = 0;
     pBlockUse  = false;
     pBlockSize = 0;
     pBlockType = 0;
@@ -48,23 +49,25 @@ Mecable& Mecable::operator =(const Mecable& o)
 /**
 Set block size and allocate if necessary to hold 'alc' scalars
  */
-void Mecable::blockSize(size_t bks, size_t alc)
+void Mecable::blockSize(size_t bks, size_t block, size_t pivot)
 {
     assert_true( bks <= DIM * nPoints );
     pBlockSize = bks;
     
-    if ( alc > pBlockAlc )
+    if ( block > pBlockAlc )
     {
         free_real(pBlock);
+        pBlockAlc = chunk_real(block);
+        //std::clog <<reference()<<" allocateBlock " << pBlockAlc << "\n";
+        pBlock = new_real(pBlockAlc);
+        //zero_real(pBlockAlc, pBlock);
+    }
+    
+    if ( pivot > pPivotAlc )
+    {
         delete[] pPivot;
-        size_t bum = chunk_real(alc);
-        //std::clog << "Mecable("<<reference()<<")::allocateBlock " << bum << "\n";
-   
-        pBlock = new_real(bum*bum);
-        pPivot = new int[bum];
-        pBlockAlc = bum;
-        
-        //zero_real(bum*bum, pBlock);
+        pPivotAlc = chunk_real(pivot);
+        pPivot = new int[pPivotAlc];
     }
 }
 

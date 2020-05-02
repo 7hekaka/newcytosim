@@ -59,6 +59,9 @@ private:
     /// Allocated size of pBlock[]
     size_t      pBlockAlc;
     
+    /// Allocated size of pPivot[]
+    size_t      pPivotAlc;
+    
     /// Current size of pBlock[]
     size_t      pBlockSize;
     
@@ -258,7 +261,7 @@ public:
     size_t          blockSize()          const { return pBlockSize; }
     
     /// set size of block needed for preconditionning, allocating memory 'alc'
-    void            blockSize(size_t, size_t alc);
+    void            blockSize(size_t, size_t block, size_t pivot);
     
     /// True if preconditionner block is 'in use'
     int             blockType()          const { return pBlockType; }

@@ -326,6 +326,8 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 
 #endif
 
+//------------------------------------------------------------------------------
+#pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
 
 #ifdef __AVX__
 
@@ -333,8 +335,8 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 3;
-    vec4 a1 = loadu4(pX);
-    vec4 a2 = loadu4(pX+ORD);
+    vec4 a1 = loadu4(pX); //may load garbage
+    vec4 a2 = loadu4(pX+ORD); //may load garbage
     for ( int j = 0; j < N-2; ++j )
     {
         vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
@@ -356,8 +358,8 @@ void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
     {
         vec4 a0 = mul4(broadcast1(pA), a1);
         store3(pX, a0);
-        pA += lda;
-        pX += ORD;
+        //pA += lda;
+        //pX += ORD;
     }
 }
 
@@ -444,8 +446,8 @@ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
-    vec2 a1 = load2(pX);
-    vec2 a2 = load2(pX+ORD);
+    vec2 a1 = load2(pX);     //may load garbage if N == 0
+    vec2 a2 = load2(pX+ORD); //may load garbage if N < 1
     for ( int j = 0; j < N-2; ++j )
     {
         vec2 a0 = mul2(loaddup2(pA), a1);      // a1 = loadu4(pX);
@@ -467,8 +469,8 @@ void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
     {
         vec2 a0 = mul2(loaddup2(pA), a1);
         store2(pX, a0);
-        pA += lda;
-        pX += ORD;
+        //pA += lda;
+        //pX += ORD;
     }
 }
 
@@ -514,8 +516,8 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 /// specialized version for K==2 and ORD==1
 void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
 {
-    real a1 = pX[0];
-    real a2 = pX[1];
+    real a1 = pX[0]; //may load garbage
+    real a2 = pX[1]; //may load garbage
     for ( int j = 0; j < N-2; ++j )
     {
         real a0 = pA[0] * a1;
@@ -537,8 +539,8 @@ void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
     {
         real a0 = pA[0] * a1;
         pX[0] = a0;
-        pA += lda;
-        pX += 1;
+        //pA += lda;
+        //pX += 1;
     }
 }
 

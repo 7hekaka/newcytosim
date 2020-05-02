@@ -543,10 +543,8 @@ void getBand(const Mecable * mec, real* res, real time_step)
     for ( size_t i = 0; i < nbp; ++i )
         res[i*BAND_LDD] += 1.0;
 
-    /*
-     std::clog<<"lower_band " << nbp << "\n";
-     VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
-     */
+    //std::clog<<"banded preconditionner " << nbp << "\n";
+    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
 }
 
 /**
@@ -771,7 +769,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     if ( mec->blockSize() == bks )
         may_keep = true;
     else
-        mec->blockSize(bks, bks*bks);
+        mec->blockSize(bks, bks*bks, bks);
     
     real* blk = mec->block();
     real* vec = vTMP + DIM * mec->matIndex();
@@ -858,7 +856,7 @@ void Meca::computePreconditionnerBand(Mecable* mec)
 {
     int info = 0;
     const size_t nbp = mec->nbPoints();
-    mec->blockSize(DIM*nbp, BAND_LDD*nbp);
+    mec->blockSize(DIM*nbp, BAND_LDD*nbp, 0);
     getBand(mec, mec->block(), time_step);
 #if CHOUCROUTE
     alsatian_xpbtf2L(nbp, 2, mec->block(), BAND_LDD, &info);
@@ -869,7 +867,8 @@ void Meca::computePreconditionnerBand(Mecable* mec)
     {
         mec->useBlock(0, 2);
         //std::clog << "Meca::computePreconditionner(" << mec->reference() << ")\n";
-        //std::clog<<"banded-block " << nbp << "\n";
+        //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
+        //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
     }
     else
     {
@@ -885,7 +884,7 @@ Compute preconditionner block corresponding to 'mec'
 void Meca::computePreconditionnerFull(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
-    mec->blockSize(bks, bks*bks);
+    mec->blockSize(bks, bks*bks, bks);
     
     getBlock(mec, mec->block());
     //verifyBlock(mec, mec->block());
@@ -925,7 +924,7 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
         MatrixFull& mat = mec->blockMatrix();
         mat.resize(bks);
         mat.importMatrix(bks, wrk, bks);
-        mec->blockSize(bks, 0);
+        mec->blockSize(bks, 0, 0);
         mec->useBlock(0, 3);
         //std::clog << "R";
     }

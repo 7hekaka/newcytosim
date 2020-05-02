@@ -345,6 +345,7 @@ inline vec4 cross4(vec4 a, vec4 b)
 #endif
 }
 
+/// streamload is a load that bypass the cache
 inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
 
 #else
