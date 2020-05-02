@@ -101,8 +101,8 @@ int main(int argc, char* argv[])
                 simul.writeObjects(output, true, binary);
         }
         catch( Exception & e ) {
-            std::clog << "Error writing `" << output << "' :\n";
-            std::clog << "    " << e.what() << '\n';
+            std::clog << "Error writing `" << output << "' :";
+            std::clog << e.what() << '\n';
             return EXIT_FAILURE;
         }
         if ( has_frame && frm == frame )

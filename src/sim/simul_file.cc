@@ -119,9 +119,8 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
     }
     catch( InvalidIO & e )
     {
-        e << " writing trajectory file";
         print_blue(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        std::cerr << " writing trajectory file" << '\n';
     }
 }
 
