@@ -242,13 +242,12 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
         const real * pA = A + j * lda - j;
         vec4 temp = mul4(broadcast1(pA+j), maskload4(X+ORD*j, msk));
         maskstore4(X+ORD*j, msk, temp);
-        const int sup = std::min(N-1, j+K);
-        for ( int i = j + 1; i <= sup; ++i )
+        const int sup = std::min(N-1, j+K);  // ( N-1 < j+K ) if ( j >= N-K )
+        for ( int i = j + 1; i <= sup; ++i )  // if K==2, only j+1 and j+2
         {
             vec4 s = fnmadd4(broadcast1(pA+i), temp, loadu4(X+ORD*i));
             storeu4(X+ORD*i, s);
         }
-        //fprintf(stderr, "%i %i\n", j, sup-j);
     }
 }
 
@@ -268,15 +267,15 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
     {
         vec4 temp = maskload4(X+ORD*j, msk); //real temp = X[jx];
         const real * pA = A + j * lda - j;
-        const int sup = std::min(N-1, j+K);
-        for ( int i = sup; i > j; --i )
+        const int sup = std::min(N-1, j+K); // ( N-1 < j+K ) if ( j >= N-K )
+        for ( int i = sup; i > j; --i )  // if K==2, only j+2 and j+1
             temp = fnmadd4(broadcast1(pA+i), loadu4(X+ORD*i), temp); // temp -= pA[i] * X[i*ORD];
         maskstore4(X+ORD*j, msk, mul4(temp, broadcast1(pA+j))); //X[j] = X[j] - temp * pA[j];
     }
 }
 
 
-#elif ( 0 )
+#elif ( 1 )
 
 /// this version is fast...
 void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
@@ -384,6 +383,75 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 
 
 #endif
+
+#ifdef __AVX__
+
+// specialized version for K==2 and ORD==3
+void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
+{
+    for ( int j = 0; j < N-2; ++j )
+    {
+        vec4 a0 =    mul4(broadcast1(pA),       loadu4(pX));
+        vec4 a1 = fnmadd4(broadcast1(pA+1), a0, loadu4(pX+3));
+        vec4 a2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+6));
+        storeu4(pX  , a0);
+        storeu4(pX+3, a1);
+        store3(pX+6, a2);
+        pA += lda;
+        pX += 3;
+    }
+    if ( N >= 2 ) // j = N-2
+    {
+        vec4 a0 =    mul4(broadcast1(pA),       loadu4(pX));
+        vec4 a1 = fnmadd4(broadcast1(pA+1), a0, loadu4(pX+3));
+        storeu4(pX , a0);
+        store3(pX+3, a1);
+        pA += lda;
+        pX += 3;
+    }
+    if ( N >= 1 ) // j = N-1
+    {
+        const vec4 a0 = mul4(broadcast1(pA), load3(pX));
+        store3(pX, a0);
+        pA += lda;
+        pX += 3;
+    }
+}
+
+
+// specialized version for K==2 and ORD==3
+void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
+{
+    pX += ( N - 1 ) * 3;
+    pA += ( N - 1 ) * lda;
+    if ( N >= 1 ) // j = N-1
+    {
+        store3(pX, mul4(loadu4(pX), broadcast1(pA)));
+        pA -= lda;
+        pX -= 3;
+    }
+    if ( N >= 2 ) // j = N-2
+    {
+        vec4 temp = load3(pX); //real temp = X[jx];
+        temp = fnmadd4(broadcast1(pA+1), loadu4(pX+3), temp);
+        store3(pX, mul4(temp, broadcast1(pA)));
+        pA -= lda;
+        pX -= 3;
+    }
+    for ( int j = N-3; j >= 0; --j )
+    {
+        vec4 temp = load3(pX); //real temp = X[jx];
+        temp = fnmadd4(broadcast1(pA+2), loadu4(pX+6), temp);
+        temp = fnmadd4(broadcast1(pA+1), loadu4(pX+3), temp);
+        store3(pX, mul4(temp, broadcast1(pA)));
+        pA -= lda;
+        pX -= 3;
+    }
+}
+
+
+#endif
+
 
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK DPBTRS

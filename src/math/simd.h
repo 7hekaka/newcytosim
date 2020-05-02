@@ -135,17 +135,7 @@ typedef __m256d vec4;
 
 #define set64x(a,b,c,d)     _mm256_setr_epi64x(a,b,c,d)
 
-constexpr __m256i msk1110 = {-1, -1, -1, 0};
 constexpr __m256d sgn1111 = {-0.0, -0.0, -0.0, -0.0};
-
-//#define load3(a)            blend4(cast4(load2(a)), _mm256_broadcast_sd(a+2), 0b0100)
-//#define store3(a,b)         storeu2(a, getlo(b)); store1(Y+ii+2, gethi(z));
-
-//inline vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }
-inline vec4 load3(double const* a)     { return _mm256_maskload_pd(a, msk1110); }
-
-/// load 4 values, and zeros out the upper one
-inline vec4 load3z(double const* a)    { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 #if CHECK_VECTOR_ALIGNMENT
 inline vec4 load4(double const* a)
@@ -168,7 +158,6 @@ inline __m256i makemask(long i)
 inline void store1(double* a, vec4 b)    { _mm_store_sd(a, _mm256_castpd256_pd128(b)); }
 inline void store2(double* a, vec4 b)    { _mm_store_pd(a, _mm256_castpd256_pd128(b)); }
 inline void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, _mm256_castpd256_pd128(b)); }
-inline void store3(double* a, vec4 b)    { _mm256_maskstore_pd(a, msk1110, b); }
 inline void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
 inline void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
 
@@ -224,13 +213,25 @@ inline vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 #define blendv4(a,b,mask)   _mm256_blendv_pd(a,b,mask)
 #define cmp4(a,b,c)         _mm256_cmp_pd(a,b,c)
 
-
 /// concatenate two vec2 into a vec4
 inline vec4 cat4(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
 inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
 
 //inline vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
 //#define cat4(h, l)           _mm256_set_m128d(h, l)
+
+#if 1
+  inline vec4  load3(double const* a)    { return blend4(cast4(loadu2(a)), broadcast1(a+2), 0b0100); }
+  inline void store3(double* a, vec4 b)  { storeu2(a, getlo(b)); store1(a+2, gethi(b)); }
+#else
+  //inline vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }
+  constexpr __m256i msk1110 = {-1, -1, -1, 0};
+  inline vec4  load3(double const* a)    { return _mm256_maskload_pd(a, msk1110); }
+  inline void store3(double* a, vec4 b)  { _mm256_maskstore_pd(a, msk1110, b); }
+#endif
+
+/// load 4 values, and zeros out the upper one
+inline vec4 load3z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 
 /// returns the sum of the elements, broadcasted
