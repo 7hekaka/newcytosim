@@ -389,29 +389,27 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 // specialized version for K==2 and ORD==3
 void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 {
+    vec4 a1 = loadu4(pX), a2 = loadu4(pX+3);
     for ( int j = 0; j < N-2; ++j )
     {
-        vec4 a0 =    mul4(broadcast1(pA),       loadu4(pX));
-        vec4 a1 = fnmadd4(broadcast1(pA+1), a0, loadu4(pX+3));
-        vec4 a2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+6));
-        storeu4(pX  , a0);
-        storeu4(pX+3, a1);
-        store3(pX+6, a2);
+        vec4 a0 = mul4(broadcast1(pA), a1);
+        a1 = fnmadd4(broadcast1(pA+1), a0, a2);
+        a2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+6));
+        storeu4(pX, a0);
         pA += lda;
         pX += 3;
     }
     if ( N >= 2 ) // j = N-2
     {
-        vec4 a0 =    mul4(broadcast1(pA),       loadu4(pX));
-        vec4 a1 = fnmadd4(broadcast1(pA+1), a0, loadu4(pX+3));
-        storeu4(pX , a0);
-        store3(pX+3, a1);
+        vec4 a0 = mul4(broadcast1(pA), a1);
+        a1 = fnmadd4(broadcast1(pA+1), a0, a2);
+        storeu4(pX, a0);
         pA += lda;
         pX += 3;
     }
     if ( N >= 1 ) // j = N-1
     {
-        const vec4 a0 = mul4(broadcast1(pA), load3(pX));
+        vec4 a0 = mul4(broadcast1(pA), a1);
         store3(pX, a0);
         pA += lda;
         pX += 3;
@@ -422,33 +420,92 @@ void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 // specialized version for K==2 and ORD==3
 void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 {
+    const vec4 zero = setzero4();
     pX += ( N - 1 ) * 3;
     pA += ( N - 1 ) * lda;
+    vec4 a2, a1;
     if ( N >= 1 ) // j = N-1
     {
-        store3(pX, mul4(loadu4(pX), broadcast1(pA)));
+        vec4 a0 = loadu4(pX);
+        a1 = mul4(broadcast1(pA), a0);
+        storeu4(pX, blend4(a1, a0, 0b1000));
+        a1 = blend4(a1, zero, 0b1000);
         pA -= lda;
         pX -= 3;
     }
     if ( N >= 2 ) // j = N-2
     {
-        vec4 temp = load3(pX); //real temp = X[jx];
-        temp = fnmadd4(broadcast1(pA+1), loadu4(pX+3), temp);
-        store3(pX, mul4(temp, broadcast1(pA)));
+        vec4 a0 = loadu4(pX);
+        a0 = fnmadd4(broadcast1(pA+1), a1, a0);
+        a2 = a1;
+        a1 = mul4(broadcast1(pA), a0);
+        storeu4(pX, blend4(a1, a0, 0b1000));
+        a1 = blend4(a1, zero, 0b1000);
         pA -= lda;
         pX -= 3;
     }
+    //vec4 a2 = load3(pX+6);
+    //vec4 a1 = load3(pX+3);
     for ( int j = N-3; j >= 0; --j )
     {
-        vec4 temp = load3(pX); //real temp = X[jx];
-        temp = fnmadd4(broadcast1(pA+2), loadu4(pX+6), temp);
-        temp = fnmadd4(broadcast1(pA+1), loadu4(pX+3), temp);
-        store3(pX, mul4(temp, broadcast1(pA)));
+        vec4 a0 = loadu4(pX);
+        a0 = fnmadd4(broadcast1(pA+2), a2, a0);  // a2 = load3(pX+6);
+        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+        a2 = a1;
+        a1 = mul4(broadcast1(pA), a0);
+        storeu4(pX, blend4(a1, a0, 0b1000));  //we the original 4th position
+        a1 = blend4(a1, zero, 0b1000);
         pA -= lda;
         pX -= 3;
     }
+    /*
+     //vec4 a2 = load3(pX+6);
+     //vec4 a1 = load3(pX+3);
+     for ( int j = N-3; j >= 0; --j )
+     {
+         vec4 a0 = loadu4(pX);
+         a0 = fnmadd4(broadcast1(pA+2), a2, a0);  // a2 = load3(pX+6);
+         a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+         a0 = mul4(blend4(broadcast1(pA), one, 0b1000), a0);
+         storeu4(pX, a0);  //we can store4 as the 4th position is unaltered
+         a2 = a1;
+         a1 = blend4(a0, zero, 0b1000);
+         pA -= lda;
+         pX -= 3;
+     }
+*/
 }
 
+/*
+ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
+ {
+     pX += ( N - 1 ) * 3;
+     pA += ( N - 1 ) * lda;
+     if ( N >= 1 ) // j = N-1
+     {
+         store3(pX, mul4(loadu4(pX), broadcast1(pA)));
+         pA -= lda;
+         pX -= 3;
+     }
+     if ( N >= 2 ) // j = N-2
+     {
+         vec4 temp = load3(pX); //real temp = X[jx];
+         temp = fnmadd4(broadcast1(pA+1), loadu4(pX+3), temp);
+         store3(pX, mul4(temp, broadcast1(pA)));
+         pA -= lda;
+         pX -= 3;
+     }
+     for ( int j = N-3; j >= 0; --j )
+     {
+         vec4 temp = load3(pX); //real temp = X[jx];
+         temp = fnmadd4(broadcast1(pA+2), loadu4(pX+6), temp);
+         temp = fnmadd4(broadcast1(pA+1), loadu4(pX+3), temp);
+         store3(pX, mul4(temp, broadcast1(pA)));
+         pA -= lda;
+         pX -= 3;
+     }
+ }
+*/
 
 #endif
 
