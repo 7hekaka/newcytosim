@@ -334,10 +334,11 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 /// specialized version for K==2 and ORD==3
 void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 {
+    const real * end = pA + (N-2) * lda;
     constexpr int ORD = 3;
     vec4 a1 = loadu4(pX); //may load garbage
     vec4 a2 = loadu4(pX+ORD); //may load garbage
-    for ( int j = 0; j < N-2; ++j )
+    while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
         vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
         a1 = fnmadd4(broadcast1(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
@@ -367,8 +368,10 @@ void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 /// specialized version for K==2 and ORD==3
 void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 {
+    const real* end = pA;
     constexpr int ORD = 3;
     const vec4 zero = setzero4();
+    const vec4 one = set4(1.0);
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
     vec4 a1 = zero;
@@ -392,15 +395,15 @@ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
         pA -= lda;
         pX -= ORD;
     }
-    for ( int j = N-3; j >= 0; --j )
+    while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
     {
         vec4 a0 = loadu4(pX);
-        a0 = fnmadd4(broadcast1(pA+2), a2, a0);  // a2 = load3(pX+6);
         a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+        a0 = fnmadd4(broadcast1(pA+2), a2, a0);  // a2 = load3(pX+6);
         a2 = a1;
-        a1 = mul4(broadcast1(pA), a0);
-        storeu4(pX, blend4(a1, a0, 0b1000));  //use the original 4th position
-        a1 = blend4(a1, zero, 0b1000);
+        a0 = mul4(blend4(broadcast1(pA), one, 0b1000), a0);
+        storeu4(pX, a0);  //use the original 4th position
+        a1 = blend4(a0, zero, 0b1000);
         pA -= lda;
         pX -= ORD;
     }
