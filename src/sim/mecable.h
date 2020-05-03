@@ -69,7 +69,7 @@ private:
     int         pBlockType;
     
     /// Flag that pBlock[] is used for preconditionning
-    int         pBlockUse;
+    int         pBlockAge;
     
     /// Matrix used for preconditionning
     MatrixFull  pBlockMatrix;
@@ -246,16 +246,13 @@ public:
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */
-    size_t          matIndex()            const { return pIndex; }
+    size_t          matIndex()           const { return pIndex; }
     
     /// True if preconditionner block is 'in use'
-    int             useBlock()           const { return pBlockUse; }
+    int             blockAge()           const { return pBlockAge; }
     
     /// Change preconditionning flag
-    void            useBlock(int b)            { pBlockUse = b; }
-    
-    /// Change preconditionning flag
-    void            useBlock(int b, int t)     { pBlockUse = b; pBlockType = t; }
+    void            blockAge(int b)            { pBlockAge = b; }
 
     /// Returns current size of block allocated for preconditionning
     size_t          blockSize()          const { return pBlockSize; }
@@ -267,7 +264,7 @@ public:
     int             blockType()          const { return pBlockType; }
     
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void            blockType(int t)           { pBlockType = t; }
+    void            blockType(int t)           { pBlockAge = 0; pBlockType = t; }
 
     /// Returns address of memory allocated for preconditionning
     real *          block()              const { return pBlock; }

@@ -287,19 +287,13 @@ private:
     void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);
     
     /// compute the preconditionner block corresponding to given Mecable
-    void renewPreconditionner(Mecable*, int, real*);
-    
-    /// compute the preconditionner block corresponding to given Mecable
     void computePreconditionnerBand(Mecable*);
 
     /// compute the preconditionner block corresponding to given Mecable
     void computePreconditionnerFull(Mecable*);
-
-    /// compute all blocks of the preconditionner
-    void renewPreconditionner(Mecable*, int);
     
     /// compute all blocks of the preconditionner (method=1)
-    void computePreconditionner(int);
+    void computePreconditionner(int, int);
     
     /// compute all blocks of the preconditionner
     void renewPreconditionner(int);

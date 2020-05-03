@@ -789,7 +789,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
         if ( eig < 1.0 )
         {
             //std::clog << "    keep     eigen(1-PM) = " << eig << std::endl;
-            mec->useBlock(0, 1);
+            mec->blockType(1);
             return;
         }
         else
@@ -824,7 +824,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
         return;
     }
     
-    mec->useBlock(0, 1);
+    mec->blockType(1);
     //checkBlock(mec, blk);
 }
 
@@ -865,14 +865,13 @@ void Meca::computePreconditionnerBand(Mecable* mec)
 #endif
     if ( 0 == info )
     {
-        mec->useBlock(0, 2);
-        //std::clog << "Meca::computePreconditionner(" << mec->reference() << ")\n";
+        mec->blockType(2);
         //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
         //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
     }
     else
     {
-        mec->useBlock(0, 0);
+        mec->blockType(0);
         std::clog << "failed to compute Preconditionner block\n";
     }
 }
@@ -895,13 +894,12 @@ void Meca::computePreconditionnerFull(Mecable* mec)
     
     if ( 0 == info )
     {
-        mec->useBlock(0, 1);
+        mec->blockType(1);
         //checkBlock(mec, blk);
-        //std::clog << "Meca::computePreconditionner(" << mec->reference() << ")\n";
     }
     else
     {
-        mec->useBlock(0, 0);
+        mec->blockType(0);
         std::clog << "failed to compute Preconditionner block\n";
     }
 }
@@ -909,7 +907,7 @@ void Meca::computePreconditionnerFull(Mecable* mec)
 
 /**
  Initialize Mecable::blockMatrix() as the preconditionner block,
- using the factorization stored already in mec::block()
+ using the factorization given by 'blk' and 'piv'
  */
 void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
 {
@@ -925,7 +923,7 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
         mat.resize(bks);
         mat.importMatrix(bks, wrk, bks);
         mec->blockSize(bks, 0, 0);
-        mec->useBlock(0, 3);
+        mec->blockType(3);
         //std::clog << "R";
     }
 }
@@ -934,29 +932,31 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
 /**
 renew preconditionner block corresponding to 'mec'
  */
-void Meca::renewPreconditionner(Mecable* mec, int cycle, real* blk, int* piv, real* wrk, size_t wrksize)
+void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, real* wrk, size_t wrksize)
 {
     const size_t bks = DIM * mec->nbPoints();
-    const int age = mec->useBlock();
+    const int age = mec->blockAge();
 
-    if (( mec->blockSize() != bks ) | ( age > cycle ))
+    if (( mec->blockType() != 3 ) | ( mec->blockSize() != bks ) | ( age >= span ))
     {
         // recalculate block!
         getBlock(mec, blk);
         int info = 0;
+        // factorize block
         lapack::xgetf2(bks, bks, blk, bks, piv, &info);
         if ( info == 0 )
             convertPreconditionner(mec, blk, piv, wrk);
         else
-            mec->useBlock(0, 0);
+            mec->blockType(0);
     }
     else
-        mec->useBlock(age+1);
+        mec->blockAge(age+1);
 }
 
 
+
 // Compute sequentially all the blocks of the preconditionner
-void Meca::renewPreconditionner(int cycle)
+void Meca::renewPreconditionner(int span)
 {
     const size_t vecsize = DIM * largestMecable();
     const size_t wrksize = vecsize * vecsize;
@@ -967,7 +967,7 @@ void Meca::renewPreconditionner(int cycle)
     int* pivot = new int[vecsize];
 
     for ( Mecable * mec : mecables )
-        renewPreconditionner(mec, cycle, tmp, pivot, wrk, wrksize);
+        renewPreconditionner(mec, span, tmp, pivot, wrk, wrksize);
     
     delete[] pivot;
     free_real(wrk);
@@ -975,24 +975,7 @@ void Meca::renewPreconditionner(int cycle)
 }
 
 
-#if ( 0 )
-// Compute sequentially all the blocks of the preconditionner
-void Meca::renewPreconditionner(int precond, int cycle)
-{
-    const size_t vecsize = DIM * largestMecable();
-    const size_t wrksize = vecsize * vecsize;
-    
-    // allocate memory:
-    real * wrk = new_real(wrksize);
-    
-    for ( Mecable * mec : mecables )
-        renewPreconditionner(mec, limit, wrk);
-    
-    free_real(wrk);
-}
-#endif
-
-void Meca::computePreconditionner(int precond)
+void Meca::computePreconditionner(int precond, int span)
 {
     switch( precond )
     {
@@ -1002,33 +985,15 @@ void Meca::computePreconditionner(int precond)
             break;
         case 1:
             for ( Mecable * mec : mecables )
-                computePreconditionnerBand(mec);
+                computePreconditionnerFull(mec);
             break;
         case 2:
             for ( Mecable * mec : mecables )
-                computePreconditionnerFull(mec);
+                computePreconditionnerBand(mec);
             break;
-        case 3: {
-            const size_t vecsize = DIM * largestMecable();
-            const size_t wrksize = vecsize * vecsize;
-            real * blk = new_real(wrksize);
-            real * wrk = new_real(wrksize);
-            int* piv = new int[vecsize];
-            for ( Mecable * mec : mecables )
-            {
-                getBlock(mec, blk);
-                const size_t bks = DIM * mec->nbPoints();
-                int info = 0;
-                lapack::xgetf2(bks, bks, blk, bks, piv, &info);
-                if ( info == 0 )
-                    convertPreconditionner(mec, blk, piv, wrk);
-                else
-                    mec->useBlock(0, 0);
-            }
-            delete[] piv;
-            free_real(wrk);
-            free_real(blk);
-        } break;
+        case 3:
+            renewPreconditionner(span);
+            break;
         default:
             throw InvalidParameter("unknown `precondition' value");
             break;
@@ -1365,7 +1330,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
 
     // compute preconditionner:
     auto start_ = __rdtsc();
-    computePreconditionner(precond);
+    computePreconditionner(precond, prop->precondition_span);
     auto precond_ = __rdtsc() - start_;
     start_ = __rdtsc();
     accum_ = 0;
@@ -1486,7 +1451,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             else
             {
                 // try with a preconditioner
-                computePreconditionner(1);
+                computePreconditionner(1, 0);
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
                 Cytosim::out("    BCGSP: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }

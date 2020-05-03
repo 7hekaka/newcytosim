@@ -28,7 +28,7 @@ void SimulProp::clear()
     tolerance         = 0.05;
     acceptable_prob   = 0.5;
     precondition      = 1;
-    precondition_span = 0;
+    precondition_span = 2;
     random_seed       = 0;
     steric            = 0;
     
