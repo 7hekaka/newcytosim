@@ -24,6 +24,7 @@
 #include "lapack.h"
 #include "cytoblas.h"
 #include "xtbsv.h"
+#include "xtrsm.h"
 #include "exceptions.h"
 #include "vecprint.h"
 #include "filepath.h"
@@ -236,19 +237,21 @@ inline void applyPrecondFull(Mecable const* mec, real* Y)
 }
 
 
-inline void DPOTRS_ISO(int N, const real* A, int LDA, real* B)
+real* TEMPSPACE = nullptr;
+
+inline void ISO_XPOTRS(int N, const real* A, int LDA, real* B)
 {
     /*
      we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
      But calling DTBSV gets the required work done.
      */
-    real * tmp = new_real(N);
+    real* tmp = TEMPSPACE;
     for ( int d = 0; d < DIM; ++d )
     {
         for ( int u = 0; u < N; ++u )
             tmp[u] = B[d+DIM*u];
-#if 1
+#if 0
         int info = 0;
         lapack::xpotrs('L', N, 1, A, LDA, tmp, N, &info);
 #else
@@ -260,7 +263,6 @@ inline void DPOTRS_ISO(int N, const real* A, int LDA, real* B)
         for ( int u = 0; u < N; ++u )
             B[d+DIM*u] = tmp[u];
     }
-    free_real(tmp);
 }
 
 
@@ -272,7 +274,7 @@ inline void applyPrecondIsop(Mecable const* mec, real* Y)
      we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
      */
-    DPOTRS_ISO(nbp, mec->block(), nbp, Y);
+    ISO_XPOTRS(nbp, mec->block(), nbp, Y);
     assert_true(info==0);
 }
 
@@ -1145,7 +1147,8 @@ void Meca::computePreconditionner(int precond, int span)
 
 
 void Meca::precondition(const real* X, real* Y) const
-{    
+{
+    TEMPSPACE = vTMP;
     auto rdt = __rdtsc();
     if ( Y != X )
     {
@@ -1648,12 +1651,12 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         {
             auto total = ( __rdtsc() - start_ ) >> 10;
             int cnt = std::max(1UL, monitor.count());
-            start_ = ( precond_ / cnt ) >> 10;
-            accum_ = ( accum_ / cnt ) >> 10;
-            oss << "  cycles " << std::setw(6) << start_;
+            precond_ = precond_ >> 10;
+            accum_ = accum_ >> 10;
+            oss << "  cycles " << std::setw(6) << precond_;
             oss << " " << std::setw(6) << accum_;
-            oss << " " << std::setw(8) << cnt * accum_;
-            oss << " " << std::setw(8) << total;
+            oss << " " << std::setw(8) << ( total - accum_ ) / cnt;
+            oss << " " << std::setw(8) << accum_/cnt;
         }
         Cytosim::out << oss.str() << "\n";
         if ( prop->verbose & 2 )

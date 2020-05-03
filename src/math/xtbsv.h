@@ -182,7 +182,7 @@ void blas_xtbsvLT(char Diag, int N, int K, const real* A, int lda, real* X, int 
 }
 
 
-void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int K, const real* A, int lda, real*X, int incX)
+void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int K, const real* A, int lda, real* X, int incX)
 {
     if ( Uplo == 'U' )
     {
@@ -586,10 +586,10 @@ void alsatian_xtbsvLT_1D(int N, const real* pA, int lda, real* pX)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - LAPACK DPBTRS
+#pragma mark - LAPACK-STYLE DPBTRS
 
 
-inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+inline void iso_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
 {
     if ( UPLO == 'U' )
     {

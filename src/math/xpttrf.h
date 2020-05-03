@@ -159,6 +159,7 @@ void italian_thomas(size_t size, real const*L, real const* D, real* U, real* B)
  
      E'[n] <-  D[n] * E[n]
 
+ Improved on 02.04.2020: reduced memory use
  */
 void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
 {
@@ -188,6 +189,8 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
 
 /**
  Based on the 'Italian' version, using precalculated constant terms
+ 
+ Improved on 02.04.2020: removed one multiplication, now only using FMAs
  */
 void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, real* B, size_t LDB)
 {
