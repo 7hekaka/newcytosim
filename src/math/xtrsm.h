@@ -11,7 +11,7 @@
  SUBROUTINE DTRSM(SIDE,UPLO,TRANSA,DIAG,M,N,ALPHA,A,LDA,B,LDB)
  
  SIDE   = 'L' : solves   op(A) * X = alpha * B.
- SIDE   = 'R' : solves   X * op(A) = alpha * B.
+        = 'R' : solves   X * op(A) = alpha * B.
  UPLO   = 'U' or 'L'
  TRANSA = 'N' or 'T' :  op(A) = A or op(A) = transpose(A)
  DIAG   = 'U' or 'N'   A is assumed to be unit triangular or not.
@@ -26,44 +26,149 @@
 
 /**
  Solve A*X = alpha*B, overwriting B with X.
- blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ 
+ DO J = 1,N
+    IF (ALPHA.NE.ONE) THEN
+        DO I = 1,M
+            B(I,J) = ALPHA*B(I,J)
+        CONTINUE
+    END IF
+    DO K = 1,M
+        IF (B(K,J).NE.ZERO) THEN
+            IF (NOUNIT) B(K,J) = B(K,J)/A(K,K)
+            DO I = K + 1,M
+                B(I,J) = B(I,J) - B(K,J)*A(I,K)
+            CONTINUE
+        END IF
+    CONTINUE
+CONTINUE
 */
 void blas_xtrsmLLN(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
     bool nounit = ( Diag == 'N' );
-
+    for ( int J = 0; J < N; ++J )
+    {
+        if ( ALPHA != 1.0 )
+        {
+            for ( int I = 0; I < M; ++I )
+                B[I+ldb*J] *= ALPHA;
+        }
+        for ( int K = 0; K < M; ++K )
+        {
+            if ( B[K+ldb*J] != 0.0 )
+            {
+                if (nounit)
+                    B[K+ldb*J] /= A[K+lda*K];
+                for ( int I = K + 1; I < M; ++I )
+                    B[I+ldb*J] -= B[K+ldb*J] * A[I+lda*K];
+            }
+        }
+    }
 }
 
 
 /**
  Solve transposed(A)*X = alpha*B, overwriting B with X.
- blas::xtrsm('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ 
+ DO J = 1,N
+     DO I = M,1,-1
+         TEMP = ALPHA*B(I,J)
+         DO K = I + 1,M
+             TEMP = TEMP - A(K,I)*B(K,J)
+         CONTINUE
+         IF (NOUNIT) TEMP = TEMP/A(I,I)
+         B(I,J) = TEMP
+     CONTINUE
+ CONTINUE
 */
 void blas_xtrsmLLT(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
     bool nounit = ( Diag == 'N' );
-
+    for ( int J = 0; J < N; ++J )
+    for ( int I = M-1; I >= 0; --I )
+    {
+        real temp = ALPHA * B[I+ldb*J];
+        for ( int K = I + 1; K < M; ++K )
+            temp -= A[K+lda*I] * B[K+ldb*J];
+        if (nounit) temp /= A[I+lda*I];
+        B[I+ldb*J] = temp;
+    }
 }
 
 
 /**
  Solve A*X = alpha*B, overwriting B with X.
- blas::xtrsm('L', 'U', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'U', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ 
+ DO J = 1,N
+     IF (ALPHA.NE.ONE) THEN
+         DO I = 1,M
+             B(I,J) = ALPHA*B(I,J)
+         CONTINUE
+     END IF
+     DO K = M,1,-1
+         IF (B(K,J).NE.ZERO) THEN
+             IF (NOUNIT) B(K,J) = B(K,J)/A(K,K)
+             DO  I = 1,K - 1
+                 B(I,J) = B(I,J) - B(K,J)*A(I,K)
+             CONTINUE
+         END IF
+     CONTINUE
+ CONTINUE
 */
 void blas_xtrsmLUN(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
     bool nounit = ( Diag == 'N' );
-
+    for ( int J = 0; J < N; ++J )
+    {
+         if ( ALPHA != 1.0 )
+         {
+             for ( int I = 0; I < M; ++I )
+                 B[I+ldb*J] *= ALPHA;
+         }
+        for ( int K = M-1; K >= 0; --K )
+        {
+             if ( B[K+ldb*J] != 0 )
+             {
+                 if (nounit)
+                     B[K+ldb*J] /= A[K+lda*K];
+                 for ( int I = 0; I < K; ++I )
+                     B[I+ldb*J] -= B[K+ldb*J] * A[I+lda*K];
+             }
+        }
+    }
 }
 
 /**
  Solve transposed(A)*X = alpha*B, overwriting B with X.
- blas::xtrsm('L', 'U', 'T', Diag', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'U', 'T', Diag', N, 1, 1.0, A, LDA, tmp, N);
+
+ DO J = 1,N
+     DO I = 1,M
+         TEMP = ALPHA*B(I,J)
+         DO K = 1,I - 1
+             TEMP = TEMP - A(K,I)*B(K,J)
+         CONTINUE
+         IF (NOUNIT) TEMP = TEMP/A(I,I)
+         B(I,J) = TEMP
+     CONTINUE
+ CONTINUE
 */
 void blas_xtrsmLUT(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
     bool nounit = ( Diag == 'N' );
-
+    for ( int J = 0; J < N; ++J )
+    for ( int I = 0; I < M; ++I )
+    {
+        real temp = ALPHA * B[I+ldb*J];
+        for ( int K = 0; K < I; ++K )
+            temp -= A[K+lda*I] * B[K+ldb*J];
+        if (nounit)
+            temp /= A[I+lda*I];
+        B[I+ldb*J] = temp;
+    }
 }
 
 /**
