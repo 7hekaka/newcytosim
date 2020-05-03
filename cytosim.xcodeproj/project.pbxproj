@@ -1002,14 +1002,21 @@
 			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
 			remoteInfo = cytomath;
 		};
-		BB5F878113B8BCB800E118EA /* PBXContainerItemProxy */ = {
+		BB5F2B79245F13FB007DDD06 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = BB51BD1305FA5FAA00D4869F;
-			remoteInfo = cytosim;
+			remoteGlobalIDString = BB692137233D359F00F528D2;
+			remoteInfo = cytosimG;
 		};
-		BB5F878213B8BCB800E118EA /* PBXContainerItemProxy */ = {
+		BB5F2B7B245F140E007DDD06 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBE82A27233D15EB00BE44DF;
+			remoteInfo = cytospaceG;
+		};
+		BB5F878113B8BCB800E118EA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
 			proxyType = 1;
@@ -4006,9 +4013,10 @@
 				BBA0215C0C5CE76E00E8407C /* PBXBuildRule */,
 			);
 			dependencies = (
+				BB5F2B7C245F140E007DDD06 /* PBXTargetDependency */,
+				BB5F2B7A245F13FB007DDD06 /* PBXTargetDependency */,
 				BB7192690EF1D0F400CED9E2 /* PBXTargetDependency */,
 				BBA579BF05FA6907009AE66E /* PBXTargetDependency */,
-				BBA579C105FA690C009AE66E /* PBXTargetDependency */,
 				BB4DB5C10C69D725001E5E4F /* PBXTargetDependency */,
 			);
 			name = play;
@@ -4835,6 +4843,16 @@
 			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
 			targetProxy = BB5C56E2243DC45200814EDD /* PBXContainerItemProxy */;
 		};
+		BB5F2B7A245F13FB007DDD06 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB692137233D359F00F528D2 /* cytosimG */;
+			targetProxy = BB5F2B79245F13FB007DDD06 /* PBXContainerItemProxy */;
+		};
+		BB5F2B7C245F140E007DDD06 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBE82A27233D15EB00BE44DF /* cytospaceG */;
+			targetProxy = BB5F2B7B245F140E007DDD06 /* PBXContainerItemProxy */;
+		};
 		BB6403C405FBC10900DF7BFF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BB7C2B7E05F93FB9002C69A9 /* test_rasterizer */;
@@ -4909,11 +4927,6 @@
 			isa = PBXTargetDependency;
 			target = BB51BC5B05FA559800D4869F /* cytobase */;
 			targetProxy = BBA3E72C13B8BD760015867F /* PBXContainerItemProxy */;
-		};
-		BBA579C105FA690C009AE66E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB51BD1305FA5FAA00D4869F /* cytosim */;
-			targetProxy = BB5F878213B8BCB800E118EA /* PBXContainerItemProxy */;
 		};
 		BBA7586B139CFC080098FBAF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
