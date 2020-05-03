@@ -103,7 +103,7 @@ Meca::Meca()
 #if USE_ISO_MATRIX
     useMatrixC = false;
 #endif
-    doNotify = false;
+    doNotify = 0;
     drawLinks = false;
     time_step = 0;
 }
@@ -227,7 +227,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 
 
 /// apply preconditionner block in full storage
-inline void applyFull(Mecable const* mec, real* Y)
+inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
     int info = 0;
@@ -236,11 +236,52 @@ inline void applyFull(Mecable const* mec, real* Y)
 }
 
 
+inline void DPOTRS_ISO(int N, const real* A, int LDA, real* B)
+{
+    /*
+     we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     But calling DTBSV gets the required work done.
+     */
+    real * tmp = new_real(N);
+    for ( int d = 0; d < DIM; ++d )
+    {
+        for ( int u = 0; u < N; ++u )
+            tmp[u] = B[d+DIM*u];
+#if 1
+        int info = 0;
+        lapack::xpotrs('L', N, 1, A, LDA, tmp, N, &info);
+#else
+        // Solve L*X = B, overwriting B with X. ALPHA = 1.0
+        blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
+        blas::xtrsm('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
+#endif
+        for ( int u = 0; u < N; ++u )
+            B[d+DIM*u] = tmp[u];
+    }
+    free_real(tmp);
+}
+
+
+/// apply preconditionner block in full storage
+inline void applyPrecondIsop(Mecable const* mec, real* Y)
+{
+    int nbp = mec->nbPoints();
+    /*
+     we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     */
+    DPOTRS_ISO(nbp, mec->block(), nbp, Y);
+    assert_true(info==0);
+}
+
+
 // the leading dimension of the banded matrix used for preconditionning
 constexpr size_t BAND_LDD = 3;
 
 /// apply preconditionner block in band storage
-inline void applyBand(Mecable const* mec, real* Y)
+inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
@@ -272,28 +313,30 @@ inline void applyBand(Mecable const* mec, real* Y)
 }
 
 
-inline void applyBlock(Mecable const* mec, real* Y)
+inline void applyPreconditionner(Mecable const* mec, real* Y)
 {
     switch ( mec->blockType() )
     {
         case 0: break;
-        case 1: applyFull(mec, Y); break;
-        case 2: applyBand(mec, Y); break;
+        case 1: applyPrecondFull(mec, Y); break;
+        case 2: applyPrecondIsop(mec, Y); break;
+        case 3: applyPrecondBand(mec, Y); break;
         default: throw InvalidParameter("unknown precondition block type"); break;
     }
 }
 
 
-inline void applyBlock(Mecable const* mec, real const* X, real* Y)
+inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
 {
     assert_true( Y != X );
     //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
     switch ( mec->blockType() )
     {
         case 0: break;
-        case 1: applyFull(mec, Y); break;
-        case 2: applyBand(mec, Y); break;
-        case 3: mec->blockMultiply(X, Y); break;
+        case 1: applyPrecondFull(mec, Y); break;
+        case 2: applyPrecondIsop(mec, Y); break;
+        case 3: applyPrecondBand(mec, Y); break;
+        case 7: mec->blockMultiply(X, Y); break;
         default: throw InvalidParameter("unknown precondition block type"); break;
     }
 }
@@ -401,7 +444,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
     }
 
     // Y <- PRECONDITIONNER_BLOCK * Y
-    applyBlock(mec, Y+inx);
+    applyPreconditionner(mec, Y+inx);
 }
 
 
@@ -444,7 +487,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
     // Y <- X + alpha * Y = X + alpha * P * FORCE
     blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
     
-    applyBlock(mec, Y+inx);
+    applyPreconditionner(mec, Y+inx);
 }
 
 /**
@@ -547,6 +590,73 @@ void getBand(const Mecable * mec, real* res, real time_step)
     //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
 }
 
+
+/**
+ Get the total diagonal block corresponding to an Object, which is:
+ 
+     I - time_step * P ( mB + mC + P' )
+ 
+ The result is constructed by using functions from mB and mC
+ This block is square but not symmetric!
+ */
+void Meca::getIsoBlock(const Mecable * mec, real* res) const
+{
+    const size_t nbp = mec->nbPoints();
+    
+    zero_real(nbp*nbp, res);
+    
+#if SEPARATE_RIGIDITY_TERMS
+    // set the Rigidity terms:
+    if ( mec->hasRigidity() )
+        //addRigidityLower<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
+        addRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
+#endif
+#if USE_ISO_MATRIX
+    mB.addTriangularBlock(res, nbp, mec->matIndex(), nbp, 1);
+    if ( useMatrixC )
+#endif
+        mC.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp);
+#if ( 0 )
+#if ADD_PROJECTION_DIFF
+    if ( mec->hasProjectionDiff() )
+    {
+        // Include the corrections P' in preconditioner, vector by vector.
+        real* tmp = vTMP + DIM * mec->matIndex();
+        zero_real(bks, tmp);
+        for ( size_t i = 0; i < bks; ++i )
+        {
+            tmp[i] = 1.0;
+            mec->addProjectionDiff(tmp, res+bks*i);
+            tmp[i] = 0.0;
+        }
+        //std::clog<<"dynamic with P'\n";
+        //VecPrint::print(std::clog, bs, bs, res, bs);
+    }
+#endif
+    
+    //compute the projection, by applying it to each column vector:
+    /*
+     This could be vectorized by having projectForces()
+     accept multiple vectors as arguments, using SIMD instructions
+     */
+    
+    for ( size_t i = 0; i < bks; ++i )
+        mec->projectForces(res+bks*i, res+bks*i);
+#endif
+
+    // scale
+    real beta = -time_step * mec->leftoverMobility();
+    //blas::xscal(bs*bs, beta, res, 1);
+    for ( size_t n = 0; n < nbp*nbp; ++n )
+        res[n] = beta * res[n];
+    
+    // add Identity matrix:
+    size_t bs1 = nbp + 1;
+    for ( size_t i = 0; i < nbp*nbp; i += bs1 )
+        res[i] += 1.0;
+}
+
+
 /**
  Get the total diagonal block corresponding to an Object, which is:
  
@@ -566,7 +676,7 @@ void Meca::getBlock(const Mecable * mec, real* res) const
     // set the Rigidity terms:
     if ( mec->hasRigidity() )
     {
-        addRigidityLower(res, bks, mec->nbPoints(), mec->fiberRigidity());
+        addRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
         //std::clog<<"Rigidity block " << mec->reference() << "\n";
         //VecPrint::print(std::clog, bks, bks, res, bks, 0);
     }
@@ -715,7 +825,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     copy_real(bks*bks, wrk, mat);  // mat <- wrk
     for ( size_t i = 0; i < bks; ++i )
     {
-        applyBlock(mec, wrk+bks*i, mat+bks*i);
+        applyPreconditionner(mec, wrk+bks*i, mat+bks*i);
         mat[i+bks*i] -= 1.0;
     }
     real err = blas::nrm2(bks*bks, mat) / bks;
@@ -758,7 +868,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
  Method 2 attempts to keep the existing block, and evaluates it fitness
  by iterations to identify the largest eigenvalue, which may or may not perform well
  */
-void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
+void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
 {
     const size_t bks = DIM * mec->nbPoints();
     assert_true( bks*bks <= wrksize );
@@ -819,7 +929,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
     if ( info )
     {
         //failed to factorize matrix !!!
-        std::clog << "Meca::computePreconditionner failed (lapack::xgetf2, info = " << info << ")\n";
+        std::clog << "Meca::computePrecond failed (lapack::xgetf2, info = " << info << ")\n";
         return;
     }
     
@@ -831,7 +941,7 @@ void Meca::computePreconditionnerAlt(Mecable* mec, real* tmp, real* wrk, size_t 
 /**
  Compute sequentially all the blocks of the preconditionner
  */
-void Meca::computePreconditionnerAlt()
+void Meca::computePrecondAlt()
 {
     const size_t vecsize = DIM * largestMecable();
     const size_t wrksize = vecsize * vecsize;
@@ -841,7 +951,7 @@ void Meca::computePreconditionnerAlt()
     real * wrk = new_real(wrksize);
     
     for ( Mecable * mec : mecables )
-        computePreconditionnerAlt(mec, tmp, wrk, wrksize);
+        computePrecondAlt(mec, tmp, wrk, wrksize);
     
     free_real(wrk);
     free_real(tmp);
@@ -851,7 +961,7 @@ void Meca::computePreconditionnerAlt()
 /**
 Compute banded preconditionner block corresponding to 'mec'
  */
-void Meca::computePreconditionnerBand(Mecable* mec)
+void Meca::computePrecondBand(Mecable* mec)
 {
     int info = 0;
     const size_t nbp = mec->nbPoints();
@@ -860,11 +970,12 @@ void Meca::computePreconditionnerBand(Mecable* mec)
 #if CHOUCROUTE
     alsatian_xpbtf2L(nbp, 2, mec->block(), BAND_LDD, &info);
 #else
+    // cholesky decomposition involves calculating SQRT(diagonal terms)
     lapack::xpbtf2('L', nbp, 2, mec->block(), BAND_LDD, &info);
 #endif
     if ( 0 == info )
     {
-        mec->blockType(2);
+        mec->blockType(3);
         //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
         //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
     }
@@ -879,7 +990,36 @@ void Meca::computePreconditionnerBand(Mecable* mec)
 /**
 Compute preconditionner block corresponding to 'mec'
  */
-void Meca::computePreconditionnerFull(Mecable* mec)
+void Meca::computePrecondIsop(Mecable* mec)
+{
+    const size_t nbp = mec->nbPoints();
+    mec->blockSize(DIM*nbp, nbp*nbp, nbp);
+    
+    getIsoBlock(mec, mec->block());
+    
+    //std::clog<<"isop preconditionner: " << nbp << "\n";
+    //VecPrint::print(std::clog, nbp, std::min(nbp, 16UL), mec->block(), nbp, 2);
+
+    // calculate LU factorization:
+    int info = 0;
+    lapack::xpotf2('L', nbp, mec->block(), nbp, &info);
+    
+    if ( 0 == info )
+    {
+        mec->blockType(2);
+        //checkBlock(mec, blk);
+    }
+    else
+    {
+        mec->blockType(0);
+        std::clog << "failed to compute Preconditionner block\n";
+    }
+}
+
+/**
+Compute preconditionner block corresponding to 'mec'
+ */
+void Meca::computePrecondFull(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
     mec->blockSize(bks, bks*bks, bks);
@@ -922,7 +1062,7 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
         mat.resize(bks);
         mat.importMatrix(bks, wrk, bks);
         mec->blockSize(bks, 0, 0);
-        mec->blockType(3);
+        mec->blockType(7);
         //std::clog << "R";
     }
 }
@@ -984,13 +1124,17 @@ void Meca::computePreconditionner(int precond, int span)
             break;
         case 1:
             for ( Mecable * mec : mecables )
-                computePreconditionnerFull(mec);
+                computePrecondFull(mec);
             break;
         case 2:
             for ( Mecable * mec : mecables )
-                computePreconditionnerBand(mec);
+                computePrecondIsop(mec);
             break;
         case 3:
+            for ( Mecable * mec : mecables )
+                computePrecondBand(mec);
+            break;
+        case 4:
             renewPreconditionner(span);
             break;
         default:
@@ -1010,7 +1154,7 @@ void Meca::precondition(const real* X, real* Y) const
         for ( Mecable const* mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
-            applyBlock(mec, X+inx, Y+inx);
+            applyPreconditionner(mec, X+inx, Y+inx);
         }
     }
     else
@@ -1019,7 +1163,7 @@ void Meca::precondition(const real* X, real* Y) const
         for ( Mecable const* mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
-            applyBlock(mec, Y+inx);
+            applyPreconditionner(mec, Y+inx);
         }
     }
     accum_ += __rdtsc() - rdt;
@@ -1104,9 +1248,9 @@ void Meca::prepare(Simul* sim)
         if ( mec->hasRigidity() )
         {
 #   if USE_ISO_MATRIX
-            addRigidityMatrix(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addRigidityMatrix<DIM>(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   else
-            addRigidityBlockMatrix(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addRigidityBlockMatrix<DIM>(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   endif
         }
 #endif
@@ -1487,9 +1631,9 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
     ready_ = 1;
     
     // report on the matrix type and size, sparsity, and the number of iterations
-    if ( doNotify || prop->verbose )
+    if ( 0 < doNotify || prop->verbose )
     {
-        doNotify = false;
+        --doNotify;
         std::stringstream oss;
         oss << "\tsize " << DIM << "*" << nb_points() << " kern " << largestMecable();
 #if USE_ISO_MATRIX
@@ -1508,8 +1652,8 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             accum_ = ( accum_ / cnt ) >> 10;
             oss << "  cycles " << std::setw(6) << start_;
             oss << " " << std::setw(6) << accum_;
-            oss << " " << std::setw(8) << total;
             oss << " " << std::setw(8) << cnt * accum_;
+            oss << " " << std::setw(8) << total;
         }
         Cytosim::out << oss.str() << "\n";
         if ( prop->verbose & 2 )

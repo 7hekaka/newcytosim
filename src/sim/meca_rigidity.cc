@@ -5,7 +5,7 @@
  Set rigidity terms with modulus 'R1' in diagonal and lower parts of `mat`,
  for a filament with 'cnt' points.
  */
-template<typename MATRIX>
+template < typename MATRIX >
 void addRigidityMatrix0(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
 {
     assert_true( cnt > 2 );
@@ -27,10 +27,10 @@ void addRigidityMatrix0(MATRIX& mat, const size_t inx, const size_t cnt, const r
 
 
 /**
- Set rigidity terms with modulus 'R1' in diagonal and lower parts of `mat`,
- for a filament with 'cnt' points.
+ Set rigidity terms on the diagonal and lower triangle of `mat`,
+ for a filament with 'cnt' points and bending modulus 'R'.
  */
-template<typename MATRIX>
+template < typename MATRIX >
 void addRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
@@ -72,7 +72,7 @@ void addRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const re
 }
 
 
-template<typename MATRIX>
+template < typename MATRIX, size_t ORD >
 void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
@@ -83,9 +83,9 @@ void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, con
     const real R5 = -5 * R;
     const real R6 = -6 * R;
     
-    constexpr size_t U = DIM, D = DIM*2, T = DIM*3;
-    const size_t s = DIM * inx;
-    const size_t e = s + DIM * ( cnt - 2 );
+    constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
+    const size_t s = ORD * inx;
+    const size_t e = s + ORD * ( cnt - 2 );
     
     mat.block(s  , s  ).add_diag(R1);
     mat.block(s+U, s  ).add_diag(R2);
@@ -117,10 +117,11 @@ void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, con
 
 /**
  Set elements of matrix `mat` corresponding to the elastic terms of the Fiber.
- The array `mat` must be square of dimension `dim * this->nPoints`
- Only terms above the diagonal and corresponding to the first subspace are set
+ The array `mat` must be square of dimension `ORD * cnt`
+ Only terms corresponding to the first subspace are set
  */
-void addRigidityUpper(real* mat, size_t ldd, size_t cnt, const real R)
+template < size_t ORD >
+void addRigidity(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
 
@@ -130,22 +131,27 @@ void addRigidityUpper(real* mat, size_t ldd, size_t cnt, const real R)
     const real R5 = -5 * R;
     const real R6 = -6 * R;
 
-    constexpr size_t U = DIM, D = DIM*2, T = DIM*3;
-    const size_t e = DIM * ( cnt - 2 );
-    const size_t f = DIM * ( cnt - 1 );
+    constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
+    const size_t e = ORD * ( cnt - 2 );
+    const size_t f = ORD * ( cnt - 1 );
     
     mat[0      ] += R1;
     mat[  ldd*U] += R2;
     mat[  ldd*D] += R1;
-    
+    mat[U      ] += R2;
+    mat[D      ] += R1;
+
     mat[e+ldd*f] += R2;
     mat[f+ldd*f] += R1;
-    
+    mat[f+ldd*e] += R2;
+
     if ( 3 < cnt )
     {
         mat[U+ldd*U] += R5;
         mat[U+ldd*D] += R4;
         mat[U+ldd*T] += R1;
+        mat[D+ldd*U] += R4;
+        mat[T+ldd*U] += R1;
         mat[e+ldd*e] += R5;
     }
     else
@@ -155,9 +161,11 @@ void addRigidityUpper(real* mat, size_t ldd, size_t cnt, const real R)
     
     for ( size_t n = D; n < e; n += U )
     {
-        mat[n+ldd* n   ] += R6;
-        mat[n+ldd*(n+U)] += R4;
-        mat[n+ldd*(n+D)] += R1;
+        mat[n  +ldd* n   ] += R6;
+        mat[n  +ldd*(n+U)] += R4;
+        mat[n  +ldd*(n+D)] += R1;
+        mat[n+U+ldd* n   ] += R4;
+        mat[n+D+ldd* n   ] += R1;
     }
 }
 
@@ -167,6 +175,7 @@ void addRigidityUpper(real* mat, size_t ldd, size_t cnt, const real R)
  The array `mat` must be square of dimension `dim * this->nPoints`
  Only terms above the diagonal and corresponding to the first subspace are set
  */
+template < size_t ORD >
 void addRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
@@ -177,9 +186,9 @@ void addRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
     const real R5 = -5 * R;
     const real R6 = -6 * R;
 
-    constexpr size_t U = DIM, D = DIM*2, T = DIM*3;
-    const size_t e = DIM * ( cnt - 2 );
-    const size_t f = DIM * ( cnt - 1 );
+    constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
+    const size_t e = ORD * ( cnt - 2 );
+    const size_t f = ORD * ( cnt - 1 );
     
     mat[0] += R1;
     mat[U] += R2;

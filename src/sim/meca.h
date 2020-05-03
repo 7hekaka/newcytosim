@@ -122,7 +122,7 @@ class Meca
 public:
     
     /// verbose level
-    bool            doNotify;
+    int             doNotify;
 
     /// enables graphical display of all interactions
     bool            drawLinks;
@@ -265,10 +265,13 @@ private:
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
 
-    /// compute the matrix diagonal block corresponding to a Mecable
+    /// compute the matrix on-diagonal block corresponding to a Mecable
     void getBlock(const Mecable*, real* mat) const;
     
-    /// DEBUG: extract the matrix diagonal block corresponding to a Mecable using 'multiply()'
+    /// compute the istropic projection of the on-diagonal block corresponding to a Mecable
+    void getIsoBlock(const Mecable*, real* mat) const;
+
+    /// DEBUG: extract the matrix on-diagonal block corresponding to a Mecable using 'multiply()'
     void extractBlock(const Mecable*, real* mat) const;
     
     /// DEBUG: compare `blk` with block extracted using extractBlockSlow()
@@ -278,19 +281,22 @@ private:
     void checkBlock(const Mecable*, const real*);
     
     /// compute the preconditionner block corresponding to given Mecable
-    void computePreconditionnerAlt(Mecable*, real*, real*, size_t);
+    void computePrecondAlt(Mecable*, real*, real*, size_t);
 
     /// compute all blocks of the preconditionner
-    void computePreconditionnerAlt();
+    void computePrecondAlt();
     
     /// compute the preconditionner block corresponding to given Mecable
     void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);
     
     /// compute the preconditionner block corresponding to given Mecable
-    void computePreconditionnerBand(Mecable*);
+    void computePrecondBand(Mecable*);
+    
+    /// compute the preconditionner block corresponding to given Mecable
+    void computePrecondIsop(Mecable*);
 
     /// compute the preconditionner block corresponding to given Mecable
-    void computePreconditionnerFull(Mecable*);
+    void computePrecondFull(Mecable*);
     
     /// compute all blocks of the preconditionner (method=1)
     void computePreconditionner(int, int);

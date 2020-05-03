@@ -835,8 +835,8 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
             {
                 simul.relax();
                 simul.writeObjects(TRAJECTORY, true, binary);
-                simul.sMeca.doNotify = true;  // to print convergence parameters
                 reportCPUtime(frame, simul.time());
+                simul.sMeca.doNotify = 2;  // to print convergence parameters
                 simul.unrelax();
             }
             if ( sss >= nb_steps )
