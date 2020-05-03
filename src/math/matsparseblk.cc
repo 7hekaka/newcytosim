@@ -227,7 +227,7 @@ void MatrixSparseBlock::scale(const real alpha)
 void MatrixSparseBlock::addTriangularBlock(real* mat, const size_t ldd,
                                            const size_t start,
                                            const size_t cnt,
-                                           const size_t dim) const
+                                           const size_t) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -236,7 +236,7 @@ void MatrixSparseBlock::addTriangularBlock(real* mat, const size_t ldd,
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t i = start; i < end; ++i )
+    for ( size_t i = start; i < end; i += BLOCK_SIZE )
     {
         Line & row = row_[i];
         for ( size_t n = 1; n < row.size_; ++n )
@@ -260,7 +260,7 @@ void MatrixSparseBlock::addDiagonalBlock(real* mat, size_t ldd,
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t i = start; i < end; ++i )
+    for ( size_t i = start; i < end; i += BLOCK_SIZE )
     {
         Line & row = row_[i];
         for ( size_t n = 0; n < row.size_; ++n )
@@ -268,6 +268,34 @@ void MatrixSparseBlock::addDiagonalBlock(real* mat, size_t ldd,
             size_t j = row.inx_[n];
             if ( start <= j && j < end )
                 row[n].addto(mat+(i+ldd*j)-off, ldd);
+        }
+    }
+}
+
+
+void MatrixSparseBlock::addDiagonalTrace(real alpha, real* mat, size_t ldd,
+                                         const size_t start,
+                                         const size_t cnt) const
+{
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
+
+    size_t end = start + cnt;
+    assert_true( end <= size_ );
+    size_t off = (1+ldd) * (start/BLOCK_SIZE);
+
+    for ( size_t ii = start; ii < end; ii += BLOCK_SIZE )
+    {
+        size_t i = ii / BLOCK_SIZE;
+        Line & row = row_[ii];
+        for ( size_t n = 0; n < row.size_; ++n )
+        {
+            size_t jj = row.inx_[n];
+            if ( start <= jj && jj < end )
+            {
+                size_t j = jj / BLOCK_SIZE;
+                mat[i+ldd*j-off] += alpha * row[n].trace();
+            }
         }
     }
 }

@@ -215,6 +215,9 @@ public:
     /// add the diagonal block ( start, start+nb ) from this matrix to M
     void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t nb) const;
     
+    /// add the diagonal block ( start, start+nb ) from this matrix to M
+    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t nb) const;
+
     /// add upper triangular half of 'this' block ( start, start+nb ) to `mat`
     void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t nb, size_t dim) const;
     

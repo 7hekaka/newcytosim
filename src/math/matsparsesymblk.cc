@@ -288,13 +288,13 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const size_t ldd,
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
     {
         Column & col = column_[jj];
         if ( col.size_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
-            col[0].addto_upper(mat + ( jj + ldd*jj ) - off, ldd);
+            col[0].addto_upper(mat+(jj+ldd*jj)-off, ldd);
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
@@ -322,13 +322,13 @@ void MatrixSparseSymmetricBlock::addDiagonalBlock(real* mat, size_t ldd,
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
     {
         Column & col = column_[jj];
         if ( col.size_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
-            col[0].addto_symm(mat+( jj + ldd*jj )-off, ldd);
+            col[0].addto_symm(mat+(jj+ldd*jj)-off, ldd);
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
@@ -346,10 +346,48 @@ void MatrixSparseSymmetricBlock::addDiagonalBlock(real* mat, size_t ldd,
 }
 
 
+void MatrixSparseSymmetricBlock::addDiagonalTrace(real alpha, real* mat, size_t ldd,
+                                                  const size_t start,
+                                                  const size_t cnt) const
+{
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
+
+    size_t end = start + cnt;
+    assert_true( end <= size_ );
+    size_t off = (1+ldd) * (start/BLOCK_SIZE);
+
+    for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
+    {
+        Column & col = column_[jj];
+        if ( col.size_ > 0 )
+        {
+            size_t j = jj / BLOCK_SIZE;
+            assert_true(col.inx_[0] == jj);
+            mat[j+ldd*j-off] += alpha * col[0].trace();
+            for ( size_t n = 1; n < col.size_; ++n )
+            {
+                size_t ii = col.inx_[n];
+                // assuming lower triangle is stored:
+                assert_true( ii > jj );
+                if ( ii < end )
+                {
+                    size_t i = ii / BLOCK_SIZE;
+                    real a = alpha * col[n].trace();
+                    //fprintf(stderr, "MSSB %4i %4i % .4f\n", ii, jj, a);
+                    mat[i+ldd*j-off] += a;
+                    mat[j+ldd*i-off] += a;
+                }
+            }
+        }
+    }
+}
+
+
 int MatrixSparseSymmetricBlock::bad() const
 {
     if ( size_ <= 0 ) return 1;
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
     {
         Column & col = column_[jj];
         for ( size_t n = 0 ; n < col.size_ ; ++n )
@@ -368,7 +406,7 @@ size_t MatrixSparseSymmetricBlock::nbElements(size_t start, size_t stop) const
     assert_true( start <= stop );
     assert_true( stop <= size_ );
     size_t cnt = 0;
-    for ( size_t jj = start; jj < stop; ++jj )
+    for ( size_t jj = start; jj < stop; jj += BLOCK_SIZE )
         cnt += column_[jj].size_;
     return cnt;
 }
