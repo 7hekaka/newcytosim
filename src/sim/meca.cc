@@ -574,8 +574,7 @@ void Meca::getBlock(const Mecable * mec, real* res) const
 #if USE_ISO_MATRIX
     mB.addTriangularBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
-    expand_lower_matrix(bks, res);
-    
+    expand_lower_matrix<DIM>(bks, res, bks);
 #if USE_ISO_MATRIX
     if ( useMatrixC )
 #endif

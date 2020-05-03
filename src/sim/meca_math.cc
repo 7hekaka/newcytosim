@@ -2,51 +2,50 @@
 
 
 /**
- Fill-in matrix 'dst' as the duplicate of 'src', for each 'DIM' dimension.
- For 'DIM==1', this makes a simple copy
- For 'DIM==2', 'src' is copied twice, into odd indices, and into even indices.
- For 'DIM==3', three copies of 'src' are made into 'dst'.
+ Fill-in matrix 'dst' as the duplicate of 'src', for each 'ORD' dimension.
+ For 'ORD==1', this makes a simple copy
+ For 'ORD==2', 'src' is copied twice, into odd indices, and into even indices.
+ For 'ORD==3', three copies of 'src' are made into 'dst'.
  
  Both 'src' and 'dst' must be symmetrix square matrices.
- The size of 'dst' is DIM times the size of 'src'.
+ The size of 'dst' is ORD times the size of 'src'.
  Only the upper diagonal of 'src' is specified.
  Matrix Y is specified in full.
  */
 
-void duplicate_matrix(size_t siz, real const* src, real * dst)
+template < size_t ORD >
+void duplicate_matrix(size_t siz, real const* src, size_t ldd, real * dst)
 {
-    size_t ddd = DIM * siz;
+    size_t ddd = ORD * siz;
+    size_t lll = ORD * ldd;
     
     zero_real(ddd*ddd, dst);
     
-    for ( size_t ii = 0; ii < siz; ++ii )
+    for ( size_t i = 0; i < siz; ++i )
     {
-        real xx = src[ii + siz * ii];
+        real dia = src[i+ldd*i];
+        size_t ii = ORD * i;
         
-        size_t kk = ( ddd+1 ) * DIM * ii;
-        for ( size_t d = 0; d < DIM; ++d, kk += ddd+1 )
-            dst[kk] = xx;
+        for ( size_t d = 0; d < ORD; ++d )
+            dst[(1+lll)*(ii+d)] = dia;
         
-        for ( size_t jj = ii+1; jj < siz; ++jj )
+        for ( size_t j = i+1; j < siz; ++j )
         {
-            xx = src[ii + siz * jj];
-            kk = DIM * ( ii + ddd * jj );
-            size_t ll = DIM * ( jj + ddd * ii );
-            for ( size_t d = 0; d < DIM; ++d )
+            real val = src[i+ldd*j];
+            size_t jj = ORD * j;
+            for ( size_t d = 0; d < ORD; ++d )
             {
-                dst[kk] = xx;
-                dst[ll] = xx;
-                kk += ddd+1;
-                ll += ddd+1;
+                dst[ii+d+lll*(jj+d)] = val;
+                dst[jj+d+lll*(ii+d)] = val;
             }
         }
     }
     
 #if ( 0 )
-    std::clog << "\nOriginal:\n";
-    VecPrint::print(std::clog, siz, siz, src, siz);
+    std::clog << "\nduplicate_matrix:\n";
+    VecPrint::print(std::clog, siz, siz, src, ldd);
     std::clog << "Duplicated:\n";
-    VecPrint::print(std::clog, ddd, ddd, dst, ddd);
+    VecPrint::print(std::clog, ddd, ddd, dst, lll);
 #endif
 }
 
@@ -59,35 +58,36 @@ void duplicate_matrix(size_t siz, real const* src, real * dst)
  input: upper triangular matrix
  ouput: full symmetric matrix
  */
-void expand_upper_matrix(size_t siz, real * mat)
+template < size_t ORD >
+void expand_upper_matrix(size_t siz, real * mat, size_t ldd)
 {
 #if ( 0 )
-    std::clog << "\nOriginal:\n";
-    VecPrint::print(std::clog, siz, siz, mat, siz);
+    std::clog << "\nexpand_upper_matrix:\n";
+    VecPrint::print(std::clog, siz, siz, mat, ldd);
 #endif
     
-    for ( size_t jj = 0; jj < siz; jj += DIM  )
+    for ( size_t jj = 0; jj < siz; jj += ORD  )
     {
-        for ( size_t ii = 0; ii < jj; ii += DIM  )
+        for ( size_t ii = 0; ii < jj; ii += ORD  )
         {
-            real val = mat[ii+siz*jj];
+            real val = mat[ii+ldd*jj];
             // expand term in other dimensions:
-            for ( size_t d = 1; d < DIM; ++d )
-                mat[ii+d+siz*(jj+d)] = val;
+            for ( size_t d = 1; d < ORD; ++d )
+                mat[ii+d+ldd*(jj+d)] = val;
             
             // symmetrize matrix:
-            for ( size_t d = 0; d < DIM; ++d )
-                mat[jj+d+siz*(ii+d)] = val;
+            for ( size_t d = 0; d < ORD; ++d )
+                mat[jj+d+ldd*(ii+d)] = val;
         }
         // expand diagonal term in other dimensions:
-        real val = mat[jj+siz*jj];
-        for ( size_t d = 1; d < DIM; ++d )
-            mat[jj+d+siz*(jj+d)] = val;
+        real val = mat[jj+ldd*jj];
+        for ( size_t d = 1; d < ORD; ++d )
+            mat[jj+d+ldd*(jj+d)] = val;
     }
 
 #if ( 0 )
     std::clog << "Expanded:\n";
-    VecPrint::print(std::clog, siz, siz, mat, siz);
+    VecPrint::print(std::clog, siz, siz, mat, ldd);
 #endif
 }
 
@@ -99,37 +99,70 @@ void expand_upper_matrix(size_t siz, real * mat)
  input: lower triangular matrix
  ouput: full symmetric matrix
  */
-void expand_lower_matrix(size_t siz, real * mat)
+template < size_t ORD >
+void expand_lower_matrix(size_t siz, real * mat, size_t ldd)
 {
 #if ( 0 )
-    std::clog << "\nOriginal:\n";
-    VecPrint::print(std::clog, siz, siz, mat, siz);
+    size_t S = std::min(12UL, siz);
+    std::clog << "\nexpand_lower_matrix:\n";
+    VecPrint::print(std::clog, S, S, mat, ldd);
 #endif
     
-    for ( size_t jj = 0; jj < siz; jj += DIM  )
+    for ( size_t jj = 0; jj < siz; jj += ORD  )
     {
-        for ( size_t ii = jj; ii < siz; ii += DIM  )
+        for ( size_t ii = jj; ii < siz; ii += ORD  )
         {
-            real val = mat[ii+siz*jj];
+            real val = mat[ii+ldd*jj];
             // expand term in other dimensions:
-            for ( size_t d = 1; d < DIM; ++d )
-                mat[ii+d+siz*(jj+d)] = val;
+            for ( size_t d = 1; d < ORD; ++d )
+                mat[ii+d+ldd*(jj+d)] = val;
             
             // symmetrize matrix:
-            for ( size_t d = 0; d < DIM; ++d )
-                mat[jj+d+siz*(ii+d)] = val;
+            for ( size_t d = 0; d < ORD; ++d )
+                mat[jj+d+ldd*(ii+d)] = val;
         }
         // expand diagonal term in other dimensions:
-        real val = mat[jj+siz*jj];
-        for ( size_t d = 1; d < DIM; ++d )
-            mat[jj+d+siz*(jj+d)] = val;
+        real val = mat[jj+ldd*jj];
+        for ( size_t d = 1; d < ORD; ++d )
+            mat[jj+d+ldd*(jj+d)] = val;
     }
-
+    
 #if ( 0 )
     std::clog << "Expanded:\n";
-    VecPrint::print(std::clog, siz, siz, mat, siz);
+    VecPrint::print(std::clog, S, S, mat, ldd);
 #endif
 }
+
+
+
+template < size_t ORD >
+void average_matrix(size_t siz, real* src, size_t ldd)
+{
+#if ( 0 )
+    size_t S = std::min(12UL, siz);
+    std::clog << "\naverage_matrix:\n";
+    VecPrint::print(std::clog, S, S, src, ldd);
+#endif
+    for ( size_t jj = 0; jj < siz; jj += ORD  )
+    for ( size_t ii = 0; ii < siz; ii += ORD  )
+    {
+        real* ptr = src + jj * ldd + ii;
+        real val = ptr[0];
+        for ( size_t d = 1; d < ORD; ++d )
+            val += ptr[d*(ldd+1)];
+        val /= (real)ORD;
+        for ( size_t d = 0; d < ORD; ++d )
+        for ( size_t u = 0; u < ORD; ++u )
+            ptr[d*ldd+u] = 0;
+        for ( size_t d = 0; d < ORD; ++d )
+            ptr[d*(ldd+1)] = val;
+    }
+#if ( 0 )
+    std::clog << "Averaged:\n";
+    VecPrint::print(std::clog, S, S, src, ldd);
+#endif
+}
+
 
 
 /**
@@ -137,16 +170,16 @@ void expand_lower_matrix(size_t siz, real * mat)
  if 'ku==0' and 'kl==0', only the diagonal is kept.
  if 'ku==1' and 'kl==1', the matrix is made tri-diagonal.
  */
-void truncate_matrix(size_t siz, real* mat, size_t kl, size_t ku)
+void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 {
 #if ( 0 )
-    std::clog << "\nOriginal:\n";
-    VecPrint::print(std::clog, siz, siz, mat, siz);
+    std::clog << "\ntruncate_matrix:\n";
+    VecPrint::print(std::clog, siz, siz, mat, ldd);
 #endif
 
     for ( size_t j = 0; j < siz; ++j )
     {
-        real * col = mat + siz * j;
+        real * col = mat + ldd * j;
         //zero out terms above the diagonal:
         for ( size_t i = 0; i+ku < j; ++i )
             col[i] = 0;
@@ -158,7 +191,7 @@ void truncate_matrix(size_t siz, real* mat, size_t kl, size_t ku)
     
 #if ( 0 )
     std::clog << "Truncated:\n";
-    VecPrint::print(std::clog, siz, siz, mat, siz);
+    VecPrint::print(std::clog, siz, siz, mat, ldd);
 #endif
 }
 
@@ -200,26 +233,25 @@ void init_matrix(size_t siz, real * mat, real dia, real off)
 
 
 /// erase all off-diagonal terms in `mat` of order `siz`
-void make_diagonal(size_t siz, real * mat)
+void make_diagonal(size_t siz, real * mat, size_t ldd)
 {
     for ( size_t j = 0; j < siz; ++j )
     {
-        real * col = mat + j * siz;
-        size_t i;
-        for ( i = 0; i < j; ++i )
+        real * col = mat + j * ldd;
+        for ( size_t i = 0; i < j; ++i )
             col[i] = 0.0;
-        for ( i = j+1; i < siz; ++i )
+        for ( size_t i = j+1; i < siz; ++i )
             col[i] = 0.0;
     }
 }
 
 
 /// a test matrix with integer components
-void test_matrix(size_t siz, real * mat)
+void test_matrix(size_t siz, real * mat, size_t ldd)
 {
     for ( size_t i = 0; i < siz; ++i )
     for ( size_t j = 0; j < siz; ++j )
-        mat[i+siz*j] = j - i;
+        mat[i+ldd*j] = j - i;
 }
 
 /**
