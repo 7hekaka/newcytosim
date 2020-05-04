@@ -173,6 +173,7 @@
 		BB5CF1FB16DD2D5A00EF0FE3 /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
 		BB5D4CA112BCBE2900A1312F /* parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5D4C9F12BCBE2900A1312F /* parser.cc */; };
 		BB5D4CA212BCBE2900A1312F /* parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5D4CA012BCBE2900A1312F /* parser.h */; };
+		BB5F2B7E245F5D90007DDD06 /* xtrsm.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5F2B7D245F5D90007DDD06 /* xtrsm.h */; };
 		BB60C6A10B6022FE00596D88 /* fiber_grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB60C69F0B6022FE00596D88 /* fiber_grid.h */; };
 		BB60C86C0B60353300596D88 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; };
 		BB61B7F019B7622800B1F4F6 /* print_color.h in Headers */ = {isa = PBXBuildFile; fileRef = BB61B7EF19B7622800B1F4F6 /* print_color.h */; };
@@ -1401,6 +1402,7 @@
 		BB5D4A9512BC035600A1312F /* common.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = common.cc; path = src/sim/common.cc; sourceTree = SOURCE_ROOT; };
 		BB5D4C9F12BCBE2900A1312F /* parser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parser.cc; sourceTree = "<group>"; };
 		BB5D4CA012BCBE2900A1312F /* parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
+		BB5F2B7D245F5D90007DDD06 /* xtrsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xtrsm.h; sourceTree = "<group>"; };
 		BB60C69F0B6022FE00596D88 /* fiber_grid.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = fiber_grid.h; path = src/sim/fiber_grid.h; sourceTree = SOURCE_ROOT; };
 		BB60C6A00B6022FE00596D88 /* fiber_grid.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber_grid.cc; path = src/sim/fiber_grid.cc; sourceTree = SOURCE_ROOT; };
 		BB61B7EF19B7622800B1F4F6 /* print_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = print_color.h; sourceTree = "<group>"; };
@@ -2054,6 +2056,7 @@
 				BBF4E88224372DFF00B9D440 /* lapack.h */,
 				BBF4E88024372DBA00B9D440 /* cytoblas.h */,
 				BBDF9AA3228BFBD3005018BD /* xpttrf.h */,
+				BB5F2B7D245F5D90007DDD06 /* xtrsm.h */,
 				BB6E5EF4245C27E000CEE184 /* xtbsv.h */,
 			);
 			name = BLAS;
@@ -3538,6 +3541,7 @@
 				BB71918A0EF1CD9900CED9E2 /* matsparsesymblk.h in Headers */,
 				BB71918B0EF1CD9900CED9E2 /* vector1.h in Headers */,
 				BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */,
+				BB5F2B7E245F5D90007DDD06 /* xtrsm.h in Headers */,
 				BB6D309A20CABF96009C5C7C /* matrix11.h in Headers */,
 				BB19DA9E231BF792001488A5 /* matrix34.h in Headers */,
 				BB71918D0EF1CD9900CED9E2 /* vector3.h in Headers */,
