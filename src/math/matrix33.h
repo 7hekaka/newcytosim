@@ -99,7 +99,7 @@ public:
 #if ( BLD == 3 )
     static std::string what() { return "9"; }
 #else
-    static std::string what() { return "4*3"; }
+    static std::string what() { return "+9"; }
 #endif
     
     /// set all elements to zero

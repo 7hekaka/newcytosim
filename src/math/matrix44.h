@@ -98,7 +98,7 @@ public:
     static size_t dimension() { return 4; }
     
     /// human-readable identifier
-    static std::string what() { return "4*4"; }
+    static std::string what() { return "16"; }
 
     /// set all elements to zero
     void reset()

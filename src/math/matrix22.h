@@ -116,9 +116,9 @@ public:
     
     /// human-readable identifier
 #if MATRIX22_USES_AVX
-    static std::string what() { return "4"; }
+    static std::string what() { return "+4"; }
 #else
-    static std::string what() { return "2*2"; }
+    static std::string what() { return "4"; }
 #endif
     
     /// set all elements to zero

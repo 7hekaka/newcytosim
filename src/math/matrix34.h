@@ -99,9 +99,9 @@ public:
 
     /// human-readable identifier
 #if MATRIX34_USES_AVX
-    static std::string what() { return "12"; }
+    static std::string what() { return "+12"; }
 #else
-    static std::string what() { return "3x4"; }
+    static std::string what() { return "12"; }
 #endif
     
     /// set all elements to zero
