@@ -150,6 +150,23 @@ void test_swapSSE()
 #ifdef __AVX__
 
 /**
+ make dst = { XYZ XYZ XYZ XYZ }
+ from src = { XYZ? }
+ */
+inline void twinedup12(real const* src, real* dst)
+{
+    vec4 s = load3(src);
+    vec4 p = permute2f128(s, s, 0x01);
+    vec4 h = shuffle4(s, p, 0b0001);
+    vec4 d0 = blend4(s, h, 0b1000);
+    vec4 d1 = blend4(h, p, 0b1100);
+    vec4 d2 = shuffle4(p, s, 0b0100);
+    store4(dst  , d0);
+    store4(dst+4, d1);
+    store4(dst+8, d2);
+}
+
+/**
  make
      dst = { XYZ XYZ XYZ XYZ }
  from
@@ -157,7 +174,7 @@ void test_swapSSE()
      dY = { YYYY }
      dZ = { ZZZZ }
  */
-inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
+inline void twine12(real const* X, real const* Y, real const* Z, real* dst)
 {
     vec4 sx = load4(X);
     vec4 sy = load4(Y);
@@ -183,7 +200,7 @@ inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
      dZ = { ZZZZ }
  from src = { XYZ XYZ XYZ XYZ }
  */
-inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
+inline void untwine12(real const* src, real* X, real* Y, real* Z)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -206,13 +223,15 @@ void test_twine()
 {
     printf("------ test_twine\n");
     real dst[12] = { 0 };
-    real src[12] = { 1.1, 2.1, 3.1, 1.2, 2.2, 3.2, 1.3, 2.3, 3.3, 1.4, 2.4, 3.4 };
-    real X[4] = { 0 }, Y[4] = { 0 }, Z[4] = { 0 };
-    untwine4x3(src, X, Y, Z);
+    real src[12] = { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3 };
+    real X[4] = { 1 }, Y[4] = { 2 }, Z[4] = { 3 };
+    untwine12(src, X, Y, Z);
     dump(4, X);
     dump(4, Y);
     dump(4, Z);
-    twine3x4(X, Y, Z, dst);
+    twine12(X, Y, Z, dst);
+    dump(12, dst);
+    twinedup12(src, dst);
     dump(12, dst);
 }
 
@@ -712,12 +731,12 @@ int main(int argc, char * argv[])
     //test_swapSSE();
 #ifdef __AVX__
     
-    if ( 0 )
+    if ( 1 )
     {
         test_twine();
         test_stride();
     }
-    if ( 1 )
+    if ( 0 )
     {
         test_cat();
         test_load();

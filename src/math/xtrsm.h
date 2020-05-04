@@ -447,14 +447,37 @@ void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        vec4 n = loadu4(B+3*K+3);
-        vec4 temp = mul4(loadu4(B+3*K), broadcast1(A+K)); // DIV
-        storeu4(B+3*K, temp);
-        for ( int I = K + 1; I < M; ++I )
+        real * pB = B + 3 * K;
+        vec4 temp0, temp1, temp2;
+        const vec4 s = mul4(loadu4(pB), broadcast1(A+K)); // DIV
+        store3(pB, s);
         {
-            vec4 t = fnmadd4(temp, broadcast1(A+I), n);
-            n = loadu4(B+3*I+3);
-            storeu4(B+3*I, t);
+            vec4 p = permute2f128(s, s, 0x01);
+            vec4 h = shuffle4(s, p, 0b0001);
+            temp0 = blend4(s, h, 0b1000);
+            temp1 = blend4(h, p, 0b1100);
+            temp2 = shuffle4(p, s, 0b0100);
+        }
+        pB += 3;
+        int I = K + 1;
+        for ( ; I+3 < M; I += 4 )
+        {
+            vec4 a0 = broadcast1(A+I  );
+            vec4 a1 = broadcast1(A+I+1);
+            vec4 a2 = broadcast1(A+I+2);
+            vec4 a3 = broadcast1(A+I+3);
+            storeu4(pB  , fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  )));
+            storeu4(pB+4, fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4)));
+            storeu4(pB+8, fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8)));
+            pB += 12;
+        }
+        vec4 n = loadu4(pB);
+        for ( ; I < M; ++I )
+        {
+            vec4 t = fnmadd4(s, broadcast1(A+I), n);
+            n = loadu4(pB+3);
+            storeu4(pB, t);
+            pB += 3;
         }
         A += lda;
     }
@@ -476,14 +499,47 @@ void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
  */
 void alsatian_xtrsmLLTN_3D(int M, const real* A, int lda, real* B)
 {
+    const vec4 zero = setzero4();
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
+#if 0
         vec4 temp = loadu4(B+3*I);
         for ( int K = I + 1; K < M; ++K )
             temp = fnmadd4(broadcast1(A+K), loadu4(B+3*K), temp);
         store3(B+3*I, mul4(temp, broadcast1(A+I)));
+#else
+        vec4 temp = loadu4(B+3*I);
+        vec4 s0 = setzero4();
+        vec4 s1 = setzero4();
+        vec4 s2 = setzero4();
+        // can unroll
+        int K = I + 1;
+        for ( ; K+3 < M; K += 4 )
+        {
+            vec4 a0 = broadcast1(A+K  );
+            vec4 a1 = broadcast1(A+K+1);
+            vec4 a2 = broadcast1(A+K+2);
+            vec4 a3 = broadcast1(A+K+3);
+            s0 = fnmadd4(blend4(a0, a1, 0b1000), loadu4(B+3*K  ), s0);
+            s1 = fnmadd4(blend4(a1, a2, 0b1100), loadu4(B+3*K+4), s1);
+            s2 = fnmadd4(blend4(a2, a3, 0b1110), loadu4(B+3*K+8), s2);
+        }
+        vec4 d = permute2f128(s0, s1, 0x21);
+        d = shuffle4(d, s1, 0b0101);
+        s0 = add4(s0, d);
+        d = blend4(s1, s2, 0b0011);
+        d = permute2f128(d, d, 0b0001);
+        s0 = add4(s0, d);
+        d = permute2f128(s2, s2, 0x01);
+        d = shuffle4(s2, d, 0b0101);
+        s0 = blend4(add4(s0, d), zero, 0b1000);
+        temp = add4(temp, s0);
+        for ( ; K < M; ++K )
+            temp = fnmadd4(broadcast1(A+K), loadu4(B+3*K), temp);
+        store3(B+3*I, mul4(temp, broadcast1(A+I)));
+#endif
     }
 }
 
@@ -514,6 +570,7 @@ void alsatian_xtrsmLLTN_2D(int M, const real* A, int lda, real* B)
     {
         A -= lda;
         vec2 temp = load2(B+2*I);
+        // can unroll
         for ( int K = I + 1; K < M; ++K )
             temp = fnmadd2(loaddup2(A+K), load2(B+2*K), temp);
         temp = mul2(temp, loaddup2(A+I)); // DIV
