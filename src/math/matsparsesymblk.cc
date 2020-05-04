@@ -355,28 +355,28 @@ void MatrixSparseSymmetricBlock::addDiagonalTrace(real alpha, real* mat, size_t 
 
     size_t end = start + cnt;
     assert_true( end <= size_ );
-    size_t off = (1+ldd) * (start/BLOCK_SIZE);
 
     for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
     {
         Column & col = column_[jj];
         if ( col.size_ > 0 )
         {
-            size_t j = jj / BLOCK_SIZE;
+            size_t j = ( jj - start ) / BLOCK_SIZE;
             assert_true(col.inx_[0] == jj);
-            mat[j+ldd*j-off] += alpha * col[0].trace();
+            mat[j+ldd*j] += alpha * col[0].trace();
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
                 assert_true( ii > jj );
+                assert_false( ii % BLOCK_SIZE );
                 if ( ii < end )
                 {
-                    size_t i = ii / BLOCK_SIZE;
+                    size_t i = ( ii - start ) / BLOCK_SIZE;
                     real a = alpha * col[n].trace();
-                    //fprintf(stderr, "MSSB %4i %4i % .4f\n", ii, jj, a);
-                    mat[i+ldd*j-off] += a;
-                    mat[j+ldd*i-off] += a;
+                    //fprintf(stderr, "MSSB %4lu %4lu : %.4f\n", i, j, a);
+                    mat[i+ldd*j] += a;
+                    mat[j+ldd*i] += a;
                 }
             }
         }

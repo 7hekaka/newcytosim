@@ -282,19 +282,19 @@ void MatrixSparseBlock::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 
     size_t end = start + cnt;
     assert_true( end <= size_ );
-    size_t off = (1+ldd) * (start/BLOCK_SIZE);
 
     for ( size_t ii = start; ii < end; ii += BLOCK_SIZE )
     {
-        size_t i = ii / BLOCK_SIZE;
+        size_t i = ( ii - start ) / BLOCK_SIZE;
         Line & row = row_[ii];
         for ( size_t n = 0; n < row.size_; ++n )
         {
             size_t jj = row.inx_[n];
-            if ( start <= jj && jj < end )
+            if (( start <= jj ) & ( jj < end ))
             {
-                size_t j = jj / BLOCK_SIZE;
-                mat[i+ldd*j-off] += alpha * row[n].trace();
+                size_t j = ( jj - start ) / BLOCK_SIZE;
+                //fprintf(stderr, "MSB %4lu %4lu : %.4f\n", i, j, alpha * row[n].trace());
+                mat[i+ldd*j] += alpha * row[n].trace();
             }
         }
     }
