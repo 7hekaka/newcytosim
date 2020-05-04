@@ -242,11 +242,8 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
     alsatian_xtbsvLN_2D(nbp, mec->block(), BAND_LDD, Y);
     alsatian_xtbsvLT_2D(nbp, mec->block(), BAND_LDD, Y);
 #  elif ( DIM == 1 )
-    alsatian_xtbsvLN_1D(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLT_1D(nbp, mec->block(), BAND_LDD, Y);
-#  else
-    alsatian_xtbsvLN<DIM>(nbp, 2, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLT<DIM>(nbp, 2, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLN(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLT(nbp, mec->block(), BAND_LDD, Y);
 #  endif
 #else
     /*
@@ -279,9 +276,22 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
     std::clog << "\n "; VecPrint::print(std::clog, S, tmp, 3, 100.0);
     free_real(tmp);
 #endif
+#if CHOUCROUTE
+#  if ( DIM == 3 )
+    alsatian_xtrsmLLNN_3D(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLTN_3D(nbp, mec->block(), nbp, Y);
+#  elif ( DIM == 2 )
+    alsatian_xtrsmLLNN_2D(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLTN_2D(nbp, mec->block(), nbp, Y);
+#  elif ( DIM == 1 )
+    alsatian_xtrsmLLNN_1D(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLTN_1D(nbp, mec->block(), nbp, Y);
+#  endif
+#else
+    //iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
     iso_xtrsmLLN<DIM>('N', nbp, mec->block(), nbp, Y);
     iso_xtrsmLLT<DIM>('N', nbp, mec->block(), nbp, Y);
-    //iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
+#endif
     //std::clog << "\nL"; VecPrint::print(std::clog, S, Y, 3, 100.0);
 }
 
@@ -1008,9 +1018,13 @@ void Meca::computePrecondIsoS(Mecable* mec)
     //std::clog<<"iso symmetric preconditionner: " << nbp << "\n";
     //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
 
-    // calculate LU factorization:
+// calculate LU factorization:
+#if CHOUCROUTE
+    alsatian_xpotf2L(nbp, mec->block(), nbp, &info);
+#else
     lapack::xpotf2('L', nbp, mec->block(), nbp, &info);
-
+#endif
+    
     if ( 0 == info )
     {
         mec->blockType(2);

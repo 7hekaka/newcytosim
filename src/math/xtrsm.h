@@ -414,19 +414,77 @@ void iso_xlaswp(real* A, int N, int K1, int K2, const int* IPIV, int INC)
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DTRSM
 
+/**
+ This calls the standard lapack::xpotf2()
+ and then inverts the diagonal terms
+*/
+void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
+{
+    lapack::xpotf2('L', N, A, LDA, INFO);
+    if ( 0 == *INFO )
+    {
+        const int S = LDA+1;
+        for ( int u = 0; u < N; ++u )
+            A[S*u] = 1.0 / A[S*u];
+    }
+}
+
+
 #ifdef __AVX__
 
 /// specialized version for ORD==3
-void alsatian_xtrsmLLNN_3D(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+/*
+ for ( int K = 0; K < M; ++K )
+ {
+     real temp = B[K] * A[K]; // DIV
+     B[K] = temp;
+     for ( int I = K + 1; I < M; ++I )
+         B[I] -= temp * A[I];
+     A += lda;
+ }
+ */
+void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
 {
-    constexpr int ORD = 3;
+    for ( int K = 0; K < M; ++K )
+    {
+        vec4 n = loadu4(B+3*K+3);
+        vec4 temp = mul4(loadu4(B+3*K), broadcast1(A+K)); // DIV
+        storeu4(B+3*K, temp);
+        for ( int I = K + 1; I < M; ++I )
+        {
+            vec4 t = fnmadd4(temp, broadcast1(A+I), n);
+            n = loadu4(B+3*I+3);
+            storeu4(B+3*I, t);
+        }
+        A += lda;
+    }
 }
 
 
 /// specialized version for ORD==3
-void alsatian_xtrsmLLTN_3D(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+/*
+ A += M * lda;
+ for ( int I = M-1; I >= 0; --I )
+ {
+     A -= lda;
+     real temp = B[I];
+     for ( int K = I + 1; K < M; ++K )
+         temp -= A[K] * B[K];
+     B[I] = temp * A[I]; // DIV
+ }
+
+ */
+void alsatian_xtrsmLLTN_3D(int M, const real* A, int lda, real* B)
 {
-    constexpr int ORD = 3;
+    A += M * lda;
+    for ( int I = M-1; I >= 0; --I )
+    {
+        A -= lda;
+        vec4 temp = loadu4(B+3*I);
+        for ( int K = I + 1; K < M; ++K )
+            temp = fnmadd4(broadcast1(A+K), loadu4(B+3*K), temp);
+        store3(B+3*I, mul4(temp, broadcast1(A+I)));
+    }
 }
 
 #endif
@@ -435,30 +493,63 @@ void alsatian_xtrsmLLTN_3D(int M, int N, real ALPHA, const real* A, int lda, rea
 #ifdef __SSE3__
 
 /// specialized version for ORD==2
-void alsatian_xtrsmLLNN_2D(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void alsatian_xtrsmLLNN_2D(int M, const real* A, int lda, real* B)
 {
-    constexpr int ORD = 2;
+    for ( int K = 0; K < M; ++K )
+    {
+        vec2 temp = mul2(load2(B+2*K), loaddup2(A+K)); // DIV
+        store2(B+2*K, temp);
+        for ( int I = K + 1; I < M; ++I )
+            store2(B+2*I, fnmadd2(temp, loaddup2(A+I), load2(B+2*I)));
+        A += lda;
+    }
 }
 
 
 /// specialized version for ORD==2
-void alsatian_xtrsmLLTN_2D(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void alsatian_xtrsmLLTN_2D(int M, const real* A, int lda, real* B)
 {
-    constexpr int ORD = 2;
+    A += M * lda;
+    for ( int I = M-1; I >= 0; --I )
+    {
+        A -= lda;
+        vec2 temp = load2(B+2*I);
+        for ( int K = I + 1; K < M; ++K )
+            temp = fnmadd2(loaddup2(A+K), load2(B+2*K), temp);
+        temp = mul2(temp, loaddup2(A+I)); // DIV
+        store2(B+2*I, temp);
+    }
 }
 
 #endif
 
 
 /// specialized version for ORD==1
-void alsatian_xtrsmLLNN(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void alsatian_xtrsmLLNN(int M, const real* A, int lda, real* B)
 {
+    for ( int K = 0; K < M; ++K )
+    {
+        real temp = B[K] * A[K]; // DIV
+        B[K] = temp;
+        for ( int I = K + 1; I < M; ++I )
+            B[I] -= temp * A[I];
+        A += lda;
+    }
 }
 
 
 /// specialized version for ORD==1
-void alsatian_xtrsmLLTN(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void alsatian_xtrsmLLTN(int M, const real* A, int lda, real* B)
 {
+    A += M * lda;
+    for ( int I = M-1; I >= 0; --I )
+    {
+        A -= lda;
+        real temp = B[I];
+        for ( int K = I + 1; K < M; ++K )
+            temp -= A[K] * B[K];
+        B[I] = temp * A[I]; // DIV
+    }
 }
 
 //------------------------------------------------------------------------------

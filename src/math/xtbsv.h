@@ -517,7 +517,7 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLN(int N, const real* pA, int lda, real* pX)
 {
     real a1 = pX[0]; //may load garbage
     real a2 = pX[1]; //may load garbage
@@ -549,7 +549,7 @@ void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLT_1D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLT(int N, const real* pA, int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
