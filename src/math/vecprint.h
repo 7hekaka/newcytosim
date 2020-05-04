@@ -32,7 +32,31 @@ namespace VecPrint
         os.flush();
         return os;
     }
-    
+
+    /// print 'm' components of 'vec' on a line
+    template< typename T >
+    std::ostream& print(std::ostream& os, size_t m, const T* vec, int digits, T alpha)
+    {
+        if ( !vec || m == 0 )
+            os << " void";
+        else
+        {
+            char str[32], fmt[32];
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
+            for ( size_t i = 0; i < m; ++i )
+            {
+                snprintf(str, sizeof(str), fmt, alpha*vec[i]);
+                if ( i % 4 )
+                    os << str;
+                else
+                    os << "  " << str;
+            }
+        }
+        os.flush();
+        return os;
+    }
+
+
     /// print 'm' components of 'vec' on separate lines
     template< typename T >
     std::ostream& dump(std::ostream& os, size_t m, const T* vec, int digits = 8)

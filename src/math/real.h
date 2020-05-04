@@ -62,7 +62,7 @@ inline real* new_real(size_t cnt)
     // we align to 4 doubles (of size 8 bytes), hence 32 bytes
     if ( posix_memalign(&ptr, 32, cnt*sizeof(real)) )
         throw std::bad_alloc();
-    //printf("new_real(%lu)  %lu\n", cnt, ((uintptr_t)ptr&63));
+    //printf("%p = new_real(%lu)  %lu\n", ptr, cnt, ((uintptr_t)ptr&63));
     return (real*)ptr;
 }
 
@@ -70,6 +70,7 @@ inline real* new_real(size_t cnt)
 /// release an array of reals allocated by `new_real`
 inline void free_real(void * ptr)
 {
+    //printf("free_real(%p)\n", ptr);
     free(ptr);
 }
 
