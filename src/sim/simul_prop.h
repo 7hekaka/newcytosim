@@ -177,8 +177,10 @@ public:
      to try the different possible values of `precondition`:
      - 0 : do not use preconditionning
      - 1 : use an simple banded preconditionner that is quick to calculate
-     - 2 : use blocks extracted from the diagonal of the full matrix of the system
-     - 3 : use same matrix as case `2`, converted to another format
+     - 2 : use a symmetric isotropic block, derived from the full matrix of the system
+     - 3 : use a isotropic block, derived from the full matrix of the system
+     - 4 : use the diagonal block of the full matrix of the system
+     - 5 : same as case `4`, converted to another format optimized for SIMD AVX.
      .
      
      Preconditionning is a technique to speed up convergence of iterative methods,
@@ -194,8 +196,11 @@ public:
      In some cases, using a preconditionner can even degrade preformance,
      in particular if some objects have many vertices.
      
+     The different preconditionners represent different tradeoff:
+     the approximation is improved from 0 to 4, but the CPU cost also increases.
+     
      If there is only one filament in the system, `precondition=0` should perform best.
-     With many filaments, trying `precondition = [0, 1, 2]' is a good strategy.
+     With many filaments, trying `precondition = [0, 1, 2, 3, 4]' is a good strategy.
      <em>default value = 0</em>
      */
     unsigned  precondition;
@@ -207,7 +212,9 @@ public:
      Thus, for a system that does not evolve too fast, it can be advantageous
      to keep a preconditionner calculated at some time point, for later times.
      Trying different values, starting from `1` up is advised.
-     <em>default value = 0</em>
+     
+     This only apply to 'precondition == 5'
+     <em>default value = 2</em>
      */
     unsigned  precondition_span;
     

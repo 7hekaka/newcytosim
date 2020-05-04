@@ -227,58 +227,6 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 }
 
 
-/// apply preconditionner block in full storage
-inline void applyPrecondFull(Mecable const* mec, real* Y)
-{
-    int bks = mec->blockSize();
-    int info = 0;
-    lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-    assert_true(info==0);
-}
-
-
-real* TEMPSPACE = nullptr;
-
-inline void ISO_XPOTRS(int N, const real* A, int LDA, real* B)
-{
-    /*
-     we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
-     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-     But calling DTBSV gets the required work done.
-     */
-    real* tmp = TEMPSPACE;
-    for ( int d = 0; d < DIM; ++d )
-    {
-        for ( int u = 0; u < N; ++u )
-            tmp[u] = B[d+DIM*u];
-#if 0
-        int info = 0;
-        lapack::xpotrs('L', N, 1, A, LDA, tmp, N, &info);
-#else
-        // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-        blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
-        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-        blas::xtrsm('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
-#endif
-        for ( int u = 0; u < N; ++u )
-            B[d+DIM*u] = tmp[u];
-    }
-}
-
-
-/// apply preconditionner block in full storage
-inline void applyPrecondIsop(Mecable const* mec, real* Y)
-{
-    int nbp = mec->nbPoints();
-    /*
-     we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-     */
-    ISO_XPOTRS(nbp, mec->block(), nbp, Y);
-    assert_true(info==0);
-}
-
-
 // the leading dimension of the banded matrix used for preconditionning
 constexpr size_t BAND_LDD = 3;
 
@@ -297,8 +245,8 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
     alsatian_xtbsvLN_1D(nbp, mec->block(), BAND_LDD, Y);
     alsatian_xtbsvLT_1D(nbp, mec->block(), BAND_LDD, Y);
 #  else
-    alsatian_xtbsvLN(nbp, 2, mec->block(), BAND_LDD, Y, DIM);
-    alsatian_xtbsvLT(nbp, 2, mec->block(), BAND_LDD, Y, DIM);
+    alsatian_xtbsvLN<DIM>(nbp, 2, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLT<DIM>(nbp, 2, mec->block(), BAND_LDD, Y);
 #  endif
 #else
     /*
@@ -315,14 +263,60 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
 }
 
 
+/// apply isotropic preconditionner block in full storage
+inline void applyPrecondIsoS(Mecable const* mec, real* Y)
+{
+    int nbp = mec->nbPoints();
+    /*
+     we cannot call lapack::DPOTRS('L', nbp, mec->block(), nbp, Y, DIM, &info);
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     */
+#if 0
+    real * tmp = new_real(DIM*nbp);
+    copy_real(DIM*nbp, Y, tmp);
+    iso_xpotrsL<DIM>(nbp, mec->block(), nbp, tmp);
+    size_t S = std::min(16, nbp);
+    std::clog << "\n "; VecPrint::print(std::clog, S, tmp, 3, 100.0);
+    free_real(tmp);
+#endif
+    iso_xtrsmLLN<DIM>('N', nbp, mec->block(), nbp, Y);
+    iso_xtrsmLLT<DIM>('N', nbp, mec->block(), nbp, Y);
+    //iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
+    //std::clog << "\nL"; VecPrint::print(std::clog, S, Y, 3, 100.0);
+}
+
+
+/// apply isotropic preconditionner block in full storage
+inline void applyPrecondIsoP(Mecable const* mec, real* Y)
+{
+    int nbp = mec->nbPoints();
+    /*
+     we cannot call lapack::DPOTRS('L', nbp, mec->block(), nbp, Y, DIM, &info);
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     */
+    iso_xgetrsL<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
+}
+
+
+/// apply preconditionner block in full storage
+inline void applyPrecondFull(Mecable const* mec, real* Y)
+{
+    int bks = mec->blockSize();
+    int info = 0;
+    lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+    assert_true(info==0);
+}
+
+
 inline void applyPreconditionner(Mecable const* mec, real* Y)
 {
     switch ( mec->blockType() )
     {
         case 0: break;
-        case 1: applyPrecondFull(mec, Y); break;
-        case 2: applyPrecondIsop(mec, Y); break;
-        case 3: applyPrecondBand(mec, Y); break;
+        case 1: applyPrecondBand(mec, Y); break;
+        case 2: applyPrecondIsoS(mec, Y); break;
+        case 3: applyPrecondIsoP(mec, Y); break;
+        case 4: applyPrecondFull(mec, Y); break;
         default: throw InvalidParameter("unknown precondition block type"); break;
     }
 }
@@ -335,9 +329,10 @@ inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
     switch ( mec->blockType() )
     {
         case 0: break;
-        case 1: applyPrecondFull(mec, Y); break;
-        case 2: applyPrecondIsop(mec, Y); break;
-        case 3: applyPrecondBand(mec, Y); break;
+        case 1: applyPrecondBand(mec, Y); break;
+        case 2: applyPrecondIsoS(mec, Y); break;
+        case 3: applyPrecondIsoP(mec, Y); break;
+        case 4: applyPrecondFull(mec, Y); break;
         case 7: mec->blockMultiply(X, Y); break;
         default: throw InvalidParameter("unknown precondition block type"); break;
     }
@@ -900,7 +895,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         if ( eig < 1.0 )
         {
             //std::clog << "    keep     eigen(1-PM) = " << eig << std::endl;
-            mec->blockType(1);
+            mec->blockType(4);
             return;
         }
         else
@@ -935,7 +930,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         return;
     }
     
-    mec->blockType(1);
+    mec->blockType(4);
     //checkBlock(mec, blk);
 }
 
@@ -977,7 +972,7 @@ void Meca::computePrecondBand(Mecable* mec)
 #endif
     if ( 0 == info )
     {
-        mec->blockType(3);
+        mec->blockType(1);
         //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
         //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
     }
@@ -992,23 +987,65 @@ void Meca::computePrecondBand(Mecable* mec)
 /**
 Compute preconditionner block corresponding to 'mec'
  */
-void Meca::computePrecondIsop(Mecable* mec)
+void Meca::computePrecondIsoS(Mecable* mec)
 {
     const size_t nbp = mec->nbPoints();
-    mec->blockSize(DIM*nbp, nbp*nbp, nbp);
+#if 0
+    const size_t S = std::min(nbp, 16UL);
+    const size_t bks = DIM * nbp;
+    mec->blockSize(bks, bks*bks, bks);
+    getBlock(mec, mec->block());
+    project_matrix<DIM>(nbp, mec->block(), bks, mec->block(), nbp);
+    std::clog<<"projected: " << bks << "\n";
+    VecPrint::print(std::clog, S, S, mec->block(), bks, 2);
+#endif
+    int info = 0;
+
+    mec->blockSize(DIM*nbp, nbp*nbp, 0);
     
     getIsoBlock(mec, mec->block());
     
-    //std::clog<<"isop preconditionner: " << nbp << "\n";
-    //VecPrint::print(std::clog, nbp, std::min(nbp, 16UL), mec->block(), nbp, 2);
+    //std::clog<<"iso symmetric preconditionner: " << nbp << "\n";
+    //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
 
     // calculate LU factorization:
-    int info = 0;
     lapack::xpotf2('L', nbp, mec->block(), nbp, &info);
-    
+
     if ( 0 == info )
     {
         mec->blockType(2);
+        //checkBlock(mec, blk);
+    }
+    else
+    {
+        mec->blockType(0);
+        std::clog << "failed to compute Preconditionner block\n";
+    }
+}
+
+/**
+Compute preconditionner block corresponding to 'mec'
+ */
+void Meca::computePrecondIsoP(Mecable* mec)
+{
+    const size_t nbp = mec->nbPoints();
+    int info = 0;
+
+    const size_t bks = DIM * nbp;
+    mec->blockSize(bks, bks*bks, nbp);
+    getBlock(mec, mec->block());
+    project_matrix<DIM>(nbp, mec->block(), bks, mec->block(), nbp);
+
+    //const size_t S = std::min(nbp, 16UL);
+    //std::clog<<"isop preconditionner: " << nbp << "\n";
+    //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
+
+    // calculate LU factorization:
+    lapack::xgetf2(nbp, nbp, mec->block(), nbp, mec->pivot(), &info);
+
+    if ( 0 == info )
+    {
+        mec->blockType(3);
         //checkBlock(mec, blk);
     }
     else
@@ -1035,7 +1072,7 @@ void Meca::computePrecondFull(Mecable* mec)
     
     if ( 0 == info )
     {
-        mec->blockType(1);
+        mec->blockType(4);
         //checkBlock(mec, blk);
     }
     else
@@ -1078,7 +1115,7 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
     const size_t bks = DIM * mec->nbPoints();
     const int age = mec->blockAge();
 
-    if (( mec->blockType() != 3 ) | ( mec->blockSize() != bks ) | ( age >= span ))
+    if (( mec->blockType() != 7 ) | ( mec->blockSize() != bks ) | ( age >= span ))
     {
         // recalculate block!
         getBlock(mec, blk);
@@ -1126,17 +1163,21 @@ void Meca::computePreconditionner(int precond, int span)
             break;
         case 1:
             for ( Mecable * mec : mecables )
-                computePrecondFull(mec);
+                computePrecondBand(mec);
             break;
         case 2:
             for ( Mecable * mec : mecables )
-                computePrecondIsop(mec);
+                computePrecondIsoS(mec);
             break;
         case 3:
             for ( Mecable * mec : mecables )
-                computePrecondBand(mec);
+                computePrecondIsoP(mec);
             break;
         case 4:
+            for ( Mecable * mec : mecables )
+                computePrecondFull(mec);
+            break;
+        case 5:
             renewPreconditionner(span);
             break;
         default:
@@ -1148,7 +1189,6 @@ void Meca::computePreconditionner(int precond, int span)
 
 void Meca::precondition(const real* X, real* Y) const
 {
-    TEMPSPACE = vTMP;
     auto rdt = __rdtsc();
     if ( Y != X )
     {
@@ -1653,10 +1693,10 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             int cnt = std::max(1UL, monitor.count());
             precond_ = precond_ >> 10;
             accum_ = accum_ >> 10;
-            oss << "  cycles " << std::setw(6) << precond_;
-            oss << " " << std::setw(6) << accum_;
-            oss << " " << std::setw(8) << ( total - accum_ ) / cnt;
-            oss << " " << std::setw(8) << accum_/cnt;
+            oss << "  cycles T " << std::setw(8) << total;
+            oss << " F " << std::setw(8) << precond_ << std::setw(6) << precond_/cnt;
+            oss << " S " << std::setw(8) << accum_ << std::setw(6) << accum_/cnt;
+            oss << " R " << std::setw(6) << ( total - accum_ ) / cnt;
         }
         Cytosim::out << oss.str() << "\n";
         if ( prop->verbose & 2 )

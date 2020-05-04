@@ -138,7 +138,7 @@ void expand_lower_matrix(size_t siz, real * mat, size_t ldd)
  This averages the terms in the different subspaces
  */
 template < size_t ORD >
-void project_matrix(size_t siz, real* src, size_t ldd)
+void average_matrix(size_t siz, real* src, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
@@ -162,6 +162,33 @@ void project_matrix(size_t siz, real* src, size_t ldd)
 #if (0 )
     std::clog << "Averaged:\n";
     VecPrint::print(std::clog, S, S, src, ldd);
+#endif
+}
+
+
+/*
+ This averages the terms in the different subspaces
+ */
+template < size_t ORD >
+void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t ldd)
+{
+#if ( 0 )
+    size_t S = std::min(12UL, siz);
+    std::clog << "\nproject_matrix:\n";
+    VecPrint::print(std::clog, S, S, src, lll);
+#endif
+    for ( size_t jj = 0; jj < siz; ++jj )
+    for ( size_t ii = 0; ii < siz; ++ii )
+    {
+        real const* ptr = src + ORD * ( jj * lll + ii );
+        real val = ptr[0];
+        for ( size_t d = 1; d < ORD; ++d )
+            val += ptr[d*(lll+1)];
+        dst[ii+ldd*jj] = val / (real)ORD;
+    }
+#if (0 )
+    std::clog << "Projected:\n";
+    VecPrint::print(std::clog, S, S, dst, ldd);
 #endif
 }
 
