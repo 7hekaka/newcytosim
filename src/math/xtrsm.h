@@ -26,7 +26,7 @@
 
 /**
  Solve A*X = alpha*B, overwriting B with X.
- DTRSM('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'L', 'N', Diag, M, N, ALPHA, A, LDA, B, LDB);
  
  DO J = 1,N
     IF (ALPHA.NE.ONE) THEN
@@ -46,31 +46,38 @@ CONTINUE
 */
 void blas_xtrsmLLN(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
-    bool nounit = ( Diag == 'N' );
+    if ( ALPHA == 0.0 )
+    {
+        for ( int U = 0; U < N*M; ++U )
+            B[U] = 0.0;
+    }
+    const bool nounit = ( Diag == 'N' );
     for ( int J = 0; J < N; ++J )
     {
         if ( ALPHA != 1.0 )
         {
             for ( int I = 0; I < M; ++I )
-                B[I+ldb*J] *= ALPHA;
+                B[I] *= ALPHA;
         }
         for ( int K = 0; K < M; ++K )
         {
-            if ( B[K+ldb*J] != 0.0 )
+            if ( B[K] != 0.0 )
             {
                 if (nounit)
-                    B[K+ldb*J] /= A[K+lda*K];
+                    B[K] /= A[K+lda*K];
+                real temp = B[K];
                 for ( int I = K + 1; I < M; ++I )
-                    B[I+ldb*J] -= B[K+ldb*J] * A[I+lda*K];
+                    B[I] -= temp * A[I+lda*K];
             }
         }
+        B += ldb;
     }
 }
 
 
 /**
  Solve transposed(A)*X = alpha*B, overwriting B with X.
- DTRSM('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'L', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
  
  DO J = 1,N
      DO I = M,1,-1
@@ -85,22 +92,31 @@ void blas_xtrsmLLN(char Diag, int M, int N, real ALPHA, const real* A, int lda, 
 */
 void blas_xtrsmLLT(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
-    bool nounit = ( Diag == 'N' );
-    for ( int J = 0; J < N; ++J )
-    for ( int I = M-1; I >= 0; --I )
+    if ( ALPHA == 0.0 )
     {
-        real temp = ALPHA * B[I+ldb*J];
-        for ( int K = I + 1; K < M; ++K )
-            temp -= A[K+lda*I] * B[K+ldb*J];
-        if (nounit) temp /= A[I+lda*I];
-        B[I+ldb*J] = temp;
+        for ( int U = 0; U < N*M; ++U )
+            B[U] = 0.0;
+    }
+    const bool nounit = ( Diag == 'N' );
+    for ( int J = 0; J < N; ++J )
+    {
+        for ( int I = M-1; I >= 0; --I )
+        {
+            real temp = ALPHA * B[I];
+            for ( int K = I + 1; K < M; ++K )
+                temp -= A[K+lda*I] * B[K];
+            if (nounit)
+                temp /= A[I+lda*I];
+            B[I] = temp;
+        }
+        B += ldb;
     }
 }
 
 
 /**
  Solve A*X = alpha*B, overwriting B with X.
- DTRSM('L', 'U', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'U', 'N', Diag, M, N, ALPHA, A, LDA, B, LDB);
  
  DO J = 1,N
      IF (ALPHA.NE.ONE) THEN
@@ -120,30 +136,37 @@ void blas_xtrsmLLT(char Diag, int M, int N, real ALPHA, const real* A, int lda, 
 */
 void blas_xtrsmLUN(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
-    bool nounit = ( Diag == 'N' );
+    if ( ALPHA == 0.0 )
+    {
+        for ( int U = 0; U < N*M; ++U )
+            B[U] = 0.0;
+    }
+    const bool nounit = ( Diag == 'N' );
     for ( int J = 0; J < N; ++J )
     {
-         if ( ALPHA != 1.0 )
-         {
-             for ( int I = 0; I < M; ++I )
-                 B[I+ldb*J] *= ALPHA;
-         }
+        if ( ALPHA != 1.0 )
+        {
+            for ( int I = 0; I < M; ++I )
+                B[I] *= ALPHA;
+        }
         for ( int K = M-1; K >= 0; --K )
         {
-             if ( B[K+ldb*J] != 0 )
+             if ( B[K] != 0 )
              {
                  if (nounit)
-                     B[K+ldb*J] /= A[K+lda*K];
+                     B[K] /= A[K+lda*K];
+                 real temp = B[K];
                  for ( int I = 0; I < K; ++I )
-                     B[I+ldb*J] -= B[K+ldb*J] * A[I+lda*K];
+                     B[I] -= temp * A[I+lda*K];
              }
         }
+        B += ldb;
     }
 }
 
 /**
  Solve transposed(A)*X = alpha*B, overwriting B with X.
- DTRSM('L', 'U', 'T', Diag', N, 1, 1.0, A, LDA, tmp, N);
+ DTRSM('L', 'U', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
 
  DO J = 1,N
      DO I = 1,M
@@ -158,16 +181,24 @@ void blas_xtrsmLUN(char Diag, int M, int N, real ALPHA, const real* A, int lda, 
 */
 void blas_xtrsmLUT(char Diag, int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
 {
-    bool nounit = ( Diag == 'N' );
-    for ( int J = 0; J < N; ++J )
-    for ( int I = 0; I < M; ++I )
+    if ( ALPHA == 0.0 )
     {
-        real temp = ALPHA * B[I+ldb*J];
-        for ( int K = 0; K < I; ++K )
-            temp -= A[K+lda*I] * B[K+ldb*J];
-        if (nounit)
-            temp /= A[I+lda*I];
-        B[I+ldb*J] = temp;
+        for ( int U = 0; U < N*M; ++U )
+            B[U] = 0.0;
+    }
+    const bool nounit = ( Diag == 'N' );
+    for ( int J = 0; J < N; ++J )
+    {
+        for ( int I = 0; I < M; ++I )
+        {
+            real temp = ALPHA * B[I];
+            for ( int K = 0; K < I; ++K )
+                temp -= A[K+lda*I] * B[K];
+            if (nounit)
+                temp /= A[I+lda*I];
+            B[I] = temp;
+        }
+        B += ldb;
     }
 }
 
@@ -201,8 +232,184 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real 
 
 
 //------------------------------------------------------------------------------
-#pragma mark - ALSATIAN DTRSM
+#pragma mark - DTRSM-STYLE for interleaved vectors
 
+/**
+ Solve A*X = B, for 'ORD' interleaved vectors B
+ like DTRSM('L', 'L', 'N', Diag, M, 1, 1.0, A, LDA, B, LDB);
+ N = 1
+ ALPHA = 1.0
+ but for the ORD vectors
+ 
+ for ( int K = 0; K < M; ++K )
+ {
+     if (nounit)
+         B[K] /= A[K+lda*K];
+     real temp = B[K];
+     for ( int I = K + 1; I < M; ++I )
+         B[I] -= temp * A[I+lda*K];
+ }
+
+ */
+template < int ORD >
+void iso_xtrsmLLN(char Diag, int M, const real* A, int lda, real* B)
+{
+    const bool nounit = ( Diag == 'N' );
+    for ( int K = 0; K < M; ++K )
+    {
+        real temp[ORD];
+        if (nounit)
+        {
+            for ( int d = 0; d < ORD; ++d )
+            {
+                temp[d] = B[ORD*K+d] / A[K+lda*K];
+                B[ORD*K+d] = temp[d];
+            }
+        }
+        else
+        {
+            for ( int d = 0; d < ORD; ++d )
+                temp[d] = B[ORD*K+d];
+        }
+        for ( int I = K + 1; I < M; ++I )
+        {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] -= temp[d] * A[I+lda*K];
+        }
+    }
+}
+
+
+/**
+ Solve transposed(A)*X = B, for 'ORD' interleaved vectors B
+ DTRSM('L', 'L', 'T', Diag, M, 1, 1.0, A, LDA, B, LDB);
+ N = 1
+ ALPHA = 1.0
+ 
+ for ( int I = M-1; I >= 0; --I )
+ {
+     real temp = ALPHA * B[I];
+     for ( int K = I + 1; K < M; ++K )
+         temp -= A[K+lda*I] * B[K];
+     if (nounit)
+         temp /= A[I+lda*I];
+     B[I] = temp;
+ }
+*/
+template < int ORD >
+void iso_xtrsmLLT(char Diag, int M, const real* A, int lda, real* B)
+{
+    const bool nounit = ( Diag == 'N' );
+    for ( int I = M-1; I >= 0; --I )
+    {
+        real temp[ORD];
+        for ( int d = 0; d < ORD; ++d )
+            temp[d] = B[ORD*I+d];
+        for ( int K = I + 1; K < M; ++K )
+        {
+            for ( int d = 0; d < ORD; ++d )
+                temp[d] -= A[K+lda*I] * B[ORD*K+d];
+        }
+        if (nounit)
+        {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] = temp[d] / A[I+lda*I];
+        }
+        else
+        {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] = temp[d];
+        }
+    }
+}
+
+/**
+ Solve transposed(A)*X = B, for 'ORD' interleaved vectors B
+ DTRSM('L', 'U', 'N', Diag, M, 1, 1.0, A, LDA, B, LDB);
+ N = 1
+ ALPHA = 1.0
+ 
+ for ( int K = M-1; K >= 0; --K )
+ {
+     if (nounit)
+         B[K] /= A[K+lda*K];
+     real temp = B[K];
+     for ( int I = 0; I < K; ++I )
+         B[I] -= temp * A[I+lda*K];
+ }
+*/
+template < int ORD >
+void iso_xtrsmLUN(char Diag, int M, const real* A, int lda, real* B)
+{
+    const bool nounit = ( Diag == 'N' );
+    for ( int K = M-1; K >= 0; --K )
+    {
+        if ( B[K] != 0 )
+        {
+            real temp[ORD];
+            if (nounit)
+            {
+                for ( int d = 0; d < ORD; ++d )
+                {
+                    temp[d] = B[ORD*K+d] / A[K+lda*K];
+                    B[ORD*K+d] = temp[d];
+                }
+            }
+            else
+            {
+                for ( int d = 0; d < ORD; ++d )
+                    temp[d] = B[ORD*K+d];
+            }
+            for ( int I = 0; I < K; ++I )
+            {
+                for ( int d = 0; d < ORD; ++d )
+                    B[ORD*I+d] -= temp[d] * A[I+lda*K];
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - DLASWP for interleaved vector
+
+/*
+ DLASWP performs a series of row interchanges on the matrix A.
+ INCX = 1
+
+ IF( INCX.GT.0 ) THEN
+     IX0 = K1
+     I1 = K1
+     I2 = K2
+     INC = 1
+  ELSE IF( INCX.LT.0 ) THEN
+     IX0 = K1 + ( K1-K2 )*INCX
+     I1 = K2
+     I2 = K1
+     INC = -1
+  ELSE
+     RETURN
+  END IF
+
+   IX = IX0
+   DO I = I1, I2, INC
+      IP = IPIV( IX )
+      IF( IP.NE.I ) THEN
+         DO K = 1, N
+            TEMP = A( I, K )
+            A( I, K ) = A( IP, K )
+            A( IP, K ) = TEMP
+         CONTINUE
+      END IF
+      IX = IX + INCX
+   CONTINUE
+ */
+template < int ORD >
+void iso_xlaswp(real* A, int N, int K1, int K2, const int* IPIV, int INC)
+{
+    for ( int d = 0; d < ORD; ++d )
+        lapack::xlaswp(1, A+d, N, K1, K2, IPIV, INC);
+    ABORT_NOW("unfinished 'iso_xlaswp' code");
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DTRSM
@@ -272,9 +479,9 @@ inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, c
     else
     {
         // Solve U**T *X = B, overwriting B with X.
-        blas::xtrsm('L', 'U', 'T', 'N', N, NRHS, 1.0, A, LDA, B, LDB );
+        blas::xtrsm('L', 'U', 'T', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
         // Solve L**T *X = B, overwriting B with X.
-        blas::xtrsm('L', 'L', 'T', 'U', N, NRHS, 1.0, A, LDA, B, LDB );
+        blas::xtrsm('L', 'L', 'T', 'U', N, NRHS, 1.0, A, LDA, B, LDB);
         // Apply row interchanges to the solution vectors.
         lapack::xlaswp(NRHS, B, LDB, 1, N, IPIV, -1);
     }
@@ -301,62 +508,73 @@ inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, re
 }
 
 
-
+template < int ORD >
 inline void iso_xgetrsL(int N, const real* A, int LDA, const int* IPIV, real* B)
 {
     /*
      we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
      But calling DTBSV gets the required work done.
      */
+#if 1
     real * tmp = new_real(N);
-    for ( int d = 0; d < DIM; ++d )
+    for ( int d = 0; d < ORD; ++d )
     {
         for ( int u = 0; u < N; ++u )
-            tmp[u] = B[d+DIM*u];
-#if 0
-        int info = 0;
-        lapack::xgetrs('N', N, 1, A, N, IPIV, tmp, N, &info);
-#else
+            tmp[u] = B[d+ORD*u];
+        //int info = 0;
+        //lapack::xgetrs('N', N, 1, A, N, IPIV, tmp, N, &info);
         // Apply row interchanges to the right hand sides.
         lapack::xlaswp(1, tmp, N, 1, N, IPIV, 1);
         // Solve L*X = B, overwriting B with X.
         blas::xtrsm('L', 'L', 'N', 'U', N, 1, 1.0, A, LDA, tmp, N);
         // Solve U*X = B, overwriting B with X.
         blas::xtrsm('L', 'U', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
-#endif
         for ( int u = 0; u < N; ++u )
-            B[d+DIM*u] = tmp[u];
+            B[d+ORD*u] = tmp[u];
     }
     free_real(tmp);
+#else
+    // Apply row interchanges to the right hand sides.
+    iso_xlaswp<ORD>(B, N, 1, N, IPIV, 1);
+    // Solve L*X = B, overwriting B with X.
+    iso_xtrsmLLN<ORD>('U', N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    iso_xtrsmLUN<ORD>('N', N, A, LDA, B);
+#endif
 }
 
 
+template < int ORD >
 inline void iso_xpotrsL(int N, const real* A, int LDA, real* B)
 {
     /*
      we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
-     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
      But calling DTBSV gets the required work done.
      */
+#if 1
     real * tmp = new_real(N);
-    for ( int d = 0; d < DIM; ++d )
+    for ( int d = 0; d < ORD; ++d )
     {
         for ( int u = 0; u < N; ++u )
-            tmp[u] = B[d+DIM*u];
-#if 1
-        int info = 0;
-        lapack::xpotrs('L', N, 1, A, LDA, tmp, N, &info);
-#else
+            tmp[u] = B[d+ORD*u];
+        //int info = 0;
+        //lapack::xpotrs('L', N, 1, A, LDA, tmp, N, &info);
         // Solve L*X = B, overwriting B with X. ALPHA = 1.0
         blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
         // Solve U*X = B, overwriting B with X. ALPHA = 1.0
         blas::xtrsm('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
-#endif
         for ( int u = 0; u < N; ++u )
-            B[d+DIM*u] = tmp[u];
+            B[d+ORD*u] = tmp[u];
     }
     free_real(tmp);
+#else
+    // Solve L*X = B, overwriting B with X. ALPHA = 1.0
+    iso_xtrsmLLN<ORD>('N', N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X. ALPHA = 1.0
+    iso_xtrsmLLT<ORD>('N', N, A, LDA, B);
+#endif
 }
 
 

@@ -9,19 +9,19 @@
  FJN 28.04.2020
  
  */
-void blas_xtbsvUN(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
+void blas_xtbsvUN(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    bool nounit = ( Diag == 'N' );
+    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = N-1; j >= 0; --j)
         {
             if (X[j] != 0.)
             {
-                const real * pA = A + K + j * lda;
+                const real * pA = A + KD + j * lda;
                 if ( nounit ) X[j] /= pA[0];
                 real temp = X[j];
-                const int inf = std::max(0, j-K);
+                const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
                     X[i] -= temp * pA[i-j];
             }
@@ -39,10 +39,10 @@ void blas_xtbsvUN(char Diag, int N, int K, const real* A, int lda, real* X, int 
             if (X[jx] != 0.)
             {
                 int ix = kx;
-                const real * pA = A + K + j * lda;
+                const real * pA = A + KD + j * lda;
                 if ( nounit ) X[jx] /= pA[0];
                 real temp = X[jx];
-                const int inf = std::max(0, j-K);
+                const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
                 {
                     X[ix] -= temp * pA[i-j];
@@ -54,9 +54,9 @@ void blas_xtbsvUN(char Diag, int N, int K, const real* A, int lda, real* X, int 
     }
 }
 
-void blas_xtbsvLN(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
+void blas_xtbsvLN(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    bool nounit = ( Diag == 'N' );
+    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = 0; j < N; ++j)
@@ -66,7 +66,7 @@ void blas_xtbsvLN(char Diag, int N, int K, const real* A, int lda, real* X, int 
                 const real * pA = A + j * lda;
                 if ( nounit ) X[j] /= pA[0];
                 real temp = X[j];
-                const int sup = std::min(N-1, j+K);
+                const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
                     X[i] -= temp * pA[i-j];
             }
@@ -87,7 +87,7 @@ void blas_xtbsvLN(char Diag, int N, int K, const real* A, int lda, real* X, int 
                 const real * pA = A + j * lda;
                 if ( nounit ) X[jx] /= pA[0];
                 real temp = X[jx];
-                const int sup = std::min(N-1, j+K);
+                const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
                 {
                     X[ix] -= temp * pA[i-j];
@@ -99,16 +99,16 @@ void blas_xtbsvLN(char Diag, int N, int K, const real* A, int lda, real* X, int 
     }
 }
 
-void blas_xtbsvUT(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
+void blas_xtbsvUT(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    bool nounit = ( Diag == 'N' );
+    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = 0; j < N; ++j)
         {
             real temp = X[j];
-            const real * pA = A + K + j * lda;
-            for (int i = std::max(0, j-K); i < j; ++i)
+            const real * pA = A + KD + j * lda;
+            for (int i = std::max(0, j-KD); i < j; ++i)
                 temp -= pA[i-j] * X[i];
             if ( nounit ) temp /= pA[0];
             X[j] = temp;
@@ -124,8 +124,8 @@ void blas_xtbsvUT(char Diag, int N, int K, const real* A, int lda, real* X, int 
         {
             real temp = X[jx];
             int ix = kx;
-            const real * pA = A + K + j * lda;
-            for (int i = std::max(0, j-K); i < j; ++i)
+            const real * pA = A + KD + j * lda;
+            for (int i = std::max(0, j-KD); i < j; ++i)
             {
                 temp -= pA[i-j] * X[ix];
                 ix += incX;
@@ -133,22 +133,22 @@ void blas_xtbsvUT(char Diag, int N, int K, const real* A, int lda, real* X, int 
             if ( nounit ) temp /= pA[0];
             X[jx] = temp;
             jx += incX;
-            if (j >= K)
+            if (j >= KD)
                 kx += incX;
         }
     }
 }
 
-void blas_xtbsvLT(char Diag, int N, int K, const real* A, int lda, real* X, int incX)
+void blas_xtbsvLT(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    bool nounit = ( Diag == 'N' );
+    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = N-1; j >= 0; --j)
         {
             real temp = X[j];
             const real * pA = A + j * lda;
-            const int sup = std::min(N-1, j+K);
+            const int sup = std::min(N-1, j+KD);
             for (int i = sup; i > j; --i)
                 temp -= pA[i-j] * X[i];
             if ( nounit ) temp /= pA[0];
@@ -166,7 +166,7 @@ void blas_xtbsvLT(char Diag, int N, int K, const real* A, int lda, real* X, int 
             real temp = X[jx];
             int ix = kx;
             const real * pA = A + j * lda;
-            const int sup = std::min(N-1, j+K);
+            const int sup = std::min(N-1, j+KD);
             for (int i = sup; i > j; --i)
             {
                 temp -= pA[i-j] * X[ix];
@@ -175,33 +175,33 @@ void blas_xtbsvLT(char Diag, int N, int K, const real* A, int lda, real* X, int 
             if ( nounit ) temp /= pA[0];
             X[jx] = temp;
             jx -= incX;
-            if ( j < N-K )
+            if ( j < N-KD )
                 kx -= incX;
         }
     }
 }
 
 
-void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int K, const real* A, int lda, real* X, int incX)
+void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
 {
     if ( Uplo == 'U' )
     {
         if ( Trans == 'N' )
-            blas_xtbsvUN(Diag, N, K, A, lda, X, incX);
+            blas_xtbsvUN(Diag, N, KD, A, lda, X, incX);
         else
-            blas_xtbsvUT(Diag, N, K, A, lda, X, incX);
+            blas_xtbsvUT(Diag, N, KD, A, lda, X, incX);
     }
     else if ( Uplo == 'L' )
     {
         if ( Trans == 'N' )
-            blas_xtbsvLN(Diag, N, K, A, lda, X, incX);
+            blas_xtbsvLN(Diag, N, KD, A, lda, X, incX);
         else
-            blas_xtbsvLT(Diag, N, K, A, lda, X, incX);
+            blas_xtbsvLT(Diag, N, KD, A, lda, X, incX);
     }
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - ALSATIAN DPBTF2
+#pragma mark - ALSATIAN versions that inverse the diagonal elements
 
 /**
  This calls the standard lapack::pbtf2()
@@ -221,9 +221,9 @@ void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
 #if ( 1 )
 
 /// this version is fast...
-void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
+template < int ORD >
+void alsatian_xtbsvLN(int N, int KD, const real* A, int lda, real* X)
 {
-    assert_true(ORD<=4);
     int kx = 0;
     int jx = 0;
     for ( int j = 0; j < N; ++j )
@@ -233,13 +233,13 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
         {
             real* pX = X + kx; // kx == ORD*(j+1);
             const real * pA = A + j * lda;
-            real temp[4];
+            real temp[ORD];
             for ( int d = 0; d < ORD; ++d )
             {
                 temp[d] = X[jx+d] * pA[0]; // X[jx] *= pA[0];
                 X[jx+d] = temp[d]; //real temp = X[jx];
             }
-            const int sup = std::min(N-1-j, K); // ( N-1-j < K ) if ( j >= N-K )
+            const int sup = std::min(N-1-j, KD); // ( N-1-j < KD ) if ( j >= N-KD )
             for ( int ij = 1; ij <= sup; ++ij )
             {
                 for ( int d = 0; d < ORD; ++d )
@@ -251,9 +251,9 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
     }
 }
 
-void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
+template < int ORD >
+void alsatian_xtbsvLT(int N, int KD, const real* A, int lda, real* X)
 {
-    assert_true(ORD<=4);
     int kx = (N-1) * ORD;
     int jx = kx;
     for ( int j = N-1; j >= 0; --j )
@@ -263,7 +263,7 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
             temp[d] = X[jx+d]; //real temp = X[jx];
         real* pX = X + kx;
         const real * pA = A + j * lda;
-        const int sup = std::min(N-1-j, K); // ( N-1-j < K ) if ( j >= N-K )
+        const int sup = std::min(N-1-j, KD); // ( N-1-j < KD ) if ( j >= N-KD )
         for ( int ij = sup; ij > 0; --ij )
         {
             for ( int d = 0; d < ORD; ++d )
@@ -273,7 +273,7 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
         for ( int d = 0; d < ORD; ++d )
             X[jx+d] = temp[d] * pA[0]; //X[jx] = temp * pA[0];
         jx -= ORD;
-        if ( j < N-K )
+        if ( j < N-KD )
             kx -= ORD;
     }
 }
@@ -282,20 +282,20 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 
 /*
  */
-void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
+template < int ORD >
+void alsatian_xtbsvLN(int N, int KD, const real* A, int lda, real* X)
 {
-    assert_true(ORD<=4);
     for ( int j = 0; j < N; ++j )
     {
         const real * pA = A + j * lda - j;
-        real temp[4];
+        real temp[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
             /// X[j] /= pA[0]; // temp = X[j];
             temp[d] = X[ORD*j+d] * pA[j];
             X[ORD*j+d] = temp[d];
         }
-        const int sup = std::min(N-1, j+K);
+        const int sup = std::min(N-1, j+KD);
         for ( int i = j + 1; i <= sup; ++i )
         {
             for ( int d = 0; d < ORD; ++d )
@@ -304,16 +304,16 @@ void alsatian_xtbsvLN(int N, int K, const real* A, int lda, real* X, int ORD)
     }
 }
 
-void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
+template < int ORD >
+void alsatian_xtbsvLT(int N, int KD, const real* A, int lda, real* X)
 {
-    assert_true(ORD<=4);
     for ( int j = N-1; j >= 0; --j )
     {
-        real temp[4];
+        real temp[ORD];
         for ( int d = 0; d < ORD; ++d )
             temp[d] = X[ORD*j+d]; // real temp = X[j];
         const real * pA = A + j * lda - j;
-        const int sup = std::min(N-1, j+K);
+        const int sup = std::min(N-1, j+KD);
         for ( int i = sup; i > j; --i )
         {
             for ( int d = 0; d < ORD; ++d )
@@ -331,7 +331,7 @@ void alsatian_xtbsvLT(int N, int K, const real* A, int lda, real* X, int ORD)
 
 #ifdef __AVX__
 
-/// specialized version for K==2 and ORD==3
+/// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 {
     const real * end = pA + (N-2) * lda;
@@ -365,7 +365,7 @@ void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 }
 
 
-/// specialized version for K==2 and ORD==3
+/// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 {
     const real* end = pA;
@@ -445,7 +445,7 @@ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 
 #ifdef __SSE3__
 
-/// specialized version for K==2 and ORD==2
+/// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
@@ -478,7 +478,7 @@ void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
 }
 
 
-/// specialized version for K==2 and ORD==2
+/// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
@@ -516,7 +516,7 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 #endif
 
 
-/// specialized version for K==2 and ORD==1
+/// specialized version for KD==2 and ORD==1
 void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
 {
     real a1 = pX[0]; //may load garbage
@@ -548,7 +548,7 @@ void alsatian_xtbsvLN_1D(int N, const real* pA, int lda, real* pX)
 }
 
 
-/// specialized version for K==2 and ORD==1
+/// specialized version for KD==2 and ORD==1
 void alsatian_xtbsvLT_1D(int N, const real* pA, int lda, real* pX)
 {
     pX += ( N - 1 );
@@ -589,8 +589,9 @@ void alsatian_xtbsvLT_1D(int N, const real* pA, int lda, real* pX)
 #pragma mark - LAPACK-STYLE DPBTRS
 
 
-inline void iso_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
 {
+    *INFO = 0;
     if ( UPLO == 'U' )
     {
         for ( int i = 0; i < NRHS; ++i )
@@ -608,6 +609,53 @@ inline void iso_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int L
             blas_xtbsvLT('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
         }
     }
+    else
+        *INFO = 1;
+}
+
+
+template < int ORD >
+inline void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+{
+    *INFO = 0;
+    if ( UPLO == 'U' )
+    {
+        for ( int d = 0; d < ORD; ++d )
+        {
+            blas_xtbsvUT('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+d, ORD);
+            blas_xtbsvUN('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+d, ORD);
+        }
+    }
+    else if ( UPLO == 'L' )
+    {
+        for ( int d = 0; d < ORD; ++d )
+        {
+            blas_xtbsvLN('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+d, ORD);
+            blas_xtbsvLT('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+d, ORD);
+        }
+    }
+    else
+        *INFO = 1;
+}
+
+
+template < int ORD >
+inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+{
+    *INFO = 0;
+    if ( UPLO == 'U' )
+    {
+        ABORT_NOW("unfinished alsatian_xpbtrs('U', ...)");
+        //alsatian_xtbsvUT<ORD>(N, KD, AB, LDAB, B);
+        //alsatian_xtbsvUN<ORD>(N, KD, AB, LDAB, B);
+    }
+    else if ( UPLO == 'L' )
+    {
+        alsatian_xtbsvLN<ORD>(N, KD, AB, LDAB, B);
+        alsatian_xtbsvLT<ORD>(N, KD, AB, LDAB, B);
+    }
+    else
+        *INFO = 1;
 }
 
 

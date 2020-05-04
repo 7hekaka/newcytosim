@@ -10,6 +10,7 @@
 */
 void lapack_xpttrf(int size, real* D, real* E, int* INFO)
 {
+    *INFO = 0;
     for ( int i = 0; i < size-1; ++i )
     {
         if ( D[i] < 0 )
@@ -73,6 +74,7 @@ void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, in
  */
 void italian_xpttrf(int size, real* D, real const* E, int* INFO)
 {
+    *INFO = 0;
     D[0] = 1.0 / D[0];
     
     for ( int n = 1; n < size; ++n )
@@ -163,6 +165,7 @@ void italian_thomas(size_t size, real const*L, real const* D, real* U, real* B)
  */
 void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
 {
+    *INFO = 0;
     if ( size < 1 ) return;
 
     real x = 0;
