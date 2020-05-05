@@ -75,14 +75,16 @@ Simul::Simul()
 fibers(*this), spheres(*this), beads(*this), solids(*this),
 singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 {
-    pMeca1D       = nullptr;
-    sReady        = false;
-    precondCPU[0] = 0;
-    precondCPU[1] = 0;
-    precondCPU[2] = 0;
-    precondCPU[3] = 0;
-    precondMethod = 1;
-    precondCounter = 0;
+    pMeca1D = nullptr;
+    sReady  = false;
+    
+    autoPrecond = 0;
+    autoCounter = 0;
+    for ( size_t u = 0; u < 6; ++u )
+    {
+        autoCPU[u] = 0;
+        autoCNT[u] = 0;
+    }
     
     prop = new SimulProp("undefined");
 }

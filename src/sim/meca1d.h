@@ -177,13 +177,15 @@ public:
          vSOL = newPOS - oldPOS
 
      */
-    void solve(real precision)
+    size_t solve(real precision)
     {
         ready_ = false;
         mA.prepareForMultiply(1);
         LinearSolvers::Monitor monitor(dimension(), precision);
+        // solve without preconditionner
         LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
         ready_ = monitor.converged();
+        return monitor.count();
     }
     
     /// apply translation to registered Mecables based on 'vSOL'

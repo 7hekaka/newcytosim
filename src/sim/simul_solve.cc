@@ -313,63 +313,73 @@ void Simul::solve_half()
 }
 
 
+
 /**
  Solve the system, and automatically select the fastest preconditionning method
  */
 void Simul::solve_auto()
 {
+    sMeca.prepare(this);
     setInteractions(sMeca);
     
     // solve the system, recording time:
-    double cpu = TicToc::centiseconds();
-    sMeca.solve(prop, precondMethod);
-    cpu = TicToc::centiseconds() - cpu;
+    double cpu = TicToc::milliseconds();
+    size_t cnt = sMeca.solve(prop, autoPrecond);
+    cpu = TicToc::milliseconds() - cpu;
     
     sMeca.apply();
 
     // Automatic selection of preconditionning method:
-    const unsigned N_TEST = 6;
-    const unsigned PERIOD = 32;
+    constexpr size_t N_TEST = 5*3;
+    constexpr size_t PERIOD = 64;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
-    if ( precondCounter++ < N_TEST )
+    
+    if ( ++autoCounter <= N_TEST )
     {
-        precondCPU[precondMethod] += cpu;
+        assert_true(autoPrecond < 6);
+        autoCPU[autoPrecond] += cpu;
+        autoCNT[autoPrecond] += cnt;
+
+        //std::clog << " precond " << autoPrecond << " cnt " << cnt << " CPU " << cpu << "\n";
         
-        //std::clog << " precond "<<precondMethod<<" iter " << iter << " CPU " << cpu << "\n";
-        
-        if ( precondCounter == N_TEST )
+        if ( autoCounter == N_TEST )
         {
             // if the differential of times is significant, use the fastest method
             // but otherwise, select the simplest method:
-            precondMethod = 0;
-            if ( precondCPU[0] > precondCPU[1] + 10 )
-                precondMethod = 1;
-            if ( precondCPU[precondMethod] > precondCPU[2] + 10 )
-                precondMethod = 2;
-            
+            autoPrecond = 0;
+            for ( int m = 1; m < 4; ++m )
+            {
+                if ( autoCPU[m] < autoCPU[autoPrecond] - 1 )
+                    autoPrecond = m;
+            }
             if ( prop->verbose )
             {
-                std::clog << " precond 0 time " << precondCPU[0] << "\n";
-                std::clog << "         1 time " << precondCPU[1] << "\n";
-                std::clog << "         2 time " << precondCPU[2] << "\n";
-                std::clog << " ----> " << precondMethod << std::endl;
+                std::ostream& os = std::clog;
+                os << " precond 0 cnt " << std::setw(6) << autoCNT[0] << " cpu " << autoCPU[0] << "\n";
+                os << "         1 cnt " << std::setw(6) << autoCNT[1] << " cpu " << autoCPU[1] << "\n";
+                os << "         2 cnt " << std::setw(6) << autoCNT[2] << " cpu " << autoCPU[2] << "\n";
+                os << "         3 cnt " << std::setw(6) << autoCNT[3] << " cpu " << autoCPU[3] << "\n";
+                os << "         4 cnt " << std::setw(6) << autoCNT[4] << " cpu " << autoCPU[4];
+                os << " -----> " << autoPrecond << std::endl;
+            }
+            for ( size_t u = 0; u < 6; ++u )
+            {
+                autoCPU[u] = 0;
+                autoCNT[u] = 0;
             }
         }
         else
         {
-            //alternate betwen methods { 0, 1, 2 }
-            precondMethod = ( 1 + precondMethod ) % 3;
+            //alternate betwen methods { 0, 1, 2, 3, 4 }
+            autoPrecond = ( 1 + autoPrecond ) % 5;
         }
     }
-    else if ( precondCounter > PERIOD )
+    else
     {
-        precondCPU[0] = 0;
-        precondCPU[1] = 0;
-        precondCPU[2] = 0;
-        precondCPU[3] = 0;
-        precondCounter = 0;
+        if ( autoCounter > PERIOD )
+            autoCounter = 0;
     }
 }
 

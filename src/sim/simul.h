@@ -54,14 +54,17 @@ private:
     /// signals that engine is ready to perform a step
     bool            sReady;
 
-    /// preconditionning method used in last solve
-    unsigned int    precondMethod;
+    /// preconditionning method used/determined by `solve_auto()`
+    unsigned int    autoPrecond;
     
-    /// counter that is used to automatically set the preconditionning option
-    unsigned int    precondCounter;
+    /// counter used by `solve_auto()`
+    size_t          autoCounter;
     
-    /// stores cpu time to automatically set the preconditionning option
-    double          precondCPU[4];
+    /// record of CPU time for `solve_auto()`
+    double          autoCPU[6];
+    
+    /// record of iteration count for `solve_auto()`
+    size_t          autoCNT[6];
     
     /// a copy of the properties as they were stored to file
     mutable std::string properties_saved;

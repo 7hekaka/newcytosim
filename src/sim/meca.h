@@ -597,8 +597,8 @@ public:
     /// Allocate the memory necessary to solve(). This must be called after the last add()
     void prepare(Simul*);
     
-    /// Calculate motion of all Mecables in the system
-    void solve(SimulProp const*, unsigned precondition);
+    /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
+    size_t solve(SimulProp const*, unsigned precondition);
     
     /// transfer newly calculated point coordinates back to Mecables
     void apply();

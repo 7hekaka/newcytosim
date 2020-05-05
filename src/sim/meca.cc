@@ -1439,7 +1439,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
      'vSOL' is `Xnew - Xold`, the solution to the system
  
  */
-void Meca::solve(SimulProp const* prop, const unsigned precond)
+size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
     // get global time step
     time_step = prop->time_step;
@@ -1525,7 +1525,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         mec->getPoints(vPTS+DIM*mec->matIndex());
         mec->getForces(vFOR+DIM*mec->matIndex());
     }
-    return;
+    return 1;
 #endif
 
     // compute preconditionner:
@@ -1671,7 +1671,7 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
             // no method could converge... this is really bad!
             if ( monitor.residual() > 4*abstol )
                 throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
-            return;
+            return 0;
         }
     }
     
@@ -1716,6 +1716,8 @@ void Meca::solve(SimulProp const* prop, const unsigned precond)
         if ( prop->verbose & 2 )
             std::clog << oss.str() << "\n";
     }
+    
+    return monitor.count();
 }
 
 
