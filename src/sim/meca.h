@@ -126,19 +126,20 @@ public:
 
     /// enables graphical display of all interactions
     bool            drawLinks;
+    
+    /// used for recording CPU cycles
+    mutable unsigned long long cycles_;
 
 private:
     
-    mutable unsigned long long accum_;
-    
-    /// flag to indicate that result is available
-    int             ready_;
+    /// list of Mecable containing points to simulate
+    Array<Mecable*> mecables;
     
     /// local copy of the SimulProp::time_step
     real            time_step;
-    
-    /// list of Mecable containing points to simulate
-    Array<Mecable*> mecables;
+
+    /// flag to indicate that result is available
+    int             ready_;
     
     /// total number of points in the system
     size_t          nPoints_;

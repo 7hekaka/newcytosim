@@ -323,9 +323,10 @@ void Simul::solve_auto()
     setInteractions(sMeca);
     
     // solve the system, recording time:
-    double cpu = TicToc::milliseconds();
+    //double cpu = TicToc::milliseconds();
     size_t cnt = sMeca.solve(prop, autoPrecond);
-    cpu = TicToc::milliseconds() - cpu;
+    //cpu = TicToc::milliseconds() - cpu;
+    double cpu = sMeca.cycles_ >> 10;
     
     sMeca.apply();
 
@@ -351,7 +352,7 @@ void Simul::solve_auto()
             autoPrecond = 0;
             for ( int m = 1; m < 4; ++m )
             {
-                if ( autoCPU[m] < autoCPU[autoPrecond] - 1 )
+                if ( autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
                     autoPrecond = m;
             }
             if ( prop->verbose )

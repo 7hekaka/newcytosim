@@ -1223,7 +1223,7 @@ void Meca::precondition(const real* X, real* Y) const
             applyPreconditionner(mec, Y+inx);
         }
     }
-    accum_ += __rdtsc() - rdt;
+    cycles_ += __rdtsc() - rdt;
 }
 
 
@@ -1529,11 +1529,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 #endif
 
     // compute preconditionner:
-    auto start_ = __rdtsc();
+    auto start = __rdtsc();
     computePreconditionner(precond, prop->precondition_span);
-    auto precond_ = __rdtsc() - start_;
-    start_ = __rdtsc();
-    accum_ = 0;
+    auto factor = __rdtsc() - start;
+    cycles_ = 0;
 
     /*
      Choose the initial guess for the solution of the system (Xnew - Xold):
@@ -1675,9 +1674,11 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         }
     }
     
+    auto total = ( __rdtsc() - start ) >> 10;
+
     //add the solution of the system (=dPTS) to the points coordinates
     blas::add(dimension(), vSOL, vPTS);
-    
+
     /*
      Re-calculate forces with the new coordinates, excluding bending elasticity
      and Brownian terms on the vertices.
@@ -1686,7 +1687,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      */
     calculateForces(vPTS, vBAS, vFOR);
     ready_ = 1;
-    
+
     // report on the matrix type and size, sparsity, and the number of iterations
     if ( 0 < doNotify || prop->verbose )
     {
@@ -1703,20 +1704,20 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         if ( prop->verbose & 4 )
         {
-            auto total = ( __rdtsc() - start_ ) >> 10;
             int cnt = std::max(1UL, monitor.count());
-            precond_ = precond_ >> 10;
-            accum_ = accum_ >> 10;
+            factor = factor >> 10;
+            auto solve = cycles_ >> 10;
             oss << "  cycles T " << std::setw(8) << total;
-            oss << " F " << std::setw(8) << precond_ << std::setw(6) << precond_/cnt;
-            oss << " S " << std::setw(8) << accum_ << std::setw(6) << accum_/cnt;
-            oss << " R " << std::setw(6) << ( total - accum_ ) / cnt;
+            oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
+            oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
+            oss << " R " << std::setw(6) << ( total - factor - solve ) / cnt;
         }
         Cytosim::out << oss.str() << "\n";
         if ( prop->verbose & 2 )
             std::clog << oss.str() << "\n";
     }
     
+    cycles_ = total;
     return monitor.count();
 }
 
