@@ -150,6 +150,27 @@ void test_swapSSE()
 #ifdef __AVX__
 
 /**
+ make
+     dst = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
+ from
+     src = { XYZ XYZ XYZ XYZ }
+ */
+inline void sumXYZ(real const* src, real* dst)
+{
+    vec4 s0 = load4(src);
+    vec4 s1 = load4(src+4);
+    vec4 s2 = load4(src+8);
+    
+    vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
+    vec4 d3 = permute2f128(s1, s2, 0x21);
+    vec4 d2 = shuffle4(s2, s1, 0b0101);
+    vec4 d1 = permute2f128(h, h, 0x01);
+
+    vec4 sum = add4(add4(s0, d2), add4(d3, d1));
+    store4(dst, sum);
+}
+
+/**
  make dst = { XYZ XYZ XYZ XYZ }
  from src = { XYZ? }
  */
@@ -165,6 +186,28 @@ inline void twinedup12(real const* src, real* dst)
     store4(dst+4, d1);
     store4(dst+8, d2);
 }
+
+
+/**
+ make
+     dst = { XXX YYY ZZZ TTT }
+ from
+     src = { XYZT }
+ */
+inline void repeat12(real const* src, real* dst)
+{
+    vec4 s = load4(src);
+    dump(s, "s");
+
+    vec4 zx = permute2f128(s, s, 0x21);
+    vec4 xy = unpacklo4(s, s);
+    vec4 yz = unpackhi4(s, s);
+    
+    store4(dst  , blend4(xy, zx, 0b1100));
+    store4(dst+4, blend4(yz, xy, 0b1100));
+    store4(dst+8, blend4(zx, yz, 0b1100));
+}
+
 
 /**
  make
@@ -230,9 +273,13 @@ void test_twine()
     dump(4, Y);
     dump(4, Z);
     twine12(X, Y, Z, dst);
-    dump(12, dst);
+    printf("twine12  "); dump(12, dst);
+    repeat12(X, dst);
+    printf("repeat12 "); dump(12, dst);
     twinedup12(src, dst);
-    dump(12, dst);
+    printf("twinedup "); dump(12, dst);
+    sumXYZ(src, dst);
+    printf("sumXYZ "); dump(4, dst);
 }
 
 

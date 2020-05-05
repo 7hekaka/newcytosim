@@ -447,37 +447,60 @@ void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        real * pB = B + 3 * K;
-        vec4 temp0, temp1, temp2;
-        const vec4 s = mul4(loadu4(pB), broadcast1(A+K)); // DIV
-        store3(pB, s);
-        {
-            vec4 p = permute2f128(s, s, 0x01);
-            vec4 h = shuffle4(s, p, 0b0001);
-            temp0 = blend4(s, h, 0b1000);
-            temp1 = blend4(h, p, 0b1100);
-            temp2 = shuffle4(p, s, 0b0100);
-        }
-        pB += 3;
+        vec4 n = loadu4(B+3*K);
+        const vec4 T = mul4(n, broadcast1(A+K)); // DIV
+        storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
         int I = K + 1;
-        for ( ; I+3 < M; I += 4 )
         {
-            vec4 a0 = broadcast1(A+I  );
-            vec4 a1 = broadcast1(A+I+1);
-            vec4 a2 = broadcast1(A+I+2);
-            vec4 a3 = broadcast1(A+I+3);
-            storeu4(pB  , fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  )));
-            storeu4(pB+4, fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4)));
-            storeu4(pB+8, fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8)));
-            pB += 12;
+            vec4 temp0, temp1, temp2;
+            {
+                /*
+                 Convert temp = { XYZ? }
+                 into temp0 = { XYZX } temp1 = { YZXY } temp2 = { ZXYZ }
+                 */
+                vec4 p = permute2f128(T, T, 0x01);
+                vec4 h = shuffle4(T, p, 0b0001);
+                temp0 = blend4(T, h, 0b1000);
+                temp1 = blend4(h, p, 0b1100);
+                temp2 = shuffle4(p, T, 0b0100);
+            }
+            // this loop could be unrolled further
+            for ( ; I+3 < M; I += 4 )
+            {
+                /*
+                 broadcast values of A:
+                 a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
+                 */
+#if 1
+                vec4 a0 = broadcast1(A+I  );
+                vec4 a1 = broadcast1(A+I+1);
+                vec4 a2 = broadcast1(A+I+2);
+                vec4 a3 = broadcast1(A+I+3);
+#else
+                vec4 a1 = broadcast2(A+I);
+                vec4 a3 = broadcast2(A+I+2);
+                vec4 a0 = unpacklo4(a1, a1);
+                vec4 a2 = unpacklo4(a3, a3);
+                a1 = unpackhi4(a1, a1);
+                a3 = unpackhi4(a3, a3);
+#endif
+                /*
+                 blend broadcasted values of A to generate the required vec4:
+                  { AAAB } { BBCC } { CDDD }
+                 */
+                real * pB = B+3*I;
+                storeu4(pB  , fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  )));
+                storeu4(pB+4, fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4)));
+                storeu4(pB+8, fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8)));
+            }
         }
-        vec4 n = loadu4(pB);
+        // load the next vector, before store4() will change it
+        n = loadu4(B+3*I);
         for ( ; I < M; ++I )
         {
-            vec4 t = fnmadd4(s, broadcast1(A+I), n);
-            n = loadu4(pB+3);
-            storeu4(pB, t);
-            pB += 3;
+            vec4 a = fnmadd4(T, broadcast1(A+I), n);
+            n = loadu4(B+3*I+3);
+            storeu4(B+3*I, a);
         }
         A += lda;
     }
@@ -499,47 +522,65 @@ void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
  */
 void alsatian_xtrsmLLTN_3D(int M, const real* A, int lda, real* B)
 {
-    const vec4 zero = setzero4();
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-#if 0
-        vec4 temp = loadu4(B+3*I);
-        for ( int K = I + 1; K < M; ++K )
-            temp = fnmadd4(broadcast1(A+K), loadu4(B+3*K), temp);
-        store3(B+3*I, mul4(temp, broadcast1(A+I)));
-#else
-        vec4 temp = loadu4(B+3*I);
+        real * pB = B + 3 * I;
+        vec4 temp = loadu4(pB); //(B+3*I);
         vec4 s0 = setzero4();
         vec4 s1 = setzero4();
         vec4 s2 = setzero4();
         // can unroll
+        pB += 3;
         int K = I + 1;
         for ( ; K+3 < M; K += 4 )
         {
+            /*
+             broadcast values of A:
+             a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
+             */
+#if 1
             vec4 a0 = broadcast1(A+K  );
             vec4 a1 = broadcast1(A+K+1);
             vec4 a2 = broadcast1(A+K+2);
             vec4 a3 = broadcast1(A+K+3);
-            s0 = fnmadd4(blend4(a0, a1, 0b1000), loadu4(B+3*K  ), s0);
-            s1 = fnmadd4(blend4(a1, a2, 0b1100), loadu4(B+3*K+4), s1);
-            s2 = fnmadd4(blend4(a2, a3, 0b1110), loadu4(B+3*K+8), s2);
-        }
-        vec4 d = permute2f128(s0, s1, 0x21);
-        d = shuffle4(d, s1, 0b0101);
-        s0 = add4(s0, d);
-        d = blend4(s1, s2, 0b0011);
-        d = permute2f128(d, d, 0b0001);
-        s0 = add4(s0, d);
-        d = permute2f128(s2, s2, 0x01);
-        d = shuffle4(s2, d, 0b0101);
-        s0 = blend4(add4(s0, d), zero, 0b1000);
-        temp = add4(temp, s0);
-        for ( ; K < M; ++K )
-            temp = fnmadd4(broadcast1(A+K), loadu4(B+3*K), temp);
-        store3(B+3*I, mul4(temp, broadcast1(A+I)));
+#else
+            vec4 a1 = broadcast2(A+K);
+            vec4 a3 = broadcast2(A+K+2);
+            vec4 a0 = unpacklo4(a1, a1);
+            vec4 a2 = unpacklo4(a3, a3);
+            a1 = unpackhi4(a1, a1);
+            a3 = unpackhi4(a3, a3);
 #endif
+            /*
+             blend broadcasted values of A to generate the required vec4:
+              { AAAB } { BBCC } { CDDD }
+             */
+            s0 = fnmadd4(blend4(a0, a1, 0b1000), loadu4(pB  ), s0); //(B+3*K  )
+            s1 = fnmadd4(blend4(a1, a2, 0b1100), loadu4(pB+4), s1);
+            s2 = fnmadd4(blend4(a2, a3, 0b1110), loadu4(pB+8), s2);
+            pB += 12;
+        }
+        {
+            /*
+             Sum the X, Y and Z components:
+             from s0 = { XYZX } s1 = { YZXY } s2 = { ZXYZ }
+             into s0 = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
+             */
+            vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
+            vec4 d3 = permute2f128(s1, s2, 0x21);
+            vec4 d2 = shuffle4(s2, s1, 0b0101);
+            vec4 d1 = permute2f128(h, h, 0x01);
+            s0 = add4(add4(s0, d2), add4(d3, d1));
+        }
+        for ( ; K < M; ++K )
+        {
+            s0 = fnmadd4(broadcast1(A+K), loadu4(pB), s0);
+            pB += 3;
+        }
+        s0 = fmadd4(s0, broadcast1(A+I), temp);
+        storeu4(B+3*I, blend4(s0, temp, 0b1000));
     }
 }
 

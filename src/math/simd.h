@@ -220,7 +220,7 @@ inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
 //inline vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
 //#define cat4(h, l)           _mm256_set_m128d(h, l)
 
-#if 1
+#if 0
   inline vec4  load3(double const* a)    { return blend4(cast4(loadu2(a)), broadcast1(a+2), 0b0100); }
   inline void store3(double* a, vec4 b)  { storeu2(a, getlo(b)); store1(a+2, gethi(b)); }
 #else
