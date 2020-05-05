@@ -55,7 +55,6 @@ int LAPACK(gbtf2)(int*, int*, int*, int*, real*, int*, int*, int*);
 int LAPACK(gesv)(int*, int*, real*, int*, int*, real*, int*, int*);
 int LAPACK(getrf)(int*, int*, real*, int*, int*, int*);
 int LAPACK(getf2)(int*, int*, real*, int*, int*, int*);
-int LAPACK(getf2f)(int*, int*, real*, int*, int*, int*);
 int LAPACK(getc2)(int*, real*, int*, int*, int*, int*);
 int LAPACK(getri)(int*, real*, int*, const int*, real*, const int*, int*);
 int LAPACK(getrs)(char*, int*, int*, const real*, int*, const int*, real*, int*, int*);
@@ -206,11 +205,6 @@ inline void xgetrf(int M, int N, real* A, int LDA, int* IPIV, int* INFO)
 inline void xgetf2(int M, int N, real* A, int LDA, int* IPIV, int* INFO)
 {
     LAPACK(getf2)(&M, &N, A, &LDA, IPIV, INFO);
-}
-
-inline void xgetf2f(int M, int N, real* A, int LDA, int* IPIV, int* INFO)
-{
-    LAPACK(getf2f)(&M, &N, A, &LDA, IPIV, INFO);
 }
 
 inline void xgetc2(int N, real* A, int LDA, int* IPIV, int* JPIV, int* INFO)
