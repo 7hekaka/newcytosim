@@ -251,10 +251,9 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real 
  }
 
  */
-template < int ORD >
-void iso_xtrsmLLN(char Diag, int M, const real* A, int lda, real* B)
+template < int ORD, bool nounit >
+void iso_xtrsmLLN(int M, const real* A, int lda, real* B)
 {
-    const bool nounit = ( Diag == 'N' );
     for ( int K = 0; K < M; ++K )
     {
         real temp[ORD];
@@ -296,10 +295,9 @@ void iso_xtrsmLLN(char Diag, int M, const real* A, int lda, real* B)
      B[I] = temp;
  }
 */
-template < int ORD >
-void iso_xtrsmLLT(char Diag, int M, const real* A, int lda, real* B)
+template < int ORD, bool nounit >
+void iso_xtrsmLLT(int M, const real* A, int lda, real* B)
 {
-    const bool nounit = ( Diag == 'N' );
     for ( int I = M-1; I >= 0; --I )
     {
         real temp[ORD];
@@ -338,10 +336,9 @@ void iso_xtrsmLLT(char Diag, int M, const real* A, int lda, real* B)
          B[I] -= temp * A[I+lda*K];
  }
 */
-template < int ORD >
-void iso_xtrsmLUN(char Diag, int M, const real* A, int lda, real* B)
+template < int ORD, bool nounit >
+void iso_xtrsmLUN(int M, const real* A, int lda, real* B)
 {
-    const bool nounit = ( Diag == 'N' );
     for ( int K = M-1; K >= 0; --K )
     {
         if ( B[K] != 0 )
@@ -443,12 +440,15 @@ void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
      A += lda;
  }
  */
-void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
+template < bool nounit >
+void alsatian_xtrsmLLN_3D(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        vec4 n = loadu4(B+3*K);
-        const vec4 T = mul4(n, broadcast1(A+K)); // DIV
+        vec4 T = loadu4(B+3*K);
+        vec4 n = T;
+        if ( nounit )
+            T = mul4(n, broadcast1(A+K)); // DIV
         storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
         int I = K + 1;
         {
@@ -516,19 +516,22 @@ void alsatian_xtrsmLLNN_3D(int M, const real* A, int lda, real* B)
      real temp = B[I];
      for ( int K = I + 1; K < M; ++K )
          temp -= A[K] * B[K];
-     B[I] = temp * A[I]; // DIV
- }
+     if ( nounit )
+         temp *= A[I]; // DIV
+     B[I] = temp;
+}
 
  */
-void alsatian_xtrsmLLTN_3D(int M, const real* A, int lda, real* B)
+template < bool nounit >
+void alsatian_xtrsmLLT_3D(int M, const real* A, int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
         real * pB = B + 3 * I;
-        vec4 temp = loadu4(pB); //(B+3*I);
-        vec4 s0 = setzero4();
+        const vec4 ori = loadu4(pB); //(B+3*I);
+        vec4 s0 = setzero4();  // temp
         vec4 s1 = setzero4();
         vec4 s2 = setzero4();
         // can unroll
@@ -579,8 +582,11 @@ void alsatian_xtrsmLLTN_3D(int M, const real* A, int lda, real* B)
             s0 = fnmadd4(broadcast1(A+K), loadu4(pB), s0);
             pB += 3;
         }
-        s0 = fmadd4(s0, broadcast1(A+I), temp);
-        storeu4(B+3*I, blend4(s0, temp, 0b1000));
+        if ( nounit )
+            s0 = fmadd4(s0, broadcast1(A+I), ori);
+        else
+            s0 = add4(s0, ori);
+        storeu4(B+3*I, blend4(s0, ori, 0b1000));
     }
 }
 
@@ -590,11 +596,14 @@ void alsatian_xtrsmLLTN_3D(int M, const real* A, int lda, real* B)
 #ifdef __SSE3__
 
 /// specialized version for ORD==2
-void alsatian_xtrsmLLNN_2D(int M, const real* A, int lda, real* B)
+template < bool nounit >
+void alsatian_xtrsmLLN_2D(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        vec2 temp = mul2(load2(B+2*K), loaddup2(A+K)); // DIV
+        vec2 temp = load2(B+2*K);
+        if ( nounit )
+            temp = mul2(temp, loaddup2(A+K)); // DIV
         store2(B+2*K, temp);
         for ( int I = K + 1; I < M; ++I )
             store2(B+2*I, fnmadd2(temp, loaddup2(A+I), load2(B+2*I)));
@@ -604,7 +613,8 @@ void alsatian_xtrsmLLNN_2D(int M, const real* A, int lda, real* B)
 
 
 /// specialized version for ORD==2
-void alsatian_xtrsmLLTN_2D(int M, const real* A, int lda, real* B)
+template < bool nounit >
+void alsatian_xtrsmLLT_2D(int M, const real* A, int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
@@ -614,7 +624,8 @@ void alsatian_xtrsmLLTN_2D(int M, const real* A, int lda, real* B)
         // can unroll
         for ( int K = I + 1; K < M; ++K )
             temp = fnmadd2(loaddup2(A+K), load2(B+2*K), temp);
-        temp = mul2(temp, loaddup2(A+I)); // DIV
+        if ( nounit )
+            temp = mul2(temp, loaddup2(A+I)); // DIV
         store2(B+2*I, temp);
     }
 }
@@ -623,11 +634,14 @@ void alsatian_xtrsmLLTN_2D(int M, const real* A, int lda, real* B)
 
 
 /// specialized version for ORD==1
-void alsatian_xtrsmLLNN(int M, const real* A, int lda, real* B)
+template < bool nounit >
+void alsatian_xtrsmLLN_1D(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        real temp = B[K] * A[K]; // DIV
+        real temp = B[K];
+        if ( nounit )
+            B[K] *= A[K]; // DIV
         B[K] = temp;
         for ( int I = K + 1; I < M; ++I )
             B[I] -= temp * A[I];
@@ -637,7 +651,8 @@ void alsatian_xtrsmLLNN(int M, const real* A, int lda, real* B)
 
 
 /// specialized version for ORD==1
-void alsatian_xtrsmLLTN(int M, const real* A, int lda, real* B)
+template < bool nounit >
+void alsatian_xtrsmLLT_1D(int M, const real* A, int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
@@ -646,7 +661,9 @@ void alsatian_xtrsmLLTN(int M, const real* A, int lda, real* B)
         real temp = B[I];
         for ( int K = I + 1; K < M; ++K )
             temp -= A[K] * B[K];
-        B[I] = temp * A[I]; // DIV
+        if ( nounit )
+            temp *= A[I]; // DIV
+        B[I] = temp;
     }
 }
 
@@ -727,9 +744,9 @@ inline void iso_xgetrsL(int N, const real* A, int LDA, const int* IPIV, real* B)
     // Apply row interchanges to the right hand sides.
     iso_xlaswp<ORD>(B, N, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
-    iso_xtrsmLLN<ORD>('U', N, A, LDA, B);
+    iso_xtrsmLLN<ORD, 0>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    iso_xtrsmLUN<ORD>('N', N, A, LDA, B);
+    iso_xtrsmLUN<ORD, 1>(N, A, LDA, B);
 #endif
 }
 
@@ -742,7 +759,7 @@ inline void iso_xpotrsL(int N, const real* A, int LDA, real* B)
      because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
      But calling DTBSV gets the required work done.
      */
-#if 1
+#if 0
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
     {
@@ -760,9 +777,9 @@ inline void iso_xpotrsL(int N, const real* A, int LDA, real* B)
     free_real(tmp);
 #else
     // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLN<ORD>('N', N, A, LDA, B);
+    iso_xtrsmLLN<ORD, 1>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLT<ORD>('N', N, A, LDA, B);
+    iso_xtrsmLLT<ORD, 1>(N, A, LDA, B);
 #endif
 }
 

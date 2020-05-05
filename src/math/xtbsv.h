@@ -222,7 +222,7 @@ void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
 
 /// this version is fast...
 template < int ORD >
-void alsatian_xtbsvLN(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLNN(int N, int KD, const real* A, int lda, real* X)
 {
     int kx = 0;
     int jx = 0;
@@ -252,7 +252,7 @@ void alsatian_xtbsvLN(int N, int KD, const real* A, int lda, real* X)
 }
 
 template < int ORD >
-void alsatian_xtbsvLT(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
 {
     int kx = (N-1) * ORD;
     int jx = kx;
@@ -283,7 +283,7 @@ void alsatian_xtbsvLT(int N, int KD, const real* A, int lda, real* X)
 /*
  */
 template < int ORD >
-void alsatian_xtbsvLN(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLNN(int N, int KD, const real* A, int lda, real* X)
 {
     for ( int j = 0; j < N; ++j )
     {
@@ -305,7 +305,7 @@ void alsatian_xtbsvLN(int N, int KD, const real* A, int lda, real* X)
 }
 
 template < int ORD >
-void alsatian_xtbsvLT(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
 {
     for ( int j = N-1; j >= 0; --j )
     {
@@ -332,7 +332,7 @@ void alsatian_xtbsvLT(int N, int KD, const real* A, int lda, real* X)
 #ifdef __AVX__
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN_3D(int N, const real* pA, int lda, real* pX)
 {
     const real * end = pA + (N-2) * lda;
     constexpr int ORD = 3;
@@ -366,7 +366,7 @@ void alsatian_xtbsvLN_3D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN_3D(int N, const real* pA, int lda, real* pX)
 {
     const real* end = pA;
     constexpr int ORD = 3;
@@ -410,7 +410,7 @@ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 }
 
 /*
- void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
+ void alsatian_xtbsvLTN_3D(int N, const real* pA, int lda, real* pX)
  {
      pX += ( N - 1 ) * 3;
      pA += ( N - 1 ) * lda;
@@ -446,7 +446,7 @@ void alsatian_xtbsvLT_3D(int N, const real* pA, int lda, real* pX)
 #ifdef __SSE3__
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
     vec2 a1 = load2(pX);     //may load garbage if N == 0
@@ -479,7 +479,7 @@ void alsatian_xtbsvLN_2D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN_2D(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
     pX += ( N - 1 ) * ORD;
@@ -517,7 +517,7 @@ void alsatian_xtbsvLT_2D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLN(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN_1D(int N, const real* pA, int lda, real* pX)
 {
     real a1 = pX[0]; //may load garbage
     real a2 = pX[1]; //may load garbage
@@ -549,7 +549,7 @@ void alsatian_xtbsvLN(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLT(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN_1D(int N, const real* pA, int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
@@ -646,13 +646,13 @@ inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, 
     if ( UPLO == 'U' )
     {
         ABORT_NOW("unfinished alsatian_xpbtrs('U', ...)");
-        //alsatian_xtbsvUT<ORD>(N, KD, AB, LDAB, B);
-        //alsatian_xtbsvUN<ORD>(N, KD, AB, LDAB, B);
+        //alsatian_xtbsvUTN<ORD>(N, KD, AB, LDAB, B);
+        //alsatian_xtbsvUNN<ORD>(N, KD, AB, LDAB, B);
     }
     else if ( UPLO == 'L' )
     {
-        alsatian_xtbsvLN<ORD>(N, KD, AB, LDAB, B);
-        alsatian_xtbsvLT<ORD>(N, KD, AB, LDAB, B);
+        alsatian_xtbsvLNN<ORD>(N, KD, AB, LDAB, B);
+        alsatian_xtbsvLTN<ORD>(N, KD, AB, LDAB, B);
     }
     else
         *INFO = 1;

@@ -330,7 +330,7 @@ void Simul::solve_auto()
     sMeca.apply();
 
     // Automatic selection of preconditionning method:
-    constexpr size_t N_TEST = 5*3;
+    constexpr size_t N_TEST = 5*4;
     constexpr size_t PERIOD = 64;
     
     //automatically select the preconditionning mode:

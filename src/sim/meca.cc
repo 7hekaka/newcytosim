@@ -236,14 +236,14 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
 #  if ( DIM == 3 )
-    alsatian_xtbsvLN_3D(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLT_3D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLNN_3D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLTN_3D(nbp, mec->block(), BAND_LDD, Y);
 #  elif ( DIM == 2 )
-    alsatian_xtbsvLN_2D(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLT_2D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLNN_2D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLTN_2D(nbp, mec->block(), BAND_LDD, Y);
 #  elif ( DIM == 1 )
-    alsatian_xtbsvLN(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLT(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLNN_1D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLTN_1D(nbp, mec->block(), BAND_LDD, Y);
 #  endif
 #else
     /*
@@ -278,19 +278,19 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
 #endif
 #if CHOUCROUTE
 #  if ( DIM == 3 )
-    alsatian_xtrsmLLNN_3D(nbp, mec->block(), nbp, Y);
-    alsatian_xtrsmLLTN_3D(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLN_3D<1>(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLT_3D<1>(nbp, mec->block(), nbp, Y);
 #  elif ( DIM == 2 )
-    alsatian_xtrsmLLNN_2D(nbp, mec->block(), nbp, Y);
-    alsatian_xtrsmLLTN_2D(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLN_2D<1>(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLT_2D<1>(nbp, mec->block(), nbp, Y);
 #  elif ( DIM == 1 )
-    alsatian_xtrsmLLNN_1D(nbp, mec->block(), nbp, Y);
-    alsatian_xtrsmLLTN_1D(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLN_1D<1>(nbp, mec->block(), nbp, Y);
+    alsatian_xtrsmLLT_1D<1>(nbp, mec->block(), nbp, Y);
 #  endif
 #else
     //iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
-    iso_xtrsmLLN<DIM>('N', nbp, mec->block(), nbp, Y);
-    iso_xtrsmLLT<DIM>('N', nbp, mec->block(), nbp, Y);
+    iso_xtrsmLLN<DIM, 1>(nbp, mec->block(), nbp, Y);
+    iso_xtrsmLLT<DIM, 1>(nbp, mec->block(), nbp, Y);
 #endif
     //std::clog << "\nL"; VecPrint::print(std::clog, S, Y, 3, 100.0);
 }
