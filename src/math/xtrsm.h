@@ -45,7 +45,7 @@
 CONTINUE
 */
 template < char diag >
-void blas_xtrsmLLN(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void blas_xtrsmLLN(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
 {
     if ( ALPHA == 0.0 )
     {
@@ -91,7 +91,7 @@ void blas_xtrsmLLN(int M, int N, real ALPHA, const real* A, int lda, real* B, in
  CONTINUE
 */
 template < char diag >
-void blas_xtrsmLLT(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void blas_xtrsmLLT(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
 {
     if ( ALPHA == 0.0 )
     {
@@ -135,7 +135,7 @@ void blas_xtrsmLLT(int M, int N, real ALPHA, const real* A, int lda, real* B, in
  CONTINUE
 */
 template < char diag >
-void blas_xtrsmLUN(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void blas_xtrsmLUN(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
 {
     if ( ALPHA == 0.0 )
     {
@@ -180,7 +180,7 @@ void blas_xtrsmLUN(int M, int N, real ALPHA, const real* A, int lda, real* B, in
  CONTINUE
 */
 template < char diag >
-void blas_xtrsmLUT(int M, int N, real ALPHA, const real* A, int lda, real* B, int ldb)
+void blas_xtrsmLUT(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
 {
     if ( ALPHA == 0.0 )
     {
@@ -205,7 +205,7 @@ void blas_xtrsmLUT(int M, int N, real ALPHA, const real* A, int lda, real* B, in
 /**
  Patch to BLAS' DTRSM
  */
-void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real ALPHA, const real* A, int LDA, real* B, int LDB)
+void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, const int N, real ALPHA, const real* A, int LDA, real* B, int LDB)
 {
     if ( Side == 'L' )
     {
@@ -266,7 +266,7 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real 
 
  */
 template < int ORD, char diag >
-void iso_xtrsmLLN(int M, const real* A, int lda, real* B)
+void iso_xtrsmLLN(const int M, const real* A, const int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
@@ -307,7 +307,7 @@ void iso_xtrsmLLN(int M, const real* A, int lda, real* B)
  }
 */
 template < int ORD, char diag >
-void iso_xtrsmLLT(int M, const real* A, int lda, real* B)
+void iso_xtrsmLLT(const int M, const real* A, const int lda, real* B)
 {
     for ( int I = M-1; I >= 0; --I )
     {
@@ -345,7 +345,7 @@ void iso_xtrsmLLT(int M, const real* A, int lda, real* B)
  }
 */
 template < int ORD, char diag >
-void iso_xtrsmLUN(int M, const real* A, int lda, real* B)
+void iso_xtrsmLUN(const int M, const real* A, const int lda, real* B)
 {
     for ( int K = M-1; K >= 0; --K )
     {
@@ -392,7 +392,7 @@ void iso_xtrsmLUN(int M, const real* A, int lda, real* B)
  }
 */
 template < int ORD, char diag >
-void iso_xtrsmLUT(int M, const real* A, int lda, real* B)
+void iso_xtrsmLUT(const int M, const real* A, const int lda, real* B)
 {
     for ( int I = 0; I < M; ++I )
     {
@@ -432,20 +432,22 @@ void iso_xtrsmLUT(int M, const real* A, int lda, real* B)
  }
  */
 template < char diag >
-void alsatian_xtrsmLLN3(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
         vec4 T = loadu4(B+3*K);
-        vec4 n = T;
         if ( diag == 'N' ) {
-            T = div4(n, broadcast1(A+K));
+            vec4 n = T;
+            T = div4(T, broadcast1(A+K));
             storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
         } else if ( diag == 'A' ) {
-            T = mul4(n, broadcast1(A+K)); // DIV
+            vec4 n = T;
+            T = mul4(T, broadcast1(A+K)); // DIV
             storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
         }
         int I = K + 1;
+        real* pB = B+3*I;
         {
             vec4 temp0, temp1, temp2;
             {
@@ -461,32 +463,45 @@ void alsatian_xtrsmLLN3(int M, const real* A, int lda, real* B)
             }
 #if 0
             // this unrolling may not work so well
-            for ( ; I+7 < M; I += 8 )
+            for ( ; I < M-7; I += 8 )
             {
-                /*
-                 broadcast values of A:
-                 a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
-                 */
-                vec4 a0 = broadcast1(A+I  );
-                vec4 a1 = broadcast1(A+I+1);
-                vec4 a2 = broadcast1(A+I+2);
-                vec4 a3 = broadcast1(A+I+3);
-                vec4 a4 = broadcast1(A+I+4);
-                vec4 a5 = broadcast1(A+I+5);
-                vec4 a6 = broadcast1(A+I+6);
-                vec4 a7 = broadcast1(A+I+7);
-                /*
-                 blend broadcasted values of A to generate the required vec4:
-                  { AAAB } { BBCC } { CDDD }
-                 */
-                real * pB = B+3*I;
-                storeu4(pB  , fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  )));
-                storeu4(pB+4, fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4)));
-                storeu4(pB+8, fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8)));
-
-                storeu4(pB+12, fnmadd4(blend4(a4, a5, 0b1000), temp0, loadu4(pB+12)));
-                storeu4(pB+16, fnmadd4(blend4(a5, a6, 0b1100), temp1, loadu4(pB+16)));
-                storeu4(pB+24, fnmadd4(blend4(a6, a7, 0b1110), temp2, loadu4(pB+24)));
+                real const* pA = A + I;
+#if 1
+                vec4 a0 = broadcast1(pA  );
+                vec4 a1 = broadcast1(pA+1);
+                vec4 a2 = broadcast1(pA+2);
+                vec4 a3 = broadcast1(pA+3);
+                vec4 a4 = broadcast1(pA+4);
+                vec4 a5 = broadcast1(pA+5);
+                vec4 a6 = broadcast1(pA+6);
+                vec4 a7 = broadcast1(pA+7);
+#else
+                vec4 a1 = broadcast2(pA);
+                vec4 a3 = broadcast2(pA+2);
+                vec4 a0 = unpacklo4(a1, a1);
+                vec4 a2 = unpacklo4(a3, a3);
+                a1 = unpackhi4(a1, a1);
+                a3 = unpackhi4(a3, a3);
+                vec4 a5 = broadcast2(pA+4);
+                vec4 a7 = broadcast2(pA+6);
+                vec4 a4 = unpacklo4(a5, a5);
+                vec4 a6 = unpacklo4(a7, a7);
+                a5 = unpackhi4(a5, a5);
+                a7 = unpackhi4(a7, a7);
+#endif
+                vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
+                vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
+                vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
+                vec4 t3 = fnmadd4(blend4(a4, a5, 0b1000), temp0, loadu4(pB+12));
+                vec4 t4 = fnmadd4(blend4(a5, a6, 0b1100), temp1, loadu4(pB+16));
+                vec4 t5 = fnmadd4(blend4(a6, a7, 0b1110), temp2, loadu4(pB+20));
+                storeu4(pB  , t0);
+                storeu4(pB+4, t1);
+                storeu4(pB+8, t2);
+                storeu4(pB+12, t3);
+                storeu4(pB+16, t4);
+                storeu4(pB+20, t5);
+                pB += 24;
             }
 #endif
             for ( ; I+3 < M; I += 4 )
@@ -512,26 +527,30 @@ void alsatian_xtrsmLLN3(int M, const real* A, int lda, real* B)
                  blend broadcasted values of A to generate the required vec4:
                  { AAAB } { BBCC } { CDDD }
                  */
-                real * pB = B+3*I;
                 vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
                 vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
                 vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
                 storeu4(pB  , t0);
                 storeu4(pB+4, t1);
                 storeu4(pB+8, t2);
+                pB += 12;
             }
         }
         if ( I < M )
         {
             // load the next vector, before store4() will change it
-            n = loadu4(B+3*I);
+            vec4 n = loadu4(pB);
+            #pragma nounroll
             for ( ; I < M-1; ++I )
             {
                 vec4 a = fnmadd4(T, broadcast1(A+I), n);
                 n = loadu4(B+3*I+3);
                 storeu4(B+3*I, a);
+                pB += 3;
             }
-            storeu4(B+3*I, fnmadd4(T, broadcast1(A+I), n));
+            storeu4(pB, fnmadd4(T, broadcast1(A+I), n));
+            assert_true(I==M);
+            assert_true(pB==B+3*I);
         }
         A += lda;
     }
@@ -554,7 +573,7 @@ void alsatian_xtrsmLLN3(int M, const real* A, int lda, real* B)
 
  */
 template < char diag >
-void alsatian_xtrsmLLT3(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLLT3(const int M, const real* A, const int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
@@ -565,10 +584,53 @@ void alsatian_xtrsmLLT3(int M, const real* A, int lda, real* B)
         vec4 s0 = setzero4();  // temp
         vec4 s1 = setzero4();
         vec4 s2 = setzero4();
-        // can unroll
         pB += 3;
         int K = I + 1;
-        for ( ; K+3 < M; K += 4 )
+#if ( 0 )
+        for ( ; K < M-7; K += 8 )
+        {
+            const real* pA = A + K;
+            /*
+             broadcast values of A:
+             a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
+             */
+#if 1
+            vec4 a0 = broadcast1(pA  );
+            vec4 a1 = broadcast1(pA+1);
+            vec4 a2 = broadcast1(pA+2);
+            vec4 a3 = broadcast1(pA+3);
+            vec4 a4 = broadcast1(pA+4);
+            vec4 a5 = broadcast1(pA+5);
+            vec4 a6 = broadcast1(pA+6);
+            vec4 a7 = broadcast1(pA+7);
+#else
+            vec4 a1 = broadcast2(pA);
+            vec4 a3 = broadcast2(pA+2);
+            vec4 a0 = unpacklo4(a1, a1);
+            vec4 a2 = unpacklo4(a3, a3);
+            a1 = unpackhi4(a1, a1);
+            a3 = unpackhi4(a3, a3);
+            vec4 a5 = broadcast2(pA+4);
+            vec4 a7 = broadcast2(pA+6);
+            vec4 a4 = unpacklo4(a5, a5);
+            vec4 a6 = unpacklo4(a7, a7);
+            a5 = unpackhi4(a5, a5);
+            a7 = unpackhi4(a7, a7);
+#endif
+            /*
+             blend broadcasted values of A to generate the required vec4:
+             { AAAB } { BBCC } { CDDD }
+             */
+            s0 = fnmadd4(blend4(a0, a1, 0b1000), loadu4(pB  ), s0);
+            s1 = fnmadd4(blend4(a1, a2, 0b1100), loadu4(pB+4), s1);
+            s2 = fnmadd4(blend4(a2, a3, 0b1110), loadu4(pB+8), s2);
+            s0 = fnmadd4(blend4(a4, a5, 0b1000), loadu4(pB+12), s0);
+            s1 = fnmadd4(blend4(a5, a6, 0b1100), loadu4(pB+16), s1);
+            s2 = fnmadd4(blend4(a6, a7, 0b1110), loadu4(pB+20), s2);
+            pB += 24;
+        }
+#endif
+        for ( ; K < M-3; K += 4 )
         {
             /*
              broadcast values of A:
@@ -608,6 +670,7 @@ void alsatian_xtrsmLLT3(int M, const real* A, int lda, real* B)
             vec4 d1 = permute2f128(h, h, 0x01);
             s0 = add4(add4(s0, d2), add4(d3, d1));
         }
+        #pragma nounroll
         for ( ; K < M; ++K )
         {
             s0 = fnmadd4(broadcast1(A+K), loadu4(pB), s0);
@@ -639,7 +702,7 @@ void alsatian_xtrsmLLT3(int M, const real* A, int lda, real* B)
  }
  */
 template < char diag >
-void alsatian_xtrsmLUN3(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
 {
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
@@ -655,7 +718,8 @@ void alsatian_xtrsmLUN3(int M, const real* A, int lda, real* B)
             ori = blend4(T, ori, 0b1000);
         }
         int I = 0;
-        if ( 1 ) {
+        real * pB = B;
+        {
             vec4 temp0, temp1, temp2;
             {
                 /*
@@ -691,19 +755,20 @@ void alsatian_xtrsmLUN3(int M, const real* A, int lda, real* B)
                  blend broadcasted values of A to generate the required vec4:
                  { AAAB } { BBCC } { CDDD }
                  */
-                real * pB = B+3*I;
                 vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
                 vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
                 vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
                 storeu4(pB  , t0);
                 storeu4(pB+4, t1);
                 storeu4(pB+8, t2);
+                pB += 12;
             }
         }
         if ( I < K )
         {
             // load the next vector, before store4() will change it
             vec4 n = loadu4(B+3*I);
+            #pragma nounroll
             for ( ; I < K-1; ++I )
             {
                 vec4 a = fnmadd4(T, broadcast1(A+I), n);
@@ -726,7 +791,7 @@ void alsatian_xtrsmLUN3(int M, const real* A, int lda, real* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLLN2(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLLN2(const int M, const real* A, const int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
@@ -748,7 +813,7 @@ void alsatian_xtrsmLLN2(int M, const real* A, int lda, real* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLLT2(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLLT2(const int M, const real* A, const int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
@@ -769,7 +834,7 @@ void alsatian_xtrsmLLT2(int M, const real* A, int lda, real* B)
 
 /// specialized version for ORD==1
 template < char diag >
-void alsatian_xtrsmLUN2(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLUN2(const int M, const real* A, const int lda, real* B)
 {
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
@@ -793,7 +858,7 @@ void alsatian_xtrsmLUN2(int M, const real* A, int lda, real* B)
 
 /// specialized version for ORD==1
 template < char diag >
-void alsatian_xtrsmLLN1(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLLN1(const int M, const real* A, const int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
@@ -805,6 +870,7 @@ void alsatian_xtrsmLLN1(int M, const real* A, int lda, real* B)
             temp *= A[K]; // DIV
             B[K] = temp;
         }
+        # pragma ivdep
         for ( int I = K + 1; I < M; ++I )
             B[I] -= temp * A[I];
         A += lda;
@@ -814,13 +880,14 @@ void alsatian_xtrsmLLN1(int M, const real* A, int lda, real* B)
 
 /// specialized version for ORD==1
 template < char diag >
-void alsatian_xtrsmLLT1(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLLT1(const int M, const real* A, const int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
         real temp = B[I];
+        # pragma ivdep
         for ( int K = I + 1; K < M; ++K )
             temp -= A[K] * B[K];
         if ( diag == 'N' )
@@ -834,7 +901,7 @@ void alsatian_xtrsmLLT1(int M, const real* A, int lda, real* B)
 
 /// specialized version for ORD==1
 template < char diag >
-void alsatian_xtrsmLUN1(int M, const real* A, int lda, real* B)
+void alsatian_xtrsmLUN1(const int M, const real* A, const int lda, real* B)
 {
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
@@ -848,6 +915,7 @@ void alsatian_xtrsmLUN1(int M, const real* A, int lda, real* B)
             temp *= A[K]; // DIV
             B[K] = temp;
         }
+        # pragma ivdep
         for ( int I = 0; I < K; ++I )
             B[I] -= temp * A[I];
     }
@@ -856,7 +924,7 @@ void alsatian_xtrsmLUN1(int M, const real* A, int lda, real* B)
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for Positive Symmetric Matrices
 
-inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
+inline void lapack_xpotrs(char UPLO, const int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
@@ -1045,7 +1113,7 @@ void iso_xlaswp(real* A, int K1, int K2, const int* IPIV, int INCX)
 }
 
 
-inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
+inline void lapack_xgetrs(char TRANS, const int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
     if ( TRANS == 'N' )
