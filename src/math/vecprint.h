@@ -42,11 +42,11 @@ namespace VecPrint
         else
         {
             char str[32], fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+3, digits);
             for ( size_t i = 0; i < m; ++i )
             {
                 snprintf(str, sizeof(str), fmt, alpha*vec[i]);
-                if ( i % 4 )
+                if ( i % 3 )
                     os << str;
                 else
                     os << "  " << str;

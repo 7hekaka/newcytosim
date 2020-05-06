@@ -17,8 +17,9 @@
 void help(std::ostream& os)
 {
     os << "sim [OPTIONS] [FILE]\n";
-    os << "  FILE    run specified config file (FILE must end with `.cym')\n";
-    os << "  *       print messages to terminal (and not `messages.cmo')\n";
+    os << "  FILE    if FILE ends with `.cym', run specified config file\n";
+    os << "  +       redirect outputs to terminal instead of `messages.cmo'\n";
+    os << "  -       suppress output\n";
     os << "  info    print build options\n";
     os << "  help    print this message\n";
 }

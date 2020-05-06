@@ -331,8 +331,8 @@ void Simul::solve_auto()
     sMeca.apply();
 
     // Automatic selection of preconditionning method:
-    constexpr size_t N_TEST = 5*4;
-    constexpr size_t PERIOD = 64;
+    constexpr size_t N_TEST = 5*8;
+    constexpr size_t PERIOD = 128;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
@@ -357,13 +357,16 @@ void Simul::solve_auto()
             }
             if ( prop->verbose )
             {
-                std::ostream& os = std::clog;
-                os << " precond 0 cnt " << std::setw(6) << autoCNT[0] << " cpu " << autoCPU[0] << "\n";
-                os << "         1 cnt " << std::setw(6) << autoCNT[1] << " cpu " << autoCPU[1] << "\n";
-                os << "         2 cnt " << std::setw(6) << autoCNT[2] << " cpu " << autoCPU[2] << "\n";
-                os << "         3 cnt " << std::setw(6) << autoCNT[3] << " cpu " << autoCPU[3] << "\n";
-                os << "         4 cnt " << std::setw(6) << autoCNT[4] << " cpu " << autoCPU[4];
-                os << " -----> " << autoPrecond << std::endl;
+                std::stringstream os;
+                os << " precond selection | method cnt cpu ";
+                for ( size_t u = 0; u < 5; ++u )
+                {
+                    os << " | " << u << " " << std::setw(6) << autoCNT[u];
+                    os << " " << std::setw(6) << autoCPU[u];
+                }
+                os << " |  -----> " << autoPrecond;
+                //Cytosim::log << os.str() << std::endl;
+                std::clog << os.str() << std::endl;
             }
             for ( size_t u = 0; u < 6; ++u )
             {

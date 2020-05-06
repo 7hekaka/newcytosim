@@ -251,22 +251,19 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real 
  }
 
  */
-template < int ORD, bool nounit >
+template < int ORD, char diag >
 void iso_xtrsmLLN(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
         real temp[ORD];
-        if (nounit)
-        {
+        if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
             {
                 temp[d] = B[ORD*K+d] / A[K+lda*K];
                 B[ORD*K+d] = temp[d];
             }
-        }
-        else
-        {
+        } else {
             for ( int d = 0; d < ORD; ++d )
                 temp[d] = B[ORD*K+d];
         }
@@ -287,7 +284,7 @@ void iso_xtrsmLLN(int M, const real* A, int lda, real* B)
  
  for ( int I = M-1; I >= 0; --I )
  {
-     real temp = ALPHA * B[I];
+     real temp = B[I];
      for ( int K = I + 1; K < M; ++K )
          temp -= A[K+lda*I] * B[K];
      if (nounit)
@@ -295,7 +292,7 @@ void iso_xtrsmLLN(int M, const real* A, int lda, real* B)
      B[I] = temp;
  }
 */
-template < int ORD, bool nounit >
+template < int ORD, char diag >
 void iso_xtrsmLLT(int M, const real* A, int lda, real* B)
 {
     for ( int I = M-1; I >= 0; --I )
@@ -308,13 +305,10 @@ void iso_xtrsmLLT(int M, const real* A, int lda, real* B)
             for ( int d = 0; d < ORD; ++d )
                 temp[d] -= A[K+lda*I] * B[ORD*K+d];
         }
-        if (nounit)
-        {
+        if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
                 B[ORD*I+d] = temp[d] / A[I+lda*I];
-        }
-        else
-        {
+        } else {
             for ( int d = 0; d < ORD; ++d )
                 B[ORD*I+d] = temp[d];
         }
@@ -336,7 +330,7 @@ void iso_xtrsmLLT(int M, const real* A, int lda, real* B)
          B[I] -= temp * A[I+lda*K];
  }
 */
-template < int ORD, bool nounit >
+template < int ORD, char diag >
 void iso_xtrsmLUN(int M, const real* A, int lda, real* B)
 {
     for ( int K = M-1; K >= 0; --K )
@@ -344,16 +338,19 @@ void iso_xtrsmLUN(int M, const real* A, int lda, real* B)
         if ( B[K] != 0 )
         {
             real temp[ORD];
-            if (nounit)
-            {
+            if ( diag == 'N' ) {
                 for ( int d = 0; d < ORD; ++d )
                 {
                     temp[d] = B[ORD*K+d] / A[K+lda*K];
                     B[ORD*K+d] = temp[d];
                 }
-            }
-            else
-            {
+            } else if ( diag == 'A' ) {
+                for ( int d = 0; d < ORD; ++d )
+                {
+                    temp[d] = B[ORD*K+d] * A[K+lda*K];
+                    B[ORD*K+d] = temp[d];
+                }
+            } else {
                 for ( int d = 0; d < ORD; ++d )
                     temp[d] = B[ORD*K+d];
             }
@@ -366,70 +363,50 @@ void iso_xtrsmLUN(int M, const real* A, int lda, real* B)
     }
 }
 
-//------------------------------------------------------------------------------
-#pragma mark - DLASWP for interleaved vector
-
-/*
- DLASWP performs a series of row interchanges on the matrix A.
- INCX = 1
-
- IF( INCX.GT.0 ) THEN
-     IX0 = K1
-     I1 = K1
-     I2 = K2
-     INC = 1
-  ELSE IF( INCX.LT.0 ) THEN
-     IX0 = K1 + ( K1-K2 )*INCX
-     I1 = K2
-     I2 = K1
-     INC = -1
-  ELSE
-     RETURN
-  END IF
-
-   IX = IX0
-   DO I = I1, I2, INC
-      IP = IPIV( IX )
-      IF( IP.NE.I ) THEN
-         DO K = 1, N
-            TEMP = A( I, K )
-            A( I, K ) = A( IP, K )
-            A( IP, K ) = TEMP
-         CONTINUE
-      END IF
-      IX = IX + INCX
-   CONTINUE
- */
-template < int ORD >
-void iso_xlaswp(real* A, int N, int K1, int K2, const int* IPIV, int INC)
-{
-    for ( int d = 0; d < ORD; ++d )
-        lapack::xlaswp(1, A+d, N, K1, K2, IPIV, INC);
-    ABORT_NOW("unfinished 'iso_xlaswp' code");
-}
-
-//------------------------------------------------------------------------------
-#pragma mark - DIMENSION-SPECIFIC ALSATIAN DTRSM
-
 /**
- This calls the standard lapack::xpotf2()
- and then inverts the diagonal terms
+ Solve transposed(A)*X = alpha*B, overwriting B with X.
+ DTRSM('L', 'U', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
+
+ for ( int I = 0; I < M; ++I )
+ {
+     real temp = B[I];
+     for ( int K = 0; K < I; ++K )
+         temp -= A[K+lda*I] * B[K];
+     if (nounit)
+         temp /= A[I+lda*I];
+     B[I] = temp;
+ }
 */
-void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
+template < int ORD, char diag >
+void iso_xtrsmLUT(int M, const real* A, int lda, real* B)
 {
-    lapack::xpotf2('L', N, A, LDA, INFO);
-    if ( 0 == *INFO )
+    for ( int I = 0; I < M; ++I )
     {
-        const int S = LDA+1;
-        for ( int u = 0; u < N; ++u )
-            A[S*u] = 1.0 / A[S*u];
+        real temp[ORD];
+        for ( int d = 0; d < ORD; ++d )
+            temp[d] = B[I];
+        for ( int K = 0; K < I; ++K )
+        {
+            for ( int d = 0; d < ORD; ++d )
+                temp[d] -= A[K+lda*I] * B[ORD*K+d];
+        }
+        if ( diag == 'N' ) {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] = temp[d] / A[I+lda*I];
+        } else {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] = temp[d];
+        }
     }
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - DIMENSION-SPECIFIC ALSATIAN DTRSM
+
 #ifdef __AVX__
 
-/// specialized version for ORD==3
+/// specialized version for ORD==3, FJN 4.5.2020
 /*
  for ( int K = 0; K < M; ++K )
  {
@@ -440,16 +417,20 @@ void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
      A += lda;
  }
  */
-template < bool nounit >
-void alsatian_xtrsmLLN_3D(int M, const real* A, int lda, real* B)
+template < char diag >
+void alsatian_xtrsmLLN3(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
         vec4 T = loadu4(B+3*K);
         vec4 n = T;
-        if ( nounit )
+        if ( diag == 'N' ) {
+            T = div4(n, broadcast1(A+K));
+            storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
+        } else if ( diag == 'A' ) {
             T = mul4(n, broadcast1(A+K)); // DIV
-        storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
+            storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
+        }
         int I = K + 1;
         {
             vec4 temp0, temp1, temp2;
@@ -464,7 +445,36 @@ void alsatian_xtrsmLLN_3D(int M, const real* A, int lda, real* B)
                 temp1 = blend4(h, p, 0b1100);
                 temp2 = shuffle4(p, T, 0b0100);
             }
-            // this loop could be unrolled further
+#if 0
+            // this unrolling may not work so well
+            for ( ; I+7 < M; I += 8 )
+            {
+                /*
+                 broadcast values of A:
+                 a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
+                 */
+                vec4 a0 = broadcast1(A+I  );
+                vec4 a1 = broadcast1(A+I+1);
+                vec4 a2 = broadcast1(A+I+2);
+                vec4 a3 = broadcast1(A+I+3);
+                vec4 a4 = broadcast1(A+I+4);
+                vec4 a5 = broadcast1(A+I+5);
+                vec4 a6 = broadcast1(A+I+6);
+                vec4 a7 = broadcast1(A+I+7);
+                /*
+                 blend broadcasted values of A to generate the required vec4:
+                  { AAAB } { BBCC } { CDDD }
+                 */
+                real * pB = B+3*I;
+                storeu4(pB  , fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  )));
+                storeu4(pB+4, fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4)));
+                storeu4(pB+8, fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8)));
+
+                storeu4(pB+12, fnmadd4(blend4(a4, a5, 0b1000), temp0, loadu4(pB+12)));
+                storeu4(pB+16, fnmadd4(blend4(a5, a6, 0b1100), temp1, loadu4(pB+16)));
+                storeu4(pB+24, fnmadd4(blend4(a6, a7, 0b1110), temp2, loadu4(pB+24)));
+            }
+#endif
             for ( ; I+3 < M; I += 4 )
             {
                 /*
@@ -486,28 +496,35 @@ void alsatian_xtrsmLLN_3D(int M, const real* A, int lda, real* B)
 #endif
                 /*
                  blend broadcasted values of A to generate the required vec4:
-                  { AAAB } { BBCC } { CDDD }
+                 { AAAB } { BBCC } { CDDD }
                  */
                 real * pB = B+3*I;
-                storeu4(pB  , fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  )));
-                storeu4(pB+4, fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4)));
-                storeu4(pB+8, fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8)));
+                vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
+                vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
+                vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
+                storeu4(pB  , t0);
+                storeu4(pB+4, t1);
+                storeu4(pB+8, t2);
             }
         }
-        // load the next vector, before store4() will change it
-        n = loadu4(B+3*I);
-        for ( ; I < M; ++I )
+        if ( I < M )
         {
-            vec4 a = fnmadd4(T, broadcast1(A+I), n);
-            n = loadu4(B+3*I+3);
-            storeu4(B+3*I, a);
+            // load the next vector, before store4() will change it
+            n = loadu4(B+3*I);
+            for ( ; I < M-1; ++I )
+            {
+                vec4 a = fnmadd4(T, broadcast1(A+I), n);
+                n = loadu4(B+3*I+3);
+                storeu4(B+3*I, a);
+            }
+            storeu4(B+3*I, fnmadd4(T, broadcast1(A+I), n));
         }
         A += lda;
     }
 }
 
 
-/// specialized version for ORD==3
+/// specialized version for ORD==3, FJN 4.5.2020
 /*
  A += M * lda;
  for ( int I = M-1; I >= 0; --I )
@@ -522,14 +539,14 @@ void alsatian_xtrsmLLN_3D(int M, const real* A, int lda, real* B)
 }
 
  */
-template < bool nounit >
-void alsatian_xtrsmLLT_3D(int M, const real* A, int lda, real* B)
+template < char diag >
+void alsatian_xtrsmLLT3(int M, const real* A, int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-        real * pB = B + 3 * I;
+        real * pB = B+3*I;
         const vec4 ori = loadu4(pB); //(B+3*I);
         vec4 s0 = setzero4();  // temp
         vec4 s1 = setzero4();
@@ -582,7 +599,9 @@ void alsatian_xtrsmLLT_3D(int M, const real* A, int lda, real* B)
             s0 = fnmadd4(broadcast1(A+K), loadu4(pB), s0);
             pB += 3;
         }
-        if ( nounit )
+        if ( diag == 'N' )
+            s0 = sub4(div4(s0, broadcast1(A+I)), ori);
+        else if ( diag == 'A' )
             s0 = fmadd4(s0, broadcast1(A+I), ori);
         else
             s0 = add4(s0, ori);
@@ -590,21 +609,122 @@ void alsatian_xtrsmLLT_3D(int M, const real* A, int lda, real* B)
     }
 }
 
+
+
+/// specialized version for ORD==3, FJN 4.5.2020
+/*
+ A += M * lda;
+ for ( int K = M-1; K >= 0; --K )
+ {
+     A -= lda;
+     if (nounit)
+         B[K] /= A[K];
+     real temp = B[K];
+     for ( int I = 0; I < K; ++I )
+         B[I] -= temp * A[I];
+ }
+ */
+template < char diag >
+void alsatian_xtrsmLUN3(int M, const real* A, int lda, real* B)
+{
+    A += M * lda;
+    for ( int K = M-1; K >= 0; --K )
+    {
+        A -= lda;
+        vec4 T = loadu4(B+3*K);
+        vec4 ori = T;
+        if ( diag == 'N' ) {
+            T = div4(ori, broadcast1(A+K));
+            ori = blend4(T, ori, 0b1000);  // blend to keep 4th value!
+        } else if ( diag == 'A' ) {
+            T = mul4(ori, broadcast1(A+K)); // DIV
+            ori = blend4(T, ori, 0b1000);
+        }
+        int I = 0;
+        if ( 1 ) {
+            vec4 temp0, temp1, temp2;
+            {
+                /*
+                 Convert temp = { XYZ? }
+                 into temp0 = { XYZX } temp1 = { YZXY } temp2 = { ZXYZ }
+                 */
+                vec4 p = permute2f128(T, T, 0x01);
+                vec4 h = shuffle4(T, p, 0b0001);
+                temp0 = blend4(T, h, 0b1000);
+                temp1 = blend4(h, p, 0b1100);
+                temp2 = shuffle4(p, T, 0b0100);
+            }
+            for ( ; I+3 < K; I += 4 )
+            {
+                /*
+                 broadcast values of A:
+                 a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
+                 */
+#if 1
+                vec4 a0 = broadcast1(A+I  );
+                vec4 a1 = broadcast1(A+I+1);
+                vec4 a2 = broadcast1(A+I+2);
+                vec4 a3 = broadcast1(A+I+3);
+#else
+                vec4 a1 = broadcast2(A+I);
+                vec4 a3 = broadcast2(A+I+2);
+                vec4 a0 = unpacklo4(a1, a1);
+                vec4 a2 = unpacklo4(a3, a3);
+                a1 = unpackhi4(a1, a1);
+                a3 = unpackhi4(a3, a3);
+#endif
+                /*
+                 blend broadcasted values of A to generate the required vec4:
+                 { AAAB } { BBCC } { CDDD }
+                 */
+                real * pB = B+3*I;
+                vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
+                vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
+                vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
+                storeu4(pB  , t0);
+                storeu4(pB+4, t1);
+                storeu4(pB+8, t2);
+            }
+        }
+        if ( I < K )
+        {
+            // load the next vector, before store4() will change it
+            vec4 n = loadu4(B+3*I);
+            for ( ; I < K-1; ++I )
+            {
+                vec4 a = fnmadd4(T, broadcast1(A+I), n);
+                n = loadu4(B+3*I+3);
+                storeu4(B+3*I, a);
+            }
+            // last is I = K-1
+            storeu4(B+3*I, fnmadd4(T, broadcast1(A+I), n));
+        }
+        storeu4(B+3*K, ori);
+    }
+}
+
+
+
 #endif
 
 
 #ifdef __SSE3__
 
 /// specialized version for ORD==2
-template < bool nounit >
-void alsatian_xtrsmLLN_2D(int M, const real* A, int lda, real* B)
+template < char diag >
+void alsatian_xtrsmLLN2(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
         vec2 temp = load2(B+2*K);
-        if ( nounit )
+        if ( diag == 'N' ) {
+            temp = div2(temp, loaddup2(A+K));
+            store2(B+2*K, temp);
+        } else if ( diag == 'A' ) {
             temp = mul2(temp, loaddup2(A+K)); // DIV
-        store2(B+2*K, temp);
+            store2(B+2*K, temp);
+        }
+        // could unroll, using AVX
         for ( int I = K + 1; I < M; ++I )
             store2(B+2*I, fnmadd2(temp, loaddup2(A+I), load2(B+2*I)));
         A += lda;
@@ -613,18 +733,20 @@ void alsatian_xtrsmLLN_2D(int M, const real* A, int lda, real* B)
 
 
 /// specialized version for ORD==2
-template < bool nounit >
-void alsatian_xtrsmLLT_2D(int M, const real* A, int lda, real* B)
+template < char diag >
+void alsatian_xtrsmLLT2(int M, const real* A, int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
         vec2 temp = load2(B+2*I);
-        // can unroll
+        // could unroll, using AVX
         for ( int K = I + 1; K < M; ++K )
             temp = fnmadd2(loaddup2(A+K), load2(B+2*K), temp);
-        if ( nounit )
+        if ( diag == 'N' )
+            temp = div2(temp, loaddup2(A+I));
+        else if ( diag == 'A' )
             temp = mul2(temp, loaddup2(A+I)); // DIV
         store2(B+2*I, temp);
     }
@@ -634,15 +756,19 @@ void alsatian_xtrsmLLT_2D(int M, const real* A, int lda, real* B)
 
 
 /// specialized version for ORD==1
-template < bool nounit >
-void alsatian_xtrsmLLN_1D(int M, const real* A, int lda, real* B)
+template < char diag >
+void alsatian_xtrsmLLN1(int M, const real* A, int lda, real* B)
 {
     for ( int K = 0; K < M; ++K )
     {
         real temp = B[K];
-        if ( nounit )
-            B[K] *= A[K]; // DIV
-        B[K] = temp;
+        if ( diag == 'N' ) {
+            temp /= A[K];
+            B[K] = temp;
+        } else if ( diag == 'A' ) {
+            temp *= A[K]; // DIV
+            B[K] = temp;
+        }
         for ( int I = K + 1; I < M; ++I )
             B[I] -= temp * A[I];
         A += lda;
@@ -651,8 +777,8 @@ void alsatian_xtrsmLLN_1D(int M, const real* A, int lda, real* B)
 
 
 /// specialized version for ORD==1
-template < bool nounit >
-void alsatian_xtrsmLLT_1D(int M, const real* A, int lda, real* B)
+template < char diag >
+void alsatian_xtrsmLLT1(int M, const real* A, int lda, real* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
@@ -661,38 +787,17 @@ void alsatian_xtrsmLLT_1D(int M, const real* A, int lda, real* B)
         real temp = B[I];
         for ( int K = I + 1; K < M; ++K )
             temp -= A[K] * B[K];
-        if ( nounit )
+        if ( diag == 'N' )
+            temp /= A[I];
+        else if ( diag == 'A' )
             temp *= A[I]; // DIV
         B[I] = temp;
     }
 }
 
+
 //------------------------------------------------------------------------------
-#pragma mark - LAPACK-STYLE ROUTINES
-
-inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int& INFO)
-{
-    INFO = 0;
-    if ( TRANS == 'N' )
-    {
-        // Apply row interchanges to the right hand sides.
-        lapack::xlaswp(NRHS, B, LDB, 1, N, IPIV, 1);
-        // Solve L*X = B, overwriting B with X.
-        blas::xtrsm('L', 'L', 'N', 'U', N, NRHS, 1.0, A, LDA, B, LDB);
-        // Solve U*X = B, overwriting B with X.
-        blas::xtrsm('L', 'U', 'N', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
-    }
-    else
-    {
-        // Solve U**T *X = B, overwriting B with X.
-        blas::xtrsm('L', 'U', 'T', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
-        // Solve L**T *X = B, overwriting B with X.
-        blas::xtrsm('L', 'L', 'T', 'U', N, NRHS, 1.0, A, LDA, B, LDB);
-        // Apply row interchanges to the solution vectors.
-        lapack::xlaswp(NRHS, B, LDB, 1, N, IPIV, -1);
-    }
-}
-
+#pragma mark - LAPACK-STYLE ROUTINES for Positive Symmetric Matrices
 
 inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int& INFO)
 {
@@ -715,44 +820,7 @@ inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, re
 
 
 template < int ORD >
-inline void iso_xgetrsL(int N, const real* A, int LDA, const int* IPIV, real* B)
-{
-    /*
-     we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-     because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
-     But calling DTBSV gets the required work done.
-     */
-#if 1
-    real * tmp = new_real(N);
-    for ( int d = 0; d < ORD; ++d )
-    {
-        for ( int u = 0; u < N; ++u )
-            tmp[u] = B[d+ORD*u];
-        //int info = 0;
-        //lapack::xgetrs('N', N, 1, A, N, IPIV, tmp, N, &info);
-        // Apply row interchanges to the right hand sides.
-        lapack::xlaswp(1, tmp, N, 1, N, IPIV, 1);
-        // Solve L*X = B, overwriting B with X.
-        blas::xtrsm('L', 'L', 'N', 'U', N, 1, 1.0, A, LDA, tmp, N);
-        // Solve U*X = B, overwriting B with X.
-        blas::xtrsm('L', 'U', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
-        for ( int u = 0; u < N; ++u )
-            B[d+ORD*u] = tmp[u];
-    }
-    free_real(tmp);
-#else
-    // Apply row interchanges to the right hand sides.
-    iso_xlaswp<ORD>(B, N, 1, N, IPIV, 1);
-    // Solve L*X = B, overwriting B with X.
-    iso_xtrsmLLN<ORD, 0>(N, A, LDA, B);
-    // Solve U*X = B, overwriting B with X.
-    iso_xtrsmLUN<ORD, 1>(N, A, LDA, B);
-#endif
-}
-
-
-template < int ORD >
-inline void iso_xpotrsL(int N, const real* A, int LDA, real* B)
+void iso_xpotrsL(int N, const real* A, int LDA, real* B)
 {
     /*
      we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
@@ -777,11 +845,231 @@ inline void iso_xpotrsL(int N, const real* A, int LDA, real* B)
     free_real(tmp);
 #else
     // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLN<ORD, 1>(N, A, LDA, B);
+    iso_xtrsmLLN<ORD, 'N'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLT<ORD, 1>(N, A, LDA, B);
+    iso_xtrsmLLT<ORD, 'N'>(N, A, LDA, B);
 #endif
 }
 
+
+
+/**
+ This calls the standard lapack::xpotf2()
+ and then inverts the diagonal terms
+*/
+void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
+{
+    lapack::xpotf2('L', N, A, LDA, INFO);
+    if ( 0 == *INFO )
+    {
+        const int S = LDA+1;
+        for ( int u = 0; u < N; ++u )
+            A[S*u] = 1.0 / A[S*u];
+    }
+}
+
+
+template < int ORD >
+void alsatian_xpotrsL(int N, const real* A, int LDA, real* B)
+{
+    real * tmp = new_real(N);
+    for ( int d = 0; d < ORD; ++d )
+    {
+        for ( int u = 0; u < N; ++u )
+            tmp[u] = B[d+ORD*u];
+#if 0
+        // Solve L*X = B, overwriting B with X. ALPHA = 1.0
+        blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
+        blas::xtrsm('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
+#else
+        // Solve L*X = B, overwriting B with X. ALPHA = 1.0
+        alsatian_xtrsmLLN1<'A'>(N, A, LDA, tmp);
+        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
+        alsatian_xtrsmLLT1<'A'>(N, A, LDA, tmp);
+#endif
+        for ( int u = 0; u < N; ++u )
+            B[d+ORD*u] = tmp[u];
+    }
+    free_real(tmp);
+}
+
+
+void alsatian_xpotrsL(int N, const real* A, int LDA, real* B)
+{
+#if ( DIM == 3 )
+    alsatian_xtrsmLLN3<'A'>(N, A, LDA, B);
+    alsatian_xtrsmLLT3<'A'>(N, A, LDA, B);
+#elif ( DIM == 2 )
+    alsatian_xtrsmLLN2<'A'>(N, A, LDA, B);
+    alsatian_xtrsmLLT2<'A'>(N, A, LDA, B);
+#elif ( DIM == 1 )
+    alsatian_xtrsmLLN1<'A'>(N, A, LDA, B);
+    alsatian_xtrsmLLT1<'A'>(N, A, LDA, B);
+#else
+    ABORT_NOW("unexpected DIM!");
+#endif
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - LAPACK-STYLE ROUTINES for General LU factorization
+
+/*
+ DLASWP performs a series of row interchanges on the matrix A.
+
+  if ( INCX > 0 )
+  {
+      IX0 = K1
+      I1 = K1
+      I2 = K2
+      INC = 1
+  }
+  else if ( INCX < 0 )
+  {
+      IX0 = K1 + ( K1-K2 )*INCX
+      I1 = K2
+      I2 = K1
+      INC = -1
+  }
+  int IX = IX0;
+  for ( int I = I1; I <= I2; I += INC )
+  {
+      int IP = IPIV[IX];
+      if ( IP != I )
+          swap<ORD>(A+ORD*I, A+ORD*IP);
+      IX = IX + INCX;
+  }
+ */
+
+template < int ORD >
+inline void swap(real* A, real* B)
+{
+    for ( int d = 0; d < ORD; ++d )
+    {
+        real t = A[d];
+        A[d] = B[d];
+        B[d] = t;
+    }
+}
+
+
+template < int ORD >
+void iso_xlaswp(real* A, int K1, int K2, const int* IPIV, int INCX)
+{
+    if ( INCX == 1 )
+    {
+        for ( int I = K1-1; I < K2; ++I )
+        {
+            int IP = IPIV[I] - 1;  // zero-based array indexing!
+            if ( IP != I )
+                swap<ORD>(A+ORD*I, A+ORD*IP);
+        }
+    }
+    else if ( INCX > 0 )
+    {
+        for ( int I = K1-1; I < K2; ++I )
+        {
+            int IP = IPIV[INCX*I] - 1;  // zero-based array indexing!
+            if ( IP != I )
+                swap<ORD>(A+ORD*I, A+ORD*IP);
+        }
+    }
+    else if ( INCX < 0 )
+    {
+        int IX = K1 + ( K1-K2 )*INCX - 1;
+        for ( int I = K2-1; I < K1; --I )
+        {
+            int IP = IPIV[IX] - 1;  // zero-based array indexing!
+            if ( IP != I )
+                swap<ORD>(A+ORD*I, A+ORD*IP);
+            IX += INCX;
+        }
+    }
+}
+
+
+inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int& INFO)
+{
+    INFO = 0;
+    if ( TRANS == 'N' )
+    {
+        // Apply row interchanges to the right hand sides.
+        lapack::xlaswp(NRHS, B, LDB, 1, N, IPIV, 1);
+        // Solve L*X = B, overwriting B with X.
+        blas::xtrsm('L', 'L', 'N', 'U', N, NRHS, 1.0, A, LDA, B, LDB);
+        // Solve U*X = B, overwriting B with X.
+        blas::xtrsm('L', 'U', 'N', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
+    }
+    else
+    {
+        // Solve U**T *X = B, overwriting B with X.
+        blas::xtrsm('L', 'U', 'T', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
+        // Solve L**T *X = B, overwriting B with X.
+        blas::xtrsm('L', 'L', 'T', 'U', N, NRHS, 1.0, A, LDA, B, LDB);
+        // Apply row interchanges to the solution vectors.
+        lapack::xlaswp(NRHS, B, LDB, 1, N, IPIV, -1);
+    }
+}
+
+template < int ORD >
+void iso_xgetrsL(int N, const real* A, int LDA, const int* IPIV, real* B)
+{
+    /*
+     we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+     because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
+     But calling DTBSV gets the required work done.
+     */
+#if 0
+    real * tmp = new_real(N);
+    for ( int d = 0; d < ORD; ++d )
+    {
+        for ( int u = 0; u < N; ++u )
+            tmp[u] = B[d+ORD*u];
+        //int info = 0;
+        //lapack::xgetrs('N', N, 1, A, N, IPIV, tmp, N, &info);
+        // Apply row interchanges to the right hand side.
+        lapack::xlaswp(1, tmp, N, 1, N, IPIV, 1);
+        // Solve L*X = B, overwriting B with X.
+        blas::xtrsm('L', 'L', 'N', 'U', N, 1, 1.0, A, LDA, tmp, N);
+        // Solve U*X = B, overwriting B with X.
+        blas::xtrsm('L', 'U', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+        for ( int u = 0; u < N; ++u )
+            B[d+ORD*u] = tmp[u];
+    }
+    free_real(tmp);
+#else
+    // Apply row interchanges to the right hand side.
+    iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
+    // Solve L*X = B, overwriting B with X.
+    iso_xtrsmLLN<ORD, 'U'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    iso_xtrsmLUN<ORD, 'N'>(N, A, LDA, B);
+#endif
+}
+
+
+void alsatian_xgetrsL(int N, const real* A, int LDA, const int* IPIV, real* B)
+{
+    // Apply row interchanges to the right hand side.
+    iso_xlaswp<DIM>(B, 1, N, IPIV, 1);
+#if ( DIM == 3 )
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN3<'U'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN3<'N'>(N, A, LDA, B);
+#elif ( DIM == 2 )
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN2<'U'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN2<'N'>(N, A, LDA, B);
+#elif ( DIM == 1 )
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1<'N'>(N, A, LDA, B);
+#else
+    ABORT_NOW("unexpected DIM!");
+#endif
+}
 
 #endif

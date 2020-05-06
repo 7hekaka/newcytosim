@@ -236,14 +236,14 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
 #  if ( DIM == 3 )
-    alsatian_xtbsvLNN_3D(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLTN_3D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLNN3(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLTN3(nbp, mec->block(), BAND_LDD, Y);
 #  elif ( DIM == 2 )
-    alsatian_xtbsvLNN_2D(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLTN_2D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLNN2(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLTN2(nbp, mec->block(), BAND_LDD, Y);
 #  elif ( DIM == 1 )
-    alsatian_xtbsvLNN_1D(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLTN_1D(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLNN1(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xtbsvLTN1(nbp, mec->block(), BAND_LDD, Y);
 #  endif
 #else
     /*
@@ -277,20 +277,9 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
     free_real(tmp);
 #endif
 #if CHOUCROUTE
-#  if ( DIM == 3 )
-    alsatian_xtrsmLLN_3D<1>(nbp, mec->block(), nbp, Y);
-    alsatian_xtrsmLLT_3D<1>(nbp, mec->block(), nbp, Y);
-#  elif ( DIM == 2 )
-    alsatian_xtrsmLLN_2D<1>(nbp, mec->block(), nbp, Y);
-    alsatian_xtrsmLLT_2D<1>(nbp, mec->block(), nbp, Y);
-#  elif ( DIM == 1 )
-    alsatian_xtrsmLLN_1D<1>(nbp, mec->block(), nbp, Y);
-    alsatian_xtrsmLLT_1D<1>(nbp, mec->block(), nbp, Y);
-#  endif
+    alsatian_xpotrsL(nbp, mec->block(), nbp, Y);
 #else
-    //iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
-    iso_xtrsmLLN<DIM, 1>(nbp, mec->block(), nbp, Y);
-    iso_xtrsmLLT<DIM, 1>(nbp, mec->block(), nbp, Y);
+    iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
 #endif
     //std::clog << "\nL"; VecPrint::print(std::clog, S, Y, 3, 100.0);
 }
@@ -304,7 +293,8 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
      we cannot call lapack::DPOTRS('L', nbp, mec->block(), nbp, Y, DIM, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
      */
-    iso_xgetrsL<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
+    //iso_xgetrsL<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
+    alsatian_xgetrsL(nbp, mec->block(), nbp, mec->pivot(), Y);
 }
 
 
@@ -1707,7 +1697,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             int cnt = std::max(1UL, monitor.count());
             factor = factor >> 10;
             auto solve = cycles_ >> 10;
-            oss << "  cycles T " << std::setw(8) << total;
+            oss << "  cycles " << precond << "T " << std::setw(8) << total;
             oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
             oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
             oss << " R " << std::setw(6) << ( total - factor - solve ) / cnt;

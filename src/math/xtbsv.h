@@ -332,7 +332,7 @@ void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
 #ifdef __AVX__
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLNN_3D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN3(int N, const real* pA, int lda, real* pX)
 {
     const real * end = pA + (N-2) * lda;
     constexpr int ORD = 3;
@@ -366,7 +366,7 @@ void alsatian_xtbsvLNN_3D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLTN_3D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN3(int N, const real* pA, int lda, real* pX)
 {
     const real* end = pA;
     constexpr int ORD = 3;
@@ -410,7 +410,7 @@ void alsatian_xtbsvLTN_3D(int N, const real* pA, int lda, real* pX)
 }
 
 /*
- void alsatian_xtbsvLTN_3D(int N, const real* pA, int lda, real* pX)
+ void alsatian_xtbsvLTN3(int N, const real* pA, int lda, real* pX)
  {
      pX += ( N - 1 ) * 3;
      pA += ( N - 1 ) * lda;
@@ -446,7 +446,7 @@ void alsatian_xtbsvLTN_3D(int N, const real* pA, int lda, real* pX)
 #ifdef __SSE3__
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLNN_2D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN2(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
     vec2 a1 = load2(pX);     //may load garbage if N == 0
@@ -479,7 +479,7 @@ void alsatian_xtbsvLNN_2D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLTN_2D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN2(int N, const real* pA, int lda, real* pX)
 {
     constexpr int ORD = 2;
     pX += ( N - 1 ) * ORD;
@@ -517,7 +517,7 @@ void alsatian_xtbsvLTN_2D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLNN_1D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN1(int N, const real* pA, int lda, real* pX)
 {
     real a1 = pX[0]; //may load garbage
     real a2 = pX[1]; //may load garbage
@@ -549,7 +549,7 @@ void alsatian_xtbsvLNN_1D(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLTN_1D(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN1(int N, const real* pA, int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
