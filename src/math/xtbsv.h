@@ -9,9 +9,9 @@
  FJN 28.04.2020
  
  */
-void blas_xtbsvUN(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
+template < char diag >
+void blas_xtbsvUN(int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = N-1; j >= 0; --j)
@@ -19,7 +19,7 @@ void blas_xtbsvUN(char Diag, int N, int KD, const real* A, int lda, real* X, int
             if (X[j] != 0.)
             {
                 const real * pA = A + KD + j * lda;
-                if ( nounit ) X[j] /= pA[0];
+                if ( diag == 'N' ) X[j] /= pA[0];
                 real temp = X[j];
                 const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
@@ -40,7 +40,7 @@ void blas_xtbsvUN(char Diag, int N, int KD, const real* A, int lda, real* X, int
             {
                 int ix = kx;
                 const real * pA = A + KD + j * lda;
-                if ( nounit ) X[jx] /= pA[0];
+                if ( diag == 'N' ) X[jx] /= pA[0];
                 real temp = X[jx];
                 const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
@@ -54,9 +54,10 @@ void blas_xtbsvUN(char Diag, int N, int KD, const real* A, int lda, real* X, int
     }
 }
 
-void blas_xtbsvLN(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
+
+template < char diag >
+void blas_xtbsvLN(int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = 0; j < N; ++j)
@@ -64,7 +65,7 @@ void blas_xtbsvLN(char Diag, int N, int KD, const real* A, int lda, real* X, int
             if (X[j] != 0.)
             {
                 const real * pA = A + j * lda;
-                if ( nounit ) X[j] /= pA[0];
+                if ( diag == 'N' ) X[j] /= pA[0];
                 real temp = X[j];
                 const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
@@ -85,7 +86,7 @@ void blas_xtbsvLN(char Diag, int N, int KD, const real* A, int lda, real* X, int
             {
                 int ix = kx;
                 const real * pA = A + j * lda;
-                if ( nounit ) X[jx] /= pA[0];
+                if ( diag == 'N' ) X[jx] /= pA[0];
                 real temp = X[jx];
                 const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
@@ -99,9 +100,10 @@ void blas_xtbsvLN(char Diag, int N, int KD, const real* A, int lda, real* X, int
     }
 }
 
-void blas_xtbsvUT(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
+
+template < char diag >
+void blas_xtbsvUT(int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = 0; j < N; ++j)
@@ -110,7 +112,7 @@ void blas_xtbsvUT(char Diag, int N, int KD, const real* A, int lda, real* X, int
             const real * pA = A + KD + j * lda;
             for (int i = std::max(0, j-KD); i < j; ++i)
                 temp -= pA[i-j] * X[i];
-            if ( nounit ) temp /= pA[0];
+            if ( diag == 'N' ) temp /= pA[0];
             X[j] = temp;
         }
     }
@@ -130,7 +132,7 @@ void blas_xtbsvUT(char Diag, int N, int KD, const real* A, int lda, real* X, int
                 temp -= pA[i-j] * X[ix];
                 ix += incX;
             }
-            if ( nounit ) temp /= pA[0];
+            if ( diag == 'N' ) temp /= pA[0];
             X[jx] = temp;
             jx += incX;
             if (j >= KD)
@@ -139,9 +141,10 @@ void blas_xtbsvUT(char Diag, int N, int KD, const real* A, int lda, real* X, int
     }
 }
 
-void blas_xtbsvLT(char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
+
+template < char diag >
+void blas_xtbsvLT(int N, int KD, const real* A, int lda, real* X, int incX)
 {
-    const bool nounit = ( Diag == 'N' );
     if ( incX == 1 )
     {
         for (int j = N-1; j >= 0; --j)
@@ -151,7 +154,7 @@ void blas_xtbsvLT(char Diag, int N, int KD, const real* A, int lda, real* X, int
             const int sup = std::min(N-1, j+KD);
             for (int i = sup; i > j; --i)
                 temp -= pA[i-j] * X[i];
-            if ( nounit ) temp /= pA[0];
+            if ( diag == 'N' ) temp /= pA[0];
             X[j] = temp;
         }
     }
@@ -172,7 +175,7 @@ void blas_xtbsvLT(char Diag, int N, int KD, const real* A, int lda, real* X, int
                 temp -= pA[i-j] * X[ix];
                 ix -= incX;
             }
-            if ( nounit ) temp /= pA[0];
+            if ( diag == 'N' ) temp /= pA[0];
             X[jx] = temp;
             jx -= incX;
             if ( j < N-KD )
@@ -186,17 +189,31 @@ void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int KD, const real* A, 
 {
     if ( Uplo == 'U' )
     {
-        if ( Trans == 'N' )
-            blas_xtbsvUN(Diag, N, KD, A, lda, X, incX);
-        else
-            blas_xtbsvUT(Diag, N, KD, A, lda, X, incX);
+        if ( Trans == 'N' ) {
+            if ( Diag == 'N' )
+                blas_xtbsvUN<'N'>(N, KD, A, lda, X, incX);
+            else
+                blas_xtbsvUN<'U'>(N, KD, A, lda, X, incX);
+        } else {
+            if ( Diag == 'N' )
+                blas_xtbsvUT<'N'>(N, KD, A, lda, X, incX);
+            else
+                blas_xtbsvUT<'U'>(N, KD, A, lda, X, incX);
+        }
     }
     else if ( Uplo == 'L' )
     {
-        if ( Trans == 'N' )
-            blas_xtbsvLN(Diag, N, KD, A, lda, X, incX);
-        else
-            blas_xtbsvLT(Diag, N, KD, A, lda, X, incX);
+        if ( Trans == 'N' ) {
+            if ( Diag == 'N' )
+                blas_xtbsvLN<'N'>(N, KD, A, lda, X, incX);
+            else
+                blas_xtbsvLN<'U'>(N, KD, A, lda, X, incX);
+        } else {
+            if ( Diag == 'N' )
+                blas_xtbsvLT<'N'>(N, KD, A, lda, X, incX);
+            else
+                blas_xtbsvLT<'U'>(N, KD, A, lda, X, incX);
+        }
     }
 }
 
@@ -596,8 +613,8 @@ inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, in
     {
         for ( int i = 0; i < NRHS; ++i )
         {
-            blas_xtbsvUT('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
-            blas_xtbsvUN('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvUT<'N'>(N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvUN<'N'>(N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
 
         }
     }
@@ -605,8 +622,8 @@ inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, in
     {
         for ( int i = 0; i < NRHS; ++i )
         {
-            blas_xtbsvLN('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
-            blas_xtbsvLT('N', N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvLN<'N'>(N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
+            blas_xtbsvLT<'N'>(N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
         }
     }
     else
@@ -622,16 +639,16 @@ inline void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real*
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            blas_xtbsvUT('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+d, ORD);
-            blas_xtbsvUN('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+d, ORD);
+            blas_xtbsvUT<'N'>(N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+d, ORD);
+            blas_xtbsvUN<'N'>(N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+d, ORD);
         }
     }
     else if ( UPLO == 'L' )
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            blas_xtbsvLN('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+d, ORD);
-            blas_xtbsvLT('N', N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+d, ORD);
+            blas_xtbsvLN<'N'>(N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+d, ORD);
+            blas_xtbsvLT<'N'>(N, KD, AB, LDAB, B+d, ORD); //blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+d, ORD);
         }
     }
     else

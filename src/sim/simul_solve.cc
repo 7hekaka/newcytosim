@@ -358,7 +358,7 @@ void Simul::solve_auto()
             if ( prop->verbose )
             {
                 std::stringstream os;
-                os << " precond selection | method cnt cpu ";
+                os << " precond selection | method cnt cpu";
                 for ( size_t u = 0; u < 5; ++u )
                 {
                     os << " | " << u << " " << std::setw(6) << autoCNT[u];

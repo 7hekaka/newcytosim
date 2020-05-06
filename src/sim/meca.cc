@@ -294,7 +294,7 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
      because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
      */
     //iso_xgetrsL<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
-    alsatian_xgetrsL(nbp, mec->block(), nbp, mec->pivot(), Y);
+    alsatian_xgetrsN(nbp, mec->block(), nbp, mec->pivot(), Y);
 }
 
 
@@ -304,6 +304,7 @@ inline void applyPrecondFull(Mecable const* mec, real* Y)
     int bks = mec->blockSize();
     int info = 0;
     lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+    //blas_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
     assert_true(info==0);
 }
 
