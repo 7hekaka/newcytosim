@@ -266,10 +266,13 @@ private:
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
 
-    /// compute the matrix on-diagonal block corresponding to a Mecable
+    /// extract the matrix on-diagonal block corresponding to a Mecable
     void getBlock(const Mecable*, real* mat) const;
     
-    /// compute the istropic projection of the on-diagonal block corresponding to a Mecable
+    /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
+    void getBandedBlock(const Mecable*, real* mat) const;
+
+    /// extract the istropic projection of the on-diagonal block corresponding to a Mecable
     void getIsoBlock(const Mecable*, real* mat) const;
 
     /// DEBUG: extract the matrix on-diagonal block corresponding to a Mecable using 'multiply()'

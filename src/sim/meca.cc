@@ -304,7 +304,7 @@ inline void applyPrecondFull(Mecable const* mec, real* Y)
     int bks = mec->blockSize();
     int info = 0;
     lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-    //blas_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
+    //lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
     assert_true(info==0);
 }
 
@@ -318,7 +318,7 @@ inline void applyPreconditionner(Mecable const* mec, real* Y)
         case 2: applyPrecondIsoS(mec, Y); break;
         case 3: applyPrecondIsoP(mec, Y); break;
         case 4: applyPrecondFull(mec, Y); break;
-        default: throw InvalidParameter("unknown precondition block type"); break;
+        default: ABORT_NOW("unknown Mecable::blockType()"); break;
     }
 }
 
@@ -335,7 +335,7 @@ inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
         case 3: applyPrecondIsoP(mec, Y); break;
         case 4: applyPrecondFull(mec, Y); break;
         case 7: mec->blockMultiply(X, Y); break;
-        default: throw InvalidParameter("unknown precondition block type"); break;
+        default: ABORT_NOW("unknown Mecable::blockType()"); break;
     }
 }
 
@@ -568,24 +568,29 @@ void printBlock(Mecable* mec, size_t sup)
  
  This block is square, symmetric, definite positive and totally predictable
  */
-void getBand(const Mecable * mec, real* res, real time_step)
+void Meca::getBandedBlock(const Mecable * mec, real* res) const
 {
     const size_t nbp = mec->nbPoints();
 
+    real beta = -time_step * mec->leftoverMobility();
+    
     if ( mec->hasRigidity() )
-    {
-        real beta = -time_step * mec->leftoverMobility() * mec->fiberRigidity();
-        setRigidityBanded(res, BAND_LDD, nbp, beta);
-    }
+        setRigidityBanded(res, BAND_LDD, nbp, beta*mec->fiberRigidity());
     else
         zero_real(BAND_LDD*nbp, res);
 
     // add ones to the diagonal:
     for ( size_t i = 0; i < nbp; ++i )
         res[i*BAND_LDD] += 1.0;
-
-    //std::clog<<"banded preconditionner " << nbp << "\n";
+    
+    //std::clog << "\nrigidity band " << nbp << "\n";
     //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
+
+#if USE_ISO_MATRIX
+    mB.addTriangularBlockBanded(beta, res, nbp, mec->matIndex(), nbp, 2);
+    if ( useMatrixC )
+#endif
+        mC.addDiagonalTraceBanded(beta/DIM, res, BAND_LDD, DIM*mec->matIndex(), DIM*nbp, 2);
 }
 
 
@@ -961,14 +966,23 @@ Compute banded preconditionner block corresponding to 'mec'
  */
 void Meca::computePrecondBand(Mecable* mec)
 {
-    int info = 0;
+    assert_true(BAND_LDD>2);
     const size_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, BAND_LDD*nbp, 0);
-    getBand(mec, mec->block(), time_step);
+    getBandedBlock(mec, mec->block());
+    
+    //std::clog << "banded preconditionner " << nbp << "\n";
+    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
+    
+    /**
+     Factorize banded matrix with Andre-Louis Cholesky's method
+     born 15.10.1875 in Montguyon, France
+     died 31.08.1918 in Bagneux, following wounds received in battlefield.
+     */
+    int info = 0;
 #if CHOUCROUTE
     alsatian_xpbtf2L(nbp, 2, mec->block(), BAND_LDD, &info);
 #else
-    // cholesky decomposition involves calculating SQRT(diagonal terms)
     lapack::xpbtf2('L', nbp, 2, mec->block(), BAND_LDD, &info);
 #endif
     if ( 0 == info )
@@ -991,25 +1005,29 @@ Compute preconditionner block corresponding to 'mec'
 void Meca::computePrecondIsoS(Mecable* mec)
 {
     const size_t nbp = mec->nbPoints();
+    //const size_t S = std::min(nbp, 16UL);
 #if 0
-    const size_t S = std::min(nbp, 16UL);
     const size_t bks = DIM * nbp;
     mec->blockSize(bks, bks*bks, bks);
     getBlock(mec, mec->block());
     project_matrix<DIM>(nbp, mec->block(), bks, mec->block(), nbp);
     std::clog<<"projected: " << bks << "\n";
-    VecPrint::print(std::clog, S, S, mec->block(), bks, 2);
+    VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
 #endif
-    int info = 0;
 
     mec->blockSize(DIM*nbp, nbp*nbp, 0);
     
+    //getBandedBlock(mec, mec->block());
+    //std::clog << "banded preconditionner " << nbp << "\n";
+    //VecPrint::print(std::clog, 3, S, mec->block(), BAND_LDD, 1);
+
     getIsoBlock(mec, mec->block());
     
     //std::clog<<"iso symmetric preconditionner: " << nbp << "\n";
     //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
 
-// calculate LU factorization:
+    // calculate LU factorization:
+    int info = 0;
 #if CHOUCROUTE
     alsatian_xpotf2L(nbp, mec->block(), nbp, &info);
 #else
@@ -1665,7 +1683,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         }
     }
     
-    auto total = ( __rdtsc() - start ) >> 10;
+    const auto total = ( __rdtsc() - start ) >> 10;
 
     //add the solution of the system (=dPTS) to the points coordinates
     blas::add(dimension(), vSOL, vPTS);
@@ -1680,7 +1698,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     ready_ = 1;
 
     // report on the matrix type and size, sparsity, and the number of iterations
-    if ( 0 < doNotify || prop->verbose )
+    if (( 0 < doNotify ) || ( prop->verbose & 1 ))
     {
         --doNotify;
         std::stringstream oss;
