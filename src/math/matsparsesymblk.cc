@@ -420,7 +420,6 @@ void MatrixSparseSymmetricBlock::addDiagonalTraceBanded(real alpha, real* mat, s
                         //fprintf(stderr, "MSSB %4lu %4lu : %.4f\n", i, j, a);
                         // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
                         mat[i-j+ldd*j] += a;
-                        //mat[j+ldd*i] += a;  // above diagonal
                     }
                 }
             }

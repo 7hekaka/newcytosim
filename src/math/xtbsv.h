@@ -10,7 +10,7 @@
  
  */
 template < char diag >
-void blas_xtbsvUN(int N, int KD, const real* A, int lda, real* X, int incX)
+void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
     if ( incX == 1 )
     {
@@ -56,7 +56,7 @@ void blas_xtbsvUN(int N, int KD, const real* A, int lda, real* X, int incX)
 
 
 template < char diag >
-void blas_xtbsvLN(int N, int KD, const real* A, int lda, real* X, int incX)
+void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
     if ( incX == 1 )
     {
@@ -102,7 +102,7 @@ void blas_xtbsvLN(int N, int KD, const real* A, int lda, real* X, int incX)
 
 
 template < char diag >
-void blas_xtbsvUT(int N, int KD, const real* A, int lda, real* X, int incX)
+void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
     if ( incX == 1 )
     {
@@ -143,7 +143,7 @@ void blas_xtbsvUT(int N, int KD, const real* A, int lda, real* X, int incX)
 
 
 template < char diag >
-void blas_xtbsvLT(int N, int KD, const real* A, int lda, real* X, int incX)
+void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
     if ( incX == 1 )
     {
@@ -185,7 +185,7 @@ void blas_xtbsvLT(int N, int KD, const real* A, int lda, real* X, int incX)
 }
 
 
-void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int KD, const real* A, int lda, real* X, int incX)
+void blas_xtbsv(char Uplo, char Trans, char Diag, const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
     if ( Uplo == 'U' )
     {
@@ -224,7 +224,7 @@ void blas_xtbsv(char Uplo, char Trans, char Diag, int N, int KD, const real* A, 
  This calls the standard lapack::pbtf2()
  and then inverts the diagonal terms
 */
-void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
+void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* INFO)
 {
     lapack::xpbtf2('L', N, KD, AB, LDAB, INFO);
     if ( 0 == *INFO )
@@ -239,7 +239,7 @@ void alsatian_xpbtf2L(int N, int KD, real* AB, int LDAB, int* INFO)
 
 /// this version is fast...
 template < int ORD >
-void alsatian_xtbsvLNN(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     int kx = 0;
     int jx = 0;
@@ -269,7 +269,7 @@ void alsatian_xtbsvLNN(int N, int KD, const real* A, int lda, real* X)
 }
 
 template < int ORD >
-void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     int kx = (N-1) * ORD;
     int jx = kx;
@@ -300,7 +300,7 @@ void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
 /*
  */
 template < int ORD >
-void alsatian_xtbsvLNN(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     for ( int j = 0; j < N; ++j )
     {
@@ -322,7 +322,7 @@ void alsatian_xtbsvLNN(int N, int KD, const real* A, int lda, real* X)
 }
 
 template < int ORD >
-void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
+void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     for ( int j = N-1; j >= 0; --j )
     {
@@ -349,12 +349,27 @@ void alsatian_xtbsvLTN(int N, int KD, const real* A, int lda, real* X)
 #ifdef __AVX__
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLNN3(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN3(const int N, const real* pA, const int lda, real* pX)
 {
-    const real * end = pA + (N-2) * lda;
+    const real*const end = pA + (N-2) * lda;
     constexpr int ORD = 3;
     vec4 a1 = loadu4(pX); //may load garbage
     vec4 a2 = loadu4(pX+ORD); //may load garbage
+#if ( 0 )
+    while ( pA < end-lda )
+    {
+        vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
+        vec4 b1 = fnmadd4(broadcast1(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
+        vec4 b2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+2*ORD));
+        storeu4(pX, a0);
+        vec4 b0 = mul4(broadcast1(pA+lda), b1);
+        a1 = fnmadd4(broadcast1(pA+lda+1), b0, b2);
+        a2 = fnmadd4(broadcast1(pA+lda+2), b0, loadu4(pX+3*ORD));
+        storeu4(pX+ORD, b0);
+        pA += 2*lda;
+        pX += 2*ORD;
+    }
+#endif
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
         vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
@@ -383,9 +398,9 @@ void alsatian_xtbsvLNN3(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLTN3(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN3(const int N, const real* pA, const int lda, real* pX)
 {
-    const real* end = pA;
+    const real*const end = pA;
     constexpr int ORD = 3;
     const vec4 zero = setzero4();
     const vec4 one = set4(1.0);
@@ -427,7 +442,7 @@ void alsatian_xtbsvLTN3(int N, const real* pA, int lda, real* pX)
 }
 
 /*
- void alsatian_xtbsvLTN3(int N, const real* pA, int lda, real* pX)
+ void alsatian_xtbsvLTN3(const int N, const real* pA, const int lda, real* pX)
  {
      pX += ( N - 1 ) * 3;
      pA += ( N - 1 ) * lda;
@@ -463,7 +478,7 @@ void alsatian_xtbsvLTN3(int N, const real* pA, int lda, real* pX)
 #ifdef __SSE3__
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLNN2(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN2(const int N, const real* pA, const int lda, real* pX)
 {
     constexpr int ORD = 2;
     vec2 a1 = load2(pX);     //may load garbage if N == 0
@@ -496,7 +511,7 @@ void alsatian_xtbsvLNN2(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLTN2(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN2(const int N, const real* pA, const int lda, real* pX)
 {
     constexpr int ORD = 2;
     pX += ( N - 1 ) * ORD;
@@ -534,7 +549,7 @@ void alsatian_xtbsvLTN2(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLNN1(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
 {
     real a1 = pX[0]; //may load garbage
     real a2 = pX[1]; //may load garbage
@@ -566,7 +581,7 @@ void alsatian_xtbsvLNN1(int N, const real* pA, int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLTN1(int N, const real* pA, int lda, real* pX)
+void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;

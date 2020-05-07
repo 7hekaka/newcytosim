@@ -13,7 +13,7 @@
 /// BLD is the leading dimension of the matrix
 /**
  The code works with BLD = 3 or 4, and typically memory storage is less with 3,
- but performance can be better with 4, as SIMD-AVX calls handle floats by 4.
+ but performance can be better with 4, as SIMD-AVX calls handle doubles by 4.
  */
 
 #ifdef __AVX__

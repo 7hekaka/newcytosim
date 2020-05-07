@@ -205,7 +205,7 @@ void blas_xtrsmLUT(const int M, const int N, real ALPHA, const real* A, const in
 /**
  Patch to BLAS' DTRSM
  */
-void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, const int N, real ALPHA, const real* A, int LDA, real* B, int LDB)
+void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real ALPHA, const real* A, int LDA, real* B, int LDB)
 {
     if ( Side == 'L' )
     {
@@ -924,7 +924,7 @@ void alsatian_xtrsmLUN1(const int M, const real* A, const int lda, real* B)
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for Positive Symmetric Matrices
 
-inline void lapack_xpotrs(char UPLO, const int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
+inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
@@ -945,7 +945,7 @@ inline void lapack_xpotrs(char UPLO, const int N, int NRHS, const real* A, int L
 
 
 template < int ORD >
-void iso_xpotrsL(int N, const real* A, int LDA, real* B)
+void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
     /*
      we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
@@ -982,7 +982,7 @@ void iso_xpotrsL(int N, const real* A, int LDA, real* B)
  This calls the standard lapack::xpotf2()
  and then inverts the diagonal terms
 */
-void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
+void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 {
     lapack::xpotf2('L', N, A, LDA, INFO);
     if ( 0 == *INFO )
@@ -995,7 +995,7 @@ void alsatian_xpotf2L(int N, real* A, int LDA, int* INFO)
 
 
 template < int ORD >
-void alsatian_xpotrsL(int N, const real* A, int LDA, real* B)
+void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
@@ -1020,7 +1020,7 @@ void alsatian_xpotrsL(int N, const real* A, int LDA, real* B)
 }
 
 
-void alsatian_xpotrsL(int N, const real* A, int LDA, real* B)
+void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
 #if ( DIM == 3 )
     alsatian_xtrsmLLN3<'A'>(N, A, LDA, B);
@@ -1113,7 +1113,7 @@ void iso_xlaswp(real* A, int K1, int K2, const int* IPIV, int INCX)
 }
 
 
-inline void lapack_xgetrs(char TRANS, const int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
+inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
     if ( TRANS == 'N' )
@@ -1167,7 +1167,7 @@ void lapack_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 
 
 template < int ORD >
-void iso_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
+void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
     /*
      we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
@@ -1203,7 +1203,7 @@ void iso_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 }
 
 
-void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
+void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
     // Apply row interchanges to the right hand side.
     iso_xlaswp<DIM>(B, 1, N, IPIV, 1);

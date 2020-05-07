@@ -369,6 +369,10 @@ void MatrixSparseSymmetric1::addTriangularBlock(real* mat, const size_t ldd,
 }
 
 
+/*
+addresses `mat' using lower banded storage for a symmetric matrix
+mat(i, j) is stored in mat[i-j+ldd*j]
+*/
 void MatrixSparseSymmetric1::addTriangularBlockBanded(real alpha, real* mat, const size_t ldd,
                                                       const size_t start,
                                                       const size_t cnt,
@@ -388,8 +392,8 @@ void MatrixSparseSymmetric1::addTriangularBlockBanded(real alpha, real* mat, con
             {
                 size_t i = ii - start;
                 //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
-                // address lower triangle of 'mat'
                 assert_true( i > j );
+                // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
                 if ( i <= j + rank )
                     mat[i-j+ldd*j] += alpha * column_[jj][n].val;
             }
