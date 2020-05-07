@@ -220,18 +220,148 @@ void blas_xtbsv(char Uplo, char Trans, char Diag, const int N, const int KD, con
 //------------------------------------------------------------------------------
 #pragma mark - ALSATIAN versions that inverse the diagonal elements
 
+/*
+  SUBROUTINE DSYR(UPLO,N,ALPHA,X,INCX,A,LDA)
+ 
+    IF (LSAME(UPLO,'L')) THEN
+    IF (INCX.EQ.1) THEN
+
+       DO 60 J = 1,N
+            IF (X(J).NE.ZERO) THEN
+                TEMP = ALPHA*X(J)
+                DO 50 I = J,N
+                    A(I,J) = A(I,J) + X(I)*TEMP
+50                 CONTINUE
+            END IF
+60         CONTINUE
+    END IF
+    END IF
+ */
+void  blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
+{
+    for ( int J = 0; J < N; ++J )
+    {
+        if ( X[J] != 0 )
+        {
+            real temp = ALPHA * X[J];
+            for ( int I = J; I < N; ++I )
+                A[I] = A[I] + X[I] * temp;
+        }
+        A += LDA;
+    }
+}
+
+
 /**
  This calls the standard lapack::pbtf2()
  and then inverts the diagonal terms
+ 
+ SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
+ 
+ int KLD = std::max(1, LDAB-1);
+ //Compute the Cholesky factorization A = L*L**T.
+ for ( int J = 0; J < N; ++J )
+ {
+     //Compute L(J,J) and test for non-positive-definiteness.
+     real dia = AB[0];
+     if ( dia <= 0 )
+     {
+         *INFO = J;
+         return;
+     }
+     dia = 1.0 / sqrt(dia);
+     AB[0] = dia;
+     // Compute elements J+1:J+KN of column J
+     int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
+     // scale off diagonal terms in column:
+     for ( int K = 1; K <= KN; ++K )
+         AB[K] *= dia;
+     // update the trailing submatrix within the band.
+     real* A = AB + LDAB; // next column of AB
+     real const* X = AB + 1;
+     for ( int K = 0; K < KN; ++K )
+     {
+         real temp = X[K];
+         for ( int I = K; I < KN; ++I )
+             A[I] -= X[I] * temp;
+         A += KLD;
+     }
+     AB += LDAB;
+ }
 */
-void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* INFO)
+
+template < int KD >
+void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
 {
+    /*
     lapack::xpbtf2('L', N, KD, AB, LDAB, INFO);
     if ( 0 == *INFO )
     {
         for ( int u = 0; u < N; ++u )
             AB[LDAB*u] = 1.0 / AB[LDAB*u];
     }
+     */
+    int KLD = std::max(1, LDAB-1);
+    //Compute the Cholesky factorization A = L*L**T.
+    for ( int J = 0; J < N-KD; ++J )
+    {
+        //Compute L(J,J) and test for non-positive-definiteness.
+        real dia = AB[0];
+        if ( dia <= 0 )
+        {
+            *INFO = J;
+            return;
+        }
+        dia = 1.0 / sqrt(dia);
+        AB[0] = dia;
+        /* Compute elements J+1:J+KN of column J and update the
+         trailing submatrix within the band.*/
+        {
+            for ( int K = 1; K <= KD; ++K )
+                AB[K] *= dia;
+            real* A = AB + LDAB; // next column of AB
+            real const* X = AB + 1;
+            for ( int K = 0; K < KD; ++K )
+            {
+                real temp = X[K];
+                for ( int I = K; I < KD; ++I )
+                    A[I] -= X[I] * temp;
+                A += KLD;
+            }
+        }
+        AB += LDAB;
+    }
+    // process remaining columns with < KD terms
+    for ( int J = N-KD; J < N; ++J )
+    {
+        //Compute L(J,J) and test for non-positive-definiteness.
+        real dia = AB[0];
+        if ( dia <= 0 )
+        {
+            *INFO = J;
+            return;
+        }
+        dia = 1.0 / sqrt(dia);
+        AB[0] = dia;
+        /* Compute elements J+1:J+KN of column J and update the
+         trailing submatrix within the band.*/
+        int KN = std::min(KD, N-1-J); // always N-1-J
+        {
+            for ( int K = 1; K <= KN; ++K )
+                AB[K] *= dia;
+            real* A = AB + LDAB; // next column of AB
+            real const* X = AB + 1;
+            for ( int K = 0; K < KN; ++K )
+            {
+                real temp = X[K];
+                for ( int I = K; I < KN; ++I )
+                    A[I] -= X[I] * temp;
+                A += KLD;
+            }
+        }
+        AB += LDAB;
+    }
+    *INFO = 0;
 }
 
 

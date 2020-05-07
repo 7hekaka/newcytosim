@@ -986,7 +986,7 @@ void Meca::computePrecondBand(Mecable* mec)
      */
     int info = 0;
 #if CHOUCROUTE
-    alsatian_xpbtf2L(nbp, 2, mec->block(), BAND_LDD, &info);
+    alsatian_xpbtf2L<2>(nbp, mec->block(), BAND_LDD, &info);
 #else
     lapack::xpbtf2('L', nbp, 2, mec->block(), BAND_LDD, &info);
 #endif
@@ -999,7 +999,7 @@ void Meca::computePrecondBand(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute Preconditionner block\n";
+        std::clog << "failed to compute Band Preconditionner block\n";
     }
 }
 
@@ -1047,7 +1047,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute Preconditionner block\n";
+        std::clog << "failed to compute IsoS Preconditionner block\n";
     }
 }
 
@@ -1079,7 +1079,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute Preconditionner block\n";
+        std::clog << "failed to compute IsoP Preconditionner block\n";
     }
 }
 
