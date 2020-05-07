@@ -212,14 +212,14 @@ public:
     /// scale the matrix by a scalar factor
     void scale(real);
     
-    /// add the diagonal block ( start, start+nb ) from this matrix to M
+    /// add terms within ( start, start+nb ) to `mat`
     void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t nb) const;
     
-    /// add the diagonal block ( start, start+nb ) from this matrix to M
+    /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
     void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t nb) const;
 
-    /// add upper triangular half of 'this' block ( start, start+nb ) to `mat`
-    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t nb, size_t dim) const;
+    /// add lower triangle within ( start, start+nb ) to `mat`
+    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t nb) const;
     
     
     /// prepare matrix for multiplications by a vector (must be called)

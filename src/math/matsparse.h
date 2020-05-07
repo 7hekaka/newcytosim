@@ -63,10 +63,10 @@ public:
     void scale( real a );
     
     /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
-    void addDiagonalBlock(real* mat, unsigned ldd, size_t si, size_t nb) const;
+    void addDiagonalBlock(real* mat, unsigned ldd, size_t start, size_t cnt) const;
     
     /// add this' data block ( idx, idx, idx+siz, idx+siz ) to upper triangular half of `mat`
-    void addTriangularBlock(real* mat, size_t ldd, size_t si, size_t nb, size_t dim) const;
+    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const;
     
     /// multiplication of a vector: Y = Y + M * X, dim(X) = dim(M)
     void vecMulAdd( const real* X, real* Y ) const;

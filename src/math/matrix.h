@@ -68,10 +68,10 @@ public:
     void copyBlock(real* mat, unsigned ldd, size_t sx, size_t nx, size_t sy, size_t ny) const;
     
     /// add the block ( x, x, x+sx, x+sx ) from this matrix to `mat`
-    virtual void addDiagonalBlock(real* mat, size_t ldd, size_t si, size_t nb) const;
+    virtual void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt) const;
     
     /// add upper triangular half of ( idx, idx, idx+siz, idx+siz ) to `mat`
-    virtual void addTriangularBlock(real* mat, size_t ldd, size_t si, size_t nb, size_t dim) const;
+    virtual void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const;
     
     //----------------------------------------------------------------------
     

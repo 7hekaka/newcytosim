@@ -117,7 +117,7 @@ namespace VecPrint
                 os << '\n';
             }
         }
-        std::endl(os);
+        //std::endl(os);
     }
     
     /// print matrix in sparse format: line_index, column_index, value

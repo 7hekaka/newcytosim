@@ -178,22 +178,22 @@ void MatrixSparse::scale( real a )
 }
 
 
-void MatrixSparse::addTriangularBlock(real* mat, size_t ldd, size_t si, size_t nb, size_t dim) const
+void MatrixSparse::addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const
 {
-    assert_true( si + nb <= size_ );
+    assert_true( start + cnt <= size_ );
     
-    for ( size_t jj = 0; jj < nb; ++jj )
+    for ( size_t jj = 0; jj < cnt; ++jj )
     {
-        size_t* row = mxRow[jj + si];
+        size_t* row = mxRow[jj + start];
         if ( row != nullptr )
         {
-            real* col = mxCol[jj + si];
+            real* col = mxCol[jj + start];
             for ( ; *row != LAST_IN_COLUMN; ++row, ++col )
             {
-                if ( *row > si )
+                if ( *row > start )
                 {
-                    size_t ii = *row - si;
-                    if ( ii < nb )
+                    size_t ii = *row - start;
+                    if ( ii < cnt )
                     {
                         assert_true( ii <= jj );
                         mat[dim*( ii + ldd * jj )] += *col;
@@ -206,22 +206,22 @@ void MatrixSparse::addTriangularBlock(real* mat, size_t ldd, size_t si, size_t n
 }
 
 
-void MatrixSparse::addDiagonalBlock(real* mat, unsigned ldd, size_t si, size_t nb) const
+void MatrixSparse::addDiagonalBlock(real* mat, unsigned ldd, size_t start, size_t cnt) const
 {
-    assert_true( si + nb <= size_ );
+    assert_true( start + cnt <= size_ );
     
-    for ( size_t jj = 0; jj < nb; ++jj )
+    for ( size_t jj = 0; jj < cnt; ++jj )
     {
-        size_t* row = mxRow[jj + si];
+        size_t* row = mxRow[jj + start];
         if ( row )
         {
-            real* col = mxCol[jj + si];
+            real* col = mxCol[jj + start];
             for ( ; *row != LAST_IN_COLUMN; ++row, ++col )
             {
-                if ( *row > si )
+                if ( *row > start )
                 {
-                    size_t ii = *row - si;
-                    if ( ii < nb )
+                    size_t ii = *row - start;
+                    if ( ii < cnt )
                     {
                         //printf("Sp %4i %4i % .4f\n", ii, jj, a );
                         mat[ii+ldd*jj] += *col;

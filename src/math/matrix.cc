@@ -61,27 +61,27 @@ void Matrix::copyBlock(real* mat, unsigned ldd, size_t sx, size_t nx, size_t sy,
     
     for ( size_t ii = 0; ii < nx; ++ii )
     for ( size_t jj = 0; jj < ny; ++jj )
-        mat[ii + ldd * jj] = value( sx + ii, sy + jj );
+        mat[ii + ldd*jj] = value(sx+ii, sy+jj);
 }
 
 
-void Matrix::addDiagonalBlock(real* mat, const size_t ldd, const size_t si, const size_t nb) const
+void Matrix::addDiagonalBlock(real* mat, const size_t ldd, const size_t start, const size_t cnt) const
 {
-    assert_true( si + nb < size() );
+    assert_true( start + cnt < size() );
 
-    for ( size_t jj = 0; jj < nb; ++jj )
-    for ( size_t ii = 0; ii < nb; ++ii )
-        mat[ ii + ldd * jj ] += value( si + ii, si + jj );
+    for ( size_t jj = 0; jj < cnt; ++jj )
+    for ( size_t ii = 0; ii < cnt; ++ii )
+        mat[ii + ldd*jj] += value(start+ii, start+jj);
 }
 
 
-void Matrix::addTriangularBlock(real* mat, const size_t ldd, const size_t si, const size_t nb, const size_t dim) const
+void Matrix::addTriangularBlock(real* mat, const size_t ldd, const size_t start, const size_t cnt, const size_t dim) const
 {
-    assert_true( si + nb < size() );
+    assert_true( start + cnt < size() );
 
-    for ( size_t ii = 0; ii < nb; ++ii )
-    for ( size_t jj = ii; jj < nb; ++jj )
-        mat[ dim*ii + ldd * dim*jj ] += value( si + ii, si + jj );
+    for ( size_t jj = 0; jj < cnt; ++jj )
+    for ( size_t ii = jj; ii < cnt; ++ii )
+        mat[dim*ii + ldd*dim*jj] += value(start+ii, start+jj);
 }
 
 //------------------------------------------------------------------------------

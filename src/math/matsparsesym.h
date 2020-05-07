@@ -81,10 +81,10 @@ public:
     void scale(real);
     
     /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
-    void addDiagonalBlock(real* mat, size_t ldd, size_t si, size_t nb) const;
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt) const;
     
-    /// add upper triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
-    void addTriangularBlock(real* mat, size_t ldd, size_t si, size_t nb, size_t dim) const;
+    /// add lower triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
+    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const;
     
     /// prepare matrix for multiplications by a vector (must be called)
     void prepareForMultiply(int dim);

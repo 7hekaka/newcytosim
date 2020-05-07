@@ -569,8 +569,8 @@ public:
             M[y+ldd*x] = val[y+4*x];
     }
     
-    /// add lower elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, size_t ldd) const
+    /// add lower elements of this block to lower triangle of 'M'
+    void addto_lower(real * M, size_t ldd) const
     {
         for ( index x = 0; x < 4; ++x )
         for ( index y = x; y < 4; ++y )

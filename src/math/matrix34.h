@@ -762,14 +762,14 @@ public:
         M[2+ldd*2] += val[10];
     }
     
-    /// add upper elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, size_t ldd) const
+    /// add lower elements of this block to upper triangle of 'M'
+    void addto_lower(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
-        M[  ldd  ] += val[1];
-        M[  ldd*2] += val[2];
+        M[1      ] += val[1];
+        M[2      ] += val[2];
         M[1+ldd  ] += val[4];
-        M[1+ldd*2] += val[5];
+        M[2+ldd*1] += val[5];
         M[2+ldd*2] += val[10];
     }
     

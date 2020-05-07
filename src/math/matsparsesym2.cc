@@ -253,25 +253,27 @@ void MatrixSparseSymmetric2::scale(const real alpha)
 
 
 void MatrixSparseSymmetric2::addTriangularBlock(real* mat, const size_t ldd,
-                                                const size_t si,
-                                                const size_t nb,
+                                                const size_t start,
+                                                const size_t cnt,
                                                 const size_t dim) const
 {
-    size_t up = si + nb;
-    assert_true( up <= size_ );
+    size_t end = start + cnt;
+    assert_true( end <= size_ );
     
-    for ( size_t jj = si; jj < up; ++jj )
+    for ( size_t jj = start; jj < end; ++jj )
     {
+        size_t j = dim * ( jj - start );
         for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             // assuming lower triangle is stored:
-            assert_true( ii >= jj );
-            if ( ii < up )
+            if ( ii < end )
             {
+                size_t i = dim * ( ii - start );
                 //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
                 // address lower triangle of 'mat'
-                mat[dim*(ii-si + ldd * (jj-si))] += col_[jj][n].val;
+                assert_true( i > j );
+                mat[i+ldd*j] += col_[jj][n].val;
             }
         }
     }
@@ -279,25 +281,27 @@ void MatrixSparseSymmetric2::addTriangularBlock(real* mat, const size_t ldd,
 
 
 void MatrixSparseSymmetric2::addDiagonalBlock(real* mat, size_t ldd,
-                                              const size_t si,
-                                              const size_t nb) const
+                                              const size_t start,
+                                              const size_t cnt) const
 {
-    size_t up = si + nb;
-    assert_true( up <= size_ );
+    size_t end = start + cnt;
+    assert_true( end <= size_ );
     
-    for ( size_t jj = si; jj < up; ++jj )
+    for ( size_t jj = start; jj < end; ++jj )
     {
+        size_t j = jj - start;
         for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             // assuming lower triangle is stored:
             assert_true( ii >= jj );
-            if ( ii < up )
+            if ( ii < end )
             {
+                size_t i = ii - start;
                 //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
-                mat[jj-si+ldd*(ii-si)] += col_[jj][n].val;
-                if ( jj != ii )
-                    mat[ii-si+ldd*(jj-si)] += col_[jj][n].val;
+                mat[j+ldd*i] += col_[jj][n].val;
+                if ( j != i )
+                    mat[i+ldd*j] += col_[jj][n].val;
             }
         }
     }

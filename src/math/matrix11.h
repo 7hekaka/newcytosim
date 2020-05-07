@@ -301,7 +301,7 @@ public:
     }
     
     /// add lower elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, size_t ldd) const
+    void addto_lower(real * M, size_t ldd) const
     {
         M[0] += val_;
     }

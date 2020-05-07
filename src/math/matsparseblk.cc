@@ -226,8 +226,7 @@ void MatrixSparseBlock::scale(const real alpha)
 
 void MatrixSparseBlock::addTriangularBlock(real* mat, const size_t ldd,
                                            const size_t start,
-                                           const size_t cnt,
-                                           const size_t) const
+                                           const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );

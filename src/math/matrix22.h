@@ -705,10 +705,10 @@ public:
     }
     
     /// add lower elements of this block to upper triangle of 'M'
-    void addto_upper(real * M, size_t ldd) const
+    void addto_lower(real * M, size_t ldd) const
     {
         M[0    ] += val[0];
-        M[  ldd] += val[1];
+        M[1    ] += val[1];
         M[1+ldd] += val[3];
         assert_true( val[2] == 0 );
     }

@@ -278,8 +278,7 @@ void MatrixSparseSymmetricBlock::scale(const real alpha)
 
 void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const size_t ldd,
                                                     const size_t start,
-                                                    const size_t cnt,
-                                                    const size_t dim) const
+                                                    const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -294,14 +293,14 @@ void MatrixSparseSymmetricBlock::addTriangularBlock(real* mat, const size_t ldd,
         if ( col.size_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
-            col[0].addto_upper(mat+(jj+ldd*jj)-off, ldd);
+            col[0].addto_lower(mat+(jj+ldd*jj)-off, ldd);
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
-                assert_true( ii > jj );
                 if ( ii < end )
                 {
+                    assert_true( ii > jj );
                     //fprintf(stderr, "`B %4i %4i % .4f\n", ii, jj, a);
                     col[n].addto_trans(mat+(ii+ldd*jj)-off, ldd);
                 }
@@ -363,25 +362,72 @@ void MatrixSparseSymmetricBlock::addDiagonalTrace(real alpha, real* mat, size_t 
         {
             size_t j = ( jj - start ) / BLOCK_SIZE;
             assert_true(col.inx_[0] == jj);
-            mat[j+ldd*j] += alpha * col[0].trace();
+            mat[j+ldd*j] += alpha * col[0].trace();  // diagonal term
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
-                assert_true( ii > jj );
                 assert_false( ii % BLOCK_SIZE );
                 if ( ii < end )
                 {
                     size_t i = ( ii - start ) / BLOCK_SIZE;
+                    assert_true( i > j );
                     real a = alpha * col[n].trace();
                     //fprintf(stderr, "MSSB %4lu %4lu : %.4f\n", i, j, a);
                     mat[i+ldd*j] += a;
-                    mat[j+ldd*i] += a;
+                    mat[j+ldd*i] += a;  // above diagonal
                 }
             }
         }
     }
 }
+
+/*
+addresses `mat' using lower banded storage for a symmetric matrix
+mat(i, j) is stored in mat[i-j+ldd*j]
+*/
+void MatrixSparseSymmetricBlock::addDiagonalTraceBanded(real alpha, real* mat, size_t ldd,
+                                                        const size_t start,
+                                                        const size_t cnt, const size_t rank) const
+{
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
+
+    size_t end = start + cnt;
+    assert_true( end <= size_ );
+
+    for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
+    {
+        Column & col = column_[jj];
+        if ( col.size_ > 0 )
+        {
+            size_t j = ( jj - start ) / BLOCK_SIZE;
+            assert_true(col.inx_[0] == jj);
+            // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+            mat[ldd*j] += alpha * col[0].trace();  // diagonal term
+            for ( size_t n = 1; n < col.size_; ++n )
+            {
+                size_t ii = col.inx_[n];
+                // assuming lower triangle is stored:
+                assert_false( ii % BLOCK_SIZE );
+                if ( ii < end )
+                {
+                    size_t i = ( ii - start ) / BLOCK_SIZE;
+                    assert_true( i > j );
+                    if ( i <= j + rank )
+                    {
+                        real a = alpha * col[n].trace();
+                        //fprintf(stderr, "MSSB %4lu %4lu : %.4f\n", i, j, a);
+                        // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+                        mat[i-j+ldd*j] += a;
+                        //mat[j+ldd*i] += a;  // above diagonal
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 int MatrixSparseSymmetricBlock::bad() const
