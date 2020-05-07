@@ -406,19 +406,23 @@ int main(int argc, char* argv[])
             return EXIT_SUCCESS;
         }
         char *dot = strrchr(arg, '.');
-        if ( dot && 0==strcmp(dot, ".cmo" ) )
+        if ( is_file(arg) )
         {
-            if ( is_file(arg) )
+            if ( has_file++ )
             {
-                if ( has_file++ )
-                {
-                    fprintf(stderr, "error: only one input file can be specified\n");
-                    return EXIT_SUCCESS;
-                }
-                strncpy(filename, arg, sizeof(filename));
+                fprintf(stderr, "error: only one input file can be specified\n");
+                return EXIT_SUCCESS;
             }
-            else
-                strncpy(outputname, arg, sizeof(outputname));
+            strncpy(filename, arg, sizeof(filename));
+        }
+        else if ( dot && 0==strcmp(dot, ".cmo" ) )
+        {
+            if ( outputname[0] )
+            {
+                fprintf(stderr, "error: only one output file can be specified\n");
+                return EXIT_SUCCESS;
+            }
+            strncpy(outputname, arg, sizeof(outputname));
         }
         else if ( is_dir(arg) )
             snprintf(filename, sizeof(filename), "%s/objects.cmo", arg);
