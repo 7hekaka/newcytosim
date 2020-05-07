@@ -235,6 +235,7 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
+    /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
 #  if ( DIM == 3 )
     alsatian_xtbsvLNN3(nbp, mec->block(), BAND_LDD, Y);
     alsatian_xtbsvLTN3(nbp, mec->block(), BAND_LDD, Y);
@@ -575,7 +576,11 @@ void Meca::getBandedBlock(const Mecable * mec, real* res) const
     real beta = -time_step * mec->leftoverMobility();
     
     if ( mec->hasRigidity() )
+    {
+        if ( BAND_LDD != 3 )
+            zero_real(BAND_LDD*nbp, res);
         setRigidityBanded(res, BAND_LDD, nbp, beta*mec->fiberRigidity());
+    }
     else
         zero_real(BAND_LDD*nbp, res);
 
@@ -587,7 +592,7 @@ void Meca::getBandedBlock(const Mecable * mec, real* res) const
     //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
 
 #if USE_ISO_MATRIX
-    mB.addTriangularBlockBanded(beta, res, nbp, mec->matIndex(), nbp, 2);
+    mB.addTriangularBlockBanded(beta, res, BAND_LDD, mec->matIndex(), nbp, 2);
     if ( useMatrixC )
 #endif
         mC.addDiagonalTraceBanded(beta/DIM, res, BAND_LDD, DIM*mec->matIndex(), DIM*nbp, 2);

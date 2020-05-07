@@ -348,8 +348,11 @@ void Simul::solve_auto()
         
         if ( autoCounter == N_TEST*N_METHODS )
         {
-            // if the differential of times is significant, use the fastest method
-            // but otherwise, select the simplest method:
+            /*
+             Compare the performance of all methods, and select the fastest.
+             Only adopt a more complicated method if the gain is significant,
+             as the simpler one uses less memory.
+             */
             autoPrecond = 0;
             for ( size_t m = 1; m < N_METHODS; ++m )
             {
