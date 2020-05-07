@@ -263,6 +263,10 @@ void addRigidityBanded(real* mat, size_t ldd, size_t cnt, const real R)
 }
 
 
+/*
+ addresses `mat' using lower banded storage for a symmetric matrix
+ mat(i, j) is stored in mat[i-j+ldd*j]
+ */
 void setRigidityBanded(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
