@@ -971,7 +971,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
             
             mul += 2;
             vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-            vec4 a1 = fmadd4(p1, cast4(load2(dif+4)), loadu4(src+4));
+            vec4 a1 = fmadd4(p1, load2Z(dif+4), loadu4(src+4));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
             storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));

@@ -359,6 +359,7 @@ void test_load()
     
     dump(cast4(load1(mem)), "cast4(load1)");
     dump(cast4(load2(mem)), "cast4(load2)");
+    dump(load2Z(mem), "load2Z");
 
     dump(load3(mem), "load3");
     dump(cat4(load1(mem+2), load2(mem)), "cat4(load1, load2)");
@@ -783,7 +784,7 @@ int main(int argc, char * argv[])
         test_twine();
         test_stride();
     }
-    if ( 0 )
+    if ( 1 )
     {
         test_cat();
         test_load();

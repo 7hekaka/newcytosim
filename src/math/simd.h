@@ -4,10 +4,7 @@
 #ifndef SIMD_H
 #define SIMD_H
 
-#define CHECK_VECTOR_ALIGNMENT 0
-
 #include <cstdio>
-
 
 //---------------------------------- SSE ---------------------------------------
 
@@ -20,17 +17,9 @@ typedef __m128d vec2;
 
 constexpr __m128d sgn11 = {-0.0, -0.0};
 
+// Attention: load1() and load2() do not initialize the upper AVX registers
 inline vec2 load1(double const* a)           { return _mm_load_sd(a); }
-#if CHECK_VECTOR_ALIGNMENT
-inline vec2 load2(double const* a)
-{
-    if ((uintptr_t)a & 15)
-        fprintf(stderr, "unaligned __m128d load2 %p\n", a);
-    return _mm_load_pd(a);
-}
-#else
 inline vec2 load2(double const* a)           { return _mm_load_pd(a); }
-#endif
 
 // unaligned load
 inline vec2 loadu2(double const* a)          { return _mm_loadu_pd(a); }
@@ -137,17 +126,30 @@ typedef __m256d vec4;
 
 constexpr __m256d sgn1111 = {-0.0, -0.0, -0.0, -0.0};
 
-#if CHECK_VECTOR_ALIGNMENT
-inline vec4 load4(double const* a)
-{
-    if ((uintptr_t)a & 31)
-        fprintf(stderr, "unaligned __m256d load4 %p (%lu)\n", a, (uintptr_t)a & 31);
-    return _mm256_load_pd(a);
-}
-#else
+
+inline vec4 setr4(double a, double b, double c, double d) { return _mm256_setr_pd(a,b,c,d); }
+inline vec4 set4(double a, double b, double c, double d)  { return _mm256_set_pd(a,b,c,d); }
+
+inline vec4 set4(double a)               { return _mm256_set1_pd(a); }
+inline vec4 setzero4()                   { return _mm256_setzero_pd(); }
+
+inline vec4 cast4(vec2 a)                { return _mm256_castpd128_pd256(a); }
+inline vec2 cast2(vec4 a)                { return _mm256_castpd256_pd128(a); }
+
 inline vec4 load4(double const* a)       { return _mm256_load_pd(a); }
-#endif
 inline vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
+
+/// unaligned load 2 values, and zeros out the upper two
+inline vec4 load2Z(double const* a)      { return _mm256_blend_pd(cast4(loadu2(a)), setzero4(), 0b1100); }
+
+/// unaligned load 4 values, and zeros out the upper one
+inline vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), setzero4(), 0b1000); }
+
+inline void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
+inline void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
+inline void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, cast2(b)); }
+inline void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
+inline void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
 
 inline __m256i makemask(long i)
 {
@@ -155,20 +157,8 @@ inline __m256i makemask(long i)
     return _mm256_castpd_si256(_mm256_cmp_pd(ramp, _mm256_set1_pd((double)i), _CMP_LT_OQ));
 }
 
-inline void store1(double* a, vec4 b)    { _mm_store_sd(a, _mm256_castpd256_pd128(b)); }
-inline void store2(double* a, vec4 b)    { _mm_store_pd(a, _mm256_castpd256_pd128(b)); }
-inline void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, _mm256_castpd256_pd128(b)); }
-inline void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
-inline void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
-
 inline vec4 maskload4(double const* a, __m256i k)     { return _mm256_maskload_pd(a,k); }
 inline void maskstore4(double* a, __m256i k, vec4 b)  { _mm256_maskstore_pd(a,k,b); }
-
-inline vec4 setr4(double a, double b, double c, double d) { return _mm256_setr_pd(a,b,c,d); }
-inline vec4 set4(double a, double b, double c, double d)  { return _mm256_set_pd(a,b,c,d); }
-
-inline vec4 set4(double a)               { return _mm256_set1_pd(a); }
-inline vec4 setzero4()                   { return _mm256_setzero_pd(); }
 
 inline vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); }
 inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); }
@@ -180,8 +170,6 @@ inline vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d c
 
 inline vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
 inline vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
-inline vec4 cast4(vec2 a)                { return _mm256_castpd128_pd256(a); }
-inline vec2 cast2(vec4 a)                { return _mm256_castpd256_pd128(a); }
 
 inline vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }
 inline vec4 div4(vec4 a, vec4 b)         { return _mm256_div_pd(a,b); }
@@ -229,9 +217,6 @@ inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
   inline vec4  load3(double const* a)    { return _mm256_maskload_pd(a, msk1110); }
   inline void store3(double* a, vec4 b)  { _mm256_maskstore_pd(a, msk1110, b); }
 #endif
-
-/// load 4 values, and zeros out the upper one
-inline vec4 load3z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 
 /// returns the sum of the elements, broadcasted
@@ -328,7 +313,8 @@ inline vec8f cvt8i(__m256i a)           { return _mm256_cvtepi32_ps(a); }
 #define rotatel4(a)         _mm256_castsi256_pd(_m256_alignr_epi8(a, a, 7));
 
 // load a memory address = [ X Y ] into [ X X Y Y ]:
-#define interleave4(a)      _mm256_permute4x64_pd(cast4(a), 0x50)
+inline vec4 interleave4(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 0x50); }
+inline vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
 
 inline vec4 broadcast1(vec2 a)  { return _mm256_broadcastsd_pd(a); }
 
@@ -348,11 +334,12 @@ inline vec4 cross4(vec4 a, vec4 b)
 /// streamload is a load that bypass the cache
 inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
 
-#else
+#elif defined __AVX__
 
 inline vec4 streamload4(double const* a) { return _mm256_load_pd(a); }
 
-#define interleave4(a)      permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100)
+inline vec4 interleave4(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
+inline vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
 
 #endif
 
