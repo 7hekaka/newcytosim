@@ -872,13 +872,14 @@ public:
     {
 #if MATRIX33_USES_AVX && ( BLD == 4 )
         Matrix33 res;
-        vec4 p = permute2f128(dir, dir, 0x01);
-        vec4 l = blend4(dir, p, 0b1100);
-        vec4 u = blend4(dir, p, 0b0011);
-        vec4 d = mul4(dir, set4(alpha));
-        store4(res.val  , mul4(d, duplo4(l)));
-        store4(res.val+4, mul4(d, duphi4(l)));
-        store4(res.val+8, mul4(d, duplo4(u)));
+        vec4 d = dir;
+        vec4 p = permute2f128(d, d, 0x01);
+        vec4 l = blend4(d, p, 0b1100);
+        vec4 u = blend4(d, p, 0b0011);
+        vec4 a = mul4(d, set4(alpha));
+        store4(res.val  , mul4(a, duplo4(l)));
+        store4(res.val+4, mul4(a, duphi4(l)));
+        store4(res.val+8, mul4(a, duplo4(u)));
         return res;
 #else
         real XX = dir.XX * alpha;
@@ -895,12 +896,14 @@ public:
     {
 #if MATRIX33_USES_AVX && ( BLD == 4 )
         Matrix33 res;
-        vec4 p = permute2f128(vec, vec, 0x01);
-        vec4 l = blend4(vec, p, 0b1100);
-        vec4 u = blend4(vec, p, 0b0011);
-        store4(res.val  , mul4(dir, duplo4(l)));
-        store4(res.val+4, mul4(dir, duphi4(l)));
-        store4(res.val+8, mul4(dir, duplo4(u)));
+        vec4 v = vec;
+        vec4 p = permute2f128(v, v, 0x01);
+        vec4 l = blend4(v, p, 0b1100);
+        vec4 u = blend4(v, p, 0b0011);
+        vec4 d = dir;
+        store4(res.val  , mul4(d, duplo4(l)));
+        store4(res.val+4, mul4(d, duphi4(l)));
+        store4(res.val+8, mul4(d, duplo4(u)));
         return res;
 #else
         return Matrix33(dir.XX*vec.XX, dir.YY*vec.XX, dir.ZZ*vec.XX,
