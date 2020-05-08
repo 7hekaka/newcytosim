@@ -1232,14 +1232,14 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
         // Solve U*X = B, overwriting B with X.
         alsatian_xtrsmLUN3<'N'>(N, A, LDA, B);
     }
-    elif ( ORD == 2 )
+    else if ( ORD == 2 )
     {
         // Solve L*X = B, overwriting B with X.
         alsatian_xtrsmLLN2<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
         alsatian_xtrsmLUN2<'N'>(N, A, LDA, B);
     }
-    elif ( ORD == 1 )
+    else if ( ORD == 1 )
     {
         // Solve L*X = B, overwriting B with X.
         alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
@@ -1248,10 +1248,10 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
     }
     else
         ABORT_NOW("unexpected DIM!");
-#  endif
 #else
     iso_xtrsmLLN<ORD, 'U'>(N, A, LDA, B);
     iso_xtrsmLLT<ORD, 'N'>(N, A, LDA, B);
 #endif
 }
 
+#endif
