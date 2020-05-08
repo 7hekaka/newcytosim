@@ -37,7 +37,7 @@ int invMatrix3(const FLOAT m[9], FLOAT inv[9])
         inv[6] = ( m[3]*m[7] - m[4]*m[6] ) * det;
         inv[1] = ( m[2]*m[7] - m[1]*m[8] ) * det;
         inv[4] = ( m[0]*m[8] - m[2]*m[6] ) * det;
-        inv[7] = ( m[1]*m[6] - m[0]*m[9] ) * det;
+        inv[7] = ( m[1]*m[6] - m[0]*m[7] ) * det;
         inv[2] = ( m[1]*m[5] - m[2]*m[4] ) * det;
         inv[5] = ( m[2]*m[3] - m[0]*m[5] ) * det;
         inv[8] = ( m[0]*m[4] - m[1]*m[3] ) * det;
