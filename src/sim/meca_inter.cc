@@ -2201,8 +2201,8 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     std::cerr << "C: " << std::setw(9) << ptB.pos() << std::endl;
 #endif
     
-    MatrixBlock waT = -weight * aR.transposed();
-    MatrixBlock wbT = -weight * bR.transposed();
+    MatrixBlock waT = aR.transposed(-weight);
+    MatrixBlock wbT = bR.transposed(-weight);
     
     // fill the matrix mC
     add_block_diag(ii0, waT*aR); //this term is symmetric but not diagonal
@@ -2407,8 +2407,8 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     const real wcc2 = -weight * cc2;
     const real wcc3 = -weight * cc3;
 
-    MatrixBlock waT = -weight * aR.transposed();
-    MatrixBlock wbT = -weight * bR.transposed();
+    MatrixBlock waT = aR.transposed(-weight);
+    MatrixBlock wbT = bR.transposed(-weight);
     
     // fill the matrix mC
     add_block_diag(ii0, waT*aR);  //this term is symmetric but not diagonal
@@ -2667,10 +2667,10 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
     Matrix22 C(cc2, -ee2,  ee2, cc2);
     Matrix22 D(cc3,  ee2, -ee2, cc3);
 
-    Matrix22 wAt = (-weight) * A.transposed(); //(ww0,  we1, -we1, ww0);
-    Matrix22 wBt = (-weight) * B.transposed(); //(ww1, -we1,  we1, ww1);
-    Matrix22 wCt = (-weight) * C.transposed(); //(ww2,  we2, -we2, ww2);
-    Matrix22 wDt = (-weight) * D.transposed(); //(ww3, -we2,  we2, ww3);
+    Matrix22 wAt = A.transposed(-weight); //(ww0,  we1, -we1, ww0);
+    Matrix22 wBt = B.transposed(-weight); //(ww1, -we1,  we1, ww1);
+    Matrix22 wCt = C.transposed(-weight); //(ww2,  we2, -we2, ww2);
+    Matrix22 wDt = D.transposed(-weight); //(ww3, -we2,  we2, ww3);
         
     /*
      We use block operations to set the matrix lower blocks:
@@ -2761,10 +2761,10 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
     MatrixBlock C = MatrixBlock::vectorProduct(cc2,  epsB*armB);
     MatrixBlock D = MatrixBlock::vectorProduct(cc3, -epsB*armB);
 
-    MatrixBlock wAt = (-weight) * A.transposed();
-    MatrixBlock wBt = (-weight) * B.transposed();
-    MatrixBlock wCt = (-weight) * C.transposed();
-    MatrixBlock wDt = (-weight) * D.transposed();
+    MatrixBlock wAt = A.transposed(-weight);
+    MatrixBlock wBt = B.transposed(-weight);
+    MatrixBlock wCt = C.transposed(-weight);
+    MatrixBlock wDt = D.transposed(-weight);
         
     /*
      We use block operations to set the matrix lower blocks:
@@ -4314,8 +4314,8 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0,  eps*arm);
     MatrixBlock bR = MatrixBlock::vectorProduct(cc1, -eps*arm);
 
-    MatrixBlock waT = -weight * aR.transposed();
-    MatrixBlock wbT = -weight * bR.transposed();
+    MatrixBlock waT = aR.transposed(-weight);
+    MatrixBlock wbT = bR.transposed(-weight);
     
     // fill the matrix mC
     add_block_diag(ii0, waT*aR); //this term is symmetric but not diagonal

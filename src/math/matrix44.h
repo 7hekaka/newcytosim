@@ -306,6 +306,34 @@ public:
         return res;
     }
     
+    /// return scaled transposed matrix
+    Matrix44 transposed(real alpha) const
+    {
+        Matrix44 res;
+#if MATRIX44_USES_AVX
+        vec4 a = set4(alpha);
+        vec4 v0 = mul4(a, load4(val));
+        vec4 v1 = mul4(a, load4(val+4));
+        vec4 v2 = mul4(a, load4(val+8));
+        vec4 v3 = mul4(a, load4(val+12));
+        vec4 u0 = unpacklo4(v0, v1);
+        vec4 u1 = unpackhi4(v0, v1);
+        vec4 u2 = unpacklo4(v2, v3);
+        vec4 u3 = unpackhi4(v2, v3);
+        v0 = permute2f128(u0, u2, 0x21);
+        v1 = permute2f128(u1, u3, 0x21);
+        store4(res.val   , blend4(u0, v0, 0b1100));
+        store4(res.val+4 , blend4(u1, v1, 0b1100));
+        store4(res.val+8 , blend4(u2, v0, 0b0011));
+        store4(res.val+12, blend4(u3, v1, 0b0011));
+#else
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = 0; y < 4; ++y )
+            res.val[y+4*x] = alpha * val[x+4*y];
+#endif
+        return res;
+    }
+
     /// maximum of all component's absolute values
     real norm_inf() const
     {

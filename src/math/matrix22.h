@@ -338,7 +338,17 @@ public:
         return Matrix22(val[0], val[2], val[1], val[3]);
 #endif
     }
-    
+       
+    /// return scaled transposed matrix
+    Matrix22 transposed(real alpha) const
+    {
+#if MATRIX22_USES_AVX && defined __AVX2__
+        return Matrix22(mul4(set4(alpha), permute4x64(mat, 0xD8)));
+#else
+        return Matrix22(alpha*val[0], alpha*val[2], alpha*val[1], alpha*val[3]);
+#endif
+    }
+ 
     /// maximum of all component's absolute values
     real norm_inf() const
     {

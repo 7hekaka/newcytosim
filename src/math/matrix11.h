@@ -195,7 +195,13 @@ public:
     {
         return Matrix11(val_);
     }
-    
+        
+    /// return scaled transposed matrix
+    Matrix11 transposed(real alpha) const
+    {
+        return Matrix11(alpha*val_);
+    }
+
     /// maximum of all component's absolute values
     real norm_inf() const
     {

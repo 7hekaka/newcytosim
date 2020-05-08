@@ -345,6 +345,29 @@ public:
         return res;
     }
     
+    /// return matrix where 3x3 part is transposed and scale by alpha
+    Matrix34 transposed(real alpha) const
+    {
+        Matrix34 res;
+#if MATRIX34_USES_AVX
+        vec4 a = set4(alpha);
+        vec4 m012 = mul4(a, load4(val  ));
+        vec4 m345 = mul4(a, load4(val+4));
+        vec4 m678 = mul4(a, load4(val+8));
+        vec4 z = shuffle4(m012, m345, 0b0011);
+        vec4 u = permute2f128(m678, z, 0x03);
+        vec4 t = shuffle4(m012, m345, 0b1000);
+        store4(res.val  , blend4(u, t, 0b1011));
+        store4(res.val+4, blend4(z, shuffle4(u, m345, 0b1100), 0b1100));
+        store4(res.val+8, blend4(u, m678, 0b1100));
+#else
+        for ( index x = 0; x < 3; ++x )
+        for ( index y = 0; y < 3; ++y )
+            res[y+4*x] = alpha * val[x+4*y];
+#endif
+        return res;
+    }
+
 #pragma mark -
 
     /// maximum of all component's absolute values
