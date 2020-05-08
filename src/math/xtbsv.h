@@ -254,7 +254,7 @@ void  blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
 
 /**
  This calls the standard lapack::pbtf2()
- and then inverts the diagonal terms
+ and then *** inverts *** the diagonal terms
  
  SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
  
@@ -820,5 +820,33 @@ inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, 
         *INFO = 1;
 }
 
+
+template < int ORD >
+inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
+{
+#ifdef __AVX__
+    /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
+    if ( ORD == 3 )
+    {
+        alsatian_xtbsvLNN3(N, AB, LDAB, B);
+        alsatian_xtbsvLTN3(N, AB, LDAB, B);
+    }
+    else if ( ORD == 2 )
+    {
+        alsatian_xtbsvLNN2(N, AB, LDAB, B);
+        alsatian_xtbsvLTN2(N, AB, LDAB, B);
+    }
+    else if ( ORD == 1 )
+    {
+        alsatian_xtbsvLNN1(N, AB, LDAB, B);
+        alsatian_xtbsvLTN1(N, AB, LDAB, B);
+    }
+    else
+        ABORT_NOW("unexpected DIM!");
+#else
+    alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
+    alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
+#endif
+}
 
 #endif

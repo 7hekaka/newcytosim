@@ -235,17 +235,7 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
-    /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
-#  if ( DIM == 3 )
-    alsatian_xtbsvLNN3(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLTN3(nbp, mec->block(), BAND_LDD, Y);
-#  elif ( DIM == 2 )
-    alsatian_xtbsvLNN2(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLTN2(nbp, mec->block(), BAND_LDD, Y);
-#  elif ( DIM == 1 )
-    alsatian_xtbsvLNN1(nbp, mec->block(), BAND_LDD, Y);
-    alsatian_xtbsvLTN1(nbp, mec->block(), BAND_LDD, Y);
-#  endif
+    alsatian_xpbtrsL<DIM>(nbp, mec->block(), BAND_LDD, Y);
 #else
     /*
      we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
@@ -278,7 +268,7 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
     free_real(tmp);
 #endif
 #if CHOUCROUTE
-    alsatian_xpotrsL(nbp, mec->block(), nbp, Y);
+    alsatian_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
 #else
     iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
 #endif
@@ -295,7 +285,7 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
      because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
      */
     //iso_xgetrsL<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
-    alsatian_xgetrsN(nbp, mec->block(), nbp, mec->pivot(), Y);
+    alsatian_xgetrsN<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
 }
 
 

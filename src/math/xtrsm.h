@@ -277,6 +277,12 @@ void iso_xtrsmLLN(const int M, const real* A, const int lda, real* B)
                 temp[d] = B[ORD*K+d] / A[K+lda*K];
                 B[ORD*K+d] = temp[d];
             }
+        } else if ( diag == 'I' ) {
+            for ( int d = 0; d < ORD; ++d )
+            {
+                temp[d] = B[ORD*K+d] * A[K+lda*K];
+                B[ORD*K+d] = temp[d];
+            }
         } else {
             for ( int d = 0; d < ORD; ++d )
                 temp[d] = B[ORD*K+d];
@@ -322,6 +328,9 @@ void iso_xtrsmLLT(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
                 B[ORD*I+d] = temp[d] / A[I+lda*I];
+        } else if ( diag == 'I' ) {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] = temp[d] * A[I+lda*I];
         } else {
             for ( int d = 0; d < ORD; ++d )
                 B[ORD*I+d] = temp[d];
@@ -358,7 +367,7 @@ void iso_xtrsmLUN(const int M, const real* A, const int lda, real* B)
                     temp[d] = B[ORD*K+d] / A[K+lda*K];
                     B[ORD*K+d] = temp[d];
                 }
-            } else if ( diag == 'A' ) {
+            } else if ( diag == 'I' ) {
                 for ( int d = 0; d < ORD; ++d )
                 {
                     temp[d] = B[ORD*K+d] * A[K+lda*K];
@@ -407,6 +416,9 @@ void iso_xtrsmLUT(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
                 B[ORD*I+d] = temp[d] / A[I+lda*I];
+        } else if ( diag == 'I' ) {
+            for ( int d = 0; d < ORD; ++d )
+                B[ORD*I+d] = temp[d] * A[I+lda*I];
         } else {
             for ( int d = 0; d < ORD; ++d )
                 B[ORD*I+d] = temp[d];
@@ -441,7 +453,7 @@ void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
             vec4 n = T;
             T = div4(T, broadcast1(A+K));
             storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
-        } else if ( diag == 'A' ) {
+        } else if ( diag == 'I' ) {
             vec4 n = T;
             T = mul4(T, broadcast1(A+K)); // DIV
             storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
@@ -678,7 +690,7 @@ void alsatian_xtrsmLLT3(const int M, const real* A, const int lda, real* B)
         }
         if ( diag == 'N' )
             s0 = sub4(div4(s0, broadcast1(A+I)), ori);
-        else if ( diag == 'A' )
+        else if ( diag == 'I' )
             s0 = fmadd4(s0, broadcast1(A+I), ori);
         else
             s0 = add4(s0, ori);
@@ -713,7 +725,7 @@ void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             T = div4(ori, broadcast1(A+K));
             ori = blend4(T, ori, 0b1000);  // blend to keep 4th value!
-        } else if ( diag == 'A' ) {
+        } else if ( diag == 'I' ) {
             T = mul4(ori, broadcast1(A+K)); // DIV
             ori = blend4(T, ori, 0b1000);
         }
@@ -799,7 +811,7 @@ void alsatian_xtrsmLLN2(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             temp = div2(temp, loaddup2(A+K));
             store2(B+2*K, temp);
-        } else if ( diag == 'A' ) {
+        } else if ( diag == 'I' ) {
             temp = mul2(temp, loaddup2(A+K)); // DIV
             store2(B+2*K, temp);
         }
@@ -825,7 +837,7 @@ void alsatian_xtrsmLLT2(const int M, const real* A, const int lda, real* B)
             temp = fnmadd2(loaddup2(A+K), load2(B+2*K), temp);
         if ( diag == 'N' )
             temp = div2(temp, loaddup2(A+I));
-        else if ( diag == 'A' )
+        else if ( diag == 'I' )
             temp = mul2(temp, loaddup2(A+I)); // DIV
         store2(B+2*I, temp);
     }
@@ -844,7 +856,7 @@ void alsatian_xtrsmLUN2(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             temp = div2(temp, loaddup2(A+K));
             store2(B+2*K, temp);
-        } else if ( diag == 'A' ) {
+        } else if ( diag == 'I' ) {
             temp = mul2(temp, loaddup2(A+K)); // DIV
             store2(B+2*K, temp);
         }
@@ -866,7 +878,7 @@ void alsatian_xtrsmLLN1(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             temp /= A[K];
             B[K] = temp;
-        } else if ( diag == 'A' ) {
+        } else if ( diag == 'I' ) {
             temp *= A[K]; // DIV
             B[K] = temp;
         }
@@ -892,7 +904,7 @@ void alsatian_xtrsmLLT1(const int M, const real* A, const int lda, real* B)
             temp -= A[K] * B[K];
         if ( diag == 'N' )
             temp /= A[I];
-        else if ( diag == 'A' )
+        else if ( diag == 'I' )
             temp *= A[I]; // DIV
         B[I] = temp;
     }
@@ -911,7 +923,7 @@ void alsatian_xtrsmLUN1(const int M, const real* A, const int lda, real* B)
         if ( diag == 'N' ) {
             temp /= A[K];
             B[K] = temp;
-        } else if ( diag == 'A' ) {
+        } else if ( diag == 'I' ) {
             temp *= A[K]; // DIV
             B[K] = temp;
         }
@@ -995,24 +1007,17 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 
 
 template < int ORD >
-void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
+void alsatian_xpotrsL0(const int N, const real* A, const int LDA, real* B)
 {
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
     {
         for ( int u = 0; u < N; ++u )
             tmp[u] = B[d+ORD*u];
-#if 0
         // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-        blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
+        alsatian_xtrsmLLN1<'I'>(N, A, LDA, tmp);
         // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-        blas::xtrsm('L', 'L', 'T', 'N', N, 1, 1.0, A, LDA, tmp, N);
-#else
-        // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-        alsatian_xtrsmLLN1<'A'>(N, A, LDA, tmp);
-        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-        alsatian_xtrsmLLT1<'A'>(N, A, LDA, tmp);
-#endif
+        alsatian_xtrsmLLT1<'I'>(N, A, LDA, tmp);
         for ( int u = 0; u < N; ++u )
             B[d+ORD*u] = tmp[u];
     }
@@ -1020,19 +1025,30 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 }
 
 
+template < int ORD >
 void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
-#if ( DIM == 3 )
-    alsatian_xtrsmLLN3<'A'>(N, A, LDA, B);
-    alsatian_xtrsmLLT3<'A'>(N, A, LDA, B);
-#elif ( DIM == 2 )
-    alsatian_xtrsmLLN2<'A'>(N, A, LDA, B);
-    alsatian_xtrsmLLT2<'A'>(N, A, LDA, B);
-#elif ( DIM == 1 )
-    alsatian_xtrsmLLN1<'A'>(N, A, LDA, B);
-    alsatian_xtrsmLLT1<'A'>(N, A, LDA, B);
+#ifdef __AVX__
+    if ( ORD == 3 )
+    {
+        alsatian_xtrsmLLN3<'I'>(N, A, LDA, B);
+        alsatian_xtrsmLLT3<'I'>(N, A, LDA, B);
+    }
+    else if ( ORD == 2 )
+    {
+        alsatian_xtrsmLLN2<'I'>(N, A, LDA, B);
+        alsatian_xtrsmLLT2<'I'>(N, A, LDA, B);
+    }
+    else if ( ORD == 1 )
+    {
+        alsatian_xtrsmLLN1<'I'>(N, A, LDA, B);
+        alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
+    }
+    else
+        ABORT_NOW("unexpected DIM!");
 #else
-    ABORT_NOW("unexpected DIM!");
+    iso_xtrsmLLN<ORD, 'I'>(N, A, LDA, B);
+    iso_xtrsmLLT<ORD, 'I'>(N, A, LDA, B);
 #endif
 }
 
@@ -1203,28 +1219,39 @@ void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, rea
 }
 
 
+template < int ORD >
 void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
     // Apply row interchanges to the right hand side.
-    iso_xlaswp<DIM>(B, 1, N, IPIV, 1);
-#if ( DIM == 3 )
-    // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN3<'U'>(N, A, LDA, B);
-    // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN3<'N'>(N, A, LDA, B);
-#elif ( DIM == 2 )
-    // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN2<'U'>(N, A, LDA, B);
-    // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN2<'N'>(N, A, LDA, B);
-#elif ( DIM == 1 )
-    // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
-    // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1<'N'>(N, A, LDA, B);
+    iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
+#ifdef __AVX__
+    if ( ORD == 3 )
+    {
+        // Solve L*X = B, overwriting B with X.
+        alsatian_xtrsmLLN3<'U'>(N, A, LDA, B);
+        // Solve U*X = B, overwriting B with X.
+        alsatian_xtrsmLUN3<'N'>(N, A, LDA, B);
+    }
+    elif ( ORD == 2 )
+    {
+        // Solve L*X = B, overwriting B with X.
+        alsatian_xtrsmLLN2<'U'>(N, A, LDA, B);
+        // Solve U*X = B, overwriting B with X.
+        alsatian_xtrsmLUN2<'N'>(N, A, LDA, B);
+    }
+    elif ( ORD == 1 )
+    {
+        // Solve L*X = B, overwriting B with X.
+        alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
+        // Solve U*X = B, overwriting B with X.
+        alsatian_xtrsmLUN1<'N'>(N, A, LDA, B);
+    }
+    else
+        ABORT_NOW("unexpected DIM!");
+#  endif
 #else
-    ABORT_NOW("unexpected DIM!");
+    iso_xtrsmLLN<ORD, 'U'>(N, A, LDA, B);
+    iso_xtrsmLLT<ORD, 'N'>(N, A, LDA, B);
 #endif
 }
 
-#endif
