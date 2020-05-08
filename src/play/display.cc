@@ -791,7 +791,7 @@ void Display::drawFiberLines(Fiber const& fib) const
         lineWidth(disp->line_width);
 #if ( DIM > 1 ) && REAL_IS_DOUBLE
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(DIM, GL_DOUBLE, 0, fib.data());
+        glVertexPointer(DIM, GL_DOUBLE, 0, fib.addrPoints());
         glDrawArrays(GL_LINE_STRIP, 0, fib.nbPoints());
         glDisableClientState(GL_VERTEX_ARRAY);
 #else

@@ -18,7 +18,7 @@ void Simul::solve_flux()
 
     for ( Fiber * fib = fibers.first(); fib ; fib=fib->next() )
     {
-        real const* pos = fib->data();
+        real const* pos = fib->addrPoints();
         if ( pos[DIM] > pos[0] )
             fib->translate( Vector(-shift, 0, 0) );
         else

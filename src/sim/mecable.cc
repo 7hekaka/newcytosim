@@ -74,14 +74,15 @@ void Mecable::blockSize(size_t bks, size_t block, size_t pivot)
 
 /**
  allocateMecable(size) ensures that the set can hold `size` points
- it returns the size if new memory was allocated
+ returns: size of new memory allocated, or 0
+ some extra space is allowed in 3D to allow for AVX overspill
  */
 size_t Mecable::allocateMecable(const size_t nbp)
 {
     pForce = nullptr;
     if ( pAllocated < nbp )
     {
-        size_t all = chunk_real(nbp);
+        size_t all = chunk_real(nbp+(DIM==3));
         // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
         // allocate memory:
@@ -373,7 +374,7 @@ void Mecable::print(std::ostream& os, real const* ptr) const
 
 std::ostream& operator << (std::ostream& os, Mecable const& arg)
 {
-    arg.print(os, arg.data());
+    arg.print(os, arg.addrPoints());
     return os;
 }
 

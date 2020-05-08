@@ -118,7 +118,7 @@ public:
     Vector          posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
     /// Address of coordinate array
-    const real*     data()                const { return pPos; }
+    const real*     addrPoints()        const { return pPos; }
     
     /// Address of point `p`
     const real*     addrPoint(size_t p) const { return pPos + DIM*p; }

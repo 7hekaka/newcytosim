@@ -61,7 +61,7 @@ void Display2::drawSimul(Simul const& sim)
         {
             lineWidth(fib->prop->disp->line_width);
             fib->disp->color.load();
-            glVertexPointer(DIM, GL_DOUBLE, 0, fib->data());
+            glVertexPointer(DIM, GL_DOUBLE, 0, fib->addrPoints());
             glDrawArrays(GL_LINE_STRIP, 0, fib->nbPoints());
         }
     }
