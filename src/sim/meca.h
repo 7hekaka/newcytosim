@@ -599,7 +599,7 @@ public:
     //-------------------------- COMPUTING METHODS -----------------------------
 
     /// Allocate the memory necessary to solve(). This must be called after the last add()
-    void prepare(Simul*);
+    void prepare(Simul const*);
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
     size_t solve(SimulProp const*, unsigned precondition);

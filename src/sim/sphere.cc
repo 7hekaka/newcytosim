@@ -271,7 +271,7 @@ void Sphere::setDragCoefficientStokes()
     spDrag    = 6 * M_PI * prop->viscosity * rad;
     spDragRot = 8 * M_PI * prop->viscosity * rad * rad * rad;
 
-    Cytosim::log("Sphere of radius %.3f has mobility %.2e\n", spRadius, spDrag);
+    //Cytosim::log("Sphere of radius %.3f has mobility %.2e\n", spRadius, spDrag);
 }
 
 
@@ -305,7 +305,7 @@ void Sphere::setDragCoefficientPiston()
     spDragRot = 2*M_PI*M_PI * prop->viscosity * rad * rad * rad * sqrt(2.0/eps);
         
     //report the reduced mobility of the sphere:
-    Cytosim::out << "Sphere of radius "<< radius() <<" has drag coefficient "<<spDrag<<", due to piston effect" << std::endl;
+    Cytosim::log("Sphere of radius %.3f has piston mobility %.2e\n", spRadius, spDrag);
 }
 
 

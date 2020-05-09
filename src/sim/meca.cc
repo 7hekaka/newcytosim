@@ -1248,7 +1248,7 @@ int compareMecables(const void * ap, const void * bp)
  Allocate and reset matrices and vectors necessary for Meca::solve(),
  copy coordinates of Mecables into vPTS[]
  */
-void Meca::prepare(Simul* sim)
+void Meca::prepare(Simul const* sim)
 {
     mecables.clear();
 

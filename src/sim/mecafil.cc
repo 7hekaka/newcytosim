@@ -121,6 +121,7 @@ real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 
 void Mecafil::storeDirections()
 {
+    //iDirValid = true;
 #if ( 1 )
     //checkSegmentation(0.01);
     /*

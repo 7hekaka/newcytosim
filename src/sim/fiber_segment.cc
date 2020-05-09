@@ -28,8 +28,8 @@ real FiberSegment::projectPoint0(Vector W, real& dis) const
     Vector A = pos1();
     W -= A;
     
-    if ( modulo )
-        modulo->fold(W);
+    //if ( modulo )
+    //    modulo->fold(W);
     
     // project with the scalar product:
     real abs = dot(W, pos2()-A) * lenInv();

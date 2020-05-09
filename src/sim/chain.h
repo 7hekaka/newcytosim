@@ -15,6 +15,9 @@ class Glossary;
 // Option to segment Filaments according to their curvature (experimental)
 #define CURVATURE_DEPENDENT_SEGMENTATION 0
 
+#define FIBER_HAS_NORMAL 0
+
+
 /// Mecable with linear geometry
 /**
  This class describes a thin flexible filament that is longitudinally incompressible.
@@ -79,13 +82,13 @@ private:
   
 #if CURVATURE_DEPENDENT_SEGMENTATION    
     /// error due to the cutting at different steps
-    real         fnCutErrorVal;
+    real         autoCutVal;
     
     /// number of errors accumulated
-    real         fnCutErrorCnt;
+    real         autoCutCnt;
     
-    /// index into the fnCutError[]
-    size_t       fnCutErrorIdx;
+    /// index into the autoCut[]
+    size_t       autoCutIdx;
 #endif
     
     /// abscissa of the minus-end (equal to zero initially)
@@ -93,18 +96,23 @@ private:
     
     /// abscissa of the plus-end
     real         fnAbscissaP;
-
+    
+#if FIBER_HAS_NORMAL
     /// vector orthogonal to backbone at the origin, used for display only
     mutable Vector3 fnNormal;
-
-protected:
+#endif
     
+protected:
+
     /// time at birth
     real         fnBirthTime;
 
     /// flag to update
     bool         needUpdate;
     
+    /// true if iDir[] may be up-to-date
+    //bool         iDirValid;
+
     /// callback to signal that update is needed, to be called after a change in length
     void         postUpdate() { needUpdate = true; }
     

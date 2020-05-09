@@ -356,8 +356,9 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
 
 
 /**
- This is used to check two FiberSegment, that each represent a segment of a Fiber.
- The segments are tested for intersection in 3D.
+ This is used to check two FiberSegment, each representing the segment of a Fiber.
+ in 3D, the segments are tested for getting within the requested distance.
+ in 2D, only the vertices are checked.
  */
 void PointGrid::checkLL(Meca& meca, StericParam const& pam,
                         FatLocus const& aa, FatLocus const& bb) const

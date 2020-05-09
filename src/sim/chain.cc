@@ -18,27 +18,10 @@
 #include "simul.h"
 #include "vecprint.h"
 
-#if ( 0 )
-// defined in Mecafil
-void projectForcesD_(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
-{
-    for ( size_t s = 0, e = DIM*nbs; s < DIM; ++s, ++e )
-    {
-        dst[s] = src[s] + dif[s    ] * mul[    0];
-        dst[e] = src[e] - dif[e-DIM] * mul[nbs-1];
-    }
-    
-    for ( size_t jj = 1; jj < nbs; ++jj )
-    {
-        const size_t kk = DIM*jj;
-        dst[kk  ] = src[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
-        dst[kk+1] = src[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
-#if ( DIM > 2 )
-        dst[kk+2] = src[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
-#endif
-    }
-}
-#endif
+
+// defined in "mecafil_code.cc"
+extern void projectForcesD_(size_t, const real*, const real*, const real*, real*);
+
 
 extern Modulo const* modulo;
 
@@ -73,19 +56,22 @@ real Chain::contourLength(const real pts[], size_t n_pts)
 
 Chain::Chain()
 {
-    fnNormal.set(0, 0, 1);
     fnCut          = 0;
     fnSegmentation = 0;
-    fnAbscissaM    = 0;
-    fnAbscissaP    = 0;
-    fnBirthTime    = 0;
 #if CURVATURE_DEPENDENT_SEGMENTATION
-    fnCutErrorVal  = 0;
-    fnCutErrorCnt  = 0;
+    autoCutVal  = 0;
+    autoCutCnt  = 0;
     // set different 'seeds' to desynchronize the adjustSegmentation()
-    fnCutErrorIdx  = RNG.pint(RECUT_PERIOD);
+    autoCutIdx  = RNG.pint(RECUT_PERIOD);
 #endif
-    needUpdate     = false;
+    fnAbscissaM = 0;
+    fnAbscissaP = 0;
+    fnBirthTime = 0;
+    needUpdate  = false;
+    //iDirValid   = false;
+#if FIBER_HAS_NORMAL
+    fnNormal.set(0, 0, 1);
+#endif
 }
 
 
@@ -250,15 +236,19 @@ void Chain::setEquilibrated(real len, real persistence_length)
 
 /**
  This adjusts the current `normal` or makes a new one if necessary
- (used for display)
+ (that is only used for display following the 'faked' actin or microtubule style)
  */
 Vector3 Chain::adjustedNormal(Vector3 const& d) const
 {
+#if FIBER_HAS_NORMAL
     if ( fnNormal.normSqr() < 0.8 || dot(fnNormal, d) > 0.5 )
         fnNormal = d.orthogonal(1.0);
     else
         fnNormal = d.orthogonal(fnNormal, 1.0);
     return fnNormal;
+#else
+    return Vector3(1,0,0);
+#endif
 }
 
 
@@ -811,7 +801,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 #if ( 0 )
         // checking against older code
         reshape_apply_alt(nbs, dif, src, mem, mag);
-        //projectForcesD_(nbs, dif, src, mem, mag);
+        //projectForcesD_(nbs, dif, src, mem, mag);  // similar calculation!
         size_t nbv = DIM*nbs+DIM;
         real errP = blas::max_diff(nbv, mag, dst);
         //printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
@@ -972,6 +962,7 @@ void Chain::getPoints(real const* ptr)
         Cytosim::warn << "a crude method was used to reshape " << reference() << '\n';
     }
     //dump(std::cerr);
+    //iDirValid = false;
 }
 
 
@@ -1657,27 +1648,27 @@ void Chain::adjustSegmentation()
         goto clear_counter;
     }
     
-    // accumulate the error in variable fnCutError, 
+    // accumulate the error in variable autoCut, 
     // The error is in angle-square: 1-cos(angle) ~ (angle)^2
-    fnCutErrorCnt += 1.0;
-    fnCutErrorVal += minCosinus();
+    autoCutCnt += 1.0;
+    autoCutVal += minCosinus();
     
     // after accumulation of RECUT_PERIOD time steps, we check the result
-    if ( ++fnCutErrorIdx < RECUT_PERIOD )
+    if ( ++autoCutIdx < RECUT_PERIOD )
         return;
     
-    if ( fnCutErrorCnt > 2 )
+    if ( autoCutCnt > 2 )
     {
         // calculate error accumulated over the last steps
-        fnCutErrorVal = ( 1.0 - fnCutErrorVal/fnCutErrorCnt ) * fnCut;
+        autoCutVal = ( 1.0 - autoCutVal/autoCutCnt ) * fnCut;
         
-        if ( fnCutErrorVal > RECUT_PRECISION )
+        if ( autoCutVal > RECUT_PRECISION )
         {
             //cut more finely if the error is large
             if ( fnCut > fnSegmentation )
                 resegment(2*nbs);
         }
-        else if ( fnCutErrorVal < 0.1 * RECUT_PRECISION )
+        else if ( autoCutVal < 0.1 * RECUT_PRECISION )
         {
             /*
              We want the future error with fewer points to be small.
@@ -1691,9 +1682,9 @@ void Chain::adjustSegmentation()
     }
 clear_counter:
     //reset the counter and error accumulator
-    fnCutErrorIdx = 0;
-    fnCutErrorCnt = 0;
-    fnCutErrorVal = 0;
+    autoCutIdx = 0;
+    autoCutCnt = 0;
+    autoCutVal = 0;
 }
 
 #endif

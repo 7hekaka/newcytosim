@@ -216,7 +216,7 @@ void Simul::setStericInteractions(Meca& meca) const
  - call setStericInteractions() if prop->steric is true.
  .
  */
-void Simul::setInteractions(Meca& meca) const
+void Simul::setAllInteractions(Meca& meca) const
 {
     for ( Space * s=spaces.first(); s; s=s->next() )
         s->setInteractions(meca);
@@ -293,7 +293,7 @@ void Simul::solve()
 {
     sMeca.prepare(this);
     //auto rdt = __rdtsc();
-    setInteractions(sMeca);
+    setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.solve(prop, prop->precondition);
     //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
@@ -306,7 +306,7 @@ void Simul::solve_half()
 {
     sMeca.prepare(this);
     //auto rdt = __rdtsc();
-    setInteractions(sMeca);
+    setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.solve(prop, prop->precondition);
     //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
@@ -320,7 +320,7 @@ void Simul::solve_half()
 void Simul::solve_auto()
 {
     sMeca.prepare(this);
-    setInteractions(sMeca);
+    setAllInteractions(sMeca);
     
     // solve the system, recording time:
     //double cpu = TicToc::milliseconds();
@@ -398,7 +398,8 @@ void Simul::computeForces() const
         if ( !ready() )
         {
             prop->complete(*this);
-            setInteractions(sMeca);
+            sMeca.prepare(this);
+            setAllInteractions(sMeca);
             sMeca.computeForces();
         }
         else
