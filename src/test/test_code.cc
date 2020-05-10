@@ -46,9 +46,9 @@ void nan_real(size_t cnt, real*& ptr)
 
 void nan_reals(size_t cnt, real*& x, real*& y, real*& z, real mag)
 {
-    nan_real(cnt, x);
-    nan_real(cnt, y);
-    nan_real(cnt, z);
+    x = new_real(cnt);
+    y = new_real(cnt);
+    z = new_real(cnt);
     
     for ( size_t i=0; i<cnt; ++i )
     {
@@ -67,23 +67,22 @@ void free_reals(real* x, real* y, real* z)
 
 
 #pragma STDC_FENV_ACCESS on
-void show_fe_exceptions(const char* str)
+void print_fe_exceptions(const char* str)
 {
     int n = std::fetestexcept(FE_ALL_EXCEPT);
     n &= ~FE_INEXACT;
     if ( n )
     {
-        printf(" %s(", str);
-        if (n&FE_DIVBYZERO) printf("DIVBYZERO ");
-        if (n&FE_INEXACT)   printf("INEXACT ");
-        if (n&FE_INVALID)   printf("INVALID ");
-        if (n&FE_OVERFLOW)  printf("OVERFLOW ");
-        if (n&FE_UNDERFLOW) printf("UNDERFLOW ");
-        if (n&FE_ALL_EXCEPT) printf("UNKNOWN ");
+        fprintf(stderr, " %s(", str);
+        if (n&FE_DIVBYZERO) fprintf(stderr, "DIVBYZERO ");
+        if (n&FE_INEXACT)   fprintf(stderr, "INEXACT ");
+        if (n&FE_INVALID)   fprintf(stderr, "INVALID ");
+        if (n&FE_OVERFLOW)  fprintf(stderr, "OVERFLOW ");
+        if (n&FE_UNDERFLOW) fprintf(stderr, "UNDERFLOW ");
+        if (n&FE_ALL_EXCEPT) fprintf(stderr, "UNKNOWN ");
         if ( std::feclearexcept(FE_ALL_EXCEPT) )
-            printf("unclear)");
-        else
-            printf(")");
+            fprintf(stderr, "unclear ");
+        fprintf(stderr, "\b)");
     }
 }
 
@@ -125,7 +124,7 @@ void setFilament(size_t nbs, real seg, real persistence_length, real mag)
     nbs = std::min(nbs, NBS+1);
     size_t nbv = DIM * ( nbs + 1 );
     nan_real(nbv, pos_);
-    nan_real(nbv-DIM, dir_);
+    nan_real(nbv, dir_);
     nan_real(nbs, lag_);
 
     real sigma = sqrt(2.0*seg/persistence_length);
@@ -150,7 +149,7 @@ void setFilament(size_t nbs, real seg, real persistence_length, real mag)
     for ( size_t i = 0 ; i < nbv; ++i )
         force_[i] = mag * RNG.sreal();
     
-    show_fe_exceptions("setFililament");
+    print_fe_exceptions("setFilament");
 }
 
 
@@ -178,7 +177,7 @@ void setProjection(size_t nbs)
     std::clog << "\nD "; VecPrint::print(std::clog, nbs, diag_, 3);
     std::clog << "\nU "; VecPrint::print(std::clog, nbs-1, upper_, 3); std::clog << '\n';
 #endif
-    show_fe_exceptions("setProjection");
+    print_fe_exceptions("setProjection");
 }
 
 
@@ -197,7 +196,7 @@ void setAnisotropy(size_t nbs)
     for ( size_t p = DIM ; p < sup; ++p )
         ani_[p] = 0.5 * ( dir_[p-DIM] + dir_[p] );
     
-    show_fe_exceptions("setAnisotroy");
+    print_fe_exceptions("setAnisotroy");
 }
 
 
@@ -497,8 +496,8 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         vec4 yz = blend4(s1, s2, 0b1100);
         
         vec4 mm = shuffle4(xy, yz, 0b0101);
-        mm = add4(mm, blend4(zx, xy, 0b0101));
-        store4(mul, add4(mm, blend4(zx, yz, 0b1010)));
+        zx = add4(blend4(zx, yz, 0b1010), blend4(zx, xy, 0b0101));
+        store4(mul, add4(mm, zx));
         
         src += 12;
         dif += 12;
@@ -507,26 +506,26 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
     while ( mul < end+2 )
     {
         vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+3), loadu4(src)));
-        vec4 s1 = mul4(load4(dif+4), sub4(cast4(loadu2(src+7)), loadu4(src+4)));
+        vec2 s1 = mul2(load2(dif+4), sub2(loadu2(src+7), loadu2(src+4)));
 
-        vec4 xy = blend4(s0, s1, 0b1100);
-        vec4 zx = permute2f128(s0, s0, 0x21);
-        
-        vec4 mm = shuffle4(xy, s1, 0b0101);
-        mm = add4(mm, blend4(zx, xy, 0b0101));
-        store2(mul, add4(mm, blend4(zx, s1, 0b1010)));
-        
+        vec2 xy = getlo(s0);
+        vec2 zx = gethi(s0);
+
+        vec2 mm = shuffle2(xy, s1, 0b01);
+        zx = add2(blend2(zx, s1, 0b10), blend2(zx, xy, 0b01));
+        store2(mul, add2(mm, zx));
+
         src += 6;
         dif += 6;
         mul += 2;
     }
     while ( mul < end+3 )
     {
-        vec4 x = mul4(load3(dif), sub4(load3(src+3), loadu4(src)));
-        vec4 z = permute2f128(x, x, 0x21);
-        vec4 y = permute4(x, 0b0011);
+        vec2 x = mul2(loadu2(dif), sub2(loadu2(src+3), loadu2(src)));
+        vec2 z = mul1(load1(dif+2), sub1(load1(src+5), load1(src+2)));
+        vec2 y = permute2(x, 0b1);
         
-        store1(mul, add4(add4(x, y), z));
+        store1(mul, add1(add1(x, y), z));
         
         src += 3;
         dif += 3;
@@ -993,8 +992,9 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         } break;
         case 3: {
             // 1 vector remaining
-            dd = blend4(dd, setzero4(), 0b1000);
-            store3(dst, fnmadd4(mm, dd, load3(src)));
+            //store3(dst, fnmadd4(mm, blend4(dd, setzero4(), 0b1000), load3(src)));
+            store2(dst  , fnmadd2(getlo(mm), getlo(dd), loadu2(src)));
+            store1(dst+2, fnmadd1(getlo(mm), gethi(dd), load1(src+2)));
             dif += 3; dst += 3; src += 3;
         } break;
         default:
@@ -1173,16 +1173,17 @@ void testProject()
     real *x = nullptr, *y = nullptr, *z = nullptr;
     nan_reals(ALOC, x, y, z, 1.0);
 
-    for ( size_t nbs = std::min(NBS,13UL); nbs > 0; --nbs )
+    for ( size_t nbs = std::min(NBS,17UL); nbs > 0; --nbs )
     {
         size_t nbv = DIM * ( nbs + 1 );
         setFilament(nbs, 0.1, 20.0, 1.0);
         setProjection(nbs);
-        nan_fill(ALOC, x);
         
+        nan_fill(ALOC, x);
         for ( size_t i = 0; i < nbv; ++i )
             x[i] = RNG.sreal();
-        
+        //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
+
         nan_fill(nbs, lag_);
         //projectForces(nbs, x, y);
         projectForcesU_(nbs, dir_, x, lag_);
@@ -1190,12 +1191,12 @@ void testProject()
         projectForcesD_(nbs, dir_, x, lag_, y);
         printf("%2lu ", nbs);
         //VecPrint::print(std::cout, std::min(DISP,nbv), y);
-        show_fe_exceptions("projectForces");
+        print_fe_exceptions("projectForces");
         printf(" SCA ");
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
 
-#ifdef __AVX__
         nan_fill(nbs, lag_);
+#ifdef __AVX__
         //projectForcesAVX(nbs, x, z);
 #if ( DIM == 3 )
         projectForcesU3D_AVX(nbs, dir_, x, lag_);
@@ -1208,7 +1209,7 @@ void testProject()
 #endif
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
-        show_fe_exceptions("projectForcesAVX");
+        print_fe_exceptions("projectForcesAVX");
         real err = blas::max_diff(nbv, y, z);
         printf(" AVX err %e\n", err);
 #endif
@@ -1227,9 +1228,9 @@ int main(int argc, char* argv[])
     RNG.seed();
     testProject();
     
+    std::cout << __VERSION__ << "\n";
     if ( 1 )
     {
-        std::cout << __VERSION__ << "\n";
         setFilament(NBS, 0.1, 20.0, 1.0);
         testProjectionU(CNT);
         testProjectionD(CNT);

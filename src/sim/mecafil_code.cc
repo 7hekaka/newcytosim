@@ -346,7 +346,7 @@ void projectForcesD__(size_t nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
+void projectForcesU_PTR(size_t nbs, const real* dif, const real* src, real* mul)
 {
     real x3, x0 = src[0];
     real x4, x1 = src[1];
@@ -433,7 +433,7 @@ void projectForcesD_PTR(size_t nbs, const real* dif,
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mul)
+void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mul)
 {
     real const*const end = mul - 1 + nbs;
 
@@ -606,8 +606,8 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
         vec4 yz = blend4(s1, s2, 0b1100);
         
         vec4 mm = shuffle4(xy, yz, 0b0101);
-        mm = add4(mm, blend4(zx, xy, 0b0101));
-        store4(mul, add4(mm, blend4(zx, yz, 0b1010)));
+        zx = add4(blend4(zx, yz, 0b1010), blend4(zx, xy, 0b0101));
+        store4(mul, add4(mm, zx));
         
         src += 12;
         dif += 12;
@@ -615,37 +615,27 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
     }
     while ( mul < end+2 )
     {
-        /*
-         *mul = dif[0] * ( src[DIM  ] - src[0] )
-              + dif[1] * ( src[DIM+1] - src[1] )
-              + dif[2] * ( src[DIM+2] - src[2] );
-         */
         vec4 s0 = mul4(load4(dif  ), sub4(loadu4(src+3), loadu4(src)));
-        vec4 s1 = mul4(load4(dif+4), sub4(cast4(loadu2(src+7)), loadu4(src+4)));
+        vec2 s1 = mul2(load2(dif+4), sub2(loadu2(src+7), loadu2(src+4)));
 
-        vec4 xy = blend4(s0, s1, 0b1100);
-        vec4 zx = permute2f128(s0, s0, 0x21);
-        
-        vec4 mm = shuffle4(xy, s1, 0b0101);
-        mm = add4(mm, blend4(zx, xy, 0b0101));
-        store2(mul, add4(mm, blend4(zx, s1, 0b1010)));
-        
+        vec2 xy = getlo(s0);
+        vec2 zx = gethi(s0);
+
+        vec2 mm = shuffle2(xy, s1, 0b01);
+        zx = add2(blend2(zx, s1, 0b10), blend2(zx, xy, 0b01));
+        store2(mul, add2(mm, zx));
+
         src += 6;
         dif += 6;
         mul += 2;
     }
     while ( mul < end+3 )
     {
-        /*
-         *mul = dif[0] * ( src[DIM  ] - src[0] )
-              + dif[1] * ( src[DIM+1] - src[1] )
-              + dif[2] * ( src[DIM+2] - src[2] );
-         */
-        vec4 x = mul4(load3(dif), sub4(load3(src+3), loadu4(src)));
-        vec4 z = permute2f128(x, x, 0x21);
-        vec4 y = permute4(x, 0b0011);
+        vec2 x = mul2(loadu2(dif), sub2(loadu2(src+3), loadu2(src)));
+        vec2 z = mul1(load1(dif+2), sub1(load1(src+5), load1(src+2)));
+        vec2 y = permute2(x, 0b1);
         
-        store1(mul, add4(add4(x, y), z));
+        store1(mul, add1(add1(x, y), z));
         
         src += 3;
         dif += 3;
@@ -653,6 +643,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
     }
     assert_true(mul==end+3);
 }
+
 
 
 
@@ -804,7 +795,9 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         } break;
         case 3: {
             // 1 vector remaining
-            store3(dst, fnmadd4(mm, dd, load3(src)));
+            //store3(dst, fnmadd4(mm, blend4(dd, setzero4(), 0b1000), load3(src)));
+            store2(dst  , fnmadd2(getlo(mm), getlo(dd), loadu2(src)));
+            store1(dst+2, fnmadd1(getlo(mm), gethi(dd), load1(src+2)));
             //dif += 3; dst += 3; src += 3;
         } break;
         default:
@@ -820,7 +813,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
 
 
 ///expanded implementation:
-inline void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real* Y)
+void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     // this loop cannot be unrolled as there is an OUTPUT dependency in Y
     for ( size_t jj = 0; jj < nbs; ++jj )
@@ -843,7 +836,7 @@ inline void add_projectiondiffR(const size_t nbs, const real* mul, const real* X
 
 
 ///scalar implementation
-inline void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real* Y)
+void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     real px0 = X[0];
     real px1 = X[1];
@@ -894,7 +887,7 @@ inline void add_projectiondiffF(const size_t nbs, const real* mul, const real* X
 
 #include "simd.h"
 
-inline void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, real* Y)
+void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     vec2 px = load2(X);
     vec2 pw = setzero2();
@@ -918,7 +911,7 @@ inline void add_projectiondiffSSE(const size_t nbs, const real* mul, const real*
 
 #include "simd.h"
 
-inline void add_projectiondiffAVX(const size_t nbs, const real* mul, const real* X, real* Y)
+void add_projectiondiffAVX(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     real * pY = Y;
     real const* pX = X;

@@ -31,6 +31,7 @@ void init()
 
 void dump(size_t len, const real* vec)
 {
+    printf(": ");
     for ( size_t n = 0; n < len; ++n )
     {
         if ( n % 4 == 3 )
@@ -150,27 +151,6 @@ void test_swapSSE()
 #ifdef __AVX__
 
 /**
- make
-     dst = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
- from
-     src = { XYZ XYZ XYZ XYZ }
- */
-inline void sumXYZ(real const* src, real* dst)
-{
-    vec4 s0 = load4(src);
-    vec4 s1 = load4(src+4);
-    vec4 s2 = load4(src+8);
-    
-    vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
-    vec4 d3 = permute2f128(s1, s2, 0x21);
-    vec4 d2 = shuffle4(s2, s1, 0b0101);
-    vec4 d1 = permute2f128(h, h, 0x01);
-
-    vec4 sum = add4(add4(s0, d2), add4(d3, d1));
-    store4(dst, sum);
-}
-
-/**
  make dst = { XYZ XYZ XYZ XYZ }
  from src = { XYZ? }
  */
@@ -262,11 +242,60 @@ inline void untwine12(real const* src, real* X, real* Y, real* Z)
     store4(Z,   blend4(zx, yz, 0b1010));
 }
 
+
+/**
+ make
+     dst = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
+ from
+     src = { XYZ XYZ XYZ XYZ }
+ */
+inline void sumXXX(real const* src, real* dst)
+{
+    vec4 s0 = load4(src);
+    vec4 s1 = load4(src+4);
+    vec4 s2 = load4(src+8);
+    
+    vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
+    vec4 d3 = permute2f128(s1, s2, 0x21);
+    vec4 d2 = shuffle4(s2, s1, 0b0101);
+    vec4 d1 = permute2f128(h, h, 0x01);
+
+    vec4 sum = add4(add4(s0, d2), add4(d3, d1));
+    store4(dst, sum);
+}
+
+
+/**
+ make
+     dst = { X+Y+Z, X+Y+Z, X+Y+Z, X+Y+Z }
+ from
+     src = { XYZ XYZ XYZ XYZ }
+ */
+inline void sumXYZ(real const* src, real* dst)
+{
+    vec4 s0 = load4(src);
+    vec4 s1 = load4(src+4);
+    vec4 s2 = load4(src+8);
+    
+    vec4 zx = blend4(s0, s2, 0b0011);
+    zx = permute2f128(zx, zx, 0x21);
+    vec4 xy = blend4(s0, s1, 0b1100);
+    vec4 yz = blend4(s1, s2, 0b1100);
+    
+    vec4 d1 =   blend4(zx, xy, 0b0101);
+    vec4 d2 = shuffle4(xy, yz, 0b0101);
+    vec4 d3 =   blend4(zx, yz, 0b1010);
+
+    vec4 sum = add4(d2, add4(d3, d1));
+    store4(dst, sum);
+}
+
+
 void test_twine()
 {
     printf("------ test_twine\n");
     real dst[12] = { 0 };
-    real src[12] = { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3 };
+    const real src[12] = { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3 };
     real X[4] = { 1 }, Y[4] = { 2 }, Z[4] = { 3 };
     untwine12(src, X, Y, Z);
     dump(4, X);
@@ -280,6 +309,8 @@ void test_twine()
     printf("twinedup "); dump(12, dst);
     sumXYZ(src, dst);
     printf("sumXYZ "); dump(4, dst);
+    sumXXX(src, dst);
+    printf("sumXXX "); dump(4, dst);
 }
 
 
@@ -778,7 +809,6 @@ int main(int argc, char * argv[])
 {
     //test_swapSSE();
 #ifdef __AVX__
-    
     if ( 1 )
     {
         test_twine();

@@ -25,8 +25,18 @@ inline void dump(vec2 v, vec2 w, char const* s)
     printf("%16s vec2( %5.2f %5.2f )( %5.2f %5.2f )\n", s, v[1], v[0], w[1], w[0]);
 }
 
+/// print SIMD vector of 4 floats
+inline void dump(vec4f v, char const* s)
+{
+    printf("%16s floats( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
+}
+
+#endif
+
+//------------------------------- INTEGERS -------------------------------------
+
 /*
-inline void dump8(__m128i v, char const* s)
+inline void dump16(__m128i v, char const* s)
 {
     uint16_t a = _mm_extract_epi16(v, 0);
     uint16_t b = _mm_extract_epi16(v, 1);
@@ -36,17 +46,18 @@ inline void dump8(__m128i v, char const* s)
     uint16_t f = _mm_extract_epi16(v, 6);
     uint16_t g = _mm_extract_epi16(v, 7);
     uint16_t h = _mm_extract_epi16(v, 8);
-    printf("veci %s ( %3i %3i %3i %3i %3i %3i %3i %3i )\n", s, h, g, f, e, d, c, b, a);
+    printf("%16s int16( %3i %3i %3i %3i %3i %3i %3i %3i )\n", s, h, g, f, e, d, c, b, a);
+}
+
+inline void dump32(__m128i v, char const* s)
+{
+    uint32_t a = _mm_extract_epi32(v, 0);
+    uint32_t b = _mm_extract_epi32(v, 1);
+    uint32_t c = _mm_extract_epi32(v, 2);
+    uint32_t d = _mm_extract_epi32(v, 3);
+    printf("%16s int32( %5i %5i %5i %5i )\n", s, d, c, b, a);
 }
 */
-
-/// print SIMD vector of 4 floats
-inline void dump(vec4f v, char const* s)
-{
-    printf("%16s vec4f( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
-}
-
-#endif
 
 //---------------------------------- AVX ---------------------------------------
 
@@ -65,21 +76,10 @@ inline void dump(vec4 v, vec4 w, char const* s)
            s, v[3], v[2], v[1], v[0], w[3], w[2], w[1], w[0]);
 }
 
-/*
-inline void dump4(__m128i v, char const* s)
-{
-    uint32_t a = _mm_extract_epi32(v, 0);
-    uint32_t b = _mm_extract_epi32(v, 1);
-    uint32_t c = _mm_extract_epi32(v, 2);
-    uint32_t d = _mm_extract_epi32(v, 3);
-    printf("veci %s ( %5i %5i %5i %5i )\n", s, d, c, b, a);
-}
-*/
-
 /// print SIMD vector of 8 floats
 inline void dump(vec8f v, char const* s)
 {
-    printf("%16s vec8f( %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f )\n", s,
+    printf("%16s floats( %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f )\n", s,
            v[7], v[6], v[5], v[4], v[3], v[2], v[1], v[0]);
 }
 

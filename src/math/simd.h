@@ -38,6 +38,11 @@ inline void storeu2(double* a, vec2 b)       { _mm_storeu_pd(a, b); }
 
 inline vec2 movedup2(vec2 a)                 { return _mm_movedup_pd(a); }
 
+inline vec2 mul1(vec2 a, vec2 b)             { return _mm_mul_sd(a,b); }
+inline vec2 div1(vec2 a, vec2 b)             { return _mm_div_sd(a,b); }
+inline vec2 add1(vec2 a, vec2 b)             { return _mm_add_sd(a,b); }
+inline vec2 sub1(vec2 a, vec2 b)             { return _mm_sub_sd(a,b); }
+
 inline vec2 mul2(vec2 a, vec2 b)             { return _mm_mul_pd(a,b); }
 inline vec2 div2(vec2 a, vec2 b)             { return _mm_div_pd(a,b); }
 inline vec2 add2(vec2 a, vec2 b)             { return _mm_add_pd(a,b); }
