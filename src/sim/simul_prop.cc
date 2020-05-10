@@ -32,10 +32,10 @@ void SimulProp::clear()
     random_seed       = 0;
     steric            = 0;
     
-    steric_stiffness_push[0] = 100;
-    steric_stiffness_pull[0] = 100;
-    steric_stiffness_push[1] = 100;
-    steric_stiffness_pull[1] = 100;
+    steric_stiffness_push[0] = 0;
+    steric_stiffness_pull[0] = 0;
+    steric_stiffness_push[1] = 0;
+    steric_stiffness_pull[1] = 0;
 
     steric_max_range  = -1;
     binding_grid_step = -1;

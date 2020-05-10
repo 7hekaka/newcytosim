@@ -72,7 +72,8 @@ real Simul::estimateStericRange() const
 }
 
 
-void Simul::setStericGrid(Space const* spc) const
+template < typename GRID >
+void Simul::setStericGrid(GRID& grid, Space const* spc) const
 {
     assert_true(spc);
     real& range = prop->steric_max_range;
@@ -87,12 +88,12 @@ void Simul::setStericGrid(Space const* spc) const
         throw InvalidParameter("simul:steric_max_range must be defined");
 
     const size_t sup = 1 << 17;
-    while ( pointGrid.setGrid(spc, range) > sup )
+    while ( grid.setGrid(spc, range) > sup )
     {
         //std::clog << "increasing simul:steric_max_range\n";
         range *= 2;
     }
-    pointGrid.createCells();
+    grid.createCells();
 }
 
 
@@ -121,7 +122,7 @@ void Simul::setStericInteractions(Meca& meca) const
     {
         if (!spaces.master())
             return;
-        setStericGrid(spaces.master());
+        setStericGrid(pointGrid, spaces.master());
     }
 
     // clear grid
@@ -187,6 +188,9 @@ void Simul::setStericInteractions(Meca& meca) const
     /// create parameters
     StericParam pam(prop->steric_stiffness_push[0], prop->steric_stiffness_pull[0]);
     
+    assert_true(prop->steric_stiffness_push[0] >= 0);
+    assert_true(prop->steric_stiffness_pull[0] >= 0);
+    
 #if ( NB_STERIC_PANES == 1 )
     
     pointGrid.setInteractions(meca, pam);
@@ -204,6 +208,120 @@ void Simul::setStericInteractions(Meca& meca) const
     // add steric interactions between different panes:
     for ( size_t p = 1; p <= NB_STERIC_PANES; ++p )
         pointGrid.setInteractions(meca, pam, p);
+
+#endif
+}
+
+
+
+/**
+ The prop->steric of each object is a bit-field that
+ specify one or more 'pane' where the object is present.
+ The different panes are then treated consecutively and independently,
+ and only objects in the same pane may interact.
+ 
+     for ( int pane=1; pane<=2 && pane<=prop->steric; ++pane )
+     {
+         if ( obj->prop->steric & pane )
+         ...
+     }
+ 
+ With this mechanism, the user can flexibly configure which objects
+ may see each other and thus control the steric interactions.
+ 
+ At present, we only support 1 pane (Simul property steric).
+ This can be extended if necessary, but the steric_stiffness[]
+ properties should be extended as well.
+ */
+void Simul::setStericInteractionsF(Meca& meca) const
+{
+    if ( !pointGridF.hasGrid() )
+    {
+        if (!spaces.master())
+            return;
+        setStericGrid(pointGridF, spaces.master());
+    }
+
+    // clear grid
+    pointGridF.clear();
+    
+    // distribute Fiber-points on the grid
+    for ( Fiber* fib=fibers.first(); fib; fib=fib->next() )
+    {
+        if ( fib->prop->steric )
+        {
+            const real rad = fib->prop->steric_radius;
+            // include segments, in the cell associated with their center
+            for ( size_t r = 0; r < fib->nbSegments(); ++r )
+#if ( NB_STERIC_PANES == 1 )
+                pointGridF.add(FiberSegment(fib, r), rad);
+#else
+                pointGridF.add(fib->prop->steric, FiberSegment(fib, r), rad);
+#endif
+        }
+    }
+    
+    // include Spheres
+    for ( Sphere* sp=spheres.first(); sp; sp=sp->next() )
+    {
+        if ( sp->prop->steric )
+#if ( NB_STERIC_PANES == 1 )
+            pointGridF.add(Mecapoint(sp, 0), sp->radius());
+#else
+            pointGridF.add(sp->prop->steric, Mecapoint(sp, 0), sp->radius());
+#endif
+    }
+    
+    // include Beads
+    for ( Bead* bd=beads.first(); bd; bd=bd->next() )
+    {
+        if ( bd->prop->steric )
+#if ( NB_STERIC_PANES == 1 )
+            pointGridF.add(Mecapoint(bd, 0), bd->radius());
+#else
+            pointGridF.add(bd->prop->steric, Mecapoint(bd, 0), bd->radius());
+#endif
+    }
+        
+    // include Points that have a radius from Solids
+    for ( Solid* so=solids.first(); so; so=so->next() )
+    {
+        if ( so->prop->steric )
+        {
+            for ( size_t i = 0; i < so->nbPoints(); ++i )
+            {
+                if ( so->radius(i) > REAL_EPSILON )
+#if ( NB_STERIC_PANES == 1 )
+                    pointGridF.add(Mecapoint(so, i), so->radius(i));
+#else
+                    pointGridF.add(so->prop->steric, Mecapoint(so, i), so->radius(i));
+#endif
+            }
+        }
+    }
+    
+    /// create parameters
+    real stiff = prop->steric_stiffness_push[0];
+    
+    assert_true(prop->steric_stiffness_push[0] >= 0);
+
+#if ( NB_STERIC_PANES == 1 )
+        
+    pointGridF.setInteractions(meca, stiff);
+
+#elif ( NB_STERIC_PANES == 2 )
+    
+    // add steric interactions inside pane 1:
+    pointGridF.setInteractions(meca, stiff, 1);
+    // add steric interactions between panes 1 and 2:
+    pointGridF.setInteractions(meca, stiff, 1, 2);
+    //pointGrid.setInteractions(meca, pam, 2, 1);
+
+#else
+    
+    // add steric interactions between different panes:
+    for ( size_t p = 1; p <= NB_STERIC_PANES; ++p )
+        pointGridF.setInteractions(meca, stiff, p);
 
 #endif
 }
@@ -258,8 +376,12 @@ void Simul::setAllInteractions(Meca& meca) const
 
     // add steric interactions
     if ( prop->steric )
-        setStericInteractions(meca);
-    
+    {
+        if ( prop->steric_stiffness_pull[0] > 0 )
+            setStericInteractions(meca);
+        else
+            setStericInteractionsF(meca);
+    }
     //addExperimentalInteractions(meca);
 
 #if ( 0 )

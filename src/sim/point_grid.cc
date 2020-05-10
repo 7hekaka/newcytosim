@@ -460,8 +460,6 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
 {
-    assert_true(pam.stiff_push >= 0);
-    assert_true(pam.stiff_pull >= 0);
     //std::clog << "----" << std::endl;
     
     // scan all cells to examine each pair of particles:
@@ -497,9 +495,6 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
                                  const size_t pan) const
 {
-    assert_true(pam.stiff_push >= 0);
-    assert_true(pam.stiff_pull >= 0);
-    
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -532,8 +527,6 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
                                  const size_t pan1, const size_t pan2) const
 {
-    assert_true(pam.stiff_push >= 0);
-    assert_true(pam.stiff_pull >= 0);
     assert_true(pan1 != pan2);
     
     // scan all cells to examine each pair of particles:

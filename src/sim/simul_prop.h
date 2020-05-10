@@ -221,16 +221,16 @@ public:
     /// A flag to control the engine that implement steric interactions between objects
     int       steric;
     
-    /// Stiffness for repulsive steric interaction
+    /// Stiffness for repulsive steric interaction (set as steric[1])
     real      steric_stiffness_push[2];
     
-    /// Stiffness for attractive steric interaction
+    /// Stiffness for `attractive` steric interaction (set as steric[2])
     real      steric_stiffness_pull[2];
     
     /// Grid size used to determine steric interactions
     /**
      Cytosim uses a divide-and-conquer approach to find pairs of objects that are 
-     close enough to interact, based on a dividing the Space with a rectangular grid (see PointGrid).
+     close enough to interact, based on a dividing the Space with a rectangular grid.
      
      `steric_max_range` defines the minimum size of the cells in the grid.
      A finer grid reduces false positives, but increases the amount of memory used by the grid,
