@@ -796,7 +796,7 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         case 3: {
             // 1 vector remaining
             //store3(dst, fnmadd4(mm, blend4(dd, setzero4(), 0b1000), load3(src)));
-            store2(dst  , fnmadd2(getlo(mm), getlo(dd), loadu2(src)));
+            storeu2(dst, fnmadd2(getlo(mm), getlo(dd), loadu2(src)));
             store1(dst+2, fnmadd1(getlo(mm), gethi(dd), load1(src+2)));
             //dif += 3; dst += 3; src += 3;
         } break;
