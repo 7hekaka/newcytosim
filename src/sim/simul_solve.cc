@@ -1,8 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 /**
- Calculate the grid size automatically for dynamic Fiber,
- Bead, Sphere and Solid.
+ Calculate the minimum grid cell size, given that Fibers are dynamic, and the
+ radius of Bead, Sphere and Solid.
  
  This function can be used to set SimulProp::steric_max_range.
  
@@ -17,14 +17,14 @@ real Simul::estimateStericRange() const
     // check all FiberProp with enabled steric:
     for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp const*>(i);
-        if ( fp->steric )
+        FiberProp const* fip = static_cast<FiberProp const*>(i);
+        if ( fip->steric )
         {
             // The maximum length of a segment is 4/3 * segmentation
-            len = std::max(len, (real)(1.4) * fp->segmentation);
+            len = std::max(len, (real)(1.34) * fip->segmentation);
             
             // check extended range of interaction
-            ran = std::max(ran, fp->steric_radius + fp->steric_range);
+            ran = std::max(ran, fip->steric_radius + fip->steric_range);
         }
     }
     
@@ -76,23 +76,25 @@ template < typename GRID >
 void Simul::setStericGrid(GRID& grid, Space const* spc) const
 {
     assert_true(spc);
-    real& range = prop->steric_max_range;
+    real res = prop->steric_max_range;
+    real inf = estimateStericRange();
     
-    if ( range <= 0 ) 
+    if ( res < inf )
     {
-        range = estimateStericRange();
-        //Cytosim::log("auto setting simul:steric_max_range=%.3f\n", range);
+        Cytosim::log("adjusting simul:steric_max_range = %.3f;\n", inf);
+        res = inf;
     }
-    
-    if ( range <= 0 )
+    if ( res <= 0 )
         throw InvalidParameter("simul:steric_max_range must be defined");
 
     const size_t sup = 1 << 17;
-    while ( grid.setGrid(spc, range) > sup )
+    while ( grid.setGrid(spc, res) > sup )
     {
         //std::clog << "increasing simul:steric_max_range\n";
-        range *= 2;
+        res *= 2;
     }
+    
+    prop->steric_max_range = res;
     grid.createCells();
 }
 
@@ -138,7 +140,7 @@ void Simul::setStericInteractions(Meca& meca) const
         
             // include segments, in the cell associated with their center
             for ( size_t r = 0; r < fib->nbSegments(); ++r )
-#if ( NB_STERIC_PANES == 1 )
+#if ( N_STERIC_PANES == 1 )
                 pointGrid.add(FiberSegment(fib, r), rad, ran);
 #else
                 pointGrid.add(fib->prop->steric, FiberSegment(fib, r), rad, ran);
@@ -150,7 +152,7 @@ void Simul::setStericInteractions(Meca& meca) const
     for ( Sphere* sp=spheres.first(); sp; sp=sp->next() )
     {
         if ( sp->prop->steric )
-#if ( NB_STERIC_PANES == 1 )
+#if ( N_STERIC_PANES == 1 )
             pointGrid.add(Mecapoint(sp, 0), sp->radius(), sp->radius()+sp->prop->steric_range);
 #else
             pointGrid.add(sp->prop->steric, Mecapoint(sp, 0), sp->radius(), sp->radius()+sp->prop->steric_range);
@@ -161,7 +163,7 @@ void Simul::setStericInteractions(Meca& meca) const
     for ( Bead* bd=beads.first(); bd; bd=bd->next() )
     {
         if ( bd->prop->steric )
-#if ( NB_STERIC_PANES == 1 )
+#if ( N_STERIC_PANES == 1 )
             pointGrid.add(Mecapoint(bd, 0), bd->radius(), bd->radius()+bd->prop->steric_range);
 #else
             pointGrid.add(bd->prop->steric, Mecapoint(bd, 0), bd->radius(), bd->radius()+bd->prop->steric_range);
@@ -176,7 +178,7 @@ void Simul::setStericInteractions(Meca& meca) const
             for ( size_t i = 0; i < so->nbPoints(); ++i )
             {
                 if ( so->radius(i) > REAL_EPSILON )
-#if ( NB_STERIC_PANES == 1 )
+#if ( N_STERIC_PANES == 1 )
                     pointGrid.add(Mecapoint(so, i), so->radius(i), so->radius(i)+so->prop->steric_range);
 #else
                     pointGrid.add(so->prop->steric, Mecapoint(so, i), so->radius(i), so->radius(i)+so->prop->steric_range);
@@ -191,11 +193,11 @@ void Simul::setStericInteractions(Meca& meca) const
     assert_true(prop->steric_stiffness_push[0] >= 0);
     assert_true(prop->steric_stiffness_pull[0] >= 0);
     
-#if ( NB_STERIC_PANES == 1 )
+#if ( N_STERIC_PANES == 1 )
     
     pointGrid.setInteractions(meca, pam);
 
-#elif ( NB_STERIC_PANES == 2 )
+#elif ( N_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
     pointGrid.setInteractions(meca, pam, 1);
@@ -206,7 +208,7 @@ void Simul::setStericInteractions(Meca& meca) const
 #else
     
     // add steric interactions between different panes:
-    for ( size_t p = 1; p <= NB_STERIC_PANES; ++p )
+    for ( size_t p = 1; p <= N_STERIC_PANES; ++p )
         pointGrid.setInteractions(meca, pam, p);
 
 #endif
@@ -253,7 +255,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
             const real rad = fib->prop->steric_radius;
             // include segments, in the cell associated with their center
             for ( size_t r = 0; r < fib->nbSegments(); ++r )
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
                 pointGridF.add(FiberSegment(fib, r), rad);
 #else
                 pointGridF.add(fib->prop->steric, FiberSegment(fib, r), rad);
@@ -265,7 +267,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     for ( Sphere* sp=spheres.first(); sp; sp=sp->next() )
     {
         if ( sp->prop->steric )
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
             pointGridF.add(Mecapoint(sp, 0), sp->radius());
 #else
             pointGridF.add(sp->prop->steric, Mecapoint(sp, 0), sp->radius());
@@ -276,7 +278,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     for ( Bead* bd=beads.first(); bd; bd=bd->next() )
     {
         if ( bd->prop->steric )
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
             pointGridF.add(Mecapoint(bd, 0), bd->radius());
 #else
             pointGridF.add(bd->prop->steric, Mecapoint(bd, 0), bd->radius());
@@ -291,7 +293,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
             for ( size_t i = 0; i < so->nbPoints(); ++i )
             {
                 if ( so->radius(i) > REAL_EPSILON )
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
                     pointGridF.add(Mecapoint(so, i), so->radius(i));
 #else
                     pointGridF.add(so->prop->steric, Mecapoint(so, i), so->radius(i));
@@ -305,11 +307,11 @@ void Simul::setStericInteractionsF(Meca& meca) const
     
     assert_true(prop->steric_stiffness_push[0] >= 0);
 
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
         
     pointGridF.setInteractions(meca, stiff);
 
-#elif ( NB_STERIC_PANES == 2 )
+#elif ( MAX_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
     pointGridF.setInteractions(meca, stiff, 1);
@@ -320,7 +322,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
 #else
     
     // add steric interactions between different panes:
-    for ( size_t p = 1; p <= NB_STERIC_PANES; ++p )
+    for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
         pointGridF.setInteractions(meca, stiff, p);
 
 #endif

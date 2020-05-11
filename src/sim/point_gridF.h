@@ -22,7 +22,7 @@ class FatPointF
     
 public:
     
-    /// buffer for position
+    /// current position of center
     Vector         pos;
     
     /// equilibrium radius of the interaction (distance where force is zero)
@@ -63,7 +63,7 @@ public:
     /// equilibrium radius of the interaction (distance where force is zero)
     real           radius;
     
-    /// this FatLocus represents the entire segment indicated by the FiberSegment
+    /// indicates the fiber's segment
     FiberSegment   seg;
     
 public:
@@ -116,7 +116,7 @@ typedef Array<FatLocusF> FatLocusListF;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
-#define NB_STERIC_PANES 1
+#define MAX_STERIC_PANES 1
 
 
 /// a set of lists associated with the same location
@@ -124,7 +124,7 @@ class PointGridCellF
 {
     friend class PointGridF;
     
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
     
     /// unique steric pane
     FatPointListF point_pane;
@@ -135,10 +135,10 @@ class PointGridCellF
 #else
     
     /// different steric panes
-    FatPointListF point_panes_0[NB_STERIC_PANES];
+    FatPointListF point_panes_0[MAX_STERIC_PANES];
     
     /// different steric panes
-    FatLocusListF locus_panes_0[NB_STERIC_PANES];
+    FatLocusListF locus_panes_0[MAX_STERIC_PANES];
     
     /// alias to the array of panes, with index 1 refering to point_panes_0[0]
     FatPointListF * point_panes;
@@ -150,7 +150,7 @@ class PointGridCellF
     
 public:
     
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
     
     PointGridCellF()
     {
@@ -174,7 +174,7 @@ public:
     /// clear all panes
     void clear()
     {
-        for ( size_t p = 1; p <= NB_STERIC_PANES; ++p )
+        for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
         {
             point_panes[p].clear();
             locus_panes[p].clear();
@@ -183,14 +183,14 @@ public:
     
     FatPointListF& point_list(size_t p)
     {
-        assert_true( 0 < p && p <= NB_STERIC_PANES );
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return point_panes[p];
     }
     
     
     FatLocusListF& locus_list(size_t p)
     {
-        assert_true( 0 < p && p <= NB_STERIC_PANES );
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return locus_panes[p];
     }
     
@@ -244,7 +244,7 @@ private:
                          FatPointListF &, FatLocusListF &,
                          FatPointListF &, FatLocusListF &) const;
     
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
     FatPointListF& point_list(Vector const& w) const
@@ -273,30 +273,30 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    FatPointList& point_list(Vector const& w, const size_t p) const
+    FatPointListF& point_list(Vector const& w, const size_t p) const
     {
-        assert_true( 0 < p && p <= NB_STERIC_PANES );
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.cell(w).point_panes[p];
     }
     
     /// cell corresponding to position `w`, and pane `p`
-    FatLocusList& locus_list(Vector const& w, const size_t p) const
+    FatLocusListF& locus_list(Vector const& w, const size_t p) const
     {
-        assert_true( 0 < p && p <= NB_STERIC_PANES );
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.cell(w).locus_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatPointList& point_list(const size_t c, const size_t p) const
+    FatPointListF& point_list(const size_t c, const size_t p) const
     {
-        assert_true( 0 < p && p <= NB_STERIC_PANES );
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.icell(c).point_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatLocusList& locus_list(const size_t c, const size_t p) const
+    FatLocusListF& locus_list(const size_t c, const size_t p) const
     {
-        assert_true( 0 < p && p <= NB_STERIC_PANES );
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.icell(c).locus_panes[p];
     }
     
@@ -319,7 +319,7 @@ public:
     /// clear the grid
     void clear()            { pGrid.clear(); }
     
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
     
     /// place Mecapoint on the grid
     void add(Mecapoint const& p, real radius) const

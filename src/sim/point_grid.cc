@@ -74,23 +74,23 @@ void PointGrid::createCells()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/// include verifications that the grid is appropriate for the particule radius
-#define CHECK_RANGE 0
+/// include verifications that the grid range is appropriate
+#define CHECK_STERIC_RANGE 0
 
 
-#if ( NB_STERIC_PANES != 1 )
+#if ( N_STERIC_PANES != 1 )
 
 void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 {
-    if ( pan == 0 || pan > NB_STERIC_PANES )
+    if ( pan == 0 || pan > N_STERIC_PANES )
         throw InvalidParameter("point:steric is out-of-range");
     
     Vector w = pe.pos();
     point_list(w, pan).new_val().set(pe, rd, rg, w);
     
-#if ( CHECK_RANGE )
+#if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two particles
-    if ( max_diameter < 2 * rg - REAL_EPSILON )
+    if ( max_diameter < 1.999 * rg )
     {
         InvalidParameter e("simul:steric_max_range is too short");
         e << PREF << "steric_max_range should be greater than 2 * ( particle_radius + extra_range )\n";
@@ -103,20 +103,20 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 
 void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 {
-    if ( pan == 0 || pan > NB_STERIC_PANES )
+    if ( pan == 0 || pan > N_STERIC_PANES )
         throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
     locus_list(w, pan).new_val().set(fl, rd, rg);
     
-#if ( CHECK_RANGE )
+#if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
     //along the diagonal, corresponding to the worst-case scenario
-    real diag = sqrt( fl.len() * fl.len() + 4 * rg * rg );
-    if ( max_diameter < diag - REAL_EPSILON )
+    real diag = square(fl.len()) + square(2*rg);
+    if ( square(max_diameter) * 1.001 < diag )
     {
-        InvalidParameter("simul:steric_max_range is too short");
+        InvalidParameter e("simul:steric_max_range is too short");
         e << PREF << "steric_max_range should be greater than sqrt( sqr(segment_length) + 4*sqr(range) )\n";
         e << PREF << "with segment_length ~ 4/3 segmentation\n";
         e << PREF << "= " << diag << " for some fibers\n";
@@ -384,9 +384,12 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     real d = aa.seg.shortestDistance(bb.seg, a, b);
     if ( d < ran*ran )
     {
-        const real len = aa.radius + bb.radius;
-        real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
-        meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), len, stiff);
+        if ( aa.seg.within(a) & bb.seg.within(b) )
+        {
+            const real len = aa.radius + bb.radius;
+            real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+            meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), len, stiff);
+        }
     }
     
 #endif
@@ -453,7 +456,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 }
 
 
-#if ( NB_STERIC_PANES == 1 )
+#if ( N_STERIC_PANES == 1 )
 
 /**
  Check interactions between objects contained in the grid.

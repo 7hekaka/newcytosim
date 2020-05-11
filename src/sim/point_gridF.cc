@@ -75,49 +75,49 @@ void PointGridF::createCells()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/// include verifications that the grid is appropriate for the particule radius
-#define CHECK_RANGE 0
+/// include verifications that the grid range is appropriate
+#define CHECK_STERIC_RANGE 0
 
 
-#if ( NB_STERIC_PANES != 1 )
+#if ( MAX_STERIC_PANES != 1 )
 
-void PointGridF::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
+void PointGridF::add(size_t pan, Mecapoint const& pe, real rd) const
 {
-    if ( pan == 0 || pan > NB_STERIC_PANES )
+    if ( pan == 0 || pan > MAX_STERIC_PANES )
         throw InvalidParameter("point:steric is out-of-range");
     
     Vector w = pe.pos();
-    point_list(w, pan).new_val().set(pe, rd, rg, w);
+    point_list(w, pan).new_val().set(pe, rd, w);
     
-#if ( CHECK_RANGE )
+#if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two particles
-    if ( max_diameter < 2 * rg - REAL_EPSILON )
+    if ( max_diameter < 1.999 * rd )
     {
         InvalidParameter e("simul:steric_max_range is too short");
         e << PREF << "steric_max_range should be greater than 2 * ( particle_radius + extra_range )\n";
-        e << PREF << "= " << 2 * rg << " for some particles\n";
+        e << PREF << "= " << 2 * rd << " for some particles\n";
         throw e;
     }
 #endif
 }
 
 
-void PointGridF::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
+void PointGridF::add(size_t pan, FiberSegment const& fl, real rd) const
 {
-    if ( pan == 0 || pan > NB_STERIC_PANES )
+    if ( pan == 0 || pan > MAX_STERIC_PANES )
         throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
-    locus_list(w, pan).new_val().set(fl, rd, rg);
+    locus_list(w, pan).new_val().set(fl, rd);
     
-#if ( CHECK_RANGE )
+#if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
     //along the diagonal, corresponding to the worst-case scenario
-    real diag = sqrt( fl.len() * fl.len() + 4 * rg * rg );
-    if ( max_diameter < diag - REAL_EPSILON )
+    real diag = square(fl.len()) + square(2*rd);
+    if ( square(max_diameter) * 1.001 < diag )
     {
-        InvalidParameter("simul:steric_max_range is too short");
+        InvalidParameter e("simul:steric_max_range is too short");
         e << PREF << "steric_max_range should be greater than sqrt( sqr(segment_length) + 4*sqr(range) )\n";
         e << PREF << "with segment_length ~ 4/3 segmentation\n";
         e << PREF << "= " << diag << " for some fibers\n";
@@ -348,6 +348,22 @@ void PointGridF::checkLL2(Meca& meca, real stiff,
 void PointGridF::checkLL(Meca& meca, real stiff,
                          FatLocusF const& aa, FatLocusF const& bb) const
 {
+#if ( DIM == 3 )
+    
+    const real ran = aa.radius + bb.radius;;
+    
+    /* in 3D, we use shortestDistance() to calculate the closest distance
+     between two segments, and use the result to build an interaction */
+    real a, b;
+    real d = aa.seg.shortestDistance(bb.seg, a, b);
+    if ( d >= ran*ran )
+        return;
+    
+    if ( aa.seg.within(a) & bb.seg.within(b) )
+        meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), ran, stiff);
+    
+#endif
+
     //std::clog << "LL " << aa.seg << " " << bb.seg << std::endl;
     checkLL1(meca, stiff, aa, bb);
     
@@ -358,19 +374,6 @@ void PointGridF::checkLL(Meca& meca, real stiff,
     
     if ( bb.isLast() )
         checkLL2(meca, stiff, aa, bb);
-    
-#if ( DIM == 3 )
-    
-    const real ran = aa.radius + bb.radius;;
-    
-    /* in 3D, we use shortestDistance() to calculate the closest distance
-     between two segments, and use the result to build an interaction */
-    real a, b;
-    real d = aa.seg.shortestDistance(bb.seg, a, b);
-    if ( d < ran*ran )
-        meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), ran, stiff);
-    
-#endif
 }
 
 
@@ -434,7 +437,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
 }
 
 
-#if ( NB_STERIC_PANES == 1 )
+#if ( MAX_STERIC_PANES == 1 )
 
 /**
  Check interactions between objects contained in the grid.
@@ -485,15 +488,15 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
         
         // We consider each pair of objects (ii, jj) only once:
         
-        FatPointList & baseP = point_list(inx, pan);
-        FatLocusList & baseL = locus_list(inx, pan);
+        FatPointListF & baseP = point_list(inx, pan);
+        FatLocusListF & baseL = locus_list(inx, pan);
         
         setInteractions(meca, stiff, baseP, baseL);
         
         for ( int reg = 1; reg < nr; ++reg )
         {
-            FatPointList & sideP = point_list(inx+region[reg], pan);
-            FatLocusList & sideL = locus_list(inx+region[reg], pan);
+            FatPointListF & sideP = point_list(inx+region[reg], pan);
+            FatLocusListF & sideL = locus_list(inx+region[reg], pan);
             
             setInteractions(meca, stiff, baseP, baseL, sideP, sideL);
         }
@@ -519,24 +522,24 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
         
         // We consider each pair of objects (ii, jj) only once:
         
-        FatPointList & baseP = point_list(inx, pan1);
-        FatLocusList & baseL = locus_list(inx, pan1);
+        FatPointListF & baseP = point_list(inx, pan1);
+        FatLocusListF & baseL = locus_list(inx, pan1);
         
         for ( int reg = 0; reg < nr; ++reg )
         {
-            FatPointList & sideP = point_list(inx+region[reg], pan2);
-            FatLocusList & sideL = locus_list(inx+region[reg], pan2);
+            FatPointListF & sideP = point_list(inx+region[reg], pan2);
+            FatLocusListF & sideL = locus_list(inx+region[reg], pan2);
             
             setInteractions(meca, stiff, baseP, baseL, sideP, sideL);
         }
         
-        FatPointList & baseP2 = point_list(inx, pan2);
-        FatLocusList & baseL2 = locus_list(inx, pan2);
+        FatPointListF & baseP2 = point_list(inx, pan2);
+        FatLocusListF & baseL2 = locus_list(inx, pan2);
         
         for ( int reg = 1; reg < nr; ++reg )
         {
-            FatPointList & sideP = point_list(inx+region[reg], pan1);
-            FatLocusList & sideL = locus_list(inx+region[reg], pan1);
+            FatPointListF & sideP = point_list(inx+region[reg], pan1);
+            FatLocusListF & sideL = locus_list(inx+region[reg], pan1);
             
             setInteractions(meca, stiff, baseP2, baseL2, sideP, sideL);
         }
