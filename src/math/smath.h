@@ -261,8 +261,10 @@ namespace sMath
     
     //------------------------------------------------------------------------------
 
+#if ( 0 )
+
     /// return the usual base-10 representation of a number
-    /** Note that with C++11, you can use std::to_string */
+    /** Note that with C++11, std::to_string() provides this functionality */
     template <typename T> 
     std::string repr(T const& x)
     {
@@ -271,6 +273,7 @@ namespace sMath
         return oss.str();
     }
     
+    /// return the usual base-10 representation of a number
     template <typename T>
     std::string repr(T const& x, unsigned width, unsigned precision)
     {
@@ -278,7 +281,9 @@ namespace sMath
         oss << std::setw(width) << std::setprecision(precision) << std::fixed << x;
         return oss.str();
     }
-    
+
+#endif
+
     //------------------------------------------------------------------------------
 #pragma mark -
     /*

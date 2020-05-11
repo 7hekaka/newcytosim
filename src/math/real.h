@@ -62,8 +62,21 @@ inline real* new_real(size_t cnt)
     // we align to 4 doubles (of size 8 bytes), hence 32 bytes
     if ( posix_memalign(&ptr, 32, cnt*sizeof(real)) )
         throw std::bad_alloc();
+    real* res = (real*)ptr;
     //printf("%p = new_real(%lu)  %lu\n", ptr, cnt, ((uintptr_t)ptr&63));
-    return (real*)ptr;
+    if ( 0 )
+    {
+        /*
+         Allocated space can be filled with signalling NaN, to catch access to
+         uninitialized data, using the option '-fp-trap-all=divzero,invalid'
+         from the intel compiler, or with GCC:
+         feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
+         */
+        real n = std::numeric_limits<real>::signaling_NaN();
+        for ( size_t u = 0; u < cnt; ++u )
+            res[u] = n;
+    }
+    return res;
 }
 
 
