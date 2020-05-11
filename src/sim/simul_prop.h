@@ -233,37 +233,39 @@ public:
      close enough to interact, based on a dividing the Space with a rectangular grid.
      
      `steric_max_range` defines the minimum size of the cells in the grid.
-     A finer grid reduces false positives, but increases the amount of memory used by the grid,
-     and the number operations needed to establish and clear the grid.
+     A finer grid reduces false positives, but increases the amount of memory used
+     by the grid, and the number operations needed to establish and clear the grid.
      
-     Thus optimal performance is usually obtained for an intermediate value of `steric_max_range`.
-     However `steric_max_range` must remain greater than the maximum interaction distance,
-     otherwise some interacting pairs will be missed. 
+     Thus optimal performance is usually obtained for an intermediate value of
+     `steric_max_range`. However `steric_max_range` must remain greater than the
+     maximum interaction distance, otherwise some interacting pairs will be missed.
      Experimentation is usually necessary to find the best value.
      
-     The maximum distance at which an object may interact with a sibling is its diameter.
-     Generally, `steric_max_range` should be greater or equal to the sum of the radiuses,
-     of any two object that may interact.
-     In the case of fiber, the `interaction-radius` is a combination of the segmentation,
-     and the radius: sqrt( (4/3*segmentation)^2 + 4*radius^2 )
+     The maximum distance at which an object may interact with a sibling is its
+     diameter. Generally, `steric_max_range` should be greater or equal to the
+     sum of the radiuses, of any two object that may interact.
+     In the case of fiber, the `interaction-radius` is a combination of the
+     segmentation, and the radius: sqrt( (4/3*segmentation)^2 + 4*radius^2 )
 
-     If the parameter is not set, cytosim attempts to calculate `steric_max_range` automatically.
+     If the parameter is not set, cytosim attempts to set it automatically.
      */
     real      steric_max_range;
     
     
     /// Grid size used to determine the attachment of Hand to Fiber
     /**
-     Cytosim uses a divide-and-conquer approach to detect which Fibers are near a given point,
-     witout testing every Fiber. This is necessary to determine onto which Fiber a Hand may bind.
-     The algorithm is based on partitionning Space with a rectangular grid
-     with cells of size `binding_grid_step` (see FiberGrid).
+     Cytosim uses a divide-and-conquer approach to detect which Fibers are near
+     a given point, witout testing every Fiber. This is necessary to determine
+     to which Fiber a Hand may bind. The algorithm is based on partitionning Space
+     with a grid of rectangular cells of size `binding_grid_step` (see FiberGrid).
 
-     `binding_grid_step` affects the execution speed of the algorithm, but not its result.
+     `binding_grid_step` affects the performance of the algorithm, but not its result.
      Smaller values of binding_grid_step reduce the number of false positives, 
      but requires more memory and housekeeping calculations. 
      Memory requirements also increase with the physical dimensions of the system, 
      to the power DIM (the dimensionality, set at compilation time).
+     
+     If the parameter is not set, cytosim attempts to set it automatically.
      */
     real      binding_grid_step;
     

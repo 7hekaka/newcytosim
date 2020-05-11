@@ -23,7 +23,7 @@ real Simul::estimateFiberGridStep() const
  Procedure:
  1. if binding_grid_step is not set, attempt to find a suitable value for it,
  2. if the number of cells is superior to 1e5, double the step size,
- 2. initialize the grid with this calculated step size.
+ 2. initialize the grid with the estimated step size.
  */
 void Simul::setFiberGrid(Space const* spc) const
 {

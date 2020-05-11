@@ -12,7 +12,7 @@
 /// FiberSite indicates a location on a Fiber by its curvilinear abscissa
 /**
  The key variable is a pointer to a Fiber, `fbFiber`, which is NULL
- if the state is `unattached`.
+ in the `unattached` state.
  
  In the `attached` state, the location on the Fiber is recorded using the
  curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
