@@ -91,11 +91,12 @@ size_t Mecable::allocateMecable(const size_t nbp)
         // retain existing data:
         if ( pPos )
         {
+            assert_true(nPoints < all);
             copy_real(DIM*nPoints, pPos, mem);
             free_real(pPos);
         }
         pPos = mem;
-        pAllocated = all;
+        pAllocated = all-(DIM==3);
         return all;
     }
     

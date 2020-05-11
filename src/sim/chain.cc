@@ -677,6 +677,9 @@ int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
  except for the edges, this is:
  P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) - sca[i-1] * ( P[i] - P[i-1] )
  
+ src[] and dst[] should be arrays of size `DIM*(nbs+1)`
+ sca[] should be an array of size `nbs`
+ 
  The code is similar to projectForcesD(), with an additional difference
  
  */
@@ -1534,7 +1537,7 @@ void Chain::resegment(size_t ns)
     
     real h = 0;
     size_t p = 1;
-    real* tmp = new_real(DIM*(ns+1));
+    real* tmp = new_real(DIM*(ns+2));
     
     a.store(tmp);
     for ( size_t n = 1; n < ns; ++n )
@@ -1593,7 +1596,7 @@ void Chain::adjustSegmentation()
         resegment(best-1);
 #else
         // copy current points in temporary array:
-        real* tmp = new_real(DIM*nPoints);
+        real* tmp = new_real(DIM*allocated());
         copy_real(DIM*nPoints, pPos, tmp);
         // re-interpolate:
         setShape(tmp, nPoints, best);
