@@ -28,6 +28,12 @@ namespace Platonic
     /// A vertex is interpolated from 3 Corners
     class Vertex
     {
+    private:
+        
+        void order(unsigned ii, unsigned jj);
+        
+        void order();
+
     public:
         
         /// pointers to the corners being interpolated
@@ -35,10 +41,6 @@ namespace Platonic
         
         /// Weights of the interpolation
         unsigned  weight_[3];
-        
-        void sort(unsigned ii, unsigned jj);
-        
-        void sort();
         
         bool equal(const Vertex &) const;
         

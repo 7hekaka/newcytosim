@@ -472,11 +472,11 @@ namespace Platonic
         weight_[2] = w2;
         assert_true( w2 == 0 || v2 );
         
-        sort();
+        order();
     }
     
     
-    void Vertex::sort(unsigned ii, unsigned jj)
+    void Vertex::order(unsigned ii, unsigned jj)
     {
         if ( weight_[ii] < weight_[jj] || ( weight_[ii] == weight_[jj] && vertex_[ii] < vertex_[jj]) )
         {
@@ -493,11 +493,11 @@ namespace Platonic
     /**
      order vertices in decreasing weights:
      */
-    void Vertex::sort()
+    void Vertex::order()
     {
-        sort(0,1);
-        sort(1,2);
-        sort(0,1);
+        order(0,1);
+        order(1,2);
+        order(0,1);
     }
     
     
