@@ -29,11 +29,6 @@ private:
     
 public:
     
-#if ATTACH_CLOSEST_FIBER
-    /// used to sort targets according to distance in tryToAttach()
-    mutable real  dis_;
-#endif
-    
     /// construct without initialization
     FiberSegment() {}
     
@@ -61,6 +56,9 @@ public:
     /// should return 1.0 / len()
     real         lenInv()      const { return fib_->segmentationInv(); }
     
+    /// true if abscissa 'a', counted from point 0 is within the segment
+    bool         within(real a) const { return ( 0 <= a && a < fib_->segmentation() ); }
+    
     /// position of first point
     Vector       pos1()        const { return fib_->posP(pti_); }
     
@@ -78,6 +76,9 @@ public:
 
     /// normalized tangent to Fiber
     Vector       dir()         const { return fib_->dirSegment(pti_); }
+    
+    /// normalized tangent to Fiber
+    Vector       dirS()        const { return Vector(fib_->addrDir(pti_)); }
     
     /// Mecapoint corresponding to first point
     Mecapoint    exact1()      const { return Mecapoint(fib_, pti_); }
@@ -110,7 +111,7 @@ public:
     /// faster projectionPoint, but incompatible with periodic boundary conditions
     real         projectPointF(const real[], real& dist) const;
 
-    /// calculates the closest distance between two segments and set abscissa
+    /// calculates the closest distance between two lines and set corresponding abscissa
     real         shortestDistance(FiberSegment const&, real& a, real& b) const;
 
     /// Human friendly ouput

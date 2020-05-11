@@ -343,8 +343,11 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 real abs1, abs2;
                 if ( seg1.shortestDistance(seg2, abs1, abs2) < sup )
                 {
-                    res1.push_back(FiberSite(fib1, abs1+fib1->abscissaPoint(s1)));
-                    res2.push_back(FiberSite(fib1, abs2+fib1->abscissaPoint(s2)));
+                    if ( seg1.within(abs1) & seg2.within(abs2) )
+                    {
+                        res1.push_back(FiberSite(fib1, abs1+fib1->abscissaPoint(s1)));
+                        res2.push_back(FiberSite(fib1, abs2+fib1->abscissaPoint(s2)));
+                    }
                 }
             }
             // check against other fibers:
@@ -356,8 +359,11 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                     real abs1, abs2;
                     if ( seg1.shortestDistance(seg2, abs1, abs2) < sup )
                     {
-                        res1.push_back(FiberSite(fib1, abs1+fib1->abscissaPoint(s1)));
-                        res2.push_back(FiberSite(fib2, abs2+fib2->abscissaPoint(s2)));
+                        if ( seg1.within(abs1) & seg2.within(abs2) )
+                        {
+                            res1.push_back(FiberSite(fib1, abs1+fib1->abscissaPoint(s1)));
+                            res2.push_back(FiberSite(fib2, abs2+fib2->abscissaPoint(s2)));
+                        }
                     }
                 }
             }
@@ -418,8 +424,11 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                     real abs1, abs2;
                     if ( seg.shortestDistance(can, abs1, abs2) < DD )
                     {
-                        res1.push_back(FiberSite(fib, abs1+fib->abscissaPoint(s)));
-                        res2.push_back(FiberSite(bif, abs2+bif->abscissaPoint(can.point())));
+                        if ( seg.within(abs1) & can.within(abs2) )
+                        {
+                            res1.push_back(FiberSite(fib, abs1+fib->abscissaPoint(s)));
+                            res2.push_back(FiberSite(bif, abs2+bif->abscissaPoint(can.point())));
+                        }
                     }
                 }
             }

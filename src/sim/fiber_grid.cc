@@ -123,6 +123,7 @@ void paintCell(const int x_inf, const int x_sup, const int y, const int z, void 
     FiberGrid::SegmentList * sup = & grid->icell3D( x_sup, y, z );
 #endif
     
+    // Since all the lists are independent, they can be updated in parallel
     # pragma ivdep
     for ( FiberGrid::SegmentList * list = inf; list <= sup; ++list )
         list->push_back(seg);
@@ -235,11 +236,24 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 
 #if ATTACH_CLOSEST_FIBER
 
+class HeavySegment
+{
+public:
+    FiberSegment seg_;
+    real         dis_;
+    real         abs_;
+    HeavySegment() { }
+    HeavySegment(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
+};
+
+
+typedef Array<HeavySegment> HeavySegmentList;
+
 /// used to qsort segments according to distance
 int compareSegments(const void * a, const void * b)
 {
-    real ad = ((FiberSegment const*)(a))->dis_;
-    real bd = ((FiberSegment const*)(b))->dis_;
+    real ad = ((HeavySegment const*)(a))->dis_;
+    real bd = ((HeavySegment const*)(b))->dis_;
     
     return ( ad > bd ) - ( bd > ad );
 }
@@ -263,15 +277,15 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      get the list of segments associated with this cell in FiberGrid::paintGrid
      */
     SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
-    SegmentList targets;
+    HeavySegmentList targets;
 
     // calculate distance to all targets
     for ( FiberSegment const& seg : segments )
     {
-        seg.dis_ = INFINITY;
-        seg.projectPoint(place, seg.dis_);
-        if ( seg.dis_ < ha.prop->binding_range_sqr )
-            targets.push_back(seg);
+        real dis_ = INFINITY;
+        real abs_ = seg.projectPoint(place, dis_);
+        if ( dis_ < ha.prop->binding_range_sqr )
+            targets.push_back(HeavySegment(seg, dis_, abs_));
     }
     
     // sort targets within range from close to distant:
@@ -287,14 +301,14 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      number to get the index of the next target that will bind, using a Poisson
      distribution */
     const real prob = ha.prop->binding_prob;
-    for ( FiberSegment const& seg : targets )
+    for ( HeavySegment const& target : targets )
     {
         //printf("    trying segment F%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), seg.dis_);
         if ( RNG.test(prob) )
         {
+            FiberSegment const& seg = target.seg_;
             Fiber * fib = const_cast<Fiber*>(seg.fiber());
-            // need to recalculate the abscissa of the projection:
-            FiberSite pos(fib, seg.abscissa1()+seg.projectPoint(place, seg.dis_));
+            FiberSite pos(fib, seg.abscissa1()+target.abs_);
             if ( ha.attachmentAllowed(pos) )
             {
                 ha.attach(pos);

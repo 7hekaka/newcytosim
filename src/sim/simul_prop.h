@@ -234,7 +234,7 @@ public:
      
      `steric_max_range` defines the minimum size of the cells in the grid.
      A finer grid reduces false positives, but increases the amount of memory used by the grid,
-     and the number calculations that are necessary to maintain and clear the grid.
+     and the number operations needed to establish and clear the grid.
      
      Thus optimal performance is usually obtained for an intermediate value of `steric_max_range`.
      However `steric_max_range` must remain greater than the maximum interaction distance,
