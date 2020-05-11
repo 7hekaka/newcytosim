@@ -350,7 +350,7 @@ public:
     void add(Mecapoint const& p, real radius, real extra_range) const
     {
         Vector w = p.pos();
-        point_list(w).push_back(FatPoint(p, radius, extra_range, w));
+        point_list(w).emplace_back(p, radius, extra_range, w);
     }
     
     /// place FiberSegment on the grid
@@ -358,7 +358,7 @@ public:
     {
         //we use the middle of the segment (interpolation coefficient is ignored)
         Vector w = p.center();
-        locus_list(w).push_back(FatLocus(p, radius, extra_range));
+        locus_list(w).emplace_back(p, radius, extra_range);
     }
     
     /// enter interactions into Meca with given stiffness

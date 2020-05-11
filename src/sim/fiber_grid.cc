@@ -285,7 +285,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
         real dis_ = INFINITY;
         real abs_ = seg.projectPoint(place, dis_);
         if ( dis_ < ha.prop->binding_range_sqr )
-            targets.push_back(HeavySegment(seg, dis_, abs_));
+            targets.emplace_back(seg, dis_, abs_);
     }
     
     // sort targets within range from close to distant:

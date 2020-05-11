@@ -92,8 +92,9 @@ private:
     /// copy data
     inline void copy(VAL * dst, const VAL* src, const size_t cnt)
     {
-        //std::clog << "Array::copy " << cnt << "   " << src << " ---> " << dst << "\n";
-#if ( 0 )
+        //fprintf(stderr, "Array::copy(%lu) ", cnt);
+#if ( 1 )
+        // to bypass the constructor/destructor
         memcpy(dst, src, cnt*sizeof(VAL));
 #else
         for ( size_t n = 0; n < cnt; ++n )
@@ -117,7 +118,6 @@ public:
             fprintf(stderr, "Array::chunk must not be null");
             exit(1);
         }
-
         chk_ = next_power(k);
         alc_ = chk_;
         val_ = new VAL[chk_];
@@ -235,12 +235,11 @@ public:
         VAL * val_new = new VAL[alc_new];
         if ( val_ )
         {
-            if ( alc_ < alc_new )
-                copy(val_new, val_, alc_);
-            else
-                copy(val_new, val_, alc_new);
+            // copy over valid data
+            copy(val_new, val_, std::min(nbo_, alc_new));
             delete[] val_;
         }
+        //fprintf(stderr, "  reallocate(%lu -> %lu)\n", alc_, alc_new);
         alc_ = alc_new;
         val_ = val_new;
     }
@@ -345,6 +344,14 @@ public:
         val_[nbo_++] = v;
     }
     
+    template < typename... Args >
+    void emplace_back(Args&&... args)
+    {
+        if ( nbo_ >= alc_ )
+            reallocate(chunked(nbo_+1));
+        val_[nbo_++] = VAL(args...);
+    }
+
     /// remove last element
     void pop_back()
     {
