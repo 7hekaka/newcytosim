@@ -14,13 +14,39 @@ typedef std::vector <FiberSegment> SegmentVector;
 SegmentVector allSegments;
 
 
-unsigned FiberGrid::setGrid(Space const*, real)
+size_t FiberGrid::setGrid(Space const*, real)
 {
     LOG_ONCE("Cytosim is using a crude method to localize fibers!\n");
-    return 0;
+    return 1;
 }
 
-void FiberGrid::paintGrid(const Fiber * first, const Fiber * last)
+
+void FiberGrid::createCells()
+{
+}
+
+
+size_t FiberGrid::nbCells() const
+{
+    return 1;
+}
+
+
+size_t FiberGrid::hasGrid() const
+{
+    return 1;
+}
+
+
+size_t FiberGrid::nbTargets() const
+{
+    return allSegments.size();
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Paint
+
+void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real)
 {
     allSegments.clear();
     // add all segments
@@ -32,26 +58,17 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last)
 }
 
 
-void FiberGrid::createCells()
-{
-}
-
-size_t FiberGrid::hasGrid() const
-{
-    return 1;
-}
-
-
 void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 {
     // randomize the list order
-    std::random_shuffle( allSegments.begin(), allSegments.end() );
+    //std::random_shuffle(allSegments.begin(), allSegments.end());
 
     // test all segments:
+    const uint32_t prob = 0x1p+32 * ha.prop->binding_prob;
     for ( FiberSegment const& seg : allSegments )
     {
 #if !TRICKY_HAND_ATTACHMENT
-        if ( RNG.test(ha.prop->binding_prob) )
+        if ( RNG.pint() < prob )
 #else
         if ( RNG.flip_8th() )
 #endif

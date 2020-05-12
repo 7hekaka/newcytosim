@@ -17,7 +17,7 @@ extern Modulo const* modulo;
 
 
 #if ( 0 )
-// this includes a naive implementation, which is slow but helpful for debugging
+// use a naive implementation, which is slow but helpful for debugging
 #   include "fiber_grid2.cc"
 #else
 
@@ -34,7 +34,7 @@ extern Modulo const* modulo;
  A good compromise is to set `max_step` equivalent to the attachment distance,
  or at least to the size of the segments of the Fibers.
  */
-unsigned FiberGrid::setGrid(Space const* space, real max_step)
+size_t FiberGrid::setGrid(Space const* space, real max_step)
 {
     if ( max_step <= 0 )
         throw InvalidParameter("simul:binding_grid_step should be > 0");
@@ -77,14 +77,33 @@ void FiberGrid::createCells()
     fGrid.createCells();
 #if ( 0 )
     if ( fGrid.nbCells() > 4096 )
-        fGrid.printSummary(std::cerr, "FiberGrid");
+        fGrid.printSummary(Cytosim::log, "FiberGrid");
 #endif
+}
+
+
+size_t FiberGrid::nbCells() const
+{
+    return fGrid.nbCells();
 }
 
 
 size_t FiberGrid::hasGrid() const
 {
     return fGrid.hasCells();
+}
+
+
+size_t FiberGrid::nbTargets() const
+{
+    size_t res = 0;
+    SegmentList * ptr = fGrid.data();
+    const SegmentList * end = ptr + fGrid.nbCells();
+    
+    for ( ; ptr < end; ++ptr )
+        res += ptr->size();
+    
+    return res;
 }
 
 //------------------------------------------------------------------------------
@@ -228,6 +247,8 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 #endif
         }
     }
+    
+    //Cytosim::log("distributed %lu segments over %lu cells\n", nbTargets(), nbCells());
 }
 
 

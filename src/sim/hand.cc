@@ -6,7 +6,6 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "fiber_prop.h"
-#include "fiber_grid.h"
 #include "simul.h"
 #include "sim.h"
 

@@ -399,12 +399,12 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
         len = std::max(len, fib->segmentation());
     
     const real DD = square(max_distance);
-    const real sup = square(len) + DD;
+    const real sup = sqrt(square(len) + DD);
     res1.clear();
     res2.clear();
     
     // distribute segments
-    grid.paintGrid(first(), nullptr, sqrt(sup));
+    grid.paintGrid(first(), nullptr, sup);
     
     FiberGrid::SegmentList list;
     for ( Fiber * fib = first(); fib; fib = fib->next() )
@@ -413,7 +413,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
         {
             FiberSegment seg(fib, s);
-            list = grid.segments(seg.center());
+            list = grid.cellTargets(seg.center());
             //std::clog << seg << ":";
             for ( FiberSegment const& can : list )
             {
