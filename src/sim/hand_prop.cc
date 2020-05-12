@@ -316,7 +316,7 @@ void HandProp::checkStiffness(real stiff, real len, real mul, real kT) const
     
     if ( ap > 10.0 )
     {
-        Cytosim::warn << " `" << name() << "' may unbind immediately, "\
+        Cytosim::warn << "`" << name() << "' may unbind immediately, "\
         << "exp(stiffness*binding_range/unbinding_force) = " << ap << "\n";
         //<< PREF << "you could decrease stiffness or binding_range\n";
     }

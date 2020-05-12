@@ -23,26 +23,21 @@ extern Modulo const* modulo;
 
 /**
  Creates a grid where the dimensions of the cells are `max_step` at most.
- If the numbers of cells that need to be created is greater than `max_nb_cells`,
- the function returns 1 without building the grid.
- The return value is zero in case of success.
+ @returns the numbers of cells to be created with this cell size.
  
- The results are correct with any value of `max_step`, but efficiency of the
+ The results will be correct for any value of `max_step`, but efficiency of the
  algorithm is affected by `max_step`:
      -if `max_step` is too small, paintGrid() will be slow,
      -if `max_step` is too large, tryToAttach() will be slow.
- A good compromise is to set `max_step` equivalent to the attachment distance,
- or at least to the size of the segments of the Fibers.
+ A compromise is to adjust `max_step` to the length of the segments.
  */
 size_t FiberGrid::setGrid(Space const* space, real max_step)
 {
-    if ( max_step <= 0 )
-        throw InvalidParameter("simul:binding_grid_step should be > 0");
-    
+    assert_true(max_step > 0);
     Vector inf, sup;
     space->boundaries(inf, sup);
     
-    size_t n_cell[3] = { 1, 1, 1 };
+    size_t cnt[3] = { 1, 1, 1 };
     
     for ( size_t d = 0; d < DIM; ++d )
     {
@@ -54,20 +49,19 @@ size_t FiberGrid::setGrid(Space const* space, real max_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges exactly
-            n_cell[d] = std::max((size_t)1, (size_t)ceil(n));
+            cnt[d] = std::max((size_t)1, (size_t)ceil(n));
             fGrid.setPeriodic(d, true);
         }
         else
         {
             //extend the grid by one cell on each side
-            n_cell[d] = (size_t)ceil(n) + 2;
-            inf[d]   -= max_step;
-            sup[d]   += max_step;
+            cnt[d]  = (size_t)ceil(n) + 2;
+            inf[d] -= max_step;
+            sup[d] += max_step;
         }
     }
-
-    //create the grid using the calculated dimensions:
-    fGrid.setDimensions(inf, sup, n_cell);
+    
+    fGrid.setDimensions(inf, sup, cnt);
     return fGrid.nbCells();
 }
 
@@ -75,10 +69,7 @@ size_t FiberGrid::setGrid(Space const* space, real max_step)
 void FiberGrid::createCells()
 {
     fGrid.createCells();
-#if ( 0 )
-    if ( fGrid.nbCells() > 4096 )
-        fGrid.printSummary(Cytosim::log, "FiberGrid");
-#endif
+    fGrid.printSummary(Cytosim::log, "BindingGrid");
 }
 
 

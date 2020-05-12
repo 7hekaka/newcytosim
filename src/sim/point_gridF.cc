@@ -20,13 +20,11 @@ PointGridF::PointGridF()
 
 size_t PointGridF::setGrid(Space const* spc, real min_step)
 {
-    if ( min_step <= REAL_EPSILON )
-        return 0;
-    
+    assert_true( min_step > 0 );
     Vector inf, sup;
     spc->boundaries(inf, sup);
     
-    size_t n_cell[3] = { 1, 1, 1 };
+    size_t cnt[3] = { 1, 1, 1 };
     for ( size_t d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / min_step;
@@ -37,22 +35,21 @@ size_t PointGridF::setGrid(Space const* spc, real min_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges
-            n_cell[d] = std::max((size_t)1, (size_t)floor(n));
+            cnt[d] = std::max((size_t)1, (size_t)floor(n));
             pGrid.setPeriodic(d, true);
         }
         else
         {
             //add a border in any dimension which is not periodic
-            n_cell[d] = (size_t)ceil(n) + 2;
-            n = n_cell[d] * 0.5 * min_step;
+            cnt[d] = (size_t)ceil(n) + 2;
+            n = cnt[d] * 0.5 * min_step;
             real mid = inf[d] + sup[d];
             inf[d] = mid - n;
             sup[d] = mid + n;
         }
     }
     
-    //create the grid using the calculated dimensions:
-    pGrid.setDimensions(inf, sup, n_cell);
+    pGrid.setDimensions(inf, sup, cnt);
     return pGrid.nbCells();
 }
 

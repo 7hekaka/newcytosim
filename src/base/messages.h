@@ -15,7 +15,7 @@ namespace Cytosim
     class Output
     {
         /// prefix to all messages
-        std::string   pref_;
+        std::string  pref_;
 
         /// pointer to the current destination of output
         std::ostream* out_;
@@ -97,7 +97,7 @@ namespace Cytosim
             return nul_;
         }
         
-        /// front-end to a `printf()` syntax and flush
+        /// front-end to a `printf()` syntax with flush
         template < typename... Args >
         void operator()(const char* fmt, Args&&... args)
         {

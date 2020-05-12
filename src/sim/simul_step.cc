@@ -23,7 +23,7 @@ real Simul::estimateFiberGridStep() const
  Procedure:
  1. if `binding_grid_step` is not set, attempt to find a suitable value for it,
  2. if the number of cells is superior to 1e5, double the step size,
- 2. initialize the grid with the estimated step size.
+ 3. initialize the grid with the estimated step size.
  */
 void Simul::setFiberGrid(Space const* spc) const
 {
@@ -36,9 +36,10 @@ void Simul::setFiberGrid(Space const* spc) const
 
     /// otherwise, try to get it from the space
     if ( res <= 0 )
-        res = spc->max_extension() / 128;
+        res = spc->max_extension() / 128.0;
     
-    assert_true( res > 0 );
+    if ( res <= 0 )
+         throw InvalidParameter("simul:binding_grid_step must be > 0");
 
     // increase the cell size until we get acceptable memory requirements:
     const size_t sup = 1 << 17;
@@ -48,13 +49,12 @@ void Simul::setFiberGrid(Space const* spc) const
     if ( res != prop->binding_grid_step )
     {
         prop->binding_grid_step = res;
-        Cytosim::log("adjusting simul:binding_grid_step = %.3f;", res);
+        Cytosim::log("adjusting simul:binding_grid_step = %.3f\n", res);
     }
 
     // create the grid cells:
     fiberGrid.createCells();
 
-    //Cytosim::log("simul:binding_grid_step %.3f\n", prop->binding_grid_step);
     Cytosim::log(" BindingGrid has %lu cells of size %.3f um\n", fiberGrid.nbCells(), res);
 }
 
