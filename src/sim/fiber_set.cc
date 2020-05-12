@@ -384,7 +384,6 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
 
     if ( ! grid.hasGrid() )
     {
-        return allIntersections0(res1, res2, max_distance);
         Space const* spc = simul.spaces.master();
         if ( spc )
             simul.setFiberGrid(spc);
