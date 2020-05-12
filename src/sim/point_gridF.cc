@@ -347,7 +347,7 @@ void PointGridF::checkLL(Meca& meca, real stiff,
 {
 #if ( DIM == 3 )
     
-    const real ran = aa.radius + bb.radius;;
+    const real ran = aa.radius + bb.radius;
     
     /* in 3D, we use shortestDistance() to calculate the closest distance
      between two segments, and use the result to build an interaction */

@@ -284,7 +284,7 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
      we cannot call lapack::DPOTRS('L', nbp, mec->block(), nbp, Y, DIM, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
      */
-    //iso_xgetrsL<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
+    //iso_xgetrsN<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
     alsatian_xgetrsN<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
 }
 

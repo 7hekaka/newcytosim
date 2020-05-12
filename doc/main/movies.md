@@ -27,7 +27,8 @@ Command                          |   Result                                   |
 `play movie period=10`           | images for frames 0, 10, 20, ...
 
 
-Cytosim can usually generate <a href="http://en.wikipedia.org/wiki/Netpbm_format">PPM images</a>, readible by <a href="http://rsbweb.nih.gov/ij/">ImageJ</a> (of FIJI).
+Cytosim can usually generate <a href="http://en.wikipedia.org/wiki/Netpbm_format">PPM images</a>, 
+readable by <a href="http://rsbweb.nih.gov/ij/">ImageJ</a> (of FIJI).
 In addition, Cytosim may be able to generate images in the PNG formats,
 if the required library was linked during compilation.
 

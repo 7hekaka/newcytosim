@@ -5,8 +5,9 @@ set simul system
 {
     steric = 1, 500
     time_step = 0.005
-    viscosity = 2.0
-    precondition = 2
+    binding_grid_step = 0.1
+    viscosity = 1.0
+    precondition = 1
 }
 
 set system display

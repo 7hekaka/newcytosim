@@ -175,7 +175,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
 #if ( 0 )
     size_t S = std::min(12UL, siz);
     std::clog << "\nproject_matrix:\n";
-    VecPrint::print(std::clog, S, S, src, lll);
+    VecPrint::print(std::clog, ORD*S, ORD*S, src, lll);
 #endif
     for ( size_t jj = 0; jj < siz; ++jj )
     for ( size_t ii = 0; ii < siz; ++ii )
@@ -186,7 +186,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
             val += ptr[d*(lll+1)];
         dst[ii+ldd*jj] = val / (real)ORD;
     }
-#if (0 )
+#if ( 0 )
     std::clog << "Projected:\n";
     VecPrint::print(std::clog, S, S, dst, ldd);
 #endif

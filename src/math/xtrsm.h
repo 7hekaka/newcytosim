@@ -844,7 +844,7 @@ void alsatian_xtrsmLLT2(const int M, const real* A, const int lda, real* B)
 }
 
 
-/// specialized version for ORD==1
+/// specialized version for ORD==2
 template < char diag >
 void alsatian_xtrsmLUN2(const int M, const real* A, const int lda, real* B)
 {
@@ -852,7 +852,7 @@ void alsatian_xtrsmLUN2(const int M, const real* A, const int lda, real* B)
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        vec2 temp = load2(B+K);
+        vec2 temp = load2(B+2*K);
         if ( diag == 'N' ) {
             temp = div2(temp, loaddup2(A+K));
             store2(B+2*K, temp);
