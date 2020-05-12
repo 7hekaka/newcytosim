@@ -220,14 +220,14 @@ public:
     
     /// this is used for development
     void            addExperimentalInteractions(Meca&) const;
+    
+    /// set FiberGrid and StericGrid over the given space
+    void            setFiberGrid(Space const*) const;
 
 private:
     
     /// give an estimate of the cell size of the FiberGrid
     real            estimateFiberGridStep() const;
-    
-    /// set FiberGrid and StericGrid over the given space
-    void            setFiberGrid(Space const*) const;
     
     /// give an estimate for the cell size of the PointGrid used for steric interactions
     real            estimateStericRange() const;

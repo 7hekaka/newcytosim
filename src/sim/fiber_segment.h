@@ -57,7 +57,7 @@ public:
     real         lenInv()      const { return fib_->segmentationInv(); }
     
     /// true if abscissa 'a', counted from point 0 is within the segment
-    bool         within(real a) const { return ( 0 <= a ) & ( a < fib_->segmentation() ); }
+    bool         within(real a) const { return ( 0 <= a ) & ( a <= fib_->segmentation() ); }
     
     /// position of first point
     Vector       pos1()        const { return fib_->posP(pti_); }

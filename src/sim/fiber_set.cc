@@ -327,7 +327,7 @@ void FiberSet::foldPosition(Modulo const* s) const
 void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                                  const real max_distance) const
 {
-    const real sup = max_distance * max_distance;
+    const real sup = square(max_distance);
     res1.clear();
     res2.clear();
 
@@ -345,8 +345,8 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 {
                     if ( seg1.within(abs1) & seg2.within(abs2) )
                     {
-                        res1.push_back(FiberSite(fib1, abs1+fib1->abscissaPoint(s1)));
-                        res2.push_back(FiberSite(fib1, abs2+fib1->abscissaPoint(s2)));
+                        res1.emplace_back(fib1, abs1+fib1->abscissaPoint(s1));
+                        res2.emplace_back(fib1, abs2+fib1->abscissaPoint(s2));
                     }
                 }
             }
@@ -361,8 +361,8 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                     {
                         if ( seg1.within(abs1) & seg2.within(abs2) )
                         {
-                            res1.push_back(FiberSite(fib1, abs1+fib1->abscissaPoint(s1)));
-                            res2.push_back(FiberSite(fib2, abs2+fib2->abscissaPoint(s2)));
+                            res1.emplace_back(fib1, abs1+fib1->abscissaPoint(s1));
+                            res2.emplace_back(fib2, abs2+fib2->abscissaPoint(s2));
                         }
                     }
                 }
@@ -383,7 +383,14 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     FiberGrid & grid = simul.fiberGrid;
 
     if ( ! grid.hasGrid() )
+    {
         return allIntersections0(res1, res2, max_distance);
+        Space const* spc = simul.spaces.master();
+        if ( spc )
+            simul.setFiberGrid(spc);
+        else
+            return allIntersections0(res1, res2, max_distance);
+    }
     
 #if ( 0 )
     // check what other method gives:
@@ -426,8 +433,8 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                     {
                         if ( seg.within(abs1) & can.within(abs2) )
                         {
-                            res1.push_back(FiberSite(fib, abs1+fib->abscissaPoint(s)));
-                            res2.push_back(FiberSite(bif, abs2+bif->abscissaPoint(can.point())));
+                            res1.emplace_back(fib, abs1+fib->abscissaPoint(s));
+                            res2.emplace_back(bif, abs2+bif->abscissaPoint(can.point()));
                         }
                     }
                 }
@@ -467,7 +474,7 @@ void FiberSet::uniFiberSites(Array<FiberSite>& res, const real spread) const
         real len = fib->length();
         while ( abs < len )
         {
-            res.push_back(FiberSite(fib, abs+fib->abscissaM()));
+            res.emplace_back(fib, abs+fib->abscissaM());
             abs += spread * RNG.exponential();
         }
         abs -= len;
@@ -609,7 +616,7 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
         real len = fib->freshAssemblyP();
         while ( abs < len )
         {
-            res.push_back(FiberSite(fib, fib->abscissaP()-abs));
+            res.emplace_back(fib, fib->abscissaP()-abs);
             abs += spread * RNG.exponential();
         }
         abs -= len;
@@ -643,7 +650,7 @@ void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real spread) const
         real a = fib->freshAssemblyM();
         while ( abs < a )
         {
-            res.push_back(FiberSite(fib, fib->abscissaM()+abs));
+            res.emplace_back(fib, fib->abscissaM()+abs);
             abs += spread * RNG.exponential();
         }
         abs -= a;

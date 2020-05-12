@@ -4,6 +4,7 @@
 #include "couple_set.h"
 #include "couple_prop.h"
 #include "fork_prop.h"
+#include "messages.h"
 #include "crosslink_prop.h"
 #include "shackle_prop.h"
 #include "bridge_prop.h"
@@ -1119,8 +1120,8 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, PropertyList const& 
     const size_t nbc = loc1.size();
     assert_true(nbc == loc2.size());
     
-    //std::clog << nbc << " intersections at range " << range << "\n";
-
+    Cytosim::log << "Connect on " << nbc << " intersections within range " << range << "\n";
+    
     if ( nbc > 0 )
     {
         Couple * c = firstFF(), * nxt;

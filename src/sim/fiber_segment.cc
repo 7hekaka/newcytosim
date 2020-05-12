@@ -204,15 +204,18 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
 
 real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& abs2) const
 {
-    //assert_true(fib_->iDirValid);
     const real len1 = len();
     const real len2 = seg.len();
 
-    //Vector pos = pos1();
     Vector off = seg.pos1() - pos1();
-    Vector d11 = dirS(); //( pos2() - pos ) * lenInv();
-    Vector d22 = seg.dirS(); //( seg.pos2() - off ) * seg.lenInv();
-    //off -= pos; // off = seg.pos1() - pos1()
+#if 0
+    assert_true(fib_->iDirValid);
+    Vector d11 = dirS();
+    Vector d22 = seg.dirS();
+#else
+    Vector d11 = dir();
+    Vector d22 = seg.dir();
+#endif
     
 #if GRID_HAS_PERIODIC
     if ( modulo )
@@ -263,30 +266,16 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
     real m1 = d1off;
     real p1 = d1off + C * len2;
 
-    //if (((m1 < 0) & (p1 < 0)) | ((m1 > len1) & (p1 > len1)))
-    //    return INFINITY;
-
-    // clamp inside segment:
-    m1 = std::max(0., std::min(m1, len1));
-    p1 = std::max(0., std::min(p1, len1));
-
-    // use mid-point:
-    abs1 = 0.5 * ( m1 + p1 );
+    // clamp inside segment and use mid-point
+    abs1 = 0.5 * ( std::min(len1, std::max(m1, p1)) + std::max(0., std::min(m1, p1)));
     
     real m2 = -dot(d22, off);
     real p2 = m2 + C * len1;
 
-    //if (((m2 < 0) & (p2 < 0)) | ((m2 > len2) & (p2 > len2)))
-    //    return INFINITY;
+    // clamp inside segment and use mid-point
+    abs2 = 0.5 * ( std::min(len2, std::max(m2, p2)) + std::max(0., std::min(m2, p2)));
 
-    // clamp inside segment:
-    m2 = std::max(0., std::min(m2, len2));
-    p2 = std::max(0., std::min(p2, len2));
-
-    // use mid-point:
-    abs2 = 0.5 * ( m2 + p2 );
-    
-    // return distance between
+    // return distance between lines
     return off.normSqr() - d1off * d1off;
 }
 
