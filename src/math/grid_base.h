@@ -862,11 +862,14 @@ public:
 #pragma mark -
 
     /// write some info on the grid
-    void printSummary(std::ostream& os, std::string str)
+    void printSummary(std::ostream& os, const char arg[])
     {
-        os << str << " of dim " << ORD << " has " << gAllocated << " cells:" << std::endl;
+        char str[512], *ptr = str;
+        char*const end = str+sizeof(str);
+        ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells:", arg, ORD, gAllocated);
         for ( int d = 0; d < ORD; ++d )
-            os << "     [ " << gInf[d] << " " << gSup[d] << " ] / " << gDim[d] << " = " << cWidth[d] << std::endl;
+            ptr += snprintf(ptr, end-ptr, "\n   [ %6.3f  %+6.3f ] / %4lu = %6.3f", gInf[d], gSup[d], gDim[d], cWidth[d]);
+        os << str << std::endl;
     }
 };
 

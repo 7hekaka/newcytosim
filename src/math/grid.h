@@ -170,16 +170,11 @@ public:
             return;
         
         CELL * c = gCell;
-        const CELL * last = gCell + GRID::nCells;
-#if ( 0 )
-        for ( ; c < last; ++c )
-            c->clear();
-#else
-        //we unroll the loop to go faster
-        const CELL * stop = gCell + (GRID::nCells % 8);
-        for ( ; c < stop; ++c )
-            c->clear();
-        for ( ; c < last ; c += 8 )
+        const CELL * end = gCell + GRID::nCells;
+#if ( 1 )
+        //we unroll the loop for speed
+        const CELL * stop = end - 7;
+        for ( ; c < stop; c += 8 )
         {
             c[0].clear();
             c[1].clear();
@@ -191,6 +186,8 @@ public:
             c[7].clear();
         }
 #endif
+        for ( ; c < end; ++c )
+            c->clear();
     }
 
     //--------------------------------------------------------------------------
