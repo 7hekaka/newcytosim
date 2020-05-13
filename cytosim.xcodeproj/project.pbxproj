@@ -6376,6 +6376,7 @@
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
 				SDKROOT = macosx;
+				UNDEFINED_IDENTIFIER = "-Wundef";
 				USE_HEADERMAP = YES;
 				WARNING_CFLAGS = "-Wall";
 			};
@@ -6454,6 +6455,7 @@
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
 				SDKROOT = macosx;
+				UNDEFINED_IDENTIFIER = "-Wundef";
 				USE_HEADERMAP = YES;
 			};
 			name = Deployment;
@@ -6529,6 +6531,7 @@
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
 				SDKROOT = macosx;
+				UNDEFINED_IDENTIFIER = "-Wundef";
 				USE_HEADERMAP = YES;
 			};
 			name = Default;
