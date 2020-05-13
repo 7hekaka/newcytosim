@@ -354,9 +354,13 @@ public:
     /// square of the distance between two points, equivalent to (a-b).normSqr()
     friend real distanceSqr(Vector2 const& a, Vector2 const& b)
     {
+#if VECTOR2_USES_SSE
+        return normsqr2(sub2(a.vec, b.vec))[0];
+#else
         real x = a.XX - b.XX;
         real y = a.YY - b.YY;
         return x*x + y*y;
+#endif
     }
 
     /// distance between two points, equivalent to (a-b).norm()

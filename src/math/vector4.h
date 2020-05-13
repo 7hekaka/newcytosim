@@ -380,11 +380,15 @@ public:
     /// square of the distance between two points, equivalent to (a-b).normSqr()
     friend real distanceSqr(Vector4 const& a, Vector4 const& b)
     {
+#if VECTOR4_USES_AVX
+        return normsqr4(sub4(a.vec, b.vec))[0];
+#else
         real x = a.XX - b.XX;
         real y = a.YY - b.YY;
         real z = a.ZZ - b.ZZ;
         real t = a.TT - b.TT;
         return x*x + y*y + z*z + t*t;
+#endif
     }
 
     /// distance between two points, equivalent to (a-b).norm()

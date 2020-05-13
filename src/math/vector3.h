@@ -62,7 +62,7 @@ public:
     Vector3(real x, real y, real z) : vec(setr4(x, y, z, 0)) {}
     
     /// construct from address
-    Vector3(const real v[]) : vec(load3(v)) {}
+    Vector3(const real v[]) : vec(load3Z(v)) {}
 #else
     /// construct from 3 values
     Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
@@ -399,10 +399,16 @@ public:
     /// square of the distance between two points, equivalent to (a-b).normSqr()
     friend real distanceSqr(Vector3 const& a, Vector3 const& b)
     {
+#if VECTOR3_USES_AVX
+        assert_true(a.vec[3] == 0);
+        assert_true(b.vec[3] == 0);
+        return normsqr4(sub4(a.vec, b.vec))[0];
+#else
         real x = a.XX - b.XX;
         real y = a.YY - b.YY;
         real z = a.ZZ - b.ZZ;
         return x*x + y*y + z*z;
+#endif
     }
 
     /// distance between two points, equivalent to (a-b).norm()
