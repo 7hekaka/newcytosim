@@ -223,7 +223,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
 #endif
     
     real C = dot(d11, d22);  // cosinus of angle
-    real S = 1.0 - C * C;    // sinus
+    real S = 1.0 - C * C;    // sinus squared
 
     if ( S > REAL_EPSILON )
     {
@@ -243,13 +243,17 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         Vector p2 = seg.pos1() + abs2 * d22;
         real n1 = dot(d11, p2-p1);
         real n2 = dot(d22, p2-p1);
-        real res = ( off + d22 * abs2 ).normSqr() - abs1 * abs1;
-        printf("shortestDistance %+9.6f %+9.6f   %10.3f\n", n1, n2, res);
+        real res1 = sqrt(( off - d11 * abs1 ).normSqr() - abs2 * abs2);
+        real res2 = sqrt(( off + d22 * abs2 ).normSqr() - abs1 * abs1);
+        printf("shortestDistance %+9.6f %+9.6f   %6.3f   %6.3f ", n1, n2, res1, res2);
 #endif
 #if ( DIM > 2 )
         //real res = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
-        //real res = ( off - d11 * abs1 ).normSqr() - abs2 * abs2;
-        return ( off + d22 * abs2 ).normSqr() - abs1 * abs1;
+        real res = ( off - d11 * abs1 ).normSqr() - abs2 * abs2;
+        //real res = ( off + d22 * abs2 ).normSqr() - abs1 * abs1;
+        //printf("dis %03u:%02lu", fiber()->identity(), point());
+        //printf(" %03u:%02lu   %6.3f", seg.fiber()->identity(), seg.point(), sqrt(res));
+        return res;
 #else
         return 0;
 #endif

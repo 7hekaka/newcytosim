@@ -341,7 +341,7 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
             {
                 FiberSegment seg2(fib1, s2);
                 real abs1, abs2;
-                if ( seg1.shortestDistance(seg2, abs1, abs2) < sup )
+                if ( seg1.shortestDistance(seg2, abs1, abs2) <= sup )
                 {
                     if ( seg1.within(abs1) & seg2.within(abs2) )
                     {
@@ -357,7 +357,7 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 {
                     FiberSegment seg2(fib2, s2);
                     real abs1, abs2;
-                    if ( seg1.shortestDistance(seg2, abs1, abs2) < sup )
+                    if ( seg1.shortestDistance(seg2, abs1, abs2) <= sup )
                     {
                         if ( seg1.within(abs1) & seg2.within(abs2) )
                         {
@@ -404,13 +404,12 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     for ( Fiber * fib = first(); fib; fib = fib->next() )
         len = std::max(len, fib->segmentation());
     
-    const real DD = square(max_distance);
-    const real sup = sqrt(square(len) + DD);
+    const real sup = square(max_distance);
     res1.clear();
     res2.clear();
     
     // distribute segments
-    grid.paintGrid(first(), nullptr, sup);
+    grid.paintGrid(first(), nullptr, sqrt(square(len)+sup));
     
     FiberGrid::SegmentList list;
     for ( Fiber * fib = first(); fib; fib = fib->next() )
@@ -428,7 +427,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 {
                     //std::clog << "   " << can;
                     real abs1, abs2;
-                    if ( seg.shortestDistance(can, abs1, abs2) < DD )
+                    if ( seg.shortestDistance(can, abs1, abs2) <= sup )
                     {
                         if ( seg.within(abs1) & can.within(abs2) )
                         {

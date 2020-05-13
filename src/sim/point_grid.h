@@ -22,7 +22,7 @@ class FatPoint
     
 public:
     
-    /// buffer for position
+    /// position of center
     Vector         pos;
     
     /// equilibrium radius of the interaction (distance where force is zero)
@@ -38,22 +38,12 @@ public:
     
     FatPoint() {}
     
-    
     FatPoint(Mecapoint const& p, real rd, real rg, Vector const& w)
     {
-        pnt    = p;
+        pos    = w;
         radius = rd;
         range  = rg;
-        pos    = w;
-    }
-    
-    /// set from Mecapoint p, with radius=rd and range=rd+erg
-    void set(Mecapoint const& p, real rd, real rg, Vector const& w)
-    {
         pnt    = p;
-        radius = rd;
-        range  = rg;
-        pos    = w;
     }
 };
 
@@ -65,6 +55,9 @@ class FatLocus
     
 public:
     
+    /// position of center
+    Vector         pos;
+
     /// equilibrium radius of the interaction (distance where force is zero)
     real           radius;
     
@@ -78,19 +71,12 @@ public:
     
     FatLocus() {}
     
-    FatLocus(FiberSegment const& p, real rd, real rg)
+    FatLocus(FiberSegment const& p, real rd, real rg, Vector const& w)
     {
-        seg    = p;
+        pos    = w;
         radius = rd;
         range  = rg;
-    }
-    
-    /// set from FiberSegment p, with radius=rd and range=rd+erg
-    void set(FiberSegment const& p, real rd, real rg)
-    {
         seg    = p;
-        radius = rd;
-        range  = rg;
     }
     
     /// true if the segment is the first of the Fiber
@@ -356,9 +342,9 @@ public:
     /// place FiberSegment on the grid
     void add(FiberSegment const& p, real radius, real extra_range) const
     {
-        //we use the middle of the segment (interpolation coefficient is ignored)
+        // link in cell containing the middle of the segment
         Vector w = p.center();
-        locus_list(w).emplace_back(p, radius, extra_range);
+        locus_list(w).emplace_back(p, radius, extra_range, w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -379,6 +365,9 @@ public:
     void setInteractions(Meca&, StericParam const& pam, size_t pan1, size_t pan2) const;
     
 #endif
+    
+    /// underlying spatial grid
+    GridBase<DIM> const& base() const { return pGrid; }
     
     /// OpenGL display function
     void draw() const;

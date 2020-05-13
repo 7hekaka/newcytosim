@@ -1117,7 +1117,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
     opt.set(up, "threshold");
     opt.set(details, "details");
     
-    const real mds = up * up;
+    const real sup = up * up;
     
     if ( details == 2 )
     {
@@ -1138,7 +1138,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                 {
                     real abs1, abs2;
                     FiberSegment seg2(fob, jj);
-                    if ( seg1.shortestDistance(seg2, abs1, abs2) <= mds )
+                    if ( seg1.shortestDistance(seg2, abs1, abs2) <= sup )
                     {
                         if ( seg1.within(abs1) & seg2.within(abs2) )
                         {

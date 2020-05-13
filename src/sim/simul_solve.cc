@@ -41,7 +41,7 @@ real Simul::estimateStericRange() const
      + 2 * ( len / 2 ) since len/2 is the distance between the center of the segment
      and its most distal point.
      */
-    ran =  len + 2*ran;
+    ran = len + 2*ran;
     
     
     for ( Sphere const* sp=spheres.first(); sp; sp=sp->next() )

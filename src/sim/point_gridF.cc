@@ -32,6 +32,7 @@ size_t PointGridF::setGrid(Space const* spc, real min_step)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
         
+#if GRID_HAS_PERIODIC
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges
@@ -39,6 +40,7 @@ size_t PointGridF::setGrid(Space const* spc, real min_step)
             pGrid.setPeriodic(d, true);
         }
         else
+#endif
         {
             //add a border in any dimension which is not periodic
             cnt[d] = (size_t)ceil(n) + 2;
@@ -106,7 +108,7 @@ void PointGridF::add(size_t pan, FiberSegment const& fl, real rd) const
     
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
-    locus_list(w, pan).emplace_back(fl, rd);
+    locus_list(w, pan).emplace_back(fl, rd, w);
     
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
@@ -145,9 +147,10 @@ void PointGridF::checkPP(Meca& meca, real stiff,
     const real ran = aa.radius + bb.radius;
     Vector vab = bb.pos - aa.pos;
     
+#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(vab);
-    
+#endif
     if ( vab.normSqr() < ran*ran )
         meca.addLongLink(aa.pnt, bb.pnt, ran, stiff);
 }
@@ -193,9 +196,10 @@ void PointGridF::checkPL(Meca& meca, real stiff,
              and if it falls on the right of it, then we interact with the node */
             Vector vab = aa.pos - bb.seg.pos1();
             
+#if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
-            
+#endif
             if ( dot(vab, bb.seg.fiber()->diffPoints(bb.seg.point()-1)) >= 0 )
             {
                 if ( vab.normSqr() < ran*ran )
@@ -241,9 +245,10 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
             {
                 Vector vab = bb.seg.pos1() - aa.seg.pos1();
                 
+#if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
-                
+#endif
                 if ( vab.normSqr() < ran*ran  &&  dot(vab, bb.seg.diff()) >= 0 )
                     meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), ran, stiff);
             }
@@ -256,9 +261,10 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
              */
             Vector vab = bb.seg.pos1() - aa.seg.pos1();
             
+#if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
-            
+#endif
             if ( dot(vab, aa.seg.fiber()->diffPoints(aa.seg.point()-1)) >= 0 )
             {
                 if ( vab.normSqr() < ran*ran )
@@ -301,9 +307,10 @@ void PointGridF::checkLL2(Meca& meca, real stiff,
          */
         Vector vab = bb.seg.pos2() - aa.seg.pos1();
         
+#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-        
+#endif
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
@@ -329,9 +336,10 @@ void PointGridF::checkLL2(Meca& meca, real stiff,
         
         Vector vab = bb.seg.pos2() - aa.seg.pos2();
         
+#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-        
+#endif
         if ( vab.normSqr() < ran*ran  &&  dot(vab, bb.seg.diff()) <= 0 )
             meca.addLongLink(aa.seg.exact2(), bb.seg.exact2(), ran, stiff);
     }
@@ -392,11 +400,13 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
         for ( FatLocusF* kk = fll.begin(); kk < fll.end(); ++kk )
             checkPL(meca, stiff, *ii, *kk);
     }
-    
+
+    const real sup = square(max_diameter);
     for ( FatLocusF* ii = fll.begin(); ii < fll.end(); ++ii )
     {
+        Vector pos = ii->pos;
         for ( FatLocusF* jj = ii+1; jj < fll.end(); ++jj )
-            if ( !adjacent(ii->seg, jj->seg) )
+            if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
                 checkLL(meca, stiff, *ii, *jj);
     }
 }
@@ -422,14 +432,18 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
             checkPL(meca, stiff, *ii, *kk);
     }
     
+    const real sup = square(max_diameter);
     for ( FatLocusF* ii = fll1.begin(); ii < fll1.end(); ++ii )
     {
         for ( FatPointF* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
             checkPL(meca, stiff, *jj, *ii);
         
+        Vector pos = ii->pos;
         for ( FatLocusF* kk = fll2.begin(); kk < fll2.end(); ++kk )
-            if ( !adjacent(ii->seg, kk->seg) )
+        {
+            if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
                 checkLL(meca, stiff, *ii, *kk);
+        }
     }
 }
 

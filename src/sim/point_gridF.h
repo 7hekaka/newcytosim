@@ -22,7 +22,7 @@ class FatPointF
     
 public:
     
-    /// current position of center
+    /// position of center
     Vector         pos;
     
     /// equilibrium radius of the interaction (distance where force is zero)
@@ -35,20 +35,11 @@ public:
     
     FatPointF() {}
     
-    
     FatPointF(Mecapoint const& p, real rd, Vector const& w)
     {
-        pnt    = p;
-        radius = rd;
         pos    = w;
-    }
-    
-    /// set from Mecapoint p, with radius=rd and range=rd+erg
-    void set(Mecapoint const& p, real rd, Vector const& w)
-    {
-        pnt    = p;
         radius = rd;
-        pos    = w;
+        pnt    = p;
     }
 };
 
@@ -60,6 +51,9 @@ class FatLocusF
     
 public:
     
+    /// position of center
+    Vector         pos;
+
     /// equilibrium radius of the interaction (distance where force is zero)
     real           radius;
     
@@ -70,17 +64,11 @@ public:
     
     FatLocusF() {}
     
-    FatLocusF(FiberSegment const& p, real rd)
+    FatLocusF(FiberSegment const& p, real rd, Vector const& w)
     {
-        seg    = p;
+        pos    = w;
         radius = rd;
-    }
-    
-    /// set from FiberSegment p, with radius=rd and range=rd+erg
-    void set(FiberSegment const& p, real rd)
-    {
         seg    = p;
-        radius = rd;
     }
     
     /// true if the segment is the first of the Fiber
@@ -331,9 +319,9 @@ public:
     /// place FiberSegment on the grid
     void add(FiberSegment const& p, real radius) const
     {
-        //we use the middle of the segment (interpolation coefficient is ignored)
+        // link in cell containing the middle of the segment
         Vector w = p.center();
-        locus_list(w).emplace_back(p, radius);
+        locus_list(w).emplace_back(p, radius, w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -354,6 +342,9 @@ public:
     void setInteractions(Meca&, real stiff, size_t pan1, size_t pan2) const;
     
 #endif
+    
+    /// underlying spatial grid
+    GridBase<DIM> const& base() const { return pGrid; }
     
     /// OpenGL display function
     void draw() const;

@@ -106,7 +106,7 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
     
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
-    locus_list(w, pan).emplace_back(fl, rd, rg);
+    locus_list(w, pan).emplace_back(fl, rd, rg, w);
     
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
@@ -361,6 +361,25 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
 void PointGrid::checkLL(Meca& meca, StericParam const& pam,
                         FatLocus const& aa, FatLocus const& bb) const
 {
+#if ( DIM == 3 )
+    
+    const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
+
+    /* in 3D, we use shortestDistance() to calculate the closest distance
+     between two segments, and use the result to build an interaction */
+    real a, b;
+    real d = aa.seg.shortestDistance(bb.seg, a, b);
+    if ( d >= ran*ran )
+        return;
+    
+    if ( aa.seg.within(a) & bb.seg.within(b) )
+    {
+        const real len = aa.radius + bb.radius;
+        real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+        meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), ran, stiff);
+    }
+#endif
+    
     //std::clog << "LL " << aa.seg << " " << bb.seg << std::endl;
     checkLL1(meca, pam, aa, bb);
     
@@ -371,26 +390,6 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     
     if ( bb.isLast() )
         checkLL2(meca, pam, aa, bb);
-    
-#if ( DIM == 3 )
-    
-    const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
-    
-    /* in 3D, we use shortestDistance() to calculate the closest distance
-     between two segments, and use the result to build an interaction */
-    real a, b;
-    real d = aa.seg.shortestDistance(bb.seg, a, b);
-    if ( d < ran*ran )
-    {
-        if ( aa.seg.within(a) & bb.seg.within(b) )
-        {
-            const real len = aa.radius + bb.radius;
-            real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
-            meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), len, stiff);
-        }
-    }
-    
-#endif
 }
 
 
@@ -413,10 +412,12 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             checkPL(meca, pam, *ii, *kk);
     }
     
+    const real sup = square(max_diameter);
     for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
     {
+        Vector pos = ii->pos;
         for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
-            if ( !adjacent(ii->seg, jj->seg) )
+            if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
                 checkLL(meca, pam, *ii, *jj);
     }
 }
@@ -442,13 +443,15 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             checkPL(meca, pam, *ii, *kk);
     }
     
+    const real sup = square(max_diameter);
     for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
     {
         for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
             checkPL(meca, pam, *jj, *ii);
         
+        Vector pos = ii->pos;
         for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
-            if ( !adjacent(ii->seg, kk->seg) )
+            if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
                 checkLL(meca, pam, *ii, *kk);
     }
 }
