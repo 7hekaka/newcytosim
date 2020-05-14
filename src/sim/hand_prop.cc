@@ -291,7 +291,7 @@ void HandProp::complete(Simul const& sim)
     if ( unbinding_rate == 0 )
         unbinding_force_inv = 0;
 
-    //std::clog << name() << " unbinding_force_inv = " << unbinding_force_inv << std::endl;
+    //std::clog << name() << ":unbinding_force_inv = " << unbinding_force_inv << std::endl;
 }
 
 

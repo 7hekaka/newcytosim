@@ -97,7 +97,7 @@ void MightyProp::checkStiffness(real stiff, real len, real mul, real kT) const
      */
     if ( sqrt( DIM * kT * stiff ) > stall_force )
     {
-        Cytosim::warn << "The stall force of `" << name() << "' is too small:\n"\
+        Cytosim::warn << name() << ":stall_force is too small:\n"\
         << PREF << "DIM * kT * stiffness > stall_force\n"\
         << PREF << "-> reduce stiffness or increase stall_force\n";
     }

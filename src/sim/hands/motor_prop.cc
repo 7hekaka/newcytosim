@@ -119,7 +119,7 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
      */
     if ( sqrt( DIM * kT * stiff ) > stall_force )
     {
-        Cytosim::warn << "The stall force of `" << name() << "' is too small:\n"\
+        Cytosim::warn << name() << ":stall_force is too small:\n"\
         << PREF << "DIM * kT * stiffness > stall_force\n"\
         << PREF << "-> reduce stiffness or increase stall_forc\n";
     }
@@ -140,7 +140,7 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Compare detachment rate at stall-force, with detachment rate at rest
      */
     if ( exp( stall_force * unbinding_force_inv ) > 100 )
-        Cytosim::warn << "Hand:exp( stall_force / unbinding_force ) is greater than 100\n";
+        Cytosim::warn << name() << ":exp( stall_force / unbinding_force ) is greater than 100!\n";
 }
 
 
