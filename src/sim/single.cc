@@ -171,7 +171,7 @@ void Single::write(Outputter& out) const
 void Single::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     const bool s = attached();
-    sHand->read(in, sim);
+    const bool a = sHand->read(in, sim);
     in.readFloats(sPos, DIM);
     
     /*
@@ -179,7 +179,7 @@ void Single::read(Inputter& in, Simul& sim, ObjectTag tag)
      on their bound/unbound state, we need to unlink and relink here, in
      case the state stored on file is different from the current state.
      */
-    if ( s != attached() )
+    if ( s != a )
     {
         SingleSet * set = static_cast<SingleSet*>(objset());
         if ( set )

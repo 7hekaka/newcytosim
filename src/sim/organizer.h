@@ -104,10 +104,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// a static_cast<> of Node::next()
-    Organizer *   next()  const  { return static_cast<Organizer*>(nNext); }
+    Organizer *   next() const { return static_cast<Organizer*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Organizer *   prev()  const  { return static_cast<Organizer*>(nPrev); }
+    Organizer *   prev() const { return static_cast<Organizer*>(nPrev); }
     
     //--------------------------------------------------------------------------
     

@@ -1860,7 +1860,14 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( tag == TAG )
     {
         Chain::read(in, sim, tag);
-        
+#if FIBER_HAS_LATTICE
+        if ( frLattice.ready() )
+            frLattice.setRange(abscissaM(), abscissaP());
+#endif
+#if FIBER_HAS_MESH
+        if ( frMesh.ready() )
+            frMesh.setRange(abscissaM(), abscissaP());
+#endif
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
             fnBirthTime = in.readFloat();
@@ -1923,7 +1930,6 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == 'm' )
     {
         Chain::read(in, sim, tag);
-        updateFiber();
     }
 #endif
     else

@@ -163,10 +163,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// a static_cast<> of Node::next()
-    Single*         next()   const  { return static_cast<Single*>(nNext); }
+    Single*         next() const { return static_cast<Single*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Single*         prev()   const  { return static_cast<Single*>(nPrev); }
+    Single*         prev() const { return static_cast<Single*>(nPrev); }
 
     //--------------------------------------------------------------------------
 

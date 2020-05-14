@@ -108,6 +108,9 @@ public:
     void    prev(Hand * h) { haPrev = h; }
 
     
+    /// identify as Digital class
+    virtual bool isDigit() const { return false; }
+
     /// move to a different fiber, at the same abscissa
     void         relocate(Fiber* f);
     
@@ -177,7 +180,7 @@ public:
 
     
     /// read from file
-    void         read(Inputter&, Simul&);
+    bool         read(Inputter&, Simul&);
     
     /// write to file
     void         write(Outputter&) const;

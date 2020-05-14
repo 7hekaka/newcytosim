@@ -20,19 +20,19 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
     if ( Hand::attachmentAllowed(sit) )
     {
 #if FIBER_HAS_LATTICE
-        FiberLattice * lat = &sit.fiber()->lattice();
+        FiberLattice& lat = sit.fiber()->lattice();
         
-        if ( !lat->ready() )
+        if ( !lat.ready() )
             throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
         
         // index to site containing given abscissa:
-        lati_t s = lat->index(sit.abscissa());
+        lati_t s = lat.index(sit.abscissa());
 
-        if ( lat->outsideMP(s) || occupied(lat, s) )
+        if ( lat.outsideMP(s) || occupied(lat, s) )
             return false;
         
         // adjust to match selected lattice site:
-        sit.engageLattice(lat, s, prop->site_shift);
+        sit.engageLattice(&lat, s, prop->site_shift);
 #endif
         return true;
     }

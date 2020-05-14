@@ -242,10 +242,10 @@ public:
     Property const* property() const { return prop; }
     
     /// a static_cast<> of Node::next()
-    Field* next()  const  { return static_cast<Field*>(nNext); }
+    Field* next() const { return static_cast<Field*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Field* prev()  const  { return static_cast<Field*>(nPrev); }
+    Field* prev() const { return static_cast<Field*>(nPrev); }
     
     //------------------------------ read/write --------------------------------
 #pragma mark -

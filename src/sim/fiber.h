@@ -389,10 +389,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Node::next()
-    Fiber *  next()  const  { return static_cast<Fiber*>(nNext); }
+    Fiber *  next() const { return static_cast<Fiber*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Fiber *  prev()  const  { return static_cast<Fiber*>(nPrev); }
+    Fiber *  prev() const { return static_cast<Fiber*>(nPrev); }
 
     //--------------------------------------------------------------------------
     

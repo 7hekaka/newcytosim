@@ -180,10 +180,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Node::next()
-    Solid *     next()  const { return static_cast<Solid*>(nNext); }
+    Solid *     next() const { return static_cast<Solid*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Solid *     prev()  const { return static_cast<Solid*>(nPrev); }
+    Solid *     prev() const { return static_cast<Solid*>(nPrev); }
     
     //--------------------------------------------------------------------------
 

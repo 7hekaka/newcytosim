@@ -93,10 +93,10 @@ public:
     
     
     /// a static_cast<> of Node::next()
-    Event *   next()  const  { return static_cast<Event*>(nNext); }
+    Event *   next() const { return static_cast<Event*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Event *   prev()  const  { return static_cast<Event*>(nPrev); }
+    Event *   prev() const { return static_cast<Event*>(nPrev); }
     
 
     /// read

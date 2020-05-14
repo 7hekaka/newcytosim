@@ -270,13 +270,14 @@ bool Couple::allowAttachment(FiberSite const& sit)
     
 #if FIBER_HAS_FAMILY
     // prevent binding if that would induce link inside the same family
-    if ( that->fiber()->family_ && that->fiber()->family_ == sit.fiber()->family_ )
+    if ( that->fiber()->family_
+        &&  that->fiber()->family_ == sit.fiber()->family_ )
         return false;
 #endif
 
     // prevent binding to the same fiber at adjacent locations:
-    if ( ( that->fiber() == sit.fiber() ) &&
-        ( abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop ))
+    if ( that->fiber() == sit.fiber()
+        &&  abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop )
         return false;
     
 #if ( 0 )
@@ -381,7 +382,7 @@ void Couple::beforeDetachment(Hand const* h)
      the Filaments to which they bind.
      */
     if ( ! Couple::otherHand(h)->attached() )
-    cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
+        cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
 #endif
     
     // link into correct CoupleSet sublist:
@@ -522,10 +523,10 @@ void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
     const bool s1 = attached1();
     const bool s2 = attached2();
     
-    cHand1->read(in, sim);
-    cHand2->read(in, sim);
+    const bool a1 = cHand1->read(in, sim);
+    const bool a2 = cHand2->read(in, sim);
     
-    if ( attached1() || attached2() )
+    if ( a1 || a2 )
         cPos = position();
     else
         in.readFloats(cPos, DIM);
@@ -535,7 +536,7 @@ void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
      on their bound/unbound state, we need to relink *this Couple now,
      since the state stored on file could be different from the current state.
      */
-    if ( s1 != attached1() || s2 != attached2() )
+    if ( s1 != a1 || s2 != a2 )
     {
         CoupleSet * set = static_cast<CoupleSet*>(objset());
         if ( set )

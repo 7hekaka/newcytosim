@@ -239,10 +239,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Node::next()
-    inline Couple * next()        const { return static_cast<Couple*>(nNext); }
+    inline Couple * next() const { return static_cast<Couple*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    inline Couple * prev()        const { return static_cast<Couple*>(nPrev); }
+    inline Couple * prev() const { return static_cast<Couple*>(nPrev); }
     
     //------------------------------ read/write --------------------------------
 

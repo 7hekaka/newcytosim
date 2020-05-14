@@ -377,7 +377,7 @@ void Hand::write(Outputter& out) const
 }
 
 
-void Hand::read(Inputter& in, Simul& sim)
+bool Hand::read(Inputter& in, Simul& sim)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() < 32 )
@@ -396,7 +396,23 @@ void Hand::read(Inputter& in, Simul& sim)
         if ( fbFiber )
             fbFiber->addHand(this);
     }
+    
+    fib = fbFiber;
+#if FIBER_HAS_LATTICE
+    if ( fbFiber && !fbLattice && isDigit() )
+    {
+        /* Promote a Digit class that is not bound to the lattice */
+        FiberSite sit(*this);
+        Hand::detach();
+        // attaching Hand to Lattice if possible
+        if ( attachmentAllowed(sit) )
+            attach(sit);
+    }
+#endif
+    
+    return ( fib != nullptr );
 }
+
 
 std::ostream& operator << (std::ostream& os, Hand const& arg)
 {

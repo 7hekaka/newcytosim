@@ -54,10 +54,10 @@ void DigitProp::complete(Simul const& sim)
     HandProp::complete(sim);
     
     if ( step_size <= 0 )
-        throw InvalidParameter("Digit:step_size must be defined and > 0");
+        throw InvalidParameter("`step_size' must be defined and > 0");
     
     if ( site_shift < 0 || step_size < site_shift )
-        throw InvalidParameter("Digit:site_shift must be in [0, step_size]");
+        throw InvalidParameter("`site_shift' must be in [0, step_size]");
 }
 
 

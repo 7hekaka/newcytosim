@@ -98,10 +98,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Node::next()
-    Bead *      next()  const { return static_cast<Bead*>(nNext); }
+    Bead *      next() const { return static_cast<Bead*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Bead *      prev()  const { return static_cast<Bead*>(nPrev); }
+    Bead *      prev() const { return static_cast<Bead*>(nPrev); }
     
     //--------------------------------------------------------------------------
 

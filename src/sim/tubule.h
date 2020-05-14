@@ -87,10 +87,10 @@ public:
     
     
     /// a static_cast<> of Node::next()
-    Tubule *  next()  const  { return static_cast<Tubule*>(nNext); }
+    Tubule *  next() const { return static_cast<Tubule*>(nNext); }
     
     /// a static_cast<> of Node::prev()
-    Tubule *  prev()  const  { return static_cast<Tubule*>(nPrev); }
+    Tubule *  prev() const { return static_cast<Tubule*>(nPrev); }
     
     /// debug printout
     void      report(std::ostream&);
