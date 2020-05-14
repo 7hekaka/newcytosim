@@ -536,7 +536,7 @@ void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
      on their bound/unbound state, we need to relink *this Couple now,
      since the state stored on file could be different from the current state.
      */
-    if ( s1 != a1 || s2 != a2 )
+    if ( s1 != attached1() || s2 != attached2() )
     {
         CoupleSet * set = static_cast<CoupleSet*>(objset());
         if ( set )
