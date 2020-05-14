@@ -412,6 +412,17 @@ void set_color_abscissaP(Fiber const& fib, size_t seg, real beta)
 }
 
 
+
+/// color set according to steric grid
+void set_color_grid(Fiber const& fib, size_t seg, real beta)
+{
+    GridBase<DIM> const& grid = fib.simul().pointGridF.base();
+    Vector w = fib.posPoint(seg, 0.5);
+    size_t i = grid.index(w);
+    gle::alt_color(i).load_front();
+}
+
+
 void Display3::drawFiberLines(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -454,6 +465,10 @@ void Display3::drawFiberLines(Fiber const& fib) const
         real beta = fib.segmentation() / disp->length_scale;
         drawFiberSegments(fib, rad, set_color_abscissaP, beta);
         glDisable(GL_CULL_FACE);
+    }
+    else if ( disp->line_style == 8 )
+    {
+        drawFiberSegments(fib, rad, set_color_grid, 1.0);
     }
 }
 
