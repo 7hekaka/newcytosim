@@ -434,61 +434,6 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
 }
 
 
-/**
- if `coloring` is enabled, this loads the N-th bright color,
- otherwise load the object' display color
- */
-void Display::bodyColor(PointDisp const* disp, size_t s) const
-{
-    if ( disp->coloring )
-    {
-        gle_color col = gle::bright_color(s);
-        col.load();
-        col.load_front();
-        col.darken(0.5).load_back();
-    }
-    else
-    {
-        disp->color.load_load(1.0);
-        disp->color2.load_back();
-    }
-}
-
-/**
- if `coloring` is enabled, this loads the N-th bright color,
- otherwise load the object' display color
- */
-void Display::bodyColor2(PointDisp const* disp, size_t s) const
-{
-    if ( disp->coloring )
-        gle::bright_color(s).match_a(disp->color).load();
-    else
-        disp->color.load();
-}
-
-/**
- This is used for transparent objects.
- if `coloring` is enabled, this loads the N-th bright color,
- with an alpha value matched to the one of the object's display color.
- */
-void Display::bodyColorT(PointDisp const* disp, size_t s) const
-{
-    //assert_true(disp->color.transparent());
-    
-    if ( disp->coloring )
-    {
-        gle_color col = gle::bright_color(s).match_a(disp->color);
-        col.load();
-        col.load_both();
-    }
-    else
-    {
-        disp->color.load();
-        disp->color.load_both();
-    }
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

@@ -29,9 +29,6 @@ class Bead;
 class BeadSet;
 class FieldSet;
 class FiberProp;
-class FiberDisp;
-class PointDisp;
-class LineDisp;
 
 /// defining the DISPLAY keyword enables display code in included files
 #define DISPLAY
@@ -151,16 +148,6 @@ public:
     
     /// display for periodic systems
     void displayTiled(Simul const&, int nine);
-    
-        
-    /// find an individual color
-    void bodyColor(PointDisp const*, size_t) const;
-    
-    /// find an individual color
-    void bodyColor2(PointDisp const*, size_t) const;
-
-    /// find an individual color that may be transparent
-    void bodyColorT(PointDisp const*, size_t) const;
 
     /// set OpenGL line width
     void lineWidth(real w) const { glLineWidth(std::max((GLfloat)(w*uFactor), 0.25f)); }

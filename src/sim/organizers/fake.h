@@ -57,7 +57,10 @@ public:
     /// retrieve links end-points for display
     bool       getLink(size_t, Vector&, Vector&) const;
     
-    /// return PointDisp of Solid
+    /// return Solid
+    Mecable*   core() const { return fkSolid; }
+    
+    /// return display parameters
     PointDisp const* disp() const { return fkSolid->prop->disp; }
 
     /// a unique character identifying the class

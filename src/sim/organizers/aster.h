@@ -217,9 +217,12 @@ public:
     /// retrieve links end-points for display
     bool          getLink(size_t, Vector&, Vector&) const;
     
-    /// return PointDisp of Solid
-    PointDisp const* disp() const { if ( solid() ) return solid()->prop->disp; return nullptr; }
+    /// return Solid
+    Mecable*      core() const { return asSolid; }
     
+    /// return PointDisp of Solid
+    PointDisp const* disp() const { if ( asSolid ) return asSolid->prop->disp; return nullptr; }
+
     //--------------------------------------------------------------------------
 
     /// a unique character identifying the class

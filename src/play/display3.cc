@@ -3,6 +3,7 @@
 #include "dim.h"
 #include "simul.h"
 #include "display3.h"
+#include "display_color.h"
 #include "modulo.h"
 
 #include "fake.h"
@@ -789,7 +790,7 @@ void Display3::drawBead(Bead const& obj)
     // display center:
     if ( disp->style & 2 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         drawPoint(obj.position(), disp);
     }
     
@@ -797,7 +798,7 @@ void Display3::drawBead(Bead const& obj)
     // display outline:
     if ( disp->style & 4 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         lineWidth(disp->width);
         gleObject(obj.position(), obj.radius(), gleCircleB);
     }
@@ -813,7 +814,7 @@ void Display3::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        bodyColorT(disp, obj.signature());
+        bodyColorT(obj);
         drawBall(obj.position(), obj.radius());
     }
 }
@@ -828,7 +829,7 @@ void Display3::drawSolid(Solid const& obj)
     //display points:
     if ( disp->style & 2  &&  disp->size > 0 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             drawPoint(obj.posP(ii), disp);
     }
@@ -837,7 +838,7 @@ void Display3::drawSolid(Solid const& obj)
     //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
     if ( obj.mark()  &&  disp->style & 4  &&  obj.nbPoints() > 1 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
         glPushMatrix();
         Vector A = obj.posP(0), B = obj.posP(1);
@@ -853,7 +854,7 @@ void Display3::drawSolid(Solid const& obj)
     if ( disp->style & 8 )
     {
         char tmp[8];
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
         gleDrawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
     }
@@ -862,7 +863,7 @@ void Display3::drawSolid(Solid const& obj)
     if ( disp->style & 16 )
     {
         const real rad = disp->width * sFactor;
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         for ( size_t ii = 1; ii < obj.nbPoints(); ++ii )
             gleTube(obj.posPoint(ii-1), obj.posPoint(ii), rad, gleTube2B);
     }
@@ -878,7 +879,7 @@ void Display3::drawSolidT(Solid const& obj, size_t ii)
 
     if ( disp->style & 1  &&  obj.radius(ii) > 0 )
     {
-        bodyColorT(disp, obj.signature());
+        bodyColorT(obj);
         drawBall(obj.posP(ii), obj.radius(ii));
     }
 }
@@ -894,7 +895,7 @@ void Display3::drawSphere(Sphere const& obj)
     //display center and surface points
     if ( disp->size > 0  &&  disp->style & 2 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         drawPoint(obj.posP(0), disp);
         for ( size_t ii = obj.nbRefPoints; ii < obj.nbPoints(); ++ii )
             drawPoint(obj.posP(ii), disp);
@@ -903,7 +904,7 @@ void Display3::drawSphere(Sphere const& obj)
     //display reference points
     if ( disp->size > 0  &&  disp->style & 8 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         for ( size_t ii = 1; ii < obj.nbRefPoints; ii++ )
             drawPoint(obj.posP(ii), disp);
     }
@@ -916,7 +917,7 @@ void Display3::drawSphereT(Sphere const& obj)
     //display the envelope
     if ( disp->style & 5 )
     {
-        bodyColorT(disp, obj.signature());
+        bodyColorT(obj);
         lineWidth(disp->width);
         
         glPushMatrix();
@@ -984,21 +985,21 @@ void Display3::drawOrganizer(Organizer const& obj) const
      */
     if ( disp->style & 1 && obj.tag() == Fake::TAG )
     {
-        Solid const* so = static_cast<const Fake&>(obj).solid();
-        if ( so && so->nbPoints() >= 4 )
+        Solid const* sol = Solid::toSolid(obj.core());
+        if ( sol && sol->nbPoints() >= 4 )
         {
-            bodyColor(so->prop->disp, so->signature());
+            bodyColor(*sol);
 #if ( DIM == 3 )
             glPushMatrix();
-            Vector3 a = 0.5 * (so->posP(0) + so->posP(2));
-            Vector3 b = 0.5 * (so->posP(1) + so->posP(3));
+            Vector3 a = 0.5 * (sol->posP(0) + sol->posP(2));
+            Vector3 b = 0.5 * (sol->posP(1) + sol->posP(3));
             gleTransAlignZ(a, b, 1);
             glColor3f(0.6f,0.6f,0.6f);
             gleDualPass(gleBarrel1);
             glPopMatrix();
 #else
-            for ( size_t ii = 0; ii < so->nbPoints(); ii+=2 )
-                gleTube(so->posPoint(ii), so->posPoint(ii+1), w, gleHexTube1B);
+            for ( size_t ii = 0; ii < sol->nbPoints(); ii+=2 )
+                gleTube(sol->posPoint(ii), sol->posPoint(ii+1), w, gleHexTube1B);
 #endif
         }
     }

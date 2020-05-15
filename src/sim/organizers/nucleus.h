@@ -62,9 +62,12 @@ public:
     /// retrieve links end-points for display
     bool          getLink(size_t, Vector&, Vector&) const;
     
-    /// display parameters 
-    PointDisp const* disp() const { if ( nuSphere ) return nuSphere->prop->disp; return nullptr; }
+    /// return Sphere
+    Mecable*      core() const { return nuSphere; }
     
+    /// display parameters
+    PointDisp const* disp() const { if ( nuSphere ) return nuSphere->prop->disp; return nullptr; }
+
     //------------------------------ read/write --------------------------------
     
     /// a unique character identifying the class

@@ -5,6 +5,17 @@
 #include "exceptions.h"
 #include <iomanip>
 
+/// Holds the name and the RGBA components of a color
+class gle::named_color
+{
+public:
+    /// name of color
+    char const * name;
+    /// components of color (RGBA)
+    uint32_t hex;
+};
+
+
 /// list of unnamed colors
 static gle_color nice_colors[] = {
     0xFFFFFFFF,

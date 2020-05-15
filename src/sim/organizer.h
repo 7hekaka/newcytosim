@@ -98,7 +98,10 @@ public:
     /// retrieve ends link number `inx`, or returns zero if this link does not exist
     virtual bool       getLink(size_t inx, Vector&, Vector&) const { return false; }
     
-    /// display parameters 
+    /// object from that gives its display parameters
+    virtual Mecable*   core() const { return nullptr; }
+    
+    /// display parameters
     virtual PointDisp const* disp() const { return nullptr; }
     
     //--------------------------------------------------------------------------

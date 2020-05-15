@@ -162,6 +162,7 @@
 		BB55C2230A261FC8003333C9 /* simul.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358FC05B98DA3006956D5 /* simul.h */; };
 		BB55C2250A261FC9003333C9 /* hand.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358E205B98DA3006956D5 /* hand.h */; };
 		BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BB560C2F1813DC8800CB1BF5 /* vecprint.h */; };
+		BB56AB71246F0451002EB689 /* display_color.h in Headers */ = {isa = PBXBuildFile; fileRef = BB56AB70246F0451002EB689 /* display_color.h */; };
 		BB56FA7712D0A0BF008B2260 /* player_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB56FA7512D0A0BF008B2260 /* player_prop.h */; };
 		BB56FA7812D0A0BF008B2260 /* player_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB56FA7612D0A0BF008B2260 /* player_prop.cc */; };
 		BB5783DC23EB3A250022878E /* test_size.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5783DB23EB3A250022878E /* test_size.cc */; };
@@ -1395,6 +1396,7 @@
 		BB55BF390A25FB22003333C9 /* platonic.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = platonic.h; path = src/math/platonic.h; sourceTree = SOURCE_ROOT; };
 		BB560C2F1813DC8800CB1BF5 /* vecprint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vecprint.h; path = src/math/vecprint.h; sourceTree = SOURCE_ROOT; };
 		BB568CCA0BFCEAA300CB5335 /* cym */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; path = cym; sourceTree = SOURCE_ROOT; };
+		BB56AB70246F0451002EB689 /* display_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = display_color.h; sourceTree = "<group>"; };
 		BB56FA7512D0A0BF008B2260 /* player_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = player_prop.h; sourceTree = "<group>"; };
 		BB56FA7612D0A0BF008B2260 /* player_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = player_prop.cc; sourceTree = "<group>"; };
 		BB5783DB23EB3A250022878E /* test_size.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_size.cc; sourceTree = "<group>"; };
@@ -2950,6 +2952,7 @@
 				BBADE80D091F4427007BB791 /* display.cc */,
 				BB7F683F12D0F1B100F8FC84 /* display_prop.h */,
 				BB7F683E12D0F1B100F8FC84 /* display_prop.cc */,
+				BB56AB70246F0451002EB689 /* display_color.h */,
 				BBADE810091F4427007BB791 /* display1.h */,
 				BBADE80F091F4427007BB791 /* display1.cc */,
 				BBF7BB1910CD44E00089F5B1 /* display2.h */,
@@ -3204,6 +3207,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB7B5A9C241A81BB0063F252 /* platonic.h in Headers */,
+				BB56AB71246F0451002EB689 /* display_color.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

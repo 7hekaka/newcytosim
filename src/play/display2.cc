@@ -4,6 +4,7 @@
 #include "sim.h"
 #include "simul.h"
 #include "display2.h"
+#include "display_color.h"
 #include "modulo.h"
 
 #include "fake.h"
@@ -184,7 +185,7 @@ void Display2::drawBead(Bead const& obj)
     // display center:
     if ( disp->style & 2 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         drawPoint(obj.position(), disp);
     }
     
@@ -192,7 +193,7 @@ void Display2::drawBead(Bead const& obj)
     // display outline:
     if ( disp->style & 4 )
     {
-        bodyColor2(disp, obj.signature());
+        bodyColor2(obj);
         lineWidth(disp->width);
         gleObject(obj.position(), obj.radius(), gleCircleB);
     }
@@ -209,7 +210,7 @@ void Display2::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        bodyColorT(disp, obj.signature());
+        bodyColorT(obj);
         drawBall(obj.position(), obj.radius());
     }
 }
@@ -224,7 +225,7 @@ void Display2::drawSolid(Solid const& obj)
     //display points:
     if ( disp->style & 2  &&  disp->size > 0 )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             drawPoint(obj.posP(ii), disp);
     }
@@ -233,7 +234,7 @@ void Display2::drawSolid(Solid const& obj)
     if ( disp->style & 4 )
     {
         //disp->color.load();
-        bodyColor2(disp, obj.signature());
+        bodyColor2(obj);
         lineWidth(disp->width);
 #if ( DIM == 2 )
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
@@ -245,7 +246,7 @@ void Display2::drawSolid(Solid const& obj)
         //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
-            bodyColor(disp, obj.signature());
+            bodyColor(obj);
             //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
             glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
@@ -262,7 +263,7 @@ void Display2::drawSolid(Solid const& obj)
     if ( disp->style & 8 )
     {
         char tmp[8];
-        bodyColor2(disp, obj.signature());
+        bodyColor2(obj);
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
         gleDrawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
     }
@@ -271,7 +272,7 @@ void Display2::drawSolid(Solid const& obj)
     if ( disp->style & 16 )
     {
         lineWidth(disp->width);
-        bodyColor2(disp, obj.signature());
+        bodyColor2(obj);
         glBegin(GL_LINE_LOOP);
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             gleVertex(obj.posPoint(ii));
@@ -288,7 +289,7 @@ void Display2::drawSolidT(Solid const& obj, size_t ii)
 
     if ( disp->style & 1  &&  obj.radius(ii) > 0 )
     {
-        bodyColorT(disp, obj.signature());
+        bodyColorT(obj);
         drawBall(obj.posP(ii), obj.radius(ii));
     }
 }
@@ -303,7 +304,7 @@ void Display2::drawSphere(Sphere const& obj)
     //display center and surface points
     if ( disp->style & 2  &&  disp->perceptible )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         drawPoint(obj.posP(0), disp);
         for ( size_t ii = obj.nbRefPoints; ii < obj.nbPoints(); ii++ )
             drawPoint(obj.posP(ii), disp);
@@ -312,7 +313,7 @@ void Display2::drawSphere(Sphere const& obj)
     //display reference points
     if ( disp->style & 8  &&  disp->perceptible )
     {
-        bodyColor(disp, obj.signature());
+        bodyColor(obj);
         for ( size_t ii = 1; ii < obj.nbRefPoints; ii++ )
             drawPoint(obj.posP(ii), disp);
     }
@@ -325,7 +326,7 @@ void Display2::drawSphereT(Sphere const& obj)
 
     if ( disp->style & 5 )
     {
-        bodyColorT(disp, obj.signature());
+        bodyColorT(obj);
         lineWidth(disp->width);
         
 #if ( DIM < 3 )
@@ -398,23 +399,23 @@ void Display2::drawOrganizer(Organizer const& obj) const
      */
     if ( disp->style & 1 && obj.tag() == Fake::TAG )
     {
-        Solid const* so = static_cast<const Fake&>(obj).solid();
-        if ( so && so->nbPoints() >= 4 )
+        Solid const* sol = Solid::toSolid(obj.core());
+        if ( sol && sol->nbPoints() >= 4 )
         {
-            bodyColor(disp, obj.signature());
+            bodyColor(*sol);
 #if ( DIM == 3 )
             glEnable(GL_LIGHTING);
             glPushMatrix();
-            Vector3 a = 0.5*(so->posP(0) + so->posP(2));
-            Vector3 b = 0.5*(so->posP(1) + so->posP(3));
+            Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
+            Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
             gleTransAlignZ(a, b, 1);
             gleDualPass(gleBarrel1);
             glPopMatrix();
             glDisable(GL_LIGHTING);
 #else
             glBegin(GL_LINES);
-            for ( size_t ii = 0; ii < so->nbPoints(); ++ii )
-                gleVertex(so->posPoint(ii));
+            for ( size_t ii = 0; ii < sol->nbPoints(); ++ii )
+                gleVertex(sol->posPoint(ii));
             glEnd();
 #endif
         }
