@@ -79,11 +79,11 @@ public:
     void step(Simul&);
     
     ///
-    void setInteractions(Meca&);
+    void setInteractions(Meca&) const;
     ///
-    void setInteractionsB(Meca&);
+    void setInteractionsB(Meca&) const;
     ///
-    void setInteractionsC(Meca&);
+    void setInteractionsC(Meca&) const;
     
     
     /// a static_cast<> of Node::next()

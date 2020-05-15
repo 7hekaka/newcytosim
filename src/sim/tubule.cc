@@ -183,7 +183,7 @@ void Tubule::goodbye(Buddy const* b)
 This uses only addSideLink() with appropriate directions
 Cambridge, 12.2019
 */
-void Tubule::setInteractionsB(Meca& meca)
+void Tubule::setInteractionsB(Meca& meca) const
 {
 #if ( DIM >= 3 )
     const real stiff = prop->stiffness[0];
@@ -237,7 +237,7 @@ void Tubule::setInteractionsB(Meca& meca)
  This uses a centerline `bone`
  Cambridge, 18.01.2020
  */
-void Tubule::setInteractions(Meca& meca)
+void Tubule::setInteractions(Meca& meca) const
 {
     assert_true(bone_);
 
@@ -297,7 +297,7 @@ void Tubule::setInteractions(Meca& meca)
 This uses addSideLink() and addTorque() with appropriate directions
 Cambridge, 12.2019
 */
-void Tubule::setInteractionsC(Meca& meca)
+void Tubule::setInteractionsC(Meca& meca) const
 {
     const real stiffL = prop->stiffness[0];
     const real stiffA = prop->stiffness[1];

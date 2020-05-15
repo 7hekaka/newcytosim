@@ -476,7 +476,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
         for ( size_t u = 0; u <= nbin; ++u )
             cnt[u] = 0;
         
-        for ( Fiber * obj=fibers.first(); obj; obj=obj->next() )
+        for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
         {
             if ( obj->prop == fp )
             {
@@ -505,7 +505,7 @@ void Simul::reportFiberDynamic(std::ostream& out, FiberEnd end) const
     int cnt[MAX] = { 0 };
     int sum = 0;
     
-    for ( Fiber * obj=fibers.first(); obj; obj=obj->next() )
+    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
     {
         ++sum;
         unsigned s = obj->dynamicState(end);
@@ -562,7 +562,7 @@ void Simul::reportFiberSegments(std::ostream& out) const
 void Simul::reportFiberHands(std::ostream& out) const
 {
     out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
-    for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
         if ( fib->nbHands() > 0 )
         {
@@ -583,13 +583,13 @@ void Simul::reportFiberHands(std::ostream& out) const
 void Simul::reportFiberLinks(std::ostream& out) const
 {
     out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
-    for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
         if ( fib->nbHands() > 0 )
         {
             out << COM << "on fiber " << fib->reference();
             fib->sortHands();
-            for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
+            for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
             {
                 if ( ha->interactionStiffness() > 0 )
                 {
@@ -717,7 +717,7 @@ void Simul::reportFiberEnds(std::ostream& out) const
     out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
     out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
     
-    for ( Fiber * obj=fibers.first(); obj; obj=obj->next() )
+    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
@@ -774,7 +774,7 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
         opt.set(spread, "interval");
     constexpr real TINY = 0x1p-32;
 
-    Fiber * fib = fibers.first();
+    Fiber const* fib = fibers.first();
     while ( fib )
     {
         out << COM << "fiber " << fib->reference();
@@ -834,7 +834,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
     Array<FiberSite> loc(1024);
     fibers.uniFiberSites(loc, spread);
     
-    Fiber * ofib = nullptr;
+    Fiber const* ofib = nullptr;
     for ( FiberSite & i : loc )
     {
         if ( ofib != i.fiber() )
@@ -862,7 +862,7 @@ void Simul::reportFiberDisplacement(std::ostream& out) const
     
     real sum = 0;
     size_t cnt = 0;
-    for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
         Vector pos = fib->posEndM();
         fiber_map::iterator i = positions.find(fib->identity());
@@ -905,7 +905,7 @@ void Simul::reportFiberMoments(std::ostream& out) const
         
         accum.reset();
         
-        for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
+        for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
         {
             if ( fib->prop == fp )
             {
@@ -1081,7 +1081,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
     real   rad = 0;
     
 #if ( DIM > 1 )
-    for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
         Space const* spc = findSpace(fib->prop->confine_space);
         const real stiff = fib->prop->confine_stiffness;
@@ -1129,7 +1129,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         unsigned cnt = 0;
-        for ( Fiber * fob = fibers.nextID(fib); fob; fob = fibers.nextID(fob) )
+        for ( Fiber const* fob = fibers.nextID(fib); fob; fob = fibers.nextID(fob) )
         {
             for ( size_t ii = 0; ii < fib->nbSegments(); ++ii )
             {
@@ -1218,9 +1218,9 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
     {
         map.clear();
         // check all connecting Hands and record abscissa, depending on the fiber that is linked
-        for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
+        for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
         {
-            Hand * oh = ha->otherHand();
+            Hand const* oh = ha->otherHand();
             if ( oh && oh->attached() )
             {
                 ObjectID f2 = oh->fiber()->identity();
@@ -1436,7 +1436,7 @@ void Simul::reportOrganizer(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
 
-    for ( Organizer * obj=organizers.first(); obj; obj=obj->next() )
+    for ( Organizer const* obj=organizers.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->property()->number();
         out << SEP << obj->identity();
@@ -1453,7 +1453,7 @@ void Simul::reportAster(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
     
-    for ( Organizer * obj=organizers.first(); obj; obj=obj->next() )
+    for ( Organizer const* obj=organizers.first(); obj; obj=obj->next() )
     {
         if ( obj->tag() == Aster::TAG )
         {
@@ -1472,7 +1472,7 @@ void Simul::reportBeadPosition(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
     
-    for ( Bead * obj=beads.first(); obj; obj=obj->next() )
+    for ( Bead const* obj=beads.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
@@ -1491,7 +1491,7 @@ void Simul::reportBeadSingles(std::ostream& out) const
     
     std::map<ObjectID, int> cnt;
     
-    for ( Single * sig=singles.firstA(); sig; sig=sig->next() )
+    for ( Single const* sig=singles.firstA(); sig; sig=sig->next() )
     {
         Bead const* obj = Bead::toBead(sig->base());
         if ( obj )
@@ -1500,7 +1500,7 @@ void Simul::reportBeadSingles(std::ostream& out) const
 
     const int max = 12;
     int nb[max] = { 0 };
-    for ( Bead * obj=beads.first(); obj; obj=obj->next() )
+    for ( Bead const* obj=beads.first(); obj; obj=obj->next() )
         ++nb[ cnt[obj->identity()] ];
     
     for ( int c = 0; c < max; ++c )
@@ -1516,7 +1516,7 @@ void Simul::reportSolidPosition(std::ostream& out) const
     out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
     out << SEP << repeatXYZ("point0") << SEP << repeatXYZ("point1");
     
-    for ( Solid * obj=solids.first(); obj; obj=obj->next() )
+    for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
@@ -1566,7 +1566,7 @@ void Simul::reportSpherePosition(std::ostream& out) const
     out << COM << "class" << SEP << "identity";
     out << SEP << repeatXYZ("point0") << SEP << repeatXYZ("point1");
   
-    for ( Sphere * obj=spheres.first(); obj; obj=obj->next() )
+    for ( Sphere const* obj=spheres.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
@@ -1584,7 +1584,7 @@ void Simul::reportSpace(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity";
     
-    for ( Space * obj=spaces.first(); obj; obj=obj->next() )
+    for ( Space const* obj=spaces.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();
@@ -1600,7 +1600,7 @@ void Simul::reportSpaceForce(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity" << SEP << "shape";
     
-    for ( Space * obj=spaces.first(); obj; obj=obj->next() )
+    for ( Space const* obj=spaces.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();
@@ -1621,7 +1621,7 @@ void Simul::reportField(std::ostream& out) const
     out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max";
     
     // report total substance in each Field
-    for ( Field * obj=fields.first(); obj; obj=obj->next() )
+    for ( Field const* obj=fields.first(); obj; obj=obj->next() )
     {
         real vol = obj->cellVolume();
         Field::value_type s, n, x;
@@ -1746,7 +1746,7 @@ void Simul::reportSingle(std::ostream& out) const
     
     int free[mx] = { 0 }, bound[mx] = { 0 };
     
-    for ( Single * si = singles.firstF(); si ; si = si->next() )
+    for ( Single const* si = singles.firstF(); si ; si = si->next() )
     {
         assert_true(!si->attached());
         size_t ix = si->prop->number();
@@ -1754,7 +1754,7 @@ void Simul::reportSingle(std::ostream& out) const
             ++free[ix];
     }
     
-    for ( Single * sig=singles.firstA(); sig ; sig=sig->next() )
+    for ( Single const* sig=singles.firstA(); sig ; sig=sig->next() )
     {
         assert_true(sig->attached());
         size_t ix = sig->prop->number();
@@ -1790,7 +1790,7 @@ void Simul::reportSingle(std::ostream& out) const
 #pragma mark - Couple
 
 
-void write(std::ostream& out, Couple * obj)
+void write(std::ostream& out, Couple const* obj)
 {
     out << LIN << obj->prop->number();
     out << SEP << obj->identity();
@@ -1830,16 +1830,16 @@ void Simul::reportCoupleState(std::ostream& out) const
     out << COM << "class" << SEP << "identity" << SEP << "active" << SEP << repeatXYZ("pos");
     out << SEP << "fiber1" << SEP << "abscissa1" << SEP << "fiber2" << SEP << "abscissa2";
 
-    for ( Couple * obj=couples.firstFF(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstFF(); obj ; obj=obj->next() )
         write(out, obj);
     
-    for ( Couple * obj=couples.firstAF(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAF(); obj ; obj=obj->next() )
         write(out, obj);
     
-    for ( Couple * obj=couples.firstFA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstFA(); obj ; obj=obj->next() )
         write(out, obj);
     
-    for ( Couple * obj=couples.firstAA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
         write(out, obj);
 }
 
@@ -1853,19 +1853,19 @@ void Simul::reportCoupleState(std::ostream& out, std::string const& which) const
     out << COM << "class" << SEP << "identity" << SEP << "active" << SEP << repeatXYZ("pos");
     out << SEP << "fiber1" << SEP << "abscissa1" << SEP << "fiber2" << SEP << "abscissa2";
     
-    for ( Couple * obj=couples.firstFF(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstFF(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             write(out, obj);
     
-    for ( Couple * obj=couples.firstAF(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAF(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             write(out, obj);
     
-    for ( Couple * obj=couples.firstFA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstFA(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             write(out, obj);
     
-    for ( Couple * obj=couples.firstAA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             write(out, obj);
 }
@@ -1880,19 +1880,19 @@ void Simul::reportCoupleActive(std::ostream& out, std::string const& which) cons
     
     out << COM << "state" << SEP << repeatXYZ("pos");
     
-    for ( Couple * obj=couples.firstFF(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstFF(); obj ; obj=obj->next() )
         if ( obj->active()  &&  obj->prop == selected )
             out << "\n 0 " << obj->position();
    
-    for ( Couple * obj=couples.firstAF(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAF(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             out << "\n 1 " << obj->position();
     
-    for ( Couple * obj=couples.firstFA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstFA(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             out << "\n 2 " << obj->position();
     
-    for ( Couple * obj=couples.firstAA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
         if ( obj->prop == selected )
             out << "\n 3 " << obj->position();
 }
@@ -1913,7 +1913,7 @@ void Simul::reportCoupleLink(std::ostream& out, std::string const& which) const
     out << SEP << "fiber2" << SEP << "abscissa2";// << SEP << repeatXYZ("pos2");
     out << SEP << "force" << SEP << "cos_angle";
     
-    for ( Couple * obj=couples.firstAA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
     {
         if ( !selected || obj->prop == selected )
         {
@@ -1965,7 +1965,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, std::string const& whic
     opt.set(end, "end", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
     
     size_t T[6] = { 0 };
-    for ( Couple * obj=couples.firstAA(); obj ; obj=obj->next() )
+    for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
     {
         if ( !selected || obj->prop == selected )
             ++T[obj->configuration(end, threshold)];
@@ -1998,7 +1998,7 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
         cnt[ii][jj] = 0;
     
     // accumulate counts:
-    for ( Couple * cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
+    for ( Couple const* cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
     {
         size_t ix = cxi->prop->number();
         if ( ix < IMAX )
@@ -2052,7 +2052,7 @@ void Simul::reportCouple(std::ostream& out) const
         cnt[ii][3] = 0;
     }
     
-    for ( Couple * cxi=couples.firstFF(); cxi ; cxi = cxi->next() )
+    for ( Couple const* cxi=couples.firstFF(); cxi ; cxi = cxi->next() )
     {
         assert_true(!cxi->attached1() && !cxi->attached2());
         size_t ix = cxi->prop->number();
@@ -2063,7 +2063,7 @@ void Simul::reportCouple(std::ostream& out) const
         }
     }
     
-    for ( Couple * cxi=couples.firstAF(); cxi ; cxi = cxi->next() )
+    for ( Couple const* cxi=couples.firstAF(); cxi ; cxi = cxi->next() )
     {
         assert_true(cxi->attached1() && !cxi->attached2());
         size_t ix = cxi->prop->number();
@@ -2073,7 +2073,7 @@ void Simul::reportCouple(std::ostream& out) const
             ++(cnt[ix][1]);
         }
     }
-    for ( Couple * cxi=couples.firstFA(); cxi ; cxi = cxi->next() )
+    for ( Couple const* cxi=couples.firstFA(); cxi ; cxi = cxi->next() )
     {
         assert_true(!cxi->attached1() && cxi->attached2());
         size_t ix = cxi->prop->number();
@@ -2084,7 +2084,7 @@ void Simul::reportCouple(std::ostream& out) const
         }
     }
     
-    for ( Couple * cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
+    for ( Couple const* cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
     {
         assert_true(cxi->attached1() && cxi->attached2());
         size_t ix = cxi->prop->number();
@@ -2221,7 +2221,7 @@ void Simul::flagClustersCouples(Property const* arg) const
 {
     resetFlags(fibers);
 
-    for ( Couple * cx = couples.firstAA(); cx ; cx=cx->next() )
+    for ( Couple const* cx = couples.firstAA(); cx ; cx=cx->next() )
     {
         if ( cx->prop == arg  &&  cx->fiber1()->flag() != cx->fiber2()->flag() )
             reFlag(fibers, cx->fiber1()->flag(), cx->fiber2()->flag());
@@ -2234,7 +2234,7 @@ void Simul::flagClustersCouples(Property const* arg) const
  */
 void Simul::flagClustersSolids() const
 {
-    for ( Solid * obj=solids.first(); obj; obj=obj->next() )
+    for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
         SingleList anchored = singles.collectWrists(obj);
         // find the minimun flag value:
@@ -2610,7 +2610,7 @@ void Simul::reportProfile(std::ostream& out) const
 void Simul::reportAshbya(std::ostream& out) const
 {
     out << COM << "class id point_0, vector_1, angle";
-    for ( Solid * obj=solids.first(); obj; obj=obj->next() )
+    for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
@@ -2631,7 +2631,7 @@ void Simul::reportAshbya(std::ostream& out) const
  */
 void Simul::reportCustom(std::ostream& out) const
 {
-    for ( Fiber * obj=fibers.first(); obj; obj=obj->next() )
+    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
     {
         Vector ee = obj->posEndP() - obj->posEndM();
         out << ee.norm() << " ";

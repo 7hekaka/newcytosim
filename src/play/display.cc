@@ -412,7 +412,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
     }
     
     // attribute LineDisp, and set individual display values for all fibers
-    for ( Fiber * fib = sim.fibers.first(); fib; fib = fib->next() )
+    for ( Fiber const* fib = sim.fibers.first(); fib; fib = fib->next() )
         prepareLineDisp(fib);
     
     //create a PointDisp for each HandProp:

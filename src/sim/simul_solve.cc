@@ -130,7 +130,7 @@ void Simul::setStericInteractions(Meca& meca) const
     pointGrid.clear();
     
     // distribute Fiber-points on the grid
-    for ( Fiber* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
         if ( fib->prop->steric )
         {
@@ -148,7 +148,7 @@ void Simul::setStericInteractions(Meca& meca) const
     }
     
     // include Spheres
-    for ( Sphere* sp=spheres.first(); sp; sp=sp->next() )
+    for ( Sphere const* sp=spheres.first(); sp; sp=sp->next() )
     {
         if ( sp->prop->steric )
 #if ( N_STERIC_PANES == 1 )
@@ -159,7 +159,7 @@ void Simul::setStericInteractions(Meca& meca) const
     }
     
     // include Beads
-    for ( Bead* bd=beads.first(); bd; bd=bd->next() )
+    for ( Bead const* bd=beads.first(); bd; bd=bd->next() )
     {
         if ( bd->prop->steric )
 #if ( N_STERIC_PANES == 1 )
@@ -170,7 +170,7 @@ void Simul::setStericInteractions(Meca& meca) const
     }
         
     // include Points that have a radius from Solids
-    for ( Solid* so=solids.first(); so; so=so->next() )
+    for ( Solid const* so=solids.first(); so; so=so->next() )
     {
         if ( so->prop->steric )
         {
@@ -247,7 +247,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     pointGridF.clear();
     
     // distribute Fiber-points on the grid
-    for ( Fiber* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
         if ( fib->prop->steric )
         {
@@ -263,7 +263,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     }
     
     // include Spheres
-    for ( Sphere* sp=spheres.first(); sp; sp=sp->next() )
+    for ( Sphere const* sp=spheres.first(); sp; sp=sp->next() )
     {
         if ( sp->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
@@ -274,7 +274,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     }
     
     // include Beads
-    for ( Bead* bd=beads.first(); bd; bd=bd->next() )
+    for ( Bead const* bd=beads.first(); bd; bd=bd->next() )
     {
         if ( bd->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
@@ -285,7 +285,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     }
         
     // include Points that have a radius from Solids
-    for ( Solid* so=solids.first(); so; so=so->next() )
+    for ( Solid const* so=solids.first(); so; so=so->next() )
     {
         if ( so->prop->steric )
         {
@@ -337,42 +337,42 @@ void Simul::setStericInteractionsF(Meca& meca) const
  */
 void Simul::setAllInteractions(Meca& meca) const
 {
-    for ( Space * s=spaces.first(); s; s=s->next() )
+    for ( Space const* s=spaces.first(); s; s=s->next() )
         s->setInteractions(meca);
     
-    for ( Fiber * f=fibers.first(); f ; f=f->next() )
+    for ( Fiber const* f=fibers.first(); f ; f=f->next() )
         f->setInteractions(meca);
     
-    for ( Solid * s=solids.first(); s ; s=s->next() )
+    for ( Solid const* s=solids.first(); s ; s=s->next() )
         s->setInteractions(meca);
     
-    for ( Sphere * o=spheres.first(); o ; o=o->next() )
+    for ( Sphere const* o=spheres.first(); o ; o=o->next() )
         o->setInteractions(meca);
     
-    for ( Bead * b=beads.first(); b ; b=b->next() )
+    for ( Bead const* b=beads.first(); b ; b=b->next() )
         b->setInteractions(meca);
 
-    for ( Single * i=singles.firstA(); i ; i=i->next() )
+    for ( Single const* i=singles.firstA(); i ; i=i->next() )
         i->setInteractions(meca);
 
-    for ( Couple * c=couples.firstAA(); c ; c=c->next() )
+    for ( Couple const* c=couples.firstAA(); c ; c=c->next() )
         c->setInteractions(meca);
 
 #ifdef NEW_DANGEROUS_CONFINEMENTS
-    for ( Couple * c=couples.firstAF(); c ; c=c->next() )
+    for ( Couple const* c=couples.firstAF(); c ; c=c->next() )
         c->setInteractionsAF(meca);
 
-    for ( Couple * c=couples.firstFA(); c ; c=c->next() )
+    for ( Couple const* c=couples.firstFA(); c ; c=c->next() )
         c->setInteractionsFA(meca);
 #endif
     
-    for ( Organizer * x = organizers.first(); x; x=x->next() )
+    for ( Organizer const* x = organizers.first(); x; x=x->next() )
         x->setInteractions(meca);
     
-    for ( Tubule * t = tubules.first(); t; t=t->next() )
+    for ( Tubule const* t = tubules.first(); t; t=t->next() )
         t->setInteractions(meca);
 
-    //for ( Event * e = events.first(); e; e=e->next() )
+    //for ( Event const* e = events.first(); e; e=e->next() )
     //    e->setInteractions(meca);
 
     // add steric interactions
@@ -395,7 +395,7 @@ void Simul::setAllInteractions(Meca& meca) const
         const real rad2 = square(rad);
         const real stiff = prop->steric_stiffness_push[0];
 
-        for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
+        for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         {
             for ( size_t n = 0; n < fib->nbSegments(); ++n )
             {
@@ -558,7 +558,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 #if ( 0 )
     LOG_ONCE("AD-HOC FUNKY REPULSIVE FORCE ENABLED\n");
     // add pairwise repulsive force:
-    for ( Bead * i=beads.first(); i ; i=i->next() )
+    for ( Bead const* i=beads.first(); i ; i=i->next() )
         for ( Bead * j=i->next()    ; j ; j=j->next() )
             meca.addCoulomb(Mecapoint(i,0), Mecapoint(j,0), 0.1);
 #endif
@@ -600,7 +600,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 #if ( 0 )
     LOG_ONCE("AD-HOC FUNKY RADIAL FORCES ENABLED\n");
     // attach beads together in a string:
-    for( Bead * b=beads.first(); b; b=b->next() )
+    for( Bead const* b=beads.first(); b; b=b->next() )
     {
         real x = ( b->identity() - 2 ) * ang;
         Vector pos(5*cos(x), 5*sin(x), 0);
@@ -610,14 +610,14 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 #if ( 0 )
     LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated forces, for testing rotation
-    for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         meca.addTorqueClamp(fib->interpolateCenter(), Vector(0,1,0), 1);
 #endif
 #if ( 0 )
     LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated force to test rotation of spheres:
     Vector force(0,1,0);
-    for ( Sphere * sph = spheres.first(); sph; sph = sph->next() )
+    for ( Sphere const* sph = spheres.first(); sph; sph = sph->next() )
     {
         meca.addForce(Mecapoint(sph, 1), -force);
         meca.addForce(Mecapoint(sph, 2), +force);

@@ -56,7 +56,7 @@ void Display2::drawSimul(Simul const& sim)
     // bypass the normal display to improve performance:
     glEnableClientState(GL_VERTEX_ARRAY);
     // display Fibers in a random (ever changing) order:
-    for ( Fiber * fib = sim.fibers.first(); fib ; fib=fib->next() )
+    for ( Fiber const* fib = sim.fibers.first(); fib ; fib=fib->next() )
     {
         if ( fib->disp->visible )
         {
