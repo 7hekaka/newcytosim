@@ -127,6 +127,8 @@ public:
     /// Destructor
     virtual    ~Mecafil();
     
+    //------------------------------- Mecable ----------------------------------
+
     /// allocate memory
     size_t      allocateMecable(size_t);
     

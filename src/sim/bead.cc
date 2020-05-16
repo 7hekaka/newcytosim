@@ -112,11 +112,13 @@ real Bead::addBrownianForces(real const* rnd, real sc, real* rhs) const
 */
 void Bead::setDragCoefficient()
 {
+    paDrag = 6 * M_PI * prop->viscosity * paRadius;
     if ( prop->drag > 0 )
+    {
+        //std::clog << "setting for `" << prop->name() << "' bypass Stokes' drag " << paDrag << std::endl;
         paDrag = prop->drag;
-    else
-        paDrag = 6 * M_PI * prop->viscosity * paRadius;
-        
+    }
+    
 #if ( 0 )
     static bool virgin = true;
     if ( paRadius > 0  &&  virgin )

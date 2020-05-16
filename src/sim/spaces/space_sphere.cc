@@ -48,7 +48,7 @@ real SpaceSphere::volume() const
 
 bool SpaceSphere::inside(Vector const& pos) const
 {
-    return pos.normSqr() <= radiusSqr_;
+    return pos.normSqr() <= radiusSqr_ + REAL_EPSILON;
 }
 
 Vector SpaceSphere::project(Vector const& pos) const

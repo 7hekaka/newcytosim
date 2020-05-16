@@ -75,7 +75,16 @@ public:
     virtual    ~Sphere();
     
     //-------------------------------- info ------------------------------------
+
+    /// allocate memory
+    size_t      allocateMecable(size_t);
     
+    /// free allocated memory
+    void        release();
+
+    /// calculate mobility and diffusion constant
+    void        prepareMecable();
+
     /// calculate mobility with piston effect
     void        setDragCoefficientPiston();
     
@@ -88,14 +97,8 @@ public:
     /// total drag-coefficient of object (force = drag * speed)
     real        dragCoefficient() const { return spDrag; }
 
-    /// allocate memory
-    size_t      allocateMecable(size_t);
-    
-    /// free allocated memory
-    void        release();
-
-    /// calculate mobility and diffusion constant
-    void        prepareMecable();
+    /// add the interactions due to confinement
+    void        setInteractions(Meca&) const;
 
     /// returns position of center of gravity (the center of the sphere)
     Vector      position()        const { return posP(0); }
@@ -105,9 +108,6 @@ public:
 
     /// change radius
     void        resize(real);
-    
-    /// add the interactions due to confinement
-    void        setInteractions(Meca&) const;
     
     //------------------- technical functions and mathematics ------------------
         

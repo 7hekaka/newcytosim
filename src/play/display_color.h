@@ -38,7 +38,10 @@ void bodyColor2(T const& obj)
 {
     const PointDisp * disp = obj.prop->disp;
     if ( disp->coloring )
-        gle::bright_color(obj.signature()).match_a(disp->color).load();
+    {
+        unsigned long i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
+        gle::bright_color(i).match_a(disp->color).load();
+    }
     else
         disp->color.load();
 }
@@ -56,7 +59,8 @@ void bodyColorT(T const& obj)
 
     if ( disp->coloring )
     {
-        gle_color col = gle::bright_color(obj.signature()).match_a(disp->color);
+        unsigned long i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
+        gle_color col = gle::bright_color(i).match_a(disp->color);
         col.load();
         col.load_both();
     }

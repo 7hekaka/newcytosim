@@ -184,11 +184,11 @@ public:
 
     //--------------------------------------------------------------------------
     
-    /// calculate viscous drag coefficient
-    void           setDragCoefficient();
-    
     /// prepare for Meca
     void           prepareMecable();
+
+    /// calculate viscous drag coefficient
+    void           setDragCoefficient();
     
     /// add interactions to a Meca
     void           setInteractions(Meca&) const;

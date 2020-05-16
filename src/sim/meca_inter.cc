@@ -1069,6 +1069,11 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
 //------------------------------------------------------------------------------
 
 
+Vector Meca::position1(const size_t inx) const
+{
+    return Vector(vPTS+inx);
+}
+
 Vector Meca::position2(const size_t inx[2], const real coef[2]) const
 {
     Vector P0(vPTS+inx[0]);

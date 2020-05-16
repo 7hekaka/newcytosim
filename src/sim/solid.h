@@ -85,12 +85,6 @@ public:
     
     /// Property
     SolidProp const* prop;
-    
-    /// allocate memory
-    size_t      allocateMecable(size_t);
-    
-    /// free allocated memory
-    void        release();
 
     /// initialize according to options given in Glossary
     ObjectList  build(Glossary&, Simul&);
@@ -109,14 +103,23 @@ public:
     
     //------------------------------- Mecable ----------------------------------
     
+    /// allocate memory
+    size_t      allocateMecable(size_t);
+    
+    /// free allocated memory
+    void        release();
+
+    /// prepare for Meca
+    void        prepareMecable();
+
     /// sets the mobility
     void        setDragCoefficient();
 
     /// total translation drag-coefficient (force = drag * speed)
     real        dragCoefficient() const;
 
-    /// prepare for Meca
-    void        prepareMecable();
+    /// add the interactions due to confinement
+    void        setInteractions(Meca&) const;
 
     /// prepare for constrained projection
     void        makeProjection();
@@ -160,9 +163,6 @@ public:
     size_t      addTriad(real len);
 
     //--------------------------------------------------------------------------
-
-    /// add the interactions due to confinement
-    void        setInteractions(Meca&) const;
     
     /// radius of the sphere around point `i`
     real        radius(const size_t i) const { return soRadius[i]; }

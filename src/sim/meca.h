@@ -190,8 +190,14 @@ private:
     */
     MatrixSparseSymmetricBlock  mC;
 
-private:
-    
+public:
+
+    /// return address of vector where positions are stored
+    real const* addrPTS() const { return vPTS; }
+
+    /// position interpolated from two points in vPTS[]
+    Vector  position1(const size_t inx) const;
+
     /// position interpolated from two points in vPTS[]
     Vector  position2(const size_t inx[2], const real coef[2]) const;
 
@@ -207,6 +213,8 @@ private:
     /// position interpolated from six points in vPTS[]
     Vector  position6(const size_t inx[6], const real coef[6]) const;
 
+private:
+    
     /// add block 'T' to mC at position (i, j)
     void add_block(size_t i, size_t j, MatrixBlock const& T);
     

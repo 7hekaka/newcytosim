@@ -20,7 +20,7 @@
 //------------------- construction and destruction ---------------------------
 
 /**
- The Sphere is returned with no points
+ The Sphere is made with no point
  */
 Sphere::Sphere(SphereProp const* p)
 : spRadius(0), spDrag(0), spDragRot(0), sRad(nullptr), prop(p)
@@ -29,7 +29,7 @@ Sphere::Sphere(SphereProp const* p)
 
 
 /*
- This will create the center point
+ This will initialize with a center point and references
  */
 Sphere::Sphere(SphereProp const* p, real rad)
 : spRadius(rad), spDrag(0), spDragRot(0), sRad(nullptr), prop(p)
@@ -46,11 +46,13 @@ Sphere::Sphere(SphereProp const* p, real rad)
     
     // reference points to track the orientation of the sphere
     if ( DIM >= 2 )
-        addPoint( Vector(spRadius,0,0) );
-    if ( DIM == 3 ) {
-        addPoint( Vector(0,spRadius,0) );
-        addPoint( Vector(0,0,spRadius) );
+        addPoint( Vector(rad,0,0) );
+    if ( DIM >= 3 ) {
+        addPoint( Vector(0,rad,0) );
+        addPoint( Vector(0,0,rad) );
     }
+    
+    setDragCoefficient();
 }
 
 
@@ -207,37 +209,6 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
 
 
 //------------------------------------------------------------------------------
-void Sphere::setInteractions(Meca& meca) const
-{
-    if ( prop->confine != CONFINE_OFF )
-    {
-        Space const* spc = prop->confine_space_ptr;
-        
-        switch ( prop->confine )
-        {
-            case CONFINE_INSIDE:
-            {
-                Vector cen(pPos);
-                if ( ! spc->inside(cen) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
-            } break;
-                
-            case CONFINE_ALL_INSIDE:
-            {
-                Vector cen(pPos);
-                if ( ! spc->allInside(cen, spRadius) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), spRadius, meca, prop->confine_stiffness);
-            } break;
-                
-            case CONFINE_ON:
-                spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
-                
-            default:
-                throw InvalidParameter("Invalid sphere::confine");
-        }
-    }
-}
-
 
 void Sphere::resize(const real R)
 {
@@ -323,7 +294,8 @@ void Sphere::setDragCoefficient()
 }
 
 
-#pragma mark -
+//------------------------------------------------------------------------------
+#pragma mark - Mecable
 
 size_t Sphere::allocateMecable(size_t nbp)
 {
@@ -351,6 +323,38 @@ void Sphere::prepareMecable()
     assert_true( spDragRot > 0 );
     
     makeProjection();
+}
+
+
+void Sphere::setInteractions(Meca& meca) const
+{
+    if ( prop->confine != CONFINE_OFF )
+    {
+        Space const* spc = prop->confine_space_ptr;
+        
+        switch ( prop->confine )
+        {
+            case CONFINE_INSIDE:
+            {
+                Vector cen(pPos);
+                if ( ! spc->inside(cen) )
+                    spc->setInteraction(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+            } break;
+            
+            case CONFINE_ALL_INSIDE:
+            {
+                Vector cen(pPos);
+                if ( ! spc->allInside(cen, spRadius) )
+                    spc->setInteraction(cen, Mecapoint(this, 0), spRadius, meca, prop->confine_stiffness);
+            } break;
+            
+            case CONFINE_ON:
+                spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
+            
+            default:
+                throw InvalidParameter("Invalid sphere::confine");
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
