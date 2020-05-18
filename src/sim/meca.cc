@@ -1236,10 +1236,10 @@ void Meca::precondition(const real* X, real* Y) const
 
 
 /// function to sort Mecables
-int compareMecables(const void * ap, const void * bp)
+int compareMecables(const void * A, const void * B)
 {
-    size_t a = (*static_cast<Mecable *const*>(ap))->nbPoints();
-    size_t b = (*static_cast<Mecable *const*>(bp))->nbPoints();
+    size_t a = (*static_cast<Mecable *const*>(A))->nbPoints();
+    size_t b = (*static_cast<Mecable *const*>(B))->nbPoints();
     return ( a < b ) - ( a > b );
 }
 

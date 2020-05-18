@@ -1102,11 +1102,11 @@ void Fiber::detachHands() const
 /**
 Sort in ascending order
 */
-int compareAbscissa(const void* a, const void* b)
+int compareAbscissa(const void* A, const void* B)
 {
-    real ax = (*static_cast<Hand *const*>(a))->abscissa();
-    real bx = (*static_cast<Hand *const*>(b))->abscissa();
-    return ( ax > bx ) - ( bx > ax );
+    real a = (*static_cast<Hand *const*>(A))->abscissa();
+    real b = (*static_cast<Hand *const*>(B))->abscissa();
+    return ( a > b ) - ( b > a );
 }
 
 /**

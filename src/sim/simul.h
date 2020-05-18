@@ -370,16 +370,22 @@ public:
     
     /// give a short inventory of the simulation state, obtained from ObjectSet::report()
     void      reportInventory(std::ostream&) const;
- 
-    /// print the length and the points of each fiber
-    void      reportFiber(std::ostream&, FiberProp const*) const;
     
     /// print the length and the points of each fiber
-    void      reportFiber(std::ostream&, std::string const&) const;
+    void      reportFiber(std::ostream&, Fiber const*) const;
+
+    /// print the length and the points of each fiber
+    void      reportFibers(std::ostream&, FiberProp const*) const;
     
     /// print the length and the points of each fiber
-    void      reportFiber(std::ostream&) const;
+    void      reportFibers(std::ostream&, std::string const&) const;
     
+    /// print the length and the points of each fiber
+    void      reportFibers(std::ostream&) const;
+
+    /// print the length and the points of each fiber
+    void      reportFibersSorted(std::ostream&, FiberProp const*) const;
+
     /// print the coordinates of the vertices of each fiber
     void      reportFiberPoints(std::ostream&) const;
     

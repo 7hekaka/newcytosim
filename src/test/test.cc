@@ -7,11 +7,11 @@
 #include "random.h"
 
 
-int compare(const void * a, const void * b)
+int compare(const void * A, const void * B)
 {
-    int av = *static_cast<const int*>(a);
-    int bv = *static_cast<const int*>(b);
-    return ( av > bv ) - ( av < bv );
+    int a = *static_cast<const int*>(A);
+    int b = *static_cast<const int*>(B);
+    return ( a > b ) - ( a < b );
 }
 
 

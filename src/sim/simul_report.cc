@@ -197,9 +197,9 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
     if ( who == "fiber" )
     {
         if ( !which.empty() )
-            return reportFiber(out, which);
+            return reportFibers(out, which);
         if ( what.empty() || what == "position" )
-            return reportFiber(out);
+            return reportFibers(out);
         if ( what == "end" )
             return reportFiberEnds(out);
         if ( what == "point" )
@@ -654,29 +654,44 @@ void Simul::reportFiberMesh(std::ostream& out, bool density) const
 //------------------------------------------------------------------------------
 #pragma mark - Fiber Individual Properties
 
+/// to sort in ascending order
+int compareFibers(Node const* A, Node const* B)
+{
+    real a = static_cast<Fiber const*>(A)->length();
+    real b = static_cast<Fiber const*>(B)->length();
+    //return ( a < b ) - ( a > b );
+    return ( a > b ) - ( b > a );
+}
+
+
 /**
  Export length, position and directions at center of fibers
  */
-void Simul::reportFiber(std::ostream& out, FiberProp const* selected) const
+void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << "length";
-    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
-    out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "aster";
+    out << LIN << fib->prop->number();
+    out << SEP << fib->identity();
+    out << SEP << fib->length();
+    out << SEP << fib->posEnd(CENTER);
+    out << SEP << fib->dirEnd(CENTER);
+    out << SEP << (fib->posEndM()-fib->posEndP()).norm();
+    out << SEP << dot(fib->dirEndM(), fib->dirEndP());
+    out << SEP << organizers.findOrganizerID(fib);
+}
 
-    // list fibers in the order of the inventory:
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+
+
+/**
+ Export length, position and directions at center of fibers
+ */
+void Simul::reportFibersSorted(std::ostream& out, FiberProp const* selected) const
+{
+    const_cast<Simul*>(this)->fibers.nodes.mergesort(compareFibers);
+
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         if ( fib->prop == selected )
-        {
-            out << LIN << fib->prop->number();
-            out << SEP << fib->identity();
-            out << SEP << fib->length();
-            out << SEP << fib->posEnd(CENTER);
-            out << SEP << fib->dirEnd(CENTER);
-            out << SEP << (fib->posEndM()-fib->posEndP()).norm();
-            out << SEP << dot(fib->dirEndM(), fib->dirEndP());
-            out << SEP << organizers.findOrganizerID(fib);
-        }
+            reportFiber(out, fib);
     }
 }
 
@@ -684,25 +699,47 @@ void Simul::reportFiber(std::ostream& out, FiberProp const* selected) const
 /**
  Export length, position and directions at center of fibers
  */
-void Simul::reportFiber(std::ostream& out, std::string const& which) const
+void Simul::reportFibers(std::ostream& out, FiberProp const* selected) const
 {
-    Property const* p = properties.find_or_die("fiber", which);
-    reportFiber(out, static_cast<FiberProp const*>(p));
+    // list fibers in the order of the inventory:
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    {
+        if ( fib->prop == selected )
+            reportFiber(out, fib);
+    }
 }
 
 
 /**
  Export length, position and directions at center of fibers
  */
-void Simul::reportFiber(std::ostream& out) const
+void Simul::reportFibers(std::ostream& out, std::string const& which) const
 {
+    Property const* p = properties.find_or_die("fiber", which);
+    out << COM << "class" << SEP << "identity" << SEP << "length";
+    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
+    out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
+    
+    reportFibers(out, static_cast<FiberProp const*>(p));
+}
+
+
+/**
+ Export length, position and directions at center of fibers
+ */
+void Simul::reportFibers(std::ostream& out) const
+{
+    out << COM << "class" << SEP << "identity" << SEP << "length";
+    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
+    out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
+
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         if ( fibers.count(match_property, fp) > 0 )
         {
             out << COM << "fiber class " + std::to_string(fp->number()) + " is " + fp->name();
-            reportFiber(out, fp);
+            reportFibers(out, fp);
         }
     }
 }

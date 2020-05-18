@@ -75,10 +75,10 @@ protected:
     };
     
     /// function to sort zObjects according to their position 'depth'
-    static int compareZObject(const void * ap, const void * bp)
+    static int compareZObject(const void * A, const void * B)
     {
-        real a = static_cast<const zObject*>(ap)->depth();
-        real b = static_cast<const zObject*>(bp)->depth();
+        real a = static_cast<const zObject*>(A)->depth();
+        real b = static_cast<const zObject*>(B)->depth();
         return ( a > b ) - ( a < b );
     }
 
