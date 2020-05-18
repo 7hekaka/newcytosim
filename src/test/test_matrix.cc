@@ -547,8 +547,8 @@ void testMatrixBlock(const size_t size, const size_t fill)
 
 int compareInt(const void* p, const void* q)
 {
-    size_t i = *(size_t const*)p;
-    size_t j = *(size_t const*)q;
+    size_t i = *static_cast<size_t const*>(p);
+    size_t j = *static_cast<size_t const*>(q);
     return ( i > j ) - ( j > i );
 }
 

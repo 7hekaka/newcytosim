@@ -98,10 +98,10 @@ private:
         real operator < (SeverPos const&b) const { return abs > b.abs; }
     };
     
-    /// Pointer to hold a list of attached Hands
+    /// Pointer to first attached Hand
     mutable Hand *      handListFront;
     
-    /// Pointer to hold a list of attached Hands
+    /// Pointer to last attached Hand
     mutable Hand *      handListBack;
 
 #if FIBER_HAS_LATTICE

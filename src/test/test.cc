@@ -9,8 +9,8 @@
 
 int compare(const void * a, const void * b)
 {
-    int av = *(static_cast<const int*>(a));
-    int bv = *(static_cast<const int*>(b));
+    int av = *static_cast<const int*>(a);
+    int bv = *static_cast<const int*>(b);
     return ( av > bv ) - ( av < bv );
 }
 

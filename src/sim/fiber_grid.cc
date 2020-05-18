@@ -264,8 +264,8 @@ typedef Array<HeavySegment> HeavySegmentList;
 /// used to qsort segments according to distance
 int compareSegments(const void * a, const void * b)
 {
-    real ad = ((HeavySegment const*)(a))->dis_;
-    real bd = ((HeavySegment const*)(b))->dis_;
+    real ad = static_cast<HeavySegment const*>(a)->dis_;
+    real bd = static_cast<HeavySegment const*>(b)->dis_;
     
     return ( ad > bd ) - ( bd > ad );
 }
