@@ -182,7 +182,7 @@ void NodeList::erase()
 This is a bubble sort?
 comp(a,b) = -1 if (a<b) and 1 if (a>b) or 0
 */
-void NodeList::sort(int (*comp)(const void*, const void*))
+void NodeList::bubblesort(int (*comp)(const Node*, const Node*))
 {
     Node * ii = front();
     
@@ -216,8 +216,24 @@ void NodeList::sort(int (*comp)(const void*, const void*))
 
 
 /**
-This copies the data to a temporary space to use the standard library qsort()
+This is a bubble sort?
 comp(a,b) = -1 if (a<b) and 1 if (a>b) or 0
+*/
+void NodeList::mergesort(int (*comp)(const Node*, const Node*))
+{
+    Node * n = Node::mergesort(comp, nFront);
+    nFront = n;
+    while ( n->next() )
+    {
+        n = n->next();
+    }
+    nBack = n;
+}
+
+
+/**
+This copies the data to a temporary space to use the standard library qsort()
+comp(Node** a, Node** b) = -1 if (a<b) and 1 if (a>b) or 0
 */
 void NodeList::quicksort(int (*comp)(const void*, const void*))
 {

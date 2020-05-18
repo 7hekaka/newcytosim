@@ -731,6 +731,8 @@
 		BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
 		BBB1E480126DC70B00B19D26 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
 		BBBD34E01AABA5BE00819326 /* grid_base.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* grid_base.h */; };
+		BBC422F52472D0C2007EA070 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
+		BBC422F724731657007EA070 /* node.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F624731657007EA070 /* node.cc */; };
 		BBCA7D081803EAF4000DFD95 /* player.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9CED2A07E21B0F00887531 /* player.h */; };
 		BBCA9EEF06AFCB4600638608 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BBCAA27F06B0539000638608 /* mecapoint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCAA27B06B0539000638608 /* mecapoint.cc */; };
@@ -1710,6 +1712,7 @@
 		BBBD34DF1AABA5BE00819326 /* grid_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid_base.h; path = src/math/grid_base.h; sourceTree = SOURCE_ROOT; };
 		BBC0E57110CABBBB008139D1 /* point_disp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = point_disp.cc; sourceTree = "<group>"; };
 		BBC0E57210CABBBB008139D1 /* point_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_disp.h; sourceTree = "<group>"; };
+		BBC422F624731657007EA070 /* node.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = node.cc; sourceTree = "<group>"; };
 		BBC91299204EC2DC00219DC5 /* test_pipe.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_pipe.cc; sourceTree = "<group>"; };
 		BBCA9EF006AFCB4600638608 /* report */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = report; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBCAA27B06B0539000638608 /* mecapoint.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = mecapoint.cc; path = src/sim/mecapoint.cc; sourceTree = SOURCE_ROOT; };
@@ -2009,6 +2012,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC422F52472D0C2007EA070 /* Accelerate.framework in Frameworks */,
 				BB786AF30AF62C90005AF9A2 /* libcytosim.a in Frameworks */,
 				BB786AF20AF62C8B005AF9A2 /* libcytospace.a in Frameworks */,
 				BBCA9EEF06AFCB4600638608 /* libcytobase.a in Frameworks */,
@@ -2359,6 +2363,7 @@
 				BB6E52CE15D206DF00946BFF /* buddy.h */,
 				BB73586D05B98DA3006956D5 /* array.h */,
 				BB73589505B98DA3006956D5 /* node.h */,
+				BBC422F624731657007EA070 /* node.cc */,
 				BB73589705B98DA3006956D5 /* node_list.h */,
 				BB73589605B98DA3006956D5 /* node_list.cc */,
 				BB19FEF312F352A400ACEA12 /* inventoried.h */,
@@ -4588,6 +4593,7 @@
 				BB74F41B231C334D0019D68E /* matsparseblk.cc in Sources */,
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
+				BBC422F724731657007EA070 /* node.cc in Sources */,
 				BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */,
 				BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */,

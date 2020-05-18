@@ -39,6 +39,22 @@ public:
     /// the previous Node in the list, or zero if this is first
     Node*      prev()      const { return nPrev; }
 
+    /// set next Node
+    void       next(Node* n)     { nNext = n; }
+    
+    /// set previous Node
+    void       prev(Node* n)     { nPrev = n; }
+
+    
+    /// split linked list roughly in two
+    static Node * split(Node*);
+    
+    /// sort according to given function
+    static Node * mergesort(int (*comp)(const Node*, const Node*), Node*);
+
+    /// merge two linked lists
+    static Node * merge(int (*comp)(const Node*, const Node*), Node *first, Node *second);
+
 };
 
 

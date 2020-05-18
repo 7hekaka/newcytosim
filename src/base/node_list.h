@@ -97,8 +97,11 @@ public:
     void            erase();
     
     /// sort according to given function
-    void            sort(int (*comp)(const void*, const void*));
+    void            bubblesort(int (*comp)(const Node*, const Node*));
     
+    /// sort according to given function
+    void            mergesort(int (*comp)(const Node*, const Node*));
+
     /// quicksort according to given function
     void            quicksort(int (*comp)(const void*, const void*));
 
