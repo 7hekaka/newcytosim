@@ -136,7 +136,7 @@ void Fiber::step()
  and other newFiber() functions where the initial length is known.
  */
 Fiber::Fiber(FiberProp const* p)
-: handListFront(nullptr), handListBack(nullptr), prop(p), disp(nullptr)
+: prop(p), disp(nullptr)
 {
     if ( prop )
     {
@@ -275,7 +275,7 @@ void Fiber::flipHandsPolarity()
      new_abs = plus + minus - old_abs
      */
     real mid = abscissaM() + abscissaP();
-    Hand * ha = handListFront;
+    Hand * ha = frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -295,7 +295,7 @@ void Fiber::cutM(real len)
     
     Chain::cutM(len);
     
-    Hand * ha = handListFront;
+    Hand * ha = frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -316,7 +316,7 @@ void Fiber::cutP(real len)
     
     Chain::cutP(len);
     
-    Hand * ha = handListFront;
+    Hand * ha = frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -372,7 +372,7 @@ Fiber* Fiber::severPoint(size_t pti)
     truncateP(pti);
     
     // transfer Hands above point P, at same abscissa
-    Hand * ha = handListFront;
+    Hand * ha = frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -446,7 +446,7 @@ Fiber* Fiber::severP(real abs)
     // transfer all Hands above cut to new piece
     // their abscissa should not change in this transfer
     abs += abscissaM();
-    Hand * ha = handListFront;
+    Hand * ha = frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -628,7 +628,7 @@ void Fiber::join(Fiber * fib)
 #endif
 
     // transfer all Hands
-    Hand * ha = fib->handListFront;
+    Hand * ha = fib->frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -1040,175 +1040,31 @@ void Fiber::setInteractions(Meca& meca) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - list of bound Hands
+#pragma mark - Attached Hands
 
-/**
-Link the hand at the front of the list.
-
-Keeping track of the bound Hands is needed to run Cytosim if the filaments are
-dynamic, so that a Fiber that has changed can update all the Hands bound to it.
-The list is also used in reports, or to quickly count Hands bound to the fiber.
-*/
-void Fiber::addHand(Hand * n) const
+size_t Fiber::nbHandsInRange(real i, real s, const FiberEnd ref) const
 {
-    n->prev(nullptr);
-    n->next(handListFront);
-    if ( handListFront )
-        handListFront->prev(n);
-    else
-        handListBack = n;
-    handListFront = n;
-}
-
-
-void Fiber::removeHand(Hand * n) const
-{
-    Hand * x = n->next();
-    if ( n->prev() )
-        n->prev()->next(x);
-    else {
-        assert_true( handListFront == n );
-        handListFront = x;
-    }
-    
-    if ( x )
-        x->prev(n->prev());
-    else {
-        assert_true( handListBack == n );
-        handListBack = n->prev();
-    }
-}
-
-
-void Fiber::updateHands() const
-{
-    for ( Hand * ha = handListFront; ha; ha = ha->next() )
-        ha->update();
-}
-
-
-void Fiber::detachHands() const
-{
-    // we must iterate one step ahead, because detach() will unlink
-    Hand * ha = handListFront;
-    while ( ha )
-    {
-        Hand * nx = ha->next();
-        ha->detach();
-        ha = nx;
-    }
-}
-
-/**
-Sort in ascending order
-*/
-int compareAbscissa(const void* A, const void* B)
-{
-    real a = (*static_cast<Hand *const*>(A))->abscissa();
-    real b = (*static_cast<Hand *const*>(B))->abscissa();
-    return ( a > b ) - ( b > a );
-}
-
-/**
- This sorts the Hands in order of increasing abscissa
- Sorting is done by copying to temporary array space, using std::qsort
- */
-void Fiber::sortHands() const
-{
-    size_t cnt = nbHands();
-    if ( cnt > 1 )
-    {
-        Hand ** tmp = new Hand*[cnt];
-        
-        size_t i = 0;
-        Hand * n = handListFront;
-        
-        while ( n )
-        {
-            tmp[i++] = n;
-            n = n->next();
-        }
-        
-        qsort(tmp, cnt, sizeof(Hand*), compareAbscissa);
-        
-        n = tmp[0];
-        handListFront = n;
-        n->prev(nullptr);
-        for ( i = 1; i < cnt; ++i )
-        {
-            n->next(tmp[i]);
-            tmp[i]->prev(n);
-            n = tmp[i];
-        }
-        n->next(nullptr);
-        handListBack = n;
-        
-        delete[] tmp;
-    }
-}
-
-
-size_t Fiber::nbHands() const
-{
-    size_t res = 0;
-    
-    for ( Hand const* ha = handListFront; ha; ha = ha->next() )
-        ++res;
-    
-    return res;
-}
-
-
-int Fiber::nbHands(int (*count)(Hand const*)) const
-{
-    int res = 0;
-    
-    for ( Hand const* ha = handListFront; ha; ha = ha->next() )
-        res += count(ha);
-    
-    //printf("nbHands(%p) = %u\n", count, res);
-    return res;
-}
-
-
-size_t Fiber::nbHandsInRange(real a, real b, const FiberEnd ref) const
-{
-    size_t res = 0;
-    if ( b > a )
-    {
-        // Convert to absolute abscissa:
-        a = abscissaFrom(a, ref);
-        b = abscissaFrom(b, ref);
-        if ( b < a )
-            std::swap(a, b);
-        
-        for ( Hand const* ha = handListFront; ha; ha = ha->next() )
-            res += ( a <= ha->abscissa()  &&  ha->abscissa() <= b );
-    }
-    //printf("nbHandsInRange(%8.2f, %8.2f) = %u\n", a, b, res);
-    return res;
+    // Convert to absolute abscissa:
+    i = abscissaFrom(i, ref);
+    s = abscissaFrom(s, ref);
+    if ( s < i )
+        std::swap(i, s);
+    return frHands.countInRange(i, s);
 }
 
 
 size_t Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
 {
-    size_t res = 0;
     real i = -INFINITY, s = INFINITY;
     
-    if ( len > 0 )
-    {
-        if ( ref == PLUS_END )
-            i = abscissaP() - len;
-        else if ( ref == MINUS_END )
-            s = abscissaM() + len;
-        else
-            throw("invalid argument value to nbHadsNearEnd()");
+    if ( ref == PLUS_END )
+        i = abscissaP() - len;
+    else if ( ref == MINUS_END )
+        s = abscissaM() + len;
+    else
+        throw("invalid argument value to nbHandsNearEnd()");
         
-        for ( Hand const* ha = handListFront; ha; ha = ha->next() )
-            res += ( i <= ha->abscissa() && ha->abscissa() <= s );
-    }
-    //printf("nbHandsNearEnd(%8.2f) = %u\n", len, res);
-    return res;
+    return frHands.countInRange(i, s);
 }
 
 //------------------------------------------------------------------------------
@@ -1266,7 +1122,7 @@ void Fiber::updateFiber()
      We must iterate one step ahead, because `checkFiberRange()` may lead to detachment.
      The loop could be unrolled, or parallelized
      */
-    Hand * ha = handListFront;
+    Hand * ha = frHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();

@@ -7,7 +7,8 @@
 #include <stdint.h>
 #include "mecafil.h"
 #include "fiber_prop.h"
-#include "node_list.h"
+//#include "node_list.h"
+#include "hand_list.h"
 #include "lattice.h"
 #include "sim.h"
 
@@ -64,7 +65,7 @@ typedef FiberLattice VisibleLattice;
  
  - `FiberProp * prop` points to the physical properties (ie. parameters) of the Fiber.
  - `FiberDisp * disp` points to display parameters (not used in sim).
- - `handListFront` and `handListBack` keep track of all attached Hands.
+ - `frHands` keeps track of all attached Hands.
  .
  
  The Fiber may have a Lattice of integers, used by Digit and derived Hands.
@@ -97,13 +98,10 @@ private:
         /// sort from PLUS_END to MINUS_END, i.e. with decreasing abscissa
         real operator < (SeverPos const&b) const { return abs > b.abs; }
     };
-    
-    /// Pointer to first attached Hand
-    mutable Hand *      handListFront;
-    
-    /// Pointer to last attached Hand
-    mutable Hand *      handListBack;
 
+    /// list of bound Hands
+    mutable HandList    frHands;
+    
 #if FIBER_HAS_LATTICE
     /// Associated Lattice used for occupancy of Digit
     FiberLattice        frLattice;
@@ -281,28 +279,28 @@ public:
     //--------------------------------------------------------------------------
     
     /// register a new Hands that attached to this Fiber
-    void           addHand(Hand*) const;
+    void           addHand(Hand* h) const { frHands.add(h); }
     
     /// unregister bound Hands (which has detached)
-    void           removeHand(Hand*) const;
+    void           removeHand(Hand* h) const  { frHands.remove(h); }
     
     /// update all Hands bound to this
-    void           updateHands() const;
+    void           updateHands() const { frHands.update(); }
 
     /// detach all Hands
-    void           detachHands() const;
+    void           detachHands() const { frHands.detach(); }
     
     /// sort Hands by order of increasing abscissa
-    void           sortHands() const;
+    void           sortHands() const { frHands.sort(); }
     
     /// return Hand bound to this fiber (use ->next() to access all other Hands)
-    Hand *         firstHand() const { return handListFront; }
+    Hand *         firstHand() const { return frHands.front(); }
    
     /// number of attached Hands
-    size_t         nbHands() const;
+    size_t         nbHands() const { return frHands.count(); }
     
     /// a function to count Hands using a custom criteria
-    int            nbHands(int (*count)(Hand const*)) const;
+    int            nbHands(int (*func)(Hand const*)) const { return frHands.count(func); }
 
     /// number of Hands attached within a range of abscissa
     size_t         nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;

@@ -194,7 +194,7 @@ void Fiber::resetLattice()
 {
     frLattice.clear();
     
-    for ( Hand * ha = handListFront; ha; ha = ha->next() )
+    for ( Hand * ha = frHands.front(); ha; ha = ha->next() )
     {
         if ( ha->lattice() == &frLattice )
             static_cast<Digit*>(ha)->inc();

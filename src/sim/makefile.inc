@@ -9,7 +9,7 @@ OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_disc.o\
              space_banana.o space_cylinderP.o space_lid.o space_beads.o space_force.o\
              space_dynamic_prop.o space_dynamic_sphere.o space_dynamic_ellipse.o
 
-OBJ_HANDS := hand.o hand_prop.o\
+OBJ_HANDS := hand.o hand_prop.o hand_list.o\
              motor.o motor_prop.o\
              slider.o slider_prop.o\
              actor.o actor_prop.o\
