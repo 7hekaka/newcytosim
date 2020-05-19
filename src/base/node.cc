@@ -8,7 +8,7 @@ Node* Node::split(Node* head)
 {
     Node* slow = head;
     Node* fast = head;
-
+    
     while ( fast->nNext && fast->nNext->nNext )
     {
         fast = fast->nNext->nNext;
@@ -26,11 +26,11 @@ Node* Node::merge(int (*comp)(const Node*, const Node*), Node *first, Node *seco
     // If first linked list is empty
     if ( !first )
         return second;
-  
+    
     // If second linked list is empty
     if ( !second )
         return first;
-  
+    
     // Pick the smaller value
     if ( comp(second, first) > 0 )
     {

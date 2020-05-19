@@ -30,7 +30,7 @@ class NodeList
 {
     
 private:
-        
+    
     /// First Node in the list
     Node *   nFront;
     
@@ -45,7 +45,7 @@ private:
     
     /// Disabled copy assignment
     NodeList& operator=(NodeList const&);
-
+    
 public:
     
     /// default constructor
@@ -59,7 +59,7 @@ public:
     
     /// Last Node in list
     Node *          back()   const { return nBack; }
-
+    
     /// Number of objects in the list
     size_t          size()   const { return nSize; }
     
@@ -86,10 +86,10 @@ public:
     
     /// Remove top Node from list
     void            pop_front();
-
+    
     /// Remove top Node from list
     void            pop_back();
-   
+    
     /// clear the list
     void            clear();
     
@@ -101,13 +101,13 @@ public:
     
     /// sort according to given function
     void            mergesort(int (*comp)(const Node*, const Node*));
-
+    
     /// quicksort according to given function using std::qsort()
     void            quicksort(int (*comp)(const void*, const void*));
     
-    /// quicksort according to given function using std::qsort()
+    /// sort according to given function
     void            blinksort(int (*comp)(const Node*, const Node*));
-
+    
     /// Rearrange the list by exchanging the portions before and after `p`
     void            permute(Node *);
     
@@ -122,7 +122,7 @@ public:
     
     /// call mix() three times
     void            shuffle3();
-
+    
     /// count number of elements in the list
     size_t          count() const;
     
@@ -139,7 +139,7 @@ private:
     
     /// sort sublist
     void   blinksort(int (*comp)(const Node*, const Node*), Node*, Node*);
-
+    
 };
 
 

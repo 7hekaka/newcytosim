@@ -195,7 +195,7 @@ size_t NodeList::count() const
 #pragma mark - Sort
 
 /**
-This is a bubble sort?
+This is a bubble sort, which scales like O(N^2)
 comp(a,b) = -1 if (a<b) and 1 if (a>b) or 0
 */
 void NodeList::bubblesort(int (*comp)(const Node*, const Node*))
@@ -232,7 +232,7 @@ void NodeList::bubblesort(int (*comp)(const Node*, const Node*))
 
 
 /**
-This is a bubble sort?
+The merge sort should have O(N*log(N))
 comp(a,b) = -1 if (a<b) and 1 if (a>b) or 0
 */
 void NodeList::mergesort(int (*comp)(const Node*, const Node*))
