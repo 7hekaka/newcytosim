@@ -654,13 +654,13 @@ void Simul::reportFiberMesh(std::ostream& out, bool density) const
 //------------------------------------------------------------------------------
 #pragma mark - Fiber Individual Properties
 
-/// to sort in ascending order
+/// to sort in ascending order: return -1 if ( a < b ) and +1 if ( a > b )
 int compareFibers(Node const* A, Node const* B)
 {
     real a = static_cast<Fiber const*>(A)->length();
     real b = static_cast<Fiber const*>(B)->length();
-    //return ( a < b ) - ( a > b );
-    return ( a > b ) - ( b > a );
+    return ( a < b ) - ( a > b );
+    //return ( a > b ) - ( b > a );
 }
 
 
@@ -686,7 +686,7 @@ void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
  */
 void Simul::reportFibersSorted(std::ostream& out, FiberProp const* selected) const
 {
-    const_cast<Simul*>(this)->fibers.nodes.mergesort(compareFibers);
+    const_cast<Simul*>(this)->fibers.nodes.blinksort(compareFibers);
 
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {

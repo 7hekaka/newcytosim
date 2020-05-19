@@ -32,7 +32,7 @@ Node* Node::merge(int (*comp)(const Node*, const Node*), Node *first, Node *seco
         return first;
   
     // Pick the smaller value
-    if ( comp(first, second) > 0 )
+    if ( comp(second, first) > 0 )
     {
         first->nNext = merge(comp, first->nNext, second);
         first->nNext->nPrev = first;

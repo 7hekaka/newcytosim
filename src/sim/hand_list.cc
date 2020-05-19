@@ -77,9 +77,9 @@ int compareAbscissa(const void* A, const void* B)
  */
 void HandList::sort()
 {
-    size_t cnt = count();
-    if ( cnt > 1 )
+    if ( haFront != haBack )
     {
+        size_t cnt = count();
         Hand ** tmp = new Hand*[cnt];
         
         size_t i = 0;

@@ -178,6 +178,22 @@ void NodeList::erase()
 }
 
 
+
+size_t NodeList::count() const
+{
+    size_t cnt = 0;
+    Node * p = nFront;
+    while ( p )
+    {
+        ++cnt;
+        p = p->nNext;
+    }
+    return cnt;
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Sort
+
 /**
 This is a bubble sort?
 comp(a,b) = -1 if (a<b) and 1 if (a>b) or 0
@@ -231,6 +247,73 @@ void NodeList::mergesort(int (*comp)(const Node*, const Node*))
 }
 
 
+void NodeList::move_behind(Node *& subF, Node *& subL, Node * pvt, Node * down)
+{
+    if ( down != subL )
+        down->nNext->nPrev = down->nPrev;
+    else {
+        if ( down == nBack )
+            nBack = down->nPrev;
+        else
+            down->nNext->nPrev = down->nPrev;
+        subL = down->nPrev;
+    }
+    down->nPrev->nNext = down->nNext;
+    down->nNext = pvt;
+    down->nPrev = pvt->nPrev;
+    pvt->nPrev = down;
+    if ( pvt != subF )
+        down->nPrev->nNext = down;
+    else {
+        if ( pvt == nFront )
+            nFront = down;
+        else
+            down->nPrev->nNext = down;
+        subF = down;
+    }
+}
+
+/*
+ From `Partition Algorithms for the Doubly Linked List`
+ John M. Boyer, University of Southern Mississippi; ACM 1990
+ */
+void NodeList::blinksort(int (*comp)(const Node*, const Node*), Node * subF, Node * subL)
+{
+    Node * pvt2 = subF->nNext;
+    if ( comp(subF, pvt2) > 0 )
+        move_behind(subF, subL, subF, pvt2);
+    Node * pvt1 = subF;
+    while ((pvt2 != subL) and comp(pvt2->nNext, pvt2) >= 0 )
+        pvt2 = pvt2->nNext;
+    if ( pvt2 != subL )
+    {
+        Node * down = subL;
+        while ( down != pvt2 )
+        {
+            Node * temp = down->nPrev;
+            if ( comp(pvt1, down) > 0 )
+                move_behind(subF, subL, pvt1, down);
+            else if ( comp(pvt2, down) > 0 )
+                move_behind(subF, subL, pvt2, down);
+            down = temp;
+        }
+        if ((pvt1 != subF) and (pvt1->nPrev != subF))
+            blinksort(comp, subF, pvt1->nPrev);
+        if ((pvt1->nNext != pvt2) and (pvt1->nNext != pvt2->nPrev))
+            blinksort(comp, pvt1->nNext, pvt2->nPrev);
+        if ((pvt2 != subL) and (pvt2->nNext != subL))
+            blinksort(comp, pvt2->nNext, subL);
+    }
+}
+
+
+void NodeList::blinksort(int (*comp)(const Node*, const Node*))
+{
+    if ( nFront != nBack )
+        blinksort(comp, nFront, nBack);
+}
+
+
 /**
 This copies the data to a temporary space to use the standard library qsort()
 comp(Node** a, Node** b) = -1 if (a<b) and 1 if (a>b) or 0
@@ -265,6 +348,10 @@ void NodeList::quicksort(int (*comp)(const void*, const void*))
     
     delete[] tmp;
 }
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Shuffle
 
 
 /**
@@ -389,17 +476,8 @@ void NodeList::shuffle3()
 }
 
 
-size_t NodeList::count() const
-{
-    size_t cnt = 0;
-    Node * p = nFront;
-    while ( p )
-    {
-        ++cnt;
-        p = p->nNext;
-    }
-    return cnt;
-}
+//------------------------------------------------------------------------------
+#pragma mark - Check
 
 
 bool NodeList::check(Node const* n) const
