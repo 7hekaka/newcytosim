@@ -315,7 +315,7 @@ void Aster::placeAnchor(Vector const& A, Vector const& B, size_t ref)
 
 ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
 {
-    ObjectList res(2);
+    ObjectList res(4, 4);
     Solid * sol = nullptr;
     
     // find the Solid specified:

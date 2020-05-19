@@ -743,7 +743,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
 void CoupleSet::uniAttach(FiberSet const& fibers)
 {
     // preallocate array:
-    Array<FiberSite> loc(1024);
+    Array<FiberSite> loc(1024, 1024);
     
 #if ( 0 )
     
@@ -907,7 +907,7 @@ void CoupleSet::uniRelax()
 
 void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CoupleProp const* cop)
 {
-    Array<FiberSite> loc1(1024), loc2(1024);
+    Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
     
     if ( cop->hand1_prop != cop->hand2_prop )
         throw InvalidParameter("Cannot equilibrate heterogeneous Couple");
@@ -982,7 +982,7 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
  */
 void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp const* cop)
 {
-    Array<FiberSite> loc1(1024), loc2(1024);
+    Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
     if ( cop->trans_activated )
         throw InvalidParameter("Cannot equilibrate trans_activated Couple");
     
@@ -1115,7 +1115,7 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, PropertyList const& 
         throw InvalidParameter("cannot connect network!");
     
     // get all crosspoints within this range:
-    Array<FiberSite> loc1(1024), loc2(1024);
+    Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
     fibers.allIntersections(loc1, loc2, range);
     const size_t nbc = loc1.size();
     assert_true(nbc == loc2.size());

@@ -89,7 +89,7 @@ With a sequential simulation, the second option is usually faster.
 #pragma mark - Allocate
 
 Meca::Meca()
-: mecables(32)
+: mecables(32, 32)
 {
     ready_ = 0;
     nPoints_ = 0;

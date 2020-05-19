@@ -76,17 +76,19 @@ private:
     }
     
     /// return smallest power of 2 that is greater or equal to `s`
-    size_t next_power(size_t s)
+    size_t next_power(size_t x)
     {
-        if ( s & (s-1) )
+        if ( x > 0 )
         {
-            do
-                s &= s-1;
-            while ( s & (s-1) );
-            
-            s <<= 1;
+            --x;
+            x |= x >> 1;
+            x |= x >> 2;
+            x |= x >> 4;
+            x |= x >> 8;
+            x |= x >> 16;
+            x |= x >> 32;
         }
-        return s;
+        return x+1;
     }
     
     /// copy data
@@ -111,16 +113,11 @@ public:
     }
 
     /// set chunk size to `k` (do not allocate)
-    Array(size_t k) : nbo_(0)
+    Array(size_t a, size_t k) : nbo_(0)
     {
-        if ( !k )
-        {
-            fprintf(stderr, "Array::chunk must not be null");
-            exit(1);
-        }
-        chk_ = next_power(k);
-        alc_ = chk_;
-        val_ = new VAL[chk_];
+        chk_ = std::max(next_power(k), 4UL);
+        alc_ = chunked(a);
+        val_ = new VAL[alc_];
     }
     
     /// Copy constructor
@@ -141,7 +138,7 @@ public:
         deallocate();
     }
     
-    /// Assignment operator
+    /// Copy assignment operator
     Array& operator =(Array<VAL> const & o)
     {
         if ( o.nbo_ > alc_ )
@@ -155,6 +152,20 @@ public:
         return *this;
     }
     
+    /// Move assignment operator
+    Array& operator =(Array<VAL> && o)
+    {
+        //printf("Array %p <---move--- %p\n", this, o);
+        delete[] val_;
+        nbo_ = o.nbo_;
+        alc_ = o.alc_;
+        val_ = o.val_;
+        o.val_ = nullptr;
+        o.alc_ = 0;
+        o.nbo_ = 0;
+        return *this;
+    }
+
 #pragma mark -
     
     /// Number of objects
@@ -227,8 +238,8 @@ public:
         return val_[nbo_-1];
     }
 
-    
 #pragma mark -
+    
     /// Allocate to hold `s` objects: valid indices are 0 <= indx < max
     void reallocate(const size_t alc_new)
     {

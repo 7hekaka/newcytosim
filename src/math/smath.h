@@ -343,28 +343,30 @@ namespace sMath
     inline unsigned next_power(unsigned x)
     {
         if ( x > 0 )
-            return 0;
-        --x;
-        x |= x >> 1;
-        x |= x >> 2;
-        x |= x >> 4;
-        x |= x >> 8;
-        x |= x >> 16;
+        {
+            --x;
+            x |= x >> 1;
+            x |= x >> 2;
+            x |= x >> 4;
+            x |= x >> 8;
+            x |= x >> 16;
+        }
         return x+1;
     }
     
     /// return smallest power of 2 that is greater or equal to `x`
     inline size_t next_power(size_t x)
     {
-        if ( x == 0 )
-            return 0;
-        --x;
-        x |= x >> 1;
-        x |= x >> 2;
-        x |= x >> 4;
-        x |= x >> 8;
-        x |= x >> 16;
-        x |= x >> 32;
+        if ( x > 0 )
+        {
+            --x;
+            x |= x >> 1;
+            x |= x >> 2;
+            x |= x >> 4;
+            x |= x >> 8;
+            x |= x >> 16;
+            x |= x >> 32;
+        }
         return x+1;
     }
 

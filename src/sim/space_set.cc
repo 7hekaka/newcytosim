@@ -142,7 +142,7 @@ ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
     SpaceProp * p = simul.findProperty<SpaceProp>("space", name);
     Space * obj = p->newSpace(opt);
 
-    ObjectList res(2);
+    ObjectList res(2, 4);
 
     if ( !obj )
     {

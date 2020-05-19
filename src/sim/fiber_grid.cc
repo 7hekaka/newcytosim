@@ -289,7 +289,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      get the list of segments associated with this cell in FiberGrid::paintGrid
      */
     SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
-    HeavySegmentList targets;
+    HeavySegmentList targets(8, 8);
 
     // calculate distance to all targets
     for ( FiberSegment const& seg : segments )
@@ -306,7 +306,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     else if ( targets.empty() )
         return;
     
-    //std::clog << "tryToAttachClosest has " << targets.size() << " targets\n";
+    std::clog << "tryToAttachClosest has " << targets.size() << " targets / " << segments.size() << "\n";
 
     /**
      Instead of flipping a coin for each target, we could use a single random

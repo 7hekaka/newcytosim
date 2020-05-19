@@ -947,6 +947,8 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
+        if ( simul.prop->verbose )
+            Cytosim::log("repeat %i\n", cnt);
         evaluate(code);
     }
 }

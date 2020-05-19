@@ -125,7 +125,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         fib->family_ = simul.findFiber(str);
 #endif
 
-    ObjectList res(2);
+    ObjectList res(8, 8);
     res.push_back(fib);
  
     size_t inp = 1;

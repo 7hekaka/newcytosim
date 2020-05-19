@@ -868,7 +868,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
     else
         opt.set(spread, "interval");
     
-    Array<FiberSite> loc(1024);
+    Array<FiberSite> loc(1024, 1024);
     fibers.uniFiberSites(loc, spread);
     
     Fiber const* ofib = nullptr;
