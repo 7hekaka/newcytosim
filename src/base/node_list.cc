@@ -205,19 +205,19 @@ void NodeList::bubblesort(int (*comp)(const Node*, const Node*))
     if ( ii == nullptr )
         return;
     
-    ii = ii->next();
+    ii = ii->nNext;
     
     while ( ii )
     {
-        Node * kk = ii->next();
-        Node * jj = ii->prev();
+        Node * kk = ii->nNext;
+        Node * jj = ii->nPrev;
         
         if ( comp(ii, jj) > 0 )
         {
-            jj = jj->prev();
+            jj = jj->nPrev;
             
             while ( jj && comp(ii, jj) > 0 )
-                jj = jj->prev();
+                jj = jj->nPrev;
             
             pop(ii);
             
@@ -239,9 +239,9 @@ void NodeList::mergesort(int (*comp)(const Node*, const Node*))
 {
     Node * n = Node::mergesort(comp, nFront);
     nFront = n;
-    while ( n->next() )
+    while ( n->nNext )
     {
-        n = n->next();
+        n = n->nNext;
     }
     nBack = n;
 }
@@ -329,7 +329,7 @@ void NodeList::quicksort(int (*comp)(const void*, const void*))
     while( n )
     {
         tmp[i++] = n;
-        n = n->next();
+        n = n->nNext;
     }
     
     qsort(tmp, cnt, sizeof(Node*), comp);
