@@ -38,10 +38,10 @@ void SpaceCylinderP::resize(Glossary& opt)
 }
 
 
-Modulo * SpaceCylinderP::makeModulo() const
+Modulo * SpaceCylinderP::newModulo() const
 {
     Modulo * mod = new Modulo();
-    mod->enable(0U, length_);
+    mod->enable(0U, 2*length_);
     return mod;
 }
 
@@ -55,7 +55,7 @@ void SpaceCylinderP::boundaries(Vector& inf, Vector& sup) const
 
 real SpaceCylinderP::volume() const
 {
-    return 2 * M_PI * length_ * radius_ * radius_;
+    return 2 * M_PI * length_ * square(radius_);
 }
 
 
@@ -63,7 +63,7 @@ bool SpaceCylinderP::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
     const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
-    return ( RT <= radius_ * radius_ );
+    return ( RT <= square(radius_) );
 #elif ( DIM > 1 )
     return ( abs_real(W.YY) <= radius_ );
 #else

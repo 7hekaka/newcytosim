@@ -20,7 +20,7 @@
 class SpacePeriodic : public Space
 {
     
-    /// dimensions
+    /// half-length in each dimension
     real   length_[3];
  
 public:
@@ -32,7 +32,7 @@ public:
     void        resize(Glossary& opt);
     
     /// initialize Modulo Object
-    Modulo *    makeModulo() const;
+    Modulo *    newModulo() const;
 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;

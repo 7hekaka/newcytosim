@@ -43,11 +43,11 @@ void SpaceStrip::resize(Glossary& opt)
 }
 
 
-Modulo * SpaceStrip::makeModulo() const
+Modulo * SpaceStrip::newModulo() const
 {
     Modulo * mod = new Modulo();
     for ( unsigned d = 0; d < DIM-1; ++d )
-        mod->enable(d, length_[d]);
+        mod->enable(d, 2*length_[d]);
     return mod;
 }
 

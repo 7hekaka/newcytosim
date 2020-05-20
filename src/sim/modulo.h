@@ -17,24 +17,11 @@ class Modulo
 {
 private:
     
+    /// half-period in each dimension
+    real  mSize[4];
+    
     /// bitfield indicating the dimensions that are periodic
     int   mMode;
-
-    /// half-period in each dimension
-    real  mSize[DIM];
-    
-    /// adjust 'x' to canonical image within periodicity 'p':
-    static inline void fold(real& x, const real p)
-    {
-        ///@todo use remainder() function for branchless code?
-        if ( abs_real(x) > p )
-        {
-            real i = std::copysign(p, x);
-            do
-                x = x - 2.0 * i;
-            while ( abs_real(x) > p );
-        }
-    }
 
 public:
     

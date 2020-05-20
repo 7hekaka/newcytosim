@@ -41,10 +41,10 @@ void SpaceLid::resize(Glossary& opt)
 }
 
 
-Modulo * SpaceLid::makeModulo() const
+Modulo * SpaceLid::newModulo() const
 {
     Modulo * mod = new Modulo();
-    mod->enable(0, length_[0]);
+    mod->enable(0, 2*length_[0]);
     return mod;
 }
 

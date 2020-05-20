@@ -47,7 +47,7 @@ public:
     void       resize(Glossary& opt);
     
     /// initialize Modulo Object
-    Modulo*    makeModulo() const;
+    Modulo*    newModulo() const;
 
     /// true if the Space is periodic in dimension ii
     bool       isPeriodic(int ii) const { return ( ii < DIM-1 ); }

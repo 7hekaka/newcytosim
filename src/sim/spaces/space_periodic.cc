@@ -28,11 +28,11 @@ void SpacePeriodic::resize(Glossary& opt)
 }
 
 
-Modulo * SpacePeriodic::makeModulo() const
+Modulo * SpacePeriodic::newModulo() const
 {
     Modulo * mod = new Modulo();
     for ( unsigned d = 0; d < DIM; ++d )
-        mod->enable(d, length_[d]);
+        mod->enable(d, 2*length_[d]);
     return mod;
 }
 

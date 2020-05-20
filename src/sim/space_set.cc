@@ -41,7 +41,7 @@ void SpaceSet::setMaster(Space const* spc)
     modulo = nullptr;
 
     if ( master_ )
-        modulo = master_->makeModulo();
+        modulo = master_->newModulo();
 }
 
 //------------------------------------------------------------------------------
