@@ -454,14 +454,14 @@ void Simul::solve_auto()
     sMeca.apply();
 
     // Automatic selection of preconditionning method:
-    constexpr size_t N_METHODS = 5;
-    constexpr size_t N_TEST = 8;
+    constexpr size_t N_METHODS = 4;
+    constexpr size_t N_TESTS = 8;
     constexpr size_t PERIOD = 128;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
     
-    if ( ++autoCounter <= N_TEST*N_METHODS )
+    if ( ++autoCounter <= N_TESTS*N_METHODS )
     {
         assert_true(autoPrecond < 6);
         autoCPU[autoPrecond] += cpu;
@@ -469,7 +469,7 @@ void Simul::solve_auto()
 
         //std::clog << " precond " << autoPrecond << " cnt " << cnt << " CPU " << cpu << "\n";
         
-        if ( autoCounter == N_TEST*N_METHODS )
+        if ( autoCounter == N_TESTS*N_METHODS )
         {
             /*
              Compare the performance of all methods, and select the fastest.
@@ -477,7 +477,7 @@ void Simul::solve_auto()
              as the simpler one uses less memory.
              */
             autoPrecond = 0;
-            for ( size_t m = 1; m < N_METHODS; ++m )
+            for ( size_t m : { 0, 1, 2, 4 } )
             {
                 if ( autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
                     autoPrecond = m;
@@ -486,9 +486,9 @@ void Simul::solve_auto()
             {
                 char str[256], *ptr = str;
                 char*const end = str+sizeof(str);
-                ptr += snprintf(ptr, end-ptr, " precond selection %lu | method cnt cpu", N_TEST);
-                for ( size_t u = 0; u < N_METHODS; ++u )
-                    ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, (real)autoCNT[u]/N_TEST, autoCPU[u]/N_TEST);
+                ptr += snprintf(ptr, end-ptr, " precond selection %lu | method cnt cpu", N_TESTS);
+                for ( size_t u : { 0, 1, 2, 4 } )
+                    ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, (real)autoCNT[u]/N_TESTS, autoCPU[u]/N_TESTS);
                 ptr += snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
                 Cytosim::log << str << std::endl;
                 if ( prop->verbose )
@@ -502,8 +502,8 @@ void Simul::solve_auto()
         }
         else
         {
-            //alternate betwen methods { 0, 1, 2, 3, 4 }
-            autoPrecond = ( 1 + autoPrecond ) % N_METHODS;
+            //alternate betwen { 0, 1, 2, 4 }
+            autoPrecond = ( 1 + autoPrecond + (autoPrecond==2) ) % 5;
         }
     }
     else
