@@ -297,13 +297,10 @@ namespace sMath
 #ifdef WIN32
     
     //this is needed under windows:
-    inline real remainder( const real a, const real b )
+    inline real remainder(const real a, const real b)
     {
-        int p = (int)floor( 0.5 + a / b );
-        if ( p )
-            return a - p * b;
-        else
-            return a;
+        real p = floor( 0.5 + a / b );
+        return a - p * b;
     }
     
     inline real round(real x)
