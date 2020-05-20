@@ -515,35 +515,20 @@ void glApp::processNormalKey(unsigned char c, int, int)
         } break;
 #endif
         //------------------------- Zoom in and out:
-        
-        case '/':
-            if ( glutGetModifiers() & GLUT_ACTIVE_SHIFT )
-                view.zoom_out(1.071773463);
+            
+        case '-':
+            if ( glutGetModifiers() & GLUT_ACTIVE_ALT )
+                view.zoom_out(1.071773463f);
             else
                 view.zoom_out(1.4142135623f);
             break;
         
-        case '*':
-            if ( glutGetModifiers() & GLUT_ACTIVE_SHIFT )
-                view.zoom_in(1.071773463f);
+        case '=':
+        case '+':
+            if ( glutGetModifiers() & GLUT_ACTIVE_ALT )
+                view.zoom_in(1.071773463);
             else
                 view.zoom_in(1.4142135623f);
-            break;
-     
-        case '-':
-            view.zoom_out(1.4142135623f);
-            break;
-        
-        case '=':
-            view.zoom_in(1.4142135623f);
-            break;
-            
-        case '_':
-            view.zoom_out(1.071773463f);
-            break;
-        
-        case '+':
-            view.zoom_in(1.071773463);
             break;
 
         default:
