@@ -85,7 +85,7 @@ void PlayerProp::write_values(std::ostream& os) const
 
 void PlayerProp::toggleReport(bool alt)
 {
-    report_index = ( report_index + 1 ) % 7;
+    report_index = ( report_index + 1 ) % 8;
     
     if ( alt )
     {
@@ -93,11 +93,12 @@ void PlayerProp::toggleReport(bool alt)
         {
             case 0: report = "";                   break;
             case 1: report = "inventory";          break;
-            case 2: report = "platelet";           break;
-            case 3: report = "fiber:mesh;field";   break;
-            case 4: report = "fiber:segment";      break;
-            case 5: report = "fiber:cluster";      break;
-            case 6: report = "fiber:age";          break;
+            case 2: report = "system";             break;
+            case 3: report = "fiber:energy";       break;
+            case 4: report = "fiber:mesh;field";   break;
+            case 5: report = "fiber:segment";      break;
+            case 6: report = "fiber:cluster";      break;
+            case 7: report = "fiber:age";          break;
         }
     }
     else
@@ -111,6 +112,7 @@ void PlayerProp::toggleReport(bool alt)
             case 4: report = "couple";             break;
             case 5: report = "couple:configuration"; break;
             case 6: report = "fiber:distribution"; break;
+            case 7: report = "platelet";           break;
         }
     }
 }
