@@ -1648,8 +1648,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             if ( precond )
             {
                 // try with different method
-                LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    GMRES: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+                computePreconditionner(4, 0);
+                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+                //LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
+                Cytosim::out("    BCGSP (precond=4): count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {

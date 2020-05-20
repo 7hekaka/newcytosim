@@ -167,7 +167,7 @@ private:
     LinearSolvers::Allocator temporary;
     
     /// Matrices used for GMRES
-    LinearSolvers::Matrix mH, mV;
+    //LinearSolvers::Matrix mH, mV;
 
 private:
 #if USE_ISO_MATRIX    
