@@ -129,13 +129,6 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
 {
     assert_true( sit.attached() );
     
-    /*
-     Check that the two binding keys match, allowing binding 
-     according to the BITWISE AND of the two keys:
-     */
-    if ( ! ( prop->binding_key & sit.fiber()->prop->binding_key ) )
-        return false;
-    
 #if NEW_BINDING_LIMITS
     if ( sit.abscissa() < prop->binding_limits[0] )
         return false;

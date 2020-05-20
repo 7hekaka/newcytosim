@@ -151,7 +151,8 @@ void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int 
     auto* grid = static_cast<PaintJob*>(arg)->grid;
     const auto& seg = static_cast<PaintJob*>(arg)->segment;
     //printf("paint %p in (%i to %i, %i, %i)\n", seg, x_inf, x_sup, y, z);
-    
+    //std::clog << " paint " << seg << " over ("<< x_inf << " " << x_sup << "; " << y << "; " << z << ")\n";
+
     # pragma ivdep
     for ( int x = x_inf; x <= x_sup; ++x )
     {
@@ -213,7 +214,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
     
     for ( const Fiber * fib = first; fib != last ; fib=fib->next() )
     {
-        // do not paint fibers on which binding is disabled:
+        // skip any Fiber on which binding is disabled:
         if ( 0 == fib->prop->binding_key )
             continue;
         PaintJob job;
@@ -239,7 +240,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
         }
     }
     
-    //Cytosim::log("distributed %lu segments over %lu cells\n", nbTargets(), nbCells());
+    //Cytosim::log("FiberGrid distributed %lu segments over %lu cells\n", nbTargets(), nbCells());
 }
 
 
@@ -292,11 +293,13 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     HeavySegmentList targets(8, 8);
 
     // calculate distance to all targets
+    const real sup = ha.prop->binding_range_sqr;
     for ( FiberSegment const& seg : segments )
     {
         real dis_ = INFINITY;
         real abs_ = seg.projectPoint(place, dis_);
-        if ( dis_ < ha.prop->binding_range_sqr )
+        //std::clog << " target " << seg << " at " << dis_ << "\n";
+        if ( dis_ < sup )
             targets.emplace_back(seg, dis_, abs_);
     }
     
@@ -306,7 +309,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     else if ( targets.empty() )
         return;
     
-    std::clog << "tryToAttachClosest has " << targets.size() << " targets / " << segments.size() << "\n";
+    //std::clog << "tryToAttachClosest has " << targets.size() << " targets / " << segments.size() << "\n";
 
     /**
      Instead of flipping a coin for each target, we could use a single random
@@ -321,7 +324,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             FiberSegment const& seg = target.seg_;
             Fiber * fib = const_cast<Fiber*>(seg.fiber());
             FiberSite pos(fib, seg.abscissa1()+target.abs_);
-            if ( ha.attachmentAllowed(pos) )
+            if ( ha.keyMatch(fib) &&  ha.attachmentAllowed(pos) )
             {
                 ha.attach(pos);
                 return;
@@ -350,6 +353,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     
     //std::clog << "tryToAttach has " << segments.size() << " targets\n";
 
+    const real sup = ha.prop->binding_range_sqr;
     for ( FiberSegment const& seg : segments )
     {
 #if !TRICKY_HAND_ATTACHMENT
@@ -367,12 +371,12 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
              Compare to the maximum attachment range of the hand,
              and compare a newly tossed random number with 'prob'
              */
-            if ( dis < ha.prop->binding_range_sqr )
+            if ( dis < sup )
             {
                 Fiber * fib = const_cast<Fiber*>(seg.fiber());
                 FiberSite pos(fib, seg.abscissa1()+abs);
                 
-                if ( ha.attachmentAllowed(pos) )
+                if ( ha.keyMatch(fib) &&  ha.attachmentAllowed(pos) )
                 {
                     ha.attach(pos);
                     return;

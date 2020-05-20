@@ -504,7 +504,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
         Single * s = can.back();
         Hand const* h = s->hand();
         
-        if ( h->attachmentAllowed(i) )
+        if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             Vector pos = i.pos();
             Space const* spc = i.fiber()->prop->confine_space_ptr;

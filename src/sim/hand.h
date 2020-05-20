@@ -123,6 +123,12 @@ public:
     /// bind at position `a` on Fiber `f`
     void         locate(Fiber* f, real a);
 
+    // Check that binding can occur on Fiber, from BITWISE AND of the binding keys
+    bool         keyMatch(Fiber const* fib) const
+    {
+        return prop->binding_key & fib->prop->binding_key;
+    }
+
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;
     

@@ -654,10 +654,11 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& can)
     for ( FiberSite & i : loc )
     {
         Couple * c = can.back();
-        if ( c->hand1()->attachmentAllowed(i) )
+        Hand * h = c->hand1();
+        if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             can.pop_back();
-            c->attach1(i);
+            h->attach(i);
             link(c);
         }
     }
@@ -680,10 +681,11 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
     for ( FiberSite & i : loc )
     {
         Couple * c = can.back();
-        if ( c->hand2()->attachmentAllowed(i) )
+        Hand * h = c->hand2();
+        if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             can.pop_back();
-            c->attach2(i);
+            h->attach(i);
             link(c);
         }
     }
