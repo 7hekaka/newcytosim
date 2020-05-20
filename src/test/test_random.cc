@@ -150,7 +150,7 @@ void test_RNG(const size_t MAX)
 }
 
 
-void test_float()
+void test_real()
 {
     for (int j=0; j<8; ++j)
     {
@@ -160,48 +160,52 @@ void test_float()
     }
 
     printf("\n");
-    
     for (int j=0; j<8; ++j)
     {
         for (int k=0; k<8; ++k)
             printf(" %10f", RNG.preal());
         printf("\n");
     }
-
+    
     printf("\n");
+    for (int j=0; j<8; ++j)
+    {
+        for (int k=0; k<8; ++k)
+            printf(" %10f", RNG.shalf());
+        printf("\n");
+    }
 
-    printf("pfloat:     ");
+    printf("\npfloat:     ");
     float x;
     for ( int kk=0; kk < 10; ++kk )
     {
         x = RNG.pfloat();
         printf(" %+f", x);
     }
-    printf("\n");
-    printf("sfloat:     ");
+
+    printf("\nsfloat:     ");
     for ( int kk=0; kk < 10; ++kk )
     {
         x = RNG.sfloat();
         printf(" %+f", x);
     }
-    printf("\n");
     
     double d;
-    printf("pdouble:    ");
+    printf("\npdouble:    ");
     for ( int kk=0; kk < 10; ++kk )
     {
         d = RNG.pdouble();
         printf(" %+f", d);
     }
-    printf("\n");
-    printf("sdouble:    ");
+
+    printf("\nsdouble:    ");
     for ( int kk=0; kk < 10; ++kk )
     {
         d = RNG.sdouble();
         printf(" %+f", d);
     }
-    printf("\n");
-    printf("sflip:      ");
+
+    printf("\nsflip:      ");
     for ( int kk=0; kk < 10; ++kk )
     {
         d = RNG.sflip();
@@ -566,13 +570,16 @@ void test_gaussian(int cnt)
 //==========================================================================
 int main(int argc, char* argv[])
 {
+    int mode = 4;
     RNG.seed();
 
-    real rate = 0;
     if ( argc > 1 )
-        rate = strtod(argv[1], 0);
+        mode = atoi(argv[1]);
+    real rate = 1;
+    if ( argc > 2 )
+        rate = strtod(argv[2], 0);
 
-    switch ( 4 )
+    switch ( mode )
     {
         case 0:
             test_poisson(1024);
@@ -597,7 +604,7 @@ int main(int argc, char* argv[])
         case 4:
             printf("sizeof(uint32_t) = %lu\n", sizeof(uint32_t));
             test_int();
-            test_float();
+            test_real();
             break;
             
         case 5:

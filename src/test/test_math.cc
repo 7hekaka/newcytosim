@@ -55,6 +55,21 @@ void modulo()
     out << '\n';
 }
 
+void divide()
+{
+    std::div_t dv;
+    
+    out << "   x    div.quot div.rem";
+    for ( int x = -6; x <= 6; x += 1 )
+    {
+        dv = std::div(x, 3);
+        out << "\n" << std::setw(5) << x;
+        out << "  " << std::setw(5) << dv.quot;
+        out << "  " << std::setw(5) << dv.rem;
+    }
+    out << '\n';
+}
+
 void infinities()
 {
     out << "0   < inf = " << ( 0 < INFINITY ) << '\n';
@@ -116,6 +131,8 @@ int main()
         out << "Could not register SIGFPE handler\n";
         return EXIT_FAILURE;
     }
+    divide();
+    modulo();
     std_copysign();
     infinities();
     print_numbers();
