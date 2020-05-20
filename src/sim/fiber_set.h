@@ -123,7 +123,7 @@ public:
     static void  infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& dev, real& mn, real& mx);
 
     /// calculate: number of fibers, number of joints and number of kinks
-    static void  infoSegments(ObjectList const&, size_t& cnt, size_t& joints, real&, real&);
+    static void  infoSegments(ObjectList const&, size_t& cnt, size_t& points, real&, real&);
     
     /// calculate: number of fibers, number of joints and number of kinks
     static size_t nbKinks(ObjectList const&);

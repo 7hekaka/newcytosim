@@ -733,8 +733,8 @@ void FiberSet::infoLength(ObjectList const& objs,
             real x = fib->length();
             avg += x;
             dev += x * x;
-            if ( x < mn ) mn = x;
-            if ( x > mx ) mx = x;
+            mn = std::min(mn, x);
+            mx = std::max(mx, x);
         }
     }
     
@@ -769,8 +769,8 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
             real x = fib->birthTime();
             avg += x;
             dev += x * x;
-            if ( x < mn ) mn = x;
-            if ( x > mx ) mx = x;
+            mn = std::min(mn, x);
+            mx = std::max(mx, x);
         }
     }
     
@@ -788,10 +788,10 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
 
 
 void FiberSet::infoSegments(ObjectList const& objs,
-                            size_t& cnt, size_t& joints, real& mn, real& mx)
+                            size_t& cnt, size_t& points, real& mn, real& mx)
 {
     cnt = 0;
-    joints = 0;
+    points = 0;
     mn = INFINITY;
     mx = 0;
     
@@ -802,12 +802,10 @@ void FiberSet::infoSegments(ObjectList const& objs,
         {
             ++cnt;
             real n, x;
-            joints += fib->nbPoints() - 2;
+            points += fib->nbPoints();
             fib->segmentationMinMax(n, x);
-            if ( n < mn )
-                mn = n;
-            if ( x > mx )
-                mx = x;
+            mn = std::min(mn, n);
+            mx = std::max(mx, x);
         }
     }
 }
@@ -1112,13 +1110,11 @@ void FiberSet::infoPlane(int& np, int& na, Vector const& n, real a) const
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
         {
             real abs = fib->planarIntersect(s, n, a);
-            if ( 0 <= abs  &&  abs < 1 )
+            if (( 0 <= abs ) & ( abs < 1 ))
             {
                 real sec = dot(n, fib->dirSegment(s));
-                if ( sec > 0 )
-                    ++np;
-                else if ( sec < 0 )
-                    ++na;
+                np += ( sec > 0 );
+                na += ( sec < 0 );
             }
         }
     }

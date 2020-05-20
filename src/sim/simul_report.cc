@@ -346,6 +346,10 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
             return reportInventory(out);
         throw InvalidSyntax("I only know `inventory'");
     }
+    if ( who == "system" )
+    {
+        return reportSystem(out);
+    }
     if ( who == "property" || who == "parameter" )
     {
         if ( what.empty() )
@@ -451,9 +455,13 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
 {
     const size_t BMAX = 256;
     unsigned cnt[BMAX+1];
-    
-    real delta = 1;
-    size_t nbin = 32;
+
+    real sup = 0;
+    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
+        sup = std::max(sup, obj->length());
+
+    real delta = ( sup > 2 ) ? 1 : 0.1;
+    size_t nbin = std::ceil(sup/delta);
     opt.set(delta, "interval");
     opt.set(nbin, "interval", 1);
     nbin = std::min(nbin, BMAX);
@@ -537,21 +545,21 @@ void Simul::reportFiberDynamic(std::ostream& out) const
 
 void Simul::reportFiberSegments(std::ostream& out) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "nb_fibers" << SEP << "nb_joints";
-    out << SEP << "nb_kinks" << SEP << "min_seg" << SEP << "max_seg";
+    out << COM << ljust("class", 2, 2) << SEP << "fibers" << SEP << "joints";
+    out << SEP << "kinks" << SEP << "min_seg" << SEP << "max_seg";
     
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         
-        size_t cnt, joints;
+        size_t cnt, points;
         real mn = 0, mx = 0;
         
         ObjectList objs = fibers.collect(fp);
-        fibers.infoSegments(objs, cnt, joints, mn, mx);
+        fibers.infoSegments(objs, cnt, points, mn, mx);
         out << LIN << ljust(fp->name(), 2);
         out << SEP << cnt;
-        out << SEP << joints;
+        out << SEP << points - 2 * cnt;
         out << SEP << fibers.nbKinks(objs);
         out << SEP << std::fixed << mn;
         out << SEP << std::fixed << mx;
@@ -1051,7 +1059,7 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportFiberBendingEnergy(std::ostream& out) const
 {
-    out << COM << ljust("class",2,2) << SEP << "count" << SEP << "sum" << SEP << "avg" << SEP << "dev";
+    out << COM << ljust("bending_energy",2,2) << SEP << "count" << SEP << "sum" << SEP << "avg" << SEP << "dev";
     
     size_t cnt;
     real avg, dev;
@@ -1065,9 +1073,9 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
         {
             out << LIN << ljust(fp->name(), 2);
             out << SEP << cnt;
-            out << SEP << avg*cnt;
-            out << SEP << avg;
-            out << SEP << dev;
+            out << SEP << std::setprecision(3) << avg*cnt;
+            out << SEP << std::setprecision(3) << avg;
+            out << SEP << std::setprecision(3) << dev;
         }
     }
 }
@@ -1465,6 +1473,36 @@ void Simul::reportInventory(std::ostream& out) const
     events.report(out);
 }
 
+template < typename SET >
+void reportSystemSet(std::ostream& out, SET& set, PropertyList const& properties)
+{
+    size_t points = 0;
+    for ( Property const* i : properties.find_all(set.title()) )
+    {
+        ObjectList objs = set.collect(match_property, i);
+        for ( Object * o : objs )
+        {
+            Mecable * mec = Simul::toMecable(o);
+            if ( mec )
+                points += mec->nbPoints();
+        }
+        if ( points > 0 )
+        {
+            out << LIN << ljust(i->name(), 2);
+            out << SEP << objs.size();
+            out << SEP << points;
+        }
+    }
+}
+
+void Simul::reportSystem(std::ostream& out) const
+{
+    out << COM << ljust("class", 2) << SEP << "count" << SEP << "vertices";
+    reportSystemSet(out,  fibers, properties);
+    reportSystemSet(out,  solids, properties);
+    reportSystemSet(out, spheres, properties);
+    reportSystemSet(out,   beads, properties);
+}
 
 /**
  Export position of all organizers
@@ -2009,7 +2047,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, std::string const& whic
     }
     size_t sum = T[0]+T[1]+T[2]+T[3]+T[4]+T[5];
     
-    out << COM << "total" << SEP << "P" << SEP << "A" << SEP << "X" << SEP << "T" << SEP << "V";
+    out << COM << "couples" << SEP << "P" << SEP << "A" << SEP << "X" << SEP << "T" << SEP << "V";
     out << LIN << sum << SEP << T[0] << SEP << T[1] << SEP << T[2] << SEP << T[3] << SEP << T[4];
  }
 

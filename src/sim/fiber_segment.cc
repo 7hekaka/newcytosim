@@ -287,8 +287,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
 void FiberSegment::print(std::ostream& os) const
 {
     if ( fiber() )
-        //os << "(" << fiber()->reference() << " seg " << point() << ":" << point()+1 << ")";
-        os << "(f" << fiber()->identity() << " " << point() << ":" << point()+1 << ")";
+        os << "(" << fiber()->reference() << " " << std::setw(3) << point() << ":)";
     else
         os << "(null)";
 }
