@@ -217,12 +217,15 @@ private:
     
     /// add block 'T' to mC at position (i, j)
     void add_block(size_t i, size_t j, MatrixBlock const& T);
-    
-    /// subtract block 'T' to mC at position (i, j)
-    void sub_block(size_t i, size_t j, MatrixBlock const& T);
  
     /// add block 'alpha*T' to mC at position (i, j)
     void add_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
+    
+    /// subtract block 'T' to mC at position (i, j)
+    void sub_block(size_t i, size_t j, MatrixBlock const& T);
+
+    /// subtract block 'alpha*T' to mC at position (i, j)
+    void sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
 
     /// add block 'T' to mC at position (i, i)
     void add_block_diag(size_t i, MatrixBlock const& T);
