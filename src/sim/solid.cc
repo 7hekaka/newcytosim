@@ -476,11 +476,11 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         
         // get index of point A
         opt.set(str, var, 0);
-        a = Mecable::point_index(str, nbPoints());
+        a = point_index(str);
 
         // get index of point B
         opt.set(str, var, 1);
-        b = Mecable::point_index(str, nbPoints());
+        b = point_index(str);
 
         // get coefficient
         opt.set(c, var, 2);

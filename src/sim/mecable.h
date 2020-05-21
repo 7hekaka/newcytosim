@@ -373,8 +373,8 @@ public:
     /// Human friendly ouput
     void            print(std::ostream&, real const*) const;
     
-    /// return index encoded in `str`
-    static size_t   point_index(std::string const& str, size_t max);
+    /// return (validated) index encoded in `str`
+    size_t          point_index(std::string const& str) const;
 
 };
 

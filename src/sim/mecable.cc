@@ -380,15 +380,16 @@ std::ostream& operator << (std::ostream& os, Mecable const& arg)
 }
 
 
-size_t Mecable::point_index(std::string const& str, size_t X)
+size_t Mecable::point_index(std::string const& str) const
 {
+    const size_t sup = nbPoints();
     if ( str.size() > 5  &&  str.compare(0,5,"point") == 0 )
     {
         errno = 0;
         unsigned long i = strtoul(str.c_str()+5, nullptr, 10);
         if ( errno ) throw InvalidParameter("a point index must be specified, eg. `point1`");
         if ( i < 1 ) throw InvalidParameter("a point index must must be >= 1");
-        if ( i > X ) throw InvalidParameter("point index is out of range");
+        if ( i > sup ) throw InvalidParameter("point index is out of range");
         return i - 1;
     }
     throw InvalidParameter("expected a point specification eg. `point1'");

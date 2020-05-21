@@ -148,7 +148,7 @@ ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
         // get index of point in second argument
         size_t ip = 0;
         if ( opt.set(str, "base", 1) )
-            ip = Mecable::point_index(str, mec->nbPoints());
+            ip = mec->point_index(str);
          
         obj = p->newWrist(mec, ip);
     }
