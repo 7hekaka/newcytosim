@@ -618,6 +618,17 @@ public:
 #endif
     }
 
+    /// subtract full matrix: this <- this - alpha * M
+    void sub_full(const real alpha, Matrix22 const& M)
+    {
+#if MATRIX22_USES_AVX
+        mat = fnmadd4(set4(alpha), M.mat, mat);
+#else
+        for ( index u = 0; u < 4; ++u )
+            val[u] -= alpha * M.val[u];
+#endif
+    }
+
     /// subtract transposed matrix: this <- this - transposed(M)
     void sub_trans(Matrix22 const& M)
     {

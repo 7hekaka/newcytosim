@@ -671,6 +671,21 @@ public:
             val[u] -= src[u];
 #endif
     }
+    
+    /// subtract full matrix: this <- this - alpha * M
+    void sub_full(const real alpha, Matrix34 const& M)
+    {
+        real const* src = M.val;
+#if MATRIX34_USES_AVX
+        vec4 a = set4(alpha);
+        store4(val  , fnmadd4(a, load4(src  ), load4(val  )));
+        store4(val+4, fnmadd4(a, load4(src+4), load4(val+4)));
+        store4(val+8, fnmadd4(a, load4(src+8), load4(val+8)));
+#else
+        for ( index u = 0; u < 12; ++u )
+            val[u] -= alpha * src[u];
+#endif
+    }
 
     /// subtract transposed matrix: this <- this - transposed(M)
     void sub_trans(Matrix34 const& M)

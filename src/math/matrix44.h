@@ -527,6 +527,14 @@ public:
         for ( index u = 0; u < 16; ++u )
             val[u] -= src[u];
     }
+    
+    /// subtract full matrix: this <- this - alpha * M
+    void sub_full(const real alpha, Matrix44 const& M)
+    {
+        real const* src = M.val;
+        for ( index u = 0; u < 16; ++u )
+            val[u] -= alpha * src[u];
+    }
 
     /// add lower triangle of matrix including diagonal: this <- this + M
     void add_half(Matrix44 const& M)
