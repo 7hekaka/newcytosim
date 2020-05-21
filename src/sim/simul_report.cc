@@ -1476,28 +1476,31 @@ void Simul::reportInventory(std::ostream& out) const
 template < typename SET >
 void reportSystemSet(std::ostream& out, SET& set, PropertyList const& properties)
 {
-    size_t points = 0;
     for ( Property const* i : properties.find_all(set.title()) )
     {
+        size_t points = 0, sup = 0;
         ObjectList objs = set.collect(match_property, i);
         for ( Object * o : objs )
         {
             Mecable * mec = Simul::toMecable(o);
             if ( mec )
+            {
                 points += mec->nbPoints();
+                sup = std::max(sup, mec->nbPoints());
+            }
         }
         if ( points > 0 )
         {
             out << LIN << ljust(i->name(), 2);
             out << SEP << objs.size();
-            out << SEP << points;
+            out << SEP << points << SEP << sup;
         }
     }
 }
 
 void Simul::reportSystem(std::ostream& out) const
 {
-    out << COM << ljust("class", 2) << SEP << "count" << SEP << "vertices";
+    out << COM << ljust("class", 2) << SEP << "count" << SEP << "vertices" << SEP << "largest";
     reportSystemSet(out,  fibers, properties);
     reportSystemSet(out,  solids, properties);
     reportSystemSet(out, spheres, properties);
