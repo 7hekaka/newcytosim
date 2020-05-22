@@ -51,6 +51,18 @@ Wrist::~Wrist()
 }
 
 
+Vector Wrist::stretch() const
+{
+    assert_true( sHand->attached() );
+    Vector d = posFoot() - sHand->pos();
+    
+    if ( modulo )
+        modulo->fold(d);
+    
+    return d;
+}
+
+
 Vector Wrist::force() const
 {
     assert_true( sHand->attached() );

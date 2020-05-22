@@ -100,7 +100,6 @@ void Simul::report1(std::ostream& out, std::string arg, Glossary& opt) const
     catch( Exception & e )
     {
         out << e.brief() << '\n';
-        throw;
     }
 }
 
@@ -157,13 +156,15 @@ void Simul::report1(std::ostream& out, std::string arg, Glossary& opt) const
  `spindle:indice`        | Two scalar indices that caracterize the organization of fibers
  `spindle:profile`       | Number of right- and left-pointing fiber as a function of position
  `single:all`            | Position and force of singles
+ `single:force`          | Average and maximum force of singles
  `single:NAME`           | Position and force of singles of class NAME
  `single:position:NAME`  | Position and force of singles of class NAME
  `couple:state`          | Position and state of all couples
  `couple:NAME`           | Position and state of couples of class NAME
  `couple:link`           | detailed information on doubly-attached couples
  `couple:configuration`  | number of Couples in { X, P, A, V, T } states
- `couple:force`          | Histogram of tension in the couple links
+ `couple:force`          | Average and maximum of tension in the couple links
+ `couple:histogram`      | Histogram of tension in the couple links
  `couple:active`         | Position of active couples
  `couple:anatomy`        | Composition of couples
  `couple:NAME`           | Position of couples of class NAME
@@ -216,8 +217,8 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
             return reportFiberSegments(out);
         if ( what == "length" )
             return reportFiberLengths(out);
-        if ( what == "distribution" )
-            return reportFiberLengthDistribution(out, opt);
+        if ( what == "distribution" || what == "histogram" )
+            return reportFiberLengthHistogram(out, opt);
         if ( what == "tension" )
             return reportFiberTension(out, opt);
         if ( what == "energy" )
@@ -289,8 +290,10 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
             return reportSingle(out);
         if ( what == "link" )
             return reportSingleLink(out, which);
-        if ( what == "state" || what == "force" )
+        if ( what == "state" )
             return reportSingleState(out, which);
+        if ( what == "force" )
+            return reportSingleForce(out);
         if ( what == "position" )
             return reportSinglePosition(out, which);
         throw InvalidSyntax("I only know single: state, force, position, NAME");
@@ -310,7 +313,9 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
         if ( what == "configuration" )
             return reportCoupleConfiguration(out, which, opt);
         if ( what == "force" )
-            return reportCoupleForce(out, opt);
+            return reportCoupleForce(out);
+        if ( what == "histogram" )
+            return reportCoupleForceHistogram(out, opt);
         if ( what == "active" )
             return reportCoupleActive(out, which);
         if ( what == "anatomy" )
@@ -451,7 +456,7 @@ void Simul::reportFiberLengths(std::ostream& out) const
 /**
  Export average length and standard-deviation for each class of fiber
  */
-void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) const
+void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 {
     const size_t BMAX = 256;
     unsigned cnt[BMAX+1];
@@ -471,7 +476,7 @@ void Simul::reportFiberLengthDistribution(std::ostream& out, Glossary & opt) con
 
     if ( 1 )
     {
-        out << COM << "length_distribution (`scale` indicates the center of each bin)";
+        out << COM << "length_histogram (`scale` indicates the center of each bin)";
         out << LIN << ljust("scale", 2);
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
@@ -1569,9 +1574,9 @@ void Simul::reportBeadSingles(std::ostream& out) const
     
     std::map<ObjectID, int> cnt;
     
-    for ( Single const* sig=singles.firstA(); sig; sig=sig->next() )
+    for ( Single const* i=singles.firstA(); i; i=i->next() )
     {
-        Bead const* obj = Bead::toBead(sig->base());
+        Bead const* obj = Bead::toBead(i->base());
         if ( obj )
             ++cnt[ obj->identity() ];
     }
@@ -1824,20 +1829,20 @@ void Simul::reportSingle(std::ostream& out) const
     
     int free[mx] = { 0 }, bound[mx] = { 0 };
     
-    for ( Single const* si = singles.firstF(); si ; si = si->next() )
+    for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
         assert_true(!si->attached());
-        size_t ix = si->prop->number();
-        if ( ix < mx )
-            ++free[ix];
+        size_t x = i->prop->number();
+        if ( x < mx )
+            ++free[x];
     }
     
-    for ( Single const* sig=singles.firstA(); sig ; sig=sig->next() )
+    for ( Single const* i=singles.firstA(); i ; i=i->next() )
     {
-        assert_true(sig->attached());
-        size_t ix = sig->prop->number();
-        if ( ix < mx )
-            ++bound[ix];
+        assert_true(i->attached());
+        size_t x = i->prop->number();
+        if ( x < mx )
+            ++bound[x];
     }
     
     if ( 1 )
@@ -1860,6 +1865,46 @@ void Simul::reportSingle(std::ostream& out) const
         }
         else
             out << SEP << " out-of-range ";
+    }
+}
+
+
+/**
+ Export average properties of Couples forces
+ */
+void Simul::reportSingleForce(std::ostream& out) const
+{
+    const size_t MAX = 8;
+    real cnt[MAX+1] = { 0 };
+    real avg[MAX+1] = { 0 };
+    real sup[MAX+1] = { 0 };
+    real len[MAX+1] = { 0 };
+
+    // accumulate counts:
+    for ( Single const* i=singles.firstA(); i; i=i->next() )
+    {
+        if ( i->hasForce() )
+        {
+            size_t x = std::min(MAX, i->prop->number());
+            real f = i->force().norm();
+            avg[x] += f;
+            cnt[x] += 1;
+            sup[x] = std::max(sup[x], f);
+            len[x] = std::max(len[x], i->stretch().norm());
+        }
+    }
+        
+    out << COM << ljust("class", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_length";
+    for ( size_t i = 0; i < MAX; ++i )
+    {
+        if ( cnt[i] > 0 )
+        {
+            Property const* p = properties.find_or_die("single", i);
+            out << LIN << ljust(p->name(), 2);
+            out << SEP << avg[i] / cnt[i];
+            out << SEP << sup[i];
+            out << SEP << len[i];
+        }
     }
 }
 
@@ -2055,10 +2100,49 @@ void Simul::reportCoupleConfiguration(std::ostream& out, std::string const& whic
  }
 
 
+
+/**
+ Export average properties of Couples forces
+ */
+void Simul::reportCoupleForce(std::ostream& out) const
+{
+    const size_t MAX = 8;
+    real cnt[MAX+1] = { 0 };
+    real avg[MAX+1] = { 0 };
+    real sup[MAX+1] = { 0 };
+    real len[MAX+1] = { 0 };
+
+    // accumulate counts:
+    for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
+    {
+        size_t x = std::min(MAX, i->prop->number());
+        real f = i->force().norm();
+        avg[x] += f;
+        cnt[x] += 1;
+        sup[x] = std::max(sup[x], f);
+        len[x] = std::max(len[x], i->stretch().norm());
+    }
+        
+    out << COM << ljust("class", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_length";
+
+    for ( size_t i = 0; i < MAX; ++i )
+    {
+        if ( cnt[i] > 0 )
+        {
+            Property const* p = properties.find_or_die("couple", i);
+            out << LIN << ljust(p->name(), 2);
+            out << SEP << avg[i] / cnt[i];
+            out << SEP << sup[i];
+            out << SEP << len[i];
+        }
+    }
+}
+
+
 /**
  Export histogram of Couples forces
  */
-void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
+void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
 {
     const size_t IMAX = 8;
     const size_t BMAX = 256;
@@ -2104,8 +2188,8 @@ void Simul::reportCoupleForce(std::ostream& out, Glossary& opt) const
             sum += cnt[ii][jj];
         if ( sum )
         {
-            Property const* ip = properties.find_or_die("couple", ii);
-            out << LIN << ljust(ip->name(), 2);
+            Property const* p = properties.find_or_die("couple", ii);
+            out << LIN << ljust(p->name(), 2);
             for ( size_t jj = 0; jj <= nbin; ++jj )
                 out << ' ' << std::setw(5) << cnt[ii][jj];
         }

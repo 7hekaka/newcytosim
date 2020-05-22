@@ -41,6 +41,9 @@ public:
     
     /// true if Single creates an interaction
     bool    hasForce() const { return true; }
+    
+    /// stretch of the link = ( posFoot() - posHand() )
+    Vector  stretch() const;
 
     /// tension in the link = stiffness * ( posFoot() - posHand() )
     Vector  force() const;

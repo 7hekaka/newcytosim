@@ -238,7 +238,8 @@ void HandProp::complete(Simul const& sim)
     binding_range_sqr = square(binding_range);
     binding_prob = -std::expm1(-binding_rate * sim.time_step());
     unbinding_rate_dt = unbinding_rate * sim.time_step();
-    
+    std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
+
     binding_rate_dt_8 = 8 * binding_rate * sim.time_step();
     
     if ( binding_range < 0 )

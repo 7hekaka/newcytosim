@@ -143,6 +143,9 @@ public:
     /// return one of the Hand that is attached, or zero if both are detached
     Hand *         attachedHand()         const;
     
+    /// offset between hands, essentially: ( cHand2->posHand() - cHand1->posHand() )
+    Vector         stretch()              const;
+
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
     virtual Vector force()                const;
      

@@ -408,7 +408,7 @@ public:
     void      reportFiberLengths(std::ostream&) const;
     
     /// print length distribution for each class of fiber
-    void      reportFiberLengthDistribution(std::ostream&, Glossary&) const;
+    void      reportFiberLengthHistogram(std::ostream&, Glossary&) const;
 
     /// print number of kinks in each class of Fiber
     void      reportFiberSegments(std::ostream&) const;
@@ -504,9 +504,12 @@ public:
     /// print configurations of doubly-attached Couples
     void      reportCoupleConfiguration(std::ostream&, std::string const&, Glossary&) const;
 
-    /// print position and forces of Couples of a certain kind
-    void      reportCoupleForce(std::ostream&, Glossary&) const;
+    /// print agregate properties of Couple force
+    void      reportCoupleForce(std::ostream&) const;
     
+    /// print histogram of Couples force
+    void      reportCoupleForceHistogram(std::ostream&, Glossary&) const;
+
     /// print state of Singles
     void      reportSingle(std::ostream&) const;
     
@@ -518,6 +521,9 @@ public:
    
     /// print force of attached Singles
     void      reportSingleLink(std::ostream&, std::string const&) const;
+    
+    /// print agregate properties of Singles force
+    void      reportSingleForce(std::ostream&) const;
 
     /// print state of Couples 
     void      reportSpherePosition(std::ostream&) const;

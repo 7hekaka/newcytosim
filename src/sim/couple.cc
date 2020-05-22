@@ -436,6 +436,18 @@ void Couple::randomizePosition()
 //------------------------------------------------------------------------------
 #pragma mark -
 
+Vector Couple::stretch() const
+{
+    Vector d = cHand2->pos() - cHand1->pos();
+    
+    //correct for periodic space:
+    if ( modulo )
+        modulo->fold(d);
+    
+    return d;
+}
+
+
 Vector Couple::force() const
 {
     Vector d = cHand2->pos() - cHand1->pos();

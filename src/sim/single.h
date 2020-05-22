@@ -147,6 +147,9 @@ public:
     
     /// true if Single creates an interaction
     virtual bool    hasForce()    const { return false; }
+    
+    /// stretch = ( position_anchor - position_hand ), or zero for a diffusible Single
+    virtual Vector  stretch()     const { return Vector(0,0,0); }
 
     /// force = stiffness * ( position_anchor - position_hand ), or zero for a diffusible Single
     virtual Vector  force()       const { return Vector(0,0,0); }

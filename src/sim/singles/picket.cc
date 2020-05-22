@@ -54,6 +54,20 @@ void Picket::stepA()
 /**
  This calculates the force corresponding to addPointClamp()
  */
+Vector Picket::stretch() const
+{
+    assert_true( sHand->attached() );
+    Vector d = sPos - posHand();
+    
+    if ( modulo )
+        modulo->fold(d);
+    
+    return d;
+}
+
+/**
+ This calculates the force corresponding to addPointClamp()
+ */
 Vector Picket::force() const
 {
     assert_true( sHand->attached() );
