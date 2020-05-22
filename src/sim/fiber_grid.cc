@@ -290,17 +290,20 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      get the list of segments associated with this cell in FiberGrid::paintGrid
      */
     SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
-    HeavySegmentList targets(8, 8);
+    HeavySegmentList targets(16, 16);
 
     // calculate distance to all targets
     const real sup = ha.prop->binding_range_sqr;
     for ( FiberSegment const& seg : segments )
     {
-        real dis_ = INFINITY;
-        real abs_ = seg.projectPoint(place, dis_);
-        //std::clog << " target " << seg << " at " << dis_ << "\n";
-        if ( dis_ < sup )
-            targets.emplace_back(seg, dis_, abs_);
+        if ( ha.keyMatch(seg.fiber()) )
+        {
+            real dis = INFINITY;
+            real abs = seg.projectPoint(place, dis);
+            //std::clog << " target " << seg << " at " << dis << "\n";
+            if ( dis < sup )
+                targets.emplace_back(seg, dis, abs);
+        }
     }
     
     // sort targets within range from close to distant:
@@ -309,8 +312,6 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     else if ( targets.empty() )
         return;
     
-    //std::clog << "tryToAttachClosest has " << targets.size() << " targets / " << segments.size() << "\n";
-
     /**
      Instead of flipping a coin for each target, we could use a single random
      number to get the index of the next target that will bind, using a Poisson
@@ -318,16 +319,117 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     const real prob = ha.prop->binding_prob;
     for ( HeavySegment const& target : targets )
     {
-        //printf("    trying segment F%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), seg.dis_);
+        //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
         if ( RNG.test(prob) )
         {
             FiberSegment const& seg = target.seg_;
             Fiber * fib = const_cast<Fiber*>(seg.fiber());
             FiberSite pos(fib, seg.abscissa1()+target.abs_);
-            if ( ha.keyMatch(fib) &&  ha.attachmentAllowed(pos) )
+            if ( ha.attachmentAllowed(pos) )
             {
                 ha.attach(pos);
                 return;
+            }
+        }
+    }
+}
+
+
+/**
+This version of tryToAttach() uses the Stack instead of the head to store targets
+ */
+void FiberGrid::tryToAttach1(Vector const& place, Hand& ha) const
+{
+    assert_true( hasGrid() );
+    /*
+     find the cell whose center is closest to the position, and
+     get the list of segments associated with this cell in FiberGrid::paintGrid
+     */
+    SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
+    
+    constexpr size_t MAX_TARGETS = 16;
+    HeavySegment targets[MAX_TARGETS];
+    size_t n_targets = 0;
+
+    HeavySegmentList more_targets(0, 16);
+
+    // calculate distance to all targets
+    const real sup = ha.prop->binding_range_sqr;
+    for ( FiberSegment const& seg : segments )
+    {
+        if ( ha.keyMatch(seg.fiber()) )
+        {
+            real dis = INFINITY;
+            real abs = seg.projectPoint(place, dis);
+            //std::clog << " target " << seg << " at " << dis << "\n";
+            if ( dis < sup )
+            {
+                if ( n_targets < MAX_TARGETS )
+                {
+                    targets[n_targets].seg_ = seg;
+                    targets[n_targets].dis_ = dis;
+                    targets[n_targets].abs_ = abs;
+                    ++n_targets;
+                }
+                else
+                {
+                    more_targets.emplace_back(seg, dis, abs);
+                }
+            }
+        }
+    }
+    
+    /**
+     Instead of flipping a coin for each target, we could use a single random
+     number to get the index of the next target that will bind, using a Poisson
+     distribution */
+    const real prob = ha.prop->binding_prob;
+
+    // sort targets within range from close to distant:
+    if ( more_targets.size() > 0 )
+    {
+        std::clog << "tryToAttachClosest has " << n_targets << " + " << more_targets.size() << " targets / " << segments.size() << "\n";
+        more_targets.allocate(more_targets.size()+MAX_TARGETS);
+        for ( size_t i = 0; i < n_targets; ++i )
+            more_targets.push_back(targets[i]);
+        n_targets = 0;
+        more_targets.sort(compareSegments);
+        
+        for ( HeavySegment const& target : more_targets )
+        {
+            //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
+            if ( RNG.test(prob) )
+            {
+                FiberSegment const& seg = target.seg_;
+                Fiber * fib = const_cast<Fiber*>(seg.fiber());
+                FiberSite pos(fib, seg.abscissa1()+target.abs_);
+                if ( ha.attachmentAllowed(pos) )
+                {
+                    ha.attach(pos);
+                    return;
+                }
+            }
+        }
+    }
+    else if ( n_targets > 1 )
+    {
+        std::qsort(targets, n_targets, sizeof(HeavySegment), compareSegments);
+        
+        for ( size_t i = 0; i < n_targets; ++i )
+        {
+            HeavySegment const& target = targets[i];
+            //FiberSegment const& seg = target.seg_;
+            //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
+            if ( RNG.test(prob) )
+            {
+                FiberSegment const& seg = target.seg_;
+                Fiber * fib = const_cast<Fiber*>(seg.fiber());
+                FiberSite pos(fib, seg.abscissa1()+target.abs_);
+                if ( ha.attachmentAllowed(pos) )
+                {
+                    ha.attach(pos);
+                    return;
+                }
             }
         }
     }
