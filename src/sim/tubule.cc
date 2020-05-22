@@ -124,7 +124,8 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         Fiber * fib = fp->newFiber();
         fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
-        fib->copyPoints(bone_->nbPoints(), bone_->addrPoints());
+        if ( bone_ )
+            fib->copyPoints(bone_->nbPoints(), bone_->addrPoints());
         Buddy::connect(fib);
         res.push_back(fib);
         fil_[i] = fib;
