@@ -12,7 +12,7 @@
 the full lower triangular is stored
  (not used in Cytosim)
  */
-class MatrixSymmetric
+class MatrixSymmetric final
 {
 private:
     
@@ -68,7 +68,7 @@ public:
     }
     
     /// default destructor
-    virtual ~MatrixSymmetric()  { deallocate(); }
+    ~MatrixSymmetric()  { deallocate(); }
     
     /// set to zero
     void reset();

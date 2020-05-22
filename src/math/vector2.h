@@ -26,7 +26,7 @@
  allowing easy conversion operators to and from C-array.
  Although this is not guaranteed by the C-standard, this is usually the case.
  */
-class Vector2
+class Vector2 final
 {
     
 public:

@@ -50,7 +50,7 @@ typedef Matrix44 SubBlock;
  
  FJN @ Cambridge, August-September 2019
  */
-class MatrixSparseBlock
+class MatrixSparseBlock final
 {
 public:
     
@@ -176,7 +176,7 @@ public:
     MatrixSparseBlock();
     
     /// default destructor
-    virtual ~MatrixSparseBlock()  { deallocate(); }
+    ~MatrixSparseBlock()  { deallocate(); }
     
     /// set to zero
     void reset();

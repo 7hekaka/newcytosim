@@ -17,7 +17,7 @@
  This is used to calculate the distance to this segment,
  the intersection of the segment with a plane.
 */
-class FiberSegment
+class FiberSegment final
 {
 private:
     

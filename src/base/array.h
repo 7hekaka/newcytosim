@@ -39,7 +39,7 @@
 
 /// Dynamically allocated array of VAL
 template <typename VAL>
-class Array
+class Array final
 {
 public:
 
@@ -115,9 +115,13 @@ public:
     /// set chunk size to `k` (do not allocate)
     Array(size_t a, size_t k) : nbo_(0)
     {
+        //printf("Array %p constructor size %i\n", this, alc_);
         chk_ = std::max(next_power(k), 4UL);
         alc_ = chunked(a);
-        val_ = new VAL[alc_];
+        if ( alc_ > 0 )
+            val_ = new VAL[alc_];
+        else
+            val_ = nullptr;
     }
     
     /// Copy constructor
@@ -133,7 +137,7 @@ public:
     }
 
     /// Destructor
-    virtual ~Array()
+    ~Array()
     {
         deallocate();
     }

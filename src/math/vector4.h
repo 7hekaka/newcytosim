@@ -30,7 +30,7 @@ class Vector3;
  allowing easy conversion operators to and from C-array.
  Although this is not guaranteed by the C-standard, this is usually the case.
  */
-class Vector4
+class Vector4 final
 {
     
 public:

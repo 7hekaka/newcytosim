@@ -13,6 +13,7 @@
 
 int main(int argc, char* argv[])
 {
+    print_sizeof(Array<int>);
     print_sizeof(Vector1);
     print_sizeof(Vector2);
     print_sizeof(Vector3);

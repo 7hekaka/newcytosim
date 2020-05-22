@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #include "matfull.h"
 #include "blas.h"
@@ -289,34 +289,6 @@ real MatrixFull::norm_inf() const
     return res;
 }
 
-/*
- char str[32] = { 0 }, zer[32] = { 0 }, fmt[32] = " %4.0f";
-  
-  { // build format strings:
-      snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
-      snprintf(zer, sizeof(zer), fmt, 0.0);
-      bool dot = false; char * d = zer;
-      for ( char * c = zer; *c; ++c )
-      {
-          if ( *c == '0' ) { *c = ' '; d = c; }
-          dot |= ( *c == '.' );
-      }
-      if ( !dot ) *d = '.';
-  }
-  
-  for ( size_t ii = 0; ii < m; ++ii )
-  {
-      for ( size_t jj = 0; jj < n; ++jj )
-      {
-          T val = mat[ii+ldd*jj];
-          if ( std::fabs(val) < threshold )
-              os << zer;
-          else
-          {
-              snprintf(str, sizeof(str), fmt, mat[ii+ldd*jj]);
-              os << str;
-
- */
 
 void MatrixFull::print(std::ostream& os, size_t imin, size_t imax, size_t jmin, size_t jmax) const
 {
@@ -345,7 +317,7 @@ std::string MatrixFull::what() const
 {
     std::ostringstream msg;
 #ifdef __AVX__
-    msg << "mFX " << size_ << "x" << size_;
+    msg << "mFx " << size_ << "x" << size_;
 #else
     msg << "mF " << size_ << "x" << size_;
 #endif

@@ -10,7 +10,7 @@
 /**
  This class used to be called 'PointExact' before 12.2017 and 'ModelPoint' until 7.2018
  */
-class Mecapoint
+class Mecapoint final
 {    
 private:
     

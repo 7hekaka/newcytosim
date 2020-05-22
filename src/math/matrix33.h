@@ -27,7 +27,7 @@
 
 
 /// 3x3 matrix class with 9 'real' elements
-class alignas(32) Matrix33
+class alignas(32) Matrix33 final
 {
 public:
     

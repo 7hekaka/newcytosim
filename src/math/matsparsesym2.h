@@ -17,7 +17,7 @@
  
  Elements are stored in random order in the column.
 */
-class MatrixSparseSymmetric2
+class MatrixSparseSymmetric2 final
 {
 public:
     
@@ -85,7 +85,7 @@ public:
     MatrixSparseSymmetric2();
     
     /// default destructor
-    virtual ~MatrixSparseSymmetric2()  { deallocate(); }
+    ~MatrixSparseSymmetric2()  { deallocate(); }
     
     /// set to zero
     void reset();

@@ -292,7 +292,11 @@ size_t MatrixSparse::nbElements(size_t start, size_t stop) const
 std::string MatrixSparse::what() const
 {
     std::ostringstream msg;
+#if MATRIX_OPTIMIZED_MULTIPLY
+    msg << "mS+ " << nbElements();
+#else
     msg << "mS " << nbElements();
+#endif
     return msg.str();
 }
 

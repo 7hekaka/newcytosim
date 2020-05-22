@@ -29,7 +29,7 @@ class Vector2;
  allowing easy conversion operators to and from C-array.
  Although this is not guaranteed by the C-standard, this is usually the case.
  */
-class Vector3
+class Vector3 final
 {
     
 public:
@@ -760,7 +760,14 @@ public:
     /// scalar product of two vectors
     friend real dot(Vector3 const& a, Vector3 const& b)
     {
+#if VECTOR3_USES_AVX
+        vec2 axy = load2(&a.XX), bxy = load2(&b.XX);
+        vec2 az = load1(&a.ZZ), bz = load1(&b.ZZ);
+        vec2 d = fmadd2(az, bz, mul2(axy, bxy));
+        return add2(d, permute2(d, 0x01))[0];
+#else
         return a.XX * b.XX + a.YY * b.YY + a.ZZ * b.ZZ;
+#endif
     }
     
     /// multiplication by scalar

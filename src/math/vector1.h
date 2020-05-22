@@ -13,7 +13,7 @@
 #include <cmath>
 
 /// Vector1 is a vector with 1 `real` component.
-class Vector1
+class Vector1 final
 {
     
 public:

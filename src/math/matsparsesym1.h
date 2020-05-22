@@ -20,7 +20,7 @@
  
  Elements are stored in order of increasing index in each column.
 */
-class MatrixSparseSymmetric1
+class MatrixSparseSymmetric1 final
 {
 public:
     
@@ -127,7 +127,7 @@ public:
     MatrixSparseSymmetric1();
     
     /// default destructor
-    virtual ~MatrixSparseSymmetric1()  { deallocate(); }
+    ~MatrixSparseSymmetric1()  { deallocate(); }
     
     /// set to zero
     void reset();

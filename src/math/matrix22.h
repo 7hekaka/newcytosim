@@ -21,7 +21,7 @@
 
 
 /// 2x2 matrix class with 4 'real' elements
-class alignas(32) Matrix22
+class alignas(32) Matrix22 final
 {
 public:
     

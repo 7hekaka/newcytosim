@@ -41,7 +41,7 @@ typedef Matrix44 SquareBlock;
  
  F. Nedelec, 17--27 March 2017, revised entirely June 2018
  */
-class MatrixSparseSymmetricBlock
+class MatrixSparseSymmetricBlock final
 {
 public:
     
@@ -160,7 +160,7 @@ public:
     MatrixSparseSymmetricBlock();
     
     /// default destructor
-    virtual ~MatrixSparseSymmetricBlock()  { deallocate(); }
+    ~MatrixSparseSymmetricBlock()  { deallocate(); }
     
     /// set to zero
     void reset();

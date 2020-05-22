@@ -11,7 +11,7 @@
 /**
  MatrixSparseSymmetric uses a sparse storage, with arrays of elements for each column.
  */
-class MatrixSparseSymmetric
+class MatrixSparseSymmetric final
 {
 public:
     
@@ -63,7 +63,7 @@ public:
     MatrixSparseSymmetric();
     
     /// default destructor
-    virtual ~MatrixSparseSymmetric()  { deallocate(); }
+    ~MatrixSparseSymmetric()  { deallocate(); }
     
     /// set to zero
     void reset();

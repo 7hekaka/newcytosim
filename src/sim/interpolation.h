@@ -21,7 +21,7 @@ class FiberSegment;
  
  This class used to be called 'PointInterpolated' before 12.2017
  */
-class Interpolation
+class Interpolation final
 {
 private:
     

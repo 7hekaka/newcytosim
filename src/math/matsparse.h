@@ -11,7 +11,7 @@
 /**
  This class is not used currently in Cytosim
  */
-class MatrixSparse
+class MatrixSparse final
 {
 private:
     
@@ -45,7 +45,7 @@ public:
     MatrixSparse();
     
     /// default destructor
-    virtual ~MatrixSparse()  { deallocate(); }
+    ~MatrixSparse()  { deallocate(); }
     
     /// set to zero
     void reset();

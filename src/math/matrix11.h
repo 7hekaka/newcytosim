@@ -13,7 +13,7 @@
 /**
  This matrix can use AVX instructions if 'real == double'
  */
-class Matrix11
+class Matrix11 final
 {
 public:
     

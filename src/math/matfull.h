@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #ifndef MATFULL_H
 #define MATFULL_H
@@ -14,8 +14,9 @@
  This matrix uses line-major storage and size is padded to a multiple of 4
  to enable optimal use of SIMD operations for matrix-vector multiplication.
  
+ FJN 27.04.2020
  */
-class MatrixFull
+class MatrixFull final
 {    
 private:
     
@@ -57,7 +58,7 @@ public:
     void allocate(size_t nb_block);
     
     /// default destructor
-    virtual ~MatrixFull() { deallocate(); }
+    ~MatrixFull() { deallocate(); }
     
     /// return memory used to store values
     real* data() const { return mat_; }
