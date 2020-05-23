@@ -41,7 +41,7 @@ public:
     
     //------------------- simulation -------------------------------------------    
 
-    /// monte-carlo simulation step
+    /// Stochastic simulation
     void          step();
     
     ///add interactions for this object to a Meca

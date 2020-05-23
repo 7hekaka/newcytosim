@@ -738,7 +738,7 @@ void reportCPUtime(int frame, real simtime)
  
  
  The parameter `solve` can be used to select alternative mechanical engines.
- The monte-carlo part of the simulation is always done, including
+ The Monte-Carlo part of the simulation is always done, including
  fiber assembly dynamics, binding/unbinding and diffusion of molecules.
  
  `solve`      | Result                                                         |
@@ -907,7 +907,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     {
         selected = simul.findSet(what);
         if ( !selected )
-            throw InvalidIO("expected class specifier (eg. `import all FILE' `import fiber FILE')");
+            throw InvalidIO("expected class specifier (eg. `import all FILE' or `import fiber FILE')");
     }
 
     Inputter in(DIM, file.c_str(), true);

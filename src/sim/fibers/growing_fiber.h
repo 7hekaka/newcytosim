@@ -94,11 +94,14 @@ public:
     real        freshAssemblyP() const { return mGrowthP; }
 
     
-    /// monte-carlo step
+    /// Stochastic simulation
     void        step();
     
     //--------------------------------------------------------------------------
     
+    /// return specification of fiber class
+    std::string activity() const { return "grow"; }
+
     /// write to Outputter
     void        write(Outputter&) const;
     

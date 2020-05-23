@@ -152,11 +152,14 @@ public:
     /// simulate dynamic instability of MINUS_END
     int         stepMinusEnd();
     
-    /// monte-carlo step
+    /// Stochastic simulation
     void        step();
     
     //--------------------------------------------------------------------------
     
+    /// return specification of fiber class
+    std::string activity() const { return "dynamic"; }
+
     /// write to Outputter
     void        write(Outputter&) const;
 

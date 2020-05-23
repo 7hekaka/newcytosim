@@ -178,7 +178,7 @@ real Space::max_extension() const
 }
 
 /**
- The volume is estimated with a simple monte-carlo approach:
+ The volume is estimated with a simple Monte-Carlo approach:
  - throw points in the rectangular volume provided by boundaries()
  - count how many are inside the volume with inside()
  .

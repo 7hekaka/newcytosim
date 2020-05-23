@@ -99,11 +99,14 @@ public:
     /// change state of PLUS_END
     void        setDynamicStateP(state_t s);
 
-    /// monte-carlo step
+    /// Stochastic simulation
     void        step();
     
     //--------------------------------------------------------------------------
     
+    /// return specification of fiber class
+    std::string activity() const { return "classic"; }
+
     /// write to Outputter
     void        write(Outputter&) const;
 

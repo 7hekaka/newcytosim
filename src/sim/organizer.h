@@ -85,7 +85,7 @@ public:
     /// rotate all associated objects
     void               rotate(Rotation const& T);
 */
-    /// monte-carlo simulation step
+    /// Stochastic simulation
     virtual void       step() {}
     
     /// add interactions to a Meca

@@ -133,7 +133,7 @@ public:
     /// add contribution of Brownian forces
     real        addBrownianForces(real const* rnd, real sc, real* rhs) const;
     
-    /// monte-carlo step
+    /// Stochastic simulation
     void        step();
     
     //------------------------------- Shaping ----------------------------------

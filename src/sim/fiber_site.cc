@@ -214,14 +214,14 @@ int FiberSite::checkAbscissa() const
     real a = fbFiber->abscissaM() - fbAbs;
     if ( a > 1e-3 )
     {
-        std::cerr << "FiberSite:abscissa < fiber:abscissa(MINUS_END) : " << a << '\n';
+        std::cerr << "FiberSite:abscissa < fiber:abscissa(MINUS_END) by " << a << '\n';
         return 2;
     }
     
     real b = fbAbs - fbFiber->abscissaP();
     if ( b > 1e-3 )
     {
-        std::cerr << "FiberSite:abscissa > fiber:abscissa(PLUS_END)  : " << b << '\n';
+        std::cerr << "FiberSite:abscissa > fiber:abscissa(PLUS_END) by " << b << '\n';
         return 1;
     }
     return 0;

@@ -633,7 +633,7 @@ void Simul::dump(const char dirname[]) const
     FilePath::change_dir(dirname);
     sMeca.dump();
     FilePath::change_dir(cwd);
-    fprintf(stderr, "Cytosim dumped its matrices in directory `%s'\n", dirname);
+    fprintf(stderr, "Cytosim dumped its system of size %lu in directory `%s'\n", sMeca.dimension(), dirname);
 }
 
 

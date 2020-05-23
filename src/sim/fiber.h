@@ -412,6 +412,9 @@ public:
     /// return associated Property
     Property const* property() const { return prop; }
     
+    /// return specification of fiber class
+    virtual std::string activity() const { return "static"; }
+    
     /// convert pointer to Fiber* if the conversion seems valid; returns 0 otherwise
     static Fiber* toFiber(Object * obj)
     {

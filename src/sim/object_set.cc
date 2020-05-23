@@ -589,7 +589,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool ski
 //------------------------------------------------------------------------------
 
 
-void ObjectSet::writeAssets(std::ostream& os, const std::string& title) const
+void ObjectSet::writeReport(std::ostream& os, const std::string& title) const
 {
     if ( size() > 0 )
     {

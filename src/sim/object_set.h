@@ -74,7 +74,7 @@ protected:
     static void       writeNodes(Outputter&, NodeList const&);
     
     /// print a list of the content (nb of objects, class)
-    void              writeAssets(std::ostream&, const std::string& title) const;
+    void              writeReport(std::ostream&, const std::string& title) const;
 
 public:
     

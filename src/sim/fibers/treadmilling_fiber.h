@@ -69,11 +69,14 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// monte-carlo step
+    /// Stochastic simulation
     void        step();
     
     //--------------------------------------------------------------------------
     
+    /// return specification of fiber class
+    std::string activity() const { return "treadmill"; }
+
     /// write to Outputter
     void        write(Outputter&) const;
 

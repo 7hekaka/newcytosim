@@ -47,7 +47,7 @@ public:
     void        write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream& os) const { writeAssets(os, title()); }
+    void        report(std::ostream&) const;
 
     //--------------------------
 

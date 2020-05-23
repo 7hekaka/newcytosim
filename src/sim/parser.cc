@@ -659,7 +659,7 @@ void Parser::parse_run(std::istream& is)
     }
 #endif
     if ( name.empty() )
-        throw InvalidSyntax("missing simul name (use `run NB_STEPS all { }')");
+        throw InvalidSyntax("unexpected syntax (use `run NB_STEPS all { }')");
     
     if ( name == "all" )
     {

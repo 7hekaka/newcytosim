@@ -47,7 +47,7 @@ SpacePolygonZ::~SpacePolygonZ()
 
 
 /**
- The volume is estimated with a monte-carlo approach,
+ The volume is estimated with a Monte-Carlo approach,
  but taking into account that the volume is axisymmetric.
  The result should be more precise than Space::estimateVolume()
  */

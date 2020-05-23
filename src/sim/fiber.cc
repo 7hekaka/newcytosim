@@ -1769,7 +1769,6 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             throw;
         }
     }
-
 #ifdef BACKWARD_COMPATIBILITY
     else if ( tag == TAG_DYNAMIC )
     {

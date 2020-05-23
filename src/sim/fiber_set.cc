@@ -229,6 +229,26 @@ void FiberSet::write(Outputter& out) const
     }
 }
 
+
+void FiberSet::report(std::ostream& os) const
+{
+    if ( size() > 0 )
+    {
+        os << '\n' << title();
+        PropertyList plist = simul.properties.find_all(title());
+        for ( Property const* i : plist )
+        {
+            FiberProp const* p = static_cast<FiberProp const*>(i);
+            size_t cnt = count(match_property, p);
+            os << '\n' << std::setw(10) << cnt << ' ' << p->name();
+            os << " ( " << p->activity << " )";
+        }
+        if ( plist.size() > 1 )
+            os << '\n' << std::setw(10) << size() << " total";
+    }
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
