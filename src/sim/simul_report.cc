@@ -514,26 +514,26 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
  */
 void Simul::reportFiberDynamic(std::ostream& out, FiberEnd end) const
 {
-    const int MAX = 5;
-    int cnt[MAX] = { 0 };
-    int sum = 0;
+    constexpr size_t MAX = 5;
+    size_t cnt[MAX+1] = { 0 };
+    size_t sum = 0;
     
     for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
     {
         ++sum;
-        unsigned s = obj->dynamicState(end);
-        if ( s < MAX )
-            ++cnt[s];
+        state_t x = std::min(obj->dynamicState(end), (state_t)MAX);
+        ++cnt[x];
     }
 
+    out << LIN;
     if ( end == PLUS_END )
-        out << LIN << ljust("plus_end", 1);
+        out << ljust("plus_end", 1);
     else if ( end == MINUS_END )
-        out << LIN << ljust("minus_end", 1);
- 
+        out << ljust("minus_end", 1);
+
     out << SEP << sum;
-    for ( int ii = 0; ii < MAX; ++ii )
-        out << SEP << cnt[ii];
+    for ( size_t i = 0; i < MAX; ++i )
+        out << SEP << cnt[i];
 }
 
 /**
@@ -1874,7 +1874,7 @@ void Simul::reportSingle(std::ostream& out) const
  */
 void Simul::reportSingleForce(std::ostream& out) const
 {
-    const size_t MAX = 8;
+    constexpr size_t MAX = 8;
     real cnt[MAX+1] = { 0 };
     real avg[MAX+1] = { 0 };
     real sup[MAX+1] = { 0 };
@@ -2106,7 +2106,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, std::string const& whic
  */
 void Simul::reportCoupleForce(std::ostream& out) const
 {
-    const size_t MAX = 8;
+    constexpr size_t MAX = 8;
     real cnt[MAX+1] = { 0 };
     real avg[MAX+1] = { 0 };
     real sup[MAX+1] = { 0 };
