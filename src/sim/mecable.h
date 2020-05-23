@@ -192,7 +192,7 @@ public:
         assert_true( P+1 < nPoints );
         //assert_true( 0 <= A && A <= 1 );
         Vector vec;
-        vec.interp(pPos+DIM*P, pPos+DIM*P+DIM, A);
+        vec.interpolate(pPos+DIM*P, pPos+DIM*P+DIM, A);
         return vec;
     }
 
@@ -203,7 +203,7 @@ public:
         assert_true( Q < nPoints );
         //assert_true( 0 <= A && A <= 1 );
         Vector vec;
-        vec.interp(pPos+DIM*P, pPos+DIM*Q, A);
+        vec.interpolate(pPos+DIM*P, pPos+DIM*Q, A);
         return vec;
     }
     

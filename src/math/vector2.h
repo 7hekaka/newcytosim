@@ -168,14 +168,14 @@ public:
     }
     
     /// Calculate intermediate position = A + C * ( B - A )
-    void interp(const float a[], const float b[], const float C)
+    void interpolate(const float a[], const float b[], const float C)
     {
         XX = a[0] + C * ( b[0] - a[0] );
         YY = a[1] + C * ( b[1] - a[1] );
     }
     
     /// Calculate intermediate position = A + C * ( B - A )
-    void interp(const double a[], const double b[], const double C)
+    void interpolate(const double a[], const double b[], const double C)
     {
 #if VECTOR2_USES_SSE
         vec2 A = loadu2(a), B = loadu2(b);

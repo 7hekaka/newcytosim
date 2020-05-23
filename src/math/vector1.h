@@ -117,13 +117,13 @@ public:
     }
         
     /// Calculate intermediate position = A + C * ( B - A )
-    void interp(const float a[], const float b[], const float C)
+    void interpolate(const float a[], const float b[], const float C)
     {
         XX = a[0] + C * ( b[0] - a[0] );
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
-    void interp(const double a[], const double b[], const double C)
+    void interpolate(const double a[], const double b[], const double C)
     {
         XX = a[0] + C * ( b[0] - a[0] );
     }
