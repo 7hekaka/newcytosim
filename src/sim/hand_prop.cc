@@ -238,7 +238,7 @@ void HandProp::complete(Simul const& sim)
     binding_range_sqr = square(binding_range);
     binding_prob = -std::expm1(-binding_rate * sim.time_step());
     unbinding_rate_dt = unbinding_rate * sim.time_step();
-    std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
+    //std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
 
     binding_rate_dt_8 = 8 * binding_rate * sim.time_step();
     
@@ -309,7 +309,7 @@ void HandProp::checkStiffness(real stiff, real len, real mul, real kT) const
     
     if ( en > 10.0 && binding_rate > 0 )
     {
-        Cytosim::warn << "binding of `" << name() << "' is thermodynamically unfavorable (stiffness * binding_range^2 = " << en << " kT)\n";
+        Cytosim::warn << "binding of `" << name() << "' is thermodynamically unfavorable: stiffness * binding_range^2 = " << en << " kT\n";
         //<< PREF << "you could decrease stiffness or binding_range\n";
     }
     

@@ -2211,10 +2211,10 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     // interpolation coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    const real eps = -1.0 / ptA.len();
+    const Torque leg = arm / ptA.len();
 
-    MatrixBlock aR = MatrixBlock::vectorProduct(cc0,  eps*arm);
-    MatrixBlock bR = MatrixBlock::vectorProduct(cc1, -eps*arm);
+    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
     
 #if 0
     std::cerr.precision(3);
@@ -2422,10 +2422,10 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     const real cc1 =  ptA.coef1();
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
-    const real eps = -1.0 / ptA.len();
+    const Torque leg = arm / ptA.len();
 
-    MatrixBlock aR = MatrixBlock::vectorProduct(cc0,  eps*arm);
-    MatrixBlock bR = MatrixBlock::vectorProduct(cc1, -eps*arm);
+    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
     const real wcc2 = -weight * cc2;
     const real wcc3 = -weight * cc3;
@@ -2776,13 +2776,13 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
-    const real epsA = -1.0 / ptA.len();
-    const real epsB =  1.0 / ptA.len();
+    const Torque legA = armA / ptA.len();
+    const Torque legB = armB / ptB.len();
 
-    MatrixBlock A = MatrixBlock::vectorProduct(cc0,  epsA*armA);
-    MatrixBlock B = MatrixBlock::vectorProduct(cc1, -epsA*armA);
-    MatrixBlock C = MatrixBlock::vectorProduct(cc2,  epsB*armB);
-    MatrixBlock D = MatrixBlock::vectorProduct(cc3, -epsB*armB);
+    MatrixBlock A = MatrixBlock::vectorProduct(cc0, -legA);
+    MatrixBlock B = MatrixBlock::vectorProduct(cc1,  legA);
+    MatrixBlock C = MatrixBlock::vectorProduct(cc2,  legB);
+    MatrixBlock D = MatrixBlock::vectorProduct(cc3, -legB);
 
     MatrixBlock wAt = A.transposed(-weight);
     MatrixBlock wBt = B.transposed(-weight);
@@ -4332,10 +4332,10 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     // interpolation coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    const real eps = -1.0 / ptA.len();
+    const Torque leg = arm / ptA.len();
 
-    MatrixBlock aR = MatrixBlock::vectorProduct(cc0,  eps*arm);
-    MatrixBlock bR = MatrixBlock::vectorProduct(cc1, -eps*arm);
+    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);

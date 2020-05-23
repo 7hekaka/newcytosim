@@ -92,8 +92,25 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     mArm2 = cross(pt2.diff(), fiber2()->radialDir(abscissa2())).normalized(len);
 # else
     Vector dir = pt2.pos() - pt1.pos();
-    mArm1 = cross(pt1.diff(), dir).normalized(len);
-    mArm2 = cross(dir, pt2.diff()).normalized(len);
+    if ( modulo )
+        modulo->fold(dir);
+    
+    Vector off1 = cross(pt1.diff(), dir);
+    real n1 = off1.norm();
+    if ( n1 > REAL_EPSILON )
+        mArm1 = off1 * ( len / n1 );
+    else
+        mArm1 = pt1.diff().randOrthoU(len);
+    
+    Vector off2 = cross(dir, pt2.diff());
+    real n2 = off2.norm();
+    if ( n2 > REAL_EPSILON )
+        mArm2 = off2 * ( len / n2 );
+    else
+        mArm2 = pt1.diff().randOrthoU(len);
+
+    //mArm1 = cross(pt1.diff(), dir).normalized(len);
+    //mArm2 = cross(dir, pt2.diff()).normalized(len);
 # endif
     meca.addSideSideLink3D(pt1, pt2, mArm1, mArm2, prop->stiffness);
     

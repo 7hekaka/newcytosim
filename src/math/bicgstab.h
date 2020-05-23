@@ -46,10 +46,10 @@ namespace LinearSolvers
         mat.multiply(sol, r0);                  // r0 = A * sol
         blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
         blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * sol
-        blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-        blas::xcopy(dim, r, 1, p, 1);
         if ( monitor.finished(dim, r) )
             return;
+        blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
+        blas::xcopy(dim, r, 1, p, 1);
 #endif
         rho = blas::dot(dim, r, r);
         goto start;
@@ -159,13 +159,12 @@ namespace LinearSolvers
         mat.multiply(sol, r0);                  // r0 = MAT * sol
         blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
         blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * sol
-        blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-        blas::xcopy(dim, r, 1, p, 1);
         if ( monitor.finished(dim, r) )
             return;
+        blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
+        blas::xcopy(dim, r, 1, p, 1);
 #endif
         rho = blas::dot(dim, r, r);
-
         goto start;
 
         while ( ! monitor.finished(dim, r) )
