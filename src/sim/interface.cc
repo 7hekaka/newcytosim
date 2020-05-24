@@ -6,7 +6,6 @@
 #include "tokenizer.h"
 #include "messages.h"
 #include "glossary.h"
-#include "filepath.h"
 #include "tictoc.h"
 #include "simul.h"
 #include "event.h"

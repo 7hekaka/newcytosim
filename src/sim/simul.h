@@ -212,12 +212,6 @@ public:
     /// calculate Forces and Lagrange multipliers on the Mecables, but do not move them
     void            computeForces() const;
     
-    /// dump matrix and vector from Meca in a format that can be read in MATLAB
-    void            dump(const char dirname[]) const;
-    
-    /// dump system matrix and vector in sparse text format
-    void            saveSystem(const char dirname[]) const;
-    
     /// this is used for development
     void            addExperimentalInteractions(Meca&) const;
     

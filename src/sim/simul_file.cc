@@ -3,7 +3,6 @@
 #include "sim.h"
 #include <fstream>
 #include <unistd.h>
-#include "filepath.h"
 #include "messages.h"
 #include "parser.h"
 #include "print_color.h"

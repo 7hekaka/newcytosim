@@ -659,7 +659,7 @@ void Parser::parse_run(std::istream& is)
     }
 #endif
     if ( name.empty() )
-        throw InvalidSyntax("unexpected syntax (use `run NB_STEPS all { }')");
+        throw InvalidSyntax("unexpected syntax (use `run NB_STEPS * { }')");
     
     if ( name == "all" )
     {
@@ -668,8 +668,8 @@ void Parser::parse_run(std::istream& is)
         // There can only be one Simul object:
         name = simul.prop->name();
     }
-
-    if ( name != simul.prop->name() )
+    
+    if ( name != "*"  &&  name != simul.prop->name() )
         throw InvalidSyntax("unknown simul name `"+name+"'");
 
     std::string blok = Tokenizer::get_block(is, '{');
@@ -1041,7 +1041,7 @@ void Parser::parse_dump(std::istream& is)
         throw InvalidSyntax("missing directory name after 'dump'");
 
     if ( do_write && do_run )
-        simul.dump(str.c_str());
+        simul.sMeca.dump(str.c_str());
 }
 
 
@@ -1058,7 +1058,7 @@ void Parser::parse_save(std::istream& is)
         throw InvalidSyntax("missing directory name after 'save'");
 
     if ( do_write && do_run )
-        simul.saveSystem(str.c_str());
+        simul.sMeca.saveSystem(str.c_str());
 }
 
 
