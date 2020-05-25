@@ -317,10 +317,15 @@ bool SpacePolygon::draw() const
     // display sides
     real Z = height_;
     glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t n=0; n <= npts; ++n )
+    for ( size_t n=0; n < npts; ++n )
     {
         gle::gleVertex(pts[n].xx, pts[n].yy, Z);
         gle::gleVertex(pts[n].xx, pts[n].yy,-Z);
+    }
+    if ( 0 < npts )
+    {
+        gle::gleVertex(pts[0].xx, pts[0].yy, Z);
+        gle::gleVertex(pts[0].xx, pts[0].yy,-Z);
     }
     glEnd();
     
@@ -345,7 +350,6 @@ bool SpacePolygon::draw() const
         gle::gleDrawText(p, tmp, 0);
     }
 #endif
-    
 
     return true;
 }
