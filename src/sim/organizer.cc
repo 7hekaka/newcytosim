@@ -131,7 +131,7 @@ void Organizer::write(Outputter& out) const
     for ( Mecable const* i : mObjects )
     {
         out.writeSoftSpace();
-        i->writeReference(out, i);
+        Mecable::writeReference(out, i);
     }
 }
 

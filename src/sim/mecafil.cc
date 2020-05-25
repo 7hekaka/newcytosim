@@ -283,7 +283,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
     // compare to default implementation:
     real * tmp = new_real(DIM*nPoints);
     copy_real(DIM*nPoints, Y, tmp);
-    add_rigidity0(nbt, X, iRigidity, tmp);
+    add_rigidity0(DIM*(nPoints-2), X, iRigidity, tmp);
 #endif
     if ( nPoints > 3 )
     {
