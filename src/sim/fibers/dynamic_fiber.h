@@ -127,16 +127,16 @@ public:
     //--------------------------------------------------------------------------
     
     /// return assembly/disassembly state of MINUS_END
-    state_t     dynamicStateM() const;
+    state_t     endStateM() const;
     
     /// return assembly/disassembly state of PLUS_END
-    state_t     dynamicStateP() const;
+    state_t     endStateP() const;
     
     /// change state of MINUS_END
-    void        setDynamicStateM(state_t s);
+    void        setEndStateM(state_t s);
     
     /// change state of PLUS_END
-    void        setDynamicStateP(state_t s);
+    void        setEndStateP(state_t s);
     
     /// length increment at MINUS_END during last time-step
     real        freshAssemblyM() const { return mGrowthM; }
@@ -162,6 +162,9 @@ public:
 
     /// write to Outputter
     void        write(Outputter&) const;
+    
+    /// read from Inputter
+    void        readEndState(Inputter&);
 
     /// read from Inputter
     void        read(Inputter&, Simul&, ObjectTag);

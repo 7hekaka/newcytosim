@@ -35,7 +35,7 @@ void Rescuer::handleDisassemblyM()
         Fiber * fib = fiber();
         assert_true( fbAbs < fbFiber->abscissaM() );
         // induce rescue:
-        fib->setDynamicStateM(STATE_GREEN);
+        fib->setEndStateM(STATE_GREEN);
         // increase MT length to cover position of Hand
         fib->growM(fiber()->abscissaM()-fbAbs);
         // update all Hands:
@@ -67,7 +67,7 @@ void Rescuer::handleDisassemblyP()
         Fiber * fib = fiber();
         assert_true( fbAbs > fbFiber->abscissaP() );
         // induce rescue:
-        fib->setDynamicStateP(STATE_GREEN);
+        fib->setEndStateP(STATE_GREEN);
         // increase MT length to cover position of Hand
         fib->growP(fbAbs-fiber()->abscissaP());
         // update all Hands:

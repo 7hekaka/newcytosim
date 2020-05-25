@@ -153,8 +153,7 @@ Writes the info that is common to all objects to file
      - 2 bytes for the identity
      .
  - A fat format:
-     - the character '$' in binary mode
-     - 1 byte for the tag()
+     - 1 byte for the tag() with the highest bit set
      - 2 bytes for the index of the property
      - 4 bytes for the identity
      - 4 bytes for the mark

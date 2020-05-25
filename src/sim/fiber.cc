@@ -516,11 +516,11 @@ void Fiber::severNow()
                 
                 try {
                     // old PLUS_END converves its state:
-                    frag->setDynamicStateP(dynamicStateP());
+                    frag->setEndStateP(endStateP());
                     
                     // new ends are set as wished:
-                    this->setDynamicStateP(cut.stateP);
-                    frag->setDynamicStateM(cut.stateM);
+                    this->setEndStateP(cut.stateP);
+                    frag->setEndStateM(cut.stateM);
                 }
                 catch ( Exception & e )
                 {
@@ -583,10 +583,10 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
         if ( fib )
         {
             // old PLUS_END converves its state:
-            fib->setDynamicStateP(dynamicStateP());
+            fib->setEndStateP(endStateP());
             // dynamic of new ends are set as usual:
-            setDynamicStateP(stateP);
-            fib->setDynamicStateM(stateM);
+            setEndStateP(stateP);
+            fib->setEndStateM(stateM);
             //assert_true(!fib->linked());
             objset()->add(fib);
         }
@@ -613,7 +613,7 @@ void Fiber::join(Fiber * fib)
     Chain::join(fib);
     
     //transfer dynamic state of PLUS_END:
-    setDynamicStateP(fib->dynamicStateP());
+    setEndStateP(fib->endStateP());
 
 #if FIBER_HAS_MESH
     if ( frMesh.ready() )
@@ -1073,20 +1073,20 @@ size_t Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
 state_t Fiber::dynamicState(FiberEnd end) const
 {
     if ( end == PLUS_END )
-        return dynamicStateP();
+        return endStateP();
     if ( end == MINUS_END )
-        return dynamicStateM();
+        return endStateM();
     ABORT_NOW("invalid argument value");
     return 0;
 }
 
 
-void Fiber::setDynamicState(const FiberEnd end, const state_t s)
+void Fiber::setEndState(const FiberEnd end, const state_t s)
 {
     if ( end == PLUS_END )
-        setDynamicStateP(s);
+        setEndStateP(s);
     else if ( end == MINUS_END )
-        setDynamicStateM(s);
+        setEndStateM(s);
 }
 
 
@@ -1707,8 +1707,8 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     if ( in.formatID() < 31 )
     {
-        setDynamicStateM(in.readUInt8());
-        setDynamicStateP(in.readUInt8());
+        setEndStateM(in.readUInt8());
+        setEndStateP(in.readUInt8());
     }
     
 #endif
@@ -1779,8 +1779,10 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             virgin = false;
             std::cerr << "INCIDENT: skipping dynamic states for unknown fiber class\n";
         }
-        in.readUInt32();
-        in.readUInt32();
+        in.readUInt16();
+        in.readUInt16();
+        in.readUInt16();
+        in.readUInt16();
     }
     else if ( tag == 'm' )
     {

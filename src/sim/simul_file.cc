@@ -13,6 +13,7 @@
  This is the initial value to Inputter::formatID()
  History of changes in file format:
 
+ 54: 25/05/2020 All fiber dynamic stored on 16 bytes
  53: 18/10/2019 Aster, Nucleus and Bundle store their primary Mecable directly
  52: 18/10/2019 Space's shape is stored always on 16 characters
  51: 03/03/2019 Storing number of Aster links

@@ -55,7 +55,7 @@ state_t DynamicFiber::calculateStateM() const
 }
 
 
-state_t DynamicFiber::dynamicStateM() const
+state_t DynamicFiber::endStateM() const
 {
     return STATE_WHITE;
     assert_true( mStateM == calculateStateM() );
@@ -63,7 +63,7 @@ state_t DynamicFiber::dynamicStateM() const
 }
 
 
-void DynamicFiber::setDynamicStateM(state_t s)
+void DynamicFiber::setEndStateM(state_t s)
 {
     if ( s < 1 || 4 < s )
         throw InvalidParameter("Invalid AssemblyState for DynamicFiber MINUS_END");
@@ -125,14 +125,14 @@ state_t DynamicFiber::calculateStateP() const
 }
 
 
-state_t DynamicFiber::dynamicStateP() const
+state_t DynamicFiber::endStateP() const
 {
     assert_true( mStateP == calculateStateP() );
     return mStateP;
 }
 
 
-void DynamicFiber::setDynamicStateP(state_t s)
+void DynamicFiber::setEndStateP(state_t s)
 {
     if ( s < 1 || 4 < s )
         throw InvalidParameter("Invalid AssemblyState for DynamicFiber PLUS_END");
@@ -283,7 +283,7 @@ void DynamicFiber::step()
             }
             // possibly rescue:
             if ( RNG.test(prop->rebirth_prob[0]) )
-                setDynamicStateP(STATE_GREEN);
+                setEndStateP(STATE_GREEN);
         }
         else if ( length() + mGrowthM + mGrowthP < prop->max_length )
         {
@@ -309,32 +309,48 @@ void DynamicFiber::write(Outputter& out) const
     writeHeader(out, TAG_DYNAMIC);
     out.writeUInt8(unitM[0]);
     out.writeUInt8(unitM[1]);
+    out.writeUInt16(0);
     out.writeUInt8(unitP[0]);
     out.writeUInt8(unitP[1]);
+    out.writeUInt16(0);
+}
+
+
+void DynamicFiber::readEndState(Inputter& in)
+{
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 54 )
+    {
+        unitM[0] = in.readUInt8();
+        unitM[1] = in.readUInt8();
+        unitP[0] = in.readUInt8();
+        unitP[1] = in.readUInt8();
+    }
+    else
+#endif
+    {
+        unitM[0] = in.readUInt8();
+        unitM[1] = in.readUInt8();
+        in.readUInt16();
+        unitP[0] = in.readUInt8();
+        unitP[1] = in.readUInt8();
+        in.readUInt16();
+    }
+    mStateM = calculateStateM();
+    mStateP = calculateStateP();
 }
 
 
 void DynamicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-#ifdef BACKWARD_COMPATIBILITY
-    if ( tag == TAG_DYNAMIC || ( tag == TAG && in.formatID() < 44 ) )
-#else
-    if ( tag == TAG_DYNAMIC )
-#endif
+    if ( tag == TAG )
     {
-        unitM[0] = in.readUInt8();
-        unitM[1] = in.readUInt8();
-        mStateM  = calculateStateM();
-
-        unitP[0] = in.readUInt8();
-        unitP[1] = in.readUInt8();
-        mStateP  = calculateStateP();
-    }
 #ifdef BACKWARD_COMPATIBILITY
-    if ( tag != TAG_DYNAMIC || in.formatID() < 44 )
-#else
-    else
+        if ( in.formatID() < 44 )
+            readEndState(in);
 #endif
         Fiber::read(in, sim, tag);
+    }
+    else if ( tag == TAG_DYNAMIC )
+        readEndState(in);
 }
-

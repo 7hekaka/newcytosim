@@ -214,12 +214,12 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 #ifdef BACKWARD_COMPATIBILITY
     if ( opt.set(p, "plus_end_state") )
     {
-        fib->setDynamicStateP(p);
+        fib->setEndStateP(p);
         Cytosim::warn << "use `plus_end = STATE` instead of `plus_end_state = STATE`\n";
     }
 #endif
     if ( opt.set(p, "plus_end", keys) || opt.set(p, "end_state", keys) )
-        fib->setDynamicStateP(p);
+        fib->setEndStateP(p);
 
     // set state of minus ends:
     state_t m = STATE_WHITE;
@@ -227,11 +227,11 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     if ( opt.set(m, "minus_end_state") )
     {
         Cytosim::warn << "use `minus_end = STATE` instead of `minus_end_state = STATE`\n";
-        fib->setDynamicStateM(m);
+        fib->setEndStateM(m);
     }
 #endif
     if ( opt.set(m, "minus_end", keys) || opt.set(m, "end_state", 1, keys) )
-        fib->setDynamicStateM(m);
+        fib->setEndStateM(m);
 
 #ifdef BACKWARD_COMPATIBILITY
     if ( fib->prop->activity != "none" && m == 0 && p == 0 )

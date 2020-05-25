@@ -325,7 +325,7 @@ public:
     //---------------------------- LOAD OBJECTS --------------------------------
     
     /// current file format (check history in `simul_file.cc`
-    const static int currentFormatID = 53;
+    const static int currentFormatID = 54;
     
     /// class for reading trajectory file
     class     InputLock;

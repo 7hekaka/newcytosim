@@ -30,7 +30,7 @@ TreadmillingFiber::~TreadmillingFiber()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void TreadmillingFiber::setDynamicStateM(state_t s)
+void TreadmillingFiber::setEndStateM(state_t s)
 {
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateM = s;
@@ -39,7 +39,7 @@ void TreadmillingFiber::setDynamicStateM(state_t s)
 }
 
 
-void TreadmillingFiber::setDynamicStateP(state_t s)
+void TreadmillingFiber::setEndStateP(state_t s)
 {
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateP = s;
@@ -139,26 +139,42 @@ void TreadmillingFiber::write(Outputter& out) const
     /// write variables describing the dynamic state of the ends:
     writeHeader(out, TAG_DYNAMIC);
     out.writeUInt16(mStateM);
+    out.writeUInt16(0);
     out.writeUInt16(mStateP);
+    out.writeUInt16(0);
+}
+
+
+void TreadmillingFiber::readEndState(Inputter& in)
+{
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 54 )
+    {
+        mStateM = in.readUInt16();
+        mStateP = in.readUInt16();
+    }
+    else
+#endif
+    {
+        mStateM = in.readUInt16();
+        in.readUInt16();
+        mStateP = in.readUInt16();
+        in.readUInt16();
+    }
 }
 
 
 void TreadmillingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-#ifdef BACKWARD_COMPATIBILITY
-    if ( tag == TAG_DYNAMIC || ( tag == TAG && in.formatID() < 44 ) )
-#else
-    if ( tag == TAG_DYNAMIC )
-#endif
+    if ( tag == TAG )
     {
-        mStateM = in.readUInt16();
-        mStateP = in.readUInt16();
-    }
 #ifdef BACKWARD_COMPATIBILITY
-    if ( tag != TAG_DYNAMIC || in.formatID() < 44 )
-#else
-    else
+        if ( in.formatID() < 44 )
+            readEndState(in);
 #endif
         Fiber::read(in, sim, tag);
+    }
+    else if ( tag == TAG_DYNAMIC )
+        readEndState(in);
 }
 

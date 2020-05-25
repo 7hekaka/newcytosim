@@ -772,10 +772,10 @@ void Simul::reportFiberEnds(std::ostream& out) const
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
         out << SEP << obj->length();
-        out << SEP << obj->dynamicStateM();
+        out << SEP << obj->endStateM();
         out << SEP << obj->posEndM();
         out << SEP << obj->dirEndM();
-        out << SEP << obj->dynamicStateP();
+        out << SEP << obj->endStateP();
         out << SEP << obj->posEndP();
         out << SEP << obj->dirEndP();
     }

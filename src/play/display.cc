@@ -248,11 +248,11 @@ void Display::prepareLineDisp(const Fiber * fib)
 #endif
     
     // For dynamic Fibers, change colors of tips according to state:
-    if ( fib->dynamicStateP() > 0 )
-        self->end_color[0] = disp->end_color[fib->dynamicStateP()%5];
+    if ( fib->endStateP() > 0 )
+        self->end_color[0] = disp->end_color[fib->endStateP()%5];
     
-    if ( fib->dynamicStateM() > 0 )
-        self->end_color[1] = disp->end_color[fib->dynamicStateM()%5];
+    if ( fib->endStateM() > 0 )
+        self->end_color[1] = disp->end_color[fib->endStateM()%5];
 
     // hide right or left-pointing fibers:
     if ( ( disp->exclude & 1 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) < 0 )
@@ -299,7 +299,7 @@ void Display::prepareLineDisp(const Fiber * fib)
 
 #if ( 0 )
     // hide fibers which are not growing
-    if ( fib->dynamicStateP() == STATE_WHITE )
+    if ( fib->endStateP() == STATE_WHITE )
     {
         LOG_ONCE("non-growing fibers made invisible\n");
         self->visible = -1;

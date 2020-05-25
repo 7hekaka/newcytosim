@@ -19,7 +19,7 @@ void Regulator::attach(FiberSite const& s)
 {
     Hand::attach(s);
     // freeze the PLUS_END:
-    fiber()->setDynamicStateP(STATE_WHITE);
+    fiber()->setEndStateP(STATE_WHITE);
 }
 
 

@@ -28,7 +28,7 @@ ClassicFiber::~ClassicFiber()
 }
 
 
-void ClassicFiber::setDynamicStateM(state_t s)
+void ClassicFiber::setEndStateM(state_t s)
 {
     if ( s==STATE_WHITE || s==STATE_GREEN || s==STATE_RED )
         mStateM = s;
@@ -37,7 +37,7 @@ void ClassicFiber::setDynamicStateM(state_t s)
 }
 
 
-void ClassicFiber::setDynamicStateP(state_t s)
+void ClassicFiber::setEndStateP(state_t s)
 {
     if ( s==STATE_WHITE || s==STATE_GREEN || s==STATE_RED )
         mStateP = s;
@@ -200,47 +200,59 @@ void ClassicFiber::write(Outputter& out) const
 {
     Fiber::write(out);
     
-    /// write variables describing the dynamic state of the ends:
+    // write variables describing the dynamic state of the ends, using 8 bytes:
     writeHeader(out, TAG_DYNAMIC);
     out.writeUInt16(mStateM);
+    out.writeUInt16(0);
     out.writeUInt16(mStateP);
+    out.writeUInt16(0);
 }
 
 
-void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
+void ClassicFiber::readEndState(Inputter& in)
 {
 #ifdef BACKWARD_COMPATIBILITY
-    if ( tag == TAG_DYNAMIC || ( tag == TAG && in.formatID() < 44 ) )
-#else
-    if ( tag == TAG_DYNAMIC )
-#endif
+    if ( in.formatID() < 54 )
     {
         unsigned m = 0, p = 0;
-#ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() < 42 )
             p = in.readUInt8();
         else
-#endif
         {
             m = in.readUInt16();
             p = in.readUInt16();
         }
-
-#ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() < 46 )
-            setDynamicStateP(p);
+            setEndStateP(p);
         else
-#endif
         {
-            setDynamicStateM(m);
-            setDynamicStateP(p);
+            setEndStateM(m);
+            setEndStateP(p);
         }
     }
-#ifdef BACKWARD_COMPATIBILITY
-    if ( tag != TAG_DYNAMIC || in.formatID() < 44 )
-#else
     else
 #endif
+    {
+        mStateM = in.readUInt16();
+        in.readUInt16();
+        mStateP = in.readUInt16();
+        in.readUInt16();
+    }
+}
+
+
+
+void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
+{
+    if ( tag == TAG )
+    {
+#ifdef BACKWARD_COMPATIBILITY
+        if ( in.formatID() < 44 )
+            readEndState(in);
+#endif
         Fiber::read(in, sim, tag);
+    }
+    else if ( tag == TAG_DYNAMIC )
+        readEndState(in);
 }
 

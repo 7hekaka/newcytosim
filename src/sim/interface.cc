@@ -540,7 +540,7 @@ public:
                 return false;
             if ( obj->tag()==Couple::TAG && static_cast<Couple const*>(obj)->attached1() != st1 )
                 return false;
-            if ( obj->tag()==Fiber::TAG && static_cast<Fiber const*>(obj)->dynamicStateP() != st1 )
+            if ( obj->tag()==Fiber::TAG && static_cast<Fiber const*>(obj)->endStateP() != st1 )
                 return false;
         }
         if ( st2 != ~0U )
@@ -549,7 +549,7 @@ public:
                 throw InvalidParameter("to select Single, `state2' is irrelevant");
             if ( obj->tag()==Couple::TAG && static_cast<Couple const*>(obj)->attached2() != st2 )
                 return false;
-            if ( obj->tag()==Fiber::TAG && static_cast<Fiber const*>(obj)->dynamicStateM() != st2 )
+            if ( obj->tag()==Fiber::TAG && static_cast<Fiber const*>(obj)->endStateM() != st2 )
                 return false;
         }
         return true;

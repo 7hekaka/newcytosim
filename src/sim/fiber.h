@@ -241,23 +241,23 @@ public:
     //--------------------------------------------------------------------------
     
     /// return assembly/disassembly state of MINUS_END
-    virtual state_t dynamicStateM() const { return STATE_WHITE; }
+    virtual state_t endStateM() const { return STATE_WHITE; }
 
     /// return assembly/disassembly state of PLUS_END
-    virtual state_t dynamicStateP() const { return STATE_WHITE; }
+    virtual state_t endStateP() const { return STATE_WHITE; }
 
     /// return assembly/disassembly state of the FiberEnd
     state_t         dynamicState(FiberEnd end) const;
 
     
     /// change state of MINUS_END
-    virtual void   setDynamicStateM(state_t) {}
+    virtual void   setEndStateM(state_t) {}
 
     /// change state of PLUS_END
-    virtual void   setDynamicStateP(state_t) {}
+    virtual void   setEndStateP(state_t) {}
 
     /// change state of FiberEnd `end` to `s`
-    void           setDynamicState(FiberEnd end, state_t s);
+    void           setEndState(FiberEnd end, state_t s);
     
     
     /// the length of freshly assembled polymer at the MINUS_END during the last time step

@@ -211,7 +211,7 @@ void Nucleator::stepLoaded(Vector const& force, real force_norm)
 void Nucleator::detach()
 {
     if ( prop->addictive )
-        fiber()->setDynamicState(nearestEnd(), STATE_RED);
+        fiber()->setEndState(nearestEnd(), STATE_RED);
     
     Hand::detach();
 }

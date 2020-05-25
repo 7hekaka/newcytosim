@@ -80,10 +80,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// return assembly/disassembly state of MINUS_END
-    state_t     dynamicStateM() const { return mStateM; }
+    state_t     endStateM() const { return mStateM; }
 
     /// return assembly/disassembly state of PLUS_END
-    state_t     dynamicStateP() const { return mStateP; }
+    state_t     endStateP() const { return mStateP; }
 
     
     /// length increment at MINUS_END during last time-step
@@ -94,10 +94,10 @@ public:
 
     
     /// change state of MINUS_END
-    void        setDynamicStateM(state_t s);
+    void        setEndStateM(state_t s);
     
     /// change state of PLUS_END
-    void        setDynamicStateP(state_t s);
+    void        setEndStateP(state_t s);
 
     /// Stochastic simulation
     void        step();
@@ -109,6 +109,9 @@ public:
 
     /// write to Outputter
     void        write(Outputter&) const;
+    
+    /// read from Inputter
+    void        readEndState(Inputter&);
 
     /// read from Inputter
     void        read(Inputter&, Simul&, ObjectTag);

@@ -30,7 +30,7 @@ GrowingFiber::~GrowingFiber()
 #pragma mark -
 
 
-void GrowingFiber::setDynamicStateM(state_t s)
+void GrowingFiber::setEndStateM(state_t s)
 {
     if ( s == STATE_WHITE || s == STATE_GREEN )
         mStateM = s;
@@ -39,7 +39,7 @@ void GrowingFiber::setDynamicStateM(state_t s)
 }
 
 
-void GrowingFiber::setDynamicStateP(state_t s)
+void GrowingFiber::setEndStateP(state_t s)
 {
     if ( s == STATE_WHITE || s == STATE_GREEN )
         mStateP = s;
@@ -146,36 +146,44 @@ void GrowingFiber::write(Outputter& out) const
     /// write variables describing the dynamic state of the ends:
     writeHeader(out, TAG_DYNAMIC);
     out.writeFloat(mGrowthM);
+    out.writeFloat(0.0);
     out.writeFloat(mGrowthP);
+    out.writeFloat(0.0);
+}
+
+
+void GrowingFiber::readEndState(Inputter& in)
+{
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 54 )
+    {
+        mGrowthM = in.readFloat();
+        if ( in.formatID() > 45 )
+            mGrowthP = in.readFloat();
+    }
+    else
+#endif
+    {
+        mGrowthM = in.readFloat();
+        in.readFloat();
+        mGrowthP = in.readFloat();
+        in.readFloat();
+    }
 }
 
 
 void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-#ifdef BACKWARD_COMPATIBILITY
-    if ( tag == TAG_DYNAMIC || ( tag == TAG && in.formatID() < 44 ) )
-#else
-    if ( tag == TAG_DYNAMIC )
-#endif
-    {
-        mGrowthM = in.readFloat();
-#ifdef BACKWARD_COMPATIBILITY
-        if ( in.formatID() > 45 )
-#endif
-        mGrowthP = in.readFloat();
-    }
-#ifdef BACKWARD_COMPATIBILITY
-    if ( tag != TAG_DYNAMIC || in.formatID() < 44 )
-#else
-    else
-#endif
+    if ( tag == TAG )
     {
 #ifdef BACKWARD_COMPATIBILITY
+        if ( in.formatID() < 44 )
+            readEndState(in);
         const real len = length();
 #endif
         
         Fiber::read(in, sim, tag);
-        
+                
 #ifdef BACKWARD_COMPATIBILITY
         if ( tag == TAG && in.formatID() < 46 )
         {
@@ -185,5 +193,7 @@ void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
 #endif
     }
+    else if ( tag == TAG_DYNAMIC )
+        readEndState(in);
 }
 
