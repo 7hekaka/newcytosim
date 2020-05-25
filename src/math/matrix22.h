@@ -384,7 +384,7 @@ public:
 #if MATRIX22_USES_AVX
     static const vec4 transposed(vec4 const& mat)
     {
-#if __AVX2__
+#ifdef __AVX2__
         return permute4x64(mat, 0xD8);
 #else
         return blend4(mat, permute4(permute2f128(mat,mat,0x01),0b1100), 0b0110);
