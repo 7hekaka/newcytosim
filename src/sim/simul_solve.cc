@@ -428,11 +428,8 @@ void Simul::solve()
 void Simul::solve_half()
 {
     sMeca.prepare(this);
-    //auto rdt = __rdtsc();
     setAllInteractions(sMeca);
-    //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.solve(prop, prop->precondition);
-    //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 }
 
 

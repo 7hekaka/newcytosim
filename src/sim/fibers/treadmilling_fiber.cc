@@ -166,6 +166,7 @@ void TreadmillingFiber::readEndState(Inputter& in)
 
 void TreadmillingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
+    //std::clog << " TreadmillingFiber::read(" << tag << ")\n";
     if ( tag == TAG )
     {
 #ifdef BACKWARD_COMPATIBILITY

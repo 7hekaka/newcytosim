@@ -188,28 +188,28 @@ public:
     /// call foldPosition() for all objects (implements periodic boundary conditions)
     void            foldPosition() const;
 
-    /// simulate the mechanics of the system and move Mecables accordingly, corresponding to `time_step`
+    /// simulate the mechanics of the system and move Mecables accordingly
     void            solve();
     
-    /// like 'solve' but automatically select the fastest preconditionning method
-    void            solve_auto();
+    /// solve mechanical system and calculate forces but do not apply movements
+    void            solve_half();
 
-    /// replace coordinates of Mecables by the ones calculated in solve()
+    /// replace coordinates of Mecables by the ones calculated in solve_half()
     void            apply() const { sMeca.apply(); }
+    
+    /// like 'solve' but automatically selects the fastest preconditionning method
+    void            solve_auto();
 
     /// do nothing
     void            solve_not() {};
-    
-    /// calculate forces but do not apply movements
-    void            solve_half();
 
     /// calculate the motion of objects, but only in the X-direction
     void            solveX();
     
-    /// move every Fiber backward by `shift` (this is a extremely crude model)
+    /// move every Fiber backward by `shift` (this is an extremely crude model)
     void            solve_flux();
     
-    /// calculate Forces and Lagrange multipliers on the Mecables, but do not move them
+    /// calculate Forces and Lagrange multipliers on the Mecables
     void            computeForces() const;
     
     /// this is used for development

@@ -602,16 +602,16 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 {
                     // check that we are using the correct ObjectSet:
                     assert_true( objset == findSetT(tag) );
-                    bool skip = ( subset && subset!=objset );
+                    const bool skip = ( subset && subset!=objset );
                     objset->loadObject(in, tag, fat, skip);
                 }
                 else
                 {
-                    // this is the 'older' pathway
+                    // this is an 'older' code pathway
                     ObjectSet * set = findSetT(tag);
                     if ( set )
                     {
-                        bool skip = ( subset && subset!=set );
+                        const bool skip = ( subset && subset!=set );
                         set->loadObject(in, tag, fat, skip);
                     }
                 }

@@ -1689,7 +1689,7 @@ void Fiber::write(Outputter& out) const
 
 void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    //std::clog << this << " Fiber::read(" << tag << ")\n";
+    //std::clog << " Fiber::read(" << tag << ")\n";
 #ifdef BACKWARD_COMPATIBILITY
         
     if ( in.formatID() == 33 )
@@ -1777,12 +1777,16 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         if ( virgin )
         {
             virgin = false;
-            std::cerr << "INCIDENT: skipping dynamic states for unknown fiber class\n";
+            std::cerr << "INCIDENT: skipping end states for `" << prop->name() << "'\n";
         }
         in.readUInt16();
         in.readUInt16();
-        in.readUInt16();
-        in.readUInt16();
+        // try to recover the next record in file:
+        if ( !isalpha(in.peek()) )
+        {
+            in.readUInt16();
+            in.readUInt16();
+        }
     }
     else if ( tag == 'm' )
     {

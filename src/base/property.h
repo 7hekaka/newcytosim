@@ -87,7 +87,8 @@ public:
     
     /// set index in the array of Properties
     void         renumber(size_t x) { number_ = x; }
-    
+    //void       renumber(size_t x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
+
     //-------------------------------------------------------------------------------
     
     /// clear parameters to default values

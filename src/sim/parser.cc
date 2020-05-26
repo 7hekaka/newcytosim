@@ -1041,7 +1041,10 @@ void Parser::parse_dump(std::istream& is)
         throw InvalidSyntax("missing directory name after 'dump'");
 
     if ( do_write && do_run )
+    {
+        simul.solve_half();
         simul.sMeca.dump(str.c_str());
+    }
 }
 
 

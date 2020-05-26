@@ -485,9 +485,9 @@ Object * ObjectSet::readObject(Inputter& in, const ObjectTag tag, bool fat)
 
     assert_true(isprint(tag));
     
-    // read header:
     if ( in.binary() )
     {
+        // read header in binary format
         if ( fat )
         {
             ix = in.readUInt16();
@@ -499,7 +499,6 @@ Object * ObjectSet::readObject(Inputter& in, const ObjectTag tag, bool fat)
                 mk = in.readUInt16();
             else
 #endif
-
             mk = in.readUInt32();
         }
         else
@@ -510,6 +509,7 @@ Object * ObjectSet::readObject(Inputter& in, const ObjectTag tag, bool fat)
     }
     else
     {
+        // read header in text format
         FILE * file = in.file();
         if ( 1 != fscanf(file, "%u", &ix) )
             throw InvalidIO("invalid Object header");
@@ -537,6 +537,19 @@ Object * ObjectSet::readObject(Inputter& in, const ObjectTag tag, bool fat)
     // find corresponding object:
     Object * w = findID(id);
     
+    // check that property index has not changed:
+    if ( w && w->property()->number() != ix )
+    {
+        Property const* P = w->property();
+#if ( 1 )
+        std::clog << "Property mismatch: `";
+        std::clog << P->name() << "' is " << P->category() << P->number();
+        std::clog << " but loaded object has property #" << ix << '\n';
+#endif
+        erase(w);
+        w = nullptr;
+    }
+    
     if ( !w )
     {
         // create new object of required class
@@ -549,6 +562,7 @@ Object * ObjectSet::readObject(Inputter& in, const ObjectTag tag, bool fat)
             throw InvalidIO("invalid ObjectTag "+str+" referenced in file");
         }
         w->identity(id);
+        //std::clog << "- new " << Object::reference(tag, ix, id) << '\n';
     }
     assert_true( w->identity() == id );
     assert_true( w->property() );

@@ -28,9 +28,7 @@ void PropertyList::deposit(Property * p)
             if ( i->name() == p->name() )
                 throw InvalidParameter("Property '"+p->name()+"' is already defined");
         }
-        
-        //std::clog << "Property `" << p->name() << "' is " << p->category() << " # " << cnt+1 << std::endl;
-        
+                
         vec_.push_back(p);
         p->renumber(cnt+1);
     }
