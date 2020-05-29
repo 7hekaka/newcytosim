@@ -134,8 +134,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    if ( arg.warnings(std::cerr) )
-        std::cerr << " on command line\n";
+    arg.print_warnings(std::cerr, 1, " on command line\n");
     time_t sec = TicToc::seconds_since_1970();
     
     try {

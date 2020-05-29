@@ -281,8 +281,7 @@ int main(int argc, char* argv[])
         }
         catch( Exception & e )
         {
-            if ( arg.warnings(std::cerr) )
-                std::cerr << '\n';
+            arg.print_warnings(std::cerr, 1, "\n");
             print_magenta(std::cerr, e.brief());
             std::cerr << '\n' << e.info() << '\n';
             return EXIT_FAILURE;
@@ -362,13 +361,11 @@ int main(int argc, char* argv[])
             OffScreen::releaseBuffer();
         OffScreen::releaseBuffer();
         OffScreen::closeContext();
-        if ( arg.warnings(std::cerr) )
-            std::cerr << '\n';
+        arg.print_warnings(std::cerr, 1, "\n");
         return EXIT_SUCCESS;
     }
     
-    if ( arg.warnings(std::cerr) )
-        std::cerr << '\n';
+    arg.print_warnings(std::cerr, 1, "\n");
 
     //--------- initialize Window system and create Window
 #if ( HEADLESS_PLAYER == 0 )

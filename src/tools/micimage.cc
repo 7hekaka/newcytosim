@@ -223,8 +223,7 @@ int main(int argc, char* argv[])
     arg.set(dim, 2, "dim");
     arg.set(psf,    "psf");
 
-    if ( arg.warnings(std::cerr) )
-        std::cerr << '\n';
+    arg.print_warnings(std::cerr, 1, "\n");
 
     res = pix / mag;
     std::cerr << "A pixel covers a distance of " << res << " units" << std::endl;

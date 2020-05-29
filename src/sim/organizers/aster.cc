@@ -31,7 +31,7 @@ void Aster::step()
         {
             Glossary opt(prop->fiber_spec);
             sim.add(makeFiber(sim, ii, prop->fiber_type, opt));
-            if ( opt.warnings(std::cerr) )
+            if ( opt.has_warnings(std::cerr, 1) )
                 std::cerr << " in aster:nucleate[1]";
         }
     }
@@ -223,8 +223,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
             opt.set(str, var, 2);
             Glossary fopt(str);
             res.append(makeFiber(sim, cnt, tif, fopt));
-            if ( fopt.warnings(std::cerr) )
-                std::cerr << " in aster:nucleate[1]";
+            fopt.print_warnings(std::cerr, 1, " in aster:nucleate[1]");
             ++cnt;
             var = "fiber" + std::to_string(cnt+1);
         }
@@ -254,8 +253,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         {
             for ( size_t n = 0; n < nbf; ++n )
                 res.append(makeFiber(sim, n, tif, fopt));
-            if ( fopt.warnings(std::cerr, nbf) )
-                std::cerr << " in aster:nucleate[1]\n";
+            fopt.print_warnings(std::cerr, nbf, " in aster:nucleate[1]\n");
         }
     }
     return res;

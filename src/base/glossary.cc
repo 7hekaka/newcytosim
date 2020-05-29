@@ -725,7 +725,7 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
  If the return value is not zero, a message was printed to 'os', and
  at least a terminating '\n' should be printed to 'os' by the calling function.
  */
-int Glossary::warnings(std::ostream& os, size_t threshold) const
+int Glossary::has_warnings(std::ostream& os, size_t threshold) const
 {
     int res = 0;
     std::string msg;
@@ -740,6 +740,13 @@ int Glossary::warnings(std::ostream& os, size_t threshold) const
         }
     }
     return res;
+}
+
+
+void Glossary::print_warnings(std::ostream& os, size_t threshold, std::string const& msg) const
+{
+    if ( has_warnings(os, threshold) )
+        os << msg;
 }
 
 //------------------------------------------------------------------------------

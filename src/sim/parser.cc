@@ -35,7 +35,7 @@ Parser::Parser(Simul& sim, bool s, bool c, bool n, bool r, bool w)
 /// check for unused values in Glossary and issue a warning
 void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
 {
-    if ( opt.warnings(std::cerr, cnt) )
+    if ( opt.has_warnings(std::cerr, cnt) )
     {
         std::cerr << '\n';
         StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
