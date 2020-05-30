@@ -121,9 +121,9 @@ size_t HandList::count() const
 }
 
 
-int HandList::count(int (*func)(Hand const*)) const
+size_t HandList::count(int (*func)(Hand const*)) const
 {
-    int res = 0;
+    size_t res = 0;
     
     for ( Hand const* h = haFront; h; h = h->next() )
         res += func(h);

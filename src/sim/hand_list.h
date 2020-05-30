@@ -50,7 +50,7 @@ public:
     size_t   count() const;
     
     /// a function to count Hands using a custom criteria
-    int      count(int (*func)(Hand const*)) const;
+    size_t   count(int (*func)(Hand const*)) const;
     
     /// number of Hands attached within a range of abscissa
     size_t   countInRange(real abs_min, real abs_max) const;
