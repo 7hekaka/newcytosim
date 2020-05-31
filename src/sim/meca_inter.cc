@@ -1439,9 +1439,9 @@ void Meca::addLink1(Interpolation const& pti,
     const real cc[] = {    -1.0,  pti.coef0(),  pti.coef1() };
     const real ww[] = { -weight, weight*cc[1], weight*cc[2] };
     
-    sub_iso(ii0, ii0, ww[0]); // since cc[0] == 1.0
-    sub_iso(ii1, ii0, ww[1]); // since cc[0] == 1.0
-    sub_iso(ii2, ii0, ww[2]); // since cc[0] == 1.0
+    add_iso(ii0, ii0, ww[0]); // since cc[0] == -1.0
+    add_iso(ii1, ii0, ww[1]);
+    add_iso(ii2, ii0, ww[2]);
     
     sub_iso(ii1, ii1, ww[1] * cc[1]);
     sub_iso(ii2, ii1, ww[2] * cc[1]);
@@ -1726,7 +1726,7 @@ void Meca::addLink4(Mecapoint const& ptA,
     
     assert_small(coef[0]+coef[1]+coef[2]+coef[3]-1.0);
     
-    add_iso(ii0, ii0, ww[0]);
+    add_iso(ii0, ii0, ww[0]);  // since cc[0] = -1
     add_iso(ii1, ii0, ww[1]);
     add_iso(ii2, ii0, ww[2]);
     add_iso(ii3, ii0, ww[3]);
