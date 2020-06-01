@@ -123,16 +123,16 @@ void Display::displayTiled(Simul const& sim, int arg)
     {
         if ( modulo->isPeriodic(d) )
         {
-            l[d] = (arg>1) ? -1 : 0;
+            l[d] = (arg & (1<<d)) ? -1 : 0;
             u[d] = +1;
         }
     }
     
     glMatrixMode(GL_MODELVIEW);
     
-    Vector px = modulo->periodicity(0);
-    Vector py = modulo->periodicity(1);
-    Vector pz = modulo->periodicity(2);
+    const Vector px = modulo->period(0);
+    const Vector py = modulo->period(1);
+    const Vector pz = modulo->period(2);
 
     for ( int dx = l[0]; dx <= u[0]; ++dx )
     for ( int dy = l[1]; dy <= u[1]; ++dy )

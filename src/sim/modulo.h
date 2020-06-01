@@ -44,7 +44,7 @@ public:
     bool isPeriodic(size_t d) const { return mMode & (1<<d); }
     
     /// return the d-th direction of periodicity
-    const Vector periodicity(size_t d) const;
+    const Vector period(size_t d) const;
     
     /// shift `pos` to its canonical image, which is the one closest to the origin
     void         fold(Vector & pos) const;

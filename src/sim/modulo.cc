@@ -27,11 +27,11 @@ void Modulo::enable(size_t d, real size)
 }
 
 
-const Vector Modulo::periodicity(size_t d) const
+const Vector Modulo::period(size_t d) const
 {
     Vector vec(0,0,0);
     if ( d < DIM && ( mMode & 1<<d ))
-        vec[d] = 2 * mSize[d];
+        vec[d] = mSize[d];
     return vec;
 }
 
