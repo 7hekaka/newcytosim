@@ -85,8 +85,8 @@ This process is automated from the command line, you should be able to compile a
 Even if the MIDI device is plugged in your USB computer, it may not immediately be enabled by the system.
 The procedure depends on the OS.
 
-On Mac OSX, open an Application called "Audio MIDI Setup" (`Menu > Windows > Show MIDI Studio`)  
-The MIDI device should show up there, allowing you to customize (double click)
+On Mac OSX, open an Utility called "Audio MIDI Setup" (`Menu > Windows > Show MIDI Studio`)  
+The MIDI device should show up there, allowing you to customize it (double click)
 and **activate the output port**.
 You may need to create a new configuration.
 

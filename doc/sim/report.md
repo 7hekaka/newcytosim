@@ -153,7 +153,8 @@ It is relatively easy to extend the report functions, declared in `src/sim/simul
  `couple:NAME`           | Position and state of couples of class NAME
  `couple:link`           | detailed information on doubly-attached couples
  `couple:configuration`  | number of Couples in { X, P, A, V, T } states
- `couple:force`          | Histogram of tension in the couple links
+ `couple:force`          | Average and maximum of tension in the couple links
+ `couple:histogram`      | Histogram of tension in the couple links
  `couple:active`         | Position of active couples
  `couple:anatomy`        | Composition of couples
  `couple:NAME`           | Position of couples of class NAME
