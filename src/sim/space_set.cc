@@ -49,8 +49,18 @@ void SpaceSet::setMaster(Space const* spc)
 Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
 {
     std::string s;
-    if ( cat == "space" && opt.peek(s, "shape") )
+    if ( cat == "space" )
     {
+        if ( opt.peek(s, "shape") )
+            ;
+#ifdef BACKWARD_COMPATIBILITY
+        // "geometry" was used before 2018
+        else if ( opt.peek(s, "geometry") )
+        {
+            std::stringstream iss(s);
+            iss >> s;
+        }
+#endif
         if ( s=="disc" )                  return new SpaceDynamicProp(nom);
         if ( s=="dynamic_sphere" )        return new SpaceDynamicProp(nom);
         if ( s=="lid"  )                  return new SpaceDynamicProp(nom);

@@ -21,7 +21,7 @@ inline real fold_real(const real x, const real p)
 void Modulo::enable(size_t d, real size)
 {
     if ( size <= 0 )
-        throw InvalidParameter("periodic:length must be > 0");
+        throw InvalidParameter("periodic:length[",d,"] must be > 0");
     mMode |= 1<<d;
     mSize[d] = size;
 }

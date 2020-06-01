@@ -22,7 +22,7 @@ void SpacePeriodic::resize(Glossary& opt)
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len <= 0 )
-            throw InvalidParameter("periodic:length[] must be > 0");
+            throw InvalidParameter("periodic:length[",d,"] must be > 0");
         length_[d] = len;
     }
 }
