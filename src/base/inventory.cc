@@ -3,6 +3,7 @@
 #include "inventory.h"
 #include "assert_macro.h"
 #include "exceptions.h"
+#include <limits>
 
 
 Inventory::Inventory()
