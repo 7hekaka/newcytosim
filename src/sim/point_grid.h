@@ -327,6 +327,9 @@ public:
     /// true if the grid was initialized by calling setGrid()
     size_t hasGrid() const  { return pGrid.hasCells(); }
     
+    /// true if Grid has some periodic direction
+    bool isPeriodic() const { return pGrid.isPeriodic(); }
+
     /// clear the grid
     void clear()            { pGrid.clear(); }
     

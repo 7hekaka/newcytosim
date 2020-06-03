@@ -412,13 +412,25 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             checkPL(meca, pam, *ii, *kk);
     }
     
-    const real sup = square(max_diameter);
-    for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
+    if ( isPeriodic() )
     {
-        Vector pos = ii->pos;
-        for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
-            if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
-                checkLL(meca, pam, *ii, *jj);
+        for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
+        {
+            for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
+                if ( !adjacent(ii->seg, jj->seg) )
+                    checkLL(meca, pam, *ii, *jj);
+        }
+    }
+    else
+    {
+        const real sup = square(max_diameter);
+        for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
+        {
+            Vector pos = ii->pos;
+            for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
+                if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
+                    checkLL(meca, pam, *ii, *jj);
+        }
     }
 }
 
@@ -443,16 +455,31 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             checkPL(meca, pam, *ii, *kk);
     }
     
-    const real sup = square(max_diameter);
-    for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+    if ( isPeriodic() )
     {
-        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
-            checkPL(meca, pam, *jj, *ii);
-        
-        Vector pos = ii->pos;
-        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
-            if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
-                checkLL(meca, pam, *ii, *kk);
+        for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+        {
+            for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+                checkPL(meca, pam, *jj, *ii);
+            
+            for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+                if ( !adjacent(ii->seg, kk->seg)  )
+                    checkLL(meca, pam, *ii, *kk);
+        }
+    }
+    else
+    {
+        const real sup = square(max_diameter);
+        for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+        {
+            for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+                checkPL(meca, pam, *jj, *ii);
+            
+            Vector pos = ii->pos;
+            for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+                if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
+                    checkLL(meca, pam, *ii, *kk);
+        }
     }
 }
 

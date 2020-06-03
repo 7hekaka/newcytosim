@@ -25,8 +25,11 @@ private:
 
 public:
     
+    /// set as non periodic
+    void reset() { mMode = 0; for (int d=0; d<4; ++d) mSize[d] = 0; }
+    
     /// constructor
-    Modulo() { mMode = 0; for (int d=0; d<DIM; ++d) mSize[d] = 0; }
+    Modulo() { reset(); }
 
     /// destructor
     ~Modulo() {}
