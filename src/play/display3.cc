@@ -409,7 +409,7 @@ void set_color_abscissaM(Fiber const& fib, size_t seg, real beta)
 /// distance from the plus end
 void set_color_abscissaP(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front(exp(-(fib.nbPoints()-1.5-seg)*beta));
+    fib.disp->color.load_front(exp((seg+1.5-fib.nbPoints())*beta));
 }
 
 
@@ -429,47 +429,46 @@ void Display3::drawFiberLines(Fiber const& fib) const
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
     
-    if ( disp->line_style == 1 )
+    switch ( disp->line_style )
     {
-        drawFiberSegments(fib, rad, set_color_not, 1.0);
-    }
-    else if ( disp->line_style == 2 )
-    {
-        real beta = 1.0 / disp->tension_scale;
-        drawFiberSegments(fib, rad, set_color_tension, beta);
-    }
-    else if ( disp->line_style == 3 )
-    {
-        real beta = 1.0 / disp->tension_scale;
-        drawFiberSegments(fib, rad, set_color_tensionR, beta);
-    }
-    else if ( disp->line_style == 4 )
-    {
-        drawFiberSegments(fib, rad, set_color_curvature, 1.0);
-    }
-    else if ( disp->line_style == 5 )
-    {
-        drawFiberSegments(fib, rad, set_color_direction, 1.0);
-    }
-    else if ( disp->line_style == 6 )
-    {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        real beta = fib.segmentation() / disp->length_scale;
-        drawFiberSegments(fib, rad, set_color_abscissaM, beta);
-        glDisable(GL_CULL_FACE);
-    }
-    else if ( disp->line_style == 7 )
-    {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        real beta = fib.segmentation() / disp->length_scale;
-        drawFiberSegments(fib, rad, set_color_abscissaP, beta);
-        glDisable(GL_CULL_FACE);
-    }
-    else if ( disp->line_style == 8 )
-    {
-        drawFiberSegments(fib, rad, set_color_grid, 1.0);
+        case 1:
+            drawFiberSegments(fib, rad, set_color_not, 1.0);
+            break;
+        case 2:
+        {
+            real beta = 1.0 / disp->tension_scale;
+            drawFiberSegments(fib, rad, set_color_tension, beta);
+        } break;
+        case 3:
+        {
+            real beta = 1.0 / disp->tension_scale;
+            drawFiberSegments(fib, rad, set_color_tensionR, beta);
+        } break;
+        case 4:
+            drawFiberSegments(fib, rad, set_color_curvature, 1.0);
+            break;
+        case 5:
+            drawFiberSegments(fib, rad, set_color_direction, 1.0);
+            break;
+        case 6:
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            real beta = fib.segmentation() / disp->length_scale;
+            drawFiberSegments(fib, rad, set_color_abscissaM, beta);
+            glDisable(GL_CULL_FACE);
+        } break;
+        case 7:
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            real beta = fib.segmentation() / disp->length_scale;
+            drawFiberSegments(fib, rad, set_color_abscissaP, beta);
+            glDisable(GL_CULL_FACE);
+        } break;
+        case 8:
+            drawFiberSegments(fib, rad, set_color_grid, 1.0);
+            break;
     }
 }
 
