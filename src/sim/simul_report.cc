@@ -1825,24 +1825,20 @@ void Simul::reportSingleLink(std::ostream& out, std::string const& which) const
  */
 void Simul::reportSingle(std::ostream& out) const
 {
-    const unsigned mx = 128;
+    constexpr size_t SUP = 128;
     
-    int free[mx] = { 0 }, bound[mx] = { 0 };
+    int free[SUP+1] = { 0 }, bound[SUP+1] = { 0 };
     
     for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
-        assert_true(!si->attached());
-        size_t x = i->prop->number();
-        if ( x < mx )
-            ++free[x];
+        assert_true(!i->attached());
+        ++free[std::min(i->prop->number(), SUP)];
     }
     
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
     {
         assert_true(i->attached());
-        size_t x = i->prop->number();
-        if ( x < mx )
-            ++bound[x];
+        ++bound[std::min(i->prop->number(), SUP)];
     }
     
     if ( 1 )
@@ -1856,12 +1852,12 @@ void Simul::reportSingle(std::ostream& out) const
     for ( Property const* i : properties.find_all("single") )
     {
         out << LIN << ljust(i->name(), 2);
-        size_t ix = i->number();
-        if ( ix < mx )
+        size_t x = i->number();
+        if ( x < SUP )
         {
-            out << SEP << free[ix] + bound[ix];
-            out << SEP << free[ix];
-            out << SEP << bound[ix];
+            out << SEP << free[x] + bound[x];
+            out << SEP << free[x];
+            out << SEP << bound[x];
         }
         else
             out << SEP << " out-of-range ";
@@ -2159,16 +2155,16 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
         cnt[ii][jj] = 0;
     
     // accumulate counts:
-    for ( Couple const* cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
+    for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
-        size_t ix = cxi->prop->number();
-        if ( ix < IMAX )
+        size_t x = i->prop->number();
+        if ( x < IMAX )
         {
-            unsigned f = (unsigned)( cxi->force().norm() / delta );
+            unsigned f = (unsigned)( i->force().norm() / delta );
             if ( f < nbin )
-                ++cnt[ix][f];
+                ++cnt[x][f];
             else
-                ++cnt[ix][nbin];
+                ++cnt[x][nbin];
         }
     }
     
@@ -2201,58 +2197,58 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportCouple(std::ostream& out) const
 {
-    const size_t mx = 128;
-    int act[mx] = { 0 }, cnt[mx][4];
+    constexpr size_t SUP = 128;
+    int act[SUP] = { 0 }, cnt[SUP][4];
     
     //reset counts:
-    for ( size_t ii = 0; ii < mx; ++ii )
+    for ( size_t i = 0; i < SUP; ++i )
     {
-        cnt[ii][0] = 0;
-        cnt[ii][1] = 0;
-        cnt[ii][2] = 0;
-        cnt[ii][3] = 0;
+        cnt[i][0] = 0;
+        cnt[i][1] = 0;
+        cnt[i][2] = 0;
+        cnt[i][3] = 0;
     }
     
-    for ( Couple const* cxi=couples.firstFF(); cxi ; cxi = cxi->next() )
+    for ( Couple const* i=couples.firstFF(); i ; i = i->next() )
     {
-        assert_true(!cxi->attached1() && !cxi->attached2());
-        size_t ix = cxi->prop->number();
-        if ( ix < mx )
+        assert_true(!i->attached1() && !i->attached2());
+        size_t x = i->prop->number();
+        if ( x < SUP )
         {
-            if ( cxi->active() ) ++act[ix];
-            ++(cnt[ix][0]);
+            if ( i->active() ) ++act[x];
+            ++(cnt[x][0]);
         }
     }
     
-    for ( Couple const* cxi=couples.firstAF(); cxi ; cxi = cxi->next() )
+    for ( Couple const* i=couples.firstAF(); i ; i = i->next() )
     {
-        assert_true(cxi->attached1() && !cxi->attached2());
-        size_t ix = cxi->prop->number();
-        if ( ix < mx )
+        assert_true(i->attached1() && !i->attached2());
+        size_t x = i->prop->number();
+        if ( x < SUP )
         {
-            if ( cxi->active() ) ++act[ix];
-            ++(cnt[ix][1]);
+            if ( i->active() ) ++act[x];
+            ++(cnt[x][1]);
         }
     }
-    for ( Couple const* cxi=couples.firstFA(); cxi ; cxi = cxi->next() )
+    for ( Couple const* i=couples.firstFA(); i ; i = i->next() )
     {
-        assert_true(!cxi->attached1() && cxi->attached2());
-        size_t ix = cxi->prop->number();
-        if ( ix < mx )
+        assert_true(!i->attached1() && i->attached2());
+        size_t x = i->prop->number();
+        if ( x < SUP )
         {
-            if ( cxi->active() ) ++act[ix];
-            ++(cnt[ix][2]);
+            if ( i->active() ) ++act[x];
+            ++(cnt[x][2]);
         }
     }
     
-    for ( Couple const* cxi=couples.firstAA(); cxi ; cxi = cxi->next() )
+    for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
-        assert_true(cxi->attached1() && cxi->attached2());
-        size_t ix = cxi->prop->number();
-        if ( ix < mx )
+        assert_true(i->attached1() && i->attached2());
+        size_t x = i->prop->number();
+        if ( x < SUP )
         {
-            if ( cxi->active() ) ++act[ix];
-            ++(cnt[ix][3]);
+            if ( i->active() ) ++act[x];
+            ++(cnt[x][3]);
         }
     }
     
@@ -2270,13 +2266,13 @@ void Simul::reportCouple(std::ostream& out) const
     for ( Property const* i : properties.find_all("couple") )
     {
         out << LIN << ljust(i->name(), 2);
-        size_t ix = i->number();
-        if ( ix < mx )
+        size_t x = i->number();
+        if ( x < SUP )
         {
-            out << SEP << cnt[ix][0]+cnt[ix][1]+cnt[ix][2]+cnt[ix][3];
-            out << SEP << act[ix];
+            out << SEP << cnt[x][0]+cnt[x][1]+cnt[x][2]+cnt[x][3];
+            out << SEP << act[x];
             for ( size_t d = 0; d < 4; ++d )
-                out << SEP << cnt[ix][d];
+                out << SEP << cnt[x][d];
         }
         else
             out << SEP << "out-of-range";
