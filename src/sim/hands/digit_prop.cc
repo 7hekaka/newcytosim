@@ -3,6 +3,7 @@
 #include "dim.h"
 #include "sim.h"
 #include "common.h"
+#include "messages.h"
 #include "glossary.h"
 #include "exceptions.h"
 #include "property_list.h"
@@ -38,7 +39,7 @@ void DigitProp::read(Glossary& glos)
     if ( glos.set(footprint, "footprint") )
     {
         if ( std::is_same<real, FiberLattice::cell_t>::value )
-            throw InvalidParameter("`footprint` is only valid with Integer-based Lattice");
+            Cytosim::warn << "`footprint` is only valid with Integer-based Lattice";
     }
 
 #ifdef BACKWARD_COMPATIBILITY
@@ -65,7 +66,7 @@ void DigitProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
     write_value(os, "step_size", step_size);
-    write_value(os, "footprint", footprint);
+    write_value(os, "footprint", std::to_string(footprint));
     write_value(os, "site_shift", site_shift);
 }
 
