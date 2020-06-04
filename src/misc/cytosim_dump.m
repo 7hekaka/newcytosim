@@ -11,7 +11,8 @@ if nargin < 1
     path = '.';
 end
 
-abstol = 0.0005;
+mulcnt = 0;
+abstol = 0.005;
 
 %% Loading
 
@@ -38,7 +39,7 @@ else
     error(['cannot find dump directory ',path]);
 end
 
-fprintf(1, 'loaded cytosim system of size %i with time_step %f\n', dim, time_step);
+fprintf(1, '-------- loaded system of size %i with time_step %f --------\n', dim, time_step);
 
 %% Check matrix
 
@@ -64,19 +65,20 @@ if ( 1 )
     end
     
     fprintf(1, '%i mecables with %i block scalars\n', nbo, nbv);
-    
-    fprintf(1, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
+    fprintf(2, '    norm(ela-transpose(ela)) = %f\n', vecnorm(ela-ela'));
+
+    fprintf(2, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
     if ( err0 > 1e-8 )
         imshow(abs(mat));
         set(gcf, 'name', 'Reconstituted matrix');
     end
 
-    fprintf(1, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', max(max(abs(PRC-con))));
-    fprintf(1, '    norm(rhs) = %f\n', norm(rhs));
-    fprintf(1, '    norm(sol) = %f\n', norm(sol));
-    fprintf(1, '    norm(con*rhs) = %f\n', norm(con*rhs));
+    fprintf(2, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', max(max(abs(PRC-con))));
+    fprintf(2, '    norm(rhs) = %f', norm(rhs));
+    fprintf(2, '    norm(sol) = %f', norm(sol));
+    fprintf(2, '    norm(con*rhs) = %f\n', norm(con*rhs));
 
-    %figure('name', 'Mecable footprint'); imshow(blk);
+    %figure('name', 'Mecable footprint'); imshow(PRC);
 
 end
 
@@ -93,8 +95,8 @@ if ( 0 )
     ylabel('cytosim matrix');
 end
 if ( 0 )
-    figure; hold on;
-    plot(abs(sys), '^b');
+    figure('name', 'System matrix values');
+    plot(abs(sys), '^b'); hold on;
     plot(abs(mat), 'vr');
 end
 if ( 0 )
@@ -103,29 +105,33 @@ if ( 0 )
     drawnow;
 end
 
-%% TESTING DIFFERENT ITERATIVE SOLVERS
+%% RECALCULATE SOLUTION
 
-tol = abstol / norm(rhs);
+reltol = abstol / norm(rhs);
 
 maxit = dim;
-sss = sparse(sys);
+system = sparse(sys);
 
-solution = bicgstab(sss, rhs, abstol*0.001, maxit);
-     
-% BCGS
-[vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit);
+solution = bicgstab(@multiply, rhs, reltol*0.001, maxit);
 
-report('BCGS', 2*itr, vec, rv0(end));
-
+fprintf(2, '    norm(sol - matlab_sol) = %f\n', norm(sol-solution));
+    
 if 0
     figure;
-    plot(vec, sol, 'k.');
+    plot(solution, sol, 'k.');
     xlabel('matlab solution');
     ylabel('cytosim solution');
     xl = xlim;
     ylim(xl);
     drawnow;
 end
+
+%% BCGS
+
+mulcnt = 0;
+[vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit);
+
+report('bicgstab', mulcnt, vec, rv0(end));
 
 figure('Name', 'Convergence');
 convergence_axes = [];
@@ -135,14 +141,20 @@ ylabel('Relative residual');
 title('Solver Convergence');
 hold on;
 
+% Matlab BiCGStab(L)
+mulcnt = 0;
+[vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit);
+convergence_plot(rv0/rv0(1), 'b');
+report('bicgstab(1)', mulcnt, vec, rv0(end));
+
 if 0 %% without preconditionning
  
     % BiCGStab(L)
     for i = 1:4
-        OPT.Tol = tol;
+        OPT.Tol = reltol;
         OPT.ell = min(2^i, dim);
         OPT.MaxIt = maxit;
-        [vec,rv0,itr] = cgstab(sss, rhs, [], [], OPT);
+        [vec,rv0,itr] = cgstab(@multiply, rhs, [], [], OPT);
         convergence_plot(rv0(:,2), rv0(:,1)/rv0(1,1),'m');
         report(sprintf('BiCGS(%i)', OPT.ell), itr, vec, rv0(end,1));
     end
@@ -150,7 +162,7 @@ if 0
     % GMRES
     for i = 2:6
         RS = min(2^i, dim);
-        [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol, maxit);
+        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
         convergence_plot(rv0/rv0(1),'g');
         report(sprintf('GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
     end
@@ -158,7 +170,7 @@ end
     % IDRS-STAB
     for i = 0:4
         RS = min(2^i, dim);
-        [vec,flg,res,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/2, maxit, [], [], []);
+        [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, [], [], []);
         convergence_plot(rv0/rv0(1),'m');
         report(sprintf('IDRSTAB %03i', RS), itr, vec, rv0(end));
     end
@@ -167,45 +179,56 @@ end
     OPT.smoothing = 0;
     for i = 0:4
         RS = min(2^i, dim);
-        [vec,flg,res,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, [], [], [], OPT);
+        [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, [], [], [], OPT);
         convergence_plot(rv0/rv0(1),'r');
         report(sprintf('IDRS %03i', RS), itr, vec, rv0(end));
     end
 end
 
-    fprintf(2, 'Elasticity          has %i non-zero elements\n', nnz(ela));
-    fprintf(2, 'Mobility/Projection has %i non-zero elements\n', nnz(mob));
-    fprintf(2, 'Block conditionner  has %i non-zero elements\n', nnz(con));
+ %% WITH TRADITIONAL DIAGONAL BLOCKS PRECONDITIONNER
+ 
+ fprintf(2, '    Elasticity          has %i elements\n', nnz(ela));
+ fprintf(2, '    Mobility/Projection has %i elements\n', nnz(mob));
+ fprintf(2, '    Block conditionner  has %i elements\n', nnz(con));
 
-if 1 %% WITH TRADITIONAL PRECONDITIONNING
+ if 1
 
-    [vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit, @precondition);
-    report('P BCGS', 2*itr, vec, rv0(end));
-    convergence_plot(rv0/rv0(1),'k');
-
+     mulcnt = 0;
+     [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
+     report('P bicgstab', mulcnt, vec, rv0(end));
+     convergence_plot(rv0/rv0(1),'k--');
+     
+     mulcnt = 0;
+     % Matlab BiCGStab(L)
+     [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
+     convergence_plot(rv0/rv0(1), 'b--');
+     report('P bicgstab(1)', mulcnt, vec, rv0(end));
+    
 end
+
 if 0
     % BiCGStab(L)
     for i = 1:4
-        OPT.Tol = tol;
+        OPT.Tol = reltol;
         OPT.ell = min(2^i, dim);
         OPT.MaxIt = maxit;
         OPT.TypePrecond = 'right';
-        [vec,rv0,itr] = cgstab(sss, rhs, OPT, @precondition);
+        [vec,rv0,itr] = cgstab(@multiply, rhs, OPT, @precondition);
         convergence_plot(rv0(:,2), rv0(:,1)/rv0(1, 1),'m');
         report(sprintf('P BiCGS(%i)', OPT.ell), itr, vec, rv0(end));
     end
+
     % GMRES
     for i = 1:6
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = gmres(sss, rhs, RS, tol/3, maxit, [], @precondition);
+        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol/3, maxit, [], @precondition);
         convergence_plot(rv0/rv0(1),'g');
         report(sprintf('P GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
     end
     % IDRS-STAB
     for i = 0:5
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/2, maxit, @precondition, [], []);
+        [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, @precondition, [], []);
         convergence_plot(rv0/rv0(1),'m');
         report(sprintf('P IDRSTAB %03i', RS), itr, vec, rv0(end));
     end
@@ -213,155 +236,163 @@ if 0
     OPT.smoothing = 1;
     for i = 0:3
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs_f(sss, rhs, RS, tol, maxit, @precondition, [], [], OPT);
+        [vec,~,~,itr,rv0] = idrs_f(@multiply, rhs, RS, reltol, maxit, @precondition, [], [], OPT);
         convergence_plot(rv0/rv0(1),'r-');
         report(sprintf('P IDRS %03i', RS), itr, vec, rv0(end));
     end
 end
 
+%% a possible sparse symmetric preconditionner
+
+% the DRY matrix is not necessarily symmetric because of the diagonal matrix
+% may not commute with 'ela'. However, if all point drags are equal, then
+% surely DRY is symmetric and we can use incomplete Cholesky factorization
+
+if 1
+    val = time_step / mean(1./drg);
+    sWET = sparse( eye(dim) - diag(val.*ones(length(ela), 1)) * ela );
+    
+    fprintf(2, '    WET has %i elements; ', nnz(sWET));
+    
+    clear OPT;
+    OPT.michol = 'off';
+    OPT.type = 'nofill';
+    L = ichol(sWET, OPT);
+    fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'k:');
+    report('w bicgstab', mulcnt, vec, rv0(end));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'b:');
+    report('w bicgstab(1)', mulcnt, vec, rv0(end));
+end
+
+
+%% incomplete Cholesky
+
+% the DRY matrix is not necessarily symmetric because of the diagonal matrix
+% may not commute with 'ela'. However, if all point drags are equal, then
+% surely DRY is symmetric and we can use incomplete Cholesky factorization
 
 DRY = eye(dim) - diag(time_step./drg) * ela;
+
 sDRY = sparse(DRY);
 
-fprintf(2, 'DRY   has %i non-zero elements\n', nnz(sDRY));
+fprintf(2, '    DRY has %i elements; ', nnz(sDRY));
+fprintf(2, 'norm(DRY-transpose(DRY)) = %f\n', vecnorm(DRY-DRY'));
 
-if 0
-    e = eig(DRY);
-    figure('name', 'eigenvalues');
-    plot(e, 'x');
-    figure;
-end
-if ( 1 )
-    figure('name', 'System matrix structure');
-    spy(sDRY)
-    drawnow;
-    figure;
+if 0 && ( vecnorm(DRY-DRY') < 1 )
+    
+    clear OPT;
+    OPT.michol = 'off';
+    OPT.type = 'nofill';
+    L = ichol(sDRY, OPT);
+    fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'k.-');
+    report('y bicgstab', mulcnt, vec, rv0(end));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'b.-');
+    report('y bicgstab(1)', mulcnt, vec, rv0(end));
+    
+    for i = 0:3
+        RS = min(2^i, dim);
+        [vec,~,~,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, L, L', [], OPT);
+        convergence_plot(rv0/rv0(1),'r.-');
+        report(sprintf('y IDRS %03i', RS), 2*itr, vec, rv0(end));
+    end
+
 end
 
-%% check ILU of matrix without projection:
+%% check iLU of matrix without projection:
  
-if 1
+if 0
 
+    clear OPT;
     OPT.type = 'nofill';
     OPT.milu = 'off';
     [L, U] = ilu(sDRY, OPT);
-    fprintf(2, 'incomplete LU      has %i + %i non-zero elements\n', nnz(L), nnz(U));
+    fprintf(2, '    incomplete LU has %i + %i elements\n', nnz(L), nnz(U));
     
-    [vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit, L, U);
-    convergence_plot(rv0/rv0(1),'b--');
-    report('i BCGS', 2*itr, vec, rv0(end));
-    if 0
-        % IDRS-STAB
-        for i = 0:5
-            RS = min(2^i, dim);
-            [vec,~,~,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/2, maxit, L, U, []);
-            convergence_plot(rv0/rv0(1),'m');
-            report(sprintf('i IDRSTAB %03i', RS), itr, vec, rv0(end));
-        end
+    if 1
+        figure;
+        plot(diag(L), 'bo'); hold on;
+        plot(diag(U), 'bx');
+        title('Diag(U)');
     end
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
+    report('i bicgstab', mulcnt, vec, rv0(end));
+    convergence_plot(rv0/rv0(1),'k-.');
+    
+    % Matlab BiCGStab(L)
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, U);
+    convergence_plot(rv0/rv0(1), 'b-.');
+    report('i bicgstab(1)', mulcnt, vec, rv0(end));
+end
+
+if 0
+    % IDRS-STAB
+    for i = 0:5
+        RS = min(2^i, dim);
+        [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, L, U, []);
+        convergence_plot(rv0/rv0(1),'m');
+        report(sprintf('i IDRSTAB %03i', RS), itr, vec, rv0(end));
+    end
+    
     OPT.smoothing = 1;
     for i = 0:3
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, L, U, [], OPT);
+        [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, L, U, [], OPT);
         convergence_plot(rv0/rv0(1), 'r--');
         report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
     end
 end
 
-if 1
 
-    S = ( DRY - DRY' );
-    imshow(S);
-    
-    fprintf(2, 'Symmetrized LU has 2 * %i non-zero elements\n', nnz(S));
-    [vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit, S, S');
-    convergence_plot(rv0/rv0(1),'g--');
-    report('s BCGS', 2*itr, vec, rv0(end));
-    
-end
-
- %% incomplete Cholesky
-if 1 
-
-    clear OPT;
-    OPT.michol = 'off';
-    OPT.type = 'nofill';
-    %OPT.diagcomp = 1;
-
-    L = ichol(sDRY, OPT);
-    U = L';
-    fprintf(2, 'incomplete Cholesky has %i + %i non-zero elements\n', nnz(L), nnz(U));
-    
-    [vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit, L, U);
-    convergence_plot(rv0/rv0(1),'b--');
-    report('i BCGS', 2*itr, vec, rv0(end));
-    if 0
-    % IDRS-STAB
-    for i = 0:5
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = IDRstabg5(sss, rhs, RS, tol/2, maxit, L, U, []);
-        convergence_plot(rv0/rv0(1),'m');
-        report(sprintf('i IDRSTAB %03i', RS), itr, vec, rv0(end));
-    end
-    end
-    for i = 0:3
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, L, U, [], OPT);
-        convergence_plot(rv0/rv0(1),'r--');
-        report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
-    end
-end
-
-
-
-if 0 %% check different preconditionners
+if 0 %% check more preconditionners
 
     % preconditionner = incomplete LU factorization
-    [L, U] = ilu(sss, OPT);
-    fprintf(2, 'incomplete LU      has %i + %i non-zero elements\n', nnz(L), nnz(U));
+    [L, U] = ilu(system, OPT);
+    fprintf(2, 'incomplete LU      has %i + %i elements\n', nnz(L), nnz(U));
 
-    [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit, L, U);
+    [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
     convergence_plot(rv0/rv0(1),'b--');
-    report('i BCGS', 2*itr, vec, rv0(end));
+    report('i bicgstab', 2*itr, vec, rv0(end));
 
     for i = 1:5
         RS = min(2^i, dim);
-        [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol, maxit, L, U);
+        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit, L, U);
         convergence_plot(rv0/rv0(1),'k--');
         report(sprintf('i GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
     end
     
     for i = 1:3
         RS = min(2^i, dim);
-        [vec,flg,res,itr,rv0] = idrs(sss, rhs, RS, tol, maxit, L, U, [], OPT);
+        [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, L, U, [], OPT);
         convergence_plot(rv0/rv0(1),'r--');
         report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
-    end
-
-    
-    if ( 0 )
-        % preconditionner = Symmetric successive over-relaxation
-        L = tril(sss);
-        U = triu(sss);
-        V = diag(sss);
-        D = diag(V);
-        M = (D+L)*diag(1./V)*(D+U);
-        [vec,flg,res,itr,rv0] = bicgstab(sss, rhs, tol, maxit, M);
-        convergence_plot(rv0/rv0(1),'b--');
-        report('s BCGS', 2*itr, vec);
-
-        for i = 2:7
-            RS = min(2^i, dim);
-            [vec,flg,res,itr,rv0] = gmres(sss, rhs, RS, tol, maxit, M);
-            convergence_plot(rv0/rv0(1),'k--');
-            report(sprintf('s GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
-        end
     end
   
 end
 
  %%
  
+    function y = multiply(x)
+        mulcnt = mulcnt + 1;
+        y = system * x;
+    end
+
     function y = precondition(x)
         y = con * x;
     end
@@ -384,7 +415,7 @@ end
     end
 
     function report(s, i, v, r)
-        tr = norm(sss*v-rhs);
+        tr = norm(system*v-rhs);
         fprintf(1, '%-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
     end
 

@@ -64,7 +64,8 @@ if ( 1 )
     end
     
     fprintf(1, '%i mecables with %i block scalars\n', nbo, nbv);
-    
+    fprintf(1, '    norm(MAT-transpose(MAT)) = %f\n', vecnorm(ela-ela'));
+
     fprintf(1, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
     if ( err0 > 1e-8 )
         imshow(abs(mat));
@@ -85,18 +86,29 @@ figure('name', 'System matrix structure'); spy(sys);
 
 %% Getting the solution with high precision
 
-tol = abstol / norm(rhs);
+reltol = abstol / norm(rhs);
 
 maxit = dim;
-sss = sparse(sys);
+system = sparse(sys);
 
-solution = bicgstab(sss, rhs, abstol*0.001, maxit);
+solution = bicgstab(system, rhs, abstol*0.001, maxit);
      
+fprintf(1, '    norm(sol - matlab_sol) = %f\n', norm(sol-solution));
+    
+if 0
+    figure;
+    plot(solution, sol, 'k.');
+    xlabel('matlab solution');
+    ylabel('cytosim solution');
+    xl = xlim;
+    ylim(xl);
+    drawnow;
+end
+
 %% BCGS without preconditionning
 	
-[vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit);
-
-report('BCGS', 2*itr, vec, rv0(end));
+[vec,~,~,itr,rv0] = bicgstab(system, rhs, reltol, maxit);
+report('bicgstab', 2*itr, vec, rv0(end));
 
 figure('Name', 'Convergence');
 convergence_axes = [];
@@ -106,19 +118,15 @@ ylabel('Relative residual');
 title('Solver Convergence');
 hold on;
 
-if 0
-    figure;
-    plot(vec, sol, 'k.');
-    xlabel('matlab solution');
-    ylabel('cytosim solution');
-    xl = xlim;
-    ylim(xl);
-    drawnow;
-end
+
+[vec,~,~,itr,rv0] = bicgstabl(system, rhs, reltol, maxit);
+report('bicgstabl', 2*itr, vec, rv0(end));
+convergence_plot(rv0/rv0(1), 'k:');
+
 
 %% WITH TRADITIONAL PRECONDITIONNING
 
-[vec,~,~,itr,rv0] = bicgstab(sss, rhs, tol, maxit, @precondition);
+[vec,~,~,itr,rv0] = bicgstab(system, rhs, reltol, maxit, @precondition);
 report('P BCGS', 2*itr, vec, rv0(end));
 convergence_plot(rv0/rv0(1),'k');
 
@@ -138,7 +146,7 @@ convergence_plot(rv0/rv0(1),'k');
     end
 
     function report(s, i, v, r)
-        tr = norm(sss*v-rhs);
+        tr = norm(system*v-rhs);
         fprintf(1, '%-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
     end
 
