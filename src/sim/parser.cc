@@ -1042,6 +1042,7 @@ void Parser::parse_dump(std::istream& is)
 
     if ( do_write && do_run )
     {
+        simul.sMeca.doNotify = 1;
         simul.solve_half();
         simul.sMeca.dump(str.c_str());
     }

@@ -56,7 +56,7 @@ set couple fork
     activity = fork
 
     %torque = 100, 0         % parallel
-    %torque = 100, 0.5234     % 0.5234 radian is 30 degrees
+    %torque = 100, 0.5234   % 0.5234 radian is 30 degrees
     %torque = 100, 1.0472   % 1.0472 radian is 60 degrees
     %torque = 100, 1.2566   % 1.2566 radian is 72 degrees
     torque = 100, 1.5708    % 1.5708 radian is 90 degrees

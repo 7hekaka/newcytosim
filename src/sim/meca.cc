@@ -2140,7 +2140,7 @@ void Meca::dump(const char dirname[]) const
     FilePath::change_dir(dirname);
     dump();
     FilePath::change_dir(cwd);
-    fprintf(stderr, "Cytosim dumped a system of size %lu in `%s'\n", dimension(), dirname);
+    fprintf(stderr, "Cytosim dumped a %iD system of size %lu in `%s'\n", DIM, dimension(), dirname);
 }
 
 

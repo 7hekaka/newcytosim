@@ -230,7 +230,7 @@ void Display::prepareLineDisp(const Fiber * fib)
             break;
 #endif
         case FiberDisp::COLORING_CLUSTER:
-            self->color = gle::std_color(fib->flag());
+            self->color = gle::alt_color(fib->flag());
             break;
         case FiberDisp::COLORING_AGE:
             self->color = gle_color::jet_color((fib->age()-age_min)*age_scale, 1.0);
@@ -385,7 +385,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
         // the cluster analysis only needs to be done once per state:
         //prep_time = sim.time();
         if ( fiber_prep & 1 )
-            sim.flagClusters(true);
+            sim.flagClusters(false);
         
         // if fiber tensions are used for display, recompute them now:
         if ( fiber_prep & 2 )
