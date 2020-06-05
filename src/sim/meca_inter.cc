@@ -1304,9 +1304,9 @@ void Meca::addLink(Mecapoint const& ptA,
     const real cc[] = {    -1.0,  ptB.coef0(),  ptB.coef1() };
     const real ww[] = { -weight, weight*cc[1], weight*cc[2] };
     
-    sub_iso(ii0, ii0, ww[0]);  // since cc[0]==1
-    sub_iso(ii1, ii0, ww[1]);  // since cc[0]==1
-    sub_iso(ii2, ii0, ww[2]);  // since cc[0]==1
+    add_iso(ii0, ii0, ww[0]);  // since cc[0] == -1.0
+    add_iso(ii1, ii0, ww[1]);  // since cc[0] == -1.0
+    add_iso(ii2, ii0, ww[2]);  // since cc[0] == -1.0
     
     sub_iso(ii1, ii1, ww[1] * cc[1]);
     sub_iso(ii2, ii1, ww[2] * cc[1]);
