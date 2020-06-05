@@ -561,7 +561,6 @@ void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
                 pB += 3;
             }
             storeu4(pB, fnmadd4(T, broadcast1(A+I), n));
-            assert_true(I==M);
             assert_true(pB==B+3*I);
         }
         A += lda;
@@ -1007,7 +1006,7 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 
 
 template < int ORD >
-void alsatian_xpotrsL0(const int N, const real* A, const int LDA, real* B)
+void alsatian_xpotrsLtest(const int N, const real* A, const int LDA, real* B)
 {
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
