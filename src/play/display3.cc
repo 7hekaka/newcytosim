@@ -387,9 +387,10 @@ void set_color_curvature(Fiber const& fib, size_t seg, real)
 {
     if ( fib.nbPoints() > 2 )
     {
+        const real beta = 0.5 * fib.prop->disp->length_scale;
         real c = fib.curvature(std::max(seg, 1LU));
         real d = fib.curvature(std::min(seg+1, fib.lastSegment()));
-        gle_color::jet_color(0.5*(c+d)).load_front();
+        gle_color::jet_color(beta*(c+d)).load_front();
     }
     else
         gle_color::jet_color(0).load_front();
@@ -454,7 +455,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
         {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
-            real beta = fib.segmentation() / disp->length_scale;
+            const real beta = fib.segmentation() / disp->length_scale;
             drawFiberSegments(fib, rad, set_color_abscissaM, beta);
             glDisable(GL_CULL_FACE);
         } break;
@@ -462,7 +463,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
         {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
-            real beta = fib.segmentation() / disp->length_scale;
+            const real beta = fib.segmentation() / disp->length_scale;
             drawFiberSegments(fib, rad, set_color_abscissaP, beta);
             glDisable(GL_CULL_FACE);
         } break;

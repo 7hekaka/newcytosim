@@ -289,7 +289,7 @@ void changeScale(FiberDisp* p, int d)
         changeScale(p->tension_scale, d);
         flashText("fiber:tension_scale = %.3f", p->tension_scale);
     }
-    else if ( p->line_style == 6 || p->line_style == 7 )
+    else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 )
     {
         changeScale(p->length_scale, d);
         flashText("fiber:length_scale = %.3f", p->length_scale);

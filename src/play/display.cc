@@ -787,16 +787,17 @@ void Display::drawFiberLines(Fiber const& fib) const
         case 4:
         {
             // display segments with color indicating the curvature
+            const real beta = disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
             if ( fib.nbPoints() > 2 )
-                gle_color::jet_color(fib.curvature(1), alpha).load();
+                gle_color::jet_color(beta*fib.curvature(1), alpha).load();
             else
                 gle_color::jet_color(0, alpha).load();
             gle::gleVertex(fib.posEndM());
             for ( size_t n = 1; n < fib.lastPoint(); ++n )
             {
-                gle_color::jet_color(fib.curvature(n), alpha).load();
+                gle_color::jet_color(beta*fib.curvature(n), alpha).load();
                 gle::gleVertex(fib.posP(n));
             }
             gle::gleVertex(fib.posEndP());

@@ -245,10 +245,10 @@ public:
     unsigned int mask_bitfield;
     
     
-    /// conversion coefficient from length to color, for `line_style==6`
+    /// conversion coefficient from length to color, for some line styles
     real         length_scale;
 
-    /// conversion coefficient from tension to color, for `line_style==2`
+    /// conversion coefficient from tension to color, for `line_style==3` (tension)
     /**
      The values of `tension_scale` determines how longitudinal tensions are displayed:
      - tension_scale < 0 : compressive forces are highlighted,
