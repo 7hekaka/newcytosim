@@ -103,12 +103,6 @@ int Couple::configuration(FiberEnd end, real len) const
 }
 
 
-real Couple::stiffness() const
-{
-    return prop->stiffness;
-}
-
-
 void Couple::setInteractions(Meca& meca) const
 {
     assert_true( attached1() && attached2() );

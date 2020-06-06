@@ -136,10 +136,7 @@ public:
     
     /// category of link: 0=parallel; 1=anti-parallel; 2=X; 3=T; 4=V
     int            configuration(FiberEnd end, real len) const;
-    
-    ///stiffness of the link ( = prop->stiffness )
-    real           stiffness()            const;
-    
+
     /// return one of the Hand that is attached, or zero if both are detached
     Hand *         attachedHand()         const;
     

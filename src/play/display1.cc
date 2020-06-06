@@ -528,10 +528,22 @@ void Display1::drawCoupleB(Couple const* cx) const
         if ( pd1->perceptible )
         {
             pd1->color.load();
-#if ( DIM == 2 )
-            //gleBand(p1, pd1->width*sFactor, p2, pd2->width*sFactor);
-            real rad = pd1->width*sFactor;
-            gleMan(p1, rad * cx->dirFiber1(), p2, rad * cx->dirFiber2());
+#if ( 1 )
+            /*
+             Can shift positions towards the minus-end by couple's length
+             to create an effect to highlight the configuration:
+             ///// on antiparallel fibers
+             >>>>> on parallel fibers
+             */
+            real len = 0.5 * cx->prop->length;
+            lineWidth(pd1->width);
+            glBegin(GL_LINE_STRIP);
+            Vector d1 = len * cx->dirFiber1();
+            Vector d2 = len * cx->dirFiber2();
+            gleVertex(p1);
+            gleVertex(0.5*((p1+d1)+(p2+d2)));
+            gleVertex(p2);
+            glEnd();
 #else
             lineWidth(pd1->width);
             glBegin(GL_LINES);
@@ -545,10 +557,22 @@ void Display1::drawCoupleB(Couple const* cx) const
     {
         if ( pd1->perceptible || pd2->perceptible )
         {
-#if ( DIM == 2 )
-            //gleBand(p1, pd1->width*sFactor, pd1->color, p2, pd2->width*sFactor, pd2->color);
-            gleMan(p1, (pd1->width*sFactor) * cx->dirFiber1(), pd1->color,
-                   p2, (pd2->width*sFactor) * cx->dirFiber2(), pd2->color);
+#if ( 1 )
+            /*
+             Can shift positions towards the minus-end by couple's length
+             to create an effect to highlight the configuration:
+             ///// on antiparallel fibers
+             >>>>> on parallel fibers
+             */
+            real len = 0.5 * cx->prop->length;
+            lineWidth(pd1->width);
+            glBegin(GL_LINE_STRIP);
+            Vector d1 = len * cx->dirFiber1();
+            Vector d2 = len * cx->dirFiber2();
+            gleVertex(p1);
+            gleVertex(0.5*((p1+d1)+(p2+d2)));
+            gleVertex(p2);
+            glEnd();
 #else
             lineWidth(pd1->width);
             glBegin(GL_LINES);

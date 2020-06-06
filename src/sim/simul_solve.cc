@@ -645,24 +645,24 @@ void Simul::solveX()
     
     //-----set matrix-----
 
-    for ( Couple * co = couples.firstAA(); co ; co=co->next() )
+    for ( Couple * c = couples.firstAA(); c ; c=c->next() )
     {
-        Hand const* h1 = co->hand1();
-        Hand const* h2 = co->hand2();
+        Hand const* h1 = c->hand1();
+        Hand const* h2 = c->hand2();
         
         const size_t i1 = h1->fiber()->matIndex();
         const size_t i2 = h2->fiber()->matIndex();
         assert_true( i1 != i2 );
         
-        pMeca1D->addLink(i1, i2, co->stiffness(), h2->pos().XX - h1->pos().XX);
+        pMeca1D->addLink(i1, i2, c->prop->stiffness, h2->pos().XX - h1->pos().XX);
     }
     
-    for ( Single * gh = singles.firstA(); gh ; gh=gh->next() )
+    for ( Single * s = singles.firstA(); s ; s=s->next() )
     {
-        Hand const* h = gh->hand();
-        const size_t ii = h->fiber()->matIndex();
+        Hand const* h = s->hand();
+        const size_t i = h->fiber()->matIndex();
         
-        pMeca1D->addClamp(ii, gh->prop->stiffness, gh->position().XX - h->pos().XX);
+        pMeca1D->addClamp(i, s->prop->stiffness, s->position().XX - h->pos().XX);
     }
     
     //-----resolution-----
