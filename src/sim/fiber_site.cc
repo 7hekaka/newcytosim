@@ -138,7 +138,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
         //std::clog << "FiberSite::read() " << (char)tag << std::endl;
         if ( tag == Fiber::TAG )
         {
-            fbAbs  = in.readFloat();
+            fbAbs = in.readFloat();
 #if FIBER_HAS_LATTICE
             // set mSite to closest integral position
             if ( fbLattice )

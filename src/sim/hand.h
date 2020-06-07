@@ -179,11 +179,10 @@ public:
     Hand *       otherHand() const;
 
     /// return position of other Hand, if part of a Couple, or of Single
-    Vector       otherPosition() const;
+    Vector       linkBase() const;
     
     /// return stiffness of associated link
-    real         interactionStiffness() const;
-
+    real         linkStiffness() const;
     
     /// read from file
     bool         read(Inputter&, Simul&);
