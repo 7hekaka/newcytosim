@@ -846,32 +846,30 @@ namespace gle
     /// spherocylinder of length L, radius R, centered and aligned with axis Z
     void gleCapsule(GLfloat L, GLfloat R)
     {
-        constexpr size_t fin = finesse;
-        GLfloat c[4*fin+1], s[4*fin+1];
-        gle::circle(4*fin, c, s, 1);
-
+        const size_t fin = ncircle >> 2;
+        const size_t C = 4;
         //display strips along the side of the volume:
-        for ( size_t t = 0; t < 4*fin; ++t )
+        for ( size_t t = 0; t < 4*fin; t+=C )
         {
             //compute the transverse angles:
-            GLfloat cb = c[t  ], sb = s[t  ];
-            GLfloat ca = c[t+1], sa = s[t+1];
+            GLfloat cb = co_[t  ], sb = si_[t  ];
+            GLfloat ca = co_[t+C], sa = si_[t+C];
             GLfloat cB = R * cb, sB = R * sb;
             GLfloat cA = R * ca, sA = R * sa;
             
             //draw one srip of the oval:
             glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t i=0; i <= fin; ++i )
+            for ( size_t i=0; i <= fin; i+=C )
             {
-                GLfloat x = c[i], y = s[i];
+                GLfloat x = co_[i], y = si_[i];
                 glNormal3f(ca*y, sa*y,     x);
                 glVertex3f(cA*y, sA*y, L+R*x);
                 glNormal3f(cb*y, sb*y,     x);
                 glVertex3f(cB*y, sB*y, L+R*x);
             }
-            for ( int i=fin; i >= 0; --i )
+            for ( int i=fin; i >= 0; i-=C )
             {
-                GLfloat x = -c[i], y = s[i];
+                GLfloat x = -co_[i], y = si_[i];
                 glNormal3f(ca*y, sa*y,   x);
                 glVertex3f(cA*y, sA*y, R*x);
                 glNormal3f(cb*y, sb*y,   x);
