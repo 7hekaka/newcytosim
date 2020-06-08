@@ -256,16 +256,24 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
 #else
-    // this is a basic rendering where tubes would not join properly:
+    // rendering tubes as spherocylinders that join properly at any angle!
     const size_t last = fib.lastSegment();
-    for ( size_t inx = 0; inx < last; ++inx )
+    for ( size_t inx = 0; inx <= last; ++inx )
     {
+        set_color(fib, inx, beta);
+        glPushMatrix();
+        gleTransAlignZ(dir, 1.0, pos, 1.0);
+        gleCapsule(norm(nxt-pos), rad);
+        glPopMatrix();
         pos = nxt;
         nxt = fib.posPoint(inx+1);
-        set_color(fib, inx, beta);
-        gleTube(pos, nxt, rad, gleTube2B);
+        dir = normalize(nxt-pos);
     }
-    dir = fib.dirEndP();
+    // draw last segment:
+    glPushMatrix();
+    gleTransAlignZ(dir, 1.0, pos, 1.0);
+    gleCapsule(norm(nxt-pos), rad);
+    glPopMatrix();
 #endif
     
     drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
@@ -325,14 +333,17 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
 #else
-    // this is a basic rendering where tubes would not join properly:
+    // rendering tubes as spherocylinders that join properly at any angle!
     for ( ; inx < last; ++inx )
     {
         abs += inc;
         pos = nxt;
         nxt = fib.displayPosM(abs);
         set_color(fib, inx, fac);
-        gleTube(pos, nxt, rad, gleTube2B);
+        glPushMatrix();
+        gleTransAlignZ(dir, 1.0, pos, 1.0);
+        gleCapsule(norm(nxt-pos), rad);
+        glPopMatrix();
     }
     dir = normalize(nxt-pos);
 #endif
@@ -844,7 +855,7 @@ void Display3::drawSolid(Solid const& obj)
         Vector A = obj.posP(0), B = obj.posP(1);
         Vector dir = A - B;
         real len = dir.norm();
-        gleTransAlignZ(dir/len, (A+B)*0.5, len, obj.radius(0));
+        gleTransAlignZ(dir/len, len, (A+B)*0.5, obj.radius(0));
         gleCylinderZ();
         glPopMatrix();
     }

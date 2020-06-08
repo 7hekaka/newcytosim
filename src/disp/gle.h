@@ -132,7 +132,7 @@ namespace gle
     /// translate by T, then rotate to align Z with dir
     void gleTransAlignZ(Vector3 const& A, Vector3 const& B, float radius);
     /// translate by T, then rotate to align Z with dir, scaling X and Y by radis
-    void gleTransAlignZ(Vector3 const& dir, Vector3 const& pos, float scale, float radius);
+    void gleTransAlignZ(Vector3 const& dir, float scale, Vector3 const& pos, float radius);
 
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
@@ -206,6 +206,8 @@ namespace gle
     void gleHexTube1(GLfloat Zmin, GLfloat Zmax);
     /// draw a closed tube along Z, or diameter 1 and length 1
     void gleCylinder1();
+    /// spherocylinder of length L, radius R, centered and aligned with axis Z
+    void gleCapsule(GLfloat L, GLfloat R);
 
     /// draw a 3-portion cylinder with a larger central section
     void gleBarrel1();

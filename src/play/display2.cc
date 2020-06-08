@@ -252,7 +252,7 @@ void Display2::drawSolid(Solid const& obj)
             Vector A = obj.posP(0), B = obj.posP(1);
             Vector dir = A - B;
             real len = dir.norm();
-            gleTransAlignZ(dir/len, (A+B)*0.5, len, obj.radius(0));
+            gleTransAlignZ(dir/len, len, (A+B)*0.5, obj.radius(0));
             gleCylinderZ();
             glPopMatrix();
         }

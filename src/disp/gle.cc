@@ -279,7 +279,7 @@ namespace gle
     }
     
     // set rotation to align Z with 'dir' and scale S along `dir` and R orthogonally
-    void gleTransAlignZ(Vector3 const& dir, Vector3 const& pos, float S, float R)
+    void gleTransAlignZ(Vector3 const& dir, float S, Vector3 const& pos, float R)
     {
         float x = float(dir.XX);
         float y = float(dir.YY);
@@ -842,6 +842,45 @@ namespace gle
         gleDisc();
     }
     
+    
+    /// spherocylinder of length L, radius R, centered and aligned with axis Z
+    void gleCapsule(GLfloat L, GLfloat R)
+    {
+        constexpr size_t fin = finesse;
+        GLfloat c[4*fin+1], s[4*fin+1];
+        gle::circle(4*fin, c, s, 1);
+
+        //display strips along the side of the volume:
+        for ( size_t t = 0; t < 4*fin; ++t )
+        {
+            //compute the transverse angles:
+            GLfloat cb = c[t  ], sb = s[t  ];
+            GLfloat ca = c[t+1], sa = s[t+1];
+            GLfloat cB = R * cb, sB = R * sb;
+            GLfloat cA = R * ca, sA = R * sa;
+            
+            //draw one srip of the oval:
+            glBegin(GL_TRIANGLE_STRIP);
+            for ( size_t i=0; i <= fin; ++i )
+            {
+                GLfloat x = c[i], y = s[i];
+                glNormal3f(ca*y, sa*y,     x);
+                glVertex3f(cA*y, sA*y, L+R*x);
+                glNormal3f(cb*y, sb*y,     x);
+                glVertex3f(cB*y, sB*y, L+R*x);
+            }
+            for ( int i=fin; i >= 0; --i )
+            {
+                GLfloat x = -c[i], y = s[i];
+                glNormal3f(ca*y, sa*y,   x);
+                glVertex3f(cA*y, sA*y, R*x);
+                glNormal3f(cb*y, sb*y,   x);
+                glVertex3f(cB*y, sB*y, R*x);
+            }
+            glEnd();
+        }
+    }
+
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
 
@@ -1428,7 +1467,7 @@ namespace gle
     void gleObject(Vector3 const& x, Vector3 const& d, const float R, void (*obj)())
     {
         glPushMatrix();
-        gleTransAlignZ(d, x, R, R);
+        gleTransAlignZ(d, R, x, R);
         obj();
         glPopMatrix();
     }
@@ -1459,7 +1498,7 @@ namespace gle
                    const real L, void (*obj)() )
     {
         glPushMatrix();
-        gleTransAlignZ(d, x, L, R);
+        gleTransAlignZ(d, L, x, R);
         obj();
         glPopMatrix();
     }
@@ -1762,7 +1801,7 @@ namespace gle
     void gleCone(Vector3 const& pos, Vector3 const& dir, const real scale)
     {
         glPushMatrix();
-        gleTransAlignZ(dir, pos, scale, scale);
+        gleTransAlignZ(dir, scale, pos, scale);
         gleLongConeB();
         glPopMatrix();
     }
@@ -1797,7 +1836,7 @@ namespace gle
     {
         glPushMatrix();
         //build the rotation matrix, assuming dir is normalized
-        gleTransAlignZ(dir, pos, scale, scale);
+        gleTransAlignZ(dir, scale, pos, scale);
         gleCylinderZ();
         glPopMatrix();
     }
@@ -1842,7 +1881,7 @@ namespace gle
     {
         glPushMatrix();
         //assuming dir is normalized
-        gleTransAlignZ(dir, pos, scale, scale);
+        gleTransAlignZ(dir, scale, pos, scale);
         gleArrowTail1();
         glPopMatrix();
     }
