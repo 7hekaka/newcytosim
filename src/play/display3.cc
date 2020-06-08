@@ -213,11 +213,11 @@ void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Nicely Joined Fiber Rendering
+#pragma mark - Nicely Joined Fiber Rendering using clipping planes
 
+#if ( 1 )
 /**
-This draws the model-segments from `inx` to `last`.
-The function `set_color` is used to set the color of the segments
+This draws the model-segments, using function `set_color` to set display colors
 */
 void Display3::drawFiberSegments(Fiber const& fib, real rad,
                                  void (*set_color)(Fiber const&, size_t, real), real beta) const
@@ -229,7 +229,6 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     set_color(fib, 0, beta);
     drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
     
-#if ( DIM > 1 )
     glEnable(GL_CLIP_PLANE4);
     glEnable(GL_CLIP_PLANE5);
     setClipPlane(GL_CLIP_PLANE4, dir, pos);
@@ -255,26 +254,6 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     gleTube(pos, nxt, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
-#else
-    // rendering tubes as spherocylinders that join properly at any angle!
-    const size_t last = fib.lastSegment();
-    for ( size_t inx = 0; inx <= last; ++inx )
-    {
-        set_color(fib, inx, beta);
-        glPushMatrix();
-        gleTransAlignZ(dir, 1.0, pos, 1.0);
-        gleCapsule(norm(nxt-pos), rad);
-        glPopMatrix();
-        pos = nxt;
-        nxt = fib.posPoint(inx+1);
-        dir = normalize(nxt-pos);
-    }
-    // draw last segment:
-    glPushMatrix();
-    gleTransAlignZ(dir, 1.0, pos, 1.0);
-    gleCapsule(norm(nxt-pos), rad);
-    glPopMatrix();
-#endif
     
     drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
 }
@@ -282,8 +261,8 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
 
 /**
 This draws segments of length 'len' which may not correspond to the vertices
-used to model the Fiber. All abscissa is with respect to the MINUS_END.
-The function `set_color` is used to set the color of the segments.
+used to model the Fiber. All abscissa is relative to the MINUS_END.
+The function `set_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
@@ -291,7 +270,6 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     void (*set_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
-    // start at MINUS_END
     Vector pos = fib.displayPosM(abs), old;
     Vector nxt = fib.displayPosM(abs+inc);
     Vector dir = normalize(nxt-pos);
@@ -304,7 +282,6 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 
     abs += inc;
     
-#if ( DIM > 1 )
     glEnable(GL_CLIP_PLANE4);
     glEnable(GL_CLIP_PLANE5);
     setClipPlane(GL_CLIP_PLANE4, dir, pos);
@@ -332,21 +309,6 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     gleTube(pos, nxt, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
-#else
-    // rendering tubes as spherocylinders that join properly at any angle!
-    for ( ; inx < last; ++inx )
-    {
-        abs += inc;
-        pos = nxt;
-        nxt = fib.displayPosM(abs);
-        set_color(fib, inx, fac);
-        glPushMatrix();
-        gleTransAlignZ(dir, 1.0, pos, 1.0);
-        gleCapsule(norm(nxt-pos), rad);
-        glPopMatrix();
-    }
-    dir = normalize(nxt-pos);
-#endif
     
     if ( abs >= fib.length() )
     {
@@ -356,12 +318,11 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 }
 
 /**
-Draw a segment from 'abs1' to 'abs2', counted from the MINUS_END.
+Draw a segment from 'abs1' to 'abs2', relative to the MINUS_END.
 */
 void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad,
                                 const real abs1, const real abs2) const
 {
-    // draw MINUS_END
     Vector pos = fib.displayPosM(abs1);
     Vector nxt = fib.displayPosM(abs2);
     Vector dir = normalize(nxt-pos);
@@ -373,6 +334,83 @@ void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad
         drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
 }
 
+#else
+
+//------------------------------------------------------------------------------
+#pragma mark - Fiber Rendering using Spherocylinders
+
+/**
+This draws the model-segments, using function `set_color` to set display colors
+*/
+void Display3::drawFiberSegments(Fiber const& fib, real rad,
+                                 void (*set_color)(Fiber const&, size_t, real), real beta) const
+{
+    Vector nxt = fib.posPoint(0);
+
+    // rendering tubes as spherocylinders that join properly at any angle!
+    const size_t last = fib.lastSegment();
+    for ( size_t inx = 0; inx <= last; ++inx )
+    {
+        Vector pos = nxt;
+        nxt = fib.posPoint(inx+1);
+        Vector dir = normalize(nxt-pos);  // could use _mm_rsqrt_ss
+        set_color(fib, inx, beta);
+        glPushMatrix();
+        gleTransAlignZ(dir, 1.0, pos, 1.0);
+        gleCapsule(norm(nxt-pos), rad);
+        glPopMatrix();
+    }
+}
+
+
+/**
+This draws segments of length 'len' which may not correspond to the vertices
+used to model the Fiber. All abscissa is relative to the MINUS_END.
+The function `set_color` is called to set the color of the segments.
+*/
+void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
+                                    VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
+                                    real abs, const real inc,
+                                    void (*set_color)(Fiber const&, long, real),
+                                    real fac, real facM, real facP) const
+{
+    Vector nxt = fib.displayPosM(abs);
+    
+    // rendering tubes as spherocylinders that join properly at any angle!
+    for ( ; inx <= last; ++inx )
+    {
+        abs += inc;
+        Vector pos = nxt;
+        nxt = fib.displayPosM(abs);
+        Vector dir = normalize(nxt-pos);
+        set_color(fib, inx, fac);
+        glPushMatrix();
+        gleTransAlignZ(dir, 1.0, pos, 1.0);
+        gleCapsule(norm(nxt-pos), rad);
+        glPopMatrix();
+    }
+}
+
+/**
+Draw a segment from 'abs1' to 'abs2', relative to the MINUS_END.
+*/
+void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad,
+                                const real abs1, const real abs2) const
+{
+    Vector pos = fib.displayPosM(abs1);
+    Vector nxt = fib.displayPosM(abs2);
+    Vector dir = normalize(nxt-pos);
+
+    glPushMatrix();
+    gleTransAlignZ(dir, 1.0, pos, 1.0);
+    gleCapsule(norm(nxt-pos), rad);
+    glPopMatrix();
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 void set_color_not(Fiber const&, size_t, real)
 {

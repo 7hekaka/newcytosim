@@ -913,6 +913,10 @@ void processKey(unsigned char key)
         case '$':
             setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
             break;
+            
+        case '*':
+            setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
+            break;
 
         //------------------------ Solid / Sphere ------------------------------
   

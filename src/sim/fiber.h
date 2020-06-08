@@ -22,13 +22,13 @@ class LineDisp;
 
 
 /// Flag to add a Lattice of integers to each Fiber {0, 1}
-#define FIBER_HAS_LATTICE 0
+#define FIBER_HAS_LATTICE 1
 
 /// Flag to add a Lattice of reals to each Fiber {0, 1}
 #define FIBER_HAS_MESH 0
 
 /// Flag to allow `family` member variable to control Couple's binding {0, 1}
-#define FIBER_HAS_FAMILY 0
+#define FIBER_HAS_FAMILY 1
 
 /// Flag to allow dynamic Single creation/binding at fiber's ends {0, 1}
 #define FIBER_HAS_GLUE 0
@@ -42,7 +42,7 @@ class LineDisp;
  */
 #if FIBER_HAS_LATTICE > 0
 // Lattice composed of integers, appropriate for discrete occupancy
-typedef Lattice<uint8_t> FiberLattice;
+typedef Lattice<uint16_t> FiberLattice;
 #else
 // Lattice composed of floating point values, for continuous values
 typedef Lattice<real> FiberLattice;

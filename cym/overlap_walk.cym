@@ -42,7 +42,6 @@ set hand kinesin
     unloaded_speed = 0
     stall_force = 6
     step_size = 0.010
-    use_lattice = 1
 
     unbinding_force = 3
     hold_growing_end = 0
