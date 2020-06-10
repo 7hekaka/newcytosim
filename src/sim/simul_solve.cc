@@ -17,14 +17,14 @@ real Simul::estimateStericRange() const
     // check all FiberProp with enabled steric:
     for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* fip = static_cast<FiberProp const*>(i);
-        if ( fip->steric )
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
+        if ( fp->steric )
         {
             // The maximum length of a segment is 4/3 * segmentation
-            len = std::max(len, (real)(1.34) * fip->segmentation);
+            len = std::max(len, (real)(1.34) * fp->segmentation);
             
             // check extended range of interaction
-            ran = std::max(ran, fip->steric_radius + fip->steric_range);
+            ran = std::max(ran, fp->steric_radius + fp->steric_range);
         }
     }
     
