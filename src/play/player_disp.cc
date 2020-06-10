@@ -109,8 +109,9 @@ std::string Player::buildReport(std::string arg) const
             arg = arg.substr(0, pos);
         }
         std::stringstream ss;
-        simul.report1(ss, arg, glos);
+        simul.report(ss, arg, glos);
         std::string res = ss.str();
+        // remove extra new-line
         if ( res.size() > 1  &&  res.at(0) == '\n' )
             return res.substr(1);
         return res;

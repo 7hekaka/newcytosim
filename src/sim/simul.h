@@ -349,16 +349,20 @@ public:
     void      writeObjects(std::string const& filename, bool append, bool binary) const;
     
     //----------------------------- REPORTING ----------------------------------
+    
+    /// calls report
+    void      report_wrap(std::ostream&, std::string const&, Glossary&) const;
+    
+    /// calls report_one
+    void      report(std::ostream&, std::string, Glossary&) const;
 
-    /// call `Simul::report0`, adding lines before and after with 'start' and 'end' tags.
-    void      report(std::ostream&, std::string const&, Glossary&) const;
+    /// calls report_one
+    void      report_one(std::ostream&, std::string const&, Glossary&) const;
     
     /// call one of the report function
-    void      report1(std::ostream&, std::string, Glossary&) const;
-    
-    /// call one of the report function
-    void      report0(std::ostream&, std::string const&, Glossary&) const;
+    void      report_one(std::ostream&, std::string const&, Property const*, std::string const&, bool, Glossary&) const;
 
+    
     /// print time
     void      reportTime(std::ostream&) const;
     
@@ -369,29 +373,20 @@ public:
     void      reportSystem(std::ostream&) const;
 
     /// print the length and the points of each fiber
-    void      reportFiber(std::ostream&, Fiber const*) const;
-
-    /// print the length and the points of each fiber
-    void      reportFibers(std::ostream&, Property const*) const;
-    
-    /// print the length and the points of each fiber
-    void      reportFibers(std::ostream&, std::string const&) const;
-    
-    /// print the length and the points of each fiber
-    void      reportFibers(std::ostream&) const;
+    void      reportFibers(std::ostream&, Property const* sel, bool com=true) const;
 
     /// print the coordinates of the vertices of each fiber
-    void      reportFiberPoints(std::ostream&) const;
+    void      reportFiberPoints(std::ostream&, Property const* sel, bool com=true) const;
     
     /// print the coordinates of the vertices of each fiber
-    void      reportFiberDisplacement(std::ostream&) const;
-    
-    /// print the mean and standard deviation of vertices of all fibers
-    void      reportFiberMoments(std::ostream&) const;
+    void      reportFiberDisplacement(std::ostream&, Property const* sel, bool com=true) const;
 
     /// print the positions and the states of the two ends of each fiber
-    void      reportFiberEnds(std::ostream&) const;
+    void      reportFiberEnds(std::ostream&, Property const* sel, bool com=true) const;
     
+    /// print the mean and standard deviation of vertices for each class of fiber
+    void      reportFiberMoments(std::ostream&) const;
+
     /// print average age and standard deviation for each class of fiber
     void      reportFiberAge(std::ostream&) const;
 
@@ -466,10 +461,10 @@ public:
     void      reportBeadSingles(std::ostream&) const;
 
     /// print Bead positions
-    void      reportBeadPosition(std::ostream&) const;
+    void      reportBeadPosition(std::ostream&, Property const*, bool com) const;
 
     /// print Solid positions 
-    void      reportSolidPosition(std::ostream&) const;
+    void      reportSolidPosition(std::ostream&, Property const*, bool com) const;
 
     /// print Solid's anchored Hands
     void      reportSolidHands(std::ostream&) const;
@@ -480,20 +475,17 @@ public:
     /// print state of Couples
     void      reportCoupleAnatomy(std::ostream&) const;
     
-    /// print position of Couples 
-    void      reportCoupleState(std::ostream&) const;
-    
     /// print position of Couples of a certain kind
-    void      reportCoupleState(std::ostream&, std::string const&) const;
+    void      reportCoupleState(std::ostream&, Property const* sel, bool com) const;
     
     /// print position of active Couples of a certain kind
-    void      reportCoupleActive(std::ostream&, std::string const&) const;
+    void      reportCoupleActive(std::ostream&, Property const* sel, bool com) const;
     
     /// print position and forces of doubly-attached Couples
-    void      reportCoupleLink(std::ostream&, std::string const&) const;
+    void      reportCoupleLink(std::ostream&, Property const* sel, bool com) const;
     
     /// print configurations of doubly-attached Couples
-    void      reportCoupleConfiguration(std::ostream&, std::string const&, Glossary&) const;
+    void      reportCoupleConfiguration(std::ostream&, Property const* sel, bool com, Glossary&) const;
 
     /// print agregate properties of Couple force
     void      reportCoupleForce(std::ostream&) const;
@@ -505,19 +497,19 @@ public:
     void      reportSingle(std::ostream&) const;
     
     /// print position of Singles of a certain kind
-    void      reportSingleState(std::ostream&, std::string const&) const;
+    void      reportSingleState(std::ostream&, Property const*, bool com) const;
 
     /// print position of Singles
-    void      reportSinglePosition(std::ostream&, std::string const&) const;
+    void      reportSinglePosition(std::ostream&, Property const*, bool com) const;
    
     /// print force of attached Singles
-    void      reportSingleLink(std::ostream&, std::string const&) const;
+    void      reportSingleLink(std::ostream&, Property const*, bool com) const;
     
     /// print agregate properties of Singles force
     void      reportSingleForce(std::ostream&) const;
 
     /// print state of Couples 
-    void      reportSpherePosition(std::ostream&) const;
+    void      reportSpherePosition(std::ostream&, Property const*, bool com) const;
 
     /// print something about Spaces
     void      reportSpace(std::ostream&) const;
