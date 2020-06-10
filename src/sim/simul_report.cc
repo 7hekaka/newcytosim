@@ -175,7 +175,7 @@ void Simul::report0(std::ostream& out, std::string const& arg, Glossary& opt) co
 {
     std::string who = arg, what, which;
     
-    // split argument string into 3 parts separated by ':': who, what, which
+    // split argument string into 3 parts separated by ':': who:what:which
     std::string::size_type pos = arg.find(':');
     if ( pos != std::string::npos )
     {
@@ -697,22 +697,7 @@ void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
 /**
  Export length, position and directions at center of fibers
  */
-void Simul::reportFibersSorted(std::ostream& out, FiberProp const* selected) const
-{
-    const_cast<Simul*>(this)->fibers.nodes.blinksort(compareFibers);
-
-    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
-    {
-        if ( fib->prop == selected )
-            reportFiber(out, fib);
-    }
-}
-
-
-/**
- Export length, position and directions at center of fibers
- */
-void Simul::reportFibers(std::ostream& out, FiberProp const* selected) const
+void Simul::reportFibers(std::ostream& out, Property const* selected) const
 {
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
@@ -733,7 +718,7 @@ void Simul::reportFibers(std::ostream& out, std::string const& which) const
     out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
     out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
     
-    reportFibers(out, static_cast<FiberProp const*>(p));
+    reportFibers(out, p);
 }
 
 
@@ -767,17 +752,17 @@ void Simul::reportFiberEnds(std::ostream& out) const
     out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
     out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
     
-    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        out << LIN << obj->prop->number();
-        out << SEP << obj->identity();
-        out << SEP << obj->length();
-        out << SEP << obj->endStateM();
-        out << SEP << obj->posEndM();
-        out << SEP << obj->dirEndM();
-        out << SEP << obj->endStateP();
-        out << SEP << obj->posEndP();
-        out << SEP << obj->dirEndP();
+        out << LIN << fib->prop->number();
+        out << SEP << fib->identity();
+        out << SEP << fib->length();
+        out << SEP << fib->endStateM();
+        out << SEP << fib->posEndM();
+        out << SEP << fib->dirEndM();
+        out << SEP << fib->endStateP();
+        out << SEP << fib->posEndP();
+        out << SEP << fib->dirEndP();
     }
 }
 
