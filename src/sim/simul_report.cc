@@ -387,11 +387,16 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportInventory(out);
         if ( what == "property" || what == "parameter" )
             return writeProperties(out, false);
+        throw InvalidSyntax("I only know system: time; inventory; property");
+    }
+    if ( who == "property" )
+    {
+        if ( what.empty() || what=="all" )
+            return writeProperties(out, false);
         Property const* p = findProperty(what);
         if ( p )
-            p->write(out);
-        else
-            throw InvalidSyntax("Unknown  report `system:"+what+"'");
+            return p->write(out);
+        throw InvalidSyntax("unknown property");
     }
     if ( who == "spindle" )
     {
