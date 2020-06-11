@@ -242,35 +242,35 @@ bool SpaceCapsule::draw() const
 #else
     
     //display strips along the side of the volume:
-    for ( size_t sc = 0; sc < 4*fin; ++sc )
+    for ( size_t t = 0; t < 4*fin; ++t )
     {
         //compute the transverse angles:
-        GLfloat ctb  = c[sc  ],   stb  = s[sc  ];
-        GLfloat cta  = c[sc+1],   sta  = s[sc+1];
-        GLfloat ctbR = R*ctb,     stbR = R*stb;
-        GLfloat ctaR = R*cta,     staR = R*sta;
+        GLfloat cb = c[t  ], sb = s[t  ];
+        GLfloat ca = c[t+1], sa = s[t+1];
+        GLfloat cB = R * cb, sB = R * sb;
+        GLfloat cA = R * ca, sA = R * sa;
         
-        //draw one strip of the oval:
+        //draw one srip of the oval:
         glBegin(GL_TRIANGLE_STRIP);
-        for ( size_t ii=0; ii <= fin; ++ii )
+        for ( size_t i=0; i <= fin; ++i )
         {
-            GLfloat ca = c[ii], sa = s[ii];
-            glNormal3f( ca, cta*sa, sta*sa );
-            glVertex3f( +L+R*ca, ctaR*sa, staR*sa );
-            glNormal3f( ca, ctb*sa, stb*sa );
-            glVertex3f( +L+R*ca, ctbR*sa, stbR*sa );
+            GLfloat x = c[i], y = s[i];
+            glNormal3f(     x, ca*y, sa*y);
+            glVertex3f(+L+R*x, cA*y, sA*y);
+            glNormal3f(     x, cb*y, sb*y);
+            glVertex3f(+L+R*x, cB*y, sB*y);
         }
-        for ( int ii=fin; ii >= 0; --ii)
+        for ( int i=fin; i >= 0; --i)
         {
-            GLfloat ca = -c[ii], sa = s[ii];
-            glNormal3f( ca, cta*sa, sta*sa );
-            glVertex3f( -L+R*ca, ctaR*sa, staR*sa );
-            glNormal3f( ca, ctb*sa, stb*sa );
-            glVertex3f( -L+R*ca, ctbR*sa, stbR*sa );
+            GLfloat x = -c[i], y = s[i];
+            glNormal3f(     x, ca*y, sa*y);
+            glVertex3f(-L+R*x, cA*y, sA*y);
+            glNormal3f(     x, cb*y, sb*y);
+            glVertex3f(-L+R*x, cB*y, sB*y);
         }
         glEnd();
     }
-    
+
     if ( 1 )
     {
         //draw 2 rings on the surface

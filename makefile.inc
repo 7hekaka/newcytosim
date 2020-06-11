@@ -86,11 +86,11 @@ endif
 
 ifeq ($(COMPILER),gcc)
 
-# Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2)
+# Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2); -march=native
 # You can use g++-9 to support Intel OMP directives
     CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
     FAST     := -DNDEBUG -O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST     := -DNDEBUG -O3 -fno-trapping-math -ffast-math -funroll-loops -march=native -ffp-contract=fast
+    FAST     := -DNDEBUG -O3 -fno-trapping-math -ffast-math -funroll-loops -ffp-contract=fast -march=native
 
     DEBUG    := -g3 -ggdb
     COVERAGE := -fprofile-arcs -ftest-coverage

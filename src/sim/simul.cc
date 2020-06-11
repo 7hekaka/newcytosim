@@ -311,7 +311,7 @@ Space const* Simul::findSpace(std::string const& str) const
 
 /**
  This is used primarily to parse the configuration file,
- using full class name
+ argument is the full class name
  */
 ObjectSet * Simul::findSet(const std::string& cat)
 {
@@ -385,7 +385,7 @@ void Simul::rename(std::string const& arg)
 }
 
 
-bool Simul::isPropertyClass(const std::string& name) const
+bool Simul::isCategory(const std::string& name) const
 {
     if ( name == "hand" )
         return true;
@@ -492,7 +492,7 @@ Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glo
         return prop;
     }
     
-    if ( isPropertyClass(nom) )
+    if ( isCategory(nom) )
         throw InvalidSyntax("`"+nom+"' is a reserved keyword");
     
     Property * p = findProperty(nom);

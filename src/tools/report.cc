@@ -61,7 +61,7 @@ void report_raw(Simul const& simul, std::ostream& os, std::string const& what, i
     if ( verbose > 0 )
     {
         os << "\n% frame   " << frm;
-        simul.report(os, what, opt);
+        simul.report_wrap(os, what, opt);
     }
     else
     {
@@ -88,7 +88,7 @@ void report_prefix(Simul const& simul, std::ostream& os, std::string const& what
     if ( verbose )
     {
         os << "% frame   " << frm << '\n';
-        simul.report(ss, what, opt);
+        simul.report_wrap(ss, what, opt);
         StreamFunc::prefix_lines(os, ss, str, '%', 0);
     }
     else

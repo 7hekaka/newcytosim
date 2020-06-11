@@ -279,7 +279,7 @@ namespace gle
     }
     
     // set rotation to align Z with 'dir' and scale S along `dir` and R orthogonally
-    void gleTransAlignZ(Vector3 const& dir, Vector3 const& pos, float S, float R)
+    void gleTransAlignZ(Vector3 const& dir, float S, Vector3 const& pos, float R)
     {
         float x = float(dir.XX);
         float y = float(dir.YY);
@@ -842,6 +842,43 @@ namespace gle
         gleDisc();
     }
     
+    
+    /// spherocylinder of length L, radius R, centered and aligned with axis Z
+    void gleCapsule(GLfloat L, GLfloat R)
+    {
+        const size_t fin = ncircle >> 2;
+        const size_t C = 4;
+        //display strips along the side of the volume:
+        for ( size_t t = 0; t < 4*fin; t+=C )
+        {
+            //compute the transverse angles:
+            GLfloat cb = co_[t  ], sb = si_[t  ];
+            GLfloat ca = co_[t+C], sa = si_[t+C];
+            GLfloat cB = R * cb, sB = R * sb;
+            GLfloat cA = R * ca, sA = R * sa;
+            
+            //draw one srip of the oval:
+            glBegin(GL_TRIANGLE_STRIP);
+            for ( size_t i=0; i <= fin; i+=C )
+            {
+                GLfloat x = co_[i], y = si_[i];
+                glNormal3f(ca*y, sa*y,     x);
+                glVertex3f(cA*y, sA*y, L+R*x);
+                glNormal3f(cb*y, sb*y,     x);
+                glVertex3f(cB*y, sB*y, L+R*x);
+            }
+            for ( int i=fin; i >= 0; i-=C )
+            {
+                GLfloat x = -co_[i], y = si_[i];
+                glNormal3f(ca*y, sa*y,   x);
+                glVertex3f(cA*y, sA*y, R*x);
+                glNormal3f(cb*y, sb*y,   x);
+                glVertex3f(cB*y, sB*y, R*x);
+            }
+            glEnd();
+        }
+    }
+
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
 
@@ -1428,7 +1465,7 @@ namespace gle
     void gleObject(Vector3 const& x, Vector3 const& d, const float R, void (*obj)())
     {
         glPushMatrix();
-        gleTransAlignZ(d, x, R, R);
+        gleTransAlignZ(d, R, x, R);
         obj();
         glPopMatrix();
     }
@@ -1459,7 +1496,7 @@ namespace gle
                    const real L, void (*obj)() )
     {
         glPushMatrix();
-        gleTransAlignZ(d, x, L, R);
+        gleTransAlignZ(d, L, x, R);
         obj();
         glPopMatrix();
     }
@@ -1762,7 +1799,7 @@ namespace gle
     void gleCone(Vector3 const& pos, Vector3 const& dir, const real scale)
     {
         glPushMatrix();
-        gleTransAlignZ(dir, pos, scale, scale);
+        gleTransAlignZ(dir, scale, pos, scale);
         gleLongConeB();
         glPopMatrix();
     }
@@ -1797,7 +1834,7 @@ namespace gle
     {
         glPushMatrix();
         //build the rotation matrix, assuming dir is normalized
-        gleTransAlignZ(dir, pos, scale, scale);
+        gleTransAlignZ(dir, scale, pos, scale);
         gleCylinderZ();
         glPopMatrix();
     }
@@ -1842,7 +1879,7 @@ namespace gle
     {
         glPushMatrix();
         //assuming dir is normalized
-        gleTransAlignZ(dir, pos, scale, scale);
+        gleTransAlignZ(dir, scale, pos, scale);
         gleArrowTail1();
         glPopMatrix();
     }
@@ -2346,6 +2383,73 @@ namespace gle
         glPopMatrix();
     }
     
+
+    //-----------------------------------------------------------------------
+    
+    void gleRectangle(float X1, float Y1, float X2, float Y2, float Z)
+    {
+        glBegin(GL_TRIANGLE_STRIP);
+        glVertex3f(X1, Y1, Z);
+        glVertex3f(X2, Y1, Z);
+        glVertex3f(X1, Y2, Z);
+        glVertex3f(X2, Y2, Z);
+        glEnd();
+    }
+    
+    int copyparity(int a, int b)
+    {
+        return a + (( std::abs(a) + b ) & 1);
+    }
+
+    void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2)
+    {
+        float H = T * 0.5;
+        int Q = floor( (float)R * M_SQRT1_2 );
+        
+        if ( col1.visible() )
+        {
+            float U = R * T;
+            col1.load_load();
+            gleRectangle(-U, -U, U, U, Z);
+        }
+        
+        col2.load_load();
+        int x = R, RE = 2 * x - 3;
+        for ( int y = 0; y <= x; ++y )
+        {
+            /*
+             using the Midpoint circle algorithm
+             https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+            */
+            if ( ( 2 * y )*( y + 2 ) > RE )
+            {
+                RE += 4 * ( x - 1 );
+                --x;
+            }
+            for ( int i = copyparity(-x,y); i <= x; i+=2 )
+            {
+                float X = i * T;
+                float Y = y * T;
+                gleRectangle( X-H, Y-H, X+H, Y+H, Z);
+                gleRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
+            }
+            for ( int i = copyparity(Q,y); i <= x; i+=2 )
+            {
+                float X = y * T;
+                float Y = i * T;
+                gleRectangle( X-H, Y-H, X+H, Y+H, Z);
+                gleRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
+            }
+            for ( int i = copyparity(Q,y); i <= x; i+=2 )
+            {
+                float X = y * T;
+                float Y = i * T;
+                gleRectangle(-X-H, Y-H,-X+H, Y+H, Z);
+                gleRectangle( X+H,-Y+H, X-H,-Y-H, Z);
+            }
+        }
+    }
+
     
     //-----------------------------------------------------------------------
     void gleDrawAxes(const real size, int dim)

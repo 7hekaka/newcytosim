@@ -114,7 +114,7 @@ void Parser::parse_set(std::istream& is)
         }
 #endif
     }
-    else if ( simul.isPropertyClass(cat) && !spec )
+    else if ( simul.isCategory(cat) && !spec )
     {
         /* in this form:
          set CLASS NAME { PARAMETER = VALUE }
@@ -241,7 +241,7 @@ void Parser::parse_change(std::istream& is)
     {
         change_all = true;
         name = Tokenizer::get_symbol(is);
-        if ( !simul.isPropertyClass(name) )
+        if ( !simul.isCategory(name) )
             throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
 
@@ -360,7 +360,7 @@ void Parser::parse_new(std::istream& is)
     
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
-    if ( simul.isPropertyClass(name) )
+    if ( simul.isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -519,7 +519,7 @@ void Parser::parse_delete(std::istream& is)
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
-    if ( simul.isPropertyClass(name) )
+    if ( simul.isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -571,7 +571,7 @@ void Parser::parse_mark(std::istream& is)
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
-    if ( simul.isPropertyClass(name) )
+    if ( simul.isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )

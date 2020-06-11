@@ -1,83 +1,104 @@
-% Immobilized filament to test crossover
-% FJN and Maud Formanek, Cambridge 16.03.2020
+% Growing and colliding microtubules in 3D
+% Maud Formanek 13.03.2020
+% FJN 10.06.2020
+
 
 set simul system
 {
-    time_step = 0.001
+    dim = 3
+    time_step = 0.005
     viscosity = 0.1
-    precondition = 0
-	steric = 1, 1000
+    precondition=0
+    steric = 1, 701.171875
+    display = ( style=3; point_value=0.010; draw_links=1; floor=4, 0.1; )
 }
 
 set space cell
 {
-    shape = circle
-}
-
-set fiber microtubule
-{
-    rigidity = 20
-    segmentation = 0.5
-	steric = 1, 0.025
-	
-    activity = dynamic
-    unit_length     = 0.008
-    growing_speed   = 0.18
-    shrinking_speed = -0.36
-    hydrolysis_rate = 0.43
-    growing_force   = 1.7
- 
-    display = ( width=2; )
-}
-
-set fiber obstacle
-{
-	viscosity = 10000
-    rigidity = 20
-    segmentation = 0.5
-	steric = 1, 0.025
-
-    display = ( width=2; )
-}
-
-set hand glue
-{
-    binding = 10, 0.01
-    unbinding = 0, inf
-    display = ( color=green; size=7; width=7; )
-}
-
-set single binder
-{
-    hand = glue
-    stiffness = 1000
-    activity = fixed
+    shape = cylinderZ
 }
 
 new cell
 {
-    radius = 10
+    radius = 4
+    top = 2
+    bottom = 0
 }
+
+set fiber microtubule
+{
+	confine = inside, 1000
+    steric = 1, 0.050
+    rigidity = 10.625
+    segmentation = 0.25
+    activity = dynamic
+    growing_speed = 0.3467
+    shrinking_speed = -0.36
+    growing_force = 1.4422
+    hydrolysis_rate = 0.4
+    max_length= 10 
+    min_length = 0.01
+    persistent = 1
+    display = ( line=2.5, 1; )
+}
+
+set fiber obstacle
+{
+    steric = 1, 0.050
+    rigidity = 10.625
+    segmentation = 0.25
+    activity = none
+    viscosity = 100000
+    display = ( line=2.5, 1; )
+}
+
+set hand anchor
+{
+    binding_rate = 6.9375 
+    binding_range = 0.010
+    unbinding_rate = 0.175
+    unbinding_force = 5.0625 
+    display = {
+        size = 5
+        color = 0x0072B2FF;
+    }
+}
+
+set single grafted
+{
+    hand = anchor
+    stiffness = 250
+    activity = fixed
+}
+
 
 new 1 obstacle
 {
-	length = 10
-	direction = X
-	position = 0 0 0
-	attach1 = binder, 0, minus_end
-	attach2 = binder, 0, plus_end
+    length = 4
+    position = 0 0 0
+    direction = 0 1 0
 }
+
 
 new 1 microtubule
 {
-    length = 4
-	attach1 = binder, 0
-	attach2 = binder, 1
-	plus_end = grow
+    length = 1.6
+
+    position = -3 -1 0
+    direction = 0.906 0.423 0
+    end_state = grow
+    attach1 = grafted, 0, minus_end
+    attach2 = grafted, 1, minus_end
 }
 
-run 20000 system
+new 30 grafted ( line 4 at 1.2 0 turn 0.906 0.423 at -3 -1 )
+
+ 
+repeat 432
 {
-    nb_frames = 10
+    run 20 system
+    {
+        nb_frames=1
+    }
+    report microtubule:ends * { verbose = 0 }
 }
-

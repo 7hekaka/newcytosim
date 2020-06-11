@@ -66,7 +66,6 @@ set hand motor1
     hold_growing_end = 0
     
     activity = walk
-    use_lattice = 1
     step_size = 0.01
     unloaded_speed = 0.8
     stall_force = 5
@@ -85,7 +84,6 @@ set hand motor2
     unbinding_force = 300
     
     activity = walk
-    use_lattice = 1
     step_size = 0.01
     unloaded_speed = -0.8
     stall_force = 5

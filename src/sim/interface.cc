@@ -996,7 +996,7 @@ void Interface::execute_export(std::string& file, std::string const& what, Gloss
  */
 void Interface::execute_report(std::string& file, std::string const& what, Glossary& opt)
 {
-    bool ver = true;
+    int ver = 1;
     opt.set(ver, "verbose");
     std::string str;
     VLOG("-WRITE " << what << " to " << file << '\n');
@@ -1013,10 +1013,10 @@ void Interface::execute_report(std::string& file, std::string const& what, Gloss
         osp = &ofs;
     }
     
-    if ( ver )
-    {
+    if ( ver > 1 )
+        simul.report_wrap(*osp, what, opt);
+    else if ( ver > 0 )
         simul.report(*osp, what, opt);
-    }
     else
     {
         std::stringstream ss;
