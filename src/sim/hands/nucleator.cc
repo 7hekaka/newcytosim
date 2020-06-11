@@ -110,10 +110,10 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     ObjectSet::rotateObjects(objs, rot);
     
     // shift position by the length of the interaction:
-    if ( haMonitor->interactionLength() > 0 )
+    if ( haMonitor->linkRestingLength() > 0 )
     {
         Vector dir = haMonitor->otherDirection(this);
-        pos += dir.randOrthoU(haMonitor->interactionLength());
+        pos += dir.randOrthoU(haMonitor->linkRestingLength());
     }
 
     /*

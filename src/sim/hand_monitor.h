@@ -40,19 +40,19 @@ public:
     /// return the Hand that is not the argument, in a Couple
     virtual Hand * otherHand(Hand const*) const { return nullptr; }
 
-    /// return the position of the Hand that is not the argument, for a Couple
-    /** If the hand is not part of a Couple, this returns Vector(0,0,0) */
-    virtual Vector otherPosition(Hand const*) const { return Vector(0,0,0); }
-
     /// return the direction of the Fiber for the Hand that is not the argument, in a Couple
     /** If the hand is not part of a Couple, this returns a random unit vector */
     virtual Vector otherDirection(Hand const*) const { return Vector::randU(); }
-
-    /// resting length of the interaction
-    virtual real   interactionLength() const { return 0; }
     
-    /// stiffness of the interaction
-    virtual real   interactionStiffness() const { return 0; }
+    /// return the distal position of the link attached to this Hand
+    /** returns the position of the other Hand, if the Hand is part of a Couple */
+    virtual Vector linkBase(Hand const*) const { return Vector(0,0,0); }
+
+    /// resting length of the link involving this Hand
+    virtual real   linkRestingLength() const { return 0; }
+    
+    /// stiffness of the link involving this Hand
+    virtual real   linkStiffness() const { return 0; }
 
     /// identity() of containing object
     virtual ObjectID nucleatorID() const { return 0; }

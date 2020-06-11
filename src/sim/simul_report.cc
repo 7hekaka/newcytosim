@@ -636,13 +636,14 @@ void Simul::reportFiberLinks(std::ostream& out) const
             fib->sortHands();
             for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
             {
-                if ( ha->interactionStiffness() > 0 )
+                if ( ha->linkStiffness() > 0 )
                 {
                     out << LIN << fib->prop->number();
                     out << SEP << fib->identity();
                     out << SEP << ha->prop->number();
                     out << SEP << ha->abscissa();
-                    out << SEP << ha->otherPosition();
+                    out << SEP << ha->linkBase();
+                    out << SEP << ha->linkStiffness();
                 }
             }
         }

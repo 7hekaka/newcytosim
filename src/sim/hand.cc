@@ -40,15 +40,15 @@ Hand * Hand::otherHand() const
 }
 
 
-Vector Hand::otherPosition() const
+Vector Hand::linkBase() const
 {
-    return haMonitor->otherPosition(this);
+    return haMonitor->linkBase(this);
 }
 
 
-real Hand::interactionStiffness() const
+real Hand::linkStiffness() const
 {
-    return haMonitor->interactionStiffness();
+    return haMonitor->linkStiffness();
 }
 
 
@@ -211,7 +211,7 @@ void Hand::locate(Fiber* f, real a)
     //assert_true(f->abscissaM() <= a + REAL_EPSILON);
     //assert_true(a <= f->abscissaP() + REAL_EPSILON);
 
-    fbAbs   = a;
+    fbAbs = a;
     fbFiber = f;
     f->addHand(this);
     update();

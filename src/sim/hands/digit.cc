@@ -64,6 +64,7 @@ void Digit::hop(lati_t s)
 {
     assert_true( attached() );
 #if FIBER_HAS_LATTICE
+    assert_true( lattice() );
     dec();
     fbSite = s;
     inc();
