@@ -2414,18 +2414,21 @@ namespace gle
         }
         
         col2.load_load();
-        int x = R, RE = 2 * x - 3;
+        int x = R;
+        int RX = 2 * x - 3;
+        int RY = 0;
         for ( int y = 0; y <= x; ++y )
         {
             /*
              using the Midpoint circle algorithm
              https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
             */
-            if ( ( 2 * y )*( y + 2 ) > RE )
+            if ( RY > RX )
             {
-                RE += 4 * ( x - 1 );
+                RX += 4 * ( x - 1 );
                 --x;
             }
+            RY += 4 * y + 8;
             for ( int i = copyparity(-x,y); i <= x; i+=2 )
             {
                 float X = i * T;
