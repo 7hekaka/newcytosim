@@ -248,8 +248,12 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     {
         if ( what.empty() || what == "position" )
             return reportFibers(out, sel, com);
+        if ( what == "plus_end" )
+            return reportFiberEnds(out, 1, sel, com);
+        if ( what == "minus_end" )
+            return reportFiberEnds(out, 2, sel, com);
         if ( what == "end" )
-            return reportFiberEnds(out, sel, com);
+            return reportFiberEnds(out, 3, sel, com);
         if ( what == "point" )
             return reportFiberPoints(out, sel, com);
         if ( what == "displacement" )
@@ -774,13 +778,15 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
 /**
  Export dynamic state, positions and directions of fiber at both ends
  */
-void Simul::reportFiberEnds(std::ostream& out, Property const* sel, bool com) const
+void Simul::reportFiberEnds(std::ostream& out, int which, Property const* sel, bool com) const
 {
     if ( com )
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
-        out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
-        out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
+        if ( which & 1 )
+            out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
+        if ( which & 2 )
+            out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
     }
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
@@ -790,12 +796,18 @@ void Simul::reportFiberEnds(std::ostream& out, Property const* sel, bool com) co
             out << LIN << fib->prop->number();
             out << SEP << fib->identity();
             out << SEP << fib->length();
-            out << SEP << fib->endStateM();
-            out << SEP << fib->posEndM();
-            out << SEP << fib->dirEndM();
-            out << SEP << fib->endStateP();
-            out << SEP << fib->posEndP();
-            out << SEP << fib->dirEndP();
+            if ( which & 1 )
+            {
+                out << SEP << fib->endStateP();
+                out << SEP << fib->posEndP();
+                out << SEP << fib->dirEndP();
+            }
+            if ( which & 2 )
+            {
+                out << SEP << fib->endStateM();
+                out << SEP << fib->posEndM();
+                out << SEP << fib->dirEndM();
+            }
         }
     }
 }

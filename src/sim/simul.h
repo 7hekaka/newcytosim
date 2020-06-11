@@ -388,7 +388,7 @@ public:
     void      reportFiberDisplacement(std::ostream&, Property const* sel, bool com=true) const;
 
     /// print the positions and the states of the two ends of each fiber
-    void      reportFiberEnds(std::ostream&, Property const* sel, bool com=true) const;
+    void      reportFiberEnds(std::ostream&, int which, Property const* sel, bool com=true) const;
     
     /// print the mean and standard deviation of vertices for each class of fiber
     void      reportFiberMoments(std::ostream&) const;
