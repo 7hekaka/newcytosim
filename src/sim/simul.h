@@ -371,9 +371,15 @@ public:
     
     /// give a summary of the System
     void      reportSystem(std::ostream&) const;
+    
+    /// print the length and the points of each fiber
+    void      reportFiber(std::ostream&, Fiber const*) const;
 
     /// print the length and the points of each fiber
     void      reportFibers(std::ostream&, Property const* sel, bool com=true) const;
+    
+    /// print the length and the points of each fiber
+    void      reportFibersSorted(std::ostream&, Property const* sel, bool com=true) const;
 
     /// print the coordinates of the vertices of each fiber
     void      reportFiberPoints(std::ostream&, Property const* sel, bool com=true) const;

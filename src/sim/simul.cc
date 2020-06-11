@@ -389,7 +389,9 @@ bool Simul::isCategory(const std::string& name) const
 {
     if ( name == "hand" )
         return true;
-    
+    if ( name == "simul" )
+        return true;
+
     return const_cast<Simul*>(this)->findSet(name);
 }
 
