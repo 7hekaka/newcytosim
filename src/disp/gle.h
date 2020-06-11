@@ -393,6 +393,9 @@ namespace gle
     /// draw a rectangle to indicate the GLUT window-resize handle
     void gleDrawResizeBox(int window_width, int window_height);
     
+    /// draw plane with squares of alternating colors
+    void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2);
+
     /// draw a set of 2 or 3 axes, depending on `dim`
     void gleDrawAxes(real size, int dim);
     

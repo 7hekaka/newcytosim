@@ -250,6 +250,17 @@ void Player::displayCytosim()
     //std::cerr << "displayCytosim @ " << simul.time() << '\n';
     // clear pixels:
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    
+    if ( disp.draw_floor )
+    {
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        gle_color col1(0.0,0.0,0.0);
+        gle_color col2(0.2,0.2,0.2);
+        gle::drawTiledFloor(disp.draw_floor, disp.floor_tile, disp.floor_height, col1, col2);
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+    }
 
     try {
         // draw:

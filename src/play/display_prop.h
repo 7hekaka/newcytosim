@@ -26,7 +26,7 @@ public:
      - style 3 draw real tubes and uses OpenGL lighting for rendering. It is nice for 3D.
      .
      */
-    unsigned       style;
+    unsigned  style;
 
     /// if true, repeat the display along periodic boundary directions
     /**
@@ -34,19 +34,19 @@ public:
     In this case, the whole system will be displayed multiple times,
     shifted appropriately in the directions that are periodic.
     */
-    int            tile;
+    int       tile;
     
     /// if true, translate objects to place them in the root cell for periodic boundary conditions
-    int            fold;
+    int       fold;
     
     /// default diameter of points
-    float          point_size;
+    float     point_size;
     
     /// default width of hookean links
-    float          link_width;
+    float     link_width;
 
     /// default width of lines
-    float          line_width;
+    float     line_width;
     
     /// if set > 0, this defines the unit size used for `point_size` and `line_width` 
     /**
@@ -61,20 +61,26 @@ public:
      
      <em> default = 0 </em>
      */
-    float          point_value;
+    float     point_value;
     
     /// if `true`, unattached Couples are display randomly with one or the other Hand (default=false)
-    unsigned       couple_flip;
+    unsigned  couple_flip;
     
     /// selection bitfield for Couples
-    unsigned       couple_select;
+    unsigned  couple_select;
     
     /// selection bitfield for Singles
-    unsigned       single_select;
+    unsigned  single_select;
     
     /// flag to display Meca's links
-    bool           draw_links;
+    bool      draw_links;
 
+    /// draw 'tiled' floor
+    int       draw_floor;
+
+    /// parameters for 'tiled' floor
+    float     floor_radius, floor_tile, floor_height;
+    
     /// @}
 
 public:
