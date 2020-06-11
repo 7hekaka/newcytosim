@@ -110,6 +110,8 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
 
     for ( std::string const& what : args )
         report_one(out, what, opt);
+    
+    out << '\n';
 }
 
 
@@ -697,6 +699,22 @@ void Simul::reportFiberMesh(std::ostream& out, bool density) const
 //------------------------------------------------------------------------------
 #pragma mark - Fiber Individual Properties
 
+/**
+ Export length, position and directions at center of fibers
+ */
+void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
+{
+    out << LIN << fib->prop->number();
+    out << SEP << fib->identity();
+    out << SEP << fib->length();
+    out << SEP << fib->posEnd(CENTER);
+    out << SEP << fib->dirEnd(CENTER);
+    out << SEP << (fib->posEndM()-fib->posEndP()).norm();
+    out << SEP << dot(fib->dirEndM(), fib->dirEndP());
+    out << SEP << organizers.findOrganizerID(fib);
+}
+
+    
 /// to sort in ascending order: return -1 if ( a < b ) and +1 if ( a > b )
 int compareFibers(Node const* A, Node const* B)
 {
@@ -704,6 +722,29 @@ int compareFibers(Node const* A, Node const* B)
     real b = static_cast<Fiber const*>(B)->length();
     return ( a < b ) - ( a > b );
     //return ( a > b ) - ( b > a );
+}
+
+
+/**
+ Export length, position and directions at center of fibers
+ */
+void Simul::reportFibersSorted(std::ostream& out, Property const* sel, bool com) const
+{
+    // sort fibers in the NodeList:
+    const_cast<Simul*>(this)->fibers.nodes.blinksort(compareFibers);
+
+    if ( com )
+    {
+        out << COM << "class" << SEP << "identity" << SEP << "length";
+        out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
+        out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
+    }
+
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    {
+        if ( !sel || sel == fib->prop )
+            reportFiber(out, fib);
+    }
 }
 
 
@@ -724,16 +765,7 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( !sel || sel == fib->prop )
-        {
-            out << LIN << fib->prop->number();
-            out << SEP << fib->identity();
-            out << SEP << fib->length();
-            out << SEP << fib->posEnd(CENTER);
-            out << SEP << fib->dirEnd(CENTER);
-            out << SEP << (fib->posEndM()-fib->posEndP()).norm();
-            out << SEP << dot(fib->dirEndM(), fib->dirEndP());
-            out << SEP << organizers.findOrganizerID(fib);
-        }
+            reportFiber(out, fib);
     }
 }
 
@@ -1773,14 +1805,14 @@ void Simul::reportSingleState(std::ostream& out, Property const* sel, bool com) 
 
 
 /**
- Export details of Singles
+ Export details of attached Singles
  */
 void Simul::reportSinglePosition(std::ostream& out, Property const* sel, bool com) const
 {
     if ( com )
     {
-        out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos_hand");
-        out << SEP << repeatXYZ("pos") << SEP << "fiber" << SEP << "abscissa";
+        out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+        out << SEP << "fiber" << SEP << "abscissa";
     }
         
     for ( Single const* obj = singles.firstID(); obj; obj = singles.nextID(obj) )
@@ -1789,7 +1821,6 @@ void Simul::reportSinglePosition(std::ostream& out, Property const* sel, bool co
         {
             out << LIN << obj->prop->number();
             out << SEP << obj->identity();
-            out << SEP << obj->posHand();
             out << SEP << obj->posFoot();
             if ( obj->attached() )
             {
