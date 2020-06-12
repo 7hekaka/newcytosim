@@ -76,7 +76,7 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
     {
         out << '\n' << e.brief();
     }
-    out << "\n% end\n";
+    out << "% end\n";
 }
 
 
@@ -134,25 +134,27 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
     remove_plural(who);
     remove_plural(what);
 
-    bool com = true, sep = false;
+    int com = 1, split = false;
     opt.peek(com, "verbose");
-    opt.set(sep, "separate");
+    opt.set(split, "split");
     
     //std::clog << "report("<< what << "|" << who << ")\n";
     if ( isCategory(who) )
     {
-        if ( sep )
+        if ( split )
         {
             // process every class in the category separatly:
             PropertyList plist = properties.find_all(who);
             for ( Property const* sel : plist )
             {
+                out << COM << "class " + std::to_string(sel->number()) + " is `" + sel->name() << "'";
                 report_one(out, who, sel, what, com, opt);
-                com = false;
+                com = 0;
             }
         }
         else
         {
+            // process all objects irrespective of their class:
             report_one(out, who, nullptr, what, com, opt);
         }
     }
@@ -301,7 +303,9 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "connector" )
             return reportFiberConnectors(out, opt);
 
-        throw InvalidSyntax("I only know fiber: position, end, point, moment, speckle, sample, segment, dynamic, length, distribution, tension, force, cluster, age, energy, hand, link");
+        throw InvalidSyntax("I only know fiber: position, end, minus_end, plus_end, "\
+                            "point, moment, speckle, sample, segment, dynamic, length, "\
+                            "distribution, tension, force, cluster, age, energy, hand, link");
     }
     if ( who == "bead" )
     {
@@ -764,7 +768,6 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
         out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
         out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
     }
-    //out << COM << "fiber class " + std::to_string(sel->number()) + " is " + sel->name();
 
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
