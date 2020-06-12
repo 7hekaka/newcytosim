@@ -249,11 +249,11 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what.empty() || what == "position" )
             return reportFibers(out, sel, com);
         if ( what == "plus_end" )
-            return reportFiberEnds(out, 1, sel, com);
+            return reportFiberEnds(out, PLUS_END, sel, com);
         if ( what == "minus_end" )
-            return reportFiberEnds(out, 2, sel, com);
+            return reportFiberEnds(out, MINUS_END, sel, com);
         if ( what == "end" )
-            return reportFiberEnds(out, 3, sel, com);
+            return reportFiberEnds(out, BOTH_ENDS, sel, com);
         if ( what == "point" )
             return reportFiberPoints(out, sel, com);
         if ( what == "displacement" )
@@ -778,14 +778,14 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
 /**
  Export dynamic state, positions and directions of fiber at both ends
  */
-void Simul::reportFiberEnds(std::ostream& out, int which, Property const* sel, bool com) const
+void Simul::reportFiberEnds(std::ostream& out, FiberEnd which, Property const* sel, bool com) const
 {
     if ( com )
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
-        if ( which & 1 )
+        if ( which & PLUS_END )
             out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
-        if ( which & 2 )
+        if ( which & MINUS_END )
             out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
     }
     
@@ -796,13 +796,13 @@ void Simul::reportFiberEnds(std::ostream& out, int which, Property const* sel, b
             out << LIN << fib->prop->number();
             out << SEP << fib->identity();
             out << SEP << fib->length();
-            if ( which & 1 )
+            if ( which & PLUS_END )
             {
                 out << SEP << fib->endStateP();
                 out << SEP << fib->posEndP();
                 out << SEP << fib->dirEndP();
             }
-            if ( which & 2 )
+            if ( which & MINUS_END )
             {
                 out << SEP << fib->endStateM();
                 out << SEP << fib->posEndM();
