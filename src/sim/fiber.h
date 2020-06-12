@@ -132,15 +132,15 @@ protected:
     size_t         hasKink(real max_cos) const;
 
     
-    /// viscous drag coefficient for a cylinder moving close to a surface
-    static real    dragCoefficientSurface(real len, FiberProp const*);
-    
-    /// viscous drag coefficient for a cylinder moving in an infinite volume of fluid
+    /// viscous drag coefficient for an ellipsoid moving in an infinite volume of fluid
     static real    dragCoefficientEllipsoid(real len, FiberProp const*);
     
     /// viscous drag coefficient for a cylinder moving in an infinite volume of fluid
     static real    dragCoefficientCylinder(real len, FiberProp const*);
-
+    
+    /// viscous drag coefficient for a cylinder moving close to a surface
+    static real    dragCoefficientSurface(real len, FiberProp const*);
+    
 public:
     
 #if FIBER_HAS_FAMILY

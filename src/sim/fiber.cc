@@ -814,11 +814,11 @@ real Fiber::dragCoefficientSurface(const real len, FiberProp const* prop)
 
 
 /**
- Calculate drag coefficient by calling one of the other function:
+ Calculate drag coefficient by calling one of these functions:
 
-        dragCoefficientSurface();
         dragCoefficientEllipsoid();
         dragCoefficientCylinder();
+        dragCoefficientSurface();
 
  */
 void Fiber::setDragCoefficient()
