@@ -103,7 +103,7 @@ bool SpaceCylinderZ::inside(Vector const& W) const
     const real Z = max_real(0, std::max(bot_+edge_-W.ZZ, W.ZZ-top_+edge_));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
-    return ( bot_ <= W.ZZ  &&  W.ZZ <= top_  &&  RT <= radius_ * radius_ );
+    return (( bot_ <= W.ZZ ) & ( W.ZZ <= top_ ) & ( RT <= radius_ * radius_ ));
 # endif
 #else
     ABORT_NOW("cylinderZ is only valid in 3D");
@@ -223,7 +223,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     real Z;
 
     // inside cylinder radius_
-    if ( 2*pos.ZZ-B > T )
+    if ( 2 * pos.ZZ - B > T )
     {
         Z = T;
         cap = ( pos.ZZ > T );
@@ -269,7 +269,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     real Z;
     
     // inside cylinder radius_
-    if ( 2*pos.ZZ-B > T )
+    if ( 2 * pos.ZZ - B > T )
     {
         Z = T-E;
         if ( pos.ZZ > T-E )

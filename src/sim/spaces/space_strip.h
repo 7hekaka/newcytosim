@@ -22,6 +22,12 @@ class SpaceStrip : public Space
 {
     ///  half to total width in each dimension
     real   length_[3];
+    
+    /// Z-position of the bottom limit
+    real   bot_;
+    
+    /// Z-position of the top limit
+    real   top_;
 
 public:
     
@@ -66,7 +72,6 @@ public:
     /// read from file
     void        read(Inputter&, Simul&, ObjectTag);
 
-    
 };
 
 #endif
