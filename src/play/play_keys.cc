@@ -903,14 +903,14 @@ void processKey(unsigned char key)
             setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, 2);
             break;
             
-        case '4':
+        case '$':
             if ( altKeyDown )
                 setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 0);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSpeckleStyle, 0);
             break;
             
-        case '$':
+        case '4':
             setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
             break;
             
