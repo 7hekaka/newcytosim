@@ -40,59 +40,6 @@ void Tubule::reset()
 }
 
 
-void Tubule::salute(Buddy const* guy)
-{
-    //std::clog << reference() << " salute(" << guy << ")\n";
-    if ( guy == bone_ )
-    {
-        assert_true(bone_);
-        if (( bone_->freshAssemblyP() != 0 ) | ( bone_->freshAssemblyM() != 0 ))
-        {
-            // copy the growth exhibited from `bone_`
-            real aP = bone_->abscissaP();
-            real aM = bone_->abscissaM();
-            for ( size_t i = 0; i < NFIL; ++i )
-            {
-                fil_[i]->growP(aP-offset_[i]-fil_[i]->abscissaP());
-                fil_[i]->growM(fil_[i]->abscissaM()-aM+offset_[i]);
-                fil_[i]->adjustSegmentation();
-                fil_[i]->updateFiber();
-            }
-            //report(std::clog);
-        }
-    }
-}
-
-
-void Tubule::report(std::ostream& os)
-{
-    os << reference() << " " << bone_->segmentation() << " " << bone_->nbPoints() << " " << bone_->length() << "\n";
-    for ( size_t i = 0; i < NFIL; ++i )
-        os << std::setw(7) << i << " " << fil_[i]->segmentation() << " " << fil_[i]->nbPoints() << " "<< fil_[i]->length() << "\n";
-}
-
-
-void Tubule::setFamily(Fiber const* fam)
-{
-    // wrap array values for convenience
-    for ( size_t i = NFIL; i < FILM; ++i )
-        fil_[i] = fil_[i-NFIL];
-
-#if FIBER_HAS_FAMILY
-    for ( size_t i = 0; i < NFIL; ++i )
-    {
-        fil_[i]->family_ = fam;
-        fil_[i]->sister_ = fil_[(i+NFIL-1)%NFIL];
-        fil_[i]->brother_ = fil_[(i+1)%NFIL];
-    }
-    if ( bone_ )
-        bone_->family_ = fam;
-#else
-    std::clog << "WARNING: to use Tubule, please compile with FIBER_HAS_FAMILY\n";
-#endif
-}
-
-
 ObjectList Tubule::build(Glossary& opt, Simul& sim)
 {
     FiberProp const* fp = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
@@ -164,6 +111,64 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
 }
 
 
+Vector Tubule::posCenterlineM(real dis)
+{
+    Vector vec(0, 0, 0);
+    for ( size_t i = 0; i < NFIL; ++i )
+        vec += fil_[i]->posM(dis);
+    return vec / NFIL;
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Family
+
+
+void Tubule::setFamily(Fiber const* fam)
+{
+    // wrap array values for convenience
+    for ( size_t i = NFIL; i < FILM; ++i )
+        fil_[i] = fil_[i-NFIL];
+
+#if FIBER_HAS_FAMILY
+    for ( size_t i = 0; i < NFIL; ++i )
+    {
+        fil_[i]->family_ = fam;
+        fil_[i]->sister_ = fil_[(i+NFIL-1)%NFIL];
+        fil_[i]->brother_ = fil_[(i+1)%NFIL];
+    }
+    if ( bone_ )
+        bone_->family_ = fam;
+#else
+    std::clog << "WARNING: to use Tubule, please compile with FIBER_HAS_FAMILY\n";
+#endif
+}
+
+
+void Tubule::salute(Buddy const* guy)
+{
+    //std::clog << reference() << " salute(" << guy << ")\n";
+    if ( guy == bone_ )
+    {
+        assert_true(bone_);
+        if (( bone_->freshAssemblyP() != 0 ) | ( bone_->freshAssemblyM() != 0 ))
+        {
+            // copy the growth exhibited from `bone_`
+            real aP = bone_->abscissaP();
+            real aM = bone_->abscissaM();
+            for ( size_t i = 0; i < NFIL; ++i )
+            {
+                fil_[i]->growP(aP-offset_[i]-fil_[i]->abscissaP());
+                fil_[i]->growM(fil_[i]->abscissaM()-aM+offset_[i]);
+                fil_[i]->adjustSegmentation();
+                fil_[i]->updateFiber();
+            }
+            //report(std::clog);
+        }
+    }
+}
+
+
 void Tubule::goodbye(Buddy const* b)
 {
     std::cerr << "ERROR: Tubule's filaments cannot be deleted\n";
@@ -179,7 +184,9 @@ void Tubule::goodbye(Buddy const* b)
     }
 }
 
-    
+//------------------------------------------------------------------------------
+#pragma mark - Interactions
+
 /**
 This uses only addSideLink() with appropriate directions
 Cambridge, 12.2019
@@ -240,7 +247,8 @@ void Tubule::setInteractionsB(Meca& meca) const
  */
 void Tubule::setInteractions(Meca& meca) const
 {
-    assert_true(bone_);
+    if ( !bone_ )
+        throw InvalidParameter("tubule:bone must be defined");
 
 #if ( DIM >= 3 )
     const real stiffL = prop->stiffness[0];
@@ -354,6 +362,9 @@ void Tubule::setInteractionsC(Meca& meca) const
 #endif
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - I/O
+
 
 void Tubule::write(Outputter& out) const
 {
@@ -381,5 +392,13 @@ void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
             fil_[i] = Fiber::toFiber(w);
     }
     setFamily(bone_?bone_:fil_[0]);
+}
+
+
+void Tubule::report(std::ostream& os)
+{
+    os << reference() << " " << bone_->segmentation() << " " << bone_->nbPoints() << " " << bone_->length() << "\n";
+    for ( size_t i = 0; i < NFIL; ++i )
+        os << std::setw(7) << i << " " << fil_[i]->segmentation() << " " << fil_[i]->nbPoints() << " "<< fil_[i]->length() << "\n";
 }
 
