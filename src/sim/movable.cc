@@ -106,6 +106,17 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             if ( tok == "inside" || tok == "random" )
                 return spc->randomPlace();
             
+            if ( tok == "XY" || tok == "YZ" || tok == "XZ" )
+            {
+                real H = 0;
+                is >> H;
+                Vector V = spc->randomPlace();
+                if ( tok == "XY" ) V.ZZ = H;
+                if ( tok == "YZ" ) V.XX = H;
+                if ( tok == "XZ" ) V.YY = H;
+                return V;
+            }
+
             if ( tok == "edge" )
             {
                 real R = 0;
