@@ -277,7 +277,11 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "energy" )
             return reportFiberBendingEnergy(out);
         if ( what == "dynamic" )
-            return reportFiberDynamic(out);
+        {
+            reportFiberEndState(out, PLUS_END, true);
+            reportFiberEndState(out, MINUS_END, false);
+            return;
+        }
         if ( what == "force" )
             return reportFiberForces(out);
         if ( what == "confine_force" )
@@ -552,9 +556,17 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 /**
  Export number of fiber, classified according to dynamic state of one end
  */
-void Simul::reportFiberDynamic(std::ostream& out, FiberEnd end) const
+void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, bool com) const
 {
     constexpr size_t MAX = 5;
+    
+    if ( com )
+    {
+        out << COM << "fiber_end" << SEP << "total" << SEP << "static";
+        out << SEP << "green" << SEP << "yellow" << SEP << "orange"  << SEP << "red";
+    }
+    
+    std::string name = ( end==PLUS_END ? "plus_end" : "minus_end" );
     size_t cnt[MAX+1] = { 0 };
     size_t sum = 0;
     
@@ -564,27 +576,10 @@ void Simul::reportFiberDynamic(std::ostream& out, FiberEnd end) const
         state_t x = std::min(obj->dynamicState(end), (state_t)MAX);
         ++cnt[x];
     }
-
-    out << LIN;
-    if ( end == PLUS_END )
-        out << ljust("plus_end", 1);
-    else if ( end == MINUS_END )
-        out << ljust("minus_end", 1);
-
-    out << SEP << sum;
+    
+    out << LIN << ljust(name, 1) << SEP << sum;
     for ( size_t i = 0; i < MAX; ++i )
         out << SEP << cnt[i];
-}
-
-/**
- Export number of fiber, classified according to dynamic state of one end
- */
-void Simul::reportFiberDynamic(std::ostream& out) const
-{
-    out << COM << "fiber_end" << SEP << "total" << SEP << "static";
-    out << SEP << "green" << SEP << "yellow" << SEP << "orange"  << SEP << "red";
-    reportFiberDynamic(out, PLUS_END);
-    reportFiberDynamic(out, MINUS_END);
 }
 
 

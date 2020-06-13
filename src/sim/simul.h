@@ -376,20 +376,23 @@ public:
     void      reportFiber(std::ostream&, Fiber const*) const;
 
     /// print the length and the points of each fiber
-    void      reportFibers(std::ostream&, Property const* sel, bool com=true) const;
+    void      reportFibers(std::ostream&, Property const* sel, bool com) const;
     
     /// print the length and the points of each fiber
-    void      reportFibersSorted(std::ostream&, Property const* sel, bool com=true) const;
+    void      reportFibersSorted(std::ostream&, Property const* sel, bool com) const;
 
     /// print the coordinates of the vertices of each fiber
-    void      reportFiberPoints(std::ostream&, Property const* sel, bool com=true) const;
+    void      reportFiberPoints(std::ostream&, Property const* sel, bool com) const;
     
     /// print the coordinates of the vertices of each fiber
-    void      reportFiberDisplacement(std::ostream&, Property const* sel, bool com=true) const;
+    void      reportFiberDisplacement(std::ostream&, Property const* sel, bool com) const;
 
     /// print the positions and the states of the two ends of each fiber
-    void      reportFiberEnds(std::ostream&, FiberEnd which, Property const* sel, bool com=true) const;
+    void      reportFiberEnds(std::ostream&, FiberEnd which, Property const* sel, bool com) const;
     
+    /// print number of fibers in each end state of specified end
+    void      reportFiberEndState(std::ostream&, FiberEnd end, bool com) const;
+
     /// print the mean and standard deviation of vertices for each class of fiber
     void      reportFiberMoments(std::ostream&) const;
 
@@ -405,20 +408,11 @@ public:
     /// print number of kinks in each class of Fiber
     void      reportFiberSegments(std::ostream&) const;
     
-    /// print number of fibers according to dynamic state of end
-    void      reportFiberDynamic(std::ostream&, FiberEnd) const;
-    
-    /// print number of fibers according to their dynamic states
-    void      reportFiberDynamic(std::ostream&) const;
-    
     /// print coordinates of speckles that follow a frozen random sampling
     void      reportFiberSpeckles(std::ostream&, Glossary&) const;
     
     /// print coordinates of points randomly and freshly distributed
     void      reportFiberSamples(std::ostream&, Glossary&) const;
-
-    /// print dynamic states of Fiber
-    void      reportFiberStates(std::ostream&) const;
     
     /// print the coordinates and forces on the vertices of each fiber
     void      reportFiberForces(std::ostream&) const;
