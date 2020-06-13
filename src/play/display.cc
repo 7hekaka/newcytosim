@@ -851,7 +851,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
             {
-                gle_color::jet_color(exp(fib.posPoint(n).ZZ*beta)).load();
+                gle_color::jet_color(exp(fib.posPoint(n).z()*beta)).load();
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
