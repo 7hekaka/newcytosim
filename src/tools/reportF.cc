@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::cerr << e.biref() << "\n";
+        std::cerr << e.brief() << "\n";
         return EXIT_FAILURE;
     }
     

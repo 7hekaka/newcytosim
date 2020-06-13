@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::clog << e.biref() << '\n';
+        std::clog << e.brief() << '\n';
         return EXIT_FAILURE;
     }
 
