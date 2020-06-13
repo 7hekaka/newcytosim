@@ -126,6 +126,13 @@ void help(std::ostream& os)
 enum { ONSCREEN, OFFSCREEN_IMAGE, OFFSCREEN_MOVIE, ONSCREEN_MOVIE };
 
 
+void print_error(Exception const& e)
+{
+    print_magenta(std::cerr, e.brief());
+    std::cerr << e.info() << '\n';
+}
+
+
 int main(int argc, char* argv[])
 {
     int mode = ONSCREEN;
@@ -198,8 +205,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        print_magenta(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        print_error(e);
         return EXIT_FAILURE;
     }
     
@@ -250,8 +256,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        print_magenta(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        print_error(e);
         return EXIT_FAILURE;
     }
     
@@ -282,8 +287,7 @@ int main(int argc, char* argv[])
         catch( Exception & e )
         {
             arg.print_warnings(std::cerr, 1, "\n");
-            print_magenta(std::cerr, e.brief());
-            std::cerr << '\n' << e.info() << '\n';
+            print_error(e);
             return EXIT_FAILURE;
         }
     }
@@ -402,8 +406,7 @@ int main(int argc, char* argv[])
     }
     catch ( Exception & e )
     {
-        print_magenta(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        print_error(e);
         return EXIT_FAILURE;
     }
     
@@ -419,8 +422,7 @@ int main(int argc, char* argv[])
         }
         catch( Exception & e )
         {
-            print_magenta(std::cerr, e.brief());
-            std::cerr << '\n' << e.info() << '\n';
+            print_error(e);
             return EXIT_FAILURE;
         }
     }

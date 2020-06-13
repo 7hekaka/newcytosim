@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::clog << "Aborted: " << e.what() << '\n';
+        std::clog << e.biref() << '\n';
         return EXIT_FAILURE;
     }
 

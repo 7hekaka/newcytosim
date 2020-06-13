@@ -65,12 +65,11 @@ int main(int argc, char* argv[])
         in.open(input.c_str(), "rb");
     }
     catch( Exception & e ) {
-        std::cerr << "Error opening input file `" << input << "' :" << std::endl;
-        std::cerr << e.what() << "\n";
+        std::cerr << e.brief() << '\n';
         return EXIT_FAILURE;
     }
     
-    std::clog << ">>>>>> Sieve `" << input << "' -> `" << output << "'" << std::endl;
+    std::clog << ">>>>>> Sieve `" << input << "' -> `" << output << "'\n";
     
     size_t frm = 0, frame = 0;
     
@@ -84,8 +83,7 @@ int main(int argc, char* argv[])
                 return EXIT_SUCCESS;
         }
         catch( Exception & e ) {
-            std::clog << "Error in frame " << frm << ":\n";
-            std::clog << "    " << e.what() << '\n';
+            std::cerr << "Frame " << frm << ":" << e.brief() << '\n';
         }
 
         if ( skip_set )
@@ -101,8 +99,7 @@ int main(int argc, char* argv[])
                 simul.writeObjects(output, true, binary);
         }
         catch( Exception & e ) {
-            std::clog << "Error writing `" << output << "' :";
-            std::clog << e.what() << '\n';
+            std::cerr << e.brief() << '\n';
             return EXIT_FAILURE;
         }
         if ( has_frame && frm == frame )

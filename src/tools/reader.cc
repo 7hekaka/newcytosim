@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::clog << "Aborted: " << e.what() << '\n';
+        std::clog << e.biref() << '\n';
         return EXIT_FAILURE;
     }
     
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
                         printf("Reader: frame not found: ");
                 }
                 catch( Exception & e ) {
-                    printf("Reader: exception in `read` %lu: %s\n", frm, e.msg());
+                    printf("Reader: exception in `read` %lu: %s\n", frm, e.c_str());
                 }
             }
         }
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
                         if ( err ) printf("Reader error with `next`: %i\n", err);
                     }
                     catch( Exception & e ) {
-                        printf("Reader: exception in `next`: %s\n", e.msg());
+                        printf("Reader: exception in `next`: %s\n", e.c_str());
                     }
                     break;
                     

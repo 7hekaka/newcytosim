@@ -50,6 +50,12 @@ void handle_interrupt(int sig)
 //=================================  MAIN  =====================================
 //------------------------------------------------------------------------------
 
+void print_error(Exception const& e)
+{
+    print_magenta(std::cerr, e.brief());
+    std::cerr << e.info() << '\n';
+}
+
 int main(int argc, char* argv[])
 {
     // register callback to catch interrupting signals:
@@ -125,8 +131,7 @@ int main(int argc, char* argv[])
         simul.initialize(arg);
     }
     catch( Exception & e ) {
-        print_magenta(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        print_error(e);
         return EXIT_FAILURE;
     }
     catch(...) {
@@ -141,8 +146,7 @@ int main(int argc, char* argv[])
         Parser(simul, 1, 1, 1, 1, 1).readConfig();
     }
     catch( Exception & e ) {
-        print_magenta(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        print_error(e);
         return EXIT_FAILURE;
     }
     catch(...) {

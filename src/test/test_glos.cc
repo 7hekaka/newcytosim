@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     }
     catch ( Exception& e )
     {
-        std::cout << "Error : " << e.what();
+        std::cout << e.brief() << '\n';
         return EXIT_FAILURE;
     }
 }

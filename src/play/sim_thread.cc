@@ -95,7 +95,7 @@ void SimThread::run()
     }
     catch( Exception & e ) {
         simul.relax();
-        std::cerr << e.brief() << '\n' << e.info() << '\n';
+        std::cerr << e.brief() << e.info() << '\n';
         //flashText("Error: the simulation died");
     }
     hold_callback();
@@ -154,9 +154,9 @@ void SimThread::extend_run()
         Parser::execute_run(100000);
     }
     catch( Exception & e ) {
-        std::cerr << e.brief() << '\n' << e.info() << '\n';
+        std::cerr << e.brief() << e.info() << '\n';
         simul.relax();
-        //flashText("Error: %s", e.what());
+        //flashText("Error: %s", e.c_str());
     }
     hold_callback();
 }
@@ -487,7 +487,7 @@ void SimThread::execute(std::string const& code)
         evaluate(code);
     }
     catch( Exception & e ) {
-        std::cerr << e.brief() << '\n' << e.info() << '\n';
+        std::cerr << e.brief() << e.info() << '\n';
     }
     unlock();
 }
@@ -512,7 +512,7 @@ void SimThread::exportObjects(bool binary)
     {
         e << " in Simul::exportObjects()";
         print_blue(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        std::cerr << e.info() << '\n';
     }
     unlock();
 }
@@ -528,7 +528,7 @@ void SimThread::writeProperties(std::ostream& os, bool prune)
     {
         e << " in Simul::writeProperties()";
         print_blue(std::cerr, e.brief());
-        std::cerr << '\n' << e.info() << '\n';
+        std::cerr << e.info() << '\n';
     }
     unlock();
 }

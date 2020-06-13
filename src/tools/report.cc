@@ -111,7 +111,7 @@ void report(Simul const& simul, std::ostream& os, std::string const& what, int f
     }
     catch( Exception & e )
     {
-        std::cerr << "Aborted: " << e.what() << '\n';
+        std::cerr << e.biref() << '\n';
         exit(EXIT_FAILURE);
     }
 }
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        std::clog << "Aborted: " << e.what() << '\n';
+        std::clog << e.biref() << '\n';
         return EXIT_FAILURE;
     }
 

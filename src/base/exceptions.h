@@ -47,27 +47,21 @@ public:
     }
     
     /// return the message
-    std::string brief()
+    std::string brief() const
     {
-        return "Error, " + msg_ + ":";
+        return "Error, " + msg_;
     }
     
     /// return supplementary message
     std::string info() const
     {
-        return info_;
-    }
-
-    /// return copy of the message composed of brief and info
-    std::string what() const
-    {
         if ( info_.size() > 0 )
-            return msg_ + ":\n" + info_;
-        return msg_;
+             return ": " + info_;
+        return "";
     }
 
-    /// return copy of the message
-    char const* msg() const
+    /// return copy of the message as C-string
+    char const* c_str() const
     {
         return msg_.c_str();
     }
