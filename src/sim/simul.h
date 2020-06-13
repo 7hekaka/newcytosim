@@ -376,22 +376,22 @@ public:
     void      reportFiber(std::ostream&, Fiber const*) const;
 
     /// print the length and the points of each fiber
-    void      reportFibers(std::ostream&, Property const* sel, bool com) const;
+    void      reportFibers(std::ostream&, Property const*, bool com) const;
     
     /// print the length and the points of each fiber
-    void      reportFibersSorted(std::ostream&, Property const* sel, bool com) const;
+    void      reportFibersSorted(std::ostream&, Property const*, bool com) const;
 
     /// print the coordinates of the vertices of each fiber
-    void      reportFiberPoints(std::ostream&, Property const* sel, bool com) const;
+    void      reportFiberPoints(std::ostream&, Property const*, bool com) const;
     
     /// print the coordinates of the vertices of each fiber
-    void      reportFiberDisplacement(std::ostream&, Property const* sel, bool com) const;
+    void      reportFiberDisplacement(std::ostream&, Property const*, bool com) const;
 
     /// print the positions and the states of the two ends of each fiber
-    void      reportFiberEnds(std::ostream&, FiberEnd which, Property const* sel, bool com) const;
+    void      reportFiberEnds(std::ostream&, FiberEnd which, Property const*, bool com) const;
     
     /// print number of fibers in each end state of specified end
-    void      reportFiberEndState(std::ostream&, FiberEnd end, bool com) const;
+    void      reportFiberEndState(std::ostream&, FiberEnd end, Property const*, bool com) const;
 
     /// print the mean and standard deviation of vertices for each class of fiber
     void      reportFiberMoments(std::ostream&) const;
@@ -476,16 +476,16 @@ public:
     void      reportCoupleAnatomy(std::ostream&) const;
     
     /// print position of Couples of a certain kind
-    void      reportCoupleState(std::ostream&, Property const* sel, bool com) const;
+    void      reportCoupleState(std::ostream&, Property const*, bool com) const;
     
     /// print position of active Couples of a certain kind
-    void      reportCoupleActive(std::ostream&, Property const* sel, bool com) const;
+    void      reportCoupleActive(std::ostream&, Property const*, bool com) const;
     
     /// print position and forces of doubly-attached Couples
-    void      reportCoupleLink(std::ostream&, Property const* sel, bool com) const;
+    void      reportCoupleLink(std::ostream&, Property const*, bool com) const;
     
     /// print configurations of doubly-attached Couples
-    void      reportCoupleConfiguration(std::ostream&, Property const* sel, bool com, Glossary&) const;
+    void      reportCoupleConfiguration(std::ostream&, Property const*, bool com, Glossary&) const;
 
     /// print agregate properties of Couple force
     void      reportCoupleForce(std::ostream&) const;

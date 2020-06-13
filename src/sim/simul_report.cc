@@ -278,10 +278,14 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberBendingEnergy(out);
         if ( what == "dynamic" )
         {
-            reportFiberEndState(out, PLUS_END, true);
-            reportFiberEndState(out, MINUS_END, false);
+            reportFiberEndState(out, PLUS_END, sel, true);
+            reportFiberEndState(out, MINUS_END, sel, false);
             return;
         }
+        if ( what == "plus_state" )
+            return reportFiberEndState(out, PLUS_END, sel, true);
+        if ( what == "minus_state" )
+            return reportFiberEndState(out, MINUS_END, sel, true);
         if ( what == "force" )
             return reportFiberForces(out);
         if ( what == "confine_force" )
@@ -520,7 +524,7 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 
     if ( 1 )
     {
-        out << COM << "length_histogram (`scale` indicates the center of each bin)";
+        out << COM << "fiber length histogram (bin size " << delta <<")";
         out << LIN << ljust("scale", 2);
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
@@ -556,28 +560,34 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 /**
  Export number of fiber, classified according to dynamic state of one end
  */
-void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, bool com) const
+void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const* sel, bool com) const
 {
-    constexpr size_t MAX = 5;
+    std::string name;
+    if ( sel )
+        name = sel->name() + ":";
+    name.append(end==PLUS_END ?"plus_end":"minus_end");
     
     if ( com )
     {
-        out << COM << "fiber_end" << SEP << "total" << SEP << "static";
-        out << SEP << "green" << SEP << "yellow" << SEP << "orange"  << SEP << "red";
+        out << COM << ljust("class", 2, 2) << SEP << "total" << SEP << "static";
+        out << SEP << "green" << SEP << "yellow" << SEP << "orange" << SEP << "red";
     }
     
-    std::string name = ( end==PLUS_END ? "plus_end" : "minus_end" );
+    constexpr size_t MAX = 5;
     size_t cnt[MAX+1] = { 0 };
     size_t sum = 0;
     
-    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
+    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
     {
-        ++sum;
-        state_t x = std::min(obj->dynamicState(end), (state_t)MAX);
-        ++cnt[x];
+        if ( !sel || sel == fib->prop )
+        {
+            ++sum;
+            state_t x = std::min(fib->dynamicState(end), (state_t)MAX);
+            ++cnt[x];
+        }
     }
     
-    out << LIN << ljust(name, 1) << SEP << sum;
+    out << LIN << ljust(name, 2) << SEP << sum;
     for ( size_t i = 0; i < MAX; ++i )
         out << SEP << cnt[i];
 }
