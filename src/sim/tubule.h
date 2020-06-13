@@ -50,8 +50,18 @@ public:
     /// destructor
     ~Tubule();
     
+    ///
+    void step(Simul&);
+
     /// initialize
     void reset();
+    
+    /// create filaments
+    ObjectList build(Glossary&, Simul&);
+
+    /// position of centerline at distance 'dis' from the MINUS_END
+    Vector     posCenterlineM(real dis);
+
     
     /// initialize sister[] and brother[]
     void setFamily(Fiber const*);
@@ -59,24 +69,8 @@ public:
     /// update length of family members
     void salute(Buddy const*);
     
-    /// create filaments
-    ObjectList build(Glossary&, Simul&);
-    
     /// handles the disapearance of one of the filament
-    void       goodbye(Buddy const*);
-
-    
-    /// a unique character identifying the class
-    static const ObjectTag TAG = 't';
-
-    /// an ASCII character identifying the class of this object
-    ObjectTag tag() const { return TAG; }
-
-    /// returns 0, since Event have no Property
-    Property const* property() const { return prop; }
-
-    ///
-    void step(Simul&);
+    void goodbye(Buddy const*);
     
     ///
     void setInteractions(Meca&) const;
@@ -92,14 +86,23 @@ public:
     /// a static_cast<> of Node::prev()
     Tubule *  prev() const { return static_cast<Tubule*>(nPrev); }
     
-    /// debug printout
-    void      report(std::ostream&);
+    /// a unique character identifying the class
+    static const ObjectTag TAG = 't';
+
+    /// an ASCII character identifying the class of this object
+    ObjectTag tag() const { return TAG; }
+
+    /// returns 0, since Event have no Property
+    Property const* property() const { return prop; }
 
     /// read
     void      read(Inputter&, Simul&, ObjectTag);
     
     /// write
     void      write(Outputter&) const;
+    
+    /// debug printout
+    void      report(std::ostream&);
 };
 
 #endif

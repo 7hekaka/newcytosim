@@ -51,7 +51,8 @@ Vector FiberSite::outerPos() const
     {
         real ab = fbAbs - fbFiber->abscissaM();
         Vector pos = fbFiber->posM(ab);
-        return pos + 0.5 * ( pos - fbFiber->family_->posM(ab) );
+        Vector cen = fbFiber->family_->posM(ab);
+        return pos + 0.5 * ( pos - cen );
         //return 2 * pos - fbFiber->family_->posM(ab);
     }
     return inter.pos();
