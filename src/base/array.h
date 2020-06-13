@@ -521,8 +521,8 @@ public:
 #endif
     }
 
-    /// Move the last Object on top, push all other values down by one slot
-    void turn()
+    /// Move the last Object on top, pushing all other values down by one slot
+    void rotate()
     {
         if ( nbo_ > 1 )
         {

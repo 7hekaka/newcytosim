@@ -430,13 +430,12 @@ public:
     
     /// check if value of `key[inx]` could be a number
     /**
-     @returns a bitwise field:
-     - 0 if this is not a number
-     - 1 if not negative (>=0)
+     @returns a bitwise field with individual bits set as follows:
+     - 1 if not negative (that is >= 0 )
      - 2 if integer
      - 4 if float
      .
-     eg. value 3 is a positive integer
+     eg. result is 0 if not a number; result is 3 for a positive integer
      */
     int is_number(key_type const& key, size_t inx) const
     {
