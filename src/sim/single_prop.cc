@@ -116,6 +116,9 @@ void SingleProp::read(Glossary& glos)
                                          {"inside",  CONFINE_INSIDE}});
     
     //glos.set(confine_stiffness,  "confine", 1);
+    if ( glos.is_number("confine", 1) )
+        throw InvalidParameter(name()+":confine[1] is ignored");
+    
     glos.set(confine_space,  "confine", 2);
 
 #ifdef BACKWARD_COMPATIBILITY

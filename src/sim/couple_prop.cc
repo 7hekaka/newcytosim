@@ -85,6 +85,9 @@ void CoupleProp::read(Glossary& glos)
                                           {"surface", CONFINE_ON},
                                           {"inside",  CONFINE_INSIDE}});
     
+    if ( glos.is_number("confine", 1) )
+        throw InvalidParameter(name()+":confine[1] is ignored");
+
     //glos.set(confine_stiffness, "confine", 1);
     glos.set(confine_space,   "confine", 2);
 

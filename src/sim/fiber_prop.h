@@ -55,10 +55,10 @@ public:
      
      Many measurments have been made and they agree somewhat:\n
      
-     Filament                      |    Lp        | rigidity       |
-     ------------------------------|--------------|-----------------
-     Microtubule                   |   ~ 7200 um  | ~ 30 pN.um^2
-     Stabilized Microtubule        |   ~ 2200 um  | ~ 10 pN.um^2
+     Filament                      |    Lp        |    Rigidity
+     ------------------------------|--------------|------------------
+     Microtubule                   |   ~ 7200 um  | ~ 30   pN.um^2
+     Stabilized Microtubule        |   ~ 2200 um  | ~ 10   pN.um^2
      F-actin                       | ~  9--10 um  | ~ 0.04 pN.um^2
      Phalloidin-stabilized F-actin | ~ 17--18 um  | ~ 0.08 pN.um^2
      
