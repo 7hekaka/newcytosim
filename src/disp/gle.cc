@@ -2143,9 +2143,9 @@ namespace gle
         if ( !font )
             font = GLUT_BITMAP_9_BY_15;
         
-        int lineHeight = gleLineHeight(font);
-        int textWidth = 0;
         int nblines = 1;
+        int lineHeight = gleLineHeight(font);
+        int textWidth = gleComputeTextSize(text, font, nblines);
         
         GLint px, py;
         switch( position )
@@ -2157,14 +2157,12 @@ namespace gle
             } break;
             case 1: {
                 //bottom-right, text going up
-                textWidth = gleComputeTextSize(text, font, nblines);
                 px = width - textWidth - lineHeight/2;
                 if ( px < 0 ) px = 0;
                 py = lineHeight/2;
             } break;
             case 2: {
                 //top-right, text going down
-                textWidth = gleComputeTextSize(text, font, nblines);
                 px = width - textWidth - lineHeight/2;
                 if ( px < 0 ) px = 0;
                 py = height - lineHeight;
@@ -2179,7 +2177,6 @@ namespace gle
             } break;
             case 4: {
                 //center, text going down
-                textWidth = gleComputeTextSize(text, font, nblines);
                 px = ( width - textWidth ) / 2;
                 if ( px < 0 ) px = 0;
                 py = ( height + nblines*lineHeight ) / 2;
@@ -2209,29 +2206,26 @@ namespace gle
         {
             glPushAttrib(GL_LIGHTING_BIT|GL_CURRENT_BIT);
             glDisable(GL_LIGHTING);
-            int rd = abs(lineHeight);
-            int bt = py;
-            int tp = py + nblines*lineHeight;
-            if ( lineHeight < 0 )
-            {
-                int x = tp;
-                tp = bt;
-                bt = x;
-            }
+            int R = abs(lineHeight);
+            int B = std::min(py, py + nblines * lineHeight);
+            int T = std::max(py, py + nblines * lineHeight);
             
-            int rec[4] = { px-rd, bt, px+textWidth+rd, tp+rd+rd/2+rd/4 };
+            int rec[4] = { px-R, B, px+textWidth+R, T+R+R/2+R/4 };
             
             bcol.load();
             glBegin(GL_TRIANGLE_FAN);
-            gleNiceRectangle(rec, 4);
+            gleNiceRectangle(rec, 3);
             glEnd();
             
             glPopAttrib();
             
-            glLineWidth(1.0);
-            glBegin(GL_LINE_STRIP);
-            gleNiceRectangle(rec, 4);
-            glEnd();
+            if ( position == 4 )
+            {
+                glLineWidth(0.5);
+                glBegin(GL_LINE_STRIP);
+                gleNiceRectangle(rec, 3);
+                glEnd();
+            }
         }
         
         gleBitmapText(text, font, lineHeight);

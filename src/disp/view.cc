@@ -156,7 +156,7 @@ void View::drawInteractiveFeatures() const
     if ( top_message.size() )
     {
         front_color.load();
-        drawText(top_message, nullptr, 0x0, 3);
+        drawText(top_message, nullptr, back_color.alpha(0.5), 3);
     }
     
     if ( label != "off" )
