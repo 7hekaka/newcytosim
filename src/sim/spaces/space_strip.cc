@@ -33,8 +33,7 @@ void SpaceStrip::resize(Glossary& opt)
     real bot = bot_, top = top_;
     if ( opt.set(top, "length", DIM-1) )
     {
-        bot = -0.5 * top;
-        top =  0.5 * top;
+        bot = -top;
     }
     else
     {
@@ -44,16 +43,19 @@ void SpaceStrip::resize(Glossary& opt)
 
 #if ( DIM == 2 )
     // that is for impersonating a 'cylinderP' in 2D:
-    if ( length_[1] <= 0 )
+    if ( top <= bot )
     {
         real rad = 0;
         if ( opt.set(rad, "radius") )
-            length_[1] = rad;
+        {
+            top =  rad;
+            bot = -rad;
+        }
     }
 #endif
 
-    if ( top <= bot )
-        throw InvalidParameter("strip:top must be > strip:bottom");
+    if ( top < bot )
+        throw InvalidParameter("strip:top must be >= strip:bottom");
     
     bot_ = bot;
     top_ = top;
