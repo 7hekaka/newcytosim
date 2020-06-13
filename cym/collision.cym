@@ -8,9 +8,9 @@ set simul system
     dim = 3
     time_step = 0.005
     viscosity = 0.1
-    precondition=0
+    precondition = 0
     steric = 1, 701.171875
-    display = ( style=3; point_value=0.010; draw_links=1; floor=4, 0.1; )
+    display = ( style=3; point_value=0.010; draw_links=1; floor=3, 0.1; )
 }
 
 set space cell
@@ -20,9 +20,9 @@ set space cell
 
 new cell
 {
-    radius = 4
-    top = 2
+    radius = 3
     bottom = 0
+    top = 2
 }
 
 set fiber microtubule
@@ -48,7 +48,7 @@ set fiber obstacle
     rigidity = 10.625
     segmentation = 0.25
     activity = none
-    viscosity = 100000
+    viscosity = inf
     display = ( line=2.5, 1; )
 }
 
@@ -58,10 +58,7 @@ set hand anchor
     binding_range = 0.010
     unbinding_rate = 0.175
     unbinding_force = 5.0625 
-    display = {
-        size = 5
-        color = 0x0072B2FF;
-    }
+    display = ( size=5; color = blue; )
 }
 
 set single grafted
@@ -82,23 +79,24 @@ new 1 obstacle
 
 new 1 microtubule
 {
-    length = 1.6
+    length = 1.5
 
-    position = -3 -1 0
+    position = -2.0 -0.9 0
     direction = 0.906 0.423 0
     end_state = grow
     attach1 = grafted, 0, minus_end
     attach2 = grafted, 1, minus_end
 }
 
-new 30 grafted ( line 4 at 1.2 0 turn 0.906 0.423 at -3 -1 )
+new 30 grafted ( line 2 at 1.3 0 turn 0.906 0.423 at -2.0 -0.9 )
 
- 
-repeat 432
+report microtubule:plus_end * { verbose = 1 }
+
+repeat 20
 {
-    run 20 system
+    run 200 system
     {
         nb_frames=1
     }
-    report microtubule:ends * { verbose = 0 }
+    report fiber:plus_end * { verbose = 2; split=1; }
 }
