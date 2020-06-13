@@ -69,13 +69,7 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
 {
     out << "\n% time " << std::fixed << std::setprecision(3) << prop->time;
     out << "\n% report " << arg;
-    try {
-        report(out, arg, opt);
-    }
-    catch( Exception & e )
-    {
-        out << '\n' << e.brief();
-    }
+    report(out, arg, opt);
     out << "% end\n";
 }
 
@@ -108,8 +102,14 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
     }
     args.push_back(arg);
 
-    for ( std::string const& what : args )
-        report_one(out, what, opt);
+    try {
+        for ( std::string const& what : args )
+            report_one(out, what, opt);
+    }
+    catch( Exception & e )
+    {
+        out << '\n' << e.brief();
+    }
     
     out << '\n';
 }

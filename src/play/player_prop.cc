@@ -92,7 +92,7 @@ void PlayerProp::toggleReport(bool alt)
         switch( report_index )
         {
             case 0: report = "";                   break;
-            case 1: report = "inventory";          break;
+            case 1: report = "system:inventory";   break;
             case 2: report = "system";             break;
             case 3: report = "fiber:energy";       break;
             case 4: report = "fiber:mesh;field";   break;
