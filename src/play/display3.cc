@@ -416,7 +416,7 @@ void set_color_not(Fiber const&, size_t, real)
 {
 }
 
-void set_color_tension(Fiber const& fib, size_t seg, real beta)
+void color_by_tension(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
     if ( x > 0 )  // invert color for extended fibers
@@ -425,14 +425,14 @@ void set_color_tension(Fiber const& fib, size_t seg, real beta)
         fib.disp->color.load_front(-x);
 }
 
-void set_color_tensionR(Fiber const& fib, size_t seg, real beta)
+void color_by_tensionR(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
     // use rainbow coloring, where Lagrange multipliers are negative under compression
     gle_color::jet_color(1-x, fib.disp->color.a()).load_front();
 }
 
-void set_color_curvature(Fiber const& fib, size_t seg, real)
+void color_by_curvature(Fiber const& fib, size_t seg, real)
 {
     if ( fib.nbPoints() > 2 )
     {
@@ -445,27 +445,36 @@ void set_color_curvature(Fiber const& fib, size_t seg, real)
         gle_color::jet_color(0).load_front();
 }
 
-void set_color_direction(Fiber const& fib, size_t seg, real)
+void color_by_direction(Fiber const& fib, size_t seg, real)
 {
     gle::radial_color(fib.dirSegment(seg)).load_front();
 }
 
 /// distance from the minus end
-void set_color_abscissaM(Fiber const& fib, size_t seg, real beta)
+void color_by_abscissaM(Fiber const& fib, size_t seg, real beta)
 {
     fib.disp->color.load_front(exp(-(0.5+seg)*beta));
 }
 
 /// distance from the plus end
-void set_color_abscissaP(Fiber const& fib, size_t seg, real beta)
+void color_by_abscissaP(Fiber const& fib, size_t seg, real beta)
 {
     fib.disp->color.load_front(exp((seg+1.5-fib.nbPoints())*beta));
 }
 
 
+/// distance from the plus end
+void color_by_height(Fiber const& fib, size_t seg, real beta)
+{
+#if ( DIM > 2 )
+    real Z = fib.posPoint(seg,0.5).ZZ;
+    gle_color::jet_color(exp(Z*beta)).load_front();
+#endif
+}
+
 
 /// color set according to steric grid
-void set_color_grid(Fiber const& fib, size_t seg, real beta)
+void color_by_grid(Fiber const& fib, size_t seg, real beta)
 {
     GridBase<DIM> const& grid = fib.simul().pointGridF.base();
     Vector w = fib.posPoint(seg, 0.5);
@@ -487,25 +496,25 @@ void Display3::drawFiberLines(Fiber const& fib) const
         case 2:
         {
             real beta = 1.0 / disp->tension_scale;
-            drawFiberSegments(fib, rad, set_color_tension, beta);
+            drawFiberSegments(fib, rad, color_by_tension, beta);
         } break;
         case 3:
         {
             real beta = 1.0 / disp->tension_scale;
-            drawFiberSegments(fib, rad, set_color_tensionR, beta);
+            drawFiberSegments(fib, rad, color_by_tensionR, beta);
         } break;
         case 4:
-            drawFiberSegments(fib, rad, set_color_curvature, 1.0);
+            drawFiberSegments(fib, rad, color_by_curvature, 1.0);
             break;
         case 5:
-            drawFiberSegments(fib, rad, set_color_direction, 1.0);
+            drawFiberSegments(fib, rad, color_by_direction, 1.0);
             break;
         case 6:
         {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
             const real beta = fib.segmentation() / disp->length_scale;
-            drawFiberSegments(fib, rad, set_color_abscissaM, beta);
+            drawFiberSegments(fib, rad, color_by_abscissaM, beta);
             glDisable(GL_CULL_FACE);
         } break;
         case 7:
@@ -513,11 +522,16 @@ void Display3::drawFiberLines(Fiber const& fib) const
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
             const real beta = fib.segmentation() / disp->length_scale;
-            drawFiberSegments(fib, rad, set_color_abscissaP, beta);
+            drawFiberSegments(fib, rad, color_by_abscissaP, beta);
             glDisable(GL_CULL_FACE);
         } break;
         case 8:
-            drawFiberSegments(fib, rad, set_color_grid, 1.0);
+        {
+            const real beta = 1.0 / disp->length_scale;
+            drawFiberSegments(fib, rad, color_by_height, beta);
+        } break;
+        case 9:
+            drawFiberSegments(fib, rad, color_by_grid, 1.0);
             break;
     }
 }

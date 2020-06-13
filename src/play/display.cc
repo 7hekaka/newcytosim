@@ -842,7 +842,20 @@ void Display::drawFiberLines(Fiber const& fib) const
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
-        }
+        } break;
+        case 8:
+        {
+            // color according to Z
+            const real beta = 1.0 / disp->length_scale;
+            lineWidth(disp->line_width);
+            glBegin(GL_LINE_STRIP);
+            for ( size_t n = 0; n < fib.nbPoints(); ++n )
+            {
+                gle_color::jet_color(exp(fib.posPoint(n).ZZ*beta)).load();
+                gle::gleVertex(fib.posP(n));
+            }
+            glEnd();
+        } break;
     }
 }
 
