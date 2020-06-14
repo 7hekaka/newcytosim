@@ -1,55 +1,44 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#include <cstdio>
-#include <sys/types.h>
-
-#include "array.h"
+#include <string>
+#include <iostream>
 #include "random.h"
 
 
-int compare(const void * A, const void * B)
+
+/**
+ Returns a bitwise representation of the argument 'val'
+ */
+template < typename T >
+std::string to_bits(const T& val, char spc = 0)
 {
-    int a = *static_cast<const int*>(A);
-    int b = *static_cast<const int*>(B);
-    return ( a > b ) - ( a < b );
+    unsigned char * ptr = (unsigned char*) & val;
+    char res[10*sizeof(T)];
+    char * out = res;
+    
+    for ( int i = sizeof(T)-1; i >= 0; --i)
+    {
+        unsigned char byte = ptr[i];
+        for ( int i = 0; i < 8; ++i )
+        {
+            *out++ = (byte&0x80?'1':'0');
+            byte <<= 1;
+        }
+        if ( spc )
+            *out++ = spc;
+    }
+    *out = 0;
+    return std::string(res);
 }
+
 
 
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    Array<int> a;
     
-    for( size_t cnt = 0; cnt < 10; ++cnt )
-    {
-        a.clear();
-        size_t n = RNG.poisson(8);
-        for( size_t i=0; i < n; ++i )
-            a.push_back(RNG.pint(2));
-        
-        printf("\nsize %lu", a.size());
-        {
-            Array<int> b;
-            b = a;
-            a.deallocate();
-            
-            printf("\n   copy %2lu :", b.size());
-            for( size_t i=0; i < b.size(); ++i )
-                printf(" %i", b[i]);
-
-            b.remove_pack(0);
-            
-            printf("\n   pack %2lu :", b.size());
-            for( size_t i=0; i < b.size(); ++i )
-                printf(" %i", b[i]);
-            
-            b.sort(compare);
-            
-            printf("\n   sort %2lu :", b.size());
-            for( size_t i=0; i < b.size(); ++i )
-                printf(" %i", b[i]);
-        }
-    }
+    for ( int i = 0; i < 16; ++i )
+        std::cout << to_bits(i, ' ') << '\n';
     
     printf("\ndone\n");
     return 0;

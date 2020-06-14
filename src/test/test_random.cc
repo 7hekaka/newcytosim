@@ -2,20 +2,27 @@
 
 #include "random.h"
 #include <cstdio>
+#include <bitset>
 #include <cstring>
+#include <iostream>
 #include "tictoc.h"
 
 
-void print_bits(FILE * f, const void * v, const int size)
+template < typename T >
+void print_bits(FILE* f, const T& val, char spc = 0)
 {
-    for ( int ii=0; ii < size; ++ii )
+    unsigned char * ptr = (unsigned char*) & val;
+    for ( int i = sizeof(T)-1; i >= 0; --i)
     {
-        char c = ((char*)v)[ii];
-        for ( int jj=7; jj >=0; --jj )
-            fprintf(f, "%d", ( c >> jj ) & 1 );
-        fprintf(f, ".");
+        unsigned char byte = ptr[i];
+        for ( int i = 0; i < 8; ++i )
+        {
+            putc((byte&0x80?'1':'0'), f);
+            byte <<= 1;
+        }
+        if ( spc ) putc(spc, f);
     }
-    fprintf(f, "\n");
+    putc('\n', f);
 }
 
 
@@ -91,37 +98,37 @@ void silly_test()
 }
 
 
+/**
+ This assumes IEEE Standard 754 Floating point numbers
+32 bits: 1 for sign, 8 for exponents, 23 for fraction
+ */
 float convertFix(uint32_t x)
 {
-    //This assumes IEEE Standard 754 Floating point numbers
-    //32 bits: 1 for sign, 8 for exponents, 23 for fraction
-    const uint32_t FRAC     = 0x7FFFFFU;
-    const uint32_t EXPON    = 127 << 23;
-    uint32_t result = EXPON | ( x & FRAC );
-    return *(float*)&result - 1.0;
+    constexpr uint32_t FRAC  = 0x7FFFFFU;
+    constexpr uint32_t EXPON = 127 << 23;
+    uint32_t res = EXPON | ( x & FRAC );
+    return *((float*)&res) - 1.0;
 }
 
 
 void testbits()
 {
-    const int SCALE=2;
-    float x;
-    for ( int ii=0; ii <= SCALE; ++ii )
+    const int SCALE = 2;
+    for ( int i=0; i <= SCALE; ++i )
     {
-        x = ii / float(SCALE);
+        float x = i / float(SCALE);
         printf(" %f :", x);
-        print_bits(stdout, &x, 4);
+        print_bits(stdout, x);
         // x = -ii / float(SCALE);
         // printf("%f :", x);
-        // print_bits(stdout, &x, 4);
+        // print_bits(stdout, x);
     }
     
-    double y;
-    for ( int ii=0; ii <= 20; ++ii )
+    for ( int i=0; i < 16; ++i )
     {
-        y = convertFix( RNG.pint() );
+        float y = convertFix( RNG.pint() );
         printf(" %f :", y);
-        print_bits(stdout, &y,8);
+        print_bits(stdout, y, ' ');
     }
 }
 
