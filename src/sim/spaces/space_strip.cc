@@ -96,7 +96,7 @@ bool SpaceStrip::inside(Vector const& point) const
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
-    real X = if_select(2 * pos.XX - bot_ < top_, bot_, top_);
+    real X = sign_select(2 * pos.XX - bot_ - top_, bot_, top_);
     return Vector(X);
 }
 
@@ -120,7 +120,7 @@ bool SpaceStrip::inside(Vector const& point) const
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
-    real Y = if_select(2 * pos.YY - bot_ < top_, bot_, top_);
+    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
     return Vector(pos.XX, Y);
 }
 
@@ -142,7 +142,7 @@ bool SpaceStrip::inside(Vector const& point) const
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
-    real Z = if_select(2 * pos.ZZ - bot_ < top_, bot_, top_);
+    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_, top_);
     return Vector(pos.XX, pos.YY, Z);
 }
 
@@ -153,10 +153,10 @@ Vector SpaceStrip::project(Vector const& pos) const
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = if_select(2 * pos.YY - bot_ < top_, bot_, top_);
+    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
     meca.addPlaneClampY(pe, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = if_select(2 * pos.ZZ - bot_ < top_, bot_, top_);
+    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_, top_);
     meca.addPlaneClampZ(pe, Z, stiff);
 #endif
 }
@@ -165,10 +165,10 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& me
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = if_select(2 * pos.YY - bot_ < top_, bot_ + rad, top_ - rad);
+    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_ + rad, top_ - rad);
     meca.addPlaneClampY(pe, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = if_select(2 * pos.ZZ - bot_ < top_, bot_ + rad, top_ - rad);
+    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_ + rad, top_ - rad);
     meca.addPlaneClampZ(pe, Z, stiff);
 #endif
 }

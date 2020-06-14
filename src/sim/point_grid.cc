@@ -227,7 +227,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
          bb.point1() projects inside segment 'aa'
          */
         const real len = aa.radius + bb.radius;
-        real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
+        real stiff = sign_select(dis2-len*len, pam.stiff_push, pam.stiff_pull);
         meca.addSideSlidingLink(Interpolation(aa.seg, abs), bb.seg.exact1(), len, stiff);
     }
     else if ( abs < 0 )
@@ -267,7 +267,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
                 if ( d < ran*ran )
                 {
                     const real len = aa.radius + bb.radius;
-                    real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+                    real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
                     meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), len, stiff);
                 }
             }
@@ -298,7 +298,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          bb.point2() projects inside segment 'aa'
          */
         const real len = aa.radius + bb.radius;
-        real stiff = if_select(dis2>len*len, pam.stiff_pull, pam.stiff_push);
+        real stiff = sign_select(dis2-len*len, pam.stiff_push, pam.stiff_pull);
         meca.addSideSlidingLink(Interpolation(aa.seg, abs), bb.seg.exact2(), len, stiff);
     }
     else if ( abs < 0 )
@@ -327,7 +327,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
                 if ( d < ran*ran )
                 {
                     const real len = aa.radius + bb.radius;
-                    real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+                    real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
                     meca.addLongLink(aa.seg.exact1(), bb.seg.exact2(), len, stiff);
                 }
             }
@@ -375,7 +375,7 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     if ( aa.seg.within(a) & bb.seg.within(b) )
     {
         const real len = aa.radius + bb.radius;
-        real stiff = if_select(d>len*len, pam.stiff_pull, pam.stiff_push);
+        real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
         meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), ran, stiff);
     }
 #endif
