@@ -113,10 +113,10 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
                 Vector V = spc->randomPlace();
                 if ( tok == "YZ" ) V.XX = H;
 #if ( DIM > 1 )
-                if ( tok == "XZ" ) V.setY(H);
+                if ( tok == "XZ" ) V.YY = H;
 #endif
 #if ( DIM > 2 )
-                if ( tok == "XY" ) V.setZ(H);
+                if ( tok == "XY" ) V.ZZ = H;
 #endif
                 return V;
             }
