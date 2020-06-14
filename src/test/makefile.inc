@@ -26,6 +26,11 @@ test: test.cc random.o SFMT.o tictoc.o backtrace.o | bin
 	$(DONE)
 vpath test bin
 
+test_array: test_array.cc random.o SFMT.o tictoc.o backtrace.o | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+vpath test_array bin
+
 test_blas: test_blas.cc random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
