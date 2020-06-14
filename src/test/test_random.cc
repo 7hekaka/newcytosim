@@ -15,9 +15,9 @@ void print_bits(FILE* f, const T& val, char spc = 0)
     for ( int i = sizeof(T)-1; i >= 0; --i)
     {
         unsigned char byte = ptr[i];
-        for ( int i = 0; i < 8; ++i )
+        for ( int i = 0; i < CHAR_BIT; ++i )
         {
-            putc((byte&0x80?'1':'0'), f);
+            putc('0' + (1 & (byte>>(CHAR_BIT-1))), f);
             byte <<= 1;
         }
         if ( spc ) putc(spc, f);

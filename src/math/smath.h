@@ -27,17 +27,6 @@ constexpr real M_E=2.7182818284590452354;
 /// simple mathematical functions, mostly templated
 namespace sMath
 {
-    // limit `x` inside [`a` , `b` ]:
-    template <typename T>
-    inline const T& crop(T& x, const T& a, const T& b)
-    {
-        if ( x < a )
-            return a;
-        if ( x > b )
-            return b;
-        return x;
-    }
-
     /// minimum of three arguments
     template <typename T>
     inline const T& min(const T& a, const T& b, const T& c)
@@ -212,30 +201,13 @@ namespace sMath
         return y;
     }
     
-    
-    ///power of `a` by integer exponent `n`
+    ///power of `a` by signed integer exponent `n`
     template <typename T>
     inline T power(const T& a, const int n)
     {
         if ( n < 0 )
             return power_int(1.0/a, -n);
         return power_int(a, n);
-    }
-    
-    
-    ///power of `a` by integer exponent `n`
-    template <typename T>
-    T nextPowerOf2(T k)
-    {
-        if ( k & (k-1) )
-        {
-            do
-                k &= k-1;
-            while ( k & (k-1) );
-            
-            k <<= 1;
-        }
-        return k;
     }
     
     

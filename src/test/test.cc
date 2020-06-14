@@ -13,15 +13,15 @@ template < typename T >
 std::string to_bits(const T& val, char spc = 0)
 {
     unsigned char * ptr = (unsigned char*) & val;
-    char res[10*sizeof(T)];
+    char res[1+(1+CHAR_BIT)*sizeof(T)];
     char * out = res;
     
     for ( int i = sizeof(T)-1; i >= 0; --i)
     {
         unsigned char byte = ptr[i];
-        for ( int i = 0; i < 8; ++i )
+        for ( int i = 0; i < CHAR_BIT; ++i )
         {
-            *out++ = (byte&0x80?'1':'0');
+            *out++ = '0' + ( 1 & ( byte >> (CHAR_BIT-1) ));
             byte <<= 1;
         }
         if ( spc )
