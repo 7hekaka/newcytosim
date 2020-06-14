@@ -11,9 +11,9 @@
 
  Parameters:
      - radius = radius of cylinder
-     - bottom = smallest Z
-     - top = highest Z
-     - edge = radius of smoothing of the edge
+     - bottom = lower limit in Z
+     - top    = upper limit in Z
+     - edge   = smoothing radius of the edges
      .
 
  Added edge smoothing 09.12.2019

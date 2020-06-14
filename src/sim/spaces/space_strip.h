@@ -12,9 +12,10 @@
  The last dimension is Y in 2D and Z in 3D.
  
  Parameters:
-     - length = extent in X, Y and Z
-     .
-     
+     - length = extent in X, and Y in 3D
+     - bottom = lower limit in Z
+     - top    = upper limit in Z
+ 
  To display a periodic Space, use simul:display parameter 'tile'.
  @ingroup SpaceGroup
  */

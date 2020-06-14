@@ -33,7 +33,8 @@ void SpaceStrip::resize(Glossary& opt)
     real bot = bot_, top = top_;
     if ( opt.set(top, "length", DIM-1) )
     {
-        bot = -top;
+        bot = -0.5 * top;
+        top =  0.5 * top;
     }
     else
     {

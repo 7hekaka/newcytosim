@@ -11,21 +11,17 @@
 
 
 SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
-: Space(p)
+: Space(p), radius_(0), bot_(0), top_(0), edge_(0)
 {
     if ( DIM < 3 )
         throw InvalidParameter("cylinderZ is only valid in 3D");
-    bot_ = 0;
-    top_ = 0;
-    radius_ = 0;
-    edge_ = 0;
     update();
 }
 
 
 void SpaceCylinderZ::resize(Glossary& opt)
 {
-    real rad = radius_, top = top_, bot = bot_, edg = edge_;
+    real rad = radius_, bot = bot_, top = top_, edg = edge_;
 
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
@@ -60,9 +56,9 @@ void SpaceCylinderZ::resize(Glossary& opt)
     }
 #endif
     
+    radius_ = rad;
     bot_ = bot;
     top_ = top;
-    radius_ = rad;
     edge_ = edg;
     update();
 }
