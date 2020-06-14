@@ -33,9 +33,6 @@ inline void print_version(std::ostream& os)
 #else
     os << " with assertions\n";
 #endif
-#if !GRID_HAS_PERIODIC
-    os << " no periodic boundary conditions\n";
-#endif
     os << "   Fiber: lattice " << FIBER_HAS_LATTICE;
     os << " mesh " << FIBER_HAS_MESH;
     os << " family " << FIBER_HAS_FAMILY;

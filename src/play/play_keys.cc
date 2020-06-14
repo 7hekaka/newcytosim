@@ -362,6 +362,7 @@ void changeLineStyle(FiberDisp* p, int)
         case 6:  flashText("Fibers: distance minus-end");break;
         case 7:  flashText("Fibers: distance plus-end"); break;
         case 8:  flashText("Fibers: height");            break;
+        case 9:  flashText("Fibers: grid (if style=3)"); break;
     }
 }
 
