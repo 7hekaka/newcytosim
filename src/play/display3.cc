@@ -466,10 +466,15 @@ void color_by_abscissaP(Fiber const& fib, size_t seg, real beta)
 /// distance from the plus end
 void color_by_height(Fiber const& fib, size_t seg, real beta)
 {
+    real Z = 0;
+    Space const* spc = fib.prop->confine_space_ptr;
+    if ( spc )
+        Z = -spc->signedDistanceToEdge(fib.posPoint(seg, 0.5));
 #if ( DIM > 2 )
-    real Z = fib.posPoint(seg,0.5).ZZ;
-    gle_color::jet_color(exp(Z*beta)).load_front();
+    else
+        Z = fib.posPoint(seg,0.5).ZZ;
 #endif
+    gle_color::jet_color(exp(Z*beta)).load_front();
 }
 
 

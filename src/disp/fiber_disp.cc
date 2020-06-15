@@ -78,7 +78,9 @@ void FiberDisp::read(Glossary& glos)
     std::string key = glos.has_key("line") ? "line" : "lines";
     glos.set(line_width, "line_width")
     || glos.set(line_width, key) || glos.set(line_width, "width");
-    glos.set(line_style, "line_style", {{"off", 0}, {"line", 1}, {"tension", 2}, {"curvature", 3}, {"orientation", 4}, {"abscissa", 5}, {"reverse_abscissa", 6}})
+    glos.set(line_style, "line_style", {{"off", 0}, {"line", 1}, {"tension", 2},
+                                        {"rainbow_tension", 3}, {"curvature", 4}, {"orientation", 5},
+                                        {"minus_end", 6}, {"plus_end", 7}, {"height", 8}})
     || glos.set(line_style, key, 1, {{"off", 0}, {"line", 1}, {"tension", 2}, {"curvature", 3}, {"orientation", 4}, {"abscissa", 5}, {"reverse_abscissa", 6}});
     glos.set(line_caps,  "line_caps")
     || glos.set(line_caps, key, 2);

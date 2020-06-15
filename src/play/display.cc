@@ -845,13 +845,21 @@ void Display::drawFiberLines(Fiber const& fib) const
         } break;
         case 8:
         {
+            Space const* spc = fib.prop->confine_space_ptr;
             // color according to Z
             const real beta = 1.0 / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
             {
-                gle_color::jet_color(exp(fib.posPoint(n).z()*beta)).load();
+                real Z = 0;
+                if ( spc )
+                    Z = -spc->signedDistanceToEdge(fib.posPoint(n));
+#if ( DIM > 2 )
+                else
+                    Z = fib.posPoint(n).ZZ;
+#endif
+                gle_color::jet_color(exp(Z*beta)).load();
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
