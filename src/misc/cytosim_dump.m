@@ -5,7 +5,7 @@ function [sys, rhs, con] = cytosim_dump(path)
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019,
-% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020
+% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020, 15.06.2002
 
 if nargin < 1
     path = '.';
@@ -65,7 +65,7 @@ if ( 1 )
     end
     
     fprintf(1, '%i mecables with %i block scalars\n', nbo, nbv);
-    fprintf(2, '    norm(ela-transpose(ela)) = %f\n', vecnorm(ela-ela'));
+    fprintf(2, '    norm(ela-transpose(ela)) = %f\n', norm(ela-ela',1));
 
     fprintf(2, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
     if ( err0 > 1e-8 )
@@ -73,7 +73,7 @@ if ( 1 )
         set(gcf, 'name', 'Reconstituted matrix');
     end
 
-    fprintf(2, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', max(max(abs(PRC-con))));
+    fprintf(2, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', norm(PRC-con,1));
     fprintf(2, '    norm(rhs) = %f', norm(rhs));
     fprintf(2, '    norm(sol) = %f', norm(sol));
     fprintf(2, '    norm(con*rhs) = %f\n', norm(con*rhs));
@@ -244,15 +244,48 @@ end
 
 %% a possible sparse symmetric preconditionner
 
-% the DRY matrix is not necessarily symmetric because of the diagonal matrix
-% may not commute with 'ela'. However, if all point drags are equal, then
-% surely DRY is symmetric and we can use incomplete Cholesky factorization
+% we average all point drag coefficient to derive a matrix that is
+% symmetric and ammenable to incomplete Cholesky factorization
 
 if 1
-    val = time_step / mean(1./drg);
-    sWET = sparse( eye(dim) - diag(val.*ones(length(ela), 1)) * ela );
     
-    fprintf(2, '    WET has %i elements; ', nnz(sWET));
+    val = time_step / mean(1./drg);
+    DRY = sparse( eye(dim) - diag(val.*ones(length(ela), 1)) * ela );
+    
+    fprintf(2, '    DRY is symmetric with %i elements; ', nnz(DRY));
+    
+    clear OPT;
+    OPT.michol = 'off';
+    OPT.type = 'nofill';
+    L = ichol(DRY, OPT);
+    fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'k:');
+    report('y bicgstab', mulcnt, vec, rv0(end));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'b:');
+    report('y bicgstab(1)', mulcnt, vec, rv0(end));
+end
+
+
+%% incomplete Cholesky
+
+% the WET matrix is not necessarily symmetric because of the diagonal matrix
+% may not commute with 'ela'. However, if all point drags are equal, then
+% surely WET is symmetric and we can use incomplete Cholesky factorization
+
+WET = eye(dim) - diag(time_step./drg) * ela;
+
+sWET = sparse(WET);
+
+fprintf(2, '    WET has %i elements; ', nnz(sWET));
+fprintf(2, 'norm(WET-transpose(WET)) = %f\n', norm(WET-WET',1));
+
+if 0 && ( norm(WET-WET',1) < 1 )
     
     clear OPT;
     OPT.michol = 'off';
@@ -262,72 +295,28 @@ if 1
     
     mulcnt = 0;
     [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(rv0/rv0(1),'k:');
+    convergence_plot(rv0/rv0(1),'k.-');
     report('w bicgstab', mulcnt, vec, rv0(end));
     
     mulcnt = 0;
     [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(rv0/rv0(1),'b:');
-    report('w bicgstab(1)', mulcnt, vec, rv0(end));
-end
-
-
-%% incomplete Cholesky
-
-% the DRY matrix is not necessarily symmetric because of the diagonal matrix
-% may not commute with 'ela'. However, if all point drags are equal, then
-% surely DRY is symmetric and we can use incomplete Cholesky factorization
-
-DRY = eye(dim) - diag(time_step./drg) * ela;
-
-sDRY = sparse(DRY);
-
-fprintf(2, '    DRY has %i elements; ', nnz(sDRY));
-fprintf(2, 'norm(DRY-transpose(DRY)) = %f\n', vecnorm(DRY-DRY'));
-
-if 0 && ( vecnorm(DRY-DRY') < 1 )
-    
-    clear OPT;
-    OPT.michol = 'off';
-    OPT.type = 'nofill';
-    L = ichol(sDRY, OPT);
-    fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
-    
-    mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(rv0/rv0(1),'k.-');
-    report('y bicgstab', mulcnt, vec, rv0(end));
-    
-    mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
     convergence_plot(rv0/rv0(1),'b.-');
-    report('y bicgstab(1)', mulcnt, vec, rv0(end));
+    report('w bicgstab(1)', mulcnt, vec, rv0(end));
     
     for i = 0:3
         RS = min(2^i, dim);
         [vec,~,~,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, L, L', [], OPT);
         convergence_plot(rv0/rv0(1),'r.-');
-        report(sprintf('y IDRS %03i', RS), 2*itr, vec, rv0(end));
+        report(sprintf('w IDRS %03i', RS), 2*itr, vec, rv0(end));
     end
 
-end
-
-%% check iLU of matrix without projection:
- 
-if 0
+else
 
     clear OPT;
     OPT.type = 'nofill';
     OPT.milu = 'off';
-    [L, U] = ilu(sDRY, OPT);
+    [L, U] = ilu(sWET, OPT);
     fprintf(2, '    incomplete LU has %i + %i elements\n', nnz(L), nnz(U));
-    
-    if 1
-        figure;
-        plot(diag(L), 'bo'); hold on;
-        plot(diag(U), 'bx');
-        title('Diag(U)');
-    end
     
     mulcnt = 0;
     [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
@@ -339,6 +328,7 @@ if 0
     [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, U);
     convergence_plot(rv0/rv0(1), 'b-.');
     report('i bicgstab(1)', mulcnt, vec, rv0(end));
+    
 end
 
 if 0
