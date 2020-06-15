@@ -261,8 +261,8 @@ void changeExclude(FiberDisp* p, int val)
 
 void changeScale(real& scale, int d)
 {
-    int s = (int) round( log2(scale) + d );
-    if ( s < -10 ) s =  10;
+    real s = log2(scale) + d * 0.1;
+    if ( s < -14 ) s =  10;
     if ( s >  10 ) s = -10;
     scale = exp2(s);
 }
@@ -282,22 +282,22 @@ void changeScale(FiberDisp* p, int d)
     if ( p->lattice_style )
     {
         changeScale(p->lattice_scale, d);
-        flashText("fiber:lattice_scale = %.3f", p->lattice_scale);
+        flashText("fiber:lattice_scale = %.5f", p->lattice_scale);
     }
     else if ( p->line_style == 2 || p->line_style == 3 )
     {
         changeScale(p->tension_scale, d);
-        flashText("fiber:tension_scale = %.3f", p->tension_scale);
+        flashText("fiber:tension_scale = %.5f", p->tension_scale);
     }
     else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
     {
         changeScale(p->length_scale, d);
-        flashText("fiber:length_scale = %.3f", p->length_scale);
+        flashText("fiber:length_scale = %.5f", p->length_scale);
     }
     else if ( p->force_scale > 0 )
     {
         changeScale(p->force_scale, d);
-        flashText("fiber:force_scale = %.3f", p->force_scale);
+        flashText("fiber:force_scale = %.5f", p->force_scale);
     }
     else if ( disp.style == 2 )
         flipExplode(p);
@@ -309,14 +309,14 @@ void changeColoring(FiberDisp* p, int)
     p->coloring = ( p->coloring + 1 ) % 8;
     switch( p->coloring )
     {
-        case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");           break;
-        case FiberDisp::COLORING_RANDOM:    flashText("Fibers: coloring");              break;
-        case FiberDisp::COLORING_DIRECTION: flashText("Fibers: coloring by direction"); break;
-        case FiberDisp::COLORING_MARK:      flashText("Fibers: coloring by mark");      break;
-        case FiberDisp::COLORING_FLAG:      flashText("Fibers: coloring by flag");      break;
-        case FiberDisp::COLORING_FAMILY:    flashText("Fibers: coloring by family");    break;
-        case FiberDisp::COLORING_CLUSTER:   flashText("Fibers: coloring by cluster");   break;
-        case FiberDisp::COLORING_AGE:       flashText("Fibers: coloring by age");       break;
+        case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");          break;
+        case FiberDisp::COLORING_RANDOM:    flashText("Fibers coloring");              break;
+        case FiberDisp::COLORING_DIRECTION: flashText("Fibers coloring by direction"); break;
+        case FiberDisp::COLORING_MARK:      flashText("Fibers coloring by mark");      break;
+        case FiberDisp::COLORING_FLAG:      flashText("Fibers coloring by flag");      break;
+        case FiberDisp::COLORING_FAMILY:    flashText("Fibers coloring by family");    break;
+        case FiberDisp::COLORING_CLUSTER:   flashText("Fibers coloring by cluster");   break;
+        case FiberDisp::COLORING_AGE:       flashText("Fibers coloring by age");       break;
     }
 }
 
@@ -353,16 +353,16 @@ void changeLineStyle(FiberDisp* p, int)
     p->line_style = ( p->line_style + 1 ) % 9;
     switch ( p->line_style )
     {
-        case 0:  flashText("Fibers: no lines");          break;
-        case 1:  flashText("Fibers: lines");             break;
-        case 2:  flashText("Fibers: axial tensions");    break;
-        case 3:  flashText("Fibers: rainbow tensions");  break;
-        case 4:  flashText("Fibers: curvature");         break;
-        case 5:  flashText("Fibers: orientation");       break;
-        case 6:  flashText("Fibers: distance minus-end");break;
-        case 7:  flashText("Fibers: distance plus-end"); break;
-        case 8:  flashText("Fibers: height");            break;
-        case 9:  flashText("Fibers: grid (if style=3)"); break;
+        case 0:  flashText("Fibers: no lines");                     break;
+        case 1:  flashText("Fibers: lines");                        break;
+        case 2:  flashText("Fiber color by axial tensions");        break;
+        case 3:  flashText("Fiber rainbow color by tensions");      break;
+        case 4:  flashText("Fiber color by curvature");             break;
+        case 5:  flashText("Fiber color by orientation");           break;
+        case 6:  flashText("Fiber color by distance to minus-end"); break;
+        case 7:  flashText("Fiber color by distance to plus-end");  break;
+        case 8:  flashText("Fiber color by height");                break;
+        case 9:  flashText("Fiber color by grid (if style=3)");     break;
     }
 }
 
@@ -850,13 +850,21 @@ void processKey(unsigned char key)
             break;
             
         case 'w':
-            setFiberDisp(player.allVisibleFiberDisp(), changeScale, -1);
+            setFiberDisp(player.allVisibleFiberDisp(), changeScale, -10);
             break;
 
         case 'e':
-            setFiberDisp(player.allVisibleFiberDisp(), changeScale, 1);
+            setFiberDisp(player.allVisibleFiberDisp(), changeScale, 10);
             break;
             
+        case 'W':
+            setFiberDisp(player.allVisibleFiberDisp(), changeScale, -1);
+            break;
+
+        case 'E':
+            setFiberDisp(player.allVisibleFiberDisp(), changeScale, 1);
+            break;
+
         case 'm':
             if ( altKeyDown )
                 setFiberDisp(player.allVisibleFiberDisp(), setMask, 0);
