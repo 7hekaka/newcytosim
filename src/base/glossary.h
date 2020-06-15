@@ -362,6 +362,15 @@ public:
         return 0;
     }
     
+    /// set `var` from `key[int]` or `alt[alt_inx], using the dictionary `dict`
+    template <typename T>
+    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx) const
+    {
+        int res = set(var, key, inx);
+        if ( !res )
+            res = set(var, alt, alt_inx);
+        return res;
+    }
     
     /// set `cnt` values in the array `ptr[]`, starting at `key[0]`
     template <typename T>
@@ -410,13 +419,22 @@ public:
         return 0;
     }
     
+    /// set `var` from `key[int]` or `alt[alt_inx], using the dictionary `dict`
+    template <typename T>
+    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx, dict_type<T> const& dict) const
+    {
+        int res = set(var, key, inx, dict);
+        if ( !res )
+            res = set(var, alt, alt_inx, dict);
+        return res;
+    }
+
     /// set `var` from `key[0]`, using the dictionary `dict`
     template <typename T>
     int set(T & var, key_type const& key, dict_type<T> const& dict) const
     {
         return set(var, key, 0, dict);
     }
-
     
     /// true if value of `key[inx]` is composed of alpha characters and '_'
     int is_alpha(key_type const& key, size_t inx) const

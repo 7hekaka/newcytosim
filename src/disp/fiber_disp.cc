@@ -72,26 +72,19 @@ void FiberDisp::read(Glossary& glos)
 
     glos.set(back_color,       "back_color");
     glos.set(hide_color,       "hide_color");
-
     glos.set(coloring,         "coloring");
     
     std::string key = glos.has_key("line") ? "line" : "lines";
-    glos.set(line_width, "line_width")
-    || glos.set(line_width, key) || glos.set(line_width, "width");
-    glos.set(line_style, "line_style", {{"off", 0}, {"line", 1}, {"tension", 2},
+    glos.set(line_width, "line_width", 0, key, 0) || glos.set(line_width, "width");
+    glos.set(line_style, "line_style", 0, key, 1,  {{"off", 0}, {"line", 1}, {"tension", 2},
                                         {"rainbow_tension", 3}, {"curvature", 4}, {"orientation", 5},
-                                        {"minus_end", 6}, {"plus_end", 7}, {"height", 8}})
-    || glos.set(line_style, key, 1, {{"off", 0}, {"line", 1}, {"tension", 2}, {"curvature", 3}, {"orientation", 4}, {"abscissa", 5}, {"reverse_abscissa", 6}});
-    glos.set(line_caps,  "line_caps")
-    || glos.set(line_caps, key, 2);
+                                        {"minus_end", 6}, {"plus_end", 7}, {"height", 8}});
+    glos.set(line_caps, "line_caps", 0, key, 2);
     
     key = glos.has_key("point") ? "point" : "points";
-    glos.set(point_size, "point_size")
-    || glos.set(point_size, key) || glos.set(point_size, "size");
-    glos.set(point_style, "point_style", {{"off", 0}, {"point", 1}, {"arrow", 2}, {"center", 3}})
-    || glos.set(point_style, key, 1, {{"off", 0}, {"point", 1}, {"arrow", 2}, {"center", 3}});
-    glos.set(point_interval, "point_interval")
-    || glos.set(point_interval, key, 2);
+    glos.set(point_size,  "point_size", 0, key, 0) || glos.set(point_size, "size");
+    glos.set(point_style, "point_style", 0, key, 1, {{"off", 0}, {"point", 1}, {"arrow", 2}, {"center", 3}});
+    glos.set(point_interval, "point_interval", 0, key, 2);
 
     if ( point_interval <= 0 )
         point_interval = 1;
@@ -99,12 +92,12 @@ void FiberDisp::read(Glossary& glos)
     if ( glos.set(end_size[0], "plus_end") )
         end_style[0] = 2;
     glos.set(end_style[0], "plus_end", 1, {{"off", 0}, {"sphere", 1}, {"cone", 2},
-            {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
+                           {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
     
     if ( glos.set(end_size[1], "minus_end") )
         end_style[1] = 1;
     glos.set(end_style[1], "minus_end", 1, {{"off", 0}, {"sphere", 1}, {"cone", 2},
-            {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
+                           {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
     
     glos.set(end_style,  2,    "end_style");
     glos.set(end_size,   2,    "end_size");
@@ -116,25 +109,17 @@ void FiberDisp::read(Glossary& glos)
     glos.set(tension_scale,    "tension");
 #endif
     
-    glos.set(lattice_style,    "lattice")
-    || glos.set(lattice_style, "lattice_style");
-    glos.set(lattice_scale,    "lattice_scale")
-    || glos.set(lattice_scale, "lattice", 1);
+    glos.set(lattice_style,    "lattice_style", 0, "lattice", 0);
+    glos.set(lattice_scale,    "lattice_scale", 0, "lattice", 1);
     glos.set(lattice_rescale,  "lattice", 2);
 
-    glos.set(label_style,      "label_style")
-    || glos.set(label_style, "labels") || glos.set(label_style, "label");
+    key = glos.has_key("label") ? "label" : "labels";
+    glos.set(label_style,      "label_style", 0, key, 0);
 
     key = glos.has_key("speckle") ? "speckle" : "speckles";
-    glos.set(speckle_size,     "speckle_size")
-    || glos.set(speckle_size, key);
-    glos.set(speckle_style,    "speckle_style")
-    || glos.set(speckle_style, key, 1, {{"off", 0}, {"random", 1}, {"regular", 2}});
-    
-    glos.set(speckle_interval, "speckle_interval")
-    || glos.set(speckle_interval, key, 2)
-    || glos.set(speckle_interval, "interval");
-
+    glos.set(speckle_size,     "speckle_size", 0, key, 0);
+    glos.set(speckle_style,    "speckle_style", 0, key, 1, {{"off", 0}, {"random", 1}, {"regular", 2}});
+    glos.set(speckle_interval, "speckle_interval", 0, key, 2) || glos.set(speckle_interval, "interval");
     if ( speckle_interval <= 0 )
         speckle_interval = 1;
 
@@ -142,9 +127,9 @@ void FiberDisp::read(Glossary& glos)
     glos.set(exclude_axis,     "exclude", 1);
     glos.set(exclude_axis,     "exclude_axis");
     
-    if ( glos.set(mask, "mask") )
+    if ( glos.set(mask,        "mask") )
         mask_bitfield = RNG.distributed_bits(mask);
-    glos.set(mask_bitfield, "mask", 1);
+    glos.set(mask_bitfield,    "mask", 1);
 
     glos.set(length_scale,     "length_scale");
     glos.set(tension_scale,    "tension_scale");
