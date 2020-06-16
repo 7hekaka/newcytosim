@@ -9,7 +9,7 @@ set simul system
     viscosity = 0.2
     precondition = 0
     steric = 1, 777
-    display = ( style=3; point_value=0.010; draw_links=1; floor=3, 0.1; )
+    display = ( style=2; point_value=0.010; )
 }
 
 set space cell
@@ -87,16 +87,16 @@ set single creator
     diffusion = 1
 }
 
-new 10000 grafted ( XY 0 )
+new 20000 grafted ( XY 0 )
 new 200 creator
 
-report microtubule:plus_state * { verbose = 1 }
+report microtubule:plus_state states.txt { verbose = 1 }
 
-repeat 200
+repeat 100
 {
-    run 200 system
+    run 1000 system
     {
-        nb_frames=10
+        nb_frames = 10
     }
-    report microtubule:plus_state * { verbose = 0; }
+    report microtubule:plus_state states.txt { verbose = 0; }
 }
