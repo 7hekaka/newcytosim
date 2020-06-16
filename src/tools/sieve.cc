@@ -55,8 +55,9 @@ int main(int argc, char* argv[])
        skip_set = simul.findSet(skip);
     
     arg.set(binary, "binary");
+    arg.set(simul.prop->skip_free_single, "skip_free_single");
     arg.set(simul.prop->skip_free_couple, "skip_free_couple");
-    
+
     Inputter in(DIM);
     try {
         simul.loadProperties();
