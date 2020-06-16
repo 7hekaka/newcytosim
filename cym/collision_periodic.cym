@@ -38,7 +38,8 @@ new base
 
 set fiber microtubule
 {
-    confine = on, 100, base
+    confine = on, 10, base   % apply always
+    confine2 = inside, 990, cell  % apply for Z<0 (need to be enabled)
     steric = 1, 0.050
     rigidity = 10.625
     segmentation = 0.25
