@@ -33,9 +33,9 @@ Glossary::Glossary(std::istream& in)
     read(in);
 }
 
-Glossary::Glossary(const std::string& str)
+Glossary::Glossary(const std::string& arg)
 {
-    std::istringstream iss(str);
+    std::istringstream iss(arg);
     read(iss);
 }
 
@@ -311,7 +311,7 @@ void Glossary::add_value(Glossary::pair_type& res, std::string& str, bool def)
     
     VLOG2("Glossary::SET" << std::setw(20) << res.first << "[" << res.second.size() << "] = |" << val << "|\n");
 
-    res.second.push_back(val_type(val, def));
+    res.second.emplace_back(val, def);
 }
 
 
@@ -394,9 +394,10 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
 
 
 /**
- If `no_overwrite == 0`, previous values can be erased without warning,
- If `no_overwrite == 1`, a prexisting symbol cannot be altered, but no exception is thrown
- If `no_overwrite == 2`, an exception is thrown for any duplicate symbol
+ The value of `mode' will determine how to handle duplicate values:
+ - `0`, previous values are erased without warning,
+ - `1`, a prexisting symbol in not altered, but no exception is thrown
+ - `2`, an exception is thrown for any duplicate symbol
  */
 void Glossary::add_entry(Glossary::pair_type& pair, int no_overwrite)
 {
@@ -406,30 +407,24 @@ void Glossary::add_entry(Glossary::pair_type& pair, int no_overwrite)
     
     if ( w == mTerms.end() )
     {
-        // for a new key, we accept all values
-        rec_type & rec = mTerms[pair.first];
-        for ( size_t i = 0; i < pair.second.size(); ++i )
-            rec.push_back(pair.second[i]);
+        mTerms.insert(pair);
     }
     else
     {
-        // for pre-existing keys, we check every values:
+        // the key already exists:
         rec_type & rec = w->second;
+        // check every value of the argument:
         for ( size_t i = 0; i < pair.second.size(); ++i )
         {
             if ( rec.size() <= i )
                 rec.push_back(pair.second[i]);
             else
             {
+                // the record already exists:
                 if ( !rec[i].defined_  ||  !no_overwrite )
                     rec[i] = pair.second[i];
                 else if ( pair.second[i].value_ != rec[i].value_  &&  no_overwrite > 1 )
-                {
-                    InvalidSyntax e("conflicting definitions");
-                    e << PREF << format(*w) << '\n';
-                    e << PREF << format(pair) << '\n';
-                    throw e;
-                }
+                    throw InvalidSyntax("conflicting definition: "+format(*w)+" and "+format(pair));
             }
         }
     }
@@ -437,17 +432,17 @@ void Glossary::add_entry(Glossary::pair_type& pair, int no_overwrite)
 
 
 /// define one value for the key at specified index: `key[inx]=val`.
-void Glossary::define(key_type const& key, size_t inx, const std::string& str)
+void Glossary::define(key_type const& key, size_t inx, const std::string& arg)
 {
-    std::string val = Tokenizer::trim(str);
+    std::string val = Tokenizer::trim(arg);
     map_type::iterator w = mTerms.find(key);
     
     if ( w == mTerms.end() )
     {
-        // add new key and its value at index 0:
         if ( inx > 0 )
             throw InvalidSyntax("index out of range in Glossary::define");
-        mTerms[key].push_back(val_type(val, true));
+        // add new key and its value at index 0:
+        mTerms[key].emplace_back(val, true);
 
         VLOG1("Glossary::DEFINE    " << key << " = |" << val << "|\n");
     }
@@ -459,7 +454,7 @@ void Glossary::define(key_type const& key, size_t inx, const std::string& str)
         if ( rec.size() > inx )
             rec[inx] = val_type(val, true);
         else if ( rec.size() == inx )
-            rec.push_back(val_type(val, true));
+            rec.emplace_back(val, true);
         else
             throw InvalidSyntax("index out of range in Glossary::define");
         
@@ -471,9 +466,24 @@ void Glossary::define(key_type const& key, size_t inx, const std::string& str)
 /**
  This should be equivalent to read('k = rhs')
  */
-void Glossary::define(key_type const& k, const std::string& rhs)
+void Glossary::add_value(key_type const& key, const std::string& arg)
 {
-    define(k, 0, rhs);
+    std::string val = Tokenizer::trim(arg);
+    map_type::iterator w = mTerms.find(key);
+    // define a new key, or add value to existing key:
+    if ( w == mTerms.end() )
+        mTerms[key].emplace_back(val, true);
+    else
+        w->second.emplace_back(val, true);
+}
+
+
+/**
+ This should be equivalent to read('k = rhs')
+ */
+void Glossary::define(key_type const& key, const std::string& rhs)
+{
+    define(key, 0, rhs);
 }
 
 
@@ -609,32 +619,23 @@ void Glossary::read_string(const char arg[], int no_overwrite)
     }
     else
     {
-        /*
-         Here is a key specified without any value:
-         */
+        // Handle a key specified without any value
         if ( FilePath::is_dir(arg) )
-        {
-            // this is a directory
-            pair.first = "directory";
-            pair.second.push_back(val_type(arg, true));
-        }
+            add_value("directory", arg);
         else
         {
-            // find last occurence of '.'
+            /*
+             Find last occurence of '.' to identify a potential file name,
+             while anything else is treated as a orphan string */
             char const* c = strrchr(arg, '.');
             if ( c )
-            {
-                // with a '.', this is a potential file name
-                pair.first = c;
-                pair.second.push_back(val_type(arg, true));
-            }
+                add_value(c, arg);
             else
             {
-                // anything else is just a orphan string
                 pair.first = arg;
+                add_entry(pair, no_overwrite);
             }
         }
-        add_entry(pair, no_overwrite);
     }
 }
 

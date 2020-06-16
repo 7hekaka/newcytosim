@@ -266,7 +266,7 @@ public:
     rec_type const* values(key_type const&) const;
     
     /// return copy of value corresponding to `key[inx]`, or empty string if this value is not present
-    std::string  value(key_type const&, size_t inx) const;
+    std::string  value(key_type const&, size_t inx = 0) const;
     
     /// returns true if `key[inx]==val`, or false otherwise. Counter is incremented in case of match
     bool         value_is(key_type const& key, size_t inx, std::string const& val) const;
@@ -294,6 +294,9 @@ public:
         oss << val;
         define(key, inx, oss.str());
     }
+    
+    /// add value to key
+    void         add_value(key_type const&, std::string const& val);
 
     /// update the glossary to include one assignment read from stream
     void         read_entry(std::istream&, int no_overwrite = 2);

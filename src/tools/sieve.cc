@@ -36,40 +36,38 @@ void help()
 
 int main(int argc, char* argv[])
 {
+    Simul simul;
+    Glossary arg;
+    bool binary = true;
+    ObjectSet * skip_set = nullptr;
+    std::string skip;
+
     if ( argc < 3 )
     {
         help();
         return EXIT_SUCCESS;
     }
 
-    Simul simul;
-    Glossary arg;
-    
-    std::string input  = argv[1];
-    std::string output = argv[2];
     if ( arg.read_strings(argc-3, argv+3) )
         return EXIT_FAILURE;
     
-    ObjectSet * skip_set = nullptr;
-    std::string skip;
     if ( arg.set(skip, "skip") )
        skip_set = simul.findSet(skip);
     
-    bool binary = true;
     arg.set(binary, "binary");
     arg.set(simul.prop->skip_free_couple, "skip_free_couple");
     
     Inputter in(DIM);
     try {
         simul.loadProperties();
-        in.open(input.c_str(), "rb");
+        in.open(argv[1], "rb");
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << '\n';
         return EXIT_FAILURE;
     }
     
-    std::clog << ">>>>>> Sieve `" << input << "' -> `" << output << "'\n";
+    std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2] << "'\n";
     
     size_t frm = 0, frame = 0;
     
@@ -96,7 +94,7 @@ int main(int argc, char* argv[])
         
         try {
             if ( !has_frame || ( frm == frame ) )
-                simul.writeObjects(output, true, binary);
+                simul.writeObjects(argv[2], true, binary);
         }
         catch( Exception & e ) {
             std::cerr << e.brief() << '\n';

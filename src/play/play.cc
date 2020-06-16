@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
     // change working directory if specified:
     if ( arg.has_key("directory") )
     {
-        FilePath::change_dir(arg.value("directory", 0));
+        FilePath::change_dir(arg.value("directory"));
         //std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
     

@@ -64,6 +64,8 @@ int FileWrapper::open(const char* name, const char* mode)
     {
         if ( mode[0] == 'w'  ||  mode[0] == 'a' )
             throw InvalidIO("output file could not be opened");
+        if ( mode[0] == 'r' )
+            throw InvalidIO("input file could not be opened");
         return 1;
     }
     
