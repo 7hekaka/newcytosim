@@ -597,6 +597,7 @@
 		BB957FF92466A86500A61493 /* point_gridF.h in Headers */ = {isa = PBXBuildFile; fileRef = BB957FF82466A86500A61493 /* point_gridF.h */; };
 		BB957FFA2466A8B300A61493 /* point_gridF.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* point_gridF.cc */; };
 		BB957FFB2466A8B300A61493 /* point_gridF.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* point_gridF.cc */; };
+		BB95C53C249627ED003CA21A /* test_array.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB95C53B249627EC003CA21A /* test_array.cc */; };
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
@@ -753,6 +754,7 @@
 		BBD025E11B28DF950002B9FE /* chewer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DD1B28DF950002B9FE /* chewer.h */; };
 		BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */; };
 		BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */; };
+		BBD59C972498C738002A2E7B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBD5DA7A0FF7956C0010D08D /* organizer_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5DA760FF7956C0010D08D /* organizer_set.cc */; };
 		BBD5DA7B0FF7956C0010D08D /* organizer_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5DA770FF7956C0010D08D /* organizer_set.h */; };
 		BBD6F5C112D9D16400A5F99B /* bundle_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */; };
@@ -1589,6 +1591,7 @@
 		BB955C4B116FBF4C000E70A6 /* space_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_set.cc; path = src/sim/space_set.cc; sourceTree = SOURCE_ROOT; };
 		BB955C4C116FBF4C000E70A6 /* space_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_set.h; path = src/sim/space_set.h; sourceTree = SOURCE_ROOT; };
 		BB957FF82466A86500A61493 /* point_gridF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_gridF.h; sourceTree = "<group>"; };
+		BB95C53B249627EC003CA21A /* test_array.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_array.cc; sourceTree = "<group>"; };
 		BB97114C1DECDA1300352630 /* glapp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = glapp.cc; sourceTree = "<group>"; };
 		BB97114D1DECDA1300352630 /* glapp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glapp.h; sourceTree = "<group>"; };
 		BB9711501DECDA1300352630 /* gle.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gle.cc; sourceTree = "<group>"; };
@@ -1912,6 +1915,7 @@
 			files = (
 				BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */,
 				BB6403F705FBC2F400DF7BFF /* libcytosim.a in Frameworks */,
+				BBD59C972498C738002A2E7B /* Accelerate.framework in Frameworks */,
 				BB6403FA05FBC2F900DF7BFF /* libcytobase.a in Frameworks */,
 				BBAEC4F80EF1D1DD00955B64 /* libcytomath.a in Frameworks */,
 			);
@@ -2596,6 +2600,7 @@
 			children = (
 				BB2BF8D50E085C270024546A /* makefile.inc */,
 				BB882B400EE82D6A00E29E5C /* test.cc */,
+				BB95C53B249627EC003CA21A /* test_array.cc */,
 				BB1227AE114FB8640042589A /* test_blas.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */,
 				BB7086342448BC3700C73273 /* test_dpttrs.cc */,
@@ -4601,6 +4606,7 @@
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
 				BBC422F724731657007EA070 /* node.cc in Sources */,
+				BB95C53C249627ED003CA21A /* test_array.cc in Sources */,
 				BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */,
 				BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */,
