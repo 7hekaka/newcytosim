@@ -25,6 +25,10 @@ typedef Array<Single *> SingleList;
  */
 class SingleSet: public ObjectSet
 {
+public:
+    
+    ///
+    static bool prune_free, skip_free;
     
 private:
     
@@ -106,6 +110,9 @@ public:
     /// delete an attached Single
     void          deleteA(Single *);
     
+    /// detach an attached Single
+    void          detachA(Single *);
+
     /// create Wrists anchored on given Mecable
     ObjectList    makeWrists(Mecable const*, size_t, size_t, std::string&);
 

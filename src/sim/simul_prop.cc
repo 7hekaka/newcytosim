@@ -45,8 +45,10 @@ void SimulProp::clear()
     property_file     = "properties.cmo";
     trajectory_file   = TRAJECTORY;
     clear_trajectory  = true;
-    skip_free_couple  = false;
     
+    skip_free_single  = 0;
+    skip_free_couple  = 0;
+
     display           = "";
     display_fresh     = false;
 }
@@ -115,6 +117,7 @@ void SimulProp::read(Glossary& glos)
     glos.set(trajectory_file,   ".cmo");
 
     glos.set(clear_trajectory,  "clear_trajectory");
+    glos.set(skip_free_single,  "skip_free_single");
     glos.set(skip_free_couple,  "skip_free_couple");
     glos.set(random_seed,       "random_seed");
     

@@ -284,9 +284,12 @@ public:
     /// If `true`, any pre-existing trajectory_file will be erased (<em>default = true</em>)
     bool          clear_trajectory;
     
-    /// If `true` free couples are not saved/read to/from file (<em>default = false</em>)
-    bool          skip_free_couple;
+    /// If `true` free singles are not saved/read to/from file (<em>default = false</em>)
+    int           skip_free_single;
     
+    /// If `true` free couples are not saved/read to/from file (<em>default = false</em>)
+    int           skip_free_couple;
+
     /// Display parameters (see @ref DisplayPar)
     std::string   display;
 

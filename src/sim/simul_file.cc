@@ -475,23 +475,41 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             std::string tok;
             iss >> tok;
 
-            // section start
+            // section heading
             if ( tok == "section" )
             {
                 iss >> section;
                 //std::clog << " section |" << section << "|\n";
-                if ( prop->skip_free_couple )
+                if ( section == "end" )
+                    continue;
+                if ( section == "single" )
                 {
-                    iss >> tok;
-                    // this skips loading of Couple that are not bridging:
-                    if ( section == "couple" && tok == "FF" )
+                    int mod = 0;
+                    iss >> tok >> mod;
+                    // skip unattached Singles
+                    if ( tok == "F" )
                     {
-                        in.skip_until("#section ");
-                        std::clog << "skipped " << section << " " << tok << '\n';
+                        if ( prop->skip_free_single > 1 )
+                            in.skip_until("#section ");
+                        else
+                            singles.prune_free = mod;
+                    }
+                }
+                if ( section == "couple" )
+                {
+                    int mod = 0;
+                    iss >> tok >> mod;
+                    // skip unattached Couples
+                    if ( tok == "FF" )
+                    {
+                        if ( prop->skip_free_couple > 1 )
+                            in.skip_until("#section ");
+                        else
+                            singles.prune_free = mod;
                     }
                 }
                 objset = findSet(section);
-                if ( !objset && section != "end" )
+                if ( !objset )
                     std::clog << " warning: unknown section |" << section << "|\n";
             }
             // frame start

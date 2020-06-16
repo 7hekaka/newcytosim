@@ -29,7 +29,11 @@ typedef Array<Couple *> CoupleList;
  */
 class CoupleSet: public ObjectSet
 {
+public:
     
+    ///
+    static bool prune_free, skip_free;
+
 private:
     
     /// list of Couple which are not attached (f=free)
@@ -227,6 +231,13 @@ public:
 
     //--------------------------
     
+    /// detach FF Couple
+    void         detachAA(Couple *);
+    /// detach AF Couple
+    void         detachAF(Couple *);
+    /// detach FA Couple
+    void         detachFA(Couple *);
+
     /// delete FF Couple
     void         deleteAA(Couple *);
     /// delete AF Couple

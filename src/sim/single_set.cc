@@ -5,8 +5,13 @@
 #include "iowrapper.h"
 
 #include "simul.h"
+#include "simul_prop.h"
 #include "wrist.h"
 #include "wrist_long.h"
+
+
+bool SingleSet::prune_free = 0;
+bool SingleSet::skip_free = 0;
 
 //------------------------------------------------------------------------------
 
@@ -253,6 +258,14 @@ void SingleSet::freeze(ObjectFlag f)
 }
 
 
+void SingleSet::detachA(Single * s)
+{
+    s->hand()->detachHand();
+    aList.pop(s);
+    fList.push_back(s);
+}
+
+
 void SingleSet::deleteA(Single * s)
 {
     s->hand()->detachHand();
@@ -265,19 +278,36 @@ void SingleSet::deleteA(Single * s)
 
 void SingleSet::prune(ObjectFlag f)
 {
-    /* After reading from file, the Hands should not
-     update any Fiber, Single or Couple as they will be deleted */
-    for (Single* s=firstA(), *n; s; s=n)
+    if ( prune_free )
     {
-        n = s->next();
-        if ( s->flag() == f )
-            deleteA(s);
-        else
+        /* Update system given that only attached hand were read again */
+        for ( Single* s=firstA(), *n; s; s=n )
+        {
+            n = s->next();
+            if ( s->flag() == f )
+                detachA(s);
             s->flag(0);
+        }
+        
+        //ObjectSet::prune(aList, f, 0);
+        ObjectSet::flag(fList, 0);
     }
-
-    //ObjectSet::prune(aList, f, 0);
-    ObjectSet::prune(fList, f, 0);
+    else
+    {
+        /* After reading from file, the Hands should not update
+         any Fiber, Single or Couple as they will be deleted */
+        for ( Single* s=firstA(), *n; s; s=n )
+        {
+            n = s->next();
+            if ( s->flag() == f )
+                deleteA(s);
+            else
+                s->flag(0);
+        }
+        
+        //ObjectSet::prune(aList, f, 0);
+        ObjectSet::prune(fList, f, 0);
+    }
 }
 
 
@@ -297,8 +327,18 @@ void SingleSet::write(Outputter& out) const
     }
     if ( sizeF() > 0 )
     {
-        out.put_line("\n#section single F", out.binary());
-        writeNodes(out, fList);
+        if ( simul.prop->skip_free_single )
+        {
+            out.put_line("\n#section single F 1", out.binary());
+            if ( ! skip_free )
+                writeNodes(out, fList);
+            skip_free = 1;
+        }
+        else
+        {
+            out.put_line("\n#section single F", out.binary());
+            writeNodes(out, fList);
+        }
     }
 }
 

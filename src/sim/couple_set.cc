@@ -12,6 +12,10 @@
 #include "glossary.h"
 #include "simul.h"
 
+
+bool CoupleSet::prune_free = 0;
+bool CoupleSet::skip_free = 0;
+
 //------------------------------------------------------------------------------
 
 void CoupleSet::prepare(PropertyList const& properties)
@@ -422,6 +426,31 @@ void CoupleSet::freeze(ObjectFlag f)
 }
 
 
+void CoupleSet::detachAA(Couple * c)
+{
+    c->hand1()->detachHand();
+    c->hand2()->detachHand();
+    aaList.pop(c);
+    ffList.push_back(c);
+}
+
+
+void CoupleSet::detachFA(Couple * c)
+{
+    c->hand2()->detachHand();
+    faList.pop(c);
+    ffList.push_back(c);
+}
+
+
+void CoupleSet::detachAF(Couple * c)
+{
+    c->hand1()->detachHand();
+    afList.pop(c);
+    ffList.push_back(c);
+}
+
+
 void CoupleSet::deleteAA(Couple * c)
 {
     c->hand1()->detachHand();
@@ -455,37 +484,66 @@ void CoupleSet::deleteAF(Couple * c)
 
 void CoupleSet::prune(ObjectFlag f)
 {
-    /* After reading from file, the Hands should not
-     update any Fiber, Single or Couple as they will be deleted */
-    for (Couple* c=firstAF(), *n; c; c=n)
+    if ( prune_free )
     {
-        n = c->next();
-        if ( c->flag() == f )
-            deleteAF(c);
-        else
+        /* Update system given that only attached hand were read again */
+        for ( Couple* c=firstAF(), *n; c; c=n )
+        {
+            n = c->next();
+            if ( c->flag() == f )
+                detachAF(c);
             c->flag(0);
+        }
+        for ( Couple* c=firstFA(), *n; c; c=n )
+        {
+            n = c->next();
+            if ( c->flag() == f )
+                detachFA(c);
+            c->flag(0);
+        }
+        for ( Couple* c=firstAA(), *n; c; c=n )
+        {
+            n = c->next();
+            if ( c->flag() == f )
+                detachAA(c);
+            c->flag(0);
+        }
+        ObjectSet::flag(ffList, 0);
     }
-    for (Couple* c=firstFA(), *n; c; c=n)
+    else
     {
-        n = c->next();
-        if ( c->flag() == f )
-            deleteFA(c);
-        else
-            c->flag(0);
+        /* After reading from file, the Hands should not
+         update any Fiber, Single or Couple as they will be deleted */
+        for ( Couple* c=firstAF(), *n; c; c=n )
+        {
+            n = c->next();
+            if ( c->flag() == f )
+                deleteAF(c);
+            else
+                c->flag(0);
+        }
+        for ( Couple* c=firstFA(), *n; c; c=n )
+        {
+            n = c->next();
+            if ( c->flag() == f )
+                deleteFA(c);
+            else
+                c->flag(0);
+        }
+        for ( Couple* c=firstAA(), *n; c; c=n )
+        {
+            n = c->next();
+            if ( c->flag() == f )
+                deleteAA(c);
+            else
+                c->flag(0);
+        }
+        
+        //ObjectSet::prune(aaList, f, 0);
+        //ObjectSet::prune(faList, f, 0);
+        //ObjectSet::prune(afList, f, 0);
+        ObjectSet::prune(ffList, f, 0);
     }
-    for (Couple* c=firstAA(), *n; c; c=n)
-    {
-        n = c->next();
-        if ( c->flag() == f )
-            deleteAA(c);
-        else
-            c->flag(0);
-    }
-
-    //ObjectSet::prune(aaList, f, 0);
-    //ObjectSet::prune(faList, f, 0);
-    //ObjectSet::prune(afList, f, 0);
-    ObjectSet::prune(ffList, f, 0);
 }
 
 
@@ -522,8 +580,18 @@ void CoupleSet::writeFA(Outputter& out) const
 
 void CoupleSet::writeFF(Outputter& out) const
 {
-    out.put_line("\n#section couple FF", out.binary());
-    writeNodes(out, ffList);
+    if ( simul.prop->skip_free_couple )
+    {
+        out.put_line("\n#section couple FF 1", out.binary());
+        if ( !skip_free )
+            writeNodes(out, ffList);
+        skip_free = 1;
+    }
+    else
+    {
+        out.put_line("\n#section couple FF", out.binary());
+        writeNodes(out, ffList);
+    }
 }
 
 void CoupleSet::write(Outputter& out) const
@@ -534,7 +602,7 @@ void CoupleSet::write(Outputter& out) const
         writeAF(out);
     if ( sizeFA() > 0 )
         writeFA(out);
-    if ( sizeFF() > 0 && !simul.prop->skip_free_couple )
+    if ( sizeFF() > 0 )
         writeFF(out);
 }
 
