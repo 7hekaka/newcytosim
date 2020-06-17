@@ -9,7 +9,7 @@ set simul system
     time_step = 0.005
     viscosity = 0.1
     precondition = 0
-    steric = 1, 701.171875
+    steric = 1, 2000
     display = ( style=3; point_value=0.010;  )
 }
 
@@ -20,7 +20,7 @@ set space cell
 
 new cell
 {
-    radius = 1.5
+    radius = 1.25
     bottom = 0
     top = 0.25
 }
@@ -28,9 +28,9 @@ new cell
 set fiber microtubule
 {
     confine = inside, 1000
-    steric = 1, 0.050
+    steric = 1, 0.025
     rigidity = 10.625
-    segmentation = 0.25
+    segmentation = 0.1
     activity = dynamic
     growing_speed = 0.3467
     shrinking_speed = -0.36
@@ -39,12 +39,12 @@ set fiber microtubule
     max_length= 10 
     min_length = 0.01
     persistent = 1
-    display = ( line=2.5, 1; )
+    display = ( line=2.5, 8; length_scale=0.02; )
 }
 
 set fiber obstacle
 {
-    steric = 1, 0.050
+    steric = 1, 0.025
     rigidity = 10.625
     segmentation = 0.25
     activity = none
@@ -55,7 +55,7 @@ set fiber obstacle
 set hand anchor
 {
     binding_rate = 6.9375 
-    binding_range = 0.010
+    binding_range = 0.020
     unbinding_rate = 0.175
     unbinding_force = 5.0625 
     display = ( size=5; color = green; )
@@ -71,22 +71,21 @@ set single grafted
 
 new 1 obstacle
 {
-    length = 2.5
-    position = 0.5 0 0
+    length = 2
+    position = 0.6 0 0
     direction = 0 1 0
 }
 
 
 new 1 microtubule
 {
-    length = 1.5
-
-    position = -0.5 -0.42 0
+    length = 1
+    position = -0.533 -0.528 0
     direction = 0.906 0.423 0
     end_state = grow
 }
 
-new 5000 grafted ( XY 0 )
+new 1000 grafted ( XY 0 )
 
 run 200 system
 {
