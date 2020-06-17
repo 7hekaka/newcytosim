@@ -5,7 +5,7 @@ function [sys, rhs, con] = cytosim_dump(path)
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019,
-% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020, 15.06.2002
+% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020, 15.06.2002, 17.06.2020
 
 if nargin < 1
     path = '.';
@@ -21,15 +21,16 @@ if isfolder(path)
     cwd = pwd;
     cd(path);
     
-    dim = load('ord.txt');
+    ord = load('ord.txt');
+    dim = ord(1);
     time_step = load('stp.txt');
     
     obj = fread(fopen('obj.bin'), dim, 'double');    
     drg = fread(fopen('drg.bin'), dim, 'double');
     sys = fread(fopen('sys.bin'), [dim, dim], 'double');
-    ela = fread(fopen('ela.bin'), [dim, dim], 'double');  %elasticity matrix
-    mob = fread(fopen('mob.bin'), [dim, dim], 'double');  %projection matrix
-    con = fread(fopen('con.bin'), [dim, dim], 'double');  %preconditionner
+    ela = fread(fopen('ela.bin'), [dim, dim], 'double');  % elasticity matrix
+    mob = fread(fopen('mob.bin'), [dim, dim], 'double');  % projection matrix
+    con = fread(fopen('con.bin'), [dim, dim], 'double');  % preconditionner
     %pts = fread(fopen('pts.bin'), dim, 'double');
     rhs = fread(fopen('rhs.bin'), dim, 'double');
     sol = fread(fopen('sol.bin'), dim, 'double');
@@ -39,7 +40,7 @@ else
     error(['cannot find dump directory ',path]);
 end
 
-fprintf(1, '-------- loaded system of size %i with time_step %f --------\n', dim, time_step);
+fprintf(1, '----------------------- loaded system of size %i with time_step %f -----------------------\n', dim, time_step);
 
 %% Check matrix
 
@@ -117,7 +118,7 @@ solution = bicgstab(@multiply, rhs, reltol*0.001, maxit);
 fprintf(2, '    norm(sol - matlab_sol) = %f\n', norm(sol-solution));
     
 if 0
-    figure;
+    figure('Name', 'Validation of solution');;
     plot(solution, sol, 'k.');
     xlabel('matlab solution');
     ylabel('cytosim solution');
@@ -185,14 +186,13 @@ end
     end
 end
 
- %% WITH TRADITIONAL DIAGONAL BLOCKS PRECONDITIONNER
+ %% USING PRECONDITIONNER CALCULATED BY CYTOSIM
  
- fprintf(2, '    Elasticity          has %i elements\n', nnz(ela));
- fprintf(2, '    Mobility/Projection has %i elements\n', nnz(mob));
- fprintf(2, '    Block conditionner  has %i elements\n', nnz(con));
+ fprintf(2, '    Elasticity            has %9i elements\n', nnz(ela));
+ fprintf(2, '    Mobility/Projection   has %9i elements\n', nnz(mob));
+ fprintf(2, '--- Block preconditionner has %9i elements\n', nnz(con));
 
  if 1
-
      mulcnt = 0;
      [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
      report('P bicgstab', mulcnt, vec, rv0(end));
@@ -203,7 +203,12 @@ end
      [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
      convergence_plot(rv0/rv0(1), 'b--');
      report('P bicgstab(1)', mulcnt, vec, rv0(end));
-    
+     
+     % checking the reconstituted block preconditionner:
+     mulcnt = 0;
+     [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
+     report('R bicgstab', mulcnt, vec, rv0(end));
+     convergence_plot(rv0/rv0(1),'k--');
 end
 
 if 0
@@ -243,16 +248,16 @@ if 0
 end
 
 %% a possible sparse symmetric preconditionner
-
 % we average all point drag coefficient to derive a matrix that is
 % symmetric and ammenable to incomplete Cholesky factorization
 
 if 1
     
     val = time_step / mean(1./drg);
-    DRY = sparse( eye(dim) - diag(val.*ones(length(ela), 1)) * ela );
+    DRY = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
+    DRY = sparse(DRY);
     
-    fprintf(2, '    DRY is symmetric with %i elements; ', nnz(DRY));
+    fprintf(2, '--- DRY is symmetric with %i elements; ', nnz(DRY));
     
     clear OPT;
     OPT.michol = 'off';
@@ -271,8 +276,54 @@ if 1
     report('y bicgstab(1)', mulcnt, vec, rv0(end));
 end
 
+%% a smaller sparse symmetric preconditionner
+% We project the previous preconditionner to make it isotropic in X, Y Z
 
-%% incomplete Cholesky
+if 1
+    
+    val = time_step / mean(1./drg);
+    SML = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
+
+    if ( ord(2) == 3 )
+        SML = SML(1:3:end, 1:3:end) + SML(2:3:end, 2:3:end) + SML(3:3:end, 3:3:end);
+        SML = (1/3) * sparse(SML);
+    elseif ( ord(2) == 2 )
+        SML = SML(1:2:end, 1:2:end) + SML(2:2:end, 2:2:end);
+        SML = (1/2) * sparse(SML);
+    end
+    
+    fprintf(2, '--- SML is symmetric with %i elements; ', nnz(SML));
+    
+    clear OPT;
+    OPT.michol = 'off';
+    OPT.type = 'nofill';
+    SML = ichol(SML, OPT);
+    fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(SML));
+    
+    if ( ord(2) == 3 )
+        L = sparse(dim, dim);
+        L(1:3:end, 1:3:end) = SML;
+        L(2:3:end, 2:3:end) = SML;
+        L(3:3:end, 3:3:end) = SML;
+    elseif ( ord(2) == 2 )
+        L = sparse(dim, dim);
+        L(1:2:end, 1:2:end) = SML;
+        L(2:2:end, 2:2:end) = SML;
+    end
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'k:');
+    report('s bicgstab', mulcnt, vec, rv0(end));
+    
+    mulcnt = 0;
+    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1),'b:');
+    report('s bicgstab(1)', mulcnt, vec, rv0(end));
+end
+
+
+%% incomplete LU factorization
 
 % the WET matrix is not necessarily symmetric because of the diagonal matrix
 % may not commute with 'ela'. However, if all point drags are equal, then
@@ -282,8 +333,8 @@ WET = eye(dim) - diag(time_step./drg) * ela;
 
 sWET = sparse(WET);
 
-fprintf(2, '    WET has %i elements; ', nnz(sWET));
-fprintf(2, 'norm(WET-transpose(WET)) = %f\n', norm(WET-WET',1));
+fprintf(2, '--- WET has %i elements; ', nnz(sWET));
+fprintf(2, 'norm(WET-transpose(WET)) = %.2f; ', norm(WET-WET',1));
 
 if 0 && ( norm(WET-WET',1) < 1 )
     
@@ -387,6 +438,10 @@ end
         y = con * x;
     end
 
+    function y = preconditionPRC(x)
+        y = PRC * x;
+    end
+
     function y = precondition2(x, mode)
         if ( strcmp(mode, 'notransp') )
             y = con * x;
@@ -406,7 +461,7 @@ end
 
     function report(s, i, v, r)
         tr = norm(system*v-rhs);
-        fprintf(1, '%-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
+        fprintf(1, '    %-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
     end
 
 end

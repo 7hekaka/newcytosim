@@ -2088,7 +2088,7 @@ void Meca::dumpDrag(FILE * file) const
 void Meca::dump() const
 {
     FILE * f = fopen("ord.txt", "w");
-    fprintf(f, "%lu\n", dimension());
+    fprintf(f, "%lu %i\n", dimension(), DIM);
     fclose(f);
     
     f = fopen("stp.txt", "w");
@@ -2140,7 +2140,7 @@ void Meca::dump(const char dirname[]) const
     FilePath::change_dir(dirname);
     dump();
     FilePath::change_dir(cwd);
-    fprintf(stderr, "Cytosim dumped a %iD system of size %lu in `%s'\n", DIM, dimension(), dirname);
+    fprintf(stderr, "Cytosim exported a %iD system of size %lu in `%s'\n", DIM, dimension(), dirname);
 }
 
 
