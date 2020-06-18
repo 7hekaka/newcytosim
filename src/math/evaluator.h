@@ -39,7 +39,7 @@ private:
     char const* ptr;
     
     /// list of variables
-    variable_list variables_;
+    const variable_list variables_;
     
     
     void skip_space()
