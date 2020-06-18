@@ -365,6 +365,9 @@ int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
     if ( 0 == loadObjects(in, subset) )
         lock.prune();
 
+    // renew pointers to objects, particularly 'confine_space'
+    prop->complete(*this);
+
     return in.eof();
 }
 
