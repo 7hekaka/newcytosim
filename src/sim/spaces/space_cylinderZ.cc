@@ -365,6 +365,7 @@ void SpaceCylinderZ::setLengths(const real len[])
     bot_    = len[1];
     top_    = len[2];
     edge_   = len[3];
+    update();
 }
 
 
