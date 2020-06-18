@@ -11,8 +11,8 @@ if nargin < 1
     path = '.';
 end
 
-mulcnt = 0;
-abstol = 0.005;
+abstol = 0.001;
+
 
 %% Loading
 
@@ -23,8 +23,11 @@ if isfolder(path)
     
     ord = load('ord.txt');
     dim = ord(1);
-    time_step = load('stp.txt');
-    
+    stp = load('stp.txt');
+    time_step = stp(1);
+    if ( length(stp) > 1 )
+        abstol = stp(2);
+    end
     obj = fread(fopen('obj.bin'), dim, 'double');    
     drg = fread(fopen('drg.bin'), dim, 'double');
     sys = fread(fopen('sys.bin'), [dim, dim], 'double');
@@ -42,6 +45,7 @@ end
 
 fprintf(1, '----------------------- loaded system of size %i with time_step %f -----------------------\n', dim, time_step);
 
+mulcnt = 0;
 %% Check matrix
 
 %figure('name', 'System matrix'); imshow(abs(sys)); 
@@ -148,15 +152,15 @@ mulcnt = 0;
 convergence_plot(rv0/rv0(1), 'b');
 report('bicgstab(1)', mulcnt, vec, rv0(end));
 
-if 0 %% without preconditionning
+if 0 %% no preconditionning
  
     % BiCGStab(L)
     for i = 1:4
         OPT.Tol = reltol;
         OPT.ell = min(2^i, dim);
         OPT.MaxIt = maxit;
-        [vec,rv0,itr] = cgstab(@multiply, rhs, [], [], OPT);
-        convergence_plot(rv0(:,2), rv0(:,1)/rv0(1,1),'m');
+        [vec,rv0,itr] = cgstab(system, rhs, [], [], OPT);
+        convergence_plot(rv0(:,1)/rv0(1,1), 'm');
         report(sprintf('BiCGS(%i)', OPT.ell), itr, vec, rv0(end,1));
     end
 if 0
@@ -171,7 +175,7 @@ end
     % IDRS-STAB
     for i = 0:4
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, [], [], []);
+        [vec,~,~,itr,rv0] = IDRstabg5(system, rhs, RS, reltol, maxit, [], [], []);
         convergence_plot(rv0/rv0(1),'m');
         report(sprintf('IDRSTAB %03i', RS), itr, vec, rv0(end));
     end
@@ -180,7 +184,7 @@ end
     OPT.smoothing = 0;
     for i = 0:4
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, [], [], [], OPT);
+        [vec,~,~,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, [], [], [], OPT);
         convergence_plot(rv0/rv0(1),'r');
         report(sprintf('IDRS %03i', RS), itr, vec, rv0(end));
     end
@@ -197,18 +201,18 @@ end
      [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
      report('P bicgstab', mulcnt, vec, rv0(end));
      convergence_plot(rv0/rv0(1),'k--');
-     
-     mulcnt = 0;
-     % Matlab BiCGStab(L)
-     [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
-     convergence_plot(rv0/rv0(1), 'b--');
-     report('P bicgstab(1)', mulcnt, vec, rv0(end));
-     
+          
      % checking the reconstituted block preconditionner:
      mulcnt = 0;
      [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
      report('R bicgstab', mulcnt, vec, rv0(end));
      convergence_plot(rv0/rv0(1),'k--');
+
+     mulcnt = 0;
+     % Matlab BiCGStab(L)
+     [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
+     convergence_plot(rv0/rv0(1), 'b--');
+     report('P bicgstab(1)', mulcnt, vec, rv0(end));
 end
 
 if 0
@@ -329,79 +333,85 @@ end
 % may not commute with 'ela'. However, if all point drags are equal, then
 % surely WET is symmetric and we can use incomplete Cholesky factorization
 
-WET = eye(dim) - diag(time_step./drg) * ela;
-
-sWET = sparse(WET);
-
-fprintf(2, '--- WET has %i elements; ', nnz(sWET));
-fprintf(2, 'norm(WET-transpose(WET)) = %.2f; ', norm(WET-WET',1));
-
-if 0 && ( norm(WET-WET',1) < 1 )
-    
-    clear OPT;
-    OPT.michol = 'off';
-    OPT.type = 'nofill';
-    L = ichol(sWET, OPT);
-    fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
-    
-    mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(rv0/rv0(1),'k.-');
-    report('w bicgstab', mulcnt, vec, rv0(end));
-    
-    mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(rv0/rv0(1),'b.-');
-    report('w bicgstab(1)', mulcnt, vec, rv0(end));
-    
-    for i = 0:3
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, L, L', [], OPT);
-        convergence_plot(rv0/rv0(1),'r.-');
-        report(sprintf('w IDRS %03i', RS), 2*itr, vec, rv0(end));
-    end
-
-else
-
-    clear OPT;
-    OPT.type = 'nofill';
-    OPT.milu = 'off';
-    [L, U] = ilu(sWET, OPT);
-    fprintf(2, '    incomplete LU has %i + %i elements\n', nnz(L), nnz(U));
-    
-    mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
-    report('i bicgstab', mulcnt, vec, rv0(end));
-    convergence_plot(rv0/rv0(1),'k-.');
-    
-    % Matlab BiCGStab(L)
-    mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, U);
-    convergence_plot(rv0/rv0(1), 'b-.');
-    report('i bicgstab(1)', mulcnt, vec, rv0(end));
-    
-end
-
 if 0
-    % IDRS-STAB
-    for i = 0:5
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, L, U, []);
-        convergence_plot(rv0/rv0(1),'m');
-        report(sprintf('i IDRSTAB %03i', RS), itr, vec, rv0(end));
+    
+    WET = eye(dim) - diag(time_step./drg) * ela;
+    
+    sWET = sparse(WET);
+    
+    fprintf(2, '--- WET has %i elements; ', nnz(sWET));
+    fprintf(2, 'norm(WET-transpose(WET)) = %.2f; ', norm(WET-WET',1));
+    
+    if ( norm(WET-WET',1) < 1 )
+        
+        clear OPT;
+        OPT.michol = 'off';
+        OPT.type = 'nofill';
+        L = ichol(sWET, OPT);
+        fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
+        
+        mulcnt = 0;
+        [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+        convergence_plot(rv0/rv0(1),'k.-');
+        report('w bicgstab', mulcnt, vec, rv0(end));
+        
+        mulcnt = 0;
+        [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+        convergence_plot(rv0/rv0(1),'b.-');
+        report('w bicgstab(1)', mulcnt, vec, rv0(end));
+        
+        for i = 0:3
+            RS = min(2^i, dim);
+            [vec,~,~,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, L, L', [], OPT);
+            convergence_plot(rv0/rv0(1),'r.-');
+            report(sprintf('w IDRS %03i', RS), 2*itr, vec, rv0(end));
+        end
+        
+    else
+        
+        clear OPT;
+        OPT.type = 'nofill';
+        OPT.milu = 'off';
+        [L, U] = ilu(sWET, OPT);
+        fprintf(2, '    incomplete LU has %i + %i elements\n', nnz(L), nnz(U));
+        
+        mulcnt = 0;
+        [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
+        report('i bicgstab', mulcnt, vec, rv0(end));
+        convergence_plot(rv0/rv0(1),'k-.');
+        
+        % Matlab BiCGStab(L)
+        mulcnt = 0;
+        [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, U);
+        convergence_plot(rv0/rv0(1), 'b-.');
+        report('i bicgstab(1)', mulcnt, vec, rv0(end));
+        
     end
     
-    OPT.smoothing = 1;
-    for i = 0:3
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, L, U, [], OPT);
-        convergence_plot(rv0/rv0(1), 'r--');
-        report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
+    if 0
+        % IDRS-STAB
+        for i = 0:5
+            RS = min(2^i, dim);
+            [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, L, U, []);
+            convergence_plot(rv0/rv0(1),'m');
+            report(sprintf('i IDRSTAB %03i', RS), itr, vec, rv0(end));
+        end
+        
+        OPT.smoothing = 1;
+        for i = 0:3
+            RS = min(2^i, dim);
+            [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, L, U, [], OPT);
+            convergence_plot(rv0/rv0(1), 'r--');
+            report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
+        end
     end
+    
 end
 
 
-if 0 %% check more preconditionners
+%% check preconditionning with iLU on the full matrix
+ 
+if 0
 
     % preconditionner = incomplete LU factorization
     [L, U] = ilu(system, OPT);
@@ -451,11 +461,13 @@ end
     end
 
     function convergence_plot(data, col)
+        % crop data:
+        dat = data(1:min(256,length(data)));
         if isempty(convergence_axes)
-            semilogy(data, col, 'Linewidth', 2);
+            semilogy(dat, col, 'Linewidth', 2);
             convergence_axes = gca;
         else
-            semilogy(convergence_axes, data, col, 'Linewidth', 2);
+            semilogy(convergence_axes, dat, col, 'Linewidth', 2);
         end
     end
 

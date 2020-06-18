@@ -1,17 +1,18 @@
-function [sys, rhs, con] = check_dump(path)
+function [sys, rhs, con] = cytosim_dump(path)
 
 % This is used to explore Cytosim's linear system in matlab
 % - load the matrices and vector from Cytosim's dump
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019,
-% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020
+% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020, 15.06.2002, 17.06.2020
 
 if nargin < 1
     path = '.';
 end
 
-abstol = 0.0005;
+abstol = 0.001;
+
 
 %% Loading
 
@@ -20,15 +21,19 @@ if isfolder(path)
     cwd = pwd;
     cd(path);
     
-    dim = load('ord.txt');
-    time_step = load('stp.txt');
-    
+    ord = load('ord.txt');
+    dim = ord(1);
+    stp = load('stp.txt');
+    time_step = stp(1);
+    if ( length(stp) > 1 )
+        abstol = stp(2);
+    end
     obj = fread(fopen('obj.bin'), dim, 'double');    
-    %drg = fread(fopen('drg.bin'), dim, 'double');
+    drg = fread(fopen('drg.bin'), dim, 'double');
     sys = fread(fopen('sys.bin'), [dim, dim], 'double');
-    ela = fread(fopen('ela.bin'), [dim, dim], 'double');  %elasticity matrix
-    mob = fread(fopen('mob.bin'), [dim, dim], 'double');  %projection matrix
-    con = fread(fopen('con.bin'), [dim, dim], 'double');  %preconditionner
+    ela = fread(fopen('ela.bin'), [dim, dim], 'double');  % elasticity matrix
+    mob = fread(fopen('mob.bin'), [dim, dim], 'double');  % projection matrix
+    con = fread(fopen('con.bin'), [dim, dim], 'double');  % preconditionner
     %pts = fread(fopen('pts.bin'), dim, 'double');
     rhs = fread(fopen('rhs.bin'), dim, 'double');
     sol = fread(fopen('sol.bin'), dim, 'double');
@@ -38,7 +43,7 @@ else
     error(['cannot find dump directory ',path]);
 end
 
-fprintf(1, 'loaded cytosim system of size %i with time_step %f\n', dim, time_step);
+fprintf(1, '----------------------- loaded system of size %i with time_step %f -----------------------\n', dim, time_step);
 
 %% Check matrix
 
@@ -64,39 +69,59 @@ if ( 1 )
     end
     
     fprintf(1, '%i mecables with %i block scalars\n', nbo, nbv);
-    fprintf(1, '    norm(MAT-transpose(MAT)) = %f\n', vecnorm(ela-ela'));
+    fprintf(2, '    norm(ela-transpose(ela)) = %f\n', norm(ela-ela',1));
 
-    fprintf(1, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
+    fprintf(2, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
     if ( err0 > 1e-8 )
         imshow(abs(mat));
         set(gcf, 'name', 'Reconstituted matrix');
     end
 
-    fprintf(1, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', max(max(abs(PRC-con))));
-    fprintf(1, '    norm(rhs) = %f\n', norm(rhs));
-    fprintf(1, '    norm(sol) = %f\n', norm(sol));
-    fprintf(1, '    norm(con*rhs) = %f\n', norm(con*rhs));
+    fprintf(2, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', norm(PRC-con,1));
+    fprintf(2, '    norm(rhs) = %f', norm(rhs));
+    fprintf(2, '    norm(sol) = %f', norm(sol));
+    fprintf(2, '    norm(con*rhs) = %f\n', norm(con*rhs));
 
+    %figure('name', 'Mecable footprint'); imshow(PRC);
 
 end
 
-figure('name', 'Mecable footprint'); imshow(PRC);
-figure('name', 'System matrix structure'); spy(sys);
+if ( 0 )
+    mag = time_step * max(max(abs(mob * ela)));
+    fprintf(1, 'norm8(system matrix - eye) : %e\n', mag);
+end
+if ( 0 )
+    figure('Position', [50 50 1000 1000]);
+    plot(reshape(mat,1,dim*dim), reshape(sys,1,dim*dim), '.')
+    xl = xlim;
+    ylim(xl);
+    xlabel('Reconstituted matrix');
+    ylabel('cytosim matrix');
+end
+if ( 0 )
+    figure('name', 'System matrix values');
+    plot(abs(sys), '^b'); hold on;
+    plot(abs(mat), 'vr');
+end
+if ( 0 )
+    figure('name', 'System matrix structure');
+    spy(mat)
+    drawnow;
+end
 
-
-%% Getting the solution with high precision
+%% RECALCULATE SOLUTION
 
 reltol = abstol / norm(rhs);
 
 maxit = dim;
 system = sparse(sys);
 
-solution = bicgstab(system, rhs, abstol*0.001, maxit);
-     
-fprintf(1, '    norm(sol - matlab_sol) = %f\n', norm(sol-solution));
+solution = bicgstab(@multiply, rhs, reltol*0.001, maxit);
+
+fprintf(2, '    norm(sol - matlab_sol) = %f\n', norm(sol-solution));
     
 if 0
-    figure;
+    figure('Name', 'Validation of solution');;
     plot(solution, sol, 'k.');
     xlabel('matlab solution');
     ylabel('cytosim solution');
@@ -105,10 +130,12 @@ if 0
     drawnow;
 end
 
-%% BCGS without preconditionning
-	
-[vec,~,~,itr,rv0] = bicgstab(system, rhs, reltol, maxit);
-report('bicgstab', 2*itr, vec, rv0(end));
+%% BCGS
+
+mulcnt = 0;
+[vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit);
+
+report('bicgstab', mulcnt, vec, rv0(end));
 
 figure('Name', 'Convergence');
 convergence_axes = [];
@@ -136,18 +163,32 @@ convergence_plot(rv0/rv0(1),'k');
         y = con * x;
     end
 
+    function y = preconditionPRC(x)
+        y = PRC * x;
+    end
+
+    function y = precondition2(x, mode)
+        if ( strcmp(mode, 'notransp') )
+            y = con * x;
+        else
+            y = con' * x;
+        end
+    end
+
     function convergence_plot(data, col)
+        % crop data:
+        dat = data(1:min(256,length(data)));
         if isempty(convergence_axes)
-            semilogy(data, col, 'Linewidth', 2);
+            semilogy(dat, col, 'Linewidth', 2);
             convergence_axes = gca;
         else
-            semilogy(convergence_axes, data, col, 'Linewidth', 2);
+            semilogy(convergence_axes, dat, col, 'Linewidth', 2);
         end
     end
 
     function report(s, i, v, r)
         tr = norm(system*v-rhs);
-        fprintf(1, '%-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
+        fprintf(1, '    %-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
     end
 
 end
