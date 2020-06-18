@@ -833,20 +833,20 @@ void Fiber::setDragCoefficient()
         drag = dragCoefficientSurface(len, prop);
 #if ( 0 )
         real d = dragCoefficientCylinder(len, prop);
-        Cytosim::log << "Drag coefficient of Fiber near a planar surface amplified by " << drag/d << std::endl;
+        Cytosim::log << "Drag of Fiber near a planar surface amplified by " << drag/d << std::endl;
 #endif
     }
     else
         drag = dragCoefficientCylinder(len, prop);
 
-    //the forces are distributed equally on all points, hence we multiply by nPoints
+    // distribute drag equally to all points, by multiplying by number of Points
     assert_true( drag > 0 );
     iPointMobility = nPoints / drag;
     
 #if ( 0 )
     std::ostream& os = std::cerr; //Cytosim::log;
     os << "Fiber " << prop->name() << "  L = " << std::setw(7) << length();
-    os << "  has  drag " << drag << "    point_mobility " << iPointMobility << std::endl;
+    os << "  has  drag " << std::setw(9) << drag << "    point_mobility " << iPointMobility << std::endl;
 #endif
 }
 
