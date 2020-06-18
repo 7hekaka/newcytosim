@@ -49,11 +49,7 @@ int FilePath::change_dir(const char path[], bool make)
     if ( !path || *path == 0 )
         return 0;
     if ( make )
-    {
-        int res = mkdir(path, S_IRWXU|S_IRWXG|S_IRWXG|S_IXOTH);
-        if ( res )
-            return res;
-    }
+        mkdir(path, S_IRWXU|S_IRWXG|S_IRWXG|S_IXOTH);
     return chdir(path);
 }
 
