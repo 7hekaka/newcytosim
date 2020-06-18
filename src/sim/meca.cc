@@ -1876,8 +1876,7 @@ void Meca::saveRHS(FILE * file) const
 void Meca::saveSystem(const char dirname[]) const
 {
     std::string cwd = FilePath::get_cwd();
-    FilePath::make_dir(dirname);
-    FilePath::change_dir(dirname);
+    FilePath::change_dir(dirname, true);
     FILE * f = fopen("matrix.mtx", "w");
     if ( f && ~ferror(f) )
     {
@@ -2136,8 +2135,7 @@ void Meca::dump() const
 void Meca::dump(const char dirname[]) const
 {
     std::string cwd = FilePath::get_cwd();
-    FilePath::make_dir(dirname);
-    FilePath::change_dir(dirname);
+    FilePath::change_dir(dirname, true);
     dump();
     FilePath::change_dir(cwd);
     fprintf(stderr, "Cytosim exported a %iD system of size %lu in `%s'\n", DIM, dimension(), dirname);

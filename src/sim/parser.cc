@@ -727,7 +727,7 @@ void Parser::parse_read(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     bool required = true;
-    std::string file = Tokenizer::get_filename(is);
+    std::string file = Tokenizer::get_path(is);
     
     if ( file.empty() )
         throw InvalidSyntax("missing/invalid file name after 'read'");
@@ -788,7 +788,7 @@ void Parser::parse_import(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_token(is);
-    std::string file = Tokenizer::get_filename(is);
+    std::string file = Tokenizer::get_path(is);
     
     if ( what.empty() )
         throw InvalidSyntax("missing class specification (use `import all FILENAME')");
@@ -836,7 +836,7 @@ void Parser::parse_export(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_token(is);
-    std::string file = Tokenizer::get_filename(is);
+    std::string file = Tokenizer::get_path(is);
     
     if ( what.empty() )
         throw InvalidSyntax("missing class specification (use `export all FILENAME')");
@@ -884,7 +884,7 @@ void Parser::parse_report(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_symbols(is);
-    std::string file = Tokenizer::get_filename(is);
+    std::string file = Tokenizer::get_path(is);
 
     if ( file.empty() )
         throw InvalidSyntax("missing file name. Expected 'report WHAT FILE'");
@@ -1036,7 +1036,7 @@ void Parser::parse_end(std::istream& is)
  */
 void Parser::parse_dump(std::istream& is)
 {
-    std::string str = Tokenizer::get_token(is);
+    std::string str = Tokenizer::get_path(is);
     if ( str.empty() )
         throw InvalidSyntax("missing directory name after 'dump'");
 

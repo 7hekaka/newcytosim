@@ -137,12 +137,12 @@ std::string Tokenizer::get_symbols(std::istream& is, bool eat_line)
 }
 
 
-bool valid_filename_start(int c)
+bool valid_path_start(int c)
 {
     return isalpha(c) | (c=='/') | (c=='\\') | (c=='.');
 }
 
-bool valid_filename(int c)
+bool valid_path(int c)
 {
     return isalnum(c) | (c=='_') | (c=='-') | (c=='/') | (c=='\\') | (c=='.') | (c==':');
 }
@@ -150,7 +150,7 @@ bool valid_filename(int c)
 /**
  Return next token if it looks likes a path to a file name
  */
-std::string Tokenizer::get_filename(std::istream& is, bool eat_line)
+std::string Tokenizer::get_path(std::istream& is, bool eat_line)
 {
     int c = skip_space(is, eat_line);
     
@@ -160,10 +160,10 @@ std::string Tokenizer::get_filename(std::istream& is, bool eat_line)
         return "*";
     }
     
-    if ( !valid_filename_start(c) )
+    if ( !valid_path_start(c) )
         return "";
     
-    std::string res = get_stuff(is, valid_filename);
+    std::string res = get_stuff(is, valid_path);
     
     VLOG(" FILENAME |" << res << "|\n");
     

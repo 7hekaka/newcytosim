@@ -59,7 +59,7 @@ namespace Tokenizer
     std::string get_symbols(std::istream&, bool eat_line=false);
     
     /// return next token if it looks like a file name
-    std::string get_filename(std::istream&, bool eat_line=false);
+    std::string get_path(std::istream&, bool eat_line=false);
     
     /// return next token
     std::string get_token(std::istream&, bool eat_line=false);
