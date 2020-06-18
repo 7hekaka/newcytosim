@@ -784,16 +784,17 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
 
 
 /**
- Export dynamic state, positions and directions of fiber at both ends
+ Export dynamic state, positions and directions of fiber
+ Argument `end` can be MINUS_END, PLUS_END or BOTH_ENDS
  */
-void Simul::reportFiberEnds(std::ostream& out, FiberEnd which, Property const* sel, bool com) const
+void Simul::reportFiberEnds(std::ostream& out, FiberEnd end, Property const* sel, bool com) const
 {
     if ( com )
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
-        if ( which & PLUS_END )
+        if ( end & PLUS_END )
             out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
-        if ( which & MINUS_END )
+        if ( end & MINUS_END )
             out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
     }
     
@@ -804,13 +805,13 @@ void Simul::reportFiberEnds(std::ostream& out, FiberEnd which, Property const* s
             out << LIN << fib->prop->number();
             out << SEP << fib->identity();
             out << SEP << fib->length();
-            if ( which & PLUS_END )
+            if ( end & PLUS_END )
             {
                 out << SEP << fib->endStateP();
                 out << SEP << fib->posEndP();
                 out << SEP << fib->dirEndP();
             }
-            if ( which & MINUS_END )
+            if ( end & MINUS_END )
             {
                 out << SEP << fib->endStateM();
                 out << SEP << fib->posEndM();

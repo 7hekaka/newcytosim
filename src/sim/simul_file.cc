@@ -482,7 +482,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 //std::clog << " section |" << section << "|\n";
                 if ( section == "end" )
                     continue;
-                if ( section == "single" )
+                else if ( section == "single" )
                 {
                     int mod = 0;
                     iss >> tok >> mod;
@@ -495,7 +495,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                             singles.prune_free = mod;
                     }
                 }
-                if ( section == "couple" )
+                else if ( section == "couple" )
                 {
                     int mod = 0;
                     iss >> tok >> mod;

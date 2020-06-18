@@ -31,7 +31,7 @@ class CoupleSet: public ObjectSet
 {
 public:
     
-    ///
+    /// flags affecting how free Couples are read/written from file
     static bool prune_free, skip_free;
 
 private:
