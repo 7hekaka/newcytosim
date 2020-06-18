@@ -70,6 +70,33 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
     sup.set( radius_, radius_, top_);
 }
 
+
+Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
+{
+#if ( DIM > 2 )
+    if ( edge_ > 0 )
+    {
+        const real R = sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+        const real n = min_real(R, radius_-edge_) / R;
+        // projection on the inner cylinder:
+        const real X = n * pos.XX;
+        const real Y = n * pos.YY;
+        const real Z = max_real(min_real(pos.ZZ, top_-edge_), bot_+edge_);
+        return normalize(pos-Vector(X,Y,Z));
+    }
+    else
+    {
+        const real R = sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+        const real dZ = min_real(abs_real(pos.ZZ-top_), abs_real(bot_-pos.ZZ));
+        if ( abs_real(R-radius_) < dZ )
+            return Vector(pos.XX/R, pos.YY/R, 0);
+        else
+            return Vector(0, 0, std::copysign(1, 2*pos.ZZ-top_-bot_));
+    }
+#endif
+}
+
+
 /**
  Pappus's (2nd) Centroid Theorem: the volume of a planar area of revolution is
  the product of the area A and the length of the path traced by its centroid R,

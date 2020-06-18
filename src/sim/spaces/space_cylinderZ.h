@@ -59,6 +59,9 @@ public:
     
     /// radius
     real        thickness() const { return radius_; }
+    
+    /// direct normal direction calculation
+    Vector      normalToEdge(Vector const& pos) const;
 
     /// the volume inside
     real        volume() const;
