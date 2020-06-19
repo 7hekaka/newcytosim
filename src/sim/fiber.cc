@@ -170,7 +170,7 @@ Fiber::Fiber(FiberProp const* p)
     frGlue = nullptr;
 #endif
 #if FIBER_HAS_FAMILY
-    family_ = nullptr;
+    family_ = this;
     sister_ = nullptr;
     brother_ = nullptr;
 #endif
@@ -188,13 +188,9 @@ Fiber::Fiber(FiberProp const* p)
 */
 Vector Fiber::displayPosM(real ab) const
 {
-    if ( family_ )
-    {
-        Vector I = family_->posM(ab);
-        Vector O = posM(ab);
-        return I + 0.703 * ( O - I );
-    }
-    return posM(ab);
+    Vector I = family_->posM(ab);
+    Vector O = posM(ab);
+    return I + 0.703 * ( O - I );
 }
 
 Vector Fiber::radialDir(real ab) const
