@@ -139,7 +139,7 @@ public:
     void            flag(ObjectFlag f)    { flag_ = f; }
     
     /// set flag to match identity()
-    void            flag_to_identity()    { flag_ = identity(); }
+    void            matchFlagIdentity()   { flag_ = identity(); }
 
     
     /// a random number that makes objects unique

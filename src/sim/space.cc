@@ -273,7 +273,7 @@ Vector Space::bounce(Vector pos) const
  */
 Vector Space::normalToEdge(Vector const& pos) const
 {
-    const real goal = 10000*REAL_EPSILON*REAL_EPSILON;
+    const real goal = square(100*REAL_EPSILON);
     
     Vector P, M, res;
     Vector prj = project(pos);

@@ -2347,7 +2347,7 @@ void Simul::reportCoupleAnatomy(std::ostream& out) const
 void resetFlags(FiberSet const& set)
 {
     for ( Fiber * fib = set.first(); fib; fib=fib->next() )
-        fib->flag_to_identity();
+        fib->matchFlagIdentity();
 }
 
 
@@ -2395,13 +2395,11 @@ void Simul::flagClustersCouples() const
 /**
  equalize flag() when fibers are connected by a Couple of given type:
  */
-void Simul::flagClustersCouples(Property const* arg) const
+void Simul::flagClustersCouples(Property const* sel) const
 {
-    resetFlags(fibers);
-
     for ( Couple const* cx = couples.firstAA(); cx ; cx=cx->next() )
     {
-        if ( cx->prop == arg )
+        if ( cx->prop == sel )
         {
             ObjectFlag f1 = cx->fiber1()->flag();
             ObjectFlag f2 = cx->fiber2()->flag();
