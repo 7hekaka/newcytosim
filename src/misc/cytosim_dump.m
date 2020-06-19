@@ -5,7 +5,7 @@ function [sys, rhs, con] = cytosim_dump(path)
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019,
-% 11.08.2019, 17.08.2019, 7.01.2020, 3.06.2020, 15.06.2002, 17.06.2020
+% 11.08.2019, 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020
 
 if nargin < 1
     path = '.';
@@ -45,7 +45,6 @@ end
 
 fprintf(1, '----------------------- loaded system of size %i with time_step %f -----------------------\n', dim, time_step);
 
-mulcnt = 0;
 %% Check matrix
 
 %figure('name', 'System matrix'); imshow(abs(sys)); 
@@ -55,7 +54,7 @@ mulcnt = 0;
 if ( 1 )
     
     mat = eye(dim) - time_step * mob * ela;
-    err0 = max(max(abs(mat-sys)));
+    err0 = norm(mat-sys, 1);
     
     nbo = 0;
     nbv = 0;
@@ -105,8 +104,18 @@ if ( 0 )
     plot(abs(mat), 'vr');
 end
 if ( 0 )
-    figure('name', 'System matrix structure');
-    spy(mat)
+    uuu = eye(dim) - time_step * ela;
+    figure('name', 'System structure', 'Position', [150 300 1800 600]);
+    subplot(1,3,1);
+    spy(uuu);
+    subplot(1,3,2);
+    rcm = symrcm(uuu);
+    spy(uuu(rcm,rcm));
+    title('Reverse Cuthill-McKee ordering');
+    subplot(1,3,3);
+    amd = symamd(uuu);
+    spy(uuu(amd,amd));
+    title('Approximate Minimum Degree permutation');
     drawnow;
 end
 
@@ -117,9 +126,10 @@ reltol = abstol / norm(rhs);
 maxit = dim;
 system = sparse(sys);
 
+mulcnt = 0;
 solution = bicgstab(@multiply, rhs, reltol*0.001, maxit);
 
-fprintf(2, '    norm(sol - matlab_sol) = %f\n', norm(sol-solution));
+fprintf(2, '    %i vecmuls; norm(sol - matlab_sol) = %f\n', mulcnt, norm(sol-solution));
     
 if 0
     figure('Name', 'Validation of solution');;
@@ -255,6 +265,8 @@ end
 % we average all point drag coefficient to derive a matrix that is
 % symmetric and ammenable to incomplete Cholesky factorization
 
+fprintf(2, 'Mecable drag coefficients : %f +/- %f\n', mean(1./drg), var(1./drg));
+
 if 1
     
     val = time_step / mean(1./drg);
@@ -274,8 +286,26 @@ if 1
     convergence_plot(rv0/rv0(1),'k:');
     report('y bicgstab', mulcnt, vec, rv0(end));
     
+    try
+        OPT.michol = 'off';
+        OPT.type = 'ict';
+        OPT.droptol = 0.1;
+        L = ichol(DRY, OPT);
+        fprintf(2, 'dropped incomplete Cholesky has %i elements\n', nnz(L));
+        
+        mulcnt = 0;
+        [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+        convergence_plot(rv0/rv0(1),'k:');
+        report('y bicgstab', mulcnt, vec, rv0(end));
+    catch
+        fprintf(2, 'dropped incomplete Cholesky failed!\n');
+    end
+    
+    L = chol(DRY, 'lower');
+    fprintf(2, 'complete Cholesky has %i elements\n', nnz(L));
+
     mulcnt = 0;
-    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
     convergence_plot(rv0/rv0(1),'b:');
     report('y bicgstab(1)', mulcnt, vec, rv0(end));
 end
