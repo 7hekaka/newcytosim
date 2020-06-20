@@ -1766,6 +1766,81 @@ void Meca::apply()
 
 
 //------------------------------------------------------------------------------
+#pragma mark - Analysis Functions
+
+/** Assuming that Mecable::flag() have been set already */
+void Meca::flagClusters() const
+{
+    const size_t MAX = dimension() / DIM;
+    Mecable ** which = new Mecable*[MAX];
+    
+    //for ( size_t i = 0; i < MAX; ++i )
+    //    which[i] = nullptr;
+
+    for ( Mecable * mec : mecables )
+    {
+        //mec->matchFlagIdentity();
+        const size_t inx = mec->matIndex();
+        const size_t end = mec->nbPoints() + inx;
+        assert_true( end <= MAX );
+        for ( size_t i = inx; i < end; ++i )
+            which[i] = mec;
+    }
+    
+    /// equalize flags for any non-zero matrix element between Mecables:
+    for ( size_t jj = 0; jj < MAX; ++jj )
+    {
+        Mecable const* A = which[jj];
+        auto const& col = mC.column(DIM*jj);
+        for ( size_t n = 0; n < col.size_; ++n )
+        {
+            size_t ii = col.inx_[n]/DIM;
+            assert_true( ii < MAX );
+            Mecable const* B = which[ii];
+            if ( A->flag() != B->flag() )
+            {
+                ObjectFlag a = std::min(A->flag(), B->flag());
+                ObjectFlag b = std::max(A->flag(), B->flag());
+                // replace b -> a everywhere:
+                for ( Mecable * mec : mecables )
+                {
+                    if ( mec->flag() == b )
+                        mec->flag(a);
+                }
+            }
+        }
+    }
+    
+#if USE_ISO_MATRIX
+    /// equalize flags for any non-zero matrix element between Mecables:
+    for ( size_t jj = 0; jj < MAX; ++jj )
+    {
+        Mecable const* A = which[jj];
+        auto const* col = mB.column(jj);
+        for ( size_t n = 0; n < mB.column_size(jj); ++n )
+        {
+            size_t ii = col[n].inx;
+            assert_true( ii < MAX );
+            Mecable const* B = which[ii];
+            if ( A->flag() != B->flag() )
+            {
+                ObjectFlag a = std::min(A->flag(), B->flag());
+                ObjectFlag b = std::max(A->flag(), B->flag());
+                // replace b -> a everywhere:
+                for ( Mecable * mec : mecables )
+                {
+                    if ( mec->flag() == b )
+                        mec->flag(a);
+                }
+            }
+        }
+    }
+#endif
+    delete[] which;
+}
+
+
+//------------------------------------------------------------------------------
 #pragma mark - Debug/Output Functions
 
 

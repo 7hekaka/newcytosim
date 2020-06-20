@@ -544,6 +544,15 @@ void Simul::computeForces() const
 }
 
 
+void Simul::flagMecaClusters() const
+{
+    prop->complete(*this);
+    sMeca.prepare(this);
+    setAllInteractions(sMeca);
+    sMeca.flagClusters();
+}
+
+
 //==============================================================================
 //                           EXPERIMENTAL-DEBUG
 //==============================================================================

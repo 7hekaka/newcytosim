@@ -212,6 +212,9 @@ public:
     /// calculate Forces and Lagrange multipliers on the Mecables
     void            computeForces() const;
     
+    /// calculate clusters of Mecable derived from all interactions
+    void            flagMecaClusters() const;
+    
     /// this is used for development
     void            addExperimentalInteractions(Meca&) const;
     
@@ -530,15 +533,18 @@ public:
     
     /// flag fibers according to connectivity defined by Solids
     void      flagClustersSolids() const;
+    
+    /// analyse the network connectivity to identify isolated sub-networks
+    void      flagClusters(bool cop, bool sol, bool mec) const;
+    
+    /// change flag for fibers belonging to largest cluster
+    void      flagLargestCluster(ObjectFlag) const;
 
     /// order clusters in decreasing number of fibers
     int       orderClusters(std::ostream&, size_t threshold, int details) const;
     
     /// print size of clusters defined by connections with Couples
     void      reportClusters(std::ostream&, Glossary&) const;
-    
-    /// analyse the network connectivity to identify isolated sub-networks
-    void      flagClusters(bool order) const;
 
     /// flag the fibers that appear to constitute a ring
     size_t    flagRing() const;

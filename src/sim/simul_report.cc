@@ -2442,6 +2442,19 @@ void Simul::flagClustersSolids() const
 }
 
 
+void Simul::flagClusters(bool cop, bool sol, bool mec) const
+{
+    if ( ! ( cop | sol | mec ) )
+        throw InvalidSyntax("missing cluster type [couple|solid|meca]");
+
+    resetFlags(fibers);
+    if ( mec ) flagMecaClusters();
+    if ( cop ) flagClustersCouples();
+    if ( sol ) flagClustersSolids();
+    flagLargestCluster(1UL);
+}
+
+
 /// class to store info about a Cluster
 struct Cluster
 {
@@ -2453,10 +2466,47 @@ struct Cluster
 };
 
 
-/*
-Clusters are ordered from 1 to max, in decreasing order
-Returns the number of clusters, `max`, and set the fiber's
-flags according to the corresponding cluster index.
+/**
+Set Mecable::flag() to 'f' for Mecables in the largest cluster
+*/
+void Simul::flagLargestCluster(ObjectFlag f) const
+{
+    typedef std::map<ObjectFlag, size_t> map_t;
+    map_t map;
+
+    // extract clusters in 'map' and reset fiber's flag:
+    for ( Fiber* fib = fibers.first(); fib; fib = fib->next() )
+        ++map[fib->flag()];
+    
+    size_t size = 0;
+    ObjectFlag largest = 0;
+    // insert clusters with size information to get them sorted:
+    for ( map_t::value_type const& i : map )
+    {
+        if ( i.second > size )
+        {
+            largest = i.first;
+            size = i.second;
+        }
+    }
+    
+    if ( size > 2 )
+    {
+        // swap 'largest' and 'f':
+        for ( Fiber* fib = fibers.first(); fib; fib = fib->next() )
+        {
+            if ( fib->flag() == f )
+                fib->flag(largest);
+            else if ( fib->flag() == largest )
+                fib->flag(f);
+        }
+    }
+}
+
+/**
+Order Clusters from 1 to max, in order of decreasing size,
+and set fiber:flag() to the corresponding cluster index.
+@return number of clusters
 */
 int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
 {
@@ -2513,36 +2563,21 @@ int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
 }
 
 
-void Simul::flagClusters(bool order) const
-{
-    resetFlags(fibers);
-    flagClustersCouples();
-    if ( order )
-    {
-        std::ofstream nos("/dev/null");
-        orderClusters(nos, 2, 0);
-    }
-}
-
-
 /**
- Export size of clusters found by Simul::flagClusters()
+ Export clusters defined by Simul::flagClusters()
  Clusters are ordered in decreasing size.
  */
 void Simul::reportClusters(std::ostream& out, Glossary& opt) const
 {
-    int details = 2, sol = 0, cop = 1;
+    int details = 2;
+    bool C = false, S = false, M = false;
+
     opt.set(details, "details");
-    opt.set(cop, "couples");
-    opt.set(sol, "solids");
-
-    resetFlags(fibers);
-
-    if ( cop )
-        flagClustersCouples();
+    opt.set(C, "couples") || opt.set(C, "couple");
+    opt.set(S, "solids") || opt.set(S, "solid");
+    opt.set(M, "meca");
     
-    if ( sol )
-        flagClustersSolids();
+    flagClusters(C, S, M);
     
     out << COM << "cluster" << SEP << "nb_fibers :" << SEP << "fiber_id";
     orderClusters(out, 2, details);
@@ -2559,7 +2594,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
  */
 size_t Simul::flagRing() const
 {
-    flagClusters(false);
+    flagClusters(1, 0, 0);
 
     typedef std::list<ObjectFlag> list_t;
     list_t ring;

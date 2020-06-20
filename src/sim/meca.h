@@ -625,7 +625,10 @@ public:
     void computeForces();
     
     //----------------------- EXPORT/DEBUG FUNCTIONS ---------------------------
-
+    
+    /// set Mecable:flag() according to connectivity defined by matrix elements
+    void flagClusters() const;
+    
     /// Count number of non-zero entries in the entire system
     size_t nbNonZeros(real threshold) const;
 

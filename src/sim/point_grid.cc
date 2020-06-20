@@ -53,6 +53,7 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
     return pGrid.nbCells();
 }
 
+
 void PointGrid::createCells()
 {
     pGrid.createCells();
@@ -64,8 +65,7 @@ void PointGrid::createCells()
     max_diameter = pGrid.minimumWidth(1);
     
     //report the grid size used
-    if ( pGrid.nbCells() > 4096 )
-        pGrid.printSummary(std::clog, "StericGrid");
+    pGrid.printSummary(std::clog, "StericGrid");
 }
 
 
