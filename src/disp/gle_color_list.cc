@@ -48,7 +48,7 @@ static gle_color nice_colors[] = {
 
 /// List of Francois's named colors
 gle::named_color std_colors[] = {
-    {"dark_gray",     0x404040FF},
+    {"gray",          0x707070FF},
     {"aquamarine",    0x66DDAAFF},
     {"azur",          0xF0FFFFFF},
     {"beige",         0x908470FF},
@@ -62,6 +62,7 @@ gle::named_color std_colors[] = {
     {"crimson",       0xCC0033FF},
     {"cyan",          0x00FFFFFF},
     {"dark_blue",     0x000080FF},
+    {"dark_gray",     0x404040FF},
     {"dark_green",    0x008000FF},
     {"dark_orange",   0xAA6E00FF},
     {"dark_purple",   0x800080FF},
@@ -87,7 +88,6 @@ gle::named_color std_colors[] = {
     {"flesh",         0xF4D3B4FF},
     {"gold",          0xD4A017FF},
     {"grass_green",   0x408080FF},
-    {"gray",          0x707070FF},
     {"grey",          0x707070FF},
     {"green",         0x00EE00FF},
     {"green_blue",    0x2E8B57FF},
