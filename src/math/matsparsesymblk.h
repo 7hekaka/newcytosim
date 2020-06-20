@@ -53,6 +53,7 @@ private:
     class Column
     {
         friend class MatrixSparseSymmetricBlock;
+        friend class Meca;
 
         size_t       allo_;   ///< allocated size of array
         size_t       size_;   ///< number of blocks in column
@@ -140,10 +141,10 @@ private:
     size_t   alloc_;
 
     /// array col_[c][] holds Elements of column 'c'
-    Column *  column_;
+    Column * column_;
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
-    size_t *  next_;
+    size_t * next_;
 
 public:
     
@@ -167,6 +168,9 @@ public:
     
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
+    
+    /// return column at index j
+    Column const& column(size_t j) const { return column_[j]; }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
     SquareBlock& block(const size_t ii, const size_t jj)

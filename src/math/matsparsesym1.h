@@ -135,6 +135,12 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t sz);
     
+    /// return column at index j
+    Element const* column(size_t j) const { return column_[j]; }
+    
+    /// number of elements in j-th column
+    size_t column_size(size_t j) const { return col_size_[j]; }
+
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;
 

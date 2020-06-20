@@ -1164,7 +1164,6 @@ void lapack_xgetrsN(int N, int NRHS, const real* A, int LDA, const int* IPIV, re
         alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
         alsatian_xtrsmLUN1<'N'>(N, A, LDA, B);
-        
         B += LDB;
     }
 }

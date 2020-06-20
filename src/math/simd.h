@@ -336,12 +336,20 @@ inline vec4 cross4(vec4 a, vec4 b)
 #endif
 }
 
-/// streamload is a load that bypass the cache
+/*
+ Using `stream_load` may or may not improve performance
+ It is a aligned load intruction that bypasses the cache.
+ It would be advantageous if the cache is too small to hold the whole `data',
+ since in this case data caching would simply load value that are not used anymore
+ */
 inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
+
+/// streamload is a load that bypass the cache
+//inline vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 #elif defined __AVX__
 
-inline vec4 streamload4(double const* a) { return _mm256_load_pd(a); }
+inline vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 inline vec4 interleave4(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
 inline vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }

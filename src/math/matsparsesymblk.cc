@@ -809,10 +809,11 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_SSE(const real* X, real* Y,
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
+    assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     // xy = { X0 X1 X0 X1 }
     vec4 xy = broadcast2(X+jj);
-    //multiply with full block, assuming it was symmetrized:
+    //multiply with full block, assuming it is symmetric:
     //real Y0 = M[0] * X0 + M[1] * X1;
     //real Y1 = M[1] * X0 + M[3] * X1;
     
@@ -868,6 +869,7 @@ inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
+    assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(streamload4(blk_[0]), xyxy);
@@ -923,6 +925,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU(const real* X, real* Y
 void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
+    assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(streamload4(blk_[0]), xyxy);
@@ -991,8 +994,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D_AVXU4(const real* X, real* 
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
+    assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
-    // load 3x3 matrix element into 3 vectors:
+    // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = blk_[0];
     
     //multiply with the symmetrized block, assuming it has been symmetrized:
@@ -1076,6 +1080,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
 void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
+    assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     constexpr size_t BS = sizeof(SquareBlock)/sizeof(real);
     const real* M = blk_[0];
@@ -1189,6 +1194,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
 void MatrixSparseSymmetricBlock::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
+    assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
     real const* D = blk_[0];
     //multiply with the symmetrized block, assuming it has been symmetrized:
