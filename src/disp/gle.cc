@@ -20,7 +20,7 @@ namespace gle
     GLfloat co_[ncircle+1] = { 0 };
     
     /// vertex buffer objects for tubes
-    GLuint tub_buf[12] = { 0 };
+    GLuint tub_buf[14] = { 0 };
     
     /// vertex buffer objects for hex tubes
     GLuint hex_buf[2] = { 0 };
@@ -750,8 +750,9 @@ namespace gle
             initTubeBuffer(tub_buf[ 2], tub_buf[ 3],  0.0, 1.0, 4);
             initTubeBuffer(tub_buf[ 4], tub_buf[ 5],  0.0, 1.0, 2);
             initTubeBuffer(tub_buf[ 6], tub_buf[ 7],  0.0, 1.0, 1);
-            initTubeBuffer(tub_buf[ 8], tub_buf[ 9], -0.25, 1.25, 8);
-            initTubeBuffer(tub_buf[10], tub_buf[11], -0.25, 1.25, 4);
+            initTubeBuffer(tub_buf[ 8], tub_buf[ 9], -0.25, 1.25, 16);
+            initTubeBuffer(tub_buf[10], tub_buf[11], -0.25, 1.25, 8);
+            initTubeBuffer(tub_buf[12], tub_buf[13], -0.25, 1.25, 4);
         }
         if ( !glIsBuffer(hex_buf[0]) )
         {
@@ -766,8 +767,9 @@ namespace gle
     void gleTube2B()     { drawTubeBuffer(tub_buf[ 2], tub_buf[ 3], 2+ncircle/2); }
     void gleTube4B()     { drawTubeBuffer(tub_buf[ 4], tub_buf[ 5], 2+ncircle  ); }
     void gleTube8B()     { drawTubeBuffer(tub_buf[ 6], tub_buf[ 7], 2+ncircle*2); }
-    void gleLongTube1B() { drawTubeBuffer(tub_buf[ 8], tub_buf[ 9], 2+ncircle/4); }
-    void gleLongTube2B() { drawTubeBuffer(tub_buf[10], tub_buf[11], 2+ncircle/2); }
+    void gleLongTube1B() { drawTubeBuffer(tub_buf[ 8], tub_buf[ 9], 2+ncircle/8); }
+    void gleLongTube2B() { drawTubeBuffer(tub_buf[10], tub_buf[11], 2+ncircle/4); }
+    void gleLongTube4B() { drawTubeBuffer(tub_buf[12], tub_buf[13], 2+ncircle/2); }
     void gleHexTube1B()  { drawTubeBuffer(hex_buf[0], hex_buf[1], 14); }
 #else
     // unbuffered functions:
@@ -777,6 +779,7 @@ namespace gle
     void gleTube8B()     { gleTube8(); }
     void gleLongTube1B() { gleLongTube1(); }
     void gleLongTube2B() { gleLongTube2(); }
+    void gleLongTube2B() { gleLongTube4(); }
     void gleHexTube1B()  { gleHexTube1(0, 1); }
 #endif
  

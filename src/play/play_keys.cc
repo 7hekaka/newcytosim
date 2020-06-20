@@ -318,6 +318,8 @@ void changeColoring(FiberDisp* p, int)
         case FiberDisp::COLORING_CLUSTER:   flashText("Fibers coloring by cluster");   break;
         case FiberDisp::COLORING_AGE:       flashText("Fibers coloring by age");       break;
     }
+    if ( p->coloring )
+        p->line_style = 1;
 }
 
 

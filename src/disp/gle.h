@@ -199,9 +199,11 @@ namespace gle
     /// draw a nicer open tube along Z, of diameter 1 and length 1
     inline void gleTube8()     { gleTube0(0, 1, 1); }
     /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
-    inline void gleLongTube1() { gleTube0(-0.25f, 1.25f, 4); }
+    inline void gleLongTube1() { gleTube0(-0.25f, 1.25f, 8); }
     /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
-    inline void gleLongTube2() { gleTube0(-0.25f, 1.25f, 2); }
+    inline void gleLongTube2() { gleTube0(-0.25f, 1.25f, 4); }
+    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    inline void gleLongTube4() { gleTube0(-0.25f, 1.25f, 2); }
     /// draw an open tube along Z, of diameter 1 and length 1, Z=[0, 1]
     void gleHexTube1(GLfloat Zmin, GLfloat Zmax);
     /// draw a closed tube along Z, or diameter 1 and length 1
@@ -253,6 +255,7 @@ namespace gle
     void gleTube8B();
     void gleLongTube1B();
     void gleLongTube2B();
+    void gleLongTube4B();
     void gleHexTube1B();
     
     void gleSphere1B();
