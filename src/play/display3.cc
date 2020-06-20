@@ -1081,6 +1081,17 @@ void Display3::drawSinglesF(SingleSet const& set) const
     for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
     {
         obj->disp()->color2.load_both();
+#if ( 0 )
+        Space const* spc = obj->confineSpace();
+        if ( spc && nullptr == obj->base() )
+        {
+            /// draw a disc tangent to the Space:
+            Vector pos = obj->posFoot();
+            Vector dir = spc->normalToEdge(pos);
+            gleObject(pos, dir, obj->disp()->size*sFactor, gleDisc);
+        }
+        else
+#endif
         drawPoint(obj->posFoot(), obj->disp());
     }
 }
@@ -1100,8 +1111,19 @@ void Display3::drawSinglesA(SingleSet const& set) const
                 Vector pf = obj->posFoot();
                 if ( modulo ) pf = modulo->image(pf, ph);
                 disp->color2.load_both();
-#if ( DIM >= 3 )
-                gleTube(ph, pf, disp->width*sFactor);
+#if ( 0 )
+                Space const* spc = obj->confineSpace();
+                if ( spc && nullptr == obj->base() )
+                {
+                    /// draw a disc tangent to the Space:
+                    Vector dir = spc->normalToEdge(pf);
+                    gleObject(pf, dir, disp->size*sFactor, gleDisc);
+                    gleTube(ph, pf, disp->width*sFactor, gleCone1);
+                }
+                else
+#endif
+#if ( DIM > 2 )
+                gleTube(ph, pf, disp->width*sFactor, gleCone1);
 #else
                 gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
