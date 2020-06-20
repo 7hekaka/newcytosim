@@ -118,6 +118,8 @@ public:
     real y() const { return YY; }
     /// return z-component
     real z() const { return ZZ; }
+    /// return t-component
+    real t() const { return TT; }
 
     /// copy coordinates from array of size d
     void load(const real v[], const int& d)
