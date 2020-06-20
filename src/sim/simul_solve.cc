@@ -526,10 +526,10 @@ void Simul::computeForces() const
         else
         {
 #if ( 0 )
-            /* if the simulation is running live, the force are already available
-            and we can check here that the result are similar */
+            /* if the simulation is running live, the force are already available.
+            This code is used to check that recalculating gives similar results */
             fibers.first()->printTensions(std::clog);
-            setInteractions(sMeca);
+            setAllInteractions(sMeca);
             sMeca.computeForces();
             fibers.first()->printTensions(std::clog);
             std::clog<<"\n";

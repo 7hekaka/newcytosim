@@ -2476,11 +2476,11 @@ int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
     }
     
     // insert clusters with size information to get them sorted:
-    for ( map_t::const_iterator c = map.begin(); c != map.end(); ++c )
+    for ( map_t::value_type const& i : map )
     {
-        size_t s = c->second.size();
+        size_t s = i.second.size();
         if ( s >= threshold )
-            clusters.emplace(c->first, s);
+            clusters.emplace(i.first, s);
     }
     
     if ( details > 0 )
@@ -2488,17 +2488,17 @@ int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
     
     // consider clusters by decreasing size:
     size_t idx = 0;
-    for ( set_t::const_iterator cc = clusters.begin(); cc != clusters.end(); ++cc )
+    for ( set_t::value_type const& c : clusters )
     {
         ++idx;
-        list_t const& list = map[cc->flg];
+        list_t const& list = map[c.flg];
         
         for ( Fiber * i : list )
             i->flag(idx);
 
         if ( details > 0 )
         {
-            out << LIN << cc->flg << SEP << cc->cnt;
+            out << LIN << c.flg << SEP << c.cnt;
             
             if ( details > 1 )
             {

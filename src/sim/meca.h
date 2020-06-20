@@ -146,6 +146,9 @@ private:
     
     /// size of the currently allocated memory
     size_t          allocated_;
+    
+    /// residual threshold used for iterative solver
+    real            tolerance_;
 
     //--------------------------------------------------------------------------
     // Vectors of size DIM * nbPoints()

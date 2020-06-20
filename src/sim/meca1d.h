@@ -110,7 +110,7 @@ public:
         size_t ii = 0;
         for ( Mecable * mec : mecables )
         {
-            mec->matIndex(ii);
+            mec->setIndex(ii);
             mec->setDragCoefficient();
             // Put the x coordinate of the origin in vSOL[ii]
             vSOL[ii] = mec->posPoint(0).XX;

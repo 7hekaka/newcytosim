@@ -74,7 +74,6 @@ void Simul::prepare()
         throw InvalidSyntax("A space must be defined first!");
 
     // make sure properties are ready for simulations:
-    sReady = true;
     prop->complete(*this);
     
     // prepare grid for attachments:
@@ -86,6 +85,8 @@ void Simul::prepare()
     // this prepares for 'fast_diffusion':
     singles.prepare(properties);
     couples.prepare(properties);
+    
+    sReady = true;
 }
 
 

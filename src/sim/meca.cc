@@ -1282,7 +1282,7 @@ void Meca::prepare(Simul const* sim)
     size_t cnt = 0;
     for ( Mecable * mec : mecables )
     {
-        mec->matIndex(cnt);
+        mec->setIndex(cnt);
         cnt += mec->nbPoints();
     }
     nPoints_ = cnt;
@@ -1560,10 +1560,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     // NOTE: the tolerance to solve the system should be such that the solution
     // found does not depend on the initial guess.
     
-    real abstol = noiseLevel * prop->tolerance;
+    tolerance_ = noiseLevel * prop->tolerance;
     
     if ( prop->kT == 0 )
-        abstol = prop->tolerance;
+        tolerance_ = prop->tolerance;
     
     /*
      With exact arithmetic, biConjugate Gradient should converge at most
@@ -1572,7 +1572,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      We set here this theoretical limit to the number multiplications:
      */
 
-    LinearSolvers::Monitor monitor(2*dimension(), abstol);
+    LinearSolvers::Monitor monitor(2*dimension(), tolerance_);
 
     //fprintf(stderr, "Solve precond %i size %6i absolute tolerance %f\n", precond, dimension(), abstol);
     
@@ -1674,7 +1674,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         if ( !monitor.converged() )
         {
             // no method could converge... this is really bad!
-            if ( monitor.residual() > 4*abstol )
+            if ( monitor.residual() > 4*tolerance_ )
                 throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
             return 0;
         }
@@ -2024,13 +2024,15 @@ void Meca::dumpObjectID(FILE * file) const
 {
     real * vec = new_real(largestMecable());
     
-    for ( size_t ii = 0; ii < mecables.size(); ++ii )
+    int ii = 0;
+    for ( Mecable const* mec : mecables )
     {
-        const size_t nbp = mecables[ii]->nbPoints();
-        for ( size_t p=0; p < nbp; ++p )
+        const size_t nbp = mec->nbPoints();
+        for ( size_t p = 0; p < nbp; ++p )
             vec[p] = ii;
         for ( int d = 0; d < DIM; ++ d )
             fwrite(vec, sizeof(real), nbp, file);
+        ++ii;
     }
     
     free_real(vec);
@@ -2091,7 +2093,7 @@ void Meca::dump() const
     fclose(f);
     
     f = fopen("stp.txt", "w");
-    fprintf(f, "%f\n", time_step);
+    fprintf(f, "%f %f\n", time_step, tolerance_);
     fclose(f);
  
     f = fopen("drg.bin", "wb");
