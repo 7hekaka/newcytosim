@@ -141,9 +141,12 @@ namespace gle
     //------------------------------------------------------------------------------
 #pragma mark -
 
-    /// call glVertex() along a centered 2D circle of radius 1 in plane XY
+    /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void gleCircle();
+    /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void gleDisc();
+    /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
+    void gleDisc2();
     /// draw a triangle of radius 1 in plane XY, normals pointing in +Z
     void gleTriangleS();
     void gleTriangleL();
@@ -245,6 +248,7 @@ namespace gle
     inline void gleArrowTailB()    { gleArrowTail1();   }
     inline void gleCircleB()       { gleCircle();       }
     inline void gleDiscB()         { gleDisc();         }
+    inline void gleDisc2B()        { gleDisc2();        }
     inline void gleCylinderB()     { gleCylinderZ();    }
     inline void gleConeB()         { gleCone1();        }
     inline void gleLongConeB()     { gleLongCone1();    }

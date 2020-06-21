@@ -137,7 +137,7 @@ void PointDisp::paintShape() const
         case 's': gle::gleStarS();      break;
         case '+': gle::glePlusS();      break;
         case 'c': break;
-        default:  gle::gleDisc();    break;
+        default:  gle::gleDisc();       break;
     }
 }
 
