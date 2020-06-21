@@ -1114,7 +1114,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
                 Vector pf = obj->posFoot();
                 if ( modulo ) pf = modulo->image(pf, ph);
                 disp->color2.load_both();
-#if ( 1 )
+#if ( 0 )
                 if ( obj->disp()->style == 2 )
                 {
                     Space const* spc = obj->confineSpace();
@@ -1123,13 +1123,11 @@ void Display3::drawSinglesA(SingleSet const& set) const
                         /// draw a disc tangent to the Space:
                         Vector dir = spc->normalToEdge(pf);
                         gleObject(pf, dir, disp->size*sFactor, gleDisc);
-                        gleTube(ph, pf, disp->width*sFactor, gleCone1);
                     }
-                    continue;
                 }
 #endif
 #if ( DIM > 2 )
-                gleTube(ph, pf, disp->width*sFactor, gleCone1);
+                gleTube(pf, ph, disp->width*sFactor, gleCone1);
 #else
                 gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
