@@ -158,11 +158,11 @@ Vector SpacePolygon::project(Vector const& W) const
         {
             // inside in the Z axis and the XY polygon:
             // to the polygonal edge in XY plane:
-            real hh = (W.XX-P.XX)*(W.XX-P.XX) + (W.YY-P.YY)*(W.YY-P.YY);
+            real HH = (W.XX-P.XX)*(W.XX-P.XX) + (W.YY-P.YY)*(W.YY-P.YY);
             // to the top/bottom plates:
-            real v = height_ - abs_real(W.ZZ);
+            real V = height_ - abs_real(W.ZZ);
             // compare distances
-            if ( v * v < hh )
+            if ( V * V < HH )
                 return Vector(W.XX, W.YY, std::copysign(height_, W.ZZ));
         }
         P.ZZ = W.ZZ;
@@ -200,13 +200,15 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
     else if ( in )
     {
         // Compare distance to top/bottom plate:
-        real v = height_ - abs_real(pos.ZZ);
+        real V = height_ - abs_real(pos.ZZ);
         // and distance to polygonal edge in XY plane:
-        real hh = (pos.XX-pX)*(pos.XX-pX) + (pos.YY-pY)*(pos.YY-pY);
+        real HH = (pos.XX-pX)*(pos.XX-pX) + (pos.YY-pY)*(pos.YY-pY);
         
-        if ( v * v < hh )
+        if ( V * V < HH )
+        {
             meca.addPlaneClampZ(pe, std::copysign(height_, pos.ZZ), stiff);
-        return;
+            return;
+        }
     }
 #endif
 
