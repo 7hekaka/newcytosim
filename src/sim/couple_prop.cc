@@ -85,7 +85,8 @@ void CoupleProp::read(Glossary& glos)
                                           {"surface", CONFINE_ON},
                                           {"inside",  CONFINE_INSIDE}});
     
-    if ( glos.is_number("confine", 1) )
+    real val;
+    if ( glos.set(val, "confine", 1) && val > 0 )
         throw InvalidParameter(name()+":confine[1] is ignored");
 
     //glos.set(confine_stiffness, "confine", 1);
@@ -173,7 +174,7 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "trans_activated", trans_activated);
     write_value(os, "min_loop",        min_loop);
     write_value(os, "specificity",     specificity);
-    write_value(os, "confine",         confine, "", confine_space);
+    write_value(os, "confine",         confine, 0, confine_space);
     write_value(os, "activity",        activity);
 }
 

@@ -514,11 +514,21 @@ namespace gle
         glNormal3f(0, 0, 1);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(0, 0);
-        for( size_t n = 0; n <= ncircle; ++n )
+        for( size_t n = 0; n <= ncircle; n+=4 )
             glVertex2f(co_[n], si_[n]);
         glEnd();
     }
     
+    void gleDisc2()
+    {
+        glNormal3f(0, 0, 1);
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(0, 0);
+        for( size_t n = 0; n <= ncircle; ++n )
+            glVertex2f(co_[n], si_[n]);
+        glEnd();
+    }
+
     //-----------------------------------------------------------------------
     
     void gleStarS()

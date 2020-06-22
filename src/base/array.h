@@ -112,7 +112,7 @@ public:
     {
     }
 
-    /// set chunk size to `k` (do not allocate)
+    /// allocate to hold `a` objects and set chunk size to `k`
     Array(size_t a, size_t k) : nbo_(0)
     {
         //printf("Array %p constructor size %i\n", this, alc_);

@@ -7,15 +7,15 @@
 #include "vector.h"
 #include "array.h"
 #include "grid.h"
+#include "fiber.h"
+#include "fiber_segment.h"
 //#include <vector>
 
 class Simul;
 class PropertyList;
-class FiberSegment;
 class FiberSet;
 class Modulo;
 class Space;
-class Fiber;
 class HandProp;
 class Hand;
 class Node;
@@ -57,6 +57,25 @@ public:
 
     /// type of grid
     typedef Grid<SegmentList, DIM> grid_type;
+
+#if ATTACH_CLOSEST_FIBER
+
+    class HeavySegment
+    {
+    public:
+        FiberSegment seg_;
+        real         dis_;
+        real         abs_;
+        HeavySegment() { }
+        HeavySegment(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
+    };
+    
+    typedef Array<HeavySegment> HeavySegmentList;
+
+    /// used for tryToAttach()
+    mutable HeavySegmentList targets;
+    
+#endif
     
 private:
     
@@ -85,9 +104,6 @@ public:
     
     /// given a position, find nearby Fiber segments and test attachement of the provided Hand
     void         tryToAttach(Vector const&, Hand&) const;
-    
-    /// given a position, find nearby Fiber segments and test attachement of the provided Hand
-    void         tryToAttach1(Vector const&, Hand&) const;
 
     /// return all Fiber segments located near P, within distance squared, except those belonging to `exclude`
     SegmentList  nearbySegments(Vector const&, real disSqr, Fiber * exclude = nullptr) const;

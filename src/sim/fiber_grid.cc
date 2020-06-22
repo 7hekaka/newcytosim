@@ -249,24 +249,11 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 
 #if ATTACH_CLOSEST_FIBER
 
-class HeavySegment
-{
-public:
-    FiberSegment seg_;
-    real         dis_;
-    real         abs_;
-    HeavySegment() { }
-    HeavySegment(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
-};
-
-
-typedef Array<HeavySegment> HeavySegmentList;
-
 /// used to qsort segments according to distance
 int compareSegments(const void * A, const void * B)
 {
-    real a = static_cast<HeavySegment const*>(A)->dis_;
-    real b = static_cast<HeavySegment const*>(B)->dis_;
+    real a = static_cast<FiberGrid::HeavySegment const*>(A)->dis_;
+    real b = static_cast<FiberGrid::HeavySegment const*>(B)->dis_;
     
     return ( a > b ) - ( b > a );
 }
@@ -289,9 +276,10 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      find the cell whose center is closest to the position, and
      get the list of segments associated with this cell in FiberGrid::paintGrid
      */
-    SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
-    HeavySegmentList targets(16, 16);
-
+    SegmentList const& segments = fGrid.icell(fGrid.index(place, 0.5));
+    // using here the member variable 'targets' as a temporary list:
+    targets.clear();
+    
     // calculate distance to all targets
     const real sup = ha.prop->binding_range_sqr;
     for ( FiberSegment const& seg : segments )
@@ -334,106 +322,6 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     }
 }
 
-
-/**
-This version of tryToAttach() uses the Stack instead of the head to store targets
- */
-void FiberGrid::tryToAttach1(Vector const& place, Hand& ha) const
-{
-    assert_true( hasGrid() );
-    /*
-     find the cell whose center is closest to the position, and
-     get the list of segments associated with this cell in FiberGrid::paintGrid
-     */
-    SegmentList & segments = fGrid.icell(fGrid.index(place, 0.5));
-    
-    constexpr size_t MAX_TARGETS = 16;
-    HeavySegment targets[MAX_TARGETS];
-    size_t n_targets = 0;
-
-    HeavySegmentList more_targets(0, 16);
-
-    // calculate distance to all targets
-    const real sup = ha.prop->binding_range_sqr;
-    for ( FiberSegment const& seg : segments )
-    {
-        if ( ha.keyMatch(seg.fiber()) )
-        {
-            real dis = INFINITY;
-            real abs = seg.projectPoint(place, dis);
-            //std::clog << " target " << seg << " at " << dis << "\n";
-            if ( dis < sup )
-            {
-                if ( n_targets < MAX_TARGETS )
-                {
-                    targets[n_targets].seg_ = seg;
-                    targets[n_targets].dis_ = dis;
-                    targets[n_targets].abs_ = abs;
-                    ++n_targets;
-                }
-                else
-                {
-                    more_targets.emplace_back(seg, dis, abs);
-                }
-            }
-        }
-    }
-    
-    /**
-     Instead of flipping a coin for each target, we could use a single random
-     number to get the index of the next target that will bind, using a Poisson
-     distribution */
-    const real prob = ha.prop->binding_prob;
-
-    // sort targets within range from close to distant:
-    if ( more_targets.size() > 0 )
-    {
-        std::clog << "tryToAttachClosest has " << n_targets << " + " << more_targets.size() << " targets / " << segments.size() << "\n";
-        more_targets.allocate(more_targets.size()+MAX_TARGETS);
-        for ( size_t i = 0; i < n_targets; ++i )
-            more_targets.push_back(targets[i]);
-        n_targets = 0;
-        more_targets.sort(compareSegments);
-        
-        for ( HeavySegment const& target : more_targets )
-        {
-            //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
-            if ( RNG.test(prob) )
-            {
-                FiberSegment const& seg = target.seg_;
-                Fiber * fib = const_cast<Fiber*>(seg.fiber());
-                FiberSite pos(fib, seg.abscissa1()+target.abs_);
-                if ( ha.attachmentAllowed(pos) )
-                {
-                    ha.attach(pos);
-                    return;
-                }
-            }
-        }
-    }
-    else if ( n_targets > 1 )
-    {
-        std::qsort(targets, n_targets, sizeof(HeavySegment), compareSegments);
-        
-        for ( size_t i = 0; i < n_targets; ++i )
-        {
-            HeavySegment const& target = targets[i];
-            //FiberSegment const& seg = target.seg_;
-            //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
-            if ( RNG.test(prob) )
-            {
-                FiberSegment const& seg = target.seg_;
-                Fiber * fib = const_cast<Fiber*>(seg.fiber());
-                FiberSite pos(fib, seg.abscissa1()+target.abs_);
-                if ( ha.attachmentAllowed(pos) )
-                {
-                    ha.attach(pos);
-                    return;
-                }
-            }
-        }
-    }
-}
 
 #else
 

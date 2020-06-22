@@ -517,7 +517,7 @@ void glApp::processNormalKey(unsigned char c, int, int)
         //------------------------- Zoom in and out:
             
         case '-':
-            if ( glutGetModifiers() & GLUT_ACTIVE_ALT )
+            if ( glutGetModifiers() )
                 view.zoom_out(1.071773463f);
             else
                 view.zoom_out(1.4142135623f);
@@ -525,7 +525,7 @@ void glApp::processNormalKey(unsigned char c, int, int)
         
         case '=':
         case '+':
-            if ( glutGetModifiers() & GLUT_ACTIVE_ALT )
+            if ( glutGetModifiers() )
                 view.zoom_in(1.071773463);
             else
                 view.zoom_in(1.4142135623f);
