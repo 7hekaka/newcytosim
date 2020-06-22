@@ -448,6 +448,8 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
  */
 int Polygon::project(real xx, real yy, real& pX, real& pY, size_t& hit) const
 {
+    if ( npts_ < 1 )
+        throw InvalidParameter("Cannot project on uninitialized polygon");
     int res = 0;
     
     //initialize with first point:
