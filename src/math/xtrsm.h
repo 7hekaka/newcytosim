@@ -4,6 +4,18 @@
 #ifndef XTRSM_H
 #define XTRSM_H
 
+#ifdef __SSE3__
+#  define XTRSM_USES_SSE3 REAL_IS_DOUBLE
+#else
+#  define XTRSM_USES_SSE3 0
+#endif
+
+#ifdef __AVX__
+#  define XTRSM_USES_AVX REAL_IS_DOUBLE
+#else
+#  define XTRSM_USES_AVX 0
+#endif
+
 /**
  This is a C-translation of the BLAS reference implementation of DTRSM
  FJN 03.05.2020
@@ -430,7 +442,7 @@ void iso_xtrsmLUT(const int M, const real* A, const int lda, real* B)
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DTRSM
 
-#ifdef __AVX__
+#if XTRSM_USES_AVX
 
 /// specialized version for ORD==3, FJN 4.5.2020
 /*
@@ -798,7 +810,7 @@ void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
 #endif
 
 
-#ifdef __SSE3__
+#if XTRSM_USES_SSE3
 
 /// specialized version for ORD==2
 template < char diag >
@@ -1027,7 +1039,7 @@ void alsatian_xpotrsLtest(const int N, const real* A, const int LDA, real* B)
 template < int ORD >
 void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
-#ifdef __AVX__
+#if XTRSM_USES_AVX
     if ( ORD == 3 )
     {
         alsatian_xtrsmLLN3<'I'>(N, A, LDA, B);
@@ -1222,7 +1234,7 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
 {
     // Apply row interchanges to the right hand side.
     iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
-#ifdef __AVX__
+#if XTRSM_USES_AVX
     if ( ORD == 3 )
     {
         // Solve L*X = B, overwriting B with X.

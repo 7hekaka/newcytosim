@@ -4,6 +4,18 @@
 #ifndef XTBSV_H
 #define XTBSV_H
 
+#ifdef __SSE3__
+#  define XTBSV_USES_SSE3 REAL_IS_DOUBLE
+#else
+#  define XTBSV_USES_SSE3 0
+#endif
+
+#ifdef __AVX__
+#  define XTBSV_USES_AVX REAL_IS_DOUBLE
+#else
+#  define XTBSV_USES_AVX 0
+#endif
+
 /**
  This is a C-translation of the BLAS reference implementation of DTBSV
  FJN 28.04.2020
@@ -476,7 +488,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
 
-#ifdef __AVX__
+#if XTBSV_USES_AVX
 
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const real* pA, const int lda, real* pX)
@@ -605,7 +617,7 @@ void alsatian_xtbsvLTN3(const int N, const real* pA, const int lda, real* pX)
 #endif
 
 
-#ifdef __SSE3__
+#if XTBSV_USES_SSE3
 
 /// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLNN2(const int N, const real* pA, const int lda, real* pX)
@@ -824,7 +836,7 @@ inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, 
 template < int ORD >
 inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 {
-#ifdef __AVX__
+#if XTBSV_USES_AVX
     /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
     if ( ORD == 3 )
     {

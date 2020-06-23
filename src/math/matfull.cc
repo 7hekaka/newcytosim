@@ -8,6 +8,14 @@
 #include <sstream>
 
 
+#ifdef __AVX__
+#  define MATFULL_USES_AVX REAL_IS_DOUBLE
+#else
+#  define MATFULL_USES_AVX 0
+#endif
+
+
+
 MatrixFull::MatrixFull()
 {
     allo_ = 0;
@@ -146,7 +154,7 @@ void MatrixFull::vecMul0(const real* X, real* Y)  const
     }
 }
 
-#ifdef __AVX__
+#if MATFULL_USES_AVX
 
 void MatrixFull::vecMul(const real* X, real* Y)  const
 {
@@ -316,7 +324,7 @@ void MatrixFull::print(std::ostream& os, size_t imin, size_t imax, size_t jmin, 
 std::string MatrixFull::what() const
 {
     std::ostringstream msg;
-#ifdef __AVX__
+#if MATFULL_USES_AVX
     msg << "mFx " << size_ << "x" << size_;
 #else
     msg << "mF " << size_ << "x" << size_;
