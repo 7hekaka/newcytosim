@@ -18,7 +18,7 @@ namespace gle
 {
     /// this defines the number of triangles used to draw shapes
     /** higher finesse improves the rendering: 8 is good, 16 is nice and 32 is very nice */
-    constexpr size_t finesse = 8;
+    constexpr size_t finesse = 12;
     
     /// number of circle points stored in buffer
     constexpr size_t ncircle = finesse * 8;
