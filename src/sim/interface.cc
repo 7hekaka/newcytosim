@@ -325,16 +325,18 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
 {
     ObjectList res;
     ObjectSet * set = nullptr;
-    {
-        Property * pp = simul.properties.find(name);
-        // Allows to make an object without an associated Property
-        if ( pp )
-            set = simul.findSet(pp->category());
-        else
-            set = simul.findSet(name);
-    }
+    Property * pp = simul.properties.find(name);
+    // Allows to make an object without an associated Property
+    if ( pp )
+        set = simul.findSet(pp->category());
+    else
+        set = simul.findSet(name);
     if ( !set )
-        throw InvalidSyntax("could not determine the class of `"+name+"'");
+    {
+        if ( pp )
+            throw InvalidSyntax("could not determine the class of `"+name+"'");
+        throw InvalidSyntax("undefined class `"+name+"'");
+    }
     
     do {
         
