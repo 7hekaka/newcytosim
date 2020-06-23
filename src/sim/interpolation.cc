@@ -12,7 +12,7 @@ Interpolation::Interpolation(FiberSegment const& loc, real abs)
     pt2_  = loc.point()+1;
     coef_ = abs * loc.lenInv(); /// loc.len();
     assert_true( 0 <= coef_ && coef_ <= 1 );
-    coef_ = std::max(0.0, std::min(1.0, coef_));
+    coef_ = std::max((real)0, std::min((real)1, coef_));
 }
 
 

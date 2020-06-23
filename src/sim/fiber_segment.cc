@@ -271,13 +271,13 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
     real p1 = d1off + C * len2;
 
     // clamp inside segment and use mid-point
-    abs1 = 0.5 * ( std::min(len1, std::max(m1, p1)) + std::max(0., std::min(m1, p1)));
+    abs1 = 0.5 * ( std::min(len1, std::max(m1, p1)) + std::max((real)0, std::min(m1, p1)));
     
     real m2 = -dot(d22, off);
     real p2 = m2 + C * len1;
 
     // clamp inside segment and use mid-point
-    abs2 = 0.5 * ( std::min(len2, std::max(m2, p2)) + std::max(0., std::min(m2, p2)));
+    abs2 = 0.5 * ( std::min(len2, std::max(m2, p2)) + std::max((real)0, std::min(m2, p2)));
 
     // return distance between lines
     return off.normSqr() - d1off * d1off;
