@@ -1262,9 +1262,10 @@ void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector 
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
         {
             real abs = fib->planarIntersect(s, n, a);
-            if ( 0 <= abs  &&  abs < 1 )
+            if (( 0 <= abs ) & ( abs < 1 ))
             {
-                real h = abs_real(dot(dir, fib->dirSegment(s))) * fib->tension(s);
+                real t = fib->tension(s);
+                real h = t * abs_real(dot(dir, fib->dirSegment(s)));
                 sum += h;
                 inf = std::min(inf, h);
                 sup = std::max(sup, h);

@@ -2766,7 +2766,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     
     computeForces();
 
-    real t, ten = 0, inf = 0, sup = 0;
+    real t = 0, ten = 0, inf = 0, sup = 0;
     size_t c, cnt = 0;
 
     // rotate plane around the Z-axis and find intersecting fibers

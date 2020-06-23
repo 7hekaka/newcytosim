@@ -193,13 +193,6 @@ Vector Fiber::displayPosM(real ab) const
     return I + 0.703 * ( O - I );
 }
 
-Vector Fiber::radialDir(real ab) const
-{
-    assert_true( family_ );
-    ab -= abscissaM();
-    return posM(ab) - family_->posM(ab);
-}
-
 #endif
 
 Fiber::~Fiber()
