@@ -892,10 +892,14 @@ void Fiber::setInteractions(Meca& meca) const
         case PLUS_END:
             meca.addForce(Mecapoint(this, lastPoint()), prop->end_force);
             break;
+        case BOTH_ENDS:
+            meca.addForce(Mecapoint(this, 0), prop->end_force);
+            meca.addForce(Mecapoint(this, lastPoint()), prop->end_force);
+            break;
         case CENTER:
             meca.addForce(interpolateCenter(), prop->end_force);
             break;
-        case BOTH_ENDS: //this adds a bending torque where the sum of force is zero
+        case ORIGIN: //this adds a bending torque where the sum of force is zero
             meca.addForce(Mecapoint(this, 0), prop->end_force);
             meca.addForce(Mecapoint(this, lastPoint()), prop->end_force);
             meca.addForce(interpolateCenter(), -2.0 * prop->end_force);

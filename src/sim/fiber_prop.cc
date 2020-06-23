@@ -435,7 +435,7 @@ void FiberProp::read(Glossary& glos)
 #if NEW_END_FORCE
     glos.set(end_force,         "end_force");
     glos.set(end_force_mode,    "end_force", 1, {{"off", NO_END}, {"plus_end", PLUS_END},
-        {"minus_end", MINUS_END}, {"center", CENTER}, {"torque", BOTH_ENDS}});
+        {"minus_end", MINUS_END}, {"center", CENTER}, {"both_ends", BOTH_ENDS}, {"torque", ORIGIN}});
 #endif
 
     glos.set(steric,            "steric");

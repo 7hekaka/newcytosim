@@ -1,5 +1,5 @@
 % Fiber under bending with reporting of forces
-% FJN Strasbourg 23.06.2020
+% FJN Strasbourg 25.03.2020
 
 set simul system
 {
@@ -22,7 +22,6 @@ set fiber microtubule
 {
     rigidity = 100
     segmentation = 0.5
-	end_force = 0 -1 0, both_ends
     display = ( color=blue; point=3,1; line=10,2; tension_scale=10; )
 }
 
@@ -37,26 +36,51 @@ set single clamp
 {
     hand = binder
     activity = fixed
-    stiffness = 100
+    stiffness = 1000
+}
+
+set couple link
+{
+    hand1 = binder
+    hand2 = binder
+    stiffness = 1
 }
 
 % with a length of 10 um, and a rigidity of 10, the Euler buckling is
 % PI^2 * 100 / 10^2 ~ 10 pN
-new microtubule
+new 1 microtubule
 {
     length = 10
-    position = 0 1 0
+    position = 0 4 0
     direction = 1 0 0
-    attach1 = clamp, 5
+    attach1 = clamp, 0
+    attach2 = clamp, 1
 }
 
-run 1000 system
+new 1 microtubule
+{
+    length = 10
+    position = 0 -4 0
+    direction = 1 0 0
+    attach1 = clamp, 0
+    attach2 = clamp, 1
+}
+
+% with an extension of 1um and a stiffness of 1, the tension is ~10 pN
+
+new link
+{
+    attach1 = fiber1, 0, plus_end
+    attach2 = fiber2, 0, plus_end
+}
+
+run 10000 system
 {
     nb_frames = 10
 }
 
 % report forces in the `link`:
-report single:link *
+report couples:link *
 
 % report internal tensions all fibers
 report fiber:force *
