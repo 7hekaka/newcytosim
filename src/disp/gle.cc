@@ -9,6 +9,7 @@
 #include "platonic.h"
 #include "smath.h"
 #include "simd.h"
+#include "simd_float.h"
 
 
 namespace gle
@@ -103,7 +104,7 @@ namespace gle
         GLfloat * const end = cosi + 2 * cnt;
         while ( ptr < end )
         {
-            store4f(ptr, _mm256_cvtpd_ps(pp));
+            store4f(ptr, pp);
             ptr += 4;
             // apply the rotation matrix
             // x = c * x - s * y;

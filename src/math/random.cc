@@ -282,7 +282,7 @@ void Random::refill_gaussians()
 
 #else
 
-#include "simd.h"
+#include "simd_float.h"
 
 // pack array by removing 'nan' values in arrray [s, e[
 real * remove_nans(real * s, real * e)
@@ -339,16 +339,16 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
          */
         n = rsqrtf(divf(n, mulf(two, _mm256_log_ps(n))));
         // the 16 single-precision values are converted to double-precision:
-#if REAL_IS_DOUBLE
         x = mulf(n, x);
         y = mulf(n, y);
-        store4(d   , cvt4f(getlof(x)));
-        store4(d+4 , cvt4f(getlof(y)));
-        store4(d+8 , cvt4f(gethif(x)));
-        store4(d+12, cvt4f(gethif(y)));
+#if REAL_IS_DOUBLE
+        store4(d   , getlof(x));
+        store4(d+4 , gethif(x));
+        store4(d+8 , getlof(y));
+        store4(d+12, gethif(y));
 #else
-        store8f(d  , mulf(n, x));
-        store8f(d+8, mulf(n, y));
+        store8f(d  , x);
+        store8f(d+8, y);
 #endif
         d += 16;
     }

@@ -554,7 +554,7 @@ int compareInt(const void* A, const void* B)
 
 int main( int argc, char* argv[] )
 {
-    printf("Matrix test and timing code --- %s\n", __VERSION__);
+    printf("Matrix test and timing code --- real %lu --- %s\n", sizeof(real), __VERSION__);
 
     RNG.seed();
 #if ( 0 )

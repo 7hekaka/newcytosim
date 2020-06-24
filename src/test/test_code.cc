@@ -17,6 +17,7 @@
 #include "xpttrf.h"
 #include "cytoblas.h"
 #include "simd.h"
+#include "simd_float.h"
 #include "simd_print.h"
 
 
