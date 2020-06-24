@@ -164,7 +164,7 @@ public:
     void            step();
 
     /// time in the simulated world (shortcut to `prop->time`)
-    real            time()   const;
+    double          time()   const;
     
     /// shortcut to prop->time_step;
     real            time_step() const;

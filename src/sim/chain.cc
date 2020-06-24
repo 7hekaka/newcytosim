@@ -252,7 +252,7 @@ Vector3 Chain::adjustedNormal(Vector3 const& d) const
 }
 
 
-real Chain::age() const
+double Chain::age() const
 {
     return simul().time() - fnBirthTime;
 }

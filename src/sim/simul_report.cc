@@ -950,7 +950,7 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel, bool
 {
     typedef std::map <ObjectID, Vector> fiber_map;
     static fiber_map positions;
-    static real old_time = 0;
+    static double past = 0;
     
     if ( com )
         out << COM << "delta_time nb_fibers mean_squared_displacement";
@@ -977,11 +977,11 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel, bool
     }
     
     if ( cnt > 0 )
-        out << LIN << time() - old_time << SEP << cnt << SEP << sum / (real)cnt;
+        out << LIN << time() - past << SEP << cnt << SEP << sum / (real)cnt;
     else
-        out << LIN << time() - old_time << SEP << 0 << SEP << 0;
+        out << LIN << time() - past << SEP << 0 << SEP << 0;
     
-    old_time = time();
+    past = time();
 }
 
 

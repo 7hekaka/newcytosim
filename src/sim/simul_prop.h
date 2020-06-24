@@ -55,7 +55,7 @@ public:
     
     
     /// Current time in the simulated world
-    real      time;
+    double    time;
 
     /// A small interval of time
     /**

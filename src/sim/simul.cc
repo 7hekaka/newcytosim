@@ -121,7 +121,7 @@ void Simul::initialize(Glossary & glos)
 
 //------------------------------------------------------------------------------
 
-real Simul::time() const
+double Simul::time() const
 {
     return prop->time;
 }

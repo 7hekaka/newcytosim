@@ -105,7 +105,7 @@ private:
 protected:
 
     /// time at birth
-    real         fnBirthTime;
+    double       fnBirthTime;
 
     /// flag to update
     bool         needUpdate;
@@ -187,7 +187,7 @@ public:
     real         birthTime() const { return fnBirthTime; }
 
     /// set birth time
-    void         birthTime(real t) { fnBirthTime = t; }
+    void         birthTime(double t) { fnBirthTime = t; }
     
     /// returns current age of the fiber
     real         age() const;
