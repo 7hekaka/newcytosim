@@ -4,8 +4,6 @@
 #ifndef SIMD_H
 #define SIMD_H
 
-#include <cstdio>
-
 //---------------------------------- SSE ---------------------------------------
 
 #ifdef __SSE3__
@@ -64,10 +62,10 @@ inline vec2 setzero2()                       { return _mm_setzero_pd(); }
 inline vec2 unpacklo2(vec2 a, vec2 b)        { return _mm_unpacklo_pd(a,b); }
 inline vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 
-#define shuffle2(a,b,c)   _mm_shuffle_pd(a,b,c)
-#define blend2(a,b,c)     _mm_blend_pd(a,b,c)
-#define blendv2(a,b,c)    _mm_blendv_pd(a,b,c)
-#define cmp2(a,b,c)       _mm_cmp_pd(a,b,c)
+#define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
+#define blend2(a,b,k)     _mm_blend_pd(a,b,k)
+#define blendv2(a,b,k)    _mm_blendv_pd(a,b,k)
+#define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)
 
 /// returns the sum of the elements, broadcasted
 inline vec2 esum2(vec2 v)
@@ -155,9 +153,6 @@ inline __m256i makemask(long i)
 inline vec4 maskload4(double const* a, __m256i k)     { return _mm256_maskload_pd(a,k); }
 inline void maskstore4(double* a, __m256i k, vec4 b)  { _mm256_maskstore_pd(a,k,b); }
 
-inline vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); }
-inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); }
-
 /// load 1 double into all 4 positions
 inline vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a); }
 /// load 2 doubles and duplicate: X, Y, X, Y
@@ -182,19 +177,22 @@ inline vec4 abs4(vec4 a)                 { return _mm256_andnot_pd(sgn1111, a); 
 inline vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
 inline vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 
+inline vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); } //_mm256_unpacklo_pd(a,a)
+inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
+
 /* Unused functions:
  inline vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
  inline void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
  */
 
-#define insertf128(a,b,c)   _mm256_insertf128_pd(a,b,c)
+#define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,b)       _mm256_permute_pd(a,b)
-#define permute2(a,b)       _mm_permute_pd(a,b)       // same as shuffle2(a,a,b)
-#define permute2f128(a,b,c) _mm256_permute2f128_pd(a,b,c)
-#define shuffle4(a,b,c)     _mm256_shuffle_pd(a,b,c)
-#define blend4(a,b,mask)    _mm256_blend_pd(a,b,mask)
-#define blendv4(a,b,mask)   _mm256_blendv_pd(a,b,mask)
-#define cmp4(a,b,c)         _mm256_cmp_pd(a,b,c)
+#define permute2(a,b)       _mm_permute_pd(a,b)       // same as shuffle2(a,a,k)
+#define permute2f128(a,b,k) _mm256_permute2f128_pd(a,b,k)
+#define shuffle4(a,b,k)     _mm256_shuffle_pd(a,b,k)
+#define blend4(a,b,k)       _mm256_blend_pd(a,b,k)
+#define blendv4(a,b,k)      _mm256_blendv_pd(a,b,k)
+#define cmp4(a,b,k)         _mm256_cmp_pd(a,b,k)
 
 /// concatenate two vec2 into a vec4
 inline vec4 cat4(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
