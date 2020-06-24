@@ -233,7 +233,7 @@ void Display::prepareLineDisp(const Fiber * fib)
             self->color = gle::alt_color(fib->flag());
             break;
         case FiberDisp::COLORING_AGE:
-            self->color = gle_color::jet_color((fib->age()-age_min)*age_scale, 1.0);
+            self->color = gle_color::jet_color((fib->age()-age_start)*age_scale, 1.0);
             break;
     }
     
@@ -400,12 +400,12 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
             if ( mx > mn )
             {
                 //std::clog << "=Fiber:age range [" << mn << " " << mx << " ]\n";
-                age_min = sim.time() - mx;
+                age_start = sim.time() - mx;
                 age_scale = 5.0 / ( mx - mn );
             }
             else
             {
-                age_min = 0;
+                age_start = 0;
                 age_scale = 1;
             }
         }

@@ -112,10 +112,10 @@ protected:
     size_t         fiber_prep;
     
     /// used to calculate clusterAnalysis only once
-    real           prep_time;
+    double         prep_time;
     
     /// min and max age used to adjust color range with COLORING_AGE
-    real           age_scale, age_min;
+    double         age_scale, age_start;
     
     /// use OpenGL stencil test:
     bool           stencil_;
