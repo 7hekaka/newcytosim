@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #ifndef EVENT_H
 #define EVENT_H
@@ -44,10 +44,10 @@ public:
     std::string activity;
 
     /// rate of occurence of firing events
-    real        rate;
+    double      rate;
     
     /// delay in unit time between firing events (used if `rate` is not set)
-    real        delay;
+    double      delay;
 
     /// true if event will fire multiple times
     bool        recurrent;
@@ -55,7 +55,7 @@ public:
     ///@}
     
     /// time of next event
-    real        nextTime;
+    double      nextTime;
     
 public:
 
@@ -63,16 +63,16 @@ public:
     Event() { clear(); }
     
     /// constructor
-    Event(real time, Glossary&);
+    Event(double time, Glossary&);
 
     /// destructor
     virtual ~Event();
 
     /// set next firing time
-    void fire_at(real time);
+    void fire_once_at(double time);
 
     /// recalculate next firing time, given current time
-    void reload(real time);
+    void reload(double time);
     
     /// a unique character identifying the class
     static const ObjectTag TAG = 'q';

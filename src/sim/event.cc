@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #include "event.h"
 #include "exceptions.h"
@@ -17,14 +17,14 @@ void Event::clear()
 }
 
 
-void Event::fire_at(real time)
+void Event::fire_once_at(double time)
 {
     nextTime = time;
     recurrent = false;
 }
 
 
-void Event::reload(real now)
+void Event::reload(double now)
 {
     if ( recurrent )
     {
@@ -40,26 +40,30 @@ void Event::reload(real now)
 }
 
 
-Event::Event(real now, Glossary& opt)
+Event::Event(double now, Glossary& opt)
 {
-    real t = now;
+    double t = now;
     clear();
     opt.set(activity, "activity") || opt.set(activity, "code");
+    
     if ( opt.set(t, "time") )
     {
-        fire_at(t);
+        fire_once_at(t);
     }
-    else
+    else if ( opt.set(rate, "rate") )
     {
-        opt.set(rate, "rate") || opt.set(delay, "delay");
-        if ( rate < 0 )
-            throw InvalidParameter("event:rate must be >= 0");
-        if ( delay < 0 )
-            throw InvalidParameter("event:delay must be >= 0");
-        if ( rate <= 0 && delay <= 0 )
-            throw InvalidParameter("event:rate or delay must be > 0");
+        if ( rate <= 0 )
+            throw InvalidParameter("event:rate must be > 0");
         reload(now);
     }
+    else if ( opt.set(delay, "delay") )
+    {
+        if ( delay <= 0 )
+            throw InvalidParameter("event:delay must be > 0");
+        reload(now);
+    }
+    else
+        throw InvalidParameter("event:time, rate or delay must be specified");
 }
 
 
@@ -69,11 +73,15 @@ Event::~Event()
 }
 
 
+/**
+ This is called once per time_step
+ */
 void Event::step(Simul& sim)
 {
     if ( sim.time() >= nextTime )
     {
         sim.relax();
+        // the event can fire multiple time at each time_step
         do {
             reload(nextTime);
             sim.evaluate(activity);
