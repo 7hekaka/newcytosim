@@ -211,8 +211,9 @@ void sizeFrame(FILE* in)
         switch(whatline(in, nullptr))
         {
             case FRAME_END: {
-                printf("pid %lu   frame %6lu   time: %8.3f %9li bytes %7li lines (%+li)\n",
-                       frame_pid, frm, frame_time, ftell(in)-pos, cnt, cnt-old);
+                size_t kb = ( ftell(in) - pos ) >> 10;
+                printf("pid %lu   frame %6lu   time: %8.3f %6lu kB %7li lines (%+li)\n",
+                       frame_pid, frm, frame_time, kb, cnt, cnt-old);
                 old = cnt;
                 ++frm;
             }
