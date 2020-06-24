@@ -190,7 +190,7 @@ public:
     void         birthTime(double t) { fnBirthTime = t; }
     
     /// returns current age of the fiber
-    real         age() const;
+    double       age() const;
 
     //---------------------
     
