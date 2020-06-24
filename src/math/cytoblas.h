@@ -181,7 +181,7 @@ inline float nrm8(const size_t siz, const float* X)
         u = max8f(u, abs8f(load8f(ptr)));
         ptr += 8;
     }
-    vec4f v = _mm256_castps256_ps128(max8f(u, _mm256_permute2f128_ps(u, u, 0x01)));
+    vec4f v = getlof(max8f(u, permute2f128f(u, u, 0x01)));
     while ( ptr <= end - 4 )
     {
         v = max4f(v, abs4f(load4f(ptr)));
