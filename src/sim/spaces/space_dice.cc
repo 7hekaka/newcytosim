@@ -276,7 +276,7 @@ void SpaceDice::setLengths(const real len[])
     length_[0] = len[0];
     length_[1] = len[1];
     length_[2] = len[2];
-    edge_ = len[4];
+    edge_ = len[3];
     update();
 }
 
