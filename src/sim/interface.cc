@@ -2,8 +2,10 @@
 
 #include "interface.h"
 #include "stream_func.h"
+#include "exceptions.h"
 #include "simul_prop.h"
 #include "tokenizer.h"
+#include "evaluator.h"
 #include "messages.h"
 #include "glossary.h"
 #include "tictoc.h"
@@ -12,7 +14,6 @@
 #include "sim.h"
 #include <fstream>
 
-#include "evaluator.h"
 
 // Use the second definition to get some verbose reports:
 #define VLOG(ARG) ((void) 0)
@@ -807,7 +808,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     
     do_write &= ( nb_frames > 0 );
 
-    size_t frame = 1;
+    size_t frame = 0;
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
     
@@ -828,30 +829,28 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     simul.prepare();
     
     size_t sss = 0;
-    while ( 1 )
-    {
-        if ( sss >= check )
+    do {
+        while ( sss < check )
         {
-            if ( do_write )
-            {
-                simul.relax();
-                simul.writeObjects(TRAJECTORY, true, binary);
-                reportCPUtime(frame, simul.time());
-                simul.sMeca.doNotify = 2;  // to print convergence parameters
-                simul.unrelax();
-            }
-            if ( sss >= nb_steps )
-                break;
-            check = (size_t)( ++frame * delta );
+            hold();
+            //fprintf(stderr, "> step %6zu\n", sss);
+            (simul.*solveFunc)();
+            simul.step();
+            ++sss;
         }
+        // next check point:
+        check = (size_t)( ++frame * delta );
 
-        hold();
-        //fprintf(stderr, "> step %6zu\n", sss);
-        (simul.*solveFunc)();
-        simul.step();
-        
-        ++sss;
-    }
+        if ( do_write )
+        {
+            simul.relax();
+            simul.writeObjects(TRAJECTORY, true, binary);
+            reportCPUtime(frame, simul.time());
+            simul.sMeca.doNotify = 2;  // to print convergence parameters
+            simul.unrelax();
+        }
+    } while ( sss < nb_steps );
+    
 #ifdef BACKWARD_COMPATIBILITY
     if ( event )
         simul.events.erase(event);
