@@ -76,7 +76,7 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
-        void * ptr = new_real(alc*sizeof(SubBlock)/sizeof(real));
+        void * ptr = new_real(alc*SB);
         SubBlock * blk_new  = new(ptr) SubBlock[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
@@ -512,7 +512,7 @@ void MatrixSparseBlock::consolidate()
     //std::cerr << "\nMatrixSparseBlock:consolidate with " << cnt << " blocks";
 
     free_real(blocks_);
-    real * ptr = new_real(cnt*sizeof(SubBlock)/sizeof(real));
+    real * ptr = new_real(cnt*SB);
     blocks_ = new(ptr) SubBlock[cnt];
     
     cnt = 0;
@@ -692,7 +692,7 @@ vec2 MatrixSparseBlock::Line::vecMul2DU(const real* X) const
     const real* end = sbk_[size_-size_%4];
     const size_t * inx = inx_;
     #pragma nounroll
-    for ( ; M < end; M += 16 )
+    for ( ; M < end; M += SB )
     {
         //IACA_START
         vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
@@ -783,7 +783,7 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
     vec4 t1 = setzero4();
     vec4 t2 = setzero4();
 
-    static_assert(sizeof(SubBlock) == 12*sizeof(real), "unexpected SubBlock size");
+    static_assert(SB==12, "unexpected SubBlock size");
     const real* M = sbk_[0];
     const real* end = sbk_[size_-size_%2];
     const size_t * inx = inx_;
@@ -802,12 +802,12 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
             vec4 B = loadu4(X+inx[1]);
             inx += 2;
             // multiply each line of the two blocks:
-            s0 = fmadd4(streamload4(M   ), A, s0);
-            s1 = fmadd4(streamload4(M+4 ), A, s1);
-            s2 = fmadd4(streamload4(M+8 ), A, s2);
-            t0 = fmadd4(streamload4(M+12), B, t0);
-            t1 = fmadd4(streamload4(M+16), B, t1);
-            t2 = fmadd4(streamload4(M+20), B, t2);
+            s0 = fmadd4(streamload4(M  ), A, s0);
+            s1 = fmadd4(streamload4(M+4), A, s1);
+            s2 = fmadd4(streamload4(M+8), A, s2);
+            t0 = fmadd4(streamload4(M  +SB), B, t0);
+            t1 = fmadd4(streamload4(M+4+SB), B, t1);
+            t2 = fmadd4(streamload4(M+8+SB), B, t2);
         }
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
@@ -862,7 +862,7 @@ vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
          */
         // process blocks 3 by 3:
         #pragma nounroll
-        for ( ; M < end; M += 36 )
+        for ( ; M < end; M += 3*SB )
         {
             vec4 A = loadu4(X+inx[0]);
             vec4 B = loadu4(X+inx[1]);
@@ -872,12 +872,12 @@ vec4 MatrixSparseBlock::Line::vecMul3DU4(const real* X) const
             s0 = fmadd4(streamload4(M   ), A, s0);
             s1 = fmadd4(streamload4(M+4 ), A, s1);
             s2 = fmadd4(streamload4(M+8 ), A, s2);
-            t0 = fmadd4(streamload4(M+12), B, t0);
-            t1 = fmadd4(streamload4(M+16), B, t1);
-            t2 = fmadd4(streamload4(M+20), B, t2);
-            u0 = fmadd4(streamload4(M+24), C, u0);
-            u1 = fmadd4(streamload4(M+28), C, u1);
-            u2 = fmadd4(streamload4(M+32), C, u2);
+            t0 = fmadd4(streamload4(M  +SB), B, t0);
+            t1 = fmadd4(streamload4(M+4+SB), B, t1);
+            t2 = fmadd4(streamload4(M+8+SB), B, t2);
+            u0 = fmadd4(streamload4(M  +SB*2), C, u0);
+            u1 = fmadd4(streamload4(M+4+SB*2), C, u1);
+            u2 = fmadd4(streamload4(M+8+SB*2), C, u2);
         }
         s0 = add4(s0, add4(t0, u0));
         s1 = add4(s1, add4(t1, u1));

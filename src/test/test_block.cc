@@ -52,11 +52,12 @@ void checkMatrix(MATRIX & mat)
 
 void checkMatrixFull(Matrix44 const& src)
 {
+    const size_t SUP = 4;
     MatrixFull mat;
-    mat.resize(3);
+    mat.resize(SUP);
     
-    for ( size_t i = 0; i < 3; ++i )
-    for ( size_t j = 0; j < 3; ++j )
+    for ( size_t i = 0; i < SUP; ++i )
+    for ( size_t j = 0; j < SUP; ++j )
         mat(i,j) = src(i,j);
     
     Vector3 vec, vik(0,0,0), vok;
