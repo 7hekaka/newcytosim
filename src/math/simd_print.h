@@ -43,10 +43,10 @@ inline void dump16(__m128i v, char const* s)
     uint16_t b = _mm_extract_epi16(v, 1);
     uint16_t c = _mm_extract_epi16(v, 2);
     uint16_t d = _mm_extract_epi16(v, 3);
-    uint16_t e = _mm_extract_epi16(v, 5);
-    uint16_t f = _mm_extract_epi16(v, 6);
-    uint16_t g = _mm_extract_epi16(v, 7);
-    uint16_t h = _mm_extract_epi16(v, 8);
+    uint16_t e = _mm_extract_epi16(v, 4);
+    uint16_t f = _mm_extract_epi16(v, 5);
+    uint16_t g = _mm_extract_epi16(v, 6);
+    uint16_t h = _mm_extract_epi16(v, 7);
     printf("%16s int16( %3i %3i %3i %3i %3i %3i %3i %3i )\n", s, h, g, f, e, d, c, b, a);
 }
 
