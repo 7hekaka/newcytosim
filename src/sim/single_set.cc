@@ -624,7 +624,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
         const real vol = p->spaceVolume();
         SingleList& can = reserve.second;
         
-        bool fixed = ( p->fast_diffusion & 4 );
+        bool fixed = ( p->fast_diffusion_nb > 0 );
         size_t cnt = ( fixed ? p->fast_diffusion_nb : can.size());
 
         if ( cnt > 0 )
