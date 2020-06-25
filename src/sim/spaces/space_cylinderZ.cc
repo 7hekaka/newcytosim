@@ -107,12 +107,13 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 real SpaceCylinderZ::volume() const
 {
 #if HAS_SMOOTH_EDGES
-    const real R0 = radius_ - edge_;
-    return M_PI * (( top_ - bot_ - 2 * edge_ ) * radius_ * radius_  //central cylindrical part
-                   + 2 * edge_ * R0 * R0                            //top and bottom central cylinders
-                   + ( R0 * M_PI + 4/3.0 * edge_ ) * edgeSqr_ );
+    const real R = radius_ - edge_;
+    const real L = top_ - bot_ - 2 * edge_;
+    return M_PI * ( L * square(radius_)       //central cylindrical part
+                   + 2 * edge_ * square(R)    //top and bottom central cylinders
+                   + ( R * M_PI + 4/3.0 * edge_ ) * square(edge_) );
 #else
-    return M_PI * ( top_ - bot_ ) * radius_ * radius_;
+    return M_PI * ( top_ - bot_ ) * square(radius_);
 #endif
 }
 
@@ -414,21 +415,21 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 bool SpaceCylinderZ::draw() const
 {
 #if ( DIM > 2 )
-    GLfloat T = top_;
-    GLfloat B = bot_;
-    GLfloat R = radius_;
-    GLfloat E = edge_;
-    GLfloat RE = radius_ - edge_;
-    GLfloat TE = top_ - edge_;
-    GLfloat BE = bot_ + edge_;
+    const GLfloat T = (GLfloat)top_;
+    const GLfloat B = (GLfloat)bot_;
+    const GLfloat R = (GLfloat)radius_;
+    const GLfloat E = (GLfloat)edge_;
+    const GLfloat RE = (GLfloat)(radius_ - edge_);
+    const GLfloat TE = (GLfloat)(top_ - edge_);
+    const GLfloat BE = (GLfloat)(bot_ + edge_);
     
     const size_t fin = 256;
     GLfloat c[fin+1], s[fin+1];
     gle::circle(fin, c, s, 1);
 
-    size_t pi_half = fin/4;
-    size_t pi_once = fin/2;
-
+    const size_t pi_half = fin/4;
+    const size_t pi_once = fin/2;
+    
     for (size_t i = 0; i < fin; i++)
     {
         GLfloat CU = c[i],   SU = s[i];
@@ -447,7 +448,18 @@ bool SpaceCylinderZ::draw() const
                 glNormal3f(CL*s[j],        SL*s[j],             c[j]);
                 glVertex3f(CL*(RE+E*s[j]), SL*(RE+E*s[j]), TE+E*c[j]);
             }
-            
+            /*
+            // at pi_half, c[j] = 0 and s[j] = 1
+            glNormal3f(CU,        SU,         0);
+            glVertex3f(CU*(RE+E), SU*(RE+E), TE);
+            glNormal3f(CL,        SL,         0);
+            glVertex3f(CL*(RE+E), SL*(RE+E), TE);
+
+            glNormal3f(CU,        SU,         0);
+            glVertex3f(CU*(RE+E), SU*(RE+E), BE);
+            glNormal3f(CL,        SL,         0);
+            glVertex3f(CL*(RE+E), SL*(RE+E), BE);
+             */
             //draw bottom arc
             for ( size_t j = pi_half; j<=pi_once; j++ )
             {

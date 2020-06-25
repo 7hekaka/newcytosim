@@ -14,10 +14,10 @@
 
 namespace gle
 {    
-    /// sinus
+    /// values of sinus over a full circle
     GLfloat si_[ncircle+1] = { 0 };
 
-    /// cosinus
+    /// values of cosinus over a full circle
     GLfloat co_[ncircle+1] = { 0 };
     
     /// vertex buffer objects for tubes
@@ -34,10 +34,10 @@ namespace gle
     
     // Fast method to calculate cosine and sinus over the entire circle
     /**
-     co[] and si[] should be allocated to hold 'cnt+1' values.
+     C[] and S[] should be preallocated to hold 'cnt+1' values.
      Fill in with a counter-clockwise circle starting at angle `start`
     */
-    void circle(size_t cnt, GLfloat co[], GLfloat si[], GLfloat rad, double start)
+    void circle(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start)
     {
         const double theta = 2.0 * M_PI / (double)cnt;
         const double c = cos(theta);
@@ -49,20 +49,20 @@ namespace gle
         
         for( size_t n = 0; n < cnt; ++n )
         {
-            co[n] = GLfloat(x);
-            si[n] = GLfloat(y);
+            C[n] = GLfloat(x);
+            S[n] = GLfloat(y);
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
             y = s * t + c * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        co[cnt] = co[0];
-        si[cnt] = si[0];
+        C[cnt] = C[0];
+        S[cnt] = S[0];
     }
     
-    void arc(size_t cnt, GLfloat co[], GLfloat si[], GLfloat rad,
-             double start, double end, GLfloat cx, GLfloat cy )
+    void arc(size_t cnt, GLfloat C[], GLfloat S[], double rad,
+             double start, double end, GLfloat cenX, GLfloat cenY)
     {
         const double theta = ( end - start ) / (double)cnt;
         const double c = cos(theta);
@@ -72,23 +72,21 @@ namespace gle
         double x = rad * cos(start);
         double y = rad * sin(start);
         
-        for( size_t n = 0; n < cnt; ++n )
+        for( size_t n = 0; n <= cnt; ++n )
         {
-            co[n] = GLfloat(x) + cx;
-            si[n] = GLfloat(y) + cy;
+            C[n] = GLfloat(x) + cenX;
+            S[n] = GLfloat(y) + cenY;
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
             y = s * t + c * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        co[cnt] = co[0];
-        si[cnt] = si[0];
     }
 
 #ifdef __AVX__
     // This works only if 'GLfloat == float'
-    void circle(size_t cnt, float cosi[], float rad)
+    void circle(size_t cnt, float CS[], double rad, double start)
     {
         const double theta = 2.0 * M_PI / (double)cnt;
         const double c = cos(theta);
@@ -98,50 +96,54 @@ namespace gle
 
         vec4 cs{ c2, s2,  c2, s2};
         vec4 sc{-s2, c2, -s2, c2};
-        vec4 pp{rad, 0.0, c*rad, s*rad};
         
-        GLfloat * ptr = cosi;
-        GLfloat * const end = cosi + 2 * cnt;
+        const double x0 = rad * cos(start);
+        const double y0 = rad * sin(start);
+        vec4 pp{x0, y0, c*x0-s*y0, s*x0+c*y0};
+        
+        GLfloat * ptr = CS;
+        GLfloat * const end = CS + 2 * cnt;
         while ( ptr < end )
         {
             store4f(ptr, pp);
             ptr += 4;
             // apply the rotation matrix
             // x = c * x - s * y;
-            // y = s * X + c * y;
+            // y = s * y + c * y;
             pp = add4(mul4(cs, duplo4(pp)), mul4(sc, duphi4(pp)));
         }
-        end[0] = rad;
-        end[1] = 0.0;
+        end[0] = x0;
+        end[1] = y0;
     }
 #else
-    void circle(size_t cnt, GLfloat cosi[], GLfloat rad)
+    void circle(size_t cnt, GLfloat CS[], double rad, double start)
     {
         const double theta = 2.0 * M_PI / (double)cnt;
         const double c = cos(theta);
         const double s = sin(theta);
     
         double t;
-        double x = rad;
-        double y = 0.0;
+        double x = rad * cos(start);
+        double y = rad * sin(start);
         
         for( size_t n = 0; n < cnt; ++n )
         {
-            cosi[2*n  ] = GLfloat(x);
-            cosi[2*n+1] = GLfloat(y);
+            CS[2*n  ] = GLfloat(x);
+            CS[2*n+1] = GLfloat(y);
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
             y = s * t + c * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        cosi[2*cnt  ] = rad;
-        cosi[2*cnt+1] = 0.0;
+        CS[2*cnt  ] = CS[0];
+        CS[2*cnt+1] = CS[1];
     }
 #endif
     
     void initialize()
     {
+        //gleReportErrors(stderr, "before gle:initialize()");
 #ifndef __APPLE__
         //need to initialize GLEW on Linux
         const GLenum err = glewInit();
@@ -154,7 +156,9 @@ namespace gle
 #endif
         circle(ncircle, co_, si_, 1);
         initializeIcoBuffers();
+        //gleReportErrors(stderr, "gle:initializeIcoBuffers()");
         initializeTubeBuffers();
+        //gleReportErrors(stderr, "gle:initializeTubeBuffers()");
         std::atexit(release);
     }
     
@@ -756,7 +760,7 @@ namespace gle
     {
         if ( !glIsBuffer(tub_buf[0]) )
         {
-            glGenBuffers(12, tub_buf);
+            glGenBuffers(14, tub_buf);
             initTubeBuffer(tub_buf[ 0], tub_buf[ 1],  0.0, 1.0, 8);
             initTubeBuffer(tub_buf[ 2], tub_buf[ 3],  0.0, 1.0, 4);
             initTubeBuffer(tub_buf[ 4], tub_buf[ 5],  0.0, 1.0, 2);
@@ -987,15 +991,15 @@ namespace gle
     {
         for ( size_t n = 0; n < ncircle/2; n += inc )
         {
-            real U = co[n], R = si[n];
-            real L = co[n+inc], S = si[n+inc];
+            real U = co_[n], R = si_[n];
+            real L = co_[n+inc], S = si_[n+inc];
             glBegin(GL_TRIANGLE_STRIP);
             for ( size_t p = 0; p <= ncircle; p += inc )
             {
-                glNormal3f(R*co[p], R*si[p], U);
-                glVertex3f(R*co[p], R*si[p], U);
-                glNormal3f(S*co[p], S*si[p], L);
-                glVertex3f(S*co[p], S*si[p], L);
+                glNormal3f(R*co_[p], R*si_[p], U);
+                glVertex3f(R*co_[p], R*si_[p], U);
+                glNormal3f(S*co_[p], S*si_[p], L);
+                glVertex3f(S*co_[p], S*si_[p], L);
             }
             glEnd();
         }

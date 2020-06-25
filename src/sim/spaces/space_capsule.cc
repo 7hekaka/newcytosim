@@ -223,8 +223,8 @@ bool SpaceCapsule::draw() const
     GLfloat c[4*fin+1], s[4*fin+1];
     gle::circle(4*fin, c, s, 1);
     
-    GLfloat L = (GLfloat)length_;
-    GLfloat R = (GLfloat)radius_;
+    const GLfloat L = (GLfloat)length_;
+    const GLfloat R = (GLfloat)radius_;
     
 #if ( DIM <= 2 )
     

@@ -1162,7 +1162,7 @@ void glApp::displayPlain()
  */
 void glApp::displayMain()
 {
-    gle::gleReportErrors(stderr, "in glApp::displayMain()");
+    //gle::gleReportErrors(stderr, "before glApp::displayMain()");
     View & view = views[1];
     
     view.openDisplay();
@@ -1194,6 +1194,7 @@ void glApp::displayMain()
         glutSwapBuffers();
     else
         glFlush();
+    gle::gleReportErrors(stderr, "in glApp::displayMain()");
 }
 
 /**

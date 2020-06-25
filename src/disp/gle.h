@@ -36,13 +36,13 @@ namespace gle
     void initializeIcoBuffers();
    
     /// calculate sinus and cosinus for a circle
-    void circle(size_t cnt, GLfloat c[], GLfloat s[], GLfloat radius, double start = 0);
+    void circle(size_t cnt, GLfloat C[], GLfloat S[], double radius, double start = 0);
     
-    /// calculate sinus and cosinus for a circular arc
-    void arc(size_t cnt, GLfloat c[], GLfloat s[], GLfloat radius, double start, double end, GLfloat cenx, GLfloat ceny);
-
     /// calculate sinus and cosinus
-    void circle(size_t cnt, GLfloat cs[], GLfloat radius);
+    void circle(size_t cnt, GLfloat CS[], double radius, double start = 0);
+
+    /// calculate sinus and cosinus for a circular arc
+    void arc(size_t cnt, GLfloat C[], GLfloat S[], double radius, double start, double end, GLfloat cenx, GLfloat ceny);
 
 #pragma mark -
     

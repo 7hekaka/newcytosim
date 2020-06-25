@@ -116,6 +116,7 @@
 		BB3A4AE919351389005CD868 /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB46A4C524A349F400E89FE2 /* simd_float.h in Headers */ = {isa = PBXBuildFile; fileRef = BB46A4C424A349F400E89FE2 /* simd_float.h */; };
+		BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
 		BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4737BC2024B39300FE6CEC /* accumulator.h */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
@@ -169,7 +170,6 @@
 		BB55C0A90A260F19003333C9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB55C0CF0A26113A003333C9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB55C0E30A2613D5003333C9 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
-		BB55C0E50A2613E1003333C9 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB55C0F00A26147A003333C9 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB55C12D0A261725003333C9 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB7ED2906933C6700E2B49B /* AGL.framework */; };
 		BB55C13B0A261795003333C9 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
@@ -993,6 +993,13 @@
 			remoteGlobalIDString = BB4DB5940C69D5A2001E5E4F;
 			remoteInfo = glapp;
 		};
+		BB46A4C824A48DE700E89FE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBE82A27233D15EB00BE44DF;
+			remoteInfo = cytospaceG;
+		};
 		BB4DB5B40C69D6F0001E5E4F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
@@ -1006,13 +1013,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = BB4DB5940C69D5A2001E5E4F;
 			remoteInfo = glapp;
-		};
-		BB55C0E70A261402003333C9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BBE0993D0869D87F005FF210;
-			remoteInfo = cytospace;
 		};
 		BB5C02E6100A1AE50073DC21 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1942,7 +1942,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB55C0E50A2613E1003333C9 /* libcytospace.a in Frameworks */,
+				BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */,
 				BB55C0F00A26147A003333C9 /* libcytobase.a in Frameworks */,
 				BB805D482419635D00B62699 /* libcytodisp.a in Frameworks */,
 				BBAEC50F0EF1D23400955B64 /* libcytomath.a in Frameworks */,
@@ -3896,8 +3896,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				BB46A4C924A48DE700E89FE2 /* PBXTargetDependency */,
 				BB64061805FBDA1C00DF7BFF /* PBXTargetDependency */,
-				BB55C0E80A261402003333C9 /* PBXTargetDependency */,
 				BBAF2F78100B611E0077A86B /* PBXTargetDependency */,
 				BBE8E6CE10C199E1006527D4 /* PBXTargetDependency */,
 				BBE8E6D010C199EA006527D4 /* PBXTargetDependency */,
@@ -4886,6 +4886,11 @@
 			target = BB4DB5940C69D5A2001E5E4F /* cytodisp */;
 			targetProxy = BB398063124133E400104264 /* PBXContainerItemProxy */;
 		};
+		BB46A4C924A48DE700E89FE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBE82A27233D15EB00BE44DF /* cytospaceG */;
+			targetProxy = BB46A4C824A48DE700E89FE2 /* PBXContainerItemProxy */;
+		};
 		BB4DB5B50C69D6F0001E5E4F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BB4DB5940C69D5A2001E5E4F /* cytodisp */;
@@ -4895,11 +4900,6 @@
 			isa = PBXTargetDependency;
 			target = BB4DB5940C69D5A2001E5E4F /* cytodisp */;
 			targetProxy = BB4DB5C00C69D725001E5E4F /* PBXContainerItemProxy */;
-		};
-		BB55C0E80A261402003333C9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BBE0993D0869D87F005FF210 /* cytospace */;
-			targetProxy = BB55C0E70A261402003333C9 /* PBXContainerItemProxy */;
 		};
 		BB5C02E7100A1AE50073DC21 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

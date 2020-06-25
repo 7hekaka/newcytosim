@@ -32,6 +32,8 @@ SpaceProp prop("test_space");
 // Space to be tested:
 Space * spc = nullptr;
 
+bool draw_space = true;
+
 // number of points
 const size_t maxpts = 1<<17;
 size_t nbpts = 1024;
@@ -207,19 +209,25 @@ void setGeometry()
 
 void checkVolume()
 {
-    size_t cnt = 1<<22;
-    real e1 = spc->estimateVolume(cnt);
-    real e2 = spc->estimateVolume(cnt);
+    const size_t CNT = 16;
+    real avg = 0, var = 0;
     
+    for ( size_t i = 0; i < CNT; ++i )
+    {
+        real e = spc->estimateVolume(1<<21);
+        avg += e;
+        var += e * e;
+    }
+    avg /= CNT;
+    var = var/CNT - avg * avg;
+    
+    real vol = spc->volume();
+
     printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
-    printf("  %.6f +/- %.6f\n", e1, std::fabs(e2-e1));
+    printf("  %.3f +/- %.3f;  given volume is %.3f\n", avg, var, vol);
     
-    real v = spc->volume();
-    
-    real err = abs_real( e1 - v ) / v;
-    
-    if ( err > 1e-3 )
-        printf("    but given volume is %f  (difference %.2f %%)\n", v, 100*err);
+    if ( fabs(vol-avg) > var )
+         printf("WARNING: POSSIBLE VOLUME MISMATCH!!!!\n");
 }
 
 //------------------------------------------------------------------------------
@@ -406,6 +414,10 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
             
         case 'd':
+            draw_space = !draw_space;
+            break;
+
+        case 'f':
         {
             real val[] = { -2, -1, 0, 1, 2, 5 };
             opt.define("inflate", 0, val[ RNG.pint(6) ]);
@@ -453,19 +465,24 @@ void display(View&, int)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    if ( spc )
+    if ( spc && draw_space )
     {
+        glEnable(GL_LIGHTING);
         glEnable(GL_CULL_FACE);
+        glDepthMask(GL_FALSE);
         // draw back side
         glCullFace(GL_FRONT);
-        gle_color(0.2, 0.2, 0.2).load_back();
-        spc->draw();
+        gle_color(0.2, 0.2, 0.2, 0.1).load_back();
+        if ( !spc->draw() )
+            printf("Space::draw() returned false\n");
 
         // draw front side
         glCullFace(GL_BACK);
-        gle_color(0.5, 0.5, 0.5).load_front();
+        gle_color(1.0, 1.0, 1.0, 0.1).load_front();
         spc->draw();
         glDisable(GL_CULL_FACE);
+        glDisable(GL_LIGHTING);
+        glDepthMask(GL_TRUE);
     }
     
     //plot a gren dot for points inside, a red dot for point outside:
@@ -559,6 +576,7 @@ int main(int argc, char* argv[])
     glApp::specialKeyFunc(processSpecialKey);
     glApp::createWindow(display);
     glApp::setScale(20);
+    gle::initialize();
 
     initMenus();
     RNG.seed();
@@ -578,10 +596,7 @@ int main(int argc, char* argv[])
     }
 
     checkVolume();
-    gle::initialize();
-
     glutMainLoop();
-    
     return EXIT_SUCCESS;
 }
 
