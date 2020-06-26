@@ -882,51 +882,51 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_SSEU(const real* X, real* Y
     const vec4f x2 = permute4f(tt, 0xAA);
 
     size_t n = 1;
-#if 1
-    const size_t stop = 1 + 2 * ((size_-1)/2);
-
-    // process 2 by 2
-    #pragma nounroll
-    for ( ; n < stop; n += 2 )
     {
-        const size_t ii = inx_[n  ];
-        const size_t kk = inx_[n+1];
-        real const* M = blk_[n  ];
-        real const* P = blk_[n+1];
+        const size_t stop = 1 + 2 * ((size_-1)/2);
+        
+        // process 2 by 2
+#pragma nounroll
+        for ( ; n < stop; n += 2 )
+        {
+            const size_t ii = inx_[n  ];
+            const size_t kk = inx_[n+1];
+            real const* M = blk_[n  ];
+            real const* P = blk_[n+1];
 #if ( BLD == 4 )
-        const vec4f m012 = streamload4f(M  );
-        const vec4f m345 = streamload4f(M+4);
-        const vec4f m678 = streamload4f(M+8);
-        const vec4f p012 = streamload4f(P  );
-        const vec4f p345 = streamload4f(P+4);
-        const vec4f p678 = streamload4f(P+8);
+            const vec4f m012 = streamload4f(M  );
+            const vec4f m345 = streamload4f(M+4);
+            const vec4f m678 = streamload4f(M+8);
+            const vec4f p012 = streamload4f(P  );
+            const vec4f p345 = streamload4f(P+4);
+            const vec4f p678 = streamload4f(P+8);
 #else
-        const vec4f m012 = load3f(M      );
-        const vec4f m345 = load3f(M+BLD  );
-        const vec4f m678 = load3f(M+BLD*2);
-        const vec4f p012 = load3f(P      );
-        const vec4f p345 = load3f(P+BLD  );
-        const vec4f p678 = load3f(P+BLD*2);
+            const vec4f m012 = load3f(M      );
+            const vec4f m345 = load3f(M+BLD  );
+            const vec4f m678 = load3f(M+BLD*2);
+            const vec4f p012 = load3f(P      );
+            const vec4f p345 = load3f(P+BLD  );
+            const vec4f p678 = load3f(P+BLD*2);
 #endif
-        // multiply with the full block:
-        vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
-        vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
-        vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
-        vec4f tuv = loadu4f(X+kk);  // xyz = { X0 X1 X2 - }
-        z = fmadd4f(m345, x1, z);
-        t = fmadd4f(p345, x1, t);
-        s0 = fmadd4f(m012, xyz, s0);
-        s1 = fmadd4f(m345, xyz, s1);
-        s2 = fmadd4f(m678, xyz, s2);
-        z = fmadd4f(m678, x2, z);
-        t = fmadd4f(p678, x2, t);
-        s0 = fmadd4f(p012, tuv, s0);
-        s1 = fmadd4f(p345, tuv, s1);
-        s2 = fmadd4f(p678, tuv, s2);
-        storeu4f(Y+ii, z);
-        storeu4f(Y+kk, t);
+            // multiply with the full block:
+            vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
+            vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
+            vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
+            vec4f tuv = loadu4f(X+kk);  // xyz = { X0 X1 X2 - }
+            z = fmadd4f(m345, x1, z);
+            t = fmadd4f(p345, x1, t);
+            s0 = fmadd4f(m012, xyz, s0);
+            s1 = fmadd4f(m345, xyz, s1);
+            s2 = fmadd4f(m678, xyz, s2);
+            z = fmadd4f(m678, x2, z);
+            t = fmadd4f(p678, x2, t);
+            s0 = fmadd4f(p012, tuv, s0);
+            s1 = fmadd4f(p345, tuv, s1);
+            s2 = fmadd4f(p678, tuv, s2);
+            storeu4f(Y+ii, z);
+            storeu4f(Y+kk, t);
+        }
     }
-#endif
     
     // process remaining blocks
     #pragma nounroll
