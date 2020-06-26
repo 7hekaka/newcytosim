@@ -56,8 +56,8 @@ private:
     /// gather all Single with `fast_diffusion` in reserve lists
     Single*       uniCollect(Single*);
 
-    /// add new Single to given list
-    void          uniRefill(SingleList&, size_t, SingleProp const*);
+    /// ensures that `can` holds `cnt` Singles, creating them of specified SingleProp
+    void          uniRefill(SingleList& can, size_t cnt, SingleProp const*);
 
     /// attach Singles from `can` on locations specified in `loc`
     void          uniAttach(Array<FiberSite>& can, SingleList& loc);

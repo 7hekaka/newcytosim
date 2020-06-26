@@ -694,7 +694,7 @@ int CoupleSet::bad() const
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
 
-/// create enough candidates to bind to all sites:
+
 void CoupleSet::uniRefill(CoupleList& can, size_t cnt, CoupleProp const* p)
 {
     for ( size_t i = can.size(); i < cnt; ++i )
@@ -843,6 +843,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 
         CoupleList& can = reserve.second;
         
+        // assuming (or not) a fixed number of diffusing molecules
         bool fixed = ( p->fast_diffusion_nb > 0 );
         size_t cnt = ( fixed ? p->fast_diffusion_nb : can.size());
 
@@ -861,7 +862,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            if ( fixed )
+            if ( fixed ) // create enough candidates for all sites
                 uniRefill(can, loc.size(), p);
             uniAttach1(loc, can);
             
@@ -880,7 +881,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            if ( fixed )
+            if ( fixed ) // create enough candidates for all sites
                 uniRefill(can, loc.size(), p);
             uniAttach2(loc, can);
         }

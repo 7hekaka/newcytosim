@@ -514,7 +514,6 @@ void SingleSet::removeWrists(Object const* arg)
 #pragma mark - Fast Diffusion
 
 
-/// create enough candidates to bind to all sites:
 void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
 {
     for ( size_t i = can.size(); i < cnt; ++i )
@@ -624,6 +623,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
         const real vol = p->spaceVolume();
         SingleList& can = reserve.second;
         
+        // assuming (or not) a fixed number of diffusing molecules
         bool fixed = ( p->fast_diffusion_nb > 0 );
         size_t cnt = ( fixed ? p->fast_diffusion_nb : can.size());
 
@@ -640,7 +640,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
                 fibers.uniFiberSites(loc, dis);
             }
             
-            if ( fixed & ( can.size() < loc.size() ))
+            if ( fixed ) // create enough candidates for all sites
                 uniRefill(can, loc.size(), p);
 
             uniAttach(loc, can);

@@ -77,8 +77,8 @@ private:
     /// gather all Couple with `fast_diffusion` in reserve lists
     Couple*       uniCollect(Couple*);
 
-    /// add new Couple to given list
-    void          uniRefill(CoupleList&, size_t, CoupleProp const*);
+    /// ensures that `can` holds `cnt` Couple, creating them of specified CoupleProp
+    void          uniRefill(CoupleList& can, size_t cnt, CoupleProp const*);
 
     /// attach Hand1 of Couple from `can` on locations specified in `loc`
     void          uniAttach1(Array<FiberSite>& loc, CoupleList& can);
