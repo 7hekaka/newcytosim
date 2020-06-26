@@ -139,19 +139,15 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 -
 - A level-set based Space to import images (2D sufficient initially)
 - Steric using analytical formula for potential, integrated over segment length
-- Review & port Antonio's Meca::addTorqueClamp()
-- Couple::Fork implements Antonio's forks (Antonio did this)
 - a Space to represent a lamellipodium: like a capsule in Y&Z, periodic in X
 - extensions of fast_diffusion:
-   - constant concentration of free molecules (Jonathan)
    - dirichlet boundary conditions: set concentration of molecules at edges of Space
 
 - remove variadic functions (#include <stdarg>)
 - option to pull on beads with mouse
 - use sidePos() for display more systematically
 - Crank-Nicholson diffusion in Field (Jonathan did this)
-- class Event to control the value of a parameter in time, or execute arbitrary code
-   can replace the 'event' parameter of command 'run'.
+- class Event to control the value of a parameter in time
 - include simple math evaluation tool, to be able to use '10*time+5' (muParser? Lua?)
 
 # New molecular activities:
@@ -163,7 +159,6 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 - stabilize the steric interactions of particles: solid.cym
 
 - new Space in 3D defined as the intersection of an arbitrary number of half-spaces
-- LevelSet volumes
 - translated/rotated Space
 
 - Glossary could record the queries and use this information for error reporting:
@@ -175,7 +170,6 @@ problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
 - Improve control of whether bound Hands are hidden if fiber->disp->visible==0
 - use VBO to display each fiber with style=1 and 2
 - SimThread can store two simulation states, such as to be able to flip back-and-forth quickly.
-- depth-sorting of fiber segment: displayTFiber(Fiber *, int inx)
 - stereoscopic display for 3D
 
 # Misc:
