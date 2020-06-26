@@ -97,10 +97,10 @@ const GLfloat COL = 0.8;
 
 void generatePoints(real len)
 {
-    Vector inf, sup;
-    spc->boundaries(inf, sup);
+    Vector inf, dif;
+    spc->boundaries(inf, dif);
     inf -= Vector(len, len, len);
-    Vector dif = sup - inf + Vector(len, len, len);
+    dif += Vector(len, len, len) - inf;
     
     if ( regular_distribution )
     {
@@ -109,15 +109,15 @@ void generatePoints(real len)
         nbpts = 0;
         //follow a regular lattice:
         for ( size_t ii = 0; ii <= scan; ++ii )
-            for ( size_t jj = 0; jj <= scan; ++jj )
+        for ( size_t jj = 0; jj <= scan; ++jj )
 #if ( DIM >= 3 )
-                for ( kk = 0; kk <= scan; ++kk )
+        for ( kk = 0; kk <= scan; ++kk )
 #endif
-                {
-                    point[nbpts++] = inf + dif.e_mul(Vector(ii, jj, kk));
-                    if ( nbpts >= maxpts )
-                        return;
-                }
+        {
+            point[nbpts++] = inf + dif.e_mul(Vector(ii, jj, kk));
+            if ( nbpts >= maxpts )
+                return;
+        }
     }
     else
     {
