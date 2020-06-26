@@ -131,20 +131,29 @@ public:
     Vector         bounce(Vector) const;
     
     
-    /// a Vector perpendicular to the space edge at `point`, directed towards the outside
-    virtual Vector normalToEdge(Vector const& pos) const;
+    //---------------------------- DERIVED -------------------------------------
+    
+    /// calculate a random position located inside and at most at distance `radius` from the edge
+    Vector         randomPlaceNearEdge(real rad, size_t nb_trials) const;
+
+    /// calculate a random position located on the edge
+    Vector         randomPlaceOnEdge(real rad, size_t nb_trials) const;
+    
+    /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
+    real           estimateVolume(size_t cnt) const;
+    
     
     /// a random position inside the volume, uniformly distributed in the volume
     virtual Vector randomPlace() const;
 
-    /// a random position located inside and at most at distance `radius` from the edge
-    virtual Vector randomPlaceNearEdge(real rad, unsigned long nb_trials = 10000) const;
+    /// a Vector perpendicular to the space edge at `point`, directed towards the outside
+    virtual Vector normalToEdge(Vector const& pos) const;
     
-    /// a random position located on the edge
-    Vector         randomPlaceOnEdge(real rad, size_t nb_trials = 10000) const;
+    /// a random position located on the edge of the Space, uniformly distributed on the surface
+    virtual Vector randomPlaceNearEdge(real rad) const { return randomPlaceNearEdge(rad, 1<<14); }
     
-    /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
-    real           estimateVolume(size_t cnt) const;
+    /// a random position located on the edge of the Space, uniformly distributed on the surface
+    virtual Vector randomPlaceOnEdge(real rad) const { return randomPlaceOnEdge(rad, 1<<14); }
 
     //------------------------------ SIMULATION ---------------------------------
     

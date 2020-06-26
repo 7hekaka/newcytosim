@@ -85,7 +85,7 @@ public:
     void       step();
     
     /// near the top edge
-    Vector     randomPlaceNearEdge(real radius, unsigned long) const;
+    Vector     randomPlaceOnEdge(real) const;
 
     /// OpenGL display function; returns true if successful
     bool       draw() const;

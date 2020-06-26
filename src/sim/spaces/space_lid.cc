@@ -59,7 +59,7 @@ void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 /**
  place only at upper boundary. This overrides the function in spaces
  */
-Vector SpaceLid::randomPlaceNearEdge(real radius, unsigned long) const
+Vector SpaceLid::randomPlaceOnEdge(real) const
 {
     return Vector( RNG.sfloat()*length_[0], top_, 0 );
 }

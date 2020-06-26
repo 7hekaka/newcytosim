@@ -74,6 +74,7 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
 Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 {
 #if ( DIM > 2 )
+#if HAS_SMOOTH_EDGES
     if ( edge_ > 0 )
     {
         const real R = sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
@@ -85,6 +86,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
         return normalize(pos-Vector(X,Y,Z));
     }
     else
+#endif
     {
         const real R = sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
         const real dZ = min_real(abs_real(pos.ZZ-top_), abs_real(bot_-pos.ZZ));
@@ -98,20 +100,103 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 
 
 /**
+Pappus's (1st) Centroid Theorem: the volume of a planar area of revolution is
+the product of the area A and the length of the path traced by its centroid,
+For a half-circle, this is GC = 2 R / M_PI
+
+https://en.wikipedia.org/wiki/Pappus%27s_centroid_theorem
+*/
+Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
+{
+#if ( DIM > 2 )
+#if HAS_SMOOTH_EDGES
+    if ( edge_ > 0 )
+    {
+        const real RE = radius_ - edge_;
+        const real LE = top_ - bot_ - 2 * edge_;
+        const real GC = RE + 2 * edge_ / M_PI;
+        const real S0 = 2 * M_PI * radius_ * LE;
+        const real S1 = 2 * M_PI * square(RE);
+        const real S2 = 2 * square(M_PI) * GC * edge_;
+        const real P = RNG.preal() * ( S0 + S1 + S2 );
+        if ( P < S0 )
+        {
+            Vector2 XY = Vector2::randU(radius_);
+            real Z = bot_ + edge_ + LE * RNG.preal();
+            return Vector(XY.XX, XY.YY, Z);
+        }
+        else if ( P < S0+S1 )
+        {
+            Vector2 XY = Vector2::randB(RE);
+            real Z = RNG.choice(bot_, top_);
+            return Vector(XY.XX, XY.YY, Z);
+        }
+        else
+        {
+            real L = square(RE/radius_);
+            real X, Y, Z, R;
+            do {
+                // generate a point inside Cylinder
+                do {
+                    X = RNG.sreal();
+                    Y = RNG.sreal();
+                    R = square(X) + square(Y);
+                } while ( R < L | 1.0 < R );
+                R = sqrt(R);
+                Z = edge_ * RNG.sreal();
+                // repeat until point is inside Torus
+            } while ( square(R*radius_-RE) + square(Z) > edgeSqr_ );
+            // coordinate of projection on circle of radius RE:
+            real Xc = X * RE / R;
+            real Yc = Y * RE / R;
+            X *= radius_;
+            Y *= radius_;
+            // normalize to [Xc, Yc, 0]
+            R = edge_ / sqrt( square(X-Xc) + square(Y-Yc) + square(Z) );
+            X = R * ( X - Xc ) + Xc;
+            Y = R * ( Y - Yc ) + Yc;
+            Z = R * Z + sign_select(Z, bot_+edge_, top_-edge_);
+            return Vector(X, Y, Z);
+        }
+    }
+    else
+#endif
+    {
+        const real S0 = M_PI * square(radius_) * ( top_ - bot_ );
+        const real S1 = M_PI * square(radius_) * 2;
+        const real P = RNG.preal() * ( S0 + S1 );
+        if ( P < S0 )
+        {
+            Vector2 XY = Vector2::randU(radius_);
+            real Z = bot_ + ( top_ - bot_ ) * RNG.preal();
+            return Vector(XY.XX, XY.YY, Z);
+        }
+        else
+        {
+            Vector2 XY = Vector2::randB(radius_);
+            real Z = RNG.choice(bot_, top_);
+            return Vector(XY.XX, XY.YY, Z);
+        }
+    }
+#endif
+}
+
+/**
  Pappus's (2nd) Centroid Theorem: the volume of a planar area of revolution is
  the product of the area A and the length of the path traced by its centroid R,
- i.e., 2 M_PI R.
+ For a half-disc, this is GC = 4 / 3.0 * R / M_PI
  
  https://en.wikipedia.org/wiki/Pappus%27s_centroid_theorem
  */
 real SpaceCylinderZ::volume() const
 {
 #if HAS_SMOOTH_EDGES
-    const real R = radius_ - edge_;
-    const real L = top_ - bot_ - 2 * edge_;
-    return M_PI * ( L * square(radius_)       //central cylindrical part
-                   + 2 * edge_ * square(R)    //top and bottom central cylinders
-                   + ( R * M_PI + 4/3.0 * edge_ ) * square(edge_) );
+    const real RE = radius_ - edge_;
+    const real LE = top_ - bot_ - 2 * edge_;
+    const real GC = RE + 4 / 3.0 * edge_ / M_PI;
+    return M_PI * ( LE * square(radius_)       // central cylindrical part
+                   + 2 * edge_ * square(RE)    // top and bottom central cylinders
+                   + M_PI * GC * square(edge_) );     // revolution
 #else
     return M_PI * ( top_ - bot_ ) * square(radius_);
 #endif

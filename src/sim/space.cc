@@ -95,7 +95,7 @@ Vector Space::randomPlaceOnEdge(real rad, size_t nb_trials) const
         res = project(pos);
         D = ( pos - res ).normSqr();
         if ( ++ouf > nb_trials )
-            throw InvalidParameter("edge placement failed for space `"+prop->name()+"'");
+            throw InvalidParameter("surface placement failed for space `"+prop->name()+"'");
     } while ( D > RR );
     
     return res;

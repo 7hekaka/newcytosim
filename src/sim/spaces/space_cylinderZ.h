@@ -62,6 +62,9 @@ public:
     
     /// direct normal direction calculation
     Vector      normalToEdge(Vector const& pos) const;
+    
+    /// direct surface placement
+    Vector      randomPlaceOnEdge(real) const;
 
     /// the volume inside
     real        volume() const;
