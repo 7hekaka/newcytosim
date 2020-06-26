@@ -115,6 +115,12 @@ private:
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
         void vecMulAdd2D_AVXU4(const real* X, real* Y, size_t j) const;
+        
+        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
+        void vecMulAdd3D_SSE(const real* X, real* Y, size_t j) const;
+        
+        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
+        void vecMulAdd3D_SSEU(const real* X, real* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
         void vecMulAdd3D_AVX(const real* X, real* Y, size_t j) const;

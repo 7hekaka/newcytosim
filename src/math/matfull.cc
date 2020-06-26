@@ -166,7 +166,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         vec4 y1 = setzero4();
         vec4 y2 = setzero4();
         vec4 y3 = setzero4();
-        real const* ptr = mat_ + 16 * block(i, 0);
+        real const* ptr = mat_ + SB * block(i, 0);
         const size_t last = ~7 & size_; // last multiple of 8 <= size_
         {
             vec4 s0 = setzero4();
@@ -181,11 +181,11 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
                 y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
                 y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
                 y3 = fmadd4(streamload4(ptr+12), xx, y3);
-                s0 = fmadd4(streamload4(ptr+16), yy, s0);
-                s1 = fmadd4(streamload4(ptr+20), yy, s1);
-                s2 = fmadd4(streamload4(ptr+24), yy, s2);
-                s3 = fmadd4(streamload4(ptr+28), yy, s3);
-                ptr += 32;
+                s0 = fmadd4(streamload4(ptr   +SB), yy, s0);
+                s1 = fmadd4(streamload4(ptr+ 4+SB), yy, s1);
+                s2 = fmadd4(streamload4(ptr+ 8+SB), yy, s2);
+                s3 = fmadd4(streamload4(ptr+12+SB), yy, s3);
+                ptr += 2*SB;
             }
             y0 = add4(y0, s0);
             y1 = add4(y1, s1);
@@ -199,7 +199,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
             y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
             y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
             y3 = fmadd4(streamload4(ptr+12), xx, y3);
-            ptr += 16;
+            ptr += SB;
         }
         if ( end < size_ )
         {
@@ -237,7 +237,7 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
             x2 = duplo4(x3); // = broadcast1(xxx+2);
             x3 = duphi4(x3); // = broadcast1(xxx+3);
         }
-        real const* ptr = mat_ + 16 * block(i, 0);
+        real const* ptr = mat_ + SB * block(i, 0);
         for ( size_t j = 0; j < end; j += 4 )
         {
             vec4 s = fmadd4(streamload4(ptr), x0, load4(Y+j));
@@ -245,7 +245,7 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
             s = fmadd4(streamload4(ptr+ 8), x2, s);
             s = fmadd4(streamload4(ptr+12), x3, s);
             store4(Y+j, s);
-            ptr += 16;
+            ptr += SB;
         }
         if ( end < size_ )
         {

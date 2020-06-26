@@ -17,7 +17,10 @@
  FJN 27.04.2020
  */
 class MatrixFull final
-{    
+{
+    /// number of real in a matrix block
+    static constexpr size_t SB = 16;
+
 private:
     
     /// size of matrix
