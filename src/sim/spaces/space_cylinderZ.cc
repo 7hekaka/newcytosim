@@ -133,30 +133,25 @@ Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
         }
         else
         {
-            real L = square(RE/radius_);
-            real X, Y, Z, R;
+            real Z, R, N;
             do {
                 // generate a point inside Cylinder
-                do {
-                    X = RNG.sreal();
-                    Y = RNG.sreal();
-                    R = square(X) + square(Y);
-                } while ( R < L | 1.0 < R );
-                R = sqrt(R);
-                Z = edge_ * RNG.sreal();
-                // repeat until point is inside Torus
-            } while ( square(R*radius_-RE) + square(Z) > edgeSqr_ );
-            // coordinate of projection on circle of radius RE:
-            real Xc = X * RE / R;
-            real Yc = Y * RE / R;
-            X *= radius_;
-            Y *= radius_;
-            // normalize to [Xc, Yc, 0]
-            R = edge_ / sqrt( square(X-Xc) + square(Y-Yc) + square(Z) );
-            X = R * ( X - Xc ) + Xc;
-            Y = R * ( Y - Yc ) + Yc;
-            Z = R * Z + sign_select(Z, bot_+edge_, top_-edge_);
-            return Vector(X, Y, Z);
+                R = RE / edge_;
+                /* generate R randomly between 0 and 1, with skewed probabilities:
+                 The probability is 'RE' at 0 and 'RE+edge_' at 1, as needed
+                 to obtain a uniform volume sampling of the cut cylinder,
+                 for RE < R < RE + edge_.
+                 This formula was derived by inverting the cumulative probability */
+                R = sqrt(square(R)+RNG.preal()*(2*R+1)) - R;
+                Z = RNG.sreal();
+                // repeat until point is inside Torus:
+                N = square(R) + square(Z);
+            } while ( N > 1.0 );
+            // normalize to get a point on the surface:
+            N = edge_ / sqrt(N);
+            Vector2 XY = Vector2::randU(RE+R*N);
+            Z = N * Z + sign_select(Z, bot_+edge_, top_-edge_);
+            return Vector(XY.XX, XY.YY, Z);
         }
     }
     else
