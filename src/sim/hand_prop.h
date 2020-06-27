@@ -15,8 +15,11 @@
 #define NEW_BIND_ONLY_FREE_END 0
 
 /**
- Only attempts to binds Hands every 8 times-step, compensating by increasing the
- effective binding rate. This can be advantageous since paintGrid() is spared
+ Only attempts to binds Hands every N times-step, compensating by increasing the
+ effective binding rate by a factor N. This can be advantageous since paintGrid()
+ is spared during N-1 steps as attachment algorithm runs only once every N steps.
+ The defined value is N, the number of steps over which attachments are pooled.
+ Define POOL_HAND_ATTACHMENT as 0 to disable, or 4, 8 or 16 to enable.
  */
 #define POOL_HAND_ATTACHMENT 0
 

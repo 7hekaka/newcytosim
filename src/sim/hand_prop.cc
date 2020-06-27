@@ -239,7 +239,7 @@ void HandProp::complete(Simul const& sim)
     unbinding_rate_dt = unbinding_rate * sim.time_step();
     //std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
 #if POOL_HAND_ATTACHMENT
-    binding_prob = -std::expm1(-binding_rate * sim.time_step() * 8);
+    binding_prob = -std::expm1(-binding_rate * sim.time_step() * POOL_HAND_ATTACHMENT);
 #else
     binding_prob = -std::expm1(-binding_rate * sim.time_step());
 #endif

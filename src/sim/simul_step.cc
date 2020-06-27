@@ -133,7 +133,7 @@ void Simul::step()
     //printf("     ::steps    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 
 #if POOL_HAND_ATTACHMENT
-    dontAttach = ( dontAttach + 1 ) & 7;
+    dontAttach = ( dontAttach + 1 ) % POOL_HAND_ATTACHMENT;
     
     if ( 0 == dontAttach )
 #endif
