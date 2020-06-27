@@ -48,8 +48,7 @@ const Vector2 Vector2::randU()
         y = RNG.sreal();
         d = x*x + y*y;
     } while ( d > 1.0  ||  d < 0.01 );
-    d = sqrt( d );
-    return Vector2(x, y) / d;
+    return Vector2(x, y) / sqrt(d);
 }
 
 const Vector2 Vector2::randU(const real n)
@@ -72,11 +71,8 @@ const Vector2 Vector2::randU()
         x = RNG.sreal();
         y = RNG.sreal();
         d = x*x + y*y;
-    } while ( d > 1.0 );
-    if ( d > 0.0 )
-        return Vector2(x*x-y*y, 2*x*y) / d;
-    else
-        return Vector2(1, 0);
+    } while ( d > 1.0 | d == 0 );
+    return Vector2(x*x-y*y, 2*x*y) / d;
 }
 
 const Vector2 Vector2::randU(const real n)
@@ -86,11 +82,8 @@ const Vector2 Vector2::randU(const real n)
         x = RNG.sreal();
         y = RNG.sreal();
         d = x*x + y*y;
-    } while ( d > 1.0 );
-    if ( d > 0.0 )
-        return Vector2(x*x-y*y, 2*x*y) * (n/d);
-    else
-        return Vector2(n, 0);
+    } while ( d > 1.0 | d == 0 );
+    return Vector2(x*x-y*y, 2*x*y) * (n/d);
 }
 
 #endif
