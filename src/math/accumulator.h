@@ -8,9 +8,9 @@ This calculated the mean and the variance of a set of given Vector
 class Accumulator
 {
 public:
-    real sum;
-    real avg[3];
-    real var[9];
+    double sum;
+    double avg[3];
+    double var[9];
     
     /// set all accumulators to zero
     void reset()

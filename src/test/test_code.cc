@@ -341,7 +341,7 @@ void projectForcesU2D_SSE(size_t nbs, const real* dif, const real* src, real* mu
 
 #endif
 
-#ifdef __AVX__
+#if defined __AVX__ && ( REAL_IS_DOUBLE )
 
 __m256i make_mask(long i)
 {
@@ -1061,7 +1061,8 @@ void projectForces(size_t nbs, const real* X, real* Y)
 }
 
 
-#if defined __AVX__
+#if defined __AVX__ && ( REAL_IS_DOUBLE )
+
 void projectForcesAVX(size_t nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
@@ -1197,7 +1198,7 @@ void testProject()
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
 
         nan_fill(nbs, lag_);
-#ifdef __AVX__
+#if defined __AVX__ && ( REAL_IS_DOUBLE )
         //projectForcesAVX(nbs, x, z);
 #if ( DIM == 3 )
         projectForcesU3D_AVX(nbs, dir_, x, lag_);
@@ -1242,7 +1243,7 @@ int main(int argc, char* argv[])
         setAnisotropy(NBS);
         std::cout << "testProject " << DIM << "D " << NBS << "\n";
         speedProject(CNT, projectForces,    " projF");
-#if defined __AVX__
+#if defined __AVX__ && ( REAL_IS_DOUBLE )
         speedProject(CNT, projectForcesAVX, " prAVX");
 #endif
         speedProject(CNT, projectDPTTS,     " dptts");
