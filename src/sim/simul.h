@@ -53,6 +53,11 @@ public:
     /// Meca used to solve the system with option 'solve=horizontal'
     Meca1D *          pMeca1D;
 
+#if POOL_HAND_ATTACHMENT
+    /// flag to authorize Hand's attachment
+    unsigned char     dontAttach;
+#endif
+    
 private:
     
     /// signals that Simul is ready to perform a Monte-Carlo step

@@ -12,12 +12,6 @@ class FiberProp;
 class Simul;
 
 
-/**
- Use alternative binding scheme in which Hands have their own Gillespie counter
- This may be more efficient as it uses fewer random numbers
- */
-#define TRICKY_HAND_ATTACHMENT 0
-
 
 /// Simulates the stochastic binding/unbinding of a FiberSite
 /**

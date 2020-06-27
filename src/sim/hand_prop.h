@@ -14,6 +14,12 @@
 /// enables "bind_only_free_end" to limit binding of Hands to Fibers
 #define NEW_BIND_ONLY_FREE_END 0
 
+/**
+ Only attempts to binds Hands every 8 times-step, compensating by increasing the
+ effective binding rate. This can be advantageous since paintGrid() is spared
+ */
+#define POOL_HAND_ATTACHMENT 0
+
 class Hand;
 class HandMonitor;
 class PointDisp;

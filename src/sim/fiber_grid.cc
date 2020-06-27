@@ -304,11 +304,11 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      Instead of flipping a coin for each target, we could use a single random
      number to get the index of the next target that will bind, using a Poisson
      distribution */
-    const real prob = ha.prop->binding_prob;
+    const uint32_t prob = 0x1p+32 * ha.prop->binding_prob;
     for ( HeavySegment const& target : targets )
     {
         //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
-        if ( RNG.test(prob) )
+        if ( RNG.pint() < prob )
         {
             FiberSegment const& seg = target.seg_;
             Fiber * fib = const_cast<Fiber*>(seg.fiber());
@@ -343,14 +343,11 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     
     //std::clog << "tryToAttach has " << segments.size() << " targets\n";
 
+    const uint32_t prob = 0x1p+32 * ha.prop->binding_prob;
     const real sup = ha.prop->binding_range_sqr;
     for ( FiberSegment const& seg : segments )
     {
-#if !TRICKY_HAND_ATTACHMENT
-        if ( RNG.test(ha.prop->binding_prob) )
-#else
-        if ( RNG.flip_8th() )
-#endif
+        if ( RNG.pint() < prob )
         {
             real dis = INFINITY;
             // Compute the distance from the hand to the rod, and abscissa of projection:

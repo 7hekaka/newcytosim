@@ -77,7 +77,9 @@ singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 {
     pMeca1D = nullptr;
     sReady  = false;
-    
+#if POOL_HAND_ATTACHMENT
+    dontAttach = 0;
+#endif
     autoPrecond = 0;
     autoCounter = 0;
     for ( size_t u = 0; u < 6; ++u )

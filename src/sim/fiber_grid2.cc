@@ -67,11 +67,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     const uint32_t prob = 0x1p+32 * ha.prop->binding_prob;
     for ( FiberSegment const& seg : allSegments )
     {
-#if !TRICKY_HAND_ATTACHMENT
         if ( RNG.pint() < prob )
-#else
-        if ( RNG.flip_8th() )
-#endif
         {
             // Compute the distance between 'place' and segment
             real dis = INFINITY;

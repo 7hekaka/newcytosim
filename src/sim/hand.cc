@@ -242,9 +242,6 @@ void Hand::detach()
 #if FIBER_HAS_LATTICE
     fbLattice = nullptr;
 #endif
-#if TRICKY_HAND_ATTACHMENT
-    nextAttach = RNG.exponential();
-#endif
 }
 
 
@@ -299,32 +296,11 @@ void Hand::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_true( unattached() );
 
-#if !TRICKY_HAND_ATTACHMENT
-    // test for attachment at every time_step, ignoring `nextAttach`
-    sim.fiberGrid.tryToAttach(pos, *this);
-#else
-    assert_true( nextAttach >= 0 );
-    // we test attachement with a rate that is 8x higher than the binding rate:
-    nextAttach -= prop->binding_rate_dt_8;
-
-    while ( nextAttach < 0 )
-    {
-        /*
-         grid.tryToAttach() is modified to give a probability to attach of 1/8,
-         to compensate for the counter 'nextAttach' running at 8x the true binding rate.
-         In this way, there is still a difference in binding between a region with
-         many filament targets, or just one. However, the two algorithms would differ
-         in the case of very high number of targets, with the TRICKY_HAND_ATTACHMENT
-         saturating at 8x the given binding rate.
-         */
-        sim.fiberGrid.tryToAttach(pos, *this);
-            
-        if ( attached() )
-            break;
-        
-        nextAttach += RNG.exponential();
-    }
+    // test for attachment
+#if POOL_HAND_ATTACHMENT
+    if ( 0 == sim.dontAttach )
 #endif
+        sim.fiberGrid.tryToAttach(pos, *this);
 }
 
 

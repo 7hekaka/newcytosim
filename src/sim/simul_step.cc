@@ -132,42 +132,45 @@ void Simul::step()
     
     //printf("     ::steps    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
 
-    // calculate grid range from Hand's binding range:
-    real range = 0.0;
-    for ( Property const* i : properties.find_all("hand") )
-        range = std::max(range, static_cast<HandProp const*>(i)->binding_range);
-
-    // distribute Fibers over a grid for binding of Hands:
-    fiberGrid.paintGrid(fibers.first(), nullptr, range);
+#if POOL_HAND_ATTACHMENT
+    dontAttach = ( dontAttach + 1 ) & 7;
     
-    //printf("     ::paint    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
-
-#if ( 0 )
-    
-    // This code continuously tests the binding algorithm.
-    
-    if ( fiberGrid.hasGrid() )
-    {
-        HandProp hp("test_binding");
-        hp.binding_rate  = INFINITY;
-        hp.binding_range = RNG.preal() * range;
-        hp.bind_also_end = BOTH_ENDS;
-        hp.complete(*this);
-        
-        Space const* spc = spaces.master();
-        for ( size_t i = 0; i < 16; ++i )
-        {
-            Vector pos = spc->randomPlace();
-            fiberGrid.testAttach(stdout, pos, fibers, &hp);
-        }
-    }
-    
+    if ( 0 == dontAttach )
 #endif
+    {
+        // calculate grid range from Hand's binding range:
+        real range = 0.0;
+        for ( Property const* i : properties.find_all("hand") )
+            range = std::max(range, static_cast<HandProp const*>(i)->binding_range);
+        
+        // distribute Fibers over a grid for binding of Hands:
+        fiberGrid.paintGrid(fibers.first(), nullptr, range);
+        
+        //printf("     ::paint    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+    
+#if ( 0 )
+        // This code continuously tests the binding algorithm.
+        if ( fiberGrid.hasGrid() )
+        {
+            HandProp hp("test_binding");
+            hp.binding_rate  = INFINITY;
+            hp.binding_range = RNG.preal() * range;
+            hp.bind_also_end = BOTH_ENDS;
+            hp.complete(*this);
+            
+            Space const* spc = spaces.master();
+            for ( size_t i = 0; i < 16; ++i )
+            {
+                Vector pos = spc->randomPlace();
+                fiberGrid.testAttach(stdout, pos, fibers, &hp);
+            }
+        }
+#endif
+    }
     
     // step Hand-containing objects, giving them a possibility to attach Fibers:
     couples.step();
     singles.step();
-    
     //printf("     ::attach   %16llu\n", (__rdtsc()-rdt)>>3);
 }
 
