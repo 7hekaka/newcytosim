@@ -63,6 +63,14 @@ new event
    mark = 2
 }
 
+
+new event
+{
+   delay = 0.01
+   code = ( new ball { radius=0.5; position=0 0 0; } )
+}
+
+
 run 100 system
 
 delete ball
