@@ -18,7 +18,7 @@
 
 
 /// 4x4 matrix class with 16 'real' elements
-class alignas(32) Matrix44
+class alignas(4*sizeof(real)) Matrix44
 {
 public:
     

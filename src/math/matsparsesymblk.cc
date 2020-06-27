@@ -534,7 +534,7 @@ void MatrixSparseSymmetricBlock::Column::print(std::ostream& os) const
 
 
 /// A block element of the sparse matrix suitable for qsort()
-class alignas(32) MatrixSparseSymmetricBlock::Element
+class alignas(4*sizeof(real)) MatrixSparseSymmetricBlock::Element
 {
 public:
     /// index

@@ -29,7 +29,7 @@
  Matrix34 is defacto a 3x4 matrix, but it can be used as a 3x3 matrix.
  The function clear_shadow() clears the data that is not part of the 3x3 matrix.
  */
-class alignas(32) Matrix34 final
+class alignas(4*sizeof(real)) Matrix34 final
 {
 public:
     
