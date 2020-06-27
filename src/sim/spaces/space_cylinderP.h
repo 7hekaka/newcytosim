@@ -58,6 +58,12 @@ public:
     /// a random position inside the volume
     Vector      randomPlace() const;
     
+    /// direct normal direction calculation
+    Vector      normalToEdge(Vector const&) const;
+    
+    /// direct surface placement
+    Vector      randomPlaceOnEdge(real) const;
+
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
 

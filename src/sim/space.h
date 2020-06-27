@@ -106,7 +106,7 @@ public:
     /// true if no point of the sphere (`center`, `radius`) is inside this Space
     virtual bool   allOutside(Vector const&, real rad) const;
     
-    //---------------------------- DERIVED -------------------------------------
+    //--------------- FUNCTIONS THAT CAN BE CALCULATED--------------------------
     
     /// returns the maximum absolute value of any coordinate
     real           max_extension() const;
@@ -117,6 +117,12 @@ public:
     /// project `point` on this Space deflated by `radius`, putting the result in `proj`
     Vector         projectDeflated(Vector const&, real rad) const;
     
+    /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
+    real           estimateVolume(size_t cnt) const;
+    
+    /// bring a position back inside, as if it bounced off the edges of the Space
+    Vector         bounce(Vector) const;
+
     
     /// the square of the distance to the edge of this Space
     real           distanceToEdgeSqr(Vector const&) const;
@@ -127,22 +133,14 @@ public:
     /// the distance to the edge, positive if `point` is outside, and negative if inside
     real           signedDistanceToEdge(Vector const&) const;
     
-    /// bring a position back inside, as if it bounced off the walls of the Space
-    Vector         bounce(Vector) const;
-    
-    
-    //---------------------------- DERIVED -------------------------------------
-    
-    /// calculate a random position located inside and at most at distance `radius` from the edge
+    /// calculate a random position located inside and at most at distance `rad` from the edge
     Vector         randomPlaceNearEdge(real rad, size_t nb_trials) const;
-
+    
     /// calculate a random position located on the edge
     Vector         randomPlaceOnEdge(real rad, size_t nb_trials) const;
-    
-    /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
-    real           estimateVolume(size_t cnt) const;
-    
-    
+
+    //------------- DERIVED FUNCTIONS THAT CAN BE OVERWRITTEN ------------------
+
     /// a random position inside the volume, uniformly distributed in the volume
     virtual Vector randomPlace() const;
 
@@ -155,7 +153,7 @@ public:
     /// a random position located on the edge of the Space, uniformly distributed on the surface
     virtual Vector randomPlaceOnEdge(real rad) const { return randomPlaceOnEdge(rad, 1<<14); }
 
-    //------------------------------ SIMULATION ---------------------------------
+    //------------------------------ SIMULATION --------------------------------
     
     /// one Monte-Carlo simulation step
     virtual void   step() {}
@@ -195,7 +193,7 @@ public:
     /// print descriptive quantities to stream
     virtual void   report(std::ostream&) const {}
 
-    //------------------------------ DISPLAY ----------------------------------
+    //------------------------------ DISPLAY -----------------------------------
     
     /// a shape-specific openGL display function, return true if display was done
     /**

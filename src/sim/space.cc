@@ -509,7 +509,7 @@ void Space::drawSection(const int dim, const real pos, const real step) const
 {
     Vector inf, sup;
     boundaries(inf, sup);
-    Vector q, p( pos, pos, pos );
+    Vector p( pos, pos, pos );
     int xx = ( dim + 1 ) % DIM;
     int yy = ( xx + 1 ) % DIM;
     
@@ -522,29 +522,25 @@ void Space::drawSection(const int dim, const real pos, const real step) const
     for ( real a = -xs; a < xs; a += inc )
     {
         p[xx] = a;
-        q = project(p);
-        gle::gleVertex(q);
+        gle::gleVertex(project(p));
     };
     p[xx] = xs;
     for ( real a = -ys; a < ys; a += inc )
     {
         p[yy] = -a;
-        q = project(p);
-        gle::gleVertex(q);
+        gle::gleVertex(project(p));
     };
     p[yy] = -ys;
     for ( real a = -xs; a < xs; a += inc )
     {
         p[xx] = -a;
-        q = project(p);
-        gle::gleVertex(q);
+        gle::gleVertex(project(p));
     };
     p[xx] = -xs;
     for ( real a = -ys; a < ys; a += inc )
     {
         p[yy] = a;
-        q = project(p);
-        gle::gleVertex(q);
+        gle::gleVertex(project(p));
     };
     glEnd();
 }

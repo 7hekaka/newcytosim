@@ -34,7 +34,6 @@ void SpaceRing::resize(Glossary& opt)
 
     length_ = len;
     radius_ = rad;
-    update();
 }
 
 
@@ -69,7 +68,7 @@ bool SpaceRing::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
     const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
-    return ( abs_real(W.XX) <= length_  &&  RT <= radiusSqr_ );
+    return ( abs_real(W.XX) <= length_  &&  RT <= square(radius_) );
 #else
     return false;
 #endif
@@ -164,7 +163,6 @@ void SpaceRing::setLengths(const real len[])
 {
     length_ = len[0];
     radius_ = len[1];
-    update();
 }
 
 

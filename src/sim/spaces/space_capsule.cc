@@ -34,7 +34,6 @@ void SpaceCapsule::resize(Glossary& opt)
     
     length_ = len;
     radius_ = rad;
-    update();
 }
 
 
@@ -48,17 +47,16 @@ void SpaceCapsule::boundaries(Vector& inf, Vector& sup) const
 real SpaceCapsule::volume() const
 {
 #if ( DIM >= 3 )
-    return ( length_ + (2/3.0) * radius_ ) * radiusSqr_ * ( 2 * M_PI );
+    return ( length_ + (2/3.0) * radius_ ) * square(radius_) * ( 2 * M_PI );
 #else
-    return 4 * length_ * radius_ + M_PI * radiusSqr_;
+    return 4 * length_ * radius_ + M_PI * square(radius_);
 #endif
 }
 
 bool SpaceCapsule::inside(Vector const& W) const
 {
     real n = W.normYZSqr() + square(max_real(0, abs_real(W.XX)-length_));
-    
-    return ( n <= radiusSqr_ );
+    return ( n <= square(radius_) );
 }
 
 
@@ -71,79 +69,109 @@ bool SpaceCapsule::allInside(Vector const& W, const real rad) const
 }
 
 //------------------------------------------------------------------------------
-Vector SpaceCapsule::project(Vector const& W) const
+Vector SpaceCapsule::project(Vector const& pos) const
 {
-    Vector P(W);
-    real n = W.normYZSqr();
+    // calculate the projection on the axis, within boundaries:
+    real X = min_real(length_, max_real(pos.XX, -length_));
     
-    //calculate the projection on the axis, within boundaries:
-    if ( abs_real(W.XX) > length_ )
-    {
-        real L = std::copysign(length_, W.XX);
-        n += square( W.XX - L );
-        //normalize from this point on the axis
-        if ( n > 0 ) n = radius_ / sqrt(n);
-        
-        P.XX = L + n * ( W.XX - L );
-    }
-    else
-    {
-        //normalize from this point on the axis
-        if ( n > 0 ) n = radius_ / sqrt(n);
-        
-        P.XX = W.XX;
-    }
-    
+#if ( DIM >= 3 )
+    real n = square(pos.XX-X) + pos.normYZSqr();
     if ( n > 0 )
     {
-#if ( DIM > 1 )
-        P.YY = n * W.YY;
-#endif
-#if ( DIM >= 3 )
-        P.ZZ = n * W.ZZ;
-#endif
+        n = radius_ / sqrt(n);
+        return Vector( X + n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
     }
-    else
+    Vector2 YZ = Vector2::randU(radius_);
+    return Vector(0, YZ.XX, YZ.YY);
+#elif ( DIM >= 2 )
+    real n = square(pos.XX-X) + square(pos.YY);
+    if ( n > 0 )
     {
-        //we project on a arbitrary point on the cylinder
-#if ( DIM > 1 )
-        P.YY = radius_;
-#endif
-#if ( DIM >= 3 )
-        P.ZZ = 0;
-#endif
+        n = radius_ / sqrt(n);
+        return Vector(X + n * ( pos.XX - X ), n * pos.YY, 0);
     }
-    return P;
+#endif
+    return Vector(0, radius_*RNG.sflip(), 0);
 }
 
 
 Vector SpaceCapsule::randomPlace() const
 {
-    size_t nb_trials = 1<<13;
-    size_t ouf = 0;
-    Vector res;
-
-    do {
-        
-#if ( DIM == 1 )
-        res.set((length_+radius_)*RNG.sreal());
-#elif ( DIM == 2 )
-        res.set((length_+radius_)*RNG.sreal(), radius_*RNG.sreal());
-#else
-        const Vector2 V = Vector2::randB(radius_);
-        res.set((length_+radius_)*RNG.sreal(), V.XX, V.YY);
+#if ( DIM >= 3 )
+    // volume elements divided by 4 * M_PI * radius_
+    const real V0 = length_;
+    const real V1 = radius_;  // spherical caps
+    const real P = RNG.preal() * ( V0 + V1 );
+    if ( P < V0 )
+    {
+        Vector2 YZ = Vector2::randB(radius_);
+        return Vector(RNG.sreal()*length_, YZ.XX, YZ.YY);
+    }
+#elif ( DIM >= 2 )
+    // surface elements divided by radius_
+    const real V0 = 4 * length_;
+    const real V1 = M_PI * radius_;  // spherical caps
+    const real P = RNG.preal() * ( V0 + V1 );
+    if ( P < V0 )
+        return Vector(RNG.sreal()*length_, RNG.sreal()*radius_, 0);
 #endif
-        
-        if ( ++ouf > nb_trials )
-        {
-            std::clog << "placement failed in SpaceCapsule::randomPlace()" << std::endl;
-            return Vector(0,0,0);
-        }
-        
-    } while ( ! inside(res) );
-    
-    return res;
+    // a position on the caps:
+    Vector vec = Vector::randB(radius_);
+    vec.XX += std::copysign(length_, vec.XX);
+    return vec;
 }
+
+
+Vector SpaceCapsule::normalToEdge(Vector const& pos) const
+{
+    real X = min_real(length_, max_real(pos.XX, -length_));
+#if ( DIM >= 3 )
+    real n = square(pos.XX-X) + pos.normYZSqr();
+    if ( n > 0 )
+    {
+        n = 1.0 / sqrt(n);
+        return Vector(n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
+    }
+    Vector2 YZ = Vector2::randU();
+    return Vector(0, YZ.XX, YZ.YY);
+#elif ( DIM >= 2 )
+    real n = square(pos.XX-X) + square(pos.YY);
+    if ( n > 0 )
+    {
+        n = 1.0 / sqrt(n);
+        return Vector(n * ( pos.XX - X ), n * pos.YY, 0);
+    }
+#endif
+    return Vector(0, RNG.sflip(), 0);
+}
+
+
+Vector SpaceCapsule::randomPlaceOnEdge(real) const
+{
+#if ( DIM >= 3 )
+    // surface elements divided by 4 * M_PI * radius_
+    const real S0 = length_;
+    const real S1 = radius_;  // spherical caps
+    const real P = RNG.preal() * ( S0 + S1 );
+    if ( P < S0 )
+    {
+        Vector2 YZ = Vector2::randU(radius_);
+        return Vector(RNG.sreal()*length_, YZ.XX, YZ.YY);
+    }
+#else
+    // length elements divided by 2
+    const real S0 = length_;
+    const real S1 = M_PI * radius_;  // spherical caps
+    const real P = RNG.preal() * ( S0 + S1 );
+    if ( P < S0 )
+        return Vector(RNG.sreal()*length_, RNG.sflip()*radius_, 0);
+#endif
+    // a position on the caps:
+    Vector vec = Vector::randU(radius_);
+    vec.XX += std::copysign(length_, vec.XX);
+    return vec;
+}
+
 
 //------------------------------------------------------------------------------
 
@@ -196,7 +224,6 @@ void SpaceCapsule::setLengths(const real len[])
 {
     length_ = len[0];
     radius_ = len[1];
-    update();
 }
 
 void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)

@@ -22,17 +22,11 @@ class SpaceCapsule : public Space
 
 private:
     
-    /// half the length of the central cylinder, hemispherical caps not included
+    /// half the distance between the centers of the two hemispherical caps
     real  length_;
     
-    /// the radius of the hemisphere
+    /// the radius of the hemispheres caps
     real  radius_;
-    
-    /// the square of the radius
-    real  radiusSqr_;
-    
-    /// calculate radiusSqr
-    void  update() { radiusSqr_ = square(radius_); }
 
 public:
         
@@ -59,6 +53,12 @@ public:
     
     /// a random position inside the volume
     Vector      randomPlace() const;
+    
+    /// direct normal direction calculation
+    Vector      normalToEdge(Vector const&) const;
+    
+    /// direct surface placement
+    Vector      randomPlaceOnEdge(real) const;
 
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;

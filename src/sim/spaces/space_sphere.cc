@@ -8,7 +8,7 @@
 #include "meca.h"
 
 SpaceSphere::SpaceSphere(SpaceProp const* p)
-: Space(p), radius_(0), radiusSqr_(0)
+: Space(p), radius_(0)
 {
 }
 
@@ -25,7 +25,6 @@ void SpaceSphere::resize(Glossary& opt)
         throw InvalidParameter(prop->name()+":radius must be >= 0");
     
     radius_ = rad;
-    update();
 }
 
 void SpaceSphere::boundaries(Vector& inf, Vector& sup) const
@@ -48,7 +47,7 @@ real SpaceSphere::volume() const
 
 bool SpaceSphere::inside(Vector const& pos) const
 {
-    return pos.normSqr() <= radiusSqr_ + REAL_EPSILON;
+    return pos.normSqr() <= square(radius_);
 }
 
 Vector SpaceSphere::project(Vector const& pos) const
@@ -97,7 +96,6 @@ void SpaceSphere::write(Outputter& out) const
 void SpaceSphere::setLengths(const real len[])
 {
     radius_ = len[0];
-    update();
 }
 
 

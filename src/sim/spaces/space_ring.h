@@ -30,12 +30,6 @@ private:
     
     /// the radius of the ring
     real  radius_;
-    
-    /// the square of the radius
-    real  radiusSqr_;
-    
-    /// calculate radiusSqr
-    void  update() { radiusSqr_ = square(radius_); }
 
 public:
         

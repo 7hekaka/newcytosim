@@ -65,7 +65,7 @@ Vector normal[maxpts];
 Vector edge[maxpts];
 
 //max distance from projection to second projection
-real  max_error_projection;
+real  error = 0;
 
 //slicing parameters
 int slicing = 0;
@@ -129,36 +129,40 @@ void generatePoints(real len)
 }
 
 
+void calculateNormals()
+{
+    for ( size_t ii = 0; ii < nbpts; ++ii )
+        normal[ii] = spc->normalToEdge(project[ii]);
+}
+
+
 void distributePoints(real len = INFLATION)
 {
     generatePoints(len);
-    max_error_projection = 0;
+    error = 0;
     
     for ( size_t ii = 0; ii < nbpts; ++ii )
     {
+        normal[ii].reset();
         //see if space finds it inside:
         inside[ii] = spc->inside(point[ii]);
         //calculate the projection:
         project[ii] = spc->project(point[ii]);
         
         //calculate the projection of the projection:
-        //project2[ii] = spc->project(project[ii]);
-        project2[ii] = project[ii];
-        
-        if ( showNormals )
-            normal[ii] = spc->normalToEdge(project[ii]);
-        else
-            normal[ii].reset();
+        project2[ii] = spc->project(project[ii]);
         
         edge[ii] = spc->randomPlaceOnEdge(1);
         
-        real d = (project[ii] - project2[ii]).normSqr();
-        if ( d > max_error_projection ) max_error_projection = d;
+        real d = ( project[ii] - project2[ii] ).normSqr();
+        error = std::max(d, error);
     }
-    max_error_projection = sqrt( max_error_projection );
+    error = sqrt(error);
+    if ( showNormals )
+        calculateNormals();
     
     char tmp[128];
-    snprintf(tmp, sizeof(tmp), "error %.6f", max_error_projection);
+    snprintf(tmp, sizeof(tmp), "projection error %.9f", error);
     glApp::setMessage(tmp);
 }
 
@@ -209,24 +213,26 @@ void setGeometry()
 
 void checkVolume()
 {
-    const size_t CNT = 16;
-    real avg = 0, var = 0;
+    const size_t CNT = 2;
+    double avg = 0, dev = 0;
     
     for ( size_t i = 0; i < CNT; ++i )
     {
         real e = spc->estimateVolume(1<<21);
+        //printf("Monte-Carlo estimated volume %.6f\n", e);
         avg += e;
-        var += e * e;
+        dev += e * e;
     }
     avg /= CNT;
-    var = var/CNT - avg * avg;
+    dev = dev/(real)CNT - avg * avg;
+    dev = sqrt(abs_real(dev));
     
     real vol = spc->volume();
 
     printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
-    printf("  %.3f +/- %.3f;  given volume is %.3f\n", avg, var, vol);
+    printf("  %.3f +/- %.3f;  given volume is %.3f\n", avg, dev, vol);
     
-    if ( fabs(vol-avg) > var )
+    if ( fabs(vol-avg) > 3*dev )
          printf("WARNING: POSSIBLE VOLUME MISMATCH!!!!\n");
 }
 
@@ -404,8 +410,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             
         case 'n':
             showNormals = ! showNormals;
-            if ( showNormals)
-                distributePoints();
+            if ( showNormals ) calculateNormals();
             break;
             
         case 'R':
@@ -485,7 +490,7 @@ void display(View&, int)
         glDepthMask(GL_TRUE);
     }
     
-    //plot a gren dot for points inside, a red dot for point outside:
+    //use green for points inside, magenta for point outside:
     glPointSize(2.0);
     glBegin(GL_POINTS);
     for ( size_t ii = 0; ii < nbpts; ++ii )
@@ -495,7 +500,7 @@ void display(View&, int)
             if ( inside[ii] )
                 glColor3f(0.0, COL, 0.0);
             else
-                glColor3f(0.0, 0.0, COL);
+                glColor3f(COL, 0.0, COL);
             gleVertex( point[ii] );
         }
     }

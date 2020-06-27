@@ -98,6 +98,29 @@ Vector SpaceCylinderP::randomPlace() const
 #endif
 }
 
+
+Vector SpaceCylinderP::normalToEdge(Vector const& pos) const
+{
+#if ( DIM >= 3 )
+    real n = 1.0 / pos.normYZ();
+    return Vector(0, n * pos.YY, n * pos.ZZ);
+#elif ( DIM >= 2 )
+    return Vector(0, sign_real(pos.YY), 0);
+#endif
+    return Vector(0, 0, 0);  // intentionally invalid!
+}
+
+
+Vector SpaceCylinderP::randomPlaceOnEdge(real) const
+{
+#if ( DIM >= 3 )
+    const Vector2 YZ = Vector2::randU(radius_);
+    return Vector(0, YZ.XX, YZ.YY);
+#endif
+    return Vector(0, radius_*RNG.sflip(), 0);
+}
+
+
 //------------------------------------------------------------------------------
 Vector SpaceCylinderP::project(Vector const& W) const
 {

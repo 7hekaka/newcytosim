@@ -22,12 +22,6 @@ protected:
     /// the radius of the sphere
     real  radius_;
     
-    /// square of the radius
-    real  radiusSqr_;
-    
-    /// calculate radiusSqr
-    void  update() { radiusSqr_ = square(radius_); }
-    
 public:
     
     /// constructor
@@ -53,6 +47,9 @@ public:
     
     /// direct normal direction calculation
     Vector      normalToEdge(Vector const& pos) const { return normalize(pos); }
+    
+    /// direct surface placement
+    Vector      randomPlaceOnEdge(real) const { return Vector::randU(radius_); }
 
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;

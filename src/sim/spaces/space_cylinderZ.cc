@@ -71,6 +71,22 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
 }
 
 
+Vector SpaceCylinderZ::randomPlace() const
+{
+#if HAS_SMOOTH_EDGES
+    Vector W;
+    do {
+        const Vector2 V = Vector2::randB(radius_);
+        W.set(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
+    } while ( !inside(W) );
+    return W;
+#else
+    const Vector2 V = Vector2::randB(radius_);
+    return Vector(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
+#endif
+}
+
+
 Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 {
 #if ( DIM > 2 )
@@ -96,6 +112,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
             return Vector(0, 0, std::copysign(1, 2*pos.ZZ-top_-bot_));
     }
 #endif
+    return Vector(0, 0, 0);  // intentionally invalid!
 }
 
 
@@ -115,9 +132,10 @@ Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
         const real RE = radius_ - edge_;
         const real LE = top_ - bot_ - 2 * edge_;
         const real GC = RE + 2 * edge_ / M_PI;
-        const real S0 = 2 * M_PI * radius_ * LE;
-        const real S1 = 2 * M_PI * square(RE);
-        const real S2 = 2 * square(M_PI) * GC * edge_;
+        // surface elements divided by 2 * M_PI:
+        const real S0 = radius_ * LE;
+        const real S1 = square(RE);
+        const real S2 = M_PI * GC * edge_;
         const real P = RNG.preal() * ( S0 + S1 + S2 );
         if ( P < S0 )
         {
@@ -157,8 +175,9 @@ Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
     else
 #endif
     {
-        const real S0 = M_PI * square(radius_) * ( top_ - bot_ );
-        const real S1 = M_PI * square(radius_) * 2;
+        // surface elements divided by M_PI * square(radius_)
+        const real S0 = top_ - bot_;
+        const real S1 = 2;
         const real P = RNG.preal() * ( S0 + S1 );
         if ( P < S0 )
         {
@@ -174,7 +193,9 @@ Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
         }
     }
 #endif
+    return Vector(0, 0, 0);  // intentionally invalid!
 }
+
 
 /**
  Pappus's (2nd) Centroid Theorem: the volume of a planar area of revolution is
@@ -233,22 +254,6 @@ bool SpaceCylinderZ::allInside(Vector const& W, const real rad) const
 #else
     ABORT_NOW("cylinderZ is only valid in 3D");
     return true;
-#endif
-}
-
-
-Vector SpaceCylinderZ::randomPlace() const
-{
-#if HAS_SMOOTH_EDGES
-    Vector W;
-    do {
-        const Vector2 V = Vector2::randB(radius_);
-        W.set(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
-    } while ( !inside(W) );
-    return W;
-#else
-    const Vector2 V = Vector2::randB(radius_);
-    return Vector(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
 #endif
 }
 
