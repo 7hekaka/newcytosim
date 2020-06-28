@@ -20,6 +20,7 @@
 using namespace TicToc;
 
 typedef MatrixSparseSymmetricBlock MatrixSparseSymmetricB;
+typedef MatrixSparseSymmetricBlock::Block SquareBlock;
 
 const size_t N_RUN = 16;
 const size_t N_MUL = 99;

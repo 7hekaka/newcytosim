@@ -20,16 +20,12 @@
 
 #if ( BLOCK_SIZE == 1 )
 #  include "matrix11.h"
-typedef Matrix11 SubBlock;
 #elif ( BLOCK_SIZE == 2 )
 #  include "matrix22.h"
-typedef Matrix22 SubBlock;
 #elif ( BLOCK_SIZE == 3 )
 #  include "matrix34.h"
-typedef Matrix34 SubBlock;
 #elif ( BLOCK_SIZE == 4 )
 #  include "matrix44.h"
-typedef Matrix44 SubBlock;
 #endif
 
 
@@ -54,11 +50,21 @@ class MatrixSparseBlock final
 {
 public:
     
+#if ( BLOCK_SIZE == 1 )
+    typedef Matrix11 Block;
+#elif ( BLOCK_SIZE == 2 )
+    typedef Matrix22 Block;
+#elif ( BLOCK_SIZE == 3 )
+    typedef Matrix34 Block;
+#elif ( BLOCK_SIZE == 4 )
+    typedef Matrix44 Block;
+#endif
+
     /// accessory class
     class Element;
 
     /// number of real in a block
-    static constexpr size_t SB = sizeof(SubBlock) / sizeof(real);
+    static constexpr size_t SB = sizeof(Block) / sizeof(real);
 
 private:
     
@@ -69,8 +75,8 @@ private:
 
         size_t    size_;    ///< number of elements
         size_t    allo_;    ///< allocated size
-        SubBlock * blk_;    ///< block elements
-        SubBlock * sbk_;    ///< pointer for consolidate elements
+        Block *    blk_;    ///< block elements
+        Block *    sbk_;    ///< pointer for consolidate elements
         size_t   * inx_;    ///< column indices for each element
         
     public:
@@ -100,10 +106,10 @@ private:
         void print(std::ostream&) const;
 
         /// return n-th block (not necessarily, located at line inx_[n]
-        SubBlock& operator[](size_t n) { return blk_[n]; }
+        Block& operator[](size_t n) { return blk_[n]; }
 
         /// return block located at column 'j'
-        SubBlock& block(size_t j);
+        Block& block(size_t j);
         
         /// multiplication of a vector: L * X
         Vector vecMul(const real* X) const;
@@ -162,7 +168,7 @@ private:
     size_t *  next_;
 
     /// memory for consolidated version
-    SubBlock* blocks_;
+    Block * blocks_;
     
 public:
     
@@ -188,7 +194,7 @@ public:
     void allocate(size_t alc);
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
-    SubBlock& block(const size_t ii, const size_t jj)
+    Block& block(const size_t ii, const size_t jj)
     {
         assert_true( ii >= jj );
         assert_true( ii < size_ );
@@ -199,7 +205,7 @@ public:
     }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
-    SubBlock& diag_block(const size_t ii)
+    Block& diag_block(const size_t ii)
     {
         assert_true( ii < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );

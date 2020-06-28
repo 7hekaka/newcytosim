@@ -80,8 +80,8 @@ void MatrixSparseSymmetricBlock::Column::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
-        void * ptr = new_real(alc*sizeof(SquareBlock)/sizeof(real));
-        SquareBlock * blk_new  = new(ptr) SquareBlock[alc];
+        void * ptr = new_real(alc*SB);
+        Block * blk_new  = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
             throw std::bad_alloc();
@@ -140,7 +140,7 @@ void MatrixSparseSymmetricBlock::Column::operator =(MatrixSparseSymmetricBlock::
 /**
  This allocate to be able to hold the matrix element if necessary
  */
-SquareBlock& MatrixSparseSymmetricBlock::Column::block(size_t ii, size_t jj)
+MatrixSparseSymmetricBlock::Block& MatrixSparseSymmetricBlock::Column::block(size_t ii, size_t jj)
 {
     assert_true( ii >= jj );
     if ( size_ > 0 )
@@ -192,7 +192,7 @@ void MatrixSparseSymmetricBlock::Column::reset()
     size_ = 0;
 }
 
-SquareBlock& MatrixSparseSymmetricBlock::diag_block(size_t ii)
+MatrixSparseSymmetricBlock::Block& MatrixSparseSymmetricBlock::diag_block(size_t ii)
 {
     assert_true( ii < size_ );
     Column & col = column_[ii];
@@ -465,11 +465,13 @@ std::string MatrixSparseSymmetricBlock::what() const
 {
     std::ostringstream msg;
 #if MATRIXSSB_USES_AVX
-    msg << "MSSBx " << SquareBlock::what() << "*" << nbElements();
+    msg << "MSSBx " << Block::what() << "*" << nbElements();
 #elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "MSSBe " << SquareBlock::what() << "*" << nbElements();
+    msg << "MSSBe " << Block::what() << "*" << nbElements();
+#elif defined(__SSE3__) && ( REAL_IS_DOUBLE == 0 )
+    msg << "MSSBs " << Block::what() << "*" << nbElements();
 #else
-    msg << "MSSB " << SquareBlock::what() << "*" << nbElements();
+    msg << "MSSB " << Block::what() << "*" << nbElements();
 #endif
     return msg.str();
 }
@@ -490,7 +492,7 @@ void MatrixSparseSymmetricBlock::printSparse(std::ostream& os, real inf) const
         for ( size_t n = 0 ; n < col.size_ ; ++n )
         {
             size_t ii = col.inx_[n];
-            SquareBlock blk = col.blk_[n];
+            Block blk = col.blk_[n];
             size_t d = ( ii == jj );
             for ( size_t y = 0  ; y < BLOCK_SIZE; ++y )
             for ( size_t x = y*d; x < BLOCK_SIZE; ++x )
@@ -541,7 +543,7 @@ public:
     size_t inx;
 
     /// block element
-    SquareBlock blk;
+    Block blk;
 };
 
 
@@ -701,7 +703,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd2D(const real* X, real* Y, siz
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
-        SquareBlock const& M = blk_[n];
+        Block const& M = blk_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -720,7 +722,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D(const real* X, real* Y, siz
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
-        SquareBlock const& M = blk_[n];
+        Block const& M = blk_[n];
         M.vecmul(xxx).add_to(Y+ii);
         yyy += M.trans_vecmul(X+ii);
     }
@@ -740,7 +742,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd4D(const real* X, real* Y, siz
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
-        SquareBlock const& M = blk_[n];
+        Block const& M = blk_[n];
         store4(Y+ii, add4(load4(Y+ii), M.vecmul4(xxxx)));
         yyyy += M.trans_vecmul(X+ii);
     }
@@ -782,6 +784,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_SSE(const real* X, real* Y,
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
+    printf("MSSB %lu : %lu\n", jj, size_);
 #if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = blk_[0];
@@ -793,9 +796,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_SSE(const real* X, real* Y,
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
 #if ( BLD == 4 )
     vec4f tt = loadu4f(X+jj);
-    vec4f s0 = mul4f(load4f(D  ), tt);
-    vec4f s1 = mul4f(load4f(D+4), tt);
-    vec4f s2 = mul4f(load4f(D+8), tt);
+    vec4f s0 = mul4f(streamload4f(D  ), tt);
+    vec4f s1 = mul4f(streamload4f(D+4), tt);
+    vec4f s2 = mul4f(streamload4f(D+8), tt);
 #else
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
@@ -857,114 +860,119 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_SSEU(const real* X, real* Y
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
+    //std::cout << blk_[0].to_string(7,1); printf(" MSSB %lu : %lu\n", jj, size_);
 #if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = blk_[0];
     
-    //multiply with the symmetrized block, assuming it has been symmetrized:
+    //multiply with the diagonal block, assuming it has been symmetrized:
     //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
 #if ( BLD == 4 )
     vec4f tt = loadu4f(X+jj);
-    vec4f s0 = mul4f(load4f(D  ), tt);
-    vec4f s1 = mul4f(load4f(D+4), tt);
-    vec4f s2 = mul4f(load4f(D+8), tt);
+    vec4f s0 = mul4f(streamload4f(D  ), tt);
+    vec4f s1 = mul4f(streamload4f(D+4), tt);
+    vec4f s2 = mul4f(streamload4f(D+8), tt);
 #else
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
 #endif
-    const vec4f x0 = permute4f(tt, 0x00);
-    const vec4f x1 = permute4f(tt, 0x55);
-    const vec4f x2 = permute4f(tt, 0xAA);
-
-    size_t n = 1;
+    
+    if ( size_ > 1 )
     {
-        const size_t stop = 1 + 2 * ((size_-1)/2);
+        const vec4f x0 = permute4f(tt, 0x00);
+        const vec4f x1 = permute4f(tt, 0x55);
+        const vec4f x2 = permute4f(tt, 0xAA);
         
-        // process 2 by 2
-#pragma nounroll
-        for ( ; n < stop; n += 2 )
+        size_t n = 1;
         {
-            const size_t ii = inx_[n  ];
-            const size_t kk = inx_[n+1];
-            real const* M = blk_[n  ];
-            real const* P = blk_[n+1];
+            const size_t stop = 1 + 2 * ((size_-1)/2);
+            
+            // process 2 by 2
+#pragma nounroll
+            for ( ; n < stop; n += 2 )
+            {
+                const size_t ii = inx_[n  ];
+                const size_t kk = inx_[n+1];
+                real const* M = blk_[n  ];
+                real const* P = blk_[n+1];
+#if ( BLD == 4 )
+                const vec4f m012 = streamload4f(M  );
+                const vec4f m345 = streamload4f(M+4);
+                const vec4f m678 = streamload4f(M+8);
+                const vec4f p012 = streamload4f(P  );
+                const vec4f p345 = streamload4f(P+4);
+                const vec4f p678 = streamload4f(P+8);
+#else
+                const vec4f m012 = load3f(M      );
+                const vec4f m345 = load3f(M+BLD  );
+                const vec4f m678 = load3f(M+BLD*2);
+                const vec4f p012 = load3f(P      );
+                const vec4f p345 = load3f(P+BLD  );
+                const vec4f p678 = load3f(P+BLD*2);
+#endif
+                // multiply with the full block:
+                vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
+                vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
+                vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
+                vec4f tuv = loadu4f(X+kk);  // xyz = { X0 X1 X2 - }
+                z = fmadd4f(m345, x1, z);
+                t = fmadd4f(p345, x1, t);
+                s0 = fmadd4f(m012, xyz, s0);
+                s1 = fmadd4f(m345, xyz, s1);
+                s2 = fmadd4f(m678, xyz, s2);
+                z = fmadd4f(m678, x2, z);
+                t = fmadd4f(p678, x2, t);
+                s0 = fmadd4f(p012, tuv, s0);
+                s1 = fmadd4f(p345, tuv, s1);
+                s2 = fmadd4f(p678, tuv, s2);
+                storeu4f(Y+ii, z);
+                storeu4f(Y+kk, t);
+            }
+        }
+        
+        // process remaining blocks
+#pragma nounroll
+        for ( ; n < size_; ++n )
+        {
+            const size_t ii = inx_[n];
+            real const* M = blk_[n];
 #if ( BLD == 4 )
             const vec4f m012 = streamload4f(M  );
             const vec4f m345 = streamload4f(M+4);
             const vec4f m678 = streamload4f(M+8);
-            const vec4f p012 = streamload4f(P  );
-            const vec4f p345 = streamload4f(P+4);
-            const vec4f p678 = streamload4f(P+8);
 #else
             const vec4f m012 = load3f(M      );
             const vec4f m345 = load3f(M+BLD  );
             const vec4f m678 = load3f(M+BLD*2);
-            const vec4f p012 = load3f(P      );
-            const vec4f p345 = load3f(P+BLD  );
-            const vec4f p678 = load3f(P+BLD*2);
 #endif
             // multiply with the full block:
+            //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
+            //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
+            //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
             vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
-            vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
-            vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
-            vec4f tuv = loadu4f(X+kk);  // xyz = { X0 X1 X2 - }
             z = fmadd4f(m345, x1, z);
-            t = fmadd4f(p345, x1, t);
+            z = fmadd4f(m678, x2, z);
+            storeu4f(Y+ii, z);
+            
+            // multiply with the transposed block:
+            //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
+            //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
+            //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+            vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
             s0 = fmadd4f(m012, xyz, s0);
             s1 = fmadd4f(m345, xyz, s1);
             s2 = fmadd4f(m678, xyz, s2);
-            z = fmadd4f(m678, x2, z);
-            t = fmadd4f(p678, x2, t);
-            s0 = fmadd4f(p012, tuv, s0);
-            s1 = fmadd4f(p345, tuv, s1);
-            s2 = fmadd4f(p678, tuv, s2);
-            storeu4f(Y+ii, z);
-            storeu4f(Y+kk, t);
         }
-    }
-    
-    // process remaining blocks
-    #pragma nounroll
-    for ( ; n < size_; ++n )
-    {
-        const size_t ii = inx_[n];
-        real const* M = blk_[n];
-#if ( BLD == 4 )
-        const vec4f m012 = streamload4f(M  );
-        const vec4f m345 = streamload4f(M+4);
-        const vec4f m678 = streamload4f(M+8);
-#else
-        const vec4f m012 = load3f(M      );
-        const vec4f m345 = load3f(M+BLD  );
-        const vec4f m678 = load3f(M+BLD*2);
-#endif
-        // multiply with the full block:
-        //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
-        //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
-        //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
-        vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
-        z = fmadd4f(m345, x1, z);
-        z = fmadd4f(m678, x2, z);
-        storeu4f(Y+ii, z);
-        
-        // multiply with the transposed block:
-        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
-        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
-        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
-        s0 = fmadd4f(m012, xyz, s0);
-        s1 = fmadd4f(m345, xyz, s1);
-        s2 = fmadd4f(m678, xyz, s2);
     }
     
     /* finally sum horizontally:
      s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
-     to s1 = { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
+     to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
      */
     vec4f s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
@@ -1233,9 +1241,9 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVX(const real* X, real* Y,
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
 #if ( BLD == 4 )
     vec4 tt = loadu4(X+jj);
-    vec4 s0 = mul4(load4(D  ), tt);
-    vec4 s1 = mul4(load4(D+4), tt);
-    vec4 s2 = mul4(load4(D+8), tt);
+    vec4 s0 = mul4(streamload4(D  ), tt);
+    vec4 s1 = mul4(streamload4(D+4), tt);
+    vec4 s2 = mul4(streamload4(D+8), tt);
 #else
     vec4 tt = loadu4(X+jj);
     vec4 s0 = mul4(load3(D      ), tt);
@@ -1309,7 +1317,6 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
-    constexpr size_t BS = sizeof(SquareBlock)/sizeof(real);
     const real* M = blk_[0];
 
     vec4 sa, sb, sc;
@@ -1332,7 +1339,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
         xb = duphi4(l);
         xc = duplo4(u);
     }
-    M += BS;
+    M += SB;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     const real* stop = blk_[1+2*((size_-1)/2)];
     const size_t * inx = inx_+1;
@@ -1343,14 +1350,14 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
      */
     //process 2 by 2:
     #pragma nounroll
-    for ( ; M < stop; M += 2*BS )
+    for ( ; M < stop; M += 2*SB )
     {
         const size_t i0 = inx[0];
         const size_t i1 = inx[1];
         inx += 2;
         //printf("--- %4i %4i\n", i0, i1);
         vec4 ma0 = streamload4(M);
-        vec4 ma1 = streamload4(M+BS);
+        vec4 ma1 = streamload4(M+SB);
         vec4 z0 = fmadd4(ma0, xa, loadu4(Y+i0));
         vec4 z1 = fmadd4(ma1, xa, loadu4(Y+i1));
         vec4 xyz0 = loadu4(X+i0);
@@ -1359,13 +1366,13 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
         ta = fmadd4(ma1, xyz1, ta);
         // multiply with the full block:
         vec4 mb0 = streamload4(M+4);
-        vec4 mb1 = streamload4(M+(BS+4));
+        vec4 mb1 = streamload4(M+(SB+4));
         z0 = fmadd4(mb0, xb, z0);
         z1 = fmadd4(mb1, xb, z1);
         sb = fmadd4(mb0, xyz0, sb);
         tb = fmadd4(mb1, xyz1, tb);
         vec4 mc0 = streamload4(M+8);
-        vec4 mc1 = streamload4(M+(BS+8));
+        vec4 mc1 = streamload4(M+(SB+8));
         z0 = fmadd4(mc0, xc, z0);
         z1 = fmadd4(mc1, xc, z1);
         sc = fmadd4(mc0, xyz0, sc);
@@ -1389,7 +1396,7 @@ void MatrixSparseSymmetricBlock::Column::vecMulAdd3D_AVXU(const real* X, real* Y
     // process remaining blocks:
     stop = blk_[size_];
     #pragma nounroll
-    for ( ; M < stop; M += BS )
+    for ( ; M < stop; M += SB )
     {
         const size_t ii = inx[0];
         ++inx;

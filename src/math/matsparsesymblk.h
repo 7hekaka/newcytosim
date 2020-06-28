@@ -19,16 +19,12 @@
 
 #if ( BLOCK_SIZE == 1 )
 #   include "matrix11.h"
-typedef Matrix11 SquareBlock;
 #elif ( BLOCK_SIZE == 2 )
 #   include "matrix22.h"
-typedef Matrix22 SquareBlock;
 #elif ( BLOCK_SIZE == 3 )
 #   include "matrix33.h"
-typedef Matrix33 SquareBlock;
 #elif ( BLOCK_SIZE == 4 )
 #   include "matrix44.h"
-typedef Matrix44 SquareBlock;
 #endif
 
 ///real symmetric sparse Matrix
@@ -44,9 +40,23 @@ typedef Matrix44 SquareBlock;
 class MatrixSparseSymmetricBlock final
 {
 public:
-    
+
+#if ( BLOCK_SIZE == 1 )
+    typedef Matrix11 Block;
+#elif ( BLOCK_SIZE == 2 )
+    typedef Matrix22 Block;
+#elif ( BLOCK_SIZE == 3 )
+    typedef Matrix33 Block;
+#elif ( BLOCK_SIZE == 4 )
+    typedef Matrix44 Block;
+#endif
+
+    /// accessory class used to sort columns
     class Element;
     
+    /// number of real in a block
+    static constexpr size_t SB = sizeof(Block) / sizeof(real);
+
 private:
     
     /// A column of the sparse matrix
@@ -55,10 +65,10 @@ private:
         friend class MatrixSparseSymmetricBlock;
         friend class Meca;
 
-        size_t       allo_;   ///< allocated size of array
-        size_t       size_;   ///< number of blocks in column
-        size_t      * inx_;   ///< line index for each element
-        SquareBlock * blk_;   ///< block
+        size_t  allo_;   ///< allocated size of array
+        size_t  size_;   ///< number of blocks in column
+        size_t * inx_;   ///< line index for each element
+        Block  * blk_;   ///< block
         
     public:
         
@@ -87,10 +97,10 @@ private:
         void print(std::ostream&) const;
 
         /// return n-th block (not necessarily, located at line inx_[n]
-        SquareBlock& operator[](size_t n) { return blk_[n]; }
+        Block& operator[](size_t n) { return blk_[n]; }
 
         /// return block located at line 'i' and column 'j'
-        SquareBlock& block(size_t i, size_t j);
+        Block& block(size_t i, size_t j);
         
         /// multiplication of a vector: Y <- Y + M * X, block_size = 1
         void vecMulAdd1D(const real* X, real* Y, size_t j) const;
@@ -179,7 +189,7 @@ public:
     Column const& column(size_t j) const { return column_[j]; }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
-    SquareBlock& block(const size_t ii, const size_t jj)
+    Block& block(const size_t ii, const size_t jj)
     {
         assert_true( ii < size_ );
         assert_true( jj < size_ );
@@ -197,7 +207,7 @@ public:
     }
     
     /// returns element at (i, i)
-    SquareBlock& diag_block(size_t i);
+    Block& diag_block(size_t i);
     
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;

@@ -77,7 +77,7 @@ void MatrixSparseBlock::Line::allocate(size_t alc)
         
         // use aligned memory:
         void * ptr = new_real(alc*SB);
-        SubBlock * blk_new  = new(ptr) SubBlock[alc];
+        Block * blk_new  = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
             throw std::bad_alloc();
@@ -137,7 +137,7 @@ void MatrixSparseBlock::Line::operator =(MatrixSparseBlock::Line & row)
 /**
  This allocate to be able to hold the matrix element if necessary
  */
-SubBlock& MatrixSparseBlock::Line::block(size_t jj)
+MatrixSparseBlock::Block& MatrixSparseBlock::Line::block(size_t jj)
 {
     size_t n = 0;
     /* This is a silly search that could be optimized */
@@ -334,9 +334,9 @@ std::string MatrixSparseBlock::what() const
 {
     std::ostringstream msg;
 #if MATRIXSB_USES_AVX
-    msg << "MSBx " << SubBlock::what() << "*" << nbElements();
+    msg << "MSBx " << Block::what() << "*" << nbElements();
 #else
-    msg << "MSB " << SubBlock::what() << "*" << nbElements();
+    msg << "MSB " << Block::what() << "*" << nbElements();
 #endif
     return msg.str();
 }
@@ -357,7 +357,7 @@ void MatrixSparseBlock::printSparse(std::ostream& os, real inf) const
         for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
             size_t ii = row.inx_[n];
-            SubBlock blk = row.blk_[n];
+            Block blk = row.blk_[n];
             size_t d = ( ii == jj );
             for ( size_t x = 0  ; x < BLOCK_SIZE; ++x )
             for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
@@ -408,7 +408,7 @@ public:
     size_t inx;
 
     /// block element
-    SubBlock blk;
+    MatrixSparseBlock::Block blk;
 };
 
 
@@ -513,7 +513,7 @@ void MatrixSparseBlock::consolidate()
 
     free_real(blocks_);
     real * ptr = new_real(cnt*SB);
-    blocks_ = new(ptr) SubBlock[cnt];
+    blocks_ = new(ptr) Block[cnt];
     
     cnt = 0;
     for ( size_t i = 0; i < size_; ++i )
@@ -783,7 +783,7 @@ vec4 MatrixSparseBlock::Line::vecMul3DU(const real* X) const
     vec4 t1 = setzero4();
     vec4 t2 = setzero4();
 
-    static_assert(SB==12, "unexpected SubBlock size");
+    static_assert(SB==12, "unexpected Block size");
     const real* M = sbk_[0];
     const real* end = sbk_[size_-size_%2];
     const size_t * inx = inx_;
