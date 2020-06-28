@@ -1,11 +1,11 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #ifndef MECA1D_H
 #define MECA1D_H
 
 #include "array.h"
 #include "mecable.h"
-#include "matsparsesym1.h"
+#include "sparmatsym1.h"
 #include "monitor.h"
 #include "allocator.h"
 #include "bicgstab.h"
@@ -37,7 +37,7 @@ public:
     real * vRHS;                 ///< right-hand side term of the equation
 
     /// matrix containing the elasticity coefficients
-    MatrixSparseSymmetric1   mA;
+    SparMatSym1   mA;
     
     /// working memory allocator
     LinearSolvers::Allocator allocator;

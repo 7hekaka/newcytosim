@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #ifndef MECA_H
 #define MECA_H
@@ -6,10 +6,10 @@
 #include "dim.h"
 #include "array.h"
 #include "vector.h"
-//#include "matsparse.h"
-#include "matsparsesym1.h"
-#include "matsparsesymblk.h"
-//#include "matsparseblk.h"
+//#include "sparmat.h"
+#include "sparmatsym1.h"
+#include "sparmatsymblk.h"
+//#include "sparmatblk.h"
 #include "allocator.h"
 
 
@@ -182,7 +182,7 @@ private:
      This is a symmetric square matrix of size `nbPoints()`
      It contains terms which have identical coefficients on the X, Y, Z subspaces, such as addLink()
     */
-    MatrixSparseSymmetric1  mB;
+    SparMatSym1  mB;
 #endif
     
     /// non-isotropic symmetric part of the dynamic
@@ -191,7 +191,7 @@ private:
      It contains terms which are different in the X, Y, Z subspaces,
      arising from addSideLink() addSideSlidingLink(), etc.
     */
-    MatrixSparseSymmetricBlock  mC;
+    SparMatSymBlk  mC;
 
 public:
 

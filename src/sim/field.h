@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #ifndef FIELD_H
 #define FIELD_H
@@ -11,8 +11,8 @@
 #include "iowrapper.h"
 #include "messages.h"
 #include "exceptions.h"
-#include "matsparsesym1.h"
-#include "matsparsesym2.h"
+#include "sparmatsym1.h"
+#include "sparmatsym2.h"
 #include "field_prop.h"
 #include "field_values.h"
 
@@ -63,7 +63,7 @@ private:
     size_t   fiTMPSize;
     
     /// matrix for diffusion
-    MatrixSparseSymmetric1 fiDiffusionMatrix;
+    SparMatSym1 fiDiffusionMatrix;
     
     /// initialize to cover the given Space with squares of size 'step'
     void setGrid(Vector inf, Vector sup, real step, bool tight)

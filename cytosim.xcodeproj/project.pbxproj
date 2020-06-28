@@ -472,10 +472,10 @@
 		BB70864E2449CBF300C73273 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB7086572449CC2500C73273 /* test_rigidity.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7086372449C83100C73273 /* test_rigidity.cc */; };
 		BB7086582449CC3000C73273 /* test_dpttrs.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7086342448BC3700C73273 /* test_dpttrs.cc */; };
-		BB71916B0EF1CD9900CED9E2 /* matsparsesym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0C409F069A043600CF45A8 /* matsparsesym.h */; };
-		BB71916C0EF1CD9900CED9E2 /* matsparsesym2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA331AF06CA7059002C3684 /* matsparsesym2.h */; };
+		BB71916B0EF1CD9900CED9E2 /* sparmatsym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0C409F069A043600CF45A8 /* sparmatsym.h */; };
+		BB71916C0EF1CD9900CED9E2 /* sparmatsym2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA331AF06CA7059002C3684 /* sparmatsym2.h */; };
 		BB71916E0EF1CD9900CED9E2 /* quaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = BB94965A0933B75B003A32FE /* quaternion.h */; };
-		BB71916F0EF1CD9900CED9E2 /* matsparsesym1.h in Headers */ = {isa = PBXBuildFile; fileRef = BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */; };
+		BB71916F0EF1CD9900CED9E2 /* sparmatsym1.h in Headers */ = {isa = PBXBuildFile; fileRef = BB66BF2E09A8DC2600E5C5BE /* sparmatsym1.h */; };
 		BB7191700EF1CD9900CED9E2 /* dim.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF300A25FB13003333C9 /* dim.h */; };
 		BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
 		BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* pointsonsphere.h */; };
@@ -483,29 +483,29 @@
 		BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* smath.h */; };
 		BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matfull.h */; };
 		BB71917F0EF1CD9900CED9E2 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589D05B98DA3006956D5 /* random.h */; };
-		BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588A05B98DA3006956D5 /* matsparse.h */; };
+		BB7191800EF1CD9900CED9E2 /* sparmat.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588A05B98DA3006956D5 /* sparmat.h */; };
 		BB7191820EF1CD9900CED9E2 /* real.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC66B209C0C3D30031048A /* real.h */; };
 		BB7191830EF1CD9900CED9E2 /* grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588105B98DA3006956D5 /* grid.h */; };
 		BB7191850EF1CD9900CED9E2 /* matsym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589005B98DA3006956D5 /* matsym.h */; };
 		BB7191860EF1CD9900CED9E2 /* isometry.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8CE30705DFF9140031D3B4 /* isometry.h */; };
 		BB7191870EF1CD9900CED9E2 /* matrix.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588505B98DA3006956D5 /* matrix.h */; };
 		BB7191890EF1CD9900CED9E2 /* linear_solvers.h in Headers */ = {isa = PBXBuildFile; fileRef = BB21854D0B40836900B75436 /* linear_solvers.h */; };
-		BB71918A0EF1CD9900CED9E2 /* matsparsesymblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF72AE0B5C2327007CAD2A /* matsparsesymblk.h */; };
+		BB71918A0EF1CD9900CED9E2 /* sparmatsymblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF72AE0B5C2327007CAD2A /* sparmatsymblk.h */; };
 		BB71918B0EF1CD9900CED9E2 /* vector1.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB89ED40BE3DED10054838A /* vector1.h */; };
 		BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB89ED60BE3DED10054838A /* vector2.h */; };
 		BB71918D0EF1CD9900CED9E2 /* vector3.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB89ED80BE3DED10054838A /* vector3.h */; };
 		BB7191960EF1CD9900CED9E2 /* vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB318E260EE688610050C945 /* vector.h */; };
 		BB71919E0EF1CD9900CED9E2 /* conjgradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587105B98DA3006956D5 /* conjgradient.cc */; };
-		BB7191A00EF1CD9900CED9E2 /* matsparse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* matsparse.cc */; };
+		BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* sparmat.cc */; };
 		BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E505E1440E00BC9B7A /* matrix.cc */; };
 		BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
 		BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3D2ADA05C8396B0022ACE5 /* pointsonsphere.cc */; };
 		BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; };
 		BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588F05B98DA3006956D5 /* matsym.cc */; };
-		BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0C409E069A043600CF45A8 /* matsparsesym.cc */; };
-		BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */; };
-		BB7191B80EF1CD9900CED9E2 /* matsparsesymblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */; };
+		BB7191B00EF1CD9900CED9E2 /* sparmatsym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0C409E069A043600CF45A8 /* sparmatsym.cc */; };
+		BB7191B40EF1CD9900CED9E2 /* sparmatsym1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB66BF2D09A8DC2600E5C5BE /* sparmatsym1.cc */; };
+		BB7191B80EF1CD9900CED9E2 /* sparmatsymblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF72AD0B5C2327007CAD2A /* sparmatsymblk.cc */; };
 		BB7191B90EF1CD9900CED9E2 /* vector1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED30BE3DED10054838A /* vector1.cc */; };
 		BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED50BE3DED10054838A /* vector2.cc */; };
 		BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
@@ -514,9 +514,9 @@
 		BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB749D6017935DAC00B43298 /* quartic_solver.cc */; };
 		BB749D661793645D00B43298 /* polygon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB749D641793645C00B43298 /* polygon.cc */; };
 		BB749D671793645D00B43298 /* polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB749D651793645D00B43298 /* polygon.h */; };
-		BB74F41A231C334D0019D68E /* matsparseblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F418231C334D0019D68E /* matsparseblk.h */; };
-		BB74F41B231C334D0019D68E /* matsparseblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74F419231C334D0019D68E /* matsparseblk.cc */; };
-		BB74F41C231E7E0F0019D68E /* matsparseblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74F419231C334D0019D68E /* matsparseblk.cc */; };
+		BB74F41A231C334D0019D68E /* sparmatblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F418231C334D0019D68E /* sparmatblk.h */; };
+		BB74F41B231C334D0019D68E /* sparmatblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74F419231C334D0019D68E /* sparmatblk.cc */; };
+		BB74F41C231E7E0F0019D68E /* sparmatblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74F419231C334D0019D68E /* sparmatblk.cc */; };
 		BB74F420232024AB0019D68E /* byteswap.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F41F232024AB0019D68E /* byteswap.h */; };
 		BB7662C510E923A200C93DF6 /* frame_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7662C310E923A200C93DF6 /* frame_reader.cc */; };
 		BB7662C610E923A200C93DF6 /* frame_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7662C410E923A200C93DF6 /* frame_reader.h */; };
@@ -633,12 +633,12 @@
 		BB9D87A81E76BB0000DD0F00 /* test_matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */; };
 		BB9D87A91E76BB7000DD0F00 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB9D87AA1E76BB9B00DD0F00 /* matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E505E1440E00BC9B7A /* matrix.cc */; };
-		BB9D87AB1E76BBA100DD0F00 /* matsparse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* matsparse.cc */; };
-		BB9D87AC1E76BBA400DD0F00 /* matsparsesym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0C409E069A043600CF45A8 /* matsparsesym.cc */; };
-		BB9D87AD1E76BBA700DD0F00 /* matsparsesym1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */; };
-		BB9D87AE1E76BBAB00DD0F00 /* matsparsesym2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA331AE06CA7059002C3684 /* matsparsesym2.cc */; };
-		BB9D87AF1E76BBAE00DD0F00 /* matsparsesymblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */; };
-		BB9D87B01E76BBB800DD0F00 /* matsparsesym2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA331AE06CA7059002C3684 /* matsparsesym2.cc */; };
+		BB9D87AB1E76BBA100DD0F00 /* sparmat.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* sparmat.cc */; };
+		BB9D87AC1E76BBA400DD0F00 /* sparmatsym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0C409E069A043600CF45A8 /* sparmatsym.cc */; };
+		BB9D87AD1E76BBA700DD0F00 /* sparmatsym1.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB66BF2D09A8DC2600E5C5BE /* sparmatsym1.cc */; };
+		BB9D87AE1E76BBAB00DD0F00 /* sparmatsym2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA331AE06CA7059002C3684 /* sparmatsym2.cc */; };
+		BB9D87AF1E76BBAE00DD0F00 /* sparmatsymblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF72AD0B5C2327007CAD2A /* sparmatsymblk.cc */; };
+		BB9D87B01E76BBB800DD0F00 /* sparmatsym2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA331AE06CA7059002C3684 /* sparmatsym2.cc */; };
 		BB9D87B31E76BBDD00DD0F00 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB9D87B41E76BBF100DD0F00 /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
 		BB9D992908D6281100DBD2BF /* mecafil.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9D992508D6281100DBD2BF /* mecafil.cc */; };
@@ -1305,8 +1305,8 @@
 		BB089A082228A26D00C070E7 /* matrix22.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix22.cc; sourceTree = "<group>"; };
 		BB089A092228A26D00C070E7 /* matrix33.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix33.cc; sourceTree = "<group>"; };
 		BB0AB41E201BBA41004739CE /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = doc; sourceTree = "<group>"; };
-		BB0C409E069A043600CF45A8 /* matsparsesym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparsesym.cc; path = src/math/matsparsesym.cc; sourceTree = SOURCE_ROOT; };
-		BB0C409F069A043600CF45A8 /* matsparsesym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparsesym.h; path = src/math/matsparsesym.h; sourceTree = SOURCE_ROOT; };
+		BB0C409E069A043600CF45A8 /* sparmatsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym.cc; path = src/math/sparmatsym.cc; sourceTree = SOURCE_ROOT; };
+		BB0C409F069A043600CF45A8 /* sparmatsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym.h; path = src/math/sparmatsym.h; sourceTree = SOURCE_ROOT; };
 		BB0CB11A20C170C10016D73D /* qmr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qmr.h; path = src/math/qmr.h; sourceTree = SOURCE_ROOT; };
 		BB0E4BD61002698100A96B34 /* random_vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = random_vector.h; path = src/math/random_vector.h; sourceTree = SOURCE_ROOT; };
 		BB0E4BD71002698100A96B34 /* random_vector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_vector.cc; path = src/math/random_vector.cc; sourceTree = SOURCE_ROOT; };
@@ -1457,8 +1457,8 @@
 		BB669AC80FE2E9FA00E5AC10 /* single_set.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = single_set.h; path = src/sim/single_set.h; sourceTree = SOURCE_ROOT; };
 		BB669AC90FE2E9FA00E5AC10 /* single.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = single.cc; path = src/sim/single.cc; sourceTree = SOURCE_ROOT; };
 		BB669ACA0FE2E9FA00E5AC10 /* single.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = single.h; path = src/sim/single.h; sourceTree = SOURCE_ROOT; };
-		BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparsesym1.cc; path = src/math/matsparsesym1.cc; sourceTree = SOURCE_ROOT; };
-		BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparsesym1.h; path = src/math/matsparsesym1.h; sourceTree = SOURCE_ROOT; };
+		BB66BF2D09A8DC2600E5C5BE /* sparmatsym1.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym1.cc; path = src/math/sparmatsym1.cc; sourceTree = SOURCE_ROOT; };
+		BB66BF2E09A8DC2600E5C5BE /* sparmatsym1.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym1.h; path = src/math/sparmatsym1.h; sourceTree = SOURCE_ROOT; };
 		BB66EA66068D95AD001934AF /* test_space */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_space; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB692222233D359F00F528D2 /* libcytosimG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytosimG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB69D0B8209C666100445716 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
@@ -1491,8 +1491,8 @@
 		BB73588105B98DA3006956D5 /* grid.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = grid.h; path = src/math/grid.h; sourceTree = SOURCE_ROOT; };
 		BB73588405B98DA3006956D5 /* matfull.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matfull.h; path = src/math/matfull.h; sourceTree = SOURCE_ROOT; };
 		BB73588505B98DA3006956D5 /* matrix.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matrix.h; path = src/math/matrix.h; sourceTree = SOURCE_ROOT; };
-		BB73588905B98DA3006956D5 /* matsparse.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparse.cc; path = src/math/matsparse.cc; sourceTree = SOURCE_ROOT; };
-		BB73588A05B98DA3006956D5 /* matsparse.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparse.h; path = src/math/matsparse.h; sourceTree = SOURCE_ROOT; };
+		BB73588905B98DA3006956D5 /* sparmat.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmat.cc; path = src/math/sparmat.cc; sourceTree = SOURCE_ROOT; };
+		BB73588A05B98DA3006956D5 /* sparmat.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmat.h; path = src/math/sparmat.h; sourceTree = SOURCE_ROOT; };
 		BB73588F05B98DA3006956D5 /* matsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsym.cc; path = src/math/matsym.cc; sourceTree = SOURCE_ROOT; };
 		BB73589005B98DA3006956D5 /* matsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsym.h; path = src/math/matsym.h; sourceTree = SOURCE_ROOT; };
 		BB73589505B98DA3006956D5 /* node.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = node.h; path = src/base/node.h; sourceTree = SOURCE_ROOT; };
@@ -1529,8 +1529,8 @@
 		BB749D621793620500B43298 /* test_quartic.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_quartic.cc; sourceTree = "<group>"; };
 		BB749D641793645C00B43298 /* polygon.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polygon.cc; path = src/math/polygon.cc; sourceTree = SOURCE_ROOT; };
 		BB749D651793645D00B43298 /* polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = polygon.h; path = src/math/polygon.h; sourceTree = SOURCE_ROOT; };
-		BB74F418231C334D0019D68E /* matsparseblk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matsparseblk.h; sourceTree = "<group>"; };
-		BB74F419231C334D0019D68E /* matsparseblk.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matsparseblk.cc; sourceTree = "<group>"; };
+		BB74F418231C334D0019D68E /* sparmatblk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sparmatblk.h; sourceTree = "<group>"; };
+		BB74F419231C334D0019D68E /* sparmatblk.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sparmatblk.cc; sourceTree = "<group>"; };
 		BB74F41F232024AB0019D68E /* byteswap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = byteswap.h; sourceTree = "<group>"; };
 		BB7662C310E923A200C93DF6 /* frame_reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_reader.cc; path = src/play/frame_reader.cc; sourceTree = SOURCE_ROOT; };
 		BB7662C410E923A200C93DF6 /* frame_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_reader.h; path = src/play/frame_reader.h; sourceTree = SOURCE_ROOT; };
@@ -1669,8 +1669,8 @@
 		BBA2954911A1C16600FDCD2E /* bead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bead.h; sourceTree = "<group>"; };
 		BBA295CC11A1CDEB00FDCD2E /* bead_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bead_set.cc; sourceTree = "<group>"; };
 		BBA295CD11A1CDEB00FDCD2E /* bead_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bead_set.h; sourceTree = "<group>"; };
-		BBA331AE06CA7059002C3684 /* matsparsesym2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparsesym2.cc; path = src/math/matsparsesym2.cc; sourceTree = SOURCE_ROOT; };
-		BBA331AF06CA7059002C3684 /* matsparsesym2.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparsesym2.h; path = src/math/matsparsesym2.h; sourceTree = SOURCE_ROOT; };
+		BBA331AE06CA7059002C3684 /* sparmatsym2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym2.cc; path = src/math/sparmatsym2.cc; sourceTree = SOURCE_ROOT; };
+		BBA331AF06CA7059002C3684 /* sparmatsym2.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym2.h; path = src/math/sparmatsym2.h; sourceTree = SOURCE_ROOT; };
 		BBA49EF912FF5331008A7D33 /* dynamic_fiber.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_fiber.cc; path = fibers/dynamic_fiber.cc; sourceTree = "<group>"; };
 		BBA49EFA12FF5331008A7D33 /* dynamic_fiber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_fiber.h; path = fibers/dynamic_fiber.h; sourceTree = "<group>"; };
 		BBA49F1C12FF5589008A7D33 /* dynamic_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_fiber_prop.cc; path = fibers/dynamic_fiber_prop.cc; sourceTree = "<group>"; };
@@ -1803,8 +1803,8 @@
 		BBDE7FF914E2609B00A23E0C /* picket_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = picket_long.h; path = singles/picket_long.h; sourceTree = "<group>"; };
 		BBDE7FFC14E260B400A23E0C /* wrist_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wrist_long.cc; path = singles/wrist_long.cc; sourceTree = "<group>"; };
 		BBDE7FFD14E260B400A23E0C /* wrist_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wrist_long.h; path = singles/wrist_long.h; sourceTree = "<group>"; };
-		BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsparsesymblk.cc; path = src/math/matsparsesymblk.cc; sourceTree = SOURCE_ROOT; };
-		BBDF72AE0B5C2327007CAD2A /* matsparsesymblk.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsparsesymblk.h; path = src/math/matsparsesymblk.h; sourceTree = SOURCE_ROOT; };
+		BBDF72AD0B5C2327007CAD2A /* sparmatsymblk.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsymblk.cc; path = src/math/sparmatsymblk.cc; sourceTree = SOURCE_ROOT; };
+		BBDF72AE0B5C2327007CAD2A /* sparmatsymblk.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsymblk.h; path = src/math/sparmatsymblk.h; sourceTree = SOURCE_ROOT; };
 		BBDF9AA3228BFBD3005018BD /* xpttrf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xpttrf.h; sourceTree = "<group>"; };
 		BBDFE3BD0C6A37FF00CD333A /* hand_monitor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = hand_monitor.h; path = src/sim/hand_monitor.h; sourceTree = SOURCE_ROOT; };
 		BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = hand_monitor.cc; path = src/sim/hand_monitor.cc; sourceTree = SOURCE_ROOT; };
@@ -2115,18 +2115,18 @@
 		BB2C7FEB24A88CFE0024E133 /* SparseMatrices */ = {
 			isa = PBXGroup;
 			children = (
-				BB73588A05B98DA3006956D5 /* matsparse.h */,
-				BB73588905B98DA3006956D5 /* matsparse.cc */,
-				BB0C409F069A043600CF45A8 /* matsparsesym.h */,
-				BB0C409E069A043600CF45A8 /* matsparsesym.cc */,
-				BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */,
-				BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */,
-				BBA331AF06CA7059002C3684 /* matsparsesym2.h */,
-				BBA331AE06CA7059002C3684 /* matsparsesym2.cc */,
-				BB74F418231C334D0019D68E /* matsparseblk.h */,
-				BB74F419231C334D0019D68E /* matsparseblk.cc */,
-				BBDF72AE0B5C2327007CAD2A /* matsparsesymblk.h */,
-				BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */,
+				BB73588A05B98DA3006956D5 /* sparmat.h */,
+				BB73588905B98DA3006956D5 /* sparmat.cc */,
+				BB0C409F069A043600CF45A8 /* sparmatsym.h */,
+				BB0C409E069A043600CF45A8 /* sparmatsym.cc */,
+				BB66BF2E09A8DC2600E5C5BE /* sparmatsym1.h */,
+				BB66BF2D09A8DC2600E5C5BE /* sparmatsym1.cc */,
+				BBA331AF06CA7059002C3684 /* sparmatsym2.h */,
+				BBA331AE06CA7059002C3684 /* sparmatsym2.cc */,
+				BB74F418231C334D0019D68E /* sparmatblk.h */,
+				BB74F419231C334D0019D68E /* sparmatblk.cc */,
+				BBDF72AE0B5C2327007CAD2A /* sparmatsymblk.h */,
+				BBDF72AD0B5C2327007CAD2A /* sparmatsymblk.cc */,
 			);
 			name = SparseMatrices;
 			sourceTree = "<group>";
@@ -3558,11 +3558,11 @@
 			files = (
 				BB957FF92466A86500A61493 /* point_gridF.h in Headers */,
 				BB9EC396209235CC00EF00E7 /* SFMT-sse2.h in Headers */,
-				BB71916B0EF1CD9900CED9E2 /* matsparsesym.h in Headers */,
-				BB71916C0EF1CD9900CED9E2 /* matsparsesym2.h in Headers */,
+				BB71916B0EF1CD9900CED9E2 /* sparmatsym.h in Headers */,
+				BB71916C0EF1CD9900CED9E2 /* sparmatsym2.h in Headers */,
 				BB9EC393209235CC00EF00E7 /* SFMT-common.h in Headers */,
 				BB71916E0EF1CD9900CED9E2 /* quaternion.h in Headers */,
-				BB71916F0EF1CD9900CED9E2 /* matsparsesym1.h in Headers */,
+				BB71916F0EF1CD9900CED9E2 /* sparmatsym1.h in Headers */,
 				BB7191700EF1CD9900CED9E2 /* dim.h in Headers */,
 				BB6485EE2057FD30005F2CD1 /* linear_operator.h in Headers */,
 				BB9D224620C5D30200CBB0B1 /* simd.h in Headers */,
@@ -3581,7 +3581,7 @@
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
 				BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
-				BB7191800EF1CD9900CED9E2 /* matsparse.h in Headers */,
+				BB7191800EF1CD9900CED9E2 /* sparmat.h in Headers */,
 				BB7191820EF1CD9900CED9E2 /* real.h in Headers */,
 				BB6485EC2057FD1B005F2CD1 /* allocator.h in Headers */,
 				BB7191830EF1CD9900CED9E2 /* grid.h in Headers */,
@@ -3590,7 +3590,7 @@
 				BB6485F2205803BB005F2CD1 /* gmres.h in Headers */,
 				BB7191870EF1CD9900CED9E2 /* matrix.h in Headers */,
 				BB7191890EF1CD9900CED9E2 /* linear_solvers.h in Headers */,
-				BB71918A0EF1CD9900CED9E2 /* matsparsesymblk.h in Headers */,
+				BB71918A0EF1CD9900CED9E2 /* sparmatsymblk.h in Headers */,
 				BB71918B0EF1CD9900CED9E2 /* vector1.h in Headers */,
 				BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */,
 				BB5F2B7E245F5D90007DDD06 /* xtrsm.h in Headers */,
@@ -3600,7 +3600,7 @@
 				BB7191960EF1CD9900CED9E2 /* vector.h in Headers */,
 				BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */,
 				BB0E4BD81002698100A96B34 /* random_vector.h in Headers */,
-				BB74F41A231C334D0019D68E /* matsparseblk.h in Headers */,
+				BB74F41A231C334D0019D68E /* sparmatblk.h in Headers */,
 				BB89999420CECB5C00498F48 /* matrix44.h in Headers */,
 				BBC422FA247342CF007EA070 /* hand_list.h in Headers */,
 				BB10378310B8032E00CEC5C6 /* assert_macro.h in Headers */,
@@ -4629,25 +4629,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB71919E0EF1CD9900CED9E2 /* conjgradient.cc in Sources */,
-				BB7191A00EF1CD9900CED9E2 /* matsparse.cc in Sources */,
+				BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */,
 				BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */,
 				BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */,
 				BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */,
 				BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */,
-				BB9D87B01E76BBB800DD0F00 /* matsparsesym2.cc in Sources */,
+				BB9D87B01E76BBB800DD0F00 /* sparmatsym2.cc in Sources */,
 				BB9EC398209235CC00EF00E7 /* SFMT.c in Sources */,
 				BB089A0C2228A26D00C070E7 /* matrix33.cc in Sources */,
 				BB089A0B2228A26D00C070E7 /* matrix22.cc in Sources */,
-				BB74F41B231C334D0019D68E /* matsparseblk.cc in Sources */,
+				BB74F41B231C334D0019D68E /* sparmatblk.cc in Sources */,
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
 				BBC422F724731657007EA070 /* node.cc in Sources */,
 				BB95C53C249627ED003CA21A /* test_array.cc in Sources */,
-				BB7191B00EF1CD9900CED9E2 /* matsparsesym.cc in Sources */,
-				BB7191B40EF1CD9900CED9E2 /* matsparsesym1.cc in Sources */,
+				BB7191B00EF1CD9900CED9E2 /* sparmatsym.cc in Sources */,
+				BB7191B40EF1CD9900CED9E2 /* sparmatsym1.cc in Sources */,
 				BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */,
 				BB003F3020EDEDA4007C9593 /* vector4.cc in Sources */,
-				BB7191B80EF1CD9900CED9E2 /* matsparsesymblk.cc in Sources */,
+				BB7191B80EF1CD9900CED9E2 /* sparmatsymblk.cc in Sources */,
 				BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */,
 				BB7DC19C2200DCE400DB779E /* test_glos.cc in Sources */,
 				BB5783DC23EB3A250022878E /* test_size.cc in Sources */,
@@ -4691,18 +4691,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB74F41C231E7E0F0019D68E /* matsparseblk.cc in Sources */,
+				BB74F41C231E7E0F0019D68E /* sparmatblk.cc in Sources */,
 				BB31698424A0F3F2008DFDB3 /* operator_new.cc in Sources */,
 				BB9D87B41E76BBF100DD0F00 /* backtrace.cc in Sources */,
-				BB9D87AF1E76BBAE00DD0F00 /* matsparsesymblk.cc in Sources */,
+				BB9D87AF1E76BBAE00DD0F00 /* sparmatsymblk.cc in Sources */,
 				BB738A6420C51E620039C670 /* SFMT.c in Sources */,
-				BB9D87AD1E76BBA700DD0F00 /* matsparsesym1.cc in Sources */,
-				BB9D87AC1E76BBA400DD0F00 /* matsparsesym.cc in Sources */,
+				BB9D87AD1E76BBA700DD0F00 /* sparmatsym1.cc in Sources */,
+				BB9D87AC1E76BBA400DD0F00 /* sparmatsym.cc in Sources */,
 				BB9D87A81E76BB0000DD0F00 /* test_matrix.cc in Sources */,
 				BB9D87A91E76BB7000DD0F00 /* random.cc in Sources */,
 				BB9D87AA1E76BB9B00DD0F00 /* matrix.cc in Sources */,
-				BB9D87AB1E76BBA100DD0F00 /* matsparse.cc in Sources */,
-				BB9D87AE1E76BBAB00DD0F00 /* matsparsesym2.cc in Sources */,
+				BB9D87AB1E76BBA100DD0F00 /* sparmat.cc in Sources */,
+				BB9D87AE1E76BBAB00DD0F00 /* sparmatsym2.cc in Sources */,
 				BB9D87B31E76BBDD00DD0F00 /* tictoc.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

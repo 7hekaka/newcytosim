@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #include <sys/time.h>
 #include <fstream>
@@ -11,16 +11,16 @@
 
 #include "dim.h"
 #include "matrix33.h"
-#include "matsparsesym.h"
-#include "matsparsesym1.h"
-#include "matsparsesym2.h"
-#include "matsparsesymblk.h"
-#include "matsparseblk.h"
+#include "sparmatsym.h"
+#include "sparmatsym1.h"
+#include "sparmatsym2.h"
+#include "sparmatsymblk.h"
+#include "sparmatblk.h"
 
 using namespace TicToc;
 
-typedef MatrixSparseSymmetricBlock MatrixSparseSymmetricB;
-typedef MatrixSparseSymmetricBlock::Block SquareBlock;
+typedef SparMatSymBlk SparMatSymB;
+typedef SparMatSymBlk::Block SquareBlock;
 
 const size_t N_RUN = 16;
 const size_t N_MUL = 99;
@@ -161,7 +161,7 @@ void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
 
 
 #if ( DIM == 3 )
-void fillMatrix(MatrixSparseSymmetricBlock& mat, const size_t i, const size_t j)
+void fillMatrix(SparMatSymBlk& mat, const size_t i, const size_t j)
 {
     SquareBlock M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
     
@@ -175,7 +175,7 @@ void fillMatrix(MatrixSparseSymmetricBlock& mat, const size_t i, const size_t j)
 }
 
 
-void fillMatrix(MatrixSparseBlock& mat, const size_t i, const size_t j)
+void fillMatrix(SparMatBlk& mat, const size_t i, const size_t j)
 {
     Matrix34 M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
     
@@ -403,11 +403,11 @@ void testMatrixIso(MATRIX & mat,
 void testMatrices(const size_t size, const size_t fill)
 {
     printf("------ %iD size %lu  filled %.1f %% :", DIM, size, fill*100.0/size/size);
-    //MatrixSparseSymmetric  mat0;
-    MatrixSparseSymmetric1 mat1;
-    //MatrixSparseSymmetric2 mat2;
-    MatrixSparseSymmetricB mat3;
-    MatrixSparseBlock      mat4;
+    //SparMatSym  mat0;
+    SparMatSym1 mat1;
+    //SparMatSym2 mat2;
+    SparMatSymB mat3;
+    SparMatBlk  mat4;
 
     size_t * inx = nullptr;
     size_t * iny = nullptr;
@@ -452,7 +452,7 @@ void testMatrices(const size_t size, const size_t fill)
 const real dir[4] = {  2, 1, -1, 3 };
 const real vec[4] = { -1, 3,  1, 2 };
 
-void fillMatrixBlock(MatrixSparseSymmetricBlock& mat, const size_t fill, size_t inx[], size_t iny[])
+void fillMatrixBlock(SparMatSymBlk& mat, const size_t fill, size_t inx[], size_t iny[])
 {
     SquareBlock S = SquareBlock::outerProduct(dir);
     SquareBlock U = SquareBlock::outerProduct(dir, vec);
@@ -470,7 +470,7 @@ void fillMatrixBlock(MatrixSparseSymmetricBlock& mat, const size_t fill, size_t 
 /**
 This compares the Scalar and SIMD implementations of one matrix
 */
- void testMatrixBlock(MatrixSparseSymmetricBlock & mat,
+ void testMatrixBlock(SparMatSymBlk & mat,
                      const size_t size, real const* x, real const* y, real * z,
                      const size_t fill, size_t inx[], size_t iny[])
 {
@@ -536,7 +536,7 @@ void testMatrixBlock(const size_t size, const size_t fill)
     setVectors(size, x, y, z);
     alpha = RNG.sreal();
     
-    MatrixSparseSymmetricBlock mat;
+    SparMatSymBlk mat;
     testMatrixBlock(mat, size, x, y, z, fill, inx, iny);
     
     free_real(x);
@@ -560,9 +560,9 @@ int main( int argc, char* argv[] )
     RNG.seed();
 #if ( 0 )
         // small tests to check correctness:
-        MatrixSparseSymmetric1 mat1;
-        MatrixSparseSymmetricB mat3;
-        MatrixSparseBlock mat4;
+        SparMatSym1 mat1;
+        SparMatSymB mat3;
+        SparMatBlk  mat4;
         
         compare(4*3, mat1, mat3, 1<<4);
         compare(4*7, mat1, mat3, 1<<5);

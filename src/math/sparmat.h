@@ -1,0 +1,100 @@
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
+
+#ifndef SPARMAT_H
+#define SPARMAT_H
+
+#include "real.h"
+#include <cstdio>
+#include <string>
+
+/// a real (non-symmetric) sparse Matrix
+/**
+ This class is not used currently in Cytosim
+ */
+class SparMat final
+{
+private:
+    
+    /// size of matrix
+    size_t  size_;
+
+    /// size of memory which has been allocated
+    size_t  alloc_;
+
+    // array [ size ][ ? ] holding the values for each column
+    real ** mxCol;
+    
+    // array [ size ][ ? ] holding the line index for each column
+    size_t ** mxRow;
+    
+    // allocate column to hold nb values
+    void allocateColumn(size_t column_index, size_t nb_values);
+    
+public:
+    
+    /// return the size of the matrix
+    size_t size() const { return size_; }
+    
+    /// change the size of the matrix
+    void resize(size_t s) { allocate(s); size_=s; }
+
+    /// base for destructor
+    void deallocate();
+    
+    /// default constructor
+    SparMat();
+    
+    /// default destructor
+    ~SparMat()  { deallocate(); }
+    
+    /// set to zero
+    void reset();
+    
+    /// allocate the matrix to hold ( sz * sz )
+    void allocate(size_t sz);
+        
+    /// returns the address of element at (x, y), no allocation is done
+    real* addr( size_t x, size_t y ) const;
+    
+    /// returns the address of element at (x, y), allocating if necessary
+    real& operator()( size_t x, size_t y );
+    
+    /// scale the matrix by a scalar factor
+    void scale( real a );
+    
+    /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
+    void addDiagonalBlock(real* mat, unsigned ldd, size_t start, size_t cnt) const;
+    
+    /// add this' data block ( idx, idx, idx+siz, idx+siz ) to upper triangular half of `mat`
+    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const;
+    
+    /// multiplication of a vector: Y = Y + M * X, dim(X) = dim(M)
+    void vecMulAdd( const real* X, real* Y ) const;
+    
+    /// 2D isotropic multiplication of a vector: Y = Y + M * X
+    void vecMulAddIso2D( const real* X, real* Y ) const;
+    
+    /// 3D isotropic multiplication of a vector: Y = Y + M * X
+    void vecMulAddIso3D( const real* X, real* Y ) const;
+    
+    /// true if matrix is non-zero
+    bool isNotZero() const;
+    
+    /// number of element which are non-zero
+    size_t nbElements(size_t start, size_t stop) const;
+    
+    /// number of blocks which are not null
+    size_t nbElements() const { return nbElements(0, size_); }
+
+    /// returns a string which a description of the type of matrix
+    std::string what() const;
+    
+    /// printf debug function in sparse mode: i, j : value
+    void printSparse(std::ostream&, real) const;
+    
+    /// debug function
+    int bad() const;
+};
+
+
+#endif

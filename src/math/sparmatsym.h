@@ -1,0 +1,131 @@
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
+
+#ifndef SPARMATSYM_H
+#define SPARMATSYM_H
+
+#include "real.h"
+#include <cstdio>
+#include <string>
+
+///real symmetric sparse Matrix
+/**
+ SparMatSym uses a sparse storage, with arrays of elements for each column.
+ */
+class SparMatSym final
+{
+public:
+    
+    /// An element of the sparse matrix
+    struct Element
+    {
+        real     val;   ///< The value of the element
+        size_t   inx;   ///< The index of the line
+        
+        void reset(size_t i)
+        {
+            inx = i;
+            val = 0.0;
+        }
+    };
+    
+private:
+    
+    /// size of matrix
+    size_t     size_;
+
+    /// amount of memory which has been allocated
+    size_t     allocated_;
+    
+    /// array col_[c][] holds Elements of column 'c'
+    Element ** col_;
+    
+    /// col_size_[c] is the number of Elements in column 'c'
+    size_t   * col_size_;
+    
+    /// col_max_[c] is the number of Elements allocated in column 'c'
+    size_t   * col_max_;
+    
+    /// allocate column to hold specified number of values
+    void allocateColumn(size_t col, size_t nb);
+    
+public:
+    
+    /// return the size of the matrix
+    size_t size() const { return size_; }
+    
+    /// change the size of the matrix
+    void resize(size_t s) { allocate(s); size_=s; }
+
+    /// base for destructor
+    void deallocate();
+    
+    /// default constructor
+    SparMatSym();
+    
+    /// default destructor
+    ~SparMatSym()  { deallocate(); }
+    
+    /// set to zero
+    void reset();
+    
+    /// allocate the matrix to hold ( sz * sz )
+    void allocate(size_t sz);
+    
+    /// returns the address of element at (x, y), no allocation is done
+    real* addr(size_t x, size_t y) const;
+    
+    /// returns the address of element at (x, y), allocating if necessary
+    real& operator()(size_t x, size_t y);
+    
+    /// scale the matrix by a scalar factor
+    void scale(real);
+    
+    /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt) const;
+    
+    /// add lower triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
+    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const;
+    
+    /// prepare matrix for multiplications by a vector (must be called)
+    void prepareForMultiply(int dim);
+    
+    /// multiplication of a vector: Y = Y + M * X with dim(X) = dim(M)
+    void vecMulAdd(const real* X, real* Y) const;
+    
+    /// multiplication of a vector: Y = Y + M * X with dim(X) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd(X, Y); }
+
+    /// 2D isotropic multiplication of a vector: Y = Y + M * X with dim(X) = 2 * dim(M)
+    void vecMulAddIso2D(const real* X, real* Y) const;
+    
+    /// 3D isotropic multiplication of a vector: Y = Y + M * X with dim(X) = 3 * dim(M)
+    void vecMulAddIso3D(const real* X, real* Y) const;
+    
+    /// true if matrix is non-zero
+    bool isNotZero() const;
+    
+    /// number of element which are not null
+    size_t nbElements(size_t start, size_t stop) const;
+    
+    /// number of blocks which are not null
+    size_t nbElements() const { return nbElements(0, size_); }
+
+    /// returns a string which a description of the type of matrix
+    std::string what() const;
+    
+    /// printf debug function in sparse mode: i, j : value
+    void printSparse(std::ostream&, real) const;
+    
+    /// print content of one column
+    void printColumn(std::ostream&, size_t);
+    
+    /// print content of one column
+    void printColumns(std::ostream&);
+
+    /// debug function
+    int bad() const;
+};
+
+
+#endif
+

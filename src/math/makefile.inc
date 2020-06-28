@@ -2,8 +2,8 @@
 
 
 OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
-    	rasterizer.o platonic.o matrix.o matsparse.o matsparsesym.o\
-    	matsparsesym1.o polygon.o pointsonsphere.o random.o random_vector.o\
+    	rasterizer.o platonic.o matrix.o sparmat.o sparmatsym.o\
+    	sparmatsym1.o polygon.o pointsonsphere.o random.o random_vector.o\
         matrix34.o matsym.o matfull.o project_ellipse.o quartic_solver.o
 
 #----------------------------rules----------------------------------------------
@@ -15,49 +15,49 @@ $(OBJ_MATH): %.o: %.cc %.h | build
 	$(COMPILE) $(INC_BM) -c $< -o build/$@
 
 
-matsparsesym2.o: matsparsesym2.cc matsparsesym2.h
+sparmatsym2.o: sparmatsym2.cc sparmatsym2.h
 	$(COMPILE) $(INC_BM) -c $< -o build/$@
 
 
-matsparsesymblk.o: matsparsesymblk.cc matsparsesymblk.h
+sparmatsymblk.o: sparmatsymblk.cc sparmatsymblk.h
 	$(COMPILE) $(INC_BM) -c $< -o build/$@
 
-matsparsesymblkD1.o: matsparsesymblk.cc matsparsesymblk.h
+sparmatsymblkD1.o: sparmatsymblk.cc sparmatsymblk.h
 	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o build/$@
 
-matsparsesymblkD2.o: matsparsesymblk.cc matsparsesymblk.h
+sparmatsymblkD2.o: sparmatsymblk.cc sparmatsymblk.h
 	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o build/$@
 
-matsparsesymblkD3.o: matsparsesymblk.cc matsparsesymblk.h
+sparmatsymblkD3.o: sparmatsymblk.cc sparmatsymblk.h
 	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
 
 
-matsparseblk.o: matsparseblk.cc matsparseblk.h
+sparmatblk.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -c $< -o build/$@
 
-matsparseblkD1.o: matsparseblk.cc matsparseblk.h
+sparmatblkD1.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o build/$@
 
-matsparseblkD2.o: matsparseblk.cc matsparseblk.h
+sparmatblkD2.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o build/$@
 
-matsparseblkD3.o: matsparseblk.cc matsparseblk.h
+sparmatblkD3.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
 
 
-cytomath.a: $(OBJ_MATH) matsparsesymblk.o matsparseblk.o | lib
+cytomath.a: $(OBJ_MATH) sparmatsymblk.o sparmatblk.o | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD1.a: $(OBJ_MATH) matsparsesymblkD1.o matsparseblkD1.o
+cytomathD1.a: $(OBJ_MATH) sparmatsymblkD1.o sparmatblkD1.o
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD2.a: $(OBJ_MATH) matsparsesymblkD2.o matsparseblkD2.o
+cytomathD2.a: $(OBJ_MATH) sparmatsymblkD2.o sparmatblkD2.o
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD3.a: $(OBJ_MATH) matsparsesymblkD3.o matsparseblkD3.o
+cytomathD3.a: $(OBJ_MATH) sparmatsymblkD3.o sparmatblkD3.o
 	$(MAKELIB)
 	$(DONE)
 
