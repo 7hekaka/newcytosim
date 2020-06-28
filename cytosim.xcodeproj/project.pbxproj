@@ -2112,6 +2112,25 @@
 			name = geometry;
 			sourceTree = "<group>";
 		};
+		BB2C7FEB24A88CFE0024E133 /* SparseMatrices */ = {
+			isa = PBXGroup;
+			children = (
+				BB73588A05B98DA3006956D5 /* matsparse.h */,
+				BB73588905B98DA3006956D5 /* matsparse.cc */,
+				BB0C409F069A043600CF45A8 /* matsparsesym.h */,
+				BB0C409E069A043600CF45A8 /* matsparsesym.cc */,
+				BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */,
+				BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */,
+				BBA331AF06CA7059002C3684 /* matsparsesym2.h */,
+				BBA331AE06CA7059002C3684 /* matsparsesym2.cc */,
+				BB74F418231C334D0019D68E /* matsparseblk.h */,
+				BB74F419231C334D0019D68E /* matsparseblk.cc */,
+				BBDF72AE0B5C2327007CAD2A /* matsparsesymblk.h */,
+				BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */,
+			);
+			name = SparseMatrices;
+			sourceTree = "<group>";
+		};
 		BB4ADEC10D47459400C2B1C9 /* Grids */ = {
 			isa = PBXGroup;
 			children = (
@@ -2310,18 +2329,6 @@
 				BB0E75E805E14D9C00BC9B7A /* matfull.cc */,
 				BB73589005B98DA3006956D5 /* matsym.h */,
 				BB73588F05B98DA3006956D5 /* matsym.cc */,
-				BB73588A05B98DA3006956D5 /* matsparse.h */,
-				BB73588905B98DA3006956D5 /* matsparse.cc */,
-				BB0C409F069A043600CF45A8 /* matsparsesym.h */,
-				BB0C409E069A043600CF45A8 /* matsparsesym.cc */,
-				BB66BF2E09A8DC2600E5C5BE /* matsparsesym1.h */,
-				BB66BF2D09A8DC2600E5C5BE /* matsparsesym1.cc */,
-				BBA331AF06CA7059002C3684 /* matsparsesym2.h */,
-				BBA331AE06CA7059002C3684 /* matsparsesym2.cc */,
-				BB74F418231C334D0019D68E /* matsparseblk.h */,
-				BB74F419231C334D0019D68E /* matsparseblk.cc */,
-				BBDF72AE0B5C2327007CAD2A /* matsparsesymblk.h */,
-				BBDF72AD0B5C2327007CAD2A /* matsparsesymblk.cc */,
 			);
 			name = Matrices;
 			sourceTree = "<group>";
@@ -2498,6 +2505,7 @@
 				BB614D9E05BE8FDB0048FA70 /* solvers */,
 				BB614D9D05BE8FD30048FA70 /* vector */,
 				BB614D9C05BE8FCC0048FA70 /* Matrices */,
+				BB2C7FEB24A88CFE0024E133 /* SparseMatrices */,
 			);
 			name = math;
 			path = src/math;
