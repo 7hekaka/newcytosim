@@ -186,10 +186,11 @@ public:
     }
 
     /// conversion to string
-    std::string to_string(int w, int p) const
+    std::string to_string(std::streamsize w, std::streamsize p) const
     {
         std::ostringstream os;
         os.precision(p);
+        os.width(w);
         print(os);
         return os.str();
     }
