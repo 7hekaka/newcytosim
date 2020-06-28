@@ -815,7 +815,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
 {
     assert_true(size_==0);
     assert_small(dia_.asymmetry());
-    
+#if ( BLOCK_SIZE == 3 )
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = dia_;
     
@@ -854,6 +854,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
     vec4f s2 = mul4f(load3f(D+BLD*2), permute4f(tt, 0xAA));
 # endif
     storeu4f(Y+jj, add4f(add4f(loadu4f(Y+jj), s0), add4f(s1, s2)));
+#endif
 #endif
 }
 
@@ -1546,7 +1547,7 @@ void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y) const
 #elif ( BLOCK_SIZE == 2 )
         column_[jj].vecMulAdd2D(X, Y, jj);
 #elif ( BLOCK_SIZE == 3 )
-        column_[jj].VECMULADD3D(X, Y, jj);
+        column_[jj].vecMulAdd3D(X, Y, jj);
 #elif ( BLOCK_SIZE == 4 )
         column_[jj].vecMulAdd4D(X, Y, jj);
 #endif

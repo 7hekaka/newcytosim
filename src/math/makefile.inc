@@ -6,6 +6,8 @@ OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
     	sparmatsym1.o polygon.o pointsonsphere.o random.o random_vector.o\
         matrix34.o matsym.o matfull.o project_ellipse.o quartic_solver.o
 
+OBJ_SPARMAT := sparmatblk.o sparmatsymblk.o sparmatsymblkdiag.o
+
 #----------------------------rules----------------------------------------------
 
 INC_BM:=-Isrc/base -Isrc/math
@@ -58,19 +60,19 @@ sparmatblkD3.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
 
 
-cytomath.a: $(OBJ_MATH) sparmatsymblk.o sparmatblk.o | lib
+cytomath.a: $(OBJ_MATH) $(OBJ_SPARMAT) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD1.a: $(OBJ_MATH) sparmatsymblkD1.o sparmatblkD1.o
+cytomathD1.a: $(OBJ_MATH) $(OBJ_SPARMAT:%.o=%D1.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD2.a: $(OBJ_MATH) sparmatsymblkD2.o sparmatblkD2.o
+cytomathD2.a: $(OBJ_MATH) $(OBJ_SPARMAT:%.o=%D2.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytomathD3.a: $(OBJ_MATH) sparmatsymblkD3.o sparmatblkD3.o
+cytomathD3.a: $(OBJ_MATH) $(OBJ_SPARMAT:%.o=%D3.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
