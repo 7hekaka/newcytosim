@@ -53,7 +53,7 @@ void SparMatSym1::allocate(size_t alc)
         constexpr size_t chunk = 64;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        //fprintf(stderr, "MSS1 allocate matrix %u\n", alc);
+        //fprintf(stderr, "SMS1 allocate matrix %u\n", alc);
         Element ** col_new      = new Element*[alc];
         size_t   * col_size_new = new size_t[alc];
         size_t   * col_max_new  = new size_t[alc];
@@ -137,7 +137,7 @@ void SparMatSym1::allocateColumn(const size_t jj, size_t alc)
     assert_true( jj < size_ );
     if ( alc > col_max_[jj] )
     {
-        //fprintf(stderr, "MSS1 allocate column %i size %u\n", jj, alc);
+        //fprintf(stderr, "SMS1 allocate column %i size %u\n", jj, alc);
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
         Element * col_new = new Element[alc];
@@ -214,7 +214,7 @@ real& SparMatSym1::operator()(size_t i, size_t j)
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
-    //fprintf(stderr, "MSS1( %6i %6i )\n", i, j);
+    //fprintf(stderr, "SMS1( %6i %6i )\n", i, j);
     
     Element * col;
     
@@ -359,7 +359,7 @@ void SparMatSym1::addTriangularBlock(real* mat, const size_t ldd,
             if ( ii < end )
             {
                 size_t i = dim * ( ii - start );
-                //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
+                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 // address lower triangle of 'mat'
                 assert_true( i > j );
                 mat[i+ldd*j] += column_[jj][n].val;
@@ -391,7 +391,7 @@ void SparMatSym1::addTriangularBlockBanded(real alpha, real* mat, const size_t l
             if ( ii < end )
             {
                 size_t i = ii - start;
-                //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
+                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 assert_true( i > j );
                 // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
                 if ( i <= j + rank )
@@ -420,7 +420,7 @@ void SparMatSym1::addDiagonalBlock(real* mat, size_t ldd,
             if ( ii < end )
             {
                 size_t i = ii - start;
-                //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
+                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 mat[j+ldd*i] += column_[jj][n].val;
                 if ( j != i )
                     mat[i+ldd*j] += column_[jj][n].val;
@@ -461,11 +461,11 @@ std::string SparMatSym1::what() const
 {
     std::ostringstream msg;
 #if MATRIX1_USES_AVX
-    msg << "MSS1x " << nbElements();
+    msg << "SMS1x " << nbElements();
 #elif MATRIX1_USES_SSE
-    msg << "MSS1e " << nbElements();
+    msg << "SMS1e " << nbElements();
 #else
-    msg << "MSS1 " << nbElements();
+    msg << "SMS1 " << nbElements();
 #endif
     return msg.str();
 }
@@ -493,7 +493,7 @@ void SparMatSym1::printSparse(std::ostream& os, real inf) const
 
 void SparMatSym1::printColumns(std::ostream& os)
 {
-    os << "MSS1 size " << size_ << ":";
+    os << "SMS1 size " << size_ << ":";
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         os << "\n   " << jj << "   " << col_size_[jj];
@@ -508,7 +508,7 @@ void SparMatSym1::printColumns(std::ostream& os)
 void SparMatSym1::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = column_[jj];
-    os << "MSS1 col " << jj << ":";
+    os << "SMS1 col " << jj << ":";
     for ( size_t n = 0; n < col_size_[jj]; ++n )
     {
         os << "\n" << col[n].inx << " :";

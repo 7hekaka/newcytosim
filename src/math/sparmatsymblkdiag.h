@@ -1,7 +1,7 @@
-// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
-#ifndef SPARMATSYMBLK_H
-#define SPARMATSYMBLK_H
+#ifndef SPARMATSYMBLKDIAG_H
+#define SPARMATSYMBLKDIAG_H
 
 #include "dim.h"
 #include "real.h"
@@ -32,12 +32,12 @@
  The lower triangle of the matrix is stored.
  Elements are stored in no particular order in each column.
 
- SparMatSymBlk uses a sparse storage, with arrays of elements for each column.
+ MatrixSparseSymmetricBlock uses a sparse storage, with arrays of elements for each column.
  Each element is a full square block of size DIM x DIM.
  
  F. Nedelec, 17--27 March 2017, revised entirely June 2018
  */
-class SparMatSymBlk final
+class SparMatSymBlkDiag final
 {
 public:
 
@@ -62,18 +62,19 @@ private:
     /// A column of the sparse matrix
     class Column
     {
-        friend class SparMatSymBlk;
+        friend class SparMatSymBlkDiag;
         friend class Meca;
 
+        Block    dia_;   ///< diagonal block
         size_t  allo_;   ///< allocated size of array
         size_t  size_;   ///< number of blocks in column
         size_t * inx_;   ///< line index for each element
-        Block  * blk_;   ///< all blocks
-        
+        Block  * blk_;   ///< off-diagonal blocks
+
     public:
         
         /// constructor
-        Column() { size_=0; allo_=0; inx_=nullptr; blk_=nullptr; }
+        Column() { size_=0; allo_=0; dia_.reset(); inx_=nullptr; blk_=nullptr; }
         
         /// the assignment operator will transfer memory
         void operator =(Column&);
@@ -97,14 +98,17 @@ private:
         void print(std::ostream&) const;
         
         /// true if column is empty
-        bool isNotZero() const { return ( size_ > 0 ); }
-
-        /// return n-th block (not necessarily, located at line inx_[n]
-        Block& operator[](size_t n) const { return blk_[n]; }
+        bool isNotZero() const { return ( dia_ != 0.0 ) || ( size_ > 0 ); }
+        
+        /// return block located on the diagonal
+        Block& diag_block() { return dia_; }
 
         /// return block located at line 'i' and column 'j'
         Block& block(size_t i, size_t j);
         
+        /// return n-th off-diagonal block, located at line inx_[n]
+        Block& operator[](size_t n) const { return blk_[n]; }
+
         /// multiplication of a vector: Y <- Y + M * X, block_size = 1
         void vecMulAdd1D(const real* X, real* Y, size_t j) const;
         
@@ -129,6 +133,9 @@ private:
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
         void vecMulAdd2D_AVXU4(const real* X, real* Y, size_t j) const;
         
+        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
+        void vecMulAdd3D_DIAG(const real* X, real* Y, size_t j) const;
+
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
         void vecMulAdd3D_SSE(const real* X, real* Y, size_t j) const;
         
@@ -177,10 +184,10 @@ public:
     void deallocate();
     
     /// default constructor
-    SparMatSymBlk();
+    SparMatSymBlkDiag();
     
     /// default destructor
-    ~SparMatSymBlk()  { deallocate(); }
+    ~SparMatSymBlkDiag()  { deallocate(); }
     
     /// set to zero
     void reset();
@@ -191,9 +198,6 @@ public:
     /// return column at index j
     Column const& column(size_t j) const { return column_[j]; }
     
-    /// returns element at (i, i)
-    Block& diag_block(size_t i);
-
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
     {
@@ -201,6 +205,8 @@ public:
         assert_true( jj < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );
         assert_true( jj % BLOCK_SIZE == 0 );
+        if ( ii == jj )
+            return column_[ii].diag_block();
 #if ( 1 )
         // safe swap, with branchless code:
         size_t i = std::max(ii, jj);
@@ -211,6 +217,9 @@ public:
         return column_[jj].block(ii, jj);
 #endif
     }
+    
+    /// returns element at (i, i)
+    Block& diag_block(size_t i) { return column_[i].diag_block(); }
     
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;

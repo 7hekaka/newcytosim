@@ -29,7 +29,7 @@ void SparMatBlk::allocate(size_t alc)
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        //fprintf(stderr, "MSB allocates %u\n", alc);
+        //fprintf(stderr, "SMB allocates %u\n", alc);
         Line * row_new = new Line[alc];
        
         if ( row_ )
@@ -66,8 +66,8 @@ void SparMatBlk::Line::allocate(size_t alc)
 {
     if ( alc > allo_ )
     {
-        //fprintf(stderr, "MSB reallocates line %i for %u: %p\n", inx_[0], alc);
-        //else fprintf(stderr, "MSB allocates line for %u: %p\n", alc);
+        //fprintf(stderr, "SMB reallocates line %i for %u: %p\n", inx_[0], alc);
+        //else fprintf(stderr, "SMB allocates line for %u: %p\n", alc);
         /*
          'chunk' can be increased, to possibly gain performance:
          more memory will be used, but reallocation will be less frequent
@@ -108,7 +108,7 @@ void SparMatBlk::Line::allocate(size_t alc)
 
 void SparMatBlk::Line::deallocate()
 {
-    //if ( inx_ ) fprintf(stderr, "MSB deallocates line %i\n", inx_[0]);
+    //if ( inx_ ) fprintf(stderr, "SMB deallocates line %i\n", inx_[0]);
     free(inx_);
     free_real(blk_);
     inx_ = nullptr;
@@ -118,7 +118,7 @@ void SparMatBlk::Line::deallocate()
 
 void SparMatBlk::Line::operator =(SparMatBlk::Line & row)
 {
-    //if ( inx_ ) fprintf(stderr, "MSB transfers line %u\n", inx_[0]);
+    //if ( inx_ ) fprintf(stderr, "SMB transfers line %u\n", inx_[0]);
     free(inx_);
     free_real(blk_);
 
@@ -292,7 +292,7 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
             if (( start <= jj ) & ( jj < end ))
             {
                 size_t j = ( jj - start ) / BLOCK_SIZE;
-                //fprintf(stderr, "MSB %4lu %4lu : %.4f\n", i, j, alpha * row[n].trace());
+                //fprintf(stderr, "SMB %4lu %4lu : %.4f\n", i, j, alpha * row[n].trace());
                 mat[i+ldd*j] += alpha * row[n].trace();
             }
         }
@@ -334,9 +334,9 @@ std::string SparMatBlk::what() const
 {
     std::ostringstream msg;
 #if MATRIXSB_USES_AVX
-    msg << "MSBx " << Block::what() << "*" << nbElements();
+    msg << "SMBx " << Block::what() << "*" << nbElements();
 #else
-    msg << "MSB " << Block::what() << "*" << nbElements();
+    msg << "SMB " << Block::what() << "*" << nbElements();
 #endif
     return msg.str();
 }
@@ -352,20 +352,20 @@ void SparMatBlk::printSparse(std::ostream& os, real inf) const
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         Line & row = row_[jj];
-        if ( row.size_ > 0 )
+        if ( row.isNotZero() )
             os << "% line " << jj << "\n";
-        for ( size_t n = 0 ; n < row.size_ ; ++n )
+        size_t d = 1;
+        for ( size_t n = 0 ; n < row.size_ ; ++n, d = 0 )
         {
             size_t ii = row.inx_[n];
-            Block blk = row.blk_[n];
-            size_t d = ( ii == jj );
+            Block B = row.blk_[n];
             for ( size_t x = 0  ; x < BLOCK_SIZE; ++x )
             for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
             {
-                real v = blk(y, x);
+                real v = B(y, x);
                 if ( abs_real(v) >= inf )
                 {
-                    snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, blk(y, x));
+                    snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, v);
                     os << str;
                 }
             }
@@ -377,9 +377,9 @@ void SparMatBlk::printSparse(std::ostream& os, real inf) const
 
 void SparMatBlk::printLines(std::ostream& os)
 {
-    os << "MSB size " << size_ << ":";
+    os << "SMB size " << size_ << ":";
     for ( size_t i = 0; i < size_; ++i )
-        if (  row_[i].size_ > 0 )
+        if ( row_[i].isNotZero() )
         {
             os << "\n   " << i << "   " << row_[i].size_;
             os << " next " << next_[i];
@@ -478,7 +478,7 @@ void SparMatBlk::sortElements()
         assert_true( i < size_ );
         Line & row = row_[i];
         assert_true( row.size_ > 0 );
-        //std::clog << "MSB line " << jj << " has " << row.size_ << " elements\n";
+        //std::clog << "SMB line " << jj << " has " << row.size_ << " elements\n";
         
         // order the elements in each line:
         if ( row.size_ > 1 )
@@ -540,7 +540,7 @@ void SparMatBlk::symmetrize()
     for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
     {
         Line & row = row_[i];
-        //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
+        //std::clog << "SMB line " << i << " has " << row.size_ << " elements\n";
         
         for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
@@ -563,12 +563,12 @@ void SparMatBlk::symmetrize()
     for ( size_t i = 0; i < size_; ++i )
     {
         Line & row = row_[i];
-        //std::clog << "MSB line " << i << " has " << row.size_ << " elements\n";
+        //std::clog << "SMB line " << i << " has " << row.size_ << " elements\n";
         size_t j = 0;
         for ( size_t n = 0 ; n < row.size_ ; ++n )
         {
             if ( row.inx_[n] < j )
-                std::clog << "MSB line " << i << " is disordered\n";
+                std::clog << "SMB line " << i << " is disordered\n";
             j = row.inx_[n];
         }
     }
@@ -586,11 +586,11 @@ bool SparMatBlk::prepareForMultiply(int)
         size_t nxt = size_;
         while ( --inx > 0 )
         {
-            if ( row_[inx].size_ > 0 )
+            if ( row_[inx].isNotZero() )
                 nxt = inx;
             next_[inx] = nxt;
         }
-        if ( row_[0].size_ > 0 )
+        if ( row_[0].isNotZero() )
             next_[0] = 0;
         else
             next_[0] = nxt;
@@ -1002,7 +1002,7 @@ void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t sto
     }
     /*
     if ( cnt > 0 )
-        fprintf(stderr, "MSB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
+        fprintf(stderr, "SMB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
                 row, cnt, real(__rdtsc()-rdt)/cnt);
      */
 }

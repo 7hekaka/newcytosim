@@ -39,7 +39,7 @@ void SparMatSym2::allocate(size_t alc)
         constexpr size_t chunk = 32;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        //fprintf(stderr, "MSS1 allocate matrix %u\n", alc);
+        //fprintf(stderr, "SMS1 allocate matrix %u\n", alc);
         Element ** col_new      = new Element*[alc];
         size_t   * col_size_new = new size_t[alc];
         size_t   * col_max_new  = new size_t[alc];
@@ -124,7 +124,7 @@ void SparMatSym2::allocateColumn(const size_t jj, size_t alc)
 
     if ( alc > col_max_[jj] )
     {
-        //fprintf(stderr, "MSS1 allocate column %i size %u\n", jj, alc);
+        //fprintf(stderr, "SMS1 allocate column %i size %u\n", jj, alc);
         constexpr size_t chunk = 32;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
         Element * col_new = new Element[alc];
@@ -150,7 +150,7 @@ real& SparMatSym2::operator()(size_t i, size_t j)
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
-    //fprintf(stderr, "MSS( %6i %6i )\n", i, j);
+    //fprintf(stderr, "SMS( %6i %6i )\n", i, j);
     
     // swap to get ii > jj (address lower triangle)
     size_t ii = std::max(i, j);
@@ -270,7 +270,7 @@ void SparMatSym2::addTriangularBlock(real* mat, const size_t ldd,
             if ( ii < end )
             {
                 size_t i = dim * ( ii - start );
-                //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
+                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 // address lower triangle of 'mat'
                 assert_true( i > j );
                 mat[i+ldd*j] += col_[jj][n].val;
@@ -298,7 +298,7 @@ void SparMatSym2::addDiagonalBlock(real* mat, size_t ldd,
             if ( ii < end )
             {
                 size_t i = ii - start;
-                //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
+                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 mat[j+ldd*i] += col_[jj][n].val;
                 if ( j != i )
                     mat[i+ldd*j] += col_[jj][n].val;
@@ -341,9 +341,9 @@ std::string SparMatSym2::what() const
 {
     std::ostringstream msg;
 #if MATRIX2_USES_SSE
-    msg << "MSS2e " << nbElements();
+    msg << "SMS2e " << nbElements();
 #else
-    msg << "MSS2 " << nbElements();
+    msg << "SMS2 " << nbElements();
 #endif
     return msg.str();
 }
@@ -366,7 +366,7 @@ void SparMatSym2::printSparse(std::ostream& os, real) const
 
 void SparMatSym2::printColumns(std::ostream& os)
 {
-    os << "MSS2 size " << size_ << ":";
+    os << "SMS2 size " << size_ << ":";
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         os << "\n   " << jj << "   " << col_size_[jj];
@@ -381,7 +381,7 @@ void SparMatSym2::printColumns(std::ostream& os)
 void SparMatSym2::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = col_[jj];
-    os << "MSS2 col " << jj << ":";
+    os << "SMS2 col " << jj << ":";
     for ( size_t n = 0; n < col_size_[jj]; ++n )
     {
         os << "\n" << col[n].inx << " :";

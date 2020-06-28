@@ -24,7 +24,7 @@ void SparMatSym::allocate(size_t alc)
         constexpr size_t chunk = 64;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        //fprintf(stderr, "MSS allocate matrix %u\n", alc);
+        //fprintf(stderr, "SMS allocate matrix %u\n", alc);
         Element ** col_new      = new Element*[alc];
         size_t   * col_size_new = new size_t[alc];
         size_t   * col_max_new  = new size_t[alc];
@@ -90,7 +90,7 @@ void SparMatSym::allocateColumn(const size_t jj, size_t alc)
 
     if ( alc > col_max_[jj] )
     {
-        //fprintf(stderr, "MSS allocate column %i size %u\n", jj, alc);
+        //fprintf(stderr, "SMS allocate column %i size %u\n", jj, alc);
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
         Element * col_new = new Element[alc];
@@ -116,7 +116,7 @@ real& SparMatSym::operator()(size_t i, size_t j)
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
-    //fprintf(stderr, "MSS( %6i %6i )\n", i, j);
+    //fprintf(stderr, "SMS( %6i %6i )\n", i, j);
     
     // swap to get ii > jj (address lower triangle)
     size_t ii = std::max(i, j);
@@ -245,7 +245,7 @@ void SparMatSym::addDiagonalBlock(real* mat, size_t ldd,
             if ( start <= ii && ii < end )
             {
                 size_t i = ii - start;
-                //printf("MSS1 %4i %4i % .4f\n", ii, jj, a);
+                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 mat[i+ldd*j] += col_[jj][n].val;
                 if ( jj != ii )
                     mat[j+ldd*i] += col_[jj][n].val;
@@ -287,7 +287,7 @@ size_t SparMatSym::nbElements(size_t start, size_t stop) const
 std::string SparMatSym::what() const
 {
     std::ostringstream msg;
-    msg << "MSS " << nbElements();
+    msg << "SMS " << nbElements();
     return msg.str();
 }
 
@@ -310,7 +310,7 @@ void SparMatSym::printSparse(std::ostream& os, real) const
 
 void SparMatSym::printColumns(std::ostream& os)
 {
-    os << "MSS size " << size_ << ":";
+    os << "SMS size " << size_ << ":";
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         os << "\n   " << jj << "   " << col_size_[jj];
@@ -322,7 +322,7 @@ void SparMatSym::printColumns(std::ostream& os)
 void SparMatSym::printColumn(std::ostream& os, const size_t jj)
 {
     Element const* col = col_[jj];
-    os << "MSS col " << jj << ":";
+    os << "SMS col " << jj << ":";
     for ( size_t n = 0; n < col_size_[jj]; ++n )
     {
         os << "\n" << col[n].inx << " :";

@@ -104,9 +104,12 @@ private:
         
         /// print
         void print(std::ostream&) const;
+        
+        /// true if column is empty
+        bool isNotZero() const { return ( size_ > 0 ); }
 
         /// return n-th block (not necessarily, located at line inx_[n]
-        Block& operator[](size_t n) { return blk_[n]; }
+        Block& operator[](size_t n) const { return blk_[n]; }
 
         /// return block located at column 'j'
         Block& block(size_t j);
