@@ -68,7 +68,7 @@ private:
         size_t  allo_;   ///< allocated size of array
         size_t  size_;   ///< number of blocks in column
         size_t * inx_;   ///< line index for each element
-        Block  * blk_;   ///< block
+        Block  * blk_;   ///< all blocks
         
     public:
         

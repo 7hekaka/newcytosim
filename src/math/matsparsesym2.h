@@ -24,7 +24,7 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real     val;   ///< The value of the element
+        real    val;   ///< The value of the element
         size_t  inx;   ///< The index of the line
         
         void reset(size_t i)

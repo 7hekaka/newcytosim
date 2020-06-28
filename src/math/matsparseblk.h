@@ -75,8 +75,8 @@ private:
 
         size_t    size_;    ///< number of elements
         size_t    allo_;    ///< allocated size
-        Block *    blk_;    ///< block elements
-        Block *    sbk_;    ///< pointer for consolidate elements
+        Block    * blk_;    ///< block elements
+        Block    * sbk_;    ///< pointer for consolidate elements
         size_t   * inx_;    ///< column indices for each element
         
     public:
