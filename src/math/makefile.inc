@@ -32,6 +32,19 @@ sparmatsymblkD3.o: sparmatsymblk.cc sparmatsymblk.h
 	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
 
 
+sparmatsymblkdiag.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -c $< -o build/$@
+
+sparmatsymblkdiagD1.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o build/$@
+
+sparmatsymblkdiagD2.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o build/$@
+
+sparmatsymblkdiagD3.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
+
+
 sparmatblk.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -c $< -o build/$@
 

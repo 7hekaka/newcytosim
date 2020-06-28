@@ -422,13 +422,13 @@ int compareSMBElement(const void * A, const void * B)
 }
 
 
-size_t SparMatBlk::newElements(SparMatBlk::Element*& ptr, size_t size)
+size_t SparMatBlk::newElements(SparMatBlk::Element*& ptr, size_t cnt)
 {
     constexpr size_t chunk = 16;
-    size_t all = ( size + chunk - 1 ) & ~( chunk - 1 );
+    size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor 
     void* tmp = nullptr;
-    if ( size > 0 )
+    if ( cnt > 0 )
     {
         if ( posix_memalign(&tmp, 32, all*sizeof(SparMatBlk::Element)) )
             throw std::bad_alloc();
@@ -694,6 +694,9 @@ vec2 SparMatBlk::Line::vecMul2DU(const real* X) const
     #pragma nounroll
     for ( ; M < end; M += SB )
     {
+        assert_true( inx[0] < inx[1] );
+        assert_true( inx[1] < inx[2] );
+        assert_true( inx[2] < inx[3] );
         //IACA_START
         vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
         vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
@@ -798,6 +801,7 @@ vec4 SparMatBlk::Line::vecMul3DU(const real* X) const
         #pragma nounroll
         for ( ; M < end; M += 24 )
         {
+            assert_true( inx[0] < inx[1] );
             vec4 A = loadu4(X+inx[0]);
             vec4 B = loadu4(X+inx[1]);
             inx += 2;
@@ -838,7 +842,7 @@ vec4 SparMatBlk::Line::vecMul3DU(const real* X) const
 
 
 #if ( BLOCK_SIZE == 3 )
-vec4 SparMatBlk::Line::vecMul3DU4(const real* X) const
+vec4 SparMatBlk::Line::vecMul3DUU(const real* X) const
 {
     vec4 s0 = setzero4();
     vec4 s1 = setzero4();
@@ -864,6 +868,8 @@ vec4 SparMatBlk::Line::vecMul3DU4(const real* X) const
         #pragma nounroll
         for ( ; M < end; M += 3*SB )
         {
+            assert_true( inx[0] < inx[1] );
+            assert_true( inx[1] < inx[2] );
             vec4 A = loadu4(X+inx[0]);
             vec4 B = loadu4(X+inx[1]);
             vec4 C = loadu4(X+inx[2]);
@@ -949,7 +955,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
         store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
 #elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DU4(X)));
+        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DUU(X)));
 #else
         row_[i].vecMul(X).add_to(Y+i);
 #endif
@@ -995,7 +1001,7 @@ void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t sto
         store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
 #elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DU4(X)));
+        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DUU(X)));
 #else
         row_[i].vecMul(X).add_to(Y+i);
 #endif
@@ -1027,7 +1033,7 @@ void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
         store2(Y+i, row_[i].vecMul2DU(X));
 #elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, row_[i].vecMul3DU4(X));
+        store3(Y+i, row_[i].vecMul3DUU(X));
 #else
         row_[i].vecMul(X).store(Y+i);
 #endif

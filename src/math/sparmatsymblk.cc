@@ -579,13 +579,13 @@ void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
 }
 
 
-size_t SparMatSymBlk::newElements(Element*& ptr, size_t size)
+size_t SparMatSymBlk::newElements(Element*& ptr, size_t cnt)
 {
     constexpr size_t chunk = 16;
-    size_t all = ( size + chunk - 1 ) & ~( chunk - 1 );
+    size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor
     void* tmp = nullptr;
-    if ( size > 0 )
+    if ( cnt > 0 )
     {
         if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
             throw std::bad_alloc();
@@ -794,17 +794,17 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-#if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
-#else
+# else
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
-#endif
+# endif
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
     const vec4f x2 = permute4f(tt, 0xAA);
@@ -815,15 +815,15 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
     {
         const size_t ii = inx_[n];
         real const* M = blk_[n];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
         const vec4f m012 = streamload4f(M  );
         const vec4f m345 = streamload4f(M+4);
         const vec4f m678 = streamload4f(M+8);
-#else
+# else
         const vec4f m012 = load3f(M      );
         const vec4f m345 = load3f(M+BLD  );
         const vec4f m678 = load3f(M+BLD*2);
-#endif
+# endif
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -855,7 +855,6 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
 }
 
 
-
 void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -870,17 +869,17 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-#if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
-#else
+# else
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
-#endif
+# endif
     
     if ( size_ > 1 )
     {
@@ -898,23 +897,24 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
             {
                 const size_t ii = inx_[n  ];
                 const size_t kk = inx_[n+1];
+                assert_true( ii < kk );
                 real const* M = blk_[n  ];
                 real const* P = blk_[n+1];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
                 const vec4f m012 = streamload4f(M  );
                 const vec4f m345 = streamload4f(M+4);
                 const vec4f m678 = streamload4f(M+8);
                 const vec4f p012 = streamload4f(P  );
                 const vec4f p345 = streamload4f(P+4);
                 const vec4f p678 = streamload4f(P+8);
-#else
+# else
                 const vec4f m012 = load3f(M      );
                 const vec4f m345 = load3f(M+BLD  );
                 const vec4f m678 = load3f(M+BLD*2);
                 const vec4f p012 = load3f(P      );
                 const vec4f p345 = load3f(P+BLD  );
                 const vec4f p678 = load3f(P+BLD*2);
-#endif
+# endif
                 // multiply with the full block:
                 vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
                 vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
@@ -941,15 +941,15 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
         {
             const size_t ii = inx_[n];
             real const* M = blk_[n];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
             const vec4f m012 = streamload4f(M  );
             const vec4f m345 = streamload4f(M+4);
             const vec4f m678 = streamload4f(M+8);
-#else
+# else
             const vec4f m012 = load3f(M      );
             const vec4f m345 = load3f(M+BLD  );
             const vec4f m678 = load3f(M+BLD*2);
-#endif
+# endif
             // multiply with the full block:
             //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
             //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -1133,6 +1133,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) 
          The compiler can reorder instructions to avoid lattencies */
         const size_t i0 = inx_[n  ];
         const size_t i1 = inx_[n+1];
+        assert_true( i0 < i1 );
         vec4 mat0 = streamload4(blk_[n  ]);
         vec4 mat1 = streamload4(blk_[n+1]);
         vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
@@ -1157,7 +1158,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) 
 }
 
 
-void SparMatSymBlk::Column::vecMulAdd2D_AVXU4(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
@@ -1190,6 +1191,9 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU4(const real* X, real* Y, size_t jj)
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
+        assert_true( inx[n  ] < inx[n+1] );
+        assert_true( inx[n+1] < inx[n+2] );
+        assert_true( inx[n+2] < inx[n+3] );
         const size_t i0 = inx_[n  ];
         const size_t i1 = inx_[n+1];
         const size_t i2 = inx_[n+2];
@@ -1239,17 +1243,17 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) c
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-#if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4 tt = loadu4(X+jj);
     vec4 s0 = mul4(streamload4(D  ), tt);
     vec4 s1 = mul4(streamload4(D+4), tt);
     vec4 s2 = mul4(streamload4(D+8), tt);
-#else
+# else
     vec4 tt = loadu4(X+jj);
     vec4 s0 = mul4(load3(D      ), tt);
     vec4 s1 = mul4(load3(D+BLD  ), tt);
     vec4 s2 = mul4(load3(D+BLD*2), tt);
-#endif
+# endif
     // sum non-diagonal elements:
 #if ( 0 )
     const vec4 x0 = broadcast1(X+jj);
@@ -1269,15 +1273,15 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) c
     {
         const size_t ii = inx_[n];
         real const* M = blk_[n];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
         const vec4 m012 = streamload4(M  );
         const vec4 m345 = streamload4(M+4);
         const vec4 m678 = streamload4(M+8);
-#else
+# else
         const vec4 m012 = load3(M      );
         const vec4 m345 = load3(M+BLD  );
         const vec4 m678 = load3(M+BLD*2);
-#endif
+# endif
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -1354,6 +1358,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) 
     {
         const size_t i0 = inx[0];
         const size_t i1 = inx[1];
+        assert_true( i0 < i1 );
         inx += 2;
         //printf("--- %4i %4i\n", i0, i1);
         vec4 ma0 = streamload4(M);

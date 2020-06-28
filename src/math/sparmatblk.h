@@ -131,7 +131,7 @@ private:
         vec4 vecMul3DU(const real* X) const;
         
         /// multiplication of a vector: L * X
-        vec4 vecMul3DU4(const real* X) const;
+        vec4 vecMul3DUU(const real* X) const;
 
         /// multiplication of a vector: L * X
         vec4 vecMul3D(const real* X) const;

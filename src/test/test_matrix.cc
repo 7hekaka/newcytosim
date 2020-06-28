@@ -15,12 +15,17 @@
 #include "sparmatsym1.h"
 #include "sparmatsym2.h"
 #include "sparmatsymblk.h"
+#include "sparmatsymblkdiag.h"
 #include "sparmatblk.h"
 
 using namespace TicToc;
 
-typedef SparMatSymBlk SparMatSymB;
-typedef SparMatSymBlk::Block SquareBlock;
+typedef SparMatSym1       SparMat1;
+typedef SparMatSym2       SparMat2;
+typedef SparMatBlk        SparMatB;
+typedef SparMatSymBlk     SparMatS;
+typedef SparMatSymBlkDiag SparMatD;
+
 
 const size_t N_RUN = 16;
 const size_t N_MUL = 99;
@@ -160,36 +165,6 @@ void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
 }
 
 
-#if ( DIM == 3 )
-void fillMatrix(SparMatSymBlk& mat, const size_t i, const size_t j)
-{
-    SquareBlock M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
-    
-    mat.diag_block(i).add_half(M);
-    mat.diag_block(j).add_half(M);
-
-    if ( i > j )
-        mat.block(i,j).add_full(M);
-    else
-        mat.block(j,i).add_full(M.transposed());
-}
-
-
-void fillMatrix(SparMatBlk& mat, const size_t i, const size_t j)
-{
-    Matrix34 M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
-    
-    mat.diag_block(i).add_half(M);
-    mat.diag_block(j).add_half(M);
-    
-    if ( i > j )
-        mat.block(i,j).add_full(M);
-    else
-        mat.block(j,i).add_full(M.transposed());
-}
-#endif
-
-
 template <typename MATRIX>
 void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
 {
@@ -287,7 +262,7 @@ void testMatrix(MATRIX & mat,
     }
     double t2 = toc();
 
-    printf("\n %20s : ", mat.what().c_str());
+    printf("\n   %-16s : ", mat.what().c_str());
     printf("set %8.3f  mul %8.3f  alt %8.3f", ts, t1, t2);
     checkMatrix(mat, size, x, y, z);
 }
@@ -403,11 +378,6 @@ void testMatrixIso(MATRIX & mat,
 void testMatrices(const size_t size, const size_t fill)
 {
     printf("------ %iD size %lu  filled %.1f %% :", DIM, size, fill*100.0/size/size);
-    //SparMatSym  mat0;
-    SparMatSym1 mat1;
-    //SparMatSym2 mat2;
-    SparMatSymB mat3;
-    SparMatBlk  mat4;
 
     size_t * inx = nullptr;
     size_t * iny = nullptr;
@@ -421,14 +391,16 @@ void testMatrices(const size_t size, const size_t fill)
     setVectors(DIM*size, x, y, z);
     alpha = RNG.sreal();
     
-    //testMatrix(mat0, size, x, y, z, fill, inx, iny);
-    testMatrix(mat1, size, x, y, z, fill, inx, iny);
-    //testMatrix(mat2, size, x, y, z, fill, inx, iny);
-    testMatrix(mat3, size, x, y, z, fill, inx, iny);
-    testMatrix(mat4, size, x, y, z, fill, inx, iny);
+    SparMat1 mat1; testMatrix(mat1, size, x, y, z, fill, inx, iny);
+    //SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
+    SparMatS mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
+    SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
+    //testMatrix(mat4, size, x, y, z, fill, inx, iny);
+    SparMatB mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
 #ifdef _OPENMP
-    testMatrixParallel(mat4, size, x, y, z, fill, inx, iny);
+    testMatrixParallel(mat5, size, x, y, z, fill, inx, iny);
 #endif
+
     printf("\n");
     
 #if ( 0 )
@@ -452,19 +424,34 @@ void testMatrices(const size_t size, const size_t fill)
 const real dir[4] = {  2, 1, -1, 3 };
 const real vec[4] = { -1, 3,  1, 2 };
 
-void fillMatrixBlock(SparMatSymBlk& mat, const size_t fill, size_t inx[], size_t iny[])
+template < typename MATRIX >
+void fillMatrixBlock(MATRIX& mat, const size_t fill, size_t inx[], size_t iny[])
 {
-    SquareBlock S = SquareBlock::outerProduct(dir);
-    SquareBlock U = SquareBlock::outerProduct(dir, vec);
+    typename MATRIX::Block S = MATRIX::Block::outerProduct(dir);
+    typename MATRIX::Block U = MATRIX::Block::outerProduct(dir, vec);
     
     for ( size_t n=0; n<fill; ++n )
     {
-        size_t ii = inx[n] - inx[n] % SquareBlock::dimension();
-        size_t jj = iny[n] - iny[n] % SquareBlock::dimension();
+        size_t ii = inx[n] - inx[n] % MATRIX::Block::dimension();
+        size_t jj = iny[n] - iny[n] % MATRIX::Block::dimension();
         mat.diag_block(ii).sub_half(S);
         mat.diag_block(jj).add_half(S);
         mat.block(ii, jj).add_full(U);
     }
+}
+
+template < typename MATRIX >
+void fillBlockMatrix(MATRIX& mat, const size_t i, const size_t j)
+{
+    typename MATRIX::Block M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
+    
+    mat.diag_block(i).add_half(M);
+    mat.diag_block(j).add_half(M);
+
+    if ( i > j )
+        mat.block(i,j).add_full(M);
+    else
+        mat.block(j,i).add_full(M.transposed());
 }
 
 /**
@@ -581,7 +568,7 @@ int main( int argc, char* argv[] )
         testMatrices(DIM*33, 1111);
 #endif
 #if ( 0 )
-        printf("\ntest_matrix BLOCK_SIZE %i (%s)", DIM, SquareBlock::what().c_str());
+        printf("\ntest_matrix BLOCK_SIZE %i (%s)", DIM, SparMatSymB::Block::what().c_str());
         size_t siz = DIM;
         for ( int i = 0; i < 14; ++i )
         {
@@ -610,12 +597,12 @@ int main( int argc, char* argv[] )
 #if ( 1 )
         //testMatrices(DIM*17, 23);
         //testMatrices(DIM*91, 1<<12);
-        testMatrices(DIM*196, 1<<11);
-        testMatrices(DIM*436, 1<<13);
+        //testMatrices(DIM*196, 1<<11);
+        //testMatrices(DIM*436, 1<<13);
         testMatrices(DIM*714, 1<<14);
         testMatrices(DIM*1358, 1<<15);
-        testMatrices(DIM*2130, 1<<14);
-        testMatrices(DIM*2130, 1<<15);
+        testMatrices(DIM*2130, 1<<16);
+        testMatrices(DIM*4323, 1<<17);
 #endif
 #if ( 0 )
         //testMatrices(DIM*17, 23);

@@ -485,7 +485,7 @@ void SparMatSymBlkDiag::printColumns(std::ostream& os)
 {
     os << "SMSB size " << size_ << ":";
     for ( size_t j = 0; j < size_; ++j )
-        if ( column_[j].size_ > 0 )
+    if ( column_[j].size_ > 0 )
         {
             os << "\n   " << j << "   " << column_[j].size_;
             os << " next " << next_[j];
@@ -519,7 +519,7 @@ public:
 
 
 /// function for qsort, comparing line indices
-int compareMSSBElement(const void * A, const void * B)
+int compareSMSBDElement(const void * A, const void * B)
 {
     size_t a = static_cast<SparMatSymBlkDiag::Element const*>(A)->inx;
     size_t b = static_cast<SparMatSymBlkDiag::Element const*>(B)->inx;
@@ -533,16 +533,16 @@ int compareMSSBElement(const void * A, const void * B)
 void SparMatSymBlkDiag::Column::sortElements(Element tmp[], size_t tmp_size)
 {
     assert_true( size_ <= tmp_size );
-    for ( size_t i = 1; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
     {
         tmp[i].blk = blk_[i];
         tmp[i].inx = inx_[i];
     }
     
     //std::clog << "sizeof(Element) " << sizeof(Element) << "\n";
-    qsort(tmp+1, size_-1, sizeof(Element), &compareMSSBElement);
+    qsort(tmp, size_, sizeof(Element), &compareSMSBDElement);
     
-    for ( size_t i = 1; i < size_; ++i )
+    for ( size_t i = 0; i < size_; ++i )
     {
          blk_[i] = tmp[i].blk;
          inx_[i] = tmp[i].inx;
@@ -550,13 +550,13 @@ void SparMatSymBlkDiag::Column::sortElements(Element tmp[], size_t tmp_size)
 }
 
 
-size_t SparMatSymBlkDiag::newElements(Element*& ptr, size_t size)
+size_t SparMatSymBlkDiag::newElements(Element*& ptr, size_t cnt)
 {
     constexpr size_t chunk = 16;
-    size_t all = ( size + chunk - 1 ) & ~( chunk - 1 );
+    size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor
     void* tmp = nullptr;
-    if ( size > 0 )
+    if ( cnt > 0 )
     {
         if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
             throw std::bad_alloc();
@@ -570,7 +570,6 @@ size_t SparMatSymBlkDiag::newElements(Element*& ptr, size_t size)
 
 void SparMatSymBlkDiag::sortElements()
 {
-    //size_t cnt = 0;
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
@@ -581,14 +580,12 @@ void SparMatSymBlkDiag::sortElements()
         //std::clog << "SMSB column " << j << " has 1+" << col.size_ << " elements\n";
         
         // order the elements within the column:
-        if ( col.size_ > 2 )
+        if ( col.size_ > 1 )
         {
             if ( tmp_size < col.size_ )
                 tmp_size = newElements(tmp, col.size_);
             col.sortElements(tmp, tmp_size);
         }
-        
-        //++cnt;
         
         // diagonal element should be first:
         col.dia_.copy_lower();
@@ -603,7 +600,6 @@ void SparMatSymBlkDiag::sortElements()
     }
     
     newElements(tmp, 0);
-    //std::clog << "SparMatSymBlkDiag " << size_ << " with " << cnt << " non-empty columns\n";
 }
 
 
@@ -643,7 +639,6 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
 
 void SparMatSymBlkDiag::Column::vecMulAdd1D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 1 )
     const real X0 = X[jj];
     real D = dia_.value();
@@ -662,7 +657,6 @@ void SparMatSymBlkDiag::Column::vecMulAdd1D(const real* X, real* Y, size_t jj) c
 
 void SparMatSymBlkDiag::Column::vecMulAdd2D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 )
     const Vector2 xx(X+jj);
     assert_small(dia_.asymmetry());
@@ -698,7 +692,6 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D(const real* X, real* Y, size_t jj) c
 
 void SparMatSymBlkDiag::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 4 )
     const vec4 xxxx = load4(X+jj);
     assert_small(dia_.asymmetry());
@@ -746,7 +739,6 @@ inline vec4f fmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_add_ps(_mm_mul_ps(a
 
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
     printf("SMSB %lu : %lu\n", jj, size_);
 #if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
     // load 3x3 matrix diagonal element into 3 vectors:
@@ -757,17 +749,17 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-#if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
-#else
+# else
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
-#endif
+# endif
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
     const vec4f x2 = permute4f(tt, 0xAA);
@@ -778,15 +770,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
     {
         const size_t ii = inx_[n];
         real const* M = blk_[n];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
         const vec4f m012 = streamload4f(M  );
         const vec4f m345 = streamload4f(M+4);
         const vec4f m678 = streamload4f(M+8);
-#else
+# else
         const vec4f m012 = load3f(M      );
         const vec4f m345 = load3f(M+BLD  );
         const vec4f m678 = load3f(M+BLD*2);
-#endif
+# endif
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -821,7 +813,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
 /* Multiplies the diagonal block */
 void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ == 0);
+    assert_true(size_==0);
     assert_small(dia_.asymmetry());
     
     // load 3x3 matrix diagonal element into 3 vectors:
@@ -835,15 +827,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
     const vec4 x0 = duplo4(l);
     const vec4 x1 = duphi4(l);
     const vec4 x2 = duplo4(u);
-#  if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4 s0 = mul4(streamload4(D  ), x0);
     vec4 s1 = mul4(streamload4(D+4), x1);
     vec4 s2 = mul4(streamload4(D+8), x2);
-#  else
+# else
     vec4 s0 = mul4(load3(D      ), x0);
     vec4 s1 = mul4(load3(D+BLD  ), x1);
     vec4 s2 = mul4(load3(D+BLD*2), x2);
-#  endif
+# endif
     storeu4(Y+jj, add4(add4(loadu4(Y+jj), s0), add4(s1, s2)));
 #else
     //multiply with the diagonal block, assuming it has been symmetrized:
@@ -852,15 +844,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     vec4f tt = loadu4f(X+jj);
-#  if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4f s0 = mul4f(streamload4f(D  ), permute4f(tt, 0x00));
     vec4f s1 = mul4f(streamload4f(D+4), permute4f(tt, 0x55));
     vec4f s2 = mul4f(streamload4f(D+8), permute4f(tt, 0xAA));
-#  else
+# else
     vec4f s0 = mul4f(load3f(D      ), permute4f(tt, 0x00));
     vec4f s1 = mul4f(load3f(D+BLD  ), permute4f(tt, 0x55));
     vec4f s2 = mul4f(load3f(D+BLD*2), permute4f(tt, 0xAA));
-#  endif
+# endif
     storeu4f(Y+jj, add4f(add4f(loadu4f(Y+jj), s0), add4f(s1, s2)));
 #endif
 }
@@ -868,28 +860,28 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
 
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_small(dia_.asymmetry());
     //std::cout << dia_.to_string(7,1); printf(" MSSB %lu : %lu\n", jj, size_);
 #if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = dia_;
-    
+
     //multiply with the diagonal block, assuming it has been symmetrized:
     //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-#if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
-#else
+# else
     vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
-#endif
+# endif
     
     if ( size_ > 0 )
     {
@@ -898,7 +890,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
         const vec4f x2 = permute4f(tt, 0xAA);
         
         size_t n = 0;
-        {
+        if ( 1 ) {
             const size_t stop = 2 * (size_/2);
         
             // process 2 by 2
@@ -907,23 +899,24 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
             {
                 const size_t ii = inx_[n  ];
                 const size_t kk = inx_[n+1];
+                assert_true( ii < kk );
                 real const* M = blk_[n  ];
                 real const* P = blk_[n+1];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
                 const vec4f m012 = streamload4f(M  );
                 const vec4f m345 = streamload4f(M+4);
                 const vec4f m678 = streamload4f(M+8);
                 const vec4f p012 = streamload4f(P  );
                 const vec4f p345 = streamload4f(P+4);
                 const vec4f p678 = streamload4f(P+8);
-#else
+# else
                 const vec4f m012 = load3f(M      );
                 const vec4f m345 = load3f(M+BLD  );
                 const vec4f m678 = load3f(M+BLD*2);
                 const vec4f p012 = load3f(P      );
                 const vec4f p345 = load3f(P+BLD  );
                 const vec4f p678 = load3f(P+BLD*2);
-#endif
+# endif
                 // multiply with the full block:
                 vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
                 vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
@@ -950,15 +943,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
         {
             const size_t ii = inx_[n];
             real const* M = blk_[n];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
             const vec4f m012 = streamload4f(M  );
             const vec4f m345 = streamload4f(M+4);
             const vec4f m678 = streamload4f(M+8);
-#else
+# else
             const vec4f m012 = load3f(M      );
             const vec4f m345 = load3f(M+BLD  );
             const vec4f m678 = load3f(M+BLD*2);
-#endif
+# endif
             // multiply with the full block:
             //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
             //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -1000,7 +993,6 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
 
 void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
     vec2 x0, x1;
     vec2 yy = load2(Y+jj);
@@ -1053,7 +1045,6 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t j
 
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     // xy = { X0 X1 X0 X1 }
     vec4 xy = broadcast2(X+jj);
@@ -1112,7 +1103,6 @@ inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 
 
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(streamload4(dia_), xyxy);
@@ -1140,6 +1130,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
          The compiler can reorder instructions to avoid lattencies */
         const size_t i0 = inx_[n  ];
         const size_t i1 = inx_[n+1];
+        assert_true( i0 < i1 );
         vec4 mat0 = streamload4(blk_[n  ]);
         vec4 mat1 = streamload4(blk_[n+1]);
         vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
@@ -1164,9 +1155,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
 }
 
 
-void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU4(const real* X, real* Y, size_t jj) const
+void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(streamload4(dia_), xyxy);
@@ -1200,6 +1190,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU4(const real* X, real* Y, size_t
         const size_t i1 = inx_[n+1];
         const size_t i2 = inx_[n+2];
         const size_t i3 = inx_[n+3];
+        assert_true( i0 < i1 );
+        assert_true( i1 < i2 );
+        assert_true( i2 < i3 );
         vec4 mat0 = streamload4(blk_[n  ]);
         vec4 mat1 = streamload4(blk_[n+1]);
         vec4 mat2 = streamload4(blk_[n+2]);
@@ -1243,17 +1236,17 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t j
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-#if ( BLD == 4 )
+# if ( BLD == 4 )
     vec4 tt = loadu4(X+jj);
     vec4 s0 = mul4(streamload4(D  ), tt);
     vec4 s1 = mul4(streamload4(D+4), tt);
     vec4 s2 = mul4(streamload4(D+8), tt);
-#else
+# else
     vec4 tt = loadu4(X+jj);
     vec4 s0 = mul4(load3(D      ), tt);
     vec4 s1 = mul4(load3(D+BLD  ), tt);
     vec4 s2 = mul4(load3(D+BLD*2), tt);
-#endif
+# endif
     // sum non-diagonal elements:
 #if ( 0 )
     const vec4 x0 = broadcast1(X+jj);
@@ -1273,15 +1266,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t j
     {
         const size_t ii = inx_[n];
         real const* M = blk_[n];
-#if ( BLD == 4 )
+# if ( BLD == 4 )
         const vec4 m012 = streamload4(M  );
         const vec4 m345 = streamload4(M+4);
         const vec4 m678 = streamload4(M+8);
-#else
+# else
         const vec4 m012 = load3(M      );
         const vec4 m345 = load3(M+BLD  );
         const vec4 m678 = load3(M+BLD*2);
-#endif
+# endif
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -1319,7 +1312,6 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t j
 void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) const
 {
 #if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
-
     vec4 sa, sb, sc;
     vec4 xa, xb, xc;
     vec4 ta = setzero4();
@@ -1356,6 +1348,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
     {
         const size_t i0 = inx[0];
         const size_t i1 = inx[1];
+        assert_true( i0 < i1 );
         inx += 2;
         //printf("--- %4i %4i\n", i0, i1);
         vec4 ma0 = streamload4(M);
@@ -1429,7 +1422,6 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
 
 void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
     real const* D = dia_;
     //multiply with the symmetrized block, assuming it has been symmetrized:
@@ -1498,7 +1490,7 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 
 #if MATRIXSSB_USES_AVX
 #   define VECMULADD2D vecMulAdd2D_AVXU
-#   define VECMULADD3D vecMulAdd3D_AVX
+#   define VECMULADD3D vecMulAdd3D_AVXU
 #   define VECMULADD4D vecMulAdd4D_AVX
 #elif defined(__SSE3__) && REAL_IS_DOUBLE
 #   define VECMULADD2D vecMulAdd2D_SSE
@@ -1525,21 +1517,21 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 #else
     for ( size_t jj = start; jj < stop; jj += BLOCK_SIZE )
 #endif
-            {
-                //std::clog << "SparMatSymBlkDiag column " << jj << "  " << size_ << " \n";
+    {
+        //std::clog << "SparMatSymBlkDiag column " << jj << "  " << size_ << " \n";
 #if ( BLOCK_SIZE == 1 )
-                column_[jj].vecMulAdd1D(X, Y, jj);
+        column_[jj].vecMulAdd1D(X, Y, jj);
 #elif ( BLOCK_SIZE == 2 )
-                column_[jj].VECMULADD2D(X, Y, jj);
+        column_[jj].VECMULADD2D(X, Y, jj);
 #elif ( BLOCK_SIZE == 3 )
-                if ( column_[jj].size_ == 0 )
-                    column_[jj].vecMulAdd3D_DIAG(X, Y, jj);
-                else
-                    column_[jj].VECMULADD3D(X, Y, jj);
+        if ( column_[jj].size_ == 0 )
+            column_[jj].vecMulAdd3D_DIAG(X, Y, jj);
+        else
+            column_[jj].VECMULADD3D(X, Y, jj);
 #elif ( BLOCK_SIZE == 4 )
-                column_[jj].VECMULADD4D(X, Y, jj);
+        column_[jj].VECMULADD4D(X, Y, jj);
 #endif
-            }
+    }
 }
 
 
@@ -1554,7 +1546,7 @@ void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y) const
 #elif ( BLOCK_SIZE == 2 )
         column_[jj].vecMulAdd2D(X, Y, jj);
 #elif ( BLOCK_SIZE == 3 )
-        column_[jj].vecMulAdd3D(X, Y, jj);
+        column_[jj].VECMULADD3D(X, Y, jj);
 #elif ( BLOCK_SIZE == 4 )
         column_[jj].vecMulAdd4D(X, Y, jj);
 #endif
