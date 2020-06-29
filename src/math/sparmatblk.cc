@@ -10,6 +10,7 @@
 
 SparMatBlk::SparMatBlk()
 {
+    size_    = 0;
     alloc_   = 0;
     row_     = nullptr;
     blocks_  = nullptr;
@@ -224,33 +225,8 @@ void SparMatBlk::scale(const real alpha)
 }
 
 
-void SparMatBlk::addTriangularBlock(real* mat, const size_t ldd,
-                                           const size_t start,
-                                           const size_t cnt) const
-{
-    assert_false( start % BLOCK_SIZE );
-    assert_false( cnt % BLOCK_SIZE );
-
-    size_t end = start + cnt;
-    size_t off = start + ldd * start;
-    assert_true( end <= size_ );
-    
-    for ( size_t i = start; i < end; i += BLOCK_SIZE )
-    {
-        Line & row = row_[i];
-        for ( size_t n = 1; n < row.size_; ++n )
-        {
-            size_t j = row.inx_[n];
-            if ( start <= j && j < end )
-                row[n].addto(mat+(i+ldd*j)-off, ldd);
-        }
-    }
-}
-
-
 void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd,
-                                         const size_t start,
-                                         const size_t cnt) const
+                                  const size_t start, const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );

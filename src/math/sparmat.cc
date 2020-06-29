@@ -178,16 +178,16 @@ void SparMat::scale( real a )
 }
 
 
-void SparMat::addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const
+void SparMat::addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp) const
 {
     assert_true( start + cnt <= size_ );
     
     for ( size_t jj = 0; jj < cnt; ++jj )
     {
-        size_t* row = mxRow[jj + start];
+        size_t* row = mxRow[jj+start];
         if ( row != nullptr )
         {
-            real* col = mxCol[jj + start];
+            real* col = mxCol[jj+start];
             for ( ; *row != LAST_IN_COLUMN; ++row, ++col )
             {
                 if ( *row > start )
@@ -196,35 +196,10 @@ void SparMat::addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt
                     if ( ii < cnt )
                     {
                         assert_true( ii <= jj );
-                        mat[dim*( ii + ldd * jj )] += *col;
+                        mat[amp*(ii+ldd*jj)] += *col;
+                        if ( ii != jj )
+                            mat[amp*(jj+ldd*ii)] += *col;
                         //printf("Sp %4i %4i % .4f\n", ii, jj, a );
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-void SparMat::addDiagonalBlock(real* mat, unsigned ldd, size_t start, size_t cnt) const
-{
-    assert_true( start + cnt <= size_ );
-    
-    for ( size_t jj = 0; jj < cnt; ++jj )
-    {
-        size_t* row = mxRow[jj + start];
-        if ( row )
-        {
-            real* col = mxCol[jj + start];
-            for ( ; *row != LAST_IN_COLUMN; ++row, ++col )
-            {
-                if ( *row > start )
-                {
-                    size_t ii = *row - start;
-                    if ( ii < cnt )
-                    {
-                        //printf("Sp %4i %4i % .4f\n", ii, jj, a );
-                        mat[ii+ldd*jj] += *col;
                     }
                 }
             }

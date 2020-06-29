@@ -153,11 +153,8 @@ public:
     /// scale the matrix by a scalar factor
     void scale(real);
     
-    /// add the diagonal block ( x, x, x+sx, x+sx ) from this matrix to M
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt) const;
-    
     /// add lower triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
-    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t dim) const;
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
     
     /// add lower terms within ( start, start+nb ) and at distance `rank' from diagonal to `mat`
     void addTriangularBlockBanded(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t rank) const;

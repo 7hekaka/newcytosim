@@ -17,6 +17,7 @@
 
 SparMatSymBlk::SparMatSymBlk()
 {
+    size_    = 0;
     alloc_   = 0;
     column_  = nullptr;
     next_    = new size_t[1];
@@ -276,43 +277,8 @@ void SparMatSymBlk::scale(const real alpha)
 }
 
 
-void SparMatSymBlk::addTriangularBlock(real* mat, const size_t ldd,
-                                                    const size_t start,
-                                                    const size_t cnt) const
-{
-    assert_false( start % BLOCK_SIZE );
-    assert_false( cnt % BLOCK_SIZE );
-
-    size_t end = start + cnt;
-    size_t off = start + ldd * start;
-    assert_true( end <= size_ );
-    
-    for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
-    {
-        Column & col = column_[jj];
-        if ( col.size_ > 0 )
-        {
-            assert_true(col.inx_[0] == jj);
-            col[0].addto_lower(mat+(jj+ldd*jj)-off, ldd);
-            for ( size_t n = 1; n < col.size_; ++n )
-            {
-                size_t ii = col.inx_[n];
-                // assuming lower triangle is stored:
-                if ( ii < end )
-                {
-                    assert_true( ii > jj );
-                    //fprintf(stderr, "`B %4i %4i % .4f\n", ii, jj, a);
-                    col[n].addto_trans(mat+(ii+ldd*jj)-off, ldd);
-                }
-            }
-        }
-    }
-}
-
-
 void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
-                                                  const size_t start,
-                                                  const size_t cnt) const
+                                     const size_t start, const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -331,9 +297,7 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
-                // assuming lower triangle is stored:
-                assert_true( ii > jj );
-                if ( ii < end )
+                if ((start <= ii) & (ii < end))
                 {
                     //fprintf(stderr, "SMSB %4i %4i % .4f\n", ii, jj, a);
                     col[n].addto(mat+(ii+ldd*jj)-off, ldd);
@@ -346,8 +310,7 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
 
 
 void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
-                                                  const size_t start,
-                                                  const size_t cnt) const
+                                     const size_t start, const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -387,8 +350,8 @@ addresses `mat' using lower banded storage for a symmetric matrix
 mat(i, j) is stored in mat[i-j+ldd*j]
 */
 void SparMatSymBlk::addDiagonalTraceBanded(real alpha, real* mat, size_t ldd,
-                                                        const size_t start,
-                                                        const size_t cnt, const size_t rank) const
+                                           const size_t start, const size_t cnt,
+                                           const size_t rank) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );

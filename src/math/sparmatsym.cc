@@ -201,37 +201,9 @@ void SparMatSym::scale(const real alpha)
 }
 
 
-void SparMatSym::addTriangularBlock(real* mat, const size_t ldd,
-                                               const size_t start,
-                                               const size_t cnt,
-                                               const size_t dim) const
-{
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
-    
-    for ( size_t jj = start; jj < end; ++jj )
-    {
-        size_t j = dim * ( jj - start );
-        for ( size_t n = 0; n < col_size_[jj]; ++n )
-        {
-            size_t ii = col_[jj][n].inx;
-            size_t i = dim * ( ii - start );
-            if ( start <= ii && ii < end )
-            {
-                // address lower triangle of 'mat'
-                if ( i > j )
-                    mat[i+ldd*j] += col_[jj][n].val;
-                else
-                    mat[j+ldd*i] += col_[jj][n].val;
-            }
-        }
-    }
-}
-
-
-void SparMatSym::addDiagonalBlock(real* mat, size_t ldd,
-                                             const size_t start,
-                                             const size_t cnt) const
+void SparMatSym::addDiagonalBlock(real* mat, const size_t ldd,
+                                  const size_t start, const size_t cnt,
+                                  const size_t amp) const
 {
     size_t end = start + cnt;
     assert_true( end <= size_ );
@@ -245,10 +217,11 @@ void SparMatSym::addDiagonalBlock(real* mat, size_t ldd,
             if ( start <= ii && ii < end )
             {
                 size_t i = ii - start;
-                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                mat[i+ldd*j] += col_[jj][n].val;
-                if ( jj != ii )
-                    mat[j+ldd*i] += col_[jj][n].val;
+                assert_true(i > j);
+                // address lower triangle of 'mat'
+                mat[amp*(i+ldd*j)] += col_[jj][n].val;
+                if ( i != j )
+                    mat[amp*(j+ldd*i)] += col_[jj][n].val;
             }
         }
     }

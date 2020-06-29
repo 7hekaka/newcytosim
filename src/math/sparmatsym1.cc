@@ -25,6 +25,7 @@
 
 SparMatSym1::SparMatSym1()
 {
+    size_      = 0;
     allocated_ = 0;
     column_    = nullptr;
     col_size_  = nullptr;
@@ -341,28 +342,27 @@ void SparMatSym1::scale(const real alpha)
 }
 
 
-void SparMatSym1::addTriangularBlock(real* mat, const size_t ldd,
-                                                const size_t start,
-                                                const size_t cnt,
-                                                const size_t dim) const
+void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd,
+                                   const size_t start, const size_t cnt,
+                                   const size_t amp) const
 {
     size_t end = start + cnt;
     assert_true( end <= size_ );
     
     for ( size_t jj = start; jj < end; ++jj )
     {
-        size_t j = dim * ( jj - start );
+        size_t j = amp * ( jj - start );
         for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
             if ( ii < end )
             {
-                size_t i = dim * ( ii - start );
+                size_t i = amp * ( ii - start );
                 //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                // address lower triangle of 'mat'
-                assert_true( i > j );
                 mat[i+ldd*j] += column_[jj][n].val;
+                if ( j != i )
+                    mat[j+ldd*i] += column_[jj][n].val;
             }
         }
     }
@@ -374,9 +374,8 @@ addresses `mat' using lower banded storage for a symmetric matrix
 mat(i, j) is stored in mat[i-j+ldd*j]
 */
 void SparMatSym1::addTriangularBlockBanded(real alpha, real* mat, const size_t ldd,
-                                                      const size_t start,
-                                                      const size_t cnt,
-                                                      const size_t rank) const
+                                           const size_t start, const size_t cnt,
+                                           const size_t rank) const
 {
     size_t end = start + cnt;
     assert_true( end <= size_ );
@@ -396,34 +395,6 @@ void SparMatSym1::addTriangularBlockBanded(real alpha, real* mat, const size_t l
                 // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
                 if ( i <= j + rank )
                     mat[i-j+ldd*j] += alpha * column_[jj][n].val;
-            }
-        }
-    }
-}
-
-
-void SparMatSym1::addDiagonalBlock(real* mat, size_t ldd,
-                                              const size_t start,
-                                              const size_t cnt) const
-{
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
-    
-    for ( size_t jj = start; jj < end; ++jj )
-    {
-        size_t j = jj - start;
-        for ( size_t n = 0; n < col_size_[jj]; ++n )
-        {
-            size_t ii = column_[jj][n].inx;
-            // assuming lower triangle is stored:
-            assert_true( ii >= jj );
-            if ( ii < end )
-            {
-                size_t i = ii - start;
-                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                mat[j+ldd*i] += column_[jj][n].val;
-                if ( j != i )
-                    mat[i+ldd*j] += column_[jj][n].val;
             }
         }
     }

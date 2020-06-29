@@ -225,13 +225,10 @@ public:
     void scale(real);
     
     /// add terms within ( start, start+nb ) to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t nb) const;
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt) const;
     
     /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
-    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t nb) const;
-
-    /// add lower triangle within ( start, start+nb ) to `mat`
-    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t nb) const;
+    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt) const;
     
     
     /// prepare matrix for multiplications by a vector (must be called)

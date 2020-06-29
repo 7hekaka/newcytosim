@@ -140,7 +140,7 @@ private:
         void vecMulAdd3D_SSEU(const real* X, real* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMul3D_SSEU(const real* X, real* Y, size_t j) const;
+        void vecMulAddOff3D_SSEU(const real* X, real* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
         void vecMulAdd3D_AVX(const real* X, real* Y, size_t j) const;
@@ -238,9 +238,6 @@ public:
     
     /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
     void addDiagonalTraceBanded(real alpha, real* mat, size_t ldd, size_t start, size_t nb, size_t rank) const;
-
-    /// add upper triangular half of 'this' block ( start, start+nb ) to `mat`
-    void addTriangularBlock(real* mat, size_t ldd, size_t start, size_t nb) const;
     
     
     /// prepare matrix for multiplications by a vector (must be called)
@@ -267,6 +264,9 @@ public:
     /// 3D isotropic multiplication (not implemented)
     void vecMulAddIso3D(const real*, real*) const {};
     
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMul3D_DIAG(const real* X, real* Y) const;
+
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMul(const real* X, real* Y) const;
 

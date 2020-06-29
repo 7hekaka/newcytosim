@@ -252,52 +252,23 @@ void SparMatSym2::scale(const real alpha)
 }
 
 
-void SparMatSym2::addTriangularBlock(real* mat, const size_t ldd,
-                                                const size_t start,
-                                                const size_t cnt,
-                                                const size_t dim) const
+void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd,
+                                   const size_t start, const size_t cnt,
+                                   const size_t amp) const
 {
     size_t end = start + cnt;
     assert_true( end <= size_ );
     
     for ( size_t jj = start; jj < end; ++jj )
     {
-        size_t j = dim * ( jj - start );
+        size_t j = amp * ( jj - start );
         for ( size_t n = 0; n < col_size_[jj]; ++n )
         {
             size_t ii = col_[jj][n].inx;
             // assuming lower triangle is stored:
             if ( ii < end )
             {
-                size_t i = dim * ( ii - start );
-                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                // address lower triangle of 'mat'
-                assert_true( i > j );
-                mat[i+ldd*j] += col_[jj][n].val;
-            }
-        }
-    }
-}
-
-
-void SparMatSym2::addDiagonalBlock(real* mat, size_t ldd,
-                                              const size_t start,
-                                              const size_t cnt) const
-{
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
-    
-    for ( size_t jj = start; jj < end; ++jj )
-    {
-        size_t j = jj - start;
-        for ( size_t n = 0; n < col_size_[jj]; ++n )
-        {
-            size_t ii = col_[jj][n].inx;
-            // assuming lower triangle is stored:
-            assert_true( ii >= jj );
-            if ( ii < end )
-            {
-                size_t i = ii - start;
+                size_t i = amp * ( ii - start );
                 //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
                 mat[j+ldd*i] += col_[jj][n].val;
                 if ( j != i )
@@ -306,7 +277,6 @@ void SparMatSym2::addDiagonalBlock(real* mat, size_t ldd,
         }
     }
 }
-
 
 int SparMatSym2::bad() const
 {
