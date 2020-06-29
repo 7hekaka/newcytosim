@@ -1520,15 +1520,18 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
-
-
-#if ( BLOCK_SIZE == 3 )
+#if ( BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
+    #pragma unroll 4
     for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
     {
         real const* D = column_[jj].dia_;
-#if REAL_IS_DOUBLE
+        assert_small(D.asymmetry());
+        //multiply with the diagonal block, assuming it has been symmetrized:
+        //real Y0 = M[0] * X0 + M[1] * X1 + M[2] * X2;
+        //real Y1 = M[1] * X0 + M[4] * X1 + M[5] * X2;
+        //real Y2 = M[2] * X0 + M[5] * X1 + M[8] * X2;
         vec4 tt = loadu4(X+jj);
         vec4 p = permute2f128(tt, tt, 0x01);
         vec4 l = blend4(tt, p, 0b1100);
@@ -1546,12 +1549,23 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
         vec4 s2 = mul4(load3(D+BLD*2), x2);
 # endif
         storeu4(Y+jj, add4(s0, add4(s1, s2)));
-#else
+    }
+}
+#endif
+
+
+#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
+void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
+{
+    #pragma unroll 4
+    for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
+    {
+        real const* D = column_[jj].dia_;
+        assert_small(D.asymmetry());
         //multiply with the diagonal block, assuming it has been symmetrized:
-        //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
-        //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
-        //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
-        /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+        //real Y0 = M[0] * X0 + M[1] * X1 + M[2] * X2;
+        //real Y1 = M[1] * X0 + M[4] * X1 + M[5] * X2;
+        //real Y2 = M[2] * X0 + M[5] * X1 + M[8] * X2;
         const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
         vec4f s0 = mul4f(streamload4f(D  ), permute4f(tt, 0x00));
@@ -1563,17 +1577,17 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
         vec4f s2 = mul4f(load3f(D+BLD*2), permute4f(tt, 0xAA));
 # endif
         storeu4f(Y+jj, add4f(s0, add4f(s1, s2)));
-#endif
     }
 }
 #endif
-#include "vecprint.h"
+
 
 void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 {
 #if ( BLOCK_SIZE == 3 )
     // process diagonal:
     vecMul3D_DIAG(X, Y);
+    
     // add the contribution of off-diagonal elements:
     for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
         column_[jj].vecMulAddOff3D_SSEU(X, Y, jj);
