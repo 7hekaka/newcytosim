@@ -110,53 +110,55 @@ void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
     
     mat1.reset();
     mat2.reset();
-    
+
     mat1.resize(size);
     mat2.resize(size);
     
     for ( size_t n = 0; n < fill; ++n )
     {
         real a = 10.0 * RNG.preal();
-        size_t ii = RNG.pint(size);
-        size_t jj = RNG.pint(size);
-        mat1(ii, jj) += a;
-        mat2(ii, jj) += a;
+        size_t ii = RNG.pint(size), jj = RNG.pint(size);
+        size_t i = std::max(ii, jj), j = std::min(ii, jj);
+        mat1(i, j) += a;
+        mat2(i, j) += a;
+        mat1(j, i) += a;
+        mat2(j, i) += a;
     }
     
-    for ( size_t nbc = DIM; nbc < size; nbc+=DIM )
+    for ( size_t cnt = DIM; cnt < size; cnt += DIM )
     {
-        size_t inx = DIM * ( RNG.pint(size-nbc) / DIM );
-        std::clog << "Comparing matrices: size " << size << " inx " << inx << " nbc " << nbc << " ";
+        size_t inx = DIM * ( RNG.pint(size-cnt) / DIM );
         
         zero_real(size*size, tmp1);
-        
-        mat1.addDiagonalBlock(tmp1, size, inx, nbc);
-        
-        //std::clog<<"mat1:\n";
-        //VecPrint::print(std::clog, nbc, nbc, tmp1, size);
-        
+        mat1.addDiagonalBlock(tmp1, size, inx, cnt);
         zero_real(size*size, tmp2);
-        mat2.addDiagonalBlock(tmp2, size, inx, nbc);
-        
-        //std::clog<<"mat2:\n";
-        //VecPrint::print(std::clog, nbc, nbc, tmp2, size);
+        mat2.addDiagonalBlock(tmp2, size, inx, cnt);
         
         real nrm = 0;
-        for ( size_t n=0; n<size*size; ++n )
+        for ( size_t n = 0; n < size*size; ++n )
         {
             tmp1[n] -= tmp2[n];
             nrm += tmp1[n] * tmp1[n];
         }
         
+        std::clog << "Size " << size << " : " << mat1.what() << "  " << mat2.what();
+        std::clog << " inx " << inx << " + " << cnt << " ";
         if ( nrm > 0 )
         {
-            std::clog<<": diff:\n";
-            VecPrint::print(std::clog, nbc, nbc, tmp1, size);
+            std::clog << mat2.what() << ":\n";
+            VecPrint::print(std::clog, cnt, cnt, tmp2, size);
+            zero_real(size*size, tmp2);
+            mat1.addDiagonalBlock(tmp2, size, inx, cnt);
+            std::clog << mat1.what() << ":\n";
+            VecPrint::print(std::clog, cnt, cnt, tmp2, size);
+            std::clog<<"\ndiff:\n";
+            VecPrint::print(std::clog, cnt, cnt, tmp1, size);
+            
         }
         else
         {
             std::clog<<": identical\n";
-            VecPrint::print(std::clog, nbc, nbc, tmp2, size);
+            //VecPrint::print(std::clog, cnt, cnt, tmp2, size);
         }
     }
     
@@ -545,20 +547,23 @@ int main( int argc, char* argv[] )
     printf("Matrix test and timing code --- real %lu --- %s\n", sizeof(real), __VERSION__);
 
     RNG.seed();
-#if ( 0 )
+#if ( 1 )
         // small tests to check correctness:
-        SparMatSym1 mat1;
-        SparMatSymB mat3;
-        SparMatBlk  mat4;
-        
+        SparMat1 mat1;
+        SparMatS mat2;
+        SparMatD mat3;
+        SparMatB mat4;
+
         compare(4*3, mat1, mat3, 1<<4);
-        compare(4*7, mat1, mat3, 1<<5);
+        compare(4*7, mat2, mat3, 1<<5);
+    /*
         compare(4*11, mat1, mat3, 1<<6);
         compare(4*33, mat1, mat3, 1<<16);
         compare(4*3, mat1, mat4, 1<<16);
         compare(4*7, mat1, mat4, 1<<16);
         compare(4*11, mat1, mat4, 1<<16);
         compare(4*33, mat1, mat4, 1<<16);
+     */
 #endif
 #if ( 0 )
         testMatrices(6, 1);
