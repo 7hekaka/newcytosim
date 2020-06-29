@@ -65,23 +65,14 @@ void Matrix::copyBlock(real* mat, unsigned ldd, size_t sx, size_t nx, size_t sy,
 }
 
 
-void Matrix::addDiagonalBlock(real* mat, const size_t ldd, const size_t start, const size_t cnt) const
+void Matrix::addDiagonalBlock(real* mat, const size_t ldd, const size_t start,
+                              const size_t cnt, const size_t amp) const
 {
     assert_true( start + cnt < size() );
 
     for ( size_t jj = 0; jj < cnt; ++jj )
     for ( size_t ii = 0; ii < cnt; ++ii )
-        mat[ii + ldd*jj] += value(start+ii, start+jj);
-}
-
-
-void Matrix::addTriangularBlock(real* mat, const size_t ldd, const size_t start, const size_t cnt, const size_t dim) const
-{
-    assert_true( start + cnt < size() );
-
-    for ( size_t jj = 0; jj < cnt; ++jj )
-    for ( size_t ii = jj; ii < cnt; ++ii )
-        mat[dim*ii + ldd*dim*jj] += value(start+ii, start+jj);
+        mat[amp*(ii+ldd*jj)] += value(start+ii, start+jj);
 }
 
 //------------------------------------------------------------------------------

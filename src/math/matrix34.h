@@ -19,7 +19,7 @@
 
 
 
-/// 3x4 matrix class with 9 'real' elements
+/// 3x4 matrix class with 9 'real' elements stored in line order
 /**
  Unlike the other matrices, this class uses line-major storage, which is the
  order by which the values are considered when multiplying on the right with a
@@ -196,9 +196,9 @@ public:
     /// print matrix in human readable format
     void print(FILE * f) const
     {
-        fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n",  val[0], val[1], val[2], val[3]);
-        fprintf(f, "(  %9.3f %+9.3f %+9.3f %+9.3f  )\n" , val[4], val[5], val[6], val[7]);
-        fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n",  val[8], val[9], val[10], val[11]);
+        fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n", val[0], val[1], val[2], val[3]);
+        fprintf(f, " | %9.3f %+9.3f %+9.3f %+9.3f |\n" , val[4], val[5], val[6], val[7]);
+        fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n", val[8], val[9], val[10], val[11]);
     }
     
     /// print on one line
@@ -479,8 +479,8 @@ public:
     /// true if 3x3 subset of matrix is symmetric
     real asymmetry() const
     {
-        return abs_real(val[4]-val[1])
-        + abs_real(val[8]-val[2]) + abs_real(val[9]-val[6]);
+        return ( abs_real(val[4]-val[1]) + abs_real(val[8]-val[2])
+                + abs_real(val[9]-val[6]) );
     }
 
 #pragma mark -

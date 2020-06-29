@@ -20,7 +20,7 @@
 #endif
 
 
-/// 2x2 matrix class with 4 'real' elements
+/// 2x2 matrix class with 4 'real' elements stored in column order
 class alignas(4*sizeof(real)) Matrix22 final
 {
 public:

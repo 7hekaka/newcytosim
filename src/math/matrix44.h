@@ -17,7 +17,7 @@
 #endif
 
 
-/// 4x4 matrix class with 16 'real' elements
+/// 4x4 matrix class with 16 'real' elements stored in column order
 class alignas(4*sizeof(real)) Matrix44
 {
 public:
@@ -163,10 +163,10 @@ public:
     /// output in human-friendly format
     void print(FILE * f) const
     {
-        fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n",  val[0x0], val[0x4], val[0x8], val[0xC]);
-        fprintf(f, "(  %9.3f %+9.3f %+9.3f %+9.3f  )\n" , val[0x1], val[0x5], val[0x9], val[0xD]);
-        fprintf(f, "(  %9.3f %+9.3f %+9.3f %+9.3f  )\n" , val[0x2], val[0x6], val[0xA], val[0xE]);
-        fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n",  val[0x3], val[0x7], val[0xB], val[0xF]);
+        fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n", val[0x0], val[0x4], val[0x8], val[0xC]);
+        fprintf(f, " | %9.3f %+9.3f %+9.3f %+9.3f |\n" , val[0x1], val[0x5], val[0x9], val[0xD]);
+        fprintf(f, " | %9.3f %+9.3f %+9.3f %+9.3f |\n" , val[0x2], val[0x6], val[0xA], val[0xE]);
+        fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n", val[0x3], val[0x7], val[0xB], val[0xF]);
     }
     
     /// print
@@ -358,7 +358,7 @@ public:
     /// true if matrix is symmetric
     real asymmetry() const
     {
-        return ( abs_real(val[0x4]-val[0x1])
+        return (  abs_real(val[0x4]-val[0x1])
                 + abs_real(val[0x8]-val[0x2])
                 + abs_real(val[0xC]-val[0x3])
                 + abs_real(val[0x9]-val[0x6])

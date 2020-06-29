@@ -26,7 +26,7 @@
 #endif
 
 
-/// 3x3 matrix class with 9 'real' elements
+/// 3x3 matrix class with 9 'real' elements stored in column order
 class alignas(4*sizeof(real)) Matrix33 final
 {
 public:
@@ -194,9 +194,9 @@ public:
     /// print matrix in human readable format
     void print(FILE * f) const
     {
-        fprintf(f, " / %9.3f %+9.3f %+9.3f \\\n",  val[0], val[0+BLD], val[0+BLD*2]);
-        fprintf(f, "(  %9.3f %+9.3f %+9.3f  )\n" , val[1], val[1+BLD], val[1+BLD*2]);
-        fprintf(f, " \\ %9.3f %+9.3f %+9.3f /\n",  val[2], val[2+BLD], val[2+BLD*2]);
+        fprintf(f, " / %9.3f %+9.3f %+9.3f \\\n", val[0], val[0+BLD], val[0+BLD*2]);
+        fprintf(f, " | %9.3f %+9.3f %+9.3f |\n" , val[1], val[1+BLD], val[1+BLD*2]);
+        fprintf(f, " \\ %9.3f %+9.3f %+9.3f /\n", val[2], val[2+BLD], val[2+BLD*2]);
     }
     
     /// output operator
@@ -470,8 +470,8 @@ public:
     /// true if matrix is symmetric
     real asymmetry() const
     {
-        return ( abs_real(val[BLD]-val[1])
-                + abs_real(val[BLD*2]-val[2]) + abs_real(val[1+BLD*2]-val[2+BLD]) );
+        return ( abs_real(val[BLD]-val[1]) + abs_real(val[BLD*2]-val[2])
+                + abs_real(val[1+BLD*2]-val[2+BLD]) );
     }
     
 #pragma mark -
