@@ -932,7 +932,7 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     vec4f s2 = setzero4f();
 
     size_t n = 0;
-    if ( 0 ) {
+    {
         const size_t stop = 2 * (size_/2);
         // process 2 by 2
         #pragma nounroll
@@ -1598,7 +1598,7 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 #   define VECMULADD4D vecMulAdd4D
 #elif defined(__SSE3__)
 #   define VECMULADD2D vecMulAdd2D
-#   define VECMULADD3D vecMulAdd3D
+#   define VECMULADD3D vecMulAdd3D_SSEU
 #   define VECMULADD4D vecMulAdd4D
 #else
 #   define VECMULADD2D vecMulAdd2D
