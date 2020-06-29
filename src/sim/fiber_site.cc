@@ -242,7 +242,7 @@ int FiberSite::bad() const
         const real e = fbAbs - abscissaInter();
         
         //std::clog << "Interpolation " << std::scientific << e << std::endl;
-        if ( abs_real(e) > 1e-5 )
+        if ( abs_real(e) > 1e-4 )
         {
             std::cerr << "Interpolation error is " << std::scientific << e << "\n";
             std::cerr << " abscissa:\n";
