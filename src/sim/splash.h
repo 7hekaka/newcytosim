@@ -19,6 +19,7 @@ inline void splash(std::ostream& os)
 /// print general info about the program
 inline void print_version(std::ostream& os)
 {
+    os << "   Dimension: " << DIM;
     os << "   Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON << "\n";
     os << "   Built " <<__DATE__<< " " <<__TIME__<< " with " <<__VERSION__<< "\n";
     

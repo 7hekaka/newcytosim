@@ -42,7 +42,7 @@ Lower values are better, but increase the number of degrees of freedom of the sy
 
 Again, you systematically vary `segmentation` while measuring the system dynamics, as described above. At some point it will fail and you want to know when that happens.
 
-You can probe the range [ 0.25;  1.0 ]
+You can probe the range [ 0.25;  2.0 ]
 
 ## `tolerance`
 
