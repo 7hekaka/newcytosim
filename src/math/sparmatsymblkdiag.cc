@@ -749,13 +749,12 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
-    vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
@@ -810,8 +809,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
 }
 
 
-/* Multiplies the diagonal block */
-void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t jj) const
+#if 0
+void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
     assert_true(size_==0);
     assert_small(dia_.asymmetry());
@@ -843,7 +842,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    vec4f tt = loadu4f(X+jj);
+    const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
     vec4f s0 = mul4f(streamload4f(D  ), permute4f(tt, 0x00));
     vec4f s1 = mul4f(streamload4f(D+4), permute4f(tt, 0x55));
@@ -857,6 +856,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_DIAG(const real* X, real* Y, size_t 
 #endif
 #endif
 }
+#endif
 
 
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
@@ -872,30 +872,27 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-# if ( BLD == 4 )
-    vec4f tt = loadu4f(X+jj);
-    vec4f s0 = mul4f(streamload4f(D  ), tt);
-    vec4f s1 = mul4f(streamload4f(D+4), tt);
-    vec4f s2 = mul4f(streamload4f(D+8), tt);
-# else
-    vec4f tt = loadu4f(X+jj);
-    vec4f s0 = mul4(load3f(D      ), tt);
-    vec4f s1 = mul4(load3f(D+BLD  ), tt);
-    vec4f s2 = mul4(load3f(D+BLD*2), tt);
-# endif
+    const vec4f tt = loadu4f(X+jj);
+    const vec4f x0 = permute4f(tt, 0x00);
+    const vec4f x1 = permute4f(tt, 0x55);
+    const vec4f x2 = permute4f(tt, 0xAA);
     
     if ( size_ > 0 )
     {
-        const vec4f x0 = permute4f(tt, 0x00);
-        const vec4f x1 = permute4f(tt, 0x55);
-        const vec4f x2 = permute4f(tt, 0xAA);
-        
+# if ( BLD == 4 )
+        vec4f s0 = mul4f(streamload4f(D  ), tt);
+        vec4f s1 = mul4f(streamload4f(D+4), tt);
+        vec4f s2 = mul4f(streamload4f(D+8), tt);
+# else
+        vec4f s0 = mul4(load3f(D      ), tt);
+        vec4f s1 = mul4(load3f(D+BLD  ), tt);
+        vec4f s2 = mul4(load3f(D+BLD*2), tt);
+# endif
         size_t n = 0;
-        if ( 1 ) {
+        {
             const size_t stop = 2 * (size_/2);
-        
             // process 2 by 2
-#pragma nounroll
+            #pragma nounroll
             for ( ; n < stop; n += 2 )
             {
                 const size_t ii = inx_[n  ];
@@ -937,9 +934,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
                 storeu4f(Y+kk, t);
             }
         }
-        
         // process remaining blocks
-#pragma nounroll
+        #pragma nounroll
         for ( ; n < size_; ++n )
         {
             const size_t ii = inx_[n];
@@ -971,20 +967,169 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
             s1 = fmadd4f(m345, xyz, s1);
             s2 = fmadd4f(m678, xyz, s2);
         }
+        
+        /* finally sum horizontally:
+         s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
+         to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
+         */
+        vec4f s3 = setzero4f();
+        s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
+        s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
+        s0 = add4f(shuffle4f(s0, s2, 0x4E), blend4f(s0, s2, 0b1100));
+        storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
     }
-    
-    /* finally sum horizontally:
-     s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
-     to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
-     */
-    vec4f s3 = setzero4f();
-    s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
-    s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
-    s0 = add4f(shuffle4f(s0, s2, 0x4E), blend4f(s0, s2, 0b1100));
-    storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
+    else
+    {
+# if ( BLD == 4 )
+        vec4f s0 = mul4f(streamload4f(D  ), x0);
+        vec4f s1 = mul4f(streamload4f(D+4), x1);
+        vec4f s2 = mul4f(streamload4f(D+8), x2);
+# else
+        vec4f s0 = mul4f(load3f(D      ), x0);
+        vec4f s1 = mul4f(load3f(D+BLD  ), x1);
+        vec4f s2 = mul4f(load3f(D+BLD*2), x2);
+# endif
+        storeu4f(Y+jj, add4f(add4f(loadu4f(Y+jj), s0), add4f(s1, s2)));
+    }
 #endif
 }
 
+
+
+void SparMatSymBlkDiag::Column::vecMul3D_SSEU(const real* X, real* Y, size_t jj) const
+{
+    assert_small(dia_.asymmetry());
+    //std::cout << dia_.to_string(7,1); printf(" MSSB %lu : %lu\n", jj, size_);
+#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
+    // load 3x3 matrix diagonal element into 3 vectors:
+    real const* D = dia_;
+
+    //multiply with the diagonal block, assuming it has been symmetrized:
+    //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
+    //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
+    //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
+    /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    const vec4f tt = loadu4f(X+jj);
+    const vec4f x0 = permute4f(tt, 0x00);
+    const vec4f x1 = permute4f(tt, 0x55);
+    const vec4f x2 = permute4f(tt, 0xAA);
+    
+    if ( size_ > 0 )
+    {
+# if ( BLD == 4 )
+        vec4f s0 = mul4f(streamload4f(D  ), tt);
+        vec4f s1 = mul4f(streamload4f(D+4), tt);
+        vec4f s2 = mul4f(streamload4f(D+8), tt);
+# else
+        vec4f s0 = mul4(load3f(D      ), tt);
+        vec4f s1 = mul4(load3f(D+BLD  ), tt);
+        vec4f s2 = mul4(load3f(D+BLD*2), tt);
+# endif
+        size_t n = 0;
+        {
+            const size_t stop = 2 * (size_/2);
+            // process 2 by 2
+            #pragma nounroll
+            for ( ; n < stop; n += 2 )
+            {
+                const size_t ii = inx_[n  ];
+                const size_t kk = inx_[n+1];
+                assert_true( ii < kk );
+                real const* M = blk_[n  ];
+                real const* P = blk_[n+1];
+# if ( BLD == 4 )
+                const vec4f m012 = streamload4f(M  );
+                const vec4f m345 = streamload4f(M+4);
+                const vec4f m678 = streamload4f(M+8);
+                const vec4f p012 = streamload4f(P  );
+                const vec4f p345 = streamload4f(P+4);
+                const vec4f p678 = streamload4f(P+8);
+# else
+                const vec4f m012 = load3f(M      );
+                const vec4f m345 = load3f(M+BLD  );
+                const vec4f m678 = load3f(M+BLD*2);
+                const vec4f p012 = load3f(P      );
+                const vec4f p345 = load3f(P+BLD  );
+                const vec4f p678 = load3f(P+BLD*2);
+# endif
+                // multiply with the full block:
+                vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
+                vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
+                vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
+                vec4f tuv = loadu4f(X+kk);  // xyz = { X0 X1 X2 - }
+                z = fmadd4f(m345, x1, z);
+                t = fmadd4f(p345, x1, t);
+                s0 = fmadd4f(m012, xyz, s0);
+                s1 = fmadd4f(m345, xyz, s1);
+                s2 = fmadd4f(m678, xyz, s2);
+                z = fmadd4f(m678, x2, z);
+                t = fmadd4f(p678, x2, t);
+                s0 = fmadd4f(p012, tuv, s0);
+                s1 = fmadd4f(p345, tuv, s1);
+                s2 = fmadd4f(p678, tuv, s2);
+                storeu4f(Y+ii, z);
+                storeu4f(Y+kk, t);
+            }
+        }
+        // process remaining blocks
+        #pragma nounroll
+        for ( ; n < size_; ++n )
+        {
+            const size_t ii = inx_[n];
+            real const* M = blk_[n];
+# if ( BLD == 4 )
+            const vec4f m012 = streamload4f(M  );
+            const vec4f m345 = streamload4f(M+4);
+            const vec4f m678 = streamload4f(M+8);
+# else
+            const vec4f m012 = load3f(M      );
+            const vec4f m345 = load3f(M+BLD  );
+            const vec4f m678 = load3f(M+BLD*2);
+# endif
+            // multiply with the full block:
+            //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
+            //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
+            //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
+            vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
+            z = fmadd4f(m345, x1, z);
+            z = fmadd4f(m678, x2, z);
+            storeu4f(Y+ii, z);
+            
+            // multiply with the transposed block:
+            //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
+            //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
+            //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+            vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
+            s0 = fmadd4f(m012, xyz, s0);
+            s1 = fmadd4f(m345, xyz, s1);
+            s2 = fmadd4f(m678, xyz, s2);
+        }
+        
+        /* finally sum horizontally:
+         s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
+         to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
+         */
+        vec4f s3 = setzero4f();
+        s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
+        s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
+        s0 = add4f(shuffle4f(s0, s2, 0x4E), blend4f(s0, s2, 0b1100));
+        storeu4f(Y+jj, s0);
+    }
+    else
+    {
+# if ( BLD == 4 )
+        vec4f s0 = mul4f(streamload4f(D  ), x0);
+        vec4f s1 = mul4f(streamload4f(D+4), x1);
+        vec4f s2 = mul4f(streamload4f(D+8), x2);
+# else
+        vec4f s0 = mul4f(load3f(D      ), x0);
+        vec4f s1 = mul4f(load3f(D+BLD  ), x1);
+        vec4f s2 = mul4f(load3f(D+BLD*2), x2);
+# endif
+        storeu4f(Y+jj, add4f(s0, add4f(s1, s2)));
+    }
+#endif
+}
 #endif
 
 //------------------------------------------------------------------------------
@@ -1485,8 +1630,13 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
 
 void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 {
+#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
+    for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
+        column_[jj].vecMul3D_SSEU(X, Y, jj);
+#else
     zero_real(size_, Y);
     vecMulAdd(X, Y, 0, size_);
+#endif
 }
 
 #if MATRIXSSB_USES_AVX
@@ -1525,10 +1675,7 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 #elif ( BLOCK_SIZE == 2 )
         column_[jj].VECMULADD2D(X, Y, jj);
 #elif ( BLOCK_SIZE == 3 )
-        if ( column_[jj].size_ == 0 )
-            column_[jj].vecMulAdd3D_DIAG(X, Y, jj);
-        else
-            column_[jj].VECMULADD3D(X, Y, jj);
+        column_[jj].VECMULADD3D(X, Y, jj);
 #elif ( BLOCK_SIZE == 4 )
         column_[jj].VECMULADD4D(X, Y, jj);
 #endif

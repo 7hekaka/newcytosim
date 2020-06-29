@@ -794,13 +794,12 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
-    vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
@@ -869,13 +868,12 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
-    vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4f(streamload4f(D  ), tt);
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f tt = loadu4f(X+jj);
     vec4f s0 = mul4(load3f(D      ), tt);
     vec4f s1 = mul4(load3f(D+BLD  ), tt);
     vec4f s2 = mul4(load3f(D+BLD*2), tt);
