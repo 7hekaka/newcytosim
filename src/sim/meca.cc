@@ -610,7 +610,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
         addRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
 #endif
 #if USE_ISO_MATRIX
-    mB.addTriangularBlock(res, nbp, mec->matIndex(), nbp, 1);
+    mB.addDiagonalBlock(res, nbp, mec->matIndex(), nbp);
     if ( useMatrixC )
 #endif
         mC.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp);
@@ -680,7 +680,7 @@ void Meca::getBlock(const Mecable * mec, real* res) const
     }
 #endif
 #if USE_ISO_MATRIX
-    mB.addTriangularBlock(res, bks, mec->matIndex(), nbp, DIM);
+    mB.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
     expand_lower_matrix<DIM>(bks, res, bks);
 #if USE_ISO_MATRIX
@@ -750,7 +750,7 @@ void Meca::extractBlock(const Mecable* mec, real* res) const
     real * tmp = new_real(dim);
     
     zero_real(dim, vec);
-    //zero_real(bs*bs, res);
+    //zero_real(bks*bks, res);
     
     // proceed column by column:
     for ( size_t jj = 0; jj < bks; ++jj )
@@ -758,7 +758,7 @@ void Meca::extractBlock(const Mecable* mec, real* res) const
         vec[jj+off] = 1.0;
         multiply(vec, tmp);
         vec[jj+off] = 0.0;
-        blas::xcopy(bks, tmp+off, 1, res+jj*bks, 1);
+        copy_real(bks, tmp+off, res+jj*bks);
     }
     
     free_real(vec);
@@ -785,15 +785,12 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
     
     if ( err > bks * bks * REAL_EPSILON )
     {
-        VecPrint::sparse(std::clog, bks, bks, wrk, bks, 3, (real)0.1);
-        
-        size_t s = std::min(16UL, bks);
+        //VecPrint::sparse(std::clog, bks, bks, wrk, bks, 3, (real)0.1);
         extractBlock(mec, wrk);
-        std::clog << " blockS\n";
-        VecPrint::print(std::clog, s, s, wrk, bks, 3);
         
-        std::clog << " block \n";
-        VecPrint::print(std::clog, s, s, blk, bks, 3);
+        const size_t S = std::min(9UL, bks);
+        std::clog << " extracted:\n"; VecPrint::print(std::clog, S, S, wrk, bks, 3);
+        std::clog << " computed:\n";  VecPrint::print(std::clog, S, S, blk, bks, 3);
     }
     
     free_real(wrk);
@@ -844,13 +841,13 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     if ( err > 1 )
     {
         // print preconditionner block for visual inspection:
-        unsigned s = std::min(16UL, bks);
+        const size_t S = std::min(16UL, bks);
         std::clog << " matrix: \n";
-        VecPrint::print(std::clog, s, s, wrk, bks);
+        VecPrint::print(std::clog, S, S, wrk, bks);
         std::clog << "\nprecond: \n";
-        VecPrint::print(std::clog, s, s, blk, bks);
+        VecPrint::print(std::clog, S, S, blk, bks);
         std::clog << "\nprecond * matrix:\n";
-        VecPrint::print(std::clog, s, s, mat, bks);
+        VecPrint::print(std::clog, S, S, mat, bks);
         std::clog << "\n";
     }
     free_real(vec);
@@ -1309,7 +1306,7 @@ void Meca::prepare(Simul const* sim)
         if ( mec->hasRigidity() )
         {
 #   if USE_ISO_MATRIX
-            addRigidityMatrix<DIM>(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addRigidityMatrix(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   else
             addRigidityBlockMatrix<DIM>(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   endif

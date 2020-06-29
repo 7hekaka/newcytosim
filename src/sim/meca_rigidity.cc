@@ -72,7 +72,7 @@ void addRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const re
 }
 
 
-template < typename MATRIX, size_t ORD >
+template < int ORD, typename MATRIX>
 void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
