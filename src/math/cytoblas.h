@@ -125,11 +125,11 @@ inline real nrm8seq(const size_t cnt, const real* X)
 inline double nrm8(const size_t cnt, const double* ptr)
 {
     //double const* adr = ptr;
-    double const* end = ptr - 11 + cnt;
+    double const* end = ptr + cnt;
     const vec4 sign = {-0.0, -0.0, -0.0, -0.0};
     vec4 u = setzero4();
     #pragma nounroll
-    while ( ptr < end )
+    while ( ptr+12 <= end )
     {
         vec4 a = andnot4(sign, load4(ptr));
         vec4 b = andnot4(sign, load4(ptr+4));
@@ -138,19 +138,19 @@ inline double nrm8(const size_t cnt, const double* ptr)
         ptr += 12;
     }
     #pragma nounroll
-    while ( ptr < end + 8 )
+    while ( ptr+8 <= end )
     {
         u = max4(u, andnot4(sign, load4(ptr)));
         ptr += 4;
     }
     vec2 w = getlo(max4(u, permute2f128(u, u, 0x01)));
-    while ( ptr < end + 10 )
+    while ( ptr+2 <= end )
     {
         w = max2(w, andnot2(getlo(sign), load2(ptr)));
         ptr += 2;
     }
     double res = std::max(w[0], w[1]);
-    for ( ; ptr < end + 11; ++ptr )
+    for ( ; ptr < end; ++ptr )
         res = std::max(res, std::fabs(*ptr));
 #if 0
     real z = std::fabs(adr[0]);
@@ -162,13 +162,11 @@ inline double nrm8(const size_t cnt, const double* ptr)
     return res;
 }
 
-inline float nrm8(const size_t siz, const float* X)
+inline float nrm8(const size_t siz, const float* ptr)
 {
-    float const* ptr = X;
-    float const* end = X + siz;
-    float const* stop = end - 24;
+    float const* end = ptr + siz;
     vec8f u = setzero8f();
-    while ( ptr <= stop )
+    while ( ptr+24 <= end )
     {
         vec8f a = abs8f(load8f(ptr));
         vec8f b = abs8f(load8f(ptr+8));
@@ -176,13 +174,13 @@ inline float nrm8(const size_t siz, const float* X)
         u = max8f(max8f(u,a), max8f(b,c));
         ptr += 24;
     }
-    while ( ptr <= end - 8 )
+    while ( ptr+8 <= end )
     {
         u = max8f(u, abs8f(load8f(ptr)));
         ptr += 8;
     }
     vec4f v = getlof(max8f(u, permute2f128f(u, u, 0x01)));
-    while ( ptr <= end - 4 )
+    while ( ptr+4 <= end )
     {
         v = max4f(v, abs4f(load4f(ptr)));
         ptr += 4;
