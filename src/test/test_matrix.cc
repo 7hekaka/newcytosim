@@ -226,8 +226,11 @@ void checkMatrix(MATRIX & mat, const size_t size,
     zero_real(size, z);
     mat.vecMulAdd_ALT(x, z);
     real sum2 = checksum(size, y, z);
+    
+    mat.vecMul(x, z);
+    real sum3 = checksum(size, y, z);
 
-    printf("  check %+16.6f  %+16.6f ", sum1, sum2);
+    printf("  check %+16.6f %+16.6f %+16.6f ", sum1, sum2, sum3);
 }
 
 

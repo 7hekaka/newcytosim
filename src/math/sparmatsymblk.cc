@@ -66,6 +66,17 @@ void SparMatSymBlk::deallocate()
     alloc_ = 0;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Column
+
+SparMatSymBlk::Column::Column()
+{
+    size_ = 0;
+    allo_ = 0;
+    inx_ = nullptr;
+    blk_ = nullptr;
+}
+
 
 void SparMatSymBlk::Column::allocate(size_t alc)
 {

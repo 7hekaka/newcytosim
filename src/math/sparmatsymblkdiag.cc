@@ -67,6 +67,20 @@ void SparMatSymBlkDiag::deallocate()
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - Column
+
+SparMatSymBlkDiag::Column::Column()
+{
+    size_ = 0;
+    allo_ = 0;
+    dia_.reset();
+    last_.reset();
+    inx_ = nullptr;
+    blk_ = nullptr;
+}
+
+
 void SparMatSymBlkDiag::Column::allocate(size_t alc)
 {
     if ( alc > allo_ )
@@ -130,6 +144,7 @@ void SparMatSymBlkDiag::Column::operator =(SparMatSymBlkDiag::Column & col)
     size_ = col.size_;
     allo_ = col.allo_;
     dia_ = col.dia_;
+    last_ = col.last_;
     inx_ = col.inx_;
     blk_ = col.blk_;
     
@@ -599,7 +614,7 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
     for ( size_t j = 0; j < size_; ++j )
     {
         column_[j].dia_.copy_lower();
-        column_[j].last_.reset();
+        //column_[j].last_.reset();
     }
     
     sortElements();
@@ -935,8 +950,8 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     assert_true(size_ > 0);
 #if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
 
-    const vec4f tt = loadu4f(X+jj);
-    
+    vec4f tt = loadu4f(X+jj);
+
     real const* L = last_;    // should be blk_[size_-1]
 # if ( BLD == 4 )
     const vec4f L012 = streamload4f(L  );
@@ -1033,9 +1048,9 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
      s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
      to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
      */
-    vec4f s3 = setzero4f();
+    tt = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
-    s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
+    s2 = add4f(unpacklo4f(s2, tt), unpackhi4f(s2, tt));
     s0 = add4f(shuffle4f(s0, s2, 0x4E), blend4f(s0, s2, 0b1100));
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 #endif

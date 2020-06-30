@@ -73,7 +73,7 @@ private:
     public:
         
         /// constructor
-        Column() { size_=0; allo_=0; inx_=nullptr; blk_=nullptr; }
+        Column();
         
         /// the assignment operator will transfer memory
         void operator =(Column&);

@@ -75,9 +75,9 @@ private:
     public:
         
         /// constructor
-        Column() { size_=0; allo_=0; dia_.reset(); inx_=nullptr; blk_=nullptr; }
+        Column();
         
-        /// the assignment operator will transfer memory
+        /// the assignment operator will transfer memory ownership
         void operator =(Column&);
         
         /// destructor
