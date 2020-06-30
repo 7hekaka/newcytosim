@@ -27,18 +27,27 @@ inline void alsatian0(int N, real const* AB, real* B)
 {
     for ( int d = 0; d < DIM; ++d )
     {
-        blas_xtbsvLN<'I'>(N, KD, AB, LDAB, B+d, DIM);
-        blas_xtbsvLT<'I'>(N, KD, AB, LDAB, B+d, DIM);
+        blas::xtbsv('L', 'N', 'N', N, KD, AB, LDAB, B+d, DIM);
+        blas::xtbsv('L', 'T', 'N', N, KD, AB, LDAB, B+d, DIM);
     }
 }
 
 inline void alsatian1(int N, real const* AB, real* B)
 {
+    for ( int d = 0; d < DIM; ++d )
+    {
+        blas_xtbsvLN<'I'>(N, KD, AB, LDAB, B+d, DIM);
+        blas_xtbsvLT<'I'>(N, KD, AB, LDAB, B+d, DIM);
+    }
+}
+
+inline void alsatian2(int N, real const* AB, real* B)
+{
     alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
     alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
 }
 
-inline void alsatian2(int N, real const* AB, real* B)
+inline void alsatian3(int N, real const* AB, real* B)
 {
     alsatian_xtbsvLNN3(N, AB, LDAB, B);
     alsatian_xtbsvLTN3(N, AB, LDAB, B);
@@ -52,44 +61,53 @@ inline void alsatian2(int N, real const* AB, real* B)
 void testTBSV(size_t cnt)
 {
     
-    std::cout << "testDPTT " << __VERSION__ << "\n";
+    std::cout << "testTBSV " << sizeof(real) << " " << __VERSION__ << "\n";
 
     real * AB  = new_real(NBS*LDAB);
-    real * Bs = new_real(NBS);
-    real * B  = new_real(NBS);
+    real * Bs = new_real(NBS*DIM);
+    real * B  = new_real(NBS*DIM);
 
     for ( size_t i = 0; i < NBS; ++i )
     {
-        AB[  LDAB*i] =  5.0;
-        AB[1+LDAB*i] = -0.5;
-        AB[2+LDAB*i] =  RNG.sreal();
-        Bs[i] = RNG.sreal();
+        AB[  LDAB*i] = 5.0;
+        AB[1+LDAB*i] = 0.5;
+        AB[2+LDAB*i] = RNG.sreal();
     }
+    for ( size_t i = 0; i < NBS*DIM; ++i )
+        Bs[i] = RNG.sreal();
     int info;
     alsatian_xpbtf2L<2>(NBS, AB, LDAB, &info);
-
-    copy_real(NBS, Bs, B);
+    
+    copy_real(NBS*DIM, Bs, B);
     alsatian0(NBS, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian0(NBS, AB, B);
-    TicToc::toc("    xtbsv<'I'>");
-    
-    copy_real(NBS, Bs, B);
+    TicToc::toc("    wrong BLAS");
+
+    copy_real(NBS*DIM, Bs, B);
     alsatian1(NBS, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian1(NBS, AB, B);
-    TicToc::toc("    xtbsv<DIM>");
-
-    copy_real(NBS, Bs, B);
+    TicToc::toc("    xtbsv<'I'>");
+    
+    copy_real(NBS*DIM, Bs, B);
     alsatian2(NBS, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian2(NBS, AB, B);
+    TicToc::toc("    xtbsv<DIM>");
+
+    copy_real(NBS*DIM, Bs, B);
+    alsatian3(NBS, AB, B);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        alsatian3(NBS, AB, B);
     TicToc::toc("    xtbsvLNN3 ");
 
     free_real(B);
