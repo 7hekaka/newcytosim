@@ -27,6 +27,7 @@ void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real*
             {
                 const real * pA = A + KD + j * lda;
                 if ( diag == 'N' ) X[j] /= pA[0];
+                else if ( diag == 'I' ) X[j] *= pA[0];
                 real temp = X[j];
                 const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
@@ -48,6 +49,7 @@ void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real*
                 int ix = kx;
                 const real * pA = A + KD + j * lda;
                 if ( diag == 'N' ) X[jx] /= pA[0];
+                else if ( diag == 'I' ) X[jx] *= pA[0];
                 real temp = X[jx];
                 const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
@@ -73,6 +75,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
             {
                 const real * pA = A + j * lda;
                 if ( diag == 'N' ) X[j] /= pA[0];
+                else if ( diag == 'I' ) X[j] *= pA[0];
                 real temp = X[j];
                 const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
@@ -94,6 +97,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
                 int ix = kx;
                 const real * pA = A + j * lda;
                 if ( diag == 'N' ) X[jx] /= pA[0];
+                else if ( diag == 'I' ) X[jx] *= pA[0];
                 real temp = X[jx];
                 const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
@@ -120,6 +124,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
             for (int i = std::max(0, j-KD); i < j; ++i)
                 temp -= pA[i-j] * X[i];
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[j] = temp;
         }
     }
@@ -140,6 +145,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
                 ix += incX;
             }
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[jx] = temp;
             jx += incX;
             if (j >= KD)
@@ -162,6 +168,7 @@ void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real*
             for (int i = sup; i > j; --i)
                 temp -= pA[i-j] * X[i];
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[j] = temp;
         }
     }
@@ -183,6 +190,7 @@ void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real*
                 ix -= incX;
             }
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[jx] = temp;
             jx -= incX;
             if ( j < N-KD )
@@ -904,7 +912,7 @@ inline void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real*
 
 
 template < int ORD >
-inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
