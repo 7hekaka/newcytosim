@@ -86,6 +86,7 @@ size_t Mecafil::allocateMecable(const size_t nbp)
         
         // reset Lagrange multipliers
         zero_real(ms, iLag);
+        zero_real(ms, iLLG); // generally not needed
     }
     return ms;
 }

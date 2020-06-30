@@ -17,6 +17,8 @@ class Glossary;
 
 #define FIBER_HAS_NORMAL 0
 
+#define NEW_SKIP_PROJECTION 1
+
 
 /// Mecable with linear geometry
 /**
@@ -80,7 +82,7 @@ private:
     /// target segmentation length (equal to parameter 'fiber:segmentation')
     real         fnSegmentation;
   
-#if CURVATURE_DEPENDENT_SEGMENTATION    
+#if CURVATURE_DEPENDENT_SEGMENTATION
     /// error due to the cutting at different steps
     real         autoCutVal;
     
@@ -103,6 +105,11 @@ private:
 #endif
     
 protected:
+
+#if NEW_SKIP_PROJECTION
+    /// true if projection operator is identity
+    bool        skipProjection;
+#endif
 
     /// time at birth
     double       fnBirthTime;

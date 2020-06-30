@@ -848,7 +848,10 @@ void Fiber::prepareMecable()
     //printProjection(std::clog);
     
     assert_true( iPointMobility > REAL_EPSILON );
-
+    
+#if NEW_SKIP_PROJECTION
+    skipProjection = prop->skip_projection;
+#endif
     // the scaling of the bending elasticity depends on the length of the segments
     iRigidity = prop->rigidity / segmentationCube();
 #if NEW_FIBER_LOOP

@@ -330,6 +330,9 @@ public:
     /// if `true`, link MINUS and PLUS ends together to form a loop
     bool         loop;
 #endif
+    
+    bool         skip_projection;
+
     /// @}
 
     /// derived variable: flag to indicate that `display` has a new value

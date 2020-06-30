@@ -258,6 +258,11 @@ void projectForcesD_(size_t nbs, const real* dif, const real* src, const real* m
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
+#if NEW_SKIP_PROJECTION
+    if ( skipProjection )
+        return copy_real(DIM*nPoints, X, Y);
+#endif
+    
     const size_t nbs = nbSegments();
     //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
 
@@ -300,9 +305,14 @@ void Mecafil::computeTensions(const real* force)
 }
 
 
-void Mecafil::storeTensions(const real*)
+void Mecafil::storeTensions(const real* force)
 {
-    copy_real(nPoints, iLLG, iLag);
+#if NEW_SKIP_PROJECTION
+    if ( skipProjection )
+        computeTensions(force);
+    else
+#endif
+        copy_real(nPoints, iLLG, iLag);
 }
 
 
