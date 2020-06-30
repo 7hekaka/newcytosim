@@ -80,7 +80,6 @@ inline vec8f rcpf(vec8f a)                 { return _mm256_rcp_ps(a); }
 /// approximate inverse square root
 inline vec8f rsqrtf(vec8f a)               { return _mm256_rsqrt_ps(a); }
 
-inline vec4f cvt4ds(vec4 a)                { return _mm256_cvtpd_ps(a); }
 inline vec4f getlof(vec8f a)               { return _mm256_castps256_ps128(a); }
 inline vec4f gethif(vec8f a)               { return _mm256_extractf128_ps(a,1); }
 
@@ -95,6 +94,7 @@ inline vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a); }
 /// Vector of doubles
 typedef __m256d vec4;
 
+inline vec4f cvt4ds(vec4 a)                { return _mm256_cvtpd_ps(a); }
 inline vec4  cvt4sd(vec4f a)               { return _mm256_cvtps_pd(a); }
 inline void store4f(float* a, vec4 b)      { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
 

@@ -1609,11 +1609,6 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     // add the contribution of off-diagonal elements:
     for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
         column_[jj].vecMulAddOff3D_SSEU(X, Y, jj);
-    /*
-    std::clog << "\nY "; VecPrint::print(std::clog, std::min(20LU, size_), Y);
-    zero_real(size_, Y); vecMulAdd(X, Y, 0, size_);
-    std::clog << "\n  "; VecPrint::print(std::clog, std::min(20LU, size_), Y);
-     */
 #else
     zero_real(size_, Y);
     vecMulAdd(X, Y, 0, size_);

@@ -621,16 +621,16 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
     vec4f a1 = loadu4f(pX);     //may load garbage
     vec4f a2 = loadu4f(pX+ORD); //may load garbage
 #if ( 0 )
-    while ( pA < end-lda )
+    while ( pA+lda < end )
     {
         vec4f a0 = mul4f(broadcast1f(pA), a1);      // a1 = loadu4(pX);
         vec4f b1 = fnmadd4f(broadcast1f(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
         vec4f b2 = fnmadd4f(broadcast1f(pA+2), a0, loadu4f(pX+2*ORD));
-        storeu4(pX, a0);
+        storeu4f(pX, a0);
         vec4f b0 = mul4f(broadcast1f(pA+lda), b1);
         a1 = fnmadd4f(broadcast1f(pA+lda+1), b0, b2);
         a2 = fnmadd4f(broadcast1f(pA+lda+2), b0, loadu4f(pX+3*ORD));
-        storeu4(pX+ORD, b0);
+        storeu4f(pX+ORD, b0);
         pA += 2*lda;
         pX += 2*ORD;
     }
