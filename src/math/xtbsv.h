@@ -4,22 +4,17 @@
 #ifndef XTBSV_H
 #define XTBSV_H
 
-#ifdef __SSE3__
-#  define XTBSV_USES_SSE3 REAL_IS_DOUBLE
-#else
-#  define XTBSV_USES_SSE3 0
-#endif
-
-#ifdef __AVX__
-#  define XTBSV_USES_AVX REAL_IS_DOUBLE
-#else
-#  define XTBSV_USES_AVX 0
-#endif
 
 /**
  This is a C-translation of the BLAS reference implementation of DTBSV
  FJN 28.04.2020
  
+ DTBSV  solves one of the systems of equations
+ 
+     A*x = b,   or   A**T*x = b,
+ 
+ where b and x are n element vectors and A is an n by n unit, or non-unit,
+ upper or lower triangular band matrix, with ( k + 1 ) diagonals.
  */
 template < char diag >
 void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
@@ -488,12 +483,11 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
 
-#if XTBSV_USES_AVX
-
+#if defined(__AVX__) && REAL_IS_DOUBLE
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLNN3(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
 {
-    const real*const end = pA + (N-2) * lda;
+    const double*const end = pA + (N-2) * lda;
     constexpr int ORD = 3;
     vec4 a1 = loadu4(pX); //may load garbage
     vec4 a2 = loadu4(pX+ORD); //may load garbage
@@ -540,9 +534,9 @@ void alsatian_xtbsvLNN3(const int N, const real* pA, const int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLTN3(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX)
 {
-    const real*const end = pA;
+    const double*const end = pA;
     constexpr int ORD = 3;
     const vec4 zero = setzero4();
     const vec4 one = set4(1.0);
@@ -615,12 +609,109 @@ void alsatian_xtbsvLTN3(const int N, const real* pA, const int lda, real* pX)
 */
 
 #endif
+#if defined(__SSE3__) && !REAL_IS_DOUBLE
+
+#include "simd_float.h"
+
+/// specialized version for KD==2 and ORD==3
+void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
+{
+    const float*const end = pA + (N-2) * lda;
+    constexpr int ORD = 3;
+    vec4f a1 = loadu4f(pX);     //may load garbage
+    vec4f a2 = loadu4f(pX+ORD); //may load garbage
+#if ( 0 )
+    while ( pA < end-lda )
+    {
+        vec4f a0 = mul4f(broadcast1f(pA), a1);      // a1 = loadu4(pX);
+        vec4f b1 = fnmadd4f(broadcast1f(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
+        vec4f b2 = fnmadd4f(broadcast1f(pA+2), a0, loadu4f(pX+2*ORD));
+        storeu4(pX, a0);
+        vec4f b0 = mul4f(broadcast1f(pA+lda), b1);
+        a1 = fnmadd4f(broadcast1f(pA+lda+1), b0, b2);
+        a2 = fnmadd4f(broadcast1f(pA+lda+2), b0, loadu4f(pX+3*ORD));
+        storeu4(pX+ORD, b0);
+        pA += 2*lda;
+        pX += 2*ORD;
+    }
+#endif
+    while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
+    {
+        vec4f a0 = mul4f(broadcast1f(pA), a1);     // a1 = loadu4(pX);
+        a1 = fnmadd4f(broadcast1f(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
+        a2 = fnmadd4f(broadcast1f(pA+2), a0, loadu4f(pX+2*ORD));
+        storeu4f(pX, a0);
+        pA += lda;
+        pX += ORD;
+    }
+    if ( N >= 2 ) // j = N-2
+    {
+        vec4f a0 = mul4f(broadcast1f(pA), a1);
+        a1 = fnmadd4f(broadcast1f(pA+1), a0, a2);
+        storeu4f(pX, a0);
+        pA += lda;
+        pX += ORD;
+    }
+    if ( N >= 1 ) // j = N-1
+    {
+        vec4f a0 = mul4f(broadcast1f(pA), a1);
+        store3f(pX, a0);
+        //pA += lda;
+        //pX += ORD;
+    }
+}
 
 
-#if XTBSV_USES_SSE3
+/// specialized version for KD==2 and ORD==3
+void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
+{
+    const float*const end = pA;
+    constexpr int ORD = 3;
+    const vec4f zero = setzero4f();
+    const vec4f one = set4f(1.0);
+    pX += ( N - 1 ) * ORD;
+    pA += ( N - 1 ) * lda;
+    vec4f a1 = zero;
+    if ( N >= 1 ) // j = N-1
+    {
+        vec4f a0 = loadu4f(pX);
+        a1 = mul4f(broadcast1f(pA), a0);
+        storeu4f(pX, blend4f(a1, a0, 0b1000));
+        a1 = blend4f(a1, zero, 0b1000);
+        pA -= lda;
+        pX -= ORD;
+    }
+    vec4f a2 = a1;
+    if ( N >= 2 ) // j = N-2
+    {
+        vec4f a0 = loadu4f(pX);
+        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
+        a1 = mul4f(broadcast1f(pA), a0);
+        storeu4f(pX, blend4f(a1, a0, 0b1000));
+        a1 = blend4f(a1, zero, 0b1000);
+        pA -= lda;
+        pX -= ORD;
+    }
+    while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
+    {
+        vec4f a0 = loadu4f(pX);
+        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);  // a1 = load3(pX+3);
+        a0 = fnmadd4f(broadcast1f(pA+2), a2, a0);  // a2 = load3(pX+6);
+        a2 = a1;
+        a0 = mul4f(blend4f(broadcast1f(pA), one, 0b1000), a0);
+        storeu4f(pX, a0);  //use the original 4th position
+        a1 = blend4f(a0, zero, 0b1000);
+        pA -= lda;
+        pX -= ORD;
+    }
+}
+#endif
+
+
+#if defined(__SSE3__) && REAL_IS_DOUBLE
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLNN2(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 2;
     vec2 a1 = load2(pX);     //may load garbage if N == 0
@@ -653,7 +744,7 @@ void alsatian_xtbsvLNN2(const int N, const real* pA, const int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLTN2(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLTN2(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 2;
     pX += ( N - 1 ) * ORD;
@@ -691,7 +782,7 @@ void alsatian_xtbsvLTN2(const int N, const real* pA, const int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLNN1(const int N, const double* pA, const int lda, double* pX)
 {
     real a1 = pX[0]; //may load garbage
     real a2 = pX[1]; //may load garbage
@@ -723,7 +814,7 @@ void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLTN1(const int N, const double* pA, const int lda, double* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
@@ -772,7 +863,6 @@ inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, in
         {
             blas_xtbsvUT<'N'>(N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'T', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
             blas_xtbsvUN<'N'>(N, KD, AB, LDAB, B+i*LDB, 1); //blas::xtbsv('U', 'N', 'N', N, KD, AB, LDAB, B+i*LDB, 1);
-
         }
     }
     else if ( UPLO == 'L' )
@@ -836,7 +926,7 @@ inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, 
 template < int ORD >
 inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 {
-#if XTBSV_USES_AVX
+#if defined(__AVX__) && REAL_IS_DOUBLE
     /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
     if ( ORD == 3 )
     {
@@ -855,6 +945,17 @@ inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     }
     else
         ABORT_NOW("unexpected DIM!");
+#elif defined(__AVX__) && !REAL_IS_DOUBLE
+    if ( ORD == 3 )
+    {
+        alsatian_xtbsvLNN3(N, AB, LDAB, B);
+        alsatian_xtbsvLTN3(N, AB, LDAB, B);
+    }
+    else
+    {
+        alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
+        alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
+    }
 #else
     alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
     alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);

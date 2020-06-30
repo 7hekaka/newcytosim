@@ -6,7 +6,8 @@
 
 /**
  This is a C-translation of the LAPACK reference implementation of dpttrf()
- (the method is known as Thomas' algorithm to factorize a tridiagonal matrix)
+ to factorize a symmetric definite-positive tridiagonal matrix.
+ The method is known as Thomas' algorithm.
 */
 void lapack_xpttrf(int size, real* D, real* E, int* INFO)
 {

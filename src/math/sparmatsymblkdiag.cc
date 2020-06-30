@@ -703,35 +703,11 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) c
 #pragma mark - Manually Optimized Vector Multiplication
 
 #ifdef __AVX__
+#include "simd_float.h"
 
-typedef __m128 vec4f;
-inline vec4f setzero4f()                        { return _mm_setzero_ps(); }
-inline vec4f load4f(float const* a)             { return _mm_load_ps(a); }
-inline vec4f loadu4f(float const* a)            { return _mm_loadu_ps(a); }
-inline void  storeu4f(float* a, vec4f b)        { _mm_storeu_ps(a, b); }
-inline vec4f add4f(vec4f a, vec4f b)            { return _mm_add_ps(a,b); }
-inline vec4f mul4f(vec4f a, vec4f b)            { return _mm_mul_ps(a,b); }
-inline vec4f streamload4f(float const* a)       { return (vec4f)_mm_stream_load_si128((__m128i const*)a); }
-inline vec4f unpacklo4f(vec4f a, vec4f b)       { return _mm_unpacklo_ps(a,b); }
-inline vec4f unpackhi4f(vec4f a, vec4f b)       { return _mm_unpackhi_ps(a,b); }
-inline vec4f duplo4f(vec4f a)                   { return _mm_unpacklo_ps(a,a); }
-inline vec4f duphi4f(vec4f a)                   { return _mm_unpackhi_ps(a,a); }
-
-#define shuffle4f(a,b,k)  _mm_shuffle_ps(a,b,k)
-#define permute4f(a,k)    _mm_permute_ps(a,k)
-#define blend4f(a,b,k)    _mm_blend_ps(a,b,k)
-
-#ifdef __FMA__
-inline vec4f fmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_fmadd_ps(a,b,c); }
-#else
-inline vec4f fmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_add_ps(_mm_mul_ps(a,b), c); }  // a * b + c
-#endif
-
-
+#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
 {
-    printf("SMSBD %lu : %lu\n", jj, size_);
-#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = dia_;
     
@@ -799,15 +775,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
     s0 = add4f(shuffle4f(s0, s2, 0x4E), blend4f(s0, s2, 0b1100));
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
-#endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_small(dia_.asymmetry());
     //std::cout << dia_.to_string(7,1); printf(" MSSB %lu : %lu\n", jj, size_);
-#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = dia_;
 
@@ -938,18 +914,16 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
 # endif
         storeu4f(Y+jj, add4f(add4f(loadu4f(Y+jj), s0), add4f(s1, s2)));
     }
-#endif
 }
-
+#endif
 
 /**
  Only process off-diagonal terms!
  */
+#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
-#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
-
     vec4f tt = loadu4f(X+jj);
 
     real const* L = last_;    // should be blk_[size_-1]
@@ -1053,8 +1027,8 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     s2 = add4f(unpacklo4f(s2, tt), unpackhi4f(s2, tt));
     s0 = add4f(shuffle4f(s0, s2, 0x4E), blend4f(s0, s2, 0b1100));
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
-#endif
 }
+#endif
 #endif
 
 //------------------------------------------------------------------------------
@@ -1062,9 +1036,9 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
 
 #include "simd.h"
 
+#if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
     vec2 x0, x1;
     vec2 yy = load2(Y+jj);
     {
@@ -1111,13 +1085,13 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t j
     //Y[jj  ] = Y0;
     //Y[jj+1] = Y1;
     store2(Y+jj, yy);
-#endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     // xy = { X0 X1 X0 X1 }
     vec4 xy = broadcast2(X+jj);
     //multiply with full block, assuming it is symmetric:
@@ -1158,8 +1132,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t j
     vec2 yy = load2(Y+jj);
     vec2 h = gethi(ss);
     store2(Y+jj, add2(yy, add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h))));
-#endif
 }
+#endif
 
 
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
@@ -1173,9 +1147,9 @@ inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 
 #endif
 
 
+#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(streamload4(dia_), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
@@ -1226,13 +1200,13 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
     store2(Y+jj, add2(load2(Y+jj), h));
-#endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(streamload4(dia_), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
@@ -1299,13 +1273,13 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
     store2(Y+jj, add2(load2(Y+jj), h));
-#endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
     // load 3x3 matrix diagonal element into 3 vectors:
     real const* D = dia_;
     
@@ -1380,127 +1354,131 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t j
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s1 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
-    storeu4(Y+jj, add4(loadu4(Y+jj), s1));
-#endif
+    s0 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+    storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 #endif
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
-    vec4 sa, sb, sc;
-    vec4 xa, xb, xc;
-    vec4 ta = setzero4();
-    vec4 tb = setzero4();
-    vec4 tc = setzero4();
+    vec4 s0, s1, s2;
+    vec4 x0, x1, x2;
     // load 3x3 matrix element into 3 vectors:
     {
         const real* D = dia_;
+        assert_small(D.asymmetry());
         vec4 tt = loadu4(X+jj);
         // multiply by diagonal elements:
-        sa = mul4(streamload4(D  ), tt);
-        sb = mul4(streamload4(D+4), tt);
-        sc = mul4(streamload4(D+8), tt);
+        s0 = mul4(streamload4(D  ), tt);
+        s1 = mul4(streamload4(D+4), tt);
+        s2 = mul4(streamload4(D+8), tt);
         // prepare broadcasted vectors:
         vec4 p = permute2f128(tt, tt, 0x01);
         vec4 l = blend4(tt, p, 0b1100);
         vec4 u = blend4(tt, p, 0b0011);
-        xa = duplo4(l);
-        xb = duphi4(l);
-        xc = duplo4(u);
+        x0 = duplo4(l);
+        x1 = duphi4(l);
+        x2 = duplo4(u);
     }
-    // There is a dependency in the loop for 's0', 's1' and 's2'.
-    const real* M = blk_[0];
-    const size_t* inx = inx_;
-    const real* stop = blk_[2*(size_/2)];
-    /*
-     Unrolling will reduce the dependency chain, which may be limiting the
-     throughput here. However the number of registers (16 for AVX CPU) limits
-     the level of unrolling that can be done.
-     */
-    //process 2 by 2:
-    #pragma nounroll
-    for ( ; M < stop; M += 2*SB )
+    if ( size_ > 0 )
     {
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
-        assert_true( i0 < i1 );
-        inx += 2;
-        //printf("--- %4i %4i\n", i0, i1);
-        vec4 ma0 = streamload4(M);
-        vec4 ma1 = streamload4(M+SB);
-        vec4 z0 = fmadd4(ma0, xa, loadu4(Y+i0));
-        vec4 z1 = fmadd4(ma1, xa, loadu4(Y+i1));
-        vec4 xyz0 = loadu4(X+i0);
-        vec4 xyz1 = loadu4(X+i1);
-        sa = fmadd4(ma0, xyz0, sa);
-        ta = fmadd4(ma1, xyz1, ta);
-        // multiply with the full block:
-        vec4 mb0 = streamload4(M+4);
-        vec4 mb1 = streamload4(M+(SB+4));
-        z0 = fmadd4(mb0, xb, z0);
-        z1 = fmadd4(mb1, xb, z1);
-        sb = fmadd4(mb0, xyz0, sb);
-        tb = fmadd4(mb1, xyz1, tb);
-        vec4 mc0 = streamload4(M+8);
-        vec4 mc1 = streamload4(M+(SB+8));
-        z0 = fmadd4(mc0, xc, z0);
-        z1 = fmadd4(mc1, xc, z1);
-        sc = fmadd4(mc0, xyz0, sc);
-        tc = fmadd4(mc1, xyz1, tc);
+        vec4 t0 = setzero4();
+        vec4 t1 = setzero4();
+        vec4 t2 = setzero4();
+        // There is a dependency in the loop for 's0', 's1' and 's2'.
+        const real* M = blk_[0];
+        const size_t* inx = inx_;
+        const real* stop = blk_[2*(size_/2)];
         /*
-         Attention: the 4th elements of the vectors z0 and z1 would be correct,
-         because only zero was added to the value loaded from 'Y'. However, in the
-         case where the indices i0 and i1 are consecutive and reverted (i1 < i0),
-         the value stored in z0 would not have been updated giving a wrong results.
-         The solution is to either use a 'store3(Y+i1, z1)', or to make sure that
-         indices are non-consecutive or ordered in the column in increasing order.
-         This affects performance since 'store3' is slower than 'storeu4'
+         Unrolling will reduce the dependency chain, which may be limiting the
+         throughput here. However the number of registers (16 for AVX CPU) limits
+         the level of unrolling that can be done.
          */
-        storeu4(Y+i0, z0);
-        storeu4(Y+i1, z1);
-    }
-    sa = add4(sa, ta);
-    sb = add4(sb, tb);
-    sc = add4(sc, tc);
-    
-    // process remaining blocks:
-    stop = blk_[size_];
-    #pragma nounroll
-    for ( ; M < stop; M += SB )
-    {
-        const size_t ii = inx[0];
-        ++inx;
-        //printf("--- %4i\n", ii);
-        vec4 ma = streamload4(M);
-        vec4 z = fmadd4(ma, xa, loadu4(Y+ii));
-        vec4 xyz = loadu4(X+ii);
-        sa = fmadd4(ma, xyz, sa);
+        //process 2 by 2:
+#pragma nounroll
+        for ( ; M < stop; M += 2*SB )
+        {
+            const size_t i0 = inx[0];
+            const size_t i1 = inx[1];
+            assert_true( i0 < i1 );
+            inx += 2;
+            //printf("--- %4i %4i\n", i0, i1);
+            vec4 ma0 = streamload4(M);
+            vec4 ma1 = streamload4(M+SB);
+            vec4 z0 = fmadd4(ma0, x0, loadu4(Y+i0));
+            vec4 z1 = fmadd4(ma1, x0, loadu4(Y+i1));
+            vec4 xyz0 = loadu4(X+i0);
+            vec4 xyz1 = loadu4(X+i1);
+            s0 = fmadd4(ma0, xyz0, s0);
+            t0 = fmadd4(ma1, xyz1, t0);
+            // multiply with the full block:
+            vec4 mb0 = streamload4(M+4);
+            vec4 mb1 = streamload4(M+(SB+4));
+            z0 = fmadd4(mb0, x1, z0);
+            z1 = fmadd4(mb1, x1, z1);
+            s1 = fmadd4(mb0, xyz0, s1);
+            t1 = fmadd4(mb1, xyz1, t1);
+            vec4 mc0 = streamload4(M+8);
+            vec4 mc1 = streamload4(M+(SB+8));
+            z0 = fmadd4(mc0, x2, z0);
+            z1 = fmadd4(mc1, x2, z1);
+            s2 = fmadd4(mc0, xyz0, s2);
+            t2 = fmadd4(mc1, xyz1, t2);
+            /*
+             Attention: the 4th elements of the vectors z0 and z1 would be correct,
+             because only zero was added to the value loaded from 'Y'. However, in the
+             case where the indices i0 and i1 are consecutive and reverted (i1 < i0),
+             the value stored in z0 would not have been updated giving a wrong results.
+             The solution is to either use a 'store3(Y+i1, z1)', or to make sure that
+             indices are non-consecutive or ordered in the column in increasing order.
+             This affects performance since 'store3' is slower than 'storeu4'
+             */
+            storeu4(Y+i0, z0);
+            storeu4(Y+i1, z1);
+        }
+        s0 = add4(s0, t0);
+        s1 = add4(s1, t1);
+        s2 = add4(s2, t2);
         
-        vec4 mb = streamload4(M+4);
-        z = fmadd4(mb, xb, z);
-        sb = fmadd4(mb, xyz, sb);
-        
-        vec4 mc = streamload4(M+8);
-        z = fmadd4(mc, xc, z);
-        sc = fmadd4(mc, xyz, sc);
-        storeu4(Y+ii, z);
+        // process remaining blocks:
+        stop = blk_[size_];
+        #pragma nounroll
+        for ( ; M < stop; M += SB )
+        {
+            const size_t ii = inx[0];
+            ++inx;
+            //printf("--- %4i\n", ii);
+            vec4 ma = streamload4(M);
+            vec4 z = fmadd4(ma, x0, loadu4(Y+ii));
+            vec4 xyz = loadu4(X+ii);
+            s0 = fmadd4(ma, xyz, s0);
+            
+            vec4 mb = streamload4(M+4);
+            z = fmadd4(mb, x1, z);
+            s1 = fmadd4(mb, xyz, s1);
+            
+            vec4 mc = streamload4(M+8);
+            z = fmadd4(mc, x2, z);
+            s2 = fmadd4(mc, xyz, s2);
+            storeu4(Y+ii, z);
+        }
     }
     // finally sum s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
-    xa = setzero4();
-    xb = add4(unpacklo4(sa, sb), unpackhi4(sa, sb));
-    xc = add4(unpacklo4(sc, xa), unpackhi4(sc, xa));
-    sa = add4(permute2f128(xb, xc, 0x21), blend4(xb, xc, 0b1100));
-    storeu4(Y+jj, add4(loadu4(Y+jj), sa));
-#endif
+    x0 = setzero4();
+    s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+    s2 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
+    s0 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+    storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
+#endif
 
 
+#if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) const
 {
-#if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
     real const* D = dia_;
     //multiply with the symmetrized block, assuming it has been symmetrized:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
@@ -1553,8 +1531,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
     s1 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
     store4(Y+jj, add4(load4(Y+jj), s1));
-#endif
 }
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -1594,7 +1572,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && ( REAL_IS_DOUBLE == 0 )
+#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
     #pragma unroll 4
@@ -1624,7 +1602,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 
 void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 )
+#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
     // process diagonal:
     vecMul3D_DIAG(X, Y);
     
@@ -1714,11 +1692,11 @@ void SparMatSymBlkDiag::vecMulAdd_TIME(const real* X, real* Y) const
 #if ( BLOCK_SIZE == 1 )
         column_[jj].vecMulAdd1D(X, Y, jj);
 #elif ( BLOCK_SIZE == 2 )
-        column_[jj].vecMulAdd2D_AVXU(X, Y, jj);
+        column_[jj].vecMulAdd2D(X, Y, jj);
 #elif ( BLOCK_SIZE == 3 )
-        column_[jj].vecMulAdd3D_AVXU(X, Y, jj);
+        column_[jj].vecMulAdd3D(X, Y, jj);
 #elif ( BLOCK_SIZE == 4 )
-        column_[jj].vecMulAdd4D_AVX(X, Y, jj);
+        column_[jj].vecMulAdd4D(X, Y, jj);
 #endif
     }
     /*

@@ -22,6 +22,17 @@
  
  SUBROUTINE DTRSM(SIDE,UPLO,TRANSA,DIAG,M,N,ALPHA,A,LDA,B,LDB)
  
+ DTRSM  solves one of the matrix equations
+ 
+    op( A )*X = alpha*B,   or   X*op( A ) = alpha*B,
+ 
+ where alpha is a scalar, X and B are m by n matrices, A is a unit, or
+ non-unit, upper or lower triangular matrix and op(A) is one of
+ 
+     op(A) = A   or   op(A) = A**T.
+ 
+ The matrix X is overwritten on B.
+ 
  SIDE   = 'L' : solves   op(A) * X = alpha * B.
         = 'R' : solves   X * op(A) = alpha * B.
  UPLO   = 'U' or 'L'
