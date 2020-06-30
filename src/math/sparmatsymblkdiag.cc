@@ -1369,7 +1369,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
     // load 3x3 matrix element into 3 vectors:
     {
         const real* D = dia_;
-        assert_small(D.asymmetry());
+        assert_small(dia_.asymmetry());
         vec4 tt = loadu4(X+jj);
         // multiply by diagonal elements:
         s0 = mul4(streamload4(D  ), tt);
@@ -1541,11 +1541,11 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
 #if ( BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
-    #pragma unroll 4
+    #pragma unroll (4)
     for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
     {
         real const* D = column_[jj].dia_;
-        assert_small(D.asymmetry());
+        assert_small(column_[jj].dia_.asymmetry());
         //multiply with the diagonal block, assuming it has been symmetrized:
         //real Y0 = M[0] * X0 + M[1] * X1 + M[2] * X2;
         //real Y1 = M[1] * X0 + M[4] * X1 + M[5] * X2;
@@ -1575,11 +1575,11 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 #if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
-    #pragma unroll 4
+    #pragma unroll (4)
     for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
     {
         real const* D = column_[jj].dia_;
-        assert_small(D.asymmetry());
+        assert_small(column_[jj].dia_.asymmetry());
         //multiply with the diagonal block, assuming it has been symmetrized:
         //real Y0 = M[0] * X0 + M[1] * X1 + M[2] * X2;
         //real Y1 = M[1] * X0 + M[4] * X1 + M[5] * X2;
