@@ -66,6 +66,7 @@ private:
         friend class Meca;
 
         Block    dia_;   ///< diagonal block
+        Block   last_;   ///< last off-diagonal block
         size_t  allo_;   ///< allocated size of array
         size_t  size_;   ///< number of blocks in column
         size_t * inx_;   ///< line index for each element
