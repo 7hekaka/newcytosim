@@ -732,13 +732,16 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
     const vec4f x2 = permute4f(tt, 0xAA);
+    
+    Block  const* blk = blk_;
+    size_t const* inx = inx_;
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
     for ( size_t n = 0; n < size_; ++n )
     {
-        const size_t ii = inx_[n];
-        real const* M = blk_[n];
+        real const* M = *blk++;
+        const size_t ii = *inx++;
 # if ( BLD == 4 )
         const vec4f m012 = streamload4f(M  );
         const vec4f m345 = streamload4f(M+4);
@@ -796,7 +799,10 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
     const vec4f x2 = permute4f(tt, 0xAA);
-    
+
+    Block  const* blk = blk_;
+    size_t const* inx = inx_;
+
     if ( size_ > 0 )
     {
 # if ( BLD == 4 )
@@ -815,11 +821,11 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
             #pragma nounroll
             for ( ; n < stop; n += 2 )
             {
-                const size_t ii = inx_[n  ];
-                const size_t kk = inx_[n+1];
+                real const* M = *blk++;
+                real const* P = *blk++;
+                const size_t ii = *inx++;
+                const size_t kk = *inx++;
                 assert_true( ii < kk );
-                real const* M = blk_[n  ];
-                real const* P = blk_[n+1];
 # if ( BLD == 4 )
                 const vec4f m012 = streamload4f(M  );
                 const vec4f m345 = streamload4f(M+4);
@@ -858,8 +864,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
         #pragma nounroll
         for ( ; n < size_; ++n )
         {
-            const size_t ii = inx_[n];
-            real const* M = blk_[n];
+            real const* M = *blk++;
+            const size_t ii = *inx++;
 # if ( BLD == 4 )
             const vec4f m012 = streamload4f(M  );
             const vec4f m345 = streamload4f(M+4);
@@ -931,18 +937,22 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     vec4f s1 = setzero4f();
     vec4f s2 = setzero4f();
 
-    size_t n = 0;
+    Block  const* blk = blk_;
+    size_t const* inx = inx_;
+    size_t const* end = inx_ + size_;
+    
+    //size_t n = 0;
     {
-        const size_t stop = 2 * (size_/2);
         // process 2 by 2
+        size_t const* stop = inx + 2 * (size_/2);
         #pragma nounroll
-        for ( ; n < stop; n += 2 )
+        for ( ; inx < stop; inx += 2 )
         {
-            const size_t ii = inx_[n  ];
-            const size_t kk = inx_[n+1];
+            real const* M = *blk++;
+            real const* P = *blk++;
+            const size_t ii = inx[0];
+            const size_t kk = inx[1];
             assert_true( ii < kk );
-            real const* M = blk_[n  ];
-            real const* P = blk_[n+1];
 # if ( BLD == 4 )
             const vec4f m012 = streamload4f(M  );
             const vec4f m345 = streamload4f(M+4);
@@ -977,12 +987,12 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
             storeu4f(Y+kk, t);
         }
     }
-    // process remaining blocks
-#pragma nounroll
-    for ( ; n < size_; ++n )
+    // process last remaining block
+//#pragma nounroll
+    if ( inx < end ) // for ( ; n < size_; ++n )
     {
-        const size_t ii = inx_[n];
-        real const* M = blk_[n];
+        real const* M = *blk;    // *blk++
+        const size_t ii = *inx;
 # if ( BLD == 4 )
         const vec4f m012 = streamload4f(M  );
         const vec4f m345 = streamload4f(M+4);
@@ -1081,6 +1091,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t j
 #endif
 }
 
+
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
 {
 #if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
@@ -1102,10 +1113,10 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t j
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < size_; ++n )
     {
-        const size_t& ii = inx_[n];
-        vec4 mat = streamload4(blk_[n]);      // load 2x2 matrix
-        vec4 yy = cast4(load2(Y+ii));   // yy = { Y0 Y1 0 0 }
-        vec4 xx = broadcast2(X+ii);     // xx = { X0 X1 X0 X1 }
+        const size_t ii = inx_[n];
+        vec4 mat = streamload4(blk_[n]); // load 2x2 matrix
+        vec4 yy = cast4(load2(Y+ii));    // yy = { Y0 Y1 0 0 }
+        vec4 xx = broadcast2(X+ii);      // xx = { X0 X1 X0 X1 }
 
         // multiply with the full block:
         //Y[ii  ] += M[0] * X0 + M[2] * X1;
@@ -1146,6 +1157,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
     vec4 ss = mul4(streamload4(dia_), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
+    
+    Block  const* blk = blk_;
+    size_t const* inx = inx_;
 
     size_t n = 0;
     const size_t stop = 2 * (size_/2);
@@ -1160,17 +1174,17 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, inx_[n  ], streamload4(blk_[n  ]), xxyy, ss);
-        multiply2D(X, Y, inx_[n+1], streamload4(blk_[n+1]), xxyy, s1);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, ss);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, s1);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = inx_[n  ];
-        const size_t i1 = inx_[n+1];
+        const size_t i0 = *inx++;
+        const size_t i1 = *inx++;
         assert_true( i0 < i1 );
-        vec4 mat0 = streamload4(blk_[n  ]);
-        vec4 mat1 = streamload4(blk_[n+1]);
+        vec4 mat0 = streamload4(*blk++);
+        vec4 mat1 = streamload4(*blk++);
         vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
         vec4 u1 = fmadd4(mat1, xxyy, cast4(load2(Y+i1)));
         ss = fmadd4(mat0, broadcast2(X+i0), ss);
@@ -1184,7 +1198,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
     // process remaining blocks:
     #pragma nounroll
     for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], streamload4(blk_[n]), xxyy, ss);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1203,6 +1217,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
 
+    Block  const* blk = blk_;
+    size_t const* inx = inx_;
+
     size_t n = 0;
     const size_t stop = 4 * (size_/4);
     // process 4 by 4:
@@ -1216,25 +1233,25 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, inx_[n  ], streamload4(blk_[n  ]), xxyy, ss);
-        multiply2D(X, Y, inx_[n+1], streamload4(blk_[n+1]), xxyy, s1);
-        multiply2D(X, Y, inx_[n+2], streamload4(blk_[n+2]), xxyy, s2);
-        multiply2D(X, Y, inx_[n+3], streamload4(blk_[n+3]), xxyy, s3);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, ss);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, s1);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, s2);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, s3);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = inx_[n  ];
-        const size_t i1 = inx_[n+1];
-        const size_t i2 = inx_[n+2];
-        const size_t i3 = inx_[n+3];
+        const size_t i0 = *inx++;
+        const size_t i1 = *inx++;
+        const size_t i2 = *inx++;
+        const size_t i3 = *inx++;
         assert_true( i0 < i1 );
         assert_true( i1 < i2 );
         assert_true( i2 < i3 );
-        vec4 mat0 = streamload4(blk_[n  ]);
-        vec4 mat1 = streamload4(blk_[n+1]);
-        vec4 mat2 = streamload4(blk_[n+2]);
-        vec4 mat3 = streamload4(blk_[n+3]);
+        vec4 mat0 = streamload4(*blk++);
+        vec4 mat1 = streamload4(*blk++);
+        vec4 mat2 = streamload4(*blk++);
+        vec4 mat3 = streamload4(*blk++);
         vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
         vec4 u1 = fmadd4(mat1, xxyy, cast4(load2(Y+i1)));
         vec4 u2 = fmadd4(mat2, xxyy, cast4(load2(Y+i2)));
@@ -1254,7 +1271,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t
     // process remaining blocks:
     #pragma nounroll
     for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], streamload4(blk_[n]), xxyy, ss);
+        multiply2D(X, Y, *inx++, streamload4(*blk++), xxyy, ss);
     /* finally sum ss = { S0 S0 S1 S1 } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1373,8 +1390,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     const real* M = blk_[0];
+    const size_t* inx = inx_;
     const real* stop = blk_[2*(size_/2)];
-    const size_t * inx = inx_;
     /*
      Unrolling will reduce the dependency chain, which may be limiting the
      throughput here. However the number of registers (16 for AVX CPU) limits

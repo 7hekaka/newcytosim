@@ -636,8 +636,8 @@ vec2 SparMatBlk::Line::vecMul2D(const real* X) const
 {
     vec4 ss = setzero4();
     const real* M = blk_[0];
+    const size_t* inx = inx_;
     const real* end = blk_[size_];
-    const size_t * inx = inx_;
     #pragma nounroll
     for ( ; M < end; M += 4 )
     {
@@ -665,8 +665,8 @@ vec2 SparMatBlk::Line::vecMul2DU(const real* X) const
     vec4 uu = setzero4();
     vec4 vv = setzero4();
     const real* M = sbk_[0];
+    const size_t* inx = inx_;
     const real* end = sbk_[size_-size_%4];
-    const size_t * inx = inx_;
     #pragma nounroll
     for ( ; M < end; M += SB )
     {
@@ -728,8 +728,8 @@ vec4 SparMatBlk::Line::vecMul3D(const real* X) const
     vec4 s2 = setzero4();
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     const real* M = blk_[0];
+    const size_t* inx = inx_;
     const real* end = blk_[size_];
-    const size_t * inx = inx_;
     #pragma nounroll
     for ( ; M < end; M += 12 )
     {
@@ -764,8 +764,8 @@ vec4 SparMatBlk::Line::vecMul3DU(const real* X) const
 
     static_assert(SB==12, "unexpected Block size");
     const real* M = sbk_[0];
+    const size_t* inx = inx_;
     const real* end = sbk_[size_-size_%2];
-    const size_t * inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
@@ -831,8 +831,8 @@ vec4 SparMatBlk::Line::vecMul3DUU(const real* X) const
     vec4 u2 = setzero4();
 
     const real* M = sbk_[0];
+    const size_t* inx = inx_;
     const real* end = sbk_[size_-size_%3];
-    const size_t * inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
