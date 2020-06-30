@@ -264,8 +264,16 @@ void testMatrix(MATRIX & mat,
     }
     double t2 = toc();
 
+    tic();
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
+    {
+        mat.vecMul(y, z);
+        mat.vecMul(x, z);
+    }
+    double t3 = toc();
+
     printf("\n   %-16s : ", mat.what().c_str());
-    printf("set %8.3f  mul %8.3f  alt %8.3f", ts, t1, t2);
+    printf("set %8.3f  add %8.3f  alt %8.3f  mul %8.3f", ts, t1, t2, t3);
     checkMatrix(mat, size, x, y, z);
 }
 
@@ -547,7 +555,7 @@ int main( int argc, char* argv[] )
     printf("Matrix test and timing code --- real %lu --- %s\n", sizeof(real), __VERSION__);
 
     RNG.seed();
-#if ( 1 )
+#if ( 0 )
         // small tests to check correctness:
         SparMat1 mat1;
         SparMatS mat2;
@@ -556,14 +564,14 @@ int main( int argc, char* argv[] )
 
         compare(4*3, mat1, mat3, 1<<4);
         compare(4*7, mat2, mat3, 1<<5);
-    /*
+#endif
+#if ( 0 )
         compare(4*11, mat1, mat3, 1<<6);
         compare(4*33, mat1, mat3, 1<<16);
         compare(4*3, mat1, mat4, 1<<16);
         compare(4*7, mat1, mat4, 1<<16);
         compare(4*11, mat1, mat4, 1<<16);
         compare(4*33, mat1, mat4, 1<<16);
-     */
 #endif
 #if ( 0 )
         testMatrices(6, 1);
