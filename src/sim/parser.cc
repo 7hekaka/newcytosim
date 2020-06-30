@@ -297,7 +297,8 @@ void Parser::parse_change(std::istream& is)
         else
             execute_change(name, opt, do_set);
  
-        check_warnings(opt, is, ipos, ~0U);
+        if ( do_set )
+            check_warnings(opt, is, ipos, ~0U);
     }
     else if ( para == "display" )
     {

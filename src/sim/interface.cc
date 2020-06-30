@@ -36,11 +36,8 @@ Interface::Interface(Simul& s)
  Property::complete() is called after a property is set.
  This ensures that inconsistencies are detected as early as possible.
  
- The drawback is that we cannot support cross-dependencies (A needs B and vice-versa).
- If that is necessary, we could:
- - call complete() for all Properties, after the parsing process is complete.
- - remove any check for the existence of invoked properties, in which case 
- error would be detected only when objects are created later.
+ In addition, we call complete() for all Properties, when the simulation is
+ about to start.
  */
 Property* Interface::execute_set(std::string const& cat, std::string const& name, Glossary& def)
 {
