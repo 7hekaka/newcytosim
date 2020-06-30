@@ -596,23 +596,24 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
 void Simul::reportFiberSegments(std::ostream& out) const
 {
     out << COM << ljust("class", 2, 2) << SEP << "fibers" << SEP << "joints";
-    out << SEP << "kinks" << SEP << "min_seg" << SEP << "max_seg";
+    out << SEP << "kinks" << SEP << "min_seg" << SEP << "max_seg" << SEP << "err_seg";
     
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         
         size_t cnt, points;
-        real mn = 0, mx = 0;
+        real mn = 0, mx = 0, dv = 0;
         
         ObjectList objs = fibers.collect(fp);
-        fibers.infoSegments(objs, cnt, points, mn, mx);
+        fibers.infoSegments(objs, cnt, points, mn, mx, dv);
         out << LIN << ljust(fp->name(), 2);
         out << SEP << cnt;
         out << SEP << points - 2 * cnt;
         out << SEP << fibers.nbKinks(objs);
         out << SEP << std::fixed << mn;
         out << SEP << std::fixed << mx;
+        out << SEP << std::fixed << dv;
     }
 }
 

@@ -807,13 +807,14 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
 }
 
 
-void FiberSet::infoSegments(ObjectList const& objs,
-                            size_t& cnt, size_t& points, real& mn, real& mx)
+void FiberSet::infoSegments(ObjectList const& objs, size_t& cnt, size_t& points,
+                            real& mn, real& mx, real& dv)
 {
     cnt = 0;
     points = 0;
     mn = INFINITY;
     mx = 0;
+    dv = 0;
     
     for ( Object * i : objs )
     {
@@ -826,6 +827,9 @@ void FiberSet::infoSegments(ObjectList const& objs,
             fib->segmentationMinMax(n, x);
             mn = std::min(mn, n);
             mx = std::max(mx, x);
+            n = abs_real(1.0 - n/fib->segmentation());
+            x = abs_real(1.0 - x/fib->segmentation());
+            dv = std::max(dv, std::max(n, x));
         }
     }
 }
