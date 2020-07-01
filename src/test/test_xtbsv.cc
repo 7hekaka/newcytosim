@@ -120,7 +120,7 @@ void testTBSV(size_t cnt)
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian3(NBS, AB, B);
-    TicToc::toc("    xpbtrsL   ");
+    TicToc::toc("    xtbsvLNN3 ");
     
 #if 0
     copy_real(NBS*DIM, Bs, B);

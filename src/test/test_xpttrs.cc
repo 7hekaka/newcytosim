@@ -115,6 +115,19 @@ void testThomas(size_t cnt)
         Us[i] = -RNG.preal();
         Bs[i] = RNG.sreal();
     }
+    
+    int info = 0;
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        copy_real(NBS, Bs, B);
+        lapack_xpttrf(NBS, D, U, &info);
+        lapack_xptts2(NBS, 1, D, U, B, 1);
+    }
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    TicToc::toc("    lapack");
 
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -122,6 +135,8 @@ void testThomas(size_t cnt)
         copy_real(NBS, Ds, D);
         copy_real(NBS, Us, U);
         copy_real(NBS, Bs, B);
+        //italian_xpttrf(NBS, D, U, &info);
+        //italian_xptts2(NBS, 1, D, U, B, 1);
         italian_thomas(NBS, U, D, U, B);
     }
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);

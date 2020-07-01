@@ -116,42 +116,62 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 
 /**
  This implements Thomas's algorithm to solve a linear system
- with a tridiagonal matrix {L, D, U} and right-hand side 'B'
+ with a tridiagonal matrix {L, D, U} and right-hand side vector 'B'
  
  L is lower diagonal, with valid index in [0, size-2]
  D is diagonal, with valid index in [0, size-1]
  U is upper diagonal, with valid index in [0, size-2]
- B is input/output, with valid index in [0, size-1]
+ B is input/output vector, with valid index in [0, size-1]
  
  This works even if 'L == U'
  
+ This code was not tested for L != U!!!
  Modified from:
  https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
  */
-void italian_thomas(size_t size, real const*L, real const* D, real* U, real* B)
+void italian_thomas(size_t size, real* L, real const* D, real* U, real* B)
 {
-    U[0] = U[0] / D[0];
-    B[0] = B[0] / D[0];
-    
+#if 0
+    D[0] = 1.0 / D[0];
+    B[0] = D[0] * B[0];
     if ( size > 1 )
     {
-        real e = L[0];
-        // upward recursion: U is changed, D and L are not changed
-        for ( size_t i = 1; i < size; ++i )
+        // upward recursion on B[]
+        for ( size_t n = 1; n < size; ++n )
         {
-            //const real m = 1.0 / (D[i] - L[i-1] * U[i-1]);
-            const real m = 1.0 / ( D[i] - e * U[i-1] );
-            //B[i] = (B[i] - L[i-1] * B[i-1]) * m;
-            B[i] = ( B[i] - e * B[i-1] ) * m;
-            e = L[i];
-            U[i] = U[i] * m;
+            D[n] = 1.0 / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
+            B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
         }
-        
-        // downward recursion: D[] and L[] are not used
+        // downward recursion on B[]
         for ( size_t i = size-2; i > 0; --i )
-            B[i] = B[i] - U[i] * B[i+1];
+            B[i] = B[i] - ( D[i] * U[i] ) * B[i+1];
+        B[0] = B[0] - ( D[0] * U[0] ) * B[1];
+    }
+#else
+    real l = L[0];
+    real e = U[0] * L[0];
+    real d = 1 / D[0];
+    U[0] = U[0] / D[0];
+    B[0] = B[0] / D[0];
+    if ( size > 1 )
+    {
+        // upward recursion on B[]
+        for ( size_t n = 1; n < size; ++n )
+        {
+            //D[n] = 1.0 / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
+            d = 1.0 / ( D[n] - e * d );
+            //B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
+            B[n] = d * ( B[n] - l * B[n-1] );
+            l = L[n];
+            e = l * U[n];
+            U[n] = U[n] * d;
+        }
+        // downward recursion on B[]
+        for ( size_t n = size-2; n > 0; --n )
+            B[n] = B[n] - U[n] * B[n+1];
         B[0] = B[0] - U[0] * B[1];
     }
+#endif
 }
 
 //------------------------------------------------------------------------------
