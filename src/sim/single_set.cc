@@ -6,6 +6,7 @@
 
 #include "simul.h"
 #include "simul_prop.h"
+#include "property_list.h"
 #include "wrist.h"
 #include "wrist_long.h"
 

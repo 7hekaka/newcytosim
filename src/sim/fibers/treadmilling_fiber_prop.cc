@@ -2,7 +2,6 @@
 #include <cmath>
 #include "treadmilling_fiber_prop.h"
 #include "treadmilling_fiber.h"
-#include "property_list.h"
 #include "exceptions.h"
 #include "glossary.h"
 #include "simul.h"

@@ -3,7 +3,6 @@
 #include "glossary.h"
 #include "messages.h"
 
-#include "property_list.h"
 #include "simul_prop.h"
 #include "hand_prop.h"
 #include "single.h"

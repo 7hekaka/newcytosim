@@ -5,7 +5,6 @@
 #include "messages.h"
 #include "classic_fiber_prop.h"
 #include "classic_fiber.h"
-#include "property_list.h"
 #include "exceptions.h"
 #include "glossary.h"
 #include "simul.h"

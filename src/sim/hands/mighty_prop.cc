@@ -4,7 +4,6 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "common.h"
-#include "property_list.h"
 #include "mighty_prop.h"
 #include "mighty.h"
 #include "simul.h"

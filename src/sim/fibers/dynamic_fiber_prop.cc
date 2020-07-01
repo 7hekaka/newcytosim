@@ -4,7 +4,6 @@
 #include "sim.h"
 #include "dynamic_fiber_prop.h"
 #include "dynamic_fiber.h"
-#include "property_list.h"
 #include "simul_prop.h"
 #include "exceptions.h"
 #include "glossary.h"

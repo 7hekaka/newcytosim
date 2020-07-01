@@ -4,7 +4,7 @@
 
 #include "object_set.h"
 #include "single.h"
-
+class PropertyList;
 
 /// a list of pointers to Single
 typedef Array<Single *> SingleList;

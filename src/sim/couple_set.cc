@@ -5,6 +5,7 @@
 #include "couple_prop.h"
 #include "fork_prop.h"
 #include "messages.h"
+#include "property_list.h"
 #include "crosslink_prop.h"
 #include "shackle_prop.h"
 #include "bridge_prop.h"
