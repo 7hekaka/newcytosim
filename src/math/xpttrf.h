@@ -129,7 +129,7 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
  Modified from:
  https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
  */
-void italian_thomas(size_t size, real* L, real const* D, real* U, real* B)
+void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
 {
 #if 0
     D[0] = 1.0 / D[0];
@@ -171,6 +171,39 @@ void italian_thomas(size_t size, real* L, real const* D, real* U, real* B)
             B[n] = B[n] - U[n] * B[n+1];
         B[0] = B[0] - U[0] * B[1];
     }
+#endif
+}
+
+
+/*
+ Translated to C from
+ https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+ */
+void tridiagonal_solve(size_t N, real* A, real* B, real* C, real* X)
+{
+#if 1
+    X[0] = X[0] / B[0];
+    B[0] = C[0] / B[0];
+    for ( size_t i = 1; i < N; ++i )
+    {
+        real W = 1.0 / ( B[i] - B[i-1] * A[i-1] );
+        X[i] = W * ( X[i] - A[i-1] * X[i-1] );
+        B[i] = W * C[i];
+    }
+    for ( size_t i = N-2; i > 0; --i )
+        X[i] = X[i] - B[i] * X[i+1];
+    X[0] = X[0] - B[0] * X[1];
+#else
+    for ( size_t i = 1; i < N; ++i )
+    {
+        real W = A[i-1] / B[i-1];
+        B[i] = B[i] - W * C[i-1];
+        X[i] = X[i] - W * X[i-1];
+    }
+    X[N-1] = X[N-1] / B[N-1];
+    for ( size_t i = N-2; i > 0; --i )
+        X[i] = (X[i] - C[i] * X[i+1]) / B[i];
+    X[0] = (X[0] - C[0] * X[1]) / B[0];
 #endif
 }
 
