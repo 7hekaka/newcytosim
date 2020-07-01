@@ -363,7 +363,7 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
     for ( size_t i = 0; i < ns; ++i )
     {
         sca[i] = mag[i] - cutcut;
-        err0 += abs_real(sca[i]);
+        err0 += abs_real(sca[i]);  // calculating the 1-norm
         dia[i] = mag[i] * 4;
         low[i] = pri[i] * (-2);  //accessing pri[ns-1], but not used
     }
@@ -381,7 +381,7 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
     printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
 #endif
     size_t cnt = 0;
-    while ( ++cnt < 16 )
+    while ( ++cnt < 8 )
     {
         assert_true( ns > 1 );
         // set the matrix elements and RHS of system,
@@ -429,11 +429,11 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
         }
         err += abs_real(val[ns-1]);
 #if ( 0 )
-        printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
-        //printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
-        printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+        printf("\n %3lu err %20.16f norm(val) %8.5e", cnt, err, blas::nrm2(ns, val));
+        //printf("\n     val "); VecPrint::print(std::cout, ns, val, 6);
+        //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 6);
 #endif
-        if ( err < 1e-10 )
+        if ( err < REAL_EPSILON )
             return 0;
         if ( err > err0 )
             return 3;
