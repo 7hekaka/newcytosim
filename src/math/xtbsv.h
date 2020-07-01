@@ -327,7 +327,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
             *INFO = J;
             return;
         }
-        dia = 1.0 / sqrt(dia);
+        dia = 1.0 / sqrt(dia); // inverse the diagonal term!!!
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
@@ -420,7 +420,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
     int jx = kx;
     for ( int j = N-1; j >= 0; --j )
     {
-        real temp[4];
+        real temp[ORD];
         for ( int d = 0; d < ORD; ++d )
             temp[d] = X[jx+d]; //real temp = X[jx];
         real* pX = X + kx;
@@ -492,6 +492,8 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
 
 #if defined(__AVX__) && REAL_IS_DOUBLE
+#include "simd.h"
+
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
 {
@@ -571,18 +573,38 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
         pA -= lda;
         pX -= ORD;
     }
+#if 0
     while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
     {
         vec4 a0 = loadu4(pX);
-        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
         a0 = fnmadd4(broadcast1(pA+2), a2, a0);  // a2 = load3(pX+6);
         a2 = a1;
+        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+        // change multiplier to preserve the original 4th position
         a0 = mul4(blend4(broadcast1(pA), one, 0b1000), a0);
-        storeu4(pX, a0);  //use the original 4th position
+        storeu4(pX, a0);
         a1 = blend4(a0, zero, 0b1000);
         pA -= lda;
         pX -= ORD;
     }
+#else
+    vec4 tt = broadcast1(a1);
+    vec4 af = loadu4(pX);
+    while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
+    {
+        vec4 a0 = fnmadd4(broadcast1(pA+2), a2, af);  // a2 = load3(pX+6);
+        af = loadu4(pX-ORD);
+        a2 = a1;
+        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+        // restore 4th position that was saved in 'tt'
+        a0 = blend4(mul4(broadcast1(pA), a0), tt, 0b1000);
+        tt = broadcast1(a0); // save 4th position for next round
+        storeu4(pX, a0);
+        a1 = blend4(a0, zero, 0b1000);
+        pA -= lda;
+        pX -= ORD;
+    }
+#endif
 }
 
 /*
@@ -700,6 +722,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
         pA -= lda;
         pX -= ORD;
     }
+#if 0
     while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
     {
         vec4f a0 = loadu4f(pX);
@@ -712,6 +735,24 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
         pA -= lda;
         pX -= ORD;
     }
+#else
+    vec4f tt = broadcast1f(a1);
+    vec4f af = loadu4f(pX);
+    while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
+    {
+        vec4f a0 = fnmadd4f(broadcast1f(pA+2), a2, af);  // a2 = load3(pX+6);
+        af = loadu4f(pX-ORD);
+        a2 = a1;
+        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);  // a1 = load3(pX+3);
+        // restore 4th position that was saved in 'tt'
+        a0 = blend4f(mul4f(broadcast1f(pA), a0), tt, 0b1000);
+        tt = broadcast1f(a0); // save 4th position for next round
+        storeu4f(pX, a0);
+        a1 = blend4f(a0, zero, 0b1000);
+        pA -= lda;
+        pX -= ORD;
+    }
+#endif
 }
 #endif
 

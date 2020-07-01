@@ -186,8 +186,8 @@ inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_
  */
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
-#define permute4(a,b)       _mm256_permute_pd(a,b)
-#define permute2(a,b)       _mm_permute_pd(a,b)       // same as shuffle2(a,a,k)
+#define permute4(a,k)       _mm256_permute_pd(a,k)
+#define permute2(a,k)       _mm_permute_pd(a,k)       // same as shuffle2(a,a,k)
 #define permute2f128(a,b,k) _mm256_permute2f128_pd(a,b,k)
 #define shuffle4(a,b,k)     _mm256_shuffle_pd(a,b,k)
 #define blend4(a,b,k)       _mm256_blend_pd(a,b,k)
@@ -259,7 +259,7 @@ inline vec4 normalize4(vec4 vec, double n)
 
 #ifdef __AVX2__
 
-#define permute4x64(a,b)    _mm256_permute4x64_pd(a,b)
+#define permute4x64(a,k)    _mm256_permute4x64_pd(a,k)
 #define rotater4(a)         _mm256_castsi256_pd(_m256_alignr_epi8(a, a, 1));
 #define rotatel4(a)         _mm256_castsi256_pd(_m256_alignr_epi8(a, a, 7));
 
@@ -267,7 +267,10 @@ inline vec4 normalize4(vec4 vec, double n)
 inline vec4 interleave4(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 0x50); }
 inline vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
 
+// copy a[0] into all elements of dst.
 inline vec4 broadcast1(vec2 a)  { return _mm256_broadcastsd_pd(a); }
+// copy a[0] into all elements of dst.
+inline vec4 broadcast1(vec4 a)  { return _mm256_broadcastsd_pd(cast2(a)); }
 
 
 /// cross product of two 3D vectors ( X Y Z T )

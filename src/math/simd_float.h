@@ -31,11 +31,16 @@ inline vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b); }
 inline vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
-#define permute4f(a,b)    _mm_permute_ps(a,b)       // same as shuffle2(a,a,b)
+#define permute4f(a,k)    _mm_permute_ps(a,k)       // same as shuffle2(a,a,b)
 #define shuffle4f(a,b,k)  _mm_shuffle_ps(a,b,k)
 #define blend4f(a,b,k)    _mm_blend_ps(a,b,k)
 
 #endif  // __SSE3__
+
+#ifdef __AVX__
+// copy a[0] into all elements of dst.
+inline vec4f broadcast1f(vec4f a)  { return _mm_permute_ps(a,0x00); }
+#endif
 
 //-------------------------- FMA Single Precision-------------------------------
 

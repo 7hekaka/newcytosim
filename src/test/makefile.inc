@@ -1,7 +1,7 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-TESTS:=test test_gillespie test_solve test_random test_math test_glos test_dpttrs\
+TESTS:=test test_gillespie test_solve test_random test_math test_glos test_xpttrs\
        test_quaternion test_code test_matrix test_thread test_blas test_pipe
 
 TESTS_GL:=test_opengl test_vbo test_glut test_glapp test_platonic\

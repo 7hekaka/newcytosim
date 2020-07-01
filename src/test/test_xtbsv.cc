@@ -23,7 +23,7 @@ const size_t NBS = 1240;
 const size_t DISP = 16UL;
 
 
-inline void alsatian0(int N, real const* AB, real* B)
+ void alsatian0(int N, real const* AB, real* B)
 {
     for ( int d = 0; d < DIM; ++d )
     {
@@ -32,7 +32,7 @@ inline void alsatian0(int N, real const* AB, real* B)
     }
 }
 
-inline void alsatian1(int N, real const* AB, real* B)
+ void alsatian1(int N, real const* AB, real* B)
 {
     for ( int d = 0; d < DIM; ++d )
     {
@@ -41,15 +41,25 @@ inline void alsatian1(int N, real const* AB, real* B)
     }
 }
 
-inline void alsatian2(int N, real const* AB, real* B)
+ void alsatian2(int N, real const* AB, real* B)
 {
     alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
     alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
 }
 
-inline void alsatian3(int N, real const* AB, real* B)
+ void alsatian3(int N, real const* AB, real* B)
 {
     alsatian_xtbsvLNN3(N, AB, LDAB, B);
+    alsatian_xtbsvLTN3(N, AB, LDAB, B);
+}
+
+ void alsatian4(int N, real const* AB, real* B)
+{
+    alsatian_xtbsvLNN3(N, AB, LDAB, B);
+}
+
+ void alsatian5(int N, real const* AB, real* B)
+{
     alsatian_xtbsvLTN3(N, AB, LDAB, B);
 }
 
@@ -61,7 +71,7 @@ inline void alsatian3(int N, real const* AB, real* B)
 void testTBSV(size_t cnt)
 {
     
-    std::cout << "testTBSV " << sizeof(real) << " " << __VERSION__ << "\n";
+    std::cout << "testTBSV sizeof(real)=" << sizeof(real) << " --- " << __VERSION__ << "\n";
 
     real * AB  = new_real(NBS*LDAB);
     real * Bs = new_real(NBS*DIM);
@@ -78,6 +88,7 @@ void testTBSV(size_t cnt)
     int info;
     alsatian_xpbtf2L<2>(NBS, AB, LDAB, &info);
     
+#if ( 0 )
     copy_real(NBS*DIM, Bs, B);
     alsatian0(NBS, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
@@ -85,7 +96,8 @@ void testTBSV(size_t cnt)
     for ( size_t n = 0; n < cnt; ++n )
         alsatian0(NBS, AB, B);
     TicToc::toc("    wrong BLAS");
-
+#endif
+    
     copy_real(NBS*DIM, Bs, B);
     alsatian1(NBS, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
@@ -108,8 +120,26 @@ void testTBSV(size_t cnt)
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian3(NBS, AB, B);
+    TicToc::toc("    xpbtrsL   ");
+    
+#if 0
+    copy_real(NBS*DIM, Bs, B);
+    alsatian4(NBS, AB, B);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        alsatian4(NBS, AB, B);
     TicToc::toc("    xtbsvLNN3 ");
-
+    
+    copy_real(NBS*DIM, Bs, B);
+    alsatian5(NBS, AB, B);
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 2);
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        alsatian5(NBS, AB, B);
+    TicToc::toc("    xtbsvLTN3 ");
+#endif
+    
     free_real(B);
     free_real(Bs);
     free_real(AB);
