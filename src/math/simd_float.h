@@ -14,8 +14,6 @@ inline vec4f setzero4f()                   { return _mm_setzero_ps(); }
 inline vec4f set4f(float a)                { return _mm_set1_ps(a); }
 inline vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 inline vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
-inline vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
-inline vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i const*)a); }
 inline void  store3f(float* a, vec4f b)    { a[0]=b[0]; a[1]=b[1]; a[2]=b[2]; }
 inline void  store4f(float* a, vec4f b)    { _mm_store_ps(a, b); }
 inline void  storeu4f(float* a, vec4f b)   { _mm_storeu_ps(a, b); }
@@ -31,11 +29,23 @@ inline vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b); }
 inline vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
-#define permute4f(a,b)    _mm_permute_ps(a,b)       // same as shuffle2(a,a,b)
 #define shuffle4f(a,b,k)  _mm_shuffle_ps(a,b,k)
 #define blend4f(a,b,k)    _mm_blend_ps(a,b,k)
 
 #endif  // __SSE3__
+
+#ifdef __AVX__
+// copy a[0] into all elements of destination
+inline vec4f broadcast1f(vec4f a)          { return _mm_permute_ps(a,0x00); }
+inline vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
+inline vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i const*)a); }
+#define permute4f(a,k)    _mm_permute_ps(a,k)
+#elif defined(__SSE3__)
+inline vec4f broadcast1f(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
+inline vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
+inline vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
+#define permute4f(a,k)    _mm_shuffle_ps(a,a,k)
+#endif
 
 //-------------------------- FMA Single Precision-------------------------------
 

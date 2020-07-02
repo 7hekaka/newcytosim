@@ -11,6 +11,7 @@
 #include "sim_thread.h"
 #include "display_prop.h"
 #include "player_prop.h"
+#include "property_list.h"
 
 class FiberDisp;
 class View;

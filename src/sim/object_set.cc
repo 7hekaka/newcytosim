@@ -7,6 +7,7 @@
 #include "glossary.h"
 #include "modulo.h"
 #include "space.h"
+#include "property_list.h"
 #include "simul.h"
 #include <errno.h>
 

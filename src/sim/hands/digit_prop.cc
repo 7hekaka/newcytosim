@@ -6,7 +6,6 @@
 #include "messages.h"
 #include "glossary.h"
 #include "exceptions.h"
-#include "property_list.h"
 #include "simul_prop.h"
 #include "digit_prop.h"
 #include "digit.h"

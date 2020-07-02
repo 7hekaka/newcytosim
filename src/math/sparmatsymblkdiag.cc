@@ -9,9 +9,18 @@
 
 // Flag to enable AVX implementation
 #ifdef __AVX__
-#  define MATRIXSSB_USES_AVX REAL_IS_DOUBLE
+#  include "simd.h"
+#  include "simd_float.h"
+#  define SMSBD_USES_AVX REAL_IS_DOUBLE
+#  define SMSBD_USES_SSE !REAL_IS_DOUBLE
+#elif defined(__SSE3__)
+#  include "simd.h"
+#  include "simd_float.h"
+#  define SMSBD_USES_AVX 0
+#  define SMSBD_USES_SSE !REAL_IS_DOUBLE
 #else
-#  define MATRIXSSB_USES_AVX 0
+#  define SMSBD_USES_AVX 0
+#  define SMSBD_USES_SSE 0
 #endif
 
 
@@ -414,13 +423,14 @@ size_t SparMatSymBlkDiag::nbElements(size_t start, size_t stop) const
 std::string SparMatSymBlkDiag::what() const
 {
     std::ostringstream msg;
-#if MATRIXSSB_USES_AVX
-    msg << "SMSBDx " << Block::what() << "*" << nbElements();
-#elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "SMSBDe " << Block::what() << "*" << nbElements();
+#if SMSBD_USES_AVX
+    msg << "SMSBDx ";
+#elif SMSBD_USES_SSE
+    msg << "SMSBDe ";
 #else
-    msg << "SMSBD " << Block::what() << "*" << nbElements();
+    msg << "SMSBD ";
 #endif
+    msg << Block::what() << "*" << nbElements();
     return msg.str();
 }
 
@@ -702,10 +712,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) c
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
 
-#ifdef __AVX__
-#include "simd_float.h"
-
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
 {
     // load 3x3 matrix diagonal element into 3 vectors:
@@ -779,7 +786,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_small(dia_.asymmetry());
@@ -920,7 +927,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
 /**
  Only process off-diagonal terms!
  */
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1029,12 +1036,9 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 }
 #endif
-#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
-
-#include "simd.h"
 
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const
@@ -1089,7 +1093,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t j
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
 {
     // xy = { X0 X1 X0 X1 }
@@ -1136,7 +1140,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t j
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSBD_USES_AVX
 inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
@@ -1147,7 +1151,7 @@ inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) const
 {
     vec4 xyxy = broadcast2(X+jj);
@@ -1204,7 +1208,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj) const
 {
     vec4 xyxy = broadcast2(X+jj);
@@ -1277,7 +1281,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) const
 {
     // load 3x3 matrix diagonal element into 3 vectors:
@@ -1361,7 +1365,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t j
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) const
 {
     vec4 s0, s1, s2;
@@ -1476,7 +1480,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
 #endif
 
 
-#if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 4 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) const
 {
     real const* D = dia_;
@@ -1538,7 +1542,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
-#if ( BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
     #pragma unroll (4)
@@ -1572,7 +1576,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
     #pragma unroll (4)
@@ -1602,7 +1606,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 
 void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
     // process diagonal:
     vecMul3D_DIAG(X, Y);
     
@@ -1615,7 +1619,7 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 #endif
 }
 
-#if MATRIXSSB_USES_AVX
+#if SMSBD_USES_AVX
 #   define VECMULADD2D vecMulAdd2D_AVXU
 #   define VECMULADD3D vecMulAdd3D_AVXU
 #   define VECMULADD4D vecMulAdd4D_AVX

@@ -6,7 +6,6 @@
 #include "common.h"
 #include "sim.h"
 #include <cmath>
-#include "property_list.h"
 #include "slider.h"
 #include "simul.h"
 

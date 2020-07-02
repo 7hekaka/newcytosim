@@ -2,7 +2,6 @@
 // Copyright Cambridge University, 2019
 
 #include "tubule_prop.h"
-#include "property_list.h"
 #include "simul_prop.h"
 #include "solid_prop.h"
 #include "fiber_prop.h"

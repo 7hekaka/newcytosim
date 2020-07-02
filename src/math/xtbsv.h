@@ -4,6 +4,12 @@
 #ifndef XTBSV_H
 #define XTBSV_H
 
+#ifdef __AVX__
+#  include "simd.h"
+#  include "simd_float.h"
+#elif defined(__SSE3__)
+#  include "simd_float.h"
+#endif
 
 /**
  This is a C-translation of the BLAS reference implementation of DTBSV
@@ -27,6 +33,7 @@ void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real*
             {
                 const real * pA = A + KD + j * lda;
                 if ( diag == 'N' ) X[j] /= pA[0];
+                else if ( diag == 'I' ) X[j] *= pA[0];
                 real temp = X[j];
                 const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
@@ -48,6 +55,7 @@ void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real*
                 int ix = kx;
                 const real * pA = A + KD + j * lda;
                 if ( diag == 'N' ) X[jx] /= pA[0];
+                else if ( diag == 'I' ) X[jx] *= pA[0];
                 real temp = X[jx];
                 const int inf = std::max(0, j-KD);
                 for (int i = j - 1; i >= inf; --i)
@@ -73,6 +81,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
             {
                 const real * pA = A + j * lda;
                 if ( diag == 'N' ) X[j] /= pA[0];
+                else if ( diag == 'I' ) X[j] *= pA[0];
                 real temp = X[j];
                 const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
@@ -94,6 +103,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
                 int ix = kx;
                 const real * pA = A + j * lda;
                 if ( diag == 'N' ) X[jx] /= pA[0];
+                else if ( diag == 'I' ) X[jx] *= pA[0];
                 real temp = X[jx];
                 const int sup = std::min(N-1, j+KD);
                 for (int i = j + 1; i <= sup; ++i)
@@ -120,6 +130,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
             for (int i = std::max(0, j-KD); i < j; ++i)
                 temp -= pA[i-j] * X[i];
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[j] = temp;
         }
     }
@@ -140,6 +151,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
                 ix += incX;
             }
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[jx] = temp;
             jx += incX;
             if (j >= KD)
@@ -162,6 +174,7 @@ void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real*
             for (int i = sup; i > j; --i)
                 temp -= pA[i-j] * X[i];
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[j] = temp;
         }
     }
@@ -183,6 +196,7 @@ void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real*
                 ix -= incX;
             }
             if ( diag == 'N' ) temp /= pA[0];
+            else if ( diag == 'I' ) temp *= pA[0];
             X[jx] = temp;
             jx -= incX;
             if ( j < N-KD )
@@ -319,7 +333,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
             *INFO = J;
             return;
         }
-        dia = 1.0 / sqrt(dia);
+        dia = 1.0 / sqrt(dia); // inverse the diagonal term!!!
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
@@ -374,7 +388,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
 
 #if ( 1 )
 
-/// this version is fast...
+/// this version is quite fast...
 template < int ORD >
 void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
@@ -412,7 +426,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
     int jx = kx;
     for ( int j = N-1; j >= 0; --j )
     {
-        real temp[4];
+        real temp[ORD];
         for ( int d = 0; d < ORD; ++d )
             temp[d] = X[jx+d]; //real temp = X[jx];
         real* pX = X + kx;
@@ -483,7 +497,8 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
 
-#if defined(__AVX__) && REAL_IS_DOUBLE
+#if defined(__AVX__)
+
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
 {
@@ -539,7 +554,6 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     const double*const end = pA;
     constexpr int ORD = 3;
     const vec4 zero = setzero4();
-    const vec4 one = set4(1.0);
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
     vec4 a1 = zero;
@@ -563,14 +577,18 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
         pA -= lda;
         pX -= ORD;
     }
+    vec4 tt = broadcast1(a1);
+    vec4 af = loadu4(pX);
     while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
     {
-        vec4 a0 = loadu4(pX);
-        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
-        a0 = fnmadd4(broadcast1(pA+2), a2, a0);  // a2 = load3(pX+6);
+        vec4 a0 = fnmadd4(broadcast1(pA+2), a2, af);  // a2 = load3(pX+6);
+        af = loadu4(pX-ORD);
         a2 = a1;
-        a0 = mul4(blend4(broadcast1(pA), one, 0b1000), a0);
-        storeu4(pX, a0);  //use the original 4th position
+        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+        // restore 4th position that was saved in 'tt'
+        a0 = blend4(mul4(broadcast1(pA), a0), tt, 0b1000);
+        tt = broadcast1(a0); // save 4th position for next round
+        storeu4(pX, a0);
         a1 = blend4(a0, zero, 0b1000);
         pA -= lda;
         pX -= ORD;
@@ -607,12 +625,10 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
      }
  }
 */
-
 #endif
-#if defined(__SSE3__) && !REAL_IS_DOUBLE
 
-#include "simd_float.h"
 
+#if defined(__SSE3__)
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 {
@@ -660,15 +676,15 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
         //pX += ORD;
     }
 }
+#endif
 
-
+#if defined(__SSE3__)
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 {
     const float*const end = pA;
     constexpr int ORD = 3;
     const vec4f zero = setzero4f();
-    const vec4f one = set4f(1.0);
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
     vec4f a1 = zero;
@@ -692,14 +708,18 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
         pA -= lda;
         pX -= ORD;
     }
+    vec4f tt = broadcast1f(a1);
+    vec4f af = loadu4f(pX);
     while ( pA >= end ) // for ( int j = N-3; j >= 0; --j )
     {
-        vec4f a0 = loadu4f(pX);
-        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);  // a1 = load3(pX+3);
-        a0 = fnmadd4f(broadcast1f(pA+2), a2, a0);  // a2 = load3(pX+6);
+        vec4f a0 = fnmadd4f(broadcast1f(pA+2), a2, af);  // a2 = load3(pX+6);
+        af = loadu4f(pX-ORD);
         a2 = a1;
-        a0 = mul4f(blend4f(broadcast1f(pA), one, 0b1000), a0);
-        storeu4f(pX, a0);  //use the original 4th position
+        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);  // a1 = load3(pX+3);
+        // restore 4th position that was saved in 'tt'
+        a0 = blend4f(mul4f(broadcast1f(pA), a0), tt, 0b1000);
+        tt = broadcast1f(a0); // save 4th position for next round
+        storeu4f(pX, a0);
         a1 = blend4f(a0, zero, 0b1000);
         pA -= lda;
         pX -= ORD;
@@ -708,7 +728,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 #endif
 
 
-#if defined(__SSE3__) && REAL_IS_DOUBLE
+#if defined(__SSE3__)
 
 /// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX)
@@ -782,7 +802,7 @@ void alsatian_xtbsvLTN2(const int N, const double* pA, const int lda, double* pX
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLNN1(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
 {
     real a1 = pX[0]; //may load garbage
     real a2 = pX[1]; //may load garbage
@@ -814,7 +834,7 @@ void alsatian_xtbsvLNN1(const int N, const double* pA, const int lda, double* pX
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLTN1(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
@@ -904,7 +924,7 @@ inline void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real*
 
 
 template < int ORD >
-inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
@@ -945,7 +965,7 @@ inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     }
     else
         ABORT_NOW("unexpected DIM!");
-#elif defined(__AVX__) && !REAL_IS_DOUBLE
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
     if ( ORD == 3 )
     {
         alsatian_xtbsvLNN3(N, AB, LDAB, B);

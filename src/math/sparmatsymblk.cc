@@ -9,11 +9,19 @@
 
 // Flag to enable AVX implementation
 #ifdef __AVX__
-#  define MATRIXSSB_USES_AVX REAL_IS_DOUBLE
+#  include "simd.h"
+#  include "simd_float.h"
+#  define SMSB_USES_AVX REAL_IS_DOUBLE
+#  define SMSB_USES_SSE !REAL_IS_DOUBLE
+#elif defined(__SSE3__)
+#  include "simd.h"
+#  include "simd_float.h"
+#  define SMSB_USES_AVX 0
+#  define SMSB_USES_SSE !REAL_IS_DOUBLE
 #else
-#  define MATRIXSSB_USES_AVX 0
+#  define SMSB_USES_AVX 0
+#  define SMSB_USES_SSE 0
 #endif
-
 
 SparMatSymBlk::SparMatSymBlk()
 {
@@ -438,15 +446,16 @@ size_t SparMatSymBlk::nbElements(size_t start, size_t stop) const
 std::string SparMatSymBlk::what() const
 {
     std::ostringstream msg;
-#if MATRIXSSB_USES_AVX
-    msg << "SMSBx " << Block::what() << "*" << nbElements();
+#if SMSB_USES_AVX
+    msg << "SMSBx ";
 #elif defined(__SSE3__) &&  REAL_IS_DOUBLE
-    msg << "SMSBe " << Block::what() << "*" << nbElements();
-#elif defined(__SSE3__) && !REAL_IS_DOUBLE
-    msg << "SMSBs " << Block::what() << "*" << nbElements();
+    msg << "SMSBe ";
+#elif SMSB_USES_SSE
+    msg << "SMSBf ";
 #else
-    msg << "SMSB " << Block::what() << "*" << nbElements();
+    msg << "SMSB ";
 #endif
+    msg << Block::what() << "*" << nbElements();
     return msg.str();
 }
 
@@ -728,11 +737,7 @@ void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
 
-#ifdef __AVX__
-
-#include "simd_float.h"
-
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSB_USES_SSE
 void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -806,7 +811,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSB_USES_SSE
 void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -932,12 +937,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
 }
 #endif
 
-#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
-
-#include "simd.h"
 
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const
@@ -992,7 +994,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) c
 }
 #endif
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX
 void SparMatSymBlk::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1041,7 +1043,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) c
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX
 inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
@@ -1052,7 +1054,7 @@ inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX
 void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1108,7 +1110,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) 
 #endif
 
 
-#if ( BLOCK_SIZE == 2 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX
 void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1180,7 +1182,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj)
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 3 ) && SMSB_USES_AVX
 void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1266,7 +1268,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) c
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 3 ) && SMSB_USES_AVX
 void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1380,7 +1382,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) 
 #endif
 
 
-#if ( BLOCK_SIZE == 4 ) && MATRIXSSB_USES_AVX
+#if ( BLOCK_SIZE == 4 ) && SMSB_USES_AVX
 void SparMatSymBlk::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1450,7 +1452,7 @@ void SparMatSymBlk::vecMul(const real* X, real* Y) const
     vecMulAdd(X, Y, 0, size_);
 }
 
-#if MATRIXSSB_USES_AVX
+#if SMSB_USES_AVX
 #   define VECMULADD2D vecMulAdd2D_AVXU
 #   define VECMULADD3D vecMulAdd3D_AVXU
 #   define VECMULADD4D vecMulAdd4D_AVX

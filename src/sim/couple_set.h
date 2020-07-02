@@ -7,6 +7,7 @@
 #include "couple.h"
 #include "couple_prop.h"
 
+class PropertyList;
 
 /// a list of pointers to Single
 typedef Array<Couple *> CoupleList;

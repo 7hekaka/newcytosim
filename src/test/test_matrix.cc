@@ -275,7 +275,7 @@ void testMatrix(MATRIX & mat,
     }
     double t3 = toc();
 
-    printf("\n   %-16s : ", mat.what().c_str());
+    printf("\n%-20s : ", mat.what().c_str());
     printf("set %8.3f  add %8.3f  alt %8.3f  mul %8.3f", ts, t1, t2, t3);
     checkMatrix(mat, size, x, y, z);
 }
@@ -349,7 +349,7 @@ void testMatrixParallel(MATRIX & mat,
     }
     double t4 = toc();
 
-    printf("\n %20s threaded mul :  x2  %8.3f  x4  %8.3f", mat.what().c_str(), t2, t4);
+    printf("\n%-24s threaded mul :  x2  %8.3f  x4  %8.3f", mat.what().c_str(), t2, t4);
     checkMatrixParallel(mat, size, x, y, z);
 }
 
@@ -618,7 +618,7 @@ int main( int argc, char* argv[] )
         testMatrices(DIM*714, 1<<14);
         testMatrices(DIM*1358, 1<<15);
         testMatrices(DIM*2130, 1<<16);
-        testMatrices(DIM*4323, 1<<17);
+        testMatrices(DIM*4323, 1<<19);
 #endif
 #if ( 0 )
         //testMatrices(DIM*17, 23);

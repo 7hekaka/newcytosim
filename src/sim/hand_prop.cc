@@ -7,7 +7,6 @@
 #include "glossary.h"
 #include "common.h"
 #include "sim.h"
-#include "property_list.h"
 #include "simul_prop.h"
 #include "simul.h"
 #include "hand.h"

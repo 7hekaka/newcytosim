@@ -5,7 +5,6 @@
 #include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "property_list.h"
 #include "duo_prop.h"
 #include "duo.h"
 #include "duo_long.h"

@@ -3,7 +3,6 @@
 #include "solid_prop.h"
 #include "glossary.h"
 #include "messages.h"
-#include "property_list.h"
 #include "simul_prop.h"
 #include "simul.h"
 #include "sim.h"

@@ -5,7 +5,6 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "common.h"
-#include "property_list.h"
 #include "motor_prop.h"
 #include "motor.h"
 #include "simul.h"

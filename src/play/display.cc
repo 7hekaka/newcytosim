@@ -2,6 +2,7 @@
 
 #include "display.h"
 #include "organizer.h"
+#include "property_list.h"
 #include "hand_prop.h"
 #include "sphere_prop.h"
 #include "fiber_prop.h"

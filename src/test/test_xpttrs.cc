@@ -24,8 +24,6 @@ const size_t DISP = 16UL;
  */
 void testDPTT(size_t cnt)
 {
-    std::cout << "testDPTT " << __VERSION__ << "\n";
-
     real * D = new_real(NBS);
     real * U = new_real(NBS);
     real * B = new_real(NBS);
@@ -100,8 +98,6 @@ void testDPTT(size_t cnt)
  */
 void testThomas(size_t cnt)
 {
-    std::cout << "testThomas " << __VERSION__ << "\n";
-
     real * D = new_real(NBS);
     real * U = new_real(NBS);
     real * B = new_real(NBS);
@@ -115,6 +111,19 @@ void testThomas(size_t cnt)
         Us[i] = -RNG.preal();
         Bs[i] = RNG.sreal();
     }
+    
+    int info = 0;
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        copy_real(NBS, Bs, B);
+        lapack::xpttrf(NBS, D, U, &info);
+        lapack::xptts2(NBS, 1, D, U, B, 1);
+    }
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    TicToc::toc("    lapack");
 
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -122,6 +131,8 @@ void testThomas(size_t cnt)
         copy_real(NBS, Ds, D);
         copy_real(NBS, Us, U);
         copy_real(NBS, Bs, B);
+        //italian_xpttrf(NBS, D, U, &info);
+        //italian_xptts2(NBS, 1, D, U, B, 1);
         italian_thomas(NBS, U, D, U, B);
     }
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
@@ -137,7 +148,18 @@ void testThomas(size_t cnt)
     }
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     TicToc::toc("  alsatian");
-    
+
+    TicToc::tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        copy_real(NBS, Bs, B);
+        tridiagonal_solve(NBS, U, D, U, B);
+    }
+    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    TicToc::toc("  tridiag.");
+
     free_real(D);
     free_real(U);
     free_real(B);
@@ -149,9 +171,10 @@ void testThomas(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
+    std::cout << "testPTTRS  --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
 
-    testThomas(1<<16);
-    testDPTT(1<<17);
+    testThomas(1<<14);
+    //testDPTT(1<<17);
     
     return EXIT_SUCCESS;
 }

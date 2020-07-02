@@ -8,7 +8,6 @@
 #include "mecable.h"
 #include "mecapoint.h"
 #include "display_prop.h"
-#include "property_list.h"
 #include "gle_color.h"
 
 class Simul;
@@ -29,6 +28,7 @@ class Bead;
 class BeadSet;
 class FieldSet;
 class FiberProp;
+class PropertyList;
 
 /// defining the DISPLAY keyword enables display code in included files
 #define DISPLAY

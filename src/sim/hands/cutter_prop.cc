@@ -4,7 +4,6 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "common.h"
-#include "property_list.h"
 #include "cutter_prop.h"
 #include "cutter.h"
 #include "simul.h"

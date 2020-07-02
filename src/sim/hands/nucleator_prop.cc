@@ -5,7 +5,6 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "common.h"
-#include "property_list.h"
 #include "nucleator_prop.h"
 #include "nucleator.h"
 #include "simul.h"

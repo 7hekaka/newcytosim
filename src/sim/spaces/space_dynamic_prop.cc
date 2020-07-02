@@ -3,7 +3,6 @@
 #include <cmath>
 #include "space_prop.h"
 #include "space_dynamic_prop.h"
-#include "property_list.h"
 #include "glossary.h"
 #include "simul_prop.h"
 #include "simul.h"

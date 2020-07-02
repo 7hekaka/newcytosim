@@ -4,7 +4,6 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "common.h"
-#include "property_list.h"
 #include "simul_prop.h"
 #include "chewer_prop.h"
 #include "chewer.h"
