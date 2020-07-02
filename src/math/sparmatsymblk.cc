@@ -9,11 +9,19 @@
 
 // Flag to enable AVX implementation
 #ifdef __AVX__
+#  include "simd.h"
+#  include "simd_float.h"
 #  define SMSB_USES_AVX REAL_IS_DOUBLE
+#  define SMSB_USES_SSE !REAL_IS_DOUBLE
+#elif defined(__SSE3__)
+#  include "simd.h"
+#  include "simd_float.h"
+#  define SMSB_USES_AVX 0
+#  define SMSB_USES_SSE !REAL_IS_DOUBLE
 #else
 #  define SMSB_USES_AVX 0
+#  define SMSB_USES_SSE 0
 #endif
-
 
 SparMatSymBlk::SparMatSymBlk()
 {
@@ -442,8 +450,8 @@ std::string SparMatSymBlk::what() const
     msg << "SMSBx ";
 #elif defined(__SSE3__) &&  REAL_IS_DOUBLE
     msg << "SMSBe ";
-#elif defined(__SSE3__) && !REAL_IS_DOUBLE
-    msg << "SMSBs ";
+#elif SMSB_USES_SSE
+    msg << "SMSBf ";
 #else
     msg << "SMSB ";
 #endif
@@ -729,11 +737,7 @@ void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
 
-#ifdef __AVX__
-
-#include "simd_float.h"
-
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSB_USES_SSE
 void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -807,7 +811,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSB_USES_SSE
 void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -933,12 +937,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
 }
 #endif
 
-#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
-
-#include "simd.h"
 
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const

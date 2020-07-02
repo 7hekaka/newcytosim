@@ -195,11 +195,8 @@ inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_
 #define cmp4(a,b,k)         _mm256_cmp_pd(a,b,k)
 
 /// concatenate two vec2 into a vec4
-inline vec4 cat4(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
-inline vec4 cat4(vec2 h, vec4 l) { return _mm256_insertf128_pd(l, h, 1); }
-
-//inline vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
-//#define cat4(h, l)           _mm256_set_m128d(h, l)
+inline vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
+inline vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); }
 
 #if 0
   inline vec4  load3(double const* a)    { return blend4(cast4(loadu2(a)), broadcast1(a+2), 0b0100); }
@@ -302,6 +299,7 @@ inline vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 inline vec4 interleave4(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
 inline vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
+inline vec4 broadcast1(vec4 a)  { return _mm256_movedup_pd(_mm256_set_m128d(cast2(a), cast2(a))); }
 
 #endif
 

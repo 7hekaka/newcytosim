@@ -9,6 +9,7 @@
 #include "vecprint.h"
 #include "blas.h"
 #include "lapack.h"
+#include "simd.h"
 #include "assert_macro.h"
 #include "xtbsv.h"
 #include "cytoblas.h"
@@ -49,18 +50,33 @@ const size_t DISP = 16UL;
 
  void alsatian3(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN3(N, AB, LDAB, B);
-    alsatian_xtbsvLTN3(N, AB, LDAB, B);
+    alsatian_xpbtrsL<DIM>(N, AB, LDAB, B);
 }
 
- void alsatian4(int N, real const* AB, real* B)
+void alsatian4(int N, real const* AB, real* B)
 {
+#ifdef __AVX__
+#if ( DIM == 1 )
+    alsatian_xtbsvLNN1(N, AB, LDAB, B);
+#elif ( DIM == 2 )
+    alsatian_xtbsvLNN2(N, AB, LDAB, B);
+#elif ( DIM == 3 )
     alsatian_xtbsvLNN3(N, AB, LDAB, B);
+#endif
+#endif
 }
 
- void alsatian5(int N, real const* AB, real* B)
+void alsatian5(int N, real const* AB, real* B)
 {
+#ifdef __AVX__
+#if ( DIM == 1 )
+    alsatian_xtbsvLTN1(N, AB, LDAB, B);
+#elif ( DIM == 2 )
+    alsatian_xtbsvLTN2(N, AB, LDAB, B);
+#elif ( DIM == 3 )
     alsatian_xtbsvLTN3(N, AB, LDAB, B);
+#endif
+#endif
 }
 
 

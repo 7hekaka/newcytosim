@@ -9,9 +9,18 @@
 
 // Flag to enable AVX implementation
 #ifdef __AVX__
+#  include "simd.h"
+#  include "simd_float.h"
 #  define SMSBD_USES_AVX REAL_IS_DOUBLE
+#  define SMSBD_USES_SSE !REAL_IS_DOUBLE
+#elif defined(__SSE3__)
+#  include "simd.h"
+#  include "simd_float.h"
+#  define SMSBD_USES_AVX 0
+#  define SMSBD_USES_SSE !REAL_IS_DOUBLE
 #else
 #  define SMSBD_USES_AVX 0
+#  define SMSBD_USES_SSE 0
 #endif
 
 
@@ -416,7 +425,7 @@ std::string SparMatSymBlkDiag::what() const
     std::ostringstream msg;
 #if SMSBD_USES_AVX
     msg << "SMSBDx ";
-#elif defined(__SSE3__) &&  REAL_IS_DOUBLE
+#elif SMSBD_USES_SSE
     msg << "SMSBDe ";
 #else
     msg << "SMSBD ";
@@ -703,10 +712,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) c
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
 
-#ifdef __AVX__
-#include "simd_float.h"
-
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
 {
     // load 3x3 matrix diagonal element into 3 vectors:
@@ -780,7 +786,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t j
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_small(dia_.asymmetry());
@@ -921,7 +927,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
 /**
  Only process off-diagonal terms!
  */
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
@@ -1030,12 +1036,9 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 }
 #endif
-#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
-
-#include "simd.h"
 
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const
@@ -1539,7 +1542,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
-#if ( BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_AVX
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
     #pragma unroll (4)
@@ -1573,7 +1576,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 #endif
 
 
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
 void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 {
     #pragma unroll (4)
@@ -1603,7 +1606,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 
 void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE
     // process diagonal:
     vecMul3D_DIAG(X, Y);
     

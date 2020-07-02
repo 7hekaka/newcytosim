@@ -8,18 +8,18 @@
 #include <iomanip>
 #include <sstream>
 
-#ifdef __SSE3__
-#  define MATRIX1_USES_SSE REAL_IS_DOUBLE
-#  include "simd.h"
-#else
-#  define MATRIX1_USES_SSE 0
-#endif
 
 #ifdef __AVX__
 #  define MATRIX1_USES_AVX REAL_IS_DOUBLE
+#  define MATRIX1_USES_SSE 0
+#  include "simd.h"
+#elif defined(__SSE3__)
+#  define MATRIX1_USES_AVX 0
+#  define MATRIX1_USES_SSE REAL_IS_DOUBLE
 #  include "simd.h"
 #else
 #  define MATRIX1_USES_AVX 0
+#  define MATRIX1_USES_SSE 0
 #endif
 
 
