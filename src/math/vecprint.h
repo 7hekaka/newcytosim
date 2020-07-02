@@ -12,14 +12,14 @@ namespace VecPrint
 {
     /// print 'm' components of 'vec' on a line
     template< typename T >
-    std::ostream& print(std::ostream& os, size_t m, const T* vec, int digits = 3)
+    std::ostream& print(std::ostream& os, size_t m, const T* vec, int digits = 2)
     {
         if ( !vec || m == 0 )
             os << " void";
         else
         {
             char str[32], fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
             for ( size_t i = 0; i < m; ++i )
             {
                 snprintf(str, sizeof(str), fmt, vec[i]);

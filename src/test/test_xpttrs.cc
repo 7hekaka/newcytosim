@@ -24,8 +24,6 @@ const size_t DISP = 16UL;
  */
 void testDPTT(size_t cnt)
 {
-    std::cout << "testDPTT " << __VERSION__ << "\n";
-
     real * D = new_real(NBS);
     real * U = new_real(NBS);
     real * B = new_real(NBS);
@@ -100,8 +98,6 @@ void testDPTT(size_t cnt)
  */
 void testThomas(size_t cnt)
 {
-    std::cout << "testThomas " << __VERSION__ << "\n";
-
     real * D = new_real(NBS);
     real * U = new_real(NBS);
     real * B = new_real(NBS);
@@ -175,6 +171,7 @@ void testThomas(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
+    std::cout << "testPTTRS  --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
 
     testThomas(1<<14);
     //testDPTT(1<<17);

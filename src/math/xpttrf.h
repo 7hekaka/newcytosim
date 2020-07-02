@@ -176,12 +176,13 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
 
 
 /*
- Translated to C from
+ Adapted from
  https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
  */
 void tridiagonal_solve(size_t N, real* A, real* B, real* C, real* X)
 {
 #if 1
+    // revised version to supress divisions in the downward recursion
     X[0] = X[0] / B[0];
     B[0] = C[0] / B[0];
     for ( size_t i = 1; i < N; ++i )
@@ -194,6 +195,7 @@ void tridiagonal_solve(size_t N, real* A, real* B, real* C, real* X)
         X[i] = X[i] - B[i] * X[i+1];
     X[0] = X[0] - B[0] * X[1];
 #else
+    // wikipedia's version translated to C
     for ( size_t i = 1; i < N; ++i )
     {
         real W = A[i-1] / B[i-1];

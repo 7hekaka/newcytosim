@@ -71,7 +71,7 @@ const size_t DISP = 16UL;
 void testTBSV(size_t cnt)
 {
     
-    std::cout << "testTBSV sizeof(real)=" << sizeof(real) << " --- " << __VERSION__ << "\n";
+    std::cout << "testTBSV --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
 
     real * AB  = new_real(NBS*LDAB);
     real * Bs = new_real(NBS*DIM);
