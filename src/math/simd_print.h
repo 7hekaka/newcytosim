@@ -11,8 +11,6 @@
 
 #ifdef __SSE3__
 
-#include <pmmintrin.h>
-
 /// print SIMD vector of 2 doubles
 inline void dump(__m128d v, char const* s)
 {

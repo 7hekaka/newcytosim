@@ -4,11 +4,11 @@
 #ifndef SIMD_H
 #define SIMD_H
 
+#include <immintrin.h>
+
 //---------------------------------- SSE ---------------------------------------
 
 #ifdef __SSE3__
-
-#include <pmmintrin.h>
 
 /// Vector of 2 doubles
 typedef __m128d vec2;
@@ -108,8 +108,6 @@ inline vec2 normalize2(vec2 vec, double n)
 //---------------------------------- AVX ---------------------------------------
 
 #ifdef __AVX__
-
-#include <immintrin.h>
 
 /// Vector of 4 doubles
 typedef __m256d vec4;

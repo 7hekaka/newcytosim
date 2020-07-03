@@ -1,11 +1,14 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 // Wednesday 24 June 2020 was a very nice day in Strasbourg
 
+#ifndef SIMD_FLOAT_H
+#define SIMD_FLOAT_H
+
+#include <immintrin.h>
+
 //--------------------------- SSE Single Precision -----------------------------
 
 #ifdef __SSE3__
-
-//#include <pmmintrin.h>
 
 /// Vector of 4 floats
 typedef __m128 vec4f;
@@ -109,3 +112,5 @@ inline vec4  cvt4sd(vec4f a)               { return _mm256_cvtps_pd(a); }
 inline void store4f(float* a, vec4 b)      { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
 
 #endif  // AVX
+
+#endif
