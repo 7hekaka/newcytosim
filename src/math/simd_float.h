@@ -1,14 +1,12 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 // Wednesday 24 June 2020 was a very nice day in Strasbourg
 
-#ifndef SIMD_FLOAT_H
-#define SIMD_FLOAT_H
-
 #include <immintrin.h>
 
 //--------------------------- SSE Single Precision -----------------------------
 
-#ifdef __SSE3__
+#if defined(__SSE3__) && !defined(SIMD_VEC4FLOAT)
+#define SIMD_VEC4FLOAT
 
 /// Vector of 4 floats
 typedef __m128 vec4f;
@@ -35,36 +33,50 @@ inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 #define shuffle4f(a,b,k)  _mm_shuffle_ps(a,b,k)
 #define blend4f(a,b,k)    _mm_blend_ps(a,b,k)
 
-#endif  // __SSE3__
+#endif  // SSE3
 
-#ifdef __AVX__
+
+#ifndef SIMD_AVX_SINGLE
+#define SIMD_AVX_SINGLE
+
+#  ifdef __AVX__
 // copy a[0] into all elements of destination
 inline vec4f broadcast1f(vec4f a)          { return _mm_permute_ps(a,0x00); }
 inline vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
 inline vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i const*)a); }
 #define permute4f(a,k)    _mm_permute_ps(a,k)
-#elif defined(__SSE3__)
+// Convert between vector types
+inline vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
+inline __m256d  cvt4sd(vec4f a)            { return _mm256_cvtps_pd(a); }
+inline void store4f(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
+#  elif defined(__SSE3__)
 inline vec4f broadcast1f(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
 inline vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
 inline vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
 #define permute4f(a,k)    _mm_shuffle_ps(a,a,k)
 #endif
+#endif
 
 //-------------------------- FMA Single Precision-------------------------------
 
+#ifndef SIMD_FMA_SINGLE
+#define SIMD_FMA_SINGLE
 #ifdef __FMA__
 inline vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_fmadd_ps(a,b,c); }
 inline vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_fmsub_ps(a,b,c); }
 inline vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_fnmadd_ps(a,b,c); }
 #elif defined(__SSE3__)
+// erzatz functions
 inline vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_add_ps(_mm_mul_ps(a,b), c); }  // a * b + c
 inline vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(_mm_mul_ps(a,b), c); }
 inline vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _mm_mul_ps(a,b)); }
 #endif
+#endif
 
 //-------------------------- AVX Single Precision-------------------------------
 
-#ifdef __AVX__
+#if defined(__AVX__) && !defined(SIMD_VEC8FLOAT)
+#define SIMD_VEC8FLOAT
 
 /// Vector of 8 floats
 typedef __m256 vec8f;
@@ -102,15 +114,5 @@ inline vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a); }
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
 
-//---------- Conversion
-
-/// Vector of doubles
-typedef __m256d vec4;
-
-inline vec4f cvt4ds(vec4 a)                { return _mm256_cvtpd_ps(a); }
-inline vec4  cvt4sd(vec4f a)               { return _mm256_cvtps_pd(a); }
-inline void store4f(float* a, vec4 b)      { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
-
 #endif  // AVX
 
-#endif
