@@ -497,8 +497,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
 
-#if defined(__AVX__)
-
+#ifdef __AVX__
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
 {
@@ -628,8 +627,8 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
 #endif
 
 
-#if defined(__SSE3__)
-/// specialized version for KD==2 and ORD==3
+#ifdef __SSE3__
+/// specialized version for single precision, KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 {
     const float*const end = pA + (N-2) * lda;
@@ -678,8 +677,8 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 }
 #endif
 
-#if defined(__SSE3__)
-/// specialized version for KD==2 and ORD==3
+#ifdef __SSE3__
+/// specialized version for single precision, KD==2 and ORD==3
 void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 {
     const float*const end = pA;
@@ -728,8 +727,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 #endif
 
 
-#if defined(__SSE3__)
-
+#ifdef __SSE3__
 /// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX)
 {
