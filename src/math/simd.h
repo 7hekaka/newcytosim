@@ -1,12 +1,14 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 // Monday 5 June 2018 was a very nice day in Strasbourg
 
+#ifndef SIMD_H
+#define SIMD_H
+
 #include <immintrin.h>
 
 //---------------------------------- SSE ---------------------------------------
 
-#if defined(__SSE3__) && !defined(SIMD_VEC2DOUBLE)
-#define SIMD_VEC2DOUBLE
+#ifdef __SSE3__
 
 /// Vector of 2 doubles
 typedef __m128d vec2;
@@ -105,8 +107,7 @@ inline vec2 normalize2(vec2 vec, double n)
 
 //---------------------------------- AVX ---------------------------------------
 
-#if defined(__AVX__) && !defined(SIMD_VEC4DOUBLE)
-#define SIMD_VEC4DOUBLE
+#ifdef __AVX__
 
 /// Vector of 4 doubles
 typedef __m256d vec4;
@@ -251,9 +252,6 @@ inline vec4 normalize4(vec4 vec, double n)
 
 //---------------------------------- AVX2 --------------------------------------
 
-#ifndef SIMD_AVX2_DOUBLE
-#define SIMD_AVX2_DOUBLE
-
 #ifdef __AVX2__
 
 #define permute4x64(a,k)    _mm256_permute4x64_pd(a,k)
@@ -302,12 +300,9 @@ inline vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b11
 inline vec4 broadcast1(vec4 a)  { return _mm256_movedup_pd(_mm256_set_m128d(cast2(a), cast2(a))); }
 
 #endif
-#endif
 
 //----------------------------------- FMA --------------------------------------
 
-#ifndef SIMD_FMA_DOUBLE
-#define SIMD_FMA_DOUBLE
 #ifdef __FMA__
 inline vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_sd(a,b,c); }  // a * b + c
 inline vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_sd(a,b,c); }  // a * b - c
@@ -337,4 +332,5 @@ inline vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_sub_pd(_mm256_mul_pd
 inline vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_sub_pd(c, _mm256_mul_pd(a,b)); }
 #  endif
 #endif
-#endif
+
+#endif // SIMD_H

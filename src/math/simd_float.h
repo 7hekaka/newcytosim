@@ -1,12 +1,14 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 // Wednesday 24 June 2020 was a very nice day in Strasbourg
 
+#ifndef SIMD_FLOAT_H
+#define SIMD_FLOAT_H
+
 #include <immintrin.h>
 
 //--------------------------- SSE Single Precision -----------------------------
 
-#if defined(__SSE3__) && !defined(SIMD_VEC4FLOAT)
-#define SIMD_VEC4FLOAT
+#ifdef __SSE3__
 
 /// Vector of 4 floats
 typedef __m128 vec4f;
@@ -33,13 +35,9 @@ inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 #define shuffle4f(a,b,k)  _mm_shuffle_ps(a,b,k)
 #define blend4f(a,b,k)    _mm_blend_ps(a,b,k)
 
-#endif  // SSE3
+#endif  // __SSE3__
 
-
-#ifndef SIMD_AVX_SINGLE
-#define SIMD_AVX_SINGLE
-
-#  ifdef __AVX__
+#ifdef __AVX__
 // copy a[0] into all elements of destination
 inline vec4f broadcast1f(vec4f a)          { return _mm_permute_ps(a,0x00); }
 inline vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
@@ -49,18 +47,15 @@ inline vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128
 inline vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
 inline __m256d  cvt4sd(vec4f a)            { return _mm256_cvtps_pd(a); }
 inline void store4f(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
-#  elif defined(__SSE3__)
+#elif defined(__SSE3__)
 inline vec4f broadcast1f(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
 inline vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
 inline vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
 #define permute4f(a,k)    _mm_shuffle_ps(a,a,k)
 #endif
-#endif
 
 //-------------------------- FMA Single Precision-------------------------------
 
-#ifndef SIMD_FMA_SINGLE
-#define SIMD_FMA_SINGLE
 #ifdef __FMA__
 inline vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_fmadd_ps(a,b,c); }
 inline vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_fmsub_ps(a,b,c); }
@@ -71,12 +66,10 @@ inline vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_add_ps(_mm_mul_ps(
 inline vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(_mm_mul_ps(a,b), c); }
 inline vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _mm_mul_ps(a,b)); }
 #endif
-#endif
 
 //-------------------------- AVX Single Precision-------------------------------
 
-#if defined(__AVX__) && !defined(SIMD_VEC8FLOAT)
-#define SIMD_VEC8FLOAT
+#ifdef __AVX__
 
 /// Vector of 8 floats
 typedef __m256 vec8f;
@@ -116,3 +109,4 @@ inline vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a); }
 
 #endif  // AVX
 
+#endif // SIMD_FLOAT_H
