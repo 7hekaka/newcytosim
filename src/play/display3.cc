@@ -412,7 +412,7 @@ void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void set_color_not(Fiber const&, size_t, real)
+void color_unchanged(Fiber const&, size_t, real)
 {
 }
 
@@ -462,8 +462,7 @@ void color_by_abscissaP(Fiber const& fib, size_t seg, real beta)
     fib.disp->color.load_front(exp((seg+1.5-fib.nbPoints())*beta));
 }
 
-
-/// distance from the plus end
+/// color set according to distance to the confining Space
 void color_by_height(Fiber const& fib, size_t seg, real beta)
 {
     real Z = 0;
@@ -496,7 +495,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
     switch ( disp->line_style )
     {
         case 1:
-            drawFiberSegments(fib, rad, set_color_not, 1.0);
+            drawFiberSegments(fib, rad, color_unchanged, 1.0);
             break;
         case 2:
         {
@@ -584,12 +583,8 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void set_color_not(Fiber const&, long, real)
-{
-}
 
-
-void set_color_alternate(Fiber const& fib, long ix, real)
+void color_alternate(Fiber const& fib, long ix, real)
 {
     if ( ix & 1 )
         fib.disp->color.load_front();
@@ -598,13 +593,13 @@ void set_color_alternate(Fiber const& fib, long ix, real)
 }
 
 
-void set_color_lattice(Fiber const& fib, long ix, real scale)
+void color_by_lattice(Fiber const& fib, long ix, real scale)
 {
     fib.disp->color.darken(scale*fib.visibleLattice()->data(ix)).load_front();
 }
 
 
-void set_rainbow_lattice(Fiber const& fib, long ix, real scale)
+void color_by_lattice_jet(Fiber const& fib, long ix, real scale)
 {
     gle_color::jet_color(scale*fib.visibleLattice()->data(ix)).load_front();
 }
@@ -656,17 +651,17 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
 
 void Display3::drawFiberLattice1(Fiber const& fib, real width) const
 {
-    drawFiberLattice(fib, width, set_color_lattice);
+    drawFiberLattice(fib, width, color_by_lattice);
 }
 
 void Display3::drawFiberLattice2(Fiber const& fib, real width) const
 {
-    drawFiberLattice(fib, width, set_rainbow_lattice);
+    drawFiberLattice(fib, width, color_by_lattice_jet);
 }
 
 void Display3::drawFiberLatticeEdges(Fiber const& fib, real width) const
 {
-    drawFiberLattice(fib, width, set_color_alternate);
+    drawFiberLattice(fib, width, color_alternate);
 }
 
 //------------------------------------------------------------------------------
