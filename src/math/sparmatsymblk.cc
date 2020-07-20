@@ -1143,9 +1143,9 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj)
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        assert_true( inx[n  ] < inx[n+1] );
-        assert_true( inx[n+1] < inx[n+2] );
-        assert_true( inx[n+2] < inx[n+3] );
+        assert_true( inx_[n  ] < inx_[n+1] );
+        assert_true( inx_[n+1] < inx_[n+2] );
+        assert_true( inx_[n+2] < inx_[n+3] );
         const size_t i0 = inx_[n  ];
         const size_t i1 = inx_[n+1];
         const size_t i2 = inx_[n+2];
