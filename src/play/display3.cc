@@ -412,7 +412,7 @@ void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void color_unchanged(Fiber const&, size_t, real)
+void color_not(Fiber const&, size_t, real)
 {
 }
 
@@ -425,7 +425,7 @@ void color_by_tension(Fiber const& fib, size_t seg, real beta)
         fib.disp->color.load_front(-x);
 }
 
-void color_by_tensionR(Fiber const& fib, size_t seg, real beta)
+void color_by_tension_jet(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
     // use rainbow coloring, where Lagrange multipliers are negative under compression
@@ -495,7 +495,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
     switch ( disp->line_style )
     {
         case 1:
-            drawFiberSegments(fib, rad, color_unchanged, 1.0);
+            drawFiberSegments(fib, rad, color_not, 1.0);
             break;
         case 2:
         {
@@ -505,7 +505,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
         case 3:
         {
             real beta = 1.0 / disp->tension_scale;
-            drawFiberSegments(fib, rad, color_by_tensionR, beta);
+            drawFiberSegments(fib, rad, color_by_tension_jet, beta);
         } break;
         case 4:
             drawFiberSegments(fib, rad, color_by_curvature, 1.0);
