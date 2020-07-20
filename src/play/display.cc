@@ -751,8 +751,8 @@ void Display::drawFiberLines(Fiber const& fib) const
         } break;
         case 2:
         {
-            gle_color col = fib.disp->color;
             // display segments with color indicating internal tension
+            const gle_color col = fib.disp->color;
             lineWidth(disp->line_width);
             glBegin(GL_LINES);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
