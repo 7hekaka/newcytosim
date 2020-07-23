@@ -11,6 +11,8 @@
 #include <cstdio>
 #include <cmath>
 
+#include "simd.h"
+#include "simd_float.h"
 
 namespace blas
 {
@@ -118,9 +120,6 @@ inline real nrm8seq(const size_t cnt, const real* X)
 }
 
 #ifdef __AVX__
-
-#include "simd.h"
-#include "simd_float.h"
 
 inline double nrm8(const size_t cnt, const double* ptr)
 {

@@ -751,8 +751,8 @@ void Display::drawFiberLines(Fiber const& fib) const
         } break;
         case 2:
         {
-            gle_color col = fib.disp->color;
             // display segments with color indicating internal tension
+            const gle_color col = fib.disp->color;
             lineWidth(disp->line_width);
             glBegin(GL_LINES);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
@@ -839,15 +839,15 @@ void Display::drawFiberLines(Fiber const& fib) const
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
             {
-                fib.disp->color.load(exp(alpha+n*beta));
+                fib.disp->color.load(exp(alpha+beta*n));
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
         } break;
         case 8:
         {
+            // color according to distance to the confining Space
             Space const* spc = fib.prop->confine_space_ptr;
-            // color according to Z
             const real beta = 1.0 / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);

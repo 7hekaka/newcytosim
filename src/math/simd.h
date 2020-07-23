@@ -304,7 +304,6 @@ inline vec4 broadcast1(vec4 a)  { return _mm256_movedup_pd(_mm256_set_m128d(cast
 //----------------------------------- FMA --------------------------------------
 
 #ifdef __FMA__
-
 inline vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_sd(a,b,c); }  // a * b + c
 inline vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_sd(a,b,c); }  // a * b - c
 inline vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_sd(a,b,c); } // c - a * b
@@ -316,13 +315,9 @@ inline vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_pd(a,b,c); }
 inline vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmadd_pd(a,b,c); }
 inline vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmsub_pd(a,b,c); }
 inline vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_fnmadd_pd(a,b,c); }
-
 #else
-
-// define erzatz functions
-//#warning "Patching SIMD' Fused Multiply Add functions"
-
-#ifdef __SSE3__
+// erzatz functions
+#  ifdef __SSE3__
 inline vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_add_sd(_mm_mul_sd(a,b), c); }
 inline vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_sub_sd(_mm_mul_sd(a,b), c); }
 inline vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_sub_sd(c, _mm_mul_sd(a,b)); }
@@ -330,15 +325,12 @@ inline vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_sub_sd(c, _mm_mul_sd(a,
 inline vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_add_pd(_mm_mul_pd(a,b), c); }
 inline vec2 fmsub2(vec2 a, vec2 b, vec2 c)  { return _mm_sub_pd(_mm_mul_pd(a,b), c); }
 inline vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_sub_pd(c, _mm_mul_pd(a,b)); }
-#endif
-
-#ifdef __AVX__
+#  endif
+#  ifdef __AVX__
 inline vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_add_pd(_mm256_mul_pd(a,b), c); }
 inline vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_sub_pd(_mm256_mul_pd(a,b), c); }
 inline vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_sub_pd(c, _mm256_mul_pd(a,b)); }
+#  endif
 #endif
 
-#endif
-
-#endif
-
+#endif // SIMD_H
