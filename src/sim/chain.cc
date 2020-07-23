@@ -927,9 +927,10 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
  */
 void Chain::getPoints(real const* ptr)
 {
+#if NEW_SKIP_PROJECTION
     if ( skipProjection )
         return copy_real(DIM*nPoints, ptr, pPos);
-
+#endif
 #if 0
     // use here static memory
     // Attention: this only works if using a single thread

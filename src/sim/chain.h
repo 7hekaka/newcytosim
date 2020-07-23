@@ -17,7 +17,8 @@ class Glossary;
 
 #define FIBER_HAS_NORMAL 0
 
-#define NEW_SKIP_PROJECTION 1
+/// Option to not use constraints on the fiber's segment lengths
+#define NEW_SKIP_PROJECTION 0
 
 
 /// Mecable with linear geometry
