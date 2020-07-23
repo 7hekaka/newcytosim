@@ -1113,7 +1113,8 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportFiberBendingEnergy(std::ostream& out) const
 {
-    out << COM << ljust("bending_energy",2,2) << SEP << "count" << SEP << "sum" << SEP << "avg" << SEP << "dev";
+    out << COM << ljust("bending_energy",2,2) << SEP << "count";
+    out << SEP << "sum" << SEP << "avg" << SEP << "dev" << SEP << "rigidity";
     
     size_t cnt;
     real avg, dev;
@@ -1130,6 +1131,7 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
             out << SEP << std::setprecision(3) << avg*cnt;
             out << SEP << std::setprecision(3) << avg;
             out << SEP << std::setprecision(3) << dev;
+            out << SEP << std::setprecision(3) << fp->rigidity;
         }
     }
 }

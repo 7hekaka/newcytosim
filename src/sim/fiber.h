@@ -236,7 +236,7 @@ public:
     //--------------------------------------------------------------------------
 
     /// the energy due to bending rigidity: 1/2 * rigidity * sum( curvature(s)^2 ds ),
-    real           bendingEnergy() const { return bendingEnergy0()*prop->rigidity; }
+    real           bendingEnergy() const { return bendingEnergy0() * prop->rigidity; }
     
     /// return the abscissa of the closest position to `w` on this Fiber, and set `dis` to the square of the distance
     real           projectPoint(Vector const& w, real & dis) const;
