@@ -1012,7 +1012,7 @@ void processNormalKey(const unsigned char key, const int x, const int y)
     {
         if ( key == prop.magic_key[k] )
         {
-            thread.execute(prop.magic_code[k]);
+            thread.evaluate(prop.magic_code[k]);
             glApp::postRedisplay();
             return;
         }

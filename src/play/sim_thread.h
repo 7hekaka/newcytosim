@@ -9,7 +9,7 @@
 
 
 /// SimThread is used to run a simulation in a dedicated thread
-class SimThread : private Parser
+class SimThread
 {
     /// disabled default constructor
     SimThread();
@@ -18,10 +18,15 @@ class SimThread : private Parser
     friend void child_cleanup(void*);
     
 private:
+    
+    /// associated Simul
+    Simul&          simul;
 
-    /// reader used to access frames in a trajectory file
+    /// Parser used to read Cytosim's config file
+    Parser          parser_;
+
+    /// Reader used to access frames in a trajectory file
     FrameReader     reader_;
-
     
     /// callback invoked when the thread is halted, set in constructor
     void           (*hold_callback)(void);
@@ -159,7 +164,7 @@ public:
     void       reloadParameters(std::string const& file);
     
     /// execute given code
-    void       execute(std::string const&);
+    void       evaluate(std::string const&);
     
     /// export simulation Propertes and Objects to file
     void       exportObjects(bool binary);

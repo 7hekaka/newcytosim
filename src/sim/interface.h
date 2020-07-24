@@ -23,12 +23,10 @@ private:
     /// disabled default constructor
     Interface();
 
-protected:
+public:
     
     /// associated Simul
     Simul& simul;
-    
-public:
     
     /// construct and associates with given Simul
     Interface(Simul&);

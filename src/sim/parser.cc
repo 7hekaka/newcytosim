@@ -19,10 +19,10 @@
 
 //------------------------------------------------------------------------------
 /**
- The permission of the parser are:
- - do_set: new Properties can be created
- - do_change: existing Property or Object can be modified
- - do_new: new Object can be created
+ The permission of the parser are set by a number of variables:
+ - do_set: can create new Properties
+ - do_change: can modify existing Property or Object
+ - do_new: can create new Object
  - do_run: can perform simulation steps
  - do_write: can write to disc
  .

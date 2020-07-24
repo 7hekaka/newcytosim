@@ -15,10 +15,10 @@
 
 /**
  This uses a Parser that cannot write to disc.
- The function callback is called when Parser::hold() is reached.
+ The function `callback` is called when Parser::hold() is reached.
  */
 SimThread::SimThread(Simul& sim, void (*callback)(void))
-: Parser(sim, 1, 1, 1, 1, 0), hold_callback(callback)
+: simul(sim), parser_(sim, 1, 1, 1, 1, 0), hold_callback(callback)
 {
     hasChild = false;
     mFlag   = 0;
@@ -91,7 +91,7 @@ void SimThread::run()
 {
     assert_true( isChild() );
     try {
-        Parser::readConfig();
+        parser_.readConfig();
     }
     catch( Exception & e ) {
         simul.relax();
@@ -151,7 +151,7 @@ void SimThread::extend_run()
 {
     assert_true( isChild() );
     try {
-        Parser::execute_run(100000);
+        parser_.execute_run(100000);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
@@ -437,7 +437,7 @@ size_t SimThread::readInput(size_t max_nb_lines)
         {
             //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
             try {
-                evaluate(str);
+                parser_.evaluate(str);
                 glApp::flashText0(str);
             }
             catch ( Exception & e ) {
@@ -480,11 +480,11 @@ void SimThread::reloadParameters(std::string const& file)
  
  This can be executed by the parent thread who does not own the data
  */
-void SimThread::execute(std::string const& code)
+void SimThread::evaluate(std::string const& code)
 {
     lock();
     try {
-        evaluate(code);
+        parser_.evaluate(code);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
