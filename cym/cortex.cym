@@ -1,7 +1,7 @@
 % Thin actomyosin network in 3D
 % FJN, Strasbourg, 18 Feb. 2019
 
-set simul contract 
+set simul system 
 {
     dim = 3
     time_step = 0.001
@@ -101,7 +101,7 @@ change motor_head
     max_speed = 0.5
 }
 
-run simul *
+run simul system
 {   
     nb_frames = 2
     nb_steps = 2000
