@@ -109,7 +109,7 @@ protected:
 
 #if NEW_SKIP_PROJECTION
     /// true if projection operator is identity
-    bool        skipProjection;
+    bool         skipProjection;
 #endif
 
     /// time at birth

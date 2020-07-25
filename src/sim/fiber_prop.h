@@ -331,8 +331,11 @@ public:
     bool         loop;
 #endif
     
+#if NEW_SKIP_PROJECTION
+    /// if `true` do not enforce segment length constraints
     bool         skip_projection;
-
+#endif
+    
     /// @}
 
     /// derived variable: flag to indicate that `display` has a new value

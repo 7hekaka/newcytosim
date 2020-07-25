@@ -316,8 +316,9 @@ void FiberProp::clear()
 #if NEW_FIBER_LOOP
     loop                = 0;
 #endif
+#if NEW_SKIP_PROJECTION
     skip_projection     = 0;
-
+#endif
     activity            = "none";
     display             = "";
     display_fresh       = false;
@@ -465,8 +466,9 @@ void FiberProp::read(Glossary& glos)
 #if NEW_FIBER_LOOP
     glos.set(loop,              "loop");
 #endif
+#if NEW_SKIP_PROJECTION
     glos.set(skip_projection, "skip_projection");
-
+#endif
     glos.set(activity, "activity");
     if ( glos.set(display, "display") )
         display_fresh = true;
@@ -666,7 +668,9 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_FIBER_LOOP
     write_value(os, "loop",                loop);
 #endif
+#if NEW_SKIP_PROJECTION
     write_value(os, "skip_projection",     skip_projection);
+#endif
     write_value(os, "activity",            activity);
     write_value(os, "display",             "("+display+")");
 }
