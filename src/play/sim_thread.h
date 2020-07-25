@@ -9,7 +9,10 @@
 
 
 /// SimThread is used to run a simulation in a dedicated thread
-class SimThread
+/**
+ The SimThread needs to derive from Parser, for overwritting 'hold()'
+ */
+class SimThread : private Parser
 {
     /// disabled default constructor
     SimThread();
@@ -18,12 +21,6 @@ class SimThread
     friend void child_cleanup(void*);
     
 private:
-    
-    /// associated Simul
-    Simul&          simul;
-
-    /// Parser used to read Cytosim's config file
-    Parser          parser_;
 
     /// Reader used to access frames in a trajectory file
     FrameReader     reader_;

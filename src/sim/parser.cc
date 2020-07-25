@@ -1000,7 +1000,6 @@ void Parser::parse_for(std::istream& is)
         StreamFunc::find_and_replace(sub, var, std::to_string(c));
         // execute code:
         evaluate(sub);
-        //hold();
     }
 }
 

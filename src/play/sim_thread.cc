@@ -18,7 +18,7 @@
  The function `callback` is called when Parser::hold() is reached.
  */
 SimThread::SimThread(Simul& sim, void (*callback)(void))
-: simul(sim), parser_(sim, 1, 1, 1, 1, 0), hold_callback(callback)
+: Parser(sim, 1, 1, 1, 1, 0), hold_callback(callback)
 {
     hasChild = false;
     mFlag   = 0;
@@ -91,7 +91,7 @@ void SimThread::run()
 {
     assert_true( isChild() );
     try {
-        parser_.readConfig();
+        Parser::readConfig();
     }
     catch( Exception & e ) {
         simul.relax();
@@ -151,7 +151,7 @@ void SimThread::extend_run()
 {
     assert_true( isChild() );
     try {
-        parser_.execute_run(100000);
+        Parser::execute_run(100000);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
@@ -437,7 +437,7 @@ size_t SimThread::readInput(size_t max_nb_lines)
         {
             //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
             try {
-                parser_.evaluate(str);
+                Parser::evaluate(str);
                 glApp::flashText0(str);
             }
             catch ( Exception & e ) {
@@ -484,7 +484,7 @@ void SimThread::evaluate(std::string const& code)
 {
     lock();
     try {
-        parser_.evaluate(code);
+        Parser::evaluate(code);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
