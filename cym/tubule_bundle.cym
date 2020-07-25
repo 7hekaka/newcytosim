@@ -28,15 +28,15 @@ set space cell
 
 new cell
 {
-    length = 0.9
-    radius = 0.3
+    length = 0.8
+    radius = 0.4
 }
 
 
 set fiber backbone
 {
     rigidity     = 1
-    segmentation = 0.064
+    segmentation = 0.032
     steric       = 1, 0.015
     binding_key  = 0
     display = ( color=red; visible=1; )
@@ -44,8 +44,8 @@ set fiber backbone
 
 set fiber filament
 {
-    rigidity = 1
-    segmentation = 0.064
+    rigidity = 0.1
+    segmentation = 0.032
     lattice = 1, 0.008
     skip_projection = 1
 }
@@ -61,7 +61,7 @@ set filament display
 
 set tubule microtubule
 {
-    stiffness = 20000, 10000
+    stiffness = 50000, 10000
     fiber = filament
     bone = backbone
 }
@@ -173,7 +173,7 @@ run 100 system
 
 change filament
 {
-    confine = inside, 1000
+    confine = inside, 100
 }
 
 run 1000 system
@@ -181,3 +181,12 @@ run 1000 system
     nb_frames = 1000
 }
 
+change filament
+{
+    confine = inside, 1000
+}
+
+run 1000 system
+{
+    nb_frames = 1000
+}
