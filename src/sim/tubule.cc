@@ -69,6 +69,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     for ( size_t i = 0; i < NFIL; ++i )
     {
         Fiber * fib = fp->newFiber();
+        fib->setProjection(false);
         fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
         if ( bone_ )

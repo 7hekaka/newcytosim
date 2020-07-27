@@ -17,9 +17,6 @@ class Glossary;
 
 #define FIBER_HAS_NORMAL 0
 
-/// Option to not use constraints on the fiber's segment lengths
-#define NEW_SKIP_PROJECTION 0
-
 
 /// Mecable with linear geometry
 /**
@@ -188,7 +185,13 @@ public:
 
     /// change the current segmentation to force `length()==len` (normally not needed)
     void         imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
-    
+   
+#if NEW_SKIP_PROJECTION
+    void         setProjection(bool s) { skipProjection = s; }
+#else
+    void         setProjection(bool) {}
+#endif
+
     //---------------------
 
     /// returns simulation time at which Fiber was created

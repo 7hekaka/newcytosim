@@ -20,4 +20,8 @@
 #define NEW_SPACES 1
 
 
+/// Option to not use constraints on the fiber's segment lengths
+#define NEW_SKIP_PROJECTION 0
+
+
 #endif
