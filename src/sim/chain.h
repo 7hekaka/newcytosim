@@ -12,9 +12,10 @@
 class Mecapoint;
 class Glossary;
 
-// Option to segment Filaments according to their curvature (experimental)
+/// Option to segment Filaments according to their curvature (experimental)
 #define CURVATURE_DEPENDENT_SEGMENTATION 0
 
+/// include a normal used for fancy display of fibers as helices
 #define FIBER_HAS_NORMAL 0
 
 

@@ -375,7 +375,7 @@ public:
         real res = cWidth[0] * cWidth[0];
         for ( int d = 1; d < ORD; ++d )
             res += cWidth[d] * cWidth[d];
-        return sqrt( res );
+        return sqrt(res);
     }
     
     /// the smallest cell width, along dimensions that have more than `min_size` cells
