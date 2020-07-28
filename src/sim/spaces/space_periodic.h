@@ -22,7 +22,10 @@ class SpacePeriodic : public Space
     
     /// half-length in each dimension
     real   length_[3];
- 
+
+    /// Object to handle periodic boundary conditions
+    Modulo modulo_;
+
 public:
     
     /// creator
@@ -31,8 +34,11 @@ public:
     /// change dimensions
     void        resize(Glossary& opt);
     
-    /// initialize Modulo Object
-    Modulo *    newModulo() const;
+    /// return Modulo Object
+    Modulo const* getModulo() const { return &modulo_; }
+    
+    /// match sizes of Modulo object
+    void        adjustModulo();
 
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;

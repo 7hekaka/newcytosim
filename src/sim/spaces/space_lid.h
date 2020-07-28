@@ -34,7 +34,10 @@ private:
 
     /// force during last time step
     mutable real force_;
-    
+  
+    /// Object to handle periodic boundary conditions
+    Modulo modulo_;
+
 public:
     
     /// creator
@@ -46,8 +49,11 @@ public:
     /// change dimensions
     void       resize(Glossary& opt);
     
-    /// initialize Modulo Object
-    Modulo*    newModulo() const;
+    /// return Modulo Object
+    Modulo const* getModulo() const { return &modulo_; }
+    
+    /// match sizes of Modulo object
+    void        adjustModulo();
 
     /// true if the Space is periodic in dimension ii
     bool       isPeriodic(int ii) const { return ( ii < DIM-1 ); }

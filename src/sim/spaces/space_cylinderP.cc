@@ -35,14 +35,15 @@ void SpaceCylinderP::resize(Glossary& opt)
     
     length_ = len;
     radius_ = rad;
+
+    adjustModulo();
 }
 
 
-Modulo * SpaceCylinderP::newModulo() const
+void SpaceCylinderP::adjustModulo()
 {
-    Modulo * mod = new Modulo();
-    mod->enable(0U, 2*length_);
-    return mod;
+    modulo_.reset();
+    modulo_.enable(0, 2*length_);
 }
 
 
@@ -178,6 +179,7 @@ void SpaceCylinderP::setLengths(const real len[])
 {
     length_ = len[0];
     radius_ = len[1];
+    adjustModulo();
 }
 
 

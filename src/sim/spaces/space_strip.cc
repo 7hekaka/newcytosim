@@ -26,7 +26,7 @@ void SpaceStrip::resize(Glossary& opt)
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len < 0 )
-            throw InvalidParameter("square:length[] must be >= 0");
+            throw InvalidParameter("strip:length[] must be >= 0");
         length_[d] = len;
     }
     
@@ -60,15 +60,16 @@ void SpaceStrip::resize(Glossary& opt)
     
     bot_ = bot;
     top_ = top;
+    
+    adjustModulo();
 }
 
 
-Modulo * SpaceStrip::newModulo() const
+void SpaceStrip::adjustModulo()
 {
-    Modulo * mod = new Modulo();
+    modulo_.reset();
     for ( unsigned d = 0; d < DIM-1; ++d )
-        mod->enable(d, 2*length_[d]);
-    return mod;
+        modulo_.enable(d, 2*length_[d]);
 }
 
 
@@ -201,6 +202,7 @@ void SpaceStrip::setLengths(const real len[])
         bot_ = -0.5 * bot_;
     }
 #endif
+    adjustModulo();
 }
 
 void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
