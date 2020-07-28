@@ -1185,11 +1185,6 @@ void glApp::displayMain()
         }
     }
     
-    if ( userMode == MOUSE_EDIT_ROI )
-    {
-        view.drawROI();
-    }
-    
     if ( view.buffered )
         glutSwapBuffers();
     else

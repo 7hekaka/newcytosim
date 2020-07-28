@@ -32,6 +32,9 @@ private:
     /// window number in GLUT
     int        mWindowId;
     
+    /// flag for Region of Interest
+    bool       hasROI;
+    
     /// Region of interest
     Vector3    mROI[2];
 

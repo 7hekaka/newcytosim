@@ -25,6 +25,10 @@ View::View(const std::string& n)
     eyePosition[1] = 0;
     eyePosition[2] = -0.5f * view_size;
     
+    hasROI = false;
+    mROI[0].reset();
+    mROI[1].reset();
+    
     hasMatrices = false;
 }
 
@@ -145,7 +149,8 @@ void View::closeDisplay() const
 */
 void View::drawInteractiveFeatures() const
 {
-    drawROI();
+    if ( hasROI )
+        drawROI();
 
     if ( draw_memo && memo.size() )
     {
@@ -480,14 +485,17 @@ void View::adjustROI(real Z)
 
 void View::matchROI()
 {
-    focus = 0.5 * ( mROI[0] + mROI[1] );
-    real r = 0.5 * ( mROI[0] - mROI[1] ).norm_inf();
-    
-    // zoom only if region is 7 pixels wide:
-    if ( r > 7 * pixelSize() )
-        zoom = view_size / (GLfloat)r;
-    
-    setModelView();
+    if ( hasROI )
+    {
+        focus = 0.5 * ( mROI[0] + mROI[1] );
+        real r = 0.5 * ( mROI[0] - mROI[1] ).norm_inf();
+        
+        // zoom only if region is 7 pixels wide:
+        if ( r > 7 * pixelSize() )
+            zoom = view_size / (GLfloat)r;
+        
+        setModelView();
+    }
 }
 
 
@@ -502,6 +510,7 @@ bool View::insideROI(Vector3 pos) const
 
 void View::setROI(Vector3 a, Vector3 b)
 {
+    hasROI = true;
     mROI[0].set(std::min(a.XX, b.XX), std::min(a.YY, b.YY), std::min(a.ZZ, b.ZZ));
     mROI[1].set(std::max(a.XX, b.XX), std::max(a.YY, b.YY), std::max(a.ZZ, b.ZZ));
 }
@@ -779,17 +788,17 @@ void View::drawCuboid(Vector3 const& A, Vector3 const& B)
     glLineWidth(0.5);
 
     glBegin(GL_LINE_LOOP);
-    glVertex3d(A.XX, A.YY, A.ZZ);
-    glVertex3d(B.XX, A.YY, A.ZZ);
-    glVertex3d(B.XX, B.YY, A.ZZ);
-    glVertex3d(A.XX, B.YY, A.ZZ);
+    gleVertex(A.XX, A.YY, A.ZZ);
+    gleVertex(B.XX, A.YY, A.ZZ);
+    gleVertex(B.XX, B.YY, A.ZZ);
+    gleVertex(A.XX, B.YY, A.ZZ);
     glEnd();
 
     glBegin(GL_LINE_LOOP);
-    glVertex3d(A.XX, A.YY, B.ZZ);
-    glVertex3d(B.XX, A.YY, B.ZZ);
-    glVertex3d(B.XX, B.YY, B.ZZ);
-    glVertex3d(A.XX, B.YY, B.ZZ);
+    gleVertex(A.XX, A.YY, B.ZZ);
+    gleVertex(B.XX, A.YY, B.ZZ);
+    gleVertex(B.XX, B.YY, B.ZZ);
+    gleVertex(A.XX, B.YY, B.ZZ);
     glEnd();
 
     glPopAttrib();
