@@ -29,6 +29,7 @@ Object * SphereSet::newObject(const ObjectTag tag, size_t num)
         SphereProp * p = simul.findProperty<SphereProp>("sphere", num);
         return new Sphere(p);
     }
+    std::cerr << "Warning: unknown Sphere tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

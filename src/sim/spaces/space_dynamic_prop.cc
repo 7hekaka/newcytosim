@@ -73,7 +73,7 @@ Space * SpaceDynamicProp::newSpace() const
 #ifdef BACKWARD_COMPATIBILITY
     if ( s=="contractile" )           return new SpaceDynamicEllipse(this);
 #endif
-    //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
+    std::cerr << "Warning: unknown dynamic Space shape `"+s+"'\n";
     return nullptr;
 }
 

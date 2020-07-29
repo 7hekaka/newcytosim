@@ -94,6 +94,7 @@ Object * SingleSet::newObject(const ObjectTag tag, size_t num)
         SingleProp * p = simul.findProperty<SingleProp>("single", num);
         return p->newWrist(nullptr, 0);
     }
+    std::cerr << "Warning: unknown Single tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

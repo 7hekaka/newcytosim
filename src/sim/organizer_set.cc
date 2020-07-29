@@ -75,6 +75,7 @@ Object * OrganizerSet::newObject(const ObjectTag tag, size_t num)
         return new Fake(p);
     }
     
+    std::cerr << "Warning: unknown Organizer tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

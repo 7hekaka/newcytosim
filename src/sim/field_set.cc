@@ -68,6 +68,7 @@ Object * FieldSet::newObject(const ObjectTag tag, size_t num)
         FieldProp * p = simul.findProperty<FieldProp>("field", num);
         return new Field(p);
     }
+    std::cerr << "Warning: unknown Field tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

@@ -40,6 +40,7 @@ Object * SolidSet::newObject(const ObjectTag tag, size_t num)
             throw InvalidIO("could not find `solid' class with id "+std::to_string(num));
         return new Solid(static_cast<SolidProp*>(p));
    }
+    std::cerr << "Warning: unknown Solid tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

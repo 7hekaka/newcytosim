@@ -216,6 +216,7 @@ Object * FiberSet::newObject(const ObjectTag tag, size_t num)
         obj->birthTime(simul.time());
         return obj;
     }
+    std::cerr << "Warning: unknown Fiber tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

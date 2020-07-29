@@ -214,6 +214,7 @@ Object * CoupleSet::newObject(const ObjectTag tag, size_t num)
         CoupleProp * p = simul.findProperty<CoupleProp>("couple", num);
         return p->newCouple();
     }
+    std::cerr << "Warning: unknown Couple tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

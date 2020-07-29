@@ -34,10 +34,10 @@ Property* EventSet::newProperty(const std::string& cat, const std::string& nom, 
 
 Object * EventSet::newObject(const ObjectTag tag, size_t num)
 {
-    Event * e = nullptr;
     if ( tag == Event::TAG )
-        e = new Event();
-    return e;
+        return new Event();
+    std::cerr << "Warning: unknown Event tag `"+std::string(1,tag)+"' requested\n";
+    return nullptr;
 }
 
 

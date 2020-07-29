@@ -38,13 +38,13 @@ Property* TubuleSet::newProperty(const std::string& cat, const std::string& nom,
 
 Object * TubuleSet::newObject(const ObjectTag tag, size_t num)
 {
-    Tubule * o = nullptr;
     if ( tag == Tubule::TAG )
     {
         TubuleProp * p = simul.findProperty<TubuleProp>("tubule", num);
-        o = new Tubule(p);
+        return new Tubule(p);
     }
-    return o;
+    std::cerr << "Warning: unknown Tubule tag `"+std::string(1,tag)+"' requested\n";
+    return nullptr;
 }
 
 
