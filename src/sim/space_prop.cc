@@ -121,7 +121,7 @@ Space * SpaceProp::newSpace() const
     if ( s=="beads" )                          return new SpaceBeads(this);
 #endif
     
-    std::cerr << "Warning: unknown Space shape `"+s+"'\n";
+    //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
     return nullptr;
 }
 

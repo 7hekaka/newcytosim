@@ -1247,6 +1247,7 @@ int compareMecables(const void * A, const void * B)
  */
 void Meca::prepare(Simul const* sim)
 {
+    ready_ = 0;
     mecables.clear();
 
     for ( Fiber  * f= sim->fibers.first(); f ; f=f->next() )
@@ -1730,7 +1731,6 @@ void Meca::apply()
 {
     if ( ready_ )
     {
-        ready_ = 0;
         if ( 1 )
         {
             //check validity of the data:

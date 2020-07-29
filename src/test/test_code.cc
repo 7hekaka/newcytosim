@@ -75,11 +75,11 @@ void print_fe_exceptions(const char* str)
     if ( n )
     {
         fprintf(stderr, " %s(", str);
-        if (n&FE_DIVBYZERO) fprintf(stderr, "DIVBYZERO ");
-        if (n&FE_INEXACT)   fprintf(stderr, "INEXACT ");
-        if (n&FE_INVALID)   fprintf(stderr, "INVALID ");
-        if (n&FE_OVERFLOW)  fprintf(stderr, "OVERFLOW ");
-        if (n&FE_UNDERFLOW) fprintf(stderr, "UNDERFLOW ");
+        if (n&FE_DIVBYZERO)  fprintf(stderr, "DIVBYZERO ");
+        if (n&FE_INEXACT)    fprintf(stderr, "INEXACT ");
+        if (n&FE_INVALID)    fprintf(stderr, "INVALID ");
+        if (n&FE_OVERFLOW)   fprintf(stderr, "OVERFLOW ");
+        if (n&FE_UNDERFLOW)  fprintf(stderr, "UNDERFLOW ");
         if (n&FE_ALL_EXCEPT) fprintf(stderr, "UNKNOWN ");
         if ( std::feclearexcept(FE_ALL_EXCEPT) )
             fprintf(stderr, "unclear ");

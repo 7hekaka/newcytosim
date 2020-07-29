@@ -17,8 +17,9 @@
  - the standard assert() macro and
  - the custom assert_true and assert_false macros defined below,
  This makes the executable faster.
+ Note that the value of NDEBUG is ignored!
  */
-#define NDEBUG 1
+//#define NDEBUG 1
 
 
 /// strips the full pathname for a file name

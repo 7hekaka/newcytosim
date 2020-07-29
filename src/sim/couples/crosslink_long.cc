@@ -88,6 +88,8 @@ void CrosslinkLong::setInteractions(Meca& meca) const
 # if FIBER_HAS_FAMILY
     /* calculate the Arms to offset the position along the radial direction
     of the microtubules */
+    assert_true(fiber1() != fiber1()->family_);
+    assert_true(fiber2() != fiber2()->family_);
     mArm1 = cross(pt1.diff(), fiber1()->radialDir(abscissa1())).normalized(len);
     mArm2 = cross(pt2.diff(), fiber2()->radialDir(abscissa2())).normalized(len);
 # else

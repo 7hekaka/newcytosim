@@ -13,7 +13,6 @@
 #include "tictoc.h"
 #include "unistd.h"
 
-
 void help(std::ostream& os)
 {
     os << "sim [OPTIONS] [FILE]\n";
@@ -69,6 +68,9 @@ int main(int argc, char* argv[])
         std::cerr << "Could not register SIGILL handler\n";
     if ( signal(SIGABRT, handle_signal) )
         std::cerr << "Could not register SIGABRT handler\n";
+
+    // catch division by zero and Nan
+    //feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 
     Glossary arg;
 

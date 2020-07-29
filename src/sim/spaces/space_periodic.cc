@@ -154,7 +154,7 @@ using namespace gle;
 bool SpacePeriodic::draw() const
 {
     const real X = length_[0];
-    const real Y = ( DIM > 1 ) ? length_[1] : 10;
+    const real Y = ( DIM > 1 ) ? length_[1] : 1;
     const real Z = ( DIM > 2 ) ? length_[2] : 0;
     
     glLineStipple(1, 0x000F);

@@ -152,14 +152,14 @@ ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
     SpaceProp * p = simul.findProperty<SpaceProp>("space", name);
     Space * obj = p->newSpace(opt);
 
-    ObjectList res(2, 4);
-
     if ( !obj )
     {
         throw InvalidParameter("unknown space:shape `"+p->shape+"'");
         //std::cerr << "Warning: substituting unbounded Space for unknown `"+p->shape+"'\n";
         //obj = new Space(p);
     }
+    
+    ObjectList res(1, 4);
     res.push_back(obj);
     return res;
 }
