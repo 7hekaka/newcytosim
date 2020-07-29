@@ -61,11 +61,11 @@ void SpaceStrip::resize(Glossary& opt)
     bot_ = bot;
     top_ = top;
     
-    adjustModulo();
+    update();
 }
 
 
-void SpaceStrip::adjustModulo()
+void SpaceStrip::update()
 {
     modulo_.reset();
     for ( unsigned d = 0; d < DIM-1; ++d )
@@ -202,7 +202,7 @@ void SpaceStrip::setLengths(const real len[])
         bot_ = -0.5 * bot_;
     }
 #endif
-    adjustModulo();
+    update();
 }
 
 void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)

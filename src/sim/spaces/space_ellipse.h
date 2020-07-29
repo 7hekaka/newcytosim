@@ -39,6 +39,7 @@ protected:
     int mSpheroid;
 #endif
     
+    /// update derived lengths
     void update();
     
 public:

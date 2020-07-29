@@ -45,7 +45,7 @@ private:
     /// half the total height in Z
     real        height_;
 
-    /// update
+    /// update derived lengths
     void        update();
 
 public:

@@ -37,6 +37,7 @@ private:
     /// coordinates of the center of the torus
     Vector bCenter;
     
+    /// update derived lengths
     void update();
     
     /// project on the backbone circle

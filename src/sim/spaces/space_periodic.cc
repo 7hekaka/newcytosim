@@ -25,11 +25,11 @@ void SpacePeriodic::resize(Glossary& opt)
             throw InvalidParameter("periodic:length[",d,"] must be > 0");
         length_[d] = len;
     }
-    adjustModulo();
+    update();
 }
 
 
-void SpacePeriodic::adjustModulo()
+void SpacePeriodic::update()
 {
     modulo_.reset();
     for ( unsigned d = 0; d < DIM; ++d )
@@ -130,7 +130,7 @@ void SpacePeriodic::setLengths(const real len[])
     length_[0] = len[0];
     length_[1] = len[1];
     length_[2] = len[2];
-    adjustModulo();
+    update();
 }
 
 

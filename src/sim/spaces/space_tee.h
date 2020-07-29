@@ -37,6 +37,7 @@ private:
     ///the radius of the caps, and square of it
     real tRadius,  tRadiusSq;
     
+    /// update derived lengths
     void update() { tRadiusSq = square(tRadius); }
     
     ///project on base cylinder, return distance

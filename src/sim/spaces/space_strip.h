@@ -45,7 +45,7 @@ public:
     Modulo const* getModulo() const { return &modulo_; }
     
     /// match sizes of Modulo object
-    void        adjustModulo();
+    void        update();
     
     /// return bounding box in `inf` and `sup`
     void        boundaries(Vector& inf, Vector& sup) const;

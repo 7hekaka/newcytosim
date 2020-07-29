@@ -39,11 +39,11 @@ void SpaceLid::resize(Glossary& opt)
     if ( top_ < 0 )
         throw InvalidParameter("lid:top must be >= 0");
     
-    adjustModulo();
+    update();
 }
 
 
-void SpaceLid::adjustModulo()
+void SpaceLid::update()
 {
     modulo_.reset();
     modulo_.enable(0, 2*length_[0]);
@@ -191,7 +191,7 @@ void SpaceLid::setLengths(const real len[])
     length_[2] = len[2];
     top_       = len[3];
     force_     = len[4];
-    adjustModulo();
+    update();
 }
 
 void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
