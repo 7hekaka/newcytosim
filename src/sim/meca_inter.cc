@@ -41,7 +41,7 @@ extern Modulo const* modulo;
 void drawLinkM(Vector const& a, Vector const& ab, Vector c)
 {
     if ( modulo )
-        c = modulo->image(c, a);
+        modulo->fold(c, a);
     gle::drawLink(a, ab, c);
 }
 
@@ -3847,7 +3847,7 @@ void Meca::addPointClamp(Mecapoint const& ptA,
     sub_iso(inx, inx, weight);
     
     if ( modulo )
-        pos = modulo->image(pos, ptA.pos());
+        modulo->fold(pos, ptA.pos());
 
     add_base(DIM*inx, pos, weight);
     
@@ -3893,7 +3893,7 @@ void Meca::addPointClamp(Interpolation const& pti,
     sub_iso(ii1, ii1, c2w * c2);
     
     if ( modulo )
-        pos = modulo->image(pos, pti.pos());
+        modulo->fold(pos, pti.pos());
     
     add_base(DIM*ii0, pos, c1w);
     add_base(DIM*ii1, pos, c2w);
@@ -4037,7 +4037,7 @@ void Meca::addSphereClamp(Mecapoint const& pte,
 {
     Vector pos = pte.pos();
     if ( modulo )
-        center = modulo->image(center, pos);
+        modulo->fold(center, pos);
     addSphereClamp(pos-center, pte, center, rad, weight);
 }
 
@@ -4049,7 +4049,7 @@ void Meca::addSphereClamp(Interpolation const& pti,
 {
     Vector pos = pti.pos();
     if ( modulo )
-        center = modulo->image(center, pos);
+        modulo->fold(center, pos);
     addSphereClamp(pos-center, pti, center, rad, weight);
 }
 

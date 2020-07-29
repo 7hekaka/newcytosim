@@ -386,7 +386,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
         glBegin(GL_LINES);
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
-            if ( modulo ) Q = modulo->image(Q, P);
+            if ( modulo ) modulo->fold(Q, P);
             gleVertex(P);
             gleVertex(Q);
         }
@@ -609,7 +609,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
             {
                 Vector ph = obj->posHand();
                 Vector pf = obj->posFoot();
-                if ( modulo ) pf = modulo->image(pf, ph);
+                if ( modulo ) modulo->fold(pf, ph);
                 drawLine(ph, obj->fiber(), obj->disp(), pf);
             }
         glEnd();
@@ -744,7 +744,7 @@ void Display2::drawCouplesB(CoupleSet const& set) const
 #endif
             Vector P = cx->posHand1();
             Vector Q = cx->posHand2();
-            if ( modulo ) Q = modulo->image(Q, P);
+            if ( modulo ) modulo->fold(Q, P);
             drawLine(P, cx->fiber1(), cx->disp1(), Q, cx->fiber2(), cx->disp2());
         }
         glEnd();

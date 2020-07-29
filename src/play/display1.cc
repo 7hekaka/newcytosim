@@ -330,7 +330,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
             if ( modulo )
-                Q = modulo->image(Q, P);
+                modulo->fold(Q, P);
             gleVertex(P);
             gleVertex(Q);
         }
@@ -397,8 +397,8 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 Vector pf = obj->posFoot();
                 if ( modulo )
                 {
-                    pf = modulo->image(pf, ph);
-                    ps = modulo->image(ps, ph);
+                    modulo->fold(pf, ph);
+                    modulo->fold(ps, ph);
                 }
                 
                 disp->color.load();
@@ -521,7 +521,7 @@ void Display1::drawCoupleB(Couple const* cx) const
     Vector p2 = cx->posHand2();
     
     if ( modulo )
-        p2 = modulo->image(p2, p1);
+        modulo->fold(p2, p1);
     
     if ( pd1 == pd2 )
     {

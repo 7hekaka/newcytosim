@@ -1038,7 +1038,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
 
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
-            if ( modulo ) Q = modulo->image(Q, P);
+            if ( modulo ) modulo->fold(Q, P);
             gleTube(P, Q, w, gleTube1B);
         }
     }
@@ -1107,7 +1107,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
             if ( obj->hasForce() && disp->width > 0 )
             {
                 Vector pf = obj->posFoot();
-                if ( modulo ) pf = modulo->image(pf, ph);
+                if ( modulo ) modulo->fold(pf, ph);
                 disp->color2.load_both();
 #if ( 0 )
                 if ( obj->disp()->style == 2 )
@@ -1238,7 +1238,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
-    if ( modulo ) p2 = modulo->image(p2, p1);
+    if ( modulo ) modulo->fold(p2, p1);
     
     Vector dif = p2 - p1;
     real dns = dif.normSqr();

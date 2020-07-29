@@ -9,15 +9,13 @@
 /// Modulo implements periodic boundary conditions
 /**
  This class is used to apply periodic boundaries conditions in one or 
- in multiple dimensions in space, X Y or Z.
-
- The methods are not virtual to avoid the calling overload in C++.
+ in multiple dimensions in space: X, Y or Z.
  */
 class Modulo
 {
 private:
     
-    /// half-period in each dimension
+    /// the period in each dimension
     real  mSize[4];
     
     /// bitfield indicating the dimensions that are periodic
@@ -50,10 +48,10 @@ public:
     const Vector period(size_t d) const;
     
     /// shift `pos` to its canonical image, which is the one closest to the origin
-    void         fold(Vector & pos) const;
+    void         fold(Vector& pos) const;
     
     /// shift `pos` to its image which is closest to `ref`
-    Vector       image(Vector const& pos, Vector const& ref) const;
+    void         fold(Vector& pos, Vector const& ref) const;
     
     /// return translation necessary to bring `pos` to its canonical image
     const Vector offset(Vector const& pos) const;

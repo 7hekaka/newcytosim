@@ -9,7 +9,7 @@ constexpr int PERIODIC_YZ  = ( 1 << (DIM-1) ) - 1;
 constexpr int PERIODIC_X   = 1;
 
 
-/// adjust 'x' to canonical image within periodicity 'p':
+/// adjust 'x' to canonical image with period 'p':
 inline real fold_real(const real x, const real p)
 {
     // using remainder() function for branchless code
@@ -75,11 +75,11 @@ void Modulo::fold(Vector& vec) const
 
 
 //this makes modulo around the center 'ref'
-Vector Modulo::image(Vector const& pos, Vector const& ref) const
+void Modulo::fold(Vector& pos, Vector const& ref) const
 {
     Vector img = pos - ref;
     fold(img);
-    return img + ref;
+    pos = img + ref;
 }
 
 
