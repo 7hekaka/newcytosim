@@ -680,6 +680,8 @@ std::istream& operator >> (std::istream& is, Glossary& glos)
 #pragma mark -
 
 /**
+ builds the warning message in `msg'.
+ 
  @returns:
  - 4 if the parameter was not read
  - 2 if one of the value was not read
@@ -706,16 +708,11 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     code ^= 4;  // invert highest bit
     
     if ( code & 4 )
-        msg = "Warning, this parameter was ignored: ";
+        msg = "Warning, the parameter `"+pair.first+"' was ignored";
     else if ( code & 2 )
-        msg = "Warning, a value was ignored: ";
+        msg = "Warning, a value was ignored: " + format_counts(pair);
     else if ( code & 1 )
-        msg = "Warning, some value might have been overused: ";
-    
-    if ( code & 4 )
-        msg += format(pair);
-    else if ( code )
-        msg += format_counts(pair);
+        msg = "Warning, some value might have been overused: " + format_counts(pair);
     
     return code;
 }
