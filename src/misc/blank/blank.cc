@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
     
     PAM.read(arg);
     glApp::currentView().read(arg);
-    arg.print_warnings(std::cerr, 1, "\n");
+    arg.print_warning(std::cerr, 1, "\n");
     glApp::createWindow(display);
     gle::initialize();
     simReset();

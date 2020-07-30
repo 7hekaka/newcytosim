@@ -708,7 +708,7 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     code ^= 4;  // invert highest bit
     
     if ( code & 4 )
-        msg = "Warning, the parameter `"+pair.first+"' was ignored";
+        msg = "Warning, the parameter `" + pair.first + "' was ignored";
     else if ( code & 2 )
         msg = "Warning, a value was ignored: " + format_counts(pair);
     else if ( code & 1 )
@@ -723,7 +723,7 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
  If the return value is not zero, a message was printed to 'os', and
  at least a terminating '\n' should be printed to 'os' by the calling function.
  */
-int Glossary::has_warnings(std::ostream& os, size_t threshold) const
+int Glossary::has_warning(std::ostream& os, size_t threshold) const
 {
     int res = 0;
     std::string msg;
@@ -741,9 +741,9 @@ int Glossary::has_warnings(std::ostream& os, size_t threshold) const
 }
 
 
-void Glossary::print_warnings(std::ostream& os, size_t threshold, std::string const& msg) const
+void Glossary::print_warning(std::ostream& os, size_t threshold, std::string const& msg) const
 {
-    if ( has_warnings(os, threshold) )
+    if ( has_warning(os, threshold) )
         os << msg;
 }
 

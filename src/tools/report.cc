@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
     if ( ofs.is_open() )
         ofs.close();
 
-    arg.print_warnings(std::cerr, cnt, "\n");
+    arg.print_warning(std::cerr, cnt, "\n");
 
     return EXIT_SUCCESS;
 }

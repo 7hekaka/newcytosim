@@ -271,11 +271,11 @@ public:
     /// returns true if `key[inx]==val`, or false otherwise. Counter is incremented in case of match
     bool         value_is(key_type const& key, size_t inx, std::string const& val) const;
     
-    /// print warnings about unused values and values used multiple times; return warning code
-    int          has_warnings(std::ostream&, size_t threshold = 1) const;
+    /// print message about unused values and values used multiple times; return warning code
+    int          has_warning(std::ostream&, size_t threshold = 1) const;
     
-    /// print warnings about unused values and values used multiple times
-    void         print_warnings(std::ostream&, size_t threshold, std::string const&) const;
+    /// print message about unused values and values used multiple times
+    void         print_warning(std::ostream&, size_t threshold, std::string const&) const;
 
     //-------------------------------------------------------------------------------
     #pragma mark -
@@ -365,7 +365,7 @@ public:
         return 0;
     }
     
-    /// set `var` from `key[int]` or `alt[alt_inx], using the dictionary `dict`
+    /// set `var` from `key[int]` or `alt[alt_inx]
     template <typename T>
     int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx) const
     {

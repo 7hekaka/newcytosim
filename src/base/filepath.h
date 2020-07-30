@@ -14,7 +14,7 @@ namespace FilePath
     /// true if 'path' is an existing directory
     bool is_dir(const char path[]);
     
-    /// change current working directory, made new if 'create==true'
+    /// change current working directory, making it, if absent and 'make==true'
     int  change_dir(const char path[], bool make);
 
     /// true if 'path' is an existing directory
