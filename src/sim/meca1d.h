@@ -26,7 +26,7 @@ class Meca1D
 {
     size_t allocated_;           ///< allocated size of vectors
     
-    bool   ready_;               ///< true if the solution is contained in 'vSOL'
+    int    ready_;               ///< true if the solution is contained in 'vSOL'
     
 public:
    
@@ -46,7 +46,7 @@ public:
     Meca1D()
     {
         allocated_ = 0;
-        ready_ = false;
+        ready_ = -1;
         vSOL = nullptr;
         vBAS = nullptr;
         vMOB = nullptr;
@@ -74,7 +74,7 @@ public:
 
     void prepare(Simul const* sim, real time_step, real kT)
     {
-        ready_ = false;
+        ready_ = 0;
         mecables.clear();
         
         for(Fiber * fib = sim->fibers.first(); fib; fib=fib->next())
@@ -175,7 +175,7 @@ public:
      */
     size_t solve(real precision)
     {
-        ready_ = false;
+        assert_true(ready_==0);
         mA.prepareForMultiply(1);
         LinearSolvers::Monitor monitor(dimension(), precision);
         // solve without preconditionner

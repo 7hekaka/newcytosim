@@ -91,7 +91,7 @@ With a sequential simulation, the second option is usually faster.
 Meca::Meca()
 : mecables(32, 32)
 {
-    ready_ = 0;
+    ready_ = -1;
     nPoints_ = 0;
     allocated_ = 0;
     vPTS = nullptr;
@@ -1443,6 +1443,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
  */
 size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
+    assert_true(ready_==0);
     // get global time step
     time_step = prop->time_step;
 
