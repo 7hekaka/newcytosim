@@ -2,16 +2,6 @@
 % run in 2D
 % Beat Rupp, May 2011
 
-set space cell
-{
-    shape = periodic
-}
-
-new cell
-{
-    length = 10, 10, 2
-}
-
 set simul system
 {
     dim = 2
@@ -26,6 +16,16 @@ set simul system
         point_size = 6
     }
     precondition = 0
+}
+
+set space cell
+{
+    shape = periodic
+}
+
+new cell
+{
+    length = 10, 10, 2
 }
 
 set fiber microtubule
