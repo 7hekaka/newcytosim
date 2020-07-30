@@ -646,13 +646,8 @@ void Simul::solveX()
         pMeca1D = new Meca1D();
 
     //-----initialize-----
-    
-    pMeca1D->clear();
-    
-    for(Fiber * fib = fibers.first(); fib; fib=fib->next())
-        pMeca1D->add(fib);
 
-    pMeca1D->prepare(prop->time_step, prop->kT);
+    pMeca1D->prepare(this, prop->time_step, prop->kT);
     
     //-----set matrix-----
 

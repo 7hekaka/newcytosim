@@ -9,6 +9,7 @@
 #include "monitor.h"
 #include "allocator.h"
 #include "bicgstab.h"
+#include "simul.h"
 
 
 /// Solves the motion of Objects along the X axis
@@ -70,20 +71,15 @@ public:
         vMOB = nullptr;
         vRHS = nullptr;
     }
-    
-    void clear()
-    {
-        mecables.clear();
-    }
-    
-    /// register a Mecable
-    void add(Mecable * fib)
-    {
-        mecables.push_back(fib);
-    }
 
-    void prepare(real time_step, real kT)
+    void prepare(Simul const* sim, real time_step, real kT)
     {
+        ready_ = false;
+        mecables.clear();
+        
+        for(Fiber * fib = sim->fibers.first(); fib; fib=fib->next())
+            mecables.push_back(fib);
+
         size_t dim = mecables.size();
         if ( dim > allocated_ )
         {
@@ -193,7 +189,6 @@ public:
     {
         if ( ready_ )
         {
-            ready_ = false;
             size_t ii = 0;
             for ( Mecable * mec : mecables )
             {
