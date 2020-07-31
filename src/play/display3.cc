@@ -515,6 +515,8 @@ void Display3::drawFiberLines(Fiber const& fib) const
             break;
         case 6:
         {
+            /** This is using transparency with segments that are not depth sorted
+             but this code is only used in 2D normally, so it's okay */
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
             const real beta = fib.segmentation() / disp->length_scale;
@@ -523,6 +525,8 @@ void Display3::drawFiberLines(Fiber const& fib) const
         } break;
         case 7:
         {
+            /** This is using transparency with segments that are not depth sorted
+             but this code is only used in 2D normally, so it's okay */
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
             const real beta = fib.segmentation() / disp->length_scale;
@@ -546,8 +550,13 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
- 
-    fib.disp->color.load_both();
+    
+    if ( disp->line_style == 6 )
+        color_by_abscissaM(fib, i, fib.segmentation()/disp->length_scale);
+    else if ( disp->line_style == 7 )
+        color_by_abscissaP(fib, i, fib.segmentation()/disp->length_scale);
+    else
+        fib.disp->color.load_both();
 
     Vector A = fib.posP(i);
     Vector B = fib.posP(i+1);

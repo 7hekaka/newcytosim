@@ -869,11 +869,22 @@ void Display::drawFiberLines(Fiber const& fib) const
 }
 
 
+// functions defined in display3.cc:
+extern void color_by_abscissaM(Fiber const& fib, size_t seg, real beta);
+extern void color_by_abscissaP(Fiber const& fib, size_t seg, real beta);
+
+
 void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    
-    fib.disp->color.load_load();
+        
+    if ( disp->line_style == 6 )
+        color_by_abscissaM(fib, i, fib.segmentation()/disp->length_scale);
+    else if ( disp->line_style == 7 )
+        color_by_abscissaP(fib, i, fib.segmentation()/disp->length_scale);
+    else
+        fib.disp->color.load_both();
+
     // display plain lines:
     lineWidth(disp->line_width);
     
@@ -1460,8 +1471,9 @@ void Display::drawFiber(Fiber const& fib)
     }
     
 #if ( DIM == 3 )
-    // full transparent style in 3D
-    if ( line_style && fib.disp->color.transparent() )
+    // transparent styles in 3D
+    if (( line_style==1 && fib.disp->color.transparent())
+        || line_style==6 || line_style==7 )
     {
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
             zObjects.push_back(zObject(&fib, i));
