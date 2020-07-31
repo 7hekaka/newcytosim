@@ -420,14 +420,16 @@ void changeSize(FiberDisp* p, int inc)
 }
 
 
-void changeEndStyle(FiberDisp* p, int)
+void changeEndStyle(FiberDisp* p, int val)
 {
+    const int P = 1+val;
+    const int M = 1+val*2;
     int * style = p->end_style;
     // showing the plus ends -> the minus ends -> both -> none
     switch( bool(style[1]) + 2*bool(style[0]) )
     {
         case 0:
-            style[0] = 2;
+            style[0] = P;
             style[1] = 0;
             break;
         case 1:
@@ -435,13 +437,13 @@ void changeEndStyle(FiberDisp* p, int)
             style[1] = 0;
             break;
         case 2:
-            style[0] = 2;
-            style[1] = 1;
+            style[0] = P;
+            style[1] = M;
             break;
         case 3:
         default:
             style[0] = 0;
-            style[1] = 1;
+            style[1] = M;
             break;
     }
     
@@ -891,7 +893,7 @@ void processKey(unsigned char key)
             break;
             
         case '!':
-            setFiberDisp(player.allVisibleFiberDisp(), changeEndStyle, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), changeEndStyle, !altKeyDown);
             break;
             
         case '2':
