@@ -116,9 +116,9 @@ Vector SpaceCylinderP::randomPlaceOnEdge(real) const
 {
 #if ( DIM >= 3 )
     const Vector2 YZ = Vector2::randU(radius_);
-    return Vector(0, YZ.XX, YZ.YY);
+    return Vector(length_*RNG.sreal(), YZ.XX, YZ.YY);
 #endif
-    return Vector(0, radius_*RNG.sflip(), 0);
+    return Vector(length_*RNG.sreal(), radius_*RNG.sflip(), 0);
 }
 
 

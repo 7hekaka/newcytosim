@@ -148,10 +148,10 @@ public:
     virtual Vector normalToEdge(Vector const& pos) const;
     
     /// a random position located on the edge of the Space, uniformly distributed on the surface
-    virtual Vector randomPlaceNearEdge(real rad) const { return randomPlaceNearEdge(rad, 1<<14); }
+    virtual Vector randomPlaceNearEdge(real rad) const { return randomPlaceNearEdge(rad, 1<<20); }
     
     /// a random position located on the edge of the Space, uniformly distributed on the surface
-    virtual Vector randomPlaceOnEdge(real rad) const { return randomPlaceOnEdge(rad, 1<<14); }
+    virtual Vector randomPlaceOnEdge(real rad) const { return randomPlaceOnEdge(rad, 1<<20); }
 
     //------------------------------ SIMULATION --------------------------------
     

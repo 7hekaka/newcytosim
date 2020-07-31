@@ -26,7 +26,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit
  @return number of points stored in 'pts[]'
  */
 template <typename VECTOR>
-size_t tossPointsSphere(std::vector<VECTOR>& pts, real sep, size_t limit_trials)
+size_t tossPointsSphere(std::vector<VECTOR>& pts, real sep, size_t max_trials)
 {
     const real ss = sep * sep;
     size_t ouf = 0;
@@ -36,7 +36,7 @@ size_t tossPointsSphere(std::vector<VECTOR>& pts, real sep, size_t limit_trials)
     for ( VECTOR& vec : pts )
     {
     toss:
-        if ( ++ouf > limit_trials )
+        if ( ++ouf > max_trials )
             break;
         
         pos = VECTOR::randU();

@@ -319,7 +319,7 @@ void  Vector4::addRand(real n)        { XX += n*RNG.sreal(); YY += n*RNG.sreal()
  with the distance between two points never below `sep`.
  @return number of points stored in 'pts[]'
  */
-size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials)
+size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t max_trials)
 {
     const real ss = sep * sep;
     size_t ouf = 0;
@@ -328,7 +328,7 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials)
     for ( Vector2& vec : pts )
     {
     toss:
-        if ( ++ouf > limit_trials )
+        if ( ++ouf > max_trials )
             break;
         
         const Vector2 V = Vector2::randB();
@@ -350,7 +350,7 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials)
  with the distance between two points never below `sep`.
  @return number of points stored in 'pts[]'
  */
-size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit_trials)
+size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_trials)
 {
     const real ss = sep * sep;
     size_t ouf = 0;
@@ -359,7 +359,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit
     for ( Vector3& vec : pts )
     {
     toss:
-        if ( ++ouf > limit_trials )
+        if ( ++ouf > max_trials )
             break;
         
         real a = M_PI * RNG.sreal();

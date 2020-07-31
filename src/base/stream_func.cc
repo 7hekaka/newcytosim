@@ -124,7 +124,7 @@ void print_line(std::ostream& os, const char prefix[], std::string const& line)
 void StreamFunc::mark_line(std::ostream& os, std::istream& is, std::streampos pos, const char prefix[])
 {
     is.clear();
-    std::streampos isp, sos = is.tellg();
+    std::streampos sos = is.tellg(), isp = sos;
     is.seekg(0);
 
     // get the line containing 'pos'
@@ -140,7 +140,7 @@ void StreamFunc::mark_line(std::ostream& os, std::istream& is, std::streampos po
     is.seekg(sos);
 
     std::string sub;
-    unsigned i = 0;
+    std::streamoff i = 0;
     while ( i < off )
     {
         int c = line[i++];
@@ -150,8 +150,8 @@ void StreamFunc::mark_line(std::ostream& os, std::istream& is, std::streampos po
     }
     sub.push_back('^');
     //sub.append(" ("+std::string(1, is.peek())+")");
-    print_line(os, prefix, line);
-    print_line(os, prefix, sub);
+    os << '\n' << prefix << " " << line;
+    os << '\n' << prefix << " " << sub;
 }
 
 

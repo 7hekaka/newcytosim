@@ -97,19 +97,33 @@ void Parser::parse_set(std::istream& is)
     
     if ( cat == "simul" )
     {
-        name = Tokenizer::get_symbol(is);
+#ifdef BACKWARD_COMPATIBILITY
+        // Patch to accept 'set simul:display NAME {}':
+        if ( spec )
+        {
+            is.get(); // skip ':'
+            para = Tokenizer::get_symbol(is);
+        }
+#endif
+        name = Tokenizer::get_token(is);
         blok = Tokenizer::get_block(is, '{', true);
 
         if ( do_change )
         {
+#ifdef BACKWARD_COMPATIBILITY
+            if ( spec )
+                opt.define(para, blok);
+            else
+#endif
             opt.read(blok);
             execute_change(simul.prop, opt);
-            simul.rename(name);
+            if ( name != "*" )
+                simul.rename(name);
         }
 #ifdef BACKWARD_COMPATIBILITY
-        else if ( name == "display" )
+        else if ( para == "display" )
         {
-            opt.define(name, blok);
+            opt.define(para, blok);
             execute_change(simul.prop, opt);
         }
 #endif
@@ -154,17 +168,9 @@ void Parser::parse_set(std::istream& is)
         if ( spec )
         {
             //set CLASS:PARAMETER NAME { VALUE }
-            is.get();
+            is.get(); // skip ':'
             para = Tokenizer::get_symbol(is);
-            // Patch to accept 'set simul:display * {}':
-            if ( cat == "simul" )
-            {
-                name = simul.prop->name();
-                // skip the name
-                Tokenizer::get_token(is);
-            }
-            else
-                name = Tokenizer::get_token(is);
+            name = Tokenizer::get_token(is);
         }
         else
 #endif

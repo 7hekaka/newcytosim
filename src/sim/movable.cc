@@ -132,11 +132,11 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
             
             if ( tok == "surface" )
             {
-                real e = 0.1;
-                is >> e;
-                if ( e < REAL_EPSILON )
+                real R = 1;
+                is >> R;
+                if ( R < REAL_EPSILON )
                     throw InvalidParameter("distance R must be > 0 in `surface R`");
-                return spc->randomPlaceOnEdge(e);
+                return spc->randomPlaceOnEdge(R);
             }
 
             if ( tok == "outside_sphere" )
@@ -447,120 +447,117 @@ Vector Movable::readPosition0(std::istream& is, Space const* spc)
  */ 
 Vector Movable::readPosition(std::istream& is, Space const* spc)
 {
+    size_t ouf = 0, max_trials = 1<<14;
     std::string tok;
     Vector pos(0,0,0);
     std::streampos isp, start = is.tellg();
     
-    try
+restart:
+    if ( is.fail() )
+        return pos;
+    pos = readPosition0(is, spc);
+    is.clear();
+    
+    while ( !is.eof() )
     {
-    restart:
-        if ( is.fail() )
-            return pos;
-        pos = readPosition0(is, spc);
-        is.clear();
+        isp = is.tellg();
+        tok = Tokenizer::get_symbol(is);
         
-        while ( !is.eof() )
+        if ( tok.empty() )
+            return pos;
+        
+        // Translation is specified with 'at' or 'move'
+        if ( tok == "at"  ||  tok == "move" )
         {
-            isp = is.tellg();
-            tok = Tokenizer::get_symbol(is);
-
-            if ( tok.empty() )
-                return pos;
-            
-            // Translation is specified with 'at' or 'move'
-            if ( tok == "at"  ||  tok == "move" )
-            {
-                Vector vec(0,0,0);
-                is >> vec;
-                pos = pos + vec;
-            }
-            // Convolve with shape
-            else if ( tok == "add" )
-            {
-                Vector vec = readPosition0(is, spc);
-                pos = pos + vec;
-            }
-            // Alignment with a vector is specified with 'align'
-            else if ( tok == "align" )
-            {
-                Vector vec = readDirection(is, pos, spc);
-                Rotation rot = Rotation::randomRotationToVector(vec);
-                pos = rot * pos;
-            }
-            // Rotation is specified with 'turn'
-            else if ( tok == "turn" )
-            {
-                Rotation rot = readOrientation(is, pos, spc);
-                pos = rot * pos;
-            }
-            // apply central symmetry with 'flip'
-            else if ( tok == "flip" )
-            {
-                pos = -pos;
-            }
-            // Gaussian noise specified with 'blur'
-            else if ( tok == "blur" )
-            {
-                real blur = 0;
-                is >> blur;
-                pos += Vector::randG(blur);
-            }
-            // returns a random position between the two points specified
-            else if ( tok == "to" )
-            {
-                Vector vec = readPosition0(is, spc);
-                return pos + ( vec - pos ) * RNG.preal();
-            }
-            // returns one of the two points specified
-            else if ( tok == "or" )
-            {
-                Vector alt = readPosition0(is, spc);
-                if ( RNG.flip() ) pos = alt;
-            }
-            else if ( tok == "if" )
-            {
-                tok = Tokenizer::get_token(is);
-                Evaluator evaluator{{'X', pos.x()}, {'Y', pos.y()}, {'Z', pos.z()}};
-                try {
-                    if ( 0 == evaluator.evaluate(tok.c_str()) )
+            Vector vec(0,0,0);
+            is >> vec;
+            pos = pos + vec;
+        }
+        // Convolve with shape
+        else if ( tok == "add" )
+        {
+            Vector vec = readPosition0(is, spc);
+            pos = pos + vec;
+        }
+        // Alignment with a vector is specified with 'align'
+        else if ( tok == "align" )
+        {
+            Vector vec = readDirection(is, pos, spc);
+            Rotation rot = Rotation::randomRotationToVector(vec);
+            pos = rot * pos;
+        }
+        // Rotation is specified with 'turn'
+        else if ( tok == "turn" )
+        {
+            Rotation rot = readOrientation(is, pos, spc);
+            pos = rot * pos;
+        }
+        // apply central symmetry with 'flip'
+        else if ( tok == "flip" )
+        {
+            pos = -pos;
+        }
+        // Gaussian noise specified with 'blur'
+        else if ( tok == "blur" )
+        {
+            real blur = 0;
+            is >> blur;
+            pos += Vector::randG(blur);
+        }
+        // returns a random position between the two points specified
+        else if ( tok == "to" )
+        {
+            Vector vec = readPosition0(is, spc);
+            return pos + ( vec - pos ) * RNG.preal();
+        }
+        // returns one of the two points specified
+        else if ( tok == "or" )
+        {
+            Vector alt = readPosition0(is, spc);
+            if ( RNG.flip() ) pos = alt;
+        }
+        else if ( tok == "if" )
+        {
+            tok = Tokenizer::get_token(is);
+            Evaluator evaluator{{'X', pos.x()}, {'Y', pos.y()}, {'Z', pos.z()}};
+            try {
+                if ( 0 == evaluator.evaluate(tok.c_str()) )
+                {
+                    if ( ++ouf < max_trials )
                     {
                         is.seekg(start);
                         goto restart;
                     }
-                }
-                catch( Exception& e ) {
-                    e.message(e.message()+" in `"+tok+"'");
-                    throw;
+                    break;
                 }
             }
-            else
-            {
-                // unget last token:
-                is.clear();
-                is.seekg(isp);
-#if 1
-                /*
-                We need to work around a bug in the stream extraction operator,
-                which eats extra characters ('a','n','e','E') if a double is read
-                19.10.2015
-                */
-                is.seekg(-1, std::ios_base::cur);
-                int c = is.peek();
-                if ( c=='a' || c=='b' )
-                    continue;
-                is.seekg(1, std::ios_base::cur);
-#endif
-                break;
-                //throw InvalidParameter("unexpected `"+tok+"'");
+            catch( Exception& e ) {
+                e.message(e.message()+" in `"+tok+"'");
+                throw;
             }
         }
+        else
+        {
+            // unget last token:
+            is.clear();
+            is.seekg(isp);
+#if 1
+            /*
+             We need to work around a bug in the stream extraction operator,
+             which eats extra characters ('a','n','e','E') if a double is read
+             19.10.2015
+             */
+            is.seekg(-1, std::ios_base::cur);
+            int c = is.peek();
+            if ( c=='a' || c=='b' )
+                continue;
+            is.seekg(1, std::ios_base::cur);
+#endif
+            //throw InvalidParameter("unexpected `"+tok+"'");
+            break;
+        }
     }
-    catch ( InvalidParameter& e )
-    {
-        e << StreamFunc::marked_line(is, isp, PREF);
-        throw;
-    }
-    return pos;
+return pos;
 }
 
 
@@ -719,7 +716,7 @@ Vector Movable::readDirection0(std::istream& is, Vector const& pos, Space const*
                 return spc->normalToEdge(pos);
         }
         
-        throw InvalidParameter("Unknown direction `"+tok+"'");
+        throw InvalidParameter("Unknown direction specification `"+tok+"'");
     }
     
     {
@@ -739,76 +736,73 @@ Vector Movable::readDirection0(std::istream& is, Vector const& pos, Space const*
 
 Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* spc)
 {
+    size_t ouf = 0, max_trials = 1<<14;
     std::string tok;
     Vector dir(1,0,0);
     std::streampos isp, start = is.tellg();
     
-    try
+restart:
+    if ( is.fail() )
+        return dir;
+    dir = readDirection0(is, pos, spc);
+    is.clear();
+    
+    while ( !is.eof() )
     {
-    restart:
-        if ( is.fail() )
-            return dir;
-        dir = readDirection0(is, pos, spc);
-        is.clear();
+        isp = is.tellg();
+        tok = Tokenizer::get_symbol(is);
         
-        while ( !is.eof() )
+        if ( tok.empty() )
+            return dir;
+        
+        // Gaussian noise specified with 'blur'
+        else if ( tok == "blur" )
         {
-            isp = is.tellg();
-            tok = Tokenizer::get_symbol(is);
-
-            if ( tok.empty() )
-                return dir;
-            
-            // Gaussian noise specified with 'blur'
-            else if ( tok == "blur" )
-            {
-                real blur = 0;
-                is >> blur;
+            real blur = 0;
+            is >> blur;
 #if ( DIM == 3 )
-                Vector3 X, Y;
-                dir.orthonormal(X, Y);
-                X *= blur*RNG.gauss();
-                Y *= blur*RNG.gauss();
-                dir = normalize(dir+X+Y);
+            Vector3 X, Y;
+            dir.orthonormal(X, Y);
+            X *= blur*RNG.gauss();
+            Y *= blur*RNG.gauss();
+            dir = normalize(dir+X+Y);
 #elif ( DIM == 2 )
-                dir = Rotation::rotation(blur*RNG.gauss()) * dir;
+            dir = Rotation::rotation(blur*RNG.gauss()) * dir;
 #endif
-            }
-            // returns one of the two points specified
-            else if ( tok == "or" )
-            {
-                Vector alt = readDirection0(is, pos, spc);
-                if ( RNG.flip() ) dir = alt;
-            }
-            else if ( tok == "if" )
-            {
-                tok = Tokenizer::get_token(is);
-                Evaluator evaluator{{'X', dir.x()}, {'Y', dir.y()}, {'Z', dir.z()}};
-                try {
-                    if ( 0 == evaluator.evaluate(tok.c_str()) )
+        }
+        // returns one of the two points specified
+        else if ( tok == "or" )
+        {
+            Vector alt = readDirection0(is, pos, spc);
+            if ( RNG.flip() ) dir = alt;
+        }
+        else if ( tok == "if" )
+        {
+            tok = Tokenizer::get_token(is);
+            Evaluator evaluator{{'X', dir.x()}, {'Y', dir.y()}, {'Z', dir.z()}};
+            try {
+                if ( 0 == evaluator.evaluate(tok.c_str()) )
+                {
+                    if ( ++ouf < max_trials )
                     {
                         is.seekg(start);
                         goto restart;
                     }
-                }
-                catch( Exception& e ) {
-                    e.message(e.message()+" in `"+tok+"'");
-                    throw;
+                    break;
                 }
             }
-            else
-            {
-                // unget last token
-                is.clear();
-                is.seekg(isp);
-                break;
+            catch( Exception& e ) {
+                e.message(e.message()+" in `"+tok+"'");
+                throw;
             }
         }
-    }
-    catch ( InvalidParameter& e )
-    {
-        e << StreamFunc::marked_line(is, isp, PREF);
-        throw;
+        else
+        {
+            // unget last token
+            is.clear();
+            is.seekg(isp);
+            break;
+        }
     }
     return dir;
 }
