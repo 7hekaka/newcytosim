@@ -75,23 +75,18 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
             if ( ha && ha->attached() )
             {
                 rot = Rotation::randomRotationToVector(ha->dirFiber());
-                // remove key to avoid warning:
-                opt.clear("orientation");
+                // remove key to avoid unused warning:
+                opt.clear("direction");
                 break;
             }
             fib->mark(0);
         }
         // here is an intentional fallback on the next case:
         
-        case NucleatorProp::NUCLEATE_ORIENTATED:
+        case NucleatorProp::NUCLEATE_DIRECTED:
         {
             std::string str;
-            if ( opt.set(str, "orientation") )
-            {
-                std::istringstream iss(str);
-                rot = Movable::readOrientation(iss, pos, fib->prop->confine_space_ptr);
-            }
-            else if ( opt.set(str, "direction") )
+            if ( opt.set(str, "direction") )
             {
                 std::istringstream iss(str);
                 Vector vec = Movable::readDirection(iss, pos, fib->prop->confine_space_ptr);

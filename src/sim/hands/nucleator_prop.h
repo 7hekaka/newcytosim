@@ -23,7 +23,7 @@ public:
     /// indicates a specificity
     enum Specificity
     {
-        NUCLEATE_ORIENTATED,
+        NUCLEATE_DIRECTED,
         NUCLEATE_PARALLEL, 
         NUCLEATE_ANTIPARALLEL, 
         NUCLEATE_PARALLEL_IF

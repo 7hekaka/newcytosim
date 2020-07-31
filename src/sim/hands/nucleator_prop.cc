@@ -23,7 +23,7 @@ void NucleatorProp::clear()
     rate         = 0;
     fiber_type   = "";
     fiber_spec   = "";
-    specificity  = NUCLEATE_ORIENTATED;
+    specificity  = NUCLEATE_DIRECTED;
     track_end    = NO_END;
     hold_end     = MINUS_END;
     addictive    = false;
@@ -63,9 +63,9 @@ void NucleatorProp::read(Glossary& glos)
                                        {"minus_end", MINUS_END},
                                        {"plus_end",  PLUS_END}});
     
-    glos.set(specificity, "specificity", {{"off",          NUCLEATE_ORIENTATED},
+    glos.set(specificity, "specificity", {{"off",          NUCLEATE_DIRECTED},
 #ifdef BACKWARD_COMPATIBILITY
-                                          {"none",         NUCLEATE_ORIENTATED},
+                                          {"none",         NUCLEATE_DIRECTED},
 #endif
                                           {"parallel",     NUCLEATE_PARALLEL},
                                           {"antiparallel", NUCLEATE_ANTIPARALLEL},
