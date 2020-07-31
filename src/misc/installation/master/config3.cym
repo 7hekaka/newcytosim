@@ -85,13 +85,13 @@ new head
     point4 = 0.0 -0.1 0
     point5 = 0.8 -0.1 0
     position = -5.0 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
 }
 
 new filament
 {
     position = 0 0.1 0
-    orientation = 1 0 0
+    direction = 1 0 0
     length = 10
 }
 
@@ -110,7 +110,7 @@ new linker
 new filament
 {
     position = 0 -0.1 0
-    orientation = 1 0 0
+    direction = 1 0 0
     length = 10
 }
 

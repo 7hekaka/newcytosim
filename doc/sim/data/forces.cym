@@ -30,7 +30,7 @@ new microtubule
 {
     length = 4
     position = 0 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
 }
 
 % with an extension of 1um and a stiffness of 10, the tension is ~10 pN

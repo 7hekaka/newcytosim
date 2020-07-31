@@ -108,7 +108,7 @@ new star
     solid = core
     %aster_angle = 0.6      % definit l'angle du pole, 30°, moy of measure
     position = 2 0
-    orientation = -1 0 0
+    direction = -1 0 0
     radius = 0.5, 0.1
     fibers = 400, filament, ( plus_end=grow; length=0.5, 0.1; )
 }
@@ -118,7 +118,7 @@ new star
     solid = core
     %aster_angle = 0.6      % definit l'angle du pole, 30°, moy of measure
     position = -2 0
-    orientation = 1 0 0
+    direction = 1 0 0
     radius = 0.5, 0.1
     fibers = 400, filament, ( plus_end=grow; length=0.5, 0.1; )
 }

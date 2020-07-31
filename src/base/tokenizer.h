@@ -54,7 +54,10 @@ namespace Tokenizer
 
     /// return next token if it looks like a variable name
     std::string get_symbol(std::istream&, bool eat_line=false);
-    
+
+    /// return 'true' if next symbol matches 'arg'
+    bool has_symbol(std::istream& is, std::string const& arg, bool eat_line=false);
+
     /// return next token if it looks like a variable name
     std::string get_symbols(std::istream&, bool eat_line=false);
     

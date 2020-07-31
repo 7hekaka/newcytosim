@@ -834,69 +834,46 @@ Rotation Movable::readRotation(std::istream& is)
         return Rotation::randomRotation();
     else if ( tok == "identity" || tok == "off" || tok == "none" )
         return Rotation::identity();
-    else if ( tok == "angle" || tok == "angles" )
+    else if ( tok == "angle" )
     {
         real ang = 0;
         is >> ang;
+        Vector3 dir(0,0,1);
+        if ( Tokenizer::has_symbol(is, "axis") )
+            is >> dir;
 #if ( DIM >= 3 )
-        Vector dir(0,0,1);
-        if ( is.good() )
-        {
-            isp = is.tellg();
-            if ( Tokenizer::get_symbol(is) == "axis" )
-                is >> dir;
-            else
-            {
-                is.clear();
-                is.seekg(isp);
-            }
-        }
         return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
         return Rotation::rotation(cos(ang), sin(ang));
 #endif
     }
-#if ( DIM >= 3 )
     else if ( tok == "axis" )
     {
-        real ang = 0;
-        Vector dir(0,0,1);
+        Vector3 dir(0,0,1);
         is >> dir;
-        isp = is.tellg();
-        tok = Tokenizer::get_symbol(is);
-        if ( tok == "angle" )
+        real ang = 0;
+        if ( Tokenizer::has_symbol(is, "angle") )
             is >> ang;
-        else if ( tok == "degree" )
+        else if ( Tokenizer::has_symbol(is, "degree") )
         {
             is >> ang;
             ang *= M_PI/180.0;
         }
-        else
-        {
-            is.clear();
-            is.seekg(isp);
-        }
+#if ( DIM >= 3 )
         return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
-    }
+#else
+        return Rotation::rotation(ang);
 #endif
+    }
     else if ( tok == "degree" )
     {
         real ang = 0;
         is >> ang;
         ang *= M_PI/180.0;
+        Vector3 dir(0,0,1);
+        if ( Tokenizer::has_symbol(is, "axis") )
+            is >> dir;
 #if ( DIM >= 3 )
-        Vector dir(0,0,1);
-        if ( is.good() )
-        {
-            isp = is.tellg();
-            if ( Tokenizer::get_symbol(is) == "axis" )
-                is >> dir;
-            else
-            {
-                is.clear();
-                is.seekg(isp);
-            }
-        }
         return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
         return Rotation::rotation(cos(ang), sin(ang));

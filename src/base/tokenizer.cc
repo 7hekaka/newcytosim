@@ -116,6 +116,20 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
 }
 
 
+bool Tokenizer::has_symbol(std::istream& is, std::string const& arg, bool eat_line)
+{
+    if ( is.good() )
+    {
+        std::streampos isp = is.tellg();
+        if ( get_symbol(is) == arg )
+            return true;
+        is.clear();
+        is.seekg(isp);
+    }
+    return false;
+}
+
+
 /**
  get_symbols() reads multiple symbols concatenated with ':'
  */
