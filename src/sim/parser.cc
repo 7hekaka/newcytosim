@@ -403,9 +403,9 @@ void Parser::parse_new(std::istream& is)
                 Vector A, B;
                 if ( !opt.set(A, "position_ends") || !opt.set(B, "position_ends", 1) )
                     throw InvalidParameter("two vectors need to be defined by `position_ends'");
-                opt.define("length",      0, (A-B).norm());
-                opt.define("position",    0, (A+B)*0.5);
-                opt.define("orientation", 0, (B-A).normalized());
+                opt.define("length",    0, (A-B).norm());
+                opt.define("position",  0, (A+B)*0.5);
+                opt.define("direction", 0, (B-A).normalized());
             }
 
             // distribute objects regularly between two points:

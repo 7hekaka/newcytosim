@@ -1,4 +1,5 @@
-% Contraction
+% Network contraction with filament turnover
+% around 2017
 
 set simul system
 {

@@ -496,7 +496,7 @@ public:
     void      reportCoupleConfiguration(std::ostream&, Property const*, bool com, Glossary&) const;
 
     /// print agregate properties of Couple force
-    void      reportCoupleForce(std::ostream&) const;
+    void      reportCoupleForce(std::ostream&, Property const*, bool com) const;
     
     /// print histogram of Couples force
     void      reportCoupleForceHistogram(std::ostream&, Glossary&) const;
@@ -514,7 +514,7 @@ public:
     void      reportSingleLink(std::ostream&, Property const*, bool com) const;
     
     /// print agregate properties of Singles force
-    void      reportSingleForce(std::ostream&) const;
+    void      reportSingleForce(std::ostream&, Property const*, bool com) const;
 
     /// print state of Couples 
     void      reportSpherePosition(std::ostream&, Property const*, bool com) const;

@@ -81,5 +81,5 @@ run 1000 system
     nb_frames = 10
 }
 
-report single:force:holder *
+report holder:force *
 

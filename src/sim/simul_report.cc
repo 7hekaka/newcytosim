@@ -365,7 +365,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "state" )
             return reportSingleState(out, sel, com);
         if ( what == "force" )
-            return reportSingleForce(out);
+            return reportSingleForce(out, sel, com);
         if ( what == "position" )
             return reportSinglePosition(out, sel, com);
         throw InvalidSyntax("I only know single: state, force, position, NAME");
@@ -381,7 +381,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "configuration" )
             return reportCoupleConfiguration(out, sel, com, opt);
         if ( what == "force" )
-            return reportCoupleForce(out);
+            return reportCoupleForce(out, sel, com);
         if ( what == "histogram" )
             return reportCoupleForceHistogram(out, opt);
         if ( what == "active" )
@@ -1567,7 +1567,7 @@ void reportSystemSet(std::ostream& out, SET& set, PropertyList const& properties
 
 void Simul::reportSystem(std::ostream& out) const
 {
-    out << COM << ljust("class", 2) << SEP << "count" << SEP << "vertices" << SEP << "largest";
+    out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "vertices" << SEP << "largest";
     reportSystemSet(out,  fibers, properties);
     reportSystemSet(out,  solids, properties);
     reportSystemSet(out, spheres, properties);
@@ -1939,7 +1939,7 @@ void Simul::reportSingle(std::ostream& out) const
 /**
  Export average properties of Couples forces
  */
-void Simul::reportSingleForce(std::ostream& out) const
+void Simul::reportSingleForce(std::ostream& out, Property const* sel, bool com) const
 {
     constexpr size_t MAX = 8;
     real cnt[MAX+1] = { 0 };
@@ -1950,7 +1950,7 @@ void Simul::reportSingleForce(std::ostream& out) const
     // accumulate counts:
     for ( Single const* i=singles.firstA(); i; i=i->next() )
     {
-        if ( i->hasForce() )
+        if ( i->hasForce() && ( !sel || sel == i->prop ))
         {
             size_t x = std::min(MAX, i->prop->number());
             real f = i->force().norm();
@@ -1960,8 +1960,9 @@ void Simul::reportSingleForce(std::ostream& out) const
             len[x] = std::max(len[x], i->stretch().norm());
         }
     }
-        
-    out << COM << ljust("class", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_length";
+    
+    if ( com )
+        out << COM << ljust("class", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( size_t i = 0; i < MAX; ++i )
     {
         if ( cnt[i] > 0 )
@@ -2145,7 +2146,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
 /**
  Export average properties of Couples forces
  */
-void Simul::reportCoupleForce(std::ostream& out) const
+void Simul::reportCoupleForce(std::ostream& out, Property const* sel, bool com) const
 {
     constexpr size_t MAX = 8;
     real cnt[MAX+1] = { 0 };
@@ -2156,15 +2157,19 @@ void Simul::reportCoupleForce(std::ostream& out) const
     // accumulate counts:
     for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
-        size_t x = std::min(MAX, i->prop->number());
-        real f = i->force().norm();
-        avg[x] += f;
-        cnt[x] += 1;
-        sup[x] = std::max(sup[x], f);
-        len[x] = std::max(len[x], i->stretch().norm());
+        if ( !sel || sel == i->prop )
+        {
+            size_t x = std::min(MAX, i->prop->number());
+            real f = i->force().norm();
+            avg[x] += f;
+            cnt[x] += 1;
+            sup[x] = std::max(sup[x], f);
+            len[x] = std::max(len[x], i->stretch().norm());
+        }
     }
         
-    out << COM << ljust("class", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_length";
+    if ( com )
+        out << COM << ljust("class", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( size_t i = 0; i < MAX; ++i )
     {
         if ( cnt[i] > 0 )
