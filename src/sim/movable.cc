@@ -809,7 +809,7 @@ restart:
 
 
 /**
- A rotation can be specified as follows:
+ A rotation can be specified in 3D as follows:
  
  Keyword                 | Rotation / Result
  ------------------------|-----------------------------------------------------------
@@ -929,6 +929,17 @@ Rotation Movable::readRotation(std::istream& is)
         real ang = 0.5 * M_PI;
         is >> ang;
         return Rotation::rotationAroundZ(ang);
+    }
+#else
+    else if ( tok == "X" )
+    {
+        return Rotation::identity();
+    }
+    else if ( tok == "Z" )
+    {
+        real ang = 0.5 * M_PI;
+        is >> ang;
+        return Rotation::rotation(ang);
     }
 #endif
     

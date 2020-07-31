@@ -81,7 +81,7 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
      report fiber:force;fiber:length
  
  */
-void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
+void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
 {
     std::streamsize p = 4;
     opt.peek(p, "precision");
@@ -93,18 +93,29 @@ void Simul::report(std::ostream& out, std::string arg, Glossary& opt) const
 
     // split argument:
     std::vector<std::string> args;
-    std::string::size_type pos = arg.find(';');
+    std::string::size_type pos = what.find(';');
     while ( pos != std::string::npos )
     {
-        args.push_back(arg.substr(0, pos));
-        arg = arg.substr(pos+1);
-        pos = arg.find(';');
+        args.push_back(what.substr(0, pos));
+        what = what.substr(pos+1);
+        pos = what.find(';');
     }
-    args.push_back(arg);
+    args.push_back(what);
 
     try {
-        for ( std::string const& what : args )
-            report_one(out, what, opt);
+        for ( std::string arg : args )
+        {
+            Glossary glos(opt);
+            // put options that appear after a space into 'glos':
+            pos = arg.find(' ');
+            if ( pos != std::string::npos )
+            {
+                glos.read_string(arg.substr(pos+1).c_str(), 2);
+                arg = arg.substr(0, pos);
+                //std::cerr << glos;
+            }
+            report_one(out, arg, glos);
+        }
     }
     catch( Exception & e )
     {

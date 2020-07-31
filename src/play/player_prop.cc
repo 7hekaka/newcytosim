@@ -97,7 +97,7 @@ void PlayerProp::toggleReport(bool alt)
             case 3: report = "fiber:energy";       break;
             case 4: report = "fiber:mesh;field";   break;
             case 5: report = "fiber:segment";      break;
-            case 6: report = "fiber:cluster";      break;
+            case 6: report = "fiber:cluster meca=1"; break;
             case 7: report = "fiber:age";          break;
             case 8: report = "fiber:distribution"; break;
         }
