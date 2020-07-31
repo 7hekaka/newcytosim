@@ -755,6 +755,7 @@
 		BBC422F724731657007EA070 /* node.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F624731657007EA070 /* node.cc */; };
 		BBC422FA247342CF007EA070 /* hand_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC422F8247342CF007EA070 /* hand_list.h */; };
 		BBC422FB247342CF007EA070 /* hand_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F9247342CF007EA070 /* hand_list.cc */; };
+		BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */; };
 		BBC96C5624A8A9CD00864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
 		BBC96C5724A8A9CD00864F9B /* sparmatsymblkdiag.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC96C5524A8A9CD00864F9B /* sparmatsymblkdiag.h */; };
 		BBC96C5824A8B56900864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
@@ -1755,6 +1756,7 @@
 		BBC422F624731657007EA070 /* node.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = node.cc; sourceTree = "<group>"; };
 		BBC422F8247342CF007EA070 /* hand_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hand_list.h; sourceTree = "<group>"; };
 		BBC422F9247342CF007EA070 /* hand_list.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hand_list.cc; sourceTree = "<group>"; };
+		BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fp_exceptions.cc; sourceTree = "<group>"; };
 		BBC91299204EC2DC00219DC5 /* test_pipe.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_pipe.cc; sourceTree = "<group>"; };
 		BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sparmatsymblkdiag.cc; sourceTree = "<group>"; };
 		BBC96C5524A8A9CD00864F9B /* sparmatsymblkdiag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sparmatsymblkdiag.h; sourceTree = "<group>"; };
@@ -2528,6 +2530,7 @@
 				BB9D224520C5D30200CBB0B1 /* simd.h */,
 				BB46A4C424A349F400E89FE2 /* simd_float.h */,
 				BB18BB8523CDC20400B3605E /* simd_print.h */,
+				BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */,
 				BBE447C4206468560058ADAC /* random */,
 				BB1B0F5323D3068B00C2608A /* grid */,
 				BB21D1F017D9BDA8005F5A8E /* BLAS */,
@@ -4700,6 +4703,7 @@
 				BB089A0C2228A26D00C070E7 /* matrix33.cc in Sources */,
 				BB089A0B2228A26D00C070E7 /* matrix22.cc in Sources */,
 				BB74F41B231C334D0019D68E /* sparmatblk.cc in Sources */,
+				BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */,
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
 				BBC422F724731657007EA070 /* node.cc in Sources */,
