@@ -135,7 +135,7 @@ new star
     type = astral
     %aster_angle = 0.6      %% definit l'angle du pole, 30°, moy of measure
     position = 2 0
-    orientation = -1 0 0
+    direction = -1 0 0
     point1 = center, 0.5
     radius = 0.5, 0.2
     fibers = 500, microtubule, ( length = 0.5, 0.1; plus_end = grow; )
@@ -147,7 +147,7 @@ new star
     type = astral
     %aster_angle = 0.6      %% definit l'angle du pole, 30°, moy of measure
     position = -2 0
-    orientation = 1 0 0
+    direction = 1 0 0
     point1 = center, 0.5
     radius = 0.5, 0.2
     fibers = 500, microtubule, ( length = 0.5, 0.1; plus_end = grow; )

@@ -60,21 +60,21 @@ new 2 microtubule
 {
     length = 0.512
     range = 0 0.025 -0.025, 0 -0.025 0.025
-    orientation = +1 0 0
+    direction = +1 0 0
 }
 
 new 2 microtubule
 {
     length = 0.512
     range = 0 -0.025 -0.025, 0 0.025 0.025
-    orientation = -1 0 0
+    direction = -1 0 0
 }
 
 new microtubule
 {
     length = 0.512
     position = 0 0.025 0.075
-    orientation = 1 0 0
+    direction = 1 0 0
 }
 
 new 128 complex

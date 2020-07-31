@@ -44,7 +44,7 @@ new 3 actin_brush
     fibers = 12, actin, ( length = 1 )
     radius = 1
     range = -3 0, 3 0
-    orientation = 1 0 0
+    direction = 1 0 0
 
     point1 = 0 -0.2 0, 0.2
     point2 = 0 +0.2 0, 0.2

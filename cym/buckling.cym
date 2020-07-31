@@ -45,7 +45,7 @@ new filament
 {
     length = 10
     position = 0 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
     attach1 = link, 0,,, -4 0 0
     attach2 = link, 10,,, 4 0 0
 }

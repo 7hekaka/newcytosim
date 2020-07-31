@@ -56,7 +56,7 @@ new 1 dna
 {
     length = 0.2
     position = 0 -2 0
-    orientation = 0 -1 0
+    direction = 0 -1 0
     attach = anchor, 0, plus_end
     plus_end = grow
 }

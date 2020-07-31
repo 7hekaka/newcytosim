@@ -70,14 +70,14 @@ new cell
 new microtubule
 {
     position = 1 0.1 0
-    orientation = 1 0 0
+    direction = 1 0 0
     length = 10
 }
 
 new microtubule
 {
     position = ( 1 -0.1 0 )
-    orientation = 1 0 0
+    direction = 1 0 0
     length = 10
 }
 % these static crosslinkers will link the two filaments near their minus-end

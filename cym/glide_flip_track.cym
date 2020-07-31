@@ -83,7 +83,7 @@ new 1 microtubule
 {
     length = 10
     position = -6 0 0
-    orientation = -1 0 0
+    direction = -1 0 0
 }
 
 % --------------

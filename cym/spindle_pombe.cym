@@ -76,7 +76,7 @@ new mtoc
     seed_diameter = 0.025
     fibers = 6, microtubule, ( plus_end=grow; length=3.0; )
     position = -2.0 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
 }
 
 new mtoc
@@ -88,7 +88,7 @@ new mtoc
     fibers = 6, microtubule, ( plus_end=grow; length=3.0; )
     seed_diameter = 0.025
     position = 2.0 0 0
-    orientation = -1 0 0 
+    direction = -1 0 0 
 }
 
 set hand ase1_clasp

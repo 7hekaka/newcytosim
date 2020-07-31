@@ -43,7 +43,7 @@ set fiber microtubule
 new 10 microtubule
 {
     length = 7, exponential
-    orientation = 1 0 0
+    direction = 1 0 0
     position = rectangle 0 0.5 at -19 -1.5
     reference = minus_end
 }

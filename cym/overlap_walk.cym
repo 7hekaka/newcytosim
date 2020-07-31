@@ -62,14 +62,14 @@ new 3 microtubule
 {
     length = 1
     range = -0.2 -0.125, -0.2 0.075
-    orientation = +1 0
+    direction = +1 0
 }
     
 new 3 microtubule
 {
     length = 1
     range = 0.2 -0.075, 0.2 0.125
-    orientation = -1 0
+    direction = -1 0
 }
 
 new 256 complex

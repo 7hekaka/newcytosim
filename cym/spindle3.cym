@@ -118,7 +118,7 @@ new 100 filament
 {
     position = ( rectangle 2 2 at -3 0 )
     length = 4
-    orientation = ( 1 0 0 )
+    direction = 1 0 0
     plus_end = grow
 }
 
@@ -126,7 +126,7 @@ new 100 filament
 {
     position = ( rectangle 2 2 at 3 0 )
     length = 4
-    orientation = ( -1 0 0 )
+    direction = -1 0 0
     plus_end = grow
 }
 
@@ -134,7 +134,7 @@ new 50 filament
 {
     position = ( rectangle 2 2 at -5 0 )
     length = 3
-    orientation = ( 1 0 0 )
+    direction = 1 0 0
     plus_end = grow
 }
 
@@ -142,7 +142,7 @@ new 50 filament
 {
     position = ( rectangle 2 2 at 5 0 )
     length = 3
-    orientation = ( -1 0 0 )
+    direction = -1 0 0
     plus_end = grow
 }
 

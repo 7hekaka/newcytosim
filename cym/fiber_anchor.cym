@@ -44,7 +44,7 @@ set fiber filament
 
 new 32 filament
 {
-    orientation = 1 0.2 0, random
+    direction = 1 0.2 0, random
     position = ( -6 0 0 )
     length = 8
     attach1 = pivot, 0, minus_end
@@ -53,7 +53,7 @@ new 32 filament
 
 new filament
 {
-    orientation = 1 0 0
+    direction = 1 0 0
     position = ( 1.5 0 0 )
     length = 3
     attach = pivot, 0, minus_end

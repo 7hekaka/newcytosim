@@ -75,7 +75,7 @@ set couple link
 
 new filament
 {
-    orientation = 0 1 0
+    direction = 0 1 0
     position = 0 0 0
     length = 3
 }

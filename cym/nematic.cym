@@ -5,45 +5,40 @@
 set simul system
 {
     time_step = 0.005
-    viscosity = 10
+    viscosity = 1
     steric = 1, 10, 1
     display = ( style=1; )
 }
 
-%------------------------CELL
-
-set space spindle
+set space shape
 {
     shape = ellipse
     display = ( color=0x0000FF33; visible=1; )
 }
-new spindle
-{
-    diameter = 12, 10, 10
-}
 
-%-------------------------MICROTUBULES
+new shape
+{
+    diameter = 5, 3, 3
+}
 
 set fiber microtubule
 {
-    rigidity = 20
-    segmentation = 2
-    confine = inside, 10, spindle
-    steric = 1, 0.15
+    rigidity = 10
+    segmentation = 0.5
+    confine = inside, 100, shape
+    steric = 1, 0.050
 
     display = ( line=2.5, 1; )
 }
 
-%-------------------------RUN
-
-new 5000 microtubule
+new 1500 microtubule
 {
-    direction = horizontal;
-    position = inside, spindle
-    length=2;
+    direction = X;
+    position = inside, shape
+    length = 3;
 }
 
-run 10000 system
+run 2000 system
 {
     nb_frames = 10
 }

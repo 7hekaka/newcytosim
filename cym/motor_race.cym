@@ -82,7 +82,7 @@ new 76 actin
 {
     length = 11;
     range = 0 -1.9, 0 1.9
-    orientation = 1 0 0;
+    direction = 1 0 0;
 }
 
 

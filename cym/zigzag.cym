@@ -47,7 +47,7 @@ new filament
 {
     length = 8
     position = 0 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
 }
 
 new link

@@ -86,7 +86,7 @@ new 32 microtubule
 {
     length = 2, exponential
     placement = all_inside
-    orientation = 1 0 0
+    direction = 1 0 0
     position = 0 -1 to 0 1
 }
 

@@ -61,7 +61,7 @@ set single grafted
 new microtubule
 {
     position = 0 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
     length = 5
     attach = holder, 0, minus_end
 }

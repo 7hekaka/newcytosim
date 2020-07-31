@@ -107,7 +107,7 @@ new 1 microtubule
 {
     length = 10
     position = -20 9.6 0
-    orientation = -1 0 0
+    direction = -1 0 0
 }
 
 run 40000 system
@@ -116,7 +116,7 @@ new 1 microtubule
 {
     length = 10
     position = -20 9.6 0
-    orientation = -1 0 0
+    direction = -1 0 0
 }
 
 run 100000 system

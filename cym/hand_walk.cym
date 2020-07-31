@@ -109,21 +109,21 @@ set single single2
 new fiber1
 {
     length = 1.5
-    orientation = 1 0 0
+    direction = 1 0 0
     position = 0 -0.1 0
 }
 
 new fiber2
 {
     length = 1.5
-    orientation = 1 0 0
+    direction = 1 0 0
     position = 0 0.1 0
 }
 
 new fiber3
 {
     length = 1.5
-    orientation = -1 0 0
+    direction = -1 0 0
     position = 0 0 0
 }
 

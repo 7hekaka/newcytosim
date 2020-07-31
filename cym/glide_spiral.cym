@@ -56,7 +56,7 @@ new 1 microtubule
 {
     length = 5
     position = 2.5 0 0
-    orientation = 1 0 0
+    direction = 1 0 0
     attach = pivot, 0, minus_end
     placement = anywhere
 }

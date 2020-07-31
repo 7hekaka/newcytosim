@@ -61,7 +61,7 @@ set single anchor
 new microtubule
 {
     position = -6 0 0
-    orientation = -1 0 0
+    direction = -1 0 0
     length = 10
 }
 

@@ -48,7 +48,7 @@ new filament
 {
     length = 6
     position = 0 -1 0
-    orientation = 1 0 0
+    direction = 1 0 0
 }
 new link
 {
@@ -71,7 +71,7 @@ new filament
 {
     length = 3
     position = 1 1.2 0
-    orientation = 0 1 0
+    direction = 0 1 0
 }
 new link
 {
@@ -89,7 +89,7 @@ new filament
 {
     length = 3
     position = -1 1.2 0
-    orientation = 0 1 0
+    direction = 0 1 0
 }
 new link
 {

@@ -98,19 +98,19 @@ set single single2
 new 1 fiber1
 {
     length = 1
-    orientation = 1 0 0
+    direction = 1 0 0
     position = 0 -0.1 0
 }
 new 1 fiber2
 {
     length = 1
-    orientation = 1 0 0
+    direction = 1 0 0
     position = 0 0 0
 }
 new 1 fiber3
 {
     length = 1
-    orientation = 1 0 0
+    direction = 1 0 0
     position = 0 0.1 0
 }
 

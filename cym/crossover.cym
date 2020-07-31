@@ -111,7 +111,7 @@ new microtubule
 {
     length = 1
     position = 0 0 0.01
-    orientation = +1 0 0
+    direction = +1 0 0
     mark = 2
 }
 
@@ -119,7 +119,7 @@ new microtubule
 {
     length = 1
     position = 0 0 0.035
-    orientation = 1 2 0
+    direction = 1 2 0
     mark = 4
 }
 

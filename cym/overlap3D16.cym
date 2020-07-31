@@ -66,56 +66,56 @@ new 2 microtubule
 {
     length = 2
     range = 0 -0.025 -0.075, 0 0.075 -0.075
-    orientation = +1 0
+    direction = +1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.075 -0.075, 0 0.025 -0.075
-    orientation = -1 0
+    direction = -1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.025 -0.025, 0 0.075 -0.025
-    orientation = -1 0
+    direction = -1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.075 -0.025, 0 0.025 -0.025
-    orientation = +1 0
+    direction = +1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.025 +0.025, 0 0.075 +0.025
-    orientation = +1 0
+    direction = +1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.075 +0.025, 0 0.025 +0.025
-    orientation = -1 0
+    direction = -1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.025 +0.075, 0 0.075 +0.075
-    orientation = -1 0
+    direction = -1 0
 }
 
 new 2 microtubule
 {
     length = 2
     range = 0 -0.075 +0.075, 0 0.025 +0.075
-    orientation = +1 0
+    direction = +1 0
 }
 
 new 4000 complex
