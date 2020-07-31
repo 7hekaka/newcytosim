@@ -68,7 +68,7 @@ Once *cytosim* is running on your machine, check the tutorials, the page on [run
  We hope cytosim can be useful for your research. 
  Sincerely yours, The Developers of Cytosim:
 
-*  Francois Nedelec        1995-
+*  Francois J. Nedelec     1995-
 *  Dietrich Foethke        2003-2007
 *  Cleopatra Kozlowski     2003-2007
 *  Elizabeth Loughlin      2006-2010
@@ -77,11 +77,12 @@ Once *cytosim* is running on your machine, check the tutorials, the page on [run
 *  Jonathan Ward           2008-2014
 *  Antonio Politi          2010-2012
 *  Andre-Claude Clapson    2011-2013
+*  Jamie-Li Rickman        2014-2019
 *  Serge Dmitrieff         2013-
-*  Gaelle Letort           2014-
 *  Julio Belmonte          2014-
-*  Jamie-Li Rickman        2014-
+*  Gaelle Letort           2014-
 *  Manuel Lera-Ramirez     2017-
+*  Maud Formanek           2019-
 
 # Contact
 
