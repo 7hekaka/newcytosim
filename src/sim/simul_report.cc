@@ -322,7 +322,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "connector" )
             return reportFiberConnectors(out, opt);
 
-        throw InvalidSyntax("I only know fiber: position, end, minus_end, plus_end, "\
+        throw InvalidSyntax("I can only report fiber: position, end, minus_end, plus_end, "\
                             "point, moment, speckle, sample, segment, dynamic, length, "\
                             "distribution, tension, force, cluster, age, energy, hand, link");
     }
@@ -332,7 +332,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportBeadPosition(out, sel, com);
         if ( what == "single" )
             return reportBeadSingles(out);
-        throw InvalidSyntax("I only know bead: position, single");
+        throw InvalidSyntax("I can only report bead: position, single");
     }
     if ( who == "solid" )
     {
@@ -340,7 +340,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSolidHands(out);
         if ( what == "position" || what.empty() )
             return reportSolidPosition(out, sel, com);
-        throw InvalidSyntax("I only know `solid'");
+        throw InvalidSyntax("I can only report solid: hand, position");
     }
     if ( who == "space" )
     {
@@ -348,13 +348,13 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSpaceForce(out);
         if ( what.empty() )
             return reportSpace(out);
-        throw InvalidSyntax("I only know `space'");
+        throw InvalidSyntax("I can only report `space` and space:force");
     }
     if ( who == "sphere" )
     {
         if ( what == "position" || what.empty() )
             return reportSpherePosition(out, sel, com);
-        throw InvalidSyntax("I only know `sphere'");
+        throw InvalidSyntax("I can only report sphere:position");
     }
     if ( who == "single" )
     {
@@ -368,7 +368,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSingleForce(out, sel, com);
         if ( what == "position" )
             return reportSinglePosition(out, sel, com);
-        throw InvalidSyntax("I only know single: state, force, position, NAME");
+        throw InvalidSyntax("I can only report single: link, state, force, position");
     }
     if ( who == "couple" )
     {
@@ -388,19 +388,19 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportCoupleActive(out, sel, com);
         if ( what == "anatomy" )
             return reportCoupleAnatomy(out);
-        throw InvalidSyntax("I only know couple: state, link, active, force, anatomy, NAME");
+        throw InvalidSyntax("I can only report couple: state, link, configuration, active, force, anatomy");
     }
     if ( who == "organizer" )
     {
         if ( what.empty() )
             return reportOrganizer(out);
-        throw InvalidSyntax("I only know `organizer'");
+        throw InvalidSyntax("I can only report `organizer'");
     }
     if ( who == "aster" )
     {
         if ( what.empty() )
             return reportAster(out);
-        throw InvalidSyntax("I only know `aster'");
+        throw InvalidSyntax("I can only report `aster'");
     }
     if ( who == "field" )
     {
@@ -416,7 +416,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportInventory(out);
         if ( what == "property" || what == "parameter" )
             return writeProperties(out, false);
-        throw InvalidSyntax("I only know system: time; inventory; property");
+        throw InvalidSyntax("I can only report system: time, inventory, property");
     }
     if ( who == "property" )
     {
@@ -433,7 +433,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportIndices(out);
         if ( what == "profile" )
             return reportProfile(out);
-        throw InvalidSyntax("I only know spindle: indices, profile");
+        throw InvalidSyntax("I can only report spindle: indices, profile");
     }
     if ( who == "network" && what == "bridge" )
         return reportNetworkBridges(out, opt);
