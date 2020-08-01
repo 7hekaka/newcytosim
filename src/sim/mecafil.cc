@@ -5,7 +5,6 @@
 #include "mecafil.h"
 #include "blas.h"
 #include "lapack.h"
-#include "matsym.h"
 #include "random.h"
 #include "vecprint.h"
 
