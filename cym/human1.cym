@@ -47,7 +47,7 @@ set bead ball
 new 21 ball
 {
     radius = 1
-	position = cylinder 2 5
+    position = cylinder 2 5
 }
 
 run 200 system

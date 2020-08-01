@@ -4,6 +4,7 @@
 
 set simul system
 {
+    dim = 2
     viscosity = 0.1       % educated guess
     time_step = 0.002     % in seconds
     steric = 1, 100       % enable steric interaction, with stiffness 100

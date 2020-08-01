@@ -50,7 +50,7 @@ set filament display
 {
     color      = 0xFFFFFFFF, 0x333333FF, 0xFFFFFF00;
     coloring   = 5;
-	points     = 6, 1;
+    points     = 6, 1;
     lines      = 4, 1;
 }
 

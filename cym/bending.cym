@@ -22,7 +22,7 @@ set fiber microtubule
 {
     rigidity = 100
     segmentation = 0.5
-	end_force = 0 -1 0, both_ends
+    end_force = 0 -1 0, both_ends
     display = ( color=blue; point=3,1; line=10,2; tension_scale=10; )
 }
 

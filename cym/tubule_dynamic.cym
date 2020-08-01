@@ -77,7 +77,7 @@ set hand dynein
     hold_growing_end = 1
     forward_rate = 277
     backward_rate = 0.34
-	unbinding_chance = 0.01
+    unbinding_chance = 0.01
     step_size = 0.008
     stride = -1
     force = 2

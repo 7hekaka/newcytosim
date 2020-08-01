@@ -12,6 +12,7 @@
 
 set simul system
 {
+    dim = 3
     time_step = 0.01
     viscosity = 0.2
 }
@@ -76,8 +77,8 @@ new star
     fibers = 2048, microtubule, ( plus_end=grow; length=2.6, 2.5; )
 }
 
-run 50000 system
+run 10000 system
 {
-    nb_frames = 100
+    nb_frames = 50
 }
 

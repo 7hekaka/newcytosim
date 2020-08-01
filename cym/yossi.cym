@@ -83,7 +83,7 @@ new 100 blob
 
 run system
 {
-    nb_steps  = 100000
-    nb_frames = 100
+    nb_steps  = 10000
+    nb_frames = 50
 }
 
