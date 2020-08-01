@@ -10,28 +10,28 @@ set(SOURCES_SIM
     "${PROJECT_SOURCE_DIR}/src/sim/object_set.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_site.cc"
     
-	"${PROJECT_SOURCE_DIR}/src/sim/sphere_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/sphere_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/sphere.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/sphere_set.cc"
     
-	"${PROJECT_SOURCE_DIR}/src/sim/bead.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/bead.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/bead_set.cc"
     
-	"${PROJECT_SOURCE_DIR}/src/sim/solid_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/solid_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/solid.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/solid_set.cc"
-	
+    
     "${PROJECT_SOURCE_DIR}/src/sim/field.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/field_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/field_set.cc"
     
-	"${PROJECT_SOURCE_DIR}/src/sim/event.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/event.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/event_set.cc"
-	
-	"${PROJECT_SOURCE_DIR}/src/sim/tubule_prop.cc"
+    
+    "${PROJECT_SOURCE_DIR}/src/sim/tubule_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/tubule.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/tubule_set.cc"
-	
+    
     "${PROJECT_SOURCE_DIR}/src/sim/meca.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/simul_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_grid.cc"
@@ -64,14 +64,14 @@ set(SOURCES_HANDS
     "${PROJECT_SOURCE_DIR}/src/sim/hands/mighty.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/mighty_prop.cc"
     
-	"${PROJECT_SOURCE_DIR}/src/sim/hands/chewer_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/hands/chewer_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/chewer.cc"
-	"${PROJECT_SOURCE_DIR}/src/sim/hands/walker_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/hands/walker_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/walker.cc"
-	"${PROJECT_SOURCE_DIR}/src/sim/hands/regulator_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/hands/regulator_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/regulator.cc"
-	
-	"${PROJECT_SOURCE_DIR}/src/sim/hands/digit_prop.cc"
+    
+    "${PROJECT_SOURCE_DIR}/src/sim/hands/digit_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/digit.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/myosin_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/myosin.cc"
