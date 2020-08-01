@@ -65,7 +65,7 @@ void PointGrid::createCells()
     max_diameter = pGrid.minimumWidth(1);
     
     //report the grid size used
-    pGrid.printSummary(std::clog, "StericGrid");
+    pGrid.printSummary(Cytosim::log, "StericGrid");
 }
 
 

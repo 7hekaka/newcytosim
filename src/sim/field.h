@@ -106,8 +106,7 @@ private:
         mGrid.createCells();
         // set all values to zero (already done in the constructor of FieldValue)
         // mGrid.clear();
-        // report dimensions:
-        //mGrid.printSummary(std::clog, "Field");
+        mGrid.printSummary(Cytosim::log, "Field");
     }
     
 public:

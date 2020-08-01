@@ -861,14 +861,14 @@ public:
 
 #pragma mark -
 
-    /// write some info on the grid
+    /// write total number of cells and number of subdivision in each dimension
     void printSummary(std::ostream& os, const char arg[])
     {
         char str[512], *ptr = str;
         char*const end = str+sizeof(str);
         ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells:", arg, ORD, gAllocated);
         for ( int d = 0; d < ORD; ++d )
-            ptr += snprintf(ptr, end-ptr, "\n   [ %6.3f  %+6.3f ] / %4lu = %6.3f", gInf[d], gSup[d], gDim[d], cWidth[d]);
+            ptr += snprintf(ptr, end-ptr, "\n   [ %9.3f  %+9.3f ] / %6lu = %9.3f", gInf[d], gSup[d], gDim[d], cWidth[d]);
         os << str << std::endl;
     }
 };
