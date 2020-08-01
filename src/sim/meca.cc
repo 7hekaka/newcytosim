@@ -1672,7 +1672,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         
         if ( !monitor.converged() )
         {
-            // no method could converge... this is really bad!
+            // if the solve could converge, its result cannot be used!
             if ( monitor.residual() > 4*tolerance_ )
                 throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
             return 0;
@@ -1758,7 +1758,8 @@ void Meca::apply()
     }
     else
     {
-        printf("superfluous Meca::apply() call\n");
+        // if !ready_, the result is not usable
+        //printf("superfluous call to Meca::apply()\n");
     }
 }
 
