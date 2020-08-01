@@ -36,6 +36,7 @@ set(SOURCES_SIM
     "${PROJECT_SOURCE_DIR}/src/sim/simul_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_grid.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/point_grid.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/point_gridF.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/space_set.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/simul.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/interface.cc"
@@ -44,6 +45,7 @@ set(SOURCES_SIM
 
 set(SOURCES_HANDS
     "${PROJECT_SOURCE_DIR}/src/sim/hand.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/hand_list.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hand_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/motor.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/hands/motor_prop.cc"

@@ -6,6 +6,7 @@ set(BASE_SOURCES
     "${PROJECT_SOURCE_DIR}/src/base/iowrapper.cc"
     "${PROJECT_SOURCE_DIR}/src/base/exceptions.cc"
     "${PROJECT_SOURCE_DIR}/src/base/tictoc.cc"
+    "${PROJECT_SOURCE_DIR}/src/base/node.cc"
     "${PROJECT_SOURCE_DIR}/src/base/node_list.cc"
     "${PROJECT_SOURCE_DIR}/src/base/inventory.cc"
     "${PROJECT_SOURCE_DIR}/src/base/stream_func.cc"

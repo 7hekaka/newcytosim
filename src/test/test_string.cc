@@ -13,8 +13,9 @@ int main(int argc, char *argv[])
     try {
         throw InvalidParameter("illegal code ", 10, "=3");
     } catch( Exception & e ) {
-        std::cout << "[" << e.what() << "]\n";
+        std::cout << e.brief() << std::endl;
     }
     
     return 0;
 }
+
