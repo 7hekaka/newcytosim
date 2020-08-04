@@ -58,7 +58,7 @@ public:
     /// type of grid
     typedef Grid<SegmentList, DIM> grid_type;
 
-#if ATTACH_CLOSEST_FIBER
+#if BIND_CLOSEST_FIBER
 
     class HeavySegment
     {

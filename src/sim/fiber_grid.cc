@@ -247,7 +247,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 //------------------------------------------------------------------------------
 #pragma mark - Access
 
-#if ATTACH_CLOSEST_FIBER
+#if BIND_CLOSEST_FIBER
 
 /// used to qsort segments according to distance
 int compareSegments(const void * A, const void * B)

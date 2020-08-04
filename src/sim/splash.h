@@ -38,6 +38,6 @@ inline void print_version(std::ostream& os)
     os << " mesh " << FIBER_HAS_MESH;
     os << " family " << FIBER_HAS_FAMILY;
     os << " glue " << FIBER_HAS_GLUE;
-    os << " attach_closest " << ATTACH_CLOSEST_FIBER << "\n";
+    os << " bind_closest " << BIND_CLOSEST_FIBER << "\n";
 }
 

@@ -34,7 +34,7 @@ class LineDisp;
 #define FIBER_HAS_GLUE 0
 
 /// Flag to enable the sorting of targets for attachment of Hands {0, 1}
-#define ATTACH_CLOSEST_FIBER 1
+#define BIND_CLOSEST_FIBER 1
 
 
 /**

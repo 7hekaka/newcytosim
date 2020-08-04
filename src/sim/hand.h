@@ -20,8 +20,8 @@ class Simul;
  Hand is the parent to many class that implement different fiber-related activities.
  Hand provides binding/unbinding capacity to these derived classes.
  
- Attachment occurs with constant rate @ref HandPar "attach_rate" to any fiber located
- at distance  @ref HandPar "attach_range" or less.
+ Attachment occurs with constant rate @ref HandPar "binding_rate" to any fiber located
+ at distance  @ref HandPar "binding_range" or less.
  If attachment occurs, it happens on the closest point of the fiber,
  which is either the projection of the current position on the fiber axis, 
  or one of the fiber end.
