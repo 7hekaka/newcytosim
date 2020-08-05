@@ -560,7 +560,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
                     continue;
                 // Only attach if position is near the edge of the Space:
                 Vector prj = spc->project(pos);
-                if ( distanceSqr(pos, prj) > h->prop->binding_range_sqr )
+                if ( distanceSqr(pos, prj) >= square(h->prop->binding_range) )
                     continue;
                 // Single will be placed on the edge of the Space:
                 pos = prj;

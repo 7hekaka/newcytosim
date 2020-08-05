@@ -216,9 +216,6 @@ public:
     /// derived variable = probability to bind in one `time_step`;
     real   binding_prob;
     
-    /// derived variable = square(binding_range);
-    real   binding_range_sqr;
-    
     /// derived variable = unbinding_rate * time_step;
     real   unbinding_rate_dt;
     

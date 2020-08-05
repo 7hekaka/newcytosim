@@ -281,7 +281,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     targets.clear();
     
     // calculate distance to all targets
-    const real sup = ha.prop->binding_range_sqr;
+    const real sup = square(ha.prop->binding_range);
     for ( FiberSegment const& seg : segments )
     {
         if ( ha.keyMatch(seg.fiber()) )
@@ -344,7 +344,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     //std::clog << "tryToAttach has " << segments.size() << " targets\n";
 
     const uint32_t prob = 0x1p+32 * ha.prop->binding_prob;
-    const real sup = ha.prop->binding_range_sqr;
+    const real sup = square(ha.prop->binding_range);
     for ( FiberSegment const& seg : segments )
     {
         if ( RNG.pint() < prob )
@@ -461,7 +461,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
     // create a test Hand with a dummy HandMonitor:
     HandMonitor hm;
     Hand ha(hp, &hm);
-    real sup = square(hp->binding_range);
+    const real sup = square(hp->binding_range);
     
     //check all the segments to find those close enough from pos:
     for ( Fiber const* fib=set.first(); fib; fib=fib->next() )

@@ -234,7 +234,6 @@ void HandProp::complete(Simul const& sim)
     if ( sim.time_step() < REAL_EPSILON )
         throw InvalidParameter("simul:time_step is not defined");
     
-    binding_range_sqr = square(binding_range);
     unbinding_rate_dt = unbinding_rate * sim.time_step();
     //std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
 #if POOL_HAND_ATTACHMENT

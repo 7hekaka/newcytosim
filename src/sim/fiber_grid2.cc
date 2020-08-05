@@ -65,6 +65,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 
     // test all segments:
     const uint32_t prob = 0x1p+32 * ha.prop->binding_prob;
+    const real sup = square(ha.prop->binding_range);
     for ( FiberSegment const& seg : allSegments )
     {
         if ( RNG.pint() < prob )
@@ -77,7 +78,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
              Compare to the maximum attachment range of the hand,
              and compare a newly tossed random number with 'prob'
              */
-            if ( dis < ha.prop->binding_range_sqr )
+            if ( dis < sup )
             {
                 Fiber * fib = const_cast<Fiber*>(seg.fiber());
                 FiberSite pos(fib, seg.abscissa1()+abs);

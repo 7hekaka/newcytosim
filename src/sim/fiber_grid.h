@@ -60,16 +60,18 @@ public:
 
 #if BIND_CLOSEST_FIBER
 
+    /// HeavySegment is used to calculate distance of segments to a point
     class HeavySegment
     {
     public:
-        FiberSegment seg_;
-        real         dis_;
-        real         abs_;
+        FiberSegment seg_;   //< The segment
+        real         dis_;   //< shortest distance from point to segment
+        real         abs_;   //< abscissa of projection of point
         HeavySegment() { }
         HeavySegment(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
     };
     
+    /// list of HeavySegments
     typedef Array<HeavySegment> HeavySegmentList;
 
     /// used for tryToAttach()
