@@ -84,7 +84,7 @@ def process_dir(roots, pathL, files):
     else:
         path = pathL
     pathR = os.path.normpath(roots[1] + '/' + path)
-    #print("PATH %s %s" % (pathL, pathR))
+    #print("PATH %s %s %s" % (path, pathL, pathR))
     #print("FILES %s" % files)
     if path.endswith('.svn'):
         return
@@ -94,11 +94,9 @@ def process_dir(roots, pathL, files):
         return
     if 0 <= path.find('/.git/'):
         return
-    if path == 'DerivedData':
+    if path.startswith('/bin'):
         return
-    if path.startswith('bin'):
-        return
-    if path == 'build':
+    if path.startswith('/build/'):
         return
     print_spacer('%s %s'%(pathL, pathR))
     for file in files:
