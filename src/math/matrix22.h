@@ -824,7 +824,7 @@ public:
         return Matrix22(c, s, -s, c);
     }
     
-    /// return rotation matrix of angle defined by cosinus and sinus
+    /// return rotation matrix of given angle
     static Matrix22 rotation(const real ang)
     {
         real c = cos(ang), s = sin(ang);

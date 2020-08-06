@@ -375,9 +375,15 @@ public:
     }
 
     /// return rotation matrix of angle defined by cosinus and sinus
-    static Matrix11 rotation(real c, real s)
+    static Matrix11 rotation(const real c, const real s)
     {
         return Matrix11(sign_real(c));
+    }
+    
+    /// return rotation matrix of given angle
+    static Matrix11 rotation(const real ang)
+    {
+        return Matrix11(sign_real(cos(ang)));
     }
 
     /// rotation angle

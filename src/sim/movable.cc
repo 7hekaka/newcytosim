@@ -862,7 +862,7 @@ Rotation Movable::readRotation(std::istream& is)
 #if ( DIM >= 3 )
         return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
 #else
-        return Rotation::rotation(ang);
+        return Rotation::rotation(cos(ang), sin(ang));
 #endif
     }
     else if ( tok == "degree" )
