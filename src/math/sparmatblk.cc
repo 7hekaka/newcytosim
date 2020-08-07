@@ -668,7 +668,7 @@ vec2 SparMatBlk::Line::vecMul2DU(const real* X) const
     const size_t* inx = inx_;
     const real* end = sbk_[size_-size_%4];
     #pragma nounroll
-    for ( ; M < end; M += SB )
+    for ( ; M < end; M += 4*SB )
     {
         assert_true( inx[0] < inx[1] );
         assert_true( inx[1] < inx[2] );
