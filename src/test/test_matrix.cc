@@ -276,7 +276,7 @@ void testMatrix(MATRIX & mat,
     double t3 = toc();
 
     printf("\n%-20s : ", mat.what().c_str());
-    printf("set %8.3f  add %8.3f  alt %8.3f  mul %8.3f", ts, t1, t2, t3);
+    printf("set %8.3f  muladd %8.3f  alt %8.3f  mul %8.3f", ts, t1, t2, t3);
     checkMatrix(mat, size, x, y, z);
 }
 

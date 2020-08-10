@@ -2847,7 +2847,7 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
 
 /**
  Link `ptA` (A) and `ptB` (B),
- but the links are maded between SA and SB which are located
+ but the links are made between SA and SB which are located
  on the side of A and B, respectively:
  
      SA = A + len * N_A,

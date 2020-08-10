@@ -133,7 +133,7 @@ void ClassicFiber::step()
 #if NEW_LENGTH_DEPENDENT_CATASTROPHE
         /*
          Ad-hoc length dependence, used to simulate S. pombe with catastrophe_length=5
-         Foethke et al. MSB 5:241 - 2009
+         Foethke et al. Molecular Systems Biology 5:241 - 2009
          */
         if ( prop->catastrophe_length > 0 )
         {
