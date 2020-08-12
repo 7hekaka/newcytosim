@@ -210,9 +210,6 @@ public:
     /// derived variable: 1.0/unbinding_force
     real   unbinding_force_inv;
     
-    /// oversampled binding_rate for Gillespie's method
-    real   binding_rate_dt_8;
-    
     /// derived variable = probability to bind in one `time_step`;
     real   binding_prob;
     
