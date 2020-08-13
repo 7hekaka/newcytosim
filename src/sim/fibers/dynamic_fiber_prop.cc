@@ -34,6 +34,7 @@ void DynamicFiberProp::clear()
         zone_hydrolysis_rate[i] = 0;
         shrinking_speed[i]      = 0;
         rebirth_rate[i]         = 0;
+        rescue_rate[i] 			= 0;
     }
 }
 
@@ -49,7 +50,7 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(hydrolysis_rate,      2, "hydrolysis_rate");
     glos.set(shrinking_speed,      2, "shrinking_speed");
     glos.set(rebirth_rate,         2, "rebirth_rate");
-    
+    glos.set(rescue_rate,          2, "rescue_rate");
     glos.set(zone_space,              "zone_space");
     glos.set(zone_radius,             "zone_radius");
     glos.set(zone_hydrolysis_rate, 2, "zone_hydrolysis_rate");
@@ -108,6 +109,12 @@ void DynamicFiberProp::complete(Simul const& sim)
         if ( rebirth_rate[i] < 0 )
             throw InvalidParameter("fiber:rebirth_rate should be >= 0");
         rebirth_prob[i] = -std::expm1( -rebirth_rate[i] * sim.time_step() );
+
+        if ( rescue_rate[i] < 0 )
+			throw InvalidParameter("fiber:rescue_rate should be >= 0");
+        /// this needs evaluating
+        //rescue_prob[i] = -std::expm1( -rescue_rate[i] * sim.time_step() );
+        rescue_prob[i] = rescue_rate[i];
     }
 
     if ( min_length <= 0 )
@@ -151,7 +158,7 @@ void DynamicFiberProp::write_values(std::ostream& os) const
     write_value(os, "hydrolysis_rate",      hydrolysis_rate, 2);
     write_value(os, "shrinking_speed",      shrinking_speed, 2);
     write_value(os, "rebirth_rate",         rebirth_rate, 2);
-
+    write_value(os, "rescue_rate",         	rescue_rate, 2);
     write_value(os, "zone_space",           zone_space);
     write_value(os, "zone_radius",          zone_radius);
     write_value(os, "zone_hydrolysis_rate", zone_hydrolysis_rate, 2);
