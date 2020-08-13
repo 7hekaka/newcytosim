@@ -59,9 +59,6 @@ protected:
     /// the monitor associated with this Hand
     HandMonitor *  haMonitor;
     
-    /// Gillespie normalized time for attachment (must be set at detachment)
-    real           nextAttach;
-    
     /// Gillespie normalized time for detachment (must be set at attachment)
     real           nextDetach;
     

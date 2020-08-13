@@ -21,8 +21,6 @@ Hand::Hand(HandProp const* p, HandMonitor* m)
     if ( !m )
         haMonitor = &dummyMonitor;
     // initialize in unattached state:
-    assert_true(unattached());
-    nextAttach = RNG.exponential();
     nextDetach = 0;
 }
 
@@ -58,12 +56,10 @@ void Hand::resetTimers()
     // initialize the Gillespie counters:
     if ( attached() )
     {
-        nextAttach = 0;
         nextDetach = RNG.exponential();
     }
     else
     {
-        nextAttach = RNG.exponential();
         nextDetach = 0;
     }
 }

@@ -344,15 +344,6 @@ void Couple::afterAttachment(Hand const* h)
         else
             set->relinkA2(this);
     }
-    
-#if ( 0 )
-    if ( attached1() && attached2() )
-        printf("%i %.9f %.9f\n", 3+prop->fast_diffusion, cHand1->nextAttach, cHand2->nextAttach);
-    else if ( !attached1() )
-        printf("%i %.9f  %.9f\n", 1+prop->fast_diffusion, cHand1->nextAttach, cHand2->nextAttach);
-    else if ( !attached2() )
-        printf("%i %.9f  %.9f\n", 1+prop->fast_diffusion, cHand2->nextAttach, cHand1->nextAttach);
-#endif
 }
 
 
