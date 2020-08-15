@@ -45,7 +45,7 @@ void test_int()
     for (int j=0; j<8; ++j)
     {
         for (int k=0; k<8; ++k)
-            printf(" %12u", RNG.pint());
+            printf(" %12u", RNG.pint32());
         printf("\n");
     }
     printf("\n");
@@ -53,7 +53,7 @@ void test_int()
     for (int j=0; j<8; ++j)
     {
         for (int k=0; k<8; ++k)
-            printf(" %+12i", RNG.sint());
+            printf(" %+12i", RNG.sint32());
         printf("\n");
     }
     printf("\n");
@@ -92,9 +92,9 @@ void silly_test()
     uint32_t hit = 0;
     
     for (uint32_t j=0; j<cnt; ++j)
-        hit += ( RNG.pint() < up );
+        hit += ( RNG.pint32() < up );
 
-    printf(" prob( pint() < 1^30 ) = %f\n", hit/(float)cnt);
+    printf(" prob( pint32() < 1^30 ) = %f\n", hit/(float)cnt);
 }
 
 
@@ -126,7 +126,7 @@ void testbits()
     
     for ( int i=0; i < 16; ++i )
     {
-        float y = convertFix( RNG.pint() );
+        float y = convertFix(RNG.pint32());
         printf(" %f :", y);
         print_bits(stdout, y, ' ');
     }

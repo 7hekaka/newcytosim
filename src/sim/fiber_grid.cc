@@ -260,11 +260,8 @@ int compareSegments(const void * A, const void * B)
 
 
 /**
- This will bind the given Hand to any Fiber found within `binding_range`, with a
- probability that is encoded in `prob`.
- The test is `RNG.pint() < prob`, and with 'prob = 1<<30', the chance is 1/4.
- The result is thus stochastic, and will depend on the number of Fiber
- within the range, but it will saturate if there are more than '4' possible targets.
+ This will bind the given Hand to any Fiber found within `HandProp::binding_range`,
+ with a probability `HandProp::binding_prob`
  
  NOTE:
  The distance at which Fibers are detected is limited to the range given in paintGrid()
@@ -308,7 +305,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     for ( HeavySegment const& target : targets )
     {
         //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
-        if ( RNG.pint() < prob )
+        if ( RNG.pint32() < prob )
         {
             FiberSegment const& seg = target.seg_;
             Fiber * fib = const_cast<Fiber*>(seg.fiber());
@@ -347,7 +344,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     const real sup = square(ha.prop->binding_range);
     for ( FiberSegment const& seg : segments )
     {
-        if ( RNG.pint() < prob )
+        if ( RNG.pint32() < prob )
         {
             real dis = INFINITY;
             // Compute the distance from the hand to the rod, and abscissa of projection:
