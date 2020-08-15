@@ -780,7 +780,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
         Couple * c = can.back();
         can.pop_back();
         // pick a random point to attach:
-        size_t p = RNG.pint(nbc);
+        size_t p = RNG.pint32(nbc);
         c->attach1(loc1[p]);
         c->attach2(loc2[p]);
         link(c);
@@ -1200,7 +1200,7 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, PropertyList const& 
         while ( c )
         {
             nxt = c->next();
-            size_t p = RNG.pint(nbc);
+            size_t p = RNG.pint32(nbc);
             c->attach1(loc1[p]);
             c->attach2(loc2[p]);
             c = nxt;

@@ -66,8 +66,8 @@ void setIndices(size_t fill, size_t*& ii, size_t*& jj, unsigned mx, size_t bs)
     {
         size_t i, j;
         do {
-            i = RNG.pint(mx) / bs;
-            j = RNG.pint(mx) / bs;
+            i = RNG.pint32(mx) / bs;
+            j = RNG.pint32(mx) / bs;
         } while ( i == j );
         ii[n] = bs * std::max(i,j);
         jj[n] = bs * std::min(i,j);
@@ -117,7 +117,7 @@ void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
     for ( size_t n = 0; n < fill; ++n )
     {
         real a = 10.0 * RNG.preal();
-        size_t ii = RNG.pint(size), jj = RNG.pint(size);
+        size_t ii = RNG.pint32(size), jj = RNG.pint32(size);
         size_t i = std::max(ii, jj), j = std::min(ii, jj);
         mat1(i, j) += a;
         mat2(i, j) += a;
@@ -127,7 +127,7 @@ void compare(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
     
     for ( size_t cnt = DIM; cnt < size; cnt += DIM )
     {
-        size_t inx = DIM * ( RNG.pint(size-cnt) / DIM );
+        size_t inx = DIM * ( RNG.pint32(size-cnt) / DIM );
         
         zero_real(size*size, tmp1);
         mat1.addDiagonalBlock(tmp1, size, inx, cnt);
@@ -623,10 +623,10 @@ int main( int argc, char* argv[] )
 #if ( 0 )
         //testMatrices(DIM*17, 23);
         size_t dim[5] = { 0 };
-        for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint(1<<(i+7));
+        for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
         qsort(dim, 5, sizeof(size_t), compareInt);
         for ( int i = 0; i < 5; ++i )
-            testMatrices(DIM*dim[i], RNG.pint(dim[i]*dim[i]));
+            testMatrices(DIM*dim[i], RNG.pint32(dim[i]*dim[i]));
 #endif
 return EXIT_SUCCESS;
 }

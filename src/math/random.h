@@ -144,16 +144,16 @@ public:
 
 #if ( 0 )
     /// unsigned integer in [0,n-1] for n < 2^32
-    uint32_t pint(const uint32_t& n)  { return uint32_t(URAND32()*TWO_POWER_MINUS_32*n); }
+    uint32_t pint32(const uint32_t& n) { return uint32_t(URAND32()*TWO_POWER_MINUS_32*n); }
 
     /// unsigned integer in [0,n-1] for n < 2^64
-    uint64_t plong(const uint64_t& n) { return uint32_t(URAND64()*TWO_POWER_MINUS_64*n); }
+    uint64_t pint64(const uint64_t& n) { return uint32_t(URAND64()*TWO_POWER_MINUS_64*n); }
 #else
     /// unsigned integer in [0,n-1] for n < 2^32, Daniel Lemire's method
-    uint32_t pint(const uint32_t& n)  { return (uint32_t)(((uint64_t)URAND32() * (uint64_t)n) >> 32); }
+    uint32_t pint32(const uint32_t& n) { return (uint32_t)(((uint64_t)URAND32() * (uint64_t)n) >> 32); }
 
     /// unsigned integer in [0,n-1] for n < 2^32, Daniel Lemire's fair method
-    uint32_t pint_fair(const uint32_t& range)
+    uint32_t pint32_fair(const uint32_t& range)
     {
         uint64_t multiresult = (uint64_t)URAND32() * (uint64_t)range;
         uint32_t leftover = (uint32_t) multiresult;
@@ -170,7 +170,7 @@ public:
     }
     
     /// unsigned integer in [0,n-1] for n < 2^64, Daniel Lemire's method
-    uint64_t plong(const uint64_t& p) {
+    uint64_t pint64(const uint64_t& p) {
 #ifdef __SIZEOF_INT128__ // then we know we have 128-bit integers
         return (uint64_t)(((__uint128_t)URAND64() * (__uint128_t)p) >> 64);
 #else
@@ -180,13 +180,13 @@ public:
 #endif
  
     /// integer in [0,n] for n < 2^32, (slow) bitwise algorithm
-    uint32_t  pint_slow(uint32_t n);
+    uint32_t  pint32_slow(uint32_t n);
     
     /// a random unsigned integer with exactly `b` bit equal to `1`
     uint32_t  distributed_bits(int b);
 
     /// integer in [0 N], with probabilities given in ratio[] of size N, with sum(ratio)>0
-    uint32_t  pint_ratio(uint32_t n, const int ratio[]);
+    uint32_t  pint32_ratio(uint32_t n, const uint32_t ratio[]);
 
     /// integer k of probability distribution p(k,E) = exp(-E) * pow(E,k) / factorial(k)
     uint32_t  poisson(real E);
@@ -310,7 +310,7 @@ public:
     template<typename T>
     T choice(const T val[], uint32_t size)
     {
-        return val[ pint(size) ];
+        return val[ pint32(size) ];
     }
     
     /// uniform shuffling of array `T[]`.
@@ -321,7 +321,7 @@ public:
         uint32_t jj = size, kk;
         while ( jj > 1 )
         {
-            kk = pint(jj);
+            kk = pint32(jj);
             --jj;
             T tmp   = val[jj];
             val[jj] = val[kk];

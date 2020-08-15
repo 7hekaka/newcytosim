@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
         a.clear();
         size_t n = RNG.poisson(8);
         for( size_t i=0; i < n; ++i )
-            a.push_back(RNG.pint(3));
+            a.push_back(RNG.pint32(3));
         
         printf("\nsize %lu", a.size());
         {

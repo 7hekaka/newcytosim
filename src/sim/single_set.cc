@@ -464,7 +464,7 @@ ObjectList SingleSet::makeWrists(Mecable const* obj, size_t fip, size_t nbp, std
     {
         for ( size_t u = 0; u < num; ++u )
         {
-            res.push_back(sip->newWrist(obj, fip+RNG.pint(nbp)));
+            res.push_back(sip->newWrist(obj, fip+RNG.pint32(nbp)));
         }
     }
     

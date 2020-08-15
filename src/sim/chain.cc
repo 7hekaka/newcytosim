@@ -65,7 +65,7 @@ Chain::Chain()
     autoCutVal  = 0;
     autoCutCnt  = 0;
     // set different 'seeds' to desynchronize the adjustSegmentation()
-    autoCutIdx  = RNG.pint(RECUT_PERIOD);
+    autoCutIdx  = RNG.pint32(RECUT_PERIOD);
 #endif
     fnAbscissaM = 0;
     fnAbscissaP = 0;

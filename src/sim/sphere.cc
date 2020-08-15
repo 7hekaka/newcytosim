@@ -490,7 +490,7 @@ void Sphere::reshape()
     }
     
 #if ( DIM == 3 )
-    orthogonalize(RNG.pint(3));
+    orthogonalize(RNG.pint32(3));
 #endif
 }
 

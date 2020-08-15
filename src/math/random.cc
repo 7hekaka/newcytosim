@@ -445,7 +445,7 @@ void Random::gauss_slow(real& x, real& y)
 /**
  integer in [0,n] for n < 2^32
  */
-uint32_t Random::pint_slow(const uint32_t n)
+uint32_t Random::pint32_slow(const uint32_t n)
 {
     // Find which bits are used in n
     uint32_t used = n | ( n >> 1 );
@@ -502,15 +502,14 @@ uint32_t Random::distributed_bits(int b)
 /**
  returns an integer in [0 n], with the ratios given in the array of ints
  */
-uint32_t Random::pint_ratio(const uint32_t n, const int ratio[])
+uint32_t Random::pint32_ratio(const uint32_t n, const uint32_t ratio[])
 {
-    int sum = 0;
-    uint32_t ii;
+    uint32_t ii, sum = 0;
     for ( ii = 0; ii < n; ++ii )
         sum += ratio[ii];
-    // sum==0 may denotes a careless use of the function, with wrong arguments.
-    // it might be safer to throw an exception
-    if ( sum == 0 ) return 0;
+    // `sum==0` may be caused by wrong arguments; might be safer to throw an exception
+    if ( sum == 0 )
+        return 0; //throw InvalidParameter("invalid argument to Random::pint32_ratio");
     sum = (int) floor( preal() * sum );
     ii = 0;
     while ( sum >= ratio[ii] )
