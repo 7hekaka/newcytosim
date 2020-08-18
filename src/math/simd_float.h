@@ -41,7 +41,7 @@ inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 // copy a[0] into all elements of destination
 inline vec4f broadcast1f(vec4f a)          { return _mm_permute_ps(a,0x00); }
 inline vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
-inline vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i const*)a); }
+inline vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i*)a); }
 #define permute4f(a,k)    _mm_permute_ps(a,k)
 // Convert between vector types
 inline vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
