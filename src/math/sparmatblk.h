@@ -230,6 +230,9 @@ public:
     /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
     void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt) const;
     
+    /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
+    void addDiagonalTraceBanded(real alpha, real* mat, size_t ldd, size_t start, size_t nb, size_t rank) const;
+
     
     /// prepare matrix for multiplications by a vector (must be called)
     bool prepareForMultiply(int);

@@ -276,6 +276,41 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 }
 
 
+// with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+void SparMatBlk::addDiagonalTraceBanded(real alpha, real* mat, size_t ldd,
+                                         const size_t start,
+                                         const size_t cnt, size_t rank) const
+{
+    assert_false( start % BLOCK_SIZE );
+    assert_false( cnt % BLOCK_SIZE );
+
+    size_t end = start + cnt;
+    assert_true( end <= size_ );
+
+    for ( size_t ii = start; ii < end; ii += BLOCK_SIZE )
+    {
+        size_t i = ( ii - start ) / BLOCK_SIZE;
+        Line & row = row_[ii];
+        for ( size_t n = 0; n < row.size_; ++n )
+        {
+            size_t jj = row.inx_[n];
+            if (( start <= jj ) & ( jj < end ))
+            {
+                size_t j = ( jj - start ) / BLOCK_SIZE;
+                if ( i <= j + rank )
+                {
+                    real a = alpha * row[n].trace();
+                    //fprintf(stderr, "SMB %4lu %4lu : %.4f\n", i, j, a);
+                    // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+                    mat[i-j+ldd*j] += a;
+                }
+            }
+        }
+    }
+}
+
+
+
 int SparMatBlk::bad() const
 {
     if ( size_ <= 0 ) return 1;
