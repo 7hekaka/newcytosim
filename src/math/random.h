@@ -214,7 +214,7 @@ public:
     int  flip()           { return URAND32() & 1U; }
     
     /// returns -1  or  1 with equal chance
-    int  flipsign()       { return (int)( URAND32() & 2U ) - 1; }
+    int  flipsign()       { return std::copysign(1, RAND32()); }
     
     /// returns 1 with probability P and -1 with probability 1-P
     int  flipsign(real p) { return 2*(int)test(p) - 1; }
@@ -300,7 +300,7 @@ public:
     template<typename T>
     T choice(const T& x, const T& y)
     {
-        if ( flip() )
+        if ( RAND32() > 0 )
             return x;
         else
             return y;
