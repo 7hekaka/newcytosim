@@ -169,12 +169,10 @@ It is defined as:
 If assembly is reduced following the equations above, this also increase the catastrophe rate.
 This effect was described in:
 
->[Measurement of the Force-Velocity Relation for Growing Microtubules](http://www.sciencemag.org/content/278/5339/856.abstract)
->
+>[Measurement of the Force-Velocity Relation for Growing Microtubules](http://www.sciencemag.org/content/278/5339/856.abstract)  
 >Marileen Dogterom and Bernard Yurke; Science Vol 278 pp 856-860; 1997
  
->[Dynamic instability of MTs is regulated by force](http://www.jcb.org/cgi/doi/10.1083/jcb.200301147)
->
+>[Dynamic instability of MTs is regulated by force](http://www.jcb.org/cgi/doi/10.1083/jcb.200301147)  
 > M.Janson, M. de Dood, M. Dogterom; Journal of Cell Biology Vol 161, Nb 6, 2003
  Figure 2 C
 
@@ -222,8 +220,7 @@ While playing with this features, press `i` in the keyboard once to display info
 
 Microtubules can grow and shrink according to a four-state dynamic instability model:
 
-> [A theory of microtubule catastrophes and their regulation](http://www.pnas.org/content/106/50/21173)
-> 
+> [A theory of microtubule catastrophes and their regulation](http://www.pnas.org/content/106/50/21173)  
 > Brun L, Rupp B, Ward J, Nedelec F; PNAS 106 (50) 21173-21178; 2009
 
 Set the parameter `activity = dynamic` to enable this model on:
