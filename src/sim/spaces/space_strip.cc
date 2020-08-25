@@ -227,10 +227,10 @@ bool SpaceStrip::draw() const
 {
     const real X = length_[0];
     const real Y = ( DIM > 1 ) ? length_[1] : 1;
-    const real B = ( DIM > 2 ) ? bot_ : 0;
     const real T = ( DIM > 2 ) ? top_ : 0;
     
 #if ( DIM > 2 )
+    const real B = ( DIM > 2 ) ? bot_ : 0;
     // draw faces:
     glBegin(GL_TRIANGLE_STRIP);
     glNormal3f(0, 0, 1);
