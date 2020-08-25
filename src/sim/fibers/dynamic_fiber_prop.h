@@ -85,9 +85,8 @@ public:
     /** this create an circular zone around the origin */
     real    zone_hydrolysis_rate[2];
 
-    /// Rescue rate after a catastrophe has occured. Relates to the probability of encountering an
-    /// unhydrolysed tubulin monomer while the plus end is in a shrinking state. (default=0)
-    real rescue_rate[2];
+    /// The probability of encountering an unhydrolysed tubulin monomer while the plus end is in a shrinking state. (default=0)
+    real    unhydrolyzed_prob[2];
     /// @}
     
 private:
@@ -98,7 +97,6 @@ private:
     real    zone_hydrolysis_rate_2dt[2];
     real    shrinking_rate_dt[2];
     real    rebirth_prob[2];
-    real 	rescue_prob[2];
     
     real    zone_radius_sqr;
     Space const*  zone_space_ptr;
