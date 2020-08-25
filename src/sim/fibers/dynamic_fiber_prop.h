@@ -74,7 +74,7 @@ public:
     /// switching rate to the growing state for a fiber shorter than `min_length` (default=0)
     real    rebirth_rate[2];
 
-    
+#if OLD_DYNAMIC_ZONE
     /// Space defining the zone in which hydrolysis_rate is different
     std::string zone_space;
     
@@ -84,6 +84,7 @@ public:
     /// Hydrolysis rate of G-units, outside the zone of radius `zone_radius`.
     /** this create an circular zone around the origin */
     real    zone_hydrolysis_rate[2];
+#endif
 
     /// @}
     
@@ -95,9 +96,10 @@ private:
     real    zone_hydrolysis_rate_2dt[2];
     real    shrinking_rate_dt[2];
     real    rebirth_prob[2];
-    
+#if OLD_DYNAMIC_ZONE
     real    zone_radius_sqr;
     Space const*  zone_space_ptr;
+#endif
     
 public:
     

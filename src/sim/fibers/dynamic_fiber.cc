@@ -195,7 +195,7 @@ int DynamicFiber::stepPlusEnd()
 
         real hydrol_rate = prop->hydrolysis_rate_2dt[0];
         
-#if ( 0 )
+#if OLD_DYNAMIC_ZONE
         // change Hydrolysis rate if PLUS_END is far from origin:
         if ( posEndP().normSqr() > prop->zone_radius_sqr )
             hydrol_rate = prop->zone_hydrolysis_rate_2dt[0];

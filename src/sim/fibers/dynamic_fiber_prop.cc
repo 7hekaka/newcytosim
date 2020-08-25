@@ -22,8 +22,6 @@ void DynamicFiberProp::clear()
     FiberProp::clear();
     
     unit_length    = 0.008;
-    zone_radius    = INFINITY;
-    zone_space     = "";
     
     for ( int i = 0; i < 2; ++i )
     {
@@ -31,10 +29,15 @@ void DynamicFiberProp::clear()
         growing_off_speed[i]    = 0;
         growing_force[i]        = INFINITY;
         hydrolysis_rate[i]      = 0;
-        zone_hydrolysis_rate[i] = 0;
         shrinking_speed[i]      = 0;
         rebirth_rate[i]         = 0;
     }
+#if OLD_DYNAMIC_ZONE
+    zone_radius    = INFINITY;
+    zone_space     = "";
+    for ( int i = 0; i < 2; ++i )
+        zone_hydrolysis_rate[i] = 0;
+#endif
 }
 
 
@@ -49,11 +52,11 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(hydrolysis_rate,      2, "hydrolysis_rate");
     glos.set(shrinking_speed,      2, "shrinking_speed");
     glos.set(rebirth_rate,         2, "rebirth_rate");
-    
+#if OLD_DYNAMIC_ZONE
     glos.set(zone_space,              "zone_space");
     glos.set(zone_radius,             "zone_radius");
     glos.set(zone_hydrolysis_rate, 2, "zone_hydrolysis_rate");
-
+#endif
 #ifdef BACKWARD_COMPATIBILITY
     
     if ( glos.set(growing_force[0], "dynamic_force") )
@@ -92,15 +95,17 @@ void DynamicFiberProp::complete(Simul const& sim)
             throw InvalidParameter("fiber:hydrolysis_rate should be >= 0");
         hydrolysis_rate_2dt[i] = 2 * sim.time_step() * hydrolysis_rate[i];
         
-        
+#if OLD_DYNAMIC_ZONE
         zone_space_ptr = sim.findSpace(zone_space);
-        
         if ( zone_radius < 0 )
             throw InvalidParameter("fiber:zone_radius should be >= 0");
         if ( zone_hydrolysis_rate[i] < 0 )
             throw InvalidParameter("fiber:zone_hydrolysis_rate should be >= 0");
         zone_hydrolysis_rate_2dt[i] = 2 * sim.time_step() * zone_hydrolysis_rate[i];
-        
+
+        zone_radius_sqr = square(zone_radius);
+#endif
+
         if ( shrinking_speed[i] > 0 )
             throw InvalidParameter("fiber:shrinking_speed should be <= 0");
         shrinking_rate_dt[i] = sim.time_step() * abs_real(shrinking_speed[i]) / unit_length;
@@ -112,9 +117,7 @@ void DynamicFiberProp::complete(Simul const& sim)
 
     if ( min_length <= 0 )
         min_length = 3 * unit_length;
-    
-    zone_radius_sqr = square(zone_radius);
-    
+     
     /// print predicted average length in verbose mode:
     if ( sim.prop->verbose && sim.ready() )
         splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0]);
@@ -151,9 +154,10 @@ void DynamicFiberProp::write_values(std::ostream& os) const
     write_value(os, "hydrolysis_rate",      hydrolysis_rate, 2);
     write_value(os, "shrinking_speed",      shrinking_speed, 2);
     write_value(os, "rebirth_rate",         rebirth_rate, 2);
-
+#if OLD_DYNAMIC_ZONE
     write_value(os, "zone_space",           zone_space);
     write_value(os, "zone_radius",          zone_radius);
     write_value(os, "zone_hydrolysis_rate", zone_hydrolysis_rate, 2);
+#endif
 }
 
