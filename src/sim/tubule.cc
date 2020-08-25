@@ -309,11 +309,11 @@ Cambridge, 12.2019
 */
 void Tubule::setInteractionsC(Meca& meca) const
 {
-    const real stiffL = prop->stiffness[0];
-    const real stiffA = prop->stiffness[1];
+#if ( DIM >= 3 )
     const real ang = M_PI / NFIL;
     const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
-#if ( DIM >= 3 )
+    const real stiffL = prop->stiffness[0];
+    const real stiffA = prop->stiffness[1];
     real co = cos(2*ang), si = sin(2*ang);
     
     assert_true(fil_[0]);
