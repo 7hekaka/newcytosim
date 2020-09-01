@@ -552,7 +552,7 @@ void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void *
     PQ.orthonormal(A, C);
     
     // normalize vectors to norm = radius:
-    constexpr real alpha = 1.1547005383792517; // = 2.0 / sqrt(3);
+    constexpr real alpha = 2.0 / M_SQRT3;
     
     PQ *= radius;
 
