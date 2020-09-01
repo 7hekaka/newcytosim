@@ -60,10 +60,10 @@ public:
     Vector4() {}
     
     /// construct from 3 values
-    Vector4(real x, real y, real z) : XX(x), YY(y), ZZ(z), TT(0.0) {}
+    constexpr Vector4(real x, real y, real z) : XX(x), YY(y), ZZ(z), TT(0.0) {}
 
     /// construct from 4 values
-    Vector4(real x, real y, real z, real t) : XX(x), YY(y), ZZ(z), TT(t) {}
+    constexpr Vector4(real x, real y, real z, real t) : XX(x), YY(y), ZZ(z), TT(t) {}
     
     /// construct from address
     Vector4(const real v[]) : XX(v[0]), YY(v[1]), ZZ(v[2]), TT(v[3]) {}

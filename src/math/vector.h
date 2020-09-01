@@ -15,7 +15,7 @@
 
 typedef Vector1 Vector;
 typedef real    Torque;
-constexpr Torque nullTorque = 0;
+constexpr Torque nullTorque(0);
 
 /// helper function to normalize a 'Torque'
 inline Torque normalize(Torque x) { return sign_real(x); }
@@ -24,7 +24,7 @@ inline Torque normalize(Torque x) { return sign_real(x); }
 
 typedef Vector2 Vector;
 typedef real    Torque;
-constexpr Torque nullTorque = 0;
+constexpr Torque nullTorque(0);
 
 /// helper function to normalize a 'Torque'
 inline Torque normalize(Torque x) { return sign_real(x); }
@@ -33,13 +33,7 @@ inline Torque normalize(Torque x) { return sign_real(x); }
 
 typedef Vector3 Vector;
 typedef Vector3 Torque;
-#define nullTorque Vector3(0,0,0)
-
-#else
-
-typedef Vector4 Vector;
-typedef Vector4 Torque;
-#define nullTorque Vector4(0,0,0,0)
+constexpr Torque nullTorque(Vector3(0,0,0));
 
 #endif
 

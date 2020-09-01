@@ -59,13 +59,13 @@ public:
 
 #if VECTOR3_USES_AVX
     /// construct from 3 values
-    Vector3(real x, real y, real z) : vec(setr4(x, y, z, 0)) {}
+    constexpr Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z), TT(0.0) {}
     
     /// construct from address
     Vector3(const real v[]) : vec(load3Z(v)) {}
 #else
     /// construct from 3 values
-    Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
+    constexpr Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
 
     /// construct from address
     Vector3(const real v[]) : XX(v[0]), YY(v[1]), ZZ(v[2]) {}

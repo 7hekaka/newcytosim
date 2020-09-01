@@ -29,10 +29,10 @@ public:
     Vector1() {}
     
     /// construct from 3 values
-    Vector1(real x, real, real) : XX(x) {}
+    constexpr Vector1(real x, real, real) : XX(x) {}
     
     /// construct from 1 value
-    explicit Vector1(real x) : XX(x) {}
+    constexpr explicit Vector1(real x) : XX(x) {}
 
     /// construct from address
     Vector1(const real v[]) : XX(v[0]) {}    
