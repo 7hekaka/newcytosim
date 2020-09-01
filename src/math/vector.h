@@ -1,6 +1,9 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-//Vector is defined as one of Vector1, 2 or 3, according to DIM
-//Vector1, 2 or 3 are still available
+/**
+@file vector.h
+ `Vector` is defined as an alias to Vector1, 2 or 3, according to DIM
+ The types Vector1, Vector2 and Vector3 are always available
+*/
 
 #ifndef VECTOR_H
 #define VECTOR_H
@@ -15,7 +18,7 @@
 
 typedef Vector1 Vector;
 typedef real    Torque;
-constexpr Torque nullTorque(0);
+constexpr Torque nullTorque(0.0);
 
 /// helper function to normalize a 'Torque'
 inline Torque normalize(Torque x) { return sign_real(x); }
@@ -24,7 +27,7 @@ inline Torque normalize(Torque x) { return sign_real(x); }
 
 typedef Vector2 Vector;
 typedef real    Torque;
-constexpr Torque nullTorque(0);
+constexpr Torque nullTorque(0.0);
 
 /// helper function to normalize a 'Torque'
 inline Torque normalize(Torque x) { return sign_real(x); }
@@ -33,7 +36,7 @@ inline Torque normalize(Torque x) { return sign_real(x); }
 
 typedef Vector3 Vector;
 typedef Vector3 Torque;
-constexpr Torque nullTorque(Vector3(0,0,0));
+constexpr Torque nullTorque(0.0,0.0,0.0);
 
 #endif
 
