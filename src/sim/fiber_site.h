@@ -170,7 +170,7 @@ public:
     /// true if abscissa is above abscissaM
     bool         aboveM()        const { return fbFiber->aboveM(fbAbs); }
     
-    /// true if abscissa is within the fiber boundaries
+    /// true if abscissa is not within the fiber's boundaries
     bool         outsideMP()     const { return fbFiber->outsideMP(fbAbs); }
     
     //--------------------------------------------------------------------------

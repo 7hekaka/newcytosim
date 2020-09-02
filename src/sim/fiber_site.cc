@@ -233,7 +233,7 @@ int FiberSite::bad() const
 {
     if ( fbFiber != inter.mecable() )
     {
-        std::cerr << "Interpolation mismatch " << fbFiber << " " << inter.mecable() << std::endl;
+        std::cerr << "Interpolation mismatch " << fbFiber << " " << inter.mecable() << '\n';
         return 7;
     }
     
