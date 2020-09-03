@@ -373,7 +373,7 @@ void Field::step(FiberSet& fibers)
     // decay:
     if ( prop->decay_rate > 0 )
     {
-        // field = field * exp( - decay_rate * dt ):
+        // field = field * exp( - decay_rate * time_step ):
         blas::xscal(nbc, prop->decay_frac, field, 1);
     }
 

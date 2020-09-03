@@ -95,7 +95,7 @@ size_t Mecafil::allocateMecable(const size_t nbp)
 #pragma mark -
 
 /**
- The argument should be: sc = kT / dt;
+ The argument should be: sc = kT / time_step;
  */
 real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 {
