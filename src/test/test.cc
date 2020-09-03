@@ -4,8 +4,9 @@
 
 #include <string>
 #include <iostream>
-#include "random.h"
+#include <climits>
 #include <stdint.h>
+#include "random.h"
 
 
 /**

@@ -21,6 +21,7 @@ Hand::Hand(HandProp const* p, HandMonitor* m)
     if ( !m )
         haMonitor = &dummyMonitor;
     // initialize in unattached state:
+    assert_true(unattached());
     nextAttach = RNG.exponential();
     nextDetach = 0;
 }

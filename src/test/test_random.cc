@@ -5,6 +5,7 @@
 #include <bitset>
 #include <cstring>
 #include <iostream>
+#include <climits>
 #include "tictoc.h"
 
 
