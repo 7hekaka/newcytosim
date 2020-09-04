@@ -7,7 +7,12 @@
 #include <cstdlib>
 
 
-#if ( 1 )
+#ifndef PRINT_IN_COLOR
+#define PRINT_IN_COLOR 1
+#endif
+
+
+#if PRINT_IN_COLOR
 
 // using ANSI escape sequence for UNIX-based systems
 
@@ -34,8 +39,8 @@
 #define KBLDWHT  "\x1B[1m\x1B[37m"
 
 
-/* Check the number of colors that the terminal supports */
-bool has_colors()
+/* Check the number of colors supported by the terminal */
+bool print_has_colors()
 {
     static long n_colors = 0;
     if ( n_colors == 0 )
@@ -57,7 +62,7 @@ bool has_colors()
 
 void print_red(std::ostream& os, std::string const& str)
 {
-    if ( has_colors() )
+    if ( print_has_colors() )
         os << KBLDRED << str << KNRM;
     else
         os << str;
@@ -65,7 +70,7 @@ void print_red(std::ostream& os, std::string const& str)
 
 void print_green(std::ostream& os, std::string const& str)
 {
-    if ( has_colors() )
+    if ( print_has_colors() )
         os << KBLDGRN << str << KNRM;
     else
         os << str;
@@ -73,7 +78,7 @@ void print_green(std::ostream& os, std::string const& str)
 
 void print_yellow(std::ostream& os, std::string const& str)
 {
-    if ( has_colors() )
+    if ( print_has_colors() )
         os << KBLDYEL << str << KNRM;
     else
         os << str;
@@ -81,7 +86,7 @@ void print_yellow(std::ostream& os, std::string const& str)
 
 void print_blue(std::ostream& os, std::string const& str)
 {
-    if ( has_colors() )
+    if ( print_has_colors() )
         os << KBLDBLU << str << KNRM;
     else
         os << str;
@@ -89,7 +94,7 @@ void print_blue(std::ostream& os, std::string const& str)
 
 void print_magenta(std::ostream& os, std::string const& str)
 {
-    if ( has_colors() )
+    if ( print_has_colors() )
         os << KBLDMAG << str << KNRM;
     else
         os << str;
@@ -97,7 +102,7 @@ void print_magenta(std::ostream& os, std::string const& str)
 
 void print_cyan(std::ostream& os, std::string const& str)
 {
-    if ( has_colors() )
+    if ( print_has_colors() )
         os << KBLDCYN << str << KNRM;
     else
         os << str;
@@ -105,6 +110,10 @@ void print_cyan(std::ostream& os, std::string const& str)
 
 #else
 
+bool print_has_colors()
+{
+    return false;
+}
 
 void print_red(std::ostream& os, std::string const& str)
 {
