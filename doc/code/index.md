@@ -13,6 +13,11 @@ After installing `doxygen` on your machine, in a terminal, and the project root 
 
 The output is exported into [`doc/code/doxygen/`](doxygen) and accessible [from the index file](doxygen/index.html).
 
+
+# Cytosim Testing
+
+- [How to validate the executable](validation.md)
+
 ### Contact
 
 feedbackATcytosimDOTorg
