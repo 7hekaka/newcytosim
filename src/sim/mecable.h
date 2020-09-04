@@ -231,7 +231,7 @@ public:
     /// The total drag coefficient of the object ( force = drag * speed )
     virtual real    dragCoefficient() const = 0;
 
-    /// Add Brownian noise terms to a force vector (alpha = kT / time_step)
+    /// Add Brownian noise terms to a force vector (alpha = kT / timestep)
     virtual real    addBrownianForces(real const* rnd, real alpha, real* rhs) const { return INFINITY; }
     
     /// add the interactions (for example due to confinements)

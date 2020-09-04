@@ -1273,7 +1273,7 @@ void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real binding_rate) const
     // each point represents a Fiber chunk of length 'spread':
     const real rate = binding_rate * spread / fld->cellVolume();
     
-    // fraction of the cell content that will bind in one time_step:
+    // fraction of the cell content that will bind in one time step:
     const real frac = -std::expm1( -rate * simul().time_step() );
     
     real abs = spread * RNG.exponential();

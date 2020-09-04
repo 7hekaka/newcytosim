@@ -210,10 +210,10 @@ public:
     /// derived variable: 1.0/unbinding_force
     real   unbinding_force_inv;
     
-    /// derived variable = probability to bind in one `time_step`;
+    /// derived variable = probability to bind in one time step;
     real   binding_prob;
     
-    /// derived variable = unbinding_rate * time_step;
+    /// derived variable = unbinding_rate * timestep;
     real   unbinding_rate_dt;
     
     /// flag to indicate that `display` has a new value
@@ -251,7 +251,7 @@ public:
     /// Attachment rate per unit length of fiber
     real bindingSectionRate() const;
     
-    /// Attachment probability per unit length of fiber in one time_step
+    /// Attachment probability per unit length of fiber in one time step
     real bindingSectionProb() const;
 
     /// write all values

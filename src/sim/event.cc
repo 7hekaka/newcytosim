@@ -74,14 +74,14 @@ Event::~Event()
 
 
 /**
- This is called once per time_step
+ This is called once per time step
  */
 void Event::step(Simul& sim)
 {
     if ( sim.time() >= nextTime )
     {
         sim.relax();
-        // the event can fire multiple time at each time_step
+        // the event can fire multiple time at each time step
         do {
             reload(nextTime);
             sim.evaluate(activity);

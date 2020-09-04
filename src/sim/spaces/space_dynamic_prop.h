@@ -34,7 +34,7 @@ public:
     
     /// @}
 
-    /// derived values equal to time_step / viscosity
+    /// derived values equal to timestep / viscosity
     real         mobility_dt, mobility_rot_dt;
 
 public:

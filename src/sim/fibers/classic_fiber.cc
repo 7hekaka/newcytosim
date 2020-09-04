@@ -54,8 +54,8 @@ void ClassicFiber::setEndStateP(state_t s)
  which is itself reduced by antagonistic force. 
  The correspondance is : 1/rate = a + b * growthSpeed.
  
- For no force on the growing tip: rate = catastrophe_rate * time_step
- For very large forces          : rate = catastrophe_rate_stalled * time_step
+ For no force on the growing tip: rate = catastrophe_rate * timestep
+ For very large forces          : rate = catastrophe_rate_stalled * timestep
  
  cf. `Dynamic instability of MTs is regulated by force`
  M.Janson, M. de Dood, M. Dogterom. JCB 2003, Figure 2 C.

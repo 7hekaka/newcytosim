@@ -165,7 +165,7 @@ public:
     /// ready the engine for a subsequent call to `step()` and `solve()`
     void            prepare();
     
-    /// perform one Monte-Carlo step, corresponding to `time_step`
+    /// perform one Monte-Carlo step, corresponding to the time step
     void            step();
 
     /// time in the simulated world (shortcut to `prop->time`)

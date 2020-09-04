@@ -135,7 +135,7 @@ private:
     /// list of Mecable containing points to simulate
     Array<Mecable*> mecables;
     
-    /// local copy of the SimulProp::time_step
+    /// local copy of time step
     real            time_step;
 
     /// flag to indicate that result is available

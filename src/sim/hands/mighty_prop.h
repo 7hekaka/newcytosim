@@ -65,7 +65,7 @@ public:
     
 private:
     
-    /// limits for a displacement in one time_step apply if ( limit_speed = true )
+    /// limits for a displacement in one time step apply if ( limit_speed = true )
     real    min_dab, max_dab;
     
     /// variables derived from `unloaded_speed`

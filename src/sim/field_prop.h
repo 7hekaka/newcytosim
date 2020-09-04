@@ -88,7 +88,7 @@ public:
     
 public:
 
-    /// local copy of SimulProp:time_step
+    /// local copy of time step
     real          time_step;
     
     /// derived variable

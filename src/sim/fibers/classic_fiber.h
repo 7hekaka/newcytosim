@@ -23,7 +23,7 @@ class ClassicFiberProp;
  .
  
  Both ends may grow/shrink and do so smoothly:
- The length is incremented at each time step by `time_step * tip_speed`.
+ The length is incremented at each time step by `timestep * timestep`.
  
  The speed of the tip `tip_speed` is a fraction of `prop->growing_speed`,
  because the growth speed is reduced under antagonistic force by an exponential factor:

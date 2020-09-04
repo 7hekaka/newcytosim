@@ -94,7 +94,7 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     {
         Cytosim::warn << "simulating `" << name() << "' may fail as:\n"\
         << PREF << "time_step * stiffness * unloaded_speed / stall_force = " << ef << '\n'\
-        << PREF << "-> reduce time_step (really)\n";
+        << PREF << "-> reduce time_step (really!)\n";
         //throw InvalidParameter(oss.str());
     }
     

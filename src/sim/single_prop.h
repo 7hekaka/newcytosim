@@ -109,11 +109,11 @@ protected:
     Space const*   confine_space_ptr;
     
 #if NEW_MOBILE_SINGLE
-    /// movement in one time_step
+    /// movement in one time step
     Vector         speed_dt;
 #endif
 
-    /// displacement in one time_step
+    /// displacement in one time step
     real           diffusion_dt;
     
 public:

@@ -81,7 +81,7 @@ void MotorProp::complete(Simul const& sim)
     abs_speed_dt = abs_real(set_speed_dt);
     var_speed_dt = abs_speed_dt / stall_force;
     
-    // The limits for a displacement in one time_step apply if ( limit_speed = true )
+    // The limits for a displacement in one time step apply if ( limit_speed = true )
     if ( unloaded_speed > 0 )
     {
         min_dab = 0;
@@ -107,7 +107,7 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
     {
         Cytosim::warn << "simulating `" << name() << "' may fail as:\n"\
         << PREF << "time_step * stiffness * unloaded_speed / stall_force = " << ef << '\n'\
-        << PREF << "-> reduce time_step (really)\n";
+        << PREF << "-> reduce time_step (really!)\n";
         //throw InvalidParameter(oss.str());
     }
     

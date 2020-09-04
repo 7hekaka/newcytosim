@@ -1444,7 +1444,6 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
 size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
     assert_true(ready_==0);
-    // get global time step
     time_step = prop->time_step;
 
     prepareMatrices();

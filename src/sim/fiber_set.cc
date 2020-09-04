@@ -615,7 +615,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
  the PLUS_END. This relies on Fiber::freshAssemblyP() returning the length of
  polymer made in the last time step.
  The number of locations returned will be proportional to the total length of
- new polymer recently made, and thus proportional to simul:time_step.
+ new polymer recently made, and thus proportional to simul:timestep.
  
  Because the list of fiber is regularly shuffled, the sites will consider fibers
  in a random order. However, the sites on one fiber will be listed in the order
@@ -649,7 +649,7 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
  the MINUS_END. This relies on Fiber::freshAssemblyM() returning the length of
  polymer made in the last time step.
  The number of locations returned will be proportional to the total length of
- new polymer recently made, and thus proportional to simul:time_step.
+ new polymer recently made, and thus proportional to simul:timestep.
  
  Because the list of fiber is regularly shuffled, the sites will consider fibers
  in a random order. However, the sites on one fiber will be listed in the order

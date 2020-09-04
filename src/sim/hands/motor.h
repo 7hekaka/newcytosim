@@ -22,7 +22,7 @@
  
  The actual movement depends on the time step:
 
-     real displacement = speed * time_step;
+     real displacement = speed * timestep;
  
  As defined in Hand, detachment increases exponentially with force.
 

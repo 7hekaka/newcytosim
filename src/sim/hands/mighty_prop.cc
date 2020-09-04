@@ -59,7 +59,7 @@ void MightyProp::complete(Simul const& sim)
     var_speed_dt = abs_speed_dt / stall_force;
 
     
-    // The limits for a displacement in one time_step apply if ( limit_speed = true )
+    // The limits for a displacement in one time step apply if ( limit_speed = true )
     if ( unloaded_speed > 0 )
     {
         min_dab = 0;
