@@ -1078,6 +1078,7 @@ void Solid::makeProjection()
     soCenter = cen / sum;
     if ( cnt == 1 )
     {
+        // in this case there is a single bead, and the matrix is isotropic
         soMomentum = Matrix33(0, 1.0/soDragRot);
         return;
     }
@@ -1088,7 +1089,7 @@ void Solid::makeProjection()
     const real D = soDragRot - soDrag*soCenter.normSqr();
     
     // finally set the matrix in front of R in projectForces()
-    // the matrix is symmetric, and we only set the lower diagonal:
+    // the 3x3 matrix is symmetric, and we only set its lower half:
     soMomentum(0,0) = D + A * (mYY+mZZ) + B * soCenter.XX * soCenter.XX;
     soMomentum(1,0) =   - A *  mXY      + B * soCenter.XX * soCenter.YY;
     soMomentum(2,0) =   - A *  mXZ      + B * soCenter.XX * soCenter.ZZ;
@@ -1099,14 +1100,15 @@ void Solid::makeProjection()
     soMomentum.symmetricInverse();
 
 #if ( 0 )
+    // checking here that the calculated inverse is the inverse!
     mat.copy_lower();
-    mat.inverse();
-    real dif = ( mat - soMomentum ).norm();
-    if ( dif > 0.01 )
+    const real dif = ( mat * soMomentum - Matrix33(0,1) ).norm_inf();
+    //std::clog << "Solid " << reference() << ' ' << std::fixed << dif << '\n';
+    if ( dif > 0.001 )
     {
-        std::clog << "Solid " << reference() << " " << cnt << "\n";
-        std::clog << std::setw(10) << soMomentum << "\n";
-        std::clog << std::setw(10) << mat << "\n";
+        std::clog << "Solid " << reference() << ' ' << cnt << '\n';
+        std::clog << std::setw(10) << soMomentum << '\n';
+        std::clog << std::setw(10) << mat << '\n';
     }
 #endif
 }
