@@ -8,6 +8,10 @@ Table of Content:
 
 * [The configuration file](config.md)
 * [Commands](commands.md)
+* [Physical Units](units.md)
+
+Object:
+
 * [Objects](objects.md)
 * [Placement](placement.md)
 * [Confinement and Space](spaces.md)
@@ -16,8 +20,10 @@ Table of Content:
 * [Stochastic events](stochastic.md)
 * [Stochastic forces](forces.md)
 * [Steric interactions](steric.md)
-* [Numerical Precision](numerical_precision.md)
 * [Graphical display](graphics.md)
 * [Parameters](parameters.md)
-* [Physical Units](units.md)
 
+Advanced matter:
+
+* [Numerical Precision](numerical_precision.md)
+* [Preconditionning](preconditionning.md)
