@@ -954,7 +954,9 @@ void Meca::computePrecondAlt()
 
 
 /**
-Compute banded preconditionner block corresponding to 'mec'
+ Compute a preconditionner block corresponding to 'mec'
+ The dimension is reduced by DIM and banded with diagonal + 2 off-diagonals
+ This block is symmetric definite positive, and is invertex by Cholesky's method
  */
 void Meca::computePrecondBand(Mecable* mec)
 {
@@ -992,7 +994,9 @@ void Meca::computePrecondBand(Mecable* mec)
 
 
 /**
-Compute preconditionner block corresponding to 'mec'
+ Compute a preconditionner block corresponding to 'mec':
+ Block of dimension reduced by DIM and without projection
+ This block is symmetric definite positive, and is invertex by Cholesky's method
  */
 void Meca::computePrecondIsoS(Mecable* mec)
 {
@@ -1039,7 +1043,9 @@ void Meca::computePrecondIsoS(Mecable* mec)
 }
 
 /**
-Compute preconditionner block corresponding to 'mec'
+Compute a preconditionner block corresponding to 'mec':
+ Block of dimension reduced by DIM, with projection
+ The block is not symmetric and is factorized by LU decomposition
  */
 void Meca::computePrecondIsoP(Mecable* mec)
 {
