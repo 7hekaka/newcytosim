@@ -12,13 +12,13 @@ SpaceCylinderP::SpaceCylinderP(SpaceProp const* p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("cylinderP is only valid in 3D: use strip instead");
-    length_ = 0;
+    halflength_ = 0;
     radius_ = 0;
 }
 
 void SpaceCylinderP::resize(Glossary& opt)
 {
-    real len = length_, rad = radius_;
+    real len = halflength_, rad = radius_;
     
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
@@ -33,7 +33,7 @@ void SpaceCylinderP::resize(Glossary& opt)
     if ( len <= 0 )
         throw InvalidParameter("cylinderP:length must be > 0");
     
-    length_ = len;
+    halflength_ = len;
     radius_ = rad;
 
     update();
@@ -43,20 +43,20 @@ void SpaceCylinderP::resize(Glossary& opt)
 void SpaceCylinderP::update()
 {
     modulo_.reset();
-    modulo_.enable(0, 2*length_);
+    modulo_.enable(0, 2*halflength_);
 }
 
 
 void SpaceCylinderP::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_,-radius_,-radius_);
-    sup.set( length_, radius_, radius_);
+    inf.set(-halflength_,-radius_,-radius_);
+    sup.set( halflength_, radius_, radius_);
 }
 
 
 real SpaceCylinderP::volume() const
 {
-    return 2 * M_PI * length_ * square(radius_);
+    return 2 * M_PI * halflength_ * square(radius_);
 }
 
 
@@ -91,11 +91,11 @@ Vector SpaceCylinderP::randomPlace() const
 {
 #if ( DIM >= 3 )
     const Vector2 V = Vector2::randB(radius_);
-    return Vector(length_*RNG.sreal(), V.XX, V.YY);
+    return Vector(halflength_*RNG.sreal(), V.XX, V.YY);
 #elif ( DIM > 1 )
-    return Vector(length_*RNG.sreal(), radius_*RNG.sreal());
+    return Vector(halflength_*RNG.sreal(), radius_*RNG.sreal());
 #else
-    return Vector(length_*RNG.sreal());
+    return Vector(halflength_*RNG.sreal());
 #endif
 }
 
@@ -116,9 +116,9 @@ Vector SpaceCylinderP::randomPlaceOnEdge(real) const
 {
 #if ( DIM >= 3 )
     const Vector2 YZ = Vector2::randU(radius_);
-    return Vector(length_*RNG.sreal(), YZ.XX, YZ.YY);
+    return Vector(halflength_*RNG.sreal(), YZ.XX, YZ.YY);
 #endif
-    return Vector(length_*RNG.sreal(), radius_*RNG.sflip(), 0);
+    return Vector(halflength_*RNG.sreal(), radius_*RNG.sflip(), 0);
 }
 
 
@@ -179,14 +179,14 @@ void SpaceCylinderP::write(Outputter& out) const
 {
     out.put_characters("cylinderP", 16);
     out.writeUInt16(2);
-    out.writeFloat(length_);
+    out.writeFloat(halflength_);
     out.writeFloat(radius_);
 }
 
 
 void SpaceCylinderP::setLengths(const real len[])
 {
-    length_ = len[0];
+    halflength_ = len[0];
     radius_ = len[1];
     update();
 }

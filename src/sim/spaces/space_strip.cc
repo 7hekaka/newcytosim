@@ -14,7 +14,7 @@ SpaceStrip::SpaceStrip(SpaceProp const* p)
     if ( DIM == 1 )
         throw InvalidParameter("strip is not usable in 1D");
     for ( unsigned d = 0; d < 3; ++d )
-        length_[d] = 0;
+        halflength_[d] = 0;
 }
 
 
@@ -22,12 +22,12 @@ void SpaceStrip::resize(Glossary& opt)
 {
     for ( unsigned d = 0; d < DIM-1; ++d )
     {
-        real len = length_[d];
+        real len = halflength_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len < 0 )
             throw InvalidParameter("strip:length[] must be >= 0");
-        length_[d] = len;
+        halflength_[d] = len;
     }
     
     real bot = bot_, top = top_;
@@ -69,14 +69,14 @@ void SpaceStrip::update()
 {
     modulo_.reset();
     for ( unsigned d = 0; d < DIM-1; ++d )
-        modulo_.enable(d, 2*length_[d]);
+        modulo_.enable(d, 2*halflength_[d]);
 }
 
 
 void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_[0],-length_[1], bot_);
-    sup.set( length_[0], length_[1], top_);
+    inf.set(-halflength_[0],-halflength_[1], bot_);
+    sup.set( halflength_[0], halflength_[1], top_);
 }
 
 
@@ -127,7 +127,7 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 real SpaceStrip::volume() const
 {
-    return 2.0 * length_[0] * ( top_ - bot_ );
+    return 2.0 * halflength_[0] * ( top_ - bot_ );
 }
 
 bool SpaceStrip::inside(Vector const& point) const
@@ -150,7 +150,7 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 real SpaceStrip::volume() const
 {
-    return 4.0 * length_[0] * length_[1] * ( top_ - bot_ );
+    return 4.0 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
 }
 
 bool SpaceStrip::inside(Vector const& point) const
@@ -197,8 +197,8 @@ void SpaceStrip::write(Outputter& out) const
 {
     out.put_characters("strip", 16);
     out.writeUInt16(4);
-    out.writeFloat(length_[0]);
-    out.writeFloat(length_[1]);
+    out.writeFloat(halflength_[0]);
+    out.writeFloat(halflength_[1]);
     out.writeFloat(bot_);
     out.writeFloat(top_);
 }
@@ -206,8 +206,8 @@ void SpaceStrip::write(Outputter& out) const
 
 void SpaceStrip::setLengths(const real len[])
 {
-    length_[0] = len[0];
-    length_[1] = len[1];
+    halflength_[0] = len[0];
+    halflength_[1] = len[1];
     bot_ = len[2];
     top_ = len[3];
 #ifdef BACKWARD_COMPATIBILITY
@@ -241,8 +241,8 @@ using namespace gle;
 
 bool SpaceStrip::draw() const
 {
-    const real X = length_[0];
-    const real Y = ( DIM > 1 ) ? length_[1] : 1;
+    const real X = halflength_[0];
+    const real Y = ( DIM > 1 ) ? halflength_[1] : 1;
     const real T = ( DIM > 2 ) ? top_ : 0;
     
 #if ( DIM > 2 )

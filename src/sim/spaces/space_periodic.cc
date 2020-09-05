@@ -10,7 +10,7 @@ SpacePeriodic::SpacePeriodic(SpaceProp const* p)
 : Space(p)
 {
     for ( int d = 0; d < 3; ++d )
-        length_[d] = 0;
+        halflength_[d] = 0;
 }
 
 
@@ -18,12 +18,12 @@ void SpacePeriodic::resize(Glossary& opt)
 {
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        real len = length_[d];
+        real len = halflength_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len <= 0 )
             throw InvalidParameter("periodic:length[",d,"] must be > 0");
-        length_[d] = len;
+        halflength_[d] = len;
     }
     update();
 }
@@ -33,14 +33,14 @@ void SpacePeriodic::update()
 {
     modulo_.reset();
     for ( unsigned d = 0; d < DIM; ++d )
-        modulo_.enable(d, 2*length_[d]);
+        modulo_.enable(d, 2*halflength_[d]);
 }
 
 
 void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_[0],-length_[1],-length_[2]);
-    sup.set( length_[0], length_[1], length_[2]);
+    inf.set(-halflength_[0],-halflength_[1],-halflength_[2]);
+    sup.set( halflength_[0], halflength_[1], halflength_[2]);
 }
 
 
@@ -62,7 +62,7 @@ void SpacePeriodic::bounce(Vector& pos) const
 
 real SpacePeriodic::volume() const
 {
-    return 2.0 * length_[0];
+    return 2.0 * halflength_[0];
 }
 
 bool SpacePeriodic::inside(Vector const& point) const
@@ -86,7 +86,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 real SpacePeriodic::volume() const
 {
-    return 4.0 * length_[0] * length_[1];
+    return 4.0 * halflength_[0] * halflength_[1];
 }
 
 bool SpacePeriodic::inside(Vector const& point) const
@@ -108,7 +108,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 real SpacePeriodic::volume() const
 {
-    return 8.0 * length_[0] * length_[1] * length_[2];
+    return 8.0 * halflength_[0] * halflength_[1] * halflength_[2];
 }
 
 bool SpacePeriodic::inside(Vector const& point) const
@@ -131,18 +131,18 @@ void SpacePeriodic::write(Outputter& out) const
 {
     out.put_characters("periodic", 16);
     out.writeUInt16(4);
-    out.writeFloat(length_[0]);
-    out.writeFloat(length_[1]);
-    out.writeFloat(length_[2]);
+    out.writeFloat(halflength_[0]);
+    out.writeFloat(halflength_[1]);
+    out.writeFloat(halflength_[2]);
     out.writeFloat(0.f);
 }
 
 
 void SpacePeriodic::setLengths(const real len[])
 {
-    length_[0] = len[0];
-    length_[1] = len[1];
-    length_[2] = len[2];
+    halflength_[0] = len[0];
+    halflength_[1] = len[1];
+    halflength_[2] = len[2];
     update();
 }
 
@@ -166,9 +166,9 @@ using namespace gle;
 
 bool SpacePeriodic::draw() const
 {
-    const real X = length_[0];
-    const real Y = ( DIM > 1 ) ? length_[1] : 1;
-    const real Z = ( DIM > 2 ) ? length_[2] : 0;
+    const real X = halflength_[0];
+    const real Y = ( DIM > 1 ) ? halflength_[1] : 1;
+    const real Z = ( DIM > 2 ) ? halflength_[2] : 0;
     
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);

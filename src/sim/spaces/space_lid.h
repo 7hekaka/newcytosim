@@ -27,7 +27,7 @@ class SpaceLid : public Space
 private:
     
     /// half the length in each dimension
-    real  length_[3];
+    real  halflength_[3];
 
     /// the position of the top lid
     real  top_;

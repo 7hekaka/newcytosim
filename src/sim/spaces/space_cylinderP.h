@@ -24,7 +24,7 @@ class SpaceCylinderP : public Space
 private:
     
     /// half the length of the central cylinder
-    real  length_;
+    real  halflength_;
     
     /// the radius of the cylinder
     real  radius_;

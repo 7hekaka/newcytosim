@@ -17,7 +17,7 @@ SpaceLid::SpaceLid(SpaceDynamicProp const* p)
         throw InvalidParameter("lid is only valid in DIM=2 or 3");
     
     for ( int d = 0; d < 3; ++d )
-        length_[d] = 0;
+        halflength_[d] = 0;
     top_ = 0;
     force_ = 0;
 }
@@ -27,12 +27,12 @@ void SpaceLid::resize(Glossary& opt)
 {
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        real len = length_[d];
+        real len = halflength_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len <= 0 )
             throw InvalidParameter("lid:length_[] must be > 0");
-        length_[d] = len;
+        halflength_[d] = len;
     }
     
     opt.set(top_, "top");
@@ -46,14 +46,30 @@ void SpaceLid::resize(Glossary& opt)
 void SpaceLid::update()
 {
     modulo_.reset();
-    modulo_.enable(0, 2*length_[0]);
+    modulo_.enable(0, 2*halflength_[0]);
 }
 
 
 void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_[0],-length_[1],-length_[2]);
-    sup.set( length_[0], length_[1], top_);
+    inf.set(-halflength_[0],-halflength_[1],-halflength_[2]);
+    sup.set( halflength_[0], halflength_[1], top_);
+}
+
+
+
+void SpaceLid::bounce(Vector& pos) const
+{
+    if ( !inside(pos) )
+        bounceOnEdges(pos);
+    
+    // periodic in all except the last dimension:
+#if ( DIM > 1 )
+    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+#endif
+#if ( DIM > 2 )
+    pos.YY = fold_real(pos.YY, modulo_.period_[1]);
+#endif
 }
 
 
@@ -78,7 +94,7 @@ void SpaceLid::bounce(Vector& pos) const
  */
 Vector SpaceLid::randomPlaceOnEdge(real) const
 {
-    return Vector( RNG.sfloat()*length_[0], top_, 0 );
+    return Vector( RNG.sfloat()*halflength_[0], top_, 0 );
 }
 
 
@@ -89,11 +105,11 @@ Vector SpaceLid::randomPlaceOnEdge(real) const
 real SpaceLid::volume() const
 {
 #if ( DIM == 1 )
-    return top_ + length_[0];
+    return top_ + halflength_[0];
 #elif ( DIM == 2 )
-    return 2.0 * length_[0] * ( top_ + length_[1] );
+    return 2.0 * halflength_[0] * ( top_ + halflength_[1] );
 #else
-    return 4.0 * length_[0] * length_[1] * ( top_ + length_[2] );
+    return 4.0 * halflength_[0] * length_[1] * ( top_ + halflength_[2] );
 #endif
 }
 
@@ -180,7 +196,7 @@ void SpaceLid::step()
         std::cerr << "Error: lid displacement is too fast: " << dc << '\n';
     std::cerr << "force on lid is " << force_ << '\n';
     
-    if ( top_ > length_[DIM-1] )
+    if ( top_ > halflength_[DIM-1] )
         std::cerr << "Warning: space lid has reached its maximum\n";
 }
 
@@ -191,9 +207,9 @@ void SpaceLid::write(Outputter& out) const
 {
     out.put_characters("lid", 16);
     out.writeUInt16(6);
-    out.writeFloat(length_[0]);
-    out.writeFloat(length_[1]);
-    out.writeFloat(length_[2]);
+    out.writeFloat(halflength_[0]);
+    out.writeFloat(halflength_[1]);
+    out.writeFloat(halflength_[2]);
     out.writeFloat(top_);
     out.writeFloat(force_);
     out.writeFloat(0.f);
@@ -202,9 +218,9 @@ void SpaceLid::write(Outputter& out) const
 
 void SpaceLid::setLengths(const real len[])
 {
-    length_[0] = len[0];
-    length_[1] = len[1];
-    length_[2] = len[2];
+    halflength_[0] = len[0];
+    halflength_[1] = len[1];
+    halflength_[2] = len[2];
     top_       = len[3];
     force_     = len[4];
     update();
@@ -229,9 +245,9 @@ using namespace gle;
 
 bool SpaceLid::draw() const
 {
-    const real X = length_[0];
-    const real Y = ( DIM > 1 ) ? length_[1] : 1;
-    const real Z = ( DIM > 2 ) ? length_[2] : 0;
+    const real X = halflength_[0];
+    const real Y = ( DIM > 1 ) ? halflength_[1] : 1;
+    const real Z = ( DIM > 2 ) ? halflength_[2] : 0;
 
 #if ( DIM == 2 )
     glBegin(GL_LINES);

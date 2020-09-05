@@ -22,7 +22,7 @@
 class SpaceStrip : public Space
 {
     /// half to total width in each dimension
-    real   length_[3];
+    real   halflength_[3];
 
     /// Z-position of the bottom limit
     real   bot_;
