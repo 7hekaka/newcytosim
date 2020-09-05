@@ -5,25 +5,28 @@ Cytosim can perform simulations in 1D, 2D or 3D, but the dimensionality is selec
 
 This means that one executable will only be able to perform simulations for one dimensionality.
 
-### Compilation
+### As specified in the code
 
-The dimension of the simulation is selected in `src/math/dim.h`
+The dimension by defalt is selected in `src/math/dim.h`
 
 	#define DIM 2
 
-Save the file and always recompile everything after changing `DIM`:
+If you edit this file and change `DIM`, always recompile everything:
 
 	make clean
 	make
 
-This will place the executables in `bin/`
+This will replace the executables in `bin/`
 
 You can check the dimensionality of the executable, with:
 
 	bin/sim info
 	bin/play info
 
-Shortcuts are built into the makefile, and you can do:
+### Selected at compilations
+
+The value defined in `dim.h` can be overwritten by the compilation system (e.g. `make`).
+Shortcuts are built into the makefile, and you can built directly the 2D executables:
 
 	make bin2/sim
 	make bin2/play
@@ -33,20 +36,20 @@ and similarly
 	make bin3/sim
 	make bin3/play
 
-and also:
+or to make all exectuables of specified dimension:
 
-	make bin2
-	make bin3
+	make dim2
+	make dim3
 
-or
+and to all everything:
 
 	make alldim
 
 ### Recommended practice
 
-Compile the executables that you need and rename them accordingly:
+You can compile the executables that you need and rename them accordingly:
 
-	cp bin2/play ~/cytobin/play2
-	cp bin3/play ~/cytobin/play3
+	cp bin2/play ~/bin/play2
+	cp bin3/play ~/bin/play3
 
-Create shortcuts or alias if you use these often.
+It can be handy to create shortcuts or alias if you use these often.
