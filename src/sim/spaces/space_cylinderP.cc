@@ -144,6 +144,15 @@ Vector SpaceCylinderP::project(Vector const& W) const
     return P;
 }
 
+
+void SpaceCylinderP::bounce(Vector& pos) const
+{
+    if ( !inside(pos) )
+        bounceOnEdges(pos);
+
+    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+}
+
 //------------------------------------------------------------------------------
 
 /**

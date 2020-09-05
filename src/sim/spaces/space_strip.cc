@@ -79,6 +79,22 @@ void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
     sup.set( length_[0], length_[1], top_);
 }
 
+
+void SpaceStrip::bounce(Vector& pos) const
+{
+    if ( !inside(pos) )
+        bounceOnEdges(pos);
+
+    // periodic in all except the last dimension:
+#if ( DIM > 1 )
+    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+#endif
+#if ( DIM > 2 )
+    pos.YY = fold_real(pos.YY, modulo_.period_[1]);
+#endif
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 

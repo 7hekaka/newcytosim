@@ -158,6 +158,13 @@ inline real clamp_real(const real x, const real i, const real s)
     return std::max(i, std::min(x, s));
 }
 
+/// adjust 'x' to canonical image with period 'p':
+inline real fold_real(const real x, const real p)
+{
+    // using remainder() function for branchless code
+    return std::remainder(x, p);
+}
+
 //----------------------------------- DEBUG ------------------------------------
 
 inline bool isnan(size_t cnt, real const* ptr)

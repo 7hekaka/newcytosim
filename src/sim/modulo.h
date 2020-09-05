@@ -13,10 +13,10 @@
  */
 class Modulo
 {
-private:
+public:
     
     /// the period in each dimension
-    real  mSize[4];
+    real  period_[4];
     
     /// bitfield indicating the dimensions that are periodic
     int   mMode;
@@ -24,7 +24,7 @@ private:
 public:
     
     /// set as non periodic
-    void reset() { mMode = 0; for (int d=0; d<4; ++d) mSize[d] = 0; }
+    void reset() { mMode = 0; for (int d=0; d<4; ++d) period_[d] = 0; }
     
     /// constructor
     Modulo() { reset(); }

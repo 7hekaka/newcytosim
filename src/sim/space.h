@@ -120,8 +120,13 @@ public:
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
     real           estimateVolume(size_t cnt) const;
     
+    
     /// bring a position back inside, as if it bounced off the edges of the Space
-    Vector         bounce(Vector) const;
+    void           bounceOnEdges(Vector&) const;
+
+    /// bring a position back inside, as if it bounced off the edges of the Space
+    /** This is also used for periodic boundary conditions*/
+    virtual void   bounce(Vector&) const;
 
     
     /// the square of the distance to the edge of this Space

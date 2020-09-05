@@ -120,10 +120,7 @@ void Single::stepF(Simul& sim)
     // confinement:
     if ( prop->confine == CONFINE_INSIDE )
     {
-        if ( !prop->confine_space_ptr->inside(sPos) )
-            sPos = prop->confine_space_ptr->bounce(sPos);
-        if ( modulo )
-            modulo->fold(sPos);
+        prop->confine_space_ptr->bounce(sPos);
     }
     else if ( prop->confine == CONFINE_ON )
     {

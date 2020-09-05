@@ -37,11 +37,7 @@ void Crosslink::stepFF(Simul& sim)
     diffuse();
     
     // confinement:
-    if ( !prop->confine_space_ptr->inside(cPos) )
-        cPos = prop->confine_space_ptr->bounce(cPos);
-    
-    if ( modulo )
-        modulo->fold(cPos);
+    prop->confine_space_ptr->bounce(cPos);
     
     // activity:
     cHand1->stepUnattached(sim, cPos);

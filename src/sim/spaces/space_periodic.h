@@ -52,6 +52,9 @@ public:
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
     
+    /// equivalent to 'Modulo::fold'
+    void        bounce(Vector&) const;
+
     /// OpenGL display function; returns true if successful
     bool        draw() const;
     

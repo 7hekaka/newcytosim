@@ -30,7 +30,7 @@ class SpaceDice : public Space
 {
 private:
     
-    /// dimensions
+    /// half-width in each dimension
     real      length_[3];
     
     /// the radius by which the corners are smoothed

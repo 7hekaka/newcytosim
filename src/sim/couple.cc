@@ -168,10 +168,7 @@ void Couple::stepFF(Simul& sim)
          Set concentration of molecules at edges of Space by letting molecules
          out, and put some back at a constant rate
          */
-        if ( !prop->confine_space_ptr->inside(cPos) )
-            cPos = prop->confine_space_ptr->bounce(cPos);
-        if ( modulo )
-            modulo->fold(cPos);
+        prop->confine_space_ptr->bounce(cPos);
     }
     else if ( prop->confine == CONFINE_ON )
     {

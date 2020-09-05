@@ -43,10 +43,7 @@ void Duo::stepFF(Simul& sim)
     // confinement:
     if ( prop->confine == CONFINE_INSIDE )
     {
-        if ( !prop->confine_space_ptr->inside(cPos) )
-            cPos = prop->confine_space_ptr->bounce(cPos);
-        if ( modulo )
-            modulo->fold(cPos);
+        prop->confine_space_ptr->bounce(cPos);
     }
     else if ( prop->confine == CONFINE_ON )
     {

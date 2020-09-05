@@ -208,14 +208,14 @@ real Space::estimateVolume(size_t cnt) const
 
 
 /**
- This uses Space::project to reflect `w` on the edge of the Space,
+ This uses `Space::project()` to reflect `w` on the edge of the Space,
  until the result eventually falls inside.
  
  In most geometries, this works well, but if the distance from the point
  to the edge is very large compared to the width of the space, the number
  of iterations may be large.
 */
-Vector Space::bounce(Vector pos) const
+void Space::bounceOnEdges(Vector& pos) const
 {
     Vector P;
     // bounce on the edge, and return if inside
@@ -224,7 +224,7 @@ Vector Space::bounce(Vector pos) const
         P = project(pos);
         pos = 2*P - pos;
         if ( inside(pos) )
-            return pos;
+            return;
     } while ( ++cnt < 8 );
     
     Vector Q;
@@ -232,13 +232,16 @@ Vector Space::bounce(Vector pos) const
         Q = project(pos);
         pos = 2*Q - pos;
         if ( inside(pos) )
-            return pos;
+            return;
         if ( distanceSqr(P, Q) < REAL_EPSILON )
-            return ( P + Q ) * 0.5;
+        {
+            pos = ( P + Q ) * 0.5;
+            return;
+        }
         P = project(pos);
         pos = 2*P - pos;
         if ( inside(pos) )
-            return pos;
+            return;
     } while ( ++cnt < 16 );
 
     static size_t msg = 0;
@@ -250,12 +253,19 @@ Vector Space::bounce(Vector pos) const
             pos = 2*P - pos;
             std::cerr << cnt << "  " << pos << " proj " << P << '\n';
             if ( inside(pos) )
-                return pos;
+                return;
         } while ( ++cnt < 24 );
     }
     
     // if space is convex, the midpoint should be inside
-    return ( P + Q ) * 0.5;
+    pos = ( P + Q ) * 0.5;
+}
+
+
+void Space::bounce(Vector& pos) const
+{
+    if ( !inside(pos) )
+        bounceOnEdges(pos);
 }
 
 

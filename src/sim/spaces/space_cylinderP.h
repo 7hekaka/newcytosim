@@ -57,7 +57,7 @@ public:
     
     /// true if the point is inside the Space
     bool        inside(Vector const&) const;
-    
+
     /// true if the bead is inside the Space
     bool        allInside(Vector const&, real rad) const;
     
@@ -72,6 +72,9 @@ public:
 
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
+    
+    /// equivalent to 'Modulo::fold'
+    void        bounce(Vector&) const;
 
     
     /// apply a force directed towards the edge of the Space

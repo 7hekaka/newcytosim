@@ -21,9 +21,9 @@
  */
 class SpaceStrip : public Space
 {
-    ///  half to total width in each dimension
+    /// half to total width in each dimension
     real   length_[3];
-    
+
     /// Z-position of the bottom limit
     real   bot_;
     
@@ -58,6 +58,9 @@ public:
     
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
+    
+    /// equivalent to 'Modulo::fold'
+    void        bounce(Vector&) const;
 
     
     /// apply a force directed towards the edge of the Space

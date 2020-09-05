@@ -26,9 +26,9 @@ class SpaceLid : public Space
 {
 private:
     
-    /// dimensions
+    /// half the length in each dimension
     real  length_[3];
-    
+
     /// the position of the top lid
     real  top_;
 
@@ -53,7 +53,7 @@ public:
     Modulo const* getModulo() const { return &modulo_; }
     
     /// match sizes of Modulo object
-    void        update();
+    void       update();
 
     /// true if the Space is periodic in dimension ii
     bool       isPeriodic(int ii) const { return ( ii < DIM-1 ); }
@@ -76,6 +76,9 @@ public:
     /// project point on the closest edge of the Space
     Vector     project(Vector const& pos) const;
     
+    /// equivalent to 'Modulo::fold'
+    void       bounce(Vector&) const;
+
     
     /// apply a force directed towards the edge of the Space
     void       setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;

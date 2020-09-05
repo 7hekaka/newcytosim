@@ -43,8 +43,20 @@ void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
     sup.set( length_[0], length_[1], length_[2]);
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
+
+void SpacePeriodic::bounce(Vector& pos) const
+{
+    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+#if ( DIM > 1 )
+    pos.YY = fold_real(pos.YY, modulo_.period_[1]);
+#endif
+#if ( DIM > 2 )
+    pos.ZZ = fold_real(pos.ZZ, modulo_.period_[2]);
+#endif
+}
+
+
+#pragma mark - DIM = 1
 
 #if ( DIM == 1 )
 
@@ -68,7 +80,7 @@ Vector SpacePeriodic::project(Vector const&) const
 #endif
 
 
-//------------------------------------------------------------------------------
+#pragma mark - DIM = 2
 
 #if ( DIM == 2 )
 
@@ -90,7 +102,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 #endif
 
-//------------------------------------------------------------------------------
+#pragma mark - DIM = 3
 
 #if ( DIM >= 3 )
 
@@ -113,6 +125,7 @@ Vector SpacePeriodic::project(Vector const&) const
 #endif
 
 //------------------------------------------------------------------------------
+#pragma mark - I/O
 
 void SpacePeriodic::write(Outputter& out) const
 {
