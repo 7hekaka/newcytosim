@@ -13,9 +13,13 @@ The selection is done with the parameter 'precondition':
 Possible values of `precondition` are: 0, 1, 2, 3 and 4:
 
 - 0 is no preconditionning
-- 1 is a tridiagonal symmetric preconditionner
-- 2 is a pentadiagonal non-symmetric preconditionner
-- 4 is a non-symmetric block preconditionner
+- 1 is a reduced banded symmetric preconditionner with 2 off-diagonals
+- 2 is a reduced symmetric block preconditionner
+- 3 is a reduced non-symmetric block preconditionner
+- 4 is a fullsize non-symmetric block preconditionner
+
+A higher setting requires more calculation/memory, while offering a better approximation of 
+the true matrix, thus creating a tradeoff in terms of performance.
 
 With `verbose=1` cytosim will report some useful information in `messages.cmo`:
 

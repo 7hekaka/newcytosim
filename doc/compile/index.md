@@ -22,7 +22,7 @@ There is a [public reference implementations](http://netlib.org).
 Compiling the reference code is possible with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
 Precompiled libraries are available for most platforms, within:
 
-- [Intel Math Kernel Library](http://software.intel.com/en-us/articles/intel-mkl/)
+- [Intel Math Kernel Library](https://software.intel.com/mkl)
 - [Apple's vecLib](http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html)
 - [OpenBLAS](https://www.openblas.net)
 - Also available for many Linux distributions.

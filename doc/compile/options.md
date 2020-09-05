@@ -61,7 +61,7 @@ You can then enable PNG support by editing the `makefile.inc`:
 
 # Advanced features
 
-* [Math Kernel Library](intel_mkl.md)
+* [Math Kernel Library](math_kernel_library.md)
 * [SIMD optimizations](vectorization.md)
 * [Parallel execution](multithreading.md)
 
