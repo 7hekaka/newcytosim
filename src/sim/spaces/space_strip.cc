@@ -106,9 +106,9 @@ real SpaceStrip::volume() const
     return ( top_ - bot_ );
 }
 
-bool SpaceStrip::inside(Vector const& point) const
+bool SpaceStrip::inside(Vector const& pos) const
 {
-    return (( bot_ <= point.XX ) & ( point.XX <= top_ ));
+    return (( bot_ <= pos.XX ) & ( pos.XX <= top_ ));
 }
 
 
@@ -130,9 +130,9 @@ real SpaceStrip::volume() const
     return 2.0 * halflength_[0] * ( top_ - bot_ );
 }
 
-bool SpaceStrip::inside(Vector const& point) const
+bool SpaceStrip::inside(Vector const& pos) const
 {
-    return (( bot_ <= point.YY ) & ( point.YY <= top_ ));
+    return (( bot_ <= pos.YY ) & ( pos.YY <= top_ ));
 }
 
 
@@ -153,9 +153,9 @@ real SpaceStrip::volume() const
     return 4.0 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
 }
 
-bool SpaceStrip::inside(Vector const& point) const
+bool SpaceStrip::inside(Vector const& pos) const
 {
-    return (( bot_ <= point.ZZ ) & ( point.ZZ <= top_ ));
+    return (( bot_ <= pos.ZZ ) & ( pos.ZZ <= top_ ));
 }
 
 Vector SpaceStrip::project(Vector const& pos) const

@@ -215,7 +215,7 @@ bool SpaceCylinderP::draw() const
     GLfloat c[fin+1], s[fin+1];
     gle::circle(fin, c, s, 1);
 
-    GLfloat L = (GLfloat)length_;
+    GLfloat L = (GLfloat)halflength_;
     GLfloat R = (GLfloat)radius_;
 
     glBegin(GL_TRIANGLE_STRIP);

@@ -57,26 +57,9 @@ void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-
 void SpaceLid::bounce(Vector& pos) const
 {
-    if ( !inside(pos) )
-        bounceOnEdges(pos);
-    
-    // periodic in all except the last dimension:
-#if ( DIM > 1 )
-    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
-#endif
-#if ( DIM > 2 )
-    pos.YY = fold_real(pos.YY, modulo_.period_[1]);
-#endif
-}
-
-
-
-void SpaceLid::bounce(Vector& pos) const
-{
-    if ( !inside(pos) )
+    if ( !SpaceLid::inside(pos) )
         bounceOnEdges(pos);
     
     // periodic in all except the last dimension:
@@ -109,14 +92,14 @@ real SpaceLid::volume() const
 #elif ( DIM == 2 )
     return 2.0 * halflength_[0] * ( top_ + halflength_[1] );
 #else
-    return 4.0 * halflength_[0] * length_[1] * ( top_ + halflength_[2] );
+    return 4.0 * halflength_[0] * halflength_[1] * ( top_ + halflength_[2] );
 #endif
 }
 
 
-bool SpaceLid::inside(Vector const& point) const
+bool SpaceLid::inside(Vector const& pos) const
 {
-    return ( point[DIM-1] < top_ );
+    return ( pos[DIM-1] < top_ );
 }
 
 
