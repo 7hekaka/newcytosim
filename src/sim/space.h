@@ -37,8 +37,8 @@ class Space : public Object
 {
 protected:
     
-    /// read numbers from file
-    static void read_data(Inputter&, real*, std::string const&);
+    /// read numbers from file into array `len` of size `n_len`
+    static void read_data(Inputter&, size_t n_len, real* len, std::string const&);
 
 public:
     

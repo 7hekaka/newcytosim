@@ -212,7 +212,7 @@ void SpaceLid::setLengths(const real len[])
 void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "lid");
+    read_data(in, 8, len, "lid");
     setLengths(len);
 }
 

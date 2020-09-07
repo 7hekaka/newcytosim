@@ -103,7 +103,7 @@ void SpaceTorus::setLengths(const real len[])
 void SpaceTorus::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "torus");
+    read_data(in, 8, len, "torus");
     setLengths(len);
 }
 

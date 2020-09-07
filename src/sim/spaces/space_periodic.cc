@@ -150,7 +150,7 @@ void SpacePeriodic::setLengths(const real len[])
 void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "periodic");
+    read_data(in, 8, len, "periodic");
     setLengths(len);
 }
 

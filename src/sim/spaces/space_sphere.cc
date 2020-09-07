@@ -102,7 +102,7 @@ void SpaceSphere::setLengths(const real len[])
 void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "sphere");
+    read_data(in, 8, len, "sphere");
     setLengths(len);
 }
 

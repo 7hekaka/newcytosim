@@ -404,7 +404,7 @@ void SpaceTee::setLengths(const real len[])
 void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "tee");
+    read_data(in, 8, len, "tee");
     setLengths(len);
 }
 

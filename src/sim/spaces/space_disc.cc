@@ -145,7 +145,7 @@ void SpaceDisc::setLengths(const real len[])
 void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "disc");
+    read_data(in, 8, len, "disc");
     setLengths(len);
 }
 

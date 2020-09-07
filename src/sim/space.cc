@@ -442,12 +442,12 @@ void Space::write(Outputter& out) const
 void Space::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "space");
+    read_data(in, 8, len, "space");
     setLengths(len);
 }
 
 
-void Space::read_data(Inputter& in, real len[8], std::string const& expected)
+void Space::read_data(Inputter& in, size_t n_len, real len[], std::string const& expected)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() < 35 )
@@ -500,7 +500,7 @@ void Space::read_data(Inputter& in, real len[8], std::string const& expected)
         n = in.readUInt16();
     
     size_t d = 0;
-    for ( ; d < std::min(8UL,n); ++d )
+    for ( ; d < std::min(n_len,n); ++d )
         len[d] = in.readFloat();
     for ( ; d < n; ++d )
         in.readFloat();

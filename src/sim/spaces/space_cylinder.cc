@@ -208,7 +208,7 @@ void SpaceCylinder::setLengths(const real len[])
 void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "cylinder");
+    read_data(in, 8, len, "cylinder");
     setLengths(len);
 }
 

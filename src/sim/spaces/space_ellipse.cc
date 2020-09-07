@@ -200,7 +200,7 @@ void SpaceEllipse::setLengths(const real len[])
 void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "ellipse");
+    read_data(in, 8, len, "ellipse");
     setLengths(len);
 }
 

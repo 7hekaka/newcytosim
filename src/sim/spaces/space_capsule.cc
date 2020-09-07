@@ -229,7 +229,7 @@ void SpaceCapsule::setLengths(const real len[])
 void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "capsule");
+    read_data(in, 8, len, "capsule");
     setLengths(len);
 }
 

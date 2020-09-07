@@ -145,7 +145,7 @@ void SpaceBanana::setLengths(const real len[])
 void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, len, "banana");
+    read_data(in, 8, len, "banana");
     setLengths(len);
 }
 
