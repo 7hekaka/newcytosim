@@ -22,7 +22,7 @@ const size_t DISP = 16UL;
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testDPTT(size_t cnt)
+void testDPTTS(size_t cnt)
 {
     real * D = new_real(NBS);
     real * U = new_real(NBS);
@@ -171,10 +171,10 @@ void testThomas(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    std::cout << "testPTTRS  --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
-
-    testThomas(1<<14);
-    //testDPTT(1<<17);
+    std::cout << "testPTTS   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    testDPTTS(1<<17);
+    std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    testThomas(1<<15);
     
     return EXIT_SUCCESS;
 }
