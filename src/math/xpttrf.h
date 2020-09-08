@@ -265,7 +265,6 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
         B[n] = D[n] * x;
     }
     x = D[size-1] * x;
-    B[size-1] = x;
     
     if ( size > 1 )
     {
@@ -273,7 +272,7 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
         for ( size_t n = size-2; n > 0; --n )
         {
             // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
-            x = B[n] - DE[n] * x;
+            x = B[n] - x * DE[n];
             B[n] = x;
         }
         B[0] = D[0] * B[0] - DE[0] * x;

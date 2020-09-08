@@ -15,7 +15,7 @@
 #include "cytoblas.h"
 
 /// number of segments:
-const size_t NBS = 1240;
+const size_t NBS = 117;
 const size_t DISP = 16UL;
 
 /**
@@ -48,11 +48,11 @@ void testDPTTS(size_t cnt)
     copy_real(NBS, B, S);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    TicToc::tic();
+    auto rdt = __rdtsc();
     for ( size_t n = 0; n < cnt; ++n )
         lapack_xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("   clapack");
-    
+    printf("  clapack %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
+
     copy_real(NBS, Ds, D);
     copy_real(NBS, Us, U);
     copy_real(NBS, Bs, B);
@@ -60,10 +60,10 @@ void testDPTTS(size_t cnt)
     lapack::xptts2(NBS, 1, D, U, B, 1);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    TicToc::tic();
+    rdt = __rdtsc();
     for ( size_t n = 0; n < cnt; ++n )
         lapack::xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("    lapack");
+    printf("   lapack %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
 
     copy_real(NBS, Ds, D);
     copy_real(NBS, Us, U);
@@ -72,10 +72,10 @@ void testDPTTS(size_t cnt)
     italian_xptts2(NBS, 1, D, U, B, 1);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    TicToc::tic();
+    rdt = __rdtsc();
     for ( size_t n = 0; n < cnt; ++n )
         italian_xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("   italian");
+    printf("  italian %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
     
     copy_real(NBS, Ds, D);
     copy_real(NBS, Us, U);
@@ -84,10 +84,10 @@ void testDPTTS(size_t cnt)
     alsatian_xptts2(NBS, 1, D, U, B, 1);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    TicToc::tic();
+    rdt = __rdtsc();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian_xptts2(NBS, 1, D, U, B, 1);
-    TicToc::toc("  alsatian");
+    printf(" alsatian %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
 
     free_real(D);
     free_real(U);
