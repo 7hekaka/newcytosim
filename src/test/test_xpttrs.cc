@@ -30,6 +30,7 @@ void testDPTTS(size_t cnt)
     real * Ds = new_real(NBS);
     real * Us = new_real(NBS);
     real * Bs = new_real(NBS);
+    real * S = new_real(NBS);
 
     for ( size_t i = 0; i < NBS; ++i )
     {
@@ -44,7 +45,9 @@ void testDPTTS(size_t cnt)
     copy_real(NBS, Bs, B);
     lapack_xpttrf(NBS, D, U, &info);
     lapack_xptts2(NBS, 1, D, U, B, 1);
+    copy_real(NBS, B, S);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    printf(" err %f", blas::max_diff(NBS, S, B));
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack_xptts2(NBS, 1, D, U, B, 1);
@@ -56,6 +59,7 @@ void testDPTTS(size_t cnt)
     lapack::xpttrf(NBS, D, U, &info);
     lapack::xptts2(NBS, 1, D, U, B, 1);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    printf(" err %f", blas::max_diff(NBS, S, B));
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack::xptts2(NBS, 1, D, U, B, 1);
@@ -67,6 +71,7 @@ void testDPTTS(size_t cnt)
     italian_xpttrf(NBS, D, U, &info);
     italian_xptts2(NBS, 1, D, U, B, 1);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    printf(" err %f", blas::max_diff(NBS, S, B));
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         italian_xptts2(NBS, 1, D, U, B, 1);
@@ -78,6 +83,7 @@ void testDPTTS(size_t cnt)
     alsatian_xpttrf(NBS, D, U, &info);
     alsatian_xptts2(NBS, 1, D, U, B, 1);
     VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    printf(" err %f", blas::max_diff(NBS, S, B));
     TicToc::tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian_xptts2(NBS, 1, D, U, B, 1);
@@ -89,6 +95,7 @@ void testDPTTS(size_t cnt)
     free_real(Ds);
     free_real(Us);
     free_real(Bs);
+    free_real(S);
 }
 
 
@@ -173,8 +180,8 @@ int main(int argc, char* argv[])
     RNG.seed();
     std::cout << "testPTTS   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
     testDPTTS(1<<17);
-    std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
-    testThomas(1<<15);
+    //std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    //testThomas(1<<15);
     
     return EXIT_SUCCESS;
 }

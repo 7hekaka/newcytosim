@@ -245,6 +245,7 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
     D[size-1] = 1.0 / ( D[size-1] - e * x );
 }
 
+
 /**
  Based on the 'Italian' version, using precalculated constant terms
  
@@ -261,7 +262,7 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
     {
         //B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
         x = B[n] - x * DE[n-1];  // = B[n+1] - B[n] * E[n]
-        B[n] = x;
+        B[n] = D[n] * x;
     }
     x = D[size-1] * x;
     B[size-1] = x;
@@ -272,7 +273,7 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
         for ( size_t n = size-2; n > 0; --n )
         {
             // B[n] = B[n] - ( D[n] * E[n] ) * B[n+1];
-            x = D[n] * B[n] - DE[n] * x;
+            x = B[n] - DE[n] * x;
             B[n] = x;
         }
         B[0] = D[0] * B[0] - DE[0] * x;
