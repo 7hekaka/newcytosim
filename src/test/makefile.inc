@@ -41,12 +41,12 @@ test_code: test_code.cc random.o random_vector.o SFMT.o tictoc.o | bin
 	$(DONE)
 vpath test_code bin
 
-test_xpttrs: test_xpttrs.cc random.o SFMT.o tictoc.o | bin
+test_xpttrs: xpttrf.h test_xpttrs.cc random.o SFMT.o tictoc.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_xpttrs bin
 
-test_xtbsv: test_xtbsv.cc random.o SFMT.o tictoc.o | bin
+test_xtbsv: xtbsv.h test_xtbsv.cc random.o SFMT.o tictoc.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_xtbsv bin
