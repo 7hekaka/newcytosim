@@ -31,9 +31,9 @@ void SpaceSet::setMaster(Space const* spc)
         
 #if ( 0 )
         if ( spc )
-            std::clog << "setMaster(" << spc->prop->name() << ")" << std::endl;
+            std::clog << "Space master: " << spc->prop->name() << std::endl;
         else
-            std::clog << "setMaster(NULL)" << std::endl;
+            std::clog << "Space master: NULL" << std::endl;
 #endif
     }
     

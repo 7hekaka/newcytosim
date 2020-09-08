@@ -102,9 +102,9 @@ void Display1::drawBall(Vector const& pos, real radius) const
     if ( DIM == 3 )
     {
         glCullFace(GL_FRONT);
-        gleSphere2B();
+        gleSphere1B();
         glCullFace(GL_BACK);
-        gleSphere4B();
+        gleSphere2B();
     }
     else
         gleDiscB();

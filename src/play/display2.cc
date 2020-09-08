@@ -123,9 +123,9 @@ void Display2::drawBall(Vector const& pos, real radius)
     {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
-        gleSphere2B();
+        gleSphere1B();
         glCullFace(GL_BACK);
-        gleSphere4B();
+        gleSphere2B();
     }
     else
         gleDiscB();
