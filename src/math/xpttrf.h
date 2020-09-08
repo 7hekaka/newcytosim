@@ -265,7 +265,7 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
         B[n] = D[n] * x;
     }
     x = D[size-1] * x;
-    
+
     if ( size > 1 )
     {
         // downward recursion on B[]
@@ -277,6 +277,8 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
         }
         B[0] = D[0] * B[0] - DE[0] * x;
     }
+    else
+        B[0] = x;
 }
 
 
