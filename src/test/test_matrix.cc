@@ -275,7 +275,7 @@ void testMatrix(MATRIX & mat,
     }
     double t3 = toc();
 
-    printf("\n%-20s : ", mat.what().c_str());
+    printf("\n%-20s ", mat.what().c_str());
     printf("set %8.3f  muladd %8.3f  alt %8.3f  mul %8.3f", ts, t1, t2, t3);
     checkMatrix(mat, size, x, y, z);
 }
@@ -303,8 +303,14 @@ void checkMatrixParallel(MATRIX & mat, const size_t size,
     for ( size_t i = 0; i < size; i += CHK )
         mat.vecMulAdd(x, z, i, i+CHK);
     real sum2 = checksum(size, y, z);
+    
+    zero_real(size, z);
+    #pragma omp parallel for num_threads(16)
+    for ( size_t i = 0; i < size; i += CHK )
+        mat.vecMulAdd(x, z, i, i+CHK);
+    real sum3 = checksum(size, y, z);
 
-    printf("  check %+16.6f  %+16.6f", sum1, sum2);
+    printf("  check %+16.6f %+16.6f %+16.6f", sum1, sum2, sum3);
 }
 
 
@@ -360,8 +366,21 @@ void testMatrixParallel(MATRIX & mat,
         }
     }
     double t8 = toc();
+    
+    tic();
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
+    {
+        #pragma omp parallel for num_threads(16)
+        for ( size_t i = 0; i < size; i += CHK )
+        {
+            mat.vecMulAdd(y, z, i, i+CHK);
+            mat.vecMulAdd(x, z, i, i+CHK);
+        }
+    }
+    double t16 = toc();
 
-    printf("\n%-24s threaded mul :  x2 %8.3f   x4 %8.3f   x8 %8.3f", mat.what().c_str(), t2, t4, t8);
+    printf("\n%-20s ", mat.what().c_str());
+    printf(" 2x %8.3f   4x %8.3f   8x %8.3f  16x %8.3f", t2, t4, t8, t16);
     checkMatrixParallel(mat, size, x, y, z);
 }
 
@@ -642,5 +661,4 @@ int main( int argc, char* argv[] )
 #endif
 return EXIT_SUCCESS;
 }
-
 
