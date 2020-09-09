@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
 {
     size_t nbs = 117;
     if ( argc > 1)
-        nbs = std::min(1, atoi(argv[1]));
+        nbs = std::max(1, atoi(argv[1]));
     
     RNG.seed();
     std::cout << "testPTTS   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
