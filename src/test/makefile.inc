@@ -66,7 +66,7 @@ test_block: test_block.cc matrix33.o matrix34.o vector3.o matfull.o random_vecto
 	$(DONE)
 vpath test_block bin
 
-test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o | bin
+test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o operator_new.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
 vpath test_matrix bin

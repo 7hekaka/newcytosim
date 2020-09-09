@@ -348,8 +348,20 @@ void testMatrixParallel(MATRIX & mat,
         }
     }
     double t4 = toc();
+    
+    tic();
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
+    {
+        #pragma omp parallel for num_threads(8)
+        for ( size_t i = 0; i < size; i += CHK )
+        {
+            mat.vecMulAdd(y, z, i, i+CHK);
+            mat.vecMulAdd(x, z, i, i+CHK);
+        }
+    }
+    double t8 = toc();
 
-    printf("\n%-24s threaded mul :  x2  %8.3f  x4  %8.3f", mat.what().c_str(), t2, t4);
+    printf("\n%-24s threaded mul :  x2 %8.3f   x4 %8.3f   x8 %8.3f", mat.what().c_str(), t2, t4, t8);
     checkMatrixParallel(mat, size, x, y, z);
 }
 
@@ -615,10 +627,10 @@ int main( int argc, char* argv[] )
         //testMatrices(DIM*91, 1<<12);
         //testMatrices(DIM*196, 1<<11);
         //testMatrices(DIM*436, 1<<13);
-        testMatrices(DIM*714, 1<<14);
-        testMatrices(DIM*1358, 1<<15);
-        testMatrices(DIM*2130, 1<<16);
-        testMatrices(DIM*4323, 1<<19);
+        testMatrices(DIM*8*94, 1<<14);
+        testMatrices(DIM*8*169, 1<<15);
+        testMatrices(DIM*8*331, 1<<16);
+        testMatrices(DIM*8*513, 1<<19);
 #endif
 #if ( 0 )
         //testMatrices(DIM*17, 23);
