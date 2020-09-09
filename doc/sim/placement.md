@@ -11,17 +11,18 @@ The position of an object is specified as it is created with the `new` command:
      }
 
 All parameters are optional. See the specifications below.
-Some POSITION primitives refer to the *current space*, but another space can be specified (`position = inside, my_space`). 
+Some POSITION primitives refer to the *master space*, but another space can be specified (`position = inside, my_space`). 
 
-The rotation given in `orientation` is applied before the translation given by `position`.
-If a second value is specified in `orientation`, this rotation will be applied after the translation. The parameter `direction` is a replacement to `orientation`, which is handy in the case of linear objects. If both are specified, `direction` will be ignored.
+The rotation given in `orientation` is applied before the translation specified in `position`.
+But if a second value is specified in `orientation`, this rotation will be applied after the translation. The parameter `direction` is a alternative to `orientation`, by which one specifies a vector, rather than a full rotation. If `direction` is specified, `orientation` will be ignored.
 
 
 # POSITION
 
-A position is defined with a `PRIMITIVE` optionally followed by `TRANSFORMATION`. A vector is first set according to the `PRIMITIVE`, and the transformations are applied one after the other, in the order in which they are given. Examples:
+A position is defined with a `PRIMITIVE` optionally followed by some `TRANSFORMATION`. A vector is first set according to the `PRIMITIVE`, and the transformations are applied one after the other, in the order in which they are given. Examples:
 
 	   position = 1 0 0
+	   position = disc 2 0.1
 	   position = circle 3 at 1 0
 	   position = square 3 align 1 1 0 at 1 1
 
@@ -90,23 +91,23 @@ Most primitives describe a certain area in Space, and the returned position is
  Note: when the rotation is not uniquely determined in 3D (eg. `horizontal`), 
  cytosim will pick uniformly among all the possible rotations that fulfill the requirements.
 
-### DIRECTION
+# DIRECTION
 
- For some objects (e.g. fiber) specifying a direction is sufficient. A direction is a unit vector (of norm = 1):
+For some objects (e.g. fiber) specifying a direction is sufficient. A direction is a unit vector (of norm = 1):
  
  Keyword                                     | Resulting Vector    
  --------------------------------------------|------------------------------------------------------------
- `REAL REAL REAL`                            | the vector of norm 1 co-aligned with given vector
- `parallel REAL REAL REAL`                   | one of the two vectors of norm 1 parallel with given vector
+ `REAL REAL REAL`                            | the vector of norm 1 co-aligned with the given vector
+ `parallel REAL REAL REAL`                   | one of the two vectors of norm 1 parallel to given vector
  `orthogonal REAL REAL REAL`                 | a vector of norm 1 perpendicular to the given vector
- `horizontal`    `parallel X`                | (+1,0,0) or (-1,0,0), randomly chosen with equal chance
- `vertical`   `parallel Y`                   | (0,+1,0) or (0,-1,0), randomly chosen with equal chance
+ `horizontal`   `parallel X`                 | (+1,0,0) or (-1,0,0), randomly chosen with equal chance
+ `vertical`     `parallel Y`                 | (0,+1,0) or (0,-1,0), randomly chosen with equal chance
  `parallel Z`                                | (0,0,+1) or (0,0,-1), randomly chosen with equal chance
- `parallel XY`  `parallel XZ`  `parallel YZ` | A random vector in the specified plane
+ `parallel XY` `parallel XZ` `parallel YZ`   | A random vector in the specified plane
  `radial`                                    | directed from the origin to the current point
  `antiradial`                                | directed from the current point to the origin
  `circular`                                  | perpendicular to axis joining the current point to the origin
- `or DIRECTION`                              | flip randomly between two specified directions
+ `DIRECTION or DIRECTION`                    | one of the two specified directions, randomly with equiprobability
 
  
  If a Space is defined, one may also use:
@@ -172,7 +173,6 @@ One can use `nb_trials=1` to control the density of objects:
 In this way an object will be created only if its randomly chosen position falls
 inside the Space, and the density will thus be exactly what is specified from the
 `position` range (here 100/10*10 = 1 object per squared micrometer).
-
 
 
 To place objects at the intersection of two spaces

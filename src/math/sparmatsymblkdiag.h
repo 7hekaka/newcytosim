@@ -60,7 +60,7 @@ public:
 private:
     
     /// A column of the sparse matrix
-    class Column
+    class alignas(32) Column
     {
         friend class SparMatSymBlkDiag;
         friend class Meca;

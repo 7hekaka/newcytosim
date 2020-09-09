@@ -330,6 +330,18 @@ void testMatrixParallel(MATRIX & mat,
     }
     double ts = toc();
     mat.prepareForMultiply(1);
+    
+    tic();
+    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
+    {
+        #pragma omp parallel for num_threads(1)
+        for ( size_t i = 0; i < size; i += CHK )
+        {
+            mat.vecMulAdd(y, z, i, i+CHK);
+            mat.vecMulAdd(x, z, i, i+CHK);
+        }
+    }
+    double t1 = toc();
 
     tic();
     for ( size_t n=0; n<N_RUN*N_MUL; ++n )
@@ -380,7 +392,7 @@ void testMatrixParallel(MATRIX & mat,
     double t16 = toc();
 
     printf("\n%-20s ", mat.what().c_str());
-    printf(" 2x %8.3f   4x %8.3f   8x %8.3f  16x %8.3f", t2, t4, t8, t16);
+    printf("1T %7.3f 2T %7.3f  4T %7.3f  8T %7.3f 16T %7.3f", t1, t2, t4, t8, t16);
     checkMatrixParallel(mat, size, x, y, z);
 }
 
