@@ -5,7 +5,6 @@
 #define DIM 2
 
 #include "real.h"
-#include "tictoc.h"
 #include "random.h"
 #include "vecprint.h"
 #include "blas.h"
@@ -14,15 +13,24 @@
 #include "xpttrf.h"
 #include "cytoblas.h"
 
-/// number of segments:
-const size_t NBS = 117;
-const size_t DISP = 16UL;
+
+/// keeping time using Intel's cycle counters
+unsigned long long rdt = 0;
+/// start timer
+inline void tic() { rdt = __rdtsc(); }
+/// stop timer and print time
+inline void toc(const char* str, double num) { printf("  %10s %5.2f\n", str, double(__rdtsc()-rdt)/num); }
+
+
+/// print only first 16 scalars from given vector
+inline void print(size_t n, real const* vec) { VecPrint::print(std::cout, std::min(16UL,n), vec, 3); }
+
 
 /**
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testDPTTS(size_t cnt)
+void testDPTTS(size_t NBS, size_t cnt)
 {
     real * D = new_real(NBS);
     real * U = new_real(NBS);
@@ -46,48 +54,48 @@ void testDPTTS(size_t cnt)
     lapack_xpttrf(NBS, D, U, &info);
     lapack_xptts2(NBS, 1, D, U, B, 1);
     copy_real(NBS, B, S);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    print(NBS, B);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    auto rdt = __rdtsc();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack_xptts2(NBS, 1, D, U, B, 1);
-    printf("  clapack %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
+    toc("clapack", NBS*cnt);
 
     copy_real(NBS, Ds, D);
     copy_real(NBS, Us, U);
     copy_real(NBS, Bs, B);
     lapack::xpttrf(NBS, D, U, &info);
     lapack::xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    print(NBS, B);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    rdt = __rdtsc();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack::xptts2(NBS, 1, D, U, B, 1);
-    printf("   lapack %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
+    toc("lapack", NBS*cnt);
 
     copy_real(NBS, Ds, D);
     copy_real(NBS, Us, U);
     copy_real(NBS, Bs, B);
     italian_xpttrf(NBS, D, U, &info);
     italian_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    print(NBS, B);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    rdt = __rdtsc();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         italian_xptts2(NBS, 1, D, U, B, 1);
-    printf("  italian %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
+    toc("italian", NBS*cnt);
     
     copy_real(NBS, Ds, D);
     copy_real(NBS, Us, U);
     copy_real(NBS, Bs, B);
     alsatian_xpttrf(NBS, D, U, &info);
     alsatian_xptts2(NBS, 1, D, U, B, 1);
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
+    print(NBS, B);
     printf(" err %f", blas::max_diff(NBS, S, B));
-    rdt = __rdtsc();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian_xptts2(NBS, 1, D, U, B, 1);
-    printf(" alsatian %5.2f\n", real(__rdtsc()-rdt)/(NBS*cnt));
+    toc("alsatian", NBS*cnt);
 
     free_real(D);
     free_real(U);
@@ -103,7 +111,7 @@ void testDPTTS(size_t cnt)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testThomas(size_t cnt)
+void testThomas(size_t NBS, size_t cnt)
 {
     real * D = new_real(NBS);
     real * U = new_real(NBS);
@@ -120,7 +128,7 @@ void testThomas(size_t cnt)
     }
     
     int info = 0;
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(NBS, Ds, D);
@@ -129,10 +137,10 @@ void testThomas(size_t cnt)
         lapack::xpttrf(NBS, D, U, &info);
         lapack::xptts2(NBS, 1, D, U, B, 1);
     }
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::toc("    lapack");
+    print(NBS, B);
+    toc("lapack", NBS*cnt);
 
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(NBS, Ds, D);
@@ -142,10 +150,10 @@ void testThomas(size_t cnt)
         //italian_xptts2(NBS, 1, D, U, B, 1);
         italian_thomas(NBS, U, D, U, B);
     }
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::toc("   italian");
+    print(NBS, B);
+    toc("italian", NBS*cnt);
     
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(NBS, Ds, D);
@@ -153,10 +161,10 @@ void testThomas(size_t cnt)
         copy_real(NBS, Bs, B);
         alsatian_thomas(NBS, D, U, B);
     }
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::toc("  alsatian");
+    print(NBS, B);
+    toc("alsatian", NBS*cnt);
 
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(NBS, Ds, D);
@@ -164,8 +172,8 @@ void testThomas(size_t cnt)
         copy_real(NBS, Bs, B);
         tridiagonal_solve(NBS, U, D, U, B);
     }
-    VecPrint::print(std::clog, std::min(DISP,NBS), B, 3);
-    TicToc::toc("  tridiag.");
+    print(NBS, B);
+    toc("tridiag", NBS*cnt);
 
     free_real(D);
     free_real(U);
@@ -179,9 +187,9 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     std::cout << "testPTTS   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
-    testDPTTS(1<<17);
-    //std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
-    //testThomas(1<<15);
+    testDPTTS(117, 1<<17);
+    std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    testThomas(117, 1<<15);
     
     return EXIT_SUCCESS;
 }
