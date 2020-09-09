@@ -2,7 +2,6 @@
 
 #include <sys/time.h>
 
-#define DIM 2
 
 #include "real.h"
 #include "random.h"
@@ -22,8 +21,19 @@ inline void tic() { rdt = __rdtsc(); }
 inline void toc(const char* str, double num) { printf("  %10s %5.2f\n", str, double(__rdtsc()-rdt)/num); }
 
 
-/// print only first 16 scalars from given vector
-inline void print(size_t n, real const* vec) { VecPrint::print(std::cout, std::min(16UL,n), vec, 3); }
+/// print only 16 scalars from given vector
+inline void print(size_t n, real const* vec)
+{
+    if ( n > 16 )
+    {
+        VecPrint::print(std::cout, 8, vec, 3);
+        VecPrint::print(std::cout, 8, vec+n-8, 3);
+    }
+    else
+    {
+        VecPrint::print(std::cout, n, vec, 3);
+    }
+}
 
 
 /**
@@ -185,11 +195,15 @@ void testThomas(size_t NBS, size_t cnt)
 
 int main(int argc, char* argv[])
 {
+    size_t nbs = 117;
+    if ( argc > 1)
+        nbs = std::min(1, atoi(argv[1]));
+    
     RNG.seed();
     std::cout << "testPTTS   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
-    testDPTTS(117, 1<<17);
+    testDPTTS(nbs, 1<<17);
     std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
-    testThomas(117, 1<<15);
+    testThomas(nbs, 1<<15);
     
     return EXIT_SUCCESS;
 }
