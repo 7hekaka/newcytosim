@@ -40,6 +40,67 @@ inline void print(size_t n, real const* vec)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
+void testDPTTF(size_t NBS, size_t cnt)
+{
+    real * D = new_real(NBS);
+    real * U = new_real(NBS);
+    real * Ds = new_real(NBS);
+    real * Us = new_real(NBS);
+
+    for ( size_t i = 0; i < NBS; ++i )
+    {
+        Ds[i] = 2.0;
+        Us[i] = -0.5 * RNG.preal();
+    }
+
+    int info;
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        lapack_xpttrf(NBS, D, U, &info);
+    }
+    toc("clapack", NBS*cnt);
+
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        lapack::xpttrf(NBS, D, U, &info);
+    }
+    toc("lapack", NBS*cnt);
+
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        italian_xpttrf(NBS, D, U, &info);
+    }
+    toc("italian", NBS*cnt);
+    
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        alsatian_xpttrf(NBS, D, U, &info);
+    }
+    toc("alsatian", NBS*cnt);
+
+    free_real(D);
+    free_real(U);
+    free_real(Ds);
+    free_real(Us);
+}
+
+
+/**
+ Test Lapack and custom implementation of routines used to factorize
+ a symmetric tri-diagonal matrix and solve the associated system.
+ */
 void testDPTTS(size_t NBS, size_t cnt)
 {
     real * D = new_real(NBS);
@@ -169,16 +230,28 @@ void testThomas(size_t NBS, size_t cnt)
         copy_real(NBS, Ds, D);
         copy_real(NBS, Us, U);
         copy_real(NBS, Bs, B);
-        alsatian_thomas(NBS, D, U, B);
+        alsatian_xpttrf(NBS, D, U, &info);
+        alsatian_xptts2(NBS, 1, D, U, B, 1);
     }
     print(NBS, B);
-    toc("alsatian", NBS*cnt);
+    toc("alsatian2", NBS*cnt);
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(NBS, Ds, D);
         copy_real(NBS, Us, U);
+        copy_real(NBS, Bs, B);
+        alsatian_thomas(NBS, D, U, B);
+    }
+    print(NBS, B);
+    toc("alsatian", NBS*cnt);
+
+    tic();
+    copy_real(NBS, Us, U);
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(NBS, Ds, D);
         copy_real(NBS, Bs, B);
         tridiagonal_solve(NBS, U, D, U, B);
     }
@@ -200,9 +273,11 @@ int main(int argc, char* argv[])
         nbs = std::max(1, atoi(argv[1]));
     
     RNG.seed();
-    std::cout << "testPTTS   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    std::cout << "testPTTF   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    testDPTTF(nbs, 1<<10);
+    std::cout << "testPTTS\n";
     testDPTTS(nbs, 1<<17);
-    std::cout << "testThomas --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    std::cout << "testThomas\n";
     testThomas(nbs, 1<<15);
     
     return EXIT_SUCCESS;

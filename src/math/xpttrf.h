@@ -182,20 +182,22 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
  A is the sub diagonal of size N-1
  B is the diagonal of size N
  C is the upper diagonal of size N-1
+ 
+ B is modified in this version!
  */
-void tridiagonal_solve(size_t N, real* A, real* B, real* C, real* X)
+void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
 {
 #if 1
     // revised version without divisions in the downward recursion
     X[0] = X[0] / B[0];
     B[0] = C[0] / B[0];
-    for ( int i = 1; i < N; ++i )
+    for ( size_t i = 1; i < N; ++i )
     {
         real W = 1.0 / ( B[i] - B[i-1] * A[i-1] );
         X[i] = W * ( X[i] - A[i-1] * X[i-1] );
         B[i] = W * C[i];
     }
-    for ( int i = N-2; i >= 0; --i )
+    for ( size_t i = N-1; i-- > 0; )
         X[i] = X[i] - B[i] * X[i+1];
 #else
     // wikipedia's version translated to C
@@ -226,8 +228,7 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
     *INFO = 0;
     if ( size < 1 ) return;
 
-    real x = 0;
-    real e = 0;
+    real w = 1.0 / D[0];
 
     for ( size_t n = 0; n < size-1; ++n )
     {
@@ -238,13 +239,12 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
             *INFO = n;
             return;
         }
-        x = 1.0 / ( D[n] - e * x );
-        e = E[n];
-        D[n] = x;
-        x = x * e;
+        D[n] = w;
+        real x = w * E[n];
+        w = 1.0 / ( D[n+1] - x * E[n] );
         E[n] = x;
     }
-    D[size-1] = 1.0 / ( D[size-1] - e * x );
+    D[size-1] = w;
 }
 
 
@@ -278,7 +278,7 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
             x = B[n] - x * DE[n];
             B[n] = x;
         }
-        B[0] = y - DE[0] * x;
+        B[0] = y - x * DE[0];
     }
     else
         B[0] = y;
@@ -293,23 +293,21 @@ void alsatian_thomas(size_t size, real* D, real* E, real* B)
 {
     assert_true(size > 0);
     real x = 0;
-    real e = 0;
+    real w = 1.0 / D[0];
     real y = B[0];
 
     // upward recursion
     for ( size_t n = 0; n < size-1; ++n )
     {
-        x = 1.0 / ( D[n] - e * x );
-        e = E[n];
-        D[n] = x;
-        x = x * e;
+        D[n] = w;
+        x = w * E[n];
+        w = 1.0 / ( D[n+1] - E[n] * x );
         E[n] = x;
-        B[n] = D[n] * y;
-        y = B[n+1] - y * E[n];
+        B[n] = y * D[n];
+        y = B[n+1] - y * x;
     }
-    x = 1.0 / ( D[size-1] - e * x );
-    D[size-1] = x;
-    E[size-1] = x * E[size-1];
+    D[size-1] = w;
+    E[size-1] = w * E[size-1];
     y = D[size-1] * y;
     B[size-1] = y;
 
