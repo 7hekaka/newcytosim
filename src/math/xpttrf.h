@@ -175,37 +175,39 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
 }
 
 
-/*
+/**
  Adapted from
  https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+ 
+ A is the sub diagonal of size N-1
+ B is the diagonal of size N
+ C is the upper diagonal of size N-1
  */
 void tridiagonal_solve(size_t N, real* A, real* B, real* C, real* X)
 {
 #if 1
-    // revised version to supress divisions in the downward recursion
+    // revised version without divisions in the downward recursion
     X[0] = X[0] / B[0];
     B[0] = C[0] / B[0];
-    for ( size_t i = 1; i < N; ++i )
+    for ( int i = 1; i < N; ++i )
     {
         real W = 1.0 / ( B[i] - B[i-1] * A[i-1] );
         X[i] = W * ( X[i] - A[i-1] * X[i-1] );
         B[i] = W * C[i];
     }
-    for ( size_t i = N-2; i > 0; --i )
+    for ( int i = N-2; i >= 0; --i )
         X[i] = X[i] - B[i] * X[i+1];
-    X[0] = X[0] - B[0] * X[1];
 #else
     // wikipedia's version translated to C
-    for ( size_t i = 1; i < N; ++i )
+    for ( int i = 1; i < N; ++i )
     {
         real W = A[i-1] / B[i-1];
         B[i] = B[i] - W * C[i-1];
         X[i] = X[i] - W * X[i-1];
     }
     X[N-1] = X[N-1] / B[N-1];
-    for ( size_t i = N-2; i > 0; --i )
-        X[i] = (X[i] - C[i] * X[i+1]) / B[i];
-    X[0] = (X[0] - C[0] * X[1]) / B[0];
+    for ( int i = N-2; i >= 0; --i )
+        X[i] = ( X[i] - C[i] * X[i+1] ) / B[i];
 #endif
 }
 
@@ -258,16 +260,17 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
 
     // upward recursion on B[]
     real x = B[0];
+    real y = D[0] * x;
     for ( size_t n = 1; n < size; ++n )
     {
         //B[n] = D[n] * ( B[n] - B[n-1] * E[n-1] );
         x = B[n] - x * DE[n-1];  // = B[n+1] - B[n] * E[n]
         B[n] = D[n] * x;
     }
-    x = D[size-1] * x;
 
     if ( size > 1 )
     {
+        x = D[size-1] * x;
         // downward recursion on B[]
         for ( size_t n = size-2; n > 0; --n )
         {
@@ -275,10 +278,10 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
             x = B[n] - x * DE[n];
             B[n] = x;
         }
-        B[0] = D[0] * B[0] - DE[0] * x;
+        B[0] = y - DE[0] * x;
     }
     else
-        B[0] = x;
+        B[0] = y;
 }
 
 
@@ -288,6 +291,7 @@ with a tridiagonal symmetric matrix {E, D, E} and right-hand side 'B'
 */
 void alsatian_thomas(size_t size, real* D, real* E, real* B)
 {
+    assert_true(size > 0);
     real x = 0;
     real e = 0;
     real y = B[0];
