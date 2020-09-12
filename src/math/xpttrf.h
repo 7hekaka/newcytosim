@@ -4,12 +4,15 @@
 #ifndef XPTTRF_H
 #define XPTTRF_H
 
+
+#include "../iacaMarks.h"
+
 /**
  This is a C-translation of the LAPACK reference implementation of dpttrf()
  to factorize a symmetric definite-positive tridiagonal matrix.
  The method is known as Thomas' algorithm.
 */
-void lapack_xpttrf(int size, real* D, real* E, int* INFO)
+void lapack_xpttrf_ori(int size, real* D, real* E, int* INFO)
 {
     *INFO = 0;
     for ( int i = 0; i < size-1; ++i )
@@ -22,6 +25,42 @@ void lapack_xpttrf(int size, real* D, real* E, int* INFO)
         real e = E[i];
         E[i] = e / D[i];
         D[i+1] = D[i+1] - e * E[i];
+    }
+}
+
+/// modified version only loads D[] at one place
+void lapack_xpttrf(int size, real* D, real* E, int* INFO)
+{
+    *INFO = 0;
+    real d = D[0];
+    for ( int i = 0; i < size-1; ++i )
+    {
+        if ( D[i] < 0 )
+        {
+            *INFO = i;
+            return;
+        }
+        real e = E[i] / d;
+        d = D[i+1] - e * E[i];
+        D[i+1] = d;
+        E[i] = e;
+    }
+}
+
+/**
+ This is a C-translation of the LAPACK reference implementation of dpttrf()
+ to factorize a symmetric definite-positive tridiagonal matrix.
+ The method is known as Thomas' algorithm.
+*/
+void xpttrf(int size, real* D, real* E)
+{
+    real d = D[0];
+    for ( int i = 0; i < size-1; ++i )
+    {
+        real e = E[i] / d;
+        d = D[i+1] - e * E[i];
+        D[i+1] = d;
+        E[i] = e;
     }
 }
 
@@ -225,26 +264,30 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
  */
 void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
 {
+    if ( D[0] < 0 | size < 1 )
+    {
+        *INFO = 1;
+        return;
+    }
     *INFO = 0;
-    if ( size < 1 ) return;
 
     real w = 1.0 / D[0];
+    real e = E[0] * E[0];
+    D[0] = w;
+    E[0] = w * E[0];
 
-    for ( size_t n = 0; n < size-1; ++n )
+    for ( size_t n = 1; n < size; ++n )
     {
-        //D[n] = 1.0 / ( D[n] - E[n-1] * E[n-1] * D[n-1] );
-        //x = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * x );
         if ( D[n] < 0 )
         {
             *INFO = n;
             return;
         }
+        w = 1.0 / ( D[n] - w * e );
+        e = E[n] * E[n];
         D[n] = w;
-        real x = w * E[n];
-        w = 1.0 / ( D[n+1] - x * E[n] );
-        E[n] = x;
+        E[n] = w * E[n];
     }
-    D[size-1] = w;
 }
 
 
@@ -292,27 +335,29 @@ with a tridiagonal symmetric matrix {E, D, E} and right-hand side 'B'
 void alsatian_thomas(size_t size, real* D, real* E, real* B)
 {
     assert_true(size > 0);
-    real x = 0;
     real w = 1.0 / D[0];
     real y = B[0];
+    real e = E[0] * E[0];
+    real x = w * E[0];
+    D[0] = w;
+    E[0] = x;
+    B[0] = y * w;
 
     // upward recursion
-    for ( size_t n = 0; n < size-1; ++n )
+    for ( size_t n = 1; n < size; ++n )
     {
+        w = 1.0 / ( D[n] - w * e );
+        e = E[n] * E[n];
+        y = B[n] - y * x;
         D[n] = w;
         x = w * E[n];
-        w = 1.0 / ( D[n+1] - E[n] * x );
         E[n] = x;
-        B[n] = y * D[n];
-        y = B[n+1] - y * x;
+        B[n] = y * w;
     }
-    D[size-1] = w;
-    E[size-1] = w * E[size-1];
-    y = D[size-1] * y;
-    B[size-1] = y;
 
     if ( size > 1 )
     {
+        y = B[size-1];
         // downward recursion on B[]
         for ( size_t n = size-2; n > 0; --n )
         {
