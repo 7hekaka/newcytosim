@@ -5,8 +5,6 @@
 #define XPTTRF_H
 
 
-#include "../iacaMarks.h"
-
 /**
  This is a C-translation of the LAPACK reference implementation of dpttrf()
  to factorize a symmetric definite-positive tridiagonal matrix.
