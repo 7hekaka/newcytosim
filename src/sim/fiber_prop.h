@@ -17,7 +17,8 @@ class SingleSet;
 class Space;
 
 
-/// compile switches to enable advanced features:
+/// compile switches to enable specialized features:
+#define OLD_DYNAMIC_ZONE        0
 #define OLD_SQUEEZE_FORCE       0
 #define NEW_COLINEAR_FORCE      0
 #define NEW_FIBER_CHEW          0
