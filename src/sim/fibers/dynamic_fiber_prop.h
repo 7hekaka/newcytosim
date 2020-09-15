@@ -86,6 +86,8 @@ public:
     real    zone_hydrolysis_rate[2];
 #endif
 
+    /// The probability of encountering an unhydrolysed tubulin monomer while the plus end is in a shrinking state. (default=0)
+    real    unhydrolyzed_prob[2];
     /// @}
     
 private:

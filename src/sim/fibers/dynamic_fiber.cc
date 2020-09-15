@@ -177,8 +177,14 @@ int DynamicFiber::stepPlusEnd()
         nextShrinkP -= prop->shrinking_rate_dt[0] + chewing_rate;
         while ( nextShrinkP <= 0 )
         {
-            --res;
+        	// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+			unitP[0] = unitP[1];
+            unitP[1] = unitP[2];
+			unitP[2] = RNG.test(prop->unhydrolyzed_prob[0]);
+			--res;
             nextShrinkP += RNG.exponential();
+            mStateP = calculateStateP();
+            //std::cout << "mStateP = " << mStateP << std::endl;
         }
     }
     else
@@ -228,7 +234,7 @@ int DynamicFiber::stepPlusEnd()
             {
                 case 0:
                     // add fresh unit, shifting old terminal to penultimate position
-                    unitP[2] = unitP[1];
+                    unitP[2] = unitP[1] * RNG.test(prop->unhydrolyzed_prob[0]);
                     unitP[1] = unitP[0];
                     unitP[0] = 1;
                     ++res;
@@ -242,13 +248,14 @@ int DynamicFiber::stepPlusEnd()
                     break;
 
                 case 2:
-                    // remove last unit, assuming hydrolysis already occurred below
+                    // remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
                     unitP[0] = unitP[1];
                     unitP[1] = unitP[2];
-                    unitP[2] = 0;
+                    unitP[2] = RNG.test(prop->unhydrolyzed_prob[0]);
                     --res;
                     nextShrinkP += RNG.exponential();
                     break;
+
             }
             
             mStateP = calculateStateP();
