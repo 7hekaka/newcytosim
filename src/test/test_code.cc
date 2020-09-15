@@ -9,7 +9,6 @@
 #include "assert_macro.h"
 #include "real.h"
 #include "vector.h"
-#include "tictoc.h"
 #include "random.h"
 #include "vecprint.h"
 #include "blas.h"
@@ -19,6 +18,14 @@
 #include "simd.h"
 #include "simd_float.h"
 #include "simd_print.h"
+
+
+/// keeping time using Intel's cycle counters
+unsigned long long rdt = 0;
+/// start timer
+inline void tic() { rdt = __rdtsc(); }
+/// stop timer and print time
+inline void toc(const char* str, double num) { printf("  %10s %5.2f\n", str, double(__rdtsc()-rdt)/num); }
 
 
 /// number of segments:
@@ -545,7 +552,7 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
     func(NBS, dir_, force_, lag_);
     VecPrint::print(std::cout, std::min(DISP,NBS+1), lag_);
 
-    TicToc::tic();
+    tic();
     for ( size_t ii=0; ii<cnt; ++ii )
     {
         func(NBS, dir_, y, z);
@@ -553,7 +560,7 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
         func(NBS, dir_, x+DIM, y);
         func(NBS, dir_, z, y);
     }
-    TicToc::toc(str);
+    toc(str, cnt*NBS);
     
     free_reals(x,y,z);
 }
@@ -1014,7 +1021,7 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
     func(NBS, dir_, pos_, lag_, x);
     VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
 
-    TicToc::tic();
+    tic();
     for ( size_t ii=0; ii<cnt; ++ii )
     {
         func(NBS, dir_, x, lag_, z);
@@ -1022,7 +1029,7 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
         func(NBS, dir_, y, lag_, x+DIM);
         func(NBS, dir_, z+DIM, lag_, y);
     }
-    TicToc::toc(str);
+    toc(str, cnt*NBS);
     
     free_reals(x,y,z);
 }
@@ -1157,7 +1164,7 @@ void speedProject(size_t cnt, void (*func)(size_t, const real*, real*), char con
     func(NBS, force_, x);
     VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
 
-    TicToc::tic();
+    tic();
     for ( size_t ii=0; ii<cnt; ++ii )
     {
         func(NBS, x, y);
@@ -1165,7 +1172,7 @@ void speedProject(size_t cnt, void (*func)(size_t, const real*, real*), char con
         func(NBS, y+2, z);
         func(NBS, z, x);
     }
-    TicToc::toc(str);
+    toc(str, cnt*NBS);
     free_reals(x,y,z);
 }
 
