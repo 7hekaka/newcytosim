@@ -135,13 +135,11 @@ std::string Player::buildMemo(int type) const
 
 void Player::autoTrack(FiberSet const& fibers, View& view)
 {
-    Vector G(0, 0, 0);
-    Vector D(0, 0, 0);
     real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     
     if ( view.track_fibers & 1 )
     {
-        Vector M, P;
+        Vector M, G, P;
         FiberSet::infoPosition(fibers.collect(), M, G, P);
         view.move_shift(Vector3(G));
         //std::clog << "auto center: " << G << std::endl;

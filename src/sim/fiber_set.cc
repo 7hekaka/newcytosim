@@ -844,10 +844,13 @@ size_t FiberSet::nbKinks(ObjectList const& objs)
 /**
  Each Fiber segment is weigthed by its length.
  
- @return G = average center of gravity
- @return D = average direction
+ @set M = averaged minus ends
+ @set G = average center of gravity
+ @set P = averaged plus ends
+
+ @return S = sum of length
  
- The average direction is the average of the filament's tangents at each segment.
+ An average direction can be obtained from ( P - M ) / S.
  */
 real FiberSet::infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector& P)
 {
