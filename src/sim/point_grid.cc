@@ -221,7 +221,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg.projectPoint0(bb.seg.pos1(), dis2);
     
-    if ((0 <= abs)  & (abs <= aa.seg.len())  & (dis2 < ran*ran))
+    if ((0 <= abs) & (abs <= aa.seg.len()) & (dis2 < ran*ran))
     {
         /*
          bb.point1() projects inside segment 'aa'

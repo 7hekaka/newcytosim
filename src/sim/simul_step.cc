@@ -73,6 +73,8 @@ void Simul::prepare()
     if ( !spaces.master() )
         throw InvalidSyntax("A space must be defined first!");
 
+    sReady = 1;
+
     // make sure properties are ready for simulations:
     prop->complete(*this);
     
@@ -86,7 +88,7 @@ void Simul::prepare()
     singles.prepare(properties);
     couples.prepare(properties);
     
-    sReady = true;
+    sReady = 2;
 }
 
 
@@ -179,7 +181,7 @@ void Simul::relax()
 {
     singles.relax();
     couples.relax();
-    sReady = false;
+    sReady = 0;
 }
 
 

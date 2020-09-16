@@ -98,15 +98,11 @@ void SolidProp::complete(Simul const& sim)
     
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
+    else if ( sim.ready() && confine != CONFINE_OFF )
+        throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
     
-    if ( sim.ready() && confine != CONFINE_OFF )
-    {
-        if ( !confine_space_ptr )
-            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-        
-        if ( confine_stiffness < 0 )
-            throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
-    }
+    if ( confine_stiffness < 0 )
+        throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
     if ( sim.ready() && steric && !sim.prop->steric )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";

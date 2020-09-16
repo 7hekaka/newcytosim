@@ -281,13 +281,13 @@ void FiberProp::clear()
     mesh_aging_rate     = 0;
 
     confine             = CONFINE_OFF;
-    confine_stiffness   = -1;
+    confine_stiffness   = 0;
     confine_space       = "first";
     confine_space_ptr   = nullptr;
     
 #if NEW_FIBER_CONFINE2
     confine2            = CONFINE_OFF;
-    confine2_stiffness  = -1;
+    confine2_stiffness  = 0;
     confine2_space      = "first";
     confine2_space_ptr  = nullptr;
 #endif
@@ -484,21 +484,24 @@ void FiberProp::complete(Simul const& sim)
         throw InvalidParameter("fiber:viscosity or simul:viscosity should be defined");
     
     confine_space_ptr = sim.findSpace(confine_space);
-#if NEW_FIBER_CONFINE2
-    confine2_space_ptr = sim.findSpace(confine2_space);
-#endif
-    
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
-
-    if ( sim.ready() && confine != CONFINE_OFF )
-    {
-        if ( !confine_space_ptr )
-            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+    else if ( sim.ready() && confine != CONFINE_OFF )
+        throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
     
-        if ( confine_stiffness < 0 )
-            throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
-    }
+    if ( confine_stiffness < 0 )
+        throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
+
+#if NEW_FIBER_CONFINE2
+    confine2_space_ptr = sim.findSpace(confine2_space);
+    if ( confine2_space_ptr )
+        confine2_space = confine2_space_ptr->name();
+    else if ( sim.ready() && confine2 != CONFINE_OFF )
+        throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
+    
+    if ( confine2_stiffness < 0 )
+        throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
+#endif
     
     if ( sim.ready() && steric && !sim.prop->steric )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";

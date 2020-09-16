@@ -167,7 +167,7 @@ void SingleProp::complete(Simul const& sim)
     if ( length < 0 )
         throw InvalidParameter("single:length must be >= 0");
 
-    if ( stiffness > 0  &&  sim.ready() )
+    if ( sim.ready() && stiffness > 0 )
     {
         hand_prop->checkStiffness(stiffness, length, 1, sim.prop->kT);
         

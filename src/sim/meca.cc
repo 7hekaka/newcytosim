@@ -1099,7 +1099,7 @@ void Meca::computePrecondFull(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute Preconditionner block\n";
+        std::clog << "failed to compute full Preconditionner block\n";
     }
 }
 

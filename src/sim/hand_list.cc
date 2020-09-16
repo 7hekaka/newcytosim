@@ -138,7 +138,7 @@ size_t HandList::countInRange(real i, real s) const
     size_t res = 0;
         
     for ( Hand const* h = haFront; h; h = h->next() )
-        res += (( i <= h->abscissa())  & ( h->abscissa() <= s ));
+        res += (( i <= h->abscissa()) & ( h->abscissa() <= s ));
     
     //printf("nbHandsInRange(%8.2f, %8.2f) = %u\n", a, b, res);
     return res;
