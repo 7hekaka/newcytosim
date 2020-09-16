@@ -29,7 +29,7 @@ public:
     real          step;
     
     /// name of confining Space
-    std::string   confine_space;
+    std::string   field_space;
     
     /// use periodic boundary conditions for diffusion
     bool          periodic;
@@ -94,8 +94,8 @@ public:
     /// derived variable
     real          decay_frac;
     
-    /// pointer to actual confinement Space, derived from `confine_space`
-    Space const*  confine_space_ptr;
+    /// pointer to actual confinement Space, derived from `field_space`
+    Space const*  field_space_ptr;
 
 public:
     

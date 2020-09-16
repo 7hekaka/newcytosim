@@ -10,8 +10,8 @@
 void FieldProp::clear()
 {
     step                  = 0;
-    confine_space         = "first";
-    confine_space_ptr     = nullptr;
+    field_space           = "first";
+    field_space_ptr       = nullptr;
     periodic              = 0;
     diffusion             = 0;
     full_diffusion        = 0;
@@ -40,7 +40,7 @@ void FieldProp::read(Glossary& glos)
     
     glos.set(step,               "step");
     glos.set(periodic,           "periodic");
-    glos.set(confine_space,      "space");
+    glos.set(field_space,        "space");
     glos.set(diffusion,          "diffusion");
     glos.set(full_diffusion,     "full_diffusion");
     glos.set(boundary_condition, "boundary_condition", keys);
@@ -73,13 +73,12 @@ void FieldProp::complete(Simul const& sim)
 {
     time_step = sim.time_step();
     
-    confine_space_ptr = sim.findSpace(confine_space);
+    field_space_ptr = sim.findSpace(field_space);
     
-    if ( confine_space_ptr )
-        confine_space = confine_space_ptr->name();
-
-    if ( sim.ready()  &&  !confine_space_ptr )
-        throw InvalidParameter("A Space must be created before the field");
+    if ( field_space_ptr )
+        field_space = field_space_ptr->name();
+    else if ( sim.ready() )
+        throw InvalidParameter("field::space must be created before the field");
 
     if ( step < REAL_EPSILON )
         throw InvalidParameter("field:step must be defined and > 0");
@@ -111,7 +110,7 @@ void FieldProp::complete(Simul const& sim)
 void FieldProp::write_values(std::ostream& os) const
 {
     write_value(os, "step",           step);
-    write_value(os, "space",          confine_space);
+    write_value(os, "space",          field_space);
     write_value(os, "periodic",       periodic);
     write_value(os, "diffusion",      diffusion);
     write_value(os, "full_diffusion", full_diffusion);

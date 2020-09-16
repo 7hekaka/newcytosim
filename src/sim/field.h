@@ -133,11 +133,11 @@ public:
         
         if ( ! mGrid.hasCells() )
         {
-            if ( !prop->confine_space_ptr )
-                throw InvalidParameter("A space must be defined to set a field");
+            if ( !prop->field_space_ptr )
+                throw InvalidParameter("field:space must be defined");
             
             Vector inf, sup;
-            prop->confine_space_ptr->boundaries(inf, sup);
+            prop->field_space_ptr->boundaries(inf, sup);
             
             if ( prop->periodic )
             {
@@ -347,7 +347,7 @@ public:
     void draw() const;
     
     /// OpenGL display
-    void draw(bool all, Vector3 const& dir, const real pos) const;
+    void draw(Space const*, Vector3 const& dir, const real pos) const;
     
 };
 

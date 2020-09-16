@@ -87,7 +87,7 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
  */
 void Field::prepare()
 {
-    Space const* spc = prop->confine_space_ptr;
+    Space const* spc = prop->field_space_ptr;
 
     if ( !spc )
         throw InvalidParameter("A Space must be created before the field");
@@ -504,9 +504,8 @@ void Field::step(FiberSet& fibers)
     };
     
     
-    static bool field_set_color(void* arg, FieldGrid::value_type const& val, Vector const& pos)
+    static bool field_set_color(FieldDisplayParameters* fdp, FieldGrid::value_type const& val, Vector const& pos)
     {
-        FieldDisplayParameters * fdp = static_cast<FieldDisplayParameters*>(arg);
         if ( fdp->spc && ! fdp->spc->inside(pos) )
             return false;
         val.setColor(fdp->amp);
@@ -514,7 +513,7 @@ void Field::step(FiberSet& fibers)
     }
     
     
-    /// openGL display function
+    /// display all cells
     void Field::draw() const
     {
         FieldDisplayParameters fdp;
@@ -536,18 +535,12 @@ void Field::step(FiberSet& fibers)
     }
     
     
-    /// openGL display function
-    /**
-     display all cells that are inside field:confine_space
-     */
-    void Field::draw(bool all, Vector3 const& dir, const real pos) const
+    /// display only cells that are inside `spc`
+    void Field::draw(Space const* spc, Vector3 const& dir, const real pos) const
     {
         FieldDisplayParameters fdp;
         fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
-        if ( all )
-            fdp.spc = nullptr;
-        else
-            fdp.spc = prop->confine_space_ptr;
+        fdp.spc = spc;
         
         //glPushAttrib(GL_ENABLE_BIT|GL_POLYGON_BIT);
         glPushAttrib(GL_ENABLE_BIT);
@@ -572,7 +565,7 @@ void Field::draw() const
     LOG_ONCE("no field:draw()\n");
 }
 
-void Field::draw(bool all, Vector3 const& dir, const real pos) const
+void Field::draw(Space const*, Vector3 const& dir, const real pos) const
 {
     LOG_ONCE("no field:draw()\n");
 }

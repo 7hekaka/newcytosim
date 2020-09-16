@@ -104,7 +104,7 @@ ObjectList FieldSet::newObjects(const std::string& name, Glossary& opt)
         {
             Space const* spc = simul.findSpace(str);
             if ( !spc )
-                spc = obj->prop->confine_space_ptr;
+                spc = obj->prop->field_space_ptr;
             obj->setConcentration(spc, val, 0);
         }
         else

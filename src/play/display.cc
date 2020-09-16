@@ -537,7 +537,7 @@ void Display::drawFields(FieldSet const& set)
     if ( obj && obj->hasField() )
     {
         if ( obj->prop->visible == 1 )
-            obj->draw(false, dir, 0);
+            obj->draw(obj->prop->field_space_ptr, dir, 0);
         else if ( obj->prop->visible == 2 )
             obj->draw();
     }
