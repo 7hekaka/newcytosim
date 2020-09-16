@@ -343,8 +343,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             // add 'nbp' points:
             for ( size_t n = 0; n < nbp; ++n )
             {
-                std::istringstream iss(str);
-                Vector vec = Movable::readPosition(iss, nullptr);
+                Vector vec = Movable::readPosition(str, nullptr);
                 addSphere(vec, rad);
             }
             
@@ -378,12 +377,11 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         if ( rad <= 0 )
             throw InvalidParameter("radius of sphere specified in solid must be > 0");
 
-        // get position:
-        std::istringstream iss(opt.value(var, 0));
-        Vector vec = Movable::readPosition(iss, nullptr);
+        // get position of center:
+        Vector cen = Movable::readPosition(opt.value(var, 0), nullptr);
         
         // add a bead with a local coordinate system
-        size_t ref = addSphere(vec, rad);
+        size_t ref = addSphere(cen, rad);
         addTriad(rad);
 
 #if ( DIM > 1 )
@@ -428,7 +426,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 Vector pos = pts[inx-3];
                 for ( size_t i = 0; i < num; ++i )
                 {
-                    vec = normalize(pos+pos.randOrthoB(dev/rad));
+                    Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
                     res.push_back(new Wrist(sip, this, ref, vec));
                 }
             }
@@ -436,7 +434,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         else
 #endif
         {
-            // Singles are distributed uniformly on the surface of the sphere
+            // associate Singles with this sphere
             inx = 2;
             while ( opt.set(str, var, inx++) )
             {
@@ -445,10 +443,18 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 Tokenizer::split_integer(num, str);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
+                Vector vec;
+                bool has_pos = opt.set(str, var, inx++);
                 /* add Wrists anchored on the local coordinate system:
-                 we use unit vectors here since the Triad is build with 'rad' */
+                 need to use unit vectors here since the Triad is build with 'rad' */
                 for ( size_t i = 0; i < num; ++i )
-                    res.push_back(new Wrist(sip, this, ref, Vector::randU()));
+                {
+                    if ( has_pos )
+                        vec = Movable::readPosition(str, nullptr);
+                    else
+                        vec = Vector::randU();
+                    res.push_back(new Wrist(sip, this, ref, vec));
+                }
             }
         }
         var = "sphere" + std::to_string(++inp);

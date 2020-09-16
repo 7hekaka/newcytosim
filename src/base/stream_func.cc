@@ -272,3 +272,17 @@ size_t StreamFunc::find_and_replace(std::string & src,
 }
 
 
+/// return `true` if stream contains unread non-space character(s)
+bool StreamFunc::has_trail(std::istream& is)
+{
+    int c = is.get();
+    while ( isspace(c) )
+        c = is.get();
+    if ( c != EOF )
+    {
+        is.unget();
+        return true;
+    }
+    return false;
+}
+

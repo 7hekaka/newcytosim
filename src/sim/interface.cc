@@ -130,21 +130,9 @@ void Interface::execute_change_all(std::string const& cat, Glossary& def)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/// check if stream still contains a non-space character
-bool has_trail(std::istream& is)
-{
-    int c = is.get();
-    while ( isspace(c) )
-        c = is.get();
-    if ( c != EOF )
-    {
-        is.unget();
-        return true;
-    }
-    return false;
-}
+using StreamFunc::has_trail;
 
-/// report warning
+/// report a warning if some text was ignored
 void warn_trail(std::istream& is)
 {
     std::string str;
@@ -169,15 +157,9 @@ Isometry Interface::read_placement(Glossary& opt)
     
     // Position
     if ( opt.set(str, "position") )
-    {
-        std::istringstream iss(str);
-        iso.mov = Movable::readPosition(iss, spc);
-        if ( has_trail(iss) ) warn_trail(iss);
-    }
+        iso.mov = Movable::readPosition(str, spc);
     else if ( spc )
-    {
         iso.mov = spc->randomPlace();
-    }
     
     // Rotation applied before the translation
     if ( opt.set(str, "direction") )

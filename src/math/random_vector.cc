@@ -20,9 +20,9 @@ const Vector1 Vector1::randU()        { return Vector1(  RNG.sflip()); }
 const Vector1 Vector1::randU(real n)  { return Vector1(n*RNG.sflip()); }
 void  Vector1::addRand(real n)        { XX += n*RNG.sreal(); }
 
-const Vector1 Vector1::randB()        { return Vector1(   RNG.sreal()); }
-const Vector1 Vector1::randB(real n)  { return Vector1( n*RNG.sreal()); }
-const Vector1 Vector1::randG(real n)  { return Vector1( n*RNG.gauss());  }
+const Vector1 Vector1::randB()        { return Vector1(  RNG.sreal()); }
+const Vector1 Vector1::randB(real n)  { return Vector1(n*RNG.sreal()); }
+const Vector1 Vector1::randG(real n)  { return Vector1(n*RNG.gauss()); }
 
 const Vector1 Vector1::randOrthoU(real len) const { return Vector1(0.0); }
 

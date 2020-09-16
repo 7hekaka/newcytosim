@@ -166,8 +166,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
                     vec = Vector::randU(radius());
                 else
                 {
-                    std::istringstream iss(str);
-                    vec = Movable::readPosition(iss, nullptr);
+                    vec = Movable::readPosition(str, nullptr);
                     if ( 8 * vec.norm() < spRadius )
                         throw InvalidParameter(var+" cannot be brought to the Sphere surface");
                 }

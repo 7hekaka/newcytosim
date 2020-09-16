@@ -44,5 +44,9 @@ namespace StreamFunc
 
     /// replace all occurences of `fnd` by `rep` in `src`. Returns number of replacements done
     size_t find_and_replace(std::string & src, std::string const& fnd, std::string const& rep);
+
+    /// true if stream has unread material
+    bool has_trail(std::istream& is);
+     
 }
 

@@ -67,7 +67,7 @@ void Movable::revolve(Rotation const& T)
  `inside`             | A random position inside the current Space
  `edge E`             | At distance E from the edge of the current Space
  `surface E`          | On the surface of the current Space\n By projecting a point at distance E from the surface.
- `line L T`           | Selected randomly with -L/2 < X < L/2; norm(Y,Z) < T
+ `line L T`           | L = Length, T = thickness. Selected randomly with -L/2 < X < L/2; norm(Y,Z) < T
  `sphere R T`         | At distance R +/- T/2 from the origin\n `R-T/2 < norm(X,Y,Z) < R+T/2`
  `ball R`             | At distance R at most from the origin\n `norm(X,Y,Z) < R`
  `disc R T`           | in 2D, a disc in the XY-plane \n in 3D, a disc in the XY-plane of thickness T in Z
@@ -75,7 +75,8 @@ void Movable::revolve(Rotation const& T)
  `discYZ R T`         | Disc in the YZ-plane of radius R, thickness T
  `equator R T`        | At distance R from the origin, and T from the XY plane:\n `norm(X,Y) < R` `norm(Z) < T`
  `circle R T`         | Circle of radius R and thickness T \n At distance T from the circle of radius R
- `cylinder W R`       | Cylinder of axis X, W=thickness in X, R=radius in YZ
+ `cylinder L R`       | Cylinder of axis X, L=length in X, R=radius in YZ
+ `ring L R T`         | Surface of a cylinder of axis X, L=length in X, R=radius in YZ, T = thickness
  `ellipse A B C`      | Inside the ellipse or ellipsoid of main axes 2A, 2B and 2C
  `arc L Theta`        | A piece of circle of length L and covering an angle Theta
  `stripe L R`         | Random vector with L < X < R
@@ -221,6 +222,15 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             return Vector::randU(R) + Vector::randU(T*0.5);
         }
         
+        if ( tok == "ball" )
+        {
+            real R = -1;
+            is >> R;
+            if ( R < 0 )
+                throw InvalidParameter("radius R must be >= 0 in `sphere R`");
+            return Vector::randB(R);
+        }
+        
         if ( tok == "equator" )
         {
             real R = 0, T = 0;
@@ -232,7 +242,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             const Vector2 V = Vector2::randU();
             return Vector(R*V.XX, R*V.YY, T*RNG.shalf());
         }
-       
+        
         if ( tok == "cylinder" )
         {
             real L = -1, R = -1;
@@ -242,6 +252,18 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
             const Vector2 V = Vector2::randB(R);
+            return Vector(L*RNG.shalf(), V.XX, V.YY);
+        }
+        
+        if ( tok == "ring" )
+        {
+            real L = -1, R = -1, T = 0;
+            is >> L >> R >> T;
+            if ( L < 0 )
+                throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
+            if ( R < 0 )
+                throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
+            const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
             return Vector(L*RNG.shalf(), V.XX, V.YY);
         }
         
@@ -560,7 +582,23 @@ restart:
 return pos;
 }
 
+/// convert string to a position
+Vector Movable::readPosition(std::string const& arg, Space const* spc)
+{
+    std::istringstream iss(arg);
+    Vector vec = Movable::readPosition(iss, spc);
+    if ( StreamFunc::has_trail(iss) )
+    {
+        std::string str;
+        std::streampos pos = iss.tellg();
+        std::getline(iss, str);
+        throw InvalidSyntax("unexpected `"+str+"' in `"+StreamFunc::get_line(iss, pos)+"'");
+    }
+    return vec;
+}
 
+
+#pragma mark - Direction
 //------------------------------------------------------------------------------
 /**
  Reads a direction which is a unit vector (norm = 1):
