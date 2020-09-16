@@ -34,10 +34,10 @@ class Movable
 {
     
     /// read a position primitives, such as 'circle 5', etc.
-    static Vector readPosition0(std::istream&, Space const*);
+    static Vector readPositionPrimitive(std::istream&, Space const*);
     
     /// read a direction primitives, such as 'horizontal', etc.
-    static Vector readDirection0(std::istream&, Vector const&, Space const*);
+    static Vector readDirectionPrimitive(std::istream&, Vector const&, Space const*);
 
 public:
     

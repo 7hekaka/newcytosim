@@ -90,7 +90,7 @@ void Movable::revolve(Rotation const& T)
  chosen randomly inside this area following a uniform probability.
  */
 
-Vector Movable::readPosition0(std::istream& is, Space const* spc)
+Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
 
@@ -455,7 +455,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
 restart:
     if ( is.fail() )
         return pos;
-    pos = readPosition0(is, spc);
+    pos = readPositionPrimitive(is, spc);
     is.clear();
     
     while ( !is.eof() )
@@ -476,7 +476,7 @@ restart:
         // Convolve with shape
         else if ( tok == "add" )
         {
-            Vector vec = readPosition0(is, spc);
+            Vector vec = readPositionPrimitive(is, spc);
             pos = pos + vec;
         }
         // Alignment with a vector is specified with 'align'
@@ -507,13 +507,13 @@ restart:
         // returns a random position between the two points specified
         else if ( tok == "to" )
         {
-            Vector vec = readPosition0(is, spc);
+            Vector vec = readPositionPrimitive(is, spc);
             return pos + ( vec - pos ) * RNG.preal();
         }
         // returns one of the two points specified
         else if ( tok == "or" )
         {
-            Vector alt = readPosition0(is, spc);
+            Vector alt = readPositionPrimitive(is, spc);
             if ( RNG.flip() ) pos = alt;
         }
         else if ( tok == "if" )
@@ -594,8 +594,7 @@ return pos;
  cytosim will pick uniformly among all the possible rotations that fulfill the requirements.
  */
 
-
-Vector Movable::readDirection0(std::istream& is, Vector const& pos, Space const* spc)
+Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
     
@@ -744,7 +743,7 @@ Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* 
 restart:
     if ( is.fail() )
         return dir;
-    dir = readDirection0(is, pos, spc);
+    dir = readDirectionPrimitive(is, pos, spc);
     is.clear();
     
     while ( !is.eof() )
@@ -773,7 +772,7 @@ restart:
         // returns one of the two points specified
         else if ( tok == "or" )
         {
-            Vector alt = readDirection0(is, pos, spc);
+            Vector alt = readDirectionPrimitive(is, pos, spc);
             if ( RNG.flip() ) dir = alt;
         }
         else if ( tok == "if" )
