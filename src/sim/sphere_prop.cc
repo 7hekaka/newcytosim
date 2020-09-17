@@ -73,8 +73,8 @@ void SphereProp::complete(Simul const& sim)
     if ( viscosity < 0 )
         viscosity = sim.prop->viscosity;
         
-    if ( viscosity < 0 )
-        throw InvalidParameter("sphere:viscosity or simul:viscosity should be defined");
+    if ( viscosity <= 0 )
+        throw InvalidParameter("sphere:viscosity or simul:viscosity should be defined > 0");
     
     confine_space_ptr = sim.findSpace(confine_space);
 

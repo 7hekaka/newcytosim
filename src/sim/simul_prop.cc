@@ -139,7 +139,10 @@ void SimulProp::complete(Simul const& sim)
         else
             random_seed = RNG.seed();
     }
-    
+
+    if ( time_step < 0 )
+        throw InvalidParameter("simul:time_step must be > 0");
+
     if ( sim.ready() )
     {
         if ( viscosity <= 0 )

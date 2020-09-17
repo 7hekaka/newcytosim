@@ -279,7 +279,12 @@ PropertyList PropertyList::find_all_except(std::string const& cat) const
 
 void PropertyList::write_names(std::ostream& os, std::string const& pf) const
 {
-    os << pf << "Known classes:\n";
+    if ( vec_.size() < 1 )
+    {
+        os << "no name known!";
+        return;
+    }
+    os << pf << "\nKnown names:\n";
     for ( Property const* i : vec_ )
     {
         os << pf << std::setw(10);
