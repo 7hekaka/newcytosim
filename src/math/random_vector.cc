@@ -362,10 +362,10 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
         if ( ++ouf > max_trials )
             break;
         
-        real a = M_PI * RNG.sreal();
+        const Vector2 YZ = Vector2::randB();
         real u = 1.0 - cap * RNG.preal();
         real v = sqrt( 1.0 - u * u );
-        Vector3 pos(u, v*cos(a), v*sin(a));
+        Vector3 pos(u, v*YZ.XX, v*YZ.YY);
         
         for ( size_t i = 0; i < n; ++i )
             if ( distanceSqr(pos, pts[i]) < ss )
