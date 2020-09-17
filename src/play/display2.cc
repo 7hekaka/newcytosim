@@ -296,10 +296,12 @@ void Display2::drawSolidT(Solid const& obj, size_t inx)
         // set clipping planes with nearest balls
         for ( size_t i = 0; i < num; ++i )
         {
-            Vector P = obj.posPoint(near[i]);
+            size_t J = near[i];
+            Vector P = obj.posPoint(J);
+            real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
             GLenum glp = GL_CLIP_PLANE5 - i;
             glEnable(glp);
-            gle::setClipPlane(glp, normalize(X-P), (X+P)*0.5);
+            gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
         // draw ball:
         bodyColorT(obj);
