@@ -116,7 +116,7 @@ public:
     void        setDragCoefficient();
 
     /// total translation drag-coefficient (force = drag * speed)
-    real        dragCoefficient() const;
+    real        dragCoefficient() const { return ( 6 * M_PI ) * prop->viscosity * sumRadius(); }
 
     /// add the interactions due to confinement
     void        setInteractions(Meca&) const;
@@ -167,6 +167,12 @@ public:
     /// radius of the sphere around point `i`
     real        radius(const size_t i) const { return soRadius[i]; }
     
+    /// sum of all sphere's radius
+    real        sumRadius() const;
+
+    /// set index of Spheres that are nearest neighbors to `inx`; return number of values set
+    size_t      nearestBalls(size_t inx, size_t&, size_t&, size_t&) const;
+
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
     Vector      centroid() const;
     

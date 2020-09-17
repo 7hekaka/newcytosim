@@ -14,7 +14,7 @@ class ViewProp : public Property
 public:
     
     /// number of OpenGL clipping planes
-    static constexpr int NB_CLIP_PLANES = 4;
+    static constexpr int NB_CLIP_PLANES = 3;
     
     /**
      @defgroup ViewPar Display Parameters: View

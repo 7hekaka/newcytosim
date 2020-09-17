@@ -345,7 +345,7 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
         throw InvalidParameter("aster:solid must be specified");
     
     // check that there is at least one point:
-    if ( sol->dragCoefficient() < REAL_EPSILON )
+    if ( sol->sumRadius() < REAL_EPSILON )
 #ifdef BACKWARD_COMPATIBILITY
         sol->addSphere(Vector(0,0,0), asRadius);
 #else

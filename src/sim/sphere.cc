@@ -360,11 +360,13 @@ void Sphere::setInteractions(Meca& meca) const
 
 real Sphere::addBrownianForces(real const* rnd, real sc, real* res) const
 {
-    real bS, bT = sqrt( 2 * sc * spDrag );
+    real bT = 0;
+    if ( ! std::isinf(spDrag) )
+        bT = sqrt( 2 * sc * spDrag );
+    
+    real bS = 0;
     if ( prop->point_mobility > 0 )
         bS = sqrt( 2 * sc / prop->point_mobility );
-    else
-        bS = 0;
 
     Vector F(0, 0, 0);
     Torque T(nullTorque);

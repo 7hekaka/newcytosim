@@ -546,12 +546,71 @@ size_t Solid::addTriad(real arm)
 }
 
 
-void Solid::setRadius(const size_t indx, real rad)
+void Solid::setRadius(const size_t indx, const real rad)
 {
     assert_true( indx < nPoints );
     if ( rad < 0 )
         throw InvalidParameter("solid:radius must be positive");
     soRadius[indx] = rad;
+}
+
+
+real Solid::sumRadius() const
+{
+    real res = 0;
+    
+    for ( size_t i = 0; i < nPoints; ++i )
+        res += soRadius[i];
+    
+    return res;
+}
+
+
+/**
+ find the 3 nearest spheres to sphere at `inx` on the same Solid
+ The result should be independent of the actual position, since the shape
+ of a Solid is fixed, and it could be precalculated
+ */
+size_t Solid::nearestBalls(const size_t inx, size_t& i1, size_t& i2, size_t& i3) const
+{
+    assert_true( inx < nbPoints() );
+    const size_t sup = nbPoints();
+    Vector X = posP(inx);
+    i1 = sup;
+    i2 = sup;
+    i3 = sup;
+    real d1 = INFINITY;
+    real d2 = INFINITY;
+    real d3 = INFINITY;
+    for ( size_t i = 0; i < sup; ++i )
+    {
+        if ( i != inx && radius(i) > 0 )
+        {
+            real d = distanceSqr(X, posP(i));
+            if ( d < d1 )
+            {
+                d3 = d2;
+                i3 = i2;
+                d2 = d1;
+                i2 = i1;
+                d1 = d;
+                i1 = i;
+            }
+            else if ( d < d2 )
+            {
+                d3 = d2;
+                i3 = i2;
+                d2 = d;
+                i2 = i;
+            }
+            else if ( d < d3 )
+            {
+                d3 = d;
+                i3 = i;
+            }
+        }
+    }
+    return ( i1 < sup ) + ( i2 < sup ) + ( i3 < sup );
 }
 
 
@@ -852,21 +911,6 @@ void Solid::getPoints(real const* ptr)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-
-/**
- returns 6 * M_PI * viscosity * sum(radius);
- */
-real Solid::dragCoefficient() const
-{
-    real sumR = 0;
-    
-    for ( size_t i = 0; i < nPoints; ++i )
-        sumR += soRadius[i];
-    
-    return ( 6 * M_PI ) * prop->viscosity * sumR;
-}
-
-
 /**
 The mobility is that of a set of spheres in an infinite fluid (Stokes law):
 
@@ -916,15 +960,15 @@ void Solid::setDragCoefficient()
     
     // sanity check:
     if ( soDrag < REAL_EPSILON )
-        throw InvalidParameter("The Solid's drag coefficient is null");
+        throw InvalidParameter("ill-formed Solid has no translational drag");
 
     if ( soDragRot < REAL_EPSILON )
-        throw InvalidParameter("ill-formed Solid has zero rotational drag");
+        throw InvalidParameter("ill-formed Solid has no rotational drag");
 
 #if ( 0 )
-    std::clog << "Solid " << reference() << " (viscosity " << prop->viscosity << ") has drag:\n";
-    std::clog << "     translation " << soDrag * prop->viscosity << "\n";
-    std::clog << "     rotation    " << soDragRot * prop->viscosity << "\n";
+    std::clog << "Solid " << reference() << " (viscosity " << prop->viscosity << ") has:\n";
+    std::clog << "     translation drag " << soDrag * prop->viscosity << "\n";
+    std::clog << "     rotation drag    " << soDragRot * prop->viscosity << "\n";
 #endif
 }
 
@@ -937,10 +981,14 @@ void Solid::prepareMecable()
 
 
 real Solid::addBrownianForces(real const* rnd, real sc, real* rhs) const
-{    
-    // Brownian amplitude
+{
     const real drag = prop->viscosity * soDrag;
-    real b = sqrt( 2 * sc * drag / (real)nPoints );
+
+    if ( std::isinf(drag) )
+        return INFINITY;
+    
+    // amplitude of Brownian motion
+    const real b = sqrt( 2 * sc * drag / (real)nPoints );
 
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];
@@ -967,7 +1015,7 @@ void Solid::projectForces(const real* X, real* Y) const
     for ( size_t p = 0; p < nPoints; ++p )
         T += X[p];
     
-    T *= 1.0 / ( prop->viscosity * soDrag );
+    T /= prop->viscosity * soDrag;
     
     for ( size_t p = 0; p < nPoints; ++p )
         Y[p] = T;
@@ -1151,9 +1199,10 @@ void Solid::projectForces0(const real* X, real* Y) const
     
     Vector V = R + cross(T, soCenter);
     
-    R = soMomentum.vecmul(V) / ( prop->viscosity );
+    const real visc = prop->viscosity;
+    R = soMomentum.vecmul(V) / visc;
     // reduce Torque to center of mobility:
-    T = cross(soCenter, R) + T / ( prop->viscosity * soDrag );
+    T = cross(soCenter, R) + T / ( visc * soDrag );
 
     for ( size_t p = 0; p < nPoints; ++p )
     {
@@ -1181,9 +1230,10 @@ void Solid::projectForces(const real* X, real* Y) const
     
     Vector V = R + cross(T, soCenter);
 
-    R = soMomentum.vecmul(V) / ( prop->viscosity );
+    const real visc = prop->viscosity;
+    R = soMomentum.vecmul(V) / visc;
     // reduce Torque to center of mobility:
-    T = cross(soCenter, R) + T / ( prop->viscosity * soDrag );
+    T = cross(soCenter, R) + T / ( visc * soDrag );
     
     for ( size_t p = 0; p < nPoints; ++p )
     {
