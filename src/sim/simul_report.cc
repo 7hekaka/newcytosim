@@ -2558,8 +2558,16 @@ int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
             clusters.emplace(i.first, s);
     }
     
-    if ( details > 0 )
+    if ( details > 1 )
+    {
+        out << COM << "cluster_id" << SEP << "nb_fibers :" << SEP << "fiber_id";
         out << LIN << clusters.size() << " clusters:";
+    } else if ( details > 0 )
+    {
+        out << COM << "cluster_id" << SEP << "nb_fibers";
+        out << LIN << clusters.size() << " clusters:";
+    }
+
     
     // consider clusters by decreasing size:
     size_t idx = 0;
@@ -2604,7 +2612,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
     
     flagClusters(C, S, M);
     
-    out << COM << "cluster" << SEP << "nb_fibers :" << SEP << "fiber_id";
+    out << COM << "cluster by couples " << C << " solids " << S << " meca " << M;
     orderClusters(out, 2, details);
 }
 

@@ -519,7 +519,8 @@ void Meca::multiply(const real* X, real* Y) const
 #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
+        const real alpha = -time_step * mec->leftoverMobility();
+        blas::xpay(DIM*mec->nbPoints(), X+inx, alpha, Y+inx);
     }
 }
 
@@ -956,7 +957,7 @@ void Meca::computePrecondAlt()
 /**
  Compute a preconditionner block corresponding to 'mec'
  The dimension is reduced by DIM and banded with diagonal + 2 off-diagonals
- This block is symmetric definite positive, and is invertex by Cholesky's method
+ This block is symmetric definite positive, and is factorized by Cholesky's method
  */
 void Meca::computePrecondBand(Mecable* mec)
 {
@@ -996,7 +997,7 @@ void Meca::computePrecondBand(Mecable* mec)
 /**
  Compute a preconditionner block corresponding to 'mec':
  Block of dimension reduced by DIM and without projection
- This block is symmetric definite positive, and is invertex by Cholesky's method
+ This block is symmetric definite positive, and is factorized by Cholesky's method
  */
 void Meca::computePrecondIsoS(Mecable* mec)
 {
@@ -1022,7 +1023,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
     //std::clog<<"iso symmetric preconditionner: " << nbp << "\n";
     //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
 
-    // calculate LU factorization:
+    // calculate Cholesky factorization:
     int info = 0;
 #if CHOUCROUTE
     alsatian_xpotf2L(nbp, mec->block(), nbp, &info);
