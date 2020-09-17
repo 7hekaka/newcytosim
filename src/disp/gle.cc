@@ -903,8 +903,8 @@ namespace gle
 #ifdef PLATONIC_H
     
     /// using icosahedrons to render the sphere:
-    Platonic::Solid ico1(Platonic::Solid::ICOSAHEDRON, gle::finesse/4);
-    Platonic::Solid ico2(Platonic::Solid::ICOSAHEDRON, gle::finesse/2);
+    Platonic::Solid ico1(Platonic::Solid::ICOSAHEDRON, gle::finesse/6);
+    Platonic::Solid ico2(Platonic::Solid::ICOSAHEDRON, gle::finesse/3);
     Platonic::Solid ico4(Platonic::Solid::ICOSAHEDRON, gle::finesse);
     Platonic::Solid ico8(Platonic::Solid::ICOSAHEDRON, gle::finesse*2);
     
@@ -952,6 +952,10 @@ namespace gle
             ico_nfaces[1] = initializeIcoBuffers(ico_buf[2], ico_buf[3], ico2);
             ico_nfaces[2] = initializeIcoBuffers(ico_buf[4], ico_buf[5], ico4);
             ico_nfaces[3] = initializeIcoBuffers(ico_buf[6], ico_buf[7], ico8);
+#if 0
+            for ( int n = 0; n < 4; ++n )
+                fprintf(stderr, "GLE's icosahedron %i has %u faces\n", n, ico_nfaces[n]);
+#endif
         }
     }
     

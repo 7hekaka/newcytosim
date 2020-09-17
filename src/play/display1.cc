@@ -102,9 +102,9 @@ void Display1::drawBall(Vector const& pos, real radius) const
     if ( DIM == 3 )
     {
         glCullFace(GL_FRONT);
-        gleSphere1B();
-        glCullFace(GL_BACK);
         gleSphere2B();
+        glCullFace(GL_BACK);
+        gleSphere4B();
     }
     else
         gleDiscB();
@@ -229,14 +229,30 @@ void Display1::drawSolid(Solid const& obj)
 /**
  Display a semi-transparent disc / sphere
  */
-void Display1::drawSolidT(Solid const& obj, size_t ii)
+void Display1::drawSolidT(Solid const& obj, size_t inx)
 {
     const PointDisp * disp = obj.prop->disp;
 
-    if ( disp->style & 1  &&  obj.radius(ii) > 0 )
+    if ( disp->style & 1  &&  obj.radius(inx) > 0 )
     {
+        Vector X = obj.posP(inx);
+        size_t near[3];
+        size_t num = obj.nearestBalls(inx, near[0], near[1], near[2]);
+        //printf("nearest balls to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
+        // set clipping planes with nearest balls
+        for ( size_t i = 0; i < num; ++i )
+        {
+            Vector P = obj.posPoint(near[i]);
+            GLenum glp = GL_CLIP_PLANE5 - i;
+            glEnable(glp);
+            gle::setClipPlane(glp, normalize(X-P), (X+P)*0.5);
+        }
+        // draw ball:
         bodyColorT(obj);
-        drawBall(obj.posP(ii), obj.radius(ii));
+        drawBall(X, obj.radius(inx));
+        glDisable(GL_CLIP_PLANE3);
+        glDisable(GL_CLIP_PLANE4);
+        glDisable(GL_CLIP_PLANE5);
     }
 }
 
