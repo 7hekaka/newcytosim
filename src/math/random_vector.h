@@ -15,7 +15,7 @@
 size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials);
 
 
-/// Distribute points on the unit disc, over a cap of solid-angle `cap`.
+/// Distribute points on the unit disc, over a spherical cap of thickness `cap`.
 size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit_trials);
 
 

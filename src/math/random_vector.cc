@@ -346,12 +346,14 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t max_trials)
 
 
 /**
- Generate a random distribution of points on a cap of solid-angle `cap` on the unit circle,
+ Generate a random distribution of points over a portion of the unit sphere,
+ defined by the thickness 'cap' of the cap.
  with the distance between two points never below `sep`.
  @return number of points stored in 'pts[]'
  */
 size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_trials)
 {
+    assert_true( cap < 2.0 );
     const real ss = sep * sep;
     size_t ouf = 0;
     size_t n = 0;
@@ -362,8 +364,8 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
         if ( ++ouf > max_trials )
             break;
         
-        const Vector2 YZ = Vector2::randB();
-        real u = 1.0 - cap * RNG.preal();
+        const Vector2 YZ = Vector2::randU();
+        real u = std::max(1.0 - cap * RNG.preal(), -1.0);
         real v = sqrt( 1.0 - u * u );
         Vector3 pos(u, v*YZ.XX, v*YZ.YY);
         
