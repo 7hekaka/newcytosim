@@ -179,7 +179,7 @@ public:
         return 0 == ( n - s ) % i;
     }
     
-    unsigned last()
+    size_t last()
     {
         return e;
     }

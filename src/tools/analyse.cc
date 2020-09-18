@@ -68,12 +68,12 @@ int main(int argc, char* argv[])
     }
 
     Cytosim::silence_all();
-    unsigned frm = 0;
+    size_t frm = 0;
     
     // multiple frame indices can be specified:
     if ( arg.set(frm, "frame") )
     {
-        unsigned s = 0;
+        size_t s = 0;
         do {
             // try to load the specified frame:
             if ( 0 == reader.loadFrame(simul, frm) )

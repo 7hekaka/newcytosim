@@ -325,7 +325,7 @@ int main(int argc, char* argv[])
     std::string input = TRAJECTORY;
     arg.set(input, ".cmo") || arg.set(input, "input");
 
-    unsigned frame = 0;
+    size_t frame = 0;
     FrameReader reader;
     RNG.seed();
 

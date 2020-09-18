@@ -164,8 +164,8 @@ int main(int argc, char* argv[])
         prefix = 1;
 #endif
     
-    unsigned frame = 0;
-    unsigned period = 1;
+    size_t frame = 0;
+    size_t period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     arg.set(verbose, "verbose");
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
     if ( arg.nb_values("frame") > 1 )
     {
         // multiple record indices were specified:
-        unsigned s = 1;
+        size_t s = 1;
         while ( arg.set(frame, "frame", s) )
         {
             // try to load the specified frame:
@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
     else if ( period > 0 )
     {
         // process every 'period' record:
-        unsigned f = frame;
+        size_t f = frame;
         while ( 0 == reader.loadNextFrame(simul)  )
         {
             ++f;
@@ -243,9 +243,6 @@ int main(int argc, char* argv[])
         }
     }
     
-    if ( ofs.is_open() )
-        ofs.close();
-
     arg.print_warning(std::cerr, cnt, "\n");
 
     return EXIT_SUCCESS;

@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
         simul.loadProperties();
         reader.openFile(input);
         
-        unsigned frame = 0;
+        size_t frame = 0;
         char filename[256];
         
         // load all frames in the file:

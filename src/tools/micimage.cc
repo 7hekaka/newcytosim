@@ -17,15 +17,15 @@
 #include "saveimage.h"
 
 
-unsigned   hits = 1000;
-unsigned dim[2] = { 1024, 1024 };
-real        pix = 6.5;
-real        mag = 100;
-real        res = pix / mag;
-real     foc[3] = { 0, 0, 0 };
-real        psf = 0.22;
-real        bck = 0;
-real        brt = 1;
+size_t   hits = 1000;
+size_t dim[2] = { 1024, 1024 };
+real      pix = 6.5;
+real      mag = 100;
+real      res = pix / mag;
+real   foc[3] = { 0, 0, 0 };
+real      psf = 0.22;
+real      bck = 0;
+real      brt = 1;
 
 
 //------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void emitter(uint16_t array[], size_t array_size, real x, real y, real z)
 }
 
 
-unsigned image(std::istream& is, FILE * file)
+size_t image(std::istream& is, FILE * file)
 {
     // lower left corner of image:
     real cx = foc[0] - 0.5 * res * dim[0];
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
             {
                 if ( !ferror(file) )
                 {
-                    unsigned cnt = image(is, file);
+                    size_t cnt = image(is, file);
                     std::cerr << "created " << on << " from " << cnt << " active emitters" << std::endl;
                 }
                 fclose(file);
