@@ -36,8 +36,8 @@ void drawEdges(GridBase<3> const& grid);
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 1> const& grid,
-                bool set_color(TYPE*, CELL const&, Vector1 const&),
-                TYPE* arg)
+                bool set_color(TYPE, CELL const&, Vector1 const&),
+                TYPE arg)
 {
     float d = grid.cellWidth(0);
     float e = 2;
@@ -67,8 +67,8 @@ void drawValues(Grid<CELL, 1> const& grid,
 */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 2> const& grid,
-                bool set_color(TYPE*, CELL const&, Vector2 const&),
-                TYPE* arg)
+                bool set_color(TYPE, CELL const&, Vector2 const&),
+                TYPE arg)
 {
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(1);
@@ -99,8 +99,8 @@ void drawValues(Grid<CELL, 2> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
-                bool set_color(TYPE*, CELL const&, Vector3 const&),
-                TYPE* arg,
+                bool set_color(TYPE, CELL const&, Vector3 const&),
+                TYPE arg,
                 real z_pos = 0)
 {
     assert_true(grid.hasCells());
@@ -135,8 +135,8 @@ void drawValues(Grid<CELL, 3> const& grid,
 */
 template <typename CELL, typename TYPE>
 void drawValuesXZ(Grid<CELL, 3> const& grid,
-                  bool set_color(TYPE*, CELL const&, Vector3 const&),
-                  TYPE* arg,
+                  bool set_color(TYPE, CELL const&, Vector3 const&),
+                  TYPE arg,
                   real pos)
 {
     assert_true(grid.hasCells());
@@ -171,8 +171,8 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValuesYZ(Grid<CELL, 3> const& grid,
-                  bool set_color(TYPE*, CELL const&, Vector3 const&),
-                  TYPE* arg,
+                  bool set_color(TYPE, CELL const&, Vector3 const&),
+                  TYPE arg,
                   real pos)
 {
     assert_true(grid.hasCells());
@@ -207,8 +207,8 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
-                bool set_color(TYPE*, CELL const&, Vector3 const&),
-                TYPE* arg,
+                bool set_color(TYPE, CELL const&, Vector3 const&),
+                TYPE arg,
                 Vector3 const& dir,
                 real z_pos)
 {

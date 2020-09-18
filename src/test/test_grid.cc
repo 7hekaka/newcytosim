@@ -136,13 +136,13 @@ void processMouseDrag(int mx, int my, Vector3 & a, const Vector3 & b, int m)
 
 //------------------------------------------------------------------------------
 #if ( DIM == 3 )
-static bool field_color(void*, const real& val, Vector3 const&)
+static bool field_color(int, const real& val, Vector3 const&)
 {
     glColor3f(val/5.0, 0, 0);
     return true;
 }
 #else
-static bool field_color(void*, const real& val, Vector2 const&)
+static bool field_color(int, const real& val, Vector2 const&)
 {
     glColor3f(val/5.0, 0, 0);
     return true;
@@ -156,9 +156,9 @@ void display(View&, int)
 
 #if ( DIM == 3 )
     Vector3 dir(0,0,1);
-    drawValues(myGrid, field_color, nullptr, dir);
+    drawValues(myGrid, field_color, 0, dir);
 #else
-    drawValues(myGrid, field_color, nullptr);
+    drawValues(myGrid, field_color, 0);
 #endif
     
     //--------------draw a grid in gray:
