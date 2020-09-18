@@ -36,6 +36,14 @@ inline void print(size_t n, real const* vec)
 }
 
 
+/// benchmark division
+void divide(int size, real const* D, real* E)
+{
+    for ( int i = 0; i < size-1; ++i )
+        E[i] = E[i] / D[i];
+}
+
+
 /**
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
@@ -52,6 +60,24 @@ void testDPTTF(size_t NBS, size_t cnt)
         Ds[i] = 2.0;
         Us[i] = -0.5 * RNG.preal();
     }
+    
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        //copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        divide(NBS, D, U);
+    }
+    toc("divide", NBS*cnt);
+    
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        //copy_real(NBS, Ds, D);
+        copy_real(NBS, Us, U);
+        xpttrf(NBS, D, U);
+    }
+    toc("pttrf", NBS*cnt);
 
     int info;
     tic();
