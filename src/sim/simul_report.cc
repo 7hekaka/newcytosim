@@ -530,15 +530,15 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
     opt.set(nbin, "interval", 1);
     nbin = std::min(nbin, BMAX);
     
-    std::streamsize p = out.precision();
-    out.precision(3);
-
     if ( 1 )
     {
         out << COM << "fiber length histogram (bin size " << delta <<")";
         out << LIN << ljust("scale", 2);
+        std::streamsize p = out.precision();
+        out.precision(2);
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
+        out.precision(p);
     }
     
     for ( Property const* i : properties.find_all("fiber") )
@@ -564,7 +564,6 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << cnt[u];
     }
-    out.precision(p);
 }
 
 
