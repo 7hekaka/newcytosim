@@ -79,10 +79,10 @@ public:
     void       execute_import(std::string const& filename, std::string const& what, Glossary&);
 
     /// export objects (or `what`) to a file
-    void       execute_export(std::string& filename, std::string const& what, Glossary&);
+    void       execute_export(std::string const& filename, std::string const& what, Glossary&);
 
     /// write information (specified in `what`) to a file
-    void       execute_report(std::string& filename, std::string const& what, Glossary&);
+    void       execute_write(std::string const& filename, std::string const& what, Glossary&);
     
     /// perform `cnt` simulation steps, following options specified in Glossary
     void       execute_run(size_t cnt, Glossary&, bool write_permission);

@@ -889,21 +889,21 @@ void Parser::parse_export(std::istream& is)
  Note that writing to a file is normally disabled for `play`.
  */
 
-void Parser::parse_report(std::istream& is)
+void Parser::parse_write(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_symbols(is);
     std::string file = Tokenizer::get_path(is);
 
     if ( file.empty() )
-        throw InvalidSyntax("missing file name. Expected 'report WHAT FILE'");
+        throw InvalidSyntax("missing file name. Expected 'write WHAT FILE'");
     
     std::string blok = Tokenizer::get_block(is, '{');
     
     if ( do_run && ( do_write || file == "*" ))
     {
         Glossary opt(blok);
-        execute_report(file, what, opt);
+        execute_write(file, what, opt);
         check_warnings(opt, is, ipos);
     }
 }
@@ -1146,12 +1146,8 @@ int Parser::evaluate_one(std::istream& is)
 #endif
     else if ( tok == "cut" )
         parse_cut(is);
-    else if ( tok == "report" )
-        parse_report(is);
-#ifdef BACKWARD_COMPATIBILITY
-    else if ( tok == "write" )
-        parse_report(is);
-#endif
+    else if ( tok == "report" || tok == "write" )
+        parse_write(is);
     else if ( tok == "import" )
         parse_import(is);
     else if ( tok == "export" )

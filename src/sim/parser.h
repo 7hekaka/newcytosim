@@ -59,7 +59,7 @@ private:
     void      parse_read(std::istream&);
     
     /// parse command `write`
-    void      parse_report(std::istream&);
+    void      parse_write(std::istream&);
     
     /// parse command `import`
     void      parse_import(std::istream&);

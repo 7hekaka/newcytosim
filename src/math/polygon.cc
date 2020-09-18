@@ -141,8 +141,6 @@ void Polygon::read(std::string const& file)
     
     if ( nbPoints() < 3 )
         throw InvalidParameter("polygon: too few points specified in `"+file+"'");
-    
-    in.close();
 }
 
 

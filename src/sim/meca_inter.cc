@@ -2494,7 +2494,6 @@ void Meca::testSideLink(Interpolation const& ptA,
         std::ofstream o("x");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex() << "\n";
         mC.printSparse(o, REAL_EPSILON);
-        o.close();
     }
     
     mC.reset();
@@ -2508,7 +2507,6 @@ void Meca::testSideLink(Interpolation const& ptA,
         std::ofstream o("y");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex() << "\n";
         mC.printSparse(o, REAL_EPSILON);
-        o.close();
     }
 }
 

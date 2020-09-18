@@ -585,7 +585,6 @@ void Glossary::read_file(const char path[], int no_overwrite)
         read(is, no_overwrite);
     else
         throw InvalidIO("could not open Glossary file");
-    is.close();
 }
 
 

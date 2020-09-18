@@ -940,31 +940,43 @@ void Interface::execute_import(std::string const& file, std::string const& what,
 /**
  see Parser::parse_export
  */
-void Interface::execute_export(std::string& file, std::string const& what, Glossary& opt)
+void Interface::execute_export(std::string const& name, std::string const& what, Glossary& opt)
 {
     bool append = true;
     bool binary = true;
-    
-    opt.set(append, "append");
-    opt.set(binary, "binary");
+    bool prune = true;
 
-    VLOG("-EXPORT " << what << " to " << file << '\n');
-    
+    VLOG("-EXPORT " << what << " to " << name << '\n');
+
+    // here '*' designates the standard output:
     if ( what == "all" || what == "objects" )
     {
-        // a '*' designates the current output:
-        if ( file == "*" )
-            file = simul.prop->trajectory_file;
-
-        simul.writeObjects(file, append, binary);
+        if ( name != "*" )
+        {
+            opt.set(append, "append");
+            opt.set(binary, "binary");
+            simul.writeObjects(name, append, binary);
+        }
+        else
+        {
+            Outputter out(stdout, false);
+            simul.writeObjects(out);
+        }
     }
     else if ( what == "properties" )
     {
-        // a '*' designates the usual file name for output:
-        if ( file == "*" )
-            file = simul.prop->property_file;
-        
-        simul.writeProperties(file.c_str(), false);
+        opt.set(prune, "prune");
+        std::ostream * osp = &std::cout;
+        std::ofstream ofs;
+        if ( name != "*" )
+        {
+            opt.set(append, "append");
+            std::ios_base::openmode mode = std::ios_base::out;
+            if ( append ) mode |= std::ofstream::app;
+            ofs.open(name.c_str(), mode);
+            osp = &ofs;
+        }
+        simul.writeProperties(*osp, prune);
     }
     else
         throw InvalidIO("only `objects' or `properties' can be exported");
@@ -974,22 +986,22 @@ void Interface::execute_export(std::string& file, std::string const& what, Gloss
 /**
  see Parser::parse_report
  */
-void Interface::execute_report(std::string& file, std::string const& what, Glossary& opt)
+void Interface::execute_write(std::string const& name, std::string const& what, Glossary& opt)
 {
     int ver = 1;
     opt.set(ver, "verbose");
     std::string str;
-    VLOG("-WRITE " << what << " to " << file << '\n');
+    VLOG("-REPORT " << what << " to " << file << '\n');
     
-    std::ostream * osp = &std::cout;
+    std::ostream* osp = &std::cout;
     std::ofstream ofs;
 
     // a STAR designates the standard output:
-    if ( file != "*" )
+    if ( name != "*" )
     {
         bool append = true;
         opt.set(append, "append");
-        ofs.open(file.c_str(), append ? std::ios_base::app : std::ios_base::out);
+        ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
         osp = &ofs;
     }
     
@@ -1003,9 +1015,6 @@ void Interface::execute_report(std::string& file, std::string const& what, Gloss
         simul.report(ss, what, opt);
         StreamFunc::skip_lines(*osp, ss, '%');
     }
-    
-    if ( ofs.is_open() )
-        ofs.close();
 }
 
 
