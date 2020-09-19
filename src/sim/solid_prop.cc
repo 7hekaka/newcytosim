@@ -43,14 +43,17 @@ void SolidProp::read(Glossary& glos)
     glos.set(steric,         "steric");
     glos.set(steric_range,   "steric", 1);
     
-    glos.set(confine,        "confine", {{"off",        CONFINE_OFF},
-                                         {"on",         CONFINE_ON},
-                                         {"inside",     CONFINE_INSIDE},
-                                         {"outside",    CONFINE_OUTSIDE},
-                                         {"point",      CONFINE_POINT},
-                                         {"none",       CONFINE_OFF},
-                                         {"surface",    CONFINE_ON},
-                                         {"all_inside", CONFINE_ALL_INSIDE}});
+    glos.set(confine,        "confine", {{"off",          CONFINE_OFF},
+                                         {"on",           CONFINE_ON},
+                                         {"inside",       CONFINE_INSIDE},
+                                         {"outside",      CONFINE_OUTSIDE},
+                                         {"point",        CONFINE_POINT},
+                                         {"point_inside", CONFINE_POINT_INSIDE},
+#ifdef BACKWARD_COMPATIBILITY
+                                         {"none",         CONFINE_OFF},
+                                         {"surface",      CONFINE_ON},
+#endif
+                                         {"all_inside",   CONFINE_ALL_INSIDE}});
     
     glos.set(confine_stiffness, "confine", 1);
     glos.set(confine_space,     "confine", 2);

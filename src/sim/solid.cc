@@ -108,10 +108,16 @@ void Solid::setInteractions(Meca& meca) const
                 break;
                 
             case CONFINE_POINT:
-                // confine Point 0:
                 spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
                 break;
                 
+            case CONFINE_POINT_INSIDE:
+            {
+                Vector pos = posP(0);
+                if ( !spc->inside(pos) )
+                    spc->setInteraction(pos, Mecapoint(this, 0), meca, prop->confine_stiffness);
+            } break;
+
             default:
                 throw InvalidParameter("Invalid solid::confine");
         }
