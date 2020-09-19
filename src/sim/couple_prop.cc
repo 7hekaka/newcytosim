@@ -66,15 +66,15 @@ void CoupleProp::read(Glossary& glos)
     // changed 'stiff' to 'min_loop' on 26.04.2020
     glos.set(min_loop, "min_loop") || glos.set(min_loop, "stiff");
 
-    glos.set(specificity,     "specificity", {{"off",          BIND_ALWAYS},
+    glos.set(specificity, "specificity", {{"off",          BIND_ALWAYS},
 #ifdef BACKWARD_COMPATIBILITY
-                                              {"none",         BIND_ALWAYS},
-            #endif
-                                              {"orthogonal",   BIND_ORTHOGONAL},
-                                              {"parallel",     BIND_PARALLEL},
-                                              {"not_parallel", BIND_NOT_PARALLEL},
-                                              {"antiparallel", BIND_ANTIPARALLEL},
-                                              {"not_antiparallel", BIND_NOT_ANTIPARALLEL}});
+                                          {"none",         BIND_ALWAYS},
+#endif
+                                          {"orthogonal",   BIND_ORTHOGONAL},
+                                          {"parallel",     BIND_PARALLEL},
+                                          {"not_parallel", BIND_NOT_PARALLEL},
+                                          {"antiparallel", BIND_ANTIPARALLEL},
+                                          {"not_antiparallel", BIND_NOT_ANTIPARALLEL}});
     
     glos.set(activity,        "activity");
     
