@@ -1391,11 +1391,13 @@ namespace gle
      */
     void gleDualPass(void primitive())
     {
-        glEnable(GL_CULL_FACE);
+        GLboolean cull = glIsEnabled(GL_CULL_FACE);
+        if ( !cull ) glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         primitive();
         glCullFace(GL_BACK);
         primitive();
+        if ( !cull ) glDisable(GL_CULL_FACE);
     }
     
     

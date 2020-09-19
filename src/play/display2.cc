@@ -121,11 +121,13 @@ void Display2::drawBall(Vector const& pos, real radius)
     gleScale(radius);
     if ( DIM == 3 )
     {
-        glEnable(GL_CULL_FACE);
+        GLboolean cull = glIsEnabled(GL_CULL_FACE);
+        if ( !cull ) glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         gleSphere2B();
         glCullFace(GL_BACK);
         gleSphere4B();
+        if ( !cull ) glDisable(GL_CULL_FACE);
     }
     else
         gleDiscB();

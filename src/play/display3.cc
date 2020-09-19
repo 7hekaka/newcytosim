@@ -137,8 +137,8 @@ void Display3::drawSimul(Simul const& sim)
 
 void Display3::drawBall(Vector const& pos, float radius) const
 {
-    glEnable(GL_CULL_FACE);
-    assert_true(glIsEnabled(GL_LIGHTING));
+    GLboolean cull = glIsEnabled(GL_CULL_FACE);
+    if ( !cull ) glEnable(GL_CULL_FACE);
     glPushMatrix();
     gleTranslate(pos);
     gleScale(radius);
@@ -147,6 +147,7 @@ void Display3::drawBall(Vector const& pos, float radius) const
     glCullFace(GL_BACK);
     gleSphere8B();
     glPopMatrix();
+    if ( !cull ) glDisable(GL_CULL_FACE);
 }
 
 
@@ -517,21 +518,22 @@ void Display3::drawFiberLines(Fiber const& fib) const
         {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_BACK);
+            GLboolean cull = glIsEnabled(GL_CULL_FACE);
+            if ( !cull ) glEnable(GL_CULL_FACE);
             const real beta = fib.segmentation() / disp->length_scale;
             drawFiberSegments(fib, rad, color_by_abscissaM, beta);
-            glDisable(GL_CULL_FACE);
+            if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
         case 7:
         {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
-            glEnable(GL_CULL_FACE);
+            GLboolean cull = glIsEnabled(GL_CULL_FACE);
+            if ( !cull ) glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
             const real beta = fib.segmentation() / disp->length_scale;
             drawFiberSegments(fib, rad, color_by_abscissaP, beta);
-            glDisable(GL_CULL_FACE);
+            if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
         case 8:
         {
@@ -561,6 +563,8 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
     Vector A = fib.posP(i);
     Vector B = fib.posP(i+1);
     
+    // GL_CULL_FACE should not be enabled!
+#if 1
     if ( i == 0 )
     {
         drawFiberCap(fib.prop->disp->line_caps, A, normalize(A-B), rad);
@@ -586,6 +590,12 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
     gleTube(A, B, rad, gleLongTube2B);
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
+#else
+    glPushMatrix();
+    gleTransAlignZ(normalize(B-A), 1.0, 0.5*(A+B), 1.0);
+    gleCapsule(fib.segmentation(), rad);
+    glPopMatrix();
+#endif
 }
 
 

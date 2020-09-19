@@ -87,7 +87,7 @@ void Display::display(Simul const& sim)
 
 #if ( DIM >= 3 )
     
-    glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glDepthMask(GL_FALSE);
     
@@ -446,7 +446,8 @@ void Display::drawSpace(Space const* obj, bool opaque)
 {
     const PointDisp * disp = obj->prop->disp;
     
-    glEnable(GL_CULL_FACE);
+    GLboolean cull = glIsEnabled(GL_CULL_FACE);
+    if ( !cull ) glEnable(GL_CULL_FACE);
     // draw back side
     if ( disp->visible & 2 && disp->color2.opaque() == opaque )
     {
@@ -463,6 +464,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
         disp->color.load_front();
         obj->draw();
     }
+    if ( !cull ) glDisable(GL_CULL_FACE);
 }
 
 
