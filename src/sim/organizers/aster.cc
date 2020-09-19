@@ -420,22 +420,17 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
         /*
          For type 'angular' all fibers are restricted within an specified solid angle,
          and their orientation is radial
-         by GAELLE LETORT, 14.03.2017
+         initial code by GAELLE LETORT, 14.03.2017
          */
-        real angle = M_PI;
-        opt.set(angle, "angle") || opt.set(angle, "aster_angle");
-        if ( angle < REAL_EPSILON )
-            throw InvalidParameter("aster::angle must be > 0");
 #if ( DIM == 1 )
         // No effect of angle in 1D, same as default
         for ( size_t n = 0; n < nbf; ++n )
-        {
-            Vector D(n%2?1:-1);
-            placeAnchor(Vector(0.0), D, origin);
-        }
+            placeAnchor(Vector(0.0), Vector(2*(n&1)-1), origin);
 #elif ( DIM == 2 )
+        real angle = M_PI;
+        opt.set(angle, "aster_angle");
         real delta = 2 * angle / real(nbf);
-        // points are evenly distributed from -aster_angle to aster_angle
+        // points are evenly distributed in [-aster_angle, aster_angle]
         real ang = -angle;
         for ( size_t n = 0; n < nbf; ++n )
         {
@@ -444,20 +439,26 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
             ang += delta;
         }
 #else
-        real cap = 1.0 - cos(angle);
-        real sep, sep0 = sqrt( 2 * M_PI * cap / nbf );
+        real cap, angle = M_PI;
+        // either 'angle' or 'cap' can be specified:
+        if ( opt.set(angle, "aster_angle") )
+            cap = 1.0 - cos(angle);
+        else
+            opt.set(cap, "aster_cap" );
+        // distribute points randomly over a portion of the unit sphere:
         std::vector<Vector> pts(nbf, Vector(0,0,0));
         size_t ouf = 0;
         size_t cnt = 0;
+        real sep, sep0 = sqrt( 2 * M_PI * cap / nbf );
         do {
             // we decrease gradually the separation, to reach a good solution...
             sep = 512 * sep0 / real(ouf+512);
             cnt = tossPointsCap(pts, cap, sep, 1024);
-            //std::clog << "toss(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
+            //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
         } while ( cnt < nbf && ++ouf < 1024 );
         if ( cnt < nbf )
             std::clog << "warning: aster could only fit " << cnt << " seeds\n";
-        //std::clog << "toss(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
+        //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
         for ( size_t n = 0; n < cnt; ++n )
             placeAnchor(alpha*pts[n], pts[n], origin);
 #endif
