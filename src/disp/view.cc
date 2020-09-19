@@ -388,7 +388,6 @@ void View::setModelView() const
  - 3 : show slice ( -a < Z < a ) where a = 5% of view_size
  .
  
- This uses GL_CLIP_PLANE2 and GL_CLIP_PLANE3
  */
 void View::sliceView(int mode) const
 {
@@ -396,20 +395,20 @@ void View::sliceView(int mode) const
     
     if ( mode == 1 )
     {
-        setClipPlaneEye(GL_CLIP_PLANE3, Vector3(0,0,+1), off);
+        setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,+1), off);
         if ( !depth_clamp )
             setFog(1, 0, fog_color);
     }
     else if ( mode == 2 )
     {
-        setClipPlaneEye(GL_CLIP_PLANE3, Vector3(0,0,-1), -off);
+        setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,-1), -off);
         setFog(1, 1, fog_color);
     }
     else if ( mode == 3 )
     {
         real thk = view_size * 0.05;
-        setClipPlaneEye(GL_CLIP_PLANE2, Vector3(0,0,-1), thk-off);
-        setClipPlaneEye(GL_CLIP_PLANE3, Vector3(0,0,+1), thk+off);
+        setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,-1), thk-off);
+        setClipPlaneEye(GL_CLIP_PLANE2, Vector3(0,0,+1), thk+off);
     }
 }
 
