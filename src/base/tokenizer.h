@@ -36,6 +36,9 @@ namespace Tokenizer
     /// split string using the given separator.
     std::vector<std::string> split(std::string&, char sep, bool get_empty_fields);
     
+    /// read symbol from string if possible, truncating the string in that case
+    std::string split_symbol(std::string&);
+
     /// read integer from string if possible, truncating the string in that case
     bool split_integer(long&, std::string&);
     

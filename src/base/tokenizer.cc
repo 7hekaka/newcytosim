@@ -116,6 +116,19 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
 }
 
 
+std::string Tokenizer::split_symbol(std::string& arg)
+{
+    std::stringstream is(arg);
+    std::string res = get_symbol(is, false);
+    skip_space(is, false);
+    if ( is.good() )
+        arg = arg.substr(is.tellg());
+    else
+        arg.clear();
+    return res;
+}
+
+
 bool Tokenizer::has_symbol(std::istream& is, std::string const& arg, bool eat_line)
 {
     if ( is.good() )

@@ -447,15 +447,17 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 // get a number and the name of a class:
                 size_t num = 1;
                 Tokenizer::split_integer(num, str);
-                SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+                std::string nam = Tokenizer::split_symbol(str);
+                if ( nam.empty() )
+                    throw InvalidParameter("the name of a single should be specified in `"+var+"'");
+                SingleProp * sip = sim.findProperty<SingleProp>("single", nam);
                 
                 Vector vec;
-                bool has_pos = opt.set(str, var, inx++);
                 /* add Wrists anchored on the local coordinate system:
                  need to use unit vectors here since the Triad is build with 'rad' */
                 for ( size_t i = 0; i < num; ++i )
                 {
-                    if ( has_pos )
+                    if ( str.size() )
                         vec = Movable::readPosition(str, nullptr);
                     else
                         vec = Vector::randU();
