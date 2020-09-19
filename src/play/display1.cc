@@ -101,10 +101,13 @@ void Display1::drawBall(Vector const& pos, real radius) const
     gleScale(radius);
     if ( DIM == 3 )
     {
+        GLboolean cull = glIsEnabled(GL_CULL_FACE);
+        if ( !cull ) glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         gleSphere2B();
         glCullFace(GL_BACK);
         gleSphere4B();
+        if ( !cull ) glDisable(GL_CULL_FACE);
     }
     else
         gleDiscB();
