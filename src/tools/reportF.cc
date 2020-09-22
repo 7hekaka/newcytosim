@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
         // load all frames in the file:
         while ( 0 == reader.loadNextFrame(simul) )
         {
-            snprintf(filename, sizeof(filename), "%s%04i.txt", root.c_str(), frame);
+            snprintf(filename, sizeof(filename), "%s%04lu.txt", root.c_str(), frame);
             std::ofstream out(filename);
             report(simul, out, what, arg);
             ++frame;

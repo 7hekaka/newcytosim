@@ -34,12 +34,9 @@ void DisplayProp::read(Glossary& glos)
     glos.set(fold,          "fold");
     glos.set(fold,          "tile", 1);
 
-    glos.set(tile,          "periodic");
-    glos.set(fold,          "periodic", 1);
-//#ifdef BACKWARD_COMPATIBILITY
-    glos.set(tile,          "tiled");
-    glos.set(fold,          "tiled", 1);
-//#endif
+    glos.set(tile, "tiled") || glos.set(tile, "periodic");
+    glos.set(fold, "tiled", 1) || glos.set(fold, "periodic", 1);
+
     glos.set(draw_links,    "draw_links");
 
     glos.set(couple_flip,   "couple_flip");
