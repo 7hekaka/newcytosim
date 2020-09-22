@@ -162,6 +162,9 @@ private:
     /// residual threshold used for iterative solver
     real            tolerance_;
 
+    /// number of preconditionner blocks that could not be factorized
+    size_t          bump_;
+    
     //--------------------------------------------------------------------------
     // Vectors of size DIM * nbPoints()
     

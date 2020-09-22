@@ -982,7 +982,8 @@ void Meca::computePrecondBand(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute Band Preconditionner block\n";
+        //std::clog << "failed to compute Band Preconditionner block\n";
+        ++bump_;
     }
 }
 
@@ -1032,7 +1033,8 @@ void Meca::computePrecondIsoS(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute IsoS Preconditionner block\n";
+        //std::clog << "failed to compute IsoS Preconditionner block\n";
+        ++bump_;
     }
 }
 
@@ -1066,7 +1068,8 @@ void Meca::computePrecondIsoP(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute IsoP Preconditionner block\n";
+        //std::clog << "failed to compute IsoP Preconditionner block\n";
+        ++bump_;
     }
 }
 
@@ -1093,7 +1096,8 @@ void Meca::computePrecondFull(Mecable* mec)
     else
     {
         mec->blockType(0);
-        std::clog << "failed to compute full Preconditionner block\n";
+        //std::clog << "failed to compute full Preconditionner block\n";
+        ++bump_;
     }
 }
 
@@ -1170,6 +1174,7 @@ void Meca::renewPreconditionner(int span)
 
 void Meca::computePreconditionner(int precond, int span)
 {
+    bump_ = 0;
     switch( precond )
     {
         case 0:
@@ -1199,6 +1204,8 @@ void Meca::computePreconditionner(int precond, int span)
             throw InvalidParameter("unknown `precondition' value");
             break;
     }
+    if ( bump_ > 0 )
+        std::clog << "failed to compute " << bump_ << " / " << mecables.size() << " Preconditionner blocks\n";
 }
 
 
