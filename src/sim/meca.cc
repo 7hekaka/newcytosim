@@ -44,14 +44,6 @@
 
 
 /**
- Set to 1 if the Matrix Vector-multiplication can be distributed.
- This will work only if the matrix mC is specifically built for that purpose,
- which is the case of SparMatBlk
- */
-#define PARALLELIZE_MATRIX 0
-
-
-/**
 Set SEPARATE_RIGIDITY_TERMS to chose how Rigidity term are calculated:
    0. Rigidity terms are added to Matrix 'mB' or 'mC'
    1. Rigidity values are calculated on the fly using `Mecable::addRigidity()`

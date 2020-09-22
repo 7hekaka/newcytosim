@@ -9,7 +9,7 @@
 //#include "sparmat.h"
 #include "sparmatsym1.h"
 #include "sparmatsymblk.h"
-//#include "sparmatblk.h"
+#include "sparmatblk.h"
 #include "allocator.h"
 
 
@@ -20,6 +20,15 @@ class Interpolation;
 class SimulProp;
 class Simul;
 
+/**
+ Set to 1 to distribute the Matrix Vector-multiplication in multithreaded code.
+ This will select a type for matrix mC specifically built for that purpose.
+ This option can only be beneficial if NUM_THREADS > 1
+ Do not enable this option for sequential code.
+ */
+#define PARALLELIZE_MATRIX 0
+
+
 // known Matrix block types:
 class Matrix11;
 class Matrix22;
@@ -28,19 +37,22 @@ class Matrix34;
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM
 /**
- It is used to update the matrix mC in 'meca_inter.cc',
- and should match the matrix block from the class used for mC.
+ MatrixBlock is used to update the matrix mC in 'meca_inter.cc',
+ and should match the class used for the blocks of mC.
  */
 #if ( DIM == 1 )
 typedef Matrix11 MatrixBlock;
 #elif ( DIM == 2 )
 typedef Matrix22 MatrixBlock;
+#elif PARALLELIZE_MATRIX
+typedef Matrix34 MatrixBlock;
 #else
 typedef Matrix33 MatrixBlock;
 #endif
 
 
 /// set TRUE to use matrix mB and mC (the traditional way)
+/** This option should be 0 if PARALLELIZE_MATRIX == 1 */
 #define USE_ISO_MATRIX 0
 
 /**
@@ -191,8 +203,12 @@ private:
      It contains terms which are different in the X, Y, Z subspaces,
      arising from addSideLink() addSideSlidingLink(), etc.
     */
+#if PARALLELIZE_MATRIX
+    SparMatBlk     mC;
+#else
     SparMatSymBlk  mC;
-
+#endif
+    
 public:
 
     /// return address of vector where positions are stored

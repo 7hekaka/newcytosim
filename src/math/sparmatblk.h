@@ -72,12 +72,13 @@ private:
     class Line
     {
         friend class SparMatBlk;
+        friend class Meca;
 
-        size_t    size_;    ///< number of elements
-        size_t    allo_;    ///< allocated size
-        Block    * blk_;    ///< block elements
-        Block    * sbk_;    ///< pointer for consolidate elements
-        size_t   * inx_;    ///< column indices for each element
+        size_t  size_;    ///< number of elements
+        size_t  allo_;    ///< allocated size
+        Block  * blk_;    ///< block elements
+        Block  * sbk_;    ///< pointer for consolidated elements
+        size_t * inx_;    ///< column index for each element
         
     public:
         
@@ -195,6 +196,12 @@ public:
     
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
+    
+    /// return line at index j
+    Line const& row(size_t j) const { return row_[j]; }
+    
+    /// return line at index j
+    Line const& column(size_t j) const { return row_[j]; }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
