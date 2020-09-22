@@ -292,25 +292,24 @@ void checkMatrixParallel(MATRIX & mat, const size_t size,
                          real const* x, real const* y, real * z)
 {
     assert_true(mat.size() == size);
-    zero_real(size, z);
-    #pragma omp parallel for num_threads(4)
-    for ( size_t i = 0; i < size; i += CHK )
-        mat.vecMulAdd(x, z, i, i+CHK);
-    real sum1 = checksum(size, y, z);
-
-    zero_real(size, z);
-    #pragma omp parallel for num_threads(8)
-    for ( size_t i = 0; i < size; i += CHK )
-        mat.vecMulAdd(x, z, i, i+CHK);
-    real sum2 = checksum(size, y, z);
     
     zero_real(size, z);
-    #pragma omp parallel for num_threads(16)
-    for ( size_t i = 0; i < size; i += CHK )
-        mat.vecMulAdd(x, z, i, i+CHK);
-    real sum3 = checksum(size, y, z);
+    for ( size_t i = 0; i < size; ++i )
+        mat.vecMulAdd(x, z, i, i+1);
+    real sum = checksum(size, y, z);
+    printf(" check %+16.6f", sum);
 
-    printf("  check %+16.6f %+16.6f %+16.6f", sum1, sum2, sum3);
+    for ( int i = 0; i < 5; ++i )
+    {
+        zero_real(size, z);
+        omp_set_num_threads(1<<i);
+        #pragma omp parallel for
+        for ( size_t u = 0; u < size; u += CHK )
+            mat.vecMulAdd(x, z, u, u+CHK);
+        real sum1 = checksum(size, y, z);
+        if ( sum != sum1 )
+            printf(" %luT %+16.6f", 1<<i, sum1);
+    }
 }
 
 
@@ -320,80 +319,33 @@ void testMatrixParallel(MATRIX & mat,
                         const size_t fill, size_t inx[], size_t iny[])
 {
     mat.resize(size);
-
-    tic();
-    for ( size_t ii=0; ii<N_RUN; ++ii )
-    {
-        mat.reset();
-        for ( size_t n=0; n<fill; ++n )
-            fillMatrix(mat, iny[n], inx[n]);
-    }
-    double ts = toc();
+    mat.reset();
+    for ( size_t n=0; n<fill; ++n )
+        fillMatrix(mat, iny[n], inx[n]);
     mat.prepareForMultiply(1);
-    
-    tic();
-    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
-    {
-        #pragma omp parallel for num_threads(1)
-        for ( size_t i = 0; i < size; i += CHK )
-        {
-            mat.vecMulAdd(y, z, i, i+CHK);
-            mat.vecMulAdd(x, z, i, i+CHK);
-        }
-    }
-    double t1 = toc();
 
-    tic();
-    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
-    {
-        #pragma omp parallel for num_threads(2)
-        for ( size_t i = 0; i < size; i += CHK )
-        {
-            mat.vecMulAdd(y, z, i, i+CHK);
-            mat.vecMulAdd(x, z, i, i+CHK);
-        }
-    }
-    double t2 = toc();
-
-    tic();
-    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
-    {
-        #pragma omp parallel for num_threads(4)
-        for ( size_t i = 0; i < size; i += CHK )
-        {
-            mat.vecMulAdd(y, z, i, i+CHK);
-            mat.vecMulAdd(x, z, i, i+CHK);
-        }
-    }
-    double t4 = toc();
+    const size_t sup = 7;
+    double t[sup] = { 0 };
     
-    tic();
-    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
+    for ( int i = 0; i < sup; ++i )
     {
-        #pragma omp parallel for num_threads(8)
-        for ( size_t i = 0; i < size; i += CHK )
+        omp_set_num_threads(1<<i);
+        tic();
+        for ( size_t j=0; j < N_RUN*N_MUL; ++j )
         {
-            mat.vecMulAdd(y, z, i, i+CHK);
-            mat.vecMulAdd(x, z, i, i+CHK);
+            #pragma omp parallel for
+            for ( size_t i = 0; i < size; i += CHK )
+            {
+                mat.vecMulAdd(y, z, i, i+CHK);
+                mat.vecMulAdd(x, z, i, i+CHK);
+            }
         }
+        t[i] = toc();
     }
-    double t8 = toc();
-    
-    tic();
-    for ( size_t n=0; n<N_RUN*N_MUL; ++n )
-    {
-        #pragma omp parallel for num_threads(16)
-        for ( size_t i = 0; i < size; i += CHK )
-        {
-            mat.vecMulAdd(y, z, i, i+CHK);
-            mat.vecMulAdd(x, z, i, i+CHK);
-        }
-    }
-    double t16 = toc();
 
-    printf("\n%-20s ", mat.what().c_str());
-    printf("1T %7.3f 2T %7.3f  4T %7.3f  8T %7.3f 16T %7.3f", t1, t2, t4, t8, t16);
-    checkMatrixParallel(mat, size, x, y, z);
+    printf("\n%-20s", mat.what().c_str());
+    for ( int i = 0; i < sup; ++i )
+        printf("  %luT %6.3f", 1<<i, t[i]);
 }
 
 #endif
@@ -455,6 +407,7 @@ void testMatrices(const size_t size, const size_t fill)
     SparMatB mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
 #ifdef _OPENMP
     testMatrixParallel(mat5, size, x, y, z, fill, inx, iny);
+    checkMatrixParallel(mat5, size, x, y, z);
 #endif
 
     printf("\n");
