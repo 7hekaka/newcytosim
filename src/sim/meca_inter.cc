@@ -274,7 +274,7 @@ void Meca::addForce(Interpolation const& pti, Vector const& force)
 
 void Meca::addForceToAll(Vector const& force)
 {
-    for ( size_t p = 0; p < nb_points(); ++p )
+    for ( size_t p = 0; p < nbVertices(); ++p )
         add_base(DIM*p, force);
 }
 
@@ -3930,7 +3930,7 @@ void Meca::addPointClampXY(Mecapoint const& ptA,
 void Meca::addPointClampToAll(Vector const& pos, const real weight)
 {
     Vector vec = weight * pos;
-    for ( size_t p = 0; p < nb_points(); ++p )
+    for ( size_t p = 0; p < nbVertices(); ++p )
     {
         sub_iso(p, p, weight);
         add_base(p, vec);

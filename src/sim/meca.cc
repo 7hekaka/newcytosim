@@ -45,7 +45,8 @@
 
 /**
  Set to 1 if the Matrix Vector-multiplication can be distributed.
- This will work only if the matrix mC is specifically build for that purpose
+ This will work only if the matrix mC is specifically built for that purpose,
+ which is the case of SparMatBlk
  */
 #define PARALLELIZE_MATRIX 0
 
@@ -1704,7 +1705,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     {
         --doNotify;
         std::stringstream oss;
-        oss << "\tsize " << DIM << "*" << nb_points() << " kern " << largestMecable();
+        oss << "\tsize " << DIM << "*" << nbVertices() << " kern " << largestMecable();
 #if USE_ISO_MATRIX
         oss << " " << mB.what();
         if ( useMatrixC )
@@ -1755,7 +1756,7 @@ void Meca::apply()
                 abort();
             }
         }
-        //#pragma omp parallel for num_threads(NUM_THREADS)
+        #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
             mec->getForces(vFOR+DIM*mec->matIndex());

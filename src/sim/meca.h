@@ -346,7 +346,7 @@ public:
     bool     empty() const { return nPoints_ == 0; }
     
     /// number of points in the system
-    size_t   nb_points() const { return nPoints_; }
+    size_t   nbVertices() const { return nPoints_; }
     
     /// Implementation of LinearOperator::size()
     size_t   dimension() const { return DIM * nPoints_; }
