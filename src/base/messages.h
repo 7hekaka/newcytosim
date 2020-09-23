@@ -109,7 +109,7 @@ namespace Cytosim
 
     };
     
-    /// for usual output
+    /// for normal output
     extern Output out;
 
     /// for logs

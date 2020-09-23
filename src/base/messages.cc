@@ -13,7 +13,7 @@ namespace Cytosim
     /// for warnings
     Output warn(std::cerr, 32U, "WARNING: ");
     
-    /// turn all output off
+    /// supress all output
     void silence_all()
     {
         Cytosim::out.silent();

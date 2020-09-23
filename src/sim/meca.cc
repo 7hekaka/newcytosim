@@ -1205,7 +1205,7 @@ void Meca::computePreconditionner(int precond, int span)
             break;
     }
     if ( bump_ > 0 )
-        std::clog << "failed to compute " << bump_ << " / " << mecables.size() << " Preconditionner blocks\n";
+        Cytosim::log << "failed to compute " << bump_ << " / " << mecables.size() << " preconditionner blocks\n";
 }
 
 
