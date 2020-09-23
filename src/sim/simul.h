@@ -264,19 +264,19 @@ public:
     static Mecable* toMecable(Object *);
 
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
-    Mecable*        findMecable(const std::string& spec) const;
+    Mecable*        findMecable(const std::string&) const;
     
-    /// find a Solid
+    /// find a Solid by name
     Solid *         findSolid(std::string s) { return Solid::toSolid(solids.findObject(s, "solid")); }
     
-    /// find a Fiber
+    /// find a Fiber by name
     Fiber *         findFiber(std::string s) { return Fiber::toFiber(fibers.findObject(s, "fiber")); }
     
-    /// find a Fiber
+    /// find a Sphere by name
     Sphere *        findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
     
     /// return first Space with given name
-    Space const*    findSpace(std::string const& name) const;
+    Space const*    findSpace(std::string const&) const;
     
     //---------------------------- PROPERTIES ----------------------------------
 

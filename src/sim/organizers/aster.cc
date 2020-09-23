@@ -338,10 +338,11 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
                 opt.define("placement", "off");
                 //std::clog << "Aster created on solid " << sol->reference() << "\n";
             }
+            else
+                throw InvalidParameter("unknown aster:solid `"+spec+"'");
         }
     }
-    
-    if ( ! sol )
+    else
         throw InvalidParameter("aster:solid must be specified");
     
     // check that there is at least one point:
