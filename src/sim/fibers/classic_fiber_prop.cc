@@ -134,7 +134,7 @@ void ClassicFiberProp::complete(Simul const& sim)
             if ( catastrophe_rate[i] > catastrophe_rate_stalled[i] )
                 throw InvalidParameter("fiber:catastrophe_rate_stalled must be greater than catastrophe_rate");
 
-            if ( sim.ready()  &&  growing_speed[i] + growing_off_speed[i] <= 0 )
+            if ( sim.primed()  &&  growing_speed[i] + growing_off_speed[i] <= 0 )
                 Cytosim::warn << "fiber:growing_speed + growing_off_speed <= 0\n";
             
             if ( growing_speed[i] + growing_off_speed[i] <= 0 )
@@ -161,7 +161,7 @@ void ClassicFiberProp::complete(Simul const& sim)
     
     if ( catastrophe_space_ptr )
         catastrophe_space = catastrophe_space_ptr->name();
-    else if ( sim.ready() )
+    else if ( sim.primed() )
         throw InvalidParameter("A space must be defined as catastrophe_outside[1]");
 #endif
 }

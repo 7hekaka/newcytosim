@@ -60,7 +60,7 @@ void WalkerProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.ready() && stall_force <= 0 )
+    if ( sim.primed() && stall_force <= 0 )
         throw InvalidParameter("walker:stall_force must be > 0");
     
     if ( unbinding_chance < 0 )

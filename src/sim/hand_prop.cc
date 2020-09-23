@@ -257,7 +257,7 @@ void HandProp::complete(Simul const& sim)
     if ( hold_shrinking_end < 0 )
         throw InvalidParameter(name()+":hold_shrinking_end must be >= 0");
 
-    if ( sim.ready() )
+    if ( sim.primed() )
     {
         if ( binding_prob > sim.prop->acceptable_prob )
             Cytosim::warn << name() << ":binding_rate is too high: decrease time_step\n";

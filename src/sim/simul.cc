@@ -76,7 +76,7 @@ fibers(*this), spheres(*this), beads(*this), solids(*this),
 singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 {
     pMeca1D = nullptr;
-    sReady  = 0;
+    primed_  = 0;
 #if POOL_HAND_ATTACHMENT
     dontAttach = 0;
 #endif

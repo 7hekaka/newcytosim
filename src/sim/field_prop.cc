@@ -77,7 +77,7 @@ void FieldProp::complete(Simul const& sim)
     
     if ( field_space_ptr )
         field_space = field_space_ptr->name();
-    else if ( sim.ready() )
+    else if ( sim.primed() )
         throw InvalidParameter("field::space must be created before the field");
 
     if ( step < REAL_EPSILON )
@@ -89,7 +89,7 @@ void FieldProp::complete(Simul const& sim)
     real theta = 2 * DIM * time_step * (diffusion+full_diffusion) / ( step * step );
     //std::clog << "The CFL condition for `" << name() << "' is " << theta << std::endl;
     
-    if ( sim.ready()  &&  theta > 0.5 )
+    if ( sim.primed()  &&  theta > 0.5 )
     {
         InvalidParameter e("field:diffusion is too fast");
         e << "The CFL condition ( diffusion * time_step / step^2 ) must be below 1/2,";

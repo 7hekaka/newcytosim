@@ -45,7 +45,7 @@ void KinesinProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.ready() && force <= 0 )
+    if ( sim.primed() && force <= 0 )
         throw InvalidParameter("kinesin:force must be > 0");
     force_inv = 1.0 / force;
     
@@ -61,7 +61,7 @@ void KinesinProp::complete(Simul const& sim)
     if ( abs_real(directionality) != 1 )
         throw InvalidParameter("kinesin:directionality must be +/- 1");
     
-    if ( sim.ready() )
+    if ( sim.primed() )
     {
         real stall = log(forward_rate/backward_rate)*0.5/force_inv;
         printf("Kinesin's stall force is %.4f pN\n", stall);

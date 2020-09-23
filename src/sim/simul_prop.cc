@@ -143,7 +143,7 @@ void SimulProp::complete(Simul const& sim)
     if ( time_step < 0 )
         throw InvalidParameter("simul:time_step must be > 0");
 
-    if ( sim.ready() )
+    if ( sim.primed() )
     {
         if ( viscosity <= 0 )
             throw InvalidParameter("simul:viscosity must be > 0");

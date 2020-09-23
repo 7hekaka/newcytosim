@@ -61,7 +61,7 @@ public:
 private:
     
     /// signals that Simul is ready to perform a Monte-Carlo step
-    int             sReady;
+    int             primed_;
 
     /// preconditionning method used/determined by `solve_auto()`
     unsigned int    autoPrecond;
@@ -178,10 +178,10 @@ public:
     void            relax();
     
     /// this is called to signal that engine is ready to proceed
-    void            unrelax() { sReady = 2; }
+    void            unrelax() { primed_ = 2; }
 
     /// true if engine is ready to go (between `prepare()` and `relax()`)
-    int             ready() const { return sReady; }
+    int             primed() const { return primed_; }
 
     
     /// call setInteractions(Meca) for all objects (this is called before `solve()`

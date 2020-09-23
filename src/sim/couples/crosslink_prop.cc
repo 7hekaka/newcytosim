@@ -43,7 +43,7 @@ void CrosslinkProp::complete(Simul const& sim)
     CoupleProp::complete(sim);
     
     // check for unsupported features:
-    if ( sim.ready() && trans_activated )
+    if ( sim.primed() && trans_activated )
         throw InvalidParameter("couple:activity=crosslink and trans_activated are incompatible");
 }
 

@@ -516,7 +516,7 @@ void Simul::computeForces() const
 {
     // we could use here an accessory Meca mec;
     try {
-        if ( !ready() )
+        if ( !primed() )
         {
             prop->complete(*this);
             sMeca.prepare(this);

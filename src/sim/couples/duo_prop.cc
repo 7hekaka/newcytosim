@@ -62,7 +62,7 @@ void DuoProp::complete(Simul const& sim)
     
     activation_space_ptr = sim.findSpace(activation_space);
     
-    if ( sim.ready()  &&  !activation_space_ptr )
+    if ( sim.primed()  &&  !activation_space_ptr )
         throw InvalidParameter("duo:activation_space not found!");
 
     if ( deactivation_rate < 0 )

@@ -73,7 +73,7 @@ void Simul::prepare()
     if ( !spaces.master() )
         throw InvalidSyntax("A space must be defined first!");
 
-    sReady = 1;
+    primed_ = 1;
 
     // make sure properties are ready for simulations:
     prop->complete(*this);
@@ -88,7 +88,7 @@ void Simul::prepare()
     singles.prepare(properties);
     couples.prepare(properties);
     
-    sReady = 2;
+    primed_ = 2;
 }
 
 
@@ -181,14 +181,14 @@ void Simul::relax()
 {
     singles.relax();
     couples.relax();
-    sReady = 0;
+    primed_ = 0;
 }
 
 
 void Simul::drawLinks() const
 {
     sMeca.drawLinks = true;
-    if ( !sReady )
+    if ( !primed_ )
         prop->complete(*this);
     sMeca.prepare(this);
     setAllInteractions(sMeca);

@@ -124,7 +124,7 @@ void DynamicFiberProp::complete(Simul const& sim)
         min_length = 3 * unit_length;
      
     /// print predicted average length in verbose mode:
-    if ( sim.ready() && sim.prop->verbose )
+    if ( sim.primed() && sim.prop->verbose )
         splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0]);
 }
 

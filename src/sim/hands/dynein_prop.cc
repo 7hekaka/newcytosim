@@ -40,7 +40,7 @@ void DyneinProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.ready() && stall_force <= 0 )
+    if ( sim.primed() && stall_force <= 0 )
         throw InvalidParameter("dynein:stall_force must be > 0");
     
     if ( unloaded_speed < 0 )

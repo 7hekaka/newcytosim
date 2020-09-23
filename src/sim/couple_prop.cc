@@ -107,7 +107,7 @@ void CoupleProp::complete(Simul const& sim)
 
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
-    else if ( sim.ready() && confine != CONFINE_OFF )
+    else if ( sim.primed() && confine != CONFINE_OFF )
         throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
     
     if ( length < 0 )
@@ -135,7 +135,7 @@ void CoupleProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":hand2 must be defined");
     hand2_prop = sim.findProperty<HandProp>("hand", hand2);
     
-    if ( sim.ready() )
+    if ( sim.primed() )
     {
         hand1_prop->checkStiffness(stiffness, length, 2, sim.prop->kT);
         /*

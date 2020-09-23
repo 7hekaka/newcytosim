@@ -48,7 +48,7 @@ void MightyProp::complete(Simul const& sim)
 {
     HandProp::complete(sim);
     
-    if ( sim.ready() && stall_force <= 0 )
+    if ( sim.primed() && stall_force <= 0 )
         throw InvalidParameter("mighty:stall_force must be > 0");
     
     if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )

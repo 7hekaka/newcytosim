@@ -59,7 +59,7 @@ void MotorProp::complete(Simul const& sim)
 {
     HandProp::complete(sim);
     
-    if ( sim.ready() && stall_force <= 0 )
+    if ( sim.primed() && stall_force <= 0 )
         throw InvalidParameter("motor:stall_force must be > 0");
     
 #if NEW_VARIABLE_SPEED
@@ -70,7 +70,7 @@ void MotorProp::complete(Simul const& sim)
     if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )
         throw InvalidParameter("motor:unbinding_density must be > 0");
 
-    if ( sim.ready() && unbinding_density > 0 )
+    if ( sim.primed() && unbinding_density > 0 )
     {
         real rate = unbinding_rate + unbinding_density * unloaded_speed;
         std::clog << name() + " unbinding rate: unloaded " << rate << " stalled " << unbinding_rate << std::endl;

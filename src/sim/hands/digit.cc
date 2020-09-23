@@ -193,6 +193,7 @@ std::ostream& operator << (std::ostream& os, Digit const& arg)
 #if FIBER_HAS_LATTICE
 void Fiber::resetLattice()
 {
+    assert_false(frLattice.bad());
     frLattice.clear();
     
     for ( Hand * ha = frHands.front(); ha; ha = ha->next() )

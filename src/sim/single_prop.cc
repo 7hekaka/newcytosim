@@ -134,7 +134,7 @@ void SingleProp::complete(Simul const& sim)
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
 
-    if ( sim.ready() && confine != CONFINE_OFF )
+    if ( sim.primed() && confine != CONFINE_OFF )
     {
         if ( !confine_space_ptr )
             throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
@@ -167,7 +167,7 @@ void SingleProp::complete(Simul const& sim)
     if ( length < 0 )
         throw InvalidParameter(name()+":length must be >= 0");
 
-    if ( sim.ready() && stiffness > 0 )
+    if ( sim.primed() && stiffness > 0 )
     {
         hand_prop->checkStiffness(stiffness, length, 1, sim.prop->kT);
         

@@ -486,7 +486,7 @@ void FiberProp::complete(Simul const& sim)
     confine_space_ptr = sim.findSpace(confine_space);
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
-    else if ( sim.ready() && confine != CONFINE_OFF )
+    else if ( sim.primed() && confine != CONFINE_OFF )
         throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
     
     if ( confine_stiffness < 0 )
@@ -496,14 +496,14 @@ void FiberProp::complete(Simul const& sim)
     confine2_space_ptr = sim.findSpace(confine2_space);
     if ( confine2_space_ptr )
         confine2_space = confine2_space_ptr->name();
-    else if ( sim.ready() && confine2 != CONFINE_OFF )
+    else if ( sim.primed() && confine2 != CONFINE_OFF )
         throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
     
     if ( confine2_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
 #endif
     
-    if ( sim.ready() && steric && !sim.prop->steric )
+    if ( sim.primed() && steric && !sim.prop->steric )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( min_length < 0 )
@@ -521,7 +521,7 @@ void FiberProp::complete(Simul const& sim)
 
     if ( glue )
     {
-        if ( sim.ready() )
+        if ( sim.primed() )
             glue_prop = sim.findProperty<SingleProp>("single", glue_single);
     }
     
@@ -531,7 +531,7 @@ void FiberProp::complete(Simul const& sim)
         field_ptr = static_cast<Field*>(sim.fields.findObject(fp));
     }
     
-    if ( lattice && sim.ready() )
+    if ( lattice && sim.primed() )
     {
 #if FIBER_HAS_LATTICE
         if ( lattice_unit <= 0 )
@@ -541,7 +541,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
 
-    if ( mesh && sim.ready() )
+    if ( mesh && sim.primed() )
     {
 #if FIBER_HAS_MESH
         if ( mesh_unit <= 0 )
@@ -563,7 +563,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
     
-    if ( mesh_aging_rate > 0 && !mesh && sim.ready() )
+    if ( mesh_aging_rate > 0 && !mesh && sim.primed() )
         throw InvalidParameter("for `mesh_aging_rate', the mesh must be defined");
 
     if ( rigidity < 0 )
