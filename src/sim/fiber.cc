@@ -290,6 +290,8 @@ void Fiber::cutM(real len)
         Hand * nx = ha->next();
         if ( ha->abscissa() < abs )
             ha->detach();
+        else
+            ha->update();
         ha = nx;
     }
 }
@@ -311,6 +313,8 @@ void Fiber::cutP(real len)
         Hand * nx = ha->next();
         if ( ha->abscissa() > abs )
             ha->detach();
+        else
+            ha->update();
         ha = nx;
     }
 }
@@ -338,7 +342,8 @@ Fiber* Fiber::severPoint(size_t pti)
     
     // copy the Chain part of the object:
     *(static_cast<Chain*>(fib)) = *this;
-    
+    *(static_cast<Object*>(fib)) = *this;
+
     // the signature on both pieces should be conserved:
     fib->signature(signature());
     fib->birthTime(birthTime());
@@ -347,7 +352,8 @@ Fiber* Fiber::severPoint(size_t pti)
     // remove MINUS_END portion on new piece:
     fib->truncateM(pti);
     assert_true(fib->abscissaM() == abs);
-    
+    fib->updateFiber();
+
 #if FIBER_HAS_MESH
     if ( frMesh.ready() )
     {
@@ -408,24 +414,22 @@ Fiber* Fiber::severP(real abs)
     // the signature on both pieces should be conserved:
     assert_true(fib->signature() == signature());
     assert_true(fib->birthTime() == birthTime());
-
     assert_small(fib->abscissaM() - abscissaM());
+    assert_small(fib->abscissaP() - abscissaP());
+
     // remove MINUS_END portion on new piece
     fib->Chain::cutM(abs);
+    // initialize Lattice on new piece
+    fib->updateFiber();
 
 #if FIBER_HAS_MESH
     if ( frMesh.ready() )
     {
         assert_true( frMesh.unit() == fib->frMesh.unit() );
-        // ensure valid range:
-        fib->frMesh.setRange(abscissaM()+abs, abscissaP());
-        
         // transfer Lattice values located above the cut:
         fib->frMesh.takeP(frMesh, frMesh.index_round(abscissaM()+abs));
     }
 #endif
-    
-    assert_small(fib->abscissaM()-abs-abscissaM());
     
     // remove PLUS_END portion on self
     Chain::cutP(length()-abs);
@@ -466,6 +470,7 @@ void Fiber::severNow()
      */
     for ( SeverPos const& cut : pendingCuts )
     {
+        //std::clog << "cut " << cut.abs << " [ " << abscissaM() << " " << abscissaP() << " ]\n";
         if ( cut.abs - abscissaM() <= prop->min_length )
         {
             // we check the range again, since the fiber tip may have changed:
@@ -518,7 +523,7 @@ void Fiber::severNow()
                 }
             
 #ifdef LOGGING
-                Cytosim::log << "severed " << reference() << " at abscissa " << s->abs;
+                Cytosim::log << "severed " << reference() << " at abscissa " << cut.abs;
                 Cytosim::log << "   creating " << frag->reference();
                 Cytosim::log << "   position " << frag->posEndM() << std::endl;
 #endif
@@ -600,7 +605,9 @@ void Fiber::join(Fiber * fib)
 
     // join backbones
     Chain::join(fib);
-    
+    // extend Lattice range
+    updateFiber();
+
     //transfer dynamic state of PLUS_END:
     setEndStateP(fib->endStateP());
 
@@ -608,9 +615,6 @@ void Fiber::join(Fiber * fib)
     if ( frMesh.ready() )
     {
         assert_true( frMesh.unit() == fib->frMesh.unit() );
-        // ensure valid range:
-        frMesh.setRange(abscissaM(), abscissaP());
-        
         // transfer Lattice values from other fiber
         frMesh.takeP(fib->frMesh, frMesh.indexM());
     }
@@ -1252,7 +1256,7 @@ Update all Mesh values according to:
  */
 void Fiber::evolveMeshValues(Lattice<real>& lat, real cst, real fac) const
 {
-    assert_true(lat.ready());
+    assert_false(lat.bad());
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
@@ -1266,7 +1270,7 @@ void Fiber::evolveMeshValues(Lattice<real>& lat, real cst, real fac) const
 
 void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real binding_rate) const
 {
-    assert_true(lat.ready());
+    assert_false(lat.bad());
     // we want roughly one point per cell:
     const real spread = fld->cellWidth();
     
@@ -1351,7 +1355,7 @@ void Fiber::equilibrateMesh(Lattice<real>& lat, Field * fld, real on, real off) 
 
 void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
 {
-    assert_true( lat.ready() );
+    assert_false(lat.bad());
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     assert_true( inf <= sup );

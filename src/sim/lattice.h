@@ -194,7 +194,7 @@ public:
     /// true if lattice unit size was set
     bool ready() const
     {
-        return laUnit > REAL_EPSILON;
+        return ( laUnit > REAL_EPSILON );
     }
 
     /// change distance betwen adjacent sites
@@ -537,16 +537,14 @@ public:
         write(out);
     }
     
-    /// debug function
+    /// check basic requirements
     int bad()
     {
-        if ( laSite ) {
-            if ( laInf > laSup )
-                return 1;
-        }
+        if ( laUnit <= 0 )   return 1;
+        if ( !laSite )       return 2;
+        if ( laInf > laSup ) return 4;
         return 0;
     }
-    
 };
 
 #endif
