@@ -141,14 +141,14 @@ void SingleProp::complete(Simul const& sim)
     }
 
     if ( hand.empty() )
-        throw InvalidParameter("single:hand must be defined");
+        throw InvalidParameter(name()+":hand must be defined");
     hand_prop = sim.findProperty<HandProp>("hand", hand);
     
     if ( !hand_prop )
         throw InvalidParameter("unknown single:hand '"+hand+"'");
 
     if ( diffusion < 0 )
-        throw InvalidParameter("single:diffusion must be >= 0");
+        throw InvalidParameter(name()+":diffusion must be >= 0");
 
     /**
      We want for one degree of freedom to fulfill `var(dx) = 2 D time_step`
@@ -162,10 +162,10 @@ void SingleProp::complete(Simul const& sim)
 #endif
     
     if ( stiffness < 0 )
-        throw InvalidParameter("single:stiffness must be >= 0");
+        throw InvalidParameter(name()+":stiffness must be >= 0");
 
     if ( length < 0 )
-        throw InvalidParameter("single:length must be >= 0");
+        throw InvalidParameter(name()+":length must be >= 0");
 
     if ( sim.ready() && stiffness > 0 )
     {
@@ -211,7 +211,7 @@ real SingleProp::spaceVolume() const
     real volume = confine_space_ptr->volume();
     
     if ( volume <= 0 )
-        throw InvalidParameter("single:confinement has null volume");
+        throw InvalidParameter(name()+":confinement has null volume");
     
     return volume;
 }

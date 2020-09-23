@@ -111,10 +111,10 @@ void CoupleProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
     
     if ( length < 0 )
-        throw InvalidParameter("couple:length must be >= 0");
+        throw InvalidParameter(name()+":length must be >= 0");
     
     if ( diffusion < 0 )
-        throw InvalidParameter("couple:diffusion must be >= 0");
+        throw InvalidParameter(name()+":diffusion must be >= 0");
 
     /**
      We want for one degree of freedom to fulfill `var(dx) = 2 D time_step`
@@ -125,14 +125,14 @@ void CoupleProp::complete(Simul const& sim)
     diffusion_dt = sqrt( 6.0 * diffusion * sim.time_step() );
 
     if ( stiffness < 0 )
-        throw InvalidParameter("couple:stiffness must be specified and >= 0");
+        throw InvalidParameter(name()+":stiffness must be specified and >= 0");
     
     if ( hand1.empty() )
-        throw InvalidParameter("couple:hand1 must be defined");
+        throw InvalidParameter(name()+":hand1 must be defined");
     hand1_prop = sim.findProperty<HandProp>("hand", hand1);
    
     if ( hand2.empty() )
-        throw InvalidParameter("couple:hand2 must be defined");
+        throw InvalidParameter(name()+":hand2 must be defined");
     hand2_prop = sim.findProperty<HandProp>("hand", hand2);
     
     if ( sim.ready() )
@@ -182,7 +182,7 @@ real CoupleProp::spaceVolume() const
     real volume = confine_space_ptr->volume();
     
     if ( volume <= 0 )
-        throw InvalidParameter("couple:confinement has null volume");
+        throw InvalidParameter(name()+":confinement has null volume");
     
     return volume;
 }

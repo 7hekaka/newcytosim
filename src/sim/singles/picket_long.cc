@@ -13,7 +13,7 @@ PicketLong::PicketLong(SingleProp const* p, Vector const& w)
 {
 #if ( 0 )
     if ( p->diffusion > 0 )
-        throw InvalidParameter("single:diffusion cannot be > 0 if activity=fixed");
+        throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=fixed");
 #endif
 }
 

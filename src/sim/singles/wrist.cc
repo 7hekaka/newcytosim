@@ -15,7 +15,7 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
 
 #if ( 0 )
     if ( p->diffusion > 0 )
-        throw InvalidParameter("single:diffusion cannot be > 0 if activity=anchored");
+        throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
 #endif
 }
 
@@ -28,7 +28,7 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t a, size_t b, real 
     
 #if ( 0 )
     if ( p->diffusion > 0 )
-        throw InvalidParameter("single:diffusion cannot be > 0 if activity=anchored");
+        throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
 #endif
 }
 
@@ -41,7 +41,7 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t ref, Vector pos)
     
 #if ( 0 )
     if ( p->diffusion > 0 )
-        throw InvalidParameter("single:diffusion cannot be > 0 if activity=anchored");
+        throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
 #endif
 }
 
