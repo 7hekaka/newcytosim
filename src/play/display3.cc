@@ -624,10 +624,9 @@ void color_by_lattice_jet(Fiber const& fib, long ix, real scale)
 }
 
 
-void Display3::drawFiberLattice(Fiber const& fib, real width,
+void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, real width,
                                 void (*set_color)(Fiber const&, long, real)) const
 {
-    VisibleLattice const& lat = *fib.visibleLattice();
     FiberDisp const*const disp = fib.prop->disp;
 
     glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);
@@ -668,19 +667,19 @@ void Display3::drawFiberLattice(Fiber const& fib, real width,
 }
 
 
-void Display3::drawFiberLattice1(Fiber const& fib, real width) const
+void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    drawFiberLattice(fib, width, color_by_lattice);
+    drawFiberLattice(fib, lat, width, color_by_lattice);
 }
 
-void Display3::drawFiberLattice2(Fiber const& fib, real width) const
+void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    drawFiberLattice(fib, width, color_by_lattice_jet);
+    drawFiberLattice(fib, lat, width, color_by_lattice_jet);
 }
 
-void Display3::drawFiberLatticeEdges(Fiber const& fib, real width) const
+void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    drawFiberLattice(fib, width, color_alternate);
+    drawFiberLattice(fib, lat, width, color_alternate);
 }
 
 //------------------------------------------------------------------------------

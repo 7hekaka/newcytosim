@@ -46,7 +46,7 @@ private:
     void drawFiberSegment(Fiber const&, bool capM, bool capP, real rad, real abs1, real abs2) const;
     
     /// display lattice subtance using specified color function
-    void drawFiberLattice(Fiber const&, real width, void (*set_color)(Fiber const&, long, real)) const;
+    void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, void (*set_color)(Fiber const&, long, real)) const;
 
 public:
         
@@ -72,13 +72,13 @@ public:
     void drawFiberSegmentT(Fiber const&, size_t) const;
 
     /// display lattice subtance using color
-    void drawFiberLattice1(Fiber const&, real width) const;
+    void drawFiberLattice1(Fiber const&, VisibleLattice const&, real width) const;
     
     /// display lattice subtance using color
-    void drawFiberLattice2(Fiber const&, real width) const;
+    void drawFiberLattice2(Fiber const&, VisibleLattice const&, real width) const;
 
     /// draw Edges of lattice
-    void drawFiberLatticeEdges(Fiber const&, real width) const;
+    void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real width) const;
 
     /// draw Fiber point-like features
     void drawFiberPoints(Fiber const&) const;

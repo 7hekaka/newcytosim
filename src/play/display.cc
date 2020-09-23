@@ -1015,9 +1015,8 @@ void set_lattice_color(Fiber const& fib, real val)
  This style uses one vertex for each site, positionned at the center of the range
  OpenGL will interpolate the colors, and each site will be covered by a gradient.
  */
-void Display::drawFiberLattice1(Fiber const& fib, real width) const
+void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    VisibleLattice const& lat = *fib.visibleLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1075,9 +1074,8 @@ void Display::drawFiberLattice1(Fiber const& fib, real width) const
  This style, uses two vertices for each site, positionned at the extremity of the range,
  and each site is entirely covered by the color corresponding to the value.
  */
-void Display::drawFiberLattice2(Fiber const& fib, real width) const
+void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    VisibleLattice const& lat = *fib.visibleLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1132,9 +1130,8 @@ void Display::drawFiberLattice2(Fiber const& fib, real width) const
 /**
  Indicate the edges between sites with small dots
  */
-void Display::drawFiberLatticeEdges(Fiber const& fib, real) const
+void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real) const
 {
-    VisibleLattice const& lat = *fib.visibleLattice();
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1458,15 +1455,15 @@ void Display::drawFiber(Fiber const& fib)
         switch ( disp->lattice_style )
         {
             case 1:
-                drawFiberLattice1(fib, disp->line_width);
+                drawFiberLattice1(fib, *lat, disp->line_width);
                 line_style = 0;
                 break;
             case 2:
-                drawFiberLattice2(fib, disp->line_width);
+                drawFiberLattice2(fib, *lat, disp->line_width);
                 line_style = 0;
                 break;
             case 3:
-                drawFiberLatticeEdges(fib, disp->line_width);
+                drawFiberLatticeEdges(fib, *lat, disp->line_width);
                 line_style = 0;
                 break;
         }
