@@ -60,8 +60,10 @@ void ClassicFiberProp::read(Glossary& glos)
     glos.set(catastrophe_length,    "catastrophe_length");
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
-    glos.set(catastrophe_outside,   "catastrophe_outside");
     glos.set(catastrophe_space,     "catastrophe_outside", 1);
+    if ( glos.set(catastrophe_outside, "catastrophe_outside") )
+        if ( catastrophe_space.empty() )
+            throw InvalidParameter("A space must be defined as catastrophe_outside[1]");
 #endif
 
 #ifdef BACKWARD_COMPATIBILITY
@@ -161,8 +163,6 @@ void ClassicFiberProp::complete(Simul const& sim)
     
     if ( catastrophe_space_ptr )
         catastrophe_space = catastrophe_space_ptr->name();
-    else if ( sim.primed() )
-        throw InvalidParameter("A space must be defined as catastrophe_outside[1]");
 #endif
 }
 
