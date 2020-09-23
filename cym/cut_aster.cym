@@ -42,6 +42,15 @@ set aster star
     stiffness = 1000, 500
 }
 
+new star
+{
+    solid = core
+    point1 = center, 0.5
+    radius = 0.5
+    position = circle 3
+    fibers = 32, microtubule, ( plus_end=grow; length = 5, 4; )
+}
+
 set hand cutter
 {
     binding_rate = 10
@@ -56,20 +65,11 @@ set hand cutter
 
 set single katanin
 {
-    hand=cutter
+    hand = cutter
     stiffness = 0
     diffusion = 10
 }
-new 100 katanin
-
-new star
-{
-    solid = core
-    point1 = center, 0.5
-    radius = 0.5
-    position = circle 3
-    fibers = 32, microtubule, ( plus_end=grow; length = 5, 4; )
-}
+new 1000 katanin
 
 run system
 {

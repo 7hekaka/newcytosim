@@ -1,0 +1,96 @@
+% Mixing cutting activity with digital hands and occupancy lattice
+% F. Nedelec, Sep. 2020
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 0.01
+    verbose = 0
+}
+
+set space cell
+{
+    shape = sphere
+}
+
+new cell
+{
+    radius = 2
+}
+
+set fiber microtubule
+{
+    rigidity = 30
+    segmentation = 0.5
+    lattice = 1, 0.010
+    confine = inside, 100
+    display = ( line=3; lattice = 1; )
+}
+
+set hand kinesin
+{
+    binding_rate = 10
+    binding_range = 0.06
+    unbinding_rate = 0.3
+
+    activity = walk
+    
+    unloaded_speed = 0
+    stall_force = 6
+    step_size = 0.010
+
+    unbinding_force = 3
+    hold_growing_end = 0
+    hold_shrinking_end = 0
+    display = ( color=blue; )
+}
+
+set hand cutter
+{
+    binding = 10, 0.05
+    unbinding = 0, 3
+
+    activity = cut
+    cutting_rate = 1
+    new_end_state = 1, 4
+    display = ( color=green; )
+}
+
+set single motor
+{
+    hand = kinesin
+    diffusion = 2
+}
+
+set single katanin
+{
+    hand = cutter
+    diffusion = 0.2
+}
+
+set solid core
+{
+    display = ( style=3; color=red; )
+}
+
+set aster star
+{
+    stiffness = 1000, 500
+}
+
+new star
+{
+    solid = core
+    radius = 0.25
+    point1 = center, 0.25
+    fibers = 32, microtubule, ( length = 2; )
+}
+
+new 10000 motor
+new 100 katanin
+
+run system
+{
+    nb_steps = 100000
+    nb_frames = 100
+}
