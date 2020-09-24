@@ -57,8 +57,8 @@ std::string format_count(size_t c)
     if ( c == 0 )
         return " (unused)";
     if ( c == 1 )
-        return " (used once)";
-    return " (used " + std::to_string(c) + " times)";
+        return " (used)";
+    return " (used " + std::to_string(c) + "x)";
 }
     
 
@@ -159,12 +159,28 @@ void Glossary::clear_except(key_type const& key)
 }
 
 
-void Glossary::clear_counts() const
+void Glossary::clear_counts()
 {
-    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
+    for ( auto& i : mTerms )
     {
-        for ( val_type const& v : i->second )
+        for ( val_type const& v : i.second )
             v.count_ = 0;
+    }
+}
+
+
+void Glossary::add_counts(Glossary const& opt)
+{
+    for ( auto& i : mTerms )
+    {
+        map_type::const_iterator w = opt.mTerms.find(i.first);
+        if ( w != opt.mTerms.end() )
+        {
+            size_t sup = std::min(i.second.size(), w->second.size());
+            std::clog << " Glossary::add_counts " << w->first << " " << sup << "\n";
+            for ( size_t n = 0; n < sup; ++n )
+                i.second[n].count_ = std::max(i.second[n].count_, w->second[n].count_);
+        }
     }
 }
 
@@ -184,15 +200,15 @@ Glossary Glossary::extract(key_type const& key) const
 Glossary Glossary::extract_unused() const
 {
     Glossary res;
-    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
+    for ( const pair_type i : mTerms )
     {
         bool used = false;
-        for ( val_type const& v : i->second )
+        for ( val_type const& v : i.second )
             if ( v.count_ == 0 )
                 used = true;
         
         if ( !used )
-            res.mTerms[i->first] = i->second;
+            res.mTerms[i.first] = i.second;
     }
     return res;
 }
@@ -399,7 +415,7 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
  - `1`, a prexisting symbol in not altered, but no exception is thrown
  - `2`, an exception is thrown for any duplicate symbol
  */
-void Glossary::add_entry(Glossary::pair_type& pair, int no_overwrite)
+void Glossary::add_entry(Glossary::pair_type const& pair, int no_overwrite)
 {
     VLOG0("Glossary::ENTRY" << pair.second.size() << "   " << pair << '\n');
     
@@ -490,12 +506,21 @@ void Glossary::define(key_type const& key, const std::string& rhs)
 //------------------------------------------------------------------------------
 #pragma mark - Output
 
+void Glossary::write_counts(std::ostream& os, std::string const& prefix) const
+{
+    for ( auto const& i : mTerms )
+    {
+        os << prefix << format_counts(i);
+        std::endl(os);
+    }
+}
+
 
 void Glossary::write(std::ostream& os, std::string const& prefix) const
 {
-    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
+    for ( auto const& i : mTerms )
     {
-        os << prefix << format(*i);
+        os << prefix << format(i);
         std::endl(os);
     }
 }
@@ -726,9 +751,9 @@ int Glossary::has_warning(std::ostream& os, size_t threshold) const
 {
     int res = 0;
     std::string msg;
-    for ( map_type::const_iterator i = mTerms.begin(); i != mTerms.end(); ++i )
+    for ( pair_type const& i : mTerms )
     {
-        int val = warning(*i, msg, threshold);
+        int val = warning(i, msg, threshold);
         if ( val )
         {
             if ( res ) os.put('\n');

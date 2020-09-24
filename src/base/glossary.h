@@ -77,7 +77,7 @@ public:
     
     /// type of a pair (key, record)
     typedef std::pair<key_type, rec_type> pair_type;
-    
+
     /// type for a dictionary of terms given to set(T&, ...)
     template < typename T >
     using dict_type = std::initializer_list<std::pair<Glossary::key_type, T> >;
@@ -109,7 +109,7 @@ private:
     static void  add_value(pair_type&, std::string&, bool);
 
     /// register a new pair into the dictionnary
-    void         add_entry(pair_type&, int no_overwrite);
+    void         add_entry(pair_type const&, int no_overwrite);
     
     //-------------------------------------------------------------------------------
     
@@ -245,8 +245,11 @@ public:
     void         clear_except(key_type const&);
 
     /// clear usage counts for all entries
-    void         clear_counts() const;
+    void         clear_counts();
     
+    /// add usage counts from another Glossary
+    void         add_counts(Glossary const&);
+
     /// create a new Glossary with only the given key
     Glossary     extract(key_type const&) const;
     
@@ -322,6 +325,9 @@ public:
     /// write all [key, values]
     void         write(std::ostream&, std::string const& prefix = "") const;
     
+    /// write all [key, values]
+    void         write_counts(std::ostream&, std::string const& prefix = "") const;
+
     //-------------------------------------------------------------------------------
     
     /// set `var` from `key[inx]`. The counter associated to the value is incremented.

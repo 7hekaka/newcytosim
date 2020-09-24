@@ -892,7 +892,7 @@ void Parser::parse_export(std::istream& is)
 void Parser::parse_write(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    std::string what = Tokenizer::get_symbols(is);
+    std::string what = Tokenizer::get_polysymbol(is);
     std::string file = Tokenizer::get_path(is);
 
     if ( file.empty() )

@@ -144,9 +144,9 @@ bool Tokenizer::has_symbol(std::istream& is, std::string const& arg, bool eat_li
 
 
 /**
- get_symbols() reads multiple symbols concatenated with ':'
+ get_polysymbol() reads multiple symbols concatenated with ':'
  */
-std::string Tokenizer::get_symbols(std::istream& is, bool eat_line)
+std::string Tokenizer::get_polysymbol(std::istream& is, bool eat_line)
 {
     int c = skip_space(is, eat_line);
     

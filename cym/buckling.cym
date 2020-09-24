@@ -56,4 +56,4 @@ run 10000 system
 }
 
 report single:force force.txt { verbose=0; }
-report fiber:tension tension.txt { verbose=0; plane = 1 0 0, 0; }
+report fiber:tension tension.txt { verbose=1; plane=1 1 0, 1; }

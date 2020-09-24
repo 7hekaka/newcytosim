@@ -4,6 +4,7 @@
 #include <numeric>
 #include <list>
 #include <set>
+#include "tokenizer.h"
 #include "stream_func.h"
 
 /// width of columns in formatted output, in number of characters
@@ -76,10 +77,14 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
 
 /**
  calls report_one() multiple times, if `arg` contains multiple instructions,
- separated by ';', for example:
+ separated by a comma, for example:
  
-     report fiber:force;fiber:length
+     report fiber:force,fiber:length
  
+ parameters can be includes as in:
+ 
+     report fiber:cluster {couple=1},fiber:length
+
  */
 void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
 {
@@ -91,37 +96,43 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
     out.setf(std::ios_base::fixed, std::ios_base::floatfield);
     out.precision(p);
 
-    // split argument:
-    std::vector<std::string> args;
-    std::string::size_type pos = what.find(';');
-    while ( pos != std::string::npos )
+    std::stringstream is(what);
+    while ( is.good() )
     {
-        args.push_back(what.substr(0, pos));
-        what = what.substr(pos+1);
-        pos = what.find(';');
-    }
-    args.push_back(what);
-
-    try {
-        for ( std::string arg : args )
-        {
-            Glossary glos(opt);
-            // put options that appear after a space into 'glos':
-            pos = arg.find(' ');
-            if ( pos != std::string::npos )
+        std::string arg = Tokenizer::get_polysymbol(is, false);
+        std::string blok = Tokenizer::get_block(is, '{');
+        try {
+            if ( blok.empty() )
             {
-                glos.read_string(arg.substr(pos+1).c_str(), 2);
-                arg = arg.substr(0, pos);
-                //std::cerr << glos;
+                //std::clog << "\nSimul::report(" << arg << ")";
+                report_one(out, arg, opt);
             }
-            report_one(out, arg, glos);
+            else
+            {
+                //std::clog << "\nSimul::report(" << arg << ", " << blok << ")";
+                Glossary glos(opt);
+                glos.read(blok, 0);
+                report_one(out, arg, glos);
+                opt.add_counts(glos);
+            }
+        }
+        catch( Exception & e )
+        {
+            out << '\n' << e.brief();
+        }
+        char c = Tokenizer::get_character(is, true, false);
+        if ( c == EOF )
+            break;
+        if ( c != ',' )
+        {
+            char rest[256] = { 0 };
+            rest[0] = c;
+            is.getline(rest+1, sizeof(rest)-1);
+            throw InvalidParameter("unexpected `" + std::string(rest) + "'");
+            break;
         }
     }
-    catch( Exception & e )
-    {
-        out << '\n' << e.brief();
-    }
-    
+    //opt.write_counts(std::cerr);
     out << '\n';
 }
 

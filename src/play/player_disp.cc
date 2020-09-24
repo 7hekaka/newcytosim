@@ -93,7 +93,7 @@ std::string Player::buildLabel() const
 
 /**
  This information is displayed in the top corner of the window.
- Calling simul.report() maked sure that the message is identical to what
+ Calling simul.report() ensures that the message is identical to what
  would be printed by the command 'report'.
  */
 std::string Player::buildReport(std::string arg) const
