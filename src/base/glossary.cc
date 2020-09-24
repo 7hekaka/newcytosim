@@ -177,7 +177,7 @@ void Glossary::add_counts(Glossary const& opt)
         if ( w != opt.mTerms.end() )
         {
             size_t sup = std::min(i.second.size(), w->second.size());
-            std::clog << " Glossary::add_counts " << w->first << " " << sup << "\n";
+            //std::clog << " Glossary::add_counts `" << w->first << "' " << sup << "\n";
             for ( size_t n = 0; n < sup; ++n )
                 i.second[n].count_ = std::max(i.second[n].count_, w->second[n].count_);
         }

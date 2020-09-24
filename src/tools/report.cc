@@ -39,12 +39,12 @@ void help(std::ostream& os)
     os << "  This tool must be invoked in a directory containing the simulation output,\n";
     os << "  and it will generate reports by calling Simul::report(). The only required\n";
     os << "  argument `WHAT` determines what sort of data will be generated. Many options are\n";
-    os << "  available, but are not listed here. Please check the HTML documentation.\n";
+    os << "  available, please check the HTML documentation for a list of possibilities.\n\n";
     os << "  By default, all frames in the file are processed in order, but a frame index,\n";
     os << "  or multiple indices can be specified (the first frame has index 0).\n";
-    os << "  A periodicity can also be specified (ignored if multiple frames are specified).\n";
+    os << "  A periodicity can also be specified (ignored if multiple frames are specified).\n\n";
     os << "  The input trajectory file is `objects.cmo` unless otherwise specified.\n";
-    os << "  The result is sent to standard output unless a file is specified as `output`\n";
+    os << "  The result is sent to standard output unless a file is specified as `output=NAME`\n";
     os << "  Attention: there should be no whitespace in any of the option.\n";
     os << "\n";
     os << "Examples:\n";

@@ -104,12 +104,12 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
         try {
             if ( blok.empty() )
             {
-                //std::clog << "\nSimul::report(" << arg << ")";
+                //out << "\nSimul::report(" << arg << ")";
                 report_one(out, arg, opt);
             }
             else
             {
-                //std::clog << "\nSimul::report(" << arg << ", " << blok << ")";
+                //out << "\nSimul::report(" << arg << ", " << blok << ")";
                 Glossary glos(opt);
                 glos.read(blok, 0);
                 report_one(out, arg, glos);
@@ -125,11 +125,11 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
             break;
         if ( c != ',' )
         {
+            out << '\n';
             char rest[256] = { 0 };
             rest[0] = c;
             is.getline(rest+1, sizeof(rest)-1);
-            throw InvalidParameter("unexpected `" + std::string(rest) + "'");
-            break;
+            throw InvalidParameter("unexpected `" + std::string(rest) + "' in report string");
         }
     }
     //opt.write_counts(std::cerr);
