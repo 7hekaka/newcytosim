@@ -83,7 +83,7 @@ void SphereProp::complete(Simul const& sim)
     else if ( sim.primed() && confine != CONFINE_OFF )
         throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
 
-    if ( confine_stiffness < 0 )
+    if ( sim.primed() && confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
     if ( sim.primed() && steric && !sim.prop->steric )
