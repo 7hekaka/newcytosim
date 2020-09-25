@@ -461,11 +461,14 @@ public:
 
     //---------------------
     
-    /// check length and segmentation
-    int          check(std::ostream&, real len) const;
+    /// print info such as length and segmentation
+    void         writeInfo(std::ostream&, real, real, real, real) const;
     
-    /// print length and segmentation
-    void         dump(std::ostream&) const;
+    /// print info such as length and segmentation
+    void         writeInfo(std::ostream&) const;
+
+    /// check length and segmentation and write if suspicious
+    int          check(std::ostream&, real len) const;
 
     /// write to Outputter
     void         write(Outputter&) const;

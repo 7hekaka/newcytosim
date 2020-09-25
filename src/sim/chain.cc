@@ -2000,39 +2000,11 @@ real Chain::projectedForceEnd(const FiberEnd end) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-int Chain::check(std::ostream& os, real len) const
-{
-    int res = 0;
-    real mn, mx;
-    segmentationMinMax(mn, mx);
-    real dev = ( mx - mn ) / segmentation();
-    real con = contourLength(pPos, nPoints);
-    res = ( dev > 0.01 ) + ( abs_real( con - len ) > 0.1 );
-    if ( res )
-    {
-        os << "chain " << std::setw(7) << reference() << '\n';
-        os << "{\n";
-        os << "    segmentation = " << segmentation() << '\n';
-        os << "    segments_min = " << mn << '\n';
-        os << "    segments_max = " << mx << '\n';
-        os << "    length  = " << len << '\n';
-        os << "    contour = " << con << '\n';
-        os << "}" << std::endl;
-    }
-    return res;
-}
-
-
 /**
  Prints info on the length of Segments, which can be useful for debugging
  */
-void Chain::dump(std::ostream& os) const
+void Chain::writeInfo(std::ostream& os, real len, real con, real mn, real mx) const
 {
-    real mn, mx;
-    real len = length();
-    segmentationMinMax(mn, mx);
-    real con = contourLength(pPos, nPoints);
-
     os << "chain " << std::setw(7) << reference() << '\n';
     os << "{\n";
     os << "    segmentation = " << segmentation() << '\n';
@@ -2041,6 +2013,33 @@ void Chain::dump(std::ostream& os) const
     os << "    length  = " << len << '\n';
     os << "    contour = " << con << '\n';
     os << "}" << std::endl;
+}
+
+
+int Chain::check(std::ostream& os, real len) const
+{
+    real mn, mx;
+    segmentationMinMax(mn, mx);
+    real dev = ( mx - mn ) / segmentation();
+    real con = contourLength(pPos, nPoints);
+    real err = abs_real( con - len ) / ( con + len );
+    int res = ( dev > 0.05 ) + ( err > 0.05 );
+    if ( res )
+        writeInfo(os, len, con, mn, mx);
+    return res;
+}
+
+
+/**
+ Prints info on the length of Segments, which can be useful for debugging
+ */
+void Chain::writeInfo(std::ostream& os) const
+{
+    real mn, mx;
+    real len = length();
+    segmentationMinMax(mn, mx);
+    real con = contourLength(pPos, nPoints);
+    writeInfo(os, len, con, mn, mx);
 }
 
 
