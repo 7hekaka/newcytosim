@@ -24,10 +24,10 @@ class SpaceStrip : public Space
     /// half to total width in each dimension
     real   halflength_[3];
 
-    /// Z-position of the bottom limit
+    /// lower position of the bottom limit: Y in 2D and Z in 3D
     real   bot_;
     
-    /// Z-position of the top limit
+    /// upper position of the top limit: Y in 2D and Z in 3D
     real   top_;
     
     /// Object to handle periodic boundary conditions

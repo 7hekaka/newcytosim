@@ -75,8 +75,13 @@ void SpaceStrip::update()
 
 void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 {
+#if ( DIM == 2 )
+    inf.set(-halflength_[0], bot_, 0);
+    sup.set( halflength_[0], top_, 0);
+#else
     inf.set(-halflength_[0],-halflength_[1], bot_);
     sup.set( halflength_[0], halflength_[1], top_);
+#endif
 }
 
 
@@ -242,7 +247,7 @@ using namespace gle;
 bool SpaceStrip::draw() const
 {
     const real X = halflength_[0];
-    const real Y = ( DIM > 1 ) ? halflength_[1] : 1;
+    const real Y = ( DIM > 2 ) ? halflength_[1] : top_;
     const real T = ( DIM > 2 ) ? top_ : 0;
     
 #if ( DIM > 2 )
@@ -286,7 +291,7 @@ bool SpaceStrip::draw() const
     glEnd();
 #endif
 
-    // draw outline:
+    // draw periodic boundaries:
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
