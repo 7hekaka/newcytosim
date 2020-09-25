@@ -107,7 +107,7 @@ Please check our [system of units](sim/units.md).
 
 <details>
 <summary>
-**Do you have a suggestion how to control the .cym file with parameters externally?** <br>**Is it possible to control/override parameters in .cym file from the command line?**
+**Do you have a suggestion how to control the `.cym` file with parameters externally?** <br>**Is it possible to control/override parameters in .cym file from the command line?**
 </summary>
 We recommend using [preconfig](https://github.com/nedelec/preconfig) with a template. For more details on this approach, [read this](https://openresearchsoftware.metajnl.com/articles/10.5334/jors.156/). Check also [the tutorial](https://github.com/nedelec/cytosim/blob/master/tutorials/tutorial5.md) dedicated to this topic.
 </details>
@@ -935,13 +935,14 @@ There are many other outputs possible, listed in the file `simul_report.cc`.
 <summary>
 **I am performing a parameter sweep with `scan.py`. How can I get different names for the report file?**
 </summary>
-You can use `preconfig` to template the file name:
-
-	report fiber:force force_[[nb]].txt
-
-Normally, these files will be created in the local run folder, but you may also use:
+We recommend storing each run in a separate folder, since in this way the names would not collide.
+You can always run report from the subfolder, and direct it to one file up:
 
 	report fiber:force ../report.txt
+
+You could also use `preconfig` to template the file name:
+
+	report fiber:force force_[[n]].txt
 	
 </details>
 
@@ -1424,6 +1425,35 @@ That is doable in a few weeks. You could start with a naive method to detect whi
 	( for all A ) x ( for all B ) : if ( A close to B )  …
 
 However, before you do this, I would still advise to think hard wether you really need this in your model. There maybe a simpler solution!
+</details>
+
+
+<details>
+<summary>
+**How can I get the forces acting on an aster?**
+</summary>
+I’m working on a centrosomal system and was attempting to write a reporting function to get the contribution ***per fiber*** on the motion/force on the aster. How can I do this?
+
+The aster is a composite object made from one solid and many fibers, and by modifying the code, you can calculate what forces are applied by the fibers to the Solid. You can use two functions: `Aster::getLink1()` and `Aster::getLink2()`
+
+	real stiff1 = getLink1(inx, pos11, pos12)
+	real stiff2 = getLink2(inx, pos21, pos22)
+
+-there is one input argument: inx, which should be varied to cover [0, nbFibers()-1]
+
+The function will:
+
+-sets pos1 to be the point on the Solid to which the link is attached
+-sets pos2 to be the point on the Fiber to which the link is attached
+-returns the stiffness of the link
+
+The link is Hookean with zero-resting length.
+So you can calculate the forces experienced by the solid, simply as:
+
+	 force1 = stiff1 * ( pos12 - pos11 )
+	 force2 = stiff2 * ( pos22 - pos21 )
+
+You could then sum all these forces, or calculate a torque...
 </details>
 
 
