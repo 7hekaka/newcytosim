@@ -43,7 +43,7 @@ fts = 14
 
 #------------------------------------------------------------------------
 
-def sqr(x):
+def square(x):
     return x * x;
 
 def get_meshsize(filename):
@@ -54,13 +54,13 @@ def get_meshsize(filename):
     com = read_config.get_command(pile, ['set', 'space', '*'])
     geo = com.value("geometry")
     space_radius = float(geo.split()[1])
-    space_volume = math.pi * sqr(space_radius)
+    space_volume = math.pi * square(space_radius)
     #print('space_radius  = ', space_radius)
     com = read_config.get_command(pile, ['new', 'fiber', '*'])
     fiber_length = com.value("length")
     nb_fiber = com.cnt
-    p0 = 1.0 / sqr(math.pi) - 0.0235 * fiber_length / space_radius; # we previously used 0.09;
-    nb_crossings = p0  * nb_fiber * ( nb_fiber - 1 ) * sqr( fiber_length / space_radius )
+    p0 = 1.0 / square(math.pi) - 0.0235 * fiber_length / space_radius; # we previously used 0.09;
+    nb_crossings = p0  * nb_fiber * ( nb_fiber - 1 ) * square( fiber_length / space_radius )
     mesh_size = fiber_length / ( 1 + 2 * nb_crossings / nb_fiber )
     #print('nb_fibers     = ', nb_fiber)
     #print('fibers_length = ', fiber_length)

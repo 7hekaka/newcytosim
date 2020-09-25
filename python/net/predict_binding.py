@@ -23,7 +23,7 @@ import read_config
 
 #------------------------------------------------------------------------
 
-def sqr(x):
+def square(x):
     return x * x;
 
 def write(arg):
@@ -97,18 +97,18 @@ def predict_couple(binding_rate, binding_range, unbinding_rate):
     #surface area from which it is possible to bind to a fiber
     ratio_fibs = 2 * total_length * binding_range / space_volume;
     #surface area from which it is possible to bind to a crosspoint
-    ratio_cros = 4 * math.pi * nb_crossings * sqr(binding_range) / space_volume;
+    ratio_cros = 4 * math.pi * nb_crossings * square(binding_range) / space_volume;
     #print("ratio_fibs %f ratio_cross %f" % (ratio_fibs, ratio_cros))
     try:
         # ratio of rates can be undefined if unbinding_rate == 0:
         bind = binding_rate / unbinding_rate;
     except:
-        ratio_cros = ( 2 * math.pi + 1 ) * nb_crossings * sqr(binding_range) / space_volume;
+        ratio_cros = ( 2 * math.pi + 1 ) * nb_crossings * square(binding_range) / space_volume;
         # This is to analyse non-steady state for which unbinding_rate = 0:
         time_span = 1;
         fraction_bound = 1 - math.exp( -binding_rate * time_span )
         #print("   fraction_bound = %9.6f;" % fraction_bound)
-        B2 = sqr(fraction_bound) * ratio_cros
+        B2 = square(fraction_bound) * ratio_cros
         B1 = fraction_bound * ratio_fibs - B2
         return [1-B1-B2, B1, B2]
     AsF = ( ratio_fibs - ratio_cros ) * bind;
@@ -163,7 +163,7 @@ def process(config):
     com = read_config.get_command(pile, ['set', 'space', '*'])
     geo = com.value("geometry")
     space_radius = float(geo.split()[1])
-    space_volume = math.pi * sqr(space_radius)
+    space_volume = math.pi * square(space_radius)
     #print("space: ",  space_radius, space_volume)
     com = read_config.get_command(pile, ['new', 'fiber', '*'])
     try:
@@ -172,8 +172,8 @@ def process(config):
     except:
         fiber_length = com[0].value("length")
         nb_fiber = com[0].cnt + com[1].cnt
-    p0 = 1.0 / sqr(math.pi) - 0.0235 * fiber_length / space_radius; # we previously used 0.09;
-    nb_crossings = p0 * nb_fiber * ( nb_fiber - 1 ) * sqr( fiber_length / space_radius )
+    p0 = 1.0 / square(math.pi) - 0.0235 * fiber_length / space_radius; # we previously used 0.09;
+    nb_crossings = p0 * nb_fiber * ( nb_fiber - 1 ) * square( fiber_length / space_radius )
     mesh_size = fiber_length / ( 1 + 2 * nb_crossings / nb_fiber )
     if 0:
         write("nb_fiber              = %.1f\n" % nb_fiber)

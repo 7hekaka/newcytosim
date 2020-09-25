@@ -12,7 +12,7 @@ def random_color():
     return (R, G, B)
 
 
-def sqr(x):
+def square(x):
     return x * x;
 
 
