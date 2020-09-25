@@ -44,7 +44,6 @@ set single leg
 set solid blob
 {
     confine = inside, 100
-    steric = 1
     display = ( style=7; )
 }
 

@@ -332,6 +332,10 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         }
 #endif
         
+        // early bailout for immobile objects:
+        if ( res.size()==1 && !res[0]->mobile() )
+            break;
+        
         PlacementType placement = PLACE_INSIDE;
         
         opt.set(placement, "placement",{{"off",       PLACE_NOT},
@@ -354,9 +358,14 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
                 for ( Object * i : res )
                 {
                     Mecable * mec = Simul::toMecable(i);
-                    if ( mec && ! mec->allInside(simul.spaces.master()) )
+                    if ( mec )
                     {
-                        res.destroy();
+                        std::string str;
+                        Space const* spc = simul.spaces.master();
+                        if ( opt.set(str, "placement", 1) )
+                            spc = simul.findSpace(str);
+                        if ( ! mec->allInside(spc) )
+                            res.destroy();
                         continue;
                     }
                 }

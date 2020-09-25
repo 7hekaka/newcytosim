@@ -203,7 +203,7 @@ real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
 void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
 {
     const real xRel = (W.XX - tJunction);
-    real pX, pY, pZ;
+    real pX, pY;
 
 #if ( DIM == 2 )
     //Points in the intersection area are projected to the corners or to the bottom.
@@ -242,6 +242,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
 #endif
     
 #if ( DIM >= 3 )
+    real pZ;
     //w is in the intersection area and projected on the intersection line,
     //which is an ellipse in 3D. The two halfaxis of the ellipse are given
     //by    a = tRadius * sqrt(2)
@@ -254,7 +255,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
         P.set(0,0,std::copysign(tRadius, W.ZZ));
         return;
     }
-    M_PI;
+    
     //turn the point, so that the intersection ellipse is in the xz-plane
     real xTurned = ( xRel + std::copysign(W.YY, xRel) ) * M_SQRT1_2;
     real xTurnedSq = square(xTurned);

@@ -537,7 +537,7 @@ void FiberProp::complete(Simul const& sim)
         if ( lattice_unit <= 0 )
             throw InvalidParameter("fiber:lattice_unit (known as lattice[1]) must be specified and > 0");
 #else
-        throw InvalidParameter("cytosim cannot run with fiber:lattice");
+        throw InvalidParameter("Cytosim was not compiled to handle fiber:lattice");
 #endif
     }
 
@@ -559,7 +559,7 @@ void FiberProp::complete(Simul const& sim)
         if ( mesh_aging_rate < 0 )
             throw InvalidParameter("fiber:mesh_aging_rate must be >= 0");
 #else
-        throw InvalidParameter("cytosim cannot run with fiber:mesh");
+        throw InvalidParameter("Cytosim was not compiled to handle fiber:mesh");
 #endif
     }
     

@@ -13,7 +13,6 @@
 
 int main(int argc, char* argv[])
 {
-    print_sizeof(Array<int>);
     print_sizeof(Vector1);
     print_sizeof(Vector2);
     print_sizeof(Vector3);
@@ -25,6 +24,10 @@ int main(int argc, char* argv[])
     print_sizeof(Matrix34);
     print_sizeof(Matrix44);
     
+    print_sizeof(Random);
+    print_sizeof(Space);
+    print_sizeof(Array<int>);
+
     print_sizeof(Mecapoint);
     print_sizeof(FiberSegment);
     print_sizeof(Interpolation);
@@ -33,10 +36,9 @@ int main(int argc, char* argv[])
     print_sizeof(Single);
     print_sizeof(Couple);
 
-    print_sizeof(Space);
-    print_sizeof(Node);
     print_sizeof(Inventoried);
     print_sizeof(Movable);
+    print_sizeof(Node);
     print_sizeof(Object);
 
     print_sizeof(Mecable);

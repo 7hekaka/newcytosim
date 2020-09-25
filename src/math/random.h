@@ -13,9 +13,9 @@
 
 #include "SFMT.h"
 
-constexpr real TWO_POWER_MINUS_31 = 0x1p-31;
-constexpr real TWO_POWER_MINUS_32 = 0x1p-32;
-constexpr real TWO_POWER_MINUS_64 = 0x1p-64;
+#define TWO_POWER_MINUS_31 0x1p-31
+#define TWO_POWER_MINUS_32 0x1p-32
+#define TWO_POWER_MINUS_64 0x1p-64
 
 
 /// Random Number Generator
