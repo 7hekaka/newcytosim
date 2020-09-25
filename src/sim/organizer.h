@@ -95,7 +95,7 @@ public:
     real               sumDragCoefficient() const;
     
     
-    /// retrieve ends link number `inx`, or returns zero if this link does not exist
+    /// retrieve end positions of link number `inx`, or returns zero if this link does not exist
     virtual bool       getLink(size_t inx, Vector&, Vector&) const { return false; }
     
     /// object from that gives its display parameters

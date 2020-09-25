@@ -197,6 +197,9 @@ public:
     Vector        position() const { return solid()->posP(0); }
     
     /// return Fiber `n`
+    size_t        nbFibers() const { return nbOrganized(); }
+
+    /// return Fiber `n`
     Fiber *       fiber(size_t n) const { return Fiber::toFiber(organized(n)); }
     
     /// perform one Monte-Carlo step
@@ -211,12 +214,21 @@ public:
     /// position of second clamp for Fiber n
     Vector        posLink2(size_t n) const;
 
+    /// position of end on Fiber corresponding to first link
+    Vector        posFiber1(size_t n) const { return fiber(n)->posEnd(prop->focus); }
+    
     /// position of attachment point on Fiber corresponding to second link
     Vector        posFiber2(size_t n) const;
     
-    /// retrieve links end-points for display
-    bool          getLink(size_t, Vector&, Vector&) const;
+    /// retrieve link between Solid and end of Fiber number `i`, returning stiffness
+    real          getLink1(size_t i, Vector&, Vector&) const;
     
+    /// retrieve link between Solid and side of Fiber number `i`, returning stiffness
+    real          getLink2(size_t i, Vector&, Vector&) const;
+    
+    /// retrieve link of type 1 if `i` is even, of type 2 if `i` is odd
+    bool          getLink(size_t i, Vector&, Vector&) const;
+
     /// return Solid
     Mecable*      core() const { return asSolid; }
     

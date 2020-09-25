@@ -59,7 +59,7 @@ public:
     Fiber *       fiber(size_t i) const { return static_cast<Fiber*>(organized(i)); }
     
     
-    /// retrieve links end-points for display
+    /// retrieve link between Sphere and ends of Fiber
     bool          getLink(size_t, Vector&, Vector&) const;
     
     /// return Sphere
