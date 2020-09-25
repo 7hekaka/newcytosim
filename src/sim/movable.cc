@@ -579,8 +579,9 @@ restart:
             break;
         }
     }
-return pos;
+    return pos;
 }
+
 
 /// convert string to a position
 Vector Movable::readPosition(std::string const& arg, Space const* spc)
@@ -592,7 +593,7 @@ Vector Movable::readPosition(std::string const& arg, Space const* spc)
         std::string str;
         std::streampos pos = iss.tellg();
         std::getline(iss, str);
-        throw InvalidSyntax("unexpected `"+str+"' in `"+StreamFunc::get_line(iss, pos)+"'");
+        throw InvalidSyntax("unexpected `"+str+"' in position `"+StreamFunc::get_line(iss, pos)+"'");
     }
     return vec;
 }
