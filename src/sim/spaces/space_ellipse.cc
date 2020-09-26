@@ -78,44 +78,30 @@ Vector SpaceEllipse::normalToEdge(Vector const& pos) const
 #endif
 }
 
+
+real SpaceEllipse::volume() const
+{
 #if ( DIM == 1 )
-
-real SpaceEllipse::volume() const
-{
     return 2 * length_[0];
-}
-
-bool SpaceEllipse::inside(Vector const& W) const
-{
-    return abs_real(W.XX) < length_[0];
-}
-
 #elif ( DIM == 2 )
-
-real SpaceEllipse::volume() const
-{
     return M_PI * length_[0] * length_[1];
-}
-
-bool SpaceEllipse::inside(Vector const& W) const
-{
-    return square(W.XX/length_[0]) + square(W.YY/length_[1]) <= 1;
-}
-
 #else
-
-real SpaceEllipse::volume() const
-{
     constexpr real C = 4 * M_PI / 3.0;
     return (C * length_[0]) * (length_[1] * length_[2]);
+#endif
 }
+
 
 bool SpaceEllipse::inside(Vector const& W) const
 {
+#if ( DIM == 1 )
+    return abs_real(W.XX) < length_[0];
+#elif ( DIM == 2 )
+    return square(W.XX/length_[0]) + square(W.YY/length_[1]) <= 1;
+#else
     return square(W.XX/length_[0]) + square(W.YY/length_[1]) + square(W.ZZ/length_[2]) <= 1;
-}
-
 #endif
+}
 
 
 Vector1 SpaceEllipse::project1D(Vector1 const& W) const

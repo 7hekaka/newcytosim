@@ -11,7 +11,7 @@
  Space `disc` is a disc centered around the origin.
  Forces registered with 'setInteractions' are added, and used to update the
  radius of the Space. How fast the radius changes is set by the value 'mobility'
- in SpaceProp.
+ in SpaceDynamicProp.
  
  Parameters:
      - radius = radius of the disc

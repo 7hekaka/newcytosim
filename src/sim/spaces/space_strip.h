@@ -1,4 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+
 #ifndef SPACE_STRIP_H
 #define SPACE_STRIP_H
 
@@ -7,11 +8,12 @@
 
 ///a rectangular Space with partial periodic boundary conditions
 /**
- Space `periodic` implements periodic boundary condition in all but the last dimension.
- The volume only has edge in the last dimension, and otherwise wraps on itself.
- The last dimension is Y in 2D and Z in 3D.
+ SpaceStrip implements periodic boundary conditions in all dimensions except the
+ last one: Y in 2D and Z in 3D. The volume is a cuboid, with edges in the last
+ dimension, while other dimensions (X and Y in 2D) wraps on itself periodically.
  
  Parameters:
+ 
      - length = extent in X, and Y in 3D
      - bottom = lower limit in Z
      - top    = upper limit in Z
@@ -21,14 +23,16 @@
  */
 class SpaceStrip : public Space
 {
-    /// half to total width in each dimension
-    real   halflength_[3];
-
+private:
+    
+    /// half to total width in X and Y dimensions
+    real halflength_[2];
+    
     /// lower position of the bottom limit: Y in 2D and Z in 3D
-    real   bot_;
+    real bot_;
     
     /// upper position of the top limit: Y in 2D and Z in 3D
-    real   top_;
+    real top_;
     
     /// Object to handle periodic boundary conditions
     Modulo modulo_;
@@ -37,50 +41,56 @@ public:
     
     /// creator
     SpaceStrip(SpaceProp const*);
-
+    
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
+    
+    /// match sizes of Modulo object
+    void update();
 
     /// return Modulo Object
     Modulo const* getModulo() const { return &modulo_; }
     
-    /// match sizes of Modulo object
-    void        update();
-    
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    /// true if a sphere (\a center, \a radius) is entirely inside this Space
+    bool allInside(Vector const&, real rad) const;
+    
+    /// true if a sphere (\a center, \a radius) is entirely outside this Space
+    bool allOutside(Vector const&, real rad) const;
+
+    /// project point on the closest edge of the Space
+    Vector project(Vector const& pos) const;
     
     /// equivalent to 'Modulo::fold'
-    void        bounce(Vector&) const;
+    void bounce(Vector&) const;
 
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     
     /// OpenGL display function; returns true if successful
-    bool        draw() const;
+    bool draw() const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
-
+    void setLengths(const real len[8]);
+    
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
 };
 

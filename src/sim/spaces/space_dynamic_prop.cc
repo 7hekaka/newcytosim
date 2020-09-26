@@ -38,14 +38,14 @@
  PARAMETER is usually 'length' or 'radius', but also 'height' or 'width'
  DIMENSIONS is a single REAL or a comma-separated list of REAL.
  
- List of known `shape` with variable geometry:
+ List of Space with variable geometry:
  
- GEOMETRY           | Class                | PARAMETER        |
+ SHAPE              | Class                | PARAMETER        |
  -------------------|----------------------|--------------------
  `lid`              | SpaceLid             | width height
  `disc`             | SpaceDisc            | radius
  `dynamic_sphere`   | SpaceDynamicSphere   | radius
- `dynamic_ellipse`  | SpaceDynamicEllipse  | length
+ `dynamic_ellipse`  | SpaceDynamicEllipse  | DIM lengths
  
  Example:
  

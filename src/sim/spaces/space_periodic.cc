@@ -56,14 +56,17 @@ void SpacePeriodic::bounce(Vector& pos) const
 }
 
 
-#pragma mark - DIM = 1
-
+real SpacePeriodic::volume() const
+{
 #if ( DIM == 1 )
-
-real SpacePeriodic::volume() const
-{
-    return 2.0 * halflength_[0];
+    return 2 * halflength_[0];
+#elif ( DIM == 2 )
+    return 4 * halflength_[0] * halflength_[1];
+#else
+    return 8 * halflength_[0] * halflength_[1] * halflength_[2];
+#endif
 }
+
 
 bool SpacePeriodic::inside(Vector const&) const
 {
@@ -76,53 +79,6 @@ Vector SpacePeriodic::project(Vector const&) const
     throw InvalidParameter("A periodic space has no edge!");
     return Vector(0, 0, 0);
 }
-
-#endif
-
-
-#pragma mark - DIM = 2
-
-#if ( DIM == 2 )
-
-real SpacePeriodic::volume() const
-{
-    return 4.0 * halflength_[0] * halflength_[1];
-}
-
-bool SpacePeriodic::inside(Vector const&) const
-{
-    return true;
-}
-
-
-Vector SpacePeriodic::project(Vector const&) const
-{
-    throw InvalidParameter("A periodic space has no edge!");
-}
-
-#endif
-
-#pragma mark - DIM = 3
-
-#if ( DIM >= 3 )
-
-real SpacePeriodic::volume() const
-{
-    return 8.0 * halflength_[0] * halflength_[1] * halflength_[2];
-}
-
-bool SpacePeriodic::inside(Vector const&) const
-{
-    return true;
-}
-
-Vector SpacePeriodic::project(Vector const&) const
-{
-    throw InvalidParameter("A periodic space has no edge!");
-    return Vector(0, 0, 0);
-}
-
-#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - I/O

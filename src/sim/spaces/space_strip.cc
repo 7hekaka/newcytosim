@@ -1,4 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+
 #include "dim.h"
 #include "space_strip.h"
 #include "exceptions.h"
@@ -9,12 +10,14 @@
 
 
 SpaceStrip::SpaceStrip(SpaceProp const* p)
-: Space(p), bot_(0), top_(0)
+: Space(p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("strip is not usable in 1D");
-    for ( unsigned d = 0; d < 3; ++d )
-        halflength_[d] = 0;
+    halflength_[0] = 0;
+    halflength_[1] = 0;
+    bot_ = 0;
+    top_ = 0;
 }
 
 
@@ -75,21 +78,21 @@ void SpaceStrip::update()
 
 void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 {
-#if ( DIM == 2 )
-    inf.set(-halflength_[0], bot_, 0);
-    sup.set( halflength_[0], top_, 0);
-#else
+#if ( DIM >= 3 )
     inf.set(-halflength_[0],-halflength_[1], bot_);
     sup.set( halflength_[0], halflength_[1], top_);
+#else
+    inf.set(-halflength_[0], bot_, 0);
+    sup.set( halflength_[0], top_, 0);
 #endif
 }
 
 
 void SpaceStrip::bounce(Vector& pos) const
 {
-    if ( !inside(pos) )
+    if ( !SpaceStrip::inside(pos) )
         bounceOnEdges(pos);
-
+    
     // periodic in all except the last dimension:
 #if ( DIM > 1 )
     pos.XX = fold_real(pos.XX, modulo_.period_[0]);
@@ -104,74 +107,74 @@ void SpaceStrip::bounce(Vector& pos) const
 #pragma mark -
 
 
-#if ( DIM == 1 )
-
 real SpaceStrip::volume() const
 {
+#if ( DIM == 1 )
     return ( top_ - bot_ );
+#elif ( DIM == 2 )
+    return 2.0 * halflength_[0] * ( top_ - bot_ );
+#else
+    return 4.0 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
+#endif
 }
+
 
 bool SpaceStrip::inside(Vector const& pos) const
 {
+#if ( DIM == 1 )
     return (( bot_ <= pos.XX ) & ( pos.XX <= top_ ));
+#elif ( DIM == 2 )
+    return (( bot_ <= pos.YY ) & ( pos.YY <= top_ ));
+#else
+    return (( bot_ <= pos.ZZ ) & ( pos.ZZ <= top_ ));
+#endif
+}
+
+
+bool SpaceStrip::allInside(Vector const& pos, const real rad) const
+{
+    assert_true( rad >= 0 );
+#if ( DIM == 1 )
+    return (( bot_+rad <= pos.XX ) & ( pos.XX+rad <= top_ ));
+#elif ( DIM == 2 )
+    return (( bot_+rad <= pos.YY ) & ( pos.YY+rad <= top_ ));
+#else
+    return (( bot_+rad <= pos.ZZ ) & ( pos.ZZ+rad <= top_ ));
+#endif
+}
+
+
+bool SpaceStrip::allOutside(Vector const& pos, const real rad) const
+{
+    assert_true( rad >= 0 );
+#if ( DIM == 1 )
+    return (( bot_ > pos.XX+rad ) | ( pos.XX > top_+rad ));
+#elif ( DIM == 2 )
+    return (( bot_ > pos.YY+rad ) | ( pos.YY > top_+rad ));
+#else
+    return (( bot_ > pos.ZZ+rad ) | ( pos.ZZ > top_+rad ));
+#endif
 }
 
 
 Vector SpaceStrip::project(Vector const& pos) const
 {
+#if ( DIM == 1 )
     real X = sign_select(2 * pos.XX - bot_ - top_, bot_, top_);
     return Vector(X);
-}
-
-#endif
-
-
-//------------------------------------------------------------------------------
-
-#if ( DIM == 2 )
-
-real SpaceStrip::volume() const
-{
-    return 2.0 * halflength_[0] * ( top_ - bot_ );
-}
-
-bool SpaceStrip::inside(Vector const& pos) const
-{
-    return (( bot_ <= pos.YY ) & ( pos.YY <= top_ ));
-}
-
-
-Vector SpaceStrip::project(Vector const& pos) const
-{
+#elif ( DIM == 2 )
     real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
     return Vector(pos.XX, Y);
-}
-
-#endif
-
-//------------------------------------------------------------------------------
-
-#if ( DIM >= 3 )
-
-real SpaceStrip::volume() const
-{
-    return 4.0 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
-}
-
-bool SpaceStrip::inside(Vector const& pos) const
-{
-    return (( bot_ <= pos.ZZ ) & ( pos.ZZ <= top_ ));
-}
-
-Vector SpaceStrip::project(Vector const& pos) const
-{
+#else
     real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_, top_);
     return Vector(pos.XX, pos.YY, Z);
+#endif
 }
 
-#endif
 
 //------------------------------------------------------------------------------
+#pragma mark - setInteraction
+
 
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
@@ -188,10 +191,10 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& me
 void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_ + rad, top_ - rad);
+    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_+rad, top_-rad);
     meca.addPlaneClampY(pe, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_ + rad, top_ - rad);
+    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_+rad, top_-rad);
     meca.addPlaneClampZ(pe, Z, stiff);
 #endif
 }
@@ -226,6 +229,7 @@ void SpaceStrip::setLengths(const real len[])
     update();
 }
 
+
 void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
@@ -235,9 +239,7 @@ void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Display
 
 #ifdef DISPLAY
 #include "opengl.h"
@@ -249,7 +251,7 @@ bool SpaceStrip::draw() const
     const real X = halflength_[0];
     const real T = top_;
     const real B = bot_;
-
+    
 #if ( DIM >= 3 )
     const real Y = halflength_[1];
     // draw faces:
@@ -290,7 +292,7 @@ bool SpaceStrip::draw() const
     gleVertex(-X, B, 0);
     glEnd();
 #endif
-
+    
     // draw periodic boundaries:
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);

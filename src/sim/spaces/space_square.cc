@@ -47,91 +47,56 @@ void SpaceSquare::boundaries(Vector& inf, Vector& sup) const
 //------------------------------------------------------------------------------
 #pragma mark - DIM=1
 
-
-#if ( DIM == 1 )
-
 real SpaceSquare::volume() const
 {
+#if ( DIM == 1 )
     return 2 * length_[0];
+#elif ( DIM == 2 )
+    return 4 * length_[0] * length_[1];
+#else
+    return 8 * length_[0] * length_[1] * length_[2];
+#endif
 }
 
 bool SpaceSquare::inside(Vector const& W) const
 {
+#if ( DIM == 1 )
     return abs_real(W.XX) <= length_[0];
+#elif ( DIM == 2 )
+    return (abs_real(W.XX) <= length_[0]) &
+           (abs_real(W.YY) <= length_[1]);
+#else
+    return (abs_real(W.XX) <= length_[0]) &
+           (abs_real(W.YY) <= length_[1]) &
+           (abs_real(W.ZZ) <= length_[2]);
+#endif
 }
 
 bool SpaceSquare::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
-    
+#if ( DIM == 1 )
     return std::max(rad-W.XX, W.XX+rad) <= length_[0];
+#elif ( DIM == 2 )
+    return (std::max(rad-W.XX, W.XX+rad) <= length_[0]) &
+           (std::max(rad-W.YY, W.YY+rad) <= length_[1]);
+#else
+    return (std::max(rad-W.XX, W.XX+rad) <= length_[0]) &
+           (std::max(rad-W.YY, W.YY+rad) <= length_[1]) &
+           (std::max(rad-W.ZZ, W.ZZ+rad) <= length_[2]);
+#endif
+
 }
+
+
+#if ( DIM == 1 )
 
 Vector SpaceSquare::project(Vector const& W) const
 {
     return Vector(std::copysign(length_[0], W.XX), 0, 0);
 }
 
-#endif
-
-
-//------------------------------------------------------------------------------
-#pragma mark - DIM=2
-
-
-#if ( DIM == 2 )
-
-real SpaceSquare::volume() const
-{
-    return 4 * length_[0] * length_[1];
-}
-
-
-bool SpaceSquare::inside(Vector const& W) const
-{
-    return (abs_real(W.XX) <= length_[0]) &
-           (abs_real(W.YY) <= length_[1]);
-}
-
-bool SpaceSquare::allInside(Vector const& W, const real rad) const
-{
-    assert_true( rad >= 0 );
-    
-    return (std::max(rad-W.XX, W.XX+rad) <= length_[0]) &
-           (std::max(rad-W.YY, W.YY+rad) <= length_[1]);
-}
-
-#endif
-
-//------------------------------------------------------------------------------
-#pragma mark - DIM=3
-
-
-#if ( DIM >= 3 )
-
-real SpaceSquare::volume() const
-{
-    return 8 * length_[0] * length_[1] * length_[2];
-}
-
-bool SpaceSquare::inside(Vector const& W) const
-{
-    return (abs_real(W.XX) <= length_[0]) &
-           (abs_real(W.YY) <= length_[1]) &
-           (abs_real(W.ZZ) <= length_[2]);
-}
-
-bool SpaceSquare::allInside(Vector const& W, const real rad) const
-{
-    assert_true( rad >= 0 );
-    
-    return (std::max(rad-W.XX, W.XX+rad) <= length_[0]) &
-           (std::max(rad-W.YY, W.YY+rad) <= length_[1]) &
-           (std::max(rad-W.ZZ, W.ZZ+rad) <= length_[2]);
-}
-#endif
-
-#if ( DIM > 1 )
+#else
 
 Vector SpaceSquare::project(Vector const& W) const
 {
