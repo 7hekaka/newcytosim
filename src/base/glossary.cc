@@ -751,7 +751,7 @@ int Glossary::has_warning(std::ostream& os, size_t threshold) const
 {
     int res = 0;
     std::string msg;
-    for ( pair_type const& i : mTerms )
+    for ( auto const& i : mTerms )
     {
         int val = warning(i, msg, threshold);
         if ( val )
