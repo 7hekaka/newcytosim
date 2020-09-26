@@ -262,3 +262,31 @@ def powerlaw_fit(arg):
         scale = exp(( sy - power * sx ) / s);
         return ( scale, power )
     return ()
+
+
+def quadratic_val(arg, pol):
+    """
+    return value of 2-d order polynomial
+    """
+    return [ pol[0] * x * x + pol[1] * x + pol[2] for x in arg ]
+
+
+def quadratic_fit(data):
+    """
+    fit 2-d order polynomial to data = [ (x, y), ... ]
+    returns parameters [ a, b, c ] of the best fit: a * x^2 + b * x + c
+    """
+    sx = 0; sx2 = 0; sx3 = 0; sx4 = 0;
+    sx2y = 0; sxy = 0; sy = 0
+    for x, y in data:
+        x2 = x * x
+        sx = sx + x
+        sx2 = sx2 + x2
+        sx3 = sx3 + x2 * x
+        sx4 = sx4 + x2 * x2
+        sx2y = sx2y + x2 * y
+        sxy = sxy + x * y
+        sy = sy + y
+    mat = numpy.array([[sx4,sx3,sx2],[sx3,sx2,sx],[sx2,sx,len(data)]])
+    sol = numpy.linalg.inv(mat).dot([sx2y, sxy, sy])
+    return sol
