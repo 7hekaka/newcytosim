@@ -26,6 +26,8 @@ SpacePolygon::~SpacePolygon()
 {
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - I/O
 
 /**
  recalculate bounding box, volume
@@ -38,6 +40,8 @@ void SpacePolygon::resize(Glossary& opt)
     
     if ( opt.set(file, "file") )
         poly_.read(file);
+    else if ( !prop->dimensions.empty() )
+        poly_.read(prop->dimensions);
     else if ( opt.has_key("points") )
     {
         // specify vertices directly:
@@ -172,6 +176,8 @@ Vector SpacePolygon::project(Vector const& W) const
     return P;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - setInteraction
 
 /**
  The current procedure tests the vertices of fibers against the segments of the polygon.
