@@ -428,13 +428,13 @@ void Space::setInteraction(Interpolation const& pi, Meca& meca, real stiff, Conf
 
 #endif
 
+
 //------------------------------------------------------------------------------
 #pragma mark - IO
 
-
 void Space::write(Outputter& out) const
 {
-    out.put_characters("space", 16);
+    out.put_characters(prop->shape, 16);
     out.writeUInt16(0);
 }
 
@@ -442,7 +442,7 @@ void Space::write(Outputter& out) const
 void Space::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "space");
+    read_data(in, 8, len, prop->shape);
     setLengths(len);
 }
 

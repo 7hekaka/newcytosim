@@ -66,7 +66,6 @@ public:
 
     /// read from file
     void        read(Inputter&, Simul&, ObjectTag);
-
     
 };
 

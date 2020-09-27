@@ -97,8 +97,8 @@ void SpacePolygon::update()
 
     real box[4];
     poly_.find_extremes(box);
-    inf_.set(box[0], box[2], 0);
-    sup_.set(box[1], box[3], 0);
+    inf_.set(box[0], box[2], -height_);
+    sup_.set(box[1], box[3],  height_);
 }
 
 
@@ -263,8 +263,33 @@ void SpacePolygon::setInteractions(Meca& meca) const
 }
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
+#pragma mark - I/O
+
+void SpacePolygon::write(Outputter& out) const
+{
+    out.put_characters("polygon", 16);
+    out.writeUInt16(2);
+    out.writeFloat(height_);
+    out.writeFloat(0.f);
+}
+
+
+void SpacePolygon::setLengths(const real len[])
+{
+    height_ = len[0];
+}
+
+
+void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    read_data(in, 8, len, "polygon");
+    setLengths(len);
+}
+
+
 //------------------------------------------------------------------------------
+#pragma mark - Display
 
 #ifdef DISPLAY
 #include "opengl.h"
