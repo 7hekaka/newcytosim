@@ -34,10 +34,10 @@ public:
     /// display string (see @ref PointDispPar)
     std::string  display;
     
+    /// name of the file where dimensions are stored
+    std::string  dimensions;
+
     /// @}
-    
-    /// BACKWARD_COMPATIBILITY
-    std::string  dimensions_;
     
     /// derived variable: flag to indicate that `display` has a new value
     bool         display_fresh;

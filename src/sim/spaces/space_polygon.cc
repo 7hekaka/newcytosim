@@ -61,12 +61,6 @@ void SpacePolygon::resize(Glossary& opt)
     else
         return;
     
-    if ( poly_.surface() < 0 )
-    {
-        //std::clog << "flipping clockwise polygon `" << file << "'" << std::endl;
-        poly_.flip();
-    }
-
     real x;
     if ( opt.set(x, "scale") )
         poly_.scale(x, x);
@@ -90,6 +84,12 @@ void SpacePolygon::resize(Glossary& opt)
 void SpacePolygon::update()
 {
     surface_ = poly_.surface();
+    if ( surface_ < 0 )
+    {
+        //std::clog << "flipping clockwise polygon `" << file << "'" << std::endl;
+        poly_.flip();
+        surface_ = poly_.surface();
+    }
     assert_true( surface_ > 0 );
     
     if ( poly_.complete(REAL_EPSILON) )
@@ -285,6 +285,11 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
     real len[8] = { 0 };
     read_data(in, 8, len, "polygon");
     setLengths(len);
+    if ( !prop->dimensions.empty() )
+    {
+        poly_.read(prop->dimensions);
+        update();
+    }
 }
 
 
