@@ -261,10 +261,10 @@ void changeExclude(FiberDisp* p, int val)
 
 void changeScale(real& scale, int d)
 {
-    real s = log2(scale) + d * 0.1;
+    real s = std::log2(std::fabs(scale)) + d * 0.125;
     if ( s < -14 ) s =  10;
-    if ( s >  10 ) s = -10;
-    scale = exp2(s);
+    if ( s >  10 ) s = -14;
+    scale = std::copysign(exp2(s), scale);
 }
 
 
@@ -855,11 +855,11 @@ void processKey(unsigned char key)
             break;
             
         case 'w':
-            setFiberDisp(player.allVisibleFiberDisp(), changeScale, -10);
+            setFiberDisp(player.allVisibleFiberDisp(), changeScale, -8);
             break;
 
         case 'e':
-            setFiberDisp(player.allVisibleFiberDisp(), changeScale, 10);
+            setFiberDisp(player.allVisibleFiberDisp(), changeScale, 8);
             break;
             
         case 'W':
