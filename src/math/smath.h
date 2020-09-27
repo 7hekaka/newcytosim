@@ -228,7 +228,7 @@ namespace sMath
         T n = ( a[0] - b[0] ) * ( a[0] - b[0] );
         for( int d = 1; d < dim; ++d )
             n += ( a[d] - b[d] ) * ( a[d] - b[d] );
-        return sqrt(n);
+        return std::sqrt(n);
     }
     
     //------------------------------------------------------------------------------
@@ -271,16 +271,16 @@ namespace sMath
     //this is needed under windows:
     inline real remainder(const real a, const real b)
     {
-        real p = floor( 0.5 + a / b );
+        real p = std::floor( 0.5 + a / b );
         return a - p * b;
     }
     
     inline real round(real x)
     {
         if ( x < 0 )
-            return -floor(0.5-x);
+            return -std::floor(0.5-x);
         else
-            return  floor(0.5+x);
+            return  std::floor(0.5+x);
     }
 
 #endif

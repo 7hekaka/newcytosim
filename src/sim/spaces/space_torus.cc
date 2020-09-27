@@ -77,7 +77,7 @@ Vector SpaceTorus::project(Vector const& pos) const
     Vector cen = backbone(pos);
     Vector ax = pos - cen;
     real n = ax.normSqr();
-    n = bWidth / sqrt(n);
+    n = bWidth / std::sqrt(n);
     return cen + n * ax;
 }
 

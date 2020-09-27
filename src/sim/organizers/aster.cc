@@ -280,9 +280,9 @@ ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_typ
     if ( n > REAL_EPSILON )
     {
         if ( prop->focus == PLUS_END )
-            dir /= -sqrt(n);
+            dir /= -std::sqrt(n);
         else
-            dir /= sqrt(n);
+            dir /= std::sqrt(n);
     }
     else
         dir = Vector::randU();
@@ -434,7 +434,7 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
         real ang = -angle;
         for ( size_t n = 0; n < nbf; ++n )
         {
-            Vector P(cos(ang), sin(ang));
+            Vector P(std::cos(ang), std::sin(ang));
             placeAnchor(alpha*P, P, origin);
             ang += delta;
         }
@@ -442,14 +442,14 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
         real cap, angle = M_PI;
         // either 'angle' or 'cap' can be specified:
         if ( opt.set(angle, "aster_angle") )
-            cap = 1.0 - cos(angle);
+            cap = 1.0 - std::cos(angle);
         else
             opt.set(cap, "aster_cap" );
         // distribute points randomly over a portion of the unit sphere:
         std::vector<Vector> pts(nbf, Vector(0,0,0));
         size_t ouf = 0;
         size_t cnt = 0;
-        real sep, sep0 = sqrt( 2 * M_PI * cap / nbf );
+        real sep, sep0 = std::sqrt( 2 * M_PI * cap / nbf );
         do {
             // we decrease gradually the separation, to reach a good solution...
             sep = 512 * sep0 / real(ouf+512);
@@ -478,7 +478,7 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
         real ang = 0, delta = 2 * M_PI / real(nbf);
         for ( size_t n = 0; n < nbf; ++n )
         {
-            Vector P(cos(ang), sin(ang));
+            Vector P(std::cos(ang), std::sin(ang));
             placeAnchor(alpha*P, P, origin);
             ang += delta;
         }

@@ -86,7 +86,7 @@ namespace VecPrint
             os << " void";
         else
         {
-            const T threshold = pow(0.1, digits);
+            const T threshold = std::pow(0.1, digits);
             char str[32] = { 0 }, zer[32] = { 0 }, fmt[32] = " %4.0f";
             
             { // build format strings:
@@ -188,7 +188,7 @@ namespace VecPrint
                         os << ' ';
                     else
                     {
-                        int x = std::max(7, 2 + log10( std::fabs(val) / scale ));
+                        int x = std::max(7, 2+std::log10(std::fabs(val)/scale));
                         os << str[x];
                     }
                 }

@@ -204,13 +204,13 @@ public:
     }
     
     
-    /// the standard norm = sqrt(x^2)
+    /// the standard norm = std::sqrt(x^2)
     real norm() const
     {
         return abs_real(XX);
     }
     
-    /// the standard norm = sqrt(x^2)
+    /// the standard norm = std::sqrt(x^2)
     friend real norm(Vector1 const& V)
     {
         return V.norm();
@@ -222,7 +222,7 @@ public:
         return 1.0 / abs_real(XX);
     }
     
-    /// the 2D norm = sqrt(x^2+y^2)
+    /// the 2D norm = std::sqrt(x^2+y^2)
     real normXY() const
     {
         return abs_real(XX);

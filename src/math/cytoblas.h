@@ -21,7 +21,7 @@ namespace blas
 inline double nrm2(int N, const real* X)
 {
     //using double precision to accumulate:
-    return sqrt(blas::xdot(N, X, 1, X, 1));
+    return std::sqrt(blas::xdot(N, X, 1, X, 1));
 }
 
 

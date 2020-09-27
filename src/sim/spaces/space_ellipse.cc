@@ -142,7 +142,7 @@ Vector3 SpaceEllipse::project3D(Vector3 const& W) const
             throw InvalidParameter("Inconsistent mSpheroid dimensions");
         
         //rotate point around the xx axis to bring it into the yy-zz plane:
-        real pR, rr = sqrt( W[xx]*W[xx] + W[yy]*W[yy] );
+        real pR, rr = std::sqrt( W[xx]*W[xx] + W[yy]*W[yy] );
         projectEllipse(pR, P[zz], rr, W[zz], length(xx), length(zz), 8*REAL_EPSILON);
         // back-rotate to get the projection in 3D:
         if ( rr > 0 ) {
@@ -281,7 +281,7 @@ bool SpaceEllipse::draw() const
     for ( GLfloat u = -0.9f; u < 1.0f; u += 0.2f )
     {
         GLfloat H = u * Z;
-        GLfloat R = sqrt( 1 - u*u );
+        GLfloat R = std::sqrt( 1 - u*u );
         glBegin(GL_LINE_LOOP);
         for ( size_t n = 0; n <= 2*fin; ++n )
         {

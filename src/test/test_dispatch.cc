@@ -9,7 +9,7 @@ double results[CNT];
 
 void work(size_t i)
 {
-    results[i] = sin(i);
+    results[i] = std::sin(i);
 }
 
 

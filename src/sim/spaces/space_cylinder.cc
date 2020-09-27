@@ -151,7 +151,7 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca&
     else if ( ! cap )
     {
         // inside cylinder in YZ plane and also inside in X:
-        //if ( abs_real( pos.XX - p ) > rad - sqrt(dis) )
+        //if ( abs_real( pos.XX - p ) > rad - std::sqrt(dis) )
         if ( dis > square( rad - abs_real(pos.XX-X) ) )
             cyl = true;
         else

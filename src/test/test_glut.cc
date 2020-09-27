@@ -234,7 +234,7 @@ void processMouse(int button, int state, int x, int y)
         {
             GLfloat xx = x - 0.5*windowSize[0];
             GLfloat yy = y - 0.5*windowSize[1];
-            zoomFactor = sqrt( xx*xx + yy*yy );
+            zoomFactor = std::sqrt( xx*xx + yy*yy );
             if ( zoomFactor > 0 )
                 zoomFactor = 1.0 / zoomFactor;
             zoomSave = zoom;
@@ -268,7 +268,7 @@ void processMotion(int x, int y)
             // --- we set the zoom from how far the mouse is from the window center
             GLfloat xx = x - 0.5*windowSize[0];
             GLfloat yy = y - 0.5*windowSize[1];
-            GLfloat Z = zoomFactor * sqrt( xx*xx + yy*yy );
+            GLfloat Z = zoomFactor * std::sqrt( xx*xx + yy*yy );
             if ( Z <= 0 ) return;
             zoom = zoomSave * Z;
         } break;

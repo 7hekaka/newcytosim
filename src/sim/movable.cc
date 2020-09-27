@@ -178,7 +178,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                     } while ( p < 0 || p > 1 || p < RNG.preal() );
                     return vec;
                 }
-                real x = sqrt(RNG.preal());
+                real x = std::sqrt(RNG.preal());
 #if ( DIM < 3 )
                 return Vector(S+(E-S)*x, R*RNG.sreal(), 0);
 #else
@@ -197,7 +197,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                     real p;
                     do {
                         vec = spc->randomPlace();
-                        p = exp( ( S - vec.XX ) / E );
+                        p = std::exp( ( S - vec.XX ) / E );
                     } while ( p < 0 || p > 1 || p < RNG.preal() );
                     return vec;
                 }
@@ -377,8 +377,8 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             else {
                 real R = L / A;
                 real a = A * RNG.shalf();
-                x = R * cos(a) - R; // origin centered on arc
-                y = R * sin(a);
+                x = R * std::cos(a) - R; // origin centered on arc
+                y = R * std::sin(a);
             }
             return Vector(x, y, 0);
         }
@@ -415,12 +415,12 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                 real theta = abs_real( length / radius );
                 real angle = RNG.preal() * theta;
                 // substract R to have the arc start from 0,0:
-                x = (radiusInner + thickness * RNG.preal()) * cos( angle ) - radius;
-                y = (radiusInner + thickness * RNG.preal()) * sin( angle );
+                x = (radiusInner + thickness * RNG.preal()) * std::cos( angle ) - radius;
+                y = (radiusInner + thickness * RNG.preal()) * std::sin( angle );
             }
             
-            real cr = cos(rotation);
-            real sr = sin(rotation);
+            real cr = std::cos(rotation);
+            real sr = std::sin(rotation);
             
             // rotate
             return Vector(cr*x + sr*y , -sr*x + cr*y, 0 );
@@ -880,9 +880,9 @@ Rotation Movable::readRotation(std::istream& is)
         if ( Tokenizer::has_symbol(is, "axis") )
             is >> dir;
 #if ( DIM >= 3 )
-        return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
+        return Rotation::rotationAroundAxis(normalize(dir), std::cos(ang), std::sin(ang));
 #else
-        return Rotation::rotation(cos(ang), sin(ang));
+        return Rotation::rotation(std::cos(ang), std::sin(ang));
 #endif
     }
     else if ( tok == "axis" )
@@ -898,9 +898,9 @@ Rotation Movable::readRotation(std::istream& is)
             ang *= M_PI/180.0;
         }
 #if ( DIM >= 3 )
-        return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
+        return Rotation::rotationAroundAxis(normalize(dir), std::cos(ang), std::sin(ang));
 #else
-        return Rotation::rotation(cos(ang), sin(ang));
+        return Rotation::rotation(std::cos(ang), std::sin(ang));
 #endif
     }
     else if ( tok == "degree" )
@@ -912,9 +912,9 @@ Rotation Movable::readRotation(std::istream& is)
         if ( Tokenizer::has_symbol(is, "axis") )
             is >> dir;
 #if ( DIM >= 3 )
-        return Rotation::rotationAroundAxis(normalize(dir), cos(ang), sin(ang));
+        return Rotation::rotationAroundAxis(normalize(dir), std::cos(ang), std::sin(ang));
 #else
-        return Rotation::rotation(cos(ang), sin(ang));
+        return Rotation::rotation(std::cos(ang), std::sin(ang));
 #endif
     }
 #if ( DIM >= 3 )

@@ -6,7 +6,7 @@
 
 real Matrix22::rotationAngle() const
 {
-    return atan2(val[1], val[0]);
+    return std::atan2(val[1], val[0]);
 }
 
 
@@ -20,16 +20,16 @@ Matrix22 Matrix22::rotation180()
 Matrix22 Matrix22::randomRotation()
 {
     real a = M_PI*RNG.sreal();
-    real c = cos(a);
-    real s = sin(a);
+    real c = std::cos(a);
+    real s = std::sin(a);
     return Matrix22(c, s, -s, c);
 }
 
 
 Matrix22 Matrix22::randomRotation(real angle)
 {
-    real c = cos(angle);
-    real s = sin(angle) * RNG.sflip();
+    real c = std::cos(angle);
+    real s = std::sin(angle) * RNG.sflip();
     return Matrix22(c, s, -s, c);
 }
 

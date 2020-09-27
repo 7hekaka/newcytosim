@@ -337,43 +337,43 @@ public:
         return XX*XX + YY*YY + ZZ*ZZ + TT*TT;
     }
     
-    /// the standard norm = sqrt(x^2+y^2+z^2+t^2)
+    /// the standard norm = std::sqrt(x^2+y^2+z^2+t^2)
     real norm() const
     {
-        return sqrt(XX*XX + YY*YY + ZZ*ZZ + TT*TT);
+        return std::sqrt(XX*XX + YY*YY + ZZ*ZZ + TT*TT);
     }
     
-    /// the standard norm = sqrt(x^2+y^2+z^2+t^2)
+    /// the standard norm = std::sqrt(x^2+y^2+z^2+t^2)
     friend real norm(Vector4 const& V)
     {
         return V.norm();
     }
     
-    /// the inversed magnitude = 1.0 / sqrt(x^2+y^2+z^2+t^2)
+    /// the inversed magnitude = 1.0 / std::sqrt(x^2+y^2+z^2+t^2)
     real inv_norm() const
     {
-        return 1.0 / sqrt(XX*XX + YY*YY + ZZ*ZZ + TT*TT);
+        return 1.0 / std::sqrt(XX*XX + YY*YY + ZZ*ZZ + TT*TT);
     }
 
-    /// the 2D norm = sqrt(x^2+y^2)
+    /// the 2D norm = std::sqrt(x^2+y^2)
     real normXY() const
     {
-        return sqrt(XX*XX + YY*YY);
+        return std::sqrt(XX*XX + YY*YY);
     }
     
-    /// the 2D norm = sqrt(x^2+z^2)
+    /// the 2D norm = std::sqrt(x^2+z^2)
     real normXZ() const
     {
-        return sqrt(XX*XX + ZZ*ZZ);
+        return std::sqrt(XX*XX + ZZ*ZZ);
     }
     
-    /// the 2D norm = sqrt(y^2+z^2)
+    /// the 2D norm = std::sqrt(y^2+z^2)
     real normYZ() const
     {
-        return sqrt(YY*YY + ZZ*ZZ);
+        return std::sqrt(YY*YY + ZZ*ZZ);
     }
     
-    /// the 2D norm = sqrt(y^2+z^2)
+    /// the 2D norm = std::sqrt(y^2+z^2)
     real normYZSqr() const
     {
         return YY*YY + ZZ*ZZ;
@@ -396,7 +396,7 @@ public:
     /// distance between two points, equivalent to (a-b).norm()
     friend real distance(Vector4 const& a, Vector4 const& b)
     {
-        return sqrt(distanceSqr(a, b));
+        return std::sqrt(distanceSqr(a, b));
     }
     
     /// absolute values: (|x|, |y|, |z|, |t|)

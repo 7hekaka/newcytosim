@@ -3,7 +3,6 @@
 #define RANDOM_H
 
 #include <stdint.h>
-#include <cmath>
 
 #ifndef REAL_H
 #  include "real.h"
@@ -291,10 +290,10 @@ public:
     void gauss_slow(real &, real&);
     
     /// random in [0, inf[, with P(x) = exp(-x), mean = 1.0, variance = 1.0
-    real exponential() { return -log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
+    real exponential() { return -std::log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
     
     /// exponentially distributed positive real, with P(x) = exp(-x/E) / E,  parameter E is 1/Rate
-    real exponential(const real E) { return -E * log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
+    real exponential(const real E) { return -E * std::log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
 
     /// fair choice among two given values
     template<typename T>

@@ -121,7 +121,7 @@ real scale, nrm = 0;
         nrm += square(W.XX + tLength);
     
     if ( nrm > 0 ) {
-        nrm   = sqrt(nrm);
+        nrm   = std::sqrt(nrm);
         scale = tRadius/nrm;
     }
     else {
@@ -171,7 +171,7 @@ real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
     if ( W.YY > totArmLength )
         nrm += square(W.YY-totArmLength);
     if ( nrm > 0 ) {
-        nrm   = sqrt(nrm);
+        nrm   = std::sqrt(nrm);
         scale = tRadius/nrm;
     }
     else {
@@ -245,7 +245,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
     real pZ;
     //w is in the intersection area and projected on the intersection line,
     //which is an ellipse in 3D. The two halfaxis of the ellipse are given
-    //by    a = tRadius * sqrt(2)
+    //by    a = tRadius * std::sqrt(2)
     //      b = tRadius
     
     //check for pathological cases
@@ -279,7 +279,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
             pX = xTurned*M_SQRT2 + tJunction;
             pY = abs_real(xTurned)*M_SQRT2;
             //we randomly distribute the points to +z or -z
-            pZ = RNG.sflip()*sqrt(tRadiusSq - 2*xTurnedSq);
+            pZ = RNG.sflip()*std::sqrt(tRadiusSq - 2*xTurnedSq);
         }
     }
     else {
@@ -303,7 +303,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
         xSol = xSolTurned * M_SQRT1_2;
         pX = xSol + tJunction;
         pY = abs_real(xSol);
-        pZ = std::copysign(sqrt(tRadiusSq-xSol*xSol), W.ZZ);
+        pZ = std::copysign(std::sqrt(tRadiusSq-xSol*xSol), W.ZZ);
     }
     P.set(pX,pY,pZ);
 #endif
@@ -345,13 +345,13 @@ Vector SpaceTee::project(Vector const& W) const
             //or  the point is in the lower half of the base cylinder
             //or  the y coordinate of the point is low enough, so that it can
             //    be projected perpendicularly on the base cylinder:
-            //    y < z |xRel| / sqrt( tRadius^2 - xRel^2 )
+            //    y < z |xRel| / std::sqrt( tRadius^2 - xRel^2 )
             projectOnBase(W, P);
         } else if ( square(W.YY*xRel) + square(W.YY*W.ZZ) > square(xRel*tRadius) ) {
             //w is projected on the arm, if
             //the y coordinate of the point is greater than the y coordinate of
             //the corresponding point on the intersection ellipse:
-            //y > r |xRel| / sqrt( xRel^2 + z^2 )
+            //y > r |xRel| / std::sqrt( xRel^2 + z^2 )
             projectOnArm(W, P);
         }
         else {
@@ -465,8 +465,8 @@ bool SpaceTee::draw() const
     const GLenum glp1 = GL_CLIP_PLANE4;
     const GLenum glp2 = GL_CLIP_PLANE5;
     const GLdouble planeZ[] = { 0, 0, 1, 0 };
-    const GLdouble plane1[] = { 0, -sqrt(0.5), sqrt(0.5), 0 };
-    const GLdouble plane2[] = { 0,  sqrt(0.5), sqrt(0.5), 0 };
+    const GLdouble plane1[] = { 0, -std::sqrt(0.5), std::sqrt(0.5), 0 };
+    const GLdouble plane2[] = { 0,  std::sqrt(0.5), std::sqrt(0.5), 0 };
 
     GLdouble L = tLength/tRadius;
     GLdouble J = tJunction/tRadius;

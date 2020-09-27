@@ -264,7 +264,7 @@ void changeScale(real& scale, int d)
     real s = std::log2(std::fabs(scale)) + d * 0.125;
     if ( s < -14 ) s =  10;
     if ( s >  10 ) s = -14;
-    scale = std::copysign(exp2(s), scale);
+    scale = std::copysign(std::exp2(s), scale);
 }
 
 

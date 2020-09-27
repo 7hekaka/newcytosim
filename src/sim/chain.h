@@ -329,7 +329,7 @@ public:
     Vector       dirSegment(size_t p)  const { return diffPoints(p) * iCut; }
 #else
     /// normalized tangent vector to the fiber within segment [p, p+1]
-    /** Normalizing the difference between points is slow due to sqrt() */
+    /** Normalizing the difference between points is slow due to std::sqrt() */
     Vector       dirSegment(size_t p)  const { return normalize(diffPoints(p)); }
 #endif
 #if ( DIM == 1 )

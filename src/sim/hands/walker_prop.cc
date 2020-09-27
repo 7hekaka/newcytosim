@@ -103,7 +103,7 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
      to the maximum force that the motor can sustain before detaching:
      1/2 kT * DIM  <<  1/2 stiffness x^2 ~ 1/2 force^2 / stiffness;
      */
-    if ( sqrt( DIM * kT * stiff ) > stall_force )
+    if ( std::sqrt( DIM * kT * stiff ) > stall_force )
     {
         Cytosim::warn << "The stall force of `" << name() << "' is too small:\n"\
         << PREF << "DIM * kT * stiffness > stall_force\n"\

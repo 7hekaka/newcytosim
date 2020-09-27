@@ -102,7 +102,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     real da = 2 * M_PI / NFIL;
     for ( size_t i = 0; i < NFIL; ++i )
     {
-        fil_[i]->translate(cos(a)*E+sin(a)*F);
+        fil_[i]->translate(std::cos(a)*E+std::sin(a)*F);
         a += da;
     }
 #endif
@@ -197,8 +197,8 @@ void Tubule::setInteractionsB(Meca& meca) const
 #if ( DIM >= 3 )
     const real stiff = prop->stiffness[0];
     const real ang = M_PI / NFIL;
-    const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
-    const real c = cos(ang), s = sin(ang);
+    const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
+    const real c = std::cos(ang), s = std::sin(ang);
     
     assert_true(fil_[0]);
     const size_t end = fil_[0]->nbSegments();
@@ -255,8 +255,8 @@ void Tubule::setInteractions(Meca& meca) const
     const real stiffL = prop->stiffness[0];
     const real stiffR = prop->stiffness[1];
     const real ang = M_PI / NFIL;
-    const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
-    const real c = cos(ang), s = sin(ang);
+    const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
+    const real c = std::cos(ang), s = std::sin(ang);
     
     const size_t e = bone_->nbSegments();
     
@@ -311,10 +311,10 @@ void Tubule::setInteractionsC(Meca& meca) const
 {
 #if ( DIM >= 3 )
     const real ang = M_PI / NFIL;
-    const real len = 2 * prop->radius * sin(ang);  // distance between protofilaments
+    const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
     const real stiffL = prop->stiffness[0];
     const real stiffA = prop->stiffness[1];
-    real co = cos(2*ang), si = sin(2*ang);
+    real co = std::cos(2*ang), si = std::sin(2*ang);
     
     assert_true(fil_[0]);
     const size_t end = fil_[0]->nbSegments();

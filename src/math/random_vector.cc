@@ -48,7 +48,7 @@ const Vector2 Vector2::randU()
         y = RNG.sreal();
         d = x*x + y*y;
     } while ( d > 1.0  ||  d < 0.01 );
-    return Vector2(x, y) / sqrt(d);
+    return Vector2(x, y) / std::sqrt(d);
 }
 
 const Vector2 Vector2::randU(const real n)
@@ -59,7 +59,7 @@ const Vector2 Vector2::randU(const real n)
         y = RNG.sreal();
         d = x*x + y*y;
     } while ( d > 1.0  ||  d < 0.01 );
-    return Vector2(x, y) * (n/sqrt(d));
+    return Vector2(x, y) * (n/std::sqrt(d));
 }
 
 #else
@@ -113,7 +113,7 @@ const Vector2 Vector2::randB(const real n)
 
 const Vector2 Vector2::randOrthoU(const real len) const
 {
-    real s = RNG.sflip(len) / sqrt( XX * XX + YY * YY );
+    real s = RNG.sflip(len) / std::sqrt( XX * XX + YY * YY );
     return Vector2(-YY, XX, 0) * s;
 }
 
@@ -149,7 +149,7 @@ const Vector3 Vector3::randU()
         z = RNG.sreal();
         d = x*x + y*y + z*z;
     } while ( d > 1.0  ||  d < 0.01 );
-    return Vector3(x, y, z) / sqrt(d);
+    return Vector3(x, y, z) / std::sqrt(d);
 
 }
 
@@ -163,7 +163,7 @@ const Vector3 Vector3::randU(real n)
         z = RNG.sreal();
         d = x*x + y*y + z*z;
     } while ( d > 1.0  ||  d < 0.01 );
-    return Vector3(x, y, z) * (n/sqrt(d));
+    return Vector3(x, y, z) * (n/std::sqrt(d));
 }
 
 #elif ( 1 )
@@ -182,7 +182,7 @@ const Vector3 Vector3::randU()
         y = RNG.sreal();
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
-    real h = 2 * sqrt(d);
+    real h = 2 * std::sqrt(d);
     return Vector3(x*h, y*h, 2.0*d-1.0);
 }
 
@@ -194,7 +194,7 @@ const Vector3 Vector3::randU(const real n)
         y = RNG.sreal();
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
-    real h = ( n + n ) * sqrt(d);
+    real h = ( n + n ) * std::sqrt(d);
     return Vector3(x*h, y*h, n*(2.0*d-1.0));
 }
 
@@ -267,7 +267,7 @@ const Vector3 Vector3::randOrthoU(const real len) const
     if ( n > REAL_EPSILON )
     {
         const Vector2 V = Vector2::randU();
-        Vector3 x, y, z = *this / sqrt(n);
+        Vector3 x, y, z = *this / std::sqrt(n);
         z.orthonormal(x, y);
         return x * ( len * V.XX ) + y * ( len * V.YY );
     }
@@ -366,7 +366,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
         
         const Vector2 YZ = Vector2::randU();
         real u = std::max(1.0 - cap * RNG.preal(), -1.0);
-        real v = sqrt( 1.0 - u * u );
+        real v = std::sqrt( 1.0 - u * u );
         Vector3 pos(u, v*YZ.XX, v*YZ.YY);
         
         for ( size_t i = 0; i < n; ++i )

@@ -563,7 +563,7 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
         {
             if ( obj->prop == fp )
             {
-                size_t u = size_t(floor( obj->length() / delta ));
+                size_t u = size_t(std::floor( obj->length() / delta ));
                 if ( u < nbin )
                     ++cnt[u];
                 else
@@ -899,34 +899,34 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
         if ( fib->abscissaM() < 0 )
         {
             uint32_t z = fib->signature();
-            real a = spread * log(z*TINY);
+            real a = spread * std::log(z*TINY);
             while ( a > fib->abscissaP() )
             {
                 z = lcrng2(z);
-                a += spread * log(z*TINY);
+                a += spread * std::log(z*TINY);
             }
             while ( a >= fib->abscissaM() )
             {
                 out << '\n' << fib->pos(a);
                 z = lcrng2(z);
-                a += spread * log(z*TINY);
+                a += spread * std::log(z*TINY);
             }
         }
         // generate speckles above the origin of abscissa
         if ( fib->abscissaP() > 0 )
         {
             uint32_t z = ~fib->signature();
-            real a = -spread * log(z*TINY);
+            real a = -spread * std::log(z*TINY);
             while ( a < fib->abscissaM() )
             {
                 z = lcrng1(z);
-                a -= spread * log(z*TINY);
+                a -= spread * std::log(z*TINY);
             }
             while ( a <= fib->abscissaP() )
             {
                 out << '\n' << fib->pos(a);
                 z = lcrng1(z);
-                a -= spread * log(z*TINY);
+                a -= spread * std::log(z*TINY);
             }
         }
         
@@ -2658,8 +2658,8 @@ size_t Simul::flagRing() const
     for ( unsigned a = 0; a < 360; ++a )
     {
         real ang = a * M_PI / 180.0;
-        Vector nor( cos(ang), sin(ang), 0.0);
-        Vector dir(-sin(ang), cos(ang), 0.0);
+        Vector nor( std::cos(ang), std::sin(ang), 0.0);
+        Vector dir(-std::sin(ang), std::cos(ang), 0.0);
         
         list_t sec;
         for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
@@ -2735,8 +2735,8 @@ void Simul::analyzeRing(ObjectFlag flg, real& length, real& radius) const
     for ( unsigned a = 0; a <= 360; ++a )
     {
         real ang = a * M_PI / 180.0;
-        Vector nor( cos(ang), sin(ang), 0);
-        Vector dir(-sin(ang), cos(ang), 0);
+        Vector nor( std::cos(ang), std::sin(ang), 0);
+        Vector dir(-std::sin(ang), std::cos(ang), 0);
         
         unsigned cen_cnt = 0;
         Vector cen(0,0,0);
@@ -2816,7 +2816,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     for ( unsigned a = 0; a < 180; a += 10 )
     {
         real ang = a * M_PI / 180.0;
-        Vector dir(cos(ang), sin(ang), 0);
+        Vector dir(std::cos(ang), std::sin(ang), 0);
         fibers.infoTension(c, t, inf, sup, dir, 0);
         cnt += 2;  // every plane should intersect the ring twice
         ten += t;
@@ -2890,7 +2890,7 @@ void Simul::reportAshbya(std::ostream& out) const
             Vector vec = normalize(obj->diffPoints(0));
             Vector dir(1,0,0);
             out << SEP << vec;
-            out << SEP << acos(dot(vec, dir));
+            out << SEP << std::acos(dot(vec, dir));
         }
     }
 }

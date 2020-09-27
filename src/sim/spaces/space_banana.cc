@@ -56,8 +56,8 @@ void SpaceBanana::update()
     }
 
     bWidthSqr = bWidth * bWidth;
-    bEnd[0] = bRadius * sin(bAngle);
-    bEnd[1] = 0.5*bRadius*(1-cos(bAngle));
+    bEnd[0] = bRadius * std::sin(bAngle);
+    bEnd[1] = 0.5*bRadius*(1-std::cos(bAngle));
     
     bCenter[0] = 0;
     bCenter[1] = bRadius - bEnd[1];
@@ -117,7 +117,7 @@ Vector SpaceBanana::project(Vector const& pos) const
     Vector cen = backbone(pos);
     Vector dif = pos - cen;
     real n = dif.normSqr();
-    return cen + (bWidth / sqrt(n)) * dif;
+    return cen + (bWidth / std::sqrt(n)) * dif;
 }
 
 
@@ -196,10 +196,10 @@ bool SpaceBanana::draw() const
     
     glMatrixMode(GL_MODELVIEW);
 
-    GLdouble plane1[] = { -cos(bAngle), -sin(bAngle), 0, 0 };
-    GLdouble plane2[] = {  cos(bAngle), -sin(bAngle), 0, 0 };
-    GLdouble plane1i[] = {  cos(bAngle), sin(bAngle), 0, 0 };
-    GLdouble plane2i[] = { -cos(bAngle), sin(bAngle), 0, 0 };
+    GLdouble plane1[] = { -std::cos(bAngle), -std::sin(bAngle), 0, 0 };
+    GLdouble plane2[] = {  std::cos(bAngle), -std::sin(bAngle), 0, 0 };
+    GLdouble plane1i[] = {  std::cos(bAngle), std::sin(bAngle), 0, 0 };
+    GLdouble plane2i[] = { -std::cos(bAngle), std::sin(bAngle), 0, 0 };
     
     const GLenum glp1 = GL_CLIP_PLANE4;
     const GLenum glp2 = GL_CLIP_PLANE5;

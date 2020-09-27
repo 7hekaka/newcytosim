@@ -93,7 +93,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 #if HAS_SMOOTH_EDGES
     if ( edge_ > 0 )
     {
-        const real R = sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+        const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
         const real n = min_real(R, radius_-edge_) / R;
         // projection on the inner cylinder:
         const real X = n * pos.XX;
@@ -104,7 +104,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
     else
 #endif
     {
-        const real R = sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+        const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
         const real dZ = min_real(abs_real(pos.ZZ-top_), abs_real(bot_-pos.ZZ));
         if ( abs_real(R-radius_) < dZ )
             return Vector(pos.XX/R, pos.YY/R, 0);
@@ -160,13 +160,13 @@ Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
                  to obtain a uniform volume sampling of the cut cylinder,
                  for RE < R < RE + edge_.
                  This formula was derived by inverting the cumulative probability */
-                R = sqrt(square(R)+RNG.preal()*(2*R+1)) - R;
+                R = std::sqrt(square(R)+RNG.preal()*(2*R+1)) - R;
                 Z = RNG.sreal();
                 // repeat until point is inside Torus:
                 N = square(R) + square(Z);
             } while ( N > 1.0 );
             // normalize to get a point on the surface:
-            N = edge_ / sqrt(N);
+            N = edge_ / std::sqrt(N);
             Vector2 XY = Vector2::randU(RE+R*N);
             Z = N * Z + sign_select(Z, bot_+edge_, top_-edge_);
             return Vector(XY.XX, XY.YY, Z);
@@ -224,7 +224,7 @@ bool SpaceCylinderZ::inside(Vector const& W) const
 #if ( DIM > 2 )
     const real RT = W.XX * W.XX + W.YY * W.YY;
 # if HAS_SMOOTH_EDGES
-    const real R = max_real(0, sqrt(RT)-radius_+edge_);
+    const real R = max_real(0, std::sqrt(RT)-radius_+edge_);
     const real Z = max_real(0, std::max(bot_+edge_-W.ZZ, W.ZZ-top_+edge_));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
@@ -244,7 +244,7 @@ bool SpaceCylinderZ::allInside(Vector const& W, const real rad) const
     const real RT = W.XX * W.XX + W.YY * W.YY;
 # if HAS_SMOOTH_EDGES
     const real E = edge_ + rad;
-    const real R = max_real(0, sqrt(RT)-E);
+    const real R = max_real(0, std::sqrt(RT)-E);
     const real Z = max_real(0, max_real(bot_+E-W.ZZ, W.ZZ-top_+E));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
@@ -353,7 +353,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     else if ( ! cap )
     {
         // inside cylinder in XY plane and also inside in Z:
-        //if ( abs_real(pos.ZZ-Z) > R - sqrt(dis) )
+        //if ( abs_real(pos.ZZ-Z) > R - std::sqrt(dis) )
         if ( dis > square( R - abs_real(pos.ZZ-Z) ) )
             cyl = true;
         else

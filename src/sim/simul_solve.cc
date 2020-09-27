@@ -594,7 +594,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
         LOG_ONCE("AD-HOC BEAD TORQUES ENABLED\n");
         const real sti = 10000;
         const real ang = 2 * M_PI / 12;
-        real co = cos(ang), si = sin(ang);
+        real co = std::cos(ang), si = std::sin(ang);
         // attach beads together in a closed loop:
         Bead * a = beads.firstID();
         Bead * b = beads.nextID(a);
@@ -611,7 +611,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     for( Bead const* b=beads.first(); b; b=b->next() )
     {
         real x = ( b->identity() - 2 ) * ang;
-        Vector pos(5*cos(x), 5*sin(x), 0);
+        Vector pos(5*std::cos(x), 5*std::sin(x), 0);
         meca.addPointClamp(Mecapoint(b, 0), pos, 1);
     }
 #endif

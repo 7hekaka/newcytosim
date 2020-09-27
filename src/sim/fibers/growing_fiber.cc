@@ -68,7 +68,7 @@ void GrowingFiber::step()
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( forceP < 0  &&  prop->growing_force[P] < INFINITY )
-            mGrowthP *= exp(forceP/prop->growing_force[P]);
+            mGrowthP *= std::exp(forceP/prop->growing_force[P]);
         
         mGrowthP += prop->growing_off_speed_dt[P];
     }
@@ -92,7 +92,7 @@ void GrowingFiber::step()
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( forceM < 0  &&  prop->growing_force[M] < INFINITY )
-            mGrowthM *= exp(forceM/prop->growing_force[M]);
+            mGrowthM *= std::exp(forceM/prop->growing_force[M]);
 
         mGrowthM += prop->growing_off_speed_dt[M];
     }

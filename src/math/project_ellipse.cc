@@ -57,7 +57,7 @@ void projectEllipse(real&   pX, real&  pY,
     // we derive a lower limit for 'h' from  pX^2 + pY^2 > max(radX,radY)^2
     real RR = std::max(aa, bb);
     // 'hmin' is the minimum value that 'h' could have
-    real hmin = sqrt( ( wX*wX*aa*aa + wY*wY*bb*bb ) / RR ) - RR;
+    real hmin = std::sqrt( ( wX*wX*aa*aa + wY*wY*bb*bb ) / RR ) - RR;
     
     // we derive another lower limit for 'h' from  |pX| < radX
     hmin = std::max(hmin, ( abs_real(wX) - radX ) * radX);
@@ -195,7 +195,7 @@ void projectEllipsoid(real  p[3],
     // we derive a lower limit for 'h' from  pX^2 + pY^2 + pZ^2 < max(radX,radY,radZ)^2
     real RR = std::max(aa, std::max(bb,cc));
     // 'hmin' is the minimum value that 'h' can have
-    real hmin = sqrt( ( w[0]*w[0]*aa*aa + w[1]*w[1]*bb*bb + w[2]*w[2]*cc*cc ) / RR ) - RR;
+    real hmin = std::sqrt( ( w[0]*w[0]*aa*aa + w[1]*w[1]*bb*bb + w[2]*w[2]*cc*cc ) / RR ) - RR;
 
     // we derive another lower limit for 'h' from  |pX| < radX
     hmin = std::max(hmin, ( abs_real(w[0]) - rad[0] ) * rad[0]);

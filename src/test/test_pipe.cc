@@ -99,7 +99,7 @@ int command(char cmd[], size_t len, int num)
             return snprintf(cmd, len, "change all simul display {back_color=%s}\n", str.c_str());
         }
         case 1:
-            return snprintf(cmd, len, "change kinesin { unloaded_speed=%.2f }\n", cos(angle));
+            return snprintf(cmd, len, "change kinesin { unloaded_speed=%.2f }\n", std::cos(angle));
         case 2:
         {
             int s = round(2+14*std::fabs(cosf(angle)));

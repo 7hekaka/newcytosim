@@ -78,7 +78,7 @@ Vector SpaceCapsule::project(Vector const& pos) const
     real n = square(pos.XX-X) + pos.normYZSqr();
     if ( n > 0 )
     {
-        n = radius_ / sqrt(n);
+        n = radius_ / std::sqrt(n);
         return Vector( X + n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
     }
     Vector2 YZ = Vector2::randU(radius_);
@@ -87,7 +87,7 @@ Vector SpaceCapsule::project(Vector const& pos) const
     real n = square(pos.XX-X) + square(pos.YY);
     if ( n > 0 )
     {
-        n = radius_ / sqrt(n);
+        n = radius_ / std::sqrt(n);
         return Vector(X + n * ( pos.XX - X ), n * pos.YY, 0);
     }
 #endif
@@ -129,7 +129,7 @@ Vector SpaceCapsule::normalToEdge(Vector const& pos) const
     real n = square(pos.XX-X) + pos.normYZSqr();
     if ( n > 0 )
     {
-        n = 1.0 / sqrt(n);
+        n = 1.0 / std::sqrt(n);
         return Vector(n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
     }
     Vector2 YZ = Vector2::randU();
@@ -138,7 +138,7 @@ Vector SpaceCapsule::normalToEdge(Vector const& pos) const
     real n = square(pos.XX-X) + square(pos.YY);
     if ( n > 0 )
     {
-        n = 1.0 / sqrt(n);
+        n = 1.0 / std::sqrt(n);
         return Vector(n * ( pos.XX - X ), n * pos.YY, 0);
     }
 #endif

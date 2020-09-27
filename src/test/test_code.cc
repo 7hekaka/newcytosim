@@ -135,7 +135,7 @@ void setFilament(size_t nbs, real seg, real persistence_length, real mag)
     nan_real(nbv, dir_);
     nan_real(nbs, lag_);
 
-    real sigma = sqrt(2.0*seg/persistence_length);
+    real sigma = std::sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
     Vector dir = Vector::randU();
@@ -149,7 +149,7 @@ void setFilament(size_t nbs, real seg, real persistence_length, real mag)
         dir.store(dir_+DIM*p);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
-        dir = cos(a) * dir + dir.randOrthoU(sin(a));
+        dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
     }
     pos.store(pos_+DIM*nbs);
     

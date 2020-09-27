@@ -234,7 +234,7 @@ void Random::gauss_set(real & a, real & b, real v)
      formula below are only valid if ( w > 0 ),
      which may be false only with a minuscule probability
      */
-    w = v * sqrt( -2 * log(w) / w );
+    w = v * std::sqrt( -2 * std::log(w) / w );
     a = w * x;
     b = w * y;
 }
@@ -256,7 +256,7 @@ real * gauss_fill(real dst[], const int32_t src[], int32_t const*const end)
         real w = x * x + y * y;
         if ( w <= 1 && 0 < w )
         {
-            w = sqrt( -2 * log(w) / w );
+            w = std::sqrt( -2 * std::log(w) / w );
             dst[0] = w * x;
             dst[1] = w * y;
             dst += 2;
@@ -434,9 +434,9 @@ void Random::gauss_set(real vec[], size_t cnt)
 void Random::gauss_slow(real& x, real& y)
 {
     real angle = real( URAND32() ) * ( TWO_POWER_MINUS_31 * M_PI );
-    real norm  = sqrt( -2 * log( preal_exc() ));
-    x = norm * cos(angle);
-    y = norm * sin(angle);
+    real norm  = std::sqrt( -2 * std::log( preal_exc() ));
+    x = norm * std::cos(angle);
+    y = norm * std::sin(angle);
 }
 
 //------------------------------------------------------------------------------
@@ -510,7 +510,7 @@ uint32_t Random::pint32_ratio(const uint32_t n, const uint32_t ratio[])
     // `sum==0` may be caused by wrong arguments; might be safer to throw an exception
     if ( sum == 0 )
         return 0; //throw InvalidParameter("invalid argument to Random::pint32_ratio");
-    sum = (int) floor( preal() * sum );
+    sum = (int) std::floor( preal() * sum );
     ii = 0;
     while ( sum >= ratio[ii] )
         sum -= ratio[ii++];
@@ -534,10 +534,10 @@ uint32_t Random::pint32_ratio(const uint32_t n, const uint32_t ratio[])
 uint32_t Random::poisson_knuth(const real E)
 {
     if ( E > 256 )
-        return static_cast<uint32_t>( gauss() * sqrt(E) + E );
+        return static_cast<uint32_t>( gauss() * std::sqrt(E) + E );
     if ( E < 0 )
         return 0;
-    real L = exp(-E);
+    real L = std::exp(-E);
     real p = preal();
     uint32_t k = 0;
     while ( p > L )
@@ -562,10 +562,10 @@ uint32_t Random::poisson_knuth(const real E)
 uint32_t Random::poisson(const real E)
 {
     if ( E > 256 )
-        return static_cast<uint32_t>( gauss() * sqrt(E) + E );
+        return static_cast<uint32_t>( gauss() * std::sqrt(E) + E );
     if ( E < 0 )
         return 0;
-    real p = exp(-E);
+    real p = std::exp(-E);
     real s = p;
     uint32_t k = 0;
     real u = preal();

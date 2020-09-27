@@ -94,7 +94,7 @@ void MightyProp::checkStiffness(real stiff, real len, real mul, real kT) const
      to the maximum force that the motor can sustain before detaching:
      1/2 kT * DIM  <<  1/2 stiffness x^2 ~ 1/2 force^2 / stiffness;
      */
-    if ( sqrt( DIM * kT * stiff ) > stall_force )
+    if ( std::sqrt( DIM * kT * stiff ) > stall_force )
     {
         Cytosim::warn << name() << ":stall_force is too small:\n"\
         << PREF << "DIM * kT * stiffness > stall_force\n"\
@@ -116,7 +116,7 @@ void MightyProp::checkStiffness(real stiff, real len, real mul, real kT) const
     /*
      Compare detachment rate at stall-force, with detachment rate at rest
      */
-    if ( exp( stall_force * unbinding_force_inv ) > 100 )
+    if ( std::exp( stall_force * unbinding_force_inv ) > 100 )
         Cytosim::warn << "Hand:exp( stall_force / unbinding_force ) is greater than 100\n";
 }
 

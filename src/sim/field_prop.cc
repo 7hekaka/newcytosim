@@ -101,7 +101,7 @@ void FieldProp::complete(Simul const& sim)
         throw InvalidParameter("field:decay_rate must be >= 0");
     
     // calculate decay coefficient during interval `time-step`
-    decay_frac = exp( -time_step * decay_rate );
+    decay_frac = std::exp( -time_step * decay_rate );
 }
 
 

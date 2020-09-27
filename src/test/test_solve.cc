@@ -96,7 +96,7 @@ void display()
     glColor3f(0,0,1.0);
     glBegin(GL_LINE_LOOP);
     for ( real ii = 0 ; ii < 6.28; ii+=0.0314 )
-        glVertex2d( radius*cos(ii), radius*sin(ii) );
+        glVertex2d( radius*std::cos(ii), radius*std::sin(ii) );
     glEnd();
     
     glPointSize(7.0);

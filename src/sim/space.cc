@@ -154,7 +154,7 @@ Vector Space::projectDeflated(Vector const& pos, const real rad) const
     real n = dif.normSqr();
     
     if ( n > 0 )
-        n = ( inside(pos) ? +rad : -rad ) / sqrt(n);
+        n = ( inside(pos) ? +rad : -rad ) / std::sqrt(n);
     else {
         throw Exception("in project(..., radius): the point is on the edge");
         //printf("point % .3f % .3f % .3f :", pos[0], pos[1], pos[2]);

@@ -75,7 +75,7 @@ void ClassicFiber::step()
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( force < 0  &&  prop->growing_force[M] < INFINITY )
-            mGrowthM = spd * exp(force/prop->growing_force[M]) + prop->growing_off_speed_dt[M];
+            mGrowthM = spd * std::exp(force/prop->growing_force[M]) + prop->growing_off_speed_dt[M];
         else
             mGrowthM = spd + prop->growing_off_speed_dt[M];
         
@@ -109,7 +109,7 @@ void ClassicFiber::step()
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( force < 0  &&  prop->growing_force[P] < INFINITY )
-            mGrowthP = spd * exp(force/prop->growing_force[P]) + prop->growing_off_speed_dt[P];
+            mGrowthP = spd * std::exp(force/prop->growing_force[P]) + prop->growing_off_speed_dt[P];
         else
             mGrowthP = spd + prop->growing_off_speed_dt[P];
         

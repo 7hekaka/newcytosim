@@ -1039,7 +1039,7 @@ void glApp::processMouseDrag(int mX, int mY)
             real cos = dot(depthAxis, mouse - viewFocus);
             real sin = dot(mouseAxis, cross(depthAxis, mouse - viewFocus));
             Quaternion<real> q;
-            q.setFromAxis(mouseAxis, atan2( sin, cos ));
+            q.setFromAxis(mouseAxis, std::atan2( sin, cos ));
             view.rotate_to(savedView.rotation * q);
             real Z = norm( mouse - viewFocus ) / norm( mouseDown - viewFocus );
             if ( Z > 0.001 ) view.zoom_to(savedView.zoom * (GLfloat)Z);

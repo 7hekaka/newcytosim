@@ -271,8 +271,8 @@ void Sphere::setDragCoefficientPiston()
     if ( eps <= 0 || eps > 1 )
         throw InvalidParameter("Error: piston formula yields invalid value");
 
-    spDrag    = 9*M_PI*M_PI * prop->viscosity * rad * M_SQRT2 / ( 4 * pow(eps,2.5) );
-    spDragRot = 2*M_PI*M_PI * prop->viscosity * rad * rad * rad * sqrt(2.0/eps);
+    spDrag    = 9*M_PI*M_PI * prop->viscosity * rad * M_SQRT2 / ( 4 * std::pow(eps,2.5) );
+    spDragRot = 2*M_PI*M_PI * prop->viscosity * rad * rad * rad * std::sqrt(2.0/eps);
         
     //report the reduced mobility of the sphere:
     Cytosim::log("Sphere of radius %.3f has piston mobility %.2e\n", spRadius, spDrag);
@@ -362,11 +362,11 @@ real Sphere::addBrownianForces(real const* rnd, real sc, real* res) const
 {
     real bT = 0;
     if ( ! std::isinf(spDrag) )
-        bT = sqrt( 2 * sc * spDrag );
+        bT = std::sqrt( 2 * sc * spDrag );
     
     real bS = 0;
     if ( prop->point_mobility > 0 )
-        bS = sqrt( 2 * sc / prop->point_mobility );
+        bS = std::sqrt( 2 * sc / prop->point_mobility );
 
     Vector F(0, 0, 0);
     Torque T(nullTorque);

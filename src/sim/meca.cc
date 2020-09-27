@@ -1431,7 +1431,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
  
      F = M * Xold + B
  
-     Noise = sqrt(2*kT*time_step*mobility) * Gaussian(0,1)
+     Noise = std::sqrt(2*kT*time_step*mobility) * Gaussian(0,1)
  
  Implicit integration ensures numerical stability. In the code,
  the matrix M is decomposed as:
@@ -1506,7 +1506,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     noiseLevel *= time_step;
     
     //printf("noiseLeveld = %8.2e   variance(vRHS) / estimate = %8.4f\n",
-    //       noiseLevel, blas::nrm2(dimension(), vRHS) / (noiseLevel * sqrt(dimension())) );
+    //       noiseLevel, blas::nrm2(dimension(), vRHS) / (noiseLevel * std::sqrt(dimension())) );
 
 #if NEW_CYTOPLASMIC_FLOW
     /**

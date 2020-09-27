@@ -133,7 +133,7 @@ public:
     real           distanceToEdgeSqr(Vector const&) const;
     
     /// the distance to the edge, always positive
-    real           distanceToEdge(Vector const& pos) const { return sqrt(distanceToEdgeSqr(pos)); }
+    real           distanceToEdge(Vector const& pos) const { return std::sqrt(distanceToEdgeSqr(pos)); }
     
     /// the distance to the edge, positive if `point` is outside, and negative if inside
     real           signedDistanceToEdge(Vector const&) const;

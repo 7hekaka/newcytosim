@@ -177,8 +177,8 @@ void drawActin(Fiber const& fib)
     
     // rotation angle between consecutive monomers
     const real dan = -166 * M_PI / 180;
-    const real cs = cos(dan);
-    const real sn = sin(dan);
+    const real cs = std::cos(dan);
+    const real sn = std::sin(dan);
     
     real ab = 0;
     Vector3 p(0,0,0); //position of monomer;
@@ -232,7 +232,7 @@ void drawMicrotubule(Fiber const& fib)
     // distance from central axis to center of monomers
     real off = 0.025 / 2 - rad;
     
-    real ab = dab * ceil( fib.abscissaM() / dab );
+    real ab = dab * std::ceil( fib.abscissaM() / dab );
     Vector3 d(fib.dir(ab));   // unit tangent vector
     Vector3 n = fib.adjustedNormal(d);
     

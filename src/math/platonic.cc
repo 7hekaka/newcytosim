@@ -50,11 +50,11 @@ namespace Platonic
      We estimate L from:
      - the area of the sphere is 4*PI
      - the number of triangles on it is nb_faces()
-     - the area of an equilateral triangle of side L is sqrt(3)*(L/2)^2
+     - the area of an equilateral triangle of side L is std::sqrt(3)*(L/2)^2
      */
     real Solid::length_edge(Polyhedra K, unsigned N)
     {
-        return 4 * sqrt( M_PI / ( sqrt(3) * nb_faces(K,N) ) );
+        return 4 * std::sqrt( M_PI / ( std::sqrt(3) * nb_faces(K,N) ) );
     }
     
     //------------------------------------------------------------------------------
@@ -216,8 +216,8 @@ namespace Platonic
     void Solid::initTetrahedron(unsigned div)
     {
         real a = 1/3.0;
-        real b = sqrt(2)/3.0;
-        real c = sqrt(2/3.0);
+        real b = std::sqrt(2)/3.0;
+        real c = std::sqrt(2/3.0);
         
         
         // Four vertices on unit sphere
@@ -309,8 +309,8 @@ namespace Platonic
     {
 #if ( 0 )
         const real x = (1+std::sqrt(5.0))*0.5;
-        const real T = x/sqrt(1+x*x);
-        const real Z = 1/sqrt(1+x*x);
+        const real T = x/std::sqrt(1+x*x);
+        const real Z = 1/std::sqrt(1+x*x);
 #else
         constexpr real T = 0.850650808352039932;
         constexpr real Z = 0.525731112119133606;
@@ -536,7 +536,7 @@ namespace Platonic
         real n = C[0]*C[0] + C[1]*C[1] + C[2]*C[2];
         if ( n > 0 )
         {
-            n = sqrt(n);
+            n = std::sqrt(n);
             for ( int d = 0; d < 3; ++d )
                 C[d] /= n;
         }

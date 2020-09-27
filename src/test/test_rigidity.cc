@@ -54,7 +54,7 @@ void setFilament(size_t np, real seg, real persistence_length)
     np = std::min(np, NBS+1);
     delete(pos_);
     pos_ = new_real(NCO);
-    real sigma = sqrt(2.0*seg/persistence_length);
+    real sigma = std::sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
     Vector dir(1,0,0);
@@ -66,7 +66,7 @@ void setFilament(size_t np, real seg, real persistence_length)
         pos.store(pos_+DIM*p);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
-        dir = cos(a) * dir + dir.randOrthoU(sin(a));
+        dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
     }
 }
 

@@ -206,7 +206,7 @@ void gle_color::HSV2RGB(const GLfloat h, const GLfloat s, const GLfloat v, GLflo
         return;
     }
     GLfloat hc = h/60;               // sector 0 to 5
-    i = (int)floor(hc);
+    i = (int)std::floor(hc);
     f = hc - (GLfloat)i;             // fractional part of h
     p = v * ( 1 - s );
     q = v * ( 1 - s * f );
@@ -231,7 +231,7 @@ void gle_color::HSV2RGB(const GLfloat h, const GLfloat s, const GLfloat v, GLflo
 void gle_color::set_hue_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLfloat h)
 {
     GLfloat x = 3 * GLfloat( h * M_1_PI + 1 );
-    int i = (int)floor(x);
+    int i = (int)std::floor(x);
     GLfloat f = x-(GLfloat)i;
     switch( i % 6 )
     {
@@ -265,7 +265,7 @@ void gle_color::set_jet_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLf
     }
     else
     {
-        int i = (int)floor(h);
+        int i = (int)std::floor(h);
         GLfloat f = h-(GLfloat)i;
         switch( i )
         {
@@ -299,7 +299,7 @@ void gle_color::set_jet_components_dark(GLfloat& r, GLfloat& g, GLfloat& b, cons
     }
     else
     {
-        int i = (int)floor(h);
+        int i = (int)std::floor(h);
         GLfloat f = h-(GLfloat)i;
         switch( i )
         {

@@ -42,12 +42,12 @@ namespace LinearSolvers
         else if ( abs_real(dy) > abs_real(dx) )
         {
             real t = dx / dy;
-            S = 1.0 / sqrt(1.0 + t*t);
+            S = 1.0 / std::sqrt(1.0 + t*t);
             C = t * S;
         } else
         {
             real t = dy / dx;
-            C = 1.0 / sqrt(1.0 + t*t);
+            C = 1.0 / std::sqrt(1.0 + t*t);
             S = t * C;
         }
     }

@@ -197,7 +197,7 @@ int DynamicFiber::stepPlusEnd()
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( force < 0  &&  prop->growing_force[0] < INFINITY )
-            growth_rate *= exp(force/prop->growing_force[0]);
+            growth_rate *= std::exp(force/prop->growing_force[0]);
 
         real hydrol_rate = prop->hydrolysis_rate_2dt[0];
         

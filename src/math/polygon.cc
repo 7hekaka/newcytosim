@@ -35,8 +35,8 @@ void Polygon::set(size_t ord, real rad, real ang)
     real a = 2 * M_PI / (real)ord;
     for ( size_t i = 0; i < ord; ++i )
     {
-        pts_[i].xx = rad * cos(ang);
-        pts_[i].yy = rad * sin(ang);
+        pts_[i].xx = rad * std::cos(ang);
+        pts_[i].yy = rad * std::sin(ang);
         ang += a;
     }
     pts_[ord] = pts_[0];
@@ -308,7 +308,7 @@ int Polygon::complete(real epsilon)
                     goto finish;
                 dx = pts_[p].xx - pts_[n].xx;
                 dy = pts_[p].yy - pts_[n].yy;
-                d = sqrt( dx * dx + dy * dy );
+                d = std::sqrt( dx * dx + dy * dy );
             } while ( d < epsilon );
             //normalize the vector:
             pts_[i]     = pts_[n];

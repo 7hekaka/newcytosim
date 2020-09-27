@@ -51,8 +51,8 @@
  Thus 1/Q is the rotation that is inverse to the rotation associated with Q.
  
  The angle A of the rotation associated with the quaternion Q obeys:
- - real part of Q = cos(A/2),
- - norm of imaginary part of Q = sin(A/2).
+ - real part of Q = std::cos(A/2),
+ - norm of imaginary part of Q = std::sin(A/2).
  The rotation axis is defined by the imaginary components of Q.
  
  Quaternion<real> implements the standard mathematical operations, 
@@ -225,7 +225,7 @@ public:
     /// extract the norm 
     R norm() const
     {
-        return sqrt( q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        return std::sqrt( q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
     }
     
     /// return the normalized quaternion
@@ -463,7 +463,7 @@ public:
         
         // check the diagonal
         if ( trace > 0 ) {
-            s = sqrt( trace + 1.0 );
+            s = std::sqrt( trace + 1.0 );
             q[0] = s * 0.5;
             s = 0.5 / s;
             q[1] = (m[5] - m[7]) * s;
@@ -477,7 +477,7 @@ public:
             if (m[1+3*1] > m[0+3*0]) i = 1;
             if (m[2+3*2] > m[i+3*i]) i = 2;
             
-            s = sqrt( 1.0 + 2*m[i+3*i] - trace );
+            s = std::sqrt( 1.0 + 2*m[i+3*i] - trace );
             q[i+1] = s * 0.5;
             if (s != 0) s = 0.5 / s;
             int j = (i+1) % 3;
@@ -561,12 +561,12 @@ public:
     /// set from polar coordinates (r, phi, theta, psi)
     void setFromPolar( const R v[4] )
     {
-        R a    = v[0] * sin(v[1]);
-        q[0]   = v[0] * cos(v[1]);   //r*cos(phi)
-        R b    = a * sin(v[2]);
-        q[1]   = a * cos(v[2]);      //r*sin(phi)*cos(theta)
-        q[2]   = b * cos(v[3]);      //r*sin(phi)*sin(theta)*cos(psi)
-        q[3]   = b * sin(v[3]);      //r*sin(phi)*sin(theta)*sin(psi)
+        R a    = v[0] * std::sin(v[1]);
+        q[0]   = v[0] * std::cos(v[1]);   //r*std::cos(phi)
+        R b    = a * std::sin(v[2]);
+        q[1]   = a * std::cos(v[2]);      //r*std::sin(phi)*std::cos(theta)
+        q[2]   = b * std::cos(v[3]);      //r*std::sin(phi)*std::sin(theta)*std::cos(psi)
+        q[3]   = b * std::sin(v[3]);      //r*std::sin(phi)*std::sin(theta)*std::sin(psi)
     }
     
     /// return new quaternion with polar coordinates (r, phi, theta, psi)
@@ -582,9 +582,9 @@ public:
     {
         // r,  phi, theta, psi
         v[0] = norm();
-        v[1] = acos( q[0] / v[0] );
-        v[2] = acos( q[1] / (v[0] * sin(v[1])) );
-        v[3] = atan2( q[3], q[2] );
+        v[1] = std::acos( q[0] / v[0] );
+        v[2] = std::acos( q[1] / (v[0] * std::sin(v[1])) );
+        v[3] = std::atan2( q[3], q[2] );
     }
     
 
@@ -592,11 +592,11 @@ public:
     void setFromAxis( const R v[3] )
     {
         /** for small angles, we assume here angle ~ v.norm() */
-        R n  = sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-        R sd = sin( n * 0.5 );
+        R n  = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
+        R sd = std::sin( n * 0.5 );
         if ( n > 0 )
             sd /= n;
-        q[0] = cos( n * 0.5 );
+        q[0] = std::cos( n * 0.5 );
         q[1] = v[0] * sd;
         q[2] = v[1] * sd;
         q[3] = v[2] * sd;
@@ -606,9 +606,9 @@ public:
     /** argument `v` is normalized for more security */
     void setFromAxis( const R v[3], R angle )
     {
-        R  n = sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-        R sd = sin( angle * 0.5 ) / n;
-        q[0] = cos( angle * 0.5 );
+        R  n = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
+        R sd = std::sin( angle * 0.5 ) / n;
+        q[0] = std::cos( angle * 0.5 );
         q[1] = v[0] * sd;
         q[2] = v[1] * sd;
         q[3] = v[2] * sd;
@@ -619,27 +619,27 @@ public:
     void setFromPrincipalAxis( int axis, R angle )
     {
         R  a = angle * 0.5;
-        q[0] = cos(a);
+        q[0] = std::cos(a);
         q[1] = 0.0;
         q[2] = 0.0;
         q[3] = 0.0;
-        q[axis+1] = sin(a);
+        q[axis+1] = std::sin(a);
     }
     
     /// return angle of the rotation
     R getAngle() const
     {
-        R n = sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
-        return  2 * atan2(n, q[0]);
+        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        return  2 * std::atan2(n, q[0]);
     }
     
     /// compute the axis and return the angle of the rotation
     R getAngle( R v[3] ) const
     {
-        R n = sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         if ( n > 0 )
         {
-            R a = 2 * atan2(n, q[0]);
+            R a = 2 * std::atan2(n, q[0]);
             n = 1.0 / n;
             v[0] = q[1] * n;
             v[1] = q[2] * n;
@@ -655,7 +655,7 @@ public:
     /// compute the axis and return the angle of the rotation
     void getAxis( R v[3] ) const
     {
-        R n = sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         if ( n > 0 )
         {
             n = 1.0 / n;
@@ -674,12 +674,12 @@ public:
     /// multiply the angle of the rotation by `s`
     const Quaternion scaledAngle( R s ) const
     {
-        R n = sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         if ( n > 0 )
         {
-            R a = s * atan2(n, q[0]);
-            n = sin(a) / n;
-            return Quaternion(cos(a), n*q[1], n*q[2], n*q[3]);
+            R a = s * std::atan2(n, q[0]);
+            n = std::sin(a) / n;
+            return Quaternion(std::cos(a), n*q[1], n*q[2], n*q[3]);
         }
         return Quaternion(1, 0, 0, 0);
     }
@@ -697,10 +697,10 @@ public:
             return normalize( (*this) + (b - (*this))*u );
         }
         
-        R tmp = acos(dot) * u;
+        R tmp = std::acos(dot) * u;
         //build v2 ortogonal to *this:
         Quaternion v2 = normalize( b - (*this)*dot );
-        return (*this)*cos(tmp) + v2*sin(tmp);
+        return (*this)*std::cos(tmp) + v2*std::sin(tmp);
     }
     
     /// printf
@@ -737,9 +737,9 @@ public:
         R u1 = RNG.preal();
         R u2 = M_PI*RNG.sreal();
         R u3 = M_PI*RNG.sreal();
-        R s1 = sqrt(1-u1), s2 = sqrt(u1);
+        R s1 = std::sqrt(1-u1), s2 = std::sqrt(u1);
         
-        return Quaternion<R>(s1*sin(u2), s1*cos(u2), s2*sin(u3), s2*cos(u3));
+        return Quaternion<R>(s1*std::sin(u2), s1*std::cos(u2), s2*std::sin(u3), s2*std::cos(u3));
     }
     
 #endif

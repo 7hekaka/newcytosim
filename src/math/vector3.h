@@ -354,40 +354,40 @@ public:
         return XX*XX + YY*YY + ZZ*ZZ;
     }
     
-    /// the standard norm = sqrt(x^2+y^2+z^2)
+    /// the standard norm = std::sqrt(x^2+y^2+z^2)
     real norm() const
     {
-        return sqrt(XX*XX + YY*YY + ZZ*ZZ);
+        return std::sqrt(XX*XX + YY*YY + ZZ*ZZ);
     }
     
-    /// the standard norm = sqrt(x^2+y^2+z^2)
+    /// the standard norm = std::sqrt(x^2+y^2+z^2)
     friend real norm(Vector3 const& V)
     {
         return V.norm();
     }
     
-    /// the inversed magnitude = 1.0 / sqrt(x^2+y^2+z^2)
+    /// the inversed magnitude = 1.0 / std::sqrt(x^2+y^2+z^2)
     real inv_norm() const
     {
-        return 1.0 / sqrt(XX*XX + YY*YY + ZZ*ZZ);
+        return 1.0 / std::sqrt(XX*XX + YY*YY + ZZ*ZZ);
     }
 
-    /// the 2D norm = sqrt(x^2+y^2)
+    /// the 2D norm = std::sqrt(x^2+y^2)
     real normXY() const
     {
-        return sqrt(XX*XX + YY*YY);
+        return std::sqrt(XX*XX + YY*YY);
     }
     
-    /// the 2D norm = sqrt(x^2+z^2)
+    /// the 2D norm = std::sqrt(x^2+z^2)
     real normXZ() const
     {
-        return sqrt(XX*XX + ZZ*ZZ);
+        return std::sqrt(XX*XX + ZZ*ZZ);
     }
     
-    /// the 2D norm = sqrt(y^2+z^2)
+    /// the 2D norm = std::sqrt(y^2+z^2)
     real normYZ() const
     {
-        return sqrt(YY*YY + ZZ*ZZ);
+        return std::sqrt(YY*YY + ZZ*ZZ);
     }
 
     /// the 2D norm = y^2+z^2
@@ -414,7 +414,7 @@ public:
     /// distance between two points, equivalent to (a-b).norm()
     friend real distance(Vector3 const& a, Vector3 const& b)
     {
-        return sqrt(distanceSqr(a,b));
+        return std::sqrt(distanceSqr(a,b));
     }
 
     /// absolute values: (|x|, |y|, |z|)
@@ -525,13 +525,13 @@ public:
             if ( abs_real(XX) < abs_real(ZZ) )
             {
                 // XX is the smallest component
-                real s = n / sqrt(YY*YY+ZZ*ZZ);
+                real s = n / std::sqrt(YY*YY+ZZ*ZZ);
                 return Vector3(0.0, -s*ZZ, s*YY);
             }
             else
             {
                 // ZZ is the smallest component
-                real s = n / sqrt(XX*XX+YY*YY);
+                real s = n / std::sqrt(XX*XX+YY*YY);
                 return Vector3(s*YY, -s*XX, 0.0);
             }
         }
@@ -540,13 +540,13 @@ public:
             if ( abs_real(YY) < abs_real(ZZ) )
             {
                 // YY is the smallest component
-                real s = n / sqrt(XX*XX+ZZ*ZZ);
+                real s = n / std::sqrt(XX*XX+ZZ*ZZ);
                 return Vector3(-s*ZZ, 0.0, s*XX);
             }
             else
             {
                 // ZZ is the smallest component
-                real s = n / sqrt(XX*XX+YY*YY);
+                real s = n / std::sqrt(XX*XX+YY*YY);
                 return Vector3(s*YY, -s*XX, 0.0);
             }
         }
@@ -620,7 +620,7 @@ public:
         real x = dot(vec, ex);
         real y = dot(vec, ey);
         // normalization factor:
-        real n = 1.0 / sqrt( x * x + y * y );
+        real n = 1.0 / std::sqrt( x * x + y * y );
         x = x * n;
         y = y * n;
         // rotated vector:
@@ -630,17 +630,17 @@ public:
     /// convert from cartesian to spherical coordinates ( r, theta, phi )
     const Vector3 spherical() const
     {
-        return Vector3(sqrt(XX*XX+YY*YY+ZZ*ZZ),
-                       atan2(YY, XX),
-                       atan2(sqrt(XX*XX+YY*YY), ZZ));
+        return Vector3(std::sqrt(XX*XX+YY*YY+ZZ*ZZ),
+                       std::atan2(YY, XX),
+                       std::atan2(std::sqrt(XX*XX+YY*YY), ZZ));
     }
     
     /// convert from spherical to cartesian coordinates ( x, y, z )
     const Vector3 cartesian() const
     {
-        return Vector3(XX*cos(YY)*sin(ZZ),
-                       XX*sin(YY)*sin(ZZ),
-                       XX*cos(ZZ));
+        return Vector3(XX*std::cos(YY)*std::sin(ZZ),
+                       XX*std::sin(YY)*std::sin(ZZ),
+                       XX*std::cos(ZZ));
     }
     
     //------------------------------------------------------------------

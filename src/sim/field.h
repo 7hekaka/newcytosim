@@ -76,7 +76,7 @@ private:
         // we use square cells:
         for ( size_t d = 0; d < DIM; ++d )
         {
-            n_cell[d] = (size_t)ceil( (sup[d]-inf[d]+extra) / step );
+            n_cell[d] = (size_t)std::ceil( (sup[d]-inf[d]+extra) / step );
             real mid = 0.5 * ( inf[d] + sup[d] );
             inf[d] = mid - 0.5 * step * n_cell[d];
             sup[d] = mid + 0.5 * step * n_cell[d];

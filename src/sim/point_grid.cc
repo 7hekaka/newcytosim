@@ -35,13 +35,13 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges
-            cnt[d] = std::max((size_t)1, (size_t)floor(n));
+            cnt[d] = std::max((size_t)1, (size_t)std::floor(n));
             pGrid.setPeriodic(d, true);
         }
         else
         {
             //add a border in any dimension which is not periodic
-            cnt[d] = (size_t)ceil(n) + 2;
+            cnt[d] = (size_t)std::ceil(n) + 2;
             n = cnt[d] * 0.5 * min_step;
             real mid = inf[d] + sup[d];
             inf[d] = mid - n;
@@ -115,7 +115,7 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
     if ( square(max_diameter) * 1.001 < diag )
     {
         InvalidParameter e("simul:steric_max_range is too short");
-        e << PREF << "steric_max_range should be greater than sqrt( sqr(segment_length) + 4*sqr(range) )\n";
+        e << PREF << "steric_max_range should be greater than std::sqrt( sqr(segment_length) + 4*sqr(range) )\n";
         e << PREF << "with segment_length ~ 4/3 segmentation\n";
         e << PREF << "= " << diag << " for some fibers\n";
         throw e;

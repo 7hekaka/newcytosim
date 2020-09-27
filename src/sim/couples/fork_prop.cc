@@ -43,11 +43,11 @@ void ForkProp::complete(Simul const& sim)
 {
     CoupleProp::complete(sim);
     
-    cosinus = cos(angle);
+    cosinus = std::cos(angle);
 #if ( DIM == 3 )
-    sinus = abs_real(sin(angle));
+    sinus = abs_real(std::sin(angle));
 #else
-    sinus = sin(angle);
+    sinus = std::sin(angle);
 #endif
 #if ( 0 )
     if ( angle < 0 || sinus < 0 )

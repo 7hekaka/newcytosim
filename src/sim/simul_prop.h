@@ -245,7 +245,7 @@ public:
      diameter. Generally, `steric_max_range` should be greater or equal to the
      sum of the radiuses, of any two object that may interact.
      In the case of fiber, the `interaction-radius` is a combination of the
-     segmentation, and the radius: sqrt( (4/3*segmentation)^2 + 4*radius^2 )
+     segmentation, and the radius: std::sqrt( (4/3*segmentation)^2 + 4*radius^2 )
 
      If the parameter is not set, cytosim attempts to set it automatically.
      */

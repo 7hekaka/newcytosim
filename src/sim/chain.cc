@@ -215,7 +215,7 @@ void Chain::setEquilibrated(real len, real persistence_length)
     setSegmentation(len/(np-1));
     fnAbscissaP = fnAbscissaM + len;
     
-    real sigma = sqrt(2*fnCut/persistence_length);
+    real sigma = std::sqrt(2*fnCut/persistence_length);
     
     Vector pos(0,0,0);
     Vector dir(1,0,0);
@@ -227,7 +227,7 @@ void Chain::setEquilibrated(real len, real persistence_length)
         setPoint(p, pos);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
-        dir = cos(a) * dir + dir.randOrthoU(sin(a));
+        dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
     }
     
     // cancel out mean orientation and position:
@@ -279,12 +279,12 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
     real s = 0.5 - 0.5 * (cut/abs_real(X));
 #elif ( DIM == 2 )
     real Y = src[1+DIM] - src[1];
-    real n = sqrt( X * X + Y * Y );
+    real n = std::sqrt( X * X + Y * Y );
     real s = 0.5 - 0.5 * (cut/n);
 #else
     real Y = src[1+DIM] - src[1];
     real Z = src[2+DIM] - src[2];
-    real n = sqrt( X * X + Y * Y + Z * Z );
+    real n = std::sqrt( X * X + Y * Y + Z * Z );
     real s = 0.5 - 0.5 * (cut/n);
 #endif
     
@@ -1337,8 +1337,8 @@ void Chain::segmentationMinMax(real& mn, real& mx) const
         mn = std::min(mn, r);
         mx = std::max(mx, r);
     }
-    mn = sqrt(mn);
-    mx = sqrt(mx);
+    mn = std::sqrt(mn);
+    mx = std::sqrt(mx);
 }
 
 /**
@@ -1362,11 +1362,11 @@ void Chain::segmentationVariance(real& avg, real& var) const
 /**
  Calculate the inverse of the radius of the circle containing the points A, B, C
  
-     cos(angle) = scalar_product( AB, BC ) / ( |AB| * |BC| )
-     sin(angle) = sqrt( 1 - cos(angle)^2 )
-     2 * radius * sin(angle) = |AC|
-     curvature = 2 * sin(angle) / |AC|
-     curvature = 2 * sqrt( ( 1 - cos(angle)^2 ) / AC^2 )
+     std::cos(angle) = scalar_product( AB, BC ) / ( |AB| * |BC| )
+     std::sin(angle) = std::sqrt( 1 - std::cos(angle)^2 )
+     2 * radius * std::sin(angle) = |AC|
+     curvature = 2 * std::sin(angle) / |AC|
+     curvature = 2 * std::sqrt( ( 1 - std::cos(angle)^2 ) / AC^2 )
 
  curvature is ZERO if A, B and C are aligned
  */
@@ -1377,7 +1377,7 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C)
     real P = dot(ab, bc);
     real S = std::max(0.0, 1.0 - ( P * P ) / ( ab.normSqr() * bc.normSqr() ));
     real D = ( C - A ).normSqr();
-    return 2.0 * sqrt( S / D );
+    return 2.0 * std::sqrt( S / D );
 }
 
 
@@ -1397,19 +1397,19 @@ real Chain::curvature(size_t p) const
  The curvature is calculated from the positions of the vertices:
  Given theta = angle between two consecutive segments,
 
-     curvature = 1/R = 2 * sin(angle/2) / segmentation
+     curvature = 1/R = 2 * std::sin(angle/2) / segmentation
  
  and since
  
-     sin^2(angle/2) = ( 1 - cos(angle) ) / 2
+     sin^2(angle/2) = ( 1 - std::cos(angle) ) / 2
  
  hence:
  
-     1/2 * curvature^2 = ( 1 - cos(angle) ) / ( segmentation^2 )
+     1/2 * curvature^2 = ( 1 - std::cos(angle) ) / ( segmentation^2 )
  
  and finaly:
  
-     1/2 * sum( curvature^2 * ds ) = sum( 1 - cos(angle) ) / segmentation
+     1/2 * sum( curvature^2 * ds ) = sum( 1 - std::cos(angle) ) / segmentation
  
  */
 real Chain::bendingEnergy0() const
@@ -1424,9 +1424,9 @@ real Chain::bendingEnergy0() const
             Vector A = posP(p);
             Vector B = posP(p+1);
             Vector C = posP(p+2);
-            e += dot(B - A, C - B);  // e += cos(angle) * segmentation^2
+            e += dot(B - A, C - B);  // e += std::cos(angle) * segmentation^2
         }
-        // e <- sum( 1 - cos(angle) )
+        // e <- sum( 1 - std::cos(angle) )
         e = lsp - e / ( fnCut * fnCut );
         
         /*
@@ -1663,7 +1663,7 @@ void Chain::adjustSegmentation()
     }
     
     // accumulate the error in variable autoCut, 
-    // The error is in angle-square: 1-cos(angle) ~ (angle)^2
+    // The error is in angle-square: 1-std::cos(angle) ~ (angle)^2
     autoCutCnt += 1.0;
     autoCutVal += minCosinus();
     

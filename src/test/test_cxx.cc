@@ -31,7 +31,7 @@ int main ()
     std::clog << "C++ version " << __cplusplus << std::endl;
 
     std::clog << "Constant = " << CONSTANT << std::endl;
-    std::clog << "sqrt(3) = " << SQ3 << std::endl;
+    std::clog << "std::sqrt(3) = " << SQ3 << std::endl;
 
     int my_array[] = { 1, 2, 3, 5, 7, 11, 13, 17, 23 };
     for (int &x : my_array) {

@@ -409,7 +409,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 if ( ++ouf > 128 )
                 {
                     ouf = 0;
-                    dis /= 1.0905044; // sqrt(sqrt(sqrt(2)))
+                    dis /= 1.0905044; // std::sqrt(sqrt(std::sqrt(2)))
                 }
             }
             if ( dis < sep )
@@ -717,7 +717,7 @@ void Solid::rescale()
     if ( M > 0 )
     {
         // calculate the scaling factor to restore the size to 'soShapeSqr':
-        real scale = sqrt( soShapeSqr / M );
+        real scale = std::sqrt( soShapeSqr / M );
     
         // scale the shape around the center of gravity:
         for ( size_t p = 0; p < nPoints; ++p )
@@ -787,7 +787,7 @@ void Solid::reshape()
         b += soShape[DIM*i] * pPos[DIM*i+1] - soShape[DIM*i+1] * pPos[DIM*i  ];
     }
     
-    real n = sqrt( a*a + b*b );
+    real n = std::sqrt( a*a + b*b );
     
     // cosine and sinus of the rotation:
     real c = 1, s = 0;
@@ -996,7 +996,7 @@ real Solid::addBrownianForces(real const* rnd, real sc, real* rhs) const
         return INFINITY;
     
     // amplitude of Brownian motion
-    const real b = sqrt( 2 * sc * drag / (real)nPoints );
+    const real b = std::sqrt( 2 * sc * drag / (real)nPoints );
 
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];

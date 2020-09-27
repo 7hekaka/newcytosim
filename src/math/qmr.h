@@ -166,7 +166,7 @@ namespace LinearSolvers
             theta_1 = theta;
             
             theta = rho / ( gamma_1 * beta );
-            gamma = 1.0 / sqrt( 1.0 + theta * theta );
+            gamma = 1.0 / std::sqrt( 1.0 + theta * theta );
             
             if (gamma == 0.0)
             {

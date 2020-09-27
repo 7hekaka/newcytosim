@@ -223,7 +223,7 @@ void drawValues(Grid<CELL, 3> const& grid,
     dx *= n;
     dy *= n;
     
-    Vector3 dh = dy * cos(M_PI/6);
+    Vector3 dh = dy * std::cos(M_PI/6);
     Vector3 w, a;
     
     for ( int y = -m; y <= m; y+=2 )

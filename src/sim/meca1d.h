@@ -138,7 +138,7 @@ public:
         real res = INFINITY;
         for ( size_t ii = 0; ii < mecables.size(); ++ii )
         {
-            real b = sqrt( 2 * kT * vMOB[ii] );
+            real b = std::sqrt( 2 * kT * vMOB[ii] );
             vRHS[ii] = vMOB[ii] * vBAS[ii] + b * RNG.gauss();
             if ( b < res )
                 res = b;

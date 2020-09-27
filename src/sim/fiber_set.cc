@@ -430,7 +430,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     res2.clear();
     
     // distribute segments
-    grid.paintGrid(first(), nullptr, sqrt(square(len)+sup));
+    grid.paintGrid(first(), nullptr, std::sqrt(square(len)+sup));
     
     FiberGrid::SegmentList list;
     for ( Fiber * fib = first(); fib; fib = fib->next() )
@@ -764,7 +764,7 @@ void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
         avg /= (real)cnt;
         real v = dev/(real)cnt - avg*avg;
         // the variance can be numerically negative, which is mathematically impossible
-        dev = sqrt(std::max((real)0, v));
+        dev = std::sqrt(std::max((real)0, v));
     }
 }
 
@@ -797,7 +797,7 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
         avg /= (real)cnt;
         real v = dev/(real)cnt - avg*avg;
         // the variance can be numerically negative, which is mathematically impossible
-        dev = sqrt(std::max((real)0, v));
+        dev = std::sqrt(std::max((real)0, v));
     }
 }
 
@@ -1229,7 +1229,7 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
         avg /= (real)cnt;
         real v = dev/(real)cnt - avg*avg;
         // the variance can be numerically negative, which is mathematically impossible
-        dev = sqrt(std::max((real)0, v));
+        dev = std::sqrt(std::max((real)0, v));
     }
 }
 

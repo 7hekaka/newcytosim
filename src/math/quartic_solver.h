@@ -23,14 +23,14 @@ namespace QuarticSolver
         bool operator <(cplx c) const { return r < c.r; }
         bool operator >(cplx c) const { return r > c.r; }
         cplx operator -() const { return cplx(-r, -i); }
-        real norm() const { return sqrt(r*r+i*i); }
+        real norm() const { return std::sqrt(r*r+i*i); }
         cplx root() const
         {
             real n = norm();
             if  ( i >= 0 )
-                return cplx(sqrt(0.5*( n + r )),  sqrt(0.5*( n - r )));
+                return cplx(std::sqrt(0.5*( n + r )),  std::sqrt(0.5*( n - r )));
             else
-                return cplx(sqrt(0.5*( n + r )), -sqrt(0.5*( n - r )));
+                return cplx(std::sqrt(0.5*( n + r )), -std::sqrt(0.5*( n - r )));
         }
     };
         

@@ -720,7 +720,7 @@ void reportCPUtime(int frame, real simtime)
  Parameter    | Default | Description                                          |
  -------------|---------|-------------------------------------------------------
  `nb_steps`   |  1      | number of simulation steps
- `duration`   |  -      | when specified, `nb_steps` is set to `ceil(duration/time_step)`
+ `duration`   |  -      | when specified, `nb_steps` is set to `std::ceil(duration/time_step)`
  `solve`      |  `on`   | Define the type of method used for the mechanics
  `event`      |  `none` | custom code executed stochastically with prescribed rate
  `nb_frames`  |  0      | number of states written to trajectory file

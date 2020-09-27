@@ -90,7 +90,7 @@ public:
      As a rule of thumb, segmentation should scale with rigidity, depending on 
      the expected magnitude of the forces experienced by the filament:
 
-         segmentation = sqrt(rigidity/force)
+         segmentation = std::sqrt(rigidity/force)
          force ~ rigidity / segmentation^2
      
      Generally, a simulation should not be trusted if any filament contains kinks

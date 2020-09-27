@@ -156,7 +156,7 @@ void SingleProp::complete(Simul const& sim)
      Since `sreal()` is uniformly distributed, its variance is 1/3,
      and we need `diffusion_dt^2 = 6 D time_step`
      */
-    diffusion_dt = sqrt( 6.0 * diffusion * sim.time_step() );
+    diffusion_dt = std::sqrt( 6.0 * diffusion * sim.time_step() );
 #if NEW_MOBILE_SINGLE
     speed_dt = speed * sim.time_step();
 #endif

@@ -175,7 +175,7 @@ void display(View&, int)
         {
             Vector x;
             myGrid.setPositionFromIndex(x, c, 0.5);
-            glPointSize(sqrt(16*val));
+            glPointSize(std::sqrt(16*val));
             glBegin(GL_POINTS);
             gleVertex(x);
             glEnd();

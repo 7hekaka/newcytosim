@@ -307,7 +307,7 @@ void test_poisson(size_t sup)
 {
     for ( size_t n = 0; n < sup; ++n )
     {
-        int x = (int)(RNG.gauss() * sqrt(n) + n);
+        int x = (int)(RNG.gauss() * std::sqrt(n) + n);
         printf("%10lu %9i %9i %9i\n", n, RNG.poisson_knuth(n), RNG.poisson(n), x);
     }
 }
@@ -341,7 +341,7 @@ int method2(const int maxTime, const real rate[])
 //this is exact, and the fastest method: 10s CPU!
 int method3(const int maxTime, const real rate[])
 {
-    real T = -log( RNG.preal() );
+    real T = -std::log( RNG.preal() );
     for ( int ii=0; ii<maxTime; ++ii )
     {
         T -= rate[ii];
@@ -428,7 +428,7 @@ real * gauss_fill_0(real dst[], const int32_t src[], int32_t const*const end)
         real w = x * x + y * y;
         if ( w <= 1 && 0 < w )
         {
-            w = sqrt( -2 * log(w) / w );
+            w = std::sqrt( -2 * std::log(w) / w );
             *dst++ = w * x;
             *dst++ = w * y;
         }
@@ -512,7 +512,7 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
          The function used to calculate logarithm on SIMD data is part of the
          Intel SVML library, and is provided by the Intel compiler.
          */
-        //w = sqrt( -2 * log(w) / n );
+        //w = std::sqrt( -2 * std::log(w) / n );
         n = rsqrtf(divf(n, mulf(two, _mm256_log_ps(n))));
         // the 16 single-precision values are converted to double-precision:
         x = mulf(n, x);

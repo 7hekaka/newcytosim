@@ -290,7 +290,7 @@ void  blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
          *INFO = J;
          return;
      }
-     dia = 1.0 / sqrt(dia);
+     dia = 1.0 / std::sqrt(dia);
      AB[0] = dia;
      // Compute elements J+1:J+KN of column J
      int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
@@ -333,7 +333,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
             *INFO = J;
             return;
         }
-        dia = 1.0 / sqrt(dia); // inverse the diagonal term!!!
+        dia = 1.0 / std::sqrt(dia); // inverse the diagonal term!!!
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
@@ -362,7 +362,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
             *INFO = J;
             return;
         }
-        dia = 1.0 / sqrt(dia);
+        dia = 1.0 / std::sqrt(dia);
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/

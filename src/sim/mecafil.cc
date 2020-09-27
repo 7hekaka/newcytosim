@@ -99,7 +99,7 @@ size_t Mecafil::allocateMecable(const size_t nbp)
  */
 real Mecafil::addBrownianForces(real const* rnd, real sc, real* rhs) const
 {
-    real b = sqrt( 2 * sc / iPointMobility );
+    real b = std::sqrt( 2 * sc / iPointMobility );
 
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];

@@ -315,28 +315,28 @@ public:
     }
     
     
-    /// the standard norm = sqrt(x^2+y^2)
+    /// the standard norm = std::sqrt(x^2+y^2)
     real norm() const
     {
-        return sqrt(XX*XX + YY*YY);
+        return std::sqrt(XX*XX + YY*YY);
     }
     
-    /// the standard norm = sqrt(x^2+y^2)
+    /// the standard norm = std::sqrt(x^2+y^2)
     friend real norm(Vector2 const& V)
     {
         return V.norm();
     }
     
-    /// the inversed magnitude = 1.0 / sqrt(x^2+y^2)
+    /// the inversed magnitude = 1.0 / std::sqrt(x^2+y^2)
     real inv_norm() const
     {
-        return 1.0 / sqrt(XX*XX + YY*YY);
+        return 1.0 / std::sqrt(XX*XX + YY*YY);
     }
 
-    /// the 2D norm = sqrt(x^2+y^2)
+    /// the 2D norm = std::sqrt(x^2+y^2)
     real normXY() const
     {
-        return sqrt(XX*XX + YY*YY);
+        return std::sqrt(XX*XX + YY*YY);
     }
     
     /// the 2D norm = |y| since Z = 0
@@ -366,7 +366,7 @@ public:
     /// distance between two points, equivalent to (a-b).norm()
     friend real distance(Vector2 const& a, Vector2 const& b)
     {
-        return sqrt(distanceSqr(a, b));
+        return std::sqrt(distanceSqr(a, b));
     }
     
     /// absolute values: (|x|, |y|)
@@ -450,7 +450,7 @@ public:
     /// returns a perpendicular vector, of norm `n`
     const Vector2 orthogonal(const real n) const
     {
-        real s = n / sqrt( XX*XX + YY*YY );
+        real s = n / std::sqrt( XX*XX + YY*YY );
         return Vector2(-s*YY, s*XX);
     }
     
@@ -464,13 +464,13 @@ public:
     /// convert from cartesian to spherical coordinates ( r, theta, phi )
     const Vector2 spherical() const
     {
-        return Vector2(sqrt(XX*XX+YY*YY), atan2(YY, XX));
+        return Vector2(std::sqrt(XX*XX+YY*YY), std::atan2(YY, XX));
     }
     
     /// convert from spherical to cartesian coordinates ( x, y, z )
     const Vector2 cartesian() const
     {
-        return Vector2(XX*cos(YY), XX*sin(YY));
+        return Vector2(XX*std::cos(YY), XX*std::sin(YY));
     }
     
     //------------------------------------------------------------------

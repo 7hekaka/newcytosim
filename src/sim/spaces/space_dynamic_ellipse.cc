@@ -17,13 +17,13 @@ constexpr real POW = 1.6075;
 /// building block for area of an ellipsoid in 3D
 inline real surf_block(const real a, const real b)
 {
-    return pow(a*b,POW);
+    return std::pow(a*b,POW);
 }
 
 /// building block for area of an ellipsoid in 3D
 inline real surf_block(const real a, const real b, const real c)
 {
-    return pow(a*b,POW) + pow(b*c,POW) + pow(a*c,POW);
+    return std::pow(a*b,POW) + std::pow(b*c,POW) + std::pow(a*c,POW);
 }
 
 
@@ -240,7 +240,7 @@ Vector SpaceDynamicEllipse::tension_forces() const
 #if ( DIM == 2 )
 
     real S = -prop->tension * M_PI;
-    real N = sqrt( (3.0*length_[0]+length_[1])*(length_[0]+3.0*length_[1]) );
+    real N = std::sqrt( (3.0*length_[0]+length_[1])*(length_[0]+3.0*length_[1]) );
 
     res.XX = S * (3.0 - ( 3.0*length_[0] + 5.0*length_[1] ) / N );
     res.YY = S * (3.0 - ( 3.0*length_[1] + 5.0*length_[0] ) / N );
@@ -299,8 +299,8 @@ void SpaceDynamicEllipse::step()
             real theta = prop->mobility_rot_dt * Torques;
             if ( theta > REAL_EPSILON )
             {
-                real c = cos(theta);
-                real s = sin(theta);
+                real c = std::cos(theta);
+                real s = std::sin(theta);
                 mat = Matrix22(c, s, -s, c) * mat;
             }
 #elif ( DIM > 2 )
@@ -308,7 +308,7 @@ void SpaceDynamicEllipse::step()
             real theta = prop->mobility_rot_dt * n;
             if ( theta > REAL_EPSILON )
             {
-                MatrixD rot = MatrixD::rotationAroundAxis(Torques/n, cos(theta), sin(theta));
+                MatrixD rot = MatrixD::rotationAroundAxis(Torques/n, std::cos(theta), std::sin(theta));
                 mat = rot * mat;
             }
 #endif
@@ -353,13 +353,13 @@ real SpaceDynamicEllipse::surfaceEllipse(Vector const& sizes)
     real a = sizes.XX;
     real b = sizes.YY;
     real c = sizes.ZZ;
-    return 4.0*M_PI*pow(surf_block(a,b,c)/3.0, 1.0/POW);
+    return 4.0*M_PI*std::pow(surf_block(a,b,c)/3.0, 1.0/POW);
 #elif ( DIM == 2 )
     // In 2D, the 'surface' is a line
     real a = sizes.XX;
     real b = sizes.YY;
     real r = square( (a-b)/(a+b) );
-    return M_PI*(a+b)*(1.0+3.0*r/(10.0+sqrt(4.0-3.0*r)));
+    return M_PI*(a+b)*(1.0+3.0*r/(10.0+std::sqrt(4.0-3.0*r)));
 #else
     return 0;
 #endif

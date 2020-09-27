@@ -40,12 +40,12 @@ namespace gle
     void circle(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start)
     {
         const double theta = 2.0 * M_PI / (double)cnt;
-        const double c = cos(theta);
-        const double s = sin(theta);
+        const double c = std::cos(theta);
+        const double s = std::sin(theta);
     
         double t;
-        double x = rad * cos(start);
-        double y = rad * sin(start);
+        double x = rad * std::cos(start);
+        double y = rad * std::sin(start);
         
         for( size_t n = 0; n < cnt; ++n )
         {
@@ -65,12 +65,12 @@ namespace gle
              double start, double end, GLfloat cenX, GLfloat cenY)
     {
         const double theta = ( end - start ) / (double)cnt;
-        const double c = cos(theta);
-        const double s = sin(theta);
+        const double c = std::cos(theta);
+        const double s = std::sin(theta);
     
         double t;
-        double x = rad * cos(start);
-        double y = rad * sin(start);
+        double x = rad * std::cos(start);
+        double y = rad * std::sin(start);
         
         for( size_t n = 0; n <= cnt; ++n )
         {
@@ -89,16 +89,16 @@ namespace gle
     void circle(size_t cnt, float CS[], double rad, double start)
     {
         const double theta = 2.0 * M_PI / (double)cnt;
-        const double c = cos(theta);
-        const double s = sin(theta);
+        const double c = std::cos(theta);
+        const double s = std::sin(theta);
         const double c2 = c * c - s * s;
         const double s2 = c * s + c * s;
 
         vec4 cs{ c2, s2,  c2, s2};
         vec4 sc{-s2, c2, -s2, c2};
         
-        const double x0 = rad * cos(start);
-        const double y0 = rad * sin(start);
+        const double x0 = rad * std::cos(start);
+        const double y0 = rad * std::sin(start);
         vec4 pp{x0, y0, c*x0-s*y0, s*x0+c*y0};
         
         GLfloat * ptr = CS;
@@ -119,12 +119,12 @@ namespace gle
     void circle(size_t cnt, GLfloat CS[], double rad, double start)
     {
         const double theta = 2.0 * M_PI / (double)cnt;
-        const double c = cos(theta);
-        const double s = sin(theta);
+        const double c = std::cos(theta);
+        const double s = std::sin(theta);
     
         double t;
-        double x = rad * cos(start);
-        double y = rad * sin(start);
+        double x = rad * std::cos(start);
+        double y = rad * std::sin(start);
         
         for( size_t n = 0; n < cnt; ++n )
         {
@@ -325,7 +325,7 @@ namespace gle
     
     void gleTriangleS()
     {
-        constexpr GLfloat H = 0.8660254037844386f; //sqrt(3)/2;
+        constexpr GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
         const GLfloat pts[] = {
              0,  1.0, 0,
             -H, -0.5, 0,
@@ -349,7 +349,7 @@ namespace gle
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
-        const GLfloat H = 0.8660254037844386f; //sqrt(3)/2;
+        const GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
         glVertex2f( 0,  1.0);
         glVertex2f(-H, -0.5);
         glVertex2f( H, -0.5);
@@ -362,7 +362,7 @@ namespace gle
     {
         glBegin(GL_TRIANGLES);
         glNormal3f(0, 0, 1);
-        const GLfloat H = 0.8660254037844386f; //sqrt(3)/2;
+        const GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
         glVertex2f( 0, -1.0);
         glVertex2f( H,  0.5);
         glVertex2f(-H,  0.5);
@@ -373,7 +373,7 @@ namespace gle
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
-        const GLfloat H = 0.8660254037844386f; //sqrt(3)/2;
+        const GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
         glVertex2f( 0, -1.0);
         glVertex2f( H,  0.5);
         glVertex2f(-H,  0.5);
@@ -436,7 +436,7 @@ namespace gle
         glBegin(GL_TRIANGLE_FAN);
         glNormal3f(0, 0, 1);
         glVertex2f(0, 0);
-        const GLfloat R  = 1.3512958724134987f; //sqrt( 4 * M_PI / sqrt( 25 + 10 * sqrt(5)) );
+        const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
         const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
         const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
         
@@ -455,7 +455,7 @@ namespace gle
         const GLfloat B = (GLfloat)M_PI * 0.3;
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
-        const GLfloat R  = 1.3512958724134987f; //sqrt( 4 * M_PI / sqrt( 25 + 10 * sqrt(5)) );
+        const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
         const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
         const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
         
@@ -474,7 +474,7 @@ namespace gle
         glBegin(GL_TRIANGLE_FAN);
         glNormal3f(0, 0, 1);
         glVertex2f(0, 0);
-        const GLfloat R = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
+        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const GLfloat H = R * 0.8660254037844386f; // sqrtf(3)/2;
         const GLfloat X = R * 0.5f;
         glVertex2f( R,  0);
@@ -491,7 +491,7 @@ namespace gle
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
-        const GLfloat R = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
+        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const GLfloat H = R * 0.8660254037844386f; // sqrtf(3)/2;
         const GLfloat X = R * 0.5f;
         glVertex2f( R,  0);
@@ -725,8 +725,8 @@ namespace gle
     /// draw hexagon that has the same surface as a disc of radius 1.
     void initHexTubeBuffer(GLint buf1, GLint buf2, GLfloat A, GLfloat B)
     {
-        const GLfloat R = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
-        const GLfloat C = 0.8660254037844386f; //sqrt(3)/2;
+        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
         const GLfloat S = 0.5f;
         const GLfloat H = R * C, X = R * S;
         
@@ -817,8 +817,8 @@ namespace gle
     void gleHexTube1(GLfloat A, GLfloat B)
     {
         /// draw hexagon that has the same surface as a disc of radius 1.
-        const GLfloat R = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
-        const GLfloat C = 0.8660254037844386f; //sqrt(3)/2;
+        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
         const GLfloat S = 0.5f;
         const GLfloat H = R * C, X = R * S;
         
@@ -1096,8 +1096,8 @@ namespace gle
     
     void gleIcosahedron1()
     {
-        const GLfloat tau=0.8506508084f;      /* t=(1+sqrt(5))/2, tau=t/sqrt(1+t^2)  */
-        const GLfloat one=0.5257311121f;      /* one=1/sqrt(1+t^2) , unit sphere     */
+        const GLfloat tau=0.8506508084f;      /* t=(1+std::sqrt(5))/2, tau=t/std::sqrt(1+t^2)  */
+        const GLfloat one=0.5257311121f;      /* one=1/std::sqrt(1+t^2) , unit sphere     */
         
         /* Twelve vertices of icosahedron on unit sphere */
         GLfloat pts[] = {
@@ -1747,7 +1747,7 @@ namespace gle
      */
     void gleDumbbell(Vector2 const& a, Vector2 const& b, GLfloat diameter)
     {
-        const GLfloat S = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
+        const GLfloat S = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const GLfloat R = diameter * S;
         const GLfloat H = R * 0.8660254037844386f; //0.5f * sqrtf(3);
         const GLfloat X = R * 0.5f;
@@ -2422,7 +2422,7 @@ namespace gle
     void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2)
     {
         float H = T * 0.5;
-        int Q = floor( (float)R * M_SQRT1_2 );
+        int Q = std::floor( (float)R * M_SQRT1_2 );
         
         if ( col1.visible() )
         {

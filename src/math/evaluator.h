@@ -123,7 +123,7 @@ private:
             else if ( c == '^' )
             {
                 ++ptr;
-                result = pow(result, factor_());
+                result = std::pow(result, factor_());
             }
             else
                 return result;

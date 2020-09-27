@@ -827,7 +827,7 @@ public:
     /// return rotation matrix of given angle
     static Matrix22 rotation(const real ang)
     {
-        real c = cos(ang), s = sin(ang);
+        real c = std::cos(ang), s = std::sin(ang);
         return Matrix22(c, s, -s, c);
     }
 

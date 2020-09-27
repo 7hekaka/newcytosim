@@ -236,7 +236,7 @@ real off_diagonal_norm(size_t siz, real * mat)
     for ( size_t k = 0; k < siz*siz; k+=siz+1 )
         dia += mat[k] * mat[k];
 
-    return sqrt( ( all - dia ) / dia );
+    return std::sqrt( ( all - dia ) / dia );
 }
 
 

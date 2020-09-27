@@ -75,8 +75,8 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
     real load = dot(force, dirFiber()) * prop->directionality;
     
     // antagonistic load is negative
-    nextStep -= prop->forward_rate_dt / ( 1 + exp(-load*prop->force_inv) );
-    nextBack -= prop->backward_rate_dt / ( 0.1 + exp(load*prop->force_inv) );
+    nextStep -= prop->forward_rate_dt / ( 1 + std::exp(-load*prop->force_inv) );
+    nextBack -= prop->backward_rate_dt / ( 0.1 + std::exp(load*prop->force_inv) );
 
     while ( std::min(nextStep, nextBack) <= 0 )
     {

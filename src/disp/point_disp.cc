@@ -439,7 +439,7 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
 void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
 {
     realSize    = size * sf;
-    size_t   sz = (size_t)ceil(uf*(size+width));
+    size_t   sz = (size_t)std::ceil(uf*(size+width));
     // use a multiple of 4 pixels:
     pixSize     = ( sz + 4 ) & ~3;
     perceptible = visible && ( uf*(size+width) > 0.25 );

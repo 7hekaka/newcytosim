@@ -219,8 +219,8 @@ protected:
          which is problematic if 'unbinding_rate==0' and 'unbinding_force' is finite.
          This issue is handled in HandProp::complete()
          */
-        //std::cerr << prop->name() << " " << exp(force*prop->unbinding_force_inv) << "\n";
-        nextDetach -= prop->unbinding_rate_dt * exp(force*prop->unbinding_force_inv);
+        //std::cerr << prop->name() << " " << std::exp(force*prop->unbinding_force_inv) << "\n";
+        nextDetach -= prop->unbinding_rate_dt * std::exp(force*prop->unbinding_force_inv);
         if ( nextDetach <= 0 )
         {
             detach();

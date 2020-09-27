@@ -24,7 +24,7 @@
  The index of a site can be positive or negative, but always corresponds
  to the abscissa taken along the Fiber:
  
-     index = (lati_t) floor( abscissa / unit );
+     index = (lati_t) std::floor( abscissa / unit );
  
  The Lattice may hold different types of information at each site, eg. a 'number of molecule'.
  The linear density can be derived by dividing by the unit length:
@@ -261,10 +261,10 @@ public:
 #pragma mark - Index / Abscissa
 
     /// index of the site containing abscissa `a`
-    lati_t  index(real a)       const { return (lati_t)floor(a/laUnit); }
+    lati_t  index(real a)       const { return (lati_t)std::floor(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
-    lati_t  index_sup(real a)   const { return (lati_t)ceil(a/laUnit); }
+    lati_t  index_sup(real a)   const { return (lati_t)std::ceil(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
     lati_t  index_round(real a) const { return (lati_t)round(a/laUnit); }

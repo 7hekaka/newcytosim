@@ -369,13 +369,13 @@ public:
     /// index in dimension `d` corresponding to position `w`
     int          index(size_t d, real w) const { return (int)map(d, w); }
 
-    /// the length of the diagonal of a cell = sqrt( sum(cWidth[d]^2) )
+    /// the length of the diagonal of a cell = std::sqrt( sum(cWidth[d]^2) )
     real diagonalLength() const
     {
         real res = cWidth[0] * cWidth[0];
         for ( int d = 1; d < ORD; ++d )
             res += cWidth[d] * cWidth[d];
-        return sqrt(res);
+        return std::sqrt(res);
     }
     
     /// the smallest cell width, along dimensions that have more than `min_size` cells
@@ -400,7 +400,7 @@ public:
             real m = std::max(gSup[d], -gInf[d]);
             res += m * m;
         }
-        return sqrt(res);
+        return std::sqrt(res);
     }
 
     //--------------------------------------------------------------------------
@@ -763,7 +763,7 @@ public:
     {
         size_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
-            range[d] = ceil( radius / cWidth[d] );
+            range[d] = std::ceil( radius / cWidth[d] );
         size_t cmx = 0;
         int * ccc = newRectangularGrid(cmx, range);
         
@@ -786,7 +786,7 @@ public:
         for ( int d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > 0 );
-            range[d] = ceil( radius / cWidth[d] );
+            range[d] = std::ceil( radius / cWidth[d] );
         }
         size_t cmx = 0;
         int * ccc = newRectangularGrid(cmx, range);

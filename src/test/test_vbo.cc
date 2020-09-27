@@ -87,8 +87,8 @@ void initVBO()
 {
     //Vertices of a triangle (counter-clockwise winding)
     GLfloat a = 1/3.0;
-    GLfloat b = sqrt(2.0)/3.0;
-    GLfloat c = sqrt(2.0/3.0);
+    GLfloat b = std::sqrt(2.0)/3.0;
+    GLfloat c = std::sqrt(2.0/3.0);
     
     GLfloat vertices[] = { 0, 2*b, -a,
                         -c,  -b, -a,

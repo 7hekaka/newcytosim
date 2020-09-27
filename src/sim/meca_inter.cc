@@ -333,15 +333,15 @@ void Meca::addTorqueClamp(Interpolation const& pti,
 #endif
     
     // calculate current angle between segments in [0, pi]:
-    const real angle = atan2(Tn, dot(d, dir));
+    const real angle = std::atan2(Tn, dot(d, dir));
     
     /**
      Scale torque to make it proportional to angle:
-     we multiply the vector Tq by angle / sin(angle),
-     knowing that Tn = Tq.norm() = sin(angle) * sqrt(n)
+     we multiply the vector Tq by angle / std::sin(angle),
+     knowing that Tn = Tq.norm() = std::sin(angle) * std::sqrt(n)
      
-     To have a Torque proportional to sin(angle), use:
-     real nn = weight / ( n * sqrt(n) );
+     To have a Torque proportional to std::sin(angle), use:
+     real nn = weight / ( n * std::sqrt(n) );
      */
     real nn = weight * angle / ( n * Tn );
     
@@ -392,15 +392,15 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 #endif
     
     // calculate current angle between segments in [0, pi]:
-    const real angle = atan2(Tn, dot(da, db));
+    const real angle = std::atan2(Tn, dot(da, db));
     
     /**
      Scale torque to make it proportional to angle:
-     we multiply the vector Tq by angle / sin(angle),
-     knowing that Tn = Tq.norm() = sin(angle) * sqrt( na * nb )
+     we multiply the vector Tq by angle / std::sin(angle),
+     knowing that Tn = Tq.norm() = std::sin(angle) * std::sqrt( na * nb )
      
-     To have a Torque proportional to sin(angle), use:
-     real nn = sqrt( na * nb ); or nn = Tn / angle
+     To have a Torque proportional to std::sin(angle), use:
+     real nn = std::sqrt( na * nb ); or nn = Tn / angle
      na = weight / ( na * nn );
      nb = weight / ( nb * nn );
      */
@@ -491,15 +491,15 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 #endif
     
     // calculate current angle between segments in [0, pi]:
-    const real angle = atan2(Tn, dot(da, rot));
+    const real angle = std::atan2(Tn, dot(da, rot));
     
     /**
      Scale torque to make it proportional to angle:
-     we multiply the vector Tq by angle / sin(angle),
-     but knowing that Tn = Tq.norm() = sin(angle) * sqrt( na * nb )
+     we multiply the vector Tq by angle / std::sin(angle),
+     but knowing that Tn = Tq.norm() = std::sin(angle) * std::sqrt( na * nb )
      
-     To have a Torque proportional to sin(angle), use:
-     real nn = sqrt( na * nb ); or nn = Tn / angle;
+     To have a Torque proportional to std::sin(angle), use:
+     real nn = std::sqrt( na * nb ); or nn = Tn / angle;
      na = weight / ( na * nn );
      nb = weight / ( nb * nn );
      */
@@ -581,8 +581,8 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
     const real h[]={ ab.YY/abn, -ab.XX/abn, -ab.YY/abn, ab.XX/abn, -cd.YY/cdn, cd.XX/cdn, cd.YY/cdn, -cd.XX/cdn };
     
     //dangle = angle - torque_angle
-    //real dangle = atan2( cross(ab, ce), dot(ab, ce) );
-    real dangle = atan2( ab.XX*ce.YY - ab.YY*ce.XX, dot(ab, ce) );
+    //real dangle = std::atan2( cross(ab, ce), dot(ab, ce) );
+    real dangle = std::atan2( ab.XX*ce.YY - ab.YY*ce.XX, dot(ab, ce) );
     //Computation of the jacobian for the linearization
     //M = d_x f = M1 + M2
     //M1 = w1/l normal d_x dangle
@@ -610,8 +610,8 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
     //The pos(-1, jj) accounts for the different signs of the matrix
     for ( int jj=0; jj <  4; ++jj) {
         for ( int ii=jj ; ii < 4; ++ii ) {
-            m[ii + shifta] += pow(-1,jj)*entrya[ii-jj];
-            m[ii + shiftc] += pow(-1,jj)*entryc[ii-jj];
+            m[ii + shifta] += std::pow(-1,jj)*entrya[ii-jj];
+            m[ii + shiftc] += std::pow(-1,jj)*entryc[ii-jj];
         }
         shifta += 7 - jj;
         shiftc += 3 - jj;
@@ -640,9 +640,9 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
  Add torque between segments AB and CD defined by `pt1` and `pt2`.
  Opposite forces are applied at the end of the segments resulting in pure torque.
  
-     force_A = weight * sin( angle - equilibrium_angle ) / |AB|
+     force_A = weight * std::sin( angle - equilibrium_angle ) / |AB|
      force_B = - force_A
-     force_C = weight * sin( angle - equilibrium_angle ) / |CD|
+     force_C = weight * std::sin( angle - equilibrium_angle ) / |CD|
      force_D = - force_C
  
  These force vectors are orthogonal to the segments on which they are applied.
@@ -1044,7 +1044,7 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
     const real ab2 = AB.normSqr();
     if ( ab2 > REAL_EPSILON )
     {
-        real ab = sqrt(ab2);
+        real ab = std::sqrt(ab2);
         const real wla = weightL * len / ab;
         add_base(iiA, AB, -wla);
         add_base(iiB, AB,  wla);
@@ -1878,7 +1878,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
 
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
-    const real abn = sqrt(ab2);
+    const real abn = std::sqrt(ab2);
 
     const real wla = weight * len / abn;
 
@@ -1952,7 +1952,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
-    const real abn = sqrt(ab2);
+    const real abn = std::sqrt(ab2);
 
     const real wla = weight * len / abn;
 
@@ -2040,7 +2040,7 @@ void Meca::addLongLink(Interpolation const& ptA,
 
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
-    const real abn = sqrt(ab2);
+    const real abn = std::sqrt(ab2);
 
     const real wla = weight * len / abn;
 
@@ -4628,7 +4628,7 @@ void  Meca::addTriLink(Interpolation const& pt1, const real w1,
 void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
 {
     Vector ab = ptB.pos() - ptA.pos();
-    real abnSqr = ab.normSqr(), abn=sqrt(abnSqr);
+    real abnSqr = ab.normSqr(), abn=std::sqrt(abnSqr);
     
     const size_t inxA = DIM * ptA.matIndex();
     const size_t inxB = DIM * ptB.matIndex();

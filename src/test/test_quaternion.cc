@@ -36,7 +36,7 @@ void testRotation(Vector3 vec, real angle)
     //mat.print(stdout);
     printf("  deviation = %e", maxDeviationFromRotation(mat));
     
-    Matrix33 rot = Matrix33::rotationAroundAxis(vec, cos(angle), sin(angle));
+    Matrix33 rot = Matrix33::rotationAroundAxis(vec, std::cos(angle), std::sin(angle));
     
     printf("  error = %e  ", ( rot - mat ).norm_inf());
     printf("  angles  %+6.2f %+6.2f %+6.2f\n", angle, a, mat.rotationAngle());

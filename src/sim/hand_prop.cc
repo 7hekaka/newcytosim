@@ -309,7 +309,7 @@ void HandProp::checkStiffness(real stiff, real len, real mul, real kT) const
         //<< PREF << "you could decrease stiffness or binding_range\n";
     }
     
-    real ap = exp( stiff * dis * unbinding_force_inv );
+    real ap = std::exp( stiff * dis * unbinding_force_inv );
     
     if ( ap > 10.0 )
     {

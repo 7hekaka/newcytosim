@@ -383,7 +383,7 @@ public:
     /// return rotation matrix of given angle
     static Matrix11 rotation(const real ang)
     {
-        return Matrix11(sign_real(cos(ang)));
+        return Matrix11(sign_real(std::cos(ang)));
     }
 
     /// rotation angle

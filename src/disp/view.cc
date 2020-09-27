@@ -467,7 +467,7 @@ void View::align_with(const Vector3 & dir)
     real cs = dir.XX, si = axis.norm();
     if ( si > REAL_EPSILON )
     {
-        rotation.setFromAxis(axis, atan2(si, cs));
+        rotation.setFromAxis(axis, std::atan2(si, cs));
         setModelView();
     }
 }

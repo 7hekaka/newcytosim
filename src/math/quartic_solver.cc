@@ -72,7 +72,7 @@ int QuarticSolver::solveQuadratic(const real A, const real B, const real C,
     
     if ( discriminant >= 0.0 )
     {
-        discriminant = sqrt(discriminant);
+        discriminant = std::sqrt(discriminant);
         r1 =  ( discriminant - B ) / A2;
         r2 = -( discriminant + B ) / A2;
         return 2;
@@ -98,13 +98,13 @@ int QuarticSolver::solveQuadratic(const real A, const real B, const real C,
     
     if ( discriminant >= 0.0 )
     {
-        discriminant = sqrt(discriminant);
+        discriminant = std::sqrt(discriminant);
         r1 = cplx( ( discriminant - B ) / A2, 0);
         r2 = cplx(-( discriminant + B ) / A2, 0);
     }
     else
     {
-        discriminant = sqrt(-discriminant);
+        discriminant = std::sqrt(-discriminant);
         r1 = cplx( -B / A2,  discriminant / A2 );
         r2 = cplx( -B / A2, -discriminant / A2 );
     }
@@ -164,22 +164,22 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     {
         /* This sqrt and division is safe, since RR >= 0, so QQQ > RR,    */
         /* so QQQ > 0.  The acos is also safe, since RR/QQQ < 1, and      */
-        /* thus R/sqrt(QQQ) < 1.                                          */
-        real theta = acos(R/sqrt(QQQ));
+        /* thus R/std::sqrt(QQQ) < 1.                                          */
+        real theta = std::acos(R/std::sqrt(QQQ));
         /* This sqrt is safe, since QQQ >= 0, and thus Q >= 0             */
         
-        real x = -2*sqrt(Q);
+        real x = -2*std::sqrt(Q);
         real t = theta/3.0;
-        r1 = x * cos(t)            - B3;
-        r2 = x * cos(t+2*M_PI/3.0) - B3;
-        r3 = x * cos(t-2*M_PI/3.0) - B3;
+        r1 = x * std::cos(t)            - B3;
+        r2 = x * std::cos(t+2*M_PI/3.0) - B3;
+        r3 = x * std::cos(t-2*M_PI/3.0) - B3;
 
         return 3;
     }
     else if ( RR == QQQ )
     {
         // 3 real roots
-        real sq = sqrt(Q);
+        real sq = std::sqrt(Q);
         
         if ( R > 0 )
         {
@@ -199,8 +199,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     {
         // 1 real root
         real sgn = -sign_real(R);
-        real x = sgn * pow( abs_real(R)+sqrt(RR-QQQ), 1.0/3.0 );
-        //real x = sgn * exp( log(abs_real(R)+sqrt(RR-QQQ)) / 3.0 );
+        real x = sgn * std::pow( abs_real(R)+std::sqrt(RR-QQQ), 1.0/3.0 );
         real y = Q / x;
 
         r1 = x + y - B3;
@@ -247,16 +246,16 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     {
         /* This sqrt and division is safe, since RR >= 0, so QQQ > RR,    */
         /* so QQQ > 0.  The acos is also safe, since RR/QQQ < 1, and      */
-        /* thus R/sqrt(QQQ) < 1.                                          */
-        real theta = acos(R/sqrt(QQQ));
+        /* thus R/std::sqrt(QQQ) < 1.                                          */
+        real theta = std::acos(R/std::sqrt(QQQ));
         /* This sqrt is safe, since QQQ >= 0, and thus Q >= 0             */
         
-        real x = -2*sqrt(Q);
+        real x = -2*std::sqrt(Q);
         real t = theta/3.0;
         
-        r1 = cplx( x * cos(t)            - B3, 0 );
-        r2 = cplx( x * cos(t+2*M_PI/3.0) - B3, 0 );
-        r3 = cplx( x * cos(t-2*M_PI/3.0) - B3, 0 );
+        r1 = cplx( x * std::cos(t)            - B3, 0 );
+        r2 = cplx( x * std::cos(t+2*M_PI/3.0) - B3, 0 );
+        r3 = cplx( x * std::cos(t-2*M_PI/3.0) - B3, 0 );
         
         return 3;
     }
@@ -264,7 +263,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     {
         // 3 real roots
         real sgn = sign_real(R);
-        real x = sgn * sqrt(Q);
+        real x = sgn * std::sqrt(Q);
         
         r1 = cplx( x - B3, 0 );
         r2 = cplx( x - B3, 0 );
@@ -276,13 +275,12 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     {
         // 1 real root
         real sgn = -sign_real(R);
-        real x = sgn * pow( abs_real(R)+sqrt(RR-QQQ), 1.0/3.0 );
-        //real x = sgn * exp( log(abs_real(R)+sqrt(RR-QQQ)) / 3.0 );
+        real x = sgn * std::pow( abs_real(R)+std::sqrt(RR-QQQ), 1.0/3.0 );
         real y = Q / x;
         
         r1 = cplx( x + y - B3, 0 );
-        r2 = cplx( -0.5 * ( x + y ) - B3, -0.5 * sqrt(3) * abs_real( x - y ) );
-        r3 = cplx( -0.5 * ( x + y ) - B3,  0.5 * sqrt(3) * abs_real( x - y ) );
+        r2 = cplx( -0.5 * ( x + y ) - B3, -0.5 * std::sqrt(3) * abs_real( x - y ) );
+        r3 = cplx( -0.5 * ( x + y ) - B3,  0.5 * std::sqrt(3) * abs_real( x - y ) );
         
         return 3;
     }
@@ -315,7 +313,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
  Solve equation for z (one solution is enough):
  z^3 + 2Iz^2 + (I^2 - 4K)z - J^2 = 0
  
- p = sqrt(z)
+ p = std::sqrt(z)
  r = -p
  q = (I + z - J/p)/2
  s = (I + z + J/p)/2
@@ -389,8 +387,8 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         
         if ( m > 0 && z1 >= 0 )
         {
-            r1 =  sqrt(z1) - 0.25*B;
-            r2 = -sqrt(z1) - 0.25*B;
+            r1 =  std::sqrt(z1) - 0.25*B;
+            r2 = -std::sqrt(z1) - 0.25*B;
             n  = 2;
         }
         
@@ -398,14 +396,14 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         {
             if ( n == 2 )
             {
-                r3 =  sqrt(z2) - 0.25*B;
-                r4 = -sqrt(z2) - 0.25*B;
+                r3 =  std::sqrt(z2) - 0.25*B;
+                r4 = -std::sqrt(z2) - 0.25*B;
                 n = 4;
             }
             else
             {
-                r1 =  sqrt(z2) - 0.25*B;
-                r2 = -sqrt(z2) - 0.25*B;
+                r1 =  std::sqrt(z2) - 0.25*B;
+                r2 = -std::sqrt(z2) - 0.25*B;
                 n = 2;
             }
         }
@@ -431,10 +429,10 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         fprintf(stderr, " real %+f\n", ss);
 #endif
 
-        real p = sqrt(ss);
+        real p = std::sqrt(ss);
         real w = J/p;
         // alternative formula, which has lower precision:
-        //real w = sqrt( abs_real( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
+        //real w = std::sqrt( abs_real( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
         
         real q = ( I + ss - w ) * 0.5;
         real s = ( I + ss + w ) * 0.5;
@@ -559,10 +557,10 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         fprintf(stderr, " real %+f\n", ss);
 #endif
 
-        real p = sqrt(ss);
+        real p = std::sqrt(ss);
         real w = J/p;
         // alternative formula, which has lower precision:
-        //real w = sqrt( abs_real( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
+        //real w = std::sqrt( abs_real( ( I + z1 )*( I + z1 ) - 4*K ) ) * ( J < 0 ? -1 : 1 );
         
         real q = ( I + ss - w ) * 0.5;
         real s = ( I + ss + w ) * 0.5;

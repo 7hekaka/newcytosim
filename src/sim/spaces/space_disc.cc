@@ -77,7 +77,7 @@ Vector SpaceDisc::project(Vector const& pos) const
     real n = pos.normSqr();
     
     if ( n > 0 ) {
-        return pos * ( radius_ / sqrt(n) );
+        return pos * ( radius_ / std::sqrt(n) );
     }
     else {
         //select a random point on the surface

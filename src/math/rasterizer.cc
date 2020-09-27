@@ -26,8 +26,8 @@ void Rasterizer::paintFatLine1D(void (*paint)(int, int, int, int, void*), void *
     real p = ( P.XX - radius - offset.XX ) * delta.XX;
     real q = ( Q.XX - radius - offset.XX ) * delta.XX;
     
-    int inf = (int) ceil(std::min(p,q));
-    int sup = (int)floor(std::max(p,q));
+    int inf = (int) std::ceil(std::min(p,q));
+    int sup = (int)std::floor(std::max(p,q));
     
     paint(inf, sup, 0, 0, arg);
 }
@@ -70,7 +70,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
     real xxL, yyL, dxL;
     
     // start on the line just above the bottom point
-    int yy = (int)ceil(R.YY);
+    int yy = (int)std::ceil(R.YY);
     
     while ( true )
     {
@@ -107,12 +107,12 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
         }
         
         // index of the last line without changing edges:
-        int yym = (int)floor(std::min(L.YY, R.YY));
+        int yym = (int)std::floor(std::min(L.YY, R.YY));
         
         for ( ; yy <= yym; ++yy )
         {
-            int inf = (int) ceil(xxL);
-            int sup = (int)floor(xxR);
+            int inf = (int) std::ceil(xxL);
+            int sup = (int)std::floor(xxR);
             if ( inf <= sup )
             {
                 // draw the horizontal line:
@@ -167,7 +167,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
     real xxL, yyL, dxL;
 
     // start on the line just above the bottom point
-    int yy = (int)ceil(pts[0].YY);
+    int yy = (int)std::ceil(pts[0].YY);
     
     while ( true )
     {
@@ -202,12 +202,12 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
         }
         
         // index of the last line without changing edges:
-        int yym = (int)floor(std::min(L.YY, R.YY));
+        int yym = (int)std::floor(std::min(L.YY, R.YY));
         
         for ( ; yy <= yym; ++yy )
         {
-            int inf = (int) ceil(xxL);
-            int sup = (int)floor(xxR);
+            int inf = (int) std::ceil(xxL);
+            int sup = (int)std::floor(xxR);
             if ( inf <= sup )
             {
                 // draw the horizontal line:
@@ -335,13 +335,13 @@ void Rasterizer::paintBox2D(void (*paint)(int, int, int, int, void*), void * arg
     {
         if ( P[d] > Q[d] )
         {
-            inf[d] = (int) ceil( ( Q[d] - radius - offset[d] ) * delta[d] );
-            sup[d] = (int)floor( ( P[d] + radius - offset[d] ) * delta[d] );
+            inf[d] = (int) std::ceil( ( Q[d] - radius - offset[d] ) * delta[d] );
+            sup[d] = (int)std::floor( ( P[d] + radius - offset[d] ) * delta[d] );
         }
         else
         {
-            inf[d] = (int) ceil( ( P[d] - radius - offset[d] ) * delta[d] );
-            sup[d] = (int)floor( ( Q[d] + radius - offset[d] ) * delta[d] );
+            inf[d] = (int) std::ceil( ( P[d] - radius - offset[d] ) * delta[d] );
+            sup[d] = (int)std::floor( ( Q[d] + radius - offset[d] ) * delta[d] );
         }
     }
     
@@ -406,7 +406,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
     Vertex2 xy[max];
     
     size_t above = 0;
-    int zz  = (int) ceil( pts[0].ZZ );
+    int zz  = (int) std::ceil( pts[0].ZZ );
     
     while ( ++above < n_pts )
     {
@@ -422,7 +422,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         
         //the next time we have to recalculate the lines
         //is when pts[above] will be below the plane Z = zzn:
-        int zzn = (int)ceil( pts[above].ZZ );
+        int zzn = (int)std::ceil( pts[above].ZZ );
         
         //number of edges crossing the plane at Z=zz;
         size_t nbl = 0;
@@ -538,9 +538,9 @@ void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void *
      D (  0,  2*a ) = -A
      E ( -b,    a ) = -B
      F ( -b,   -a ) = -C
- with b = sqrt(3) * a
+ with b = std::sqrt(3) * a
      b = 1
-     a = 1 / sqrt(3)
+     a = 1 / std::sqrt(3)
  */
 void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void * arg,
                                 const Vector3& P, const Vector3& Q, const real iPQ,
@@ -607,13 +607,13 @@ void Rasterizer::paintBox3D(void (*paint)(int, int, int, int, void*), void * arg
     {
         if ( P[d] > Q[d] )
         {
-            inf[d] = (int) ceil( ( Q[d] - radius - offset[d] ) * delta[d] );
-            sup[d] = (int)floor( ( P[d] + radius - offset[d] ) * delta[d] );
+            inf[d] = (int) std::ceil( ( Q[d] - radius - offset[d] ) * delta[d] );
+            sup[d] = (int)std::floor( ( P[d] + radius - offset[d] ) * delta[d] );
         }
         else
         {
-            inf[d] = (int) ceil( ( P[d] - radius - offset[d] ) * delta[d] );
-            sup[d] = (int)floor( ( Q[d] + radius - offset[d] ) * delta[d] );
+            inf[d] = (int) std::ceil( ( P[d] - radius - offset[d] ) * delta[d] );
+            sup[d] = (int)std::floor( ( Q[d] + radius - offset[d] ) * delta[d] );
         }
     }
     

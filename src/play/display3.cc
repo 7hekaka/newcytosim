@@ -454,13 +454,13 @@ void color_by_direction(Fiber const& fib, size_t seg, real)
 /// distance from the minus end
 void color_by_abscissaM(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front(exp(-(0.5+seg)*beta));
+    fib.disp->color.load_front(std::exp(-(0.5+seg)*beta));
 }
 
 /// distance from the plus end
 void color_by_abscissaP(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front(exp((seg+1.5-fib.nbPoints())*beta));
+    fib.disp->color.load_front(std::exp((seg+1.5-fib.nbPoints())*beta));
 }
 
 /// color set according to distance to the confining Space
@@ -474,7 +474,7 @@ void color_by_height(Fiber const& fib, size_t seg, real beta)
     else
         Z = fib.posPoint(seg,0.5).ZZ;
 #endif
-    gle_color::jet_color(exp(Z*beta)).load_front();
+    gle_color::jet_color(std::exp(Z*beta)).load_front();
 }
 
 
@@ -784,34 +784,34 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
         if ( fib.abscissaM() < 0 )
         {
             uint32_t z = fib.signature();
-            real a = spread * log(z*TINY);
+            real a = spread * std::log(z*TINY);
             while ( a > fib.abscissaP() )
             {
                 z = lcrng2(z);
-                a += spread * log(z*TINY);
+                a += spread * std::log(z*TINY);
             }
             while ( a >= fib.abscissaM() )
             {
                 gleObject(fib.pos(a), rad, gleSphere1B);
                 z = lcrng2(z);
-                a += spread * log(z*TINY);
+                a += spread * std::log(z*TINY);
             }
         }
         // draw speckles above the origin of abscissa:
         if ( fib.abscissaP() > 0 )
         {
             uint32_t z = ~fib.signature();
-            real a = -spread * log(z*TINY);
+            real a = -spread * std::log(z*TINY);
             while ( a < fib.abscissaM() )
             {
                 z = lcrng1(z);
-                a -= spread * log(z*TINY);
+                a -= spread * std::log(z*TINY);
             }
             while ( a <= fib.abscissaP() )
             {
                 gleObject(fib.pos(a), rad, gleSphere1B);
                 z = lcrng1(z);
-                a -= spread * log(z*TINY);
+                a -= spread * std::log(z*TINY);
             }
         }
     }
@@ -819,7 +819,7 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
     {
         //we distribute points regularly along the center line
         const real grad = disp->speckle_interval;
-        real ab = grad * ceil( fib.abscissaM() / grad );
+        real ab = grad * std::ceil( fib.abscissaM() / grad );
         while ( ab <= fib.abscissaP() )
         {
             gleObject(fib.pos(ab), rad, gleSphere1B);
@@ -849,7 +849,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         // display arrowheads along the fiber:
         const real siz = disp->point_size*sFactor;
         const real sep = disp->point_interval;
-        real ab = ceil(fib.abscissaM()/sep) * sep;
+        real ab = std::ceil(fib.abscissaM()/sep) * sep;
         for ( ; ab <= fib.abscissaP(); ab += sep )
             gleCone(fib.pos(ab), fib.dir(ab), siz);
     }
@@ -1283,7 +1283,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
-        dns = sFactor / sqrt(dns);
+        dns = sFactor / std::sqrt(dns);
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;

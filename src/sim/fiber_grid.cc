@@ -49,13 +49,13 @@ size_t FiberGrid::setGrid(Space const* space, real max_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             //adjust the grid to match the edges exactly
-            cnt[d] = std::max((size_t)1, (size_t)ceil(n));
+            cnt[d] = std::max((size_t)1, (size_t)std::ceil(n));
             fGrid.setPeriodic(d, true);
         }
         else
         {
             //extend the grid by one cell on each side
-            cnt[d]  = (size_t)ceil(n) + 2;
+            cnt[d]  = (size_t)std::ceil(n) + 2;
             inf[d] -= max_step;
             sup[d] += max_step;
         }

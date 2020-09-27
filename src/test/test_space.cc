@@ -157,7 +157,7 @@ void distributePoints(real len = INFLATION)
         real d = ( project[ii] - project2[ii] ).normSqr();
         error = std::max(d, error);
     }
-    error = sqrt(error);
+    error = std::sqrt(error);
     if ( showNormals )
         calculateNormals();
     
@@ -225,7 +225,7 @@ void checkVolume()
     }
     avg /= CNT;
     dev = dev/(real)CNT - avg * avg;
-    dev = sqrt(abs_real(dev));
+    dev = std::sqrt(abs_real(dev));
     
     real vol = spc->volume();
 

@@ -827,7 +827,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
             {
-                fib.disp->color.load(exp(beta*n));
+                fib.disp->color.load(std::exp(beta*n));
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
@@ -841,7 +841,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
             {
-                fib.disp->color.load(exp(alpha+beta*n));
+                fib.disp->color.load(std::exp(alpha+beta*n));
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
@@ -862,7 +862,7 @@ void Display::drawFiberLines(Fiber const& fib) const
                 else
                     Z = fib.posPoint(n).ZZ;
 #endif
-                gle_color::jet_color(exp(Z*beta)).load();
+                gle_color::jet_color(std::exp(Z*beta)).load();
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
@@ -918,34 +918,34 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         if ( fib.abscissaM() < 0 )
         {
             uint32_t z = fib.signature();
-            real a = spread * log(z*TINY);
+            real a = spread * std::log(z*TINY);
             while ( a > fib.abscissaP() )
             {
                 z = lcrng2(z);
-                a += spread * log(z*TINY);
+                a += spread * std::log(z*TINY);
             }
             while ( a >= fib.abscissaM() )
             {
                 gle::gleVertex(fib.pos(a));
                 z = lcrng2(z);
-                a += spread * log(z*TINY);
+                a += spread * std::log(z*TINY);
             }
         }
         // draw speckles above the origin of abscissa
         if ( fib.abscissaP() > 0 )
         {
             uint32_t z = ~fib.signature();
-            real a = -spread * log(z*TINY);
+            real a = -spread * std::log(z*TINY);
             while ( a < fib.abscissaM() )
             {
                 z = lcrng1(z);
-                a -= spread * log(z*TINY);
+                a -= spread * std::log(z*TINY);
             }
             while ( a <= fib.abscissaP() )
             {
                 gle::gleVertex(fib.pos(a));
                 z = lcrng1(z);
-                a -= spread * log(z*TINY);
+                a -= spread * std::log(z*TINY);
             }
         }
         glEnd();
@@ -957,7 +957,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         glBegin(GL_POINTS);
         //we distribute points regularly along the center line
         const real grad = disp->speckle_interval;
-        real ab = grad * ceil( fib.abscissaM() / grad );
+        real ab = grad * std::ceil( fib.abscissaM() / grad );
         while ( ab <= fib.abscissaP() ) {
             gle::gleVertex(fib.pos(ab));
             ab += grad;
@@ -985,7 +985,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         // display arrowheads along the fiber:
         const real siz = disp->point_size*sFactor;
         const real sep = disp->point_interval;
-        real ab = ceil(fib.abscissaM()/sep) * sep;
+        real ab = std::ceil(fib.abscissaM()/sep) * sep;
         for ( ; ab <= fib.abscissaP(); ab += sep )
             gle::gleCone(fib.pos(ab), fib.dir(ab), siz);
     }
@@ -1178,8 +1178,8 @@ void Display::drawFiberLabels(Fiber const& fib, void* font) const
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
         gle::gleDrawText(fib.posEndM(), str, font);
         
-        int s = (int)ceil(fib.abscissaM());
-        int e = (int)floor(fib.abscissaP());
+        int s = (int)std::ceil(fib.abscissaM());
+        int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
@@ -1305,8 +1305,8 @@ void Display::drawActin(Fiber const& fib,
     */
     // rotation angle between consecutive monomers
     const real dan = -166 * M_PI / 180;
-    const real cs = cos(dan);
-    const real sn = sin(dan);
+    const real cs = std::cos(dan);
+    const real sn = std::sin(dan);
 
     real ab = 0;
     Vector3 d(fib.dirEndM());  // unit tangent to centerline
@@ -1390,7 +1390,7 @@ void Display::drawMicrotubule(Fiber const& fib,
     real off = 0.025 / 2 - rad;
 
     const real abmax = fib.abscissaP();
-    real ab = dab * ceil( fib.abscissaM() / dab );
+    real ab = dab * std::ceil( fib.abscissaM() / dab );
     Vector3 d(fib.dir(ab));   // unit tangent vector
     Vector3 n = fib.adjustedNormal(d);
     

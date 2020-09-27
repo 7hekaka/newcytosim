@@ -65,7 +65,7 @@ void TreadmillingFiber::step()
         assert_true(mGrowthP>=0);
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( forceP < 0  &&  prop->growing_force[P] < INFINITY )
-            mGrowthP *= exp(forceP/prop->growing_force[P]);
+            mGrowthP *= std::exp(forceP/prop->growing_force[P]);
     }
     else if ( mStateP == STATE_RED )
     {
@@ -88,7 +88,7 @@ void TreadmillingFiber::step()
         assert_true(mGrowthM>=0);
         // antagonistic force (< 0) decreases assembly rate exponentially
         if ( forceM < 0  &&  prop->growing_force[M] < INFINITY  )
-            mGrowthM *= exp(forceM/prop->growing_force[M]);
+            mGrowthM *= std::exp(forceM/prop->growing_force[M]);
     }
     else if ( mStateM == STATE_RED )
     {

@@ -541,7 +541,7 @@ void Fiber::severNow()
 
 
 /**
- returns index of first point for which ( cos(angle) < max_cosine ),
+ returns index of first point for which ( std::cos(angle) < max_cosine ),
  or zero
  */
 size_t Fiber::hasKink(const real max_cosine) const
@@ -679,10 +679,10 @@ real Fiber::dragCoefficientEllipsoid(const real len, FiberProp const* prop)
     const real lenc = std::max(std::min(len, prop->drag_length), prop->drag_radius);
 
     // drag of 3D ellipsoid
-    const real drag_ellipsoid = DRAG * len / log( lenc / prop->drag_radius );
+    const real drag_ellipsoid = DRAG * len / std::log( lenc / prop->drag_radius );
     
     // length below which ellipsoid formula is not valid:
-    const real min_len = exp( 1 + log(prop->drag_radius) );
+    const real min_len = std::exp( 1 + std::log(prop->drag_radius) );
     
     if ( len > min_len )
     {
@@ -746,11 +746,11 @@ real Fiber::dragCoefficientCylinder(const real len, FiberProp const* prop)
     const real lenc = std::max(std::min(len, prop->drag_length), prop->drag_radius);
     
     /// drag of a cylinder:
-    const real drag_cylinder = DRAG * len / ( log(0.5*lenc/prop->drag_radius) + 0.32 );
+    const real drag_cylinder = DRAG * len / ( std::log(0.5*lenc/prop->drag_radius) + 0.32 );
 
     // length below which the formula is not valid anymore ( ~ 3.94 * radius )
     // this corresponds to the minimun value of the formula above
-    const real min_len = 2 * prop->drag_radius * exp(1.0-0.32);
+    const real min_len = 2 * prop->drag_radius * std::exp(1.0-0.32);
     
     if ( len > min_len )
     {
@@ -788,7 +788,7 @@ real Fiber::dragCoefficientCylinder(const real len, FiberProp const* prop)
 
  because
 
-       acosh(x) = ln[ x + sqrt(x^2-1)) ] ~ ln[2x] if x >> 1
+       acosh(x) = ln[ x + std::sqrt(x^2-1)) ] ~ ln[2x] if x >> 1
 
  Hunt et al. also credit this reference for the formula:
  > The slow motion of a cylinder next to a plane wall.

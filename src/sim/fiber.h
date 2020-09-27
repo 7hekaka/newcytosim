@@ -128,7 +128,7 @@ protected:
     /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
     virtual Fiber* severPoint(size_t pti);
     
-    /// return index of point where there is a kink with ( cos(angle) < max_cos )
+    /// return index of point where there is a kink with ( std::cos(angle) < max_cos )
     size_t         hasKink(real max_cos) const;
 
     

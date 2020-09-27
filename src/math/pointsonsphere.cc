@@ -68,7 +68,7 @@ void PointsOnSphere::printAllPositions( FILE* file )
 
 real PointsOnSphere::distance3( const real P[], const real Q[] )
 {
-    return sqrt( (P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]) );
+    return std::sqrt( (P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]) );
 }
 
 
@@ -85,7 +85,7 @@ bool PointsOnSphere::project(const real S[3], real P[3])
     real n = S[0]*S[0] + S[1]*S[1] + S[2]*S[2];
     if ( n > 0 )
     {
-        n = sqrt(n);
+        n = std::sqrt(n);
         P[0] = S[0] / n;
         P[1] = S[1] / n;
         P[2] = S[2] / n;
@@ -112,7 +112,7 @@ void PointsOnSphere::randomize(real P[3])
         }
     } while ( n > 1.0 );
     
-    n = sqrt(n);
+    n = std::sqrt(n);
     P[0] /= n;
     P[1] /= n;
     P[2] /= n;
@@ -123,12 +123,12 @@ void PointsOnSphere::randomize(real P[3])
 /**
  With N points on the sphere according to a triagular lattice, 
  each of ~2N triangles should occupy an area of S = 4*PI/2*N, 
- and the distance between points should be ~2 * sqrt(S/sqrt(3)).
+ and the distance between points should be ~2 * std::sqrt(S/std::sqrt(3)).
  */
 real PointsOnSphere::expectedDistance(size_t n)
 {
     real surface = 2 * M_PI / (real)n;
-    return 2 * sqrt( surface / sqrt(3) );
+    return 2 * std::sqrt( surface / std::sqrt(3) );
 }
 
 
@@ -144,7 +144,7 @@ real PointsOnSphere::minimumDistance()
                 res = dis;
         }
     }
-    return sqrt(res);
+    return std::sqrt(res);
 }
 
 
@@ -200,7 +200,7 @@ void PointsOnSphere::setForces( real forces[], real threshold )
             {
                 // points do not overlap:
                 //force = vector / r^3, but here dist = r^2
-                dist = 1.0 / ( dist * sqrt(dist) );
+                dist = 1.0 / ( dist * std::sqrt(dist) );
                 //update forces for jj and ii:
                 for ( size_t d = 0 ; d < 3; ++d )
                 {
