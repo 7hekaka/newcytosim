@@ -200,7 +200,7 @@ Glossary Glossary::extract(key_type const& key) const
 Glossary Glossary::extract_unused() const
 {
     Glossary res;
-    for ( const pair_type i : mTerms )
+    for ( auto const& i : mTerms )
     {
         bool used = false;
         for ( val_type const& v : i.second )
