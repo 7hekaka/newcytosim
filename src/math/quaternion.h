@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 // Created by F. Nedelec, Oct 2002
 
 
@@ -62,15 +62,15 @@
 
 
 /// a Quaternion is similar to a complex number, but in dimension four
-template <typename R>
+template <typename REAL>
 class Quaternion 
 {
 
 private:
     
-    /// The four coordinates of a Quaternion
+    /// The four coordinates of a Quaternion, real part first
     /** this represents q[0] + i * q[1] + j * q[2] + k * q[3] */
-    R q[4];
+    REAL q[4];
     
 public:
     
@@ -78,7 +78,7 @@ public:
     Quaternion() {}
     
     /// Constructor which can be used to convert from a real
-    Quaternion(R a, R b, R c, R d)
+    Quaternion(REAL a, REAL b, REAL c, REAL d)
     {
         q[0] = a;
         q[1] = b;
@@ -90,7 +90,7 @@ public:
     ~Quaternion() {}
     
     /// setting the values from Cartesian coordinates
-    void set(R a, R b, R c, R d)
+    void set(REAL a, REAL b, REAL c, REAL d)
     {
         q[0] = a;
         q[1] = b;
@@ -99,16 +99,16 @@ public:
     }
     
     /// access to a modifiable coordinate
-    R& operator[] ( int n )  { return q[n]; }
+    REAL& operator[] (size_t n) { return q[n]; }
     
     /// access to a non-modifiable coordinate 
-    R  operator[] ( int n ) const  { return q[n]; };
+    REAL  operator[] (size_t n) const  { return q[n]; };
     
     /// conversion operator to a "real array"
-    operator R*() { return q; }
+    operator REAL*() { return q; }
     
     /// conversion to a 'real array'
-    R *    data() { return q; }
+    REAL *    data() { return q; }
     
     /// opposition: change sign in all coordinates 
     Quaternion operator - () const
@@ -117,31 +117,31 @@ public:
     }
     
     /// multiply by a real value
-    Quaternion operator * ( R f ) const
+    Quaternion operator * (REAL f) const
     {
         return Quaternion(q[0]*f, q[1]*f, q[2]*f, q[3]*f);
     }
     
     /// divide by a real value
-    Quaternion operator / ( R f ) const
+    Quaternion operator / (REAL f) const
     {
         return Quaternion(q[0]/f, q[1]/f, q[2]/f, q[3]/f);
     }
     
     /// add a real value in place
-    void operator += ( R f )
+    void operator += (REAL f)
     {
         q[0] += f;
     }
     
     /// subtract a real value in place
-    void operator -= ( R f )
+    void operator -= (REAL f)
     {
         q[0] -= f;
     }
     
     /// multiply for a real value in place
-    void operator *= ( R f )
+    void operator *= (REAL f)
     {
         q[0] *= f;
         q[1] *= f;
@@ -150,7 +150,7 @@ public:
     }
     
     /// divide by a real value in place
-    void operator /= ( R f )
+    void operator /= (REAL f)
     {
         q[0] /= f;
         q[1] /= f;
@@ -159,93 +159,93 @@ public:
     }
     
     /// sum two quaternions
-    const Quaternion  operator + ( const Quaternion &a ) const
+    const Quaternion  operator + (const Quaternion & X) const
     {
-        return Quaternion(q[0]+a.q[0], q[1]+a.q[1], q[2]+a.q[2], q[3]+a.q[3]);
+        return Quaternion(q[0]+X[0], q[1]+X[1], q[2]+X[2], q[3]+X[3]);
     }
     
     /// subtract two quaternions
-    const Quaternion  operator - ( const Quaternion &a ) const
+    const Quaternion  operator - (const Quaternion & X) const
     {
-        return Quaternion(q[0]-a.q[0], q[1]-a.q[1], q[2]-a.q[2], q[3]-a.q[3]);
+        return Quaternion(q[0]-X[0], q[1]-X[1], q[2]-X[2], q[3]-X[3]);
     }
     
     /// add another quaternion in place
-    void operator += ( const Quaternion & a )
+    void operator += (const Quaternion & X)
     {
-        q[0] += a.q[0];
-        q[1] += a.q[1];
-        q[2] += a.q[2];
-        q[3] += a.q[3];
+        q[0] += X[0];
+        q[1] += X[1];
+        q[2] += X[2];
+        q[3] += X[3];
     }
     
     /// subtract a quaternion in place
-    void operator -= ( const Quaternion & a )
+    void operator -= (const Quaternion & X)
     {
-        q[0] -= a.q[0];
-        q[1] -= a.q[1];
-        q[2] -= a.q[2];
-        q[3] -= a.q[3];
+        q[0] -= X[0];
+        q[1] -= X[1];
+        q[2] -= X[2];
+        q[3] -= X[3];
     }
     
     /// multiplication from the right side
-    void operator *= ( const Quaternion & a )
+    void operator *= (const Quaternion & X)
     {
-        rightMult(a);
+        rightMult(X);
     }
     
     /// divide in place by another quaternion
-    void operator /= ( const Quaternion & a )
+    void operator /= (const Quaternion & X)
     {
-        rightMult( a.inverted() );
+        rightMult( X.inverted() );
     }
     
     /// multiplication between quaternions
-    const Quaternion operator * ( const Quaternion & a ) const
+    const Quaternion operator * (const Quaternion & X) const
     {
         Quaternion result(q[0], q[1], q[2], q[3]);
-        result.rightMult( a );
+        result.rightMult(X);
         return result;
     }
     
     /// division between quaternions
-    const Quaternion operator / ( const Quaternion & a ) const
+    const Quaternion operator / (const Quaternion & X) const
     {
         Quaternion  result(q[0], q[1], q[2], q[3]);
-        result.rightMult( a.inverted() );
+        result.rightMult(X.inverted());
         return result;
     }
     
     /// extract the square of the norm, i.e. norm*norm
-    R normSqr() const
+    REAL normSqr() const
     {
         return q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
     }
     
     /// extract the norm 
-    R norm() const
+    REAL norm() const
     {
         return std::sqrt( q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
     }
     
     /// return the normalized quaternion
-    const Quaternion normalized(R n = 1.0) const
+    const Quaternion normalized(REAL n = 1.0) const
     {
-        R s = n / norm();
+        REAL s = n / norm();
         return Quaternion(q[0]*s, q[1]*s, q[2]*s, q[3]*s );
     }
     
     /// return the normalized Quaternion
-    friend Quaternion normalize(Quaternion a)
+    friend Quaternion normalize(const Quaternion & X)
     {
-        R s = 1.0 / a.norm();
-        return Quaternion(a[0]*s, a[1]*s, a[2]*s, a[3]*s );
+        REAL s = 1.0 / X.norm();
+        return Quaternion(X[0]*s, X[1]*s, X[2]*s, X[3]*s );
     }
 
     /// scale in place to obtain norm = `n`
-    void normalize(R n = 1.0)
+    void normalize(REAL n = 1.0)
     {
-        R s = n / norm();
+        REAL s = n / norm();
         q[0] *= s;
         q[1] *= s;
         q[2] *= s;
@@ -269,14 +269,14 @@ public:
     /// inversed quaternion:  1/*this
     const Quaternion inverted() const
     {
-        R x = -normSqr();
+        REAL x = -normSqr();
         return Quaternion( -q[0]/x, q[1]/x, q[2]/x, q[3]/x );
     }
     
     /// inverse in place
     void inverse()
     {
-        R x = -normSqr();
+        REAL x = -normSqr();
         q[0] /= -x;
         q[1] /=  x;
         q[2] /=  x;
@@ -310,7 +310,7 @@ public:
     /// this = this * this
     void square()
     {
-        R a = q[0], b = q[1], c = q[2], d = q[3];
+        REAL a = q[0], b = q[1], c = q[2], d = q[3];
         q[0] = a*a - b*b - c*c - d*d;
         a += a;
         q[1] = a*b;
@@ -318,41 +318,41 @@ public:
         q[3] = a*d;
     }
     
-    /// multiplication from the right side ( this <= this * a )
-    void rightMult( const Quaternion & a )
+    /// multiplication from the right side (this <= this * X )
+    void rightMult(const Quaternion & X)
     {
-        R q0 = q[0],   q1 = q[1],   q2 = q[2],   q3 = q[3];
+        REAL q0 = q[0],   q1 = q[1],   q2 = q[2],   q3 = q[3];
         
-        q[0] = q0 * a.q[0] - q1 * a.q[1] - q2 * a.q[2] - q3 * a.q[3];
-        q[1] = q0 * a.q[1] + q1 * a.q[0] + q2 * a.q[3] - q3 * a.q[2];
-        q[2] = q0 * a.q[2] - q1 * a.q[3] + q2 * a.q[0] + q3 * a.q[1];
-        q[3] = q0 * a.q[3] + q1 * a.q[2] - q2 * a.q[1] + q3 * a.q[0];
+        q[0] = q0 * X[0] - q1 * X[1] - q2 * X[2] - q3 * X[3];
+        q[1] = q0 * X[1] + q1 * X[0] + q2 * X[3] - q3 * X[2];
+        q[2] = q0 * X[2] - q1 * X[3] + q2 * X[0] + q3 * X[1];
+        q[3] = q0 * X[3] + q1 * X[2] - q2 * X[1] + q3 * X[0];
     }
     
-    /// multiplication from the left side ( this <= a * this )
-    void leftMult( const Quaternion & a )
+    /// multiplication from the left side (this <= X * this )
+    void leftMult(const Quaternion & X)
     {
-        R q0 = q[0],   q1 = q[1],   q2 = q[2],   q3 = q[3];
+        REAL q0 = q[0],   q1 = q[1],   q2 = q[2],   q3 = q[3];
         
-        q[0] = q0 * a.q[0] - q1 * a.q[1] - q2 * a.q[2] - q3 * a.q[3];
-        q[1] = q0 * a.q[1] + q1 * a.q[0] - q2 * a.q[3] + q3 * a.q[2];
-        q[2] = q0 * a.q[2] + q1 * a.q[3] + q2 * a.q[0] - q3 * a.q[1];
-        q[3] = q0 * a.q[3] - q1 * a.q[2] + q2 * a.q[1] + q3 * a.q[0];
+        q[0] = q0 * X[0] - q1 * X[1] - q2 * X[2] - q3 * X[3];
+        q[1] = q0 * X[1] + q1 * X[0] - q2 * X[3] + q3 * X[2];
+        q[2] = q0 * X[2] + q1 * X[3] + q2 * X[0] - q3 * X[1];
+        q[3] = q0 * X[3] - q1 * X[2] + q2 * X[1] + q3 * X[0];
     }
     
     /// multiplication from the right side, different implementation
-    void rightMult_fast( const Quaternion & a )
+    void rightMult_fast(const Quaternion & X)
     {
-        R E = (q[3] + q[1]) * (a.q[1] + a.q[2]);
-        R F = (q[3] - q[1]) * (a.q[1] - a.q[2]);
-        R G = (q[0] + q[2]) * (a.q[0] - a.q[3]);
-        R H = (q[0] - q[2]) * (a.q[0] + a.q[3]);
-        R A = F - E;
-        R B = F + E;
-        R C = (q[0] + q[1]) * (a.q[0] + a.q[1]);
-        R D = (q[0] - q[1]) * (a.q[2] + a.q[3]);
-        E = (q[3] + q[2]) * (a.q[0] - a.q[1]);
-        F = (q[3] - q[2]) * (a.q[2] - a.q[3]);
+        REAL E = (q[3] + q[1]) * (X[1] + X[2]);
+        REAL F = (q[3] - q[1]) * (X[1] - X[2]);
+        REAL G = (q[0] + q[2]) * (X[0] - X[3]);
+        REAL H = (q[0] - q[2]) * (X[0] + X[3]);
+        REAL A = F - E;
+        REAL B = F + E;
+        REAL C = (q[0] + q[1]) * (X[0] + X[1]);
+        REAL D = (q[0] - q[1]) * (X[2] + X[3]);
+        E = (q[3] + q[2]) * (X[0] - X[1]);
+        F = (q[3] - q[2]) * (X[2] - X[3]);
         q[0] = F + (A + G + H) * 0.5;
         q[1] = C + (A - G - H) * 0.5;
         q[2] = D + (B + G - H) * 0.5;
@@ -360,18 +360,18 @@ public:
     }
     
     /// multiplication from the left side, different implementation
-    void leftMult_fast( const Quaternion & a )
+    void leftMult_fast(const Quaternion & X)
     {
-        R E = (a.q[3] + a.q[1])*(q[1] + q[2]);
-        R F = (a.q[3] - a.q[1])*(q[1] - q[2]);
-        R G = (a.q[0] + a.q[2])*(q[0] - q[3]);
-        R H = (a.q[0] - a.q[2])*(q[0] + q[3]);
-        R A = F - E;
-        R B = F + E;
-        R C = (a.q[0] + a.q[1])*(q[0] + q[1]);
-        R D = (a.q[0] - a.q[1])*(q[2] + q[3]);
-        E = (a.q[3] + a.q[2])*(q[0] - q[1]);
-        F = (a.q[3] - a.q[2])*(q[2] - q[3]);
+        REAL E = (X[3] + X[1])*(q[1] + q[2]);
+        REAL F = (X[3] - X[1])*(q[1] - q[2]);
+        REAL G = (X[0] + X[2])*(q[0] - q[3]);
+        REAL H = (X[0] - X[2])*(q[0] + q[3]);
+        REAL A = F - E;
+        REAL B = F + E;
+        REAL C = (X[0] + X[1])*(q[0] + q[1]);
+        REAL D = (X[0] - X[1])*(q[2] + q[3]);
+        E = (X[3] + X[2])*(q[0] - q[1]);
+        F = (X[3] - X[2])*(q[2] - q[3]);
         q[0] = F + (A + G + H) * 0.5;
         q[1] = C + (A - G - H) * 0.5;
         q[2] = D + (B + G - H) * 0.5;
@@ -381,9 +381,9 @@ public:
     
     /// generate the associated 3x3 rotation matrix for unit Quaternion
     /** This assumes that norm(*this) = 1 */
-    void setMatrix3( R mat[], int ldd ) const
+    void setMatrix3(REAL mat[], int ldd) const
     {
-        R rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+        REAL rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
         
         x2 = q[1] + q[1];
         y2 = q[2] + q[2];
@@ -409,9 +409,9 @@ public:
     /// generate the associated 3x3 rotation matrix for unit Quaternion
     /** This assumes that norm(*this) = 1 */
     template < typename Matrix >
-    void setMatrix3( Matrix & mat ) const
+    void setMatrix3(Matrix & mat) const
     {
-        R rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+        REAL rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
         
         x2 = q[1] + q[1];
         y2 = q[2] + q[2];
@@ -436,33 +436,33 @@ public:
     
     /// Rotate a 3D vector: des = Q * src * Q.conjugated()
     /** This assumes that norm(*this) = 1 */
-    void rotateVector( R des[3], const R src[3] ) const
+    void rotateVector(REAL des[3], const REAL src[3]) const
     {
-        R two(2.0);
+        REAL two(2.0);
         
-        R rx =  q[0]*q[1];
-        R ry =  q[0]*q[2];
-        R rz =  q[0]*q[3];
-        R xx = -q[1]*q[1];
-        R xy =  q[1]*q[2];
-        R xz =  q[1]*q[3];
-        R yy = -q[2]*q[2];
-        R yz =  q[2]*q[3];
-        R zz = -q[3]*q[3];
+        REAL rx =  q[0]*q[1];
+        REAL ry =  q[0]*q[2];
+        REAL rz =  q[0]*q[3];
+        REAL xx = -q[1]*q[1];
+        REAL xy =  q[1]*q[2];
+        REAL xz =  q[1]*q[3];
+        REAL yy = -q[2]*q[2];
+        REAL yz =  q[2]*q[3];
+        REAL zz = -q[3]*q[3];
         
-        des[0] = two * ( (yy + zz)*src[0] + (xy - rz)*src[1] + (ry + xz)*src[2] ) + src[0];
-        des[1] = two * ( (rz + xy)*src[0] + (xx + zz)*src[1] + (yz - rx)*src[2] ) + src[1];
-        des[2] = two * ( (xz - ry)*src[0] + (rx + yz)*src[1] + (xx + yy)*src[2] ) + src[2];
+        des[0] = two * ((yy + zz)*src[0] + (xy - rz)*src[1] + (ry + xz)*src[2] ) + src[0];
+        des[1] = two * ((rz + xy)*src[0] + (xx + zz)*src[1] + (yz - rx)*src[2] ) + src[1];
+        des[2] = two * ((xz - ry)*src[0] + (rx + yz)*src[1] + (xx + yy)*src[2] ) + src[2];
     }
     
     
     /// set from given 3x3 rotation matrix `m`
-    void setFromMatrix3( const R m[9] )
+    void setFromMatrix3(const REAL m[9])
     {
-        R  s, trace = m[0] + m[4] + m[8];
+        REAL  s, trace = m[0] + m[4] + m[8];
         
         // check the diagonal
-        if ( trace > 0 ) {
+        if (trace > 0 ) {
             s = std::sqrt( trace + 1.0 );
             q[0] = s * 0.5;
             s = 0.5 / s;
@@ -489,7 +489,7 @@ public:
     }
     
     /// generate OpenGL transformation matrix, translation followed by rotation
-    void setOpenGLMatrix( float m[16], const float trans[3] ) const
+    void setOpenGLMatrix(float m[16], const float trans[3]) const
     {
         //this code assumes that the quaternion has norm = 1,
         float rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
@@ -524,7 +524,7 @@ public:
     }
 
     /// generate OpenGL transformation matrix, translation followed by rotation
-    void setOpenGLMatrix( double m[16], const double trans[3] ) const
+    void setOpenGLMatrix(double m[16], const double trans[3]) const
     {
         //this code assumes that the quaternion has norm = 1,
         double rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
@@ -559,18 +559,18 @@ public:
     }
     
     /// set from polar coordinates (r, phi, theta, psi)
-    void setFromPolar( const R v[4] )
+    void setFromPolar(const REAL v[4])
     {
-        R a    = v[0] * std::sin(v[1]);
+        REAL a = v[0] * std::sin(v[1]);
         q[0]   = v[0] * std::cos(v[1]);   //r*std::cos(phi)
-        R b    = a * std::sin(v[2]);
+        REAL b = a * std::sin(v[2]);
         q[1]   = a * std::cos(v[2]);      //r*std::sin(phi)*std::cos(theta)
         q[2]   = b * std::cos(v[3]);      //r*std::sin(phi)*std::sin(theta)*std::cos(psi)
         q[3]   = b * std::sin(v[3]);      //r*std::sin(phi)*std::sin(theta)*std::sin(psi)
     }
     
     /// return new quaternion with polar coordinates (r, phi, theta, psi)
-    static const Quaternion newFromPolar( const R v[4] )
+    static const Quaternion newFromPolar(const REAL v[4])
     {
         Quaternion result;
         result.setFromPolar(v);
@@ -578,7 +578,7 @@ public:
     }
     
     /// calculate the polar coordinates (r, phi, theta, psi)
-    void getPolar( R v[4] ) const
+    void getPolar(REAL v[4]) const
     {
         // r,  phi, theta, psi
         v[0] = norm();
@@ -589,11 +589,11 @@ public:
     
 
     /// set as rotation of axis v, with angle = v.norm() in radian;
-    void setFromAxis( const R v[3] )
+    void setFromAxis(const REAL v[3])
     {
         /** for small angles, we assume here angle ~ v.norm() */
-        R n  = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-        R sd = std::sin( n * 0.5 );
+        REAL n  = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
+        REAL sd = std::sin( n * 0.5 );
         if ( n > 0 )
             sd /= n;
         q[0] = std::cos( n * 0.5 );
@@ -604,10 +604,10 @@ public:
     
     /// set from rotation of axis v, and angle 'angle' in radian around this axis
     /** argument `v` is normalized for more security */
-    void setFromAxis( const R v[3], R angle )
+    void setFromAxis(const REAL v[3], REAL angle)
     {
-        R  n = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-        R sd = std::sin( angle * 0.5 ) / n;
+        REAL  n = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
+        REAL sd = std::sin( angle * 0.5 ) / n;
         q[0] = std::cos( angle * 0.5 );
         q[1] = v[0] * sd;
         q[2] = v[1] * sd;
@@ -616,9 +616,9 @@ public:
     
     /// set as rotation of angle 'angle' and axis X, Y or Z (axis=0,1,2)
     /** along one of the unit axis specified by `axis`: ( 0: X, 1: Y, 2: Z ) */
-    void setFromPrincipalAxis( int axis, R angle )
+    void setFromPrincipalAxis(int axis, REAL angle)
     {
-        R  a = angle * 0.5;
+        REAL a = angle * 0.5;
         q[0] = std::cos(a);
         q[1] = 0.0;
         q[2] = 0.0;
@@ -627,19 +627,19 @@ public:
     }
     
     /// return angle of the rotation
-    R getAngle() const
+    REAL getAngle() const
     {
-        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        REAL n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         return  2 * std::atan2(n, q[0]);
     }
     
     /// compute the axis and return the angle of the rotation
-    R getAngle( R v[3] ) const
+    REAL getAngle(REAL v[3]) const
     {
-        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        REAL n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         if ( n > 0 )
         {
-            R a = 2 * std::atan2(n, q[0]);
+            REAL a = 2 * std::atan2(n, q[0]);
             n = 1.0 / n;
             v[0] = q[1] * n;
             v[1] = q[2] * n;
@@ -653,9 +653,9 @@ public:
     }
     
     /// compute the axis and return the angle of the rotation
-    void getAxis( R v[3] ) const
+    void getAxis(REAL v[3]) const
     {
-        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        REAL n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         if ( n > 0 )
         {
             n = 1.0 / n;
@@ -672,12 +672,12 @@ public:
     }
     
     /// multiply the angle of the rotation by `s`
-    const Quaternion scaledAngle( R s ) const
+    const Quaternion scaledAngle(REAL s) const
     {
-        R n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+        REAL n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
         if ( n > 0 )
         {
-            R a = s * std::atan2(n, q[0]);
+            REAL a = s * std::atan2(n, q[0]);
             n = std::sin(a) / n;
             return Quaternion(std::cos(a), n*q[1], n*q[2], n*q[3]);
         }
@@ -685,26 +685,26 @@ public:
     }
     
     /// Linear interpolation between rotations 'this' and 'b'.
-    const Quaternion slerp( const Quaternion &b, const R u ) const
+    const Quaternion slerp(const Quaternion & X, const REAL u) const
     {
         // code from Jonathan Blow
         // Calculate the cosine of the angle between the two vectors
-        R dot = q[0]*b.q[0] + q[1]*b.q[1] + q[2]*b.q[2] + q[3]*b.q[3];
+        REAL dot = q[0]*X[0] + q[1]*X[1] + q[2]*X[2] + q[3]*X[3];
         
         // If the angle is significant, use the spherical interpolation
         if ( dot > 0.9995 ) {
             // use cheap linear interpolation
-            return normalize( (*this) + (b - (*this))*u );
+            return normalize( (*this) + (X - (*this))*u );
         }
         
-        R tmp = std::acos(dot) * u;
+        REAL tmp = std::acos(dot) * u;
         //build v2 ortogonal to *this:
-        Quaternion v2 = normalize( b - (*this)*dot );
+        Quaternion v2 = normalize( X - (*this)*dot );
         return (*this)*std::cos(tmp) + v2*std::sin(tmp);
     }
     
     /// printf
-    void print( FILE* out = stdout, bool parenthesis = false ) const
+    void print(FILE* out = stdout, bool parenthesis = false) const
     {
         if ( parenthesis )
             fprintf( out, "( %+6.3f %+6.3f %+6.3f %+6.3f )", q[0], q[1], q[2], q[3]);
@@ -713,7 +713,7 @@ public:
     }
     
     /// printf with a new-line
-    void println( FILE* out = stdout, bool parenthesis = false ) const
+    void println(FILE* out = stdout, bool parenthesis = false) const
     {
         if ( parenthesis )
             fprintf( out, "( %+6.3f %+6.3f %+6.3f %+6.3f )\n", q[0], q[1], q[2], q[3]);
@@ -734,12 +734,12 @@ public:
     /** James Arvo, Fast random rotation matrices. in Graphics Gems 3. */
     static const Quaternion randomRotation()
     {
-        R u1 = RNG.preal();
-        R u2 = M_PI*RNG.sreal();
-        R u3 = M_PI*RNG.sreal();
-        R s1 = std::sqrt(1-u1), s2 = std::sqrt(u1);
+        REAL u1 = RNG.preal();
+        REAL u2 = M_PI*RNG.sreal();
+        REAL u3 = M_PI*RNG.sreal();
+        REAL s1 = std::sqrt(1-u1), s2 = std::sqrt(u1);
         
-        return Quaternion<R>(s1*std::sin(u2), s1*std::cos(u2), s2*std::sin(u3), s2*std::cos(u3));
+        return Quaternion<REAL>(s1*std::sin(u2), s1*std::cos(u2), s2*std::sin(u3), s2*std::cos(u3));
     }
     
 #endif
