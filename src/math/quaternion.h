@@ -321,7 +321,7 @@ public:
     /// multiplication from the right side (this <= this * X )
     void rightMult(const Quaternion & X)
     {
-        REAL q0 = q[0],   q1 = q[1],   q2 = q[2],   q3 = q[3];
+        REAL q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
         
         q[0] = q0 * X[0] - q1 * X[1] - q2 * X[2] - q3 * X[3];
         q[1] = q0 * X[1] + q1 * X[0] + q2 * X[3] - q3 * X[2];
@@ -332,7 +332,7 @@ public:
     /// multiplication from the left side (this <= X * this )
     void leftMult(const Quaternion & X)
     {
-        REAL q0 = q[0],   q1 = q[1],   q2 = q[2],   q3 = q[3];
+        REAL q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
         
         q[0] = q0 * X[0] - q1 * X[1] - q2 * X[2] - q3 * X[3];
         q[1] = q0 * X[1] + q1 * X[0] - q2 * X[3] + q3 * X[2];
