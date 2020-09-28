@@ -481,9 +481,9 @@ void color_by_height(Fiber const& fib, size_t seg, real beta)
 /// color set according to steric grid
 void color_by_grid(Fiber const& fib, size_t seg, real beta)
 {
-    GridBase<DIM> const& grid = fib.simul().pointGridF.base();
+    Map<DIM> const& map = fib.simul().pointGridF.map();
     Vector w = fib.posPoint(seg, 0.5);
-    size_t i = grid.index(w);
+    size_t i = map.index(w);
     gle::alt_color(i).load_front();
 }
 

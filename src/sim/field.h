@@ -150,7 +150,7 @@ public:
                 setGrid(inf, sup, prop->step, false);
             }
             createCells();
-            //std::clog << "Field step "<<prop->step<<" nCells "<<mGrid.nbCells()<<std::endl;
+            //std::clog << "Field step "<<prop->step<<" gCells "<<mGrid.nbCells()<<std::endl;
             Cytosim::log("Field %lx set with %i cells of size %.3f um\n", this, mGrid.nbCells(), prop->step);
         }
     }

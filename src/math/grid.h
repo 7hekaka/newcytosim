@@ -4,10 +4,10 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "grid_base.h"
+#include "map.h"
 
 
-/// A GridBase with an instantiation of class CELL in each voxel
+/// A Map with an instantiation of class CELL in each voxel
 /** 
 Grid<int ORD, typename CELL> creates a regular lattice over a rectangular
 region of space of dimensionality ORD.
@@ -94,7 +94,7 @@ Example:
 ///\todo add Grid<> copy constructor and copy assignment
 
 template <typename CELL, int ORD>
-class Grid : public GridBase<ORD>
+class Grid : public Map<ORD>
 {
     
     /// Disabled copy constructor
@@ -111,7 +111,7 @@ protected:
 public:
     
     /// Type of the parent class
-    typedef GridBase<ORD> GRID;
+    typedef Map<ORD> MAP;
 
     /// The type of cells (=CELL)
     typedef CELL value_type;
@@ -126,7 +126,7 @@ public:
     void destroy()
     {
         deleteCells();
-        GRID::destroy();
+        MAP::destroy();
     }
     
     /// Destructor
@@ -138,20 +138,20 @@ public:
     /// allocate the array of cells
     void createCells()
     {
-        if ( GRID::nCells == 0 )
-            printf("nCells==0 in createCells() : call setDimensions() first\n");
+        if ( MAP::gCells == 0 )
+            printf("gCells==0 in createCells() : call setDimensions() first\n");
         
         delete[] gCell;
         
-        gCell = new CELL[GRID::nCells];
-        GRID::gAllocated = GRID::nCells;
+        gCell = new CELL[MAP::gCells];
+        MAP::gAllocated = MAP::gCells;
     }
     
     /// returns true if cells have been allocated
     size_t hasCells() const
     {
         if ( gCell )
-            return GRID::gAllocated;
+            return MAP::gAllocated;
         return 0;
     }
     
@@ -160,7 +160,7 @@ public:
     {
         delete[] gCell;
         gCell = nullptr;
-        GRID::gAllocated = 0;
+        MAP::gAllocated = 0;
     }
     
     /// call function clear() for all cells
@@ -170,7 +170,7 @@ public:
             return;
         
         CELL * c = gCell;
-        const CELL * end = gCell + GRID::nCells;
+        const CELL * end = gCell + MAP::gCells;
 #if ( 1 )
         //we unroll the loop for speed
         const CELL * stop = end - 7;
@@ -201,45 +201,45 @@ public:
     /// return cell at index 'indx'
     CELL & icell(const size_t indx) const
     {
-        assert_true( indx < GRID::gAllocated );
-        assert_true( indx < GRID::nCells );
+        assert_true( indx < MAP::gAllocated );
+        assert_true( indx < MAP::gCells );
         return gCell[ indx ];
     }
     
     /// reference to CELL whose center is closest to w[]
     CELL & cell(const real w[ORD]) const
     {
-        size_t inx = GRID::index(w);
-        assert_true( inx < GRID::nCells );
+        size_t inx = MAP::index(w);
+        assert_true( inx < MAP::gCells );
         return gCell[ inx ];
     }
     
     /// reference to CELL of coordinates c[]
     CELL & cell(const int c[ORD]) const
     {
-        assert_true( GRID::pack(c) < GRID::nCells );
-        return gCell[ GRID::pack(c) ];
+        assert_true( MAP::pack(c) < MAP::gCells );
+        return gCell[ MAP::pack(c) ];
     }
    
     /// operator access to a cell by index
     CELL & operator[](const size_t indx) const
     {
-        assert_true( indx < GRID::nCells );
+        assert_true( indx < MAP::gCells );
         return gCell[ indx ];
     }
 
     /// short-hand access to a cell by coordinates
     CELL & operator()(const int c[ORD]) const
     {
-        assert_true( GRID::pack(c) < GRID::nCells );
-        return gCell[ GRID::pack(c) ];
+        assert_true( MAP::pack(c) < MAP::gCells );
+        return gCell[ MAP::pack(c) ];
     }
     
     /// operator access to a cell by position
     CELL & operator()(const real w[ORD]) const
     {
-        assert_true( GRID::index(w) < GRID::nCells );
-        return gCell[ GRID::index(w) ];
+        assert_true( MAP::index(w) < MAP::gCells );
+        return gCell[ MAP::index(w) ];
     }
     
     
@@ -250,50 +250,50 @@ public:
     void create1D(real i, real s, size_t d)
     {
         assert_true( ORD == 1 );
-        GRID::setDimensions(&i, &s, &d);
+        MAP::setDimensions(&i, &s, &d);
         createCells();
     }
 
     /// access to cell for ORD==1
     CELL & icell1D(const int x) const
     {
-        assert_true( GRID::pack1D(x) < GRID::nCells );
-        return gCell[GRID::pack1D(x)];
+        assert_true( MAP::pack1D(x) < MAP::gCells );
+        return gCell[MAP::pack1D(x)];
     }
     
     /// access to cell for ORD==2
     CELL & icell2D(const int x, const int y) const
     {
-        assert_true( GRID::pack2D(x,y) < GRID::nCells );
-        return gCell[GRID::pack2D(x,y)];
+        assert_true( MAP::pack2D(x,y) < MAP::gCells );
+        return gCell[MAP::pack2D(x,y)];
     }
     
     /// access to cell for ORD==3
     CELL & icell3D(const int x, const int y, const int z) const
     {
-        assert_true( GRID::pack3D(x,y,z) < GRID::nCells );
-        return gCell[GRID::pack3D(x,y,z)];
+        assert_true( MAP::pack3D(x,y,z) < MAP::gCells );
+        return gCell[MAP::pack3D(x,y,z)];
     }
     
     /// access to cell for ORD==1
     CELL & cell1D(const real x) const
     {
-        assert_true( GRID::index1D(x) < GRID::nCells );
-        return gCell[GRID::index1D(x)];
+        assert_true( MAP::index1D(x) < MAP::gCells );
+        return gCell[MAP::index1D(x)];
     }
     
     /// access to cell for ORD==2
     CELL & cell2D(const real x, const real y) const
     {
-        assert_true( GRID::index2D(x,y) < GRID::nCells );
-        return gCell[GRID::index2D(x,y)];
+        assert_true( MAP::index2D(x,y) < MAP::gCells );
+        return gCell[MAP::index2D(x,y)];
     }
     
     /// access to cell for ORD==3
     CELL & cell3D(const real x, const real y, const real z) const
     {
-        assert_true( GRID::index3D(x,y,z) < GRID::nCells );
-        return gCell[GRID::index3D(x,y,z)];
+        assert_true( MAP::index3D(x,y,z) < MAP::gCells );
+        return gCell[MAP::index3D(x,y,z)];
     }
 
     //-----------------------------------------------------------------------
@@ -310,11 +310,11 @@ public:
         int nb = 0;
         for ( int d = ORD-1; d >= 0; --d )
         {
-            real a = GRID::map(d, w[d]) + 0.5;
+            real a = MAP::map(d, w[d]) + 0.5;
             int ia = (int)std::floor(a);
             a     -= ia;
-            int  l = GRID::image(d, ia-1);
-            int  u = GRID::image(d, ia  );
+            int  l = MAP::image(d, ia-1);
+            int  u = MAP::image(d, ia  );
             
             if ( nb == 0 )
             {
@@ -329,9 +329,9 @@ public:
                 //with the indices and coefficients for lower and upper bounds
                 for ( int c = 0; c < nb; ++c )
                 {
-                    inx[c+nb] = GRID::breadth(d) * inx[c] + u;
+                    inx[c+nb] = MAP::breadth(d) * inx[c] + u;
                     alp[c+nb] = alp[c] * a;
-                    inx[c   ] = GRID::breadth(d) * inx[c] + l;
+                    inx[c   ] = MAP::breadth(d) * inx[c] + l;
                     alp[c   ] = alp[c] * (1-a);
                 }
                 nb *= 2;
@@ -352,7 +352,7 @@ public:
     {
         assert_true( ORD == 1 );
         
-        real  ax = 0.5 + GRID::map(0, xx);
+        real  ax = 0.5 + MAP::map(0, xx);
         
 #if GRID_HAS_PERIODIC
         int   ix = (int)std::floor(ax);
@@ -362,8 +362,8 @@ public:
         
         ax -= ix;
         
-        size_t lx = GRID::image(0, ix-1);
-        size_t ux = GRID::image(0, ix  );
+        size_t lx = MAP::image(0, ix-1);
+        size_t ux = MAP::image(0, ix  );
         
         return gCell[lx] + ax * ( gCell[ux] - gCell[lx] );
     }
@@ -374,8 +374,8 @@ public:
     {
         assert_true( ORD == 2 );
         
-        real  ax = 0.5 + GRID::map(0, w[0]);
-        real  ay = 0.5 + GRID::map(1, w[1]);
+        real  ax = 0.5 + MAP::map(0, w[0]);
+        real  ay = 0.5 + MAP::map(1, w[1]);
         
 #if GRID_HAS_PERIODIC
         int   ix = (int)std::floor(ax);
@@ -388,11 +388,11 @@ public:
         ax -= ix;
         ay -= iy;
         
-        size_t lx = GRID::image(0, ix-1);
-        size_t ux = GRID::image(0, ix  );
+        size_t lx = MAP::image(0, ix-1);
+        size_t ux = MAP::image(0, ix  );
         
-        size_t ly = GRID::image(1, iy-1) * GRID::breadth(0);
-        size_t uy = GRID::image(1, iy  ) * GRID::breadth(0);
+        size_t ly = MAP::image(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::image(1, iy  ) * MAP::breadth(0);
         
         //sum weighted cells to get interpolation
         CELL  rl = gCell[lx+ly] + ay * ( gCell[lx+uy] - gCell[lx+ly] );
@@ -407,9 +407,9 @@ public:
     {
         assert_true( ORD == 3 );
         
-        real  ax = 0.5 + GRID::map(0, w[0]);
-        real  ay = 0.5 + GRID::map(1, w[1]);
-        real  az = 0.5 + GRID::map(2, w[2]);
+        real  ax = 0.5 + MAP::map(0, w[0]);
+        real  ay = 0.5 + MAP::map(1, w[1]);
+        real  az = 0.5 + MAP::map(2, w[2]);
         
 #if GRID_HAS_PERIODIC
         int   ix = (int)std::floor(ax);
@@ -425,14 +425,14 @@ public:
         ay -= iy;
         az -= iz;
 
-        size_t lx = GRID::image(0, ix-1);
-        size_t ux = GRID::image(0, ix  );
+        size_t lx = MAP::image(0, ix-1);
+        size_t ux = MAP::image(0, ix  );
         
-        size_t ly = GRID::image(1, iy-1) * GRID::breadth(0);
-        size_t uy = GRID::image(1, iy  ) * GRID::breadth(0);
+        size_t ly = MAP::image(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::image(1, iy  ) * MAP::breadth(0);
         
-        size_t lz = GRID::image(2, iz-1) * GRID::breadth(1) * GRID::breadth(0);
-        size_t uz = GRID::image(2, iz  ) * GRID::breadth(1) * GRID::breadth(0);
+        size_t lz = MAP::image(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
+        size_t uz = MAP::image(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
 
         CELL * cul = gCell + (uy+lz), rul = cul[lx] + ax * ( cul[ux] - cul[lx] );
         CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ax * ( cuu[ux] - cuu[lx] );
@@ -451,27 +451,27 @@ public:
     /// set all cells to `val`
     void setValues(const CELL val)
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        assert_true( MAP::gCells <= MAP::gAllocated );
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
             gCell[ii] = val;
     }
     
     /// multiply all cells by `val`
     void scaleValues(const CELL val)
     {
-        assert_true ( GRID::nCells <= GRID::gAllocated );
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        assert_true ( MAP::gCells <= MAP::gAllocated );
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
             gCell[ii] *= val;
     }
     
     /// get sum, minimum and maximum value over all cells
     void infoValues(CELL& sum, CELL& mn, CELL& mx) const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         sum = 0;
         mn = gCell[0];
         mx = gCell[0];
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
         {
             if ( gCell[ii] < mn ) mn = gCell[ii];
             if ( gCell[ii] > mx ) mx = gCell[ii];
@@ -482,9 +482,9 @@ public:
     /// sum of all values, if CELL supports the addition
     CELL sumValues() const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         CELL result = 0;
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
             result += gCell[ii];
         return result;
     }
@@ -492,9 +492,9 @@ public:
     /// maximum value over all cells
     CELL maxValue() const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         CELL res = gCell[0];
-        for ( size_t ii = 1; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 1; ii < MAP::gCells; ++ii )
         {
             if ( res < gCell[ii] )
                 res = gCell[ii];
@@ -505,9 +505,9 @@ public:
     /// minimum value over all cells
     CELL minValue() const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         CELL res = gCell[0];
-        for ( size_t ii = 1; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 1; ii < MAP::gCells; ++ii )
         {
             if ( res > gCell[ii] )
                 res = gCell[ii];
@@ -518,8 +518,8 @@ public:
     /// true if any( cells[] < 0 )
     bool hasNegativeValue() const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        assert_true( MAP::gCells <= MAP::gAllocated );
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
             if ( gCell[ii] < 0 )
                 return true;
         return false;
@@ -533,7 +533,7 @@ public:
         CELL result = 0;
         int * offsets = nullptr;
         const CELL * ce = gCell + indx;
-        int nb = GRID::getRegion(offsets, indx);
+        int nb = MAP::getRegion(offsets, indx);
         for ( int c = 0; c < nb; ++c )
             result += ce[ offsets[c] ];
         return result;
@@ -545,7 +545,7 @@ public:
         CELL result = 0;
         int * offsets = nullptr;
         const CELL * ce = gCell + indx;
-        int nb = GRID::getRegion(offsets, indx);
+        int nb = MAP::getRegion(offsets, indx);
         for ( int c = 0; c < nb; ++c )
             result += ce[ offsets[c] ];
         return result / (real)nb;
@@ -554,11 +554,11 @@ public:
     /// the maximum of the values in the region around cell referred by 'indx'
     CELL maxValueInRegion(const size_t indx) const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         CELL result = gCell[indx];
         int * offsets = nullptr;
         const CELL * ce = gCell + indx;
-        int nb = GRID::getRegion(offsets, indx);
+        int nb = MAP::getRegion(offsets, indx);
         for ( int c = 0; c < nb; ++c )
             if ( result < ce[ offsets[c] ] )
                 result = ce[ offsets[c] ];
@@ -570,11 +570,11 @@ public:
     /// write values to a file, with the position for each cell (file can be stdout)
     void printValues(FILE* file, const real offset) const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         real w[ORD];
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
         {
-            GRID::setPositionFromIndex(w, ii, offset);
+            MAP::setPositionFromIndex(w, ii, offset);
             for ( int d=0; d < ORD; ++d )
                 fprintf(file, "%7.2f ", w[d]);
             fprintf(file,"  %f\n", gCell[ii]);
@@ -584,12 +584,12 @@ public:
     /// write values to a file, with the range for each cell (file can be stdout)
     void printValuesWithRange(FILE* file) const
     {
-        assert_true( GRID::nCells <= GRID::gAllocated );
+        assert_true( MAP::gCells <= MAP::gAllocated );
         real l[ORD], r[ORD];
-        for ( size_t ii = 0; ii < GRID::nCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
         {
-            GRID::setPositionFromIndex(l, ii, 0.0);
-            GRID::setPositionFromIndex(r, ii, 1.0);
+            MAP::setPositionFromIndex(l, ii, 0.0);
+            MAP::setPositionFromIndex(r, ii, 1.0);
             for ( int d=0; d < ORD; ++d )
                 fprintf(file, "%7.2f %7.2f  ", l[d], r[d]);
             fprintf(file,"  %f\n", gCell[ii]);

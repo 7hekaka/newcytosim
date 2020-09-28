@@ -7,22 +7,22 @@
 #include "vector1.h"
 #include "vector2.h"
 #include "vector3.h"
-#include "grid_base.h"
+#include "map.h"
 #include "grid.h"
 #include "opengl.h"
 #include "gle.h"
 
 
 /// display the edges of a 1D grid using OpenGL
-void drawEdges(GridBase<1> const& grid);
+void drawEdges(Map<1> const&);
 
 
 /// display the edges of a 2D grid using OpenGL
-void drawEdges(GridBase<2> const& grid);
+void drawEdges(Map<2> const&);
 
 
 /// display the edges of a 3D grid using OpenGL
-void drawEdges(GridBase<3> const& grid);
+void drawEdges(Map<3> const&);
 
 //------------------------------------------------------------------------------
 #pragma mark -

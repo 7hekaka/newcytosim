@@ -347,7 +347,7 @@ public:
 #endif
     
     /// underlying spatial grid
-    GridBase<DIM> const& base() const { return pGrid; }
+    Map<DIM> const& map() const { return pGrid; }
     
     /// OpenGL display function
     void draw() const;

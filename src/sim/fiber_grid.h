@@ -129,7 +129,7 @@ public:
     void         testAttach(FILE *, Vector place, FiberSet const&, HandProp const*) const;
     
     /// underlying spatial grid
-    GridBase<DIM> const& base() const { return fGrid; }
+    Map<DIM> const& map() const { return fGrid; }
 
     /// OpenGL display function
     void         draw() const;

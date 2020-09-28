@@ -19,9 +19,9 @@
 #define GRID_HAS_PERIODIC 1
 
 
-///Divides a rectangle of dimensionality ORD into regular voxels
+/// Map divides a rectangle of dimensionality ORD into regular voxels
 /** 
-Grid<int ORD> creates a regular grid over a rectangular region
+Map<ORD>, where ORD is an integer creates a regular grid over a rectangular region
 of space of dimensionality ORD, initialized by setDimensions().
 
 Functions are provided to convert from the space coordinates (of type real)
@@ -90,8 +90,8 @@ In the example above:
 You obtain the cell-indices of the neighboring cells by adding offsets[n] to 'index':
 Example:
 
-    CELL * cell = & myGrid.icell(indx);
-    nb_neighbors = myGrid.getRegion(region, indx);
+    CELL * cell = & map.icell(indx);
+    nb_neighbors = map.getRegion(region, indx);
     for ( int n = 1; n < nb_neighbors; ++n ) 
     {
         Cell & neighbor = cell[region[n]];
@@ -100,18 +100,18 @@ Example:
 
 */
 
-///\todo add Grid<> copy constructor and copy assignment
+///\todo add Map<> copy constructor and copy assignment
 
 template <int ORD>
-class GridBase
+class Map
 {
 public:
 
     /// Disabled copy constructor
-    GridBase<ORD>(GridBase<ORD> const&);
+    Map<ORD>(Map<ORD> const&);
     
     /// Disabled copy assignment
-    GridBase<ORD>& operator=(GridBase<ORD> const&);
+    Map<ORD>& operator=(Map<ORD> const&);
 
 protected:
     
@@ -119,7 +119,7 @@ protected:
     size_t  gAllocated;
    
     /// Total number of cells in the map; size of cells[]
-    size_t  nCells;
+    size_t  gCells;
     
     /// The number of cells in each dimension
     size_t  gDim[ORD];
@@ -133,7 +133,7 @@ protected:
     /// The position of the superior (max) edge in each dimension
     real    gSup[ORD];
     
-    /// true if Grid has periodic boundary conditions
+    /// true if Map has periodic boundary conditions
     bool    gPeriodic[ORD];
 
     /// The size of a cell: cWidth[d] = ( gSup[d] - inf[d] ) / gDim[d]
@@ -234,10 +234,10 @@ protected:
 public:
     
     /// constructor
-    GridBase() : gDim{0}, gInf{0}, gSup{0}, gPeriodic{false}, cWidth{0}, cDelta{0}, gStart{0}
+    Map() : gDim{0}, gInf{0}, gSup{0}, gPeriodic{false}, cWidth{0}, cDelta{0}, gStart{0}
     {
         gAllocated  = 0;
-        nCells      = 0;
+        gCells      = 0;
         regionsEdge = nullptr;
         regions     = nullptr;
         cVolume     = 0;
@@ -250,7 +250,7 @@ public:
     }
     
     /// Destructor
-    virtual ~GridBase()
+    virtual ~Map()
     {
         destroy();
     }
@@ -263,7 +263,7 @@ public:
      */
     void setDimensions(const real infs[ORD], real sups[ORD], const size_t cells[ORD])
     {
-        nCells = 1;
+        gCells = 1;
         cVolume = 1;
         
         for ( int d = 0; d < ORD; ++d )
@@ -281,8 +281,8 @@ public:
             if ( infs[d] == sups[d] )
                 throw InvalidParameter("Cannot build grid as sup[] == inf[]");
             
-            gStride[d] = nCells;
-            nCells    *= cells[d];
+            gStride[d] = gCells;
+            gCells    *= cells[d];
             gDim[d]    = cells[d];
             gInf[d]    = infs[d];
             gSup[d]    = sups[d];
@@ -297,7 +297,7 @@ public:
     ///true if setDimensions() was called
     bool hasDimensions() const
     {
-        return nCells > 0;
+        return gCells > 0;
     }
     
     /// true if dimension `d` has periodic boundary conditions
@@ -337,7 +337,7 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    size_t       nbCells()           const { return nCells; }
+    size_t       nbCells()           const { return gCells; }
 
     /// number of cells in dimensionality `d`
     size_t       breadth(size_t d)   const { return gDim[d]; }
@@ -692,13 +692,13 @@ private:
         //allocate and reset arrays:
         deleteRegions();
         
-        regions     = new int*[nCells];
+        regions     = new int*[gCells];
         regionsEdge = new int[edgeMax*(regMax+1)];
         for ( size_t e = 0; e < edgeMax*(regMax+1); ++e )
             regionsEdge[e] = 0;
         
         int ori[ORD];
-        for ( size_t indx = 0; indx < nCells; ++indx )
+        for ( size_t indx = 0; indx < gCells; ++indx )
         {
             setCoordinatesFromIndex(ori, indx);
             size_t e = edgeFromCoordinates(ori, range);
@@ -831,8 +831,8 @@ public:
      
      \par Example:
 
-         CELL * cell = & myGrid.icell(indx);
-         n_offset = myGrid.getRegion(offset, indx);
+         CELL * cell = & map.icell(indx);
+         n_offset = map.getRegion(offset, indx);
          for ( int n = 1; n < n_offset; ++n )
          {
              Cell & neighbor = cell[offset[n]];

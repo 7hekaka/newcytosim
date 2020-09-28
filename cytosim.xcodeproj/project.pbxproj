@@ -750,7 +750,7 @@
 		BBB1E47E126DC70B00B19D26 /* actor_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47A126DC70B00B19D26 /* actor_prop.h */; };
 		BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
 		BBB1E480126DC70B00B19D26 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
-		BBBD34E01AABA5BE00819326 /* grid_base.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* grid_base.h */; };
+		BBBD34E01AABA5BE00819326 /* map.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* map.h */; };
 		BBC422F52472D0C2007EA070 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBC422F724731657007EA070 /* node.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F624731657007EA070 /* node.cc */; };
 		BBC422FA247342CF007EA070 /* hand_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC422F8247342CF007EA070 /* hand_list.h */; };
@@ -1751,7 +1751,7 @@
 		BBB89ED80BE3DED10054838A /* vector3.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = vector3.h; path = src/math/vector3.h; sourceTree = SOURCE_ROOT; };
 		BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_simd.cc; path = src/test/test_simd.cc; sourceTree = SOURCE_ROOT; };
 		BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_code.cc; path = src/test/test_code.cc; sourceTree = SOURCE_ROOT; };
-		BBBD34DF1AABA5BE00819326 /* grid_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid_base.h; path = src/math/grid_base.h; sourceTree = SOURCE_ROOT; };
+		BBBD34DF1AABA5BE00819326 /* map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = map.h; path = src/math/map.h; sourceTree = SOURCE_ROOT; };
 		BBC0E57110CABBBB008139D1 /* point_disp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = point_disp.cc; sourceTree = "<group>"; };
 		BBC0E57210CABBBB008139D1 /* point_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_disp.h; sourceTree = "<group>"; };
 		BBC422F624731657007EA070 /* node.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = node.cc; sourceTree = "<group>"; };
@@ -2084,7 +2084,7 @@
 			isa = PBXGroup;
 			children = (
 				BB73588105B98DA3006956D5 /* grid.h */,
-				BBBD34DF1AABA5BE00819326 /* grid_base.h */,
+				BBBD34DF1AABA5BE00819326 /* map.h */,
 				BB73589F05B98DA3006956D5 /* rasterizer.h */,
 				BB73589E05B98DA3006956D5 /* rasterizer.cc */,
 			);
@@ -3650,7 +3650,7 @@
 				BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */,
 				BB6E5EF5245C27E000CEE184 /* xtbsv.h in Headers */,
 				BB6485F02057FDD5005F2CD1 /* monitor.h in Headers */,
-				BBBD34E01AABA5BE00819326 /* grid_base.h in Headers */,
+				BBBD34E01AABA5BE00819326 /* map.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
