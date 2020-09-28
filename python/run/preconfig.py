@@ -166,11 +166,12 @@
    of 'x' can be read. This can be useful to process the results later.
 
     [[ x = random.uniform(0,1) ]]
-    % preconfig.x = [[ x ]];
+    %preconfig.x= [[ x ]]
     binding_rate = [[ 10*x ]]
     unbinding_rate = [[ 2*x ]]
 
    Command: `preconfig 256 TEMPLATE_FILE` to make 256 files.
+   Extract values:  awk '/%preconfig./{sub("%preconfig.","");print}' config0000.cym
 
 ## Example 8
 
