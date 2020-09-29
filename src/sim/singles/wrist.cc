@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 #include "wrist.h"
 #include "simul.h"
 #include "meca.h"
@@ -11,8 +11,9 @@ extern Modulo const* modulo;
 Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
 : Single(sp)
 {
-    anchor.set(mec, pti);
-
+    assert_true(mec);
+    rebase(mec, pti);
+    assert_false(base_.bad());
 #if ( 0 )
     if ( p->diffusion > 0 )
         throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
@@ -24,8 +25,8 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t a, size_t b, real 
 : Single(sp)
 {
     assert_true(mec);
-    anchor.set(mec, a, b, c);
-    
+    rebase(mec, a, b, c);
+    assert_false(base_.bad());
 #if ( 0 )
     if ( p->diffusion > 0 )
         throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
@@ -37,8 +38,8 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t ref, Vector pos)
 : Single(sp)
 {
     assert_true(mec);
-    anchor.set(mec, ref, pos);
-    
+    rebase(mec, ref, pos);
+    assert_false(base_.bad());
 #if ( 0 )
     if ( p->diffusion > 0 )
         throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
@@ -93,7 +94,7 @@ void Wrist::stepA()
 
 void Wrist::setInteractions(Meca& meca) const
 {
-    anchor.addLink(meca, sHand->interpolation(), prop->stiffness);
+    base_.addLink(meca, sHand->interpolation(), prop->stiffness);
 }
 
 
@@ -101,7 +102,7 @@ void Wrist::write(Outputter& out) const
 {
     sHand->write(out);
     out.writeSoftSpace();
-    anchor.write(out);
+    base_.write(out);
 }
 
 
@@ -115,11 +116,11 @@ void Wrist::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         Mecapoint base;
         base.read(in, sim);
-        anchor.set(base.mecable(), base.point());
+        base_.set(base.mecable(), base.point());
     }
     else
 #endif
-        anchor.read(in, sim);
+        base_.read(in, sim);
     
     /*
      Because the SingleSet has 2 lists where Single are stored depending

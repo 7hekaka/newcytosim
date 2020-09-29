@@ -6,6 +6,19 @@
 #include "simul.h"
 #include "meca.h"
 
+
+void Interpolation4::clear()
+{
+    mec_ = nullptr;
+    ref_ = 0;
+    ord_ = 0;
+    coef_[0] = 1.0;
+    coef_[1] = 0.0;
+    coef_[2] = 0.0;
+    coef_[3] = 0.0;
+}
+
+
 /**
 Set a point of index 'P' on Mecable
 */
@@ -145,6 +158,29 @@ void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight
             meca.addLink4(arg, pts, coef_, weight);
         break;
     }
+}
+
+
+int Interpolation4::bad() const
+{
+    if ( !mec_ )
+        return 1;
+
+    if ( ref_ >= mec_->nbPoints() )
+        return 2;
+
+    if ( ref_+ord_ > mec_->nbPoints() )
+        return 3;
+
+    // the sum of the coefficients should equal 1:
+    real s = -1;
+    for ( int d = 0; d < 4; ++d )
+        s += coef_[d];
+    
+    if ( abs_real(s) > 0.1 )
+        return 4;
+
+    return 0;
 }
 
 

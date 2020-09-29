@@ -32,13 +32,12 @@ private:
 
 public:
     
-    /// constructor
-    Interpolation4()
-    {
-        set(nullptr, 0);
-        ord_ = 0;
-    }
+    /// set pointers to null
+    void clear();
     
+    /// constructor
+    Interpolation4() { clear(); }
+
     /// set as pointing to vertex `p` of `mec`
     void set(Mecable const* mec, size_t p);
     
@@ -63,6 +62,9 @@ public:
     /// create addLink with given Mecapoint
     void addLink(Meca&, Mecapoint const&, real weight) const;
 
+    /// check validity
+    int  bad() const;
+    
     /// output
     void write(Outputter& out) const;
     

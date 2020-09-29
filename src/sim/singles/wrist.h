@@ -1,4 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
+
 #ifndef WRIST_H
 #define WRIST_H
 
@@ -16,10 +17,10 @@ class Wrist : public Single
 {
 protected:
     
-    Interpolation4 anchor;
+    Interpolation4 base_;
     
 public:
-     
+    
     /// Construct object anchored at one Mecapoint
     Wrist(SingleProp const*, Mecable const*, size_t point);
     
@@ -45,19 +46,28 @@ public:
     
     /// modulo the position of the grafted
     void    foldPosition(Modulo const*) { }
-    
-    /// stiffness of the interaction
-    real    linkStiffness() const { return prop->stiffness; }
 
     //--------------------------------------------------------------------------
     
     /// Object to which this is anchored
-    Mecable const* base() const { return anchor.base(); }
+    Mecable const* base() const { return base_.base(); }
+    
+    /// attach at one Mecapoint
+    void    rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }
+    
+    /// attach between two Mecapoint
+    void    rebase(Mecable const* mec, size_t a, size_t b, real c) { base_.set(mec, a, b, c); }
+    
+    /// attach over a triad of Mecapoint
+    void    rebase(Mecable const* mec, size_t ref, Vector pos) { base_.set(mec, ref, pos); }
+    
+    
+    /// stiffness of the interaction
+    real    linkStiffness() const { return prop->stiffness; }
 
     /// the position of the anchoring point
-    Vector  posFoot() const { return anchor.position(); }
-    
-    
+    Vector  posFoot() const { return base_.position(); }
+
     /// true if Single creates a link
     bool    hasForce() const { return true; }
     
