@@ -195,7 +195,7 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
             if ( a == "diffuse" )
                 return new CoupleProp(nom);
 #if ( 0 )
-            throw InvalidParameter("unknown single:activity `"+a+"'");
+            throw InvalidParameter("unknown couple:activity `"+a+"'");
 #else
         // try to proceed anyhow:
         std::cerr << "WARNING: unknown couple:activity `" << a << "'" << std::endl;

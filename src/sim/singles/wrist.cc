@@ -101,7 +101,6 @@ void Wrist::setInteractions(Meca& meca) const
 void Wrist::write(Outputter& out) const
 {
     sHand->write(out);
-    out.writeSoftSpace();
     base_.write(out);
 }
 

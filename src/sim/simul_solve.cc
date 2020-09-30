@@ -30,10 +30,10 @@ real Simul::estimateStericRange() const
     }
     
     // verify against the actual segmentations of the Fibers:
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* F=fibers.first(); F; F=F->next() )
     {
-        if ( fib->prop->steric )
-            len = std::max(len, fib->segmentation());
+        if ( F->prop->steric )
+            len = std::max(len, F->segmentation());
     }
 
     /*
@@ -45,24 +45,24 @@ real Simul::estimateStericRange() const
     ran = len + 2*ran;
     
     
-    for ( Sphere const* sp=spheres.first(); sp; sp=sp->next() )
+    for ( Sphere const* S=spheres.first(); S; S=S->next() )
     {
-        if ( sp->prop->steric )
-            ran = std::max(ran, 2 * sp->radius() + sp->prop->steric_range);
+        if ( S->prop->steric )
+            ran = std::max(ran, 2 * S->radius() + S->prop->steric_range);
     }
     
-    for ( Bead const* bd=beads.first(); bd; bd=bd->next() )
+    for ( Bead const* B=beads.first(); B; B=B->next() )
     {
-        if ( bd->prop->steric )
-            ran = std::max(ran, 2 * bd->radius() + bd->prop->steric_range);
+        if ( B->prop->steric )
+            ran = std::max(ran, 2 * B->radius() + B->prop->steric_range);
     }
     
-    for ( Solid const* so=solids.first(); so; so=so->next() )
+    for ( Solid const* S=solids.first(); S; S=S->next() )
     {
-        if ( so->prop->steric )
+        if ( S->prop->steric )
         {
-            for ( size_t p = 0; p < so->nbPoints(); ++p )
-                ran = std::max(ran, 2 * so->radius(p) + so->prop->steric_range);
+            for ( size_t p = 0; p < S->nbPoints(); ++p )
+                ran = std::max(ran, 2 * S->radius(p) + S->prop->steric_range);
         }
     }
     
@@ -131,57 +131,57 @@ void Simul::setStericInteractions(Meca& meca) const
     pointGrid.clear();
     
     // distribute Fiber-points on the grid
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* F=fibers.first(); F; F=F->next() )
     {
-        if ( fib->prop->steric )
+        if ( F->prop->steric )
         {
-            const real rad = fib->prop->steric_radius;        // equilibrium radius
-            const real ran = rad + fib->prop->steric_range;   // extended range of interaction
+            const real rad = F->prop->steric_radius;        // equilibrium radius
+            const real ran = rad + F->prop->steric_range;   // extended range of interaction
         
             // include segments, in the cell associated with their center
-            for ( size_t r = 0; r < fib->nbSegments(); ++r )
+            for ( size_t r = 0; r < F->nbSegments(); ++r )
 #if ( N_STERIC_PANES == 1 )
-                pointGrid.add(FiberSegment(fib, r), rad, ran);
+                pointGrid.add(FiberSegment(F, r), rad, ran);
 #else
-                pointGrid.add(fib->prop->steric, FiberSegment(fib, r), rad, ran);
+                pointGrid.add(F->prop->steric, FiberSegment(F, r), rad, ran);
 #endif
         }
     }
     
     // include Spheres
-    for ( Sphere const* sp=spheres.first(); sp; sp=sp->next() )
+    for ( Sphere const* S=spheres.first(); S; S=S->next() )
     {
-        if ( sp->prop->steric )
+        if ( S->prop->steric )
 #if ( N_STERIC_PANES == 1 )
-            pointGrid.add(Mecapoint(sp, 0), sp->radius(), sp->radius()+sp->prop->steric_range);
+            pointGrid.add(Mecapoint(S, 0), S->radius(), S->radius()+S->prop->steric_range);
 #else
-            pointGrid.add(sp->prop->steric, Mecapoint(sp, 0), sp->radius(), sp->radius()+sp->prop->steric_range);
+            pointGrid.add(S->prop->steric, Mecapoint(S, 0), S->radius(), S->radius()+S->prop->steric_range);
 #endif
     }
     
     // include Beads
-    for ( Bead const* bd=beads.first(); bd; bd=bd->next() )
+    for ( Bead const* B=beads.first(); B; B=B->next() )
     {
-        if ( bd->prop->steric )
+        if ( B->prop->steric )
 #if ( N_STERIC_PANES == 1 )
-            pointGrid.add(Mecapoint(bd, 0), bd->radius(), bd->radius()+bd->prop->steric_range);
+            pointGrid.add(Mecapoint(B, 0), B->radius(), B->radius()+B->prop->steric_range);
 #else
-            pointGrid.add(bd->prop->steric, Mecapoint(bd, 0), bd->radius(), bd->radius()+bd->prop->steric_range);
+            pointGrid.add(B->prop->steric, Mecapoint(B, 0), B->radius(), B->radius()+B->prop->steric_range);
 #endif
     }
         
     // include Points that have a radius from Solids
-    for ( Solid const* so=solids.first(); so; so=so->next() )
+    for ( Solid const* S=solids.first(); S; S=S->next() )
     {
-        if ( so->prop->steric )
+        if ( S->prop->steric )
         {
-            for ( size_t i = 0; i < so->nbPoints(); ++i )
+            for ( size_t i = 0; i < S->nbPoints(); ++i )
             {
-                if ( so->radius(i) > REAL_EPSILON )
+                if ( S->radius(i) > REAL_EPSILON )
 #if ( N_STERIC_PANES == 1 )
-                    pointGrid.add(Mecapoint(so, i), so->radius(i), so->radius(i)+so->prop->steric_range);
+                    pointGrid.add(Mecapoint(S, i), S->radius(i), S->radius(i)+S->prop->steric_range);
 #else
-                    pointGrid.add(so->prop->steric, Mecapoint(so, i), so->radius(i), so->radius(i)+so->prop->steric_range);
+                    pointGrid.add(S->prop->steric, Mecapoint(S, i), S->radius(i), S->radius(i)+S->prop->steric_range);
 #endif
             }
         }
@@ -248,55 +248,55 @@ void Simul::setStericInteractionsF(Meca& meca) const
     pointGridF.clear();
     
     // distribute Fiber-points on the grid
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* F=fibers.first(); F; F=F->next() )
     {
-        if ( fib->prop->steric )
+        if ( F->prop->steric )
         {
-            const real rad = fib->prop->steric_radius;
+            const real rad = F->prop->steric_radius;
             // include segments, in the cell associated with their center
-            for ( size_t r = 0; r < fib->nbSegments(); ++r )
+            for ( size_t r = 0; r < F->nbSegments(); ++r )
 #if ( MAX_STERIC_PANES == 1 )
-                pointGridF.add(FiberSegment(fib, r), rad);
+                pointGridF.add(FiberSegment(F, r), rad);
 #else
-                pointGridF.add(fib->prop->steric, FiberSegment(fib, r), rad);
+                pointGridF.add(F->prop->steric, FiberSegment(F, r), rad);
 #endif
         }
     }
     
     // include Spheres
-    for ( Sphere const* sp=spheres.first(); sp; sp=sp->next() )
+    for ( Sphere const* S=spheres.first(); S; S=S->next() )
     {
-        if ( sp->prop->steric )
+        if ( S->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(Mecapoint(sp, 0), sp->radius());
+            pointGridF.add(Mecapoint(S, 0), S->radius());
 #else
-            pointGridF.add(sp->prop->steric, Mecapoint(sp, 0), sp->radius());
+            pointGridF.add(S->prop->steric, Mecapoint(S, 0), S->radius());
 #endif
     }
     
     // include Beads
-    for ( Bead const* bd=beads.first(); bd; bd=bd->next() )
+    for ( Bead const* B=beads.first(); B; B=B->next() )
     {
-        if ( bd->prop->steric )
+        if ( B->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(Mecapoint(bd, 0), bd->radius());
+            pointGridF.add(Mecapoint(B, 0), B->radius());
 #else
-            pointGridF.add(bd->prop->steric, Mecapoint(bd, 0), bd->radius());
+            pointGridF.add(B->prop->steric, Mecapoint(B, 0), B->radius());
 #endif
     }
         
     // include Points that have a radius from Solids
-    for ( Solid const* so=solids.first(); so; so=so->next() )
+    for ( Solid const* S=solids.first(); S; S=S->next() )
     {
-        if ( so->prop->steric )
+        if ( S->prop->steric )
         {
-            for ( size_t i = 0; i < so->nbPoints(); ++i )
+            for ( size_t i = 0; i < S->nbPoints(); ++i )
             {
-                if ( so->radius(i) > REAL_EPSILON )
+                if ( S->radius(i) > REAL_EPSILON )
 #if ( MAX_STERIC_PANES == 1 )
-                    pointGridF.add(Mecapoint(so, i), so->radius(i));
+                    pointGridF.add(Mecapoint(S, i), S->radius(i));
 #else
-                    pointGridF.add(so->prop->steric, Mecapoint(so, i), so->radius(i));
+                    pointGridF.add(S->prop->steric, Mecapoint(S, i), S->radius(i));
 #endif
             }
         }
@@ -396,11 +396,11 @@ void Simul::setAllInteractions(Meca& meca) const
         const real rad2 = square(rad);
         const real stiff = prop->steric_stiffness_push[0];
 
-        for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+        for ( Fiber const* F = fibers.first(); F; F = F->next() )
         {
-            for ( size_t n = 0; n < fib->nbSegments(); ++n )
+            for ( size_t n = 0; n < F->nbSegments(); ++n )
             {
-                FiberSegment seg(fib, n);
+                FiberSegment seg(F, n);
                 real dis = INFINITY;
                 real abs = seg.projectPoint(cen, dis);
                 if ( dis < rad2 )
@@ -618,17 +618,17 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 #if ( 0 )
     LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated forces, for testing rotation
-    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
-        meca.addTorqueClamp(fib->interpolateCenter(), Vector(0,1,0), 1);
+    for ( Fiber const* F = fibers.first(); F; F = F->next() )
+        meca.addTorqueClamp(F->interpolateCenter(), Vector(0,1,0), 1);
 #endif
 #if ( 0 )
     LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated force to test rotation of spheres:
     Vector force(0,1,0);
-    for ( Sphere const* sph = spheres.first(); sph; sph = sph->next() )
+    for ( Sphere const* S = spheres.first(); S; S = S->next() )
     {
-        meca.addForce(Mecapoint(sph, 1), -force);
-        meca.addForce(Mecapoint(sph, 2), +force);
+        meca.addForce(Mecapoint(S, 1), -force);
+        meca.addForce(Mecapoint(S, 2), +force);
     }
 #endif
 }

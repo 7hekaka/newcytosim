@@ -539,7 +539,7 @@ size_t Solid::addTriad(real arm)
     assert_true(arm > 0);
     
     if ( nPoints < 1 )
-        throw InvalidParameter("cannot add Triad to solid without point");
+        throw InvalidParameter("cannot add Triad to a Solid with no point");
     
     size_t inx = lastPoint();
 
