@@ -82,7 +82,7 @@ Once *cytosim* is running on your machine, check the tutorials, the page on [run
 *  Julio Belmonte          2014-
 *  Gaelle Letort           2014-
 *  Manuel Lera-Ramirez     2017-
-*  Maud Formanek           2019-
+*  Maud Formanek           2020-
 
 # Contact
 

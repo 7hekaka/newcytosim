@@ -55,7 +55,7 @@ will fix problem for off-screen: glutBitmapCharacter() requires GLUT to be initi
 - Find a solution for 'confine = type, stiff, space' and 'confine = type, space' in Single.
 
 - add generic classes that can be customized: OpenFiber, OpenHand, OpenCouple, OpenSingle...
-- fix SpaceBead: list of beads not set correctly after a read state.cym
+- fix SpaceBeads: list of beads not set correctly after a read state.cym
 - binding_range warnings are not necessary for long Couples
 
 
