@@ -228,10 +228,7 @@ void SpaceLid::step()
         top_ += dc;
     else
         std::cerr << "Error: lid displacement is too fast: " << dc << '\n';
-    std::cerr << "force on lid is " << force_ << '\n';
-    
-    if ( top_ > halflength_[DIM-1] )
-        std::cerr << "Warning: space lid has reached its maximum\n";
+    std::cerr << "SpaceLid: top = " << top_ << " force = " << force_ << '\n';
 }
 
 
