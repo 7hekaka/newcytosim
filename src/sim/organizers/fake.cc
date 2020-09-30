@@ -135,6 +135,33 @@ Fake::~Fake()
 }
 
 
+void Fake::write(Outputter& out) const
+{
+    Object::writeReference(out, fkSolid);
+    Organizer::write(out);
+}
+
+
+void Fake::read(Inputter& in, Simul& sim, ObjectTag tag)
+{
+    ObjectTag g;
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 53 )
+    {
+        size_t n = in.readUInt16();
+        fkSolid = Solid::toSolid(sim.readReference(in, g));
+        if ( n > 0 )
+            Organizer::readOrganized(in, sim, n-1);
+    }
+    else
+#endif
+    {
+        fkSolid = Solid::toSolid(sim.readReference(in, g));
+        Organizer::read(in, sim, tag);
+    }
+}
+
+
 /**
  This sets the ends of the link number `inx`
  or returns zero if the link does not exist

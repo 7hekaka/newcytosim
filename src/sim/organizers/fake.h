@@ -71,6 +71,12 @@ public:
     
     /// return associated Property
     Property const* property() const { return prop; }
+    
+    /// read from IO
+    void            read(Inputter&, Simul&, ObjectTag);
+    
+    /// write to IO
+    void            write(Outputter&) const;
 
  };
 
