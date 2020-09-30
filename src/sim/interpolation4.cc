@@ -10,8 +10,9 @@
 void Interpolation4::clear()
 {
     mec_ = nullptr;
-    ref_ = 0;
-    ord_ = 0;
+    prime_ = 0;
+    
+    rank_ = 0;
     coef_[0] = 1.0;
     coef_[1] = 0.0;
     coef_[2] = 0.0;
@@ -27,13 +28,13 @@ void Interpolation4::set(Mecable const* m, size_t p)
     assert_true( !m || p < m->nbPoints() );
     
     mec_ = m;
-    ref_ = p;
+    prime_ = p;
     
+    rank_ = 1;
     coef_[0] = 1.0;
     coef_[1] = 0.0;
     coef_[2] = 0.0;
     coef_[3] = 0.0;
-    ord_ = 1;
 }
 
 /**
@@ -49,13 +50,13 @@ void Interpolation4::set(Mecable const* m, size_t p, size_t q, real c)
     assert_true(q < m->nbPoints());
     
     mec_ = m;
-    ref_ = p;
+    prime_ = p;
     
+    rank_ = 2;
     coef_[0] = c;
     coef_[1] = 1.0 - c;
     coef_[2] = 0.0;
     coef_[3] = 0.0;
-    ord_ = 2;
 }
 
 /**
@@ -74,7 +75,7 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
     assert_true(m);
     
     mec_ = m;
-    ref_ = p;
+    prime_ = p;
 
     coef_[1] = vec.XX;
 #if ( DIM == 1 )
@@ -92,31 +93,31 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
 #endif
 
     if ( vec.norm_inf() < REAL_EPSILON )
-        ord_ = 1;
+        rank_ = 1;
     else
-        ord_ = 1+DIM;
+        rank_ = 1+DIM;
 
-    // the last point to be interpolated is ( ref_ + ord_ -1 )
-    assert_true(ref_+ord_ <= m->nbPoints());
+    // the last point to be interpolated is ( prime_ + rank_ -1 )
+    assert_true(prime_+rank_ <= m->nbPoints());
 }
 
 
 Vector Interpolation4::position() const
 {
-    size_t top = std::min(ord_, mec_->nbPoints());
-    Vector res = coef_[0] * mec_->posPoint(ref_);
+    size_t top = std::min(rank_, mec_->nbPoints());
+    Vector res = coef_[0] * mec_->posPoint(prime_);
     for ( size_t i = 1; i < top; ++i )
-        res += coef_[i] * mec_->posPoint(ref_+i);
+        res += coef_[i] * mec_->posPoint(prime_+i);
     return res;
 }
 
 
 void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real weight) const
 {
-    size_t off = mec_->matIndex() + ref_;
+    size_t off = mec_->matIndex() + prime_;
     size_t pts[] = { off, off+1, off+2, off+3 };
     
-    switch ( ord_ )
+    switch ( rank_ )
     {
         case 0:
             break;
@@ -138,15 +139,15 @@ void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real we
 
 void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight) const
 {
-    size_t off = mec_->matIndex() + ref_;
+    size_t off = mec_->matIndex() + prime_;
     size_t pts[] = { off, off+1, off+2, off+3 };
     
-    switch ( ord_ )
+    switch ( rank_ )
     {
         case 0:
             break;
         case 1:
-            meca.addLink(arg, Mecapoint(mec_, ref_), weight);
+            meca.addLink(arg, Mecapoint(mec_, prime_), weight);
             break;
         case 2:
             meca.addLink2(arg, pts, coef_, weight);
@@ -166,10 +167,10 @@ int Interpolation4::bad() const
     if ( !mec_ )
         return 1;
 
-    if ( ref_ >= mec_->nbPoints() )
+    if ( prime_ >= mec_->nbPoints() )
         return 2;
 
-    if ( ref_+ord_ > mec_->nbPoints() )
+    if ( prime_+rank_ > mec_->nbPoints() )
         return 3;
 
     // the sum of the coefficients should equal 1:
@@ -187,7 +188,7 @@ int Interpolation4::bad() const
 void Interpolation4::write(Outputter& out) const
 {
     Object::writeReference(out, mec_);
-    out.writeUInt16(ref_);
+    out.writeUInt16(prime_);
     for ( int d = 1; d < 4; ++d )
         out.writeFloat(coef_[d]);
 }
@@ -197,16 +198,16 @@ void Interpolation4::read(Inputter& in, Simul& sim)
 {
     ObjectTag g;
     mec_ = Simul::toMecable(sim.readReference(in, g));
-    ref_ = in.readUInt16();
+    prime_ = in.readUInt16();
     
     for ( int d = 1; d < 4; ++d )
         coef_[d] = in.readFloat();
     
     coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
     
-    ord_ = 4;
-    while ( abs_real(coef_[ord_-1]) < REAL_EPSILON )
-        --ord_;
+    rank_ = 4;
+    while ( abs_real(coef_[rank_-1]) < REAL_EPSILON )
+        --rank_;
 }
 
 

@@ -21,14 +21,14 @@ private:
     Mecable const* mec_;
 
     /// index of first interpolated point
-    size_t         ref_;
+    size_t       prime_;
     
     /// interpolation coefficients for points [ref, ref+1, ref+2, ref+3]
     /** The sum of these 4 coefficients is equal to one */
     real       coef_[4];
     
     /// number of interpolated points (order)
-    size_t         ord_;
+    size_t        rank_;
 
 public:
     
@@ -54,7 +54,7 @@ public:
     Vector position() const;
     
     /// attachement point
-    Mecapoint point() const { return Mecapoint(mec_, ref_); }
+    Mecapoint point() const { return Mecapoint(mec_, prime_); }
 
     /// create addLink with given Interpolation
     void addLink(Meca&, Interpolation const&, real weight) const;
