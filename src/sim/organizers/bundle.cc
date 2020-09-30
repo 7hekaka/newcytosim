@@ -136,7 +136,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     opt.set(spec, "fibers", 2);
     
     if ( cnt <= 0 )
-        throw InvalidParameter("number of fibers (fibers[0]) must be specified and >= 1");
+        throw InvalidParameter(prop->name()+":fibers[0] (number of fibers) must be specified and >= 1");
     
     nbOrganized(cnt);
     
