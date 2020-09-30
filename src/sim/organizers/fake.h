@@ -61,7 +61,7 @@ public:
     Mecable*   core() const { return fkSolid; }
     
     /// return display parameters
-    PointDisp const* disp() const { return fkSolid->prop->disp; }
+    PointDisp const* disp() const { if ( fkSolid ) return fkSolid->prop->disp; return nullptr; }
 
     /// a unique character identifying the class
     static const ObjectTag TAG = 'k';
