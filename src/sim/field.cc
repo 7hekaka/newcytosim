@@ -507,7 +507,10 @@ void Field::step(FiberSet& fibers)
     static bool field_set_color(FieldDisplayParameters fdp, FieldGrid::value_type const& val, Vector const& pos)
     {
         if ( fdp.spc && ! fdp.spc->inside(pos) )
+        {
+            glColor3f(0, 0, 0); // background color
             return false;
+        }
         val.setColor(fdp.amp);
         return true;
     }

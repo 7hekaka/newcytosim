@@ -91,36 +91,35 @@ void drawValues(Grid<CELL, 2> const& grid,
 }
 
 
-/// display the slice of a 3D grid in a plane parallel to XY at `Z = z_pos`
+/// display the slice of a 3D grid in a plane parallel to XY at `Z = zzz`
 /**
- OpenGL color is to be specified by the provided function:
- bool set_color(void*, CELL const&, Vector2 const&);
+ a Cell color is specified by `bool set_color(TYPE, CELL const&, Vector2 const&)`
  Each particular cell is displayed only if `set_color' returns true.
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
                 bool set_color(TYPE, CELL const&, Vector3 const&),
                 TYPE arg,
-                real z_pos = 0)
+                real zzz = 0)
 {
     assert_true(grid.hasCells());
     
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(1);
     
-    size_t z = grid.index(2, z_pos);
+    size_t z = grid.index(2, zzz);
     
     for ( size_t y = 0; y < grid.breadth(1); ++y )
     for ( size_t x = 0; x < grid.breadth(0); ++x )
     {
-        Vector3 w(grid.position(0, x+0.5), grid.position(1, y+0.5), z_pos);
+        Vector3 w(grid.position(0, x+0.5), grid.position(1, y+0.5), zzz);
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(w.XX-d, w.YY-e, z_pos);
-            gle::gleVertex(w.XX+d, w.YY-e, z_pos);
-            gle::gleVertex(w.XX-d, w.YY+e, z_pos);
-            gle::gleVertex(w.XX+d, w.YY+e, z_pos);
+            gle::gleVertex(w.XX-d, w.YY-e, zzz);
+            gle::gleVertex(w.XX+d, w.YY-e, zzz);
+            gle::gleVertex(w.XX-d, w.YY+e, zzz);
+            gle::gleVertex(w.XX+d, w.YY+e, zzz);
             glEnd();
         }
     }
@@ -137,26 +136,26 @@ template <typename CELL, typename TYPE>
 void drawValuesXZ(Grid<CELL, 3> const& grid,
                   bool set_color(TYPE, CELL const&, Vector3 const&),
                   TYPE arg,
-                  real pos)
+                  real yyy)
 {
     assert_true(grid.hasCells());
     
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(2);
     
-    size_t y = grid.index(1, pos);
+    size_t y = grid.index(1, yyy);
     
     for ( size_t z = 0; z < grid.breadth(2); ++z )
     for ( size_t x = 0; x < grid.breadth(0); ++x )
     {
-        Vector3 w(grid.position(0, x+0.5), pos, grid.position(2, y+0.5));
+        Vector3 w(grid.position(0, x+0.5), yyy, grid.position(2, y+0.5));
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(w.XX-d, pos, w.ZZ-e);
-            gle::gleVertex(w.XX+d, pos, w.ZZ-e);
-            gle::gleVertex(w.XX-d, pos, w.ZZ+e);
-            gle::gleVertex(w.XX+d, pos, w.ZZ+e);
+            gle::gleVertex(w.XX-d, yyy, w.ZZ-e);
+            gle::gleVertex(w.XX+d, yyy, w.ZZ-e);
+            gle::gleVertex(w.XX-d, yyy, w.ZZ+e);
+            gle::gleVertex(w.XX+d, yyy, w.ZZ+e);
             glEnd();
         }
     }
@@ -173,26 +172,26 @@ template <typename CELL, typename TYPE>
 void drawValuesYZ(Grid<CELL, 3> const& grid,
                   bool set_color(TYPE, CELL const&, Vector3 const&),
                   TYPE arg,
-                  real pos)
+                  real xxx)
 {
     assert_true(grid.hasCells());
     
     real d = 0.5 * grid.cellWidth(0);
     real e = 0.5 * grid.cellWidth(2);
     
-    size_t x = grid.index(0, pos);
+    size_t x = grid.index(0, xxx);
     
     for ( size_t z = 0; z < grid.breadth(2); ++z )
     for ( size_t y = 0; y < grid.breadth(1); ++y )
     {
-        Vector3 w(pos, grid.position(1, y+0.5), grid.position(2, z+0.5));
+        Vector3 w(xxx, grid.position(1, y+0.5), grid.position(2, z+0.5));
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(pos, w.YY-d, w.ZZ-e);
-            gle::gleVertex(pos, w.YY+d, w.ZZ-e);
-            gle::gleVertex(pos, w.YY-d, w.ZZ+e);
-            gle::gleVertex(pos, w.YY+d, w.ZZ+e);
+            gle::gleVertex(xxx, w.YY-d, w.ZZ-e);
+            gle::gleVertex(xxx, w.YY+d, w.ZZ-e);
+            gle::gleVertex(xxx, w.YY-d, w.ZZ+e);
+            gle::gleVertex(xxx, w.YY+d, w.ZZ+e);
             glEnd();
         }
     }
@@ -201,8 +200,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
 
 /// display a slice of the field in a plane perpendicular to 'dir'
 /**
- OpenGL color is to be specified by the function `set_color`:
- bool set_color(void*, CELL const&, Vector2 const&);
+ a Cell color is specified by `bool set_color(TYPE, CELL const&, Vector2 const&)`
  The return value of this function is ignored.
  */
 template <typename CELL, typename TYPE>
@@ -210,7 +208,7 @@ void drawValues(Grid<CELL, 3> const& grid,
                 bool set_color(TYPE, CELL const&, Vector3 const&),
                 TYPE arg,
                 Vector3 const& dir,
-                real z_pos)
+                real pos)
 {
     assert_true(grid.hasCells());
     
@@ -224,19 +222,19 @@ void drawValues(Grid<CELL, 3> const& grid,
     dy *= n;
     
     Vector3 dh = dy * std::cos(M_PI/6);
-    Vector3 w, a;
     
     for ( int y = -m; y <= m; y+=2 )
     {
-        a = y * dh + z_pos * dir;
+        const Vector3 a = y * dh + pos * dir;
+        const Vector3 b = a + dh;
         glBegin(GL_TRIANGLE_STRIP);
         for ( int x = -m; x <= m; ++x )
         {
-            w = a + x * dx;
-            set_color(arg, grid.interpolate3D(w), w);
-            gle::gleVertex(w);
+            const Vector3 v = a + x * dx;
+            set_color(arg, grid.interpolate3D(v), v);
+            gle::gleVertex(v);
             
-            w = a + ( x + 0.5 ) * dx + dh;
+            const Vector3 w = b + ( x + 0.5 ) * dx;
             set_color(arg, grid.interpolate3D(w), w);
             gle::gleVertex(w);
         }
@@ -244,11 +242,11 @@ void drawValues(Grid<CELL, 3> const& grid,
         glBegin(GL_TRIANGLE_STRIP);
         for ( int x = -m; x <= m; ++x )
         {
-            w = a + x * dx + dh + dh;
-            set_color(arg, grid.interpolate3D(w), w);
-            gle::gleVertex(w);
+            const Vector3 v = b + x * dx + dh;
+            set_color(arg, grid.interpolate3D(v), v);
+            gle::gleVertex(v);
             
-            w = a + ( x + 0.5 ) * dx + dh;
+            const Vector3 w = b + ( x + 0.5 ) * dx;
             set_color(arg, grid.interpolate3D(w), w);
             gle::gleVertex(w);
         }
