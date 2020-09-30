@@ -125,7 +125,7 @@ public:
     ~SingleProp() { }
     
     /// create a Single with this property
-    Single * newSingle() const;
+    virtual Single * newSingle() const;
     
     /// create a Write with this property
     Wrist * newWrist(Mecable const*, size_t) const;

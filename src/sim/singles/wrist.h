@@ -36,10 +36,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// return the position in space of the object
-    Vector  position() const { return posFoot(); }
+    Vector  position() const { return base_.position(); }
     
     /// Wrist accepts translation
-    int     mobile() const { return 1; }
+    int     mobile() const { return 0; }
     
     /// translate object's position by the given vector
     void    translate(Vector const&) { }
@@ -50,7 +50,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Object to which this is anchored
-    Mecable const* base() const { return base_.base(); }
+    Mecable const* base() const { return base_.mecable(); }
     
     /// attach at one Mecapoint
     void    rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }

@@ -104,7 +104,8 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
 
 Vector Interpolation4::position() const
 {
-    size_t top = std::min(rank_, mec_->nbPoints());
+    assert_true(mec_);
+    size_t top = std::min(rank_, mec_->nbPoints()-prime_);
     Vector res = coef_[0] * mec_->posPoint(prime_);
     for ( size_t i = 1; i < top; ++i )
         res += coef_[i] * mec_->posPoint(prime_+i);
@@ -114,6 +115,7 @@ Vector Interpolation4::position() const
 
 void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real weight) const
 {
+    assert_true(mec_);
     size_t off = mec_->matIndex() + prime_;
     size_t pts[] = { off, off+1, off+2, off+3 };
     
@@ -187,6 +189,7 @@ int Interpolation4::bad() const
 
 void Interpolation4::write(Outputter& out) const
 {
+    out.writeSoftSpace();
     Object::writeReference(out, mec_);
     out.writeUInt16(prime_);
     for ( int d = 1; d < 4; ++d )
@@ -213,7 +216,7 @@ void Interpolation4::read(Inputter& in, Simul& sim)
 
 void Interpolation4::print(std::ostream& out) const
 {
-    const unsigned w = 9;
+    const int w = 9;
     if ( mec_ )
     {
         out << "(" << mec_->reference() << "  " << std::setw(w) << coef_[0];

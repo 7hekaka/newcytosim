@@ -39,6 +39,9 @@ public:
     /// translate object's position by the given vector
     void    translate(Vector const& w)  { sPos += w; }
     
+    /// move object to specified position
+    void    setPosition(Vector const& x) { sPos = x; }
+
     /// true if Single creates an interaction
     bool    hasForce() const { return true; }
     

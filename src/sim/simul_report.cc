@@ -1843,7 +1843,7 @@ void Simul::reportSingleState(std::ostream& out, Property const* sel, bool com) 
         out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
         out << SEP << "fiber" << SEP << "abscissa" << SEP << "aster";
     }
-        
+    
     for ( Single const* obj = singles.firstID(); obj; obj = singles.nextID(obj) )
         if ( !sel || sel == obj->prop )
             write(out, obj, this);
@@ -1908,18 +1908,20 @@ void Simul::reportSingle(std::ostream& out) const
 {
     constexpr size_t SUP = 128;
     
-    int free[SUP+1] = { 0 }, bound[SUP+1] = { 0 };
+    size_t free[SUP+1] = { 0 }, bound[SUP+1] = { 0 }, based[SUP+1] = { 0 };
     
     for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
         assert_true(!i->attached());
         ++free[std::min(i->prop->number(), SUP)];
+        based[std::min(i->prop->number(), SUP)] += ( i->base() != nullptr );
     }
     
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
     {
         assert_true(i->attached());
         ++bound[std::min(i->prop->number(), SUP)];
+        based[std::min(i->prop->number(), SUP)] += ( i->base() != nullptr );
     }
     
     if ( 1 )
@@ -1928,6 +1930,7 @@ void Simul::reportSingle(std::ostream& out) const
         out << SEP << "total";
         out << SEP << "free";
         out << SEP << "bound";
+        out << SEP << "based";
     }
     
     for ( Property const* i : properties.find_all("single") )
@@ -1939,6 +1942,7 @@ void Simul::reportSingle(std::ostream& out) const
             out << SEP << free[x] + bound[x];
             out << SEP << free[x];
             out << SEP << bound[x];
+            out << SEP << based[x];
         }
         else
             out << SEP << " out-of-range ";

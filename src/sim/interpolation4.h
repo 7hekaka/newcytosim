@@ -48,7 +48,7 @@ public:
     void set(Mecable const*, size_t, Vector const& vec);
 
     /// attachment mecable
-    Mecable const* base() const { return mec_; }
+    Mecable const* mecable() const { return mec_; }
     
     /// position in space
     Vector position() const;
