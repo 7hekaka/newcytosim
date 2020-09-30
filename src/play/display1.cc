@@ -94,7 +94,7 @@ void Display1::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display1::drawBall(Vector const& pos, real radius) const
+inline void Display1::drawBall(Vector const& pos, real radius) const
 {
     glPushMatrix();
     gleTranslate(pos);
@@ -124,6 +124,20 @@ inline void Display1::drawPoint(Vector const& pos, PointDisp const* disp) const
     gleSphere1B();
     glPopMatrix();
 }
+
+
+inline void Display1::drawCube(Vector const& pos, PointDisp const* disp) const
+{
+    if ( disp->perceptible )
+    {
+        glPushMatrix();
+        gle::gleTranslate(pos);
+        gle::gleScale(disp->size*sFactor);
+        gle::gleCube1();
+        glPopMatrix();
+    }
+}
+
 
 
 //------------------------------------------------------------------------------
@@ -177,8 +191,13 @@ void Display1::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0  && disp->perceptible )
     {
         bodyColor(obj);
-        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
-            drawPoint(obj.posP(ii), disp);
+        for ( size_t p = 0; p < obj.nbPoints(); ++p )
+        {
+            if ( obj.radius(p) > 0 )
+                drawPoint(obj.posP(p), disp);
+            else
+                drawCube(obj.posP(p), disp);
+        }
     }
     
     //display outline of spheres

@@ -52,9 +52,9 @@ namespace glApp
     UserMode     mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
     Vector3      mouseDown(0,0,0);               ///< position where mouse button was pressed down
     GLint        mouseX, mouseY;                 ///< current position of mouse in pixels
-    Vector3      depthAxis;                      ///< vector normal to desired rotation
-    Vector3      mouseAxis;                      ///< axis of rotation for MOUSE_SPIN
-    Vector3      viewFocus;                      ///< unprojected center of screen
+    Vector3      depthAxis(0,0,0);               ///< vector normal to desired rotation
+    Vector3      mouseAxis(0,0,0);               ///< axis of rotation for MOUSE_SPIN
+    Vector3      viewFocus(0,0,0);               ///< unprojected center of screen
     
     int          savedWindowPos[4] = { 24, 24, 800, 800 };
     

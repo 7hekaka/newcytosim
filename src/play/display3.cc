@@ -135,7 +135,7 @@ void Display3::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display3::drawBall(Vector const& pos, float radius) const
+inline void Display3::drawBall(Vector const& pos, float radius) const
 {
     GLboolean cull = glIsEnabled(GL_CULL_FACE);
     if ( !cull ) glEnable(GL_CULL_FACE);
@@ -151,7 +151,7 @@ void Display3::drawBall(Vector const& pos, float radius) const
 }
 
 
-void Display3::drawPoint(Vector const& pos, float size) const
+inline void Display3::drawPoint(Vector const& pos, float size) const
 {
     glPushMatrix();
     gleTranslate(pos);
@@ -161,7 +161,7 @@ void Display3::drawPoint(Vector const& pos, float size) const
 }
 
 
-void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
+inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
     if ( disp->perceptible )
     {
@@ -184,6 +184,20 @@ void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
         glPopMatrix();
     }
 }
+
+
+inline void Display3::drawCube(Vector const& pos, PointDisp const* disp) const
+{
+    if ( disp->perceptible )
+    {
+        glPushMatrix();
+        gle::gleTranslate(pos);
+        gle::gleScale(disp->size*sFactor);
+        gle::gleCube1();
+        glPopMatrix();
+    }
+}
+
 
 
 void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
@@ -911,8 +925,13 @@ void Display3::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0 )
     {
         bodyColor(obj);
-        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
-            drawPoint(obj.posP(ii), disp);
+        for ( size_t p = 0; p < obj.nbPoints(); ++p )
+        {
+            if ( obj.radius(p) > 0 )
+                drawPoint(obj.posP(p), disp);
+            else
+                drawCube(obj.posP(p), disp);
+        }
     }
     
 #if ( DIM == 3 )

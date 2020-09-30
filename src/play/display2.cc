@@ -114,7 +114,7 @@ void Display2::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display2::drawBall(Vector const& pos, real radius)
+inline void Display2::drawBall(Vector const& pos, real radius) const
 {
     glPushMatrix();
     gleTranslate(pos);
@@ -136,7 +136,7 @@ void Display2::drawBall(Vector const& pos, real radius)
 
 
 /// this version usually draws a little sphere
-inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp)
+inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
     if ( disp->perceptible )
     {
@@ -156,6 +156,21 @@ inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp)
 #endif
     }
 }
+
+
+inline void Display2::drawCube(Vector const& pos, PointDisp const* disp) const
+{
+    if ( disp->perceptible )
+    {
+        glPushMatrix();
+        gle::gleTranslate(pos);
+        gle::gleScale(disp->size*sFactor);
+        gle::gleCube1();
+        glPopMatrix();
+    }
+}
+
+
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -228,8 +243,13 @@ void Display2::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0 )
     {
         bodyColor(obj);
-        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
-            drawPoint(obj.posP(ii), disp);
+        for ( size_t p = 0; p < obj.nbPoints(); ++p )
+        {
+            if ( obj.radius(p) > 0 )
+                drawPoint(obj.posP(p), disp);
+            else
+                drawCube(obj.posP(p), disp);
+        }
     }
     
     //display outline of spheres

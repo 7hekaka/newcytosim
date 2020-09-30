@@ -19,6 +19,9 @@ class Display1 : public Display
     /// draw a point
     void drawPoint(Vector const&, PointDisp const*) const;
 
+    /// draw a point with a small cube
+    void drawCube(Vector const&, PointDisp const*) const;
+
 public:
     
     ///constructor

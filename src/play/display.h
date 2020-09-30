@@ -29,6 +29,8 @@ class BeadSet;
 class FieldSet;
 class FiberProp;
 class PropertyList;
+class PointDisp;
+
 
 /// defining the DISPLAY keyword enables display code in included files
 #define DISPLAY

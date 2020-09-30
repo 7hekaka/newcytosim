@@ -1147,9 +1147,9 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    void gleCube1()
+    void gleCube0()
     {
-        constexpr GLfloat R = 0.5;
+        constexpr GLfloat R = 0.5773502692;
         constexpr GLfloat pts[] = {
             -R,  R,  R,
              R,  R,  R,
@@ -1158,6 +1158,7 @@ namespace gle
              R, -R, -R,
              R,  R,  R,
              R,  R, -R,
+            
             -R,  R,  R,
             -R,  R, -R,
             -R, -R,  R,
@@ -1165,29 +1166,51 @@ namespace gle
              R, -R, -R,
             -R,  R, -R,
              R,  R, -R };
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    
+    void gleCube1()
+    {
+        constexpr GLfloat R = 0.5773502692;
+        constexpr GLfloat pts[] = {
+             R, R, R, R,-R,-R, R, R,-R, // X
+             R,-R,-R, R, R, R, R,-R, R, // X
+             R, R, R, R, R,-R,-R, R,-R, // Y
+             R, R, R,-R, R,-R,-R, R, R, // Y
+            -R, R, R,-R,-R, R, R,-R, R, // Z
+             R, R, R,-R, R, R, R,-R, R, // Z
+            -R,-R,-R,-R,-R, R,-R, R, R,
+            -R,-R,-R,-R, R, R,-R, R,-R,
+             R,-R, R,-R,-R,-R, R,-R,-R,
+             R,-R, R,-R,-R, R,-R,-R,-R,
+             R, R,-R,-R,-R,-R,-R, R,-R,
+             R, R,-R, R,-R,-R,-R,-R,-R
+        };
         
-        constexpr GLfloat N = 0.5773502692;
         constexpr GLfloat dir[] = {
-            -N,  N,  N,
-             N,  N,  N,
-            -N, -N,  N,
-             N, -N,  N,
-             N, -N, -N,
-             N,  N,  N,
-             N,  N, -N,
-            -N,  N,  N,
-            -N,  N, -N,
-            -N, -N,  N,
-            -N, -N, -N,
-             N, -N, -N,
-            -N,  N, -N,
-             N,  N, -N };
+             1, 0, 0, 1, 0, 0, 1, 0, 0,
+             1, 0, 0, 1, 0, 0, 1, 0, 0,
+             0, 1, 0, 0, 1, 0, 0, 1, 0,
+             0, 1, 0, 0, 1, 0, 0, 1, 0,
+             0, 0, 1, 0, 0, 1, 0, 0, 1,
+             0, 0, 1, 0, 0, 1, 0, 0, 1,
+            -1, 0, 0,-1, 0, 0,-1, 0, 0,
+            -1, 0, 0,-1, 0, 0,-1, 0, 0,
+             0,-1, 0, 0,-1, 0, 0,-1, 0,
+             0,-1, 0, 0,-1, 0, 0,-1, 0,
+             0, 0,-1, 0, 0,-1, 0, 0,-1,
+             0, 0,-1, 0, 0,-1, 0, 0,-1
+        };
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, pts);
         glNormalPointer(GL_FLOAT, 0, dir);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glDisableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
     }

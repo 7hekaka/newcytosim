@@ -17,11 +17,14 @@ class PointDisp;
 class Display2 : public Display
 {
     /// draw a fine spherical object
-    void drawBall(Vector const&, real radius);
+    void drawBall(Vector const&, real radius) const;
     
     /// draw a point
-    void drawPoint(Vector const&, PointDisp const*);
-    
+    void drawPoint(Vector const&, PointDisp const*) const;
+
+    /// draw a cube
+    void drawCube(Vector const&, PointDisp const*) const;
+
 public:
     
     ///constructor
