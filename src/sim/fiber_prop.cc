@@ -489,7 +489,7 @@ void FiberProp::complete(Simul const& sim)
     else if ( sim.primed() && confine != CONFINE_OFF )
         throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
     
-    if ( sim.primed() && confine_stiffness < 0 )
+    if ( sim.primed() && confine && confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
 
 #if NEW_FIBER_CONFINE2
@@ -499,8 +499,8 @@ void FiberProp::complete(Simul const& sim)
     else if ( sim.primed() && confine2 != CONFINE_OFF )
         throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
     
-    if ( sim.primed() && confine2_stiffness < 0 )
-        throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
+    if ( sim.primed() && confine2 && confine2_stiffness < 0 )
+        throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");
 #endif
     
     if ( sim.primed() && steric && !sim.prop->steric )
