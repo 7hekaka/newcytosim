@@ -83,39 +83,48 @@ void PlayerProp::write_values(std::ostream& os) const
 
 //------------------------------------------------------------------------------
 
+std::string standardReport(unsigned inx)
+{
+    switch( inx )
+    {
+        case 0: return "";
+        case 1: return "fiber:lengths";
+        case 2: return "fiber:dynamics";
+        case 3: return "single";
+        case 4: return "single:force";
+        case 5: return "couple";
+        case 6: return "couple:force";
+        case 7: return "couple:configuration";
+        case 8: return "platelet";
+    }
+    return "";
+}
+
+std::string alternativeReport(unsigned inx)
+{
+    switch( inx )
+    {
+        case 0: return "";
+        case 1: return "system:inventory";
+        case 2: return "system";
+        case 3: return "fiber:energy";
+        case 4: return "fiber:mesh,field";
+        case 5: return "fiber:segment";
+        case 6: return "fiber:cluster{couple=1}";
+        case 7: return "fiber:age";
+        case 8: return "fiber:distribution";
+    }
+    return "";
+}
+
+
 void PlayerProp::toggleReport(bool alt)
 {
     report_index = ( report_index + 1 ) % 9;
     
     if ( alt )
-    {
-        switch( report_index )
-        {
-            case 0: report = "";                   break;
-            case 1: report = "system:inventory";   break;
-            case 2: report = "system";             break;
-            case 3: report = "fiber:energy";       break;
-            case 4: report = "fiber:mesh,field";   break;
-            case 5: report = "fiber:segment";      break;
-            case 6: report = "fiber:cluster{couple=1}"; break;
-            case 7: report = "fiber:age";          break;
-            case 8: report = "fiber:distribution"; break;
-        }
-    }
+        report = alternativeReport(report_index);
     else
-    {
-        switch( report_index )
-        {
-            case 0: report = "";                   break;
-            case 1: report = "fiber:lengths";      break;
-            case 2: report = "fiber:dynamics";     break;
-            case 3: report = "single";             break;
-            case 4: report = "single:force";       break;
-            case 5: report = "couple";             break;
-            case 6: report = "couple:force";       break;
-            case 7: report = "couple:configuration"; break;
-            case 8: report = "platelet";           break;
-        }
-    }
+        report = standardReport(report_index);
 }
 
