@@ -57,13 +57,11 @@ void ClassicFiberProp::read(Glossary& glos)
     glos.set(rebirth_rate,             2, "rebirth_rate");
 
 #if NEW_LENGTH_DEPENDENT_CATASTROPHE
-    glos.set(catastrophe_length,    "catastrophe_length");
+    glos.set(catastrophe_length, "catastrophe_length");
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
-    glos.set(catastrophe_space,     "catastrophe_outside", 1);
-    if ( glos.set(catastrophe_outside, "catastrophe_outside") )
-        if ( catastrophe_space.empty() )
-            throw InvalidParameter("A space must be defined as catastrophe_outside[1]");
+    glos.set(catastrophe_outside, "catastrophe_outside");
+    glos.set(catastrophe_space, "catastrophe_outside", 1);
 #endif
 
 #ifdef BACKWARD_COMPATIBILITY
@@ -163,6 +161,8 @@ void ClassicFiberProp::complete(Simul const& sim)
     
     if ( catastrophe_space_ptr )
         catastrophe_space = catastrophe_space_ptr->name();
+    else if ( sim.primed() && catastrophe_outside != 1 )
+        throw InvalidParameter("A space must be specified as catastrophe_outside[1]");
 #endif
 }
 
@@ -183,7 +183,7 @@ void ClassicFiberProp::write_values(std::ostream& os) const
     write_value(os, "catastrophe_length",       catastrophe_length);
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
-    write_value(os, "catastrophe_outside",      catastrophe_outside);
+    write_value(os, "catastrophe_outside", catastrophe_outside, catastrophe_space);
 #endif
 }
 
