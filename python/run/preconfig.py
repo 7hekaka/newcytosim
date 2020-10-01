@@ -217,9 +217,9 @@ except ImportError:
 
 #-------------------------------------------------------------------------------
 
-__VERSION__="1.4"
+__VERSION__="1.41"
 
-__DATE__   ="19.03.2020"
+__DATE__   ="1.10.2020"
 
 # code snippets are surrounded by double square brackets:
 CODE = '['
@@ -421,10 +421,11 @@ class Preconfig:
         self.template = name
 
     def set_pattern(self, name, path):
-        [main, ext] = os.path.splitext(os.path.basename(name))
-        if '.' in main:
-            [main, ext] = os.path.splitext(main)
-        res = main + '%0' + repr(self.nb_digits) + 'i' + ext
+        """
+        insert the number before the first '.' on the pattern
+        """
+        [main, ext] = os.path.basename(name).split('.', 1)
+        res = main + '%0' + repr(self.nb_digits) + 'i' + '.' + ext
         if path:
             res = os.path.join(path, res)
         self.pattern = res
