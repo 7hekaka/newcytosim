@@ -981,7 +981,7 @@ void Display3::drawSolidT(Solid const& obj, size_t inx)
     {
         Vector X = obj.posP(inx);
         size_t near[3];
-        size_t num = obj.nearestBalls(inx, near[0], near[1], near[2]);
+        size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
         //printf("nearest balls to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
         // set clipping planes with nearest balls
         for ( size_t i = 0; i < num; ++i )

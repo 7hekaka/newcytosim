@@ -533,11 +533,11 @@ FiberSite FiberSet::randomSite() const
 /**
  This method is unefficient if multiple sites are desired
  */
-FiberSite FiberSet::randomSite(FiberProp const* fp) const
+FiberSite FiberSet::randomSite(FiberProp const* sel) const
 {
     real abs = 0;
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
-        if ( fib->property() == fp )
+        if ( fib->property() == sel )
             abs += fib->length();
 
     if ( abs == 0 )
@@ -546,7 +546,7 @@ FiberSite FiberSet::randomSite(FiberProp const* fp) const
     abs *= RNG.preal();
     
     for ( Fiber* fib=first(); fib; fib=fib->next() )
-        if ( fib->property() == fp )
+        if ( fib->property() == sel )
         {
             real len = fib->length();
             if ( abs <= len )
@@ -724,12 +724,12 @@ real FiberSet::totalLength() const
 }
 
 
-real FiberSet::totalLength(FiberProp const* p) const
+real FiberSet::totalLength(FiberProp const* sel) const
 {
     real res = 0;
     
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
-        if ( fib->prop == p )
+        if ( fib->prop == sel )
             res += fib->length();
     
     return res;

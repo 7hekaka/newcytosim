@@ -16,6 +16,40 @@ void SolidSet::step()
 #endif
 
 
+/**
+ This performs a systematic search over all Solids, to return the closest
+ possible match.
+ 
+ //@todo: could pick one of the matching Sphere randomly
+ */
+Solid* SolidSet::insideSphere(Vector const& pos, size_t& inx, SolidProp const* sel) const
+{
+    real best = INFINITY;
+    Solid* res = nullptr;
+    
+    for ( Solid* S = first(); S; S = S->next() )
+        if ( S->prop == sel )
+        {
+            for ( size_t p = 0; p < S->nbPoints(); ++p )
+            {
+                const real rad = S->radius(p);
+                if ( rad > 0 )
+                {
+                    real dd = distanceSqr(S->posPoint(p), pos);
+                    if (( dd < best ) & ( dd < square(rad)))
+                    {
+                        best = dd;
+                        res = S;
+                        inx = p;
+                    }
+                }
+            }
+        }
+    
+    return res;
+}
+
+
 //------------------------------------------------------------------------------
 
 Property* SolidSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const

@@ -171,7 +171,7 @@ public:
     real        sumRadius() const;
 
     /// set index of Spheres that are nearest neighbors to `inx`; return number of values set
-    size_t      nearestBalls(size_t inx, size_t&, size_t&, size_t&) const;
+    size_t      closestSpheres(size_t inx, size_t&, size_t&, size_t&) const;
 
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
     Vector      centroid() const;

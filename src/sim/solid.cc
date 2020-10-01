@@ -579,7 +579,7 @@ real Solid::sumRadius() const
  The result should be independent of the actual position, since the shape
  of a Solid is fixed, and it could be precalculated
  */
-size_t Solid::nearestBalls(const size_t inx, size_t& i1, size_t& i2, size_t& i3) const
+size_t Solid::closestSpheres(const size_t inx, size_t& i1, size_t& i2, size_t& i3) const
 {
     assert_true( inx < nbPoints() );
     const size_t sup = nbPoints();
