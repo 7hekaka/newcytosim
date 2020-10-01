@@ -37,7 +37,7 @@ Single::~Single()
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - HandMonitor
 
 void Single::afterAttachment(Hand const*)
 {
@@ -79,7 +79,7 @@ void Single::beforeDetachment(Hand const* h)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Functions
 
 
 Vector Single::position() const
@@ -161,7 +161,7 @@ void Single::setInteractions(Meca& meca) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - I/O
 
 void Single::write(Outputter& out) const
 {

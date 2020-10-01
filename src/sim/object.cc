@@ -229,8 +229,6 @@ void Object::readHeader(Inputter& in, bool fat, unsigned& ix, ObjectID& id, Obje
     if ( in.formatID() < 45 )
         ++ix;
 #endif
-    if ( id == 0 )
-        throw InvalidIO("Invalid ObjectID referenced in file");
 }
 
 

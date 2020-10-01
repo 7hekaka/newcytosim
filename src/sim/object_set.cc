@@ -477,8 +477,8 @@ void ObjectSet::writeNodes(Outputter& out, NodeList const& list)
 /**
  Load an object from file
  
- If 'update==true', the corresponding object is changed, otherwise a new object is created.
- If 'load==false', the record is not kept
+ If 'update==true', the corresponding object is changed, or a new object is created.
+ If 'discard==true', the object is deleted / not loaded
  */
 void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool discard, bool update)
 {
@@ -486,9 +486,12 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
     ObjectID id = 0;
     ObjectMark mk = 0;
     Object * obj = nullptr;
-
+    
     Object::readHeader(in, fat, ix, id, mk);
     
+    if ( id == 0 )
+        throw InvalidIO("Invalid ObjectID referenced in file");
+
     if ( update )
     {
         obj = findID(id);

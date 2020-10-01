@@ -51,8 +51,12 @@ Single * SingleProp::newSingle() const
     {
         return new Single(this);
     }
-    else 
-        throw InvalidParameter("unknown Single activity `"+activity+"'");
+#if ( 0 )
+    throw InvalidParameter("unknown single:activity `"+activity+"'");
+#else
+    // try to proceed anyhow:
+    std::cerr << "WARNING: unknown single:activity `"+activity+"'\n";
+#endif
     return new Single(this);
 }
 

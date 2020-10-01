@@ -198,7 +198,7 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
             throw InvalidParameter("unknown couple:activity `"+a+"'");
 #else
         // try to proceed anyhow:
-        std::cerr << "WARNING: unknown couple:activity `" << a << "'" << std::endl;
+        std::cerr << "WARNING: unknown couple:activity `"+a+"'\n";
 #endif
         }
         return new CoupleProp(nom);
