@@ -9,46 +9,50 @@
 
 
 /**
- A number `currentFormatID` is used to define the format of trajectory files
- This is the initial value to Inputter::formatID()
+ \var Simul::currentFormatID
+ An integer `currentFormatID` is used to record the format of the trajectory file,
+ allowing some backward compatibility as the format of the trajectory file evolves.
+ It is stored in the file and accessible upon reading through `Inputter::formatID()`
+ 
  History of changes in file format:
 
- 54: 25/05/2020 All fiber dynamic stored on 16 bytes
- 53: 18/10/2019 Aster, Nucleus and Bundle store their primary Mecable directly
- 52: 18/10/2019 Space's shape is stored always on 16 characters
- 51: 03/03/2019 Storing number of Aster links
- 50: 19/12/2018 Fiber's birth time moved to Filament (now Chain)
- 49: 12/12/2018 FiberSite writes the Lattice index but not the abscissa
- 49: 22/11/2018 reference do not include mark, which is writen in object header
- 48: 04/07/2018 Fiber stores its birth time
- 47: 13/02/2017 Wrist and Aster built on a local reference frame of Solid
- 46: 23/10/2015 GrowingFiber writes dynamic states, changed ClassicFiber:write()
- 45: 18/09/2015 Indices of Properties are numbers starting from one, and not zero
- 44: 25/07/2015 the dynamic state of fiber ends is stored with a separate TAG
- 43: 24/04/2014 number of dimension in Space stored in 16 bits
- 42: 09/11/2013 All fibers store end_state on 32 bits
-     08/12/2012 FRAME_TAG was changed from "#frame " to "#Cytosim "
- 41: 17/11/2012 Space stores its shape as a string in objects.cmo
- 40: 11/09/2012 Aster format simplified
- 39: 11/07/2012 Object::mark is stored on 32 bits instead of 16 previously
- 38: 03/05/2012 Fiber stores length instead of segment-length
- 37: 30/04/2012 Couple::Duo stores its activity state
- 36: 22/02/2012 All Spaces store their dimensions in objects.cmo
- 35: 15/09/2011 Some Spaces store their dimensions in objects.cmo
- 34: 20/12/2010 Moved Fiber::mark to Object::mark
- 33: 29/04/2010 Added Fiber::mark
- 32: 15/04/2010 Space became an Object
- 31: 01/04/2010 Fiber became a Mecable
- 30: The Tag were reduced to 1 char: saves space & simplifies code
-     26/05/2009 started cytosim-PI: a revolution!
- 27: 22/03/2008 new Fiber::write(), called in Tubule::write()
- 26: 03/11/2007 Hand do not record haEnd flag
- 24: 14/12/2006 started cytosim 3, lots of changes
- 23: 10/12/2005 new class Solid
- 22: modified Sphere
- 21: modified Sphere
- 20: 12/07/2004
- 19: introduced different kinds of Single
+ - 55: 02/10/2020 Interpolation4 stores coefficients only if mecable!=nullptr
+ - 54: 25/05/2020 All fiber dynamic stored on 16 bytes
+ - 53: 18/10/2019 Aster, Nucleus and Bundle store their primary Mecable directly
+ - 52: 18/10/2019 Space's shape is stored always on 16 characters
+ - 51: 03/03/2019 Storing number of Aster links
+ - 50: 19/12/2018 Fiber's birth time moved to Filament (now Chain)
+ - 49: 12/12/2018 FiberSite writes the Lattice index but not the abscissa
+ - 49: 22/11/2018 reference do not include mark, which is writen in object header
+ - 48: 04/07/2018 Fiber stores its birth time
+ - 47: 13/02/2017 Wrist and Aster built on a local reference frame of Solid
+ - 46: 23/10/2015 GrowingFiber writes dynamic states, changed ClassicFiber:write()
+ - 45: 18/09/2015 Indices of Properties are numbers starting from one, and not zero
+ - 44: 25/07/2015 the dynamic state of fiber ends is stored with a separate TAG
+ - 43: 24/04/2014 number of dimension in Space stored in 16 bits
+ - 42: 09/11/2013 All fibers store end_state on 32 bits
+ -     08/12/2012 FRAME_TAG was changed from "#frame " to "#Cytosim "
+ - 41: 17/11/2012 Space stores its shape as a string in objects.cmo
+ - 40: 11/09/2012 Aster format simplified
+ - 39: 11/07/2012 Object::mark is stored on 32 bits instead of 16 previously
+ - 38: 03/05/2012 Fiber stores length instead of segment-length
+ - 37: 30/04/2012 Couple::Duo stores its activity state
+ - 36: 22/02/2012 All Spaces store their dimensions in objects.cmo
+ - 35: 15/09/2011 Some Spaces store their dimensions in objects.cmo
+ - 34: 20/12/2010 Moved Fiber::mark to Object::mark
+ - 33: 29/04/2010 Added Fiber::mark
+ - 32: 15/04/2010 Space became an Object
+ - 31: 01/04/2010 Fiber became a Mecable
+ - 30: The Tag were reduced to 1 char: saves space & simplifies code
+ - 28, 29: 26/05/2009 started cytosim-PI: a revolution!
+ - 27: 22/03/2008 new Fiber::write(), called in Tubule::write()
+ - 26: 03/11/2007 Hand do not record haEnd flag
+ - 24: 14/12/2006 started cytosim 3, lots of changes
+ - 23: 10/12/2005 new class Solid
+ - 22: modified Sphere
+ - 21: modified Sphere
+ - 20: 12/07/2004
+ - 19: introduced different kinds of Single
 */
 
 

@@ -191,9 +191,12 @@ void Interpolation4::write(Outputter& out) const
 {
     out.writeSoftSpace();
     Object::writeReference(out, mec_);
-    out.writeUInt16(prime_);
-    for ( int d = 1; d < 4; ++d )
-        out.writeFloat(coef_[d]);
+    if ( mec_ )
+    {
+        out.writeUInt16(prime_);
+        for ( int d = 1; d < 4; ++d )
+            out.writeFloat(coef_[d]);
+    }
 }
 
 
@@ -201,16 +204,24 @@ void Interpolation4::read(Inputter& in, Simul& sim)
 {
     ObjectTag g;
     mec_ = Simul::toMecable(sim.readReference(in, g));
-    prime_ = in.readUInt16();
     
-    for ( int d = 1; d < 4; ++d )
-        coef_[d] = in.readFloat();
-    
-    coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
-    
-    rank_ = 4;
-    while ( abs_real(coef_[rank_-1]) < REAL_EPSILON )
-        --rank_;
+#ifdef BACKWARD_COMPATIBILITY
+    if ( mec_ || in.formatID() < 55 )
+#else
+    if ( mec_ )
+#endif
+    {
+        prime_ = in.readUInt16();
+        for ( int d = 1; d < 4; ++d )
+            coef_[d] = in.readFloat();
+        // set derived variables:
+        coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
+        rank_ = 4;
+        while ((rank_ > 0) & (abs_real(coef_[rank_-1]) < REAL_EPSILON))
+            --rank_;
+    }
+    else
+        clear();
 }
 
 
