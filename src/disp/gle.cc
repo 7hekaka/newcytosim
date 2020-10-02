@@ -1086,7 +1086,8 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    inline void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
+#if ( 0 )
+    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
     {
         glNormal3f((a[0]+b[0]+c[0])/3.0f, (a[1]+b[1]+c[1])/3.0f, (a[2]+b[2]+c[2])/3.0f);
         glVertex3fv(a);
@@ -1094,55 +1095,144 @@ namespace gle
         glVertex3fv(c);
     }
     
+    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
+    {
+        printf("%2.0f, %2.0f, %2.0f,  ", a[0], a[1], a[2]);
+        printf("%2.0f, %2.0f, %2.0f,  ", b[0], b[1], b[2]);
+        printf("%2.0f, %2.0f, %2.0f,\n", c[0], c[1], c[2]);
+    }
+    
+    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
+    {
+        Vector3 A(a[0], a[1], a[2]);
+        Vector3 B(b[0], b[1], b[2]);
+        Vector3 C(c[0], c[1], c[2]);
+        Vector3 n = normalize(cross(B-A, C-A));
+        glNormal3f(n.XX, n.YY, n.ZZ);
+        glVertex3fv(a);
+        glVertex3fv(b);
+        glVertex3fv(c);
+        printf("%+9.7f,%+9.7f,%+9.7f, ", n[0], n[1], n[2]);
+        printf("%+9.7f,%+9.7f,%+9.7f, ", n[0], n[1], n[2]);
+        printf("%+9.7f,%+9.7f,%+9.7f,\n", n[0], n[1], n[2]);
+    }
+
+    void icoFace(GLfloat* pts, size_t a, size_t b, size_t c)
+    {
+        icoFace(pts+3*a, pts+3*b, pts+3*c);
+    }
+
     void gleIcosahedron1()
     {
-        const GLfloat tau=0.8506508084f;      /* t=(1+std::sqrt(5))/2, tau=t/std::sqrt(1+t^2)  */
-        const GLfloat one=0.5257311121f;      /* one=1/std::sqrt(1+t^2) , unit sphere     */
-        
+        constexpr GLfloat T = 0.8506508084f;      // (1 + sqrt(5))/2
+        constexpr GLfloat O = 0.5257311121f;      // 1 / sqrt(1+T^2)
+
         /* Twelve vertices of icosahedron on unit sphere */
         GLfloat pts[] = {
-            +tau,  one,    0 , // 0
-            -tau, -one,    0 , // 1
-            -tau,  one,    0 , // 2
-            +tau, -one,    0 , // 3
-            +one,   0 ,  tau , // 4
-            -one,   0 , -tau , // 5
-            +one,   0 , -tau , // 6
-            -one,   0 ,  tau , // 7
-            0   ,  tau,  one , // 8
-            0   , -tau, -one , // 9
-            0   , -tau,  one , // 10
-            0   ,  tau, -one };// 11
+            +T,  O,  0, // 0
+            -T, -O,  0, // 1
+            -T,  O,  0, // 2
+            +T, -O,  0, // 3
+            +O,  0,  T, // 4
+            -O,  0, -T, // 5
+            +O,  0, -T, // 6
+            -O,  0,  T, // 7
+             0,  T,  O, // 8
+             0, -T, -O, // 9
+             0, -T,  O, // 10
+             0,  T, -O  // 11
+        };
         
         /* The faces are ordered with increasing Z */
         glBegin(GL_TRIANGLES);
-        icoFace(pts+3*5, pts+3*6,  pts+3*9);
-        icoFace(pts+3*5, pts+3*11, pts+3*6);
+        icoFace(pts, 5,  6, 9);
+        icoFace(pts, 5, 11, 6);
         
-        icoFace(pts+3*6, pts+3*3,  pts+3*9);
-        icoFace(pts+3*2, pts+3*11, pts+3*5);
-        icoFace(pts+3*1, pts+3*5,  pts+3*9);
-        icoFace(pts+3*0, pts+3*6,  pts+3*11);
+        icoFace(pts, 6, 3,  9);
+        icoFace(pts, 2, 11, 5);
+        icoFace(pts, 1, 5,  9);
+        icoFace(pts, 0, 6, 11);//
         
-        icoFace(pts+3*0, pts+3*3,  pts+3*6);
-        icoFace(pts+3*1, pts+3*2,  pts+3*5);
+        icoFace(pts, 0, 3,  6);
+        icoFace(pts, 1, 2,  5);
         
-        icoFace(pts+3*1, pts+3*9,  pts+3*10);
-        icoFace(pts+3*0, pts+3*11, pts+3*8);
-        icoFace(pts+3*8, pts+3*11, pts+3*2);
-        icoFace(pts+3*9, pts+3*3,  pts+3*10);
+        icoFace(pts, 1, 9, 10);
+        icoFace(pts, 0, 11, 8);//
+        icoFace(pts, 8, 11, 2);
+        icoFace(pts, 9, 3, 10);
         
-        icoFace(pts+3*0, pts+3*4,  pts+3*3);
-        icoFace(pts+3*1, pts+3*7,  pts+3*2);
+        icoFace(pts, 0, 4,  3);
+        icoFace(pts, 1, 7,  2);
         
-        icoFace(pts+3*0, pts+3*8,  pts+3*4);
-        icoFace(pts+3*1, pts+3*10, pts+3*7);
-        icoFace(pts+3*3, pts+3*4,  pts+3*10);
-        icoFace(pts+3*7, pts+3*8,  pts+3*2);
+        icoFace(pts, 0, 8,  4);
+        icoFace(pts, 1, 10, 7);
+        icoFace(pts, 3, 4, 10);
+        icoFace(pts, 7, 8,  2);
         
-        icoFace(pts+3*4, pts+3*8,  pts+3*7);
-        icoFace(pts+3*4, pts+3*7,  pts+3*10);
+        icoFace(pts, 4, 8,  7);
+        icoFace(pts, 4, 7, 10);
         glEnd();
+    }
+#endif
+    
+    void gleIcosahedron1()
+    {
+        constexpr GLfloat T = 0.8506508084f;      // (1 + sqrt(5))/2
+        constexpr GLfloat O = 0.5257311121f;      // 1 / sqrt(1+T^2)
+        
+        constexpr GLfloat pts[] = {
+             -O,  0, -T,   O,  0, -T,   0, -T, -O,
+             -O,  0, -T,   0,  T, -O,   O,  0, -T,
+              O,  0, -T,   T, -O,  0,   0, -T, -O,
+             -T,  O,  0,   0,  T, -O,  -O,  0, -T,
+             -T, -O,  0,  -O,  0, -T,   0, -T, -O,
+              T,  O,  0,   O,  0, -T,   0,  T, -O,
+              T,  O,  0,   T, -O,  0,   O,  0, -T,
+             -T, -O,  0,  -T,  O,  0,  -O,  0, -T,
+             -T, -O,  0,   0, -T, -O,   0, -T,  O,
+              T,  O,  0,   0,  T, -O,   0,  T,  O,
+              0,  T,  O,   0,  T, -O,  -T,  O,  0,
+              0, -T, -O,   T, -O,  0,   0, -T,  O,
+              T,  O,  0,   O,  0,  T,   T, -O,  0,
+             -T, -O,  0,  -O,  0,  T,  -T,  O,  0,
+              T,  O,  0,   0,  T,  O,   O,  0,  T,
+             -T, -O,  0,   0, -T,  O,  -O,  0,  T,
+              T, -O,  0,   O,  0,  T,   0, -T,  O,
+             -O,  0,  T,   0,  T,  O,  -T,  O,  0,
+              O,  0,  T,   0,  T,  O,  -O,  0,  T,
+              O,  0,  T,  -O,  0,  T,   0, -T,  O,
+        };
+        
+        constexpr GLfloat dir[] = {
+            +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724,
+            +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724,
+            +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503,
+            -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503,
+            -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503,
+            +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503,
+            +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221,
+            -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221,
+            -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000,
+            +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000,
+            -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000,
+            +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000,
+            +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221,
+            -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221,
+            +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503,
+            -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503,
+            +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503,
+            -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503,
+            +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724,
+            +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724,
+        };
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glNormalPointer(GL_FLOAT, 0, dir);
+        glDrawArrays(GL_TRIANGLES, 0, 60);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
     }
     
     //-----------------------------------------------------------------------

@@ -21,9 +21,9 @@ class Display2 : public Display
     
     /// draw a point
     void drawPoint(Vector const&, PointDisp const*) const;
-
-    /// draw a cube
-    void drawCube(Vector const&, PointDisp const*) const;
+    
+    /// draw primitive at given position
+    void drawObject(Vector const&, PointDisp const*, void (*obj)()) const;
 
 public:
     

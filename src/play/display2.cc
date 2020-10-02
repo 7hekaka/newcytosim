@@ -158,18 +158,17 @@ inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp) const
 }
 
 
-inline void Display2::drawCube(Vector const& pos, PointDisp const* disp) const
+inline void Display2::drawObject(Vector const& pos, PointDisp const* disp, void(*obj)()) const
 {
     if ( disp->perceptible )
     {
         glPushMatrix();
         gle::gleTranslate(pos);
         gle::gleScale(disp->size*sFactor);
-        gle::gleCube1();
+        obj();
         glPopMatrix();
     }
 }
-
 
 
 //------------------------------------------------------------------------------
@@ -248,7 +247,7 @@ void Display2::drawSolid(Solid const& obj)
             if ( obj.radius(p) > 0 )
                 drawPoint(obj.posP(p), disp);
             else
-                drawCube(obj.posP(p), disp);
+                drawObject(obj.posP(p), disp, gle::gleCube1);
         }
     }
     

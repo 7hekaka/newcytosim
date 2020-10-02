@@ -28,9 +28,10 @@ private:
     /// draw a point with a small sphere
     void drawPoint(Vector const&, float) const;
     
-    /// draw a cube
-    void drawCube(Vector const&, PointDisp const*) const;
+    /// draw primitive at given position
+    void drawObject(Vector const&, PointDisp const*, void (*obj)()) const;
 
+    
     /// draw a point with a small sphere
     inline void drawHand(Vector const& p, PointDisp const* d) const
     { d->color.load_both(); drawPoint(p, d); }

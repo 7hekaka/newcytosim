@@ -169,7 +169,6 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
         gleTranslate(pos);
         gleScale(disp->size*sFactor);
         gleSphere1B();
-        
 #if ( 0 )
         if ( disp->symbol )
         {
@@ -186,18 +185,17 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
 }
 
 
-inline void Display3::drawCube(Vector const& pos, PointDisp const* disp) const
+inline void Display3::drawObject(Vector const& pos, PointDisp const* disp, void(*obj)()) const
 {
     if ( disp->perceptible )
     {
         glPushMatrix();
         gle::gleTranslate(pos);
         gle::gleScale(disp->size*sFactor);
-        gle::gleCube1();
+        obj();
         glPopMatrix();
     }
 }
-
 
 
 void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
@@ -930,7 +928,7 @@ void Display3::drawSolid(Solid const& obj)
             if ( obj.radius(p) > 0 )
                 drawPoint(obj.posP(p), disp);
             else
-                drawCube(obj.posP(p), disp);
+                drawObject(obj.posP(p), disp, gle::gleCube1);
         }
     }
     
@@ -1145,7 +1143,10 @@ void Display3::drawSinglesF(SingleSet const& set) const
             }
         }
 #endif
-        drawPoint(obj->posFoot(), obj->disp());
+        if ( obj->base() )
+            drawObject(obj->posFoot(), obj->disp(), gle::gleIcosahedron1);
+        else
+            drawPoint(obj->posFoot(), obj->disp());
     }
 }
 
@@ -1158,12 +1159,12 @@ void Display3::drawSinglesA(SingleSet const& set) const
         {
             const PointDisp * disp = obj->disp();
             Vector ph = obj->posHand();
-            
+            disp->color.load_both();
+
             if ( obj->hasForce() && disp->width > 0 )
             {
                 Vector pf = obj->posFoot();
                 if ( modulo ) modulo->fold(pf, ph);
-                disp->color2.load_both();
 #if ( 0 )
                 if ( obj->disp()->style == 2 )
                 {
@@ -1172,7 +1173,9 @@ void Display3::drawSinglesA(SingleSet const& set) const
                     {
                         /// draw a disc tangent to the Space:
                         Vector dir = spc->normalToEdge(pf);
+                        disp->color2.load_both();
                         gleObject(pf, dir, disp->size*sFactor, gleDisc);
+                        disp->color.load_both();
                     }
                 }
 #endif
@@ -1182,9 +1185,10 @@ void Display3::drawSinglesA(SingleSet const& set) const
                 gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
             }
-            
-            disp->color.load_both();
-            drawPoint(ph, disp);
+            if ( obj->base() )
+                drawObject(ph, disp, gle::gleIcosahedron1);
+            else
+                drawPoint(ph, disp);
         }
     }
 }
