@@ -224,18 +224,24 @@ void View::setLights(bool local) const
     GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat lModelAmbient[] = { 0.4f, 0.4f, 0.4f, 1.0f };
     
-    GLfloat light0Pos[] = { 5.0f, -3.0f, 3.0f, 0.0f };
-    glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
+    GLfloat light0[] = { 0.577f, -0.577f, 0.577f, 0.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, light0);
     glLightfv(GL_LIGHT0, GL_DIFFUSE,  lightDiffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
     glEnable(GL_LIGHT0);
     
-    GLfloat light1Pos[] = {-4.0f, 0.0f, -3.0f, 0.0f };
-    glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
+    GLfloat light1[] = {-0.7f, 0.0f, -0.7f, 0.0f };
+    glLightfv(GL_LIGHT1, GL_POSITION, light1);
     glLightfv(GL_LIGHT1, GL_DIFFUSE,  lightDiffuse);
     glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular);
     glEnable(GL_LIGHT1);
-    
+    /*
+    GLfloat light2[] = { 0.0f, 0.0f, -1.0f, 0.0f };
+    glLightfv(GL_LIGHT2, GL_POSITION, light2);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE,  lightDiffuse);
+    glLightfv(GL_LIGHT2, GL_SPECULAR, lightSpecular);
+    glEnable(GL_LIGHT2);
+     */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lModelAmbient);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);

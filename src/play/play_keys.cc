@@ -58,15 +58,17 @@ void setWidth(PointDisp * p, GLfloat s)
     }
 }
 
-void scaleSize(PointDisp * p, int s)
+void changeSize(PointDisp * p, int inc)
 {
+    GLfloat s = grained(p->size, inc);
+    if ( s > 16 )
+        s = 0.5;
     if ( s > 0 )
     {
-        p->size *= s;
-        if ( p->size > 16 )
-            p->size = 0.5;
-        p->width = p->size / 2;
-        flashText("%s:size = %.2f", p->name_str(), p->size);
+        real w = p->width;
+        p->size = s;
+        p->width *= s / w;
+        flashText("%s:size = %.2f", p->name_str(), s);
     }
 }
 
@@ -88,28 +90,6 @@ void setPointDisp(PropertyList const& plist, void(*func)(PointDisp*, int), int v
     for ( Property * i : plist )
         if ( toPointDisp(i)->visible )
             func(toPointDisp(i), val);
-}
-
-
-PointDisp * nextPointDisp(PropertyList const& plist, int& cnt)
-{
-    PointDisp* one = nullptr;
-    cnt = 0;
-    // find first one which is visible:
-    for ( PropertyList::const_iterator i = plist.begin(); i < plist.end(); ++i )
-    {
-        PointDisp * dsp = toPointDisp(*i);
-        if ( dsp->visible )
-        {
-            ++cnt;
-            // choose follower:
-            if ( i+1 < plist.end() )
-                one = toPointDisp(*(i+1));
-            else
-                one = nullptr;
-        }
-    }
-    return one;
 }
 
 
@@ -153,6 +133,28 @@ void setPointDispVisible(PropertyList const& plist, int val)
 }
 
 
+PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
+{
+    PointDisp* one = nullptr;
+    cnt = 0;
+    // find first one which is visible:
+    for ( PropertyList::const_iterator i = plist.begin(); i < plist.end(); ++i )
+    {
+        PointDisp * dsp = toPointDisp(*i);
+        if ( dsp->visible )
+        {
+            ++cnt;
+            // choose follower:
+            if ( i+1 < plist.end() )
+                one = toPointDisp(*(i+1));
+            else
+                one = nullptr;
+        }
+    }
+    return one;
+}
+
+
 void shufflePointDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
@@ -164,22 +166,31 @@ void shufflePointDispVisible(const PropertyList& plist, int val)
     }
     else
     {
-        int cnt = 0;
-        PointDisp * p = nextPointDisp(plist, cnt);
-        
+        size_t cnt = 0;
+        PointDisp * p = nextVisiblePointDisp(plist, cnt);
+
         if ( cnt > 1 )
+        {
+            setPointDispVisible(plist, 0);
             p = toPointDisp(plist.front());
-        
-        if ( p )
+            p->visible = val;
+            flashText("Only `%s' is visible", p->name_str());
+        }
+        else if ( p != nullptr )
         {
             setPointDispVisible(plist, 0);
             p->visible = val;
             flashText("Only `%s' is visible", p->name_str());
         }
+        else if ( cnt == 1 )
+        {
+            setPointDispVisible(plist, 0);
+            flashText("All hidden");
+        }
         else
         {
             setPointDispVisible(plist, val);
-            flashText("All are visible");
+            flashText("All visible");
         }
     }
 }
@@ -350,6 +361,14 @@ void changePointStyle(FiberDisp* p, int)
     }
 }
 
+void toggleLineStyle(FiberDisp* p, int)
+{
+    p->line_style = ! p->line_style;
+    if ( p->line_style )
+        flashText("Fibers: lines");
+    else
+        flashText("Fibers: no lines");
+}
 
 void changeLineStyle(FiberDisp* p, int)
 {
@@ -513,7 +532,14 @@ PointDisp * findVisibleFiberDisp(PropertyList const& plist, int& cnt)
 }
 
 
-FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, int& cnt)
+void setFiberDispVisible(PropertyList const& plist, int val)
+{
+    for ( Property * i : plist )
+        toFiberDisp(i)->visible = val;
+}
+
+
+FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 {
     FiberDisp* one = nullptr;
     cnt = 0;
@@ -535,37 +561,42 @@ FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, int& cnt)
 }
 
 
-void setFiberDispVisible(PropertyList const& plist, int val)
-{
-    for ( Property * i : plist )
-        toFiberDisp(i)->visible = val;
-}
-
-
 void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
+    if ( plist.empty() )
+        flashText("no relevant object");
+    
     if ( plist.size() == 1 )
     {
         flipVisible(toFiberDisp(plist.front()), val);
     }
     else
     {
-        int cnt = 0;
+        size_t cnt = 0;
         FiberDisp * p = nextVisibleFiberDisp(plist, cnt);
         
         if ( cnt > 1 )
+        {
+            setFiberDispVisible(plist, 0);
             p = toFiberDisp(plist.front());
-        
-        if ( p )
+            p->visible = val;
+            flashText("Only `%s' is visible", p->name_str());
+        }
+        else if ( p != nullptr )
         {
             setFiberDispVisible(plist, 0);
             p->visible = val;
             flashText("Only `%s' is visible", p->name_str());
         }
+        else if ( cnt == 1 )
+        {
+            setFiberDispVisible(plist, 0);
+            flashText("All hidden");
+        }
         else
         {
             setFiberDispVisible(plist, val);
-            flashText("All fibers are visible");
+            flashText("All visible");
         }
     }
 }
@@ -885,6 +916,10 @@ void processKey(unsigned char key)
             setFiberDisp(player.allVisibleFiberDisp(), changeColoring, 0);
             break;
             
+        case 167:
+            setFiberDisp(player.allVisibleFiberDisp(), toggleLineStyle, 0);
+            break;
+            
         case '1':
             if ( altKeyDown )
                 setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 0);
@@ -898,24 +933,24 @@ void processKey(unsigned char key)
             
         case '2':
             if ( altKeyDown)
-                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -2);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -1);
             else
-                setFiberDisp(player.allVisibleFiberDisp(), changeSize, -2);
+                setFiberDisp(player.allVisibleFiberDisp(), changeSize, -1);
             break;
 
         case '@':
-            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, -2);
+            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, -1);
             break;
 
         case '3':
             if ( altKeyDown)
-                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 2);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
             else
-                setFiberDisp(player.allVisibleFiberDisp(), changeSize, 2);
+                setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
             break;
             
         case '#':
-            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, 2);
+            setFiberDisp(player.allVisibleFiberDisp(), changeEndSize, 1);
             break;
             
         case '$':
@@ -943,7 +978,7 @@ void processKey(unsigned char key)
             break;
         
         case '%':
-            setPointDisp(player.allSphereDisp(), scaleSize, 2);
+            setPointDisp(player.allSphereDisp(), changeSize, 2);
             break;
             
         //------------------------ Single/Couple + Hands -----------------------
@@ -958,8 +993,12 @@ void processKey(unsigned char key)
                 changeSingleSelect();
             break;
             
-        case '&': case '^':
+        case '&':
             shufflePointDispVisible(player.allSpaceDisp(), 3);
+            break;
+            
+        case '^':
+            shufflePointDispVisible(player.allSpaceDisp(), 1);
             break;
 
         case '7':
