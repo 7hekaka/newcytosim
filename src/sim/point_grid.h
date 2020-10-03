@@ -232,29 +232,38 @@ private:
 private:
     
     /// check two Spheres
-    void checkPP(Meca&, StericParam const&, FatPoint const&, FatPoint const&) const;
+    static void checkPP(Meca&, StericParam const&, FatPoint const&, FatPoint const&);
     
     /// check Sphere against Line segment
-    void checkPL(Meca&, StericParam const&, FatPoint const&, FatLocus const&) const;
+    static void checkPL(Meca&, StericParam const&, FatPoint const&, FatLocus const&);
     
     /// check Line segment against Sphere
-    void checkLL1(Meca&, StericParam const&, FatLocus const&, FatLocus const&) const;
+    static void checkLL1(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
     
     /// check Line segment against Sphere
-    void checkLL2(Meca&, StericParam const&, FatLocus const&, FatLocus const&) const;
+    static void checkLL2(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
     
     /// check two Line segments
-    void checkLL(Meca&, StericParam const&, FatLocus const&, FatLocus const&) const;
+    static void checkLL(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
     
-    /// check all interacting pairs between the two lists
-    void setInteractions(Meca&, StericParam const&,
-                         FatPointList &, FatLocusList &) const;
+    /// check all pairs between the two lists
+    static void setInteractions(Meca&, StericParam const&,
+                                FatPointList &, FatLocusList &);
     
-    /// check all interacting pairs between the two lists
-    void setInteractions(Meca&, StericParam const&,
-                         FatPointList &, FatLocusList &,
-                         FatPointList &, FatLocusList &) const;
+    /// check all pairs between the two lists
+    static void setInteractions(Meca&, StericParam const&,
+                                FatPointList &, FatLocusList &,
+                                FatPointList &, FatLocusList &);
     
+    /// check all pairs between two lists, checking center-to-center distance
+    static void setInteractions(Meca&, StericParam const&, real sup,
+                                FatPointList &, FatLocusList &);
+    
+    /// check all pairs between two lists, checking center-to-center distance
+    static void setInteractions(Meca&, StericParam const&, real sup,
+                                FatPointList &, FatLocusList &,
+                                FatPointList &, FatLocusList &);
+
 #if ( N_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
@@ -351,7 +360,7 @@ public:
     }
     
     /// enter interactions into Meca with given stiffness
-    void setInteractions(Meca&, StericParam const& pam) const;
+    void setInteractions(Meca&, StericParam const&) const;
     
 #else
     
@@ -362,10 +371,10 @@ public:
     void add(size_t pane, FiberSegment const&, real radius, real extra_range) const;
     
     /// enter interactions into Meca in one panes with given parameters
-    void setInteractions(Meca&, StericParam const& pam, size_t pan) const;
+    void setInteractions(Meca&, StericParam const&, size_t pan) const;
     
     /// enter interactions into Meca between two panes with given parameters
-    void setInteractions(Meca&, StericParam const& pam, size_t pan1, size_t pan2) const;
+    void setInteractions(Meca&, StericParam const&, size_t pan1, size_t pan2) const;
     
 #endif
     

@@ -128,7 +128,7 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Steric functions
+#pragma mark - Check two Objects: P = Point; L = Line segment
 
 
 /**
@@ -139,7 +139,7 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
  sum of their radiuses.
  */
 void PointGrid::checkPP(Meca& meca, StericParam const& pam,
-                        FatPoint const& aa, FatPoint const& bb) const
+                        FatPoint const& aa, FatPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << std::endl;
     const real len = aa.radius + bb.radius;
@@ -160,7 +160,7 @@ void PointGrid::checkPP(Meca& meca, StericParam const& pam,
  The force is applied if the objects are closer than the sum of their radiuses.
  */
 void PointGrid::checkPL(Meca& meca, StericParam const& pam,
-                        FatPoint const& aa, FatLocus const& bb) const
+                        FatPoint const& aa, FatLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << std::endl;
     const real len = aa.radius + bb.radius;
@@ -212,7 +212,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
-                         FatLocus const& aa, FatLocus const& bb) const
+                         FatLocus const& aa, FatLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << std::endl;
     const real ran = aa.range + bb.radius;
@@ -283,7 +283,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
-                         FatLocus const& aa, FatLocus const& bb) const
+                         FatLocus const& aa, FatLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << std::endl;
     const real ran = aa.range + bb.radius;
@@ -359,7 +359,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
  in 2D, only the vertices are checked.
  */
 void PointGrid::checkLL(Meca& meca, StericParam const& pam,
-                        FatLocus const& aa, FatLocus const& bb) const
+                        FatLocus const& aa, FatLocus const& bb)
 {
 #if ( DIM == 3 )
     
@@ -394,43 +394,29 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Check all possible object pairs from two Cells
 
 
 /**
  This will consider once all pairs of objects from the given lists
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                FatPointList & fpl, FatLocusList & fll) const
+void PointGrid::setInteractions(Meca& meca, StericParam const& stiff,
+                                FatPointList & fpl, FatLocusList & fll)
 {
     for ( FatPoint* ii = fpl.begin(); ii < fpl.end(); ++ii )
     {
         for ( FatPoint* jj = ii+1; jj < fpl.end(); ++jj )
-            checkPP(meca, pam, *ii, *jj);
+            checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocus* kk = fll.begin(); kk < fll.end(); ++kk )
-            checkPL(meca, pam, *ii, *kk);
+            checkPL(meca, stiff, *ii, *kk);
     }
-    
-    if ( isPeriodic() )
+
+    for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
     {
-        for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
-        {
-            for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
-                if ( !adjacent(ii->seg, jj->seg) )
-                    checkLL(meca, pam, *ii, *jj);
-        }
-    }
-    else
-    {
-        const real sup = square(max_diameter);
-        for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
-        {
-            Vector pos = ii->pos;
-            for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
-                if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
-                    checkLL(meca, pam, *ii, *jj);
-        }
+        for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
+            if ( !adjacent(ii->seg, jj->seg) )
+                checkLL(meca, stiff, *ii, *jj);
     }
 }
 
@@ -441,7 +427,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
                                 FatPointList & fpl1, FatLocusList & fll1,
-                                FatPointList & fpl2, FatLocusList & fll2) const
+                                FatPointList & fpl2, FatLocusList & fll2)
 {
     assert_true( &fpl1 != &fpl2 );
     assert_true( &fll1 != &fll2 );
@@ -455,33 +441,95 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             checkPL(meca, pam, *ii, *kk);
     }
     
-    if ( isPeriodic() )
+    for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
     {
-        for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+            checkPL(meca, pam, *jj, *ii);
+        
+        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
         {
-            for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
-                checkPL(meca, pam, *jj, *ii);
-            
-            for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
-                if ( !adjacent(ii->seg, kk->seg)  )
-                    checkLL(meca, pam, *ii, *kk);
-        }
-    }
-    else
-    {
-        const real sup = square(max_diameter);
-        for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
-        {
-            for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
-                checkPL(meca, pam, *jj, *ii);
-            
-            Vector pos = ii->pos;
-            for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
-                if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
-                    checkLL(meca, pam, *ii, *kk);
+            if ( !adjacent(ii->seg, kk->seg)  )
+                checkLL(meca, pam, *ii, *kk);
         }
     }
 }
+
+
+/**
+ This will consider once all pairs of objects from the given lists
+ Compared to `setInteractions()`, this performs an additional test
+ for the distance between the object's `pos` is below `max_diameter`
+ */
+void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
+                                FatPointList & fpl, FatLocusList & fll)
+{
+    for ( FatPoint* ii = fpl.begin(); ii < fpl.end(); ++ii )
+    {
+        Vector pos = ii->pos;
+        for ( FatPoint* jj = ii+1; jj < fpl.end(); ++jj )
+            if ( distanceSqr(pos, jj->pos) <= sup )
+                checkPP(meca, pam, *ii, *jj);
+        
+        for ( FatLocus* kk = fll.begin(); kk < fll.end(); ++kk )
+            if ( distanceSqr(pos, kk->pos) <= sup )
+                checkPL(meca, pam, *ii, *kk);
+    }
+
+    for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
+    {
+        Vector pos = ii->pos;
+        for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
+            if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
+                checkLL(meca, pam, *ii, *jj);
+    }
+}
+
+
+/**
+ This will consider once all pairs of objects from the given lists,
+ assuming that the list are different and no object is repeated.
+
+ Compared to `setInteractions()`, this performs an additional test
+ for the distance between the object's `pos` is below `max_diameter`
+ */
+void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
+                                FatPointList & fpl1, FatLocusList & fll1,
+                                FatPointList & fpl2, FatLocusList & fll2)
+{
+    assert_true( &fpl1 != &fpl2 );
+    assert_true( &fll1 != &fll2 );
+
+    for ( FatPoint* ii = fpl1.begin(); ii < fpl1.end(); ++ii )
+    {
+        const Vector pos = ii->pos;
+
+        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+            if ( distanceSqr(pos, jj->pos) <= sup )
+                checkPP(meca, pam, *ii, *jj);
+        
+        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+            if ( distanceSqr(pos, kk->pos) <= sup )
+                checkPL(meca, pam, *ii, *kk);
+    }
+    
+    for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+    {
+        const Vector pos = ii->pos;
+
+        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+            if ( distanceSqr(pos, jj->pos) <= sup )
+                checkPL(meca, pam, *jj, *ii);
+        
+        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+        {
+            if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
+                checkLL(meca, pam, *ii, *kk);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Check all pairs of Cells
 
 
 #if ( N_STERIC_PANES == 1 )
@@ -505,14 +553,28 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
         FatPointList & baseP = point_list(inx);
         FatLocusList & baseL = locus_list(inx);
         
-        setInteractions(meca, pam, baseP, baseL);
-        
-        for ( int reg = 1; reg < nr; ++reg )
+        if ( isPeriodic() )
         {
-            FatPointList & sideP = point_list(inx+region[reg]);
-            FatLocusList & sideL = locus_list(inx+region[reg]);
+            setInteractions(meca, pam, baseP, baseL);
             
-            setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                FatPointList & sideP = point_list(inx+region[reg]);
+                FatLocusList & sideL = locus_list(inx+region[reg]);
+                setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+            }
+        }
+        else
+        {
+            const real sup = square(max_diameter);
+            setInteractions(meca, pam, sup, baseP, baseL);
+            
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                FatPointList & sideP = point_list(inx+region[reg]);
+                FatLocusList & sideL = locus_list(inx+region[reg]);
+                setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
+            }
         }
     }
 }
@@ -524,7 +586,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
  Check interactions between the FatPoints contained in Pane `pan`.
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                 const size_t pan) const
+                                const size_t pan) const
 {
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
@@ -538,14 +600,28 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         FatPointList & baseP = point_list(inx, pan);
         FatLocusList & baseL = locus_list(inx, pan);
         
-        setInteractions(meca, pam, baseP, baseL);
-        
-        for ( int reg = 1; reg < nr; ++reg )
+        if ( isPeriodic() )
         {
-            FatPointList & sideP = point_list(inx+region[reg], pan);
-            FatLocusList & sideL = locus_list(inx+region[reg], pan);
+            setInteractions(meca, pam, baseP, baseL);
             
-            setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                FatPointList & sideP = point_list(inx+region[reg], pan);
+                FatLocusList & sideL = locus_list(inx+region[reg], pan);
+                setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+            }
+        }
+        else
+        {
+            const real sup = square(max_diameter);
+            setInteractions(meca, pam, sup, baseP, baseL);
+            
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                FatPointList & sideP = point_list(inx+region[reg], pan);
+                FatLocusList & sideL = locus_list(inx+region[reg], pan);
+                setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
+            }
         }
     }
 }
@@ -572,24 +648,46 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         FatPointList & baseP = point_list(inx, pan1);
         FatLocusList & baseL = locus_list(inx, pan1);
         
-        for ( int reg = 0; reg < nr; ++reg )
+        if ( isPeriodic() )
         {
-            FatPointList & sideP = point_list(inx+region[reg], pan2);
-            FatLocusList & sideL = locus_list(inx+region[reg], pan2);
+            for ( int reg = 0; reg < nr; ++reg )
+            {
+                FatPointList & sideP = point_list(inx+region[reg], pan2);
+                FatLocusList & sideL = locus_list(inx+region[reg], pan2);
+                setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+            }
             
-            setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+            FatPointList & baseP2 = point_list(inx, pan2);
+            FatLocusList & baseL2 = locus_list(inx, pan2);
+            
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                FatPointList & sideP = point_list(inx+region[reg], pan1);
+                FatLocusList & sideL = locus_list(inx+region[reg], pan1);
+                setInteractions(meca, pam, baseP2, baseL2, sideP, sideL);
+            }
         }
-        
-        FatPointList & baseP2 = point_list(inx, pan2);
-        FatLocusList & baseL2 = locus_list(inx, pan2);
-        
-        for ( int reg = 1; reg < nr; ++reg )
+        else
         {
-            FatPointList & sideP = point_list(inx+region[reg], pan1);
-            FatLocusList & sideL = locus_list(inx+region[reg], pan1);
+            const real sup = square(max_diameter);
+            for ( int reg = 0; reg < nr; ++reg )
+            {
+                FatPointListF & sideP = point_list(inx+region[reg], pan2);
+                FatLocusListF & sideL = locus_list(inx+region[reg], pan2);
+                setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
+            }
+
+            FatPointListF & baseP2 = point_list(inx, pan2);
+            FatLocusListF & baseL2 = locus_list(inx, pan2);
             
-            setInteractions(meca, pam, baseP2, baseL2, sideP, sideL);
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                FatPointListF & sideP = point_list(inx+region[reg], pan1);
+                FatLocusListF & sideL = locus_list(inx+region[reg], pan1);
+                setInteractions(meca, pam, sup, baseP2, baseL2, sideP, sideL);
+            }
         }
+
     }
 }
 

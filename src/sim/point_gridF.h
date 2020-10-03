@@ -104,7 +104,7 @@ typedef Array<FatLocusF> FatLocusListF;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
-#define MAX_STERIC_PANES 1
+#define MAX_STERIC_PANES 2
 
 
 /// a set of lists associated with the same location
@@ -209,29 +209,38 @@ private:
 private:
     
     /// check two Spheres
-    void checkPP(Meca&, real stiff, FatPointF const&, FatPointF const&) const;
+    static void checkPP(Meca&, real stiff, FatPointF const&, FatPointF const&);
     
     /// check Sphere against Line segment
-    void checkPL(Meca&, real stiff, FatPointF const&, FatLocusF const&) const;
+    static void checkPL(Meca&, real stiff, FatPointF const&, FatLocusF const&);
     
     /// check Line segment against Sphere
-    void checkLL1(Meca&, real stiff, FatLocusF const&, FatLocusF const&) const;
+    static void checkLL1(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
     
     /// check Line segment against Sphere
-    void checkLL2(Meca&, real stiff, FatLocusF const&, FatLocusF const&) const;
+    static void checkLL2(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
     
     /// check two Line segments
-    void checkLL(Meca&, real stiff, FatLocusF const&, FatLocusF const&) const;
+    static void checkLL(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
     
-    /// check all interacting pairs between the two lists
-    void setInteractions(Meca&, real stiff,
-                         FatPointListF &, FatLocusListF &) const;
+    /// check all pairs between the two lists
+    static void setInteractions(Meca&, real stiff,
+                                FatPointListF &, FatLocusListF &);
     
-    /// check all interacting pairs between the two lists
-    void setInteractions(Meca&, real stiff,
-                         FatPointListF &, FatLocusListF &,
-                         FatPointListF &, FatLocusListF &) const;
+    /// check all pairs between the two lists
+    static void setInteractions(Meca&, real stiff,
+                                FatPointListF &, FatLocusListF &,
+                                FatPointListF &, FatLocusListF &);
     
+    /// check all pairs between the two lists, checking center-to-center distance
+    static void setInteractions(Meca&, real stiff, real sup,
+                                FatPointListF &, FatLocusListF &);
+    
+    /// check all pairs between the two lists, checking center-to-center distance
+    static void setInteractions(Meca&, real stiff, real sup,
+                                FatPointListF &, FatLocusListF &,
+                                FatPointListF &, FatLocusListF &);
+
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
