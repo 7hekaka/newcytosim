@@ -207,7 +207,7 @@ void Simul::setStericInteractions(Meca& meca) const
 
 #else
     
-    // add steric interactions between different panes:
+    // add steric interactions within each pane:
     for ( size_t p = 1; p <= N_STERIC_PANES; ++p )
         pointGrid.setInteractions(meca, pam, p);
 
@@ -321,7 +321,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
 
 #else
     
-    // add steric interactions between different panes:
+    // add steric interactions within each pane:
     for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
         pointGridF.setInteractions(meca, stiff, p);
 
