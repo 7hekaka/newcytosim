@@ -618,7 +618,7 @@ void helpKeys(std::ostream& os)
     os << "   ALT-SPACE   Reset view (i.e. zoom, translation, rotation)\n";
     os << "   f F         Toggle full-screen mode; maximize window size\n";
     os << "   i v b       Invert colors; toggle slice view; toggle scale bar\n";
-    os << "   l L         Read parameter file; Print display parameters\n";
+    os << "   l k         Read parameter file; Print display parameters\n";
     os << "   r R         Report various informations on display window\n";
 #if ENABLE_WRITE
     os << "   y Y         Save current image; Play and save all images\n";
@@ -702,7 +702,25 @@ void processKey(unsigned char key)
 #endif
 
         //------------------------- Global controls ----------------------------
-        
+       
+        case 'j':
+#if DRAW_MECA_LINKS
+            disp.draw_links = !disp.draw_links;
+            flashText("draw_links = %i", disp.draw_links);
+#endif
+            break;
+            
+        case 'k':
+        {
+            if ( altKeyDown )
+                thread.writeProperties(std::cout, true);
+            else
+            {
+                player.writePlayParameters(std::cout, true);
+                player.writeDisplayParameters(std::cout, true);
+            }
+        } break;
+            
         case 'l': {
             try {
                 std::string file = simul.prop->config_file;
@@ -711,17 +729,6 @@ void processKey(unsigned char key)
             }
             catch( Exception & e ) {
                 flashText("Error in config: %s", e.c_str());
-            }
-        } break;
-
-        case 'L':
-        {
-            if ( altKeyDown )
-                thread.writeProperties(std::cout, true);
-            else
-            {
-                player.writePlayParameters(std::cout, true);
-                player.writeDisplayParameters(std::cout, true);
             }
         } break;
             
@@ -984,13 +991,7 @@ void processKey(unsigned char key)
         //------------------------ Single/Couple + Hands -----------------------
            
         case '6':
-            if ( altKeyDown )
-            {
-                disp.draw_links = !disp.draw_links;
-                flashText("draw_links = %i", disp.draw_links);
-            }
-            else
-                changeSingleSelect();
+            changeSingleSelect();
             break;
             
         case '&':
