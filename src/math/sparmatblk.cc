@@ -415,11 +415,11 @@ void SparMatBlk::Line::print(std::ostream& os) const
 class alignas(4*sizeof(real)) SparMatBlk::Element
 {
 public:
+    /// block element
+    Block blk;
+
     /// index
     size_t inx;
-
-    /// block element
-    SparMatBlk::Block blk;
 };
 
 

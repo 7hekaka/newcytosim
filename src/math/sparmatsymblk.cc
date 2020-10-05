@@ -522,11 +522,11 @@ void SparMatSymBlk::Column::print(std::ostream& os) const
 class alignas(4*sizeof(real)) SparMatSymBlk::Element
 {
 public:
-    /// index
-    size_t inx;
-
     /// block element
     Block blk;
+
+    /// index
+    size_t inx;
 };
 
 
@@ -551,7 +551,7 @@ void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
         tmp[i].inx = inx_[i];
     }
     
-    //std::clog << "sizeof(Element) " << sizeof(Element) << "\n";
+    //std::clog << "sizeof(SparMatSymBlk::Element) " << sizeof(Element) << "\n";
     qsort(tmp+1, size_-1, sizeof(Element), &compareSMSBElement);
     
     for ( size_t i = 1; i < size_; ++i )
