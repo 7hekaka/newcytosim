@@ -240,7 +240,7 @@ private:
     /// check Line segment against Sphere
     static void checkLL1(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
     
-    /// check Line segment against Sphere
+    /// check Line segment against the terminal Sphere of a Fiber
     static void checkLL2(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
     
     /// check two Line segments

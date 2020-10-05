@@ -116,22 +116,22 @@ public:
 
     /// Human friendly ouput
     void         print(std::ostream&) const;
-
-    /// true if segments are adjacent on the same fiber
-    /** This is used to exclude certain segment pairs from steric interactions */
-    friend bool  adjacent(FiberSegment const& a, FiberSegment const& b)
-    {
-#if FIBER_HAS_FAMILY
-        if (( a.fib_->family_==b.fib_->family_ ) & ( a.pti_ < 2 + b.pti_ ) & ( b.pti_ < 2 + a.pti_ ))
-            return true;
-#endif
-        return (( a.fib_==b.fib_ ) & ( a.pti_ < 2 + b.pti_ ) & ( b.pti_ < 2 + a.pti_ ));
-    }
 };
 
 /// print for debug purpose
 std::ostream& operator << (std::ostream&, FiberSegment const&);
 
+
+/// true if segments are adjacent on the same fiber or Tubule
+inline bool adjacent(FiberSegment const& a, FiberSegment const& b)
+{
+#if FIBER_HAS_FAMILY
+    return (( a.fiber()->family_ == b.fiber()->family_ )
+#else
+    return (( a.fiber() == b.fiber() )
+#endif
+            & ( a.point() < 2 + b.point() ) & ( b.point() < 2 + a.point() ));
+}
 
 #endif
 

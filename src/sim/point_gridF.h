@@ -217,7 +217,7 @@ private:
     /// check Line segment against Sphere
     static void checkLL1(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
     
-    /// check Line segment against Sphere
+    /// check Line segment against the terminal Sphere of a Fiber
     static void checkLL2(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
     
     /// check two Line segments

@@ -276,9 +276,8 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
 
 
 /**
- This is used to check a segment of a fiber against another segment of fiber,
- the non-terminal vertex of a fiber.
- 
+ This is used to check a segment of a fiber against the terminal vertex of fiber
+
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void PointGridF::checkLL2(Meca& meca, real stiff,
@@ -385,6 +384,12 @@ void PointGridF::checkLL(Meca& meca, real stiff,
 //------------------------------------------------------------------------------
 #pragma mark - Check all possible object pairs from two Cells
 
+/// true if two spheres are from the same object
+inline bool adjacent(FatPointF const* a, FatPointF const* b)
+{
+    // this can be true only for two spheres of the same Solid
+    return ( a->pnt.mecable() == b->pnt.mecable() );
+}
 
 /**
  This will consider once all pairs of objects from the given lists
@@ -395,7 +400,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
     for ( FatPointF* ii = fpl.begin(); ii < fpl.end(); ++ii )
     {
         for ( FatPointF* jj = ii+1; jj < fpl.end(); ++jj )
-            checkPP(meca, stiff, *ii, *jj);
+            if ( !adjacent(ii, jj) )
+                checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocusF* kk = fll.begin(); kk < fll.end(); ++kk )
             checkPL(meca, stiff, *ii, *kk);
@@ -424,7 +430,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
     for ( FatPointF* ii = fpl1.begin(); ii < fpl1.end(); ++ii )
     {
         for ( FatPointF* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
-            checkPP(meca, stiff, *ii, *jj);
+            if ( !adjacent(ii, jj) )
+                checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocusF* kk = fll2.begin(); kk < fll2.end(); ++kk )
             checkPL(meca, stiff, *ii, *kk);
@@ -456,7 +463,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
     {
         Vector pos = ii->pos;
         for ( FatPointF* jj = ii+1; jj < fpl.end(); ++jj )
-            if ( distanceSqr(pos, jj->pos) <= sup )
+            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocusF* kk = fll.begin(); kk < fll.end(); ++kk )
@@ -493,7 +500,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
         const Vector pos = ii->pos;
 
         for ( FatPointF* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
-            if ( distanceSqr(pos, jj->pos) <= sup )
+            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocusF* kk = fll2.begin(); kk < fll2.end(); ++kk )
