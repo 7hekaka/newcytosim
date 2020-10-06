@@ -94,23 +94,26 @@ void Display1::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-inline void Display1::drawBall(Vector const& pos, real radius) const
+inline void Display1::drawBall(Vector const& pos, real radius, gle_color const& col) const
 {
     glPushMatrix();
     gleTranslate(pos);
     gleScale(radius);
-    if ( DIM == 3 )
-    {
-        GLboolean cull = glIsEnabled(GL_CULL_FACE);
-        if ( !cull ) glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        gleSphere2B();
-        glCullFace(GL_BACK);
-        gleSphere4B();
-        if ( !cull ) glDisable(GL_CULL_FACE);
-    }
-    else
-        gleDiscB();
+#if ( DIM == 3 )
+    GLboolean cull = glIsEnabled(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_LIGHTING);
+    col.load_both();
+    glCullFace(GL_FRONT);
+    gleSphere2B();
+    glCullFace(GL_BACK);
+    gleSphere4B();
+    if ( !cull ) glDisable(GL_CULL_FACE);
+#else
+    glDisable(GL_LIGHTING);
+    col.load();
+    gleDiscB();
+#endif
     glPopMatrix();
 }
 
@@ -118,6 +121,7 @@ inline void Display1::drawBall(Vector const& pos, real radius) const
 /// draw a little sphere
 inline void Display1::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
+    glEnable(GL_LIGHTING);
     glPushMatrix();
     gleTranslate(pos);
     gleScale(disp->size*sFactor);
@@ -130,6 +134,7 @@ inline void Display1::drawObject(Vector const& pos, PointDisp const* disp, void(
 {
     if ( disp->perceptible )
     {
+        glEnable(GL_LIGHTING);
         glPushMatrix();
         gle::gleTranslate(pos);
         gle::gleScale(disp->size*sFactor);
@@ -175,8 +180,7 @@ void Display1::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        bodyColorT(obj);
-        drawBall(obj.position(), obj.radius());
+        drawBall(obj.position(), obj.radius(), bodyColorF(obj));
     }
 }
 
@@ -203,9 +207,10 @@ void Display1::drawSolid(Solid const& obj)
     //display outline of spheres
     if ( disp->style & 4 )
     {
-        lineWidth(disp->width);
-        bodyColor(obj);
 #if ( DIM == 2 )
+        glDisable(GL_LIGHTING);
+        lineWidth(disp->width);
+        bodyColorF(obj).load();
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
         {
             if ( obj.radius(ii) > 0 )
@@ -216,6 +221,8 @@ void Display1::drawSolid(Solid const& obj)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
             //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
+            glEnable(GL_LIGHTING);
+            bodyColor(obj);
             glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
             Vector dir = A - B;
@@ -231,7 +238,7 @@ void Display1::drawSolid(Solid const& obj)
     if ( disp->style & 8 )
     {
         char tmp[8];
-        bodyColor(obj);
+        bodyColorF(obj).load();
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
         gleDrawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
     }
@@ -240,7 +247,7 @@ void Display1::drawSolid(Solid const& obj)
     if ( disp->style & 16 )
     {
         lineWidth(disp->width);
-        bodyColor(obj);
+        bodyColorF(obj).load();
         glBegin(GL_LINE_LOOP);
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
             gleVertex(obj.posPoint(ii));
@@ -255,7 +262,7 @@ void Display1::drawSolidT(Solid const& obj, size_t inx)
 {
     const PointDisp * disp = obj.prop->disp;
 
-    if ( disp->style & 1  &&  obj.radius(inx) > 0 )
+    if (( disp->style & 1 ) & ( obj.radius(inx) > 0 ))
     {
         Vector X = obj.posP(inx);
         size_t near[3];
@@ -271,9 +278,7 @@ void Display1::drawSolidT(Solid const& obj, size_t inx)
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
-        // draw ball:
-        bodyColorT(obj);
-        drawBall(X, obj.radius(inx));
+        drawBall(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
         glDisable(GL_CLIP_PLANE5);
@@ -312,18 +317,14 @@ void Display1::drawSphereT(Sphere const& obj)
 
     if ( disp->style & 5 )
     {
-        bodyColorT(obj);
-        lineWidth(disp->width);
-        
+        bodyColorF(obj).load_both();
 #if ( DIM < 3 )
-        
+        lineWidth(disp->width);
         if ( disp->style & 1 )
             gleObject(obj.posP(0), obj.radius(), gleDiscB);
         else
             gleObject(obj.posP(0), obj.radius(), gleCircleB);
-        
 #else
-        
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         /* Note: The rotation matrix for the sphere calculated below from the
@@ -342,7 +343,6 @@ void Display1::drawSphereT(Sphere const& obj)
             gleThreeBands(64);
         }
         glPopMatrix();
-        
 #endif
     }
 }
@@ -358,14 +358,13 @@ void Display1::drawOrganizer(Organizer const& obj) const
     if ( disp->style & 2 )
     {
         Vector P, Q;
-        
         glDisable(GL_LIGHTING);
         
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
             disp->drawI(P);
 
         lineWidth(disp->width);
-        bodyColor(disp, obj.signature());
+        bodyColorF(disp, obj.signature()).load();
         glBegin(GL_LINES);
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
@@ -386,9 +385,9 @@ void Display1::drawOrganizer(Organizer const& obj) const
         Solid const* sol = Solid::toSolid(obj.core());
         if ( sol && sol->nbPoints() >= 4 )
         {
-            bodyColor(*sol);
 #if ( DIM == 3 )
             glEnable(GL_LIGHTING);
+            bodyColor(*sol);
             glPushMatrix();
             Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
@@ -397,6 +396,8 @@ void Display1::drawOrganizer(Organizer const& obj) const
             glPopMatrix();
             glDisable(GL_LIGHTING);
 #else
+            glDisable(GL_LIGHTING);
+            bodyColorF(*sol).load();
             glBegin(GL_LINES);
             for ( size_t ii = 0; ii < sol->nbPoints(); ++ii )
                 gleVertex(sol->posPoint(ii));

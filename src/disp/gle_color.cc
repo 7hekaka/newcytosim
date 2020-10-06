@@ -263,7 +263,7 @@ void gle_color::set_jet_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLf
         g = 0;
         b = 0.4f;
     }
-    else
+    else if ( h < 4.0 )
     {
         int i = (int)std::floor(h);
         GLfloat f = h-(GLfloat)i;
@@ -275,6 +275,12 @@ void gle_color::set_jet_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLf
             case 3:  r = 1;   g = 1-f; b = 0;   break;
             default: r = 1;   g = 0;   b = 0;   break;
         }
+    }
+    else
+    {
+        r = 1;
+        g = 0;
+        b = 0;
     }
 }
 
@@ -297,7 +303,7 @@ void gle_color::set_jet_components_dark(GLfloat& r, GLfloat& g, GLfloat& b, cons
         g = 0;
         b = 0.1f;
     }
-    else
+    else if ( h < 5.0 )
     {
         int i = (int)std::floor(h);
         GLfloat f = h-(GLfloat)i;
@@ -310,6 +316,12 @@ void gle_color::set_jet_components_dark(GLfloat& r, GLfloat& g, GLfloat& b, cons
             case 4:  r = 1;   g = 1;   b = f;   break;
             default: r = 1;   g = 1;   b = 1;   break;
         }
+    }
+    else
+    {
+        r = 1;
+        g = 1;
+        b = 1;
     }
 }
 

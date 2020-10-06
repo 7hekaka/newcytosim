@@ -56,12 +56,6 @@ void Display::display(Simul const& sim)
 {
     // clear list of transparent objects
     zObjects.clear();
-
-#if ( DIM >= 3 )
-    glEnable(GL_LIGHTING);
-#else
-    glDisable(GL_LIGHTING);
-#endif
     
     /*
      Draw opaque objects:
@@ -70,10 +64,10 @@ void Display::display(Simul const& sim)
      */
 
 #if ( DIM >= 3 )
-    
     glEnable(GL_LIGHTING);
     glDepthMask(GL_TRUE);
-    
+#else
+    glDisable(GL_LIGHTING);
 #endif
     
     drawSimul(sim);
@@ -88,7 +82,6 @@ void Display::display(Simul const& sim)
 #if ( DIM >= 3 )
     
     glDisable(GL_CULL_FACE);
-    glEnable(GL_LIGHTING);
     glDepthMask(GL_FALSE);
     
     if ( zObjects.size() )
@@ -99,7 +92,6 @@ void Display::display(Simul const& sim)
 
 #endif
     
-    glEnable(GL_LIGHTING);
     glDepthMask(GL_TRUE);
     
 #ifndef NDEBUG
@@ -446,25 +438,29 @@ void Display::drawSpace(Space const* obj, bool opaque)
 {
     const PointDisp * disp = obj->prop->disp;
     
-    GLboolean cull = glIsEnabled(GL_CULL_FACE);
-    if ( !cull ) glEnable(GL_CULL_FACE);
-    // draw back side
-    if ( disp->visible & 2 && disp->color2.opaque() == opaque )
+    bool back = ( disp->visible & 2 ) & ( disp->color2.opaque() == opaque );
+    bool front = ( disp->visible & 1 ) & ( disp->color.opaque() == opaque );
+    
+    if ( back | front )
     {
         lineWidth(disp->width);
-        glCullFace(GL_FRONT);
-        disp->color2.load_back();
-        obj->draw();
+        glEnable(GL_LIGHTING);
+        GLboolean cull = glIsEnabled(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
+        if ( back )
+        {
+            disp->color2.load_back();
+            glCullFace(GL_FRONT);
+            obj->draw();
+        }
+        if ( front )
+        {
+            disp->color.load_front();
+            glCullFace(GL_BACK);
+            obj->draw();
+        }
+        if ( !cull ) glDisable(GL_CULL_FACE);
     }
-    // draw front side
-    if ( disp->visible & 1 && disp->color.opaque() == opaque )
-    {
-        lineWidth(disp->width);
-        glCullFace(GL_BACK);
-        disp->color.load_front();
-        obj->draw();
-    }
-    if ( !cull ) glDisable(GL_CULL_FACE);
 }
 
 
@@ -489,6 +485,7 @@ void Display::drawSpaces(SpaceSet const& set)
         const PointDisp * disp = obj->prop->disp;
         if ( disp->visible )
         {
+            glDisable(GL_LIGHTING);
             lineWidth(disp->width);
             disp->color.load_load();
             obj->draw();
@@ -728,6 +725,63 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 }
 
 
+inline gle_color color_by_tension(Fiber const& fib, size_t seg, real beta)
+{
+    real x = beta * fib.tension(seg);
+    if ( x > 0 )  // use normal color for extension
+        return fib.disp->color.inverted().alpha(x);
+    else          // invert color for compression
+        return fib.disp->color.alpha(-x);
+}
+
+inline gle_color color_by_tension_jet(Fiber const& fib, size_t seg, real beta)
+{
+    real x = fib.tension(seg) * beta;
+    // use rainbow coloring, where Lagrange multipliers are negative under compression
+    return gle_color::jet_color(1-x);
+}
+
+inline gle_color color_by_curvature(real val)
+{
+    return gle_color::jet_color(val);
+}
+
+inline gle_color color_by_direction(Fiber const& fib, size_t seg)
+{
+    return gle::radial_color(fib.dirSegment(seg));
+}
+
+/// using the distance from the minus end to vertex `pti`
+inline gle_color color_by_distanceM(Fiber const& fib, real pti, real beta)
+{
+    real x = std::min(pti*beta, (real)32.0);
+    return fib.disp->color.alpha(std::exp(-x));
+}
+
+/// using the distance from the plus end to vertex `pti`
+inline gle_color color_by_distanceP(Fiber const& fib, real pti, real beta)
+{
+    // using the distance at the vertex
+    real x = std::min((fib.lastPoint()-pti)*beta, (real)32.0);
+    return fib.disp->color.alpha(std::exp(-x));
+}
+
+/// color set according to distance to the confining Space
+inline gle_color color_by_height(Fiber const& fib, size_t pti, real beta)
+{
+    real Z = 0;
+    Space const* spc = fib.prop->confine_space_ptr;
+    if ( spc )
+        Z = -spc->signedDistanceToEdge(fib.posPoint(pti));
+#if ( DIM > 2 )
+    else
+        Z = fib.posPoint(pti).ZZ;
+#endif
+    return gle_color::jet_color(Z*beta);
+}
+
+
+
 void Display::drawFiberLines(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -737,6 +791,7 @@ void Display::drawFiberLines(Fiber const& fib) const
     {
         case 1:
         {
+            fib.disp->color.load();
             // display plain lines:
             lineWidth(disp->line_width);
 #if ( DIM > 1 ) && REAL_IS_DOUBLE
@@ -754,18 +809,12 @@ void Display::drawFiberLines(Fiber const& fib) const
         case 2:
         {
             // display segments with color indicating internal tension
-            const gle_color col = fib.disp->color;
+            const real beta = 1.0 / disp->tension_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINES);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                // the Lagrange multipliers are negative under compression
-                real x = fib.tension(n) / disp->tension_scale;
-                // adjust transparency, to make tense fibers more visible:
-                if ( x <= 0 )
-                    col.inverted().load(-x);  // invert color for compression
-                else
-                    col.load(x);  // extension
+                color_by_tension(fib, n, beta).load();
                 gle::gleVertex(fib.posP(n));
                 gle::gleVertex(fib.posP(n+1));
             }
@@ -774,33 +823,29 @@ void Display::drawFiberLines(Fiber const& fib) const
         case 3:
         {
             // display segments with color indicating internal tension
+            const real beta = 1.0 / disp->tension_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                // the Lagrange multipliers are negative under compression
-                real x = fib.tension(n) / disp->tension_scale;
-                // use rainbow coloring, where Lagrange multipliers are negative under compression
-                gle_color::jet_color(1-x, alpha).load();
+                color_by_tension_jet(fib, n, beta).load(alpha);
                 gle::gleVertex(fib.posP(n));
+                gle::gleVertex(fib.posP(n+1));
             }
-            gle::gleVertex(fib.posEndP());
             glEnd();
         } break;
         case 4:
         {
             // display segments with color indicating the curvature
-            const real beta = disp->length_scale;
+            const real beta = 0.5 * disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
-            if ( fib.nbPoints() > 2 )
-                gle_color::jet_color(beta*fib.curvature(1), alpha).load();
-            else
-                gle_color::jet_color(0, alpha).load();
+            real C = ( fib.nbPoints() > 2 ? fib.curvature(1) : 0.0 );
+            color_by_curvature(beta*C).load(alpha);
             gle::gleVertex(fib.posEndM());
             for ( size_t n = 1; n < fib.lastPoint(); ++n )
             {
-                gle_color::jet_color(beta*fib.curvature(n), alpha).load();
+                color_by_curvature(beta*fib.curvature(n)).load(alpha);
                 gle::gleVertex(fib.posP(n));
             }
             gle::gleVertex(fib.posEndP());
@@ -813,7 +858,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             glBegin(GL_LINES);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                gle::radial_color(fib.dirSegment(n)).load();
+                color_by_direction(fib, n).load(alpha);
                 gle::gleVertex(fib.posP(n));
                 gle::gleVertex(fib.posP(n+1));
             }
@@ -822,12 +867,16 @@ void Display::drawFiberLines(Fiber const& fib) const
         case 6:
         {
             // color according to the distance from the minus end
-            const real beta = -fib.segmentation() / disp->length_scale;
+            const real beta = fib.segmentation() / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
-            for ( size_t n = 0; n < fib.nbPoints(); ++n )
+            color_by_distanceM(fib, 0, beta).load();
+            gle::gleVertex(fib.posEndM());
+            color_by_distanceM(fib, 0.5, beta).load();
+            gle::gleVertex(fib.posPoint(0, 0.5));
+            for ( size_t n = 1; n < fib.nbPoints(); ++n )
             {
-                fib.disp->color.load(std::exp(beta*n));
+                color_by_distanceM(fib, n, beta).load();
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
@@ -836,33 +885,29 @@ void Display::drawFiberLines(Fiber const& fib) const
         {
             // color according to the distance from the plus end
             const real beta = fib.segmentation() / disp->length_scale;
-            const real alpha = -beta * fib.lastPoint();
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
-            for ( size_t n = 0; n < fib.nbPoints(); ++n )
+            size_t last = fib.lastSegment();
+            for ( size_t n = 0; n < last; ++n )
             {
-                fib.disp->color.load(std::exp(alpha+beta*n));
+                color_by_distanceP(fib, n, beta).load();
                 gle::gleVertex(fib.posP(n));
             }
+            color_by_distanceP(fib, last+0.5, beta).load();
+            gle::gleVertex(fib.posPoint(last, 0.5));
+            color_by_distanceP(fib, last+1.0, beta).load();
+            gle::gleVertex(fib.posEndP());
             glEnd();
         } break;
         case 8:
         {
             // color according to distance to the confining Space
-            Space const* spc = fib.prop->confine_space_ptr;
             const real beta = 1.0 / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
             {
-                real Z = 0;
-                if ( spc )
-                    Z = -spc->signedDistanceToEdge(fib.posPoint(n));
-#if ( DIM > 2 )
-                else
-                    Z = fib.posPoint(n).ZZ;
-#endif
-                gle_color::jet_color(std::exp(Z*beta)).load();
+                color_by_height(fib, n, beta).load(alpha);
                 gle::gleVertex(fib.posP(n));
             }
             glEnd();
@@ -871,29 +916,40 @@ void Display::drawFiberLines(Fiber const& fib) const
 }
 
 
-// functions defined in display3.cc:
-extern void color_by_abscissaM(Fiber const& fib, size_t seg, real beta);
-extern void color_by_abscissaP(Fiber const& fib, size_t seg, real beta);
-
-
 void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-        
-    if ( disp->line_style == 6 )
-        color_by_abscissaM(fib, i, fib.segmentation()/disp->length_scale);
-    else if ( disp->line_style == 7 )
-        color_by_abscissaP(fib, i, fib.segmentation()/disp->length_scale);
-    else
-        fib.disp->color.load_both();
-
-    // display plain lines:
     lineWidth(disp->line_width);
     
-    glBegin(GL_LINES);
-    gle::gleVertex(fib.posP(i));
-    gle::gleVertex(fib.posP(i+1));
-    glEnd();
+    glDisable(GL_LIGHTING);
+    if ( disp->line_style == 6 )
+    {
+        const real beta = fib.segmentation() / disp->length_scale;
+        glBegin(GL_LINES);
+        color_by_distanceM(fib, i, beta).load();
+        gle::gleVertex(fib.posP(i));
+        color_by_distanceM(fib, i+1, beta).load();
+        gle::gleVertex(fib.posP(i+1));
+        glEnd();
+    }
+    else if ( disp->line_style == 7 )
+    {
+        const real beta = fib.segmentation() / disp->length_scale;
+        glBegin(GL_LINES);
+        color_by_distanceP(fib, i, beta).load();
+        gle::gleVertex(fib.posP(i));
+        color_by_distanceP(fib, i+1, beta).load();
+        gle::gleVertex(fib.posP(i+1));
+        glEnd();
+    }
+    else
+    {
+        fib.disp->color.load();
+        glBegin(GL_LINES);
+        gle::gleVertex(fib.posP(i));
+        gle::gleVertex(fib.posP(i+1));
+        glEnd();
+    }
 }
 
 
@@ -996,6 +1052,9 @@ void Display::drawFiberPoints(Fiber const& fib) const
     }
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark - Lattice
 
 void set_lattice_color(Fiber const& fib, real val)
 {
@@ -1150,7 +1209,6 @@ void Display::drawFiberLabels(Fiber const& fib, void* font) const
     FiberDisp const*const disp = fib.prop->disp;
     char str[32];
 
-    glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
     if ( disp->label_style & 1 )
     {
@@ -1189,14 +1247,12 @@ void Display::drawFiberLabels(Fiber const& fib, void* font) const
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
         gle::gleDrawText(fib.posEndP(), str, font);
     }
-    glPopAttrib();
 }
 
 
 /// display forces acting on the vertices, with lines
 void Display::drawFiberForces(Fiber const& fib, real scale) const
 {
-    glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
     for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
@@ -1207,9 +1263,10 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
         gle::gleVertex(q);
     }
     glEnd();
-    glPopAttrib();
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Specific styles
 
 /// used for drawFilament
 inline void drawMonomer(Vector3 const& pos, real rad)
@@ -1486,8 +1543,7 @@ void Display::drawFiber(Fiber const& fib)
         gle_color col2 = fib.disp->color.darken(0.625);
         gle_color colE = fib.disp->end_color[0];
         
-        // adjust colors for front and back surfaces:
-        col1.load_load();
+        // load backface color:
         if ( fib.prop->disp->coloring )
             col1.load_back();
         else

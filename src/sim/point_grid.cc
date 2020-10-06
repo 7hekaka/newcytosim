@@ -712,12 +712,10 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 
 void PointGrid::draw() const
 {
-    glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
     glColor3f(1, 0, 1);
     glLineWidth(0.5);
     drawEdges(pGrid);
-    glPopAttrib();
 }
 #endif
 

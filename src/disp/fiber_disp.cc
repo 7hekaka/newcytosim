@@ -78,7 +78,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(line_width, "line_width", 0, key, 0) || glos.set(line_width, "width");
     glos.set(line_style, "line_style", 0, key, 1,  {{"off", 0}, {"line", 1}, {"tension", 2},
                                         {"rainbow_tension", 3}, {"curvature", 4}, {"orientation", 5},
-                                        {"minus_end", 6}, {"plus_end", 7}, {"height", 8}});
+                                        {"minus_end", 6}, {"plus_end", 7}, {"height", 8}, {"grid", 9}});
     glos.set(line_caps, "line_caps", 0, key, 2);
     
     key = glos.has_key("point") ? "point" : "points";

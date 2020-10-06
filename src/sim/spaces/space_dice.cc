@@ -350,9 +350,7 @@ bool SpaceDice::draw() const
     gleVertex( -X, -Y, -ZR );
     glEnd();
     
-    glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
-    
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
     drawSection( 0, -X, 0.01 );
@@ -362,7 +360,6 @@ bool SpaceDice::draw() const
     drawSection( 2, -Z, 0.01 );
     drawSection( 2,  Z, 0.01 );
     glDisable(GL_LINE_STIPPLE);
-    glPopAttrib();
     
 #else
 

@@ -27,7 +27,7 @@ class gle_color
     /// concatenate 4 bytes into an int
     static uint32_t combine(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
     {
-        const uint32_t K = 0xFF;
+        constexpr uint32_t K = 0xFF;
         return (R&K) << 24 | (G&K) << 16 | (B&K) << 8 | (A&K);
     }
     
@@ -194,10 +194,10 @@ public:
     GLfloat   blue()  const { return col_[2]; }
     GLfloat   alpha() const { return col_[3]; }
 
-    void      set_red  (GLfloat s) { col_[0] = s; update_rgba(); }
-    void      set_green(GLfloat s) { col_[1] = s; update_rgba(); }
-    void      set_blue (GLfloat s) { col_[2] = s; update_rgba(); }
-    void      set_alpha(GLfloat s) { col_[3] = s; update_rgba(); }
+    void      set_red  (GLfloat s) { col_[0] = clamp(s); update_rgba(); }
+    void      set_green(GLfloat s) { col_[1] = clamp(s); update_rgba(); }
+    void      set_blue (GLfloat s) { col_[2] = clamp(s); update_rgba(); }
+    void      set_alpha(GLfloat s) { col_[3] = clamp(s); update_rgba(); }
 
     gle_color red  (GLfloat s) const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
     gle_color green(GLfloat s) const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }

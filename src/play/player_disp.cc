@@ -263,14 +263,12 @@ void Player::displayCytosim()
 #if DRAW_MECA_LINKS
         if ( disp.draw_links )
         {
-            glPushAttrib(GL_LIGHTING_BIT);
             glDisable(GL_LIGHTING);
-            glLineWidth(4);
+            glLineWidth(6);
             glPointSize(8);
             glEnable(GL_LINE_STIPPLE);
             simul.drawLinks();
             glDisable(GL_LINE_STIPPLE);
-            glPopAttrib();
             gle::gleReportErrors(stderr, "Simul::drawLinks()");
         }
 #endif

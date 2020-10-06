@@ -243,7 +243,7 @@ void View::setLights(bool local) const
     glEnable(GL_LIGHT2);
      */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lModelAmbient);
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);
 
     if ( local )

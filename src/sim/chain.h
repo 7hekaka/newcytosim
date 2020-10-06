@@ -279,6 +279,12 @@ public:
     /// signed distance from ORIGIN to vertex specified with index (or intermediate position)
     real         abscissaPoint(const real n) const { return fnAbscissaM + fnCut * n; }
 
+    /// distance from MINUS_END to a vertex specified as index (or intermediate position)
+    real         distancePointM(const real n) const { return fnCut * n; }
+
+    /// distance from PLUS_END to a vertex specified as index (or intermediate position)
+    real         distancePointP(const real n) const { return fnCut * ( lastPoint() - n ); }
+
     /// signed distance from the ORIGIN to the specified FiberEnd
     real         abscissaEnd(FiberEnd end) const;
     

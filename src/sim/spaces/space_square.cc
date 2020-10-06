@@ -248,8 +248,6 @@ bool SpaceSquare::draw() const
     const real X = length_[0];
     const real Y = length_[1];
     const real Z = ( DIM > 2 ) ? length_[2] : 0;
-  
-    glPushAttrib(GL_ENABLE_BIT);
 
 #if ( DIM > 2 )
 
@@ -326,7 +324,6 @@ bool SpaceSquare::draw() const
     gleVertex( -X,  Y, -Z );
     glEnd();
 
-    glPopAttrib();
     return true;
 }
 

@@ -187,10 +187,10 @@ void Simul::relax()
 
 void Simul::drawLinks() const
 {
-    sMeca.drawLinks = true;
     if ( !primed_ )
         prop->complete(*this);
     sMeca.prepare(this);
+    sMeca.drawLinks = true;
     setAllInteractions(sMeca);
     sMeca.drawLinks = false;
 }

@@ -1505,7 +1505,7 @@ namespace gle
     void gleDualPass(void primitive())
     {
         GLboolean cull = glIsEnabled(GL_CULL_FACE);
-        if ( !cull ) glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         primitive();
         glCullFace(GL_BACK);

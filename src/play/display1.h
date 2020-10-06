@@ -14,7 +14,7 @@ class PointDisp;
 class Display1 : public Display
 {
     /// draw a fine spherical object
-    void drawBall(Vector const&, real radius) const;
+    void drawBall(Vector const&, real radius, gle_color const&) const;
     
     /// draw a point
     void drawPoint(Vector const&, PointDisp const*) const;

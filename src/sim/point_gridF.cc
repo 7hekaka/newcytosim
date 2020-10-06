@@ -697,12 +697,10 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
 
 void PointGridF::draw() const
 {
-    glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
     glColor3f(1, 0, 1);
     glLineWidth(0.5);
     drawEdges(pGrid);
-    glPopAttrib();
 }
 #endif
 

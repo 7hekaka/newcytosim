@@ -135,13 +135,15 @@ void Display3::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-inline void Display3::drawBall(Vector const& pos, float radius) const
+inline void Display3::drawBall(Vector const& pos, float radius, gle_color const& col) const
 {
     GLboolean cull = glIsEnabled(GL_CULL_FACE);
-    if ( !cull ) glEnable(GL_CULL_FACE);
+    glEnable(GL_LIGHTING);
+    col.load_both();
     glPushMatrix();
     gleTranslate(pos);
     gleScale(radius);
+    glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     gleSphere4B();
     glCullFace(GL_BACK);
@@ -153,6 +155,7 @@ inline void Display3::drawBall(Vector const& pos, float radius) const
 
 inline void Display3::drawPoint(Vector const& pos, float size) const
 {
+    glEnable(GL_LIGHTING);
     glPushMatrix();
     gleTranslate(pos);
     gleScale(size*sFactor);
@@ -165,6 +168,7 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
     if ( disp->perceptible )
     {
+        glEnable(GL_LIGHTING);
         glPushMatrix();
         gleTranslate(pos);
         gleScale(disp->size*sFactor);
@@ -189,6 +193,7 @@ inline void Display3::drawObject(Vector const& pos, PointDisp const* disp, void(
 {
     if ( disp->perceptible )
     {
+        glEnable(GL_LIGHTING);
         glPushMatrix();
         gle::gleTranslate(pos);
         gle::gleScale(disp->size*sFactor);
@@ -429,27 +434,26 @@ void color_not(Fiber const&, size_t, real)
 {
 }
 
-void color_by_tension(Fiber const& fib, size_t seg, real beta)
+void color_seg_tension(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
-    if ( x > 0 )  // invert color for extended fibers
-        fib.disp->color.inverted().load_front(x);
-    else          // use normal color compressed fibers
-        fib.disp->color.load_front(-x);
+    if ( x > 0 )  // use normal color for extension
+        fib.disp->color.load_front(x);
+    else          // invert color for compression
+        fib.disp->color.inverted().load_front(-x);
 }
 
-void color_by_tension_jet(Fiber const& fib, size_t seg, real beta)
+void color_seg_tension_jet(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
     // use rainbow coloring, where Lagrange multipliers are negative under compression
     gle_color::jet_color(1-x, fib.disp->color.a()).load_front();
 }
 
-void color_by_curvature(Fiber const& fib, size_t seg, real)
+void color_seg_curvature(Fiber const& fib, size_t seg, real beta)
 {
     if ( fib.nbPoints() > 2 )
     {
-        const real beta = 0.5 * fib.prop->disp->length_scale;
         real c = fib.curvature(std::max(seg, 1LU));
         real d = fib.curvature(std::min(seg+1, fib.lastSegment()));
         gle_color::jet_color(beta*(c+d)).load_front();
@@ -458,25 +462,27 @@ void color_by_curvature(Fiber const& fib, size_t seg, real)
         gle_color::jet_color(0).load_front();
 }
 
-void color_by_direction(Fiber const& fib, size_t seg, real)
+void color_seg_direction(Fiber const& fib, size_t seg, real)
 {
     gle::radial_color(fib.dirSegment(seg)).load_front();
 }
 
-/// distance from the minus end
-void color_by_abscissaM(Fiber const& fib, size_t seg, real beta)
+/// using distance from the minus end to the middle of segment `seg`
+void color_seg_distanceM(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front(std::exp(-(0.5+seg)*beta));
+    real x = std::min((seg+0.5)*beta, (real)32.0);
+    fib.disp->color.load_front(std::exp(-x));
 }
 
-/// distance from the plus end
-void color_by_abscissaP(Fiber const& fib, size_t seg, real beta)
+/// using distance from the plus end to the middle of segment `seg`
+void color_seg_distanceP(Fiber const& fib, size_t seg, real beta)
 {
-    fib.disp->color.load_front(std::exp((seg+1.5-fib.nbPoints())*beta));
+    real x = std::min((fib.lastPoint()-seg-0.5)*beta, (real)32.0);
+    fib.disp->color.load_front(std::exp(-x));
 }
 
 /// color set according to distance to the confining Space
-void color_by_height(Fiber const& fib, size_t seg, real beta)
+void color_seg_height(Fiber const& fib, size_t seg, real beta)
 {
     real Z = 0;
     Space const* spc = fib.prop->confine_space_ptr;
@@ -486,12 +492,12 @@ void color_by_height(Fiber const& fib, size_t seg, real beta)
     else
         Z = fib.posPoint(seg,0.5).ZZ;
 #endif
-    gle_color::jet_color(std::exp(Z*beta)).load_front();
+    gle_color::jet_color(Z*beta).load_front();
 }
 
 
 /// color set according to steric grid
-void color_by_grid(Fiber const& fib, size_t seg, real beta)
+void color_seg_grid(Fiber const& fib, size_t seg, real beta)
 {
     Map<DIM> const& map = fib.simul().pointGridF.map();
     Vector w = fib.posPoint(seg, 0.5);
@@ -504,36 +510,46 @@ void Display3::drawFiberLines(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
+
+    // set back color:
+    if ( fib.prop->disp->coloring )
+        fib.disp->color.load_back();
+    else
+        fib.prop->disp->back_color.load_back();
+    glEnable(GL_LIGHTING);
     
     switch ( disp->line_style )
     {
         case 1:
+            fib.disp->color.load_front();
             drawFiberSegments(fib, rad, color_not, 1.0);
             break;
         case 2:
         {
             real beta = 1.0 / disp->tension_scale;
-            drawFiberSegments(fib, rad, color_by_tension, beta);
+            drawFiberSegments(fib, rad, color_seg_tension, beta);
         } break;
         case 3:
         {
             real beta = 1.0 / disp->tension_scale;
-            drawFiberSegments(fib, rad, color_by_tension_jet, beta);
+            drawFiberSegments(fib, rad, color_seg_tension_jet, beta);
         } break;
         case 4:
-            drawFiberSegments(fib, rad, color_by_curvature, 1.0);
-            break;
+        {
+            const real beta = 0.5 * fib.prop->disp->length_scale;
+            drawFiberSegments(fib, rad, color_seg_curvature, beta);
+        } break;
         case 5:
-            drawFiberSegments(fib, rad, color_by_direction, 1.0);
+            drawFiberSegments(fib, rad, color_seg_direction, 1.0);
             break;
         case 6:
         {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
             GLboolean cull = glIsEnabled(GL_CULL_FACE);
-            if ( !cull ) glEnable(GL_CULL_FACE);
+            glEnable(GL_CULL_FACE);
             const real beta = fib.segmentation() / disp->length_scale;
-            drawFiberSegments(fib, rad, color_by_abscissaM, beta);
+            drawFiberSegments(fib, rad, color_seg_distanceM, beta);
             if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
         case 7:
@@ -541,19 +557,19 @@ void Display3::drawFiberLines(Fiber const& fib) const
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
             GLboolean cull = glIsEnabled(GL_CULL_FACE);
-            if ( !cull ) glEnable(GL_CULL_FACE);
+            glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
             const real beta = fib.segmentation() / disp->length_scale;
-            drawFiberSegments(fib, rad, color_by_abscissaP, beta);
+            drawFiberSegments(fib, rad, color_seg_distanceP, beta);
             if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
         case 8:
         {
             const real beta = 1.0 / disp->length_scale;
-            drawFiberSegments(fib, rad, color_by_height, beta);
+            drawFiberSegments(fib, rad, color_seg_height, beta);
         } break;
         case 9:
-            drawFiberSegments(fib, rad, color_by_grid, 1.0);
+            drawFiberSegments(fib, rad, color_seg_grid, 1.0);
             break;
     }
 }
@@ -564,18 +580,20 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
-    
-    if ( disp->line_style == 6 )
-        color_by_abscissaM(fib, i, fib.segmentation()/disp->length_scale);
-    else if ( disp->line_style == 7 )
-        color_by_abscissaP(fib, i, fib.segmentation()/disp->length_scale);
-    else
-        fib.disp->color.load_both();
 
     Vector A = fib.posP(i);
     Vector B = fib.posP(i+1);
     
-    // GL_CULL_FACE should not be enabled!
+    glEnable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
+    
+    if ( disp->line_style == 6 )
+        color_seg_distanceM(fib, i, fib.segmentation()/disp->length_scale);
+    else if ( disp->line_style == 7 )
+        color_seg_distanceP(fib, i, fib.segmentation()/disp->length_scale);
+    else
+        fib.disp->color.load_both();
+
 #if 1
     if ( i == 0 )
     {
@@ -641,7 +659,6 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 {
     FiberDisp const*const disp = fib.prop->disp;
 
-    glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT);
     GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat bak[] = { 0.0, 0.0, 0.0, 1.0 };
     disp->back_color.store(bak);
@@ -675,7 +692,6 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
     }
 
     drawFiberSubSegments(fib, rad, inf, sup, abs, uni, set_color, fac, facM, facP);
-    glPopAttrib();
 }
 
 
@@ -891,7 +907,8 @@ void Display3::drawBead(Bead const& obj)
     // display outline:
     if ( disp->style & 4 )
     {
-        bodyColor(obj);
+        glDisable(GL_LIGHTING);
+        bodyColorF(obj).load();
         lineWidth(disp->width);
         gleObject(obj.position(), obj.radius(), gleCircleB);
     }
@@ -907,8 +924,7 @@ void Display3::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        bodyColorT(obj);
-        drawBall(obj.position(), obj.radius());
+        drawBall(obj.position(), obj.radius(), bodyColorF(obj));
     }
 }
 
@@ -936,6 +952,7 @@ void Display3::drawSolid(Solid const& obj)
     //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
     if ( obj.mark()  &&  disp->style & 4  &&  obj.nbPoints() > 1 )
     {
+        glEnable(GL_LIGHTING);
         bodyColor(obj);
         //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
         glPushMatrix();
@@ -962,8 +979,8 @@ void Display3::drawSolid(Solid const& obj)
     {
         const real rad = disp->width * sFactor;
         bodyColor(obj);
-        for ( size_t ii = 1; ii < obj.nbPoints(); ++ii )
-            gleTube(obj.posPoint(ii-1), obj.posPoint(ii), rad, gleTube2B);
+        for ( size_t n = 1; n < obj.nbPoints(); ++n )
+            gleTube(obj.posPoint(n-1), obj.posPoint(n), rad, gleTube2B);
     }
 }
 
@@ -975,7 +992,7 @@ void Display3::drawSolidT(Solid const& obj, size_t inx)
 {
     const PointDisp * disp = obj.prop->disp;
 
-    if ( disp->style & 1  &&  obj.radius(inx) > 0 )
+    if (( disp->style & 1 ) & ( obj.radius(inx) > 0 ))
     {
         Vector X = obj.posP(inx);
         size_t near[3];
@@ -991,15 +1008,12 @@ void Display3::drawSolidT(Solid const& obj, size_t inx)
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
-        // draw ball:
-        bodyColorT(obj);
-        drawBall(X, obj.radius(inx));
+        drawBall(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
         glDisable(GL_CLIP_PLANE5);
     }
 }
-
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -1013,16 +1027,16 @@ void Display3::drawSphere(Sphere const& obj)
     {
         bodyColor(obj);
         drawPoint(obj.posP(0), disp);
-        for ( size_t ii = obj.nbRefPoints; ii < obj.nbPoints(); ++ii )
-            drawPoint(obj.posP(ii), disp);
+        for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
+            drawPoint(obj.posP(i), disp);
     }
 
     //display reference points
     if ( disp->size > 0  &&  disp->style & 8 )
     {
         bodyColor(obj);
-        for ( size_t ii = 1; ii < obj.nbRefPoints; ii++ )
-            drawPoint(obj.posP(ii), disp);
+        for ( size_t i = 1; i < obj.nbRefPoints; i++ )
+            drawPoint(obj.posP(i), disp);
     }
 }
 
@@ -1033,18 +1047,12 @@ void Display3::drawSphereT(Sphere const& obj)
     //display the envelope
     if ( disp->style & 5 )
     {
-        bodyColorT(obj);
-        lineWidth(disp->width);
-        
+        bodyColorF(obj).load_both();
         glPushMatrix();
-        
 #if ( DIM < 3 )
-        
         gleTranslate(obj.posP(0));
         gleTorus(obj.radius(), disp->size*sFactor);
-        
 #else
-        
         /* Note: The rotation matrix for the sphere calculated below from the
             reference points, includes scaling by the radius of the sphere.
             We then use a primitive for a sphere of radius 1.
@@ -1064,7 +1072,6 @@ void Display3::drawSphereT(Sphere const& obj)
             disp->color2.load_front();
             gleThreeBands(64);
         }
-        
 #endif
         glPopMatrix();
     }
@@ -1087,10 +1094,8 @@ void Display3::drawOrganizer(Organizer const& obj) const
         bodyColor(disp, obj.signature());
         
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
-            drawPoint(P, disp);
-
-        for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
+            drawPoint(P, disp);
             if ( modulo ) modulo->fold(Q, P);
             gleTube(P, Q, w, gleTube1B);
         }
