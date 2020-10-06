@@ -51,7 +51,7 @@ public:
 #pragma mark -
     
     /// dimensionality
-    static size_t dimension() { return 1; }
+    static constexpr size_t dimension() { return 1; }
     
     /// human-readable identifier
     static std::string what() { return "1"; }
@@ -92,6 +92,18 @@ public:
     real& operator()(const index i, const index j)       { return val_; }
     real  operator()(const index i, const index j) const { return val_; }
     
+    /// set elements from given array
+    void load(const real ptr[])
+    {
+        val_ = ptr[0];
+    }
+
+    /// copy elements to given array
+    void store(real ptr[]) const
+    {
+        ptr[0] = val_;
+    }
+
     /// extract column vector at given index
     Vector1 column(const index) const
     {

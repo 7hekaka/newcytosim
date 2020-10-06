@@ -112,7 +112,7 @@ public:
     ~Matrix22() {}
     
     /// dimensionality
-    static size_t dimension() { return 2; }
+    static constexpr size_t dimension() { return 2; }
     
     /// human-readable identifier
 #if MATRIX22_USES_AVX
@@ -171,6 +171,20 @@ public:
     real& operator()(const index i, const index j)       { return val[i+2*j]; }
     real  operator()(const index i, const index j) const { return val[i+2*j]; }
     
+    /// set elements from given array
+    void load(const real ptr[])
+    {
+        for ( index u = 0; u < 4; ++u )
+            val[u] = ptr[u];
+    }
+
+    /// copy elements to given array
+    void store(real ptr[]) const
+    {
+        for ( index u = 0; u < 4; ++u )
+            ptr[u] = val[u];
+    }
+
     /// extract column vector at given index
     Vector2 column(const index i) const
     {

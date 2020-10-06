@@ -412,11 +412,11 @@ void SparMatBlk::Line::print(std::ostream& os) const
 
 
 /// A block element of the sparse matrix suitable for qsort()
-class alignas(4*sizeof(real)) SparMatBlk::Element
+class SparMatBlk::Element
 {
 public:
     /// block element
-    Block blk;
+    real blk[BLOCK_SIZE*BLOCK_SIZE];
 
     /// index
     size_t inx;
@@ -439,14 +439,9 @@ size_t SparMatBlk::newElements(SparMatBlk::Element*& ptr, size_t cnt)
     size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor 
     void* tmp = nullptr;
-    if ( cnt > 0 )
-    {
-        if ( posix_memalign(&tmp, 32, all*sizeof(SparMatBlk::Element)) )
-            throw std::bad_alloc();
-        ptr = new(tmp) SparMatBlk::Element[all];
-    }
-    else
-        ptr = nullptr;
+    if ( posix_memalign(&tmp, 32, all*sizeof(SparMatBlk::Element)) )
+        throw std::bad_alloc();
+    ptr = new(tmp) SparMatBlk::Element[all];
     return all;
 }
 
@@ -461,7 +456,7 @@ void SparMatBlk::Line::sortElements(Element tmp[], size_t tmp_size)
     assert_true( size_ <= tmp_size );
     for ( size_t i = 0; i < size_; ++i )
     {
-        tmp[i].blk = blk_[i];
+        blk_[i].store(tmp[i].blk);
         tmp[i].inx = inx_[i];
     }
     
@@ -470,7 +465,7 @@ void SparMatBlk::Line::sortElements(Element tmp[], size_t tmp_size)
     
     for ( size_t i = 0; i < size_; ++i )
     {
-         blk_[i] = tmp[i].blk;
+         blk_[i].load(tmp[i].blk);
          inx_[i] = tmp[i].inx;
     }
 }
@@ -502,7 +497,7 @@ void SparMatBlk::sortElements()
         //++cnt;
     }
     
-    newElements(tmp, 0);
+    free(tmp);
     //std::clog << "SparMatBlk " << size_ << " with " << cnt << " non-empty lines\n";
 }
 

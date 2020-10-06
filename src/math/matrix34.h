@@ -95,7 +95,7 @@ public:
 #pragma mark -
     
     /// dimensionality
-    static size_t dimension() { return 4; }
+    static constexpr size_t dimension() { return 4; }
 
     /// human-readable identifier
 #if MATRIX34_USES_AVX
@@ -139,6 +139,22 @@ public:
     real& operator()(const index i, const index j)       { return val[4*i+j]; }
     real  operator()(const index i, const index j) const { return val[4*i+j]; }
     
+    /// set elements from given array
+    void load(const real ptr[])
+    {
+        for ( index i = 0; i < 3; ++i )
+        for ( index j = 0; j < 3; ++j )
+            val[4*i+j] = ptr[i+3*j];
+    }
+
+    /// copy elements to given array
+    void store(real ptr[]) const
+    {
+        for ( index i = 0; i < 3; ++i )
+        for ( index j = 0; j < 3; ++j )
+            ptr[i+3*j] = val[4*i+j];
+    }
+
     /// extract column vector at given index
     Vector3 column(const index i) const
     {

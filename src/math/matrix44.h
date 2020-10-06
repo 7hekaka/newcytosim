@@ -95,7 +95,7 @@ public:
 #pragma mark -
         
     /// dimensionality
-    static size_t dimension() { return 4; }
+    static constexpr size_t dimension() { return 4; }
     
     /// human-readable identifier
     static std::string what() { return "16"; }
@@ -136,6 +136,20 @@ public:
     real& operator()(const index i, const index j)       { return val[i+4*j]; }
     real  operator()(const index i, const index j) const { return val[i+4*j]; }
     
+    /// set elements from given array
+    void load(const real ptr[])
+    {
+        for ( index u = 0; u < 16; ++u )
+            val[u] = ptr[u];
+    }
+
+    /// copy elements to given array
+    void store(real ptr[]) const
+    {
+        for ( index u = 0; u < 16; ++u )
+            ptr[u] = val[u];
+    }
+
     /// extract column vector at given index
     Vector4 column(const index i) const
     {

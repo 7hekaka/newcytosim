@@ -519,11 +519,11 @@ void SparMatSymBlk::Column::print(std::ostream& os) const
 
 
 /// A block element of the sparse matrix suitable for qsort()
-class alignas(4*sizeof(real)) SparMatSymBlk::Element
+class SparMatSymBlk::Element
 {
 public:
-    /// block element
-    Block blk;
+    /// block elements
+    real blk[BLOCK_SIZE*BLOCK_SIZE];
 
     /// index
     size_t inx;
@@ -547,7 +547,7 @@ void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
     assert_true( size_ <= tmp_size );
     for ( size_t i = 1; i < size_; ++i )
     {
-        tmp[i].blk = blk_[i];
+        blk_[i].store(tmp[i].blk);
         tmp[i].inx = inx_[i];
     }
     
@@ -556,8 +556,8 @@ void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
     
     for ( size_t i = 1; i < size_; ++i )
     {
-         blk_[i] = tmp[i].blk;
-         inx_[i] = tmp[i].inx;
+        blk_[i].load(tmp[i].blk);
+        inx_[i] = tmp[i].inx;
     }
 }
 
@@ -568,14 +568,9 @@ size_t SparMatSymBlk::newElements(Element*& ptr, size_t cnt)
     size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor
     void* tmp = nullptr;
-    if ( cnt > 0 )
-    {
-        if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
-            throw std::bad_alloc();
-        ptr = new(tmp) Element[all];
-    }
-    else
-        ptr = nullptr;
+    if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
+        throw std::bad_alloc();
+    ptr = new(tmp) Element[all];
     return all;
 }
 
@@ -616,7 +611,7 @@ void SparMatSymBlk::sortElements()
 #endif
     }
     
-    newElements(tmp, 0);
+    free(tmp);
     //std::clog << "SparMatSymBlk " << size_ << " with " << cnt << " non-empty columns\n";
 }
 

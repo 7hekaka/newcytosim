@@ -176,7 +176,7 @@ inline bool isnan(size_t cnt, real const* ptr)
 }
 
 
-#ifdef DEBUG_REAL
+#if 1
 
 #include <cstdio>
 
@@ -195,7 +195,7 @@ inline void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
 
 
 /// check memory alignement of a pointer for AVX load/store
-inline void check_alignment(void * ptr)
+inline void check_alignment(void const* ptr)
 {
     uintptr_t a = ((uintptr_t)ptr & 31);
     if ( a )

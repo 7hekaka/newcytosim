@@ -507,7 +507,7 @@ class alignas(4*sizeof(real)) SparMatSymBlkDiag::Element
 {
 public:
     /// block element
-    Block blk;
+    real blk[BLOCK_SIZE*BLOCK_SIZE];
 
     /// index
     size_t inx;
@@ -531,7 +531,7 @@ void SparMatSymBlkDiag::Column::sortElements(Element tmp[], size_t tmp_size)
     assert_true( size_ <= tmp_size );
     for ( size_t i = 0; i < size_; ++i )
     {
-        tmp[i].blk = blk_[i];
+        blk_[i].store(tmp[i].blk);
         tmp[i].inx = inx_[i];
     }
     
@@ -540,7 +540,7 @@ void SparMatSymBlkDiag::Column::sortElements(Element tmp[], size_t tmp_size)
     
     for ( size_t i = 0; i < size_; ++i )
     {
-         blk_[i] = tmp[i].blk;
+         blk_[i].load(tmp[i].blk);
          inx_[i] = tmp[i].inx;
     }
 }
@@ -552,14 +552,9 @@ size_t SparMatSymBlkDiag::newElements(Element*& ptr, size_t cnt)
     size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor
     void* tmp = nullptr;
-    if ( cnt > 0 )
-    {
-        if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
-            throw std::bad_alloc();
-        ptr = new(tmp) Element[all];
-    }
-    else
-        ptr = nullptr;
+    if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
+        throw std::bad_alloc();
+    ptr = new(tmp) Element[all];
     return all;
 }
 
@@ -597,7 +592,7 @@ void SparMatSymBlkDiag::sortElements()
 #endif
     }
     // release memory:
-    newElements(tmp, 0);
+    free(tmp);
 }
 
 
