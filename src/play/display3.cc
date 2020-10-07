@@ -1149,7 +1149,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
         }
 #endif
         if ( obj->base() )
-            drawObject(obj->posFoot(), obj->disp(), gle::gleIcosahedron1);
+            drawObject(obj->posFoot(), obj->disp(), gle::gleOctahedron1);
         else
             drawPoint(obj->posFoot(), obj->disp());
     }
@@ -1191,7 +1191,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
 #endif
             }
             if ( obj->base() )
-                drawObject(ph, disp, gle::gleIcosahedron1);
+                drawObject(ph, disp, gle::gleOctahedron1);
             else
                 drawPoint(ph, disp);
         }
