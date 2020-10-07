@@ -162,10 +162,11 @@ public:
     /// colors of the different FiberTip states
     /**
      This determines the set of color that are used to display the fiber tips,
-     according to their assembly state (Fiber::dynamicState):
-     - static ends (dynamic-state 0) use end_color[0],
-     - growing end (dynamic-state 1), use end_color[1],
-     - shrinking end (dynamic-state 4), use end_color[4]
+     according to their assembly state, Fiber::endState():
+     - 0, static ends use end_color[0],
+     - 1, growing end, use end_color[1],
+     - 2 and 3, intermediate states, use end_color[2] and end_color[3],
+     - 4, shrinking end, use end_color[4]
      .
      */
     gle_color    end_color[5];

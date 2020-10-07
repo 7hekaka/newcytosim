@@ -250,7 +250,7 @@ public:
     virtual state_t endStateP() const { return STATE_WHITE; }
 
     /// return assembly/disassembly state of the FiberEnd
-    state_t         dynamicState(FiberEnd end) const;
+    state_t         endState(FiberEnd end) const;
 
     
     /// change state of MINUS_END

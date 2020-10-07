@@ -1070,7 +1070,7 @@ size_t Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
 //------------------------------------------------------------------------------
 #pragma mark - Dynamic ends
 
-state_t Fiber::dynamicState(FiberEnd end) const
+state_t Fiber::endState(FiberEnd end) const
 {
     if ( end == PLUS_END )
         return endStateP();

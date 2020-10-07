@@ -603,7 +603,7 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
         if ( !sel || sel == fib->prop )
         {
             ++sum;
-            state_t x = std::min(fib->dynamicState(end), (state_t)MAX);
+            state_t x = std::min(fib->endState(end), (state_t)MAX);
             ++cnt[x];
         }
     }
