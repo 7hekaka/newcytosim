@@ -326,12 +326,12 @@ namespace gle
     void gleTriangleS()
     {
         constexpr GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
-        const GLfloat pts[] = {
+        constexpr GLfloat pts[] = {
              0,  1.0, 0,
             -H, -0.5, 0,
              H, -0.5, 0 };
 
-        const GLfloat dir[] = {
+        constexpr GLfloat dir[] = {
             0, 0, 1.0,
             0, 0, 1.0,
             0, 0, 1.0 };
@@ -725,10 +725,10 @@ namespace gle
     /// draw hexagon that has the same surface as a disc of radius 1.
     void initHexTubeBuffer(GLint buf1, GLint buf2, GLfloat A, GLfloat B)
     {
-        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
-        const GLfloat S = 0.5f;
-        const GLfloat H = R * C, X = R * S;
+        constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
+        constexpr GLfloat S = 0.5f;
+        constexpr GLfloat H = R * C, X = R * S;
         
         const GLfloat pos[] = {
              R,  0, B,  R,  0, A,
@@ -739,7 +739,7 @@ namespace gle
              X, -H, B,  X, -H, A,
              R,  0, B,  R,  0, A };
         
-        const GLfloat dir[] = {
+        constexpr GLfloat dir[] = {
              1,  0, 0,  1,  0, 0,
              S,  C, 0,  S,  C, 0,
             -S,  C, 0, -S,  C, 0,
@@ -817,10 +817,10 @@ namespace gle
     void gleHexTube1(GLfloat A, GLfloat B)
     {
         /// draw hexagon that has the same surface as a disc of radius 1.
-        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
-        const GLfloat S = 0.5f;
-        const GLfloat H = R * C, X = R * S;
+        constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
+        constexpr GLfloat S = 0.5f;
+        constexpr GLfloat H = R * C, X = R * S;
         
         const GLfloat pts[] = {
              R,  0, B,  R,  0, A,
@@ -831,7 +831,7 @@ namespace gle
              X, -H, B,  X, -H, A,
              R,  0, B,  R,  0, A };
         
-        const GLfloat dir[] = {
+        constexpr GLfloat dir[] = {
              1,  0, 0,  1,  0, 0,
              S,  C, 0,  S,  C, 0,
             -S,  C, 0, -S,  C, 0,
@@ -1304,6 +1304,44 @@ namespace gle
         glDisableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
     }
+    
+    void gleOctahedron1()
+    {
+        // Eight triangles, ordered counterclockwise
+        constexpr GLfloat R = 1.0;
+        constexpr GLfloat pts[] = {
+             R, 0, 0, 0, 0, R, 0,-R, 0,
+             0, 0,-R,-R, 0, 0, 0, R, 0,
+             0, 0, R,-R, 0, 0, 0,-R, 0,
+             0, 0,-R, 0, R, 0, R, 0, 0,
+            -R, 0, 0, 0, 0, R, 0, R, 0,
+             0, 0,-R, R, 0, 0, 0,-R, 0,
+             0, 0, R, R, 0, 0, 0, R, 0,
+             0, 0,-R, 0,-R, 0,-R, 0, 0
+        };
+        
+        // normals
+        constexpr GLfloat N = 1.0 / M_SQRT3;
+        constexpr GLfloat dir[] = {
+            N,-N, N, N,-N, N, N,-N, N,
+           -N, N,-N,-N, N,-N,-N, N,-N,
+           -N,-N, N,-N,-N, N,-N,-N, N,
+            N, N,-N, N, N,-N, N, N,-N,
+           -N, N, N,-N, N, N,-N, N, N,
+            N,-N,-N, N,-N,-N, N,-N,-N,
+            N, N, N, N, N, N, N, N, N,
+           -N,-N,-N,-N,-N,-N,-N,-N,-N
+        };
+        
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glNormalPointer(GL_FLOAT, 0, dir);
+        glDrawArrays(GL_TRIANGLES, 0, 24);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+    }
+    
     
     void gleCylinderZ()
     {
