@@ -22,7 +22,7 @@ void SolidSet::step()
  
  //@todo: could pick one of the matching Sphere randomly
  */
-Solid* SolidSet::insideSphere(Vector const& pos, size_t& inx, SolidProp const* sel) const
+Solid* SolidSet::insideSphere(Vector const& pos, real range, size_t& inx, SolidProp const* sel) const
 {
     real best = INFINITY;
     Solid* res = nullptr;
@@ -36,7 +36,7 @@ Solid* SolidSet::insideSphere(Vector const& pos, size_t& inx, SolidProp const* s
                 if ( rad > 0 )
                 {
                     real dd = distanceSqr(S->posPoint(p), pos);
-                    if (( dd < best ) & ( dd < square(rad)))
+                    if (( dd < best ) && ( dd < square(rad+range)))
                     {
                         best = dd;
                         res = S;

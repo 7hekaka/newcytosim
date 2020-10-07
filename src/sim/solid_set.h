@@ -77,7 +77,7 @@ public:
     void        foldPosition(Modulo const*) const;
     
     /// returns Solid, if one of its Sphere covers the given position (`inx` is set by this function)
-    Solid*      insideSphere(Vector const&, size_t& inx, SolidProp const*) const;
+    Solid*      insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;
                              
     /// Monte-Carlo simulation step for every Object
     void        step() {}
