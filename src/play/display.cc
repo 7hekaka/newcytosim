@@ -925,9 +925,16 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
     if ( disp->line_style == 6 )
     {
         const real beta = fib.segmentation() / disp->length_scale;
-        glBegin(GL_LINES);
+        glBegin(GL_LINE_STRIP);
         color_by_distanceM(fib, i, beta).load();
         gle::gleVertex(fib.posP(i));
+        if ( i == 0 )
+        {
+            color_by_distanceM(fib, 0.25, beta).load();
+            gle::gleVertex(fib.posPoint(0, 0.25));
+            color_by_distanceM(fib, 0.5, beta).load();
+            gle::gleVertex(fib.posPoint(0, 0.5));
+        }
         color_by_distanceM(fib, i+1, beta).load();
         gle::gleVertex(fib.posP(i+1));
         glEnd();
@@ -935,9 +942,16 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
     else if ( disp->line_style == 7 )
     {
         const real beta = fib.segmentation() / disp->length_scale;
-        glBegin(GL_LINES);
+        glBegin(GL_LINE_STRIP);
         color_by_distanceP(fib, i, beta).load();
         gle::gleVertex(fib.posP(i));
+        if ( i == fib.lastSegment() )
+        {
+            color_by_distanceP(fib, i+0.5, beta).load();
+            gle::gleVertex(fib.posPoint(i, 0.5));
+            color_by_distanceP(fib, i+0.75, beta).load();
+            gle::gleVertex(fib.posPoint(i, 0.75));
+        }
         color_by_distanceP(fib, i+1, beta).load();
         gle::gleVertex(fib.posP(i+1));
         glEnd();
