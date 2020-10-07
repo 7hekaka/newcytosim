@@ -22,9 +22,7 @@ void Fiber::step()
 #if FIBER_HAS_GLUE
     //add single that act like glue
     if ( prop->glue )
-    {
-        setGlue(frGlue, PLUS_END, prop->confine_space_ptr);
-    }
+        setGlue(frGlue, PLUS_END);
 #endif
 #if NEW_FIBER_CHEW
     if ( frChewP > 0 )
@@ -1594,6 +1592,26 @@ void Fiber::setGlue3(Single* glue, Space const* spc)
 
 
 /**
+ This associates a Single to the end of the Fiber if this end is growing.
+ */
+void Fiber::setGlueG(Single* glue, FiberEnd end)
+{
+    if ( glue->attached() )
+    {
+        if ( isShrinking(end) )
+            glue->detach();
+        else
+            glue->moveToEnd(end);
+    }
+    else if ( isGrowing(end) )
+    {
+        glue->attachEnd(this, end);
+        glue->unbase();
+    }
+}
+
+
+/**
  Search for a glue in the list of bound HandSingle
  this is useful when a simulation is restarted from file
  */
@@ -1624,18 +1642,17 @@ void Fiber::makeGlue(Single*& glue)
 /**
  setGlue() creates Single when MT interact with the edge of the Space
 */
-void Fiber::setGlue(Single*& glue, const FiberEnd end, Space const* space)
+void Fiber::setGlue(Single*& glue, const FiberEnd end)
 {
-    assert_true(space);
-    
     if ( !glue )
         makeGlue(glue);
     
     switch( prop->glue )
     {
-        case 1:  setGlue1(glue, end, space);  break;
-        case 2:  setGlue2(glue, end, space);  break;
-        case 3:  setGlue3(glue, space);       break;
+        case 1: setGlue1(glue, end, prop->confine_space_ptr); break;
+        case 2: setGlue2(glue, end, prop->confine_space_ptr); break;
+        case 3: setGlue3(glue, prop->confine_space_ptr); break;
+        case 4: setGlueG(glue, end); break;
         default: throw InvalidParameter("invalid value of fiber:glue");
     }
     

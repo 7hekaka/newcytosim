@@ -146,6 +146,9 @@ public:
     /// the Mecable to which this is anchored, or zero
     virtual Mecable const* base() const { return nullptr; }
     
+    /// the Mecable to which this is anchored, or zero
+    virtual void    unbase() {}
+
     /// true if Single creates an interaction
     virtual bool    hasForce()    const { return false; }
     

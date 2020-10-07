@@ -31,7 +31,7 @@ class LineDisp;
 #define FIBER_HAS_FAMILY 0
 
 /// Flag to allow dynamic Single creation/binding at fiber's ends {0, 1}
-#define FIBER_HAS_GLUE 0
+#define FIBER_HAS_GLUE 1
 
 /// Flag to enable the sorting of targets for attachment of Hands {0, 1}
 #define BIND_CLOSEST_FIBER 1
@@ -372,17 +372,20 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// set the box glue for pure pushing
-    void           setGlue1(Single* glue, FiberEnd, Space const* space);
+    /// set Space glue for pure pushing
+    void           setGlue1(Single* glue, FiberEnd, Space const*);
     
-    /// set the box glue for pure pulling
-    void           setGlue2(Single* glue, FiberEnd, Space const* space);
+    /// set Space glue for pure pulling
+    void           setGlue2(Single* glue, FiberEnd, Space const*);
     
-    /// set the box glue for pushing and pulling
-    void           setGlue3(Single* glue, Space const* space);
+    /// set Space glue for pushing and pulling
+    void           setGlue3(Single* glue, Space const*);
     
+    /// set Solid glue
+    void           setGlueG(Single* glue, FiberEnd);
+
     /// a setGlue to rule them all
-    void           setGlue(Single*& glue, FiberEnd, Space const* space);
+    void           setGlue(Single*& glue, FiberEnd);
     
     /// create a Single that can be used as glue
     void           makeGlue(Single*& glue);
