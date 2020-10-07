@@ -220,37 +220,39 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
 #endif
     
     real C = dot(d11, d22);  // cosinus of angle
-    real S = 1.0 - C * C;    // sinus squared
-
-    if ( S > REAL_EPSILON )
+    
+    if ( C < 1.0-REAL_EPSILON )
     {
-        real iS = 1.0 / S;
+        real iS = 1.0 / ( 1.0 - C * C );    // sinus squared
         // This deals with the general case of non-parallel lines
-        real d1off = dot(d11, off) * iS;
-        real d2off = dot(d22, off) * iS;
+#if ( DIM > 2 )
+        // direction N of the shortest path is orthogonal to both lines:
+        // distance between lines = dot(off, N) / N.norm()
+        real D = dot(off, cross(d11, d22));
+#endif
+        real d1off = dot(d11, off);
+        real d2off = dot(d22, off);
         
-        //abs1 = dot(d11-beta*d22, off) / scal;
-        abs1 = d1off - C * d2off;
-        
-        //abs2 = dot(beta*d11-d22, off) / scal;
-        abs2 = C * d1off - d2off;
+        abs1 = ( d1off - C * d2off ) * iS;
+        abs2 = ( C * d1off - d2off ) * iS;
 #if 0
         // check that identified line path is orthogonal to both segments:
         Vector p1 = pos1() + abs1 * d11;
         Vector p2 = seg.pos1() + abs2 * d22;
         real n1 = dot(d11, p2-p1);
         real n2 = dot(d22, p2-p1);
-        real res1 = std::sqrt(( off - d11 * abs1 ).normSqr() - abs2 * abs2);
-        real res2 = std::sqrt(( off + d22 * abs2 ).normSqr() - abs1 * abs1);
-        printf("shortestDistance %+9.6f %+9.6f   %6.3f   %6.3f ", n1, n2, res1, res2);
+        printf("shortestDistance %+9.6f %+9.6f :", n1, n2);
+        // check different formula for distance betwen lines:
+        real res0 = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
+        real res1 = ( off - d11 * abs1 ).normSqr() - abs2 * abs2;
+        real res2 = ( off + d22 * abs2 ).normSqr() - abs1 * abs1;
+        real res3 = ( D * D ) * iS;  // 1.0 / N.normSqr() == iS
+        printf("%6.4f  %6.4f  %6.4f  %6.4f\n", sqrt(res0), sqrt(res1), sqrt(res2), sqrt(res3));
 #endif
 #if ( DIM > 2 )
-        //real res = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
-        real res = ( off - d11 * abs1 ).normSqr() - abs2 * abs2;
-        //real res = ( off + d22 * abs2 ).normSqr() - abs1 * abs1;
-        //printf("dis %03u:%02lu", fiber()->identity(), point());
-        //printf(" %03u:%02lu   %6.3f", seg.fiber()->identity(), seg.point(), std::sqrt(res));
-        return res;
+        //printf("dis %03u:%02lu", seg.fiber()->identity(), seg.point());
+        //printf(" %03u:%02lu  %6.4f\n", fiber()->identity(), point(), fabs(D)*sqrt(iS));
+        return ( D * D ) * iS;
 #else
         return 0;
 #endif
