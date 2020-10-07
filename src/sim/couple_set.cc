@@ -74,15 +74,15 @@ void CoupleSet::step()
     if ( faOdd )
     {
         nxt = obj->next();
-        obj->stepFA(simul);
+        obj->stepFA();
         obj = nxt;
     }
     while ( obj )
     {
         nxt = obj->next();
-        obj->stepFA(simul);
+        obj->stepFA();
         obj = nxt->next();
-        nxt->stepFA(simul);
+        nxt->stepFA();
     }
 
     obj = afHead;
@@ -90,15 +90,15 @@ void CoupleSet::step()
     if ( afOdd )
     {
         nxt = obj->next();
-        obj->stepAF(simul);
+        obj->stepAF();
         obj = nxt;
     }
     while ( obj )
     {
         nxt = obj->next();
-        obj->stepAF(simul);
+        obj->stepAF();
         obj = nxt->next();
-        nxt->stepAF(simul);
+        nxt->stepAF();
     }
     
     // use alternative attachment strategy:
@@ -109,7 +109,7 @@ void CoupleSet::step()
         while ( obj )
         {
             nxt = obj->next();
-            obj->stepFF(simul);
+            obj->stepFF();
             obj = nxt;
         }
     }
@@ -121,15 +121,15 @@ void CoupleSet::step()
         if ( ffOdd )
         {
             nxt = obj->next();
-            obj->stepFF(simul);
+            obj->stepFF();
             obj = nxt;
         }
         while ( obj )
         {
             nxt = obj->next();
-            obj->stepFF(simul);
+            obj->stepFF();
             obj = nxt->next();
-            nxt->stepFF(simul);
+            nxt->stepFF();
         }
     }
 

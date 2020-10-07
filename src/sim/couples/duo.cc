@@ -36,7 +36,7 @@ void Duo::deactivate()
 
 //------------------------------------------------------------------------------
 
-void Duo::stepFF(Simul& sim)
+void Duo::stepFF()
 {
     diffuse();
     
@@ -70,9 +70,9 @@ void Duo::stepFF(Simul& sim)
         }
     
         // hands may bind:
-        cHand1->stepUnattached(sim, cPos);
+        cHand1->stepUnattached(simul(), cPos);
         if ( !prop->trans_activated )
-            cHand2->stepUnattached(sim, cPos);
+            cHand2->stepUnattached(simul(), cPos);
     }
 }
 
@@ -94,13 +94,13 @@ void Duo::deactivation()
  - attached activity of cHand1
  .
  */
-void Duo::stepAF(Simul& sim)
+void Duo::stepAF()
 {
     if ( mActive && prop->vulnerable )
         deactivation();
     
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
-    cHand2->stepUnattached(sim, cHand1->outerPos());
+    cHand2->stepUnattached(simul(), cHand1->outerPos());
     cHand1->stepUnloaded();
 }
 
@@ -111,13 +111,13 @@ void Duo::stepAF(Simul& sim)
  - attached activity of cHand2
  .
  */
-void Duo::stepFA(Simul& sim)
+void Duo::stepFA()
 {
     if ( mActive && prop->vulnerable )
         deactivation();
     
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
-    cHand1->stepUnattached(sim, cHand2->outerPos());
+    cHand1->stepUnattached(simul(), cHand2->outerPos());
     cHand2->stepUnloaded();
 }
 

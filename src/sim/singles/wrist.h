@@ -79,7 +79,7 @@ public:
     
     
     /// Monte-Carlo step for a free Single
-    void    stepF(Simul&);
+    void    stepF();
     
     /// Monte-Carlo step for a bound Single
     void    stepA();

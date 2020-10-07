@@ -105,7 +105,7 @@ void Single::randomizePosition()
 }
 
 
-void Single::stepF(Simul& sim)
+void Single::stepF()
 {
     assert_false( sHand->attached() );
 
@@ -127,7 +127,7 @@ void Single::stepF(Simul& sim)
         sPos = prop->confine_space_ptr->project(sPos);
     }
     
-    sHand->stepUnattached(sim, sPos);
+    sHand->stepUnattached(simul(), sPos);
 }
 
 

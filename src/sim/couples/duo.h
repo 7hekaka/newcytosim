@@ -53,13 +53,13 @@ public:
     bool    active() const { return mActive; }
     
     /// simulation step for a free Duo
-    void    stepFF(Simul&);
+    void    stepFF();
     
     /// simulation step for a Duo attached by Hand1
-    void    stepAF(Simul&);
+    void    stepAF();
     
     /// simulation step for a Duo attached by Hand2
-    void    stepFA(Simul&);
+    void    stepFA();
     
     /// simulation step for a linking Duo
     void    stepAA();

@@ -120,7 +120,7 @@ void OrganizerSet::add(Object * obj)
 {
     ObjectSet::add(obj);
     // we also link all dependent objects:
-    static_cast<Organizer*>(obj)->addOrganized(simul);
+    static_cast<Organizer*>(obj)->addOrganized();
 }
 
 

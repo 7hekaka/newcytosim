@@ -11,7 +11,7 @@
 #include "glossary.h"
 
 
-void Tubule::step(Simul&)
+void Tubule::step()
 {
 }
 

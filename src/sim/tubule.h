@@ -50,8 +50,8 @@ public:
     /// destructor
     ~Tubule();
     
-    ///
-    void step(Simul&);
+    /// simulation
+    void step();
 
     /// initialize
     void reset();

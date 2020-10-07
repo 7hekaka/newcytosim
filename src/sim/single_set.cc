@@ -59,10 +59,10 @@ void SingleSet::step()
     while ( obj )
     {
         nxt = obj->next();
-        obj->stepF(simul);
+        obj->stepF();
         if ( ! nxt ) break;
         obj = nxt->next();
-        nxt->stepF(simul);
+        nxt->stepF();
     }
 }
 

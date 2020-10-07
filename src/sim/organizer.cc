@@ -49,14 +49,15 @@ void Organizer::goodbye(Buddy const* b)
 }
 
 
-void Organizer::addOrganized(Simul & simul)
+void Organizer::addOrganized()
 {
+    Simul & sim = simul();
     for ( Mecable * i : mObjects )
     {
         if ( i && ! i->linked() )
         {
             std::clog << " Registering " << i->reference() << "\n";
-            simul.add(i);
+            sim.add(i);
         }
         //i->mark(identity());
     }

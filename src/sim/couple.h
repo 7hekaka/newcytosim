@@ -161,13 +161,13 @@ public:
     //--------------------------------------------------------------------------
 
     /// simulation step for a free Couple: diffusion
-    virtual void   stepFF(Simul&);
+    virtual void   stepFF();
     
     /// simulation step for a Couple attached by Hand1
-    virtual void   stepAF(Simul&);
+    virtual void   stepAF();
     
     /// simulation step for a Couple attached by Hand2
-    virtual void   stepFA(Simul&);
+    virtual void   stepFA();
     
     /// simulation step for a doubly-attached Couple
     virtual void   stepAA();

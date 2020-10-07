@@ -156,7 +156,7 @@ void Couple::setInteractionsFA(Meca& meca) const
  - attachment
  .
  */
-void Couple::stepFF(Simul& sim)
+void Couple::stepFF()
 {
     diffuse();
     
@@ -182,12 +182,12 @@ void Couple::stepFF(Simul& sim)
      */
     if ( RNG.flip() )
     {
-        cHand1->stepUnattached(sim, cPos);
+        cHand1->stepUnattached(simul(), cPos);
     }
     else
     {
         if ( !prop->trans_activated )
-            cHand2->stepUnattached(sim, cPos);
+            cHand2->stepUnattached(simul(), cPos);
     }
 }
 
@@ -198,10 +198,10 @@ void Couple::stepFF(Simul& sim)
  - attached activity of cHand1
  .
  */
-void Couple::stepAF(Simul& sim)
+void Couple::stepAF()
 {
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
-    cHand2->stepUnattached(sim, cHand1->outerPos());
+    cHand2->stepUnattached(simul(), cHand1->outerPos());
     cHand1->stepUnloaded();
 }
 
@@ -212,10 +212,10 @@ void Couple::stepAF(Simul& sim)
  - attached activity of cHand2
  .
  */
-void Couple::stepFA(Simul& sim)
+void Couple::stepFA()
 {
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
-    cHand1->stepUnattached(sim, cHand2->outerPos());
+    cHand1->stepUnattached(simul(), cHand2->outerPos());
     cHand2->stepUnloaded();
 }
 

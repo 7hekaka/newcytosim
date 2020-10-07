@@ -32,7 +32,7 @@ Crosslink::~Crosslink()
  - attachment
  .
  */
-void Crosslink::stepFF(Simul& sim)
+void Crosslink::stepFF()
 {
     diffuse();
     
@@ -40,8 +40,8 @@ void Crosslink::stepFF(Simul& sim)
     prop->confine_space_ptr->bounce(cPos);
     
     // activity:
-    cHand1->stepUnattached(sim, cPos);
-    cHand2->stepUnattached(sim, cPos);
+    cHand1->stepUnattached(simul(), cPos);
+    cHand2->stepUnattached(simul(), cPos);
 }
 
 

@@ -110,11 +110,11 @@ private:
     /// Associated Lattice of reals
     Lattice<real>       frMesh;
 #endif
-
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
     Single *            frGlue;
 #endif
+
 protected:
 #if NEW_FIBER_CHEW
     /// stored chewing at the end

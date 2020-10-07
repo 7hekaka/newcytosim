@@ -156,7 +156,7 @@ public:
     virtual Vector  force()       const { return Vector(0,0,0); }
 
     /// Monte-Carlo step if the Hand is not attached
-    virtual void    stepF(Simul&);
+    virtual void    stepF();
     
     /// Monte-Carlo step if the Hand is attached
     virtual void    stepA();

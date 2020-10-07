@@ -76,11 +76,11 @@ Vector Wrist::force() const
 }
 
 
-void Wrist::stepF(Simul& sim)
+void Wrist::stepF()
 {
     assert_false( sHand->attached() );
 
-    sHand->stepUnattached(sim, posFoot());
+    sHand->stepUnattached(simul(), posFoot());
 }
 
 
