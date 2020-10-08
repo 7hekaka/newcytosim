@@ -1184,7 +1184,7 @@ void glApp::displayMain()
             view.drawText(flashString, GLUT_BITMAP_9_BY_15, 0x0, 2);
         }
     }
-    
+    glFinish();
     if ( view.buffered )
         glutSwapBuffers();
     else
