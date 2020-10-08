@@ -592,7 +592,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
     else if ( disp->line_style == 7 )
         color_seg_distanceP(fib, i, fib.segmentation()/disp->length_scale);
     else
-        fib.disp->color.load_both();
+        fib.disp->color.load_front();
 
 #if 1
     if ( i == 0 )

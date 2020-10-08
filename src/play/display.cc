@@ -893,7 +893,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             const real beta = fib.segmentation() / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
-            size_t last = fib.lastSegment();
+            const size_t last = fib.lastSegment();
             for ( size_t n = 0; n < last; ++n )
             {
                 color_by_distanceP(fib, n, beta).load();
@@ -901,6 +901,8 @@ void Display::drawFiberLines(Fiber const& fib) const
             }
             color_by_distanceP(fib, last+0.5, beta).load();
             gle::gleVertex(fib.posPoint(last, 0.5));
+            color_by_distanceP(fib, last+0.75, beta).load();
+            gle::gleVertex(fib.posPoint(last, 0.75));
             color_by_distanceP(fib, last+1.0, beta).load();
             gle::gleVertex(fib.posEndP());
             glEnd();
@@ -1548,11 +1550,28 @@ void Display::drawFiber(Fiber const& fib)
     
 #if ( DIM == 3 )
     // transparent styles in 3D
-    if (( line_style==1 && fib.disp->color.transparent())
-        || line_style==6 || line_style==7 )
+    if (( line_style==1 && fib.disp->color.transparent()))
     {
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
             zObjects.push_back(zObject(&fib, i));
+        line_style = 0;
+    }
+    else if ( line_style == 6 )
+    {
+        // color according to the distance from the minus end
+        const real beta = fib.segmentation() / disp->length_scale;
+        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+            if ( color_by_distanceM(fib, i, beta).visible() )
+                zObjects.push_back(zObject(&fib, i));
+        line_style = 0;
+    }
+    else if ( line_style == 7 )
+    {
+        // color according to the distance from the plus end
+        const real beta = fib.segmentation() / disp->length_scale;
+        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+            if ( color_by_distanceP(fib, i+1, beta).visible() )
+                zObjects.push_back(zObject(&fib, i));
         line_style = 0;
     }
 #endif
