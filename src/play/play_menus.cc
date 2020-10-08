@@ -29,7 +29,8 @@ void processMenuFiber(int item)
             case 25:  FD->coloring = FiberDisp::COLORING_CLUSTER;   break;
             case 26:  FD->coloring = FiberDisp::COLORING_DIRECTION; break;
             case 27:  FD->coloring = FiberDisp::COLORING_AGE;       break;
-                
+            case 28:  FD->coloring = FiberDisp::COLORING_PSTATE;    break;
+
             case 30:  FD->draw_average = 0;  break;
             case 31:  FD->draw_average = 1;  break;
             case 32:  FD->draw_average = 2;  break;
@@ -70,6 +71,7 @@ int buildMenuFiber()
         glutAddMenuEntry("Coloring by cluster",   25);
         glutAddMenuEntry("Coloring by direction", 26);
         glutAddMenuEntry("Coloring by age",       27);
+        glutAddMenuEntry("Coloring by +end state",28);
         glutAddMenuEntry("draw_average=0", 30);
         glutAddMenuEntry("draw_average=1", 31);
         glutAddMenuEntry("draw_average=2", 32);

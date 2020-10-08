@@ -193,47 +193,55 @@ void Display::prepareLineDisp(const Fiber * fib)
     
     if ( !fib->disp )
         fib->disp = new LineDisp();
-    LineDisp * self = fib->disp;
+    
+    gle_color col = disp->color;
     
     // change body color depending on coloring mode:
     switch ( disp->coloring )
     {
         default:
         case FiberDisp::COLORING_OFF:
-            self->color = disp->color;
+            col = disp->color;
             break;
         case FiberDisp::COLORING_RANDOM:
-            self->color = gle::bright_color(fib->signature()).match_a(disp->color);
+            col = gle::bright_color(fib->signature()).match_a(disp->color);
             break;
         case FiberDisp::COLORING_DIRECTION:
-            self->color = gle::radial_color(fib->avgDirection());
+            col = gle::radial_color(fib->avgDirection());
             break;
         case FiberDisp::COLORING_MARK:
-            self->color = gle::nice_color(fib->mark());
+            col = gle::nice_color(fib->mark());
             break;
         case FiberDisp::COLORING_FLAG:
-            self->color = gle::std_color(fib->flag());
+            col = gle::std_color(fib->flag());
             break;
 #if FIBER_HAS_FAMILY
         case FiberDisp::COLORING_FAMILY:
             if ( fib->family_ )
-                self->color = gle::nice_color(fib->family_->signature());
+                col = gle::nice_color(fib->family_->signature());
             else
-                self->color = disp->color;
+                col = disp->color;
             break;
 #endif
         case FiberDisp::COLORING_CLUSTER:
-            self->color = gle::alt_color(fib->flag());
+            col = gle::alt_color(fib->flag());
             break;
         case FiberDisp::COLORING_AGE:
-            self->color = gle_color::jet_color((fib->age()-age_start)*age_scale, 1.0);
+            col = gle_color::jet_color((fib->age()-age_start)*age_scale, 1.0);
+            break;
+        case FiberDisp::COLORING_PSTATE:
+            if ( fib->endStateP() > 0 )
+                col = disp->end_color[std::min(fib->endStateP(),5U)];
             break;
     }
     
+    LineDisp * self = fib->disp;
+    self->color = col;
+    
 #if ( 0 )
     // colors of ends set to match body color:
-    self->end_color[0] = self->color;
-    self->end_color[1] = self->color;
+    self->end_color[0] = col;
+    self->end_color[1] = col;
 #else
     // colors of ends for non-dynamic filaments:
     self->end_color[0] = disp->end_color[0];
@@ -242,40 +250,49 @@ void Display::prepareLineDisp(const Fiber * fib)
     
     // For dynamic Fibers, change colors of tips according to state:
     if ( fib->endStateP() > 0 )
-        self->end_color[0] = disp->end_color[fib->endStateP()%5];
+        self->end_color[0] = disp->end_color[std::min(fib->endStateP(),5U)];
     
     if ( fib->endStateM() > 0 )
-        self->end_color[1] = disp->end_color[fib->endStateM()%5];
+        self->end_color[1] = disp->end_color[std::min(fib->endStateM(),5U)];
 
+    bool hide = false;
     // hide right or left-pointing fibers:
-    if ( ( disp->exclude & 1 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) < 0 )
-        self->color = disp->hide_color;
-    if ( ( disp->exclude & 2 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) > 0 )
-        self->color = disp->hide_color;
+    if (( disp->exclude & 1 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) < 0 )
+        hide = true;
+    if (( disp->exclude & 2 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) > 0 )
+        hide = true;
     
 #if ( DIM == 2 )
     // hide clockwise or counter-clockwise orientated fibers:
-    if ( ( disp->exclude & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)) < 0 )
-        self->color = disp->hide_color;
-    if ( ( disp->exclude & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
-        self->color = disp->hide_color;
+    if (( disp->exclude & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)) < 0 )
+        hide = true;
+    if (( disp->exclude & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
+        hide = true;
 #elif ( DIM == 3 )
     // hide clockwise or counter-clockwise orientated fibers in the XY plane
-    if ( ( disp->exclude & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
-        self->color = disp->hide_color;
-    if ( ( disp->exclude & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ > 0 )
-        self->color = disp->hide_color;
+    if (( disp->exclude & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
+        hide = true;
+    if (( disp->exclude & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ > 0 )
+        hide = true;
 #endif
     
 #if ( 1 )
     // hide fibers depending on mask
     if ( fib->signature() & disp->mask_bitfield )
-        self->color = disp->hide_color;
+        hide = true;
 #else
     if ( fib->mark() & disp->mask_bitfield )
-        self->color = disp->hide_color;
+        hide = true;
 #endif
 
+    // hide fibers in a specified state
+    if ( fib->endStateP() == disp->hide_state )
+        hide = true;
+    
+    // change color of 'hidden' filament:
+    if ( hide )
+        self->color = disp->hide_color;
+    
     // default visibility set from class:
     if ( disp->visible )
     {
@@ -289,17 +306,6 @@ void Display::prepareLineDisp(const Fiber * fib)
     }
     else
         self->visible = 0;
-
-#if ( 0 )
-    // hide fibers which are not growing
-    if ( fib->endStateP() == STATE_WHITE )
-    {
-        LOG_ONCE("non-growing fibers made invisible\n");
-        self->visible = -1;
-        self->color = disp->hide_color;
-        self->end_color[0] = self->color.transparency(1.0);
-    }
-#endif
     
     // set parameters for exploded display
     if ( disp->explode )

@@ -34,7 +34,8 @@ void FiberDisp::clear()
     end_color[2]     = 0xFFFF00FF;  // yellow
     end_color[3]     = 0xFF7538FF;  // orange
     end_color[4]     = 0xFF0000FF;  // red
-    
+    end_color[5]     = 0x777777FF;  // gray
+
     lattice_style    = 0;
     lattice_scale    = 1;
     lattice_rescale  = 0;
@@ -49,7 +50,8 @@ void FiberDisp::clear()
     
     mask             = 0;
     mask_bitfield    = 0;
-
+    hide_state       = 7;  // not a possible state
+    
     length_scale     = 1;
     tension_scale    = 1;
     force_scale      = 0;
@@ -130,7 +132,8 @@ void FiberDisp::read(Glossary& glos)
     if ( glos.set(mask,        "mask") )
         mask_bitfield = RNG.distributed_bits(mask);
     glos.set(mask_bitfield,    "mask", 1);
-
+    glos.set(hide_state,       "hide_state");
+    
     glos.set(length_scale,     "length_scale");
     glos.set(tension_scale,    "tension_scale");
     glos.set(force_scale,      "forces");
@@ -166,7 +169,8 @@ void FiberDisp::write_values(std::ostream& os) const
     write_value(os, "speckles",     speckle_size, speckle_style, speckle_interval);
     write_value(os, "exclude",      exclude, exclude_axis);
     write_value(os, "mask",         mask, mask_bitfield);
-
+    write_value(os, "hide_state",   hide_state);
+    
     write_value(os, "length_scale", length_scale);
     write_value(os, "tension_scale",tension_scale);
     write_value(os, "forces",       force_scale, force_color);

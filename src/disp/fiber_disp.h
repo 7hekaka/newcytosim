@@ -28,7 +28,8 @@ public:
         COLORING_FLAG,
         COLORING_FAMILY,
         COLORING_CLUSTER,
-        COLORING_AGE
+        COLORING_AGE,
+        COLORING_PSTATE
     };
     
 public:
@@ -169,7 +170,7 @@ public:
      - 4, shrinking end, use end_color[4]
      .
      */
-    gle_color    end_color[5];
+    gle_color    end_color[6];
     
     
     /// if true, specify the style for displaying lattice content (also known as `lattice[0]`)
@@ -230,7 +231,8 @@ public:
     /// the direction used for hiding left- or right-pointing fibers, etc. (known as `exclude[1]`)
     Vector3      exclude_axis;
     
-    
+    /// hide filament with specified state
+    unsigned     hide_state;
     
     /// number of bits equal to `1` in the mask_bitfield
     /**
