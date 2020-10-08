@@ -104,7 +104,7 @@ typedef Array<FatLocusF> FatLocusListF;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
-#define MAX_STERIC_PANES 2
+#define MAX_STERIC_PANES 1
 
 
 /// a set of lists associated with the same location
