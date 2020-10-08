@@ -139,11 +139,11 @@ void Simul::setStericInteractions(Meca& meca) const
             const real ran = rad + F->prop->steric_range;   // extended range of interaction
         
             // include segments, in the cell associated with their center
-            for ( size_t r = 0; r < F->nbSegments(); ++r )
+            for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( N_STERIC_PANES == 1 )
-                pointGrid.add(FiberSegment(F, r), rad, ran);
+                pointGrid.add(FiberSegment(F, i), rad, ran);
 #else
-                pointGrid.add(F->prop->steric, FiberSegment(F, r), rad, ran);
+                pointGrid.add(F->prop->steric, FiberSegment(F, i), rad, ran);
 #endif
         }
     }
@@ -254,11 +254,11 @@ void Simul::setStericInteractionsF(Meca& meca) const
         {
             const real rad = F->prop->steric_radius;
             // include segments, in the cell associated with their center
-            for ( size_t r = 0; r < F->nbSegments(); ++r )
+            for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( MAX_STERIC_PANES == 1 )
-                pointGridF.add(FiberSegment(F, r), rad);
+                pointGridF.add(FiberSegment(F, i), rad);
 #else
-                pointGridF.add(F->prop->steric, FiberSegment(F, r), rad);
+                pointGridF.add(F->prop->steric, FiberSegment(F, i), rad);
 #endif
         }
     }
