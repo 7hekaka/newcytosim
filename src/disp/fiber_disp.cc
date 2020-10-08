@@ -45,8 +45,8 @@ void FiberDisp::clear()
     speckle_style    = 0;
     speckle_interval = 1;
     
-    exclude          = 0;
-    exclude_axis.set(1,0,0);
+    hide             = 0;
+    hide_axis.set(1,0,0);
     
     mask             = 0;
     mask_bitfield    = 0;
@@ -125,9 +125,8 @@ void FiberDisp::read(Glossary& glos)
     if ( speckle_interval <= 0 )
         speckle_interval = 1;
 
-    glos.set(exclude,          "exclude");
-    glos.set(exclude_axis,     "exclude", 1);
-    glos.set(exclude_axis,     "exclude_axis");
+    glos.set(hide, "hide") || glos.set(hide, "exclude");
+    glos.set(hide_axis, "hide_axis") || glos.set(hide_axis, "hide", 1) || glos.set(hide_axis, "exclude", 1);
     
     if ( glos.set(mask,        "mask") )
         mask_bitfield = RNG.distributed_bits(mask);
@@ -167,7 +166,7 @@ void FiberDisp::write_values(std::ostream& os) const
     write_value(os, "lattice",      lattice_style, lattice_scale, lattice_rescale);
     write_value(os, "labels",       label_style);
     write_value(os, "speckles",     speckle_size, speckle_style, speckle_interval);
-    write_value(os, "exclude",      exclude, exclude_axis);
+    write_value(os, "hide",         hide, hide_axis);
     write_value(os, "mask",         mask, mask_bitfield);
     write_value(os, "hide_state",   hide_state);
     

@@ -257,22 +257,22 @@ void Display::prepareLineDisp(const Fiber * fib)
 
     bool hide = false;
     // hide right or left-pointing fibers:
-    if (( disp->exclude & 1 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) < 0 )
+    if (( disp->hide & 1 )  &&  dot(fib->diffPoints(0), disp->hide_axis) < 0 )
         hide = true;
-    if (( disp->exclude & 2 )  &&  dot(fib->diffPoints(0), disp->exclude_axis) > 0 )
+    if (( disp->hide & 2 )  &&  dot(fib->diffPoints(0), disp->hide_axis) > 0 )
         hide = true;
     
 #if ( DIM == 2 )
     // hide clockwise or counter-clockwise orientated fibers:
-    if (( disp->exclude & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)) < 0 )
+    if (( disp->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)) < 0 )
         hide = true;
-    if (( disp->exclude & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
+    if (( disp->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
         hide = true;
 #elif ( DIM == 3 )
     // hide clockwise or counter-clockwise orientated fibers in the XY plane
-    if (( disp->exclude & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
+    if (( disp->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
         hide = true;
-    if (( disp->exclude & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ > 0 )
+    if (( disp->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ > 0 )
         hide = true;
 #endif
     
@@ -570,13 +570,13 @@ void Display::drawAverageFiber(ObjectList const& objs)
 bool selectR(Object const* obj, void const* arg)
 {
     Fiber const* fib = static_cast<Fiber const*>(obj);
-    return fib->prop == arg  &&  dot(fib->diffPoints(0), fib->prop->disp->exclude_axis) > 0;
+    return fib->prop == arg  &&  dot(fib->diffPoints(0), fib->prop->disp->hide_axis) > 0;
 }
 
 bool selectL(Object const* obj, void const* arg)
 {
     Fiber const* fib = static_cast<Fiber const*>(obj);
-    return fib->prop == arg  &&  dot(fib->diffPoints(0), fib->prop->disp->exclude_axis) < 0;
+    return fib->prop == arg  &&  dot(fib->diffPoints(0), fib->prop->disp->hide_axis) < 0;
 }
 
 void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg)

@@ -252,12 +252,12 @@ void changeCoupleSelect2()
 void changeExclude(FiberDisp* p, int val)
 {
     if ( val )
-        p->exclude >>= 2;
-    p->exclude = ( p->exclude + 1 ) % 4;
+        p->hide >>= 2;
+    p->hide = ( p->hide + 1 ) % 4;
     if ( val )
-        p->exclude <<= 2;
+        p->hide <<= 2;
     
-    switch ( p->exclude )
+    switch ( p->hide )
     {
         case 0: flashText("All fibers");                break;
         case 1: flashText("Right-pointing fibers");     break;

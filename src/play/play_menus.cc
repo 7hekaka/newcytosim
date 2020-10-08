@@ -189,9 +189,9 @@ void processMenuFiberSelect(int item)
         switch (item)
         {
             case 0:  return;
-            case 1:  FD->exclude  = 0;   break;
-            case 2:  FD->exclude ^= 1;   break;
-            case 3:  FD->exclude ^= 2;   break;
+            case 1:  FD->hide  = 0;   break;
+            case 2:  FD->hide ^= 1;   break;
+            case 3:  FD->hide ^= 2;   break;
             default:
                 std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
                 return;
@@ -212,8 +212,8 @@ int buildMenuFiberSelect()
     FiberDisp * FD = player.firstFiberDisp();
     if ( FD )
     {
-        glutAddMenuEntry(FD->exclude&1?"Show right pointing":"Hide right pointing", 2);
-        glutAddMenuEntry(FD->exclude&2?"Show left pointing":"Hide left pointing", 3);
+        glutAddMenuEntry(FD->hide&1?"Show right pointing":"Hide right pointing", 2);
+        glutAddMenuEntry(FD->hide&2?"Show left pointing":"Hide left pointing", 3);
     }
     return menuID;
 }

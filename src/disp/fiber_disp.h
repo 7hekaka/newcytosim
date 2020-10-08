@@ -226,10 +226,10 @@ public:
      - 4th bit true: hide counter-clockwise fibers
      .
      */
-    int          exclude;
+    int          hide;
     
     /// the direction used for hiding left- or right-pointing fibers, etc. (known as `exclude[1]`)
-    Vector3      exclude_axis;
+    Vector3      hide_axis;
     
     /// hide filament with specified state
     unsigned     hide_state;
