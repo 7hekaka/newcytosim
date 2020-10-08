@@ -1308,7 +1308,8 @@ namespace gle
     void gleOctahedron1()
     {
         // Eight triangles, ordered counterclockwise
-        constexpr GLfloat R = 1.0;
+        // set size to match the volume of the unit sphere
+        constexpr GLfloat R = 1.46459188756;
         constexpr GLfloat pts[] = {
              R, 0, 0, 0, 0, R, 0,-R, 0,
              0, 0,-R,-R, 0, 0, 0, R, 0,
