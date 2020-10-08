@@ -34,8 +34,8 @@ extern Modulo const* modulo;
 
 #if DRAW_MECA_LINKS
 
-#  include "gle.h"
-#  include "gle_color_list.h"
+#  include "../disp/gle.h"
+#  include "../disp/gle_color_list.h"
 
 /// this performs the modulo on `c`
 void drawLinkM(Vector const& a, Vector const& ab, Vector c)
