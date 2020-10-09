@@ -27,6 +27,7 @@ except ImportError:
 
 executable = 'pwd'
 out = sys.stderr
+verbose = 1
 njobs = 1
 
 #------------------------------------------------------------------------
@@ -36,7 +37,8 @@ def execute(path):
     run executable in specified directory
     """
     os.chdir(path)
-    out.write('-  '*24+path+"\n")
+    if verbose:
+        out.write('-  '*24+path+"\n")
     try:
         subprocess.call(executable, shell=True)
     except Exception as e:
@@ -59,7 +61,7 @@ def main(args):
     """
         read command line arguments and process command
     """
-    global executable
+    global executable, verbose
     try:
         executable = args[0]
     except:
@@ -75,6 +77,8 @@ def main(args):
             njobs = int(arg[6:])
         elif arg.startswith('jobs='):
             njobs = int(arg[5:])
+        elif arg == '-':
+            verbose = 0
         else:
             out.write("  Warning: unexpected argument `%s'\n" % arg)
             sys.exit()
