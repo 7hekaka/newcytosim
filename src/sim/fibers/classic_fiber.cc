@@ -62,7 +62,7 @@ void ClassicFiber::setEndStateP(state_t s)
  */
 void ClassicFiber::step()
 {
-    constexpr int P = 0, M = 1;
+    constexpr size_t P = 0, M = 1;
     const real len = length();
 
     if ( mStateM == STATE_GREEN )
@@ -120,6 +120,8 @@ void ClassicFiber::step()
             cata = prop->catastrophe_rate_stalled_dt[P] / ( 1.0 + prop->catastrophe_coef[P] * mGrowthP );
         else
             cata = prop->catastrophe_rate_dt[P];
+        
+        //printf("ClassicFiber %5u : force %9.5f growth %9.5f cata %9.5f\n", identity(), force, mGrowthP, cata);
         
 #if NEW_CATASTROPHE_OUTSIDE
         // Catastrophe rate is multiplied if the PLUS_END is outside

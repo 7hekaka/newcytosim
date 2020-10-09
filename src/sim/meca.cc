@@ -1352,7 +1352,7 @@ void Meca::computeForces()
 {
     prepareMatrices();
     
-    // calculate forces in vFOR, but without Brownian noise:
+    // calculate forces into vFOR and vTMP
     calculateForces(vPTS, vBAS, vFOR);
     copy_real(dimension(), vFOR, vTMP);
 

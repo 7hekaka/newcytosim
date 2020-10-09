@@ -51,7 +51,7 @@ void GrowingFiber::setEndStateP(state_t s)
 
 void GrowingFiber::step()
 {
-    constexpr int P = 0, M = 1;
+    constexpr size_t P = 0, M = 1;
 
     // PLUS_END
     if ( prop->shrink_outside[P] && prop->confine_space_ptr->outside(posEndP()) )

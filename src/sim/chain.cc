@@ -1976,8 +1976,7 @@ real Chain::projectedForceEndM() const
 /// force on the PLUS_END projected on the direction of elongation
 real Chain::projectedForceEndP() const
 {
-    size_t p = lastSegment();
-    return dot(netForce(p+1), dirSegment(p));
+    return dot(netForce(lastPoint()), dirSegment(lastSegment()));
 }
 
 

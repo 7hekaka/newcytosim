@@ -52,7 +52,7 @@ void TreadmillingFiber::setEndStateP(state_t s)
 
 void TreadmillingFiber::step()
 {    
-    constexpr int P = 0, M = 1;
+    constexpr size_t P = 0, M = 1;
 
     if ( mStateP == STATE_GREEN )
     {
