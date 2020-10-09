@@ -425,6 +425,7 @@ class Preconfig:
         insert the number before the first '.' on the pattern
         """
         [main, ext] = os.path.basename(name).split('.', 1)
+        ext, drop = os.path.splitext(ext)
         res = main + '%0' + repr(self.nb_digits) + 'i' + '.' + ext
         if path:
             res = os.path.join(path, res)
