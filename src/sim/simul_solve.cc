@@ -426,6 +426,14 @@ void Simul::solve()
 }
 
 
+void Simul::solve_force()
+{
+    sMeca.prepare(this);
+    setAllInteractions(sMeca);
+    sMeca.computeForces();
+}
+
+
 void Simul::solve_half()
 {
     sMeca.prepare(this);
@@ -640,7 +648,7 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 
 #include "meca1d.h"
 
-void Simul::solveX()
+void Simul::solve_onlyX()
 {
     if ( !pMeca1D )
         pMeca1D = new Meca1D();

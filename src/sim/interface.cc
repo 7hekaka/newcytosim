@@ -733,9 +733,11 @@ void reportCPUtime(int frame, real simtime)
  
  `solve`      | Result                                                         |
  -------------|-----------------------------------------------------------------
- `off`        | Objects are immobile.
- `on`         | The mechanics is solved fully (default).
+ `off`        | Objects are immobile and mechanical equations are not solved.
+ `on`         | The mechanics is solved and applied to the objects (default).
  `auto`       | Same as 'on' but preconditionning method is set automatically.
+ `force`      | Calculate forces given the current object's positions.
+ `half`       | Solve mechanical system and calculate forces but do not apply movements.
  `horizontal` | The mechanics is solved only allowing motion in the X-direction.
  `flux`       | Fibers are translated at `flux_speed` according to their orientation.
  
@@ -777,16 +779,18 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         simul.events.add(event);
     }
 #endif
-    opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"horizontal",4}, {"flux",5}, {"half",7}});
+    opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
+                             {"horizontal",4}, {"flux",5}, {"half",7}});
     
     // setting a pointer to the 'solve' function
     void (Simul::* solveFunc)() = &Simul::solve_not;
     switch ( solve )
     {
-        case 1: solveFunc = &Simul::solve;      break;
+        case 1: solveFunc = &Simul::solve; break;
         case 2: solveFunc = &Simul::solve_auto; break;
-        case 3: solveFunc = &Simul::solveX;     break;
-        case 4: solveFunc = &Simul::solve_flux; break;
+        case 3: solveFunc = &Simul::solve_force; break;
+        case 4: solveFunc = &Simul::solve_onlyX; break;
+        case 5: solveFunc = &Simul::solve_flux; break;
         case 7: solveFunc = &Simul::solve_half; break;
     }
 

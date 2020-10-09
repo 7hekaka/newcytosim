@@ -196,6 +196,9 @@ public:
     /// simulate the mechanics of the system and move Mecables accordingly
     void            solve();
     
+    /// calculate forces given the current positions
+    void            solve_force();
+
     /// solve mechanical system and calculate forces but do not apply movements
     void            solve_half();
 
@@ -209,7 +212,7 @@ public:
     void            solve_not() {};
 
     /// calculate the motion of objects, but only in the X-direction
-    void            solveX();
+    void            solve_onlyX();
     
     /// move every Fiber backward by `shift` (this is an extremely crude model)
     void            solve_flux();
