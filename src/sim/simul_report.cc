@@ -68,7 +68,7 @@ void remove_plural(std::string & str)
  */
 void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt) const
 {
-    out << "\n% time " << std::fixed << std::setprecision(3) << prop->time;
+    out << "% time " << std::fixed << std::setprecision(3) << prop->time;
     out << "\n% report " << arg;
     report(out, arg, opt);
     out << "% end\n";

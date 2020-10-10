@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 /**
  This is a program to analyse simulation results:
- it reads a trajectory-file, and print selected data from it to text files.
+ it reads a trajectory-file, and print some data from it.
 */
 
 #include <fstream>
@@ -17,20 +17,33 @@
 #include "simul.h"
 
 int verbose = 1;
+char root[256] = "report";
 
 void help(std::ostream& os)
 {
     os << "Cytosim-reportF "<<DIM<<"D, file version " << Simul::currentFormatID << '\n';
-    os << "       generate reports/statistics about cytosim's objects\n";
+    os << "       generates reports/statistics from a trajectory file\n";
+    os << "       this tool is simular to 'report', but generates one file per frame\n";
+    os << " Syntax:\n";
+    os << "       reportF WHAT [OPTIONS]\n";
+    os << " Options:\n";
+    os << "       precision=INTEGER\n";
+    os << "       column=INTEGER\n";
+    os << "       verbose=0\n";
+    os << "       frame=INTEGER\n";
+    os << "       period=INTEGER\n";
+    os << "       input=FILE_NAME\n";
+    os << "       root=STRING\n";
+    os << " This tool must be invoked in a directory containing the simulation output,\n";
+    os << " and it will generate reports by calling Simul::report(). The only required\n";
+    os << " argument `WHAT` determines what sort of data will be generated. Many options are\n";
+    os << " available, please check the HTML documentation for a list of possibilities.\n\n";
+    os << " By default, all frames in the file are processed in order, but a initial frame\n";
+    os << " and a periodicity can be specified.\n";
+    os << " The input trajectory file is `objects.cmo` unless otherwise specified.\n";
+    os << " The result is sent to standard output unless a file is specified as `output=NAME`\n";
+    os << " Attention: there should be no whitespace in any of the option.\n";
     os << "\n";
-    os << "Syntax:\n";
-    os << "       reportF WHAT [verbose=0] [root=STRING]\n";
-    os << "\n";
-    os << "This tool must be invoked in a directory containing the simulation output\n";
-    os << "It will generate the same reports as Simul::report()\n";
-    os << "See the documentation of Simul::report() for a list of possible values for WHAT\n";
-    os << "\n";
-    os << "'reportF' is simular to 'report', but sends the output for each frame\n";
     os << "of the trajectory to a different file. These files are named:\n";
     os << "    ROOT####.txt\n";
     os << "where #### is the frame number and ROOT can be specified.\n";
@@ -40,9 +53,9 @@ void help(std::ostream& os)
 
 void report(Simul const& simul, std::ostream& os, std::string const& what, Glossary& opt)
 {
-    if ( verbose )
+    if ( verbose > 0 )
     {
-        simul.report(os, what, opt);
+        simul.report_wrap(os, what, opt);
     }
     else
     {
@@ -52,13 +65,20 @@ void report(Simul const& simul, std::ostream& os, std::string const& what, Gloss
     }
 }
 
+
+void report(Simul const& simul, std::string const& what, Glossary& opt, size_t frm)
+{
+    char filename[256];
+    snprintf(filename, sizeof(filename), "%s%04lu.txt", root, frm);
+    std::ofstream os(filename);
+    report(simul, os, what, opt);
+}
+
 //------------------------------------------------------------------------------
 
 
 int main(int argc, char* argv[])
 {
-    Cytosim::silence_all();
-    
     if ( argc < 2 || strstr(argv[1], "help") )
     {
         help(std::cout);
@@ -71,37 +91,69 @@ int main(int argc, char* argv[])
         print_version(std::cout);
         return EXIT_SUCCESS;
     }
-
-    std::string input = TRAJECTORY;
-    std::string root = "report", str, what = argv[1];
     
     Glossary arg;
+
+    std::string input = TRAJECTORY;
+    std::string str, what = argv[1];
+
     if ( arg.read_strings(argc-2, argv+2) )
         return EXIT_FAILURE;
+
+    size_t frame = 0;
+    size_t period = 1;
+
     arg.set(input, ".cmo") || arg.set(input, "input");
-    if ( arg.use_key("-") ) verbose = 0;
     arg.set(verbose, "verbose");
-    arg.set(root, "root");
-    
+    if ( arg.use_key("-") ) verbose = 0;
+
     Simul simul;
     FrameReader reader;
     RNG.seed();
 
+    if ( arg.set(str, "root") )
+        strncpy(root, str.c_str(), sizeof(root));
+    
     try
     {
         simul.loadProperties();
         reader.openFile(input);
         
-        size_t frame = 0;
-        char filename[256];
+        // get arguments:
+        if ( arg.set(frame, "frame") )
+            period = 0;
+        arg.set(period, "period");
+    }
+    catch( Exception & e )
+    {
+        std::clog << e.brief() << '\n';
+        return EXIT_FAILURE;
+    }
+    
+    Cytosim::silence_all();
+    size_t f = frame;
+    size_t cnt = 1;
+    
+    try
+    {
+        if ( reader.loadFrame(simul, frame) )
+        {
+            std::cerr << "Error: missing frame " << frame << '\n';
+            return EXIT_FAILURE;
+        }
+ 
+        // process first record, at index 'frame':
+        report(simul, what, arg, frame);
         
-        // load all frames in the file:
+        // load other frames in the file:
         while ( 0 == reader.loadNextFrame(simul) )
         {
-            snprintf(filename, sizeof(filename), "%s%04lu.txt", root.c_str(), frame);
-            std::ofstream out(filename);
-            report(simul, out, what, arg);
-            ++frame;
+            ++f;
+            if ( f % period == frame % period )
+            {
+                report(simul, what, arg, f);
+                ++cnt;
+            }
         }
     }
     catch( Exception & e )
@@ -110,5 +162,6 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
+    arg.print_warning(std::cerr, cnt, "\n");
     return EXIT_SUCCESS;
 }

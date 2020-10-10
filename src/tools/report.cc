@@ -18,24 +18,22 @@
 
 int verbose = 1;
 int prefix = 0;
-size_t cnt = 0;
 
 
 void help(std::ostream& os)
 {
     os << "Cytosim-report "<<DIM<<"D, file version " << Simul::currentFormatID << '\n';
-    os << "       generates reports/statistics from a trjacetory file\n";
-    os << "Syntax:\n";
+    os << "       generates reports/statistics from a trajectory file\n";
+    os << " Syntax:\n";
     os << "       report [time] WHAT [OPTIONS]\n";
-    os << "Options:\n";
+    os << " Options:\n";
     os << "       precision=INTEGER\n";
     os << "       column=INTEGER\n";
     os << "       verbose=0\n";
     os << "       frame=INTEGER[,INTEGER[,INTEGER[,INTEGER]]]\n";
     os << "       period=INTEGER\n";
     os << "       input=FILE_NAME\n";
-    os << "       output=FILE_NAME\n";
-    os << "\n";
+    os << "       output=FILE_NAME\n\n";
     os << "  This tool must be invoked in a directory containing the simulation output,\n";
     os << "  and it will generate reports by calling Simul::report(). The only required\n";
     os << "  argument `WHAT` determines what sort of data will be generated. Many options are\n";
@@ -45,8 +43,7 @@ void help(std::ostream& os)
     os << "  A periodicity can also be specified (ignored if multiple frames are specified).\n\n";
     os << "  The input trajectory file is `objects.cmo` unless otherwise specified.\n";
     os << "  The result is sent to standard output unless a file is specified as `output=NAME`\n";
-    os << "  Attention: there should be no whitespace in any of the option.\n";
-    os << "\n";
+    os << "  Attention: there should be no whitespace in any of the option.\n\n";
     os << "Examples:\n";
     os << "       report fiber:points\n";
     os << "       report fiber:points frame=10 > fibers.txt\n";
@@ -101,7 +98,6 @@ void report_prefix(Simul const& simul, std::ostream& os, std::string const& what
 
 void report(Simul const& simul, std::ostream& os, std::string const& what, int frm, Glossary& opt)
 {
-    ++cnt;
     try
     {
         if ( prefix )
@@ -173,38 +169,38 @@ int main(int argc, char* argv[])
 
     Simul simul;
     FrameReader reader;
+    RNG.seed();
 
     try
     {
-        RNG.seed();
         simul.loadProperties();
         reader.openFile(input);
+        
+        // get arguments:
+        if ( arg.set(frame, "frame") )
+            period = 0;
+        arg.set(period, "period");
+
+        if ( arg.set(str, "output") )
+        {
+            try {
+                ofs.open(str.c_str());
+            }
+            catch( ... )
+            {
+                std::clog << "Cannot open output file\n";
+                return EXIT_FAILURE;
+            }
+            osp = &ofs;
+        }
     }
     catch( Exception & e )
     {
         std::clog << e.brief() << '\n';
         return EXIT_FAILURE;
     }
-
-    if ( arg.set(str, "output") )
-    {
-        try {
-            ofs.open(str.c_str());
-        }
-        catch( ... )
-        {
-            std::clog << "Cannot open output file\n";
-            return EXIT_FAILURE;
-        }
-        osp = &ofs;
-    }
     
     Cytosim::silence_all();
-    
-    // get arguments:
-    if ( arg.set(frame, "frame") )
-        period = 0;
-    arg.set(period, "period");
     
     // process first record, at index 'frame':
     if ( reader.loadFrame(simul, frame) )
@@ -213,6 +209,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     report(simul, *osp, what, frame, arg);
+    size_t cnt = 1;
 
     if ( arg.nb_values("frame") > 1 )
     {
@@ -222,7 +219,10 @@ int main(int argc, char* argv[])
         {
             // try to load the specified frame:
             if ( 0 == reader.loadFrame(simul, frame) )
+            {
                 report(simul, *osp, what, frame, arg);
+                ++cnt;
+            }
             else
             {
                 std::cerr << "Error: missing frame " << frame << '\n';
@@ -239,11 +239,13 @@ int main(int argc, char* argv[])
         {
             ++f;
             if ( f % period == frame % period )
+            {
                 report(simul, *osp, what, f, arg);
+                ++cnt;
+            }
         }
     }
     
     arg.print_warning(std::cerr, cnt, "\n");
-
     return EXIT_SUCCESS;
 }
