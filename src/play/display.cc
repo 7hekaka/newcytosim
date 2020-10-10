@@ -683,7 +683,7 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
                 gle::gleArrowTail(fib.posEndM(), -fib.dirEndM(), width);
                 break;
             case 6:
-                gle::gleObject(fib.posEndM(), width, gle::gleCube1);
+                gle::gleObject(fib.posEndM(), width, gle::cube);
                 break;
         }
     }
@@ -724,7 +724,7 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
                 gle::gleArrowTail(fib.posEndP(), -fib.dirEndP(), width);
                 break;
             case 6:
-                gle::gleObject(fib.posEndP(), width, gle::gleCube1);
+                gle::gleObject(fib.posEndP(), width, gle::cube);
                 break;
         }
     }
@@ -924,7 +924,7 @@ void Display::drawFiberLines(Fiber const& fib) const
 }
 
 
-void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
+void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     lineWidth(disp->line_width);
@@ -934,42 +934,42 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t i) const
     {
         const real beta = fib.segmentation() / disp->length_scale;
         glBegin(GL_LINE_STRIP);
-        color_by_distanceM(fib, i, beta).load();
-        gle::gleVertex(fib.posP(i));
-        if ( i == 0 )
+        color_by_distanceM(fib, inx, beta).load();
+        gle::gleVertex(fib.posP(inx));
+        if ( inx == 0 )
         {
             color_by_distanceM(fib, 0.25, beta).load();
             gle::gleVertex(fib.posPoint(0, 0.25));
             color_by_distanceM(fib, 0.5, beta).load();
             gle::gleVertex(fib.posPoint(0, 0.5));
         }
-        color_by_distanceM(fib, i+1, beta).load();
-        gle::gleVertex(fib.posP(i+1));
+        color_by_distanceM(fib, inx+1, beta).load();
+        gle::gleVertex(fib.posP(inx+1));
         glEnd();
     }
     else if ( disp->line_style == 7 )
     {
         const real beta = fib.segmentation() / disp->length_scale;
         glBegin(GL_LINE_STRIP);
-        color_by_distanceP(fib, i, beta).load();
-        gle::gleVertex(fib.posP(i));
-        if ( i == fib.lastSegment() )
+        color_by_distanceP(fib, inx, beta).load();
+        gle::gleVertex(fib.posP(inx));
+        if ( inx == fib.lastSegment() )
         {
-            color_by_distanceP(fib, i+0.5, beta).load();
-            gle::gleVertex(fib.posPoint(i, 0.5));
-            color_by_distanceP(fib, i+0.75, beta).load();
-            gle::gleVertex(fib.posPoint(i, 0.75));
+            color_by_distanceP(fib, inx+0.5, beta).load();
+            gle::gleVertex(fib.posPoint(inx, 0.5));
+            color_by_distanceP(fib, inx+0.75, beta).load();
+            gle::gleVertex(fib.posPoint(inx, 0.75));
         }
-        color_by_distanceP(fib, i+1, beta).load();
-        gle::gleVertex(fib.posP(i+1));
+        color_by_distanceP(fib, inx+1, beta).load();
+        gle::gleVertex(fib.posP(inx+1));
         glEnd();
     }
     else
     {
         fib.disp->color.load();
         glBegin(GL_LINES);
-        gle::gleVertex(fib.posP(i));
-        gle::gleVertex(fib.posP(i+1));
+        gle::gleVertex(fib.posP(inx));
+        gle::gleVertex(fib.posP(inx+1));
         glEnd();
     }
 }

@@ -22,7 +22,7 @@ void display(View&, int)
     // rendering of icosahedron:
     gle_color(1.0, 0.0, 1.0, 1.0).load_front();
     gle_color(0.0, 0.0, 0.5, 1.0).load_back();
-    gle::gleIcosahedron1();
+    gle::icosahedron();
 
     gle_color(1.0, 1.0, 1.0, 1.0).load_both();
     glLineWidth(3.0);

@@ -200,7 +200,7 @@ void Display1::drawSolid(Solid const& obj)
             if ( obj.radius(p) > 0 )
                 drawPoint(obj.posP(p), disp);
             else
-                drawObject(obj.posP(p), disp, gle::gleCube1);
+                drawObject(obj.posP(p), disp, gle::cube);
         }
     }
     

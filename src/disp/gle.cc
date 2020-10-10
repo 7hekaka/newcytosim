@@ -21,16 +21,16 @@ namespace gle
     GLfloat co_[ncircle+1] = { 0 };
     
     /// vertex buffer objects for tubes
-    GLuint tub_buf[14] = { 0 };
+    GLuint tub_[16] = { 0 };
     
     /// vertex buffer objects for hex tubes
-    GLuint hex_buf[2] = { 0 };
+    GLuint buf_[16] = { 0 };
 
     /// vertex buffer objects for icosahedrons
-    GLuint ico_buf[8] = { 0 };
+    GLuint ico_[16] = { 0 };
     
     /// number of faces in icosahedrons
-    GLuint ico_nfaces[4] = { 0 };
+    GLuint ico_nfaces[8] = { 0 };
     
     // Fast method to calculate cosine and sinus over the entire circle
     /**
@@ -155,24 +155,22 @@ namespace gle
         }
 #endif
         circle(ncircle, co_, si_, 1);
-        initializeIcoBuffers();
-        //gleReportErrors(stderr, "gle:initializeIcoBuffers()");
-        initializeTubeBuffers();
-        //gleReportErrors(stderr, "gle:initializeTubeBuffers()");
+        initSphereBuffers();
+        //gleReportErrors(stderr, "gle:initSphereBuffers()");
+        initTubeBuffers();
+        //gleReportErrors(stderr, "gle:initTubes()");
+        initBuffers();
         std::atexit(release);
     }
     
     void release()
     {
-        if ( ico_buf[0] && glIsBuffer(ico_buf[0]) )
-            glDeleteBuffers(8, ico_buf);
-        ico_buf[0] = 0;
-        if ( tub_buf[0] && glIsBuffer(tub_buf[0]) )
-            glDeleteBuffers(12, tub_buf);
-        tub_buf[0] = 0;
-        if ( hex_buf[0] && glIsBuffer(hex_buf[0]) )
-            glDeleteBuffers(2, hex_buf);
-        hex_buf[0] = 0;
+        glDeleteBuffers(16, ico_);
+        ico_[0] = 0;
+        glDeleteBuffers(16, tub_);
+        tub_[0] = 0;
+        glDeleteBuffers(16, buf_);
+        buf_[0] = 0;
     }
     
     //-----------------------------------------------------------------------
@@ -639,6 +637,264 @@ namespace gle
     
     
     //-----------------------------------------------------------------------
+    #pragma mark - Some Platonic solids
+    
+    /// Cube is make of 12 triangles = 36 vertices
+    void initCube(GLint buf1, GLint buf2, GLfloat R=0.5773502692f)
+    {
+        const GLfloat pts[] = {
+            +R, R, R, R,-R,-R, R, R,-R,
+            +R,-R,-R, R, R, R, R,-R, R,
+            +R, R, R, R, R,-R,-R, R,-R,
+            +R, R, R,-R, R,-R,-R, R, R,
+            -R, R, R,-R,-R, R, R,-R, R,
+            +R, R, R,-R, R, R, R,-R, R,
+            -R,-R,-R,-R,-R, R,-R, R, R,
+            -R,-R,-R,-R, R, R,-R, R,-R,
+            +R,-R, R,-R,-R,-R, R,-R,-R,
+            +R,-R, R,-R,-R, R,-R,-R,-R,
+            +R, R,-R,-R,-R,-R,-R, R,-R,
+            +R, R,-R, R,-R,-R,-R,-R,-R
+        };
+        
+        const GLfloat dir[] = {
+            +1, 0, 0, 1, 0, 0, 1, 0, 0,
+            +1, 0, 0, 1, 0, 0, 1, 0, 0,
+            +0, 1, 0, 0, 1, 0, 0, 1, 0,
+            +0, 1, 0, 0, 1, 0, 0, 1, 0,
+            +0, 0, 1, 0, 0, 1, 0, 0, 1,
+            +0, 0, 1, 0, 0, 1, 0, 0, 1,
+            -1, 0, 0,-1, 0, 0,-1, 0, 0,
+            -1, 0, 0,-1, 0, 0,-1, 0, 0,
+            +0,-1, 0, 0,-1, 0, 0,-1, 0,
+            +0,-1, 0, 0,-1, 0, 0,-1, 0,
+            +0, 0,-1, 0, 0,-1, 0, 0,-1,
+            +0, 0,-1, 0, 0,-1, 0, 0,-1
+        };
+        
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
+    }
+    
+    /// Octahedron is make of 8 triangles = 24 vertices
+    void initOctahedron(GLint buf1, GLint buf2, GLfloat R=1.46459188756f)
+    {
+        // Eight triangles, ordered counterclockwise
+        // set size to match the volume of the unit sphere
+        const GLfloat pts[] = {
+            +R, 0, 0, 0, 0, R, 0,-R, 0,
+            +0, 0,-R,-R, 0, 0, 0, R, 0,
+            +0, 0, R,-R, 0, 0, 0,-R, 0,
+            +0, 0,-R, 0, R, 0, R, 0, 0,
+            -R, 0, 0, 0, 0, R, 0, R, 0,
+            +0, 0,-R, R, 0, 0, 0,-R, 0,
+            +0, 0, R, R, 0, 0, 0, R, 0,
+            +0, 0,-R, 0,-R, 0,-R, 0, 0
+        };
+        
+        // normals
+        const GLfloat N = 1.0 / M_SQRT3;
+        const GLfloat dir[] = {
+            +N,-N, N, N,-N, N, N,-N, N,
+            -N, N,-N,-N, N,-N,-N, N,-N,
+            -N,-N, N,-N,-N, N,-N,-N, N,
+            +N, N,-N, N, N,-N, N, N,-N,
+            -N, N, N,-N, N, N,-N, N, N,
+            +N,-N,-N, N,-N,-N, N,-N,-N,
+            +N, N, N, N, N, N, N, N, N,
+            -N,-N,-N,-N,-N,-N,-N,-N,-N
+        };
+        
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
+    }
+
+    
+#if ( 0 )
+    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
+    {
+        glNormal3f((a[0]+b[0]+c[0])/3.0f, (a[1]+b[1]+c[1])/3.0f, (a[2]+b[2]+c[2])/3.0f);
+        glVertex3fv(a);
+        glVertex3fv(b);
+        glVertex3fv(c);
+    }
+    
+    void icoFaceP(GLfloat* a, GLfloat* b, GLfloat* c)
+    {
+        printf("%2.0f, %2.0f, %2.0f,  ", a[0], a[1], a[2]);
+        printf("%2.0f, %2.0f, %2.0f,  ", b[0], b[1], b[2]);
+        printf("%2.0f, %2.0f, %2.0f,\n", c[0], c[1], c[2]);
+    }
+    
+    void icoFaceN(GLfloat* a, GLfloat* b, GLfloat* c)
+    {
+        Vector3 A(a[0], a[1], a[2]);
+        Vector3 B(b[0], b[1], b[2]);
+        Vector3 C(c[0], c[1], c[2]);
+        Vector3 n = normalize(cross(B-A, C-A));
+        glNormal3f(n.XX, n.YY, n.ZZ);
+        glVertex3fv(a);
+        glVertex3fv(b);
+        glVertex3fv(c);
+        printf("%+9.7f,%+9.7f,%+9.7f, ", n[0], n[1], n[2]);
+        printf("%+9.7f,%+9.7f,%+9.7f, ", n[0], n[1], n[2]);
+        printf("%+9.7f,%+9.7f,%+9.7f,\n", n[0], n[1], n[2]);
+    }
+    
+    void icoFace(GLfloat* pts, size_t a, size_t b, size_t c)
+    {
+        icoFace(pts+3*a, pts+3*b, pts+3*c);
+    }
+    
+    void icosahedron()
+    {
+        const GLfloat G = 0.5+0.5*std::sqrt(5.0);
+        const GLfloat O = 1.0/std::sqrt(G*G+1.0); //0.5257311121f;
+        const GLfloat T = G * O;   //0.8506508084f;
+        
+        // Twelve vertices of icosahedron on unit sphere
+        GLfloat pts[] = {
+            +T,  O,  0, // 0
+            -T, -O,  0, // 1
+            -T,  O,  0, // 2
+            +T, -O,  0, // 3
+            +O,  0,  T, // 4
+            -O,  0, -T, // 5
+            +O,  0, -T, // 6
+            -O,  0,  T, // 7
+            +0,  T,  O, // 8
+            +0, -T, -O, // 9
+            +0, -T,  O, // 10
+            +0,  T, -O  // 11
+        };
+        
+        /* The faces are ordered with increasing Z */
+        glBegin(GL_TRIANGLES);
+        icoFace(pts, 5,  6, 9);
+        icoFace(pts, 5, 11, 6);
+        
+        icoFace(pts, 6, 3,  9);
+        icoFace(pts, 2, 11, 5);
+        icoFace(pts, 1, 5,  9);
+        icoFace(pts, 0, 6, 11);//
+        
+        icoFace(pts, 0, 3,  6);
+        icoFace(pts, 1, 2,  5);
+        
+        icoFace(pts, 1, 9, 10);
+        icoFace(pts, 0, 11, 8);//
+        icoFace(pts, 8, 11, 2);
+        icoFace(pts, 9, 3, 10);
+        
+        icoFace(pts, 0, 4,  3);
+        icoFace(pts, 1, 7,  2);
+        
+        icoFace(pts, 0, 8,  4);
+        icoFace(pts, 1, 10, 7);
+        icoFace(pts, 3, 4, 10);
+        icoFace(pts, 7, 8,  2);
+        
+        icoFace(pts, 4, 8,  7);
+        icoFace(pts, 4, 7, 10);
+        glEnd();
+    }
+#endif
+    
+    /// Icosahedrong with 20 triangles = 60 vertices
+    void initIcosahedron(GLint buf1, GLint buf2, GLfloat R=1.0f)
+    {
+        const GLfloat T = R * 0.8506508084f;      // (1 + sqrt(5))/2
+        const GLfloat O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
+        
+        const GLfloat pts[] = {
+            -O,  0, -T,   O,  0, -T,   0, -T, -O,
+            -O,  0, -T,   0,  T, -O,   O,  0, -T,
+            +O,  0, -T,   T, -O,  0,   0, -T, -O,
+            -T,  O,  0,   0,  T, -O,  -O,  0, -T,
+            -T, -O,  0,  -O,  0, -T,   0, -T, -O,
+            +T,  O,  0,   O,  0, -T,   0,  T, -O,
+            +T,  O,  0,   T, -O,  0,   O,  0, -T,
+            -T, -O,  0,  -T,  O,  0,  -O,  0, -T,
+            -T, -O,  0,   0, -T, -O,   0, -T,  O,
+            +T,  O,  0,   0,  T, -O,   0,  T,  O,
+            +0,  T,  O,   0,  T, -O,  -T,  O,  0,
+            +0, -T, -O,   T, -O,  0,   0, -T,  O,
+            +T,  O,  0,   O,  0,  T,   T, -O,  0,
+            -T, -O,  0,  -O,  0,  T,  -T,  O,  0,
+            +T,  O,  0,   0,  T,  O,   O,  0,  T,
+            -T, -O,  0,   0, -T,  O,  -O,  0,  T,
+            +T, -O,  0,   O,  0,  T,   0, -T,  O,
+            -O,  0,  T,   0,  T,  O,  -T,  O,  0,
+            +O,  0,  T,   0,  T,  O,  -O,  0,  T,
+            +O,  0,  T,  -O,  0,  T,   0, -T,  O,
+        };
+        
+        const GLfloat dir[] = {
+            +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724,
+            +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724,
+            +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503,
+            -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503,
+            -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503,
+            +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503,
+            +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221,
+            -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221,
+            -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000,
+            +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000,
+            -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000,
+            +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000,
+            +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221,
+            -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221,
+            +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503,
+            -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503,
+            +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503,
+            -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503,
+            +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724,
+            +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724,
+        };
+        
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
+    }
+    
+    //-----------------------------------------------------------------------
+
+    void drawBuffer(GLint buf1, GLint buf2, size_t cnt, GLenum mode)
+    {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glVertexPointer(3, GL_FLOAT, 0, nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
+        glDrawArrays(mode, 0, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void initBuffers()
+    {
+        if ( !glIsBuffer(buf_[0]) )
+        {
+            glGenBuffers(16, buf_);
+            initCube(buf_[0], buf_[1]);
+            initOctahedron(buf_[2], buf_[3]);
+            initIcosahedron(buf_[4], buf_[5]);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+    }
+    
+    void cube() { drawBuffer(buf_[0], buf_[1], 36, GL_TRIANGLES); }
+    void octahedron() { drawBuffer(buf_[2], buf_[3], 24, GL_TRIANGLES); }
+    void icosahedron() { drawBuffer(buf_[4], buf_[5], 60, GL_TRIANGLES); }
+
+    //-----------------------------------------------------------------------
 #pragma mark - Tubes
     
     void gleTube0(GLfloat B, GLfloat T, int inc)
@@ -670,7 +926,7 @@ namespace gle
         glEnd();
     }
 
-    void initTubeBuffer(GLuint buf1, GLuint buf2, GLfloat A, GLfloat B, size_t inc)
+    void initTube(GLuint buf1, GLuint buf2, GLfloat A, GLfloat B, size_t inc)
     {
         size_t sec = ncircle / inc;
         size_t nbf = 6 * sec + 6;     // number of coordinates
@@ -702,35 +958,17 @@ namespace gle
         glBufferData(GL_ARRAY_BUFFER, nbf*sizeof(GLfloat), pos, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, buf2);
         glBufferData(GL_ARRAY_BUFFER, nbf*sizeof(GLfloat), dir, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //gleReportErrors(stderr, "initTubeBuffer");
-    }
-
-    void drawTubeBuffer(GLint buf1, GLint buf2, GLint n_triangles)
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, buf1);
-        glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glBindBuffer(GL_ARRAY_BUFFER, buf2);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, n_triangles);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //gleReportErrors(stderr, "drawTubeBuffer");
     }
     
-    
-    /// draw hexagon that has the same surface as a disc of radius 1.
-    void initHexTubeBuffer(GLint buf1, GLint buf2, GLfloat A, GLfloat B)
+    /// hexagon has the same surface as a disc of radius 1.
+    void initHexTube(GLint buf1, GLint buf2, GLfloat A, GLfloat B)
     {
         constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
         constexpr GLfloat S = 0.5f;
         constexpr GLfloat H = R * C, X = R * S;
         
-        const GLfloat pos[] = {
+        const GLfloat pts[] = {
              R,  0, B,  R,  0, A,
              X,  H, B,  X,  H, A,
             -X,  H, B, -X,  H, A,
@@ -749,43 +987,40 @@ namespace gle
              1,  0, 0,  1,  0, 0 };
 
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
-        glBufferData(GL_ARRAY_BUFFER, 42*sizeof(GLfloat), pos, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, buf2);
-        glBufferData(GL_ARRAY_BUFFER, 42*sizeof(GLfloat), dir, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
     }
     
     
-    void initializeTubeBuffers()
+    void initTubeBuffers()
     {
-        if ( !glIsBuffer(tub_buf[0]) )
+        if ( !glIsBuffer(tub_[0]) )
         {
-            glGenBuffers(14, tub_buf);
-            initTubeBuffer(tub_buf[ 0], tub_buf[ 1],  0.0, 1.0, 8);
-            initTubeBuffer(tub_buf[ 2], tub_buf[ 3],  0.0, 1.0, 4);
-            initTubeBuffer(tub_buf[ 4], tub_buf[ 5],  0.0, 1.0, 2);
-            initTubeBuffer(tub_buf[ 6], tub_buf[ 7],  0.0, 1.0, 1);
-            initTubeBuffer(tub_buf[ 8], tub_buf[ 9], -0.25, 1.25, 16);
-            initTubeBuffer(tub_buf[10], tub_buf[11], -0.25, 1.25, 8);
-            initTubeBuffer(tub_buf[12], tub_buf[13], -0.25, 1.25, 4);
-        }
-        if ( !glIsBuffer(hex_buf[0]) )
-        {
-            glGenBuffers(2, hex_buf);
-            initHexTubeBuffer(hex_buf[0], hex_buf[1], 0.0, 1.0);
+            glGenBuffers(16, tub_);
+            initTube(tub_[ 0], tub_[ 1],  0.0, 1.0, 8);
+            initTube(tub_[ 2], tub_[ 3],  0.0, 1.0, 4);
+            initTube(tub_[ 4], tub_[ 5],  0.0, 1.0, 2);
+            initTube(tub_[ 6], tub_[ 7],  0.0, 1.0, 1);
+            initTube(tub_[ 8], tub_[ 9], -0.25, 1.25, 16);
+            initTube(tub_[10], tub_[11], -0.25, 1.25, 8);
+            initTube(tub_[12], tub_[13], -0.25, 1.25, 4);
+            initHexTube(tub_[14], tub_[15], 0.0, 1.0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            //gleReportErrors(stderr, "initTube");
         }
     }
 
 #if ( 1 )
     // using Vertex Buffer Objects
-    void gleTube1B()     { drawTubeBuffer(tub_buf[ 0], tub_buf[ 1], 2+ncircle/4); }
-    void gleTube2B()     { drawTubeBuffer(tub_buf[ 2], tub_buf[ 3], 2+ncircle/2); }
-    void gleTube4B()     { drawTubeBuffer(tub_buf[ 4], tub_buf[ 5], 2+ncircle  ); }
-    void gleTube8B()     { drawTubeBuffer(tub_buf[ 6], tub_buf[ 7], 2+ncircle*2); }
-    void gleLongTube1B() { drawTubeBuffer(tub_buf[ 8], tub_buf[ 9], 2+ncircle/8); }
-    void gleLongTube2B() { drawTubeBuffer(tub_buf[10], tub_buf[11], 2+ncircle/4); }
-    void gleLongTube4B() { drawTubeBuffer(tub_buf[12], tub_buf[13], 2+ncircle/2); }
-    void gleHexTube1B()  { drawTubeBuffer(hex_buf[0], hex_buf[1], 14); }
+    void gleTube1B()     { drawBuffer(tub_[ 0], tub_[ 1], 2+ncircle/4, GL_TRIANGLE_STRIP); }
+    void gleTube2B()     { drawBuffer(tub_[ 2], tub_[ 3], 2+ncircle/2, GL_TRIANGLE_STRIP); }
+    void gleTube4B()     { drawBuffer(tub_[ 4], tub_[ 5], 2+ncircle  , GL_TRIANGLE_STRIP); }
+    void gleTube8B()     { drawBuffer(tub_[ 6], tub_[ 7], 2+ncircle*2, GL_TRIANGLE_STRIP); }
+    void gleLongTube1B() { drawBuffer(tub_[ 8], tub_[ 9], 2+ncircle/8, GL_TRIANGLE_STRIP); }
+    void gleLongTube2B() { drawBuffer(tub_[10], tub_[11], 2+ncircle/4, GL_TRIANGLE_STRIP); }
+    void gleLongTube4B() { drawBuffer(tub_[12], tub_[13], 2+ncircle/2, GL_TRIANGLE_STRIP); }
+    void gleHexTube1B()  { drawBuffer(tub_[14], tub_[15], 14, GL_TRIANGLE_STRIP); }
 #else
     // unbuffered functions:
     void gleTube1B()     { gleTube1(); }
@@ -812,43 +1047,6 @@ namespace gle
         }
         glEnd();
     }
-    
-
-    void gleHexTube1(GLfloat A, GLfloat B)
-    {
-        /// draw hexagon that has the same surface as a disc of radius 1.
-        constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
-        constexpr GLfloat S = 0.5f;
-        constexpr GLfloat H = R * C, X = R * S;
-        
-        const GLfloat pts[] = {
-             R,  0, B,  R,  0, A,
-             X,  H, B,  X,  H, A,
-            -X,  H, B, -X,  H, A,
-            -R,  0, B, -R,  0, A,
-            -X, -H, B, -X, -H, A,
-             X, -H, B,  X, -H, A,
-             R,  0, B,  R,  0, A };
-        
-        constexpr GLfloat dir[] = {
-             1,  0, 0,  1,  0, 0,
-             S,  C, 0,  S,  C, 0,
-            -S,  C, 0, -S,  C, 0,
-            -1,  0, 0, -1,  0, 0,
-            -S, -C, 0, -S, -C, 0,
-             S, -C, 0,  S, -C, 0,
-             1,  0, 0,  1,  0, 0 };
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, dir);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-    }
-    
     
     void gleCylinder1()
     {
@@ -907,8 +1105,11 @@ namespace gle
     Platonic::Solid ico2(Platonic::Solid::ICOSAHEDRON, gle::finesse/3);
     Platonic::Solid ico4(Platonic::Solid::ICOSAHEDRON, gle::finesse);
     Platonic::Solid ico8(Platonic::Solid::ICOSAHEDRON, gle::finesse*2);
-    
-    void gleSpherePlatonic(Platonic::Solid & ico)
+    Platonic::Solid icoH1(Platonic::Solid::HEMISPHERE, gle::finesse/6);
+    Platonic::Solid icoH2(Platonic::Solid::HEMISPHERE, gle::finesse/3);
+    Platonic::Solid icoH4(Platonic::Solid::HEMISPHERE, gle::finesse);
+
+    void drawPlatonic(Platonic::Solid & ico)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -919,39 +1120,45 @@ namespace gle
         glDisableClientState(GL_VERTEX_ARRAY);
     }
     
-    void gleSphere1() { gleSpherePlatonic(ico1); }
-    void gleSphere2() { gleSpherePlatonic(ico2); }
-    void gleSphere4() { gleSpherePlatonic(ico4); }
-    void gleSphere8() { gleSpherePlatonic(ico8); }
-    
-    
+    void sphere1U() { drawPlatonic(ico1); }
+    void sphere2U() { drawPlatonic(ico2); }
+    void sphere4U() { drawPlatonic(ico4); }
+    void sphere8U() { drawPlatonic(ico8); }
+    void hemisphere1U() { drawPlatonic(icoH1); }
+    void hemisphere2U() { drawPlatonic(icoH2); }
+    void hemisphere4U() { drawPlatonic(icoH4); }
+
     //-----------------------------------------------------------------------
     
-    GLuint initializeIcoBuffers(GLuint buf1, GLuint buf2, Platonic::Solid & ico)
+    GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Platonic::Solid & ico)
     {
         //std::clog << "initializeIco ico " << ico.nb_faces() << std::endl;
         
         // upload vertex data:
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
         glBufferData(GL_ARRAY_BUFFER, 3*ico.nb_vertices()*sizeof(float), ico.vertex_data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         
         // upload indices:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico.nb_faces()*sizeof(unsigned), ico.faces_data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         return ico.nb_faces();
     }
     
-    void initializeIcoBuffers()
+    void initSphereBuffers()
     {
-        if ( !glIsBuffer(ico_buf[0]) )
+        if ( !glIsBuffer(ico_[0]) )
         {
-            glGenBuffers(8, ico_buf);
-            ico_nfaces[0] = initializeIcoBuffers(ico_buf[0], ico_buf[1], ico1);
-            ico_nfaces[1] = initializeIcoBuffers(ico_buf[2], ico_buf[3], ico2);
-            ico_nfaces[2] = initializeIcoBuffers(ico_buf[4], ico_buf[5], ico4);
-            ico_nfaces[3] = initializeIcoBuffers(ico_buf[6], ico_buf[7], ico8);
+            glGenBuffers(12, ico_);
+            ico_nfaces[0] = initIcoBuffer(ico_[0], ico_[1], ico1);
+            ico_nfaces[1] = initIcoBuffer(ico_[2], ico_[3], ico2);
+            ico_nfaces[2] = initIcoBuffer(ico_[4], ico_[5], ico4);
+            ico_nfaces[3] = initIcoBuffer(ico_[6], ico_[7], ico8);
+            ico_nfaces[4] = initIcoBuffer(ico_[8], ico_[9], icoH1);
+            ico_nfaces[5] = initIcoBuffer(ico_[10], ico_[11], icoH2);
+            ico_nfaces[6] = initIcoBuffer(ico_[12], ico_[13], icoH4);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            //gleReportErrors(stderr, "initIcoBuffer");
 #if 0
             for ( int n = 0; n < 4; ++n )
                 fprintf(stderr, "GLE's icosahedron %i has %u faces\n", n, ico_nfaces[n]);
@@ -965,7 +1172,7 @@ namespace gle
         {
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_NORMAL_ARRAY);
-            
+            // the normal in each vertex is equal to the vertex!
             glBindBuffer(GL_ARRAY_BUFFER, buf1);
             glVertexPointer(3, GL_FLOAT, 0, nullptr);
             glNormalPointer(GL_FLOAT, 0, nullptr);
@@ -980,18 +1187,21 @@ namespace gle
         }
     }
     
-    void gleSphere1B() { drawIcoBuffer(ico_nfaces[0], ico_buf[0], ico_buf[1]); }
-    void gleSphere2B() { drawIcoBuffer(ico_nfaces[1], ico_buf[2], ico_buf[3]); }
-    void gleSphere4B() { drawIcoBuffer(ico_nfaces[2], ico_buf[4], ico_buf[5]); }
-    void gleSphere8B() { drawIcoBuffer(ico_nfaces[3], ico_buf[6], ico_buf[7]); }
+    void gleSphere1B() { drawIcoBuffer(ico_nfaces[0], ico_[0], ico_[1]); }
+    void gleSphere2B() { drawIcoBuffer(ico_nfaces[1], ico_[2], ico_[3]); }
+    void gleSphere4B() { drawIcoBuffer(ico_nfaces[2], ico_[4], ico_[5]); }
+    void gleSphere8B() { drawIcoBuffer(ico_nfaces[3], ico_[6], ico_[7]); }
+    void hemisphere1() { drawIcoBuffer(ico_nfaces[4], ico_[8], ico_[9]); }
+    void hemisphere2() { drawIcoBuffer(ico_nfaces[5], ico_[10], ico_[11]); }
+    void hemisphere4() { drawIcoBuffer(ico_nfaces[4], ico_[12], ico_[13]); }
     
 #else
     
     // Without using PlatonicSolid
-    void initializeIcoBuffers() { }
+    void initSphereBuffers() { }
 
     /// using trigonometric functions to draw a ball of radius 1
-    void gleSphereF(size_t inc)
+    void drawSphere(size_t inc)
     {
         for ( size_t n = 0; n < ncircle/2; n += inc )
         {
@@ -1009,15 +1219,15 @@ namespace gle
         }
     }
     
-    void gleSphere1() { gleSphereF(8); }
-    void gleSphere2() { gleSphereF(4); }
-    void gleSphere4() { gleSphereF(2); }
-    void gleSphere8() { gleSphereF(1); }
+    void sphere1U() { drawSphere(8); }
+    void sphere2U() { drawSphere(4); }
+    void sphere4U() { drawSphere(2); }
+    void sphere8U() { drawSphere(1); }
     
-    void gleSphere1B() { gleSphereF(8); }
-    void gleSphere2B() { gleSphereF(4); }
-    void gleSphere4B() { gleSphereF(2); }
-    void gleSphere8B() { gleSphereF(1); }
+    void gleSphere1B() { drawSphere(8); }
+    void gleSphere2B() { drawSphere(4); }
+    void gleSphere4B() { drawSphere(2); }
+    void gleSphere8B() { drawSphere(1); }
 
 #endif
     
@@ -1083,264 +1293,6 @@ namespace gle
         gleArrowedBand(nb_triangles, 0.25);
         glRotated(90,0,1,0);
         gleArrowedBand(nb_triangles, 0.25);
-    }
-    
-    //-----------------------------------------------------------------------
-#if ( 0 )
-    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
-    {
-        glNormal3f((a[0]+b[0]+c[0])/3.0f, (a[1]+b[1]+c[1])/3.0f, (a[2]+b[2]+c[2])/3.0f);
-        glVertex3fv(a);
-        glVertex3fv(b);
-        glVertex3fv(c);
-    }
-    
-    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
-    {
-        printf("%2.0f, %2.0f, %2.0f,  ", a[0], a[1], a[2]);
-        printf("%2.0f, %2.0f, %2.0f,  ", b[0], b[1], b[2]);
-        printf("%2.0f, %2.0f, %2.0f,\n", c[0], c[1], c[2]);
-    }
-    
-    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
-    {
-        Vector3 A(a[0], a[1], a[2]);
-        Vector3 B(b[0], b[1], b[2]);
-        Vector3 C(c[0], c[1], c[2]);
-        Vector3 n = normalize(cross(B-A, C-A));
-        glNormal3f(n.XX, n.YY, n.ZZ);
-        glVertex3fv(a);
-        glVertex3fv(b);
-        glVertex3fv(c);
-        printf("%+9.7f,%+9.7f,%+9.7f, ", n[0], n[1], n[2]);
-        printf("%+9.7f,%+9.7f,%+9.7f, ", n[0], n[1], n[2]);
-        printf("%+9.7f,%+9.7f,%+9.7f,\n", n[0], n[1], n[2]);
-    }
-
-    void icoFace(GLfloat* pts, size_t a, size_t b, size_t c)
-    {
-        icoFace(pts+3*a, pts+3*b, pts+3*c);
-    }
-
-    void gleIcosahedron1()
-    {
-        constexpr GLfloat T = 0.8506508084f;      // (1 + sqrt(5))/2
-        constexpr GLfloat O = 0.5257311121f;      // 1 / sqrt(1+T^2)
-
-        /* Twelve vertices of icosahedron on unit sphere */
-        GLfloat pts[] = {
-            +T,  O,  0, // 0
-            -T, -O,  0, // 1
-            -T,  O,  0, // 2
-            +T, -O,  0, // 3
-            +O,  0,  T, // 4
-            -O,  0, -T, // 5
-            +O,  0, -T, // 6
-            -O,  0,  T, // 7
-             0,  T,  O, // 8
-             0, -T, -O, // 9
-             0, -T,  O, // 10
-             0,  T, -O  // 11
-        };
-        
-        /* The faces are ordered with increasing Z */
-        glBegin(GL_TRIANGLES);
-        icoFace(pts, 5,  6, 9);
-        icoFace(pts, 5, 11, 6);
-        
-        icoFace(pts, 6, 3,  9);
-        icoFace(pts, 2, 11, 5);
-        icoFace(pts, 1, 5,  9);
-        icoFace(pts, 0, 6, 11);//
-        
-        icoFace(pts, 0, 3,  6);
-        icoFace(pts, 1, 2,  5);
-        
-        icoFace(pts, 1, 9, 10);
-        icoFace(pts, 0, 11, 8);//
-        icoFace(pts, 8, 11, 2);
-        icoFace(pts, 9, 3, 10);
-        
-        icoFace(pts, 0, 4,  3);
-        icoFace(pts, 1, 7,  2);
-        
-        icoFace(pts, 0, 8,  4);
-        icoFace(pts, 1, 10, 7);
-        icoFace(pts, 3, 4, 10);
-        icoFace(pts, 7, 8,  2);
-        
-        icoFace(pts, 4, 8,  7);
-        icoFace(pts, 4, 7, 10);
-        glEnd();
-    }
-#endif
-    
-    void gleIcosahedron1()
-    {
-        constexpr GLfloat T = 0.8506508084f;      // (1 + sqrt(5))/2
-        constexpr GLfloat O = 0.5257311121f;      // 1 / sqrt(1+T^2)
-        
-        constexpr GLfloat pts[] = {
-             -O,  0, -T,   O,  0, -T,   0, -T, -O,
-             -O,  0, -T,   0,  T, -O,   O,  0, -T,
-              O,  0, -T,   T, -O,  0,   0, -T, -O,
-             -T,  O,  0,   0,  T, -O,  -O,  0, -T,
-             -T, -O,  0,  -O,  0, -T,   0, -T, -O,
-              T,  O,  0,   O,  0, -T,   0,  T, -O,
-              T,  O,  0,   T, -O,  0,   O,  0, -T,
-             -T, -O,  0,  -T,  O,  0,  -O,  0, -T,
-             -T, -O,  0,   0, -T, -O,   0, -T,  O,
-              T,  O,  0,   0,  T, -O,   0,  T,  O,
-              0,  T,  O,   0,  T, -O,  -T,  O,  0,
-              0, -T, -O,   T, -O,  0,   0, -T,  O,
-              T,  O,  0,   O,  0,  T,   T, -O,  0,
-             -T, -O,  0,  -O,  0,  T,  -T,  O,  0,
-              T,  O,  0,   0,  T,  O,   O,  0,  T,
-             -T, -O,  0,   0, -T,  O,  -O,  0,  T,
-              T, -O,  0,   O,  0,  T,   0, -T,  O,
-             -O,  0,  T,   0,  T,  O,  -T,  O,  0,
-              O,  0,  T,   0,  T,  O,  -O,  0,  T,
-              O,  0,  T,  -O,  0,  T,   0, -T,  O,
-        };
-        
-        constexpr GLfloat dir[] = {
-            +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724,
-            +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724,
-            +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503,
-            -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503,
-            -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503,
-            +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503,
-            +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221,
-            -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221,
-            -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000,
-            +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000,
-            -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000,
-            +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000,
-            +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221,
-            -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221,
-            +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503,
-            -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503,
-            +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503,
-            -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503,
-            +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724,
-            +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724,
-        };
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, dir);
-        glDrawArrays(GL_TRIANGLES, 0, 60);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-    }
-    
-    //-----------------------------------------------------------------------
-    
-    void gleCube0()
-    {
-        constexpr GLfloat R = 0.5773502692;
-        constexpr GLfloat pts[] = {
-            -R,  R,  R,
-             R,  R,  R,
-            -R, -R,  R,
-             R, -R,  R,
-             R, -R, -R,
-             R,  R,  R,
-             R,  R, -R,
-            
-            -R,  R,  R,
-            -R,  R, -R,
-            -R, -R,  R,
-            -R, -R, -R,
-             R, -R, -R,
-            -R,  R, -R,
-             R,  R, -R };
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-    
-    void gleCube1()
-    {
-        constexpr GLfloat R = 0.5773502692;
-        constexpr GLfloat pts[] = {
-             R, R, R, R,-R,-R, R, R,-R, // X
-             R,-R,-R, R, R, R, R,-R, R, // X
-             R, R, R, R, R,-R,-R, R,-R, // Y
-             R, R, R,-R, R,-R,-R, R, R, // Y
-            -R, R, R,-R,-R, R, R,-R, R, // Z
-             R, R, R,-R, R, R, R,-R, R, // Z
-            -R,-R,-R,-R,-R, R,-R, R, R,
-            -R,-R,-R,-R, R, R,-R, R,-R,
-             R,-R, R,-R,-R,-R, R,-R,-R,
-             R,-R, R,-R,-R, R,-R,-R,-R,
-             R, R,-R,-R,-R,-R,-R, R,-R,
-             R, R,-R, R,-R,-R,-R,-R,-R
-        };
-        
-        constexpr GLfloat dir[] = {
-             1, 0, 0, 1, 0, 0, 1, 0, 0,
-             1, 0, 0, 1, 0, 0, 1, 0, 0,
-             0, 1, 0, 0, 1, 0, 0, 1, 0,
-             0, 1, 0, 0, 1, 0, 0, 1, 0,
-             0, 0, 1, 0, 0, 1, 0, 0, 1,
-             0, 0, 1, 0, 0, 1, 0, 0, 1,
-            -1, 0, 0,-1, 0, 0,-1, 0, 0,
-            -1, 0, 0,-1, 0, 0,-1, 0, 0,
-             0,-1, 0, 0,-1, 0, 0,-1, 0,
-             0,-1, 0, 0,-1, 0, 0,-1, 0,
-             0, 0,-1, 0, 0,-1, 0, 0,-1,
-             0, 0,-1, 0, 0,-1, 0, 0,-1
-        };
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, dir);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-    }
-    
-    void gleOctahedron1()
-    {
-        // Eight triangles, ordered counterclockwise
-        // set size to match the volume of the unit sphere
-        constexpr GLfloat R = 1.46459188756;
-        constexpr GLfloat pts[] = {
-             R, 0, 0, 0, 0, R, 0,-R, 0,
-             0, 0,-R,-R, 0, 0, 0, R, 0,
-             0, 0, R,-R, 0, 0, 0,-R, 0,
-             0, 0,-R, 0, R, 0, R, 0, 0,
-            -R, 0, 0, 0, 0, R, 0, R, 0,
-             0, 0,-R, R, 0, 0, 0,-R, 0,
-             0, 0, R, R, 0, 0, 0, R, 0,
-             0, 0,-R, 0,-R, 0,-R, 0, 0
-        };
-        
-        // normals
-        constexpr GLfloat N = 1.0 / M_SQRT3;
-        constexpr GLfloat dir[] = {
-            N,-N, N, N,-N, N, N,-N, N,
-           -N, N,-N,-N, N,-N,-N, N,-N,
-           -N,-N, N,-N,-N, N,-N,-N, N,
-            N, N,-N, N, N,-N, N, N,-N,
-           -N, N, N,-N, N, N,-N, N, N,
-            N,-N,-N, N,-N,-N, N,-N,-N,
-            N, N, N, N, N, N, N, N, N,
-           -N,-N,-N,-N,-N,-N,-N,-N,-N
-        };
-        
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, dir);
-        glDrawArrays(GL_TRIANGLES, 0, 24);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
     }
     
     
@@ -2662,7 +2614,7 @@ namespace gle
         gle_color(1.0, 1.0, 1.0, 1.0).load_load();
         glPushMatrix();
         gleScale(R);
-        gleSphere4();
+        gleSphere4B();
         glPopMatrix();
     }
     

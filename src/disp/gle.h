@@ -30,11 +30,14 @@ namespace gle
     void release();
     
     /// initialize the Vertex Buffer Objects
-    void initializeTubeBuffers();
+    void initTubeBuffers();
 
     /// initialize the Vertex Buffer Objects
-    void initializeIcoBuffers();
+    void initSphereBuffers();
    
+    /// initialize more buffer objects
+    void initBuffers();
+    
     /// calculate sinus and cosinus for a circle
     void circle(size_t cnt, GLfloat C[], GLfloat S[], double radius, double start = 0);
     
@@ -172,23 +175,21 @@ namespace gle
     void gleStarS();
     void gleStarL();
     
-    /// display a Cube of side 2 in 3D and a Square in 2D
-    void gleCube1();
+    /// draw a Cube of side 2 in 3D and a Square in 2D
+    void cube();
+    /// draw a octahedron of radius 1
+    void octahedron();
     /// draw a icosahedron of radius 1
-    void gleOctahedron1();
-    /// draw a icosahedron of radius 1
-    void gleIcosahedron1();
+    void icosahedron();
 
-    /// draw a sphere of radius 1 at origin, using a refined icosahedron
-    void gleSphereN(int);
     /// draw a sphere of radius 1 at origin
-    void gleSphere1();
+    void sphere1U();
     /// draw a nice sphere of radius 1 at origin
-    void gleSphere2();
+    void sphere2U();
     /// draw a very nice sphere of radius 1 at origin
-    void gleSphere4();
+    void sphere4U();
     /// draw a very nice sphere of radius 1 at origin
-    void gleSphere8();
+    void sphere8U();
     /// draw Torus of radius `rad` and thickness `thick`
     void gleTorus(GLfloat rad, GLfloat thick, size_t inc = 1);
     
@@ -246,7 +247,6 @@ namespace gle
     //------------------------------------------------------------------------------
 
     inline void gleDumbbellB()     { gleDumbbell1();    }
-    inline void gleIcosahedronB()  { gleIcosahedron1(); }
     
     inline void gleArrowTailB()    { gleArrowTail1();   }
     inline void gleCircleB()       { gleCircle();       }
@@ -269,6 +269,8 @@ namespace gle
     void gleSphere2B();
     void gleSphere4B();
     void gleSphere8B();
+    void hemisphere2();
+    void hemisphere4();
 
     //------------------------------------------------------------------------------
 #pragma mark -

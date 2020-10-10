@@ -212,7 +212,7 @@ void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
         glEnable(GL_CLIP_PLANE4);
         setClipPlane(GL_CLIP_PLANE4, dir, pos);
 #if 1
-        gleObject(pos, rad, gleSphere4);
+        gleObject(pos, rad, gleSphere4B);
 #else
         // dual pass
         assert_true(glIsEnabled(GL_CULL_FACE));
@@ -576,43 +576,43 @@ void Display3::drawFiberLines(Fiber const& fib) const
 
 
 // displays segment 'i' with transparency
-void Display3::drawFiberSegmentT(Fiber const& fib, size_t i) const
+void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
 
-    Vector A = fib.posP(i);
-    Vector B = fib.posP(i+1);
+    Vector A = fib.posP(inx);
+    Vector B = fib.posP(inx+1);
     
     glEnable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
     
     if ( disp->line_style == 6 )
-        color_seg_distanceM(fib, i, fib.segmentation()/disp->length_scale);
+        color_seg_distanceM(fib, inx, fib.segmentation()/disp->length_scale);
     else if ( disp->line_style == 7 )
-        color_seg_distanceP(fib, i, fib.segmentation()/disp->length_scale);
+        color_seg_distanceP(fib, inx, fib.segmentation()/disp->length_scale);
     else
         fib.disp->color.load_front();
 
 #if 1
-    if ( i == 0 )
+    if ( inx == 0 )
     {
         drawFiberCap(fib.prop->disp->line_caps, A, normalize(A-B), rad);
         setClipPlane(GL_CLIP_PLANE5, normalize(B-A), A);
     }
     else
     {
-        setClipPlane(GL_CLIP_PLANE5, normalize(B-fib.posP(i-1)), A);
+        setClipPlane(GL_CLIP_PLANE5, normalize(B-fib.posP(inx-1)), A);
     }
     
-    if ( i == fib.lastSegment() )
+    if ( inx == fib.lastSegment() )
     {
         drawFiberCap(fib.prop->disp->line_caps, B, normalize(B-A), rad);
         setClipPlane(GL_CLIP_PLANE4, normalize(A-B), B);
     }
     else
     {
-        setClipPlane(GL_CLIP_PLANE4, normalize(A-fib.posP(i+2)), B);
+        setClipPlane(GL_CLIP_PLANE4, normalize(A-fib.posP(inx+2)), B);
     }
     
     glEnable(GL_CLIP_PLANE5);
@@ -944,7 +944,7 @@ void Display3::drawSolid(Solid const& obj)
             if ( obj.radius(p) > 0 )
                 drawPoint(obj.posP(p), disp);
             else
-                drawObject(obj.posP(p), disp, gle::gleCube1);
+                drawObject(obj.posP(p), disp, gle::cube);
         }
     }
     
@@ -1149,7 +1149,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
         }
 #endif
         if ( obj->base() )
-            drawObject(obj->posFoot(), obj->disp(), gle::gleOctahedron1);
+            drawObject(obj->posFoot(), obj->disp(), gle::octahedron);
         else
             drawPoint(obj->posFoot(), obj->disp());
     }
@@ -1191,7 +1191,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
 #endif
             }
             if ( obj->base() )
-                drawObject(ph, disp, gle::gleOctahedron1);
+                drawObject(ph, disp, gle::octahedron);
             else
                 drawPoint(ph, disp);
         }
