@@ -153,23 +153,6 @@ namespace sMath
 #endif
     }
     
-    template < typename FLOAT >
-    inline void orthonormal(const FLOAT z[3], FLOAT x[3], FLOAT y[3], FLOAT scale)
-    {
-        const FLOAT s = std::copysign((FLOAT)1.0, z[2]);
-        /// optimized version by Marc B. Reynolds
-        const FLOAT a = z[1] / ( z[2] + s );
-        const FLOAT b = z[1] * a;
-        const FLOAT c = z[0] * a;
-        float ss = s * scale;
-        x[0] = scale * ( -z[2] - b );
-        x[1] = scale * c;
-        x[2] = scale * z[0];
-        y[0] = ss * c;
-        y[1] = ss * b - scale;
-        y[2] = ss * z[1];
-    }
-    
     /// square of a number
     template <typename T> 
     inline T square(const T& a)

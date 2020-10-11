@@ -194,7 +194,7 @@ namespace Platonic
         
         unsigned num_vertices_, max_vertices_;
         
-        unsigned num_vertices_on_edges_;
+        unsigned num_edge_vertices_;
         
         /// coordinates of all vertices
         float  * coordinates_;
@@ -211,12 +211,13 @@ namespace Platonic
         /// array of indices of the points making the edges
         unsigned *edges_;
         
-        unsigned getVertex(Corner*, unsigned, Corner*, unsigned);
+        unsigned findEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
+        unsigned getEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
         unsigned addVertex(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
         unsigned makeVertex(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
         
         void init(unsigned, real* vdata[3], unsigned, unsigned* fdata[3], unsigned);
-        void refineTriangles(unsigned, real vex[][3], unsigned, unsigned fac[][3], unsigned div, bool posZ);
+        void refineTriangles(unsigned, real vex[][3], unsigned, unsigned fac[][3], unsigned div, int half);
 
         void initTetrahedron(unsigned div);
         void initOctahedron(unsigned div);
@@ -224,10 +225,10 @@ namespace Platonic
         void initHemisphere(unsigned div);
 
         void setVertices(Polyhedra K, unsigned div);
-        void addFace(unsigned, unsigned, unsigned, bool posZ);
+        void addFace(unsigned, unsigned, unsigned, int half);
         void addEdge(unsigned, unsigned);
         void refineEdge(unsigned a, unsigned b, unsigned div);
-        void refineFace(unsigned a, unsigned b, unsigned c, unsigned div, bool posZ);
+        void refineFace(unsigned a, unsigned b, unsigned c, unsigned div, int half);
     };
 }
 

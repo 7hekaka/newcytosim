@@ -354,7 +354,7 @@ public:
     /// normalized tangent vector to the fiber at given end
     Vector       dirEnd(FiberEnd end) const;
     
-    /// normalized tangent vector to the fiber at MINUS_END
+    /// normalized tangent vector at MINUS_END, orientated towards the PLUS_END
     Vector       dirEndM() const { return dirSegment(0); }
     
     /// normalized tangent vector to the fiber at PLUS_END

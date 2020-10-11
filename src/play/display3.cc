@@ -135,21 +135,15 @@ void Display3::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-inline void Display3::drawBall(Vector const& pos, float radius, gle_color const& col) const
+inline void Display3::drawBallT(Vector const& pos, float radius, gle_color const& col) const
 {
-    GLboolean cull = glIsEnabled(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     col.load_both();
     glPushMatrix();
     gleTranslate(pos);
     gleScale(radius);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    gleSphere4B();
-    glCullFace(GL_BACK);
-    gleSphere8B();
+    gle::dualPassSphere();
     glPopMatrix();
-    if ( !cull ) glDisable(GL_CULL_FACE);
 }
 
 
@@ -159,7 +153,7 @@ inline void Display3::drawPoint(Vector const& pos, float size) const
     glPushMatrix();
     gleTranslate(pos);
     gleScale(size*sFactor);
-    gleSphere2B();
+    gle::sphere2();
     glPopMatrix();
 }
 
@@ -172,7 +166,7 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
         glPushMatrix();
         gleTranslate(pos);
         gleScale(disp->size*sFactor);
-        gleSphere1B();
+        gle::sphere1();
 #if ( 0 )
         if ( disp->symbol )
         {
@@ -185,47 +179,6 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
         }
 #endif
         glPopMatrix();
-    }
-}
-
-
-inline void Display3::drawObject(Vector const& pos, PointDisp const* disp, void(*obj)()) const
-{
-    if ( disp->perceptible )
-    {
-        glEnable(GL_LIGHTING);
-        glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(disp->size*sFactor);
-        obj();
-        glPopMatrix();
-    }
-}
-
-
-void drawFiberCap(int sty, Vector const& pos, Vector const& dir, real rad)
-{
-    if ( sty == 1 )
-        gleObject(pos, dir, rad, gleDiscB);
-    else if ( sty == 2 )
-    {
-        glEnable(GL_CLIP_PLANE4);
-        setClipPlane(GL_CLIP_PLANE4, dir, pos);
-#if 1
-        gleObject(pos, rad, gleSphere4B);
-#else
-        // dual pass
-        assert_true(glIsEnabled(GL_CULL_FACE));
-        glPushMatrix();
-        gleTranslate(pos);
-        gleScale(rad);
-        glCullFace(GL_FRONT);
-        gleSphere2B();
-        glCullFace(GL_BACK);
-        gleSphere4B();
-        glPopMatrix();
-#endif
-        glDisable(GL_CLIP_PLANE4);
     }
 }
 
@@ -244,36 +197,32 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     Vector nxt = fib.posPoint(1);
     Vector dir = normalize(nxt-pos);  // could use _mm_rsqrt_ss
     
-    set_color(fib, 0, beta);
-    drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
-    
     glEnable(GL_CLIP_PLANE4);
+    setClipPlane(GL_CLIP_PLANE4, -dir, nxt);
+    set_color(fib, 0, beta);
+    drawTube(pos, rad, nxt, gle::capedTube2);
+    setClipPlane(GL_CLIP_PLANE4, dir, nxt);
     glEnable(GL_CLIP_PLANE5);
-    setClipPlane(GL_CLIP_PLANE4, dir, pos);
-    
+
     // draw inner segments
     const size_t last = fib.lastSegment();
-    for ( size_t inx = 0; inx < last; ++inx )
+    for ( size_t inx = 1; inx <= last; ++inx )
     {
         old = pos;
         pos = nxt;
-        nxt = fib.posPoint(inx+2);
+        nxt = fib.posPoint(inx+1);
         dir = normalize(nxt-old);
         set_color(fib, inx, beta);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
-        gleTube(old, pos, rad, gleLongTube2B);
+        drawTube(old, rad, pos, gle::longTube2);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
     }
 
-    // draw last segment:
-    dir = normalize(nxt-pos);
-    set_color(fib, last, beta);
-    setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
-    gleTube(pos, nxt, rad, gleLongTube2B);
-    glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
-    
-    drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
+    // draw last segment:
+    set_color(fib, last, beta);
+    drawTube(nxt, rad, pos, gle::capedTube2);
+    glDisable(GL_CLIP_PLANE4);
 }
 
 
@@ -288,22 +237,22 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     void (*set_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
-    Vector pos = fib.displayPosM(abs), old;
-    Vector nxt = fib.displayPosM(abs+inc);
+    Vector old = fib.displayPosM(abs);
+    Vector pos = fib.displayPosM(abs+inc);
+    Vector nxt = fib.displayPosM(abs+inc*2);
     Vector dir = normalize(nxt-pos);
     
-    if ( abs <= 0 )
-    {
-        set_color(fib, inx, facM);
-        drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
-    }
-
-    abs += inc;
-    
+    set_color(fib, inx++, facM);
     glEnable(GL_CLIP_PLANE4);
-    glEnable(GL_CLIP_PLANE5);
+    setClipPlane(GL_CLIP_PLANE4, -dir, pos);
+    if ( abs <= 0 )
+        drawTube(old, rad, pos, gle::capedTube2);
+    else
+        drawTube(old, rad, pos, gle::halfTube2);
     setClipPlane(GL_CLIP_PLANE4, dir, pos);
-    
+
+    glEnable(GL_CLIP_PLANE5);
+    abs += inc*2;
     // draw segments
     while ( inx < last )
     {
@@ -314,42 +263,19 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         dir = normalize(nxt-old);
         set_color(fib, inx++, fac);
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
-        gleTube(old, pos, rad, gleLongTube2B);
-        // draw a disc to close the tube:
-        //gleObject(0.5*(old+pos), normalize(pos-old), rad, gleDiscB);
-        setClipPlane(GL_CLIP_PLANE4,  dir, pos);
+        // can draw a disc to close the tube:
+        drawTube(old, rad, pos, gle::longTube2);  //gle::obturatedTube2
+        setClipPlane(GL_CLIP_PLANE4, dir, pos);
     }
-    
-    // draw last segment, which may be truncated:
-    dir = normalize(nxt-pos);
-    set_color(fib, inx, facP);
-    setClipPlane(GL_CLIP_PLANE5, -dir, nxt);
-    gleTube(pos, nxt, rad, gleLongTube2B);
-    glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
-    
+
+    // draw last segment, which may be truncated:
+    set_color(fib, inx, facP);
     if ( abs >= fib.length() )
-    {
-        // draw PLUS_END:
-        drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
-    }
-}
-
-/**
-Draw a segment from 'abs1' to 'abs2', relative to the MINUS_END.
-*/
-void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad,
-                                const real abs1, const real abs2) const
-{
-    Vector pos = fib.displayPosM(abs1);
-    Vector nxt = fib.displayPosM(abs2);
-    Vector dir = normalize(nxt-pos);
-
-    if ( capM )
-        drawFiberCap(fib.prop->disp->line_caps, pos, -dir, rad);
-    gleTube(pos, nxt, rad, gleTube2B);
-    if ( capP )
-        drawFiberCap(fib.prop->disp->line_caps, nxt, dir, rad);
+        drawTube(nxt, rad, pos, gle::capedTube2);
+    else
+        drawTube(nxt, rad, pos, gle::halfTube2);
+    glDisable(GL_CLIP_PLANE4);
 }
 
 #else
@@ -371,11 +297,10 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     {
         Vector pos = nxt;
         nxt = fib.posPoint(inx+1);
-        Vector dir = normalize(nxt-pos);  // could use _mm_rsqrt_ss
         set_color(fib, inx, beta);
         glPushMatrix();
-        gleTransAlignZ(dir, 1.0, pos, 1.0);
-        gleCapsule(norm(nxt-pos), rad);
+        gle::transAlignZ(pos, 1.0, nxt-pos);
+        gle::capsuleZ(norm(nxt-pos), rad);
         glPopMatrix();
     }
 }
@@ -400,29 +325,12 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         abs += inc;
         Vector pos = nxt;
         nxt = fib.displayPosM(abs);
-        Vector dir = normalize(nxt-pos);
         set_color(fib, inx, fac);
         glPushMatrix();
-        gleTransAlignZ(dir, 1.0, pos, 1.0);
-        gleCapsule(norm(nxt-pos), rad);
+        gle::transAlignZ(pos, 1.0, nxt-pos);
+        gle::capsuleZ(norm(nxt-pos), rad);
         glPopMatrix();
     }
-}
-
-/**
-Draw a segment from 'abs1' to 'abs2', relative to the MINUS_END.
-*/
-void Display3::drawFiberSegment(Fiber const& fib, bool capM, bool capP, real rad,
-                                const real abs1, const real abs2) const
-{
-    Vector pos = fib.displayPosM(abs1);
-    Vector nxt = fib.displayPosM(abs2);
-    Vector dir = normalize(nxt-pos);
-
-    glPushMatrix();
-    gleTransAlignZ(dir, 1.0, pos, 1.0);
-    gleCapsule(norm(nxt-pos), rad);
-    glPopMatrix();
 }
 
 #endif
@@ -575,7 +483,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
 }
 
 
-// displays segment 'i' with transparency
+// displays segment 'inx' with transparency
 void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -585,7 +493,10 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     Vector B = fib.posP(inx+1);
     
     glEnable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+    /* Either CULL_FACE should be enable to hide the back side,
+     or every primitive should be renderred with a double pass*/
+    GLboolean cull = glIsEnabled(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     
     if ( disp->line_style == 6 )
         color_seg_distanceM(fib, inx, fib.segmentation()/disp->length_scale);
@@ -597,8 +508,11 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 #if 1
     if ( inx == 0 )
     {
-        drawFiberCap(fib.prop->disp->line_caps, A, normalize(A-B), rad);
-        setClipPlane(GL_CLIP_PLANE5, normalize(B-A), A);
+        glEnable(GL_CLIP_PLANE5);
+        setClipPlane(GL_CLIP_PLANE5, (A-B)*fib.segmentationInv(), B);
+        drawTube(A, rad, B, gle::capedTube2);
+        glDisable(GL_CLIP_PLANE5);
+        return;
     }
     else
     {
@@ -607,8 +521,11 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     
     if ( inx == fib.lastSegment() )
     {
-        drawFiberCap(fib.prop->disp->line_caps, B, normalize(B-A), rad);
-        setClipPlane(GL_CLIP_PLANE4, normalize(A-B), B);
+        glEnable(GL_CLIP_PLANE4);
+        setClipPlane(GL_CLIP_PLANE4, (B-A)*fib.segmentationInv(), A);
+        drawTube(B, rad, A, gle::capedTube2);
+        glDisable(GL_CLIP_PLANE4);
+        return;
     }
     else
     {
@@ -617,15 +534,16 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     
     glEnable(GL_CLIP_PLANE5);
     glEnable(GL_CLIP_PLANE4);
-    gleTube(A, B, rad, gleLongTube2B);
+    drawTube(A, rad, B, gle::longTube2);
     glDisable(GL_CLIP_PLANE4);
     glDisable(GL_CLIP_PLANE5);
 #else
     glPushMatrix();
-    gleTransAlignZ(normalize(B-A), 1.0, 0.5*(A+B), 1.0);
-    gleCapsule(fib.segmentation(), rad);
+    gle::transAlignZ(0.5*(A+B), 1.0, B-A);
+    gle::capsuleZ(fib.segmentation(), rad);
     glPopMatrix();
 #endif
+    if ( !cull ) glDisable(GL_CULL_FACE);
 }
 
 
@@ -644,7 +562,11 @@ void color_alternate(Fiber const& fib, long ix, real)
 
 void color_by_lattice(Fiber const& fib, long ix, real scale)
 {
-    fib.disp->color.darken(scale*fib.visibleLattice()->data(ix)).load_front();
+    gle_color col = fib.disp->color.darken(scale*fib.visibleLattice()->data(ix));
+    if ( col.transparent() )
+        col.load_both();
+    else
+        col.load_front();
 }
 
 
@@ -669,6 +591,8 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, blk);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, blk);
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 32);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     const real fac = 1.0 / disp->lattice_scale;
     const real uni = lat.unit();
@@ -726,26 +650,18 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
  */
 void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
 {
-    real width = size * sFactor;
-    if ( width > 0 )
+    real rad = size * sFactor;
+    if ( rad > 0 )
     {
-        switch (style)
+        switch(style)
         {
-            case 1:
-                gleObject(fib.posEndM(), width, gleSphere2B);
-                break;
-            case 2:
-                gleObject(fib.posEndM(), -fib.dirEndM(), width, gleLongConeB);
-                break;
-            case 3:
-                gleObject(fib.posEndM(), -fib.dirEndM(), width, gleCylinderB);
-                break;
-            case 4:
-                gleObject(fib.posEndM(),  fib.dirEndM(), width, gleArrowTailB);
-                break;
-            case 5:
-                gleObject(fib.posEndM(), -fib.dirEndM(), width, gleArrowTailB);
-                break;
+            default: break;
+            case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
+            case 2: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::longCone); break;
+            case 3: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cylinder); break;
+            case 4: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::arrowTail); break;
+            case 5: drawObject(fib.posEndM(),  fib.dirEndM(), rad, gle::arrowTail); break;
+            case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
         }
     }
 }
@@ -763,26 +679,18 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
  */
 void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 {
-    real width = size * sFactor;
-    if ( width > 0 )
+    real rad = size * sFactor;
+    if ( rad > 0 )
     {
-        switch (style)
+        switch(style)
         {
-            case 1:
-                gleObject(fib.posEndP(), width, gleSphere2B);
-                break;
-            case 2:
-                gleObject(fib.posEndP(), fib.dirEndP(), width, gleLongConeB);
-                break;
-            case 3:
-                gleObject(fib.posEndP(), fib.dirEndP(), width, gleCylinderB);
-                break;
-            case 4:
-                gleObject(fib.posEndP(), fib.dirEndP(), width, gleArrowTailB);
-                break;
-            case 5:
-                gleObject(fib.posEndP(), -fib.dirEndP(), width, gleArrowTailB);
-                break;
+            default: break;
+            case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
+            case 2: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::longCone); break;
+            case 3: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cylinder); break;
+            case 4: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::arrowTail); break;
+            case 5: drawObject(fib.posEndP(), -fib.dirEndP(), rad, gle::arrowTail); break;
+            case 6: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cube); break;
         }
     }
 }
@@ -791,10 +699,9 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    // diameter of lines and points in space units:
-    real rad = disp->speckle_size * sFactor;
-    
-    if ( disp->point_size * uFactor < 2 )
+    real rad = disp->speckle_size;
+
+    if ( rad * uFactor < 2 )
         return;
 
     // display random speckles:
@@ -820,7 +727,7 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
             }
             while ( a >= fib.abscissaM() )
             {
-                gleObject(fib.pos(a), rad, gleSphere1B);
+                drawPoint(fib.pos(a), rad);
                 z = lcrng2(z);
                 a += spread * std::log(z*TINY);
             }
@@ -837,7 +744,7 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
             }
             while ( a <= fib.abscissaP() )
             {
-                gleObject(fib.pos(a), rad, gleSphere1B);
+                drawPoint(fib.pos(a), rad);
                 z = lcrng1(z);
                 a -= spread * std::log(z*TINY);
             }
@@ -846,12 +753,12 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
     else if ( disp->speckle_style == 2 )
     {
         //we distribute points regularly along the center line
-        const real grad = disp->speckle_interval;
-        real ab = grad * std::ceil( fib.abscissaM() / grad );
-        while ( ab <= fib.abscissaP() )
+        const real sep = disp->speckle_interval;
+        real a = sep * std::ceil( fib.abscissaM() / sep );
+        while ( a <= fib.abscissaP() )
         {
-            gleObject(fib.pos(ab), rad, gleSphere1B);
-            ab += grad;
+            drawPoint(fib.pos(a), rad);
+            a += sep;
         }
     }
 }
@@ -869,22 +776,22 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     if ( disp->point_style == 1 )
     {
         // display vertices:
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gleObject(fib.posP(ii), rad, gleSphere2B);
+        for ( size_t i = 0; i < fib.nbPoints(); ++i )
+            drawPoint(fib.posP(i), rad);
     }
     else if ( disp->point_style == 2 )
     {
         // display arrowheads along the fiber:
-        const real siz = disp->point_size*sFactor;
+        const float rad = disp->point_size*sFactor;
         const real sep = disp->point_interval;
         real ab = std::ceil(fib.abscissaM()/sep) * sep;
         for ( ; ab <= fib.abscissaP(); ab += sep )
-            gleCone(fib.pos(ab), fib.dir(ab), siz);
+            drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( disp->point_style == 3 )
     {
         // display middle of fiber:
-        gleObject(fib.posMiddle(), 2*disp->point_size, gleSphere2B);
+        drawPoint(fib.posMiddle(), 2*rad);
     }
 }
 
@@ -910,7 +817,7 @@ void Display3::drawBead(Bead const& obj)
         glDisable(GL_LIGHTING);
         bodyColorF(obj).load();
         lineWidth(disp->width);
-        gleObject(obj.position(), obj.radius(), gleCircleB);
+        drawFlat(obj.position(), obj.radius(), gle::circle);
     }
 #endif
 }
@@ -924,7 +831,7 @@ void Display3::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        drawBall(obj.position(), obj.radius(), bodyColorF(obj));
+        drawBallT(obj.position(), obj.radius(), bodyColorF(obj));
     }
 }
 
@@ -944,7 +851,7 @@ void Display3::drawSolid(Solid const& obj)
             if ( obj.radius(p) > 0 )
                 drawPoint(obj.posP(p), disp);
             else
-                drawObject(obj.posP(p), disp, gle::cube);
+                drawObject(obj.posP(p), disp->size, gle::cube);
         }
     }
     
@@ -954,13 +861,11 @@ void Display3::drawSolid(Solid const& obj)
     {
         glEnable(GL_LIGHTING);
         bodyColor(obj);
-        //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
+        //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
         glPushMatrix();
         Vector A = obj.posP(0), B = obj.posP(1);
-        Vector dir = A - B;
-        real len = dir.norm();
-        gleTransAlignZ(dir/len, len, (A+B)*0.5, obj.radius(0));
-        gleCylinderZ();
+        gle::transAlignZ(0.5*(A+B), obj.radius(0), A-B);
+        gle::cylinderZ();
         glPopMatrix();
     }
 #endif
@@ -980,7 +885,7 @@ void Display3::drawSolid(Solid const& obj)
         const real rad = disp->width * sFactor;
         bodyColor(obj);
         for ( size_t n = 1; n < obj.nbPoints(); ++n )
-            gleTube(obj.posPoint(n-1), obj.posPoint(n), rad, gleTube2B);
+            gleTube(obj.posPoint(n-1), obj.posPoint(n), rad, gle::tube2);
     }
 }
 
@@ -1008,7 +913,7 @@ void Display3::drawSolidT(Solid const& obj, size_t inx)
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
-        drawBall(X, obj.radius(inx), bodyColorF(obj));
+        drawBallT(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
         glDisable(GL_CLIP_PLANE5);
@@ -1044,36 +949,18 @@ void Display3::drawSphereT(Sphere const& obj)
 {
     const PointDisp * disp = obj.prop->disp;
 
-    //display the envelope
     if ( disp->style & 5 )
     {
-        bodyColorF(obj).load_both();
-        glPushMatrix();
-#if ( DIM < 3 )
-        gleTranslate(obj.posP(0));
-        gleTorus(obj.radius(), disp->size*sFactor);
-#else
-        /* Note: The rotation matrix for the sphere calculated below from the
-            reference points, includes scaling by the radius of the sphere.
-            We then use a primitive for a sphere of radius 1.
-            */
         const Vector C = obj.posP(0);
-        gleTransRotate(obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, C);
-        
+        bodyColorF(obj).load_front();
+#if ( DIM < 3 )
         if ( disp->style & 1 )
-        {
-            glCullFace(GL_FRONT);
-            gleSphere2B();
-            glCullFace(GL_BACK);
-            gleSphere4B();
-        }
-        if ( disp->style & 4 )
-        {
-            disp->color2.load_front();
-            gleThreeBands(64);
-        }
+            drawFlat(C, obj.radius(), gle::circle);
+        if ( disp->style & 2 )
+            drawBallT(C, obj.radius(), bodyColorF(obj));
+#else
+        Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
 #endif
-        glPopMatrix();
     }
 }
 
@@ -1097,7 +984,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
         {
             drawPoint(P, disp);
             if ( modulo ) modulo->fold(Q, P);
-            gleTube(P, Q, w, gleTube1B);
+            gleTube(P, Q, w, gle::tube1);
         }
     }
     /**
@@ -1114,13 +1001,13 @@ void Display3::drawOrganizer(Organizer const& obj) const
             glPushMatrix();
             Vector3 a = 0.5 * (sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5 * (sol->posP(1) + sol->posP(3));
-            gleTransAlignZ(a, b, 1);
+            gleStretchZ(a, b, 1);
             glColor3f(0.6f,0.6f,0.6f);
-            gleDualPass(gleBarrel1);
+            gle::dualPass(gle::barrel);
             glPopMatrix();
 #else
             for ( size_t ii = 0; ii < sol->nbPoints(); ii+=2 )
-                gleTube(sol->posPoint(ii), sol->posPoint(ii+1), w, gleHexTube1B);
+                gleTube(sol->posPoint(ii), sol->posPoint(ii+1), w, gle::hexTube1);
 #endif
         }
     }
@@ -1143,13 +1030,13 @@ void Display3::drawSinglesF(SingleSet const& set) const
                 /// draw a disc tangent to the Space:
                 Vector pos = obj->posFoot();
                 Vector dir = spc->normalToEdge(pos);
-                gleObject(pos, dir, obj->disp()->size*sFactor, gleDisc);
+                drawObject(pos, dir, obj->disp()->size, gle::discUp);
                 continue;
             }
         }
 #endif
         if ( obj->base() )
-            drawObject(obj->posFoot(), obj->disp(), gle::octahedron);
+            drawObject(obj->posFoot(), obj->disp()->size, gle::octahedron);
         else
             drawPoint(obj->posFoot(), obj->disp());
     }
@@ -1176,22 +1063,21 @@ void Display3::drawSinglesA(SingleSet const& set) const
                     Space const* spc = obj->confineSpace();
                     if ( spc )
                     {
-                        /// draw a disc tangent to the Space:
-                        Vector dir = spc->normalToEdge(pf);
+                        // draw a disc tangent to the Space:
                         disp->color2.load_both();
-                        gleObject(pf, dir, disp->size*sFactor, gleDisc);
+                        drawObject(pf, spc->normalToEdge(pf), disp->size, gle::discUp);
                         disp->color.load_both();
                     }
                 }
 #endif
 #if ( DIM > 2 )
-                gleTube(pf, ph, disp->width*sFactor, gleCone1);
+                gleTube(pf, ph, disp->width*sFactor, gle::cone);
 #else
                 gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
             }
             if ( obj->base() )
-                drawObject(ph, disp, gle::octahedron);
+                drawObject(ph, disp->size, gle::octahedron);
             else
                 drawPoint(ph, disp);
         }
@@ -1280,7 +1166,7 @@ void Display3::drawCoupleBfast(Couple const* cx) const
         if ( pd1->visible )
         {
             pd1->color.load_both();
-            gleTube(p1, p2, pd2->width*sFactor, gleHexTube1B);
+            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube1);
             drawHand(p1, pd1);
             drawHand(p2, pd2);
         }
@@ -1288,7 +1174,7 @@ void Display3::drawCoupleBfast(Couple const* cx) const
     else if ( pd1->visible || pd2->visible )
     {
         pd1->color.load_both();
-        gleTube(p1, p2, pd1->width*sFactor, gleTube1B);
+        gleTube(p1, p2, pd1->width*sFactor, gle::tube1);
         if ( pd1->visible ) drawHand(p1, pd1);
         if ( pd2->visible ) drawHand(p2, pd2);
     }
@@ -1334,7 +1220,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         {
             pd1->color.load_both(cx->fiber1()->disp->color.transparency());
             glDepthMask(GL_FALSE);
-            gleTube(p1, p2, pd2->width*sFactor, gleHexTube1B);
+            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube1);
             glDepthMask(GL_TRUE);
             continue;
         }
@@ -1348,16 +1234,16 @@ void Display3::drawCoupleB(Couple const* cx) const
             // accurate rendering of Couple's composite link
             Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
             drawPoint(mid, pd1->width);
-            gleTube(p2, mid, pd2->width*sFactor, gleTube2B); //gleHexTube1B);
-            gleTube(p1, mid, pd1->width*sFactor, gleTube2B); //gleHexTube1B);
+            gleTube(p2, mid, pd2->width*sFactor, gle::tube2); //gle::hexTube1);
+            gleTube(p1, mid, pd1->width*sFactor, gle::tube2); //gle::hexTube1);
 #elif ( 0 )
             drawPoint(cx->sidePos1(), pd1->width);
             drawPoint(cx->sidePos2(), pd1->width);
-            gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gleHexTube1B);
-            gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gleHexTube1B);
-            gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gleHexTube1B);
+            gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gle::hexTube1);
+            gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gle::hexTube1);
+            gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gle::hexTube1);
 #else
-            gleTube(p1, p2, pd2->width*sFactor, gleHexTube1B);
+            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube1);
 #endif
         }
     }
@@ -1370,7 +1256,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         {
             setClipPlane(GL_CLIP_PLANE5, -dif, mid);
             pd1->color.load_front();
-            gleTube(p1, p2, pd1->width*sFactor, gleTube1B);
+            gleTube(p1, p2, pd1->width*sFactor, gle::tube1);
             drawHand(p1, pd1);
         }
         
@@ -1378,7 +1264,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         {
             setClipPlane(GL_CLIP_PLANE5,  dif, mid);
             pd2->color.load_front();
-            gleTube(p2, p1, pd2->width*sFactor, gleTube1B);
+            gleTube(p2, p1, pd2->width*sFactor, gle::tube1);
             drawHand(p2, pd2);
         }
         glDisable(GL_CLIP_PLANE5);

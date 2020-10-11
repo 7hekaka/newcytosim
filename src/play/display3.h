@@ -20,16 +20,13 @@ class Display3 : public Display
 private:
     
     /// draw a fine spherical object
-    void drawBall(Vector const&, float radius, gle_color const&) const;
+    void drawBallT(Vector const&, float radius, gle_color const&) const;
 
     /// draw a point with a small sphere
     void drawPoint(Vector const&, PointDisp const*) const;
     
     /// draw a point with a small sphere
     void drawPoint(Vector const&, float) const;
-    
-    /// draw primitive at given position
-    void drawObject(Vector const&, PointDisp const*, void (*obj)()) const;
 
     
     /// draw a point with a small sphere
@@ -47,9 +44,6 @@ private:
     /// draw Fiber segments not necessarily aligned with the vertices
     void drawFiberSubSegments(Fiber const&, real rad, VisibleLattice::lati_t inx, VisibleLattice::lati_t last, real abs, real inc,
                               void (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
-    
-    /// not used
-    void drawFiberSegment(Fiber const&, bool capM, bool capP, real rad, real abs1, real abs2) const;
     
     /// display lattice subtance using specified color function
     void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, void (*set_color)(Fiber const&, long, real)) const;

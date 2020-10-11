@@ -125,21 +125,36 @@ namespace Platonic
 
     
     /**
-     return the Vertex identical to `X`, which should exist
+     return index of the Vertex corresponding to given interpolation
+     of max_vertices_ if not found
      */
-    unsigned Solid::getVertex(Corner* A, unsigned wA, Corner* B, unsigned wB)
+    unsigned Solid::findEdgeVertex(Corner* A, unsigned wA, Corner* B, unsigned wB) const
     {
         /**
          We limit the search to the vertices that are on the edges of
          the original PlatonicSolid, since they are the only one to be duplicated
          Yet, we have a linear search that may be limiting for very fine divisions
          */
-        for ( unsigned i = 0; i < num_vertices_on_edges_; ++i )
+        for ( unsigned i = 0; i < num_edge_vertices_; ++i )
         {
             if ( vertices_[i].equivalent(A, wA, B, wB) )
                 return i;
         }
         return max_vertices_;
+    }
+    
+    /**
+     return index of the Vertex corresponding to given interpolation
+     */
+    unsigned Solid::getEdgeVertex(Corner* A, unsigned wA, Corner* B, unsigned wB) const
+    {
+        unsigned i = findEdgeVertex(A, wA, B, wB);
+        if ( i >= max_vertices_ )
+        {
+            fprintf(stderr, "Platonic::Solid internal error: non-existent edge vertex\n");
+            return 0;
+        }
+        return i;
     }
 
     
@@ -152,7 +167,7 @@ namespace Platonic
     unsigned Solid::makeVertex(Corner* A, unsigned wA, Corner* B, unsigned wB, Corner* C, unsigned wC)
     {
         if ( wC == 0 )
-            return getVertex(A, wA, B, wB);
+            return getEdgeVertex(A, wA, B, wB);
         return addVertex(A, wA, B, wB, C, wC);
     }
     
@@ -166,29 +181,30 @@ namespace Platonic
         Corner *A = &corners_[a];
         Corner *B = &corners_[b];
         
-        for ( unsigned u = 1; u < div; ++u )
+        // check if this edge has been processes already:
+        unsigned i = findEdgeVertex(A, div-1, B, 1);
+        if ( i >= max_vertices_ )
         {
-            unsigned i = getVertex(A, div-u, B, u);
-            if ( i >= max_vertices_ )
+            for ( unsigned u = 1; u < div; ++u )
             {
                 addVertex(A, div-u, B, u, nullptr, 0);
-                num_vertices_on_edges_ = num_vertices_;
+                num_edge_vertices_ = num_vertices_;
             }
         }
     }
 
     
-    void Solid::addFace(unsigned a, unsigned b, unsigned c, bool posZ)
+    void Solid::addFace(unsigned a, unsigned b, unsigned c, int half)
     {
         //printf("face %i %i %i\n", a, b, c);
         assert_true( a!=b && b!=c && a!=c );
-        if ( posZ )
+        if ( half )
         {
             real pos[3], Z = 0;
             vertex(a).store_pos(pos); Z += pos[2];
             vertex(b).store_pos(pos); Z += pos[2];
             vertex(c).store_pos(pos); Z += pos[2];
-            if ( Z < 0 )
+            if ( half * Z < 0 )
                 return;
         }
         faces_[3*num_faces_  ] = a;
@@ -198,7 +214,7 @@ namespace Platonic
     }
 
     
-    void Solid::refineFace(unsigned a, unsigned b, unsigned c, unsigned div, bool posZ)
+    void Solid::refineFace(unsigned a, unsigned b, unsigned c, unsigned div, int half)
     {
         Corner *A = &corners_[a];
         Corner *B = &corners_[b];
@@ -207,20 +223,20 @@ namespace Platonic
         unsigned* line = new unsigned[div+1];
         
         for ( unsigned u = 0; u <= div;  ++u )
-            line[u] = getVertex(A, div-u, B, u);
+            line[u] = getEdgeVertex(A, div-u, B, u);
         
         for ( unsigned ii = 1; ii <= div; ++ii )
         {
-            unsigned X = getVertex(A, div-ii, C, ii);
+            unsigned X = getEdgeVertex(A, div-ii, C, ii);
             
-            addFace(line[0], line[1], X, posZ);
+            addFace(line[0], line[1], X, half);
             line[0] = X;
             
             for ( unsigned jj = 1; ii+jj <= div; ++jj )
             {
                 X = makeVertex(B, jj, C, ii, A, div-ii-jj);
-                addFace(line[jj-1], line[jj], X, posZ);
-                addFace(line[jj], line[jj+1], X, posZ);
+                addFace(line[jj-1], line[jj], X, half);
+                addFace(line[jj], line[jj+1], X, half);
                 line[jj] = X;
             }
         }
@@ -233,7 +249,7 @@ namespace Platonic
     
     void Solid::refineTriangles(unsigned n_vex, real vex[][3],
                                 unsigned n_fac, unsigned fac[][3],
-                                unsigned div, bool posZ = false)
+                                unsigned div, int half = 0)
     {
         assert_true(n_vex <= num_corners_);
         
@@ -258,7 +274,7 @@ namespace Platonic
         assert_true(num_vertices_ <= max_vertices_);
 
         for ( unsigned f = 0; f < n_fac; ++f )
-            refineFace(fac[f][0], fac[f][1], fac[f][2], div, posZ);
+            refineFace(fac[f][0], fac[f][1], fac[f][2], div, half);
     }
     
     
@@ -413,7 +429,7 @@ namespace Platonic
             {11, 6, 10},
         };
         
-        refineTriangles(12, vex, 15, fac, div, true);
+        refineTriangles(12, vex, 15, fac+5, div, -1);
     }
     
     //------------------------------------------------------------------------------

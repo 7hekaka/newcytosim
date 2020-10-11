@@ -39,13 +39,13 @@ namespace gle
     void initBuffers();
     
     /// calculate sinus and cosinus for a circle
-    void circle(size_t cnt, GLfloat C[], GLfloat S[], double radius, double start = 0);
+    void circle(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start = 0);
     
     /// calculate sinus and cosinus
-    void circle(size_t cnt, GLfloat CS[], double radius, double start = 0);
+    void circle(size_t cnt, GLfloat CS[], double rad, double start = 0);
 
     /// calculate sinus and cosinus for a circular arc
-    void arc(size_t cnt, GLfloat C[], GLfloat S[], double radius, double start, double end, GLfloat cenx, GLfloat ceny);
+    void arc(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start, double end, GLfloat cenx, GLfloat ceny);
 
 #pragma mark -
     
@@ -57,9 +57,6 @@ namespace gle
    
     inline void gleTranslate(float x, float y, float z)    { glTranslatef(x, y, z); }
     inline void gleTranslate(double x, double y, double z) { glTranslated(x, y, z); }
-
-    inline void gleRotate(float a, float x, float y, float z)     { glRotatef(a, x, y, z); }
-    inline void gleRotate(double x, double y, double z, double t) { glRotated(x, y, z, t); }
 
 #if REAL_IS_DOUBLE
     
@@ -76,9 +73,6 @@ namespace gle
     inline void gleTranslate(Vector1 const& v)            { glTranslated(v.XX, 0, 0); }
     inline void gleTranslate(Vector2 const& v)            { glTranslated(v.XX, v.YY, 0); }
     inline void gleTranslate(Vector3 const& v)            { glTranslated(v.XX, v.YY, v.ZZ); }
-    
-    inline void gleMultMatrix(real mat[])                 { glMultMatrixd(mat); }
-    inline void gleLoadMatrix(real mat[])                 { glLoadMatrixd(mat); }
 
     inline void gleRasterPos(Vector1 const& v)            { glRasterPos2d(v.XX, 0); }
     inline void gleRasterPos(Vector2 const& v)            { glRasterPos2d(v.XX, v.YY); }
@@ -100,9 +94,6 @@ namespace gle
     inline void gleTranslate(Vector2 const& v)            { glTranslatef(v.XX, v.YY, 0); }
     inline void gleTranslate(Vector3 const& v)            { glTranslatef(v.XX, v.YY, v.ZZ); }
 
-    inline void gleMultMatrix(real mat[])                 { glMultMatrixf(mat); }
-    inline void gleLoadMatrix(real mat[])                 { glLoadMatrixf(mat); }
-
     inline void gleRasterPos(Vector1 const& v)            { glRasterPos2f(v.XX, 0); }
     inline void gleRasterPos(Vector2 const& v)            { glRasterPos2f(v.XX, v.YY); }
     inline void gleRasterPos(Vector3 const& v)            { glRasterPos3f(v.XX, v.YY, v.ZZ); }
@@ -122,20 +113,18 @@ namespace gle
     //------------------------------------------------------------------------------
 #pragma mark -
         
-    /// align the X-axis to the given vector, by rotating around Z
-    void gleAlignX(Vector2 const& v1);
-    /// translate by A, then rotate to align Z with AB (which is in the XY-plane)
-    void gleAlignZ(Vector2 const& A, Vector2 const& B);
-    /// translate by A, then rotate to align Z with AB, Z replaces X. The X-Y plane is scaled by ts
-    void gleAlignZ(Vector2 const& A, Vector2 const& B, real R);
-    ///  align the view to the three orthogonal vectors given
-    void gleRotate(Vector3 const& v1, Vector3 const& v2, Vector3 const& v3, bool inverse=false);
-    /// translate by T, then rotate to align X with v1, Y with v2 and Z with v3
-    void gleTransRotate(Vector3 const& v1, Vector3 const& v2, Vector3 const& v3, Vector3 const& T);
+    /// translate by T, then rotate to align X with A, Y with B and Z with C
+    void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
+
+    /// translate by A; rotate to align Z with AB, Z replaces X. The X-Y plane is scaled by R
+    void gleStretchZ(Vector2 const& A, Vector2 const& B, float rad);
     /// translate by T, then rotate to align Z with dir
-    void gleTransAlignZ(Vector3 const& A, Vector3 const& B, float radius);
+    void gleStretchZ(Vector3 const& A, Vector3 const& B, float rad);
+    
     /// translate by T, then rotate to align Z with dir, scaling X and Y by radis
-    void gleTransAlignZ(Vector3 const& dir, float scale, Vector3 const& pos, float radius);
+    void transAlignZ(Vector1 const& pos, float rad, Vector1 const& dir);
+    void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir);
+    void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir);
 
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
@@ -145,35 +134,36 @@ namespace gle
 #pragma mark -
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
-    void gleCircle();
+    void circle();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
-    void gleDisc();
+    void discUp();
+    void discDown();
     /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
-    void gleDisc2();
+    void disc2();
     /// draw a triangle of radius 1 in plane XY, normals pointing in +Z
-    void gleTriangleS();
-    void gleTriangleL();
+    void triangleS();
+    void triangleL();
     /// draw a triangle of radius 1 in plane XY, normals pointing in +Z
-    void gleNablaS();
-    void gleNablaL();
+    void nablaS();
+    void nablaL();
     /// draw a square of radius 1 in plane XY, normals pointing in +Z
-    void gleSquareL();
-    void gleSquareS();
+    void squareL();
+    void squareS();
     /// draw a rectangle of radius 1 in plane XY, normals pointing in +Z
-    void gleRectangleL();
-    void gleRectangleS();
+    void rectangleL();
+    void rectangleS();
     /// draw a PLUS of radius 1 in plane XY, normals pointing in +Z
-    void glePlusS();
-    void glePlusL();
+    void plusS();
+    void plusL();
     /// draw a pentagon of radius 1 in plane XY, normals pointing in +Z
-    void glePentagonS();
-    void glePentagonL();
+    void pentagonS();
+    void pentagonL();
     /// draw an hexagon of surface M_PI in plane XY, normals pointing in +Z
-    void gleHexagonS();
-    void gleHexagonL();
+    void hexagonS();
+    void hexagonL();
     /// draw a star of radius 1 in plane XY, normals pointing in +Z
-    void gleStarS();
-    void gleStarL();
+    void starS();
+    void starL();
     
     /// draw a Cube of side 2 in 3D and a Square in 2D
     void cube();
@@ -191,129 +181,141 @@ namespace gle
     /// draw a very nice sphere of radius 1 at origin
     void sphere8U();
     /// draw Torus of radius `rad` and thickness `thick`
-    void gleTorus(GLfloat rad, GLfloat thick, size_t inc = 1);
+    void torusZ(GLfloat rad, GLfloat thick, size_t inc = 1);
     
     /// draw an open tube from B to T along Z, of diameter 1
-    void gleTube0(GLfloat B, GLfloat T, int inc);
+    void tubeZ(GLfloat B, GLfloat T, int inc);
     /// draw an open tube from B to T along Z, of diameter 1
-    void gleTube0(GLfloat B, GLfloat RB, GLfloat T, GLfloat RT, int inc);
-    /// draw a rough open tube along Z, of diameter 1 and length 1
-    inline void gleTube1()     { gleTube0(0, 1, 8); }
-    /// draw an open tube along Z, of diameter 1 and length 1
-    inline void gleTube2()     { gleTube0(0, 1, 4); }
-    /// draw a nice open tube along Z, of diameter 1 and length 1
-    inline void gleTube4()     { gleTube0(0, 1, 2); }
-    /// draw a nicer open tube along Z, of diameter 1 and length 1
-    inline void gleTube8()     { gleTube0(0, 1, 1); }
-    /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
-    inline void gleLongTube1() { gleTube0(-0.25f, 1.25f, 8); }
-    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
-    inline void gleLongTube2() { gleTube0(-0.25f, 1.25f, 4); }
-    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
-    inline void gleLongTube4() { gleTube0(-0.25f, 1.25f, 2); }
+    void tubeZ(GLfloat B, GLfloat RB, GLfloat T, GLfloat RT, int inc);
     /// draw an open tube along Z, of diameter 1 and length 1, Z=[0, 1]
-    void gleHexTube1(GLfloat Zmin, GLfloat Zmax);
+    void hexTubeZ(GLfloat Zmin, GLfloat Zmax);
+    
+    /// draw an open tube along Z, of diameter 1 and length 1
+    void tube1();
+    /// draw an open tube along Z, of diameter 1 and length 1
+    void tube2();
+    /// draw a nice open tube along Z, of diameter 1 and length 1
+    void tube4();
+    /// draw a nicer open tube along Z, of diameter 1 and length 1
+    void tube8();
+    /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    void longTube1();
+    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    void longTube2();
+    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    void longTube4();
+    /// draw a tube along Z, of diameter 1 with Z=[-16, 0]
+    void halfTube1();
+    /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
+    void halfTube2();
+    /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
+    void halfTube4();
+    /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
+    void hexTube1();
+
+    
     /// draw a closed tube along Z, or diameter 1 and length 1
-    void gleCylinder1();
+    void cylinder();
     /// spherocylinder of length L, radius R, centered and aligned with axis Z
-    void gleCapsule(GLfloat L, GLfloat R);
+    void capsuleZ(GLfloat L, GLfloat R);
 
     /// draw a 3-portion cylinder with a larger central section
-    void gleBarrel1();
+    void barrel();
     /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
-    void gleCone0(GLfloat R, GLfloat B, GLfloat T, bool closed);
+    void coneZ(GLfloat R, GLfloat B, GLfloat T, bool closed);
     /// display an open cone directed along Z, of radius 1 at Z=0
-    inline void gleCone1() { gleTube0(0, 1, 1, 0.25, 4); }
+    inline void cone() { tubeZ(0, 1, 1, 0.25, 4); }
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
-    inline void gleLongCone1() { gleCone0(1, -1, 2, true); }
+    inline void longCone() { coneZ(1, -1, 2, true); }
     /// display a cylindrical box, directed along Z, of length 1, radius 1 in Z=[-0.5, +0.5]
-    void gleCylinderZ();
+    void cylinderZ();
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
-    void gleDumbbell1();
+    void dumbbell();
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
-    void gleArrowTail1();
+    void arrowTail();
 
     /// draw a circular band composed of little triangles
-    void gleArrowedBand(size_t nb_triangles, float width);
+    void drawArrowedBand(size_t nb_triangles, float width);
     /// draw 3 Arrowed Bands defining 8 quadrants on the sphere of radius 1
-    void gleThreeBands(size_t nb_triangles);
+    void drawThreeBands(size_t nb_triangles);
     
     /// a rectangle ( rect = [ left, bottom, right, top ] )
-    void gleRectangle(const int rect[4]);
+    void drawRectangle(const int rect[4]);
     
     /// a rectangle with cut corners
-    void gleNiceRectangle(const int rect[4], int);
+    void drawNiceRectangle(const int rect[4], int);
 
     //------------------------------------------------------------------------------
-
-    inline void gleDumbbellB()     { gleDumbbell1();    }
     
-    inline void gleArrowTailB()    { gleArrowTail1();   }
-    inline void gleCircleB()       { gleCircle();       }
-    inline void gleDiscB()         { gleDisc();         }
-    inline void gleDisc2B()        { gleDisc2();        }
-    inline void gleCylinderB()     { gleCylinderZ();    }
-    inline void gleConeB()         { gleCone1();        }
-    inline void gleLongConeB()     { gleLongCone1();    }
-
-    void gleTube1B();
-    void gleTube2B();
-    void gleTube4B();
-    void gleTube8B();
-    void gleLongTube1B();
-    void gleLongTube2B();
-    void gleLongTube4B();
-    void gleHexTube1B();
+    /// do not draw
+    void nothing();
     
-    void gleSphere1B();
-    void gleSphere2B();
-    void gleSphere4B();
-    void gleSphere8B();
+    /// draw a sphere at the origin of radius 1
+    void sphere1();
+    /// draw a nice sphere at the origin of radius 1
+    void sphere2();
+    /// draw a very nice sphere at the origin of radius 1
+    void sphere4();
+    /// draw a refined sphere at the origin of radius 1
+    void sphere8();
+    
+    void dualPassSphere();
+    
+    /// draw half a sphere in Z < 0
+    void hemisphere1();
+    /// draw a nice half-sphere in Z < 0
     void hemisphere2();
+    /// draw a very nice half-sphere in Z < 0
     void hemisphere4();
-
+    
+    /// primitives to draw the ends of spherocylinders:
+    inline void capedTube1() { halfTube1(); hemisphere1(); }
+    inline void capedTube2() { halfTube2(); hemisphere2(); }
+    inline void capedTube4() { halfTube4(); hemisphere4(); }
+    
+    /// primitives to draw the ends of spherocylinders:
+    inline void endedTube1() { halfTube1(); discDown(); }
+    inline void endedTube2() { halfTube2(); discDown(); }
+    inline void endedTube4() { halfTube4(); discDown(); }
+    
     //------------------------------------------------------------------------------
 #pragma mark -
     
-    /// display a surface of revolution around the Z axis
-    void gleRevolution(GLfloat (*radius)(GLfloat), GLfloat, GLfloat, GLfloat);
-    
     /// display back first, and then front
-    void gleDualPass(void primitive());
+    void dualPass(void primitive());
     
     /// draw the object specified by obj, scaled by radius
     void gleObject(real radius, void (*obj)());
     
     /// draw 'obj' scaled by radius at position 'x'
-    void gleObject(Vector1 const& x, float radius, void (*obj)());
-    void gleObject(Vector2 const& x, float radius, void (*obj)());
-    void gleObject(Vector3 const& x, float radius, void (*obj)());
+    void gleObject(Vector1 const& x, float rad, void (*obj)());
+    void gleObject(Vector2 const& x, float rad, void (*obj)());
+    void gleObject(Vector3 const& x, float rad, void (*obj)());
  
     /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& x, Vector1 const& d, float radius, void (*obj)());
-    void gleObject(Vector2 const& x, Vector2 const& d, float radius, void (*obj)());
-    void gleObject(Vector3 const& x, Vector3 const& d, float radius, void (*obj)());
+    void gleObject(Vector1 const& x, Vector1 const& d, float rad, void (*obj)());
+    void gleObject(Vector2 const& x, Vector2 const& d, float rad, void (*obj)());
+    void gleObject(Vector3 const& x, Vector3 const& d, float rad, void (*obj)());
 
     /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& a, Vector1 const& b, void (*obj)());
-    void gleObject(Vector2 const& a, Vector2 const& b, void (*obj)());
-    void gleObject(Vector3 const& a, Vector3 const& b, void (*obj)());
+    void gleObject(Vector1 const& A, Vector1 const& B, void (*obj)());
+    void gleObject(Vector2 const& A, Vector2 const& B, void (*obj)());
+    void gleObject(Vector3 const& A, Vector3 const& B, void (*obj)());
     
-    /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& x, Vector1 const& d, real radius, real length, void (*obj)());
-    void gleObject(Vector2 const& x, Vector2 const& d, real radius, real length, void (*obj)());
-    void gleObject(Vector3 const& x, Vector3 const& d, real radius, real length, void (*obj)());
-
     //------------------------------------------------------------------------------
 
     /// draw 'obj' with its ends at [a,b], of specified radius
-    void gleTube(Vector1 const& a, Vector1 const& b, float radius, void (*obj)()=gleTube1B);
-    void gleTube(Vector2 const& a, Vector2 const& b, float radius, void (*obj)()=gleTube1B);
-    void gleTube(Vector3 const& a, Vector3 const& b, float radius, void (*obj)()=gleTube1B);
+    void gleTube(Vector1 const& A, Vector1 const& B, float rad, void (*obj)());
+    void gleTube(Vector2 const& A, Vector2 const& B, float rad, void (*obj)());
+    void gleTube(Vector3 const& A, Vector3 const& B, float rad, void (*obj)());
+
+    void drawTube(Vector1 const& a, float rad, Vector1 const& b, void (*obj)());
+    void drawTube(Vector2 const& a, float rad, Vector2 const& b, void (*obj)());
+    void drawTube(Vector3 const& a, float rad, Vector3 const& b, void (*obj)());
     
     /// draw a band from A to B, with specified radius
-    void gleBand(Vector2 const& a, Vector2 const& b, real);
-    void gleBand(Vector3 const& a, Vector3 const& b, real);
+    void gleBand(Vector2 const& A, Vector2 const& B, real);
+    void gleBand(Vector3 const& A, Vector3 const& B, real);
 
     /// draw a band from A to B, with specified radius in A and B
     void gleBand(Vector1 const& a, real, Vector1 const& b, real);
@@ -332,35 +334,35 @@ namespace gle
     void gleBar(Vector3 const& a, Vector3 const& da, Vector3 const& b, Vector3 const& db, real);
     
     /// draw two discs in A and B, connected with a line
-    void gleDumbbell(Vector2 const& a, Vector2 const& b, GLfloat diameter);
+    void gleDumbbell(Vector2 const& A, Vector2 const& B, float diameter);
     /// draw two spheres in A and B, connected with a cylinder
-    void gleDumbbell(Vector3 const& a, Vector3 const& b, GLfloat diameter);
+    void gleDumbbell(Vector3 const& A, Vector3 const& B, float diameter);
 
     /// display cone, dir should be normalized
-    void gleCone(Vector1 const& center, Vector1 const& dir, real scale);
+    void drawCone(Vector1 const& center, Vector1 const& dir, float rad);
     /// display arrow-head, dir should be normalized
-    void gleCone(Vector2 const& center, Vector2 const& dir, real scale);
+    void drawCone(Vector2 const& center, Vector2 const& dir, float rad);
     /// display arrow-head, dir should be normalized
-    void gleCone(Vector3 const& center, Vector3 const& dir, real scale);
+    void drawCone(Vector3 const& center, Vector3 const& dir, float rad);
     
     /// display arrow-head, dir should be normalized
-    void gleCylinder(Vector1 const& center, Vector1 const& dir, real scale);
+    void drawCylinder(Vector1 const& center, Vector1 const& dir, float rad);
     /// display arrow-head, dir should be normalized
-    void gleCylinder(Vector2 const& center, Vector2 const& dir, real scale);
+    void drawCylinder(Vector2 const& center, Vector2 const& dir, float rad);
     /// display arrow-head, dir should be normalized
-    void gleCylinder(Vector3 const& center, Vector3 const& dir, real scale);
+    void drawCylinder(Vector3 const& center, Vector3 const& dir, float rad);
 
     /// display arrow-head, dir should be normalized
-    void gleArrowTail(Vector1 const& center, Vector1 const& dir, real scale);
+    void drawArrowTail(Vector1 const& center, Vector1 const& dir, float rad);
     /// display arrow-head, dir should be normalized
-    void gleArrowTail(Vector2 const& center, Vector2 const& dir, real scale);
+    void drawArrowTail(Vector2 const& center, Vector2 const& dir, float rad);
     /// display arrow-head, dir should be normalized
-    void gleArrowTail(Vector3 const& center, Vector3 const& dir, real scale);
+    void drawArrowTail(Vector3 const& center, Vector3 const& dir, float rad);
 
     /// draw an arrow with ends [a,b], of specified radius
-    void gleArrow(Vector1 const& a, Vector1 const& b, float radius);
-    void gleArrow(Vector2 const& a, Vector2 const& b, float radius);
-    void gleArrow(Vector3 const& a, Vector3 const& b, float radius);
+    void drawArrow(Vector1 const& A, Vector1 const& B, float rad);
+    void drawArrow(Vector2 const& A, Vector2 const& B, float rad);
+    void drawArrow(Vector3 const& A, Vector3 const& B, float rad);
     
     /// Display link between 2 positions
     void drawLink(Vector const& a, Vector const& b);

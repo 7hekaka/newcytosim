@@ -236,10 +236,10 @@ bool SpaceCylinderP::draw() const
         glTranslatef(L, 0, 0);
         glScalef(R, R, R);
         glRotated(90, 0, 1, 0);
-        gle::gleCircle();
+        gle::circle();
         glTranslatef(0, 0, -2*L/R);
         glRotated(180, 0, 1, 0);
-        gle::gleCircle();
+        gle::circle();
         glPopMatrix();
         glDisable(GL_LINE_STIPPLE);
     }

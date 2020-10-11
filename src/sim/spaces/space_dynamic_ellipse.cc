@@ -462,7 +462,7 @@ bool SpaceDynamicEllipse::draw() const
     glEnd();
 #endif
 
-    real MM[16] = { 0 };
+    GLfloat MM[16] = { 0 };
     MM[ 5]=1.0f;
     MM[10]=1.0f;
     MM[15]=1.0f;
@@ -470,7 +470,7 @@ bool SpaceDynamicEllipse::draw() const
     for ( unsigned j=0; j<DIM; ++j )
         MM[i+4*j] = mat(i,j);
     glPushMatrix();
-    gle::gleMultMatrix(MM);
+    glMultMatrixf(MM);
     SpaceEllipse::draw();
     glPopMatrix();
 

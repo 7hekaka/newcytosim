@@ -110,15 +110,15 @@ void PointDisp::strokeShape() const
 {
     switch ( tolower(shape) )
     {
-        case 'v': gle::gleNablaL();     break;
-        case 't': gle::gleTriangleL();  break;
-        case 'q': gle::gleSquareL();    break;
-        case 'r': gle::gleRectangleL(); break;
-        case 'p': gle::glePentagonL();  break;
-        case 'h': gle::gleHexagonL();   break;
-        case 's': gle::gleStarL();      break;
-        case '+': gle::glePlusL();      break;
-        case 'c': gle::gleCircle();    break;
+        case 'v': gle::nablaL();     break;
+        case 't': gle::triangleL();  break;
+        case 'q': gle::squareL();    break;
+        case 'r': gle::rectangleL(); break;
+        case 'p': gle::pentagonL();  break;
+        case 'h': gle::hexagonL();   break;
+        case 's': gle::starL();      break;
+        case '+': gle::plusL();      break;
+        case 'c': gle::circle();     break;
         default: break;
     }
 }
@@ -128,16 +128,16 @@ void PointDisp::paintShape() const
 {
     switch ( tolower(shape) )
     {
-        case 'v': gle::gleNablaS();     break;
-        case 't': gle::gleTriangleS();  break;
-        case 'q': gle::gleSquareS();    break;
-        case 'r': gle::gleRectangleS(); break;
-        case 'p': gle::glePentagonS();  break;
-        case 'h': gle::gleHexagonS();   break;
-        case 's': gle::gleStarS();      break;
-        case '+': gle::glePlusS();      break;
+        case 'v': gle::nablaS();     break;
+        case 't': gle::triangleS();  break;
+        case 'q': gle::squareS();    break;
+        case 'r': gle::rectangleS(); break;
+        case 'p': gle::pentagonS();  break;
+        case 'h': gle::hexagonS();   break;
+        case 's': gle::starS();      break;
+        case '+': gle::plusS();      break;
         case 'c': break;
-        default:  gle::gleDisc();       break;
+        default: gle::discUp(); break;
     }
 }
 
@@ -181,7 +181,7 @@ void PointDisp::strokeI() const
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
     glColor4f(0, 0, 0, 0);
-    gle::gleDiscB(); //strokeShape();
+    gle::discUp(); //strokeShape();
     glPopMatrix();
     glPopAttrib();
 }

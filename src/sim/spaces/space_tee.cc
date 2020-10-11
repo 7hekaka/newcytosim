@@ -481,10 +481,10 @@ bool SpaceTee::draw() const
     glRotated(90, 0, 1, 0);
     glTranslated(0, 0, J);
     glClipPlane(glp1, plane1);
-    gleTube0(0, L-J, 1);
+    gle::tubeZ(0, L-J, 1);
     glTranslated(0, 0, L-J);
     glClipPlane(glp1, planeZ);
-    gleSphere8B();
+    gle::sphere8();
     glPopMatrix();
 
     //left side:
@@ -492,10 +492,10 @@ bool SpaceTee::draw() const
     glRotated(90, 0, -1, 0);
     glTranslated(0, 0, -J);
     glClipPlane(glp1, plane1);
-    gleTube0(0, L+J, 1);
+    gle::tubeZ(0, L+J, 1);
     glTranslated(0, 0, L+J);
     glClipPlane(glp1, planeZ);
-    gleSphere8B();
+    gle::sphere8();
     glTranslated(0, 0, -L-J);
     glPopMatrix();
 
@@ -507,11 +507,11 @@ bool SpaceTee::draw() const
     glEnable(glp2);
     glClipPlane(glp1, plane1);
     glClipPlane(glp2, plane2);
-    gleTube0(0, A+1, 1);
+    gle::tubeZ(0, A+1, 1);
     glTranslated(0, 0, A+1);
     glDisable(glp2);
     glClipPlane(glp1, planeZ);
-    gleSphere8B();
+    gle::sphere8();
     glPopMatrix();
 
     glPopMatrix();

@@ -185,7 +185,7 @@ public:
             gle::gleTranslate(pos);
             gle::gleScale(realSize);
             color2.load();
-            gle::gleDisc();
+            gle::discUp();
             glPopMatrix();
     #endif
         }

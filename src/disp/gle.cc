@@ -7,7 +7,6 @@
 #include "gle.h"
 #include "glut.h"
 #include "platonic.h"
-#include "smath.h"
 #include "simd.h"
 #include "simd_float.h"
 
@@ -21,7 +20,7 @@ namespace gle
     GLfloat co_[ncircle+1] = { 0 };
     
     /// vertex buffer objects for tubes
-    GLuint tub_[16] = { 0 };
+    GLuint tub_[24] = { 0 };
     
     /// vertex buffer objects for hex tubes
     GLuint buf_[16] = { 0 };
@@ -167,135 +166,174 @@ namespace gle
     {
         glDeleteBuffers(16, ico_);
         ico_[0] = 0;
-        glDeleteBuffers(16, tub_);
+        glDeleteBuffers(24, tub_);
         tub_[0] = 0;
         glDeleteBuffers(16, buf_);
         buf_[0] = 0;
     }
     
     //-----------------------------------------------------------------------
-    void gleAlignX(Vector2 const& v)
+    #pragma mark - Rotation
+    
+    void alignZ(GLfloat X)
     {
-        const real n = v.norm();
-        //warning! this matrix is displayed transposed
-        real mat[16] = {
-            v.XX, -v.YY,  0,  0,
-            v.YY,  v.XX,  0,  0,
-            0,        0,  n,  0,
-            0,        0,  0,  1 };
-        gleMultMatrix(mat);
+        glRotated(std::copysign(90, X), 0.0, 1.0, 0.0);
     }
-    
-    
-    /**
-     Graphical elements are aligned in 3D along Z and this function is used
-     to rotate them in the XY plane for the 2D display.
-     The rotation is chosen such that the Y face of the rotated object points
-     down the Z axis. In this way, the lower part of the object is drawn first,
-     such that the upper half overwrites it and become the only visible part.
-     The display is thus correct even if DEPTH_TEST is disabled.
-     */
-    void gleAlignZ(Vector2 const& A, Vector2 const& B)
+
+    template < typename FLOAT >
+    inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3])
     {
-        Vector2 D = B - A;
-        real n = D.inv_norm();
-        //warning! this matrix is displayed transposed
-        real mat[16] = {
-            D.YY*n, -D.XX*n,   0,  0,
-            0,            0,  -1,  0,
-            D.XX,      D.YY,   0,  0,
-            A.XX,      A.YY,   0,  1 };
-        gleMultMatrix(mat);
+        const FLOAT s = std::copysign((FLOAT)1.0, v[2]);
+        /// optimized version by Marc B. Reynolds
+        const FLOAT a = v[1] / ( v[2] + s );
+        const FLOAT b = v[1] * a;
+        const FLOAT c = v[0] * a;
+        FLOAT ss = s * mul;
+        x[0] = mul * ( -v[2] - b );
+        x[1] = mul * c;
+        x[2] = mul * v[0];
+        y[0] = ss * c;
+        y[1] = ss * b - mul;
+        y[2] = ss * v[1];
     }
-    
+
+    template < typename FLOAT >
+    inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3], FLOAT z[3])
+    {
+        const FLOAT s = std::copysign((FLOAT)1.0, v[2]);
+        /// optimized version by Marc B. Reynolds
+        const FLOAT a = v[1] / ( v[2] + s );
+        const FLOAT b = v[1] * a;
+        const FLOAT c = v[0] * a;
+        FLOAT ss = s * mul;
+        x[0] = mul * ( -v[2] - b );
+        x[1] = mul * c;
+        x[2] = mul * v[0];
+        y[0] = ss * c;
+        y[1] = ss * b - mul;
+        y[2] = ss * v[1];
+        z[0] = mul * v[0];
+        z[1] = mul * v[1];
+        z[2] = mul * v[2];
+    }    
     
     /**
      `R` is the transverse scaling done in the XY plane after rotation
      */
-    void gleAlignZ(Vector2 const& A, Vector2 const& B, real R)
+    void gleStretchZ(Vector2 const& A, Vector2 const& B, float R)
     {
-        Vector2 D = B - A;
-        real S = R;
-        real n = R / D.norm();
+        float X = float(B.XX-A.XX);
+        float Y = float(B.YY-A.YY);
+        float N = invsqrt(X*X+Y*Y);
+        X *= N;
+        Y *= N;
         //warning! this matrix appears here transposed
-        real mat[16] = {
-            D.YY*n, -D.XX*n,  0,  0,
-            0,            0, -S,  0,
-            D.XX,      D.YY,  0,  0,
-            A.XX,      A.YY,  0,  1 };
-        gleMultMatrix(mat);
-    }
-    
-    
-    void gleRotate(Vector3 const& v1, Vector3 const& v2, Vector3 const& v3, bool inverse)
-    {
-        real mat[16];
-        for ( int ii = 0; ii < 3; ++ii )
-        {
-            if ( inverse )
-            {
-                mat[4*ii  ] = v1[ii];
-                mat[4*ii+1] = v2[ii];
-                mat[4*ii+2] = v3[ii];
-            }
-            else
-            {
-                mat[ii  ]   = v1[ii];
-                mat[ii+4]   = v2[ii];
-                mat[ii+8]   = v3[ii];
-            }
-            mat[ii+12]  = 0;
-            mat[ii*4+3] = 0;
-        }
-        mat[15] = 1;
-        gleMultMatrix(mat);
-    }
-    
-    
-    void gleTransRotate(Vector3 const& v1, Vector3 const& v2,
-                        Vector3 const& v3, Vector3 const& OF)
-    {
-        //warning! this matrix is displayed here transposed
-        real mat[16] = {
-            v1.XX, v1.YY, v1.ZZ, 0,
-            v2.XX, v2.YY, v2.ZZ, 0,
-            v3.XX, v3.YY, v3.ZZ, 0,
-            OF.XX, OF.YY, OF.ZZ, 1};
-        gleMultMatrix(mat);
-    }
-    
-    // set rotation to align Z with 'dir' and translate to 'A'
-    void gleTransAlignZ(Vector3 const& A, Vector3 const& B, float R)
-    {
-        float x = float(B.XX-A.XX);
-        float y = float(B.YY-A.YY);
-        float z = float(B.ZZ-A.ZZ);
-        float N = invsqrt(x*x+y*y+z*z);
-        float vec[3] = { N*x, N*y, N*z };
         float mat[16] = {
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            x, y, z, 0,
-            float(A.XX), float(A.YY), float(A.ZZ), 1};
-        sMath::orthonormal(vec, mat, mat+4, R);
+            Y*R,  -X*R,  0,  0,
+            0,       0, -R,  0,
+            X,       Y,  0,  0,
+            (float)A.XX, (float)A.YY,  0,  1 };
         glMultMatrixf(mat);
     }
     
-    // set rotation to align Z with 'dir' and scale S along `dir` and R orthogonally
-    void gleTransAlignZ(Vector3 const& dir, float S, Vector3 const& pos, float R)
+    // set rotation to align Z with 'AB' and translate to 'A'
+    void gleStretchZ(Vector3 const& A, Vector3 const& B, float R)
     {
-        float x = float(dir.XX);
-        float y = float(dir.YY);
-        float z = float(dir.ZZ);
-        float N = invsqrt(x*x+y*y+z*z);
-        float X = (GLfloat)S;
-        float vec[3] = { N*x, N*y, N*z };
+        float X = float(B.XX-A.XX);
+        float Y = float(B.YY-A.YY);
+        float Z = float(B.ZZ-A.ZZ);
+        float N = invsqrt(X*X+Y*Y+Z*Z);
+        float vec[3] = { N*X, N*Y, N*Z };
         float mat[16] = {
             0, 0, 0, 0,
             0, 0, 0, 0,
-            X*vec[0], X*vec[1], X*vec[2], 0,
-            float(pos.XX), float(pos.YY), float(pos.ZZ), 1};
-        sMath::orthonormal(vec, mat, mat+4, R);
+            X, Y, Z, 0,
+            float(A.XX), float(A.YY), float(A.ZZ), 1};
+        orthonormal(vec, R, mat, mat+4);
+        glMultMatrixf(mat);
+    }
+
+    
+    void gleRotate(Vector3 const& A, Vector3 const& B,
+                   Vector3 const& C, bool inverse)
+    {
+        float mat[16];
+        for ( int i = 0; i < 3; ++i )
+        {
+            if ( inverse )
+            {
+                mat[4*i  ] = A[i];
+                mat[4*i+1] = B[i];
+                mat[4*i+2] = C[i];
+            }
+            else
+            {
+                mat[i  ] = A[i];
+                mat[i+4] = B[i];
+                mat[i+8] = C[i];
+            }
+            mat[i+12]  = 0;
+            mat[i*4+3] = 0;
+        }
+        mat[15] = 1;
+        glMultMatrixf(mat);
+    }
+    
+    
+    void transRotate(Vector3 const& O, Vector3 const& A,
+                     Vector3 const& B, Vector3 const& C)
+    {
+        //warning! this matrix is displayed here transposed
+        float mat[16] = {
+            (float)A.XX, (float)A.YY, (float)A.ZZ, 0,
+            (float)B.XX, (float)B.YY, (float)B.ZZ, 0,
+            (float)C.XX, (float)C.YY, (float)C.ZZ, 0,
+            (float)O.XX, (float)O.YY, (float)O.ZZ, 1 };
+        glMultMatrixf(mat);
+    }
+    
+    // rotate to align Z with 'D' and translate to center 'P'
+    void transAlignZ(Vector1 const& P, float R, Vector1 const& D)
+    {
+        float X = std::copysign(R, float(D.XX));
+        float mat[16] = {
+            0, -X,  0,  0,
+            0,  0, -R,  0,
+            X,  0,  0,  0,
+            float(P.XX), 0, 0, 1};
+        glMultMatrixf(mat);
+    }
+    
+    // rotate to align Z with 'D' and translate to center 'P'
+    void transAlignZ(Vector2 const& P, float R, Vector2 const& D)
+    {
+        float X = float(D.XX);
+        float Y = float(D.YY);
+        float N = R * invsqrt(X*X+Y*Y);
+        X *= N;
+        Y *= N;
+        float mat[16] = {
+            Y, -X,  0,  0,
+            0,  0, -R,  0,
+            X,  Y,  0,  0,
+            float(P.XX), float(P.YY), 0, 1};
+        glMultMatrixf(mat);
+    }
+    
+    // rotate to align Z with 'D' and translate to center 'P'
+    void transAlignZ(Vector3 const& P, float R, Vector3 const& D)
+    {
+        float X = float(D.XX);
+        float Y = float(D.YY);
+        float Z = float(D.ZZ);
+        float N = invsqrt(X*X+Y*Y+Z*Z);
+        float vec[3] = { N*X, N*Y, N*Z };
+        float mat[16] = {
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            float(P.XX), float(P.YY), float(P.ZZ), 1};
+        orthonormal(vec, R, mat, mat+4, mat+8);
         glMultMatrixf(mat);
     }
 
@@ -321,7 +359,7 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - 2D Primitives
     
-    void gleTriangleS()
+    void triangleS()
     {
         constexpr GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
         constexpr GLfloat pts[] = {
@@ -343,7 +381,7 @@ namespace gle
         glEnableClientState(GL_NORMAL_ARRAY);
     }
     
-    void gleTriangleL()
+    void triangleL()
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
@@ -356,7 +394,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    void gleNablaS()
+    void nablaS()
     {
         glBegin(GL_TRIANGLES);
         glNormal3f(0, 0, 1);
@@ -367,7 +405,7 @@ namespace gle
         glEnd();
     }
     
-    void gleNablaL()
+    void nablaL()
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
@@ -379,7 +417,7 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    void gleSquareS()
+    void squareS()
     {
         glBegin(GL_TRIANGLE_FAN);
         glNormal3f(0, 0, 1);
@@ -390,7 +428,7 @@ namespace gle
         glEnd();
     }
     
-    void gleSquareL()
+    void squareL()
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
@@ -402,7 +440,7 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    void gleRectangleS()
+    void rectangleS()
     {
         glBegin(GL_TRIANGLE_FAN);
         glNormal3f(0, 0, 1);
@@ -413,7 +451,7 @@ namespace gle
         glEnd();
     }
     
-    void gleRectangleL()
+    void rectangleL()
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
@@ -427,7 +465,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     /// draw pentagon that has the same surface as a disc of radius 1.
-    void glePentagonS()
+    void pentagonS()
     {
         const GLfloat A = (GLfloat)M_PI * 0.1;
         const GLfloat B = (GLfloat)M_PI * 0.3;
@@ -447,7 +485,7 @@ namespace gle
         glEnd();
     }
     
-    void glePentagonL()
+    void pentagonL()
     {
         const GLfloat A = (GLfloat)M_PI * 0.1;
         const GLfloat B = (GLfloat)M_PI * 0.3;
@@ -467,7 +505,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     /// draw hexagon that has the same surface as a disc of radius 1.
-    void gleHexagonS()
+    void hexagonS()
     {
         glBegin(GL_TRIANGLE_FAN);
         glNormal3f(0, 0, 1);
@@ -485,7 +523,7 @@ namespace gle
         glEnd();
     }
     
-    void gleHexagonL()
+    void hexagonL()
     {
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
@@ -503,7 +541,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    void gleCircle()
+    void circle()
     {
         glNormal3f(0, 0, 1);
         glBegin(GL_LINE_LOOP);
@@ -512,7 +550,7 @@ namespace gle
         glEnd();
     }
     
-    void gleDisc()
+    void discUp()
     {
         glNormal3f(0, 0, 1);
         glBegin(GL_TRIANGLE_FAN);
@@ -522,7 +560,17 @@ namespace gle
         glEnd();
     }
     
-    void gleDisc2()
+    void discDown()
+    {
+        glNormal3f(0, 0, -1);
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(0, 0);
+        for( size_t n = 0; n <= ncircle; n+=4 )
+            glVertex2f(si_[n], co_[n]);
+        glEnd();
+    }
+    
+    void disc2()
     {
         glNormal3f(0, 0, 1);
         glBegin(GL_TRIANGLE_FAN);
@@ -534,7 +582,7 @@ namespace gle
 
     //-----------------------------------------------------------------------
     
-    void gleStarS()
+    void starS()
     {
         const GLfloat A = (GLfloat)M_PI * 0.1;
         const GLfloat B = (GLfloat)M_PI * 0.3;
@@ -559,7 +607,7 @@ namespace gle
         glEnd();
     }
     
-    void gleStarL()
+    void starL()
     {
         const GLfloat A = (GLfloat)M_PI * 0.1;
         const GLfloat B = (GLfloat)M_PI * 0.3;
@@ -583,7 +631,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    void glePlusS()
+    void plusS()
     {
         const GLfloat R = 1.1f;
         const GLfloat C = 0.4f;
@@ -613,7 +661,7 @@ namespace gle
         glEnd();
     }
     
-    void glePlusL()
+    void plusL()
     {
         const GLfloat R = 1.2f;
         const GLfloat C = 0.6f;
@@ -897,7 +945,7 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
     
-    void gleTube0(GLfloat B, GLfloat T, int inc)
+    void tubeZ(GLfloat B, GLfloat T, int inc)
     {
         assert_true( B <= T );
         glBegin(GL_TRIANGLE_STRIP);
@@ -910,7 +958,7 @@ namespace gle
         glEnd();
     }
 
-    void gleTube0(GLfloat B, GLfloat rB, GLfloat T, GLfloat rT, int inc)
+    void tubeZ(GLfloat B, GLfloat rB, GLfloat T, GLfloat rT, int inc)
     {
         assert_true( B <= T );
         const GLfloat N = 1.f/sqrtf((T-B)*(T-B)+(rT-rB)*(rT-rB));
@@ -926,7 +974,7 @@ namespace gle
         glEnd();
     }
 
-    void initTube(GLuint buf1, GLuint buf2, GLfloat A, GLfloat B, size_t inc)
+    size_t initTube(GLuint buf1, GLuint buf2, GLfloat A, GLfloat B, size_t inc)
     {
         size_t sec = ncircle / inc;
         size_t nbf = 6 * sec + 6;     // number of coordinates
@@ -935,29 +983,30 @@ namespace gle
 
         for( size_t n = 0, p = 0; n < nbf; n += 6, p += inc )
         {
-            GLfloat c = co_[p];
-            GLfloat s = si_[p];
+            GLfloat C = co_[p];
+            GLfloat S = si_[p];
             
-            dir[n  ] = c;
-            dir[n+1] = s;
+            dir[n  ] = C;
+            dir[n+1] = S;
             dir[n+2] = 0;
             
-            dir[n+3] = c;
-            dir[n+4] = s;
+            dir[n+3] = C;
+            dir[n+4] = S;
             dir[n+5] = 0;
 
-            pos[n  ] = c;
-            pos[n+1] = s;
+            pos[n  ] = C;
+            pos[n+1] = S;
             pos[n+2] = B;
 
-            pos[n+3] = c;
-            pos[n+4] = s;
+            pos[n+3] = C;
+            pos[n+4] = S;
             pos[n+5] = A;
         }
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
         glBufferData(GL_ARRAY_BUFFER, nbf*sizeof(GLfloat), pos, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, buf2);
         glBufferData(GL_ARRAY_BUFFER, nbf*sizeof(GLfloat), dir, GL_STATIC_DRAW);
+        return nbf;
     }
     
     /// hexagon has the same surface as a disc of radius 1.
@@ -977,7 +1026,7 @@ namespace gle
              X, -H, B,  X, -H, A,
              R,  0, B,  R,  0, A };
         
-        constexpr GLfloat dir[] = {
+        const GLfloat dir[] = {
              1,  0, 0,  1,  0, 0,
              S,  C, 0,  S,  C, 0,
             -S,  C, 0, -S,  C, 0,
@@ -997,15 +1046,19 @@ namespace gle
     {
         if ( !glIsBuffer(tub_[0]) )
         {
-            glGenBuffers(16, tub_);
-            initTube(tub_[ 0], tub_[ 1],  0.0, 1.0, 8);
-            initTube(tub_[ 2], tub_[ 3],  0.0, 1.0, 4);
-            initTube(tub_[ 4], tub_[ 5],  0.0, 1.0, 2);
-            initTube(tub_[ 6], tub_[ 7],  0.0, 1.0, 1);
-            initTube(tub_[ 8], tub_[ 9], -0.25, 1.25, 16);
-            initTube(tub_[10], tub_[11], -0.25, 1.25, 8);
-            initTube(tub_[12], tub_[13], -0.25, 1.25, 4);
-            initHexTube(tub_[14], tub_[15], 0.0, 1.0);
+            glGenBuffers(24, tub_);
+            const GLfloat L = 128.0f;
+            initTube(tub_[ 0], tub_[ 1], 0, 1, 8);
+            initTube(tub_[ 2], tub_[ 3], 0, 1, 4);
+            initTube(tub_[ 4], tub_[ 5], 0, 1, 2);
+            initTube(tub_[ 6], tub_[ 7], 0, 1, 1);
+            initTube(tub_[ 8], tub_[ 9],-2, L, 8);
+            initTube(tub_[10], tub_[11],-2, L, 4);
+            initTube(tub_[12], tub_[13],-2, L, 2);
+            initTube(tub_[14], tub_[15], 0, L, 8);
+            initTube(tub_[16], tub_[17], 0, L, 4);
+            initTube(tub_[18], tub_[19], 0, L, 2);
+            initHexTube(tub_[22], tub_[23], 0, 1);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             //gleReportErrors(stderr, "initTube");
         }
@@ -1013,27 +1066,33 @@ namespace gle
 
 #if ( 1 )
     // using Vertex Buffer Objects
-    void gleTube1B()     { drawBuffer(tub_[ 0], tub_[ 1], 2+ncircle/4, GL_TRIANGLE_STRIP); }
-    void gleTube2B()     { drawBuffer(tub_[ 2], tub_[ 3], 2+ncircle/2, GL_TRIANGLE_STRIP); }
-    void gleTube4B()     { drawBuffer(tub_[ 4], tub_[ 5], 2+ncircle  , GL_TRIANGLE_STRIP); }
-    void gleTube8B()     { drawBuffer(tub_[ 6], tub_[ 7], 2+ncircle*2, GL_TRIANGLE_STRIP); }
-    void gleLongTube1B() { drawBuffer(tub_[ 8], tub_[ 9], 2+ncircle/8, GL_TRIANGLE_STRIP); }
-    void gleLongTube2B() { drawBuffer(tub_[10], tub_[11], 2+ncircle/4, GL_TRIANGLE_STRIP); }
-    void gleLongTube4B() { drawBuffer(tub_[12], tub_[13], 2+ncircle/2, GL_TRIANGLE_STRIP); }
-    void gleHexTube1B()  { drawBuffer(tub_[14], tub_[15], 14, GL_TRIANGLE_STRIP); }
+    void tube1()     { drawBuffer(tub_[ 0], tub_[ 1], 2+ncircle/4, GL_TRIANGLE_STRIP); }
+    void tube2()     { drawBuffer(tub_[ 2], tub_[ 3], 2+ncircle/2, GL_TRIANGLE_STRIP); }
+    void tube4()     { drawBuffer(tub_[ 4], tub_[ 5], 2+ncircle  , GL_TRIANGLE_STRIP); }
+    void tube8()     { drawBuffer(tub_[ 6], tub_[ 7], 2+ncircle*2, GL_TRIANGLE_STRIP); }
+    void longTube1() { drawBuffer(tub_[ 8], tub_[ 9], 2+ncircle/4, GL_TRIANGLE_STRIP); }
+    void longTube2() { drawBuffer(tub_[10], tub_[11], 2+ncircle/2, GL_TRIANGLE_STRIP); }
+    void longTube4() { drawBuffer(tub_[12], tub_[13], 2+ncircle  , GL_TRIANGLE_STRIP); }
+    void halfTube1() { drawBuffer(tub_[14], tub_[15], 2+ncircle/4, GL_TRIANGLE_STRIP); }
+    void halfTube2() { drawBuffer(tub_[16], tub_[17], 2+ncircle/2, GL_TRIANGLE_STRIP); }
+    void halfTube4() { drawBuffer(tub_[18], tub_[19], 2+ncircle  , GL_TRIANGLE_STRIP); }
+    void hexTube1()  { drawBuffer(tub_[22], tub_[23], 14, GL_TRIANGLE_STRIP); }
 #else
     // unbuffered functions:
-    void gleTube1B()     { gleTube1(); }
-    void gleTube2B()     { gleTube2(); }
-    void gleTube4B()     { gleTube4(); }
-    void gleTube8B()     { gleTube8(); }
-    void gleLongTube1B() { gleLongTube1(); }
-    void gleLongTube2B() { gleLongTube2(); }
-    void gleLongTube2B() { gleLongTube4(); }
-    void gleHexTube1B()  { gleHexTube1(0, 1); }
+    void tube1()     { tubeZ(0, 1, 8); }
+    void tube2()     { tubeZ(0, 1, 4); }
+    void tube4()     { tubeZ(0, 1, 2); }
+    void tube8()     { tubeZ(0, 1, 1); }
+    void longTube1() { tubeZ(-2.f, 128.f, 8); }
+    void longTube2() { tubeZ(-2.f, 128.f, 4); }
+    void longTube4() { tubeZ(-2.f, 128.f, 2); }
+    void halfTube1() { tubeZ(-128.f, 0.0f, 8); }
+    void halfTube2() { tubeZ(-128.f, 0.0f, 4); }
+    void halfTube4() { tubeZ(-128.f, 0.0f, 2); }
+    void hexTube1()  { hexTubeZ(0, 1); }
 #endif
  
-    void gleTubeZ(GLfloat za, GLfloat ra, gle_color ca, GLfloat zb, GLfloat rb, gle_color cb)
+    void tubeZ(GLfloat za, GLfloat ra, gle_color ca, GLfloat zb, GLfloat rb, gle_color cb)
     {
         glBegin(GL_TRIANGLE_STRIP);
         for( size_t n = 0; n <= ncircle; ++n )
@@ -1048,19 +1107,18 @@ namespace gle
         glEnd();
     }
     
-    void gleCylinder1()
+    void cylinder()
     {
-        gleTube0(0, 1, 1);
+        tubeZ(0, 1, 1);
         glTranslatef(0,0,1);
-        gleDisc();
+        discUp();
         glTranslatef(0,0,-1);
-        glRotated(180,0,1,0);
-        gleDisc();
+        discDown();
     }
     
     
     /// spherocylinder of length L, radius R, centered and aligned with axis Z
-    void gleCapsule(GLfloat L, GLfloat R)
+    void capsuleZ(GLfloat L, GLfloat R)
     {
         const size_t fin = ncircle >> 2;
         const size_t C = 4;
@@ -1187,10 +1245,10 @@ namespace gle
         }
     }
     
-    void gleSphere1B() { drawIcoBuffer(ico_nfaces[0], ico_[0], ico_[1]); }
-    void gleSphere2B() { drawIcoBuffer(ico_nfaces[1], ico_[2], ico_[3]); }
-    void gleSphere4B() { drawIcoBuffer(ico_nfaces[2], ico_[4], ico_[5]); }
-    void gleSphere8B() { drawIcoBuffer(ico_nfaces[3], ico_[6], ico_[7]); }
+    void sphere1() { drawIcoBuffer(ico_nfaces[0], ico_[0], ico_[1]); }
+    void sphere2() { drawIcoBuffer(ico_nfaces[1], ico_[2], ico_[3]); }
+    void sphere4() { drawIcoBuffer(ico_nfaces[2], ico_[4], ico_[5]); }
+    void sphere8() { drawIcoBuffer(ico_nfaces[3], ico_[6], ico_[7]); }
     void hemisphere1() { drawIcoBuffer(ico_nfaces[4], ico_[8], ico_[9]); }
     void hemisphere2() { drawIcoBuffer(ico_nfaces[5], ico_[10], ico_[11]); }
     void hemisphere4() { drawIcoBuffer(ico_nfaces[4], ico_[12], ico_[13]); }
@@ -1219,20 +1277,24 @@ namespace gle
         }
     }
     
-    void sphere1U() { drawSphere(8); }
-    void sphere2U() { drawSphere(4); }
-    void sphere4U() { drawSphere(2); }
-    void sphere8U() { drawSphere(1); }
-    
-    void gleSphere1B() { drawSphere(8); }
-    void gleSphere2B() { drawSphere(4); }
-    void gleSphere4B() { drawSphere(2); }
-    void gleSphere8B() { drawSphere(1); }
+    void sphere1() { drawSphere(8); }
+    void sphere2() { drawSphere(4); }
+    void sphere4() { drawSphere(2); }
+    void sphere8() { drawSphere(1); }
 
 #endif
     
+    void dualPassSphere()
+    {
+        assert_true(glIsEnabled(GL_CULL_FACE));
+        glCullFace(GL_FRONT);
+        gle::sphere2();
+        glCullFace(GL_BACK);
+        gle::sphere4();
+    }
+
     /// draw a Torus of radius R and a thickness 2*T
-    void gleTorus(GLfloat R, GLfloat T, size_t S)
+    void torusZ(GLfloat R, GLfloat T, size_t S)
     {
         for ( size_t n = 0; n < ncircle; n += S )
         {
@@ -1259,7 +1321,7 @@ namespace gle
      The band is in the XY plane. The axis of the cylinder is Z.
      The band is made of triangles indicating the clockwise direction.
      */
-    void gleArrowedBand(const size_t nb_triangles, float width)
+    void drawArrowedBand(const size_t nb_triangles, float width)
     {
         GLfloat A = (GLfloat)(2 * M_PI / nb_triangles);
         GLfloat W = (GLfloat)width * A * invsqrt(3.0f);
@@ -1286,17 +1348,17 @@ namespace gle
     }
     
     
-    void gleThreeBands(const size_t nb_triangles)
+    void drawThreeBands(const size_t nb_triangles)
     {
-        gleArrowedBand(nb_triangles, 0.25);
+        drawArrowedBand(nb_triangles, 0.25);
         glRotated(-90,1,0,0);
-        gleArrowedBand(nb_triangles, 0.25);
+        drawArrowedBand(nb_triangles, 0.25);
         glRotated(90,0,1,0);
-        gleArrowedBand(nb_triangles, 0.25);
+        drawArrowedBand(nb_triangles, 0.25);
     }
     
     
-    void gleCylinderZ()
+    void cylinderZ()
     {
         const GLfloat T =  0.5;
         const GLfloat B = -0.5;
@@ -1326,7 +1388,7 @@ namespace gle
     }
     
     
-    void gleCone0(GLfloat R, GLfloat B, GLfloat T, bool closed)
+    void coneZ(GLfloat R, GLfloat B, GLfloat T, bool closed)
     {
         if ( closed )
         {
@@ -1353,7 +1415,7 @@ namespace gle
     /**
      Draw three fins similar to the tail of a V2 rocket
      */
-    void gleArrowTail1()
+    void arrowTail()
     {
         GLfloat r = 0.1f;  //bottom inner radius
         GLfloat c = 0.5f, d = -0.5f;
@@ -1443,7 +1505,7 @@ namespace gle
      The surface goes from Z to Z_max, and its radius is
      given by the function `radius`(z) provided as argument.
      */
-    void gleRevolution(GLfloat (*radius)(GLfloat), GLfloat Z, GLfloat Zmax, GLfloat dZ)
+    void drawRevolution(GLfloat (*radius)(GLfloat), GLfloat Z, GLfloat Zmax, GLfloat dZ)
     {
         GLfloat R = radius(Z);
         GLfloat R0, Z0, dR, dN;
@@ -1470,9 +1532,9 @@ namespace gle
         }
     }
 
-    void gleDumbbell1()
+    void dumbbell()
     {
-        gleRevolution(dumbbellRadius, 0, 1, 0.0625);
+        drawRevolution(dumbbellRadius, 0, 1, 0.0625);
     }
     
     GLfloat barrelRadius(GLfloat z)
@@ -1480,9 +1542,9 @@ namespace gle
         return sinf(3.14159265359f*z);
     }
     
-    void gleBarrel1()
+    void barrel()
     {
-        gleRevolution(barrelRadius, 0, 1, 0.0625);
+        drawRevolution(barrelRadius, 0, 1, 0.0625);
     }
     
     //-----------------------------------------------------------------------
@@ -1493,7 +1555,7 @@ namespace gle
      draw back first, and then front of object,
      GL_CULL_FACE should be enabled
      */
-    void gleDualPass(void primitive())
+    void dualPass(void primitive())
     {
         GLboolean cull = glIsEnabled(GL_CULL_FACE);
         glEnable(GL_CULL_FACE);
@@ -1505,205 +1567,193 @@ namespace gle
     }
     
     
-    void gleObject(const real radius, void (*obj)())
+    void gleObject(const real rad, void (*obj)())
     {
         glPushMatrix();
-        gleScale(radius);
+        gleScale(rad);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector1 const& x, const float radius, void (*obj)())
+    void gleObject(Vector1 const& x, const float rad, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
-        gleScale(radius);
+        gleScale(rad);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector2 const& x, const float radius, void (*obj)())
+    void gleObject(Vector2 const& x, const float rad, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
-        gleScale(radius);
+        gleScale(rad);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector3 const& x, const float radius, void (*obj)())
+    void gleObject(Vector3 const& x, const float rad, void (*obj)())
     {
         glPushMatrix();
         gleTranslate(x);
-        gleScale(radius);
+        gleScale(rad);
         obj();
         glPopMatrix();
     }
     
     
     //-----------------------------------------------------------------------
-    void gleObject(Vector1 const& a, Vector1 const& b, void (*obj)())
+    void gleObject(Vector1 const& A, Vector1 const& B, void (*obj)())
     {
         glPushMatrix();
-        if ( a.XX < b.XX )
-            glRotated( 90, 0.0, 1.0, 0.0);
-        else
-            glRotated(-90, 0.0, 1.0, 0.0);
+        alignZ(B.XX-A.XX);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector2 const& a, Vector2 const& b, void (*obj)())
+    void gleObject(Vector2 const& A, Vector2 const& B, void (*obj)())
     {
         glPushMatrix();
-        gleAlignZ(a, b);
+        gleStretchZ(A, B, 1);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector3 const& a, Vector3 const& b, void (*obj)())
+    void gleObject(Vector3 const& A, Vector3 const& B, void (*obj)())
     {
         glPushMatrix();
-        gleTransAlignZ(a, b, 1);
+        gleStretchZ(A, B, 1);
         obj();
         glPopMatrix();
     }
     
     
     //-----------------------------------------------------------------------
-    void gleObject(Vector1 const& x, Vector1 const& d, const float R, void (*obj)())
+    void gleObject(Vector1 const& X, Vector1 const& D, const float R, void (*obj)())
     {
         glPushMatrix();
-        gleTranslate(x);
-        if ( d.XX < 0 )
-            glRotated(90, 0, 0, 1);
+        gleTranslate(X);
+        alignZ(D.XX);
         gleScale(R);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector2 const& x, Vector2 const& d, const float R, void (*obj)())
+    void gleObject(Vector2 const& X, Vector2 const& D, const float R, void (*obj)())
     {
         glPushMatrix();
-        gleAlignZ(x, x+d.normalized(R), R);
+        transAlignZ(X, R, D);
         obj();
         glPopMatrix();
     }
     
-    void gleObject(Vector3 const& x, Vector3 const& d, const float R, void (*obj)())
+    void gleObject(Vector3 const& X, Vector3 const& D, const float R, void (*obj)())
     {
         glPushMatrix();
-        gleTransAlignZ(d, R, x, R);
+        transAlignZ(X, R, D);
         obj();
         glPopMatrix();
     }
-    
-    //-----------------------------------------------------------------------
-    void gleObject(Vector1 const& x, Vector1 const& d, const real R,
-                   const real L, void (*obj)())
-    {
-        glPushMatrix();
-        gleTranslate(x);
-        if ( d.XX < 0 )
-            glRotated(90, 0, 0, 1);
-        gleScale(L,R,R);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector2 const& x, Vector2 const& d, const real R,
-                   const real L, void (*obj)())
-    {
-        glPushMatrix();
-        gleAlignZ(x, x+d.normalized(L), R);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector3 const& x, Vector3 const& d, const real R,
-                   const real L, void (*obj)() )
-    {
-        glPushMatrix();
-        gleTransAlignZ(d, L, x, R);
-        obj();
-        glPopMatrix();
-    }
-    
+
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
     
     
-    void gleTube(Vector1 const& a, Vector1 const& b, float R, void (*obj)())
+    void gleTube(Vector1 const& A, Vector1 const& B, float R, void (*obj)())
     {
         glPushMatrix();
-        if ( a.XX < b.XX )
-            glRotated( 90, 0.0, 1.0, 0.0);
-        else
-            glRotated(-90, 0.0, 1.0, 0.0);
+        alignZ(B.XX-A.XX);
         gleScale(1, R, 1);
         obj();
         glPopMatrix();
     }
     
-    void gleTube(Vector2 const& a, Vector2 const& b, float R, void (*obj)())
+    void gleTube(Vector2 const& A, Vector2 const& B, float R, void (*obj)())
     {
         glPushMatrix();
-        gleAlignZ(a, b, R);
+        gleStretchZ(A, B, R);
         obj();
         glPopMatrix();
     }
     
-    void gleTube(Vector3 const& a, Vector3 const& b, float R, void (*obj)())
+    void gleTube(Vector3 const& A, Vector3 const& B, float R, void (*obj)())
     {
         glPushMatrix();
-        gleTransAlignZ(a, b, R);
+        gleStretchZ(A, B, R);
         obj();
         glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
-    
-    void gleBand(Vector2 const& a, Vector2 const& b, real rad)
+
+    void drawTube(Vector1 const& A, float R, Vector1 const& B, void (*obj)())
     {
-        Vector2 d = ( b - a ).orthogonal();
+        glPushMatrix();
+        transAlignZ(A, R, B-A);
+        obj();
+        glPopMatrix();
+    }
+    
+    void drawTube(Vector2 const& A, float R, Vector2 const& B, void (*obj)())
+    {
+        glPushMatrix();
+        transAlignZ(A, R, B-A);
+        obj();
+        glPopMatrix();
+    }
+    
+    void drawTube(Vector3 const& A, float R, Vector3 const& B, void (*obj)())
+    {
+        glPushMatrix();
+        transAlignZ(A, R, B-A);
+        obj();
+        glPopMatrix();
+    }
+
+    //-----------------------------------------------------------------------
+    
+    void gleBand(Vector2 const& A, Vector2 const& B, real rad)
+    {
+        Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
         {
             rad /= n;
             glBegin(GL_TRIANGLE_STRIP);
-            gleVertex(a+rad*d);
-            gleVertex(a-rad*d);
-            gleVertex(b+rad*d);
-            gleVertex(b-rad*d);
+            gleVertex(A+rad*d);
+            gleVertex(A-rad*d);
+            gleVertex(B+rad*d);
+            gleVertex(B-rad*d);
             glEnd();
         }
     }
     
     
-    void gleBand(Vector1 const& a, real ra,
-                 Vector1 const& b, real rb)
+    void gleBand(Vector1 const& A, real rA,
+                 Vector1 const& B, real rB)
     {
         glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(a.XX,+ra);
-        gleVertex(a.XX,-ra);
-        gleVertex(b.XX,+rb);
-        gleVertex(b.XX,-rb);
+        gleVertex(A.XX,+rA);
+        gleVertex(A.XX,-rA);
+        gleVertex(B.XX,+rB);
+        gleVertex(B.XX,-rB);
         glEnd();
     }
     
-    void gleBand(Vector2 const& a, real ra,
-                 Vector2 const& b, real rb)
+    void gleBand(Vector2 const& A, real rA,
+                 Vector2 const& B, real rB)
     {
-        Vector2 d = ( b - a ).orthogonal();
+        Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
         {
             d /= n;
             glBegin(GL_TRIANGLE_STRIP);
-            gleVertex(a-ra*d);
-            gleVertex(a+ra*d);
-            gleVertex(b-rb*d);
-            gleVertex(b+rb*d);
+            gleVertex(A-rA*d);
+            gleVertex(A+rA*d);
+            gleVertex(B-rB*d);
+            gleVertex(B+rB*d);
             glEnd();
         }
     }
@@ -1849,18 +1899,18 @@ namespace gle
      Two hexagons linked by a rectangle
      hexagons have the same surface as a disc of radius 1.
      */
-    void gleDumbbell(Vector2 const& a, Vector2 const& b, GLfloat diameter)
+    void gleDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
     {
         const GLfloat S = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const GLfloat R = diameter * S;
         const GLfloat H = R * 0.8660254037844386f; //0.5f * sqrtf(3);
         const GLfloat X = R * 0.5f;
         
-        Vector2 x = ( b - a ).normalized(H);
+        Vector2 x = ( B - A ).normalized(H);
         Vector2 y = x.orthogonal(X);
         
         glPushMatrix();
-        gleTranslate(a);
+        gleTranslate(A);
         
         // this is an hexagon centered around 'a':
         glBegin(GL_TRIANGLE_FAN);
@@ -1878,12 +1928,12 @@ namespace gle
         glBegin(GL_TRIANGLE_FAN);
         gleVertex(+y+x);
         gleVertex(-y+x);
-        gleVertex(b-a-y-x);
-        gleVertex(b-a+y-x);
+        gleVertex(B-A-y-x);
+        gleVertex(B-A+y-x);
         glEnd();
         
         // an hexagon centered around 'b'
-        gleTranslate(b-a);
+        gleTranslate(B-A);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(0,0);
         gleVertex(x+y);
@@ -1901,9 +1951,9 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - Arrows
     
-    void gleCone(Vector1 const& pos, Vector1 const& dir, const real scale)
+    void drawCone(Vector1 const& pos, Vector1 const& dir, const GLfloat rad)
     {
-        real dx = scale*dir.XX, cx = pos.XX;
+        GLfloat dx = rad*dir.XX, cx = pos.XX;
         glBegin(GL_TRIANGLE_STRIP);
         gleVertex(cx-dx   , dx);
         gleVertex(cx-dx/2 , 0 );
@@ -1912,10 +1962,10 @@ namespace gle
         glEnd();
     }
     
-    void gleCone(Vector2 const& pos, Vector2 const& dir, const real scale)
+    void drawCone(Vector2 const& pos, Vector2 const& dir, const GLfloat rad)
     {
-        real dx = scale*dir.XX,  cx = pos.XX;
-        real dy = scale*dir.YY,  cy = pos.YY;
+        GLfloat dx = rad*dir.XX,  cx = pos.XX;
+        GLfloat dy = rad*dir.YY,  cy = pos.YY;
         glBegin(GL_TRIANGLE_STRIP);
         gleVertex(cx-dx-dy, cy-dy+dx);
         gleVertex(cx-dx/2,  cy-dy/2 );
@@ -1924,32 +1974,32 @@ namespace gle
         glEnd();
     }
     
-    void gleCone(Vector3 const& pos, Vector3 const& dir, const real scale)
+    void drawCone(Vector3 const& pos, Vector3 const& dir, const GLfloat rad)
     {
         glPushMatrix();
-        gleTransAlignZ(dir, scale, pos, scale);
-        gleLongConeB();
+        transAlignZ(pos, rad, dir);
+        gle::longCone();
         glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
     
-    void gleCylinder(Vector1 const& pos, Vector1 const& dir, const real scale)
+    void drawCylinder(Vector1 const& pos, Vector1 const& dir, float rad)
     {
         real cx = pos.XX;
         glBegin(GL_TRIANGLE_STRIP);
-        real dx = scale * dir.XX / 2;
-        gleVertex( cx-dx, -scale );
-        gleVertex( cx-dx,  scale );
-        gleVertex( cx+dx, -scale );
-        gleVertex( cx+dx,  scale );
+        real dx = rad * dir.XX / 2;
+        gleVertex( cx-dx, -rad );
+        gleVertex( cx-dx,  rad );
+        gleVertex( cx+dx, -rad );
+        gleVertex( cx+dx,  rad );
         glEnd();
     }
     
-    void gleCylinder(Vector2 const& pos, Vector2 const& dir, const real scale)
+    void drawCylinder(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        real dx = scale * dir.XX, cx = pos.XX - dx / 2;
-        real dy = scale * dir.YY, cy = pos.YY - dy / 2;
+        real dx = rad * dir.XX, cx = pos.XX - dx / 2;
+        real dy = rad * dir.YY, cy = pos.YY - dy / 2;
         glBegin(GL_TRIANGLE_STRIP);
         gleVertex( cx+dy, cy-dx );
         gleVertex( cx-dy, cy+dx );
@@ -1958,21 +2008,20 @@ namespace gle
         glEnd();
     }
     
-    void gleCylinder(Vector3 const& pos, Vector3 const& dir, const real scale)
+    void drawCylinder(Vector3 const& pos, Vector3 const& dir, float rad)
     {
         glPushMatrix();
-        //build the rotation matrix, assuming dir is normalized
-        gleTransAlignZ(dir, scale, pos, scale);
-        gleCylinderZ();
+        transAlignZ(pos, rad, dir);
+        gle::cylinderZ();
         glPopMatrix();
     }
     
     
     //-----------------------------------------------------------------------
     
-    void gleArrowTail(Vector1 const& pos, Vector1 const& dir, const real scale)
+    void drawArrowTail(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        GLfloat dx = scale * dir.XX;
+        GLfloat dx = rad * dir.XX;
         GLfloat cx = pos.XX - dx / 2;
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f( cx,       0  );
@@ -1984,10 +2033,10 @@ namespace gle
         glEnd();
     }
     
-    void gleArrowTail(Vector2 const& pos, Vector2 const& dir, const real scale)
+    void drawArrowTail(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        GLfloat dx = scale * dir.XX;
-        GLfloat dy = scale * dir.YY;
+        GLfloat dx = rad * dir.XX;
+        GLfloat dy = rad * dir.YY;
         GLfloat cx = pos.XX - 1.5f * dx;
         GLfloat cy = pos.YY - 1.5f * dy;
         GLfloat ex = cx + 2 * dx;
@@ -2003,50 +2052,46 @@ namespace gle
         glEnd();
     }
     
-    void gleArrowTail(Vector3 const& pos, Vector3 const& dir, const real scale)
+    void drawArrowTail(Vector3 const& pos, Vector3 const& dir, float rad)
     {
         glPushMatrix();
-        //assuming dir is normalized
-        gleTransAlignZ(dir, scale, pos, scale);
-        gleArrowTail1();
+        transAlignZ(pos, rad, dir);
+        arrowTail();
         glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
-    void gleArrow(Vector1 const& a, Vector1 const& b, float radius)
+    void drawArrow(Vector1 const& A, Vector1 const& B, float R)
     {
         glPushMatrix();
-        if ( a.XX < b.XX )
-            glRotated(  90, 0.0, 1.0, 0.0 );
-        else
-            glRotated( -90, 0.0, 1.0, 0.0 );
-        gleScale(1,radius,1);
-        gleTube1B();
+        alignZ(B.XX-A.XX);
+        gleScale(1,R,1);
+        tube1();
         glTranslatef(0, 0, 1);
-        glScaled(3.0, 3.0, 3*radius);
-        gleLongConeB();
+        glScaled(3.0, 3.0, 3*R);
+        gle::longCone();
         glPopMatrix();
     }
     
-    void gleArrow(Vector2 const& a, Vector2 const& b, float radius)
+    void drawArrow(Vector2 const& A, Vector2 const& B, float R)
     {
         glPushMatrix();
-        gleAlignZ(a, b, radius);
-        gleTube1B();
+        gleStretchZ(A, B, R);
+        tube1();
         glTranslatef(0, 0, 1);
-        glScaled(3.0, 3.0, 3*radius);
-        gleLongConeB();
+        glScaled(3.0, 3.0, 3*R);
+        gle::longCone();
         glPopMatrix();
     }
     
-    void gleArrow(Vector3 const& a, Vector3 const& b, float radius)
+    void drawArrow(Vector3 const& A, Vector3 const& B, float R)
     {
         glPushMatrix();
-        gleTransAlignZ(a, b, radius);
-        gleTube1B();
+        gleStretchZ(A, B, R);
+        tube1();
         glTranslatef(0, 0, 1);
-        glScaled(3.0, 3.0, 3*radius);
-        gleLongConeB();
+        glScaled(3.0, 3.0, 3*R);
+        gle::longCone();
         glPopMatrix();
     }
     
@@ -2342,7 +2387,7 @@ namespace gle
             
             bcol.load();
             glBegin(GL_TRIANGLE_FAN);
-            gleNiceRectangle(rec, 3);
+            drawNiceRectangle(rec, 3);
             glEnd();
             
             glPopAttrib();
@@ -2351,7 +2396,7 @@ namespace gle
             {
                 glLineWidth(0.5);
                 glBegin(GL_LINE_STRIP);
-                gleNiceRectangle(rec, 3);
+                drawNiceRectangle(rec, 3);
                 glEnd();
             }
         }
@@ -2429,7 +2474,7 @@ namespace gle
      rectangle should be specified as [ left, bottom, right, top ]
      The rectangle will be drawn counter-clockwise
      */
-    void gleRectangle(const int rec[4])
+    void drawRectangle(const int rec[4])
     {
         glVertex2i(rec[0], rec[1]);
         glVertex2i(rec[2], rec[1]);
@@ -2439,7 +2484,7 @@ namespace gle
     }
     
     
-    void gleNiceRectangle(const int rec[4], const int rad)
+    void drawNiceRectangle(const int rec[4], const int rad)
     {
         glVertex2i(rec[0], rec[1]+rad);
         glVertex2i(rec[0]+rad, rec[1]);
@@ -2470,7 +2515,7 @@ namespace gle
         glDisable(GL_DEPTH_TEST);
         
         glBegin(GL_LINE_LOOP);
-        gleRectangle(rec);
+        drawRectangle(rec);
         glEnd();
         
         glPopAttrib();
@@ -2508,7 +2553,7 @@ namespace gle
 
     //-----------------------------------------------------------------------
     
-    void gleRectangle(float X1, float Y1, float X2, float Y2, float Z)
+    void drawRectangle(float X1, float Y1, float X2, float Y2, float Z)
     {
         glBegin(GL_TRIANGLE_STRIP);
         glVertex3f(X1, Y1, Z);
@@ -2532,7 +2577,7 @@ namespace gle
         {
             float U = R * T;
             col1.load_load();
-            gleRectangle(-U, -U, U, U, Z);
+            drawRectangle(-U, -U, U, U, Z);
         }
         
         col2.load_load();
@@ -2555,22 +2600,22 @@ namespace gle
             {
                 float X = i * T;
                 float Y = y * T;
-                gleRectangle( X-H, Y-H, X+H, Y+H, Z);
-                gleRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
+                drawRectangle( X-H, Y-H, X+H, Y+H, Z);
+                drawRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
             }
             for ( int i = copyparity(Q,y); i <= x; i+=2 )
             {
                 float X = y * T;
                 float Y = i * T;
-                gleRectangle( X-H, Y-H, X+H, Y+H, Z);
-                gleRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
+                drawRectangle( X-H, Y-H, X+H, Y+H, Z);
+                drawRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
             }
             for ( int i = copyparity(Q,y); i <= x; i+=2 )
             {
                 float X = y * T;
                 float Y = i * T;
-                gleRectangle(-X-H, Y-H,-X+H, Y+H, Z);
-                gleRectangle( X+H,-Y+H, X-H,-Y-H, Z);
+                drawRectangle(-X-H, Y-H,-X+H, Y+H, Z);
+                drawRectangle( X+H,-Y+H, X-H,-Y-H, Z);
             }
         }
     }
@@ -2604,17 +2649,17 @@ namespace gle
                     break;
             }
             glScalef(R/2, R/2, S-R);
-            gleTube1B();
+            tube1();
             glTranslatef(0, 0, 1);
             glScalef(3, 3, R/(S-R));
-            gleLongConeB();
+            gle::longCone();
             glPopMatrix();
         }
         // display a white ball at the origin
         gle_color(1.0, 1.0, 1.0, 1.0).load_load();
         glPushMatrix();
         gleScale(R);
-        gleSphere4B();
+        gle::sphere4();
         glPopMatrix();
     }
     
