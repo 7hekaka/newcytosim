@@ -48,7 +48,10 @@ change all fiber { display = ( color = white; ) }
 set actin { display = ( size=2; color=orange; ) }
 set actin { rigidity = 1 }
 change actin { rigidity = 1 }
+set actin display { size=2; color=orange; }
 
+set actin segmentation { 0.5 }
+set actin rigidity { 1 }
 
 %%%%%%%%%%%% old syntax:
 
@@ -58,8 +61,6 @@ change simul:display * { back_color=black; }
 change simul * { viscosity = 1; }
 
 set simul:display * { back_color = blue; }
-set fiber:segmentation actin { 0.5 }
-set fiber:rigidity actin { 1 }
 
 new 10 actin
 {
