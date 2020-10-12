@@ -147,9 +147,7 @@ void Display::display(Simul const& sim)
     
     glDepthMask(GL_TRUE);
     
-#ifndef NDEBUG
-    gle::gleReportErrors(stderr, "in Display::display()");
-#endif
+    CHECK_GL_ERROR("in Display::display()");
 }
 
 

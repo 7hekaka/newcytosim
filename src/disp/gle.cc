@@ -142,7 +142,7 @@ namespace gle
     
     void initialize()
     {
-        //gleReportErrors(stderr, "before gle:initialize()");
+        CHECK_GL_ERROR("before gle:initialize()");
 #ifndef __APPLE__
         //need to initialize GLEW on Linux
         const GLenum err = glewInit();
@@ -155,10 +155,11 @@ namespace gle
 #endif
         circle(ncircle, co_, si_, 1);
         initSphereBuffers();
-        //gleReportErrors(stderr, "gle:initSphereBuffers()");
+        CHECK_GL_ERROR("gle:initSphereBuffers()");
         initTubeBuffers();
-        //gleReportErrors(stderr, "gle:initTubes()");
+        CHECK_GL_ERROR("gle:initTubeBuffers()");
         initBuffers();
+        CHECK_GL_ERROR("gle:initBuffers()");
         std::atexit(release);
     }
     
@@ -1060,7 +1061,6 @@ namespace gle
             initTube(tub_[18], tub_[19], 0, L, 2);
             initHexTube(tub_[22], tub_[23], 0, 1);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-            //gleReportErrors(stderr, "initTube");
         }
     }
 
@@ -1206,7 +1206,7 @@ namespace gle
     {
         if ( !glIsBuffer(ico_[0]) )
         {
-            glGenBuffers(12, ico_);
+            glGenBuffers(16, ico_);
             ico_nfaces[0] = initIcoBuffer(ico_[0], ico_[1], ico1);
             ico_nfaces[1] = initIcoBuffer(ico_[2], ico_[3], ico2);
             ico_nfaces[2] = initIcoBuffer(ico_[4], ico_[5], ico4);
@@ -1216,7 +1216,6 @@ namespace gle
             ico_nfaces[6] = initIcoBuffer(ico_[12], ico_[13], icoH4);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-            //gleReportErrors(stderr, "initIcoBuffer");
 #if 0
             for ( int n = 0; n < 4; ++n )
                 fprintf(stderr, "GLE's icosahedron %i has %u faces\n", n, ico_nfaces[n]);
@@ -2684,7 +2683,7 @@ namespace gle
      This is similart to glutReportError,
      but the additional argument can provide useful feedback for debugging
      */
-    void gleReportErrors(FILE * out, const char* msg)
+    void reportErrors(FILE * out, const char* msg)
     {
         GLenum glError = glGetError();
         while ( glError != GL_NO_ERROR )

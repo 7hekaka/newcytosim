@@ -296,7 +296,7 @@ void PointDisp::storePixelmap(GLubyte* bitmap, unsigned dim, GLuint pbi) const
     glBufferData(GL_PIXEL_PACK_BUFFER_ARB, 4*dim*dim, bitmap, GL_STATIC_DRAW);
     glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, 0);
     assert_true(glIsBuffer(pbi));
-    //gle::gleReportErrors(stderr, "PointDisp::storePixelmap");
+    CHECK_GL_ERROR("PointDisp::storePixelmap");
 #endif
 }
 
@@ -335,7 +335,7 @@ void PointDisp::drawPixelmap(size_t ii) const
 #else
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[ii]);
 #endif
-    gle::gleReportErrors(stderr, "PointDisp::drawPixelmap");
+    CHECK_GL_ERROR("PointDisp::drawPixelmap");
 }
 
 
@@ -345,7 +345,7 @@ void PointDisp::drawPixelmap(size_t ii) const
 void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
 {
     assert_true(pixSize==nPix);
-    //gle::gleReportErrors(stderr, "1 PointDisp::makePixelmaps");
+    CHECK_GL_ERROR("1 PointDisp::makePixelmaps");
     
     glPushAttrib(GL_PIXEL_MODE_BIT|GL_VIEWPORT_BIT|GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
 
@@ -417,7 +417,7 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
             glReadPixels(0, 0, nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[i]);
             //savePixelmap(bmp[i], nPix, i+10);
         }
-        //gle::gleReportErrors(stderr, "5 PointDisp::makePixelmaps");
+        CHECK_GL_ERROR("5 PointDisp::makePixelmaps");
         storePixelmap(bmp[i], nPix, pbo[i]);
     }
  
@@ -454,10 +454,10 @@ void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
         
         if ( pixSize != nPix )
         {
-            //gle::gleReportErrors(stderr, "1 PointDisp::prepare");
+            CHECK_GL_ERROR("1 PointDisp::prepare");
             allocatePixelmap();
             //fprintf(stderr, " new %i bitmap for %s\n", pixSize, name_str());
-            //gle::gleReportErrors(stderr, "2 PointDisp::prepare");
+            CHECK_GL_ERROR("2 PointDisp::prepare");
         }
         
         makePixelmaps(uf, 3);

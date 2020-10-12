@@ -55,6 +55,7 @@ void goodbye()
  */
 void displayLive(View& view, int mag)
 {
+    CHECK_GL_ERROR("before displayLive");
     if ( 0 == thread.trylock() )
     {
         // read and execute commands from incoming pipe:

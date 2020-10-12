@@ -417,7 +417,7 @@ namespace gle
     const char* gleErrorString(GLenum code);
 
     /// check and print OpenGL error(s)
-    void gleReportErrors(FILE*, const char* msg);
+    void reportErrors(FILE*, const char* msg);
  
     /// print some info for debugging purpose
     void dump();
@@ -435,6 +435,11 @@ inline float invsqrt(float x)
     return 1.0f/sqrtf(x);
 }
 #endif
+
+
+//#define CHECK_GL_ERROR(ARG) ((void) 0)
+#define CHECK_GL_ERROR(ARG) gle::reportErrors(stderr, ARG)
+
 
 
 #endif
