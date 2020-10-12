@@ -4,9 +4,11 @@
 #include <cstdio>
 
 
-#define QUARTIC_VERBOSE 0
+// Use the second definition to get some reports:
+#define QLOG(...) ((void) 0)
+//#define QLOG(...) fprintf(stderr, __VA_ARGS__)
 
-    
+
 /// apply one step of Halley's method (convergence is cubic in general)
 void QuarticSolver::refineQuadratic(const real A, const real B, const real C, real& x)
 {
@@ -129,9 +131,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
     
     if ( D == 0.0 )
     {
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " cubic has null root\n");
-#endif
+        QLOG(" cubic has null root\n");
         r1 = 0;
         return 1 + solveQuadratic(A, B, C, r2, r3);
     }
@@ -143,9 +143,7 @@ int QuarticSolver::solveCubicUnsorted(real A, real B, real C, real D,
         D /= A;
     }
     
-#if ( QUARTIC_VERBOSE > 1 )
-    fprintf(stderr, "  cubic x^3  %+f x^2  %+f x  %+f\n", B, C, D);
-#endif
+    QLOG("  cubic x^3  %+f x^2  %+f x  %+f\n", B, C, D);
     
     // calculate determinant of cubic
     real B3 = B / 3.0;
@@ -335,9 +333,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
     
     if ( E == 0.0 )
     {
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " quartic has null root\n");
-#endif
+        QLOG(" quartic has null root\n");
         // zero is root
         r1 = 0;
         return 1 + solveCubicUnsorted(A, B, C, D, r2, r3, r4);
@@ -351,10 +347,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         E /= A;
     }
 
-#if ( QUARTIC_VERBOSE > 1 )
-    fprintf(stderr, "quartic x^4  %+f x^3  %+f x^2  %+f x  %+f\n", B, C, D, E);
-#endif
-    
+    QLOG("quartic x^4  %+f x^3  %+f x^2  %+f x  %+f\n", B, C, D, E);
     real BB = B*B;
     
     // define new coefficients that lead to the equation X^4 + I*X^2 + J*X + K = 0,
@@ -373,9 +366,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         r2 = z1 + r1;
         r3 = z2 + r1;
         r4 = z3 + r1;
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " K == 0\n");
-#endif
+        QLOG(" K == 0\n");
         return n;
     }
     
@@ -407,9 +398,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
                 n = 2;
             }
         }
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " J == 0\n");
-#endif
+        QLOG(" J == 0\n");
         return n;
     }
     
@@ -425,10 +414,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         refineCubic(1.0, C1, C2, C3, ss);
         refineCubic(1.0, C1, C2, C3, ss);
 
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " real %+f\n", ss);
-#endif
-
+        QLOG(" real %+f\n", ss);
         real p = std::sqrt(ss);
         real w = J/p;
         // alternative formula, which has lower precision:
@@ -476,9 +462,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
     
     if ( E == 0.0 )
     {
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " quartic has null root\n");
-#endif
+        QLOG(" quartic has null root\n");
         // zero is root
         r1 = cplx(0, 0);
         return 1 + solveCubicUnsorted(A, B, C, D, r2, r3, r4);
@@ -492,10 +476,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         E /= A;
     }
     
-#if ( QUARTIC_VERBOSE > 1 )
-    fprintf(stderr, "quartic x^4  %+f x^3  %+f x^2  %+f x  %+f\n", B, C, D, E);
-#endif
-    
+    QLOG("quartic x^4  %+f x^3  %+f x^2  %+f x  %+f\n", B, C, D, E);
     real BB = B*B;
     
     // define new coefficients that lead to the equation X^4 + I*X^2 + J*X + K = 0,
@@ -514,9 +495,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         r2 = z1 + r1;
         r3 = z2 + r1;
         r4 = z3 + r1;
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " K == 0\n");
-#endif
+        QLOG(" K == 0\n");
         return n;
     }
     
@@ -537,9 +516,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
             r3 = cplx( z3.r - 0.25*B, z3.i );
             r4 = cplx(-z3.r - 0.25*B,-z3.i );
         }
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " J == 0\n");
-#endif
+        QLOG(" J == 0\n");
         return 2*n;
     }
     
@@ -553,9 +530,7 @@ int QuarticSolver::solveQuarticUnsorted(real A, real B, real C, real D, real E,
         if ( abs_real(z1.i) > abs_real(z3.i) ) z1 = z3;
         real ss = z1.r;
 
-#if ( QUARTIC_VERBOSE > 0 )
-        fprintf(stderr, " real %+f\n", ss);
-#endif
+        QLOG(" real %+f\n", ss);
 
         real p = std::sqrt(ss);
         real w = J/p;
