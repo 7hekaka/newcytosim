@@ -291,7 +291,7 @@ public:
     void           updateHands() const { frHands.update(); }
 
     /// detach all Hands
-    void           detachHands() const { frHands.detach(); }
+    void           detachHands() const { frHands.detachAll(); }
     
     /// sort Hands by order of increasing abscissa
     void           sortHands() const { frHands.sort(); }

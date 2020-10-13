@@ -13,6 +13,7 @@ The list is also used in reports, or to quickly count Hands bound to the fiber.
 */
 void HandList::add(Hand * n)
 {
+    //std::clog << this << " add " << n->prop->name() << '\n';
     n->prev(nullptr);
     n->next(haFront);
     if ( haFront )
@@ -25,6 +26,7 @@ void HandList::add(Hand * n)
 
 void HandList::remove(Hand * n)
 {
+    //std::clog << this << " rem " << n->prop->name() << '\n';
     Hand * x = n->next();
     if ( n->prev() )
         n->prev()->next(x);
@@ -49,7 +51,7 @@ void HandList::update() const
 }
 
 
-void HandList::detach() const
+void HandList::detachAll() const
 {
     // we must iterate one step ahead, because detach() will unlink
     Hand * h = haFront;

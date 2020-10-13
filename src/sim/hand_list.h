@@ -41,7 +41,7 @@ public:
     void     update() const;
     
     /// detach all Hands
-    void     detach() const;
+    void     detachAll() const;
     
     /// sort Hands by order of increasing abscissa
     void     sort();

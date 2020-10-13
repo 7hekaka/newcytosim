@@ -40,6 +40,7 @@ public:
     
     /// identify as Digital class
     bool isDigit() const { return true; }
+    
     //--------------------------------------------------------------------------
 
 #if FIBER_HAS_LATTICE > 0
@@ -54,10 +55,10 @@ public:
     bool   vacant(lati_t s) const { return 0 == (fbLattice->data(s) & prop->footprint); }
 
     /// flip footprint bits on current site
-    void   inc() { assert_true(vacant(fbSite)); fbLattice->data(fbSite) ^= prop->footprint; }
+    void   inc() const { assert_true(vacant(fbSite)); fbLattice->data(fbSite) ^= prop->footprint; }
 
     /// flip footprint bits on current site
-    void   dec() { fbLattice->data(fbSite) ^= prop->footprint; assert_true(vacant(fbSite));  }
+    void   dec() const { fbLattice->data(fbSite) ^= prop->footprint; assert_true(vacant(fbSite));  }
     
 #elif FIBER_HAS_LATTICE < 0
 
@@ -82,8 +83,8 @@ public:
     bool   outsideMP(lati_t) const { return false; }
     bool   occupied(FiberLattice& lat, lati_t s) const { return false; }
     bool   vacant(lati_t) const { return true; }
-    void   inc() {}
-    void   dec() {}
+    void   inc() const {}
+    void   dec() const {}
     
 #endif
     
