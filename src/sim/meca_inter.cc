@@ -33,22 +33,7 @@ extern Modulo const* modulo;
 #pragma mark - Accessory functions
 
 #if DRAW_MECA_LINKS
-
-#  include "../disp/gle.h"
-#  include "../disp/gle_color_list.h"
-
-/// this performs the modulo on `c`
-void drawLinkM(Vector const& a, Vector const& ab, Vector c)
-{
-    if ( modulo )
-        modulo->fold(c, a);
-    gle::drawLink(a, ab, c);
-}
-
-#  define DRAW_LINK(PTA, ...) {\
-    if ( drawLinks ) {\
-        gle::bright_color(PTA.mecable()->signature()).load();\
-        gle::drawLink(__VA_ARGS__); }}
+#  include "meca_inter_draw.cc"
 #else
 #  define DRAW_LINK(...) ((void) 0)
 #endif

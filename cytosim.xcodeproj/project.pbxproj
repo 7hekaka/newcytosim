@@ -1379,6 +1379,7 @@
 		BB3092292164BAC300C6DEE4 /* grid_display.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_display.cc; sourceTree = "<group>"; };
 		BB318E260EE688610050C945 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = vector.h; path = src/math/vector.h; sourceTree = SOURCE_ROOT; };
 		BB3205EF220DB5930098C439 /* evaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = evaluator.h; path = src/math/evaluator.h; sourceTree = SOURCE_ROOT; };
+		BB351EFF2535DFD800007B88 /* meca_inter_draw.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_inter_draw.cc; sourceTree = "<group>"; };
 		BB39EC24153806070047768E /* duo_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = duo_long.cc; path = couples/duo_long.cc; sourceTree = "<group>"; };
 		BB39EC25153806070047768E /* duo_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = duo_long.h; path = couples/duo_long.h; sourceTree = "<group>"; };
 		BB3A4AE519351389005CD868 /* space_tee.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_tee.cc; path = src/sim/spaces/space_tee.cc; sourceTree = SOURCE_ROOT; };
@@ -2329,6 +2330,7 @@
 				BB98FE900B35F66300796DAE /* meca.h */,
 				BB98FE910B35F66300796DAE /* meca.cc */,
 				BB01791906B1C05100240785 /* meca_inter.cc */,
+				BB351EFF2535DFD800007B88 /* meca_inter_draw.cc */,
 				BBF283242430C7E600FADDD8 /* meca_rigidity.cc */,
 				BBF283262430E10100FADDD8 /* meca_math.cc */,
 				BB7358FC05B98DA3006956D5 /* simul.h */,

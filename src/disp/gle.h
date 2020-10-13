@@ -361,15 +361,6 @@ namespace gle
     void gleArrow(Vector1 const& a, Vector1 const& b, float radius);
     void gleArrow(Vector2 const& a, Vector2 const& b, float radius);
     void gleArrow(Vector3 const& a, Vector3 const& b, float radius);
-    
-    /// Display link between 2 positions
-    void drawLink(Vector const& a, Vector const& b);
-    /// Display link between 2 positions, with resting length
-    void drawLink(Vector const& a, Vector const& ab, real len);
-    /// Display link between 3 positions
-    void drawLink(Vector const& a, Vector const& ab, Vector const& c);
-    /// Display link between 4 positions
-    void drawLink(Vector const& a, Vector const& ab, Vector const& dc, Vector const& d);
 
     //------------------------------------------------------------------------------
 #pragma mark -
