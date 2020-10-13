@@ -557,7 +557,7 @@ void glApp::normalKeyFunc(void (*func)(unsigned char, int, int))
  */
 void glApp::processSpecialKey(int key, int, int)
 {
-    Vector3 vec, dxy(0, 0, 0);
+    Vector3 vec(0,0,0), dxy(0, 0, 0);
     View & view = glApp::currentView();
     real F = ( glutGetModifiers() & GLUT_ACTIVE_SHIFT ) ? 0.0625 : 1;
 
@@ -1143,7 +1143,7 @@ void glApp::flashText(const char* fmt, ...)
  */
 void glApp::displayPlain()
 {
-    gle::gleReportErrors(stderr, "in glApp::displayPlain()");
+    CHECK_GL_ERROR("before glApp::displayPlain()");
     View & view = glApp::currentView();
 
     view.openDisplay();
@@ -1162,7 +1162,7 @@ void glApp::displayPlain()
  */
 void glApp::displayMain()
 {
-    //gle::gleReportErrors(stderr, "before glApp::displayMain()");
+    CHECK_GL_ERROR("before glApp::displayMain()");
     View & view = views[1];
     
     view.openDisplay();
@@ -1189,7 +1189,7 @@ void glApp::displayMain()
         glutSwapBuffers();
     else
         glFlush();
-    gle::gleReportErrors(stderr, "in glApp::displayMain()");
+    CHECK_GL_ERROR("in glApp::displayMain()");
 }
 
 /**

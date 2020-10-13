@@ -94,25 +94,19 @@ void Display1::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-inline void Display1::drawBall(Vector const& pos, real radius, gle_color const& col) const
+inline void Display1::drawBallT(Vector const& pos, real radius, gle_color const& col) const
 {
     glPushMatrix();
     gleTranslate(pos);
     gleScale(radius);
 #if ( DIM == 3 )
-    GLboolean cull = glIsEnabled(GL_CULL_FACE);
-    glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     col.load_both();
-    glCullFace(GL_FRONT);
-    gleSphere2B();
-    glCullFace(GL_BACK);
-    gleSphere4B();
-    if ( !cull ) glDisable(GL_CULL_FACE);
+    gle::dualPassSphere();
 #else
     glDisable(GL_LIGHTING);
     col.load();
-    gleDiscB();
+    gle::discUp();
 #endif
     glPopMatrix();
 }
@@ -125,24 +119,9 @@ inline void Display1::drawPoint(Vector const& pos, PointDisp const* disp) const
     glPushMatrix();
     gleTranslate(pos);
     gleScale(disp->size*sFactor);
-    gleSphere1B();
+    gle::sphere1();
     glPopMatrix();
 }
-
-
-inline void Display1::drawObject(Vector const& pos, PointDisp const* disp, void(*obj)()) const
-{
-    if ( disp->perceptible )
-    {
-        glEnable(GL_LIGHTING);
-        glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(disp->size*sFactor);
-        obj();
-        glPopMatrix();
-    }
-}
-
 
 
 //------------------------------------------------------------------------------
@@ -165,7 +144,7 @@ void Display1::drawBead(Bead const& obj)
     {
         lineWidth(disp->width);
         bodyColor(obj);
-        gleObject(obj.position(), obj.radius(), gleCircleB);
+        drawFlat(obj.position(), obj.radius(), gle::circle);
     }
 #endif
 }
@@ -180,7 +159,7 @@ void Display1::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        drawBall(obj.position(), obj.radius(), bodyColorF(obj));
+        drawBallT(obj.position(), obj.radius(), bodyColorF(obj));
     }
 }
 
@@ -200,7 +179,7 @@ void Display1::drawSolid(Solid const& obj)
             if ( obj.radius(p) > 0 )
                 drawPoint(obj.posP(p), disp);
             else
-                drawObject(obj.posP(p), disp, gle::cube);
+                drawObject(obj.posP(p), disp->size, gle::cube);
         }
     }
     
@@ -214,21 +193,19 @@ void Display1::drawSolid(Solid const& obj)
         for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
         {
             if ( obj.radius(ii) > 0 )
-                gleObject(obj.posP(ii), obj.radius(ii), gleCircleB);
+                drawFlat(obj.posP(ii), obj.radius(ii), gle::circle);
         }
 #elif ( DIM == 3 )
         //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
-            //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gleCircleB);
+            //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
             glEnable(GL_LIGHTING);
             bodyColor(obj);
             glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
-            Vector dir = A - B;
-            real len = dir.norm();
-            gleTransAlignZ(dir/len, len, (A+B)*0.5, obj.radius(0));
-            gleCylinderZ();
+            gle::transAlignZ(0.5*(A+B), obj.radius(0), A-B);
+            gle::cylinderZ();
             glPopMatrix();
         }
 #endif
@@ -278,7 +255,7 @@ void Display1::drawSolidT(Solid const& obj, size_t inx)
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
-        drawBall(X, obj.radius(inx), bodyColorF(obj));
+        drawBallT(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
         glDisable(GL_CLIP_PLANE5);
@@ -318,31 +295,18 @@ void Display1::drawSphereT(Sphere const& obj)
     if ( disp->style & 5 )
     {
         bodyColorF(obj).load_both();
+        const Vector C = obj.posP(0);
 #if ( DIM < 3 )
-        lineWidth(disp->width);
         if ( disp->style & 1 )
-            gleObject(obj.posP(0), obj.radius(), gleDiscB);
-        else
-            gleObject(obj.posP(0), obj.radius(), gleCircleB);
+            drawFlat(C, obj.radius(), gle::circle);
+        if ( disp->style & 2 )
+            drawFlat(obj.posP(0), obj.radius(), gle::discUp);
 #else
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.
          We then use a primitive for a sphere of radius 1.
          */
-        const Vector C = obj.posP(0);
-        gleTransRotate(obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, C);
-        
-        //draw transparent envelope
-        if ( disp->style & 1 )
-            gleDualPass(gleSphere4B);
-        if ( disp->style & 4 )
-        {
-            disp->color2.load_front();
-            gleThreeBands(64);
-        }
-        glPopMatrix();
+        Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
 #endif
     }
 }
@@ -391,8 +355,8 @@ void Display1::drawOrganizer(Organizer const& obj) const
             glPushMatrix();
             Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
-            gleTransAlignZ(a, b, 1);
-            gleDualPass(gleBarrel1);
+            gleStretchZ(a, b, 1);
+            gle::dualPass(gle::barrel);
             glPopMatrix();
             glDisable(GL_LIGHTING);
 #else
@@ -444,7 +408,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 
                 disp->color.load();
 #if ( DIM >= 3 )
-                gleCone(pf, ph-pf, disp->width*sFactor);
+                drawCone(pf, ph-pf, disp->width*sFactor);
 #else
                 gleBand(ph, disp->width*sFactor, ps, disp->width*sFactor);
                 gleBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));

@@ -110,15 +110,15 @@ void PointDisp::strokeShape() const
 {
     switch ( tolower(shape) )
     {
-        case 'v': gle::gleNablaL();     break;
-        case 't': gle::gleTriangleL();  break;
-        case 'q': gle::gleSquareL();    break;
-        case 'r': gle::gleRectangleL(); break;
-        case 'p': gle::glePentagonL();  break;
-        case 'h': gle::gleHexagonL();   break;
-        case 's': gle::gleStarL();      break;
-        case '+': gle::glePlusL();      break;
-        case 'c': gle::gleCircle();    break;
+        case 'v': gle::nablaL();     break;
+        case 't': gle::triangleL();  break;
+        case 'q': gle::squareL();    break;
+        case 'r': gle::rectangleL(); break;
+        case 'p': gle::pentagonL();  break;
+        case 'h': gle::hexagonL();   break;
+        case 's': gle::starL();      break;
+        case '+': gle::plusL();      break;
+        case 'c': gle::circle();     break;
         default: break;
     }
 }
@@ -128,16 +128,16 @@ void PointDisp::paintShape() const
 {
     switch ( tolower(shape) )
     {
-        case 'v': gle::gleNablaS();     break;
-        case 't': gle::gleTriangleS();  break;
-        case 'q': gle::gleSquareS();    break;
-        case 'r': gle::gleRectangleS(); break;
-        case 'p': gle::glePentagonS();  break;
-        case 'h': gle::gleHexagonS();   break;
-        case 's': gle::gleStarS();      break;
-        case '+': gle::glePlusS();      break;
+        case 'v': gle::nablaS();     break;
+        case 't': gle::triangleS();  break;
+        case 'q': gle::squareS();    break;
+        case 'r': gle::rectangleS(); break;
+        case 'p': gle::pentagonS();  break;
+        case 'h': gle::hexagonS();   break;
+        case 's': gle::starS();      break;
+        case '+': gle::plusS();      break;
         case 'c': break;
-        default:  gle::gleDisc();       break;
+        default: gle::discUp(); break;
     }
 }
 
@@ -181,7 +181,7 @@ void PointDisp::strokeI() const
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
     glColor4f(0, 0, 0, 0);
-    gle::gleDiscB(); //strokeShape();
+    gle::discUp(); //strokeShape();
     glPopMatrix();
     glPopAttrib();
 }
@@ -296,7 +296,7 @@ void PointDisp::storePixelmap(GLubyte* bitmap, unsigned dim, GLuint pbi) const
     glBufferData(GL_PIXEL_PACK_BUFFER_ARB, 4*dim*dim, bitmap, GL_STATIC_DRAW);
     glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, 0);
     assert_true(glIsBuffer(pbi));
-    //gle::gleReportErrors(stderr, "PointDisp::storePixelmap");
+    CHECK_GL_ERROR("PointDisp::storePixelmap");
 #endif
 }
 
@@ -335,7 +335,7 @@ void PointDisp::drawPixelmap(size_t ii) const
 #else
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[ii]);
 #endif
-    gle::gleReportErrors(stderr, "PointDisp::drawPixelmap");
+    CHECK_GL_ERROR("PointDisp::drawPixelmap");
 }
 
 
@@ -345,7 +345,7 @@ void PointDisp::drawPixelmap(size_t ii) const
 void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
 {
     assert_true(pixSize==nPix);
-    //gle::gleReportErrors(stderr, "1 PointDisp::makePixelmaps");
+    CHECK_GL_ERROR("1 PointDisp::makePixelmaps");
     
     glPushAttrib(GL_PIXEL_MODE_BIT|GL_VIEWPORT_BIT|GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
 
@@ -417,7 +417,7 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
             glReadPixels(0, 0, nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[i]);
             //savePixelmap(bmp[i], nPix, i+10);
         }
-        //gle::gleReportErrors(stderr, "5 PointDisp::makePixelmaps");
+        CHECK_GL_ERROR("5 PointDisp::makePixelmaps");
         storePixelmap(bmp[i], nPix, pbo[i]);
     }
  
@@ -454,10 +454,10 @@ void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
         
         if ( pixSize != nPix )
         {
-            //gle::gleReportErrors(stderr, "1 PointDisp::prepare");
+            CHECK_GL_ERROR("1 PointDisp::prepare");
             allocatePixelmap();
             //fprintf(stderr, " new %i bitmap for %s\n", pixSize, name_str());
-            //gle::gleReportErrors(stderr, "2 PointDisp::prepare");
+            CHECK_GL_ERROR("2 PointDisp::prepare");
         }
         
         makePixelmaps(uf, 3);

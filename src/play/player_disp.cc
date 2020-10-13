@@ -190,8 +190,7 @@ void Player::autoScale(SpaceSet const& spaces, View& view)
 
 void Player::prepareDisplay(View& view, int mag)
 {    
-    //gle::gleReportErrors(stderr, "before prepareDisplay");
-    
+    CHECK_GL_ERROR("before prepareDisplay");
     //----------------- automatic adjustment of viewing area:
 
     if ( view.auto_scale > 0 )
@@ -221,7 +220,7 @@ void Player::prepareDisplay(View& view, int mag)
     else
         mDisplay->setPixelFactors(pix/mag, mag);
 
-    gle::gleReportErrors(stderr, "before prepareDisplay");
+    CHECK_GL_ERROR("in prepareDisplay");
 
     try {
         mDisplay->setStencil(view.stencil && ( DIM == 3 ));
@@ -269,7 +268,7 @@ void Player::displayCytosim()
             glEnable(GL_LINE_STIPPLE);
             simul.drawLinks();
             glDisable(GL_LINE_STIPPLE);
-            gle::gleReportErrors(stderr, "Simul::drawLinks()");
+            CHECK_GL_ERROR("Simul::drawLinks()");
         }
 #endif
     }
@@ -379,7 +378,7 @@ int Player::saveView(const char* root, unsigned indx, int downsample, int verbos
 void displayMagnified(int mag, void * arg)
 {
     static_cast<Player*>(arg)->displayCytosim();
-    gle::gleReportErrors(stderr, "in displayMagnified");
+    CHECK_GL_ERROR("in displayMagnified");
 }
 
 

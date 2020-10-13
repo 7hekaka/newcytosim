@@ -138,7 +138,7 @@ bool SpaceTorus::draw() const
     
 #elif ( DIM > 2 )
     
-    gleTorus(bRadius, bWidth);
+    gle::torusZ(bRadius, bWidth);
     return true;
     
 #else

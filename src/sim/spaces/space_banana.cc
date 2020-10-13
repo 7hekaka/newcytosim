@@ -212,7 +212,7 @@ bool SpaceBanana::draw() const
     glTranslated(bCenter[0], bCenter[1], 0);
     glClipPlane(glp1, plane1);
     glClipPlane(glp2, plane2);
-    gleTorus(bRadius, bWidth);
+    gle::torusZ(bRadius, bWidth);
     glPopMatrix();
 
     glDisable(glp2);
@@ -222,7 +222,7 @@ bool SpaceBanana::draw() const
     glTranslated(bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane1i);
     gleScale(bWidth);
-    gleSphere8B();
+    gle::sphere8();
     glPopMatrix();
 
     //left cap:
@@ -230,7 +230,7 @@ bool SpaceBanana::draw() const
     glTranslated(-bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane2i);
     gleScale(bWidth);
-    gleSphere8B();
+    gle::sphere8();
     glPopMatrix();
     
     glDisable(glp1);

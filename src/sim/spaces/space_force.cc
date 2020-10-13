@@ -73,7 +73,7 @@ void SpaceForce::setInteractions(Meca& meca) const
 
 bool SpaceForce::draw() const
 {
-    gle::gleArrow(center, center+force, 0.1 * force.norm());
+    gle::drawArrow(center, center+force, 0.1 * force.norm());
     return true;
 }
 

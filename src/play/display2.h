@@ -17,13 +17,10 @@ class PointDisp;
 class Display2 : public Display
 {
     /// draw a fine spherical object
-    void drawBall(Vector const&, real radius, gle_color const&) const;
+    void drawBallT(Vector const&, real radius, gle_color const&) const;
     
     /// draw a point
     void drawPoint(Vector const&, PointDisp const*) const;
-    
-    /// draw primitive at given position
-    void drawObject(Vector const&, PointDisp const*, void (*obj)()) const;
 
 public:
     

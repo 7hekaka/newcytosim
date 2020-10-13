@@ -109,6 +109,9 @@ protected:
     /// scaling factors to convert 'size' parameter into real dimensions used in glScale()
     float          sFactor;
     
+    ///  minimum radius under which object are now drawn
+    float          minRadius;
+
     
     /// flag used to calculate clusterAnalysis only once
     size_t         fiber_prep;
@@ -156,6 +159,18 @@ public:
 
     /// set OpenGL point size
     void pointSize(real w) const { glPointSize(std::max((GLfloat)(w*uFactor), 0.25f)); }
+    
+    /// draw primitive `obj` at given position
+    void drawObject(Vector const& pos, float rad, void (*obj)()) const;
+    
+    /// draw primitive `obj` at `pos` with Z-axis oriented toward `dir`
+    void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)()) const;
+    
+    /// draw primitive `obj` at `pos` with Z-axis oriented toward `dir`
+    void drawFlat(Vector const& pos, float rad, void (*obj)()) const;
+    
+    /// draw a fine spherical object
+    void drawSphereT(Vector const&, Vector const&, Vector const&, Vector const&, int) const;
     
     
     /// draw a scalar field

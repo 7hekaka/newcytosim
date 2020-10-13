@@ -149,8 +149,8 @@ bool SpaceSphere::draw() const
     GLfloat R = (GLfloat)radius_;
     glPushMatrix();
     glScalef(R, R, R);
-    gle::gleSphere8B();
-    gle::gleThreeBands(128);
+    gle::sphere8();
+    gle::drawThreeBands(128);
     glPopMatrix();
     
 #endif

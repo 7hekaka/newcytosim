@@ -22,12 +22,8 @@
 extern Modulo const* modulo;
 
 
-//------------------------------------------------------------------------------
-#pragma mark -
-
-
 Display::Display(DisplayProp const* dp)
-: pixelSize(1), uFactor(1), sFactor(1), prop(dp)
+: pixelSize(1), uFactor(1), sFactor(1), minRadius(1), prop(dp)
 {
     assert_true(dp);
     
@@ -40,10 +36,67 @@ void Display::setPixelFactors(GLfloat ps, GLfloat u)
     uFactor   = u;
     /*
      the 0.5 below comes from the fact that glPointSize uses diameter
-     while most gle::primitives use radius as arguments
+     while most gle::primitives have a radius of 1
      */
     sFactor = 0.5f * u * ps;
+    minRadius = 0.5 * pixelSize / sFactor;
 }
+
+//------------------------------------------------------------------------------
+#pragma mark - drawObject
+
+void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
+{
+    if ( rad > minRadius )
+    {
+        glPushMatrix();
+        gle::gleTranslate(pos);
+        gle::gleScale(rad*sFactor);
+        obj();
+        glPopMatrix();
+    }
+}
+
+
+void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*obj)()) const
+{
+    if ( rad > minRadius )
+    {
+        glPushMatrix();
+        gle::transAlignZ(pos, rad*sFactor, dir);
+        obj();
+        glPopMatrix();
+    }
+}
+
+
+void Display::drawFlat(Vector const& pos, float rad, void(*obj)()) const
+{
+    if ( rad > pixelSize )
+    {
+        glPushMatrix();
+        gle::gleTranslate(pos);
+        gle::gleScale(rad);
+        obj();
+        glPopMatrix();
+    }
+}
+
+///draw transparent sphere with decoration indicating the orientation of the sphere
+void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, Vector const& C, int style) const
+{
+    glEnable(GL_LIGHTING);
+    glPushMatrix();
+    gle::transRotate(pos, A, B, C);
+    if ( style & 1 )
+        gle::dualPassSphere();
+    if ( style & 4 )
+        gle::drawThreeBands(64);
+    glPopMatrix();
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 
 void Display::drawSimul(Simul const& sim)
@@ -94,9 +147,7 @@ void Display::display(Simul const& sim)
     
     glDepthMask(GL_TRUE);
     
-#ifndef NDEBUG
-    gle::gleReportErrors(stderr, "in Display::display()");
-#endif
+    CHECK_GL_ERROR("in Display::display()");
 }
 
 
@@ -560,9 +611,10 @@ void Display::drawAverageFiber(ObjectList const& objs)
     if ( S > REAL_EPSILON )
     {
         Vector MP = normalize( P - M );
-        gle::gleCylinder(M, MP, 10*pixelSize);
-        gle::gleCone(P, MP, 10*pixelSize);
-        gle::gleObject(G, 10*pixelSize, gle::gleSphere2B);
+        const float rad = 10 * pixelSize;
+        gle::drawCylinder(M, MP, rad);
+        gle::drawCone(P, MP, rad);
+        gle::gleObject(G, rad, gle::sphere2);
     }
 }
 
@@ -660,31 +712,18 @@ void Display::drawMisc(Simul const& sim)
  */
 void Display::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
 {
-    real width = size * sFactor;
-    if ( width > 0 )
+    real rad = size * sFactor;
+    if ( rad > 0 )
     {
         switch(style)
         {
-            default:
-                break;
-            case 1:
-                gle::gleObject(fib.posEndM(), width, gle::gleSphere2B);
-                break;
-            case 2:
-                gle::gleCone(fib.posEndM(), -fib.dirEndM(), width);
-                break;
-            case 3:
-                gle::gleCylinder(fib.posEndM(), -fib.dirEndM(), width);
-                break;
-            case 4:
-                gle::gleArrowTail(fib.posEndM(), fib.dirEndM(), width);
-                break;
-            case 5:
-                gle::gleArrowTail(fib.posEndM(), -fib.dirEndM(), width);
-                break;
-            case 6:
-                gle::gleObject(fib.posEndM(), width, gle::cube);
-                break;
+            default: break;
+            case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
+            case 2: gle::drawCone(fib.posEndM(), -fib.dirEndM(), rad); break;
+            case 3: gle::drawCylinder(fib.posEndM(), fib.dirEndM(), rad); break;
+            case 4: gle::drawArrowTail(fib.posEndM(), -fib.dirEndM(), rad); break;
+            case 5: gle::drawArrowTail(fib.posEndM(), fib.dirEndM(), rad); break;
+            case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
         }
     }
 }
@@ -701,31 +740,18 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
  */
 void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 {
-    real width = size * sFactor;
-    if ( width > 0 )
+    real rad = size * sFactor;
+    if ( rad > 0 )
     {
         switch(style)
         {
-            default:
-                break;
-            case 1:
-                gle::gleObject(fib.posEndP(), width, gle::gleSphere2B);
-                break;
-            case 2:
-                gle::gleCone(fib.posEndP(), fib.dirEndP(), width);
-                break;
-            case 3:
-                gle::gleCylinder(fib.posEndP(), fib.dirEndP(), width);
-                break;
-            case 4:
-                gle::gleArrowTail(fib.posEndP(), fib.dirEndP(), width);
-                break;
-            case 5:
-                gle::gleArrowTail(fib.posEndP(), -fib.dirEndP(), width);
-                break;
-            case 6:
-                gle::gleObject(fib.posEndP(), width, gle::cube);
-                break;
+            default: break;
+            case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
+            case 2: gle::drawCone(fib.posEndP(), fib.dirEndP(), rad); break;
+            case 3: gle::drawCylinder(fib.posEndP(), -fib.dirEndP(), rad); break;
+            case 4: gle::drawArrowTail(fib.posEndP(), fib.dirEndP(), rad); break;
+            case 5: gle::drawArrowTail(fib.posEndP(), -fib.dirEndP(), rad); break;
+            case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
         }
     }
 }
@@ -1034,11 +1060,12 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         pointSize(disp->speckle_size);
         glBegin(GL_POINTS);
         //we distribute points regularly along the center line
-        const real grad = disp->speckle_interval;
-        real ab = grad * std::ceil( fib.abscissaM() / grad );
-        while ( ab <= fib.abscissaP() ) {
-            gle::gleVertex(fib.pos(ab));
-            ab += grad;
+        const real sep = disp->speckle_interval;
+        real a = sep * std::ceil( fib.abscissaM() / sep );
+        while ( a <= fib.abscissaP() )
+        {
+            gle::gleVertex(fib.pos(a));
+            a += sep;
         }
         glEnd();
     }
@@ -1061,16 +1088,17 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( disp->point_style == 2 )
     {
         // display arrowheads along the fiber:
-        const real siz = disp->point_size*sFactor;
+        const float rad = disp->point_size*sFactor;
         const real sep = disp->point_interval;
         real ab = std::ceil(fib.abscissaM()/sep) * sep;
         for ( ; ab <= fib.abscissaP(); ab += sep )
-            gle::gleCone(fib.pos(ab), fib.dir(ab), siz);
+            gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( disp->point_style == 3 )
     {
+        const float rad = 2*disp->point_size*sFactor;
         // display only middle of fiber:
-        gle::gleObject(fib.posMiddle(), 2*disp->point_size, gle::gleSphere2B);
+        gle::gleObject(fib.posMiddle(), rad, gle::sphere2);
     }
 }
 
@@ -1293,7 +1321,7 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
 /// used for drawFilament
 inline void drawMonomer(Vector3 const& pos, real rad)
 {
-    gle::gleObject(pos, rad, gle::gleSphere2B);
+    gle::gleObject(pos, rad, gle::sphere2);
 }
 
 
@@ -1826,11 +1854,13 @@ void Display::drawTransparentObjects(Array<zObject>& list)
      */
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0, 1.0);
+    glEnable(GL_CULL_FACE);
 
     for ( zObject const& i : list )
         i.draw(this);
     
     glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_CULL_FACE);
 }
 
 #endif
