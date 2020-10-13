@@ -1156,45 +1156,48 @@ void Display3::drawSinglesF(SingleSet const& set) const
 }
 
 
+void Display3::drawSingleA(Single const* obj) const
+{
+    const PointDisp * disp = obj->disp();
+    Vector ph = obj->posHand();
+    disp->color.load_both();
+    
+    if ( obj->hasForce() && disp->width > 0 )
+    {
+        Vector pf = obj->posFoot();
+        if ( modulo ) modulo->fold(pf, ph);
+#if ( 0 )
+        if ( obj->disp()->style == 2 )
+        {
+            Space const* spc = obj->confineSpace();
+            if ( spc )
+            {
+                /// draw a disc tangent to the Space:
+                Vector dir = spc->normalToEdge(pf);
+                disp->color2.load_both();
+                gleObject(pf, dir, disp->size*sFactor, gleDisc);
+                disp->color.load_both();
+            }
+        }
+#endif
+#if ( DIM > 2 )
+        gleTube(pf, ph, disp->width*sFactor, gleCone1);
+#else
+        gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
+#endif
+    }
+    if ( obj->base() )
+        drawObject(ph, disp, gle::octahedron);
+    else
+        drawPoint(ph, disp);
+}
+
 void Display3::drawSinglesA(SingleSet const& set) const
 {
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
         if ( obj->fiber()->disp->visible )
-        {
-            const PointDisp * disp = obj->disp();
-            Vector ph = obj->posHand();
-            disp->color.load_both();
-
-            if ( obj->hasForce() && disp->width > 0 )
-            {
-                Vector pf = obj->posFoot();
-                if ( modulo ) modulo->fold(pf, ph);
-#if ( 0 )
-                if ( obj->disp()->style == 2 )
-                {
-                    Space const* spc = obj->confineSpace();
-                    if ( spc )
-                    {
-                        /// draw a disc tangent to the Space:
-                        Vector dir = spc->normalToEdge(pf);
-                        disp->color2.load_both();
-                        gleObject(pf, dir, disp->size*sFactor, gleDisc);
-                        disp->color.load_both();
-                    }
-                }
-#endif
-#if ( DIM > 2 )
-                gleTube(pf, ph, disp->width*sFactor, gleCone1);
-#else
-                gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
-#endif
-            }
-            if ( obj->base() )
-                drawObject(ph, disp, gle::octahedron);
-            else
-                drawPoint(ph, disp);
-        }
+            drawSingleA(obj);
     }
 }
 

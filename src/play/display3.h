@@ -115,6 +115,9 @@ public:
 
     /// draw the attached Single
     void drawSinglesA(SingleSet const&) const;
+    
+    /// draw the attached Single
+    void drawSingleA(Single const*) const;
 
     /// draw free Couple
     void drawCouplesF1(CoupleSet const&) const;
