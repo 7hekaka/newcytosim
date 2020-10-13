@@ -72,10 +72,10 @@ public:
     bool   vacant(lati_t s) const { return fbLattice->data(s) == 0.0; }
 
     /// add 1.0 to Lattice's site
-    void   inc() { fbLattice->data(fbSite) += 1.0; }
+    void   inc() const { fbLattice->data(fbSite) += 1.0; }
 
     /// subtract 1.0 to Lattice's site
-    void   dec() { fbLattice->data(fbSite) -= 1.0; }
+    void   dec() const { fbLattice->data(fbSite) -= 1.0; }
     
 #else
 
