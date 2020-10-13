@@ -31,6 +31,13 @@ namespace gle
     /// number of faces in icosahedrons
     GLuint ico_nfaces[8] = { 0 };
     
+    /// inverse square root
+#ifdef __SSE3__
+    inline float invsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
+#else
+    inline float invsqrt(float x) { return 1.0f / sqrtf(x); }
+#endif
+
     // Fast method to calculate cosine and sinus over the entire circle
     /**
      C[] and S[] should be preallocated to hold 'cnt+1' values.
@@ -221,7 +228,7 @@ namespace gle
     /**
      `R` is the transverse scaling done in the XY plane after rotation
      */
-    void gleStretchZ(Vector2 const& A, Vector2 const& B, float R)
+    void stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
     {
         float X = float(B.XX-A.XX);
         float Y = float(B.YY-A.YY);
@@ -233,12 +240,12 @@ namespace gle
             Y*R,  -X*R,  0,  0,
             0,       0, -R,  0,
             X,       Y,  0,  0,
-            (float)A.XX, (float)A.YY,  0,  1 };
+            float(A.XX), float(A.YY),  0,  1 };
         glMultMatrixf(mat);
     }
     
     // set rotation to align Z with 'AB' and translate to 'A'
-    void gleStretchZ(Vector3 const& A, Vector3 const& B, float R)
+    void stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
     {
         float X = float(B.XX-A.XX);
         float Y = float(B.YY-A.YY);
@@ -468,8 +475,8 @@ namespace gle
     /// draw pentagon that has the same surface as a disc of radius 1.
     void pentagonS()
     {
-        const GLfloat A = (GLfloat)M_PI * 0.1;
-        const GLfloat B = (GLfloat)M_PI * 0.3;
+        const GLfloat A = GLfloat(M_PI * 0.1);
+        const GLfloat B = GLfloat(M_PI * 0.3);
         glBegin(GL_TRIANGLE_FAN);
         glNormal3f(0, 0, 1);
         glVertex2f(0, 0);
@@ -488,8 +495,8 @@ namespace gle
     
     void pentagonL()
     {
-        const GLfloat A = (GLfloat)M_PI * 0.1;
-        const GLfloat B = (GLfloat)M_PI * 0.3;
+        const GLfloat A = GLfloat(M_PI * 0.1);
+        const GLfloat B = GLfloat(M_PI * 0.3);
         glBegin(GL_LINE_LOOP);
         glNormal3f(0, 0, 1);
         const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
@@ -585,8 +592,8 @@ namespace gle
     
     void starS()
     {
-        const GLfloat A = (GLfloat)M_PI * 0.1;
-        const GLfloat B = (GLfloat)M_PI * 0.3;
+        const GLfloat A = GLfloat(M_PI * 0.1);
+        const GLfloat B = GLfloat(M_PI * 0.3);
         const GLfloat R  = 1.2f, H = -0.6f;
         const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
         const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
@@ -610,9 +617,9 @@ namespace gle
     
     void starL()
     {
-        const GLfloat A = (GLfloat)M_PI * 0.1;
-        const GLfloat B = (GLfloat)M_PI * 0.3;
-        const GLfloat R  = 1.2f, H = -0.6f;
+        const GLfloat A = GLfloat(M_PI * 0.1);
+        const GLfloat B = GLfloat(M_PI * 0.3);
+                const GLfloat R  = 1.2f, H = -0.6f;
         const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
         const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
         glBegin(GL_LINE_LOOP);
@@ -1322,8 +1329,8 @@ namespace gle
      */
     void drawArrowedBand(const size_t nb_triangles, float width)
     {
-        GLfloat A = (GLfloat)(2 * M_PI / nb_triangles);
-        GLfloat W = (GLfloat)width * A * invsqrt(3.0f);
+        GLfloat A = GLfloat(2 * M_PI / nb_triangles);
+        GLfloat W = GLfloat(width * A / M_SQRT3);
         GLfloat R = 1.0f / cosf(A*0.5f);
         
         glBegin(GL_TRIANGLES);
@@ -1494,8 +1501,8 @@ namespace gle
     
     GLfloat dumbbellRadius(GLfloat z)
     {
-        const GLfloat PI = (GLfloat)M_PI;
-        return sinf(PI*z) * ( 1.3f + cosf(2*PI*z) );
+        const GLfloat PIF = GLfloat(M_PI);
+        return sinf(PIF*z) * ( 1.3f + cosf(2*PIF*z) );
     }
     
     
@@ -1614,7 +1621,7 @@ namespace gle
     void gleObject(Vector2 const& A, Vector2 const& B, void (*obj)())
     {
         glPushMatrix();
-        gleStretchZ(A, B, 1);
+        stretchAlignZ(A, B, 1);
         obj();
         glPopMatrix();
     }
@@ -1622,7 +1629,7 @@ namespace gle
     void gleObject(Vector3 const& A, Vector3 const& B, void (*obj)())
     {
         glPushMatrix();
-        gleStretchZ(A, B, 1);
+        stretchAlignZ(A, B, 1);
         obj();
         glPopMatrix();
     }
@@ -1671,7 +1678,7 @@ namespace gle
     void gleTube(Vector2 const& A, Vector2 const& B, float R, void (*obj)())
     {
         glPushMatrix();
-        gleStretchZ(A, B, R);
+        stretchAlignZ(A, B, R);
         obj();
         glPopMatrix();
     }
@@ -1679,7 +1686,7 @@ namespace gle
     void gleTube(Vector3 const& A, Vector3 const& B, float R, void (*obj)())
     {
         glPushMatrix();
-        gleStretchZ(A, B, R);
+        stretchAlignZ(A, B, R);
         obj();
         glPopMatrix();
     }
@@ -1900,9 +1907,9 @@ namespace gle
      */
     void gleDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
     {
-        const GLfloat S = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const GLfloat S = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
         const GLfloat R = diameter * S;
-        const GLfloat H = R * 0.8660254037844386f; //0.5f * sqrtf(3);
+        const GLfloat H = R * 0.8660254037844386f; //0.5f * sqrt(3);
         const GLfloat X = R * 0.5f;
         
         Vector2 x = ( B - A ).normalized(H);
@@ -2075,7 +2082,7 @@ namespace gle
     void drawArrow(Vector2 const& A, Vector2 const& B, float R)
     {
         glPushMatrix();
-        gleStretchZ(A, B, R);
+        stretchAlignZ(A, B, R);
         tube1();
         glTranslatef(0, 0, 1);
         glScaled(3.0, 3.0, 3*R);
@@ -2086,7 +2093,7 @@ namespace gle
     void drawArrow(Vector3 const& A, Vector3 const& B, float R)
     {
         glPushMatrix();
-        gleStretchZ(A, B, R);
+        stretchAlignZ(A, B, R);
         tube1();
         glTranslatef(0, 0, 1);
         glScaled(3.0, 3.0, 3*R);
@@ -2491,7 +2498,7 @@ namespace gle
     void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2)
     {
         float H = T * 0.5;
-        int Q = std::floor( (float)R * M_SQRT1_2 );
+        int Q = std::floor( double(R) * M_SQRT1_2 );
         
         if ( col1.visible() )
         {
@@ -2544,7 +2551,7 @@ namespace gle
     //-----------------------------------------------------------------------
     void gleDrawAxes(const real size, int dim)
     {
-        const GLfloat S = (GLfloat) size;
+        const GLfloat S = GLfloat(size);
         const GLfloat R = S * 0.1f;
         
         glMatrixMode(GL_MODELVIEW);

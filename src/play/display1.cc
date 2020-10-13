@@ -355,7 +355,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
             glPushMatrix();
             Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
-            gleStretchZ(a, b, 1);
+            stretchAlignZ(a, b, 1);
             gle::dualPass(gle::barrel);
             glPopMatrix();
             glDisable(GL_LIGHTING);
@@ -408,7 +408,8 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 
                 disp->color.load();
 #if ( DIM >= 3 )
-                drawCone(pf, ph-pf, disp->width*sFactor);
+                gleTube(pf, ph, disp->width*sFactor, gle::cone);
+                //drawCone(pf, ph-pf, disp->width*sFactor);
 #else
                 gleBand(ph, disp->width*sFactor, ps, disp->width*sFactor);
                 gleBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));

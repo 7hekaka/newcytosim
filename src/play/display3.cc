@@ -1022,7 +1022,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             glPushMatrix();
             Vector3 a = 0.5 * (sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5 * (sol->posP(1) + sol->posP(3));
-            gleStretchZ(a, b, 1);
+            stretchAlignZ(a, b, 1);
             glColor3f(0.6f,0.6f,0.6f);
             gle::dualPass(gle::barrel);
             glPopMatrix();

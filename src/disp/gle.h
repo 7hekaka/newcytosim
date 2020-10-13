@@ -117,9 +117,9 @@ namespace gle
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
 
     /// translate by A; rotate to align Z with AB, Z replaces X. The X-Y plane is scaled by R
-    void gleStretchZ(Vector2 const& A, Vector2 const& B, float rad);
+    void stretchAlignZ(Vector2 const& A, Vector2 const& B, float rad);
     /// translate by T, then rotate to align Z with dir
-    void gleStretchZ(Vector3 const& A, Vector3 const& B, float rad);
+    void stretchAlignZ(Vector3 const& A, Vector3 const& B, float rad);
     
     /// translate by T, then rotate to align Z with dir, scaling X and Y by radis
     void transAlignZ(Vector1 const& pos, float rad, Vector1 const& dir);
@@ -413,20 +413,6 @@ namespace gle
     /// print some info for debugging purpose
     void dump();
 }
-
-
-#ifdef __SSE3__
-inline float invsqrt(float x)
-{
-    return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
-}
-#else
-inline float invsqrt(float x)
-{
-    return 1.0f/sqrtf(x);
-}
-#endif
-
 
 //#define CHECK_GL_ERROR(ARG) ((void) 0)
 #define CHECK_GL_ERROR(ARG) gle::reportErrors(stderr, ARG)
