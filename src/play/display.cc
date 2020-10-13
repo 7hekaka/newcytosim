@@ -964,6 +964,8 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         gle::gleVertex(fib.posP(inx));
         if ( inx == 0 )
         {
+            color_by_distanceM(fib, 0.125, beta).load();
+            gle::gleVertex(fib.posPoint(0, 0.125));
             color_by_distanceM(fib, 0.25, beta).load();
             gle::gleVertex(fib.posPoint(0, 0.25));
             color_by_distanceM(fib, 0.5, beta).load();
@@ -985,6 +987,8 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
             gle::gleVertex(fib.posPoint(inx, 0.5));
             color_by_distanceP(fib, inx+0.75, beta).load();
             gle::gleVertex(fib.posPoint(inx, 0.75));
+            color_by_distanceP(fib, inx+0.875, beta).load();
+            gle::gleVertex(fib.posPoint(inx, 0.875));
         }
         color_by_distanceP(fib, inx+1, beta).load();
         gle::gleVertex(fib.posP(inx+1));

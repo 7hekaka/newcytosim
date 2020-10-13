@@ -1048,14 +1048,14 @@ namespace gle
         if ( !glIsBuffer(tub_[0]) )
         {
             glGenBuffers(24, tub_);
-            const GLfloat L = 128.0f;
+            const GLfloat L = 256.f;
             initTube(tub_[ 0], tub_[ 1], 0, 1, 8);
             initTube(tub_[ 2], tub_[ 3], 0, 1, 4);
             initTube(tub_[ 4], tub_[ 5], 0, 1, 2);
             initTube(tub_[ 6], tub_[ 7], 0, 1, 1);
-            initTube(tub_[ 8], tub_[ 9],-2, L, 8);
-            initTube(tub_[10], tub_[11],-2, L, 4);
-            initTube(tub_[12], tub_[13],-2, L, 2);
+            initTube(tub_[ 8], tub_[ 9],-4, L, 8);
+            initTube(tub_[10], tub_[11],-4, L, 4);
+            initTube(tub_[12], tub_[13],-4, L, 2);
             initTube(tub_[14], tub_[15], 0, L, 8);
             initTube(tub_[16], tub_[17], 0, L, 4);
             initTube(tub_[18], tub_[19], 0, L, 2);
@@ -1083,12 +1083,12 @@ namespace gle
     void tube2()     { tubeZ(0, 1, 4); }
     void tube4()     { tubeZ(0, 1, 2); }
     void tube8()     { tubeZ(0, 1, 1); }
-    void longTube1() { tubeZ(-2.f, 128.f, 8); }
-    void longTube2() { tubeZ(-2.f, 128.f, 4); }
-    void longTube4() { tubeZ(-2.f, 128.f, 2); }
-    void halfTube1() { tubeZ(-128.f, 0.0f, 8); }
-    void halfTube2() { tubeZ(-128.f, 0.0f, 4); }
-    void halfTube4() { tubeZ(-128.f, 0.0f, 2); }
+    void longTube1() { tubeZ(-4.f, 256.f, 8); }
+    void longTube2() { tubeZ(-4.f, 256.f, 4); }
+    void longTube4() { tubeZ(-4.f, 256.f, 2); }
+    void halfTube1() { tubeZ(-256.f, 0.0f, 8); }
+    void halfTube2() { tubeZ(-256.f, 0.0f, 4); }
+    void halfTube4() { tubeZ(-256.f, 0.0f, 2); }
     void hexTube1()  { hexTubeZ(0, 1); }
 #endif
  

@@ -375,17 +375,17 @@ void color_seg_direction(Fiber const& fib, size_t seg, real)
     gle::radial_color(fib.dirSegment(seg)).load_front();
 }
 
-/// using distance from the minus end to the middle of segment `seg`
+/// using distance from the minus end to the start of segment `seg`
 void color_seg_distanceM(Fiber const& fib, size_t seg, real beta)
 {
-    real x = std::min((seg+0.5)*beta, (real)32.0);
+    real x = std::min(seg*beta, (real)32.0);
     fib.disp->color.load_front(std::exp(-x));
 }
 
-/// using distance from the plus end to the middle of segment `seg`
+/// using distance from the plus end to the end of segment `seg`
 void color_seg_distanceP(Fiber const& fib, size_t seg, real beta)
 {
-    real x = std::min((fib.lastPoint()-seg-0.5)*beta, (real)32.0);
+    real x = std::min((fib.lastSegment()-seg)*beta, (real)32.0);
     fib.disp->color.load_front(std::exp(-x));
 }
 
@@ -488,6 +488,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
+    real iseg = fib.segmentationInv();
 
     Vector A = fib.posP(inx);
     Vector B = fib.posP(inx+1);
@@ -509,7 +510,17 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     if ( inx == 0 )
     {
         glEnable(GL_CLIP_PLANE5);
-        setClipPlane(GL_CLIP_PLANE5, (A-B)*fib.segmentationInv(), B);
+        if ( disp->line_style == 6 )
+        {
+            // cut the terminal segment according to length_scale
+            real x = 2 * disp->length_scale * iseg;
+            if ( x < 1.0 )
+            {
+                B = A + x * ( B - A );
+                color_seg_distanceM(fib, 0.0, 1.0);
+            }
+        }
+        setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, B);
         drawTube(A, rad, B, gle::capedTube2);
         glDisable(GL_CLIP_PLANE5);
         return;
@@ -522,7 +533,17 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     if ( inx == fib.lastSegment() )
     {
         glEnable(GL_CLIP_PLANE4);
-        setClipPlane(GL_CLIP_PLANE4, (B-A)*fib.segmentationInv(), A);
+        if ( disp->line_style == 7 )
+        {
+            // cut the terminal segment according to length_scale
+            real x = 2 * disp->length_scale * iseg;
+            if ( x < 1.0 )
+            {
+                A = B + x * ( A - B );
+                color_seg_distanceP(fib, inx, 1.0);
+            }
+        }
+        setClipPlane(GL_CLIP_PLANE4, (B-A)*iseg, A);
         drawTube(B, rad, A, gle::capedTube2);
         glDisable(GL_CLIP_PLANE4);
         return;
