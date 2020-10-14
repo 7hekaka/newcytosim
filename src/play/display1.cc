@@ -8,6 +8,7 @@
 #include "modulo.h"
 
 #include "fake.h"
+#include "fiber_disp.h"
 #include "line_disp.h"
 #include "point_disp.h"
 

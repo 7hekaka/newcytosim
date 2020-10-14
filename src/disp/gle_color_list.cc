@@ -689,7 +689,7 @@ gle::named_color xkcd_colors[] = {
     {"yellow_tan",            0xffe36eff},
     {"dark_fuchsia",          0x9d0759ff},
     {"indigo_blue",           0x3a18b1ff},
-    {"light_yellowish_green",  0xc2ff89ff},
+    {"light_yellowish_green", 0xc2ff89ff},
     {"pale_magenta",          0xd767adff},
     {"rich_purple",           0x720058ff},
     {"sunflower_yellow",      0xffda03ff},
