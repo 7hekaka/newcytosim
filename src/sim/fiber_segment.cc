@@ -32,40 +32,21 @@ real FiberSegment::projectPoint0(Vector W, real& dis) const
 #endif
     
     // project with the scalar product:
+#if 1
     real abs = dot(W, pos2()-A) * lenInv();
-    
-    // calculate distance to projection
-#if ( DIM == 1 )
-    dis = 0;
 #else
-    dis = W.normSqr() - abs * abs;
-#endif
-
-    return abs;
-}
-
-
-/*
- Assuming that the information in iDir[] is up-to-date
- */
-real FiberSegment::projectPoint1(Vector W, real& dis) const
-{
-    //assert_true(fib_->iDirValid);
-    W -= pos1();
-    
-#if GRID_HAS_PERIODIC
-    if ( modulo )
-        modulo->fold(W);
-#endif
-    
-    // project with the scalar product:
+    // using precomputed tangent vector, which does not seem beneficial here.
+    assert_true(fib_->iDirValid);
     real abs = dot(W, dirS());
+#endif
     
     // calculate distance to projection
 #if ( DIM == 1 )
     dis = 0;
-#else
+#elif ( DIM == 2 )
     dis = W.normSqr() - abs * abs;
+#else
+    dis = ( W.XX * W.XX + W.YY * W.YY ) + ( W.ZZ * W.ZZ - abs * abs );
 #endif
 
     return abs;
@@ -82,36 +63,37 @@ real FiberSegment::projectPoint1(Vector W, real& dis) const
  It is assumed here that len() returns the distance between the two points of the FiberSegment
  Attention: `dis` may NOT be set if ( abs < 0 ) or ( abs > len() )
  */
-real FiberSegment::projectPoint(Vector const& W, real& dis) const
+real FiberSegment::projectPoint(Vector W, real& dis) const
 {
     Vector A = pos1();
-    Vector AW = W - A;
+    Vector B = pos2();
+    W -= A;
     
 #if GRID_HAS_PERIODIC
     if ( modulo )
-        modulo->fold(AW);
+        modulo->fold(W);
 #endif
     
     // project with the scalar product:
-    real abs = dot(AW, pos2()-A) * lenInv();
+    real abs = dot(W, B-A) * lenInv();
     
     // test boundaries of filament:
     if ( abs < 0 )
     {
         if ( isFirst() )
-            dis = distanceSqr(W, A);
+            dis = W.normSqr();
     }
     else if ( abs > len() )
     {
         if ( isLast() )
-            dis = distanceSqr(W, pos2());
+            dis = (W+A-B).normSqr();
     }
     else
     {
 #if ( DIM == 1 )
         dis = 0;
 #else
-        dis = AW.normSqr() - abs * abs;
+        dis = W.normSqr() - abs * abs;
 #endif
     }
     return abs;

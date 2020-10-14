@@ -171,7 +171,7 @@ void PointGridF::checkPL(Meca& meca, real stiff,
     
     // get position of point with respect to segment:
     real dis2 = INFINITY;
-    real abs = bb.seg.projectPoint1(aa.pos, dis2);
+    real abs = bb.seg.projectPoint0(aa.pos, dis2);
     
     if ( 0 <= abs )
     {
@@ -224,7 +224,7 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
     
     // get position of bb.point1() with respect to segment 'aa'
     real dis2 = INFINITY;
-    real abs = aa.seg.projectPoint1(bb.seg.pos1(), dis2);
+    real abs = aa.seg.projectPoint0(bb.seg.pos1(), dis2);
     
     if ((0 <= abs) & (abs <= aa.seg.len()) & (dis2 < ran*ran))
     {
@@ -288,7 +288,7 @@ void PointGridF::checkLL2(Meca& meca, real stiff,
     
     // get position of bb.point2() with respect to segment 'aa'
     real dis2 = INFINITY;
-    real abs = aa.seg.projectPoint1(bb.seg.pos2(), dis2);
+    real abs = aa.seg.projectPoint0(bb.seg.pos2(), dis2);
     
     if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.seg.len()))
     {

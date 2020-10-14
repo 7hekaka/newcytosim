@@ -99,19 +99,16 @@ public:
     bool         notLast()     const { return ( pti_+2 < fib_->nbPoints() ); }
 
     
-    /// calculate the projection of `w` on the line supporting the segment
+    /// return abscissa of the projection of `w` on the line supporting the segment, and set distance
     real         projectPoint0(Vector w, real& dist) const;
-    
-    /// calculate the projection of `w` on the line supporting the segment
-    real         projectPoint1(Vector w, real& dist) const;
 
-    /// calculate the projection of `w` on the line supporting the segment
-    real         projectPoint(Vector const& w, real& dist) const;
+    /// return abscissa in [0, 1] of the closest point to `w` on the segment, and set distance
+    real         projectPoint(Vector w, real& dist) const;
 
-    /// faster projectionPoint, but incompatible with periodic boundary conditions
+    /// old hand-crafted projectionPoint(), but incompatible with periodic boundary conditions
     real         projectPointF(const real[], real& dist) const;
 
-    /// calculates the closest distance between two lines and set corresponding abscissa
+    /// calculates the closest distance between two infinite lines and set corresponding abscissa
     real         shortestDistance(FiberSegment const&, real& a, real& b) const;
 
     /// Human friendly ouput
