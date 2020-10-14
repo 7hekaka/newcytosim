@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
 #include "dim.h"
 #include "sim.h"
@@ -8,7 +8,6 @@
 #include "modulo.h"
 
 #include "fake.h"
-#include "fiber_disp.h"
 #include "line_disp.h"
 #include "point_disp.h"
 
@@ -20,9 +19,7 @@
 using namespace gle;
 extern Modulo const* modulo;
 
-
-#define ENABLE_EXPLODE_DISPLAY ( DIM < 3 )
-
+//------------------------------------------------------------------------------
 
 Display2::Display2(DisplayProp const* dp) : Display(dp)
 {
@@ -48,31 +45,14 @@ void Display2::drawSimul(Simul const& sim)
 
     if ( prop->couple_select & 1 )
         drawCouplesF(sim.couples);
-
+    
+    if ( prop->couple_select & 2 )
+        drawCouplesA(sim.couples);
+    
     if ( prop->single_select & 1 )
         drawSinglesF(sim.singles);
     
-#if ( 0 )
-    // bypass the normal display to improve performance:
-    glEnableClientState(GL_VERTEX_ARRAY);
-    // display Fibers in a random (ever changing) order:
-    for ( Fiber const* fib = sim.fibers.first(); fib ; fib=fib->next() )
-    {
-        if ( fib->disp->visible )
-        {
-            lineWidth(fib->prop->disp->line_width);
-            fib->disp->color.load();
-            glVertexPointer(DIM, GL_DOUBLE, 0, fib->addrPoints());
-            glDrawArrays(GL_LINE_STRIP, 0, fib->nbPoints());
-        }
-    }
-    glDisableClientState(GL_VERTEX_ARRAY);
-#else
     drawFibers(sim.fibers);
-#endif
-
-    if ( prop->couple_select & 2 )
-        drawCouplesA(sim.couples);
     
 #if ( DIM == 3 )
     
@@ -132,48 +112,17 @@ inline void Display2::drawBallT(Vector const& pos, real radius, gle_color const&
 }
 
 
-/// this version usually draws a little sphere
+/// draw a little sphere
 inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
-    if ( disp->perceptible )
-    {
-#if ( 0 )
-        // draw a OpenGL point
-        pointSize(disp->size);
-        glBegin(GL_POINTS);
-        gleVertex(pos);
-        glEnd();
-#else
-        /// draw a little sphere
-        glPushMatrix();
-        gleTranslate(pos);
-        gleScale(disp->size*sFactor);
-        gle::sphere1();
-        glPopMatrix();
-#endif
-    }
-}
-
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-
-void Display2::drawFiber(Fiber const& fib)
-{
-#if ENABLE_EXPLODE_DISPLAY
-    //translate whole display to display the Fiber
-    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_LIGHTING);
     glPushMatrix();
-    gleTranslate(0, fib.disp->explode_shift, 0);
-#endif
-    
-    Display::drawFiber(fib);
-
-#if ENABLE_EXPLODE_DISPLAY
+    gleTranslate(pos);
+    gleScale(disp->size*sFactor);
+    gle::sphere1();
     glPopMatrix();
-#endif
 }
+
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -183,7 +132,7 @@ void Display2::drawBead(Bead const& obj)
     const PointDisp * disp = obj.prop->disp;
 
     // display center:
-    if ( disp->style & 2 )
+    if ( disp->style & 2  && disp->perceptible )
     {
         bodyColor(obj);
         drawPoint(obj.position(), disp);
@@ -222,7 +171,7 @@ void Display2::drawSolid(Solid const& obj)
     const PointDisp * disp = obj.prop->disp;
     
     //display points:
-    if ( disp->style & 2  &&  disp->size > 0 )
+    if ( disp->style & 2  &&  disp->size > 0  && disp->perceptible )
     {
         bodyColor(obj);
         for ( size_t p = 0; p < obj.nbPoints(); ++p )
@@ -374,15 +323,12 @@ void Display2::drawOrganizer(Organizer const& obj) const
     {
         Vector P, Q;
         glDisable(GL_LIGHTING);
-
-        bodyColorF(disp, obj.signature()).load();
-        pointSize(0.75f*disp->size);
-        glBegin(GL_POINTS);
+        
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
-            gleVertex(P);
-        glEnd();
+            disp->drawI(P);
 
         lineWidth(disp->width);
+        bodyColorF(disp, obj.signature()).load();
         glBegin(GL_LINES);
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
@@ -427,231 +373,84 @@ void Display2::drawOrganizer(Organizer const& obj) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-
-inline void drawVertex(Vector const& pos, const PointDisp* disp)
-{
-    if ( disp->perceptible )
-    {
-        disp->color2.load();
-        gleVertex(pos);
-    }
-}
-
-#if ENABLE_EXPLODE_DISPLAY
-
-inline void shiftedVertex(Vector const& pos, const Fiber * fib)
-{
-    real shift = fib->disp->explode_shift;
-#if ( DIM == 3 )
-    gle::gleVertex(pos.XX, pos.YY+shift, pos.ZZ);
-#elif ( DIM == 2 )
-    gle::gleVertex(pos.XX, pos.YY+shift);
-#else
-    gle::gleVertex(pos.XX, shift);
-#endif
-}
-
-inline void drawVertex(Vector const& pos, const Fiber * fib, const PointDisp* disp)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color.load();
-        shiftedVertex(pos, fib);
-    }
-}
-
-
-inline void drawVertex2(Vector const& pos, Fiber const* fib, PointDisp const* disp)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color2.load();
-        shiftedVertex(pos, fib);
-    }
-}
-
-inline void drawLine(Vector const& a, Fiber const* fib, PointDisp const* disp, Vector const& b)
-{
-    if ( disp->visible && fib->disp->visible )
-    {
-        disp->color.load();
-        shiftedVertex(a, fib);
-        disp->color2.load();
-        shiftedVertex(b, fib);
-    }
-}
-
-
 /**
+ display the attached position of free singles
  */
-inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
-                     Vector const& b, const Fiber * fibB, const PointDisp* dispB)
-{
-#if ( 1 )
-    //draw two segments if `explode` is enabled
-    if ( dispA->visible && fibA->disp->visible )
-    {
-        dispA->color.load();
-        shiftedVertex(a, fibA);
-        dispB->color.load();
-        shiftedVertex(b, fibA);
-    }
-    if ( dispB->visible && fibB->disp->visible && fibB->prop->disp->explode )
-    {
-        dispA->color.load();
-        shiftedVertex(a, fibB);
-        dispB->color.load();
-        shiftedVertex(b, fibB);
-    }
-#else
-    if ( fibA->disp->visible || fibB->disp->visible )
-    {
-        //draw one segment
-        dispA->color.load();
-        shiftedVertex(a, fibA);
-        dispB->color.load();
-        shiftedVertex(b, fibB);
-    }
-#endif
-}
-
-#else
-
-// define macros without spatial shift:
-
-inline void drawVertex(Vector const& pos, const Fiber * fib, const PointDisp* disp)
-{
-    assert_true(fib->disp);
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color.load();
-        gleVertex(pos);
-    }
-}
-
-
-inline void drawVertex2(Vector const& pos, const Fiber * fib, const PointDisp* disp)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color2.load();
-        gleVertex(pos);
-    }
-}
-
-
-inline void drawLine(Vector const& a, const Fiber * fib, const PointDisp* disp, Vector const& b)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color.load();
-        gleVertex(a);
-        disp->color2.load();
-        gleVertex(b);
-    }
-}
-
-inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA,
-                     Vector const& b, const Fiber * fibB, const PointDisp* dispB)
-{
-    if (   dispA->perceptible && dispB->perceptible
-        && ( fibA->disp->visible || fibB->disp->visible ))
-    {
-        dispA->color.load();
-        gleVertex(a);
-        dispB->color.load();
-        gleVertex(b);
-    }
-}
-
-#endif
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
 void Display2::drawSinglesF(const SingleSet & set) const
 {
-    if ( prop->point_size > 0 )
-    {
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
-        {
-#if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
-            obj->disp()->color2.load();
-            gleVertex(obj->posFoot().XX, obj->signature() * 0x1p-28 - 4);
-#else
-            drawVertex(obj->posFoot(), obj->disp());
-#endif
-        }
-        glEnd();
-    }
+    for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
+        obj->disp()->drawF(obj->posFoot());
 }
 
 
 void Display2::drawSinglesA(const SingleSet & set) const
 {
-    // display positions of Hands
-    if ( prop->point_size > 0 )
+    // display the Hands
+    for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
-            drawVertex(obj->posHand(), obj->fiber(), obj->disp());
-        glEnd();
-    }
-    
-    // display links to anchor points
-    if ( prop->link_width > 0 )
-    {
-        lineWidth(prop->link_width);
-        glBegin(GL_LINES);
-        for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
-            if ( obj->hasForce() )
+        const PointDisp * disp = obj->disp();
+        if ( disp->perceptible  &&  obj->fiber()->disp->visible )
+        {
+            Vector ph = obj->posHand();
+            
+            disp->drawA(ph);
+            
+            if ( obj->hasForce() && disp->width > 0 )
             {
-                Vector ph = obj->posHand();
+                Vector ps = obj->sidePos();
                 Vector pf = obj->posFoot();
-                if ( modulo ) modulo->fold(pf, ph);
-                drawLine(ph, obj->fiber(), obj->disp(), pf);
+                if ( modulo )
+                {
+                    modulo->fold(pf, ph);
+                    modulo->fold(ps, ph);
+                }
+                
+                disp->color.load();
+#if ( DIM >= 3 )
+                gleTube(pf, ph, disp->width*sFactor, gle::cone);
+                //drawCone(pf, ph-pf, disp->width*sFactor);
+#else
+                gleBand(ph, disp->width*sFactor, ps, disp->width*sFactor);
+                gleBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
+#endif
             }
-        glEnd();
+        }
     }
 }
 
 //------------------------------------------------------------------------------
 #pragma mark -
+
 /**
-Always display Hand1 of Couple
+ Always display Hand1 of the Couple.
  */
 void Display2::drawCouplesF1(CoupleSet const& set) const
 {
-    if ( prop->point_size > 0 )
+    for ( Couple * cx = set.firstFF() ; cx ; cx=cx->next() )
     {
-        pointSize(prop->point_size);
-        
-        glBegin(GL_POINTS);
-        for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
-        {
-#if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
-            const PointDisp * disp = obj->disp1();
-            if ( disp->perceptible )
-            {
-                disp->color2.load();
-                gleVertex(obj->posFree().XX, obj->signature() * 0x1p-28 - 4);
-            }
-#else
-            drawVertex(obj->posFree(), obj->disp1());
-#endif
-        }
-        glEnd();
-        
-#if ( DIM > 1 )
-        // display inactive Couples with bitmap:
-        for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
-            if ( !obj->active() && obj->disp1()->perceptible )
-                obj->disp1()->drawI(obj->posFree());
-#endif
+        if ( cx->active() )
+            cx->disp1()->drawF(cx->posFree());
+        else
+            cx->disp1()->drawI(cx->posFree());
     }
+}
+
+
+PointDisp const* Couple::disp12() const
+{
+    if ( disp1()->visible )
+        return disp1();
+    else
+        return disp2();
+}
+
+
+PointDisp const* Couple::disp21() const
+{
+    if ( disp2()->visible )
+        return disp2();
+    else
+        return disp1();
 }
 
 
@@ -662,94 +461,142 @@ void Display2::drawCouplesF1(CoupleSet const& set) const
  */
 void Display2::drawCouplesF2(CoupleSet const& set) const
 {
-    if ( prop->point_size > 0 )
+    Couple * nxt;
+    Couple * obj = set.firstFF();
+    // this loop is unrolled, processing objects 2 by 2:
+    if ( set.sizeFF() & 1 )
     {
-        Couple * nxt;
-        Couple * obj = set.firstFF();
-
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        if ( set.sizeFF() & 1 )
-        {
-            nxt = obj->next();
-            drawVertex(obj->posFree(), obj->disp12());
-            obj = nxt;
-        }
-        while ( obj )
-        {
-            nxt = obj->next();
-            drawVertex(obj->posFree(), obj->disp21());
-            obj = nxt->next();
-            drawVertex(nxt->posFree(), nxt->disp12());
-        }
-        glEnd();
+        nxt = obj->next();
+        if ( obj->active() )
+            obj->disp12()->drawF(obj->posFree());
+        else
+            obj->disp12()->drawI(obj->posFree());
+        obj = nxt;
+    }
+    while ( obj )
+    {
+        nxt = obj->next();
+        if ( obj->active() )
+            obj->disp21()->drawF(obj->posFree());
+        else
+            obj->disp21()->drawI(obj->posFree());
+        obj = nxt->next();
+        if ( nxt->active() )
+            nxt->disp12()->drawF(nxt->posFree());
+        else
+            nxt->disp12()->drawI(nxt->posFree());
     }
 }
 
 
 void Display2::drawCouplesA(CoupleSet const& set) const
 {
-    if ( prop->point_size > 0 )
+    // display bound couples
+    for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
     {
-        // display bound couples
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        
-        for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
-            drawVertex2(cx->posHand1(), cx->fiber1(), cx->disp1());
-        
-        for ( Couple * cx=set.firstFA(); cx ; cx=cx->next() )
-            drawVertex2(cx->posHand2(), cx->fiber2(), cx->disp2());
-        
-        glEnd();
+        if ( cx->fiber1()->disp->visible )
+        {
+            if ( cx->active() )
+                cx->disp1()->drawF(cx->posHand1());
+            else
+                cx->disp1()->drawI(cx->posHand1());
+        }
+    }
+    
+    for ( Couple * cx=set.firstFA(); cx ; cx=cx->next() )
+    {
+        if ( cx->fiber2()->disp->visible )
+        {
+            if ( cx->active() )
+                cx->disp2()->drawF(cx->posHand2());
+            else
+                cx->disp2()->drawI(cx->posHand2());
+            
+        }
     }
 }
 
 
-void Display2::drawCouplesB(CoupleSet const& set) const
+void Display2::drawCoupleB(Couple const* cx) const
 {
-    // display bridging couples
-    if ( prop->point_size > 0 )
+    const PointDisp * pd1 = cx->disp1();
+    const PointDisp * pd2 = cx->disp2();
+    
+    Vector p1 = cx->posHand1();
+    Vector p2 = cx->posHand2();
+    
+    if ( modulo )
+        modulo->fold(p2, p1);
+    
+    if ( pd1 == pd2 )
     {
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        for ( Couple * cx=set.firstAA(); cx ; cx=cx->next() )
+        if ( pd1->perceptible )
         {
-#if ( 0 )
-            // only display if bridging two anti-parallel filaments
-            if ( prop->couple_select & 8  && cx->cosAngle() > 0 )
-                continue;
-            // only display if bridging two parallel filaments
-            if ( prop->couple_select & 16 && cx->cosAngle() < 0 )
-                continue;
+            pd1->color.load();
+#if ( 1 )
+            /*
+             Can shift positions towards the minus-end by couple's length
+             to create an effect to highlight the configuration:
+             ///// on antiparallel fibers
+             >>>>> on parallel fibers
+             */
+            real len = 0.5 * cx->prop->length;
+            lineWidth(pd1->width);
+            glBegin(GL_LINE_STRIP);
+            Vector d1 = len * cx->dirFiber1();
+            Vector d2 = len * cx->dirFiber2();
+            gleVertex(p1);
+            gleVertex(0.5*((p1+d1)+(p2+d2)));
+            gleVertex(p2);
+            glEnd();
+#else
+            lineWidth(pd1->width);
+            glBegin(GL_LINES);
+            gleVertex(p1);
+            gleVertex(p2);
+            glEnd();
 #endif
-            drawVertex(cx->posHand1(), cx->fiber1(), cx->disp1());
-            drawVertex(cx->posHand2(), cx->fiber2(), cx->disp2());
         }
-        glEnd();
+    }
+    else
+    {
+        if ( pd1->perceptible || pd2->perceptible )
+        {
+#if ( 1 )
+            /*
+             Can shift positions towards the minus-end by couple's length
+             to create an effect to highlight the configuration:
+             ///// on antiparallel fibers
+             >>>>> on parallel fibers
+             */
+            real len = 0.5 * cx->prop->length;
+            lineWidth(pd1->width);
+            glBegin(GL_LINE_STRIP);
+            Vector d1 = len * cx->dirFiber1();
+            Vector d2 = len * cx->dirFiber2();
+            gleVertex(p1);
+            gleVertex(0.5*((p1+d1)+(p2+d2)));
+            gleVertex(p2);
+            glEnd();
+#else
+            lineWidth(pd1->width);
+            glBegin(GL_LINES);
+            gleVertex(p1);
+            gleVertex(p2);
+            glEnd();
+#endif
+        }
     }
     
-    // display the link for bridging couples
-    if ( prop->link_width > 0 )
+    if ( cx->active() )
     {
-        lineWidth(prop->link_width);
-        glBegin(GL_LINES);
-        for ( Couple * cx=set.firstAA(); cx ; cx=cx->next() )
-        {
-#if ( 0 )
-            // only display if bridging two anti-parallel filaments
-            if ( prop->couple_select & 8  && cx->cosAngle() > 0 )
-                continue;
-            // only display if bridging two parallel filaments
-            if ( prop->couple_select & 16 && cx->cosAngle() < 0 )
-                continue;
-#endif
-            Vector P = cx->posHand1();
-            Vector Q = cx->posHand2();
-            if ( modulo ) modulo->fold(Q, P);
-            drawLine(P, cx->fiber1(), cx->disp1(), Q, cx->fiber2(), cx->disp2());
-        }
-        glEnd();
+        pd1->drawA(p1);
+        pd2->drawA(p2);
+    }
+    else
+    {
+        pd1->drawI(p1);
+        pd2->drawI(p2);
     }
 }
 

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
 #ifndef DISPLAY1_H
 #define DISPLAY1_H
@@ -8,8 +8,11 @@ class PointDisp;
 
 ///Cytosim display class for style=1
 /**
- This is the standard 2D display.
- It implements most of the characteristics in PointDisp and FiberDisp
+ This style produces a fast 2D display.
+ Some of the parameters in PointDisp are ignored.
+
+ Point-like objects are rendered using OpenGL::Points.
+ All points are displayed with the same size `point_size`.
  */
 class Display1 : public Display
 {
@@ -30,6 +33,9 @@ public:
     
     /// draw the given simulation state using OpenGL commands
     void drawSimul(Simul const&);
+   
+    /// draw Fibers with offset
+    void drawFiber(Fiber const&);
     
     /// draw the Solids
     void drawSolid(Solid const&);
@@ -49,25 +55,25 @@ public:
     /// draw transparent membrane of Sphere
     void drawSphereT(Sphere const&);
     
-    /// draw the free Singles
+    /// draw free Singles
     void drawSinglesF(SingleSet const&) const;
     
-    /// draw the attached Singles
+    /// draw attached Singles
     void drawSinglesA(SingleSet const&) const;
 
-    /// draw the free Couples
+    /// draw free Couples
     void drawCouplesF1(CoupleSet const&) const;
     
-    /// draw free Couple, randomizing which Hand is drawn
+    /// draw free Couples, randomizing which Hand is drawn
     void drawCouplesF2(CoupleSet const&) const;
     
-    /// draw the attached Couples
+    /// draw attached Couples
     void drawCouplesA(CoupleSet const&) const;
     
-    /// draw the bridging Couples
-    void drawCoupleB(Couple const*) const;
+    /// draw bridging Couples
+    void drawCouplesB(CoupleSet const&) const;
     
-    /// draw an Organizer
+    /// draw Organizer
     void drawOrganizer(Organizer const&) const;
 };
 
