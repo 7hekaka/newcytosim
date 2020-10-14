@@ -1041,25 +1041,28 @@ void Display3::drawSinglesF(SingleSet const& set) const
 {
     for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
     {
-        obj->disp()->color2.load_both();
-#if ( 1 )
-        if ( obj->disp()->style == 2 )
+        if ( obj->disp()->perceptible )
         {
-            Space const* spc = obj->confineSpace();
-            if ( spc )
+            obj->disp()->color2.load_both();
+#if ( 1 )
+            if ( obj->disp()->style == 2 )
             {
-                /// draw a disc tangent to the Space:
-                Vector pos = obj->posFoot();
-                Vector dir = spc->normalToEdge(pos);
-                drawObject(pos, dir, obj->disp()->size, gle::discUp);
-                continue;
+                Space const* spc = obj->confineSpace();
+                if ( spc )
+                {
+                    /// draw a disc tangent to the Space:
+                    Vector pos = obj->posFoot();
+                    Vector dir = spc->normalToEdge(pos);
+                    drawObject(pos, dir, obj->disp()->size, gle::discUp);
+                    continue;
+                }
             }
-        }
 #endif
-        if ( obj->base() )
-            drawObject(obj->posFoot(), obj->disp()->size, gle::octahedron);
-        else
-            drawPoint(obj->posFoot(), obj->disp());
+            if ( obj->base() )
+                drawObject(obj->posFoot(), obj->disp()->size, gle::octahedron);
+            else
+                drawPoint(obj->posFoot(), obj->disp());
+        }
     }
 }
 
@@ -1103,7 +1106,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
 {
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
-        if ( obj->fiber()->disp->visible )
+        if ( obj->disp()->perceptible && obj->fiber()->disp->visible )
             drawSingleA(obj);
     }
 }
