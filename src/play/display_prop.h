@@ -21,9 +21,9 @@ public:
     /// style of display { 1, 2, 3 }
     /**
      3 styles are implemented:
-     - style 1 used OpenGL lines and points. It is suitable for 2D work.
-     - style 2 is a faster display, also suitable for 2D.
-     - style 3 draw real tubes and uses OpenGL lighting for rendering. It is nice for 3D.
+     - style 1 used OpenGL lines and points. It is the best style for 2D work.
+     - style 2 uses pixelmap to draw Hands, and is slower than style 1, also made for 2D.
+     - style 3 is for 3D. It draws 3D tubes and uses OpenGL lighting for rendering.
      .
      */
     unsigned  style;

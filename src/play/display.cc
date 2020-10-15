@@ -404,7 +404,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
         p->display_fresh = false;
     }
     
-    disp->prepare(uFactor, sFactor, prop->style==1);
+    disp->prepare(uFactor, sFactor, prop->style==2);
 }
 
 /**

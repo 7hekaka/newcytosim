@@ -65,6 +65,9 @@ private:
     /// create the pixelmaps
     void makePixelmaps(GLfloat, unsigned supersampling);
     
+    /// create the pixelmaps
+    void createPixelmaps(GLfloat);
+
     /// draw pixel map
     void drawPixelmap(size_t) const;
     

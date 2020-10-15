@@ -324,7 +324,7 @@ void PointDisp::savePixelmap(GLubyte* bitmap, unsigned dim, unsigned id) const
 #endif
 
 
-void PointDisp::drawPixelmap(size_t ii) const
+void PointDisp::drawPixelmap(size_t inx) const
 {
     //translate to center the bitmap:
     glBitmap(0,0,0,0,mOffs,mOffs,nullptr);
@@ -333,7 +333,7 @@ void PointDisp::drawPixelmap(size_t ii) const
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 #else
-    glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[ii]);
+    glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[inx]);
 #endif
     CHECK_GL_ERROR("PointDisp::drawPixelmap");
 }
@@ -436,7 +436,26 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
 #endif
 
 
-void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
+void PointDisp::createPixelmaps(GLfloat uf)
+{
+#if POINTDISP_USES_PIXEL_BUFFERS
+    if ( pbo[0] == 0 )
+        glGenBuffers(3, pbo);
+#endif
+    
+    if ( pixSize != nPix )
+    {
+        CHECK_GL_ERROR("1 PointDisp::prepare");
+        allocatePixelmap();
+        //fprintf(stderr, " new %i bitmap for %s\n", pixSize, name_str());
+        CHECK_GL_ERROR("2 PointDisp::prepare");
+    }
+    
+    makePixelmaps(uf, 3);
+}
+
+
+void PointDisp::prepare(GLfloat uf, GLfloat sf, bool pixelmaps)
 {
     realSize    = size * sf;
     size_t   sz = (size_t)std::ceil(uf*(size+width));
@@ -444,25 +463,10 @@ void PointDisp::prepare(GLfloat uf, GLfloat sf, bool make_maps)
     pixSize     = ( sz + 4 ) & ~3;
     perceptible = visible && ( uf*(size+width) > 0.25 );
     
-    if ( make_maps )
-    {
 #if POINTDISP_USES_PIXELMAPS
-#if POINTDISP_USES_PIXEL_BUFFERS
-        if ( pbo[0] == 0 )
-            glGenBuffers(3, pbo);
+    if ( pixelmaps )
+        createPixelmaps(uf);
 #endif
-        
-        if ( pixSize != nPix )
-        {
-            CHECK_GL_ERROR("1 PointDisp::prepare");
-            allocatePixelmap();
-            //fprintf(stderr, " new %i bitmap for %s\n", pixSize, name_str());
-            CHECK_GL_ERROR("2 PointDisp::prepare");
-        }
-        
-        makePixelmaps(uf, 3);
-#endif
-    }
 }
 
 

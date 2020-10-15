@@ -103,7 +103,7 @@ void changePointDispSize(PropertyList const& plist, int inc,
         if ( dow ) p->width = grained(p->width, inc);
     }
     
-    if ( disp.style == 2 || plist.size() > 1 )
+    if ( disp.style == 1 || plist.size() > 1 )
     {
         if ( dow ) {
             disp.link_width = grained(disp.link_width, inc);

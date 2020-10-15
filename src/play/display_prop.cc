@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 void DisplayProp::clear()
 {
-    style          = 2;
+    style          = 1;
     tile           = 0;
     fold           = 1;
     draw_links     = false;
@@ -29,30 +29,30 @@ void DisplayProp::clear()
 //------------------------------------------------------------------------------
 void DisplayProp::read(Glossary& glos)
 {
-    glos.set(style,         "style");
-    glos.set(tile,          "tile");
-    glos.set(fold,          "fold");
-    glos.set(fold,          "tile", 1);
+    glos.set(style, "style", {{"fast", 1}, {"detailed", 2}, {"nice", 3}});
+    glos.set(tile, "tile");
+    glos.set(fold, "fold");
+    glos.set(fold, "tile", 1);
 
     glos.set(tile, "tiled") || glos.set(tile, "periodic");
     glos.set(fold, "tiled", 1) || glos.set(fold, "periodic", 1);
 
-    glos.set(draw_links,    "draw_links");
+    glos.set(draw_links, "draw_links");
 
-    glos.set(couple_flip,   "couple_flip");
+    glos.set(couple_flip, "couple_flip");
     glos.set(couple_select, "couple_select");
     glos.set(single_select, "single_select");
     
-    glos.set(point_value,   "point_value");
-    glos.set(point_size,    "point_size");
+    glos.set(point_value, "point_value");
+    glos.set(point_size, "point_size");
     // unless specified, `link_width` will be equal to `line_width`:
     if ( glos.set(line_width, "line_width") )
         link_width = line_width;
-    glos.set(link_width,    "link_width") || glos.set(link_width, "link_size");
+    glos.set(link_width, "link_width") || glos.set(link_width, "link_size");
     
-    glos.set(floor_radius,  "floor");
-    glos.set(floor_tile,    "floor", 1);
-    glos.set(floor_height,  "floor", 2);
+    glos.set(floor_radius, "floor");
+    glos.set(floor_tile, "floor", 1);
+    glos.set(floor_height, "floor", 2);
     draw_floor = (int)(floor_radius/floor_tile);
 }
 
