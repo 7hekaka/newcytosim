@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-#ifndef POINTSONSPHERE_H
-#define POINTSONSPHERE_H
+#ifndef SPHERICAL_CODE_H
+#define SPHERICAL_CODE_H
 
 #include "real.h"
 #include <cstdio>
@@ -42,7 +42,7 @@ Points coordinates can then be retrieved using either:
 \author
 F. Nedelec, created August 2002, last modified May, 2014
 */
-class PointsOnSphere
+class SphericalCode
 {
 public:
     
@@ -50,19 +50,19 @@ public:
     static real expectedDistance(size_t);
 
     /// default constructor, does nothing
-    PointsOnSphere();
+    SphericalCode();
     
     /// constructor that also calls distributePoints(),
-    PointsOnSphere(size_t nbp);
+    SphericalCode(size_t nbp);
     
     /// constructor that also calls distributePoints(), 
-    PointsOnSphere(size_t nbp, real precision, size_t mx_nb_iterations);
+    SphericalCode(size_t nbp, real precision, size_t mx_nb_iterations);
     
     /// distribute the nbp points on the sphere and store their coordinates
     size_t distributePoints(size_t nbp, real precision, size_t mx_nb_iterations);
 
     /// default destructor
-    virtual ~PointsOnSphere();
+    virtual ~SphericalCode();
     
     /// number of points in the configuration
     size_t nbPoints()  const { return num_points_;  }

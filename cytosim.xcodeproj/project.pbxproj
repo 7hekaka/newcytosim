@@ -482,7 +482,7 @@
 		BB71916F0EF1CD9900CED9E2 /* sparmatsym1.h in Headers */ = {isa = PBXBuildFile; fileRef = BB66BF2E09A8DC2600E5C5BE /* sparmatsym1.h */; };
 		BB7191700EF1CD9900CED9E2 /* dim.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF300A25FB13003333C9 /* dim.h */; };
 		BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
-		BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* pointsonsphere.h */; };
+		BB7191770EF1CD9900CED9E2 /* spherical_code.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* spherical_code.h */; };
 		BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587205B98DA3006956D5 /* conjgradient.h */; };
 		BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* smath.h */; };
 		BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matfull.h */; };
@@ -503,7 +503,7 @@
 		BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* sparmat.cc */; };
 		BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E505E1440E00BC9B7A /* matrix.cc */; };
 		BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
-		BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3D2ADA05C8396B0022ACE5 /* pointsonsphere.cc */; };
+		BB7191A90EF1CD9900CED9E2 /* spherical_code.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */; };
 		BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; };
 		BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588F05B98DA3006956D5 /* matsym.cc */; };
@@ -1385,7 +1385,7 @@
 		BB3A4AE519351389005CD868 /* space_tee.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_tee.cc; path = src/sim/spaces/space_tee.cc; sourceTree = SOURCE_ROOT; };
 		BB3A4AE619351389005CD868 /* space_tee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_tee.h; path = src/sim/spaces/space_tee.h; sourceTree = SOURCE_ROOT; };
 		BB3AAF5806076A8B00508E18 /* fiber_grid2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = fiber_grid2.cc; path = src/sim/fiber_grid2.cc; sourceTree = SOURCE_ROOT; };
-		BB3D2ADA05C8396B0022ACE5 /* pointsonsphere.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = pointsonsphere.cc; path = src/math/pointsonsphere.cc; sourceTree = SOURCE_ROOT; };
+		BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = spherical_code.cc; path = src/math/spherical_code.cc; sourceTree = SOURCE_ROOT; };
 		BB3D8E1615F490D0001851E1 /* simul_report.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_report.cc; sourceTree = "<group>"; };
 		BB3F600D14964B740092690C /* test_vbo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_vbo.cc; sourceTree = "<group>"; };
 		BB40C87F0CC6044E00EC90F8 /* meca1d.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca1d.h; path = src/sim/meca1d.h; sourceTree = SOURCE_ROOT; };
@@ -1519,7 +1519,7 @@
 		BB73589505B98DA3006956D5 /* node.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = node.h; path = src/base/node.h; sourceTree = SOURCE_ROOT; };
 		BB73589605B98DA3006956D5 /* node_list.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = node_list.cc; path = src/base/node_list.cc; sourceTree = SOURCE_ROOT; };
 		BB73589705B98DA3006956D5 /* node_list.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = node_list.h; path = src/base/node_list.h; sourceTree = SOURCE_ROOT; };
-		BB73589A05B98DA3006956D5 /* pointsonsphere.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = pointsonsphere.h; path = src/math/pointsonsphere.h; sourceTree = SOURCE_ROOT; };
+		BB73589A05B98DA3006956D5 /* spherical_code.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = spherical_code.h; path = src/math/spherical_code.h; sourceTree = SOURCE_ROOT; };
 		BB73589C05B98DA3006956D5 /* random.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = random.cc; path = src/math/random.cc; sourceTree = SOURCE_ROOT; };
 		BB73589D05B98DA3006956D5 /* random.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = random.h; path = src/math/random.h; sourceTree = SOURCE_ROOT; };
 		BB73589E05B98DA3006956D5 /* rasterizer.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = rasterizer.cc; path = src/math/rasterizer.cc; sourceTree = SOURCE_ROOT; };
@@ -2134,8 +2134,8 @@
 			isa = PBXGroup;
 			children = (
 				BB8CE30705DFF9140031D3B4 /* isometry.h */,
-				BB73589A05B98DA3006956D5 /* pointsonsphere.h */,
-				BB3D2ADA05C8396B0022ACE5 /* pointsonsphere.cc */,
+				BB73589A05B98DA3006956D5 /* spherical_code.h */,
+				BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */,
 				BB55BF390A25FB22003333C9 /* platonic.h */,
 				BB55BF380A25FB22003333C9 /* platonic.cc */,
 				BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */,
@@ -3607,7 +3607,7 @@
 				BB6485EE2057FD30005F2CD1 /* linear_operator.h in Headers */,
 				BB74F420232024AB0019D68E /* byteswap.h in Headers */,
 				BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */,
-				BB7191770EF1CD9900CED9E2 /* pointsonsphere.h in Headers */,
+				BB7191770EF1CD9900CED9E2 /* spherical_code.h in Headers */,
 				BBA27AEB211EC31600A7E184 /* vector4.h in Headers */,
 				BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */,
 				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
@@ -4701,7 +4701,7 @@
 				BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */,
 				BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */,
 				BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */,
-				BB7191A90EF1CD9900CED9E2 /* pointsonsphere.cc in Sources */,
+				BB7191A90EF1CD9900CED9E2 /* spherical_code.cc in Sources */,
 				BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */,
 				BB9D87B01E76BBB800DD0F00 /* sparmatsym2.cc in Sources */,
 				BB9EC398209235CC00EF00E7 /* SFMT.c in Sources */,

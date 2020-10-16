@@ -9,7 +9,7 @@
 #include "solid.h"
 #include "solid_prop.h"
 #include "fiber_prop.h"
-#include "pointsonsphere.h"
+#include "spherical_code.h"
 #include "random_vector.h"
 #include "mecapoint.h"
 #include "interpolation.h"
@@ -483,12 +483,12 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
             ang += delta;
         }
 #else
-        //we use PointsOnSphere to distribute points 'equally' on the sphere
-        PointsOnSphere sphere(nbf);
+        //we use SphericalCode to distribute points 'equally' on the sphere
+        SphericalCode code(nbf);
         Vector P;
         for ( size_t n = 0; n < nbf; ++n )
         {
-            sphere.putPoint(P, n);
+            code.putPoint(P, n);
             placeAnchor(alpha*P, P, origin);
         }
 #endif

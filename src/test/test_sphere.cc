@@ -1,15 +1,15 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// Test for PointsOnSphere
+// Test for SphericalCode
 
 #include <pthread.h>
 
-#include "pointsonsphere.h"
+#include "spherical_code.h"
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
 
-PointsOnSphere S, T;
-PointsOnSphere * front = &S;
+SphericalCode S, T;
+SphericalCode * front = &S;
 
 pthread_t       thread;
 pthread_mutex_t lock;

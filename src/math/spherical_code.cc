@@ -1,35 +1,35 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#include "pointsonsphere.h"
+#include "spherical_code.h"
 #include "random.h"
 
-//------------------------------------------------------------------------------
-PointsOnSphere::PointsOnSphere()
+SphericalCode::SphericalCode()
 : num_points_(0), coord_(nullptr)
 {
 }
 
 
-PointsOnSphere::PointsOnSphere(size_t nbp, real precision, size_t mx_nb_iterations)
+SphericalCode::SphericalCode(size_t nbp, real precision, size_t mx_nb_iterations)
 : num_points_(0), coord_(nullptr)
 {
     distributePoints(nbp, precision, mx_nb_iterations);
 }
 
 
-PointsOnSphere::PointsOnSphere(size_t nbp)
+SphericalCode::SphericalCode(size_t nbp)
 : num_points_(0), coord_(nullptr)
 {
     distributePoints(nbp, 1e-4, 1<<14);
 }
 
 
-PointsOnSphere::~PointsOnSphere( )
+SphericalCode::~SphericalCode( )
 {
 }
 
+//------------------------------------------------------------------------------
 
-void PointsOnSphere::putPoint(real ptr[3], const size_t i)
+void SphericalCode::putPoint(real ptr[3], const size_t i)
 {
     if ( i < num_points_ )
     {
@@ -40,7 +40,7 @@ void PointsOnSphere::putPoint(real ptr[3], const size_t i)
 }
 
 
-void PointsOnSphere::putPoint(real* x, real* y, real* z, const size_t i)
+void SphericalCode::putPoint(real* x, real* y, real* z, const size_t i)
 {
     if ( i < num_points_ )
     {
@@ -51,7 +51,7 @@ void PointsOnSphere::putPoint(real* x, real* y, real* z, const size_t i)
 }
 
 
-void PointsOnSphere::putPoints( real ptr[], const size_t ptr_n )
+void SphericalCode::putPoints( real ptr[], const size_t ptr_n )
 {
     size_t sup = std::min(3*num_points_, ptr_n);
     for ( size_t i = 0; i < sup; ++i )
@@ -59,27 +59,27 @@ void PointsOnSphere::putPoints( real ptr[], const size_t ptr_n )
 }
 
 
-void PointsOnSphere::scale(const real factor)
+void SphericalCode::scale(const real factor)
 {
     for ( size_t ii = 0; ii < 3*num_points_; ++ii )
         coord_[ii] *= factor;
 }
 
 
-void PointsOnSphere::printAllPositions( FILE* file )
+void SphericalCode::printAllPositions( FILE* file )
 {
     for ( size_t ii = 0; ii < num_points_; ++ii )
         fprintf( file, "%f %f %f\n", coord_[3*ii], coord_[3*ii+1], coord_[3*ii+2]);
 }
 
 
-real PointsOnSphere::distance3( const real P[], const real Q[] )
+real SphericalCode::distance3( const real P[], const real Q[] )
 {
     return std::sqrt( (P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]) );
 }
 
 
-real PointsOnSphere::distance3Sqr( const real P[], const real Q[] )
+real SphericalCode::distance3Sqr( const real P[], const real Q[] )
 {
     return (P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]);
 }
@@ -87,7 +87,7 @@ real PointsOnSphere::distance3Sqr( const real P[], const real Q[] )
 //------------------------------------------------------------------------------
 
 
-bool PointsOnSphere::project(const real S[3], real P[3])
+bool SphericalCode::project(const real S[3], real P[3])
 {
     real n = S[0]*S[0] + S[1]*S[1] + S[2]*S[2];
     if ( n > 0 )
@@ -105,7 +105,7 @@ bool PointsOnSphere::project(const real S[3], real P[3])
 /**
  hypercube rejection method
  */
-void PointsOnSphere::randomize(real P[3])
+void SphericalCode::randomize(real P[3])
 {
     real n;
     do {
@@ -132,14 +132,14 @@ void PointsOnSphere::randomize(real P[3])
  each of ~2N triangles should occupy an area of S = 4*PI/2*N, 
  and the distance between points should be ~2 * std::sqrt(S/std::sqrt(3)).
  */
-real PointsOnSphere::expectedDistance(size_t n)
+real SphericalCode::expectedDistance(size_t n)
 {
     real surface = 2 * M_PI / (real)n;
     return 2 * std::sqrt( surface / std::sqrt(3) );
 }
 
 
-real PointsOnSphere::minimumDistance()
+real SphericalCode::minimumDistance()
 {
     real res = INFINITY;
     for ( size_t ii = 1; ii < num_points_; ++ii )
@@ -155,7 +155,7 @@ real PointsOnSphere::minimumDistance()
 }
 
 
-real PointsOnSphere::coulombEnergy( const real P[] )
+real SphericalCode::coulombEnergy( const real P[] )
 {
     real dist, result = 0;
     for ( size_t ii = 1; ii < num_points_; ++ii )
@@ -171,7 +171,7 @@ real PointsOnSphere::coulombEnergy( const real P[] )
 
 //------------------------------------------------------------------------------
 
-void PointsOnSphere::setForces( real forces[], real threshold )
+void SphericalCode::setForces( real forces[], real threshold )
 {
     real dx[3];
     real dist;
@@ -242,7 +242,7 @@ void PointsOnSphere::setForces( real forces[], real threshold )
 /**
  Move the points in the direction of the forces, with scaling factor S 
  */
-void PointsOnSphere::refinePoints( real Pnew[], const real Pold[], real forces[], real S )
+void SphericalCode::refinePoints( real Pnew[], const real Pold[], real forces[], real S )
 {
     for ( size_t ii = 0; ii < num_points_; ++ii )
     {
@@ -262,7 +262,7 @@ void PointsOnSphere::refinePoints( real Pnew[], const real Pold[], real forces[]
  create a relatively even distribution of nbp points on the sphere
  the coordinates are stored in real array coord_[]
  */
-size_t PointsOnSphere::distributePoints(size_t nbp, real precision, size_t mx_nb_iterations)
+size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_iterations)
 {
     //reallocate the array if needed:
     if ( num_points_ != nbp || ! coord_ )
