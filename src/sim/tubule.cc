@@ -73,7 +73,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
         if ( bone_ )
-            fib->copyPoints(bone_->nbPoints(), bone_->addrPoints());
+            fib->setPoints(bone_->addrPoints(), bone_->nbPoints());
         Buddy::connect(fib);
         res.push_back(fib);
         fil_[i] = fib;

@@ -29,26 +29,33 @@ PointsOnSphere::~PointsOnSphere( )
 }
 
 
-void PointsOnSphere::copyPoint( real x[3], const size_t ii )
+void PointsOnSphere::putPoint(real ptr[3], const size_t i)
 {
-    x[0] = coord_[3*ii+0];
-    x[1] = coord_[3*ii+1];
-    x[2] = coord_[3*ii+2];
+    if ( i < num_points_ )
+    {
+        ptr[0] = coord_[3*i+0];
+        ptr[1] = coord_[3*i+1];
+        ptr[2] = coord_[3*i+2];
+    }
 }
 
 
-void PointsOnSphere::copyPoint( real* x, real* y, real* z, const size_t ii )
+void PointsOnSphere::putPoint(real* x, real* y, real* z, const size_t i)
 {
-    *x = coord_[3*ii+0];
-    *y = coord_[3*ii+1];
-    *z = coord_[3*ii+2];
+    if ( i < num_points_ )
+    {
+        *x = coord_[3*i+0];
+        *y = coord_[3*i+1];
+        *z = coord_[3*i+2];
+    }
 }
 
 
-void PointsOnSphere::copyPoints( real x[], const size_t x_size )
+void PointsOnSphere::putPoints( real ptr[], const size_t ptr_n )
 {
-    for ( size_t ii = 0; ii < 3*num_points_ && ii < x_size; ++ii )
-        x[ii] = coord_[ii];
+    size_t sup = std::min(3*num_points_, ptr_n);
+    for ( size_t i = 0; i < sup; ++i )
+        ptr[i] = coord_[i];
 }
 
 

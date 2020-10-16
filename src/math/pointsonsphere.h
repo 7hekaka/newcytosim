@@ -79,14 +79,14 @@ public:
     /// address where the coordinates for point `inx` are
     const real* addr(const size_t inx) const { return &coord_[3 * inx]; }
     
-    /// copy the coordinates from point `inx` onto the given 3-dim array x
-    void   copyPoint(real x[3], size_t inx);
+    /// copy the coordinates from point `inx` onto the given 3-dim array ptr
+    void   putPoint(real ptr[3], size_t inx);
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void   copyPoint(real* x, real* y, real* z, size_t inx);
+    void   putPoint(real* x, real* y, real* z, size_t inx);
     
-    /// copy the points coordinates onto `x`
-    void   copyPoints(real x[], const size_t x_size);
+    /// copy the points coordinates onto `x[]`, allocated to hold `ptr_n` elements
+    void   putPoints(real ptr[], const size_t ptr_n);
     
     /// write points coordinates
     void   printAllPositions(FILE* file = stdout);

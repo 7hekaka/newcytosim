@@ -222,13 +222,6 @@ void Mecable::rotate(Rotation const& T)
 //------------------------------------------------------------------------------
 #pragma mark - Export/Inport
 
-void Mecable::copyPoints(const size_t nbp, const real pts[])
-{
-    setNbPoints(nbp);
-    copy_real(DIM*nbp, pts, pPos);
-}
-
-
 void Mecable::putPoints(real * ptr) const
 {
     copy_real(DIM*nPoints, pPos, ptr);
@@ -238,6 +231,40 @@ void Mecable::putPoints(real * ptr) const
 void Mecable::getPoints(const real * ptr)
 {
     copy_real(DIM*nPoints, ptr, pPos);
+}
+
+
+void Mecable::setPoints(const real pts[], const size_t nbp)
+{
+    setNbPoints(nbp);
+    copy_real(DIM*nbp, pts, pPos);
+}
+
+
+/**
+Copy the coordinates of the points of Object to array `ptr[]`, previously
+allocated to hold `ptr_n` coordinates. Thus in 3D, `ptr_n` should be >= 3*Object::nbPoints()
+Exactly 3*Object::nbPoints() values are set at most. The Z component is set to zero in 2D mode.
+
+@return error code: 0 = no error, 1 = insufficient allocation
+*/
+int Mecable::putPoints(float ptr[], size_t ptr_n) const
+{
+#if ( DIM == 2 )
+    size_t sup = std::min(DIM*nPoints, ptr_n);
+    for ( size_t i = 0; i < sup; ++sup )
+        ptr[i] = pPos[i];
+#else
+    size_t sup = std::min(nPoints, ptr_n/3);
+    for ( size_t i = 0; i < sup; ++sup )
+    {
+        for ( size_t d = 0; d < DIM; ++d )
+            ptr[3*i+d] = pPos[3*i+d];
+        for ( size_t d = DIM; d < 3; ++d )
+            ptr[3*i+d] = 0;
+    }
+#endif
+    return ( ptr_n < 3*nPoints );
 }
 
 

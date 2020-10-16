@@ -121,7 +121,7 @@ void ClassicFiber::step()
         else
             cata = prop->catastrophe_rate_dt[P];
         
-        //printf("ClassicFiber %5u : force %9.5f growth %9.5f cata %9.5f\n", identity(), force, mGrowthP, cata);
+        //printf("ClassicFiber %5u : force %9.5f growth %9.6f cata %9.6f\n", identity(), force, mGrowthP, cata);
         
 #if NEW_CATASTROPHE_OUTSIDE
         // Catastrophe rate is multiplied if the PLUS_END is outside

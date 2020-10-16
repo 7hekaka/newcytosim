@@ -488,7 +488,7 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
         Vector P;
         for ( size_t n = 0; n < nbf; ++n )
         {
-            sphere.copyPoint(P, n);
+            sphere.putPoint(P, n);
             placeAnchor(alpha*P, P, origin);
         }
 #endif
