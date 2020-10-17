@@ -10,6 +10,7 @@
 #include "display2.h"
 #include "display3.h"
 #include "saveimage.h"
+#include "tictoc.h"
 #include <unistd.h>
 #include <cstdlib>
 #include "glut.h"
@@ -68,8 +69,9 @@ std::string Player::buildLabel() const
     std::ostringstream oss;
     oss.precision(3);
 
+    //std::clog << "display @ " << std::fixed << simul.time() << "s\n";
     oss << std::setw(8) << std::fixed << simul.time() << "s";
-    
+        
     //display the force exerted by the mouse-controled Single:
     Single const* sh = thread.handle();
     if ( sh && sh->attached() )
@@ -81,6 +83,20 @@ std::string Player::buildLabel() const
         //display ratio number-of-time-step / frame
         if ( prop.period > 1 )
             oss << " " << prop.period;
+#if ( 0 )
+        // display speedup compared to clock time
+        static double sec = TicToc::seconds_today();
+        static double sim = 0, spd = 0;
+        double SEC = TicToc::seconds_today();
+        if ( SEC > sec + 1.0 )
+        {
+            double SIM = simul.time();
+            spd = ( SIM - sim ) / ( SEC - sec );
+            sim = SIM;
+            sec = SEC;
+        }
+        oss << std::setw(8) << std::fixed << spd << "x ";
+#endif
     }
     else if ( thread.currentFrame() > 0 )
     {
