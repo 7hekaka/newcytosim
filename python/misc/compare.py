@@ -29,9 +29,9 @@ def print_spacer(arg):
 
 def compareFiles(fileL, fileR):
     if not os.path.isfile(fileL):
-        return print("absent LEFT file %s" % fileL)
+        return print("only RIGHT %s" % fileR)
     if not os.path.isfile(fileR):
-        return print("absent RIGHT file %s" % fileR)
+        return print("only LEFT  %s" % fileL)
     #print("compare %s %s" % (fileL, fileR))
     comp  = os.popen(diff+" -q "+fileL+" "+fileR)
     empty = ( len(comp.read()) == 0 )
