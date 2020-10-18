@@ -333,6 +333,12 @@ void invertScale(FiberDisp* p, int)
 }
 
 
+void setColoring(FiberDisp* p, int val)
+{
+    p->coloring = val;
+}
+
+
 void changeColoring(FiberDisp* p, int)
 {
     p->coloring = ( p->coloring + 1 ) % 9;
@@ -957,7 +963,11 @@ void processKey(unsigned char key)
         case 'c':
             setFiberDisp(player.allVisibleFiberDisp(), changeColoring, 0);
             break;
-            
+                
+        case 'C':
+            setFiberDisp(player.allVisibleFiberDisp(), setColoring, 0);
+            break;
+
         case 167:
             setFiberDisp(player.allVisibleFiberDisp(), toggleLineStyle, 0);
             break;
