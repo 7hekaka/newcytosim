@@ -259,8 +259,11 @@ namespace gle
     /// draw a refined sphere at the origin of radius 1
     void sphere8();
     
-    void dualPassSphere();
-    
+    void dualPassSphere1();
+    void dualPassSphere2();
+    void dualPassSphere4();
+    void dualPassSphere8();
+
     /// draw half a sphere in Z < 0
     void hemisphere1();
     /// draw a nice half-sphere in Z < 0

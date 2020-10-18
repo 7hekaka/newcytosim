@@ -89,7 +89,7 @@ void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, V
     glPushMatrix();
     gle::transRotate(pos, A, B, C);
     if ( style & 1 )
-        gle::dualPassSphere();
+        gle::dualPassSphere2();
     if ( style & 4 )
         gle::drawThreeBands(64);
     glPopMatrix();

@@ -1290,13 +1290,37 @@ namespace gle
 
 #endif
     
-    void dualPassSphere()
+    void dualPassSphere1()
+    {
+        assert_true(glIsEnabled(GL_CULL_FACE));
+        glCullFace(GL_FRONT);
+        gle::sphere1();
+        glCullFace(GL_BACK);
+        gle::sphere1();
+    }
+    void dualPassSphere2()
     {
         assert_true(glIsEnabled(GL_CULL_FACE));
         glCullFace(GL_FRONT);
         gle::sphere2();
         glCullFace(GL_BACK);
+        gle::sphere2();
+    }
+    void dualPassSphere4()
+    {
+        assert_true(glIsEnabled(GL_CULL_FACE));
+        glCullFace(GL_FRONT);
         gle::sphere4();
+        glCullFace(GL_BACK);
+        gle::sphere4();
+    }
+    void dualPassSphere8()
+    {
+        assert_true(glIsEnabled(GL_CULL_FACE));
+        glCullFace(GL_FRONT);
+        gle::sphere8();
+        glCullFace(GL_BACK);
+        gle::sphere8();
     }
 
     /// draw a Torus of radius R and a thickness 2*T

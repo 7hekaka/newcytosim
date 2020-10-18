@@ -142,7 +142,7 @@ inline void Display3::drawBallT(Vector const& pos, float radius, gle_color const
     glPushMatrix();
     gleTranslate(pos);
     gleScale(radius);
-    gle::dualPassSphere();
+    gle::dualPassSphere4();
     glPopMatrix();
 }
 

@@ -102,7 +102,7 @@ inline void Display2::drawBallT(Vector const& pos, real radius, gle_color const&
 #if ( DIM == 3 )
     glEnable(GL_LIGHTING);
     col.load_both();
-    gle::dualPassSphere();
+    gle::dualPassSphere2();
 #else
     glDisable(GL_LIGHTING);
     col.load();
