@@ -94,6 +94,7 @@ private:
     
     real    growing_rate_dt[2];
     real    growing_off_rate_dt[2];
+    real    growing_force_inv[2];
     real    hydrolysis_rate_2dt[2];
     real    shrinking_rate_dt[2];
     real    rebirth_prob[2];

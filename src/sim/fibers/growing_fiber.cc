@@ -67,8 +67,8 @@ void GrowingFiber::step()
         mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( forceP < 0  &&  prop->growing_force[P] < INFINITY )
-            mGrowthP *= std::exp(forceP/prop->growing_force[P]);
+        if ( forceP < 0 )
+            mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
         
         mGrowthP += prop->growing_off_speed_dt[P];
     }
@@ -91,8 +91,8 @@ void GrowingFiber::step()
         mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( forceM < 0  &&  prop->growing_force[M] < INFINITY )
-            mGrowthM *= std::exp(forceM/prop->growing_force[M]);
+        if ( forceM < 0 )
+            mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
 
         mGrowthM += prop->growing_off_speed_dt[M];
     }

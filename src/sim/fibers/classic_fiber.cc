@@ -74,8 +74,8 @@ void ClassicFiber::step()
         real spd = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( force < 0  &&  prop->growing_force[M] < INFINITY )
-            mGrowthM = spd * std::exp(force/prop->growing_force[M]) + prop->growing_off_speed_dt[M];
+        if ( force < 0 )
+            mGrowthM = spd * std::exp(force*prop->growing_force_inv[M]) + prop->growing_off_speed_dt[M];
         else
             mGrowthM = spd + prop->growing_off_speed_dt[M];
         
@@ -108,8 +108,8 @@ void ClassicFiber::step()
         real spd = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( force < 0  &&  prop->growing_force[P] < INFINITY )
-            mGrowthP = spd * std::exp(force/prop->growing_force[P]) + prop->growing_off_speed_dt[P];
+        if ( force < 0 )
+            mGrowthP = spd * std::exp(force*prop->growing_force_inv[P]) + prop->growing_off_speed_dt[P];
         else
             mGrowthP = spd + prop->growing_off_speed_dt[P];
         
@@ -121,7 +121,7 @@ void ClassicFiber::step()
         else
             cata = prop->catastrophe_rate_dt[P];
         
-        //printf("ClassicFiber %5u : force %9.5f growth %9.6f cata %9.6f\n", identity(), force, mGrowthP, cata);
+        //printf("ClassicFiber %5u: force %9.2f growth %9.6f cata %9.6f\n", identity(), force, mGrowthP, cata);
         
 #if NEW_CATASTROPHE_OUTSIDE
         // Catastrophe rate is multiplied if the PLUS_END is outside
@@ -149,7 +149,11 @@ void ClassicFiber::step()
     }
     else if ( mStateP == STATE_RED )
     {
-        mGrowthP = prop->shrinking_speed_dt[P];
+        real force = -projectedForceEndP();
+        
+        mGrowthP = prop->shrinking_speed_dt[P] * std::exp(force*prop->shrinking_force_inv[P]);
+
+        //printf("ClassicFiber %5u: force %9.2f shrink %9.6f\n", identity(), force, mGrowthP);
         
         if ( RNG.test(prop->rescue_prob[P]) )
             mStateP = STATE_GREEN;

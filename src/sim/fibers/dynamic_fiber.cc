@@ -156,6 +156,7 @@ void DynamicFiber::setEndStateP(state_t s)
  */
 int DynamicFiber::stepPlusEnd()
 {
+    constexpr size_t P = 0;
     int res = 0;
     real chewing_rate = 0;
     
@@ -174,13 +175,13 @@ int DynamicFiber::stepPlusEnd()
     
     if ( mStateP == STATE_RED )
     {
-        nextShrinkP -= prop->shrinking_rate_dt[0] + chewing_rate;
+        nextShrinkP -= prop->shrinking_rate_dt[P] + chewing_rate;
         while ( nextShrinkP <= 0 )
         {
         	// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
 			unitP[0] = unitP[1];
             unitP[1] = unitP[2];
-			unitP[2] = RNG.test(prop->unhydrolyzed_prob[0]);
+			unitP[2] = RNG.test(prop->unhydrolyzed_prob[P]);
 			--res;
             nextShrinkP += RNG.exponential();
             mStateP = calculateStateP();
@@ -193,25 +194,25 @@ int DynamicFiber::stepPlusEnd()
         real force = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        real growth_rate = prop->growing_rate_dt[0] * prop->free_polymer;
+        real growth_rate = prop->growing_rate_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( force < 0  &&  prop->growing_force[0] < INFINITY )
-            growth_rate *= std::exp(force/prop->growing_force[0]);
+        if ( force < 0 )
+            growth_rate *= std::exp(force*prop->growing_force_inv[P]);
 
-        real hydrol_rate = prop->hydrolysis_rate_2dt[0];
+        real hydrol_rate = prop->hydrolysis_rate_2dt[P];
         
 #if OLD_DYNAMIC_ZONE
         // change Hydrolysis rate if PLUS_END is far from origin:
         if ( posEndP().normSqr() > prop->zone_radius_sqr )
-            hydrol_rate = prop->zone_hydrolysis_rate_2dt[0];
+            hydrol_rate = prop->zone_hydrolysis_rate_2dt[P];
         
         if ( prop->zone_space_ptr && !prop->zone_space_ptr->inside(posEndP()) )
-            hydrol_rate = prop->zone_hydrolysis_rate_2dt[0];
+            hydrol_rate = prop->zone_hydrolysis_rate_2dt[P];
 #endif
         
         // @todo detach_rate should depend on the state of the subunit
-        real detach_rate = prop->growing_off_rate_dt[0] + chewing_rate;
+        real detach_rate = prop->growing_off_rate_dt[P] + chewing_rate;
         
         nextGrowthP -= growth_rate;
         nextShrinkP -= detach_rate;
@@ -234,7 +235,7 @@ int DynamicFiber::stepPlusEnd()
             {
                 case 0:
                     // add fresh unit, shifting old terminal to penultimate position
-                    unitP[2] = unitP[1] * RNG.test(prop->unhydrolyzed_prob[0]);
+                    unitP[2] = unitP[1] * RNG.test(prop->unhydrolyzed_prob[P]);
                     unitP[1] = unitP[0];
                     unitP[0] = 1;
                     ++res;
@@ -251,7 +252,7 @@ int DynamicFiber::stepPlusEnd()
                     // remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
                     unitP[0] = unitP[1];
                     unitP[1] = unitP[2];
-                    unitP[2] = RNG.test(prop->unhydrolyzed_prob[0]);
+                    unitP[2] = RNG.test(prop->unhydrolyzed_prob[P]);
                     --res;
                     nextShrinkP += RNG.exponential();
                     break;
@@ -270,6 +271,7 @@ int DynamicFiber::stepPlusEnd()
 
 void DynamicFiber::step()
 {
+    constexpr size_t P = 0;
     // perform stochastic simulation:
     int incP = stepPlusEnd();
     int incM = stepMinusEnd();
@@ -289,7 +291,7 @@ void DynamicFiber::step()
                 return;
             }
             // possibly rescue:
-            if ( RNG.test(prop->rebirth_prob[0]) )
+            if ( RNG.test(prop->rebirth_prob[P]) )
                 setEndStateP(STATE_GREEN);
         }
         else if ( length() + mGrowthM + mGrowthP < prop->max_length )

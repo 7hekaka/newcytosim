@@ -78,6 +78,9 @@ private:
     /// derived variable
     real    growing_off_speed_dt[2];
     
+    /// 1.0 / growing_force
+    real    growing_force_inv[2];
+    
     /// derived variable
     real    shrinking_speed_dt[2];
 

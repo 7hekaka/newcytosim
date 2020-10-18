@@ -44,6 +44,8 @@ void TreadmillingFiberProp::complete(Simul const& sim)
     {
         if ( growing_force[i] <= 0 )
             throw InvalidParameter("fiber:growing_force should be > 0");
+        growing_force_inv[i] = 1.0 / growing_force[i];
+
         if ( growing_speed[i] < 0 )
             throw InvalidParameter("fiber:growing_speed should be >= 0");
         

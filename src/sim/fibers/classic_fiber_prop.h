@@ -56,9 +56,9 @@ public:
     real    growing_off_speed[2];
 
     
-    /// Characteristic force of assembly state (default=+inf)
+    /// Characteristic force of the assembly state (default=+inf)
     /**
-     Antagonistic force decrease assembly rate exponentially.
+     Antagonistic force decreases assembly rate exponentially.
      */
     real    growing_force[2];
     
@@ -72,6 +72,12 @@ public:
      */
     real    shrinking_speed[2];
     
+    /// Characteristic force of the shrinking state (default=+inf)
+    /**
+     Antagonistic force decreases disassembly rate exponentially.
+     */
+    real    shrinking_force[2];
+
     
     /// Rate of stochastic switching from assembly to disassembly
     /**
@@ -135,14 +141,16 @@ public:
     
 private:
     
-    real    shrinking_speed_dt[2];
     real    growing_speed_dt[2];
     real    growing_off_speed_dt[2];
+    real    growing_force_inv[2];
     real    catastrophe_rate_dt[2];
     real    catastrophe_rate_stalled_dt[2];
     real    catastrophe_coef[2];
     real    rescue_prob[2], rebirth_prob[2];
-    
+    real    shrinking_speed_dt[2];
+    real    shrinking_force_inv[2];
+
 #if NEW_CATASTROPHE_OUTSIDE
     /// pointer to actual Space used for `catastrophe_outside`
     Space const* catastrophe_space_ptr;

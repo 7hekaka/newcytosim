@@ -25,6 +25,7 @@ void ClassicFiberProp::clear()
         growing_speed[i]            = 0;
         growing_off_speed[i]        = 0;
         growing_force[i]            = INFINITY;
+        shrinking_force[i]          = INFINITY;
         shrinking_speed[i]          = 0;
         catastrophe_rate[i]         = 0;
         catastrophe_rate_stalled[i] = 0;
@@ -51,6 +52,7 @@ void ClassicFiberProp::read(Glossary& glos)
     glos.set(growing_off_speed,        2, "growing_off_speed");
     glos.set(growing_force,            2, "growing_force");
     glos.set(shrinking_speed,          2, "shrinking_speed");
+    glos.set(shrinking_force,          2, "shrinking_force");
     glos.set(catastrophe_rate,         2, "catastrophe_rate");
     glos.set(catastrophe_rate_stalled, 2, "catastrophe_rate_stalled");
     glos.set(rescue_rate,              2, "rescue_rate");
@@ -65,7 +67,6 @@ void ClassicFiberProp::read(Glossary& glos)
 #endif
 
 #ifdef BACKWARD_COMPATIBILITY
-    
     if ( glos.set(growing_force[0], "dynamic_force") )
         Cytosim::warn << "fiber:dynamic_force was renamed growing_force\n";
 
@@ -90,7 +91,6 @@ void ClassicFiberProp::read(Glossary& glos)
         persistent = ( f != 1 );
         rebirth_rate[0] = ( f == 2 ? INFINITY : 0 );
     }
-    
 #endif
 }
 
@@ -114,10 +114,15 @@ void ClassicFiberProp::complete(Simul const& sim)
 
         if ( growing_force[i] <= 0 )
             throw InvalidParameter("fiber:growing_force should be > 0");
+        growing_force_inv[i] = 1.0 / growing_force[i];
 
         if ( shrinking_speed[i] > 0 )
             throw InvalidParameter("fiber:shrinking_speed should be <= 0");
         shrinking_speed_dt[i]  = shrinking_speed[i] * sim.time_step();
+        
+        if ( shrinking_force[i] <= 0 )
+            throw InvalidParameter("fiber:shrinking_force should be > 0");
+        shrinking_force_inv[i] = 1.0 / shrinking_force[i];
 
         if ( catastrophe_rate[i] < 0 )
             throw InvalidParameter("fiber:catastrophe_rate should be >= 0");
@@ -175,6 +180,7 @@ void ClassicFiberProp::write_values(std::ostream& os) const
     write_value(os, "growing_off_speed",        growing_off_speed, 2);
     write_value(os, "growing_force",            growing_force, 2);
     write_value(os, "shrinking_speed",          shrinking_speed, 2);
+    write_value(os, "shrinking_force",          shrinking_force, 2);
     write_value(os, "catastrophe_rate",         catastrophe_rate, 2);
     write_value(os, "catastrophe_rate_stalled", catastrophe_rate_stalled, 2);
     write_value(os, "rescue_rate",              rescue_rate, 2);

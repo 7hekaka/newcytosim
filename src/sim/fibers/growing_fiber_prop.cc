@@ -58,6 +58,7 @@ void GrowingFiberProp::complete(Simul const& sim)
 
         growing_speed_dt[i] = growing_speed[i] * sim.time_step();
         growing_off_speed_dt[i] = growing_off_speed[i] * sim.time_step();
+        growing_force_inv[i] = 1.0 / growing_force[i];
         shrinking_speed_dt[i] = shrinking_speed[i] * sim.time_step();
     }
 }
