@@ -342,20 +342,21 @@ void color_not(Fiber const&, size_t, real)
 {
 }
 
+// defined in display.cc
+extern gle_color color_by_tension(Fiber const& fib, size_t seg);
+extern gle_color color_by_tension_jet(Fiber const& fib, size_t seg);
+
 void color_seg_tension(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
-    if ( x > 0 )  // use normal color for extension
-        fib.disp->color.load_front(x);
-    else          // invert color for compression
-        fib.disp->color.inverted().load_front(-x);
+    fib.disp->color.load_front(x);
 }
 
 void color_seg_tension_jet(Fiber const& fib, size_t seg, real beta)
 {
     real x = beta * fib.tension(seg);
-    // use rainbow coloring, where Lagrange multipliers are negative under compression
-    gle_color::jet_color(1-x, fib.disp->color.a()).load_front();
+    // use jet coloring, where Lagrange multipliers are negative under compression
+    gle_color::jet_color_alpha(x).load_front();
 }
 
 void color_seg_curvature(Fiber const& fib, size_t seg, real beta)
@@ -503,6 +504,10 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         color_seg_distanceM(fib, inx, fib.segmentation()/disp->length_scale);
     else if ( disp->line_style == 7 )
         color_seg_distanceP(fib, inx, fib.segmentation()/disp->length_scale);
+    else if ( disp->line_style == 2 )
+        color_by_tension(fib, inx).load_front();
+    else if ( disp->line_style == 3 )
+        color_by_tension_jet(fib, inx).load_front();
     else
         fib.disp->color.load_front();
 

@@ -247,86 +247,6 @@ void gle_color::set_hue_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLf
 
 
 /**
- set a RGB color as a function of a value h in [0, 4].
- The result vary from dark-blue, blue, cyan, yellow, orange to red:
- - 0 : dark-blue
- - 1 : blue
- - 2 : green
- - 3 : red
- - 4 : full red
- */
-void gle_color::set_jet_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLfloat h)
-{
-    if ( h <= 0.4 )
-    {
-        r = 0;
-        g = 0;
-        b = 0.4f;
-    }
-    else if ( h < 4.0 )
-    {
-        int i = (int)std::floor(h);
-        GLfloat f = h-(GLfloat)i;
-        switch( i )
-        {
-            case 0:  r = 0;   g = 0;   b = f;   break;
-            case 1:  r = 0;   g = f;   b = 1;   break;
-            case 2:  r = f;   g = 1;   b = 1-f; break;
-            case 3:  r = 1;   g = 1-f; b = 0;   break;
-            default: r = 1;   g = 0;   b = 0;   break;
-        }
-    }
-    else
-    {
-        r = 1;
-        g = 0;
-        b = 0;
-    }
-}
-
-
-/**
- set a RGB color as a function of a value h in [0, 4].
- The result vary from black, blue, cyan, yellow, orange to red:
- - 0 : black
- - 1 : blue
- - 2 : green
- - 3 : red
- - 4 : yellow
- - 5 : white
- */
-void gle_color::set_jet_components_dark(GLfloat& r, GLfloat& g, GLfloat& b, const GLfloat h)
-{
-    if ( h <= 0.1 )
-    {
-        r = 0;
-        g = 0;
-        b = 0.1f;
-    }
-    else if ( h < 5.0 )
-    {
-        int i = (int)std::floor(h);
-        GLfloat f = h-(GLfloat)i;
-        switch( i )
-        {
-            case 0:  r = 0;   g = 0;   b = f;   break;
-            case 1:  r = 0;   g = f;   b = 1-f; break;
-            case 2:  r = f;   g = 1-f; b = 0;   break;
-            case 3:  r = 1;   g = f;   b = 0;   break;
-            case 4:  r = 1;   g = 1;   b = f;   break;
-            default: r = 1;   g = 1;   b = 1;   break;
-        }
-    }
-    else
-    {
-        r = 1;
-        g = 1;
-        b = 1;
-    }
-}
-
-
-/**
  set a RGB color as a function of a 3D vector with components in [-1, 1],
  with alpha-component equal to `a`.
  Two opposite vectors gives approximately complementary colors.
@@ -361,17 +281,130 @@ gle_color gle_color::hue_color(const float h, const float a)
     return gle_color(r, g, b, a);
 }
 
+/**
+set a RGB color as a function of a value h in [0, 4].
+The result vary from dark-blue, blue, cyan, yellow, orange to red:
+- 0 : dark-blue
+- 1 : blue
+- 2 : green
+- 3 : red
+- 4 : full red
+*/
 gle_color gle_color::jet_color(const float h, const float a)
 {
     GLfloat r, g, b;
-    set_jet_components(r, g, b, h);
+    if ( h <= 0.4 )
+    {
+        r = 0;
+        g = 0;
+        b = 0.4f;
+    }
+    else if ( h < 4.0 )
+    {
+        int i = (int)std::floor(h);
+        GLfloat f = h-(GLfloat)i;
+        switch( i )
+        {
+            case 0:  r = 0;   g = 0;   b = f;   break;
+            case 1:  r = 0;   g = f;   b = 1;   break;
+            case 2:  r = f;   g = 1;   b = 1-f; break;
+            case 3:  r = 1;   g = 1-f; b = 0;   break;
+            default: r = 1;   g = 0;   b = 0;   break;
+        }
+    }
+    else
+    {
+        r = 1;
+        g = 0;
+        b = 0;
+    }
     return gle_color(r, g, b, a);
 }
 
+/**
+set a RGB color as a function of a value h in [0, 4].
+The result vary from black, blue, cyan, yellow, orange to red:
+- 0 : black
+- 1 : blue
+- 2 : green
+- 3 : red
+- 4 : yellow
+- 5 : white
+*/
 gle_color gle_color::jet_color_dark(const float h, const float a)
 {
     GLfloat r, g, b;
-    set_jet_components_dark(r, g, b, h);
+    if ( h <= 0.1 )
+    {
+        r = 0;
+        g = 0;
+        b = 0.1f;
+    }
+    else if ( h < 5.0 )
+    {
+        int i = (int)std::floor(h);
+        GLfloat f = h-(GLfloat)i;
+        switch( i )
+        {
+            case 0:  r = 0;   g = 0;   b = f;   break;
+            case 1:  r = 0;   g = f;   b = 1-f; break;
+            case 2:  r = f;   g = 1-f; b = 0;   break;
+            case 3:  r = 1;   g = f;   b = 0;   break;
+            case 4:  r = 1;   g = 1;   b = f;   break;
+            default: r = 1;   g = 1;   b = 1;   break;
+        }
+    }
+    else
+    {
+        r = 1;
+        g = 1;
+        b = 1;
+    }
+    return gle_color(r, g, b, a);
+}
+
+
+/**
+set a RGB color as a function of a value h in [0, 4].
+The result vary from black, blue, cyan, yellow, orange to red:
+- 0 : black
+- 1 : blue
+- 2 : green
+- 3 : red
+- 4 : yellow
+- 5 : white
+*/
+gle_color gle_color::jet_color_alpha(const float h)
+{
+    GLfloat r, g, b, a;
+    if ( h <= 0 )
+    {
+        r = 0;
+        g = 0;
+        b = 0;
+        a = 0;
+    }
+    else if ( h < 5.0 )
+    {
+        int i = (int)std::floor(h);
+        GLfloat f = h-(GLfloat)i;
+        switch( i )
+        {
+            case 0:  r = 0;   g = 0;   b = 1;   a = f; break;
+            case 1:  r = 0;   g = f;   b = 1-f; a = 1; break;
+            case 2:  r = f;   g = 1-f; b = 0;   a = 1; break;
+            case 3:  r = 1;   g = f;   b = 0;   a = 1; break;
+            case 4:  r = 1;   g = 1;   b = f;   a = 1; break;
+            default: r = 1;   g = 1;   b = 1;   a = 1; break;
+        }
+    }
+    else
+    {
+        r = 1;
+        g = 1;
+        b = 1;
+        a = 1;
+    }
     return gle_color(r, g, b, a);
 }
 

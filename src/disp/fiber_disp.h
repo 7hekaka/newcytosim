@@ -87,14 +87,14 @@ public:
      - 0 : hide,
      - 1 : plain lines,
      - 2 : color rendering of longitudinal tensions (2)
-     - 3 : color rendering of longitudinal tensions, using a rainbow color scheme (2)
+     - 3 : color rendering of longitudinal tensions, using a jet color scheme (2)
      - 4 : color rendering of local curvature (1)
      - 5 : color rendering of the angular orientation relative to the X-axis
      - 6 : color rendering based on distance from minus end (1)
      - 7 : color rendering based on distance from plus end (1)
      - 8 : color rendering based on distance to edge of Space (1)
      .
-     The color value is calculated using (1): 'length_scale' or (2): 'tension_scale' (2).
+     The color value is calculated using (1): 'length_scale' or (2): 'tension_scale'.
      */
     int          line_style;
     

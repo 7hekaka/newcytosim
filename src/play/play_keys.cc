@@ -325,7 +325,10 @@ void invertScale(FiberDisp* p, int)
     else if ( p->line_style == 2 || p->line_style == 3 )
     {
         p->tension_scale = -p->tension_scale;
-        flashText("fiber:tension_scale = %.5f", p->tension_scale);
+        if ( p->tension_scale > 0 )
+            flashText("fiber:tension_scale: pulling");
+        else
+            flashText("fiber:tension_scale: pushing");
     }
 }
 
@@ -383,7 +386,7 @@ void flashLineStyle(int style)
         case 0: flashText("Fibers: no lines");                     break;
         case 1: flashText("Fibers: lines");                        break;
         case 2: flashText("Fiber color by axial tensions");        break;
-        case 3: flashText("Fiber rainbow color by tensions");      break;
+        case 3: flashText("Fiber jet color by axial tensions");    break;
         case 4: flashText("Fiber color by curvature");             break;
         case 5: flashText("Fiber color by orientation");           break;
         case 6: flashText("Fiber color by distance to minus-end"); break;

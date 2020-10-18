@@ -757,21 +757,20 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 }
 
 
-inline gle_color color_by_tension(Fiber const& fib, size_t seg, real beta)
+gle_color color_by_tension(Fiber const& fib, size_t seg)
 {
-    real x = beta * fib.tension(seg);
-    if ( x > 0 )  // use normal color for extension
-        return fib.disp->color.inverted().alpha(x);
-    else          // invert color for compression
-        return fib.disp->color.alpha(-x);
+    real x = fib.tension(seg) / fib.prop->disp->tension_scale;
+    return fib.disp->color.alpha(x);
 }
 
-inline gle_color color_by_tension_jet(Fiber const& fib, size_t seg, real beta)
+gle_color color_by_tension_jet(Fiber const& fib, size_t seg)
 {
-    real x = fib.tension(seg) * beta;
-    // use rainbow coloring, where Lagrange multipliers are negative under compression
-    return gle_color::jet_color(1-x);
+    real x = fib.tension(seg) / fib.prop->disp->tension_scale;
+    // use jet coloring, where Lagrange multipliers are negative under compression
+    return gle_color::jet_color_alpha(x);
+    //return fib.disp->color.alpha(x-1);
 }
+
 
 inline gle_color color_by_curvature(real val)
 {
@@ -841,12 +840,11 @@ void Display::drawFiberLines(Fiber const& fib) const
         case 2:
         {
             // display segments with color indicating internal tension
-            const real beta = 1.0 / disp->tension_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINES);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                color_by_tension(fib, n, beta).load();
+                color_by_tension(fib, n).load();
                 gle::gleVertex(fib.posP(n));
                 gle::gleVertex(fib.posP(n+1));
             }
@@ -855,12 +853,11 @@ void Display::drawFiberLines(Fiber const& fib) const
         case 3:
         {
             // display segments with color indicating internal tension
-            const real beta = 1.0 / disp->tension_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                color_by_tension_jet(fib, n, beta).load(alpha);
+                color_by_tension_jet(fib, n).load(alpha);
                 gle::gleVertex(fib.posP(n));
                 gle::gleVertex(fib.posP(n+1));
             }
@@ -996,7 +993,13 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     else
     {
-        fib.disp->color.load();
+        if ( disp->line_style == 2 )
+            color_by_tension(fib, inx).load();
+        else if ( disp->line_style == 3 )
+            color_by_tension_jet(fib, inx).load();
+        else
+            fib.disp->color.load();
+        // the whole segment is painted with the same color:
         glBegin(GL_LINES);
         gle::gleVertex(fib.posP(inx));
         gle::gleVertex(fib.posP(inx+1));
@@ -1591,8 +1594,11 @@ void Display::drawFiber(Fiber const& fib)
     }
     
 #if ( DIM == 3 )
-    // transparent styles in 3D
-    if (( line_style==1 && fib.disp->color.transparent()))
+    /*
+     Handle styles in 3D that are using transparency to draw fiber's segments
+     */
+    if (( line_style==1 && fib.disp->color.transparent())
+        || ( line_style==2 || line_style==3 ))
     {
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
             zObjects.push_back(zObject(&fib, i));

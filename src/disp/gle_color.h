@@ -386,12 +386,6 @@ public:
     
     /// set a RGB color from a factor in [-PI, PI], continuously varying through all colors
     static void set_hue_components(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat h);
-    
-    /// set a RGB values from a factor in [0, 1], continuously varying between blue, green, red
-    static void set_jet_components(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat h);
-    
-    /// set a RGB values from a factor in [0, 1], continuously varying through blue, green, red, yellow, white
-    static void set_jet_components_dark(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat h);
 
     /// return new saturated color with given Hue value `h` in [-PI, PI]
     static gle_color hue_color(float h, float alpha = 1.0f);
@@ -408,6 +402,9 @@ public:
     /// return new jet color extended
     static gle_color jet_color_dark(float h, float alpha = 1.0f);
     
+    /// return new jet color extended
+    static gle_color jet_color_alpha(float h);
+
     
     static void print_components(std::ostream& os, std::string const& str, GLfloat mat[4])
     {
