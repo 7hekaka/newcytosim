@@ -31,7 +31,7 @@ public:
     PlayerProp   prop;
     
     /// container for object's display properties
-    PropertyList dproperties;
+    PropertyList dispList;
     
     /// SimThread to control the live simulation
     SimThread    thread;

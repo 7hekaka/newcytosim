@@ -28,7 +28,7 @@ void Player::clear()
 {
     thread.stop();
     thread.clear();
-    dproperties.erase();
+    dispList.erase();
     if ( mDisplay )
         delete(mDisplay);
     mDisplay = nullptr;
@@ -178,7 +178,7 @@ void Player::restart()
     {
         thread.stop();
         thread.clear();
-        dproperties.erase();
+        dispList.erase();
         thread.start();
     }
     catch( Exception & e ) {
@@ -203,12 +203,12 @@ inline PointDisp* toPointDisp(Property * ptr)
 
 PropertyList Player::allFiberDisp()
 {
-    return dproperties.find_all("fiber:display");
+    return dispList.find_all("fiber:display");
 }
 
 PropertyList Player::allVisibleFiberDisp()
 {
-    PropertyList res, plist = dproperties.find_all("fiber:display");
+    PropertyList res, plist = dispList.find_all("fiber:display");
     
     for ( Property * i : plist )
     {
@@ -220,12 +220,12 @@ PropertyList Player::allVisibleFiberDisp()
 
 PropertyList Player::allHandDisp()
 {
-    return dproperties.find_all("hand:display");
+    return dispList.find_all("hand:display");
 }
 
 PropertyList Player::allVisibleHandDisp()
 {
-    PropertyList res, plist = dproperties.find_all("hand:display");
+    PropertyList res, plist = dispList.find_all("hand:display");
     
     for ( Property * i : plist )
     {
@@ -237,12 +237,12 @@ PropertyList Player::allVisibleHandDisp()
 
 PropertyList Player::allSphereDisp()
 {
-    return dproperties.find_all("bead:display", "solid:display", "sphere:display");
+    return dispList.find_all("bead:display", "solid:display", "sphere:display");
 }
 
 PropertyList Player::allSpaceDisp()
 {
-    return dproperties.find_all("space:display");
+    return dispList.find_all("space:display");
 }
 
 FiberDisp * Player::firstFiberDisp()
@@ -284,5 +284,5 @@ void Player::writePlayParameters(std::ostream& os, bool prune) const
  */
 void Player::writeDisplayParameters(std::ostream& os, bool prune) const
 {
-    dproperties.write(os, prune);
+    dispList.write(os, prune);
 }

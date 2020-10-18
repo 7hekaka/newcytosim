@@ -24,14 +24,14 @@ void processMouseClick(int, int, const Vector3& pos3, int)
         {
             Single * s = thread.createHandle(pos, range);
             PointDisp *& pd = s->prop->hand_prop->disp;
-            pd = static_cast<PointDisp*>(player.dproperties.find("hand:display", "user_hand"));
+            pd = static_cast<PointDisp*>(player.dispList.find("hand:display", "user_hand"));
             if ( !pd )
             {
                 pd = new PointDisp("hand:display", "user_hand");
                 pd->size   = 2 * pixrad;
                 pd->color  = glApp::currentView().front_color;
                 pd->color2 = pd->color;
-                player.dproperties.deposit(pd);
+                player.dispList.deposit(pd);
             }
         }
     }

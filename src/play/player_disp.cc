@@ -240,8 +240,8 @@ void Player::prepareDisplay(View& view, int mag)
 
     try {
         mDisplay->setStencil(view.stencil && ( DIM == 3 ));
-        mDisplay->prepareForDisplay(simul, dproperties);
-        //std::clog << " dproperties.size() = " << dproperties.size() << '\n';
+        mDisplay->prepareForDisplay(simul, dispList);
+        //std::clog << " dispList.size() = " << dispList.size() << '\n';
     }
     catch(Exception & e)
     {
