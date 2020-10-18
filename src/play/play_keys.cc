@@ -349,13 +349,14 @@ void changeMask(FiberDisp* p, int val)
 
 void changePointStyle(FiberDisp* p, int)
 {
-    p->point_style = ( p->point_style + 1 ) % 3;
+    p->point_style = ( p->point_style + 1 ) % 5;
     switch ( p->point_style )
     {
-        case 0: flashText("Fibers: no points");     break;
-        case 1: flashText("Fibers: vertices");      break;
-        case 2: flashText("Fibers: arrowheads");    break;
-        case 3: flashText("Fibers: center point");  break;
+        case 0: flashText("Fibers: no points");    break;
+        case 1: flashText("Fibers: vertices");     break;
+        case 2: flashText("Fibers: arrowheads");   break;
+        case 3: flashText("Fibers: center point"); break;
+        case 4: flashText("Fibers: backbone");     break;
     }
 }
 

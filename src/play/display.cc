@@ -1079,8 +1079,9 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
 void Display::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-
-    if ( disp->point_style == 1 )
+    int style = disp->point_style & 3;
+    
+    if ( style == 1 )
     {
         // display vertices:
         pointSize(disp->point_size);
@@ -1089,7 +1090,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
             gle::gleVertex(fib.posP(ii));
         glEnd();
     }
-    else if ( disp->point_style == 2 )
+    else if ( style == 2 )
     {
         // display arrowheads along the fiber:
         const float rad = disp->point_size*sFactor;
@@ -1098,11 +1099,20 @@ void Display::drawFiberPoints(Fiber const& fib) const
         for ( ; ab <= fib.abscissaP(); ab += sep )
             gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
-    else if ( disp->point_style == 3 )
+    else if ( style == 3 )
     {
         const float rad = 2*disp->point_size*sFactor;
         // display only middle of fiber:
         gle::gleObject(fib.posMiddle(), rad, gle::sphere2);
+    }
+    // display backbone:
+    if ( disp->point_style & 4 )
+    {
+        glLineWidth(0.25);
+        glBegin(GL_LINE_STRIP);
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
+            gle::gleVertex(fib.posP(ii));
+        glEnd();
     }
 }
 
