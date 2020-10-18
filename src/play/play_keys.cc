@@ -425,6 +425,17 @@ void changePointSize(FiberDisp* p, int inc)
     }
 }
 
+void changeLineWidth(FiberDisp* p, int inc)
+{
+    GLfloat s = grained(p->line_width, inc);
+    
+    if ( s > 0 )
+    {
+        p->line_width = s;
+        flashText("%s:line_width=%0.2f", p->name_str(), s);
+    }
+}
+
 void changeSize(FiberDisp* p, int inc)
 {
     GLfloat s = grained(p->line_width, inc);
@@ -947,6 +958,8 @@ void processKey(unsigned char key)
         case '2':
             if ( altKeyDown)
                 setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -1);
+            else if ( shiftKeyDown )
+                setFiberDisp(player.allVisibleFiberDisp(), changeLineWidth, -1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, -1);
             break;
@@ -958,6 +971,8 @@ void processKey(unsigned char key)
         case '3':
             if ( altKeyDown)
                 setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
+            else if ( shiftKeyDown )
+                setFiberDisp(player.allVisibleFiberDisp(), changeLineWidth, 1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
             break;
