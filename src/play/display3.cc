@@ -434,12 +434,12 @@ void Display3::drawFiberLines(Fiber const& fib) const
             break;
         case 2:
         {
-            real beta = 1.0 / disp->tension_scale;
+            const real beta = 1.0 / disp->tension_scale;
             drawFiberSegments(fib, rad, color_seg_tension, beta);
         } break;
         case 3:
         {
-            real beta = 1.0 / disp->tension_scale;
+            const real beta = 1.0 / disp->tension_scale;
             drawFiberSegments(fib, rad, color_seg_tension_jet, beta);
         } break;
         case 4:

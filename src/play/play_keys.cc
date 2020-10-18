@@ -270,21 +270,21 @@ void changeExclude(FiberDisp* p, int val)
 }
 
 
-void changeScale(real& scale, int d)
-{
-    real s = std::log2(std::fabs(scale)) + d * 0.125;
-    if ( s < -14 ) s =  10;
-    if ( s >  10 ) s = -14;
-    scale = std::copysign(std::exp2(s), scale);
-}
-
-
 void flipExplode(FiberDisp* p)
 {
     p->explode = ! p->explode;
     if ( p->explode && p->explode_range == 0 )
         p->explode_range = 1.0;
     flashText("fiber:explode = %i", p->explode);
+}
+
+
+void changeScale(real& scale, int d)
+{
+    real s = std::log2(std::fabs(scale)) + d * 0.125;
+    if ( s < -14 ) s =  10;
+    if ( s >  10 ) s = -14;
+    scale = std::copysign(std::exp2(s), scale);
 }
 
 
@@ -312,6 +312,21 @@ void changeScale(FiberDisp* p, int d)
     }
     else if ( disp.style == 2 )
         flipExplode(p);
+}
+
+
+void invertScale(FiberDisp* p, int)
+{
+    if ( p->lattice_style )
+    {
+        p->lattice_scale = -p->lattice_scale;
+        flashText("fiber:lattice_scale = %.5f", p->lattice_scale);
+    }
+    else if ( p->line_style == 2 || p->line_style == 3 )
+    {
+        p->tension_scale = -p->tension_scale;
+        flashText("fiber:tension_scale = %.5f", p->tension_scale);
+    }
 }
 
 
@@ -904,7 +919,11 @@ void processKey(unsigned char key)
         case 'D':
             setFiberDisp(player.allVisibleFiberDisp(), changeExclude, 1);
             break;
-            
+                
+        case 'q':
+            setFiberDisp(player.allVisibleFiberDisp(), invertScale, 0);
+            break;
+
         case 'w':
             setFiberDisp(player.allVisibleFiberDisp(), changeScale, -8);
             break;
