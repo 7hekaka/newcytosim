@@ -160,7 +160,7 @@ void Parser::parse_set(std::istream& is)
             execute_change(name, opt, false);
         }
     }
-    else if ( simul.findProperty(cat) )
+    else
     {
         name = cat;
         // in this form, 'set' changes the value of an existing Property
@@ -196,8 +196,6 @@ void Parser::parse_set(std::istream& is)
             execute_change(name, opt, false);
         }
     }
-    else
-        throw InvalidSyntax("unknown class `"+cat+"'");
 
     if ( pp )
         check_warnings(opt, is, ipos);

@@ -265,7 +265,7 @@ void changeExclude(FiberDisp* p, int val)
         case 3: flashText("No fibers");                 break;
         case 4: flashText("Counter-clockwise fibers");  break;
         case 8: flashText("Clockwise fibers");          break;
-        case 12: flashText("No fibers");                 break;
+        case 12: flashText("No fibers");                break;
     }
 }
 
@@ -969,7 +969,7 @@ void processKey(unsigned char key)
             break;
 
         case 167:
-            setFiberDisp(player.allVisibleFiberDisp(), toggleLineStyle, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), toggleLineStyle, 1);
             break;
             
         case 177:

@@ -515,7 +515,8 @@ void glApp::processNormalKey(unsigned char c, int, int)
         } break;
 #endif
         //------------------------- Zoom in and out:
-            
+        
+        case '_':
         case '-':
             if ( glutGetModifiers() )
                 view.zoom_out(1.071773463f);
