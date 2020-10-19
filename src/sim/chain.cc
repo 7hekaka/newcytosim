@@ -1703,6 +1703,20 @@ clear_counter:
 
 #endif
 
+
+void Chain::adjustSegmentation(real arg)
+{
+    if ( fnSegmentation != arg )
+    {
+        std::clog << "Resegmenting " << reference() << " -> " << arg << "\n";
+        fnSegmentation = arg;
+        adjustSegmentation();
+        updateFiber();
+        reshape();
+    }
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -2099,11 +2113,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
         setSegmentation(len/nbSegments());
 
     fnAbscissaP = fnAbscissaM + len;
-
-    // resegment if the parameter has changed:
-    if ( fnSegmentation != seg )
-        adjustSegmentation();
-    
+    fnSegmentation = seg;
     //Mecable::write(std::cerr);
     
     // verify the length and segmentation:

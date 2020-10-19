@@ -138,7 +138,7 @@ Fiber::Fiber(FiberProp const* p)
 {
     if ( prop )
     {
-        segmentation(prop->segmentation);
+        targetSegmentation(prop->segmentation);
         
         if ( prop->lattice )
         {
