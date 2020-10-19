@@ -20,7 +20,13 @@ inline void splash(std::ostream& os)
 inline void print_version(std::ostream& os)
 {
     os << "   Dimension: " << DIM;
-    os << "   Precision: " << sizeof(real) << " bytes, " << REAL_EPSILON << "\n";
+    os << "   Precision: " << sizeof(real) << " bytes\n";
+    os << "   Fiber: lattice " << FIBER_HAS_LATTICE;
+    os << " mesh " << FIBER_HAS_MESH;
+    os << " family " << FIBER_HAS_FAMILY;
+    os << " glue " << FIBER_HAS_GLUE;
+    os << " bind_closest " << BIND_CLOSEST_FIBER << "\n";
+
     os << "   Built " <<__DATE__<< " " <<__TIME__<< " with " <<__VERSION__<< "\n";
     
 #ifdef CODE_VERSION
@@ -34,10 +40,5 @@ inline void print_version(std::ostream& os)
 #else
     os << " with assertions\n";
 #endif
-    os << "   Fiber: lattice " << FIBER_HAS_LATTICE;
-    os << " mesh " << FIBER_HAS_MESH;
-    os << " family " << FIBER_HAS_FAMILY;
-    os << " glue " << FIBER_HAS_GLUE;
-    os << " bind_closest " << BIND_CLOSEST_FIBER << "\n";
 }
 

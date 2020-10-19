@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
         splash(std::cout);
         print_version(std::cout);
         if ( SaveImage::supported("png") )
-            std::cout << "    PNG enabled\n";
+            std::cout << "   PNG enabled\n";
         return EXIT_SUCCESS;
     }
     
