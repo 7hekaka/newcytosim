@@ -50,10 +50,6 @@ real Chain::contourLength(const real pts[], size_t n_pts)
 }
 
 
-/** number of time steps between each attempt to remove/add a point
- also number of states over which curvature information is averaged */
-#define RECUT_PERIOD 8
-
 Chain::Chain()
 {
     fnCut          = 0;
@@ -62,10 +58,7 @@ Chain::Chain()
     skipProjection = false;
 #endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
-    autoCutVal  = 0;
-    autoCutCnt  = 0;
-    // set different 'seeds' to desynchronize the adjustSegmentation()
-    autoCutIdx  = RNG.pint32(RECUT_PERIOD);
+    clearAutoCounters(1);
 #endif
     fnAbscissaM = 0;
     fnAbscissaP = 0;
@@ -1442,33 +1435,31 @@ real Chain::bendingEnergy0() const
 
 real Chain::minCosinus() const
 {
-    real result;
+    real res;
     Vector dir1, dir2;
     
     size_t ps = nbSegments() % 2;
     if ( ps )
     {
-        dir1   = diffPoints(0);
-        result = fnCut * fnCut;
+        dir1 = diffPoints(0);
+        res = fnCut * fnCut;
     }
     else
     {
-        dir1   = diffPoints(1);
-        result = dot(diffPoints(0), dir1);
+        dir1 = diffPoints(1);
+        res = dot(diffPoints(0), dir1);
         ps = 2;
     }
     
-    for ( ; ps < nbSegments(); ps+=2 )
+    for ( ; ps < nbSegments(); ps += 2 )
     {
         dir2 = diffPoints(ps);
-        real s = dot(dir1, dir2);
-        if ( s < result ) result = s;
+        res = std::min(res, dot(dir1, dir2));
         dir1 = diffPoints(ps+1);
-        real t = dot(dir1, dir2);
-        if ( t < result ) result = t;
+        res = std::min(res, dot(dir1, dir2));
     }
     
-    return result / ( fnCut * fnCut );
+    return res / ( fnCut * fnCut );
 }
 
 
@@ -1539,7 +1530,7 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
  */
 void Chain::resegment(size_t ns)
 {
-    //std::clog << reference() << " resegment " << ns << "\n";
+    //std::clog << reference() << " resegment(" << ns << ")\n";
     assert_true( ns > 0 );
     // 'cut' is in unit of segments
     real cut = (real)nbSegments() / (real)ns;
@@ -1581,7 +1572,98 @@ void Chain::resegment(size_t ns)
 }
 
 
-#if !CURVATURE_DEPENDENT_SEGMENTATION
+#if CURVATURE_DEPENDENT_SEGMENTATION
+
+/** number of time steps between each attempt to remove/add a point
+ also number of states over which curvature information is averaged */
+const int RECUT_PERIOD = 8;
+const real RECUT_PRECISION = 0.025;
+
+void Chain::clearAutoCounters(bool mode)
+{
+    autoCutVal = 0;
+    // set different 'seeds' to desynchronize the adjustSegmentation()
+    if ( mode )
+        autoCutCnt = -(int)RNG.pint32(RECUT_PERIOD);
+    else
+        autoCutCnt = 0;
+}
+
+/**
+ A fiber is segmented as a function of its curvature.
+ Only one new segmentation is done every time step at maximum,
+ to allow the solver to equilibrate the new vertices.
+ */
+void Chain::adjustSegmentation()
+{
+    LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
+    const real upLimit = 16.0 * fnSegmentation;
+    size_t nbs = nbSegments();
+    real len = length();
+    
+    assert_true( fnSegmentation > REAL_EPSILON );
+    // use one segment for very short tubes
+    if ( len <= fnSegmentation )
+    {
+        if ( nbs > 1 )
+        {
+            resegment(1);
+            clearAutoCounters();
+        }
+        return;
+    }
+    //use at least two segments if length exceeds 2*fnSegmentation
+    if ( nbs < 2 )
+    {
+        if ( len > fnSegmentation )
+        {
+            resegment(2);
+            clearAutoCounters();
+        }
+        return;
+    }
+    //the segment-length should not exceed a upper limit
+    if ( fnCut >= upLimit )
+    {
+        resegment(2*nbs);
+        clearAutoCounters();
+        return;
+    }
+    
+    // accumulate the error in variable autoCut, 
+    // The error is in angle-square: 1-cos(angle) ~ (angle)^2
+    if ( ++autoCutCnt > 0 )
+        autoCutVal += 1.0 - minCosinus();
+    
+    // after accumulation of time steps, we check the result
+    if ( autoCutCnt >= RECUT_PERIOD )
+    {
+        // calculate error accumulated over the last steps
+        real err = autoCutVal * fnCut / autoCutCnt;
+        std::clog << reference() << " seg err. " << std::fixed << err << "\n";
+
+        if ( err > RECUT_PRECISION )
+        {
+            // cut more finely if the error is large
+            if ( fnCut > fnSegmentation )
+                resegment(2*nbs);
+        }
+        else if ( err < 0.1 * RECUT_PRECISION )
+        {
+            /*
+             We want the future error with fewer points to be small.
+             At constant curvature, the error scales like (length-of-rods)^2
+             We can expect the error to raise by 4x, if we divide the number of segments by 2.
+             For safety, we use 0.125 here, instead of 1/4, i.e. add another factor 2.
+             */
+            if ( nbs > 3 && fnCut < 0.5*upLimit )
+                resegment(nbs/2);
+        }
+        clearAutoCounters();
+    }
+}
+
+#else
 
 /**
  A fiber is segmented as a function of its length.
@@ -1617,91 +1699,6 @@ void Chain::adjustSegmentation()
     }
 }
 
-
-#else
-
-static constexpr real RECUT_PRECISION = 0.05;
-
-/**
- A fiber is segmented as a function of its curvature.
- Only one new segmentation is done every time step at maximum,
- to allow the solver to equilibrate the new vertices.
- */
-void Chain::adjustSegmentation()
-{
-    LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
-    
-    const int upLimit = 8;
-    size_t nbs = nbSegments();
-    real len = length();
-    
-    assert_true( fnSegmentation > REAL_EPSILON );
-    // use one segment for very short tubes
-    if ( len <= fnSegmentation )
-    {
-        if ( nbs > 1 )
-        {
-            resegment(1);
-            goto clear_counter;
-        }
-        return;
-    }
-    //use at least two segments if length exceeds 2*fnSegmentation
-    if ( nbs < 2 )
-    {
-        if ( len > fnSegmentation )
-        {
-            resegment(2);
-            goto clear_counter;
-        }
-        return;
-    }
-    //the segment-length should not exceed a upper limit
-    if ( fnCut >= upLimit * fnSegmentation )
-    {
-        resegment(2*nbs);
-        goto clear_counter;
-    }
-    
-    // accumulate the error in variable autoCut, 
-    // The error is in angle-square: 1-std::cos(angle) ~ (angle)^2
-    autoCutCnt += 1.0;
-    autoCutVal += minCosinus();
-    
-    // after accumulation of RECUT_PERIOD time steps, we check the result
-    if ( ++autoCutIdx < RECUT_PERIOD )
-        return;
-    
-    if ( autoCutCnt > 2 )
-    {
-        // calculate error accumulated over the last steps
-        autoCutVal = ( 1.0 - autoCutVal/autoCutCnt ) * fnCut;
-        
-        if ( autoCutVal > RECUT_PRECISION )
-        {
-            //cut more finely if the error is large
-            if ( fnCut > fnSegmentation )
-                resegment(2*nbs);
-        }
-        else if ( autoCutVal < 0.1 * RECUT_PRECISION )
-        {
-            /*
-             We want the future error with fewer points to be small.
-             At constant curvature, the error scales like (length-of-rods)^2
-             We can expect the error to raise by 4x, if we divide the number of segments by 2.
-             For safety, we use 0.125 here, instead of 1/4, i.e. add another factor 2.
-             */
-            if ( nbs > 3 && fnCut < (upLimit/2)*fnSegmentation )
-                resegment(nbs/2);
-        }
-    }
-clear_counter:
-    //reset the counter and error accumulator
-    autoCutIdx = 0;
-    autoCutCnt = 0;
-    autoCutVal = 0;
-}
-
 #endif
 
 
@@ -1709,7 +1706,7 @@ void Chain::adjustSegmentation(real arg)
 {
     if ( fnSegmentation != arg )
     {
-        std::clog << "Resegmenting " << reference() << " -> " << arg << "\n";
+        std::clog << reference() << " segmentation <- " << arg << "\n";
         fnSegmentation = arg;
         adjustSegmentation();
         updateFiber();

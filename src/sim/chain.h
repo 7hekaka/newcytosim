@@ -82,14 +82,16 @@ private:
     real         fnSegmentation;
   
 #if CURVATURE_DEPENDENT_SEGMENTATION
+
     /// error due to the cutting at different steps
     real         autoCutVal;
     
     /// number of errors accumulated
-    real         autoCutCnt;
+    int          autoCutCnt;
     
-    /// index into the autoCut[]
-    size_t       autoCutIdx;
+    /// reset auto variables
+    void clearAutoCounters(bool=false);
+    
 #endif
     
     /// abscissa of the minus-end (equal to zero initially)
