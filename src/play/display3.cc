@@ -221,7 +221,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     glDisable(GL_CLIP_PLANE5);
     // draw last segment:
     set_color(fib, last, beta);
-    drawTube(nxt, rad, pos, gle::capedTube2);
+    drawTube(nxt, rad, pos, gle::endedTube2);
     glDisable(GL_CLIP_PLANE4);
 }
 
@@ -272,7 +272,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     // draw last segment, which may be truncated:
     set_color(fib, inx, facP);
     if ( abs >= fib.length() )
-        drawTube(nxt, rad, pos, gle::capedTube2);
+        drawTube(nxt, rad, pos, gle::endedTube2);
     else
         drawTube(nxt, rad, pos, gle::halfTube2);
     glDisable(GL_CLIP_PLANE4);
@@ -549,7 +549,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
             }
         }
         setClipPlane(GL_CLIP_PLANE4, (B-A)*iseg, A);
-        drawTube(B, rad, A, gle::capedTube2);
+        drawTube(B, rad, A, gle::endedTube2);
         glDisable(GL_CLIP_PLANE4);
         return;
     }

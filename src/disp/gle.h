@@ -271,11 +271,17 @@ namespace gle
     /// draw a very nice half-sphere in Z < 0
     void hemisphere4();
     
+#if 1
     /// primitives to draw the ends of spherocylinders:
     inline void capedTube1() { halfTube1(); hemisphere1(); }
     inline void capedTube2() { halfTube2(); hemisphere2(); }
     inline void capedTube4() { halfTube4(); hemisphere4(); }
-    
+#else
+    /// primitives to draw the ends of spherocylinders:
+    inline void capedTube1() { halfTube1(); discDown(); }
+    inline void capedTube2() { halfTube2(); discDown(); }
+    inline void capedTube4() { halfTube4(); discDown(); }
+#endif
     /// primitives to draw the ends of spherocylinders:
     inline void endedTube1() { halfTube1(); discDown(); }
     inline void endedTube2() { halfTube2(); discDown(); }
