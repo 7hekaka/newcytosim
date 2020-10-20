@@ -1529,19 +1529,20 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
 #pragma mark -
 
 /**
- Recalculate the vertices of the Chain for 'ns' segments.
+ Recalculate the vertices to get 'ns' segments.
  
  @todo 2d-order interpolation in Chain::resegment()
  
- Note: Unless the Chain is straight, the length of the segments after
- an interpolation will not exactly match `segmentation()`, and we therefore
- call reshape() here to correct for the problem.
+ Note: Unless the Chain is straight, the length of the segments after this
+ new interpolation will not exactly match `segmentation()`, but this calls
+ getPoints() here which calls reshape().
  */
 void Chain::resegment(size_t ns)
 {
     //std::clog << reference() << " resegment " << ns << "\n";
     assert_true( ns > 0 );
-    real cut = nbSegments() * segmentation() / ns;
+    // 'cut' is in unit of segments
+    real cut = (real)nbSegments() / (real)ns;
     
     // calculate new intermediate points in tmp[]:
     Vector a = posP(0), b = posP(1);
@@ -1555,16 +1556,16 @@ void Chain::resegment(size_t ns)
     {
         h += cut;
         
-        while ( h > fnCut )
+        while ( h > 1.0 )
         {
-            h -= fnCut;
+            h -= 1.0;
             a = b;
             ++p;
             assert_true(p<nbPoints());
             b.load(pPos+DIM*p);
         }
         
-        Vector w = a + ( h / fnCut ) * ( b - a );
+        Vector w = a + h * ( b - a );
         w.store(tmp+DIM*n);
     }
     
@@ -1574,7 +1575,7 @@ void Chain::resegment(size_t ns)
 
     // resize filament:
     setNbPoints(ns+1);
-    setSegmentation(cut);
+    setSegmentation(cut*fnCut);
     getPoints(tmp);
     free_real(tmp);
 }
