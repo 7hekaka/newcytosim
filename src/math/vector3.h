@@ -96,24 +96,21 @@ public:
     /// constant address of coordinate array
     real const* data()     const { return &XX; }
     
-#if ( 1 )
     /// implicit conversion to a modifiable real pointer
     operator real*()             { return &XX; }
     
     /// implicit conversion to a constant real pointer
     operator const real*() const { return &XX; }
-#else
+#if ( 0 )
     /// value of a coordinate
-    template< typename T >
-    real operator[](T i) const
+    real const& operator[](size_t i) const
     {
         assert_true(i<3);
         return (&XX)[i];
     }
     
     /// modifiable access to individual coordinates
-    template< typename T >
-    real& operator[](T i)
+    real& operator[](size_t i)
     {
         assert_true(i<3);
         return (&XX)[i];
@@ -760,7 +757,7 @@ public:
     /// scalar product of two vectors
     friend real dot(Vector3 const& a, Vector3 const& b)
     {
-#if VECTOR3_USES_AVX
+#if 0 //VECTOR3_USES_AVX
         vec2 axy = load2(&a.XX), bxy = load2(&b.XX);
         vec2 az = load1(&a.ZZ), bz = load1(&b.ZZ);
         vec2 d = fmadd2(az, bz, mul2(axy, bxy));

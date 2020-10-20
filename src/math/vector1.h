@@ -44,23 +44,21 @@ public:
     /// constant address of coordinate array
     real const* data()     const { return &XX; }
     
-#if ( 1 )
     /// implicit conversion to a modifiable real pointer
     operator real*()             { return &XX; }
     
     /// implicit conversion to a constant real pointer
     operator const real*() const { return &XX; }
-#else
+#if ( 0 )
     /// value of a coordinate
-    template< typename T >
-    real operator[](T i) const
+    real const& operator[](size_t i) const
     {
-        return ( d > 0 ) ? 0 : XX;
+        assert_true(i==0);
+        return XX;
     }
     
     /// modifiable access to individual coordinates
-    template< typename T >
-    real& operator[](T i)
+    real & operator[](size_t i)
     {
         assert_true(i==0);
         return XX;
