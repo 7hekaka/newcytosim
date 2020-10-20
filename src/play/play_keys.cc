@@ -30,7 +30,7 @@ void setVisible(T* p, int val)
 template< typename T >
 void flipVisible(T* p, int val)
 {
-    p->visible = ( p->visible ? 0 : val );
+    p->visible = ( p->visible != val ) * val;
     flashText("%s:visible = %i", p->name_str(), p->visible);
 }
 
@@ -333,16 +333,9 @@ void invertScale(FiberDisp* p, int)
 }
 
 
-void setColoring(FiberDisp* p, int val)
+void flashColoring(int val)
 {
-    p->coloring = val;
-}
-
-
-void changeColoring(FiberDisp* p, int)
-{
-    p->coloring = ( p->coloring + 1 ) % 9;
-    switch( p->coloring )
+    switch ( val )
     {
         case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");          break;
         case FiberDisp::COLORING_RANDOM:    flashText("Fibers: random coloring");      break;
@@ -353,7 +346,22 @@ void changeColoring(FiberDisp* p, int)
         case FiberDisp::COLORING_CLUSTER:   flashText("Fibers coloring by cluster");   break;
         case FiberDisp::COLORING_AGE:       flashText("Fibers coloring by age");       break;
         case FiberDisp::COLORING_PSTATE:    flashText("Fibers coloring by +end state");break;
+        default: flashText("unknown fiber:coloring mode"); break;
     }
+}
+
+
+void setColoring(FiberDisp* p, int val)
+{
+    p->coloring = ( p->coloring ? 0 : val );
+    flashColoring(p->coloring);
+}
+
+
+void changeColoring(FiberDisp* p, int inc)
+{
+    p->coloring = ( p->coloring + inc + 9 ) % 9;
+    flashColoring(p->coloring);
 }
 
 
@@ -371,9 +379,9 @@ void changeMask(FiberDisp* p, int val)
     flashText("fiber:mask_bitfield=0x%X (%i bits)", p->mask_bitfield, p->mask);
 }
 
-void changePointStyle(FiberDisp* p, int)
+void changePointStyle(FiberDisp* p, int inc)
 {
-    p->point_style = ( p->point_style + 1 ) % 5;
+    p->point_style = ( p->point_style + inc + 5 ) % 5;
     switch ( p->point_style )
     {
         case 0: flashText("Fibers: no points");    break;
@@ -385,9 +393,9 @@ void changePointStyle(FiberDisp* p, int)
 }
 
 
-void flashLineStyle(int style)
+void flashLineStyle(int val)
 {
-    switch ( style )
+    switch ( val )
     {
         case 0: flashText("Fibers: no lines");                     break;
         case 1: flashText("Fibers: lines");                        break;
@@ -399,18 +407,19 @@ void flashLineStyle(int style)
         case 7: flashText("Fiber color by distance to plus-end");  break;
         case 8: flashText("Fiber color by height");                break;
         case 9: flashText("Fiber color by grid (if style=3)");     break;
+        default: flashText("unknown fiber:line style");            break;
     }
 }
 
-void toggleLineStyle(FiberDisp* p, int mode)
+void toggleLineStyle(FiberDisp* p, int val)
 {
-    p->line_style = ( p->line_style != mode ) * mode;
+    p->line_style = ( p->line_style != val ) * val;
     flashLineStyle(p->line_style);
 }
 
-void changeLineStyle(FiberDisp* p, int)
+void changeLineStyle(FiberDisp* p, int inc)
 {
-    p->line_style = ( p->line_style + 1 ) % 9;
+    p->line_style = ( p->line_style + inc + 9 ) % 9;
     flashLineStyle(p->line_style);
 }
 
@@ -961,11 +970,11 @@ void processKey(unsigned char key)
             break;
             
         case 'c':
-            setFiberDisp(player.allVisibleFiberDisp(), changeColoring, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), changeColoring, 1);
             break;
                 
         case 'C':
-            setFiberDisp(player.allVisibleFiberDisp(), setColoring, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), setColoring, 1);
             break;
 
         case 167:
@@ -978,9 +987,9 @@ void processKey(unsigned char key)
 
         case '1':
             if ( altKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 0);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 1);
             else
-                setFiberDisp(player.allVisibleFiberDisp(), changeLineStyle, 0);
+                setFiberDisp(player.allVisibleFiberDisp(), changeLineStyle, 1);
             break;
             
         case '!':
