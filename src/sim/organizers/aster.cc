@@ -69,45 +69,45 @@ void Aster::setInteractions(Meca& meca) const
         {
             AsterLink const& link = asLinks[n];
             
-            if ( link.rank == 0 )
+            if ( link.rank_ == 0 )
                 continue;
             
-            const size_t off = sol->matIndex() + link.prime;
+            const size_t off = sol->matIndex() + link.prime_;
             const size_t pts[] = { off, off+1, off+2, off+3 };
 
 #ifdef BACKWARD_COMPATIBILITY
-            if ( link.alt > 0 )
+            if ( link.alt_ > 0 )
             {
-                meca.addLink(Mecapoint(sol, link.prime), fib->exactEnd(prop->focus), prop->stiffness[0]);
-                if ( fib->length() > link.len )
+                meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(prop->focus), prop->stiffness[0]);
+                if ( fib->length() > link.len_ )
                 {
-                    meca.addLink(Mecapoint(sol, link.alt), fib->interpolate(link.len, prop->focus), prop->stiffness[1]);
+                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolate(link.len_, prop->focus), prop->stiffness[1]);
                 }
                 else
                 {
                     FiberEnd tip = ( prop->focus == PLUS_END ? MINUS_END : PLUS_END );
                     // link the opposite end to an interpolation of the two solid-points:
-                    real c = fib->length() / link.len;
-                    meca.addLink(fib->exactEnd(tip), Interpolation(sol, link.prime, link.alt, c), prop->stiffness[1]);
+                    real c = fib->length() / link.len_;
+                    meca.addLink(fib->exactEnd(tip), Interpolation(sol, link.prime_, link.alt_, c), prop->stiffness[1]);
                 }
                 continue;
             }
 #endif
-            if ( link.rank == 1 )
-                meca.addLink(fib->exactEnd(prop->focus), Mecapoint(sol, link.prime), prop->stiffness[0]);
+            if ( link.rank_ == 1 )
+                meca.addLink(fib->exactEnd(prop->focus), Mecapoint(sol, link.prime_), prop->stiffness[0]);
             else
-                meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef1, prop->stiffness[0]);
+                meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef1_, prop->stiffness[0]);
             
             
             // make second type of link:
-            real len = link.len;
+            real len = link.len_;
             
             if ( fib->length() >= len )
             {
                 if ( len > 0 )
-                    meca.ADDLINK(fib->interpolate(len, prop->focus), pts, link.coef2, prop->stiffness[1]);
+                    meca.ADDLINK(fib->interpolate(len, prop->focus), pts, link.coef2_, prop->stiffness[1]);
                 else
-                    meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef2, prop->stiffness[1]);
+                    meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef2_, prop->stiffness[1]);
             }
             else
             {
@@ -117,7 +117,7 @@ void Aster::setInteractions(Meca& meca) const
                 real u = 1.0 - c;
                 real coef[4];
                 for ( int d = 0; d < 4; ++d )
-                    coef[d] = u * link.coef1[d] + c * link.coef2[d];
+                    coef[d] = u * link.coef1_[d] + c * link.coef2_[d];
                 meca.ADDLINK(fib->exactEnd(end), pts, coef, prop->stiffness[1]);
             }
         }
@@ -304,8 +304,8 @@ void Aster::placeAnchor(Vector const& A, Vector const& B, size_t ref)
     AsterLink & link = asLinks.new_val();
     //std::clog << "Aster::placeAnchor(" << asLinks.size() << ")\n";
     link.set(A, B);
-    link.len *= asRadius;
-    link.prime = ref;
+    link.len_ *= asRadius;
+    link.prime_ = ref;
     //link.print(std::clog);
 }
 
@@ -598,27 +598,18 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() < 47 )
         {
-            asLinks[i].reset();
-            unsigned a = in.readUInt16();
-            unsigned b = in.readUInt16();
-            if ( b >= sol->nbPoints() )
-                throw InvalidIO("invalid AsterLink index");
-            asLinks[i].prime = a;
-            asLinks[i].coef1[0] = 1.0;
-            asLinks[i].alt = b;
-            asLinks[i].len = (sol->posPoint(a)-sol->posPoint(b)).norm();
+            asLinks[i].readOldFormat(in, sol);
             continue;
         }
 #endif
-        asLinks[i].read(in);
-        asLinks[i].len *= asRadius;
-        if ( asLinks[i].prime + asLinks[i].rank >= sol->nbPoints() )
+        asLinks[i].read(in, asRadius);
+        if ( asLinks[i].prime_ + asLinks[i].rank_ > sol->nbPoints() )
             throw InvalidIO("invalid AsterLink index");
     }
     
     if ( nbf > 0 )
     {
-        const size_t ref = asLinks[0].prime;
+        const size_t ref = asLinks[0].prime_;
         asRadius = ( sol->posPoint(ref) - sol->posPoint(ref) ).norm();
     }
 }
@@ -630,11 +621,11 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 Vector Aster::posLink1(size_t inx) const
 {
     Solid const* sol = solid();
-    real const* coef = asLinks[inx].coef1;
-    const size_t ref = asLinks[inx].prime;
+    real const* coef = asLinks[inx].coef1_;
+    const size_t ref = asLinks[inx].prime_;
     
 #ifdef BACKWARD_COMPATIBILITY
-    if ( asLinks[inx].alt > 0 )
+    if ( asLinks[inx].alt_ > 0 )
         return sol->posPoint(ref);
 #endif
 
@@ -649,12 +640,12 @@ Vector Aster::posLink1(size_t inx) const
 Vector Aster::posLink2(size_t inx) const
 {
     Solid const* sol = solid();
-    real const* coef = asLinks[inx].coef2;
-    const size_t ref = asLinks[inx].prime;
+    real const* coef = asLinks[inx].coef2_;
+    const size_t ref = asLinks[inx].prime_;
     
 #ifdef BACKWARD_COMPATIBILITY
-    if ( asLinks[inx].alt > 0 )
-        return sol->posPoint(asLinks[inx].alt);
+    if ( asLinks[inx].alt_ > 0 )
+        return sol->posPoint(asLinks[inx].alt_);
 #endif
 
     size_t top = std::min(DIM+1LU, sol->nbPoints());
@@ -668,7 +659,7 @@ Vector Aster::posLink2(size_t inx) const
 Vector Aster::posFiber2(size_t inx) const
 {
     Fiber const* fib = fiber(inx);
-    real len = asLinks[inx].len;
+    real len = asLinks[inx].len_;
     
     if ( fib->length() >= len )
     {
@@ -691,7 +682,7 @@ Vector Aster::posFiber2(size_t inx) const
  */
 real Aster::getLink1(size_t inx, Vector& pos1, Vector& pos2) const
 {
-    if ( inx < asLinks.size() && asLinks[inx].rank > 0 )
+    if ( inx < asLinks.size() && asLinks[inx].rank_ > 0 )
     {
         pos1 = posLink1(inx);
         if ( fiber(inx) )
@@ -711,13 +702,13 @@ real Aster::getLink1(size_t inx, Vector& pos1, Vector& pos2) const
  */
 real Aster::getLink2(size_t inx, Vector& pos1, Vector& pos2) const
 {
-    if ( inx < asLinks.size() && asLinks[inx].rank > 0 )
+    if ( inx < asLinks.size() && asLinks[inx].rank_ > 0 )
     {
         Fiber const* fib = fiber(inx);
 
         if ( fib )
         {
-            real len = asLinks[inx].len;
+            real len = asLinks[inx].len_;
             if ( fib->length() >= len )
             {
                 pos1 = posLink2(inx);

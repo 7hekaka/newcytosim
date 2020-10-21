@@ -30,6 +30,9 @@ private:
     /// number of interpolated points (order)
     size_t        rank_;
 
+    /// calculate rank: how many coefficients are not null
+    size_t calcRank() const;
+    
 public:
     
     /// set pointers to null

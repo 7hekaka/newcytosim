@@ -20,25 +20,25 @@ private:
     /// type of link:
     /**
      0 = no link
-     1 = link fiber-end with coef1, fiber-side with coef2
-     2 = the interpolation corresponds exactly to point 'ref'
+     1 = the interpolation corresponds exactly to point 'prime_'
+     2 or 3 = link fiber-end with coef1_, fiber-side with coef2_
      */
-    size_t   rank;
+    size_t   rank_;
 
     /// index of first point on the Solid
-    size_t   prime;
+    size_t   prime_;
     
     /// interpolation coefficient for Fiber end
-    real     coef1[4];
+    real     coef1_[4];
     
     /// interpolation coefficient for Fiber side
-    real     coef2[4];
+    real     coef2_[4];
     
     /// distance between the two anchoring points
-    real     len;
+    real     len_;
     
     /// index used for backward compatibility
-    size_t   alt;
+    size_t   alt_;
     
 public:
     
@@ -48,92 +48,121 @@ public:
         reset();
     }
     
+    /// set to zero
     void reset()
     {
-        rank = 0;
-        prime = 0;
-        len = 0;
+        rank_ = 0;
+        prime_ = 0;
+        len_ = 0;
         for ( int i = 0; i < 4; ++i )
         {
-            coef1[i] = 0.0;
-            coef2[i] = 0.0;
+            coef1_[i] = 0.0;
+            coef2_[i] = 0.0;
         }
-        alt = 0;
+        alt_ = 0;
     }
     
-    void set(Vector const& A, Vector const& B)
+    /// calculate rank: how many coefficients are not null
+    size_t calcRank() const
     {
-        len = ( A - B ).norm();
-        
-        coef1[1] = A.XX;
-        coef2[1] = B.XX;
-#if ( DIM == 1 )
-        coef1[2] = 0.0;
-        coef2[2] = 0.0;
-        coef1[3] = 0.0;
-        coef2[3] = 0.0;
-        coef1[0] = 1.0 - A.XX;
-        coef2[0] = 1.0 - B.XX;
-#elif ( DIM == 2 )
-        coef1[2] = A.YY;
-        coef2[2] = B.YY;
-        coef1[3] = 0.0;
-        coef2[3] = 0.0;
-        coef1[0] = 1.0 - A.XX - A.YY;
-        coef2[0] = 1.0 - B.XX - B.YY;
-#elif ( DIM == 3 )
-        coef1[2] = A.YY;
-        coef2[2] = B.YY;
-        coef1[3] = A.ZZ;
-        coef2[3] = B.ZZ;
-        coef1[0] = 1.0 - A.XX - A.YY - A.ZZ;
-        coef2[0] = 1.0 - B.XX - B.YY - B.ZZ;
-#endif
-        if ( A.norm_inf() < REAL_EPSILON )
-            rank = 1;
-        else
-            rank = 1+DIM;
+        size_t res = 4;
+        while ((res > 0) & (abs_real(coef1_[res-1]) < REAL_EPSILON))
+            --res;
+        return res;
     }
 
+    /// set to interpolate from A to B
+    void set(Vector const& A, Vector const& B)
+    {
+        len_ = ( A - B ).norm();
+        
+        coef1_[1] = A.XX;
+        coef2_[1] = B.XX;
+#if ( DIM == 1 )
+        coef1_[2] = 0.0;
+        coef2_[2] = 0.0;
+        coef1_[3] = 0.0;
+        coef2_[3] = 0.0;
+        coef1_[0] = 1.0 - A.XX;
+        coef2_[0] = 1.0 - B.XX;
+#elif ( DIM == 2 )
+        coef1_[2] = A.YY;
+        coef2_[2] = B.YY;
+        coef1_[3] = 0.0;
+        coef2_[3] = 0.0;
+        coef1_[0] = 1.0 - A.XX - A.YY;
+        coef2_[0] = 1.0 - B.XX - B.YY;
+#elif ( DIM == 3 )
+        coef1_[2] = A.YY;
+        coef2_[2] = B.YY;
+        coef1_[3] = A.ZZ;
+        coef2_[3] = B.ZZ;
+        coef1_[0] = 1.0 - A.XX - A.YY - A.ZZ;
+        coef2_[0] = 1.0 - B.XX - B.YY - B.ZZ;
+#endif
+        rank_ = calcRank();
+    }
+
+    /// save coefficient to file
     void write(Outputter& out) const
     {
-        out.writeUInt16(prime);
+        out.writeUInt16(prime_);
         for ( int d = 1; d < 4; ++d )
-            out.writeFloat(coef1[d]);
+            out.writeFloat(coef1_[d]);
         for ( int d = 1; d < 4; ++d )
-            out.writeFloat(coef2[d]);
+            out.writeFloat(coef2_[d]);
     }
     
-    void read(Inputter& in)
+    /// read coefficient from file
+    void read(Inputter& in, real rad)
     {
-        prime = in.readUInt16();
+        prime_ = in.readUInt16();
         
         for ( int d = 1; d < 4; ++d )
-            coef1[d] = in.readFloat();
-        coef1[0] = 1.0 - coef1[1] - coef1[2] - coef1[3];
+            coef1_[d] = in.readFloat();
+        coef1_[0] = 1.0 - coef1_[1] - coef1_[2] - coef1_[3];
         
         for ( int d = 1; d < 4; ++d )
-            coef2[d] = in.readFloat();
-        coef2[0] = 1.0 - coef2[1] - coef2[2] - coef2[3];
+            coef2_[d] = in.readFloat();
+        coef2_[0] = 1.0 - coef2_[1] - coef2_[2] - coef2_[3];
         
-        len = (Vector3(coef1+1)-Vector3(coef2+1)).norm();
-        
-        if ( abs_real(coef1[1]) + abs_real(coef1[2]) + abs_real(coef1[3]) < REAL_EPSILON )
-            rank = 1;
-        else
-            rank = DIM;
+        len_ = rad * ( Vector3(coef1_+1) - Vector3(coef2_+1) ).norm();
+        rank_ = calcRank();
     }
     
+#ifdef BACKWARD_COMPATIBILITY
+    void readOldFormat(Inputter& in, Solid const* sol)
+    {
+        reset();
+        prime_ = in.readUInt16();
+        alt_ = in.readUInt16();
+        coef1_[0] = 1.0;
+        len_ = ( sol->posPoint(prime_) - sol->posPoint(alt_) ).norm();
+        rank_ = 1;
+        if ( prime_ >= sol->nbPoints() )
+            throw InvalidIO("invalid AsterLink index");
+        if ( alt_ >= sol->nbPoints() )
+            throw InvalidIO("invalid AsterLink index");
+    }
+#endif
+    
+    /// help to debugging
     void print(std::ostream& out) const
     {
         const unsigned w = 9;
-        out << std::setw(w) << coef1[0];
+        out << std::setw(w) << coef1_[0];
         for ( int d = 1; d < 4; ++d )
-            out << " " << std::setw(w) << coef1[d];
-        out << "   " << std::setw(w) << coef2[0];
+            out << " " << std::setw(w) << coef1_[d];
+        out << "   " << std::setw(w) << coef2_[0];
         for ( int d = 1; d < 4; ++d )
-            out << " " << std::setw(w) << coef2[d];
+            out << " " << std::setw(w) << coef2_[d];
         out << "\n";
+    }
+
+    friend std::ostream& operator << (std::ostream& os, AsterLink const& arg)
+    {
+        arg.print(os);
+        return os;
     }
 };
 

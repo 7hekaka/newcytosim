@@ -37,6 +37,15 @@ void Interpolation4::set(Mecable const* m, size_t p)
     coef_[3] = 0.0;
 }
 
+
+size_t Interpolation4::calcRank() const
+{
+    size_t res = 4;
+    while ((res > 0) & (abs_real(coef_[res-1]) < REAL_EPSILON))
+        --res;
+    return res;
+}
+
 /**
 Coefficient 'c' determines the position between 'P' and 'Q':
 - with ( c == 0 ) the point is equal to Q
@@ -92,10 +101,7 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
     coef_[0] = 1.0 - vec.XX - vec.YY - vec.ZZ;
 #endif
 
-    if ( vec.norm_inf() < REAL_EPSILON )
-        rank_ = 1;
-    else
-        rank_ = 1+DIM;
+    rank_ = calcRank();
 
     // the last point to be interpolated is ( prime_ + rank_ -1 )
     assert_true(prime_+rank_ <= m->nbPoints());
@@ -216,9 +222,7 @@ void Interpolation4::read(Inputter& in, Simul& sim)
             coef_[d] = in.readFloat();
         // set derived variables:
         coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
-        rank_ = 4;
-        while ((rank_ > 0) & (abs_real(coef_[rank_-1]) < REAL_EPSILON))
-            --rank_;
+        rank_ = calcRank();
     }
     else
         clear();
