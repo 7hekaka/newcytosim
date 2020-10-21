@@ -1704,7 +1704,7 @@ void Chain::adjustSegmentation()
 
 void Chain::adjustSegmentation(real arg)
 {
-    if ( fnSegmentation != arg )
+    if ( (float)fnSegmentation != (float)arg )
     {
         std::clog << reference() << " segmentation <- " << arg << "\n";
         fnSegmentation = arg;
