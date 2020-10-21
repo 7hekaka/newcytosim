@@ -58,8 +58,7 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
             if ( a == "none" )
                 return new FiberProp(nom);
 
-
-            std::cerr << "INCIDENT: substituting generic Fiber class for `"+a+"'\n";
+            std::cerr << "INCIDENT: substituting generic Fiber for unknown `"+a+"'\n";
             return new FiberProp(nom);
             //throw InvalidParameter("unknown fiber:activity `"+a+"'");
         }

@@ -1612,6 +1612,23 @@ void Fiber::setGlueG(Single* glue, FiberEnd end)
 
 
 /**
+ This associates a Single to the end of the Fiber at any time
+ */
+void Fiber::setGlueE(Single* glue, FiberEnd end)
+{
+    if ( glue->attached() )
+    {
+        glue->moveToEnd(end);
+    }
+    else if ( isGrowing(end) )
+    {
+        glue->attachEnd(this, end);
+        glue->unbase();
+    }
+}
+
+
+/**
  Search for a glue in the list of bound HandSingle
  this is useful when a simulation is restarted from file
  */
@@ -1653,6 +1670,7 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end)
         case 2: setGlue2(glue, end, prop->confine_space_ptr); break;
         case 3: setGlue3(glue, prop->confine_space_ptr); break;
         case 4: setGlueG(glue, end); break;
+        case 5: setGlueE(glue, end); break;
         default: throw InvalidParameter("invalid value of fiber:glue");
     }
     

@@ -381,8 +381,11 @@ public:
     /// set Space glue for pushing and pulling
     void           setGlue3(Single* glue, Space const*);
     
-    /// set Solid glue
+    /// set Solid glue type 4
     void           setGlueG(Single* glue, FiberEnd);
+    
+    /// set Solid glue type 5
+    void           setGlueE(Single* glue, FiberEnd);
 
     /// a setGlue to rule them all
     void           setGlue(Single*& glue, FiberEnd);
