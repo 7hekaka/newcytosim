@@ -232,12 +232,10 @@ enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  inside the Space, and the density will thus be exactly what is specified from the
  `position` range (here 100/10*10 = 1 object per squared micrometer).
  */
-Isometry Interface::find_placement(Glossary& opt, int placement)
+Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trials)
 {
-    size_t n = 0, nb_trials = 1<<13;
+    size_t ouf = 0;
     std::string str;
-    
-    opt.set(nb_trials, "nb_trials");
 
     Space const* spc = simul.spaces.master();
     if ( opt.set(str, "placement", 1) )
@@ -248,7 +246,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement)
     
     Isometry iso;
 
-    while ( ++n < nb_trials )
+    while ( ++ouf < nb_trials )
     {
         // generate a new position:
         iso = read_placement(opt);
@@ -318,6 +316,9 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         throw InvalidSyntax("undefined class `"+name+"'");
     }
     
+    size_t ouf = 0, nb_trials = 1<<14;
+    opt.set(nb_trials, "nb_trials");
+
     do {
         
         // create the objects:
@@ -350,28 +351,33 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
         
         if ( placement != PLACE_NOT )
         {
-            Isometry iso = find_placement(opt, placement);
+            // find a position:
+            Isometry iso = find_placement(opt, placement, nb_trials);
+            // place object at this position:
             ObjectSet::moveObjects(res, iso);
             // special case for which we check all vertices:
             if ( placement == PLACE_ALL_INSIDE )
             {
+                std::string str;
+                Space const* spc = simul.spaces.master();
+                if ( opt.set(str, "placement", 1) )
+                    spc = simul.findSpace(str);
                 for ( Object * i : res )
                 {
                     Mecable * mec = Simul::toMecable(i);
-                    if ( mec )
+                    if ( mec && ! mec->allInside(spc) )
                     {
-                        std::string str;
-                        Space const* spc = simul.spaces.master();
-                        if ( opt.set(str, "placement", 1) )
-                            spc = simul.findSpace(str);
-                        if ( ! mec->allInside(spc) )
-                            res.destroy();
-                        continue;
+                        res.destroy();
+                        break;
                     }
                 }
             }
         }
-        
+        if ( ++ouf > nb_trials )
+        {
+            Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
+            break;
+        }
     } while ( res.empty() );
     
     // optionally mark the objects:
