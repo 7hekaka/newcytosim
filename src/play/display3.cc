@@ -607,6 +607,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 {
     FiberDisp const*const disp = fib.prop->disp;
 
+    glEnable(GL_LIGHTING);
     GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat bak[] = { 0.0, 0.0, 0.0, 1.0 };
     disp->back_color.store(bak);

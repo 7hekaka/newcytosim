@@ -115,8 +115,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(lattice_scale,    "lattice_scale", 0, "lattice", 1);
     glos.set(lattice_rescale,  "lattice", 2);
 
-    key = glos.has_key("label") ? "label" : "labels";
-    glos.set(label_style,      "label_style", 0, key, 0);
+    glos.set(label_style, "label_style", 0, "labels", 0);
 
     key = glos.has_key("speckle") ? "speckle" : "speckles";
     glos.set(speckle_size,     "speckle_size", 0, key, 0);

@@ -219,7 +219,7 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
     // parse user-provided values:
     if ( fp->display_fresh )
     {
-        disp->read_string(fp->display, " in "+fp->name()+":display");
+        disp->read_string(fp->display, fp->name()+":display");
         fp->display_fresh = false;
     }
     
@@ -400,7 +400,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
     // parse display string once:
     if ( p->display_fresh )
     {
-        disp->read_string(p->display, " in "+p->name()+":display");
+        disp->read_string(p->display, p->name()+":display");
         p->display_fresh = false;
     }
     
@@ -955,6 +955,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     glDisable(GL_LIGHTING);
     if ( disp->line_style == 6 )
     {
+        // color by distance to Minus end
         const real beta = fib.segmentation() / disp->length_scale;
         glBegin(GL_LINE_STRIP);
         color_by_distanceM(fib, inx, beta).load();
@@ -974,6 +975,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     else if ( disp->line_style == 7 )
     {
+        // color by distance to Plus end
         const real beta = fib.segmentation() / disp->length_scale;
         glBegin(GL_LINE_STRIP);
         color_by_distanceP(fib, inx, beta).load();
@@ -1152,6 +1154,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     const real fac = 1.0 / disp->lattice_scale;
 
     lineWidth(width);
+    glDisable(GL_LIGHTING);
     glBegin(GL_LINE_STRIP);
     if ( inf == sup )
     {
@@ -1211,6 +1214,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     const real fac = 1.0 / disp->lattice_scale;
 
     lineWidth(width);
+    glDisable(GL_LIGHTING);
     glBegin(GL_LINE_STRIP);
     if ( inf == sup )
     {
@@ -1264,6 +1268,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
 
     fib.disp->color.load();
     pointSize(fib.prop->disp->point_size);
+    glDisable(GL_LIGHTING);
     glBegin(GL_POINTS);
     for ( auto h = inf+1; h <= sup; ++h )
         gle::gleVertex(fib.posM(uni*h-fib.abscissaM()));
@@ -1271,33 +1276,32 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
 }
 
 
-void Display::drawFiberLabels(Fiber const& fib, void* font) const
+void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
     char str[32];
 
     glDisable(GL_LIGHTING);
-    if ( disp->label_style & 1 )
+    if ( style & 1 )
     {
-        // draw fiber name and vertex indices
-        int n = snprintf(str, sizeof(str), " %u ", fib.identity());
+        // draw fiber identity and vertex indices
+        int C = snprintf(str, sizeof(str), " %u ", fib.identity());
         for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
         {
-            snprintf(str+n, sizeof(str)-n, "%lu", ii);
+            snprintf(str+C, sizeof(str)-C, "%lu", ii);
+            gle::gleDrawText(fib.posP(ii), str, font);
+        }
+    } 
+    else if ( style & 2 )
+    {
+        // draw fiber identity and abscissa value at vertices
+        int C = snprintf(str, sizeof(str), " %u ", fib.identity());
+        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
+        {
+            snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(ii));
             gle::gleDrawText(fib.posP(ii), str, font);
         }
     }
-    if ( disp->label_style & 2 )
-    {
-        // draw fiber name and abscissa value at vertices
-        int n = snprintf(str, sizeof(str), " %u ", fib.identity());
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-        {
-            snprintf(str+n, sizeof(str)-n, "%.3f", fib.abscissaPoint(ii));
-            gle::gleDrawText(fib.posP(ii), str, font);
-        }
-    }
-    if ( disp->label_style & 4 )
+    if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
@@ -1314,10 +1318,22 @@ void Display::drawFiberLabels(Fiber const& fib, void* font) const
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
         gle::gleDrawText(fib.posEndP(), str, font);
     }
+    if ( style & 8 )
+    {
+        // indicate tension values in the segments
+        Vector a = fib.posEndM();
+        for ( size_t ii = 1; ii < fib.nbPoints(); ++ii )
+        {
+            Vector b = fib.posPoint(ii);
+            snprintf(str, sizeof(str), "%+7.2f", fib.tension(ii-1));
+            gle::gleDrawText(0.5*(a+b), str, font);
+            a = b;
+        }
+    }
 }
 
 
-/// display forces acting on the vertices, with lines
+/// display forces acting on the fiber's vertices, using lines scaled by 'scale'
 void Display::drawFiberForces(Fiber const& fib, real scale) const
 {
     glDisable(GL_LIGHTING);
@@ -1648,7 +1664,8 @@ void Display::drawFiber(Fiber const& fib)
 
     if ( disp->point_style > 0 )
     {
-        fib.disp->color.load_load();
+        //fib.disp->color.load_load();
+        disp->color.load_load();
         disp->back_color.load_back();
         drawFiberPoints(fib);
     }
@@ -1666,7 +1683,7 @@ void Display::drawFiber(Fiber const& fib)
         if ( disp->label_style )
         {
             fib.disp->color.load(0.5);
-            drawFiberLabels(fib, GLUT_BITMAP_HELVETICA_10);
+            drawFiberLabels(fib, disp->label_style, GLUT_BITMAP_HELVETICA_10);
         }
         
         if ( disp->end_style[1] )
