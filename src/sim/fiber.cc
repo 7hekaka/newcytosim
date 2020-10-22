@@ -20,9 +20,8 @@ void Fiber::step()
 {
     assert_small( length1() - length() );
 #if FIBER_HAS_GLUE
-    //add single that act like glue
     if ( prop->glue )
-        setGlue(frGlue, PLUS_END);
+        setGlue(frGlue, PLUS_END, prop->glue);
 #endif
 #if NEW_FIBER_CHEW
     if ( frChewP > 0 )
@@ -1129,7 +1128,6 @@ void Fiber::updateFiber()
         ha->checkFiberRange();
         ha = nx;
     }
-    
 #if FIBER_HAS_LATTICE
     // this will allocate the Lattice's site to cover the range of Abscissa:
     if ( frLattice.ready() )
@@ -1657,14 +1655,19 @@ void Fiber::makeGlue(Single*& glue)
 
 
 /**
- setGlue() creates Single when MT interact with the edge of the Space
+ setGlue() creates a Single associated with this Fiber, used to implement
+ specific effects or interactions associated with the tip of the Fiber:
+ - glue type 1, 2 and 3 anchor themselves at the edge of the Space
+ - glue type 4 and 5 anchor themselves on Solids
+ .
+ This was used for example to implement cortical anchors for astral microtubules.
 */
-void Fiber::setGlue(Single*& glue, const FiberEnd end)
+void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
 {
     if ( !glue )
         makeGlue(glue);
     
-    switch( prop->glue )
+    switch( mode )
     {
         case 1: setGlue1(glue, end, prop->confine_space_ptr); break;
         case 2: setGlue2(glue, end, prop->confine_space_ptr); break;

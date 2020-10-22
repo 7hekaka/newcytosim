@@ -388,7 +388,7 @@ public:
     void           setGlueE(Single* glue, FiberEnd);
 
     /// a setGlue to rule them all
-    void           setGlue(Single*& glue, FiberEnd);
+    void           setGlue(Single*& glue, FiberEnd, int mode);
     
     /// create a Single that can be used as glue
     void           makeGlue(Single*& glue);
