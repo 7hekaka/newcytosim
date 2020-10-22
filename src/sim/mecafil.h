@@ -152,7 +152,7 @@ public:
      - positive when the segment is being pulled
      - negative when the segment is under compression
      .
-     It is given in units of force (pico-Newton, if all quantitites use our units).
+     It is given in units of force (picoNewton, if all quantitites use Cytosim's units).
      */
     real        tension(size_t p) const { assert_true(p+1<nPoints); return iLag[p]; }
     
