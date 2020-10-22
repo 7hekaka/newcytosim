@@ -40,7 +40,7 @@
  Add correction term to the constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
 */
-#define ADD_PROJECTION_DIFF 0
+#define ADD_PROJECTION_DIFF 1
 
 
 /**
@@ -1484,7 +1484,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     
     /*
      Add Brownian contributions and calculate Minimum value of it
-      vFOR <- vFOR + Noise
+      vFOR <- vFOR + mobility_coefficient * vRND
       vRHS <- P * vFOR:
      */
     #pragma omp parallel num_threads(NUM_THREADS)
@@ -1696,7 +1696,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      In this way the result returned to the fibers does not sum-up to zero,
      and is appropriate for example to calculate the effect of force on assembly.
      */
-    calculateForces(vPTS, vBAS, vFOR);
+    //calculateForces(vPTS, vBAS, vFOR);
     ready_ = 1;
 
     // report on the matrix type and size, sparsity, and the number of iterations
