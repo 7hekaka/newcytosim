@@ -180,7 +180,7 @@ public:
     bool        hasProjectionDiff() const { return useProjectionDiff; }
 
     /// add displacements due to the Brownian motion to rhs[]
-    real        addBrownianForces(real const* rnd, real alpha, real* rhs) const;
+    real        addBrownianForces(real const* rnd, real, real* rhs) const;
 
     /// calculate the speeds from the forces, including projection
     void        projectForces(const real* X, real* Y) const;

@@ -671,8 +671,9 @@ void Solid::fixShape()
     // set reference to current shape translated to be centered:
     for ( size_t p = 0; p < soShapeSize; ++p )
     {
-        for ( size_t d = 0; d < DIM; ++d )
-            soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
+        ( Vector(pPos+DIM*p) - avg ).store(soShape+DIM*p);
+        //for ( size_t d = 0; d < DIM; ++d )
+        //    soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
 }
 
@@ -722,9 +723,10 @@ void Solid::rescale()
         // scale the shape around the center of gravity:
         for ( size_t p = 0; p < nPoints; ++p )
         {
-            real * pos = pPos + DIM * p;
-            for ( size_t d = 0; d < DIM; ++d )
-                pos[d] = scale * ( pos[d] - avg[d] ) + avg[d];
+            real * ptr = pPos + DIM * p;
+            (avg+scale*(Vector(ptr)-avg)).store(ptr);
+            //for ( size_t d = 0; d < DIM; ++d )
+            //    ptr[d] = scale * ( ptr[d] - avg[d] ) + avg[d];
         }
     }
 }
@@ -988,7 +990,7 @@ void Solid::prepareMecable()
 }
 
 
-real Solid::addBrownianForces(real const* rnd, real sc, real* rhs) const
+real Solid::addBrownianForces(real const* rnd, real alpha, real* rhs) const
 {
     const real drag = prop->viscosity * soDrag;
 
@@ -996,7 +998,7 @@ real Solid::addBrownianForces(real const* rnd, real sc, real* rhs) const
         return INFINITY;
     
     // amplitude of Brownian motion
-    const real b = std::sqrt( 2 * sc * drag / (real)nPoints );
+    const real b = std::sqrt( 2 * alpha * drag / (real)nPoints );
 
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];

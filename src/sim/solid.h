@@ -131,7 +131,7 @@ public:
     void        projectForces0(const real* X, real* Y) const;
 
     /// add contribution of Brownian forces
-    real        addBrownianForces(real const* rnd, real sc, real* rhs) const;
+    real        addBrownianForces(real const* rnd, real, real* rhs) const;
     
     /// Stochastic simulation
     void        step();

@@ -112,7 +112,7 @@ public:
     //------------------- technical functions and mathematics ------------------
         
     /// add contribution of Brownian forces
-    real        addBrownianForces(real const* rnd, real sc, real* rhs) const;
+    real        addBrownianForces(real const* rnd, real, real* rhs) const;
 
     /// bring all surface points at distance spRadius from center, by moving them radially
     void        reshape();

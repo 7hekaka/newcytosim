@@ -91,10 +91,10 @@ void Bead::setInteractions(Meca& meca) const
 }
 
 
-real Bead::addBrownianForces(real const* rnd, real sc, real* rhs) const
+real Bead::addBrownianForces(real const* rnd, real alpha, real* rhs) const
 {
     // Brownian amplitude:
-    real b = std::sqrt( 2 * sc * paDrag );
+    real b = std::sqrt( 2 * alpha * paDrag );
 
     for ( size_t d = 0; d < DIM; ++d )
         rhs[d] += b * rnd[d];
