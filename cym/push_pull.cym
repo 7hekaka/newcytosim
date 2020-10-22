@@ -4,7 +4,7 @@
 set simul system
 {
     time_step = 0.001
-    viscosity = 1
+    viscosity = 0.1
     precondition = 0
 }
 
@@ -23,7 +23,7 @@ set fiber microtubule
     rigidity = 100
     segmentation = 0.5
     confine = inside, 1000
-    display = ( color=blue; point=3,1; line=10,2; tension_scale=10; )
+    display = ( color=blue; point=8,1; line=10,2; tension_scale=10; forces=0.1; labels=8; )
 }
 
 set hand binder
@@ -49,7 +49,7 @@ new 1 microtubule
     direction = 1 0 0
 }
 
-% with an extension of 1um and a stiffness of 1, the tension is ~10 pN
+% with an extension of 1 um and a stiffness of 1, the tension is ~10 pN
 set single link
 {
     hand = binder
