@@ -290,9 +290,8 @@ void Player::displayCytosim()
     }
     catch(Exception & e)
     {
-        e << " in display";
         print_blue(std::cerr, e.brief());
-        std::cerr << e.info() << '\n';
+        std::cerr << e.info() << " (display)\n";
     }
 }
 
@@ -312,9 +311,8 @@ void Player::readDisplayString(View& view, std::string const& str)
     }
     catch( Exception & e )
     {
-        e << " while reading simul:display";
         print_blue(std::cerr, e.brief());
-        std::cerr << e.info() << '\n';
+        std::cerr << e.info() << " (simul:display)\n";
     }
 }
 

@@ -222,7 +222,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
             opt.set(str, var, 2);
             Glossary fopt(str);
             res.append(makeFiber(sim, cnt, tif, fopt));
-            fopt.print_warning(std::cerr, 1, " in aster:nucleate[1]");
+            fopt.print_warning(std::cerr, 1, "aster:nucleate[1]");
             ++cnt;
             var = "fiber" + std::to_string(cnt+1);
         }
@@ -252,7 +252,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         {
             for ( size_t n = 0; n < nbf; ++n )
                 res.append(makeFiber(sim, n, tif, fopt));
-            fopt.print_warning(std::cerr, nbf, " in aster:nucleate[1]\n");
+            fopt.print_warning(std::cerr, nbf, "aster:nucleate[1]");
         }
     }
     return res;

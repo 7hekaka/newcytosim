@@ -643,10 +643,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             }
             catch( Exception & e )
             {
-                if ( section.size() )
-                    e << " in section " + section;
                 print_blue(std::cerr, e.brief());
-                std::cerr << e.info() << '\n';
+                std::cerr << e.info() << " ("+section+")\n";
                 if ( objset )
                     in.skip_until("#section ");
             }

@@ -130,7 +130,7 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
 
     //std::clog << "nucleated fiber in direction " << fib->dirEndM() << "\n";
 
-    opt.print_warning(std::cerr, 1, " in nucleator's spec\n");
+    opt.print_warning(std::cerr, 1, "nucleator:spec");
 }
 
 

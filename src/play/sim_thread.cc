@@ -510,9 +510,8 @@ void SimThread::exportObjects(bool binary)
     }
     catch( Exception & e )
     {
-        e << " in Simul::exportObjects()";
         print_blue(std::cerr, e.brief());
-        std::cerr << e.info() << '\n';
+        std::cerr << e.info() << " (export objects)\n";
     }
     unlock();
 }
@@ -526,9 +525,8 @@ void SimThread::writeProperties(std::ostream& os, bool prune)
     }
     catch( Exception & e )
     {
-        e << " in Simul::writeProperties()";
         print_blue(std::cerr, e.brief());
-        std::cerr << e.info() << '\n';
+        std::cerr << e.info() << " (write properties)\n";
     }
     unlock();
 }
