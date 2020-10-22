@@ -221,6 +221,12 @@ public:
     }
     
     /// the 2D norm = std::sqrt(x^2+y^2)
+    real normXYSqr() const
+    {
+        return XX*XX;
+    }
+
+    /// the 2D norm = std::sqrt(x^2+y^2)
     real normXY() const
     {
         return abs_real(XX);

@@ -329,6 +329,12 @@ public:
     {
         return 1.0 / std::sqrt(XX*XX + YY*YY);
     }
+    
+    /// the 2D norm = std::sqrt(x^2+y^2)
+    real normXYSqr() const
+    {
+        return XX*XX + YY*YY;
+    }
 
     /// the 2D norm = std::sqrt(x^2+y^2)
     real normXY() const
