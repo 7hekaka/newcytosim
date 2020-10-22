@@ -184,7 +184,7 @@ void display(View&, int)
             const float* v = ico->vertex_data(ii);
             Vector3 pos(v[0], v[1], v[2]);
             snprintf(tmp, sizeof(tmp), "%u", ii);
-            gleDrawText(pos, tmp, GLUT_BITMAP_8_BY_13);
+            gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13);
         }        
     }
     

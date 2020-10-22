@@ -780,7 +780,7 @@ void View::displayMagnifier(GLint Z, Vector3 foc, GLint mX, GLint mY) const
 
 void View::drawText(std::string const& str, void* font, gle_color col, int pos) const
 {
-    gleDrawText(str.c_str(), font, col, pos, width(), height());
+    gle::drawText(str.c_str(), font, col, pos, width(), height());
 }
 
 //------------------------------------------------------------------------------

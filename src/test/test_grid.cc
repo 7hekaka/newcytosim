@@ -203,7 +203,7 @@ void display(View&, int)
             Vector x;
             myGrid.setPositionFromIndex(x, cell_indx+offset[i], 0.4);
             snprintf(str, sizeof(str), "%lu", i);
-            gleDrawText(x, str, GLUT_BITMAP_HELVETICA_10);
+            gle::drawText(x, str, GLUT_BITMAP_HELVETICA_10);
         }
     }
     else

@@ -377,23 +377,23 @@ namespace gle
 #pragma mark -
 
     /// return height in pixel of GLUT font
-    int  gleLineHeight(void* font);
+    int fontHeight(void* font);
 
     /// compute size of text
-    int gleComputeTextSize(const char text[], void* font, int& lines);
+    int maxTextWidth(const char text[], void* font, int& lines);
     
     /// display text on a rectangle of color `bcol`, in a corner of the center of the display window
-    void gleDrawText(const char text[], void* font, gle_color bcol, int position, int width, int height);
+    void drawText(const char text[], void* font, gle_color bcol, int position, int width, int height);
     
     /// draw text at the current OpenGL raster position and raster color
     void gleBitmapText(const char text[], void* font = nullptr, GLfloat vshift = 0);
     
     /// draw `text` at position `pos`
-    void gleDrawText(Vector1 const& pos, const char text[], void* font);
+    void drawText(Vector1 const& pos, const char text[], void* font, float dx=0);
     /// draw `text` at position `pos`
-    void gleDrawText(Vector2 const& pos, const char text[], void* font);
+    void drawText(Vector2 const& pos, const char text[], void* font, float dx=0);
     /// draw `text` at position `pos`
-    void gleDrawText(Vector3 const& pos, const char text[], void* font);
+    void drawText(Vector3 const& pos, const char text[], void* font, float dx=0);
                         
     //------------------------------------------------------------------------------
 #pragma mark -

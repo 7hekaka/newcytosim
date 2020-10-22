@@ -101,7 +101,7 @@ void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, V
 
 void Display::drawSimul(Simul const& sim)
 {
-    gle::gleDrawText(Vector(0,0,0), "Empty Display::display", GLUT_BITMAP_8_BY_13);
+    gle::drawText(Vector(0,0,0), "Empty Display::display", GLUT_BITMAP_8_BY_13);
 }
 
 
@@ -1288,7 +1288,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", ii);
-            gle::gleDrawText(fib.posP(ii), str, font);
+            gle::drawText(fib.posP(ii), str, font);
         }
     } 
     else if ( style & 2 )
@@ -1298,25 +1298,25 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(ii));
-            gle::gleDrawText(fib.posP(ii), str, font);
+            gle::drawText(fib.posP(ii), str, font);
         }
     }
     if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
-        gle::gleDrawText(fib.posEndM(), str, font);
+        gle::drawText(fib.posEndM(), str, font);
         
         int s = (int)std::ceil(fib.abscissaM());
         int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
-            gle::gleDrawText(fib.pos(a), str, font);
+            gle::drawText(fib.pos(a), str, font);
         }
         
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
-        gle::gleDrawText(fib.posEndP(), str, font);
+        gle::drawText(fib.posEndP(), str, font);
     }
     if ( style & 8 )
     {
@@ -1325,8 +1325,8 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t ii = 1; ii < fib.nbPoints(); ++ii )
         {
             Vector b = fib.posPoint(ii);
-            snprintf(str, sizeof(str), "%+7.2f", fib.tension(ii-1));
-            gle::gleDrawText(0.5*(a+b), str, font);
+            snprintf(str, sizeof(str), "%+.2f", fib.tension(ii-1));
+            gle::drawText(0.5*(a+b), str, font, 0.5);
             a = b;
         }
     }

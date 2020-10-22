@@ -2129,7 +2129,7 @@ namespace gle
 #pragma mark - Text
     
     
-    int gleLineHeight(void* font)
+    int fontHeight(void* font)
     {
         if ( font == GLUT_BITMAP_8_BY_13 )        return 13;
         if ( font == GLUT_BITMAP_9_BY_15 )        return 15;
@@ -2146,16 +2146,16 @@ namespace gle
      Compute the max width of all the lines in the given text
      This uses GLUT, which should be initialized.
      */
-    int gleComputeTextSize(const char text[], void* font, int& lines)
+    int maxTextWidth(const char text[], void* font, int& lines)
     {
-        int width = 0;
+        int res = 0;
         lines = 0;
         int w = 0;
         for (const char* c = text; *c != '\0' ; ++c)
         {
             if ( *c == '\n' )
             {
-                if ( w > width ) width = w;
+                res = std::max(res, w);
                 ++lines;
                 w = 0;
             }
@@ -2168,11 +2168,10 @@ namespace gle
                 w += glutBitmapWidth(font, *c);
             }
         }
-        if ( w > width )
-            width = w;
-        if ( width > 0 && lines == 0 )
-            lines = 1;
-        return width;
+        res = std::max(res, w);
+        if ( res > 0 )
+            lines = std::max(1, lines);
+        return res;
     }
     
     //-----------------------------------------------------------------------
@@ -2185,10 +2184,10 @@ namespace gle
         if ( !font )
         {
             font = GLUT_BITMAP_HELVETICA_12;
-            vshift = sign_real(vshift) * gleLineHeight(font);
+            vshift = sign_real(vshift) * fontHeight(font);
         }
         if ( vshift == 0 )
-            vshift = -gleLineHeight(font);
+            vshift = -fontHeight(font);
         
         GLfloat ori[4], pos[4];
         glGetFloatv(GL_CURRENT_RASTER_POSITION, ori);
@@ -2215,28 +2214,30 @@ namespace gle
     /**
      set the current raster position to `w`
      */
-    void gleDrawText(Vector3 const& vec, const char text[], void* font)
+    void drawText(Vector3 const& vec, const char text[], void* font, float dx)
     {
         glPushAttrib(GL_CURRENT_BIT|GL_ENABLE_BIT);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glDisable(GL_ALPHA_TEST);
-        int lh = gleLineHeight(font);
+        int L = 1;
+        int H = fontHeight(font);
+        int W = maxTextWidth(text, font, L);
         gleRasterPos(vec);
         //translate to center the bitmap:
-        glBitmap(0,0,0,0,1,-lh/3,nullptr);
-        gleBitmapText(text, font, -lh);
+        glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
+        gleBitmapText(text, font, H);
         glPopAttrib();
     }
     
-    void gleDrawText(Vector2 const& w, const char text[], void* font)
+    void drawText(Vector2 const& w, const char text[], void* font, float dx)
     {
-        gleDrawText(Vector3(w.XX, w.YY, 0), text, font);
+        drawText(Vector3(w.XX, w.YY, 0), text, font, dx);
     }
     
-    void gleDrawText(Vector1 const& w, const char text[], void* font)
+    void drawText(Vector1 const& w, const char text[], void* font, float dx)
     {
-        gleDrawText(Vector3(w.XX, 0, 0), text, font);
+        drawText(Vector3(w.XX, 0, 0), text, font, dx);
     }
     
     //-----------------------------------------------------------------------
@@ -2246,7 +2247,7 @@ namespace gle
      A background rectangle is displayed only if `bcol` is visible.
      
          glColor3f(1,1,1);
-         gleDrawText(fKeyString, GLUT_BITMAP_8_BY_13, 0x0, 1);
+         drawText(fKeyString, GLUT_BITMAP_8_BY_13, 0x0, 1);
      
      Possible values for `position`:
      - 0: bottom-left, text going up
@@ -2258,7 +2259,7 @@ namespace gle
      
      Note: width and height are the current size of the viewport (window)
      */
-    void gleDrawText(const char text[], void* font, const gle_color bcol,
+    void drawText(const char text[], void* font, const gle_color bcol,
                      const int position, int width, int height)
     {
         assert_true( width > 0 );
@@ -2267,9 +2268,9 @@ namespace gle
         if ( !font )
             font = GLUT_BITMAP_9_BY_15;
         
-        int nblines = 1;
-        int lineHeight = gleLineHeight(font);
-        int textWidth = gleComputeTextSize(text, font, nblines);
+        int n_lines = 1;
+        int lineHeight = fontHeight(font);
+        int textWidth = maxTextWidth(text, font, n_lines);
         
         GLint px, py;
         switch( position )
@@ -2303,7 +2304,7 @@ namespace gle
                 //center, text going down
                 px = ( width - textWidth ) / 2;
                 if ( px < 0 ) px = 0;
-                py = ( height + nblines*lineHeight ) / 2;
+                py = ( height + n_lines*lineHeight ) / 2;
                 lineHeight *= -1;
             } break;
         }
@@ -2331,8 +2332,8 @@ namespace gle
             glPushAttrib(GL_LIGHTING_BIT|GL_CURRENT_BIT);
             glDisable(GL_LIGHTING);
             int R = abs(lineHeight);
-            int B = std::min(py, py + nblines * lineHeight);
-            int T = std::max(py, py + nblines * lineHeight);
+            int B = std::min(py, py + n_lines * lineHeight);
+            int T = std::max(py, py + n_lines * lineHeight);
             
             int rec[4] = { px-R, B, px+textWidth+R, T+R+R/2+R/4 };
             

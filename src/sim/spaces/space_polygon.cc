@@ -385,7 +385,7 @@ bool SpacePolygon::draw() const
     {
         snprintf(tmp, sizeof(tmp), "%i", n);
         Vector p(pts[n].xx, pts[n].yy, height_);
-        gle::gleDrawText(p, tmp, 0);
+        gle::drawText(p, tmp, 0);
     }
 #endif
 

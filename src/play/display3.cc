@@ -915,7 +915,7 @@ void Display3::drawSolid(Solid const& obj)
         char tmp[8];
         bodyColor(obj);
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
-        gleDrawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
+        gle::drawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
     }
     
     //draw polygon around vertices of Solid
