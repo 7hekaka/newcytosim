@@ -24,6 +24,8 @@ Couple * CoupleProp::newCouple(Glossary*) const
     return new Couple(this);
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
 
 void CoupleProp::clear()
 {
@@ -179,12 +181,12 @@ real CoupleProp::spaceVolume() const
     if ( !confine_space_ptr )
         throw InvalidParameter("no couple:confinement defined for `"+name()+"'");
     
-    real volume = confine_space_ptr->volume();
+    real res = confine_space_ptr->volume();
     
-    if ( volume <= 0 )
+    if ( res <= 0 )
         throw InvalidParameter(name()+":confinement has null volume");
     
-    return volume;
+    return res;
 }
 
 

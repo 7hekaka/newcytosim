@@ -210,12 +210,12 @@ void SingleProp::write_values(std::ostream& os) const
 real SingleProp::spaceVolume() const
 {
     if ( !confine_space_ptr )
-        throw InvalidParameter("no single:confinement defined");
+        throw InvalidParameter("no single:confinement defined for `"+name()+"'");
     
-    real volume = confine_space_ptr->volume();
+    real res = confine_space_ptr->volume();
     
-    if ( volume <= 0 )
+    if ( res <= 0 )
         throw InvalidParameter(name()+":confinement has null volume");
     
-    return volume;
+    return res;
 }
