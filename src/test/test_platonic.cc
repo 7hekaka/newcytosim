@@ -32,7 +32,7 @@ void setPlatonic()
     ico = new Platonic::Solid((Platonic::Solid::Polyhedra)kind, rank);
 
     char tmp[128];
-    snprintf(tmp, sizeof(tmp), "%i points", ico->nb_vertices());
+    snprintf(tmp, sizeof(tmp), "%i div, %i points", rank, ico->nb_vertices());
     glApp::setMessage(tmp);
     
     initVBO();
@@ -43,11 +43,11 @@ void processNormalKey(unsigned char c, int x, int y)
     switch (c) 
     {
         case 'p': kind = ( kind + 1 ) % 3;      break;
-        case '=': rank += 1;                    break;
-        case '-': rank = std::max(rank-1, 1);   break;
-        case 's': style = ( style+1 ) % 4;      break;
+        case ']': rank += 1;                    break;
+        case '[': rank = std::max(rank-1, 1);   break;
+        case 's': style = ( style + 1 ) % 4;    break;
         case 'e': showEdges = !showEdges;       break;
-        case 'v': showVertices = !showVertices; break;
+        case 'd': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
         default: glApp::processNormalKey(c,x,y); return;
     }
@@ -147,24 +147,22 @@ void display(View&, int)
     glCullFace(GL_BACK);
     displayFaces();
     glDisable(GL_CULL_FACE);
-    
+    glDisable(GL_LIGHTING);
+
     if ( showEdges )
     {
-        glDisable(GL_LIGHTING);
+        if ( ico->nb_edges() == 0 )
+            ico->setEdges();
         glColor3f(1,1,1);
         glLineWidth(0.5);
         glBegin(GL_LINES);
         for ( unsigned ii=0; ii < ico->nb_edges(); ++ii )
         {
             glVertex3fv(ico->edge_data0(ii));
-            glNormal3fv(ico->edge_data0(ii));
             glVertex3fv(ico->edge_data1(ii));
-            glNormal3fv(ico->edge_data1(ii));
         }
         glEnd();
     }
-    
-    glDisable(GL_LIGHTING);
 
     if ( showVertices )
     {
@@ -182,7 +180,7 @@ void display(View&, int)
             const float* v = ico->vertex_data(ii);
             Vector3 pos(v[0], v[1], v[2]);
             snprintf(tmp, sizeof(tmp), "%u", ii);
-            gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13);
+            gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
         }        
     }
     
