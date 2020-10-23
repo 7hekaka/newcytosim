@@ -305,17 +305,6 @@ void Mecafil::computeTensions(const real* force)
 }
 
 
-void Mecafil::storeTensions(const real* force)
-{
-#if NEW_SKIP_PROJECTION
-    if ( skipProjection )
-        computeTensions(force);
-    else
-#endif
-        copy_real(nPoints, iLLG, iLag);
-}
-
-
 void Mecafil::printProjection(std::ostream& os) const
 {
     const size_t nbv = DIM * nbPoints();
@@ -342,32 +331,41 @@ void Mecafil::printProjection(std::ostream& os) const
 
 //------------------------------------------------------------------------------
 #pragma mark - Projection DIFF
-
+//#include "cytoblas.h"
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
     const size_t nbs = nbSegments();
     assert_true( nbs > 0 );
     
-#if ( 0 )
-    // verify that we have the correct Lagrange multipliers:
-    copy_real(nbs, iLag, iLLG);
+#if NEW_SKIP_PROJECTION
+    if ( skipProjection )
+    {
+        useProjectionDiff = false;
+        return;
+    }
+#endif
+
+#if 0
+    // Check here that iLLG[] contains the correct Lagrange multipliers
+    // compute Lagrange multipliers corresponding to 'force' in iLag:
     computeTensions(force);
     real n = blas::max_diff(nbs, iLLG, iLag);
     if ( n > 1e-6 )
     {
-        std::clog << "Error= \n" << n << "\n";
-        std::clog << "Lagrange: "; VecPrint::print(std::clog, std::min(20u,nbs), iLLG);
-        std::clog << "Multipl.: "; VecPrint::print(std::clog, std::min(20u,nbs), iLag);
-        std::clog << "\n";
+        fprintf(stderr, "\n|iLag - iLLG| = %e", n);
+        fprintf(stderr, "\niLag "); VecPrint::print(std::clog, std::min(20LU,nbs), iLag);
+        fprintf(stderr, "\niLLG "); VecPrint::print(std::clog, std::min(20LU,nbs), iLLG);
     }
 #endif
     
-    //----- we remove compressive forces ( negative Lagrange-multipliers )
+    // use Lagrange multipliers computed from the last projectForces() in iLLG
+
+    // remove compressive forces ( negative Lagrange-multipliers )
     useProjectionDiff = false;
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        if ( iLag[jj] > 0 )
+        if ( iLLG[jj] > 0 )
         {
             useProjectionDiff = true;
             break;
@@ -380,7 +378,7 @@ void Mecafil::makeProjectionDiff(const real* force)
         const real sc = 1.0 / segmentation();
         #pragma vector unaligned
         for ( size_t jj = 0; jj < nbs; ++jj )
-            iJJtiJforce[jj] = std::max(th, iLag[jj] * sc);
+            iJJtiJforce[jj] = std::max(th, iLLG[jj] * sc);
         
         //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtiJforce) << std::endl;
         //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtiJforce);

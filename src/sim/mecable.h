@@ -286,15 +286,9 @@ public:
     /// returns the force on point `p` calculated at the previous Meca::solve()
     Vector          netForce(const size_t p) const;
     
-    /// replaces current forces by the ones provided as argument
-    void            getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
+    /// replace current forces by the ones provided as argument
+    virtual void    getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
     
-    /// compute Lagrange multiplier corresponding to mechanical constraints
-    virtual void    computeTensions(const real* force) {}
-    
-    /// save Lagrange multipliers computed in projectForces()
-    virtual void    storeTensions(const real* force) {}
-
     //--------------------------------------------------------------------------
     
     /// return type of fiber rigidity { 0 : none, 1: fiber }

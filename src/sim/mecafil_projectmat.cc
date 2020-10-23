@@ -156,12 +156,6 @@ void Mecafil::computeTensions(const real* force)
     blas::xgemv('N', nbs, nbv, 1., iJJtiJ, nbs, force, 1, 0., iLag, 1);
 }
 
-
-void Mecafil::storeTensions(const real* force)
-{
-    computeTensions(force);
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

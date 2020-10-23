@@ -423,6 +423,13 @@ void Simul::solve()
     //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     sMeca.apply();
     //printf("     ::apply    %16llu\n", (__rdtsc()-rdt)>>5);
+#if ( 0 )
+    // check that recalculating gives similar forces
+    fibers.firstID()->printTensions(stderr, 47);
+    sMeca.computeForces();
+    fibers.firstID()->printTensions(stderr, 92);
+    putc('\n', stderr);
+#endif
 }
 
 
@@ -522,27 +529,15 @@ void Simul::solve_auto()
 
 void Simul::computeForces() const
 {
-    // we could use here an accessory Meca mec;
     try {
+        // if the simulation is running live, the force should be available.
         if ( !primed() )
         {
+            // we could use here a different Meca for safety
             prop->complete(*this);
             sMeca.prepare(this);
             setAllInteractions(sMeca);
             sMeca.computeForces();
-        }
-        else
-        {
-#if ( 0 )
-            /* if the simulation is running live, the force are already available.
-            This code is used to check that recalculating gives similar results */
-            sMeca.prepare(this);
-            setAllInteractions(sMeca);
-            fibers.firstID()->printTensions(std::clog);
-            sMeca.computeForces();
-            fibers.firstID()->printTensions(std::clog);
-            std::clog<<"\n";
-#endif
         }
     }
     catch ( Exception & e )
