@@ -10,17 +10,35 @@
 /// Templated functions to print Vectors and Matrices with minimal formatting
 namespace VecPrint
 {
-    /// print 'm' components of 'vec' on a line
+    /// print 'len' components of 'vec[]' on a line
     template< typename T >
-    std::ostream& print(std::ostream& os, size_t m, const T* vec, int digits = 2)
+    void print(FILE * file, size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
-        if ( !vec || m == 0 )
+        if ( !vec || len == 0 )
+            fprintf(file, " void");
+        else
+        {
+            char fmt[32];
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+            for ( size_t i = 0; i < len; ++i )
+            {
+                fprintf(file, fmt, vec[i]);
+                if ( dim && ( dim-1 == i % dim )) putc(39, file);
+            }
+        }
+    }
+
+    /// print 'len' components of 'vec[]' on a line
+    template< typename T >
+    std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits = 2)
+    {
+        if ( !vec || len == 0 )
             os << " void";
         else
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
-            for ( size_t i = 0; i < m; ++i )
+            for ( size_t i = 0; i < len; ++i )
             {
                 snprintf(str, sizeof(str), fmt, vec[i]);
                 if ( i % 4 )
@@ -33,17 +51,17 @@ namespace VecPrint
         return os;
     }
 
-    /// print 'm' components of 'vec' on a line
+    /// print 'len' components of 'vec[]' on a line
     template< typename T >
-    std::ostream& print(std::ostream& os, size_t m, const T* vec, int digits, T alpha)
+    std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits, T alpha)
     {
-        if ( !vec || m == 0 )
+        if ( !vec || len == 0 )
             os << " void";
         else
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+3, digits);
-            for ( size_t i = 0; i < m; ++i )
+            for ( size_t i = 0; i < len; ++i )
             {
                 snprintf(str, sizeof(str), fmt, alpha*vec[i]);
                 if ( i % 3 )
@@ -57,17 +75,17 @@ namespace VecPrint
     }
 
 
-    /// print 'm' components of 'vec' on separate lines
+    /// print 'len' components of 'vec[]' on separate lines
     template< typename T >
-    std::ostream& dump(std::ostream& os, size_t m, const T* vec, int digits = 8)
+    std::ostream& dump(std::ostream& os, size_t len, const T* vec, int digits = 8)
     {
-        if ( !vec || m == 0  )
+        if ( !vec || len == 0  )
             os << " void";
         else
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%ie", 9, digits);
-            for ( size_t i = 0; i < m; ++i )
+            for ( size_t i = 0; i < len; ++i )
             {
                 snprintf(str, sizeof(str), fmt, vec[i]);
                 os << str << '\n';
@@ -78,11 +96,11 @@ namespace VecPrint
     }
     
     
-    /// print matrix `mat` of size m*n, and leading dimension `ldd` with precision 'digits'
+    /// print matrix `mat[]` of size 'lin*col', and leading dimension `ldd` with precision 'digits'
     template< typename T >
-    void print(std::ostream& os, size_t m, size_t n, const T* mat, size_t ldd, int digits = 3)
+    void print(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 3)
     {
-        if ( !mat || m == 0 || n == 0  )
+        if ( !mat || lin == 0 || col == 0  )
             os << " void";
         else
         {
@@ -101,9 +119,9 @@ namespace VecPrint
                 if ( !dot ) *d = '.';
             }
             
-            for ( size_t ii = 0; ii < m; ++ii )
+            for ( size_t ii = 0; ii < lin; ++ii )
             {
-                for ( size_t jj = 0; jj < n; ++jj )
+                for ( size_t jj = 0; jj < col; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
                     if ( std::fabs(val) < threshold )
@@ -122,16 +140,16 @@ namespace VecPrint
     
     /// print matrix in sparse format: line_index, column_index, value
     template< typename T >
-    void sparse(std::ostream& os, size_t m, size_t n, const T* mat, size_t ldd, int digits = 8, T threshold = 0)
+    void sparse(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 8, T threshold = 0)
     {
-        if ( !mat || m == 0 || n == 0 )
+        if ( !mat || lin== 0 || col == 0 )
             os << " void";
         else
         {
             char str[64], fmt[64];
             snprintf(fmt, sizeof(fmt), " %%3i %%3i %%9.%if\n", digits);
-            for (size_t ii = 0; ii < m; ++ii )
-                for (size_t jj = 0; jj < n; ++jj )
+            for (size_t ii = 0; ii < lin; ++ii )
+                for (size_t jj = 0; jj < col; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
                     if ( std::fabs(val) > threshold )
@@ -147,16 +165,16 @@ namespace VecPrint
     
     /// print a matrix in sparse format, but adding `off` to all line and column indices
     template< typename T >
-    void sparse_off(std::ostream& os, size_t m, size_t n, const T* mat, size_t ldd, size_t off, int digits = 8)
+    void sparse_off(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, size_t off, int digits = 8)
     {
-        if ( !mat || m == 0 || n == 0 )
+        if ( !mat || lin == 0 || col == 0 )
             os << " void";
         else
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%9.%if\n", digits);
-            for (size_t ii = 0; ii < m; ++ii )
-                for (size_t jj = 0; jj < n; ++jj )
+            for (size_t ii = 0; ii < lin; ++ii )
+                for (size_t jj = 0; jj < col; ++jj )
                 {
                     snprintf(str, sizeof(str), fmt, mat[ii+ldd*jj]);
                     os << ii+off << " " << jj+off << str;
@@ -165,21 +183,21 @@ namespace VecPrint
         std::endl(os);
     }
     
-    /// print matrix `mat` of size m*n, and leading dimension `ldd` with precision 'digits'
+    /// print matrix `mat[]` of size lin*col, and leading dimension `ldd` with precision 'digits'
     template< typename T >
-    void image(std::ostream& os, size_t m, size_t n, const T* mat, size_t ldd, T scale)
+    void image(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, T scale)
     {
-        if ( !mat || m == 0 || n == 0 )
+        if ( !mat || lin == 0 || col == 0 )
             os << " void";
         else
         {
             char str[] = ".:+*hTM$";
             
             const T threshold = 0.01 * scale;
-            for ( size_t ii = 0; ii < m; ++ii )
+            for ( size_t ii = 0; ii < lin; ++ii )
             {
                 os << '|';
-                for ( size_t jj = 0; jj < n; ++jj )
+                for ( size_t jj = 0; jj < col; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
                     if ( val != val )
