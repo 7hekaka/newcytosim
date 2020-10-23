@@ -26,9 +26,9 @@ vpath %.cc $(INCDIR)
 vpath %.c  $(INCDIR)
 vpath %.o  build
 
-OBJ=platonic.o random.o exceptions.o vector3.o\
+OBJ=random.o exceptions.o vector3.o platonic.o\
     glossary.o filepath.o parameter.o iomessages.o filewrapper.o\
-    gle.o gle_color.o glapp.o object.o blank.o
+	glapp.o gle.o gle_color.o object.o blank.o
 
 #----------------------------targets--------------------------------------------
 

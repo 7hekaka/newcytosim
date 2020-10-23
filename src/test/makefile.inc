@@ -81,7 +81,7 @@ test_quartic: test_quartic.cc quartic_solver.o random.o SFMT.o backtrace.o | bin
 	$(DONE)
 vpath test_quartic bin
 
-test_quaternion: test_quaternion.cc cytomath.a SFMT.o cytobase.a | bin
+test_quaternion: test_quaternion.cc matrix33.o random_vector.o random.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_quaternion bin
@@ -153,8 +153,6 @@ vpath test_solver bin
 
 #----------------------------Targets with Graphics------------------------------
 
-OBJ_GLAP := $(OBJ_DISP) offscreen.o cytobase.a cytomath.a
-
 test_opengl: test_opengl.cc | bin
 	$(CXX) $^ $(GRAFIX) -o bin/$@
 	$(DONE)
@@ -169,6 +167,15 @@ test_glut: test_glut.cc | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 vpath test_glut bin
+
+test_solve: test_solve.cc cytomath.a cytobase.a SFMT.o | bin
+	$(GLTEST_MAKE)
+	$(DONE)
+vpath test_solve bin
+
+#----------------------------Targets using GLAPP--------------------------------
+
+OBJ_GLAP := $(OBJ_DISP) offscreen.o cytobase.a cytomath.a SFMT.o
 
 test_glapp: test_glapp.cc $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
@@ -205,9 +212,3 @@ test_grid: test_grid.cc tictoc.o $(OBJ_GLAP) grid_display.o | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 vpath test_grid bin
-
-test_solve: test_solve.cc cytomath.a cytobase.a | bin
-	$(GLTEST_MAKE)
-	$(DONE)
-vpath test_solve bin
-

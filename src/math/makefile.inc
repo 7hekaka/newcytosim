@@ -2,9 +2,9 @@
 
 
 OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
-    	rasterizer.o platonic.o matrix.o sparmat.o sparmatsym.o\
+    	rasterizer.o matrix.o sparmat.o sparmatsym.o project_ellipse.o\
     	sparmatsym1.o polygon.o spherical_code.o random.o random_vector.o\
-        matrix34.o matfull.o project_ellipse.o quartic_solver.o
+        matrix34.o matfull.o quartic_solver.o
 
 OBJ_SPARMAT := sparmatblk.o sparmatsymblk.o sparmatsymblkdiag.o
 

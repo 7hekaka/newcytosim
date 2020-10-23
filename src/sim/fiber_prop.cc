@@ -537,7 +537,7 @@ void FiberProp::complete(Simul const& sim)
         if ( lattice_unit <= 0 )
             throw InvalidParameter("fiber:lattice_unit (known as lattice[1]) must be specified and > 0");
 #else
-        throw InvalidParameter("Cytosim was not compiled to handle fiber:lattice");
+        throw InvalidParameter("Cytosim cannot handle fiber:lattice. Please recompile after setting FIBER_HAS_LATTICE to 1");
 #endif
     }
 

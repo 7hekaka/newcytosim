@@ -32,8 +32,8 @@ vpath %.c  $(INCDIR)
 vpath %.o  build
 
 OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
-    tokenizer.o stream_func.o print_color.o view.o view_prop.o platonic.o\
-    gle.o gle_color.o gle_color_list.o glapp.o tictoc.o filepath.o\
+    tokenizer.o stream_func.o print_color.o view.o view_prop.o glapp.o\
+    gle.o platonic.o gle_color.o gle_color_list.o tictoc.o filepath.o\
     mesh.o mechoui_param.o mechoui.o
 
 #----------------------------targets--------------------------------------------

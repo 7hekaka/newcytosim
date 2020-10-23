@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
     glApp::createWindow(display);
     gle::initialize();
     
-    file_list = FilePath::list_dir(pam.directory, "rec");
+    file_list = FilePath::list_dir(pam.directory.c_str(), "rec");
     load(file_index);
     timer(0);
     
