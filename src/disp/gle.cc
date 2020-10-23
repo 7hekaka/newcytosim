@@ -920,7 +920,7 @@ namespace gle
     
     //-----------------------------------------------------------------------
 
-    void drawBuffer(GLint buf1, GLint buf2, size_t cnt, GLenum mode)
+    void drawBuffer(GLint buf1, GLint buf2, unsigned cnt, GLenum mode)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, buf1);

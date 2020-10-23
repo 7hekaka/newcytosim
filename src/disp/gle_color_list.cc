@@ -1543,7 +1543,7 @@ gle_color gle::alt_color(size_t indx)
  extract all colors from the crayola list, that have a brightness between `minb` and `maxb`
  */
 
-int gle::select_colors(gle_color* list, size_t list_size,
+size_t gle::select_colors(gle_color* list, size_t list_size,
                        const GLfloat minb, const GLfloat maxb)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);

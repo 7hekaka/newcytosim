@@ -1198,7 +1198,7 @@ void glApp::displayMain()
  */
 void glApp::postRedisplay()
 {
-    for ( size_t n = 1; n < views.size(); ++n )
+    for ( unsigned n = 1; n < views.size(); ++n )
         if ( views[n].window() > 0 )
             glutPostWindowRedisplay(n);
 }

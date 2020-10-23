@@ -10,13 +10,13 @@
 using namespace gle;
 
 int style = 2;
-int kind  = 2;
-int order = 1;
+int kind = 2;
+int rank = 1;
 
 bool showVertices = false;
 bool showEdges = true;
 
-Platonic::Solid * ico = 0;
+Platonic::Solid * ico = nullptr;
 
 
 GLuint glbuffers[2] = { 0, 0 };
@@ -29,7 +29,7 @@ void setPlatonic()
     if ( ico )
         delete ico;
     
-    ico = new Platonic::Solid((Platonic::Solid::Polyhedra)kind, order);
+    ico = new Platonic::Solid((Platonic::Solid::Polyhedra)kind, rank);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i points", ico->nb_vertices());
@@ -43,15 +43,13 @@ void processNormalKey(unsigned char c, int x, int y)
     switch (c) 
     {
         case 'p': kind = ( kind + 1 ) % 3;      break;
-        case '=': order += 1;                   break;
-        case '-': if ( order > 1 ) order -= 1;  break;
+        case '=': rank += 1;                    break;
+        case '-': rank = std::max(rank-1, 1);   break;
         case 's': style = ( style+1 ) % 4;      break;
         case 'e': showEdges = !showEdges;       break;
         case 'v': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
-        default:
-            glApp::processNormalKey(c,x,y);
-            return;
+        default: glApp::processNormalKey(c,x,y); return;
     }
     
     setPlatonic();
@@ -111,12 +109,12 @@ void displayFacesVBO()
     glEnableClientState(GL_NORMAL_ARRAY);
 
     glBindBuffer(GL_ARRAY_BUFFER, glbuffers[0]);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-    glNormalPointer(GL_FLOAT, 0, 0);
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
+    glNormalPointer(GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbuffers[1]);
-    glDrawElements(GL_TRIANGLES, 3*ico->nb_faces(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 3*ico->nb_faces(), GL_UNSIGNED_INT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glDisableClientState(GL_NORMAL_ARRAY);

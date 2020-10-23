@@ -24,7 +24,7 @@ namespace gle
     gle_color alt_color(size_t indx);
     
     /// extract colors having a brightness between `minb` and `maxb`
-    int       select_colors(gle_color list[], size_t list_size, GLfloat minb, GLfloat maxb);
+    size_t    select_colors(gle_color list[], size_t list_size, GLfloat minb, GLfloat maxb);
     
     /// one of the crayola color, with a brightness() in [minb, maxb]
     gle_color bright_color(size_t indx, GLfloat minb, GLfloat maxb);
