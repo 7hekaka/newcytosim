@@ -559,7 +559,7 @@ void FiberProp::complete(Simul const& sim)
         if ( mesh_aging_rate < 0 )
             throw InvalidParameter("fiber:mesh_aging_rate must be >= 0");
 #else
-        throw InvalidParameter("Cytosim was not compiled to handle fiber:mesh");
+        throw InvalidParameter("Cytosim cannot handle fiber:mesh. Please recompile after setting FIBER_HAS_MESH to 1");
 #endif
     }
     

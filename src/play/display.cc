@@ -1325,7 +1325,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t ii = 1; ii < fib.nbPoints(); ++ii )
         {
             Vector b = fib.posPoint(ii);
-            snprintf(str, sizeof(str), "%+.2f", fib.tension(ii-1));
+            snprintf(str, sizeof(str), "%+4.1f", fib.tension(ii-1));
             gle::drawText(0.5*(a+b), str, font, 0.5);
             a = b;
         }
