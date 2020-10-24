@@ -131,8 +131,8 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vBAS, 0);
         allocate_vector(alc, vRND, 1);
         allocate_vector(alc, vRHS, 1);
-        allocate_vector(alc, vFOR, 1);
-        allocate_vector(alc, vTMP, 0);
+        vFOR = vRHS; //allocate_vector(alc, vFOR, 1);
+        vTMP = vSOL; //allocate_vector(alc, vTMP, 0);
         //std::clog << "Meca::allocate(" << allocated_ << ")\n";
     }
 }
@@ -146,8 +146,8 @@ void Meca::release()
     free_vector(vBAS);
     free_vector(vRND);
     free_vector(vRHS);
-    free_vector(vFOR);
-    free_vector(vTMP);
+    //free_vector(vFOR);
+    //free_vector(vTMP);
 }
 
 
