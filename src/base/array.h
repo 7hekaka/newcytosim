@@ -324,7 +324,7 @@ public:
         assert_true( val_ || nbo_==0 );
         for ( size_t ii=0; ii < nbo_; ++ii )
         {
-            //std::clog << " delete " << val_[ii] << std::endl;
+            //std::clog << " delete " << val_[ii] << '\n';
             delete(val_[ii]);
             val_[ii] = nullptr;
         }

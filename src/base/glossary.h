@@ -195,7 +195,7 @@ private:
             if ( val == kv.first || val == std::to_string(kv.second) )
             {
                 var = kv.second;
-                //std::clog << "KeyList::set  " << key << " -> " << val << std::endl;
+                //std::clog << "KeyList::set  " << key << " -> " << val << '\n';
                 return;
             }
         }

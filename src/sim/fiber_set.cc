@@ -948,8 +948,8 @@ real FiberSet::infoNematic(ObjectList const& objs,
                    &nv, val, vec, 3, work, 32, iwork, ifail, &info);
 
 #if ( DIM > 2 )
-    //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << std::endl;
-    //std::clog << "Eigen value2 " << val[1] << "  vector  " << Vector(vec+3) << std::endl;
+    //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << '\n';
+    //std::clog << "Eigen value2 " << val[1] << "  vector  " << Vector(vec+3) << '\n';
     real u = sign_real(vec[3]);
     real v = sign_real(vec[0]);
     // order the 2 vectors in decreasing eigenvalues (reverse order from LAPACK).
@@ -964,7 +964,7 @@ real FiberSet::infoNematic(ObjectList const& objs,
     res[7] = res[2]*res[3] - res[0]*res[5];
     res[8] = res[0]*res[4] - res[1]*res[3];
 #else
-    //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << std::endl;
+    //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << '\n';
     real u = sign_real(vec[0]);
     res[0] =  u * vec[0];
     res[1] =  u * vec[1];

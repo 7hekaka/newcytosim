@@ -1527,8 +1527,9 @@ gle_color gle::std_color(const std::string& name)
 
 void gle::print_std_colors(std::ostream& os)
 {
-    os << "Known colors:" << std::endl;
+    os << "Known colors:\n";
     print_colors(os, std_colors, sizeof(std_colors)/sizeof(named_color));
+    os.flush();
 }
 
 
@@ -1604,7 +1605,7 @@ void gle::print_colors(std::ostream& os, named_color list[], size_t max)
     for ( size_t c = 0; c < max; ++c )
     {
         os << std::setw(16) << list[c].name << "  ";
-        os << gle_color( list[c].hex ) << std::endl;
+        os << gle_color( list[c].hex ) << '\n';
     }
 }
 

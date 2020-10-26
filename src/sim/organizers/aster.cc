@@ -526,7 +526,7 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
         if ( cnt < nbf )
         {
             std::clog << "warning: aster could only fit " << cnt << " seeds ";
-            std::clog << "with aster:seed_diameter = " << sep << std::endl;
+            std::clog << "with aster:seed_diameter = " << sep << '\n';
         }
         //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
         for ( size_t n = 0; n < cnt; ++n )

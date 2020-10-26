@@ -225,10 +225,10 @@ inline std::istream& operator >> (std::istream& is, real& x)
         return is;
     try {
         x = std::stod(str);
-        //std::clog << " custom operator >> |" << str << "| -> " << x << std::endl;
+        //std::clog << " custom operator >> |" << str << "| -> " << x << '\n';
     }
     catch ( std::invalid_argument & e ) {
-        std::cerr << " error in operator >> |" << str << "| " << std::endl;
+        std::cerr << " error in operator >> |" << str << "| " << '\n';
     }
     return is;
 }

@@ -2162,8 +2162,8 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     std::cerr.precision(3);
     // check that image D calculated from (AB) is near its target C
     Vector D = aR * ptA.pos1() + bR * ptA.pos2();
-    std::cerr << "D: " << std::setw(9) << D << std::endl;
-    std::cerr << "C: " << std::setw(9) << ptB.pos() << std::endl;
+    std::cerr << "D: " << std::setw(9) << D << '\n';
+    std::cerr << "C: " << std::setw(9) << ptB.pos() << '\n';
 #endif
     
     MatrixBlock wAt = aR.transposed(-weight);

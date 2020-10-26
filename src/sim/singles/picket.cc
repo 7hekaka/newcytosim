@@ -20,7 +20,7 @@ Picket::Picket(SingleProp const* p, Vector const& w)
 
 Picket::~Picket()
 {
-    //std::clog<<"~Picket("<<this<<")"<<std::endl;
+    //std::clog<<"~Picket("<<this<<")\n";
 }
 
 

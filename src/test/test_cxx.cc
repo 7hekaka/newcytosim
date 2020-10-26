@@ -28,10 +28,10 @@ const double SQ3 = std::sqrt(3);
 
 int main ()
 {
-    std::clog << "C++ version " << __cplusplus << std::endl;
+    std::clog << "C++ version " << __cplusplus << '\n';
 
-    std::clog << "Constant = " << CONSTANT << std::endl;
-    std::clog << "std::sqrt(3) = " << SQ3 << std::endl;
+    std::clog << "Constant = " << CONSTANT << '\n';
+    std::clog << "std::sqrt(3) = " << SQ3 << '\n';
 
     int my_array[] = { 1, 2, 3, 5, 7, 11, 13, 17, 23 };
     for (int &x : my_array) {

@@ -103,7 +103,7 @@ public:
     {
         // call engine's member function:
         (obj.*mFunc)(this);
-        std::cout << " at time " << sim_time + mTime << std::endl;
+        std::cout << " at time " << sim_time + mTime << '\n';
     }
     
     // increment Gillespie time
@@ -127,7 +127,7 @@ public:
     
     void print(std::ostream& os)
     {
-        os << mTime << "  " << mFunc << std::endl;
+        os << mTime << "  " << mFunc << '\n';
     }    
 };
 

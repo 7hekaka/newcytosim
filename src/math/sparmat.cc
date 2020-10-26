@@ -233,9 +233,10 @@ void SparMat::printSparse(std::ostream& os, real) const
             for ( int ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
             {
                 os << mxRow[jj][ii] << " " << jj << " ";
-                os << std::setw(16) << mxCol[jj][ii] << std::endl;
+                os << std::setw(16) << mxCol[jj][ii] << '\n';
             }
     }
+    os.flush();
 }
 
 

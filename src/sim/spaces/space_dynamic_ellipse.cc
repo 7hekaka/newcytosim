@@ -330,7 +330,7 @@ void SpaceDynamicEllipse::resize(Glossary& opt)
     if ( prop->volume <= 0 )
     {
         prop->volume = volume();
-        //std::clog << "DynamicEllipse:volume <- " << prop->volume << std::endl;
+        //std::clog << "DynamicEllipse:volume <- " << prop->volume << '\n';
     }
 }
 

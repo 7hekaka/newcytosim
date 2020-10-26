@@ -62,7 +62,7 @@ void ObjectSet::rotateObjects(ObjectList const& objs, Rotation const& rot)
  */
 void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso)
 {
-    //std::clog << "moving " << objs.size() << " objects" << std::endl;
+    //std::clog << "moving " << objs.size() << " objects" << '\n';
     for ( Object * obj : objs )
     {
         switch ( obj->mobile() )
@@ -117,12 +117,12 @@ Apply isometry to objects in list if ( obj->flag() != f )
  */
 void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso, ObjectFlag f)
 {
-    //std::clog << "moving " << objs.size() << " objects" << std::endl;
+    //std::clog << "moving " << objs.size() << " objects" << '\n';
     for ( Object * obj : objs )
     {
         if ( obj->flag() != f )
         {
-            //std::clog << "    moving " << obj->reference() << std::endl;
+            //std::clog << "    moving " << obj->reference() << '\n';
             switch ( obj->mobile() )
             {
                 case 1: obj->rotateT(iso); obj->translate(iso); break;
@@ -131,7 +131,7 @@ void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso, ObjectF
             }
             obj->flag(f);
         }
-        //else std::clog << "    already moved " << obj->reference() << std::endl;
+        //else std::clog << "    already moved " << obj->reference() << '\n';
     }
 }
 
@@ -318,7 +318,7 @@ bool splitObjectSpec(std::string& str, long& num)
  */
 Object* ObjectSet::findObject(std::string spec, const std::string& title) const
 {
-    //std::clog << "ObjectSet::findObject " << spec << std::endl;
+    //std::clog << "ObjectSet::findObject " << spec << '\n';
     
     if ( spec == "first" )
         return static_cast<Object*>(inventory.first());

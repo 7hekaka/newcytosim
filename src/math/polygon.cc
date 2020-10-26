@@ -135,7 +135,7 @@ void Polygon::read(std::string const& file)
     if ( ! in.good() )
         throw InvalidParameter("polygon file `"+file+"' not found");
     
-    //std::clog << "reading polygon from " << file << std::endl;
+    //std::clog << "reading polygon from " << file << '\n';
     
     read(in);
     
@@ -429,7 +429,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
         }
     }
     
-    //std::clog << " polygon::inside " << cross << " for " << xx << " " << yy << std::endl;
+    //std::clog << " polygon::inside " << cross << " for " << xx << " " << yy << '\n';
     return ( cross & 1 );
 }
 

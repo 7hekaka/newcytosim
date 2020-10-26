@@ -18,7 +18,7 @@
 Couple * DuoProp::newCouple(Glossary * opt) const
 {
     Duo * res = nullptr;
-    //std::clog << "DuoProp::newCouple" << std::endl;
+    //std::clog << "DuoProp::newCouple" << '\n';
     if ( length > 0 )
         res = new DuoLong(this);
     else

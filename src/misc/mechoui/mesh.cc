@@ -155,13 +155,13 @@ int Mesh::read(char const* filename)
         fclose(f);
 /*
         if ( res )
-            std::clog << "   error " << res << std::endl;
+            std::clog << "   error " << res << '\n';
         else
-            std::clog << "   " << n_points << " points" << " and " << n_faces << " faces" << std::endl;
+            std::clog << "   " << n_points << " points" << " and " << n_faces << " faces" << '\n';
 */
         return res;
     }
-    std::clog << " Cannot read `" << filename << std::endl;
+    std::clog << " Cannot read `" << filename << '\n';
     return 1;
 }
 

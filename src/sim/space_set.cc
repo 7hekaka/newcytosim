@@ -31,9 +31,9 @@ void SpaceSet::setMaster(Space const* spc)
         
 #if ( 0 )
         if ( spc )
-            std::clog << "Space master: " << spc->prop->name() << std::endl;
+            std::clog << "Space master: " << spc->prop->name() << '\n';
         else
-            std::clog << "Space master: NULL" << std::endl;
+            std::clog << "Space master: NULL" << '\n';
 #endif
     }
     
@@ -94,7 +94,7 @@ void SpaceSet::erase()
 void SpaceSet::add(Object * obj)
 {
     assert_true(obj->tag() == Space::TAG);
-    //std::clog << "SpaceSet::add " << obj << std::endl;
+    //std::clog << "SpaceSet::add " << obj << '\n';
     ObjectSet::add(obj);
     
     if ( !master() || obj->identity() < master()->identity() )
@@ -107,7 +107,7 @@ void SpaceSet::add(Object * obj)
  */
 void SpaceSet::remove(Object * obj)
 {
-    //std::clog << "SpaceSet::remove " << obj << std::endl;
+    //std::clog << "SpaceSet::remove " << obj << '\n';
     ObjectSet::remove(obj);
 
     if ( obj == master() )

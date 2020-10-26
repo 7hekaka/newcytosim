@@ -1857,7 +1857,7 @@ void Display::zObject::draw(Display * disp) const
             break;
             
         default:
-            std::cerr << "Internal error: unknown zObject pointer" << std::endl;
+            std::cerr << "Internal error: unknown zObject pointer" << '\n';
     }
 }
 

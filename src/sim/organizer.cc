@@ -141,14 +141,14 @@ void Organizer::readOrganized(Inputter& in, Simul& sim, size_t nbo)
 {
     nbOrganized(nbo);
     
-    //std::clog << " Organizer::read with " << nb << " objects" << std::endl;
+    //std::clog << " Organizer::read with " << nb << " objects" << '\n';
     ObjectTag g;
     for ( size_t i = 0; i < nbo; ++i )
     {
         Object * w = sim.readReference(in, g);
         if ( w )
         {
-            //std::clog << " Organized(" << i << ") is " << w->reference() << std::endl;
+            //std::clog << " Organized(" << i << ") is " << w->reference() << '\n';
             grasp(Simul::toMecable(w), i);
         }
         else

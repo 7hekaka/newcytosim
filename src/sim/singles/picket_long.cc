@@ -20,7 +20,7 @@ PicketLong::PicketLong(SingleProp const* p, Vector const& w)
 
 PicketLong::~PicketLong()
 {
-    //std::clog<<"~PicketLong("<<this<<")"<<std::endl;
+    //std::clog<<"~PicketLong("<<this<<")\n";
 }
 
 //------------------------------------------------------------------------------

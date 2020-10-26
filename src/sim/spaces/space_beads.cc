@@ -66,7 +66,7 @@ void SpaceBeads::setBoundaries()
             bbMax[d] = std::max(bbMax[d], pos[d]+rad);
         }
     }
-    //std::clog << "SpaceBeads::boundaries " << bbMin[0] << "  " << bbMax[0] << std::endl;
+    //std::clog << "SpaceBeads::boundaries " << bbMin[0] << "  " << bbMax[0] << '\n';
 }
 
 

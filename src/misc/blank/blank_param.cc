@@ -47,7 +47,7 @@ void BlankParam::read(Glossary& glos)
 template<typename C>
 static  void write_value(std::ostream& os, std::string const& name, C const& c)
 {
-    os << " " << std::left << std::setw(20) << name << " = " << c << ";" << std::endl;
+    os << " " << std::left << std::setw(20) << name << " = " << c << ";\n";
 }
 
 void BlankParam::write(std::ostream& os) const
@@ -59,5 +59,6 @@ void BlankParam::write(std::ostream& os) const
     write_value(os, "delay",     delay);
     write_value(os, "repeat",    repeat);
     write_value(os, "config",    config);
+    os.flush();
 }
 

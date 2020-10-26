@@ -18,7 +18,7 @@
  */
 Couple * CrosslinkProp::newCouple(Glossary*) const
 {
-    //std::clog << "CrosslinkProp::newCouple" << std::endl;
+    //std::clog << "CrosslinkProp::newCouple" << '\n';
     if ( length > 0 )
         return new CrosslinkLong(this);
     else

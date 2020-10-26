@@ -503,9 +503,9 @@ void Simul::solve_auto()
                 for ( size_t u : { 0, 1, 2, 4 } )
                     ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, (real)autoCNT[u]/N_TESTS, autoCPU[u]/N_TESTS);
                 ptr += snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
-                Cytosim::log << str << std::endl;
+                Cytosim::log << str << '\n';
                 if ( prop->verbose )
-                    std::clog << str << std::endl;
+                    std::clog << str << '\n';
             }
             for ( size_t u = 0; u < 6; ++u )
             {

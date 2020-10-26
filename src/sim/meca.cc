@@ -774,7 +774,7 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
  
     std::clog << "verifyBlock ";
     std::clog << std::setw(8) << mec->reference() << "  size " << std::setw(4) << bks;
-    std::clog << " | B - K | = " << std::setprecision(3) << err << std::endl;
+    std::clog << " | B - K | = " << std::setprecision(3) << err << '\n';
     
     if ( err > bks * bks * REAL_EPSILON )
     {
@@ -829,7 +829,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         std::clog << "  eigen(1-PM) = " << eig;
     }
     
-    std::clog << std::endl;
+    std::clog << '\n';
 
     if ( err > 1 )
     {
@@ -885,13 +885,13 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         //std::clog << "mec " << std::setw(4) << mec->identity();
         if ( eig < 1.0 )
         {
-            //std::clog << "    keep     eigen(1-PM) = " << eig << std::endl;
+            //std::clog << "    keep     eigen(1-PM) = " << eig << '\n';
             mec->blockType(4);
             return;
         }
         else
         {
-            //std::clog << "    RENEW    eigen(1-PM) = " << eig << std::endl;
+            //std::clog << "    RENEW    eigen(1-PM) = " << eig << '\n';
             blas::xcopy(bks*bks, wrk, 1, blk, 1);
         }
     }

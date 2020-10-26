@@ -115,7 +115,7 @@ void Bead::setDragCoefficient()
     paDrag = 6 * M_PI * prop->viscosity * paRadius;
     if ( prop->drag > 0 )
     {
-        //std::clog << "setting for `" << prop->name() << "' bypass Stokes' drag " << paDrag << std::endl;
+        //std::clog << "setting for `" << prop->name() << "' bypass Stokes' drag " << paDrag << '\n';
         paDrag = prop->drag;
     }
     
@@ -123,7 +123,7 @@ void Bead::setDragCoefficient()
     static bool virgin = true;
     if ( paRadius > 0  &&  virgin )
     {
-        std::clog << "Bead `" << prop->name() << "' (radius " << paRadius << ") has drag " << paDrag << std::endl;
+        std::clog << "Bead `" << prop->name() << "' (radius " << paRadius << ") has drag " << paDrag << '\n';
         virgin = false;
     }
 #endif

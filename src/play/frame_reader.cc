@@ -39,7 +39,7 @@ void FrameReader::openFile(std::string const& file)
         {
             fclose(fp);
             tmp = "gunzip " + tmp;
-            std::clog << tmp << std::endl;
+            std::clog << tmp << '\n';
             
             if ( 0 == system(tmp.c_str()) )
                 inputter.open(file.c_str(), "rb");
@@ -54,7 +54,7 @@ void FrameReader::openFile(std::string const& file)
  
     inputter.vectorSize(DIM);
     clearPositions();
-    //std::clog << "FrameReader: has openned " << obj_file << std::endl;
+    //std::clog << "FrameReader: has openned " << obj_file << '\n';
 }
 
 

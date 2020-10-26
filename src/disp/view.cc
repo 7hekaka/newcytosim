@@ -64,7 +64,7 @@ void View::initGL()
         /*
          GLint s = 0;
          glGetIntegerv(GL_MAX_SAMPLES, &s);
-         std::clog << "OpenGL samples = " << samples << "  max = " << s << std::endl;
+         std::clog << "OpenGL samples = " << samples << "  max = " << s << '\n';
          */
     }
     else
@@ -100,7 +100,7 @@ void View::initGL()
     }
     else
     {
-        //std::clog << "no depth-test" << std::endl;
+        //std::clog << "no depth-test" << '\n';
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_ALPHA_TEST);
         glAlphaFunc(GL_ALWAYS, 0);
@@ -257,7 +257,7 @@ void View::setLights(bool local) const
 
 void View::reshape(int W, int H)
 {
-    //std::clog << "View::reshaped " << W << " " << H << std::endl;
+    //std::clog << "View::reshaped " << W << " " << H << '\n';
     window_size[0] = W;
     window_size[1] = H;
     glViewport(0, 0, W, H);
@@ -350,7 +350,7 @@ void View::load()
 
 void View::setModelView() const
 {
-    //std::cerr<<"setModelView win " << window() << std::endl;
+    //std::cerr<<"setModelView win " << window() << '\n';
 
     // setup the OpenGL transformation matrix
     glMatrixMode(GL_MODELVIEW);
@@ -435,7 +435,7 @@ void View::reset()
 
 void View::zoom_to(GLfloat z)
 {
-    //std::clog << "zoom_to " << z << " " << this << std::endl;
+    //std::clog << "zoom_to " << z << " " << this << '\n';
     zoom = z;
     setModelView();
 }

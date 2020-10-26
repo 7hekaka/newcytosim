@@ -115,7 +115,7 @@ void CoupleSet::step()
     }
     else
     {
-        //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << std::endl;
+        //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << '\n';
         // this loop is unrolled, processing objects 2 by 2:
         obj = ffHead;
         if ( ffOdd )

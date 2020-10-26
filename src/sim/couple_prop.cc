@@ -17,7 +17,7 @@
  */
 Couple * CoupleProp::newCouple(Glossary*) const
 {
-    //std::clog << "CoupleProp::newCouple" << std::endl;
+    //std::clog << "CoupleProp::newCouple" << '\n';
     if ( length > 0 )
         return new CoupleLong(this);
     

@@ -39,7 +39,7 @@
  */
 Single * SingleProp::newSingle() const
 {
-    //std::clog << "SingleProp::newSingle" << std::endl;
+    //std::clog << "SingleProp::newSingle" << '\n';
     if ( activity == "fixed" )
     {
         if ( length > 0 )
@@ -66,7 +66,7 @@ Single * SingleProp::newSingle() const
  */
 Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 {
-    //std::clog << "SingleProp::newWrist" << std::endl;
+    //std::clog << "SingleProp::newWrist" << '\n';
     if ( length > 0 )
         return new WristLong(this, mec, point);
     else

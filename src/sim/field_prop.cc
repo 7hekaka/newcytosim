@@ -87,7 +87,7 @@ void FieldProp::complete(Simul const& sim)
         throw InvalidParameter("field:diffusion must be >= 0");
     
     real theta = 2 * DIM * time_step * (diffusion+full_diffusion) / ( step * step );
-    //std::clog << "The CFL condition for `" << name() << "' is " << theta << std::endl;
+    //std::clog << "The CFL condition for `" << name() << "' is " << theta << '\n';
     
     if ( sim.primed()  &&  theta > 0.5 )
     {

@@ -73,7 +73,7 @@ void MotorProp::complete(Simul const& sim)
     if ( sim.primed() && unbinding_density > 0 )
     {
         real rate = unbinding_rate + unbinding_density * unloaded_speed;
-        std::clog << name() + " unbinding rate: unloaded " << rate << " stalled " << unbinding_rate << std::endl;
+        std::clog << name() + " unbinding rate: unloaded " << rate << " stalled " << unbinding_rate << '\n';
     }
 #endif
 

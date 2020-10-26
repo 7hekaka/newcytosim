@@ -12,7 +12,7 @@
 
 Couple * ShackleProp::newCouple(Glossary*) const
 {
-    //std::clog << "ShackleProp::newCouple" << std::endl;
+    //std::clog << "ShackleProp::newCouple" << '\n';
     if ( length > 0 )
         return new ShackleLong(this);
     else

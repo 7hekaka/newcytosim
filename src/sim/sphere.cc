@@ -202,7 +202,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
     
-    //std::cerr << *this << std::endl;
+    //std::cerr << *this << '\n';
     return res;
 }
 
@@ -211,7 +211,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
 
 void Sphere::resize(const real R)
 {
-    //std::clog << "Sphere::resize " << R << std::endl;
+    //std::clog << "Sphere::resize " << R << '\n';
     if ( R > 0 )
     {
         spRadius = R;

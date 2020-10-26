@@ -136,7 +136,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
 
     if ( w )
     {
-        //std::clog << "FiberSite::read() " << (char)tag << std::endl;
+        //std::clog << "FiberSite::read() " << (char)tag << '\n';
         if ( tag == Fiber::TAG )
         {
             fbAbs = in.readFloat();
@@ -241,7 +241,7 @@ int FiberSite::bad() const
     {
         const real e = fbAbs - abscissaInter();
         
-        //std::clog << "Interpolation " << std::scientific << e << std::endl;
+        //std::clog << "Interpolation " << std::scientific << e << '\n';
         if ( abs_real(e) > 1e-4 )
         {
             std::cerr << "Interpolation error is " << std::scientific << e << "\n";

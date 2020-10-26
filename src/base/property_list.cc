@@ -80,7 +80,7 @@ Property * PropertyList::operator[] (const size_t n) const
 
 void PropertyList::for_each(void func(Property *)) const
 {
-    //std::clog << "Running function for "<<vec_.size()<<" properties"<<std::endl;
+    //std::clog << "Running function for "<<vec_.size()<<" properties"<<'\n';
     for ( Property* i : vec_ )
         func(i);
 }
@@ -99,7 +99,7 @@ void PropertyList::complete(Simul const& sim) const
  */
 Property * PropertyList::find(std::string const& nom) const
 {
-    //std::clog << this << "->find(" << nom << ")" << std::endl;
+    //std::clog << this << "->find(" << nom << ")" << '\n';
     for ( Property* i : vec_ )
     {
         if ( i->name() == nom )
@@ -115,7 +115,7 @@ Property * PropertyList::find(std::string const& nom) const
  */
 Property * PropertyList::find_or_die(std::string const& nom) const
 {
-    //std::clog << this << "->find_or_die(" << nom << ")" << std::endl;
+    //std::clog << this << "->find_or_die(" << nom << ")" << '\n';
     Property * p = find(nom);
 
     if ( !p )
@@ -133,7 +133,7 @@ Property * PropertyList::find_or_die(std::string const& nom) const
  */
 Property * PropertyList::find(std::string const& cat, std::string const& nom) const
 {
-    //std::clog << this << "->find(" << cat << ", " << nom << ")" << std::endl;
+    //std::clog << this << "->find(" << cat << ", " << nom << ")" << '\n';
 
     for ( Property* i : vec_ )
     {
@@ -147,7 +147,7 @@ Property * PropertyList::find(std::string const& cat, std::string const& nom) co
 
 Property * PropertyList::find(std::string const& cat, const size_t num) const
 {
-    //std::clog << this << "->find(" << cat << ", " << idx << ")" << std::endl;
+    //std::clog << this << "->find(" << cat << ", " << idx << ")" << '\n';
     if ( num <= 0 )
         return nullptr;
     
@@ -191,7 +191,7 @@ Property * PropertyList::find_or_die(std::string const& cat, const size_t num) c
 
 PropertyList PropertyList::find_all(std::string const& cat) const
 {
-    //std::clog << this << "->find_all(" << cat << ") " << std::endl;
+    //std::clog << this << "->find_all(" << cat << ") " << '\n';
 
     PropertyList res;
     res.reserve(4);
@@ -206,7 +206,7 @@ PropertyList PropertyList::find_all(std::string const& cat) const
 
 PropertyList PropertyList::find_all(std::string const& c1, std::string const& c2) const
 {
-    //std::clog << this << "->find_all(" << kd1 << "," << kd2 << ") " << std::endl;
+    //std::clog << this << "->find_all(" << kd1 << "," << kd2 << ") " << '\n';
     
     PropertyList res;
     for ( Property* i : vec_ )
@@ -220,7 +220,7 @@ PropertyList PropertyList::find_all(std::string const& c1, std::string const& c2
 
 PropertyList PropertyList::find_all(std::string const& c1, std::string const& c2, std::string const& c3) const
 {
-    //std::clog << this << "->find_all(" << kd1 << "," << kd2 << ") " << std::endl;
+    //std::clog << this << "->find_all(" << kd1 << "," << kd2 << ") " << '\n';
 
     PropertyList res;
     for ( Property* i : vec_ )
@@ -234,7 +234,7 @@ PropertyList PropertyList::find_all(std::string const& c1, std::string const& c2
 
 Property* PropertyList::find_next(std::string const& cat, Property * p) const
 {
-    //std::clog << this << "->find_next(" << cat << ") " << std::endl;
+    //std::clog << this << "->find_next(" << cat << ") " << '\n';
     bool found = ( p );
     
     for ( Property* i : vec_ )
@@ -262,7 +262,7 @@ Property* PropertyList::find_next(std::string const& cat, Property * p) const
 
 PropertyList PropertyList::find_all_except(std::string const& cat) const
 {
-    //std::clog << this << "->find_all_expect(" << cat << ") " << std::endl;
+    //std::clog << this << "->find_all_expect(" << cat << ") " << '\n';
     
     PropertyList res;
     for ( Property* i : vec_ )

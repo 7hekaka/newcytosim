@@ -12,7 +12,7 @@
 
 Couple * BridgeProp::newCouple(Glossary*) const
 {
-    //std::clog << "BridgeProp::newCouple" << std::endl;
+    //std::clog << "BridgeProp::newCouple" << '\n';
     return new Bridge(this);
 }
 

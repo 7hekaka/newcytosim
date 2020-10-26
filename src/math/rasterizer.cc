@@ -74,7 +74,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
     
     while ( true )
     {
-        //std::clog << "section at Y = " << yy << std::endl;
+        //std::clog << "section at Y = " << yy << '\n';
         
         // find next point on right side:
         if ( R.YY <= yy )
@@ -152,7 +152,7 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
 
 #if ( 0 )
     // print polygon:
-    std::clog << std::endl << zz << " ";
+    std::clog << '\n' << zz << " ";
     for ( size_t n = 0; n < n_pts; ++n )
         pts[n].print(std::clog);
 #endif

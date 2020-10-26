@@ -95,7 +95,7 @@ int DynamicFiber::stepMinusEnd()
     else
         chewing_rate = frChewM / prop->unit_length;
     
-    //std::clog << " chewing rate M " << chewing_rate / prop->time_step << std::endl;
+    //std::clog << " chewing rate M " << chewing_rate / prop->time_step << '\n';
     frChewM = 0;
     
 #endif
@@ -169,7 +169,7 @@ int DynamicFiber::stepPlusEnd()
     else
         chewing_rate = frChewP / prop->unit_length;
     
-    //std::clog << " chewing rate P " << chewing_rate / prop->time_step << std::endl;
+    //std::clog << " chewing rate P " << chewing_rate / prop->time_step << '\n';
     frChewP = 0;
 #endif
     
@@ -185,7 +185,7 @@ int DynamicFiber::stepPlusEnd()
 			--res;
             nextShrinkP += RNG.exponential();
             mStateP = calculateStateP();
-            //std::cout << "mStateP = " << mStateP << std::endl;
+            //std::cout << "mStateP = " << mStateP << '\n';
         }
     }
     else

@@ -64,7 +64,7 @@ void SliderProp::complete(Simul const& sim)
          */
         std::clog << "         slider:mobility explicit = " << mobility_dt;
         mobility_dt = -std::expm1( - mobility_dt * stiffness ) / stiffness;
-        std::clog << "   implicit = " << mobility_dt << std::endl;
+        std::clog << "   implicit = " << mobility_dt << '\n';
     }
 }
 

@@ -401,7 +401,7 @@ int Simul::loadObjects(Inputter& in, ObjectSet* subset)
     try
     {
         res = readObjects(in, subset);
-        //std::clog << "loadObjects returns " << res << std::endl;
+        //std::clog << "loadObjects returns " << res << '\n';
     }
     catch(Exception & e)
     {
@@ -477,7 +477,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         //check for meta-data, contained in lines starting with '#'
         if ( c == '#' )
         {
-            //std::clog << "      |#" << line << "|" << std::endl;
+            //std::clog << "      |#" << line << "|" << '\n';
             std::istringstream iss(line);
             std::string tok;
             iss >> tok;
@@ -669,7 +669,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
 
 void Simul::writeProperties(std::ostream& os, const bool prune) const
 {
-    //std::clog << "Writing properties" << std::endl;
+    //std::clog << "Writing properties" << '\n';
     os << "% Cytosim property file, pid " << getpid() << '\n';
     os << "% " << TicToc::date() << '\n';
 
@@ -700,7 +700,7 @@ void Simul::writeProperties(char const* name, bool prune) const
         std::ofstream os(name);
         //this should be equivalent to: writeProperties(os, prune);
         os << properties_saved << std::endl;
-        //std::clog << "Writing properties at frame " << currentFrame() << std::endl;
+        //std::clog << "Writing properties at frame " << currentFrame() << '\n';
     }
 }
 

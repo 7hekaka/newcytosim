@@ -189,7 +189,7 @@ size_t Solid::allocateMecable(const size_t nbp)
     size_t ms = Mecable::allocateMecable(nbp);
     if ( ms )
     {
-        //std::clog << "Solid::allocatePoints " << ms << std::endl;
+        //std::clog << "Solid::allocatePoints " << ms << '\n';
         
         // allocate a new array of the right size:
         real  *  shp = new_real(DIM*ms);
@@ -517,7 +517,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
     
-    //std::cerr << *this << std::endl;
+    //std::cerr << *this << '\n';
     return res;
 }
 

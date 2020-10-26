@@ -141,7 +141,7 @@ void glApp::enterFullScreen(bool saveWindowPos)
         }
         //invoke full screen from GLUT
         glutFullScreen();
-        //std::clog << "Fullscreen window " << glutGetWindow() << std::endl;
+        //std::clog << "Fullscreen window " << glutGetWindow() << '\n';
     }
 }
 
@@ -215,7 +215,7 @@ int glApp::createWindow(void (*func)(View&, int))
     if ( view.retina )      oss << " hidpi";
     std::string mode = oss.str();
     
-    //std::clog << "GLUT string mode " << mode << std::endl;
+    //std::clog << "GLUT string mode " << mode << '\n';
     
     // set GLUT display mode:
     glutInitDisplayString(mode.c_str());
@@ -233,7 +233,7 @@ int glApp::createWindow(void (*func)(View&, int))
     else
         win = glutCreateWindow("Cytosim");
     assert_true( win > 0 );
-    //std::clog << "new window " << win << std::endl;
+    //std::clog << "new window " << win << '\n';
 
     // create new View for this window, duplicating the current View:
     if ( win >= (int)views.size() )
@@ -277,7 +277,7 @@ void glApp::destroyWindow(int win)
     
     if ( 1 < win  &&  win < (int)views.size()  &&  views[win].window() > 0 )
     {
-        //std::clog << "Destroy window " << win << std::endl;
+        //std::clog << "Destroy window " << win << '\n';
         assert_true( views[win].window() == win );
         glutDestroyWindow(views[win].window());
         views[win].window(0);
@@ -689,7 +689,7 @@ int glApp::buildMenu()
     static int menu = 0;
     static int menu1, menu2, menu3;
     
-    //std::clog << "buildMenu" << std::endl;
+    //std::clog << "buildMenu" << '\n';
     if ( menu )
         clearMenu(menu);
     else {
@@ -997,7 +997,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
             if ( mouseClickCallback )
             {
                 mouseDown = savedView.unproject(mouseX, mouseY, midZ);
-                //std::clog << "Action down at "<<mouseDown<<std::endl;
+                //std::clog << "Action down at "<<mouseDown<<'\n';
                 mouseClickCallback(mouseX, mouseY, mouseDown, specialKeys);
             }
         }
@@ -1092,7 +1092,7 @@ void glApp::processMouseDrag(int mX, int mY)
             if ( mouseDragCallback )
             {
                 mouse = savedView.unproject(mouseX, mouseY, midZ);
-                //std::clog << "Action move at " << mouse << std::endl;
+                //std::clog << "Action move at " << mouse << '\n';
                 mouseDragCallback(mouseX, mouseY, mouseDown, mouse, specialKeys);
             }
         } break;

@@ -94,7 +94,7 @@ std::vector<std::string> FilePath::list_dir(const char path[], std::string const
     
 #if ( 0 )
     for ( size_t i = 0; i < res.size(); ++i )
-        std::clog << "   " << res[i] << std::endl;
+        std::clog << "   " << res[i] << '\n';
 #endif
     return res;
 }

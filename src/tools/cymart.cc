@@ -63,13 +63,13 @@ FILE * openFile(const char base[], unsigned ix)
     }
     if ( f == 0 )
     {
-        std::cerr << "Aborted: could not create file " << name << std::endl;
+        std::cerr << "Aborted: could not create file " << name << '\n';
         exit(EXIT_FAILURE);
     }
     if ( ferror(f) )
     {
         fclose(f);
-        std::cerr << "Aborted: could not create file " << name << std::endl;
+        std::cerr << "Aborted: could not create file " << name << '\n';
         exit(EXIT_FAILURE);
     }
     return f;

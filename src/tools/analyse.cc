@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-                std::cerr << "Error: missing frame " << frm << std::endl;
+                std::cerr << "Error: missing frame " << frm << '\n';
                 return EXIT_FAILURE;
             }
             ++s;

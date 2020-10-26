@@ -141,7 +141,7 @@ void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
 void PointGrid::checkPP(Meca& meca, StericParam const& pam,
                         FatPoint const& aa, FatPoint const& bb)
 {
-    //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << std::endl;
+    //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
     const real len = aa.radius + bb.radius;
     Vector vab = bb.pos - aa.pos;
     
@@ -162,7 +162,7 @@ void PointGrid::checkPP(Meca& meca, StericParam const& pam,
 void PointGrid::checkPL(Meca& meca, StericParam const& pam,
                         FatPoint const& aa, FatLocus const& bb)
 {
-    //std::clog << "   PL- " << bb.seg << " " << aa.pnt << std::endl;
+    //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
     const real len = aa.radius + bb.radius;
     
     // get position of point with respect to segment:
@@ -214,7 +214,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
 void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
-    //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << std::endl;
+    //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
     const real ran = aa.range + bb.radius;
     
     // get position of bb.point1() with respect to segment 'aa'
@@ -284,7 +284,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
 void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
-    //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << std::endl;
+    //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
     const real ran = aa.range + bb.radius;
     
     // get position of bb.point2() with respect to segment 'aa'
@@ -379,7 +379,7 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     }
 #endif
     
-    //std::clog << "LL " << aa.seg << " " << bb.seg << std::endl;
+    //std::clog << "LL " << aa.seg << " " << bb.seg << '\n';
     checkLL1(meca, pam, aa, bb);
     
     if ( aa.isLast() )
@@ -547,7 +547,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
 {
-    //std::clog << "----" << std::endl;
+    //std::clog << "----" << '\n';
     
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )

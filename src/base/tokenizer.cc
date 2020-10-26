@@ -666,7 +666,7 @@ std::string Tokenizer::get_until(std::istream& is, std::string what)
         }
         is.get(c);
     }
-    //std::clog << "get_until|" << res << std::endl;
+    //std::clog << "get_until|" << res << '\n';
     return res;
 }
 

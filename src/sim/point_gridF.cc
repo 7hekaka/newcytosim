@@ -143,7 +143,7 @@ void PointGridF::add(size_t pan, FiberSegment const& fl, real rd) const
 void PointGridF::checkPP(Meca& meca, real stiff,
                          FatPointF const& aa, FatPointF const& bb)
 {
-    //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << std::endl;
+    //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
     const real ran = aa.radius + bb.radius;
     Vector vab = bb.pos - aa.pos;
     
@@ -166,7 +166,7 @@ void PointGridF::checkPP(Meca& meca, real stiff,
 void PointGridF::checkPL(Meca& meca, real stiff,
                          FatPointF const& aa, FatLocusF const& bb)
 {
-    //std::clog << "   PL- " << bb.seg << " " << aa.pnt << std::endl;
+    //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
     const real ran = aa.radius + bb.radius;
     
     // get position of point with respect to segment:
@@ -219,7 +219,7 @@ void PointGridF::checkPL(Meca& meca, real stiff,
 void PointGridF::checkLL1(Meca& meca, real stiff,
                           FatLocusF const& aa, FatLocusF const& bb)
 {
-    //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << std::endl;
+    //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
     const real ran = aa.radius + bb.radius;
     
     // get position of bb.point1() with respect to segment 'aa'
@@ -283,7 +283,7 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
 void PointGridF::checkLL2(Meca& meca, real stiff,
                           FatLocusF const& aa, FatLocusF const& bb)
 {
-    //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << std::endl;
+    //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
     const real ran = aa.radius + bb.radius;
     
     // get position of bb.point2() with respect to segment 'aa'
@@ -368,7 +368,7 @@ void PointGridF::checkLL(Meca& meca, real stiff,
     
 #endif
 
-    //std::clog << "LL " << aa.seg << " " << bb.seg << std::endl;
+    //std::clog << "LL " << aa.seg << " " << bb.seg << '\n';
     checkLL1(meca, stiff, aa, bb);
     
     if ( aa.isLast() )
@@ -534,7 +534,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
  */
 void PointGridF::setInteractions(Meca& meca, real stiff) const
 {
-    //std::clog << "----" << std::endl;
+    //std::clog << "----" << '\n';
     
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )

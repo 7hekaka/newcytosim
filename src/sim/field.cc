@@ -37,7 +37,7 @@ void Field::prepareDiffusion(real theta)
     
     /*
     std::clog << "tight Field has diffusion matrix with ";
-    std::clog << fiDiffusionMatrix.nbElements() << " elements" << std::endl;
+    std::clog << fiDiffusionMatrix.nbElements() << " elements" << '\n';
      */
 }
 
@@ -77,7 +77,7 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
     
     /*
      std::clog << "Field has diffusion matrix with ";
-     std::clog << fiDiffusionMatrix.nbElements() << " elements" << std::endl;
+     std::clog << fiDiffusionMatrix.nbElements() << " elements" << '\n';
      */
 }
 

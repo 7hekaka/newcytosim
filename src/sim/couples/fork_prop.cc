@@ -11,7 +11,7 @@
 
 Couple * ForkProp::newCouple(Glossary*) const
 {
-    //std::clog << "ForkProp::newHand" << std::endl;
+    //std::clog << "ForkProp::newHand" << '\n';
     return new Fork(this);
 }
 

@@ -90,7 +90,7 @@ void SpacePolygonZ::update()
 {
     if ( poly_.surface() < 0 )
     {
-        //std::clog << "flipping clockwise polygon `" << file << "'" << std::endl;
+        //std::clog << "flipping clockwise polygon `" << file << "'" << '\n';
         poly_.flip();
     }
 

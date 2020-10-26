@@ -40,7 +40,7 @@ void MechouiParam::read(Glossary& glos)
 template<typename T>
 static  void write_param(std::ostream& os, std::string const& name, T const& c)
 {
-    os << " " << std::left << std::setw(20) << name << " = " << c << ";" << std::endl;
+    os << " " << std::left << std::setw(20) << name << " = " << c << ";\n";
 }
 
 
@@ -55,6 +55,7 @@ void MechouiParam::write(std::ostream& os) const
     write_param(os, "directory",   directory);
     write_param(os, "config",      config);
     write_param(os, "delay",       delay);
+    os.flush();
 }
 
 

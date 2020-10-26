@@ -36,7 +36,7 @@ void processMenuFiber(int item)
             case 32:  FD->draw_average = 2;  break;
                 
             default:
-                std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+                std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
                 return;
         }
         glApp::postRedisplay();
@@ -93,7 +93,7 @@ void processMenuCouple(int item)
         case 3:  disp.couple_select = 2;  break;
         case 4:  disp.couple_select = 4;  break;
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();
@@ -131,7 +131,7 @@ void processMenuDisplay(int item)
         case 103: player.setStyle(3);  break;
             
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();
@@ -193,7 +193,7 @@ void processMenuFiberSelect(int item)
             case 2:  FD->hide ^= 1;   break;
             case 3:  FD->hide ^= 2;   break;
             default:
-                std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+                std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
                 return;
         }
         glApp::postRedisplay();
@@ -230,7 +230,7 @@ void processMenuCoupleSelect(int item)
         case 3:  disp.couple_select ^= 2;   break;
         case 4:  disp.couple_select ^= 4;   break;
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();
@@ -262,7 +262,7 @@ void processMenuSingleSelect(int item)
         case 3:  disp.single_select ^= 2;   break;
         
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();
@@ -328,7 +328,7 @@ void processMenuAnimation(int item)
         case 4:  processKey('s');   break;
         case 5:  processKey('r');   break;
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();
@@ -366,7 +366,7 @@ void processMenuReplay(int item)
         case 7:  prop.loop = 0;      break;
         case 8:  prop.loop = 1;      break;
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();
@@ -419,7 +419,7 @@ void processMenuExport(int item)
         case 24:  thread.exportObjects(true);                     return;
             
         default:
-            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << std::endl;
+            std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
     glApp::postRedisplay();

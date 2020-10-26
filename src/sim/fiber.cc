@@ -94,7 +94,7 @@ void Fiber::step()
     
 #if FIBER_HAS_MESH
     
-    //std::clog << reference() << " mesh " << std::fixed << frMesh->data(0) << std::endl;
+    //std::clog << reference() << " mesh " << std::fixed << frMesh->data(0) << '\n';
     //std::clog << reference() << " mesh sum = " << frMesh->sum() << "     ";
     
     if ( prop->mesh_binding_rate > 0 || prop->mesh_unbinding_rate > 0 )
@@ -119,9 +119,9 @@ void Fiber::step()
          */
         real cst = prop->mesh_aging_rate * simul().time_step();
         evolveMeshValues(frMesh, cst, 1.0-cst);
-        //std::clog << reference() << " lattice avg = " << frMesh->sum()*frMesh->unit()/length() << std::endl;
+        //std::clog << reference() << " lattice avg = " << frMesh->sum()*frMesh->unit()/length() << '\n';
     }
-    //std::clog << frMesh->sum() << std::endl;
+    //std::clog << frMesh->sum() << '\n';
 #endif
 }
 
@@ -144,7 +144,7 @@ Fiber::Fiber(FiberProp const* p)
 #if FIBER_HAS_LATTICE
             if ( prop->lattice_unit < REAL_EPSILON )
                 throw InvalidParameter("the Lattice unit (lattice[1]) must be > 0");
-            //Cytosim::log << reference() <<  " new Lattice" << std::endl;
+            //Cytosim::log << reference() <<  " new Lattice" << '\n';
             frLattice.setUnit(prop->lattice_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:lattice");
@@ -156,7 +156,7 @@ Fiber::Fiber(FiberProp const* p)
 #if FIBER_HAS_MESH
             if ( prop->mesh_unit < REAL_EPSILON )
                 throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
-            //Cytosim::log << reference() <<  " new value Lattice" << std::endl;
+            //Cytosim::log << reference() <<  " new value Lattice" << '\n';
             frMesh.setUnit(prop->mesh_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:mesh");
@@ -522,14 +522,14 @@ void Fiber::severNow()
 #ifdef LOGGING
                 Cytosim::log << "severed " << reference() << " at abscissa " << cut.abs;
                 Cytosim::log << "   creating " << frag->reference();
-                Cytosim::log << "   position " << frag->posEndM() << std::endl;
+                Cytosim::log << "   position " << frag->posEndM() << '\n';
 #endif
-                //Cytosim::log << " severed at X = " << frag->posEndM().XX << std::endl;
+                //Cytosim::log << " severed at X = " << frag->posEndM().XX << '\n';
             }
             else
             {
                 Cytosim::log << " sever abscissa " << cut.abs << " is out of range";
-                Cytosim::log << " [ " << abscissaM() << "   " << abscissaP() << " ]" << std::endl;
+                Cytosim::log << " [ " << abscissaM() << "   " << abscissaP() << " ]" << '\n';
             }
         }
     }
@@ -823,7 +823,7 @@ void Fiber::setDragCoefficient()
         drag = dragCoefficientSurface(len, prop);
 #if ( 0 )
         real d = dragCoefficientCylinder(len, prop);
-        Cytosim::log << "Drag of Fiber near a planar surface amplified by " << drag/d << std::endl;
+        Cytosim::log << "Drag of Fiber near a planar surface amplified by " << drag/d << '\n';
 #endif
     }
     else
@@ -836,7 +836,7 @@ void Fiber::setDragCoefficient()
 #if ( 0 )
     std::ostream& os = std::cerr; //Cytosim::log;
     os << "Fiber " << std::setw(16) << prop->name() << " length " << std::setw(7) << length();
-    os << " drag " << std::setw(9) << drag << " point_mobility " << iPointMobility << std::endl;
+    os << " drag " << std::setw(9) << drag << " point_mobility " << iPointMobility << '\n';
 #endif
 }
 
@@ -862,7 +862,7 @@ void Fiber::prepareMecable()
     real energy = bendingEnergy();
     real euler = M_PI * M_PI * prop->rigidity / ( length() * length() );
     Cytosim::log << "Euler buckling = " << euler << "    ";
-    Cytosim::log << "Bending energy = " << energy << std::endl;
+    Cytosim::log << "Bending energy = " << energy << '\n';
 #endif
 }
 
@@ -1108,7 +1108,7 @@ void Fiber::updateFiber()
     needUpdate = false;
 #if ( 0 )
     Cytosim::log << reference() << " update [ "  << std::setw(9) << std::left << abscissaM();
-    Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << std::endl;
+    Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
 #endif
     
     /*
@@ -1147,12 +1147,12 @@ void Fiber::updateFiber()
             // release Lattice substance located outside the valid abscissa range
             frMesh.collectM(sumM);
             prop->field_ptr->cell(posEndM()) += sumM;
-            //Cytosim::log << " Fiber::MINUS_END releases " << sumM << std::endl;
+            //Cytosim::log << " Fiber::MINUS_END releases " << sumM << '\n';
             
             real sumP;
             frMesh.collectP(sumP);
             prop->field_ptr->cell(posEndP()) += sumP;
-            //Cytosim::log << " Fiber::PLUS_END releases " << sumP << std::endl;
+            //Cytosim::log << " Fiber::PLUS_END releases " << sumP << '\n';
         }
     }
 #endif
@@ -1639,7 +1639,7 @@ void Fiber::makeGlue(Single*& glue)
         if ( gh->hand()->fiber() == this  &&  gh->mark() == identity() )
         {
             glue = gh;
-            //Cytosim::log << "found Fiber:glue for " << reference() << std::endl;
+            //Cytosim::log << "found Fiber:glue for " << reference() << '\n';
             return;
         }
     }
@@ -1833,7 +1833,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
     else
     {
-        Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'" << std::endl;
+        Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'" << '\n';
     }
 }
 

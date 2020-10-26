@@ -380,7 +380,7 @@ void Mecafil::makeProjectionDiff(const real* force)
         for ( size_t jj = 0; jj < nbs; ++jj )
             iJJtiJforce[jj] = std::max(th, iLLG[jj] * sc);
         
-        //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtiJforce) << std::endl;
+        //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtiJforce) << '\n';
         //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtiJforce);
     }
 }

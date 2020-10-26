@@ -232,7 +232,7 @@ Mecable * Simul::findMecable(const std::string& arg) const
 
 void Simul::add(Object * w)
 {
-    //std::clog << " Simul::add(" << w->reference() << ")" << std::endl;
+    //std::clog << " Simul::add(" << w->reference() << ")" << '\n';
     assert_true(w);
     ObjectSet * set = findSetT(w->tag());
     set->add(w);
@@ -241,7 +241,7 @@ void Simul::add(Object * w)
 
 void Simul::add(ObjectList const& objs)
 {
-    //std::clog << " Simul::add("<< objs.size() <<" objects):" << std::endl;
+    //std::clog << " Simul::add("<< objs.size() <<" objects):" << '\n';
     for ( Object * obj : objs )
         if ( obj )
             add(obj);
@@ -257,7 +257,7 @@ void Simul::remove(Object * w)
 
 void Simul::remove(ObjectList const& objs)
 {
-    //std::clog << " Simul::remove("<< objs.size() <<" objects):" << std::endl;
+    //std::clog << " Simul::remove("<< objs.size() <<" objects):" << '\n';
     for ( Object * obj : objs )
         if ( obj )
             remove(obj);
@@ -266,7 +266,7 @@ void Simul::remove(ObjectList const& objs)
 
 void Simul::erase(Object * w)
 {
-    //std::clog << "Simul::erase " << w->reference() << std::endl;
+    //std::clog << "Simul::erase " << w->reference() << '\n';
     remove(w);
     delete(w);
 }
@@ -287,7 +287,7 @@ void Simul::erase(ObjectList const& objs)
 
 void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 {
-    //std::clog << " Simul::erase("<< objs.size() <<" objects):" << std::endl;
+    //std::clog << " Simul::erase("<< objs.size() <<" objects):" << '\n';
     for ( Object * i : objs )
         i->mark(mrk);
 }
@@ -317,7 +317,7 @@ Space const* Simul::findSpace(std::string const& str) const
  */
 ObjectSet * Simul::findSet(const std::string& cat)
 {
-    //std::clog << "findSet("<<kind<<")"<<std::endl;
+    //std::clog << "findSet("<<kind<<")\n";
     if ( cat == spaces.title() )     return &spaces;
     if ( cat == fields.title() )     return &fields;
     if ( cat == fibers.title() )     return &fibers;

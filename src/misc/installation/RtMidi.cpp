@@ -417,7 +417,7 @@ RTMIDI_DLL_PUBLIC RtMidiIn :: RtMidiIn( RtMidi::Api api, const std::string &clie
 
     // No compiled support for specified API value.  Issue a warning
     // and continue as if no API was specified.
-    std::cerr << "\nRtMidiIn: no compiled support for specified API argument!\n\n" << std::endl;
+    std::cerr << "\nRtMidiIn: no compiled support for specified API argument!\n\n" << '\n';
   }
 
   // Iterate through the compiled APIs and return as soon as we find
@@ -484,7 +484,7 @@ RTMIDI_DLL_PUBLIC RtMidiOut :: RtMidiOut( RtMidi::Api api, const std::string &cl
 
     // No compiled support for specified API value.  Issue a warning
     // and continue as if no API was specified.
-    std::cerr << "\nRtMidiOut: no compiled support for specified API argument!\n\n" << std::endl;
+    std::cerr << "\nRtMidiOut: no compiled support for specified API argument!\n\n" << '\n';
   }
 
   // Iterate through the compiled APIs and return as soon as we find

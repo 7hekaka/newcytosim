@@ -64,7 +64,7 @@ size_t Mecafil::allocateMecable(const size_t nbp)
      */
     if ( ms )
     {
-        //std::clog << "Mecafil::allocatePoints " << ms << std::endl;
+        //std::clog << "Mecafil::allocatePoints " << ms << '\n';
         allocateProjection(ms);
         
         // allocate memory:

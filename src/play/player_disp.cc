@@ -50,7 +50,7 @@ void Player::setStyle(const unsigned style)
         View & view = glApp::views[n];
         if ( view.window() > 0 )
         {
-            //std::clog << "initializing GLUT window " << n << std::endl;
+            //std::clog << "initializing GLUT window " << n << '\n';
             //glutSetWindow(view.window());
             view.initGL();
             glViewport(0, 0, view.width(), view.height());
@@ -158,7 +158,7 @@ void Player::autoTrack(FiberSet const& fibers, View& view)
         Vector M, G, P;
         FiberSet::infoPosition(fibers.collect(), M, G, P);
         view.move_shift(Vector3(G));
-        //std::clog << "auto center: " << G << std::endl;
+        //std::clog << "auto center: " << G << '\n';
     }
     
     if ( view.track_fibers & 2 )
@@ -168,7 +168,7 @@ void Player::autoTrack(FiberSet const& fibers, View& view)
         view.align_with(Vector3(vec));
         //view.rotation.setFromMatrix3(vec);
         //view.rotation.conjugate();
-        //std::clog << "auto rotate: " << Vector3(vec) << std::endl;
+        //std::clog << "auto rotate: " << Vector3(vec) << '\n';
     }
 
     if ( view.track_fibers & 4 )
@@ -181,7 +181,7 @@ void Player::autoTrack(FiberSet const& fibers, View& view)
         view.rotation.setFromMatrix3(vec);
         // inverse rotation:
         view.rotation.conjugate();
-        //std::clog << "auto quat: " << view.rotation << std::endl;
+        //std::clog << "auto quat: " << view.rotation << '\n';
     }
 }
 
@@ -298,7 +298,7 @@ void Player::displayCytosim()
 
 void Player::readDisplayString(View& view, std::string const& str)
 {
-    //std::clog << "readDisplayString " << str << std::endl;
+    //std::clog << "readDisplayString " << str << '\n';
     try
     {
         Glossary glos(str);
@@ -413,7 +413,7 @@ int Player::saveScene(const int mag, const char* name, const char* format, const
     
     thread.lock();
     
-    //std::clog << "saveMagnifiedImage " << W << "x" << H << " mag=" << mag << std::endl;
+    //std::clog << "saveMagnifiedImage " << W << "x" << H << " mag=" << mag << '\n';
 
     prepareDisplay(view, mag);
     

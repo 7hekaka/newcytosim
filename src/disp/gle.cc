@@ -1197,7 +1197,7 @@ namespace gle
     
     GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Platonic::Solid & ico)
     {
-        //std::clog << "initializeIco ico " << ico.nb_faces() << std::endl;
+        //std::clog << "initializeIco ico " << ico.nb_faces() << '\n';
         
         // upload vertex data:
         glBindBuffer(GL_ARRAY_BUFFER, buf1);

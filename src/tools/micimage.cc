@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
     arg.print_warning(std::cerr, 1, "\n");
 
     res = pix / mag;
-    std::cerr << "A pixel covers a distance of " << res << " units" << std::endl;
+    std::cerr << "A pixel covers a distance of " << res << " units" << '\n';
 
     RNG.seed();
     
@@ -245,14 +245,14 @@ int main(int argc, char* argv[])
                 if ( !ferror(file) )
                 {
                     size_t cnt = image(is, file);
-                    std::cerr << "created " << on << " from " << cnt << " active emitters" << std::endl;
+                    std::cerr << "created " << on << " from " << cnt << " active emitters" << '\n';
                 }
                 fclose(file);
             }
         }
         else
         {
-            std::cerr << "Could not open file " << in << std::endl;
+            std::cerr << "Could not open file " << in << '\n';
         }
         
         is.close();
