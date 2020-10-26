@@ -1,5 +1,15 @@
+# Ignore all
+*
 
-# Cytosim's specific stuff 
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+### Above combination will ignore all files without extension ###
+
+# Ignore Cytosim's specific stuff 
 build
 bin
 lib
@@ -11,7 +21,7 @@ bin3
 *.cym
 *.tar
 
-# OSX stuff
+# Ignore OSX stuff
 **/.DS_Store
 *.xcworkspace
 *.pbxuser
@@ -30,20 +40,11 @@ DerivedData
 *.slo
 *.lo
 *.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
 
 # Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -55,20 +56,3 @@ DerivedData
 *.exe
 *.out
 *.app
-
-### CMake ###
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-
-### CMake Patch ###
-# External projects
-*-prefix/
