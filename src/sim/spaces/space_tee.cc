@@ -474,7 +474,7 @@ bool SpaceTee::draw() const
 
     glEnable(glp1);
     glPushMatrix();
-    gleScale(tRadius);
+    gle::scale(tRadius);
 
     //right side:
     glPushMatrix();

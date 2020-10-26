@@ -117,8 +117,8 @@ void Display1::drawSimul(Simul const& sim)
 inline void Display1::drawBallT(Vector const& pos, real radius, gle_color const& col) const
 {
     glPushMatrix();
-    gleTranslate(pos);
-    gleScale(radius);
+    gle::translate(pos);
+    gle::scale(radius);
 #if ( DIM == 3 )
     glEnable(GL_LIGHTING);
     col.load_both();
@@ -146,8 +146,8 @@ inline void Display1::drawPoint(Vector const& pos, PointDisp const* disp) const
 #else
         /// draw a little sphere
         glPushMatrix();
-        gleTranslate(pos);
-        gleScale(disp->size*sFactor);
+        gle::translate(pos);
+        gle::scale(disp->size*sFactor);
         gle::sphere1();
         glPopMatrix();
 #endif
@@ -165,7 +165,7 @@ void Display1::drawFiber(Fiber const& fib)
     //translate whole display to display the Fiber
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    gleTranslate(0, fib.disp->explode_shift, 0);
+    gle::translate(0, fib.disp->explode_shift, 0);
 #endif
     
     Display::drawFiber(fib);
@@ -252,7 +252,7 @@ void Display1::drawSolid(Solid const& obj)
         {
             glEnable(GL_LIGHTING);
             bodyColor(obj);
-            //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
+            //gle::gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
             glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
             gle::transAlignZ(0.5*(A+B), obj.radius(0), A-B);

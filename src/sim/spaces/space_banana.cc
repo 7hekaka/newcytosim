@@ -221,7 +221,7 @@ bool SpaceBanana::draw() const
     glPushMatrix();
     glTranslated(bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane1i);
-    gleScale(bWidth);
+    gle::scale(bWidth);
     gle::sphere8();
     glPopMatrix();
 
@@ -229,7 +229,7 @@ bool SpaceBanana::draw() const
     glPushMatrix();
     glTranslated(-bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane2i);
-    gleScale(bWidth);
+    gle::scale(bWidth);
     gle::sphere8();
     glPopMatrix();
     

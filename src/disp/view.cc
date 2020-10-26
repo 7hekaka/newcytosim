@@ -126,7 +126,7 @@ void View::closeDisplay() const
     endClipping();
     
     if ( axes )
-        gleDrawAxes(axes_size, axes);
+        gle::drawAxes(axes_size, axes);
     
     if ( scalebar )
     {
@@ -365,10 +365,10 @@ void View::setModelView() const
     glTranslatef(eyePosition[0], eyePosition[1], eyePosition[2]);
     glRotatef(ang, axs[0], axs[1], axs[2]);
 #endif
-    gleScale(zoom);
+    gle::scale(zoom);
     
     // point-of-focus:
-    gleTranslate(-(focus+focus_shift));
+    gle::translate(-(focus+focus_shift));
     
 #if ( 0 )
     std::clog << "View::setModelView eye      " << eyePosition << "\n";
@@ -889,7 +889,7 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
             drawScaleTicksH(s, a, b);
             glRasterPos2f(s-6*pixelSize(), b-12*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gleBitmapText(str);
+            gle::bitmapText(str);
         }
         w /= 2;
     } while ( w >= 0.5 );
@@ -939,7 +939,7 @@ void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
             drawScaleTicksV(s, a, b);
             glRasterPos2f(b+pixelSize(), s-4*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gleBitmapText(str);
+            gle::bitmapText(str);
         }
         w /= 2;
     } while ( w >= 0.5 );
@@ -1015,17 +1015,17 @@ void View::drawScaleBar(int mode, const real scale) const
         case 0:
             break;
         case 1:
-            gleTranslate(0, shift-0.5*visRegion[1], 0);
-            gleScale(zoom);
+            gle::translate(0, shift-0.5*visRegion[1], 0);
+            gle::scale(zoom);
             drawScaleH(S, S/10, 0);
             break;
         case 2:
-            gleTranslate(0.5*visRegion[0]-shift, 0, 0);
-            gleScale(zoom);
+            gle::translate(0.5*visRegion[0]-shift, 0, 0);
+            gle::scale(zoom);
             drawScaleV(S, -S/10, 0);
             break;
         case 3: {
-            gleScale(zoom);
+            gle::scale(zoom);
             drawScaleX(S);
         } break;
     }

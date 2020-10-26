@@ -50,8 +50,8 @@ void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
     if ( rad > minRadius )
     {
         glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(rad*sFactor);
+        gle::translate(pos);
+        gle::scale(rad*sFactor);
         obj();
         glPopMatrix();
     }
@@ -75,8 +75,8 @@ void Display::drawFlat(Vector const& pos, float rad, void(*obj)()) const
     if ( rad > pixelSize )
     {
         glPushMatrix();
-        gle::gleTranslate(pos);
-        gle::gleScale(rad);
+        gle::translate(pos);
+        gle::scale(rad);
         obj();
         glPopMatrix();
     }
@@ -92,6 +92,16 @@ void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, V
         gle::dualPassSphere2();
     if ( style & 4 )
         gle::drawThreeBands(64);
+    glPopMatrix();
+}
+
+/// used for drawFilament
+inline void drawMonomer(Vector3 const& pos, real rad)
+{
+    glPushMatrix();
+    gle::translate(pos);
+    gle::scale(rad);
+    gle::sphere2();
     glPopMatrix();
 }
 
@@ -183,9 +193,9 @@ void Display::displayTiled(Simul const& sim, int arg)
     for ( int dz = l[2]; dz <= u[2]; ++dz )
     {
         Vector T = dx * px + dy * py + dz * pz;
-        gle::gleTranslate( T);
+        gle::translate( T);
         display(sim);
-        gle::gleTranslate(-T);
+        gle::translate(-T);
     }
 }
 
@@ -611,10 +621,10 @@ void Display::drawAverageFiber(ObjectList const& objs)
     if ( S > REAL_EPSILON )
     {
         Vector MP = normalize( P - M );
-        const float rad = 10 * pixelSize;
+        const float rad = 10 * sFactor;
         gle::drawCylinder(M, MP, rad);
         gle::drawCone(P, MP, rad);
-        gle::gleObject(G, rad, gle::sphere2);
+        drawObject(G, 10, gle::sphere2);
     }
 }
 
@@ -1106,9 +1116,8 @@ void Display::drawFiberPoints(Fiber const& fib) const
     }
     else if ( style == 3 )
     {
-        const float rad = 2*disp->point_size*sFactor;
         // display only middle of fiber:
-        gle::gleObject(fib.posMiddle(), rad, gle::sphere2);
+        drawObject(fib.posMiddle(), 2*disp->point_size, gle::sphere2);
     }
     // display backbone:
     if ( disp->point_style & 4 )
@@ -1350,12 +1359,6 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
 
 //------------------------------------------------------------------------------
 #pragma mark - Specific styles
-
-/// used for drawFilament
-inline void drawMonomer(Vector3 const& pos, real rad)
-{
-    gle::gleObject(pos, rad, gle::sphere2);
-}
 
 
 /**

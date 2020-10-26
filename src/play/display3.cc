@@ -140,8 +140,8 @@ inline void Display3::drawBallT(Vector const& pos, float radius, gle_color const
     glEnable(GL_LIGHTING);
     col.load_both();
     glPushMatrix();
-    gleTranslate(pos);
-    gleScale(radius);
+    gle::translate(pos);
+    gle::scale(radius);
     gle::dualPassSphere4();
     glPopMatrix();
 }
@@ -151,8 +151,8 @@ inline void Display3::drawPoint(Vector const& pos, float size) const
 {
     glEnable(GL_LIGHTING);
     glPushMatrix();
-    gleTranslate(pos);
-    gleScale(size*sFactor);
+    gle::translate(pos);
+    gle::scale(size*sFactor);
     gle::sphere2();
     glPopMatrix();
 }
@@ -164,8 +164,8 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
     {
         glEnable(GL_LIGHTING);
         glPushMatrix();
-        gleTranslate(pos);
-        gleScale(disp->size*sFactor);
+        gle::translate(pos);
+        gle::scale(disp->size*sFactor);
         gle::sphere1();
 #if ( 0 )
         if ( disp->symbol )
@@ -900,7 +900,7 @@ void Display3::drawSolid(Solid const& obj)
     {
         glEnable(GL_LIGHTING);
         bodyColor(obj);
-        //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
+        //gle::gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
         glPushMatrix();
         Vector A = obj.posP(0), B = obj.posP(1);
         gle::transAlignZ(0.5*(A+B), obj.radius(0), A-B);
@@ -1103,7 +1103,7 @@ void Display3::drawSingleA(Single const* obj) const
             {
                 // draw a disc tangent to the Space:
                 disp->color2.load_both();
-                gleObject(pf, spc->normalToEdge(pf), disp->size*sFactor, gle::discUp);
+                drawObject(pf, spc->normalToEdge(pf), disp->size, gle::discUp);
                 disp->color.load_both();
             }
         }
@@ -1111,7 +1111,7 @@ void Display3::drawSingleA(Single const* obj) const
 #if ( DIM > 2 )
         gleTube(pf, ph, disp->width*sFactor, gle::cone);
 #else
-        gleBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
+        gle::drawBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
     }
     if ( obj->base() )

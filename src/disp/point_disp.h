@@ -181,12 +181,12 @@ public:
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            gle::gleRasterPos(pos);
+            gle::rasterPos(pos);
             drawPixelmap(0);
     #else
             glPushMatrix();
-            gle::gleTranslate(pos);
-            gle::gleScale(realSize);
+            gle::translate(pos);
+            gle::scale(realSize);
             color2.load();
             gle::discUp();
             glPopMatrix();
@@ -201,12 +201,12 @@ public:
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            gle::gleRasterPos(pos);
+            gle::rasterPos(pos);
             drawPixelmap(1);
     #else
             glPushMatrix();
-            gle::gleTranslate(pos);
-            gle::gleScale(realSize);
+            gle::translate(pos);
+            gle::scale(realSize);
             color2.load();
             strokeA();
             glPopMatrix();
@@ -221,12 +221,12 @@ public:
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            gle::gleRasterPos(pos);
+            gle::rasterPos(pos);
             drawPixelmap(2);
     #else
             glPushMatrix();
-            gle::gleTranslate(pos);
-            gle::gleScale(realSize);
+            gle::translate(pos);
+            gle::scale(realSize);
             color.load();
             strokeA();
             glPopMatrix();

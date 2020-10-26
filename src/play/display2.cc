@@ -97,8 +97,8 @@ void Display2::drawSimul(Simul const& sim)
 inline void Display2::drawBallT(Vector const& pos, real radius, gle_color const& col) const
 {
     glPushMatrix();
-    gleTranslate(pos);
-    gleScale(radius);
+    gle::translate(pos);
+    gle::scale(radius);
 #if ( DIM == 3 )
     glEnable(GL_LIGHTING);
     col.load_both();
@@ -117,8 +117,8 @@ inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
     glEnable(GL_LIGHTING);
     glPushMatrix();
-    gleTranslate(pos);
-    gleScale(disp->size*sFactor);
+    gle::translate(pos);
+    gle::scale(disp->size*sFactor);
     gle::sphere1();
     glPopMatrix();
 }
@@ -201,7 +201,7 @@ void Display2::drawSolid(Solid const& obj)
         {
             glEnable(GL_LIGHTING);
             bodyColor(obj);
-            //gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
+            //gle::gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
             glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
             gle::transAlignZ(0.5*(A+B), obj.radius(0), A-B);
@@ -410,8 +410,8 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 gleTube(pf, ph, disp->width*sFactor, gle::cone);
                 //drawCone(pf, ph-pf, disp->width*sFactor);
 #else
-                gleBand(ph, disp->width*sFactor, ps, disp->width*sFactor);
-                gleBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
+                gle::drawBand(ph, disp->width*sFactor, ps, disp->width*sFactor);
+                gle::drawBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
             }
         }

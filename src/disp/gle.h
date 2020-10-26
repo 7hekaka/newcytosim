@@ -49,14 +49,14 @@ namespace gle
 
 #pragma mark -
     
-    inline void gleScale(float x)                          { glScalef(x,x,x); }
-    inline void gleScale(double x)                         { glScaled(x,x,x); }
+    inline void scale(float x)                          { glScalef(x,x,x); }
+    inline void scale(double x)                         { glScaled(x,x,x); }
 
-    inline void gleScale(float x, float y, float z)        { glScalef(x,y,z); }
-    inline void gleScale(double x, double y, double z)     { glScaled(x,y,z); }
+    inline void scale(float x, float y, float z)        { glScalef(x,y,z); }
+    inline void scale(double x, double y, double z)     { glScaled(x,y,z); }
    
-    inline void gleTranslate(float x, float y, float z)    { glTranslatef(x, y, z); }
-    inline void gleTranslate(double x, double y, double z) { glTranslated(x, y, z); }
+    inline void translate(float x, float y, float z)    { glTranslatef(x, y, z); }
+    inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
 
 #if REAL_IS_DOUBLE
     
@@ -70,13 +70,13 @@ namespace gle
     inline void gleNormal(Vector2 const& v)               { glNormal3d(v.XX, v.YY, 0); }
     inline void gleNormal(Vector3 const& v)               { glNormal3d(v.XX, v.YY, v.ZZ); }
     
-    inline void gleTranslate(Vector1 const& v)            { glTranslated(v.XX, 0, 0); }
-    inline void gleTranslate(Vector2 const& v)            { glTranslated(v.XX, v.YY, 0); }
-    inline void gleTranslate(Vector3 const& v)            { glTranslated(v.XX, v.YY, v.ZZ); }
+    inline void translate(Vector1 const& v)            { glTranslated(v.XX, 0, 0); }
+    inline void translate(Vector2 const& v)            { glTranslated(v.XX, v.YY, 0); }
+    inline void translate(Vector3 const& v)            { glTranslated(v.XX, v.YY, v.ZZ); }
 
-    inline void gleRasterPos(Vector1 const& v)            { glRasterPos2d(v.XX, 0); }
-    inline void gleRasterPos(Vector2 const& v)            { glRasterPos2d(v.XX, v.YY); }
-    inline void gleRasterPos(Vector3 const& v)            { glRasterPos3d(v.XX, v.YY, v.ZZ); }
+    inline void rasterPos(Vector1 const& v)            { glRasterPos2d(v.XX, 0); }
+    inline void rasterPos(Vector2 const& v)            { glRasterPos2d(v.XX, v.YY); }
+    inline void rasterPos(Vector3 const& v)            { glRasterPos3d(v.XX, v.YY, v.ZZ); }
 
 #else
 
@@ -90,20 +90,15 @@ namespace gle
     inline void gleNormal(Vector2 const& v)               { glNormal3f(v.XX, v.YY, 0); }
     inline void gleNormal(Vector3 const& v)               { glNormal3f(v.XX, v.YY, v.ZZ); }
     
-    inline void gleTranslate(Vector1 const& v)            { glTranslatef(v.XX, 0, 0); }
-    inline void gleTranslate(Vector2 const& v)            { glTranslatef(v.XX, v.YY, 0); }
-    inline void gleTranslate(Vector3 const& v)            { glTranslatef(v.XX, v.YY, v.ZZ); }
+    inline void translate(Vector1 const& v)            { glTranslatef(v.XX, 0, 0); }
+    inline void translate(Vector2 const& v)            { glTranslatef(v.XX, v.YY, 0); }
+    inline void translate(Vector3 const& v)            { glTranslatef(v.XX, v.YY, v.ZZ); }
 
-    inline void gleRasterPos(Vector1 const& v)            { glRasterPos2f(v.XX, 0); }
-    inline void gleRasterPos(Vector2 const& v)            { glRasterPos2f(v.XX, v.YY); }
-    inline void gleRasterPos(Vector3 const& v)            { glRasterPos3f(v.XX, v.YY, v.ZZ); }
+    inline void rasterPos(Vector1 const& v)            { glRasterPos2f(v.XX, 0); }
+    inline void rasterPos(Vector2 const& v)            { glRasterPos2f(v.XX, v.YY); }
+    inline void rasterPos(Vector3 const& v)            { glRasterPos3f(v.XX, v.YY, v.ZZ); }
  
 #endif
-    
-    inline void gleVertex3v(const float* v)               { glVertex3fv(v); }
-    inline void gleVertex3v(const double* v)              { glVertex3dv(v); }
-    inline void gleNormal3v(const float* v)               { glNormal3fv(v); }
-    inline void gleNormal3v(const double* v)              { glNormal3dv(v); }
 
     // colors that vary with the direction of a vector:
     inline gle_color radial_color(const Vector3& d) { return gle_color::radial_color((GLfloat)d.XX, (GLfloat)d.YY, (GLfloat)d.ZZ, 1.0f); }
@@ -287,29 +282,18 @@ namespace gle
     inline void endedTube2() { halfTube2(); discDown(); }
     inline void endedTube4() { halfTube4(); discDown(); }
     
+    inline void arrowHead() { tube1(); glTranslatef(0, 0, 1); glScalef(3.f, 3.f, 3.f); gle::longCone(); }
+
     //------------------------------------------------------------------------------
 #pragma mark -
     
     /// display back first, and then front
     void dualPass(void primitive());
-    
-    /// draw the object specified by obj, scaled by radius
-    void gleObject(real radius, void (*obj)());
-    
-    /// draw 'obj' scaled by radius at position 'x'
-    void gleObject(Vector1 const& x, float rad, void (*obj)());
-    void gleObject(Vector2 const& x, float rad, void (*obj)());
-    void gleObject(Vector3 const& x, float rad, void (*obj)());
  
     /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& x, Vector1 const& d, float rad, void (*obj)());
-    void gleObject(Vector2 const& x, Vector2 const& d, float rad, void (*obj)());
-    void gleObject(Vector3 const& x, Vector3 const& d, float rad, void (*obj)());
-
-    /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& A, Vector1 const& B, void (*obj)());
-    void gleObject(Vector2 const& A, Vector2 const& B, void (*obj)());
-    void gleObject(Vector3 const& A, Vector3 const& B, void (*obj)());
+    void gleObject(Vector1 const& pos, Vector1 const& dir, float rad, void (*obj)());
+    void gleObject(Vector2 const& pos, Vector2 const& dir, float rad, void (*obj)());
+    void gleObject(Vector3 const& pos, Vector3 const& dir, float rad, void (*obj)());
     
     //------------------------------------------------------------------------------
 
@@ -318,34 +302,34 @@ namespace gle
     void gleTube(Vector2 const& A, Vector2 const& B, float rad, void (*obj)());
     void gleTube(Vector3 const& A, Vector3 const& B, float rad, void (*obj)());
 
-    void drawTube(Vector1 const& a, float rad, Vector1 const& b, void (*obj)());
-    void drawTube(Vector2 const& a, float rad, Vector2 const& b, void (*obj)());
-    void drawTube(Vector3 const& a, float rad, Vector3 const& b, void (*obj)());
+    void drawTube(Vector1 const& A, float rad, Vector1 const& B, void (*obj)());
+    void drawTube(Vector2 const& A, float rad, Vector2 const& B, void (*obj)());
+    void drawTube(Vector3 const& A, float rad, Vector3 const& B, void (*obj)());
     
     /// draw a band from A to B, with specified radius
-    void gleBand(Vector2 const& A, Vector2 const& B, real);
-    void gleBand(Vector3 const& A, Vector3 const& B, real);
+    void drawBand(Vector2 const& A, Vector2 const& B, real);
+    void drawBand(Vector3 const& A, Vector3 const& B, real);
 
     /// draw a band from A to B, with specified radius in A and B
-    void gleBand(Vector1 const& a, real, Vector1 const& b, real);
-    void gleBand(Vector2 const& a, real, Vector2 const& b, real);
+    void drawBand(Vector1 const& a, real, Vector1 const& b, real);
+    void drawBand(Vector2 const& a, real, Vector2 const& b, real);
     
     /// draw a band from A to B, with specified radius and colors in A and B
-    void gleBand(Vector1 const& a, real, gle_color, Vector1 const& b, real, gle_color);
-    void gleBand(Vector2 const& a, real, gle_color, Vector2 const& b, real, gle_color);
+    void drawBand(Vector1 const& a, real, gle_color, Vector1 const& b, real, gle_color);
+    void drawBand(Vector2 const& a, real, gle_color, Vector2 const& b, real, gle_color);
 
     /// draw symbol linking A to B
-    void gleMan(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&);
-    void gleMan(Vector2 const&, Vector2 const&, gle_color,
+    void drawHourglass(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&);
+    void drawHourglass(Vector2 const&, Vector2 const&, gle_color,
                 Vector2 const&, Vector2 const&, gle_color);
     /// draw symbol linking A to B
-    void gleCross(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&, real);
-    void gleBar(Vector3 const& a, Vector3 const& da, Vector3 const& b, Vector3 const& db, real);
+    void drawCross(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&, real);
+    void drawBar(Vector3 const& a, Vector3 const& da, Vector3 const& b, Vector3 const& db, real);
     
     /// draw two discs in A and B, connected with a line
-    void gleDumbbell(Vector2 const& A, Vector2 const& B, float diameter);
+    void drawDumbbell(Vector2 const& A, Vector2 const& B, float diameter);
     /// draw two spheres in A and B, connected with a cylinder
-    void gleDumbbell(Vector3 const& A, Vector3 const& B, float diameter);
+    void drawDumbbell(Vector3 const& A, Vector3 const& B, float diameter);
 
     /// display cone, dir should be normalized
     void drawCone(Vector1 const& center, Vector1 const& dir, float rad);
@@ -386,7 +370,7 @@ namespace gle
     void drawText(const char text[], void* font, gle_color bcol, int position, int width, int height);
     
     /// draw text at the current OpenGL raster position and raster color
-    void gleBitmapText(const char text[], void* font = nullptr, GLfloat vshift = 0);
+    void bitmapText(const char text[], void* font = nullptr, GLfloat vshift = 0);
     
     /// draw `text` at position `pos`
     void drawText(Vector1 const& pos, const char text[], void* font, float dx=0);
@@ -399,22 +383,22 @@ namespace gle
 #pragma mark -
     
     /// draw pixel array `rgba` containing 4 bytes per pixels
-    void gleDrawPixels(int width, int height, int nbc, GLubyte rgba[], Vector2 pos, Vector2 dx, Vector2 dy);
+    void drawPixels(int width, int height, int nbc, GLubyte rgba[], Vector2 pos, Vector2 dx, Vector2 dy);
     
     /// display rectangle specified in pixel-coordinates
-    void gleDrawRectangle(const int rect[4], int window_width, int window_height);
+    void drawRectangle(const int rect[4], int window_width, int window_height);
     
     /// draw a rectangle to indicate the GLUT window-resize handle
-    void gleDrawResizeBox(int window_width, int window_height);
+    void drawResizeBox(int window_width, int window_height);
     
     /// draw plane with squares of alternating colors
     void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2);
 
     /// draw a set of 2 or 3 axes, depending on `dim`
-    void gleDrawAxes(real size, int dim);
+    void drawAxes(real size, int dim);
     
     /// convert OpenGL error code to string
-    const char* gleErrorString(GLenum code);
+    const char* errorString(GLenum code);
 
     /// check and print OpenGL error(s)
     void reportErrors(FILE*, const char* msg);

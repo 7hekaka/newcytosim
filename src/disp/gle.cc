@@ -182,11 +182,6 @@ namespace gle
     
     //-----------------------------------------------------------------------
     #pragma mark - Rotation
-    
-    void alignZ(GLfloat X)
-    {
-        glRotated(std::copysign(90, X), 0.0, 1.0, 0.0);
-    }
 
     template < typename FLOAT >
     inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3])
@@ -228,6 +223,21 @@ namespace gle
     /**
      `R` is the transverse scaling done in the XY plane after rotation
      */
+    void stretchAlignZ(Vector1 const& A, Vector1 const& B, float R)
+    {
+        float X = std::copysign(R, B.XX-A.XX);
+        //warning! this matrix appears here transposed
+        float mat[16] = {
+            0, -X,  0,  0,
+            0,  0, -R,  0,
+            X,  0,  0,  0,
+            float(A.XX), 0, 0, 1 };
+        glMultMatrixf(mat);
+    }
+
+    /**
+     `R` is the transverse scaling done in the XY plane after rotation
+     */
     void stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
     {
         float X = float(B.XX-A.XX);
@@ -240,7 +250,7 @@ namespace gle
             Y*R,  -X*R,  0,  0,
             0,       0, -R,  0,
             X,       Y,  0,  0,
-            float(A.XX), float(A.YY),  0,  1 };
+            float(A.XX), float(A.YY), 0, 1 };
         glMultMatrixf(mat);
     }
     
@@ -1594,78 +1604,13 @@ namespace gle
         glCullFace(GL_BACK);
         primitive();
         if ( !cull ) glDisable(GL_CULL_FACE);
-    }
-    
-    
-    void gleObject(const real rad, void (*obj)())
-    {
-        glPushMatrix();
-        gleScale(rad);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector1 const& x, const float rad, void (*obj)())
-    {
-        glPushMatrix();
-        gleTranslate(x);
-        gleScale(rad);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector2 const& x, const float rad, void (*obj)())
-    {
-        glPushMatrix();
-        gleTranslate(x);
-        gleScale(rad);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector3 const& x, const float rad, void (*obj)())
-    {
-        glPushMatrix();
-        gleTranslate(x);
-        gleScale(rad);
-        obj();
-        glPopMatrix();
-    }
-    
-    
-    //-----------------------------------------------------------------------
-    void gleObject(Vector1 const& A, Vector1 const& B, void (*obj)())
-    {
-        glPushMatrix();
-        alignZ(B.XX-A.XX);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector2 const& A, Vector2 const& B, void (*obj)())
-    {
-        glPushMatrix();
-        stretchAlignZ(A, B, 1);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector3 const& A, Vector3 const& B, void (*obj)())
-    {
-        glPushMatrix();
-        stretchAlignZ(A, B, 1);
-        obj();
-        glPopMatrix();
-    }
-    
+    }    
     
     //-----------------------------------------------------------------------
     void gleObject(Vector1 const& X, Vector1 const& D, const float R, void (*obj)())
     {
         glPushMatrix();
-        gleTranslate(X);
-        alignZ(D.XX);
-        gleScale(R);
+        transAlignZ(X, R, D);
         obj();
         glPopMatrix();
     }
@@ -1693,8 +1638,7 @@ namespace gle
     void gleTube(Vector1 const& A, Vector1 const& B, float R, void (*obj)())
     {
         glPushMatrix();
-        alignZ(B.XX-A.XX);
-        gleScale(1, R, 1);
+        stretchAlignZ(A, B, R);
         obj();
         glPopMatrix();
     }
@@ -1743,7 +1687,7 @@ namespace gle
 
     //-----------------------------------------------------------------------
     
-    void gleBand(Vector2 const& A, Vector2 const& B, real rad)
+    void drawBand(Vector2 const& A, Vector2 const& B, real rad)
     {
         Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
@@ -1760,7 +1704,7 @@ namespace gle
     }
     
     
-    void gleBand(Vector1 const& A, real rA,
+    void drawBand(Vector1 const& A, real rA,
                  Vector1 const& B, real rB)
     {
         glBegin(GL_TRIANGLE_STRIP);
@@ -1771,7 +1715,7 @@ namespace gle
         glEnd();
     }
     
-    void gleBand(Vector2 const& A, real rA,
+    void drawBand(Vector2 const& A, real rA,
                  Vector2 const& B, real rB)
     {
         Vector2 d = ( B - A ).orthogonal();
@@ -1788,7 +1732,7 @@ namespace gle
         }
     }
     
-    void gleBand(Vector1 const& a, real ra, gle_color ca,
+    void drawBand(Vector1 const& a, real ra, gle_color ca,
                  Vector1 const& b, real rb, gle_color cb)
     {
         glBegin(GL_TRIANGLE_STRIP);
@@ -1801,7 +1745,7 @@ namespace gle
         glEnd();
     }
     
-    void gleBand(Vector2 const& a, real ra, gle_color ca,
+    void drawBand(Vector2 const& a, real ra, gle_color ca,
                  Vector2 const& b, real rb, gle_color cb)
     {
         Vector2 d = ( b - a ).orthogonal();
@@ -1825,7 +1769,7 @@ namespace gle
      This will displays a rectangle if the connection is parallel,
      and a hourglass if the connection is antiparallel
      */
-    void gleMan(Vector2 const& a, Vector2 const& da,
+    void drawHourglass(Vector2 const& a, Vector2 const& da,
                 Vector2 const& b, Vector2 const& db)
     {
         Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
@@ -1844,7 +1788,7 @@ namespace gle
      This will displays a rectangle if the connection is parallel,
      and a hourglass if the connection is antiparallel
      */
-    void gleMan(Vector2 const& a, Vector2 const& da, gle_color ca,
+    void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color ca,
                 Vector2 const& b, Vector2 const& db, gle_color cb)
     {
         Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
@@ -1874,7 +1818,7 @@ namespace gle
      This will displays a rectangle if the connection is antiparallel,
      and a hourglass if the connection is parallel
      */
-    void gleCross(Vector2 const& a, Vector2 const& da,
+    void drawCross(Vector2 const& a, Vector2 const& da,
                   Vector2 const& b, Vector2 const& db, real rad)
     {
         glLineWidth(0.5);
@@ -1892,7 +1836,7 @@ namespace gle
         glEnd();
     }
     
-    void gleBar(Vector3 const& a, Vector3 const& da,
+    void drawBar(Vector3 const& a, Vector3 const& da,
                 Vector3 const& b, Vector3 const& db, real rad)
     {
         Vector3 ab = normalize( a - b );
@@ -1929,7 +1873,7 @@ namespace gle
      Two hexagons linked by a rectangle
      hexagons have the same surface as a disc of radius 1.
      */
-    void gleDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
+    void drawDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
     {
         const GLfloat S = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
         const GLfloat R = diameter * S;
@@ -1940,7 +1884,7 @@ namespace gle
         Vector2 y = x.orthogonal(X);
         
         glPushMatrix();
-        gleTranslate(A);
+        translate(A);
         
         // this is an hexagon centered around 'a':
         glBegin(GL_TRIANGLE_FAN);
@@ -1963,7 +1907,7 @@ namespace gle
         glEnd();
         
         // an hexagon centered around 'b'
-        gleTranslate(B-A);
+        translate(B-A);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(0,0);
         gleVertex(x+y);
@@ -2094,8 +2038,7 @@ namespace gle
     void drawArrow(Vector1 const& A, Vector1 const& B, float R)
     {
         glPushMatrix();
-        alignZ(B.XX-A.XX);
-        gleScale(1,R,1);
+        stretchAlignZ(A, B, R);
         tube1();
         glTranslatef(0, 0, 1);
         glScaled(3.0, 3.0, 3*R);
@@ -2179,7 +2122,7 @@ namespace gle
      draw the string character per character using:
      glutBitmapCharacter()
      */
-    void gleBitmapText(const char text[], void* font, GLfloat vshift)
+    void bitmapText(const char text[], void* font, GLfloat vshift)
     {
         if ( !font )
         {
@@ -2223,10 +2166,10 @@ namespace gle
         int L = 1;
         int H = fontHeight(font);
         int W = maxTextWidth(text, font, L);
-        gleRasterPos(vec);
+        rasterPos(vec);
         //translate to center the bitmap:
         glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
-        gleBitmapText(text, font, H);
+        bitmapText(text, font, H);
         glPopAttrib();
     }
     
@@ -2353,7 +2296,7 @@ namespace gle
             }
         }
         
-        gleBitmapText(text, font, lineHeight);
+        bitmapText(text, font, lineHeight);
         
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
@@ -2383,7 +2326,7 @@ namespace gle
      The magnitudes of `dx` and `dy` indicates the dimensions of a pixel.
      They may be of different magnitudes, and not necessarily orthogonal.
      */
-    void gleDrawPixels(int width, int height, int nbc, GLubyte rgba[], Vector2 pos, Vector2 dx, Vector2 dy)
+    void drawPixels(int width, int height, int nbc, GLubyte rgba[], Vector2 pos, Vector2 dx, Vector2 dy)
     {
         glPushAttrib(GL_ENABLE_BIT|GL_POLYGON_BIT);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -2450,7 +2393,7 @@ namespace gle
     }
     
     
-    void gleDrawRectangle(const int rec[4], int width, int height)
+    void drawRectangle(const int rec[4], int width, int height)
     {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -2477,7 +2420,7 @@ namespace gle
     }
     
     
-    void gleDrawResizeBox(int width, int height)
+    void drawResizeBox(int width, int height)
     {
         //set the matrices
         glMatrixMode(GL_MODELVIEW);
@@ -2574,7 +2517,7 @@ namespace gle
 
     
     //-----------------------------------------------------------------------
-    void gleDrawAxes(const real size, int dim)
+    void drawAxes(const real size, int dim)
     {
         const GLfloat S = GLfloat(size);
         const GLfloat R = S * 0.1f;
@@ -2610,13 +2553,13 @@ namespace gle
         // display a white ball at the origin
         gle_color(1.0, 1.0, 1.0, 1.0).load_load();
         glPushMatrix();
-        gleScale(R);
+        scale(R);
         gle::sphere4();
         glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
-    char const* gleErrorString(GLenum code)
+    char const* errorString(GLenum code)
     {
         switch ( code )
         {
@@ -2641,7 +2584,7 @@ namespace gle
         GLenum glError = glGetError();
         while ( glError != GL_NO_ERROR )
         {
-            fprintf(out, "OpenGL error `%s' %s\n", gleErrorString(glError), msg);
+            fprintf(out, "OpenGL error `%s' %s\n", errorString(glError), msg);
             glError = glGetError();
         }
     }
