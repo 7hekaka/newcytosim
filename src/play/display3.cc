@@ -1046,7 +1046,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             glPopMatrix();
 #else
             for ( size_t ii = 0; ii < sol->nbPoints(); ii+=2 )
-                gleTube(sol->posPoint(ii), sol->posPoint(ii+1), w, gle::hexTube1);
+                gleTube(sol->posPoint(ii), sol->posPoint(ii+1), w, gle::hexTube);
 #endif
         }
     }
@@ -1211,7 +1211,7 @@ void Display3::drawCoupleBfast(Couple const* cx) const
         if ( pd1->visible )
         {
             pd1->color.load_both();
-            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube1);
+            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
             drawHand(p1, pd1);
             drawHand(p2, pd2);
         }
@@ -1265,7 +1265,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         {
             pd1->color.load_both(cx->fiber1()->disp->color.transparency());
             glDepthMask(GL_FALSE);
-            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube1);
+            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
             glDepthMask(GL_TRUE);
             continue;
         }
@@ -1279,16 +1279,16 @@ void Display3::drawCoupleB(Couple const* cx) const
             // accurate rendering of Couple's composite link
             Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
             drawPoint(mid, pd1->width);
-            gleTube(p2, mid, pd2->width*sFactor, gle::tube2); //gle::hexTube1);
-            gleTube(p1, mid, pd1->width*sFactor, gle::tube2); //gle::hexTube1);
+            gleTube(p2, mid, pd2->width*sFactor, gle::tube2); //gle::hexTube);
+            gleTube(p1, mid, pd1->width*sFactor, gle::tube2); //gle::hexTube);
 #elif ( 0 )
             drawPoint(cx->sidePos1(), pd1->width);
             drawPoint(cx->sidePos2(), pd1->width);
-            gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gle::hexTube1);
-            gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gle::hexTube1);
-            gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gle::hexTube1);
+            gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gle::hexTube);
+            gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gle::hexTube);
+            gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gle::hexTube);
 #else
-            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube1);
+            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
 #endif
         }
     }

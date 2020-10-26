@@ -1083,7 +1083,7 @@ namespace gle
     void halfTube1() { drawBuffer(tub_[14], tub_[15], 2+ncircle/4, GL_TRIANGLE_STRIP); }
     void halfTube2() { drawBuffer(tub_[16], tub_[17], 2+ncircle/2, GL_TRIANGLE_STRIP); }
     void halfTube4() { drawBuffer(tub_[18], tub_[19], 2+ncircle  , GL_TRIANGLE_STRIP); }
-    void hexTube1()  { drawBuffer(tub_[22], tub_[23], 14, GL_TRIANGLE_STRIP); }
+    void hexTube()  { drawBuffer(tub_[22], tub_[23], 14, GL_TRIANGLE_STRIP); }
 #else
     // unbuffered functions:
     void tube1()     { tubeZ(0, 1, 8); }
@@ -1096,7 +1096,7 @@ namespace gle
     void halfTube1() { tubeZ(-256.f, 0.0f, 8); }
     void halfTube2() { tubeZ(-256.f, 0.0f, 4); }
     void halfTube4() { tubeZ(-256.f, 0.0f, 2); }
-    void hexTube1()  { hexTubeZ(0, 1); }
+    void hexTube()  { hexTubeZ(0, 1); }
 #endif
  
     void tubeZ(GLfloat za, GLfloat ra, gle_color ca, GLfloat zb, GLfloat rb, gle_color cb)

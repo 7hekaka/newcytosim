@@ -211,7 +211,7 @@ namespace gle
     /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
     void halfTube4();
     /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
-    void hexTube1();
+    void hexTube();
 
     
     /// draw a closed tube along Z, or diameter 1 and length 1
