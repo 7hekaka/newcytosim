@@ -199,20 +199,20 @@ void Mecafil::makeProjection()
  
  Note that this should work even if 'mul==src'
  */
-void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
+void projectForcesU_(size_t nbs, const real* dir, const real* src, real* mul)
 {
     const real *const end = mul + nbs;
 
     while ( mul < end )
     {
-        *mul = dif[0] * ( src[DIM  ] - src[0] )
-             + dif[1] * ( src[DIM+1] - src[1] )
+        *mul = dir[0] * ( src[DIM  ] - src[0] )
+             + dir[1] * ( src[DIM+1] - src[1] )
 #if ( DIM > 2 )
-             + dif[2] * ( src[DIM+2] - src[2] )
+             + dir[2] * ( src[DIM+2] - src[2] )
 #endif
         ;
         src += DIM;
-        dif += DIM;
+        dir += DIM;
         ++mul;
     }
 }
@@ -231,21 +231,22 @@ void projectForcesU_(size_t nbs, const real* dif, const real* src, real* mul)
  
  Note that this should work even if 'dst==src'
  */
-void projectForcesD_(size_t nbs, const real* dif, const real* src, const real* mul, real* dst)
+void projectForcesD_(size_t nbs, const real* dir, const real* src, const real* mul, real* dst)
 {
     for ( size_t s = 0, e = DIM*nbs; s < DIM; ++s, ++e )
     {
-        dst[s] = src[s] + dif[s    ] * mul[    0];
-        dst[e] = src[e] - dif[e-DIM] * mul[nbs-1];
+        dst[s] = src[s] + dir[s    ] * mul[    0];
+        dst[e] = src[e] - dir[e-DIM] * mul[nbs-1];
     }
     
     for ( size_t jj = 1; jj < nbs; ++jj )
     {
         const size_t kk = DIM*jj;
-        dst[kk  ] = src[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
-        dst[kk+1] = src[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
+        const real M = mul[jj], P = mul[jj-1];
+        dst[kk  ] = src[kk  ] + dir[kk  ] * M - dir[kk-DIM  ] * P;
+        dst[kk+1] = src[kk+1] + dir[kk+1] * M - dir[kk-DIM+1] * P;
 #if ( DIM > 2 )
-        dst[kk+2] = src[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
+        dst[kk+2] = src[kk+2] + dir[kk+2] * M - dir[kk-DIM+2] * P;
 #endif
     }
 }
