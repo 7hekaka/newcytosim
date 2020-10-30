@@ -317,7 +317,9 @@ inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
         case 2: applyPrecondIsoS(mec, Y); break;
         case 3: applyPrecondIsoP(mec, Y); break;
         case 4: applyPrecondFull(mec, Y); break;
+#if EXPERIMENTAL_PRECONDITIONNERS
         case 7: mec->blockMultiply(X, Y); break;
+#endif
         default: ABORT_NOW("unknown Mecable::blockType()"); break;
     }
 }
@@ -1107,6 +1109,7 @@ void Meca::computePrecondFull(Mecable* mec)
  */
 void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
 {
+#if EXPERIMENTAL_PRECONDITIONNERS
     const size_t bks = DIM * mec->nbPoints();
     // create Identity matrix:
     init_matrix(bks, wrk, 1, 0);
@@ -1122,6 +1125,7 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
         mec->blockType(7);
         //std::clog << "R";
     }
+#endif
 }
 
 
@@ -1130,6 +1134,7 @@ renew preconditionner block corresponding to 'mec'
  */
 void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, real* wrk, size_t wrksize)
 {
+#if EXPERIMENTAL_PRECONDITIONNERS
     const size_t bks = DIM * mec->nbPoints();
     const int age = mec->blockAge();
 
@@ -1147,6 +1152,7 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
     }
     else
         mec->blockAge(age+1);
+#endif
 }
 
 

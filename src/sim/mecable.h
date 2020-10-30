@@ -12,6 +12,10 @@
 
 class Meca;
 
+/// include some experimental preconditionner methods
+#define EXPERIMENTAL_PRECONDITIONNERS 0
+
+
 /// Can be simulated using a Meca.
 /**
  A Mecable is an Object made of points that can can be simulated in a Meca.
@@ -67,12 +71,14 @@ private:
     
     /// type of block
     int         pBlockType;
-    
+
+#if EXPERIMENTAL_PRECONDITIONNERS
     /// Flag that pBlock[] is used for preconditionning
     int         pBlockAge;
     
     /// Matrix used for preconditionning
     MatrixFull  pBlockMatrix;
+#endif
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
     size_t      pIndex;
@@ -250,12 +256,6 @@ public:
      then X2, Y2, Z2...
      */
     size_t          matIndex()           const { return pIndex; }
-    
-    /// True if preconditionner block is 'in use'
-    int             blockAge()           const { return pBlockAge; }
-    
-    /// Change preconditionning flag
-    void            blockAge(int b)            { pBlockAge = b; }
 
     /// Returns current size of block allocated for preconditionning
     size_t          blockSize()          const { return pBlockSize; }
@@ -265,9 +265,6 @@ public:
     
     /// True if preconditionner block is 'in use'
     int             blockType()          const { return pBlockType; }
-    
-    /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void            blockType(int t)           { pBlockAge = 0; pBlockType = t; }
 
     /// Returns address of memory allocated for preconditionning
     real *          block()              const { return pBlock; }
@@ -275,12 +272,25 @@ public:
     /// Returns address of memory allocated for preconditionning (pivot)
     int *           pivot()              const { return pPivot; }
     
+#if EXPERIMENTAL_PRECONDITIONNERS
+    /// Type of block: 0=identity; 1=full; 2=band; 3=custom
+    void            blockType(int t)           { pBlockType = t; pBlockAge = 0; }
+
+    /// True if preconditionner block is 'in use'
+    int             blockAge()           const { return pBlockAge; }
+    
+    /// Change preconditionning flag
+    void            blockAge(int b)            { pBlockAge = b; }
+
     /// Returns matrix allocated for preconditionning
     MatrixFull&     blockMatrix()              { return pBlockMatrix; }
     
     /// Returns matrix allocated for preconditionning
     void            blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
-
+#else
+    /// Type of block: 0=identity; 1=full; 2=band; 3=custom
+    void            blockType(int t)           { pBlockType = t; }
+#endif
     //--------------------------------------------------------------------------
     
     /// returns the force on point `p` calculated at the previous Meca::solve()

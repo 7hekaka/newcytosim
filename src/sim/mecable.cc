@@ -20,7 +20,9 @@ void Mecable::clearMecable()
     pPivot     = nullptr;
     pBlockAlc  = 0;
     pPivotAlc  = 0;
+#if EXPERIMENTAL_PRECONDITIONNERS
     pBlockAge  = 0;
+#endif
     pBlockSize = 0;
     pBlockType = 0;
     pPos       = nullptr;
