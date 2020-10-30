@@ -11,16 +11,17 @@
 #include "vecprint.h"
 #include "simd.h"
 
+#define FOR 4
 
 /// number of segments:
 const size_t NBS = 127;
-const size_t NCO = DIM * ( NBS + 1 );
+const size_t NCO = FOR * ( NBS + 1 );
 const size_t ALOC = NCO + 8;
 
 const size_t DISP = 16UL;
 
-real *pos_=nullptr;
-real * x = nullptr, * y = nullptr, * z = nullptr;
+real * vP = nullptr;
+real * vX = nullptr, * vY = nullptr, * vZ = nullptr;
 
 
 #ifdef __AVX__
@@ -44,48 +45,60 @@ inline __m256d loadc4(double const* ptr)
 
 inline void print_alignment(real const* ptr, const char msg[])
 {
-    fprintf(stderr, "%s %p alignment %lu\n", msg, ptr, (uintptr_t)ptr&31);
+    fprintf(stderr, "%s %p align %lu\n", msg, ptr, (uintptr_t)ptr&63);
 }
 
 //------------------------------------------------------------------------------
 
-void setFilament(size_t np, real seg, real persistence_length)
+void setFilament(real* ptr, size_t np, real seg, real persistence_length)
 {
     np = std::min(np, NBS+1);
-    delete(pos_);
-    pos_ = new_real(NCO);
     real sigma = std::sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
     Vector dir(1,0,0);
     
-    pos.store(pos_);
+    pos.store(ptr);
     for ( size_t p = 1 ; p < np; ++p )
     {
         pos += seg * dir;
-        pos.store(pos_+DIM*p);
+        pos.store(ptr+DIM*p);
         //rotate dir in a random direction:
         real a = sigma * RNG.gauss();
         dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
     }
 }
 
-void new_reals(real*& x, real*& y, real*& z, real mag)
+void new_reals(real*& p, real*& x, real*& y, real*& z, real mag)
 {
+    p = new_real(NCO);
     x = new_real(ALOC);
     y = new_real(ALOC);
     z = new_real(ALOC);
     
-    for ( size_t ii=0; ii<ALOC; ++ii )
+    if ( mag > 0 )
     {
-        x[ii] = mag * RNG.sreal();
-        y[ii] = mag * RNG.sreal();
-        z[ii] = mag * RNG.sreal();
+        for ( size_t i=0; i<ALOC; ++i )
+        {
+            x[i] = mag * RNG.sreal();
+            y[i] = mag * RNG.sreal();
+            z[i] = mag * RNG.sreal();
+        }
     }
+    else {
+        zero_real(ALOC, vX);
+        zero_real(ALOC, vY);
+        zero_real(ALOC, vZ);
+    }
+    
+    print_alignment(p, "p");
+    print_alignment(x, "x");
+    print_alignment(y, "y");
 }
 
-void free_reals(real* x, real* y, real* z)
+void free_reals(real* p, real* x, real* y, real* z)
 {
+    free_real(p);
     free_real(x);
     free_real(y);
     free_real(z);
@@ -410,14 +423,13 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
 }
 
 /// only valid if ( nbt > DIM )
-#define FOR 4
 void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 {
     const real R6 = R1 * 6;
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
     
-    const size_t end = nbt;
+    const size_t end = FOR * nbt / DIM;
     #pragma ivdep
     for ( size_t i = FOR*2; i < end; ++i )
         Y[i] += R4 * ((X-FOR)[i]+(X+FOR)[i]) - R1 * ((X-FOR*2)[i]+(X+FOR*2)[i]) - R6 * X[i];
@@ -439,28 +451,37 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 //------------------------------------------------------------------------------
 #pragma mark - TEST Rigidity
 
+/// keeping time using Intel's cycle counters
+unsigned long long rdt = 0;
+/// start timer
+inline void tic() { rdt = __rdtsc(); }
+/// stop timer and print time
+inline void toc(const char* str, double num) { printf(" %4s %5.2f cycles\n", str, double(__rdtsc()-rdt)/num); }
+
 
 void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
 {
     const size_t nbt = DIM * ( NBS - 1 );
-    const real scalar = 2.0;
+    const real alpha = 2.0;
     
-    zero_real(ALOC, x);
-    func(nbt, pos_, scalar, x);
-    VecPrint::print(std::cout, std::min(DISP,NCO), x);
-    zero_real(ALOC, y);
-    add_rigidity0(nbt, pos_, scalar, y);
-    real err = blas::max_diff(nbt+2*DIM, x, y);
+    zero_real(ALOC, vX);
+    zero_real(ALOC, vY);
+    zero_real(ALOC, vZ);
+    
+    func(nbt, vP, alpha, vX);
+    VecPrint::print(std::cout, std::min(DISP,nbt), vX);
+    add_rigidity0(nbt, vP, alpha, vY);
+    real err = blas::max_diff(nbt+2*DIM, vX, vY);
 
-    TicToc::tic();
+    tic();
     for ( size_t i=0; i<cnt; ++i )
     {
-        func(nbt, y, scalar, x);
-        func(nbt, x, scalar, z);
-        func(nbt, z, scalar, y);
+        func(nbt, vY, alpha, vZ);
+        func(nbt, vZ, alpha, vX);
+        func(nbt, vX, alpha, vY);
     }
     printf("  -> %e ", err);
-    TicToc::toc(str);
+    toc(str, 3*cnt*nbt);
 }
 
 
@@ -492,11 +513,11 @@ void testRigidity(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    new_reals(x, y, z, 1.0);
-    setFilament(NBS+1, 0.1, 20.0);
+    new_reals(vP, vX, vY, vZ, 1.0);
+    setFilament(vP, NBS+1, 0.1, 20.0);
     std::cout << "addRigidity " << DIM << "D " << NBS;
     std::cout << "   " << __VERSION__ << "\n";
     testRigidity(1<<20);
-    free_reals(x, y, z);
+    free_reals(vP, vX, vY, vZ);
     return EXIT_SUCCESS;
 }
