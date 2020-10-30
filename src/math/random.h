@@ -30,7 +30,7 @@
  
  F. Nedelec, reclassified on 13.09.2018
 */
-class alignas(32) Random
+class alignas(64) Random
 {
     /// reserve of standard normally-distributed numbers ~ N(0,1)
     real gaussians_[SFMT_N32];

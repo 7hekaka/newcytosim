@@ -365,7 +365,7 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
 void Random::refill_gaussians()
 {
     __m256i * mem = reinterpret_cast<__m256i*>(gaussians_+SFMT_N32) - SFMT_N256;
-    //alignas(32) __m256i mem[SFMT_N32];
+    //alignas(64) __m256i mem[SFMT_N32];
     sfmt_fill_array32(&twister_, (uint32_t*)mem, SFMT_N32);
     next_gaussian_ = gauss_fill(gaussians_, mem, mem+SFMT_N256);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);

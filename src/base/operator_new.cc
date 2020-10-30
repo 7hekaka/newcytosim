@@ -23,8 +23,8 @@ void* operator new(std::size_t size)
     }
 #endif
 #if ( 1 )
-    // get memory aligned to 32 bytes
-    if ( posix_memalign(&ptr, 32, size) )
+    // get memory aligned to 64 bytes
+    if ( posix_memalign(&ptr, 64, size) )
         throw std::bad_alloc();
 #else
     // system's default (unaligned) memory

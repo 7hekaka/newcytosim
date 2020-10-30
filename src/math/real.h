@@ -55,12 +55,12 @@ inline size_t chunk_real(size_t cnt)
 
 
 /// allocate a new array to hold `size` real scalars
-/** The returned pointer is aligned to a 32 byte boundary */
+/** The returned pointer is aligned to a 64 byte boundary */
 inline real* new_real(size_t cnt)
 {
     void* ptr = nullptr;
     // we align to 4 doubles (of size 8 bytes), hence 32 bytes
-    if ( posix_memalign(&ptr, 32, cnt*sizeof(real)) )
+    if ( posix_memalign(&ptr, 64, cnt*sizeof(real)) )
         throw std::bad_alloc();
     real* res = (real*)ptr;
     //printf("%p = new_real(%lu)  %lu\n", ptr, cnt, ((uintptr_t)ptr&63));
