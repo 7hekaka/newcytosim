@@ -7,6 +7,7 @@
 #include "lapack.h"
 #include "random.h"
 #include "vecprint.h"
+//#include "cytoblas.h"
 
 //------------------------------------------------------------------------------
 Mecafil::Mecafil()
@@ -123,11 +124,11 @@ void Mecafil::storeDirections()
 {
     //iDirValid = true;
 #if ( 1 )
-    //checkSegmentation(0.01);
     /*
-     assume here that successive points are correctly separated, which is usally
-     the case, such that any error would be small
+     we assume here that successive points are correctly separated by 'segmentation',
+     such that we can normalize the vector simply by dividing by 'segmentation'
      */
+    //checkSegmentation(0.01);
     const real val = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
     #pragma ivdep
@@ -227,9 +228,9 @@ void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
     for ( size_t jj = 0; jj < nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
-        Y[jj      ] -=   f;
-        Y[jj+DIM  ] += 2*f;
-        Y[jj+DIM*2] -=   f;
+        Y[jj      ] -= f;
+        Y[jj+DIM  ] += f*2.0;
+        Y[jj+DIM*2] -= f;
     }
 }
 
@@ -244,11 +245,12 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     const real R6 = R1 * 6;
     
     const size_t end = nbt;
+    // in the general case all values can be computed independently:
     #pragma ivdep
     for ( size_t i = DIM*2; i < end; ++i )
         Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
 
-    // special cases near the edges:
+    // special cases at the edges:
     real      * Z = Y + nbt;
     real const* E = X + nbt + DIM;
     #pragma ivdep
@@ -268,14 +270,62 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
 {
 #if ( DIM > 1 )
+    const real R2 = 2.0 * R1;
     for ( size_t d = 0; d < DIM; ++ d )
     {
-        real x = 2*X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
-        Y[A*DIM+d] += x * R1;
-        Y[B*DIM+d] -= x * (R1+R1);
-        Y[C*DIM+d] += x * R1;
+        real f = 2.0 * X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
+        Y[A*DIM+d] += f * R1;
+        Y[B*DIM+d] -= f * R2;
+        Y[C*DIM+d] += f * R1;
     }
 #endif
+}
+
+
+/**
+ This is the bending elasticity terms, as obtained by derivation of the
+ Hamiltonian representing bending elasticity.
+
+     F1 = k * ( t1 * dot(t1, t2) - t2 )
+     F3 = k * ( t1 - dot(t1, t2) * t2 )
+     F2 = -F1 -F3
+ 
+ These forces are normal to the segments: dot(F1, t1) = dot(F3, t2) = 0
+ The cosinus are obtained here from the normalized difference vector 'dir'.
+
+ Ivan Hornak & Heiko Rieger in:
+     Stochastic Model of T Cell Repolarization during Target Elimination
+     https://doi.org/10.1016/j.bpj.2020.01.045
+ claimed that this would lead to a better estimation of bending elasticity.
+ However, this is not true, and using these formula makes strictly no difference,
+ because compared to our standard implementation:
+ 
+     F1 = k * ( t1 - t2 )
+     F3 = k * ( t1 - t2 )
+     F2 = -F1 -F3
+
+ the forces only differ by a vector that is tangent to the segments, and any such
+ tangent force is fully absorbed by the constraints imposed on the lengths of the
+ segments. Thus there is no advantage in using these (more exact) formula.
+ It makes no difference.
+ */
+void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, real const* dir)
+{
+    assert_true( X != Y );
+    for ( size_t jj = 0; jj < nbt; jj+=DIM )
+    {
+        // cosine of the angle between two consecutive segments:
+        const real C = dot(Vector(dir+jj), Vector(dir+jj+DIM));
+        for ( int d = 0; d < DIM; ++d )
+        {
+            int i = jj + d;
+            real f1 = rigid * (C * ( X[i+DIM] - X[i] ) - ( X[i+DIM*2] - X[i+DIM] ));
+            real f3 = rigid * (( X[i+DIM] - X[i] ) - C * ( X[i+DIM*2] - X[i+DIM] ));
+            Y[i      ] += f1;
+            Y[i+DIM  ] -= f1+f3;
+            Y[i+DIM*2] += f3;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -296,7 +346,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #endif
     if ( nPoints > 3 )
     {
-        size_t nbt = DIM * ( nPoints - 2 );  // number of triplet values
+        const size_t nbt = DIM * ( nPoints - 2 );  // number of triplet values
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
         add_rigidityF(nbt, X, iRigidity, Y);
@@ -322,16 +372,17 @@ void Mecafil::addRigidity(const real* X, real* Y) const
     }
     else if ( nPoints > 2 )
     {
+        //add_rigidityN(1, X, iRigidity, Y, iDir);
         add_rigidity(0, 1, 2, X, iRigidity, Y);
     }
     
 #if CHECK_RIGIDITY
     static size_t cnt = 0;
     real err = blas::max_diff(DIM*nPoints, tmp, Y);
-    if ( err > 1.0e-6 || ++cnt > 1<<14 )
+    if ( err > 1.0e-6 || ++cnt > 100 )
     {
         cnt = 0;
-        printf("addRigidity(%u) error %e\n", nPoints, err);
+        printf("addRigidity(%lu) error %e\n", nPoints, err);
     }
     free_real(tmp);
 #endif
