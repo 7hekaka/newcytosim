@@ -325,7 +325,7 @@ void SingleSet::write(Outputter& out) const
     if ( sizeA() > 0 )
     {
         out.put_line("\n#section single A", out.binary());
-        writeNodes(out, aList);
+        writeObjects(out, aList);
     }
     if ( sizeF() > 0 )
     {
@@ -333,13 +333,13 @@ void SingleSet::write(Outputter& out) const
         {
             out.put_line("\n#section single F 1", out.binary());
             if ( ! skip_free )
-                writeNodes(out, fList);
+                writeObjects(out, fList);
             skip_free = 1;
         }
         else
         {
             out.put_line("\n#section single F", out.binary());
-            writeNodes(out, fList);
+            writeObjects(out, fList);
         }
     }
 }

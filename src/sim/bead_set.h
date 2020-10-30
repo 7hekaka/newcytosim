@@ -44,7 +44,7 @@ public:
     /// first Object
     Bead *      first() const
     {
-        return static_cast<Bead*>(nodes.front());
+        return static_cast<Bead*>(pool.front());
     }
     
     /// first Bead in inventory

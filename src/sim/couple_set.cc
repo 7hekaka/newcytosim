@@ -565,19 +565,19 @@ void CoupleSet::thaw()
 void CoupleSet::writeAA(Outputter& out) const
 {
     out.put_line("\n#section couple AA", out.binary());
-    writeNodes(out, aaList);
+    writeObjects(out, aaList);
 }
 
 void CoupleSet::writeAF(Outputter& out) const
 {
     out.put_line("\n#section couple AF", out.binary());
-    writeNodes(out, afList);
+    writeObjects(out, afList);
 }
 
 void CoupleSet::writeFA(Outputter& out) const
 {
     out.put_line("\n#section couple FA", out.binary());
-    writeNodes(out, faList);
+    writeObjects(out, faList);
 }
 
 void CoupleSet::writeFF(Outputter& out) const
@@ -586,13 +586,13 @@ void CoupleSet::writeFF(Outputter& out) const
     {
         out.put_line("\n#section couple FF 1", out.binary());
         if ( !skip_free )
-            writeNodes(out, ffList);
+            writeObjects(out, ffList);
         skip_free = 1;
     }
     else
     {
         out.put_line("\n#section couple FF", out.binary());
-        writeNodes(out, ffList);
+        writeObjects(out, ffList);
     }
 }
 

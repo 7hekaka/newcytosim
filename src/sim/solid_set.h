@@ -46,13 +46,13 @@ public:
     /// first Solid
     Solid *     first() const
     {
-        return static_cast<Solid*>(nodes.front());
+        return static_cast<Solid*>(pool.front());
     }
     
     /// last Solid
     Solid *     last() const
     {
-        return static_cast<Solid*>(nodes.back());
+        return static_cast<Solid*>(pool.back());
     }
     
     /// first Solid in inventory

@@ -15,7 +15,7 @@
 // first Organizer
 Organizer * OrganizerSet::first() const
 {
-    return static_cast<Organizer*>(nodes.front());
+    return static_cast<Organizer*>(pool.front());
 }
 
 // find object with given ID
@@ -110,7 +110,7 @@ void OrganizerSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeNodes(out, nodes);
+        writeObjects(out, pool);
     }
 }
 

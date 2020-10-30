@@ -5,7 +5,7 @@
 
 #include "sim.h"
 #include "vector.h"
-#include "node_list.h"
+#include "object_pool.h"
 #include "common.h"
 #include "fiber.h"
 

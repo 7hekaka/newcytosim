@@ -42,7 +42,7 @@ public:
     /// first Object
     Sphere *    first() const
     {
-        return static_cast<Sphere*>(nodes.front());
+        return static_cast<Sphere*>(pool.front());
     }
     
     /// return pointer to the Object of given ID, or zero if not found

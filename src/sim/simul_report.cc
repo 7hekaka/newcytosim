@@ -752,7 +752,7 @@ void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
 
     
 /// to sort in ascending order: return -1 if ( a < b ) and +1 if ( a > b )
-int compareFibers(Node const* A, Node const* B)
+int compareFibers(Object const* A, Object const* B)
 {
     real a = static_cast<Fiber const*>(A)->length();
     real b = static_cast<Fiber const*>(B)->length();
@@ -766,8 +766,8 @@ int compareFibers(Node const* A, Node const* B)
  */
 void Simul::reportFibersSorted(std::ostream& out, Property const* sel, bool com) const
 {
-    // sort fibers in the NodeList:
-    const_cast<Simul*>(this)->fibers.nodes.blinksort(compareFibers);
+    // sort fibers in the ObjectPool:
+    const_cast<Simul*>(this)->fibers.pool.blinksort(compareFibers);
 
     if ( com )
     {

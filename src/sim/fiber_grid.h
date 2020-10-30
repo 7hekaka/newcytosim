@@ -18,7 +18,6 @@ class Modulo;
 class Space;
 class HandProp;
 class Hand;
-class Node;
 
 
 /// Divide-and-Conquer method to find all FiberSegment located near a given point in space

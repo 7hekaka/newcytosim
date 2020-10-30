@@ -169,11 +169,11 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// a static_cast<> of Node::next()
-    Single*         next() const { return static_cast<Single*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Single*         next() const { return static_cast<Single*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Single*         prev() const { return static_cast<Single*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Single*         prev() const { return static_cast<Single*>(prevO); }
 
     //--------------------------------------------------------------------------
 

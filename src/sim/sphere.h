@@ -143,11 +143,11 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// a static_cast<> of Node::next()
-    Sphere * next() const { return static_cast<Sphere*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Sphere * next() const { return static_cast<Sphere*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Sphere * prev() const { return static_cast<Sphere*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Sphere * prev() const { return static_cast<Sphere*>(prevO); }
     
     //------------------------------ read/write --------------------------------
     

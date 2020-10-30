@@ -21,7 +21,7 @@
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Step
 
 
 void Solid::step()
@@ -125,7 +125,7 @@ void Solid::setInteractions(Meca& meca) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Construction
 
 void Solid::reset()
 {
@@ -140,7 +140,14 @@ void Solid::reset()
 }
 
 
-Solid::Solid (SolidProp const* p)
+Solid::Solid()
+{
+    reset();
+    prop = nullptr;
+}
+
+
+Solid::Solid(SolidProp const* p)
 : prop(p)
 {
     reset();
@@ -230,7 +237,7 @@ void Solid::release()
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Build
 
 /**
  @ingroup NewObject
@@ -647,6 +654,9 @@ Vector Solid::centroid() const
     return res;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Shape
+
 
 /**
  fixShape() copies the current shape in the array soShape[],
@@ -676,9 +686,6 @@ void Solid::fixShape()
         //    soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
 }
-
-//------------------------------------------------------------------------------
-#pragma mark -
 
 
 /**
@@ -919,7 +926,7 @@ void Solid::getPoints(real const* ptr)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Drag
 
 /**
 The mobility is that of a set of spheres in an infinite fluid (Stokes law):
@@ -1006,7 +1013,9 @@ real Solid::addBrownianForces(real const* rnd, real alpha, real* rhs) const
     return b / drag;
 }
 
-#pragma mark -
+
+//------------------------------------------------------------------------------
+#pragma mark - Projection
 
 
 #if ( DIM == 1 )
@@ -1254,7 +1263,7 @@ void Solid::projectForces(const real* X, real* Y) const
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - I/O & print
 
 
 void Solid::write(Outputter& out) const

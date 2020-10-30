@@ -12,7 +12,7 @@ typedef Array<Single *> SingleList;
 
 /// Set for Single
 /**
- A Single is stored in one of 2 NodeList, depending on its state:
+ A Single is stored in one of 2 ObjectPool, depending on its state:
  - fList = free,
  - aList = attached.
  .
@@ -33,10 +33,10 @@ public:
 private:
     
     /// List for non-attached Singles (f=free)
-    NodeList     fList;
+    ObjectPool     fList;
     
     /// List for attached Singles (a=attached)
-    NodeList     aList;
+    ObjectPool     aList;
     
     /// holds the property and the list of singles
     typedef std::pair<SingleProp const*, SingleList> SingleReserve;

@@ -10,7 +10,7 @@
 // first object
 Event * EventSet::first() const
 {
-    return static_cast<Event*>(nodes.front());
+    return static_cast<Event*>(pool.front());
 }
 
 // return pointer to the Object of given ID, or zero if not found
@@ -70,7 +70,7 @@ void EventSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeNodes(out, nodes);
+        writeObjects(out, pool);
     }
 }
 

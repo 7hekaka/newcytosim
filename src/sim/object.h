@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #ifndef OBJECT_H
 #define OBJECT_H
@@ -7,7 +7,6 @@
 #include "movable.h"
 #include "random.h"
 #include "array.h"
-#include "node.h"
 
 class Simul;
 class Property;
@@ -41,21 +40,32 @@ typedef unsigned ObjectSignature;
  
  Objects are stored in ObjectSet.
  */
-class Object : public Node, public Inventoried, public Movable
+class Object : public Movable, public Inventoried
 {
+    /// this class stores the object
+    friend class ObjectPool;
+    
+protected:
+    
+    /// the next Object in the list
+    Object * nextO;
+    
+    /// the previous Object in the list
+    Object * prevO;
+
 private:
     
+    /// upstream pointer to container class
+    ObjectSet * set_;
+
     /// integer used for user controlled tasks, recorded to file
-    ObjectMark        mark_;
+    ObjectMark mark_;
 
     /// integer used for private tasks, not saved to file
-    ObjectFlag        flag_;
+    ObjectFlag flag_;
     
     /// a random number associated with this object
-    unsigned     signature_;
-    
-    /// upstream pointer to container class
-    ObjectSet *        set_;
+    ObjectSignature signature_;
     
 public:
     
@@ -83,16 +93,17 @@ public:
 public:
     
     /// constructor
-    Object() : mark_(0), flag_(0), signature_(RNG.pint32()), set_(nullptr) { }
-    
+    Object() : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(0), flag_(0), signature_(RNG.pint32()) { }
+
     /// copy constructor
-    Object(Object const& o) : mark_(o.mark_), flag_(o.flag_), signature_(o.signature_), set_(nullptr) {}
+    Object(Object const& o) : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(o.mark_), flag_(o.flag_), signature_(o.signature_) {}
     
     /// assignment operator
-    Object& operator =(const Object& o) { mark_=o.mark_; flag_=o.flag_; signature_=o.signature_; set_=nullptr; return *this; }
+    Object& operator =(const Object& o) { nextO=nullptr; prevO=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; signature_=o.signature_; return *this; }
     
     /// destructor
-    ~Object();
+    virtual ~Object();
+    
     
     /// a character identifying the class of this object
     virtual ObjectTag tag() const { return TAG; }
@@ -101,60 +112,67 @@ public:
     virtual Property const* property() const = 0;
     
     /// write Object data to file
-    virtual void    write(Outputter&) const = 0;
+    virtual void write(Outputter&) const = 0;
     
     /// read Object from file, within the Simul
-    virtual void    read(Inputter&, Simul&, ObjectTag) = 0;
+    virtual void read(Inputter&, Simul&, ObjectTag) = 0;
     
+    //--------------------------
+    
+    /// the next Object in the list, or zero if this is last
+    Object * next()    const { return nextO; }
+    
+    /// the previous Object in the list, or zero if this is first
+    Object * prev()    const { return prevO; }
+    
+    /// set next Object
+    void     next(Object* n) { nextO = n; }
+    
+    /// set previous Object
+    void     prev(Object* n) { prevO = n; }
+
     //--------------------------
 
     /// returns container ObjectSet
-    ObjectSet *     objset() const { return set_; }
+    ObjectSet * objset() const { return set_; }
     
     /// returns container Simul
-    Simul &         simul() const;
+    Simul &     simul() const;
     
     /// change container class
-    void            objset(ObjectSet* s) { set_ = s; }
+    void        objset(ObjectSet* s) { set_ = s; }
     
-    /// true if Node is registered in a container class
-    bool            linked() const { return set_ != nullptr; }
+    /// true if Object is registered in a container class
+    bool        linked() const { return set_ != nullptr; }
 
     /// concatenation of [ tag(), property()->number(), identity() ] in plain ascii
-    std::string     reference() const;
+    std::string reference() const;
     
     //--------------------------
 
     /// get mark
-    ObjectMark      mark()          const { return mark_; }
+    ObjectMark  mark()        const { return mark_; }
     
     /// set mark
-    void            mark(ObjectMark m)    { mark_ = m; }
+    void        mark(ObjectMark m)  { mark_ = m; }
     
     
     /// retrieve flag value
-    ObjectFlag      flag()         const  { return flag_; }
+    ObjectFlag  flag()       const  { return flag_; }
     
     /// set flag (this value is not stored in trajectory files)
-    void            flag(ObjectFlag f)    { flag_ = f; }
+    void        flag(ObjectFlag f)  { flag_ = f; }
     
     /// set flag to match identity()
-    void            matchFlagIdentity()   { flag_ = identity(); }
+    void        matchFlagIdentity() { flag_ = identity(); }
 
     
     /// a random number that makes objects unique
-    ObjectSignature signature()     const { return signature_; }
+    ObjectSignature signature() const { return signature_; }
     
     /// set signature
-    void     signature(ObjectSignature s) { signature_ = s; }
+    void signature(ObjectSignature s) { signature_ = s; }
 
-    //--------------------------
-
-    /// extends Node::next(), with a cast to preserve type
-    Object *        next()          const { return static_cast<Object*>(nNext); }
-    
-    /// extends Node::prev(), with a cast to preserve type
-    Object *        prev()          const { return static_cast<Object*>(nPrev); }
 };
 
 

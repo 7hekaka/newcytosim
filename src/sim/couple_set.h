@@ -15,7 +15,7 @@ typedef Array<Couple *> CoupleList;
 
 /// Set for Couple
 /**
- A Couple is stored in one of 4 NodeList, depending on its state:
+ A Couple is stored in one of 4 ObjectPool, depending on its state:
  - ffList = hand1 and hand2 unattached,
  - afList = hand1 attached, hand2 unattached,
  - faList = hand1 unattached, hand2 attached,
@@ -38,16 +38,16 @@ public:
 private:
     
     /// list of Couple which are not attached (f=free)
-    NodeList    ffList;
+    ObjectPool    ffList;
     
     /// list of Couple with only one side attached (a=attached, f=free)
-    NodeList    afList, faList;
+    ObjectPool    afList, faList;
     
     /// list of Couple with both sides attached (a=attached)
-    NodeList    aaList;
+    ObjectPool    aaList;
     
     /// return one of ffList, afList, faList, aaList, corresponding to given states
-    NodeList&   sublist(bool attached1, bool attached2)
+    ObjectPool&   sublist(bool attached1, bool attached2)
     {
         if ( attached1 )
         {

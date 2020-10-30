@@ -66,9 +66,6 @@ private:
     /// the number of points when fixShape() was last called, used for verifications.
     size_t         soShapeSize;
     
-    /// a counter used in reshape()
-    unsigned int   soReshapeTimer;
-    
     /// the reduced total (all points summed) drag coefficient for translation
     real           soDrag;
     
@@ -78,6 +75,9 @@ private:
     /// second momentum of the reference shape
     real           soShapeSqr;
     
+    /// a counter used in reshape()
+    unsigned int   soReshapeTimer;
+
     /// reset private variables
     void           reset();
     
@@ -85,10 +85,10 @@ public:
     
     /// Property
     SolidProp const* prop;
-
-    /// initialize according to options given in Glossary
-    ObjectList  build(Glossary&, Simul&);
     
+    /// default constructor
+    Solid();
+
     /// constructor
     Solid(SolidProp const*);
     
@@ -101,6 +101,9 @@ public:
     /// destructor
     virtual    ~Solid();
     
+    /// initialize according to options given in Glossary
+    ObjectList  build(Glossary&, Simul&);
+
     //------------------------------- Mecable ----------------------------------
     
     /// allocate memory
@@ -185,11 +188,11 @@ public:
     
     //--------------------------------------------------------------------------
 
-    /// a static_cast<> of Node::next()
-    Solid *     next() const { return static_cast<Solid*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Solid *     next() const { return static_cast<Solid*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Solid *     prev() const { return static_cast<Solid*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Solid *     prev() const { return static_cast<Solid*>(prevO); }
     
     //--------------------------------------------------------------------------
 

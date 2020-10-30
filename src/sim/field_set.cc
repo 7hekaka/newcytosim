@@ -11,7 +11,7 @@
 // first object
 Field * FieldSet::first() const
 {
-    return static_cast<Field*>(nodes.front());
+    return static_cast<Field*>(pool.front());
 }
 
 // find object
@@ -124,7 +124,7 @@ void FieldSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeNodes(out, nodes);
+        writeObjects(out, pool);
     }
 }
 

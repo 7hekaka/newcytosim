@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include "mecafil.h"
 #include "fiber_prop.h"
-//#include "node_list.h"
 #include "hand_list.h"
 #include "lattice.h"
 #include "sim.h"
@@ -395,11 +394,11 @@ public:
     
     //--------------------------------------------------------------------------
 
-    /// a static_cast<> of Node::next()
-    Fiber *  next() const { return static_cast<Fiber*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Fiber *  next() const { return static_cast<Fiber*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Fiber *  prev() const { return static_cast<Fiber*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Fiber *  prev() const { return static_cast<Fiber*>(prevO); }
 
     //--------------------------------------------------------------------------
     

@@ -60,7 +60,7 @@ public:
     /// first Space
     Space * first() const
     {
-        return static_cast<Space*>(nodes.front());
+        return static_cast<Space*>(pool.front());
     }
 
     /// first Space with this Property
@@ -72,7 +72,7 @@ public:
     /// last Space
     Space * last() const
     {
-        return static_cast<Space*>(nodes.back());
+        return static_cast<Space*>(pool.back());
     }
 
     /// return pointer to the Object of given ID, or zero if not found

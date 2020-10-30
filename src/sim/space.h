@@ -7,7 +7,6 @@
 
 #include "sim.h"
 #include "real.h"
-#include "node.h"
 #include "vector.h"
 #include "object.h"
 #include "common.h"
@@ -180,11 +179,11 @@ public:
     /// returns the name of the Property
     std::string    name() const { return prop->name(); }
     
-    /// a static_cast<> of Node::next()
-    Space*         next() const { return static_cast<Space*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Space*         next() const { return static_cast<Space*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Space*         prev() const { return static_cast<Space*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Space*         prev() const { return static_cast<Space*>(prevO); }
     
     /// write to file
     void           write(Outputter&) const;

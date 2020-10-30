@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 
 #include "object_set.h"
@@ -22,14 +22,14 @@ void ObjectSet::link(Object * obj)
 {
     assert_true( !obj->objset() );
     obj->objset(this);
-    nodes.push_front(obj);
+    pool.push_front(obj);
 }
 
 
 void ObjectSet::unlink(Object * obj)
 {
     assert_true( obj->objset() == this );
-    nodes.pop(obj);
+    pool.pop(obj);
     obj->objset(nullptr);
 }
 
@@ -177,12 +177,12 @@ void ObjectSet::remove(ObjectList const& list)
 }
 
 
-void ObjectSet::erase(NodeList & list)
+void ObjectSet::erase(ObjectPool & list)
 {
-    Node * n = list.front();
+    Object * n = list.front();
     while ( n )
     {
-        Node * p = n->next();
+        Object * p = n->next();
         list.pop(n);
         static_cast<Object*>(n)->objset(nullptr);
         delete(n);
@@ -201,7 +201,7 @@ void ObjectSet::erase(Object * obj)
 
 void ObjectSet::erase()
 {
-    erase(nodes);
+    erase(pool);
     inventory.clear();
 }
 
@@ -368,41 +368,39 @@ Object * ObjectSet::findObject(Property const* p) const
 }
 
 
-size_t ObjectSet::count(const NodeList & list,
+size_t ObjectSet::count(const ObjectPool & list,
                         bool (*func)(Object const*, void const*), void const* arg)
 {
     size_t res = 0;
-    Node const* n = list.front();
+    Object const* n = list.front();
     while ( n )
     {
-        Object const* obj = static_cast<Object const*>(n);
+        res += func(n, arg);
         n = n->next();
-        res += func(obj, arg);
     }
     return res;
 }
 
 
-ObjectList ObjectSet::collect(const NodeList & list)
+ObjectList ObjectSet::collect(const ObjectPool & list)
 {
     ObjectList res;
-    for ( Node* n = list.front(); n; n=n->next() )
-        res.push_back(static_cast<Object*>(n));
+    for ( Object* n = list.front(); n; n=n->next() )
+        res.push_back(n);
     return res;
 }
 
 
-ObjectList ObjectSet::collect(const NodeList & list,
+ObjectList ObjectSet::collect(const ObjectPool & list,
                               bool (*func)(Object const*, void const*), void const* arg)
 {
     ObjectList res;
-    Node * n = list.front();
+    Object * n = list.front();
     while ( n )
     {
-        Object * obj = static_cast<Object*>(n);
+        if ( func(n, arg) )
+            res.push_back(n);
         n = n->next();
-        if ( func(obj, arg) )
-            res.push_back(obj);
     }
     return res;
 }
@@ -410,13 +408,13 @@ ObjectList ObjectSet::collect(const NodeList & list,
 
 ObjectList ObjectSet::collect() const
 {
-    return collect(nodes);
+    return collect(pool);
 }
 
 
 ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    return collect(nodes, func, arg);
+    return collect(pool, func, arg);
 }
 
 
@@ -428,32 +426,31 @@ ObjectList ObjectSet::collect(Property const* p) const
 
 size_t ObjectSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    return count(nodes, func, arg);
+    return count(pool, func, arg);
 }
 
 //------------------------------------------------------------------------------
 #pragma mark - I/O
 
 
-void ObjectSet::flag(NodeList const& list, ObjectFlag f)
+void ObjectSet::flag(ObjectPool const& list, ObjectFlag f)
 {
-    for ( Node * n=list.front(); n; n=n->next() )
-        static_cast<Object*>(n)->flag(f);
+    for ( Object * n=list.front(); n; n=n->next() )
+        n->flag(f);
 }
 
 
-void ObjectSet::prune(NodeList const& list, ObjectFlag f, ObjectFlag g)
+void ObjectSet::prune(ObjectPool const& list, ObjectFlag f, ObjectFlag g)
 {
-    Node * n = list.front();
+    Object * n = list.front();
     
     while ( n )
     {
-        Node * p = n->next();
-        Object * o = static_cast<Object*>(n);
-        if ( o->flag() == f )
-            delete(o);
+        Object * p = n->next();
+        if ( n->flag() == f )
+            delete(n);
         else
-            o->flag(g);
+            n->flag(g);
         n = p;
     }
 }
@@ -462,14 +459,13 @@ void ObjectSet::prune(NodeList const& list, ObjectFlag f, ObjectFlag g)
 /**
  Write Reference and Object's data, for all Objects in `list`
  */
-void ObjectSet::writeNodes(Outputter& out, NodeList const& list)
+void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list)
 {
-    for ( Node const* n=list.front(); n; n=n->next() )
+    for ( Object const* n=list.front(); n; n=n->next() )
     {
-        Object const* o = static_cast<const Object*>(n);
-        //std::clog << "writeObject " << o->reference() << '\n';
-        o->writeHeader(out, o->tag());
-        o->write(out);
+        //std::clog << "writeObject " << n->reference() << '\n';
+        n->writeHeader(out, n->tag());
+        n->write(out);
     }
 }
 

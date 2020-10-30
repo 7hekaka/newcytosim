@@ -25,26 +25,29 @@ int main(int argc, char* argv[])
     print_sizeof(Matrix44);
     
     print_sizeof(Random);
-    print_sizeof(Space);
     print_sizeof(Array<int>);
 
     print_sizeof(Mecapoint);
     print_sizeof(FiberSegment);
     print_sizeof(Interpolation);
+    print_sizeof(HandMonitor);
     print_sizeof(FiberSite);
     print_sizeof(Hand);
-    print_sizeof(Single);
-    print_sizeof(Couple);
 
     print_sizeof(Inventoried);
     print_sizeof(Movable);
-    print_sizeof(Node);
+    print_sizeof(Buddy);
+    
     print_sizeof(Object);
-
     print_sizeof(Mecable);
     print_sizeof(Chain);
     print_sizeof(Mecafil);
     print_sizeof(Fiber);
+    
+    print_sizeof(Space);
+    print_sizeof(Single);
+    print_sizeof(Couple);
+
 
     print_sizeof(Solid);
     print_sizeof(Bead);

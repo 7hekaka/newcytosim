@@ -106,11 +106,11 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// a static_cast<> of Node::next()
-    Organizer *   next() const { return static_cast<Organizer*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Organizer *   next() const { return static_cast<Organizer*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Organizer *   prev() const { return static_cast<Organizer*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Organizer *   prev() const { return static_cast<Organizer*>(prevO); }
     
     //--------------------------------------------------------------------------
     

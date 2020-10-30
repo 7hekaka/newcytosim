@@ -97,11 +97,11 @@ public:
     
     //--------------------------------------------------------------------------
 
-    /// a static_cast<> of Node::next()
-    Bead *      next() const { return static_cast<Bead*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Bead *      next() const { return static_cast<Bead*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Bead *      prev() const { return static_cast<Bead*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Bead *      prev() const { return static_cast<Bead*>(prevO); }
     
     //--------------------------------------------------------------------------
 

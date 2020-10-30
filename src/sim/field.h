@@ -240,11 +240,11 @@ public:
     /// return index of 'prop' in corresponding PropertyList
     Property const* property() const { return prop; }
     
-    /// a static_cast<> of Node::next()
-    Field* next() const { return static_cast<Field*>(nNext); }
+    /// a static_cast<> of Object::next()
+    Field* next() const { return static_cast<Field*>(nextO); }
     
-    /// a static_cast<> of Node::prev()
-    Field* prev() const { return static_cast<Field*>(nPrev); }
+    /// a static_cast<> of Object::prev()
+    Field* prev() const { return static_cast<Field*>(prevO); }
     
     //------------------------------ read/write --------------------------------
 #pragma mark -

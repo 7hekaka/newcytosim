@@ -225,7 +225,7 @@ void FiberSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeNodes(out, nodes);
+        writeObjects(out, pool);
     }
 }
 

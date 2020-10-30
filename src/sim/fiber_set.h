@@ -52,10 +52,10 @@ public:
     //--------------------------
 
     /// first Fiber
-    Fiber * first()            const { return static_cast<Fiber*>(nodes.front()); }
+    Fiber * first()            const { return static_cast<Fiber*>(pool.front()); }
     
     /// last Fiber
-    Fiber * last()             const { return static_cast<Fiber*>(nodes.back()); }
+    Fiber * last()             const { return static_cast<Fiber*>(pool.back()); }
     
     /// first Fiber in inventory
     Fiber * firstID()          const { return static_cast<Fiber*>(inventory.first()); }

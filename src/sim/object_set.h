@@ -1,11 +1,10 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #ifndef OBJECT_SET_H
 #define OBJECT_SET_H
 
-#include "node.h"
 #include "object.h"
-#include "node_list.h"
+#include "object_pool.h"
 #include "inventory.h"
 #include <vector>
 
@@ -19,10 +18,10 @@ class Simul;
 /**
  Encapsulates the different functions used to manage Objects.
  Pointers to the Objects are stored in two lists:
- - a doubly linked list: nodes
+ - a doubly linked list: pool
  - an array: inventory
  .
- The NodeList nodes is mixed at every time step,
+ The ObjectPool pool is mixed at every time step,
  and thus it can be used to access the objects in a random order,
  as necessary for Monte-Carlo. 
  
@@ -48,7 +47,7 @@ public:
     Inventory         inventory;
     
     /// holds pointers to the Objects in a doubly linked list
-    NodeList          nodes;
+    ObjectPool        pool;
     
     /// the Simul containing this set
     Simul&            simul;
@@ -56,22 +55,22 @@ public:
 protected:
     
     /// mark all objects from given list with value `f`
-    static void       flag(NodeList const&, ObjectFlag f);
+    static void       flag(ObjectPool const&, ObjectFlag f);
     
     /// delete objects which are marked as `f` from given list, and mark objects with `s`
-    static void       prune(NodeList const&, ObjectFlag f, ObjectFlag g);
+    static void       prune(ObjectPool const&, ObjectFlag f, ObjectFlag g);
     
-    /// collect objects from NodeList for which func(obj, val) == true
-    static size_t     count(NodeList const&, bool (*func)(Object const*, void const*), void const*);
+    /// collect objects from ObjectPool for which func(obj, val) == true
+    static size_t     count(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
     /// collect all objects
-    static ObjectList collect(NodeList const&);
+    static ObjectList collect(ObjectPool const&);
 
-    /// collect objects from NodeList for which func(obj, val) == true
-    static ObjectList collect(NodeList const&, bool (*func)(Object const*, void const*), void const*);
+    /// collect objects from ObjectPool for which func(obj, val) == true
+    static ObjectList collect(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
-    /// write Object in NodeList to file
-    static void       writeNodes(Outputter&, NodeList const&);
+    /// write Object in ObjectPool to file
+    static void       writeObjects(Outputter&, ObjectPool const&);
     
     /// print a list of the content (nb of objects, class)
     void              writeReport(std::ostream&, const std::string& title) const;
@@ -79,13 +78,13 @@ protected:
 public:
     
     /// mark objects before import
-    virtual void      freeze(ObjectFlag f) { flag(nodes, f); }
+    virtual void      freeze(ObjectFlag f) { flag(pool, f); }
     
     /// delete marked objects
-    virtual void      prune(ObjectFlag f)  { prune(nodes, f, 0); }
+    virtual void      prune(ObjectFlag f)  { prune(pool, f, 0); }
     
     /// unmark objects after import
-    virtual void      thaw()               { flag(nodes, 0); }
+    virtual void      thaw()               { flag(pool, 0); }
     
     /// apply translation to all Objects in ObjectList
     static void       translateObjects(ObjectList const&, Vector const&);
@@ -151,22 +150,22 @@ public:
     void               erase(Object *);
     
     /// delete  Objects specified in given list
-    void               erase(NodeList&);
+    void               erase(ObjectPool&);
 
     /// delete all Objects in list and forget all serial numbers
     virtual void       erase();
     
     /// number of elements
-    virtual size_t     size()             const { return nodes.size(); }
+    virtual size_t     size()             const { return pool.size(); }
 
-    /// mix the order of elements in the doubly linked list nodes
-    virtual void       shuffle()                { nodes.shuffle(); }
+    /// mix the order of elements in the doubly linked list pool
+    virtual void       shuffle()                { pool.shuffle(); }
     
     /// first Object in the list
-    Object *           first()            const { return static_cast<Object*>(nodes.front()); }
+    Object *           first()            const { return static_cast<Object*>(pool.front()); }
     
     /// last Object
-    Object *           last()             const { return static_cast<Object*>(nodes.back()); }
+    Object *           last()             const { return static_cast<Object*>(pool.back()); }
     
     /// find Object of given serial-number (see Inventory)
     Object *           findID(ObjectID n) const { return static_cast<Object*>(inventory.get(n)); }
