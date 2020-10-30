@@ -2,12 +2,12 @@
 
 The core of Cytosim is written in C++14 and it is necessary to recompile the programs after each modification of the source code. Some of the accessory tools use [Python](https://www.python.org).
  
-Compilation requires a C++ compiler: e.g. [gcc](http://gcc.gnu.org/), [Clang](http://clang.llvm.org) or the [Intel compiler](http://en.wikipedia.org/wiki/Intel_C%2B%2B_Compiler), together with a few libraries.
-Compilation is started from a terminal, with a program called [make](http://www.gnu.org/software/make/).
+Compilation requires a C++ compiler: e.g. [`gcc`](http://gcc.gnu.org/), [`clang`](http://clang.llvm.org) or the [Intel compiler](http://en.wikipedia.org/wiki/Intel_C%2B%2B_Compiler), together with a few libraries.
+Compilation is started from a terminal, with a program called [`make`](http://www.gnu.org/software/make/). Optionally, [`cmake`](https://cmake.org) can be used to configure `make`.
 
 ### Dimensionality
 
-The dimensionality is backed into the executable during compilation. 
+The dimensionality is baked into the executable during compilation. 
 To change it, [follow these instructions](dimensionality.md).
 
 ### Mathematical libraries
@@ -18,16 +18,16 @@ Running cytosim with `sim` or `play` requires these mathematical libraries:
 * [LAPACK](http://netlib.org/lapack)
 
 These libraries offer standard interface to linear algebra functions used in Cytosim.
-There is a [public reference implementations](http://netlib.org). 
-Compiling the reference code is possible with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
-Precompiled libraries are available for most platforms, within:
+There is a [public reference implementation](http://netlib.org), which can be compiled with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
+
+Precompiled libraries are available for most platforms:
 
 - [Intel Math Kernel Library](https://software.intel.com/mkl)
 - [Apple's vecLib](http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html)
 - [OpenBLAS](https://www.openblas.net)
 - Also available for many Linux distributions.
 
-Apple's veclib is preinstalled on Mac OSX, and [Intel's MKL](https://en.wikipedia.org/wiki/Math_Kernel_Library) is available free of charge. MKL has better performance on Intel processors.
+Apple's veclib is preinstalled on Mac OSX, and [Intel's MKL](https://en.wikipedia.org/wiki/Math_Kernel_Library) is available free of charge, but is optimal only on Intel processors.
 
 ### Graphical libraries
  

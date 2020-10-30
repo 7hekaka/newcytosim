@@ -3,6 +3,8 @@
 This describes some simple ways to run one or many simulations on a personal computer,
 using the unix-style command line interface. If you are not familiar with the command line, [follow this first](starter.md).
 
+It is good practice to perform simulations in a separate folder (eg. `run`), where one copies only the necessary files: `config.cym` and `sim` and `play`.
+
 # Live Run
 
 A *live run* will perform a simulation and display its result on the fly, without saving anything on the disk.
@@ -14,9 +16,10 @@ If cytosim's executable `play` is present in the current directory, you can type
 this should open a graphical window and start a live simulation using the file
 `config.cym` that is located in the current working directory.
 
-You can specify another configuration file, here in a subdirectory `cym`:
+You can specify another configuration file, here from the subdirectory `cym`:
  
-	./play live cym/self.cym
+	./play cym/self.cym
+
 
 In the following, only the executable name will be specified. If you get an error `command not found`, please check our [Unix starter](starter.md), as every details of the command matter. 
 
@@ -24,16 +27,16 @@ In the following, only the executable name will be specified. If you get an erro
  
 The canonical way to use cytosim is to call `sim` to calculate a simulation,
 and then `play` to display the results once `sim` has finished:
-	 
+ 
 	sim
 	play
- 
-By default, `sim` uses the configuration file `config.cym` in the current directory.
+
+By default, `sim` uses the configuration file `config.cym` in the current directory, and `play` will read two files written by `sim`: `properties.cmo` and `objects.cmo`.
 If you do not want to wait until `sim` finishes, you may run `sim` in the background:
- 
+
 	sim&
- 
-You can then use `play` to display the partial results at any time, even if `sim` is still running. This works because `sim` access the result files for writting, and `play` only for reading. You could also open a second terminal window to run `play` while `sim` is still running. Learn [how to convert the results into a movie](making_movies.md).
+
+You can then use `play` at any time to display the partial results, even if `sim` is still running. This works because `sim` access the result files for writting, and `play` only for reading. You could also open a second terminal window to run `play` while `sim` is still running. Learn [how to convert the results into a movie](making_movies.md).
 
 
 # Overnight Run
@@ -66,7 +69,7 @@ You can call `start.py` many times, and the new directories will be named `run00
 # Parametric Scan
 
 The process of running many simulations can be automated with the python scripts
-located in `/python/run`. Here we illustrate how to scan one parameter by using `preconfig.py`.
+located in `/python/run`. Here we illustrate how to scan one parameter by using [preconfig](https://openresearchsoftware.metajnl.com/articles/10.5334/jors.156).
 The same technique makes it possible to scan many parameters.
 
 First create a template file from your existing config file:
@@ -147,6 +150,7 @@ The tools and python scripts should be able provide up-to-date help, for example
 	make_page.py help
 	scan.py help
 
+
 # Restarting a simulation
 
 To restart a simulation from a frame stored in a trajectory file,
@@ -156,15 +160,15 @@ follow these steps:
 
 		make frametool
 
-2. Using `frametool`, extract the desired frame (in this example, 30).
-This will create a file ‘objects.cmi’. The frame index start at 0. 
+2. Using `frametool`, extract the desired frame from which you want to restart from.
+This will create a file `objects.cmi`. The frame index start at 0, and we extract here frame 30. 
 
 		frametool objects.cmo 30 > objects.cmi
-Note that ‘frametool objects.cmo’ will tell you how many frames are contained
-in the file.
+		
+Note that `frametool objects.cmo` will tell you how many frames are contained in the file.
 
 3. Adjust the `config.cym` to import this frame.
-Use the ‘import’ command to read the file created in step 1:
+Use the `import` command to read the file created in step 1:
 	
 		import objects objects.cmi
 		
@@ -174,9 +178,9 @@ Use the ‘import’ command to read the file created in step 1:
 			nb_frames = 100
 		}
 
-The ‘import’ command replaces the objects of the simulation, without changing their Properties. The config file should thus define all the Properties with ’set’ as usual, before the ’import’ command. From an existing configuration, one simply adds the 'import' and deletes all the 'new'.
+The `import` command replaces the objects of the simulation, without changing their Properties. The config file should thus define all the Properties with `set` as usual, before the `import` command. From an existing configuration, one simply adds the 'import' and deletes all the 'new'.
 
-However, any ’new’ placed after ‘import’ will add objects as usual. The simulation should be started in a fresh directory, as ’sim’ will erase the ‘object.cmo’ file.
+However, any `new` placed after `import` will add objects as usual. The simulation should be started in a fresh directory, as `sim` will erase the `object.cmo` file.
 
 One can merge two trajectory files later with 'cat' if necessary:
 

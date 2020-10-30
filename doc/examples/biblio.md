@@ -11,14 +11,16 @@
 
 2020
 
-- [Wrinkling instability in 3D active nematics](https://arxiv.org/abs/1908.10974)
+- [Wrinkling instability in 3D active nematics](https://pubs.acs.org/doi/abs/10.1021/acs.nanolett.0c01546)
 - [Deep learning the assembly parameters of growing cytoskeletal networks]() Kros, Maury F, Eindhoven University.
+- [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/abs/1804.11044)
+- [Chromosomes function as a barrier to mitotic spindle bipolarity in polyploid cells](https://doi.org/10.1083/jcb.201908006)   
+
 
 2019
 
 - [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)  
 - [Collective effects of yeast cytoplasmic dynein based microtubule transport](http://dx.doi.org/10.1039/c8sm01434e)  
-- [Chromosomes function as a barrier to mitotic spindle bipolarity in polyploid cells](https://www.biorxiv.org/content/10.1101/572099v1.full)   
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/pdf/1804.11044.pdf)  
 - [Visualization of myosin II filament dynamics in remodeling acto-myosin networks with interferometric scattering microscopy](https://www.biorxiv.org/content/10.1101/199778v4)  
 - [Principles of self-organization and load adaptation by the actin cytoskeleton during clathrin-mediated endocytosis](https://www.biorxiv.org/content/10.1101/678797v1)  

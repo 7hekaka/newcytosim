@@ -1,4 +1,4 @@
-# Examples of work that used Cytosim
+# Projects done with Cytosim
 
 [Additional references here](biblio.md)
 
