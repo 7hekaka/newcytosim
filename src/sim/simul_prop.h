@@ -108,6 +108,7 @@ public:
     /// special parameter for Spindle simulation (solve=flux)
     real      flux_speed;
 #endif
+    
     /// Energy of Brownian motion in the system = Temperature * Boltzman constant
     /**
      <em>kT</em> is the product of the [Boltzmann constant](http://en.wikipedia.org/wiki/Boltzmann_constant) `k`

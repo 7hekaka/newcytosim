@@ -1550,34 +1550,35 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 
     /*
      We now solve the system MAT * vSOL = vRHS  by an iterative method:
-     the tolerance is in scaled to the contribution of Brownian
-     motions contained in vRHS, assuming that the error is equally spread
-     along all degrees of freedom, this should work for tolerance << 1
-     here a printf() can be used to check that the estimate is correct:
-    */
+     the convergence tolerance is scaled to the contribution of Brownian motions
+     contained in vRHS. Since we collected in 'noiseLevel' the minimul level
+     of the Brownian contribution, this should work well if tolerance << 1
+     */
     
-    // NOTE: the tolerance to solve the system should be such that the solution
-    // found does not depend on the initial guess.
-    
-    tolerance_ = noiseLevel * prop->tolerance;
-    
-    if ( prop->kT == 0 )
+    if ( noiseLevel > 0 )
+        tolerance_ = noiseLevel * prop->tolerance;
+    else
+    {
+        if ( alpha > 0 )
+            Cytosim::log << "Warning: all Brownian terms are zero\n";
+        // when temperature == 0, use tolerance as an absolute quantity:
         tolerance_ = prop->tolerance;
+    }
     
     /*
      With exact arithmetic, biConjugate Gradient should converge at most
-     in a number of iterations equal to the size of the linear system, with
-     each iteration involving 2 matrix-vector multiplications.
+     in a number of iterations equal to the size of the linear system,
+     with each BCGGS iteration involving 2 matrix-vector multiplications.
      We set here this theoretical limit to the number multiplications:
      */
 
     LinearSolvers::Monitor monitor(2*dimension(), tolerance_);
 
-    //fprintf(stderr, "Solve precond %i size %6i absolute tolerance %f\n", precond, dimension(), abstol);
+    //fprintf(stderr, "Solve precond %i size %6i absolute tolerance %f\n", precond, dimension(), tolerance_);
     
     /*
      GMRES may converge faster than BCGGS, but has overheads and uses more memory
-     hence for large systems, biCGGS is often advantageous.
+     hence for very large systems, BCGGS is often advantageous.
      */
 
     //------- call the iterative solver:

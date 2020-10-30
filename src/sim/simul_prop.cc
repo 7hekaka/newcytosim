@@ -77,6 +77,10 @@ void SimulProp::read(Glossary& glos)
 #endif
     glos.set(time,              "time");
     glos.set(time_step,         "time_step");
+    
+    real T = 0;
+    if ( glos.set(T, "temperature" ) )
+        kT = 1.38064852e-5 * T;
     glos.set(kT, "kT") || glos.set(kT, "thermal_energy");
 
     glos.set(tolerance,         "tolerance");
@@ -154,8 +158,8 @@ void SimulProp::complete(Simul const& sim)
         if ( kT < 0 )
             throw InvalidParameter("simul:kT must be > 0");
         
-        if ( kT == 0 && tolerance > 0.01 )
-            throw InvalidParameter("if simul:kT==0, simul:tolerance must be set small");
+        if ( kT == 0 && tolerance > 0.1 )
+            throw InvalidParameter("if simul:kT==0, simul:tolerance must be defined and small");
     }
     /*
      If the Global parameters have changed, we update all derived parameters.
