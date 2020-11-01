@@ -220,10 +220,8 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceCylinder::draw() const
+void SpaceCylinder::draw3D() const
 {
-#if ( DIM > 2 )
-
     const size_t fin = 512;
 
     GLfloat L = (GLfloat)length_;
@@ -257,17 +255,11 @@ bool SpaceCylinder::draw() const
     for ( size_t sc = 0; sc <= fin; ++sc )
         glVertex3f( -L,-R*c[sc], R*s[sc] );
     glEnd();
-    
-#endif
-    return true;
 }
 
 #else
 
-bool SpaceCylinder::draw() const
-{
-    return false;
-}
+void SpaceCylinder::draw3D() const {}
 
 #endif
 

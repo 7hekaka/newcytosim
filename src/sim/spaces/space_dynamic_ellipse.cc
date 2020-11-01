@@ -449,7 +449,7 @@ void SpaceDynamicEllipse::report(std::ostream& os) const
 
 #include "gle.h"
 
-bool SpaceDynamicEllipse::draw() const
+void SpaceDynamicEllipse::draw3D() const
 {
 #if ( 0 )
     // display principal axes:
@@ -471,19 +471,17 @@ bool SpaceDynamicEllipse::draw() const
         MM[i+4*j] = mat(i,j);
     glPushMatrix();
     glMultMatrixf(MM);
-    SpaceEllipse::draw();
+#if ( DIM >= 3 )
+    SpaceEllipse::draw3D();
+#else
+    SpaceEllipse::draw2D();
+#endif
     glPopMatrix();
-
-    return true;
 }
 
 #else
 
-bool SpaceDynamicEllipse::draw() const
-{
-    return false;
-}
-
+void SpaceDynamicEllipse::draw3D() const {}
 
 #endif
 

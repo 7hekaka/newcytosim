@@ -497,9 +497,8 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceCylinderZ::draw() const
+void SpaceCylinderZ::draw3D() const
 {
-#if ( DIM > 2 )
     const GLfloat T = (GLfloat)top_;
     const GLfloat B = (GLfloat)bot_;
     const GLfloat R = (GLfloat)radius_;
@@ -569,15 +568,10 @@ bool SpaceCylinderZ::draw() const
         glVertex3f(0, 0,  B);
         glEnd();
     }
-#endif
-    return true;
 }
 
 #else
 
-bool SpaceCylinderZ::draw() const
-{
-    return false;
-}
+void SpaceCylinderZ::draw3D() const {}
 
 #endif

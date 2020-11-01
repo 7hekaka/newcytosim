@@ -243,7 +243,7 @@ void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpaceSquare::draw() const
+void SpaceSquare::draw3D() const
 {
     const real X = length_[0];
     const real Y = length_[1];
@@ -323,15 +323,10 @@ bool SpaceSquare::draw() const
     gleVertex( -X, -Y, -Z );
     gleVertex( -X,  Y, -Z );
     glEnd();
-
-    return true;
 }
 
 #else
 
-bool SpaceSquare::draw() const
-{
-    return false;
-}
+void SpaceSquare::draw3D() const {}
 
 #endif

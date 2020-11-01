@@ -146,13 +146,3 @@ void SpaceBeads::setInteraction(Vector const& pos, Mecapoint const& pe, real rad
     ABORT_NOW("SpaceBeads is incomplete");
 }
 
-//------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
-
-bool SpaceBeads::draw() const
-{
-    return true;
-}
-
-

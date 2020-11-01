@@ -75,19 +75,15 @@ void SpaceRotate::setInteraction(Vector const& pos, Mecapoint const&, real rad, 
 #ifdef DISPLAY
 #include "opengl.h"
 
-bool SpaceRotate::draw() const
+void SpaceRotate::draw3D() const
 {
     glRotated(90, 0,  1, 0);
-    mSpace->draw();
+    mSpace->draw3D();
     glRotated(90, 0, -1, 0);
-    return true;
 }
 
 #else
 
-bool SpaceRotate::draw() const
-{
-    return false;
-}
+void SpaceRotate::draw3D() const {}
 
 #endif

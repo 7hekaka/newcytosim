@@ -59,15 +59,17 @@ public:
     /// change dimensions
     void        resize(Glossary& opt);
     
-    /// OpenGL display function; returns true if successful
-    bool        draw() const;
-    
     /// write to file
     void        write(Outputter&) const;
     
     /// read from file
     void        read(Inputter&, Simul&, ObjectTag);
 
+    /// OpenGL display function
+    void        draw2D() const {};
+
+    /// OpenGL display function
+    void        draw3D() const;
 };
 
 #endif

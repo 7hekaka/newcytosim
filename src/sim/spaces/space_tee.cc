@@ -419,9 +419,8 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpaceTee::draw() const
+void SpaceTee::draw2D() const
 {
-#if ( DIM == 2 )
     constexpr size_t fin = 8 * gle::finesse;
     GLfloat c[2*fin+1], s[2*fin+1];
     gle::circle(2*fin, c, s, tRadius);
@@ -458,10 +457,11 @@ bool SpaceTee::draw() const
     gleVertex( tJunction-tRadius, tRadius+tArmLength, 0 );
 
     glEnd();
-#endif
-    
-#if ( DIM > 2 )
+}
 
+
+void SpaceTee::draw3D() const
+{
     const GLenum glp1 = GL_CLIP_PLANE4;
     const GLenum glp2 = GL_CLIP_PLANE5;
     const GLdouble planeZ[] = { 0, 0, 1, 0 };
@@ -517,18 +517,12 @@ bool SpaceTee::draw() const
     glPopMatrix();
     glDisable(glp1);
     glDisable(glp2);
-#endif
-    
-    return true;
 }
 
 #else
 
-bool SpaceTee::draw() const
-{
-    return false;
-}
-
+void SpaceTee::draw2D() const {}
+void SpaceTee::draw3D() const {}
 
 #endif
 

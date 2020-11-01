@@ -199,15 +199,14 @@ public:
 
     //------------------------------ DISPLAY -----------------------------------
     
-    /// a shape-specific openGL display function, return true if display was done
-    /**
-     In 2D, this should draw the edge of the surface using lines.
-     in 3D, this should draw the surface of the volume, using triangles.
-     */
-    virtual bool   draw()  const { return false; }
-
     /// Default 2D display, tracing the outline of a section of the Volume
     void           drawSection(int dim, real pos, real step) const;
+
+    /// outline the surface using lines, return true if drawn
+    virtual void   draw2D() const {}
+    
+    /// draw surface of the volume, using triangles, return true if drawn
+    virtual void   draw3D() const {}
 
 };
 

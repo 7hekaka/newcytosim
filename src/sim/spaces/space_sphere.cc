@@ -116,12 +116,8 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 #include "point_disp.h"
 
-
-bool SpaceSphere::draw() const
+void SpaceSphere::draw2D() const
 {
-
-#if ( DIM <= 2 )
- 
     //number of sections in the quarter-circle
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     
@@ -143,26 +139,21 @@ bool SpaceSphere::draw() const
         glDrawArrays(GL_TRIANGLE_FAN, 0, fin+2);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
-    
-#else
-    
+}
+
+void SpaceSphere::draw3D() const
+{
     GLfloat R = (GLfloat)radius_;
     glPushMatrix();
     glScalef(R, R, R);
     gle::sphere8();
     gle::drawThreeBands(128);
     glPopMatrix();
-    
-#endif
-    
-    return true;
 }
 
 #else
 
-bool SpaceSphere::draw() const
-{
-    return false;
-}
+void SpaceSphere::draw2D() const {}
+void SpaceSphere::draw3D() const {}
 
 #endif

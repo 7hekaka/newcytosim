@@ -4,7 +4,7 @@ F. Nedelec
 
 # Bugs
 
-- diffusion of a looped filament
+- check diffusion of a looped filament
 - Display parameter such as 'tile': command line do not overwrite
 
 # Essential
@@ -22,7 +22,6 @@ F. Nedelec
 
 # Improvements
 
-- have Space::drawSurface and Space::drawLines
 - fiber:max_length could trigger switch to a different Dynamic state
 - Could add color of Hands for summary obtained with 'I'
 - Implement two confinements for Mecables. That's easier than constructive geometry on Spaces

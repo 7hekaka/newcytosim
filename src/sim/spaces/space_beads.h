@@ -68,9 +68,6 @@ public:
 
     /// find the beads
     void        step();
-    
-    /// OpenGL display function; returns true if successful
-    bool        draw() const;
 
 };
 

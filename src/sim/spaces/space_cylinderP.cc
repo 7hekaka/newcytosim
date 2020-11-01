@@ -207,10 +207,8 @@ void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceCylinderP::draw() const
+void SpaceCylinderP::draw3D() const
 {
-#if ( DIM > 2 )
-
     const size_t fin = 512;
     GLfloat c[fin+1], s[fin+1];
     gle::circle(fin, c, s, 1);
@@ -243,17 +241,11 @@ bool SpaceCylinderP::draw() const
         glPopMatrix();
         glDisable(GL_LINE_STIPPLE);
     }
-
-#endif
-    return true;
 }
 
 #else
 
-bool SpaceCylinderP::draw() const
-{
-    return false;
-}
+void SpaceCylinderP::draw3D() const {}
 
 #endif
 

@@ -155,10 +155,8 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceDisc::draw() const
+void SpaceDisc::draw2D() const
 {
-#if ( DIM <= 2 )
-
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     GLfloat cir[2*fin+2];
     gle::circle(fin, cir, (GLfloat)radius_);
@@ -167,18 +165,16 @@ bool SpaceDisc::draw() const
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
     glDisableClientState(GL_VERTEX_ARRAY);
-    
-#endif
-    
-    return true;
+}
+
+void SpaceDisc::draw3D() const
+{
+    draw2D(); //unfinished
 }
 
 #else
 
-bool SpaceDisc::draw() const
-{
-    return false;
-}
-
+void SpaceDisc::draw2D() const {}
+void SpaceDisc::draw3D() const {}
 
 #endif

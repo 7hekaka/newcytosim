@@ -158,10 +158,8 @@ void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpaceBanana::draw() const
+void SpaceBanana::draw2D() const
 {
-#if ( DIM == 2 )
-    
     //number of sections in the quarter-circle
     constexpr size_t fin = 8 * gle::finesse;
     GLfloat c[fin+1], s[fin+1];
@@ -191,9 +189,10 @@ bool SpaceBanana::draw() const
         gleVertex(c[i], s[i], 0);
 
     glEnd();
-    
-#elif ( DIM > 2 )
-    
+}
+
+void SpaceBanana::draw3D() const
+{
     glMatrixMode(GL_MODELVIEW);
 
     GLdouble plane1[] = { -std::cos(bAngle), -std::sin(bAngle), 0, 0 };
@@ -234,17 +233,11 @@ bool SpaceBanana::draw() const
     glPopMatrix();
     
     glDisable(glp1);
-    
-#endif
-    return true;
 }
 
 #else
 
-bool SpaceBanana::draw() const
-{
-    return false;
-}
-
+void SpaceBanana::draw2D() const {}
+void SpaceBanana::draw3D() const {}
 
 #endif

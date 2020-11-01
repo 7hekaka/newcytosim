@@ -200,7 +200,7 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 
-bool SpaceEllipse::draw() const
+void SpaceEllipse::draw2D() const
 {
 #if ( DIM == 1 )
     
@@ -227,8 +227,12 @@ bool SpaceEllipse::draw() const
     glDisableClientState(GL_VERTEX_ARRAY);
     glPopMatrix();
 
-#elif ( DIM >= 3 )
+#endif
+}
 
+
+void SpaceEllipse::draw3D() const
+{
     const size_t fin = gle::ncircle;
     static GLfloat c[2*fin+1], s[2*fin+1];
     static bool virgin = true;
@@ -292,17 +296,11 @@ bool SpaceEllipse::draw() const
         glEnd();
     }
 #endif
-#endif
-    
-    return true;
 }
 
 #else
 
-bool SpaceEllipse::draw() const
-{
-    return false;
-}
-
+void SpaceEllipse::draw2D() const {}
+void SpaceEllipse::draw3D() const {}
 
 #endif

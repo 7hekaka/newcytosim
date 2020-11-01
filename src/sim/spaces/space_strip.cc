@@ -246,13 +246,37 @@ void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpaceStrip::draw() const
+void SpaceStrip::draw2D() const
 {
     const real X = halflength_[0];
     const real T = top_;
     const real B = bot_;
     
-#if ( DIM >= 3 )
+    glBegin(GL_LINES);
+    gleVertex(-X, T, 0);
+    gleVertex( X, T, 0);
+    gleVertex( X, B, 0);
+    gleVertex(-X, B, 0);
+    glEnd();
+    
+    // draw periodic boundaries:
+    glLineStipple(1, 0x000F);
+    glEnable(GL_LINE_STIPPLE);
+    glBegin(GL_LINES);
+    gleVertex( X, T, 0);
+    gleVertex( X, B, 0);
+    gleVertex(-X, T, 0);
+    gleVertex(-X, B, 0);
+    glEnd();
+    glDisable(GL_LINE_STIPPLE);
+}
+
+void SpaceStrip::draw3D() const
+{
+    const real X = halflength_[0];
+    const real T = top_;
+    const real B = bot_;
+    
     const real Y = halflength_[1];
     // draw faces:
     glBegin(GL_TRIANGLE_STRIP);
@@ -284,20 +308,11 @@ bool SpaceStrip::draw() const
     gleVertex( X,  Y, T);
     gleVertex(-X,  Y, T);
     glEnd();
-#else
-    glBegin(GL_LINES);
-    gleVertex(-X, T, 0);
-    gleVertex( X, T, 0);
-    gleVertex( X, B, 0);
-    gleVertex(-X, B, 0);
-    glEnd();
-#endif
     
     // draw periodic boundaries:
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
-#if ( DIM >= 3 )
     gleVertex( X,  Y, T);
     gleVertex( X,  Y, B);
     gleVertex( X, -Y, T);
@@ -306,23 +321,14 @@ bool SpaceStrip::draw() const
     gleVertex(-X,  Y, B);
     gleVertex(-X, -Y, T);
     gleVertex(-X, -Y, B);
-#else
-    gleVertex( X, T, 0);
-    gleVertex( X, B, 0);
-    gleVertex(-X, T, 0);
-    gleVertex(-X, B, 0);
-#endif
     glEnd();
     glDisable(GL_LINE_STIPPLE);
-    return true;
 }
 
 #else
 
-bool SpaceStrip::draw() const
-{
-    return false;
-}
+void SpaceStrip::draw2D() const {}
+void SpaceStrip::draw3D() const {}
 
 #endif
 

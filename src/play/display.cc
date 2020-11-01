@@ -518,13 +518,13 @@ void Display::drawSpace(Space const* obj, bool opaque)
         {
             disp->color2.load_back();
             glCullFace(GL_FRONT);
-            obj->draw();
+            obj->draw3D();
         }
         if ( front )
         {
             disp->color.load_front();
             glCullFace(GL_BACK);
-            obj->draw();
+            obj->draw3D();
         }
         if ( !cull ) glDisable(GL_CULL_FACE);
     }
@@ -555,7 +555,7 @@ void Display::drawSpaces(SpaceSet const& set)
             glDisable(GL_LIGHTING);
             lineWidth(disp->width);
             disp->color.load_load();
-            obj->draw();
+            obj->draw2D();
         }
     }
     

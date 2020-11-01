@@ -71,19 +71,14 @@ void SpaceForce::setInteractions(Meca& meca) const
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceForce::draw() const
+void SpaceForce::draw3D() const
 {
     gle::drawArrow(center, center+force, 0.1 * force.norm());
-    return true;
 }
 
 #else
 
-bool SpaceForce::draw() const
-{
-    return false;
-}
-
+void SpaceForce::draw3D() const {}
 
 #endif
 

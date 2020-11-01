@@ -74,10 +74,8 @@ public:
     /// OpenGL display function
     void        drawZ(bool show_rings) const;
 
-    /// OpenGL display function; returns true if successful
-    bool        draw() const;
-
-
+    /// OpenGL display function
+    void        draw3D() const;
 };
 
 #endif

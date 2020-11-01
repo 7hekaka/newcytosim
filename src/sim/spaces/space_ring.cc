@@ -181,10 +181,8 @@ void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceRing::draw() const
+void SpaceRing::draw3D() const
 {
-#if ( DIM > 2 )
-
     const size_t fin = 512;
     GLfloat c[fin+1], s[fin+1];
     gle::circle(fin, c, s, GLfloat(radius_));
@@ -199,17 +197,11 @@ bool SpaceRing::draw() const
         glVertex3f(-L, c[n], s[n]);
     }
     glEnd();
-    
-#endif
-    return true;
 }
 
 #else
 
-bool SpaceRing::draw() const
-{
-    return false;
-}
+void SpaceRing::draw3D() const {}
 
 #endif
 

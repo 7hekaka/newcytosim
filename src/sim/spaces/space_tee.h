@@ -68,9 +68,7 @@ public:
     
     /// set `proj` as the point on the edge that is closest to `point`
     Vector      project(Vector const& pos) const;
-    
-    /// OpenGL display function; returns true if successful
-    bool        draw() const;
+
     
     /// write to file
     void        write(Outputter&) const;
@@ -81,6 +79,12 @@ public:
     /// read from file
     void        read(Inputter&, Simul&, ObjectTag);
 
+    
+    /// OpenGL display function
+    void        draw2D() const;
+    
+    /// OpenGL display function
+    void        draw3D() const;
 };
 
 #endif

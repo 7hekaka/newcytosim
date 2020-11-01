@@ -251,17 +251,15 @@ void SpacePolygonZ::drawZ(bool rings) const
 }
 
 
-bool SpacePolygonZ::draw() const
+void SpacePolygonZ::draw3D() const
 {
     drawZ(0);
-    return true;
 }
 
 #else
 
-bool SpacePolygonZ::draw() const
+void SpacePolygonZ::draw3D() const
 {
-    return false;
 }
 
 #endif

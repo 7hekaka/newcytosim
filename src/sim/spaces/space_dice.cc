@@ -296,10 +296,13 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpaceDice::draw() const
+void SpaceDice::draw2D() const
 {
-#if ( DIM > 2 )
-    
+    drawSection( 2, 0, 0.01 );
+}
+
+void SpaceDice::draw3D() const
+{
     const real X = length_[0] - edge_;
     const real Y = length_[1] - edge_;
     const real Z = length_[2] - edge_;
@@ -360,22 +363,12 @@ bool SpaceDice::draw() const
     drawSection( 2, -Z, 0.01 );
     drawSection( 2,  Z, 0.01 );
     glDisable(GL_LINE_STIPPLE);
-    
-#else
-
-    drawSection( 2, 0, 0.01 );
-
-#endif
-    
-    return true;
 }
 
 #else
 
-bool SpaceDice::draw() const
-{
-    return false;
-}
+void SpaceDice::draw2D() const {}
+void SpaceDice::draw3D() const {}
 
 #endif
 

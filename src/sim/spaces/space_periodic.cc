@@ -120,7 +120,7 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpacePeriodic::draw() const
+void SpacePeriodic::draw3D() const
 {
     const real X = halflength_[0];
     const real Y = ( DIM > 1 ) ? halflength_[1] : 1;
@@ -157,15 +157,11 @@ bool SpacePeriodic::draw() const
 #endif
 
     glDisable(GL_LINE_STIPPLE);
-    return true;
 }
 
 #else
 
-bool SpacePeriodic::draw() const
-{
-    return false;
-}
+void SpacePeriodic::draw3D() const {}
 
 #endif
 

@@ -472,22 +472,27 @@ void display(View&, int)
 
     if ( spc && draw_space )
     {
+#if ( DIM >= 3 )
         glEnable(GL_LIGHTING);
         glEnable(GL_CULL_FACE);
         glDepthMask(GL_FALSE);
         // draw back side
         glCullFace(GL_FRONT);
         gle_color(0.2, 0.2, 0.2, 0.1).load_back();
-        if ( !spc->draw() )
-            printf("Space::draw() returned false\n");
-
+        spc->draw3D();
         // draw front side
         glCullFace(GL_BACK);
         gle_color(1.0, 1.0, 1.0, 0.1).load_front();
-        spc->draw();
+        spc->draw3D();
         glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
         glDepthMask(GL_TRUE);
+#else
+        glLineWidth(2);
+        gle_color(0.2, 0.2, 0.2, 0.1).load();
+        glDisable(GL_LIGHTING);
+        spc->draw2D();
+#endif
     }
     
     //use green for points inside, magenta for point outside:

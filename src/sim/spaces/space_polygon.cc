@@ -306,12 +306,34 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpacePolygon::draw() const
+void SpacePolygon::drawPoints() const
 {
     const size_t npts = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
 
-#if ( DIM == 2 )
+    // display points:
+    glColor3f(1,1,1);
+    glPointSize(3);
+    glBegin(GL_POINTS);
+    for ( size_t n=0; n < npts; ++n )
+        gle::gleVertex(pts[n].xx, pts[n].yy);
+    glEnd();
+#if ( 0 )
+    // indicate index of each point:
+    char tmp[8];
+    for ( size_t n=0; n < npts; ++n )
+    {
+        snprintf(tmp, sizeof(tmp), "%i", n);
+        Vector p(pts[n].xx, pts[n].yy, height_);
+        gle::drawText(p, tmp, 0);
+    }
+#endif
+}
+
+void SpacePolygon::draw2D() const
+{
+    const size_t npts = poly_.nbPoints();
+    Polygon::Point2D const* pts = poly_.pts_;
     
     glEnable(GL_STENCIL_TEST);
     glClearStencil(1);
@@ -336,8 +358,12 @@ bool SpacePolygon::draw() const
     
     glClear(GL_STENCIL_BUFFER_BIT);
     glDisable(GL_STENCIL_TEST);
+}
 
-#elif ( DIM > 2 )
+void SpacePolygon::draw3D() const
+{
+    const size_t npts = poly_.nbPoints();
+    Polygon::Point2D const* pts = poly_.pts_;
     
     // display bottom
     glLineWidth(2);
@@ -366,37 +392,11 @@ bool SpacePolygon::draw() const
         gle::gleVertex(pts[0].xx, pts[0].yy,-Z);
     }
     glEnd();
-    
-#endif
-    
-#if ( 0 )
-    // display points:
-    glColor3f(1,1,1);
-    glPointSize(3);
-    glBegin(GL_POINTS);
-    for ( size_t n=0; n < npts; ++n )
-        gle::gleVertex(pts[n].xx, pts[n].yy);
-    glEnd();
-#endif
-#if ( 0 )
-    // indicate index of each point:
-    char tmp[8];
-    for ( size_t n=0; n < npts; ++n )
-    {
-        snprintf(tmp, sizeof(tmp), "%i", n);
-        Vector p(pts[n].xx, pts[n].yy, height_);
-        gle::drawText(p, tmp, 0);
-    }
-#endif
-
-    return true;
 }
 
 #else
 
-bool SpacePolygon::draw() const
-{
-    return false;
-}
+void SpacePolygon::draw2D() const {}
+void SpacePolygon::draw3D() const {}
 
 #endif

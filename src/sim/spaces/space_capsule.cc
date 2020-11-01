@@ -242,7 +242,7 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceCapsule::draw() const
+void SpaceCapsule::draw2D() const
 {
     //number of sections in the quarter-circle
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
@@ -252,8 +252,6 @@ bool SpaceCapsule::draw() const
     
     const GLfloat L = (GLfloat)length_;
     const GLfloat R = (GLfloat)radius_;
-    
-#if ( DIM <= 2 )
     
     //display a loop in X/Y plane
     glBegin(GL_LINE_LOOP);
@@ -265,8 +263,19 @@ bool SpaceCapsule::draw() const
         glVertex2f(R*s[n]-L, R*c[n]);
     
     glEnd();
+}
+
+
+void SpaceCapsule::draw3D() const
+{
+    //number of sections in the quarter-circle
+    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     
-#else
+    GLfloat c[4*fin+1], s[4*fin+1];
+    gle::circle(4*fin, c, s, 1);
+    
+    const GLfloat L = (GLfloat)length_;
+    const GLfloat R = (GLfloat)radius_;
     
     //display strips along the side of the volume:
     for ( size_t t = 0; t < 4*fin; ++t )
@@ -311,16 +320,11 @@ bool SpaceCapsule::draw() const
         gle::drawArrowedBand(24, 0.25);
         glPopMatrix();
     }
-
-#endif
-    return true;
 }
 
 #else
 
-bool SpaceCapsule::draw() const
-{
-    return false;
-}
+void SpaceCapsule::draw2D() const {}
+void SpaceCapsule::draw3D() const {}
 
 #endif

@@ -111,16 +111,12 @@ void SpaceMesh::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 
-bool SpaceMesh::draw() const
+void SpaceMesh::draw3D() const
 {
-    return true;
 }
 
 #else
 
-bool SpaceMesh::draw() const
-{
-    return false;
-}
+void SpaceMesh::draw3D() const {}
 
 #endif

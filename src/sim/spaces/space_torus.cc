@@ -116,10 +116,8 @@ void SpaceTorus::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 using namespace gle;
 
-bool SpaceTorus::draw() const
+void SpaceTorus::draw2D() const
 {
-#if ( DIM == 2 )
-    
     constexpr size_t fin = 16 * gle::finesse;
     GLfloat cir[2*fin+2];
 
@@ -134,24 +132,16 @@ bool SpaceTorus::draw() const
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
 
     glDisableClientState(GL_VERTEX_ARRAY);
-    return true;
-    
-#elif ( DIM > 2 )
-    
-    gle::torusZ(bRadius, bWidth);
-    return true;
-    
-#else
-    return false;
-#endif
 }
 
-#else
-
-bool SpaceTorus::draw() const
+void SpaceTorus::draw3D() const
 {
-    return false;
+    gle::torusZ(bRadius, bWidth);
 }
 
+#else
+
+void SpaceTorus::draw2D() const {}
+void SpaceTorus::draw3D() const {}
 
 #endif
