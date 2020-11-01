@@ -454,6 +454,7 @@
 		BB69221D233D359F00F528D2 /* growing_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB650A98182E475900A7998B /* growing_fiber.cc */; };
 		BB692223233D366F00F528D2 /* libcytosimG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB692222233D359F00F528D2 /* libcytosimG.a */; };
 		BB69D0B9209C668800445716 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
+		BB6CD588254ED31A00FB7547 /* real_print.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6CD587254ED31A00FB7547 /* real_print.h */; };
 		BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6D309520CA5B12009C5C7C /* matrix22.h */; };
 		BB6D309820CA754B009C5C7C /* matrix33.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6D309720CA754B009C5C7C /* matrix33.h */; };
 		BB6D309A20CABF96009C5C7C /* matrix11.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6D309920CABF96009C5C7C /* matrix11.h */; };
@@ -1513,6 +1514,7 @@
 		BB66EA66068D95AD001934AF /* test_space */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_space; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB692222233D359F00F528D2 /* libcytosimG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytosimG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB69D0B8209C666100445716 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
+		BB6CD587254ED31A00FB7547 /* real_print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = real_print.h; sourceTree = "<group>"; };
 		BB6D309520CA5B12009C5C7C /* matrix22.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix22.h; path = src/math/matrix22.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB6D309720CA754B009C5C7C /* matrix33.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix33.h; path = src/math/matrix33.h; sourceTree = SOURCE_ROOT; };
 		BB6D309920CABF96009C5C7C /* matrix11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix11.h; path = src/math/matrix11.h; sourceTree = SOURCE_ROOT; };
@@ -2566,6 +2568,7 @@
 				BB55BF300A25FB13003333C9 /* dim.h */,
 				BB7192360EF1CEEA00CED9E2 /* makefile.inc */,
 				BBFC66B209C0C3D30031048A /* real.h */,
+				BB6CD587254ED31A00FB7547 /* real_print.h */,
 				BB9D224520C5D30200CBB0B1 /* simd.h */,
 				BB46A4C424A349F400E89FE2 /* simd_float.h */,
 				BB18BB8523CDC20400B3605E /* simd_print.h */,
@@ -3650,6 +3653,7 @@
 				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
 				BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */,
 				BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */,
+				BB6CD588254ED31A00FB7547 /* real_print.h in Headers */,
 				BB0CB11B20C170C10016D73D /* qmr.h in Headers */,
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,

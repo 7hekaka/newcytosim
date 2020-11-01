@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 /**
  @file real.h
  SYNOPSIS: we define and use "real" to be able to easily change
@@ -59,7 +59,10 @@ inline size_t chunk_real(size_t cnt)
 inline real* new_real(size_t cnt)
 {
     void* ptr = nullptr;
-    // we align to 4 doubles (of size 8 bytes), hence 32 bytes
+    /*
+     We need to align to 4 doubles (of size 8 bytes), hence 32 bytes
+     Allocating to 64 bytes matches the cache boundary on most CPUs
+     */
     if ( posix_memalign(&ptr, 64, cnt*sizeof(real)) )
         throw std::bad_alloc();
     real* res = (real*)ptr;
@@ -174,88 +177,5 @@ inline bool isnan(size_t cnt, real const* ptr)
         res |= std::isnan(ptr[i]);
     return res;
 }
-
-
-#if 1
-
-#include <cstdio>
-
-/// print 'cnt' components of 'ptr' on a line
-inline void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
-{
-    if ( !ptr || cnt == 0 )
-        fprintf(out, "void");
-    else
-    {
-        for ( size_t i = 0; i < cnt; ++i )
-            fprintf(out, " %9.4f", ptr[i]);
-        fprintf(out, "%s", end);
-    }
-}
-
-
-/// check memory alignement of a pointer for AVX load/store
-inline void check_alignment(void const* ptr)
-{
-    uintptr_t a = ((uintptr_t)ptr & 31);
-    if ( a )
-        fprintf(stderr, "missaligned pointer %p (%lu)\n", ptr, a);
-}
-
-#endif
-
-//--------------------------------INPUT/OUTPUT----------------------------------
-
-#if ( 0 )
-
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <string>
-
-#include "tokenizer.h"
-/**
- Redefining the standard extraction operator is normally not necessary,
- but this can be useful to track certain bugs
- */
-inline std::istream& operator >> (std::istream& is, real& x)
-{
-    std::string str = Tokenizer::get_real(is);
-    if ( str.empty() )
-        return is;
-    try {
-        x = std::stod(str);
-        //std::clog << " custom operator >> |" << str << "| -> " << x << '\n';
-    }
-    catch ( std::invalid_argument & e ) {
-        std::cerr << " error in operator >> |" << str << "| " << '\n';
-    }
-    return is;
-}
-
-#endif
-#if ( 0 )
-
-/// return the usual base-10 representation of a number
-/** This is equivalent to std::to_string from the C++11 standard */
-template <typename T>
-std::string to_string(T const& x)
-{
-    std::ostringstream oss;
-    oss << x;
-    return oss.str();
-}
-
-
-template <typename T>
-std::string to_string(T const& x, unsigned width, unsigned precision)
-{
-    std::ostringstream oss;
-    oss << std::setw(width) << std::setprecision(precision) << std::fixed << x;
-    return oss.str();
-}
-
-
-#endif
 
 #endif

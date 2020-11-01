@@ -10,6 +10,7 @@
 #include <cstdio>
 #define DEBUG_REAL
 #include "real.h"
+#include "real_print.h"
 #include "blas.h"
 #include "cytoblas.h"
 #include "monitor.h"
