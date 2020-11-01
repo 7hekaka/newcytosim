@@ -348,7 +348,9 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "solid" )
     {
         if ( what == "hand" )
-            return reportSolidHands(out);
+            return reportSolidHands(out, sel, com);
+        if ( what == "orientation" )
+            return reportSolidOrientation(out, sel, com);
         if ( what == "position" || what.empty() )
             return reportSolidPosition(out, sel, com);
         throw InvalidSyntax("I can only report solid: hand, position");
@@ -819,23 +821,22 @@ void Simul::reportFiberEnds(std::ostream& out, FiberEnd end, Property const* sel
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( !sel || sel == fib->prop )
+        if ( sel && sel == fib->prop )
+            continue;
+        out << LIN << fib->prop->number();
+        out << SEP << fib->identity();
+        out << SEP << fib->length();
+        if ( end & PLUS_END )
         {
-            out << LIN << fib->prop->number();
-            out << SEP << fib->identity();
-            out << SEP << fib->length();
-            if ( end & PLUS_END )
-            {
-                out << SEP << fib->endStateP();
-                out << SEP << fib->posEndP();
-                out << SEP << fib->dirEndP();
-            }
-            if ( end & MINUS_END )
-            {
-                out << SEP << fib->endStateM();
-                out << SEP << fib->posEndM();
-                out << SEP << fib->dirEndM();
-            }
+            out << SEP << fib->endStateP();
+            out << SEP << fib->posEndP();
+            out << SEP << fib->dirEndP();
+        }
+        if ( end & MINUS_END )
+        {
+            out << SEP << fib->endStateM();
+            out << SEP << fib->posEndM();
+            out << SEP << fib->dirEndM();
         }
     }
 }
@@ -852,16 +853,15 @@ void Simul::reportFiberPoints(std::ostream& out, Property const* sel, bool com) 
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( !sel || sel == fib->prop )
+        if ( sel && sel == fib->prop )
+            continue;
+        out << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
+        
+        for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
-            out << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
-            
-            for ( size_t p = 0; p < fib->nbPoints(); ++p )
-            {
-                out << LIN << fib->identity();
-                out << SEP << fib->posP(p);
-                out << SEP << fib->curvature(p);
-            }
+            out << LIN << fib->identity();
+            out << SEP << fib->posP(p);
+            out << SEP << fib->curvature(p);
         }
     }
 }
@@ -978,20 +978,19 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel, bool
     size_t cnt = 0;
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( !sel || sel == fib->prop )
+        if ( sel && sel == fib->prop )
+            continue;
+        Vector pos = fib->posEndM();
+        fiber_map::iterator i = positions.find(fib->identity());
+        if ( i != positions.end() )
         {
-            Vector pos = fib->posEndM();
-            fiber_map::iterator i = positions.find(fib->identity());
-            if ( i != positions.end() )
-            {
-                ++cnt;
-                sum += distanceSqr(pos, i->second);
-                i->second = pos;
-            }
-            else
-            {
-                positions[fib->identity()] = pos;
-            }
+            ++cnt;
+            sum += distanceSqr(pos, i->second);
+            i->second = pos;
+        }
+        else
+        {
+            positions[fib->identity()] = pos;
         }
     }
     
@@ -1627,12 +1626,11 @@ void Simul::reportBeadPosition(std::ostream& out, Property const* sel, bool com)
     
     for ( Bead const* obj=beads.first(); obj; obj=obj->next() )
     {
-        if ( !sel || sel == obj->prop )
-        {
-            out << LIN << obj->prop->number();
-            out << SEP << obj->identity();
-            out << SEP << obj->position();
-        }
+       if ( sel && sel != obj->prop )
+            continue;
+        out << LIN << obj->prop->number();
+        out << SEP << obj->identity();
+        out << SEP << obj->position();
     }
 }
 
@@ -1677,35 +1675,61 @@ void Simul::reportSolidPosition(std::ostream& out, Property const* sel, bool com
         
     for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
-        if ( !sel || sel == obj->prop )
+        if ( sel && sel != obj->prop )
+            continue;
+        out << LIN << obj->prop->number();
+        out << SEP << obj->identity();
+        out << SEP << obj->centroid();
+        out << SEP << obj->posP(0);
+        if ( obj->nbPoints() > 1 )
+        out << SEP << obj->posP(1);
+        
+        if ( modulo )
         {
-            out << LIN << obj->prop->number();
-            out << SEP << obj->identity();
-            out << SEP << obj->centroid();
-            out << SEP << obj->posP(0);
-            if ( obj->nbPoints() > 1 )
-                out << SEP << obj->posP(1);
-
-            if ( modulo )
-            {
-                Vector pos = obj->centroid();
-                modulo->fold(pos);
-                out << SEP << pos;
-            }
+            Vector pos = obj->centroid();
+            modulo->fold(pos);
+            out << SEP << pos;
         }
+    }
+}
+
+/**
+ Export orientation of Solids
+ */
+void Simul::reportSolidOrientation(std::ostream& out, Property const* sel, bool com) const
+{
+    if ( com )
+    {
+        out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
+        out << SEP << repeatXYZ("dir");
+    }
+        
+    for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
+    {
+        if ( sel && sel != obj->prop )
+            continue;
+        out << LIN << obj->prop->number();
+        out << SEP << obj->identity();
+        out << SEP << obj->centroid();
+        out << SEP << obj->orientation();
     }
 }
 
 /**
  Export position of Solids with counts of Hands and attached Hands
  */
-void Simul::reportSolidHands(std::ostream& out) const
+void Simul::reportSolidHands(std::ostream& out, Property const* sel, bool com) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
-    out << SEP << "nb_hand" << SEP << "nb_link";
-    
+    if ( com )
+    {
+        out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+        out << SEP << "nb_hand" << SEP << "nb_link";
+    }
+        
     for ( Solid const* obj = solids.firstID(); obj; obj = solids.nextID(obj) )
     {
+        if ( sel && sel != obj->prop )
+            continue;
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
         Vector pos = obj->centroid();
@@ -1733,14 +1757,13 @@ void Simul::reportSpherePosition(std::ostream& out, Property const* sel, bool co
         
     for ( Sphere const* obj=spheres.first(); obj; obj=obj->next() )
     {
-        if ( !sel || sel == obj->prop )
-        {
-            out << LIN << obj->prop->number();
-            out << SEP << obj->identity();
-            out << SEP << obj->posP(0);
-            if ( obj->nbPoints() > 1 )
-                out << SEP << obj->posP(1);
-        }
+        if ( sel && sel != obj->prop )
+            continue;
+        out << LIN << obj->prop->number();
+        out << SEP << obj->identity();
+        out << SEP << obj->posP(0);
+        if ( obj->nbPoints() > 1 )
+        out << SEP << obj->posP(1);
     }
 }
 
@@ -1860,20 +1883,19 @@ void Simul::reportSinglePosition(std::ostream& out, Property const* sel, bool co
         
     for ( Single const* obj = singles.firstID(); obj; obj = singles.nextID(obj) )
     {
-        if ( !sel || sel == obj->prop )
+        if ( sel && sel != obj->prop )
+            continue;
+        out << LIN << obj->prop->number();
+        out << SEP << obj->identity();
+        out << SEP << obj->posFoot();
+        if ( obj->attached() )
         {
-            out << LIN << obj->prop->number();
-            out << SEP << obj->identity();
-            out << SEP << obj->posFoot();
-            if ( obj->attached() )
-            {
-                out << SEP << obj->fiber()->identity();
-                out << SEP << obj->abscissa();
-            }
-            else
-            {
-                out << SEP << 0 << SEP << 0;
-            }
+            out << SEP << obj->fiber()->identity();
+            out << SEP << obj->abscissa();
+        }
+        else
+        {
+            out << SEP << 0 << SEP << 0;
         }
     }
 }
@@ -2095,22 +2117,21 @@ void Simul::reportCoupleLink(std::ostream& out, Property const* sel, bool com) c
         
     for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
     {
-        if ( !sel || sel == obj->prop )
-        {
-            out << LIN << obj->prop->number();
-            out << SEP << obj->identity();
-            
-            out << SEP << obj->fiber1()->identity();
-            out << SEP << obj->abscissa1();
-            //out << SEP << obj->posHand1();
+        if ( sel && sel != obj->prop )
+            continue;
+        out << LIN << obj->prop->number();
+        out << SEP << obj->identity();
+        
+        out << SEP << obj->fiber1()->identity();
+        out << SEP << obj->abscissa1();
+        //out << SEP << obj->posHand1();
 
-            out << SEP << obj->fiber2()->identity();
-            out << SEP << obj->abscissa2();
-            //out << SEP << obj->posHand2();
+        out << SEP << obj->fiber2()->identity();
+        out << SEP << obj->abscissa2();
+        //out << SEP << obj->posHand2();
 
-            out << SEP << obj->force().norm();
-            out << SEP << obj->cosAngle();
-        }
+        out << SEP << obj->force().norm();
+        out << SEP << obj->cosAngle();
     }
 }
 

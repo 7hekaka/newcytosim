@@ -179,6 +179,9 @@ public:
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
     Vector      centroid() const;
     
+    /// direction calculated from all the points
+    Vector      orientation() const;
+
     /// Position of center of gravity
     Vector      position() const { return centroid(); }
 

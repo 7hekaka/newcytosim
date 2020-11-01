@@ -891,13 +891,12 @@ real FiberSet::infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector
 @return `res`, a 9-elements matrix containing the first two principal component vectors
  
  if DIM == 2:
- Component 1 is { vec[0], vec[1] }
+ Component 1 is { res[0], res[1] }
  if DIM == 3:
- Component 1 is { vec[0], vec[1], vec[2] }
- Component 2 is { vec[3], vec[4], vec[5] }
+ Component 1 is { res[0], res[1], res[2] }
+ Component 2 is { res[3], res[4], res[5] }
  */
-real FiberSet::infoNematic(ObjectList const& objs,
-                           real res[9])
+real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 {
     real S = 0;
     real M[9] = { 0 };
@@ -935,17 +934,17 @@ real FiberSet::infoNematic(ObjectList const& objs,
     for ( size_t d = 0; d < 9; ++d )
         M[d] = M[d] / S;
     
-    int nv;
+    int nbv = 1;
     real vec[9] = { 0 };
     real val[3] = { 0 };
     real work[32];
     int iwork[16];
     int ifail[4];
-    
-    // calculate two largest eigenvalues in 3D, one in 2D:
     int info = 0;
+
+    // calculate two largest eigenvalues in 3D, one in 2D:
     lapack::xsyevx('V','I','L', DIM, M, 3, 0, 0, 2, DIM, REAL_EPSILON,
-                   &nv, val, vec, 3, work, 32, iwork, ifail, &info);
+                   &nbv, val, vec, 3, work, 32, iwork, ifail, &info);
 
 #if ( DIM > 2 )
     //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << '\n';
@@ -979,7 +978,7 @@ real FiberSet::infoNematic(ObjectList const& objs,
     res[8] =  1;
 #endif
     
-    return val[nv-1];
+    return val[nbv-1];
 }
 
 
@@ -1069,17 +1068,17 @@ int FiberSet::infoComponents(ObjectList const& objs,
     for ( int i = 0; i < 9; ++i )
         mom[i] = M[i];
     
-    int nv;
+    int nbv = 1;
     real vec[9] = { 0 };
     real val[3] = { 0 };
     real work[32];
     int iwork[16];
     int ifail[4];
-    
-    // calculate two largest eigenvalues in 3D, one in 2D:
     int info = 0;
+
+    // calculate two largest eigenvalues in 3D, one in 2D:
     lapack::xsyevx('V','I','L', DIM, M, 3, 0, 0, 2, DIM, REAL_EPSILON,
-                   &nv, val, vec, 3, work, 32, iwork, ifail, &info);
+                   &nbv, val, vec, 3, work, 32, iwork, ifail, &info);
     
 #if ( DIM > 2 )
     real u = sign_real(vec[3]);
@@ -1111,7 +1110,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
 
     //VecPrint::print(std::clog, 3, 3, vec);
     
-    return ( info == 0  &&  nv == DIM-1 );
+    return ( info == 0  &&  nbv == DIM-1 );
 }
 
 

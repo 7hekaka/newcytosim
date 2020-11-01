@@ -13,11 +13,11 @@
 #include "simul.h"
 #include "space.h"
 #include "wrist.h"
+#include "lapack.h"
 
 #if ( DIM >= 3 )
 #   include "quaternion.h"
 #   include "matrix33.h"
-#   include "lapack.h"
 #endif
 
 //------------------------------------------------------------------------------
@@ -632,7 +632,7 @@ size_t Solid::closestSpheres(const size_t inx, size_t& i1, size_t& i2, size_t& i
 Vector Solid::centroid() const
 {
     if ( nPoints == 0 )
-        ABORT_NOW("cannot calculate centroid of a Solid without point");
+        throw InvalidParameter("cannot calculate centroid of a Solid without point");
     
     if ( nPoints == 1 )
         return posP(0);
@@ -648,10 +648,65 @@ Vector Solid::centroid() const
         }
     }
     if ( sum < REAL_EPSILON )
-        ABORT_NOW("cannot calculate centroid of a Solid without drag sphere");
+        throw InvalidParameter("cannot calculate centroid of a Solid without drag sphere");
     
     res /= sum;
     return res;
+}
+
+
+/**
+  
+ @return the principal component vectors
+
+ */
+Vector Solid::orientation() const
+{
+    real S = 0, M[9] = { 0 };
+    
+    for ( size_t i = 0; i < nPoints; ++i )
+    {
+        const real w = soRadius[i];
+        Vector p = posP(i);
+            
+        M[0] += w * ( DIM * p.XX * p.XX - 1 );
+#if ( DIM > 1 )
+        M[1] += w * ( DIM * p.YY * p.XX );
+        M[4] += w * ( DIM * p.YY * p.YY - 1 );
+#endif
+#if ( DIM > 2 )
+        M[2] += w * ( DIM * p.ZZ * p.XX );
+        M[5] += w * ( DIM * p.ZZ * p.YY );
+        M[8] += w * ( DIM * p.ZZ * p.ZZ - 1 );
+#endif
+        S += w;
+    }
+    
+    if ( nPoints < 2 )
+        throw InvalidParameter("cannot calculate orientation of a Solid with less than 2 spheres");
+    
+    int nbv = 0;
+    real vec[9] = { 0 };
+
+    if ( S > REAL_EPSILON )
+    {
+        // rescale matrix:
+        for ( size_t d = 0; d < 9; ++d )
+            M[d] = M[d] / S;
+        
+        real val[3] = { 0 };
+        real work[32];
+        int iwork[16];
+        int ifail[4];
+        int info = 0;
+        
+        // find vector with the largest eigenvalue:
+        lapack::xsyevx('V','I','L', DIM, M, 3, 0, 0, DIM, DIM, REAL_EPSILON,
+                       &nbv, val, vec, 3, work, 32, iwork, ifail, &info);
+    }
+    if ( nbv > 0 )
+        return Vector(vec[0], vec[1], vec[2]);
+    return Vector(0, 0, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -836,25 +891,30 @@ void Solid::reshape()
     for ( size_t i = 0; i < nPoints; ++i )
         S.addOuterProduct(soShape+DIM*i, pPos+DIM*i);
     
-    // scale to keep the magnitude of the matrix in range
-    real scale = 1.0 / ( S.diagonal().abs().e_sum() );
-    real N[4*4];
+    real N[4*4] = { 0 };
     
     // set upper triangle of the 4x4 matrix:
-    N[0+4*0] = scale * ( S(0,0) + S(1,1) + S(2,2) );
-    N[0+4*1] = scale * ( S(1,2) - S(2,1) );
-    N[0+4*2] = scale * ( S(2,0) - S(0,2) );
-    N[0+4*3] = scale * ( S(0,1) - S(1,0) );
+    N[0+4*0] = S(0,0) + S(1,1) + S(2,2);
+    N[0+4*1] = S(1,2) - S(2,1);
+    N[0+4*2] = S(2,0) - S(0,2);
+    N[0+4*3] = S(0,1) - S(1,0);
     
-    N[1+4*1] = scale * ( S(0,0) - S(1,1) - S(2,2) );
-    N[1+4*2] = scale * ( S(0,1) + S(1,0) );
-    N[1+4*3] = scale * ( S(2,0) + S(0,2) );
+    N[1+4*1] = S(0,0) - S(1,1) - S(2,2);
+    N[1+4*2] = S(0,1) + S(1,0);
+    N[1+4*3] = S(2,0) + S(0,2);
     
-    N[2+4*2] = scale * ( S(1,1) - S(0,0) - S(2,2) );
-    N[2+4*3] = scale * ( S(1,2) + S(2,1) );
+    N[2+4*2] = S(1,1) - S(0,0) - S(2,2);
+    N[2+4*3] = S(1,2) + S(2,1);
     
-    N[3+4*3] = scale * ( S(2,2) - S(1,1) - S(0,0) );
+    N[3+4*3] = S(2,2) - S(1,1) - S(0,0);
 
+    {
+    // rescale matrix to keep its magnitude in range
+    real alpha = 1.0 / ( S.diagonal().abs().e_sum() );
+    for ( int i = 0; i < 16; ++i )
+        N[i] *= alpha;
+    }
+    
     //VecPrint::print(std::cout, 4, 4, N, 4, 3);
 
     /* 
@@ -862,19 +922,19 @@ void Solid::reshape()
      which is the quaternion corresponding to the best rotation
      */
     
-    int nbvalues;
-    real eValue[4];
+    int nbv;
+    real val[4];
     Quaternion<real> quat;
     real work[8*4];
     int iwork[5*4];
     int ifail[4];
-    
     int info = 0;
+    
     lapack::xsyevx('V','I','U', 4, N, 4, 0, 0, 4, 4, REAL_EPSILON,
-                   &nbvalues, eValue, quat, 4, work, 8*4, iwork, ifail, &info);
+                   &nbv, val, quat, 4, work, 8*4, iwork, ifail, &info);
     
     //Cytosim::log("optimal LWORK = %i\n", work[0]);
-    //Cytosim::log("eigenvalue %6.2f,", eValue[0]);
+    //Cytosim::log("eigenvalue %6.2f,", val[0]);
     //quat.println();
     
     if ( info == 0 )

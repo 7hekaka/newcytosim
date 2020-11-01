@@ -476,9 +476,12 @@ public:
 
     /// print Solid positions 
     void      reportSolidPosition(std::ostream&, Property const*, bool com) const;
+    
+    /// print Solid positions
+    void      reportSolidOrientation(std::ostream&, Property const*, bool com) const;
 
     /// print Solid's anchored Hands
-    void      reportSolidHands(std::ostream&) const;
+    void      reportSolidHands(std::ostream&, Property const*, bool com) const;
 
     /// print state of Couples 
     void      reportCouple(std::ostream&) const;
