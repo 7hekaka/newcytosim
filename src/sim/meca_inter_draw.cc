@@ -47,6 +47,8 @@ void drawLink(Vector const& a, Vector const& ab, real len)
 /// Display link between 3 positions
 void drawLink(Vector const& a, Vector const& ab, Vector const& c)
 {
+    if ( modulo )
+        modulo->fold(c, a);
     Vector b = a + ab;
     glLineStipple(1, 0x7310);
     glBegin(GL_LINES);
@@ -61,14 +63,6 @@ void drawLink(Vector const& a, Vector const& ab, Vector const& c)
     glBegin(GL_POINTS);
     gle::gleVertex(b);
     glEnd();
-}
-
-/// this performs the modulo on `c`
-void drawLinkM(Vector const& a, Vector const& ab, Vector c)
-{
-    if ( modulo )
-        modulo->fold(c, a);
-    drawLink(a, ab, c);
 }
 
 /// Display link between 4 positions

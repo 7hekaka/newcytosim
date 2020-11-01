@@ -328,11 +328,11 @@ void Meca::addTorqueClamp(Interpolation const& pti,
     
     /**
      Scale torque to make it proportional to angle:
-     we multiply the vector Tq by angle / std::sin(angle),
-     knowing that Tn = Tq.norm() = std::sin(angle) * std::sqrt(n)
+     we multiply the vector Tq by angle / sin(angle),
+     knowing that Tn = Tq.norm() = sin(angle) * sqrt(n)
      
-     To have a Torque proportional to std::sin(angle), use:
-     real nn = weight / ( n * std::sqrt(n) );
+     To have a Torque proportional to sin(angle), use:
+     real nn = weight / ( n * sqrt(n) );
      */
     real nn = weight * angle / ( n * Tn );
     
@@ -387,11 +387,11 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     
     /**
      Scale torque to make it proportional to angle:
-     we multiply the vector Tq by angle / std::sin(angle),
-     knowing that Tn = Tq.norm() = std::sin(angle) * std::sqrt( na * nb )
+     we multiply the vector Tq by angle / sin(angle),
+     knowing that Tn = Tq.norm() = sin(angle) * sqrt( na * nb )
      
-     To have a Torque proportional to std::sin(angle), use:
-     real nn = std::sqrt( na * nb ); or nn = Tn / angle
+     To have a Torque proportional to sin(angle), use:
+     real nn = sqrt( na * nb ); or nn = Tn / angle
      na = weight / ( na * nn );
      nb = weight / ( nb * nn );
      */
@@ -486,11 +486,11 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     
     /**
      Scale torque to make it proportional to angle:
-     we multiply the vector Tq by angle / std::sin(angle),
-     but knowing that Tn = Tq.norm() = std::sin(angle) * std::sqrt( na * nb )
+     we multiply the vector Tq by angle / sin(angle),
+     but knowing that Tn = Tq.norm() = sin(angle) * sqrt( na * nb )
      
-     To have a Torque proportional to std::sin(angle), use:
-     real nn = std::sqrt( na * nb ); or nn = Tn / angle;
+     To have a Torque proportional to sin(angle), use:
+     real nn = sqrt( na * nb ); or nn = Tn / angle;
      na = weight / ( na * nn );
      nb = weight / ( nb * nn );
      */
@@ -631,9 +631,9 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
  Add torque between segments AB and CD defined by `pt1` and `pt2`.
  Opposite forces are applied at the end of the segments resulting in pure torque.
  
-     force_A = weight * std::sin( angle - equilibrium_angle ) / |AB|
+     force_A = weight * sin( angle - equilibrium_angle ) / |AB|
      force_B = - force_A
-     force_C = weight * std::sin( angle - equilibrium_angle ) / |CD|
+     force_C = weight * sin( angle - equilibrium_angle ) / |CD|
      force_D = - force_C
  
  These force vectors are orthogonal to the segments on which they are applied.
