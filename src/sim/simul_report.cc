@@ -532,8 +532,8 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
     unsigned cnt[BMAX+1];
 
     real sup = 0;
-    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
-        sup = std::max(sup, obj->length());
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+        sup = std::max(sup, fib->length());
 
     real delta = ( sup > 2 ) ? 1 : 0.1;
     size_t nbin = std::ceil(sup/delta);
@@ -559,15 +559,12 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
         for ( size_t u = 0; u <= nbin; ++u )
             cnt[u] = 0;
         
-        for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
+        for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         {
-            if ( obj->prop == fp )
+            if ( fib->prop == fp )
             {
-                size_t u = size_t(std::floor( obj->length() / delta ));
-                if ( u < nbin )
-                    ++cnt[u];
-                else
-                    ++cnt[nbin];
+                size_t u = (size_t)std::floor( fib->length() / delta );
+                ++cnt[std::min(u, nbin)];
             }
         }
 
@@ -598,7 +595,7 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
     size_t cnt[MAX+1] = { 0 };
     size_t sum = 0;
     
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( !sel || sel == fib->prop )
         {
@@ -642,7 +639,7 @@ void Simul::reportFiberSegments(std::ostream& out) const
 void Simul::reportFiberHands(std::ostream& out) const
 {
     out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( fib->nbHands() > 0 )
         {
@@ -663,7 +660,7 @@ void Simul::reportFiberHands(std::ostream& out) const
 void Simul::reportFiberLinks(std::ostream& out) const
 {
     out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( fib->nbHands() > 0 )
         {
@@ -697,7 +694,7 @@ void Simul::reportFiberLattice(std::ostream& out) const
     size_t cnt = 0;
     real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
     
-    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         fib->infoLattice(len, cnt, sm, mn, mx);
 
     out << LIN << ljust("fiber:lattice", 2);
@@ -720,7 +717,7 @@ void Simul::reportFiberMesh(std::ostream& out, bool density) const
     size_t cnt = 0;
     real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
     
-    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         fib->infoMesh(len, cnt, sm, mn, mx, density);
 
     out << LIN << ljust("fiber:mesh", 2);
@@ -979,7 +976,7 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel, bool
     
     real sum = 0;
     size_t cnt = 0;
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( !sel || sel == fib->prop )
         {
@@ -1025,7 +1022,7 @@ void Simul::reportFiberMoments(std::ostream& out) const
         
         accum.reset();
         
-        for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+        for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         {
             if ( fib->prop == fp )
             {
@@ -1203,7 +1200,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
     real   rad = 0;
     
 #if ( DIM > 1 )
-    for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         Space const* spc = findSpace(fib->prop->confine_space);
         const real stiff = fib->prop->confine_stiffness;
@@ -2905,9 +2902,9 @@ void Simul::reportAshbya(std::ostream& out) const
  */
 void Simul::reportCustom(std::ostream& out) const
 {
-    for ( Fiber const* obj=fibers.first(); obj; obj=obj->next() )
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        Vector ee = obj->posEndP() - obj->posEndM();
+        Vector ee = fib->posEndP() - fib->posEndM();
         out << ee.norm() << " ";
     }
 }
