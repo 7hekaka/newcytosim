@@ -57,7 +57,7 @@ void report_raw(Simul const& simul, std::ostream& os, std::string const& what, i
 {
     if ( verbose > 0 )
     {
-        os << "\n% frame   " << frm;
+        os << "\n% frame   " << frm << '\n';
         simul.report_wrap(os, what, opt);
     }
     else

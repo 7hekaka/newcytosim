@@ -484,10 +484,10 @@ public:
     void      reportSolidHands(std::ostream&, Property const*, bool com) const;
 
     /// print state of Couples 
-    void      reportCouple(std::ostream&) const;
+    void      reportCouple(std::ostream&, Property const*, bool com) const;
     
     /// print state of Couples
-    void      reportCoupleAnatomy(std::ostream&) const;
+    void      reportCoupleHands(std::ostream&, Property const*, bool com) const;
     
     /// print position of Couples of a certain kind
     void      reportCoupleState(std::ostream&, Property const*, bool com) const;
@@ -508,7 +508,7 @@ public:
     void      reportCoupleForceHistogram(std::ostream&, Glossary&) const;
 
     /// print state of Singles
-    void      reportSingle(std::ostream&) const;
+    void      reportSingle(std::ostream&, Property const*, bool com) const;
     
     /// print position of Singles of a certain kind
     void      reportSingleState(std::ostream&, Property const*, bool com) const;

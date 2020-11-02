@@ -373,7 +373,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "single" )
     {
         if ( what.empty() )
-            return reportSingle(out);
+            return reportSingle(out, sel, com);
         if ( what == "link" )
             return reportSingleLink(out, sel, com);
         if ( what == "state" )
@@ -387,7 +387,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "couple" )
     {
         if ( what.empty() )
-            return reportCouple(out);
+            return reportCouple(out, sel, com);
         if ( what == "state" )
             return reportCoupleState(out, sel, com);
         if ( what == "link" )
@@ -401,7 +401,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "active" )
             return reportCoupleActive(out, sel, com);
         if ( what == "anatomy" )
-            return reportCoupleAnatomy(out);
+            return reportCoupleHands(out, sel, com);
         throw InvalidSyntax("I can only report couple: state, link, configuration, active, force, anatomy");
     }
     if ( who == "organizer" )
@@ -1924,7 +1924,7 @@ void Simul::reportSingleLink(std::ostream& out, Property const* sel, bool com) c
 /**
  Export number of Single in each state
  */
-void Simul::reportSingle(std::ostream& out) const
+void Simul::reportSingle(std::ostream& out, Property const* sel, bool com) const
 {
     constexpr size_t SUP = 128;
     
@@ -1955,6 +1955,8 @@ void Simul::reportSingle(std::ostream& out) const
     
     for ( Property const* i : properties.find_all("single") )
     {
+        if ( sel && i != sel )
+            continue;
         out << LIN << ljust(i->name(), 2);
         size_t x = i->number();
         if ( x < SUP )
@@ -2278,7 +2280,7 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
 /**
  Export number of Couples in each state
  */
-void Simul::reportCouple(std::ostream& out) const
+void Simul::reportCouple(std::ostream& out, Property const* sel, bool com) const
 {
     constexpr size_t SUP = 128;
     int act[SUP] = { 0 }, cnt[SUP][4];
@@ -2348,6 +2350,8 @@ void Simul::reportCouple(std::ostream& out) const
     
     for ( Property const* i : properties.find_all("couple") )
     {
+        if ( sel && i != sel )
+            continue;
         out << LIN << ljust(i->name(), 2);
         size_t x = i->number();
         if ( x < SUP )
@@ -2366,7 +2370,7 @@ void Simul::reportCouple(std::ostream& out) const
 /**
  Export composition of Couple classes
  */
-void Simul::reportCoupleAnatomy(std::ostream& out) const
+void Simul::reportCoupleHands(std::ostream& out, Property const* sel, bool com) const
 {
     out << COM << "hand_id" << SEP << rjust("hand_name", 2, 1);
     
@@ -2383,6 +2387,8 @@ void Simul::reportCoupleAnatomy(std::ostream& out) const
 
     for ( Property const* i : properties.find_all("couple") )
     {
+        if ( sel && i != sel )
+            continue;
         CoupleProp const* p = static_cast<CoupleProp const*>(i);
         out << LIN << p->number();
         out << SEP << rjust(p->name(), 2);
