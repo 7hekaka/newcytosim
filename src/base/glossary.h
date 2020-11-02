@@ -330,7 +330,8 @@ public:
 
     //-------------------------------------------------------------------------------
     
-    /// set `var` from `key[inx]`. The counter associated to the value is incremented.
+    /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
+    /** An internal counter is incremented to record that the value was read */
     template <typename T>
     int set(T & var, key_type const& key, size_t inx = 0) const
     {
@@ -351,7 +352,7 @@ public:
         return 0;
     }
 
-    /// set `var` from `key[inx]`, without recording that the parameter was read.
+    /// try to set `var` from `key[inx]`, without recording that the parameter was read.
     template <typename T>
     int peek(T & var, key_type const& key, size_t inx = 0) const
     {
@@ -371,7 +372,8 @@ public:
         return 0;
     }
     
-    /// set `var` from `key[int]` or `alt[alt_inx]
+    /// try to set `var` from `key[inx]` or `alt[alt_inx]. @return 1 if `var` was set, 0 otherwise
+    /** An internal counter is incremented to record that the value was read */
     template <typename T>
     int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx) const
     {
@@ -381,7 +383,8 @@ public:
         return res;
     }
     
-    /// set `cnt` values in the array `ptr[]`, starting at `key[0]`
+    /// try to set `cnt` values in `ptr[]`, starting at `key[0]`. @return number of values set
+    /** The internal counters are incremented to record that the values were read */
     template <typename T>
     int set(T * ptr, size_t cnt, key_type const& key) const
     {
@@ -407,7 +410,8 @@ public:
     }
    
 
-    /// set `var` from `key[inx]`, using the dictionary `dict`
+    /// try to set `var` from `key[inx]`, using the dictionary `dict`. @return 1 if `var` was set, 0 otherwise
+    /** An internal counter is incremented to record that the value was read */
     template <typename T>
     int set(T & var, key_type const& key, size_t inx, dict_type<T> const& dict) const
     {
@@ -428,7 +432,8 @@ public:
         return 0;
     }
     
-    /// set `var` from `key[int]` or `alt[alt_inx], using the dictionary `dict`
+    /// try to set `var` from `key[inx]` or `alt[alt_inx], using the dictionary `dict`
+    /** An internal counter is incremented to record that the value was read */
     template <typename T>
     int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx, dict_type<T> const& dict) const
     {
@@ -438,7 +443,8 @@ public:
         return res;
     }
 
-    /// set `var` from `key[0]`, using the dictionary `dict`
+    /// try to set `var` from `key[0]`, using the dictionary `dict`
+    /** An internal counter is incremented to record that the value was read */
     template <typename T>
     int set(T & var, key_type const& key, dict_type<T> const& dict) const
     {
