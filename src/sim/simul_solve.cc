@@ -548,7 +548,7 @@ void Simul::computeForces() const
 }
 
 
-void Simul::flagMecaClusters() const
+void Simul::flagClustersMeca() const
 {
     prop->complete(*this);
     sMeca.prepare(this);

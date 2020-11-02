@@ -221,7 +221,7 @@ public:
     void            computeForces() const;
     
     /// calculate clusters of Mecable derived from all interactions
-    void            flagMecaClusters() const;
+    void            flagClustersMeca() const;
     
     /// this is used for development
     void            addExperimentalInteractions(Meca&) const;

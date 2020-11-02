@@ -83,7 +83,7 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
  
  parameters can be includes as in:
  
-     report fiber:cluster {couple=1},fiber:length
+     report fiber:cluster{couple=1},fiber:length
 
  */
 void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
@@ -247,6 +247,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
  `bead:all`              | Position of beads
  `bead:single`           | Number of Beads with no single attached, 1 single attached etc.
  `solid:hand`            | Number of hands and number of attached hands on Solids
+ `solid:orientation`     | Solid's position and orientation vectors
  `spindle:indice`        | Two scalar indices that caracterize the organization of fibers
  `spindle:profile`       | Number of right- and left-pointing fiber as a function of position
  `single:all`            | Position and force of singles
@@ -2496,10 +2497,10 @@ void Simul::flagClustersSolids() const
 void Simul::flagClusters(bool cop, bool sol, bool mec) const
 {
     if ( ! ( cop | sol | mec ) )
-        throw InvalidSyntax("missing cluster type [couple|solid|meca]");
+        throw InvalidSyntax("you must specify a cluster type: couple=1 or solid=1 or meca=1");
 
     resetFlags(fibers);
-    if ( mec ) flagMecaClusters();
+    if ( mec ) flagClustersMeca();
     if ( cop ) flagClustersCouples();
     if ( sol ) flagClustersSolids();
     flagLargestCluster(1UL);

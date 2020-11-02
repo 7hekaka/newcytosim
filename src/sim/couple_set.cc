@@ -993,23 +993,23 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
     if ( space_volume <= 0 )
         throw InvalidParameter("Cannot equilibrate as Space:volume == 0");
     
-    const real binding_rate = cop->hand1_prop->binding_rate;
-    const real binding_range = cop->hand1_prop->binding_range;
-    const real unbinding_rate = cop->hand1_prop->unbinding_rate;
+    const real bind_rate = cop->hand1_prop->binding_rate;
+    const real bind_range = cop->hand1_prop->binding_range;
+    const real unbind_rate = cop->hand1_prop->unbinding_rate;
     
     // get all crosspoints:
-    fibers.allIntersections(loc1, loc2, binding_range);
+    fibers.allIntersections(loc1, loc2, bind_range);
     const size_t nb_crossings = loc1.size();
     //const real nb_crossings = square(total_length) / ( M_PI * space_volume );
 
-    const real ratio_fibs = 2 * total_length * binding_range / space_volume;
-    const real ratio_cros = 4 * M_PI * nb_crossings * square(binding_range) / space_volume;
+    const real ratio_fibs = 2 * total_length * bind_range / space_volume;
+    const real ratio_cros = 4 * M_PI * nb_crossings * square(bind_range) / space_volume;
     
     /*
      The different states are defined in Belmonte et al. 2017, supplementary:
      Free, Bridge, Attached in location that cannot bridge, G=Attached near crosspoint
      */
-    real bind = binding_rate / unbinding_rate;
+    real bind = bind_rate / unbind_rate;
     real BsG = bind / 2;
     real AsF = ( ratio_fibs - ratio_cros ) * bind;
     real GsF = ratio_cros * bind;
@@ -1064,29 +1064,29 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
     if ( space_volume <= 0 )
         throw InvalidParameter("Cannot equilibrate as Space:volume == 0");
 
-    const real binding_rate1 = cop->hand1_prop->binding_rate;
-    const real binding_range1 = cop->hand1_prop->binding_range;
-    const real unbinding_rate1 = cop->hand1_prop->unbinding_rate;
+    const real bind_rate1 = cop->hand1_prop->binding_rate;
+    const real bind_range1 = cop->hand1_prop->binding_range;
+    const real unbind_rate1 = cop->hand1_prop->unbinding_rate;
 
-    const real binding_rate2 = cop->hand2_prop->binding_rate;
-    const real binding_range2 = cop->hand2_prop->binding_range;
-    const real unbinding_rate2 = cop->hand2_prop->unbinding_rate;
+    const real bind_rate2 = cop->hand2_prop->binding_rate;
+    const real bind_range2 = cop->hand2_prop->binding_range;
+    const real unbind_rate2 = cop->hand2_prop->unbinding_rate;
 
     // get all crosspoints:
-    fibers.allIntersections(loc1, loc2, std::max(binding_range1, binding_range2));
+    fibers.allIntersections(loc1, loc2, std::max(bind_range1, bind_range2));
     const size_t nb_crossings = loc1.size();
     
-    const real ratio_fibs1 = 2 * total_length * binding_range1 / space_volume;
-    const real ratio_fibs2 = 2 * total_length * binding_range2 / space_volume;
-    const real ratio_cros1 = 4 * M_PI * nb_crossings * square(binding_range1) / space_volume;
-    const real ratio_cros2 = 4 * M_PI * nb_crossings * square(binding_range2) / space_volume;
+    const real ratio_fibs1 = 2 * total_length * bind_range1 / space_volume;
+    const real ratio_fibs2 = 2 * total_length * bind_range2 / space_volume;
+    const real ratio_cros1 = 4 * M_PI * nb_crossings * square(bind_range1) / space_volume;
+    const real ratio_cros2 = 4 * M_PI * nb_crossings * square(bind_range2) / space_volume;
     
     /*
      The different states are defined in Belmonte et al. 2017, supplementary:
      Free, Bridge, Attached in location that cannot bridge, G=Attached near crosspoint
      */
-    real BsG1 = binding_rate1 / unbinding_rate1;
-    real BsG2 = binding_rate2 / unbinding_rate2;
+    real BsG1 = bind_rate1 / unbind_rate1;
+    real BsG2 = bind_rate2 / unbind_rate2;
     real A1sF = ( ratio_fibs1 - ratio_cros1 ) * BsG1 / 2;
     real A2sF = ( ratio_fibs2 - ratio_cros2 ) * BsG2 / 2;
     real G1sF = ratio_cros1 * BsG1 / 2;

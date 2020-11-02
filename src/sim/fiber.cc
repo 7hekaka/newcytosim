@@ -1264,14 +1264,14 @@ void Fiber::evolveMeshValues(Lattice<real>& lat, real cst, real fac) const
 }
 
 
-void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real binding_rate) const
+void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real bind_rate) const
 {
     assert_false(lat.bad());
     // we want roughly one point per cell:
     const real spread = fld->cellWidth();
     
     // each point represents a Fiber chunk of length 'spread':
-    const real rate = binding_rate * spread / fld->cellVolume();
+    const real rate = bind_rate * spread / fld->cellVolume();
     
     // fraction of the cell content that will bind in one time step:
     const real frac = -std::expm1( -rate * simul().time_step() );
