@@ -43,17 +43,17 @@ class Mecafil : public Chain
 private:
     
     /// normalized differences of successive vertices
-    real   *    iDir;
+    real * iDir;
 
     /// Lagrange multipliers associated with longitudinal imcompressibility
-    real   *    iLag;
+    real * iLag;
     
     /// work array allocated to hold `DIM*nbPoints` scalar values
-    real   *    iLLG;
+    real * iLLG;
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     /// local filament direction vectors used to calculate anisotropic drag
-    real   *    iAni;
+    real * iAni;
 #endif
 
 #if PROJECT_WITH_MATRIX
@@ -61,57 +61,57 @@ private:
     /* variables used for projecting with a matrix ( mecafil_projectmat.cc ) */
     
     /// projection matrix
-    real   *    iProj;
+    real * iProj;
     
     /// differential of projection matrix
-    real   *    iDProj;
+    real * iDProj;
     
     /// part of the projection matrix
-    real   *    iJJtiJ;
+    real * iJJtiJ;
     
     /// intermediate of calculus
-    real   *    iTMP;
+    real * iTMP;
 
 #else
     
     /// J*J' is a tridiagonal symmetric matrix of size (nbPoints-1).
     /** iJJt[] holds the diagonal elements and iJJtU[] the off-diagonal ones. */
-    real   *    iJJt, * iJJtU;
+    real * iJJt, * iJJtU;
 
 #endif
     
     /// vector for the projection correction of size nbSegments
-    real   *    iJJtiJforce;
+    real * iJJtiJforce;
     
     /// true if all elements of iJJtiJforce[] are null
-    bool        useProjectionDiff;
+    bool  useProjectionDiff;
     
 protected:
     
     /// mobility of the points (all points have the same drag coefficient)
-    real        iPointMobility;
+    real  iPointMobility;
     
     /// rigidity scaling factor used in addRigidity()
-    real        iRigidity;
+    real  iRigidity;
     
 #if NEW_FIBER_LOOP
     /// link filament into a loop
-    bool        iRigidityLoop;
+    bool  iRigidityLoop;
 #endif
     
     /// calculate the normalized difference of successive vertices in iDir[]
-    void        storeDirections();
+    void  storeDirections();
 
 private:
     
     /// reset the memory pointers for the projection
-    void        buildProjection();
+    void  buildProjection();
     
     /// allocate memory for the projection
-    void        allocateProjection(size_t);
+    void  allocateProjection(size_t);
     
     /// free the memory for the projection
-    void        destroyProjection();
+    void  destroyProjection();
 
 public:
     

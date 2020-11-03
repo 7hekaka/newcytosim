@@ -70,6 +70,7 @@ private:
             *i = b;
         else
             buddies_.push_back(b);
+        //std::clog << this << " has " << buddies_.size() << " buddies\n";
     }
     
     /// removes `b` from the list of known buddy, do not call goodbye()

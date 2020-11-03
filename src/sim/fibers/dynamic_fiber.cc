@@ -70,7 +70,7 @@ void DynamicFiber::setEndStateM(state_t s)
     
     if ( s != mStateM )
     {
-        mStateM  = s;
+        mStateM = s;
         unitM[1] = ( 4 - s ) / 2;
         unitM[0] = ( 4 - s - 2*unitM[1] );
         assert_true( 0==unitP[0] || unitP[0]==1 );
@@ -80,6 +80,9 @@ void DynamicFiber::setEndStateM(state_t s)
 }
 
 
+/**
+ Minus end can shrink
+ */
 int DynamicFiber::stepMinusEnd()
 {
     int res = 0;
@@ -139,7 +142,7 @@ void DynamicFiber::setEndStateP(state_t s)
     
     if ( s != mStateP )
     {
-        mStateP   = s;
+        mStateP = s;
         unitP[1] = ( 4 - s ) / 2;
         unitP[0] = ( 4 - s - 2*unitP[1] );
         assert_true( 0==unitP[0] || unitP[0]==1 );

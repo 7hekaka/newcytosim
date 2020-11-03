@@ -245,19 +245,19 @@ void Mecable::setPoints(const real pts[], const size_t nbp)
 
 /**
 Copy the coordinates of the points of Object to array `ptr[]`, previously
-allocated to hold `ptr_n` coordinates. Thus in 3D, `ptr_n` should be >= 3*Object::nbPoints()
+allocated to hold `cnt` coordinates. Thus in 3D, `cnt` should be >= 3*Object::nbPoints()
 Exactly 3*Object::nbPoints() values are set at most. The Z component is set to zero in 2D mode.
 
 @return error code: 0 = no error, 1 = insufficient allocation
 */
-int Mecable::putPoints(float ptr[], size_t ptr_n) const
+int Mecable::putPoints(float ptr[], size_t cnt) const
 {
 #if ( DIM == 2 )
-    size_t sup = std::min(DIM*nPoints, ptr_n);
+    size_t sup = std::min(DIM*(size_t)nPoints, cnt);
     for ( size_t i = 0; i < sup; ++sup )
         ptr[i] = pPos[i];
 #else
-    size_t sup = std::min(nPoints, ptr_n/3);
+    size_t sup = std::min((size_t)nPoints, cnt/3);
     for ( size_t i = 0; i < sup; ++sup )
     {
         for ( size_t d = 0; d < DIM; ++d )
@@ -266,7 +266,7 @@ int Mecable::putPoints(float ptr[], size_t ptr_n) const
             ptr[3*i+d] = 0;
     }
 #endif
-    return ( ptr_n < 3*nPoints );
+    return ( cnt < 3*nPoints );
 }
 
 

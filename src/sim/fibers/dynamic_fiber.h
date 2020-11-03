@@ -13,68 +13,63 @@ class DynamicFiberProp;
 
 /// A Fiber with discrete growth and dynamic instability at the PLUS_END
 /**
-
  This implements the microtubule dynamic instability model proposed by
  Brun, Rupp et al. with a 'hard-coded' coupling parameter N=2.
  
  Assembly and disassembly follow discrete steps of size `prop->unit_length`.
- The model keeps track of the discrete state of the two terminal units of tubulin.
- This leads to 4 different states, which are mapped to [STATE_GREEN, STATE_RED].
+ The model keeps track of the state of the two terminal units (ie. tubulin heterodimers).
+ This leads to 4 different states, which are mapped to states [GREEN YELLOW ORANGE RED].
  
  
- The growth speed is reduced under antagonistic force by an exponential factor:\n
- <em>
- <b>Measurement of the Force-Velocity Relation for Growing Microtubules</b>\n
- Marileen Dogterom and Bernard Yurke\n
- Science Vol 278 pp 856-860; 1997\n
- http://www.sciencemag.org/content/278/5339/856.abstract
- </em>
+ The growth speed is reduced under antagonistic force by an exponential factor:
  
- ...and this increases the catastrophe rate:\n
- <em>
- <b>Dynamic instability of MTs is regulated by force</b>\n
- M.Janson, M. de Dood, M. Dogterom.\n
- Journal of Cell Biology Vol 161, Nb 6, 2003\n
- Figure 2 C\n
- </em>
- http://www.jcb.org/cgi/doi/10.1083/jcb.200301147
+***Measurement of the Force-Velocity Relation for Growing Microtubules***
+Marileen Dogterom and Bernard Yurke
+Science Vol 278 pp 856-860; 1997
+http://www.sciencemag.org/content/278/5339/856.abstract
+ 
+...and this will increase the catastrophe rate:
+ 
+***Dynamic instability of MTs is regulated by force***
+M.Janson, M. de Dood, M. Dogterom.
+Journal of Cell Biology Vol 161, Nb 6, 2003
+Figure 2 C
+http://www.jcb.org/cgi/doi/10.1083/jcb.200301147
  
  
- If you use this model, please cite:\n
- <em>
- <b>A theory of microtubule catastrophes and their regulation</b>\n
- Brun L, Rupp B, Ward J, Nedelec F\n
- PNAS 106 (50) 21173-21178; 2009\n
- http://www.pnas.org/content/106/50/21173
- </em>
+ If you use this model, please cite:
+ 
+    ***A theory of microtubule catastrophes and their regulation***
+    Brun L, Rupp B, Ward J, Nedelec F
+    PNAS 106 (50) 21173-21178; 2009
+    http://www.pnas.org/content/106/50/21173
 
  The predicted mean time until catastrophe is approximately
 
-     growing_rate = growing_speed / unit_length
-     real ctime = growing_rate / ( 3 * hydrolysis_rate * hydrolysis_rate );
+    growing_rate = growing_speed / unit_length
+    real ctime = growing_rate / ( 3 * hydrolysis_rate * hydrolysis_rate );
  
- The implemented model includes off-rate in the assembly state, as described in:\n
- <em>
- <b>Random Hydrolysis Controls the Dynamic Instability of Microtubules</b>\n
- Ranjith Padinhateeri, Anatoly B Kolomeisky, and David Lacoste\n
- Biophys J 102, 1274–1283 (2012)\n
- http://dx.doi.org/10.1016/j.bpj.2011.12.059
- </em>
+ The implemented model includes off-rate in the assembly state, as described in:
  
+    ***Random Hydrolysis Controls the Dynamic Instability of Microtubules***
+    Ranjith Padinhateeri, Anatoly B Kolomeisky, and David Lacoste
+    Biophys J 102, 1274–1283 (2012)
+    http://dx.doi.org/10.1016/j.bpj.2011.12.059
  
-
- This is not implemented:
- - the MINUS_END is not dynamic,
- - rescues are not included.
+ Moreover:
+ 
+ - Gillespie timers are used for the stochastic model
+ - the MINUS_END can be static or shrinking (parameter `shrinking_rate[1]`)
+ - a simple rescue mechanism was implented as unhydrolyzed_prob[] (Maud Formanek)
  .
  
  See the @ref DynamicFiberPar.
 
- // @todo DynamicFiber detach_rate should depend on the state of the subunit
- // @todo DynamicFiber should keep the entire state vector of the subunits
+ @todo DynamicFiber detach_rate could depend on the state of the subunit
+ @todo DynamicFiber could keep the entire state vector of the subunits
 
- Note: A Gillespie simulation method is used.
- This class is not fully tested (17. Feb 2011).
+ Note:
+ This class is not fully tested
  @ingroup FiberGroup
  */
 class DynamicFiber : public Fiber

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 
 #ifndef MECABLE_H
@@ -16,6 +16,11 @@ class Meca;
 #define EXPERIMENTAL_PRECONDITIONNERS 0
 
 
+/// to save memory, SIZE_T could be defined to use down to 2 bytes.
+/* The limit imposed on the size of the Mecable is hardly relevant anyhow */
+typedef unsigned short SIZE_T;
+
+
 /// Can be simulated using a Meca.
 /**
  A Mecable is an Object made of points that can can be simulated in a Meca.
@@ -24,8 +29,9 @@ class Meca;
  It derives from Movable, and thus can be translated or rotated.
  Mecable is also a Buddy, and can thus be part of an Organizer.
  
- This is one of the fundamental class of Cytosim.
- Merged PointSet on 20/01/2018
+ This is one of the fundamental class of Cytosim, working closely with Meca.
+ 
+ Acquired PointSet on 20/01/2018.
  */
 class Mecable : public Object, public Buddy
 {
@@ -44,15 +50,18 @@ protected:
     real const* pForce;
     
     /// Number of points in pForce[]
-    size_t      pForceMax;
+    SIZE_T      pForceMax;
     
     /// Number of points in the Mecable
-    size_t      nPoints;
+    SIZE_T      nPoints;
 
 private:
+    
+    /// Index that Object coordinates occupy in the matrices and vectors of Meca
+    SIZE_T      pIndex;
 
     /// Currently allocated size of arrays pPos[]
-    size_t      pAllocated;
+    SIZE_T      pAllocated;
 
     /// Matrix block used for preconditionning in Meca::solve()
     real *      pBlock;
@@ -61,13 +70,13 @@ private:
     int *       pPivot;
     
     /// Allocated size of pBlock[]
-    size_t      pBlockAlc;
+    SIZE_T      pBlockAlc;
     
     /// Allocated size of pPivot[]
-    size_t      pPivotAlc;
+    SIZE_T      pPivotAlc;
     
     /// Current size of pBlock[]
-    size_t      pBlockSize;
+    SIZE_T      pBlockSize;
     
     /// type of block
     int         pBlockType;
@@ -79,9 +88,6 @@ private:
     /// Matrix used for preconditionning
     MatrixFull  pBlockMatrix;
 #endif
-    
-    /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    size_t      pIndex;
 
     /// Clear pointers
     void        clearMecable();
