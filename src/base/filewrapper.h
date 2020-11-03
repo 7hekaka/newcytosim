@@ -84,13 +84,13 @@ public:
     bool    good()             const { return mFile && !ferror(mFile); }
 
     /// return current reading position of file
-    long    pos()              const { if ( mFile ) return ftell(mFile); else return 0; }
+    //long    pos()              const { if ( mFile ) return ftell(mFile); else return 0; }
 
     /// set `p` to current reading position of file
     int     get_pos(fpos_t& p) const { return fgetpos(mFile, &p); }
 
     /// change current reading position to `p`
-    void    set_pos(const fpos_t& p) { fsetpos(mFile, &p); }
+    void    seek(const fpos_t& p) { fsetpos(mFile, &p); }
     
     
     /// put a C-string

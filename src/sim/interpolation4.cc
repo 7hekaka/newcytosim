@@ -209,7 +209,8 @@ void Interpolation4::write(Outputter& out) const
 void Interpolation4::read(Inputter& in, Simul& sim)
 {
     ObjectTag g;
-    mec_ = Simul::toMecable(sim.readReference(in, g));
+    Object * obj = sim.readReference(in, g);
+    mec_ = Simul::toMecable(obj);
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( mec_ || in.formatID() < 55 )
@@ -225,7 +226,11 @@ void Interpolation4::read(Inputter& in, Simul& sim)
         rank_ = calcRank();
     }
     else
+    {
         clear();
+        if ( obj )
+            throw InvalidIO("invalid pointer while reading Interpolation4");
+    }
 }
 
 

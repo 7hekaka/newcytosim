@@ -159,7 +159,7 @@ size_t FrameReader::seekPos(size_t frm)
     if ( 0 < inx )
     {
         VLOG("FrameReader: using known position of frame " << inx << '\n');
-        inputter.set_pos(framePos[inx].position);
+        inputter.seek(framePos[inx].position);
         return inx;
     }
     else {
@@ -228,7 +228,7 @@ int FrameReader::seekFrame(size_t frm)
             if ( has_pos ) savePos(inx, pos, 2);
             if ( inx == frm )
             {
-                if ( has_pos ) inputter.set_pos(pos);
+                if ( has_pos ) inputter.seek(pos);
                 return SUCCESS;
             }
             ++inx;
@@ -337,7 +337,7 @@ int FrameReader::loadLastFrame(Simul& sim, size_t cnt)
     /// seek last known position:
     size_t frm = lastKnownFrame();
     if ( frm > 1 )
-        inputter.set_pos(framePos[frm].position);
+        inputter.seek(framePos[frm].position);
     else
         inputter.rewind();
     

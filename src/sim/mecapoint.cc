@@ -9,11 +9,16 @@
 void Mecapoint::read(Inputter& in, Simul& sim)
 {
     ObjectTag g;
-    mec_ = Simul::toMecable(sim.readReference(in, g));
+    Object * obj = sim.readReference(in, g);
+    mec_ = Simul::toMecable(obj);
     if ( mec_ )
         pti_ = in.readUInt16();
     else
+    {
         pti_ = 0;
+        if ( obj )
+            throw InvalidIO("invalid pointer while reading Mecapoint");
+    }
 }
 
 
