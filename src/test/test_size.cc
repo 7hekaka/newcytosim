@@ -9,50 +9,50 @@
 #include "matrix44.h"
 
 
-#define print_sizeof(arg) printf("sizeof %16s   %lu bytes\n", #arg, sizeof(arg));
+#define PRINT(arg) printf("sizeof %16s   %lu bytes\n", #arg, sizeof(arg));
 
 int main(int argc, char* argv[])
 {
-    print_sizeof(Vector1);
-    print_sizeof(Vector2);
-    print_sizeof(Vector3);
-    print_sizeof(Vector4);
+    PRINT(Vector1);
+    PRINT(Vector2);
+    PRINT(Vector3);
+    PRINT(Vector4);
     
-    print_sizeof(Matrix11);
-    print_sizeof(Matrix22);
-    print_sizeof(Matrix33);
-    print_sizeof(Matrix34);
-    print_sizeof(Matrix44);
+    PRINT(Matrix11);
+    PRINT(Matrix22);
+    PRINT(Matrix33);
+    PRINT(Matrix34);
+    PRINT(Matrix44);
     
-    print_sizeof(Random);
-    print_sizeof(Array<int>);
+    PRINT(Random);
+    PRINT(Array<int>);
 
-    print_sizeof(Mecapoint);
-    print_sizeof(FiberSegment);
-    print_sizeof(Interpolation);
-    print_sizeof(HandMonitor);
-    print_sizeof(FiberSite);
-    print_sizeof(Hand);
+    PRINT(Mecapoint);
+    PRINT(FiberSegment);
+    PRINT(Interpolation);
+    PRINT(HandMonitor);
+    PRINT(FiberSite);
+    PRINT(Hand);
 
-    print_sizeof(Inventoried);
-    print_sizeof(Movable);
-    print_sizeof(Buddy);
+    PRINT(Inventoried);
+    PRINT(Movable);
+    PRINT(Buddy);
     
-    print_sizeof(Object);
-    print_sizeof(Mecable);
-    print_sizeof(Chain);
-    print_sizeof(Mecafil);
-    print_sizeof(Fiber);
+    PRINT(Object);
+    PRINT(Mecable);
+    PRINT(Chain);
+    PRINT(Mecafil);
+    PRINT(Fiber);
     
-    print_sizeof(Space);
-    print_sizeof(Single);
-    print_sizeof(Couple);
+    PRINT(Space);
+    PRINT(Single);
+    PRINT(Couple);
 
 
-    print_sizeof(Solid);
-    print_sizeof(Bead);
-    print_sizeof(Sphere);
-    print_sizeof(Simul);
+    PRINT(Solid);
+    PRINT(Bead);
+    PRINT(Sphere);
+    PRINT(Simul);
 
     return EXIT_SUCCESS;
 }

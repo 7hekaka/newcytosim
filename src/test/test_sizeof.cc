@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #include <cstdio>
 #include <sys/types.h>
@@ -6,24 +6,35 @@
 #include <iostream>
 #include <iomanip>
 #include <typeinfo>
+#include <cstdint>
 #include <cmath>
 
-#define print_sizeof(arg) printf("sizeof %16s   %lu bytes\n", #arg, sizeof(arg));
+#define PRINT(arg) printf("sizeof %16s   %lu bytes\n", #arg, sizeof(arg));
 
 
 void print_types()
 {
-    print_sizeof(bool);
-    print_sizeof(char);
-    print_sizeof(short);
-    print_sizeof(int);
-    print_sizeof(unsigned);
-    print_sizeof(long int);
-    print_sizeof(long long int);
+    PRINT(bool);
+    PRINT(char);
+    PRINT(short);
+    PRINT(int);
+    PRINT(unsigned);
+    PRINT(long int);
+    PRINT(long long int);
     
-    print_sizeof(float);
-    print_sizeof(double);
-    print_sizeof(long double);
+    PRINT(int_fast8_t);
+    PRINT(int_fast16_t);
+    PRINT(int_fast32_t);
+    PRINT(int_fast64_t);
+
+    PRINT(float);
+    PRINT(double);
+    PRINT(long double);
+    
+    PRINT(void *);
+    PRINT(fpos_t);
+    PRINT(off_t);
+    PRINT(size_t);
 }
 
 void print_sizes()
@@ -44,14 +55,13 @@ void print_sizes()
     printf("fpos_t        = %lu bytes\n", sizeof(fpos_t) );
     printf("off_t         = %lu bytes\n", sizeof(off_t) );
     printf("size_t        = %lu bytes\n", sizeof(size_t) );
- 
 }
 
 int main ()
 {
     print_types();
-    printf("\n");
-    print_sizes();
+    //printf("\n");
+    //print_sizes();
     printf("done\n");
     return 0;
 }
