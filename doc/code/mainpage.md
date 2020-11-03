@@ -1,14 +1,13 @@
 @mainpage
 
-# Cytosim
-
  [Cytosim](http://www.cytosim.org) is a simulation of the cytoskeleton.
  
- The project was started in 1995 at Princeton and continued at [ESPCI](http://www.espci.fr) until 1998. The name was coined in 1999 at [EMBL](http://www.embl.org).
- Development is conducted by the Nedelec group at Cambridge University.  
+ The project was started in 1995 at [Princeton University](https://www.princeton.edu) and continued at [ESPCI](http://www.espci.fr) until 1998.  
+ The name was coined in 1999 at [EMBL](http://www.embl.org) where development pursued until 2017.  
+ Development is now conducted at [Cambridge University](https://www.cam.ac.uk).  
  
 
- @date 2009-2018
+ @date 2009-2020  
  @version PI - Increased Modularity
  
  
@@ -25,6 +24,7 @@
  Serge Dmitrieff         2013-\n
  Julio Belmonte          2014-\n
  Manuel Lera-Ramirez     2017-\n
+ Maud Formanek           2020-\n
 
  @par Contact:
  Email: feedback@cytosim.org\n

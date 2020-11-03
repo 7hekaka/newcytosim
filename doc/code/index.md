@@ -1,17 +1,15 @@
 # Cytosim Code Documentation
 
-Cytosim is built around [a core C++ engine](../../src/index.md) constituted of the file in [`src/`](../../src).  
+Cytosim is built around [a core C++ engine](../../src/index.md) constituted of the files in [`src/`](../../src) and subdirectories.  
 Handy [Python scripts](../../python/index.md) are located in [`python/`](../../python).
 
 The C++ code contains documentation embedded in the comments.
 
-A detailed HTML documentation of the C++ classes and methods can be generated with [`doxygen`](http://www.doxygen.nl).
-
-After installing `doxygen` on your machine, in a terminal, and the project root directory, enter:
+This documentation can be extracted automatically with [`doxygen`](http://www.doxygen.nl) to generate HTML pages describing the C++ classes and their methods. After installing 'doxygen', from a terminal, in the project root directory, enter:
 
 	make doc
 
-The output is exported into [`doc/code/doxygen/`](doxygen) and accessible [from the index file](doxygen/index.html).
+The output will be accessible [from the index](doxygen/index.html) located in [`doc/code/doxygen`](doxygen).
 
 
 # Cytosim Testing
