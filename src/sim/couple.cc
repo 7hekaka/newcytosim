@@ -70,37 +70,41 @@ void Couple::changeProperty(CoupleProp * p)
     }
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
-
-/* category of link:
- Links on the side of the filaments:
-     - Parallel
-     - Antiparallel
-     - X = none of the above
- Links at the ends of the filaments:
-     - T
-     - V
+/**
+ Returns the configuration of a crosslink, in discrete categories
+     Links on the side of the filaments:
+         0 - Parallel if cos(filament1, filament2) > 0.5
+         1 - Antiparallel if cos(filament1, filament2) < -0.5
+         2 - X = none of the above
+     Links at the ends of the filaments:
+         3 - T-plus
+         4 - V-plus
+         5 - T-minus
+         6 - V-minus
  by Jamie Li Rickman, ~2017
  */
-int Couple::configuration(FiberEnd end, real len) const
+int Couple::configuration(real len, real max_cos) const
 {
-    int e = (cHand1->abscissaFrom(end) < len) + (cHand2->abscissaFrom(end) < len);
-    switch ( e )
-    {
-        case 0:
-            if (cosAngle() > 0.5)
-                return 0; // P: angle < PI/3
-            else if (cosAngle() < -0.5)
-                return 1; // A: angle > 2PI/3
-            return 2; // X
-        case 1:
-            return 3; // T
-        case 2:
-            return 4; // V
-    }
-    return 5; //should not happen!
+    int p = (cHand1->abscissaFrom(PLUS_END) < len) + (cHand2->abscissaFrom(PLUS_END) < len);
+    int m = (cHand1->abscissaFrom(MINUS_END) < len) + (cHand2->abscissaFrom(MINUS_END) < len);
+    
+    if ( p > 0 )
+        return 2+p;  // T-plus and V-plus
+    
+    if ( m > 0 )
+        return 4+m;  // T-minus and V-minus
+
+    real c = cosAngle();
+    if ( c > max_cos ) // angle < PI/3
+        return 0; // P
+    if ( c < -max_cos ) // angle > 2PI/3
+        return 1; // A
+    
+    return 2; // X
 }
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 
 void Couple::setInteractions(Meca& meca) const

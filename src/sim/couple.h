@@ -134,8 +134,8 @@ public:
     /// the state of the Couple in { 0 ... 3 } representing { FF, FA, FA, AA }
     int            state()                const { return cHand1->attached() + 2 * cHand2->attached(); }
     
-    /// category of link: 0=parallel; 1=anti-parallel; 2=X; 3=T; 4=V
-    int            configuration(FiberEnd end, real len) const;
+    /// category of link: Parallel; Anti-parallel; X; T+; V+; T-; V-
+    int            configuration(real len, real max_cos=0.5) const;
 
     /// return one of the Hand that is attached, or zero if both are detached
     Hand *         attachedHand()         const;

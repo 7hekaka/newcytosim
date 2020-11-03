@@ -2163,17 +2163,17 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
     opt.set(threshold, "threshold");
     opt.set(end, "end", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
     
-    size_t T[6] = { 0 };
+    size_t T[8] = { 0 };
     for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
     {
         if ( !sel || sel == obj->prop )
-            ++T[obj->configuration(end, threshold)];
+            ++T[obj->configuration(threshold)];
     }
-    size_t sum = T[0]+T[1]+T[2]+T[3]+T[4]+T[5];
+    size_t S = T[0]+T[1]+T[2]+T[3]+T[4]+T[5]+T[6];
     
     if ( com )
-        out << COM << "couples" << SEP << "P" << SEP << "A" << SEP << "X" << SEP << "T" << SEP << "V";
-    out << LIN << sum << SEP << T[0] << SEP << T[1] << SEP << T[2] << SEP << T[3] << SEP << T[4];
+        out << COM << "couples" << SEP << "P" << SEP << "A" << SEP << "X" << SEP << "T+" << SEP << "V+" << SEP << "T-" << SEP << "V-";
+    out << LIN << S << SEP << T[0] << SEP << T[1] << SEP << T[2] << SEP << T[3] << SEP << T[4] << SEP << T[5] << SEP << T[6];
  }
 
 

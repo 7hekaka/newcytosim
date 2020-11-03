@@ -37,12 +37,12 @@ public:
     
     /// probability to detach per step
     /**
-     This probability in [0,1] is tested for every successful step, and thus 
-     creates an additionaldetachment opportunity that is proportional to the
-     distance travelled by the motor, in contrast to `unbinding_rate` which
-     gives a contribution that is proportional to the duration of the interaction.
+     This probability in [0,1] is tested for every successful step, creating an
+     additional detachment opportunity that is proportional to the distance
+     travelled by the motor, in contrast to `unbinding_rate` which gives a
+     contribution that is proportional to the duration of the interaction.
      
-     Hence, this does not contributes to the detachment of a stalled motor.
+     In particular, `unbinding_chance` does not lead to the detachment of a stalled motor.
      */
     real    unbinding_chance;
     
