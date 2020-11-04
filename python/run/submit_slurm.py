@@ -2,7 +2,7 @@
 #
 # A script to submit jobs to the SLURM queuing system
 #
-# F. Nedelec, 10.2007 --- 29.09.2018
+# F. Nedelec, 10.2007 --- 4.11.2020
 # Adapted from LSF to SLURM on 17.02.2017
 
 """
@@ -213,33 +213,25 @@ def main(args):
                 write_script(jname, cmd)
         elif arg.isdigit():
             jdup = int(arg)
-        elif arg.startswith('mem='):
-            memory = arg[4:]
-        elif arg.startswith('memory='):
-            memory = arg[7:]
-        elif arg.startswith('cpu='):
-            ncpu = arg[4:]
-        elif arg.startswith('ncpu='):
-            ncpu = arg[5:]
-        elif arg.startswith('day='):
-            runtime = arg[4:]+'-00:00:00'
-        elif arg.startswith('days='):
-            runtime = arg[5:]+'-00:00:00'
-        elif arg.startswith('hour='):
-            runtime = arg[5:]+':00:00'
-        elif arg.startswith('hours='):
-            runtime = arg[6:]+':00:00'
-        elif arg.startswith('minute='):
-            runtime = arg[7:]+':00'
-        elif arg.startswith('minutes='):
-            runtime = arg[8:]+':00'
-        elif arg.startswith('time='):
-            runtime = arg[5:]
-        elif arg.startswith('queue='):
-            queue = arg[6:]
         else:
-            out.write("Error: I do not understand argument `%s'\n" % arg)
-            sys.exit()
+            [key, equal, val] = arg.partition('=')
+            if key == 'mem' or key == 'memory':
+                memory = val
+            elif key == 'cpu' or key == 'ncpu':
+                ncpu = val
+            elif key == 'day' or key == 'days':
+                runtime = val+'-00:00:00'
+            elif key == 'hour' or key == 'hours':
+                runtime = val+':00:00'
+            elif key == 'minute' or key == 'minutes':
+                runtime = val+':00'
+            elif key == 'time':
+                runtime = val
+            elif key == 'queue':
+                queue = val
+            else:
+                out.write("Error: I do not understand argument `%s'\n" % arg)
+                sys.exit()
 
     if memory < 128:
         out.write("Error: requested memory (%s MB) seems too low\n" % memory)

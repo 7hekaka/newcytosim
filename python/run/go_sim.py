@@ -160,28 +160,24 @@ def main(args):
     for arg in args:
         if arg.isdigit():
             repeat = int(arg)
-        elif arg.startswith('nproc=') or arg.startswith('njobs='):
-            njobs = int(arg[6:])
-        elif arg.startswith('jobs='):
-            njobs = int(arg[5:])
-        elif arg.startswith('script='):
-            preconf = arg[7:]
         elif executable(arg):
             exe = os.path.abspath(arg)
         elif os.path.isfile(arg):
             files.append(arg)
-        elif arg.startswith('name='):
-            name = arg[5:]
-        elif arg.startswith('park='):
-            park = arg[5:]
-            if not os.path.isdir(park):
-                err.write("go_sim.py: `%s' is not a directory\n" % park)
-                sys.exit()
         else:
-            err.write("go_sim.py: unexpected argument `%s'\n" % arg)
-            err.write("         : there is no file with that name\n")
-            sys.exit()
-        
+            [key, equal, val] = arg.partition('=')
+            if key == 'nproc' or key == 'njobs' or key == 'jobs':
+                njobs = val
+            elif key == 'script':
+                preconf = val
+            elif key == 'name':
+                name = val
+            elif key == 'park'):
+                park = val
+            else:
+                out.write("Error: I do not understand argument `%s'\n" % arg)
+                sys.exit()
+    
     if not files:
         err.write("You should specify a config file on the command line\n")
         sys.exit()
