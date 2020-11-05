@@ -439,7 +439,7 @@ void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
             ang += delta;
         }
 #else
-        real cap, angle = M_PI;
+        real cap = 1.0, angle = M_PI;
         // either 'angle' or 'cap' can be specified:
         if ( opt.set(angle, "aster_angle") )
             cap = 1.0 - std::cos(angle);

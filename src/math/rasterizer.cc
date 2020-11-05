@@ -66,8 +66,8 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
     Vector2 R = pts[0];
     Vector2 L = pts[0];
     
-    real xxR, yyR, dxR;
-    real xxL, yyL, dxL;
+    real xxR = 0, yyR = 0, dxR = 0;
+    real xxL = 0, yyL = 0, dxL = 0;
     
     // start on the line just above the bottom point
     int yy = (int)std::ceil(R.YY);
@@ -163,8 +163,8 @@ void Rasterizer::paintPolygon2D(void (*paint)(int, int, int, int, void*), void *
     Vertex2 R = pts[0];
     Vertex2 L = pts[0];
   
-    real xxR, yyR, dxR;
-    real xxL, yyL, dxL;
+    real xxR = 0, yyR = 0, dxR = 0;
+    real xxL = 0, yyL = 0, dxL = 0;
 
     // start on the line just above the bottom point
     int yy = (int)std::ceil(pts[0].YY);

@@ -254,22 +254,22 @@ void SaveImage::downsampleRGB(GLubyte dst[], const GLubyte src[],
 #endif
     
     for ( size_t x = 0; x < sx; ++x )
-        for ( size_t y = 0; y < sy; ++y )
+    for ( size_t y = 0; y < sy; ++y )
+    {
+        size_t r = 0, g = 0, b = 0;
+        for ( size_t dx = 0; dx < bin; ++dx )
+        for ( size_t dy = 0; dy < bin; ++dy )
         {
-            size_t r = 0, g = 0, b = 0;
-            for ( size_t dx = 0; dx < bin; ++dx )
-            for ( size_t dy = 0; dy < bin; ++dy )
-            {
-                GLubyte const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
-                r += p[0];
-                g += p[1];
-                b += p[2];
-            }
-            
-            dst[3*(x+sx*y)  ] = (GLubyte)( r / s );
-            dst[3*(x+sx*y)+1] = (GLubyte)( g / s );
-            dst[3*(x+sx*y)+2] = (GLubyte)( b / s );
+            GLubyte const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
+            r += p[0];
+            g += p[1];
+            b += p[2];
         }
+        
+        dst[3*(x+sx*y)  ] = (GLubyte)( r / s );
+        dst[3*(x+sx*y)+1] = (GLubyte)( g / s );
+        dst[3*(x+sx*y)+2] = (GLubyte)( b / s );
+    }
 }
 
 

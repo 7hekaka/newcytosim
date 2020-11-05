@@ -133,8 +133,8 @@ void Inventory::reassign()
         //swap:
         assert_true(!byNames[nxt]);
         byNames[nxt] = byNames[inf];
-        byNames[inf] = nullptr;
         byNames[nxt]->identity(nxt);
+        byNames[inf] = nullptr;
         ++nxt;
         ++inf;
     }
