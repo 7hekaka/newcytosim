@@ -250,7 +250,9 @@ void ClassicFiber::readEndState(Inputter& in)
 
 void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == TAG )
+    if ( tag == TAG_DYNAMIC )
+        readEndState(in);
+    else
     {
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() < 44 )
@@ -258,7 +260,5 @@ void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
         Fiber::read(in, sim, tag);
     }
-    else if ( tag == TAG_DYNAMIC )
-        readEndState(in);
 }
 

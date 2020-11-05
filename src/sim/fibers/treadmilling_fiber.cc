@@ -167,7 +167,9 @@ void TreadmillingFiber::readEndState(Inputter& in)
 void TreadmillingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //std::clog << " TreadmillingFiber::read(" << tag << ")\n";
-    if ( tag == TAG )
+    if ( tag == TAG_DYNAMIC )
+        readEndState(in);
+    else
     {
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() < 44 )
@@ -175,7 +177,5 @@ void TreadmillingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
         Fiber::read(in, sim, tag);
     }
-    else if ( tag == TAG_DYNAMIC )
-        readEndState(in);
 }
 

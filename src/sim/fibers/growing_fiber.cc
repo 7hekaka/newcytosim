@@ -174,7 +174,9 @@ void GrowingFiber::readEndState(Inputter& in)
 
 void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == TAG )
+    if ( tag == TAG_DYNAMIC )
+        readEndState(in);
+    else
     {
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() < 44 )
@@ -193,7 +195,5 @@ void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
 #endif
     }
-    else if ( tag == TAG_DYNAMIC )
-        readEndState(in);
 }
 
