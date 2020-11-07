@@ -211,7 +211,7 @@ void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real ra
 
 void SpaceSquare::write(Outputter& out) const
 {
-    out.put_characters("square", 16);
+    writeShape(out, "square");
     out.writeUInt16(4);
     out.writeFloat(length_[0]);
     out.writeFloat(length_[1]);
@@ -230,7 +230,7 @@ void SpaceSquare::setLengths(const real len[])
 void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "square");
+    readShape(in, 8, len, "square");
     setLengths(len);
 }
 

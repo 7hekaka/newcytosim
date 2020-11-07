@@ -152,7 +152,7 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
 
 void SpaceRing::write(Outputter& out) const
 {
-    out.put_characters("ring", 16);
+    writeShape(out, "ring");
     out.writeUInt16(2);
     out.writeFloat(length_);
     out.writeFloat(radius_);
@@ -169,7 +169,7 @@ void SpaceRing::setLengths(const real len[])
 void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "ring");
+    readShape(in, 8, len, "ring");
     setLengths(len);
 }
 

@@ -236,7 +236,7 @@ void SpaceLid::step()
 
 void SpaceLid::write(Outputter& out) const
 {
-    out.put_characters("lid", 16);
+    writeShape(out, "lid");
     out.writeUInt16(6);
     out.writeFloat(halflength_[0]);
     out.writeFloat(halflength_[1]);
@@ -261,7 +261,7 @@ void SpaceLid::setLengths(const real len[])
 void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "lid");
+    readShape(in, 8, len, "lid");
     setLengths(len);
 }
 

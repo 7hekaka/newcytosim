@@ -163,13 +163,12 @@ void FileWrapper::put_characters(std::string const& str, size_t cnt)
     // write characters from 'str':
     size_t s = std::min(cnt, str.size());
     cnt -= fwrite(str.c_str(), 1, s, mFile);
-    // fill the rest with '0'
-    const size_t CHK = 32;
-    char buf[CHK] = { 0 };
+    // write a bunch of spaces to reach 'cnt' characters
+    char buf[] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    //std::clog << "put_characters |" << buf << "| ";
     while ( cnt > 0 )
-        cnt -= fwrite(buf, 1, std::min(CHK, cnt), mFile);
+        cnt -= fwrite(buf, 1, std::min(sizeof(buf), cnt), mFile);
 }
-
 
 std::string FileWrapper::get_characters(size_t cnt)
 {
@@ -183,9 +182,14 @@ std::string FileWrapper::get_characters(size_t cnt)
         res.append(buf, s);
         cnt -= s;
     }
+    //std::clog << "get_characters |" << res << "| ";
+
+    std::string::size_type e = res.size();
+    // trim trailing zeros/spaces:
+    while ( e > 0 && ( 0==res.at(e-1) || isspace(res.at(e-1)) ))
+        --e;
     
-    // trim trailing zeros:
-    std::string::size_type e = res.find((char)0);
+    //std::clog << "trim |" << res.substr(0, e) << "|\n";
     return res.substr(0, e);
 }
 

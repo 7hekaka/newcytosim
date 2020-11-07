@@ -203,7 +203,7 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad
 
 void SpaceStrip::write(Outputter& out) const
 {
-    out.put_characters("strip", 16);
+    writeShape(out, "strip");
     out.writeUInt16(4);
     out.writeFloat(halflength_[0]);
     out.writeFloat(halflength_[1]);
@@ -233,7 +233,7 @@ void SpaceStrip::setLengths(const real len[])
 void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "strip");
+    readShape(in, 8, len, "strip");
     setLengths(len);
 }
 

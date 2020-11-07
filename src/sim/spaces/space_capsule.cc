@@ -213,7 +213,7 @@ void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, real r
 
 void SpaceCapsule::write(Outputter& out) const
 {
-    out.put_characters("capsule", 16);
+    writeShape(out, "capsule");
     out.writeUInt16(2);
     out.writeFloat(length_);
     out.writeFloat(radius_);
@@ -229,7 +229,7 @@ void SpaceCapsule::setLengths(const real len[])
 void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "capsule");
+    readShape(in, 8, len, "capsule");
     setLengths(len);
 }
 

@@ -262,7 +262,7 @@ void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
 
 void SpaceDice::write(Outputter& out) const
 {
-    out.put_characters("dice", 16);
+    writeShape(out, "dice");
     out.writeUInt16(4);
     out.writeFloat(length_[0]);
     out.writeFloat(length_[1]);
@@ -283,7 +283,7 @@ void SpaceDice::setLengths(const real len[])
 void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "dice");
+    readShape(in, 8, len, "dice");
     setLengths(len);
 }
 

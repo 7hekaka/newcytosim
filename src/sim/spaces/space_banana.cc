@@ -125,7 +125,7 @@ Vector SpaceBanana::project(Vector const& pos) const
 
 void SpaceBanana::write(Outputter& out) const
 {
-    out.put_characters("banana", 16);
+    writeShape(out, "banana");
     out.writeUInt16(4);
     out.writeFloat(bLength);
     out.writeFloat(bWidth);
@@ -145,7 +145,7 @@ void SpaceBanana::setLengths(const real len[])
 void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "banana");
+    readShape(in, 8, len, "banana");
     setLengths(len);
 }
 

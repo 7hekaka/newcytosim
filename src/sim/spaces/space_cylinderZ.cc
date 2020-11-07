@@ -463,7 +463,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real
 
 void SpaceCylinderZ::write(Outputter& out) const
 {
-    out.put_characters("cylinderZ", 16);
+    writeShape(out, "cylinderZ");
     out.writeUInt16(4);
     out.writeFloat(radius_);
     out.writeFloat(bot_);
@@ -485,7 +485,7 @@ void SpaceCylinderZ::setLengths(const real len[])
 void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "cylinderZ");
+    readShape(in, 8, len, "cylinderZ");
     setLengths(len);
 }
 

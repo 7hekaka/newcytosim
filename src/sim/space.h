@@ -37,7 +37,7 @@ class Space : public Object
 protected:
     
     /// read numbers from file into array `len` of size `n_len`
-    static void read_data(Inputter&, size_t n_len, real* len, std::string const&);
+    static void readShape(Inputter&, size_t n_len, real* len, std::string const&);
 
 public:
     
@@ -185,11 +185,14 @@ public:
     /// a static_cast<> of Object::prev()
     Space*         prev() const { return static_cast<Space*>(prevO); }
     
+    /// write shape on 16 characters
+    static void    writeShape(Outputter&, std::string const&);
+    
     /// write to file
-    void           write(Outputter&) const;
+    virtual void   write(Outputter&) const;
 
     /// read from file
-    void           read(Inputter&, Simul&, ObjectTag);
+    virtual void   read(Inputter&, Simul&, ObjectTag);
     
     /// get dimensions from array `len`
     virtual void   setLengths(const real len[8]) {}

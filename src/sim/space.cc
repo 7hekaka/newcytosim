@@ -432,22 +432,13 @@ void Space::setInteraction(Interpolation const& pi, Meca& meca, real stiff, Conf
 //------------------------------------------------------------------------------
 #pragma mark - IO
 
-void Space::write(Outputter& out) const
+void Space::writeShape(Outputter& out, std::string const& arg)
 {
-    out.put_characters(prop->shape, 16);
-    out.writeUInt16(0);
+    out.put_characters(arg, 16);
 }
 
 
-void Space::read(Inputter& in, Simul&, ObjectTag)
-{
-    real len[8] = { 0 };
-    read_data(in, 8, len, prop->shape);
-    setLengths(len);
-}
-
-
-void Space::read_data(Inputter& in, size_t n_len, real len[], std::string const& expected)
+void Space::readShape(Inputter& in, size_t n_len, real len[], std::string const& expected)
 {
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() < 35 )
@@ -504,6 +495,21 @@ void Space::read_data(Inputter& in, size_t n_len, real len[], std::string const&
         len[d] = in.readFloat();
     for ( ; d < n; ++d )
         in.readFloat();
+}
+
+
+void Space::write(Outputter& out) const
+{
+    writeShape(out, prop->shape);
+    out.writeUInt16(0);
+}
+
+
+void Space::read(Inputter& in, Simul&, ObjectTag)
+{
+    real len[8] = { 0 };
+    readShape(in, 8, len, prop->shape);
+    setLengths(len);
 }
 
 //------------------------------------------------------------------------------

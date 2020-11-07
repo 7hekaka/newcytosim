@@ -86,7 +86,7 @@ void SpaceSphere::setInteraction(Vector const& pos, Mecapoint const& pe, real ra
 
 void SpaceSphere::write(Outputter& out) const
 {
-    out.put_characters("sphere", 16);
+    writeShape(out, "sphere");
     out.writeUInt16(2);
     out.writeFloat(radius_);
     out.writeFloat(0.f);
@@ -102,7 +102,7 @@ void SpaceSphere::setLengths(const real len[])
 void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    read_data(in, 8, len, "sphere");
+    readShape(in, 8, len, "sphere");
     setLengths(len);
 }
 
