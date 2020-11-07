@@ -10,32 +10,32 @@
 
 void help()
 {
-    printf("Cytosim-sieve %iD\n", DIM);
-    printf("    file version %i built on %s\n", Simul::currentFormatID, __DATE__);
-    printf("Synopsis:\n");
-    printf("   `sieve` let you to manipulate cytosim trajectory file.\n");
-    printf("   It reads a trajectory files, and loads the objects in memory\n");
-    printf("\n");
-    printf("   The system is written in the latest format, in either binary or text.\n");
-    printf("   A category of objects can be removed with option skip=WHAT.\n");
+    printf("Cytosim-sieve:\n\n");
+    printf("   sieve reads a cytosim trajectory file, loading frames in memory,\n");
+    printf("   and writes them to a new file using the latest cytosim file format.\n");
+    printf("   The output can be generated in either binary or text format.\n");
+    printf("   A category of objects can be removed by specifying `skip=WHAT`.\n");
     printf("   If the specified output file already exists, data is appended to it.\n");
-    printf("\n");
+    printf("   This writes %iD files with format %i (built on %s)\n\n", DIM, Simul::currentFormatID, __DATE__);
     printf("Usage:\n");
     printf("    sieve input_file output_file [options]\n\n");
-    printf("Possible options:\n");
-    printf("    binary=0     generate output in text format\n");
-    printf("    binary=1     generate output in binary format\n");
-    printf("    skip=WHAT    remove all objects of class WHAT\n");
-    printf("    frame=INDEX  process only specified frame\n");
-    printf("\n");
-    printf("Example:\n");
-    printf("    sieve objects.cmo objects.txt binary=0\n");
-    printf("    sieve objects.cmo objects.txt binary=0 skip=couple\n");
+    printf("Options:\n");
+    printf("    dim=INT            process files with specified dimensionality\n");
+    printf("    binary=1           use binary format (default)\n");
+    printf("    binary=0           use text format (default if output ends with .txt\n");
+    printf("    skip=WHAT          remove all objects of class WHAT\n");
+    printf("    skip_free_single=1 remove unbound singles\n");
+    printf("    skip_free_couple=1 remove unbound couples\n");
+    printf("    frame=INDEX        process only specified frame\n\n");
+    printf("Examples:\n");
+    printf("    sieve objects.cmo objects.txt\n");
+    printf("    sieve objects.cmo objects.txt skip=couple\n");
 }
 
 
 int main(int argc, char* argv[])
 {
+    unsigned dim = DIM;
     Simul simul;
     Glossary arg;
     bool binary = true;
@@ -47,13 +47,22 @@ int main(int argc, char* argv[])
         help();
         return EXIT_SUCCESS;
     }
-
+    
+    // check extension of output file:
+    char const* ext = strrchr(argv[2], '.');
+    if ( ext )
+    {
+        if ( 0 == strncmp(ext, ".txt", 4) )
+            binary = 0;
+    }
+    
     if ( arg.read_strings(argc-3, argv+3) )
         return EXIT_FAILURE;
     
     if ( arg.set(skip, "skip") )
        skip_set = simul.findSet(skip);
     
+    arg.set(dim, "dim");
     arg.set(binary, "binary");
     arg.set(simul.prop->skip_free_single, "skip_free_single");
     arg.set(simul.prop->skip_free_couple, "skip_free_couple");
@@ -84,10 +93,16 @@ int main(int argc, char* argv[])
         catch( Exception & e ) {
             std::cerr << "Frame " << frm << ":" << e.brief() << '\n';
         }
+        
+        if ( in.vectorSize() != dim )
+        {
+            std::cerr << "Abort: dimensionality mismatch (file is " << in.vectorSize() << "D)\n";
+            return 1;
+        }
 
         if ( skip_set )
             skip_set->erase();
-            
+        
         /*
         simul.reportInventory(std::cout);
         std::clog << "\b\b\b\b\b" << std::setw(5) << cnt;
