@@ -749,7 +749,7 @@ void processKey(unsigned char key)
 
         //------------------------- Global controls ----------------------------
        
-        case 'j':
+        case 'K':
 #if DRAW_MECA_LINKS
             disp.draw_links = !disp.draw_links;
             flashText("draw_links = %i", disp.draw_links);

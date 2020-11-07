@@ -23,13 +23,13 @@ class FatPointF
 public:
     
     /// position of center
-    Vector         pos;
+    Vector    pos;
     
     /// equilibrium radius of the interaction (distance where force is zero)
-    real           radius;
+    real      radius;
     
-    /// indicates the central vertex
-    Mecapoint      pnt;
+    /// indicates one vertex in a Mecable
+    Mecapoint pnt;
     
 public:
     
@@ -52,13 +52,13 @@ class FatLocusF
 public:
     
     /// position of center
-    Vector         pos;
+    Vector       pos;
 
     /// equilibrium radius of the interaction (distance where force is zero)
-    real           radius;
+    real         radius;
     
-    /// indicates the fiber's segment
-    FiberSegment   seg;
+    /// indicates one segment of a Fiber
+    FiberSegment seg;
     
 public:
     

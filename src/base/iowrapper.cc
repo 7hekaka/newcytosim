@@ -221,7 +221,7 @@ double Inputter::readDouble()
 
 /**
  This will read vecsize_ floats, and store the first D ones in a[].
- VECSIZE can be changed by calling vectorSize(INT)
+ The default vector size can be changed by calling `vectorSize(INT)`
  */
 void Inputter::readFloats(float a[], const unsigned D)
 {

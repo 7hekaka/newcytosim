@@ -56,9 +56,9 @@ typedef Matrix33 MatrixBlock;
 #define USE_ISO_MATRIX 0
 
 /**
- Option to allow the user to see Links made by Meca in 'play'.
+ Option to allow 'play' to display Meca links graphically.
  This option affects display speed since it requires two calls to setInteractions()
- This option is normally OFF. Only supported with Xcode compilation.
+ This option is normally OFF.
  */
 #define DRAW_MECA_LINKS 0
 
