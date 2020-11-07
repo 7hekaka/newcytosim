@@ -301,7 +301,7 @@ public:
 #endif
     }
 
-    /// return substraction of two matrices
+    /// return difference of two matrices
     const Matrix22 operator -(Matrix22 const& M) const
     {
 #if MATRIX22_USES_AVX

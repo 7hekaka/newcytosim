@@ -297,7 +297,7 @@ public:
         return res;
     }
 
-    /// return sum of two matrices
+    /// return difference of two matrices
     const Matrix34 operator -(Matrix34 const& M) const
     {
         Matrix34 res;

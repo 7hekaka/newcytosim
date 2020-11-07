@@ -254,6 +254,15 @@ public:
             res.val[u] = val[u] + M.val[u];
         return res;
     }
+    
+    /// return difference of two matrices
+    const Matrix44 operator -(Matrix44 const& M) const
+    {
+        Matrix44 res;
+        for ( index u = 0; u < 16; ++u )
+            res.val[u] = val[u] - M.val[u];
+        return res;
+    }
 
     /// subtract given matrix
     void operator +=(Matrix44 const& M)
