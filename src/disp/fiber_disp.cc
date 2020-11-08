@@ -118,9 +118,20 @@ void FiberDisp::read(Glossary& glos)
     glos.set(label_style, "label_style", 0, "labels", 0);
 
     key = glos.has_key("speckle") ? "speckle" : "speckles";
-    glos.set(speckle_size,     "speckle_size", 0, key, 0);
-    glos.set(speckle_style,    "speckle_style", 0, key, 1, {{"off", 0}, {"random", 1}, {"regular", 2}});
-    glos.set(speckle_interval, "speckle_interval", 0, key, 2) || glos.set(speckle_interval, "interval");
+#ifdef BACKWARD_COMPATIBILITY
+    if ( glos.nb_values(key) == 2 )
+    {
+        speckle_size = line_width * 2;
+        glos.set(speckle_style,    key);
+        glos.set(speckle_interval, key, 1);
+    }
+    else
+#endif
+    {
+        glos.set(speckle_size,     "speckle_size", 0, key, 0);
+        glos.set(speckle_style,    "speckle_style", 0, key, 1, {{"off", 0}, {"random", 1}, {"regular", 2}});
+        glos.set(speckle_interval, "speckle_interval", 0, key, 2) || glos.set(speckle_interval, "interval");
+    }
     if ( speckle_interval <= 0 )
         speckle_interval = 1;
 

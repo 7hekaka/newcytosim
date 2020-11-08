@@ -637,7 +637,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
             if ( disp->perceptible )
             {
                 disp->color2.load();
-                gleVertex(obj->posFree().XX, obj->signature() * 0x1p-28 - 4);
+                gleVertex(obj->posFree().XX, obj->signature() * 0x1p-28 - 8);
             }
 #else
             drawVertex(obj->posFree(), obj->disp1());
