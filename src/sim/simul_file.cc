@@ -395,6 +395,9 @@ int Simul::loadObjects(Inputter& in, ObjectSet* subset)
     if ( ! in.good() )
         throw InvalidIO("invalid file in Simul::loadObjects()");
     
+    // set expected vector size as default:
+    in.vectorSize(DIM);
+
     int res = 0;
     
     in.lock();
@@ -537,11 +540,11 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 unsigned d = 0, f = 0;
                 iss >> f >> tok >> d;
                 in.formatID(f);
-                in.vectorSize(d);
-                if ( d != DIM )
-                    Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
                 //if ( f != currentFormatID )
-                //    std::clog << "Cytosim is reading data format "<<f<<"\n";
+                //    Cytosim::warn << "Cytosim is reading previous format " << f << '\n';
+                if ( d != in.vectorSize() )
+                    Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
+                in.vectorSize(d);
             }
             // time data "#time 1.2345"
             else if ( tok == "time" )

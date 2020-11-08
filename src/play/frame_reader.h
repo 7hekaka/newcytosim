@@ -30,9 +30,9 @@ private:
     class file_pos 
     {
     public:
-        int    status;   ///< indicates if `position` is valid
-        fpos_t position; ///< starting position in the file
-        file_pos() { status=0; }
+        int    status_;   ///< indicates if `position` is valid
+        fpos_t position_; ///< starting position in the file
+        file_pos() { status_ = 0; }
     };
     
     /// type for list of positions
