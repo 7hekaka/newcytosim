@@ -45,7 +45,7 @@ void drawLink(Vector const& a, Vector const& ab, real len)
 }
 
 /// Display link between 3 positions
-void drawLink(Vector const& a, Vector const& ab, Vector const& c)
+void drawLink(Vector const& a, Vector const& ab, Vector c)
 {
     if ( modulo )
         modulo->fold(c, a);
