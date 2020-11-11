@@ -16,7 +16,7 @@ extern Modulo const* modulo;
  W is projected on the line supporting this FiberSegment
  The function calculates:
  - abs <- the signed distance from pos1() to the projection of W
- - dis <- the distance between W and its projection
+ - dis <- the SQUARE of the distance between W and its projection
  .
  
  This uses FiberSegment::lenInv() that should return 1.0 / segment_length
@@ -57,7 +57,7 @@ real FiberSegment::projectPoint0(Vector W, real& dis) const
  W is projected on the line that supports this FiberSegment
  The function calculates:
  - abs <- the signed distance from pos1() to the projection of W
- - dis <- the distance between W and its projection
+ - dis <- the SQUARE of the distance between W and its projection
  .
  
  It is assumed here that len() returns the distance between the two points of the FiberSegment
@@ -102,6 +102,10 @@ real FiberSegment::projectPoint(Vector W, real& dis) const
 
 /**
  This may be faster than projectPoint(), but it does not work with periodic boundaries
+ The function calculates:
+ - abs <- the signed distance from pos1() to the projection of W
+ - dis <- the SQUARE of the distance between W and its projection
+ .
  */
 real FiberSegment::projectPointF(const real w[], real& dis) const
 {
@@ -174,14 +178,16 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
  by their abscissa (abs1, abs2) for which the values [0, segment_length] match
  the edges of the segments.
  
- @return `distance(P1, P2)^2', the square of the distance between the lines.
- @sets arguments `abs1` and `abs2` to the corresponding points
+ @return `distance(P1, P2)^2', the SQUARE of the distance between the lines.
+ @sets arguments `abs1` and `abs2` to be the abscissa of the corresponding points
  
  The calling function must check if 'abs1' and 'abs2' are within [0, segment_length]
- to do any meaningful work.
+ to do anything meaningful.
 
  If the segments are parallel, P1 and P2 are set to the middle of the overlapping
  section between the two segments.
+ 
+ In 2D, the returned distance is always zero.
  */
 
 real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& abs2) const
@@ -203,9 +209,10 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
     
     real C = dot(d11, d22);  // cosinus of angle
     
-    if ( C < 1.0-REAL_EPSILON )
+    if ( abs_real(1.0 - C) > REAL_EPSILON )
     {
-        real iS = 1.0 / ( 1.0 - C * C );    // sinus squared
+        // if C~1, the value of 1.0-C*C may be imprecise
+        real iS = 1.0 / (( 1.0 - C ) * ( 1.0 + C ));    // 1.0 / sinus^2
         // This deals with the general case of non-parallel lines
 #if ( DIM > 2 )
         // direction N of the shortest path is orthogonal to both lines:

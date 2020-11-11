@@ -1352,6 +1352,7 @@ void Chain::segmentationVariance(real& avg, real& var) const
     var = var / (real)cnt - avg * avg;
 }
 
+
 /**
  Calculate the inverse of the radius of the circle containing the points A, B, C
  
@@ -1359,7 +1360,7 @@ void Chain::segmentationVariance(real& avg, real& var) const
      std::sin(angle) = std::sqrt( 1 - std::cos(angle)^2 )
      2 * radius * std::sin(angle) = |AC|
      curvature = 2 * std::sin(angle) / |AC|
-     curvature = 2 * std::sqrt( ( 1 - std::cos(angle)^2 ) / AC^2 )
+     curvature = 2 * std::sqrt( [ 1 - std::cos(angle)^2 ] / AC^2 )
 
  curvature is ZERO if A, B and C are aligned
  */
@@ -1367,9 +1368,30 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C)
 {
     Vector ab = B - A;
     Vector bc = C - B;
+    real D = ( C - A ).normSqr();
     real P = dot(ab, bc);
     real S = std::max(0.0, 1.0 - ( P * P ) / ( ab.normSqr() * bc.normSqr() ));
+    return 2.0 * std::sqrt( S / D );
+}
+
+/**
+ Calculate the inverse of the radius of the circle containing the points A, B, C
+ 
+     std::cos(angle) = scalar_product( AB, BC ) / ( |AB| * |BC| )
+     std::sin(angle) = std::sqrt( 1 - std::cos(angle)^2 )
+     2 * radius * std::sin(angle) = |AC|
+     curvature = 2 * std::sin(angle) / |AC|
+     curvature = 2 * std::sqrt( [ 1 - std::cos(angle)^2 ] / AC^2 )
+
+ curvature is ZERO if A, B and C are aligned
+ */
+real curvature3(Vector const& A, Vector const& B, Vector const& C, real seg)
+{
+    Vector ab = B - A;
+    Vector bc = C - B;
     real D = ( C - A ).normSqr();
+    real P = dot(ab, bc) / seg;
+    real S = std::max(0.0, ( 1.0 - P ) * ( 1.0 + P ));
     return 2.0 * std::sqrt( S / D );
 }
 
@@ -1378,7 +1400,7 @@ real Chain::curvature(size_t p) const
 {
     if ( p < 1 || lastPoint() <= p )
         return 0;
-    return curvature3(posP(p-1), posP(p), posP(p+1));
+    return curvature3(posP(p-1), posP(p), posP(p+1), fnCut);
 }
 
 
