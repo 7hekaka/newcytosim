@@ -193,6 +193,9 @@ public:
     virtual void drawFiberPlusEnd(Fiber const&, int style, real size) const;
 
     
+    /// draw broken lines joining the Fiber vertices
+    void         drawFiberBackbone(Fiber const&) const;
+
     /// draw Fiber linear features
     virtual void drawFiberLines(Fiber const&) const;
     

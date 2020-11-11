@@ -820,16 +820,6 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         // display middle of fiber:
         drawPoint(fib.posMiddle(), 2*rad);
     }
-    // display backbone:
-    if ( disp->point_style & 4 )
-    {
-        glDisable(GL_LIGHTING);
-        glLineWidth(0.25);
-        glBegin(GL_LINE_STRIP);
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gle::gleVertex(fib.posP(ii));
-        glEnd();
-    }
 }
 
 

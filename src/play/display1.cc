@@ -52,24 +52,7 @@ void Display1::drawSimul(Simul const& sim)
     if ( prop->single_select & 1 )
         drawSinglesF(sim.singles);
     
-#if ( 0 )
-    // bypass the normal display to improve performance:
-    glEnableClientState(GL_VERTEX_ARRAY);
-    // display Fibers in a random (ever changing) order:
-    for ( Fiber const* fib = sim.fibers.first(); fib ; fib=fib->next() )
-    {
-        if ( fib->disp->visible )
-        {
-            lineWidth(fib->prop->disp->line_width);
-            fib->disp->color.load();
-            glVertexPointer(DIM, GL_DOUBLE, 0, fib->addrPoints());
-            glDrawArrays(GL_LINE_STRIP, 0, fib->nbPoints());
-        }
-    }
-    glDisableClientState(GL_VERTEX_ARRAY);
-#else
     drawFibers(sim.fibers);
-#endif
 
     if ( prop->couple_select & 2 )
         drawCouplesA(sim.couples);

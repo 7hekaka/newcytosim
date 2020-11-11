@@ -823,6 +823,24 @@ inline gle_color color_by_height(Fiber const& fib, size_t pti, real beta)
 
 
 
+// display fiber backbone using GL_LINES
+void Display::drawFiberBackbone(Fiber const& fib) const
+{
+    glDisable(GL_LIGHTING);
+#if ( DIM > 1 ) && REAL_IS_DOUBLE
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(DIM, GL_DOUBLE, 0, fib.addrPoints());
+    glDrawArrays(GL_LINE_STRIP, 0, fib.nbPoints());
+    glDisableClientState(GL_VERTEX_ARRAY);
+#else
+    glBegin(GL_LINE_STRIP);
+    for ( size_t i = 0; i < fib.nbPoints(); ++i )
+        gle::gleVertex(fib.posP(i));
+    glEnd();
+#endif
+}
+
+
 void Display::drawFiberLines(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -835,17 +853,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             fib.disp->color.load();
             // display plain lines:
             lineWidth(disp->line_width);
-#if ( DIM > 1 ) && REAL_IS_DOUBLE
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glVertexPointer(DIM, GL_DOUBLE, 0, fib.addrPoints());
-            glDrawArrays(GL_LINE_STRIP, 0, fib.nbPoints());
-            glDisableClientState(GL_VERTEX_ARRAY);
-#else
-            glBegin(GL_LINE_STRIP);
-            for ( size_t n = 0; n < fib.nbPoints(); ++n )
-                gle::gleVertex(fib.posP(n));
-            glEnd();
-#endif
+            drawFiberBackbone(fib);
         } break;
         case 2:
         {
@@ -1120,15 +1128,6 @@ void Display::drawFiberPoints(Fiber const& fib) const
     {
         // display only middle of fiber:
         drawObject(fib.posMiddle(), 2*disp->point_size, gle::sphere2);
-    }
-    // display backbone:
-    if ( disp->point_style & 4 )
-    {
-        glLineWidth(0.25);
-        glBegin(GL_LINE_STRIP);
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gle::gleVertex(fib.posP(ii));
-        glEnd();
     }
 }
 
@@ -1591,61 +1590,16 @@ void Display::drawMicrotubule(Fiber const& fib,
 void Display::drawFiber(Fiber const& fib)
 {
     FiberDisp const*const disp = fib.prop->disp;
-    int line_style = disp->line_style;
+    int style = disp->line_style;
+    
+    if ( disp->style & 4 )
+    {
+        glLineWidth(0.5);
+        fib.disp->color.load();
+        drawFiberBackbone(fib);
+    }
 
-    VisibleLattice const* lat = fib.visibleLattice();
-    if ( lat && lat->ready() )
-    {
-        // if the Lattice is displayed, do not draw backbone:
-        switch ( disp->lattice_style )
-        {
-            case 1:
-                drawFiberLattice1(fib, *lat, disp->line_width);
-                line_style = 0;
-                break;
-            case 2:
-                drawFiberLattice2(fib, *lat, disp->line_width);
-                line_style = 0;
-                break;
-            case 3:
-                drawFiberLatticeEdges(fib, *lat, disp->line_width);
-                line_style = 0;
-                break;
-        }
-    }
-    
-#if ( DIM == 3 )
-    /*
-     Handle styles in 3D that are using transparency to draw fiber's segments
-     */
-    if (( line_style==1 && fib.disp->color.transparent())
-        || ( line_style==2 || line_style==3 ))
-    {
-        for ( size_t i = 0; i < fib.lastPoint(); ++i )
-            zObjects.push_back(zObject(&fib, i));
-        line_style = 0;
-    }
-    else if ( line_style == 6 )
-    {
-        // color according to the distance from the minus end
-        const real beta = fib.segmentation() / disp->length_scale;
-        for ( size_t i = 0; i < fib.lastPoint(); ++i )
-            if ( color_by_distanceM(fib, i, beta).visible() )
-                zObjects.push_back(zObject(&fib, i));
-        line_style = 0;
-    }
-    else if ( line_style == 7 )
-    {
-        // color according to the distance from the plus end
-        const real beta = fib.segmentation() / disp->length_scale;
-        for ( size_t i = 0; i < fib.lastPoint(); ++i )
-            if ( color_by_distanceP(fib, i+1, beta).visible() )
-                zObjects.push_back(zObject(&fib, i));
-        line_style = 0;
-    }
-#endif
-    
-    if ( line_style )
+    if ( disp->style )
     {
         gle_color col1 = fib.disp->color;
         gle_color col2 = fib.disp->color.darken(0.625);
@@ -1657,15 +1611,69 @@ void Display::drawFiber(Fiber const& fib)
         else
             fib.prop->disp->back_color.load_back();
 
-        if ( disp->line_style != 1 || disp->style == 0 )
-            drawFiberLines(fib);
-        else if ( disp->style == 1 )
-            drawFilament(fib, col1, col2, colE);
-        else if ( disp->style == 2 )
-            drawActin(fib, col1, col2, colE);
-        else if ( disp->style == 3 )
-            drawMicrotubule(fib, col1, col2, colE);
+        switch( disp->style )
+        {
+            case 1: drawFilament(fib, col1, col2, colE); break;
+            case 2: drawActin(fib, col1, col2, colE); break;
+            case 3: drawMicrotubule(fib, col1, col2, colE); break;
+        }
+        style = 0;
     }
+
+    VisibleLattice const* lat = fib.visibleLattice();
+    if ( lat && lat->ready() )
+    {
+        // if the Lattice is displayed, do not draw backbone:
+        switch ( disp->lattice_style )
+        {
+            case 1:
+                drawFiberLattice1(fib, *lat, disp->line_width);
+                style = 0;
+                break;
+            case 2:
+                drawFiberLattice2(fib, *lat, disp->line_width);
+                style = 0;
+                break;
+            case 3:
+                drawFiberLatticeEdges(fib, *lat, disp->line_width);
+                style = 0;
+                break;
+        }
+    }
+    
+#if ( DIM == 3 )
+    /*
+     Handle styles in 3D that are using transparency to draw fiber's segments
+     */
+    if (( style==1 && fib.disp->color.transparent())
+        || ( style==2 || style==3 ))
+    {
+        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+            zObjects.push_back(zObject(&fib, i));
+        style = 0;
+    }
+    else if ( style == 6 )
+    {
+        // color according to the distance from the minus end
+        const real beta = fib.segmentation() / disp->length_scale;
+        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+            if ( color_by_distanceM(fib, i, beta).visible() )
+                zObjects.push_back(zObject(&fib, i));
+        style = 0;
+    }
+    else if ( style == 7 )
+    {
+        // color according to the distance from the plus end
+        const real beta = fib.segmentation() / disp->length_scale;
+        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+            if ( color_by_distanceP(fib, i+1, beta).visible() )
+                zObjects.push_back(zObject(&fib, i));
+        style = 0;
+    }
+#endif
+
+    if ( style )
+        drawFiberLines(fib);
 
     if ( disp->point_style > 0 )
     {
