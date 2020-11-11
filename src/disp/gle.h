@@ -160,7 +160,9 @@ namespace gle
     void starS();
     void starL();
     
-    /// draw a Cube of side 2 in 3D and a Square in 2D
+    /// draw a tetrahedron of side 2 in 3D
+    void tetrahedron();
+    /// draw a Cube of side 2
     void cube();
     /// draw a octahedron of radius 1
     void octahedron();

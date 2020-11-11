@@ -675,9 +675,8 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
  .
  with 3D objects
  */
-void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
+void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real rad) const
 {
-    real rad = size * sFactor;
     if ( rad > 0 )
     {
         switch(style)
@@ -704,9 +703,8 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
  .
  with 3D objects
  */
-void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
+void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real rad) const
 {
-    real rad = size * sFactor;
     if ( rad > 0 )
     {
         switch(style)
@@ -795,17 +793,17 @@ void Display3::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     // diameter of lines and points in space units:
-    real rad = disp->point_size * sFactor;
+    real rad = disp->point_size;
     int style = disp->point_style & 3;
 
-    if ( disp->point_size * uFactor < 2 )
+    if ( rad * uFactor < 2 )
         return;
 
     if ( style == 1 )
     {
         // display vertices:
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
-            drawPoint(fib.posP(i), rad);
+            drawObject(fib.posP(i), rad, gle::cube);
     }
     else if ( style == 2 )
     {
@@ -815,7 +813,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         const real sep = disp->point_interval;
         real ab = std::ceil(fib.abscissaM()/sep) * sep;
         for ( ; ab <= fib.abscissaP(); ab += sep )
-            drawCone(fib.pos(ab), fib.dir(ab), rad);
+            gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( style == 3 )
     {
@@ -921,10 +919,13 @@ void Display3::drawSolid(Solid const& obj)
     //draw polygon around vertices of Solid
     if ( disp->style & 16 )
     {
-        const real rad = disp->width * sFactor;
-        bodyColor(obj);
-        for ( size_t n = 1; n < obj.nbPoints(); ++n )
-            gleTube(obj.posPoint(n-1), obj.posPoint(n), rad, gle::tube2);
+        glDisable(GL_LIGHTING);
+        lineWidth(1.0);
+        bodyColorF(obj).load();
+        glBegin(GL_LINE_LOOP);
+        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
+            gleVertex(obj.posPoint(ii));
+        glEnd();
     }
 }
 
@@ -970,9 +971,9 @@ void Display3::drawSphere(Sphere const& obj)
     if ( disp->size > 0  &&  disp->style & 2 )
     {
         bodyColor(obj);
-        drawPoint(obj.posP(0), disp);
+        drawObject(obj.posP(0), disp->size, gle::octahedron);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawPoint(obj.posP(i), disp);
+            drawObject(obj.posP(i), disp->size, gle::cube);
     }
 
     //display reference points

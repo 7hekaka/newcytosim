@@ -424,9 +424,9 @@ void Platonic::Solid::refineTriangles(unsigned n_vex, real vex[][3],
 
 void Platonic::Solid::initTetrahedron(unsigned div)
 {
-    real a = 1/3.0;
-    real b = std::sqrt(2)/3.0;
-    real c = std::sqrt(2/3.0);
+    real a = 1.0/3.0;
+    real b = M_SQRT2/3.0;
+    real c = M_SQRT2/M_SQRT3;
     
     // Four vertices on unit sphere
     real vex[4][3] = {

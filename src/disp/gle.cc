@@ -705,6 +705,55 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Some Platonic solids
     
+    /// code to calculate and print normals
+    void printNormals(GLfloat const* pts, size_t cnt)
+    {
+        for ( size_t i = 0; i < cnt; ++i )
+        {
+            GLfloat const* x = pts + 9 * i;
+            Vector3 a(x[0], x[1], x[2]);
+            Vector3 b(x[3], x[4], x[5]);
+            Vector3 c(x[6], x[7], x[8]);
+            Vector3 N = cross(b-a, c-b).normalized();
+            printf("%lu %+8.5f,%+8.5f,%+8.5f,", i, N.XX, N.YY, N.ZZ);
+            printf("%+8.5f,%+8.5f,%+8.5f,", N.XX, N.YY, N.ZZ);
+            printf("%+8.5f,%+8.5f,%+8.5f,\n", N.XX, N.YY, N.ZZ);
+        }
+    }
+         
+    /// Tetrahedron is make of 4 triangles = 12 vertices
+    void initTetrahedron(GLint buf1, GLint buf2, GLfloat R=1.0f)
+    {
+        const GLfloat S = R / M_SQRT3;
+        const GLfloat Y = 2.0 * S;
+        const GLfloat B = -M_SQRT1_2 * S;
+        const GLfloat Z = -3.0 * B;
+
+        // -R,-S, B
+        // +R,-S, B
+        //  0, Y, B
+        //  0, 0, Z
+        const GLfloat pts[] = {
+             R,-S, B,-R,-S, B, 0, Y, B,
+             R,-S, B, 0, Y, B, 0, 0, Z,
+             0, Y, B,-R,-S, B, 0, 0, Z,
+            -R,-S, B, R,-S, B, 0, 0, Z,
+        };
+        
+        const GLfloat dir[] = {
+            +0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
+            +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
+            -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
+            +0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333
+        };
+        
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
+    }
+    
+    
     /// Cube is make of 12 triangles = 36 vertices
     void initCube(GLint buf1, GLint buf2, GLfloat R=0.5773502692f)
     {
@@ -949,16 +998,18 @@ namespace gle
         if ( !glIsBuffer(buf_[0]) )
         {
             glGenBuffers(16, buf_);
-            initCube(buf_[0], buf_[1]);
-            initOctahedron(buf_[2], buf_[3]);
-            initIcosahedron(buf_[4], buf_[5]);
+            initTetrahedron(buf_[0], buf_[1]);
+            initCube(buf_[2], buf_[3]);
+            initOctahedron(buf_[4], buf_[5]);
+            initIcosahedron(buf_[6], buf_[7]);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
     
-    void cube() { drawBuffer(buf_[0], buf_[1], 36, GL_TRIANGLES); }
-    void octahedron() { drawBuffer(buf_[2], buf_[3], 24, GL_TRIANGLES); }
-    void icosahedron() { drawBuffer(buf_[4], buf_[5], 60, GL_TRIANGLES); }
+    void tetrahedron() { drawBuffer(buf_[0], buf_[1], 12, GL_TRIANGLES); }
+    void cube() { drawBuffer(buf_[2], buf_[3], 36, GL_TRIANGLES); }
+    void octahedron() { drawBuffer(buf_[4], buf_[5], 24, GL_TRIANGLES); }
+    void icosahedron() { drawBuffer(buf_[6], buf_[7], 60, GL_TRIANGLES); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes

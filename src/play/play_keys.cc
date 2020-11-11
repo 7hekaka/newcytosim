@@ -748,14 +748,7 @@ void processKey(unsigned char key)
 #endif
 
         //------------------------- Global controls ----------------------------
-       
-        case 'K':
-#if DRAW_MECA_LINKS
-            disp.draw_links = !disp.draw_links;
-            flashText("draw_links = %i", disp.draw_links);
-#endif
-            break;
-            
+
         case 'k':
         {
             if ( altKeyDown )
@@ -767,6 +760,13 @@ void processKey(unsigned char key)
             }
         } break;
             
+#if DRAW_MECA_LINKS
+        case 'K':
+            disp.draw_links = !disp.draw_links;
+            flashText("draw_links = %i", disp.draw_links);
+            break;
+#endif
+
         case 'l': {
             try {
                 std::string file = simul.prop->config_file;
