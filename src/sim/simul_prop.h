@@ -55,7 +55,7 @@ public:
     
     
     /// Current time in the simulated world
-    double    time;
+    double time;
 
     /// A small interval of time
     /**
@@ -78,7 +78,7 @@ public:
      should be such that <em>time_step * R << 1</em>. In practice `time_step * R` should not be higher than 0.2.
      .
      */
-    real      time_step;
+    real time_step;
     
     
     /// Ambient viscosity
@@ -98,15 +98,15 @@ public:
      
      Note that non-linear effects are not taken into account in Cytosim. Hydrodynamic effects are also neglected, such that the drag coefficient of a collection of objects is simply the sum of the individual drag coefficients. However, an `effective` viscosity can be set for each object class, and with this option, it is possible to adjust the drag coefficient of the collection to a realistic value.
      */
-    real      viscosity;
+    real viscosity;
     
 #if NEW_CYTOPLASMIC_FLOW
     /// uniform and constant fluid flow
-    Vector    flow;
+    Vector flow;
 #endif
 #if OLD_SPINDLE_FLUX
     /// special parameter for Spindle simulation (solve=flux)
-    real      flux_speed;
+    real flux_speed;
 #endif
     
     /// Energy of Brownian motion in the system = Temperature * Boltzman constant
@@ -126,7 +126,7 @@ public:
 
      <em>default value = 0.0042</em>
      */
-    real      kT;
+    real kT;
     
     
     /// 32-bits seed for random number generator
@@ -139,7 +139,7 @@ public:
     
      <em>default value = 0</em>
      */
-    unsigned int random_seed;
+    unsigned random_seed;
     
     
     /// Desired precision in the motion of the objects
@@ -152,7 +152,7 @@ public:
      
      <em>default value = 0.05</em>
     */
-    real      tolerance;
+    real tolerance;
     
     
     /// Precision threshold for stochastic events
@@ -169,7 +169,7 @@ public:
      
      <em>default value = 0.5</em>
      */
-    real      acceptable_prob;
+    real acceptable_prob;
     
     
     /// A flag to enable preconditionning when solving the system of equations
@@ -204,7 +204,7 @@ public:
      With many filaments, trying `precondition = [0, 1, 2, 3, 4]' is a good strategy.
      <em>default value = 0</em>
      */
-    unsigned  precondition;
+    unsigned precondition;
 
     /// Number of times a preconditionner block can be used
     /**
@@ -217,16 +217,16 @@ public:
      This only apply to 'precondition == 5'
      <em>default value = 2</em>
      */
-    unsigned  precondition_span;
+    unsigned precondition_span;
     
     /// A flag to control the engine that implement steric interactions between objects
-    int       steric;
+    int steric;
     
     /// Stiffness for repulsive steric interaction (set as steric[1])
-    real      steric_stiffness_push[2];
+    real steric_stiffness_push[2];
     
     /// Stiffness for `attractive` steric interaction (set as steric[2])
-    real      steric_stiffness_pull[2];
+    real steric_stiffness_pull[2];
     
     /// Grid size used to determine steric interactions
     /**
@@ -250,7 +250,7 @@ public:
 
      If the parameter is not set, cytosim attempts to set it automatically.
      */
-    real      steric_max_range;
+    real steric_max_range;
     
     
     /// Grid size used to determine the attachment of Hand to Fiber
@@ -268,36 +268,36 @@ public:
      
      If the parameter is not set, cytosim attempts to set it automatically.
      */
-    real      binding_grid_step;
+    real binding_grid_step;
     
     /// level of verbosity
-    unsigned int  verbose;
+    unsigned verbose;
 
     /// Name of configuration file (<em>default = config.cym</em>)
-    std::string   config_file;
+    std::string config_file;
     
     /// Name of output property file (<em>default = properties.cmo</em>)
-    std::string   property_file;
+    std::string property_file;
     
     /// Name of output trajectory file (also known as `trajectory`, <em>default = objects.cmo</em>)
-    std::string   trajectory_file;
+    std::string trajectory_file;
     
     /// If `true`, any pre-existing trajectory_file will be erased (<em>default = true</em>)
-    bool          clear_trajectory;
+    bool clear_trajectory;
     
     /// If `true` free singles are not saved/read to/from file (<em>default = false</em>)
-    int           skip_free_single;
+    int skip_free_single;
     
     /// If `true` free couples are not saved/read to/from file (<em>default = false</em>)
-    int           skip_free_couple;
+    int skip_free_couple;
 
     /// Display parameters (see @ref DisplayPar)
-    std::string   display;
+    std::string display;
 
     /// @}
 
     /// this is set to true when 'display' is modified, and to 'false' when it is read
-    bool          display_fresh;
+    bool display_fresh;
 
 public:
     
