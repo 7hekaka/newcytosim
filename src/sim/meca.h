@@ -133,37 +133,37 @@ class Meca
 {
 public:
     
-    /// verbose level
-    int             doNotify;
-
-    /// enables graphical display of all interactions
-    bool            drawLinks;
-    
     /// used for recording CPU cycles
     mutable unsigned long long cycles_;
+
+    /// verbose level
+    int doNotify;
+
+    /// enables graphical display of all interactions
+    int drawLinks;
 
 private:
     
     /// list of Mecable containing points to simulate
     Array<Mecable*> mecables;
     
-    /// local copy of time step
-    real            time_step;
+    /// time step for Brownian Mechanics = copy of simul:time_step
+    real   tau_;
 
     /// flag to indicate that result is available
-    int             ready_;
+    int    ready_;
     
     /// total number of points in the system
-    size_t          nPoints_;
+    size_t nPoints_;
     
     /// size of the currently allocated memory
-    size_t          allocated_;
+    size_t allocated_;
     
-    /// residual threshold used for iterative solver
-    real            tolerance_;
+    /// accepted residual threshold when solving linear system
+    real   tolerance_;
 
     /// number of preconditionner blocks that could not be factorized
-    size_t          bump_;
+    size_t bump_;
     
     //--------------------------------------------------------------------------
     // Vectors of size DIM * nbPoints()
@@ -300,7 +300,7 @@ private:
     void addAllRigidity(const real* X, real* Y) const;
 
     /// extract the matrix on-diagonal block corresponding to a Mecable
-    void getBlock(const Mecable*, real* mat) const;
+    void getFullBlock(const Mecable*, real* mat) const;
     
     /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
     void getBandedBlock(const Mecable*, real* mat) const;

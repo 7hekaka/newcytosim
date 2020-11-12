@@ -98,8 +98,8 @@ Meca::Meca()
     useMatrixC = false;
 #endif
     doNotify = 0;
-    drawLinks = false;
-    time_step = 0;
+    drawLinks = 0;
+    tau_ = 0;
 }
 
 
@@ -353,7 +353,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     mec->projectForces(Y+inx, Y+inx);
 
     // Y <- X + alpha * Y
-    blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
+    blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
 }
 
 
@@ -384,7 +384,7 @@ void Meca::multiply(const real* X, real* Y) const
     #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -time_step*mec->leftoverMobility(), Y+inx);
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -tau_*mec->leftoverMobility(), Y+inx);
     }
 #endif
 }
@@ -416,14 +416,14 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
         // T <- P * T
         mec->projectForces(T+inx, T+inx);
         // X <- X + alpha * T = X + alpha * P * FORCE
-        blas::xaxpy(bks, -time_step*mec->leftoverMobility(), T+inx, 1, Y+inx, 1);
+        blas::xaxpy(bks, -tau_*mec->leftoverMobility(), T+inx, 1, Y+inx, 1);
     }
     else
     {
         // Y <- P * T
         mec->projectForces(T+inx, Y+inx);
         // Y <- X + alpha * Y = X + alpha * P * FORCE
-        blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
+        blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
     }
 
     // Y <- PRECONDITIONNER_BLOCK * Y
@@ -468,7 +468,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
     // Y <- P * Y
     mec->projectForces(Y+inx, Y+inx);
     // Y <- X + alpha * Y = X + alpha * P * FORCE
-    blas::xpay(bks, X+inx, -time_step*mec->leftoverMobility(), Y+inx);
+    blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
     
     applyPreconditionner(mec, Y+inx);
 }
@@ -513,8 +513,8 @@ void Meca::multiply(const real* X, real* Y) const
 #endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + alpha * Y
-        const real alpha = -time_step * mec->leftoverMobility();
-        blas::xpay(DIM*mec->nbPoints(), X+inx, alpha, Y+inx);
+        const real beta = -tau_ * mec->leftoverMobility();
+        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
     }
 }
 
@@ -558,7 +558,7 @@ void Meca::getBandedBlock(const Mecable * mec, real* res) const
 {
     const size_t nbp = mec->nbPoints();
 
-    real beta = -time_step * mec->leftoverMobility();
+    const real beta = -tau_ * mec->leftoverMobility();
     
     if ( mec->hasRigidity() )
     {
@@ -638,7 +638,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
 #endif
 
     // scale
-    real beta = -time_step * mec->leftoverMobility();
+    const real beta = -tau_ * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < nbp*nbp; ++n )
         res[n] = beta * res[n];
@@ -658,7 +658,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
  The result is constructed by using functions from mB and mC
  This block is square but not symmetric!
  */
-void Meca::getBlock(const Mecable * mec, real* res) const
+void Meca::getFullBlock(const Mecable * mec, real* res) const
 {
     const size_t nbp = mec->nbPoints();
     const size_t bks = DIM * nbp;
@@ -715,7 +715,7 @@ void Meca::getBlock(const Mecable * mec, real* res) const
         mec->projectForces(res+bks*i, res+bks*i);
     
     // scale
-    real beta = -time_step * mec->leftoverMobility();
+    const real beta = -tau_ * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < bks*bks; ++n )
         res[n] = beta * res[n];
@@ -876,7 +876,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
     if ( may_keep )
     {
         // extract diagonal matrix block corresponding to this Mecable:
-        getBlock(mec, wrk);
+        getFullBlock(mec, wrk);
         
         // chose initial vector for power iteration
         blas::xcopy(bks, vRHS+DIM*mec->matIndex(), 1, vec, 1);
@@ -900,7 +900,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
     else
     {
         // extract diagonal matrix block corresponding to this Mecable:
-        getBlock(mec, blk);
+        getFullBlock(mec, blk);
     }
     
     //verifyBlock(mec, blk);
@@ -1001,7 +1001,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
 #if 0
     const size_t bks = DIM * nbp;
     mec->blockSize(bks, bks*bks, bks);
-    getBlock(mec, mec->block());
+    getFullBlock(mec, mec->block());
     project_matrix<DIM>(nbp, mec->block(), bks, mec->block(), nbp);
     std::clog<<"projected: " << bks << "\n";
     VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
@@ -1051,7 +1051,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
 
     const size_t bks = DIM * nbp;
     mec->blockSize(bks, bks*bks, nbp);
-    getBlock(mec, mec->block());
+    getFullBlock(mec, mec->block());
     project_matrix<DIM>(nbp, mec->block(), bks, mec->block(), nbp);
 
     //const size_t S = std::min(nbp, 16UL);
@@ -1082,7 +1082,7 @@ void Meca::computePrecondFull(Mecable* mec)
     const size_t bks = DIM * mec->nbPoints();
     mec->blockSize(bks, bks*bks, bks);
     
-    getBlock(mec, mec->block());
+    getFullBlock(mec, mec->block());
     //verifyBlock(mec, mec->block());
     
     // calculate LU factorization:
@@ -1141,7 +1141,7 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
     if (( mec->blockType() != 7 ) | ( mec->blockSize() != bks ) | ( age >= span ))
     {
         // recalculate block!
-        getBlock(mec, blk);
+        getFullBlock(mec, blk);
         int info = 0;
         // factorize block
         lapack::xgetf2(bks, bks, blk, bks, piv, &info);
@@ -1377,15 +1377,15 @@ This preforms:
 
  'rhs' and 'fff' are output. Input 'rnd' is a set of independent random numbers
 */
-real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, real* rhs)
+real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real tau, real* rhs)
 {
     real n = mec->addBrownianForces(rnd, alpha, fff);
     
     // Calculate the right-hand-side of the system in vRHS:
     mec->projectForces(fff, rhs);
     
-    // rhs <- beta * rhs, resulting in time_step * P * fff:
-    blas::xscal(DIM*mec->nbPoints(), beta*mec->leftoverMobility(), rhs, 1);
+    // rhs <- tau * rhs, resulting in time_step * P * fff:
+    blas::xscal(DIM*mec->nbPoints(), tau*mec->leftoverMobility(), rhs, 1);
 
     /*
      At this stage, `fff` contains the external forces in each vertex but also
@@ -1451,7 +1451,7 @@ real brownian1(Mecable* mec, real const* rnd, real alpha, real* fff, real beta, 
 size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
     assert_true(ready_==0);
-    time_step = prop->time_step;
+    tau_ = prop->time_step;
 
     prepareMatrices();
     
@@ -1480,7 +1480,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      */
     
     real noiseLevel = INFINITY;
-    const real alpha = prop->kT/time_step;
+    const real alpha = prop->kT / tau_;
     
     /*
      Add Brownian contributions and calculate Minimum value of it
@@ -1494,7 +1494,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         for ( Mecable * mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
-            real n = brownian1(mec, vRND+inx, alpha, vFOR+inx, time_step, vRHS+inx);
+            real n = brownian1(mec, vRND+inx, alpha, vFOR+inx, tau_, vRHS+inx);
             local = std::min(local, n);
             //printf("thread %i min: %f\n", omp_get_thread_num(), local);
         }
@@ -1503,7 +1503,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     }
 
     // scale minimum noise level to serve as a measure of required precision
-    noiseLevel *= time_step;
+    noiseLevel *= tau_;
     
     //printf("noiseLeveld = %8.2e   variance(vRHS) / estimate = %8.4f\n",
     //       noiseLevel, blas::nrm2(dimension(), vRHS) / (noiseLevel * std::sqrt(dimension())) );
@@ -1515,7 +1515,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     if ( prop->flow.norm() > REAL_EPSILON )
     {
         LOG_ONCE("NEW_CYTOPLASMIC_FLOW code enabled\n");
-        Vector flow_dt = prop->flow * time_step;
+        Vector flow_dt = prop->flow * tau_;
         for ( int p = 0; p < dimension(); ++p )
             flow_dt.add_to(vRHS+DIM*p);
     }
@@ -2183,7 +2183,7 @@ void Meca::dump() const
     fclose(f);
     
     f = fopen("stp.txt", "w");
-    fprintf(f, "%f %f\n", time_step, tolerance_);
+    fprintf(f, "%f %f\n", tau_, tolerance_);
     fclose(f);
  
     f = fopen("drg.bin", "wb");
