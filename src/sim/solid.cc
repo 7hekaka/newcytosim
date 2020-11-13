@@ -725,11 +725,11 @@ void Solid::fixShape()
     
     //std::clog << "Fixing Solid " << reference() << " with " << nPoints << " points\n";
     
-    Vector avg, sec;
-    calculateMomentum(avg, sec, true);
+    Vector avg, dev;
+    calculateMomentum(avg, dev);
     
     // store momentum of the current shape:
-    soShapeSqr = sec.e_sum();
+    soShapeSqr = dev.e_sum();
     
     //we store the current points:
     soShapeSize = nPoints;
@@ -771,11 +771,11 @@ void Solid::scaleShape(const real scale[DIM])
  */
 void Solid::rescale()
 {
-    Vector avg, sec;
-    calculateMomentum(avg, sec, true);
+    Vector avg, dev;
+    calculateMomentum(avg, dev);
     
     // calculate the momentum of the current shape:
-    real M = sec.e_sum();
+    real M = dev.e_sum();
     
     if ( M > 0 )
     {

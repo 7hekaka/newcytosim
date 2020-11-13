@@ -147,11 +147,11 @@ public:
     /// Set to `n_pts` points copied from `pts[]`
     void            setPoints(const real pts[], size_t n_pts);
     
-    /// copy current vertex coordinates to given array
+    /// copy current vertex coordinates to given array, assuming it is suitably allocated
     void            putPoints(real*) const;
 
-    /// Copy point coordinates to array `ptr[]`, allocated to hold `ptr_n` scalars
-    int             putPoints(float ptr[], size_t ptr_n) const;
+    /// Copy current vertex coordinates to `ptr[]`, already allocated to hold `cnt` scalars
+    int             putPoints(float ptr[], size_t cnt) const;
 
     /// Add a point and expand the object, returning the array index that was used
     size_t          addPoint(Vector const& w);
@@ -178,7 +178,7 @@ public:
     void            addNoise(real amount);
     
     /// calculate first and second momentum of point coordinates
-    void            calculateMomentum(Vector&, Vector&, bool sub);
+    void            calculateMomentum(Vector& avg, Vector& dev);
     
     //--------------------------------------------------------------------------
     
@@ -225,10 +225,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// Allocate memory to store given number of vertices
-    virtual size_t  allocateMecable(size_t);
+    virtual size_t allocateMecable(size_t);
     
     /// free allocated memory
-    void            release();
+    void release();
     
     /// prepare the Mecable to solve the mechanics in Meca::solve()
     /**
@@ -238,80 +238,80 @@ public:
      - set matrix/variables necessary for constrained dynamics
      .
      */
-    virtual void    prepareMecable() = 0;
+    virtual void prepareMecable() = 0;
 
     /// Calculate the mobility coefficient
-    virtual void    setDragCoefficient() = 0;
+    virtual void setDragCoefficient() = 0;
     
     /// The total drag coefficient of the object ( force = drag * speed )
-    virtual real    dragCoefficient() const = 0;
+    virtual real dragCoefficient() const = 0;
 
     /// Add Brownian noise terms to a force vector (alpha = kT / timestep)
-    virtual real    addBrownianForces(real const* rnd, real alpha, real* rhs) const { return INFINITY; }
+    virtual real addBrownianForces(real const* rnd, real alpha, real* rhs) const { return INFINITY; }
     
     /// add the interactions (for example due to confinements)
-    virtual void    setInteractions(Meca&) const {}
+    virtual void setInteractions(Meca&) const {}
     
     //--------------------------------------------------------------------------
     
     /// Store the index where coordinates are located in Meca
-    void            setIndex(size_t inx)       { pIndex = inx; }
+    void        setIndex(size_t inx)       { pIndex = inx; }
     
     /// Index in mB of the first point. the index in the vectors is DIM*matIndex()
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */
-    size_t          matIndex()           const { return pIndex; }
+    size_t      matIndex()   const { return pIndex; }
 
     /// Returns current size of block allocated for preconditionning
-    size_t          blockSize()          const { return pBlockSize; }
+    size_t      blockSize()  const { return pBlockSize; }
     
     /// set size of block needed for preconditionning, allocating memory 'alc'
-    void            blockSize(size_t, size_t block, size_t pivot);
+    void        blockSize(size_t, size_t block, size_t pivot);
     
     /// True if preconditionner block is 'in use'
-    int             blockType()          const { return pBlockType; }
+    int         blockType()  const { return pBlockType; }
 
     /// Returns address of memory allocated for preconditionning
-    real *          block()              const { return pBlock; }
+    real *      block()      const { return pBlock; }
     
     /// Returns address of memory allocated for preconditionning (pivot)
-    int *           pivot()              const { return pPivot; }
+    int *       pivot()      const { return pPivot; }
     
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void            blockType(int t)           { pBlockType = t; pBlockAge = 0; }
+    void        blockType(int t)   { pBlockType = t; pBlockAge = 0; }
 
     /// True if preconditionner block is 'in use'
-    int             blockAge()           const { return pBlockAge; }
+    int         blockAge()   const { return pBlockAge; }
     
     /// Change preconditionning flag
-    void            blockAge(int b)            { pBlockAge = b; }
+    void        blockAge(int b)    { pBlockAge = b; }
 
     /// Returns matrix allocated for preconditionning
-    MatrixFull&     blockMatrix()              { return pBlockMatrix; }
+    MatrixFull& blockMatrix()      { return pBlockMatrix; }
     
     /// Returns matrix allocated for preconditionning
-    void            blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
+    void        blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
 #else
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void            blockType(int t)           { pBlockType = t; }
+    void        blockType(int t)   { pBlockType = t; }
 #endif
     //--------------------------------------------------------------------------
     
     /// returns the force on point `p` calculated at the previous Meca::solve()
-    Vector          netForce(const size_t p) const;
+    Vector      netForce(const size_t p) const;
     
     /// replace current forces by the ones provided as argument
-    virtual void    getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
+    virtual void getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
     
     //--------------------------------------------------------------------------
     
     /// return type of fiber rigidity { 0 : none, 1: fiber }
-    virtual int     hasRigidity() const { return 0; }
+    virtual int hasRigidity() const { return 0; }
 
     /// return fiber rigidity
-    virtual real    fiberRigidity() const { return 0; }
+    virtual real fiberRigidity() const { return 0; }
 
     /// Add rigidity terms Y <- Y + Rigidity * X
     /**
@@ -319,7 +319,7 @@ public:
      for example, the bending rigidity of Fibers.
      This version is used to calculate the Matrix * Vector in Meca.
      */
-    virtual void    addRigidity(const real* X, real* Y) const {}
+    virtual void addRigidity(const real* X, real* Y) const {}
 
     /// Calculate speeds for given forces: Y <- forces(X)
     /**
@@ -335,59 +335,59 @@ public:
      
      The default implementation ( Y <- 0 ) makes the object immobile
      */
-    virtual void    projectForces(const real* X, real* Y) const { zero_real(DIM*nPoints, Y); }
+    virtual void projectForces(const real* X, real* Y) const { zero_real(DIM*nPoints, Y); }
     
     /// Return drag coefficient that was not applied by projectForces()
-    virtual real    leftoverMobility() const { return 1.0; }
+    virtual real leftoverMobility() const { return 1.0; }
 
     //--------------------------------------------------------------------------
 
-    /// set the terms obtained from the linearization of the Projection operator, from the given forces
+    /// set terms derived from the Projection operator, from the given forces
     /** This is enabled by a keyword ADD_PROJECTION_DIFF in meca.cc */
-    virtual void    makeProjectionDiff(const real* force) {}
+    virtual void makeProjectionDiff(const real* force) {}
     
     /// add terms from projection correction terms: Y <- Y + P' * X;
     /** This is enabled by a keyword ADD_PROJECTION_DIFF in meca.cc */
-    virtual void    addProjectionDiff(const real* X, real* Y) const {}
+    virtual void addProjectionDiff(const real* X, real* Y) const {}
     
     /// true if addProjectionDiff() does something
-    virtual bool    hasProjectionDiff() const { return false; }
+    virtual bool hasProjectionDiff() const { return false; }
     
     //--------------------------------------------------------------------------
     //           Position-related functions derived from Movable
     //--------------------------------------------------------------------------
     
     /// Position of center of gravity
-    virtual Vector  position() const;
+    virtual Vector position() const;
     
     /// Mecable accepts translation and rotation
-    virtual int     mobile() const { return 3; }
+    virtual int    mobile() const { return 3; }
     
     /// Translate object (moves all the points by the same vector)
-    virtual void    translate(Vector const&);
+    virtual void   translate(Vector const&);
     
     /// Rotate object by given rotation
-    virtual void    rotate(Rotation const&);
+    virtual void   rotate(Rotation const&);
     
     /// Modulo around the first point
-    virtual void    foldPosition(Modulo const*);
+    virtual void   foldPosition(Modulo const*);
     
     /// true if all points are inside Space
-    bool            allInside(Space const*) const;
+    bool           allInside(Space const*) const;
     
     //--------------------------------------------------------------------------
     
     /// Write to file
-    void            write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// Read from file
-    void            read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// Human friendly ouput
-    void            print(std::ostream&, real const*) const;
+    void print(std::ostream&, real const*) const;
     
     /// return (validated) index encoded in `str`
-    size_t          point_index(std::string const& str) const;
+    size_t point_index(std::string const& str) const;
 
 };
 

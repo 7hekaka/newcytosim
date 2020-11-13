@@ -305,8 +305,9 @@ void HandProp::checkStiffness(real stiff, real len, real mul, real kT) const
     
     if ( en > 10.0 && binding_rate > 0 )
     {
-        Cytosim::warn << "binding of `" << name() << "' is thermodynamically unfavorable: stiffness * binding_range^2 = " << en << " kT\n";
-        //<< PREF << "you could decrease stiffness or binding_range\n";
+        Cytosim::warn << "binding of `" << name() << "' is thermodynamically unfavorable: ";
+        Cytosim::warn << "stiffness * binding_range^2 = " << en << " kT\n";
+        //Cytosim::warn << "you could decrease stiffness or binding_range\n";
     }
     
     real ap = std::exp( stiff * dis * unbinding_force_inv );

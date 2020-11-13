@@ -131,10 +131,10 @@ void Mecable::release()
 size_t Mecable::addPoint(Vector const& vec)
 {
     allocateMecable(nPoints+1);
-    size_t p = nPoints++;
-    //std::clog << "mecable " << reference() << " point" << p+1 << " = " << vec << "\n";
-    vec.store(pPos+DIM*p);
-    return p;
+    size_t i = nPoints++;
+    //std::clog << "mecable " << reference() << " point" << i+1 << " = " << vec << "\n";
+    vec.store(pPos+DIM*i);
+    return i;
 }
 
 
@@ -171,8 +171,8 @@ void Mecable::truncateM(const size_t p)
     
     size_t np = nPoints - p;
     
-    for ( size_t ii = 0; ii < DIM*np; ++ii )
-        pPos[ii] = pPos[ii+DIM*p];
+    for ( size_t i = 0; i < DIM*np; ++i )
+        pPos[i] = pPos[i+DIM*p];
     
     nPoints = np;
 }
@@ -194,45 +194,47 @@ void Mecable::resetPoints()
 {
     if ( pPos )
     {
-        for ( size_t p = 0; p < DIM*pAllocated; ++p )
-            pPos[p] = 0;
+        for ( size_t i = 0; i < DIM*pAllocated; ++i )
+            pPos[i] = 0;
     }
 }
 
 
-void Mecable::addNoise(const real amount)
+void Mecable::addNoise(const real mag)
 {
-    for ( size_t p = 0; p < DIM*nPoints; ++p )
-        pPos[p] += amount * RNG.sreal();
+    for ( size_t i = 0; i < DIM*nPoints; ++i )
+        pPos[i] += mag * RNG.sreal();
 }
 
 
 void Mecable::translate(Vector const& T)
 {
-    for ( size_t p = 0; p < nPoints; ++p )
-        T.add_to(pPos+DIM*p);
+    for ( size_t i = 0; i < nPoints; ++i )
+        T.add_to(pPos+DIM*i);
 }
 
 
 void Mecable::rotate(Rotation const& T)
 {
-    for ( size_t p = 0; p < nPoints; ++p)
-        ( T.vecmul(pPos+DIM*p) ).store(pPos+DIM*p);
+    for ( size_t i = 0; i < nPoints; ++i)
+        ( T.vecmul(pPos+DIM*i) ).store(pPos+DIM*i);
 }
 
 
 //------------------------------------------------------------------------------
 #pragma mark - Export/Inport
 
-void Mecable::putPoints(real * ptr) const
+/** Assuming that ptr[] is rightfully allocated! */
+void Mecable::putPoints(real * pts) const
 {
-    copy_real(DIM*nPoints, pPos, ptr);
+    copy_real(DIM*nPoints, pPos, pts);
 }
 
 
-void Mecable::getPoints(const real * ptr)
+/** Assuming that ptr[] is rightfully allocated! */
+void Mecable::getPoints(const real * pts)
 {
-    copy_real(DIM*nPoints, ptr, pPos);
+    copy_real(DIM*nPoints, pts, pPos);
 }
 
 
@@ -244,9 +246,10 @@ void Mecable::setPoints(const real pts[], const size_t nbp)
 
 
 /**
-Copy the coordinates of the points of Object to array `ptr[]`, previously
+Copy the coordinates of the points of Object to array `ptr[]`, which has been
 allocated to hold `cnt` coordinates. Thus in 3D, `cnt` should be >= 3*Object::nbPoints()
 Exactly 3*Object::nbPoints() values are set at most. The Z component is set to zero in 2D mode.
+The data is converted to single precision.
 
 @return error code: 0 = no error, 1 = insufficient allocation
 */
@@ -287,40 +290,40 @@ Vector Mecable::netForce(const size_t p) const
 Vector Mecable::position() const
 {
     Vector sum = posP(0);
-    for ( size_t p = 1; p < nPoints; ++p )
-        sum += posP(p);
+    for ( size_t i = 1; i < nPoints; ++i )
+        sum += posP(i);
     return sum / real(nPoints);
 }
 
 
 /**
- Calculate first and second moment of point distribution:
+ Calculate first and second moment of vertex coordinates:
  - avg = sum( P ) / nb_points
- - sec = sum( P * P );
+ - dev = sum( P .* P ) / nb_points - square( avg );
  .
- if 'sub = true', the average is substracted from 'sec'
  */
-void Mecable::calculateMomentum(Vector& avg, Vector& sec, bool sub)
+void Mecable::calculateMomentum(Vector& avg, Vector& dev)
 {
     avg.reset();
-    sec.reset();
+    dev.reset();
     
     // calculate first and second moments:
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
-        avg += posP(p);
-        sec += posP(p).e_squared();
+        Vector x = posPoint(i);
+        avg += x;
+        dev += x.e_squared();
         /*
-         real const* pp = pPos + DIM*p;
+         real const* pp = pPos + DIM*i;
          avg.XX += pp[0];
-         sec.XX += pp[0] * pp[0];
+         dev.XX += pp[0] * pp[0];
          #if ( DIM > 1 )
          avg.YY += pp[1];
-         sec.YY += pp[1] * pp[1];
+         dev.YY += pp[1] * pp[1];
          #endif
          #if ( DIM > 2 )
          avg.ZZ += pp[2];
-         sec.ZZ += pp[2] * pp[2];
+         dev.ZZ += pp[2] * pp[2];
          #endif
          */
     }
@@ -328,11 +331,10 @@ void Mecable::calculateMomentum(Vector& avg, Vector& sec, bool sub)
     if ( nPoints > 1 )
     {
         avg /= nPoints;
-        sec /= nPoints;
+        dev /= nPoints;
     }
     
-    if ( sub )
-        sec -= avg.e_squared();
+    dev -= avg.e_squared();
 }
 
 
@@ -346,9 +348,9 @@ void Mecable::foldPosition(Modulo const* s)
 
 bool Mecable::allInside(Space const* spc) const
 {
-    for ( size_t ii = 0; ii < nPoints; ++ii )
+    for ( size_t i = 0; i < nPoints; ++i )
     {
-        if ( spc->outside(posP(ii)) )
+        if ( spc->outside(posP(i)) )
             return false;
     }
     return true;
@@ -361,8 +363,8 @@ bool Mecable::allInside(Space const* spc) const
 void Mecable::write(Outputter& out) const
 {
     out.writeUInt16(nPoints);
-    for ( size_t p = 0; p < nPoints ; ++p )
-        out.writeFloats(pPos+DIM*p, DIM, '\n');
+    for ( size_t i = 0; i < nPoints ; ++i )
+        out.writeFloats(pPos+DIM*i, DIM, '\n');
 }
 
 
@@ -376,8 +378,8 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
         resetPoints();
         nPoints = nb;
 #if ( 1 )
-        for ( size_t p = 0; p < nb ; ++p )
-            in.readFloats(pPos+DIM*p, DIM);
+        for ( size_t i = 0; i < nb ; ++i )
+            in.readFloats(pPos+DIM*i, DIM);
 #else
         in.readFloats(pPos, nb, DIM);
 #endif

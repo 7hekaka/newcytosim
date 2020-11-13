@@ -271,11 +271,11 @@ public:
     real         abscissaM() const { return fnAbscissaM; }
     
     /// abscissa of center, midway between MINUS_END and PLUS_END
-    //real       abscissaC()             const { return fnAbscissaM + 0.5 * length(); }
+    //real       abscissaC() const { return fnAbscissaM + 0.5 * length(); }
     real         abscissaC() const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
 
     /// signed distance from ORIGIN to PLUS_END (abscissa of PLUS_END)
-    //real       abscissaP()             const { return fnAbscissaM + length(); }
+    //real       abscissaP() const { return fnAbscissaM + length(); }
     real         abscissaP() const { return fnAbscissaP; }
 
     /// signed distance from ORIGIN to vertex specified with index (or intermediate position)
