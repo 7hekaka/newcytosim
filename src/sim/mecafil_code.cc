@@ -701,15 +701,14 @@ void projectForcesD3D_AVX(size_t nbs, const real* dir, const real* src, const re
         p2 = blend4(p2, broadcast1(mul+3), 0b1110);
         
         mul += 4;
-        vec4 a0 = fmadd4(p0, load4(dir  ), loadu4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dir+4), loadu4(src+4));
-        vec4 a2 = fmadd4(p2, load4(dir+8), loadu4(src+8));
-        a0 = fnmadd4(m0, loadu4(dir-3), a0);
-        a1 = fnmadd4(m1, loadu4(dir+1), a1);
-        a2 = fnmadd4(m2, loadu4(dir+5), a2);
-        storeu4(dst  , a0);
-        storeu4(dst+4, a1);
-        storeu4(dst+8, a2);
+        vec4 a0 = fnmadd4(m0, loadu4(dir-3), loadu4(src  ));
+        vec4 a1 = fnmadd4(m1, loadu4(dir+1), loadu4(src+4));
+        vec4 a2 = fnmadd4(m2, loadu4(dir+5), loadu4(src+8));
+
+        storeu4(dst  , fmadd4(p0, load4(dir  ), a0));
+        storeu4(dst+4, fmadd4(p1, load4(dir+4), a1));
+        storeu4(dst+8, fmadd4(p2, load4(dir+8), a2));
+
         dir += 12;
         dst += 12;
         src += 12;

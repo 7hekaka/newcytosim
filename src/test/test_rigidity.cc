@@ -14,9 +14,9 @@
 #define FOR 4
 
 /// number of segments:
-const size_t NBS = 127;
-const size_t NCO = FOR * ( NBS + 1 );
-const size_t ALOC = NCO + 8;
+const size_t NSEG = 127;
+const size_t NVAL = FOR * ( NSEG + 1 );
+const size_t ALOC = NVAL + 8;
 
 const size_t DISP = 16UL;
 
@@ -52,7 +52,7 @@ inline void print_alignment(real const* ptr, const char msg[])
 
 void setFilament(real* ptr, size_t np, real seg, real persistence_length)
 {
-    np = std::min(np, NBS+1);
+    np = std::min(np, NSEG+1);
     real sigma = std::sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
@@ -71,7 +71,7 @@ void setFilament(real* ptr, size_t np, real seg, real persistence_length)
 
 void new_reals(real*& p, real*& x, real*& y, real*& z, real mag)
 {
-    p = new_real(NCO);
+    p = new_real(NVAL);
     x = new_real(ALOC);
     y = new_real(ALOC);
     z = new_real(ALOC);
@@ -461,7 +461,7 @@ inline void toc(const char* str, double num) { printf(" %4s %5.2f cycles\n", str
 
 void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
 {
-    const size_t nbt = DIM * ( NBS - 1 );
+    const size_t nbt = DIM * ( NSEG - 1 );
     const real alpha = 2.0;
     
     zero_real(ALOC, vX);
@@ -514,8 +514,8 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     new_reals(vP, vX, vY, vZ, 1.0);
-    setFilament(vP, NBS+1, 0.1, 20.0);
-    std::cout << "addRigidity " << DIM << "D " << NBS;
+    setFilament(vP, NSEG+1, 0.1, 20.0);
+    std::cout << "addRigidity " << DIM << "D " << NSEG;
     std::cout << "   " << __VERSION__ << "\n";
     testRigidity(1<<20);
     free_reals(vP, vX, vY, vZ);

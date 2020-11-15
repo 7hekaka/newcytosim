@@ -21,7 +21,7 @@
 #include "matfull.h"
 
 using namespace TicToc;
-size_t NCO = 15;
+size_t NVAL = 15;
 
 Vector4 dir(0, 1, 0);
 Vector4 off(0.1, 0.2, -0.3);
@@ -83,7 +83,7 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
     
     const int N = (int)size;
     blas::xgemv('N', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
-    VecPrint::print(std::cout, std::min(size,NCO), x);
+    VecPrint::print(std::cout, std::min(size,NVAL), x);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -103,7 +103,7 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
     
     toc("  DGEMV");
     blas::xgemv('T', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
-    VecPrint::print(std::cout, std::min(size,NCO), x);
+    VecPrint::print(std::cout, std::min(size,NVAL), x);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -137,7 +137,7 @@ void speedMatrix(size_t size, size_t cnt)
     printf("Matrix %s size %lu\n", mat.what().c_str(), size);
 
     mat.vecMul0(s, x);
-    VecPrint::print(std::cout, std::min(size,NCO), x);
+    VecPrint::print(std::cout, std::min(size,NVAL), x);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -148,7 +148,7 @@ void speedMatrix(size_t size, size_t cnt)
     toc(" SCALAR");
 
     mat.vecMul(s, x);
-    VecPrint::print(std::cout, std::min(size,NCO), x);
+    VecPrint::print(std::cout, std::min(size,NVAL), x);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -162,7 +162,7 @@ void speedMatrix(size_t size, size_t cnt)
     
     mat.transpose();
     mat.transVecMul(s, x);
-    VecPrint::print(std::cout, std::min(size,NCO), x);
+    VecPrint::print(std::cout, std::min(size,NVAL), x);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {

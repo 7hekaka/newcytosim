@@ -29,9 +29,10 @@ inline void toc(const char* str, double num) { printf("  %10s %5.2f\n", str, dou
 
 
 /// number of segments:
-const size_t NBS = 126;
-const size_t NCO = DIM * ( NBS + 1 );
-const size_t ALOC = NCO + 8;
+const size_t NSEG = 127;
+/// number of vertex coordinates
+const size_t NVAL = DIM * ( NSEG + 1 );
+const size_t ALOC = NVAL + 8;
 
 const size_t DISP = 24UL;
 
@@ -45,20 +46,24 @@ void nan_fill(size_t cnt, real * ptr)
 }
 
 
-void nan_real(size_t cnt, real*& ptr)
+void new_nans(size_t cnt, real*& ptr)
 {
     free_real(ptr);
     ptr = new_real(cnt);
     nan_fill(cnt, ptr);
+    //printf("%p = new_nans(%lu)\n", ptr, cnt);
 }
 
-void nan_reals(size_t cnt, real*& x, real*& y, real*& z, real mag)
+void new_nans(size_t cnt, real*& x, real*& y, real*& z)
 {
-    x = new_real(cnt);
-    y = new_real(cnt);
-    z = new_real(cnt);
-    
-    for ( size_t i=0; i<cnt; ++i )
+    new_nans(cnt, x);
+    new_nans(cnt, y);
+    new_nans(cnt, z);
+}
+
+void randomize(size_t cnt, real*& x, real*& y, real*& z, real mag)
+{
+    for ( size_t i = 0; i < cnt; ++i )
     {
         x[i] = mag * RNG.sreal();
         y[i] = mag * RNG.sreal();
@@ -66,11 +71,19 @@ void nan_reals(size_t cnt, real*& x, real*& y, real*& z, real mag)
     }
 }
 
-void free_reals(real* x, real* y, real* z)
+void free_reals(real*& x, real*& y, real*& z)
 {
-    free_real(x);
-    free_real(y);
-    free_real(z);
+    free_real(x); x = nullptr;
+    free_real(y); y = nullptr;
+    free_real(z); z = nullptr;
+}
+
+void free_reals(real*& x, real*& y, real*& z, real*& t)
+{
+    free_real(x); x = nullptr;
+    free_real(y); y = nullptr;
+    free_real(z); z = nullptr;
+    free_real(t); t = nullptr;
 }
 
 
@@ -129,11 +142,12 @@ real *diag_=nullptr, *upper_=nullptr;
 
 void setFilament(size_t nbs, real seg, real persistence_length, real mag)
 {
-    nbs = std::min(nbs, NBS+1);
+    nbs = std::min(nbs, NSEG);
     size_t nbv = DIM * ( nbs + 1 );
-    nan_real(nbv, pos_);
-    nan_real(nbv, dir_);
-    nan_real(nbs, lag_);
+    new_nans(nbv, pos_);
+    new_nans(nbv, dir_);
+    new_nans(nbv, lag_);
+    new_nans(nbv, force_);
 
     real sigma = std::sqrt(2.0*seg/persistence_length);
     
@@ -153,7 +167,6 @@ void setFilament(size_t nbs, real seg, real persistence_length, real mag)
     }
     pos.store(pos_+DIM*nbs);
     
-    nan_real(nbv, force_);
     for ( size_t i = 0 ; i < nbv; ++i )
         force_[i] = mag * RNG.sreal();
     
@@ -163,8 +176,8 @@ void setFilament(size_t nbs, real seg, real persistence_length, real mag)
 
 void setProjection(size_t nbs)
 {
-    nan_real(nbs, diag_);
-    nan_real(nbs, upper_);
+    new_nans(nbs, diag_);
+    new_nans(nbs, upper_);
     
     size_t j = 0;
     for ( ; j < nbs-1; ++j )
@@ -192,7 +205,7 @@ void setProjection(size_t nbs)
 void setAnisotropy(size_t nbs)
 {
     const size_t sup = DIM * nbs;
-    nan_real(sup+DIM, ani_);
+    new_nans(sup+DIM, ani_);
 
     // for the extremities, the direction of the nearby segment is used.
     for ( size_t d = 0; d < DIM; ++d )
@@ -441,6 +454,80 @@ void projectForcesU2D_AVY(size_t nbs, const real* dif, const real* src, real* mu
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP 3D
 
+#if REAL_IS_DOUBLE && defined __SSE3__
+
+void projectForcesU3D_SSE(size_t nbs, const real* dif, const real* src, real* mul)
+{
+    const real *const end = mul + nbs - 1;
+#if 1
+    // unrolled bulk of the calculation, processing 4x3 scalars
+    while ( mul < end-2 )
+    {
+        /*
+         *mul = dif[0] * ( src[DIM  ] - src[0] )
+              + dif[1] * ( src[DIM+1] - src[1] )
+              + dif[2] * ( src[DIM+2] - src[2] );
+         */
+        vec2 s0 = mul2(load2(dif  ), sub2(loadu2(src+3), loadu2(src  )));
+        vec2 s1 = mul2(load2(dif+2), sub2(loadu2(src+5), loadu2(src+2)));
+        vec2 s2 = mul2(load2(dif+4), sub2(loadu2(src+7), loadu2(src+4)));
+        vec2 ss = shuffle2(s0, s2, 0b01);
+        vec2 tt = blend2(s0, s2, 0b10);
+
+        vec2 t0 = mul2(load2(dif+ 6), sub2(loadu2(src+ 9), loadu2(src+ 6)));
+        vec2 t1 = mul2(load2(dif+ 8), sub2(loadu2(src+11), loadu2(src+ 8)));
+        vec2 t2 = mul2(load2(dif+10), sub2(loadu2(src+13), loadu2(src+10)));
+        vec2 xx = shuffle2(t0, t2, 0b01);
+        vec2 yy = blend2(t0, t2, 0b10);
+
+        store2(mul, add2(tt, add2(s1, ss)));
+        store2(mul+2, add2(yy, add2(t1, xx)));
+
+        src += 12;
+        dif += 12;
+        mul += 4;
+    }
+#endif
+    // bulk of the calculation, processing 2x3 scalars
+    while ( mul < end )
+    {
+        /*
+         *mul = dif[0] * ( src[DIM  ] - src[0] )
+              + dif[1] * ( src[DIM+1] - src[1] )
+              + dif[2] * ( src[DIM+2] - src[2] );
+         */
+        vec2 s0 = mul2(load2(dif  ), sub2(loadu2(src+3), loadu2(src  )));
+        vec2 s1 = mul2(load2(dif+2), sub2(loadu2(src+5), loadu2(src+2)));
+        vec2 s2 = mul2(load2(dif+4), sub2(loadu2(src+7), loadu2(src+4)));
+
+        vec2 ss = shuffle2(s0, s2, 0b01);
+        vec2 tt = blend2(s0, s2, 0b10);
+
+        store2(mul, add2(tt, add2(s1, ss)));
+        
+        src += 6;
+        dif += 6;
+        mul += 2;
+    }
+    // process remaining vector, 3 scalars
+    if ( mul <= end )
+    {
+         /*
+          *mul = dif[0] * ( src[DIM  ] - src[0] )
+               + dif[1] * ( src[DIM+1] - src[1] )
+               + dif[2] * ( src[DIM+2] - src[2] );
+          */
+         vec2 s0 = mul2(load2(dif  ), sub2(loadu2(src+3), loadu2(src)));
+         vec2 s1 = mul1(load1(dif+2), sub1(load1(src+5), load1(src+2)));
+         vec2 ss = unpackhi2(s0, setzero2());
+
+         store1(mul, add1(s0, add1(s1, ss)));
+   }
+    assert_true(mul==end+3);
+}
+
+#endif
+
 #if REAL_IS_DOUBLE && defined __AVX__
 
 inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
@@ -547,20 +634,23 @@ void projectForcesU3D_AVX(size_t nbs, const real* dif, const real* src, real* mu
 void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    nan_reals(ALOC, x, y, z, 1.0);
-    
-    func(NBS, dir_, force_, lag_);
-    VecPrint::print(std::cout, std::min(DISP,NBS+1), lag_);
+    new_nans(ALOC, x, y, z);
+    randomize(NVAL, x, y, z, 1.0);
+    nan_fill(NVAL, lag_);
 
+    func(NSEG, dir_, force_, lag_);
+    VecPrint::print(std::cout, std::min(DISP,NSEG), lag_);
+    std::cout << " |";
+    VecPrint::print(std::cout, 1, lag_+NSEG);
     tic();
-    for ( size_t ii=0; ii<cnt; ++ii )
+    for ( size_t i=0; i<cnt; ++i )
     {
-        func(NBS, dir_, y, z);
+        func(NSEG, dir_, y, z);
         // check the code with unaligned memory:
-        func(NBS, dir_, x+DIM, y);
-        func(NBS, dir_, z, y);
+        func(NSEG, dir_, x+DIM, y);
+        func(NSEG, dir_, z, y);
     }
-    toc(str, cnt*NBS);
+    toc(str, cnt*NSEG);
     
     free_reals(x,y,z);
 }
@@ -568,7 +658,7 @@ void testU(size_t cnt, void (*func)(size_t, const real*, const real*, real*), ch
 
 void testProjectionU(size_t cnt)
 {
-    std::cout << "testProjection UP " << DIM << "D " << NBS << "\n";
+    std::cout << "testProjection UP " << DIM << "D " << NSEG << "\n";
     testU(cnt, projectForcesU_,    " U_   ");
     testU(cnt, projectForcesU_PTR, " U_PTR");
     testU(cnt, projectForcesU_TWO, " U_TWO");
@@ -578,6 +668,9 @@ void testProjectionU(size_t cnt)
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __AVX__
     testU(cnt, projectForcesU2D_AVX, " U_AVX");
     testU(cnt, projectForcesU2D_AVY, " U_AVY");
+#endif
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __SSE__
+    testU(cnt, projectForcesU3D_SSE, " U_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __AVX__
     testU(cnt, projectForcesU3D_AVX, " U_AVX");
@@ -817,43 +910,123 @@ void projectForcesD2D_AVX(size_t nbs, const real* dif,
 #endif
 
 /*
- void projectForcesD_(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
- {
-     for ( size_t d = 0, e = DIM*nbs; d < DIM; ++d, ++e )
-     {
-         Y[d] = X[d] + dif[d    ] * mul[    0];
-         Y[e] = X[e] - dif[e-DIM] * mul[nbs-1];
-     }
-     
-     for ( size_t jj = 1; jj < nbs; ++jj )
-     {
-         const size_t kk = DIM*jj;
-         Y[kk  ] = X[kk  ] + dif[kk  ] * mul[jj] - dif[kk-DIM  ] * mul[jj-1];
-         Y[kk+1] = X[kk+1] + dif[kk+1] * mul[jj] - dif[kk-DIM+1] * mul[jj-1];
-         Y[kk+2] = X[kk+2] + dif[kk+2] * mul[jj] - dif[kk-DIM+2] * mul[jj-1];
-     }
- 
-         Y[0] = X[0] + dif[0] * mul[0] - dif[-3] * mul[-1];
-         Y[1] = X[1] + dif[1] * mul[0] - dif[-2] * mul[-1];
-         Y[2] = X[2] + dif[2] * mul[0] - dif[-1] * mul[-1];
- 
-         Y[3] = X[3] + dif[3] * mul[1] - dif[0] * mul[0];
-         Y[4] = X[4] + dif[4] * mul[1] - dif[1] * mul[0];
-         Y[5] = X[5] + dif[5] * mul[1] - dif[2] * mul[0];
- 
-         Y[6] = X[6] + dif[6] * mul[2] - dif[3] * mul[1];
-         Y[7] = X[7] + dif[7] * mul[2] - dif[4] * mul[1];
-         Y[8] = X[8] + dif[8] * mul[2] - dif[5] * mul[1];
- 
-         Y[9] = X[9] + dif[9] * mul[3] - dif[6] * mul[2];
-         Y[A] = X[A] + dif[A] * mul[3] - dif[7] * mul[2];
-         Y[B] = X[B] + dif[B] * mul[3] - dif[8] * mul[2];
+ 3D workflow:
+     Y[0] = X[0] + dif[0] * mul[0] - dif[-3] * mul[-1];
+     Y[1] = X[1] + dif[1] * mul[0] - dif[-2] * mul[-1];
 
-         Y[C] = X[C] + dif[C] * mul[4] - dif[9] * mul[3];
-         Y[D] = X[D] + dif[D] * mul[4] - dif[A] * mul[3];
-         Y[E] = X[E] + dif[E] * mul[4] - dif[B] * mul[3];
-      }
- }
+     Y[2] = X[2] + dif[2] * mul[0] - dif[-1] * mul[-1];
+     Y[3] = X[3] + dif[3] * mul[1] - dif[0] * mul[0];
+
+     Y[4] = X[4] + dif[4] * mul[1] - dif[1] * mul[0];
+     Y[5] = X[5] + dif[5] * mul[1] - dif[2] * mul[0];
+ */
+
+#if REAL_IS_DOUBLE && defined __SSE__
+void projectForcesD3D_SSE(size_t nbs, const real* dif,
+                          const real* src, const real* mul, real* dst)
+{
+    real const*const end = mul - 1 + nbs;
+    // first round involving 6 scalars = 3 SSE vectors
+    if ( mul < end )
+    {
+        vec2 m0 = loaddup2(mul);
+        vec2 m1 = loaddup2(mul+1);
+        vec2 p0 = unpacklo2(setzero2(), m0);
+        vec2 p1 = unpacklo2(m0, m1);
+
+        mul += 2;
+        vec2 a0 = fmadd2(m0, load2(dif  ), loadu2(src  ));
+        vec2 a1 = fmadd2(p1, load2(dif+2), loadu2(src+2));
+        vec2 a2 = fmadd2(m1, load2(dif+4), loadu2(src+4));
+
+        storeu2(dst  , a0);
+        storeu2(dst+2, fnmadd2(p0, loaddup2(dif), a1));
+        storeu2(dst+4, fnmadd2(m0, loadu2(dif+1), a2));
+        dif += 6;
+        dst += 6;
+        src += 6;
+    }
+    else
+    {
+        // only 2 points overall
+        vec2 m0 = loaddup2(mul);
+        vec2 p0 = unpacklo2(setzero2(), m0);
+        vec2 p1 = unpacklo2(m0, setzero2());
+        
+        vec2 a0 = fmadd2(m0, load2(dif  ), loadu2(src  ));
+        vec2 a1 = fmadd2(p1, load1(dif+2), loadu2(src+2));
+        
+        storeu2(dst  , a0);
+        storeu2(dst+2, fnmadd2(p0, loaddup2(dif), a1));
+        storeu2(dst+4, fnmadd2(m0, loadu2(dif+1), loadu2(src+4)));
+        return;
+    }
+
+    // bulk work could be unrolled
+    while ( mul < end )
+    {
+        vec2 mm = loaddup2(mul-1);
+        vec2 m0 = loaddup2(mul);
+        vec2 m1 = loaddup2(mul+1);
+        vec2 p0 = unpacklo2(mm, m0);
+        vec2 p1 = unpacklo2(m0, m1);
+
+        mul += 2;
+        vec2 a0 = fnmadd2(mm, loadu2(dif-3), loadu2(src  ));
+        vec2 a1 = fnmadd2(p0, loadu2(dif-1), loadu2(src+2));
+        vec2 a2 = fnmadd2(m0, loadu2(dif+1), loadu2(src+4));
+
+        storeu2(dst  , fmadd2(m0, load2(dif  ), a0));
+        storeu2(dst+2, fmadd2(p1, load2(dif+2), a1));
+        storeu2(dst+4, fmadd2(m1, load2(dif+4), a2));
+        dif += 6;
+        dst += 6;
+        src += 6;
+    }
+    
+    if ( nbs & 1 )
+    {
+        // 2 points remain = 6 scalars
+        vec2 mm = loaddup2(mul-1);
+        vec2 m0 = loaddup2(mul);
+        vec2 p0 = unpacklo2(mm, m0);
+
+        vec2 a0 = fnmadd2(mm, loadu2(dif-3), loadu2(src  ));
+        vec2 a1 = fnmadd2(p0, loadu2(dif-1), loadu2(src+2));
+        vec2 a2 = fnmadd2(m0, loadu2(dif+1), loadu2(src+4));
+
+        storeu2(dst  , fmadd2(m0, load2(dif  ), a0));
+        storeu2(dst+2, fmadd2(m0, load1(dif+2), a1));
+        storeu2(dst+4, a2);
+    }
+    else
+    {
+        // 1 point remains = 3 scalars
+        vec2 mm = loaddup2(mul-1);
+        storeu2(dst, fnmadd2(mm, loadu2(dif-3), loadu2(src)));
+        store1(dst+2, fnmadd1(mm, load1(dif-1), load1(src+2)));
+    }
+}
+#endif
+
+/*
+ 3D workflow:
+ 
+     Y[0] = X[0] + dif[0] * mul[0] - dif[-3] * mul[-1];
+     Y[1] = X[1] + dif[1] * mul[0] - dif[-2] * mul[-1];
+     Y[2] = X[2] + dif[2] * mul[0] - dif[-1] * mul[-1];
+
+     Y[3] = X[3] + dif[3] * mul[1] - dif[0] * mul[0];
+     Y[4] = X[4] + dif[4] * mul[1] - dif[1] * mul[0];
+     Y[5] = X[5] + dif[5] * mul[1] - dif[2] * mul[0];
+
+     Y[6] = X[6] + dif[6] * mul[2] - dif[3] * mul[1];
+     Y[7] = X[7] + dif[7] * mul[2] - dif[4] * mul[1];
+     Y[8] = X[8] + dif[8] * mul[2] - dif[5] * mul[1];
+
+     Y[9] = X[9] + dif[9] * mul[3] - dif[6] * mul[2];
+     Y[A] = X[A] + dif[A] * mul[3] - dif[7] * mul[2];
+     Y[B] = X[B] + dif[B] * mul[3] - dif[8] * mul[2];
  */
 
 #if REAL_IS_DOUBLE && defined __AVX__
@@ -912,13 +1085,13 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
         p2 = blend4(p2, broadcast1(mul+3), 0b1110);
         
         mul += 4;
-        vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
-        vec4 a2 = fmadd4(p2, load4(dif+8), loadu4(src+8));
+        vec4 a0 = fnmadd4(m0, loadu4(dif-3), loadu4(src  ));
+        vec4 a1 = fnmadd4(m1, loadu4(dif+1), loadu4(src+4));
+        vec4 a2 = fnmadd4(m2, loadu4(dif+5), loadu4(src+8));
 
-        storeu4(dst  , fnmadd4(m0, loadu4(dif-3), a0));
-        storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
+        storeu4(dst  , fmadd4(p0, load4(dif  ), a0));
+        storeu4(dst+4, fmadd4(p1, load4(dif+4), a1));
+        storeu4(dst+8, fmadd4(p2, load4(dif+8), a2));
         dif += 12;
         dst += 12;
         src += 12;
@@ -1016,20 +1189,24 @@ void projectForcesD3D_AVX(size_t nbs, const real* dif, const real* src, const re
 void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    nan_reals(ALOC, x, y, z, 1.0);
+    new_nans(ALOC, x, y, z);
+    randomize(NVAL, x, y, z, 1.0);
+    nan_fill(NVAL, x);
     
-    func(NBS, dir_, pos_, lag_, x);
-    VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
+    func(NSEG, dir_, pos_, lag_, x);
+    VecPrint::print(std::cout, std::min(DISP,NVAL), x);
+    std::cout << " |";
+    VecPrint::print(std::cout, DIM, x+NVAL);
 
     tic();
-    for ( size_t ii=0; ii<cnt; ++ii )
+    for ( size_t i=0; i<cnt; ++i )
     {
-        func(NBS, dir_, x, lag_, z);
-        // check the code with unaligned memory:
-        func(NBS, dir_, y, lag_, x+DIM);
-        func(NBS, dir_, z+DIM, lag_, y);
+        func(NSEG, dir_, x, lag_, z);
+        // check the code with unaligned memory in 3D:
+        func(NSEG, dir_, y, lag_, x+DIM);
+        func(NSEG, dir_, z+DIM, lag_, y);
     }
-    toc(str, cnt*NBS);
+    toc(str, cnt*NSEG);
     
     free_reals(x,y,z);
 }
@@ -1037,7 +1214,7 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
 
 void testProjectionD(size_t cnt)
 {
-    std::cout << "testProjection DOWN " << DIM << "D " << NBS << "\n";
+    std::cout << "testProjection DOWN " << DIM << "D " << NSEG << "\n";
     testD(cnt, projectForcesD_,    " D_   ");
     testD(cnt, projectForcesD_ADD, " D_ADD");
     testD(cnt, projectForcesD_FMA, " D_FMA");
@@ -1047,6 +1224,9 @@ void testProjectionD(size_t cnt)
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __AVX__
     testD(cnt, projectForcesD2D_AVX, " D_AVX");
+#endif
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __SSE__
+    testD(cnt, projectForcesD3D_SSE, " D_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __AVX__
     testD(cnt, projectForcesD3D_AVX, " D_AVX");
@@ -1092,7 +1272,7 @@ void projectForcesAVX(size_t nbs, const real* X, real* Y)
 
 void projectDPTTS(size_t nbs, const real* X, real* Y)
 {
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NSEG);
 }
 
 void scaleTangentially(size_t nbp, const real* X, const real* dir, real* Y)
@@ -1142,7 +1322,7 @@ void projectTangent(size_t nbs, const real* X, real* Y)
     projectForcesU_(nbs, dir_, tmp_, lag_);
     
     // find Lagrange multipliers
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NBS);
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NSEG);
 
     projectForcesD_(nbs, dir_, X, lag_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
@@ -1158,37 +1338,37 @@ void projectScale(size_t nbs, const real* X, real* Y)
 void speedProject(size_t cnt, void (*func)(size_t, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    nan_reals(ALOC, x, y, z, 1.0);
-    
+    new_nans(ALOC, x, y, z);
+    randomize(NVAL, x, y, z, 1.0);
+
     zero_real(ALOC, x);
-    func(NBS, force_, x);
-    VecPrint::print(std::cout, std::min(DISP,NCO+2), x);
+    func(NSEG, force_, x);
+    VecPrint::print(std::cout, std::min(DISP,NVAL+2), x);
 
     tic();
     for ( size_t ii=0; ii<cnt; ++ii )
     {
-        func(NBS, x, y);
+        func(NSEG, x, y);
         // check the code with unaligned memory:
-        func(NBS, y+2, z);
-        func(NBS, z, x);
+        func(NSEG, y+2, z);
+        func(NSEG, z, x);
     }
-    toc(str, cnt*NBS);
+    toc(str, cnt*NSEG);
     free_reals(x,y,z);
 }
 
 
-void testProject()
+void checkProject()
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    nan_reals(ALOC, x, y, z, 1.0);
 
-    for ( size_t nbs = std::min(NBS,17UL); nbs > 0; --nbs )
+    for ( size_t nbs = std::min(NSEG,7UL); nbs > 0; --nbs )
     {
         size_t nbv = DIM * ( nbs + 1 );
+        new_nans(nbv, x, y, z);
         setFilament(nbs, 0.1, 20.0, 1.0);
         setProjection(nbs);
         
-        nan_fill(ALOC, x);
         for ( size_t i = 0; i < nbv; ++i )
             x[i] = RNG.sreal();
         //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
@@ -1208,9 +1388,9 @@ void testProject()
 #if defined __AVX__ && ( REAL_IS_DOUBLE )
         //projectForcesAVX(nbs, x, z);
 #if ( DIM == 3 )
-        projectForcesU3D_AVX(nbs, dir_, x, lag_);
+        projectForcesU3D_SSE(nbs, dir_, x, lag_);
         alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
-        projectForcesD3D_AVX(nbs, dir_, x, lag_, z);
+        projectForcesD3D_SSE(nbs, dir_, x, lag_, z);
 #else
         projectForcesU2D_AVX(nbs, dir_, x, lag_);
         alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
@@ -1235,20 +1415,20 @@ int main(int argc, char* argv[])
 {
     const size_t CNT = 1<<20;
     RNG.seed();
-    testProject();
+    checkProject();
     
     std::cout << __VERSION__ << "\n";
     if ( 1 )
     {
-        setFilament(NBS, 0.1, 20.0, 1.0);
+        setFilament(NSEG, 0.1, 20.0, 1.0);
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
     if ( 0 )
     {
-        setProjection(NBS);
-        setAnisotropy(NBS);
-        std::cout << "testProject " << DIM << "D " << NBS << "\n";
+        setProjection(NSEG);
+        setAnisotropy(NSEG);
+        std::cout << "testProject " << DIM << "D " << NSEG << "\n";
         speedProject(CNT, projectForces,    " projF");
 #if defined __AVX__ && ( REAL_IS_DOUBLE )
         speedProject(CNT, projectForcesAVX, " prAVX");
@@ -1258,9 +1438,8 @@ int main(int argc, char* argv[])
         speedProject(CNT, projectScale,     " scale");
     }
     
-    free_reals(tmp_, lag_, force_);
-    free_reals(pos_, dir_, ani_);
-    free_reals(diag_, upper_, nullptr);
+    free_reals(tmp_, lag_, force_, pos_);
+    free_reals(dir_, ani_, diag_, upper_);
 
     return EXIT_SUCCESS;
 }

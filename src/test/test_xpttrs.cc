@@ -48,14 +48,14 @@ void divide(int size, real const* D, real* E)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testDPTTF(size_t NBS, size_t cnt)
+void testDPTTF(size_t NSEG, size_t cnt)
 {
-    real * D = new_real(NBS);
-    real * U = new_real(NBS);
-    real * Ds = new_real(NBS);
-    real * Us = new_real(NBS);
+    real * D = new_real(NSEG);
+    real * U = new_real(NSEG);
+    real * Ds = new_real(NSEG);
+    real * Us = new_real(NSEG);
 
-    for ( size_t i = 0; i < NBS; ++i )
+    for ( size_t i = 0; i < NSEG; ++i )
     {
         Ds[i] = 2.0;
         Us[i] = -0.5 * RNG.preal();
@@ -64,57 +64,57 @@ void testDPTTF(size_t NBS, size_t cnt)
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        //copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        divide(NBS, D, U);
+        //copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        divide(NSEG, D, U);
     }
-    toc("divide", NBS*cnt);
+    toc("divide", NSEG*cnt);
     
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        //copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        xpttrf(NBS, D, U);
+        //copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        xpttrf(NSEG, D, U);
     }
-    toc("pttrf", NBS*cnt);
+    toc("pttrf", NSEG*cnt);
 
     int info;
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        lapack_xpttrf(NBS, D, U, &info);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        lapack_xpttrf(NSEG, D, U, &info);
     }
-    toc("clapack", NBS*cnt);
+    toc("clapack", NSEG*cnt);
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        lapack::xpttrf(NBS, D, U, &info);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        lapack::xpttrf(NSEG, D, U, &info);
     }
-    toc("lapack", NBS*cnt);
+    toc("lapack", NSEG*cnt);
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        italian_xpttrf(NBS, D, U, &info);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        italian_xpttrf(NSEG, D, U, &info);
     }
-    toc("italian", NBS*cnt);
+    toc("italian", NSEG*cnt);
     
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        alsatian_xpttrf(NBS, D, U, &info);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        alsatian_xpttrf(NSEG, D, U, &info);
     }
-    toc("alsatian", NBS*cnt);
+    toc("alsatian", NSEG*cnt);
 
     free_real(D);
     free_real(U);
@@ -127,17 +127,17 @@ void testDPTTF(size_t NBS, size_t cnt)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testDPTTS(size_t NBS, size_t cnt)
+void testDPTTS(size_t NSEG, size_t cnt)
 {
-    real * D = new_real(NBS);
-    real * U = new_real(NBS);
-    real * B = new_real(NBS);
-    real * Ds = new_real(NBS);
-    real * Us = new_real(NBS);
-    real * Bs = new_real(NBS);
-    real * S = new_real(NBS);
+    real * D = new_real(NSEG);
+    real * U = new_real(NSEG);
+    real * B = new_real(NSEG);
+    real * Ds = new_real(NSEG);
+    real * Us = new_real(NSEG);
+    real * Bs = new_real(NSEG);
+    real * S = new_real(NSEG);
 
-    for ( size_t i = 0; i < NBS; ++i )
+    for ( size_t i = 0; i < NSEG; ++i )
     {
         Ds[i] = 2.0;
         Us[i] = -RNG.preal();
@@ -145,54 +145,54 @@ void testDPTTS(size_t NBS, size_t cnt)
     }
 
     int info;
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    lapack_xpttrf(NBS, D, U, &info);
-    lapack_xptts2(NBS, 1, D, U, B, 1);
-    copy_real(NBS, B, S);
-    print(NBS, B);
-    printf(" err %f", blas::max_diff(NBS, S, B));
+    copy_real(NSEG, Ds, D);
+    copy_real(NSEG, Us, U);
+    copy_real(NSEG, Bs, B);
+    lapack_xpttrf(NSEG, D, U, &info);
+    lapack_xptts2(NSEG, 1, D, U, B, 1);
+    copy_real(NSEG, B, S);
+    print(NSEG, B);
+    printf(" err %f", blas::max_diff(NSEG, S, B));
     tic();
     for ( size_t n = 0; n < cnt; ++n )
-        lapack_xptts2(NBS, 1, D, U, B, 1);
-    toc("clapack", NBS*cnt);
+        lapack_xptts2(NSEG, 1, D, U, B, 1);
+    toc("clapack", NSEG*cnt);
 
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    lapack::xpttrf(NBS, D, U, &info);
-    lapack::xptts2(NBS, 1, D, U, B, 1);
-    print(NBS, B);
-    printf(" err %f", blas::max_diff(NBS, S, B));
+    copy_real(NSEG, Ds, D);
+    copy_real(NSEG, Us, U);
+    copy_real(NSEG, Bs, B);
+    lapack::xpttrf(NSEG, D, U, &info);
+    lapack::xptts2(NSEG, 1, D, U, B, 1);
+    print(NSEG, B);
+    printf(" err %f", blas::max_diff(NSEG, S, B));
     tic();
     for ( size_t n = 0; n < cnt; ++n )
-        lapack::xptts2(NBS, 1, D, U, B, 1);
-    toc("lapack", NBS*cnt);
+        lapack::xptts2(NSEG, 1, D, U, B, 1);
+    toc("lapack", NSEG*cnt);
 
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    italian_xpttrf(NBS, D, U, &info);
-    italian_xptts2(NBS, 1, D, U, B, 1);
-    print(NBS, B);
-    printf(" err %f", blas::max_diff(NBS, S, B));
+    copy_real(NSEG, Ds, D);
+    copy_real(NSEG, Us, U);
+    copy_real(NSEG, Bs, B);
+    italian_xpttrf(NSEG, D, U, &info);
+    italian_xptts2(NSEG, 1, D, U, B, 1);
+    print(NSEG, B);
+    printf(" err %f", blas::max_diff(NSEG, S, B));
     tic();
     for ( size_t n = 0; n < cnt; ++n )
-        italian_xptts2(NBS, 1, D, U, B, 1);
-    toc("italian", NBS*cnt);
+        italian_xptts2(NSEG, 1, D, U, B, 1);
+    toc("italian", NSEG*cnt);
     
-    copy_real(NBS, Ds, D);
-    copy_real(NBS, Us, U);
-    copy_real(NBS, Bs, B);
-    alsatian_xpttrf(NBS, D, U, &info);
-    alsatian_xptts2(NBS, 1, D, U, B, 1);
-    print(NBS, B);
-    printf(" err %f", blas::max_diff(NBS, S, B));
+    copy_real(NSEG, Ds, D);
+    copy_real(NSEG, Us, U);
+    copy_real(NSEG, Bs, B);
+    alsatian_xpttrf(NSEG, D, U, &info);
+    alsatian_xptts2(NSEG, 1, D, U, B, 1);
+    print(NSEG, B);
+    printf(" err %f", blas::max_diff(NSEG, S, B));
     tic();
     for ( size_t n = 0; n < cnt; ++n )
-        alsatian_xptts2(NBS, 1, D, U, B, 1);
-    toc("alsatian", NBS*cnt);
+        alsatian_xptts2(NSEG, 1, D, U, B, 1);
+    toc("alsatian", NSEG*cnt);
 
     free_real(D);
     free_real(U);
@@ -208,16 +208,16 @@ void testDPTTS(size_t NBS, size_t cnt)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testThomas(size_t NBS, size_t cnt)
+void testThomas(size_t NSEG, size_t cnt)
 {
-    real * D = new_real(NBS);
-    real * U = new_real(NBS);
-    real * B = new_real(NBS);
-    real * Ds = new_real(NBS);
-    real * Us = new_real(NBS);
-    real * Bs = new_real(NBS);
+    real * D = new_real(NSEG);
+    real * U = new_real(NSEG);
+    real * B = new_real(NSEG);
+    real * Ds = new_real(NSEG);
+    real * Us = new_real(NSEG);
+    real * Bs = new_real(NSEG);
 
-    for ( size_t i = 0; i < NBS; ++i )
+    for ( size_t i = 0; i < NSEG; ++i )
     {
         Ds[i] = 2.0;
         Us[i] = -RNG.preal();
@@ -228,61 +228,61 @@ void testThomas(size_t NBS, size_t cnt)
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        copy_real(NBS, Bs, B);
-        lapack::xpttrf(NBS, D, U, &info);
-        lapack::xptts2(NBS, 1, D, U, B, 1);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        copy_real(NSEG, Bs, B);
+        lapack::xpttrf(NSEG, D, U, &info);
+        lapack::xptts2(NSEG, 1, D, U, B, 1);
     }
-    print(NBS, B);
-    toc("lapack", NBS*cnt);
+    print(NSEG, B);
+    toc("lapack", NSEG*cnt);
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        copy_real(NBS, Bs, B);
-        //italian_xpttrf(NBS, D, U, &info);
-        //italian_xptts2(NBS, 1, D, U, B, 1);
-        italian_thomas(NBS, U, D, U, B);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        copy_real(NSEG, Bs, B);
+        //italian_xpttrf(NSEG, D, U, &info);
+        //italian_xptts2(NSEG, 1, D, U, B, 1);
+        italian_thomas(NSEG, U, D, U, B);
     }
-    print(NBS, B);
-    toc("italian", NBS*cnt);
+    print(NSEG, B);
+    toc("italian", NSEG*cnt);
     
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        copy_real(NBS, Bs, B);
-        alsatian_xpttrf(NBS, D, U, &info);
-        alsatian_xptts2(NBS, 1, D, U, B, 1);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        copy_real(NSEG, Bs, B);
+        alsatian_xpttrf(NSEG, D, U, &info);
+        alsatian_xptts2(NSEG, 1, D, U, B, 1);
     }
-    print(NBS, B);
-    toc("alsatian2", NBS*cnt);
+    print(NSEG, B);
+    toc("alsatian2", NSEG*cnt);
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Us, U);
-        copy_real(NBS, Bs, B);
-        alsatian_thomas(NBS, D, U, B);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Us, U);
+        copy_real(NSEG, Bs, B);
+        alsatian_thomas(NSEG, D, U, B);
     }
-    print(NBS, B);
-    toc("alsatian", NBS*cnt);
+    print(NSEG, B);
+    toc("alsatian", NSEG*cnt);
 
     tic();
-    copy_real(NBS, Us, U);
+    copy_real(NSEG, Us, U);
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NBS, Ds, D);
-        copy_real(NBS, Bs, B);
-        tridiagonal_solve(NBS, U, D, U, B);
+        copy_real(NSEG, Ds, D);
+        copy_real(NSEG, Bs, B);
+        tridiagonal_solve(NSEG, U, D, U, B);
     }
-    print(NBS, B);
-    toc("tridiag", NBS*cnt);
+    print(NSEG, B);
+    toc("tridiag", NSEG*cnt);
 
     free_real(D);
     free_real(U);
