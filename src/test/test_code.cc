@@ -140,6 +140,20 @@ real *pos_=nullptr, *dir_=nullptr, *ani_=nullptr;
 real *lag_=nullptr, *force_=nullptr, *tmp_=nullptr;
 real *diag_=nullptr, *upper_=nullptr;
 
+
+inline void DPTTRF(size_t nbs)
+{
+    int info = 0;
+    alsatian_xpttrf(nbs, diag_, upper_, &info);
+}
+
+inline void DPTTS2(size_t nbs)
+{
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, 0);
+}
+
+//------------------------------------------------------------------------------
+
 void setFilament(size_t nbs, real seg, real persistence_length, real mag)
 {
     nbs = std::min(nbs, NSEG);
@@ -192,8 +206,7 @@ void setProjection(size_t nbs)
     }
     diag_[j] = 2.0;
 
-    int info = 0;
-    alsatian_xpttrf(nbs, diag_, upper_, &info);
+    DPTTRF(nbs);
 #if ( 0 )
     std::clog << "\nD "; VecPrint::print(std::clog, nbs, diag_, 3);
     std::clog << "\nU "; VecPrint::print(std::clog, nbs-1, upper_, 3); std::clog << '\n';
@@ -206,6 +219,7 @@ void setAnisotropy(size_t nbs)
 {
     const size_t sup = DIM * nbs;
     new_nans(sup+DIM, ani_);
+    new_nans(sup+DIM, tmp_);
 
     // for the extremities, the direction of the nearby segment is used.
     for ( size_t d = 0; d < DIM; ++d )
@@ -718,21 +732,20 @@ void projectForcesD_ADD(size_t nbs, const real* dif, const real* X, const real* 
     
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        const size_t kk = DIM * jj;
-        real b0 = dif[kk  ] * mul[jj];
-        real b1 = dif[kk+1] * mul[jj];
+        real b0 = dif[DIM*jj  ] * mul[jj];
+        real b1 = dif[DIM*jj+1] * mul[jj];
 #if ( DIM > 2 )
-        real b2 = dif[kk+2] * mul[jj];
+        real b2 = dif[DIM*jj+2] * mul[jj];
 #endif
-        Y[kk  ] = a0 + b0;
-        Y[kk+1] = a1 + b1;
+        Y[DIM*jj  ] = a0 + b0;
+        Y[DIM*jj+1] = a1 + b1;
 #if ( DIM > 2 )
-        Y[kk+2] = a2 + b2;
+        Y[DIM*jj+2] = a2 + b2;
 #endif
-        a0 = X[DIM+kk  ] - b0;
-        a1 = X[DIM+kk+1] - b1;
+        a0 = X[DIM*jj+ DIM   ] - b0;
+        a1 = X[DIM*jj+(DIM+1)] - b1;
 #if ( DIM > 2 )
-        a2 = X[DIM+kk+2] - b2;
+        a2 = X[DIM*jj+(DIM+2)] - b2;
 #endif
     }
     
@@ -743,6 +756,45 @@ void projectForcesD_ADD(size_t nbs, const real* dif, const real* X, const real* 
     Y[ee+2] = a2;
 #endif
 }
+
+
+/// proceeding downward, this could be fused with downward part of DPTTS2
+void projectForcesD_REV(size_t nbs, const real* dif, const real* X, const real* mul, real* Y)
+{
+    const size_t E = DIM * nbs;
+    real a0 = X[E  ];
+    real a1 = X[E+1];
+#if ( DIM > 2 )
+    real a2 = X[E+2];
+#endif
+    
+    for ( size_t i = nbs-1; i > 0; --i )
+    {
+        real m0 = dif[DIM*i- DIM   ] * mul[i-1];
+        real m1 = dif[DIM*i-(DIM-1)] * mul[i-1];
+#if ( DIM > 2 )
+        real m2 = dif[DIM*i-(DIM-2)] * mul[i-1];
+#endif
+        Y[DIM*i  ] = a0 - m0;
+        Y[DIM*i+1] = a1 - m1;
+#if ( DIM > 2 )
+        Y[DIM*i+2] = a2 - m2;
+#endif
+        a0 = X[DIM*i- DIM   ] + m0;
+        a1 = X[DIM*i-(DIM-1)] + m1;
+#if ( DIM > 2 )
+        a2 = X[DIM*i-(DIM-2)] + m2;
+#endif
+    }
+    
+    Y[0] = a0;
+    Y[1] = a1;
+#if ( DIM > 2 )
+    Y[2] = a2;
+#endif
+}
+
+
 
 
 
@@ -759,22 +811,21 @@ void projectForcesD_FMA(size_t nbs, const real* dif, const real* X, const real* 
     
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
-        const size_t kk = DIM * jj;
         real m = mul[jj];
-        real d0 = dif[kk  ];
-        real d1 = dif[kk+1];
+        real d0 = dif[DIM*jj  ];
+        real d1 = dif[DIM*jj+1];
 #if ( DIM > 2 )
-        real d2 = dif[kk+2];
+        real d2 = dif[DIM*jj+2];
 #endif
-        Y[kk  ] = a0 + d0 * m;
-        Y[kk+1] = a1 + d1 * m;
+        Y[DIM*jj  ] = a0 + d0 * m;
+        Y[DIM*jj+1] = a1 + d1 * m;
 #if ( DIM > 2 )
-        Y[kk+2] = a2 + d2 * m;
+        Y[DIM*jj+2] = a2 + d2 * m;
 #endif
-        a0 = X[DIM+kk  ] - d0 * m;
-        a1 = X[DIM+kk+1] - d1 * m;
+        a0 = X[DIM*jj+ DIM   ] - d0 * m;
+        a1 = X[DIM*jj+(DIM+1)] - d1 * m;
 #if ( DIM > 2 )
-        a2 = X[DIM+kk+2] - d2 * m;
+        a2 = X[DIM*jj+(DIM+2)] - d2 * m;
 #endif
     }
     
@@ -1214,9 +1265,11 @@ void testD(size_t cnt, void (*func)(size_t, const real*, const real*, const real
 
 void testProjectionD(size_t cnt)
 {
+    projectForcesU_(NSEG, dir_, force_, lag_);
     std::cout << "testProjection DOWN " << DIM << "D " << NSEG << "\n";
     testD(cnt, projectForcesD_,    " D_   ");
     testD(cnt, projectForcesD_ADD, " D_ADD");
+    testD(cnt, projectForcesD_REV, " D_REV");
     testD(cnt, projectForcesD_FMA, " D_FMA");
     testD(cnt, projectForcesD_PTR, " D_PTR");
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __SSE__
@@ -1233,17 +1286,70 @@ void testProjectionD(size_t cnt)
 #endif
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Comparison against reference implementation
+
+void checkProject()
+{
+    real *x = nullptr, *y = nullptr, *z = nullptr;
+
+    for ( size_t nbs = std::min(NSEG,7UL); nbs > 0; --nbs )
+    {
+        size_t nbv = DIM * ( nbs + 1 );
+        new_nans(nbv, x, y, z);
+        setFilament(nbs, 0.1, 20.0, 1.0);
+        setProjection(nbs);
+        
+        for ( size_t i = 0; i < nbv; ++i )
+            x[i] = RNG.sreal();
+        //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
+
+        nan_fill(nbs, lag_);
+        //projectForces(nbs, x, y);
+        projectForcesU_(nbs, dir_, x, lag_);
+        DPTTS2(nbs);
+        projectForcesD_(nbs, dir_, x, lag_, y);
+        printf("%2lu ", nbs);
+        //VecPrint::print(std::cout, std::min(DISP,nbv), y);
+        print_fe_exceptions("projectForces");
+        printf(" SCA ");
+        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+
+        nan_fill(nbs, lag_);
+#if defined __AVX__ && ( REAL_IS_DOUBLE )
+        //projectForcesAVX(nbs, x, z);
+#if ( DIM == 3 )
+        projectForcesU3D_SSE(nbs, dir_, x, lag_);
+        DPTTS2(nbs);
+        projectForcesD3D_SSE(nbs, dir_, x, lag_, z);
+#else
+        projectForcesU2D_AVX(nbs, dir_, x, lag_);
+        DPTTS2(nbs);
+        projectForcesD2D_AVX(nbs, dir_, x, lag_, z);
+#endif
+        printf(" AVX ");
+        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
+        print_fe_exceptions("projectForcesAVX");
+        real err = blas::max_diff(nbv, y, z);
+        if ( abs_real(err) > 64*REAL_EPSILON )
+            printf(" XXXX %e\n", err);
+        else
+            printf("  --> %e\n", err);
+#endif
+    }
+    free_reals(x,y,z);
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Fiber::projectForces()
 
+
 void projectForces(size_t nbs, const real* X, real* Y)
 {
     projectForcesU_(nbs, dir_, X, lag_);
-    
-    // find Lagrange multipliers
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
-
+    DPTTS2(nbs);
     projectForcesD_(nbs, dir_, X, lag_, Y);
 }
 
@@ -1258,8 +1364,7 @@ void projectForcesAVX(size_t nbs, const real* X, real* Y)
     projectForcesU3D_AVX(nbs, dir_, X, lag_);
 #endif
     
-    // find Lagrange multipliers
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
+    DPTTS2(nbs);
 
 #if ( DIM == 2 )
     projectForcesD2D_AVX(nbs, dir_, X, lag_, Y);
@@ -1321,8 +1426,7 @@ void projectTangent(size_t nbs, const real* X, real* Y)
     scaleTangentially(nbs+1, X, ani_, tmp_);
     projectForcesU_(nbs, dir_, tmp_, lag_);
     
-    // find Lagrange multipliers
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NSEG);
+    DPTTS2(nbs);
 
     projectForcesD_(nbs, dir_, X, lag_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
@@ -1335,7 +1439,7 @@ void projectScale(size_t nbs, const real* X, real* Y)
 }
 
 
-void speedProject(size_t cnt, void (*func)(size_t, const real*, real*), char const* str)
+void timeProject(size_t cnt, void (*func)(size_t, const real*, real*), char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
@@ -1357,57 +1461,6 @@ void speedProject(size_t cnt, void (*func)(size_t, const real*, real*), char con
     free_reals(x,y,z);
 }
 
-
-void checkProject()
-{
-    real *x = nullptr, *y = nullptr, *z = nullptr;
-
-    for ( size_t nbs = std::min(NSEG,7UL); nbs > 0; --nbs )
-    {
-        size_t nbv = DIM * ( nbs + 1 );
-        new_nans(nbv, x, y, z);
-        setFilament(nbs, 0.1, 20.0, 1.0);
-        setProjection(nbs);
-        
-        for ( size_t i = 0; i < nbv; ++i )
-            x[i] = RNG.sreal();
-        //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
-
-        nan_fill(nbs, lag_);
-        //projectForces(nbs, x, y);
-        projectForcesU_(nbs, dir_, x, lag_);
-        alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
-        projectForcesD_(nbs, dir_, x, lag_, y);
-        printf("%2lu ", nbs);
-        //VecPrint::print(std::cout, std::min(DISP,nbv), y);
-        print_fe_exceptions("projectForces");
-        printf(" SCA ");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-
-        nan_fill(nbs, lag_);
-#if defined __AVX__ && ( REAL_IS_DOUBLE )
-        //projectForcesAVX(nbs, x, z);
-#if ( DIM == 3 )
-        projectForcesU3D_SSE(nbs, dir_, x, lag_);
-        alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
-        projectForcesD3D_SSE(nbs, dir_, x, lag_, z);
-#else
-        projectForcesU2D_AVX(nbs, dir_, x, lag_);
-        alsatian_xptts2(nbs, 1, diag_, upper_, lag_, nbs);
-        projectForcesD2D_AVX(nbs, dir_, x, lag_, z);
-#endif
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
-        print_fe_exceptions("projectForcesAVX");
-        real err = blas::max_diff(nbv, y, z);
-        printf(" AVX err %e\n", err);
-#endif
-    }
-    
-    free_reals(x,y,z);
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark - Main
 
@@ -1424,18 +1477,18 @@ int main(int argc, char* argv[])
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
-    if ( 0 )
+    if ( 1 )
     {
         setProjection(NSEG);
         setAnisotropy(NSEG);
         std::cout << "testProject " << DIM << "D " << NSEG << "\n";
-        speedProject(CNT, projectForces,    " projF");
+        timeProject(CNT, projectForces,    " projF");
 #if defined __AVX__ && ( REAL_IS_DOUBLE )
-        speedProject(CNT, projectForcesAVX, " prAVX");
+        timeProject(CNT, projectForcesAVX, " prAVX");
 #endif
-        speedProject(CNT, projectDPTTS,     " dptts");
-        speedProject(CNT, projectTangent,   " projT");
-        speedProject(CNT, projectScale,     " scale");
+        timeProject(CNT, projectDPTTS,   " dptts");
+        timeProject(CNT, projectTangent, " projT");
+        timeProject(CNT, projectScale,   " scale");
     }
     
     free_reals(tmp_, lag_, force_, pos_);
