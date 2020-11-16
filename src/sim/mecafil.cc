@@ -351,7 +351,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
         add_rigidityF(nbt, X, iRigidity, Y);
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
-        add_rigiditySSE(nbt, X, iRigidity, Y);
+        add_rigidity2D_SSE(nbt, X, iRigidity, Y);
 #elif ( DIM > 1 )
         add_rigidityF(nbt, X, iRigidity, Y);
 #endif

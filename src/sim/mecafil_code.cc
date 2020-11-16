@@ -177,7 +177,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 /**
  2D implemention using SSE 128bit vector instructions with double precision
  */
-void add_rigiditySSE(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -213,7 +213,7 @@ void add_rigiditySSE(const size_t nbt, const real* X, const real rigid, real* Y)
  
  Note that the vectors X and Y are not aligned to memory!
  */
-void add_rigidityAVX(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);

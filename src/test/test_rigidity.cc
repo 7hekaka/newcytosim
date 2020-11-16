@@ -50,16 +50,16 @@ inline void print_alignment(real const* ptr, const char msg[])
 
 //------------------------------------------------------------------------------
 
-void setFilament(real* ptr, size_t np, real seg, real persistence_length)
+void setFilament(size_t nbs, real* ptr, real seg, real persistence_length)
 {
-    np = std::min(np, NSEG+1);
+    nbs = std::min(nbs, NSEG);
     real sigma = std::sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
     Vector dir(1,0,0);
     
     pos.store(ptr);
-    for ( size_t p = 1 ; p < np; ++p )
+    for ( size_t p = 1 ; p <= nbs; ++p )
     {
         pos += seg * dir;
         pos.store(ptr+DIM*p);
@@ -94,6 +94,7 @@ void new_reals(real*& p, real*& x, real*& y, real*& z, real mag)
     print_alignment(p, "p");
     print_alignment(x, "x");
     print_alignment(y, "y");
+    print_alignment(y, "z");
 }
 
 void free_reals(real* p, real* x, real* y, real* z)
@@ -113,7 +114,7 @@ void free_reals(real* p, real* x, real* y, real* z)
  */
 void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
-#pragma vector unaligned
+    #pragma vector unaligned
     for ( size_t jj = 0; jj < nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
@@ -130,7 +131,7 @@ void add_rigidity2(const size_t nbt, const real* vec, const real rigid, real* Y)
 {
     real fx = 0;
     real fy = 0;
-#pragma vector unaligned
+    #pragma vector unaligned
     for ( size_t jj = 0; jj < nbt; jj += 2 )
     {
         real const* X = vec + jj;
@@ -234,7 +235,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 
 #if REAL_IS_DOUBLE
 
-void add_rigiditySSE(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -262,7 +263,7 @@ void add_rigiditySSE(const size_t nbt, const real* X, const real rigid, real* Y)
 }
 
 /// older implementation
-void add_rigiditySSO(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_SSO(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
     real *const end = Y + nbt;
@@ -295,7 +296,7 @@ void add_rigiditySSO(const size_t nbt, const real* X, const real rigid, real* Y)
 
 #ifdef __AVX__
 
-void add_rigidityAVX(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
@@ -462,7 +463,7 @@ inline void toc(const char* str, double num) { printf(" %4s %5.2f cycles\n", str
 void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
 {
     const size_t nbt = DIM * ( NSEG - 1 );
-    const real alpha = 2.0;
+    const real alpha = 64.0;
     
     zero_real(ALOC, vX);
     zero_real(ALOC, vY);
@@ -470,6 +471,8 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
     
     func(nbt, vP, alpha, vX);
     VecPrint::print(std::cout, std::min(DISP,nbt), vX);
+    std::cout << " |";
+    VecPrint::print(std::cout, DIM, vX+NVAL);
     add_rigidity0(nbt, vP, alpha, vY);
     real err = blas::max_diff(nbt+2*DIM, vX, vY);
 
@@ -480,29 +483,32 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
         func(nbt, vZ, alpha, vX);
         func(nbt, vX, alpha, vY);
     }
-    printf("  -> %e ", err);
+    if ( abs_real(err) > 64*REAL_EPSILON )
+        printf(" XXXX %e ", err);
+    else
+        printf("  --> %e ", err);
     toc(str, 3*cnt*nbt);
 }
 
 
 void testRigidity(size_t cnt)
 {
-    testRigidity(cnt, add_rigidity0,    "0  ");
+    testRigidity(cnt, add_rigidity0, "0  ");
 #if ( DIM == 2 )
-    testRigidity(cnt, add_rigidity2,    "2  ");
+    testRigidity(cnt, add_rigidity2, "2  ");
 #endif
-    testRigidity(cnt, add_rigidity3,    "3  ");
-    testRigidity(cnt, add_rigidityF,    "F  ");
-    testRigidity(cnt, add_rigidityG,    "G  ");
-    testRigidity(cnt, add_rigidityF,    "F  ");
-    testRigidity(cnt, add_rigidityG,    "G  ");
-    testRigidity(cnt, add_rigidity4,    "4  ");
+    testRigidity(cnt, add_rigidity3, "3  ");
+    testRigidity(cnt, add_rigidityF, "F  ");
+    testRigidity(cnt, add_rigidityG, "G  ");
+    testRigidity(cnt, add_rigidityF, "F  ");
+    testRigidity(cnt, add_rigidityG, "G  ");
+    testRigidity(cnt, add_rigidity4, "4  ");
 #if defined __SSE__ & ( DIM == 2 )
-    testRigidity(cnt, add_rigiditySSO, "SSO");
-    testRigidity(cnt, add_rigiditySSE, "SSE");
+    testRigidity(cnt, add_rigidity2D_SSO, "SSO");
+    testRigidity(cnt, add_rigidity2D_SSE, "SSE");
 #endif
 #if defined __AVX__ & ( DIM == 2 )
-    testRigidity(cnt, add_rigidityAVX, "AVX");
+    testRigidity(cnt, add_rigidity2D_AVX, "AVX");
 #endif
 }
 
@@ -514,9 +520,9 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     new_reals(vP, vX, vY, vZ, 1.0);
-    setFilament(vP, NSEG+1, 0.1, 20.0);
-    std::cout << "addRigidity " << DIM << "D " << NSEG;
-    std::cout << "   " << __VERSION__ << "\n";
+    setFilament(NSEG, vP, 0.1, 17.0);
+    std::cout << "addRigidity " << DIM << "D,  " << NSEG;
+    std::cout << " segments,   " << __VERSION__ << "\n";
     testRigidity(1<<20);
     free_reals(vP, vX, vY, vZ);
     return EXIT_SUCCESS;
