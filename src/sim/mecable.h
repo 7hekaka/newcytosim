@@ -257,7 +257,7 @@ public:
     /// Store the index where coordinates are located in Meca
     void        setIndex(size_t inx)       { pIndex = inx; }
     
-    /// Index in mB of the first point. the index in the vectors is DIM*matIndex()
+    /// Index of the first point in Meca, possibly to be multiplied by DIM
     /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
      then X2, Y2, Z2...
      */

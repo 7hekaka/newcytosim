@@ -24,7 +24,7 @@ extern Modulo const* modulo;
 //constexpr Modulo * modulo = nullptr;
 
 
-/// set TRUE to update matrix mC using block directives
+/// set TRUE to update matrix mFUL using block directives
 /** This is significantly faster on machine with the AVX instruction set */
 #define USE_MATRIX_BLOCK 1
 
@@ -66,169 +66,172 @@ inline bool any_equal(const size_t a, const size_t b,
 //#define PRINT_BLOCK(I,J,B) { std::clog<<std::setw(3)<<I<<" "<<J<<" "<<std::setw(10)<<B<<'\n'; }
 
 
-// add alpha * T to mC.
+/// add `alpha * T` to the matrix.
 inline void Meca::add_block(size_t i, size_t j, MatrixBlock const& T)
 {
     CHECK_INDICES(i,j,"add");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
-    mC.block(i, j).add_full(T);
+    mFUL.block(i, j).add_full(T);
     PRINT_BLOCK(i,j,T);
 #elif ( DIM == 1 )
-    mB(i,j) += T.value();
+    mISO(i,j) += T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = 0; y < DIM; ++y )
-        mC(i+y, j+x) += T(y,x);
+        mFUL(i+y, j+x) += T(y,x);
 #endif
 }
 
-// add alpha * T to mC.
+/// add `alpha * T` to the matrix.
 inline void Meca::add_block(size_t i, size_t j, real alpha, MatrixBlock const& T)
 {
     CHECK_INDICES(i,j,"add_alpha");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
-    mC.block(i, j).add_full(alpha, T);
+    mFUL.block(i, j).add_full(alpha, T);
     PRINT_BLOCK(i,j,alpha*T);
 #elif ( DIM == 1 )
-    mB(i,j) += alpha * T.value();
+    mISO(i,j) += alpha * T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = 0; y < DIM; ++y )
-        mC(i+y, j+x) += alpha * T(y,x);
+        mFUL(i+y, j+x) += alpha * T(y,x);
 #endif
 }
 
-// subtract T to mC.
+/// subtract `T` to the matrix.
 inline void Meca::sub_block(size_t i, size_t j, MatrixBlock const& T)
 {
     CHECK_INDICES(i,j,"sub");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
-    mC.block(i, j).sub_full(T);
+    mFUL.block(i, j).sub_full(T);
     PRINT_BLOCK(i,j,-T);
 #elif ( DIM == 1 )
-    mB(i,j) -= T.value();
+    mISO(i,j) -= T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = 0; y < DIM; ++y )
-        mC(i+y, j+x) -= T(y,x);
+        mFUL(i+y, j+x) -= T(y,x);
 #endif
 }
 
-// subtract alpha * T to mC.
+/// subtract `alpha * T` to the matrix.
 inline void Meca::sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T)
 {
     CHECK_INDICES(i,j,"sub_alpha");
 #if USE_MATRIX_BLOCK
     assert_true( i > j );
-    mC.block(i, j).sub_full(alpha, T);
+    mFUL.block(i, j).sub_full(alpha, T);
     PRINT_BLOCK(i,j,-alpha*T);
 #elif ( DIM == 1 )
-    mB(i,j) -= alpha * T.value();
+    mISO(i,j) -= alpha * T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = 0; y < DIM; ++y )
-        mC(i+y, j+x) -= alpha * T(y,x);
+        mFUL(i+y, j+x) -= alpha * T(y,x);
 #endif
 }
 
-// add T to the diagonal of mC. `T` should be symmetric
+/// add `T` to the matrix diagonal. `T` should be symmetric
 inline void Meca::add_block_diag(size_t i, MatrixBlock const& T)
 {
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
-    mC.diag_block(i).add_half(T);
+    mFUL.diag_block(i).add_half(T);
     PRINT_BLOCK(i,i,T);
 #elif ( DIM == 1 )
-    mB(i,i) += T.value();
+    mISO(i,i) += T.value();
 #else
     // add lower part of block
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = x; y < DIM; ++y )
-        mC(i+y, i+x) += T(y,x);
+        mFUL(i+y, i+x) += T(y,x);
 #endif
 }
 
-// add alpha * T to the diagonal of mC. `T` should be symmetric
+/// add `alpha * T` to the matrix diagonal. `T` should be symmetric
 inline void Meca::add_block_diag(size_t i, real alpha, MatrixBlock const& T)
 {
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
-    mC.diag_block(i).add_half(alpha, T);
+    mFUL.diag_block(i).add_half(alpha, T);
     PRINT_BLOCK(i,i,alpha*T);
 #elif ( DIM == 1 )
-    mB(i,i) += alpha * T.value();
+    mISO(i,i) += alpha * T.value();
 #else
     // add lower part of block
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = x; y < DIM; ++y )
-        mC(i+y, i+x) += alpha * T(y,x);
+        mFUL(i+y, i+x) += alpha * T(y,x);
 #endif
 }
 
-// add -T to the diagonal of mC. `T` should be symmetric
+/// add `-T` to the matrix diagonal. `T` should be symmetric
 inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
 {
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
-    mC.diag_block(i).sub_half(T);
+    mFUL.diag_block(i).sub_half(T);
     PRINT_BLOCK(i,i,-T);
 #elif ( DIM == 1 )
-    mB(i,i) -= T.value();
+    mISO(i,i) -= T.value();
 #else
     // add lower part of block
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = x; y < DIM; ++y )
-        mC(i+y, i+x) -= T(y,x);
+        mFUL(i+y, i+x) -= T(y,x);
 #endif
 }
 
 
-// add val to mB, the XYZ-isometric component
+/// add `val` to the XYZ-isometric matrix
 inline void Meca::add_iso(size_t i, size_t j, real val)
 {
     CHECK_INDICES(i,j,"add_iso");
 #if USE_ISO_MATRIX
-    mB(i,j) += val;
+    mISO(i,j) += val;
 #else
     size_t ii = DIM * std::max(i, j);
     size_t jj = DIM * std::min(i, j);
-    mC.block(ii, jj).add_diag(val);
+    mFUL.block(ii, jj).add_diag(val);
 #endif
 }
 
-// add -val to mB, the XYZ-isometric component
+/// add `-val` to the XYZ-isometric matrix
 inline void Meca::sub_iso(size_t i, size_t j, real val)
 {
     CHECK_INDICES(i,j,"sub_iso");
 #if USE_ISO_MATRIX
-    mB(i,j) -= val;
+    mISO(i,j) -= val;
 #else
     size_t ii = DIM * std::max(i, j);
     size_t jj = DIM * std::min(i, j);
-    mC.block(ii, jj).sub_diag(val);
+    mFUL.block(ii, jj).sub_diag(val);
 #endif
 }
 
 
+/// add `vec` to the base
 inline void Meca::add_base(size_t i, Vector const& vec)
 {
     assert_true( i % DIM == 0 );
     vec.add_to(vBAS+i);
 }
 
+/// add `alpha * vec` to the base
 inline void Meca::add_base(size_t i, Vector const& vec, real alpha)
 {
     assert_true( i % DIM == 0 );
     vec.add_to(alpha, vBAS+i);
 }
 
+/// add `-vec` to the base
 inline void Meca::sub_base(size_t i, Vector const& vec)
 {
     assert_true( i % DIM == 0 );
@@ -359,7 +362,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -429,7 +432,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     assert_true( weight >= 0 );
     assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
 
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -538,7 +541,7 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
     if ( pt1.overlapping(pt2) )
         return;
     
-    //index in the matrix mC:
+    // full indices:
     const size_t index[] = { DIM*pt1.matIndex1(), DIM*pt1.matIndex1()+1,
                              DIM*pt1.matIndex2(), DIM*pt1.matIndex2()+1,
                              DIM*pt2.matIndex1(), DIM*pt2.matIndex1()+1,
@@ -609,7 +612,6 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
     }
     
     //very Cumbersome!!!
-    //Entries for Matrix mC  and vector vBAS
     //vBAS = fa - M*P0
     for ( int ii = 0; ii < 8; ++ii )
     {
@@ -619,7 +621,7 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
                 mm = int(jj*(7.5-0.5*jj)+ii);
             else {
                 mm = int(ii*(7.5-0.5*ii)+jj);
-                mC(index[ii], index[jj]) += m[mm];
+                mFUL(index[ii], index[jj]) += m[mm];
             }
             vBAS[index[ii]] -= m[mm]*coord[jj];
         }
@@ -667,7 +669,7 @@ void Meca::addTorque(Interpolation const& pt1,
     //Vector Tv = T.vecmul(v);
     Vector Tv = R.trans_vecmul(v);
 
-    // indices in matrix mC:
+    // full indices:
     const size_t iiA = DIM * pt1.matIndex1();
     const size_t iiB = DIM * pt1.matIndex2();
     const size_t iiC = DIM * pt2.matIndex1();
@@ -892,7 +894,7 @@ void Meca::addTorque(Mecapoint const& ptA,
 */
     const MatrixBlock T = R.transposed();
 
-    // indices in matrix mC:
+    // full indices:
     const size_t iiA = DIM * ptA.matIndex();
     const size_t iiB = DIM * ptB.matIndex();
     const size_t iiC = DIM * ptC.matIndex();
@@ -964,7 +966,7 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
     const MatrixBlock P(0,1);
 #endif
     
-    // indices in matrix mC:
+    // full indices:
     const size_t iiA = DIM * ptA.matIndex();
     const size_t iiB = DIM * ptB.matIndex();
     const size_t iiC = DIM * ptC.matIndex();
@@ -1025,7 +1027,7 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
 
     const MatrixBlock T = R.transposed();
     
-    // indices in matrix mC:
+    // full indices:
     const size_t iiA = DIM * ptA.matIndex();
     const size_t iiB = DIM * ptB.matIndex();
     const size_t iiC = DIM * ptC.matIndex();
@@ -1143,7 +1145,7 @@ Vector Meca::position6(const size_t inx[6], const real coef[6]) const
      force_A = weight * ( B - A )
      force_B = weight * ( A - B )
  
- In practice, Meca::addLink() will update the matrix mB,
+ In practice, Meca::addLink() will update the matrix,
  adding `weight` at the indices corresponding to `A` and `B`.
  
  Note: with modulo, the position of the fibers may be shifted in space,
@@ -1218,7 +1220,7 @@ void Meca::addLink(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = ptA.matIndex1();
     const size_t ii1 = ptA.matIndex2();
     const size_t ii2 = ptB.matIndex();
@@ -1271,7 +1273,7 @@ void Meca::addLink(Mecapoint const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = ptA.matIndex();
     const size_t ii1 = ptB.matIndex1();
     const size_t ii2 = ptB.matIndex2();
@@ -1326,7 +1328,7 @@ void Meca::addLink(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = ptA.matIndex1();
     const size_t ii1 = ptA.matIndex2();
     const size_t ii2 = ptB.matIndex1();
@@ -1386,7 +1388,6 @@ void Meca::addLink(Interpolation const& ptA,
  
  Point A is an Interpolation.
  Point B in the vertex of a Mecable, at index 'pts'.
- Diagonal and lower elements of mB are set.
  */
 void Meca::addLink1(Interpolation const& pti,
                     const size_t pts,
@@ -1394,7 +1395,7 @@ void Meca::addLink1(Interpolation const& pti,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = pts;
     const size_t ii1 = pti.matIndex1();
     const size_t ii2 = pti.matIndex2();
@@ -1438,7 +1439,6 @@ void Meca::addLink1(Interpolation const& pti,
  Point A is a Mecapoint (ptA).
  Point B in interpolated over 2 vertices, specified by index in 'pts[]'
  using the coefficients given in `coef[]`.
- Diagonal and lower elements of mB are set.
  */
 void Meca::addLink2(Mecapoint const& ptA,
                     const size_t pts[2], const real coef[2],
@@ -1446,7 +1446,7 @@ void Meca::addLink2(Mecapoint const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = ptA.matIndex();
     const size_t ii1 = pts[0];
     const size_t ii2 = pts[1];
@@ -1491,7 +1491,6 @@ void Meca::addLink2(Mecapoint const& ptA,
  Point A is an Interpolation.
  Point B in interpolated over 2 vertices, specified by index in 'pts[]'
  using the coefficients given in `coef[]`.
- Diagonal and lower elements of mB are set.
  */
 void Meca::addLink2(Interpolation const& pti,
                     const size_t pts[2], const real coef[2],
@@ -1499,7 +1498,7 @@ void Meca::addLink2(Interpolation const& pti,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = pti.matIndex1();
     const size_t ii1 = pti.matIndex2();
     const size_t ii2 = pts[0];
@@ -1549,7 +1548,6 @@ void Meca::addLink2(Interpolation const& pti,
  Point A is a Mecapoint.
  Point B in interpolated over 3 vertices, specified by index in 'pts[]'
  using the coefficients given in `coef[]`.
- Diagonal and lower elements of mB are set.
  */
 void Meca::addLink3(Mecapoint const& ptA,
                     const size_t pts[3], const real coef[3],
@@ -1557,7 +1555,7 @@ void Meca::addLink3(Mecapoint const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = ptA.matIndex();
     const size_t ii1 = pts[0];
     const size_t ii2 = pts[1];
@@ -1607,7 +1605,6 @@ void Meca::addLink3(Mecapoint const& ptA,
  Point A is an Interpolation.
  Point B in interpolated over 4 vertices, specified by index in 'pts[]'
  using the coefficients given in `coef[]`.
- Diagonal and lower elements of mB are set.
 */
 void Meca::addLink3(Interpolation const& pti,
                     const size_t pts[3], const real coef[3],
@@ -1615,7 +1612,7 @@ void Meca::addLink3(Interpolation const& pti,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = pti.matIndex1();
     const size_t ii1 = pti.matIndex2();
     const size_t ii2 = pts[0];
@@ -1672,7 +1669,6 @@ void Meca::addLink3(Interpolation const& pti,
  Point A is a Mecapoint.
  Point B in interpolated over 4 vertices, specified by index in 'pts[]'
  using the coefficients given in `coef[]`.
- Diagonal and lower elements of mB are set.
  */
 void Meca::addLink4(Mecapoint const& ptA,
                     const size_t pts[4], const real coef[4],
@@ -1680,7 +1676,7 @@ void Meca::addLink4(Mecapoint const& ptA,
 {
     assert_true( weight >= 0 );
 
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = ptA.matIndex();
     const size_t ii1 = pts[0];
     const size_t ii2 = pts[1];
@@ -1738,7 +1734,6 @@ void Meca::addLink4(Mecapoint const& ptA,
  Point A is an Interpolation.
  Point B in interpolated over 4 vertices, specified by index in 'pts[]'
  using the coefficients given in `coef[]`.
- Diagonal and lower elements of mB are set.
 */
 void Meca::addLink4(Interpolation const& pti,
                     const size_t pts[4], const real coef[4],
@@ -1746,7 +1741,7 @@ void Meca::addLink4(Interpolation const& pti,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     const size_t ii0 = pti.matIndex1();
     const size_t ii1 = pti.matIndex2();
     const size_t ii2 = pts[0];
@@ -1889,7 +1884,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     assert_true( weight >= 0 );
     assert_true( len >= 0 );
 
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptB.matIndex1();
     const size_t ii1 = DIM * ptB.matIndex2();
     const size_t ii2 = DIM * ptA.matIndex();
@@ -1929,7 +1924,6 @@ void Meca::addLongLink(Mecapoint const& ptA,
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
 
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     sub_block(ii2, ii0,     cc0, wT);
@@ -1964,7 +1958,7 @@ void Meca::addLongLink(Interpolation const& ptA,
     assert_true( weight >= 0 );
     assert_true( len >= 0 );
 
-    //indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2008,7 +2002,6 @@ void Meca::addLongLink(Interpolation const& ptA,
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
     add_block_diag(ii2, cc2*cc2, wT);
@@ -2068,7 +2061,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    // indices in the matrix mB and mC:
+    // reduced and full indices:
     const size_t ia0 = ptA.matIndex1(),  ii0 = DIM * ia0;
     const size_t ia1 = ptA.matIndex2(),  ii1 = DIM * ia1;
     const size_t ib2 = ptB.matIndex(),   ii2 = DIM * ib2;
@@ -2142,7 +2135,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
@@ -2169,7 +2162,6 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    // fill the matrix mC
     add_block_diag(ii0, wAt*aR); //this term is symmetric but not diagonal
     add_block(ii1, ii0, wBt*aR);
     add_block_diag(ii1, wBt*bR); //this term is symmetric but not diagonal
@@ -2243,7 +2235,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    // indices in the matrix mB and mC:
+    // reduced and full indices:
     const size_t ia0 = ptA.matIndex1(),  ii0 = DIM * ia0;
     const size_t ia1 = ptA.matIndex2(),  ii1 = DIM * ia1;
     const size_t ib2 = ptB.matIndex1(),  ii2 = DIM * ib2;
@@ -2338,7 +2330,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2363,7 +2355,6 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    // fill the matrix mC
     add_block_diag(ii0, wAt*aR);  //this term is symmetric but not diagonal
     add_block(ii1, ii0, wBt*aR);
     add_block_diag(ii1, wBt*bR);  //this term is symmetric but not diagonal
@@ -2411,16 +2402,16 @@ void Meca::testSideLink(Interpolation const& ptA,
                         Torque const& arm,
                         const real weight)
 {
-    mC.reset();
+    mFUL.reset();
     addSideLink3D(ptA, ptB, arm, weight);
     
     {
         std::ofstream o("x");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex() << "\n";
-        mC.printSparse(o, REAL_EPSILON);
+        mFUL.printSparse(o, REAL_EPSILON);
     }
     
-    mC.reset();
+    mFUL.reset();
     size_t P = ptB.point();
     if ( P > 0 )
         addSideLink3D(ptA, Interpolation(ptB.mecable(), P-1, P, 1), arm, weight);
@@ -2430,7 +2421,7 @@ void Meca::testSideLink(Interpolation const& ptA,
     {
         std::ofstream o("y");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex() << "\n";
-        mC.printSparse(o, REAL_EPSILON);
+        mFUL.printSparse(o, REAL_EPSILON);
     }
 }
 
@@ -2488,7 +2479,7 @@ void Meca::addSideLink(Interpolation const& ptA,
 
 #if ( DIM == 2 )
 
-// this is old style code, addressing mC() directly, but it works!
+// this is old style code, addressing mFUL() directly, but it works!
 void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
                                 Interpolation const& ptB,
                                 const real armA, const real armB,
@@ -2496,7 +2487,7 @@ void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mB:
+    // reduced indices:
     size_t ia1 = ptA.matIndex1(), ia2 = ptA.matIndex2();
     size_t ib1 = ptB.matIndex1(), ib2 = ptB.matIndex2();
     
@@ -2517,7 +2508,7 @@ void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
     const real ee2w = ee2 * W, ee2ee2w = ee2 * ee2w;
     const real ee1ee2w = ee1 * ee2w;
     
-    //we put the isotropic terms in mB
+    //isotropic terms
     add_iso(ia1, ia1, ca1w * ca1 + ee1ee1w);
     add_iso(ia2, ia1, ca1w * ca2 - ee1ee1w);
     add_iso(ia2, ia2, ca2w * ca2 + ee1ee1w);
@@ -2540,34 +2531,34 @@ void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
         add_iso(ib1, ia2, ca2w * cb1 + ee1ee2w);
         add_iso(ib2, ia2, ca2w * cb2 - ee1ee2w);
     }
-    //index in the matrix mC:
+    // convert to full indices:
     ia1 *= DIM;
     ia2 *= DIM;
     ib1 *= DIM;
     ib2 *= DIM;
     
-    mC(ia1  , ia2+1) -= ee1w;
-    mC(ia1+1, ia2  ) += ee1w;
+    mFUL(ia1  , ia2+1) -= ee1w;
+    mFUL(ia1+1, ia2  ) += ee1w;
     
-    mC(ib1  , ib2+1) -= ee2w;
-    mC(ib1+1, ib2  ) += ee2w;
+    mFUL(ib1  , ib2+1) -= ee2w;
+    mFUL(ib1+1, ib2  ) += ee2w;
     
     const real ee1cb1w = ee1w * cb1;
     const real ee1cb2w = ee1w * cb2;
     const real ee2ca1w = ee2w * ca1;
     const real ee2ca2w = ee2w * ca2;
     
-    mC(ia1, ib1+1) -=  ee2ca1w + ee1cb1w;
-    mC(ia1, ib2+1) +=  ee2ca1w - ee1cb2w;
+    mFUL(ia1, ib1+1) -=  ee2ca1w + ee1cb1w;
+    mFUL(ia1, ib2+1) +=  ee2ca1w - ee1cb2w;
     
-    mC(ia1+1, ib1) +=  ee2ca1w + ee1cb1w;
-    mC(ia1+1, ib2) -=  ee2ca1w - ee1cb2w;
+    mFUL(ia1+1, ib1) +=  ee2ca1w + ee1cb1w;
+    mFUL(ia1+1, ib2) -=  ee2ca1w - ee1cb2w;
     
-    mC(ia2, ib1+1) -=  ee2ca2w - ee1cb1w;
-    mC(ia2, ib2+1) +=  ee2ca2w + ee1cb2w;
+    mFUL(ia2, ib1+1) -=  ee2ca2w - ee1cb1w;
+    mFUL(ia2, ib2+1) +=  ee2ca2w + ee1cb2w;
     
-    mC(ia2+1, ib1) +=  ee2ca2w - ee1cb1w;
-    mC(ia2+1, ib2) -=  ee2ca2w + ee1cb2w;
+    mFUL(ia2+1, ib1) +=  ee2ca2w - ee1cb1w;
+    mFUL(ia2+1, ib2) -=  ee2ca2w + ee1cb2w;
     
     DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
     
@@ -2584,7 +2575,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
 
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2671,7 +2662,7 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
 
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2813,7 +2804,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
@@ -2880,7 +2871,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
  
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -2905,7 +2896,6 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
@@ -2954,7 +2944,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
@@ -3064,7 +3054,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     add_base(ii1, axi, wa*cc1);
     add_base(ii2, axi, wa);
     
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     sub_block(ii2, ii0,     cc0, wT);
@@ -3132,7 +3121,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     add_base(ii1, warm, cc1);
     sub_base(ii2, warm);
 
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     sub_block(ii2, ii0,     cc0, wT);
@@ -3166,7 +3154,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
@@ -3188,7 +3176,6 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     MatrixBlock aTwP = aR.trans_mul(wP);
     MatrixBlock bTwP = bR.trans_mul(wP);
     
-    // fill the matrix mC
     add_block_diag(ii0, aTwP*aR);
     add_block(ii1, ii0, bTwP*aR);
     add_block_diag(ii1, bTwP*bR);
@@ -3314,7 +3301,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -3341,7 +3328,6 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     Matrix22 aTwP = aR.trans_mul(wP);
     Matrix22 bTwP = bR.trans_mul(wP);
 
-    // fill the matrix mC
     add_block_diag(ii0, aTwP*aR);
     add_block(ii1, ii0, bTwP*aR);
     add_block_diag(ii1, bTwP*bR);
@@ -3391,7 +3377,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -3418,7 +3404,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     add_base(ii2, warm, cc2);
     add_base(ii3, warm, cc3);
     
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
@@ -3470,7 +3455,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -3493,7 +3478,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     add_base(ii2, warm, cc2);
     add_base(ii3, warm, cc3);
     
-    // fill the matrix mC
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
@@ -3557,7 +3541,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex1();
@@ -3582,7 +3566,6 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     MatrixBlock aTwP = aR.trans_mul(wP);
     MatrixBlock bTwP = bR.trans_mul(wP);
     
-    // fill the matrix mC
     add_block_diag(ii0, aTwP*aR);
     add_block(ii1, ii0, bTwP*aR);
     add_block_diag(ii1, bTwP*bR);
@@ -3752,8 +3735,8 @@ void Meca::addPointClampXY(Mecapoint const& ptA,
 #if ( DIM == 2 )
     sub_iso(ptA.matIndex(), ptA.matIndex(), weight);
 #elif ( DIM > 2 )
-    mC(inx,   inx  ) -= weight;
-    mC(inx+1, inx+1) -= weight;
+    mFUL(inx,   inx  ) -= weight;
+    mFUL(inx+1, inx+1) -= weight;
     assert_true( pos.ZZ == 0 );
 #endif
     add_base(inx, pos, weight);
@@ -3906,7 +3889,7 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
     
 #if ( DIM == 2 )
     
-    mC(inx+1, inx+1) -= weight;
+    mFUL(inx+1, inx+1) -= weight;
     vBAS[inx+1]      += weight * std::copysign(rad, pte.pos().YY);
     
 #elif ( DIM >= 3 )
@@ -3922,17 +3905,17 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
     if ( rad < len )
     {
         real wla = weight * rad / len;
-        mC(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
-        mC(inx+2, inx+1) -= wla * dir.YY * dir.ZZ;
-        mC(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+        mFUL(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
+        mFUL(inx+2, inx+1) -= wla * dir.YY * dir.ZZ;
+        mFUL(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
     }
     else
     {
         fac = weight * rad;
 
-        mC(inx+1, inx+1) -= weight * dir.YY * dir.YY;
-        mC(inx+2, inx+1) -= weight * dir.YY * dir.ZZ;
-        mC(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
+        mFUL(inx+1, inx+1) -= weight * dir.YY * dir.YY;
+        mFUL(inx+2, inx+1) -= weight * dir.YY * dir.ZZ;
+        mFUL(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
     }
     
     // there should be no XX component here!
@@ -3960,7 +3943,7 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
     
 #if ( DIM == 2 )
     
-    mC(inx, inx) -= weight;
+    mFUL(inx, inx) -= weight;
     vBAS[inx]    += weight * std::copysign(rad, pte.pos().XX);
     
 #elif ( DIM >= 3 )
@@ -3976,15 +3959,15 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
     if ( rad < len )
     {
         real wla = weight * rad / len;
-        mC(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
-        mC(inx+2, inx  ) -= wla * dir.XX * dir.ZZ;
-        mC(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+        mFUL(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
+        mFUL(inx+2, inx  ) -= wla * dir.XX * dir.ZZ;
+        mFUL(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
     }
     else
     {
-        mC(inx  , inx  ) -= weight * dir.XX * dir.XX;
-        mC(inx+2, inx  ) -= weight * dir.XX * dir.ZZ;
-        mC(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
+        mFUL(inx  , inx  ) -= weight * dir.XX * dir.XX;
+        mFUL(inx+2, inx  ) -= weight * dir.XX * dir.ZZ;
+        mFUL(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
     }
     
     vBAS[inx  ] += fac * dir.XX;
@@ -4023,15 +4006,15 @@ void Meca::addCylinderClampZ(Mecapoint const& pte,
     if ( rad < len )
     {
         real wla = weight * rad / len;
-        mC(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
-        mC(inx+1, inx  ) -= wla * dir.XX * dir.YY;
-        mC(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
+        mFUL(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
+        mFUL(inx+1, inx  ) -= wla * dir.XX * dir.YY;
+        mFUL(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
     }
     else
     {
-        mC(inx  , inx  ) -= weight * dir.XX * dir.XX;
-        mC(inx+1, inx  ) -= weight * dir.XX * dir.YY;
-        mC(inx+1, inx+1) -= weight * dir.YY * dir.YY;
+        mFUL(inx  , inx  ) -= weight * dir.XX * dir.XX;
+        mFUL(inx+1, inx  ) -= weight * dir.XX * dir.YY;
+        mFUL(inx+1, inx+1) -= weight * dir.YY * dir.YY;
     }
     
     vBAS[inx  ] += fac * dir.XX;
@@ -4101,21 +4084,21 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     const real wE = weight * E;
     const real wEE = weight * E * E;
     
-    //index in the matrix mB:
+    // reduced indices:
     size_t ii0 = ptA.matIndex1();
     size_t ii1 = ptA.matIndex2();
     
-    //we put the isotropic terms in mB
+    //isotropic terms:
     sub_iso(ii0, ii0,  wA * A + wEE);
     sub_iso(ii0, ii1,  wA * B - wEE);
     sub_iso(ii1, ii1,  wB * B + wEE);
     
-    //index in the matrix mC:
+    // convert to full indices:
     ii0 *= DIM;
     ii1 *= DIM;
     
-    mC(ii0  , ii1+1) += wE;
-    mC(ii0+1, ii1  ) -= wE;
+    mFUL(ii0  , ii1+1) += wE;
+    mFUL(ii0+1, ii1  ) -= wE;
 
     if ( modulo )
         pos += modulo->offset( ptA.pos() - pos );
@@ -4150,7 +4133,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
                                real const weight)
 {
     assert_true( weight >= 0 );
-    // indices in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
     const size_t ii1 = DIM * ptA.matIndex2();
     
@@ -4165,7 +4148,6 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    // fill the matrix mC
     add_block_diag(ii0, wAt*aR); //this term is symmetric but not diagonal
     add_block(ii1, ii0, wBt*aR);
     add_block_diag(ii1, wBt*bR); //this term is symmetric but not diagonal
@@ -4233,28 +4215,28 @@ void Meca::addPlaneClamp(size_t inx,
                          real off,
                          const real weight)
 {
-    mC(inx, inx) -= weight;
+    mFUL(inx, inx) -= weight;
     vBAS[inx] += weight * off;
 }
 
 void Meca::addPlaneClampX(Mecapoint const& P, real off, real weight)
 {
     size_t inx = DIM * P.matIndex();
-    mC(inx, inx) -= weight;
+    mFUL(inx, inx) -= weight;
     vBAS[inx] += weight * off;
 }
 
 void Meca::addPlaneClampY(Mecapoint const& P, real off, real weight)
 {
     size_t inx = DIM * P.matIndex() + 1;
-    mC(inx, inx) -= weight;
+    mFUL(inx, inx) -= weight;
     vBAS[inx] += weight * off;
 }
 
 void Meca::addPlaneClampZ(Mecapoint const& P, real off, real weight)
 {
     size_t inx = DIM * P.matIndex() + 2;
-    mC(inx, inx) -= weight;
+    mFUL(inx, inx) -= weight;
     vBAS[inx] += weight * off;
 }
 
@@ -4304,7 +4286,7 @@ void Meca::addLineClamp(Interpolation const& pti,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * pti.matIndex1();
     const size_t ii1 = DIM * pti.matIndex2();
 
@@ -4350,7 +4332,7 @@ void Meca::addPlaneClamp(Mecapoint const& pte,
     add_base(inx, dir, weight*dot(pos, dir));
     
 #if ( DIM == 1 ) && USE_ISO_MATRIX
-    mB(inx, inx) -= weight;
+    mISO(inx, inx) -= weight;
 #else
     // wT = -weight * [ dir (x) dir ]
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);
@@ -4377,7 +4359,7 @@ void Meca::addPlaneClamp(Interpolation const& pti,
 {
     assert_true( weight >= 0 );
     
-    //index in the matrix mC:
+    // full indices:
     const size_t ii0 = DIM * pti.matIndex1();
     const size_t ii1 = DIM * pti.matIndex2();
 
@@ -4469,12 +4451,12 @@ void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
         {
             real m = abn5 * ( (ii==jj) - 3 * ab[ii] * ab[jj] );
             
-            mC(inxA+ii, inxA+jj) -= m;
-            mC(inxB+ii, inxB+jj) -= m;
+            mFUL(inxA+ii, inxA+jj) -= m;
+            mFUL(inxB+ii, inxB+jj) -= m;
             
-            mC(inxA+ii, inxB+jj) += m;
+            mFUL(inxA+ii, inxB+jj) += m;
             if ( ii != jj )
-                mC(inxA+jj, inxB+ii) += m;
+                mFUL(inxA+jj, inxB+ii) += m;
         }
     }
 }

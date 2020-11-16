@@ -45,7 +45,7 @@
 
 /**
 Set SEPARATE_RIGIDITY_TERMS to chose how Rigidity term are calculated:
-   0. Rigidity terms are added to Matrix 'mB' or 'mC'
+   0. Rigidity terms are added to 'mISO' or 'mFUL'
    1. Rigidity values are calculated on the fly using `Mecable::addRigidity()`
 .
 With a sequential simulation, the second option is usually faster.
@@ -95,7 +95,7 @@ Meca::Meca()
     vFOR = nullptr;
     vTMP = nullptr;
 #if USE_ISO_MATRIX
-    useMatrixC = false;
+    useFullMatrix = false;
 #endif
     doNotify = 0;
     drawLinks = 0;
@@ -176,12 +176,12 @@ size_t Meca::largestMecable() const
 /**
  calculate the forces into `F`, given the Mecable coordinates `X`:
  
-     F <- B + mB * X + mC * X
+     F <- B + mISO * X + mFUL * X
 
  If `B == 0`, this term is ommited. With `B = vBAS` and `X = vPTS`, this
  function calculates the forces in the system in `F`:
  
-     F <- vBAS + mB * vPTS + mC * vPTS
+     F <- vBAS + mISO * vPTS + mFUL * vPTS
 
  */
 void Meca::calculateForces(const real* X, real const* B, real* F) const
@@ -194,16 +194,16 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
     else
         zero_real(dimension(), F);
     
-    // F <- F + mB * X
+    // F <- F + mISO * X
     
 #if USE_ISO_MATRIX
-    mB.VECMULADDISO(X, F);
+    mISO.VECMULADDISO(X, F);
 
-    if ( useMatrixC )
+    if ( useFullMatrix )
 #endif
     {
-        // F <- F + mC * X
-        mC.vecMulAdd(X, F);
+        // F <- F + mFUL * X
+        mFUL.vecMulAdd(X, F);
     }
 }
 
@@ -339,7 +339,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     const size_t bks = DIM * mec->nbPoints();
 
     // multiply the lines corresponding to this Mecable:
-    mC.vecMul(X, Y, inx, inx+bks);
+    mFUL.vecMul(X, Y, inx, inx+bks);
 
 #if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, Y+inx);
@@ -360,7 +360,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 /**
  calculate the matrix product needed for the conjugate gradient algorithm
  
-     Y <- X - time_step * speed( mB + mC + P' ) * X;
+     Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
  
  */
 void Meca::multiply(const real* X, real* Y) const
@@ -370,7 +370,7 @@ void Meca::multiply(const real* X, real* Y) const
     for ( Mecable * mec : mecables )
         multiply1(mec, X, Y);
 #else
-    mC.vecMul(X, Y);
+    mFUL.vecMul(X, Y);
 
     for ( Mecable * mec : mecables )
     {
@@ -400,7 +400,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
     const size_t inx = DIM * mec->matIndex();
     const size_t bks = DIM * mec->nbPoints();
 
-    mC.vecMul(X, T, inx, inx+bks);
+    mFUL.vecMul(X, T, inx, inx+bks);
     
 #if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, T+inx);
@@ -454,7 +454,7 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
     const size_t inx = DIM * mec->matIndex();
     const size_t bks = DIM * mec->nbPoints();
 
-    mC.vecMul(X, Y, inx, inx+bks);
+    mFUL.vecMul(X, Y, inx, inx+bks);
     
 #if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, Y+inx);
@@ -491,14 +491,14 @@ void Meca::multiply_precondition(real const* X, real* Y) const
 
 #else  // PARALLELIZE_MATRIX
 
-/// Y <- X - time_step * speed( mB + mC + P' ) * X;
+/// Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
 void Meca::multiply(const real* X, real* Y) const
 {
 #if USE_ISO_MATRIX
-    // Y <- ( mB + mC ) * X
+    // Y <- ( mISO + mFUL ) * X
     calculateForces(X, nullptr, Y);
 #else
-    mC.vecMul(X, Y);
+    mFUL.vecMul(X, Y);
 #endif
     
     for ( Mecable * mec : mecables )
@@ -577,19 +577,19 @@ void Meca::getBandedBlock(const Mecable * mec, real* res) const
     //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
 
 #if USE_ISO_MATRIX
-    mB.addTriangularBlockBanded(beta, res, BAND_LDD, mec->matIndex(), nbp, 2);
-    if ( useMatrixC )
+    mISO.addTriangularBlockBanded(beta, res, BAND_LDD, mec->matIndex(), nbp, 2);
+    if ( useFullMatrix )
 #endif
-        mC.addDiagonalTraceBanded(beta/DIM, res, BAND_LDD, DIM*mec->matIndex(), DIM*nbp, 2);
+        mFUL.addDiagonalTraceBanded(beta/DIM, res, BAND_LDD, DIM*mec->matIndex(), DIM*nbp, 2);
 }
 
 
 /**
  Get the total diagonal block corresponding to an Object, which is:
  
-     I - time_step * P ( mB + mC + P' )
+     I - time_step * P ( mISO + mFUL + P' )
  
- The result is constructed by using functions from mB and mC
+ The result is constructed by using functions from mISO and mFUL
  This block is square but not symmetric!
  */
 void Meca::getIsoBlock(const Mecable * mec, real* res) const
@@ -605,10 +605,10 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
         addRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
 #endif
 #if USE_ISO_MATRIX
-    mB.addDiagonalBlock(res, nbp, mec->matIndex(), nbp);
-    if ( useMatrixC )
+    mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp);
+    if ( useFullMatrix )
 #endif
-        mC.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp);
+        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp);
 #if ( 0 )
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
@@ -653,9 +653,9 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
 /**
  Get the total diagonal block corresponding to an Object, which is:
  
-     I - time_step * P ( mB + mC + P' )
+     I - time_step * P ( mISO + mFUL + P' )
  
- The result is constructed by using functions from mB and mC
+ The result is constructed by using functions from mISO and mFUL
  This block is square but not symmetric!
  */
 void Meca::getFullBlock(const Mecable * mec, real* res) const
@@ -675,16 +675,16 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     }
 #endif
 #if USE_ISO_MATRIX
-    mB.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
+    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
     expand_lower_matrix<DIM>(bks, res, bks);
 #if USE_ISO_MATRIX
-    if ( useMatrixC )
+    if ( useFullMatrix )
 #endif
-        mC.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
+        mFUL.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
     
 #if ( 0 )
-    std::clog<<"mB+mC block:\n";
+    std::clog<<"mISO+mFUL block:\n";
     VecPrint::print(std::clog, bks, bks, res, bks);
 #endif
     
@@ -1300,12 +1300,12 @@ void Meca::prepare(Simul const* sim)
     
 #if USE_ISO_MATRIX
     //allocate the sparse matrices:
-    mB.resize(cnt);
-    mB.reset();
+    mISO.resize(cnt);
+    mISO.reset();
 #endif
     
-    mC.resize(DIM*cnt);
-    mC.reset();
+    mFUL.resize(DIM*cnt);
+    mFUL.reset();
     
     // reset base:
     zero_real(DIM*cnt, vBAS);
@@ -1319,9 +1319,9 @@ void Meca::prepare(Simul const* sim)
         if ( mec->hasRigidity() )
         {
 #   if USE_ISO_MATRIX
-            addRigidityMatrix(mB, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addRigidityMatrix(mISO, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   else
-            addRigidityBlockMatrix<DIM>(mC, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addRigidityBlockMatrix<DIM>(mFUL, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   endif
         }
 #endif
@@ -1331,16 +1331,16 @@ void Meca::prepare(Simul const* sim)
 
 
 /**
- Prepare matrices mB and mC for multiplication
+ Prepare matrices mISO and mFUL for multiplication
  This should be called after setInteractions()
  */
 void Meca::prepareMatrices()
 {
 #if USE_ISO_MATRIX
-    mB.prepareForMultiply(DIM);
-    useMatrixC = mC.prepareForMultiply(1);
+    mISO.prepareForMultiply(DIM);
+    useFullMatrix = mFUL.prepareForMultiply(1);
 #else
-    mC.prepareForMultiply(1);
+    mFUL.prepareForMultiply(1);
 #endif
 }
 
@@ -1428,14 +1428,14 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real 
  Implicit integration ensures numerical stability. In the code,
  the sparse matrix M is decomposed as:
  
-     M = mB + mC + Rigidity_of_Mecables
+     M = mISO + mFUL + Rigidity_of_Mecables
  
- Where mB is isotropic: it applies similarly in the X, Y and Z subspaces, and
+ Where mISO is isotropic: it applies similarly in the X, Y and Z subspaces, and
  has no crossterms between X and Y or X and Z or Y ans Z subspaces.
- All crossterms go into mC.
+ All crossterms go into mFUL.
  The terms should already be set:
 
-     'mB', 'mC' and 'B=vBAS' are set in Meca::setAllInteractions()
+     'mISO', 'mFUL' and 'B=vBAS' are set in Meca::setAllInteractions()
      'vPTS = Xold' is set from Mecables' points in Meca::prepare()
      
  The outline of the calculation is:
@@ -1715,10 +1715,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         std::stringstream oss;
         oss << "\tsize " << DIM << "*" << nbVertices() << " kern " << largestMecable();
 #if USE_ISO_MATRIX
-        oss << " " << mB.what();
-        if ( useMatrixC )
+        oss << " " << mISO.what();
+        if ( useFullMatrix )
 #endif
-        oss << " " << mC.what();
+        oss << " " << mFUL.what();
         oss << " precond " << precond;
         oss << " count " << std::setw(3) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
@@ -1806,7 +1806,7 @@ void Meca::flagClusters() const
     for ( size_t jj = 0; jj < MAX; ++jj )
     {
         Mecable const* A = which[jj];
-        auto const& col = mC.column(DIM*jj);
+        auto const& col = mFUL.column(DIM*jj);
         for ( size_t n = 0; n < col.size_; ++n )
         {
             size_t ii = col.inx_[n]/DIM;
@@ -1831,8 +1831,8 @@ void Meca::flagClusters() const
     for ( size_t jj = 0; jj < MAX; ++jj )
     {
         Mecable const* A = which[jj];
-        auto const* col = mB.column(jj);
-        for ( size_t n = 0; n < mB.column_size(jj); ++n )
+        auto const* col = mISO.column(jj);
+        for ( size_t n = 0; n < mISO.column_size(jj); ++n )
         {
             size_t ii = col[n].inx;
             assert_true( ii < MAX );
@@ -2262,12 +2262,12 @@ void Meca::dumpSparse()
     
 #if USE_ISO_MATRIX
     os.open("d_matB.txt");
-    mB.printSparse(os, 0);
+    mISO.printSparse(os, 0);
     os.close();
 #endif
     
     os.open("d_matC.txt");
-    mC.printSparse(os, 0);
+    mFUL.printSparse(os, 0);
     os.close();
         
     size_t alc = 0;

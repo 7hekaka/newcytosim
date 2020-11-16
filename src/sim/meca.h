@@ -22,7 +22,7 @@ class Simul;
 
 /**
  Set to 1 to distribute the Matrix Vector-multiplication in multithreaded code.
- This will select a type for matrix mC specifically built for that purpose.
+ This will select a type for matrix mFUL specifically built for that purpose.
  This option can only be beneficial if NUM_THREADS > 1
  Do not enable this option for sequential code.
  */
@@ -37,8 +37,8 @@ class Matrix34;
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM
 /**
- MatrixBlock is used to update the matrix mC in 'meca_inter.cc',
- and should match the class used for the blocks of mC.
+ MatrixBlock is used to update the matrix mFUL in 'meca_inter.cc',
+ and should match the class used for the blocks of mFUL.
  */
 #if ( DIM == 1 )
 typedef Matrix11 MatrixBlock;
@@ -51,7 +51,7 @@ typedef Matrix33 MatrixBlock;
 #endif
 
 
-/// set TRUE to use matrix mB and mC (the traditional way)
+/// set TRUE to use matrix mISO and mFUL (the traditional way)
 /** This option should be 0 if PARALLELIZE_MATRIX == 1 */
 #define USE_ISO_MATRIX 0
 
@@ -75,7 +75,7 @@ The equation is formulated using linear-algebra:
  
  with
  
-    Force = vBAS + ( mB + mC + mR ) * vPTS
+    Force = vBAS + ( mISO + mFUL + mR ) * vPTS
  
  The equation is solved for a small increment of time `time_step`, in the presence
  of Brownian motion, and at low Reynolds number, ie. a regime in which inertial
@@ -93,15 +93,15 @@ The equation is formulated using linear-algebra:
    calibrated random forces simulating Brownian motion, and also offsets for periodic
    boundary conditions.
  
- - Matrix mB is the isotropic part obtained after linearization of the forces.
+ - Matrix mISO is the isotropic part obtained after linearization of the forces.
    It operates similarly and independently on the different dimension X, Y and Z.
-   mB is square of size nbPoints(), symmetric and sparse.
+   mISO is square of size nbPoints(), symmetric and sparse.
  
- - Matrix mC is the non-isotropic part obtained after linearization of the forces.
-   mC is square of size DIM*nbPoints(), symmetric and sparse.
+ - Matrix mFUL is the non-isotropic part obtained after linearization of the forces.
+   mFUL is square of size DIM*nbPoints(), symmetric and sparse.
  .
  
- Typically, mB and mC will inherit the stiffness coefficients of the interactions, 
+ Typically, mISO and mFUL will inherit the stiffness coefficients of the interactions, 
  while vBAS will get forces (stiffness * position). They are set by the member functions
  addLink(), addLongLink(), addSideLink(), addSlidingLink(), etc.
 
@@ -168,13 +168,13 @@ private:
     //--------------------------------------------------------------------------
     // Vectors of size DIM * nbPoints()
     
-    real*  vPTS;         ///< coordinates of Mecable points
-    real*  vSOL;         ///< coordinates after the dynamics has been solved
-    real*  vBAS;         ///< part of the force that is independent of positions
-    real*  vRND;         ///< vector of Gaussian random numbers
-    real*  vRHS;         ///< right hand side of the dynamic system
-    real*  vFOR;         ///< the calculated forces, with Brownian components
-    real*  vTMP;         ///< intermediate of calculus
+    real * vPTS;         ///< coordinates of Mecable points
+    real * vSOL;         ///< coordinates after the dynamics has been solved
+    real * vBAS;         ///< part of the force that is independent of positions
+    real * vRND;         ///< vector of Gaussian random numbers
+    real * vRHS;         ///< right hand side of the dynamic system
+    real * vFOR;         ///< the calculated forces, with Brownian components
+    real * vTMP;         ///< intermediate of calculus
     
     //--------------------------------------------------------------------------
 
@@ -189,27 +189,27 @@ private:
 
 private:
 #if USE_ISO_MATRIX    
-    /// true if the matrix mC is non-zero
-    bool   useMatrixC;
+    /// true if the matrix mFUL is non-zero
+    bool useFullMatrix;
 
     /// isotropic symmetric part of the dynamic
     /** 
-     This is a symmetric square matrix of size `nbPoints()`
-     It contains terms which have identical coefficients on the X, Y, Z subspaces, such as addLink()
+     This is a symmetric square matrix of size `nbPoints()`, acting
+     identically and separately on the X, Y, Z subspaces, such as addLink()
     */
-    SparMatSym1  mB;
+    SparMatSym1 mISO;
 #endif
     
     /// non-isotropic symmetric part of the dynamic
     /** 
-     This is a symmetric square matrix of size `DIM*nbPoints()`
+     This is a symmetric square matrix of size `DIM * nbPoints()`
      It contains terms which are different in the X, Y, Z subspaces,
      arising from addSideLink() addSideSlidingLink(), etc.
     */
 #if PARALLELIZE_MATRIX
-    SparMatBlk     mC;
+    SparMatBlk    mFUL;
 #else
-    SparMatSymBlk  mC;
+    SparMatSymBlk mFUL;
 #endif
     
 public:
@@ -237,40 +237,40 @@ public:
 
 private:
     
-    /// add block 'T' to mC at position (i, j)
+    /// add block 'T' to mFUL at position (i, j)
     void add_block(size_t i, size_t j, MatrixBlock const& T);
  
-    /// add block 'alpha*T' to mC at position (i, j)
+    /// add block 'alpha*T' to mFUL at position (i, j)
     void add_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
     
-    /// subtract block 'T' to mC at position (i, j)
+    /// add block '-T' to mFUL at position (i, j)
     void sub_block(size_t i, size_t j, MatrixBlock const& T);
 
-    /// subtract block 'alpha*T' to mC at position (i, j)
+    /// add block '-alpha*T' to mFUL at position (i, j)
     void sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
 
-    /// add block 'T' to mC at position (i, i)
+    /// add block 'T' to mFUL at position (i, i)
     void add_block_diag(size_t i, MatrixBlock const& T);
     
-    /// subtract block 'T' to mC at position (i, i)
+    /// add block '-T' to mFUL at position (i, i)
     void sub_block_diag(size_t i, MatrixBlock const& T);
     
-    /// add block 'alpha*T' to mC at position (i, i)
+    /// add block 'alpha*T' to mFUL at position (i, i)
     void add_block_diag(size_t i, real alpha, MatrixBlock const& T);
 
-    /// add value to mB at position (i, j)
+    /// add value to mISO at position (i, j)
     void add_iso(size_t i, size_t j, real val);
 
-    /// add value to mB at position (i, j)
+    /// subtract value to mISO at position (i, j)
     void sub_iso(size_t i, size_t j, real val);
 
-    /// add value to vBAS at index `i`
+    /// add vector to vBAS at index `i`
     void add_base(size_t i, Vector const&);
 
-    /// add value to vBAS at index `i`
+    /// add scaled vector to vBAS at index `i`
     void add_base(size_t i, Vector const&, real);
 
-    /// sub value to vBAS at index `i`
+    /// sub vector to vBAS at index `i`
     void sub_base(size_t i, Vector const&);
 
 private:
@@ -293,7 +293,7 @@ private:
     /// implements multiply() followed by precondition() for one Mecable
     void multiply_precondition1(const Mecable*, const real*, real*, real*) const;
 
-    /// calculate the linear part of forces:  Y <- B + ( mB + mC ) * X
+    /// calculate the linear part of forces:  Y <- B + ( mISO + mFUL ) * X
     void calculateForces(const real* X, const real* B, real* Y) const;
 
     /// add forces due to bending elasticity
@@ -353,22 +353,22 @@ public:
     ~Meca() { release(); }
     
     /// Add a Mecable to the list of objects to be simulated
-    void     addMecable(Mecable* p) { mecables.push_back(p); }
+    void   addMecable(Mecable* p) { mecables.push_back(p); }
     
     /// Number of Mecable
-    size_t   nbMecables() const { return mecables.size(); }
+    size_t nbMecables() const { return mecables.size(); }
     
     /// Number of points in the Mecable that has the most number of points
-    size_t   largestMecable() const;
+    size_t largestMecable() const;
 
     /// true if system does not contain any object
-    bool     empty() const { return nPoints_ == 0; }
+    bool   empty() const { return nPoints_ == 0; }
     
     /// number of points in the system
-    size_t   nbVertices() const { return nPoints_; }
+    size_t nbVertices() const { return nPoints_; }
     
     /// Implementation of LinearOperator::size()
-    size_t   dimension() const { return DIM * nPoints_; }
+    size_t dimension() const { return DIM * nPoints_; }
     
     /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;

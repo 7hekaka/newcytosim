@@ -48,10 +48,10 @@ void Aster::step()
  Note on possible optimization:
  The coefficients of the interpolations to the Solid points are constant in time,
  and so we could simply set a matrix once, and keep it over time.
- Specifically, we would introduce a new matrix in Meca, `mK` and set it only once.
+ Specifically, we would introduce a new matrix in Meca, `mCST` and set it only once.
  We can then include these additional terms directly as we calculate forces in Meca:
 
-     Y <- Y + ( mB + mC + mK ) * X
+     Y <- Y + ( mISO + mFUL + mCST ) * X
 
  */
 void Aster::setInteractions(Meca& meca) const
