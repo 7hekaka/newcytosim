@@ -78,9 +78,9 @@ void xpttrf(int size, real* D, real* E)
          B(I) = B(I) / D(I) - B(I+1) * E(I)
      CONTINUE
  */
-void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, int LDB)
+void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, int)
 {
-    assert_true( NRHS == 1 ); // in this case, LDB is not used
+    assert_true( NRHS == 1 ); // in this case, the last argument (LDB) is ignored
 
     for ( int i = 1; i < size; ++i )
         B[i] = B[i] - B[i-1] * E[i-1];
@@ -131,10 +131,10 @@ void italian_xpttrf(int size, real* D, real const* E, int* INFO)
      for i = N-1:-1:1
          x(i) = y(i) - gamma(i) * c(i) * x(i+1);
  */
-void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int LDB)
+void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int)
 {
     assert_true(size > 0);
-    assert_true(nrhs == 1); // in this case, LDB is not used
+    assert_true(nrhs == 1); // in this case, the last argument (LDB) is ignored
  
     B[0] = D[0] * B[0];
     if ( size > 1 )
@@ -294,10 +294,10 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
  
  Improved on 02.04.2020: removed one multiplication, now only using FMAs
  */
-void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, real* B, size_t LDB)
+void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, real* B, size_t)
 {
     assert_true(size > 0);
-    assert_true(nrhs == 1); // in this case, LDB is not used
+    assert_true(nrhs == 1); // in this case, the last argument (LDB) is ignored
 
     // upward recursion on B[]
     real x = B[0];
