@@ -537,7 +537,6 @@ void projectForcesU3D_SSE(size_t nbs, const real* dif, const real* src, real* mu
 
          store1(mul, add1(s0, add1(s1, ss)));
    }
-    assert_true(mul==end+3);
 }
 
 #endif
@@ -980,19 +979,19 @@ void projectForcesD3D_SSE(size_t nbs, const real* dif,
     // first round involving 6 scalars = 3 SSE vectors
     if ( mul < end )
     {
-        vec2 m0 = loaddup2(mul);
-        vec2 m1 = loaddup2(mul+1);
-        vec2 p0 = unpacklo2(setzero2(), m0);
-        vec2 p1 = unpacklo2(m0, m1);
+        vec2 BC = loadu2(mul);
+        vec2 BB = unpacklo2(BC, BC);
+        vec2 CC = unpackhi2(BC, BC);
+        vec2 AB = blend2(setzero2(), BB, 0b10);
 
         mul += 2;
-        vec2 a0 = fmadd2(m0, load2(dif  ), loadu2(src  ));
-        vec2 a1 = fmadd2(p1, load2(dif+2), loadu2(src+2));
-        vec2 a2 = fmadd2(m1, load2(dif+4), loadu2(src+4));
+        vec2 a0 = fmadd2(BB, load2(dif  ), loadu2(src  ));
+        vec2 a1 = fmadd2(BC, load2(dif+2), loadu2(src+2));
+        vec2 a2 = fmadd2(CC, load2(dif+4), loadu2(src+4));
 
         storeu2(dst  , a0);
-        storeu2(dst+2, fnmadd2(p0, loaddup2(dif), a1));
-        storeu2(dst+4, fnmadd2(m0, loadu2(dif+1), a2));
+        storeu2(dst+2, fnmadd2(AB, loaddup2(dif), a1));
+        storeu2(dst+4, fnmadd2(BB, loadu2(dif+1), a2));
         dif += 6;
         dst += 6;
         src += 6;
@@ -1000,62 +999,101 @@ void projectForcesD3D_SSE(size_t nbs, const real* dif,
     else
     {
         // only 2 points overall
-        vec2 m0 = loaddup2(mul);
-        vec2 p0 = unpacklo2(setzero2(), m0);
-        vec2 p1 = unpacklo2(m0, setzero2());
+        vec2 BB = loaddup2(mul);
+        vec2 AB = blend2(setzero2(), BB, 0b10);
+        vec2 BC = blend2(setzero2(), BB, 0b01);
         
-        vec2 a0 = fmadd2(m0, load2(dif  ), loadu2(src  ));
-        vec2 a1 = fmadd2(p1, load1(dif+2), loadu2(src+2));
+        vec2 a0 = fmadd2(BB, load2(dif  ), loadu2(src  ));
+        vec2 a1 = fmadd2(BC, load1(dif+2), loadu2(src+2));
         
         storeu2(dst  , a0);
-        storeu2(dst+2, fnmadd2(p0, loaddup2(dif), a1));
-        storeu2(dst+4, fnmadd2(m0, loadu2(dif+1), loadu2(src+4)));
+        storeu2(dst+2, fnmadd2(AB, loaddup2(dif), a1));
+        storeu2(dst+4, fnmadd2(BB, loadu2(dif+1), loadu2(src+4)));
         return;
     }
+#if 0
+    // unrolled processing 4 multipliers
+    while ( mul < end-3 )
+    {
+        vec2 AB = loadu2(mul-1);
+        vec2 CC = loaddup2(mul+1);
+        vec2 DE = loadu2(mul+2);
+        vec2 AA = unpacklo2(AB, AB);
+        vec2 BB = unpackhi2(AB, AB);
+        vec2 CD = unpacklo2(CC, DE);
+        vec2 DD = unpacklo2(DE, DE);
+        vec2 BC = unpackhi2(AB, CC);
+        vec2 EE = unpackhi2(DE, DE);
 
+        mul += 4;
+        vec2 a0 = fnmadd2(loadu2(dif-3), AA, loadu2(src  ));
+        vec2 a1 = fnmadd2(loadu2(dif-1), AB, loadu2(src+2));
+        vec2 a2 = fnmadd2(loadu2(dif+1), BB, loadu2(src+4));
+        
+        vec2 b0 = fnmadd2(loadu2(dif+3), CC, loadu2(src+6));
+        vec2 b1 = fnmadd2(loadu2(dif+5), CD, loadu2(src+8));
+        vec2 b2 = fnmadd2(loadu2(dif+7), DD, loadu2(src+10));
+
+        storeu2(dst  , fmadd2(load2(dif  ), BB, a0));
+        storeu2(dst+2, fmadd2(load2(dif+2), BC, a1));
+        storeu2(dst+4, fmadd2(load2(dif+4), CC, a2));
+        
+        storeu2(dst+ 6, fmadd2(load2(dif+6), DD, b0));
+        storeu2(dst+ 8, fmadd2(load2(dif+8), DE, b1));
+        storeu2(dst+10, fmadd2(load2(dif+10), EE, b2));
+        dif += 12;
+        dst += 12;
+        src += 12;
+    }
+#endif
     // bulk work could be unrolled
     while ( mul < end )
     {
-        vec2 mm = loaddup2(mul-1);
-        vec2 m0 = loaddup2(mul);
-        vec2 m1 = loaddup2(mul+1);
-        vec2 p0 = unpacklo2(mm, m0);
-        vec2 p1 = unpacklo2(m0, m1);
-
+        vec2 AB = loadu2(mul-1);
+        vec2 BC = loadu2(mul);
+        vec2 AA = unpacklo2(AB, AB);
+        vec2 BB = unpackhi2(AB, AB);
+        vec2 CC = unpackhi2(BC, BC);
+        /*
+        vec2 AA = loaddup2(mul-1);
+        vec2 BB = loaddup2(mul);
+        vec2 AB = blend2(AA, BB, 0b10);
+        vec2 CC = loaddup2(mul+1);
+        vec2 BC = blend2(BB, CC, 0b10);
+         */
         mul += 2;
-        vec2 a0 = fnmadd2(mm, loadu2(dif-3), loadu2(src  ));
-        vec2 a1 = fnmadd2(p0, loadu2(dif-1), loadu2(src+2));
-        vec2 a2 = fnmadd2(m0, loadu2(dif+1), loadu2(src+4));
+        vec2 a0 = fnmadd2(AA, loadu2(dif-3), loadu2(src  ));
+        vec2 a1 = fnmadd2(AB, loadu2(dif-1), loadu2(src+2));
+        vec2 a2 = fnmadd2(BB, loadu2(dif+1), loadu2(src+4));
 
-        storeu2(dst  , fmadd2(m0, load2(dif  ), a0));
-        storeu2(dst+2, fmadd2(p1, load2(dif+2), a1));
-        storeu2(dst+4, fmadd2(m1, load2(dif+4), a2));
+        storeu2(dst  , fmadd2(BB, load2(dif  ), a0));
+        storeu2(dst+2, fmadd2(BC, load2(dif+2), a1));
+        storeu2(dst+4, fmadd2(CC, load2(dif+4), a2));
         dif += 6;
         dst += 6;
         src += 6;
     }
-    
     if ( nbs & 1 )
     {
-        // 2 points remain = 6 scalars
-        vec2 mm = loaddup2(mul-1);
-        vec2 m0 = loaddup2(mul);
-        vec2 p0 = unpacklo2(mm, m0);
+        // 2 points remaining = 6 scalars
+        vec2 AA = loaddup2(mul-1);
+        vec2 BB = loaddup2(mul);
+        vec2 AB = blend2(AA, BB, 0b10);
 
-        vec2 a0 = fnmadd2(mm, loadu2(dif-3), loadu2(src  ));
-        vec2 a1 = fnmadd2(p0, loadu2(dif-1), loadu2(src+2));
-        vec2 a2 = fnmadd2(m0, loadu2(dif+1), loadu2(src+4));
+        vec2 a0 = fnmadd2(AA, loadu2(dif-3), loadu2(src  ));
+        vec2 a1 = fnmadd2(AB, loadu2(dif-1), loadu2(src+2));
+        vec2 a2 = fnmadd2(BB, loadu2(dif+1), loadu2(src+4));
 
-        storeu2(dst  , fmadd2(m0, load2(dif  ), a0));
-        storeu2(dst+2, fmadd2(m0, load1(dif+2), a1));
+        storeu2(dst  , fmadd2(BB, load2(dif  ), a0));
+        storeu2(dst+2, fmadd2(BB, load1(dif+2), a1));
         storeu2(dst+4, a2);
     }
     else
     {
         // 1 point remains = 3 scalars
-        vec2 mm = loaddup2(mul-1);
-        storeu2(dst, fnmadd2(mm, loadu2(dif-3), loadu2(src)));
-        store1(dst+2, fnmadd1(mm, load1(dif-1), load1(src+2)));
+        vec2 AA = loaddup2(mul-1);
+        storeu2(dst, fnmadd2(AA, loadu2(dif-3), loadu2(src)));
+        store1(dst+2, fnmadd1(AA, load1(dif-1), load1(src+2)));
     }
 }
 #endif
@@ -1293,7 +1331,7 @@ void checkProject()
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
 
-    for ( size_t nbs = std::min(NSEG,7UL); nbs > 0; --nbs )
+    for ( size_t nbs = std::min(NSEG,11UL); nbs > 0; --nbs )
     {
         size_t nbv = DIM * ( nbs + 1 );
         new_nans(nbv, x, y, z);
@@ -1336,6 +1374,8 @@ void checkProject()
             printf(" XXXX %e\n", err);
         else
             printf("  --> %e\n", err);
+#else
+        printf("\n");
 #endif
     }
     free_reals(x,y,z);
