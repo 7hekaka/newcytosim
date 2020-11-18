@@ -394,13 +394,10 @@ int Simul::loadObjects(Inputter& in, ObjectSet* subset)
     
     if ( ! in.good() )
         throw InvalidIO("invalid file in Simul::loadObjects()");
-    
-    // set expected vector size as default:
-    in.vectorSize(DIM);
 
     int res = 0;
-    
     in.lock();
+    
     try
     {
         res = readObjects(in, subset);
