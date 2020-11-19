@@ -861,7 +861,7 @@ void Simul::reportFiberPoints(std::ostream& out, Property const* sel, bool com) 
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
-            out << SEP << fib->posP(p);
+            out << SEP << fib->posPoint(p);
             out << SEP << fib->curvature(p);
         }
     }
@@ -1029,7 +1029,7 @@ void Simul::reportFiberMoments(std::ostream& out) const
                 const real w = fib->segmentation();
                 accum.add(0.5*w, fib->posEndM());
                 for ( size_t n = 1; n < fib->lastPoint(); ++n )
-                    accum.add(w, fib->posP(n));
+                    accum.add(w, fib->posPoint(n));
                 accum.add(0.5*w, fib->posEndP());
             }
         }
@@ -1061,7 +1061,7 @@ void Simul::reportFiberForces(std::ostream& out) const
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
-            out << SEP << fib->posP(p);
+            out << SEP << fib->posPoint(p);
             out << SEP << fib->netForce(p);
             if ( p == fib->lastPoint() )
                 out << SEP << 0.0;
@@ -1173,7 +1173,7 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
          for ( size_t p = 0; p < fib->nbPoints(); ++p )
          {
              out << LIN << fib->identity();
-             Vector w, pos = fib->posP(p);
+             Vector w, pos = fib->posPoint(p);
              out << SEP << pos;
              if ( spc->outside(pos) )
              {
@@ -1207,7 +1207,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
         
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
-            Vector w, pos = fib->posP(p);
+            Vector w, pos = fib->posPoint(p);
             if ( spc->outside(pos) )
             {
                 ++cnt;
@@ -1681,9 +1681,9 @@ void Simul::reportSolidPosition(std::ostream& out, Property const* sel, bool com
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
         out << SEP << obj->centroid();
-        out << SEP << obj->posP(0);
+        out << SEP << obj->posPoint(0);
         if ( obj->nbPoints() > 1 )
-        out << SEP << obj->posP(1);
+        out << SEP << obj->posPoint(1);
         
         if ( modulo )
         {
@@ -1762,9 +1762,9 @@ void Simul::reportSpherePosition(std::ostream& out, Property const* sel, bool co
             continue;
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
-        out << SEP << obj->posP(0);
+        out << SEP << obj->posPoint(0);
         if ( obj->nbPoints() > 1 )
-        out << SEP << obj->posP(1);
+        out << SEP << obj->posPoint(1);
     }
 }
 
@@ -2913,7 +2913,7 @@ void Simul::reportAshbya(std::ostream& out) const
     {
         out << LIN << obj->prop->number();
         out << SEP << obj->identity();
-        out << SEP << obj->posP(0);
+        out << SEP << obj->posPoint(0);
         if ( obj->nbPoints() > 1 )
         {
             Vector vec = normalize(obj->diffPoints(0));
