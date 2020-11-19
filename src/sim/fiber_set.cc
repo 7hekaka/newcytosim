@@ -365,8 +365,8 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 {
                     if ( seg1.within(abs1) & seg2.within(abs2) )
                     {
-                        res1.emplace_back(fib1, abs1+fib1->abscissaPoint(s1));
-                        res2.emplace_back(fib1, abs2+fib1->abscissaPoint(s2));
+                        res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
+                        res2.emplace(fib1, abs2+fib1->abscissaPoint(s2));
                     }
                 }
             }
@@ -381,8 +381,8 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                     {
                         if ( seg1.within(abs1) & seg2.within(abs2) )
                         {
-                            res1.emplace_back(fib1, abs1+fib1->abscissaPoint(s1));
-                            res2.emplace_back(fib2, abs2+fib2->abscissaPoint(s2));
+                            res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
+                            res2.emplace(fib2, abs2+fib2->abscissaPoint(s2));
                         }
                     }
                 }
@@ -451,8 +451,8 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                     {
                         if ( seg.within(abs1) & can.within(abs2) )
                         {
-                            res1.emplace_back(fib, abs1+fib->abscissaPoint(s));
-                            res2.emplace_back(bif, abs2+bif->abscissaPoint(can.point()));
+                            res1.emplace(fib, abs1+fib->abscissaPoint(s));
+                            res2.emplace(bif, abs2+bif->abscissaPoint(can.point()));
                         }
                     }
                 }
@@ -492,7 +492,7 @@ void FiberSet::uniFiberSites(Array<FiberSite>& res, const real spread) const
         real len = fib->length();
         while ( abs < len )
         {
-            res.emplace_back(fib, abs+fib->abscissaM());
+            res.emplace(fib, abs+fib->abscissaM());
             abs += spread * RNG.exponential();
         }
         abs -= len;
@@ -634,7 +634,7 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
         real len = fib->freshAssemblyP();
         while ( abs < len )
         {
-            res.emplace_back(fib, fib->abscissaP()-abs);
+            res.emplace(fib, fib->abscissaP()-abs);
             abs += spread * RNG.exponential();
         }
         abs -= len;
@@ -668,7 +668,7 @@ void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real spread) const
         real a = fib->freshAssemblyM();
         while ( abs < a )
         {
-            res.emplace_back(fib, fib->abscissaM()+abs);
+            res.emplace(fib, fib->abscissaM()+abs);
             abs += spread * RNG.exponential();
         }
         abs -= a;

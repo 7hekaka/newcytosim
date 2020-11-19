@@ -287,7 +287,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             real abs = seg.projectPoint(place, dis);
             //std::clog << " target " << seg << " at " << dis << "\n";
             if ( dis < sup )
-                targets.emplace_back(seg, dis, abs);
+                targets.emplace(seg, dis, abs);
         }
     }
     

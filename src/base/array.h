@@ -360,7 +360,7 @@ public:
     }
     
     template < typename... Args >
-    void emplace_back(Args&&... args)
+    void emplace(Args&&... args)
     {
         if ( nbo_ >= alc_ )
             reallocate(chunked(nbo_+1));

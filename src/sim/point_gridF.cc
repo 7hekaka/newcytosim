@@ -86,7 +86,7 @@ void PointGridF::add(size_t pan, Mecapoint const& pe, real rd) const
         throw InvalidParameter("point:steric is out-of-range");
     
     Vector w = pe.pos();
-    point_list(w, pan).emplace_back(pe, rd, w);
+    point_list(w, pan).emplace(pe, rd, w);
     
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two particles
@@ -108,7 +108,7 @@ void PointGridF::add(size_t pan, FiberSegment const& fl, real rd) const
     
     // link in the cell containing the middle of the segment:
     Vector w = fl.center();
-    locus_list(w, pan).emplace_back(fl, rd, w);
+    locus_list(w, pan).emplace(fl, rd, w);
     
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
