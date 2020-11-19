@@ -88,17 +88,14 @@ private:
     /// Matrix used for preconditionning
     MatrixFull  pBlockMatrix;
 #endif
-
-    /// Clear pointers
-    void        clearMecable();
     
 public:
 
     /// The constructor resets the pointers to memory
-    Mecable()            { clearMecable(); }
+    Mecable();
     
     /// Destructor should release memory
-    virtual ~Mecable()   { release(); }
+    virtual ~Mecable() { release(); }
 
     /// Copy constructor
     Mecable(Mecable const&);

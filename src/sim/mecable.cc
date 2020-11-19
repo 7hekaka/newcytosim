@@ -12,7 +12,7 @@
 /**
 clear pointers
  */
-void Mecable::clearMecable()
+Mecable::Mecable()
 {
     pAllocated = 0;
     nPoints    = 0;
@@ -31,9 +31,8 @@ void Mecable::clearMecable()
 }
 
 
-Mecable::Mecable(const Mecable & o)
+Mecable::Mecable(const Mecable & o) : Mecable()
 {
-    clearMecable();
     setNbPoints(o.nPoints);
     copy_real(DIM*nPoints, o.pPos, pPos);
 }
