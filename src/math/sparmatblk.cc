@@ -41,7 +41,7 @@ void SparMatBlk::allocate(size_t alc)
             delete[] row_;
         }
         
-        row_       = row_new;
+        row_   = row_new;
         alloc_ = alc;
         
         delete[] next_;

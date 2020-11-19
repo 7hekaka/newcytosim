@@ -54,16 +54,16 @@ public:
     struct val_type 
     {
         /// the value specified as a string
-        std::string      value_;
+        std::string    value_;
         
         /// true if this value has been intentionally set by the user
-        bool           defined_;
+        bool         defined_;
         
         /// the number of times this value has been read
-        mutable size_t   count_;
+        mutable size_t count_;
         
         /// constructor
-        val_type()     { defined_=false; count_=0; }
+        val_type()   { defined_=false; count_=0; }
         
         /// constructor with initialization
         val_type(std::string const& s, bool d) { value_=s; defined_=d; count_=0; }
