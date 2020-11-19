@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    Cytosim::silence_all();
+    Cytosim::silent();
     size_t f = frame;
     size_t cnt = 1;
     

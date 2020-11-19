@@ -7,14 +7,14 @@ namespace Cytosim
     /// alias to standard output
     Output out(std::cout);
     
-    /// for logs
+    /// alias to standard log
     Output log(std::clog);
     
-    /// for warnings
+    /// alias to standard error
     Output warn(std::cerr, 32U, "WARNING: ");
     
     /// supress all output
-    void silence_all()
+    void silent()
     {
         Cytosim::out.silent();
         Cytosim::log.silent();

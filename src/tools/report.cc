@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    Cytosim::silence_all();
+    Cytosim::silent();
     
     // process first record, at index 'frame':
     if ( reader.loadFrame(simul, frame) )

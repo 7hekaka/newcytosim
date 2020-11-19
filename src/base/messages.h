@@ -112,14 +112,14 @@ namespace Cytosim
     /// for normal output
     extern Output out;
 
-    /// for logs
+    /// for logging
     extern Output log;
 
     /// for warnings
     extern Output warn;
 
     /// suppress all output
-    void silence_all();
+    void silent();
 }
 
 
