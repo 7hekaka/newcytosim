@@ -19,7 +19,7 @@
  This makes the executable faster.
  Note that the value of NDEBUG is ignored!
  */
-//#define NDEBUG 1
+#define NDEBUG 1
 
 
 /// strips the full pathname for a file name
@@ -30,11 +30,7 @@
 //#define SFUNC __func__
 #define SFUNC __PRETTY_FUNCTION__
 
-//-------------------------------  TRACE  ---------------------------------------
-
-#define TRACE fprintf(stderr, "      while executing `%s'\n      in %s:%d\n", SFUNC, SFILE, __LINE__);
-
-//------------------------------- ASSERT ---------------------------------------
+//------------------------------- ASSERTIONS -----------------------------------
 /** 
   assert_true(X) stops the program if condition X is false.
   assert_false(X) stops if X is true, and prints the value of X.
@@ -52,7 +48,7 @@
         if (!(expression)) {\
             fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
             fprintf(stderr, "Cytosim failed assert(%s)\n", #expression);\
-            TRACE;\
+            fprintf(stderr, "@ `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
             fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
             abort();\
         }
@@ -62,7 +58,7 @@
         if (e) {\
             fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
             fprintf(stderr, "Cytosim failed assert_false(%s) with value %i\n", #expression, e);\
-            TRACE;\
+            fprintf(stderr, "@ `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
             fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
             abort();\
         } }
@@ -84,7 +80,7 @@
 #define ABORT_NOW(message)\
     {\
     fprintf(stderr, "Cytosim ERROR `%s'\n", message);\
-    TRACE;\
+    fprintf(stderr, "@ `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
     exit(EXIT_FAILURE);\
     }
 

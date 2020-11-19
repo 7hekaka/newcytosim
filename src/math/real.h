@@ -42,6 +42,17 @@
 
 //----------------------------ALLOCATION----------------------------------------
 
+/// add consistency checks to new_real() and free_real()
+#define CHECK_ALLOCATIONS 0
+
+
+#if CHECK_ALLOCATIONS
+#  include <set>
+#  include <cstdio>
+#  include "backtrace.h"
+static std::set<void*> allocations;
+#endif
+
 
 /// return a number greater or equal to 's' that is a multiple of 4
 inline size_t chunk_real(size_t cnt)
@@ -67,6 +78,9 @@ inline real* new_real(size_t cnt)
         throw std::bad_alloc();
     real* res = (real*)ptr;
     //printf("%p = new_real(%lu)  %lu\n", ptr, cnt, ((uintptr_t)ptr&63));
+#if CHECK_ALLOCATIONS
+    allocations.insert(res);
+#endif
 #if ( 0 )
     /*
      Allocated memory can be filled with signalling NaN, to catch access
@@ -83,10 +97,23 @@ inline real* new_real(size_t cnt)
 
 
 /// release an array of reals allocated by `new_real`
-inline void free_real(void * ptr)
+inline void free_real(void* ptr)
 {
-    //printf("free_real(%p)\n", ptr);
-    free(ptr);
+    if ( ptr )
+    {
+#if CHECK_ALLOCATIONS
+        auto i = allocations.find(ptr);
+        if ( i == allocations.end() )
+        {
+            printf("unallocated free_real(%p)\n", ptr);
+            print_backtrace();
+        }
+        else
+            allocations.erase(i);
+#endif
+        //printf("free_real(%p)\n", ptr);
+        free(ptr);
+    }
 }
 
 
@@ -137,7 +164,7 @@ inline real sign_select(real const& val, real const& neg, real const& pos)
 }
 
 /// sign of a 'real': -1 or +1; result is +1 if ( x == 0 )
-inline float sign_real(const float x)
+inline real sign_real(const real x)
 {
 #if REAL_IS_DOUBLE
     return std::copysign(1.0, x);
