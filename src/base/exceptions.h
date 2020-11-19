@@ -61,7 +61,7 @@ public:
     }
 
     /// return copy of the message as C-string
-    char const* c_str() const
+    char const* msg() const
     {
         return msg_.c_str();
     }

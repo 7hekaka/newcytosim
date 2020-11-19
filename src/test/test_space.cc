@@ -195,7 +195,7 @@ void setGeometry()
     }
     catch( Exception & e )
     {
-        printf("Error: `%s'\n", e.c_str());
+        printf("Error: `%s'\n", e.msg());
     }
     
     try {
@@ -204,7 +204,7 @@ void setGeometry()
     }
     catch( Exception & e )
     {
-        printf("Error: `%s'\n", e.c_str());
+        printf("Error: `%s'\n", e.msg());
     }
 
     glutPostRedisplay();
