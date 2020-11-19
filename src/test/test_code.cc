@@ -343,7 +343,7 @@ inline void projectForcesU_TWO(SIZE_T nbs, const real* dif, const real* src, rea
 }
 
 
-#if REAL_IS_DOUBLE && defined __SSE3__
+#if REAL_IS_DOUBLE && defined(__SSE3__)
 
 /**
  Perform first calculation needed by projectForces:
@@ -378,7 +378,7 @@ void projectForcesU2D_SSE(SIZE_T nbs, const real* dif, const real* src, real* mu
 
 #endif
 
-#if defined __AVX__ && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__AVX__)
 
 __m256i make_mask(long i)
 {
@@ -471,7 +471,7 @@ void projectForcesU2D_AVY(SIZE_T nbs, const real* dif, const real* src, real* mu
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP 3D
 
-#if REAL_IS_DOUBLE && defined __SSE3__
+#if REAL_IS_DOUBLE && defined(__SSE3__)
 
 void projectForcesU3D_SSE(SIZE_T nbs, const real* dif, const real* src, real* mul)
 {
@@ -488,14 +488,14 @@ void projectForcesU3D_SSE(SIZE_T nbs, const real* dif, const real* src, real* mu
         vec2 s0 = mul2(load2(dif  ), sub2(loadu2(src+3), loadu2(src  )));
         vec2 s1 = mul2(load2(dif+2), sub2(loadu2(src+5), loadu2(src+2)));
         vec2 s2 = mul2(load2(dif+4), sub2(loadu2(src+7), loadu2(src+4)));
-        vec2 ss = shuffle2(s0, s2, 0b01);
-        vec2 tt = blend2(s0, s2, 0b10);
+        vec2 ss = unpacklo2(s0, s2);
+        vec2 tt = unpackhi2(s0, s2);
 
         vec2 t0 = mul2(load2(dif+ 6), sub2(loadu2(src+ 9), loadu2(src+ 6)));
         vec2 t1 = mul2(load2(dif+ 8), sub2(loadu2(src+11), loadu2(src+ 8)));
         vec2 t2 = mul2(load2(dif+10), sub2(loadu2(src+13), loadu2(src+10)));
-        vec2 xx = shuffle2(t0, t2, 0b01);
-        vec2 yy = blend2(t0, t2, 0b10);
+        vec2 xx = unpacklo2(t0, t2);
+        vec2 yy = unpackhi2(t0, t2);
 
         store2(mul, add2(tt, add2(s1, ss)));
         store2(mul+2, add2(yy, add2(t1, xx)));
@@ -517,8 +517,8 @@ void projectForcesU3D_SSE(SIZE_T nbs, const real* dif, const real* src, real* mu
         vec2 s1 = mul2(load2(dif+2), sub2(loadu2(src+5), loadu2(src+2)));
         vec2 s2 = mul2(load2(dif+4), sub2(loadu2(src+7), loadu2(src+4)));
 
-        vec2 ss = shuffle2(s0, s2, 0b01);
-        vec2 tt = blend2(s0, s2, 0b10);
+        vec2 ss = unpacklo2(s0, s2);
+        vec2 tt = unpackhi2(s0, s2);
 
         store2(mul, add2(tt, add2(s1, ss)));
         
@@ -544,7 +544,7 @@ void projectForcesU3D_SSE(SIZE_T nbs, const real* dif, const real* src, real* mu
 
 #endif
 
-#if REAL_IS_DOUBLE && defined __AVX__
+#if REAL_IS_DOUBLE && defined(__AVX__)
 
 inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
 {
@@ -678,17 +678,17 @@ void testProjectionU(SIZE_T cnt)
     testU(cnt, projectForcesU_,    " U_   ");
     testU(cnt, projectForcesU_PTR, " U_PTR");
     testU(cnt, projectForcesU_TWO, " U_TWO");
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __SSE__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE__)
     testU(cnt, projectForcesU2D_SSE, " U_SSE");
 #endif
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __AVX__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testU(cnt, projectForcesU2D_AVX, " U_AVX");
     testU(cnt, projectForcesU2D_AVY, " U_AVY");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __SSE__
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE__)
     testU(cnt, projectForcesU3D_SSE, " U_SSE");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __AVX__
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testU(cnt, projectForcesU3D_AVX, " U_AVX");
 #endif
 }
@@ -928,7 +928,7 @@ void projectForcesD_PTR(SIZE_T nbs, const real* dif,
 #endif
 }
 
-#if defined __SSE3__ && ( DIM == 2 )
+#if defined(__SSE3__) && ( DIM == 2 )
 
 /**
  Perform second calculation needed by projectForces:
@@ -969,7 +969,7 @@ void projectForcesD2D_SSE(SIZE_T nbs, const real* dif,
 
 #endif
 
-#if defined __AVX__ && ( DIM == 2 )
+#if defined(__AVX__) && ( DIM == 2 )
 
 
 /**
@@ -1033,7 +1033,7 @@ void projectForcesD2D_AVX(SIZE_T nbs, const real* dif,
      Y[5] = X[5] + dif[5] * mul[1] - dif[2] * mul[0];
  */
 
-#if REAL_IS_DOUBLE && defined __SSE__
+#if REAL_IS_DOUBLE && defined(__SSE3__)
 void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
                           const real* src, const real* mul, real* dst)
 {
@@ -1044,7 +1044,7 @@ void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
         vec2 BC = loadu2(mul);
         vec2 BB = unpacklo2(BC, BC);
         vec2 CC = unpackhi2(BC, BC);
-        vec2 AB = blend2(setzero2(), BB, 0b10);
+        vec2 AB = unpacklo2(setzero2(), BB);
 
         mul += 2;
         vec2 a0 = fmadd2(BB, load2(dif  ), loadu2(src  ));
@@ -1062,8 +1062,8 @@ void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
     {
         // only 2 points overall
         vec2 BB = loaddup2(mul);
-        vec2 AB = blend2(setzero2(), BB, 0b10);
-        vec2 BC = blend2(setzero2(), BB, 0b01);
+        vec2 AB = unpacklo2(setzero2(), BB);
+        vec2 BC = unpacklo2(BB, setzero2());
         
         vec2 a0 = fmadd2(BB, load2(dif  ), loadu2(src  ));
         vec2 a1 = fmadd2(BC, load1(dif+2), loadu2(src+2));
@@ -1116,13 +1116,7 @@ void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
         vec2 AA = unpacklo2(AB, AB);
         vec2 BB = unpackhi2(AB, AB);
         vec2 CC = unpackhi2(BC, BC);
-        /*
-        vec2 AA = loaddup2(mul-1);
-        vec2 BB = loaddup2(mul);
-        vec2 AB = blend2(AA, BB, 0b10);
-        vec2 CC = loaddup2(mul+1);
-        vec2 BC = blend2(BB, CC, 0b10);
-         */
+
         mul += 2;
         vec2 a0 = fnmadd2(AA, loadu2(dif-3), loadu2(src  ));
         vec2 a1 = fnmadd2(AB, loadu2(dif-1), loadu2(src+2));
@@ -1140,7 +1134,7 @@ void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
         // 2 points remaining = 6 scalars
         vec2 AA = loaddup2(mul-1);
         vec2 BB = loaddup2(mul);
-        vec2 AB = blend2(AA, BB, 0b10);
+        vec2 AB = unpacklo2(AA, BB);
 
         vec2 a0 = fnmadd2(AA, loadu2(dif-3), loadu2(src  ));
         vec2 a1 = fnmadd2(AB, loadu2(dif-1), loadu2(src+2));
@@ -1180,7 +1174,7 @@ void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
      Y[B] = X[B] + dif[B] * mul[3] - dif[8] * mul[2];
  */
 
-#if REAL_IS_DOUBLE && defined __AVX__
+#if REAL_IS_DOUBLE && defined(__AVX__)
 
 /*
  Ugly piece of code to harvest AVX power...
@@ -1373,16 +1367,16 @@ void testProjectionD(SIZE_T cnt)
     testD(cnt, projectForcesD_RIV, " D_RIV");
     testD(cnt, projectForcesD_FMA, " D_FMA");
     testD(cnt, projectForcesD_PTR, " D_PTR");
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __SSE__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE__)
     testD(cnt, projectForcesD2D_SSE, " D_SSE");
 #endif
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined __AVX__
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testD(cnt, projectForcesD2D_AVX, " D_AVX");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __SSE__
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE__)
     testD(cnt, projectForcesD3D_SSE, " D_SSE");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined __AVX__
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testD(cnt, projectForcesD3D_AVX, " D_AVX");
 #endif
 }
@@ -1399,7 +1393,7 @@ void projectForces(SIZE_T nbs, const real* X, real* Y)
 }
 
 
-#if defined __SSE3__ && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__SSE3__)
 void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
@@ -1417,7 +1411,7 @@ void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
 #endif
 
 
-#if defined __AVX__ && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__AVX__)
 void projectForces_AVX(SIZE_T nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
@@ -1462,13 +1456,13 @@ void checkProject()
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
 
         nan_fill(nbs, lag_);
-#if defined __AVX__ && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__AVX__)
         projectForces_AVX(nbs, x, z);
         printf(" AVX ");
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
         print_fe_exceptions("projectForcesAVX");
-#elif defined __SSE3__ && REAL_IS_DOUBLE
+#elif REAL_IS_DOUBLE && defined(__SSE3__)
         projectForces_SSE(nbs, x, z);
         printf(" SSE ");
         //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
@@ -1600,10 +1594,10 @@ int main(int argc, char* argv[])
         setAnisotropy(NSEG);
         std::cout << "testProject " << DIM << "D, " << NSEG << " segments\n";
         timeProject(CNT, projectForces,    " projF");
-#if defined __SSE3__ && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__SSE3__)
         timeProject(CNT, projectForces_SSE, " prSSE");
 #endif
-#if defined __AVX__ && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__AVX__)
         timeProject(CNT, projectForces_AVX, " prAVX");
 #endif
         timeProject(CNT, projectDPTTS,   " dptts");

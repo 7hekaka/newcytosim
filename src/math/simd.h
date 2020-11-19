@@ -8,7 +8,7 @@
 
 //---------------------------------- SSE ---------------------------------------
 
-#ifdef __SSE3__
+#if defined(__SSE3__)
 
 /// Vector of 2 doubles
 typedef __m128d vec2;
@@ -63,8 +63,6 @@ inline vec2 unpacklo2(vec2 a, vec2 b)        { return _mm_unpacklo_pd(a,b); }
 inline vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
-#define blend2(a,b,k)     _mm_blend_pd(a,b,k)
-#define blendv2(a,b,k)    _mm_blendv_pd(a,b,k)
 #define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)
 
 /// returns the sum of the elements, broadcasted
@@ -105,9 +103,16 @@ inline vec2 normalize2(vec2 vec, double n)
 
 #endif
 
+#if defined(__SSE4_1__)
+
+#define blend2(a,b,k)     _mm_blend_pd(a,b,k)
+#define blendv2(a,b,k)    _mm_blendv_pd(a,b,k)
+
+#endif
+
 //---------------------------------- AVX ---------------------------------------
 
-#ifdef __AVX__
+#if defined(__AVX__)
 
 /// Vector of 4 doubles
 typedef __m256d vec4;
@@ -252,7 +257,7 @@ inline vec4 normalize4(vec4 vec, double n)
 
 //---------------------------------- AVX2 --------------------------------------
 
-#ifdef __AVX2__
+#if defined(__AVX2__)
 
 #define permute4x64(a,k)    _mm256_permute4x64_pd(a,k)
 #define rotater4(a)         _mm256_castsi256_pd(_m256_alignr_epi8(a, a, 1));
@@ -273,7 +278,7 @@ inline vec4 cross4(vec4 a, vec4 b)
 {
     vec4 a1 = permute4x64(a, 0xC9); // Y Z X T
     vec4 b1 = permute4x64(b, 0xC9); // Y Z X T
-#ifdef __FMA__
+#if defined(__FMA__)
     return permute4x64(_mm256_fmsub_pd(a, b1, mul4(a1,b)), 0xC9);
 #else
     return permute4x64(sub4(mul4(a,b1), mul4(a1,b)), 0xC9);
@@ -291,7 +296,7 @@ inline vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256
 /// streamload is a load that bypass the cache
 //inline vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
-#elif defined __AVX__
+#elif defined(__AVX__)
 
 inline vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
@@ -303,7 +308,7 @@ inline vec4 broadcast1(vec4 a)  { return _mm256_movedup_pd(_mm256_set_m128d(cast
 
 //----------------------------------- FMA --------------------------------------
 
-#ifdef __FMA__
+#if defined(__FMA__)
 inline vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_sd(a,b,c); }  // a * b + c
 inline vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_sd(a,b,c); }  // a * b - c
 inline vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_sd(a,b,c); } // c - a * b
@@ -317,7 +322,7 @@ inline vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmsub_pd(a,b,c); }
 inline vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_fnmadd_pd(a,b,c); }
 #else
 // erzatz functions
-#  ifdef __SSE3__
+#  if defined(__SSE3__)
 inline vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_add_sd(_mm_mul_sd(a,b), c); }
 inline vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_sub_sd(_mm_mul_sd(a,b), c); }
 inline vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_sub_sd(c, _mm_mul_sd(a,b)); }
@@ -326,7 +331,7 @@ inline vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_add_pd(_mm_mul_pd(a,b),
 inline vec2 fmsub2(vec2 a, vec2 b, vec2 c)  { return _mm_sub_pd(_mm_mul_pd(a,b), c); }
 inline vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_sub_pd(c, _mm_mul_pd(a,b)); }
 #  endif
-#  ifdef __AVX__
+#  if defined(__AVX__)
 inline vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_add_pd(_mm256_mul_pd(a,b), c); }
 inline vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_sub_pd(_mm256_mul_pd(a,b), c); }
 inline vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_sub_pd(c, _mm256_mul_pd(a,b)); }

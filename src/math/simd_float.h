@@ -8,7 +8,7 @@
 
 //--------------------------- SSE Single Precision -----------------------------
 
-#ifdef __SSE3__
+#if defined(__SSE3__)
 
 /// Vector of 4 floats
 typedef __m128 vec4f;
@@ -32,12 +32,17 @@ inline vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b); }
 inline vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
-#define shuffle4f(a,b,k)  _mm_shuffle_ps(a,b,k)
-#define blend4f(a,b,k)    _mm_blend_ps(a,b,k)
+#define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
 
 #endif  // __SSE3__
 
-#ifdef __AVX__
+
+#if defined(__SSE4_1__)
+#  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
+#endif
+
+
+#if defined(__AVX__)
 // copy a[0] into all elements of destination
 inline vec4f broadcast1f(vec4f a)          { return _mm_permute_ps(a,0x00); }
 inline vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
@@ -56,7 +61,7 @@ inline vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
 
 //-------------------------- FMA Single Precision-------------------------------
 
-#ifdef __FMA__
+#if defined(__FMA__)
 inline vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_fmadd_ps(a,b,c); }
 inline vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_fmsub_ps(a,b,c); }
 inline vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_fnmadd_ps(a,b,c); }
@@ -69,7 +74,7 @@ inline vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _mm_mul_
 
 //-------------------------- AVX Single Precision-------------------------------
 
-#ifdef __AVX__
+#if defined(__AVX__)
 
 /// Vector of 8 floats
 typedef __m256 vec8f;

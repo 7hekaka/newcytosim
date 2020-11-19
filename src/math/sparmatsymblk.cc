@@ -13,7 +13,7 @@
 #  include "simd_float.h"
 #  define SMSB_USES_AVX REAL_IS_DOUBLE
 #  define SMSB_USES_SSE !REAL_IS_DOUBLE
-#elif defined(__SSE3__)
+#elif defined(__SSE4_1__)
 #  include "simd.h"
 #  include "simd_float.h"
 #  define SMSB_USES_AVX 0

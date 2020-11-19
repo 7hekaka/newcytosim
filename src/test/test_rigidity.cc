@@ -503,11 +503,11 @@ void testRigidity(size_t cnt)
     testRigidity(cnt, add_rigidityF, "F  ");
     testRigidity(cnt, add_rigidityG, "G  ");
     testRigidity(cnt, add_rigidity4, "4  ");
-#if defined __SSE__ & ( DIM == 2 )
+#if defined(__SSE__) & ( DIM == 2 )
     testRigidity(cnt, add_rigidity2D_SSO, "SSO");
     testRigidity(cnt, add_rigidity2D_SSE, "SSE");
 #endif
-#if defined __AVX__ & ( DIM == 2 )
+#if defined(__AVX__) & ( DIM == 2 )
     testRigidity(cnt, add_rigidity2D_AVX, "AVX");
 #endif
 }
