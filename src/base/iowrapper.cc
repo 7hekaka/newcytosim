@@ -1,19 +1,28 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
 #include "iowrapper.h"
 #include "exceptions.h"
 #include "byteswap.h"
 
+/// store floats on two bytes with a fixed scaling factor
+/// This is experimental & unfinished: expect little gain in space (25%)
+#define FIXED_POINT_STORAGE 0
 
-///check the size of the type, as we rely on them to write byte-by-byte
-int nonStandardTypes()
+
+/// check the size of some types that are baked in the code
+void sanityCheck()
 {
-    if ( 2 != sizeof(uint16_t) ) return 1;
-    if ( 4 != sizeof(uint32_t) ) return 2;
-    if ( 8 != sizeof(uint64_t) ) return 4;
-    if ( 4 != sizeof(float) )    return 8;
-    if ( 8 != sizeof(double) )   return 16;
-    return 0;
+    bool okay = true;
+    okay &= ( 2 == sizeof(uint16_t) );
+    okay &= ( 4 == sizeof(uint32_t) );
+    okay &= ( 8 == sizeof(uint64_t) );
+    okay &= ( 4 == sizeof(float) );
+    okay &= ( 8 == sizeof(double) );
+    if ( ! okay )
+    {
+        fprintf(stderr, "Error: non-standard types in Inputter\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -24,12 +33,7 @@ void Inputter::reset()
 {
     format_  = 0;
     binary_  = 0;
-    
-    if ( nonStandardTypes() )
-    {
-        fprintf(stderr, "Error: non-standard types in Inputter\n");
-        exit(EXIT_FAILURE);
-    }
+    sanityCheck();
 }
 
 
@@ -52,7 +56,7 @@ int16_t Inputter::readInt16()
     if ( binary_ )
     {
         if ( 1 != fread(&v, 2, 1, mFile) )
-            throw InvalidIO("readInt16 failed");
+            throw InvalidIO("readInt16() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
     }
@@ -60,7 +64,7 @@ int16_t Inputter::readInt16()
     {
         int u;
         if ( 1 != fscanf(mFile, " %i", &u) )
-            throw InvalidIO("readInt16() failed");
+            throw InvalidIO("readInt16 failed");
         v = (int16_t)u;
         if ( v != u )
             throw InvalidIO("invalid int16");
@@ -75,7 +79,7 @@ int32_t Inputter::readInt32()
     if ( binary_ )
     {
         if ( 1 != fread(&v, 4, 1, mFile) )
-            throw InvalidIO("readInt32 failed");
+            throw InvalidIO("readInt32() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
     }
@@ -83,7 +87,7 @@ int32_t Inputter::readInt32()
     {
         int u;
         if ( 1 != fscanf(mFile, " %i", &u) )
-            throw InvalidIO("readInt32() failed");
+            throw InvalidIO("readInt32 failed");
         v = (int32_t)u;
         if ( v != u )
             throw InvalidIO("invalid int32");
@@ -103,7 +107,7 @@ uint8_t Inputter::readUInt8()
     {
         unsigned u;
         if ( 1 != fscanf(mFile, " %u", &u) )
-            throw InvalidIO("readUInt8() failed");
+            throw InvalidIO("readUInt8 failed");
         v = (uint8_t)u;
         if ( v != u )
             throw InvalidIO("invalid uint8");
@@ -118,7 +122,7 @@ uint16_t Inputter::readUInt16()
     if ( binary_ )
     {
         if ( 1 != fread(&v, 2, 1, mFile) )
-            throw InvalidIO("readUInt16 failed");
+            throw InvalidIO("readUInt16() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
     }
@@ -126,7 +130,7 @@ uint16_t Inputter::readUInt16()
     {
         unsigned u;
         if ( 1 != fscanf(mFile, " %u", &u) )
-            throw InvalidIO("readUInt16() failed");
+            throw InvalidIO("readUInt16 failed");
         v = (uint16_t)u;
         if ( v != u )
             throw InvalidIO("invalid uint16");
@@ -141,7 +145,7 @@ uint32_t Inputter::readUInt32()
     if ( binary_ )
     {
         if ( 1 != fread(&v, 4, 1, mFile) )
-            throw InvalidIO("readUInt32 failed");
+            throw InvalidIO("readUInt32() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
     }
@@ -149,7 +153,7 @@ uint32_t Inputter::readUInt32()
     {
         unsigned u;
         if ( 1 != fscanf(mFile, " %u", &u) )
-            throw InvalidIO("readUInt32() failed");
+            throw InvalidIO("readUInt32 failed");
         v = (uint32_t)u;
         if ( v != u )
             throw InvalidIO("invalid uint32");
@@ -164,7 +168,7 @@ uint64_t Inputter::readUInt64()
     if ( binary_ )
     {
         if ( 1 != fread(&v, 8, 1, mFile) )
-            throw InvalidIO("readUInt64 failed");
+            throw InvalidIO("readUInt64() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
     }
@@ -172,7 +176,7 @@ uint64_t Inputter::readUInt64()
     {
         unsigned long u;
         if ( 1 != fscanf(mFile, " %lu", &u) )
-            throw InvalidIO("readUInt64() failed");
+            throw InvalidIO("readUInt64 failed");
         v = (uint64_t)u;
         if ( v != u )
             throw InvalidIO("invalid uint64");
@@ -186,15 +190,24 @@ float Inputter::readFloat()
     float v;
     if ( binary_ )
     {
+#if FIXED_POINT_STORAGE
+        int16_t i;
+        if ( 1 != fread(&i, 2, 1, mFile) )
+            throw InvalidIO("readFloat() failed");
+        if ( binary_ == 2 )
+            i = byteswap(i);
+        v = float(i) * 0x1p-11;
+#else
         if ( 1 != fread(&v, 4, 1, mFile) )
-            throw InvalidIO("readFloat failed");
+            throw InvalidIO("readFloat() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
+#endif
     }
     else
     {
         if ( 1 != fscanf(mFile, " %f", &v) )
-            throw InvalidIO("readFloat() failed");
+            throw InvalidIO("readFloat failed");
     }
     return v;
 }
@@ -206,14 +219,14 @@ double Inputter::readDouble()
     if ( binary_ )
     {
         if ( 1 != fread(&v, 8, 1, mFile) )
-            throw InvalidIO("readDouble failed");
+            throw InvalidIO("readDouble() failed");
         if ( binary_ == 2 )
             v = byteswap(v);
     }
     else
     {
         if ( 1 != fscanf(mFile, " %lf", &v) )
-            throw InvalidIO("readDouble() failed");
+            throw InvalidIO("readDouble failed");
     }
     return v;
 }
@@ -279,7 +292,7 @@ void Inputter::readFloats(double a[], const size_t n, const unsigned D)
         if ( nd != fread(v, 4, nd, mFile) )
         {
             delete[] v;
-            throw InvalidIO("readFloatVector(double) failed");
+            throw InvalidIO("readFloats(D) failed");
         }
         if ( binary_ == 2 )
         {
@@ -293,7 +306,7 @@ void Inputter::readFloats(double a[], const size_t n, const unsigned D)
             if ( 1 != fscanf(mFile, " %f", v+u) )
             {
                 delete[] v;
-                throw InvalidIO("readFloatVector(double) failed");
+                throw InvalidIO("readFloats-D failed");
             }
     }
 
@@ -318,24 +331,14 @@ Outputter::Outputter()
 : FileWrapper(stdout) 
 {
     binary_ = false;
-    
-    if ( nonStandardTypes() )
-    {
-        fprintf(stderr, "Error: non-standard types in Inputter\n");
-        exit(EXIT_FAILURE);
-    }
+    sanityCheck();
 }
 
 
 Outputter::Outputter(const char* name, const bool a, const bool b)
 {
     open(name, a, b);
-    
-    if ( nonStandardTypes() )
-    {
-        fprintf(stderr, "Error: unsupported types in Outputter\n");
-        exit(EXIT_FAILURE);
-    }
+    sanityCheck();
 }
 
 
@@ -363,7 +366,7 @@ void Outputter::writeEndianess()
     //the value corresponds to the ASCII code of "01"
     uint16_t x = 12592U;
     if ( 2 != fwrite(&x, 1, 2, mFile) )
-        throw InvalidIO("writeEndianess() failed");
+        throw InvalidIO("writeEndianess failed");
 }
 
 
@@ -377,12 +380,12 @@ void Outputter::writeInt8(const int n, char before)
     if ( binary_ )
     {
         if ( 1 != fwrite(&v, 1, 1, mFile) )
-            throw InvalidIO("writeInt8()-binary failed");
+            throw InvalidIO("writeInt8() failed");
     }
     else
     {
         if ( 2 > fprintf(mFile, "%c%i", before, n) )
-            throw InvalidIO("writeInt8() failed");
+            throw InvalidIO("writeInt8 failed");
     }
 }
 
@@ -397,12 +400,12 @@ void Outputter::writeInt16(const int n, char before)
     if ( binary_ )
     {
         if ( 2 != fwrite(&v, 1, 2, mFile) )
-            throw InvalidIO("writeInt16()-binary failed");
+            throw InvalidIO("writeInt16() failed");
     }
     else
     {
         if (2 > fprintf(mFile, "%c%i", before, n))
-            throw InvalidIO("writeInt16() failed");
+            throw InvalidIO("writeInt16 failed");
     }
 }
 
@@ -417,12 +420,12 @@ void Outputter::writeInt32(const int n, char before)
     if ( binary_ )
     {
         if ( 4 != fwrite(&v, 1, 4, mFile) )
-            throw InvalidIO("writeInt32()-binary failed");
+            throw InvalidIO("writeInt32() failed");
     }
     else
     {
         if ( 2 > fprintf(mFile, "%c%d", before, n) )
-            throw InvalidIO("writeInt32() failed");
+            throw InvalidIO("writeInt32 failed");
     }
 }
 
@@ -437,18 +440,18 @@ void Outputter::writeUInt8(const unsigned n, char before)
     if ( binary_ )
     {
         if ( 1 != fwrite(&v, 1, 1, mFile) )
-            throw InvalidIO("writeUInt8()-binary failed");
+            throw InvalidIO("writeUInt8() failed");
     }
     else
     {
         if ( before )
         {
             if ( 2 > fprintf(mFile, "%c%u", before, n) )
-                throw InvalidIO("writeUInt8() failed");
+                throw InvalidIO("writeUInt8 failed");
         }
         else {
             if ( 1 > fprintf(mFile, "%u", n) )
-                throw InvalidIO("writeUInt8() failed");
+                throw InvalidIO("writeUInt8 failed");
         }
     }
 }
@@ -464,18 +467,18 @@ void Outputter::writeUInt16(const unsigned n, char before)
     if ( binary_ )
     {
         if ( 2 != fwrite(&v, 1, 2, mFile) )
-            throw InvalidIO("writeUInt16()-binary failed");
+            throw InvalidIO("writeUInt16() failed");
     }
     else
     {
         if ( before )
         {
             if ( 2 > fprintf(mFile, "%c%u", before, n) )
-                throw InvalidIO("writeUInt16() failed");
+                throw InvalidIO("writeUInt16 failed");
         }
         else {
             if ( 1 > fprintf(mFile, "%u", n) )
-                throw InvalidIO("writeUInt16() failed");
+                throw InvalidIO("writeUInt16 failed");
         }
     }
 }
@@ -491,19 +494,19 @@ void Outputter::writeUInt32(const unsigned n, char before)
     if ( binary_ )
     {
         if ( 4 != fwrite(&v, 1, 4, mFile) )
-            throw InvalidIO("writeUInt32()-binary failed");
+            throw InvalidIO("writeUInt32() failed");
     }
     else
     {
         if ( before )
         {
             if ( 2 > fprintf(mFile, "%c%u", before, n) )
-                throw InvalidIO("writeUInt32() failed");
+                throw InvalidIO("writeUInt32 failed");
         }
         else
         {
             if ( 1 > fprintf(mFile, "%u", n) )
-                throw InvalidIO("writeUInt32() failed");
+                throw InvalidIO("writeUInt32 failed");
         }
     }
 }
@@ -519,19 +522,19 @@ void Outputter::writeUInt64(const unsigned long n, char before)
     if ( binary_ )
     {
         if ( 8 != fwrite(&v, 1, 8, mFile) )
-            throw InvalidIO("writeUInt64()-binary failed");
+            throw InvalidIO("writeUInt64() failed");
     }
     else
     {
         if ( before )
         {
             if ( 2 > fprintf(mFile, "%c%lu", before, n) )
-                throw InvalidIO("writeUInt64() failed");
+                throw InvalidIO("writeUInt64 failed");
         }
         else
         {
             if ( 1 > fprintf(mFile, "%lu", n) )
-                throw InvalidIO("writeUInt64() failed");
+                throw InvalidIO("writeUInt64 failed");
         }
     }
 }
@@ -541,13 +544,19 @@ void Outputter::writeFloat(const float x)
 {
     if ( binary_ )
     {
+#if FIXED_POINT_STORAGE
+        int16_t i = int16_t(x * 0x1p11);
+        if ( 2 != fwrite(&i, 1, 2, mFile) )
+            throw InvalidIO("writeFloat() failed");
+#else
         if ( 4 != fwrite(&x, 1, 4, mFile) )
-            throw InvalidIO("writeFloat()-binary failed");
+            throw InvalidIO("writeFloat() failed");
+#endif
     }
     else
     {
         if ( 6 > fprintf(mFile, " %.6f", x) )
-            throw InvalidIO("writeFloat() failed");
+            throw InvalidIO("writeFloat failed");
     }
 }
 
@@ -577,12 +586,12 @@ void Outputter::writeDouble(const double x)
     if ( binary_ )
     {
         if ( 8 != fwrite(&x, 1, 8, mFile) )
-            throw InvalidIO("writeDouble()-binary failed");
+            throw InvalidIO("writeDouble() failed");
     }
     else
     {
         if ( 10 > fprintf(mFile, " %.8lf", x) )
-            throw InvalidIO("writeDouble() failed");
+            throw InvalidIO("writeDouble failed");
     }
 }
 

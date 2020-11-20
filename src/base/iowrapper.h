@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
 #ifndef  IOWRAPPER_H
 #define  IOWRAPPER_H
@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include "filewrapper.h"
 
-/// Input with automatic binary/text mode and byte-swapping for cross-platform compatibility
+/// Input in text or binary mode with automatic byte-swapping for endianess compatibility
 class Inputter : public FileWrapper
 {
 private:
@@ -34,7 +34,7 @@ public:
     Inputter(unsigned d) : FileWrapper(nullptr), vecsize_(d) { reset(); }
     
     /// Constructor
-    Inputter(unsigned d, FILE * f, const char * path = nullptr) : FileWrapper(f, path), vecsize_(d) { reset(); }
+    Inputter(unsigned d, FILE* f, const char* path=nullptr) : FileWrapper(f, path), vecsize_(d) { reset(); }
     
     /// constructor which opens a file
     Inputter(unsigned d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r"), vecsize_(d) { reset(); }
@@ -92,7 +92,7 @@ public:
 #pragma mark -
 
 
-///Output with automatic binary/text mode and byte-swapping for cross-platform compatibility
+/// Output in text or binary mode in the native endianess
 class Outputter : public FileWrapper
 {
     
@@ -150,16 +150,15 @@ public:
     void writeFloat(float);
     /// Write value on 4 bytes
     void writeFloat(double x) { writeFloat((float)x); }
-
-    /// Write `n` values using 4 bytes each
-    void writeFloats(const float*, size_t n, char before=0);
-    /// Write `n` values using 4 bytes each (converted to float)
-    void writeFloats(const double*, size_t n, char before=0);
+    /// Write multiple values using 4 bytes per value, and possibly a character before
+    void writeFloats(const float*, size_t, char before=0);
+    /// Write multiple values using 4 bytes per value, and possibly a character before
+    void writeFloats(const double*, size_t, char before=0);
 
     /// Write value on 8 bytes
     void writeDouble(double);
-    /// Write `n` values using 8 bytes each
-    void writeDoubles(const double*, size_t n, char before=0);
+    /// Write multiple values using 8 bytes per value
+    void writeDoubles(const double*, size_t, char before=0);
 
     int  writeChar(int c, int b)
     {
