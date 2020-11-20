@@ -12,15 +12,13 @@
 #include "frame_reader.h"
 #include "iowrapper.h"
 #include "glossary.h"
-#include "parser.h"
 #include "simul.h"
-#include "fiber_disp.h"
 
 #include <vector>
 #include <map>
 
 bool binary = 0;
-FILE * file = 0;
+FILE * file = nullptr;
 
 typedef std::vector<Vector3> PointList;
 typedef std::map<ObjectID, PointList> PointMap;
@@ -49,7 +47,7 @@ void help(std::ostream& os)
 FILE * openFile(const char base[], unsigned ix)
 {
     char name[256] = { 0 };
-    FILE * f = 0;
+    FILE * f = nullptr;
     
     if ( binary )
     {
@@ -61,7 +59,7 @@ FILE * openFile(const char base[], unsigned ix)
         snprintf(name, sizeof(name), "%s%04u.txt", base, ix);
         f = fopen(name, "w");
     }
-    if ( f == 0 )
+    if ( !f )
     {
         std::cerr << "Aborted: could not create file " << name << '\n';
         exit(EXIT_FAILURE);
@@ -304,9 +302,6 @@ void drawLink(Couple const* cop)
 
 int main(int argc, char* argv[])
 {
-    int style = 1;
-    Glossary arg;
-
     if ( argc < 2 || strstr(argv[1], "help") )
     {
         help(std::cout);
@@ -316,16 +311,18 @@ int main(int argc, char* argv[])
     std::string fiber_type = argv[1];
     Property * selected = 0;
     
+    Glossary arg;
     if ( arg.read_strings(argc-2, argv+2) )
         return EXIT_FAILURE;
 
+    int style = 1;
     arg.set(binary, "binary");
     arg.set(style, "style", {{"filament", 1}, {"actin", 2}, {"microtubule", 3}});
 
     std::string input = TRAJECTORY;
     arg.set(input, ".cmo") || arg.set(input, "input");
 
-    size_t frame = 0;
+    unsigned frame = 0;
     FrameReader reader;
     RNG.seed();
 
