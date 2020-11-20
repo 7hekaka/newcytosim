@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 #ifndef MECAFIL_H
 #define MECAFIL_H
 
@@ -81,9 +81,9 @@ private:
 #endif
     
     /// vector for the projection correction of size nbSegments
-    real * iJJtiJforce;
+    real * iJJtJF;
     
-    /// true if all elements of iJJtiJforce[] are null
+    /// true if all elements of iJJtJF[] are null
     bool  useProjectionDiff;
     
 protected:

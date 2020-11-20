@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
 #include "mecafil_code.cc"
 #include "exceptions.h"
@@ -54,8 +54,8 @@ Selection of projectForces() routines optimized for some architectures
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    iJJt        = nullptr;
-    iJJtiJforce = nullptr;
+    iJJt   = nullptr;
+    iJJtJF = nullptr;
 }
 
 
@@ -65,9 +65,9 @@ void Mecafil::allocateProjection(const size_t ms)
     free_real(iJJt);
     real * mem = new_real(3*ms);
     //zero_real(3*ms, mem);
-    iJJt        = mem;
-    iJJtU       = mem + ms;
-    iJJtiJforce = mem + ms * 2;
+    iJJt   = mem;
+    iJJtU  = mem + ms;
+    iJJtJF = mem + ms * 2;
 }
 
 
@@ -75,9 +75,9 @@ void Mecafil::destroyProjection()
 {
     //std::clog << reference() << "destroyProjection\n";
     free_real(iJJt);
-    iJJt        = nullptr;
-    iJJtU       = nullptr;
-    iJJtiJforce = nullptr;
+    iJJt   = nullptr;
+    iJJtU  = nullptr;
+    iJJtJF = nullptr;
 }
 
 
@@ -379,10 +379,10 @@ void Mecafil::makeProjectionDiff(const real* force)
         const real sc = 1.0 / segmentation();
         #pragma vector unaligned
         for ( size_t jj = 0; jj < nbs; ++jj )
-            iJJtiJforce[jj] = std::max(th, iLLG[jj] * sc);
+            iJJtJF[jj] = std::max(th, iLLG[jj] * sc);
         
-        //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtiJforce) << '\n';
-        //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtiJforce);
+        //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtJF) << '\n';
+        //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtJF);
     }
 }
 
@@ -410,15 +410,15 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     size_t nbp = nbPoints()*DIM;
     real * vec = new_real(nbp);
     copy_real(nbp, Y, vec);
-    add_projectiondiff(nbSegments(), iJJtiJforce, X, vec);
+    add_projectiondiff(nbSegments(), iJJtJF, X, vec);
 #endif
 
 #if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-    add_projectiondiffSSE(nbSegments(), iJJtiJforce, X, Y);
-    //add_projectiondiffAVX(nbSegments(), iJJtiJforce, X, Y);
+    add_projectiondiffSSE(nbSegments(), iJJtJF, X, Y);
+    //add_projectiondiffAVX(nbSegments(), iJJtJF, X, Y);
 #else
-    add_projectiondiffF(nbSegments(), iJJtiJforce, X, Y);
-    //add_projectiondiff(nbSegments(), iJJtiJforce, X, Y);
+    add_projectiondiffF(nbSegments(), iJJtJF, X, Y);
+    //add_projectiondiff(nbSegments(), iJJtJF, X, Y);
 #endif
     
     

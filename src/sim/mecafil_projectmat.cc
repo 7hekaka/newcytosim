@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 /**
  projections performed with explicit matrices
  This is a slow method, but it can be useful to compare with other methods
@@ -9,11 +9,11 @@
 void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
-    iProj       = nullptr;
-    iDProj      = nullptr;
-    iJJtiJ      = nullptr;
-    iTMP        = nullptr;
-    iJJtiJforce = nullptr;
+    iProj  = nullptr;
+    iDProj = nullptr;
+    iJJtiJ = nullptr;
+    iTMP   = nullptr;
+    iJJtJF = nullptr;
 }
 
 
@@ -23,14 +23,14 @@ void Mecafil::allocateProjection(const size_t ms)
     free_real(iProj);
     free_real(iDProj);
     free_real(iJJtiJ);
-    free_real(iJJtiJforce);
+    free_real(iJJtJF);
     free_real(iTMP);
     const size_t N = DIM * ms;
-    iProj       = new_real(N*N);
-    iDProj      = new_real(N*N);
-    iJJtiJ      = new_real(N*ms);
-    iJJtiJforce = new_real(ms);
-    iTMP        = new_real(N);
+    iProj  = new_real(N*N);
+    iDProj = new_real(N*N);
+    iJJtiJ = new_real(N*ms);
+    iJJtJF = new_real(ms);
+    iTMP   = new_real(N);
 }
 
 
@@ -40,13 +40,13 @@ void Mecafil::destroyProjection()
     free_real(iProj);
     free_real(iDProj);
     free_real(iJJtiJ);
-    free_real(iJJtiJforce);
+    free_real(iJJtJF);
     free_real(iTMP);
-    iProj       = nullptr;
-    iDProj      = nullptr;
-    iJJtiJ      = nullptr;
-    iJJtiJforce = nullptr;
-    iTMP        = nullptr;
+    iProj  = nullptr;
+    iDProj = nullptr;
+    iJJtiJ = nullptr;
+    iJJtJF = nullptr;
+    iTMP   = nullptr;
 }
 
 
@@ -175,17 +175,17 @@ void Mecafil::makeProjectionDiff(const real* force)
     {
         if ( iLag[ii] > 0 )
         {
-            iJJtiJforce[ii] = iLag[ii];
+            iJJtJF[ii] = iLag[ii];
             useProjectionDiff = true;
         }
         else
-            iJJtiJforce[ii] = 0.0;
+            iJJtJF[ii] = 0.0;
     }
     
-    //printf("diffP ");VecPrint::print(std::clog, nbs, iJJtiJforce);
+    //printf("diffP ");VecPrint::print(std::clog, nbs, iJJtJF);
     
     //set up the first term in the derivative of J with respect to variable x[ii]
-    //set up term  P * (DJ)t (JJti) J force:
+    //set up term  P * (dJ)t * inverse(J*Jt) * J * force:
     for ( size_t jj = 0; jj < nbv; ++jj )
     {
         real* col = iDProj + nbv * jj;
@@ -193,13 +193,13 @@ void Mecafil::makeProjectionDiff(const real* force)
         unsigned lin = jj / DIM;
         if ( lin > 0 )
         {
-            col[jj-DIM] = +iJJtiJforce[lin-1];
-            col[jj    ] = -iJJtiJforce[lin-1];
+            col[jj-DIM] = +iJJtJF[lin-1];
+            col[jj    ] = -iJJtJF[lin-1];
         }
         if ( lin < nbs )
         {
-            col[jj    ] += -iJJtiJforce[lin];
-            col[jj+DIM]  = +iJJtiJforce[lin];
+            col[jj    ] += -iJJtJF[lin];
+            col[jj+DIM]  = +iJJtJF[lin];
         }
     }
 
