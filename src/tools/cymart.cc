@@ -31,71 +31,75 @@ PointList * record = 0;
 
 void help(std::ostream& os)
 {
-    os << "\n";
+    os << "Syntax:\n";
+    os << "    cymart CLASS [style=filament|actin|microtubule] [INPUTFILE] [binary=1]\n";
     os << "Cymart exports Cytosim's objects to a Blender-friendly format\n";
     os << "\n";
-    os << "Syntax:\n";
-    os << "       cymart fiber_class [style=filament|actin|microtubule] [INPUTFILE] [binary=1]\n";
-    os << "\n";
-    os << "`fiber_class` names the property of the fiber (use `all` to export all fibers)\n";
+    os << "`CLASS` names the property of the fiber (use `all` to export all fibers)\n";
     os << "Select `style=filament` or `style=actin` or `style=microtubule`.\n";
     os << "Each frame of the trajectory file is sent to a separate file.\n";
     os << "By default these files are plain ASCII text files\n";
+    os << "This is " << DIM << "D\n";
 }
 
 
-FILE * openFile(const char base[], unsigned ix)
+FILE * openFile(const char base[], unsigned inx, bool binary)
 {
     char name[256] = { 0 };
     FILE * f = nullptr;
     
     if ( binary )
     {
-        snprintf(name, sizeof(name), "%s%04u.bin", base, ix);
+        snprintf(name, sizeof(name), "%s%04u.sweet", base, inx);
         f = fopen(name, "wb");
     }
     else
     {
-        snprintf(name, sizeof(name), "%s%04u.txt", base, ix);
+        snprintf(name, sizeof(name), "%s%04u.txt", base, inx);
         f = fopen(name, "w");
     }
     if ( !f )
-    {
-        std::cerr << "Aborted: could not create file " << name << '\n';
-        exit(EXIT_FAILURE);
-    }
-    if ( ferror(f) )
+        std::cerr << "Error: could not create `" << name << "'\n";
+    if ( f && ferror(f) )
     {
         fclose(f);
-        std::cerr << "Aborted: could not create file " << name << '\n';
-        exit(EXIT_FAILURE);
+        std::cerr << "Error making `" << name << "'\n";
+        f = nullptr;
     }
     return f;
 }
 
 
-void savePoint(const int dat[3], const float vec[3])
-{
-    if ( binary )
-    {
-        fwrite(dat, 3, sizeof(int), file);
-        fwrite(vec, 3, sizeof(float), file);
-    }
-    else
-    {
-        fprintf(file, "%i %i %i ", dat[0], dat[1], dat[2]);
-        fprintf(file, "%.6f %.6f %.6f\n", vec[0], vec[1], vec[2]);
-    }
-}
+//------------------------------------------------------------------------------
+#pragma mark - write data chunk
 
-void savePoint(int dat[3], Vector3 const& pos)
+void writeBinary(FILE* file, uint16_t a, uint32_t b, uint16_t c, Vector3 const& pos)
 {
+    fwrite(&a, 1, 2, file);
+    fwrite(&b, 1, 4, file);
+    fwrite(&c, 1, 2, file);
     float vec[3] = { 0 };
     pos.store(vec);
-    savePoint(dat, vec);
-    record->push_back(pos);
+    fwrite(vec, 3, sizeof(float), file);
 }
 
+
+void writeText(FILE* file, uint16_t a, uint32_t b, uint16_t c, Vector3 const& pos)
+{
+    fprintf(file, "%i %i %i ", a, b, c);
+    fprintf(file, "%.6f %.6f %.6f\n", pos.XX, pos.YY, pos.ZZ);
+}
+
+void writePoint(uint16_t a, uint32_t b, uint16_t c, Vector3 const& pos)
+{
+    if ( binary )
+        writeBinary(file, a, b, c, pos);
+    else
+        writeText(file, a, b, c, pos);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - write data chunk
 
 Vector3 closestPoint(Fiber const* fib, const Vector3 pos)
 {
@@ -139,7 +143,9 @@ void clearPoints()
 /// save Microtubules protofilament
 void drawFilament(Fiber const& fib)
 {
-    int data[3] = { 1, (int)fib.identity(), 0 };
+    uint16_t a = 1;
+    uint16_t b = 0;
+    uint32_t c = fib.identity();
 
     // axial translation between two sucessive monomers:
     const real dab = 0.004;
@@ -156,8 +162,8 @@ void drawFilament(Fiber const& fib)
     while ( ab < fib.abscissaP() )
     {
         // alternate colors:
-        data[2] = 1 + ( cnt & 1 );
-        savePoint(data, Vector3(fib.posP(ab)));
+        b = 1 + ( cnt & 1 );
+        writePoint(a, b, c, Vector3(fib.posP(ab)));
         ab += dab;
     }
 }
@@ -166,7 +172,9 @@ void drawFilament(Fiber const& fib)
 /// save double helical filament
 void drawActin(Fiber const& fib)
 {
-    int data[3] = { 1, (int)fib.identity(), 0 };
+    uint16_t a = 1;
+    uint16_t b = 0;
+    uint32_t c = fib.identity();
 
     // axial translation between two sucessive monomers:
     const real dab = 0.00275;
@@ -201,13 +209,13 @@ void drawActin(Fiber const& fib)
         p = Vector3(fib.pos(ab)) + off * n;
 
         // use different tones to individualize the two strands:
-        data[2] = 1 + ( cnt & 1 );
+        b = 1 + ( cnt & 1 );
         
         // change color for the last 2 monomers:
         if ( ab + dab > fib.abscissaP() )
-            data[2] += 2;
+            b += 2;
 
-        savePoint(data, p);
+        writePoint(a, b, c, p);
         ab += dab;
         ++cnt;
     }
@@ -221,7 +229,9 @@ void drawMicrotubule(Fiber const& fib)
     real dx[] = {0.8855,0.5681,0.1205,-0.3546,-0.7485,-0.9709,-0.9709,-0.7485,-0.3546,0.1205,0.5681,0.8855,1.0000};
     real dy[] = {-0.4647,-0.8230,-0.9927,-0.9350,-0.6631,-0.2393,0.2393,0.6631,0.9350,0.9927,0.8230,0.4647,0};
 
-    int data[3] = { 1, (int)fib.identity(), 0 };
+    uint16_t a = 1;
+    uint16_t b = 0;
+    uint32_t c = fib.identity();
 
     // axial translation between two sucessive monomers:
     const real dab = 0.004;
@@ -250,7 +260,7 @@ void drawMicrotubule(Fiber const& fib)
         Vector3 f = cross(d, e);
         
         // color of alpha subunit:
-        data[2] = 1;
+        b = 1;
         
         real up = abmax - ( cnt & 1 ? 0 : dab );
   
@@ -262,11 +272,11 @@ void drawMicrotubule(Fiber const& fib)
                 {
                     // change color for beta-tubulin near the end:
                     if ( ab + da[i] + 4 * dab > abmax )
-                        data[2] = 3;
+                        b = 3;
                     else
-                        data[2] = 2;
+                        b = 2;
                 }
-                savePoint(data, p+dx[i]*e+dy[i]*f+da[i]*d);
+                writePoint(a, b, c, p+dx[i]*e+dy[i]*f+da[i]*d);
             }
         }
         

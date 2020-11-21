@@ -307,7 +307,7 @@ public:
     {
         Property * p = properties.find(cat, ix);
         if ( !p )
-            throw InvalidIO("could not find `"+cat+"' class with id "+std::to_string(ix));
+            throw InvalidIO("could not find `"+cat+"' class with ID "+std::to_string(ix));
         return static_cast<T*>(p);
     }
     

@@ -200,6 +200,22 @@ private:
             }
         }
         
+#if ( 0 )
+        if ( std::is_enum<T>::value )
+        {
+            // accept a numeric value
+            size_t idx;
+            int i = std::stoi(val, &idx, 10);
+            T t = static_cast<T>(i);
+            if ( idx == val.size() && (int)t == i )
+            {
+                std::cerr << "Warning: accepting unknown value `" << t << "' for `" << key << "'\n";
+                var = t;
+                return;
+            }
+        }
+#endif
+        
         InvalidParameter e("could not set `"+key+"' from `"+val+"'");
         e << "Known values are:\n";
         for ( auto const& kv : dict )
