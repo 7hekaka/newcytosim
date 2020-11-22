@@ -806,7 +806,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     
     do_write &= ( nb_frames > 0 );
 
-    size_t frame = 0;
+    size_t frame = 1;
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
     
