@@ -13,7 +13,9 @@ void Mecafil::buildProjection()
     iDProj = nullptr;
     iJJtiJ = nullptr;
     iTMP   = nullptr;
+#if ADD_PROJECTION_DIFF
     iJJtJF = nullptr;
+#endif
 }
 
 
@@ -23,14 +25,16 @@ void Mecafil::allocateProjection(const size_t ms)
     free_real(iProj);
     free_real(iDProj);
     free_real(iJJtiJ);
-    free_real(iJJtJF);
     free_real(iTMP);
     const size_t N = DIM * ms;
     iProj  = new_real(N*N);
     iDProj = new_real(N*N);
     iJJtiJ = new_real(N*ms);
-    iJJtJF = new_real(ms);
     iTMP   = new_real(N);
+#if ADD_PROJECTION_DIFF
+    free_real(iJJtJF);
+    iJJtJF = new_real(ms);
+#endif
 }
 
 
@@ -40,13 +44,15 @@ void Mecafil::destroyProjection()
     free_real(iProj);
     free_real(iDProj);
     free_real(iJJtiJ);
-    free_real(iJJtJF);
     free_real(iTMP);
     iProj  = nullptr;
     iDProj = nullptr;
     iJJtiJ = nullptr;
-    iJJtJF = nullptr;
     iTMP   = nullptr;
+#if ADD_PROJECTION_DIFF
+    free_real(iJJtJF);
+    iJJtJF = nullptr;
+#endif
 }
 
 
@@ -157,7 +163,10 @@ void Mecafil::computeTensions(const real* force)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Correction terms to the Projection
+
+
+#if ADD_PROJECTION_DIFF
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
@@ -214,8 +223,8 @@ void Mecafil::makeProjectionDiff(const real* force)
 
 void Mecafil::addProjectionDiff( const real* X, real* Y ) const
 {
-    assert_true(useProjectionDiff);
     size_t nbv = DIM * nbPoints();
     blas::xsymv('U', nbv, 1.0, iDProj, nbv, X, 1, 1.0, Y, 1);
 }
 
+#endif

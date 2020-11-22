@@ -36,12 +36,6 @@
 #include "meca_rigidity.cc"
 #include "meca_math.cc"
 
-/**
- Add correction term to the constrainted dynamics
- The effect is to stabilize fibers under traction, at some modest CPU cost.
-*/
-#define ADD_PROJECTION_DIFF 1
-
 
 /**
 Set SEPARATE_RIGIDITY_TERMS to chose how Rigidity term are calculated:
@@ -1577,8 +1571,8 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      with each BCGGS iteration involving 2 matrix-vector multiplications.
      We set here this theoretical limit to the number multiplications:
      */
-
-    LinearSolvers::Monitor monitor(2*dimension(), tolerance_);
+    size_t nb_iter_max = std::min(2048UL, 2*dimension());
+    LinearSolvers::Monitor monitor(nb_iter_max, tolerance_);
 
     //fprintf(stderr, "Solve precond %i size %6i absolute tolerance %f\n", precond, dimension(), tolerance_);
     

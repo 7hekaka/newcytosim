@@ -63,9 +63,9 @@ public:
     class HeavySegment
     {
     public:
-        FiberSegment seg_;   //< The segment
-        real         dis_;   //< shortest distance from point to segment
-        real         abs_;   //< abscissa of projection of point
+        FiberSegment seg_;   ///< The segment
+        real         dis_;   ///< shortest distance from point to segment
+        real         abs_;   ///< abscissa of projection of point
         HeavySegment() { }
         HeavySegment(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
     };

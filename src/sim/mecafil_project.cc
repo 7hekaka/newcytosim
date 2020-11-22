@@ -2,9 +2,11 @@
 
 #include "mecafil_code.cc"
 #include "exceptions.h"
-#include "vecprint.h"
 #include "xpttrf.h"
 
+// required for debugging:
+#include "cytoblas.h"
+#include "vecprint.h"
 
 /*
  Selection of LAPACK routines
@@ -55,7 +57,9 @@ void Mecafil::buildProjection()
 {
     //reset all variables for the projections:
     iJJt   = nullptr;
+#if ADD_PROJECTION_DIFF
     iJJtJF = nullptr;
+#endif
 }
 
 
@@ -63,11 +67,18 @@ void Mecafil::allocateProjection(const size_t ms)
 {
     //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
     free_real(iJJt);
+#if ADD_PROJECTION_DIFF
     real * mem = new_real(3*ms);
     //zero_real(3*ms, mem);
     iJJt   = mem;
     iJJtU  = mem + ms;
     iJJtJF = mem + ms * 2;
+#else
+    real * mem = new_real(2*ms);
+    //zero_real(2*ms, mem);
+    iJJt   = mem;
+    iJJtU  = mem + ms;
+#endif
 }
 
 
@@ -77,7 +88,9 @@ void Mecafil::destroyProjection()
     free_real(iJJt);
     iJJt   = nullptr;
     iJJtU  = nullptr;
+#if ADD_PROJECTION_DIFF
     iJJtJF = nullptr;
+#endif
 }
 
 
@@ -331,55 +344,57 @@ void Mecafil::printProjection(std::ostream& os) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Projection DIFF
-//#include "cytoblas.h"
+#pragma mark - Correction terms to the Projection
+
+#if ADD_PROJECTION_DIFF
+
+// add debug code to compare with reference implementation
+#define CHECK_PROJECTION_DIFF 0
+
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
+    useProjectionDiff = false;
+#if NEW_SKIP_PROJECTION
+    if ( skipProjection )
+        return;
+#endif
     const size_t nbs = nbSegments();
     assert_true( nbs > 0 );
     
-#if NEW_SKIP_PROJECTION
-    if ( skipProjection )
-    {
-        useProjectionDiff = false;
-        return;
-    }
-#endif
-
-#if 0
+#if CHECK_PROJECTION_DIFF
     // Check here that iLLG[] contains the correct Lagrange multipliers
     // compute Lagrange multipliers corresponding to 'force' in iLag:
     computeTensions(force);
-    real n = blas::max_diff(nbs, iLLG, iLag);
-    if ( n > 1e-6 )
+    real e = blas::max_diff(nbs, iLLG, iLag);
+    if ( e > 1e-6 )
     {
-        fprintf(stderr, "\n|iLag - iLLG| = %e", n);
-        fprintf(stderr, "\niLag "); VecPrint::print(std::clog, std::min(20LU,nbs), iLag);
-        fprintf(stderr, "\niLLG "); VecPrint::print(std::clog, std::min(20LU,nbs), iLLG);
+        fprintf(stderr, "\n|iLag - iLLG| = %e", e);
+        fprintf(stderr, "\niLag "); VecPrint::print(std::clog, std::min(16LU,nbs), iLag);
+        fprintf(stderr, "\niLLG "); VecPrint::print(std::clog, std::min(16LU,nbs), iLLG);
     }
 #endif
     
-    // use Lagrange multipliers computed from the last projectForces() in iLLG
+    const real threshold = 0.0;
 
-    // remove compressive forces ( negative Lagrange-multipliers )
-    useProjectionDiff = false;
-    for ( size_t jj = 0; jj < nbs; ++jj )
+    // use Lagrange multipliers computed from the last projectForces() in iLLG
+    // check for extensile ( positive ) multipliers
+    for ( size_t i = 0; i < nbs; ++i )
     {
-        if ( iLLG[jj] > 0 )
+        if ( iLLG[i] > threshold )
         {
             useProjectionDiff = true;
             break;
         }
     }
     
+    // remove compressive ( negative ) multipliers
     if ( useProjectionDiff )
     {
-        const real th = 0.0;
-        const real sc = 1.0 / segmentation();
+        const real alpha = 1.0 / segmentation();
         #pragma vector unaligned
         for ( size_t jj = 0; jj < nbs; ++jj )
-            iJJtJF[jj] = std::max(th, iLLG[jj] * sc);
+            iJJtJF[jj] = std::max(threshold, alpha * iLLG[jj]);
         
         //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtJF) << '\n';
         //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtJF);
@@ -388,15 +403,15 @@ void Mecafil::makeProjectionDiff(const real* force)
 
 
 /// Reference (scalar) code
-inline void add_projectiondiff(const size_t nbs, const real* mul, const real* X, real* Y)
+inline void addProjectionDiff_(const size_t nbs, const real* mul, const real* X, real* Y)
 {
-    for ( size_t jj = 0; jj < nbs; ++jj )
+    for ( size_t i = 0; i < nbs; ++i )
     {
         for ( size_t d = 0; d < DIM; ++d )
         {
-            const real w = mul[jj] * ( X[DIM*jj+DIM+d] - X[DIM*jj+d] );
-            Y[DIM*jj    +d] += w;
-            Y[DIM*jj+DIM+d] -= w;
+            const real w = mul[i] * ( X[DIM*i+DIM+d] - X[DIM*i+d] );
+            Y[DIM*i+(    d)] += w;
+            Y[DIM*i+(DIM+d)] -= w;
         }
     }
 }
@@ -404,35 +419,31 @@ inline void add_projectiondiff(const size_t nbs, const real* mul, const real* X,
 
 void Mecafil::addProjectionDiff(const real* X, real* Y) const
 {
-    assert_true(useProjectionDiff);
-#if ( 0 )
-    // debug code to compare with default implementation
+#if CHECK_PROJECTION_DIFF
     size_t nbp = nbPoints()*DIM;
     real * vec = new_real(nbp);
     copy_real(nbp, Y, vec);
-    add_projectiondiff(nbSegments(), iJJtJF, X, vec);
+    addProjectionDiff_(nbSegments(), iJJtJF, X, vec);
 #endif
 
 #if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-    add_projectiondiffSSE(nbSegments(), iJJtJF, X, Y);
-    //add_projectiondiffAVX(nbSegments(), iJJtJF, X, Y);
+    addProjectionDiff_SSE(nbSegments(), iJJtJF, X, Y);
+    //addProjectionDiff_AVX(nbSegments(), iJJtJF, X, Y);
 #else
-    add_projectiondiffF(nbSegments(), iJJtJF, X, Y);
-    //add_projectiondiff(nbSegments(), iJJtJF, X, Y);
+    addProjectionDiff_F(nbSegments(), iJJtJF, X, Y);
+    //addProjectionDiff_(nbSegments(), iJJtJF, X, Y);
 #endif
     
-    
-#if ( 0 )
-    // debug code to compare with default implementation
-    real n = blas::max_diff(nbp, Y, vec);
-    if ( n > 1e-6 )
+#if CHECK_PROJECTION_DIFF
+    real e = blas::max_diff(nbp, Y, vec);
+    if ( e > 1e-6 )
     {
-        std::clog << "proj_diff error " << n << " (" << nbp << ")\n";
-        VecPrint::print(std::clog, std::min(20u,nbp), vec);
-        VecPrint::print(std::clog, std::min(20u,nbp), Y);
+        std::clog << "\naddProjectionDiff(" << nbp << ") error " << e;
+        std::clog << "\nref "; VecPrint::print(std::clog, std::min(16UL,nbp), vec);
+        std::clog << "\nopt "; VecPrint::print(std::clog, std::min(16UL,nbp), Y);
     }
     free_real(vec);
 #endif
 }
 
-
+#endif

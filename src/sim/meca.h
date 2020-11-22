@@ -53,7 +53,7 @@ typedef Matrix33 MatrixBlock;
 
 /// set TRUE to use matrix mISO and mFUL (the traditional way)
 /** This option should be 0 if PARALLELIZE_MATRIX == 1 */
-#define USE_ISO_MATRIX 0
+#define USE_ISO_MATRIX 1
 
 /**
  Option to allow 'play' to display Meca links graphically.
@@ -116,7 +116,7 @@ The equation is formulated using linear-algebra:
  
  - mdiffP is a term coming from the derivative of the projection P.
    It can provide better numerical stability in some situations where the filament are stretched.
-   You can however define ADD_PROJECTION_DIFF = 0 in meca.cc to remove mdiffP.
+   You can however define ADD_PROJECTION_DIFF=0 to remove mdiffP.
  .
  
  

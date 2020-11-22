@@ -808,11 +808,11 @@ void projectForcesD3D_AVX(size_t nbs, const real* dir, const real* src, const re
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - ProjectionDiff
+#pragma mark - Correction terms to the Projection
 
 
 ///expanded implementation:
-void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_R(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     // this loop cannot be unrolled as there is an OUTPUT dependency in Y
     for ( size_t jj = 0; jj < nbs; ++jj )
@@ -834,8 +834,8 @@ void add_projectiondiffR(const size_t nbs, const real* mul, const real* X, real*
 }
 
 
-///scalar implementation
-void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real* Y)
+/// scalar implementation
+void addProjectionDiff_F(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     real px0 = X[0];
     real px1 = X[1];
@@ -886,7 +886,7 @@ void add_projectiondiffF(const size_t nbs, const real* mul, const real* X, real*
 
 #include "simd.h"
 
-void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_SSE(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     vec2 px = load2(X);
     vec2 pw = setzero2();
@@ -910,7 +910,7 @@ void add_projectiondiffSSE(const size_t nbs, const real* mul, const real* X, rea
 
 #include "simd.h"
 
-void add_projectiondiffAVX(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_AVX(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     real * pY = Y;
     real const* pX = X;

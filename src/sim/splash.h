@@ -11,7 +11,7 @@
 inline void splash(std::ostream& os)
 {
     os << " ------------------------------------------------------------- \n";
-    os << "|  CytoSIM " <<DIM<<"D  -  www.cytosim.org  -  version PI  -  07.2020  |\n";
+    os << "|  CytoSIM " <<DIM<<"D  -  www.cytosim.org  -  version PI  -  11.2020  |\n";
     os << " ------------------------------------------------------------- \n";
 }
 

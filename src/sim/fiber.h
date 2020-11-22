@@ -302,7 +302,7 @@ public:
     size_t         nbHands() const { return frHands.count(); }
     
     /// a function to count Hands using a custom criteria
-    int            nbHands(int (*func)(Hand const*)) const { return frHands.count(func); }
+    size_t         nbHands(int (*func)(Hand const*)) const { return frHands.count(func); }
 
     /// number of Hands attached within a range of abscissa
     size_t         nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;

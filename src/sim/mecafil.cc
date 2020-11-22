@@ -21,7 +21,9 @@ Mecafil::Mecafil()
 #if NEW_ANISOTROPIC_FIBER_DRAG
     iAni = nullptr;
 #endif
+#if ADD_PROJECTION_DIFF
     useProjectionDiff = false;
+#endif
 }
 
 void Mecafil::release()
@@ -192,10 +194,11 @@ void Mecafil::projectForces(const real* X, real* Y) const
         Y[ii] = sum;
 }
 
+#if ADD_PROJECTION_DIFF
 void Mecafil::computeTensions(const real*) {} //DIM == 1
 void Mecafil::makeProjectionDiff(const real*) {} //DIM == 1
 void Mecafil::addProjectionDiff(const real*, real*) const {} //DIM == 1
-
+#endif
 #endif
 
 

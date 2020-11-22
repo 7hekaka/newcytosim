@@ -20,7 +20,7 @@
 
 
 // defined in "mecafil_code.cc"
-extern void projectForcesD_(size_t, const real*, const real*, const real*, real*);
+//extern void projectForcesD_(size_t, const real*, const real*, const real*, real*);
 
 
 extern Modulo const* modulo;
@@ -1621,7 +1621,7 @@ void Chain::adjustSegmentation()
 {
     LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
     const real upLimit = 16.0 * fnSegmentation;
-    size_t nbs = nbSegments();
+    const size_t nbs = nbSegments();
     real len = length();
     
     assert_true( fnSegmentation > REAL_EPSILON );

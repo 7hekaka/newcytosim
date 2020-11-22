@@ -36,7 +36,6 @@ class Matrix;
  -# addRigidity() implements bending elasticity.
  .
  
- \todo Rename Mecafil -> Filament
 */
 class Mecafil : public Chain
 {
@@ -79,13 +78,13 @@ private:
     real * iJJt, * iJJtU;
 
 #endif
-    
-    /// vector for the projection correction of size nbSegments
+#if ADD_PROJECTION_DIFF
+    /// vector for the correction to the projection of size (nbPoints-1)
     real * iJJtJF;
     
     /// true if all elements of iJJtJF[] are null
     bool  useProjectionDiff;
-    
+#endif
 protected:
     
     /// mobility of the points (all points have the same drag coefficient)
@@ -170,6 +169,7 @@ public:
     /// prepare for projection
     void        makeProjection();
 
+#if ADD_PROJECTION_DIFF
     /// prepare the correction to the projection
     void        makeProjectionDiff(const real* );
     
@@ -178,7 +178,8 @@ public:
     
     /// true if addProjectionDiff() does something
     bool        hasProjectionDiff() const { return useProjectionDiff; }
-
+#endif
+    
     /// add displacements due to the Brownian motion to rhs[]
     real        addBrownianForces(real const* rnd, real, real* rhs) const;
 

@@ -16,7 +16,14 @@ class Meca;
 #define EXPERIMENTAL_PRECONDITIONNERS 0
 
 
-/// to save memory, SIZE_T could be defined to use down to 2 bytes.
+/**
+ Add correction terms to the projection in constrainted dynamics
+ The effect is to stabilize fibers under traction, at some modest CPU cost.
+*/
+#define ADD_PROJECTION_DIFF 1
+
+
+/// to save memory, SIZE_T could be defined here to use down to 2 bytes.
 /* The limit imposed on the size of the Mecable is hardly relevant anyhow */
 typedef unsigned short SIZE_T;
 
@@ -338,17 +345,17 @@ public:
     virtual real leftoverMobility() const { return 1.0; }
 
     //--------------------------------------------------------------------------
-
+    
+#if ADD_PROJECTION_DIFF
     /// set terms derived from the Projection operator, from the given forces
-    /** This is enabled by a keyword ADD_PROJECTION_DIFF in meca.cc */
     virtual void makeProjectionDiff(const real* force) {}
     
     /// add terms from projection correction terms: Y <- Y + P' * X;
-    /** This is enabled by a keyword ADD_PROJECTION_DIFF in meca.cc */
     virtual void addProjectionDiff(const real* X, real* Y) const {}
     
     /// true if addProjectionDiff() does something
     virtual bool hasProjectionDiff() const { return false; }
+#endif
     
     //--------------------------------------------------------------------------
     //           Position-related functions derived from Movable
