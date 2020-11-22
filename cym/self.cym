@@ -8,7 +8,7 @@ set simul system
 {
     time_step = 0.01
     viscosity = 0.1
-    precondition = 0
+    precondition = 1
     binding_grid_step = 0.5
     display = ( style=2; delay=4; label="Nedelec et al. 1998 -" )
 }

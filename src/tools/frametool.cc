@@ -212,7 +212,7 @@ void sizeFrame(FILE* in)
         {
             case FRAME_END: {
                 size_t kb = ( ftell(in) - pos ) >> 10;
-                printf("pid %lu   frame %6lu   time: %8.3f %6lu kB %7li lines (%+li)\n",
+                printf("pid %lu   frame %6lu   time: %10.5f %6lu kB %7li lines (%+li)\n",
                        frame_pid, frm, frame_time, kb, cnt, cnt-old);
                 old = cnt;
                 ++frm;
