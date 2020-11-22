@@ -122,8 +122,8 @@ namespace LinearSolvers
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r0);
         blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
-        real resid = blas::nrm2(dim, r0);
-        fprintf(stderr, "BCGS  %4i count %4lu residual %10.6f\n", dim, monitor.count(), resid);
+        real res = blas::nrm2(dim, r0);
+        fprintf(stderr, "BCGS  %4i count %5lu residual %10.6f\n", dim, monitor.count(), res);
 #endif
         allocator.release();
     }
@@ -241,8 +241,8 @@ namespace LinearSolvers
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        real resid = blas::nrm8(dim, r);
-        fprintf(stderr, "BCGSP count %4lu norm_inf residual %10.8f\n", monitor.count(), resid);
+        real res = blas::nrm8(dim, r);
+        fprintf(stderr, "BCGSP count %4lu norm_inf residual %10.8f\n", monitor.count(), res);
 #endif
         allocator.release();
     }
@@ -338,8 +338,8 @@ namespace LinearSolvers
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        real resid = blas::nrm2(dim, r);
-        fprintf(stderr, "bicgs %4i count %4lu residual %10.6f\n", dim, monitor.count(), resid);
+        real res = blas::nrm2(dim, r);
+        fprintf(stderr, "bicgs %4i count %4lu residual %10.6f\n", dim, monitor.count(), res);
 #endif
         allocator.release();
     }

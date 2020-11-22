@@ -401,6 +401,24 @@ void SparMatSym1::addTriangularBlockBanded(real alpha, real* mat, const size_t l
 }
 
 
+
+void SparMatSym1::addDiagonalTrace(real alpha, real* mat, const size_t ldd,
+                                   const size_t start, const size_t cnt) const
+{
+    fprintf(stderr, "unfinished SparMatSym1::addDiagonalTrace()\n");
+    exit(1);
+}
+
+
+void SparMatSym1::addDiagonalTraceBanded(real alpha, real* mat, const size_t ldd,
+                                         const size_t start, const size_t cnt,
+                                         const size_t rank) const
+{
+    fprintf(stderr, "unfinished SparMatSym1::addDiagonalTraceBanded()\n");
+    exit(1);
+}
+
+
 int SparMatSym1::bad() const
 {
     if ( size_ <= 0 ) return 1;
@@ -525,8 +543,9 @@ void SparMatSym1::vecMul(const real* X, real* Y, size_t start, size_t stop) cons
 
 #if !MATRIX1_OPTIMIZED_MULTIPLY
 
-void SparMatSym1::prepareForMultiply(int)
+bool SparMatSym1::prepareForMultiply(int)
 {
+    return true;
 }
 
 /*
@@ -674,7 +693,7 @@ void SparMatSym1::setNextColumn()
 #endif
 
 
-void SparMatSym1::prepareForMultiply(int dim)
+bool SparMatSym1::prepareForMultiply(int dim)
 {
     assert_true( size_ <= allocated_ );
     
@@ -744,6 +763,7 @@ void SparMatSym1::prepareForMultiply(int dim)
 
     //printSparse(std::clog);
     //printSparseArray(std::clog);
+    return true;
 }
 
 

@@ -1915,7 +1915,7 @@ Interpolation Chain::interpolateM(const real ab) const
 {
     real a = std::max(ab, (real)0) / fnCut;
     //beyond the last point, we interpolate the PLUS_END
-    size_t s = std::min((size_t)a, (size_t)nPoints-2);
+    size_t s = std::min((size_t)a, size_t(nPoints-2));
     return Interpolation(this, s, s+1, std::min(a-s, (real)1));
 }
 

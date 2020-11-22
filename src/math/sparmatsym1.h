@@ -158,9 +158,15 @@ public:
     
     /// add lower terms within ( start, start+nb ) and at distance `rank' from diagonal to `mat`
     void addTriangularBlockBanded(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t rank) const;
+    
+    /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
+    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t nb) const;
+    
+    /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
+    void addDiagonalTraceBanded(real alpha, real* mat, size_t ldd, size_t start, size_t nb, size_t rank) const;
 
     /// create compressed storage from column-based data
-    void prepareForMultiply(int);
+    bool prepareForMultiply(int);
 
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)

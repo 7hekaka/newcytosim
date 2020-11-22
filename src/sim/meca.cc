@@ -15,16 +15,17 @@
 
 #include <fstream>
 
-#include "meca.h"
-#include "mecable.h"
-#include "messages.h"
-#include "simul_prop.h"
 #include "assert_macro.h"
 #include "blas.h"
 #include "lapack.h"
 #include "cytoblas.h"
 #include "xtbsv.h"
 #include "xtrsm.h"
+
+#include "meca.h"
+#include "mecable.h"
+#include "messages.h"
+#include "simul_prop.h"
 #include "exceptions.h"
 #include "vecprint.h"
 #include "filepath.h"
@@ -1796,6 +1797,7 @@ void Meca::flagClusters() const
             which[i] = mec;
     }
     
+#if USE_MATRIX_BLOCK
     /// equalize flags for any non-zero matrix element between Mecables:
     for ( size_t jj = 0; jj < MAX; ++jj )
     {
@@ -1819,7 +1821,7 @@ void Meca::flagClusters() const
             }
         }
     }
-    
+#endif
 #if USE_ISO_MATRIX
     /// equalize flags for any non-zero matrix element between Mecables:
     for ( size_t jj = 0; jj < MAX; ++jj )

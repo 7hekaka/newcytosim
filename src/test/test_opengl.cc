@@ -43,9 +43,9 @@ int          transparency   = 0;
 void printCaps()
 {
     GLint fog, depth, blend, clamp;
-    glGetIntegerv(GL_BLEND,       &blend);
-    glGetIntegerv(GL_FOG,         &fog);
-    glGetIntegerv(GL_DEPTH_TEST,  &depth);
+    glGetIntegerv(GL_BLEND, &blend);
+    glGetIntegerv(GL_FOG, &fog);
+    glGetIntegerv(GL_DEPTH_TEST, &depth);
     glGetIntegerv(GL_DEPTH_CLAMP, &clamp);
     
     printf("transparency %i - blend %i - fog %i - depth %i - clamp %i",
@@ -53,9 +53,9 @@ void printCaps()
     
     
     GLint point_smooth, line_smooth, multisample;
-    glGetIntegerv(GL_POINT_SMOOTH,   &point_smooth);
-    glGetIntegerv(GL_LINE_SMOOTH,    &line_smooth);
-    glGetIntegerv(GL_MULTISAMPLE,    &multisample);
+    glGetIntegerv(GL_POINT_SMOOTH, &point_smooth);
+    glGetIntegerv(GL_LINE_SMOOTH, &line_smooth);
+    glGetIntegerv(GL_MULTISAMPLE, &multisample);
 
     printf(" - point_smooth %i - line_smooth %i - multisample %i\n",
            int(point_smooth), int(line_smooth), int(multisample));

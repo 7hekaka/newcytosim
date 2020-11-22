@@ -278,8 +278,8 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 
 // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
 void SparMatBlk::addDiagonalTraceBanded(real alpha, real* mat, size_t ldd,
-                                         const size_t start,
-                                         const size_t cnt, size_t rank) const
+                                        const size_t start,
+                                        const size_t cnt, size_t rank) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
