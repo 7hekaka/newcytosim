@@ -43,7 +43,7 @@ typedef unsigned short SIZE_T;
 class Mecable : public Object, public Buddy
 {
 protected:
-    
+
     /// array of size DIM*pAllocated contains DIM*nPoints coordinates
     /**
      The coordinates are arranged as follows:
@@ -53,29 +53,36 @@ protected:
      */
     real *      pPos;
 
-    /// Array containing force-coordinates which is allocated in Meca
-    real const* pForce;
-    
-    /// Number of points in pForce[]
-    SIZE_T      pForceMax;
-    
-    /// Number of points in the Mecable
-    SIZE_T      nPoints;
-
 private:
     
-    /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    SIZE_T      pIndex;
-
-    /// Currently allocated size of arrays pPos[]
-    SIZE_T      pAllocated;
+    /// Array containing force-coordinates which is allocated in Meca
+    real const* pForce;
 
     /// Matrix block used for preconditionning in Meca::solve()
     real *      pBlock;
     
     /// Pivot indices for LAPACK
-    int *       pPivot;
+    int  *      pPivot;
     
+    /// Index that Object coordinates occupy in the matrices and vectors of Meca
+    size_t      pIndex;
+
+protected:
+
+    /// Number of points in the Mecable
+    SIZE_T      nPoints;
+
+private:
+
+    /// Number of points in pForce[]
+    SIZE_T      pForceMax;
+
+    /// Currently allocated size of arrays pPos[]
+    SIZE_T      pAllocated;
+    
+    /// type of block
+    SIZE_T      pBlockType;
+
     /// Allocated size of pBlock[]
     SIZE_T      pBlockAlc;
     
@@ -84,13 +91,10 @@ private:
     
     /// Current size of pBlock[]
     SIZE_T      pBlockSize;
-    
-    /// type of block
-    int         pBlockType;
 
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Flag that pBlock[] is used for preconditionning
-    int         pBlockAge;
+    SIZE_T      pBlockAge;
     
     /// Matrix used for preconditionning
     MatrixFull  pBlockMatrix;
@@ -113,76 +117,76 @@ public:
     //--------------------------------------------------------------------------
     
     /// Set the number of points of the object
-    void            setNbPoints(const size_t n) { allocateMecable(n); nPoints = n; }
+    void         setNbPoints(const size_t n) { allocateMecable(n); nPoints = n; }
     
     /// Returns number of points
-    size_t          nbPoints()     const { return nPoints; }
+    size_t       nbPoints()  const { return nPoints; }
     
     /// Index of the last point = nbPoints() - 1
-    size_t          lastPoint()    const { return nPoints - 1; }
+    size_t       lastPoint() const { return nPoints - 1; }
     
     /// size currently allocated
-    size_t          allocated()    const { return pAllocated; }
+    size_t       allocated() const { return pAllocated; }
 
     //--------------------------------------------------------------------------
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
-    const Vector    posP(size_t p)      const { return Vector(pPos+DIM*p); }
+    const Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
     
     /// Position of vertex number 'p' (indices starting at zero)
-    Vector          posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
+    Vector       posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
     /// Address of coordinate array
-    const real*     addrPoints()        const { return pPos; }
+    const real * addrPoints()        const { return pPos; }
     
     /// Address of point `p`
-    const real*     addrPoint(size_t p) const { return pPos + DIM*p; }
+    const real * addrPoint(size_t p) const { return pPos + DIM*p; }
 
     /// Set position of point `i` to `x`
-    void            setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
+    void         setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
     
     /// Shift point at index `i` by `x`
-    void            movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
+    void         movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
     
     /// replace current coordinates by values from the given array
-    virtual void    getPoints(real const*);
+    virtual void getPoints(real const*);
     
     /// Set to `n_pts` points copied from `pts[]`
-    void            setPoints(const real pts[], size_t n_pts);
+    void         setPoints(const real pts[], size_t n_pts);
     
     /// copy current vertex coordinates to given array, assuming it is suitably allocated
-    void            putPoints(real*) const;
+    void         putPoints(real*) const;
 
     /// Copy current vertex coordinates to `ptr[]`, already allocated to hold `cnt` scalars
-    int             putPoints(float ptr[], size_t cnt) const;
+    int          putPoints(float ptr[], size_t cnt) const;
 
     /// Add a point and expand the object, returning the array index that was used
-    size_t          addPoint(Vector const& w);
+    size_t       addPoint(Vector const& w);
     
     /// Remove `nbp` points starting from index `inx`
-    void            removePoints(size_t inx, size_t nbp);
+    void         removePoints(size_t inx, size_t nbp);
     
     /// Remove all points
-    void            clearPoints()  { nPoints = 0; }
+    void         clearPoints()  { nPoints = 0; }
     
     /// Shift `nbp` points starting from index `inx`
-    void            shiftPoints(size_t inx, size_t nbp);
+    void         shiftPoints(size_t inx, size_t nbp);
     
     /// Remove all points with indices [ 0, p-1 ], keep [ p, nbPoints() ]
-    virtual void    truncateM(size_t p);
+    virtual void truncateM(size_t p);
     
     /// Keep points [ 0, p ], remove other points
-    virtual void    truncateP(size_t p);
+    virtual void truncateP(size_t p);
     
     /// Set all coordinates to zero (nicer for debug/testing)
-    void            resetPoints();
+    void         resetPoints();
     
     /// Add random noise uniformly to all coordinate (used for testing purposes)
-    void            addNoise(real amount);
+    void         addNoise(real amount);
     
     /// calculate first and second momentum of point coordinates
-    void            calculateMomentum(Vector& avg, Vector& dev);
+    void         calculateMomentum(Vector& avg, Vector& dev);
     
     //--------------------------------------------------------------------------
     
@@ -274,7 +278,7 @@ public:
     void        blockSize(size_t, size_t block, size_t pivot);
     
     /// True if preconditionner block is 'in use'
-    int         blockType()  const { return pBlockType; }
+    SIZE_T      blockType()  const { return pBlockType; }
 
     /// Returns address of memory allocated for preconditionning
     real *      block()      const { return pBlock; }
@@ -284,13 +288,13 @@ public:
     
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void        blockType(int t)   { pBlockType = t; pBlockAge = 0; }
+    void        blockType(SIZE_T t) { pBlockType = t; pBlockAge = 0; }
 
     /// True if preconditionner block is 'in use'
-    int         blockAge()   const { return pBlockAge; }
+    SIZE_T      blockAge()   const { return pBlockAge; }
     
     /// Change preconditionning flag
-    void        blockAge(int b)    { pBlockAge = b; }
+    void        blockAge(SIZE_T b) { pBlockAge = b; }
 
     /// Returns matrix allocated for preconditionning
     MatrixFull& blockMatrix()      { return pBlockMatrix; }
@@ -299,7 +303,7 @@ public:
     void        blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
 #else
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void        blockType(int t)   { pBlockType = t; }
+    void        blockType(SIZE_T t) { pBlockType = t; }
 #endif
     //--------------------------------------------------------------------------
     
