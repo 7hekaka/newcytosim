@@ -219,7 +219,7 @@ void Object::readHeader(Inputter& in, bool fat, unsigned& ix, ObjectID& id, Obje
         int c = in.get_char();
         if ( c == ':' )
         {
-            if ( 1 != fscanf(file, "%lu", &mk) )
+            if ( 1 != fscanf(file, "%u", &mk) )
             throw InvalidIO("invalid Object header");
         }
         else

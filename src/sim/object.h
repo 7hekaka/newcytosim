@@ -19,10 +19,10 @@ class Display;
 typedef char ObjectTag;
 
 /// Type used to mark objects
-typedef unsigned long ObjectMark;
+typedef unsigned ObjectMark;
 
 /// Type used to flag objects
-typedef unsigned long ObjectFlag;
+typedef unsigned ObjectFlag;
 
 /// Type used for signature
 typedef unsigned ObjectSignature;
