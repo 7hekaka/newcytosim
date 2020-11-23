@@ -27,8 +27,8 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real     val;   ///< The value of the element
-        size_t   inx;   ///< The index of the line
+        real   val;   ///< The value of the element
+        size_t inx;   ///< The index of the line
         
         void reset(size_t i)
         {
@@ -40,19 +40,19 @@ public:
 private:
     
     /// size of matrix
-    size_t    size_;
+    size_t size_;
     
-    /// amount of memory which has been allocated
-    size_t    allocated_;
+    /// amount of memory allocated
+    size_t alloc_;
     
     /// array column_[c][] holds Elements of column 'c'
     Element ** column_;
     
-    /// col_size_[c] is the number of Elements in column 'c'
-    size_t   * col_size_;
+    /// colsiz_[c] is the number of Elements in column 'c'
+    size_t * colsiz_;
     
-    /// col_max_[c] is the number of Elements allocated in column 'c'
-    size_t   * col_max_;
+    /// colmax_[c] is the number of Elements allocated in column 'c'
+    size_t * colmax_;
     
     /// allocate column to hold specified number of values
     void allocateColumn(size_t jj, size_t nb);
@@ -74,43 +74,44 @@ private:
 
     ///array of index for the optmized multiplication
     ///@todo migrate to DSS Symmetric Matrix Storage format
-    size_t     nmax_;
-    size_t   * ija_;
-    real     * sa_;
+    size_t  nmax_;
+    size_t * ija_;
+    real   * sa_;
 
 #endif
     
     /// One column multiplication of a vector
-    void vecMulAdd(const real* X, real* Y, size_t jj, Element col[], size_t size) const;
+    void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 2D version
-    void vecMulAddIso2D(const real* X, real* Y, size_t jj, Element col[], size_t size) const;
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 3D version
-    void vecMulAddIso3D(const real* X, real* Y, size_t jj, Element col[], size_t size) const;
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
 
 
     /// One column multiplication of a vector
-    void vecMulAdd(const real* X, real* Y, size_t, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddCol(const real* X, real* Y, size_t, real const* dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
     
-    /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_SSE(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
-    
-    /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_SSEU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
-
-    
-    /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
-    
-    /// One column 2D isotropic multiplication of a vector
-    void vecMulAddIso2D_AVXU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
-
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddIso3D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
 
 public:
     
@@ -139,7 +140,7 @@ public:
     Element const* column(size_t j) const { return column_[j]; }
     
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { return col_size_[j]; }
+    size_t column_size(size_t j) const { return colsiz_[j]; }
 
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;

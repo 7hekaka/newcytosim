@@ -18,8 +18,8 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real     val;   ///< The value of the element
-        size_t   inx;   ///< The index of the line
+        real   val;   ///< The value of the element
+        size_t inx;   ///< The index of the line
         
         void reset(size_t i)
         {
@@ -34,16 +34,16 @@ private:
     size_t     size_;
 
     /// amount of memory which has been allocated
-    size_t     allocated_;
+    size_t     alloc_;
     
     /// array col_[c][] holds Elements of column 'c'
     Element ** col_;
     
-    /// col_size_[c] is the number of Elements in column 'c'
-    size_t   * col_size_;
+    /// colsiz_[c] is the number of Elements in column 'c'
+    size_t   * colsiz_;
     
-    /// col_max_[c] is the number of Elements allocated in column 'c'
-    size_t   * col_max_;
+    /// colmax_[c] is the number of Elements allocated in column 'c'
+    size_t   * colmax_;
     
     /// allocate column to hold specified number of values
     void allocateColumn(size_t col, size_t nb);

@@ -8,14 +8,17 @@
 #include <string>
 
 #define MATRIX2_OPTIMIZED_MULTIPLY 1
+#define MATRIX2_USES_COLNEXT 1
 
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
  SparMatSym2 uses a sparse storage, with arrays of elements for each column.
+ Only the lower triangle of the matrix is stored.
+ 
  For multiplication, it uses a another format, from Numerical Recipes.
  The conversion is done when prepareForMultiply() is called
  
- Elements are stored in random order in the column.
+ Elements are not orderred within the columns.
 */
 class SparMatSym2 final
 {
@@ -24,8 +27,8 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real    val;   ///< The value of the element
-        size_t  inx;   ///< The index of the line
+        real   val;   ///< The value of the element
+        size_t inx;   ///< The index of the line
         
         void reset(size_t i)
         {
@@ -33,28 +36,31 @@ public:
             val = 0.0;
         }
     };
-    
+
 private:
     
     /// size of matrix
-    size_t  size_;
-
-    /// amount of memory which has been allocated
-    size_t  allocated_;
+    size_t size_;
     
-    /// array col_[c][] holds Elements of column 'c'
-    Element ** col_;
+    /// amount of memory allocated
+    size_t alloc_;
     
-    /// col_size_[c] is the number of Elements in column 'c'
-    size_t   * col_size_;
+    /// array column_[c][] holds Elements of column 'c'
+    Element ** column_;
     
-    /// col_max_[c] is the number of Elements allocated in column 'c'
-    size_t   * col_max_;
+    /// colsiz_[c] is the number of Elements in column 'c'
+    size_t * colsiz_;
+    
+    /// colmax_[c] is the number of Elements allocated in column 'c'
+    size_t * colmax_;
     
     /// allocate column to hold specified number of values
-    void allocateColumn(size_t col, size_t nb);
-   
-#if MATRIX2_OPTIMIZED_MULTIPLY
+    void allocateColumn(size_t jj, size_t nb);
+    
+    /// insert new element in column jj
+    Element* insertElement(size_t jj, size_t inx);
+
+#if MATRIX2_USES_COLNEXT
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
     size_t * next_;
@@ -62,13 +68,50 @@ private:
     /// update next_[], a pointer to the next non-empty column
     void setNextColumn();
 
+#endif
+    
+#if MATRIX2_OPTIMIZED_MULTIPLY
+
     ///array of index for the optmized multiplication
     ///@todo migrate to DSS Symmetric Matrix Storage format
-    size_t     nmax_;
-    size_t   * ija_;
-    real     * sa_;
+    size_t  nmax_;
+    size_t * ija_;
+    real   * sa_;
 
 #endif
+    
+    /// One column multiplication of a vector
+    void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    
+    /// One column multiplication of a vector, isotropic 2D version
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    
+    /// One column multiplication of a vector, isotropic 3D version
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+
+
+    /// One column multiplication of a vector
+    void vecMulAddCol(const real* X, real* Y, size_t, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 3D isotropic multiplication of a vector
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 2D isotropic multiplication of a vector
+    void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
 
 public:
     
@@ -93,8 +136,17 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t sz);
     
+    /// return column at index j
+    Element const* column(size_t j) const { return column_[j]; }
+    
+    /// number of elements in j-th column
+    size_t column_size(size_t j) const { return colsiz_[j]; }
+
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;
+
+    /// set the diagonal term at given index
+    real& diagonal(size_t ix);
     
     /// returns the address of element at (x, y), allocating if necessary
     real& operator()(size_t x, size_t y);
@@ -105,18 +157,31 @@ public:
     /// add lower triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
     void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
     
-    ///optional optimization that may accelerate multiplications by a vector
-    void prepareForMultiply(int dim);
+    /// add lower terms within ( start, start+nb ) and at distance `rank' from diagonal to `mat`
+    void addTriangularBlockBanded(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t rank) const;
     
-    /// multiplication of a vector: Y = Y + M * X with dim(X) = dim(M)
-    void vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const;
+    /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
+    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t nb) const;
+    
+    /// add `alpha*trace()` for sub blocks within ( start, start+nb ) to `mat`
+    void addDiagonalTraceBanded(real alpha, real* mat, size_t ldd, size_t start, size_t nb, size_t rank) const;
 
-    /// 2D isotropic multiplication of a vector: Y = Y + M * X with dim(X) = 2 * dim(M)
+    /// create compressed storage from column-based data
+    bool prepareForMultiply(int);
+
+
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const;
+    
+    /// 2D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 2 * dim(M)
     void vecMulAddIso2D(const real* X, real* Y, size_t start, size_t stop) const;
     
-    /// 3D isotropic multiplication of a vector: Y = Y + M * X with dim(X) = 3 * dim(M)
+    /// 3D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 3 * dim(M)
     void vecMulAddIso3D(const real* X, real* Y, size_t start, size_t stop) const;
-    
+
+    /// multiplication of a vector, for columns within [start, stop[
+    void vecMul(const real* X, real* Y, size_t start, size_t stop) const;
+
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMulAdd(const real* X, real* Y)      const { vecMulAdd(X, Y, 0, size_); }
     
@@ -128,6 +193,9 @@ public:
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd(X, Y, 0, size_); }
+    
+    /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
+    void vecMul(const real* X, real* Y)         const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
     bool isNotZero() const;
@@ -150,6 +218,9 @@ public:
     /// print content of one column
     void printColumns(std::ostream&);
 
+    /// printf debug function in sparse mode: i, j : value
+    void printSparseArray(std::ostream&) const;
+    
     /// debug function
     int bad() const;
 };

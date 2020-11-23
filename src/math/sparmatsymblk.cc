@@ -1439,13 +1439,7 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) c
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Vector Multiplication
-
-void SparMatSymBlk::vecMul(const real* X, real* Y) const
-{
-    zero_real(size_, Y);
-    vecMulAdd(X, Y, 0, size_);
-}
+#pragma mark - Matrix-Vector Add-multiply
 
 #if SMSB_USES_AVX
 #   define VECMULADD2D vecMulAdd2D_AVXU
@@ -1538,3 +1532,11 @@ void SparMatSymBlk::vecMulAdd_TIME(const real* X, real* Y) const
      */
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Vector Multiplication
+
+void SparMatSymBlk::vecMul(const real* X, real* Y) const
+{
+    zero_real(size_, Y);
+    vecMulAdd(X, Y, 0, size_);
+}
