@@ -140,10 +140,13 @@ private:
         void vecMulAdd3D_SSEU(const real* X, real* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddOff3D_SSEU(const real* X, real* Y, size_t j) const;
+        void vecMulAddTriangle3D_SSE(const real* X, real* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
         void vecMulAdd3D_AVX(const real* X, real* Y, size_t j) const;
+        
+        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
+        void vecMulAddTriangle3D_AVX(const real* X, real* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
         void vecMulAdd3D_AVXU(const real* X, real* Y, size_t j) const;
@@ -265,7 +268,7 @@ public:
     void vecMulAddIso3D(const real*, real*) const {};
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMul3D_DIAG(const real* X, real* Y) const;
+    void vecMulDiagonal3D(const real* X, real* Y) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMul(const real* X, real* Y) const;

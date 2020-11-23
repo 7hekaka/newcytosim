@@ -812,10 +812,10 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
 # endif
         size_t n = 0;
         {
-            const size_t stop = 2 * (size_/2);
+            const size_t end = 2 * (size_/2);
             // process 2 by 2
             #pragma nounroll
-            for ( ; n < stop; n += 2 )
+            for ( ; n < end; n += 2 )
             {
                 real const* M = *blk++;
                 real const* P = *blk++;
@@ -920,25 +920,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t 
  Only process off-diagonal terms!
  */
 #if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
-void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size_t jj) const
+void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_SSE(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     vec4f tt = loadu4f(X+jj);
-
-    real const* L = blk_[size_-1]; // last element 
-# if ( BLD == 4 )
-    const vec4f L012 = streamload4f(L  );
-    const vec4f L345 = streamload4f(L+4);
-    const vec4f L678 = streamload4f(L+8);
-# else
-    const vec4f L012 = load3f(L      );
-    const vec4f L345 = load3f(L+BLD  );
-    const vec4f L678 = load3f(L+BLD*2);
-# endif
     
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
     const vec4f x2 = permute4f(tt, 0xAA);
+    
     vec4f s0 = setzero4f();
     vec4f s1 = setzero4f();
     vec4f s2 = setzero4f();
@@ -998,6 +988,17 @@ void SparMatSymBlkDiag::Column::vecMulAddOff3D_SSEU(const real* X, real* Y, size
     if ( inx < end )
     {
         const size_t ii = *inx;
+        assert_true( blk == blk_+size_-1 );
+        real const* L = *blk; // last block
+# if ( BLD == 4 )
+        const vec4f L012 = streamload4f(L  );
+        const vec4f L345 = streamload4f(L+4);
+        const vec4f L678 = streamload4f(L+8);
+# else
+        const vec4f L012 = load3f(L      );
+        const vec4f L345 = load3f(L+BLD  );
+        const vec4f L678 = load3f(L+BLD*2);
+# endif
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
@@ -1155,10 +1156,10 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t 
     size_t const* inx = inx_;
 
     size_t n = 0;
-    const size_t stop = 2 * (size_/2);
+    const size_t end = 2 * (size_/2);
     // process 2 by 2:
     #pragma nounroll
-    for ( ; n < stop; n += 2 )
+    for ( ; n < end; n += 2 )
     {
 #if ( 0 )
         /*
@@ -1214,10 +1215,10 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t
     size_t const* inx = inx_;
 
     size_t n = 0;
-    const size_t stop = 4 * (size_/4);
+    const size_t end = 4 * (size_/4);
     // process 4 by 4:
     #pragma nounroll
-    for ( ; n < stop; n += 4 )
+    for ( ; n < end; n += 4 )
     {
 #if ( 0 )
         /*
@@ -1284,29 +1285,32 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t j
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    vec4 s0, s1, s2;
+    vec4 x0, x1, x2;
+    {
+        vec4 tt = loadu4(X+jj);
 # if ( BLD == 4 )
-    vec4 tt = loadu4(X+jj);
-    vec4 s0 = mul4(streamload4(D  ), tt);
-    vec4 s1 = mul4(streamload4(D+4), tt);
-    vec4 s2 = mul4(streamload4(D+8), tt);
+        s0 = mul4(streamload4(D  ), tt);
+        s1 = mul4(streamload4(D+4), tt);
+        s2 = mul4(streamload4(D+8), tt);
 # else
-    vec4 tt = loadu4(X+jj);
-    vec4 s0 = mul4(load3(D      ), tt);
-    vec4 s1 = mul4(load3(D+BLD  ), tt);
-    vec4 s2 = mul4(load3(D+BLD*2), tt);
+        s0 = mul4(load3(D      ), tt);
+        s1 = mul4(load3(D+BLD  ), tt);
+        s2 = mul4(load3(D+BLD*2), tt);
 # endif
-    // sum non-diagonal elements:
-#if ( 0 )
+        // prepare broacasted vectors
+        vec4 p = permute2f128(tt, tt, 0x01);
+        vec4 l = blend4(tt, p, 0b1100);
+        vec4 u = blend4(tt, p, 0b0011);
+        x0 = duplo4(l);
+        x1 = duphi4(l);
+        x2 = duplo4(u);
+    }
+#if 0
+    // alternative strategy:
     const vec4 x0 = broadcast1(X+jj);
     const vec4 x1 = broadcast1(X+jj+1);
     const vec4 x2 = broadcast1(X+jj+2);
-#else
-    vec4 p = permute2f128(tt, tt, 0x01);
-    vec4 l = blend4(tt, p, 0b1100);
-    vec4 u = blend4(tt, p, 0b0011);
-    const vec4 x0 = duplo4(l);
-    const vec4 x1 = duphi4(l);
-    const vec4 x2 = duplo4(u);
 #endif
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
@@ -1387,7 +1391,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
         // There is a dependency in the loop for 's0', 's1' and 's2'.
         const real* M = blk_[0];
         const size_t* inx = inx_;
-        const real* stop = blk_[2*(size_/2)];
+        const real* end = blk_[2*(size_/2)];
         /*
          Unrolling will reduce the dependency chain, which may be limiting the
          throughput here. However the number of registers (16 for AVX CPU) limits
@@ -1395,7 +1399,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
          */
         //process 2 by 2:
 #pragma nounroll
-        for ( ; M < stop; M += 2*SB )
+        for ( ; M < end; M += 2*SB )
         {
             const size_t i0 = inx[0];
             const size_t i1 = inx[1];
@@ -1440,9 +1444,122 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t 
         s2 = add4(s2, t2);
         
         // process remaining blocks:
-        stop = blk_[size_];
+        end = blk_[size_];
         #pragma nounroll
-        for ( ; M < stop; M += SB )
+        for ( ; M < end; M += SB )
+        {
+            const size_t ii = inx[0];
+            ++inx;
+            //printf("--- %4i\n", ii);
+            vec4 ma = streamload4(M);
+            vec4 z = fmadd4(ma, x0, loadu4(Y+ii));
+            vec4 xyz = loadu4(X+ii);
+            s0 = fmadd4(ma, xyz, s0);
+            
+            vec4 mb = streamload4(M+4);
+            z = fmadd4(mb, x1, z);
+            s1 = fmadd4(mb, xyz, s1);
+            
+            vec4 mc = streamload4(M+8);
+            z = fmadd4(mc, x2, z);
+            s2 = fmadd4(mc, xyz, s2);
+            storeu4(Y+ii, z);
+        }
+    }
+    // finally sum s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
+    x0 = setzero4();
+    s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+    s2 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
+    s0 = add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+    storeu4(Y+jj, add4(loadu4(Y+jj), s0));
+}
+#endif
+
+
+
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_AVX && REAL_IS_DOUBLE
+void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_AVX(const real* X, real* Y, size_t jj) const
+{
+    vec4 x0, x1, x2;
+    // load 3x3 matrix element into 3 vectors:
+    {
+        vec4 tt = loadu4(X+jj);
+        // multiply by diagonal elements:
+        // prepare broadcasted vectors:
+        vec4 p = permute2f128(tt, tt, 0x01);
+        vec4 l = blend4(tt, p, 0b1100);
+        vec4 u = blend4(tt, p, 0b0011);
+        x0 = duplo4(l);
+        x1 = duphi4(l);
+        x2 = duplo4(u);
+    }
+    vec4 s0 = setzero4();
+    vec4 s1 = setzero4();
+    vec4 s2 = setzero4();
+    if ( size_ > 0 )
+    {
+        vec4 t0 = setzero4();
+        vec4 t1 = setzero4();
+        vec4 t2 = setzero4();
+        // There is a dependency in the loop for 's0', 's1' and 's2'.
+        const real* M = blk_[0];
+        const size_t* inx = inx_;
+        const real* end = blk_[2*(size_/2)];
+        /*
+         Unrolling will reduce the dependency chain, which may be limiting the
+         throughput here. However the number of registers (16 for AVX CPU) limits
+         the level of unrolling that can be done.
+         */
+        //process 2 by 2:
+#pragma nounroll
+        for ( ; M < end; M += 2*SB )
+        {
+            const size_t i0 = inx[0];
+            const size_t i1 = inx[1];
+            assert_true( i0 < i1 );
+            inx += 2;
+            //printf("--- %4i %4i\n", i0, i1);
+            vec4 ma0 = streamload4(M);
+            vec4 ma1 = streamload4(M+SB);
+            vec4 z0 = fmadd4(ma0, x0, loadu4(Y+i0));
+            vec4 z1 = fmadd4(ma1, x0, loadu4(Y+i1));
+            vec4 xyz0 = loadu4(X+i0);
+            vec4 xyz1 = loadu4(X+i1);
+            s0 = fmadd4(ma0, xyz0, s0);
+            t0 = fmadd4(ma1, xyz1, t0);
+            // multiply with the full block:
+            vec4 mb0 = streamload4(M+4);
+            vec4 mb1 = streamload4(M+(SB+4));
+            z0 = fmadd4(mb0, x1, z0);
+            z1 = fmadd4(mb1, x1, z1);
+            s1 = fmadd4(mb0, xyz0, s1);
+            t1 = fmadd4(mb1, xyz1, t1);
+            vec4 mc0 = streamload4(M+8);
+            vec4 mc1 = streamload4(M+(SB+8));
+            z0 = fmadd4(mc0, x2, z0);
+            z1 = fmadd4(mc1, x2, z1);
+            s2 = fmadd4(mc0, xyz0, s2);
+            t2 = fmadd4(mc1, xyz1, t2);
+            /*
+             Attention: the 4th elements of the vectors z0 and z1 would be correct,
+             because only zero was added to the value loaded from 'Y'. However, in the
+             case where the indices i0 and i1 are consecutive and reverted (i1 < i0),
+             the value stored in z0 would not have been updated giving a wrong results.
+             The solution is to either use a 'store3(Y+i1, z1)', or to make sure that
+             indices are non-consecutive or ordered in the column in increasing order.
+             This affects performance since 'store3' is slower than 'storeu4'
+             */
+            storeu4(Y+i0, z0);
+            storeu4(Y+i1, z1);
+        }
+        s0 = add4(s0, t0);
+        s1 = add4(s1, t1);
+        s2 = add4(s2, t2);
+        
+        // process remaining block:
+        end = blk_[size_];
+        #pragma nounroll
+        for ( ; M < end; M += SB )
         {
             const size_t ii = inx[0];
             ++inx;
@@ -1478,11 +1595,14 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
     real const* D = dia_;
     //multiply with the symmetrized block, assuming it has been symmetrized:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    vec4 tt = load4(X+jj);
-    vec4 s0 = mul4(streamload4(D   ), tt);
-    vec4 s1 = mul4(streamload4(D+4 ), tt);
-    vec4 s2 = mul4(streamload4(D+8 ), tt);
-    vec4 s3 = mul4(streamload4(D+12), tt);
+    vec4 s0, s1, s2;
+    {
+        vec4 tt = load4(X+jj);
+        s0 = mul4(streamload4(D   ), tt);
+        s1 = mul4(streamload4(D+4 ), tt);
+        s2 = mul4(streamload4(D+8 ), tt);
+        s3 = mul4(streamload4(D+12), tt);
+    }
     // sum non-diagonal elements:
 #if ( 0 )
     const vec4 x0 = broadcast1(X+jj);
@@ -1490,12 +1610,15 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t j
     const vec4 x2 = broadcast1(X+jj+2);
     const vec4 x3 = broadcast1(X+jj+3);
 #else
-    vec4 l = permute2f128(tt, tt, 0x00);
-    vec4 u = permute2f128(tt, tt, 0x11);
-    const vec4 x0 = duplo4(l);
-    const vec4 x1 = duphi4(l);
-    const vec4 x2 = duplo4(u);
-    const vec4 x3 = duphi4(u);
+    vec4 x0, x1, x2, x3;
+    {
+        vec4 l = permute2f128(tt, tt, 0x00);
+        vec4 u = permute2f128(tt, tt, 0x11);
+        x0 = duplo4(l);
+        x1 = duphi4(l);
+        x2 = duplo4(u);
+        x3 = duphi4(u);
+    }
 #endif
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
@@ -1624,7 +1747,7 @@ void SparMatSymBlkDiag::vecMulAdd_TIME(const real* X, real* Y) const
 #pragma mark - Vector Multiplication
 
 #if ( BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
-void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
+void SparMatSymBlkDiag::vecMulDiagonal3D(const real* X, real* Y) const
 {
     #pragma unroll (4)
     for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
@@ -1658,7 +1781,7 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 
 
 #if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
-void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
+void SparMatSymBlkDiag::vecMulDiagonal3D(const real* X, real* Y) const
 {
     #pragma unroll (4)
     for ( size_t jj = 0; jj < size_; jj += BLOCK_SIZE )
@@ -1687,13 +1810,20 @@ void SparMatSymBlkDiag::vecMul3D_DIAG(const real* X, real* Y) const
 
 void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 {
-#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE && !REAL_IS_DOUBLE
+#if ( BLOCK_SIZE == 3 ) && SMSBD_USES_AVX && REAL_IS_DOUBLE
     // process diagonal:
-    vecMul3D_DIAG(X, Y);
+    vecMulDiagonal3D(X, Y);
     
     // add the contribution of off-diagonal elements:
     for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
-        column_[jj].vecMulAddOff3D_SSEU(X, Y, jj);
+        column_[jj].vecMulAddTriangle3D_AVX(X, Y, jj);
+#elif ( BLOCK_SIZE == 3 ) && SMSBD_USES_SSE && !REAL_IS_DOUBLE
+    // process diagonal:
+    vecMulDiagonal3D(X, Y);
+    
+    // add the contribution of off-diagonal elements:
+    for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
+        column_[jj].vecMulAddTriangle3D_SSE(X, Y, jj);
 #else
     zero_real(size_, Y);
     vecMulAdd(X, Y, 0, size_);

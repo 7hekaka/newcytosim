@@ -840,11 +840,11 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
         
         size_t n = 1;
         {
-            const size_t stop = 1 + 2 * ((size_-1)/2);
+            const size_t end = 1 + 2 * ((size_-1)/2);
             
             // process 2 by 2
 #pragma nounroll
-            for ( ; n < stop; n += 2 )
+            for ( ; n < end; n += 2 )
             {
                 const size_t ii = inx_[n  ];
                 const size_t kk = inx_[n+1];
@@ -1061,10 +1061,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) 
     vec4 s1 = setzero4();
 
     size_t n = 1;
-    const size_t stop = 1 + 2 * ((size_-1)/2);
+    const size_t end = 1 + 2 * ((size_-1)/2);
     // process 2 by 2:
     #pragma nounroll
-    for ( ; n < stop; n += 2 )
+    for ( ; n < end; n += 2 )
     {
 #if ( 0 )
         /*
@@ -1119,10 +1119,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj)
     vec4 s3 = setzero4();
 
     size_t n = 1;
-    const size_t stop = 1 + 4 * ((size_-1)/4);
+    const size_t end = 1 + 4 * ((size_-1)/4);
     // process 4 by 4:
     #pragma nounroll
-    for ( ; n < stop; n += 4 )
+    for ( ; n < end; n += 4 )
     {
 #if ( 0 )
         /*
@@ -1191,29 +1191,32 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) c
     //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    vec4 s0, s1, s2;
+    vec4 x0, x1, x2;
+    {
+        vec4 tt = loadu4(X+jj);
 # if ( BLD == 4 )
-    vec4 tt = loadu4(X+jj);
-    vec4 s0 = mul4(streamload4(D  ), tt);
-    vec4 s1 = mul4(streamload4(D+4), tt);
-    vec4 s2 = mul4(streamload4(D+8), tt);
+        s0 = mul4(streamload4(D  ), tt);
+        s1 = mul4(streamload4(D+4), tt);
+        s2 = mul4(streamload4(D+8), tt);
 # else
-    vec4 tt = loadu4(X+jj);
-    vec4 s0 = mul4(load3(D      ), tt);
-    vec4 s1 = mul4(load3(D+BLD  ), tt);
-    vec4 s2 = mul4(load3(D+BLD*2), tt);
+        s0 = mul4(load3(D      ), tt);
+        s1 = mul4(load3(D+BLD  ), tt);
+        s2 = mul4(load3(D+BLD*2), tt);
 # endif
-    // sum non-diagonal elements:
+        // sum non-diagonal elements:
 #if ( 0 )
-    const vec4 x0 = broadcast1(X+jj);
-    const vec4 x1 = broadcast1(X+jj+1);
-    const vec4 x2 = broadcast1(X+jj+2);
+        x0 = broadcast1(X+jj);
+        x1 = broadcast1(X+jj+1);
+        x2 = broadcast1(X+jj+2);
 #else
-    vec4 p = permute2f128(tt, tt, 0x01);
-    vec4 l = blend4(tt, p, 0b1100);
-    vec4 u = blend4(tt, p, 0b0011);
-    const vec4 x0 = duplo4(l);
-    const vec4 x1 = duphi4(l);
-    const vec4 x2 = duplo4(u);
+        vec4 p = permute2f128(tt, tt, 0x01);
+        vec4 l = blend4(tt, p, 0b1100);
+        vec4 u = blend4(tt, p, 0b0011);
+        x0 = duplo4(l);
+        x1 = duphi4(l);
+        x2 = duplo4(u);
+    }
 #endif
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
@@ -1293,7 +1296,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) 
     }
     M += SB;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    const real* stop = blk_[1+2*((size_-1)/2)];
+    const real* end = blk_[1+2*((size_-1)/2)];
     const size_t * inx = inx_+1;
     /*
      Unrolling will reduce the dependency chain, which may be limiting the
@@ -1302,7 +1305,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) 
      */
     //process 2 by 2:
     #pragma nounroll
-    for ( ; M < stop; M += 2*SB )
+    for ( ; M < end; M += 2*SB )
     {
         const size_t i0 = inx[0];
         const size_t i1 = inx[1];
@@ -1347,9 +1350,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) 
     s2 = add4(s2, t2);
     
     // process remaining blocks:
-    stop = blk_[size_];
+    end = blk_[size_];
     #pragma nounroll
-    for ( ; M < stop; M += SB )
+    for ( ; M < end; M += SB )
     {
         const size_t ii = inx[0];
         ++inx;
@@ -1386,25 +1389,29 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) c
     real const* D = blk_[0];
     //multiply with the symmetrized block, assuming it has been symmetrized:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    vec4 tt = load4(X+jj);
-    vec4 s0 = mul4(streamload4(D   ), tt);
-    vec4 s1 = mul4(streamload4(D+4 ), tt);
-    vec4 s2 = mul4(streamload4(D+8 ), tt);
-    vec4 s3 = mul4(streamload4(D+12), tt);
-    // sum non-diagonal elements:
+    vec4 s0, s1, s2, s3;
+    vec4 x0, x1, x2, x3;
+    {
+        vec4 tt = load4(X+jj);
+        s0 = mul4(streamload4(D   ), tt);
+        s1 = mul4(streamload4(D+4 ), tt);
+        s2 = mul4(streamload4(D+8 ), tt);
+        s3 = mul4(streamload4(D+12), tt);
+        // sum non-diagonal elements:
 #if ( 0 )
-    const vec4 x0 = broadcast1(X+jj);
-    const vec4 x1 = broadcast1(X+jj+1);
-    const vec4 x2 = broadcast1(X+jj+2);
-    const vec4 x3 = broadcast1(X+jj+3);
+        x0 = broadcast1(X+jj);
+        x1 = broadcast1(X+jj+1);
+        x2 = broadcast1(X+jj+2);
+        x3 = broadcast1(X+jj+3);
 #else
-    vec4 l = permute2f128(tt, tt, 0x00);
-    vec4 u = permute2f128(tt, tt, 0x11);
-    const vec4 x0 = duplo4(l);
-    const vec4 x1 = duphi4(l);
-    const vec4 x2 = duplo4(u);
-    const vec4 x3 = duphi4(u);
+        vec4 l = permute2f128(tt, tt, 0x00);
+        vec4 u = permute2f128(tt, tt, 0x11);
+        x0 = duplo4(l);
+        x1 = duphi4(l);
+        x2 = duplo4(u);
+        x3 = duphi4(u);
 #endif
+    }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
     for ( size_t n = 1; n < size_; ++n )
