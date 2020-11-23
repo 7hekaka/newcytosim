@@ -182,16 +182,12 @@ size_t Meca::largestMecable() const
 void Meca::calculateForces(const real* X, real const* B, real* F) const
 {
     assert_true( empty() || ( X != F && X != B && F != B ));
-
-    // F <- B  of F <- 0
-    if ( B )
-        copy_real(dimension(), B, F);      //blas::xcopy(dimension(), B, 1, F, 1);
-    else
-        zero_real(dimension(), F);
     
-    // F <- F + mISO * X
+    // F <- B
+    copy_real(dimension(), B, F);      //blas::xcopy(dimension(), B, 1, F, 1);
     
 #if USE_ISO_MATRIX
+    // F <- F + mISO * X
     mISO.VECMULADDISO(X, F);
 
     if ( useFullMatrix )
@@ -490,8 +486,13 @@ void Meca::multiply_precondition(real const* X, real* Y) const
 void Meca::multiply(const real* X, real* Y) const
 {
 #if USE_ISO_MATRIX
-    // Y <- ( mISO + mFUL ) * X
-    calculateForces(X, nullptr, Y);
+    // Y <- mFUL * X
+    if ( useFullMatrix )
+        mFUL.vecMul(X, Y);
+    else
+        zero_real(dimension(), Y);
+    // Y <- Y + mISO * X
+    mISO.VECMULADDISO(X, Y);
 #else
     mFUL.vecMul(X, Y);
 #endif
@@ -2022,8 +2023,8 @@ void Meca::dumpElasticity(FILE * file) const
     {
         src[ii] = 1.0;
         
-        calculateForces(src, nullptr, res);
-        
+        mFUL.vecMul(src, res);
+        mISO.VECMULADDISO(src, res);
 #if SEPARATE_RIGIDITY_TERMS
         addAllRigidity(src, res);
 #endif
