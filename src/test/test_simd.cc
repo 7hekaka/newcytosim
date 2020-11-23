@@ -632,6 +632,33 @@ void test_hadd()
     dump(u, "u ");
 }
 
+void test_hsum()
+{
+    /* finally sum horizontally:
+     s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y0 }, s2 = { Y2 Y2 Y2 Y0 }
+     to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
+     */
+    vec4f s0{  1,   2,   3,   4};
+    vec4f s1{0.1, 0.2, 0.3, 0.4};
+    vec4f s2{ -1,  -2,  -3,  -4};
+    vec4f s3{ -1,  -2,  -3,  -4};
+
+    dump(s0, "s0  ");
+    dump(s1, "s1  ");
+    dump(s2, "s2  ");
+    dump(s3, "s3  ");
+
+    //s3 = setzero4f();
+    s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
+    s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
+    s0 = add4f(shuffle4f(s0, s2, 0x4E), shuffle4f(s0, s2, 0xE4));
+    dump(s0, "sum ");
+    
+    dump(blend4f(s0, s2, 0b1100), "blend  ");
+    dump(shuffle4f(s0, s2, 0xE4), "shuff  ");
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -810,24 +837,25 @@ int main(int argc, char * argv[])
 {
     //test_swapSSE();
 #ifdef __AVX__
-    if ( 1 )
+    if ( 0 )
     {
         test_twine();
         test_stride();
     }
-    if ( 1 )
+    if ( 0 )
     {
         test_cat();
         test_load();
         test_broadcast();
         test_store();
     }
-    if ( 0 )
+    if ( 1 )
     {
         //test_swap1();
         //test_swap2();
         test_swap4();
         test_hadd();
+        test_hsum();
     }
     if ( 0 )
     {

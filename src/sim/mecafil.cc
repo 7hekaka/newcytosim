@@ -194,8 +194,9 @@ void Mecafil::projectForces(const real* X, real* Y) const
         Y[ii] = sum;
 }
 
-#if ADD_PROJECTION_DIFF
 void Mecafil::computeTensions(const real*) {} //DIM == 1
+
+#if ADD_PROJECTION_DIFF
 void Mecafil::makeProjectionDiff(const real*) {} //DIM == 1
 void Mecafil::addProjectionDiff(const real*, real*) const {} //DIM == 1
 #endif
