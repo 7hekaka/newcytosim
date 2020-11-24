@@ -184,24 +184,24 @@ SparMatSym1::Element * SparMatSym1::insertElement(const size_t jj, size_t inx)
 }
 
 
-real& SparMatSym1::diagonal(size_t ix)
+real& SparMatSym1::diagonal(size_t i)
 {
-    assert_true( ix < size_ );
+    assert_true( i < size_ );
     
     Element * col;
     
-    if ( colsiz_[ix] == 0 )
+    if ( colsiz_[i] == 0 )
     {
-        allocateColumn(ix, 1);
-        col = column_[ix];
+        allocateColumn(i, 1);
+        col = column_[i];
         //diagonal term always first:
-        col->reset(ix);
-        colsiz_[ix] = 1;
+        col->reset(i);
+        colsiz_[i] = 1;
     }
     else
     {
-        col = column_[ix];
-        assert_true( col->inx == ix );
+        col = column_[i];
+        assert_true( col->inx == i );
     }
     
     return col->val;
@@ -960,7 +960,7 @@ void SparMatSym1::vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj,
 
 #endif
 
-#if MATRIX1_USES_AVX
+#if MATRIX1_USES_AVX && MATRIX1_OPTIMIZED_MULTIPLY
 
 /*
 Accumulation is done here in the higher part of 'ss'
@@ -1067,7 +1067,7 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
 #endif
 
 
-#if MATRIX1_USES_AVX
+#if MATRIX1_USES_AVX && MATRIX1_OPTIMIZED_MULTIPLY
 void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
                                         real const* dia, size_t start, size_t stop) const
 {
@@ -1087,7 +1087,7 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
         inx += 2;
         vec4 aa = broadcast1(val);
         vec4 bb = broadcast1(val+1);
-        vec4 nn = loadu4(Y+ii);  
+        vec4 nn = loadu4(Y+ii);
         vec4 mm = loadu4(Y+kk);
         val += 2;
         yy = fmadd4(aa, loadu4(X+ii), yy);

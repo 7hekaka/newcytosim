@@ -13,12 +13,11 @@
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
  SparMatSym1 uses a sparse storage, with arrays of elements for each column.
- Only the lower triangle of the matrix is stored.
- 
- For multiplication, it uses a another format, from Numerical Recipes.
- The conversion is done when prepareForMultiply() is called
- 
  Elements are stored in order of increasing index in each column.
+ Only the lower triangle of the matrix is stored.
+
+ For multiplication, it uses a another format, from Numerical Recipes.
+ The conversion is done by prepareForMultiply()
 */
 class SparMatSym1 final
 {

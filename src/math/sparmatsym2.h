@@ -14,11 +14,11 @@
 /**
  SparMatSym2 uses a sparse storage, with arrays of elements for each column.
  Only the lower triangle of the matrix is stored.
+ Elements are ordered within the columns.
+
+ For multiplication, it uses the `DSS Symmetric Matrix Storage`
+ The conversion is done by prepareForMultiply()
  
- For multiplication, it uses a another format, from Numerical Recipes.
- The conversion is done when prepareForMultiply() is called
- 
- Elements are not orderred within the columns.
 */
 class SparMatSym2 final
 {
@@ -71,11 +71,11 @@ private:
     
 #if MATRIX2_OPTIMIZED_MULTIPLY
 
-    ///array of index for the optmized multiplication
-    ///@todo migrate to DSS Symmetric Matrix Storage format
-    unsigned  nmax_;
-    unsigned * ija_;
-    real * sa_;
+    /// data for the DSS Symmetric Matrix Storage format
+    unsigned   alcDSS_;  ///< number of values
+    real     * valDSS_;  ///< values
+    unsigned * colDSS_;  ///< columns
+    unsigned * rowDSS_;  ///< rowIndex
 
 #endif
     
@@ -90,27 +90,27 @@ private:
 
 
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddCol(const real* X, real* Y, size_t, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, size_t start, size_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, size_t start, size_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj, size_t start, size_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj, size_t start, size_t stop) const;
 
 public:
     
