@@ -889,14 +889,17 @@ void Interface::execute_run(size_t nb_steps)
  
  The frame to be imported can be specified as an option: `frame=INTEGER`:
  
-     import objects sim_objects.cmo { frame = 10 }
+     import objects objects.cmi { frame = 10 }
  
  By default, this will replace the simulation state by the one loaded from file.
- To add the file objects to the simulation without deleting the current world,
+ To add the loaded objects to the simulation without deleting the current world,
  you should specify `append=1`:
  
-     import objects sim_objects.cmo { append = 1 }
+     import objects objects.cmi { append = 1 }
  
+ This will work however only if the ID of the objects are distinct, ie. are not
+ already in use in the current world.
+ In the examples, the `cmi` extension are like `cmo`. The extension is ignored.
  */
 void Interface::execute_import(std::string const& file, std::string const& what, Glossary& opt)
 {

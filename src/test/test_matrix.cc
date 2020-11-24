@@ -358,7 +358,7 @@ void testMatrixIso(MATRIX & mat,
                    const size_t fill, size_t inx[], size_t iny[])
 {
     tic();
-    for ( size_t ii=0; ii<N_RUN; ++ii )
+    for ( size_t i=0; i<N_RUN; ++i )
     {
         mat.reset();
         for ( size_t n=0; n<fill; ++n )
@@ -367,7 +367,7 @@ void testMatrixIso(MATRIX & mat,
     double t2 = toc();
     
     tic();
-    for ( size_t ii=0; ii<N_RUN; ++ii )
+    for ( size_t i=0; i<N_RUN; ++i )
     {
         mat.prepareForMultiply(DIM);
         for ( size_t n=0; n<N_MUL; ++n )
@@ -400,7 +400,7 @@ void testMatrices(const size_t size, const size_t fill)
     alpha = RNG.sreal();
     
     SparMat1 mat1; testMatrix(mat1, size, x, y, z, fill, inx, iny);
-    //SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
+    SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
     SparMatS mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
     SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
     //testMatrix(mat4, size, x, y, z, fill, inx, iny);

@@ -8,6 +8,12 @@
 #include "matrix34.h"
 #include "matrix44.h"
 
+#include "sparmatsym.h"
+#include "sparmatsym1.h"
+#include "sparmatsym2.h"
+#include "sparmatblk.h"
+#include "sparmatsymblk.h"
+#include "sparmatsymblkdiag.h"
 
 #define PRINT(arg) printf("sizeof %16s   %lu bytes\n", #arg, sizeof(arg));
 
@@ -53,6 +59,14 @@ int main(int argc, char* argv[])
     PRINT(Bead);
     PRINT(Sphere);
     PRINT(Simul);
+
+    PRINT(SparMatSym::Element);
+    PRINT(SparMatSym1::Element);
+    PRINT(SparMatSym2::Element);
+
+    PRINT(SparMatBlk::Line);
+    PRINT(SparMatSymBlk::Column);
+    PRINT(SparMatSymBlkDiag::Column);
 
     return EXIT_SUCCESS;
 }
