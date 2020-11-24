@@ -807,29 +807,6 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj,
     Y[jj+2] = Y2;
 }
 
-
-#if MATRIX1_USES_AVX
-void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
-                                        real const* dia, size_t start, size_t stop) const
-{
-    assert_true( start <= stop );
-    assert_true( stop <= 3*size_ );
-    vec4 zz = setzero4();
-    vec4 xx = blend4(loadu4(X+jj), zz, 0b1000);
-    vec4 aa = broadcast1(dia);
-    vec4 yy = fmadd4(aa, xx, loadu4(Y+jj));
-    for ( size_t n = start; n < stop; ++n )
-    {
-        size_t ii = ija_[n];
-        assert_true( ii > jj );
-        aa = broadcast1(sa_+n);
-        yy = fmadd4(aa, loadu4(X+ii), yy);
-        storeu4(Y+ii, fmadd4(aa, xx, loadu4(Y+ii)));
-    }
-    store3(Y+jj, yy);
-}
-#endif
-
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
 
@@ -1087,6 +1064,48 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
 #pragma mark - 3D SIMD
 
 #if MATRIX1_USES_SSE
+#endif
+
+
+#if MATRIX1_USES_AVX
+void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
+                                        real const* dia, size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    assert_true( stop <= 3*size_ );
+    vec4 zz = setzero4();
+    vec4 xx = blend4(loadu4(X+jj), zz, 0b1000);
+    vec4 yy = fmadd4(broadcast1(dia), xx, loadu4(Y+jj));
+    real * val = sa_ + start;
+    real const*end = sa_ + stop - 1;
+    unsigned *inx = ija_ + start;
+    while ( val < end )
+    {
+        size_t ii = *(inx  );
+        size_t kk = *(inx+1);
+        assert_true( kk > ii );
+        inx += 2;
+        vec4 aa = broadcast1(val);
+        vec4 bb = broadcast1(val+1);
+        vec4 nn = loadu4(Y+ii);  
+        vec4 mm = loadu4(Y+kk);
+        val += 2;
+        yy = fmadd4(aa, loadu4(X+ii), yy);
+        zz = fmadd4(bb, loadu4(X+kk), zz);
+        storeu4(Y+ii, fmadd4(aa, xx, nn));
+        storeu4(Y+kk, fmadd4(bb, xx, mm));
+    }
+    yy = add4(yy, zz);
+    while ( val <= end )
+    {
+        size_t ii = *inx++;
+        assert_true( ii > jj );
+        vec4 aa = broadcast1(val++);
+        yy = fmadd4(aa, loadu4(X+ii), yy);
+        storeu4(Y+ii, fmadd4(aa, xx, loadu4(Y+ii)));
+    }
+    store3(Y+jj, yy);
+}
 #endif
 
 
