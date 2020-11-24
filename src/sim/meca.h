@@ -258,11 +258,17 @@ private:
     /// add block 'alpha*T' to mFUL at position (i, i)
     void add_block_diag(size_t i, real alpha, MatrixBlock const& T);
 
-    /// add value to mISO at position (i, j)
+    /// add isotropic stiffness at position (i, j)
     void add_iso(size_t i, size_t j, real val);
+    
+    /// add isotropic stiffness on diagonal at position (i, i)
+    void add_iso_diag(size_t i, real val);
 
-    /// subtract value to mISO at position (i, j)
+    /// subtract isotropic stiffness at position (i, j)
     void sub_iso(size_t i, size_t j, real val);
+    
+    /// subtract isotropic stiffness on diagonal at position (i, i)
+    void sub_iso_diag(size_t i, real val);
 
     /// add vector to vBAS at index `i`
     void add_base(size_t i, Vector const&);
