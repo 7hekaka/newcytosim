@@ -56,8 +56,6 @@ public:
     
     /// number of real in a block
     static constexpr size_t SB = sizeof(Block) / sizeof(real);
-
-private:
     
     /// A column of the sparse matrix
     class Column
@@ -144,7 +142,9 @@ private:
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 4
         void vecMulAdd4D_AVX(const real* X, real* Y, size_t j) const;
     };
-    
+
+private:
+
     /// create Elements
     static size_t newElements(Element*& ptr, size_t);
     
@@ -270,11 +270,14 @@ public:
     /// returns a string which a description of the type of matrix
     std::string what() const;
     
-    /// printf debug function in sparse mode: i, j : value
-    void printSparse(std::ostream&, real) const;
+    /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    
+    /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
 
     /// print size of columns
-    void printColumns(std::ostream&);
+    void printColumns(std::ostream&, size_t start, size_t stop);
     
     /// debug function
     int bad() const;

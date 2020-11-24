@@ -46,16 +46,16 @@ void SparMatSymBlkDiag::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
         
         //fprintf(stderr, "SMSBD allocates %u\n", alc);
-        Column * col_new = new Column[alc];
+        Column * ptr = new Column[alc];
         
         if ( column_ )
         {
             for (size_t n = 0; n < alloc_; ++n )
-                col_new[n] = column_[n];
+                ptr[n] = column_[n];
             delete[] column_;
         }
         
-        column_ = col_new;
+        column_ = ptr;
         alloc_  = alc;
         
         delete[] next_;
@@ -433,14 +433,15 @@ std::string SparMatSymBlkDiag::what() const
 }
 
 
-void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf) const
+void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
+    stop = std::min(stop, size_);
     char str[256];
     std::streamsize p = os.precision();
     os.precision(8);
     if ( ! column_ )
         return;
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         Column & col = column_[jj];
         os << "% column " << jj << "\n";
@@ -475,10 +476,11 @@ void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf) const
 }
 
 
-void SparMatSymBlkDiag::printColumns(std::ostream& os)
+void SparMatSymBlkDiag::printColumns(std::ostream& os, size_t start, size_t stop)
 {
+    stop = std::min(stop, size_);
     os << "SMSBD size " << size_ << ":";
-    for ( size_t j = 0; j < size_; ++j )
+    for ( size_t j = start; j < stop; ++j )
     {
         if ( column_[j].size_ > 0 )
         {

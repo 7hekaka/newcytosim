@@ -36,7 +36,7 @@ SparMatSym1::SparMatSym1()
     sa_   = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-    next_ = new size_t[1];
+    next_ = new unsigned[1];
     next_[0] = 0;
 #endif
 }
@@ -54,16 +54,16 @@ void SparMatSym1::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
         //fprintf(stderr, "SMS1 allocate matrix %u\n", alc);
-        Element ** col_new    = new Element*[alc];
-        size_t   * colsiz_new = new size_t[alc];
-        size_t   * colmax_new = new size_t[alc];
+        Element ** column_new = new Element*[alc];
+        unsigned * colsiz_new = new unsigned[alc];
+        unsigned * colmax_new = new unsigned[alc];
         
         size_t ii = 0;
         if ( column_ )
         {
             for ( ; ii < alloc_; ++ii )
             {
-                col_new[ii]    = column_[ii];
+                column_new[ii] = column_[ii];
                 colsiz_new[ii] = colsiz_[ii];
                 colmax_new[ii] = colmax_[ii];
             }
@@ -72,7 +72,7 @@ void SparMatSym1::allocate(size_t alc)
             delete[] colmax_;
         }
         
-        column_ = col_new;
+        column_ = column_new;
         colsiz_ = colsiz_new;
         colmax_ = colmax_new;
         alloc_ = alc;
@@ -86,7 +86,7 @@ void SparMatSym1::allocate(size_t alc)
         
 #if MATRIX1_USES_COLNEXT
         delete[] next_;
-        next_ = new size_t[alc+1];
+        next_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             next_[n] = n;
 #endif
@@ -140,17 +140,17 @@ void SparMatSym1::allocateColumn(const size_t jj, size_t alc)
         //fprintf(stderr, "SMS1 allocate column %i size %u\n", jj, alc);
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
-        Element * col_new = new Element[alc];
+        Element * ptr = new Element[alc];
         
         if ( column_[jj] )
         {
             //copy over previous column elements
-            copy(colsiz_[jj], column_[jj], col_new);
+            copy(colsiz_[jj], column_[jj], ptr);
             
             //release old memory
             delete[] column_[jj];
         }
-        column_[jj]  = col_new;
+        column_[jj] = ptr;
         colmax_[jj] = alc;
     }
 }
@@ -164,14 +164,14 @@ SparMatSym1::Element * SparMatSym1::insertElement(const size_t jj, size_t inx)
     {
         constexpr size_t chunk = 16;
         size_t alc = ( colsiz_[jj] + chunk ) & ~( chunk -1 );
-        Element * col_new = new Element[alc];
+        Element * ptr = new Element[alc];
         if ( column_[jj] )
         {
-            copy(inx, column_[jj], col_new);
-            copy(colsiz_[jj]-inx, column_[jj]+inx, col_new+inx+1);
+            copy(inx, column_[jj], ptr);
+            copy(colsiz_[jj]-inx, column_[jj]+inx, ptr+inx+1);
             delete[] column_[jj];
         }
-        column_[jj]  = col_new;
+        column_[jj] = ptr;
         colmax_[jj] = alc;
     }
     else
@@ -445,6 +445,18 @@ size_t SparMatSym1::nbElements(size_t start, size_t stop) const
 }
 
 
+size_t SparMatSym1::nbDiagonalElements(size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    assert_true( stop <= size_ );
+    //all allocated elements are counted, even if zero
+    size_t cnt = 0;
+    for ( size_t jj = start; jj < stop; ++jj )
+        cnt += ( colsiz_[jj] > 0 ) && ( column_[jj][0].val != 0.0 );
+    return cnt;
+}
+
+
 std::string SparMatSym1::what() const
 {
     std::ostringstream msg;
@@ -455,34 +467,39 @@ std::string SparMatSym1::what() const
 #else
     msg << "SMS1 " << nbElements();
 #endif
+    msg << " (" << nbDiagonalElements(0, size_) << ")";
     return msg.str();
 }
 
 
-void SparMatSym1::printSparse(std::ostream& os, real inf) const
+void SparMatSym1::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
+    stop = std::min(stop, size_);
     char str[256];
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         if ( colsiz_[jj] > 0 )
-            os << "% column " << jj << "\n";
-        for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )
         {
-            real v = column_[jj][n].val;
-            if ( abs_real(v) >= inf )
+            os << "% column " << jj << "\n";
+            for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )
             {
-                snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", column_[jj][n].inx, jj, v);
-                os << str;
+                real v = column_[jj][n].val;
+                if ( abs_real(v) >= inf )
+                {
+                    snprintf(str, sizeof(str), "%6u %6lu %16.6f\n", column_[jj][n].inx, jj, v);
+                    os << str;
+                }
             }
         }
     }
 }
 
 
-void SparMatSym1::printColumns(std::ostream& os)
+void SparMatSym1::printColumns(std::ostream& os, size_t start, size_t stop)
 {
+    stop = std::min(stop, size_);
     os << "SMS1 size " << size_ << ":";
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
 #if MATRIX1_USES_COLNEXT
@@ -676,9 +693,9 @@ bool SparMatSym1::prepareForMultiply(int dim)
         delete[] ija_;
         free_real(sa_);
 
-        nmax_  = nbe + size_;
-        ija_   = new size_t[nmax_];
-        sa_    = new_real(nmax_);
+        nmax_ = nbe + size_;
+        ija_  = new unsigned[nmax_];
+        sa_   = new_real(nmax_);
     }
     
     /*
@@ -789,6 +806,29 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj,
     Y[jj+1] = Y1;
     Y[jj+2] = Y2;
 }
+
+
+#if MATRIX1_USES_AVX
+void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
+                                        real const* dia, size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    assert_true( stop <= 3*size_ );
+    vec4 zz = setzero4();
+    vec4 xx = blend4(loadu4(X+jj), zz, 0b1000);
+    vec4 aa = broadcast1(dia);
+    vec4 yy = fmadd4(aa, xx, loadu4(Y+jj));
+    for ( size_t n = start; n < stop; ++n )
+    {
+        size_t ii = ija_[n];
+        assert_true( ii > jj );
+        aa = broadcast1(sa_+n);
+        yy = fmadd4(aa, loadu4(X+ii), yy);
+        storeu4(Y+ii, fmadd4(aa, xx, loadu4(Y+ii)));
+    }
+    store3(Y+jj, yy);
+}
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
@@ -983,7 +1023,7 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
     
-    size_t * inx = ija_ + start;
+    unsigned * inx = ija_ + start;
     const real * val = sa_ + start;
     const real * end = val + 4 * ((stop-start)/4);
     // process 4 by 4:
@@ -1121,7 +1161,11 @@ void SparMatSym1::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
 #endif
     {
 #if MATRIX1_OPTIMIZED_MULTIPLY
+#if MATRIX1_USES_AVX
+        vecMulAddColIso3D_AVX(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);
+#else
         vecMulAddColIso3D(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);
+#endif
 #else
         if ( colsiz_[jj] > 0 )
         {

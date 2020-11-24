@@ -65,8 +65,6 @@ public:
 
     /// number of real in a block
     static constexpr size_t SB = sizeof(Block) / sizeof(real);
-
-private:
     
     /// A line of the sparse matrix
     class Line
@@ -74,12 +72,12 @@ private:
         friend class SparMatBlk;
         friend class Meca;
 
-        size_t  size_;    ///< number of elements
-        size_t  allo_;    ///< allocated size
-        Block  * blk_;    ///< block elements
-        Block  * sbk_;    ///< pointer for consolidated elements
-        size_t * inx_;    ///< column index for each element
-        
+        Block   * blk_;   ///< block elements
+        Block   * sbk_;   ///< pointer for consolidated elements
+        size_t  * inx_;   ///< column index for each element
+        unsigned size_;   ///< number of elements
+        unsigned allo_;   ///< allocated size
+
     public:
         
         /// constructor
@@ -141,7 +139,9 @@ private:
         vec4 vecMul4D(const real* X) const;
 #endif
     };
-    
+
+private:
+
     /// create Elements
     static size_t newElements(Element*& ptr, size_t);
     
@@ -300,8 +300,11 @@ public:
     /// returns a string which a description of the type of matrix
     std::string what() const;
     
-    /// printf debug function in sparse mode: i, j : value
-    void printSparse(std::ostream&, real) const;
+    /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    
+    /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
 
     /// print content of one column
     void printLines(std::ostream&);

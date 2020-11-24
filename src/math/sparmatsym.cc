@@ -11,7 +11,7 @@
 SparMatSym::SparMatSym()
 {
     alloc_ = 0;
-    col_    = nullptr;
+    column_ = nullptr;
     colsiz_ = nullptr;
     colmax_ = nullptr;
 }
@@ -25,32 +25,32 @@ void SparMatSym::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
         //fprintf(stderr, "SMS allocate matrix %u\n", alc);
-        Element ** col_new    = new Element*[alc];
-        size_t   * colsiz_new = new size_t[alc];
-        size_t   * colmax_new = new size_t[alc];
+        Element ** column_new = new Element*[alc];
+        unsigned * colsiz_new = new unsigned[alc];
+        unsigned * colmax_new = new unsigned[alc];
         
         size_t ii = 0;
-        if ( col_ )
+        if ( column_ )
         {
             for ( ; ii < alloc_; ++ii )
             {
-                col_new[ii]    = col_[ii];
+                column_new[ii] = column_[ii];
                 colsiz_new[ii] = colsiz_[ii];
                 colmax_new[ii] = colmax_[ii];
             }
-            delete[] col_;
+            delete[] column_;
             delete[] colsiz_;
             delete[] colmax_;
         }
         
-        col_    = col_new;
+        column_ = column_new;
         colsiz_ = colsiz_new;
         colmax_ = colmax_new;
         alloc_ = alc;
 
         for ( ; ii < alc; ++ii )
         {
-            col_[ii] = nullptr;
+            column_[ii] = nullptr;
             colsiz_[ii] = 0;
             colmax_[ii] = 0;
         }
@@ -60,11 +60,11 @@ void SparMatSym::allocate(size_t alc)
 
 void SparMatSym::deallocate()
 {
-    if ( col_ )
+    if ( column_ )
     {
         for ( size_t ii = 0; ii < alloc_; ++ii )
-            delete[] col_[ii];
-        delete[] col_;    col_    = nullptr;
+            delete[] column_[ii];
+        delete[] column_; column_ = nullptr;
         delete[] colsiz_; colsiz_ = nullptr;
         delete[] colmax_; colmax_ = nullptr;
     }
@@ -93,19 +93,44 @@ void SparMatSym::allocateColumn(const size_t jj, size_t alc)
         //fprintf(stderr, "SMS allocate column %i size %u\n", jj, alc);
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
-        Element * col_new = new Element[alc];
+        Element * ptr = new Element[alc];
         
-        if ( col_[jj] )
+        if ( column_[jj] )
         {
             //copy over previous column elements
-            copy(colsiz_[jj], col_[jj], col_new);
+            copy(colsiz_[jj], column_[jj], ptr);
             
             //release old memory
-            delete[] col_[jj];
+            delete[] column_[jj];
         }
-        col_[jj]     = col_new;
+        column_[jj] = ptr;
         colmax_[jj] = alc;
     }
+}
+
+
+
+real& SparMatSym::diagonal(size_t ix)
+{
+    assert_true( ix < size_ );
+    
+    Element * col;
+    
+    if ( colsiz_[ix] == 0 )
+    {
+        allocateColumn(ix, 1);
+        col = column_[ix];
+        //diagonal term always first:
+        col->reset(ix);
+        colsiz_[ix] = 1;
+    }
+    else
+    {
+        col = column_[ix];
+        assert_true( col->inx == ix );
+    }
+    
+    return col->val;
 }
 
 
@@ -123,7 +148,7 @@ real& SparMatSym::operator()(size_t i, size_t j)
     size_t jj = std::min(i, j);
 
     assert_true(jj < size_);
-    Element * col = col_[jj];
+    Element * col = column_[jj];
     if ( colsiz_[jj] > 0 )
     {
         Element * e = col;
@@ -145,7 +170,7 @@ real& SparMatSym::operator()(size_t i, size_t j)
     if ( n >= colmax_[jj] )
     {
         allocateColumn(jj, n+1);
-        col = col_[jj];
+        col = column_[jj];
     }
     
     col[n].reset(ii);
@@ -163,8 +188,8 @@ real* SparMatSym::addr(size_t i, size_t j) const
     size_t jj = std::min(i, j);
 
     for ( size_t kk = 0; kk < colsiz_[jj]; ++kk )
-        if ( col_[jj][kk].inx == ii )
-            return &( col_[jj][kk].val );
+        if ( column_[jj][kk].inx == ii )
+            return &( column_[jj][kk].val );
     
     return nullptr;
 }
@@ -185,7 +210,7 @@ bool SparMatSym::isNotZero() const
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
-            if ( col_[jj][kk].val != 0 )
+            if ( column_[jj][kk].val != 0 )
                 return true;
     
     //if here, the matrix is empty
@@ -197,7 +222,7 @@ void SparMatSym::scale(const real alpha)
 {
     for ( size_t jj = 0; jj < size_; ++jj )
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
-            col_[jj][n].val *= alpha;
+            column_[jj][n].val *= alpha;
 }
 
 
@@ -213,15 +238,15 @@ void SparMatSym::addDiagonalBlock(real* mat, const size_t ldd,
         size_t j = jj - start;
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
         {
-            size_t ii = col_[jj][n].inx;
+            size_t ii = column_[jj][n].inx;
             if ( start <= ii && ii < end )
             {
                 size_t i = ii - start;
                 assert_true(i > j);
                 // address lower triangle of 'mat'
-                mat[amp*(i+ldd*j)] += col_[jj][n].val;
+                mat[amp*(i+ldd*j)] += column_[jj][n].val;
                 if ( i != j )
-                    mat[amp*(j+ldd*i)] += col_[jj][n].val;
+                    mat[amp*(j+ldd*i)] += column_[jj][n].val;
             }
         }
     }
@@ -235,8 +260,8 @@ int SparMatSym::bad() const
     {
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
         {
-            if ( col_[jj][kk].inx >= size_ ) return 2;
-            if ( col_[jj][kk].inx <= jj )   return 3;
+            if ( column_[jj][kk].inx >= size_ ) return 2;
+            if ( column_[jj][kk].inx <= jj )   return 3;
         }
     }
     return 0;
@@ -265,26 +290,28 @@ std::string SparMatSym::what() const
 }
 
 
-void SparMatSym::printSparse(std::ostream& os, real) const
+void SparMatSym::printSparse(std::ostream& os, real, size_t start, size_t stop) const
 {
+    stop = std::min(stop, size_);
     std::streamsize p = os.precision();
     os.precision(8);
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )
         {
-            os << col_[jj][n].inx << " " << jj << " ";
-            os << col_[jj][n].val << "\n";
+            os << column_[jj][n].inx << " " << jj << " ";
+            os << column_[jj][n].val << "\n";
         }
     }
     os.precision(p);
 }
 
 
-void SparMatSym::printColumns(std::ostream& os)
+void SparMatSym::printColumns(std::ostream& os, size_t start, size_t stop)
 {
+    stop = std::min(stop, size_);
     os << "SMS size " << size_ << ":";
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
     }
@@ -294,7 +321,7 @@ void SparMatSym::printColumns(std::ostream& os)
 
 void SparMatSym::printColumn(std::ostream& os, const size_t jj)
 {
-    Element const* col = col_[jj];
+    Element const* col = column_[jj];
     os << "SMS col " << jj << ":";
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
     {
@@ -319,8 +346,8 @@ void SparMatSym::vecMulAdd(const real* X, real* Y) const
     {
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
         {
-            const size_t ii = col_[jj][kk].inx;
-            const real a = col_[jj][kk].val;
+            const size_t ii = column_[jj][kk].inx;
+            const real a = column_[jj][kk].val;
             Y[ii] += a * X[jj];
             if ( ii != jj )
                 Y[jj] += a * X[ii];
@@ -336,8 +363,8 @@ void SparMatSym::vecMulAddIso2D(const real* X, real* Y) const
         const size_t Djj = 2 * jj;
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
         {
-            const size_t Dii = 2 * col_[jj][kk].inx;
-            const real  a = col_[jj][kk].val;
+            const size_t Dii = 2 * column_[jj][kk].inx;
+            const real  a = column_[jj][kk].val;
             Y[Dii  ] += a * X[Djj  ];
             Y[Dii+1] += a * X[Djj+1];
             if ( Dii != Djj )
@@ -357,8 +384,8 @@ void SparMatSym::vecMulAddIso3D(const real* X, real* Y) const
         const size_t Djj = 3 * jj;
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
         {
-            const size_t Dii = 3 * col_[jj][kk].inx;
-            const real  a = col_[jj][kk].val;
+            const size_t Dii = 3 * column_[jj][kk].inx;
+            const real  a = column_[jj][kk].val;
             Y[Dii  ] += a * X[Djj  ];
             Y[Dii+1] += a * X[Djj+1];
             Y[Dii+2] += a * X[Djj+2];

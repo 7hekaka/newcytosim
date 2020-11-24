@@ -27,9 +27,8 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real   val;   ///< The value of the element
-        size_t inx;   ///< The index of the line
-        
+        real     val;  ///< The value of the element
+        unsigned inx;  ///< The index of the line
         void reset(size_t i)
         {
             inx = i;
@@ -49,10 +48,10 @@ private:
     Element ** column_;
     
     /// colsiz_[c] is the number of Elements in column 'c'
-    size_t * colsiz_;
+    unsigned * colsiz_;
     
     /// colmax_[c] is the number of Elements allocated in column 'c'
-    size_t * colmax_;
+    unsigned * colmax_;
     
     /// allocate column to hold specified number of values
     void allocateColumn(size_t jj, size_t nb);
@@ -63,7 +62,7 @@ private:
 #if MATRIX1_USES_COLNEXT
     
     /// next_[ii] is the index of the first non-empty column of index >= ii
-    size_t * next_;
+    unsigned * next_;
     
     /// update next_[], a pointer to the next non-empty column
     void setNextColumn();
@@ -74,9 +73,9 @@ private:
 
     ///array of index for the optmized multiplication
     ///@todo migrate to DSS Symmetric Matrix Storage format
-    size_t  nmax_;
-    size_t * ija_;
-    real   * sa_;
+    unsigned  nmax_;
+    unsigned * ija_;
+    real * sa_;
 
 #endif
     
@@ -112,6 +111,9 @@ private:
     
     /// One column 2D isotropic multiplication of a vector
     void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    
+    /// One column 3D isotropic multiplication of a vector
+    void vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
 
 public:
     
@@ -145,7 +147,7 @@ public:
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;
 
-    /// set the diagonal term at given index
+    /// returns a modifiable reference to the diagonal term at given index
     real& diagonal(size_t ix);
     
     /// returns the address of element at (x, y), allocating if necessary
@@ -200,23 +202,29 @@ public:
     /// true if matrix is non-zero
     bool isNotZero() const;
     
-    /// number of element which are not null
+    /// number of elements in columns [start, stop[
     size_t nbElements(size_t start, size_t stop) const;
     
-    /// number of blocks which are not null
+    /// number of diagonal elements in columns [start, stop[
+    size_t nbDiagonalElements(size_t start, size_t stop) const;
+
+    /// number of elements in matrix
     size_t nbElements() const { return nbElements(0, size_); }
 
     /// returns a string which a description of the type of matrix
     std::string what() const;
     
-    /// printf debug function in sparse mode: i, j : value
-    void printSparse(std::ostream&, real) const;
+    /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
     
+    /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
+
     /// print content of one column
     void printColumn(std::ostream&, size_t);
     
     /// print content of one column
-    void printColumns(std::ostream&);
+    void printColumns(std::ostream&, size_t start, size_t stop);
 
     /// printf debug function in sparse mode: i, j : value
     void printSparseArray(std::ostream&) const;

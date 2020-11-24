@@ -104,8 +104,11 @@ public:
     /// returns a string which a description of the type of matrix
     virtual std::string what() const = 0;
     
-    /// printf debug function in sparse mode: i, j : value
-    virtual void printSparse(std::ostream&, real) const;
+    /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    
+    /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
     
     /// printf debug function in full lines, all columns
     virtual void printFull(std::ostream&) const;

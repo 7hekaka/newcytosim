@@ -353,14 +353,15 @@ std::string SparMatBlk::what() const
 }
 
 
-void SparMatBlk::printSparse(std::ostream& os, real inf) const
+void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
+    stop = std::min(stop, size_);
     char str[256];
     std::streamsize p = os.precision();
     os.precision(8);
     if ( ! row_ )
         return;
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         Line & row = row_[jj];
         if ( row.isNotZero() )

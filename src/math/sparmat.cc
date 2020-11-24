@@ -224,10 +224,11 @@ int SparMat::bad() const
 }
 
 
-void SparMat::printSparse(std::ostream& os, real) const
+void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) const
 {
+    stop = std::min(stop, size_);
     os.precision(8);
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = start; jj < stop; ++jj )
     {
         if ( mxRow[jj] )
             for ( int ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )

@@ -18,8 +18,8 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real   val;   ///< The value of the element
-        size_t inx;   ///< The index of the line
+        real     val;  ///< The value of the element
+        unsigned inx;  ///< The index of the line
         
         void reset(size_t i)
         {
@@ -31,19 +31,19 @@ public:
 private:
     
     /// size of matrix
-    size_t     size_;
-
-    /// amount of memory which has been allocated
-    size_t     alloc_;
+    size_t size_;
     
-    /// array col_[c][] holds Elements of column 'c'
-    Element ** col_;
+    /// amount of memory allocated
+    size_t alloc_;
+    
+    /// array column_[c][] holds Elements of column 'c'
+    Element ** column_;
     
     /// colsiz_[c] is the number of Elements in column 'c'
-    size_t   * colsiz_;
+    unsigned * colsiz_;
     
     /// colmax_[c] is the number of Elements allocated in column 'c'
-    size_t   * colmax_;
+    unsigned * colmax_;
     
     /// allocate column to hold specified number of values
     void allocateColumn(size_t col, size_t nb);
@@ -74,6 +74,9 @@ public:
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;
     
+    /// returns a modifiable reference to the diagonal term at given index
+    real& diagonal(size_t ix);
+    
     /// returns the address of element at (x, y), allocating if necessary
     real& operator()(size_t x, size_t y);
     
@@ -101,23 +104,26 @@ public:
     /// true if matrix is non-zero
     bool isNotZero() const;
     
-    /// number of element which are not null
+    /// number of elements in columns [start, stop[
     size_t nbElements(size_t start, size_t stop) const;
     
-    /// number of blocks which are not null
+    /// number of elements in matrix
     size_t nbElements() const { return nbElements(0, size_); }
 
     /// returns a string which a description of the type of matrix
     std::string what() const;
     
-    /// printf debug function in sparse mode: i, j : value
-    void printSparse(std::ostream&, real) const;
+    /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
     
+    /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
+    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
+
     /// print content of one column
     void printColumn(std::ostream&, size_t);
     
     /// print content of one column
-    void printColumns(std::ostream&);
+    void printColumns(std::ostream&, size_t start, size_t stop);
 
     /// debug function
     int bad() const;
