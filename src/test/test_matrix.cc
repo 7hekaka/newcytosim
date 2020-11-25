@@ -34,13 +34,17 @@ const size_t N_MUL = 99;
 real alpha = 2.0;
 real beta = 1.0;
 
+#if 0
 /// keeping time using Intel's cycle counters
 unsigned long long rdt = 0;
 /// start timer
 inline void tic() { rdt = __rdtsc(); }
 /// return time since last 'tic()'
 inline double toc(double num) { return double(__rdtsc()-rdt) / num; }
-
+#else
+# include "tictoc.h"
+using namespace TicToc;
+#endif
 
 real checksum(size_t size, real const* vec, real const* ptr)
 {
@@ -415,8 +419,27 @@ void testIsoMatrix(MATRIX & mat,
 
     zero_real(size, z);
     mat.VECMULADDISO(x, z);
-    real sum = checksum(size, x, z);
-    printf("  check %+16.6f ", sum);
+    printf("  isocheck %+16.6f ", checksum(size, x, z));
+    
+#if ( 0 )
+    // compute checksum with another matrix class
+    SparMat1 ful;
+    ful.resize(size*DIM);
+    for ( size_t j = 0; j < size; ++j )
+    for ( size_t i = j; i < size; ++i )
+    {
+        real a = mat(i, j);
+        if ( abs_real(a) > 0 )
+        {
+            for ( int d = 0; d < DIM; ++d )
+                ful(3*i+d, 3*j+d) = a;
+        }
+    }
+    ful.prepareForMultiply(1);
+    zero_real(size, z);
+    ful.vecMulAdd(x, z);
+    printf("  %+16.6f ", checksum(size, x, z));
+#endif
 }
 
 
