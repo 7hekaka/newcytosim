@@ -23,11 +23,6 @@ class Meca;
 #define ADD_PROJECTION_DIFF 1
 
 
-/// to save memory, SIZE_T could be defined here to use down to 2 bytes.
-/* The limit imposed on the size of the Mecable is hardly relevant anyhow */
-typedef unsigned short SIZE_T;
-
-
 /// Can be simulated using a Meca.
 /**
  A Mecable is an Object made of points that can can be simulated in a Meca.
@@ -42,6 +37,11 @@ typedef unsigned short SIZE_T;
  */
 class Mecable : public Object, public Buddy
 {
+
+    /// to save memory, SIZE_T could be defined here to use down to 2 bytes.
+    /* The limit imposed on the size of the Mecable is hardly relevant anyhow */
+    typedef unsigned short SIZE_T;
+
 protected:
 
     /// array of size DIM*pAllocated contains DIM*nPoints coordinates
