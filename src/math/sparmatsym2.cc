@@ -824,7 +824,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
 
-#if MATRIX2_USES_SSE
+#if defined(__SSE3__)
 
 inline void multiply2(const double* X, double* Y, size_t ii,
                       const double* val, vec2 const& xx, vec2& ss)
@@ -855,6 +855,7 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
 {
     assert_true( start <= stop );
     assert_true( stop <= alcDSS_ );
+    
     size_t jj = colDSS_[start];
     const vec2 xx = load2(X+jj);
     vec2 s0 = mul2(loaddup2(valDSS_+start), xx);
@@ -862,73 +863,58 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
     vec2 s2 = setzero2();
     vec2 s3 = setzero2();
     
-    size_t n = start+1;
-#if ( 0 )
-    // unrolling by 8 may exceed the number of registers in the CPU
-#pragma nounroll
-    if ( end >= n + 8 )
+    unsigned * inx = colDSS_ + start + 1;
+    const double * val = valDSS_ + start + 1;
+    const double * end = valDSS_ + stop;
+
+#if ( 1 )
+    // unrolling by 6 might not lead to much improvement
+    const double * pause = end - 5;  // val+7 <= end-1  is  val < end-7;
+    if ( val < pause )
     {
-        vec2 s4 = setzero2();
-        vec2 s5 = setzero2();
-        vec2 s6 = setzero2();
-        vec2 s7 = setzero2();
-        size_t end = n + 8 * ( ( stop - n ) / 8 );
         // process 8 by 8:
-        for ( ; n < end; n += 8 )
+        #pragma nounroll
+        for ( ; val < pause; val += 6 )
         {
-            const size_t i0 = colDSS_[n  ];
-            const size_t i1 = colDSS_[n+1];
-            const size_t i2 = colDSS_[n+2];
-            const size_t i3 = colDSS_[n+3];
-            const size_t i4 = colDSS_[n+4];
-            const size_t i5 = colDSS_[n+5];
-            const size_t i6 = colDSS_[n+6];
-            const size_t i7 = colDSS_[n+7];
+            const size_t i0 = inx[0];
+            const size_t i1 = inx[1];
+            const size_t i2 = inx[2];
+            const size_t i3 = inx[3];
+            const size_t i4 = inx[4];
+            const size_t i5 = inx[5];
+            inx += 6;
             vec2 y0 = load2(Y+i0);
             vec2 y1 = load2(Y+i1);
             vec2 y2 = load2(Y+i2);
             vec2 y3 = load2(Y+i3);
-            vec2 y4 = load2(Y+i4);
-            vec2 y5 = load2(Y+i5);
-            vec2 y6 = load2(Y+i6);
-            vec2 y7 = load2(Y+i7);
-            vec2 a0 = loaddup2(valDSS_+n);
-            vec2 a1 = loaddup2(valDSS_+n+1);
-            vec2 a2 = loaddup2(valDSS_+n+2);
-            vec2 a3 = loaddup2(valDSS_+n+3);
-            vec2 a4 = loaddup2(valDSS_+n+4);
-            vec2 a5 = loaddup2(valDSS_+n+5);
-            vec2 a6 = loaddup2(valDSS_+n+6);
-            vec2 a7 = loaddup2(valDSS_+n+7);
+            vec2 a0 = loaddup2(val);
+            vec2 a1 = loaddup2(val+1);
+            vec2 a2 = loaddup2(val+2);
+            vec2 a3 = loaddup2(val+3);
             s0 = fmadd2(load2(X+i0), a0, s0);
             s1 = fmadd2(load2(X+i1), a1, s1);
             s2 = fmadd2(load2(X+i2), a2, s2);
             s3 = fmadd2(load2(X+i3), a3, s3);
-            s4 = fmadd2(load2(X+i4), a4, s4);
-            s5 = fmadd2(load2(X+i5), a5, s5);
-            s6 = fmadd2(load2(X+i6), a6, s6);
-            s7 = fmadd2(load2(X+i7), a7, s7);
+            vec2 y4 = load2(Y+i4);
+            vec2 y5 = load2(Y+i5);
+            vec2 a4 = loaddup2(val+4);
+            vec2 a5 = loaddup2(val+5);
             store2(Y+i0, fmadd2(xx, a0, y0));
             store2(Y+i1, fmadd2(xx, a1, y1));
             store2(Y+i2, fmadd2(xx, a2, y2));
             store2(Y+i3, fmadd2(xx, a3, y3));
+            s0 = fmadd2(load2(X+i4), a4, s0);
+            s1 = fmadd2(load2(X+i5), a5, s1);
             store2(Y+i4, fmadd2(xx, a4, y4));
             store2(Y+i5, fmadd2(xx, a5, y5));
-            store2(Y+i6, fmadd2(xx, a6, y6));
-            store2(Y+i7, fmadd2(xx, a7, y7));
         }
-        // collapse into lower summation registers:
-        s0 = add2(s0, s4);
-        s1 = add2(s1, s5);
-        s2 = add2(s2, s6);
-        s3 = add2(s3, s7);
     }
 #endif
     
-    size_t end = n + 4 * ( ( stop - n ) / 4 );
     // process 4 by 4:
+    const double * halt = end - 3;  // val+3 <= end-1  is  val < end-3;
 #pragma nounroll
-    for ( ; n < end; n += 4 )
+    for ( ; val < halt; val += 4 )
     {
 #if ( 0 )
         /*
@@ -937,26 +923,27 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2(X, Y, colDSS_[n  ], valDSS_+n  , xx, s0);
-        multiply2(X, Y, colDSS_[n+1], valDSS_+n+1, xx, s1);
-        multiply2(X, Y, colDSS_[n+2], valDSS_+n+2, xx, s2);
-        multiply2(X, Y, colDSS_[n+3], valDSS_+n+3, xx, s3);
+        multiply2(X, Y, inx[0], val  , xx, s0);
+        multiply2(X, Y, inx[1], val+1, xx, s1);
+        multiply2(X, Y, inx[2], val+2, xx, s2);
+        multiply2(X, Y, inx[3], val+3, xx, s3);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = colDSS_[n  ];
-        const size_t i1 = colDSS_[n+1];
-        const size_t i2 = colDSS_[n+2];
-        const size_t i3 = colDSS_[n+3];
+        const size_t i0 = inx[0];
+        const size_t i1 = inx[1];
+        const size_t i2 = inx[2];
+        const size_t i3 = inx[3];
+        inx += 4;
         vec2 y0 = load2(Y+i0);
         vec2 y1 = load2(Y+i1);
         vec2 y2 = load2(Y+i2);
         vec2 y3 = load2(Y+i3);
-        vec2 a0 = loaddup2(valDSS_+n);
-        vec2 a1 = loaddup2(valDSS_+n+1);
-        vec2 a2 = loaddup2(valDSS_+n+2);
-        vec2 a3 = loaddup2(valDSS_+n+3);
+        vec2 a0 = loaddup2(val);
+        vec2 a1 = loaddup2(val+1);
+        vec2 a2 = loaddup2(val+2);
+        vec2 a3 = loaddup2(val+3);
         s0 = fmadd2(load2(X+i0), a0, s0);
         s1 = fmadd2(load2(X+i1), a1, s1);
         s2 = fmadd2(load2(X+i2), a2, s2);
@@ -971,8 +958,8 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
     s0 = add2(add2(s0,s1), add2(s2,s3));
     // process remaining blocks:
 #pragma nounroll
-    for ( ; n < stop; ++n )
-        multiply2(X, Y, colDSS_[n], valDSS_+n, xx, s0);
+    while ( val < end )
+        multiply2(X, Y, *inx++, val++, xx, s0);
     store2(Y+jj, s0);
 }
 
@@ -1173,7 +1160,7 @@ void SparMatSym2::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t st
     {
 #if MATRIX2_OPTIMIZED_MULTIPLY
 #  if MATRIX2_USES_AVX
-        vecMulAddColIso2D_AVXU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
+        vecMulAddColIso2D_SSEU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #  elif MATRIX2_USES_SSE
         vecMulAddColIso2D_SSEU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #  else
