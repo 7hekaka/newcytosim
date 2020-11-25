@@ -558,6 +558,7 @@ Multiply by column `jj` provided in `col` of size `cnt`
 void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
+    assert_true( col[0].inx == jj );
     const real X0 = X[jj];
     real Y0 = Y[jj] + col[0].val * X0;
     for ( size_t n = 1 ; n < cnt ; ++n )
@@ -577,6 +578,7 @@ void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[],
 void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
+    assert_true( 2*col[0].inx == jj );
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
     real Y0 = Y[jj  ] + col[0].val * X0;
@@ -601,6 +603,7 @@ Multiply by column `jj` provided in `col` of size `cnt`
 void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
+    assert_true( 3*col[0].inx == jj );
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
     const real X2 = X[jj+2];
@@ -621,7 +624,7 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element c
     }
     Y[jj  ] = Y0;
     Y[jj+1] = Y1;
-    Y[jj+1] = Y2;
+    Y[jj+2] = Y2;
 }
 
 
