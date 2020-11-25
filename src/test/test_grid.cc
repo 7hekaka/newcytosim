@@ -10,6 +10,8 @@
 #include "real.h"
 #include "tictoc.h"
 #include "gle.h"
+
+using namespace TicToc;
 using namespace gle;
 
 #include "grid.h"
@@ -256,49 +258,47 @@ void speedTest()
 }
 
 
-void testInterpolate()
+void testInterpolate(unsigned CNT)
 {
-    real   L[] = { 0, 0, 0};
-    real   R[] = { 1, 1, 1};
+    real   L[] = { 0.0, 0.0, 0.0 };
+    real   R[] = { 1.0, 1.0, 1.0 };
     size_t S[] = { 100, 100, 100 };
     
-    const int MAX = 1 << 14;
+    const unsigned MAX = 1 << 14;
     real  rand[MAX+3] = { 0 };
-    for ( int i = 0; i < MAX+3; ++i )
+    for ( size_t i = 0; i < MAX+3; ++i )
         rand[i] = RNG.preal();
-    
+
     Grid<double, 3> map;
     map.setDimensions(L, R, S);
     map.createCells();
     map.setValues(0);
     
-    const int CNT = 1000000;
-    for ( int cc = 0; cc < CNT; ++cc )
+    for ( size_t i = 0; i < CNT; ++i )
     {
-        real w[] = { RNG.preal(), RNG.preal(), RNG.preal() };
-        ++map( w );
+        real W[] = { RNG.preal(), RNG.preal(), RNG.preal() };
+        ++map(W);
     }
 
-    
-    real * vec[CNT];
-    for ( int i = 0; i < CNT; ++i )
+    real ** vec = new real*[CNT];
+    for ( size_t i = 0; i < CNT; ++i )
         vec[i] = rand + RNG.pint32(MAX);
 
+    tic();
     real sum = 0;
-    TicToc::tic();
-    for ( int r = 0; r < 100; ++r )
-        for ( int cc = 0; cc < CNT; ++cc )
-            sum += map.interpolate3D(vec[cc]) + map.interpolate3D(vec[cc]);
-    TicToc::toc("interpolate3D");
-    printf("sum = %f\n", sum);
+    for ( size_t r = 0; r < 100; ++r )
+    for ( size_t i = 0; i < CNT; ++i )
+        sum += map.interpolate3D(vec[i]) + map.interpolate3D(vec[i]);
+    printf("  interpolate3D  CPU %7.3f  sum = %f\n", toc(CNT), sum);
     
+    tic();
     real som = 0;
-    TicToc::tic();
-    for ( int r = 0; r < 100; ++r )
-        for ( int cc = 0; cc < CNT; ++cc )
-            som += map.interpolate(vec[cc]) + map.interpolate(vec[cc]);
-    TicToc::toc("interpolate  ");
-    printf("som = %f\n", sum);
+    for ( size_t r = 0; r < 100; ++r )
+    for ( size_t i = 0; i < CNT; ++i )
+        som += map.interpolate(vec[i]) + map.interpolate(vec[i]);
+    printf("  interpolate    CPU %7.3f  sum = %f\n", toc(CNT), som);
+
+    delete[] vec;
 }
 
 
@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
 
     if ( argc > 1 )
     {
-        testInterpolate();
+        testInterpolate(1<<20);
         return 0;
     }
 

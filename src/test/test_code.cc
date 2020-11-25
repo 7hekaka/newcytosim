@@ -25,7 +25,7 @@ unsigned long long rdt = 0;
 /// start timer
 inline void tic() { rdt = __rdtsc(); }
 /// stop timer and print time
-inline void toc(const char* str, double num) { printf("  %10s %5.2f\n", str, double(__rdtsc()-rdt)/num); }
+inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 
 /// type used for indexing
@@ -666,7 +666,7 @@ void testU(SIZE_T cnt, void (*func)(SIZE_T, const real*, const real*, real*), ch
         func(NSEG, dir_, x+DIM, y);
         func(NSEG, dir_, z, y);
     }
-    toc(str, cnt*NSEG);
+    printf("  %10s %5.2f\n", str, toc(cnt*NSEG));
     
     free_reals(x,y,z);
 }
@@ -1351,7 +1351,7 @@ void testD(SIZE_T cnt, void (*func)(SIZE_T, const real*, const real*, const real
         func(NSEG, dir_, y, lag_, x+DIM);
         func(NSEG, dir_, z+DIM, lag_, y);
     }
-    toc(str, cnt*NSEG);
+    printf("  %10s %5.2f\n", str, toc(cnt*NSEG));
     
     free_reals(x,y,z);
 }
@@ -1568,7 +1568,7 @@ void timeProject(SIZE_T cnt, void (*func)(SIZE_T, const real*, real*), char cons
         func(NSEG, y+2, z);
         func(NSEG, z, x);
     }
-    toc(str, cnt*NSEG);
+    printf("  %10s %5.2f\n", str, toc(cnt*NSEG));
     free_reals(x,y,z);
 }
 

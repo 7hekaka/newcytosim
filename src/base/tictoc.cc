@@ -3,7 +3,6 @@
 
 
 #include "tictoc.h"
-#include <cstdio>
 #include <ctime>
 #include <cstring>
 #include <sys/time.h>
@@ -142,9 +141,6 @@ double TicToc::processor_time(clock_t& clk)
 // using real time
 struct timeval tic_t;
 
-const int nbins = 8;
-double bins[nbins] = { 0 };
-
 void TicToc::tic()
 {
     gettimeofday(&tic_t, nullptr);
@@ -157,24 +153,11 @@ double TicToc::toc()
     return (tv.tv_sec-tic_t.tv_sec) + 1e-6*(tv.tv_usec-tic_t.tv_usec);
 }
 
-void TicToc::toc(int n)
+double TicToc::toc(double arg)
 {
-    if ( n < nbins )
-    {
-        timeval tv;
-        gettimeofday(&tv, nullptr);
-        bins[n] += tv.tv_sec-tic_t.tv_sec + 1e-6*(tv.tv_usec-tic_t.tv_usec);
-        tic_t = tv;
-    }
-}
-
-void TicToc::report(const char * msg)
-{
-    for ( int n = 0; n < nbins; ++n )
-    {
-        printf("%s %i : %6.3fs\n", msg, n, bins[n]);
-        bins[n] = 0;
-    }
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    return double(1e6*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_usec-tic_t.tv_usec))/arg;
 }
 
 #else
@@ -193,21 +176,9 @@ double TicToc::toc()
     return (double)( clock() - tic_t ) / CLOCKS_PER_SEC;
 }
 
+double TicToc::toc(double arg)
+{
+    return (double)( clock() - tic_t ) / arg;
+}
+
 #endif
-
-
-void TicToc::toc(const char * msg)
-{
-    printf("%s : %6.6fs\n", msg, toc());
-}
-
-
-void TicToc::toc(const char * msg, const char * end)
-{
-    if ( end )
-        printf("%s : %6.3fs %s", msg, toc(), end);
-    else
-        printf("%s : %6.3fs ", msg, toc());
-}
-
-

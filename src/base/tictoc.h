@@ -66,18 +66,9 @@ namespace TicToc
     
     /// return number of seconds elapsed since last call to `tic()`
     double  toc();
-
-    /// print the time elapsed since 'tic', as "msg: time"
-    void    toc(const char * msg);
     
-    /// print the time elapsed since 'tic', as "msg: time end"
-    void    toc(const char * msg, const char * end);
-    
-    /// add elapsed time since last call to `tic()` to register 'n'
-    void    toc(int);
-    
-    /// report values of all registers
-    void    report(const char * msg);
+    /// return number of seconds elapsed since last call to `tic()`
+    double  toc(double);
 
 }
 

@@ -117,8 +117,7 @@ void run(real (*func)(), const char name[])
     }
     
     real s = ((a + b) + (c + d)) + ((e + f) + (g + h));
-    double ms = TicToc::toc();
-    fprintf(stderr, " %f :  %.0f ms\n", s, ms);
+    fprintf(stderr, " %f :  %.0f ms\n", s, TicToc::toc());
 }
 
 

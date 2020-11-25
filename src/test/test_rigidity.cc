@@ -4,7 +4,6 @@
 
 #include "real.h"
 #include "vector.h"
-#include "tictoc.h"
 #include "random.h"
 #include "blas.h"
 #include "cytoblas.h"
@@ -456,8 +455,8 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 unsigned long long rdt = 0;
 /// start timer
 inline void tic() { rdt = __rdtsc(); }
-/// stop timer and print time
-inline void toc(const char* str, double num) { printf(" %4s %5.2f cycles\n", str, double(__rdtsc()-rdt)/num); }
+/// return time since last `tic()`
+inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 
 void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
@@ -487,7 +486,7 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
         printf(" XXXX %e ", err);
     else
         printf("  --> %e ", err);
-    toc(str, 3*cnt*nbt);
+    printf(" %4s %5.2f cycles\n", str, toc(3*cnt*nbt));
 }
 
 

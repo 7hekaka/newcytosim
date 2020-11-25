@@ -14,6 +14,8 @@
 #include "xtbsv.h"
 #include "cytoblas.h"
 
+using namespace TicToc;
+
 #define DIM 3
 
 const size_t KD = 2;
@@ -87,7 +89,8 @@ void alsatian5(int N, real const* AB, real* B)
 void testTBSV(size_t cnt)
 {
     
-    std::cout << "testTBSV --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    std::cout << "testTBSV " << NSEG << " segments --- real " << sizeof(real);
+    std::cout << " --- " << __VERSION__ << "\n";
 
     real * AB  = new_real(NSEG*LDAB);
     real * Bs = new_real(NSEG*DIM);
@@ -108,52 +111,52 @@ void testTBSV(size_t cnt)
     copy_real(NSEG*DIM, Bs, B);
     alsatian0(NSEG, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian0(NSEG, AB, B);
-    TicToc::toc("    wrong BLAS");
+    printf("    wrong BLAS  %7.3f\n", toc(cnt));
 #endif
     
     copy_real(NSEG*DIM, Bs, B);
     alsatian1(NSEG, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian1(NSEG, AB, B);
-    TicToc::toc("    xtbsv<'I'>");
+    printf("    xtbsv<'I'>  %7.3f\n", toc(cnt));
     
     copy_real(NSEG*DIM, Bs, B);
     alsatian2(NSEG, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian2(NSEG, AB, B);
-    TicToc::toc("    xtbsv<DIM>");
+    printf("    xtbsv<DIM>  %7.3f\n", toc(cnt));
 
     copy_real(NSEG*DIM, Bs, B);
     alsatian3(NSEG, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian3(NSEG, AB, B);
-    TicToc::toc("    xtbsvLNN3 ");
+    printf("    xtbsvLNN3   %7.3f\n", toc(cnt));
     
 #if 0
     copy_real(NSEG*DIM, Bs, B);
     alsatian4(NSEG, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian4(NSEG, AB, B);
-    TicToc::toc("    xtbsvLNN3 ");
+    printf("    xtbsvLNN3   %7.3f\n", toc(cnt));
     
     copy_real(NSEG*DIM, Bs, B);
     alsatian5(NSEG, AB, B);
     VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    TicToc::tic();
+    tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian5(NSEG, AB, B);
-    TicToc::toc("    xtbsvLTN3 ");
+    printf("    xtbsvLTN3   %7.3f\n", toc(cnt));
 #endif
     
     free_real(B);

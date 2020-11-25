@@ -17,8 +17,8 @@
 unsigned long long rdt = 0;
 /// start timer
 inline void tic() { rdt = __rdtsc(); }
-/// stop timer and print time
-inline void toc(const char* str, double num) { printf("  %10s %5.2f\n", str, double(__rdtsc()-rdt)/num); }
+/// return time since last `tic()`
+inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 
 /// print only 16 scalars from given vector
@@ -68,7 +68,7 @@ void testDPTTF(size_t NSEG, size_t cnt)
         copy_real(NSEG, Us, U);
         divide(NSEG, D, U);
     }
-    toc("divide", NSEG*cnt);
+    printf("  divide     %5.2f\n", toc(NSEG*cnt));
     
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -77,7 +77,7 @@ void testDPTTF(size_t NSEG, size_t cnt)
         copy_real(NSEG, Us, U);
         xpttrf(NSEG, D, U);
     }
-    toc("pttrf", NSEG*cnt);
+    printf("  pttrf      %5.2f\n", toc(NSEG*cnt));
 
     int info;
     tic();
@@ -87,7 +87,7 @@ void testDPTTF(size_t NSEG, size_t cnt)
         copy_real(NSEG, Us, U);
         lapack_xpttrf(NSEG, D, U, &info);
     }
-    toc("clapack", NSEG*cnt);
+    printf("  clapack    %5.2f\n", toc(NSEG*cnt));
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -96,7 +96,7 @@ void testDPTTF(size_t NSEG, size_t cnt)
         copy_real(NSEG, Us, U);
         lapack::xpttrf(NSEG, D, U, &info);
     }
-    toc("lapack", NSEG*cnt);
+    printf("  lapacl     %5.2f\n", toc(NSEG*cnt));
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -105,7 +105,7 @@ void testDPTTF(size_t NSEG, size_t cnt)
         copy_real(NSEG, Us, U);
         italian_xpttrf(NSEG, D, U, &info);
     }
-    toc("italian", NSEG*cnt);
+    printf("  italian    %5.2f\n", toc(NSEG*cnt));
     
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -114,7 +114,7 @@ void testDPTTF(size_t NSEG, size_t cnt)
         copy_real(NSEG, Us, U);
         alsatian_xpttrf(NSEG, D, U, &info);
     }
-    toc("alsatian", NSEG*cnt);
+    printf("  alsatian   %5.2f\n", toc(NSEG*cnt));
 
     free_real(D);
     free_real(U);
@@ -156,7 +156,7 @@ void testDPTTS(size_t NSEG, size_t cnt)
     tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack_xptts2(NSEG, 1, D, U, B, 1);
-    toc("clapack", NSEG*cnt);
+    printf("  clapack    %5.2f\n", toc(NSEG*cnt));
 
     copy_real(NSEG, Ds, D);
     copy_real(NSEG, Us, U);
@@ -168,7 +168,7 @@ void testDPTTS(size_t NSEG, size_t cnt)
     tic();
     for ( size_t n = 0; n < cnt; ++n )
         lapack::xptts2(NSEG, 1, D, U, B, 1);
-    toc("lapack", NSEG*cnt);
+    printf("  lapack     %5.2f\n", toc(NSEG*cnt));
 
     copy_real(NSEG, Ds, D);
     copy_real(NSEG, Us, U);
@@ -180,7 +180,7 @@ void testDPTTS(size_t NSEG, size_t cnt)
     tic();
     for ( size_t n = 0; n < cnt; ++n )
         italian_xptts2(NSEG, 1, D, U, B, 1);
-    toc("italian", NSEG*cnt);
+    printf("  italian    %5.2f\n", toc(NSEG*cnt));
     
     copy_real(NSEG, Ds, D);
     copy_real(NSEG, Us, U);
@@ -192,7 +192,7 @@ void testDPTTS(size_t NSEG, size_t cnt)
     tic();
     for ( size_t n = 0; n < cnt; ++n )
         alsatian_xptts2(NSEG, 1, D, U, B, 1);
-    toc("alsatian", NSEG*cnt);
+    printf("  alsatian   %5.2f\n", toc(NSEG*cnt));
 
     free_real(D);
     free_real(U);
@@ -235,7 +235,7 @@ void testThomas(size_t NSEG, size_t cnt)
         lapack::xptts2(NSEG, 1, D, U, B, 1);
     }
     print(NSEG, B);
-    toc("lapack", NSEG*cnt);
+    printf("  lapack     %5.2f\n", toc(NSEG*cnt));
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -248,7 +248,7 @@ void testThomas(size_t NSEG, size_t cnt)
         italian_thomas(NSEG, U, D, U, B);
     }
     print(NSEG, B);
-    toc("italian", NSEG*cnt);
+    printf("  italian    %5.2f\n", toc(NSEG*cnt));
     
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -260,7 +260,7 @@ void testThomas(size_t NSEG, size_t cnt)
         alsatian_xptts2(NSEG, 1, D, U, B, 1);
     }
     print(NSEG, B);
-    toc("alsatian2", NSEG*cnt);
+    printf("  alsatian2  %5.2f\n", toc(NSEG*cnt));
 
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -271,7 +271,7 @@ void testThomas(size_t NSEG, size_t cnt)
         alsatian_thomas(NSEG, D, U, B);
     }
     print(NSEG, B);
-    toc("alsatian", NSEG*cnt);
+    printf("  alsatian   %5.2f\n", toc(NSEG*cnt));
 
     tic();
     copy_real(NSEG, Us, U);
@@ -282,7 +282,7 @@ void testThomas(size_t NSEG, size_t cnt)
         tridiagonal_solve(NSEG, U, D, U, B);
     }
     print(NSEG, B);
-    toc("tridiag", NSEG*cnt);
+    printf("  tridiag    %5.2f\n", toc(NSEG*cnt));
 
     free_real(D);
     free_real(U);

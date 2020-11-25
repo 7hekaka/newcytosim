@@ -91,7 +91,8 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
         blas::xgemv('N', N, N, 1.0, mem, N, y, 1, 0.0, z, 1);
         blas::xgemv('N', N, N, 1.0, mem, N, z, 1, 0.0, x, 1);
     }
-    
+    printf("  DGEMV %5.2f\n", toc(cnt));
+
     // transpose matrix
     for ( size_t i = 0  ; i < size; ++i )
     for ( size_t j = i+1; j < size; ++j )
@@ -101,7 +102,6 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
         mem[j+size*i] = tmp;
     }
     
-    toc("  DGEMV");
     blas::xgemv('T', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
     VecPrint::print(std::cout, std::min(size,NVAL), x);
     tic();
@@ -111,7 +111,7 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
         blas::xgemv('T', N, N, 1.0, mem, N, y, 1, 0.0, z, 1);
         blas::xgemv('T', N, N, 1.0, mem, N, z, 1, 0.0, x, 1);
     }
-    toc(" tDGEMV");
+    printf(" tDGEMV %5.2f\n", toc(cnt));
     
     free_real(mem);
 }
@@ -145,7 +145,7 @@ void speedMatrix(size_t size, size_t cnt)
         mat.vecMul0(y, z);
         mat.vecMul0(z, x);
     }
-    toc(" SCALAR");
+    printf(" SCALAR %5.2f\n", toc(cnt));
 
     mat.vecMul(s, x);
     VecPrint::print(std::cout, std::min(size,NVAL), x);
@@ -156,7 +156,7 @@ void speedMatrix(size_t size, size_t cnt)
         mat.vecMul(y, z);
         mat.vecMul(z, x);
     }
-    toc("   AVX?");
+    printf("   AVX? %5.2f\n", toc(cnt));
 
     speedBLAS(cnt, mat, s, x, y, z);
     
@@ -170,7 +170,7 @@ void speedMatrix(size_t size, size_t cnt)
         mat.transVecMul(y, z);
         mat.transVecMul(z, x);
     }
-    toc(" TRANSP");
+    printf(" TRANSP %5.2f\n", toc(cnt));
     
     free_real(x);
     free_real(y);
