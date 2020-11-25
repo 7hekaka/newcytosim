@@ -100,20 +100,20 @@ private:
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSE(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSE(const double* X, double* Y, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSEU(const double* X, double* Y, size_t start, size_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVX(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVX(const double* X, double* Y, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t start, size_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D_AVX(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddColIso3D_AVX(const double* X, double* Y, size_t start, size_t stop) const;
 
 public:
     

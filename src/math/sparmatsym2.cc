@@ -753,6 +753,7 @@ void SparMatSym2::vecMulAddCol(const real* X, real* Y,
                                size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     real X0 = X[jj];
     real Y0 = Y[jj] + valDSS_[start] * X0;
@@ -770,17 +771,17 @@ void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y,
                                     size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
-    assert_true( stop <= 2*size_ );
     real X0 = X[jj  ];
     real X1 = X[jj+1];
     real Y0 = Y[jj  ] + valDSS_[start] * X0;
     real Y1 = Y[jj+1] + valDSS_[start] * X1;
     for ( size_t n = start+1; n < stop; ++n )
     {
-        size_t ii = valDSS_[n];
+        size_t ii = colDSS_[n];
         assert_true( ii > jj );
-        real a = colDSS_[n];
+        real a = valDSS_[n];
         Y0      += a * X[ii  ];
         Y1      += a * X[ii+1];
         Y[ii  ] += a * X0;
@@ -795,6 +796,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
                                     size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     real X0 = X[jj  ];
     real X1 = X[jj+1];
@@ -824,8 +826,8 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
 
 #if MATRIX2_USES_SSE
 
-inline void multiply2(const real* X, real* Y, size_t ii,
-                      const real* val, vec2 const& xx, vec2& ss)
+inline void multiply2(const double* X, double* Y, size_t ii,
+                      const double* val, vec2 const& xx, vec2& ss)
 {
     vec2 aa = loaddup2(val);
     ss = fmadd2(load2(X+ii), aa, ss);
@@ -833,10 +835,11 @@ inline void multiply2(const real* X, real* Y, size_t ii,
 }
 
 
-void SparMatSym2::vecMulAddColIso2D_SSE(const real* X, real* Y,
+void SparMatSym2::vecMulAddColIso2D_SSE(const double* X, double* Y,
                                         size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec2 xx = load2(X+jj);
     vec2 ss = fmadd2(loaddup2(valDSS_+start), xx, load2(Y+jj));
@@ -847,10 +850,11 @@ void SparMatSym2::vecMulAddColIso2D_SSE(const real* X, real* Y,
 }
 
 
-void SparMatSym2::vecMulAddColIso2D_SSEU(const real* X, real* Y,
+void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
                                          size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec2 xx = load2(X+jj);
     vec2 s0 = mul2(loaddup2(valDSS_+start), xx);
@@ -981,8 +985,8 @@ Accumulation is done here in the higher part of 'ss'
 The high position of 'xx' is not used
 The low position of 'ss' is used locally
 */
-inline void multiply4(const real* X, real* Y, size_t ii,
-                      const real* val, vec4 const& xx, vec4& ss)
+inline void multiply4(const double* X, double* Y, size_t ii,
+                      const double* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend4(xx, broadcast2(X+ii), 0b1100);  // hi <- X , lo <- xx
     ss = blend4(cast4(load2(Y+ii)), ss, 0b1100);    // hi <- ss, lo <- Y
@@ -991,10 +995,11 @@ inline void multiply4(const real* X, real* Y, size_t ii,
 }
 
 
-void SparMatSym2::vecMulAddColIso2D_AVX(const real* X, real* Y,
+void SparMatSym2::vecMulAddColIso2D_AVX(const double* X, double* Y,
                                         size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec4 xx = broadcast2(X+jj);  // hi position
     vec4 ss = fmadd4(broadcast1(valDSS_+start), xx, broadcast2(Y+jj));
@@ -1005,10 +1010,11 @@ void SparMatSym2::vecMulAddColIso2D_AVX(const real* X, real* Y,
 }
 
 
-void SparMatSym2::vecMulAddColIso2D_AVXU(const real* X, real* Y,
+void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
                                          size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec4 xx = broadcast2(X+jj);  // hi and lo position
     vec4 s0 = mul4(broadcast1(valDSS_+start), xx);
@@ -1016,12 +1022,14 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const real* X, real* Y,
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
     
-    unsigned * inx = colDSS_ + start;
-    const real * val = valDSS_ + start + 1;
-    const real * end = val + 4 * ((stop-start)/4);
+    unsigned * inx = colDSS_ + start + 1;
+    const double * val = valDSS_ + start + 1;
+    const double * end = valDSS_ + stop;
+    const double * halt = end - 3;  // val+3 <= end-1  is  val < end-3;
+
     // process 4 by 4:
 #pragma nounroll
-    for ( ; val < end; val += 4 )
+    for ( ; val < halt; val += 4 )
     {
 #if ( 0 )
         /*
@@ -1065,7 +1073,6 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const real* X, real* Y,
     // collapse into 's0'
     s0 = add4(add4(s0,s1), add4(s2,s3));
     // process remaining values:
-    end = valDSS_ + stop;
 #pragma nounroll
     for ( ; val < end; ++val, ++inx )
         multiply4(X, Y, inx[0], val, xx, s0);
@@ -1079,14 +1086,15 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const real* X, real* Y,
 #pragma mark - 3D SIMD
 
 #if MATRIX2_USES_AVX && MATRIX2_OPTIMIZED_MULTIPLY
-void SparMatSym2::vecMulAddColIso3D_AVX(const real* X, real* Y,
+void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
                                         size_t start, size_t stop) const
 {
     assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     unsigned * inx = colDSS_ + start;
-    real const* val = valDSS_ + start;
-    real const* end = valDSS_ + stop;
+    double const* val = valDSS_ + start;
+    double const* end = valDSS_ + stop;
     
     //printf("SparMatSym2 column %lu has %lu elements\n", jj, stop - start);
     vec4 zz = setzero4();

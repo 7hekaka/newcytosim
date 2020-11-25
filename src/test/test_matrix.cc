@@ -432,7 +432,7 @@ void testIsoMatrix(MATRIX & mat,
         if ( abs_real(a) > 0 )
         {
             for ( int d = 0; d < DIM; ++d )
-                ful(3*i+d, 3*j+d) = a;
+                ful(DIM*i+d, DIM*j+d) = a;
         }
     }
     ful.prepareForMultiply(1);
