@@ -11,7 +11,7 @@
 
 #ifdef __AVX__
 #  define MATRIX1_USES_AVX REAL_IS_DOUBLE
-#  define MATRIX1_USES_SSE 0
+#  define MATRIX1_USES_SSE REAL_IS_DOUBLE
 #  include "simd.h"
 #elif defined(__SSE3__)
 #  define MATRIX1_USES_AVX 0
@@ -208,7 +208,7 @@ real& SparMatSym1::diagonal(size_t i)
 }
 
 /**
- This allocate to be able to hold the matrix element if necessary
+ This allocates to be able to hold the matrix element if necessary
 */
 real& SparMatSym1::operator()(size_t i, size_t j)
 {
@@ -474,6 +474,7 @@ std::string SparMatSym1::what() const
 
 void SparMatSym1::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
+    os << "% SparMatSym1 size " << size_ << ":";
     stop = std::min(stop, size_);
     char str[256];
     for ( size_t jj = start; jj < stop; ++jj )
@@ -498,7 +499,7 @@ void SparMatSym1::printSparse(std::ostream& os, real inf, size_t start, size_t s
 void SparMatSym1::printColumns(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
-    os << "SMS1 size " << size_ << ":";
+    os << "% SparMatSym1 size " << size_ << ":";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
@@ -1072,7 +1073,6 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
                                         real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= 3*size_ );
     vec4 zz = setzero4();
     vec4 xx = blend4(loadu4(X+jj), zz, 0b1000);
     vec4 yy = fmadd4(broadcast1(dia), xx, loadu4(Y+jj));
@@ -1180,11 +1180,11 @@ void SparMatSym1::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
 #endif
     {
 #if MATRIX1_OPTIMIZED_MULTIPLY
-#if MATRIX1_USES_AVX
+#  if MATRIX1_USES_AVX
         vecMulAddColIso3D_AVX(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);
-#else
+#  else
         vecMulAddColIso3D(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);
-#endif
+#  endif
 #else
         if ( colsiz_[jj] > 0 )
         {

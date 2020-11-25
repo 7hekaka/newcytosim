@@ -163,7 +163,7 @@ void SparMatSymBlkDiag::Column::operator =(SparMatSymBlkDiag::Column & col)
 }
 
 /**
- This allocate to be able to hold the matrix element if necessary
+ This allocates to be able to hold the matrix element if necessary
  */
 SparMatSymBlkDiag::Block& SparMatSymBlkDiag::Column::block(size_t ii, size_t jj)
 {

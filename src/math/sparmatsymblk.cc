@@ -159,7 +159,7 @@ void SparMatSymBlk::Column::operator =(SparMatSymBlk::Column & col)
 }
 
 /**
- This allocate to be able to hold the matrix element if necessary
+ This allocates to be able to hold the matrix element if necessary
  */
 SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
 {

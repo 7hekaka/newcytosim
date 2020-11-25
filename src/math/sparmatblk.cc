@@ -136,7 +136,7 @@ void SparMatBlk::Line::operator =(SparMatBlk::Line & row)
 }
 
 /**
- This allocate to be able to hold the matrix element if necessary
+ This allocates to be able to hold the matrix element if necessary
  */
 SparMatBlk::Block& SparMatBlk::Line::block(size_t jj)
 {

@@ -135,7 +135,7 @@ real& SparMatSym::diagonal(size_t ix)
 
 
 /**
- This allocate to be able to hold the matrix element if necessary
+ This allocates to be able to hold the matrix element if necessary
  */
 real& SparMatSym::operator()(size_t i, size_t j)
 {
