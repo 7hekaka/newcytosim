@@ -627,16 +627,12 @@ bool SparMatSymBlk::prepareForMultiply(int)
     {
         size_t inx = size_;
         size_t nxt = size_;
-        while ( --inx > 0 )
+        while ( inx-- > 0 )
         {
             if ( column_[inx].isNotZero() )
                 nxt = inx;
             next_[inx] = nxt;
         }
-        if ( column_[0].isNotZero() )
-            next_[0] = 0;
-        else
-            next_[0] = nxt;
     }
     
     // check if matrix is empty:

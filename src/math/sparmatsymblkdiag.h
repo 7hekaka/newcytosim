@@ -170,10 +170,10 @@ private:
     size_t   alloc_;
 
     /// array col_[c][] holds Elements of column 'c'
-    Column * column_;
+    Column * pilar_;
     
-    /// next_[ii] is the index of the first non-empty column of index >= ii
-    size_t * next_;
+    /// colix_[i] is the index of the first non-empty column of index >= i
+    size_t * colix_;
 
 public:
     
@@ -199,8 +199,11 @@ public:
     void allocate(size_t alc);
     
     /// return column at index j
-    Column const& column(size_t j) const { return column_[j]; }
+    Column const& column(size_t j) const { return pilar_[j/BLOCK_SIZE]; }
     
+    /// return column at index j
+    Column&       column(size_t j)       { return pilar_[j/BLOCK_SIZE]; }
+
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
     {
@@ -209,20 +212,20 @@ public:
         assert_true( ii % BLOCK_SIZE == 0 );
         assert_true( jj % BLOCK_SIZE == 0 );
         if ( ii == jj )
-            return column_[ii].diag_block();
+            return column(ii).diag_block();
 #if ( 1 )
         // safe swap, with branchless code:
         size_t i = std::max(ii, jj);
         size_t j = std::min(ii, jj);
-        return column_[j].block(i, j);
+        return column(j).block(i, j);
 #else
         assert_true( ii > jj );
-        return column_[jj].block(ii, jj);
+        return column(jj).block(ii, jj);
 #endif
     }
     
     /// returns element at (i, i)
-    Block& diag_block(size_t i) { return column_[i].diag_block(); }
+    Block& diag_block(size_t i) { return column(i).diag_block(); }
     
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;

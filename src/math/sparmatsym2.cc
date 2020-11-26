@@ -662,16 +662,12 @@ void SparMatSym2::setNextColumn()
     {
         size_t inx = size_;
         size_t nxt = size_;
-        while ( --inx > 0 )
+        while ( inx-- > 0 )
         {
             if ( colsiz_[inx] > 0 )
                 nxt = inx;
             next_[inx] = nxt;
         }
-        if ( colsiz_[0] > 0 )
-            next_[0] = 0;
-        else
-            next_[0] = nxt;
     }
 }
 #endif
