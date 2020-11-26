@@ -179,7 +179,7 @@ inline void repeat12(real const* src, real* dst)
     vec4 s = load4(src);
     dump(s, "s");
 
-    vec4 zx = permute2f128(s, s, 0x21);
+    vec4 zx = swap2f128(s);
     vec4 xy = unpacklo4(s, s);
     vec4 yz = unpackhi4(s, s);
     
@@ -207,7 +207,7 @@ inline void twine12(real const* X, real const* Y, real const* Z, real* dst)
     dump(sz, "sz");
 
     vec4 zx = blend4(sx, sz, 0b0101);
-    zx = permute2f128(zx, zx, 0x21);
+    zx = swap2f128(zx);
     vec4 xy = unpacklo4(sx, sy);
     vec4 yz = unpackhi4(sy, sz);
     
@@ -233,7 +233,7 @@ inline void untwine12(real const* src, real* X, real* Y, real* Z)
     dump(s2, "s2");
 
     vec4 zx = blend4(s0, s2, 0b0011);
-    zx = permute2f128(zx, zx, 0x21);
+    zx = swap2f128(zx);
     vec4 xy = blend4(s0, s1, 0b1100);
     vec4 yz = blend4(s1, s2, 0b1100);
     
@@ -256,9 +256,9 @@ inline void sumXXX(real const* src, real* dst)
     vec4 s2 = load4(src+8);
     
     vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
-    vec4 d3 = permute2f128(s1, s2, 0x21);
+    vec4 d3 = twine2f128(s1, s2);
     vec4 d2 = shuffle4(s2, s1, 0b0101);
-    vec4 d1 = permute2f128(h, h, 0x01);
+    vec4 d1 = swap2f128(h);
 
     vec4 sum = add4(add4(s0, d2), add4(d3, d1));
     store4(dst, sum);
@@ -326,15 +326,15 @@ inline void destride3x4(real const* src, real* dst)
     vec4 s2 = load4(src+8);
     store4(dst, s0);
     
-    vec4 d1 = permute2f128(s0, s1, 0x21);
+    vec4 d1 = twine2f128(s0, s1);
     d1 = shuffle4(d1, s1, 0b0101);
     store4(dst+4 , d1);
     
     vec4 d2 = blend4(s1, s2, 0b0011);
-    d2 = permute2f128(d2, d2, 0b0001);
+    d2 = swap2f128(d2);
     store4(dst+8 , d2);
     
-    vec4 d3 = permute2f128(s2, s2, 0x01);
+    vec4 d3 = swap2f128(s2);
     d3 = shuffle4(s2, d3, 0b0101);
     store4(dst+12, d3);
 }
@@ -476,8 +476,8 @@ void test_broadcast()
     xyzt = load4(mem);
     vec4 u0 = unpacklo4(xyzt, xyzt);
     vec4 u1 = unpackhi4(xyzt, xyzt);
-    vec4 v0 = permute2f128(u0, u0, 0x21);
-    vec4 v1 = permute2f128(u1, u1, 0x21);
+    vec4 v0 = swap2f128(u0);
+    vec4 v1 = swap2f128(u1);
     dump(blend4(u0, v0, 0b1100), " x");
     dump(blend4(u1, v1, 0b1100), " y");
     dump(blend4(u0, v0, 0b0011), " z");
@@ -485,7 +485,7 @@ void test_broadcast()
 
     // using 1 permute and 4 blends
     xyzt = load4(mem);
-    vec4 ztxy = permute2f128(xyzt, xyzt, 0x21);
+    vec4 ztxy = swap2f128(xyzt);
     u0 = unpacklo4(xyzt, xyzt);
     u1 = unpackhi4(xyzt, xyzt);
     v0 = unpacklo4(ztxy, ztxy);
@@ -501,7 +501,7 @@ void test_broadcast()
 
     // using 1 permute and 2 blends
     xyzt = load4(mem);
-    ztxy = permute2f128(xyzt, xyzt, 0x21);
+    ztxy = swap2f128(xyzt);
     xy = blend4(xyzt, ztxy, 0b1100);
     zt = blend4(xyzt, ztxy, 0b0011);
     dump(duplo4(xy), " x");

@@ -513,7 +513,7 @@ public:
         but this is required only once when doing a lot of vecmul */
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+        return add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
     }
     
     /// multiplication by a vector: this * V
@@ -891,7 +891,7 @@ public:
 #if MATRIX34_USES_AVX
         Matrix34 res;
         vec4 d = dir;
-        vec4 p = permute2f128(d, d, 0x01);
+        vec4 p = swap2f128(d);
         vec4 l = blend4(d, p, 0b1100);
         vec4 u = blend4(d, p, 0b0011);
         vec4 a = mul4(d, set4(alpha));
@@ -915,7 +915,7 @@ public:
 #if MATRIX34_USES_AVX
         Matrix34 res;
         vec4 v = vec;
-        vec4 p = permute2f128(v, v, 0x01);
+        vec4 p = swap2f128(v);
         vec4 l = blend4(v, p, 0b1100);
         vec4 u = blend4(v, p, 0b0011);
         vec4 d = dir;

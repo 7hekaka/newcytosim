@@ -212,7 +212,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         // sum y0 = { Y0 Y0 Y0 Y0 }, y1 = { Y1 Y1 Y1 Y1 }, y2 = { Y2 Y2 Y2 Y2 }
         y0 = add4(unpacklo4(y0, y1), unpackhi4(y0, y1));
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
-        y0 = add4(permute2f128(y0, y2, 0x21), blend4(y0, y2, 0b1100));
+        y0 = add4(twine2f128(y0, y2), blend4(y0, y2, 0b1100));
         maskstore4(Y+i, makemask(size_-i), y0);
     }
 }
@@ -229,7 +229,7 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
             x0 = maskload4(X+i, makemask(size_-i));
             //x1 = permute2f128(x0, x0, 0x00);
             //x3 = permute2f128(x0, x0, 0x11);
-            x2 = permute2f128(x0, x0, 0x21);
+            x2 = swap2f128(x0);
             x1 = blend4(x0, x2, 0b1100);
             x3 = blend4(x0, x2, 0b0011);
             x0 = duplo4(x1); // = broadcast1(xxx  );

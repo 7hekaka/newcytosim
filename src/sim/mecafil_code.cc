@@ -227,19 +227,19 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     while ( Y < end )
     {
         vec4 nnn = loadu4(X+4);
-        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 iii = twine2f128(xxx, nnn);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = loadu4(X+8);
         X += 8;
-        vec4 ppp = permute2f128(eee, ddd, 0x21);
-        vec4 jjj = permute2f128(nnn, xxx, 0x21);
+        vec4 ppp = twine2f128(eee, ddd);
+        vec4 jjj = twine2f128(nnn, xxx);
 #ifdef __FMA__
         storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
         storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
 #endif
         eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
-        ppp = permute2f128(ddd, eee, 0x21);
+        ppp = twine2f128(ddd, eee);
 #ifdef __FMA__
         storeu4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), loadu4(Y+4)));
 #else
@@ -253,10 +253,10 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     {
         vec4 nnn = loadu4(X+4);
         X += 4;
-        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 iii = twine2f128(xxx, nnn);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
-        vec4 ppp = permute2f128(eee, ddd, 0x21);
+        vec4 ppp = twine2f128(eee, ddd);
 #ifdef __FMA__
         storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
@@ -550,7 +550,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dir,
         vec4 m = permute4(t, 0b1100);
         vec4 d = mul4(m, load4(dir));
         dir += 4;
-        vec4 n = permute2f128(cc,d,0x21);
+        vec4 n = twine2f128(cc,d);
         cc = d;
         vec4 z = add4(x, sub4(d, n));
         src += 4;
@@ -602,7 +602,7 @@ void projectForcesU3D_AVX(size_t nbs, const real* dir, const real* src, real* mu
 
         vec4 zx = blend4(s0, s2, 0b0011);
         vec4 xy = blend4(s0, s1, 0b1100);
-        zx = permute2f128(zx, zx, 0x21);
+        zx = swap2f128(zx);
         vec4 yz = blend4(s1, s2, 0b1100);
         
         vec4 mm = shuffle4(xy, yz, 0b0101);

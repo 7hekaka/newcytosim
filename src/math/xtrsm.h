@@ -490,7 +490,7 @@ void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
                  Convert temp = { XYZ? }
                  into temp0 = { XYZX } temp1 = { YZXY } temp2 = { ZXYZ }
                  */
-                vec4 p = permute2f128(T, T, 0x01);
+                vec4 p = swap2f128(T);
                 vec4 h = shuffle4(T, p, 0b0001);
                 temp0 = blend4(T, h, 0b1000);
                 temp1 = blend4(h, p, 0b1100);
@@ -699,9 +699,9 @@ void alsatian_xtrsmLLT3(const int M, const real* A, const int lda, real* B)
              into s0 = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
              */
             vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
-            vec4 d3 = permute2f128(s1, s2, 0x21);
+            vec4 d3 = twine2f128(s1, s2);
             vec4 d2 = shuffle4(s2, s1, 0b0101);
-            vec4 d1 = permute2f128(h, h, 0x01);
+            vec4 d1 = swap2f128(h);
             s0 = add4(add4(s0, d2), add4(d3, d1));
         }
         #pragma nounroll
@@ -760,7 +760,7 @@ void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
                  Convert temp = { XYZ? }
                  into temp0 = { XYZX } temp1 = { YZXY } temp2 = { ZXYZ }
                  */
-                vec4 p = permute2f128(T, T, 0x01);
+                vec4 p = swap2f128(T);
                 vec4 h = shuffle4(T, p, 0b0001);
                 temp0 = blend4(T, h, 0b1000);
                 temp1 = blend4(h, p, 0b1100);

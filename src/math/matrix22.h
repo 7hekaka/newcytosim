@@ -402,7 +402,7 @@ public:
 #ifdef __AVX2__
         return permute4x64(mat, 0xD8);
 #else
-        return blend4(mat, permute4(permute2f128(mat,mat,0x01),0b1100), 0b0110);
+        return blend4(mat, permute4(swap2f128(mat),0b1100), 0b0110);
 #endif
     }
 

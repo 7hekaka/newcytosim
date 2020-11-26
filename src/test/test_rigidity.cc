@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#define DIM 3
+#define DIM 2
 
 #include "real.h"
 #include "vector.h"
@@ -309,15 +309,15 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     while ( Y < end )
     {
         vec4 nnn = load4(X+4);
-        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 iii = twine2f128(xxx, nnn);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = load4(X+8);
         X += 8;
-        vec4 ppp = permute2f128(eee, ddd, 0x21);
-        vec4 jjj = permute2f128(nnn, xxx, 0x21);
+        vec4 ppp = twine2f128(eee, ddd);
+        vec4 jjj = twine2f128(nnn, xxx);
         store4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), load4(Y)));
         eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
-        ppp = permute2f128(ddd, eee, 0x21);
+        ppp = twine2f128(ddd, eee);
         store4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), load4(Y+4)));
         Y += 8;
     }
@@ -326,11 +326,11 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     if ( Y < end+4 )
     {
         vec4 nnn = load4(X+4);
-        vec4 iii = permute2f128(xxx, nnn, 0x21);
+        vec4 iii = twine2f128(xxx, nnn);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
         X += 4;
-        vec4 ppp = permute2f128(eee, ddd, 0x21);
+        vec4 ppp = twine2f128(eee, ddd);
         store4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), load4(Y)));
         eee = ddd;
         Y += 4;

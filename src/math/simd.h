@@ -188,6 +188,12 @@ inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_
  inline void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
  */
 
+// swap the two 128 bit lanes
+inline vec4 swap2f128(vec4 a)            { return _mm256_permute2f128_pd(a, a, 0x01); }
+
+// make { A1, B0 } from a = { A0, A1 } and b = { B0, B1 }
+inline vec4 twine2f128(vec4 a, vec4 b)   { return _mm256_permute2f128_pd(a, b, 0x21); }
+
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)
 #define permute2(a,k)       _mm_permute_pd(a,k)       // same as shuffle2(a,a,k)
@@ -215,7 +221,7 @@ inline vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); }
 /// returns the sum of the elements, broadcasted
 inline vec4 esum4(vec4 v)
 {
-    vec4 s = add4(v, permute2f128(v, v, 0x01));
+    vec4 s = add4(v, swap2f128(v));
     return add4(s, permute4(s, 0b0101));
 }
 
@@ -223,7 +229,7 @@ inline vec4 esum4(vec4 v)
 inline vec4 dot4(vec4 a, vec4 b)
 {
     vec4 m = mul4(a, b);
-    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    vec4 s = add4(m, swap2f128(m));
     return add4(s, permute4(s, 0b0101));
 }
 
@@ -231,7 +237,7 @@ inline vec4 dot4(vec4 a, vec4 b)
 inline vec4 normsqr4(vec4 vec)
 {
     vec4 m = mul4(vec, vec);
-    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    vec4 s = add4(m, swap2f128(m));
     return add4(s, permute4(s, 0b0101));
 }
 
@@ -239,7 +245,7 @@ inline vec4 normsqr4(vec4 vec)
 inline vec4 normalize4(vec4 vec)
 {
     vec4 m = mul4(vec, vec);
-    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    vec4 s = add4(m, swap2f128(m));
     m = add4(s, permute4(s, 0b0101));
     return div4(vec, sqrt4(m));
 }
@@ -248,7 +254,7 @@ inline vec4 normalize4(vec4 vec)
 inline vec4 normalize4(vec4 vec, double n)
 {
     vec4 m = mul4(vec, vec);
-    vec4 s = add4(m, permute2f128(m, m, 0x01));
+    vec4 s = add4(m, swap2f128(m));
     m = add4(s, permute4(s, 0b0101));
     return mul4(vec, div4(set4(n), sqrt4(m)));
 }

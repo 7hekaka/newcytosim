@@ -316,8 +316,8 @@ public:
         vec4 u1 = unpackhi4(v0, v1);
         vec4 u2 = unpacklo4(v2, v3);
         vec4 u3 = unpackhi4(v2, v3);
-        v0 = permute2f128(u0, u2, 0x21);
-        v1 = permute2f128(u1, u3, 0x21);
+        v0 = twine2f128(u0, u2);
+        v1 = twine2f128(u1, u3);
         store4(res.val   , blend4(u0, v0, 0b1100));
         store4(res.val+4 , blend4(u1, v1, 0b1100));
         store4(res.val+8 , blend4(u2, v0, 0b0011));
@@ -344,8 +344,8 @@ public:
         vec4 u1 = unpackhi4(v0, v1);
         vec4 u2 = unpacklo4(v2, v3);
         vec4 u3 = unpackhi4(v2, v3);
-        v0 = permute2f128(u0, u2, 0x21);
-        v1 = permute2f128(u1, u3, 0x21);
+        v0 = twine2f128(u0, u2);
+        v1 = twine2f128(u1, u3);
         store4(res.val   , blend4(u0, v0, 0b1100));
         store4(res.val+4 , blend4(u1, v1, 0b1100));
         store4(res.val+8 , blend4(u2, v0, 0b0011));
@@ -395,7 +395,7 @@ public:
     /// multiplication by a vector: this * V
     const vec4 vecmul4(vec4 const& vec) const
     {
-        vec4 p = permute2f128(vec, vec, 0x01);
+        vec4 p = swap2f128(vec);
         vec4 l = blend4(vec, p, 0b1100);
         vec4 u = blend4(vec, p, 0b0011);
         vec4 x = mul4(load4(val   ), duplo4(l));
@@ -415,7 +415,7 @@ public:
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
         //return add4(permute2f128(s0, s2, 0x20), permute2f128(s0, s2, 0x31));
-        return add4(permute2f128(s0, s2, 0x21), blend4(s0, s2, 0b1100));
+        return add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
     }
 
     /// multiplication by a vector: this * V
@@ -709,7 +709,7 @@ public:
 #if MATRIX44_USES_AVX
         Matrix44 res;
         vec4 s = load4(V);
-        vec4 p = permute2f128(s, s, 0x01);
+        vec4 p = swap2f128(s);
         vec4 l = blend4(s, p, 0b1100);
         vec4 u = blend4(s, p, 0b0011);
         vec4 d = load4(D);

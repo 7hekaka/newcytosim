@@ -553,7 +553,7 @@ inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
     vec4 sz = load4(Z);
 
     vec4 zx = blend4(sx, sz, 0b0101);
-    zx = permute2f128(zx, zx, 0x21);
+    zx = swap2f128(zx);
     vec4 xy = unpacklo4(sx, sy);
     vec4 yz = unpackhi4(sy, sz);
     
@@ -576,7 +576,7 @@ inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
     vec4 s2 = load4(src+8);
 
     vec4 zx = blend4(s0, s2, 0b0011);
-    zx = permute2f128(zx, zx, 0x21);
+    zx = swap2f128(zx);
     vec4 xy = blend4(s0, s1, 0b1100);
     vec4 yz = blend4(s1, s2, 0b1100);
     
@@ -603,7 +603,7 @@ void projectForcesU3D_AVX(SIZE_T nbs, const real* dif, const real* src, real* mu
 
         vec4 zx = blend4(s0, s2, 0b0011);
         vec4 xy = blend4(s0, s1, 0b1100);
-        zx = permute2f128(zx, zx, 0x21);
+        zx = swap2f128(zx);
         vec4 yz = blend4(s1, s2, 0b1100);
         
         vec4 mm = shuffle4(xy, yz, 0b0101);
@@ -993,7 +993,7 @@ void projectForcesD2D_AVX(SIZE_T nbs, const real* dif,
         vec4 m = permute4(t, 0b1100);
         vec4 d = mul4(m, load4(dif));
         dif += 4;
-        vec4 n = permute2f128(cc,d,0x21);
+        vec4 n = twine2f128(cc,d);
         cc = d;
         vec4 z = add4(x, sub4(d, n));
         src += 4;
