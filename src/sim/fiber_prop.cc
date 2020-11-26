@@ -29,7 +29,7 @@ real FiberProp::newFiberLength(Glossary& opt) const
     real len = 1.0;
 
 #ifdef BACKWARD_COMPATIBILITY
-    opt.set(len, "initial_length");
+    opt.set(len, "initial_length") ||
 #endif
     opt.set(len, "length") || opt.set(len, "fiber_length");
     

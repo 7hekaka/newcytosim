@@ -364,6 +364,32 @@ void test_stride()
 //------------------------------------------------------------------------------
 #pragma mark -
 
+/* transforms packed symmetric storage
+ src = { a b c d e f }
+ into { a b c 0 }, { b d e 0 }, { c e f 0 }
+ */
+void unpack_matrix()
+{
+    real src[] = { 1, 2, 3, 4, 5, 6 };
+    
+    vec2 zz = setzero2();
+    vec2 ab = load2(src);
+    vec2 cd = load2(src+2);
+    vec2 ef = load2(src+4);
+    
+    vec2 m0h = blend2(cd, zz, 0b10),   m0l = ab;
+    vec2 m1h = blend2(ef, zz, 0b10),   m1l = unpackhi2(ab, cd);
+    vec2 m2h = shuffle2(ef, zz, 0b01), m2l = unpacklo2(cd, ef);
+    
+    dump(cat4(m0h, m0l), "m0 ");
+    dump(cat4(m1h, m1l), "m1 ");
+    dump(cat4(m2h, m2l), "m2 ");
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
 void test_cat()
 {
     printf("------ test_cat\n");
@@ -836,8 +862,9 @@ int main(int argc, char * argv[])
 {
     //test_swapSSE();
 #ifdef __AVX__
-    if ( 0 )
+    if ( 1 )
     {
+        unpack_matrix();
         test_twine();
         test_stride();
     }
@@ -848,7 +875,7 @@ int main(int argc, char * argv[])
         test_broadcast();
         test_store();
     }
-    if ( 1 )
+    if ( 0 )
     {
         //test_swap1();
         //test_swap2();

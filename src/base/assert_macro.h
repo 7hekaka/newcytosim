@@ -46,8 +46,8 @@
 
   #define assert_true(expression)\
         if (!(expression)) {\
-            fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
-            fprintf(stderr, "Cytosim failed assert(%s)\n", #expression);\
+            fprintf(stderr, "\n*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
+            fprintf(stderr, "Cytosim failed assert_true(%s)\n", #expression);\
             fprintf(stderr, "@ `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
             fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
             abort();\
@@ -56,7 +56,7 @@
   #define assert_false(expression)\
         { int e = expression;\
         if (e) {\
-            fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
+            fprintf(stderr, "\n*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
             fprintf(stderr, "Cytosim failed assert_false(%s) with value %i\n", #expression, e);\
             fprintf(stderr, "@ `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
             fprintf(stderr, "*  *  *  *  *  *  *  *  *  *  *  *  *  *\n");\
@@ -66,7 +66,7 @@
   #define assert_small(expression)\
         { real e = expression;\
         if ( std::fabs(e) > 0.01 ) {\
-            fprintf(stderr, "- - - - - - - - - - - - - - - - - - - - - - - - - -\n");\
+            fprintf(stderr, "\n-  -  -  -  -  -  -  -  -  -  -  -  -  -\n");\
             fprintf(stderr, "Cytosim failed assert_small(%s) with value %e\n", #expression, e);\
             fprintf(stderr, "      while executing `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
         } }

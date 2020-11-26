@@ -326,10 +326,10 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     if ( Y < end+4 )
     {
         vec4 nnn = load4(X+4);
-        X += 4;
-        vec4 iii = loadu4(X-2); //permute2f128(xxx, nnn, 0x21);
+        vec4 iii = permute2f128(xxx, nnn, 0x21);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
+        X += 4;
         vec4 ppp = permute2f128(eee, ddd, 0x21);
         store4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), load4(Y)));
         eee = ddd;

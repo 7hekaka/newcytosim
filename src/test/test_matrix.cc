@@ -32,9 +32,9 @@ const size_t N_MUL = 99;
 #define PAD 4
 
 real alpha = 2.0;
-real beta = 1.0;
+real beta = -1.0;
 
-#if 0
+#if 1
 /// keeping time using Intel's cycle counters
 unsigned long long rdt = 0;
 /// start timer
@@ -45,6 +45,10 @@ inline double toc(double num) { return double(__rdtsc()-rdt) / num; }
 # include "tictoc.h"
 using namespace TicToc;
 #endif
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Functions
 
 real checksum(size_t size, real const* vec, real const* ptr)
 {
@@ -106,6 +110,48 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
         y[n] = 0.0;
         z[n] = 0.0;
     }
+}
+
+template <typename MATRIX>
+void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
+{
+    assert_true( i+DIM-1 < mat.size() );
+    assert_true( j < i );
+    
+#if ( DIM == 3 )
+    Matrix33 M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
+#elif ( DIM == 2 )
+    Matrix22 M(alpha, beta, -beta, alpha);
+#else
+    Matrix11 M(alpha);
+#endif
+    
+    for ( int x = 0; x < DIM; ++x )
+    for ( int y = x; y < DIM; ++y )
+    {
+        mat(i+y, i+x) += M(y,x);
+        mat(j+y, j+x) += M(y,x);
+    }
+    if ( 1 )
+    {
+        size_t I = std::max(i, j);
+        size_t J = std::min(i, j);
+        for ( int x = 0; x < DIM; ++x )
+        for ( int y = 0; y < DIM; ++y )
+            mat(I+y, J+x) += M(y,x);
+    }
+}
+
+
+template <typename MATRIX>
+void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
+{
+    mat(i, i) += alpha;
+    if ( i > j )
+        mat(i, j) += beta;
+    else
+        mat(j, i) += beta;
+    mat(j, j) += alpha;
 }
 
 //------------------------------------------------------------------------------
@@ -185,54 +231,6 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
     free_real(tmp2);
 }
 
-
-template <typename MATRIX>
-void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
-{
-    assert_true( i+DIM-1 < mat.size() );
-    assert_true( j < i );
-    
-#if ( DIM == 3 )
-    Matrix33 M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
-#elif ( DIM == 2 )
-    Matrix22 M(alpha, -beta, beta, alpha);
-#else
-    Matrix11 M(alpha);
-#endif
-    
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = x; y < DIM; ++y )
-        mat(i+y, i+x) += M(y,x);
-    
-    if ( i > j )
-    {
-        for ( int x = 0; x < DIM; ++x )
-        for ( int y = 0; y < DIM; ++y )
-            mat(i+y, j+x) += M(y,x);
-    }
-    else
-    {
-        for ( int x = 0; x < DIM; ++x )
-        for ( int y = 0; y < DIM; ++y )
-            mat(j+y, i+x) += M(x,y);
-    }
-    
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = x; y < DIM; ++y )
-        mat(j+y, j+x) += M(y,x);
-}
-
-
-template <typename MATRIX>
-void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
-{
-    mat(i, i) += alpha;
-    if ( i > j )
-        mat(i, j) -= beta;
-    else
-        mat(j, i) -= beta;
-    mat(j, j) += alpha;
-}
 
 //------------------------------------------------------------------------------
 #pragma mark - Test Sparse Matrix
@@ -398,7 +396,7 @@ void testIsoMatrix(MATRIX & mat,
     {
         mat.reset();
         for ( size_t n=0; n<fill; ++n )
-            fillMatrixIso(mat, inx[n]/DIM, iny[n]/DIM);
+            fillMatrixIso(mat, inx[n], iny[n]);
     }
     double ts = toc(DIV);
     
@@ -459,22 +457,22 @@ void testMatrices(const size_t size, const size_t fill)
     setVectors(DIM*size, x, y, z);
     alpha = RNG.sreal();
     
-    SparMat1 mat1; testMatrix(mat1, size, x, y, z, fill, inx, iny);
-    SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
+    SparMat1 mat1; //testMatrix(mat1, size, x, y, z, fill, inx, iny);
+    SparMat2 mat2; //testMatrix(mat2, size, x, y, z, fill, inx, iny);
 #if 1
     SparMatB mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
     SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
     //testMatrix(mat4, size, x, y, z, fill, inx, iny);
-    SparMatA mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
+    //SparMatA mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
 #endif
 #ifdef _OPENMP
     testMatrixParallel(mat5, size, x, y, z, fill, inx, iny);
     checkMatrixParallel(mat5, size, x, y, z);
 #endif
-    
-    testIsoMatrix(mat1, size/DIM, x, y, z, fill, inx, iny);
-    testIsoMatrix(mat2, size/DIM, x, y, z, fill, inx, iny);
-
+#if 0
+    testIsoMatrix(mat1, size, x, y, z, fill, inx, iny);
+    testIsoMatrix(mat2, size, x, y, z, fill, inx, iny);
+#endif
     printf("\n");
     
 #if ( 0 )
@@ -517,7 +515,7 @@ void fillMatrixBlock(MATRIX& mat, const size_t fill, size_t inx[], size_t iny[])
 template < typename MATRIX >
 void fillBlockMatrix(MATRIX& mat, const size_t i, const size_t j)
 {
-    typename MATRIX::Block M(alpha, -beta, beta, -beta, alpha, -beta, beta, -beta, alpha);
+    typename MATRIX::Block M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
     
     mat.diag_block(i).add_half(M);
     mat.diag_block(j).add_half(M);
@@ -623,78 +621,78 @@ int main( int argc, char* argv[] )
 
     RNG.seed();
 #if ( 0 )
-        SparMat1 mat1;
-        SparMat2 mat2;
-        SparMatA matA; //assymetric!
-        SparMatB mat3;
-        SparMatD mat4;
-
-        // check correctness:
-        compareMatrix(4*3, mat1, mat2, 1<<4);
-        compareMatrix(4*5, mat1, mat3, 1<<4);
-        compareMatrix(4*7, mat2, mat3, 1<<5);
+    SparMat1 mat1;
+    SparMat2 mat2;
+    SparMatA matA; //assymetric!
+    SparMatB mat3;
+    SparMatD mat4;
+    
+    // check correctness:
+    compareMatrix(4*3, mat1, mat2, 1<<4);
+    compareMatrix(4*5, mat1, mat3, 1<<4);
+    compareMatrix(4*7, mat2, mat3, 1<<5);
 #endif
 #if ( 0 )
-        compareMatrix(4*11, mat1, mat3, 1<<6);
-        compareMatrix(4*33, mat1, mat3, 1<<16);
-        compareMatrix(4*3, mat1, mat4, 1<<16);
-        compareMatrix(4*7, mat1, mat4, 1<<16);
-        compareMatrix(4*11, mat1, mat4, 1<<16);
-        compareMatrix(4*33, mat1, mat4, 1<<16);
+    compareMatrix(4*11, mat1, mat3, 1<<6);
+    compareMatrix(4*33, mat1, mat3, 1<<16);
+    compareMatrix(4*3, mat1, mat4, 1<<16);
+    compareMatrix(4*7, mat1, mat4, 1<<16);
+    compareMatrix(4*11, mat1, mat4, 1<<16);
+    compareMatrix(4*33, mat1, mat4, 1<<16);
 #endif
 #if ( 0 )
-        testMatrices(DIM*2, 1);
-        testMatrices(DIM*3, 3);
-        testMatrices(DIM*4, 4);
-        testMatrices(DIM*7, 5);
-        testMatrices(DIM*17, 7);
-        testMatrices(DIM*33, 1111);
+    testMatrices(DIM*2, 1);
+    testMatrices(DIM*3, 3);
+    testMatrices(DIM*4, 4);
+    testMatrices(DIM*7, 5);
+    testMatrices(DIM*17, 7);
+    testMatrices(DIM*33, 1111);
 #endif
 #if ( 0 )
-        printf("\ntest_matrix BLOCK_SIZE %i (%s)", DIM, SparMatSymB::Block::what().c_str());
-        size_t siz = DIM;
-        for ( int i = 0; i < 14; ++i )
-        {
-            siz = 1 + ( 2 << i ) * RNG.preal();
-            size_t fill = 1 + siz * siz * ( 0.01 * RNG.preal() );
-            testMatrixBlock(siz, fill);
-        }
+    printf("\ntest_matrix BLOCK_SIZE %i (%s)", DIM, SparMatSymB::Block::what().c_str());
+    size_t siz = DIM;
+    for ( int i = 0; i < 14; ++i )
+    {
+        siz = 1 + ( 2 << i ) * RNG.preal();
+        size_t fill = 1 + siz * siz * ( 0.01 * RNG.preal() );
+        testMatrixBlock(siz, fill);
+    }
 #endif
 #if ( 0 )
-        testMatrixBlock(DIM*17, 2);
-        testMatrixBlock(DIM*347, 1019);
-        testMatrixBlock(DIM*753, 43039);
+    testMatrixBlock(DIM*17, 2);
+    testMatrixBlock(DIM*347, 1019);
+    testMatrixBlock(DIM*753, 43039);
 #endif
 #if ( 0 )
-        testMatrixBlock(2253, 1<<14);
-        testMatrixBlock(2253, 1<<14);
-        testMatrixBlock(2253, 1<<14);
-        testMatrixBlock(2253, 1<<14);
+    testMatrixBlock(2253, 1<<14);
+    testMatrixBlock(2253, 1<<14);
+    testMatrixBlock(2253, 1<<14);
+    testMatrixBlock(2253, 1<<14);
 #endif
 #if ( 0 )
-        testMatrixBlock(DIM*1251, 25821);
-        testMatrixBlock(DIM*1785, 153034);
-        testMatrixBlock(DIM*2311, 231111);
-        //testMatrixBlock(DIM*3217, 671234);
-#endif
-#if ( 1 )
-        //testMatrices(DIM*17, 23);
-        //testMatrices(DIM*91, 1<<12);
-        testMatrices(DIM*196, 1<<11);
-        testMatrices(DIM*436, 1<<13);
-        testMatrices(DIM*8*94, 1<<14);
-        testMatrices(DIM*8*169, 1<<15);
-        testMatrices(DIM*8*331, 1<<16);
-        testMatrices(DIM*8*513, 1<<19);
+    testMatrixBlock(DIM*1251, 25821);
+    testMatrixBlock(DIM*1785, 153034);
+    testMatrixBlock(DIM*2311, 231111);
+    //testMatrixBlock(DIM*3217, 671234);
 #endif
 #if ( 0 )
-        //testMatrices(DIM*17, 23);
-        size_t dim[5] = { 0 };
-        for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
-        qsort(dim, 5, sizeof(size_t), compareInt);
-        for ( int i = 0; i < 5; ++i )
-            testMatrices(DIM*dim[i], RNG.pint32(dim[i]*dim[i]));
+    //testMatrices(DIM*17, 23);
+    //testMatrices(DIM*91, 1<<12);
+    testMatrices(DIM*196, 1<<13);
+    //testMatrices(DIM*436, 1<<15);
+    testMatrices(DIM*8*94, 1<<16);
+    //testMatrices(DIM*8*169, 1<<17);
+    testMatrices(DIM*8*331, 1<<18);
 #endif
-return EXIT_SUCCESS;
+    testMatrices(DIM*8*255, 1<<18);
+#if ( 0 )
+    //testMatrices(DIM*17, 23);
+    size_t dim[5] = { 0 };
+    for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
+    qsort(dim, 5, sizeof(size_t), compareInt);
+    for ( int i = 0; i < 5; ++i )
+        testMatrices(DIM*dim[i], RNG.pint32(dim[i]*dim[i]));
+#endif
+    return EXIT_SUCCESS;
 }
 
