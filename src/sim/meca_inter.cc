@@ -1254,10 +1254,10 @@ void Meca::addLink(Interpolation const& ptA,
     
     sub_iso_diag(ii0, ww[0] * cc[0]);
     sub_iso(ii1, ii0, ww[1] * cc[0]);
-    add_iso(ii2, ii0, ww[0]);         // since cc[2] == -1
+    add_iso(ii2, ii0, ww[0]);         // since cc[2] == 1
     sub_iso_diag(ii1, ww[1] * cc[1]);
-    add_iso(ii2, ii1, ww[1]);         // since cc[2] == -1
-    add_iso_diag(ii2, ww[2]);         // since cc[2] == -1
+    add_iso(ii2, ii1, ww[1]);         // since cc[2] == 1
+    add_iso_diag(ii2, ww[2]);         // since cc[2] == 1
  
     if ( modulo )
     {

@@ -389,12 +389,13 @@ void SparMatSym2::addTriangularBlockBanded(real alpha, real* mat, const size_t l
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
         {
             size_t ii = column_[jj][n].inx;
+            assert_true( ii >= jj );
             // assuming lower triangle is stored:
             if ( ii < end )
             {
                 size_t i = ii - start;
                 //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
-                assert_true( i > j );
+                assert_true( i >= j );
                 // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
                 if ( i <= j + rank )
                     mat[i-j+ldd*j] += alpha * column_[jj][n].val;
