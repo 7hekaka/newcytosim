@@ -35,7 +35,7 @@
  MatrixSparseSymmetricBlock uses a sparse storage, with arrays of elements for each column.
  Each element is a full square block of size DIM x DIM.
  
- F. Nedelec, 17--27 March 2017, revised entirely June 2018
+ F. Nedelec, 17--27 March 2017, revised entirely June 2018, Nov 2020
  */
 class SparMatSymBlkDiag final
 {

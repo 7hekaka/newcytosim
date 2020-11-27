@@ -1402,12 +1402,12 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
         x2 = broadcast1(X+jj+2);
         x3 = broadcast1(X+jj+3);
 #else
-        vec4 l = duplo2f128(tt);
-        vec4 u = duphi2f128(tt);
-        x0 = duplo4(l);
-        x1 = duphi4(l);
-        x2 = duplo4(u);
-        x3 = duphi4(u);
+        x1 = duplo2f128(tt);
+        x3 = duphi2f128(tt);
+        x0 = duplo4(x1);
+        x1 = duphi4(x1);
+        x2 = duplo4(x3);
+        x3 = duphi4(x3);
 #endif
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.

@@ -15,6 +15,7 @@ typedef __m128 vec4f;
 
 inline vec4f setzero4f()                   { return _mm_setzero_ps(); }
 inline vec4f set4f(float a)                { return _mm_set1_ps(a); }
+inline vec4f load2f(float const* a)        { return (vec4f)_mm_loadl_epi64((__m128i*)a); }
 inline vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 inline vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
 inline void  store3f(float* a, vec4f b)    { a[0]=b[0]; a[1]=b[1]; a[2]=b[2]; }

@@ -1115,6 +1115,8 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
     assert_true( val == end );
 }
 #endif
+               
+#include "iacaMarks.h"
 
 #if defined(__SSE3__) && MATRIX2_OPTIMIZED_MULTIPLY && !REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
@@ -1128,36 +1130,81 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
     float const* end = valDSS_ + stop;
     
     //printf("SparMatSym2 column %lu has %lu elements\n", jj, stop - start);
-    vec4f zz = setzero4f();
-    vec4f xx = blend4f(loadu4f(X+jj), zz, 0b1000);
-    vec4f yy = fmadd4f(broadcast1f(val), xx, loadu4f(Y+jj));
+    vec4f s0 = setzero4f();
+    vec4f xx = blend4f(loadu4f(X+jj), s0, 0b1000);
+    vec4f s1 = fmadd4f(broadcast1f(val), xx, loadu4f(Y+jj));
     // process one element when the number of values is even
     if ( 0 == (( stop - start ) & 1) )
     {
         size_t ii = *(++inx);
         vec4f aa = broadcast1f(++val);
-        zz = mul4f(aa, loadu4f(X+ii));
+        s0 = mul4f(aa, loadu4f(X+ii));
         storeu4f(Y+ii, fmadd4f(aa, xx, loadu4f(Y+ii)));
     }
     ++val;
     ++inx;
+#if ( 0 )
+    vec4f s2 = setzero4f();
+    vec4f s3 = setzero4f();
+    float const* halt = end - 2;
+    #pragma ivdep unroll (4)
+    #pragma clang loop unroll(disable)
+    while ( val < halt )
+    {
+        size_t i0 = *(inx  );
+        size_t i1 = *(inx+1);
+        size_t i2 = *(inx+2);
+        size_t i3 = *(inx+3);
+        assert_true( i1 > i0 );
+        inx += 4;
+#if 0
+        vec4f a0 = broadcast1f(val);
+        vec4f a1 = broadcast1f(val+1);
+        vec4f a2 = broadcast1f(val+2);
+        vec4f a3 = broadcast1f(val+3);
+#else
+        vec4f a3 = loadu4f(val);
+        vec4f a0 = permute4f(a3, 0x00);
+        vec4f a1 = permute4f(a3, 0x55);
+        vec4f a2 = permute4f(a3, 0xAA);
+        a3 = permute4f(a3, 0xFF);
+#endif
+        val += 4;
+        s0 = fmadd4f(a0, loadu4f(X+i0), s0);
+        s1 = fmadd4f(a1, loadu4f(X+i1), s1);
+        s2 = fmadd4f(a2, loadu4f(X+i2), s2);
+        s3 = fmadd4f(a3, loadu4f(X+i3), s3);
+        storeu4f(Y+i0, fmadd4f(a0, xx, loadu4f(Y+i0)));
+        storeu4f(Y+i1, fmadd4f(a1, xx, loadu4f(Y+i1)));
+        storeu4f(Y+i2, fmadd4f(a2, xx, loadu4f(Y+i2)));
+        storeu4f(Y+i3, fmadd4f(a3, xx, loadu4f(Y+i3)));
+    }
+    s0 = add4f(s0, s2);
+    s1 = add4f(s1, s3);
+#endif
     while ( val < end )
     {
-        size_t ii = *(inx  );
-        size_t kk = *(inx+1);
-        assert_true( kk > ii );
+        IACA_START
+        size_t i0 = *(inx  );
+        size_t i1 = *(inx+1);
+        assert_true( i1 > i0 );
         inx += 2;
-        vec4f aa = broadcast1f(val);
-        vec4f bb = broadcast1f(val+1);
-        vec4f nn = loadu4f(Y+ii);
-        vec4f mm = loadu4f(Y+kk);
+#if 1
+        vec4f a0 = broadcast1f(val);
+        vec4f a1 = broadcast1f(val+1);
+#else
+        vec4f a1 = load2f(val);
+        vec4f a0 = permute4f(a1, 0x00);
+        a1 = permute4f(a1, 0x55);
+#endif
         val += 2;
-        yy = fmadd4f(aa, loadu4f(X+ii), yy);
-        zz = fmadd4f(bb, loadu4f(X+kk), zz);
-        storeu4f(Y+ii, fmadd4f(aa, xx, nn));
-        storeu4f(Y+kk, fmadd4f(bb, xx, mm));
+        s0 = fmadd4f(a0, loadu4f(X+i0), s0);
+        s1 = fmadd4f(a1, loadu4f(X+i1), s1);
+        storeu4f(Y+i0, fmadd4f(a0, xx, loadu4f(Y+i0)));
+        storeu4f(Y+i1, fmadd4f(a1, xx, loadu4f(Y+i1)));
     }
-    store3f(Y+jj, add4f(yy, zz));
+    IACA_END
+    store3f(Y+jj, add4f(s1, s0));
     assert_true( val == end );
 }
 #endif
