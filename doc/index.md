@@ -21,7 +21,7 @@
 
 # Installation
 
-Cytosim is distributed as source code and [must be compiled](compile/index.md) before use. On Mac OS X and Linux this should be straightforward if you are familiar with compilation in general. On Windows, we suggest to [compile within Cygwin](compile/cygwin.md).
+Cytosim is distributed as source code and [must be compiled](compile/index.md) before use. On Mac OS X and Linux this should be simple if you are familiar with compilation in general. On Windows, we suggest to [compile within Cygwin](compile/cygwin.md).
 
 To compile, enter these commands in a terminal window:
 

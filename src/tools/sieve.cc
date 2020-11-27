@@ -11,12 +11,13 @@
 void help()
 {
     printf("Cytosim-sieve:\n\n");
-    printf("   sieve reads a cytosim trajectory file, loading frames in memory,\n");
-    printf("   and writes them to a new file using the latest cytosim file format.\n");
+    printf("   Sieve reads a cytosim trajectory file, loading frames into memory,\n");
+    printf("   and writes them to a new file using the latest cytosim format.\n");
     printf("   The output can be generated in either binary or text format.\n");
     printf("   A category of objects can be removed by specifying `skip=WHAT`.\n");
     printf("   If the specified output file already exists, data is appended to it.\n");
-    printf("   This writes %iD files with format %i (built on %s)\n\n", DIM, Simul::currentFormatID, __DATE__);
+    printf("   This writes %iD files with format %i (real = %lu bytes)\n", DIM, Simul::currentFormatID, sizeof(real));
+    printf("   (built on %s)\n\n", __DATE__);
     printf("Usage:\n");
     printf("    sieve input_file output_file [options]\n\n");
     printf("Options:\n");

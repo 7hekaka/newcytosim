@@ -1,26 +1,25 @@
 # How to compile Cytosim
 
-The core of Cytosim is written in C++14 and it is necessary to recompile the programs after each modification of the source code. Some of the accessory tools use [Python](https://www.python.org).
+The core of Cytosim is written in [C++14](https://en.wikipedia.org/wiki/C%2B%2B14) and it is necessary to recompile the programs after each modification of the source code. Some of the accessory tools use [Python](https://www.python.org).
  
 Compilation requires a C++ compiler: e.g. [`gcc`](http://gcc.gnu.org/), [`clang`](http://clang.llvm.org) or the [Intel compiler](http://en.wikipedia.org/wiki/Intel_C%2B%2B_Compiler), together with a few libraries.
 Compilation is started from a terminal, with a program called [`make`](http://www.gnu.org/software/make/). Optionally, [`cmake`](https://cmake.org) can be used to configure `make`.
 
 ### Dimensionality
 
-The dimensionality is baked into the executable during compilation. 
-To change it, [follow these instructions](dimensionality.md).
+The dimensionality is baked into the executable during compilation. It can be querried by running `sim info`.
+It is necessary to recompile to change dimensionality, [following these instructions](dimensionality.md).
 
 ### Mathematical libraries
- 
-Running cytosim with `sim` or `play` requires these mathematical libraries:
+
+Both `sim` or `play` use these mathematical libraries:
 
 * [BLAS](http://netlib.org/blas)
 * [LAPACK](http://netlib.org/lapack)
 
-These libraries offer standard interface to linear algebra functions used in Cytosim.
-There is a [public reference implementation](http://netlib.org), which can be compiled with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
+There exists a [public reference implementation](http://netlib.org), which can be compiled with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
 
-Precompiled libraries are available for most platforms:
+If possible, use a precompiled library, which is possible on most platforms:
 
 - [Intel Math Kernel Library](https://software.intel.com/mkl)
 - [Apple's vecLib](http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html)
@@ -82,7 +81,7 @@ you are ready to compile from a terminal, with the following commands in the roo
 The command `make` without arguments will build `sim` and `play`.  
 If this does not work, you may need to manually edit `makefile.in` to adjust to your platform.
 
-It is also possible to use [cmake](https://cmake.org), which should require no adjustment:
+It is also possible to use [cmake](https://cmake.org), which finds the configuration automatically:
 
 	mkdir build
 	cd build
