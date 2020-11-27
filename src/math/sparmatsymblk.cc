@@ -1402,8 +1402,8 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
         x2 = broadcast1(X+jj+2);
         x3 = broadcast1(X+jj+3);
 #else
-        vec4 l = permute2f128(tt, tt, 0x00);
-        vec4 u = permute2f128(tt, tt, 0x11);
+        vec4 l = duplo2f128(tt);
+        vec4 u = duphi2f128(tt);
         x0 = duplo4(l);
         x1 = duphi4(l);
         x2 = duplo4(u);

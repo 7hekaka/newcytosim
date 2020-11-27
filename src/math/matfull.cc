@@ -227,11 +227,8 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
         vec4 x0, x1, x2, x3;
         {
             x0 = maskload4(X+i, makemask(size_-i));
-            //x1 = permute2f128(x0, x0, 0x00);
-            //x3 = permute2f128(x0, x0, 0x11);
-            x2 = swap2f128(x0);
-            x1 = blend4(x0, x2, 0b1100);
-            x3 = blend4(x0, x2, 0b0011);
+            x1 = duplo2f128(x0);
+            x3 = duphi2f128(x0);
             x0 = duplo4(x1); // = broadcast1(xxx  );
             x1 = duphi4(x1); // = broadcast1(xxx+1);
             x2 = duplo4(x3); // = broadcast1(xxx+2);

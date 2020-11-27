@@ -514,8 +514,8 @@ public:
     /// multiplication by a vector: this * V
     const vec4 vecmul4(const vec4 xyzt) const
     {
-        vec4 xyxy = permute2f128(xyzt, xyzt, 0x00);
-        vec4 ztzt = permute2f128(xyzt, xyzt, 0x11);
+        vec4 xyxy = duplo2f128(xyzt);
+        vec4 ztzt = duphi2f128(xyzt);
         vec4 xxxx = duplo4(xyxy);
         vec4 yyyy = duphi4(xyxy);
         vec4 zzzz = duplo4(ztzt);

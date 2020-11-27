@@ -1610,12 +1610,12 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const double* X, double* Y, size
 #else
     vec4 x0, x1, x2, x3;
     {
-        vec4 l = permute2f128(tt, tt, 0x00);
-        vec4 u = permute2f128(tt, tt, 0x11);
-        x0 = duplo4(l);
-        x1 = duphi4(l);
-        x2 = duplo4(u);
-        x3 = duphi4(u);
+        x1 = duplo2f128(tt);
+        x3 = duphi2f128(tt);
+        x0 = duplo4(x1);
+        x1 = duphi4(x1);
+        x2 = duplo4(x3);
+        x3 = duphi4(x3);
     }
 #endif
     // There is a dependency in the loop for 's0', 's1' and 's2'.

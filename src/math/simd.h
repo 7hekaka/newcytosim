@@ -191,8 +191,14 @@ inline vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_
 // swap the two 128 bit lanes
 inline vec4 swap2f128(vec4 a)            { return _mm256_permute2f128_pd(a, a, 0x01); }
 
-// make { A1, B0 } from a = { A0, A1 } and b = { B0, B1 }
+// return { A1, B0 } from a = { A0, A1 } and b = { B0, B1 }
 inline vec4 twine2f128(vec4 a, vec4 b)   { return _mm256_permute2f128_pd(a, b, 0x21); }
+
+// return { A0, A0 } from a = { A0, A1 }
+inline vec4 duplo2f128(vec4 a)            { return _mm256_permute2f128_pd(a, a, 0x00); }
+
+// return { A1, A1 } from a = { A0, A1 }
+inline vec4 duphi2f128(vec4 a)            { return _mm256_permute2f128_pd(a, a, 0x11); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)
