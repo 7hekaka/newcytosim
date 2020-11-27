@@ -173,14 +173,14 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 
 #include "simd.h"
 
-#ifdef __SSE3__
+#if defined(__SSE3__)
 /**
  2D implemention using SSE 128bit vector instructions with double precision
  */
-void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_SSE(const size_t nbt, const double* X, const double rigid, double* Y)
 {
     vec2 R = set2(rigid);
-    real *const end = Y + nbt;
+    double *const end = Y + nbt;
 
     vec2 nn = load2(X+2);
     vec2 oo = mul2(R, sub2(nn, load2(X)));
@@ -213,12 +213,12 @@ void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real*
  
  Note that the vectors X and Y are not aligned to memory!
  */
-void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, double* Y)
 {
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
     
-    real *const end = Y + nbt - 8;
+    double *const end = Y + nbt - 8;
     
     vec4 xxx = loadu4(X);
     vec4 eee = setzero4();
@@ -493,7 +493,7 @@ void projectForcesD2D_SSE(size_t nbs, const real* dir,
 
  F. Nedelec, 9.12.2016, 6.9.2018
  */
-void projectForcesU2D_AVX(size_t nbs, const real* dir, const real* src, real* mul)
+void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, double* mul)
 {
     real const*const end = mul - 3 + nbs;
 
@@ -535,7 +535,7 @@ void projectForcesU2D_AVX(size_t nbs, const real* dir, const real* src, real* mu
  F. Nedelec, 9.12.2016, 23.03.2018
  */
 void projectForcesD2D_AVX(size_t nbs, const real* dir,
-                          const real* src, const real* mul, real* dst)
+                          const double* src, const double* mul, double* dst)
 {
     vec4 cc = setzero4();
     
@@ -586,9 +586,9 @@ void projectForcesD2D_AVX(size_t nbs, const real* dir,
 #include "simd.h"
 
 /// FJN @ Strasbourg, 17 and 18.04.2020
-void projectForcesU3D_AVX(size_t nbs, const real* dir, const real* src, real* mul)
+void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, double* mul)
 {
-    const real *const end = mul - 3 + nbs;
+    const double *const end = mul - 3 + nbs;
     while ( mul < end )
     {
         /*
@@ -651,9 +651,9 @@ void projectForcesU3D_AVX(size_t nbs, const real* dir, const real* src, real* mu
  Ugly piece of code to harvest AVX power...
  FJN @ Strasbourg, 18 and 19.04.2020
  */
-void projectForcesD3D_AVX(size_t nbs, const real* dir, const real* src, const real* mul, real* dst)
+void projectForcesD3D_AVX(size_t nbs, const double* dir, const double* src, const double* mul, double* dst)
 {
-    const real* const end = mul - 3 + nbs;
+    const double* const end = mul - 3 + nbs;
     /*
      This follows the standard pattern defined below, except
      that the negative terms are not present on the first vector.
@@ -886,7 +886,7 @@ void addProjectionDiff_F(const size_t nbs, const real* mul, const real* X, real*
 
 #include "simd.h"
 
-void addProjectionDiff_SSE(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_SSE(const size_t nbs, const double* mul, const double* X, double* Y)
 {
     vec2 px = load2(X);
     vec2 pw = setzero2();
@@ -910,7 +910,7 @@ void addProjectionDiff_SSE(const size_t nbs, const real* mul, const real* X, rea
 
 #include "simd.h"
 
-void addProjectionDiff_AVX(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X, double* Y)
 {
     real * pY = Y;
     real const* pX = X;

@@ -80,12 +80,6 @@ public:
     
     /// Vector multiplication: Y <- M * X, size(X) = size(Y) = size(M)
     virtual void vecMul(const real* X, real* Y) const;
-
-    /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)
-    virtual void vecMulAddIso2D(const real*, real*) const = 0;
-    
-    /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 3 * size(M)
-    virtual void vecMulAddIso3D(const real*, real*) const = 0;
     
     //----------------------------------------------------------------------
     

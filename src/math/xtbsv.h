@@ -627,7 +627,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
 #endif
 
 
-#ifdef __SSE3__
+#if defined(__SSE3__)
 /// specialized version for single precision, KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 {
@@ -727,7 +727,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 #endif
 
 
-#ifdef __SSE3__
+#if defined(__SSE3__)
 /// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX)
 {

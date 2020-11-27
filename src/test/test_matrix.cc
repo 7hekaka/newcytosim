@@ -457,13 +457,13 @@ void testMatrices(const size_t size, const size_t fill)
     setVectors(DIM*size, x, y, z);
     alpha = RNG.sreal();
     
-    SparMat1 mat1; //testMatrix(mat1, size, x, y, z, fill, inx, iny);
-    SparMat2 mat2; //testMatrix(mat2, size, x, y, z, fill, inx, iny);
+    SparMat1 mat1; testMatrix(mat1, size, x, y, z, fill, inx, iny);
+    SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
 #if 1
     SparMatB mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
     SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
     //testMatrix(mat4, size, x, y, z, fill, inx, iny);
-    //SparMatA mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
+    SparMatA mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
 #endif
 #ifdef _OPENMP
     testMatrixParallel(mat5, size, x, y, z, fill, inx, iny);

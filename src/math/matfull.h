@@ -113,13 +113,6 @@ public:
     void transVecMul(const real* X, real* Y) const
     { zero_real(size_, Y); transVecMulAdd(X, Y); }
 
-/*
-    /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 2 * size(M)
-    void vecMulAddIso2D(const real* X, real* Y) const { }
-    
-    /// isotropic vector multiplication: Y = Y + M * X, size(X) = size(Y) = 3 * size(M)
-    void vecMulAddIso3D(const real* X, real* Y) const { }
-*/
     /// maximum of the absolute value of all elements
     real norm_inf() const;
     

@@ -11,12 +11,13 @@
 
 
 #ifdef __AVX__
-#  define MATRIX2_USES_AVX REAL_IS_DOUBLE
-#  define MATRIX2_USES_SSE 0
+#  define MATRIX2_USES_AVX 1
+#  define MATRIX2_USES_SSE 1
 #  include "simd.h"
+#  include "simd_float.h"
 #elif defined(__SSE3__)
-#  define MATRIX2_USES_AVX REAL_IS_DOUBLE
-#  define MATRIX2_USES_SSE REAL_IS_DOUBLE
+#  define MATRIX2_USES_AVX 0
+#  define MATRIX2_USES_SSE 1
 #  include "simd.h"
 #else
 #  define MATRIX2_USES_AVX 0
@@ -962,7 +963,7 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
 
 #endif
 
-#if MATRIX2_USES_AVX
+#if MATRIX2_USES_AVX && REAL_IS_DOUBLE
 
 /*
 Accumulation is done here in the higher part of 'ss'
@@ -1069,7 +1070,7 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
 //------------------------------------------------------------------------------
 #pragma mark - 3D SIMD
 
-#if MATRIX2_USES_AVX && MATRIX2_OPTIMIZED_MULTIPLY
+#if MATRIX2_USES_AVX && MATRIX2_OPTIMIZED_MULTIPLY && REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
                                         size_t start, size_t stop) const
 {
@@ -1115,6 +1116,51 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
 }
 #endif
 
+#if defined(__SSE3__) && MATRIX2_OPTIMIZED_MULTIPLY && !REAL_IS_DOUBLE
+void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
+                                        size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    assert_true( stop <= alcDSS_ );
+    size_t jj = colDSS_[start];
+    unsigned * inx = colDSS_ + start;
+    float const* val = valDSS_ + start;
+    float const* end = valDSS_ + stop;
+    
+    //printf("SparMatSym2 column %lu has %lu elements\n", jj, stop - start);
+    vec4f zz = setzero4f();
+    vec4f xx = blend4f(loadu4f(X+jj), zz, 0b1000);
+    vec4f yy = fmadd4f(broadcast1f(val), xx, loadu4f(Y+jj));
+    // process one element when the number of values is even
+    if ( 0 == (( stop - start ) & 1) )
+    {
+        size_t ii = *(++inx);
+        vec4f aa = broadcast1f(++val);
+        zz = mul4f(aa, loadu4f(X+ii));
+        storeu4f(Y+ii, fmadd4f(aa, xx, loadu4f(Y+ii)));
+    }
+    ++val;
+    ++inx;
+    while ( val < end )
+    {
+        size_t ii = *(inx  );
+        size_t kk = *(inx+1);
+        assert_true( kk > ii );
+        inx += 2;
+        vec4f aa = broadcast1f(val);
+        vec4f bb = broadcast1f(val+1);
+        vec4f nn = loadu4f(Y+ii);
+        vec4f mm = loadu4f(Y+kk);
+        val += 2;
+        yy = fmadd4f(aa, loadu4f(X+ii), yy);
+        zz = fmadd4f(bb, loadu4f(X+kk), zz);
+        storeu4f(Y+ii, fmadd4f(aa, xx, nn));
+        storeu4f(Y+kk, fmadd4f(bb, xx, mm));
+    }
+    store3f(Y+jj, add4f(yy, zz));
+    assert_true( val == end );
+}
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Matrix-Vector Add-multiply
@@ -1156,9 +1202,8 @@ void SparMatSym2::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t st
 #endif
     {
 #if MATRIX2_OPTIMIZED_MULTIPLY
-#  if MATRIX2_USES_AVX
-        vecMulAddColIso2D_SSEU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
-#  elif MATRIX2_USES_SSE
+#  if MATRIX2_USES_AVX && REAL_IS_DOUBLE
+        //vecMulAddColIso2D_AVXU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
         vecMulAddColIso2D_SSEU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #  else
         vecMulAddColIso2D(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
@@ -1187,11 +1232,12 @@ void SparMatSym2::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
 #endif
     {
 #if MATRIX2_OPTIMIZED_MULTIPLY
-#  if MATRIX2_USES_AVX
+#  if MATRIX2_USES_AVX && REAL_IS_DOUBLE
         vecMulAddColIso3D_AVX(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
-#  else
-        vecMulAddColIso3D(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
+#  elif MATRIX2_USES_SSE && !REAL_IS_DOUBLE
+        vecMulAddColIso3D_SSE(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #  endif
+        //vecMulAddColIso3D(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #else
         if ( colsiz_[jj] > 0 )
         {

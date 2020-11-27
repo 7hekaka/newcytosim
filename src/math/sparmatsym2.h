@@ -113,6 +113,9 @@ private:
     void vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t start, size_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
+    void vecMulAddColIso3D_SSE(const float* X, float* Y, size_t start, size_t stop) const;
+    
+    /// One column 3D isotropic multiplication of a vector
     void vecMulAddColIso3D_AVX(const double* X, double* Y, size_t start, size_t stop) const;
 
 public:
