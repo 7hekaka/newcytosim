@@ -115,32 +115,33 @@ public:
         /// multiplication of a vector: Y <- Y + M * X, block_size = 4
         void vecMulAdd4D(const real* X, real* Y, size_t j) const;
 
-        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_SSE(const real* X, real* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVX(const real* X, real* Y, size_t j) const;
+        void vecMulAdd2D_SSE(const double* X, double* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVXU(const real* X, real* Y, size_t j) const;
+        void vecMulAdd2D_AVX(const double* X, double* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVXUU(const real* X, real* Y, size_t j) const;
+        void vecMulAdd2D_AVXU(const double* X, double* Y, size_t j) const;
+        
+        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
+        void vecMulAdd2D_AVXUU(const double* X, double* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_SSE(const real* X, real* Y, size_t j) const;
+        void vecMulAdd3D_SSE(const float* X, float* Y, size_t j) const;
         
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_SSEU(const real* X, real* Y, size_t j) const;
+        void vecMulAdd3D_SSEU(const float* X, float* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_AVX(const real* X, real* Y, size_t j) const;
+        void vecMulAdd3D_AVX(const double* X, double* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_AVXU(const real* X, real* Y, size_t j) const;
+        void vecMulAdd3D_AVXU(const double* X, double* Y, size_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 4
-        void vecMulAdd4D_AVX(const real* X, real* Y, size_t j) const;
+        void vecMulAdd4D_AVX(const double* X, double* Y, size_t j) const;
     };
 
 private:

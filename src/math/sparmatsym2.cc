@@ -737,7 +737,7 @@ bool SparMatSym2::prepareForMultiply(int dim)
     if ( inx != nbe ) ABORT_NOW("internal error");
     rowDSS_[size_] = inx;
     
-    //printSparse(std::clog, 0, 0, 4);
+    //printSparse(std::clog, 0, 22, 28);
     //printSparseArray(std::clog);
     return true;
 }
@@ -821,7 +821,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
 
-#if defined(__SSE3__)
+#if defined(__SSE3__) && REAL_IS_DOUBLE
 
 inline void multiply2(const double* X, double* Y, size_t ii,
                       const double* val, vec2 const& xx, vec2& ss)

@@ -732,18 +732,18 @@ void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 #pragma mark - Manually Optimized Vector Multiplication
 
 #if ( BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
     printf("SMSB %lu : %lu\n", jj, size_);
     // load 3x3 matrix diagonal element into 3 vectors:
-    real const* D = blk_[0];
+    float const* D = blk_[0];
     
     //multiply with the symmetrized block, assuming it has been symmetrized:
-    //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
-    //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
-    //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
+    // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
+    // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
+    // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
@@ -764,7 +764,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
-        real const* M = blk_[n];
+        float const* M = blk_[n];
 # if ( BLD == 4 )
         const vec4f m012 = streamload4f(M  );
         const vec4f m345 = streamload4f(M+4);
@@ -806,18 +806,18 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const real* X, real* Y, size_t jj) c
 
 
 #if ( BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
     //std::cout << blk_[0].to_string(7,1); printf(" MSSB %lu : %lu\n", jj, size_);
     // load 3x3 matrix diagonal element into 3 vectors:
-    real const* D = blk_[0];
+    float const* D = blk_[0];
     
     //multiply with the diagonal block, assuming it has been symmetrized:
-    //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
-    //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
-    //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
+    // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
+    // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
+    // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     const vec4f tt = loadu4f(X+jj);
 # if ( BLD == 4 )
@@ -847,8 +847,8 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
                 const size_t ii = inx_[n  ];
                 const size_t kk = inx_[n+1];
                 assert_true( ii < kk );
-                real const* M = blk_[n  ];
-                real const* P = blk_[n+1];
+                float const* M = blk_[n  ];
+                float const* P = blk_[n+1];
 # if ( BLD == 4 )
                 const vec4f m012 = streamload4f(M  );
                 const vec4f m345 = streamload4f(M+4);
@@ -889,7 +889,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
         for ( ; n < size_; ++n )
         {
             const size_t ii = inx_[n];
-            real const* M = blk_[n];
+            float const* M = blk_[n];
 # if ( BLD == 4 )
             const vec4f m012 = streamload4f(M  );
             const vec4f m345 = streamload4f(M+4);
@@ -936,7 +936,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const real* X, real* Y, size_t jj) 
 #pragma mark - Manually Optimized Vector Multiplication
 
 #if ( BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     vec2 x0, x1;
@@ -949,10 +949,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) c
         x1 = unpackhi2(xx, xx);
         
         // load 2x2 matrix element into 2 vectors:
-        real const* D = blk_[0];
+        double const* D = blk_[0];
         //assume the block is already symmetrized:
-        //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
-        //real Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
+        // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
+        // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
         xx = add2(mul2(load2(D  ), x0), yy);
         yy = add2(mul2(load2(D+2), x1), xx);
     }
@@ -964,7 +964,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) c
         vec2 xx = load2(X+ii);
         
         // load 2x2 matrix element into 2 vectors:
-        real const* M = blk_[n];
+        double const* M = blk_[n];
         vec2 m01 = load2(M);
         vec2 m23 = load2(M+2);
         
@@ -989,15 +989,15 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const real* X, real* Y, size_t jj) c
 #endif
 
 #if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
     // xy = { X0 X1 X0 X1 }
     vec4 xy = broadcast2(X+jj);
     //multiply with full block, assuming it is symmetric:
-    //real Y0 = M[0] * X0 + M[1] * X1;
-    //real Y1 = M[1] * X0 + M[3] * X1;
+    // Y0 = M[0] * X0 + M[1] * X1;
+    // Y1 = M[1] * X0 + M[3] * X1;
     
     // yyyy = { Y0 Y0 Y1 Y1 }
     // load 2x2 matrix element into 2 vectors:
@@ -1038,7 +1038,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const real* X, real* Y, size_t jj) c
 
 
 #if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
+inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
     vec4 u = fmadd4(mat, xxxx, cast4(load2(Y+ii)));
@@ -1049,7 +1049,7 @@ inline void multiply2D(real const* X, real* Y, size_t ii, vec4 const& mat, vec4 
 
 
 #if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
@@ -1105,7 +1105,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const real* X, real* Y, size_t jj) 
 
 
 #if ( BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
@@ -1177,17 +1177,17 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const real* X, real* Y, size_t jj)
 
 
 #if ( BLOCK_SIZE == 3 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
     // load 3x3 matrix diagonal element into 3 vectors:
-    real const* D = blk_[0];
+    double const* D = blk_[0];
     
     //multiply with the symmetrized block, assuming it has been symmetrized:
-    //real Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
-    //real Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
-    //real Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
+    // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
+    // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
+    // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     vec4 s0, s1, s2;
     vec4 x0, x1, x2;
@@ -1221,7 +1221,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) c
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
-        real const* M = blk_[n];
+        double const* M = blk_[n];
 # if ( BLD == 4 )
         const vec4 m012 = streamload4(M  );
         const vec4 m345 = streamload4(M+4);
@@ -1266,7 +1266,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const real* X, real* Y, size_t jj) c
 
 
 #if ( BLOCK_SIZE == 3 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
@@ -1380,11 +1380,11 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const real* X, real* Y, size_t jj) 
 
 
 #if ( BLOCK_SIZE == 4 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t jj) const
 {
     assert_true(size_ > 0);
     assert_true(inx_[0] == jj);
-    real const* D = blk_[0];
+    double const* D = blk_[0];
     //multiply with the symmetrized block, assuming it has been symmetrized:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     vec4 s0, s1, s2, s3;
@@ -1415,7 +1415,7 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const real* X, real* Y, size_t jj) c
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
-        real const* M = blk_[n];
+        double const* M = blk_[n];
         const vec4 yy = load4(Y+ii);
         const vec4 xyzt = load4(X+ii);  // xyzt = { X0 X1 X2 X3 }
         const vec4 m0 = streamload4(M);

@@ -3,8 +3,8 @@
 
 OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
     	rasterizer.o matrix.o sparmat.o sparmatsym.o project_ellipse.o\
-    	sparmatsym1.o polygon.o spherical_code.o random.o random_vector.o\
-        matrix34.o matfull.o quartic_solver.o
+    	sparmatsym1.o sparmatsym2.o matrix34.o matfull.o polygon.o\
+        spherical_code.o random.o random_vector.o quartic_solver.o
 
 OBJ_SPARMAT := sparmatblk.o sparmatsymblk.o sparmatsymblkdiag.o
 
@@ -16,9 +16,6 @@ INC_BM:=-Isrc/base -Isrc/math
 $(OBJ_MATH): %.o: %.cc %.h | build
 	$(COMPILE) $(INC_BM) -c $< -o build/$@
 
-
-sparmatsym2.o: sparmatsym2.cc sparmatsym2.h
-	$(COMPILE) $(INC_BM) -c $< -o build/$@
 
 
 sparmatsymblk.o: sparmatsymblk.cc sparmatsymblk.h
