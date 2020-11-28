@@ -32,7 +32,7 @@ namespace gle
     GLuint ico_nfaces[8] = { 0 };
     
     /// inverse square root
-#ifdef __SSE3__
+#if defined(__SSE3__)
     inline float invsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
 #else
     inline float invsqrt(float x) { return 1.0f / sqrtf(x); }
