@@ -29,8 +29,8 @@ SparMatSymBlk::SparMatSymBlk()
     size_    = 0;
     alloc_   = 0;
     column_  = nullptr;
-    next_    = new size_t[1];
-    next_[0] = 0;
+    colidx_  = new unsigned[2];
+    colidx_[0] = 0;
 }
 
 
@@ -58,10 +58,10 @@ void SparMatSymBlk::allocate(size_t alc)
         column_ = ptr;
         alloc_  = alc;
         
-        delete[] next_;
-        next_ = new size_t[alc+1];
+        delete[] colidx_;
+        colidx_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
-            next_[n] = n;
+            colidx_[n] = n;
     }
 }
 
@@ -69,9 +69,9 @@ void SparMatSymBlk::allocate(size_t alc)
 void SparMatSymBlk::deallocate()
 {
     delete[] column_;
-    delete[] next_;
+    delete[] colidx_;
     column_ = nullptr;
-    next_   = nullptr;
+    colidx_ = nullptr;
     alloc_ = 0;
 }
 
@@ -503,7 +503,7 @@ void SparMatSymBlk::printColumns(std::ostream& os, size_t start, size_t stop)
         if ( column_[j].isNotZero() )
         {
             os << "\n   " << j << "   " << column_[j].size_;
-            os << " next " << next_[j];
+            os << " index " << colidx_[j];
         }
     std::endl(os);
 }
@@ -584,7 +584,7 @@ void SparMatSymBlk::sortElements()
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
-    for ( size_t j = next_[0]; j < size_; j = next_[j+1] )
+    for ( size_t j = colidx_[0]; j < size_; j = colidx_[j+1] )
     {
         assert_true( j < size_ );
         Column & col = column_[j];
@@ -621,8 +621,6 @@ void SparMatSymBlk::sortElements()
 
 bool SparMatSymBlk::prepareForMultiply(int)
 {
-    next_[size_] = size_;
-    
     if ( size_ > 0 )
     {
         size_t inx = size_;
@@ -631,12 +629,13 @@ bool SparMatSymBlk::prepareForMultiply(int)
         {
             if ( column_[inx].isNotZero() )
                 nxt = inx;
-            next_[inx] = nxt;
+            colidx_[inx] = nxt;
         }
     }
-    
+    colidx_[size_] = size_;
+
     // check if matrix is empty:
-    if ( next_[0] == size_ )
+    if ( colidx_[0] == size_ )
         return false;
     
     sortElements();
@@ -1472,7 +1471,7 @@ void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop)
     assert_true( start <= stop );
     assert_true( stop <= size_ );
 #if ( 1 )
-    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; jj += BLOCK_SIZE )
         if ( !column_[jj].empty() )
@@ -1495,7 +1494,7 @@ void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop)
 // multiplication of a vector: Y = Y + M * X
 void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y) const
 {
-    for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
+    for ( size_t jj = colidx_[0]; jj < size_; jj = colidx_[jj+1] )
     {
         //std::clog << "SparMatSymBlk column " << jj << "  " << size_ << " \n";
 #if ( BLOCK_SIZE == 1 )
@@ -1516,7 +1515,7 @@ void SparMatSymBlk::vecMulAdd_TIME(const real* X, real* Y) const
 {
     size_t cnt = 0, col = 0;
     //auto rdt = __rdtscd();
-    for ( size_t jj = next_[0]; jj < size_; jj = next_[jj+1] )
+    for ( size_t jj = colidx_[0]; jj < size_; jj = colidx_[jj+1] )
     {
         col++;
         cnt += column_[jj].size_;

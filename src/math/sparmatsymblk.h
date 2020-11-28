@@ -163,8 +163,8 @@ private:
     /// array col_[c][] holds Elements of column 'c'
     Column * column_;
     
-    /// next_[ii] is the index of the first non-empty column of index >= ii
-    size_t * next_;
+    /// colidx_[i] is the index of the first non-empty column of index >= i
+    unsigned * colidx_;
 
 public:
     

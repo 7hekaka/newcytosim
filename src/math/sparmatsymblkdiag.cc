@@ -599,8 +599,6 @@ void SparMatSymBlkDiag::sortElements()
 bool SparMatSymBlkDiag::prepareForMultiply(int)
 {
     size_t last = size_/BLOCK_SIZE;
-    colix_[last] = last;
-    
     if ( size_ > 0 )
     {
         size_t inx = last;
@@ -612,7 +610,8 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
             colix_[inx] = nxt;
         }
     }
-    
+    colix_[last] = last;
+
     for ( size_t j = 0; j < last; ++j )
     {
         pilar_[j].dia_.copy_lower();

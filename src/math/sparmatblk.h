@@ -168,8 +168,8 @@ private:
     /// array col_[c][] holds Elements of column 'c'
     Line *    row_;
     
-    /// next_[ii] is the index of the first non-empty column of index >= ii
-    size_t *  next_;
+    /// colidx_[i] is the index of the first non-empty row of index >= i
+    unsigned * colidx_;
 
     /// memory for consolidated version
     Block * blocks_;

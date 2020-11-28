@@ -51,22 +51,20 @@ private:
     
     /// colmax_[c] is the number of Elements allocated in column 'c'
     unsigned * colmax_;
-    
+
+#if MATRIX1_USES_COLNEXT
+    /// colidx_[i] is the index of the first non-empty column of index >= i
+    unsigned * colidx_;
+#endif
+
     /// allocate column to hold specified number of values
     void allocateColumn(size_t jj, size_t nb);
     
     /// insert new element in column jj
     Element* insertElement(size_t jj, size_t inx);
 
-#if MATRIX1_USES_COLNEXT
-    
-    /// next_[ii] is the index of the first non-empty column of index >= ii
-    unsigned * next_;
-    
-    /// update next_[], a pointer to the next non-empty column
-    void setNextColumn();
-
-#endif
+    /// update colidx_[], a pointer to the next non-empty column
+    void setColumnIndex();
     
 #if MATRIX1_OPTIMIZED_MULTIPLY
 

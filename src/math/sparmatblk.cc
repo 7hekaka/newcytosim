@@ -14,8 +14,8 @@ SparMatBlk::SparMatBlk()
     alloc_   = 0;
     row_     = nullptr;
     blocks_  = nullptr;
-    next_    = new size_t[1];
-    next_[0] = 0;
+    colidx_  = new unsigned[2];
+    colidx_[0] = 0;
 }
 
 
@@ -44,10 +44,10 @@ void SparMatBlk::allocate(size_t alc)
         row_   = row_new;
         alloc_ = alc;
         
-        delete[] next_;
-        next_ = new size_t[alc+1];
+        delete[] colidx_;
+        colidx_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
-            next_[n] = n;
+            colidx_[n] = n;
     }
 }
 
@@ -55,10 +55,11 @@ void SparMatBlk::allocate(size_t alc)
 void SparMatBlk::deallocate()
 {
     delete[] row_;
-    delete[] next_;
-    row_ = nullptr;
-    next_ = nullptr;
+    delete[] colidx_;
     free_real(blocks_);
+    row_ = nullptr;
+    colidx_ = nullptr;
+    blocks_ = nullptr;
     alloc_ = 0;
 }
 
@@ -394,7 +395,7 @@ void SparMatBlk::printLines(std::ostream& os)
         if ( row_[i].isNotZero() )
         {
             os << "\n   " << i << "   " << row_[i].size_;
-            os << " next " << next_[i];
+            os << " index " << colidx_[i];
         }
     std::endl(os);
 }
@@ -480,7 +481,7 @@ void SparMatBlk::sortElements()
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
-    for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
+    for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
     {
         assert_true( i < size_ );
         Line & row = row_[i];
@@ -510,7 +511,7 @@ void SparMatBlk::consolidate()
 {
     size_t cnt = 0;
     
-    for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
+    for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
     {
         cnt += row_[i].size_;
         //std::cerr << "\nMatrixSparseBlock line " << i << "  " << row.size_ << "  " << row.blk_ << "";
@@ -544,7 +545,7 @@ void SparMatBlk::consolidate()
  */
 void SparMatBlk::symmetrize()
 {
-    for ( size_t i = next_[0]; i < size_; i = next_[i+1] )
+    for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
     {
         Line & row = row_[i];
         //std::clog << "SMB line " << i << " has " << row.size_ << " elements\n";
@@ -585,8 +586,6 @@ void SparMatBlk::symmetrize()
 
 bool SparMatBlk::prepareForMultiply(int)
 {
-    next_[size_] = size_;
-    
     if ( size_ > 0 )
     {
         size_t inx = size_;
@@ -595,12 +594,13 @@ bool SparMatBlk::prepareForMultiply(int)
         {
             if ( row_[inx].isNotZero() )
                 nxt = inx;
-            next_[inx] = nxt;
+            colidx_[inx] = nxt;
         }
     }
-        
+    colidx_[size_] = size_;
+
     // check if matrix is empty:
-    if ( next_[0] == size_ )
+    if ( colidx_[0] == size_ )
         return false;
 
     sortElements();
@@ -635,7 +635,7 @@ void SparMatBlk::vecMulAdd_SCAL(const real* X, real* Y, size_t start, size_t sto
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
-    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
         row_[i].vecMul(X).add_to(Y+i);
 }
 
@@ -950,7 +950,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
-    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
@@ -971,7 +971,7 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
-    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
@@ -994,7 +994,7 @@ void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t sto
     assert_true( stop <= size_ );
     size_t cnt = 0, row = 0;
     //auto rdt = __rdtsc();
-    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
         row++;
         cnt += row_[i].size_;
@@ -1028,7 +1028,7 @@ void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
      not every line will be addressed below */
     zero_real(stop-start, Y+start);
     
-    for ( size_t i = next_[start]; i < stop; i = next_[i+1] )
+    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] = row_[i].vecMul1D(X);

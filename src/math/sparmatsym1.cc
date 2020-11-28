@@ -36,8 +36,8 @@ SparMatSym1::SparMatSym1()
     sa_   = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-    next_ = new unsigned[1];
-    next_[0] = 0;
+    colidx_ = new unsigned[2];
+    colidx_[0] = 0;
 #endif
 }
 
@@ -85,10 +85,10 @@ void SparMatSym1::allocate(size_t alc)
         }
         
 #if MATRIX1_USES_COLNEXT
-        delete[] next_;
-        next_ = new unsigned[alc+1];
+        delete[] colidx_;
+        colidx_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
-            next_[n] = n;
+            colidx_[n] = n;
 #endif
     }
 }
@@ -103,14 +103,14 @@ void SparMatSym1::deallocate()
         delete[] column_; column_ = nullptr;
         delete[] colsiz_; colsiz_ = nullptr;
         delete[] colmax_; colmax_ = nullptr;
+#if MATRIX1_USES_COLNEXT
+        delete[] colidx_; colidx_ = nullptr;
+#endif
 #if MATRIX1_OPTIMIZED_MULTIPLY
         delete[] ija_;
         free_real(sa_);
         ija_ = nullptr;
         sa_ = nullptr;
-#endif
-#if MATRIX1_USES_COLNEXT
-        delete[] next_;  next_ = nullptr;
 #endif
     }
     alloc_ = 0;
@@ -505,7 +505,7 @@ void SparMatSym1::printColumns(std::ostream& os, size_t start, size_t stop)
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
 #if MATRIX1_USES_COLNEXT
-        os << " next " << next_[jj];
+        os << " index " << colidx_[jj];
 #endif
     }
     std::endl(os);
@@ -632,22 +632,9 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element c
 //------------------------------------------------------------------------------
 #pragma mark - Prepare Multiplication
 
-
-#if !MATRIX1_OPTIMIZED_MULTIPLY
-
-bool SparMatSym1::prepareForMultiply(int)
-{
-    return true;
-}
-
-#else
-
-
 #if MATRIX1_USES_COLNEXT
-void SparMatSym1::setNextColumn()
+void SparMatSym1::setColumnIndex()
 {
-    next_[size_] = size_;
-
     if ( size_ > 0 )
     {
         size_t inx = size_;
@@ -656,20 +643,33 @@ void SparMatSym1::setNextColumn()
         {
             if ( colsiz_[inx] > 0 )
                 nxt = inx;
-            next_[inx] = nxt;
+            colidx_[inx] = nxt;
         }
     }
+    colidx_[size_] = size_;
+}
+#else
+void SparMatSym1::setColumnIndex()
+{
 }
 #endif
 
+
+#if !MATRIX1_OPTIMIZED_MULTIPLY
+
+bool SparMatSym1::prepareForMultiply(int)
+{
+    setColumnIndex();
+    return true;
+}
+
+#else
 
 bool SparMatSym1::prepareForMultiply(int dim)
 {
     assert_true( size_ <= alloc_ );
     
-#if MATRIX1_USES_COLNEXT
-    setNextColumn();
-#endif
+    setColumnIndex();
     
 #if ( 0 )
     size_t cnt = 0;
@@ -1122,10 +1122,10 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
 void SparMatSym1::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
 
 #if MATRIX1_USES_COLNEXT
-    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; ++jj )
 #endif
@@ -1146,10 +1146,10 @@ void SparMatSym1::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) c
 void SparMatSym1::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
 
 #if MATRIX1_USES_COLNEXT
-    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; ++jj )
 #endif
@@ -1177,10 +1177,10 @@ void SparMatSym1::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t st
 void SparMatSym1::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
 
 #if MATRIX1_USES_COLNEXT
-    for ( size_t jj = next_[start]; jj < stop; jj = next_[jj+1] )
+    for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; ++jj )
 #endif

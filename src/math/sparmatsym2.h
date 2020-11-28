@@ -52,41 +52,39 @@ private:
     
     /// colmax_[c] is the number of Elements allocated in column 'c'
     unsigned * colmax_;
-    
+
+#if MATRIX2_USES_COLNEXT
+    /// colidx_[i] is the index of the first non-empty column of index >= i
+    unsigned * colidx_;
+#endif
+
     /// allocate column to hold specified number of values
     void allocateColumn(size_t jj, size_t nb);
     
     /// insert new element in column jj
     Element* insertElement(size_t jj, size_t inx);
 
-#if MATRIX2_USES_COLNEXT
-    
-    /// next_[ii] is the index of the first non-empty column of index >= ii
-    unsigned * next_;
-    
-    /// update next_[], a pointer to the next non-empty column
-    void setNextColumn();
-
-#endif
+    /// update colidx_[], a pointer to the next non-empty column
+    void setColumnIndex();
     
 #if MATRIX2_OPTIMIZED_MULTIPLY
 
-    /// data for the DSS Symmetric Matrix Storage format
+    /// data for the DSS Symmetric Matrix Storage format = Compact Column Storage
     unsigned   alcDSS_;  ///< number of values
-    real     * valDSS_;  ///< values
-    unsigned * colDSS_;  ///< columns
-    unsigned * rowDSS_;  ///< rowIndex
+    real     * valDSS_;  ///< values of size alcDSS_: values
+    unsigned * colDSS_;  ///< columns of size alcDSS_: column index of value
+    unsigned * rowDSS_;  ///< rowIndex of size size_+1: index where column starts
 
 #endif
     
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    void vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 2D version
-    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    void vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 3D version
-    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    void vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const;
 
 
     /// One column multiplication of a vector
