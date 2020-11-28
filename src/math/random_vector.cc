@@ -268,8 +268,8 @@ const Vector3 Vector3::randOrthoU(const real len) const
     {
         const Vector2 V = Vector2::randU();
         Vector3 x, y, z = *this / std::sqrt(n);
-        z.orthonormal(x, y);
-        return x * ( len * V.XX ) + y * ( len * V.YY );
+        z.orthonormal(x, y, len);
+        return x * V.XX + y * V.YY;
     }
     return randU(len);
 }

@@ -93,9 +93,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     
     // set orthonormal coordinate system
     Vector E(0,prop->radius,0), F(0,0,prop->radius);
-    dir.orthonormal(E, F);
-    E *= prop->radius;
-    F *= prop->radius;
+    dir.orthonormal(E, F, prop->radius);
     
     // translate protofilaments to form a tube:
     real a = 0; //M_PI * RNG.sreal();

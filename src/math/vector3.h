@@ -587,19 +587,18 @@ public:
 #else
         assert_small(normSqr() - 1.0);
 #endif
-        
         real s = std::copysign(real(1.0), ZZ);
 #if ( 1 )
-        /// optimized version by Marc B. Reynolds
+        // optimized version by Marc B. Reynolds
         const real a = YY / ( ZZ + s );
         const real b = YY * a;
         const real c = XX * a;
         // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
         E.set(-ZZ - b, c, XX);
         F.set(s * c, s * b - 1.0, s * YY);
-        //if you do not mind an inverted basis, use F.set(c, b-s, YY);
+        // for an inverted basis, use F.set(c, b-s, YY);
 #else
-        /// original code from Duff et al.
+        // original code from Tom Duff et al.
         const real a = -1.0 / ( ZZ + s );
         const real b = XX * YY * a;
         // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-s*s)
@@ -608,7 +607,40 @@ public:
 #endif
     }
     
-    
+    /**
+     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = nrm
+     assuming that 'norm(*this) == 1'
+     
+     From `Building an Orthonormal Basis, Revisited`,
+     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
+     */
+    void orthonormal(Vector3& E, Vector3& F, real nrm) const
+    {
+#if 0
+        if ( abs_real(normSqr() - 1.0) > 0.01 )
+        {
+            // this should not happen...
+            E = orthogonal(1);
+            F = cross(*this, E).normalized();
+            std::clog << "rescued orthonormal(" << toString() << ")\n";
+            return;
+        }
+#else
+        assert_small(normSqr() - 1.0);
+#endif
+        real s = std::copysign(real(1.0), ZZ);
+        // optimized version by Marc B. Reynolds
+        const real nY = nrm * YY;
+        const real a = nY / ( ZZ + s );
+        const real b = YY * a;
+        const real c = XX * a;
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        E.set(-nrm * ZZ - b, c, nrm * XX);
+        F.set(s * c, s * b - nrm, s * nY);
+        // for an inverted basis, use F.set(c, b - s * nrm, nY);
+        //std::clog << " orthonormal " << nrm <<  " " << E.norm() << " " << F.norm() << " " << dot(E, F) << "\n";
+    }
+
     /// rotate `vec` around `*this`, by angle defined by cosinus and sinus
     /**
      It is assumed that norm(*this)==1

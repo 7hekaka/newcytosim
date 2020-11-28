@@ -481,18 +481,15 @@ void Rasterizer::paintFatLine3D(void (*paint)(int, int, int, int, void*), void *
                                 const Vector3& P, const Vector3& Q, const real iPQ,
                                 const real radius, const Vector3& offset, const Vector3& delta )
 {
-    real radius2 = radius * M_SQRT2;
     Vector3 PQ = ( Q - P ) * iPQ;
     Vector3 A, B;
     
-    // make an orthogonal basis with norm = radius:
+    // make an orthogonal basis with norm = radius * sqrt(2):
 #if ( 1 )
     //std::clog << std::scientific << PQ.normSqr() << '\n';
-    PQ.orthonormal(A, B);
-    A *= radius2;
-    B *= radius2;
+    PQ.orthonormal(A, B, radius*M_SQRT2);
 #else
-    A = PQ.orthogonal(radius2);
+    A = PQ.orthogonal(radius*M_SQRT2);
     B = cross(PQ, A);
 #endif
     
@@ -549,17 +546,14 @@ void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void *
     Vector3 A, B, C;
     Vector3 PQ = ( Q - P ) * iPQ;
     
-    PQ.orthonormal(A, C);
-    
-    // normalize vectors to norm = radius:
-    constexpr real alpha = 2.0 / M_SQRT3;
-    
+    PQ.orthonormal(A, C, radius);
+        
     PQ *= radius;
 
     // build the vertices of the Hexagon
-    A *= radius * alpha;
-    B  = C * radius + A * 0.5;
-    C  = B - A;
+    A *= 2.0 / M_SQRT3;
+    B = C + A * 0.5;
+    C = B - A;
     
     A = A.e_mul(delta);
     B = B.e_mul(delta);

@@ -217,10 +217,7 @@ void drawValues(Grid<CELL, 3> const& grid,
     int m = (int)( grid.radius() / n );
     
     Vector3 dx, dy;
-    dir.orthonormal(dx, dy);
-    dx *= n;
-    dy *= n;
-    
+    dir.orthonormal(dx, dy, n);
     Vector3 dh = dy * std::cos(M_PI/6);
     
     for ( int y = -m; y <= m; y+=2 )
