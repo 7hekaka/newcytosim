@@ -378,15 +378,16 @@ public:
         val[0xE] = val[0xB];
     }
 
-    /// true if matrix is symmetric
+    /// relative asymmetry of matrix (divided by the trace)
     real asymmetry() const
     {
+        real t = abs_real(val[0]) + abs_real(val[0x5]) + abs_real(val[0xA]) + abs_real(val[0xF]);
         return (  abs_real(val[0x4]-val[0x1])
                 + abs_real(val[0x8]-val[0x2])
                 + abs_real(val[0xC]-val[0x3])
                 + abs_real(val[0x9]-val[0x6])
                 + abs_real(val[0xD]-val[0x7])
-                + abs_real(val[0xE]-val[0xB]) );
+                + abs_real(val[0xE]-val[0xB]) ) / t;
     }
     
 #pragma mark -

@@ -26,7 +26,7 @@
  column vector. Thus, vector mulitplication can be done using SIMD instructions
  without swap or shuffles.
 
- Matrix34 is defacto a 3x4 matrix, but it can be used as a 3x3 matrix.
+ Matrix34 is defacto a 3x4 matrix, which can be used as a 3x3 matrix.
  The function clear_shadow() clears the data that is not part of the 3x3 matrix.
  */
 class alignas(4*sizeof(real)) Matrix34 final
@@ -492,11 +492,12 @@ public:
         val[6] = val[9];
     }
 
-    /// true if 3x3 subset of matrix is symmetric
+    /// asymmetry of 3x3 submatrice, divided by the trace
     real asymmetry() const
     {
+        real t = abs_real(val[0]) + abs_real(val[4]) + abs_real(val[8]);
         return ( abs_real(val[4]-val[1]) + abs_real(val[8]-val[2])
-                + abs_real(val[9]-val[6]) );
+                + abs_real(val[9]-val[6]) ) / t;
     }
 
 #pragma mark -
@@ -971,23 +972,23 @@ public:
     /// return [ dir (x) transpose(vec) + vec (x) transpose(dir) ]
     static Matrix34 symmetricOuterProduct(Vector3 const& dir, Vector3 const& vec)
     {
-        real xx = dir.XX * vec.XX;
-        real yy = dir.YY * vec.YY;
-        real zz = dir.ZZ * vec.ZZ;
-        return symmetric(xx+xx, dir.YY*vec.XX + dir.XX*vec.YY, dir.ZZ*vec.XX + dir.XX*vec.ZZ,
-                         yy+yy, dir.ZZ*vec.YY + dir.YY*vec.ZZ,
-                         zz+zz);
+        real X = dir.XX * vec.XX;
+        real Y = dir.YY * vec.YY;
+        real Z = dir.ZZ * vec.ZZ;
+        return symmetric(X+X, dir.YY*vec.XX + dir.XX*vec.YY, dir.ZZ*vec.XX + dir.XX*vec.ZZ,
+                         Y+Y, dir.ZZ*vec.YY + dir.YY*vec.ZZ,
+                         Z+Z);
     }
  
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
     static Matrix34 offsetOuterProduct(const real dia, Vector3 const& dir, const real len)
     {
-        real xl = dir.XX * len;
-        real yl = dir.YY * len;
-        real zl = dir.ZZ * len;
-        return symmetric(xl * dir.XX + dia, yl * dir.XX, zl * dir.XX,
-                         yl * dir.YY + dia, zl * dir.YY,
-                         zl * dir.ZZ + dia);
+        real X = dir.XX * len;
+        real Y = dir.YY * len;
+        real Z = dir.ZZ * len;
+        return symmetric(X * dir.XX + dia, Y * dir.XX, Z * dir.XX,
+                         Y * dir.YY + dia, Z * dir.YY,
+                         Z * dir.ZZ + dia);
     }
     
     // build the rotation matrix `M = 2 V * V' - 1` of angle 180

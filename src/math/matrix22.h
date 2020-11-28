@@ -237,10 +237,11 @@ public:
         return os.str();
     }
 
-    /// zero if matrix is symmetric
+    /// relative asymmetry = abs( difference of off-diagonal elements ) / trace
     real asymmetry() const
     {
-        return abs_real(val[2]-val[1]);
+        real t = abs_real(val[0]) + abs_real(val[3]);
+        return abs_real(val[2]-val[1]) / t;
     }
     
     /// scale all elements

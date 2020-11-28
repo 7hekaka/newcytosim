@@ -483,11 +483,12 @@ public:
         val[1+BLD*2] = val[2+BLD];
     }
 
-    /// true if matrix is symmetric
+    /// relative asymmetry of 3x3 submatrix (divided by the trace)
     real asymmetry() const
     {
+        real t = abs_real(val[0]) + abs_real(val[1+BLD]) + abs_real(val[2+BLD*2]);
         return ( abs_real(val[BLD]-val[1]) + abs_real(val[BLD*2]-val[2])
-                + abs_real(val[1+BLD*2]-val[2+BLD]) );
+                + abs_real(val[1+BLD*2]-val[2+BLD]) ) / t;
     }
     
 #pragma mark -
@@ -985,23 +986,23 @@ public:
     /// return [ dir (x) transpose(vec) + vec (x) transpose(dir) ]
     static Matrix33 symmetricOuterProduct(Vector3 const& dir, Vector3 const& vec)
     {
-        real xx = dir.XX * vec.XX;
-        real yy = dir.YY * vec.YY;
-        real zz = dir.ZZ * vec.ZZ;
-        return symmetric(xx+xx, dir.YY*vec.XX + dir.XX*vec.YY, dir.ZZ*vec.XX + dir.XX*vec.ZZ,
-                         yy+yy, dir.ZZ*vec.YY + dir.YY*vec.ZZ,
-                         zz+zz);
+        real X = dir.XX * vec.XX;
+        real Y = dir.YY * vec.YY;
+        real Z = dir.ZZ * vec.ZZ;
+        return symmetric(X+X, dir.YY*vec.XX + dir.XX*vec.YY, dir.ZZ*vec.XX + dir.XX*vec.ZZ,
+                         Y+Y, dir.ZZ*vec.YY + dir.YY*vec.ZZ,
+                         Z+Z);
     }
  
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
     static Matrix33 offsetOuterProduct(const real dia, Vector3 const& dir, const real len)
     {
-        real xl = dir.XX * len;
-        real yl = dir.YY * len;
-        real zl = dir.ZZ * len;
-        return symmetric(xl * dir.XX + dia, yl * dir.XX, zl * dir.XX,
-                         yl * dir.YY + dia, zl * dir.YY,
-                         zl * dir.ZZ + dia);
+        real X = dir.XX * len;
+        real Y = dir.YY * len;
+        real Z = dir.ZZ * len;
+        return symmetric(X * dir.XX + dia, Y * dir.XX, Z * dir.XX,
+                         Y * dir.YY + dia, Z * dir.YY,
+                         Z * dir.ZZ + dia);
     }
     
     // build the rotation matrix `M = 2 V * V' - 1` of angle 180
