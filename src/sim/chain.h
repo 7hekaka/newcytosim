@@ -76,18 +76,18 @@ class Chain : public Mecable
 private:
         
     /// actual section length: distance between consecutive points
-    real         fnCut, iCut;
+    real fnCut, iCut;
     
     /// target segmentation length (equal to parameter 'fiber:segmentation')
-    real         fnSegmentation;
+    real fnSegmentation;
   
 #if CURVATURE_DEPENDENT_SEGMENTATION
 
     /// error due to the cutting at different steps
-    real         autoCutVal;
+    real autoCutVal;
     
     /// number of errors accumulated
-    int          autoCutCnt;
+    int  autoCutCnt;
     
     /// reset auto variables
     void clearAutoCounters(bool=false);
@@ -95,10 +95,10 @@ private:
 #endif
     
     /// abscissa of the minus-end (equal to zero initially)
-    real         fnAbscissaM;
+    real fnAbscissaM;
     
     /// abscissa of the plus-end
-    real         fnAbscissaP;
+    real fnAbscissaP;
     
 #if FIBER_HAS_NORMAL
     /// vector orthogonal to backbone at the origin, used for display only
@@ -109,17 +109,17 @@ protected:
 
 #if NEW_SKIP_PROJECTION
     /// true if projection operator is identity
-    bool         skipProjection;
+    bool skipProjection;
 #endif
 
     /// time at birth
-    double       fnBirthTime;
+    double fnBirthTime;
 
     /// flag to update
-    bool         needUpdate;
+    bool needUpdate;
     
     /// true if iDir[] may be up-to-date
-    //bool         iDirValid;
+    //bool iDirValid;
 
     /// callback to signal that update is needed, to be called after a change in length
     void         postUpdate() { needUpdate = true; }
@@ -163,48 +163,48 @@ public:
     ~Chain() {}
     
     /// Number of segments = nbPoints() - 1
-    size_t       nbSegments()  const { return nPoints - 1; }
+    size_t nbSegments()  const { return nPoints - 1; }
     
     /// Index of the last segment = nbPoints() - 2
-    size_t       lastSegment() const { return nPoints - 2; }
+    size_t lastSegment() const { return nPoints - 2; }
 
     //---------------------
 
     /// set position of MINUS_END and direction (length and Nb of points are not modified)
     /** dir does not need to be normalized */
-    void         setStraight(Vector const& pos, Vector const& dir);
+    void setStraight(Vector const& pos, Vector const& dir);
     
     /// set position of 'ref', direction and length of Fiber
-    void         setStraight(Vector const& pos, Vector const& dir, real len);
+    void setStraight(Vector const& pos, Vector const& dir, real len);
 
     /// translate Fiber to place 'ref' at the position where the CENTER is located
-    void         placeEnd(FiberEnd ref);
+    void placeEnd(FiberEnd ref);
     
     /// set shape with `np` points from the given array of size DIM*n_pts
-    void         setShape(const real pts[], size_t n_pts, size_t np);
+    void setShape(const real pts[], size_t n_pts, size_t np);
 
     /// set shape as a random walk with given parameters
-    void         setEquilibrated(real length, real persistence_length);
+    void setEquilibrated(real length, real persistence_length);
 
     /// change the current segmentation to force `length()==len` (normally not needed)
-    void         imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
+    void imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
    
 #if NEW_SKIP_PROJECTION
-    void         setProjection(bool s) { skipProjection = s; }
+    void setProjection(bool s) { skipProjection = s; }
 #else
-    void         setProjection(bool) {}
+    void setProjection(bool) {}
 #endif
 
     //---------------------
 
     /// returns simulation time at which Fiber was created
-    real         birthTime() const { return fnBirthTime; }
+    real   birthTime() const { return fnBirthTime; }
 
     /// set birth time
-    void         birthTime(double t) { fnBirthTime = t; }
+    void   birthTime(double t) { fnBirthTime = t; }
     
     /// returns current age of the fiber
-    double       age() const;
+    double age() const;
 
     //---------------------
     

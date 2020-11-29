@@ -419,6 +419,7 @@ void ObjectPool::quicksort(int (*comp)(const void*, const void*))
  */
 void ObjectPool::permute(Object * p)
 {
+    assert_true( p  &&  p->nextO );
     if ( p  &&  p->nextO )
     {
         backO->nextO   = frontO;
@@ -428,14 +429,15 @@ void ObjectPool::permute(Object * p)
         backO->nextO   = nullptr;
         frontO->prevO  = nullptr;
     }
-    assert_false( bad() );
+    //assert_false( bad() );
 }
 
 
 /**
  Rearrange [F--P][X--Y][Q--L] into [X--Y][F--P][Q--L]
  
- If Q is between frontO and P, this will destroy the list,
+ Q must be after P
+ If Q is between Front and P, this will destroy the list,
  but there is no way to check such condition here.
  */
 void ObjectPool::shuffle_up(Object * p, Object * q)
@@ -452,14 +454,15 @@ void ObjectPool::shuffle_up(Object * p, Object * q)
         p->nextO        = q;
         q->prevO        = p;
     }
-    assert_false( bad() );
+    //assert_false( bad() );
 }
 
 
 /**
  Rearrange [F--P][X--Y][Q--L] into [F--P][Q--L][X--Y]
  
- If Q is between frontO and P, this will destroy the list,
+ Q must be after P
+ If Q is between Front and P, this will destroy the list,
  but there is no way to check such condition here.
  */
 void ObjectPool::shuffle_down(Object * p, Object * q)
@@ -476,10 +479,15 @@ void ObjectPool::shuffle_down(Object * p, Object * q)
         backO->nextO    = nullptr;
         q->prevO        = p;
     }
-    assert_false( bad() );
+    //assert_false( bad() );
 }
 
 
+/**
+ This could be improved, as we traverse the list from the root.
+ We could instead pick a random node, using Inventory, and move from there
+ Upon hitting the list end, one would restart, knowning the order of the nodes
+ */
 void ObjectPool::shuffle()
 {
     if ( nSize < 2 )
@@ -528,14 +536,6 @@ void ObjectPool::shuffle()
 }
 
 
-void ObjectPool::shuffle3()
-{
-    shuffle();
-    shuffle();
-    shuffle();
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark - Check
 
@@ -552,7 +552,9 @@ bool ObjectPool::check(Object const* n) const
     return false;
 }
 
-
+/**
+ This traverses the entire list and checks every link, which is costly
+ */
 int ObjectPool::bad() const
 {
     size_t cnt = 0;
@@ -563,11 +565,13 @@ int ObjectPool::bad() const
     while ( p )
     {
         q = p->nextO;
-        if ( q == nullptr ) {
+        if ( q == nullptr )
+        {
             if ( p != backO )
                 return 2;
         }
-        else {
+        else
+        {
             if ( q->prevO != p )
                 return 3;
         }

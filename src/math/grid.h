@@ -201,7 +201,6 @@ public:
     /// return cell at index 'indx'
     CELL & icell(const size_t indx) const
     {
-        assert_true( indx < MAP::gAllocated );
         assert_true( indx < MAP::gCells );
         return gCell[ indx ];
     }

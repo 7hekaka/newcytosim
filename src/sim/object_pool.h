@@ -119,9 +119,6 @@ public:
     /// Mix list using permute() and shuffle() functions
     void   shuffle();
     
-    /// call mix() three times
-    void   shuffle3();
-    
     /// count number of elements in the list
     size_t count() const;
     
