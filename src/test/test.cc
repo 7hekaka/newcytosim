@@ -10,7 +10,7 @@
 
 
 /**
- Returns a bitwise representation of the argument 'val'
+ Returns a bitwise representation of the argument 'val'.
  */
 template < typename T >
 std::string to_bits(const T& val, char spc = 0)
