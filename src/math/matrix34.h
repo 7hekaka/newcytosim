@@ -131,8 +131,13 @@ public:
     /// conversion to pointer of real
     operator real const*() const { return val; }
 
-    /// conversion to array of 'real'
+    /// return modifiable pointer of 'real'
     real* data() { return val; }
+
+    /// return unmodifiable pointer of real
+    real const* data() const { return val; }
+
+    /// return address of element at (i, j)
     real* addr(const index i, const index j) { return val + ( 4*i + j ); }
 
     /// access functions to element by line and column indices
@@ -1023,8 +1028,11 @@ public:
     {
         /*
          This is using Rodrigues's formula:
-             cosinus * I + sinus * K + ( 1 - cosinus ) * K^2
-             K = -1 (x) axis
+             Id + sinus * K + ( 1 - cosinus ) * K^2
+             K = -Id (X) axis       (-K is the cross product matrix)
+             K^2 = axis (x) axis - Id
+         
+         https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
          */
         const real  X = axis.XX  ,  Y = axis.YY  ,  Z = axis.ZZ;
         const real dX = X - c * X, dY = Y - c * Y, dZ = Z - c * Z;

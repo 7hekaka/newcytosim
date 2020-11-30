@@ -80,12 +80,19 @@ public:
     /// copy values from lower triangle to upper triangle
     void copy_lower() { }
 
-    /// direct access to 'unique' scalar
+    /// direct access to the scalar
     real& value()       { return val_; }
+
+    /// direct access to the scalar
     real  value() const { return val_; }
     
-    /// conversion to array of 'real'
+    /// return modifiable pointer of 'real'
     real* data() { return &val_; }
+    
+    /// return unmodifiable pointer of 'real'
+    real const* data() const { return &val_; }
+
+    /// return address of element at (i, j)
     real* addr(const index i, const index j) { return &val_; }
     
     /// access functions to element by line and column indices

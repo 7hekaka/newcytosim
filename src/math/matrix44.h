@@ -128,8 +128,13 @@ public:
     /// conversion to pointer of real
     operator real const*() const { return val; }
 
-    /// conversion to array of 'real'
+    /// return modifiable pointer of 'real'
     real* data() { return val; }
+    
+    /// return unmodifiable pointer of real
+    real const* data() const { return val; }
+
+    /// return address of element at (i, j)
     real* addr(const index i, const index j) { return val + ( i + 4*j ); }
 
     /// access functions to element by line and column indices

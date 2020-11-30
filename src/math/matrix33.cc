@@ -137,7 +137,7 @@ Matrix33 Matrix33::randomRotation()
     real u2 = M_PI * RNG.sreal();
     real u3 = RNG.preal();
     Vector3 V( std::cos(u2)*std::sqrt(u3), std::sin(u2)*std::sqrt(u3), std::sqrt(1-u3) );
-    return householder(V) * rotationAroundZ(M_PI*RNG.sreal());
+    return householder(V).mul(rotationAroundZ(M_PI*RNG.sreal()));
 }
 
 
