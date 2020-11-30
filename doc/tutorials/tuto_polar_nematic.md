@@ -210,7 +210,7 @@ Run the simulation live a few times and see which types of crosslinks form.
 
 You can also try storing the simulation with `sim` and reporting on the results. There is a special `report` function to read out numbers of the different types of crosslinks:
 
-    report couple:type:motor
+    report couple:configuration *
     
 You should see that depending on the initial orientation of the microtubule pair *Hp links* (blue) or *Hap links* (magenta) form between the microtubules and dominate the interaction. There are very few *T links* and  *V links* in these simulations. This is because the microtubules are growing as fast the motors are walking and so motors cannot efficiently reach microtubule ends. Instead the motors predominantly walk along the microtubules sides. 
 
