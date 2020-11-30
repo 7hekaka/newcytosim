@@ -441,7 +441,7 @@ void Field::step(FiberSet& fibers)
             // find index of cell:
             FieldGrid::value_type cell = mGrid.cell(i.pos());
             
-            // amount to be transfered:
+            // amount to be transferred:
             real mass = cell * frac;
             
             // transport:

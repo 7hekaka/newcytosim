@@ -407,21 +407,21 @@ inline bool adjacent(FatPoint const* a, FatPoint const* b)
  This will consider once all pairs of objects from the given lists
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& stiff,
-                                FatPointList & fpl, FatLocusList & fll)
+                                FatPointList & pots, FatLocusList & locs)
 {
-    for ( FatPoint* ii = fpl.begin(); ii < fpl.end(); ++ii )
+    for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
-        for ( FatPoint* jj = ii+1; jj < fpl.end(); ++jj )
+        for ( FatPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( !adjacent(ii, jj) )
                 checkPP(meca, stiff, *ii, *jj);
         
-        for ( FatLocus* kk = fll.begin(); kk < fll.end(); ++kk )
+        for ( FatLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             checkPL(meca, stiff, *ii, *kk);
     }
 
-    for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
+    for ( FatLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
-        for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
+        for ( FatLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( !adjacent(ii->seg, jj->seg) )
                 checkLL(meca, stiff, *ii, *jj);
     }
@@ -433,28 +433,28 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& stiff,
  assuming that the list are different and no object is repeated
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                FatPointList & fpl1, FatLocusList & fll1,
-                                FatPointList & fpl2, FatLocusList & fll2)
+                                FatPointList & pots1, FatLocusList & locs1,
+                                FatPointList & pots2, FatLocusList & locs2)
 {
-    assert_true( &fpl1 != &fpl2 );
-    assert_true( &fll1 != &fll2 );
+    assert_true( &pots1 != &pots2 );
+    assert_true( &locs1 != &locs2 );
     
-    for ( FatPoint* ii = fpl1.begin(); ii < fpl1.end(); ++ii )
+    for ( FatPoint* ii = pots1.begin(); ii < pots1.end(); ++ii )
     {
-        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+        for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( !adjacent(ii, jj) )
                 checkPP(meca, pam, *ii, *jj);
         
-        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+        for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             checkPL(meca, pam, *ii, *kk);
     }
     
-    for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+    for ( FatLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
     {
-        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+        for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             checkPL(meca, pam, *jj, *ii);
         
-        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+        for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
             if ( !adjacent(ii->seg, kk->seg)  )
                 checkLL(meca, pam, *ii, *kk);
@@ -469,24 +469,24 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
  for the distance between the object's `pos` is below `max_diameter`
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
-                                FatPointList & fpl, FatLocusList & fll)
+                                FatPointList & pots, FatLocusList & locs)
 {
-    for ( FatPoint* ii = fpl.begin(); ii < fpl.end(); ++ii )
+    for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
         Vector pos = ii->pos;
-        for ( FatPoint* jj = ii+1; jj < fpl.end(); ++jj )
+        for ( FatPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkPP(meca, pam, *ii, *jj);
         
-        for ( FatLocus* kk = fll.begin(); kk < fll.end(); ++kk )
+        for ( FatLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             if ( distanceSqr(pos, kk->pos) <= sup )
                 checkPL(meca, pam, *ii, *kk);
     }
 
-    for ( FatLocus* ii = fll.begin(); ii < fll.end(); ++ii )
+    for ( FatLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
         Vector pos = ii->pos;
-        for ( FatLocus* jj = ii+1; jj < fll.end(); ++jj )
+        for ( FatLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( !adjacent(ii->seg, jj->seg) && distanceSqr(pos, jj->pos) <= sup )
                 checkLL(meca, pam, *ii, *jj);
     }
@@ -501,34 +501,34 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
  for the distance between the object's `pos` is below `max_diameter`
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
-                                FatPointList & fpl1, FatLocusList & fll1,
-                                FatPointList & fpl2, FatLocusList & fll2)
+                                FatPointList & pots1, FatLocusList & locs1,
+                                FatPointList & pots2, FatLocusList & locs2)
 {
-    assert_true( &fpl1 != &fpl2 );
-    assert_true( &fll1 != &fll2 );
+    assert_true( &pots1 != &pots2 );
+    assert_true( &locs1 != &locs2 );
 
-    for ( FatPoint* ii = fpl1.begin(); ii < fpl1.end(); ++ii )
+    for ( FatPoint* ii = pots1.begin(); ii < pots1.end(); ++ii )
     {
         const Vector pos = ii->pos;
 
-        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+        for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkPP(meca, pam, *ii, *jj);
         
-        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+        for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             if ( distanceSqr(pos, kk->pos) <= sup )
                 checkPL(meca, pam, *ii, *kk);
     }
     
-    for ( FatLocus* ii = fll1.begin(); ii < fll1.end(); ++ii )
+    for ( FatLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
     {
         const Vector pos = ii->pos;
 
-        for ( FatPoint* jj = fpl2.begin(); jj < fpl2.end(); ++jj )
+        for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( distanceSqr(pos, jj->pos) <= sup )
                 checkPL(meca, pam, *jj, *ii);
         
-        for ( FatLocus* kk = fll2.begin(); kk < fll2.end(); ++kk )
+        for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
             if ( !adjacent(ii->seg, kk->seg) && distanceSqr(pos, kk->pos) <= sup )
                 checkLL(meca, pam, *ii, *kk);

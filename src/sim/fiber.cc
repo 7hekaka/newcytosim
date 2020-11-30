@@ -386,8 +386,8 @@ Fiber* Fiber::severPoint(size_t pti)
 The Fiber is cut at distance `abs` from its MINUS_END:
  - current Fiber is truncated to keep only the section [ MINUS_END , abs ],
  - A new Fiber is created representing the other section [ abs , PLUS_END ],
- - Hands are transfered to the new Fiber if appropriate,
- - lattice substances are also transfered,
+ - Hands are transferred to the new Fiber if appropriate,
+ - lattice substances are also transferred,
  .
  A pointer to the new Fiber is returned (containing the PLUS_END), but this
  pointer may be zero, if `abs` was not within the valid range of abscissa.
@@ -587,7 +587,7 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
 
 /**
  The given `fib` is added past the PLUS_END of `*this`,
- Hands bound to `fib` are transfered to *this.
+ Hands bound to `fib` are transferred to *this.
  The dynamic state of the PLUS_END is also transferred.
  `fib` is enventually deleted
 */
@@ -1286,7 +1286,7 @@ void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real bind_rate) const
         real& cell = fld->cell(pos);
         assert_true( cell >= 0 );
         
-        // amount to be transfered:
+        // amount to be transferred:
         real flux = cell * frac;
         
         cell -= flux;

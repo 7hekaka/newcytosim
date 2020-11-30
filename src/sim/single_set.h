@@ -20,7 +20,7 @@ typedef Array<Single *> SingleList;
  and subsequent objects obtained with next() are in the same state.
  This way, the state of the Single are known when accessing them.
  
- A Single is automatically transfered to the appropriate list,
+ A Single is automatically transferred to the appropriate list,
  if its Hand binds or unbinds. This is done by the HandMonitor.
  */
 class SingleSet: public ObjectSet

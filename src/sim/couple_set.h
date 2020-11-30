@@ -25,7 +25,7 @@ typedef Array<Couple *> CoupleList;
  and subsequent objects obtained with next() are in the same state.
  This makes iterating through the list of Couple more efficient.
  
- A Couple is automatically transfered to the appropriate list,
+ A Couple is automatically transferred to the appropriate list,
  if one of its Hand binds or unbinds. This is done by the HandMonitor.
  */
 class CoupleSet: public ObjectSet

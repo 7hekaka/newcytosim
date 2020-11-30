@@ -9,7 +9,7 @@
 
 
 /// calculate a distance to the subspace of rotations = maxNorm( M'*M - Id )
-real maxDeviationFromRotation(Matrix33 const& mat)
+real deviation(Matrix33 const& mat)
 {
     Matrix33 mm = mat.transposed() * mat - Matrix33::identity();
     return mm.norm_inf();
@@ -34,7 +34,7 @@ void testRotation(Vector3 vec, real angle)
     
     q.setMatrix3(mat);
     //mat.print(stdout);
-    printf("  deviation = %e", maxDeviationFromRotation(mat));
+    printf("  deviation = %e", deviation(mat));
     
     Matrix33 rot = Matrix33::rotationAroundAxis(vec, std::cos(angle), std::sin(angle));
     

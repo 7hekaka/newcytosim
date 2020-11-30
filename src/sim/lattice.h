@@ -319,7 +319,7 @@ public:
 
 #pragma mark - Transfer
     
-    /// transfer cells within `[s, e[` to *this, and reset transfered values
+    /// transfer cells within `[s, e[` to *this, and reset transferred values
     void take(Lattice<CELL> & lat, lati_t is, lati_t ie, cell_t zero)
     {
         //std::clog << " Lattice::take [" << is << ", " << ie << "[\n";

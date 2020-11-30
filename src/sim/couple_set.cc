@@ -29,10 +29,10 @@ void CoupleSet::step()
 {
     /*
      ATTENTION: We ensure here that step() is called exactly once for each object.
-     The Couples are stored in multiple lists, and are automatically transfered
+     The Couples are stored in multiple lists, and are automatically transferred
      from one list to another one if their Hands bind or unbind.
      The code relies on the fact that a Couple will be moved to the start of the
-     list to which it is transfered. By proceeding always from the node, which was
+     list to which it is transferred. By proceeding always from the node, which was
      first before any transfer could occur, we process each Couple only once.
      Moreover, we get the 'next' in the list always before calling 'step()', because
      'step()' may transfer the node to another list, changing the value of 'next()'

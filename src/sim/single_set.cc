@@ -25,10 +25,10 @@ void SingleSet::prepare(PropertyList const& properties)
 void SingleSet::step()
 {
     /*
-     ATTENTION: we have multiple lists, and Objects are automatically transfered
+     ATTENTION: we have multiple lists, and Objects are automatically transferred
      from one list to another if their Hands bind or unbind. We ensure here that
      step() is called exactly once for each object. THe code relies on the fact
-     that a transfered node would be linked at the start of the new list.
+     that a transferred node would be linked at the start of the new list.
      We start always at the node, which was first before any transfer could occur.
      */
     

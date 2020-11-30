@@ -34,7 +34,7 @@ private:
     Nucleator();
     
     /// Gillespie countdown timer
-    real     gspTime;
+    real gspTime;
     
 public:
     
@@ -49,19 +49,19 @@ public:
     
     
     /// create a new Fiber
-    void   makeFiber(Simul&, Vector pos, std::string const&, Glossary&);
+    void makeFiber(Simul&, Vector pos, std::string const&, Glossary&);
     
     /// simulate when is not attached
-    void   stepUnattached(Simul&, Vector const& pos);
+    void stepUnattached(Simul&, Vector const& pos);
 
     /// simulate when `this` is attached but not under load
-    void   stepUnloaded();
+    void stepUnloaded();
 
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force, real force_norm);
+    void stepLoaded(Vector const& force, real force_norm);
     
     /// detach from Fiber
-    void   detach();
+    void detach();
 
 };
 
