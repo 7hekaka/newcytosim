@@ -107,7 +107,7 @@ public:
     void         tryToAttach(Vector const&, Hand&) const;
 
     /// return all Fiber segments located near P, within distance squared, except those belonging to `exclude`
-    SegmentList  nearbySegments(Vector const&, real disSqr, Fiber * exclude = nullptr) const;
+    SegmentList  nearbySegments(Vector const&, real disSqr, Fiber const* exclude = nullptr) const;
     
     /// Among the segments closer than grid:range, return the closest one
     FiberSegment closestSegment(Vector const&) const;

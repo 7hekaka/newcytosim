@@ -94,7 +94,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 }
 
 
-FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real DD, Fiber * exclude) const
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real DD, Fiber const* exclude) const
 {
     SegmentList res;
     

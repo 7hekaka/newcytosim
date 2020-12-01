@@ -375,7 +375,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 /**
  This function is limited to the range given in paintGrid();
  */
-FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real DD, Fiber * exclude) const
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place, const real DD, Fiber const* exclude) const
 {
     SegmentList res;
     
