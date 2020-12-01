@@ -1119,7 +1119,6 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
 }
 #endif
                
-#include "iacaMarks.h"
 
 #if defined(__SSE3__) && MATRIX2_OPTIMIZED_MULTIPLY && !REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
@@ -1187,7 +1186,6 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
 #endif
     while ( val < end )
     {
-        IACA_START
         size_t i0 = *(inx  );
         size_t i1 = *(inx+1);
         assert_true( i1 > i0 );
@@ -1206,7 +1204,6 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
         storeu4f(Y+i0, fmadd4f(a0, xx, loadu4f(Y+i0)));
         storeu4f(Y+i1, fmadd4f(a1, xx, loadu4f(Y+i1)));
     }
-    IACA_END
     store3f(Y+jj, add4f(s1, s0));
     assert_true( val == end );
 }
