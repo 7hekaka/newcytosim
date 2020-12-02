@@ -47,11 +47,22 @@ void SpaceCapsule::boundaries(Vector& inf, Vector& sup) const
 real SpaceCapsule::volume() const
 {
 #if ( DIM >= 3 )
-    return ( length_ + (2/3.0) * radius_ ) * square(radius_) * ( 2 * M_PI );
+    return (2.0*M_PI) * length_ * square(radius_) + (4.0*M_PI/3.0) * cube(radius_);
 #else
     return 4 * length_ * radius_ + M_PI * square(radius_);
 #endif
 }
+
+
+real SpaceCapsule::surface() const
+{
+#if ( DIM >= 3 )
+    return (4.0*M_PI) * length_ * radius_ + (4.0*M_PI) * square(radius_);
+#else
+    return 4 * length_ + (2.0*M_PI) * radius_;
+#endif
+}
+
 
 bool SpaceCapsule::inside(Vector const& W) const
 {

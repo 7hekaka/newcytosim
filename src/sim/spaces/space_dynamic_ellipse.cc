@@ -353,7 +353,7 @@ real SpaceDynamicEllipse::surfaceEllipse(Vector const& sizes)
     real a = sizes.XX;
     real b = sizes.YY;
     real c = sizes.ZZ;
-    return 4.0*M_PI*std::pow(surf_block(a,b,c)/3.0, 1.0/POW);
+    return (4.0*M_PI)*std::pow(surf_block(a,b,c)/3.0, 1.0/POW);
 #elif ( DIM == 2 )
     // In 2D, the 'surface' is a line
     real a = sizes.XX;

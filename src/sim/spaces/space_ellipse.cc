@@ -86,8 +86,29 @@ real SpaceEllipse::volume() const
 #elif ( DIM == 2 )
     return M_PI * length_[0] * length_[1];
 #else
-    constexpr real C = 4 * M_PI / 3.0;
+    constexpr real C = 4.0 * M_PI / 3.0;
     return (C * length_[0]) * (length_[1] * length_[2]);
+#endif
+}
+
+
+real SpaceEllipse::surface() const
+{
+#if ( DIM == 1 )
+    return 2;
+#elif ( DIM == 2 )
+    // approximate formula
+    real h = square(length_[0]-length_[1]) / square(length_[0]+length_[1])
+    real S = M_PI * ( length_[0] + length_[1] );
+    return S * ( 1.0 + h/4.0 * ( 1.0 + h/16.0 * ( 1.0 + h/4.0 )));
+#else
+    // approximate formula
+    constexpr real POW = 1.6075;
+    real AB = length_[0]*length_[1];
+    real AC = length_[0]*length_[2];
+    real BC = length_[1]*length_[2];
+    real S = std::pow(AB,POW) + std::pow(AC,POW) + std::pow(BC,POW);
+    return (4.0*M_PI) * std::pow(S/3.0, 1.0/POW);
 #endif
 }
 

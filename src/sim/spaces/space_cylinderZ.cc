@@ -91,28 +91,43 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 {
 #if ( DIM > 2 )
 #if HAS_SMOOTH_EDGES
-    if ( edge_ > 0 )
-    {
-        const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
-        const real n = min_real(R, radius_-edge_) / R;
-        // projection on the inner cylinder:
-        const real X = n * pos.XX;
-        const real Y = n * pos.YY;
-        const real Z = max_real(min_real(pos.ZZ, top_-edge_), bot_+edge_);
-        return normalize(pos-Vector(X,Y,Z));
-    }
+    const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+    const real n = min_real(R, radius_-edge_) / R;
+    // projection on the inner cylinder:
+    const real X = n * pos.XX;
+    const real Y = n * pos.YY;
+    const real Z = max_real(min_real(pos.ZZ, top_-edge_), bot_+edge_);
+    return normalize(pos-Vector(X,Y,Z));
+#else
+    const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+    const real dZ = min_real(abs_real(pos.ZZ-top_), abs_real(bot_-pos.ZZ));
+    if ( abs_real(R-radius_) < dZ )
+        return Vector(pos.XX/R, pos.YY/R, 0);
     else
+        return Vector(0, 0, std::copysign(1, 2*pos.ZZ-top_-bot_));
 #endif
-    {
-        const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
-        const real dZ = min_real(abs_real(pos.ZZ-top_), abs_real(bot_-pos.ZZ));
-        if ( abs_real(R-radius_) < dZ )
-            return Vector(pos.XX/R, pos.YY/R, 0);
-        else
-            return Vector(0, 0, std::copysign(1, 2*pos.ZZ-top_-bot_));
-    }
 #endif
     return Vector(0, 0, 0);  // intentionally invalid!
+}
+
+
+real SpaceCylinderZ::surface() const
+{
+#if HAS_SMOOTH_EDGES
+    const real RE = radius_ - edge_;
+    const real LE = top_ - bot_ - 2 * edge_;
+    const real GC = RE + edge_ * ( 2.0 / M_PI );
+    // surface elements divided by 2 * M_PI:
+    const real S0 = radius_ * LE;
+    const real S1 = square(RE);
+    const real S2 = M_PI * GC * edge_;
+    return ( 2.0 * M_PI ) * ( S0 + S1 + S2 );
+#else
+    // surface elements divided by 2 * M_PI:
+    const real S0 = radius_ * ( top_ - bot_ );
+    const real S1 = square(radius_);
+    return ( 2.0 * M_PI ) * ( S0 + S1 );
+#endif
 }
 
 
@@ -127,71 +142,66 @@ Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
 {
 #if ( DIM > 2 )
 #if HAS_SMOOTH_EDGES
-    if ( edge_ > 0 )
+    const real RE = radius_ - edge_;
+    const real LE = top_ - bot_ - 2 * edge_;
+    const real GC = RE + edge_ * ( 2.0 / M_PI );
+    // surface elements divided by 2 * M_PI:
+    const real S0 = radius_ * LE;
+    const real S1 = square(RE);
+    const real S2 = M_PI * GC * edge_;
+    const real P = RNG.preal() * ( S0 + S1 + S2 );
+    if ( P < S0 )
     {
-        const real RE = radius_ - edge_;
-        const real LE = top_ - bot_ - 2 * edge_;
-        const real GC = RE + 2 * edge_ / M_PI;
-        // surface elements divided by 2 * M_PI:
-        const real S0 = radius_ * LE;
-        const real S1 = square(RE);
-        const real S2 = M_PI * GC * edge_;
-        const real P = RNG.preal() * ( S0 + S1 + S2 );
-        if ( P < S0 )
-        {
-            Vector2 XY = Vector2::randU(radius_);
-            real Z = bot_ + edge_ + LE * RNG.preal();
-            return Vector(XY.XX, XY.YY, Z);
-        }
-        else if ( P < S0+S1 )
-        {
-            Vector2 XY = Vector2::randB(RE);
-            real Z = RNG.choice(bot_, top_);
-            return Vector(XY.XX, XY.YY, Z);
-        }
-        else
-        {
-            real Z, R, N;
-            do {
-                // generate a point inside Cylinder
-                R = RE / edge_;
-                /* generate R randomly between 0 and 1, with skewed probabilities:
-                 The probability is 'RE' at 0 and 'RE+edge_' at 1, as needed
-                 to obtain a uniform volume sampling of the cut cylinder,
-                 for RE < R < RE + edge_.
-                 This formula was derived by inverting the cumulative probability */
-                R = std::sqrt(square(R)+RNG.preal()*(2*R+1)) - R;
-                Z = RNG.sreal();
-                // repeat until point is inside Torus:
-                N = square(R) + square(Z);
-            } while ( N > 1.0 );
-            // normalize to get a point on the surface:
-            N = edge_ / std::sqrt(N);
-            Vector2 XY = Vector2::randU(RE+R*N);
-            Z = N * Z + sign_select(Z, bot_+edge_, top_-edge_);
-            return Vector(XY.XX, XY.YY, Z);
-        }
+        Vector2 XY = Vector2::randU(radius_);
+        real Z = bot_ + edge_ + LE * RNG.preal();
+        return Vector(XY.XX, XY.YY, Z);
+    }
+    else if ( P < S0+S1 )
+    {
+        Vector2 XY = Vector2::randB(RE);
+        real Z = RNG.choice(bot_, top_);
+        return Vector(XY.XX, XY.YY, Z);
     }
     else
-#endif
     {
-        // surface elements divided by M_PI * square(radius_)
-        const real S0 = top_ - bot_;
-        const real S1 = 2;
-        const real P = RNG.preal() * ( S0 + S1 );
-        if ( P < S0 )
-        {
-            Vector2 XY = Vector2::randU(radius_);
-            real Z = bot_ + ( top_ - bot_ ) * RNG.preal();
-            return Vector(XY.XX, XY.YY, Z);
-        }
-        else
-        {
-            Vector2 XY = Vector2::randB(radius_);
-            real Z = RNG.choice(bot_, top_);
-            return Vector(XY.XX, XY.YY, Z);
-        }
+        real Z, R, N;
+        do {
+            // generate a point inside Cylinder
+            R = RE / edge_;
+            /* generate R randomly between 0 and 1, with skewed probabilities:
+             The probability is 'RE' at 0 and 'RE+edge_' at 1, as needed
+             to obtain a uniform volume sampling of the cut cylinder,
+             for RE < R < RE + edge_.
+             This formula was derived by inverting the cumulative probability */
+            R = std::sqrt(square(R)+RNG.preal()*(2*R+1)) - R;
+            Z = RNG.sreal();
+            // repeat until point is inside Torus:
+            N = square(R) + square(Z);
+        } while ( N > 1.0 );
+        // normalize to get a point on the surface:
+        N = edge_ / std::sqrt(N);
+        Vector2 XY = Vector2::randU(RE+R*N);
+        Z = N * Z + sign_select(Z, bot_+edge_, top_-edge_);
+        return Vector(XY.XX, XY.YY, Z);
     }
+#else
+    // surface elements divided by M_PI * square(radius_)
+    const real S0 = top_ - bot_;
+    const real S1 = 2;
+    const real P = RNG.preal() * ( S0 + S1 );
+    if ( P < S0 )
+    {
+        Vector2 XY = Vector2::randU(radius_);
+        real Z = bot_ + ( top_ - bot_ ) * RNG.preal();
+        return Vector(XY.XX, XY.YY, Z);
+    }
+    else
+    {
+        Vector2 XY = Vector2::randB(radius_);
+        real Z = RNG.choice(bot_, top_);
+        return Vector(XY.XX, XY.YY, Z);
+    }
+#endif
 #endif
     return Vector(0, 0, 0);  // intentionally invalid!
 }

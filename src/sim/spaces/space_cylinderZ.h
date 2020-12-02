@@ -68,6 +68,9 @@ public:
 
     /// the volume inside
     real        volume() const;
+    
+    /// the area of the edge surface
+    real        surface() const;
 
     /// true if the point is inside the Space
     bool        inside(Vector const&) const;

@@ -41,9 +41,22 @@ real SpaceSphere::volume() const
 #elif ( DIM == 2 )
     return M_PI * square(radius_);
 #else
-    return 4*M_PI/3.0 * cube(radius_);
+    return ( 4.0 * M_PI / 3.0 ) * cube(radius_);
 #endif
 }
+
+
+real SpaceSphere::surface() const
+{
+#if ( DIM == 1 )
+    return 2;
+#elif ( DIM == 2 )
+    return ( 2.0 * M_PI ) * radius_;
+#else
+    return ( 4.0 * M_PI ) * square(radius_);
+#endif
+}
+
 
 bool SpaceSphere::inside(Vector const& pos) const
 {
