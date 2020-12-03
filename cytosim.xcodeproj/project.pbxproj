@@ -68,7 +68,7 @@
 		BB18BBC01DFD7C0C00567023 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB18BBC11DFD7C0E00567023 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB18BBC21DFD7DD900567023 /* test_simd.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */; };
-		BB18BBCF1DFD7E4A00567023 /* test_code.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */; };
+		BB18BBCF1DFD7E4A00567023 /* test_project.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */; };
 		BB19DA9E231BF792001488A5 /* matrix34.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19DA9C231BF792001488A5 /* matrix34.h */; };
 		BB19DA9F231BF792001488A5 /* matrix34.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB19DA9D231BF792001488A5 /* matrix34.cc */; };
 		BB19FEF712F352A400ACEA12 /* inventoried.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19FEF312F352A400ACEA12 /* inventoried.h */; };
@@ -1798,7 +1798,7 @@
 		BBB89ED70BE3DED10054838A /* vector3.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = vector3.cc; path = src/math/vector3.cc; sourceTree = SOURCE_ROOT; };
 		BBB89ED80BE3DED10054838A /* vector3.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = vector3.h; path = src/math/vector3.h; sourceTree = SOURCE_ROOT; };
 		BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_simd.cc; path = src/test/test_simd.cc; sourceTree = SOURCE_ROOT; };
-		BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_code.cc; path = src/test/test_code.cc; sourceTree = SOURCE_ROOT; };
+		BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_project.cc; path = src/test/test_project.cc; sourceTree = SOURCE_ROOT; };
 		BBBD34DF1AABA5BE00819326 /* map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = map.h; path = src/math/map.h; sourceTree = SOURCE_ROOT; };
 		BBC0E57110CABBBB008139D1 /* point_disp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = point_disp.cc; sourceTree = "<group>"; };
 		BBC0E57210CABBBB008139D1 /* point_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_disp.h; sourceTree = "<group>"; };
@@ -2736,7 +2736,7 @@
 				BB95C53B249627EC003CA21A /* test_array.cc */,
 				BB1227AE114FB8640042589A /* test_blas.cc */,
 				BBAA7E7D2455D86300C924DB /* test_block.cc */,
-				BBB9BB870B45AFDD00E9FCD3 /* test_code.cc */,
+				BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */,
 				BB940AB8164BCDDF00542F06 /* test_cxx.cc */,
 				BB7086372449C83100C73273 /* test_rigidity.cc */,
 				BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */,
@@ -4424,7 +4424,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB31698024A0F3F0008DFDB3 /* operator_new.cc in Sources */,
-				BB18BBCF1DFD7E4A00567023 /* test_code.cc in Sources */,
+				BB18BBCF1DFD7E4A00567023 /* test_project.cc in Sources */,
 				BBE447DB2064ED200058ADAC /* SFMT.c in Sources */,
 				BB04E2761E1A4E89000BDBC9 /* random.cc in Sources */,
 				BB70863624499A7000C73273 /* random_vector.cc in Sources */,
@@ -5535,6 +5535,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_FLOAT_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -5579,6 +5580,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_FLOAT_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -5616,6 +5618,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_FLOAT_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;

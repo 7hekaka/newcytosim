@@ -2,7 +2,7 @@
 
 
 TESTS:=test test_gillespie test_solve test_random test_math test_glos test_xpttrs\
-       test_quaternion test_code test_matrix test_thread test_blas test_pipe
+       test_quaternion test_rigidity test_project test_matrix test_thread test_blas test_pipe
 
 TESTS_GL:=test_opengl test_vbo test_glut test_glapp test_platonic\
           test_rasterizer test_space test_grid test_sphere
@@ -36,10 +36,10 @@ test_blas: test_blas.cc random.o SFMT.o backtrace.o | bin
 	$(DONE)
 vpath test_blas bin
 
-test_code: test_code.cc random.o random_vector.o SFMT.o tictoc.o | bin
+test_project: test_project.cc random.o random_vector.o SFMT.o tictoc.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
-vpath test_code bin
+vpath test_project bin
 
 test_xpttrs: xpttrf.h test_xpttrs.cc random.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@

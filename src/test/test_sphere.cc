@@ -73,13 +73,13 @@ void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c)
     {
-        case 'r': n_points-=256;   break;
-        case 't': n_points-=32;    break;
-        case 'y': n_points+=1;     break;
-        case 'u': n_points+=16;    break;
-        case 'i': n_points+=128;   break;
-        case 'o': n_points+=1024;  break;
-        case 'p': n_points+=8192;  break;
+        case 'r': n_points-=256;  break;
+        case 't': n_points-=32;   break;
+        case 'y': n_points+=1;    break;
+        case 'u': n_points+=4;    break;
+        case 'i': n_points+=16;   break;
+        case 'o': n_points+=128;  break;
+        case 'p': n_points+=1024; break;
         case 'q' : exit(1);
             
         default:
@@ -122,8 +122,8 @@ void display(View&, int)
     }
     glEnd();
     
-#if ( 0 )
-    glLineWidth(5);
+#if ( 1 )
+    glLineWidth(3);
     glBegin(GL_LINES);
     for ( size_t ii=0; ii < front->nbPoints(); ++ii )
     {
@@ -192,6 +192,7 @@ int main(int argc, char* argv[])
     glApp::normalKeyFunc(processNormalKey);
     glApp::createWindow(display);
     glApp::setScale(3);
+    gle::initialize();
 
     glutMainLoop();
     return EXIT_SUCCESS;
