@@ -543,7 +543,6 @@
 		BB7B5A9D241A81BF0063F252 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
 		BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591105B98DA3006956D5 /* test_rasterizer.cc */; };
 		BB7D839610274A4500C1DC38 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7D839510274A4500C1DC38 /* common.h */; };
-		BB7DC19C2200DCE400DB779E /* test_glos.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7DC19B2200DCE400DB779E /* test_glos.cc */; };
 		BB7F684012D0F1B100F8FC84 /* display_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7F683E12D0F1B100F8FC84 /* display_prop.cc */; };
 		BB7F684112D0F1B100F8FC84 /* display_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7F683F12D0F1B100F8FC84 /* display_prop.h */; };
 		BB805D482419635D00B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
@@ -644,7 +643,6 @@
 		BB957FF92466A86500A61493 /* point_gridF.h in Headers */ = {isa = PBXBuildFile; fileRef = BB957FF82466A86500A61493 /* point_gridF.h */; };
 		BB957FFA2466A8B300A61493 /* point_gridF.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* point_gridF.cc */; };
 		BB957FFB2466A8B300A61493 /* point_gridF.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* point_gridF.cc */; };
-		BB95C53C249627ED003CA21A /* test_array.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB95C53B249627EC003CA21A /* test_array.cc */; };
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
@@ -673,7 +671,6 @@
 		BB9D87B41E76BBF100DD0F00 /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
 		BB9D992908D6281100DBD2BF /* mecafil.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9D992508D6281100DBD2BF /* mecafil.cc */; };
 		BB9D992A08D6281100DBD2BF /* mecafil.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9D992608D6281100DBD2BF /* mecafil.h */; };
-		BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */; };
 		BB9EC393209235CC00EF00E7 /* SFMT-common.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE447D920646A420058ADAC /* SFMT-common.h */; };
 		BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE447CE2064697D0058ADAC /* SFMT-params.h */; };
 		BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE447CF2064697D0058ADAC /* SFMT-params19937.h */; };
@@ -782,7 +779,6 @@
 		BBC422FA247342CF007EA070 /* hand_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC422F8247342CF007EA070 /* hand_list.h */; };
 		BBC422FB247342CF007EA070 /* hand_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F9247342CF007EA070 /* hand_list.cc */; };
 		BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */; };
-		BBC4C3A124D5CDE100DB5187 /* test_string.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC4C3A024D5CDE100DB5187 /* test_string.cc */; };
 		BBC96C5624A8A9CD00864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
 		BBC96C5724A8A9CD00864F9B /* sparmatsymblkdiag.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC96C5524A8A9CD00864F9B /* sparmatsymblkdiag.h */; };
 		BBC96C5824A8B56900864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
@@ -1827,6 +1823,7 @@
 		BBD025DD1B28DF950002B9FE /* chewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chewer.h; path = hands/chewer.h; sourceTree = "<group>"; };
 		BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = project_ellipse.cc; path = src/math/project_ellipse.cc; sourceTree = SOURCE_ROOT; };
 		BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = project_ellipse.h; path = src/math/project_ellipse.h; sourceTree = SOURCE_ROOT; };
+		BBD3030225798FC600C6D61A /* test_ortho.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ortho.cc; sourceTree = "<group>"; };
 		BBD4BB391007F2D300D00914 /* fiber_disp.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = fiber_disp.cc; sourceTree = "<group>"; };
 		BBD4BB3A1007F2D300D00914 /* fiber_disp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = fiber_disp.h; sourceTree = "<group>"; };
 		BBD5DA760FF7956C0010D08D /* organizer_set.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = organizer_set.cc; path = src/sim/organizer_set.cc; sourceTree = SOURCE_ROOT; };
@@ -2732,6 +2729,7 @@
 			children = (
 				BB2BF8D50E085C270024546A /* makefile.inc */,
 				BB882B400EE82D6A00E29E5C /* test.cc */,
+				BBD3030225798FC600C6D61A /* test_ortho.cc */,
 				BB9EC3912091D6B000EF00E7 /* test_asm.cc */,
 				BB95C53B249627EC003CA21A /* test_array.cc */,
 				BB1227AE114FB8640042589A /* test_blas.cc */,
@@ -4825,16 +4823,12 @@
 				BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */,
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
-				BB95C53C249627ED003CA21A /* test_array.cc in Sources */,
 				BB7191B00EF1CD9900CED9E2 /* sparmatsym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* sparmatsym1.cc in Sources */,
-				BB9DACC12381BA8D009A9D6B /* test_dispatch.cc in Sources */,
 				BB003F3020EDEDA4007C9593 /* vector4.cc in Sources */,
 				BBC96C5624A8A9CD00864F9B /* sparmatsymblkdiag.cc in Sources */,
 				BB7191B80EF1CD9900CED9E2 /* sparmatsymblk.cc in Sources */,
 				BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */,
-				BB7DC19C2200DCE400DB779E /* test_glos.cc in Sources */,
-				BBC4C3A124D5CDE100DB5187 /* test_string.cc in Sources */,
 				BBC422FB247342CF007EA070 /* hand_list.cc in Sources */,
 				BB7191B90EF1CD9900CED9E2 /* vector1.cc in Sources */,
 				BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */,

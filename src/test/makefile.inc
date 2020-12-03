@@ -1,8 +1,9 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-TESTS:=test test_gillespie test_solve test_random test_math test_glos test_xpttrs\
-       test_quaternion test_rigidity test_project test_matrix test_thread test_blas test_pipe
+TESTS:=test test_gillespie test_solve test_random test_math test_glos test_ortho\
+       test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
+       test_matrix test_thread test_blas test_pipe
 
 TESTS_GL:=test_opengl test_vbo test_glut test_glapp test_platonic\
           test_rasterizer test_space test_grid test_sphere
@@ -25,6 +26,16 @@ test: test.cc random.o SFMT.o tictoc.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test bin
+
+test_code: test_code.cc random.o SFMT.o tictoc.o backtrace.o | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+vpath test_code bin
+
+test_ortho: test_ortho.cc random.o SFMT.o tictoc.o backtrace.o | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+vpath test_ortho bin
 
 test_array: test_array.cc random.o SFMT.o tictoc.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
