@@ -519,10 +519,10 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
         x = mulf(n, x);
         y = mulf(n, y);
 #if REAL_IS_DOUBLE
-        store4(d   , getlof(x));
-        store4(d+4 , getlof(y));
-        store4(d+8 , gethif(x));
-        store4(d+12, gethif(y));
+        store4(d   , cvt4f(getlo4f(x)));
+        store4(d+4 , cvt4f(getlo4f(y)));
+        store4(d+8 , cvt4f(gethi4f(x)));
+        store4(d+12, cvt4f(gethi4f(y)));
 #else
         store8f(d  , x);
         store8f(d+8, y);

@@ -142,7 +142,7 @@ inline double nrm8(const size_t cnt, const double* ptr)
         u = max4(u, andnot4(sign, load4(ptr)));
         ptr += 4;
     }
-    vec2 w = getlo(max4(u, swap2f128(u)));
+    vec2 w = max2(getlo(u), gethi(u));
     while ( ptr+2 <= end )
     {
         w = max2(w, andnot2(getlo(sign), load2(ptr)));
@@ -178,7 +178,7 @@ inline float nrm8(const size_t siz, const float* ptr)
         u = max8f(u, abs8f(load8f(ptr)));
         ptr += 8;
     }
-    vec4f v = getlof(max8f(u, swap2f128(u)));
+    vec4f v = max4f(getlo4f(u), gethi4f(u));
     while ( ptr+4 <= end )
     {
         v = max4f(v, abs4f(load4f(ptr)));

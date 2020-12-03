@@ -104,8 +104,8 @@ inline vec8f rcpf(vec8f a)                 { return _mm256_rcp_ps(a); }
 /// approximate inverse square root
 inline vec8f rsqrtf(vec8f a)               { return _mm256_rsqrt_ps(a); }
 
-inline vec4f getlof(vec8f a)               { return _mm256_castps256_ps128(a); }
-inline vec4f gethif(vec8f a)               { return _mm256_extractf128_ps(a,1); }
+inline vec4f getlo4f(vec8f a)              { return _mm256_castps256_ps128(a); }
+inline vec4f gethi4f(vec8f a)              { return _mm256_extractf128_ps(a,1); }
 
 inline vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a); }
 
