@@ -80,7 +80,16 @@ private:
     
     /// target segmentation length (equal to parameter 'fiber:segmentation')
     real fnSegmentation;
-  
+    
+    /// abscissa of the minus-end (equal to zero initially)
+    real fnAbscissaM;
+    
+    /// abscissa of the plus-end
+    real fnAbscissaP;
+
+    /// time at birth
+    real fnBirthTime;
+
 #if CURVATURE_DEPENDENT_SEGMENTATION
 
     /// error due to the cutting at different steps
@@ -93,13 +102,6 @@ private:
     void clearAutoCounters(bool=false);
     
 #endif
-    
-    /// abscissa of the minus-end (equal to zero initially)
-    real fnAbscissaM;
-    
-    /// abscissa of the plus-end
-    real fnAbscissaP;
-    
 #if FIBER_HAS_NORMAL
     /// vector orthogonal to backbone at the origin, used for display only
     mutable Vector3 fnNormal;
@@ -111,9 +113,6 @@ protected:
     /// true if projection operator is identity
     bool skipProjection;
 #endif
-
-    /// time at birth
-    double fnBirthTime;
 
     /// flag to update
     bool needUpdate;

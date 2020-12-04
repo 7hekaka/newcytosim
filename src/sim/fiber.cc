@@ -1764,7 +1764,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
-            fnBirthTime = in.readFloat();
+            birthTime(in.readFloat());
 #endif
 
         if ( length() + 128*FLT_EPSILON < prop->min_length )
