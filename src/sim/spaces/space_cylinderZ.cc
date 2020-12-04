@@ -341,7 +341,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     bool cyl = false;
     real Z;
 
-    // inside cylinder radius_
+    // in top or bottom half
     if ( 2 * pos.ZZ - B > T )
     {
         Z = T;
@@ -387,12 +387,13 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     bool in = true;
     real Z;
     
-    // inside cylinder radius_
     if ( 2 * pos.ZZ - B > T )
     {
+        // in top half, Z = top end
         Z = T-E;
-        if ( pos.ZZ > T-E )
+        if ( pos.ZZ > Z )
         {
+            // above top end
             in = false;
             if ( n < R-E ) {
                 meca.addPlaneClampZ(pe, T, stiff);
@@ -402,8 +403,9 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
     }
     else
     {
+        //in bottom half, Z = bottom end
         Z = B+E;
-        if ( pos.ZZ < B+E )
+        if ( pos.ZZ < Z )
         {
             in = false;
             if ( n < R-E ) {
