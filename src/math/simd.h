@@ -106,7 +106,11 @@ inline vec2 normalize2(vec2 vec, double n)
 #if defined(__SSE4_1__)
 
 #define blend2(a,b,k)     _mm_blend_pd(a,b,k)
-#define blendv2(a,b,k)    _mm_blendv_pd(a,b,k)
+
+inline vec2 sign_select(vec2 const& val, vec2 const& neg, vec2 const& pos)
+{
+    return _mm_blendv_pd(pos, neg, val);
+}
 
 #endif
 
@@ -206,12 +210,20 @@ inline vec4 duphi2f128(vec4 a)            { return _mm256_permute2f128_pd(a, a, 
 #define permute2f128(a,b,k) _mm256_permute2f128_pd(a,b,k)
 #define shuffle4(a,b,k)     _mm256_shuffle_pd(a,b,k)
 #define blend4(a,b,k)       _mm256_blend_pd(a,b,k)
-#define blendv4(a,b,k)      _mm256_blendv_pd(a,b,k)
 #define cmp4(a,b,k)         _mm256_cmp_pd(a,b,k)
 
 /// concatenate two vec2 into a vec4
 inline vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
 inline vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); }
+
+inline vec4 sign_select(vec4 const& val, vec4 const& neg, vec4 const& pos)
+{
+#if defined(__AVX512VL__)
+    return _mm256_mask_mov_pd(pos, val, neg);
+#else
+    return _mm256_blendv_pd(pos, neg, val);
+#endif
+}
 
 #if 0
   inline vec4  load3(double const* a)    { return blend4(cast4(loadu2(a)), broadcast1(a+2), 0b0100); }

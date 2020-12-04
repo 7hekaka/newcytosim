@@ -500,9 +500,8 @@ public:
     }
 
     //------------------------------------------------------------------
-    
     /// returns a perpendicular vector, of comparable but unspecified norm
-    const Vector3 orthogonal() const
+    const Vector3 orthogonalB() const
     {
         if ( abs_real(XX) < abs_real(YY) )
         {
@@ -518,6 +517,27 @@ public:
             else
                 return Vector3( YY, -XX, 0.0); //ZZ is the smallest
         }
+    }
+
+    /// returns a perpendicular vector, of comparable but unspecified norm
+    /**
+     Presumably branchless code inspired from:
+     Stark, M. M., “Efficient Construction of Perpendicular Vectors without Branching”,
+     Journal of Graphics Tools 14:1 (2009), 55-61.
+     */
+    const Vector3 orthogonal() const
+    {
+        real ax = abs_real(XX);
+        real ay = abs_real(YY);
+        real az = abs_real(ZZ);
+        
+        real x = ax - std::min(ay, az); // negative if XX is smallest
+        real y = ay - std::min(az, ax);
+        real z = std::min(x, y); // use z if x and y are positive (could use bitwise OR)
+
+        return Vector3(sign_select(z, 0, YY) - sign_select(y, ZZ, 0),
+                       sign_select(x, ZZ, 0) - sign_select(z, 0, XX),
+                       sign_select(y, XX, 0) - sign_select(x, YY, 0));
     }
     
     /// returns a perpendicular vector, of norm `n`
@@ -587,24 +607,25 @@ public:
 #else
         assert_small(normSqr() - 1.0);
 #endif
-        real s = std::copysign(real(1.0), ZZ);
+        real sz = std::copysign(real(1.0), ZZ);
 #if ( 1 )
         // optimized version by Marc B. Reynolds
-        const real a = YY / ( ZZ + s );
+        const real a = YY / ( ZZ + sz );
         const real b = YY * a;
         const real c = XX * a;
-        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-sz*sz)
         E.set(-ZZ - b, c, XX);
-        F.set(s * c, s * b - 1.0, s * YY);
-        // for an inverted basis, use F.set(c, b-s, YY);
+        F.set(sz * c, sz * b - 1, sz * YY);
+        // for an inverted basis, use F.set(c, b-sz, YY);
 #else
         // original code from Tom Duff et al.
-        const real a = -1.0 / ( ZZ + s );
-        const real b = XX * YY * a;
-        // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-s*s)
-        E.set(1.0 + s * XX * XX * a, s * b, -s * XX);
-        F.set(b, s + YY * YY * a, -YY);
+        const real a = -1 / ( ZZ + sz );
+        const real b = (XX * YY) * a;
+        // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-sz*sz)
+        E.set(1 + sz * (XX * XX) * a, sz * b, -sz * XX);
+        F.set(b, sz + (YY * YY) * a, -YY);
 #endif
+        //printf("orthonormal %+9.6f %+9.6f %+9.6f\n", dot(*this, E), dot(*this, F), dot(E, F));
     }
     
     /**
@@ -628,17 +649,18 @@ public:
 #else
         assert_small(normSqr() - 1.0);
 #endif
-        real s = std::copysign(real(1.0), ZZ);
+        real sz = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
-        const real nY = nrm * YY;
-        const real a = nY / ( ZZ + s );
-        const real b = YY * a;
-        const real c = XX * a;
-        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        real nY = nrm * YY;
+        real a = nY / ( ZZ + sz );
+        real b = YY * a;
+        real c = XX * a;
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-sz*sz)
         E.set(-nrm * ZZ - b, c, nrm * XX);
-        F.set(s * c, s * b - nrm, s * nY);
-        // for an inverted basis, use F.set(c, b - s * nrm, nY);
-        //std::clog << " orthonormal " << nrm <<  " " << E.norm() << " " << F.norm() << " " << dot(E, F) << "\n";
+        F.set(sz * c, sz * b - nrm, sz * nY);
+        // for an inverted basis, use F.set(c, b - sz * nrm, nY);
+        //printf("orthonormal %+9.6f %+9.6f %+9.6f :", dot(*this, E), dot(*this, F), dot(E, F));
+        //printf(" %+9.6f %+9.6f %+9.6f\n", normSqr(), dot(E, E), dot(F, F));
     }
 
     /// rotate `vec` around `*this`, by angle defined by cosinus and sinus

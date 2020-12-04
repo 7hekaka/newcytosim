@@ -5,17 +5,21 @@
 #include <cstdlib>
 
 
-typedef float real;
+typedef double real;
 
 /// absolute value
 inline real abs_real(const real x) { return std::abs(x); }
 
-/// return `neg` if `arg < 0` and `pos` otherwise
-inline real sign_select(real const& val, real const& neg, real const& pos)
+/// return `neg` if `val < 0` and `pos` otherwise
+inline float sign_select(float const val, float const neg, float const pos)
 {
-    // this should be branchless, using Intel's VBLENDVPD instruction
-    if ( val > 0 ) return pos;
-    else return neg;
+    return ( val < 0 ? neg : pos );
+}
+
+/// return `neg` if `val < 0` and `pos` otherwise
+inline double sign_select(double const val, double const neg, double const pos)
+{
+    return ( val < 0 ? neg : pos );
 }
 
 

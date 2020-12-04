@@ -147,7 +147,7 @@ inline void zero_real(size_t cnt, real * ptr)
 
 constexpr real M_SQRT3 = 1.7320508075688772935274463415059;
 
-//---------------------------------HANDY----------------------------------------
+//----------------------------BRANCHLESS? CODE----------------------------------
 
 /// square of the argument: `x * x`
 inline real square(const real x) { return x * x; }
@@ -155,12 +155,11 @@ inline real square(const real x) { return x * x; }
 /// cube of the argument: `x * x * x`
 inline real cube(const real x) { return x * x * x; }
 
-/// return `neg` if `arg < 0` and `pos` otherwise
-inline real sign_select(real const& val, real const& neg, real const& pos)
+/// return `neg` if `val < 0` and `pos` otherwise
+inline real sign_select(real const val, real const neg, real const pos)
 {
-    // this should be branchless, using Intel's VBLENDVPD instruction
-    if ( val >= 0 ) return pos;
-    else return neg;
+    // this should be branchless, using a conditional-move instruction (CMOVBE)
+    return ( val < 0 ? neg : pos );
 }
 
 /// sign of a 'real': -1 or +1; result is +1 if ( x == 0 )

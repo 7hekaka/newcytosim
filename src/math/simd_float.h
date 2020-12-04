@@ -27,7 +27,7 @@ inline vec4f max4f(vec4f a, vec4f b)       { return _mm_max_ps(a,b); }
 inline vec4f min4f(vec4f a, vec4f b)       { return _mm_min_ps(a,b); }
 inline vec4f and4f(vec4f a, vec4f b)       { return _mm_and_ps(a,b); }
 inline vec4f andnot4f(vec4f a, vec4f b)    { return _mm_andnot_ps(a,b); }
-inline vec4f abs4f(vec4f a)                { return _mm_andnot_ps(_mm_set1_ps(-0.0), a); }
+inline vec4f abs4f(vec4f a)                { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
 inline vec4f unpacklo4f(vec4f a, vec4f b)  { return _mm_unpacklo_ps(a,b); }
 inline vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b); }
 inline vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
@@ -39,7 +39,18 @@ inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
 
 #if defined(__SSE4_1__)
+
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
+
+inline vec4f sign_select(vec4f const& val, vec4f const& neg, vec4f const& pos)
+{
+#if defined(__AVX512VL__)
+    return _mm_mask_mov_ps(pos, val, neg);
+#else
+    return _mm_blendv_ps(pos, neg, val);
+#endif
+}
+
 #endif
 
 
@@ -112,6 +123,15 @@ inline vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a); }
 #define load8si(a)           _mm256_load_si256(a)
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
+
+inline vec8f sign_select(vec8f const& val, vec8f const& neg, vec8f const& pos)
+{
+#if defined(__AVX512VL__)
+    return _mm256_mask_mov_ps(pos, val, neg);
+#else
+    return _mm256_blendv_ps(pos, neg, val);
+#endif
+}
 
 #endif  // AVX
 
