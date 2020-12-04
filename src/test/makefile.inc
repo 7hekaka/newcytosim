@@ -3,7 +3,7 @@
 
 TESTS:=test_bits test_gillespie test_solve test_random test_math test_glos\
        test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
-       test_ortho test_matrix test_thread test_blas test_pipe
+       test_ortho test_matrix test_thread test_blas test_pipe test_simd test_solver
 
 TESTS_GL:=test_opengl test_vbo test_glut test_glapp test_platonic\
           test_rasterizer test_space test_grid test_sphere

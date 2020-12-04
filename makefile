@@ -84,7 +84,7 @@ SFMT.o: SFMT.c SFMT.h
 
 .PHONY: all dim1 dim2 dim3 alldim allsim doc
 
-all: sim play tools tests
+all: sim play tools
 
 dim1: bin1/sim bin1/report bin1/play
 

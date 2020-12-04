@@ -88,7 +88,6 @@ void alsatian5(int N, real const* AB, real* B)
  */
 void testTBSV(size_t cnt)
 {
-    
     std::cout << "testTBSV " << NSEG << " segments --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__ << "\n";
 

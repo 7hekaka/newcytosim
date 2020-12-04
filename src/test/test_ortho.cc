@@ -43,7 +43,7 @@ class Vector3
 {
 public:
     
-    real XX, YY, ZZ, TT;
+    real XX, YY, ZZ;
     
     Vector3(real a, real b, real c) { XX=a; YY=b; ZZ=c; }
     void set(real a, real b, real c) { XX=a; YY=b; ZZ=c; }
@@ -105,6 +105,7 @@ void test(size_t cnt)
     }
     printf("  orthogonal    %7.3f\n", toc(cnt*MAX));
     
+#if 1
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -114,11 +115,13 @@ void test(size_t cnt)
             vec[i] = vic[i].orthogonalB();
     }
     printf("  orthogonalB   %7.3f\n", toc(cnt*MAX));
+#endif
 }
 
 
 int main ()
 {
+    printf("test_ortho --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
     test(1<<15);
     return 0;
 }
