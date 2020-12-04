@@ -1621,7 +1621,7 @@
 		BB81B86A219EE55F009CA402 /* play_keys.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = play_keys.cc; sourceTree = "<group>"; };
 		BB8481B0158348E80076C8C2 /* couple_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = couple_long.cc; path = couples/couple_long.cc; sourceTree = "<group>"; };
 		BB8481B1158348E80076C8C2 /* couple_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = couple_long.h; path = couples/couple_long.h; sourceTree = "<group>"; };
-		BB882B400EE82D6A00E29E5C /* test.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test.cc; path = src/test/test.cc; sourceTree = SOURCE_ROOT; };
+		BB882B400EE82D6A00E29E5C /* test_bits.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_bits.cc; path = src/test/test_bits.cc; sourceTree = SOURCE_ROOT; };
 		BB88388710B48EC400A4028F /* modulo.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = modulo.cc; path = src/sim/modulo.cc; sourceTree = SOURCE_ROOT; };
 		BB88388810B48EC400A4028F /* modulo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = modulo.h; path = src/sim/modulo.h; sourceTree = SOURCE_ROOT; };
 		BB88388910B48EC400A4028F /* space_prop.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = space_prop.cc; path = src/sim/space_prop.cc; sourceTree = SOURCE_ROOT; };
@@ -2728,7 +2728,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D50E085C270024546A /* makefile.inc */,
-				BB882B400EE82D6A00E29E5C /* test.cc */,
+				BB882B400EE82D6A00E29E5C /* test_bits.cc */,
 				BBD3030225798FC600C6D61A /* test_ortho.cc */,
 				BB9EC3912091D6B000EF00E7 /* test_asm.cc */,
 				BB95C53B249627EC003CA21A /* test_array.cc */,
