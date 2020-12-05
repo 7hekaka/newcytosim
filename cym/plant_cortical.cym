@@ -1,72 +1,95 @@
-% Growing microtubules on the surface of a cylinder
-% FJN, Cambridge 2019.12.19 with Maud Formanek
+% Growing and colliding microtubules in 3D
+% Maud Formanek 13.03.2020
+% FJN 15.06.2020
 
 set simul system
 {
     dim = 3
-    time_step = 0.01
+    time_step = 0.005
     viscosity = 1
-    steric = 1, 100
-    display = ( style=3; back_color=white; )
+    precondition = 1
+    steric = 1, 5000
+    tolerance = 1
+    skip_free_single = 1
+    display = ( point_value=0.010; )
 }
 
 set space cell
 {
-    shape = ring
-    display = ( color=light_blue, dark_blue; visible=3 )
+    shape = cylinderZ
+    display = ( visible = 0; )
 }
 
 new cell
 {
-    length = 4
-    radius = 2
+    length = 10
+    edge = 2
+    radius = 7
 }
 
 set fiber microtubule
 {
-    steric = 1, 0.02
-    rigidity = 1
-    segmentation = 0.25
-    confine = surface, 1000
+    confine = inside, 250, cell
+    confine2 = on, 50, cell
+    steric = 1, 0.050
+    rigidity = 20
+    segmentation = 0.250
+
     activity = dynamic
-    growing_speed = 0.5
-    shrinking_speed = -2.0
-    growing_force = 0.5
-    hydrolysis_rate = 0.2
-    max_length = 12.0
+    growing_speed = 0.3467
+    shrinking_speed = -0.7
+    growing_force = 1.4422
+    hydrolysis_rate = 0.4
+    
     min_length = 0.01
-    persistent = 1
-    rebirth_rate = 1
-    display = ( color=black; line=5; minus_end=5; )
+    persistent = 0
+    
+    display = ( line=8, 8; length_scale=0.1; )
 }
 
-set hand binder
+set hand anchor
 {
-    binding = 10, 0.05
-    unbinding = 0, inf 
+    binding_rate = 10
+    binding_range = 0.020
+    unbinding_rate = 0.02
+    unbinding_force = 5.0
+    display = ( size=5; color=white; )
 }
 
-set single anchor
+set single grafted
 {
-    hand = binder
-    stiffness = 100
+    hand = anchor
+    confine = off, 0, cell
+    stiffness = 200
     activity = fixed
 }
 
-new 5000 anchor
-{
-    position = surface
-} 
 
-
-new 50 microtubule
+set hand nucleator
 {
-    length = 0.1
-    position = surface
-    direction = 0 0 1
+    unbinding = 0, 3
+    activity = nucleate
+    nucleate = 1, microtubule, ( length=0.1; direction=XY; end_state=grow; )
+    display = ( size=7; color=yellow; )
 }
 
-run 10000 system
+set single creator
 {
-    nb_frames = 10
+    confine = on, 0, cell
+    hand = nucleator
+    diffusion = 1
+}
+
+new 22000 grafted ( surface 1 )
+new 300 creator ( surface 1 )
+
+report microtubule:plus_state states.txt { verbose = 1 }
+
+repeat 500
+{
+    run 1000 system
+    {
+        nb_frames = 10
+    }
+    report microtubule:plus_state states.txt { verbose = 0; }
 }
