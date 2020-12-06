@@ -435,12 +435,12 @@ void Display3::drawFiberLines(Fiber const& fib) const
             break;
         case 2:
         {
-            const real beta = 1.0 / disp->tension_scale;
+            const real beta = 1 / disp->tension_scale;
             drawFiberSegments(fib, rad, color_seg_tension, beta);
         } break;
         case 3:
         {
-            const real beta = 1.0 / disp->tension_scale;
+            const real beta = 1 / disp->tension_scale;
             drawFiberSegments(fib, rad, color_seg_tension_jet, beta);
         } break;
         case 4:
@@ -474,7 +474,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
         } break;
         case 8:
         {
-            const real beta = 1.0 / disp->length_scale;
+            const real beta = 1 / disp->length_scale;
             drawFiberSegments(fib, rad, color_seg_height, beta);
         } break;
         case 9:
@@ -522,7 +522,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
             if ( x < 1.0 )
             {
                 B = A + x * ( B - A );
-                color_seg_distanceM(fib, 0.0, 1.0);
+                color_seg_distanceM(fib, 0, 1);
             }
         }
         setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, B);
@@ -608,8 +608,8 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
     FiberDisp const*const disp = fib.prop->disp;
 
     glEnable(GL_LIGHTING);
-    GLfloat blk[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat bak[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat blk[] = { 0.f, 0.f, 0.f, 1.f };
+    GLfloat bak[] = { 0.f, 0.f, 0.f, 1.f };
     disp->back_color.store(bak);
     glMaterialfv(GL_BACK, GL_AMBIENT,  blk);
     glMaterialfv(GL_BACK, GL_DIFFUSE,  bak);
@@ -621,7 +621,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    const real fac = 1.0 / disp->lattice_scale;
+    const real fac = 1 / disp->lattice_scale;
     const real uni = lat.unit();
     const real rad = width * sFactor;
     

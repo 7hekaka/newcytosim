@@ -168,6 +168,8 @@ namespace gle
     void octahedron();
     /// draw a icosahedron of radius 1
     void icosahedron();
+    /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
+    void arrowTail();
 
     /// draw a sphere of radius 1 at origin
     void sphere1U();
@@ -228,8 +230,6 @@ namespace gle
     void cylinderZ();
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
     void dumbbell();
-    /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
-    void arrowTail();
 
     /// draw a circular band composed of little triangles
     void drawArrowedBand(size_t nb_triangles, float width);

@@ -60,7 +60,7 @@ namespace glApp
     
     real         nearZ  = 0;       ///< normalized device Z-coordinate of front-plane
     real         midZ   = 0.5;     ///< normalized device Z-coordinate of middle
-    real         farZ   = 1.0;     ///< normalized device Z-coordinate of back-plane
+    real         farZ   = 1;       ///< normalized device Z-coordinate of back-plane
 
     unsigned int imageIndex = 0;   ///< index for image name
     double       flashEndTime;
@@ -888,14 +888,14 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
          
          The zoom preserves the position pointed at by the mouse.
          */
-        GLfloat wz = 1.0;
+        GLfloat wZ = 1.f;
 
         if ( button == GLUT_WHEEL_UP )
-            wz = 0.96969696f;
+            wZ = 0.96969696f;
         if ( button == GLUT_WHEEL_DOWN )
-            wz = 1.031250f;
+            wZ = 1.031250f;
 
-        if ( wz != 1 )
+        if ( wZ != 1 )
         {
             /* 
              in 2D, we do not allow any shift in Z,
@@ -905,8 +905,8 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
                 mouseDown = savedView.unproject(mouseX, mouseY, midZ);
             else
                 mouseDown.ZZ = 0;
-            view.zoom_out(wz);
-            view.move_to((1.0-wz)*mouseDown+wz*view.focus);
+            view.zoom_out(wZ);
+            view.move_to((1-wZ)*mouseDown+wZ*view.focus);
         }
 
         glutSetCursor(GLUT_CURSOR_INHERIT);

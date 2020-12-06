@@ -11,7 +11,7 @@ using namespace QuarticSolver;
 /// expands ( u - s )
 void expand(real& A, real& B, real s)
 {
-    A = 1.0;
+    A = 1;
     B = -s;
 }
 
@@ -91,7 +91,7 @@ void testQuartic(size_t cnt, const int DEG)
         s1 = 0; s2 = 0; s3 = 0; s4 = 0;
         
 #if ( 0 )
-        A = 1.0;
+        A = 1;
         B = RNG.sreal();
         C = RNG.sreal();
         D = RNG.sreal();

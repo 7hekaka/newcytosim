@@ -107,9 +107,9 @@ void display(View&, int)
     glPointSize(7);
     
     if ( front == &T )
-        glColor3f(0.0, 0.0, 0.7);
+        glColor3f(0.f, 0.f, 0.7);
     else
-        glColor3f(0.0, 0.7, 0.0);
+        glColor3f(0.f, 0.7, 0.f);
 
     glBegin(GL_POINTS);
     for ( size_t ii=0; ii < front->nbPoints(); ++ii )
@@ -129,9 +129,9 @@ void display(View&, int)
     {
         Vector3 p(front->addr(ii));
         Vector3 n = p.orthogonal();
-        glColor3f(1.0, 1.0, 1.0);
+        glColor3f(1.f, 1.f, 1.f);
         gle::gleVertex(p);
-        glColor3f(0.0, 0.0, 0.0);
+        glColor3f(0.f, 0.f, 0.f);
         gle::gleVertex(p+0.1*n);
     }
     glEnd();
@@ -145,13 +145,13 @@ void display(View&, int)
         Vector3 b, c;
         a.orthonormal(b,c);
         
-        glColor3f(0.0, 1.0, 0.0);
+        glColor3f(0.f, 1.f, 0.f);
         gle::gleVertex(a);
-        glColor3f(0.0, 0.0, 0.0);
+        glColor3f(0.f, 0.f, 0.f);
         gle::gleVertex(a+e*b);
-        glColor3f(0.0, 0.0, 1.0);
+        glColor3f(0.f, 0.f, 1.f);
         gle::gleVertex(a);
-        glColor3f(0.0, 0.0, 0.0);
+        glColor3f(0.f, 0.f, 0.f);
         gle::gleVertex(a+e*c);
     }
     glEnd();

@@ -4,7 +4,7 @@
 #include "glossary.h"
 
 int i = 0;
-float f = 0.0;
+float f = 0;
 std::string s;
 
 

@@ -891,7 +891,7 @@ void Display::drawFiberLines(Fiber const& fib) const
             const real beta = 0.5 * disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
-            real C = ( fib.nbPoints() > 2 ? fib.curvature(1) : 0.0 );
+            real C = ( fib.nbPoints() > 2 ? fib.curvature(1) : 0 );
             color_by_curvature(beta*C).load(alpha);
             gle::gleVertex(fib.posEndM());
             for ( size_t n = 1; n < fib.lastPoint(); ++n )
@@ -941,25 +941,25 @@ void Display::drawFiberLines(Fiber const& fib) const
             const real beta = fib.segmentation() / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
-            const size_t inx = fib.lastSegment();
-            for ( size_t n = 0; n <= inx; ++n )
+            const size_t last = fib.lastPoint();
+            for ( size_t n = 0; n < last; ++n )
             {
                 color_by_distanceP(fib, n, beta).load();
                 gle::gleVertex(fib.posP(n));
             }
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
             {
-                color_by_distanceP(fib, inx+1.0-dx, beta).load();
-                gle::gleVertex(fib.posPoint(inx, 1.0-dx));
+                color_by_distanceP(fib, last-dx, beta).load();
+                gle::gleVertex(fib.posPoint(last-1, 1-dx));
             }
-            color_by_distanceP(fib, inx+1.0, beta).load();
+            color_by_distanceP(fib, last, beta).load();
             gle::gleVertex(fib.posEndP());
             glEnd();
         } break;
         case 8:
         {
             // color according to distance to the confining Space
-            const real beta = 1.0 / disp->length_scale;
+            const real beta = 1 / disp->length_scale;
             lineWidth(disp->line_width);
             glBegin(GL_LINE_STRIP);
             for ( size_t n = 0; n < fib.nbPoints(); ++n )
@@ -1009,8 +1009,8 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         {
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
             {
-                color_by_distanceP(fib, inx+1.0-dx, beta).load();
-                gle::gleVertex(fib.posPoint(inx, 1.0-dx));
+                color_by_distanceP(fib, inx+1-dx, beta).load();
+                gle::gleVertex(fib.posPoint(inx, 1-dx));
             }
         }
         color_by_distanceP(fib, inx+1, beta).load();
@@ -1165,7 +1165,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     assert_true( inf <= sup );
     
     FiberDisp const*const disp = fib.prop->disp;
-    const real fac = 1.0 / disp->lattice_scale;
+    const real fac = 1 / disp->lattice_scale;
 
     lineWidth(width);
     glDisable(GL_LIGHTING);
@@ -1225,7 +1225,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     assert_true( inf <= sup );
     
     FiberDisp const*const disp = fib.prop->disp;
-    const real fac = 1.0 / disp->lattice_scale;
+    const real fac = 1 / disp->lattice_scale;
 
     lineWidth(width);
     glDisable(GL_LIGHTING);

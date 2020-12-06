@@ -102,13 +102,13 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
     {
         x[n] = RNG.sreal();
         y[n] = RNG.preal();
-        z[n] = 0.0;
+        z[n] = 0;
     }
     for ( size_t n = size; n < size+PAD; ++n )
     {
-        x[n] = 0.0;
-        y[n] = 0.0;
-        z[n] = 0.0;
+        x[n] = 0;
+        y[n] = 0;
+        z[n] = 0;
     }
 }
 

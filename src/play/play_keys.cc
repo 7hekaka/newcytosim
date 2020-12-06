@@ -274,7 +274,7 @@ void flipExplode(FiberDisp* p)
 {
     p->explode = ! p->explode;
     if ( p->explode && p->explode_range == 0 )
-        p->explode_range = 1.0;
+        p->explode_range = 1;
     flashText("fiber:explode = %i", p->explode);
 }
 
@@ -524,10 +524,9 @@ void changeEndStyle(FiberDisp* p, int val)
 
 void changeEndSize(FiberDisp* p, int inc)
 {
-    const real MIN = 1.0;
     real* size = p->end_size;
-    real s0 = std::max(MIN, size[0] + inc);
-    real s1 = std::max(MIN, size[1] + inc);
+    real s0 = std::max(real(1), size[0] + inc);
+    real s1 = std::max(real(1), size[1] + inc);
     if ( p->end_style[0] )
     {
         size[0] = s0;

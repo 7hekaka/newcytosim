@@ -56,11 +56,11 @@ protected:
 
     public:
         
-        zObject() : depth_(0.0) { }
+        zObject() : depth_(0) { }
         
-        zObject(Mecable const* m) : point_(m, 0), depth_(0.0) { }
+        zObject(Mecable const* m) : point_(m, 0), depth_(0) { }
 
-        zObject(Mecable const* m, size_t i) : point_(m, i), depth_(0.0) { }
+        zObject(Mecable const* m, size_t i) : point_(m, i), depth_(0) { }
         
         /// position
         Vector position() const { return point_.pos(); }
@@ -155,10 +155,10 @@ public:
     void displayTiled(Simul const&, int nine);
 
     /// set OpenGL line width
-    void lineWidth(real w) const { glLineWidth(std::max((GLfloat)(w*uFactor), 0.25f)); }
+    void lineWidth(float w) const { glLineWidth(std::max(w*uFactor, 0.25f)); }
 
     /// set OpenGL point size
-    void pointSize(real w) const { glPointSize(std::max((GLfloat)(w*uFactor), 0.25f)); }
+    void pointSize(float w) const { glPointSize(std::max(w*uFactor, 0.25f)); }
     
     /// draw primitive `obj` at given position
     void drawObject(Vector const& pos, float rad, void (*obj)()) const;

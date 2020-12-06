@@ -101,9 +101,9 @@ void FiberDisp::read(Glossary& glos)
     glos.set(end_style[1], "minus_end", 1, {{"off", 0}, {"sphere", 1}, {"cone", 2},
                            {"cylinder", 3}, {"fins", 4}, {"inverted_fins", 5}, {"cube", 6}});
     
-    glos.set(end_style,  2,    "end_style");
-    glos.set(end_size,   2,    "end_size");
-    glos.set(end_color,  5,    "end_color");
+    glos.set(end_size,  2, "end_size");
+    glos.set(end_style, 2, "end_style");
+    glos.set(end_color, 5, "end_color");
     
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(lattice_style,    "draw_lattice");

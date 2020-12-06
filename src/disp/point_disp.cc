@@ -378,7 +378,7 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
     
     glTranslatef(t, t, 0);
     glScalef(s,s,s);
-    if ( w > 0.0 ) glLineWidth(w);
+    if ( w > 0 ) glLineWidth(w);
     // we use a transparent background, because points will overlap
     glClearColor(0,0,0,0);
     

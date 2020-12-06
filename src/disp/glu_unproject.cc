@@ -31,7 +31,7 @@ int invMatrix3(const FLOAT m[9], FLOAT inv[9])
     
     if ( det != 0 )
     {
-        det = 1.0 / det;
+        det = 1 / det;
         inv[0] = ( m[4]*m[8] - m[5]*m[7] ) * det;
         inv[3] = ( m[5]*m[6] - m[3]*m[8] ) * det;
         inv[6] = ( m[3]*m[7] - m[4]*m[6] ) * det;
@@ -52,12 +52,12 @@ int invMatrix3(const FLOAT m[9], FLOAT inv[9])
  */
 int invMatrix4(const FLOAT m[16], FLOAT inv[16])
 {
-    inv[ 0] =   m[ 5]*m[10]*m[15] - m[ 5]*m[11]*m[14] - m[ 9]*m[ 6]*m[15]
-              + m[ 9]*m[ 7]*m[14] + m[13]*m[ 6]*m[11] - m[13]*m[ 7]*m[10];
-    inv[ 4] = - m[ 4]*m[10]*m[15] + m[ 4]*m[11]*m[14] + m[ 8]*m[ 6]*m[15]
-              - m[ 8]*m[ 7]*m[14] - m[12]*m[ 6]*m[11] + m[12]*m[ 7]*m[10];
-    inv[ 8] =   m[ 4]*m[ 9]*m[15] - m[ 4]*m[11]*m[13] - m[ 8]*m[ 5]*m[15]
-              + m[ 8]*m[ 7]*m[13] + m[12]*m[ 5]*m[11] - m[12]*m[ 7]*m[ 9];
+    inv[ 0] =   m[5]*m[10]*m[15] - m[5]*m[11]*m[14] - m[9]*m[6]*m[15]
+              + m[9]*m[7]*m[14] + m[13]*m[6]*m[11] - m[13]*m[7]*m[10];
+    inv[ 4] = - m[4]*m[10]*m[15] + m[4]*m[11]*m[14] + m[8]*m[6]*m[15]
+              - m[8]*m[7]*m[14] - m[12]*m[6]*m[11] + m[12]*m[7]*m[10];
+    inv[ 8] =   m[4]*m[9]*m[15] - m[4]*m[11]*m[13] - m[8]*m[5]*m[15]
+              + m[8]*m[7]*m[13] + m[12]*m[5]*m[11] - m[12]*m[7]*m[9];
     inv[12] = - m[4]*m[9]*m[14] + m[4]*m[10]*m[13] + m[8]*m[5]*m[14]
               - m[8]*m[6]*m[13] - m[12]*m[5]*m[10] + m[12]*m[6]*m[9];
     inv[ 1] = - m[1]*m[10]*m[15] + m[1]*m[11]*m[14] + m[9]*m[2]*m[15]
@@ -90,7 +90,7 @@ int invMatrix4(const FLOAT m[16], FLOAT inv[16])
     if (det == 0)
         return GL_FALSE;
     
-    det = 1.0 / det;
+    det = 1 / det;
     
     for (int i = 0; i < 16; i++)
         inv[i] = inv[i] * det;
@@ -132,7 +132,7 @@ GLint myUnproject(FLOAT winx, FLOAT winy, FLOAT winz,
     in[0]=winx;
     in[1]=winy;
     in[2]=winz;
-    in[3]=1.0;
+    in[3]=1;
     
     /* Map x and y from window coordinates */
     in[0] = (in[0] - viewport[0]) / viewport[2];
@@ -144,7 +144,7 @@ GLint myUnproject(FLOAT winx, FLOAT winy, FLOAT winz,
     in[2] = in[2] * 2 - 1;
     
     mulMatrixVec(inv, in, out);
-    if (out[3] == 0.0)
+    if (out[3] == 0)
         return GL_FALSE;
 
     *objx = out[0] / out[3];

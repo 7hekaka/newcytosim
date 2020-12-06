@@ -186,7 +186,7 @@ namespace gle
     template < typename FLOAT >
     inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3])
     {
-        const FLOAT s = std::copysign((FLOAT)1.0, v[2]);
+        const FLOAT s = std::copysign((FLOAT)1, v[2]);
         /// optimized version by Marc B. Reynolds
         const FLOAT a = v[1] / ( v[2] + s );
         const FLOAT b = v[1] * a;
@@ -203,7 +203,7 @@ namespace gle
     template < typename FLOAT >
     inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3], FLOAT z[3])
     {
-        const FLOAT s = std::copysign((FLOAT)1.0, v[2]);
+        const FLOAT s = std::copysign((FLOAT)1, v[2]);
         /// optimized version by Marc B. Reynolds
         const FLOAT a = v[1] / ( v[2] + s );
         const FLOAT b = v[1] * a;
@@ -380,15 +380,8 @@ namespace gle
     void triangleS()
     {
         constexpr GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
-        constexpr GLfloat pts[] = {
-             0,  1.0, 0,
-            -H, -0.5, 0,
-             H, -0.5, 0 };
-
-        constexpr GLfloat dir[] = {
-            0, 0, 1.0,
-            0, 0, 1.0,
-            0, 0, 1.0 };
+        constexpr GLfloat pts[] = { 0, 1, 0, -H, -.5f, 0, H, -.5f, 0 };
+        constexpr GLfloat dir[] = { 0, 0, 1, 0, 0, 1, 0, 0, 1 };
         
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -810,7 +803,7 @@ namespace gle
         };
         
         // normals
-        const GLfloat N = 1.0 / M_SQRT3;
+        const GLfloat N = 1 / M_SQRT3;
         const GLfloat dir[] = {
             +N,-N, N, N,-N, N, N,-N, N,
             -N, N,-N,-N, N,-N,-N, N,-N,
@@ -868,7 +861,7 @@ namespace gle
     void icosahedron()
     {
         const GLfloat G = 0.5+0.5*std::sqrt(5.0);
-        const GLfloat O = 1.0/std::sqrt(G*G+1.0); //0.5257311121f;
+        const GLfloat O = 1/std::sqrt(G*G+1); //0.5257311121f;
         const GLfloat T = G * O;   //0.8506508084f;
         
         // Twelve vertices of icosahedron on unit sphere
@@ -977,6 +970,59 @@ namespace gle
         glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
     }
     
+    /// Three fins similar to the tail of a V2 rocket
+    void initArrowTail(GLint buf1, GLint buf2, GLfloat R=0.1f,
+                       GLfloat B=-0.5f, GLfloat H=-1.5f, GLfloat L=2.0f)
+    {
+        const GLfloat T = B + L;
+        const GLfloat U = H + L;
+        const GLfloat C = 0.5f;
+        const GLfloat S = M_SQRT3 * 0.5f;
+        const GLfloat cR = R * C;
+        const GLfloat sR = R * S;
+
+        const GLfloat pts[] = {
+            cR,-sR, B,  1,  0, H,  1,  0, U,
+            cR,-sR, B,  1,  0, U,  0,  0, T,
+            cR, sR, B,  0,  0, T,  1,  0, U,
+            cR, sR, B,  1,  0, U,  1,  0, H,
+            cR,-sR, B,  0,  0, T, -C, -S, U,
+            cR,-sR, B, -C, -S, U, -C, -S, H,
+            -R,  0, B, -C, -S, H, -C, -S, U,
+            -R,  0, B, -C, -S, U,  0,  0, T,
+            cR, sR, B, -C,  S, H, -C,  S, U,
+            cR, sR, B, -C,  S, U,  0,  0, T,
+            -R,  0, B,  0,  0, T, -C,  S, U,
+            -R,  0, B, -C,  S, U, -C,  S, H,
+            cR, sR, B, -R,  0, B, -C,  S, H,
+            -R,  0, B, cR,-sR, B, -C, -S, H,
+            cR,-sR, B, cR, sR, B,  1,  0, H
+        };
+        
+        const GLfloat dir[] = {
+            0, -1, 0,  0, -1, 0,  0, -1, 0,
+            0, -1, 0,  0, -1, 0,  0, -1, 0,
+            0, +1, 0,  0, +1, 0,  0, +1, 0,
+            0, +1, 0,  0, +1, 0,  0, +1, 0,
+            S, -C, 0,  S, -C, 0,  S, -C, 0,
+            S, -C, 0,  S, -C, 0,  S, -C, 0,
+           -S,  C, 0, -S,  C, 0, -S,  C, 0,
+           -S,  C, 0, -S,  C, 0, -S,  C, 0,
+            S,  C, 0,  S,  C, 0,  S,  C, 0,
+            S,  C, 0,  S,  C, 0,  S,  C, 0,
+           -S, -C, 0, -S, -C, 0, -S, -C, 0,
+           -S, -C, 0, -S, -C, 0, -S, -C, 0,
+            C, -S,-1,  C, -S,-1,  C, -S,-1,
+            C,  S,-1,  C,  S,-1,  C,  S,-1,
+            -1, 0,-1, -1,  0,-1, -1,  0,-1
+        };
+        
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
+    }
+
     //-----------------------------------------------------------------------
 
     void drawBuffer(GLint buf1, GLint buf2, unsigned cnt, GLenum mode)
@@ -1002,6 +1048,7 @@ namespace gle
             initCube(buf_[2], buf_[3]);
             initOctahedron(buf_[4], buf_[5]);
             initIcosahedron(buf_[6], buf_[7]);
+            initArrowTail(buf_[8], buf_[9]);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
@@ -1010,6 +1057,7 @@ namespace gle
     void cube() { drawBuffer(buf_[2], buf_[3], 36, GL_TRIANGLES); }
     void octahedron() { drawBuffer(buf_[4], buf_[5], 24, GL_TRIANGLES); }
     void icosahedron() { drawBuffer(buf_[6], buf_[7], 60, GL_TRIANGLES); }
+    void arrowTail() { drawBuffer(buf_[8], buf_[9], 45, GL_TRIANGLES); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
@@ -1500,86 +1548,6 @@ namespace gle
             glNormal3f(C*co_[n], C*si_[n], S);
             glVertex3f(R*co_[n], R*si_[n], B);
         }
-        glEnd();
-    }
-    
-    /**
-     Draw three fins similar to the tail of a V2 rocket
-     */
-    void arrowTail()
-    {
-        GLfloat r = 0.1f;  //bottom inner radius
-        GLfloat c = 0.5f, d = -0.5f;
-        GLfloat s = 0.8660254037844386f; // sqrtf(3)/2
-        GLfloat t = -s;
-        GLfloat rc = r * c;
-        GLfloat rs = r * s;
-        GLfloat rt = -rs;
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f(  0, -1, 0 );
-        glVertex3f( rc, rt, -0.5 );
-        glVertex3f(  1,  0, -1.5 );
-        glVertex3f(  1,  0,  0.5 );
-        glVertex3f(  0,  0,  1.5 );
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f(  0, +1, 0 );
-        glVertex3f( rc, rs, -0.5 );
-        glVertex3f(  0,  0,  1.5 );
-        glVertex3f(  1,  0,  0.5 );
-        glVertex3f(  1,  0, -1.5 );
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f(  s,  d, 0 );
-        glVertex3f( rc, rt, -0.5 );
-        glVertex3f(  0,  0,  1.5 );
-        glVertex3f(  d,  t,  0.5 );
-        glVertex3f(  d,  t, -1.5 );
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f(  t, c, 0 );
-        glVertex3f( -r, 0, -0.5 );
-        glVertex3f(  d, t, -1.5 );
-        glVertex3f(  d, t,  0.5 );
-        glVertex3f(  0, 0,  1.5 );
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f(  s, c, 0 );
-        glVertex3f( rc, rs, -0.5 );
-        glVertex3f(  d,  s, -1.5 );
-        glVertex3f(  d,  s,  0.5 );
-        glVertex3f(  0,  0,  1.5 );
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f(  t, d, 0 );
-        glVertex3f( -r, 0, -0.5 );
-        glVertex3f(  0, 0,  1.5 );
-        glVertex3f(  d, s,  0.5 );
-        glVertex3f(  d, s, -1.5 );
-        glEnd();
-        
-        // closing the bottom gaps
-        glBegin(GL_TRIANGLES);
-        glNormal3f(  c,  t, -1 );
-        glVertex3f( rc, rs, -0.5 );
-        glVertex3f( -r,  0, -0.5 );
-        glVertex3f(  d,  s, -1.5 );
-        
-        glNormal3f(  c,  s, -1 );
-        glVertex3f( -r,  0, -0.5 );
-        glVertex3f( rc, rt, -0.5 );
-        glVertex3f(  d,  t, -1.5 );
-        
-        glNormal3f( -1,  0, -1 );
-        glVertex3f( rc, rt, -0.5 );
-        glVertex3f( rc, rs, -0.5 );
-        glVertex3f(  1,  0, -1.5 );
         glEnd();
     }
     
@@ -2581,16 +2549,16 @@ namespace gle
             switch(d)
             {
                 case 0:
-                    gle_color(1.0, 0.0, 0.0, 1.0).load_load();
+                    gle_color(1, 0, 0, 1).load_load();
                     glRotatef( 90, 0, 1, 0);
                     break;
                 case 1:
-                    gle_color(0.0, 1.0, 0.0, 1.0).load_load();
+                    gle_color(0, 1, 0, 1).load_load();
                     glRotatef(-90, 1, 0, 0);
                     glRotatef(180, 0, 0, 1);
                     break;
                 case 2:
-                    gle_color(0.0, 0.0, 1.0, 1.0).load_load();
+                    gle_color(0, 0, 1, 1).load_load();
                     glRotatef(-90, 0, 0, 1);
                     break;
             }

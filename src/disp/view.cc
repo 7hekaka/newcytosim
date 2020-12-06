@@ -207,7 +207,7 @@ void View::setLights(bool local) const
     GLfloat matWhite[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat matGray[]   = { 0.2f, 0.2f, 0.2f, 1.0f };
     GLfloat matBlack[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-    //GLfloat matBlue[]   = { 0.0, 0.0, 1.0, 1.0 };
+    //GLfloat matBlue[]   = { 0.f, 0.f, 1.f, 1.f };
     
     glMaterialfv(GL_FRONT, GL_AMBIENT,   matBlack);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,   matBlack);
@@ -857,7 +857,7 @@ void View::drawScaleTicksV(GLfloat d, GLfloat a, GLfloat b) const
 void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
 {
     // draw a box of length 'scale'
-    glLineWidth(1.0);
+    glLineWidth(1);
     glBegin(GL_LINE_LOOP);
     glVertex2f(-s/2, a);
     glVertex2f(-s/2, b);
@@ -907,7 +907,7 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
 void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
 {
     // draw a box of length 'scale'
-    glLineWidth(1.0);
+    glLineWidth(1);
     glBegin(GL_LINE_LOOP);
     glVertex2f(a, -s/2);
     glVertex2f(b, -s/2);

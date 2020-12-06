@@ -91,7 +91,7 @@ void paintDraw(int x_inf, int x_sup, int y, int z, void*)
 
 void rasterize(Vector P, Vector Q, void (paint)(int, int, int, int, void*))
 {
-    real iPQ = 1.0 / ( P - Q ).norm();
+    real iPQ = 1 / ( P - Q ).norm();
 #if ( DIM == 2 )
     Rasterizer::paintFatLine2D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
     //Rasterizer::paintFatLine2D(paint, nullptr, P, Q, iPQ, radius);
@@ -219,8 +219,8 @@ void display(View&, int)
     
     //--------------draw points on the grid:
 #if ( DIM == 2 )
-    glPointSize(1.0);
-    glColor3f(0.5, 0.5, 0.5);
+    glPointSize(1);
+    glColor3f(.5f, .5f, .5f);
     glBegin(GL_POINTS);
     for ( int i = -size; i <= size; i += 1)
     for ( int j = -size; j <= size; j += 1)
@@ -231,7 +231,7 @@ void display(View&, int)
     //--------------draw a grid in gray:
 #if ( DIM == 2 )
     glLineWidth(0.5);
-    glColor3f(0.5, 0.5, 0.5);
+    glColor3f(.5f, .5f, .5f);
     glBegin(GL_LINES);
     for ( int i = -size; i <= size; i += 5)
     {
@@ -307,7 +307,7 @@ void speedTest(size_t cnt)
     {
         Vector P = pts[n-1];
         Vector Q = pts[n];
-        real iPQ = 1.0 / ( P - Q ).norm();
+        real iPQ = 1 / ( P - Q ).norm();
         for ( size_t c = 0; c < cnt; ++c )
         {
 #if ( DIM == 2 )

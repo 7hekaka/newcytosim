@@ -164,12 +164,12 @@ void display(View&, int)
 #endif
     
     //--------------draw a grid in gray:
-    glColor4f(1,1,1,0.6);
-    glLineWidth(1.0);
+    glColor4f(1,1,1,.6f);
+    glLineWidth(1);
     drawEdges(myGrid);
 
     //--------------draw content of cells
-    glColor3f(0.5,0.5,1);
+    glColor3f(.5f,.5f,1);
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
     {
         int val = myGrid.icell(c);

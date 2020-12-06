@@ -35,10 +35,10 @@ void timerFunction(int value)
     real xn = px.norm();
     Vector2 pxn = px.normalized();
     
-    P(0,0) = 1.0 - pxn[0] * pxn[0];
-    P(1,0) =     - pxn[1] * pxn[0];
-    P(0,1) =     - pxn[0] * pxn[1];
-    P(1,1) = 1.0 - pxn[1] * pxn[1];
+    P(0,0) = 1 - pxn[0] * pxn[0];
+    P(1,0) =   - pxn[1] * pxn[0];
+    P(0,1) =   - pxn[0] * pxn[1];
+    P(1,1) = 1 - pxn[1] * pxn[1];
     
     Vector2 rhs, f, fx;
     Vector2 random(RNG.gauss()*noise/km, RNG.gauss()*noise/km, 0);
@@ -102,22 +102,22 @@ void display()
     glPointSize(7.0);
     glBegin(GL_POINTS);
     
-    glColor3f(1.0, 1.0, 1.0);
+    glColor3f(1.f, 1.f, 1.f);
     glVertex2d(px[0], px[1]);
     
-    glColor3f(0.0, 0.0, 1.0);
+    glColor3f(0.f, 0.f, 1.f);
     glVertex2d(pg[0], pg[1]);
     
-    glColor3f(1.0, 0.0, 0.0);
+    glColor3f(1.f, 0.f, 0.f);
     glVertex2d(pf[0], pf[1]);
     
-    glColor3f(0.0, 1.0, 0.0);
+    glColor3f(0.f, 1.f, 0.f);
     glVertex2d(pc[0], pc[1]);
     
-    glColor3f(0.0, 0.0, 1.0);
+    glColor3f(0.f, 0.f, 1.f);
     glVertex2d(pn[0], pn[1]);
     
-    glColor3f(1.0, 0.0, 1.0);
+    glColor3f(1.f, 0.f, 1.f);
     glVertex2d(pp[0], pp[1]);
     
     glEnd();
@@ -268,7 +268,7 @@ void processMotion(int x, int y)
     {
         case MOUSE_ZOOM:
             
-            d = 1.0 + 4 * real( x - mouseX ) / viewport[2];
+            d = 1 + 4 * real( x - mouseX ) / viewport[2];
             if ( d > 0 ) zoom = zoomSaved * d;
                 setModelView();
             break;
@@ -287,7 +287,7 @@ void processMotion(int x, int y)
 
 void initGLUT()
 {
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);

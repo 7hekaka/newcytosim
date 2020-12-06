@@ -51,7 +51,7 @@ void reshape(int ww, int wh)
 //------------------------------------------------------------------------------
 void initGL()
 {
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_BLEND);
@@ -66,7 +66,7 @@ void initGL()
     glFogi(GL_FOG_MODE, GL_LINEAR);
     glFogf(GL_FOG_START, 0 );
     glFogf(GL_FOG_END,   4 );
-    GLfloat rgba[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat rgba[] = { 0.f, 0.f, 0.f, 1.0 };
     glFogfv(GL_FOG_COLOR, rgba);
 }
 
@@ -74,9 +74,9 @@ void setView(GLfloat angle)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -2.1);
-    glRotatef(angle, 0.0, 0.0, 1.0);
-    glRotatef(angle, 1.0, 0.0, 0.0);
+    glTranslatef(0.f, 0.f, -2.1);
+    glRotatef(angle, 0.f, 0.f, 1.0);
+    glRotatef(angle, 1.0, 0.f, 0.f);
 }
 
 //------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ void displayVBO()
     /*
     /// Draw lines
     glLineWidth(3);
-    glColor3f(1.0, 1.0, 1.0);
+    glColor3f(1, 1, 1);
     glDrawArrays(GL_LINE_LOOP, 0, 4);
      */
     

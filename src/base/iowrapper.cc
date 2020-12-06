@@ -244,7 +244,7 @@ void Inputter::readFloats(float a[], const unsigned D)
         for ( d = 0; d < vecsize_; ++d )
             a[d] = readFloat();
         for (; d < D; ++d )
-            a[d] = 0;
+            a[d] = 0.0f;
     }
     else
     {

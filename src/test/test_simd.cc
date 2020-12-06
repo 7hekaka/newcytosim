@@ -25,7 +25,7 @@ void init()
 {
     for ( size_t ii=0; ii<SIZE; ++ii )
     {
-        vX[ii] = 1.0/real(SIZE-ii);
+        vX[ii] = 1/real(SIZE-ii);
         vY[ii] = real(SIZE-ii);
     }
 }

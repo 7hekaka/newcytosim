@@ -142,7 +142,7 @@ void display(View&, int)
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     
-    glColor3f(0, 0, 0.75);
+    glColor3f(0, 0, 0.75f);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     displayFaces();
@@ -171,11 +171,11 @@ void display(View&, int)
         {
             Platonic::Vertex & dv = ico->vertex(ii);
             if ( dv.weight(2) == 0  &&  dv.weight(1) == 0 )
-                glColor3f(1.0, 1.0, 1.0);
+                glColor3f(1.f, 1.f, 1.f);
             else if ( dv.weight(2) == 0 )
-                glColor3f(0.0, 1.0, 0.0);
+                glColor3f(0.f, 1.f, 0.f);
             else
-                glColor3f(0.5, 0.5, 0.5);
+                glColor3f(.5f, .5f, .5f);
             
             const float* v = ico->vertex_data(ii);
             Vector3 pos(v[0], v[1], v[2]);

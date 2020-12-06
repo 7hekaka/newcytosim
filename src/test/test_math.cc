@@ -75,8 +75,8 @@ void infinities()
     out << "0   < inf = " << ( 0 < INFINITY ) << '\n';
     out << "inf < inf = " << ( INFINITY < INFINITY ) << '\n';
     real z = 0;
-    real y = 0.0 / z;
-    real x = 1.0 / z;
+    real y = 0 / z;
+    real x = 1 / z;
     out << " 1.0/0.0 = " << x << '\n';
     out << " 0.0/0.0 = " << y << '\n';
 }

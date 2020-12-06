@@ -47,14 +47,14 @@ GLfloat zoom = 0.8;
 
 //------------- point of focus:
 
-GLfloat focus[] = { 0.0, 0.0 };
+GLfloat focus[] = { 0.f, 0.f };
 
 //------------- variables for the mouse driven zoom:
 
 int mouseAction;
 GLfloat zoomSave, zoomFactor;
-GLfloat mouseDown[] = { 0.0, 0.0, 0.0 };
-GLfloat pointer[] = { 0.0, 0.0, 0.0 };
+GLfloat mouseDown[] = { 0.f, 0.f, 0.f };
+GLfloat pointer[] = { 0.f, 0.f, 0.f };
 
 //------------- function to set the OpenGL transformation:
 
@@ -78,17 +78,17 @@ void setOrtho(GLfloat mat[16],
               GLfloat const& far)
 {
     for ( int d = 0; d < 16; ++d )
-        mat[d] = 0;
+        mat[d] = 0.f;
     
-    mat[ 0] = 2.0 / ( right - left );
-    mat[ 5] = 2.0 / ( top - bottom );
-    mat[10] = 2.0 / ( near - far );
+    mat[ 0] = 2.f / ( right - left );
+    mat[ 5] = 2.f / ( top - bottom );
+    mat[10] = 2.f / ( near - far );
 
     mat[12] = - (right + left) / (right - left);
     mat[13] = - (top + bottom) / (top - bottom);
     mat[14] = - (far + near) / (far - near);
     
-    mat[15] = 1.0;
+    mat[15] = 1.f;
 }
 
 void unproject(const GLfloat X, const GLfloat Y, GLfloat res[2])
@@ -236,7 +236,7 @@ void processMouse(int button, int state, int x, int y)
             GLfloat yy = y - 0.5*windowSize[1];
             zoomFactor = std::sqrt( xx*xx + yy*yy );
             if ( zoomFactor > 0 )
-                zoomFactor = 1.0 / zoomFactor;
+                zoomFactor = 1 / zoomFactor;
             zoomSave = zoom;
         } break;
             
@@ -295,19 +295,19 @@ void display()
     glClear( GL_COLOR_BUFFER_BIT );
     
     // --- set line width to 1 and color to white:
-    glColor3f(1.0, 1.0, 1.0);
-    glLineWidth(1.0);
+    glColor3f(1.f, 1.f, 1.f);
+    glLineWidth(1);
     
     // Display of the simulation state:
     // --- draw a wireframe triangle:
     glBegin(GL_LINE_LOOP);
-    glVertex2f( 1.0, -1.0);
-    glVertex2f(-1.0, -1.0);
-    glVertex2f( 0.0,  1.0);
+    glVertex2f( 1.f, -1.f);
+    glVertex2f(-1.f, -1.f);
+    glVertex2f( 0.f,  1.f);
     glEnd();
     
     // --- a point of variable size at the last mouse click:
-    glColor3f(1.0, 1.0, 0.0);
+    glColor3f(1.f, 1.f, 0.f);
     glPointSize(pointSize);
     glBegin(GL_POINTS);
     glVertex2d(pointer[0], pointer[1]);
@@ -337,7 +337,7 @@ void timerFunction(int value)
 void initGL()
 {
     // --- choose the clearing color: black
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     
     //--- hints for OpenGL rendering:
     glEnable(GL_BLEND);

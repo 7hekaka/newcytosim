@@ -149,7 +149,7 @@ void reshape(int ww, int wh)
 //------------------------------------------------------------------------------
 void initGL()
 {
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_BLEND);
@@ -164,7 +164,7 @@ void initGL()
     glFogi(GL_FOG_MODE, GL_LINEAR);
     glFogf(GL_FOG_START, 0 );
     glFogf(GL_FOG_END,   4 );
-    GLfloat rgba[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat rgba[] = { 0.f, 0.f, 0.f, 1.f };
     glFogfv(GL_FOG_COLOR, rgba);
 }
 
@@ -172,9 +172,9 @@ void setView(GLfloat angle)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -range);
-    glRotatef(angle, 0.0, 0.0, 1.0);
-    glRotatef(angle, 1.0, 0.0, 0.0);
+    glTranslatef(0.f, 0.f, -range);
+    glRotatef(angle, 0.f, 0.f, 1.f);
+    glRotatef(angle, 1.f, 0.f, 0.f);
 }
 
 //------------------------------------------------------------------------------
@@ -184,15 +184,15 @@ void display()
     
     setView(angle);
     glLineWidth(linewidth);
-    glColor3f(1.0, 1.0, 1.0);
+    glColor3f(1.f, 1.f, 1.f);
     glutWireCube(1.35);
     
     glPointSize(32.0);
     glBegin(GL_POINTS);
-    glColor3f(1.0, 1.0, 1.0);   glVertex3f(0.0, 0.0, 0.0);
-    glColor3f(1.0, 0.0, 0.0);   glVertex3f(1.0, 0.0, 0.0);
-    glColor3f(0.0, 1.0, 0.0);   glVertex3f(0.0, 1.0, 0.0);
-    glColor3f(0.0, 0.0, 1.0);   glVertex3f(0.0, 0.0, 1.0);
+    glColor3f(1.f, 1.f, 1.f);   glVertex3f(0.f, 0.f, 0.f);
+    glColor3f(1.f, 0.f, 0.f);   glVertex3f(1.f, 0.f, 0.f);
+    glColor3f(0.f, 1.f, 0.f);   glVertex3f(0.f, 1.f, 0.f);
+    glColor3f(0.f, 0.f, 1.f);   glVertex3f(0.f, 0.f, 1.f);
     glEnd();
     
     if ( transparency )
@@ -209,7 +209,7 @@ void display()
     }
     else
     {
-        glColor3f(0.5, 0.5, 0.5);
+        glColor3f(.5f, .5f, .5f);
         glutSolidSphere(1, 32, 32);
     }
     

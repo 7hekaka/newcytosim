@@ -88,10 +88,10 @@ int timerOn = false;
 int timerDelay = 50;
 
 //display parameter for OpenGL
-GLfloat line_width = 0.5;
+GLfloat line_width = 0.5f;
 
 //amount of white added to colors
-const GLfloat COL = 0.8;
+const GLfloat COL = 0.8f;
 
 //------------------------------------------------------------------------------
 
@@ -482,7 +482,7 @@ void display(View&, int)
         spc->draw3D();
         // draw front side
         glCullFace(GL_BACK);
-        gle_color(1.0, 1.0, 1.0, 0.1).load_front();
+        gle_color(1.f, 1.f, 1.f, 0.1).load_front();
         spc->draw3D();
         glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
@@ -503,9 +503,9 @@ void display(View&, int)
         if ( showPoint(ii) )
         {
             if ( inside[ii] )
-                glColor3f(0.0, COL, 0.0);
+                glColor3f(0.f, COL, 0.f);
             else
-                glColor3f(COL, 0.0, COL);
+                glColor3f(COL, 0.f, COL);
             gleVertex( point[ii] );
         }
     }
@@ -521,9 +521,9 @@ void display(View&, int)
             if ( showPoint(ii) )
             {
                 if ( inside[ii] )
-                    glColor3f(0.0, COL, 0.0);
+                    glColor3f(0.f, COL, 0.f);
                 else
-                    glColor3f(0.0, 0.0, COL);
+                    glColor3f(0.f, 0.f, COL);
                 gleVertex( point[ii] );
                 gleVertex( project[ii] );
             }
@@ -537,9 +537,9 @@ void display(View&, int)
         glBegin(GL_LINES);
         for ( size_t ii = 0; ii < nbpts; ++ii )
         {
-            glColor4f(1.0, 1.0, 1.0, 1.0);
+            glColor4f(1.f, 1.f, 1.f, 1.f);
             gleVertex(project[ii]);
-            glColor4f(1.0, 1.0, 1.0, 0.0);
+            glColor4f(1.f, 1.f, 1.f, 0.f);
             gleVertex(project[ii] + normal[ii]);
         }
         glEnd();
@@ -553,7 +553,7 @@ void display(View&, int)
         {
             if ( showPoint(ii) )
             {
-                glColor3f(COL, 0.0, 0.0);
+                glColor3f(COL, 0.f, 0.f);
                 gleVertex(project[ii]);
                 gleVertex(project2[ii]);
             }
@@ -565,12 +565,12 @@ void display(View&, int)
     {
         glPointSize(2.0);
         glBegin(GL_POINTS);
-        glColor3f(1.0, COL, COL);
+        glColor3f(1.f, COL, COL);
         for ( size_t ii = 0; ii < nbpts; ++ii )
             gleVertex(edge[ii]);
         glEnd();
         glBegin(GL_POINTS);
-        glColor3f( 0.0, COL, 0.0);
+        glColor3f( 0.f, COL, 0.f);
         for ( size_t ii = 0; ii < nbpts; ++ii )
             gleVertex(project[ii]);
         glEnd();
