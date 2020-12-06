@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #ifndef GLE_H
 #define GLE_H
@@ -135,31 +135,7 @@ namespace gle
     void discDown();
     /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
     void disc2();
-    /// draw a triangle of radius 1 in plane XY, normals pointing in +Z
-    void triangleS();
-    void triangleL();
-    /// draw a triangle of radius 1 in plane XY, normals pointing in +Z
-    void nablaS();
-    void nablaL();
-    /// draw a square of radius 1 in plane XY, normals pointing in +Z
-    void squareL();
-    void squareS();
-    /// draw a rectangle of radius 1 in plane XY, normals pointing in +Z
-    void rectangleL();
-    void rectangleS();
-    /// draw a PLUS of radius 1 in plane XY, normals pointing in +Z
-    void plusS();
-    void plusL();
-    /// draw a pentagon of radius 1 in plane XY, normals pointing in +Z
-    void pentagonS();
-    void pentagonL();
-    /// draw an hexagon of surface M_PI in plane XY, normals pointing in +Z
-    void hexagonS();
-    void hexagonL();
-    /// draw a star of radius 1 in plane XY, normals pointing in +Z
-    void starS();
-    void starL();
-    
+
     /// draw a tetrahedron of side 2 in 3D
     void tetrahedron();
     /// draw a Cube of side 2

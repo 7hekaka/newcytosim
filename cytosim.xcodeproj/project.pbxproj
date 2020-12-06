@@ -104,6 +104,8 @@
 		BB2D09FB243DBC5E00C1C0AB /* test_solver.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EFCAD230AAF7100073B5A /* test_solver.cc */; };
 		BB2EBF470FCF1F3F00CCA721 /* fiber_site.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */; };
 		BB2EBF480FCF1F3F00CCA721 /* fiber_site.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */; };
+		BB2F144C257D8E260033F86D /* gle_zoo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2F144A257D8E260033F86D /* gle_zoo.cc */; };
+		BB2F144D257D8E260033F86D /* gle_zoo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2F144B257D8E260033F86D /* gle_zoo.h */; };
 		BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
 		BB30922D216543C000C6DEE4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB31697C24A0F3EE008DFDB3 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
@@ -1414,6 +1416,8 @@
 		BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_site.cc; path = src/sim/fiber_site.cc; sourceTree = SOURCE_ROOT; };
 		BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fiber_site.h; path = src/sim/fiber_site.h; sourceTree = SOURCE_ROOT; };
 		BB2EFCAD230AAF7100073B5A /* test_solver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_solver.cc; sourceTree = "<group>"; };
+		BB2F144A257D8E260033F86D /* gle_zoo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gle_zoo.cc; sourceTree = "<group>"; };
+		BB2F144B257D8E260033F86D /* gle_zoo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gle_zoo.h; sourceTree = "<group>"; };
 		BB30391F16FB42C700CDF586 /* reportF.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reportF.cc; sourceTree = "<group>"; };
 		BB3092282164BAC300C6DEE4 /* grid_display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = grid_display.h; sourceTree = "<group>"; };
 		BB3092292164BAC300C6DEE4 /* grid_display.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_display.cc; sourceTree = "<group>"; };
@@ -2963,6 +2967,8 @@
 			children = (
 				BB9711501DECDA1300352630 /* gle.cc */,
 				BB9711511DECDA1300352630 /* gle.h */,
+				BB2F144B257D8E260033F86D /* gle_zoo.h */,
+				BB2F144A257D8E260033F86D /* gle_zoo.cc */,
 				BB9711521DECDA1300352630 /* gle_color.cc */,
 				BB9711531DECDA1300352630 /* gle_color.h */,
 				BB9711541DECDA1300352630 /* gle_color_list.cc */,
@@ -3601,6 +3607,7 @@
 				BBA61CC2234E891F00D6A81F /* tubule.h in Headers */,
 				BB69216F233D359F00F528D2 /* walker_prop.h in Headers */,
 				BB692170233D359F00F528D2 /* walker.h in Headers */,
+				BB2F144D257D8E260033F86D /* gle_zoo.h in Headers */,
 				BB692171233D359F00F528D2 /* cutter_prop.h in Headers */,
 				BB692172233D359F00F528D2 /* cutter.h in Headers */,
 				BB692173233D359F00F528D2 /* actor_prop.h in Headers */,
@@ -4688,6 +4695,7 @@
 				BB6921C5233D359F00F528D2 /* single.cc in Sources */,
 				BB6921C6233D359F00F528D2 /* single_prop.cc in Sources */,
 				BB6921C7233D359F00F528D2 /* couple_prop.cc in Sources */,
+				BB2F144C257D8E260033F86D /* gle_zoo.cc in Sources */,
 				BB6921C8233D359F00F528D2 /* simul_prop.cc in Sources */,
 				BB6921C9233D359F00F528D2 /* solid_prop.cc in Sources */,
 				BB6921CA233D359F00F528D2 /* organizer.cc in Sources */,
