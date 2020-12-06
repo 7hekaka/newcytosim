@@ -49,10 +49,10 @@ void drawValues(Grid<CELL, 1> const& grid,
         if ( set_color(arg, grid[c], Vector1(x)) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(x  , -e);
-            gle::gleVertex(x+d, -e);
-            gle::gleVertex(x  ,  e);
-            gle::gleVertex(x+d,  e);
+            glVertex2f(x  , -e);
+            glVertex2f(x+d, -e);
+            glVertex2f(x  ,  e);
+            glVertex2f(x+d,  e);
             glEnd();
         }
     }
@@ -70,9 +70,9 @@ void drawValues(Grid<CELL, 2> const& grid,
                 bool set_color(TYPE, CELL const&, Vector2 const&),
                 TYPE arg)
 {
-    real d = 0.5 * grid.cellWidth(0);
-    real e = 0.5 * grid.cellWidth(1);
-    
+    float d = 0.5 * grid.cellWidth(0);
+    float e = 0.5 * grid.cellWidth(1);
+
     // paint all cells one by one
     for ( size_t c = 0; c < grid.nbCells(); ++c )
     {
@@ -81,10 +81,10 @@ void drawValues(Grid<CELL, 2> const& grid,
         if ( set_color(arg, grid[c], w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(w.XX-d, w.YY-e);
-            gle::gleVertex(w.XX+d, w.YY-e);
-            gle::gleVertex(w.XX-d, w.YY+e);
-            gle::gleVertex(w.XX+d, w.YY+e);
+            glVertex2f(w.XX-d, w.YY-e);
+            glVertex2f(w.XX+d, w.YY-e);
+            glVertex2f(w.XX-d, w.YY+e);
+            glVertex2f(w.XX+d, w.YY+e);
             glEnd();
         }
     }

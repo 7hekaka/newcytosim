@@ -8,14 +8,14 @@
  */
 void drawEdges(Map<1> const& map)
 {
-    const real u =  0.5;
-    const real d = -0.5;
+    const float u =  0.5f;
+    const float d = -0.5f;
     glBegin(GL_LINES);
     for ( real ix = 0; ix <= map.breadth(0); ++ix )
     {
-        real x = map.position(0, ix);
-        gle::gleVertex(x, d);
-        gle::gleVertex(x, u);
+        float x = map.position(0, ix);
+        glVertex2f(x, d);
+        glVertex2f(x, u);
     }
     glEnd();
 }
@@ -26,14 +26,14 @@ void drawEdges(Map<1> const& map)
  */
 void drawEdges(Map<2> const& map)
 {
-    real i = map.inf(0);
-    real s = map.sup(0);
+    float i = map.inf(0);
+    float s = map.sup(0);
     glBegin(GL_LINES);
     for ( float iy = 0; iy <= map.breadth(1); ++iy )
     {
-        real y = map.position(1, iy);
-        gle::gleVertex(i, y);
-        gle::gleVertex(s, y);
+        float y = map.position(1, iy);
+        glVertex2f(i, y);
+        glVertex2f(s, y);
     }
     glEnd();
     
@@ -42,9 +42,9 @@ void drawEdges(Map<2> const& map)
     glBegin(GL_LINES);
     for ( float ix = 0; ix <= map.breadth(0); ++ix )
     {
-        real x = map.position(0, ix);
-        gle::gleVertex(x, i);
-        gle::gleVertex(x, s);
+        float x = map.position(0, ix);
+        glVertex2f(x, i);
+        glVertex2f(x, s);
     }
     glEnd();
 }

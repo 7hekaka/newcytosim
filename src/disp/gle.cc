@@ -1443,7 +1443,7 @@ namespace gle
     
     
     void drawBand(Vector1 const& A, real rA,
-                 Vector1 const& B, real rB)
+                  Vector1 const& B, real rB)
     {
         glBegin(GL_TRIANGLE_STRIP);
         gleVertex(A.XX,+rA);
@@ -1454,7 +1454,7 @@ namespace gle
     }
     
     void drawBand(Vector2 const& A, real rA,
-                 Vector2 const& B, real rB)
+                  Vector2 const& B, real rB)
     {
         Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
@@ -1471,7 +1471,7 @@ namespace gle
     }
     
     void drawBand(Vector1 const& a, real ra, gle_color ca,
-                 Vector1 const& b, real rb, gle_color cb)
+                  Vector1 const& b, real rb, gle_color cb)
     {
         glBegin(GL_TRIANGLE_STRIP);
         ca.load();
@@ -1484,7 +1484,7 @@ namespace gle
     }
     
     void drawBand(Vector2 const& a, real ra, gle_color ca,
-                 Vector2 const& b, real rb, gle_color cb)
+                  Vector2 const& b, real rb, gle_color cb)
     {
         Vector2 d = ( b - a ).orthogonal();
         real n = d.norm();
