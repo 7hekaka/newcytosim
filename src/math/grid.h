@@ -106,8 +106,11 @@ class Grid : public Map<ORD>
 protected:
     
     /// The array of pointers to cells
-    CELL *  gCell;
+    CELL * gCell;
     
+    /// allocated size of array gCells[]
+    size_t gAllocated;
+
 public:
     
     /// Type of the parent class
@@ -119,6 +122,7 @@ public:
     /// constructor
     Grid()
     {
+        gAllocated = 0;
         gCell = nullptr;
     }
     
@@ -136,22 +140,26 @@ public:
     }
     
     /// allocate the array of cells
-    void createCells()
+    bool createCells()
     {
-        if ( MAP::gCells == 0 )
-            printf("gCells==0 in createCells() : call setDimensions() first\n");
+        if ( MAP::mNbCells == 0 )
+            printf("Map has no cells: call Map::setDimensions() first\n");
         
-        delete[] gCell;
-        
-        gCell = new CELL[MAP::gCells];
-        MAP::gAllocated = MAP::gCells;
+        if ( MAP::mNbCells > gAllocated )
+        {
+            delete[] gCell;
+            gCell = new CELL[MAP::mNbCells];
+            gAllocated = MAP::mNbCells;
+            return true;
+        }
+        return false;
     }
     
     /// returns true if cells have been allocated
     size_t hasCells() const
     {
         if ( gCell )
-            return MAP::gAllocated;
+            return gAllocated;
         return 0;
     }
     
@@ -160,7 +168,7 @@ public:
     {
         delete[] gCell;
         gCell = nullptr;
-        MAP::gAllocated = 0;
+        gAllocated = 0;
     }
     
     /// call function clear() for all cells
@@ -170,7 +178,7 @@ public:
             return;
         
         CELL * c = gCell;
-        const CELL * end = gCell + MAP::gCells;
+        const CELL * end = gCell + MAP::mNbCells;
 #if ( 1 )
         //we unroll the loop for speed
         const CELL * stop = end - 7;
@@ -201,7 +209,7 @@ public:
     /// return cell at index 'indx'
     CELL & icell(const size_t indx) const
     {
-        assert_true( indx < MAP::gCells );
+        assert_true( indx < MAP::mNbCells );
         return gCell[ indx ];
     }
     
@@ -209,35 +217,35 @@ public:
     CELL & cell(const real w[ORD]) const
     {
         size_t inx = MAP::index(w);
-        assert_true( inx < MAP::gCells );
+        assert_true( inx < MAP::mNbCells );
         return gCell[ inx ];
     }
     
     /// reference to CELL of coordinates c[]
     CELL & cell(const int c[ORD]) const
     {
-        assert_true( MAP::pack(c) < MAP::gCells );
+        assert_true( MAP::pack(c) < MAP::mNbCells );
         return gCell[ MAP::pack(c) ];
     }
    
     /// operator access to a cell by index
     CELL & operator[](const size_t indx) const
     {
-        assert_true( indx < MAP::gCells );
+        assert_true( indx < MAP::mNbCells );
         return gCell[ indx ];
     }
 
     /// short-hand access to a cell by coordinates
     CELL & operator()(const int c[ORD]) const
     {
-        assert_true( MAP::pack(c) < MAP::gCells );
+        assert_true( MAP::pack(c) < MAP::mNbCells );
         return gCell[ MAP::pack(c) ];
     }
     
     /// operator access to a cell by position
     CELL & operator()(const real w[ORD]) const
     {
-        assert_true( MAP::index(w) < MAP::gCells );
+        assert_true( MAP::index(w) < MAP::mNbCells );
         return gCell[ MAP::index(w) ];
     }
     
@@ -256,42 +264,42 @@ public:
     /// access to cell for ORD==1
     CELL & icell1D(const int x) const
     {
-        assert_true( MAP::pack1D(x) < MAP::gCells );
+        assert_true( MAP::pack1D(x) < MAP::mNbCells );
         return gCell[MAP::pack1D(x)];
     }
     
     /// access to cell for ORD==2
     CELL & icell2D(const int x, const int y) const
     {
-        assert_true( MAP::pack2D(x,y) < MAP::gCells );
+        assert_true( MAP::pack2D(x,y) < MAP::mNbCells );
         return gCell[MAP::pack2D(x,y)];
     }
     
     /// access to cell for ORD==3
     CELL & icell3D(const int x, const int y, const int z) const
     {
-        assert_true( MAP::pack3D(x,y,z) < MAP::gCells );
+        assert_true( MAP::pack3D(x,y,z) < MAP::mNbCells );
         return gCell[MAP::pack3D(x,y,z)];
     }
     
     /// access to cell for ORD==1
     CELL & cell1D(const real x) const
     {
-        assert_true( MAP::index1D(x) < MAP::gCells );
+        assert_true( MAP::index1D(x) < MAP::mNbCells );
         return gCell[MAP::index1D(x)];
     }
     
     /// access to cell for ORD==2
     CELL & cell2D(const real x, const real y) const
     {
-        assert_true( MAP::index2D(x,y) < MAP::gCells );
+        assert_true( MAP::index2D(x,y) < MAP::mNbCells );
         return gCell[MAP::index2D(x,y)];
     }
     
     /// access to cell for ORD==3
     CELL & cell3D(const real x, const real y, const real z) const
     {
-        assert_true( MAP::index3D(x,y,z) < MAP::gCells );
+        assert_true( MAP::index3D(x,y,z) < MAP::mNbCells );
         return gCell[MAP::index3D(x,y,z)];
     }
 
@@ -450,27 +458,27 @@ public:
     /// set all cells to `val`
     void setValues(const CELL val)
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        assert_true( MAP::mNbCells <= gAllocated );
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
             gCell[ii] = val;
     }
     
     /// multiply all cells by `val`
     void scaleValues(const CELL val)
     {
-        assert_true ( MAP::gCells <= MAP::gAllocated );
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        assert_true ( MAP::mNbCells <= gAllocated );
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
             gCell[ii] *= val;
     }
     
     /// get sum, minimum and maximum value over all cells
     void infoValues(CELL& sum, CELL& mn, CELL& mx) const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         sum = 0;
         mn = gCell[0];
         mx = gCell[0];
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
         {
             if ( gCell[ii] < mn ) mn = gCell[ii];
             if ( gCell[ii] > mx ) mx = gCell[ii];
@@ -481,9 +489,9 @@ public:
     /// sum of all values, if CELL supports the addition
     CELL sumValues() const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         CELL result = 0;
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
             result += gCell[ii];
         return result;
     }
@@ -491,9 +499,9 @@ public:
     /// maximum value over all cells
     CELL maxValue() const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         CELL res = gCell[0];
-        for ( size_t ii = 1; ii < MAP::gCells; ++ii )
+        for ( size_t ii = 1; ii < MAP::mNbCells; ++ii )
         {
             if ( res < gCell[ii] )
                 res = gCell[ii];
@@ -504,9 +512,9 @@ public:
     /// minimum value over all cells
     CELL minValue() const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         CELL res = gCell[0];
-        for ( size_t ii = 1; ii < MAP::gCells; ++ii )
+        for ( size_t ii = 1; ii < MAP::mNbCells; ++ii )
         {
             if ( res > gCell[ii] )
                 res = gCell[ii];
@@ -517,8 +525,8 @@ public:
     /// true if any( cells[] < 0 )
     bool hasNegativeValue() const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        assert_true( MAP::mNbCells <= gAllocated );
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
             if ( gCell[ii] < 0 )
                 return true;
         return false;
@@ -553,7 +561,7 @@ public:
     /// the maximum of the values in the region around cell referred by 'indx'
     CELL maxValueInRegion(const size_t indx) const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         CELL result = gCell[indx];
         int * offsets = nullptr;
         const CELL * ce = gCell + indx;
@@ -569,9 +577,9 @@ public:
     /// write values to a file, with the position for each cell (file can be stdout)
     void printValues(FILE* file, const real offset) const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         real w[ORD];
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
         {
             MAP::setPositionFromIndex(w, ii, offset);
             for ( int d=0; d < ORD; ++d )
@@ -583,9 +591,9 @@ public:
     /// write values to a file, with the range for each cell (file can be stdout)
     void printValuesWithRange(FILE* file) const
     {
-        assert_true( MAP::gCells <= MAP::gAllocated );
+        assert_true( MAP::mNbCells <= gAllocated );
         real l[ORD], r[ORD];
-        for ( size_t ii = 0; ii < MAP::gCells; ++ii )
+        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
         {
             MAP::setPositionFromIndex(l, ii, 0.0);
             MAP::setPositionFromIndex(r, ii, 1.0);

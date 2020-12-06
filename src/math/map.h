@@ -114,40 +114,37 @@ public:
     Map<ORD>& operator=(Map<ORD> const&);
 
 protected:
-    
-    /// allocated size of array cells[]
-    size_t  gAllocated;
    
     /// Total number of cells in the map; size of cells[]
-    size_t  gCells;
+    size_t  mNbCells;
     
     /// The number of cells in each dimension
-    size_t  gDim[ORD];
+    size_t  mDim[ORD];
     
     /// Offset between two consecutive cells along each dimension
-    size_t  gStride[ORD];
+    size_t  mStride[ORD];
     
     /// The position of the inferior (min) edge in each dimension
-    real    gInf[ORD];
+    real    mInf[ORD];
     
     /// The position of the superior (max) edge in each dimension
-    real    gSup[ORD];
-    
-    /// true if Map has periodic boundary conditions
-    bool    gPeriodic[ORD];
+    real    mSup[ORD];
 
-    /// The size of a cell: cWidth[d] = ( gSup[d] - inf[d] ) / gDim[d]
+    /// The size of a cell: cWidth[d] = ( mSup[d] - inf[d] ) / mDim[d]
     real    cWidth[ORD];
     
     /// cDelta[d] = 1.0 / cWidth[d]
     real    cDelta[ORD];
     
-    /// gStart[d] = gInf[d] / cWidth[d]
-    real    gStart[ORD];
+    /// mStart[d] = mInf[d] / cWidth[d]
+    real    mStart[ORD];
 
     /// The volume of one cell
     real    cVolume;
     
+    /// true if Map has periodic boundary conditions
+    bool    mPeriodic[ORD];
+
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
@@ -166,15 +163,15 @@ protected:
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
     }
     
-    /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
+    /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
     inline size_t image(const size_t d, long c) const
     {
 #if GRID_HAS_PERIODIC
-        if ( gPeriodic[d] )
-            return imagei_periodic(gDim[d], c);
+        if ( mPeriodic[d] )
+            return imagei_periodic(mDim[d], c);
         else
 #endif
-            return imagei_clamped(gDim[d], c);
+            return imagei_clamped(mDim[d], c);
     }
 
 
@@ -199,34 +196,34 @@ protected:
     }
     
     
-    /// returns  ( f - gInf[d] ) / cWidth[d]
+    /// returns  ( f - mInf[d] ) / cWidth[d]
     inline real map(const int d, real f) const
     {
-        return f * cDelta[d] - gStart[d];
+        return f * cDelta[d] - mStart[d];
     }
 
-    /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
+    /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
     inline size_t imagef(const int d, real f) const
     {
         real x = map(d, f);
 #if GRID_HAS_PERIODIC
-        if ( gPeriodic[d] )
-            return imagef_periodic(gDim[d], x);
+        if ( mPeriodic[d] )
+            return imagef_periodic(mDim[d], x);
         else
 #endif
-            return imagef_clamped(gDim[d], x);
+            return imagef_clamped(mDim[d], x);
     }
 
-    /// return closest integer to `c` in the segment [ 0, gDim[d]-1 ]
+    /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
     inline size_t imagef(const int d, real f, real offset) const
     {
         real x = map(d, f) + offset;
 #if GRID_HAS_PERIODIC
-        if ( gPeriodic[d] )
-            return imagef_periodic(gDim[d], x);
+        if ( mPeriodic[d] )
+            return imagef_periodic(mDim[d], x);
         else
 #endif
-            return imagef_clamped(gDim[d], x);
+            return imagef_clamped(mDim[d], x);
     }
 
 //--------------------------------------------------------------------------
@@ -234,10 +231,9 @@ protected:
 public:
     
     /// constructor
-    Map() : gDim{0}, gInf{0}, gSup{0}, gPeriodic{false}, cWidth{0}, cDelta{0}, gStart{0}
+    Map() : mDim{0}, mInf{0}, mSup{0}, cWidth{0}, cDelta{0}, mStart{0}, mPeriodic{false}
     {
-        gAllocated  = 0;
-        gCells      = 0;
+        mNbCells    = 0;
         regionsEdge = nullptr;
         regions     = nullptr;
         cVolume     = 0;
@@ -263,9 +259,9 @@ public:
      */
     void setDimensions(const real infs[ORD], real sups[ORD], const size_t cells[ORD])
     {
-        gCells = 1;
         cVolume = 1;
-        
+        size_t cnt = 1;
+
         for ( int d = 0; d < ORD; ++d )
         {
             if ( cells[d] <= 0 )
@@ -281,23 +277,24 @@ public:
             if ( infs[d] == sups[d] )
                 throw InvalidParameter("Cannot build grid as sup[] == inf[]");
             
-            gStride[d] = gCells;
-            gCells    *= cells[d];
-            gDim[d]    = cells[d];
-            gInf[d]    = infs[d];
-            gSup[d]    = sups[d];
-            cWidth[d]  = ( gSup[d] - gInf[d] ) / real( gDim[d] );
+            mStride[d] = cnt;
+            cnt      *= cells[d];
+            mDim[d]   = cells[d];
+            mInf[d]   = infs[d];
+            mSup[d]   = sups[d];
+            cWidth[d] = ( mSup[d] - mInf[d] ) / real(mDim[d]);
             // inverse of cell width:
-            cDelta[d]  = real( gDim[d] ) / ( gSup[d] - gInf[d] );
-            gStart[d]  = ( gInf[d] * gDim[d] ) / ( gSup[d] - gInf[d] );
-            cVolume   *= cWidth[d];
+            cDelta[d] = real(mDim[d]) / ( mSup[d] - mInf[d] );
+            mStart[d] = ( mDim[d] * mInf[d] ) / ( mSup[d] - mInf[d] );
+            cVolume  *= cWidth[d];
         }
+        mNbCells = cnt;
     }
     
     ///true if setDimensions() was called
     bool hasDimensions() const
     {
-        return gCells > 0;
+        return mNbCells > 0;
     }
     
     /// true if dimension `d` has periodic boundary conditions
@@ -305,7 +302,7 @@ public:
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
-            return gPeriodic[d];
+            return mPeriodic[d];
 #endif
         return false;
     }
@@ -315,7 +312,7 @@ public:
     {
 #if GRID_HAS_PERIODIC
         if ( d < ORD )
-            gPeriodic[d] = p;
+            mPeriodic[d] = p;
 #else
         if ( p )
             throw InvalidParameter("grid.h was compiled without PERIODIC_SUPPORT");
@@ -327,7 +324,7 @@ public:
     {
 #if GRID_HAS_PERIODIC
         for ( int d = 0; d < ORD; ++d )
-            if ( gPeriodic[d] )
+            if ( mPeriodic[d] )
                 return true;
 #endif
         return false;
@@ -337,21 +334,21 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    size_t       nbCells()           const { return gCells; }
+    size_t       nbCells()           const { return mNbCells; }
 
     /// number of cells in dimensionality `d`
-    size_t       breadth(size_t d)   const { return gDim[d]; }
+    size_t       breadth(size_t d)   const { return mDim[d]; }
     
     /// offset to the next cell in the direction `d`
-    size_t       stride(size_t d)    const { return gStride[d]; }
+    size_t       stride(size_t d)    const { return mStride[d]; }
     
     /// position of the inferior (left/bottom/etc) edge
-    const real*  inf()               const { return gInf;    }
-    real         inf(size_t d)       const { return gInf[d]; }
+    const real*  inf()               const { return mInf;    }
+    real         inf(size_t d)       const { return mInf[d]; }
     
     /// position of the superior (right/top/etc) edge
-    const real*  sup()               const { return gSup;    }
-    real         sup(size_t d)       const { return gSup[d]; }
+    const real*  sup()               const { return mSup;    }
+    real         sup(size_t d)       const { return mSup[d]; }
     
     /// the widths of a cell
     const real*  delta()             const { return cDelta;    }
@@ -364,7 +361,7 @@ public:
     real         cellVolume()        const { return cVolume; }
 
     /// position in dimension `d`, of the cell of index `c`
-    real         position(size_t d, real c) const { return gInf[d] + c * cWidth[d]; }
+    real         position(size_t d, real c) const { return mInf[d] + c * cWidth[d]; }
     
     /// index in dimension `d` corresponding to position `w`
     int          index(size_t d, real w) const { return (int)map(d, w); }
@@ -383,10 +380,10 @@ public:
     {
         real res = 0;
         for ( int d = 0; d < ORD; ++d )
-            if ( gDim[d] > min_size )
+            if ( mDim[d] > min_size )
                 res = cWidth[d];
         for ( int d = 0; d < ORD; ++d )
-            if ( gDim[d] > min_size  &&  cWidth[d] < res )
+            if ( mDim[d] > min_size  &&  cWidth[d] < res )
                 res = cWidth[d];
         return res;
     }
@@ -397,7 +394,7 @@ public:
         real res = 0;
         for ( int d = 0; d < ORD; ++d )
         {
-            real m = std::max(gSup[d], -gInf[d]);
+            real m = std::max(mSup[d], -mInf[d]);
             res += m * m;
         }
         return std::sqrt(res);
@@ -411,7 +408,7 @@ public:
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            if ( coord[d] < 0 || (size_t)coord[d] >= gDim[d] )
+            if ( coord[d] < 0 || (size_t)coord[d] >= mDim[d] )
                 return false;
         }
         return true;
@@ -422,7 +419,7 @@ public:
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            if ( w[d] < gInf[d] || w[d] >= gSup[d] )
+            if ( w[d] < mInf[d] || w[d] >= mSup[d] )
                 return false;
         }
         return true;
@@ -440,8 +437,8 @@ public:
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            coord[d] = indx % gDim[d];
-            indx    /= gDim[d];
+            coord[d] = indx % mDim[d];
+            indx    /= mDim[d];
         }
     }
     
@@ -457,8 +454,8 @@ public:
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            w[d] = gInf[d] + cWidth[d] * ( offset + indx % gDim[d] );
-            indx /= gDim[d];
+            w[d] = mInf[d] + cWidth[d] * ( offset + indx % mDim[d] );
+            indx /= mDim[d];
         }
     }
     
@@ -466,7 +463,7 @@ public:
     void setPositionFromCoordinates(real w[ORD], const int coord[ORD], real offset=0) const
     {
         for ( int d = 0; d < ORD; ++d )
-            w[d] = gInf[d] + cWidth[d] * ( offset + coord[d] );
+            w[d] = mInf[d] + cWidth[d] * ( offset + coord[d] );
     }
 
     /// conversion from coordinates to index
@@ -475,7 +472,7 @@ public:
         size_t inx = image(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + image(d, coord[d]);
+            inx = mDim[d] * inx + image(d, coord[d]);
         
         return inx;
     }
@@ -487,7 +484,7 @@ public:
         size_t inx = imagef(ORD-1, w[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + imagef(d, w[d]);
+            inx = mDim[d] * inx + imagef(d, w[d]);
         
         return inx;
     }
@@ -499,7 +496,7 @@ public:
         size_t inx = imagef(ORD-1, w[ORD-1], offset);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + imagef(d, w[d], offset);
+            inx = mDim[d] * inx + imagef(d, w[d], offset);
         
         return inx;
     }
@@ -511,8 +508,8 @@ public:
         size_t coord[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
-            coord[d] = c % gDim[d];
-            c       /= gDim[d];
+            coord[d] = c % mDim[d];
+            c       /= mDim[d];
         }
 
         coord[dir] = image(dir, coord[dir]+1);
@@ -520,7 +517,7 @@ public:
         size_t inx = coord[ORD-1];
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = gDim[d] * inx + coord[d];
+            inx = mDim[d] * inx + coord[d];
         
         return inx;
     }
@@ -534,13 +531,13 @@ public:
     /// convert coordinate to array index, if ORD==2
     size_t pack2D(const int x, const int y) const
     {
-        return image(0, x) + gDim[0]*image(1, y);
+        return image(0, x) + mDim[0]*image(1, y);
     }
     
     /// convert coordinate to array index, if ORD==3
     size_t pack3D(const int x, const int y, const int z) const
     {
-        return image(0, x) + gDim[0]*( image(1, y) + gDim[1]*image(2, z) );
+        return image(0, x) + mDim[0]*( image(1, y) + mDim[1]*image(2, z) );
     }
 
     
@@ -554,15 +551,15 @@ public:
     size_t index2D(const real x, const real y) const
     {
         return image(0, map(0, x))
-               + gDim[0] * image(1, map(1, y));
+               + mDim[0] * image(1, map(1, y));
     }
     
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     size_t index3D(const real x, const real y, const real z) const
     {
         return image(0, map(0, x))
-               + gDim[0]*( image(1, map(1, y))
-               + gDim[1]*  image(2, map(2, z)) );
+               + mDim[0]*( image(1, map(1, y))
+               + mDim[1]*  image(2, map(2, z)) );
     }
 
     //--------------------------------------------------------------------------
@@ -571,7 +568,7 @@ public:
 
     /** For any cell, we can find the adjacent cells by adding 'index offsets'
     However, the valid offsets depends on wether the cell is on a border or not.
-    For each 'edge', a list of offsets and its gDim are stored.*/
+    For each 'edge', a list of offsets and its mDim are stored.*/
     
 private:
     
@@ -601,7 +598,7 @@ private:
         for ( int d = ORD; d > 0; --d )
         {
             e *= 2 * range[d-1] + 1;
-            e += edge_signature(gDim[d-1], range[d-1], coord[d-1]);
+            e += edge_signature(mDim[d-1], range[d-1], coord[d-1]);
         }
         return e;
     }
@@ -692,13 +689,13 @@ private:
         //allocate and reset arrays:
         deleteRegions();
         
-        regions     = new int*[gCells];
+        regions     = new int*[mNbCells];
         regionsEdge = new int[edgeMax*(regMax+1)];
         for ( size_t e = 0; e < edgeMax*(regMax+1); ++e )
             regionsEdge[e] = 0;
         
         int ori[ORD];
-        for ( size_t indx = 0; indx < gCells; ++indx )
+        for ( size_t indx = 0; indx < mNbCells; ++indx )
         {
             setCoordinatesFromIndex(ori, indx);
             size_t e = edgeFromCoordinates(ori, range);
@@ -866,9 +863,9 @@ public:
     {
         char str[512], *ptr = str;
         char*const end = str+sizeof(str);
-        ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells:", arg, ORD, gAllocated);
+        ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells:", arg, ORD, mNbCells);
         for ( int d = 0; d < ORD; ++d )
-            ptr += snprintf(ptr, end-ptr, "\n   [ %9.3f  %+9.3f ] / %6lu = %9.3f", gInf[d], gSup[d], gDim[d], cWidth[d]);
+            ptr += snprintf(ptr, end-ptr, "\n   [ %9.3f  %+9.3f ] / %6lu = %9.3f", mInf[d], mSup[d], mDim[d], cWidth[d]);
         os << str << std::endl;
     }
 };
