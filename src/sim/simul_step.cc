@@ -54,8 +54,6 @@ void Simul::setFiberGrid(Space const* spc) const
 
     // create the grid cells:
     fiberGrid.createCells();
-
-    Cytosim::log(" BindingGrid has %lu cells of size %.3f um\n", fiberGrid.nbCells(), res);
 }
 
 

@@ -30,8 +30,8 @@ public:
         unsigned inx;  ///< The index of the line
         void reset(size_t i)
         {
-            inx = i;
-            val = 0.0;
+            inx = static_cast<unsigned>(i);
+            val = 0;
         }
     };
 
