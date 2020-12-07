@@ -11,8 +11,6 @@
 #include "wrist_long.h"
 
 
-bool SingleSet::prune_free = 0;
-bool SingleSet::skip_free = 0;
 
 //------------------------------------------------------------------------------
 
@@ -268,6 +266,22 @@ void SingleSet::detachA(Single * s)
 }
 
 
+void SingleSet::pruneDetach(ObjectFlag f)
+{
+    /* Update system given that only attached hand were read again */
+    for ( Single* s=firstA(), *n; s; s=n )
+    {
+        n = s->next();
+        if ( s->flag() == f )
+            detachA(s);
+        s->flag(0);
+    }
+    
+    //ObjectSet::prune(aList, f, 0);
+    ObjectSet::flag(fList, 0);
+}
+
+
 void SingleSet::deleteA(Single * s)
 {
     s->hand()->detachHand();
@@ -280,36 +294,19 @@ void SingleSet::deleteA(Single * s)
 
 void SingleSet::prune(ObjectFlag f)
 {
-    if ( prune_free )
+    /* After reading from file, the Hands should not update
+     any Fiber, Single or Couple as they will be deleted */
+    for ( Single* s=firstA(), *n; s; s=n )
     {
-        /* Update system given that only attached hand were read again */
-        for ( Single* s=firstA(), *n; s; s=n )
-        {
-            n = s->next();
-            if ( s->flag() == f )
-                detachA(s);
+        n = s->next();
+        if ( s->flag() == f )
+            deleteA(s);
+        else
             s->flag(0);
-        }
-        
-        //ObjectSet::prune(aList, f, 0);
-        ObjectSet::flag(fList, 0);
     }
-    else
-    {
-        /* After reading from file, the Hands should not update
-         any Fiber, Single or Couple as they will be deleted */
-        for ( Single* s=firstA(), *n; s; s=n )
-        {
-            n = s->next();
-            if ( s->flag() == f )
-                deleteA(s);
-            else
-                s->flag(0);
-        }
-        
-        //ObjectSet::prune(aList, f, 0);
-        ObjectSet::prune(fList, f, 0);
-    }
+    
+    //ObjectSet::prune(aList, f, 0);
+    ObjectSet::prune(fList, f, 0);
 }
 
 
@@ -320,7 +317,7 @@ void SingleSet::thaw()
 }
 
 
-void SingleSet::write(Outputter& out) const
+void SingleSet::write(Outputter& out, bool skip) const
 {
     if ( sizeA() > 0 )
     {
@@ -329,17 +326,13 @@ void SingleSet::write(Outputter& out) const
     }
     if ( sizeF() > 0 )
     {
-        if ( simul.prop->skip_free_single )
-        {
+        if ( skip & skip_free )
             out.put_line("\n#section single F 1", out.binary());
-            if ( ! skip_free )
-                writeObjects(out, fList);
-            skip_free = 1;
-        }
         else
         {
-            out.put_line("\n#section single F", out.binary());
+            out.put_line("\n#section single F 0", out.binary());
             writeObjects(out, fList);
+            skip_free = skip;
         }
     }
 }

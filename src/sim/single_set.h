@@ -25,11 +25,6 @@ typedef Array<Single *> SingleList;
  */
 class SingleSet: public ObjectSet
 {
-public:
-    
-    /// flags affecting how free Couples are read/written from file
-    static bool prune_free, skip_free;
-    
 private:
     
     /// List for non-attached Singles (f=free)
@@ -70,8 +65,11 @@ private:
 
 public:
         
+    /// flags to skip unattached Single in trajectory file
+    mutable bool skip_free;
+    
     ///creator
-    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(false) {}
+    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(false), skip_free(false) {}
     
     //--------------------------
 
@@ -90,8 +88,11 @@ public:
     /// print a summary of the content (nb of objects, class)
     void        report(std::ostream&) const;
 
-    /// write
-    void        write(Outputter&) const;
+    /// write objects
+    void        write(Outputter&, bool skip) const;
+    
+    /// save objects
+    void        write(Outputter& out) const { write(out, false); }
 
     //--------------------------
 
@@ -179,6 +180,9 @@ public:
     /// mark object before import
     void          freeze(ObjectFlag f);
     
+    /// detach marked object after import
+    void          pruneDetach(ObjectFlag f);
+
     /// delete marked object after import
     void          prune(ObjectFlag f);
     

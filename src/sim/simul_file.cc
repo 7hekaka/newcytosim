@@ -90,8 +90,8 @@ void Simul::writeObjects(Outputter& out) const
     solids.write(out);
     beads.write(out);
     spheres.write(out);
-    singles.write(out);
-    couples.write(out);
+    singles.write(out, prop->skip_free_single);
+    couples.write(out, prop->skip_free_couple);
     organizers.write(out);
     tubules.write(out);
     //events.write(out);
@@ -300,13 +300,19 @@ public:
     }
     
     /// erase objects flagged with FLAG
-    void prune()
+    void prune(bool alt_single, bool alt_couple)
     {
         //sim->events.prune(FLAG);
         sim->organizers.prune(FLAG);
         sim->tubules.prune(FLAG);
-        sim->couples.prune(FLAG);
-        sim->singles.prune(FLAG);
+        if ( alt_couple )
+            sim->couples.pruneDetach(FLAG);
+        else
+            sim->couples.prune(FLAG);
+        if ( alt_single )
+            sim->singles.pruneDetach(FLAG);
+        else
+            sim->singles.prune(FLAG);
         sim->beads.prune(FLAG);
         sim->solids.prune(FLAG);
         sim->spheres.prune(FLAG);
@@ -363,16 +369,25 @@ public:
  */
 int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
 {
+    in.lock();
     InputLock lock(this);
-
-    // if no error occurred, erase objects that have not been updated
-    if ( 0 == loadObjects(in, subset) )
-        lock.prune();
-
-    // renew pointers to objects, particularly 'confine_space'
-    prop->complete(*this);
-
-    return in.eof();
+    try
+    {
+        bool s, c;
+        int res = readObjects(in, subset, s, c);
+        in.unlock();
+        // if no error occurred, erase objects that have not been updated
+        if ( 0 == res )
+            lock.prune(s, c);
+        // renew pointers to objects, particularly 'confine_space'
+        prop->complete(*this);
+        return res;
+    }
+    catch(Exception & e)
+    {
+        in.unlock();
+        throw;
+    }
 }
 
 
@@ -389,28 +404,19 @@ int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
  */
 int Simul::loadObjects(Inputter& in, ObjectSet* subset)
 {
-    if ( in.eof() )
-        return 1;
-    
-    if ( ! in.good() )
-        throw InvalidIO("invalid file in Simul::loadObjects()");
-
-    int res = 0;
     in.lock();
-    
     try
     {
-        res = readObjects(in, subset);
-        //std::clog << "loadObjects returns " << res << '\n';
+        bool s, c;
+        int res = readObjects(in, subset, s, c);
+        in.unlock();
+        return res;
     }
     catch(Exception & e)
     {
         in.unlock();
         throw;
     }
-    
-    in.unlock();
-    return res;
 }
 
 
@@ -423,8 +429,10 @@ int Simul::loadObjects(char const* filename)
 
     if ( ! in.good() )
         throw InvalidIO("Could not open specified file for reading");
-    
-    return loadObjects(in);
+    if ( in.eof() )
+        return 1;
+
+    return loadObjects(in, nullptr);
 }
 
 
@@ -442,7 +450,7 @@ int Simul::loadObjects(char const* filename)
  - 2 : the file does not appear to be a valid cytosim archive
  
   */
-int Simul::readObjects(Inputter& in, ObjectSet* subset)
+int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool& prune_couple)
 {
     ObjectSet * objset = nullptr;
     std::string section, line;
@@ -499,7 +507,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                         if ( prop->skip_free_single > 1 )
                             in.skip_until("#section ");
                         else
-                            singles.prune_free = mod;
+                            prune_single = mod;
                     }
                 }
                 else if ( section == "couple" )
@@ -512,7 +520,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                         if ( prop->skip_free_couple > 1 )
                             in.skip_until("#section ");
                         else
-                            singles.prune_free = mod;
+                            prune_couple = mod;
                     }
                 }
                 objset = findSet(section);

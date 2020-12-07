@@ -30,11 +30,6 @@ typedef Array<Couple *> CoupleList;
  */
 class CoupleSet: public ObjectSet
 {
-public:
-    
-    /// flags affecting how free Couples are read/written from file
-    static bool prune_free, skip_free;
-
 private:
     
     /// list of Couple which are not attached (f=free)
@@ -97,9 +92,12 @@ private:
     void          uniRelax();
     
 public:
-    
+        
+    /// flags to skip unattached Couple in trajectory file
+    mutable bool skip_free;
+
     ///creator
-    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(false) {}
+    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(false), skip_free(false) {}
     
     //--------------------------
     
@@ -116,20 +114,23 @@ public:
     Object *    newObject(ObjectTag, size_t);
     
     /// save free Couples
-    void        writeFF(Outputter& out) const;
+    void        writeFF(Outputter&) const;
     
     /// save attached Couples
-    void        writeAF(Outputter& out) const;
+    void        writeAF(Outputter&) const;
     
     /// save attached Couples
-    void        writeFA(Outputter& out) const;
+    void        writeFA(Outputter&) const;
 
     /// save bridging Couples
-    void        writeAA(Outputter& out) const;
+    void        writeAA(Outputter&) const;
 
-    /// save Couples
-    void        write(Outputter&) const;
+    /// save objects
+    void        write(Outputter&, bool skip) const;
     
+    /// save objects
+    void        write(Outputter& out) const { write(out, false); }
+
     /// print a summary of the content (nb of objects, class)
     void        report(std::ostream&) const;
 
@@ -249,6 +250,9 @@ public:
     /// mark object before import
     void         freeze(ObjectFlag f);
     
+    /// detach marked object after import
+    void         pruneDetach(ObjectFlag f);
+
     /// delete marked object after import
     void         prune(ObjectFlag f);
     

@@ -342,7 +342,7 @@ public:
     class InputLock;
     
     /// read objects from file, and add them to the simulation state
-    int  readObjects(Inputter&, ObjectSet* subset);
+    int  readObjects(Inputter&, ObjectSet* subset, bool&, bool&);
 
     /// load objects from a file, adding them to the simulation state
     int  loadObjects(Inputter&, ObjectSet* subset = nullptr);
