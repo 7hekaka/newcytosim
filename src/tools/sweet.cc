@@ -18,6 +18,7 @@
 */
 
 #include <fstream>
+#include "filepath.h"
 #include "frame_reader.h"
 #include "iowrapper.h"
 #include "glossary.h"
@@ -27,7 +28,7 @@
 void help(std::ostream& os)
 {
     os << "Syntax:\n";
-    os << "        sweet CLASS [INPUTFILE] [binary=0]\n";
+    os << "        sweet CLASS [DIRECTORY] [INPUTFILE] [binary=0]\n";
     os << "Synopsis: exports Cytosim's object coordinates to binary or text files.\n";
     os << "Each frame of the trajectory file is sent to a separate file.\n";
     os << "CLASS names the objects to be exported. Supported values:\n";
@@ -140,6 +141,9 @@ int main(int argc, char* argv[])
     Glossary arg;
     if ( arg.read_strings(argc-2, argv+2) )
         return EXIT_FAILURE;
+    
+    if ( arg.has_key("directory") )
+        FilePath::change_dir(arg.value("directory"));
 
     bool binary = 1;
     arg.set(binary, "binary");

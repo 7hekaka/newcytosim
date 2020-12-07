@@ -8,6 +8,7 @@
 #include <cctype>
 #include <cstdlib>
 
+#include "filepath.h"
 #include "glossary.h"
 #include "messages.h"
 #include "iowrapper.h"
@@ -21,7 +22,7 @@ void help(std::ostream& os)
 {
     printf("Cytosim-reader %iD, file version %i\n", DIM, Simul::currentFormatID);
     os << "\n";
-    os << "Syntax:  reader [OPTIONS] INPUT_FILE_NAME output=FILE_NAME\n";
+    os << "Syntax:  reader [OPTIONS] [DIRECTORY] INPUT_FILE_NAME output=FILE_NAME\n";
     os << "\n";
     os << "OPTIONS:\n";
     os << "     help       display this message\n";
@@ -64,6 +65,9 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     
+    if ( arg.has_key("directory") )
+        FilePath::change_dir(arg.value("directory"));
+
     std::string input = TRAJECTORY;
     std::string output = "output.cmo";
     
