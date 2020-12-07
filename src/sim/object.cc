@@ -8,12 +8,6 @@
 #include "sim.h"
 
 
-Simul& Object::simul() const
-{
-    return set_->simul;
-}
-
-
 Object::~Object()
 {
     //std::clog << "~Object " << this << '\n';

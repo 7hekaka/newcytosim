@@ -2,6 +2,7 @@
 
 #include "duo.h"
 #include "duo_prop.h"
+#include "object_set.h"
 #include "random.h"
 #include "modulo.h"
 #include "space.h"

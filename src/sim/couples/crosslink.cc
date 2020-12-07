@@ -2,6 +2,7 @@
 
 #include "crosslink.h"
 #include "crosslink_prop.h"
+#include "object_set.h"
 #include "exceptions.h"
 #include "random.h"
 #include "modulo.h"

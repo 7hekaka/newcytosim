@@ -4,7 +4,7 @@
 #define OBJECT_POOL_H
 
 #include <stddef.h>
-#include "object.h"
+class Object;
 
 /// Doubly linked list of Objects
 /**

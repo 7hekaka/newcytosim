@@ -2,6 +2,7 @@
 // doubly linked list, STL style, with acces by iterators,
 // some additions to manipulate the list: sorting, unsorting, etc.
 
+#include "object.h"
 #include "object_pool.h"
 #include "assert_macro.h"
 #include "random.h"

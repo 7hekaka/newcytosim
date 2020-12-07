@@ -1,8 +1,9 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
+
 #include "wrist.h"
-#include "simul.h"
 #include "meca.h"
 #include "modulo.h"
+#include "single_set.h"
 
 
 extern Modulo const* modulo;

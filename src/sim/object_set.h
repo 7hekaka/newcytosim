@@ -204,4 +204,8 @@ public:
 
 };
 
+
+// This is declared here rather than in object.h for inlining
+inline Simul & Object::simul() const { return set_->simul; }
+
 #endif
