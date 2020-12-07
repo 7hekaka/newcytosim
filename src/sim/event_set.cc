@@ -7,13 +7,11 @@
 #include "event.h"
 
 
-// first object
 Event * EventSet::first() const
 {
     return static_cast<Event*>(pool.front());
 }
 
-// return pointer to the Object of given ID, or zero if not found
 Event * EventSet::findID(ObjectID n) const
 {
     return static_cast<Event*>(inventory.get(n));

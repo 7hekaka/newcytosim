@@ -37,25 +37,22 @@ public:
     //--------------------------
    
     /// remove object
-    void        remove(Object *);
+    void     remove(Object *);
 
     /// first Object
-    Sphere *    first() const
-    {
-        return static_cast<Sphere*>(pool.front());
-    }
+    Sphere * first() const { return static_cast<Sphere*>(pool.front()); }
     
+    /// first Sphere in inventory
+    Sphere * firstID() const { return static_cast<Sphere*>(inventory.first()); }
+
     /// return pointer to the Object of given ID, or zero if not found
-    Sphere *    findID(ObjectID n) const
-    {
-        return static_cast<Sphere*>(inventory.get(n));
-    }
+    Sphere * findID(ObjectID n) const { return static_cast<Sphere*>(inventory.get(n));}
     
     /// modulo the position (periodic boundary conditions)
-    void        foldPosition(Modulo const* s) const;
+    void     foldPosition(Modulo const* s) const;
     
     /// Monte-Carlo simulation step for every Object
-    void        step() {}
+    void     step() {}
  };
 
 #endif

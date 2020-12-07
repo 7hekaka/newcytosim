@@ -80,8 +80,8 @@ In the example above:
 You obtain the cell-indices of the neighboring cells by adding offsets[n] to 'index':
 Example:
 
-    CELL * cell = & myGrid.cell(indx);
-    nb_neighbors = myGrid.getRegion(region, indx);
+    CELL * cell = & myGrid.cell(inx);
+    nb_neighbors = myGrid.getRegion(region, inx);
     for ( int n = 1; n < nb_neighbors; ++n ) 
     {
         Cell & neighbor = cell[region[n]];
@@ -206,11 +206,11 @@ public:
         return gCell;
     }
     
-    /// return cell at index 'indx'
-    CELL & icell(const size_t indx) const
+    /// return cell at index 'inx'
+    CELL & icell(const size_t inx) const
     {
-        assert_true( indx < MAP::mNbCells );
-        return gCell[ indx ];
+        assert_true( inx < MAP::mNbCells );
+        return gCell[ inx ];
     }
     
     /// reference to CELL whose center is closest to w[]
@@ -229,10 +229,10 @@ public:
     }
    
     /// operator access to a cell by index
-    CELL & operator[](const size_t indx) const
+    CELL & operator[](const size_t inx) const
     {
-        assert_true( indx < MAP::mNbCells );
-        return gCell[ indx ];
+        assert_true( inx < MAP::mNbCells );
+        return gCell[ inx ];
     }
 
     /// short-hand access to a cell by coordinates
@@ -534,38 +534,38 @@ public:
     
 #pragma mark -
     
-    /// the sum of the values in the region around cell referred by 'indx'
-    CELL sumValuesInRegion(const size_t indx) const
+    /// the sum of the values in the region around cell referred by 'inx'
+    CELL sumValuesInRegion(const size_t inx) const
     {
         CELL result = 0;
         int * offsets = nullptr;
-        const CELL * ce = gCell + indx;
-        int nb = MAP::getRegion(offsets, indx);
+        const CELL * ce = gCell + inx;
+        int nb = MAP::getRegion(offsets, inx);
         for ( int c = 0; c < nb; ++c )
             result += ce[ offsets[c] ];
         return result;
     }
     
-    /// the sum of the values in the region around cell referred by 'indx'
-    CELL avgValueInRegion(const size_t indx) const
+    /// the sum of the values in the region around cell referred by 'inx'
+    CELL avgValueInRegion(const size_t inx) const
     {
         CELL result = 0;
         int * offsets = nullptr;
-        const CELL * ce = gCell + indx;
-        int nb = MAP::getRegion(offsets, indx);
+        const CELL * ce = gCell + inx;
+        int nb = MAP::getRegion(offsets, inx);
         for ( int c = 0; c < nb; ++c )
             result += ce[ offsets[c] ];
         return result / (real)nb;
     }
     
-    /// the maximum of the values in the region around cell referred by 'indx'
-    CELL maxValueInRegion(const size_t indx) const
+    /// the maximum of the values in the region around cell referred by 'inx'
+    CELL maxValueInRegion(const size_t inx) const
     {
         assert_true( MAP::mNbCells <= gAllocated );
-        CELL result = gCell[indx];
+        CELL result = gCell[inx];
         int * offsets = nullptr;
-        const CELL * ce = gCell + indx;
-        int nb = MAP::getRegion(offsets, indx);
+        const CELL * ce = gCell + inx;
+        int nb = MAP::getRegion(offsets, inx);
         for ( int c = 0; c < nb; ++c )
             if ( result < ce[ offsets[c] ] )
                 result = ce[ offsets[c] ];

@@ -58,28 +58,17 @@ public:
     void step();
     
     /// first Space
-    Space * first() const
-    {
-        return static_cast<Space*>(pool.front());
-    }
+    Space * first() const { return static_cast<Space*>(pool.front()); }
 
     /// first Space with this Property
-    Space * findObject(const Property * prop) const
-    {
-        return static_cast<Space*>(ObjectSet::findObject(prop));
-    }
+    Space * findObject(const Property * p) const { return static_cast<Space*>(ObjectSet::findObject(p)); }
     
     /// last Space
     Space * last() const
-    {
-        return static_cast<Space*>(pool.back());
-    }
+    { return static_cast<Space*>(pool.back());}
 
     /// return pointer to the Object of given ID, or zero if not found
-    Space * findID(ObjectID n) const
-    {
-        return static_cast<Space*>(inventory.get(n));
-    }
+    Space * findID(ObjectID n) const { return static_cast<Space*>(inventory.get(n)); }
 
 };
 

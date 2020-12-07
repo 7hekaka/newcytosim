@@ -38,49 +38,34 @@ public:
     //--------------------------
     
     /// register a Solid into the list
-    void        add(Object *);
+    void    add(Object *);
     
     /// remove from the list
-    void        remove(Object *);
+    void    remove(Object *);
     
     /// first Solid
-    Solid *     first() const
-    {
-        return static_cast<Solid*>(pool.front());
-    }
+    Solid * first() const { return static_cast<Solid*>(pool.front()); }
     
     /// last Solid
-    Solid *     last() const
-    {
-        return static_cast<Solid*>(pool.back());
-    }
+    Solid * last() const { return static_cast<Solid*>(pool.back()); }
     
     /// first Solid in inventory
-    Solid *     firstID() const
-    {
-        return static_cast<Solid*>(inventory.first());
-    }
+    Solid * firstID() const { return static_cast<Solid*>(inventory.first()); }
 
     /// next Solid in inventory
-    Solid *     nextID(Solid const* obj) const
-    {
-        return static_cast<Solid*>(inventory.next(obj));
-    }
+    Solid * nextID(Solid const* obj) const { return static_cast<Solid*>(inventory.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
-    Solid *     findID(ObjectID n) const
-    {
-        return static_cast<Solid*>(inventory.get(n));
-    }
+    Solid * findID(ObjectID n) const { return static_cast<Solid*>(inventory.get(n)); }
     
     /// modulo the position (periodic boundary conditions)
-    void        foldPosition(Modulo const*) const;
+    void    foldPosition(Modulo const*) const;
     
     /// returns Solid, if one of its Sphere covers the given position (`inx` is set by this function)
-    Solid*      insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;
+    Solid*  insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;
                              
     /// Monte-Carlo simulation step for every Object
-    void        step() {}
+    void    step() {}
 };
 
 
