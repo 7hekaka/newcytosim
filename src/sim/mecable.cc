@@ -59,9 +59,9 @@ void Mecable::blockSize(size_t bks, size_t block, size_t pivot)
     {
         free_real(pBlock);
         pBlockAlc = chunk_real(block);
-        //std::clog <<reference()<<" allocateBlock " << pBlockAlc << "\n";
         pBlock = new_real(pBlockAlc);
         //zero_real(pBlockAlc, pBlock);
+        //std::clog << reference() << " allocateBlock " << bks << " " << pBlockAlc << "\n";
     }
     
     if ( pivot > pPivotAlc )

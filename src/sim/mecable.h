@@ -37,7 +37,6 @@ class Meca;
  */
 class Mecable : public Object, public Buddy
 {
-
     /// to save memory, SIZE_T could be defined here to use down to 2 bytes.
     /* The limit imposed on the size of the Mecable is hardly relevant anyhow */
     typedef unsigned short SIZE_T;
@@ -66,6 +65,9 @@ private:
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
     size_t      pIndex;
+    
+    /// Allocated size of pBlock[], capable of size^2
+    size_t      pBlockAlc;
 
 protected:
 
@@ -82,9 +84,6 @@ private:
     
     /// type of block
     SIZE_T      pBlockType;
-
-    /// Allocated size of pBlock[]
-    SIZE_T      pBlockAlc;
     
     /// Allocated size of pPivot[]
     SIZE_T      pPivotAlc;
