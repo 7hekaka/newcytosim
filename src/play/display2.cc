@@ -175,12 +175,7 @@ void Display2::drawSolid(Solid const& obj)
     {
         bodyColor(obj);
         for ( size_t p = 0; p < obj.nbPoints(); ++p )
-        {
-            if ( obj.radius(p) > 0 )
-                drawPoint(obj.posP(p), disp);
-            else
-                drawObject(obj.posP(p), disp->size, gle::cube);
-        }
+            drawObject(obj.posP(p), disp->size, gle::hedron(obj.radius(p)>0));
     }
     
     //display outline of spheres

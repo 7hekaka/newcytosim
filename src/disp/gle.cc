@@ -434,7 +434,7 @@ namespace gle
     }
          
     /// Tetrahedron is make of 4 triangles = 12 vertices
-    void initTetrahedron(GLint buf1, GLint buf2, GLfloat R=1.0f)
+    void initTetrahedron(GLint buf1, GLint buf2, GLfloat R=1.2f)
     {
         const GLfloat S = R / M_SQRT3;
         const GLfloat Y = 2.0 * S;
@@ -764,19 +764,20 @@ namespace gle
         {
             glGenBuffers(16, buf_);
             initTetrahedron(buf_[0], buf_[1]);
-            initCube(buf_[2], buf_[3]);
-            initOctahedron(buf_[4], buf_[5]);
-            initIcosahedron(buf_[6], buf_[7]);
-            initArrowTail(buf_[8], buf_[9]);
+            initOctahedron(buf_[2], buf_[3]);
+            initIcosahedron(buf_[4], buf_[5]);
+            initArrowTail(buf_[6], buf_[7]);
+            initCube(buf_[8], buf_[9]);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
     
     void tetrahedron() { drawBuffer(buf_[0], buf_[1], 12, GL_TRIANGLES); }
-    void cube() { drawBuffer(buf_[2], buf_[3], 36, GL_TRIANGLES); }
-    void octahedron() { drawBuffer(buf_[4], buf_[5], 24, GL_TRIANGLES); }
-    void icosahedron() { drawBuffer(buf_[6], buf_[7], 60, GL_TRIANGLES); }
-    void arrowTail() { drawBuffer(buf_[8], buf_[9], 45, GL_TRIANGLES); }
+    void octahedron() { drawBuffer(buf_[2], buf_[3], 24, GL_TRIANGLES); }
+    void icosahedron() { drawBuffer(buf_[4], buf_[5], 60, GL_TRIANGLES); }
+        
+    void arrowTail() { drawBuffer(buf_[6], buf_[7], 45, GL_TRIANGLES); }
+    void cube() { drawBuffer(buf_[8], buf_[9], 36, GL_TRIANGLES); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes

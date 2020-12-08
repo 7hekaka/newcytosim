@@ -13,7 +13,7 @@ template< typename FLOAT >
 FLOAT grained(FLOAT x, int inc)
 {
     const FLOAT grain = (FLOAT)0.25;
-    FLOAT dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 16 ) + 4 * ( x >= 32 ) );
+    FLOAT dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
     FLOAT nx = grain * std::round( x / grain + dx );
     return std::max(std::abs(inc)*grain, nx);
 }
@@ -60,12 +60,12 @@ void setWidth(PointDisp * p, GLfloat s)
 
 void changeSize(PointDisp * p, int inc)
 {
-    GLfloat s = grained(p->size, inc);
-    if ( s > 16 )
-        s = 0.5;
+    float s = grained(p->size, inc);
+    if ( s > 32.f )
+        s = 0.5f;
     if ( s > 0 )
     {
-        real w = p->width;
+        float w = p->width;
         p->size = s;
         p->width *= s / w;
         flashText("%s:size = %.2f", p->name_str(), s);
