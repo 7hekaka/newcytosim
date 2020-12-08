@@ -4,17 +4,6 @@
 #
 # F. Nedelec, 19--21 February 2016
 #
-# How I installed matplotlib in Jan 2015 (Mac osx 10.10):
-#
-# brew install python3 --framework
-# pip3 install numpy
-# pip3 install nose
-# git clone git://github.com/matplotlib/matplotlib.git
-# cd matplotlib
-# python3 setup.py build
-# sudo python3 setup.py install
-# python3 setup.py clean
-#
 
 
 """

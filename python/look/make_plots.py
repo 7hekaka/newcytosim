@@ -11,7 +11,7 @@
 # pip3 install nose
 # pip3 install matplotlib
 #
-# Alternative:
+# Alternative from source:
 # git clone git://github.com/matplotlib/matplotlib.git
 # cd matplotlib
 # python3 setup.py build

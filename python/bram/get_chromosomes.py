@@ -29,9 +29,9 @@ import sys, os, subprocess, math
 from pyned import find_differences, uncode, format_line
 import read_config
 
-#------------------------------------------------------------------------
-
 import matplotlib.pyplot as plt
+
+#------------------------------------------------------------------------
 
 
 def find_indices(line):
