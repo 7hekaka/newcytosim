@@ -2050,7 +2050,7 @@ void Chain::writeInfo(std::ostream& os, real len, real con, real mn, real mx) co
 }
 
 
-int Chain::check(std::ostream& os, real len) const
+int Chain::checkLength(std::ostream& os, real len) const
 {
     real mn, mx;
     segmentationMinMax(mn, mx);
@@ -2139,6 +2139,6 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     // verify the length and segmentation:
     if ( in.vectorSize() == DIM )
-        check(std::clog, len);
+        checkLength(std::clog, len);
 }
 

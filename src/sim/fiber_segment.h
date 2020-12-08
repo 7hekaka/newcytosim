@@ -118,17 +118,5 @@ public:
 /// print for debug purpose
 std::ostream& operator << (std::ostream&, FiberSegment const&);
 
-
-/// true if segments are adjacent on the same fiber or Tubule
-inline bool adjacent(FiberSegment const& a, FiberSegment const& b)
-{
-#if FIBER_HAS_FAMILY
-    return (( a.fiber()->family_ == b.fiber()->family_ )
-#else
-    return (( a.fiber() == b.fiber() )
-#endif
-            & ( a.point() < 2 + b.point() ) & ( b.point() < 2 + a.point() ));
-}
-
 #endif
 

@@ -541,16 +541,16 @@ void ObjectPool::shuffle()
 #pragma mark - Check
 
 
-bool ObjectPool::check(Object const* n) const
+bool ObjectPool::count(Object const* n) const
 {
     Object * p = frontO;
     while ( p )
     {
         if ( p == n )
-            return true;
+            return 1;
         p = p->nextO;
     }
-    return false;
+    return 0;
 }
 
 /**

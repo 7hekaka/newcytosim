@@ -98,7 +98,7 @@ real SpaceEllipse::surface() const
     return 2;
 #elif ( DIM == 2 )
     // approximate formula
-    real h = square(length_[0]-length_[1]) / square(length_[0]+length_[1])
+    real h = square(length_[0]-length_[1]) / square(length_[0]+length_[1]);
     real S = M_PI * ( length_[0] + length_[1] );
     return S * ( 1.0 + h/4.0 * ( 1.0 + h/16.0 * ( 1.0 + h/4.0 )));
 #else

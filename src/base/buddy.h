@@ -12,7 +12,7 @@
  Buddy implements mutual relationship between objects.
  
  The class keeps track of a list of `buddies`.
- Relationship is established with hello().
+ Relationship is established with connect().
  When an object is destroyed, it calls goodbye() for all its buddies.
  
  This class can be used when an object needs to know if another object is destroyed,
@@ -150,6 +150,14 @@ public:
         return buddies_.size();
     }
     
+    /// return first buddy or nullptr
+    Buddy * buddy() const
+    {
+        if ( buddies_.size() )
+            return buddies_[0];
+        return nullptr;
+    }
+
     /// return buddy at index `ix`
     Buddy * buddy(const size_t ix) const
     {
@@ -166,6 +174,13 @@ public:
         return ( i != buddies_.end() );
     }
     
+    void print(std::ostream& os) const
+    {
+        os << "object " << this << " buddies are: ";
+        for ( Buddy * b : buddies_ )
+            os << "   " << b;
+        os << "\n";
+    }
 };
 
 #endif

@@ -59,7 +59,7 @@ public:
     /// add Mecable at given index
     void               grasp(Mecable *, size_t);
     
-    /// returns true if Mecables is one of the organize object
+    /// returns true if Mecables is one of the organized object
     bool               check(Mecable const*) const;
 
     /// handles the disapearance of one of the organized object

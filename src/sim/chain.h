@@ -476,7 +476,7 @@ public:
     void         writeInfo(std::ostream&) const;
 
     /// check length and segmentation and write if suspicious
-    int          check(std::ostream&, real len) const;
+    int          checkLength(std::ostream&, real len) const;
 
     /// write to Outputter
     void         write(Outputter&) const;

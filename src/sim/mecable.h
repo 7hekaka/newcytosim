@@ -64,10 +64,10 @@ private:
     int  *      pPivot;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    size_t      pIndex;
+    unsigned    pIndex;
     
     /// Allocated size of pBlock[], capable of size^2
-    size_t      pBlockAlc;
+    unsigned    pBlockAlc;
 
 protected:
 

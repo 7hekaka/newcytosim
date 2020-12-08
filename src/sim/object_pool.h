@@ -122,8 +122,8 @@ public:
     /// count number of elements in the list
     size_t count() const;
     
-    /// return `true` if element appears in the list
-    bool   check(Object const* n) const;
+    /// returns 1 if element appears in the list
+    bool   count(Object const* n) const;
     
     /// test coherence of list
     int    bad() const;
