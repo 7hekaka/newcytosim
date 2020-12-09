@@ -642,9 +642,9 @@
 		BB9402EC0E236778007410D7 /* sphere_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402EA0E236778007410D7 /* sphere_set.cc */; };
 		BB9402ED0E236778007410D7 /* sphere_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9402EB0E236778007410D7 /* sphere_set.h */; };
 		BB955CF6116FCB39000E70A6 /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
-		BB957FF92466A86500A61493 /* point_gridF.h in Headers */ = {isa = PBXBuildFile; fileRef = BB957FF82466A86500A61493 /* point_gridF.h */; };
-		BB957FFA2466A8B300A61493 /* point_gridF.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* point_gridF.cc */; };
-		BB957FFB2466A8B300A61493 /* point_gridF.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* point_gridF.cc */; };
+		BB957FF92466A86500A61493 /* locus_grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB957FF82466A86500A61493 /* locus_grid.h */; };
+		BB957FFA2466A8B300A61493 /* locus_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* locus_grid.cc */; };
+		BB957FFB2466A8B300A61493 /* locus_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* locus_grid.cc */; };
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
@@ -1675,7 +1675,7 @@
 		BB94965A0933B75B003A32FE /* quaternion.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = quaternion.h; path = src/math/quaternion.h; sourceTree = SOURCE_ROOT; };
 		BB955C4B116FBF4C000E70A6 /* space_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_set.cc; path = src/sim/space_set.cc; sourceTree = SOURCE_ROOT; };
 		BB955C4C116FBF4C000E70A6 /* space_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_set.h; path = src/sim/space_set.h; sourceTree = SOURCE_ROOT; };
-		BB957FF82466A86500A61493 /* point_gridF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_gridF.h; sourceTree = "<group>"; };
+		BB957FF82466A86500A61493 /* locus_grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = locus_grid.h; sourceTree = "<group>"; };
 		BB95C53B249627EC003CA21A /* test_array.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_array.cc; sourceTree = "<group>"; };
 		BB97114C1DECDA1300352630 /* glapp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = glapp.cc; sourceTree = "<group>"; };
 		BB97114D1DECDA1300352630 /* glapp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glapp.h; sourceTree = "<group>"; };
@@ -1710,7 +1710,7 @@
 		BB9B6DC806AC5160004A4D10 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		BB9BEB9C1C774BB30085E19F /* analyse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = analyse.cc; sourceTree = "<group>"; };
 		BB9C48DA20BE6E8400E1522A /* todo.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = todo.md; path = src/todo.md; sourceTree = "<group>"; };
-		BB9CA2931A55C2C000302A6D /* point_gridF.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = point_gridF.cc; sourceTree = "<group>"; };
+		BB9CA2931A55C2C000302A6D /* locus_grid.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = locus_grid.cc; sourceTree = "<group>"; };
 		BB9CED2A07E21B0F00887531 /* player.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = player.h; path = src/play/player.h; sourceTree = SOURCE_ROOT; };
 		BB9D224520C5D30200CBB0B1 /* simd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simd.h; path = src/math/simd.h; sourceTree = SOURCE_ROOT; };
 		BB9D87A01E76BAE500DD0F00 /* test_matrix */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_matrix; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2247,8 +2247,8 @@
 				BB3AAF5806076A8B00508E18 /* fiber_grid2.cc */,
 				BB53F5770DCB467000ED38EB /* point_grid.h */,
 				BB53F5760DCB467000ED38EB /* point_grid.cc */,
-				BB957FF82466A86500A61493 /* point_gridF.h */,
-				BB9CA2931A55C2C000302A6D /* point_gridF.cc */,
+				BB957FF82466A86500A61493 /* locus_grid.h */,
+				BB9CA2931A55C2C000302A6D /* locus_grid.cc */,
 			);
 			name = Grids;
 			sourceTree = "<group>";
@@ -3672,7 +3672,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB957FF92466A86500A61493 /* point_gridF.h in Headers */,
+				BB957FF92466A86500A61493 /* locus_grid.h in Headers */,
 				BB9EC396209235CC00EF00E7 /* SFMT-sse2.h in Headers */,
 				BB71916B0EF1CD9900CED9E2 /* sparmatsym.h in Headers */,
 				BB71916C0EF1CD9900CED9E2 /* sparmatsym2.h in Headers */,
@@ -4572,7 +4572,7 @@
 				BBA10153126CC7E600D28A55 /* walker.cc in Sources */,
 				BBA10159126CC7FD00D28A55 /* cutter_prop.cc in Sources */,
 				BBA1015B126CC7FD00D28A55 /* cutter.cc in Sources */,
-				BB957FFA2466A8B300A61493 /* point_gridF.cc in Sources */,
+				BB957FFA2466A8B300A61493 /* locus_grid.cc in Sources */,
 				BBB1E47D126DC70B00B19D26 /* actor_prop.cc in Sources */,
 				BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */,
 				BB5D4CA112BCBE2900A1312F /* parser.cc in Sources */,
@@ -4725,7 +4725,7 @@
 				BB6921E2233D359F00F528D2 /* walker.cc in Sources */,
 				BB6921E3233D359F00F528D2 /* cutter_prop.cc in Sources */,
 				BB6921E4233D359F00F528D2 /* cutter.cc in Sources */,
-				BB957FFB2466A8B300A61493 /* point_gridF.cc in Sources */,
+				BB957FFB2466A8B300A61493 /* locus_grid.cc in Sources */,
 				BB6921E5233D359F00F528D2 /* actor_prop.cc in Sources */,
 				BB6921E6233D359F00F528D2 /* actor.cc in Sources */,
 				BB6921E8233D359F00F528D2 /* parser.cc in Sources */,

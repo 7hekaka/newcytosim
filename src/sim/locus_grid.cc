@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "assert_macro.h"
-#include "point_gridF.h"
+#include "locus_grid.h"
 #include "exceptions.h"
 #include "messages.h"
 #include "modulo.h"
@@ -12,13 +12,13 @@ extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
 
-PointGridF::PointGridF()
+LocusGrid::LocusGrid()
 : max_diameter(0)
 {
 }
 
 
-size_t PointGridF::setGrid(Space const* spc, real min_step)
+size_t LocusGrid::setGrid(Space const* spc, real min_step)
 {
     assert_true( min_step > 0 );
     Vector inf, sup;
@@ -56,7 +56,7 @@ size_t PointGridF::setGrid(Space const* spc, real min_step)
 }
 
 
-void PointGridF::createCells()
+void LocusGrid::createCells()
 {
     pGrid.createCells();
     
@@ -80,7 +80,7 @@ void PointGridF::createCells()
 
 #if ( MAX_STERIC_PANES != 1 )
 
-void PointGridF::add(size_t pan, Mecable const* mec, size_t inx, real rad) const
+void LocusGrid::add(size_t pan, Mecable const* mec, size_t inx, real rad) const
 {
     if ( pan == 0 || pan > MAX_STERIC_PANES )
         throw InvalidParameter("point:steric is out-of-range");
@@ -101,7 +101,7 @@ void PointGridF::add(size_t pan, Mecable const* mec, size_t inx, real rad) const
 }
 
 
-void PointGridF::add(size_t pan, Fiber const* fib, size_t inx, real rad) const
+void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad) const
 {
     if ( pan == 0 || pan > MAX_STERIC_PANES )
         throw InvalidParameter("line:steric is out-of-range");
@@ -140,13 +140,13 @@ void PointGridF::add(size_t pan, Fiber const* fib, size_t inx, real rad) const
  The force is applied if the objects are closer to the maximum
  of their specified range + radius.
  */
-void PointGridF::checkPP(Meca& meca, real stiff,
+void LocusGrid::checkPP(Meca& meca, real stiff,
                          BigPoint const& aa, BigPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
-    const real ran = aa.rad_ + bb.rad_;
     Vector vab = bb.pos_ - aa.pos_;
-    
+    const real ran = aa.rad_ + bb.rad_;
+
 #if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(vab);
@@ -163,7 +163,7 @@ void PointGridF::checkPP(Meca& meca, real stiff,
  The force is applied if the objects are closer than the maximum of the two range + radius,
  and if the center of the sphere projects inside the segment.
  */
-void PointGridF::checkPL(Meca& meca, real stiff,
+void LocusGrid::checkPL(Meca& meca, real stiff,
                          BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
@@ -216,7 +216,7 @@ void PointGridF::checkPL(Meca& meca, real stiff,
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void PointGridF::checkLL1(Meca& meca, real stiff,
+void LocusGrid::checkLL1(Meca& meca, real stiff,
                           BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
@@ -281,7 +281,7 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
 
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void PointGridF::checkLL2(Meca& meca, real stiff,
+void LocusGrid::checkLL2(Meca& meca, real stiff,
                           BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
@@ -351,7 +351,7 @@ void PointGridF::checkLL2(Meca& meca, real stiff,
  This is used to check two FiberSegment, that each represent a segment of a Fiber.
  The segments are tested for intersection in 3D.
  */
-void PointGridF::checkLL(Meca& meca, real stiff,
+void LocusGrid::checkLL(Meca& meca, real stiff,
                          BigLocus const& aa, BigLocus const& bb)
 {
 #if ( DIM == 3 )
@@ -422,7 +422,7 @@ inline bool adjacent(BigLocus const* a, BigLocus const* b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-void PointGridF::setInteractions(Meca& meca, real stiff,
+void LocusGrid::setInteractions(Meca& meca, real stiff,
                                  BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
@@ -449,7 +449,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated
  */
-void PointGridF::setInteractions(Meca& meca, real stiff,
+void LocusGrid::setInteractions(Meca& meca, real stiff,
                                  BigPointList & pots1, BigLocusList & locs1,
                                  BigPointList & pots2, BigLocusList & locs2)
 {
@@ -487,7 +487,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
  Compared to `setInteractions()`, this performs an additional test
  for the distance between the object's `pos` is below `max_diameter`
  */
-void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
+void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
                                  BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
@@ -519,7 +519,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
  Compared to `setInteractions()`, this performs an additional test
  for the distance between the object's `pos` is below `max_diameter`
  */
-void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
+void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
                                  BigPointList & pots1, BigLocusList & locs1,
                                  BigPointList & pots2, BigLocusList & locs2)
 {
@@ -563,7 +563,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
 /**
  Check interactions between objects contained in the grid.
  */
-void PointGridF::setInteractions(Meca& meca, real stiff) const
+void LocusGrid::setInteractions(Meca& meca, real stiff) const
 {
     //std::clog << "----" << '\n';
     
@@ -611,7 +611,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff) const
 /**
  Check interactions between the FatPoints contained in Pane `pan`.
  */
-void PointGridF::setInteractions(Meca& meca, real stiff,
+void LocusGrid::setInteractions(Meca& meca, real stiff,
                                  const size_t pan) const
 {
     // scan all cells to examine each pair of particles:
@@ -657,7 +657,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
  Check interactions between the FatPoints contained in Panes `pan1` and `pan2`,
  where ( pan1 != pan2 )
  */
-void PointGridF::setInteractions(Meca& meca, real stiff,
+void LocusGrid::setInteractions(Meca& meca, real stiff,
                                  const size_t pan1, const size_t pan2) const
 {
     assert_true(pan1 != pan2);
@@ -726,7 +726,7 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
 
 #  include "grid_display.h"
 
-void PointGridF::draw() const
+void LocusGrid::draw() const
 {
     glDisable(GL_LIGHTING);
     glColor3f(1, 0, 1);

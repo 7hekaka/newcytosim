@@ -21,7 +21,7 @@
 #include "space_set.h"
 #include "event_set.h"
 #include "point_grid.h"
-#include "point_gridF.h"
+#include "locus_grid.h"
 #include "property_list.h"
 #include "field_values.h"
 #include "meca.h"
@@ -47,8 +47,8 @@ public:
     /// grid used for steric interaction between Fiber/Solid/Bead/Sphere
     mutable PointGrid pointGrid;
     
-    /// grid used for steric interaction between Fiber/Solid/Bead/Sphere
-    mutable PointGridF pointGridF;
+    /// alternative grid used for steric interaction, instead of pointGrid
+    mutable LocusGrid locusGrid;
 
     /// Meca used to solve the system with option 'solve=horizontal'
     Meca1D *          pMeca1D;
@@ -243,12 +243,9 @@ private:
     
     /// add steric interactions between spheres, solids and fibers to Meca
     void setStericInteractions(Meca&) const;
-    
-    /// initialize the grid for steric interaction (pointGridF)
-    void setStericGridF(Space const*) const;
 
     /// add steric interactions between spheres, solids and fibers to Meca
-    void setStericInteractionsF(Meca&) const;
+    void setStericInteractionsAlt(Meca&) const;
     
     //----------------------------- PARSING ------------------------------------
     

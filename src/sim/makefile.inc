@@ -55,7 +55,7 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            tubule_prop.o tubule.o tubule_set.o\
            event.o event_set.o space_set.o\
            mecapoint.o interpolation.o interpolation4.o\
-           meca.o fiber_grid.o point_grid.o point_gridF.o\
+           meca.o fiber_grid.o point_grid.o locus_grid.o\
            simul_prop.o simul.o interface.o parser.o
 
 

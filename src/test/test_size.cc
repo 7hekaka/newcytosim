@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
         PRINT(FatPoint);
         PRINT(FatLocus);
         
-        PRINT(PointGridF);
+        PRINT(LocusGrid);
         PRINT(BigPoint);
         PRINT(BigLocus);
     }

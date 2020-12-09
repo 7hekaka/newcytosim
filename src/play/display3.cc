@@ -408,7 +408,7 @@ void color_seg_height(Fiber const& fib, size_t seg, real beta)
 /// color set according to steric grid
 void color_seg_grid(Fiber const& fib, size_t seg, real beta)
 {
-    Map<DIM> const& map = fib.simul().pointGridF.map();
+    Map<DIM> const& map = fib.simul().locusGrid.map();
     Vector w = fib.posPoint(seg, 0.5);
     size_t i = map.index(w);
     gle::alt_color(i).load_front();

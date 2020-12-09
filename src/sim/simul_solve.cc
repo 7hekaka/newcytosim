@@ -232,17 +232,17 @@ void Simul::setStericInteractions(Meca& meca) const
  This can be extended if necessary, but the steric_stiffness[]
  properties should be extended as well.
  */
-void Simul::setStericInteractionsF(Meca& meca) const
+void Simul::setStericInteractionsAlt(Meca& meca) const
 {
-    if ( !pointGridF.hasGrid() )
+    if ( !locusGrid.hasGrid() )
     {
         if (!spaces.master())
             return;
-        setStericGrid(pointGridF, spaces.master());
+        setStericGrid(locusGrid, spaces.master());
     }
 
     // clear grid
-    pointGridF.clear();
+    locusGrid.clear();
     
     // distribute Fiber-points on the grid
     for ( Fiber const* F=fibers.first(); F; F=F->next() )
@@ -253,9 +253,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( MAX_STERIC_PANES == 1 )
-                pointGridF.add(F, i, rad);
+                locusGrid.add(F, i, rad);
 #else
-                pointGridF.add(F->prop->steric, F, i, rad);
+                locusGrid.add(F->prop->steric, F, i, rad);
 #endif
         }
     }
@@ -265,9 +265,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
     {
         if ( O->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(O, 0, O->radius());
+            locusGrid.add(O, 0, O->radius());
 #else
-            pointGridF.add(O->prop->steric, O, 0, O->radius());
+            locusGrid.add(O->prop->steric, O, 0, O->radius());
 #endif
     }
     
@@ -276,9 +276,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
     {
         if ( B->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(B, 0, B->radius());
+            locusGrid.add(B, 0, B->radius());
 #else
-            pointGridF.add(B->prop->steric, B, 0, B->radius());
+            locusGrid.add(B->prop->steric, B, 0, B->radius());
 #endif
     }
         
@@ -291,9 +291,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
             {
                 if ( S->radius(i) > REAL_EPSILON )
 #if ( MAX_STERIC_PANES == 1 )
-                    pointGridF.add(S, i, S->radius(i));
+                    locusGrid.add(S, i, S->radius(i));
 #else
-                    pointGridF.add(S->prop->steric, S, i, S->radius(i));
+                    locusGrid.add(S->prop->steric, S, i, S->radius(i));
 #endif
             }
         }
@@ -304,21 +304,21 @@ void Simul::setStericInteractionsF(Meca& meca) const
 
 #if ( MAX_STERIC_PANES == 1 )
         
-    pointGridF.setInteractions(meca, stiff);
+    locusGrid.setInteractions(meca, stiff);
 
 #elif ( MAX_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
-    pointGridF.setInteractions(meca, stiff, 1);
+    locusGrid.setInteractions(meca, stiff, 1);
     // add steric interactions between panes 1 and 2:
-    pointGridF.setInteractions(meca, stiff, 1, 2);
+    locusGrid.setInteractions(meca, stiff, 1, 2);
     //pointGrid.setInteractions(meca, pam, 2, 1);
 
 #else
     
     // add steric interactions within each pane:
     for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-        pointGridF.setInteractions(meca, stiff, p);
+        locusGrid.setInteractions(meca, stiff, p);
 
 #endif
 }
@@ -378,7 +378,7 @@ void Simul::setAllInteractions(Meca& meca) const
         if ( prop->steric_stiff_pull[0] > 0 )
             setStericInteractions(meca);
         else
-            setStericInteractionsF(meca);
+            setStericInteractionsAlt(meca);
     }
     //addExperimentalInteractions(meca);
 

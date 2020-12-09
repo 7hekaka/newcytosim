@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-#ifndef POINT_GRIDF_H
-#define POINT_GRIDF_H
+#ifndef LOCUS_GRID_H
+#define LOCUS_GRID_H
 
 #include "grid.h"
 #include "dim.h"
@@ -15,15 +15,12 @@ class Simul;
 class Fiber;
 
 
-/// represents a Mecapoint for steric interactions
+/// represents the point of a Mecable for steric interactions
 class BigPoint
 {
-    friend class PointGridF;
+    friend class LocusGrid;
     
 public:
-    
-    /// Mecable containing the point-of-interest
-    Mecable const* mec_;
     
     /// position of center
     Vector   pos_;
@@ -31,6 +28,9 @@ public:
     /// equilibrium radius of the interaction (distance where force is zero)
     real     rad_;
     
+    /// Mecable containing the point-of-interest
+    Mecable const* mec_;
+
     /// Index of the point-of-interest in the Mecable
     unsigned pti_;
     
@@ -58,18 +58,18 @@ public:
 /// represents the Segment of a Fiber for steric interactions
 class BigLocus
 {
-    friend class PointGridF;
+    friend class LocusGrid;
     
 public:
-    
-    /// Fiber to which the segment belongs to
-    Fiber const* fib_;
     
     /// position of center
     Vector   pos_;
     
     /// equilibrium radius of the interaction (distance where force is zero)
     real     rad_;
+
+    /// Fiber to which the segment belongs to
+    Fiber const* fib_;
     
     /// index of segment's first point
     unsigned pti_;
@@ -112,7 +112,7 @@ public:
     bool isFirst() const { return ( pti_ == 0 ); }
     
     /// true if the segment is the last of the Fiber
-    bool isLast() const { return ( pti_ == fib_->lastPoint() ); }
+    bool isLast() const { return ( pti_+2 == fib_->nbPoints() ); }
 
     /// Mecapoint to point 1
     Mecapoint point1() const { return Mecapoint(fib_, pti_); }
@@ -141,9 +141,9 @@ typedef Array<BigLocus> BigLocusList;
 
 
 /// a set of lists associated with the same location
-class PointGridCellF
+class LocusGridCell
 {
-    friend class PointGridF;
+    friend class LocusGrid;
     
 #if ( MAX_STERIC_PANES == 1 )
     
@@ -173,7 +173,7 @@ public:
     
 #if ( MAX_STERIC_PANES == 1 )
     
-    PointGridCellF()
+    LocusGridCell()
     {
     }
     
@@ -186,7 +186,7 @@ public:
     
 #else
     
-    PointGridCellF() : point_panes(point_panes_0), locus_panes(locus_panes_0)
+    LocusGridCell() : point_panes(point_panes_0), locus_panes(locus_panes_0)
     {
         --point_panes;
         --locus_panes;
@@ -229,12 +229,12 @@ public:
  It then calculates their actual distance, and set a interaction from Meca if necessary
  .
  */
-class PointGridF
+class LocusGrid
 {
 private:
     
     /// grid for divide-and-conquer strategies:
-    Grid<PointGridCellF, DIM> pGrid;
+    Grid<LocusGridCell, DIM> pGrid;
     
     /// max radius that can be included
     real max_diameter;
@@ -335,7 +335,7 @@ private:
 public:
     
     /// creator
-    PointGridF();
+    LocusGrid();
     
     /// define grid covering specified Space, with cell of size min_step at least
     size_t setGrid(Space const*, real min_step);
