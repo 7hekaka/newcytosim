@@ -45,10 +45,10 @@ real Simul::estimateStericRange() const
     ran = len + 2*ran;
     
     
-    for ( Sphere const* S=spheres.first(); S; S=S->next() )
+    for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
-        if ( S->prop->steric )
-            ran = std::max(ran, 2 * S->radius() + S->prop->steric_range);
+        if ( O->prop->steric )
+            ran = std::max(ran, 2 * O->radius() + O->prop->steric_range);
     }
     
     for ( Bead const* B=beads.first(); B; B=B->next() )
@@ -149,13 +149,13 @@ void Simul::setStericInteractions(Meca& meca) const
     }
     
     // include Spheres
-    for ( Sphere const* S=spheres.first(); S; S=S->next() )
+    for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
-        if ( S->prop->steric )
+        if ( O->prop->steric )
 #if ( N_STERIC_PANES == 1 )
-            pointGrid.add(Mecapoint(S, 0), S->radius(), S->radius()+S->prop->steric_range);
+            pointGrid.add(Mecapoint(O, 0), O->radius(), O->radius()+O->prop->steric_range);
 #else
-            pointGrid.add(S->prop->steric, Mecapoint(S, 0), S->radius(), S->radius()+S->prop->steric_range);
+            pointGrid.add(O->prop->steric, Mecapoint(O, 0), O->radius(), O->radius()+O->prop->steric_range);
 #endif
     }
     
@@ -189,9 +189,6 @@ void Simul::setStericInteractions(Meca& meca) const
     
     /// create parameters
     StericParam pam(prop->steric_stiffness_push[0], prop->steric_stiffness_pull[0]);
-    
-    assert_true(prop->steric_stiffness_push[0] >= 0);
-    assert_true(prop->steric_stiffness_pull[0] >= 0);
     
 #if ( N_STERIC_PANES == 1 )
     
@@ -264,13 +261,13 @@ void Simul::setStericInteractionsF(Meca& meca) const
     }
     
     // include Spheres
-    for ( Sphere const* S=spheres.first(); S; S=S->next() )
+    for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
-        if ( S->prop->steric )
+        if ( O->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(Mecapoint(S, 0), S->radius());
+            pointGridF.add(Mecapoint(O, 0), O->radius());
 #else
-            pointGridF.add(S->prop->steric, Mecapoint(S, 0), S->radius());
+            pointGridF.add(O->prop->steric, Mecapoint(O, 0), O->radius());
 #endif
     }
     
@@ -304,8 +301,6 @@ void Simul::setStericInteractionsF(Meca& meca) const
     
     /// create parameters
     real stiff = prop->steric_stiffness_push[0];
-    
-    assert_true(prop->steric_stiffness_push[0] >= 0);
 
 #if ( MAX_STERIC_PANES == 1 )
         
@@ -377,8 +372,9 @@ void Simul::setAllInteractions(Meca& meca) const
     //    e->setInteractions(meca);
 
     // add steric interactions
-    if ( prop->steric )
+    if ( prop->steric_mode )
     {
+        // in the abscence of pulling, we can use the simplified steric engine:
         if ( prop->steric_stiffness_pull[0] > 0 )
             setStericInteractions(meca);
         else
@@ -574,21 +570,21 @@ void Simul::addExperimentalInteractions(Meca& meca) const
             meca.addCoulomb(Mecapoint(i,0), Mecapoint(j,0), 0.1);
 #endif
 #if ( 0 )
-    if ( beads.size() > 1 )
+    LOG_ONCE("AD-HOC BEAD-STRING FORCES ENABLED\n");
+    // attach beads together into an open/closed string:
+    const real stiff = 1000;
+    Bead * B = beads.firstID();
+    if ( B )
     {
-        LOG_ONCE("AD-HOC BEAD-STRING FORCES ENABLED\n");
-        // attach beads together into a open string:
-        Bead * p = beads.firstID();
-        if ( p )
+        Bead * N = beads.nextID(B);
+        while ( N )
         {
-            Bead * n = beads.nextID(p);
-            while ( p )
-            {
-                meca.addLongLink(Mecapoint(n,0), Mecapoint(p,0), 1, 1000);
-                n = p;
-                p = beads.nextID(p);
-            }
+            meca.addLongLink(Mecapoint(N,0), Mecapoint(B,0), 1, stiff);
+            B = N;
+            N = beads.nextID(N);
         }
+        N = beads.firstID();
+        meca.addLongLink(Mecapoint(N,0), Mecapoint(B,0), 1, stiff);
     }
 #endif
 #if ( 0 )
@@ -609,29 +605,31 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     }
 #endif
 #if ( 0 )
-    LOG_ONCE("AD-HOC FUNKY RADIAL FORCES ENABLED\n");
-    // attach beads together in a string:
-    for( Bead const* b=beads.first(); b; b=b->next() )
+    LOG_ONCE("AD-HOC BEAD CLAMPS ENABLED\n");
+    // attach beads to fixed positions on a circle:
+    const real ang = M_PI / beads.size();
+    const real rad = 5;
+    for( Bead const* B=beads.first(); B; B=B->next() )
     {
-        real x = ( b->identity() - 2 ) * ang;
-        Vector pos(5*std::cos(x), 5*std::sin(x), 0);
-        meca.addPointClamp(Mecapoint(b, 0), pos, 1);
+        real x = B->identity() * ang;
+        Vector pos(rad*std::cos(x), rad*std::sin(x), 0);
+        meca.addPointClamp(Mecapoint(B, 0), pos, 1);
     }
 #endif
 #if ( 0 )
     LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
-    // add calibrated forces, for testing rotation
-    for ( Fiber const* F = fibers.first(); F; F = F->next() )
+    // add calibrated forces, to test rotation under known torque
+    for ( Fiber const* F=fibers.first(); F; F=F->next() )
         meca.addTorqueClamp(F->interpolateCenter(), Vector(0,1,0), 1);
 #endif
 #if ( 0 )
     LOG_ONCE("AD-HOC CALIBRATED FORCE ENABLED\n");
     // add calibrated force to test rotation of spheres:
     Vector force(0,1,0);
-    for ( Sphere const* S = spheres.first(); S; S = S->next() )
+    for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
-        meca.addForce(Mecapoint(S, 1), -force);
-        meca.addForce(Mecapoint(S, 2), +force);
+        meca.addForce(Mecapoint(O, 1), -force);
+        meca.addForce(Mecapoint(O, 2), +force);
     }
 #endif
 }

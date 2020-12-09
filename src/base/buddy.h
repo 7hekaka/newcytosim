@@ -150,16 +150,16 @@ public:
         return buddies_.size();
     }
     
-    /// return first buddy or nullptr
-    Buddy * buddy() const
+    /// return first buddy or *this
+    Buddy const* buddy() const
     {
         if ( buddies_.size() )
             return buddies_[0];
-        return nullptr;
+        return this;
     }
 
     /// return buddy at index `ix`
-    Buddy * buddy(const size_t ix) const
+    Buddy const* buddy(const size_t ix) const
     {
         if ( ix < buddies_.size() )
             return buddies_[ix];
@@ -174,6 +174,7 @@ public:
         return ( i != buddies_.end() );
     }
     
+    /// print list of buddies
     void print(std::ostream& os) const
     {
         os << "object " << this << " buddies are: ";

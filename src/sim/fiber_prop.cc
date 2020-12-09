@@ -503,7 +503,7 @@ void FiberProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");
 #endif
     
-    if ( sim.primed() && steric && !sim.prop->steric )
+    if ( sim.primed() && steric && !sim.prop->steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( min_length < 0 )

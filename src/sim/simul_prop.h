@@ -220,7 +220,7 @@ public:
     unsigned precondition_span;
     
     /// A flag to control the engine that implement steric interactions between objects
-    int steric;
+    int steric_mode;
     
     /// Stiffness for repulsive steric interaction (set as steric[1])
     real steric_stiffness_push[2];

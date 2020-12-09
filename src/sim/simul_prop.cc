@@ -28,8 +28,8 @@ void SimulProp::clear()
     precondition      = 1;
     precondition_span = 2;
     random_seed       = 0;
-    steric            = 0;
     
+    steric_mode       = 0;
     steric_stiffness_push[0] = 0;
     steric_stiffness_pull[0] = 0;
     steric_stiffness_push[1] = 0;
@@ -88,7 +88,7 @@ void SimulProp::read(Glossary& glos)
     glos.set(precondition,      "precondition");
     glos.set(precondition_span, "precondition", 1);
     
-    glos.set(steric,                   "steric", {{"off", 0}, {"on", 1}});
+    glos.set(steric_mode,              "steric", {{"off", 0}, {"on", 1}});
     glos.set(steric_stiffness_push[0], "steric", 1);
     glos.set(steric_stiffness_pull[0], "steric", 2);
     glos.set(steric_stiffness_push, 2, "steric_stiffness_push");
@@ -160,6 +160,12 @@ void SimulProp::complete(Simul const& sim)
         
         if ( kT == 0 && tolerance > 0.1 )
             throw InvalidParameter("if simul:kT==0, simul:tolerance must be defined and small");
+        
+        if ( steric_stiffness_push[0] < 0 )
+            throw InvalidParameter("steric stiffness (push, steric[1]) must be >= 0");
+
+        if ( steric_stiffness_pull[0] < 0 )
+            throw InvalidParameter("steric stiffness (pull steric[2]) must be >= 0");
     }
     /*
      If the Global parameters have changed, we update all derived parameters.
@@ -189,7 +195,7 @@ void SimulProp::write_values(std::ostream& os) const
     write_value(os, "precondition",    precondition, precondition_span);
     write_value(os, "random_seed",     random_seed);
     std::endl(os);
-    write_value(os, "steric", steric, steric_stiffness_push[0], steric_stiffness_pull[0]);
+    write_value(os, "steric", steric_mode, steric_stiffness_push[0], steric_stiffness_pull[0]);
     write_value(os, "steric_max_range",  steric_max_range);
     write_value(os, "binding_grid_step", binding_grid_step);
     write_value(os, "verbose", verbose);

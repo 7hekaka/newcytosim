@@ -107,7 +107,7 @@ void SolidProp::complete(Simul const& sim)
     if ( sim.primed() && confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
-    if ( sim.primed() && steric && !sim.prop->steric )
+    if ( sim.primed() && steric && !sim.prop->steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 }
 
