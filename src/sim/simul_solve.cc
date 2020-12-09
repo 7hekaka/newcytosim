@@ -188,7 +188,7 @@ void Simul::setStericInteractions(Meca& meca) const
     }
     
     /// create parameters
-    StericParam pam(prop->steric_stiffness_push[0], prop->steric_stiffness_pull[0]);
+    StericParam pam(prop->steric_stiff_push[0], prop->steric_stiff_pull[0]);
     
 #if ( N_STERIC_PANES == 1 )
     
@@ -300,7 +300,7 @@ void Simul::setStericInteractionsF(Meca& meca) const
     }
     
     /// create parameters
-    real stiff = prop->steric_stiffness_push[0];
+    real stiff = prop->steric_stiff_push[0];
 
 #if ( MAX_STERIC_PANES == 1 )
         
@@ -375,7 +375,7 @@ void Simul::setAllInteractions(Meca& meca) const
     if ( prop->steric_mode )
     {
         // in the abscence of pulling, we can use the simplified steric engine:
-        if ( prop->steric_stiffness_pull[0] > 0 )
+        if ( prop->steric_stiff_pull[0] > 0 )
             setStericInteractions(meca);
         else
             setStericInteractionsF(meca);
@@ -390,7 +390,7 @@ void Simul::setAllInteractions(Meca& meca) const
         const Vector cen = sol->posPoint(0);
         const real rad = sol->radius();
         const real rad2 = square(rad);
-        const real stiff = prop->steric_stiffness_push[0];
+        const real stiff = prop->steric_stiff_push[0];
 
         for ( Fiber const* F = fibers.first(); F; F = F->next() )
         {

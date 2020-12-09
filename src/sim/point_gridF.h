@@ -16,7 +16,7 @@ class Fiber;
 
 
 /// represents a Mecapoint for steric interactions
-class FatPointF
+class BigPoint
 {
     friend class PointGridF;
     
@@ -25,17 +25,17 @@ public:
     /// position of center
     Vector    pos;
     
+    /// indicates one vertex in a Mecable
+    Mecapoint pnt;
+
     /// equilibrium radius of the interaction (distance where force is zero)
     real      radius;
     
-    /// indicates one vertex in a Mecable
-    Mecapoint pnt;
-    
 public:
     
-    FatPointF() {}
+    BigPoint() {}
     
-    FatPointF(Mecapoint const& p, real rd, Vector const& w)
+    BigPoint(Mecapoint const& p, real rd, Vector const& w)
     {
         pos    = w;
         radius = rd;
@@ -45,7 +45,7 @@ public:
 
 
 /// represents the Segment of a Fiber for steric interactions
-class FatLocusF
+class BigLocus
 {
     friend class PointGridF;
     
@@ -53,18 +53,18 @@ public:
     
     /// position of center
     Vector       pos;
+    
+    /// indicates one segment of a Fiber
+    FiberSegment seg;
 
     /// equilibrium radius of the interaction (distance where force is zero)
     real         radius;
     
-    /// indicates one segment of a Fiber
-    FiberSegment seg;
-    
 public:
     
-    FatLocusF() {}
+    BigLocus() {}
     
-    FatLocusF(FiberSegment const& p, real rd, Vector const& w)
+    BigLocus(FiberSegment const& p, real rd, Vector const& w)
     {
         pos    = w;
         radius = rd;
@@ -83,23 +83,23 @@ public:
         return seg.isLast();
     }
     
-    FatPointF point1() const
+    BigPoint point1() const
     {
-        return FatPointF(seg.exact1(), radius, seg.pos1());
+        return BigPoint(seg.exact1(), radius, seg.pos1());
     }
     
-    FatPointF point2() const
+    BigPoint point2() const
     {
-        return FatPointF(seg.exact2(), radius, seg.pos2());
+        return BigPoint(seg.exact2(), radius, seg.pos2());
     }
 };
 
 
 /// type for a list of FatPoint
-typedef Array<FatPointF> FatPointListF;
+typedef Array<BigPoint> BigPointList;
 
 /// type for a list of FatLocus
-typedef Array<FatLocusF> FatLocusListF;
+typedef Array<BigLocus> BigLocusList;
 
 
 /// number of panes in the steric engine
@@ -115,24 +115,24 @@ class PointGridCellF
 #if ( MAX_STERIC_PANES == 1 )
     
     /// unique steric pane
-    FatPointListF point_pane;
+    BigPointList point_pane;
     
     /// unique steric pane
-    FatLocusListF locus_pane;
+    BigLocusList locus_pane;
     
 #else
     
     /// different steric panes
-    FatPointListF point_panes_0[MAX_STERIC_PANES];
+    BigPointList point_panes_0[MAX_STERIC_PANES];
     
     /// different steric panes
-    FatLocusListF locus_panes_0[MAX_STERIC_PANES];
+    BigLocusList locus_panes_0[MAX_STERIC_PANES];
     
     /// alias to the array of panes, with index 1 refering to point_panes_0[0]
-    FatPointListF * point_panes;
+    BigPointList * point_panes;
     
     /// alias to the array of panes, with index 1 refering to locus_panes_0[0]
-    FatLocusListF * locus_panes;
+    BigLocusList * locus_panes;
     
 #endif
     
@@ -169,14 +169,14 @@ public:
         }
     }
     
-    FatPointListF& point_list(size_t p)
+    BigPointList& point_list(size_t p)
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return point_panes[p];
     }
     
     
-    FatLocusListF& locus_list(size_t p)
+    BigLocusList& locus_list(size_t p)
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return locus_panes[p];
@@ -209,60 +209,60 @@ private:
 private:
     
     /// check two Spheres
-    static void checkPP(Meca&, real stiff, FatPointF const&, FatPointF const&);
+    static void checkPP(Meca&, real stiff, BigPoint const&, BigPoint const&);
     
     /// check Sphere against Line segment
-    static void checkPL(Meca&, real stiff, FatPointF const&, FatLocusF const&);
+    static void checkPL(Meca&, real stiff, BigPoint const&, BigLocus const&);
     
     /// check Line segment against Sphere
-    static void checkLL1(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
+    static void checkLL1(Meca&, real stiff, BigLocus const&, BigLocus const&);
     
     /// check Line segment against the terminal Sphere of a Fiber
-    static void checkLL2(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
+    static void checkLL2(Meca&, real stiff, BigLocus const&, BigLocus const&);
     
     /// check two Line segments
-    static void checkLL(Meca&, real stiff, FatLocusF const&, FatLocusF const&);
+    static void checkLL(Meca&, real stiff, BigLocus const&, BigLocus const&);
     
     /// check all pairs between the two lists
     static void setInteractions(Meca&, real stiff,
-                                FatPointListF &, FatLocusListF &);
+                                BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists
     static void setInteractions(Meca&, real stiff,
-                                FatPointListF &, FatLocusListF &,
-                                FatPointListF &, FatLocusListF &);
+                                BigPointList &, BigLocusList &,
+                                BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists, checking center-to-center distance
     static void setInteractions(Meca&, real stiff, real sup,
-                                FatPointListF &, FatLocusListF &);
+                                BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists, checking center-to-center distance
     static void setInteractions(Meca&, real stiff, real sup,
-                                FatPointListF &, FatLocusListF &,
-                                FatPointListF &, FatLocusListF &);
+                                BigPointList &, BigLocusList &,
+                                BigPointList &, BigLocusList &);
 
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
-    FatPointListF& point_list(Vector const& w) const
+    BigPointList& point_list(Vector const& w) const
     {
         return pGrid.cell(w).point_pane;
     }
     
     /// cell corresponding to position `w`, and pane `p`
-    FatLocusListF& locus_list(Vector const& w) const
+    BigLocusList& locus_list(Vector const& w) const
     {
         return pGrid.cell(w).locus_pane;
     }
     
     /// cell corresponding to index `w`, and pane `p`
-    FatPointListF& point_list(const size_t w) const
+    BigPointList& point_list(const size_t w) const
     {
         return pGrid.icell(w).point_pane;
     }
     
     /// cell corresponding to index `w`, and pane `p`
-    FatLocusListF& locus_list(const size_t w) const
+    BigLocusList& locus_list(const size_t w) const
     {
         return pGrid.icell(w).locus_pane;
     }
@@ -270,28 +270,28 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    FatPointListF& point_list(Vector const& w, const size_t p) const
+    BigPointList& point_list(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.cell(w).point_panes[p];
     }
     
     /// cell corresponding to position `w`, and pane `p`
-    FatLocusListF& locus_list(Vector const& w, const size_t p) const
+    BigLocusList& locus_list(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.cell(w).locus_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatPointListF& point_list(const size_t c, const size_t p) const
+    BigPointList& point_list(const size_t c, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.icell(c).point_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatLocusListF& locus_list(const size_t c, const size_t p) const
+    BigLocusList& locus_list(const size_t c, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.icell(c).locus_panes[p];

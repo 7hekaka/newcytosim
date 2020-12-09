@@ -25,14 +25,14 @@ public:
     /// position of center
     Vector    pos;
     
+    /// indicates one vertex in a Mecable
+    Mecapoint pnt;
+
     /// equilibrium radius of the interaction (distance where force is zero)
     real      radius;
     
     /// interaction range (maximum distance at which the force can operate)
     real      range;
-    
-    /// indicates one vertex in a Mecable
-    Mecapoint pnt;
     
 public:
     
@@ -57,15 +57,15 @@ public:
     
     /// position of center
     Vector       pos;
+    
+    /// indicates one segment of a Fiber
+    FiberSegment seg;
 
     /// equilibrium radius of the interaction (distance where force is zero)
     real         radius;
     
     /// interaction range (maximum distance at which the force can operate)
     real         range;
-    
-    /// indicates one segment of a Fiber
-    FiberSegment seg;
     
 public:
     

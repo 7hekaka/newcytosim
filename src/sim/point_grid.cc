@@ -706,18 +706,18 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             const real sup = square(max_diameter);
             for ( int reg = 0; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan2);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan2);
+                BigPointList & sideP = point_list(inx+region[reg], pan2);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan2);
                 setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
             }
 
-            FatPointListF & baseP2 = point_list(inx, pan2);
-            FatLocusListF & baseL2 = locus_list(inx, pan2);
+            BigPointList & baseP2 = point_list(inx, pan2);
+            BigLocusList & baseL2 = locus_list(inx, pan2);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan1);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan1);
+                BigPointList & sideP = point_list(inx+region[reg], pan1);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan1);
                 setInteractions(meca, pam, sup, baseP2, baseL2, sideP, sideL);
             }
         }

@@ -223,10 +223,10 @@ public:
     int steric_mode;
     
     /// Stiffness for repulsive steric interaction (set as steric[1])
-    real steric_stiffness_push[2];
+    real steric_stiff_push[2];
     
     /// Stiffness for `attractive` steric interaction (set as steric[2])
-    real steric_stiffness_pull[2];
+    real steric_stiff_pull[2];
     
     /// Grid size used to determine steric interactions
     /**

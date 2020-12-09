@@ -141,7 +141,7 @@ void PointGridF::add(size_t pan, FiberSegment const& fl, real rd) const
  of their specified range + radius.
  */
 void PointGridF::checkPP(Meca& meca, real stiff,
-                         FatPointF const& aa, FatPointF const& bb)
+                         BigPoint const& aa, BigPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
     const real ran = aa.radius + bb.radius;
@@ -164,7 +164,7 @@ void PointGridF::checkPP(Meca& meca, real stiff,
  and if the center of the sphere projects inside the segment.
  */
 void PointGridF::checkPL(Meca& meca, real stiff,
-                         FatPointF const& aa, FatLocusF const& bb)
+                         BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
     const real ran = aa.radius + bb.radius;
@@ -217,7 +217,7 @@ void PointGridF::checkPL(Meca& meca, real stiff,
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void PointGridF::checkLL1(Meca& meca, real stiff,
-                          FatLocusF const& aa, FatLocusF const& bb)
+                          BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
     const real ran = aa.radius + bb.radius;
@@ -281,7 +281,7 @@ void PointGridF::checkLL1(Meca& meca, real stiff,
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void PointGridF::checkLL2(Meca& meca, real stiff,
-                          FatLocusF const& aa, FatLocusF const& bb)
+                          BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
     const real ran = aa.radius + bb.radius;
@@ -350,7 +350,7 @@ void PointGridF::checkLL2(Meca& meca, real stiff,
  The segments are tested for intersection in 3D.
  */
 void PointGridF::checkLL(Meca& meca, real stiff,
-                         FatLocusF const& aa, FatLocusF const& bb)
+                         BigLocus const& aa, BigLocus const& bb)
 {
 #if ( DIM == 3 )
     
@@ -385,14 +385,14 @@ void PointGridF::checkLL(Meca& meca, real stiff,
 
 
 /// excluding two spheres when they are from the same Solid
-inline bool adjacent(FatPointF const* a, FatPointF const* b)
+inline bool adjacent(BigPoint const* a, BigPoint const* b)
 {
     return ( a->pnt.mecable() == b->pnt.mecable() );
 }
 
 
 /// excluding Fiber and Solid from the same Aster
-inline bool adjacent(FatPointF const* a, FatLocusF const* b)
+inline bool adjacent(BigPoint const* a, BigLocus const* b)
 {
     //a->pnt.mecable()->Buddy::print(std::clog);
     //b->seg.fiber()->Buddy::print(std::clog);
@@ -401,7 +401,7 @@ inline bool adjacent(FatPointF const* a, FatLocusF const* b)
 
 
 /// excluding segments that are adjacent on the same fiber, or protofilaments from Tubule
-inline bool adjacent(FatLocusF const* a, FatLocusF const* b)
+inline bool adjacent(BigLocus const* a, BigLocus const* b)
 {
 #if FIBER_HAS_FAMILY
     return (( a->seg.fiber()->family_ == b->seg.fiber()->family_ )
@@ -418,22 +418,22 @@ inline bool adjacent(FatLocusF const* a, FatLocusF const* b)
  This will consider once all pairs of objects from the given lists
  */
 void PointGridF::setInteractions(Meca& meca, real stiff,
-                                 FatPointListF & pots, FatLocusListF & locs)
+                                 BigPointList & pots, BigLocusList & locs)
 {
-    for ( FatPointF* ii = pots.begin(); ii < pots.end(); ++ii )
+    for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
-        for ( FatPointF* jj = ii+1; jj < pots.end(); ++jj )
+        for ( BigPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( !adjacent(ii, jj) )
                 checkPP(meca, stiff, *ii, *jj);
         
-        for ( FatLocusF* kk = locs.begin(); kk < locs.end(); ++kk )
+        for ( BigLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             if ( !adjacent(ii, kk) )
                 checkPL(meca, stiff, *ii, *kk);
     }
 
-    for ( FatLocusF* ii = locs.begin(); ii < locs.end(); ++ii )
+    for ( BigLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
-        for ( FatLocusF* jj = ii+1; jj < locs.end(); ++jj )
+        for ( BigLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( !adjacent(ii, jj) )
                 checkLL(meca, stiff, *ii, *jj);
     }
@@ -445,30 +445,30 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
  assuming that the list are different and no object is repeated
  */
 void PointGridF::setInteractions(Meca& meca, real stiff,
-                                 FatPointListF & pots1, FatLocusListF & locs1,
-                                 FatPointListF & pots2, FatLocusListF & locs2)
+                                 BigPointList & pots1, BigLocusList & locs1,
+                                 BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
     
-    for ( FatPointF* ii = pots1.begin(); ii < pots1.end(); ++ii )
+    for ( BigPoint* ii = pots1.begin(); ii < pots1.end(); ++ii )
     {
-        for ( FatPointF* jj = pots2.begin(); jj < pots2.end(); ++jj )
+        for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( !adjacent(ii, jj) )
                 checkPP(meca, stiff, *ii, *jj);
         
-        for ( FatLocusF* kk = locs2.begin(); kk < locs2.end(); ++kk )
+        for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             if ( !adjacent(ii, kk) )
                 checkPL(meca, stiff, *ii, *kk);
     }
     
-    for ( FatLocusF* ii = locs1.begin(); ii < locs1.end(); ++ii )
+    for ( BigLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
     {
-        for ( FatPointF* jj = pots2.begin(); jj < pots2.end(); ++jj )
+        for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( !adjacent(jj, ii) )
                 checkPL(meca, stiff, *jj, *ii);
         
-        for ( FatLocusF* kk = locs2.begin(); kk < locs2.end(); ++kk )
+        for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
             if ( !adjacent(ii, kk)  )
                 checkLL(meca, stiff, *ii, *kk);
@@ -483,24 +483,24 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
  for the distance between the object's `pos` is below `max_diameter`
  */
 void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
-                                 FatPointListF & pots, FatLocusListF & locs)
+                                 BigPointList & pots, BigLocusList & locs)
 {
-    for ( FatPointF* ii = pots.begin(); ii < pots.end(); ++ii )
+    for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
         Vector pos = ii->pos;
-        for ( FatPointF* jj = ii+1; jj < pots.end(); ++jj )
+        for ( BigPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkPP(meca, stiff, *ii, *jj);
         
-        for ( FatLocusF* kk = locs.begin(); kk < locs.end(); ++kk )
+        for ( BigLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos) <= sup )
                 checkPL(meca, stiff, *ii, *kk);
     }
 
-    for ( FatLocusF* ii = locs.begin(); ii < locs.end(); ++ii )
+    for ( BigLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
         Vector pos = ii->pos;
-        for ( FatLocusF* jj = ii+1; jj < locs.end(); ++jj )
+        for ( BigLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkLL(meca, stiff, *ii, *jj);
     }
@@ -515,34 +515,34 @@ void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
  for the distance between the object's `pos` is below `max_diameter`
  */
 void PointGridF::setInteractions(Meca& meca, real stiff, real sup,
-                                 FatPointListF & pots1, FatLocusListF & locs1,
-                                 FatPointListF & pots2, FatLocusListF & locs2)
+                                 BigPointList & pots1, BigLocusList & locs1,
+                                 BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
 
-    for ( FatPointF* ii = pots1.begin(); ii < pots1.end(); ++ii )
+    for ( BigPoint* ii = pots1.begin(); ii < pots1.end(); ++ii )
     {
         const Vector pos = ii->pos;
 
-        for ( FatPointF* jj = pots2.begin(); jj < pots2.end(); ++jj )
+        for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
                 checkPP(meca, stiff, *ii, *jj);
         
-        for ( FatLocusF* kk = locs2.begin(); kk < locs2.end(); ++kk )
+        for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos) <= sup )
                 checkPL(meca, stiff, *ii, *kk);
     }
     
-    for ( FatLocusF* ii = locs1.begin(); ii < locs1.end(); ++ii )
+    for ( BigLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
     {
         const Vector pos = ii->pos;
 
-        for ( FatPointF* jj = pots2.begin(); jj < pots2.end(); ++jj )
+        for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( !adjacent(jj, ii) && distanceSqr(pos, jj->pos) <= sup )
                 checkPL(meca, stiff, *jj, *ii);
         
-        for ( FatLocusF* kk = locs2.begin(); kk < locs2.end(); ++kk )
+        for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
             if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos) <= sup )
                 checkLL(meca, stiff, *ii, *kk);
@@ -571,8 +571,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff) const
         
         // We consider each pair of objects (ii, jj) only once:
         
-        FatPointListF & baseP = point_list(inx);
-        FatLocusListF & baseL = locus_list(inx);
+        BigPointList & baseP = point_list(inx);
+        BigLocusList & baseL = locus_list(inx);
         
         if ( isPeriodic() )
         {
@@ -580,8 +580,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff) const
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg]);
-                FatLocusListF & sideL = locus_list(inx+region[reg]);
+                BigPointList & sideP = point_list(inx+region[reg]);
+                BigLocusList & sideL = locus_list(inx+region[reg]);
                 setInteractions(meca, stiff, baseP, baseL, sideP, sideL);
             }
         }
@@ -592,8 +592,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff) const
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg]);
-                FatLocusListF & sideL = locus_list(inx+region[reg]);
+                BigPointList & sideP = point_list(inx+region[reg]);
+                BigLocusList & sideL = locus_list(inx+region[reg]);
                 setInteractions(meca, stiff, sup, baseP, baseL, sideP, sideL);
             }
         }
@@ -618,8 +618,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
         
         // We consider each pair of objects (ii, jj) only once:
         
-        FatPointListF & baseP = point_list(inx, pan);
-        FatLocusListF & baseL = locus_list(inx, pan);
+        BigPointList & baseP = point_list(inx, pan);
+        BigLocusList & baseL = locus_list(inx, pan);
         
         if ( isPeriodic() )
         {
@@ -627,8 +627,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan);
+                BigPointList & sideP = point_list(inx+region[reg], pan);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan);
                 setInteractions(meca, stiff, baseP, baseL, sideP, sideL);
             }
         }
@@ -639,8 +639,8 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan);
+                BigPointList & sideP = point_list(inx+region[reg], pan);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan);
                 setInteractions(meca, stiff, sup, baseP, baseL, sideP, sideL);
             }
         }
@@ -666,25 +666,25 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
         
         // We consider each pair of objects (ii, jj) only once:
         
-        FatPointListF & baseP = point_list(inx, pan1);
-        FatLocusListF & baseL = locus_list(inx, pan1);
+        BigPointList & baseP = point_list(inx, pan1);
+        BigLocusList & baseL = locus_list(inx, pan1);
         
         if ( isPeriodic() )
         {
             for ( int reg = 0; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan2);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan2);
+                BigPointList & sideP = point_list(inx+region[reg], pan2);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan2);
                 setInteractions(meca, stiff, baseP, baseL, sideP, sideL);
             }
 
-            FatPointListF & baseP2 = point_list(inx, pan2);
-            FatLocusListF & baseL2 = locus_list(inx, pan2);
+            BigPointList & baseP2 = point_list(inx, pan2);
+            BigLocusList & baseL2 = locus_list(inx, pan2);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan1);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan1);
+                BigPointList & sideP = point_list(inx+region[reg], pan1);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan1);
                 setInteractions(meca, stiff, baseP2, baseL2, sideP, sideL);
             }
         }
@@ -693,18 +693,18 @@ void PointGridF::setInteractions(Meca& meca, real stiff,
             const real sup = square(max_diameter);
             for ( int reg = 0; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan2);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan2);
+                BigPointList & sideP = point_list(inx+region[reg], pan2);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan2);
                 setInteractions(meca, stiff, sup, baseP, baseL, sideP, sideL);
             }
 
-            FatPointListF & baseP2 = point_list(inx, pan2);
-            FatLocusListF & baseL2 = locus_list(inx, pan2);
+            BigPointList & baseP2 = point_list(inx, pan2);
+            BigLocusList & baseL2 = locus_list(inx, pan2);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                FatPointListF & sideP = point_list(inx+region[reg], pan1);
-                FatLocusListF & sideL = locus_list(inx+region[reg], pan1);
+                BigPointList & sideP = point_list(inx+region[reg], pan1);
+                BigLocusList & sideL = locus_list(inx+region[reg], pan1);
                 setInteractions(meca, stiff, sup, baseP2, baseL2, sideP, sideL);
             }
         }
