@@ -1573,11 +1573,11 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      with each BCGGS iteration involving 2 matrix-vector multiplications.
      We set here this theoretical limit to the number multiplications:
      */
-    size_t nb_iter_max = std::min(2048UL, 2*dimension());
-    LinearSolvers::Monitor monitor(nb_iter_max, tolerance_);
+    size_t max_iter = std::min(2048UL, 2*dimension());
+    LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
-    //fprintf(stderr, "Solve precond %i size %6i absolute tolerance %f\n", precond, dimension(), tolerance_);
-    
+    //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dimension(), max_iter, tolerance_, precond);
+
     /*
      GMRES may converge faster than BCGGS, but has overheads and uses more memory
      hence for very large systems, BCGGS is often advantageous.
@@ -1595,12 +1595,8 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
     }
     
-#if ( 0 )
-    //size_t mem = dimension() * (64+2) * sizeof(real);
-    //std::clog << "GMRES mem " << (mem >> 20) << "MB\n";
-    fprintf(stderr, "System size %6i precondition %i", dimension(), precond);
-    fprintf(stderr, "    Solver count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
-#endif
+    //fprintf(stderr, "    BCGS%u    count %4lu  residual %.3e\n", precond, monitor.count(), monitor.residual());
+
 #if ( 0 )
     // enable this to compare with GMRES using different restart parameters
     for ( int RS : {8, 16, 32} )
@@ -1624,7 +1620,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs      count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    bcgs     count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
     
     //------- in case the solver did not converge, we try other methods:
@@ -1635,13 +1631,11 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
 
         monitor.reset();
-        // try with different seed
-        copy_real(dimension(), vRHS, vSOL);
         if ( precond )
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
         else
             LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-        Cytosim::out("  new seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+        Cytosim::out("  restarted: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
 
         if ( !monitor.converged() )
         {

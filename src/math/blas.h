@@ -84,14 +84,39 @@ namespace blas
 {
 #pragma mark - Level 1
 
+/**
+ This follows William Kahan summation to calculate the dot product
+ with minimal numerical error.
+ https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+ */
+inline double dotKahan(int N, const real* X, const real* Y)
+{
+    double sum = 0.0;
+    double c = 0.0;
+    
+    for ( int i = 0; i < N; ++i )
+    {
+        double y = X[i] * Y[i] - c;
+        double t = sum + y;
+        c = ( t - sum ) - y;
+        sum = t;
+    }
+    return sum;
+}
+
+
 inline double dot(int N, const real* X, const real* Y)
 {
     int ONE = 1;
+    double res;
 #if REAL_IS_DOUBLE
-    return ddot_(&N, X, &ONE, Y, &ONE);
+    res = ddot_(&N, X, &ONE, Y, &ONE);
 #else
-    return dsdot_(&N, X, &ONE, Y, &ONE);
+    res = dsdot_(&N, X, &ONE, Y, &ONE);
+    //res = dotKahan(N, X, Y);
+    //printf("   %.12e\n   %.12e\n", res, kahanDot(N, X, Y));
 #endif
+    return res;
 }
 
 /**

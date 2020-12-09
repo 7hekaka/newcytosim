@@ -207,7 +207,6 @@
 		BB60C86C0B60353300596D88 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; };
 		BB61B7F019B7622800B1F4F6 /* print_color.h in Headers */ = {isa = PBXBuildFile; fileRef = BB61B7EF19B7622800B1F4F6 /* print_color.h */; };
 		BB61B7F219B7626A00B1F4F6 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
-		BB61CA8416D6310100A0F6A5 /* linear_solvers.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2185620B4084CC00B75436 /* linear_solvers.cc */; };
 		BB6403F705FBC2F400DF7BFF /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB6403FA05FBC2F900DF7BFF /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB64041A05FBC59200DF7BFF /* frametool.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB77D6FB05F12F16001C0596 /* frametool.cc */; };
@@ -4845,7 +4844,6 @@
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
 				BB19DA9F231BF792001488A5 /* matrix34.cc in Sources */,
-				BB61CA8416D6310100A0F6A5 /* linear_solvers.cc in Sources */,
 				BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */,
 				BB749D661793645D00B43298 /* polygon.cc in Sources */,
 			);

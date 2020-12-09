@@ -12,6 +12,12 @@
 /// assumes that vector 'sol' is zero initially
 #define NULL_INITIAL_SOLUTION 0
 
+/// print convergence parameters
+#define VERBOSE_SOLVERS 0
+
+/// in case of no convergence, use the best vector encounterred during interations
+#define SAFER_CONVERGENCE_FAILURE !REAL_IS_DOUBLE
+
 /// Bi-Conjugate Gradient Stabilized method to solve a system of linear equations
 /**
  F. Nedelec, 27.03.2012 - 13.03.2017
@@ -29,13 +35,17 @@ namespace LinearSolvers
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
         
         const int dim = mat.dimension();
-        allocator.allocate(dim, 5);
+        allocator.allocate(dim, 5+SAFER_CONVERGENCE_FAILURE);
         real * r  = allocator.bind(0);
         real * r0 = allocator.bind(1);
         real * p  = allocator.bind(2);
         real * t  = allocator.bind(3);
         real * v  = allocator.bind(4);
-        
+#if SAFER_CONVERGENCE_FAILURE
+        real * best = allocator.bind(5);
+        real best_residual = INFINITY;
+#endif
+
 #if NULL_INITIAL_SOLUTION
         //blas::xfill(dim, 0, sol);
         // assuming that 'sol == 0' initially:
@@ -56,6 +66,13 @@ namespace LinearSolvers
         
         while ( ! monitor.finished(dim, r) )
         {
+#if SAFER_CONVERGENCE_FAILURE
+            if ( monitor.residual() < best_residual )
+            {
+                best_residual = monitor.residual();
+                blas::xcopy(dim, sol, 1, best, 1);
+            }
+#endif
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
             
@@ -117,13 +134,15 @@ namespace LinearSolvers
             else
                 omega = 0.0;
         }
-        
-#if ( 0 )
+#if SAFER_CONVERGENCE_FAILURE
+        blas::xcopy(dim, best, 1, sol, 1);
+#endif
+#if VERBOSE_SOLVERS
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r0);
         blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
         real res = blas::nrm2(dim, r0);
-        fprintf(stderr, "BCGS  %4i count %5lu residual %10.6f\n", dim, monitor.count(), res);
+        fprintf(stderr, "   -BCGS     count %4lu  residual %.3e\n", monitor.count(), res);
 #endif
         allocator.release();
     }
@@ -140,7 +159,7 @@ namespace LinearSolvers
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0, delta;
         
         const size_t dim = mat.dimension();
-        allocator.allocate(dim, 7);
+        allocator.allocate(dim, 7+SAFER_CONVERGENCE_FAILURE);
         real * r    = allocator.bind(0);
         real * r0   = allocator.bind(1);
         real * p    = allocator.bind(2);
@@ -149,6 +168,10 @@ namespace LinearSolvers
         real * phat = allocator.bind(5);
         real * shat = allocator.bind(6);
         
+#if SAFER_CONVERGENCE_FAILURE
+        real * best = allocator.bind(7);
+        real best_residual = INFINITY;
+#endif
 #if NULL_INITIAL_SOLUTION
         //blas::xfill(dim, 0, sol);
         // assuming that 'sol == 0' initially:
@@ -169,6 +192,13 @@ namespace LinearSolvers
 
         while ( ! monitor.finished(dim, r) )
         {
+#if SAFER_CONVERGENCE_FAILURE
+            if ( monitor.residual() < best_residual )
+            {
+                best_residual = monitor.residual();
+                blas::xcopy(dim, sol, 1, best, 1);
+            }
+#endif
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
             
@@ -177,9 +207,8 @@ namespace LinearSolvers
 #if ( 1 )
                 /* The residual vector became nearly orthogonal to the
                  arbitrarily chosen direction r0, and we restart with a new r0 */
-                blas::xcopy(dim, rhs, 1, r, 1);
-                mat.multiply(sol, r0);
-                blas::xaxpy(dim, -1.0, r0, 1, r, 1);  // r = rhs - MAT * x
+                mat.multiply(sol, r);
+                blas::xaxpy(dim, -1.0, rhs, 1, r, 1); // r = rhs - MAT * x
                 blas::xcopy(dim, r, 1, r0, 1);        // r0 = r
                 rho = blas::dot(dim, r0, r0);
 #else
@@ -237,12 +266,15 @@ namespace LinearSolvers
             else
                 omega = 0.0;
         }
-#if ( 0 )
+#if SAFER_CONVERGENCE_FAILURE
+        blas::xcopy(dim, best, 1, sol, 1);
+#endif
+#if VERBOSE_SOLVERS
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        real res = blas::nrm8(dim, r);
-        fprintf(stderr, "BCGSP count %4lu norm_inf residual %10.8f\n", monitor.count(), res);
+        real res = blas::nrm2(dim, r);
+        fprintf(stderr, "   -BCGSP    count %4lu  residual %.3e\n", monitor.count(), res);
 #endif
         allocator.release();
     }
@@ -334,12 +366,12 @@ namespace LinearSolvers
             blas::xscal(dim, beta, p, 1);
             blas::xaxpy(dim, 1.0, r, 1, p, 1);
         }
-#if ( 0 )
+#if VERBOSE_SOLVERS
         // calculate true residual = rhs - A * x
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
         real res = blas::nrm2(dim, r);
-        fprintf(stderr, "bicgs %4i count %4lu residual %10.6f\n", dim, monitor.count(), res);
+        fprintf(stderr, "   -bicgstab count %4lu  residual %.3e\n", monitor.count(), res);
 #endif
         allocator.release();
     }
