@@ -184,6 +184,11 @@ public:
         locus_pane.clear();
     }
     
+    size_t capacity() const
+    {
+        return point_pane.capacity() + locus_pane.capacity();
+    }
+    
 #else
     
     LocusGridCell() : point_panes(point_panes_0), locus_panes(locus_panes_0)
@@ -215,6 +220,15 @@ public:
         return locus_panes[p];
     }
     
+    
+    size_t capacity() const
+    {
+        size_t res = 0;
+        for ( int i = 0; i < MAX_STERIC_PANES; ++i )
+            res += point_pane[i].capacity() + locus_pane[i].capacity();
+        return res;
+    }
+
 #endif
 };
 
@@ -345,10 +359,13 @@ public:
     
     /// true if the grid was initialized by calling setGrid()
     size_t hasGrid() const  { return pGrid.hasCells(); }
-    
+
     /// true if Grid has some periodic direction
     bool isPeriodic() const { return pGrid.isPeriodic(); }
     
+    /// true if the grid was initialized by calling setGrid()
+    size_t capacity() const;
+
     /// clear the grid
     void clear()            { pGrid.clear(); }
     

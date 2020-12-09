@@ -71,6 +71,15 @@ void LocusGrid::createCells()
 }
 
 
+size_t LocusGrid::capacity() const
+{
+    size_t res = 0;
+    for ( size_t i = 0; i < pGrid.nbCells(); ++i )
+        res += pGrid[i].capacity();
+    return res;
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -141,7 +150,7 @@ void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad) const
  of their specified range + radius.
  */
 void LocusGrid::checkPP(Meca& meca, real stiff,
-                         BigPoint const& aa, BigPoint const& bb)
+                        BigPoint const& aa, BigPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
     Vector vab = bb.pos_ - aa.pos_;
@@ -164,7 +173,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
  and if the center of the sphere projects inside the segment.
  */
 void LocusGrid::checkPL(Meca& meca, real stiff,
-                         BigPoint const& aa, BigLocus const& bb)
+                        BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -217,7 +226,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void LocusGrid::checkLL1(Meca& meca, real stiff,
-                          BigLocus const& aa, BigLocus const& bb)
+                         BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -282,7 +291,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
 void LocusGrid::checkLL2(Meca& meca, real stiff,
-                          BigLocus const& aa, BigLocus const& bb)
+                         BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -352,7 +361,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
  The segments are tested for intersection in 3D.
  */
 void LocusGrid::checkLL(Meca& meca, real stiff,
-                         BigLocus const& aa, BigLocus const& bb)
+                        BigLocus const& aa, BigLocus const& bb)
 {
 #if ( DIM == 3 )
     
@@ -423,7 +432,7 @@ inline bool adjacent(BigLocus const* a, BigLocus const* b)
  This will consider once all pairs of objects from the given lists
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff,
-                                 BigPointList & pots, BigLocusList & locs)
+                                BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
@@ -450,8 +459,8 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
  assuming that the list are different and no object is repeated
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff,
-                                 BigPointList & pots1, BigLocusList & locs1,
-                                 BigPointList & pots2, BigLocusList & locs2)
+                                BigPointList & pots1, BigLocusList & locs1,
+                                BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -488,7 +497,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
  for the distance between the object's `pos` is below `max_diameter`
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
-                                 BigPointList & pots, BigLocusList & locs)
+                                BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
@@ -520,8 +529,8 @@ void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
  for the distance between the object's `pos` is below `max_diameter`
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
-                                 BigPointList & pots1, BigLocusList & locs1,
-                                 BigPointList & pots2, BigLocusList & locs2)
+                                BigPointList & pots1, BigLocusList & locs1,
+                                BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -612,7 +621,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff) const
  Check interactions between the FatPoints contained in Pane `pan`.
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff,
-                                 const size_t pan) const
+                                const size_t pan) const
 {
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
@@ -658,7 +667,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
  where ( pan1 != pan2 )
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff,
-                                 const size_t pan1, const size_t pan2) const
+                                const size_t pan1, const size_t pan2) const
 {
     assert_true(pan1 != pan2);
     
