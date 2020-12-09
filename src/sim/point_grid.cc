@@ -78,13 +78,13 @@ void PointGrid::createCells()
 
 #if ( N_STERIC_PANES != 1 )
 
-void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
+void PointGrid::add(size_t pan, Mecable const* mec, size_t inx, real rad, real rg) const
 {
     if ( pan == 0 || pan > N_STERIC_PANES )
         throw InvalidParameter("point:steric is out-of-range");
     
-    Vector w = pe.pos();
-    point_list(w, pan).emplace(pe, rd, rg, w);
+    Vector w = mec->posPoint(inx);
+    point_list(w, pan).emplace(Mecapoint(mec, inx), rad, rg, w);
     
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two particles
@@ -99,19 +99,19 @@ void PointGrid::add(size_t pan, Mecapoint const& pe, real rd, real rg) const
 }
 
 
-void PointGrid::add(size_t pan, FiberSegment const& fl, real rd, real rg) const
+void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rd, real rg) const
 {
     if ( pan == 0 || pan > N_STERIC_PANES )
         throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
-    Vector w = fl.center();
-    locus_list(w, pan).emplace(fl, rd, rg, w);
+    Vector w = fib->posPoint(inx, 0.5);
+    locus_list(w, pan).emplace(FiberSegment(fib, inx), rd, rg, w);
     
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
     //along the diagonal, corresponding to the worst-case scenario
-    real diag = square(fl.len()) + square(2*rg);
+    real diag = square(fib->segmentation()) + square(2*rg);
     if ( square(max_diameter) * 1.001 < diag )
     {
         InvalidParameter e("simul:steric_max_range is too short");
@@ -179,13 +179,13 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
         else
         {
             if ( bb.isLast() )
-                checkPP(meca, pam, aa, bb.point2());
+                checkPP(meca, pam, aa, bb.fatPoint2());
         }
     }
     else
     {
         if ( bb.isFirst() )
-            checkPP(meca, pam, aa, bb.point1());
+            checkPP(meca, pam, aa, bb.fatPoint1());
         else
         {
             /* we check the projection to the previous segment,

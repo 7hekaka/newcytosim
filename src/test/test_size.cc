@@ -19,54 +19,65 @@
 
 int main(int argc, char* argv[])
 {
-    PRINT(Vector1);
-    PRINT(Vector2);
-    PRINT(Vector3);
-    PRINT(Vector4);
-    
-    PRINT(Matrix11);
-    PRINT(Matrix22);
-    PRINT(Matrix33);
-    PRINT(Matrix34);
-    PRINT(Matrix44);
-    
-    PRINT(Random);
-    PRINT(Array<int>);
+    if ( argc > 1 )
+    {
+        PRINT(Random);
+        PRINT(Array<int>);
 
-    PRINT(Mecapoint);
-    PRINT(FiberSegment);
-    PRINT(Interpolation);
-    PRINT(HandMonitor);
-    PRINT(FiberSite);
-    PRINT(Hand);
-
-    PRINT(Inventoried);
-    PRINT(Movable);
-    PRINT(Buddy);
-    
-    PRINT(Object);
-    PRINT(Mecable);
-    PRINT(Chain);
-    PRINT(Mecafil);
-    PRINT(Fiber);
-    
-    PRINT(Space);
-    PRINT(Single);
-    PRINT(Couple);
-
-
-    PRINT(Solid);
-    PRINT(Bead);
-    PRINT(Sphere);
-    PRINT(Simul);
-
-    PRINT(SparMatSym::Element);
-    PRINT(SparMatSym1::Element);
-    PRINT(SparMatSym2::Element);
-
-    PRINT(SparMatBlk::Line);
-    PRINT(SparMatSymBlk::Column);
-    PRINT(SparMatSymBlkDiag::Column);
-
+        PRINT(SparMatSym::Element);
+        PRINT(SparMatSym1::Element);
+        PRINT(SparMatSym2::Element);
+        
+        PRINT(SparMatBlk::Line);
+        PRINT(SparMatSymBlk::Column);
+        PRINT(SparMatSymBlkDiag::Column);
+        
+        PRINT(PointGrid);
+        PRINT(FatPoint);
+        PRINT(FatLocus);
+        
+        PRINT(PointGridF);
+        PRINT(BigPoint);
+        PRINT(BigLocus);
+    }
+    else
+    {
+        PRINT(Vector1);
+        PRINT(Vector2);
+        PRINT(Vector3);
+        PRINT(Vector4);
+        
+        PRINT(Matrix11);
+        PRINT(Matrix22);
+        PRINT(Matrix33);
+        PRINT(Matrix34);
+        PRINT(Matrix44);
+        
+        PRINT(Mecapoint);
+        PRINT(FiberSegment);
+        PRINT(Interpolation);
+        PRINT(HandMonitor);
+        PRINT(FiberSite);
+        PRINT(Hand);
+        
+        PRINT(Inventoried);
+        PRINT(Movable);
+        PRINT(Buddy);
+        
+        PRINT(Object);
+        PRINT(Mecable);
+        PRINT(Chain);
+        PRINT(Mecafil);
+        PRINT(Fiber);
+        
+        PRINT(Space);
+        PRINT(Single);
+        PRINT(Couple);
+        
+        PRINT(Solid);
+        PRINT(Bead);
+        PRINT(Sphere);
+        PRINT(Simul);
+    }
     return EXIT_SUCCESS;
 }

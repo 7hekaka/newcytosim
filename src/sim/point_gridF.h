@@ -22,25 +22,36 @@ class BigPoint
     
 public:
     
-    /// position of center
-    Vector    pos;
+    /// Mecable containing the point-of-interest
+    Mecable const* mec_;
     
-    /// indicates one vertex in a Mecable
-    Mecapoint pnt;
-
+    /// position of center
+    Vector   pos_;
+    
     /// equilibrium radius of the interaction (distance where force is zero)
-    real      radius;
+    real     rad_;
+    
+    /// Index of the point-of-interest in the Mecable
+    unsigned pti_;
+    
+    /// key to exclude certain pairs from interacting
+    unsigned key_;
     
 public:
     
     BigPoint() {}
     
-    BigPoint(Mecapoint const& p, real rd, Vector const& w)
+    BigPoint(Mecable const* m, size_t i, real r, Vector const& w)
     {
-        pos    = w;
-        radius = rd;
-        pnt    = p;
+        mec_ = m;
+        pos_ = w;
+        rad_ = r;
+        pti_ = i;
+        key_ = 0;
     }
+    
+    /// construct Mecapoint
+    inline Mecapoint point() const { return Mecapoint(mec_, pti_); }
 };
 
 
@@ -51,47 +62,69 @@ class BigLocus
     
 public:
     
-    /// position of center
-    Vector       pos;
+    /// Fiber to which the segment belongs to
+    Fiber const* fib_;
     
-    /// indicates one segment of a Fiber
-    FiberSegment seg;
-
+    /// position of center
+    Vector   pos_;
+    
     /// equilibrium radius of the interaction (distance where force is zero)
-    real         radius;
+    real     rad_;
+    
+    /// index of segment's first point
+    unsigned pti_;
+    
+    /// key to exclude certain pairs from interacting
+    unsigned key_;
     
 public:
     
     BigLocus() {}
     
-    BigLocus(FiberSegment const& p, real rd, Vector const& w)
+    BigLocus(Fiber const*& f, size_t i, real r, Vector const& w)
     {
-        pos    = w;
-        radius = rd;
-        seg    = p;
+        fib_ = f;
+        pos_ = w;
+        rad_ = r;
+        pti_ = i;
+        key_ = 0;
     }
     
+    /// construct FiberSegment
+    FiberSegment segment() const { return FiberSegment(fib_, pti_); }
+
+    /// position of point 1
+    Vector pos1() const { return fib_->posPoint(pti_); }
+    
+    /// position of point 2
+    Vector pos2() const { return fib_->posPoint(pti_+1); }
+    
+    /// offset = point2 - point1
+    Vector diff() const { return fib_->diffPoints(pti_); }
+    
+    /// offset = point2 - point1
+    Vector prevDiff() const { return fib_->diffPoints(pti_-1); }
+    
+    /// position of point 2
+    real len() const { return fib_->segmentation(); }
+
     /// true if the segment is the first of the Fiber
-    bool isFirst() const
-    {
-        return seg.isFirst();
-    }
+    bool isFirst() const { return ( pti_ == 0 ); }
     
     /// true if the segment is the last of the Fiber
-    bool isLast() const
-    {
-        return seg.isLast();
-    }
+    bool isLast() const { return ( pti_ == fib_->lastPoint() ); }
+
+    /// Mecapoint to point 1
+    Mecapoint point1() const { return Mecapoint(fib_, pti_); }
     
-    BigPoint point1() const
-    {
-        return BigPoint(seg.exact1(), radius, seg.pos1());
-    }
+    /// Mecapoint to point 2
+    Mecapoint point2() const { return Mecapoint(fib_, pti_+1); }
     
-    BigPoint point2() const
-    {
-        return BigPoint(seg.exact2(), radius, seg.pos2());
-    }
+    /// to point 1
+    BigPoint bigPoint1() const { return BigPoint(fib_, pti_, rad_, pos1()); }
+    
+    /// to point 2
+    BigPoint bigPoint2() const { return BigPoint(fib_, pti_+1, rad_, pos2()); }
 };
 
 
@@ -322,18 +355,18 @@ public:
 #if ( MAX_STERIC_PANES == 1 )
     
     /// place Mecapoint on the grid
-    void add(Mecapoint const& p, real radius) const
+    void add(Mecable const* m, size_t i, real rad) const
     {
-        Vector w = p.pos();
-        point_list(w).emplace(p, radius, w);
+        Vector w = m->posPoint(i);
+        point_list(w).emplace(m, i, rad, w);
     }
     
     /// place FiberSegment on the grid
-    void add(FiberSegment const& p, real radius) const
+    void add(Fiber const* f, size_t i, real rad) const
     {
         // link in cell containing the middle of the segment
-        Vector w = p.center();
-        locus_list(w).emplace(p, radius, w);
+        Vector w = f->posPoint(i, 0.5);
+        locus_list(w).emplace(f, i, rad, w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -342,10 +375,10 @@ public:
 #else
     
     /// place Mecapoint on the grid
-    void add(size_t pane, Mecapoint const&, real radius) const;
+    void add(size_t pane, Mecable const*, size_t, real rad) const;
     
     /// place FiberSegment on the grid
-    void add(size_t pane, FiberSegment const&, real radius) const;
+    void add(size_t pane, Fiber const*, size_t, real rad) const;
     
     /// enter interactions into Meca in one panes with given parameters
     void setInteractions(Meca&, real stiff, size_t pan) const;

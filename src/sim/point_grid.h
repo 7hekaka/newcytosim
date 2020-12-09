@@ -91,12 +91,12 @@ public:
         return seg.isLast();
     }
     
-    FatPoint point1() const
+    FatPoint fatPoint1() const
     {
         return FatPoint(seg.exact1(), radius, range, seg.pos1());
     }
     
-    FatPoint point2() const
+    FatPoint fatPoint2() const
     {
         return FatPoint(seg.exact2(), radius, range, seg.pos2());
     }
@@ -345,18 +345,18 @@ public:
 #if ( N_STERIC_PANES == 1 )
     
     /// place Mecapoint on the grid
-    void add(Mecapoint const& p, real radius, real extra_range) const
+    void add(Mecable const* m, size_t i, real rad, real extra_range) const
     {
-        Vector w = p.pos();
-        point_list(w).emplace(p, radius, extra_range, w);
+        Vector w = m->posPoint(i);
+        point_list(w).emplace(Mecapoint(m, i), rad, extra_range, w);
     }
     
     /// place FiberSegment on the grid
-    void add(FiberSegment const& p, real radius, real extra_range) const
+    void add(Fiber const* f, size_t i, real rad, real extra_range) const
     {
         // link in cell containing the middle of the segment
-        Vector w = p.center();
-        locus_list(w).emplace(p, radius, extra_range, w);
+        Vector w = f->posPoint(i, 0.5);
+        locus_list(w).emplace(FiberSegment(f, i), rad, extra_range, w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -365,10 +365,10 @@ public:
 #else
     
     /// place Mecapoint on the grid
-    void add(size_t pane, Mecapoint const&, real radius, real extra_range) const;
+    void add(size_t pane, Mecable const*, size_t, real rad, real extra_range) const;
     
     /// place FiberSegment on the grid
-    void add(size_t pane, FiberSegment const&, real radius, real extra_range) const;
+    void add(size_t pane, Fiber const*, size_t, real rad, real extra_range) const;
     
     /// enter interactions into Meca in one panes with given parameters
     void setInteractions(Meca&, StericParam const&, size_t pan) const;

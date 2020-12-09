@@ -141,9 +141,9 @@ void Simul::setStericInteractions(Meca& meca) const
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( N_STERIC_PANES == 1 )
-                pointGrid.add(FiberSegment(F, i), rad, ran);
+                pointGrid.add(F, i, rad, ran);
 #else
-                pointGrid.add(F->prop->steric, FiberSegment(F, i), rad, ran);
+                pointGrid.add(F->prop->steric, F, i, rad, ran);
 #endif
         }
     }
@@ -153,9 +153,9 @@ void Simul::setStericInteractions(Meca& meca) const
     {
         if ( O->prop->steric )
 #if ( N_STERIC_PANES == 1 )
-            pointGrid.add(Mecapoint(O, 0), O->radius(), O->radius()+O->prop->steric_range);
+            pointGrid.add(O, 0, O->radius(), O->radius()+O->prop->steric_range);
 #else
-            pointGrid.add(O->prop->steric, Mecapoint(O, 0), O->radius(), O->radius()+O->prop->steric_range);
+            pointGrid.add(O->prop->steric, O, 0, O->radius(), O->radius()+O->prop->steric_range);
 #endif
     }
     
@@ -164,9 +164,9 @@ void Simul::setStericInteractions(Meca& meca) const
     {
         if ( B->prop->steric )
 #if ( N_STERIC_PANES == 1 )
-            pointGrid.add(Mecapoint(B, 0), B->radius(), B->radius()+B->prop->steric_range);
+            pointGrid.add(B, 0, B->radius(), B->radius()+B->prop->steric_range);
 #else
-            pointGrid.add(B->prop->steric, Mecapoint(B, 0), B->radius(), B->radius()+B->prop->steric_range);
+            pointGrid.add(B->prop->steric, B, 0, B->radius(), B->radius()+B->prop->steric_range);
 #endif
     }
         
@@ -179,9 +179,9 @@ void Simul::setStericInteractions(Meca& meca) const
             {
                 if ( S->radius(i) > REAL_EPSILON )
 #if ( N_STERIC_PANES == 1 )
-                    pointGrid.add(Mecapoint(S, i), S->radius(i), S->radius(i)+S->prop->steric_range);
+                    pointGrid.add(S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
 #else
-                    pointGrid.add(S->prop->steric, Mecapoint(S, i), S->radius(i), S->radius(i)+S->prop->steric_range);
+                    pointGrid.add(S->prop->steric, S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
 #endif
             }
         }
@@ -253,9 +253,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( MAX_STERIC_PANES == 1 )
-                pointGridF.add(FiberSegment(F, i), rad);
+                pointGridF.add(F, i, rad);
 #else
-                pointGridF.add(F->prop->steric, FiberSegment(F, i), rad);
+                pointGridF.add(F->prop->steric, F, i, rad);
 #endif
         }
     }
@@ -265,9 +265,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
     {
         if ( O->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(Mecapoint(O, 0), O->radius());
+            pointGridF.add(O, 0, O->radius());
 #else
-            pointGridF.add(O->prop->steric, Mecapoint(O, 0), O->radius());
+            pointGridF.add(O->prop->steric, O, 0, O->radius());
 #endif
     }
     
@@ -276,9 +276,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
     {
         if ( B->prop->steric )
 #if ( MAX_STERIC_PANES == 1 )
-            pointGridF.add(Mecapoint(B, 0), B->radius());
+            pointGridF.add(B, 0, B->radius());
 #else
-            pointGridF.add(B->prop->steric, Mecapoint(B, 0), B->radius());
+            pointGridF.add(B->prop->steric, B, 0, B->radius());
 #endif
     }
         
@@ -291,9 +291,9 @@ void Simul::setStericInteractionsF(Meca& meca) const
             {
                 if ( S->radius(i) > REAL_EPSILON )
 #if ( MAX_STERIC_PANES == 1 )
-                    pointGridF.add(Mecapoint(S, i), S->radius(i));
+                    pointGridF.add(S, i, S->radius(i));
 #else
-                    pointGridF.add(S->prop->steric, Mecapoint(S, i), S->radius(i));
+                    pointGridF.add(S->prop->steric, S, i, S->radius(i));
 #endif
             }
         }
