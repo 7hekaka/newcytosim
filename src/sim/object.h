@@ -73,7 +73,7 @@ public:
     static const ObjectTag TAG = 'v';
     
     /// build a reference string by concatenating (tag, property_number, ObjectID)
-    static std::string reference(ObjectTag, unsigned, ObjectID);
+    static std::string reference(ObjectTag, size_t, ObjectID);
     
     /// write a reference, but using the provided Tag
     static void writeReference(Outputter&, ObjectTag, ObjectID);

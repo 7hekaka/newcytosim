@@ -517,7 +517,8 @@ public:
 #if HANDLE_HUGE_ARRAYS
         return val_[RNG.pint64(nbo_)];
 #else
-        return val_[RNG.pint32(nbo_)];
+        assert_true( nbo_ <= UINT32_MAX );
+        return val_[RNG.pint32(static_cast<uint32_t>(nbo_))];
 #endif
     }
 
@@ -551,8 +552,9 @@ public:
         size_t ii = RNG.pint64(nbo_);
         size_t jj = RNG.pint64(nbo_);
 #else
-        size_t ii = RNG.pint32(nbo_);
-        size_t jj = RNG.pint32(nbo_);
+        assert_true( nbo_ <= UINT32_MAX );
+        size_t ii = RNG.pint32(static_cast<uint32_t>(nbo_));
+        size_t jj = RNG.pint32(static_cast<uint32_t>(nbo_));
 #endif
         if ( ii != jj )
             swap(val_+ii, val_+jj);
@@ -569,7 +571,7 @@ public:
     {
         assert_true( nbo_ <= UINT32_MAX );
         assert_true( val_ || nbo_==0 );
-        uint32_t jj = nbo_, kk;
+        uint32_t jj = (uint32_t)nbo_, kk;
         while ( jj > 1 )
         {
             kk = RNG.pint32(jj);  // 32 bits in [0, j-1]
@@ -599,13 +601,12 @@ public:
     void shuffle()
     {
 #if HANDLE_HUGE_ARRAYS
-        assert_true( nbo_ < UINT32_MAX );
-        shuffle32();
-#else
         if ( nbo_ > UINT32_MAX )
             shuffle64();
         else
             shuffle32();
+#else
+        shuffle32();
 #endif
     }
 };

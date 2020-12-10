@@ -20,24 +20,6 @@
 class PointDisp : public Property
 {
 private:
-    
-    /// used to differentiate between different uses of the class
-    std::string mKind;
-    
-    /// size of feature in pixels
-    size_t    pixSize;
-    
-    /// draw outline of shape
-    void strokeShape() const;
-    
-    /// draw surface of shape
-    void paintShape() const;
-
-    /// draw active state with OpenGL vector primitives
-    void strokeA() const;
-    
-    /// draw inactive state with OpenGL vector primitives
-    void strokeI() const;
 
 #if POINTDISP_USES_PIXELMAPS
     
@@ -78,6 +60,24 @@ private:
     void storePixelmap(GLubyte*, unsigned dim, GLuint) const;
 
 #endif
+
+    /// used to differentiate between different uses of the class
+    std::string mKind;
+    
+    /// size of feature in pixels
+    unsigned pixSize;
+    
+    /// draw outline of shape
+    void strokeShape() const;
+    
+    /// draw surface of shape
+    void paintShape() const;
+
+    /// draw active state with OpenGL vector primitives
+    void strokeA() const;
+    
+    /// draw inactive state with OpenGL vector primitives
+    void strokeI() const;
     
     /// clear pointers
     void clearPixelmaps();

@@ -444,7 +444,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
 
 //------------------------------------------------------------------------------
 
-bool showPoint(int i)
+bool visible(size_t i)
 {
     if ( inside[i] )
     {
@@ -498,15 +498,15 @@ void display(View&, int)
     //use green for points inside, magenta for point outside:
     glPointSize(2.0);
     glBegin(GL_POINTS);
-    for ( size_t ii = 0; ii < nbpts; ++ii )
+    for ( size_t i = 0; i < nbpts; ++i )
     {
-        if ( showPoint(ii) )
+        if ( visible(i) )
         {
-            if ( inside[ii] )
+            if ( inside[i] )
                 glColor3f(0.f, COL, 0.f);
             else
                 glColor3f(COL, 0.f, COL);
-            gleVertex( point[ii] );
+            gleVertex( point[i] );
         }
     }
     glEnd();
@@ -516,16 +516,16 @@ void display(View&, int)
         //plot a blue line from the point to its projection:
         glLineWidth(line_width);
         glBegin(GL_LINES);
-        for ( size_t ii = 0; ii < nbpts; ++ii )
+        for ( size_t i = 0; i < nbpts; ++i )
         {
-            if ( showPoint(ii) )
+            if ( visible(i) )
             {
-                if ( inside[ii] )
+                if ( inside[i] )
                     glColor3f(0.f, COL, 0.f);
                 else
                     glColor3f(0.f, 0.f, COL);
-                gleVertex( point[ii] );
-                gleVertex( project[ii] );
+                gleVertex( point[i] );
+                gleVertex( project[i] );
             }
         }
         glEnd();
@@ -551,7 +551,7 @@ void display(View&, int)
         glBegin(GL_LINES);
         for ( size_t ii = 0; ii < nbpts; ++ii )
         {
-            if ( showPoint(ii) )
+            if ( visible(ii) )
             {
                 glColor3f(COL, 0.f, 0.f);
                 gleVertex(project[ii]);

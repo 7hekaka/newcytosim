@@ -12,8 +12,8 @@ void FieldProp::clear()
     step                  = 0;
     field_space           = "first";
     field_space_ptr       = nullptr;
-    periodic              = 0;
-    diffusion             = 0;
+    field_periodic        = 0;
+    slow_diffusion        = 0;
     full_diffusion        = 0;
     boundary_condition    = 0;
     boundary_value        = 0;
@@ -39,9 +39,9 @@ void FieldProp::read(Glossary& glos)
                                    {"edgeXY", 3}, {"edgeYZ", 6}, {"edgeXZ", 5}});
     
     glos.set(step,               "step");
-    glos.set(periodic,           "periodic");
+    glos.set(field_periodic,     "periodic");
     glos.set(field_space,        "space");
-    glos.set(diffusion,          "diffusion");
+    glos.set(slow_diffusion,     "diffusion");
     glos.set(full_diffusion,     "full_diffusion");
     glos.set(boundary_condition, "boundary_condition", keys);
     glos.set(boundary_value,     "boundary_value");
@@ -83,10 +83,10 @@ void FieldProp::complete(Simul const& sim)
     if ( step < REAL_EPSILON )
         throw InvalidParameter("field:step must be defined and > 0");
     
-    if ( diffusion < 0 )
+    if ( slow_diffusion < 0 )
         throw InvalidParameter("field:diffusion must be >= 0");
     
-    real theta = 2 * DIM * time_step * (diffusion+full_diffusion) / ( step * step );
+    real theta = 2 * DIM * time_step * (slow_diffusion+full_diffusion) / ( step * step );
     //std::clog << "The CFL condition for `" << name() << "' is " << theta << '\n';
     
     if ( sim.primed()  &&  theta > 0.5 )
@@ -111,8 +111,8 @@ void FieldProp::write_values(std::ostream& os) const
 {
     write_value(os, "step",           step);
     write_value(os, "space",          field_space);
-    write_value(os, "periodic",       periodic);
-    write_value(os, "diffusion",      diffusion);
+    write_value(os, "periodic",       field_periodic);
+    write_value(os, "diffusion",      slow_diffusion);
     write_value(os, "full_diffusion", full_diffusion);
     write_value(os, "boundary",       boundary_condition, boundary_value);
     write_value(os, "decay_rate",     decay_rate);

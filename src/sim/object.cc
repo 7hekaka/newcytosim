@@ -61,11 +61,11 @@ bool match_property(Object const* obj, void const* prop)
  For example 'f0:021' is the fiber number 21 of class 0 (ie. property index = 0),
  For example 'f1:010' is the fiber number 10 of class 1 (ie. property index = 1)
 */
-std::string Object::reference(ObjectTag tag, unsigned pix, ObjectID id)
+std::string Object::reference(ObjectTag tag, size_t pix, ObjectID id)
 {
     assert_true( pix >= 0 );
     char tmp[32];
-    snprintf(tmp, sizeof(tmp), "%c%u:%04u", tag, pix, id);
+    snprintf(tmp, sizeof(tmp), "%c%lu:%04u", tag, pix, id);
     return std::string(tmp);
 }
 

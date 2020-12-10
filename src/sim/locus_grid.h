@@ -5,15 +5,15 @@
 #include "grid.h"
 #include "dim.h"
 #include "vector.h"
-#include "mecapoint.h"
-#include "fiber_segment.h"
 #include "array.h"
+#include "fiber.h"
 
 class Space;
 class Modulo;
 class Simul;
-class Fiber;
-
+class Mecable;
+class Mecapoint;
+class FiberSegment;
 
 /// represents the point of a Mecable for steric interactions
 class BigPoint
@@ -46,12 +46,13 @@ public:
         mec_ = m;
         pos_ = w;
         rad_ = r;
-        pti_ = i;
+        pti_ = static_cast<unsigned>(i);
         key_ = 0;
+        assert_true( i == pti_ );
     }
     
     /// construct Mecapoint
-    inline Mecapoint point() const { return Mecapoint(mec_, pti_); }
+    inline Mecapoint point() const;
 };
 
 
@@ -86,12 +87,13 @@ public:
         fib_ = f;
         pos_ = w;
         rad_ = r;
-        pti_ = i;
+        pti_ = static_cast<unsigned>(i);
         key_ = 0;
+        assert_true( i == pti_ );
     }
     
     /// construct FiberSegment
-    FiberSegment segment() const { return FiberSegment(fib_, pti_); }
+    FiberSegment segment() const;
 
     /// position of point 1
     Vector pos1() const { return fib_->posPoint(pti_); }
@@ -115,10 +117,10 @@ public:
     bool isLast() const { return ( pti_+2 == fib_->nbPoints() ); }
 
     /// Mecapoint to point 1
-    Mecapoint point1() const { return Mecapoint(fib_, pti_); }
+    Mecapoint point1() const;
     
     /// Mecapoint to point 2
-    Mecapoint point2() const { return Mecapoint(fib_, pti_+1); }
+    Mecapoint point2() const;
     
     /// to point 1
     BigPoint bigPoint1() const { return BigPoint(fib_, pti_, rad_, pos1()); }
@@ -354,14 +356,14 @@ public:
     
 #if ( MAX_STERIC_PANES == 1 )
     
-    /// place Mecapoint on the grid
+    /// place Mecable vertex on the grid
     void add(Mecable const* m, size_t i, real rad) const
     {
         Vector w = m->posPoint(i);
         point_list(w).emplace(m, i, rad, w);
     }
     
-    /// place FiberSegment on the grid
+    /// place Fiber segment on the grid
     void add(Fiber const* f, size_t i, real rad) const
     {
         // link in cell containing the middle of the segment
@@ -374,10 +376,10 @@ public:
     
 #else
     
-    /// place Mecapoint on the grid
+    /// place Mecable vertex on the grid
     void add(size_t pane, Mecable const*, size_t, real rad) const;
     
-    /// place FiberSegment on the grid
+    /// place Fiber segment on the grid
     void add(size_t pane, Fiber const*, size_t, real rad) const;
     
     /// enter interactions into Meca in one panes with given parameters

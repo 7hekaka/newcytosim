@@ -320,9 +320,9 @@ void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, r
     {
         // cosine of the angle between two consecutive segments:
         const real C = dot(Vector(dir+jj), Vector(dir+jj+DIM));
-        for ( int d = 0; d < DIM; ++d )
+        for ( size_t d = 0; d < DIM; ++d )
         {
-            int i = jj + d;
+            size_t i = jj + d;
             real f1 = rigid * (C * ( X[i+DIM] - X[i] ) - ( X[i+DIM*2] - X[i+DIM] ));
             real f3 = rigid * (( X[i+DIM] - X[i] ) - C * ( X[i+DIM*2] - X[i+DIM] ));
             Y[i      ] += f1;

@@ -34,9 +34,9 @@
  bending elasticity |  pN.um^2
  viscosity          |  pN.s/um^2
  
-The number of objects are usually specified directly and if you know a concentration,
-you will need to multiply by the volume of the cell. The binding and unbinding rates are
+The number of objects are usually specified directly but given a concentration, this can 
+be obtained by multiplying with the volume of the cell. The binding and unbinding rates are
 specified as molecular rate (1/s) and knowing the equilibrium constant of the reaction is
-usually not sufficient to deduce both rates, although knowing the equilibrium constant should
-help you to constrain the ratio of the binding to the unbinding rate.
+usually not sufficient to deduce both rates, although the equilibrium constant should
+determine the ratio of the binding to the unbinding rate.
 

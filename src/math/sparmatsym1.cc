@@ -36,7 +36,7 @@ SparMatSym1::SparMatSym1()
     sa_   = nullptr;
 #endif
 #if MATRIX1_USES_COLNEXT
-    colidx_ = new unsigned[2];
+    colidx_ = new size_t[2];
     colidx_[0] = 0;
 #endif
 }
@@ -86,7 +86,7 @@ void SparMatSym1::allocate(size_t alc)
         
 #if MATRIX1_USES_COLNEXT
         delete[] colidx_;
-        colidx_ = new unsigned[alc+1];
+        colidx_ = new size_t[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colidx_[n] = n;
 #endif
@@ -152,6 +152,7 @@ void SparMatSym1::allocateColumn(const size_t jj, size_t alc)
         }
         column_[jj] = ptr;
         colmax_[jj] = alc;
+        assert_true( alc == colmax_[jj] );
     }
 }
 
@@ -173,6 +174,7 @@ SparMatSym1::Element * SparMatSym1::insertElement(const size_t jj, size_t inx)
         }
         column_[jj] = ptr;
         colmax_[jj] = alc;
+        assert_true( alc == colmax_[jj] );
     }
     else
     {

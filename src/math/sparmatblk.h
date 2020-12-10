@@ -72,11 +72,11 @@ public:
         friend class SparMatBlk;
         friend class Meca;
 
-        Block   * blk_;   ///< block elements
-        Block   * sbk_;   ///< pointer for consolidated elements
-        size_t  * inx_;   ///< column index for each element
-        unsigned size_;   ///< number of elements
-        unsigned allo_;   ///< allocated size
+        Block  *blk_;  ///< block elements
+        Block  *sbk_;  ///< pointer for consolidated elements
+        size_t *inx_;  ///< column index for each element
+        size_t size_;  ///< number of elements
+        size_t allo_;  ///< allocated size
 
     public:
         
@@ -160,16 +160,16 @@ private:
 private:
     
     /// number of lines in the matrix
-    size_t    size_;
+    size_t  size_;
     
     /// amount of memory which has been allocated
-    size_t    alloc_;
+    size_t  alloc_;
     
     /// array col_[c][] holds Elements of column 'c'
-    Line *    row_;
+    Line *  row_;
     
     /// colidx_[i] is the index of the first non-empty row of index >= i
-    unsigned * colidx_;
+    size_t* colidx_;
 
     /// memory for consolidated version
     Block * blocks_;

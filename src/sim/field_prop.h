@@ -32,10 +32,10 @@ public:
     std::string   field_space;
     
     /// use periodic boundary conditions for diffusion
-    bool          periodic;
+    bool          field_periodic;
     
     /// diffusion constant
-    real          diffusion;
+    real          slow_diffusion;
     
     /// diffusion constant
     real          full_diffusion;

@@ -676,7 +676,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void reportCPUtime(int frame, real simtime)
+void reportCPUtime(size_t frm, real simtime)
 {
     static time_t nxt = TicToc::seconds_since_1970();
     time_t now = TicToc::seconds_since_1970();
@@ -688,10 +688,23 @@ void reportCPUtime(int frame, real simtime)
     
     static double clk = 0;
     double cpu = double(clock()) / CLOCKS_PER_SEC;
-    Cytosim::log("F%-6i  %7.2fs   CPU %10.3fs  %10.0fs\n", frame, simtime, cpu-clk, cpu);
+    Cytosim::log("F%-6lu  %7.2fs   CPU %10.3fs  %10.0fs\n", frm, simtime, cpu-clk, cpu);
     clk = cpu;
 }
 
+
+template < Interface::SimulFuncPtr FUNC >
+void Interface::execute_run(size_t& sss, size_t cnt)
+{
+    while ( sss < cnt )
+    {
+        hold();
+        //fprintf(stderr, "> step %6zu\n", sss);
+        (simul.*FUNC)();
+        simul.step();
+        ++sss;
+    }
+}
 
 /**
  Perform simulation steps. The accepted Syntax is:
@@ -787,18 +800,6 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
                              {"horizontal",4}, {"flux",5}, {"half",7}});
-    
-    // setting a pointer to the 'solve' function
-    void (Simul::* solveFunc)() = &Simul::solve_not;
-    switch ( solve )
-    {
-        case 1: solveFunc = &Simul::solve; break;
-        case 2: solveFunc = &Simul::solve_auto; break;
-        case 3: solveFunc = &Simul::solve_force; break;
-        case 4: solveFunc = &Simul::solve_onlyX; break;
-        case 5: solveFunc = &Simul::solve_flux; break;
-        case 7: solveFunc = &Simul::solve_half; break;
-    }
 
     opt.set(prune,     "prune");
     opt.set(binary,    "binary");
@@ -806,7 +807,6 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     
     do_write &= ( nb_frames > 0 );
 
-    size_t frame = 0;
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
     
@@ -814,6 +814,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 
     if ( do_write )
     {
+        // write frame 0
         simul.writeProperties(nullptr, prune);
         if ( simul.prop->clear_trajectory )
         {
@@ -826,18 +827,20 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     
     simul.prepare();
     
+    size_t frame = 0;
     size_t sss = 0;
     do {
-        while ( sss < check )
+        switch ( solve )
         {
-            hold();
-            //fprintf(stderr, "> step %6zu\n", sss);
-            (simul.*solveFunc)();
-            simul.step();
-            ++sss;
+            case 0: execute_run<&Simul::solve_not>(sss, check); break;
+            case 1: execute_run<&Simul::solve>(sss, check); break;
+            case 2: execute_run<&Simul::solve_auto>(sss, check); break;
+            case 3: execute_run<&Simul::solve_force>(sss, check); break;
+            case 4: execute_run<&Simul::solve_onlyX>(sss, check); break;
+            case 5: execute_run<&Simul::solve_flux>(sss, check); break;
+            case 7: execute_run<&Simul::solve_half>(sss, check); break;
         }
         ++frame;
-        // next check point:
         check = size_t(delta*(frame+1));
 
         if ( do_write )

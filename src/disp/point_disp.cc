@@ -267,12 +267,12 @@ void PointDisp::downsampleRGBA(GLubyte dst[], unsigned sx, unsigned sy,
     }
 #endif
     
-    for ( size_t x = 0; x < sx; ++x )
-    for ( size_t y = 0; y < sy; ++y )
+    for ( unsigned x = 0; x < sx; ++x )
+    for ( unsigned y = 0; y < sy; ++y )
     {
         size_t r = 0, g = 0, b = 0, a = 0;
-        for ( size_t dx = 0; dx < bin; ++dx )
-        for ( size_t dy = 0; dy < bin; ++dy )
+        for ( unsigned dx = 0; dx < bin; ++dx )
+        for ( unsigned dy = 0; dy < bin; ++dy )
         {
             GLubyte const* p = src + 4 * ( dx+bin*(x+sx*(dy+bin*y)) );
             r += p[0];
@@ -459,9 +459,9 @@ void PointDisp::createPixelmaps(GLfloat uf)
 void PointDisp::prepare(GLfloat uf, GLfloat sf, bool pixelmaps)
 {
     realSize    = size * sf;
-    size_t   sz = (size_t)std::ceil(uf*(size+width));
-    // use a multiple of 4 pixels:
-    pixSize     = ( sz + 4 ) & ~3;
+    unsigned sz = static_cast<unsigned>(std::ceil(uf*(size+width)));
+    // make it a multiple of 4:
+    pixSize     = ( sz + 4U ) & ~3U;
     perceptible = visible && ( uf*(size+width) > 0.25 );
     
 #if POINTDISP_USES_PIXELMAPS

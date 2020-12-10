@@ -152,7 +152,7 @@ public:
     int  saveView(const char* filename, const char* format, int downsample) const;
 
     /// export current viewport to a graphic file
-    int  saveView(const char* root, unsigned indx, int downsample, int verbose=1) const;
+    int  saveView(const char* root, size_t indx, int downsample, int verbose=1) const;
     
     /// save high-resolution image of the current scene
     int  saveScene(int mag, const char* filename, const char* format, int downsample=1);

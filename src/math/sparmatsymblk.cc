@@ -29,7 +29,7 @@ SparMatSymBlk::SparMatSymBlk()
     size_    = 0;
     alloc_   = 0;
     column_  = nullptr;
-    colidx_  = new unsigned[2];
+    colidx_  = new size_t[2];
     colidx_[0] = 0;
 }
 
@@ -59,7 +59,7 @@ void SparMatSymBlk::allocate(size_t alc)
         alloc_  = alc;
         
         delete[] colidx_;
-        colidx_ = new unsigned[alc+1];
+        colidx_ = new size_t[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colidx_[n] = n;
     }

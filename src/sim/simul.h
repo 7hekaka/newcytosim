@@ -549,7 +549,7 @@ public:
     void flagLargestCluster(ObjectFlag) const;
 
     /// order clusters in decreasing number of fibers
-    int  orderClusters(std::ostream&, size_t threshold, int details) const;
+    size_t orderClusters(std::ostream&, size_t threshold, int details) const;
     
     /// print size of clusters defined by connections with Couples
     void reportClusters(std::ostream&, Glossary&) const;
