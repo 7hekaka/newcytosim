@@ -750,9 +750,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f s0 = mul4(load3f(D      ), tt);
-    vec4f s1 = mul4(load3f(D+BLD  ), tt);
-    vec4f s2 = mul4(load3f(D+BLD*2), tt);
+    vec4f s0 = mul4f(load3f(D      ), tt);
+    vec4f s1 = mul4f(load3f(D+BLD  ), tt);
+    vec4f s2 = mul4f(load3f(D+BLD*2), tt);
 # endif
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
@@ -824,9 +824,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f s0 = mul4(load3f(D      ), tt);
-    vec4f s1 = mul4(load3f(D+BLD  ), tt);
-    vec4f s2 = mul4(load3f(D+BLD*2), tt);
+    vec4f s0 = mul4f(load3f(D      ), tt);
+    vec4f s1 = mul4f(load3f(D+BLD  ), tt);
+    vec4f s2 = mul4f(load3f(D+BLD*2), tt);
 # endif
     
     if ( size_ > 1 )

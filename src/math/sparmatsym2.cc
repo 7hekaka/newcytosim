@@ -19,6 +19,7 @@
 #  define MATRIX2_USES_AVX 0
 #  define MATRIX2_USES_SSE 1
 #  include "simd.h"
+#  include "simd_float.h"
 #else
 #  define MATRIX2_USES_AVX 0
 #  define MATRIX2_USES_SSE 0
