@@ -142,10 +142,12 @@ void DynamicFiberProp::splash(std::ostream& os, real g, real h) const
     real len = g * unit_length * ctime;
     
     //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
-    os << std::setprecision(5);
+    std::streamsize p = os.precision();
+    os.precision(5);
     os << "  DynamicFiber h " << h << " g " << g << " :";
     os << " catastrophe_time " << ctime << "  rate " << 1/ctime;
-    os << " length " << len << std::endl;
+    os << " length " << len << "\n";
+    os.precision(p);
 }
 
 

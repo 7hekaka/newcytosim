@@ -68,7 +68,10 @@ void remove_plural(std::string & str)
  */
 void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt) const
 {
-    out << "% time " << std::fixed << std::setprecision(3) << prop->time;
+    std::streamsize p = out.precision();
+    out.precision(6);
+    out << "% time " << std::fixed << prop->time;
+    out.precision(p);
     out << "\n% report " << arg;
     report(out, arg, opt);
     out << "% end\n";
@@ -88,7 +91,7 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
  */
 void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
 {
-    std::streamsize p = 4;
+    std::streamsize op = out.precision(), p = 4;
     opt.peek(p, "precision");
     opt.peek(column_width, "column") || opt.peek(column_width, "width");
     
@@ -134,6 +137,7 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
     }
     //opt.write_counts(std::cerr);
     out << '\n';
+    out.precision(op);
 }
 
 
@@ -700,12 +704,14 @@ void Simul::reportFiberLattice(std::ostream& out) const
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         fib->infoLattice(len, cnt, sm, mn, mx);
 
+    std::streamsize p = out.precision();
     out << LIN << ljust("fiber:lattice", 2);
     out << SEP << sm;
     out << SEP << std::setprecision(4) << sm / (real)cnt;
     out << SEP << std::fixed << std::setprecision(6) << mn;
     out << SEP << std::fixed << std::setprecision(6) << mx;
     out << SEP << std::setprecision(3) << len;
+    out.precision(p);
 }
 
 
@@ -723,12 +729,14 @@ void Simul::reportFiberMesh(std::ostream& out, bool density) const
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         fib->infoMesh(len, cnt, sm, mn, mx, density);
 
+    std::streamsize p = out.precision();
     out << LIN << ljust("fiber:mesh", 2);
     out << SEP << sm;
     out << SEP << std::setprecision(4) << sm / (real)cnt;
     out << SEP << std::fixed << std::setprecision(6) << mn;
     out << SEP << std::fixed << std::setprecision(6) << mx;
     out << SEP << std::setprecision(3) << len;
+    out.precision(p);
 }
 
 
@@ -1137,6 +1145,8 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
     size_t cnt;
     real avg, dev;
     
+    std::streamsize p = out.precision();
+    out.precision(3);
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
@@ -1146,12 +1156,13 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
         {
             out << LIN << ljust(fp->name(), 2);
             out << SEP << cnt;
-            out << SEP << std::setprecision(3) << avg*cnt;
-            out << SEP << std::setprecision(3) << avg;
-            out << SEP << std::setprecision(3) << dev;
-            out << SEP << std::setprecision(3) << fp->rigidity;
+            out << SEP << avg*cnt;
+            out << SEP << avg;
+            out << SEP << dev;
+            out << SEP << fp->rigidity;
         }
     }
+    out.precision(p);
 }
 
 
@@ -2861,8 +2872,11 @@ void Simul::reportPlatelet(std::ostream& out) const
     if ( flagRing() == 1 )
         analyzeRing(1, len, rad);
 
+    std::streamsize p = out.precision();
+    out.precision(std::min(p,(std::streamsize)3));
     out << COM << "nb_fiber" << SEP << "polymer" << SEP << "tension" << SEP << "force" << SEP << "length" << SEP << "radius";
-    out << LIN << nfib << SEP << std::fixed << std::setprecision(3) << pol << SEP << ten << SEP << force << SEP << len << SEP << rad;
+    out << LIN << nfib << SEP << std::fixed << pol << SEP << ten << SEP << force << SEP << len << SEP << rad;
+    out.precision(p);
 }
 
 

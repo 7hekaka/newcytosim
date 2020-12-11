@@ -772,8 +772,8 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
  
     std::clog << "verifyBlock ";
     std::clog << std::setw(8) << mec->reference() << "  size " << std::setw(4) << bks;
-    std::clog << " | B - K | = " << std::setprecision(3) << err << '\n';
-    
+    std::clog << " | B - K | = " << err << '\n';
+
     if ( err > bks * bks * REAL_EPSILON )
     {
         //VecPrint::sparse(std::clog, bks, bks, wrk, bks, 3, (real)0.1);
@@ -815,7 +815,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         mat[i+bks*i] -= 1.0;
     }
     real err = blas::nrm2(bks*bks, mat) / bks;
-    std::clog << " | 1 - PM | = " << std::setprecision(3) << err;
+    std::clog << " | 1 - PM | = " << err;
     
     if ( 1 )
     {
