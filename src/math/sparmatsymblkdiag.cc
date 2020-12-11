@@ -1132,7 +1132,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd2D_AVX(const double* X, double* Y, size
 
 
 #if ( BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
-inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
+inline static void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
     vec4 u = fmadd4(mat, xxxx, cast4(load2(Y+ii)));

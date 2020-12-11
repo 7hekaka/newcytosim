@@ -9,19 +9,19 @@ template <class T>
 void byteswap(T) = delete;
 
 /// reverse byte order
-inline uint16_t byteswap(uint16_t i)
+inline static uint16_t byteswap(uint16_t i)
 {
     return ( i & 0xff ) << 8 | ( i & 0xff00 ) >> 8;
 }
 
 /// reverse byte order
-inline int16_t byteswap(int16_t i)
+inline static int16_t byteswap(int16_t i)
 {
     return (int16_t)byteswap((uint16_t)i);
 }
 
 /// reverse byte order
-inline uint32_t byteswap(uint32_t i)
+inline static uint32_t byteswap(uint32_t i)
 {
     return (i & 0xff) << 24 |
     (i & 0xff00) << 8 |
@@ -30,13 +30,13 @@ inline uint32_t byteswap(uint32_t i)
 }
 
 /// reverse byte order
-inline int32_t byteswap(int32_t i)
+inline static int32_t byteswap(int32_t i)
 {
     return (int32_t)byteswap((uint32_t)i);
 }
 
 /// reverse byte order
-inline uint64_t byteswap(uint64_t i)
+inline static uint64_t byteswap(uint64_t i)
 {
     return (i & 0xff) << 56
     | (i & 0xff00) << 40 |
@@ -49,7 +49,7 @@ inline uint64_t byteswap(uint64_t i)
 }
 
 /// reverse byte order of float
-inline float byteswap(float i)
+inline static float byteswap(float i)
 {
     union { uint32_t i; float f; } tmp;
     tmp.f = i;
@@ -58,7 +58,7 @@ inline float byteswap(float i)
 }
 
 /// reverse byte order of double
-inline double byteswap(double i)
+inline static double byteswap(double i)
 {
     union { uint64_t i; double f; } tmp;
     tmp.f = i;

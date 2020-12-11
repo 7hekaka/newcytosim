@@ -55,7 +55,7 @@ static std::set<void*> allocations;
 
 
 /// return a number greater or equal to 's' that is a multiple of 4
-inline size_t chunk_real(size_t cnt)
+inline static size_t chunk_real(size_t cnt)
 {
     // align to 4 doubles (of size 8 bytes), hence 32 bytes
     constexpr size_t chunk = 32 / sizeof(real);
@@ -67,7 +67,7 @@ inline size_t chunk_real(size_t cnt)
 
 /// allocate a new array to hold `size` real scalars
 /** The returned pointer is aligned to a 64 byte boundary */
-inline real* new_real(size_t cnt)
+inline static real* new_real(size_t cnt)
 {
     void* ptr = nullptr;
     /*
@@ -97,7 +97,7 @@ inline real* new_real(size_t cnt)
 
 
 /// release an array of reals allocated by `new_real`
-inline void free_real(void* ptr)
+inline static void free_real(void* ptr)
 {
     if ( ptr )
     {
@@ -118,7 +118,7 @@ inline void free_real(void* ptr)
 
 
 /// copy `cnt` real scalars from `src` to `dst`
-inline void copy_real(size_t cnt, real const* src, real * dst)
+inline static void copy_real(size_t cnt, real const* src, real * dst)
 {
 #if ( 0 )
     memcpy(dst, src, cnt*sizeof(real));
@@ -131,7 +131,7 @@ inline void copy_real(size_t cnt, real const* src, real * dst)
 
 
 /// set `cnt` values of the array `ptr` to 0 (zero).
-inline void zero_real(size_t cnt, real * ptr)
+inline static void zero_real(size_t cnt, real * ptr)
 {
 #if ( 1 )
     // this works because IEEE 754 '+0.0' is represented with all bits at zero
@@ -150,20 +150,20 @@ constexpr real M_SQRT3 = 1.7320508075688772935274463415059;
 //----------------------------BRANCHLESS? CODE----------------------------------
 
 /// square of the argument: `x * x`
-inline real square(const real x) { return x * x; }
+inline static real square(const real x) { return x * x; }
 
 /// cube of the argument: `x * x * x`
-inline real cube(const real x) { return x * x * x; }
+inline static real cube(const real x) { return x * x * x; }
 
 /// return `neg` if `val < 0` and `pos` otherwise
-inline real sign_select(real const val, real const neg, real const pos)
+inline static real sign_select(real const val, real const neg, real const pos)
 {
     // this should be branchless, using a conditional-move instruction (CMOVBE)
     return ( val < 0 ? neg : pos );
 }
 
 /// sign of a 'real': -1 or +1; result is +1 if ( x == 0 )
-inline real sign_real(const real x)
+inline static real sign_real(const real x)
 {
 #if REAL_IS_DOUBLE
     return std::copysign(1.0, x);
@@ -173,22 +173,22 @@ inline real sign_real(const real x)
 }
 
 /// absolute value of `x`
-inline real abs_real(const real x) { return std::fabs(x); }
+inline static real abs_real(const real x) { return std::fabs(x); }
 
 /// minimum between `x` and `y`
-inline real min_real(const real x, const real y) { return std::min(x, y); }
+inline static real min_real(const real x, const real y) { return std::min(x, y); }
 
 /// maximum between `x` and `y`
-inline real max_real(const real x, const real y) { return std::max(x, y); }
+inline static real max_real(const real x, const real y) { return std::max(x, y); }
 
 /// clamp value 'x' within [i, s]
-inline real clamp_real(const real x, const real i, const real s)
+inline static real clamp_real(const real x, const real i, const real s)
 {
     return std::max(i, std::min(x, s));
 }
 
 /// adjust 'x' to canonical image with period 'p':
-inline real fold_real(const real x, const real p)
+inline static real fold_real(const real x, const real p)
 {
     // using remainder() function for branchless code
     return std::remainder(x, p);
@@ -196,7 +196,7 @@ inline real fold_real(const real x, const real p)
 
 //----------------------------------- DEBUG ------------------------------------
 
-inline bool isnan(size_t cnt, real const* ptr)
+inline static bool isnan(size_t cnt, real const* ptr)
 {
     bool res = false;
     for ( size_t i = 0; i < cnt; ++i )

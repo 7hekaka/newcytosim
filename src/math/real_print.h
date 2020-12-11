@@ -5,7 +5,7 @@
 
 
 /// print 'cnt' components of 'ptr' on a line
-inline void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
+inline static void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
 {
     if ( !ptr || cnt == 0 )
         fprintf(out, "void");
@@ -19,7 +19,7 @@ inline void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
 
 
 /// check memory alignement of a pointer for AVX load/store
-inline void check_alignment(void const* ptr)
+inline static void check_alignment(void const* ptr)
 {
     uintptr_t a = ((uintptr_t)ptr & 31);
     if ( a )
@@ -39,7 +39,7 @@ inline void check_alignment(void const* ptr)
  Redefining the standard extraction operator is normally not necessary,
  but this can be useful to track certain bugs
  */
-inline std::istream& operator >> (std::istream& is, real& x)
+inline static std::istream& operator >> (std::istream& is, real& x)
 {
     std::string str = Tokenizer::get_real(is);
     if ( str.empty() )

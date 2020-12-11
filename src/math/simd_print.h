@@ -12,19 +12,19 @@
 #ifdef __SSE3__
 
 /// print SIMD vector of 2 doubles
-inline void dump(__m128d v, char const* s)
+inline static void dump(__m128d v, char const* s)
 {
     printf("%16s vec2( %5.2f %5.2f )\n", s, v[1], v[0]);
 }
 
 /// print two SIMD vector
-inline void dump(__m128d v, vec2 w, char const* s)
+inline static void dump(__m128d v, vec2 w, char const* s)
 {
     printf("%16s vec2( %5.2f %5.2f )( %5.2f %5.2f )\n", s, v[1], v[0], w[1], w[0]);
 }
 
 /// print SIMD vector of 4 floats
-inline void dump(__m128 v, char const* s)
+inline static void dump(__m128 v, char const* s)
 {
     printf("%16s floats( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
@@ -35,7 +35,7 @@ inline void dump(__m128 v, char const* s)
 
 #ifdef __SSE3__
 
-inline void dump16(__m128i v, char const* s)
+inline static void dump16(__m128i v, char const* s)
 {
     uint16_t a = _mm_extract_epi16(v, 0);
     uint16_t b = _mm_extract_epi16(v, 1);
@@ -48,7 +48,7 @@ inline void dump16(__m128i v, char const* s)
     printf("%16s int16( %3i %3i %3i %3i %3i %3i %3i %3i )\n", s, h, g, f, e, d, c, b, a);
 }
 
-inline void dump32(__m128i v, char const* s)
+inline static void dump32(__m128i v, char const* s)
 {
     uint32_t a = _mm_extract_epi32(v, 0);
     uint32_t b = _mm_extract_epi32(v, 1);
@@ -64,20 +64,20 @@ inline void dump32(__m128i v, char const* s)
 #ifdef __AVX__
 
 /// print SIMD vector of 4 doubles
-inline void dump(__m256d v, char const* s)
+inline static void dump(__m256d v, char const* s)
 {
     printf("%16s vec4( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
 /// print two SIMD vector of 4 doubles
-inline void dump(__m256d v, vec4 w, char const* s)
+inline static void dump(__m256d v, vec4 w, char const* s)
 {
     printf("%16s vec4( %5.2f %5.2f %5.2f %5.2f )( %5.2f %5.2f %5.2f %5.2f )\n",
            s, v[3], v[2], v[1], v[0], w[3], w[2], w[1], w[0]);
 }
 
 /// print SIMD vector of 8 floats
-inline void dump(__m256 v, char const* s)
+inline static void dump(__m256 v, char const* s)
 {
     printf("%16s floats( %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f )\n", s,
            v[7], v[6], v[5], v[4], v[3], v[2], v[1], v[0]);

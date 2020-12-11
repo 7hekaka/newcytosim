@@ -86,7 +86,7 @@ void sfmt_gen_rand_all(sfmt_t * sfmt) {
  */
 static void gen_rand_array(sfmt_t * sfmt, w128_t * array, unsigned size)
 {
-    int i, j;
+    unsigned i, j;
     __m128i r1, r2;
     w128_t * pstate = sfmt->state;
 
