@@ -64,7 +64,7 @@ private:
         }
 #endif
         
-        // find an empty spot:
+        // find an empty slot:
         i = std::find(buddies_.begin(), buddies_.end(), nullptr);
         if ( i != buddies_.end() )
             *i = b;

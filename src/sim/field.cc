@@ -222,7 +222,7 @@ void Field::laplacian(const real* field, real * mat) const
     blas::xaxpy(nbc-nx, -1, field+nx, 1, mat,    1);
     
     size_t yy = mGrid.breadth(1) - 1;
-    if ( prop->periodic )
+    if ( prop->field_periodic )
     {
         blas::xaxpy(nx, -1, field+nx*yy, 1, mat      , 1);
         blas::xaxpy(nx, -1, field      , 1, mat+nx*yy, 1);

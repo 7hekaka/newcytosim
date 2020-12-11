@@ -56,11 +56,11 @@ public:
         /// the value specified as a string
         std::string    value_;
         
-        /// true if this value has been intentionally set by the user
-        bool         defined_;
-        
         /// the number of times this value has been read
         mutable size_t count_;
+
+        /// true if this value has been intentionally set by the user
+        bool         defined_;
         
         /// constructor
         val_type()   { defined_=false; count_=0; }

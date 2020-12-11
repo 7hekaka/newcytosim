@@ -38,12 +38,13 @@ namespace Rasterizer
         /// bit-field used to describe the connectivity between the points.
         /**
          Two points A and B are connected if ( A.UU & B.UU ) using the bit-wise AND.
+         With an integer, this limits the number of edges to 32.
          With a long integer, this limits the number of edges to 64.
          A bigger integer could be used if needed.
         */
-        size_t UU;
+        unsigned UU;
         
-        void set(Vector3 const& vec, size_t u)
+        void set(Vector3 const& vec, unsigned u)
         {
             XX = vec.XX;
             YY = vec.YY;

@@ -20,18 +20,18 @@ public:
     {
         real xx, yy;   ///< coordinates of point
         real dx, dy;   ///< normalized direction to next point
-        long info;     ///< indicates the type of edge
         real len;      ///< distance to next point
+        long spot;     ///< indicates the type of edge
         
         /// constructor
-        Point2D() { info = 0; }
+        Point2D() { spot = 0; }
         
         /// set coordinates of point
         Point2D(real sx, real sy)
         {
             xx = sx;
             yy = sy;
-            info = 0;
+            spot = 0;
         }
         
         /// test if given point overlap with *this

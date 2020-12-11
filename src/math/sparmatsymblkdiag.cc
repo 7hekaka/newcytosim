@@ -1871,7 +1871,7 @@ void SparMatSymBlkDiag::vecMulDiagonal3D(const float* X, float* Y) const
         vec4f s1 = mul4f(load3f(D+BLD  ), permute4f(tt, 0x55));
         vec4f s2 = mul4f(load3f(D+BLD*2), permute4f(tt, 0xAA));
 # endif
-        storeu4f(Y+3*j, add4f(s0, add4f(s1, s2)));
+        storeu4f(Y+3*j, add4f(s2, add4f(s0, s1)));
     }
 }
 #endif

@@ -49,7 +49,7 @@ void Polygon::setPoint(size_t i, real x, real y, long c)
     {
         pts_[i].xx = x;
         pts_[i].yy = y;
-        pts_[i].info = c;
+        pts_[i].spot = c;
     }
 }
 
@@ -107,7 +107,7 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
         {
             pts[i].xx = x;
             pts[i].yy = y;
-            pts[i].info = k;
+            pts[i].spot = k;
         }
         ++i;
     }
@@ -151,8 +151,8 @@ void Polygon::write(std::ostream& os) const
     for ( size_t i = 1; i < npts_; ++i )
     {
         os << std::setw(12) << pts_[i].xx << "  " << std::setw(12) << pts_[i].yy;
-        if ( pts_[i].info )
-            os << " " << pts_[i].info;
+        if ( pts_[i].spot )
+            os << " " << pts_[i].spot;
         std::endl(os);
     }
 }
@@ -502,11 +502,12 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, size_t& hit) const
 
 void Polygon::dump(std::ostream& os) const
 {
+    const int W = 10;
     os << "polygon " << npts_ << "\n";
     for ( size_t n = 0; n <= npts_; ++n )
     {
-        os << " " << std::setw(10) << pts_[n].xx << " " << std::setw(10) << pts_[n].yy << " " << pts_[n].info;
-        os << " " << std::setw(10) << pts_[n].dx << " " << std::setw(10) << pts_[n].dy << "\n";
+        os << " " << std::setw(W) << pts_[n].xx << " " << std::setw(W) << pts_[n].yy << " " << pts_[n].spot;
+        os << " " << std::setw(W) << pts_[n].dx << " " << std::setw(W) << pts_[n].dy << "\n";
     }
 }
 
@@ -516,7 +517,7 @@ void Polygon::print(FILE * f) const
     fprintf(f, "polygon %lu\n", npts_);
     for ( size_t n = 0; n <= npts_; ++n )
     {
-        fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].info);
+        fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].spot);
         fprintf(f, "  %10.2f %10.2f\n", pts_[n].dx, pts_[n].dy);
     }
 }

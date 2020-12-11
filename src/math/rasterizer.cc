@@ -592,23 +592,15 @@ void Rasterizer::paintHexLine3D(void (*paint)(int, int, int, int, void*), void *
 
 
 void Rasterizer::paintBox3D(void (*paint)(int, int, int, int, void*), void * arg,
-                            const Vector3& P, const Vector3& Q, const real radius,
+                            const Vector3& P, const Vector3& Q, const real rad,
                             const Vector3& offset, const Vector3& delta )
 {
     int inf[3], sup[3];
     
     for ( int d = 0; d < 3; ++d )
     {
-        if ( P[d] > Q[d] )
-        {
-            inf[d] = (int) std::ceil( ( Q[d] - radius - offset[d] ) * delta[d] );
-            sup[d] = (int)std::floor( ( P[d] + radius - offset[d] ) * delta[d] );
-        }
-        else
-        {
-            inf[d] = (int) std::ceil( ( P[d] - radius - offset[d] ) * delta[d] );
-            sup[d] = (int)std::floor( ( Q[d] + radius - offset[d] ) * delta[d] );
-        }
+        inf[d] = (int) std::ceil((std::min(P[d], Q[d]) - (offset[d]+rad)) * delta[d]);
+        sup[d] = (int)std::floor((std::max(P[d], Q[d]) - (offset[d]-rad)) * delta[d]);
     }
     
     for ( int zz = inf[2]; zz <= sup[2]; ++zz )

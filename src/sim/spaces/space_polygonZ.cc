@@ -207,7 +207,7 @@ void SpacePolygonZ::drawZ(bool rings) const
     for ( size_t n=1; n <= npts; n++ )
     {
         // do not display special edges
-        if ( pts[n-1].info )
+        if ( pts[n-1].spot )
             continue;
         
         GLfloat R1 = GLfloat(pts[n-1].xx);

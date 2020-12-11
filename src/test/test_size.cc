@@ -14,8 +14,9 @@
 #include "sparmatblk.h"
 #include "sparmatsymblk.h"
 #include "sparmatsymblkdiag.h"
+#include "rasterizer.h"
 
-#define PRINT(arg) printf("sizeof %16s   %lu bytes\n", #arg, sizeof(arg));
+#define PRINT(arg) printf("sizeof %32s  %lu bytes\n", #arg, sizeof(arg));
 
 int main(int argc, char* argv[])
 {
@@ -39,6 +40,9 @@ int main(int argc, char* argv[])
         PRINT(LocusGrid);
         PRINT(BigPoint);
         PRINT(BigLocus);
+        
+        PRINT(Rasterizer::Vertex2);
+        PRINT(Rasterizer::Vertex3);
     }
     else
     {

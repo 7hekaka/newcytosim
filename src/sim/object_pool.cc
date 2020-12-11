@@ -420,15 +420,14 @@ void ObjectPool::quicksort(int (*comp)(const void*, const void*))
  */
 void ObjectPool::permute(Object * p)
 {
-    assert_true( p  &&  p->nextO );
     if ( p  &&  p->nextO )
     {
-        backO->nextO   = frontO;
-        frontO->prevO  = backO;
-        frontO         = p->nextO;
-        backO          = p;
-        backO->nextO   = nullptr;
-        frontO->prevO  = nullptr;
+        backO->nextO  = frontO;
+        frontO->prevO = backO;
+        frontO        = p->nextO;
+        backO         = p;
+        backO->nextO  = nullptr;
+        frontO->prevO = nullptr;
     }
     //assert_false( bad() );
 }
@@ -439,7 +438,7 @@ void ObjectPool::permute(Object * p)
  
  Q must be after P
  If Q is between Front and P, this will destroy the list,
- but there is no way to check such condition here.
+ but it would be costly to check this condition here.
  */
 void ObjectPool::shuffle_up(Object * p, Object * q)
 {
@@ -464,7 +463,7 @@ void ObjectPool::shuffle_up(Object * p, Object * q)
  
  Q must be after P
  If Q is between Front and P, this will destroy the list,
- but there is no way to check such condition here.
+ but it would be costly to check this condition here.
  */
 void ObjectPool::shuffle_down(Object * p, Object * q)
 {

@@ -1295,10 +1295,10 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
 struct Connector
 {
     real a;
+    real s;
     long f;
     long g;
     long h;
-    real s;
     Connector(real as, long fs) { a = as; f = fs; g = -1; h = -1; s = 0; }
     Connector(real as, long fs, long gs) { a = as; f = fs; g = gs; h = -1; s = 0; }
     Connector(real as, long fs, long gs, long hs) { a = as; f = fs; g = gs; h = hs; s = 0; }
@@ -2255,10 +2255,13 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
     
     if ( 1 )
     {
+        std::streamsize p = out.precision();
+        out.precision(3);
         out << COM << "force_distribution" << " (`scale` indicates the center of each bin)";
         out << LIN << ljust("scale", 2);
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
+        out.precision(p);
     }
     
     for ( size_t ii = 0; ii < IMAX; ++ii )
@@ -2516,9 +2519,9 @@ void Simul::flagClusters(bool cop, bool sol, bool mec) const
 /// class to store info about a Cluster
 struct Cluster
 {
-    ObjectFlag flg;
     size_t     cnt;
-    
+    ObjectFlag flg;
+
     Cluster(ObjectFlag f, size_t n) { flg = f; cnt = n; }
         
     /// Compare function

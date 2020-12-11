@@ -35,7 +35,7 @@ inline vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
 #define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
 
-inline vec4f load3f(float const* a) { return _mm_blend_ps(_mm_load_ps(a), _mm_setzero_ps(), 0b1000); }
+inline vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
 
 
 #endif  // __SSE3__
