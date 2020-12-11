@@ -98,7 +98,7 @@ void timerCallback(const int value)
             player.previousFrame();
         
         if ( !prop.save_images )
-            glApp::postRedisplay();
+            glApp::displayMain(); //glApp::postRedisplay();
     }
     else
         millisec = 200;

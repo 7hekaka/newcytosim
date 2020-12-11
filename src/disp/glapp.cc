@@ -1188,8 +1188,6 @@ void glApp::displayMain()
     glFinish();
     if ( view.buffered )
         glutSwapBuffers();
-    else
-        glFlush();
     CHECK_GL_ERROR("in glApp::displayMain()");
 }
 

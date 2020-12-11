@@ -69,7 +69,6 @@ std::string Player::buildLabel() const
     std::ostringstream oss;
     oss.precision(3);
 
-    //std::clog << "display @ " << std::fixed << simul.time() << "s\n";
     oss << std::setw(8) << std::fixed << simul.time() << "s";
         
     //display the force exerted by the mouse-controled Single:
@@ -253,7 +252,7 @@ void Player::prepareDisplay(View& view, int mag)
 //------------------------------------------------------------------------------
 void Player::displayCytosim()
 {
-    //std::cerr << "displayCytosim @ " << simul.time() << '\n';
+    //std::clog << "displayCytosim @ " << std::fixed << simul.time() << "s\n";
     // clear pixels:
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
