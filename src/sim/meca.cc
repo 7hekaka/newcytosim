@@ -1627,15 +1627,20 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("  no convergence: size %lu precond %i flag %i count %4lu residual %.3e\n",
+        Cytosim::out("  no convergence: size %lu precond %i flag %i count %4lu residual %.3e",
             dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
 
         monitor.reset();
+#if !SAFER_CONVERGENCE_FAILURE
+        // try with a different seed
+        copy_real(dimension(), vRHS, vSOL);
+#endif
         if ( precond )
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
         else
             LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-        Cytosim::out("  restarted: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+        
+        Cytosim::out(" -> restarted: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
 
         if ( !monitor.converged() )
         {
@@ -1643,28 +1648,28 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             zero_real(dimension(), vSOL);
             if ( precond )
             {
-                // try with different method
-                computePreconditionner(4, 0);
-                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+                // try without preconditioner
+                LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
                 //LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    BCGSP (precond=4): count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGS  : count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {
-                // try with a preconditioner
-                computePreconditionner(1, 0);
+                // try with strongest preconditioner
+                computePreconditionner(4, 0);
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGSP4: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
             }
         }
 
         if ( !monitor.converged() )
         {
             monitor.reset();
-            // try with different seed
+            // try with different seed and strongest preconditioner
             copy_real(dimension(), vRND, vSOL);
+            computePreconditionner(4, 0);
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-            Cytosim::out(" another seed: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+            Cytosim::out(" reseeded: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
         }
         
         if ( !monitor.converged() )
