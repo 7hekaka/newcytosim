@@ -68,7 +68,7 @@ void SpaceBanana::update()
 real SpaceBanana::volume() const
 {
 #if ( DIM > 2 )
-    return 2*bAngle*M_PI*bRadius*bWidthSqr + 4/3.*M_PI*bWidthSqr*bWidth;
+    return (2*M_PI*bAngle*bRadius + 4*M_PI/3.*bWidth)*bWidthSqr;
 #else
     return 4*bAngle*bRadius*bWidth + M_PI*bWidthSqr;
 #endif

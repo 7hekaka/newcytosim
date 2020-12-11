@@ -29,7 +29,7 @@ SparMatSymBlk::SparMatSymBlk()
     size_    = 0;
     alloc_   = 0;
     column_  = nullptr;
-    colidx_  = new unsigned[2];
+    colidx_  = new size_t[2];
     colidx_[0] = 0;
 }
 
@@ -59,7 +59,7 @@ void SparMatSymBlk::allocate(size_t alc)
         alloc_  = alc;
         
         delete[] colidx_;
-        colidx_ = new unsigned[alc+1];
+        colidx_ = new size_t[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colidx_[n] = n;
     }
@@ -750,9 +750,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f s0 = mul4(load3f(D      ), tt);
-    vec4f s1 = mul4(load3f(D+BLD  ), tt);
-    vec4f s2 = mul4(load3f(D+BLD*2), tt);
+    vec4f s0 = mul4f(load3f(D      ), tt);
+    vec4f s1 = mul4f(load3f(D+BLD  ), tt);
+    vec4f s2 = mul4f(load3f(D+BLD*2), tt);
 # endif
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
@@ -824,9 +824,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f s0 = mul4(load3f(D      ), tt);
-    vec4f s1 = mul4(load3f(D+BLD  ), tt);
-    vec4f s2 = mul4(load3f(D+BLD*2), tt);
+    vec4f s0 = mul4f(load3f(D      ), tt);
+    vec4f s1 = mul4f(load3f(D+BLD  ), tt);
+    vec4f s2 = mul4f(load3f(D+BLD*2), tt);
 # endif
     
     if ( size_ > 1 )

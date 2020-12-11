@@ -2572,7 +2572,7 @@ Order Clusters from 1 to max, in order of decreasing size,
 and set fiber:flag() to the corresponding cluster index.
 @return number of clusters
 */
-int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
+size_t Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
 {
     typedef std::vector<Fiber*> list_t;
     typedef std::map<ObjectFlag, list_t> map_t;
@@ -2630,7 +2630,6 @@ int Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
             }
         }
     }
-    
     return idx;
 }
 

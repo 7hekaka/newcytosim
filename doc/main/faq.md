@@ -1038,7 +1038,7 @@ You can do this at every time step, for example, by changing ‘execute_run’ i
         double c_step = double(clock() - clk) / CLOCKS_PER_SEC;
         clk = clock();
 
-        (simul.*solveFunc)();
+        simul.solve();
         
         double c_solve = double(clock() - clk) / CLOCKS_PER_SEC;
         Cytosim::log("CPU  %6i  step %10.3fs  solve  %10.3fs\n", sss, c_step, c_solve);

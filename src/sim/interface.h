@@ -23,6 +23,13 @@ private:
     /// disabled default constructor
     Interface();
 
+    /// Simul member function pointer
+    using SimulFuncPtr = void (Simul::*)();
+    
+    /// perform `cnt` simulation steps using Simul::FUNC
+    template < SimulFuncPtr FUNC >
+    void execute_run(size_t& sss, size_t cnt);
+
 public:
     
     /// associated Simul

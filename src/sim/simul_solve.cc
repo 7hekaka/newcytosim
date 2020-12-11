@@ -486,7 +486,7 @@ void Simul::solve_auto()
              as the simpler one uses less memory.
              */
             autoPrecond = 0;
-            for ( size_t m : { 0, 1, 2, 4 } )
+            for ( unsigned m : { 0, 1, 2, 4 } )
             {
                 if ( autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
                     autoPrecond = m;

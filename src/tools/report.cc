@@ -53,7 +53,7 @@ void help(std::ostream& os)
 
 //------------------------------------------------------------------------------
 
-void report_raw(Simul const& simul, std::ostream& os, std::string const& what, int frm, Glossary& opt)
+void report_raw(Simul const& simul, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
     if ( verbose > 0 )
     {
@@ -69,7 +69,7 @@ void report_raw(Simul const& simul, std::ostream& os, std::string const& what, i
 }
 
 
-void report_prefix(Simul const& simul, std::ostream& os, std::string const& what, int frm, Glossary& opt)
+void report_prefix(Simul const& simul, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
     char str[256] = { 0 };
     size_t str_len = 0;
@@ -78,7 +78,7 @@ void report_prefix(Simul const& simul, std::ostream& os, std::string const& what
         str_len += snprintf(str, sizeof(str), "%9.3f ", simul.time());
     
     if ( prefix & 2 )
-        str_len += snprintf(str+str_len, sizeof(str)-str_len, "%9i ", frm);
+        str_len += snprintf(str+str_len, sizeof(str)-str_len, "%9lu ", frm);
     
     std::stringstream ss;
  
@@ -96,7 +96,7 @@ void report_prefix(Simul const& simul, std::ostream& os, std::string const& what
 }
 
 
-void report(Simul const& simul, std::ostream& os, std::string const& what, int frm, Glossary& opt)
+void report(Simul const& simul, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
     try
     {

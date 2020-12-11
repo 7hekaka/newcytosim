@@ -359,7 +359,7 @@ void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, si
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(size_t siz, real const* blk, int const* piv, real const* mat, real alpha, real * vec, real * tmp)
+real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real * vec, real * tmp)
 {
     assert_true(siz > 0);
     const real TOLERANCE = 0.05;
@@ -367,7 +367,7 @@ real largest_eigenvalue(size_t siz, real const* blk, int const* piv, real const*
     //fprintf(stderr, "      power size %i eig %10.6f\n", siz, eig);
 
     int info = 0;
-    for ( size_t n = 0; n < siz; n += 2 )
+    for ( int n = 0; n < siz; n += 2 )
     {
         blas::xcopy(siz, vec, 1, tmp, 1);
         lapack::xgetrs('N', siz, 1, blk, siz, piv, tmp, siz, &info);
@@ -400,12 +400,12 @@ real largest_eigenvalue(size_t siz, real const* blk, int const* piv, real const*
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(size_t siz, real const* mat, real const* tam, real alpha, real * vec, real * tmp)
+real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real * vec, real * tmp)
 {
     const real TOLERANCE = 0.05;
     real oge, eig = blas::nrm2(siz, vec);
     
-    for ( size_t n = 0; n < siz; n += 2 )
+    for ( int n = 0; n < siz; n += 2 )
     {
         blas::xgemv('N', siz, siz, 1.0/eig, mat, siz, vec, 1,       0.0, tmp, 1);
         blas::xgemv('N', siz, siz, 1.0,     tam, siz, tmp, 1, alpha/eig, vec, 1);

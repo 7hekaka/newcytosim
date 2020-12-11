@@ -118,7 +118,7 @@ void Fiber::step()
          with a time-scale given by 'mesh_aging_rate'.
          */
         real cst = prop->mesh_aging_rate * simul().time_step();
-        evolveMeshValues(frMesh, cst, 1.0-cst);
+        evolveMeshValues(frMesh, cst, 1 - cst);
         //std::clog << reference() << " lattice avg = " << frMesh->sum()*frMesh->unit()/length() << '\n';
     }
     //std::clog << frMesh->sum() << '\n';

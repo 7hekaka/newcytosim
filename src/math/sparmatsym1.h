@@ -54,7 +54,7 @@ private:
 
 #if MATRIX1_USES_COLNEXT
     /// colidx_[i] is the index of the first non-empty column of index >= i
-    unsigned * colidx_;
+    size_t * colidx_;
 #endif
 
     /// allocate column to hold specified number of values
@@ -70,7 +70,7 @@ private:
 
     ///array of index for the optmized multiplication
     ///@todo migrate to DSS Symmetric Matrix Storage format
-    unsigned  nmax_;
+    size_t nmax_;
     unsigned * ija_;
     real * sa_;
 

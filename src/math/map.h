@@ -151,9 +151,9 @@ protected:
     static inline size_t imagei_periodic(size_t s, long c)
     {
         ///@todo use remainder() function for branchless code?
-        while ( c <  0 )  c += s;
+        while ( c <  0 ) c += s;
         size_t u = (size_t) c;
-        while ( u >= s )  u -= s;
+        while ( u >= s ) u -= s;
         return u;
     }
 
@@ -164,7 +164,7 @@ protected:
     }
     
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t image(const size_t d, long c) const
+    inline size_t image(const int d, long c) const
     {
 #if GRID_HAS_PERIODIC
         if ( mPeriodic[d] )
@@ -502,24 +502,22 @@ public:
     }
 
     
-    /// return cell that is next to `c` in the direction `dir`
-    size_t next(size_t c, size_t dir) const
+    /// return cell that is next to `c` in the direction `dim`
+    size_t next(size_t c, int dim) const
     {
-        size_t coord[ORD];
+        size_t s[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
-            coord[d] = c % mDim[d];
-            c       /= mDim[d];
+            s[d] = c % mDim[d];
+            c   /= mDim[d];
         }
 
-        coord[dir] = image(dir, coord[dir]+1);
+        s[dim] = image(dim, s[dim]+1);
 
-        size_t inx = coord[ORD-1];
-        
+        c = s[ORD-1];
         for ( int d = ORD-2; d >= 0; --d )
-            inx = mDim[d] * inx + coord[d];
-        
-        return inx;
+            c = mDim[d] * c + s[d];
+        return c;
     }
     
     /// convert coordinate to array index, if ORD==1
@@ -623,11 +621,11 @@ private:
                 {
                     for ( int e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
-                    ccc[ORD*h+d] = s;
+                    ccc[ORD*h+d] = (int)s;
                     ++h;
                     for ( int e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
-                    ccc[ORD*h+d] = -s;
+                    ccc[ORD*h+d] = -(int)s;
                     ++h;
                 }
             }

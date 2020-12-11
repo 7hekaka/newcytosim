@@ -2,6 +2,8 @@
 
 #include "assert_macro.h"
 #include "locus_grid.h"
+#include "mecapoint.h"
+#include "fiber_segment.h"
 #include "exceptions.h"
 #include "messages.h"
 #include "modulo.h"
@@ -9,6 +11,16 @@
 #include "meca.h"
 
 extern Modulo const* modulo;
+
+//------------------------------------------------------------------------------
+
+inline Mecapoint BigPoint::point() const { return Mecapoint(mec_, pti_); }
+
+inline FiberSegment BigLocus::segment() const { return FiberSegment(fib_, pti_); }
+
+inline Mecapoint BigLocus::point1() const { return Mecapoint(fib_, pti_); }
+
+inline Mecapoint BigLocus::point2() const { return Mecapoint(fib_, pti_+1); }
 
 //------------------------------------------------------------------------------
 

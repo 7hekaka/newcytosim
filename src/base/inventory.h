@@ -89,7 +89,7 @@ public:
     void           clear();
 
     /// return the object with given serial number, or 0 if not found
-    Inventoried*   get(ObjectID number) const;
+    Inventoried*   get(size_t number) const;
     
     /// return object with given serial number
     Inventoried*   operator[](ObjectID n) const { assert_true(n<allocated_); return byNames[n]; }

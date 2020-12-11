@@ -800,7 +800,7 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir, const double* src, cons
             //dir += 3; dst += 3; src += 3;
         } break;
         default:
-            printf("unexpected case in projectForcesD3D_AVX!");
+            puts("unexpected case in projectForcesD3D_AVX!");
     }
     assert_true( mul == end+3 );
 }

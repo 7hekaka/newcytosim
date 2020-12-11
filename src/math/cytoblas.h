@@ -93,7 +93,7 @@ inline void sub(size_t N, const real* X, real* Y)
      return abs(X[inx]);
  
  */
-inline real nrm8(const size_t N, const real* X, int inc)
+inline real nrm8(const int N, const real* X, int inc)
 {
 #if ( 1 )
     size_t inx = blas::ixamax(N, X, inc);
@@ -102,7 +102,7 @@ inline real nrm8(const size_t N, const real* X, int inc)
     if ( N == 0 )
         return 0;
     real u = abs_real(X[0]);
-    for ( size_t i = 1; i < N; ++i )
+    for ( int i = 1; i < N; ++i )
         u = std::max(u, abs_real(X[i*inc]));
     return u;
 #endif

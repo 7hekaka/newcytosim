@@ -173,7 +173,7 @@ ObjectID Inventory::next_identity(ObjectID n) const
 }
 
 
-Inventoried * Inventory::get(const ObjectID n) const
+Inventoried * Inventory::get(const size_t n) const
 {
     if ( n <= highest_ )
     {

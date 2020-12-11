@@ -357,12 +357,12 @@ int Player::saveView(const char* filename, const char* format, int downsample) c
  in the folder specified in `PlayerProp::image_dir`.
  The name of the file is formed by concatenating 'root' and 'indx'.
  */
-int Player::saveView(const char* root, unsigned indx, int downsample, int verbose) const
+int Player::saveView(const char* root, size_t indx, int downsample, int verbose) const
 {
     char cwd[1024] = { 0 };
     char name[1024];
     char const* format = prop.image_format.c_str();
-    snprintf(name, sizeof(name), "%s%04i.%s", root, indx, format);
+    snprintf(name, sizeof(name), "%s%04lu.%s", root, indx, format);
     if ( prop.image_dir.length() )
     {
         if ( getcwd(cwd, sizeof(cwd)) )

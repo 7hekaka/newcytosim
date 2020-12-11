@@ -15,13 +15,12 @@
 void Field::prepareDiffusion(real theta)
 {
     const size_t nbc = mGrid.nbCells();
-    
     fiDiffusionMatrix.resize(nbc);
     fiDiffusionMatrix.reset();
     
     for ( size_t c = 0; c < nbc; ++c )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( int d = 0; d < DIM; ++d )
         {
             size_t n = mGrid.next(c, d);
             
@@ -52,7 +51,6 @@ void Field::prepareDiffusion(real theta)
 void Field::prepareDiffusion(real theta, unsigned char * domain)
 {
     const size_t nbc = mGrid.nbCells();
-    
     fiDiffusionMatrix.resize(nbc);
     fiDiffusionMatrix.reset();
     
@@ -99,11 +97,11 @@ void Field::prepare()
     fiTMP = new_real(nbc);
     fiTMPSize = nbc;
 
-    if ( prop->diffusion > 0 )
+    if ( prop->slow_diffusion > 0 )
     {
-        real theta = prop->diffusion * prop->time_step / ( prop->step * prop->step );
+        real theta = prop->slow_diffusion * prop->time_step / ( prop->step * prop->step );
 
-        if ( DIM == 1 || prop->periodic )
+        if ( DIM == 1 || prop->field_periodic )
             prepareDiffusion(theta);
         else
         {
@@ -172,7 +170,7 @@ void Field::diffuseX(real * field, real c)
     real * h = field + nx - 1;
     blas::xaxpy(nyz, -c, a, 1, h, ide);
     
-    if ( prop->periodic )
+    if ( prop->field_periodic )
     {
         real * n = field;
         blas::xcopy(nyz,  n, ide, b, 1);
@@ -206,7 +204,7 @@ void Field::laplacian(const real* field, real * mat) const
     // index of last valid X index:
     int xx = mGrid.breadth(0) - 1;
     
-    if ( prop->periodic )
+    if ( prop->field_periodic )
     {
         blas::xaxpy(nyz, -1, field+xx, nx, mat   , nx);
         blas::xaxpy(nyz, -1, field   , nx, mat+xx, nx);
@@ -247,7 +245,7 @@ void Field::laplacian(const real* field, real * mat) const
     }
     size_t yy = mGrid.breadth(1) - 1;
     
-    if ( prop->periodic )
+    if ( prop->field_periodic )
     {
         for ( size_t zz = 0; zz < mGrid.breadth(2); ++zz )
         {
@@ -273,7 +271,7 @@ void Field::laplacian(const real* field, real * mat) const
     blas::xaxpy(nbc-nxy, -1, field+nxy, 1, mat,     1);
     size_t zz = mGrid.breadth(2) - 1;
     
-    if ( prop->periodic )
+    if ( prop->field_periodic )
     {
         blas::xaxpy(nxy, -1, field+ss*zz, 1, mat      , 1);
         blas::xaxpy(nxy, -1, field      , 1, mat+ss*zz, 1);
@@ -391,7 +389,7 @@ void Field::step(FiberSet& fibers)
     }
 
     // diffusion:
-    if ( prop->diffusion > 0 )
+    if ( prop->slow_diffusion > 0 )
     {
         assert_true( fiTMP );
         assert_true( fiTMPSize == nbc );

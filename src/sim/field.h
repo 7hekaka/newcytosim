@@ -139,7 +139,7 @@ public:
             Vector inf, sup;
             prop->field_space_ptr->boundaries(inf, sup);
             
-            if ( prop->periodic )
+            if ( prop->field_periodic )
             {
                 for ( size_t d = 0; d < DIM; ++d )
                     mGrid.setPeriodic(d, true);
@@ -180,7 +180,13 @@ public:
     /// set all cells to value = volume * conc
     void setConcentration(FieldGrid::value_type conc)
     {
+#if 0
         mGrid.setValues( conc * mGrid.cellVolume() );
+#else
+        FieldGrid::value_type val = conc * mGrid.cellVolume();
+        for ( size_t i = 0; i < mGrid.nbCells(); ++i )
+            mGrid[i] = val * RNG.exponential();
+#endif
     }
     
     

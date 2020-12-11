@@ -216,7 +216,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
     //            yi(t) = (+-tRadius - t)^2 / 4tWidth
     
     if ( W.XX <= tJunction ) {
-        if ( W.YY >= (square(-tRadius - xRel)/(4.*tRadius)) ) {
+        if ( W.YY >= (square(-tRadius - xRel)/(4*tRadius)) ) {
             //w is projected on the corner
             pX =  tJunction-tRadius;
             pY =  tRadius;
@@ -228,7 +228,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
         }
     }
     else {
-        if ( W.YY >= (square(tRadius - xRel)/(4.*tRadius)) ) {
+        if ( W.YY >= (square(tRadius - xRel)/(4*tRadius)) ) {
             //w is projected on the corner
             pX =  tJunction+tRadius;
             pY =  tRadius;
@@ -297,7 +297,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
             ABORT_NOW("Failed to solve quartic for the intersection area.");
         
         // calculate x from t
-        xSolTurned = 2.*xTurned/(s1 + 2.);
+        xSolTurned = 2*xTurned/(s1 + 2);
         
         // turn the point back to it's original position
         xSol = xSolTurned * M_SQRT1_2;

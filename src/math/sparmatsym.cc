@@ -105,6 +105,7 @@ void SparMatSym::allocateColumn(const size_t jj, size_t alc)
         }
         column_[jj] = ptr;
         colmax_[jj] = alc;
+        assert_true( alc == colmax_[jj] );
     }
 }
 

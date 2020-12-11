@@ -164,7 +164,7 @@ private:
     Column * column_;
     
     /// colidx_[i] is the index of the first non-empty column of index >= i
-    unsigned * colidx_;
+    size_t * colidx_;
 
 public:
     
