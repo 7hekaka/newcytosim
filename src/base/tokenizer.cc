@@ -463,10 +463,10 @@ std::string Tokenizer::get_hexadecimal(std::istream& is)
  get_token() reads the next 'token' in stream.
  It can be:
  - a symbol starting with an alpha character
- - a block enclosed by '{}', '()' and '""',
+ - a block enclosed by delimiters: {}, () or ""
  - a number 
  - the new line character ('\n') if 'eat_line=true'
- - a single character (except '\n')
+ - a single character, except '\n' if 'eat_line=false'
  */
 
 std::string Tokenizer::get_token(std::istream& is, bool eat_line)

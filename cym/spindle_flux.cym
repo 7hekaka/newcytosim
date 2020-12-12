@@ -138,9 +138,9 @@ repeat 10
       solve = flux
   }
 
-  write fiber   fibers.txt
-  write spindle:indices indices.txt
-  write spindle:profile profile.txt
+  write fibers.txt fiber
+  write indices.txt spindle:indices
+  write profile.txt spindle:profile
 }
 
 

@@ -1017,7 +1017,7 @@ void Interface::execute_write(std::string const& name, std::string const& what, 
     int ver = 1;
     opt.set(ver, "verbose");
     std::string str;
-    VLOG("-REPORT " << what << " to " << file << '\n');
+    VLOG("-WRITE " << what << " to " << file << '\n');
     
     std::ostream* osp = &std::cout;
     std::ofstream ofs;

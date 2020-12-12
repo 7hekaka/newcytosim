@@ -123,14 +123,14 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
         {
             out << '\n' << e.brief();
         }
+        // check for another report instruction:
         char c = Tokenizer::get_character(is, true, false);
         if ( c == EOF )
             break;
         if ( c != ',' )
         {
             out << '\n';
-            char rest[256] = { 0 };
-            rest[0] = c;
+            char rest[256] = { c };
             is.getline(rest+1, sizeof(rest)-1);
             throw InvalidParameter("unexpected `" + std::string(rest) + "' in report string");
         }
@@ -296,7 +296,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "segment" )
             return reportFiberSegments(out);
         if ( what == "length" )
-            return reportFiberLengths(out);
+            return reportFiberLengths(out, sel, com);
         if ( what == "distribution" || what == "histogram" )
             return reportFiberLengthHistogram(out, opt);
         if ( what == "tension" )
@@ -464,7 +464,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "custom" )
         return reportCustom(out);
 
-    throw InvalidSyntax("unknown report `"+who+"'");
+    throw InvalidSyntax("unknown report `"+who+":"+what+"'");
 }
 
 //------------------------------------------------------------------------------
@@ -497,34 +497,46 @@ void Simul::reportFiberAge(std::ostream& out) const
     }
 }
 
+
+/**
+Export average length and standard-deviation for a class of fiber
+*/
+void Simul::reportFiberLengths(std::ostream& out, FiberProp const* fp) const
+{
+    size_t cnt;
+    real avg, dev, mn, mx;
+    ObjectList objs = fibers.collect(fp);
+    fibers.infoLength(objs, cnt, avg, dev, mn, mx);
+    
+    out << LIN << ljust(fp->name(), 2);
+    out << SEP << cnt;
+    out.precision(3);
+    out << SEP << std::fixed << avg;
+    out << SEP << std::fixed << dev;
+    out << SEP << std::fixed << mn;
+    out << SEP << std::fixed << mx;
+    out.precision(1);
+    out << SEP << std::fixed << avg*cnt;
+}
+
 /**
  Export average length and standard-deviation for each class of fiber
  */
-void Simul::reportFiberLengths(std::ostream& out) const
+void Simul::reportFiberLengths(std::ostream& out, Property const* sel, bool com) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "std_dev";
-    out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
-
-    size_t cnt;
-    real avg, dev, mn, mx;
+    if ( com )
+    {
+        out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "std_dev";
+        out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
+    }
     
     std::streamsize p = out.precision();
-    for ( Property const* i : properties.find_all("fiber") )
+    if ( sel )
+        reportFiberLengths(out, static_cast<FiberProp const*>(sel));
+    else
     {
-        FiberProp const* fp = static_cast<FiberProp const*>(i);
-        
-        ObjectList objs = fibers.collect(fp);
-        fibers.infoLength(objs, cnt, avg, dev, mn, mx);
-        
-        out << LIN << ljust(fp->name(), 2);
-        out << SEP << cnt;
-        out.precision(3);
-        out << SEP << std::fixed << avg;
-        out << SEP << std::fixed << dev;
-        out << SEP << std::fixed << mn;
-        out << SEP << std::fixed << mx;
-        out.precision(1);
-        out << SEP << std::fixed << avg*cnt;
+        for ( Property const* i : properties.find_all("fiber") )
+            reportFiberLengths(out, static_cast<FiberProp const*>(i));
     }
     out.precision(p);
 }

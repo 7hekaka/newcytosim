@@ -716,7 +716,7 @@ void Parser::parse_run(std::istream& is)
 
 //------------------------------------------------------------------------------
 /**
- Read and execute another config file.
+ Read and execute commands from another config file.
  
      read FILE_NAME
      {
@@ -732,8 +732,8 @@ void Parser::parse_run(std::istream& is)
 
 void Parser::parse_read(std::istream& is)
 {
-    std::streampos ipos = is.tellg();
     bool required = true;
+    std::streampos ipos = is.tellg();
     std::string file = Tokenizer::get_path(is);
     
     if ( file.empty() )
@@ -881,20 +881,71 @@ void Parser::parse_export(std::istream& is)
  
  Examples:
  
-     report parameters parameters.cmo { append=0 }
+     report parameters parameters.txt { append=0 }
      report fiber:length fibers_length.txt
  
  Note that writing to a file is normally disabled for `play`.
  */
 
-void Parser::parse_write(std::istream& is)
+void Parser::parse_report(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_polysymbol(is);
+    while ( is.peek() == ',' )
+        what += "," + Tokenizer::get_polysymbol(is);
     std::string file = Tokenizer::get_path(is);
-
+    
     if ( file.empty() )
-        throw InvalidSyntax("missing file name. Expected 'write WHAT FILE'");
+        throw InvalidSyntax("expected 'report CLASS:REPORT FILE'");
+    
+    std::string blok = Tokenizer::get_block(is, '{');
+    
+    if ( do_run && ( do_write || file == "*" ))
+    {
+        Glossary opt(blok);
+        execute_write(file, what, opt);
+        check_warnings(opt, is, ipos);
+    }
+}
+
+/**
+Export formatted data to file. The general syntax is:
+
+    write FILE_NAME WHAT [WHAT] ...
+    {
+      append = BOOL
+    }
+
+Short syntax:
+
+    write FILE_NAME WHAT [WHAT] ...
+
+A `*` can be specified instead of a file name, to designate the standard output.
+WHAT should be a valid argument to `report`:
+@copydetails Simul::report
+
+Examples:
+
+    write * fiber:energy
+    write data.txt microtubule:length actin:length { verbose = 0 }
+
+Note that writing to a file is normally disabled for `play`.
+*/
+
+void Parser::parse_write(std::istream& is)
+{
+    std::streampos ipos = is.tellg();
+    std::string file = Tokenizer::get_path(is);
+    if ( file.empty() )
+        throw InvalidSyntax("expected 'write FILE WHAT'");
+
+    std::string what = Tokenizer::get_polysymbol(is);
+    std::string more = Tokenizer::get_polysymbol(is);
+    while ( !more.empty() )
+    {
+        what += "," + more;
+        more = Tokenizer::get_polysymbol(is);
+    }
     
     std::string blok = Tokenizer::get_block(is, '{');
     
@@ -1144,7 +1195,9 @@ int Parser::evaluate_one(std::istream& is)
 #endif
     else if ( tok == "cut" )
         parse_cut(is);
-    else if ( tok == "report" || tok == "write" )
+    else if ( tok == "report" )
+        parse_report(is);
+    else if ( tok == "write" )
         parse_write(is);
     else if ( tok == "import" )
         parse_import(is);

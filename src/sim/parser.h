@@ -61,6 +61,9 @@ private:
     /// parse command `write`
     void      parse_write(std::istream&);
     
+    /// parse command `report`
+    void      parse_report(std::istream&);
+
     /// parse command `import`
     void      parse_import(std::istream&);
     
