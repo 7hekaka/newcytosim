@@ -216,7 +216,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
     //            yi(t) = (+-tRadius - t)^2 / 4tWidth
     
     if ( W.XX <= tJunction ) {
-        if ( W.YY >= (square(-tRadius - xRel)/(4*tRadius)) ) {
+        if ( W.YY*(4*tRadius) >= square(-tRadius - xRel) ) {
             //w is projected on the corner
             pX =  tJunction-tRadius;
             pY =  tRadius;
@@ -228,7 +228,7 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
         }
     }
     else {
-        if ( W.YY >= (square(tRadius - xRel)/(4*tRadius)) ) {
+        if ( W.YY*(4*tRadius) >= square(tRadius - xRel) ) {
             //w is projected on the corner
             pX =  tJunction+tRadius;
             pY =  tRadius;
@@ -283,9 +283,9 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
         }
     }
     else {
-        real s1, s2, s3, s4;     // solutions of the quartic
-        int    nSol;             // number of real solutions
-        real   xSol, xSolTurned; // the correct solutions of the quartic and of x
+        real s1, s2, s3, s4;   // solutions of the quartic
+        int  nSol;             // number of real solutions
+        real xSol, xSolTurned; // the correct solutions of the quartic and of x
         
         // solve the quartic
         nSol = QuarticSolver::solveQuartic(1, 6, (13-   (2*xTurnedSq +   W.ZZ*W.ZZ) / tRadiusSq),

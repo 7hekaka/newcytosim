@@ -162,7 +162,7 @@ inline static real sign_select(real const val, real const neg, real const pos)
     return ( val < 0 ? neg : pos );
 }
 
-/// sign of a 'real': -1 or +1; result is +1 if ( x == 0 )
+/// sign of a 'real': -1 or +1; result is +1 if ( x == 0 ) and -1 if ( x == -0 )
 inline static real sign_real(const real x)
 {
 #if REAL_IS_DOUBLE

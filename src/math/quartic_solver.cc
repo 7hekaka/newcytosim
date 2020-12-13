@@ -12,8 +12,8 @@
 /// apply one step of Halley's method (convergence is cubic in general)
 void QuarticSolver::refineQuadratic(const real A, const real B, const real C, real& x)
 {
-    real   F = quadratic(A, B, C, x);
-    real  dF = 2*A*x + B;
+    real  F = quadratic(A, B, C, x);
+    real dF = 2*A*x + B;
     
     if ( dF != 0 )
         x -= ( F * dF ) / ( dF * dF - A * F );
@@ -23,8 +23,8 @@ void QuarticSolver::refineQuadratic(const real A, const real B, const real C, re
 /// apply one step of Halley's method (convergence is cubic in general)
 void QuarticSolver::refineCubic(const real A, const real B, const real C, const real D, real& x)
 {
-    real   F = cubic(A, B, C, D, x);
-    real  dF = quadratic(3*A, 2*B, C, x);
+    real  F = cubic(A, B, C, D, x);
+    real dF = quadratic(3*A, 2*B, C, x);
     
     if ( dF != 0 )
     {
@@ -37,8 +37,8 @@ void QuarticSolver::refineCubic(const real A, const real B, const real C, const 
 /// apply one step of Halley's method (convergence is cubic in general)
 void QuarticSolver::refineQuartic(const real A, const real B, const real C, const real D, const real E, real& x)
 {
-    real   F = quartic(A, B, C, D, E, x);
-    real  dF = cubic(4*A, 3*B, 2*C, D, x);
+    real  F = quartic(A, B, C, D, E, x);
+    real dF = cubic(4*A, 3*B, 2*C, D, x);
     
     if ( dF != 0 )
     {

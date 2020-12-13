@@ -27,10 +27,7 @@ namespace QuarticSolver
         cplx root() const
         {
             real n = norm();
-            if  ( i >= 0 )
-                return cplx(std::sqrt(0.5*( n + r )),  std::sqrt(0.5*( n - r )));
-            else
-                return cplx(std::sqrt(0.5*( n + r )), -std::sqrt(0.5*( n - r )));
+            return cplx(std::sqrt(0.5*(n+r)), std::copysign(real(1.0), i)*std::sqrt(0.5*(n-r)));
         }
     };
         
@@ -158,9 +155,7 @@ namespace QuarticSolver
                    TYPE& r1, TYPE& r2, TYPE& r3)
     {
         int n = solveCubicUnsorted(A, B, C, D, r1, r2, r3);
-        
         sortInPlace(n, r1, r2, r3);
-        
         return n;
     }
     
@@ -181,13 +176,11 @@ namespace QuarticSolver
                      TYPE& r1, TYPE& r2, TYPE& r3, TYPE& r4)
     {
         int n = solveQuarticUnsorted(A, B, C, D, E, r1, r2, r3, r4);
-        
         sortInPlace(n, r1, r2, r3, r4);
-        
         return n;
     }
-        
-            
+    
+    
     //----------------------------------------------------------------------------
     
     /// apply one step of Halley's method (convergence is cubic in general)
