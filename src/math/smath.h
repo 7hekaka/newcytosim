@@ -55,68 +55,85 @@ namespace sMath
         return std::max(std::max(a,b), std::max(c,d));
     }
     
-    /// return index of the arguments that is the smallest
+    /// sort in ascending order
+    template <typename T>
+    inline void sort(const T& a, const T& b)
+    {
+        T i = std::min(a, b);
+        T s = std::max(a, b);
+        a = i;
+        b = s;
+    }
+    
+    /// sort in ascending order
+    template <typename T>
+    inline void sort(const T& a, const T& b, const T& c)
+    {
+        sort(a, b);
+        sort(b, c);
+        sort(a, b);
+    }
+
+    /// sort in ascending order
+    template <typename T>
+    inline void sort(const T& a, const T& b, const T& c, const T& d)
+    {
+        sort(a, b);
+        sort(c, d);
+        sort(a, c);
+        sort(b, d);
+        sort(b, c);
+    }
+
+    /// sort in ascending order
+    template <typename T>
+    inline void sort(const T& a, const T& b, const T& c, const T& d, const T& e)
+    {
+        //4 inputs [[1 2][3 4][1 3][2 4][2 3]]
+        //5 inputs [[1 2][3 4][1 3][2 5][1 2][3 4][2 3][4 5][3 4]]
+        //6 inputs [[1 2][3 4][5 6][1 3][2 5][4 6][1 2][3 4][5 6][2 3][4 5][3 4]]
+        sort(a, b);
+        sort(c, d);
+        sort(a, c);
+        sort(b, e);
+        sort(a, b);
+        sort(c, d);
+        sort(b, c);
+        sort(d, e);
+        sort(c, d);
+    }
+
+    /// return index of the arguments that is the smallest, in {0, 1, 2}
     template <typename T>
     inline int arg_min(const T& a, const T& b, const T& c)
     {
-        if ( a > b )
-            return 1 + ( b > c );
-        else
-            return ( a > c ) * 2;
+        return 2*( c < std:min(b,a) ) | ( b < std::min(a,c) );
     }
     
-    /// return index of the arguments that is the largest
+    /// return index of the arguments that is the largest, in {0, 1, 2}
     template <typename T>
     inline int arg_max(const T& a, const T& b, const T& c)
     {
-        if ( a < b )
-            return 1 + ( b < c );
-        else
-            return ( a < c ) * 2;
+        return 2*( c > std:max(b,a) ) | ( b > std::max(a,c) );
     }
 
     /// return index of the arguments that is the smallest
     template <typename T>
     inline int arg_min(const T& a, const T& b, const T& c, const T& d)
     {
-        if ( a > b )
-        {
-            // consider ( b, c, d )
-            if ( b > c )
-                return 2 + ( c > d );
-            else
-                return 1 + ( b > d ) * 2;
-        }
-        else
-        {
-            // consider ( a, c, d )
-            if ( a > c )
-                return 2 + ( c > d );
-            else
-                return ( a > d ) * 3;
-        }
+        T ab = std::min(a, b);
+        T cd = std::min(c, d);
+        return 3*( d < std::min(c,ab) ) | 2*( c < std::min(d,ab) ) | ( b < std::min(a,cd) );
     }
     
     /// return index of the arguments that is the largest
     template <typename T>
     inline int arg_max(const T& a, const T& b, const T& c, const T& d)
     {
-        if ( a < b )
-        {
-            // consider ( b, c, d )
-            if ( b < c )
-                return ( c < d ) ? 3 : 2;
-            else
-                return ( b < d ) ? 3 : 1;
-        }
-        else
-        {
-            // consider ( a, c, d )
-            if ( a < c )
-                return ( c < d ) ? 3 : 2;
-            else
-                return ( a < d ) ? 3 : 0;
-        }
+        T ab = std::max(a, b);
+        T cd = std::max(c, d);
+        return 3*( d > std::max(c,ab) ) | 2*( c > std::max(d,ab) ) | ( b > std::max(a,cd) );
+
     }
 
 
@@ -129,9 +146,9 @@ namespace sMath
     template < typename FLOAT >
     inline void orthonormal(const FLOAT z[3], FLOAT x[3], FLOAT y[3])
     {
-        const FLOAT s = std::copysign((FLOAT)1.0, z[2]);
+        const FLOAT s = std::copysign((FLOAT)1, z[2]);
 #if ( 1 )
-        /// optimized version by Marc B. Reynolds
+        // optimized version by Marc B. Reynolds
         const FLOAT a = z[1] / ( z[2] + s );
         const FLOAT b = z[1] * a;
         const FLOAT c = z[0] * a;
@@ -139,12 +156,13 @@ namespace sMath
         x[1] = c;
         x[2] = z[0];
         y[0] = s * c;
-        y[1] = s * b - 1.0f;
+        y[1] = s * b - 1;
         y[2] = s * z[1];
 #else
-        const FLOAT a = -1.0f / ( a[2] + s );
+        // original code from Tom Duff et al.
+        const FLOAT a = -1 / ( a[2] + s );
         const FLOAT b = a[0] * a[1] * a;
-        x[0] = 1.0 + s * z[0] * z[0] * a;
+        x[0] = 1 + s * z[0] * z[0] * a;
         x[1] = s * b;
         x[2] = -s * z[0];
         y[0] = b;

@@ -67,61 +67,72 @@ namespace QuarticSolver
      Sort in decreasing order
      */
     template < typename TYPE >
-    void sortInPlace(int n, TYPE& x1, TYPE& x2, TYPE& x3)
+    void sort(TYPE& x1, TYPE& x2)
+    {
+        if ( x1 < x2 )
+        {
+            TYPE x = x2;
+            x2 = x1;
+            x1 = x;
+        }
+    }
+
+    template < typename TYPE >
+    void sort(TYPE& x1, TYPE& x2, TYPE& x3)
     {
         TYPE x;
-        if ( n > 2 && x1 < x3 )
+        if ( x1 < x3 )
         {
             x  = x3;
             x3 = x1;
             x1 = x;
         }
-        if ( n > 1 && x1 < x2 )
+        if ( x1 < x2 )
         {
             x  = x2;
             x2 = x1;
             x1 = x;
         }
-        if ( n > 2 && x2 < x3 )
+        if ( x2 < x3 )
         {
             x  = x3;
             x3 = x2;
             x2 = x;
         }
     }
-    
+
     /**
      Sort in decreasing order
      */
     template < typename TYPE >
-    void sortInPlace(int n, TYPE& x1, TYPE& x2, TYPE& x3, TYPE& x4)
+    void sort(TYPE& x1, TYPE& x2, TYPE& x3, TYPE& x4)
     {
         TYPE x;
-        if ( n > 3 && x2 < x4 )
+        if ( x2 < x4 )
         {
             x  = x4;
             x4 = x2;
             x2 = x;
         }
-        if ( n > 2 && x1 < x3 )
+        if ( x1 < x3 )
         {
             x  = x3;
             x3 = x1;
             x1 = x;
         }
-        if ( n > 3 && x3 < x4 )
+        if ( x3 < x4 )
         {
             x  = x4;
             x4 = x3;
             x3 = x;
         }
-        if ( n > 1 && x1 < x2 )
+        if ( x1 < x2 )
         {
             x  = x2;
             x2 = x1;
             x1 = x;
         }
-        if ( n > 2 && x2 < x3 )
+        if ( x2 < x3 )
         {
             x  = x3;
             x3 = x2;
@@ -155,7 +166,13 @@ namespace QuarticSolver
                    TYPE& r1, TYPE& r2, TYPE& r3)
     {
         int n = solveCubicUnsorted(A, B, C, D, r1, r2, r3);
-        sortInPlace(n, r1, r2, r3);
+        switch( n )
+        {
+            case 0: break;
+            case 1: break;
+            case 2: sort(r1, r2);
+            case 3: sort(r1, r2, r3);
+        }
         return n;
     }
     
@@ -176,7 +193,14 @@ namespace QuarticSolver
                      TYPE& r1, TYPE& r2, TYPE& r3, TYPE& r4)
     {
         int n = solveQuarticUnsorted(A, B, C, D, E, r1, r2, r3, r4);
-        sortInPlace(n, r1, r2, r3, r4);
+        switch( n )
+        {
+            case 0: break;
+            case 1: break;
+            case 2: sort(r1, r2);
+            case 3: sort(r1, r2, r3);
+            case 4: sort(r1, r2, r3, r4);
+        }
         return n;
     }
     
