@@ -92,8 +92,8 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
 void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
 {
     std::streamsize op = out.precision(), p = 4;
-    opt.peek(p, "precision");
-    opt.peek(column_width, "column") || opt.peek(column_width, "width");
+    opt.set(p, "precision");
+    opt.set(column_width, "column") || opt.peek(column_width, "width");
     
     // use fixed notation:
     out.setf(std::ios_base::fixed, std::ios_base::floatfield);
@@ -766,7 +766,13 @@ void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
     out << SEP << fib->posEnd(CENTER);
     out << SEP << fib->dirEnd(CENTER);
     out << SEP << (fib->posEndM()-fib->posEndP()).norm();
-    out << SEP << dot(fib->dirEndM(), fib->dirEndP());
+    real C = dot(fib->dirEndM(), fib->dirEndP());
+#if ( DIM == 3 )
+    real S = cross(fib->dirEndM(), fib->dirEndP()).norm();
+#else
+    real S = cross(fib->dirEndM(), fib->dirEndP());
+#endif
+    out << SEP << C << SEP << S;
     out << SEP << organizers.findOrganizerID(fib);
 }
 
@@ -792,8 +798,8 @@ void Simul::reportFibersSorted(std::ostream& out, Property const* sel, bool com)
     if ( com )
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
-        out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
-        out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
+        out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
+        out << SEP << "cosinus" << SEP << "sinus" << SEP << "organizer";
     }
 
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
@@ -812,8 +818,8 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
     if ( com )
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
-        out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir");
-        out << SEP << "endToEnd" << SEP << "cosinus" << SEP << "organizer";
+        out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
+        out << SEP << "cosinus" << SEP << "sinus" << SEP << "organizer";
     }
 
     // list fibers in the order of the inventory:
@@ -1157,8 +1163,6 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
     size_t cnt;
     real avg, dev;
     
-    std::streamsize p = out.precision();
-    out.precision(3);
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
@@ -1174,7 +1178,6 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
             out << SEP << fp->rigidity;
         }
     }
-    out.precision(p);
 }
 
 

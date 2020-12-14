@@ -21,7 +21,7 @@ Description:
 F. Nedelec, 8.12.2020
 """
 
-import sys, os, subprocess, math, hashlib
+import sys, os, subprocess, math
 import matplotlib.pyplot as plt
 from pyned import uncode
 

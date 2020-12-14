@@ -67,9 +67,26 @@ public:
     unsigned  couple_flip;
     
     /// selection bitfield for Couples
+    /**
+     This is a bitfield:
+     
+         bit 1 (value 1) means `show free couple`
+         bit 2 (value 2) means `show bound couple`
+         bit 3 (value 4) means `show bridge couple`
+     
+     Hence value 7 (the default) will show all couples, while 3 will show free and bound couples but not bridge couple, etc.
+     */
     unsigned  couple_select;
     
     /// selection bitfield for Singles
+    /**
+     This is a bitfield:
+     
+         bit 1 (value 1) means `show free single`
+         bit 2 (value 2) means `show bound single`
+     
+     Hence value 3 (the default) will show all singles.
+     */
     unsigned  single_select;
     
     /// flag to display Meca's links
