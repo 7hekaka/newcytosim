@@ -52,7 +52,7 @@ In this case, `message.cmo` will include a summary as follows:
 	F10         9.00s   CPU      0.447s           4s
 	        size 3*3400 kern 17 SMSBx +9*6 precond 1 count   8 residual 0.00113671 
 	        size 3*3400 kern 17 SMSBx +9*5 precond 1 count   8 residual 0.000948063
-	 precond selection 8 | method cnt cpu | 0   34.2      4 | 1    7.8      2 | 2   12.8      5 | 4    2.0     16 |  -----> 1
+	 precond selection 8 | method count cpu | 0   34.2      4 | 1    7.8      2 | 2   12.8      5 | 4    2.0     16 |  -----> 1
 
 Line 1 is Frame 10, at 9 seconds and the system is 3D of size `3*3400`.
 

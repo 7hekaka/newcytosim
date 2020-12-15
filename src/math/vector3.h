@@ -531,15 +531,38 @@ public:
         real ay = abs_real(YY);
         real az = abs_real(ZZ);
         
+        // select axis for which vector component is the smallest:
         real x = ax - std::min(ay, az); // negative if XX is smallest
-        real y = ay - std::min(az, ax);
+        real y = ay - std::min(az, ax); // negative if YY is smallest
         real z = std::min(x, y); // use z if x and y are positive (could use bitwise OR)
 
+        // form cross product with axis (only one of x or y can be negative)
         return Vector3(sign_select(z, 0, YY) - sign_select(y, ZZ, 0),
                        sign_select(x, ZZ, 0) - sign_select(z, 0, XX),
                        sign_select(y, XX, 0) - sign_select(x, YY, 0));
     }
     
+#if ( 1 )
+    /// returns a perpendicular Vector, of norm `n`
+    const Vector3 orthogonal(const real n) const
+    {
+        real ax = abs_real(XX);
+        real ay = abs_real(YY);
+        real az = abs_real(ZZ);
+        
+        real x = ax - std::min(ay, az); // negative if XX is smallest
+        real y = ay - std::min(az, ax); // negative if YY is smallest
+        real z = std::min(x, y); // use z if x and y are positive
+
+        // form cross product with axis (only one of x or y can be negative)
+        ax = sign_select(z, 0, YY) - sign_select(y, ZZ, 0);
+        ay = sign_select(x, ZZ, 0) - sign_select(z, 0, XX);
+        az = sign_select(y, XX, 0) - sign_select(x, YY, 0);
+        // normalize:
+        real s = n / std::sqrt( ax*ax + ay*ay + az*az );
+        return Vector3(ax*s, ay*s, az*s);
+    }
+#else
     /// returns a perpendicular vector, of norm `n`
     const Vector3 orthogonal(const real n) const
     {
@@ -574,7 +597,7 @@ public:
             }
         }
     }
-    
+#endif
     /// returns a vector perpendicular to *this, close to `d` and of norm = `n`
     /**
      This removes the component of `n` parallel to *this,
