@@ -192,29 +192,6 @@ public:
         TT = a[3] - b[3];
 #endif
     }
-        
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const float a[], const float b[], const float C)
-    {
-        XX = a[0] + C * ( b[0] - a[0] );
-        YY = a[1] + C * ( b[1] - a[1] );
-        ZZ = a[2] + C * ( b[2] - a[2] );
-        TT = a[3] + C * ( b[3] - a[3] );
-    }
-
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const double a[], const double b[], const double C)
-    {
-#if VECTOR4_USES_AVX
-        vec4 A = loadu4(a), B = loadu4(b);
-        vec = fmadd4(set4(C), sub4(B, A), A);
-#else
-        XX = a[0] + C * ( b[0] - a[0] );
-        YY = a[1] + C * ( b[1] - a[1] );
-        ZZ = a[2] + C * ( b[2] - a[2] );
-        TT = a[3] + C * ( b[3] - a[3] );
-#endif
-    }
     
     /// copy coordinates to given array
     void store(float b[]) const
@@ -478,11 +455,53 @@ public:
 
     //------------------------------------------------------------------
     
-    /// linear interpolation, returning a + x * b
-    friend const Vector4 interpolate(const Vector4& a, real x, const Vector4& b)
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const float a[], const float C, const float b[])
     {
-        return Vector4(a.XX+x*b.XX, a.YY+x*b.YY, a.ZZ+x*b.ZZ, a.TT+x*b.TT);
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+        TT = a[3] + C * ( b[3] - a[3] );
     }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const double a[], const double C, const double b[])
+    {
+#if VECTOR4_USES_AVX
+        vec4 A = loadu4(a), B = loadu4(b);
+        vec = fmadd4(set4(C), sub4(B, A), A);
+#else
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+        TT = a[3] + C * ( b[3] - a[3] );
+#endif
+    }
+    
+    /// linear interpolation, returning a + x * b
+    static const Vector4 interpolated(const Vector4& a, real C, const Vector4& b)
+    {
+        return Vector4(a.XX+C*b.XX, a.YY+C*b.YY, a.ZZ+C*b.ZZ, a.TT+C*b.TT);
+    }
+    
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector4 interpolated(const float a[], const float C, const float b[])
+    {
+        return Vector4(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]), a[2]+C*(b[2]-a[2]), a[3]+C*(b[3]-a[3]));
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector4 interpolated(const double a[], const double C, const double b[])
+    {
+#if VECTOR3_USES_AVX
+        vec4 A = loadu4(a), B = loadu4(b);
+        return Vector4(fmadd4(set4(C), sub4(B, A), A));
+#else
+        return Vector4(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]), a[2]+C*(b[2]-a[2]), a[3]+C*(b[3]-a[3]));
+#endif
+    }
+
+    //------------------------------------------------------------------
     
     /// addition of two vectors
     friend const Vector4 operator +(Vector4 const& a, Vector4 const& b)

@@ -129,13 +129,13 @@ public:
 
     //--------------------------------------------------------------------------
     
-    /// Position of point 'p' of the object
-    /** this is identical to posPoint(), it exists for historical reasons*/
-    const Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
-    
     /// Position of vertex number 'p' (indices starting at zero)
     Vector       posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
+    /// Position of point 'p' of the object
+    /** this is identical to posPoint(), it exists for historical reasons*/
+    const Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
+
     /// Address of coordinate array
     const real * addrPoints()        const { return pPos; }
     
@@ -199,7 +199,7 @@ public:
     }
     
     /// Difference of two points = Q - P = vector PQ
-    Vector diffPoints(const size_t P, const size_t Q) const
+    const Vector diffPoints(const size_t P, const size_t Q) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
@@ -209,13 +209,12 @@ public:
     }
     
     /// intermediate position between P and Q=P+1 = P + A * ( Q - P )
+    /** with A = 0.5, this returns the middle of segment P */
     Vector posPoint(size_t P, const real A) const
     {
         assert_true( P+1 < nPoints );
         //assert_true( 0 <= A && A <= 1 );
-        Vector vec;
-        vec.interpolate(pPos+DIM*P, pPos+DIM*P+DIM, A);
-        return vec;
+        return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*P+DIM);
     }
 
     /// Calculate intermediate position = P + a * ( Q - P )
@@ -224,9 +223,7 @@ public:
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
         //assert_true( 0 <= A && A <= 1 );
-        Vector vec;
-        vec.interpolate(pPos+DIM*P, pPos+DIM*Q, A);
-        return vec;
+        return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*Q);
     }
     
     //--------------------------------------------------------------------------

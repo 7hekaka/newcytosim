@@ -203,31 +203,7 @@ public:
         ZZ = a[2] - b[2];
 #endif
     }
-        
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const float a[], const float b[], const float C)
-    {
-        XX = a[0] + C * ( b[0] - a[0] );
-        YY = a[1] + C * ( b[1] - a[1] );
-        ZZ = a[2] + C * ( b[2] - a[2] );
-#if VECTOR3_USES_AVX
-        vec[3] = 0;
-#endif
-    }
 
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const double a[], const double b[], const double C)
-    {
-#if VECTOR3_USES_AVX
-        vec4 A = load3(a), B = load3(b);
-        vec = fmadd4(set4(C), sub4(B, A), A);
-#else
-        XX = a[0] + C * ( b[0] - a[0] );
-        YY = a[1] + C * ( b[1] - a[1] );
-        ZZ = a[2] + C * ( b[2] - a[2] );
-#endif
-    }
-    
     /// copy coordinates to given array
     void store(float b[]) const
     {
@@ -724,13 +700,56 @@ public:
     }
     
     //------------------------------------------------------------------
-    
-    /// linear interpolation, returning a + x * b
-    friend const Vector3 interpolate(const Vector3& a, real x, const Vector3& b)
+        
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const float a[], const float C, const float b[])
     {
-        return Vector3(a.XX+x*b.XX, a.YY+x*b.YY, a.ZZ+x*b.ZZ);
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+#if VECTOR3_USES_AVX
+        vec[3] = 0;
+#endif
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const double a[], const double C, const double b[])
+    {
+#if VECTOR3_USES_AVX
+        vec4 A = load3(a), B = load3(b);
+        vec = fmadd4(set4(C), sub4(B, A), A);
+#else
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+        ZZ = a[2] + C * ( b[2] - a[2] );
+#endif
     }
     
+    /// linear interpolation, returning a + x * b
+    static const Vector3 interpolated(const Vector3& a, real C, const Vector3& b)
+    {
+        return Vector3(a.XX+C*b.XX, a.YY+C*b.YY, a.ZZ+C*b.ZZ);
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector3 interpolated(const float a[], const float C, const float b[])
+    {
+        return Vector3(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]), a[2]+C*(b[2]-a[2]));
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector3 interpolated(const double a[], const double C, const double b[])
+    {
+#if VECTOR3_USES_AVX
+        vec4 A = load3(a), B = load3(b);
+        return Vector3(fmadd4(set4(C), sub4(B, A), A));
+#else
+        return Vector3(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]), a[2]+C*(b[2]-a[2]));
+#endif
+    }
+
+    //------------------------------------------------------------------
+
     /// addition of two vectors
     friend const Vector3 operator +(Vector3 const& a, Vector3 const& b)
     {

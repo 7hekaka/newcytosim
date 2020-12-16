@@ -438,7 +438,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
         {
             FiberSegment seg(fib, s);
-            list = grid.cellTargets(seg.center());
+            list = grid.cellTargets(seg.middle());
             //std::clog << seg << ":";
             for ( FiberSegment const& can : list )
             {

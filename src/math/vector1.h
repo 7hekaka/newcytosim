@@ -113,18 +113,6 @@ public:
     {
         XX = a[0] - b[0];
     }
-        
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const float a[], const float b[], const float C)
-    {
-        XX = a[0] + C * ( b[0] - a[0] );
-    }
-
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const double a[], const double b[], const double C)
-    {
-        XX = a[0] + C * ( b[0] - a[0] );
-    }
 
     /// copy coordinates to given array
     void store(float b[]) const
@@ -334,11 +322,37 @@ public:
     
     //------------------------------------------------------------------
     
-    /// linear interpolation, returning a + x * b
-    friend const Vector1 interpolate(const Vector1& a, real x, const Vector1& b)
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const float a[], const float C, const float b[])
     {
-        return Vector1(a.XX+x*b.XX);
+        XX = a[0] + C * ( b[0] - a[0] );
     }
+    
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const double a[], const double C, const double b[])
+    {
+        XX = a[0] + C * ( b[0] - a[0] );
+    }
+    
+    /// linear interpolation, returning a + C * b
+    static const Vector1 interpolated(const Vector1& a, real C, const Vector1& b)
+    {
+        return Vector1(a.XX+C*b.XX);
+    }
+    
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector1 interpolated(const float a[], const float C, const float b[])
+    {
+        return Vector1(a[0]+C*(b[0]-a[0]));
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector1 interpolated(const double a[], const double C, const double b[])
+    {
+        return Vector1(a[0]+C*(b[0]-a[0]));
+    }
+
+    //------------------------------------------------------------------
     
     /// addition of two vectors
     friend const Vector1 operator +(Vector1 const& a, Vector1 const& b)

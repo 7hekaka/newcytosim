@@ -164,29 +164,6 @@ public:
 #endif
     }
     
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const float a[], const float b[], const float C)
-    {
-        XX = a[0] + C * ( b[0] - a[0] );
-        YY = a[1] + C * ( b[1] - a[1] );
-    }
-    
-    /// Calculate intermediate position = A + C * ( B - A )
-    void interpolate(const double a[], const double b[], const double C)
-    {
-#if VECTOR2_USES_SSE
-        vec2 A = loadu2(a), B = loadu2(b);
-#  ifdef __FMA__
-        vec = fmadd2(set2(C), sub2(B, A), A);
-#  else
-        vec = add2(mul2(set2(C), sub2(B, A)), A);
-#  endif
-#else
-        XX = a[0] + C * ( b[0] - a[0] );
-        YY = a[1] + C * ( b[1] - a[1] );
-#endif
-    }
-    
     /// copy coordinates to given array
     void store(float b[]) const
     {
@@ -478,12 +455,58 @@ public:
     
     //------------------------------------------------------------------
     
-    /// linear interpolation, returning a + x * b
-    friend const Vector2 interpolate(const Vector2& a, real x, const Vector2& b)
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const float a[], const float C, const float b[])
     {
-        return Vector2(a.XX+x*b.XX, a.YY+x*b.YY);
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
     }
     
+    /// Calculate intermediate position = A + C * ( B - A )
+    void interpolate(const double a[], const double C, const double b[])
+    {
+#if VECTOR2_USES_SSE
+        vec2 A = loadu2(a), B = loadu2(b);
+#  ifdef __FMA__
+        vec = fmadd2(set2(C), sub2(B, A), A);
+#  else
+        vec = add2(mul2(set2(C), sub2(B, A)), A);
+#  endif
+#else
+        XX = a[0] + C * ( b[0] - a[0] );
+        YY = a[1] + C * ( b[1] - a[1] );
+#endif
+    }
+    
+    /// linear interpolation, returning a + x * b
+    static const Vector2 interpolated(const Vector2& a, real C, const Vector2& b)
+    {
+        return Vector2(a.XX+C*b.XX, a.YY+C*b.YY);
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector2 interpolated(const float a[], const float C, const float b[])
+    {
+        return Vector2(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]));
+    }
+
+    /// Calculate intermediate position = A + C * ( B - A )
+    static const Vector2 interpolated(const double a[], const double C, const double b[])
+    {
+#if VECTOR2_USES_SSE
+        vec2 A = loadu2(a), B = loadu2(b);
+#  ifdef __FMA__
+        return Vector2(fmadd2(set2(C), sub2(B, A), A));
+#  else
+        return Vector2(add2(mul2(set2(C), sub2(B, A)), A));
+#  endif
+#else
+        return Vector2(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]));
+#endif
+    }
+
+    //------------------------------------------------------------------
+
     /// addition of two vectors
     friend const Vector2 operator +(Vector2 const& a, Vector2 const& b)
     {

@@ -46,7 +46,7 @@ class Glossary;
  
  Successive vertices are kept at a constant distance via constrained dynamics:
 
-    norm( posP(N+1)-posP(N) ) == Chain::segmentation()
+    norm( posPoint(N+1)-posPoint(N) ) == Chain::segmentation()
  
  \par Origin:
  
@@ -233,14 +233,16 @@ public:
     
     //---------------------
     
+    /// length of the Fiber, estimated from the difference of abscissa at the ends
+    /** This is the quantity that defines the length that the filament should have! */
+    real         length()                const { return fnAbscissaP - fnAbscissaM; }
+
     /// length of the Fiber, estimated from the segmentation and number of segments
+    /** This should be equal to length(), if computers did exact calculus */
     real         length1()               const { return nPoints * fnCut - fnCut; }
     
-    /// length of the Fiber, estimated from the difference of abscissa at the ends
-    real         length()                const { return fnAbscissaP - fnAbscissaM; }
-    
-    /// the sum of the distance between vertices (used for debugging)
-    real         trueLength()            const { return contourLength(pPos, nPoints); }
+    /// the sum of the distance between consecutive vertices (used for debugging)
+    real         contourLength()         const { return contourLength(pPos, nPoints); }
     
     /// true if ( abscissaM() <= a ) AND ( a <= abscissaP() )
     bool         betweenMP(const real a) const { return abscissaM() <= a + REAL_EPSILON && a <= abscissaP() + REAL_EPSILON; }
