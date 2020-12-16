@@ -542,7 +542,7 @@ public:
 #endif
     
     /// multiplication by a vector: this * V
-    const Vector3 vecmul0(Vector3 const& V) const
+    Vector3 vecmul0(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[1] * V.YY + val[2] * V.ZZ,
                        val[4] * V.XX + val[5] * V.YY + val[6] * V.ZZ,
@@ -550,7 +550,7 @@ public:
     }
     
     /// multiplication by a vector: this * V
-    const Vector3 vecmul0(real const* ptr) const
+    Vector3 vecmul0(real const* ptr) const
     {
         return Vector3(val[0] * ptr[0] + val[1] * ptr[1] + val[2] * ptr[2],
                        val[4] * ptr[0] + val[5] * ptr[1] + val[6] * ptr[2],
@@ -558,7 +558,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline const Vector3 vecmul(Vector3 const& vec) const
+    inline Vector3 vecmul(Vector3 const& vec) const
     {
 #if MATRIX34_USES_AVX
         return vecmul3(vec);
@@ -568,7 +568,7 @@ public:
     }
     
     /// multiplication by a vector: this * { ptr[0], ptr[1] }
-    const Vector3 vecmul(real const* ptr) const
+    Vector3 vecmul(real const* ptr) const
     {
 #if MATRIX34_USES_AVX
         return vecmul3(ptr);
@@ -584,7 +584,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const Vector3 trans_vecmul0(Vector3 const& V) const
+    Vector3 trans_vecmul0(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[4] * V.YY + val[ 8] * V.ZZ,
                        val[1] * V.XX + val[5] * V.YY + val[ 9] * V.ZZ,
@@ -592,7 +592,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const Vector3 trans_vecmul0(real const* V) const
+    Vector3 trans_vecmul0(real const* V) const
     {
         return Vector3(val[0] * V[0] + val[4] * V[1] + val[ 8] * V[2],
                        val[1] * V[0] + val[5] * V[1] + val[ 9] * V[2],
@@ -600,7 +600,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    inline const Vector3 trans_vecmul(real const* V) const
+    inline Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX34_USES_AVX
         return trans_vecmul3(V);

@@ -11,36 +11,36 @@
 //------------------------------------------------------------------------------
 #pragma mark - 1D Vectors
 
-const Vector1 Vector1::randS()        { return Vector1(  RNG.sreal()); }
-const Vector1 Vector1::randH()        { return Vector1(  RNG.shalf()); }
-const Vector1 Vector1::randS(real n)  { return Vector1(n*RNG.sreal()); }
-const Vector1 Vector1::randP()        { return Vector1(  RNG.preal()); }
-const Vector1 Vector1::randP(real n)  { return Vector1(n*RNG.preal()); }
-const Vector1 Vector1::randU()        { return Vector1(  RNG.sflip()); }
-const Vector1 Vector1::randU(real n)  { return Vector1(n*RNG.sflip()); }
-void  Vector1::addRand(real n)        { XX += n*RNG.sreal(); }
+Vector1 Vector1::randS()       { return Vector1(  RNG.sreal()); }
+Vector1 Vector1::randH()       { return Vector1(  RNG.shalf()); }
+Vector1 Vector1::randS(real n) { return Vector1(n*RNG.sreal()); }
+Vector1 Vector1::randP()       { return Vector1(  RNG.preal()); }
+Vector1 Vector1::randP(real n) { return Vector1(n*RNG.preal()); }
+Vector1 Vector1::randU()       { return Vector1(  RNG.sflip()); }
+Vector1 Vector1::randU(real n) { return Vector1(n*RNG.sflip()); }
+void  Vector1::addRand(real n) { XX += n*RNG.sreal(); }
 
-const Vector1 Vector1::randB()        { return Vector1(  RNG.sreal()); }
-const Vector1 Vector1::randB(real n)  { return Vector1(n*RNG.sreal()); }
-const Vector1 Vector1::randG(real n)  { return Vector1(n*RNG.gauss()); }
+Vector1 Vector1::randB()       { return Vector1(  RNG.sreal()); }
+Vector1 Vector1::randB(real n) { return Vector1(n*RNG.sreal()); }
+Vector1 Vector1::randG(real n) { return Vector1(n*RNG.gauss()); }
 
-const Vector1 Vector1::randOrthoU(real len) const { return Vector1(0.0); }
+Vector1 Vector1::randOrthoU(real len) const { return Vector1(0.0); }
 
 
 //------------------------------------------------------------------------------
 #pragma mark - 2D Vectors
 
-const Vector2 Vector2::randS()        { return Vector2(  RNG.sreal(),   RNG.sreal()); }
-const Vector2 Vector2::randH()        { return Vector2(  RNG.shalf(),   RNG.shalf()); }
-const Vector2 Vector2::randS(real n)  { return Vector2(n*RNG.sreal(), n*RNG.sreal()); }
-const Vector2 Vector2::randP()        { return Vector2(  RNG.preal(),   RNG.preal()); }
-const Vector2 Vector2::randP(real n)  { return Vector2(n*RNG.preal(), n*RNG.preal()); }
-const Vector2 Vector2::randG(real n)  { return Vector2(n*RNG.gauss(), n*RNG.gauss()); }
-void  Vector2::addRand(real n)        { XX += n*RNG.sreal(); YY += n*RNG.sreal(); }
+Vector2 Vector2::randS()       { return Vector2(  RNG.sreal(),   RNG.sreal()); }
+Vector2 Vector2::randH()       { return Vector2(  RNG.shalf(),   RNG.shalf()); }
+Vector2 Vector2::randS(real n) { return Vector2(n*RNG.sreal(), n*RNG.sreal()); }
+Vector2 Vector2::randP()       { return Vector2(  RNG.preal(),   RNG.preal()); }
+Vector2 Vector2::randP(real n) { return Vector2(n*RNG.preal(), n*RNG.preal()); }
+Vector2 Vector2::randG(real n) { return Vector2(n*RNG.gauss(), n*RNG.gauss()); }
+void  Vector2::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); }
 
 #if ( 0 )
 
-const Vector2 Vector2::randU()
+Vector2 Vector2::randU()
 {
     real d, x, y;
     do {
@@ -51,7 +51,7 @@ const Vector2 Vector2::randU()
     return Vector2(x, y) / std::sqrt(d);
 }
 
-const Vector2 Vector2::randU(const real n)
+Vector2 Vector2::randU(const real n)
 {
     real d, x, y;
     do {
@@ -64,7 +64,7 @@ const Vector2 Vector2::randU(const real n)
 
 #else
 
-const Vector2 Vector2::randU()
+Vector2 Vector2::randU()
 {
     real d, x, y;
     do {
@@ -75,7 +75,7 @@ const Vector2 Vector2::randU()
     return Vector2(x*x-y*y, 2*x*y) / d;
 }
 
-const Vector2 Vector2::randU(const real n)
+Vector2 Vector2::randU(const real n)
 {
     real d, x, y;
     do {
@@ -89,7 +89,7 @@ const Vector2 Vector2::randU(const real n)
 #endif
 
 
-const Vector2 Vector2::randB()
+Vector2 Vector2::randB()
 {
     real x, y;
     do {
@@ -100,7 +100,7 @@ const Vector2 Vector2::randB()
 }
 
 
-const Vector2 Vector2::randB(const real n)
+Vector2 Vector2::randB(const real n)
 {
     real x, y;
     do {
@@ -111,14 +111,14 @@ const Vector2 Vector2::randB(const real n)
 }
 
 
-const Vector2 Vector2::randOrthoU(const real len) const
+Vector2 Vector2::randOrthoU(const real len) const
 {
     real s = RNG.sflip(len) / std::sqrt( XX * XX + YY * YY );
     return Vector2(-YY, XX, 0) * s;
 }
 
 
-const Vector2 Vector2::randOrthoB(const real len) const
+Vector2 Vector2::randOrthoB(const real len) const
 {
     // this assumes norm(*this) == 1
     real s = RNG.sreal() * len;
@@ -128,19 +128,19 @@ const Vector2 Vector2::randOrthoB(const real len) const
 //------------------------------------------------------------------------------
 #pragma mark - 3D Vectors
 
-const Vector3 Vector3::randS()        { return Vector3(RNG.sreal(),     RNG.sreal(),   RNG.sreal()); }
-const Vector3 Vector3::randH()        { return Vector3(RNG.shalf(),     RNG.shalf(),   RNG.shalf()); }
-const Vector3 Vector3::randS(real n)  { return Vector3(n*RNG.sreal(), n*RNG.sreal(), n*RNG.sreal()); }
-const Vector3 Vector3::randP()        { return Vector3(RNG.preal(),     RNG.preal(),   RNG.preal()); }
-const Vector3 Vector3::randP(real n)  { return Vector3(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
-const Vector3 Vector3::randG(real n)  { return Vector3(n*RNG.gauss(), n*RNG.gauss(), n*RNG.gauss()); }
-void  Vector3::addRand(real n)        { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ += n*RNG.sreal(); }
+Vector3 Vector3::randS()       { return Vector3(RNG.sreal(),     RNG.sreal(),   RNG.sreal()); }
+Vector3 Vector3::randH()       { return Vector3(RNG.shalf(),     RNG.shalf(),   RNG.shalf()); }
+Vector3 Vector3::randS(real n) { return Vector3(n*RNG.sreal(), n*RNG.sreal(), n*RNG.sreal()); }
+Vector3 Vector3::randP()       { return Vector3(RNG.preal(),     RNG.preal(),   RNG.preal()); }
+Vector3 Vector3::randP(real n) { return Vector3(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
+Vector3 Vector3::randG(real n) { return Vector3(n*RNG.gauss(), n*RNG.gauss(), n*RNG.gauss()); }
+void  Vector3::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ += n*RNG.sreal(); }
 
 
 #if ( 0 )
 
 /// hypercube rejection method
-const Vector3 Vector3::randU()
+Vector3 Vector3::randU()
 {
     real x, y, z, d;
     do {
@@ -154,7 +154,7 @@ const Vector3 Vector3::randU()
 }
 
 /// hypercube rejection method
-const Vector3 Vector3::randU(real n)
+Vector3 Vector3::randU(real n)
 {
     real x, y, z, d;
     do {
@@ -174,7 +174,7 @@ const Vector3 Vector3::randU(real n)
  http://mathworld.wolfram.com/SpherePointPicking.html
  This uses only 2 random-numbers!
 */
-const Vector3 Vector3::randU()
+Vector3 Vector3::randU()
 {
     real x, y, d;
     do {
@@ -186,7 +186,7 @@ const Vector3 Vector3::randU()
     return Vector3(x*h, y*h, 2.0*d-1.0);
 }
 
-const Vector3 Vector3::randU(const real n)
+Vector3 Vector3::randU(const real n)
 {
     real x, y, d;
     do {
@@ -206,7 +206,7 @@ const Vector3 Vector3::randU(const real n)
  http://mathworld.wolfram.com/SpherePointPicking.html
  This uses 4 random-numbers, but avoids the square-root
  */
-const Vector3 Vector3::randU()
+Vector3 Vector3::randU()
 {
     real x, y, z, t, d;
     do {
@@ -219,7 +219,7 @@ const Vector3 Vector3::randU()
     return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x+t*t-y*y-z*z) / d;
 }
 
-const Vector3 Vector3::randU(const real n)
+Vector3 Vector3::randU(const real n)
 {
     real x, y, z, t, d;
     do {
@@ -235,7 +235,7 @@ const Vector3 Vector3::randU(const real n)
 #endif
 
 
-const Vector3 Vector3::randB()
+Vector3 Vector3::randB()
 {
     real x, y, z;
     do {
@@ -247,7 +247,7 @@ const Vector3 Vector3::randB()
 }
 
 
-const Vector3 Vector3::randB(const real n)
+Vector3 Vector3::randB(const real n)
 {
     real x, y, z;
     do {
@@ -261,7 +261,7 @@ const Vector3 Vector3::randB(const real n)
 
 #if ( 1 )
 
-const Vector3 Vector3::randOrthoU(const real len) const
+Vector3 Vector3::randOrthoU(const real len) const
 {
     real n = normSqr();
     if ( n > REAL_EPSILON )
@@ -279,7 +279,7 @@ const Vector3 Vector3::randOrthoU(const real len) const
 /**
  This method is less efficient
  */
-const Vector3 Vector3::randOrthoU(const real len) const
+Vector3 Vector3::randOrthoU(const real len) const
 {
     const Vector2 V = Vector2::randU();
     Vector3 b = orthogonal(1);
@@ -289,7 +289,7 @@ const Vector3 Vector3::randOrthoU(const real len) const
 
 #endif
 
-const Vector3 Vector3::randOrthoB(const real len) const
+Vector3 Vector3::randOrthoB(const real len) const
 {
     //this assumes norm(*this) == 1
     const Vector2 V = Vector2::randB();
@@ -299,15 +299,15 @@ const Vector3 Vector3::randOrthoB(const real len) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - 4D Vectors
+#pragma mark - 4-component Vectors treated as 3D
 
-const Vector4 Vector4::randS()        { return Vector4(RNG.sreal(),     RNG.sreal(),   RNG.sreal()); }
-const Vector4 Vector4::randH()        { return Vector4(RNG.shalf(),     RNG.shalf(),   RNG.shalf()); }
-const Vector4 Vector4::randS(real n)  { return Vector4(n*RNG.sreal(), n*RNG.sreal(), n*RNG.sreal()); }
-const Vector4 Vector4::randP()        { return Vector4(RNG.preal(),     RNG.preal(),   RNG.preal()); }
-const Vector4 Vector4::randP(real n)  { return Vector4(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
-const Vector4 Vector4::randG(real n)  { return Vector4(n*RNG.gauss(), n*RNG.gauss(), n*RNG.gauss()); }
-void  Vector4::addRand(real n)        { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ += n*RNG.sreal(); }
+Vector4 Vector4::randS()       { return Vector4(RNG.sreal(),     RNG.sreal(),   RNG.sreal()); }
+Vector4 Vector4::randH()       { return Vector4(RNG.shalf(),     RNG.shalf(),   RNG.shalf()); }
+Vector4 Vector4::randS(real n) { return Vector4(n*RNG.sreal(), n*RNG.sreal(), n*RNG.sreal()); }
+Vector4 Vector4::randP()       { return Vector4(RNG.preal(),     RNG.preal(),   RNG.preal()); }
+Vector4 Vector4::randP(real n) { return Vector4(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
+Vector4 Vector4::randG(real n) { return Vector4(n*RNG.gauss(), n*RNG.gauss(), n*RNG.gauss()); }
+void  Vector4::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ += n*RNG.sreal(); }
 
 
 //------------------------------------------------------------------------------

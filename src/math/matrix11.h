@@ -230,13 +230,13 @@ public:
 #pragma mark -
 
     /// multiplication by a vector: this * V
-    const Vector1 vecmul(Vector1 const& V) const
+    Vector1 vecmul(Vector1 const& V) const
     {
         return Vector1(val_ * V.XX);
     }
     
     /// multiplication by a vector: this * V
-    const Vector1 vecmul(real const* ptr) const
+    Vector1 vecmul(real const* ptr) const
     {
         return Vector1(val_ * ptr[0]);
     }
@@ -248,7 +248,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const Vector1 trans_vecmul(real const* V) const
+    Vector1 trans_vecmul(real const* V) const
     {
         return Vector1(val_ * V[0]);
     }

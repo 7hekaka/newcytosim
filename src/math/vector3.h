@@ -452,7 +452,7 @@ public:
     }
 
     /// returns vector parallel to argument of unit norm
-    friend const Vector3 normalize(Vector3 const& V)
+    friend Vector3 normalize(Vector3 const& V)
     {
 #if VECTOR3_USES_AVX
         assert_true(V.vec[3] == 0);
@@ -464,7 +464,7 @@ public:
     }
 
     /// returns the colinear vector of norm `n` (default 1.0)
-    const Vector3 normalized(const real n = 1.0) const
+    Vector3 normalized(const real n = 1.0) const
     {
 #if VECTOR3_USES_AVX
         assert_true(vec[3] == 0);
@@ -477,7 +477,7 @@ public:
 
     //------------------------------------------------------------------
     /// returns a perpendicular vector, of comparable but unspecified norm
-    const Vector3 orthogonalB() const
+    Vector3 orthogonalB() const
     {
         if ( abs_real(XX) < abs_real(YY) )
         {
@@ -501,7 +501,7 @@ public:
      Stark, M. M., “Efficient Construction of Perpendicular Vectors without Branching”,
      Journal of Graphics Tools 14:1 (2009), 55-61.
      */
-    const Vector3 orthogonal() const
+    Vector3 orthogonal() const
     {
         real ax = abs_real(XX);
         real ay = abs_real(YY);
@@ -520,7 +520,7 @@ public:
     
 #if ( 1 )
     /// returns a perpendicular Vector, of norm `n`
-    const Vector3 orthogonal(const real n) const
+    Vector3 orthogonal(const real n) const
     {
         real ax = abs_real(XX);
         real ay = abs_real(YY);
@@ -540,7 +540,7 @@ public:
     }
 #else
     /// returns a perpendicular vector, of norm `n`
-    const Vector3 orthogonal(const real n) const
+    Vector3 orthogonal(const real n) const
     {
         if ( abs_real(XX) < abs_real(YY) )
         {
@@ -579,7 +579,7 @@ public:
      This removes the component of `n` parallel to *this,
      and will fail if `d` is parallel to *this
      */
-    const Vector3 orthogonal(Vector3 const& d, const real n) const
+    Vector3 orthogonal(Vector3 const& d, const real n) const
     {
         real s = dot(*this, d) / normSqr();
         return ( d - s * (*this) ).normalized(n);
@@ -667,7 +667,7 @@ public:
      It is assumed that norm(*this)==1
      The result is a unit Vector orthogonal to *this, of norm `c*c + s*s`
      */
-    const Vector3 rotateOrtho(Vector3 const& vec, real c, real s)
+    Vector3 rotateOrtho(Vector3 const& vec, real c, real s)
     {
         // set two orthogonal vector to 'd' defining an orientated basis
         Vector3 ex, ey;
@@ -684,7 +684,7 @@ public:
     }
     
     /// convert from cartesian to spherical coordinates ( r, theta, phi )
-    const Vector3 spherical() const
+    Vector3 spherical() const
     {
         return Vector3(std::sqrt(XX*XX+YY*YY+ZZ*ZZ),
                        std::atan2(YY, XX),
@@ -692,7 +692,7 @@ public:
     }
     
     /// convert from spherical to cartesian coordinates ( x, y, z )
-    const Vector3 cartesian() const
+    Vector3 cartesian() const
     {
         return Vector3(XX*std::cos(YY)*std::sin(ZZ),
                        XX*std::sin(YY)*std::sin(ZZ),
@@ -726,19 +726,19 @@ public:
     }
     
     /// linear interpolation, returning a + x * b
-    static const Vector3 interpolated(const Vector3& a, real C, const Vector3& b)
+    friend Vector3 interpolated(const Vector3& a, real C, const Vector3& b)
     {
         return Vector3(a.XX+C*b.XX, a.YY+C*b.YY, a.ZZ+C*b.ZZ);
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
-    static const Vector3 interpolated(const float a[], const float C, const float b[])
+    static Vector3 interpolated(const float a[], const float C, const float b[])
     {
         return Vector3(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]), a[2]+C*(b[2]-a[2]));
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
-    static const Vector3 interpolated(const double a[], const double C, const double b[])
+    static Vector3 interpolated(const double a[], const double C, const double b[])
     {
 #if VECTOR3_USES_AVX
         vec4 A = load3(a), B = load3(b);
@@ -751,7 +751,7 @@ public:
     //------------------------------------------------------------------
 
     /// addition of two vectors
-    friend const Vector3 operator +(Vector3 const& a, Vector3 const& b)
+    friend Vector3 operator +(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
         return Vector3(add4(a.vec, b.vec));
@@ -761,7 +761,7 @@ public:
     }
     
     /// subtraction of two vectors
-    friend const Vector3 operator -(Vector3 const& a, Vector3 const& b)
+    friend Vector3 operator -(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
         return Vector3(sub4(a.vec, b.vec));
@@ -771,13 +771,13 @@ public:
     }
     
     /// unary + operator does nothing
-    friend const Vector3 operator +(Vector3 const& b)
+    friend Vector3 operator +(Vector3 const& b)
     {
         return b;
     }
     
     /// opposition of a vector
-    friend const Vector3 operator -(Vector3 const& b)
+    friend Vector3 operator -(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
         return Vector3(_mm256_xor_pd(b.vec, set4(-0.0)));
@@ -787,7 +787,7 @@ public:
     }
     
     /// returns the element-by-element product
-    const Vector3 e_mul(Vector3 const& b) const
+    Vector3 e_mul(Vector3 const& b) const
     {
 #if VECTOR3_USES_AVX
         return Vector3(mul4(vec, b.vec));
@@ -797,13 +797,13 @@ public:
     }
 
     /// returns the element-by-element division
-    const Vector3 e_div(Vector3 const& b) const
+    Vector3 e_div(Vector3 const& b) const
     {
         return Vector3(XX/b.XX, YY/b.YY, ZZ/b.ZZ);
     }
     
     /// returns a vector with each element squared
-    const Vector3 e_squared() const
+    Vector3 e_squared() const
     {
 #if VECTOR3_USES_AVX
         return Vector3(mul4(vec, vec));
@@ -831,20 +831,20 @@ public:
     }
     
     /// returns the element-by-element minimum
-    const Vector3 e_min(Vector3 const& v) const
+    Vector3 e_min(Vector3 const& v) const
     {
         return Vector3(std::min(XX, v.XX), std::min(YY, v.YY), std::min(ZZ, v.ZZ));
     }
     
     /// returns the element-by-element maximum
-    const Vector3 e_max(Vector3 const& v) const
+    Vector3 e_max(Vector3 const& v) const
     {
         return Vector3(std::max(XX, v.XX), std::max(YY, v.YY), std::max(ZZ, v.ZZ));
     }
     
 
     /// cross product of two vectors
-    friend const Vector3 cross(Vector3 const& a, Vector3 const& b)
+    friend Vector3 cross(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX && defined __AVX2__
         assert_true((a.vec[3] == 0) & (b.vec[3] == 0));
@@ -870,7 +870,7 @@ public:
     }
     
     /// multiplication by scalar
-    friend const Vector3 operator *(Vector3 const& a, const real s)
+    friend Vector3 operator *(Vector3 const& a, const real s)
     {
 #if VECTOR3_USES_AVX
         return Vector3(mul4(a.vec, set4(s)));
@@ -880,7 +880,7 @@ public:
     }
     
     /// mutiplication by scalar
-    friend const Vector3 operator *(const real s, Vector3 const& a)
+    friend Vector3 operator *(const real s, Vector3 const& a)
     {
 #if VECTOR3_USES_AVX
         return Vector3(mul4(set4(s), a.vec));
@@ -890,7 +890,7 @@ public:
     }
     
     /// division by scalar
-    friend const Vector3 operator /(Vector3 const& a, const real s)
+    friend Vector3 operator /(Vector3 const& a, const real s)
     {
 #if VECTOR3_USES_AVX
         return Vector3(div4(a.vec, set4(s)));
@@ -1023,44 +1023,44 @@ public:
     
     
     /// a vector orthogonal to *this, with `norm == n`, chosen randomly and uniformly
-    const Vector3 randOrthoU(real n) const;
+    Vector3 randOrthoU(real n) const;
     
     /// a vector orthogonal to *this, with `norm <= n`, assuming `norm(*this)==1`
-    const Vector3 randOrthoB(real n) const;
+    Vector3 randOrthoB(real n) const;
     
     
     /// Vector with random independent coordinates in [0,+1]
-    static const Vector3 randP();
+    static Vector3 randP();
     
     /// Vector with random independent coordinates in [0,+n]
-    static const Vector3 randP(real n);
+    static Vector3 randP(real n);
     
     /// Vector with random independent coordinates in [-1,+1]
-    static const Vector3 randS();
+    static Vector3 randS();
     
     /// Vector with random independent coordinates in [-1/2,+1/2]
-    static const Vector3 randH();
+    static Vector3 randH();
     
     /// Vector with random independent coordinates in [-n,+n]
-    static const Vector3 randS(real n);
+    static Vector3 randS(real n);
     
     
     /// random Vector of norm = 1; sampling is uniform
-    static const Vector3 randU();
+    static Vector3 randU();
     
     /// return a random vector of norm = n; sampling is uniform
-    static const Vector3 randU(real n);
+    static Vector3 randU(real n);
     
     
     /// return a random vector of norm <= 1; sampling is uniform
-    static const Vector3 randB();
+    static Vector3 randB();
     
     /// return a random vector of norm <= n; sampling is uniform
-    static const Vector3 randB(real n);
+    static Vector3 randB(real n);
     
     
     /// return a random vector with Normally distributed coordinates ~ N(0,n)
-    static const Vector3 randG(real n);
+    static Vector3 randG(real n);
     
 };
 

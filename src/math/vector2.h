@@ -398,7 +398,7 @@ public:
     }
     
     /// returns the colinear vector of norm `n` (default 1.0)
-    const Vector2 normalized(const real n = 1.0) const
+    Vector2 normalized(const real n = 1.0) const
     {
 #if VECTOR2_USES_SSE
         return Vector2(normalize2(vec, n));
@@ -409,7 +409,7 @@ public:
     }
     
     /// returns vector parallel to argument of unit norm
-    friend const Vector2 normalize(Vector2 const& V)
+    friend Vector2 normalize(Vector2 const& V)
     {
 #if VECTOR2_USES_SSE
         return Vector2(normalize2(V.vec));
@@ -422,33 +422,33 @@ public:
     //------------------------------------------------------------------
     
     /// returns a perpendicular vector, of same norm
-    const Vector2 orthogonal() const
+    Vector2 orthogonal() const
     {
         return Vector2(-YY, XX);
     }
     
     /// returns a perpendicular vector, of norm `n`
-    const Vector2 orthogonal(const real n) const
+    Vector2 orthogonal(const real n) const
     {
         real s = n / std::sqrt( XX*XX + YY*YY );
         return Vector2(-s*YY, s*XX);
     }
     
     /// returns a vector perpendicular to *this, close to `d` and of norm = `n`
-    const Vector2 orthogonal(Vector2 const& d, const real n) const
+    Vector2 orthogonal(Vector2 const& d, const real n) const
     {
         real s = dot(*this, d) / normSqr();
         return ( d - s * (*this) ).normalized(n);
     }
     
     /// convert from cartesian to spherical coordinates ( r, theta, phi )
-    const Vector2 spherical() const
+    Vector2 spherical() const
     {
         return Vector2(std::sqrt(XX*XX+YY*YY), std::atan2(YY, XX));
     }
     
     /// convert from spherical to cartesian coordinates ( x, y, z )
-    const Vector2 cartesian() const
+    Vector2 cartesian() const
     {
         return Vector2(XX*std::cos(YY), XX*std::sin(YY));
     }
@@ -479,19 +479,19 @@ public:
     }
     
     /// linear interpolation, returning a + x * b
-    static const Vector2 interpolated(const Vector2& a, real C, const Vector2& b)
+    friend Vector2 interpolated(const Vector2& a, real C, const Vector2& b)
     {
         return Vector2(a.XX+C*b.XX, a.YY+C*b.YY);
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
-    static const Vector2 interpolated(const float a[], const float C, const float b[])
+    static Vector2 interpolated(const float a[], const float C, const float b[])
     {
         return Vector2(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]));
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
-    static const Vector2 interpolated(const double a[], const double C, const double b[])
+    static Vector2 interpolated(const double a[], const double C, const double b[])
     {
 #if VECTOR2_USES_SSE
         vec2 A = loadu2(a), B = loadu2(b);
@@ -508,43 +508,43 @@ public:
     //------------------------------------------------------------------
 
     /// addition of two vectors
-    friend const Vector2 operator +(Vector2 const& a, Vector2 const& b)
+    friend Vector2 operator +(Vector2 const& a, Vector2 const& b)
     {
         return Vector2(a.XX+b.XX, a.YY+b.YY);
     }
     
     /// subtraction of two vectors
-    friend const Vector2 operator -(Vector2 const& a, Vector2 const& b)
+    friend Vector2 operator -(Vector2 const& a, Vector2 const& b)
     {
         return Vector2(a.XX-b.XX, a.YY-b.YY);
     }
     
     /// unary + operator does nothing
-    friend const Vector2 operator +(Vector2 const& b)
+    friend Vector2 operator +(Vector2 const& b)
     {
         return b;
     }
     
     /// opposition of a vector
-    friend const Vector2 operator -(Vector2 const& b)
+    friend Vector2 operator -(Vector2 const& b)
     {
         return Vector2(-b.XX, -b.YY);
     }
     
     /// returns the element-by-element product
-    const Vector2 e_mul(Vector2 const& b) const
+    Vector2 e_mul(Vector2 const& b) const
     {
         return Vector2(XX*b.XX, YY*b.YY);
     }
     
     /// returns the element-by-element division
-    const Vector2 e_div(Vector2 const& b) const
+    Vector2 e_div(Vector2 const& b) const
     {
         return Vector2(XX/b.XX, YY/b.YY);
     }
     
     /// returns a vector with each element squared
-    const Vector2 e_squared() const
+    Vector2 e_squared() const
     {
 #if VECTOR2_USES_SSE
         return Vector2(mul2(vec, vec));
@@ -572,13 +572,13 @@ public:
     }
     
     /// returns the element-by-element minimum
-    const Vector2 e_min(Vector2 const& v) const
+    Vector2 e_min(Vector2 const& v) const
     {
         return Vector2(std::min(XX, v.XX), std::min(YY, v.YY));
     }
     
     /// returns the element-by-element maximum
-    const Vector2 e_max(Vector2 const& v) const
+    Vector2 e_max(Vector2 const& v) const
     {
         return Vector2(std::max(XX, v.XX), std::max(YY, v.YY));
     }
@@ -597,13 +597,13 @@ public:
     }
     
     /// cross product of a vector with a Z-Vector
-    friend const Vector2 cross(Vector2 const& a, const real b)
+    friend Vector2 cross(Vector2 const& a, const real b)
     {
         return Vector2(a.YY*b, -a.XX*b);
     }
     
     /// cross product of a Z-vector with a Vector
-    friend const Vector2 cross(const real a, Vector2 const& b)
+    friend Vector2 cross(const real a, Vector2 const& b)
     {
         return Vector2(-a*b.YY, a*b.XX);
     }
@@ -615,19 +615,19 @@ public:
     }
     
     /// multiplication by scalar
-    friend const Vector2 operator *(Vector2 const& a, const real s)
+    friend Vector2 operator *(Vector2 const& a, const real s)
     {
         return Vector2(s*a.XX, s*a.YY);
     }
     
     /// mutiplication by scalar
-    friend const Vector2 operator *(const real s, Vector2 const& a)
+    friend Vector2 operator *(const real s, Vector2 const& a)
     {
         return Vector2(s*a.XX, s*a.YY);
     }
     
     /// division by scalar
-    friend const Vector2 operator /(Vector2 const& a, const real s)
+    friend Vector2 operator /(Vector2 const& a, const real s)
     {
         return Vector2(a.XX/s, a.YY/s);
     }
@@ -734,44 +734,44 @@ public:
     
     
     /// a vector orthogonal to *this, with `norm == n`, chosen randomly and uniformly
-    const Vector2 randOrthoU(real n) const;
+    Vector2 randOrthoU(real n) const;
     
     /// a vector orthogonal to *this, with `norm <= n`, assuming `norm(*this)==1`
-    const Vector2 randOrthoB(real n) const;
+    Vector2 randOrthoB(real n) const;
     
     
     /// Vector with random independent coordinates in [0,+1]
-    static const Vector2 randP();
+    static Vector2 randP();
     
     /// Vector with random independent coordinates in [0,+n]
-    static const Vector2 randP(real n);
+    static Vector2 randP(real n);
     
     /// Vector with random independent coordinates in [-1,+1]
-    static const Vector2 randS();
+    static Vector2 randS();
     
     /// Vector with random independent coordinates in [-1/2,+1/2]
-    static const Vector2 randH();
+    static Vector2 randH();
     
     /// Vector with random independent coordinates in [-n,+n]
-    static const Vector2 randS(real n);
+    static Vector2 randS(real n);
     
     
     /// random Vector of norm = 1; sampling is uniform
-    static const Vector2 randU();
+    static Vector2 randU();
     
     /// return a random vector of norm = n; sampling is uniform
-    static const Vector2 randU(real n);
+    static Vector2 randU(real n);
     
     
     /// return a random vector of norm <= 1; sampling is uniform
-    static const Vector2 randB();
+    static Vector2 randB();
     
     /// return a random vector of norm <= n; sampling is uniform
-    static const Vector2 randB(real n);
+    static Vector2 randB(real n);
     
     
     /// return a random vector with Normally distributed coordinates ~ N(0,n)
-    static const Vector2 randG(real n);
+    static Vector2 randG(real n);
     
 };
 

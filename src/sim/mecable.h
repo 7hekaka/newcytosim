@@ -134,7 +134,7 @@ public:
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
-    const Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
+    Vector       posP(size_t p)      const { return Vector(pPos+DIM*p); }
 
     /// Address of coordinate array
     const real * addrPoints()        const { return pPos; }
@@ -199,7 +199,7 @@ public:
     }
     
     /// Difference of two points = Q - P = vector PQ
-    const Vector diffPoints(const size_t P, const size_t Q) const
+    Vector diffPoints(const size_t P, const size_t Q) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );

@@ -19,7 +19,7 @@ void Modulo::enable(size_t d, real size)
 }
 
 
-const Vector Modulo::period(size_t d) const
+Vector Modulo::period(size_t d) const
 {
     Vector vec(0,0,0);
     if ( d < DIM && ( mMode & 1<<d ))
@@ -76,7 +76,7 @@ void Modulo::fold(Vector& pos, Vector const& ref) const
 
 
 //calculate the offset from the canonical image to actual 'pos'
-const Vector Modulo::offset(Vector const& pos) const
+Vector Modulo::offset(Vector const& pos) const
 {
     Vector img = pos;
     fold(img);

@@ -555,7 +555,7 @@ public:
 #endif
     
     /// multiplication by a vector: this * V
-    const Vector3 vecmul0(Vector3 const& V) const
+    Vector3 vecmul0(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[  BLD] * V.YY + val[  BLD*2] * V.ZZ,
                        val[1] * V.XX + val[1+BLD] * V.YY + val[1+BLD*2] * V.ZZ,
@@ -563,7 +563,7 @@ public:
     }
     
     /// multiplication by a vector: this * V
-    const Vector3 vecmul0(real const* ptr) const
+    Vector3 vecmul0(real const* ptr) const
     {
         return Vector3(val[0] * ptr[0] + val[  BLD] * ptr[1] + val[  BLD*2] * ptr[2],
                        val[1] * ptr[0] + val[1+BLD] * ptr[1] + val[1+BLD*2] * ptr[2],
@@ -571,7 +571,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline const Vector3 vecmul(Vector3 const& vec) const
+    inline Vector3 vecmul(Vector3 const& vec) const
     {
 #if MATRIX33_USES_AVX
         return vecmul3(vec);
@@ -581,7 +581,7 @@ public:
     }
     
     /// multiplication by a vector: this * { ptr[0], ptr[1] }
-    const Vector3 vecmul(real const* ptr) const
+    Vector3 vecmul(real const* ptr) const
     {
 #if MATRIX33_USES_AVX
         return vecmul3(ptr);
@@ -597,7 +597,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const Vector3 trans_vecmul0(Vector3 const& V) const
+    Vector3 trans_vecmul0(Vector3 const& V) const
     {
         return Vector3(val[0    ] * V.XX + val[1      ] * V.YY + val[2      ] * V.ZZ,
                        val[BLD  ] * V.XX + val[1+BLD  ] * V.YY + val[2+BLD  ] * V.ZZ,
@@ -605,7 +605,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const Vector3 trans_vecmul0(real const* V) const
+    Vector3 trans_vecmul0(real const* V) const
     {
         return Vector3(val[0    ] * V[0] + val[1      ] * V[1] + val[2      ] * V[2],
                        val[BLD  ] * V[0] + val[1+BLD  ] * V[1] + val[2+BLD  ] * V[2],
@@ -613,7 +613,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    inline const Vector3 trans_vecmul(real const* V) const
+    inline Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX33_USES_AVX
         return trans_vecmul3(V);

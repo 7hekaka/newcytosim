@@ -432,7 +432,7 @@ public:
     }
 
     /// returns the colinear vector of norm `n` (default 1.0)
-    const Vector4 normalized(const real n = 1.0) const
+    Vector4 normalized(const real n = 1.0) const
     {
 #if VECTOR4_USES_AVX
         return Vector4(normalize4(vec, n));
@@ -443,7 +443,7 @@ public:
     }
     
     /// returns vector parallel to argument of unit norm
-    friend const Vector4 normalize(Vector4 const& V)
+    friend Vector4 normalize(Vector4 const& V)
     {
 #if VECTOR4_USES_AVX
         return Vector4(normalize4(V.vec));
@@ -479,19 +479,19 @@ public:
     }
     
     /// linear interpolation, returning a + x * b
-    static const Vector4 interpolated(const Vector4& a, real C, const Vector4& b)
+    friend Vector4 interpolated(const Vector4& a, real C, const Vector4& b)
     {
         return Vector4(a.XX+C*b.XX, a.YY+C*b.YY, a.ZZ+C*b.ZZ, a.TT+C*b.TT);
     }
     
     /// Calculate intermediate position = A + C * ( B - A )
-    static const Vector4 interpolated(const float a[], const float C, const float b[])
+    static Vector4 interpolated(const float a[], const float C, const float b[])
     {
         return Vector4(a[0]+C*(b[0]-a[0]), a[1]+C*(b[1]-a[1]), a[2]+C*(b[2]-a[2]), a[3]+C*(b[3]-a[3]));
     }
 
     /// Calculate intermediate position = A + C * ( B - A )
-    static const Vector4 interpolated(const double a[], const double C, const double b[])
+    static Vector4 interpolated(const double a[], const double C, const double b[])
     {
 #if VECTOR3_USES_AVX
         vec4 A = loadu4(a), B = loadu4(b);
@@ -504,43 +504,43 @@ public:
     //------------------------------------------------------------------
     
     /// addition of two vectors
-    friend const Vector4 operator +(Vector4 const& a, Vector4 const& b)
+    friend Vector4 operator +(Vector4 const& a, Vector4 const& b)
     {
         return Vector4(a.XX+b.XX, a.YY+b.YY, a.ZZ+b.ZZ, a.TT+b.TT);
     }
     
     /// subtraction of two vectors
-    friend const Vector4 operator -(Vector4 const& a, Vector4 const& b)
+    friend Vector4 operator -(Vector4 const& a, Vector4 const& b)
     {
         return Vector4(a.XX-b.XX, a.YY-b.YY, a.ZZ-b.ZZ, a.TT-b.TT);
     }
     
     /// unary + operator does nothing
-    friend const Vector4 operator +(Vector4 const& b)
+    friend Vector4 operator +(Vector4 const& b)
     {
         return b;
     }
     
     /// opposition of a vector
-    friend const Vector4 operator -(Vector4 const& b)
+    friend Vector4 operator -(Vector4 const& b)
     {
         return Vector4(-b.XX, -b.YY, -b.ZZ, -b.TT);
     }
     
     /// returns the element-by-element product
-    const Vector4 e_mul(Vector4 const& b) const
+    Vector4 e_mul(Vector4 const& b) const
     {
         return Vector4(XX*b.XX, YY*b.YY, ZZ*b.ZZ, TT*b.TT);
     }
 
     /// returns the element-by-element division
-    const Vector4 e_div(Vector4 const& b) const
+    Vector4 e_div(Vector4 const& b) const
     {
         return Vector4(XX/b.XX, YY/b.YY, ZZ/b.ZZ, TT/b.TT);
     }
     
     /// returns a vector with each element squared
-    const Vector4 e_squared() const
+    Vector4 e_squared() const
     {
 #if VECTOR4_USES_AVX
         return Vector4(mul4(vec, vec));
@@ -568,13 +568,13 @@ public:
     }
     
     /// returns the element-by-element minimum
-    const Vector4 e_min(Vector4 const& v) const
+    Vector4 e_min(Vector4 const& v) const
     {
         return Vector4(std::min(XX, v.XX), std::min(YY, v.YY), std::min(ZZ, v.ZZ), std::min(TT, v.TT));
     }
     
     /// returns the element-by-element maximum
-    const Vector4 e_max(Vector4 const& v) const
+    Vector4 e_max(Vector4 const& v) const
     {
         return Vector4(std::max(XX, v.XX), std::max(YY, v.YY), std::max(ZZ, v.ZZ), std::max(TT, v.TT));
     }
@@ -586,7 +586,7 @@ public:
     }
     
     /// 3D cross product of two vector (TT components are ignored)
-    friend const Vector4 cross(Vector4 const& a, Vector4 const& b)
+    friend Vector4 cross(Vector4 const& a, Vector4 const& b)
     {
         return Vector4(a.YY * b.ZZ - a.ZZ * b.YY,
                        a.ZZ * b.XX - a.XX * b.ZZ,
@@ -594,19 +594,19 @@ public:
     }
 
     /// multiplication by scalar
-    friend const Vector4 operator *(Vector4 const& a, const real s)
+    friend Vector4 operator *(Vector4 const& a, const real s)
     {
         return Vector4(s*a.XX, s*a.YY, s*a.ZZ, s*a.TT);
     }
     
     /// mutiplication by scalar
-    friend const Vector4 operator *(const real s, Vector4 const& a)
+    friend Vector4 operator *(const real s, Vector4 const& a)
     {
         return Vector4(s*a.XX, s*a.YY, s*a.ZZ, s*a.TT);
     }
     
     /// division by scalar
-    friend const Vector4 operator /(Vector4 const& a, const real s)
+    friend Vector4 operator /(Vector4 const& a, const real s)
     {
         return Vector4(a.XX/s, a.YY/s, a.ZZ/s, a.TT/s);
     }
@@ -725,37 +725,37 @@ public:
     
     
     /// Vector with random independent coordinates in [0,+1]
-    static const Vector4 randP();
+    static Vector4 randP();
     
     /// Vector with random independent coordinates in [0,+n]
-    static const Vector4 randP(real n);
+    static Vector4 randP(real n);
     
     /// Vector with random independent coordinates in [-1,+1]
-    static const Vector4 randS();
+    static Vector4 randS();
     
     /// Vector with random independent coordinates in [-1/2,+1/2]
-    static const Vector4 randH();
+    static Vector4 randH();
     
     /// Vector with random independent coordinates in [-n,+n]
-    static const Vector4 randS(real n);
+    static Vector4 randS(real n);
     
     
     /// random Vector of norm = 1; sampling is uniform
-    static const Vector4 randU();
+    static Vector4 randU();
     
     /// return a random vector of norm = n; sampling is uniform
-    static const Vector4 randU(real n);
+    static Vector4 randU(real n);
     
     
     /// return a random vector of norm <= 1; sampling is uniform
-    static const Vector4 randB();
+    static Vector4 randB();
     
     /// return a random vector of norm <= n; sampling is uniform
-    static const Vector4 randB(real n);
+    static Vector4 randB(real n);
   
     
     /// return a random vector with Normally distributed coordinates ~ N(0,n)
-    static const Vector4 randG(real n);
+    static Vector4 randG(real n);
     
 };
 
