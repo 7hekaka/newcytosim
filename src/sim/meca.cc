@@ -2023,7 +2023,9 @@ void Meca::dumpElasticity(FILE * file) const
         src[ii] = 1.0;
         
         mFUL.vecMul(src, res);
+#if USE_ISO_MATRIX
         mISO.VECMULADDISO(src, res);
+#endif
 #if SEPARATE_RIGIDITY_TERMS
         addAllRigidity(src, res);
 #endif
