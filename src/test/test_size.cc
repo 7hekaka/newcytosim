@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
         PRINT(BigLocus);
         
         PRINT(Rasterizer::Vertex2);
+        PRINT(Rasterizer::Vertex2d);
         PRINT(Rasterizer::Vertex3);
     }
     else

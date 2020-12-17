@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 // Visual test for the rasterizer used in attachment algorithm of Cytosim
 // Created by Francois Nedelec, October 2002
 
@@ -93,12 +93,12 @@ void rasterize(Vector P, Vector Q, void (paint)(int, int, int, int, void*))
 {
     real iPQ = 1 / ( P - Q ).norm();
 #if ( DIM == 2 )
-    Rasterizer::paintFatLine2D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
-    //Rasterizer::paintFatLine2D(paint, nullptr, P, Q, iPQ, radius);
+    Rasterizer::paintRectangle(paint, nullptr, P, Q, iPQ, radius, shift, delta);
+    //Rasterizer::paintRectangle(paint, nullptr, P, Q, iPQ, radius);
     //Rasterizer::paintBox2D(paint, nullptr, P, Q, radius, shift, delta);
 #elif ( DIM == 3 )
-    //Rasterizer::paintHexLine3D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
-    Rasterizer::paintFatLine3D(paint, nullptr, P, Q, iPQ, radius, shift, delta);
+    //Rasterizer::paintHexagonalPrism(paint, nullptr, P, Q, iPQ, radius, shift, delta);
+    Rasterizer::paintCuboid(paint, nullptr, P, Q, iPQ, radius, shift, delta);
     //Rasterizer::paintBox3D(paint, nullptr, P, Q, radius, shift, delta);
 #endif
 }
@@ -246,7 +246,7 @@ void display(View&, int)
     /// draw large points:
     glPointSize(16);
     glBegin(GL_POINTS);
-    glColor3f(0, 0, 1);
+    glColor3f(1, 0, 1);
     for ( size_t i = 0; i < n_pts ; ++i )
     {
 #if ( DIM == 3 )
@@ -254,6 +254,7 @@ void display(View&, int)
 #elif ( DIM == 2 )
         glVertex2d(pts[i].XX, pts[i].YY);
 #endif
+        glColor3f(0, 0, 1);
     }
     glEnd();
 
@@ -261,8 +262,11 @@ void display(View&, int)
     if ( n_pts > 2 )
     {
         glLineWidth(1);
-        size_t nb = Rasterizer::convexHull2D(n_pts, pts);
-        Rasterizer::paintPolygon2D(paintDraw, nullptr, nb, pts, 0);
+        Rasterizer::Vertex2 ver[MAX];
+        for ( size_t i = 0; i < n_pts; ++i )
+            ver[i] = pts[i];
+        size_t nb = Rasterizer::convexHull2D(n_pts, ver);
+        Rasterizer::paintPolygon2D(paintDraw, nullptr, nb, ver, 0);
         
         // draw convex-hull
         glLineWidth(2);
@@ -311,9 +315,9 @@ void speedTest(size_t cnt)
         for ( size_t c = 0; c < cnt; ++c )
         {
 #if ( DIM == 2 )
-            Rasterizer::paintFatLine2D(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
+            Rasterizer::paintRectangle(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
 #elif ( DIM == 3 )
-            Rasterizer::paintFatLine3D(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
+            Rasterizer::paintCuboid(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
 #endif
         }
     }

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 #include "assert_macro.h"
 #include "rasterizer.h"
 #include "fiber_grid.h"
@@ -111,7 +111,7 @@ struct PaintJob
 /**
  paintCell(x,y,z) adds a Segment to the SegmentList associated with
  the grid point (x,y,z).
- It is called by the rasterizer function paintFatLine().
+ It is called by the rasterizer function paintThickLine().
  
  This version uses the fact that cells with consecutive
  X-coordinates should be consecutive also in the Grid
@@ -143,7 +143,7 @@ void paintCell(const int x_inf, const int x_sup, const int y, const int z, void 
 /** 
  paintCellPeriodic(x,y,z) adds a Segment in the SegmentList associated with
  the grid point (x,y,z). 
- It is called by the rasterizer function paintFatLine()
+ It is called by the rasterizer function paintThickLine()
  */
 
 void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int z, void * arg)
@@ -229,12 +229,12 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
             job.segment.set(fib, n-1);
 
 #if   ( DIM == 1 )
-            Rasterizer::paintFatLine1D(paint, &job, P, Q, width, offset, deltas);
+            Rasterizer::paintThickLine1D(paint, &job, P, Q, width, offset, deltas);
 #elif ( DIM == 2 )
-            Rasterizer::paintFatLine2D(paint, &job, P, Q, iPQ, width, offset, deltas);
+            Rasterizer::paintRectangle(paint, &job, P, Q, iPQ, width, offset, deltas);
 #else
-            //Rasterizer::paintHexLine3D(paint, &job, P, Q, iPQ, width, offset, deltas);
-            Rasterizer::paintFatLine3D(paint, &job, P, Q, iPQ, width, offset, deltas);
+            //Rasterizer::paintHexagonalPrism(paint, &job, P, Q, iPQ, width, offset, deltas);
+            Rasterizer::paintCuboid(paint, &job, P, Q, iPQ, width, offset, deltas);
             //Rasterizer::paintBox3D(paint, &job, P, Q, width, offset, deltas);
 #endif
         }
@@ -250,7 +250,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 #if BIND_CLOSEST_FIBER
 
 /// used to qsort segments according to distance
-int compareSegments(const void * A, const void * B)
+static int compareSegments(const void * A, const void * B)
 {
     real a = static_cast<FiberGrid::HeavySegment const*>(A)->dis_;
     real b = static_cast<FiberGrid::HeavySegment const*>(B)->dis_;
