@@ -160,9 +160,6 @@ public:
     
     /// drag coefficient of one point
     real        leftoverMobility() const { return iPointMobility; }
-    
-    /// Address of point `p`
-    const real* addrDir(size_t p)  const { return iDir + DIM*p; }
 
     //--------------------- Projection  / Dynamics
     

@@ -14,7 +14,9 @@ namespace VecPrint
     template< typename T >
     void print(FILE * file, size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
-        if ( !vec || len == 0 )
+        if ( !vec )
+            fprintf(file, " nullptr");
+        else if ( len == 0 )
             fprintf(file, " void");
         else
         {
@@ -32,7 +34,9 @@ namespace VecPrint
     template< typename T >
     std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits = 2)
     {
-        if ( !vec || len == 0 )
+        if ( !vec )
+            os << " nullptr";
+        else if ( len == 0 )
             os << " void";
         else
         {
@@ -55,7 +59,9 @@ namespace VecPrint
     template< typename T >
     std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits, T alpha)
     {
-        if ( !vec || len == 0 )
+        if ( !vec )
+            os << " nullptr";
+        else if ( len == 0 )
             os << " void";
         else
         {
@@ -79,7 +85,9 @@ namespace VecPrint
     template< typename T >
     std::ostream& dump(std::ostream& os, size_t len, const T* vec, int digits = 8)
     {
-        if ( !vec || len == 0  )
+        if ( !vec )
+            os << " nullptr";
+        else if ( len == 0 )
             os << " void";
         else
         {
@@ -100,7 +108,9 @@ namespace VecPrint
     template< typename T >
     void print(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 3)
     {
-        if ( !mat || lin == 0 || col == 0  )
+        if ( !mat )
+            os << " nullptr";
+        else if ( lin == 0 || col == 0  )
             os << " void";
         else
         {
@@ -142,7 +152,9 @@ namespace VecPrint
     template< typename T >
     void sparse(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 8, T threshold = 0)
     {
-        if ( !mat || lin== 0 || col == 0 )
+        if ( !mat )
+            os << " nullptr";
+        else if ( lin == 0 || col == 0  )
             os << " void";
         else
         {
@@ -167,7 +179,9 @@ namespace VecPrint
     template< typename T >
     void sparse_off(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, size_t off, int digits = 8)
     {
-        if ( !mat || lin == 0 || col == 0 )
+        if ( !mat )
+            os << " nullptr";
+        else if ( lin == 0 || col == 0  )
             os << " void";
         else
         {
@@ -187,7 +201,9 @@ namespace VecPrint
     template< typename T >
     void image(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, T scale)
     {
-        if ( !mat || lin == 0 || col == 0 )
+        if ( !mat )
+            os << " nullptr";
+        else if ( lin == 0 || col == 0  )
             os << " void";
         else
         {

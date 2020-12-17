@@ -116,9 +116,6 @@ protected:
 
     /// flag to update
     bool needUpdate;
-    
-    /// true if iDir[] may be up-to-date
-    //bool iDirValid;
 
     /// callback to signal that update is needed, to be called after a change in length
     void         postUpdate() { needUpdate = true; }

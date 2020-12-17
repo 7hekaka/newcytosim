@@ -64,7 +64,6 @@ Chain::Chain()
     fnAbscissaP = 0;
     fnBirthTime = 0;
     needUpdate  = false;
-    //iDirValid   = false;
 #if FIBER_HAS_NORMAL
     fnNormal.set(0, 0, 1);
 #endif
@@ -960,6 +959,9 @@ void Chain::getPoints(real const* ptr)
     real * mem = uptr.get();
 #endif
     
+    //printf("\n %u  /pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
+    //printf("\n %u  |ptr ", identity()); VecPrint::print(std::cerr, nPoints, ptr, 3);
+
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
@@ -969,8 +971,8 @@ void Chain::getPoints(real const* ptr)
         reshape_global(nbSegments(), ptr, pPos, fnCut);
         Cytosim::warn << "a crude method was used to reshape " << reference() << '\n';
     }
-    //dump(std::cerr);
-    //iDirValid = false;
+    
+    //printf("\n %u  >pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
 }
 
 

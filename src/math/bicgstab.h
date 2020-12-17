@@ -15,7 +15,7 @@
 /// print convergence parameters
 #define VERBOSE_SOLVERS 0
 
-/// in case of no convergence, use the best vector encounterred during interations
+/// in case of no convergence, use the best vector encountered during interations
 #define SAFER_CONVERGENCE_FAILURE !REAL_IS_DOUBLE
 
 /// Bi-Conjugate Gradient Stabilized method to solve a system of linear equations
@@ -135,7 +135,8 @@ namespace LinearSolvers
                 omega = 0.0;
         }
 #if SAFER_CONVERGENCE_FAILURE
-        blas::xcopy(dim, best, 1, sol, 1);
+        if ( best_residual < monitor.residual() )
+            blas::xcopy(dim, best, 1, sol, 1);
 #endif
 #if VERBOSE_SOLVERS
         // calculate true residual = rhs - A * x
@@ -267,7 +268,8 @@ namespace LinearSolvers
                 omega = 0.0;
         }
 #if SAFER_CONVERGENCE_FAILURE
-        blas::xcopy(dim, best, 1, sol, 1);
+        if ( best_residual < monitor.residual() )
+            blas::xcopy(dim, best, 1, sol, 1);
 #endif
 #if VERBOSE_SOLVERS
         // calculate true residual = rhs - A * x

@@ -1627,7 +1627,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("  no convergence: size %lu precond %i flag %i count %4lu residual %.3e",
+        Cytosim::out("  no convergence: size %lu precond %i flag %u count %4lu residual %.3e",
             dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
 
         monitor.reset();
@@ -1683,6 +1683,9 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     
     const auto total = ( __rdtsc() - start ) >> 10;
 
+    //printf("\n   /sol "); VecPrint::print(std::cerr, dimension(), vSOL, 3);
+    //printf("\n   >pts "); VecPrint::print(std::cerr, dimension(), vPTS, 3);
+
     //add the solution (the displacement) to update the Mecable's vertices
     blas::add(dimension(), vSOL, vPTS);
 
@@ -1719,7 +1722,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         if ( prop->verbose & 4 )
         {
-            int cnt = std::max(1UL, monitor.count());
+            unsigned cnt = std::max(1U, monitor.count());
             factor = factor >> 10;
             auto solve = cycles_ >> 10;
             oss << "  cycles " << precond << "T " << std::setw(8) << total;

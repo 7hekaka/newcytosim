@@ -32,13 +32,7 @@ real FiberSegment::projectPoint0(Vector W, real& dis) const
 #endif
     
     // project with the scalar product:
-#if 1
     real abs = dot(W, pos2()-A) * lenInv();
-#else
-    // using precomputed tangent vector, which does not seem beneficial here.
-    assert_true(fib_->iDirValid);
-    real abs = dot(W, dirS());
-#endif
     
     // calculate distance to projection
 #if ( DIM == 1 )
@@ -193,14 +187,8 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
 real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& abs2) const
 {
     Vector off = seg.pos1() - pos1();
-#if 0
-    assert_true(fib_->iDirValid);
-    Vector d11 = dirS();
-    Vector d22 = seg.dirS();
-#else
     Vector d11 = dir();
     Vector d22 = seg.dir();
-#endif
     
 #if GRID_HAS_PERIODIC
     if ( modulo )

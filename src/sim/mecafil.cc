@@ -124,7 +124,6 @@ real Mecafil::addBrownianForces(real const* rnd, real alpha, real* rhs) const
 
 void Mecafil::storeDirections()
 {
-    //iDirValid = true;
 #if ( 1 )
     /*
      we assume here that successive points are correctly separated by 'segmentation',

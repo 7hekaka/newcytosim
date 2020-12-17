@@ -77,9 +77,6 @@ public:
     /// normalized tangent to Fiber
     Vector       dir()         const { return fib_->dirSegment(pti_); }
     
-    /// normalized tangent to Fiber
-    Vector       dirS()        const { return Vector(fib_->addrDir(pti_)); }
-    
     /// Mecapoint corresponding to first point
     Mecapoint    exact1()      const { return Mecapoint(fib_, pti_); }
     
