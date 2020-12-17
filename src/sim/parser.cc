@@ -535,7 +535,7 @@ void Parser::parse_delete(std::istream& is)
 #endif
     if ( !has_cnt  &&  name == "all" )
     {
-        cnt = ~0U; // this is very large
+        cnt = ~0UL; // this is very large
         name = Tokenizer::get_symbol(is);
     }
     std::string blok = Tokenizer::get_block(is, '{');

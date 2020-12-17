@@ -15,7 +15,7 @@
 FrameReader::FrameReader() : inputter(DIM)
 {
     frameIndex = 0;
-    lastLoaded = ~0;
+    lastLoaded = ~0UL;
 }
 
 

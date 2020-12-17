@@ -519,7 +519,7 @@ public:
 
 
 /// function for qsort, comparing line indices
-int compareSMSBDElement(const void * A, const void * B)
+static int compareSMSBDElement(const void * A, const void * B)
 {
     size_t a = static_cast<SparMatSymBlkDiag::Element const*>(A)->inx;
     size_t b = static_cast<SparMatSymBlkDiag::Element const*>(B)->inx;

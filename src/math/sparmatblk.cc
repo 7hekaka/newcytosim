@@ -426,7 +426,7 @@ public:
 
 
 /// function for qsort, comparing line indices
-int compareSMBElement(const void * A, const void * B)
+static int compareSMBElement(const void * A, const void * B)
 {
     size_t a = static_cast<SparMatBlk::Element const*>(A)->inx;
     size_t b = static_cast<SparMatBlk::Element const*>(B)->inx;

@@ -127,14 +127,14 @@ public:
     {
         s =  0;
         i =  1;
-        e = ~0U;
+        e = ~0UL;
     }
     
     Slice(const char arg[])
     {
         s =  0;
         i =  1;
-        e = ~0U;
+        e = ~0UL;
 
         int c = 0;
         char * str;

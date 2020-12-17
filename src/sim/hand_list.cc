@@ -66,7 +66,7 @@ void HandList::detachAll() const
 /**
 Sort in ascending order
 */
-int compareAbscissa(const void* A, const void* B)
+static int compareAbscissa(const void* A, const void* B)
 {
     real a = (*static_cast<Hand *const*>(A))->abscissa();
     real b = (*static_cast<Hand *const*>(B))->abscissa();

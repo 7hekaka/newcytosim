@@ -534,7 +534,7 @@ public:
 
 
 /// function for qsort, comparing line indices
-int compareSMSBElement(const void * A, const void * B)
+static int compareSMSBElement(const void * A, const void * B)
 {
     size_t a = static_cast<SparMatSymBlk::Element const*>(A)->inx;
     size_t b = static_cast<SparMatSymBlk::Element const*>(B)->inx;
@@ -848,24 +848,26 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
                 assert_true( ii < kk );
                 float const* M = blk_[n  ];
                 float const* P = blk_[n+1];
+                vec4f z = loadu4f(Y+ii);
+                vec4f t = loadu4f(Y+kk);
 # if ( BLD == 4 )
-                const vec4f m012 = streamload4f(M  );
+                const vec4f m012 = streamload4f(M);
+                const vec4f p012 = streamload4f(P);
                 const vec4f m345 = streamload4f(M+4);
-                const vec4f m678 = streamload4f(M+8);
-                const vec4f p012 = streamload4f(P  );
                 const vec4f p345 = streamload4f(P+4);
+                const vec4f m678 = streamload4f(M+8);
                 const vec4f p678 = streamload4f(P+8);
 # else
-                const vec4f m012 = load3f(M      );
-                const vec4f m345 = load3f(M+BLD  );
+                const vec4f m012 = load3f(M);
+                const vec4f p012 = load3f(P);
+                const vec4f m345 = load3f(M+BLD);
+                const vec4f p345 = load3f(P+BLD);
                 const vec4f m678 = load3f(M+BLD*2);
-                const vec4f p012 = load3f(P      );
-                const vec4f p345 = load3f(P+BLD  );
                 const vec4f p678 = load3f(P+BLD*2);
 # endif
                 // multiply with the full block:
-                vec4f z = fmadd4f(m012, x0, loadu4f(Y+ii));
-                vec4f t = fmadd4f(p012, x0, loadu4f(Y+kk));
+                z = fmadd4f(m012, x0, z);
+                t = fmadd4f(p012, x0, t);
                 vec4f xyz = loadu4f(X+ii);  // xyz = { X0 X1 X2 - }
                 vec4f tuv = loadu4f(X+kk);  // xyz = { X0 X1 X2 - }
                 z = fmadd4f(m345, x1, z);

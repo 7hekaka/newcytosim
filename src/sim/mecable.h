@@ -116,7 +116,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Set the number of points of the object
-    void         setNbPoints(const size_t n) { allocateMecable(n); nPoints = n; }
+    void         setNbPoints(const size_t n) { allocateMecable(n); nPoints=(SIZE_T)n; assert_true(nPoints==n); }
     
     /// Returns number of points
     size_t       nbPoints()  const { return nPoints; }

@@ -398,7 +398,7 @@ public:
         for ( size_t ii = 0; ii < nbo_; ++ii )
             if ( val_[ii] == obj )
                 return ii;
-        return ~0;
+        return ~0UL;
     }
     
     /// Replace `old_value` by `new_value`, or return false if `old_value` is not found

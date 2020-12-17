@@ -49,7 +49,7 @@ public:
     size_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; nblk_= (~3&(s+3))>>2; }
+    void resize(size_t s) { allocate(s); size_=s; nblk_= (~3UL&(s+3UL))>>2; }
     
     /// default constructor
     MatrixFull();

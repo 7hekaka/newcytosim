@@ -177,7 +177,7 @@ public:
 
 
 /// function to sort Triangles according to their 'z'
-int compareTriangle(const void * A, const void * B)
+static int compareTriangle(const void * A, const void * B)
 {
     real a = static_cast<const Triangle*>(A)->z;
     real b = static_cast<const Triangle*>(B)->z;

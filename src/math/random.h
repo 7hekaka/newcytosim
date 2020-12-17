@@ -213,10 +213,10 @@ public:
     int  flip()           { return URAND32() & 1U; }
     
     /// returns -1  or  1 with equal chance
-    int  flipsign()       { return std::copysign(1, RAND32()); }
+    real flipsign()       { return std::copysign(1, RAND32()); }
     
     /// returns 1 with probability P and -1 with probability 1-P
-    int  flipsign(real p) { return 2*(int)test(p) - 1; }
+    real flipsign(real p) { return 2*(int)test(p) - 1; }
 
     /// True with probability 1/8
     bool flip_8th()       { return URAND32() < 1<<29; }
