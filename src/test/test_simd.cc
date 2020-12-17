@@ -145,6 +145,24 @@ void test_swapSSE()
     dump(movedup2(b),  "movedup(b)");
 }
 
+
+void test_shuffle()
+{
+    // two shuffles to perform a blend
+    vec4f a { 1, 2, 3, 4 };
+    vec4f b {-1,-2,-3,-4 };
+    dump(a, "a  ");
+    dump(b, "b  ");
+
+    vec4f x = _mm_shuffle_ps(a, b, 0xEE);
+    vec4f y = _mm_shuffle_ps(a, x, 0xC4);
+    dump(y, "y  ");
+    
+    b = _mm_shuffle_ps(a, b, 0x23);
+    a = _mm_shuffle_ps(b, a, 0x24);
+    dump(y, "a  ");
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -861,6 +879,7 @@ void test_swap7()
 int main(int argc, char * argv[])
 {
     //test_swapSSE();
+    test_shuffle();
 #ifdef __AVX__
     if ( 1 )
     {

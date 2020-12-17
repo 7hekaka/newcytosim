@@ -107,7 +107,7 @@ inline static vec2 normalize2(vec2 vec, double n)
 
 #define blend2(a,b,k)     _mm_blend_pd(a,b,k)
 
-inline static vec2 sign_select(vec2 const& val, vec2 const& neg, vec2 const& pos)
+inline static vec2 sign_select(vec2 val, vec2 neg, vec2  pos)
 {
     return _mm_blendv_pd(pos, neg, val);
 }
@@ -216,7 +216,7 @@ inline static vec4 twine2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a,
 inline static vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
 inline static vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); }
 
-inline static vec4 sign_select(vec4 const& val, vec4 const& neg, vec4 const& pos)
+inline static vec4 sign_select(vec4 val, vec4 neg, vec4 pos)
 {
 #if defined(__AVX512VL__)
     return _mm256_mask_mov_pd(pos, val, neg);

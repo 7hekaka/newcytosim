@@ -1121,7 +1121,7 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
     assert_true( val == end );
 }
 #endif
-               
+
 
 #if defined(__SSE3__) && MATRIX2_OPTIMIZED_MULTIPLY && !REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
@@ -1136,7 +1136,7 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
     
     //printf("SparMatSym2 column %lu has %lu elements\n", jj, stop - start);
     vec4f s0 = setzero4f();
-    vec4f xx = blend4f(loadu4f(X+jj), s0, 0b1000);
+    vec4f xx = blend31f(loadu4f(X+jj), s0);
     vec4f s1 = fmadd4f(broadcast1f(val), xx, loadu4f(Y+jj));
     // process one element when the number of values is even
     if (( stop & 1 ) == ( start & 1 ))

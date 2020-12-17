@@ -43,9 +43,10 @@ inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a)
 
 #if defined(__SSE4_1__)
 
+inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1000); }
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
 
-inline static vec4f sign_select(vec4f const& val, vec4f const& neg, vec4f const& pos)
+inline static vec4f sign_select(vec4f val, vec4f neg, vec4f pos)
 {
 #if defined(__AVX512VL__)
     return _mm_mask_mov_ps(pos, val, neg);
@@ -53,6 +54,10 @@ inline static vec4f sign_select(vec4f const& val, vec4f const& neg, vec4f const&
     return _mm_blendv_ps(pos, neg, val);
 #endif
 }
+
+#else
+
+inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
 
 #endif
 
@@ -127,7 +132,7 @@ inline static vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a)
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
 
-inline static vec8f sign_select(vec8f const& val, vec8f const& neg, vec8f const& pos)
+inline static vec8f sign_select(vec8f val, vec8f neg, vec8f pos)
 {
 #if defined(__AVX512VL__)
     return _mm256_mask_mov_ps(pos, val, neg);

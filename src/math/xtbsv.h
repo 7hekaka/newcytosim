@@ -677,7 +677,7 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 }
 #endif
 
-#ifdef __SSE4_1__
+#if defined(__SSE3__)
 /// specialized version for single precision, KD==2 and ORD==3
 void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 {
@@ -691,8 +691,8 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
     {
         vec4f a0 = loadu4f(pX);
         a1 = mul4f(broadcast1f(pA), a0);
-        storeu4f(pX, blend4f(a1, a0, 0b1000));
-        a1 = blend4f(a1, zero, 0b1000);
+        storeu4f(pX, blend31f(a1, a0));
+        a1 = blend31f(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -702,8 +702,8 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
         vec4f a0 = loadu4f(pX);
         a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
         a1 = mul4f(broadcast1f(pA), a0);
-        storeu4f(pX, blend4f(a1, a0, 0b1000));
-        a1 = blend4f(a1, zero, 0b1000);
+        storeu4f(pX, blend31f(a1, a0));
+        a1 = blend31f(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -716,10 +716,10 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
         a2 = a1;
         a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);  // a1 = load3(pX+3);
         // restore 4th position that was saved in 'tt'
-        a0 = blend4f(mul4f(broadcast1f(pA), a0), tt, 0b1000);
+        a0 = blend31f(mul4f(broadcast1f(pA), a0), tt);
         tt = broadcast1f(a0); // save 4th position for next round
         storeu4f(pX, a0);
-        a1 = blend4f(a0, zero, 0b1000);
+        a1 = blend31f(a0, zero);
         pA -= lda;
         pX -= ORD;
     }
