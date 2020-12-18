@@ -53,7 +53,7 @@ typedef Matrix33 MatrixBlock;
 
 /// set TRUE to use matrix mISO and mFUL (the traditional way)
 /** This option should be 0 if PARALLELIZE_MATRIX == 1 */
-#define USE_ISO_MATRIX 1
+#define USE_ISO_MATRIX 0
 
 /**
  Option to allow 'play' to display Meca links graphically.
@@ -659,15 +659,6 @@ public:
 
     /// Extract the complete dynamic matrix in column-major format in a C-array
     void getMatrix(size_t, real * matrix) const;
-    
-    /// Save complete matrix in Matrix Market format
-    void saveMatrix(FILE *, real threshold) const;
-    
-    /// Save right-hand-side vector
-    void saveRHS(FILE *) const;
-    
-    /// Output vectors and matrices, in a format that can be imported in MATLAB
-    void saveSystem(const char dirname[]) const;
 
     /// Save complete matrix in binary format
     void dumpMatrix(FILE *) const;
@@ -688,13 +679,26 @@ public:
     void dumpObjectID(FILE *) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
-    void dump() const;
+    void dumpSystem() const;
+    
+    
+    /// Save the object ID associated with each degree of freedom
+    void saveObjectID(FILE *) const;
+
+    /// Save drag coefficients associated with each degree of freedom in binary format
+    void saveDrag(FILE *) const;
+
+    /// Save complete matrix in Matrix Market format
+    void saveMatrix(FILE *, real threshold) const;
+    
+    /// Save right-hand-side vector
+    void saveRHS(FILE *) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
-    void dump(const char dirname[]) const;
+    void saveSystem() const;
 
     /// Output vectors and matrices in various files (for debugging)
-    void dumpSparse();
+    void exportSystem() const;
 
 };
 

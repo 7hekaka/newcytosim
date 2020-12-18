@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University
 
 #ifndef PARSER_H
 #define PARSER_H
@@ -34,7 +34,7 @@ private:
     
     //--------------------------------------------------------------------------
     
-    /// parse command `set
+    /// parse command `set`
     void      parse_set(std::istream&);
     
     /// parse command `change`
@@ -84,9 +84,6 @@ private:
     
     /// parse command `dump`
     void      parse_dump(std::istream&);
-    
-    /// parse command `save`
-    void      parse_save(std::istream&);
 
     //--------------------------------------------------------------------------
 

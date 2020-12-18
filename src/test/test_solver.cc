@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 /*
  A test for linear iterative solver (BCGS, GMRES, etc):
- Read 'A' from "matrix.mtx" and 'b' from "rhs.mtx" and solves the linear system
+ Read 'A' from "matrix.mtx" and 'b' from "vector.mtx" and solves the linear system
      A.x = b
  using various iterative solvers.
  FJN, 19.08.2019
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
 
     // get system's right-hand-side
     zero_real(dim, rhs);
-    readVector("rhs.mtx", dim, rhs);
+    readVector("vector.mtx", dim, rhs);
     print_real(stdout, std::min(16, dim), rhs, " rhs\n");
 
     if ( 1 )

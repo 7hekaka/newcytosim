@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #include "sim.h"
 #include "parser.h"
@@ -1084,44 +1084,40 @@ void Parser::parse_end(std::istream& is)
      */
 }
 
-
 /**
- Dump system in binary MATLAB format
+ Save current system's matrix and right-hand-side vector in separate sub directory
  
-     dump DIRECTORY_NAME
+     save DIRECTORY_NAME { mode = {1, 2, 4} }
  
  */
 void Parser::parse_dump(std::istream& is)
 {
-    std::string str = Tokenizer::get_path(is);
+    const std::string str = Tokenizer::get_token(is);
     if ( str.empty() )
-        throw InvalidSyntax("missing directory name after 'dump'");
+        throw InvalidSyntax("missing directory name after 'save'");
+    std::string blok = Tokenizer::get_block(is, '{');
 
     if ( do_write && do_run )
     {
+        Glossary opt(blok);
+        int mode = 1;
+        opt.set(mode, "mode");
+
         simul.sMeca.doNotify = 1;
         simul.solve_half();
-        simul.sMeca.dump(str.c_str());
+        
+        char const* dir = str.c_str();
+        std::string cwd = FilePath::get_cwd();
+        FilePath::change_dir(dir, true);
+
+        if ( mode & 1 ) simul.sMeca.saveSystem();
+        if ( mode & 2 ) simul.sMeca.dumpSystem();
+        if ( mode & 4 ) simul.sMeca.exportSystem();
+
+        FilePath::change_dir(cwd);
+        fprintf(stderr, "Cytosim dump a %iD system of size %lu in `%s'\n", DIM, simul.sMeca.dimension(), dir);
     }
 }
-
-
-/**
- Save system matrix and right-hand-side vector in text format
- 
-     save DIRECTORY_NAME
- 
- */
-void Parser::parse_save(std::istream& is)
-{
-    std::string str = Tokenizer::get_token(is);
-    if ( str.empty() )
-        throw InvalidSyntax("missing directory name after 'save'");
-
-    if ( do_write && do_run )
-        simul.sMeca.saveSystem(str.c_str());
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -1213,7 +1209,7 @@ int Parser::evaluate_one(std::istream& is)
         parse_for(is);
     else if ( tok == "restart" )
     {
-        // reset simulation and rewind config file
+        // reset simulation and rewind config file, repeating forever
         simul.erase();
         is.clear();
         is.seekg(0);
@@ -1225,8 +1221,6 @@ int Parser::evaluate_one(std::istream& is)
         return 0;
     else if ( tok == "dump" )
         parse_dump(is);
-    else if ( tok == "save" )
-        parse_save(is);
     else {
         throw InvalidSyntax("unexpected command `"+tok+"'");
     }
