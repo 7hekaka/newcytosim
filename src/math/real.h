@@ -129,6 +129,22 @@ inline static void copy_real(size_t cnt, real const* src, real * dst)
 #endif
 }
 
+#if REAL_IS_DOUBLE
+/// copy `cnt` real scalars from `src` to `dst`
+inline static void copy_real(size_t cnt, real const* src, float * dst)
+{
+    for ( size_t u = 0; u < cnt; ++u )
+        dst[u] = src[u];
+}
+#else
+/// copy `cnt` real scalars from `src` to `dst`
+inline static void copy_real(size_t cnt, real const* src, double * dst)
+{
+    for ( size_t u = 0; u < cnt; ++u )
+        dst[u] = src[u];
+}
+#endif
+
 
 /// set `cnt` values of the array `ptr` to 0 (zero).
 inline static void zero_real(size_t cnt, real * ptr)

@@ -661,25 +661,25 @@ public:
     void getMatrix(size_t, real * matrix) const;
 
     /// Save complete matrix in binary format
-    void dumpMatrix(FILE *) const;
+    void dumpMatrix(FILE *, bool nat=true) const;
     
     /// Save elasticity matrix in binary format
-    void dumpElasticity(FILE *) const;
+    void dumpElasticity(FILE *, bool nat=true) const;
     
     /// Save mobility/projection matrix in binary format
-    void dumpMobility(FILE *) const;
+    void dumpMobility(FILE *, bool nat=true) const;
     
     /// Save preconditionner in binary format
-    void dumpPreconditionner(FILE *) const;
+    void dumpPreconditionner(FILE *, bool nat=true) const;
     
     /// Save drag coefficients associated with each degree of freedom in binary format
-    void dumpDrag(FILE *) const;
+    void dumpDrag(FILE *, bool nat=true) const;
     
     /// Save the object ID associated with each degree of freedom
-    void dumpObjectID(FILE *) const;
+    void dumpObjectID(FILE *, bool nat=true) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
-    void dumpSystem() const;
+    void dumpSystem(bool nat=true) const;
     
     
     /// Save the object ID associated with each degree of freedom

@@ -1,16 +1,14 @@
 // Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University
 
 /**
- * ------------------------------------------------------------------------------
- *                   -- Meca is the heart of Cytosim --
- * ------------------------------------------------------------------------------
+ * -----------------------------------------------------------------------------
+ *                     -- Meca is the heart of Cytosim --
+ * -----------------------------------------------------------------------------
  *             It solves the equations of motion for the Mecables,
  *      using implicit integration and iterative methods with sparse matrix
- * ------------------------------------------------------------------------------
+ * -----------------------------------------------------------------------------
  * @todo See if Lagrangian dynamics could work better than constrainted dynamics
- * @todo Implement the PARDISO sparse matrix format
- * @todo Check if IDR(s) would perform better than BCGS or GMRES
- * ------------------------------------------------------------------------------
+ * -----------------------------------------------------------------------------
  */
 
 #include <fstream>
@@ -1586,7 +1584,9 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     //------- call the iterative solver:
     if ( precond )
     {
+        precondition(vRHS, vSOL);
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
     }
     else
@@ -1604,43 +1604,43 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         monitor.reset();
         zero_real(dimension(), vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator, mH, mV, temporary);
-        fprintf(stderr, "    GMRES-%i  count %4lu  residual %.3e\n", RS, monitor.count(), monitor.residual());
+        fprintf(stderr, "    GMRES-%i  count %4u  residual %.3e\n", RS, monitor.count(), monitor.residual());
     }
 #endif
 #if ( 0 )
     // enable this to compare BCGS and GMRES
-    fprintf(stderr, "    BCGS     count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
-    fprintf(stderr, "    GMRES-64 count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    GMRES-64 count %4u  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
     monitor.reset();
     zero_real(dimension(), vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs     count %4lu  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    bcgs     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
     
     //------- in case the solver did not converge, we try other methods:
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("  no convergence: size %lu precond %i flag %u count %4lu residual %.3e",
+        Cytosim::out("  no convergence: size %lu precond %i flag %u count %4u residual %.3e",
             dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
 
         monitor.reset();
 #if !SAFER_CONVERGENCE_FAILURE
         // try with a different seed
-        copy_real(dimension(), vRHS, vSOL);
+        precondition(vRHS, vSOL);
 #endif
         if ( precond )
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
         else
             LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
         
-        Cytosim::out(" -> restarted: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+        Cytosim::out(" -> restarted: count %4u residual %.3e\n", monitor.count(), monitor.residual());
 
         if ( !monitor.converged() )
         {
@@ -1651,14 +1651,14 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
                 // try without preconditioner
                 LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
                 //LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    BCGS  : count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGS  : count %4u residual %.3e\n", monitor.count(), monitor.residual());
             }
             else
             {
                 // try with strongest preconditioner
                 computePreconditionner(4, 0);
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP4: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+                Cytosim::out("    BCGSP4: count %4u residual %.3e\n", monitor.count(), monitor.residual());
             }
         }
 
@@ -1669,7 +1669,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             copy_real(dimension(), vRND, vSOL);
             computePreconditionner(4, 0);
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-            Cytosim::out(" reseeded: count %4lu residual %.3e\n", monitor.count(), monitor.residual());
+            Cytosim::out(" reseeded: count %4u residual %.3e\n", monitor.count(), monitor.residual());
         }
         
         if ( !monitor.converged() )
@@ -2073,10 +2073,36 @@ void Meca::exportSystem() const
 //------------------------------------------------------------------------------
 #pragma mark - Functions to export in binary format
 
+void dumpVector(FILE * file, size_t dim, real* vec, bool nat)
+{
+    static float * low = nullptr;
+    static size_t alc = 0;
+    
+    if ( file == nullptr )
+    {
+        delete[] low;
+        low = nullptr;
+        return;
+    }
+    if ( !nat && std::is_same<real, double>::value )
+    {
+        if ( dim > alc )
+        {
+            delete[] low;
+            low = new float[dim];
+            alc = dim;
+        }
+        copy_real(dim, vec, low);
+        fwrite(low, sizeof(float), dim, file);
+    }
+    else
+        fwrite(vec, sizeof(real), dim, file);
+}
+
 /**
  Save the full matrix associated with multiply(), in binary format
  */
-void Meca::dumpMatrix(FILE * file) const
+void Meca::dumpMatrix(FILE * file, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2088,7 +2114,7 @@ void Meca::dumpMatrix(FILE * file) const
     {
         src[ii] = 1;
         multiply(src, res);
-        fwrite(res, sizeof(real), dim, file);
+        dumpVector(file, dim, res, nat);
         src[ii] = 0;
     }
     
@@ -2100,7 +2126,7 @@ void Meca::dumpMatrix(FILE * file) const
 /**
  Save the elasticity matrix, in binary format
  */
-void Meca::dumpElasticity(FILE * file) const
+void Meca::dumpElasticity(FILE * file, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2131,7 +2157,7 @@ void Meca::dumpElasticity(FILE * file) const
         }
 #endif
         
-        fwrite(res, sizeof(real), dim, file);
+        dumpVector(file, dim, res, nat);
         src[ii] = 0;
     }
     
@@ -2143,7 +2169,7 @@ void Meca::dumpElasticity(FILE * file) const
 /**
  Save the projection matrix multiplied by the mobility, in binary format
  */
-void Meca::dumpMobility(FILE * file) const
+void Meca::dumpMobility(FILE * file, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2164,7 +2190,7 @@ void Meca::dumpMobility(FILE * file) const
             blas::xscal(DIM*mec->nbPoints(), mec->leftoverMobility(), res+inx, 1);
         }
         // write column to file directly:
-        fwrite(res, sizeof(real), dim, file);
+        dumpVector(file, dim, res, nat);
         src[i] = 0;
     }
     
@@ -2177,7 +2203,7 @@ void Meca::dumpMobility(FILE * file) const
  Save matrix associated with the preconditionner, in binary format
  This relies on `Meca::precondition()`, which may apply a dummy preconditionner
  */
-void Meca::dumpPreconditionner(FILE * file) const
+void Meca::dumpPreconditionner(FILE * file, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2189,7 +2215,7 @@ void Meca::dumpPreconditionner(FILE * file) const
     {
         src[ii] = 1;
         precondition(src, res);
-        fwrite(res, sizeof(real), dim, file);
+        dumpVector(file, dim, res, nat);
         src[ii] = 0;
     }
     
@@ -2198,7 +2224,7 @@ void Meca::dumpPreconditionner(FILE * file) const
 }
 
 
-void Meca::dumpObjectID(FILE * file) const
+void Meca::dumpObjectID(FILE * file, bool nat) const
 {
     real * vec = new_real(largestMecable());
     
@@ -2209,7 +2235,7 @@ void Meca::dumpObjectID(FILE * file) const
         for ( size_t p = 0; p < nbp; ++p )
             vec[p] = i;
         for ( int d = 0; d < DIM; ++d )
-            fwrite(vec, sizeof(real), nbp, file);
+            dumpVector(file, nbp, vec, nat);
         ++i;
     }
     
@@ -2217,7 +2243,7 @@ void Meca::dumpObjectID(FILE * file) const
 }
 
 
-void Meca::dumpDrag(FILE * file) const
+void Meca::dumpDrag(FILE * file, bool nat) const
 {
     real * vec = new_real(largestMecable());
     
@@ -2228,7 +2254,7 @@ void Meca::dumpDrag(FILE * file) const
         for ( size_t p=0; p < nbp; ++p )
             vec[p] = drag;
         for ( int d = 0; d < DIM; ++ d )
-            fwrite(vec, sizeof(real), nbp, file);
+            dumpVector(file, nbp, vec, nat);
     }
     
     free_real(vec);
@@ -2263,14 +2289,14 @@ void Meca::dumpDrag(FILE * file) const
      plot(x, sol, '.');
  
  */
-void Meca::dumpSystem() const
+void Meca::dumpSystem(bool nat) const
 {
     FILE * f = fopen("ord.txt", "w");
-    fprintf(f, "%lu %i\n", dimension(), DIM);
+    fprintf(f, "%lu %i %lu\n", dimension(), DIM, sizeof(real));
     fclose(f);
     
     f = fopen("stp.txt", "w");
-    fprintf(f, "%f %f\n", tau_, tolerance_);
+    fprintf(f, "%.12f %.12f\n", tau_, tolerance_);
     fclose(f);
  
     f = fopen("drg.bin", "wb");
@@ -2282,30 +2308,32 @@ void Meca::dumpSystem() const
     fclose(f);
     
     f = fopen("rhs.bin", "wb");
-    fwrite(vRHS, sizeof(real), dimension(), f);
+    dumpVector(f, dimension(), vRHS, nat);
     fclose(f);
     
     f = fopen("sol.bin", "wb");
-    fwrite(vSOL, sizeof(real), dimension(), f);
+    dumpVector(f, dimension(), vSOL, nat);
     fclose(f);
     
     f = fopen("pts.bin", "wb");
-    fwrite(vPTS, sizeof(real), dimension(), f);
+    dumpVector(f, dimension(), vPTS, nat);
     fclose(f);
     
     f = fopen("sys.bin", "wb");
-    dumpMatrix(f);
+    dumpMatrix(f, nat);
     fclose(f);
     
     f = fopen("ela.bin", "wb");
-    dumpElasticity(f);
+    dumpElasticity(f, nat);
     fclose(f);
     
     f = fopen("mob.bin", "wb");
-    dumpMobility(f);
+    dumpMobility(f, nat);
     fclose(f);
     
     f = fopen("con.bin", "wb");
-    dumpPreconditionner(f);
+    dumpPreconditionner(f, nat);
     fclose(f);
+    
+    dumpVector(nullptr, 0, nullptr, nat);
 }

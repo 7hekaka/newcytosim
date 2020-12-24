@@ -5,7 +5,7 @@ function [sys, rhs, con] = cytosim_dump(path)
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019,
-% 11.08.2019, 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020
+% 11.08.2019, 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020, 23.12.2020
 
 if nargin < 1
     path = '.';
@@ -23,20 +23,25 @@ if isfolder(path)
     
     ord = load('ord.txt');
     dim = ord(1);
+    if ord(3) == 4
+        precision = 'single';
+    else
+        precision = 'double';
+    end
     stp = load('stp.txt');
     time_step = stp(1);
     if ( length(stp) > 1 )
         abstol = stp(2);
     end
-    obj = fread(fopen('obj.bin'), dim, 'double');    
-    drg = fread(fopen('drg.bin'), dim, 'double');
-    sys = fread(fopen('sys.bin'), [dim, dim], 'double');
-    ela = fread(fopen('ela.bin'), [dim, dim], 'double');  % elasticity matrix
-    mob = fread(fopen('mob.bin'), [dim, dim], 'double');  % projection matrix
-    con = fread(fopen('con.bin'), [dim, dim], 'double');  % preconditionner
-    %pts = fread(fopen('pts.bin'), dim, 'double');
-    rhs = fread(fopen('rhs.bin'), dim, 'double');
-    sol = fread(fopen('sol.bin'), dim, 'double');
+    obj = fread(fopen('obj.bin'), dim, precision);    
+    drg = fread(fopen('drg.bin'), dim, precision);
+    sys = fread(fopen('sys.bin'), [dim, dim], precision);
+    ela = fread(fopen('ela.bin'), [dim, dim], precision);  % elasticity matrix
+    mob = fread(fopen('mob.bin'), [dim, dim], precision);  % projection matrix
+    con = fread(fopen('con.bin'), [dim, dim], precision);  % preconditionner
+    %pts = fread(fopen('pts.bin'), dim, precision);
+    rhs = fread(fopen('rhs.bin'), dim, precision);
+    sol = fread(fopen('sol.bin'), dim, precision);
     
     cd(cwd);
 else
@@ -151,9 +156,9 @@ report('bicgstab', mulcnt, vec, rv0(end));
 figure('Name', 'Convergence');
 convergence_axes = [];
 convergence_plot(rv0/rv0(1), 'k');
-xlabel('Mat*vec operations');
+xlabel('Number of MAT.vec');
 ylabel('Relative residual');
-title('Solver Convergence');
+title('Convergence');
 hold on;
 
 % Matlab BiCGStab(L)
@@ -163,7 +168,6 @@ convergence_plot(rv0/rv0(1), 'b');
 report('bicgstab(1)', mulcnt, vec, rv0(end));
 
 if 0 %% no preconditionning
- 
     % BiCGStab(L)
     for i = 1:4
         OPT.Tol = reltol;
@@ -173,15 +177,8 @@ if 0 %% no preconditionning
         convergence_plot(rv0(:,1)/rv0(1,1), 'm');
         report(sprintf('BiCGS(%i)', OPT.ell), itr, vec, rv0(end,1));
     end
-if 0
-    % GMRES
-    for i = 2:6
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
-        convergence_plot(rv0/rv0(1),'g');
-        report(sprintf('GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
-    end
 end
+if 0 %% no preconditionning
     % IDRS-STAB
     for i = 0:4
         RS = min(2^i, dim);
@@ -199,6 +196,26 @@ end
         report(sprintf('IDRS %03i', RS), itr, vec, rv0(end));
     end
 end
+if 0
+    % GMRES
+    for i = 2:6
+        RS = min(2^i, dim);
+        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
+        convergence_plot(rv0/rv0(1),'g');
+        report(sprintf('GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
+    end
+end
+if 0
+    % CORS
+    [vec,~,~,~,rv0,~,mv] = cors(system, rhs, reltol, maxit);
+    convergence_plot(rv0/rv0(1),'g');
+    report('CORS', mv, vec, rv0(end));
+    % BiCOR
+    [vec,~,~,~,rv0,~,mv] = bicor(system, rhs, reltol, maxit);
+    convergence_plot(rv0/rv0(1),[1, 0.5, 0]);
+    report('BiCOR', mv, vec, rv0(end));
+end
+legend('bicgstab', 'bicgstab(L=1)', 'cors', 'bicor');
 
  %% USING PRECONDITIONNER CALCULATED BY CYTOSIM
  
@@ -210,19 +227,29 @@ end
      mulcnt = 0;
      [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
      report('P bicgstab', mulcnt, vec, rv0(end));
-     convergence_plot(rv0/rv0(1),'k--');
+     convergence_plot(rv0/rv0(1),[0 0 0]);
           
      % checking the reconstituted block preconditionner:
      mulcnt = 0;
      [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
      report('R bicgstab', mulcnt, vec, rv0(end));
-     convergence_plot(rv0/rv0(1),'k--');
+     convergence_plot(rv0/rv0(1),[0.5 0.5 0.25]);
 
      mulcnt = 0;
      % Matlab BiCGStab(L)
      [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
-     convergence_plot(rv0/rv0(1), 'b--');
+     convergence_plot(rv0/rv0(1), [0.25 0.25 0.5]);
      report('P bicgstab(1)', mulcnt, vec, rv0(end));
+end
+if 0
+    % CORS
+    [vec,~,~,~,rv0,~,mv] = cors(system, rhs, reltol, maxit, con);
+    convergence_plot(rv0/rv0(1),'g');
+    report('P CORS', mv, vec, rv0(end));
+    % BiCOR
+    [vec,~,~,~,rv0,~,mv] = bicor(system, rhs, reltol, maxit, con);
+    convergence_plot(rv0/rv0(1),[1, 0.5, 0]);
+    report('P BiCOR', mv, vec, rv0(end));
 end
 
 if 0
@@ -236,7 +263,6 @@ if 0
         convergence_plot(rv0(:,2), rv0(:,1)/rv0(1, 1),'m');
         report(sprintf('P BiCGS(%i)', OPT.ell), itr, vec, rv0(end));
     end
-
     % GMRES
     for i = 1:6
         RS = min(2^i, dim);
@@ -244,6 +270,8 @@ if 0
         convergence_plot(rv0/rv0(1),'g');
         report(sprintf('P GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
     end
+end
+if 0
     % IDRS-STAB
     for i = 0:5
         RS = min(2^i, dim);
@@ -267,7 +295,7 @@ end
 
 fprintf(2, 'Mecable drag coefficients : %f +/- %f\n', mean(1./drg), var(1./drg));
 
-if 1
+if 0
     
     val = time_step / mean(1./drg);
     DRY = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
@@ -285,6 +313,12 @@ if 1
     [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
     convergence_plot(rv0/rv0(1),'k:');
     report('y bicgstab', mulcnt, vec, rv0(end));
+    
+    mulcnt = 0;
+    % Matlab BiCGStab(L)
+    [vec,~,~,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    convergence_plot(rv0/rv0(1), 'b:');
+    report('y bicgstab(1)', mulcnt, vec, rv0(end));
     
     try
         OPT.michol = 'off';
@@ -307,13 +341,13 @@ if 1
     mulcnt = 0;
     [vec,~,~,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
     convergence_plot(rv0/rv0(1),'b:');
-    report('y bicgstab(1)', mulcnt, vec, rv0(end));
+    report('y bicgstab', mulcnt, vec, rv0(end));
 end
 
 %% a smaller sparse symmetric preconditionner
 % We project the previous preconditionner to make it isotropic in X, Y Z
 
-if 1
+if 0
     
     val = time_step / mean(1./drg);
     SML = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
@@ -497,7 +531,7 @@ end
             semilogy(dat, col, 'Linewidth', 2);
             convergence_axes = gca;
         else
-            semilogy(convergence_axes, dat, col, 'Linewidth', 2);
+            semilogy(convergence_axes, dat, 'Color', col, 'Linewidth', 2);
         end
     end
 
@@ -506,4 +540,7 @@ end
         fprintf(1, '    %-14s     converged after %4i vecmuls residual %f %f error %e\n', s, i, tr, r, norm(v-solution));
     end
 
+if nargin < 1 & dim > 0
+    sys = []
+end
 end
