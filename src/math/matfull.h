@@ -24,16 +24,16 @@ class MatrixFull final
 private:
     
     /// size of matrix
-    size_t     size_;
+    size_t size_;
 
     /// number of block on a line
-    size_t     nblk_;
+    size_t nblk_;
     
     /// size of memory which has been allocated
-    size_t     allo_;
+    size_t allo_;
     
     /// array of pointers to the blocks
-    real*      mat_;
+    real*   mat_;
     
     /// index of block
     size_t block(size_t i, size_t j) const

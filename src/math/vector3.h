@@ -342,7 +342,7 @@ public:
     /// the inversed magnitude = 1.0 / std::sqrt(x^2+y^2+z^2)
     real inv_norm() const
     {
-        return 1.0 / std::sqrt(XX*XX + YY*YY + ZZ*ZZ);
+        return 1 / std::sqrt(XX*XX + YY*YY + ZZ*ZZ);
     }
     
     /// the 2D norm = std::sqrt(x^2+y^2)

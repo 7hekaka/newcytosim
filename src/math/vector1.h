@@ -205,7 +205,7 @@ public:
     /// the inversed magnitude = 1.0 / abs(x)
     real inv_norm() const
     {
-        return 1.0 / abs_real(XX);
+        return 1 / abs_real(XX);
     }
     
     /// the 2D norm = std::sqrt(x^2+y^2)

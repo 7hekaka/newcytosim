@@ -72,7 +72,7 @@ namespace LinearSolvers
         /// calculate residual from `x` and return true if threshold is achieved
         bool finished(size_t size, const real* x)
         {
-            //fprintf(stderr, "   Monitor %4u residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
+            fprintf(stderr, "   Monitor %4u residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
 #if ( 1 )
             // use the 'infinite' norm (i.e. the largest element)
             real res = blas::nrm8(size, x);

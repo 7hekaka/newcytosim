@@ -218,7 +218,7 @@ namespace LinearSolvers
 #endif
             }
             
-            beta = ( rho / rho_old ) * ( alpha / omega );
+            beta = ( rho * alpha ) / ( rho_old * omega );
             // p = r + beta * ( p - omega * v )
             blas::xaxpy(dim, -omega, v, 1, p, 1);  // p = p - omega * v
 #if ( 1 )
