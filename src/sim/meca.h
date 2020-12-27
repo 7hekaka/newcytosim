@@ -131,40 +131,32 @@ The equation is formulated using linear-algebra:
 
 class Meca
 {
-public:
-    
-    /// used for recording CPU cycles
-    mutable unsigned long long cycles_;
-
-    /// verbose level
-    int doNotify;
-
-    /// enables graphical display of all interactions
-    int drawLinks;
-
 private:
-    
-    /// list of Mecable containing points to simulate
-    Array<Mecable*> mecables;
     
     /// time step for Brownian Mechanics = copy of simul:time_step
     real   tau_;
-
-    /// flag to indicate that result is available
-    int    ready_;
+    
+    /// simul:kT / simul:time_step
+    real   alpha_;
+    
+    /// accepted residual threshold when solving linear system
+    real   tolerance_;
     
     /// total number of points in the system
     size_t nPoints_;
     
     /// size of the currently allocated memory
     size_t allocated_;
-    
-    /// accepted residual threshold when solving linear system
-    real   tolerance_;
 
     /// number of preconditionner blocks that could not be factorized
     size_t bump_;
     
+    /// flag to indicate that result is available
+    int    ready_;
+    
+    /// list of Mecable containing points to simulate
+    Array<Mecable*> mecables;
+
     //--------------------------------------------------------------------------
     // Vectors of size DIM * nbPoints()
     
@@ -186,6 +178,17 @@ private:
     
     /// Matrices used for GMRES
     //LinearSolvers::Matrix mH, mV;
+
+public:
+    
+    /// used for recording CPU cycles
+    mutable unsigned long long cycles_;
+
+    /// verbose level
+    int doNotify;
+
+    /// enables graphical display of all interactions
+    int drawLinks;
 
 private:
 #if USE_ISO_MATRIX    

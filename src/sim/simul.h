@@ -202,7 +202,7 @@ public:
     /// solve mechanical system and calculate forces but do not apply movements
     void  solve_half();
 
-    /// replace coordinates of Mecables by the ones calculated in solve_half()
+    /// replace coordinates of Mecables by the ones calculated in solve()
     void  apply() const { sMeca.apply(); }
     
     /// like 'solve' but automatically selects the fastest preconditionning method

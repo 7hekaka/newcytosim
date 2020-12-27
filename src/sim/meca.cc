@@ -1474,7 +1474,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      */
     
     real noiseLevel = INFINITY;
-    const real alpha = prop->kT / tau_;
+    alpha_ = prop->kT / tau_;
     
     /*
      Add Brownian contributions and calculate Minimum value of it
@@ -1488,7 +1488,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         for ( Mecable * mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
-            real n = brownian1(mec, vRND+inx, alpha, vFOR+inx, tau_, vRHS+inx);
+            real n = brownian1(mec, vRND+inx, alpha_, vFOR+inx, tau_, vRHS+inx);
             local = std::min(local, n);
             //printf("thread %i min: %f\n", omp_get_thread_num(), local);
         }
@@ -1559,7 +1559,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         tolerance_ = noiseLevel * prop->tolerance;
     else
     {
-        if ( alpha > 0 )
+        if ( alpha_ > 0 )
             Cytosim::log << "Warning: all Brownian terms are zero\n";
         // when temperature == 0, use tolerance as an absolute quantity:
         tolerance_ = prop->tolerance;
@@ -1689,21 +1689,6 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     //add the solution (the displacement) to update the Mecable's vertices
     blas::add(dimension(), vSOL, vPTS);
 
-    /*
-     Re-calculate forces with the new coordinates, excluding bending elasticity.
-     In this way the forces returned to the fibers do not sum-up to zero, and
-     are appropriate for example to calculate the effect of force on assembly.
-     */
-    calculateForces(vPTS, vBAS, vFOR);
-    
-    // add Brownian terms:
-    for ( Mecable * mec : mecables )
-    {
-        const size_t inx = DIM * mec->matIndex();
-        mec->addBrownianForces(vRND+inx, alpha, vFOR+inx);
-        //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+inx, 2, DIM);
-    }
-
     ready_ = 1;
 
     // report on the matrix type and size, sparsity, and the number of iterations
@@ -1762,6 +1747,22 @@ void Meca::apply()
                 abort();
             }
         }
+        
+        /*
+         Re-calculate forces with the new coordinates, excluding bending elasticity.
+         In this way the forces returned to the fibers do not sum-up to zero, and
+         are appropriate for example to calculate the effect of force on assembly.
+         */
+        calculateForces(vPTS, vBAS, vFOR);
+        
+        // add Brownian terms:
+        for ( Mecable * mec : mecables )
+        {
+            const size_t inx = DIM * mec->matIndex();
+            mec->addBrownianForces(vRND+inx, alpha_, vFOR+inx);
+            //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+inx, 2, DIM);
+        }
+
         #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
@@ -2206,21 +2207,21 @@ void Meca::dumpMobility(FILE * file, bool nat) const
 void Meca::dumpPreconditionner(FILE * file, bool nat) const
 {
     const size_t dim = dimension();
-    real * src = new_real(dim);
-    real * res = new_real(dim);
+    real * vec = new_real(dim);
     
-    zero_real(dim, src);
-    
-    for ( size_t ii = 0; ii < dim; ++ii )
+    for ( size_t i = 0; i < dim; ++i )
     {
-        src[ii] = 1;
-        precondition(src, res);
-        dumpVector(file, dim, res, nat);
-        src[ii] = 0;
+        zero_real(dim, vec);
+        vec[i] = 1;
+        for ( Mecable const* mec : mecables )
+        {
+            const size_t inx = DIM * mec->matIndex();
+            applyPreconditionner(mec, vec+inx);
+        }
+        dumpVector(file, dim, vec, nat);
     }
     
-    free_real(res);
-    free_real(src);
+    free_real(vec);
 }
 
 
