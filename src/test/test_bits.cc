@@ -143,5 +143,4 @@ int main(int argc, char* argv[])
     std::cout << "sign_select( 1.0, 1.0, 2.0)  " << sign_select( 1.0, 1.0, 2.0) << '\n';
 
     printf("\ndone\n");
-    return 0;
 }

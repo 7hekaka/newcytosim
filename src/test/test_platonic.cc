@@ -201,7 +201,6 @@ int main(int argc, char* argv[])
   
     setPlatonic();
     glutMainLoop();
-    return EXIT_SUCCESS;
 }
 
 /*
@@ -222,7 +221,6 @@ int main(int argc, char* argv[])
      Platonic::Solid T5(kind, 32);
      printf("-------------- order 64:\n");
      Platonic::Solid T6(kind, 64);
-    return 0;
 }
 */
 

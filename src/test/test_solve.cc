@@ -322,6 +322,4 @@ int main(int argc, char* argv[])
     glutKeyboardFunc(processNormalKey);
     
     glutMainLoop();
-    
-    return EXIT_SUCCESS;
 }

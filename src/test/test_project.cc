@@ -1607,6 +1607,4 @@ int main(int argc, char* argv[])
     
     free_reals(tmp_, lag_, force_, pos_);
     free_reals(dir_, ani_, diag_, upper_);
-
-    return EXIT_SUCCESS;
 }

@@ -246,5 +246,4 @@ int main(int argc, char* argv[])
 
     timerFunction(0);
     glutMainLoop();
-    return EXIT_SUCCESS;
 }

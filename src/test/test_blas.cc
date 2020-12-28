@@ -94,5 +94,4 @@ int main(int argc, char* argv[])
     test_lapack(10);
 
     printf("\ndone!\n");
-    return 0;
 }

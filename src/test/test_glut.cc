@@ -379,6 +379,4 @@ int main(int argc, char* argv[])
     
     // --- starts the event loop, which will never return:
     glutMainLoop();
-    
-    return EXIT_SUCCESS;
 }

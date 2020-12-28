@@ -178,5 +178,4 @@ int main(int argc, char* argv[])
     RNG.seed();
     test1();
     //test2(10000);
-    return 0;
 }

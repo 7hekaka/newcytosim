@@ -137,5 +137,4 @@ int main()
     infinities();
     print_numbers();
     out << "test completed" << '\n';
-    return 0;
 }

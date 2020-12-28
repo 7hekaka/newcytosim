@@ -25,7 +25,5 @@ int main(int argc, char * argv[])
     //dispatch_release(queue);
     for ( int i = 0; i < 10; ++i )
         printf("%i %9.3f\n", i, results[i]);
-    
-    return 0;
 }
 

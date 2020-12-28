@@ -31,8 +31,6 @@ int main(int argc, char* argv[])
         if ( arg.set(i, "integer") )  printf("integer : %i\n", i);
         if ( arg.set(f, "float") )    printf("float : %f\n", f);
         if ( arg.set(s, "string") )   printf("string : %s\n", s.c_str());
-        
-        return EXIT_SUCCESS;
     }
     catch ( Exception& e )
     {

@@ -257,6 +257,4 @@ int main(int argc, char* argv[])
         
         is.close();
     }
-    
-    return EXIT_SUCCESS;
 }

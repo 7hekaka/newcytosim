@@ -607,6 +607,5 @@ int main(int argc, char* argv[])
 
     checkVolume();
     glutMainLoop();
-    return EXIT_SUCCESS;
 }
 

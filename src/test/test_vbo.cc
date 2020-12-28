@@ -198,6 +198,4 @@ int main(int argc, char* argv[])
     
     glutReportErrors();
     glutMainLoop();
-    
-    return EXIT_SUCCESS;
 }

@@ -329,6 +329,4 @@ int main(int argc, char* argv[])
     glApp::setScale(2*range+1);
 
     glutMainLoop();
-
-    return 0;
 }

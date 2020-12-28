@@ -53,5 +53,4 @@ int main(int argc, char *argv[])
     pthread_cond_destroy(&condition);
     pthread_mutex_destroy(&mutex);
     printf("finished\n");
-    return 0;
 }

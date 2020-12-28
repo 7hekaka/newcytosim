@@ -524,6 +524,4 @@ int main( int argc, char *argv[] )
         mode = (unsigned)atoi(argv[2]);
     
     goLive(midi, nova);
-    
-    return 0;
 }

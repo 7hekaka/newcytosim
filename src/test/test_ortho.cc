@@ -119,9 +119,8 @@ void test(size_t cnt)
 }
 
 
-int main ()
+int main()
 {
     printf("test_ortho --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
     test(1<<15);
-    return 0;
 }

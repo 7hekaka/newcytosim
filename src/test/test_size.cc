@@ -84,5 +84,4 @@ int main(int argc, char* argv[])
         PRINT(Sphere);
         PRINT(Simul);
     }
-    return EXIT_SUCCESS;
 }

@@ -121,5 +121,4 @@ int main(int argc, char* argv[])
             break;
         ++frm;
     }
-    return 0;
 }

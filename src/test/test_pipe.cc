@@ -179,6 +179,5 @@ int main(int argc, char* argv[])
     
     //stop();
     printf("controller terminated\n");
-    return 0;
 }
 

@@ -502,5 +502,4 @@ int main(int argc, char* argv[])
     
     funlockfile(file);
     fclose(file);
-    return EXIT_SUCCESS;
 }

@@ -305,6 +305,4 @@ int main(int argc, char* argv[])
     testDPTTS(nbs, 1<<17);
     std::cout << "testThomas\n";
     testThomas(nbs, 1<<15);
-    
-    return EXIT_SUCCESS;
 }

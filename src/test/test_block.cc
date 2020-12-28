@@ -206,8 +206,6 @@ int main( int argc, char* argv[] )
     }
     
     speedMatrix(119, 1<<12);
-
-    return EXIT_SUCCESS;
 }
 
 

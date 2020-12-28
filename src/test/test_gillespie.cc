@@ -247,6 +247,5 @@ int main(int argc, char * argv[])
         engine.step(time_step);
         std::cout << "------" << std::endl;
     }
-    return 0;
 }
 

@@ -212,5 +212,4 @@ int main(int argc, char* argv[])
     RNG.seed();
     testQuartic(1<<14, 4);
     printf("test complete\n");
-    return 0;
 }

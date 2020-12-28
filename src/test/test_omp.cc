@@ -64,5 +64,4 @@ int main(int argc, char* argv[])
         process(i);
  
     printf("done\n");
-    return 0;
 }

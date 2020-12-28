@@ -198,6 +198,5 @@ int main(int argc, char* argv[])
     free_real(sol);
     free_real(rhs);
     free_real(vec);
-    return EXIT_SUCCESS;
 }
 

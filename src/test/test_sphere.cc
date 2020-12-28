@@ -195,5 +195,4 @@ int main(int argc, char* argv[])
     gle::initialize();
 
     glutMainLoop();
-    return EXIT_SUCCESS;
 }

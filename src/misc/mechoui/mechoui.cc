@@ -201,5 +201,4 @@ int main(int argc, char* argv[])
     timer(0);
     
     glutMainLoop();
-    return EXIT_SUCCESS;
 }

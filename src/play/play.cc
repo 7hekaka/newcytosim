@@ -431,6 +431,4 @@ int main(int argc, char* argv[])
     //start the GLUT event handler:
     glutMainLoop();
 #endif
-
-    return EXIT_SUCCESS;
 }

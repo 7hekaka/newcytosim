@@ -57,11 +57,10 @@ void print_sizes()
     printf("size_t        = %lu bytes\n", sizeof(size_t) );
 }
 
-int main ()
+int main()
 {
     print_types();
     //printf("\n");
     //print_sizes();
     printf("done\n");
-    return 0;
 }

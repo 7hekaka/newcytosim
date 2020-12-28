@@ -524,5 +524,4 @@ int main(int argc, char* argv[])
     std::cout << " segments,   " << __VERSION__ << "\n";
     testRigidity(1<<20);
     free_reals(vP, vX, vY, vZ);
-    return EXIT_SUCCESS;
 }

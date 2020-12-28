@@ -181,6 +181,4 @@ int main(int argc, char* argv[])
         std::cerr << e.brief() << '\n';
         return EXIT_FAILURE;
     }
-    
-    return EXIT_SUCCESS;
 }

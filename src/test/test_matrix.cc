@@ -693,6 +693,5 @@ int main( int argc, char* argv[] )
     for ( int i = 0; i < 5; ++i )
         testMatrices(DIM*dim[i], RNG.pint32(dim[i]*dim[i]));
 #endif
-    return EXIT_SUCCESS;
 }
 

@@ -98,6 +98,4 @@ int main(int argc, char* argv[])
             simul.report(std::cout, what, arg);
         }
     }
-    
-    return EXIT_SUCCESS;
 }

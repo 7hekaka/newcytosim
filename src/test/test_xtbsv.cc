@@ -168,5 +168,4 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     testTBSV(1<<16);
-    return EXIT_SUCCESS;
 }

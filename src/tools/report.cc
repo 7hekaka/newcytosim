@@ -247,5 +247,4 @@ int main(int argc, char* argv[])
     }
     
     arg.print_warning(std::cerr, cnt, "\n");
-    return EXIT_SUCCESS;
 }

@@ -38,5 +38,4 @@ int main ()
         std::cout << " " << x;
     }
     std::cout << std::endl;
-    return 0;
 }

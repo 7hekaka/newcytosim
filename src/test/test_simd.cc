@@ -920,6 +920,5 @@ int main(int argc, char * argv[])
         run(vectorU, "vectorU");
 #endif
     }
-    return 0;
 }
 
