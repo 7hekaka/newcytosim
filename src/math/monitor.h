@@ -72,7 +72,7 @@ namespace LinearSolvers
         /// calculate residual from `x` and return true if threshold is achieved
         bool finished(size_t size, const real* x)
         {
-            fprintf(stderr, "   Monitor %4u residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
+            //fprintf(stderr, "   Monitor %4u residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
 #if ( 1 )
             // use the 'infinite' norm (i.e. the largest element)
             real res = blas::nrm8(size, x);
@@ -81,11 +81,11 @@ namespace LinearSolvers
             real res = blas::nrm2(size, x);
 #endif
             //fprintf(stderr, "   Monitor %4u  isnan %i residual %12.6f\n", cnt_, isnan(size, x), res);
-#if ( 1 )
-            // monitor convergence: the residual from a linear solver may occasionally 
+#if ( 0 )
+            // check residual for non-smooth convergence pattern.
             if ( 1 == (16&cnt_) )
             {
-                if ( res > 2*resOld_ )
+                if ( res > 4*resOld_ )
                 {
                     printf("Warning: slow convergence (reduce time_step?)");
                     printf(" residual %.3e at iteration %u, %.3e at %u\n", resOld_, cntOld_, res, cnt_);
