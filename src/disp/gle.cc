@@ -434,7 +434,7 @@ namespace gle
     }
          
     /// Tetrahedron is make of 4 triangles = 12 vertices
-    void initTetrahedron(GLint buf1, GLint buf2, GLfloat R=1.2f)
+    void initTetrahedron(GLuint buf1, GLuint buf2, GLfloat R=1.2f)
     {
         const GLfloat S = R / M_SQRT3;
         const GLfloat Y = 2.0 * S;
@@ -467,7 +467,7 @@ namespace gle
     
     
     /// Cube is make of 12 triangles = 36 vertices
-    void initCube(GLint buf1, GLint buf2, GLfloat R=0.5773502692f)
+    void initCube(GLuint buf1, GLuint buf2, GLfloat R=0.5773502692f)
     {
         const GLfloat pts[] = {
             +R, R, R, R,-R,-R, R, R,-R,
@@ -506,7 +506,7 @@ namespace gle
     }
     
     /// Octahedron is make of 8 triangles = 24 vertices
-    void initOctahedron(GLint buf1, GLint buf2, GLfloat R=1.46459188756f)
+    void initOctahedron(GLuint buf1, GLuint buf2, GLfloat R=1.46459188756f)
     {
         // Eight triangles, ordered counterclockwise
         // set size to match the volume of the unit sphere
@@ -632,7 +632,7 @@ namespace gle
 #endif
     
     /// Icosahedrong with 20 triangles = 60 vertices
-    void initIcosahedron(GLint buf1, GLint buf2, GLfloat R=1.0f)
+    void initIcosahedron(GLuint buf1, GLuint buf2, GLfloat R=1.0f)
     {
         const GLfloat T = R * 0.8506508084f;      // (1 + sqrt(5))/2
         const GLfloat O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
@@ -690,7 +690,7 @@ namespace gle
     }
     
     /// Three fins similar to the tail of a V2 rocket
-    void initArrowTail(GLint buf1, GLint buf2, GLfloat R=0.1f,
+    void initArrowTail(GLuint buf1, GLuint buf2, GLfloat R=0.1f,
                        GLfloat B=-0.5f, GLfloat H=-1.5f, GLfloat L=2.0f)
     {
         const GLfloat T = B + L;
@@ -744,7 +744,7 @@ namespace gle
 
     //-----------------------------------------------------------------------
 
-    void drawBuffer(GLint buf1, GLint buf2, unsigned cnt, GLenum mode)
+    void drawBuffer(GLuint buf1, GLuint buf2, unsigned cnt, GLenum mode)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
@@ -847,7 +847,7 @@ namespace gle
     }
     
     /// hexagon has the same surface as a disc of radius 1.
-    void initHexTube(GLint buf1, GLint buf2, GLfloat A, GLfloat B)
+    void initHexTube(GLuint buf1, GLuint buf2, GLfloat A, GLfloat B)
     {
         constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;

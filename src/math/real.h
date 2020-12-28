@@ -134,14 +134,14 @@ inline static void copy_real(size_t cnt, real const* src, real * dst)
 inline static void copy_real(size_t cnt, real const* src, float * dst)
 {
     for ( size_t u = 0; u < cnt; ++u )
-        dst[u] = src[u];
+        dst[u] = (float)src[u];
 }
 #else
 /// copy `cnt` real scalars from `src` to `dst`
 inline static void copy_real(size_t cnt, real const* src, double * dst)
 {
     for ( size_t u = 0; u < cnt; ++u )
-        dst[u] = src[u];
+        dst[u] = (double)src[u];
 }
 #endif
 

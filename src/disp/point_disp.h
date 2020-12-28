@@ -24,10 +24,10 @@ private:
 #if POINTDISP_USES_PIXELMAPS
     
     /// pointer to 3 square bitmaps with 4*nPix*nPix pixels each
-    GLubyte   *bmp[3];
+    GLubyte   *bmp_[3];
 
     /// index of the Pixel Buffer Objects on GPU
-    GLuint     pbo[3];
+    GLuint     pbo_[3];
     
     /// center of bitmap
     GLfloat    mOffs;

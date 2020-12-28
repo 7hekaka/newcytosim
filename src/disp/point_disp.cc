@@ -20,8 +20,8 @@ void PointDisp::clearPixelmaps()
     nPix = 0;
     for ( int i = 0; i < 3; ++i )
     {
-        bmp[i] = nullptr;
-        pbo[i] = 0;
+        bmp_[i] = nullptr;
+        pbo_[i] = 0;
     }
 #endif
 }
@@ -80,12 +80,12 @@ PointDisp::~PointDisp()
     releasePixelmap();
     
 #if POINTDISP_USES_PIXEL_BUFFERS
-    if ( pbo[0] > 0 )
+    if ( pbo_[0] > 0 )
     {
-        glDeleteBuffers(3, pbo);
-        pbo[0] = 0;
-        pbo[1] = 0;
-        pbo[2] = 0;
+        glDeleteBuffers(3, pbo_);
+        pbo_[0] = 0;
+        pbo_[1] = 0;
+        pbo_[2] = 0;
     }
 #endif
 #endif
@@ -203,16 +203,16 @@ void PointDisp::allocatePixelmap()
     mOffs = -0.5f * pixSize;
     
     // allocate only if needed
-    if ( !bmp[0] || pixSize != nPix )
+    if ( !bmp_[0] || pixSize != nPix )
     {
-        if ( bmp[0] )
-            delete(bmp[0]);
+        if ( bmp_[0] )
+            delete(bmp_[0]);
     
         size_t dd = pixSize * pixSize;
         GLubyte * mem = new GLubyte[12*dd];
-        bmp[0] = mem;
-        bmp[1] = mem + 4*dd;
-        bmp[2] = mem + 8*dd;
+        bmp_[0] = mem;
+        bmp_[1] = mem + 4*dd;
+        bmp_[2] = mem + 8*dd;
         
         for ( size_t y = 0; y < 12*dd; ++y )
             mem[y] = 0;
@@ -224,10 +224,10 @@ void PointDisp::allocatePixelmap()
 
 void PointDisp::releasePixelmap()
 {
-    if ( bmp[0] )
+    if ( bmp_[0] )
     {
-        delete(bmp[0]);
-        bmp[0] = nullptr;
+        delete(bmp_[0]);
+        bmp_[0] = nullptr;
     }
     nPix = 0;
 }
@@ -330,11 +330,11 @@ void PointDisp::drawPixelmap(size_t inx) const
     //translate to center the bitmap:
     glBitmap(0,0,0,0,mOffs,mOffs,nullptr);
 #if POINTDISP_USES_PIXEL_BUFFERS
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[ii]);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, pbo_[ii]);
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 #else
-    glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[inx]);
+    glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp_[inx]);
 #endif
     CHECK_GL_ERROR("PointDisp::drawPixelmap");
 }
@@ -405,21 +405,21 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
         {
             GLubyte * tmp = new GLubyte[4*dim*dim];
             glReadPixels(0, 0, dim, dim, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
-            downsampleRGBA(bmp[i], nPix, nPix, tmp, sampling);
+            downsampleRGBA(bmp_[i], nPix, nPix, tmp, sampling);
             delete[] tmp;
 #if ( 0 )
             //savePixelmap(tmp, dim, i);
             std::clog << name() << i << "\n";
-            printPixels(bmp[i], nPix, nPix);
+            printPixels(bmp_[i], nPix, nPix);
 #endif
         }
         else
         {
-            glReadPixels(0, 0, nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp[i]);
-            //savePixelmap(bmp[i], nPix, i+10);
+            glReadPixels(0, 0, nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp_[i]);
+            //savePixelmap(bmp_[i], nPix, i+10);
         }
         CHECK_GL_ERROR("5 PointDisp::makePixelmaps");
-        storePixelmap(bmp[i], nPix, pbo[i]);
+        storePixelmap(bmp_[i], nPix, pbo_[i]);
     }
  
     glMatrixMode(GL_PROJECTION);
@@ -440,8 +440,8 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
 void PointDisp::createPixelmaps(GLfloat uf)
 {
 #if POINTDISP_USES_PIXEL_BUFFERS
-    if ( pbo[0] == 0 )
-        glGenBuffers(3, pbo);
+    if ( pbo_[0] == 0 )
+        glGenBuffers(3, pbo_);
 #endif
     
     if ( pixSize != nPix )
