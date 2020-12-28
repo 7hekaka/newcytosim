@@ -148,73 +148,68 @@ convergence_axes = [];
 
 mulcnt = 0;
 [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit);
-convergence_plot(mulcnt, rv0, 'bicgstab', '-.');
-report('bicgstab', mulcnt, vec, res);
+report('bicgstab', mulcnt, vec, res, rv0, '-.');
 
 if 0
     % Matlab BiCGStab(L)
     mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit);
-    convergence_plot(mulcnt, rv0, 'bicgstabL', ':');
-    report('bicgstab(1)', mulcnt, vec, res);
+    report('bicgstab(1)', mulcnt, vec, res, rv0, ':');
+end
+
+if 0
+    % Matlab CGS
+    mulcnt = 0;
+    [vec,~,res,itr,rv0] = cgs(@multiply, rhs, reltol, maxit);
+    report('CGS', mulcnt, vec, res, rv0, ':');
 end
 
 if 0 %% no preconditionning
- 
     % BiCGStab(L)
     for i = 1:4
         OPT.Tol = reltol;
         OPT.ell = min(2^i, dim);
         OPT.MaxIt = maxit;
         [vec,rv0,itr] = cgstab(system, rhs, [], [], OPT);
-        str = sprintf('BiCGS(%i)', OPT.ell);
-        convergence_plot(2*itr, rv0(:,1), str, ':');
-        report(str, itr, vec, rv0(end,1));
+        report(sprintf('BiCGS(%i)', OPT.ell), 2*itr, vec, rv0(end,1), rv0(:,1), ':');
     end
+end
+if 1
+    % GMRES
+    for i = 4:6
+        mulcnt = 0;
+        RS = min(2^i, dim);
+        [vec,~,res,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
+        report(sprintf('GMRES %03i', RS), mulcnt, vec, res, rv0, ':');
+    end
+end
+if 0 %% no preconditionning
     % IDRS-STAB
     for i = 0:4
         RS = min(2^i, dim);
         [vec,~,res,itr,rv0] = IDRstabg5(system, rhs, RS, reltol, maxit, [], [], []);
-        str = sprintf('IDRSTAB %03i', RS);
-        convergence_plot(2*itr, rv0,str, ':');
-        report(str, itr, vec, res);
+        report(sprintf('IDRSTAB %03i', RS), 2*itr, vec, res, rv0, ':');
     end
     % IDRS
     OPT.smoothing = 0;
     for i = 0:4
         RS = min(2^i, dim);
         [vec,~,res,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, [], [], [], OPT);
-        str = sprintf('IDRS %03i', RS);
-        convergence_plot(2*itr,rv0,str,':');
-        report(str, itr, vec, res);
-    end
-end
-if 0
-    % GMRES
-    for i = 2:6
-        RS = min(2^i, dim);
-        mulcnt = 0;
-        [vec,~,res,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
-        str = sprintf('GMRES %03i', RS);
-        convergence_plot(mulcnt,rv0,str,':');
-        report(str, itr(1)*RS+itr(2), vec, res);
+        report(sprintf('IDRS %03i', RS), 2*itr, vec, res, rv0, ':');
     end
 end
 if 1
     % CORS
     mulcnt = 0;
     [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit);
-    convergence_plot(mulcnt,rv0,'CORS', ':');
-    report('CORS', mulcnt, vec, res);
+    report('CORS', mulcnt, vec, res, rv0, ':');
     % BiCOR
     mulcnt = 0;
     [vec,~,res,itr,rv0] = BiCOR(@multiply, rhs, reltol, maxit);
-    convergence_plot(mulcnt,rv0,'BiCOR', ':');
-    report('BiCOR', mulcnt, vec, res);
+    report('BiCOR', mulcnt, vec, res, rv0, ':');
     % BiCGCR2
     [vec,~,res,itr,rv0] = BiCGCR2(system, rhs, reltol, maxit);
-    convergence_plot(2*itr,rv0,'BiCGCR2', ':');
-    report('BiCGCR2', 2*itr, vec, res);
+    report('BiCGCR2', 2*itr, vec, res, rv0, ':');
 end
 
 drawnow;
@@ -241,40 +236,43 @@ fprintf(2, '    Block preconditionner has %9i elements\n', nnz(PRC));
 
 convergence_axes = [];
 
-if 1
-    mulcnt = 0;
-    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
-    convergence_plot(mulcnt,rv0,'P bicgstab');
-    report('P bicgstab', mulcnt, vec, res);
+mulcnt = 0;
+[vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
+report('P bicgstab', mulcnt, vec, res, rv0);
 
-    % checking the reconstituted block preconditionner:
-    mulcnt = 0;
-    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
-    convergence_plot(mulcnt,rv0,'R bicgstab');
-    report('R bicgstab', mulcnt, vec, res);
-end
+% checking the reconstituted block preconditionner:
+mulcnt = 0;
+[vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
+report('R bicgstab', mulcnt, vec, res, rv0);
+
 if 0
     mulcnt = 0;
     % Matlab BiCGStab(L)
     [vec,~,res,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
-    convergence_plot(mulcnt,rv0,'P bicgstabL');
-    report('P bicgstab(1)', mulcnt, vec, res);
+    report('P bicgstab(1)', mulcnt, vec, res, rv0);
+end
+if 0
+    % GMRES
+    for i = 2:6
+        mulcnt = 0;
+        RS = min(2^i, dim);
+        [vec,~,res,itr,rv0] = gmres(@multiply, rhs, RS, reltol/3, maxit, [], @precondition);
+        str = sprintf('P GMRES %03i', RS);
+        report(str, mulcnt, vec, res, rv0);
+    end
 end
 if 1
     % CORS
     mulcnt = 0;
     [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit, @preconditionPRC);
-    convergence_plot(mulcnt,rv0,'R CORS');
-    report('R CORS', mulcnt, vec, res);
+    report('R CORS', mulcnt, vec, res, rv0);
     % BiCOR
     mulcnt = 0;
     [vec,~,res,itr,rv0] = BiCOR(@multiply, rhs, reltol, maxit, @preconditionPRC);
-    convergence_plot(mulcnt,rv0,'R BiCOR');
-    report('R BiCOR', mulcnt, vec, res);
+    report('R BiCOR', mulcnt, vec, res, rv0);
     % BiCGCR2
     [vec,~,res,itr,rv0] = BiCGCR2(system, rhs, reltol, maxit, @preconditionPRC);
-    convergence_plot(2*itr,rv0,'R BiCGCR2');
-    report('R BiCGCR2', 2*itr, vec, res);
+    report('R BiCGCR2', 2*itr, vec, res, rv0);
 end
 
 if 0
@@ -285,30 +283,20 @@ if 0
         OPT.MaxIt = maxit;
         OPT.TypePrecond = 'right';
         [vec,rv0,itr] = cgstab(@multiply, rhs, OPT, @precondition);
-        convergence_plot(itr,rv0(:,1),'P cgstab');
-        report(sprintf('P BiCGS(%i)', OPT.ell), itr, vec, rv0(end));
-    end
-    % GMRES
-    for i = 1:6
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol/3, maxit, [], @precondition);
-        convergence_plot(itr,rv0,'P GMRES');
-        report(sprintf('P GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
+        report(sprintf('P BiCGS(%i)', OPT.ell), itr, vec, rv0(end), rv0);
     end
     % IDRS-STAB
     for i = 0:5
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, @precondition, [], []);
-        convergence_plot(itr,rv0,'IDRstabg5');
-        report(sprintf('P IDRSTAB %03i', RS), itr, vec, rv0(end));
+        [vec,~,res,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, @precondition, [], []);
+        report(sprintf('P IDRSTAB %03i', RS), itr, vec, res, rv0);
     end
     % IDRS
     OPT.smoothing = 1;
     for i = 0:3
         RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs_f(@multiply, rhs, RS, reltol, maxit, @precondition, [], [], OPT);
-        convergence_plot(itr,rv0,'idrs_f');
-        report(sprintf('P IDRS %03i', RS), itr, vec, rv0(end));
+        [vec,~,res,itr,rv0] = idrs_f(@multiply, rhs, RS, reltol, maxit, @precondition, [], [], OPT);
+        report(sprintf('P IDRSF %03i', RS), itr, vec, res, rv0);
     end
 end
 
@@ -333,15 +321,8 @@ if 0
     fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
     
     mulcnt = 0;
-    [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(itr,rv0,'bicgstab');
-    report('y bicgstab', mulcnt, vec, rv0(end));
-    
-    mulcnt = 0;
-    % Matlab BiCGStab(L)
-    [vec,~,~,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(itr,rv0,'bicgstabL');
-    report('y bicgstab(1)', mulcnt, vec, rv0(end));
+    [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    report('y bicgstab', mulcnt, vec, res, rv0);
     
     try
         OPT.michol = 'off';
@@ -351,9 +332,8 @@ if 0
         fprintf(2, 'dropped incomplete Cholesky has %i elements\n', nnz(L));
         
         mulcnt = 0;
-        [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-        convergence_plot(itr,rv0,'bicgstab');
-        report('y bicgstab', mulcnt, vec, rv0(end));
+        [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+        report('y bicgstab', mulcnt, vec, res, rv0);
     catch
         fprintf(2, 'dropped incomplete Cholesky failed!\n');
     end
@@ -362,9 +342,8 @@ if 0
     fprintf(2, 'complete Cholesky has %i elements\n', nnz(L));
     
     mulcnt = 0;
-    [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(itr,rv0,'bicgstab');
-    report('y bicgstab', mulcnt, vec, rv0(end));
+    [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    report('y bicgstab', mulcnt, vec, res, rv0);
 end
 
 %% a smaller sparse symmetric preconditionner
@@ -403,14 +382,12 @@ if 0
     end
     
     mulcnt = 0;
-    [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(itr,rv0,'bicgstab');
-    report('s bicgstab', mulcnt, vec, rv0(end));
+    [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+    report('s bicgstab', mulcnt, vec, res, rv0);
     
     mulcnt = 0;
-    [vec,~,~,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
-    convergence_plot(itr,rv0,'bicgstabL');
-    report('s bicgstab(1)', mulcnt, vec, rv0(end));
+    [vec,~,res,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
+    report('s bicgstab(1)', mulcnt, vec, res, rv0);
 end
 
 
@@ -438,21 +415,8 @@ if 0
         fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
         
         mulcnt = 0;
-        [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
-        convergence_plot(itr,rv0,'I bicgstab');
-        report('w bicgstab', mulcnt, vec, rv0(end));
-        
-        mulcnt = 0;
-        [vec,~,~,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
-        convergence_plot(itr,rv0,'I bicgstabL');
-        report('w bicgstab(1)', mulcnt, vec, rv0(end));
-        
-        for i = 0:3
-            RS = min(2^i, dim);
-            [vec,~,~,itr,rv0] = idrs(system, rhs, RS, reltol, maxit, L, L', [], OPT);
-            convergence_plot(itr,rv0,'I idrs');
-            report(sprintf('w IDRS %03i', RS), 2*itr, vec, rv0(end));
-        end
+        [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
+        report('I bicgstab', mulcnt, vec, res, rv0);
         
     else
         
@@ -463,36 +427,10 @@ if 0
         fprintf(2, '    incomplete LU has %i + %i elements\n', nnz(L), nnz(U));
         
         mulcnt = 0;
-        [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
-        convergence_plot(itr,rv0,'i bicgstab');
-        report('i bicgstab', mulcnt, vec, rv0(end));
+        [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
+        report('i bicgstab', mulcnt, vec, res, rv0);
         
-        % Matlab BiCGStab(L)
-        mulcnt = 0;
-        [vec,~,~,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, U);
-        convergence_plot(itr,rv0,'i bicgstabL');
-        report('i bicgstab(1)', mulcnt, vec, rv0(end));
-        
-    end
-    
-    if 0
-        % IDRS-STAB
-        for i = 0:5
-            RS = min(2^i, dim);
-            [vec,~,~,itr,rv0] = IDRstabg5(@multiply, rhs, RS, reltol/2, maxit, L, U, []);
-            convergence_plot(itr,rv0,'LU IDRstabg5');
-            report(sprintf('i IDRSTAB %03i', RS), itr, vec, rv0(end));
-        end
-        
-        OPT.smoothing = 1;
-        for i = 0:3
-            RS = min(2^i, dim);
-            [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, L, U, [], OPT);
-            convergence_plot(itr,rv0,'LU idrs');
-            report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
-        end
-    end
-    
+    end   
 end
 
 
@@ -504,24 +442,10 @@ if 0
     [L, U] = ilu(system, OPT);
     fprintf(2, 'incomplete LU      has %i + %i elements\n', nnz(L), nnz(U));
     
-    [vec,~,~,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
-    convergence_plot(itr,rv0,'iLU bicgstab');
-    report('i bicgstab', 2*itr, vec, rv0(end));
-    
-    for i = 1:5
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit, L, U);
-        convergence_plot(itr,rv0,'iLU gmres');
-        report(sprintf('i GMRES %03i', RS), itr(1)*RS+itr(2), vec, rv0(end));
-    end
-    
-    for i = 1:3
-        RS = min(2^i, dim);
-        [vec,~,~,itr,rv0] = idrs(@multiply, rhs, RS, reltol, maxit, L, U, [], OPT);
-        convergence_plot(itr,rv0, 'iLU idrs');
-        report(sprintf('i IDRS %03i', RS), itr, vec, rv0(end));
-    end
-    
+    mulcnt = 0;
+    [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
+    report('iLU bicgstab', mulcnt, vec, res, rv0);
+
 end
 
 %% Functions
@@ -552,7 +476,7 @@ end
     end
 
 
-    function convergence_plot(mvs, data, txt, lin)
+    function convergence_plot(str, mvs, data, lin)
         %fprintf(1, '%s    %4.1f %4i\n', txt, mvs, length(data));
         mvs = (0:(length(data)-1)) * ( mvs / length(data) );
         % crop data:
@@ -561,7 +485,7 @@ end
         mvs = mvs(1:up);
         if isempty(convergence_axes)
             figure('Name', 'Convergence');
-            p = semilogy(mvs, dat,'DisplayName',txt);
+            p = semilogy(mvs, dat,'DisplayName',str);
             convergence_axes = gca;
             xlabel('Number of MAT.vec');
             ylabel('Relative residual');
@@ -569,7 +493,7 @@ end
             legend();
             hold on;
         else
-            p = semilogy(convergence_axes, mvs, dat,'DisplayName',txt);
+            p = semilogy(convergence_axes, mvs, dat,'DisplayName',str);
         end
         %pick a random color
         col = rand(1,3);
@@ -578,16 +502,16 @@ end
         end
         p.Color = col;
         p.LineWidth = 2;
-        if nargin < 4
-            p.LineStyle = '-';
-        else
-            p.LineStyle = lin;
-        end
+        p.LineStyle = lin;
     end
 
-    function report(s, mv, v, r)
+    function report(s, mv, v, r, rv0, lin)
+        if nargin < 6
+            lin = '-';
+        end
         tr = norm(system*v-rhs);
-        fprintf(1, '    %-14s     converged after %4i matvecs residual %f %f error %e\n', s, mv, tr, r*norm_rhs, norm(v-solution));
+        fprintf(1, '    %-14s     converged after %4i matvecs residual %f %f error %e\n', s, mv, tr, r, norm(v-solution));
+        convergence_plot(s, mv, rv0./rv0(1), lin);
         mulcnt = 0;
     end
 

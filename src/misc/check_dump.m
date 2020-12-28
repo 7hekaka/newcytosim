@@ -1,4 +1,4 @@
-function [sys, rhs, con] = cytosim_dump(path)
+function [sys, rhs, con] = check_dump(path)
 
 % This is used to explore Cytosim's linear system in matlab
 % - load the matrices and vector from Cytosim's dump
@@ -134,8 +134,7 @@ convergence_axes = [];
 
 mulcnt = 0;
 [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit);
-convergence_plot(mulcnt, rv0, 'bicgstab', '-.');
-report('bicgstab', mulcnt, vec, res);
+report('bicgstab', mulcnt, vec, res, rv0, '-.');
 
 drawnow;
 
@@ -161,14 +160,12 @@ fprintf(2, '    Block preconditionner has %9i elements\n', nnz(PRC));
 
 mulcnt = 0;
 [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
-convergence_plot(mulcnt,rv0,'P bicgstab');
-report('P bicgstab', mulcnt, vec, res);
+report('P bicgstab', mulcnt, vec, res, rv0);
 
 % checking the reconstituted block preconditionner:
 mulcnt = 0;
 [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
-convergence_plot(mulcnt,rv0,'R bicgstab');
-report('R bicgstab', mulcnt, vec, res);
+report('P bicgstab', mulcnt, vec, res, rv0);
 
 %% Functions
 
@@ -198,7 +195,7 @@ report('R bicgstab', mulcnt, vec, res);
     end
 
 
-    function convergence_plot(mvs, data, txt, lin)
+    function convergence_plot(str, mvs, data, lin)
         %fprintf(1, '%s    %4.1f %4i\n', txt, mvs, length(data));
         mvs = (0:(length(data)-1)) * ( mvs / length(data) );
         % crop data:
@@ -207,7 +204,7 @@ report('R bicgstab', mulcnt, vec, res);
         mvs = mvs(1:up);
         if isempty(convergence_axes)
             figure('Name', 'Convergence');
-            p = semilogy(mvs, dat,'DisplayName',txt);
+            p = semilogy(mvs, dat,'DisplayName',str);
             convergence_axes = gca;
             xlabel('Number of MAT.vec');
             ylabel('Relative residual');
@@ -215,7 +212,7 @@ report('R bicgstab', mulcnt, vec, res);
             legend();
             hold on;
         else
-            p = semilogy(convergence_axes, mvs, dat,'DisplayName',txt);
+            p = semilogy(convergence_axes, mvs, dat,'DisplayName',str);
         end
         %pick a random color
         col = rand(1,3);
@@ -224,16 +221,16 @@ report('R bicgstab', mulcnt, vec, res);
         end
         p.Color = col;
         p.LineWidth = 2;
-        if nargin < 4
-            p.LineStyle = '-';
-        else
-            p.LineStyle = lin;
-        end
+        p.LineStyle = lin;
     end
 
-    function report(s, mv, v, r)
+    function report(s, mv, v, r, rv0, lin)
+        if nargin < 6
+            lin = '-';
+        end
         tr = norm(system*v-rhs);
-        fprintf(1, '    %-14s     converged after %4i matvecs residual %f %f error %e\n', s, mv, tr, r*norm_rhs, norm(v-solution));
+        fprintf(1, '    %-14s     converged after %4i matvecs residual %f %f error %e\n', s, mv, tr, r, norm(v-solution));
+        convergence_plot(s, mv, rv0./rv0(1), lin);
         mulcnt = 0;
     end
 
