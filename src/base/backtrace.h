@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 // Created by Francois Nedelec on 24/04/2010.
 #ifndef BACKTRACE_H
 #define BACKTRACE_H
