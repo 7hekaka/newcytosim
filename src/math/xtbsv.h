@@ -258,7 +258,7 @@ void blas_xtbsv(char Uplo, char Trans, char Diag, const int N, const int KD, con
     END IF
     END IF
  */
-void  blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
+void blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
 {
     for ( int J = 0; J < N; ++J )
     {

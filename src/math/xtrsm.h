@@ -50,7 +50,7 @@
 /**
  Solve A*X = alpha*B, overwriting B with X.
  DTRSM('L', 'L', 'N', Diag, M, N, ALPHA, A, LDA, B, LDB);
- 
+ NOUNIT = LSAME(DIAG,'N')
  DO J = 1,N
     IF (ALPHA.NE.ONE) THEN
         DO I = 1,M
@@ -67,28 +67,29 @@
     CONTINUE
 CONTINUE
 */
-template < char diag >
-void blas_xtrsmLLN(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
+template < char diag, typename REAL >
+void blas_xtrsmLLN(const int M, const int N, REAL ALPHA, const REAL* A, const int lda, REAL* B, const int ldb)
 {
-    if ( ALPHA == 0.0 )
+    if ( ALPHA == 0 )
     {
         for ( int U = 0; U < N*M; ++U )
-            B[U] = 0.0;
+            B[U] = 0;
+        return;
     }
     for ( int J = 0; J < N; ++J )
     {
-        if ( ALPHA != 1.0 )
+        if ( ALPHA != 1 )
         {
             for ( int I = 0; I < M; ++I )
                 B[I] *= ALPHA;
         }
         for ( int K = 0; K < M; ++K )
         {
-            if ( B[K] != 0.0 )
+            if ( B[K] != 0 )
             {
                 if ( diag == 'N' )
                     B[K] /= A[K+lda*K];
-                real temp = B[K];
+                REAL temp = B[K];
                 for ( int I = K + 1; I < M; ++I )
                     B[I] -= temp * A[I+lda*K];
             }
@@ -101,7 +102,7 @@ void blas_xtrsmLLN(const int M, const int N, real ALPHA, const real* A, const in
 /**
  Solve transposed(A)*X = alpha*B, overwriting B with X.
  DTRSM('L', 'L', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
- 
+ NOUNIT = LSAME(DIAG,'N')
  DO J = 1,N
      DO I = M,1,-1
          TEMP = ALPHA*B(I,J)
@@ -113,19 +114,20 @@ void blas_xtrsmLLN(const int M, const int N, real ALPHA, const real* A, const in
      CONTINUE
  CONTINUE
 */
-template < char diag >
-void blas_xtrsmLLT(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
+template < char diag, typename REAL >
+void blas_xtrsmLLT(const int M, const int N, REAL ALPHA, const REAL* A, const int lda, REAL* B, const int ldb)
 {
-    if ( ALPHA == 0.0 )
+    if ( ALPHA == 0 )
     {
         for ( int U = 0; U < N*M; ++U )
-            B[U] = 0.0;
+            B[U] = 0;
+        return;
     }
     for ( int J = 0; J < N; ++J )
     {
         for ( int I = M-1; I >= 0; --I )
         {
-            real temp = ALPHA * B[I];
+            REAL temp = ALPHA * B[I];
             for ( int K = I + 1; K < M; ++K )
                 temp -= A[K+lda*I] * B[K];
             if ( diag == 'N' )
@@ -140,7 +142,7 @@ void blas_xtrsmLLT(const int M, const int N, real ALPHA, const real* A, const in
 /**
  Solve A*X = alpha*B, overwriting B with X.
  DTRSM('L', 'U', 'N', Diag, M, N, ALPHA, A, LDA, B, LDB);
- 
+ NOUNIT = LSAME(DIAG,'N')
  DO J = 1,N
      IF (ALPHA.NE.ONE) THEN
          DO I = 1,M
@@ -157,17 +159,18 @@ void blas_xtrsmLLT(const int M, const int N, real ALPHA, const real* A, const in
      CONTINUE
  CONTINUE
 */
-template < char diag >
-void blas_xtrsmLUN(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
+template < char diag, typename REAL >
+void blas_xtrsmLUN(const int M, const int N, REAL ALPHA, const REAL* A, const int lda, REAL* B, const int ldb)
 {
-    if ( ALPHA == 0.0 )
+    if ( ALPHA == 0 )
     {
         for ( int U = 0; U < N*M; ++U )
-            B[U] = 0.0;
+            B[U] = 0;
+        return;
     }
     for ( int J = 0; J < N; ++J )
     {
-        if ( ALPHA != 1.0 )
+        if ( ALPHA != 1 )
         {
             for ( int I = 0; I < M; ++I )
                 B[I] *= ALPHA;
@@ -178,7 +181,7 @@ void blas_xtrsmLUN(const int M, const int N, real ALPHA, const real* A, const in
              {
                  if ( diag == 'N' )
                      B[K] /= A[K+lda*K];
-                 real temp = B[K];
+                 REAL temp = B[K];
                  for ( int I = 0; I < K; ++I )
                      B[I] -= temp * A[I+lda*K];
              }
@@ -190,7 +193,7 @@ void blas_xtrsmLUN(const int M, const int N, real ALPHA, const real* A, const in
 /**
  Solve transposed(A)*X = alpha*B, overwriting B with X.
  DTRSM('L', 'U', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
-
+ NOUNIT = LSAME(DIAG,'N')
  DO J = 1,N
      DO I = 1,M
          TEMP = ALPHA*B(I,J)
@@ -202,19 +205,20 @@ void blas_xtrsmLUN(const int M, const int N, real ALPHA, const real* A, const in
      CONTINUE
  CONTINUE
 */
-template < char diag >
-void blas_xtrsmLUT(const int M, const int N, real ALPHA, const real* A, const int lda, real* B, const int ldb)
+template < char diag, typename REAL >
+void blas_xtrsmLUT(const int M, const int N, REAL ALPHA, const REAL* A, const int lda, REAL* B, const int ldb)
 {
-    if ( ALPHA == 0.0 )
+    if ( ALPHA == 0 )
     {
         for ( int U = 0; U < N*M; ++U )
-            B[U] = 0.0;
+            B[U] = 0;
+        return;
     }
     for ( int J = 0; J < N; ++J )
     {
         for ( int I = 0; I < M; ++I )
         {
-            real temp = ALPHA * B[I];
+            REAL temp = ALPHA * B[I];
             for ( int K = 0; K < I; ++K )
                 temp -= A[K+lda*I] * B[K];
             if ( diag == 'N' )
@@ -228,7 +232,8 @@ void blas_xtrsmLUT(const int M, const int N, real ALPHA, const real* A, const in
 /**
  Patch to BLAS' DTRSM
  */
-void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real ALPHA, const real* A, int LDA, real* B, int LDB)
+template < typename REAL >
+void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, REAL ALPHA, const REAL* A, int LDA, REAL* B, int LDB)
 {
     if ( Side == 'L' )
     {
@@ -288,12 +293,12 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, real 
  }
 
  */
-template < int ORD, char diag >
-void iso_xtrsmLLN(const int M, const real* A, const int lda, real* B)
+template < int ORD, char diag, typename REAL >
+void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        real temp[ORD];
+        REAL temp[ORD];
         if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
             {
@@ -335,12 +340,12 @@ void iso_xtrsmLLN(const int M, const real* A, const int lda, real* B)
      B[I] = temp;
  }
 */
-template < int ORD, char diag >
-void iso_xtrsmLLT(const int M, const real* A, const int lda, real* B)
+template < int ORD, char diag, typename REAL >
+void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int I = M-1; I >= 0; --I )
     {
-        real temp[ORD];
+        REAL temp[ORD];
         for ( int d = 0; d < ORD; ++d )
             temp[d] = B[ORD*I+d];
         for ( int K = I + 1; K < M; ++K )
@@ -376,14 +381,14 @@ void iso_xtrsmLLT(const int M, const real* A, const int lda, real* B)
          B[I] -= temp * A[I+lda*K];
  }
 */
-template < int ORD, char diag >
-void iso_xtrsmLUN(const int M, const real* A, const int lda, real* B)
+template < int ORD, char diag, typename REAL >
+void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int K = M-1; K >= 0; --K )
     {
         if ( B[K] != 0 )
         {
-            real temp[ORD];
+            REAL temp[ORD];
             if ( diag == 'N' ) {
                 for ( int d = 0; d < ORD; ++d )
                 {
@@ -423,12 +428,12 @@ void iso_xtrsmLUN(const int M, const real* A, const int lda, real* B)
      B[I] = temp;
  }
 */
-template < int ORD, char diag >
-void iso_xtrsmLUT(const int M, const real* A, const int lda, real* B)
+template < int ORD, char diag, typename REAL >
+void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int I = 0; I < M; ++I )
     {
-        real temp[ORD];
+        REAL temp[ORD];
         for ( int d = 0; d < ORD; ++d )
             temp[d] = B[I];
         for ( int K = 0; K < I; ++K )
@@ -467,7 +472,7 @@ void iso_xtrsmLUT(const int M, const real* A, const int lda, real* B)
  }
  */
 template < char diag >
-void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
+void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
 {
     for ( int K = 0; K < M; ++K )
     {
@@ -482,7 +487,7 @@ void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
             storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
         }
         int I = K + 1;
-        real* pB = B+3*I;
+        double* pB = B+3*I;
         {
             vec4 temp0, temp1, temp2;
             {
@@ -500,7 +505,7 @@ void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
             // this unrolling may not work so well
             for ( ; I < M-7; I += 8 )
             {
-                real const* pA = A + I;
+                double const* pA = A + I;
 #if 1
                 vec4 a0 = broadcast1(pA  );
                 vec4 a1 = broadcast1(pA+1);
@@ -607,13 +612,13 @@ void alsatian_xtrsmLLN3(const int M, const real* A, const int lda, real* B)
 
  */
 template < char diag >
-void alsatian_xtrsmLLT3(const int M, const real* A, const int lda, real* B)
+void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-        real * pB = B+3*I;
+        double * pB = B+3*I;
         const vec4 ori = loadu4(pB); //(B+3*I);
         vec4 s0 = setzero4();  // temp
         vec4 s1 = setzero4();
@@ -623,7 +628,7 @@ void alsatian_xtrsmLLT3(const int M, const real* A, const int lda, real* B)
 #if ( 0 )
         for ( ; K < M-7; K += 8 )
         {
-            const real* pA = A + K;
+            const double* pA = A + K;
             /*
              broadcast values of A:
              a0 = { AAAA } a1 = { BBBB } a2 = { CCCC } a3 = { DDDD }
@@ -736,7 +741,7 @@ void alsatian_xtrsmLLT3(const int M, const real* A, const int lda, real* B)
  }
  */
 template < char diag >
-void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
+void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
 {
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
@@ -752,7 +757,7 @@ void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
             ori = blend4(T, ori, 0b1000);
         }
         int I = 0;
-        real * pB = B;
+        double * pB = B;
         {
             vec4 temp0, temp1, temp2;
             {
@@ -825,7 +830,7 @@ void alsatian_xtrsmLUN3(const int M, const real* A, const int lda, real* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLLN2(const int M, const real* A, const int lda, real* B)
+void alsatian_xtrsmLLN2(const int M, const double* A, const int lda, double* B)
 {
     for ( int K = 0; K < M; ++K )
     {
@@ -847,7 +852,7 @@ void alsatian_xtrsmLLN2(const int M, const real* A, const int lda, real* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLLT2(const int M, const real* A, const int lda, real* B)
+void alsatian_xtrsmLLT2(const int M, const double* A, const int lda, double* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
@@ -868,7 +873,7 @@ void alsatian_xtrsmLLT2(const int M, const real* A, const int lda, real* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLUN2(const int M, const real* A, const int lda, real* B)
+void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
 {
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
@@ -891,12 +896,12 @@ void alsatian_xtrsmLUN2(const int M, const real* A, const int lda, real* B)
 
 
 /// specialized version for ORD==1
-template < char diag >
-void alsatian_xtrsmLLN1(const int M, const real* A, const int lda, real* B)
+template < char diag, typename REAL >
+void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        real temp = B[K];
+        REAL temp = B[K];
         if ( diag == 'N' ) {
             temp /= A[K];
             B[K] = temp;
@@ -913,14 +918,14 @@ void alsatian_xtrsmLLN1(const int M, const real* A, const int lda, real* B)
 
 
 /// specialized version for ORD==1
-template < char diag >
-void alsatian_xtrsmLLT1(const int M, const real* A, const int lda, real* B)
+template < char diag, typename REAL >
+void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
 {
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-        real temp = B[I];
+        REAL temp = B[I];
         # pragma ivdep
         for ( int K = I + 1; K < M; ++K )
             temp -= A[K] * B[K];
@@ -934,14 +939,14 @@ void alsatian_xtrsmLLT1(const int M, const real* A, const int lda, real* B)
 
 
 /// specialized version for ORD==1
-template < char diag >
-void alsatian_xtrsmLUN1(const int M, const real* A, const int lda, real* B)
+template < char diag, typename REAL >
+void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
 {
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        real temp = B[K];
+        REAL temp = B[K];
         if ( diag == 'N' ) {
             temp /= A[K];
             B[K] = temp;
@@ -1023,7 +1028,7 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
     {
         const int S = LDA+1;
         for ( int u = 0; u < N; ++u )
-            A[S*u] = 1.0 / A[S*u];
+            A[S*u] = real(1) / A[S*u];
     }
 }
 
@@ -1089,7 +1094,7 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
   }
   else if ( INCX < 0 )
   {
-      IX0 = K1 + ( K1-K2 )*INCX
+      IX0 = 1 + ( 1-K2 )*INCX
       I1 = K2
       I2 = K1
       INC = -1
@@ -1104,47 +1109,47 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
   }
  */
 
-template < int ORD >
-inline void swap(real* A, real* B)
+template < int ORD, typename REAL >
+inline void swap(REAL* A, REAL* B)
 {
     for ( int d = 0; d < ORD; ++d )
     {
-        real t = A[d];
+        REAL t = A[d];
         A[d] = B[d];
         B[d] = t;
     }
 }
 
 
-template < int ORD >
-void iso_xlaswp(real* A, int K1, int K2, const int* IPIV, int INCX)
+template < int ORD, typename REAL >
+void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
 {
     if ( INCX == 1 )
     {
-        for ( int I = K1-1; I < K2; ++I )
+        for ( int I = K1; I <= K2; ++I )
         {
-            int IP = IPIV[I] - 1;  // zero-based array indexing!
+            int IP = IPIV[I-1];  // IP is one-based array index!
             if ( IP != I )
-                swap<ORD>(A+ORD*I, A+ORD*IP);
+                swap<ORD>(A+ORD*(I-1), A+ORD*(IP-1));
         }
     }
     else if ( INCX > 0 )
     {
-        for ( int I = K1-1; I < K2; ++I )
+        for ( int I = K1; I <= K2; ++I )
         {
-            int IP = IPIV[INCX*I] - 1;  // zero-based array indexing!
+            int IP = IPIV[INCX*I-1];  // IP is one-based array index!
             if ( IP != I )
-                swap<ORD>(A+ORD*I, A+ORD*IP);
+                swap<ORD>(A+ORD*(I-1), A+ORD*(IP-1));
         }
     }
     else if ( INCX < 0 )
     {
-        int IX = K1 + ( K1-K2 )*INCX - 1;
-        for ( int I = K2-1; I < K1; --I )
+        int IX = 1 + ( 1 - K2 )*INCX;
+        for ( int I = K2; I >= K1; --I )
         {
-            int IP = IPIV[IX] - 1;  // zero-based array indexing!
+            int IP = IPIV[IX-1];  // IP is one-based array index!
             if ( IP != I )
-                swap<ORD>(A+ORD*I, A+ORD*IP);
+                swap<ORD>(A+ORD*(I-1), A+ORD*(IP-1));
             IX += INCX;
         }
     }
@@ -1175,8 +1180,9 @@ inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, c
 }
 
 
-/// following the standard interface
-void lapack_xgetrsN(int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
+/// following the standard LAPACK interface
+template < typename REAL >
+void lapack_xgetrsN(int N, int NRHS, const REAL* A, int LDA, const int* IPIV, REAL* B, int LDB, int* INFO)
 {
     *INFO = 0;
     for ( int i = 0; i < NRHS; ++i )
@@ -1191,8 +1197,9 @@ void lapack_xgetrsN(int N, int NRHS, const real* A, int LDA, const int* IPIV, re
     }
 }
 
-/// version for just one RHS
-void lapack_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
+/// version of xgetrs('N', ...) for NRHS==1
+template < typename REAL >
+void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 {
     // Apply row interchanges to the right hand side.
     iso_xlaswp<1>(B, 1, N, IPIV, 1);

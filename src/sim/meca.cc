@@ -275,8 +275,8 @@ inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
     int info = 0;
-    lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-    //lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
+    //lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+    lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
     assert_true(info==0);
 }
 

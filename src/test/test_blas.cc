@@ -43,11 +43,11 @@ void test_lapack(const int size)
     real* mat = new real[size*size];
     int* ipiv = new int[size];
     
-    for ( int ii = 0; ii < size; ++ii )
-    {
-        for ( int jj = 0; jj < size; ++jj )
-            mat[ii+size*jj] = (ii+1) * (ii==jj);
-    }
+    // initialize a diagonal matrix:
+    for ( int i = 0; i < size*size; ++i )
+        mat[i] = 0;
+    for ( int i = 0; i < size; ++i )
+        mat[i+size*i] = i+1;
     
     int info = 0;
     int work_size = 1024;
