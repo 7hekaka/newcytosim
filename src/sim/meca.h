@@ -221,22 +221,22 @@ public:
     real const* addrPTS() const { return vPTS; }
 
     /// position interpolated from two points in vPTS[]
-    Vector  position1(const size_t inx) const;
+    Vector position1(const size_t inx) const;
 
     /// position interpolated from two points in vPTS[]
-    Vector  position2(const size_t inx[2], const real coef[2]) const;
+    Vector position2(const size_t inx[2], const real coef[2]) const;
 
     /// position interpolated from three points in vPTS[]
-    Vector  position3(const size_t inx[3], const real coef[3]) const;
+    Vector position3(const size_t inx[3], const real coef[3]) const;
 
     /// position interpolated from four points in vPTS[]
-    Vector  position4(const size_t inx[4], const real coef[4]) const;
+    Vector position4(const size_t inx[4], const real coef[4]) const;
     
     /// position interpolated from five points in vPTS[]
-    Vector  position5(const size_t inx[5], const real coef[5]) const;
+    Vector position5(const size_t inx[5], const real coef[5]) const;
     
     /// position interpolated from six points in vPTS[]
-    Vector  position6(const size_t inx[6], const real coef[6]) const;
+    Vector position6(const size_t inx[6], const real coef[6]) const;
 
 private:
     
@@ -309,8 +309,11 @@ private:
     void addAllRigidity(const real* X, real* Y) const;
 
     /// extract the matrix on-diagonal block corresponding to a Mecable
+    void getHalfBlock(const Mecable*, real* mat) const;
+ 
+    /// extract the matrix on-diagonal block corresponding to a Mecable
     void getFullBlock(const Mecable*, real* mat) const;
-    
+
     /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
     void getBandedBlock(const Mecable*, real* mat) const;
 
@@ -343,6 +346,9 @@ private:
 
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondIsoP(Mecable*);
+    
+    /// compute the preconditionner block corresponding to given Mecable
+    void computePrecondHalf(Mecable*);
 
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondFull(Mecable*);

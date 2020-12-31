@@ -977,7 +977,7 @@ inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, re
     {
         // Solve L*X = B, overwriting B with X. ALPHA = 1.0
         blas::xtrsm('L', 'L', 'N', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
-        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
+        // Solve L**T *X = B, overwriting B with X. ALPHA = 1.0
         blas::xtrsm('L', 'L', 'T', 'N', N, NRHS, 1.0, A, LDA, B, LDB);
     }
 }
@@ -1074,8 +1074,24 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
     else
         ABORT_NOW("unexpected DIM!");
 #else
+    // Solve L*X = B, overwriting B with X. ALPHA = 1.0
     iso_xtrsmLLN<ORD, 'I'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X. ALPHA = 1.0
     iso_xtrsmLLT<ORD, 'I'>(N, A, LDA, B);
+#endif
+}
+
+
+void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
+{
+#if 1
+    // Solve L*X = B, overwriting B with X
+    alsatian_xtrsmLLN1<'I'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X
+    alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
+#else
+    iso_xtrsmLLN<'I'>(N, A, LDA, B);
+    iso_xtrsmLLT<'I'>(N, A, LDA, B);
 #endif
 }
 

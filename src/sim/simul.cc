@@ -82,7 +82,7 @@ singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 #endif
     autoPrecond = 0;
     autoCounter = 0;
-    for ( size_t u = 0; u < 6; ++u )
+    for ( size_t u = 0; u < 8; ++u )
     {
         autoCPU[u] = 0;
         autoCNT[u] = 0;

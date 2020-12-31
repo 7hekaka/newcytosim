@@ -261,12 +261,23 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
 inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
-    /*
-     we cannot call lapack::DPOTRS('L', nbp, mec->block(), nbp, Y, DIM, &info);
-     because the coordinates of the vector 'Y' are not contiguous but offset by 'DIM'.
-     */
     //iso_xgetrsN<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
     alsatian_xgetrsN<DIM>(nbp, mec->block(), nbp, mec->pivot(), Y);
+}
+
+
+/// apply preconditionner block in full storage
+inline void applyPrecondHalf(Mecable const* mec, real* Y)
+{
+    int bks = mec->blockSize();
+#if CHOUCROUTE
+    alsatian_xpotrsL(bks, mec->block(), bks, Y);
+#else
+    iso_xpotrsL<1>(bks, mec->block(), bks, Y);
+    //int info = 0;
+    //lapack::xpotrs('L', bks, 1, mec->block(), bks, Y, bks, &info);
+    //assert_true(info==0);
+#endif
 }
 
 
@@ -274,10 +285,10 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
-    int info = 0;
-    //lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
     lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
-    assert_true(info==0);
+    //int info = 0;
+    //lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+    //assert_true(info==0);
 }
 
 
@@ -289,7 +300,8 @@ inline void applyPreconditionner(Mecable const* mec, real* Y)
         case 1: applyPrecondBand(mec, Y); break;
         case 2: applyPrecondIsoS(mec, Y); break;
         case 3: applyPrecondIsoP(mec, Y); break;
-        case 4: applyPrecondFull(mec, Y); break;
+        case 4: applyPrecondHalf(mec, Y); break;
+        case 5: applyPrecondFull(mec, Y); break;
         default: ABORT_NOW("unknown Mecable::blockType()"); break;
     }
 }
@@ -305,7 +317,8 @@ inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
         case 1: applyPrecondBand(mec, Y); break;
         case 2: applyPrecondIsoS(mec, Y); break;
         case 3: applyPrecondIsoP(mec, Y); break;
-        case 4: applyPrecondFull(mec, Y); break;
+        case 4: applyPrecondHalf(mec, Y); break;
+        case 5: applyPrecondFull(mec, Y); break;
 #if EXPERIMENTAL_PRECONDITIONNERS
         case 7: mec->blockMultiply(X, Y); break;
 #endif
@@ -652,6 +665,53 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
  The result is constructed by using functions from mISO and mFUL
  This block is square but not symmetric!
  */
+void Meca::getHalfBlock(const Mecable * mec, real* res) const
+{
+    const size_t nbp = mec->nbPoints();
+    const size_t bks = DIM * nbp;
+    
+    zero_real(bks*bks, res);
+    
+#if SEPARATE_RIGIDITY_TERMS
+    // set the Rigidity terms:
+    if ( mec->hasRigidity() )
+    {
+        addRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
+        //std::clog<<"Rigidity block " << mec->reference() << "\n";
+        //VecPrint::print(std::clog, bks, bks, res, bks, 0);
+    }
+#endif
+#if USE_ISO_MATRIX
+    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
+#endif
+    expand_lower_matrix<DIM>(bks, res, bks);
+#if USE_ISO_MATRIX
+    if ( useFullMatrix )
+#endif
+        mFUL.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
+    
+    // multiply by the drag coefficient, skipping projection
+    const real beta = -tau_ * nbp / mec->dragCoefficient();
+    
+    //blas::xscal(bs*bs, beta, res, 1);
+    for ( size_t n = 0; n < bks*bks; ++n )
+        res[n] = beta * res[n];
+    
+    // add Identity matrix:
+    size_t bs1 = bks + 1;
+    for ( size_t i = 0; i < bks*bks; i += bs1 )
+        res[i] += 1;
+}
+
+
+/**
+ Get the total diagonal block corresponding to an Object, which is:
+ 
+     I - time_step * P ( mISO + mFUL + P' )
+ 
+ The result is constructed by using functions from mISO and mFUL
+ This block is square but not symmetric!
+ */
 void Meca::getFullBlock(const Mecable * mec, real* res) const
 {
     const size_t nbp = mec->nbPoints();
@@ -882,7 +942,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         if ( eig < 1.0 )
         {
             //std::clog << "    keep     eigen(1-PM) = " << eig << '\n';
-            mec->blockType(4);
+            mec->blockType(5);
             return;
         }
         else
@@ -917,7 +977,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         return;
     }
     
-    mec->blockType(4);
+    mec->blockType(5);
     //checkBlock(mec, blk);
 }
 
@@ -1071,11 +1131,48 @@ void Meca::computePrecondIsoP(Mecable* mec)
 /**
 Compute preconditionner block corresponding to 'mec'
  */
+void Meca::computePrecondHalf(Mecable* mec)
+{
+    const size_t bks = DIM * mec->nbPoints();
+    mec->blockSize(bks, bks*bks, bks);
+    getHalfBlock(mec, mec->block());
+    
+#if ( 0 )
+    std::clog << "half block " << bks <<":\n";
+    size_t S = std::min(bks, 16UL);
+    VecPrint::print(std::clog, S, S, mec->block(), bks);
+#endif
+
+    int info = 0;
+    // calculate LU factorization:
+    // lapack::xgetf2(bks, bks, mec->block(), bks, mec->pivot(), &info);
+    // calculate Cholesky factorization:
+#if CHOUCROUTE
+    alsatian_xpotf2L(bks, mec->block(), bks, &info);
+#else
+    lapack::xpotf2('L', bks, mec->block(), bks, &info);
+#endif
+
+    if ( 0 == info )
+    {
+        mec->blockType(4);
+        //checkBlock(mec, blk);
+    }
+    else
+    {
+        mec->blockType(0);
+        //std::clog << "failed to compute half Preconditionner block\n";
+        ++bump_;
+    }
+}
+
+/**
+Compute preconditionner block corresponding to 'mec'
+ */
 void Meca::computePrecondFull(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
     mec->blockSize(bks, bks*bks, bks);
-    
     getFullBlock(mec, mec->block());
     //verifyBlock(mec, mec->block());
     
@@ -1085,7 +1182,7 @@ void Meca::computePrecondFull(Mecable* mec)
     
     if ( 0 == info )
     {
-        mec->blockType(4);
+        mec->blockType(5);
         //checkBlock(mec, blk);
     }
     else
@@ -1116,7 +1213,7 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
         mat.resize(bks);
         mat.importMatrix(bks, wrk, bks);
         mec->blockSize(bks, 0, 0);
-        mec->blockType(7);
+        mec->blockType(6);
         //std::clog << "R";
     }
 #endif
@@ -1132,7 +1229,7 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
     const size_t bks = DIM * mec->nbPoints();
     const int age = mec->blockAge();
 
-    if (( mec->blockType() != 7 ) | ( mec->blockSize() != bks ) | ( age >= span ))
+    if (( mec->blockType() != 6 ) | ( mec->blockSize() != bks ) | ( age >= span ))
     {
         // recalculate block!
         getFullBlock(mec, blk);
@@ -1194,9 +1291,13 @@ void Meca::computePreconditionner(int precond, int span)
             break;
         case 4:
             for ( Mecable * mec : mecables )
-                computePrecondFull(mec);
+                computePrecondHalf(mec);
             break;
         case 5:
+            for ( Mecable * mec : mecables )
+                computePrecondFull(mec);
+            break;
+        case 6:
             renewPreconditionner(span);
             break;
         default:
@@ -1932,9 +2033,9 @@ void Meca::saveDrag(FILE * file) const
 {
     for ( Mecable const* mec : mecables )
     {
-        const real drag = mec->dragCoefficient() / mec->nbPoints();
-        const size_t nbp = DIM * mec->nbPoints();
-        for ( size_t p = 0; p < nbp; ++p )
+        const size_t nbp = mec->nbPoints();
+        const real drag = mec->dragCoefficient() / nbp;
+        for ( size_t p = 0; p < DIM * nbp; ++p )
             fprintf(file, "%f\n", drag);
     }
 }
