@@ -494,8 +494,36 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 
 #endif
 
+void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
+{
+    for ( int j = 0; j < N; ++j )
+    {
+        const real * pA = A + j * lda - j;
+        real temp;
+        // X[j] /= pA[0]; // temp = X[j];
+        temp = X[j] * pA[j];
+        X[j] = temp;
+        const int sup = std::min(N-1, j+KD);
+        for ( int i = j + 1; i <= sup; ++i )
+            X[i] -= temp * pA[i]; // X[i] -= temp * pA[i-j];
+    }
+}
+
+void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
+{
+    for ( int j = N-1; j >= 0; --j )
+    {
+        real temp = X[j]; // real temp = X[j];
+        const real * pA = A + j * lda - j;
+        const int sup = std::min(N-1, j+KD);
+        for ( int i = sup; i > j; --i )
+            temp -= pA[i] * X[i]; //temp -= pA[i-j] * X[i];
+        X[j] = temp * pA[j]; // temp /= pA[0]; X[j] = temp;
+    }
+}
+
 //------------------------------------------------------------------------------
-#pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2
+#pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2 with KD==2
 
 #ifdef __AVX__
 /// specialized version for KD==2 and ORD==3
@@ -978,6 +1006,13 @@ inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
     alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
 #endif
+}
+
+
+inline void alsatian_xpbtrsL(const int N, int KD, real const* AB, int LDAB, real* B)
+{
+    alsatian_xtbsvLNN(N, KD, AB, LDAB, B);
+    alsatian_xtbsvLTN(N, KD, AB, LDAB, B);
 }
 
 #endif

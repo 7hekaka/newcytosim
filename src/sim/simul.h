@@ -70,10 +70,10 @@ private:
     size_t   autoCounter;
     
     /// record of CPU time for `solve_auto()`
-    double   autoCPU[6];
+    double   autoCPU[8];
     
     /// record of iteration count for `solve_auto()`
-    size_t   autoCNT[6];
+    size_t   autoCNT[8];
     
     /// a copy of the properties as they were stored to file
     mutable std::string properties_saved;

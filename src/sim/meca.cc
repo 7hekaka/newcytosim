@@ -212,7 +212,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 constexpr size_t BAND_LDD = 3;
 
 /// apply preconditionner block in band storage
-inline void applyPrecondBand(Mecable const* mec, real* Y)
+inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
@@ -267,6 +267,22 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 
 
 /// apply preconditionner block in full storage
+inline void applyPrecondBand(Mecable const* mec, real* Y)
+{
+    int bks = mec->blockSize();
+#if CHOUCROUTE
+    alsatian_xpbtrsL(bks, DIM*2, mec->block(), DIM*BAND_LDD, Y);
+#else
+    int info = 0;
+    lapack::xpbtrs('L', bks, DIM*2, 1, mec->block(), DIM*BAND_LDD, Y, bks, &info);
+    assert_true(info==0);
+    //blas::xtbsv('L', 'N', 'N', bks, DIM*2, mec->block(), DIM*BAND_LDD, Y, 1);
+    //blas::xtbsv('L', 'T', 'N', bks, DIM*2, mec->block(), DIM*BAND_LDD, Y, 1);
+#endif
+}
+
+
+/// apply preconditionner block in full storage
 inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
@@ -297,11 +313,12 @@ inline void applyPreconditionner(Mecable const* mec, real* Y)
     switch ( mec->blockType() )
     {
         case 0: break;
-        case 1: applyPrecondBand(mec, Y); break;
+        case 1: applyPrecondIsoB(mec, Y); break;
         case 2: applyPrecondIsoS(mec, Y); break;
         case 3: applyPrecondIsoP(mec, Y); break;
-        case 4: applyPrecondHalf(mec, Y); break;
-        case 5: applyPrecondFull(mec, Y); break;
+        case 4: applyPrecondBand(mec, Y); break;
+        case 5: applyPrecondHalf(mec, Y); break;
+        case 6: applyPrecondFull(mec, Y); break;
         default: ABORT_NOW("unknown Mecable::blockType()"); break;
     }
 }
@@ -314,11 +331,12 @@ inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
     switch ( mec->blockType() )
     {
         case 0: break;
-        case 1: applyPrecondBand(mec, Y); break;
+        case 1: applyPrecondIsoB(mec, Y); break;
         case 2: applyPrecondIsoS(mec, Y); break;
         case 3: applyPrecondIsoP(mec, Y); break;
-        case 4: applyPrecondHalf(mec, Y); break;
-        case 5: applyPrecondFull(mec, Y); break;
+        case 4: applyPrecondBand(mec, Y); break;
+        case 5: applyPrecondHalf(mec, Y); break;
+        case 6: applyPrecondFull(mec, Y); break;
 #if EXPERIMENTAL_PRECONDITIONNERS
         case 7: mec->blockMultiply(X, Y); break;
 #endif
@@ -561,7 +579,7 @@ void printBlock(Mecable* mec, size_t sup)
  
  This block is square, symmetric, definite positive and totally predictable
  */
-void Meca::getBandedBlock(const Mecable * mec, real* res) const
+void Meca::getIsoBBlock(const Mecable * mec, real* res) const
 {
     const size_t nbp = mec->nbPoints();
 
@@ -942,7 +960,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         if ( eig < 1.0 )
         {
             //std::clog << "    keep     eigen(1-PM) = " << eig << '\n';
-            mec->blockType(5);
+            mec->blockType(6);
             return;
         }
         else
@@ -977,7 +995,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         return;
     }
     
-    mec->blockType(5);
+    mec->blockType(6);
     //checkBlock(mec, blk);
 }
 
@@ -1007,12 +1025,12 @@ void Meca::computePrecondAlt()
  The dimension is reduced by DIM and banded with diagonal + 2 off-diagonals
  This block is symmetric definite positive, and is factorized by Cholesky's method
  */
-void Meca::computePrecondBand(Mecable* mec)
+void Meca::computePrecondIsoB(Mecable* mec)
 {
     assert_true(BAND_LDD>2);
     const size_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, BAND_LDD*nbp, 0);
-    getBandedBlock(mec, mec->block());
+    getIsoBBlock(mec, mec->block());
     
     //std::clog << "banded preconditionner " << nbp << "\n";
     //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
@@ -1063,7 +1081,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
 
     mec->blockSize(DIM*nbp, nbp*nbp, 0);
     
-    //getBandedBlock(mec, mec->block());
+    //getIsoBBlock(mec, mec->block());
     //std::clog << "banded preconditionner " << nbp << "\n";
     //VecPrint::print(std::clog, 3, S, mec->block(), BAND_LDD, 1);
 
@@ -1131,10 +1149,64 @@ void Meca::computePrecondIsoP(Mecable* mec)
 /**
 Compute preconditionner block corresponding to 'mec'
  */
+void Meca::computePrecondBand(Mecable* mec)
+{
+    const size_t bks = DIM * mec->nbPoints();
+    mec->blockSize(bks, bks*bks, 0); //DIM*BAND_LDD, 0);
+    getHalfBlock(mec, mec->block());
+
+#if ( 0 )
+    std::clog << "band block " << bks <<":\n";
+    size_t S = std::min(bks, 16UL);
+    VecPrint::print(std::clog, S, S, mec->block(), bks);
+#endif
+    
+    int bt, info = 0;
+
+    if ( DIM*BAND_LDD < bks )
+    {
+        // convert to band storage:
+        lower_band_storage(bks, mec->block(), DIM*2, mec->block(), DIM*BAND_LDD);
+        
+        // calculate Cholesky factorization for band storage:
+#if CHOUCROUTE
+        alsatian_xpbtf2L<DIM*2>(bks, mec->block(), DIM*BAND_LDD, &info);
+#else
+        lapack::xpbtf2('L', bks, DIM*2, mec->block(), DIM*BAND_LDD, &info);
+#endif
+        bt = 4;
+    }
+    else
+    {
+        // calculate Cholesky factorization:
+#if CHOUCROUTE
+        alsatian_xpotf2L(bks, mec->block(), bks, &info);
+#else
+        lapack::xpotf2('L', bks, mec->block(), bks, &info);
+#endif
+        bt = 5;
+    }
+    
+    if ( 0 == info )
+    {
+        mec->blockType(bt);
+        //checkBlock(mec, blk);
+    }
+    else
+    {
+        mec->blockType(0);
+        //std::clog << "failed to compute half Preconditionner block\n";
+        ++bump_;
+    }
+}
+
+/**
+Compute preconditionner block corresponding to 'mec'
+ */
 void Meca::computePrecondHalf(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
-    mec->blockSize(bks, bks*bks, bks);
+    mec->blockSize(bks, bks*bks, 0);
     getHalfBlock(mec, mec->block());
     
 #if ( 0 )
@@ -1144,8 +1216,6 @@ void Meca::computePrecondHalf(Mecable* mec)
 #endif
 
     int info = 0;
-    // calculate LU factorization:
-    // lapack::xgetf2(bks, bks, mec->block(), bks, mec->pivot(), &info);
     // calculate Cholesky factorization:
 #if CHOUCROUTE
     alsatian_xpotf2L(bks, mec->block(), bks, &info);
@@ -1155,7 +1225,7 @@ void Meca::computePrecondHalf(Mecable* mec)
 
     if ( 0 == info )
     {
-        mec->blockType(4);
+        mec->blockType(5);
         //checkBlock(mec, blk);
     }
     else
@@ -1182,7 +1252,7 @@ void Meca::computePrecondFull(Mecable* mec)
     
     if ( 0 == info )
     {
-        mec->blockType(5);
+        mec->blockType(6);
         //checkBlock(mec, blk);
     }
     else
@@ -1213,7 +1283,7 @@ void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
         mat.resize(bks);
         mat.importMatrix(bks, wrk, bks);
         mec->blockSize(bks, 0, 0);
-        mec->blockType(6);
+        mec->blockType(7);
         //std::clog << "R";
     }
 #endif
@@ -1229,7 +1299,7 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
     const size_t bks = DIM * mec->nbPoints();
     const int age = mec->blockAge();
 
-    if (( mec->blockType() != 6 ) | ( mec->blockSize() != bks ) | ( age >= span ))
+    if (( mec->blockType() != 7 ) | ( mec->blockSize() != bks ) | ( age >= span ))
     {
         // recalculate block!
         getFullBlock(mec, blk);
@@ -1279,7 +1349,7 @@ void Meca::computePreconditionner(int precond, int span)
             break;
         case 1:
             for ( Mecable * mec : mecables )
-                computePrecondBand(mec);
+                computePrecondIsoB(mec);
             break;
         case 2:
             for ( Mecable * mec : mecables )
@@ -1291,13 +1361,17 @@ void Meca::computePreconditionner(int precond, int span)
             break;
         case 4:
             for ( Mecable * mec : mecables )
-                computePrecondHalf(mec);
+                computePrecondBand(mec);
             break;
         case 5:
             for ( Mecable * mec : mecables )
-                computePrecondFull(mec);
+                computePrecondHalf(mec);
             break;
         case 6:
+            for ( Mecable * mec : mecables )
+                computePrecondFull(mec);
+            break;
+        case 7:
             renewPreconditionner(span);
             break;
         default:

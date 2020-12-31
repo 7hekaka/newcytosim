@@ -315,7 +315,7 @@ private:
     void getFullBlock(const Mecable*, real* mat) const;
 
     /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
-    void getBandedBlock(const Mecable*, real* mat) const;
+    void getIsoBBlock(const Mecable*, real* mat) const;
 
     /// extract the istropic projection of the on-diagonal block corresponding to a Mecable
     void getIsoBlock(const Mecable*, real* mat) const;
@@ -339,7 +339,7 @@ private:
     void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);
     
     /// compute the preconditionner block corresponding to given Mecable
-    void computePrecondBand(Mecable*);
+    void computePrecondIsoB(Mecable*);
     
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondIsoS(Mecable*);
@@ -347,6 +347,9 @@ private:
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondIsoP(Mecable*);
     
+    /// compute the preconditionner block corresponding to given Mecable
+    void computePrecondBand(Mecable*);
+
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondHalf(Mecable*);
 
