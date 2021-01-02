@@ -111,7 +111,58 @@ inline void drawMonomer(Vector3 const& pos, real rad)
 
 void Display::drawSimul(Simul const& sim)
 {
-    gle::drawText(Vector(0,0,0), "Empty Display::display", GLUT_BITMAP_8_BY_13);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
+    drawFields(sim.fields);
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+    drawSpaces(sim.spaces);
+    
+    glDisable(GL_CULL_FACE);
+    
+    /**
+     If the display is 'cut', we might see the inner sides,
+     but rendering would be faster with Culling enabled
+     */
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    drawFibers(sim.fibers);
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    drawBeads(sim.beads);
+    drawSolids(sim.solids);
+    drawSpheres(sim.spheres);
+    
+    if ( prop->single_select & 1 )
+        drawSinglesF(sim.singles);
+    
+    if ( prop->couple_select & 1 )
+        drawCouplesF(sim.couples);
+
+    if ( prop->couple_select & 2 )
+        drawCouplesA(sim.couples);
+
+    if ( prop->couple_select & 4 )
+        drawCouplesB(sim.couples);
+
+    if ( prop->single_select & 2 )
+        drawSinglesA(sim.singles);
+    
+    if ( stencil_ )
+    {
+        glClearStencil(0);
+        glDisable(GL_STENCIL_TEST);
+    }
+
+    drawOrganizers(sim.organizers);
+    glDisable(GL_CULL_FACE);
+    drawMisc(sim);
 }
 
 

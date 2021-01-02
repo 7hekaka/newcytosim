@@ -64,13 +64,13 @@ public:
     //--------------------------------------------------------------------------
         
     /// the radius of the Bead
-    real        radius()               const { return paRadius; }
+    real        radius()    const { return paRadius; }
     
     /// the volume of the bead
-    real        radiusSqr()            const { return paRadius * paRadius; }
+    real        radiusSqr() const { return paRadius * paRadius; }
     
     /// set the radius of the Bead
-    void        resize(real R)               { assert_true(R>0); paRadius = R; }
+    void        resize(real R)    { assert_true(R>0); paRadius = R; }
     
     /// the volume of the bead
     real        volume() const;
@@ -81,7 +81,7 @@ public:
     void        setDragCoefficient();
     
     /// the total drag-coefficient of object (force = drag * speed)
-    real        dragCoefficient()      const { return paDrag; }
+    real        dragCoefficient() const { return paDrag; }
 
     /// sets the mobility
     void        prepareMecable() { setDragCoefficient(); }
