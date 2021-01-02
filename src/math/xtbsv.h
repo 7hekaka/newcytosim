@@ -385,6 +385,226 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
     *INFO = 0;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - ALSATIAN DTBSV with various KD
+
+/*
+ //The original LAPACK implementation load and store X at every operation
+inline void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
+{
+    for ( int j = 0; j < N; ++j )
+    {
+        const real tmp = X[j] * A[j];
+        X[j] = tmp;
+        const int sup = std::min(N-1, j+KD);  // sup=j+KD if j+KD <= N-1 : j < N-KD
+        for ( int i = j + 1; i <= sup; ++i )
+            X[i] -= tmp * A[i];
+        A += lda - 1;
+    }
+}
+
+inline void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
+{
+    A += (N-1)*(lda-1);
+    for ( int j = N-1; j >= 0; --j )
+    {
+        real tmp = X[j];
+        const int sup = std::min(N-1, j+KD);  // sup=j+KD if j+KD <= N-1 : j < N-KD
+        for ( int i = j + 1; i <= sup; ++i )
+        //for ( int i = sup; i > j; --i )
+            tmp -= A[i] * X[i];
+        X[j] = tmp * A[j];
+        A -= lda - 1;
+    }
+}
+*/
+inline void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
+{
+    // general case:
+    for ( int j = 0; j < N-KD; ++j )
+    {
+        const real tmp = X[j] * A[0];
+        X[j] = tmp;
+        for ( int i = 1; i <= KD; ++i )
+            X[i+j] -= tmp * A[i];
+        A += lda;
+    }
+    // process a few truncated case:
+    for ( int j = N-KD; j < N; ++j )
+    {
+        const real tmp = X[j] * A[0];
+        X[j] = tmp;
+        for ( int i = j + 1; i < N; ++i )
+            X[i] -= tmp * A[i-j];
+        A += lda;
+    }
+}
+
+inline void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
+{
+    A += (N-1)*lda;
+    // process a few truncated case:
+    for ( int j = N-1; j >= N-KD; --j )
+    {
+        real tmp = X[j];
+        for ( int i = j + 1; i < N; ++i )
+        //for ( int i = N-1; i > j; --i )
+            tmp -= A[i-j] * X[i];
+        X[j] = A[0] * tmp;
+        A -= lda;
+    }
+    // general case, downward:
+    for ( int j = N-KD-1; j >= 0; --j )
+    {
+        real tmp = X[j];
+        for ( int i = 1; i <= KD; ++i )
+        //for ( int i = KD; i > 0; --i )
+            tmp -= A[i] * X[i+j];
+        X[j] = A[0] * tmp;
+        A -= lda;
+    }
+}
+/*
+template < int KD >
+inline void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
+{
+    // general case:
+    for ( int j = 0; j < N-KD; ++j )
+    {
+        const real tmp = X[j] * A[0];
+        X[j] = tmp;
+        for ( int i = 1; i <= KD; ++i )
+            X[i+j] -= tmp * A[i];
+        A += lda;
+    }
+    // process a few truncated case:
+    for ( int j = N-KD; j < N; ++j )
+    {
+        const real tmp = X[j] * A[0];
+        X[j] = tmp;
+        for ( int i = j + 1; i < N; ++i )
+            X[i] -= tmp * A[i-j];
+        A += lda;
+    }
+}
+
+template < int KD >
+inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
+{
+    A += (N-1)*lda;
+    // process a few truncated case:
+    for ( int j = N-1; j >= N-KD; --j )
+    {
+        real tmp = X[j];
+        for ( int i = j + 1; i < N; ++i )
+        //for ( int i = N-1; i > j; --i )
+            tmp -= A[i-j] * X[i];
+        X[j] = A[0] * tmp;
+        A -= lda;
+    }
+    // general case, downward:
+    for ( int j = N-KD-1; j >= 0; --j )
+    {
+        real tmp = X[j];
+        for ( int i = 1; i <= KD; ++i )
+        //for ( int i = KD; i > 0; --i )
+            tmp -= A[i] * X[i+j];
+        X[j] = A[0] * tmp;
+        A -= lda;
+    }
+}
+*/
+template < int KD >
+inline void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
+{
+    real temp[KD];
+    for ( int i = 0; i < KD; ++i )
+        temp[i] = X[i];
+    // general case:
+    for ( int j = 0; j < N-KD; ++j )
+    {
+        /*
+        const real t = X[j] * A[0];
+        X[j] = t;
+        for ( int i = 1; i <= KD; ++i )
+            X[i+j] -= t * A[i];
+         */
+        real t = temp[0] * A[0];
+        X[0] = t;
+        for ( int i = 1; i < KD; ++i )
+            temp[i-1] = temp[i] - t * A[i]; // temp[i] contains X[i+j]
+        temp[KD-1] = X[KD] - t * A[KD];
+        A += lda;
+        X += 1;
+    }
+    // process a few truncated case:
+    for ( int j = N-KD; j < N; ++j )
+    {
+        /*
+        const real t = X[j] * A[0];
+        X[j] = t;
+        for ( int i = j + 1; i < N; ++i )
+            X[i] -= t * A[i-j];
+         */
+        real t = temp[0] * A[0];
+        X[0] = t;
+        for ( int i = 1; i < std::min(KD, N-j); ++i )
+            temp[i-1] = temp[i] - t * A[i]; // temp[i] contains X[i+j]
+        A += lda;
+        X += 1;
+    }
+}
+
+
+template < int KD >
+inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
+{
+    A += (N-1)*lda;
+    real temp[KD+1];
+    // process a few truncated case:
+    for ( int j = N-1; j >= N-KD; --j )
+    {
+        real tmp = X[j];
+/*
+        for ( int i = j + 1; i < N; ++i )
+            tmp -= A[i-j] * X[i];
+*/
+        for ( int i = j + 1; i < N; ++i )
+            tmp -= A[i-j] * temp[i+KD+1-N]; // temp[] is X[i];
+        tmp = A[0] * tmp;
+        temp[j+KD+1-N] = tmp;
+        X[j] = tmp;
+        A -= lda;
+    }
+    /*
+     // temp[1] = X[N-KD] and temp[KD] = X[N-1]:
+    for ( int i = 0; i < KD; ++i )
+        temp[i+1] = X[i+N-KD];
+     */
+    // general case, downward!:
+    for ( int j = N-KD-1; j >= 0; --j )
+    {
+        real tmp = X[j];
+        /*
+         for ( int i = 1; i <= KD; ++i )
+            tmp -= A[i] * X[i+j];
+         */
+        for ( int i = KD; i > 0; --i )
+        {
+            tmp -= A[i] * temp[i];
+            temp[i] = temp[i-1];
+        }
+        tmp = A[0] * tmp;
+        temp[1] = tmp;
+        X[j] = tmp;
+        A -= lda;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Isotropic ALSATIAN DTBSV with KD==2
+
 
 #if ( 1 )
 
@@ -493,34 +713,6 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 }
 
 #endif
-
-void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
-{
-    for ( int j = 0; j < N; ++j )
-    {
-        const real * pA = A + j * lda - j;
-        real temp;
-        // X[j] /= pA[0]; // temp = X[j];
-        temp = X[j] * pA[j];
-        X[j] = temp;
-        const int sup = std::min(N-1, j+KD);
-        for ( int i = j + 1; i <= sup; ++i )
-            X[i] -= temp * pA[i]; // X[i] -= temp * pA[i-j];
-    }
-}
-
-void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
-{
-    for ( int j = N-1; j >= 0; --j )
-    {
-        real temp = X[j]; // real temp = X[j];
-        const real * pA = A + j * lda - j;
-        const int sup = std::min(N-1, j+KD);
-        for ( int i = sup; i > j; --i )
-            temp -= pA[i] * X[i]; //temp -= pA[i-j] * X[i];
-        X[j] = temp * pA[j]; // temp /= pA[0]; X[j] = temp;
-    }
-}
 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2 with KD==2
@@ -876,8 +1068,7 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
     real a2 = a1;
     if ( N >= 2 ) // j = N-2
     {
-        real a0 = pX[0];
-        a0 = a0 - pA[1] * a1;
+        real a0 = pX[0] - pA[1] * a1;
         a1 = pA[0] * a0;
         pX[0] = a1;
         pA -= lda;
@@ -885,8 +1076,7 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
     }
     for ( int j = N-3; j >= 0; --j )
     {
-        real a0 = pX[0];
-        a0 = a0 - pA[2] * a2;
+        real a0 = pX[0] - pA[2] * a2;
         a0 = a0 - pA[1] * a1;
         a2 = a1;
         a1 = pA[0] * a0;
@@ -1008,11 +1198,30 @@ inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 #endif
 }
 
+#include "vecprint.h"
 
-inline void alsatian_xpbtrsL(const int N, int KD, real const* AB, int LDAB, real* B)
+template < int KD >
+inline void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
 {
-    alsatian_xtbsvLNN(N, KD, AB, LDAB, B);
-    alsatian_xtbsvLTN(N, KD, AB, LDAB, B);
+#if 0
+    int S = std::min(N, 16);
+    real* tmp = new_real(N);
+    copy_real(N, B, tmp);
+    alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
+    alsatian_xtbsvLNN(N, KD, AB, LDAB, tmp);
+    printf("\n  tmp "); VecPrint::print(std::cout, S, tmp, 4);
+    printf("\n  L   "); VecPrint::print(std::cout, S, B, 4);
+    copy_real(N, B, tmp);
+    alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
+    alsatian_xtbsvLTN(N, KD, AB, LDAB, tmp);
+    printf("\n  tmp "); VecPrint::print(std::cout, S, tmp, 4);
+    printf("\n  L   "); VecPrint::print(std::cout, S, B, 4);
+    printf("\n");
+    free_real(tmp);
+#else
+    alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
+    alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
+#endif
 }
 
 #endif

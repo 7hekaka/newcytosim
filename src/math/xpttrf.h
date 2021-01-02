@@ -113,10 +113,10 @@ void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, in
 void italian_xpttrf(int size, real* D, real const* E, int* INFO)
 {
     *INFO = 0;
-    D[0] = 1.0 / D[0];
+    D[0] = real(1) / D[0];
     
     for ( int n = 1; n < size; ++n )
-        D[n] = 1.0 / ( D[n] - ( E[n-1] * E[n-1] ) * D[n-1] );
+        D[n] = real(1) / ( D[n] - ( E[n-1] * E[n-1] ) * D[n-1] );
 }
 
 
@@ -169,14 +169,14 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
 {
 #if 0
-    D[0] = 1.0 / D[0];
+    D[0] = real(1) / D[0];
     B[0] = D[0] * B[0];
     if ( size > 1 )
     {
         // upward recursion on B[]
         for ( size_t n = 1; n < size; ++n )
         {
-            D[n] = 1.0 / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
+            D[n] = real(1) / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
             B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
         }
         // downward recursion on B[]
@@ -195,8 +195,8 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
         // upward recursion on B[]
         for ( size_t n = 1; n < size; ++n )
         {
-            //D[n] = 1.0 / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
-            d = 1.0 / ( D[n] - e * d );
+            //D[n] = real(1) / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
+            d = real(1) / ( D[n] - e * d );
             //B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
             B[n] = d * ( B[n] - l * B[n-1] );
             l = L[n];
@@ -230,11 +230,11 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
     B[0] = C[0] / B[0];
     for ( size_t i = 1; i < N; ++i )
     {
-        real W = 1.0 / ( B[i] - B[i-1] * A[i-1] );
+        real W = real(1) / ( B[i] - B[i-1] * A[i-1] );
         X[i] = W * ( X[i] - A[i-1] * X[i-1] );
         B[i] = W * C[i];
     }
-    for ( size_t i = N-1; i-- > 0; )
+    for ( size_t i = N-1; i-- > 0; )  // look at this 'i-- > 0'!
         X[i] = X[i] - B[i] * X[i+1];
 #else
     // wikipedia's version translated to C
@@ -269,7 +269,7 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
     }
     *INFO = 0;
 
-    real w = 1.0 / D[0];
+    real w = real(1) / D[0];
     real e = E[0] * E[0];
     D[0] = w;
     E[0] = w * E[0];
@@ -281,7 +281,7 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
             *INFO = n;
             return;
         }
-        w = 1.0 / ( D[n] - w * e );
+        w = real(1) / ( D[n] - w * e );
         e = E[n] * E[n];
         D[n] = w;
         E[n] = w * E[n];
@@ -331,7 +331,7 @@ with a tridiagonal symmetric matrix {E, D, E} and right-hand side 'B'
 void alsatian_thomas(size_t size, real* D, real* E, real* B)
 {
     assert_true(size > 0);
-    real w = 1.0 / D[0];
+    real w = real(1) / D[0];
     real y = B[0];
     real e = E[0] * E[0];
     real x = w * E[0];
@@ -342,7 +342,7 @@ void alsatian_thomas(size_t size, real* D, real* E, real* B)
     // upward recursion
     for ( size_t n = 1; n < size; ++n )
     {
-        w = 1.0 / ( D[n] - w * e );
+        w = real(1) / ( D[n] - w * e );
         e = E[n] * E[n];
         y = B[n] - y * x;
         D[n] = w;

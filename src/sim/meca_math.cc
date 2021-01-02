@@ -303,6 +303,7 @@ Cholesky factorization by DPBTRF() or DPBTF2().
 void lower_band_storage(size_t N, real const* src, size_t kd, real* dst, size_t ldd)
 {
     assert_true( ldd == kd+1 );
+    assert_true( dst != src || ldd <= N );
     for ( size_t j = 0; j < N; ++j )
     {
         size_t sup = std::min(N-1, j+kd);

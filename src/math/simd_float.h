@@ -15,12 +15,15 @@ typedef __m128 vec4f;
 
 inline static vec4f setzero4f()                   { return _mm_setzero_ps(); }
 inline static vec4f set4f(float a)                { return _mm_set1_ps(a); }
+inline static vec4f load1f(float const* a)        { return _mm_load_ss(a); }
 inline static vec4f load2f(float const* a)        { return (vec4f)_mm_loadl_epi64((__m128i*)a); }
 inline static vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 inline static vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
-inline static void  store3f(float* a, vec4f b)    { a[0]=b[0]; a[1]=b[1]; a[2]=b[2]; }
-inline static void  store4f(float* a, vec4f b)    { _mm_store_ps(a, b); }
-inline static void  storeu4f(float* a, vec4f b)   { _mm_storeu_ps(a, b); }
+inline static void  store1f(float* a, vec4f b)    { _mm_store_ss(a,b); }
+inline static void  store2f(float* a, vec4f b)    { _mm_storeu_si64((void*)a,_mm_castps_si128(b)); } //_mm_storel_pi((__m64*)a, b); }
+inline static void  store3f(float* a, vec4f b)    { store2f(a,b); a[2]=b[2]; }
+inline static void  store4f(float* a, vec4f b)    { _mm_store_ps(a,b); }
+inline static void  storeu4f(float* a, vec4f b)   { _mm_storeu_ps(a,b); }
 inline static vec4f add4f(vec4f a, vec4f b)       { return _mm_add_ps(a,b); }
 inline static vec4f mul4f(vec4f a, vec4f b)       { return _mm_mul_ps(a,b); }
 inline static vec4f max4f(vec4f a, vec4f b)       { return _mm_max_ps(a,b); }
@@ -44,6 +47,7 @@ inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a)
 #if defined(__SSE4_1__)
 
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1000); }
+inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110); }
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
 
 inline static vec4f sign_select(vec4f val, vec4f neg, vec4f pos)
@@ -70,7 +74,7 @@ inline static vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_loa
 #define permute4f(a,k)    _mm_permute_ps(a,k)
 // Convert between vector types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
-inline static __m256d  cvt4sd(vec4f a)            { return _mm256_cvtps_pd(a); }
+inline static __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
 inline static void store4f(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
 #elif defined(__SSE3__)
 inline static vec4f broadcast1f(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
@@ -120,7 +124,7 @@ inline static vec8f abs8f(vec8f a)                { return _mm256_andnot_ps(_mm2
 
 /// approximate inverse
 inline static vec8f rcpf(vec8f a)                 { return _mm256_rcp_ps(a); }
-/// approximate inverse square root
+/// approximate reciprocal square root
 inline static vec8f rsqrtf(vec8f a)               { return _mm256_rsqrt_ps(a); }
 
 inline static vec4f getlo4f(vec8f a)              { return _mm256_castps256_ps128(a); }

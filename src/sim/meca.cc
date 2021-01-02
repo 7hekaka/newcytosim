@@ -209,14 +209,16 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 
 
 // the leading dimension of the banded matrix used for preconditionning
-constexpr size_t BAND_LDD = 3;
+constexpr size_t ISOB_LDD = 3;
+constexpr size_t BAND_LDD = 1+2*DIM;
+constexpr size_t BAND_NUD = 2*DIM;
 
 /// apply preconditionner block in band storage
 inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if CHOUCROUTE
-    alsatian_xpbtrsL<DIM>(nbp, mec->block(), BAND_LDD, Y);
+    alsatian_xpbtrsL<DIM>(nbp, mec->block(), ISOB_LDD, Y);
 #else
     /*
      we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->block(), KD+1, Y, bks, &info)
@@ -225,8 +227,8 @@ inline void applyPrecondIsoB(Mecable const* mec, real* Y)
      */
     for ( int d = 0; d < DIM; ++d )
     {
-        blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), BAND_LDD, Y+d, DIM);
-        blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), BAND_LDD, Y+d, DIM);
+        blas::xtbsv('L', 'N', 'N', nbp, 2, mec->block(), ISOB_LDD, Y+d, DIM);
+        blas::xtbsv('L', 'T', 'N', nbp, 2, mec->block(), ISOB_LDD, Y+d, DIM);
     }
 #endif
 }
@@ -271,13 +273,13 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
 #if CHOUCROUTE
-    alsatian_xpbtrsL(bks, DIM*2, mec->block(), DIM*BAND_LDD, Y);
+    alsatian_xpbtrsLK<BAND_NUD>(bks, mec->block(), BAND_LDD, Y);
 #else
     int info = 0;
-    lapack::xpbtrs('L', bks, DIM*2, 1, mec->block(), DIM*BAND_LDD, Y, bks, &info);
+    lapack::xpbtrs('L', bks, BAND_NUD, 1, mec->block(), BAND_LDD, Y, bks, &info);
     assert_true(info==0);
-    //blas::xtbsv('L', 'N', 'N', bks, DIM*2, mec->block(), DIM*BAND_LDD, Y, 1);
-    //blas::xtbsv('L', 'T', 'N', bks, DIM*2, mec->block(), DIM*BAND_LDD, Y, 1);
+    //blas::xtbsv('L', 'N', 'N', bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
+    //blas::xtbsv('L', 'T', 'N', bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
 #endif
 }
 
@@ -587,25 +589,25 @@ void Meca::getIsoBBlock(const Mecable * mec, real* res) const
     
     if ( mec->hasRigidity() )
     {
-        if ( BAND_LDD != 3 )
-            zero_real(BAND_LDD*nbp, res);
-        setRigidityBanded(res, BAND_LDD, nbp, beta*mec->fiberRigidity());
+        if ( ISOB_LDD != 3 )
+            zero_real(ISOB_LDD*nbp, res);
+        setRigidityBanded(res, ISOB_LDD, nbp, beta*mec->fiberRigidity());
     }
     else
-        zero_real(BAND_LDD*nbp, res);
+        zero_real(ISOB_LDD*nbp, res);
 
     // add ones to the diagonal:
     for ( size_t i = 0; i < nbp; ++i )
-        res[i*BAND_LDD] += 1;
+        res[i*ISOB_LDD] += 1;
     
     //std::clog << "\nrigidity band " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, BAND_LDD, 1);
+    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, ISOB_LDD, 1);
 
 #if USE_ISO_MATRIX
-    mISO.addTriangularBlockBanded(beta, res, BAND_LDD, mec->matIndex(), nbp, 2);
+    mISO.addTriangularBlockBanded(beta, res, ISOB_LDD, mec->matIndex(), nbp, 2);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTraceBanded(beta/DIM, res, BAND_LDD, DIM*mec->matIndex(), DIM*nbp, 2);
+        mFUL.addDiagonalTraceBanded(beta/DIM, res, ISOB_LDD, DIM*mec->matIndex(), DIM*nbp, 2);
 }
 
 
@@ -1027,13 +1029,13 @@ void Meca::computePrecondAlt()
  */
 void Meca::computePrecondIsoB(Mecable* mec)
 {
-    assert_true(BAND_LDD>2);
+    assert_true(ISOB_LDD>2);
     const size_t nbp = mec->nbPoints();
-    mec->blockSize(DIM*nbp, BAND_LDD*nbp, 0);
+    mec->blockSize(DIM*nbp, ISOB_LDD*nbp, 0);
     getIsoBBlock(mec, mec->block());
     
     //std::clog << "banded preconditionner " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
+    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
     
     /**
      Factorize banded matrix with Andre-Louis Cholesky's method
@@ -1042,15 +1044,15 @@ void Meca::computePrecondIsoB(Mecable* mec)
      */
     int info = 0;
 #if CHOUCROUTE
-    alsatian_xpbtf2L<2>(nbp, mec->block(), BAND_LDD, &info);
+    alsatian_xpbtf2L<2>(nbp, mec->block(), ISOB_LDD, &info);
 #else
-    lapack::xpbtf2('L', nbp, 2, mec->block(), BAND_LDD, &info);
+    lapack::xpbtf2('L', nbp, 2, mec->block(), ISOB_LDD, &info);
 #endif
     if ( 0 == info )
     {
         mec->blockType(1);
         //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
-        //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), BAND_LDD, 1);
+        //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
     }
     else
     {
@@ -1083,7 +1085,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
     
     //getIsoBBlock(mec, mec->block());
     //std::clog << "banded preconditionner " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, S, mec->block(), BAND_LDD, 1);
+    //VecPrint::print(std::clog, 3, S, mec->block(), ISOB_LDD, 1);
 
     getIsoBlock(mec, mec->block());
     
@@ -1152,7 +1154,7 @@ Compute preconditionner block corresponding to 'mec'
 void Meca::computePrecondBand(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
-    mec->blockSize(bks, bks*bks, 0); //DIM*BAND_LDD, 0);
+    mec->blockSize(bks, bks*bks, 0); //BAND_LDD, 0);
     getHalfBlock(mec, mec->block());
 
 #if ( 0 )
@@ -1163,16 +1165,16 @@ void Meca::computePrecondBand(Mecable* mec)
     
     int bt, info = 0;
 
-    if ( DIM*BAND_LDD < bks )
+    if ( BAND_LDD < bks )
     {
         // convert to band storage:
-        lower_band_storage(bks, mec->block(), DIM*2, mec->block(), DIM*BAND_LDD);
+        lower_band_storage(bks, mec->block(), BAND_NUD, mec->block(), BAND_LDD);
         
         // calculate Cholesky factorization for band storage:
 #if CHOUCROUTE
-        alsatian_xpbtf2L<DIM*2>(bks, mec->block(), DIM*BAND_LDD, &info);
+        alsatian_xpbtf2L<BAND_NUD>(bks, mec->block(), BAND_LDD, &info);
 #else
-        lapack::xpbtf2('L', bks, DIM*2, mec->block(), DIM*BAND_LDD, &info);
+        lapack::xpbtf2('L', bks, BAND_NUD, mec->block(), BAND_LDD, &info);
 #endif
         bt = 4;
     }

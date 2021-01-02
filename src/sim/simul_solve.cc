@@ -464,9 +464,9 @@ void Simul::solve_auto()
     sMeca.apply();
 
     // Automatic selection of preconditionning method:
-    constexpr size_t N_METHODS = 6;
+    constexpr size_t N_METHODS = 3;
     constexpr size_t N_TESTS = 8;
-    constexpr size_t PERIOD = 64;
+    constexpr size_t PERIOD = 32;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
@@ -486,7 +486,7 @@ void Simul::solve_auto()
              Only adopt a more complicated method if the gain is significant.
              */
             autoPrecond = 0;
-            for ( unsigned m : { 0, 1, 2, 4, 5, 6 } )
+            for ( unsigned m : { 0, 1, 4 } )
             {
                 if ( autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
                     autoPrecond = m;
@@ -496,7 +496,7 @@ void Simul::solve_auto()
                 char str[256], *ptr = str;
                 char*const end = str+sizeof(str);
                 ptr += snprintf(ptr, end-ptr, " precond selection %lu | method count cpu", N_TESTS);
-                for ( size_t u : { 0, 1, 2, 4, 5, 6 } )
+                for ( size_t u : { 0, 1, 4 } )
                     ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, (real)autoCNT[u]/N_TESTS, autoCPU[u]/N_TESTS);
                 snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
                 Cytosim::log << str << '\n';
@@ -511,8 +511,8 @@ void Simul::solve_auto()
         }
         else
         {
-            //alternate betwen { 0, 1, 2, 4, 5 }
-            autoPrecond = ( 1 + autoPrecond + (autoPrecond==2) ) % 7;
+            //alternate betwen { 0, 1, 4 }
+            autoPrecond = ( 1 + autoPrecond + 2*(autoPrecond==1) ) % 5;
         }
     }
     else
