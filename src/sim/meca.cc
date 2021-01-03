@@ -1167,8 +1167,9 @@ void Meca::computePrecondBand(Mecable* mec)
 
     if ( BAND_LDD < bks )
     {
+        assert_true(BAND_NUD < BAND_LDD);
         // convert to band storage:
-        lower_band_storage(bks, mec->block(), BAND_NUD, mec->block(), BAND_LDD);
+        lower_band_storage<BAND_NUD>(bks, mec->block(), mec->block(), BAND_LDD);
         
         // calculate Cholesky factorization for band storage:
 #if CHOUCROUTE

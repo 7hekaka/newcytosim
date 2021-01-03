@@ -70,7 +70,7 @@ private:
     size_t   autoCounter;
     
     /// record of CPU time for `solve_auto()`
-    double   autoCPU[8];
+    float    autoCPU[8];
     
     /// record of iteration count for `solve_auto()`
     size_t   autoCNT[8];

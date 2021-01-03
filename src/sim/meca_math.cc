@@ -300,20 +300,21 @@ Cholesky factorization by DPBTRF() or DPBTF2().
  
  This should work even if 'src==dst' provided `ldd <= N`
  */
-void lower_band_storage(size_t N, real const* src, size_t kd, real* dst, size_t ldd)
+template < int KD >
+void lower_band_storage(size_t N, real const* src, real* dst, size_t ldd)
 {
-    assert_true( ldd == kd+1 );
+    assert_true( ldd == KD+1 );
     assert_true( dst != src || ldd <= N );
     for ( size_t j = 0; j < N; ++j )
     {
-        size_t sup = std::min(N-1, j+kd);
+        size_t sup = std::min(N-1, j+KD);
         real const* S = src + N * j;
         real * D = dst + ldd * j;
         for ( size_t i = j; i <= sup; ++i )
             D[i-j] = S[i];
     }
     // zero-out unused values:
-    for ( size_t j = N-kd; j < N; ++j )
+    for ( size_t j = N-KD; j < N; ++j )
     {
         for ( size_t i = N-j; i < ldd; ++i )
             dst[i+ldd*j] = 0;

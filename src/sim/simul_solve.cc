@@ -459,7 +459,7 @@ void Simul::solve_auto()
     //double cpu = TicToc::milliseconds();
     size_t cnt = sMeca.solve(prop, autoPrecond);
     //cpu = TicToc::milliseconds() - cpu;
-    double cpu = sMeca.cycles_ >> 10;
+    float cpu = sMeca.cycles_ >> 10;
     
     sMeca.apply();
 

@@ -560,7 +560,7 @@ template < int KD >
 inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
 {
     A += (N-1)*lda;
-    real temp[KD+1];
+    real temp[KD];
     // process a few truncated case:
     for ( int j = N-1; j >= N-KD; --j )
     {
@@ -570,9 +570,9 @@ inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* 
             tmp -= A[i-j] * X[i];
 */
         for ( int i = j + 1; i < N; ++i )
-            tmp -= A[i-j] * temp[i+KD+1-N]; // temp[] is X[i];
+            tmp -= A[i-j] * temp[i+KD-N]; // temp[] is X[i];
         tmp = A[0] * tmp;
-        temp[j+KD+1-N] = tmp;
+        temp[j+KD-N] = tmp;
         X[j] = tmp;
         A -= lda;
     }
@@ -584,18 +584,25 @@ inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* 
     // general case, downward!:
     for ( int j = N-KD-1; j >= 0; --j )
     {
-        real tmp = X[j];
         /*
+         real tmp = X[j];
          for ( int i = 1; i <= KD; ++i )
             tmp -= A[i] * X[i+j];
          */
-        for ( int i = KD; i > 0; --i )
-        {
-            tmp -= A[i] * temp[i];
+        /*
+        real tmp = X[j];
+        for ( int i = 1; i <= KD; ++i )
+            tmp -= A[i] * temp[i-1];
+        for ( int i = KD-1; i > 0; --i )
             temp[i] = temp[i-1];
-        }
+        */
+        real tmp = X[j] - A[KD] * temp[KD-1];
+        for ( int i = KD-1; i > 0; --i )
+            temp[i] = temp[i-1];
+        for ( int i = 1; i < KD; ++i )
+            tmp -= A[i] * temp[i];
         tmp = A[0] * tmp;
-        temp[1] = tmp;
+        temp[0] = tmp;
         X[j] = tmp;
         A -= lda;
     }
@@ -1209,13 +1216,13 @@ inline void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     copy_real(N, B, tmp);
     alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
     alsatian_xtbsvLNN(N, KD, AB, LDAB, tmp);
-    printf("\n  tmp "); VecPrint::print(std::cout, S, tmp, 4);
-    printf("\n  L   "); VecPrint::print(std::cout, S, B, 4);
+    printf("\n  t "); VecPrint::print(std::cout, S, tmp, 5);
+    printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
     copy_real(N, B, tmp);
     alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
     alsatian_xtbsvLTN(N, KD, AB, LDAB, tmp);
-    printf("\n  tmp "); VecPrint::print(std::cout, S, tmp, 4);
-    printf("\n  L   "); VecPrint::print(std::cout, S, B, 4);
+    printf("\n  - "); VecPrint::print(std::cout, S, tmp, 5);
+    printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
     printf("\n");
     free_real(tmp);
 #else
