@@ -210,7 +210,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 
 // the leading dimension of the banded matrix used for preconditionning
 constexpr size_t ISOB_LDD = 3;
-constexpr size_t BAND_LDD = 1+2*DIM;
+constexpr size_t BAND_LDD = 2*DIM+1;
 constexpr size_t BAND_NUD = 2*DIM;
 
 /// apply preconditionner block in band storage

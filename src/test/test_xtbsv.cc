@@ -18,15 +18,28 @@ using namespace TicToc;
 
 #define DIM 3
 
-const size_t KD = 2;
-const size_t LDAB = 3;
-
 /// number of segments:
 const size_t NSEG = 1240;
 const size_t DISP = 16UL;
 
 
- void alsatian0(int N, real const* AB, real* B)
+template < void (*FUNC)(int N, real const* AB, real* B) >
+void check(real const* AB, real* B, char const str[], size_t cnt)
+{
+    FUNC(NSEG, AB, B);
+    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
+    tic();
+    for ( size_t n = 0; n < cnt; ++n )
+        FUNC(NSEG, AB, B);
+    printf(" %-14s %7.3f\n", str, toc(cnt));
+}
+
+//------------------------------------------------------------------------------
+
+const size_t KD = 2;
+const size_t LDAB = 3;
+
+void iso0(int N, real const* AB, real* B)
 {
     for ( int d = 0; d < DIM; ++d )
     {
@@ -35,7 +48,7 @@ const size_t DISP = 16UL;
     }
 }
 
- void alsatian1(int N, real const* AB, real* B)
+void iso1(int N, real const* AB, real* B)
 {
     for ( int d = 0; d < DIM; ++d )
     {
@@ -44,18 +57,18 @@ const size_t DISP = 16UL;
     }
 }
 
- void alsatian2(int N, real const* AB, real* B)
+void iso2(int N, real const* AB, real* B)
 {
     alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
     alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
 }
 
- void alsatian3(int N, real const* AB, real* B)
+void iso3(int N, real const* AB, real* B)
 {
     alsatian_xpbtrsL<DIM>(N, AB, LDAB, B);
 }
 
-void alsatian4(int N, real const* AB, real* B)
+void iso4(int N, real const* AB, real* B)
 {
 #ifdef __AVX__
 #if ( DIM == 1 )
@@ -68,7 +81,7 @@ void alsatian4(int N, real const* AB, real* B)
 #endif
 }
 
-void alsatian5(int N, real const* AB, real* B)
+void iso5(int N, real const* AB, real* B)
 {
 #ifdef __AVX__
 #if ( DIM == 1 )
@@ -86,14 +99,14 @@ void alsatian5(int N, real const* AB, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testTBSV(size_t cnt)
+void testISO(size_t cnt)
 {
-    std::cout << "testTBSV " << NSEG << " segments --- real " << sizeof(real);
+    std::cout << "isoXTBSV " << NSEG << " segments --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__ << "\n";
 
-    real * AB  = new_real(NSEG*LDAB);
-    real * Bs = new_real(NSEG*DIM);
-    real * B  = new_real(NSEG*DIM);
+    real * AB = new_real(NSEG*LDAB);
+    real * S = new_real(NSEG*DIM);
+    real * B = new_real(NSEG*DIM);
 
     for ( size_t i = 0; i < NSEG; ++i )
     {
@@ -102,64 +115,146 @@ void testTBSV(size_t cnt)
         AB[2+LDAB*i] = RNG.sreal();
     }
     for ( size_t i = 0; i < NSEG*DIM; ++i )
-        Bs[i] = RNG.sreal();
+        S[i] = RNG.sreal();
     int info;
     alsatian_xpbtf2L<2>(NSEG, AB, LDAB, &info);
     
 #if ( 0 )
-    copy_real(NSEG*DIM, Bs, B);
-    alsatian0(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian0(NSEG, AB, B);
-    printf("    wrong BLAS  %7.3f\n", toc(cnt));
+    copy_real(NSEG*DIM, S, B);
+    check<iso0>(AB, B, "buggy BLAS", cnt);
 #endif
     
-    copy_real(NSEG*DIM, Bs, B);
-    alsatian1(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian1(NSEG, AB, B);
-    printf("    xtbsv<'I'>  %7.3f\n", toc(cnt));
+    copy_real(NSEG*DIM, S, B);
+    check<iso1>(AB, B, "xtbsv<'I'>", cnt);
     
-    copy_real(NSEG*DIM, Bs, B);
-    alsatian2(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian2(NSEG, AB, B);
-    printf("    xtbsv<DIM>  %7.3f\n", toc(cnt));
+    copy_real(NSEG*DIM, S, B);
+    check<iso2>(AB, B, "xtbsv<DIM>", cnt);
 
-    copy_real(NSEG*DIM, Bs, B);
-    alsatian3(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian3(NSEG, AB, B);
-    printf("    xtbsvLNN3   %7.3f\n", toc(cnt));
+    copy_real(NSEG*DIM, S, B);
+    check<iso3>(AB, B, "xtbsvLNN3", cnt);
     
 #if 0
-    copy_real(NSEG*DIM, Bs, B);
-    alsatian4(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian4(NSEG, AB, B);
-    printf("    xtbsvLNN3   %7.3f\n", toc(cnt));
+    copy_real(NSEG*DIM, S, B);
+    check<iso4>(AB, B, "xtbsvLNN3", cnt);
     
-    copy_real(NSEG*DIM, Bs, B);
-    alsatian5(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        alsatian5(NSEG, AB, B);
-    printf("    xtbsvLTN3   %7.3f\n", toc(cnt));
+    copy_real(NSEG*DIM, S, B);
+    check<iso5>(AB, B, "xtbsvLTN3", cnt);
 #endif
     
     free_real(B);
-    free_real(Bs);
+    free_real(S);
+    free_real(AB);
+}
+
+//------------------------------------------------------------------------------
+
+constexpr size_t BAND_LDD = 2*DIM+1;
+constexpr size_t BAND_NUD = 2*DIM;
+
+void uni0(int N, real const* AB, real* B)
+{
+    blas::xtbsv('L', 'N', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
+    blas::xtbsv('L', 'T', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
+}
+
+void uni1(int N, real const* AB, real* B)
+{
+    blas_xtbsvLN<'I'>(N, BAND_NUD, AB, BAND_LDD, B, 1);
+    blas_xtbsvLT<'I'>(N, BAND_NUD, AB, BAND_LDD, B, 1);
+
+}
+
+void uni2(int N, real const* AB, real* B)
+{
+    alsatian_xtbsvLNN(N, BAND_NUD, AB, BAND_LDD, B);
+    alsatian_xtbsvLTN(N, BAND_NUD, AB, BAND_LDD, B);
+}
+
+void uni3(int N, real const* AB, real* B)
+{
+    alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+}
+
+void uni4(int N, real const* AB, real* B)
+{
+    alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    //alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+}
+
+void uni5(int N, real const* AB, real* B)
+{
+    //alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
+    //alsatian_xtbsvLTN6(N, AB, BAND_LDD, B);
+}
+
+void uni6(int N, real const* AB, real* B)
+{
+    //alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+}
+
+void uni7(int N, real const* AB, real* B)
+{
+    //alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLTN6(N, AB, BAND_LDD, B);
+}
+
+
+/**
+ Test Lapack and custom implementation of routines used to factorize
+ a symmetric tri-diagonal matrix and solve the associated system.
+ */
+void test(size_t cnt)
+{
+    std::cout << "XTBSV " << NSEG << " segments --- real " << sizeof(real);
+    std::cout << " --- " << __VERSION__ << "\n";
+
+    real * AB = new_real(NSEG*BAND_LDD);
+    real * S = new_real(NSEG*DIM);
+    real * B = new_real(NSEG*DIM);
+
+    for ( size_t i = 0; i < NSEG*BAND_LDD; ++i )
+        AB[i] = 0;
+    for ( size_t i = 0; i < NSEG; ++i )
+    {
+        AB[  BAND_LDD*i] = 5.0;
+        AB[1+BAND_LDD*i] = 0.5;
+        AB[2+BAND_LDD*i] = RNG.sreal();
+        AB[3+BAND_LDD*i] = 0.5*RNG.sreal();
+        AB[4+BAND_LDD*i] = 0.25*RNG.sreal();
+    }
+    for ( size_t i = 0; i < NSEG*DIM; ++i )
+        S[i] = RNG.sreal();
+    int info;
+    alsatian_xpbtf2L<2>(NSEG, AB, BAND_LDD, &info);
+#if 0
+    copy_real(NSEG*DIM, S, B);
+    check<uni0>(AB, B, "blas::", cnt);
+#endif
+    copy_real(NSEG*DIM, S, B);
+    check<uni1>(AB, B, "blas_xtbsv", cnt);
+
+    copy_real(NSEG*DIM, S, B);
+    check<uni2>(AB, B, "xtbsvLNN", cnt);
+    
+    copy_real(NSEG*DIM, S, B);
+    check<uni3>(AB, B, "xtbsvLNNK<KD>", cnt);
+    
+    copy_real(NSEG*DIM, S, B);
+    check<uni4>(AB, B, "LNNK<KD>", cnt);
+    
+    copy_real(NSEG*DIM, S, B);
+    check<uni5>(AB, B, "LNN6", cnt);
+
+    copy_real(NSEG*DIM, S, B);
+    check<uni6>(AB, B, "LTNK<KD>", cnt);
+    
+    copy_real(NSEG*DIM, S, B);
+    check<uni7>(AB, B, "LTN6", cnt);
+
+    free_real(B);
+    free_real(S);
     free_real(AB);
 }
 
@@ -167,5 +262,6 @@ void testTBSV(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    testTBSV(1<<16);
+    //testISO(1<<16);
+    test(1<<16);
 }

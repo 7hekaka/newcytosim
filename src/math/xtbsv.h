@@ -388,8 +388,8 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
 //------------------------------------------------------------------------------
 #pragma mark - ALSATIAN DTBSV with various KD
 
-/*
- //The original LAPACK implementation load and store X at every operation
+#if 0
+//The original LAPACK implementation load and store X at every operation
 inline void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     for ( int j = 0; j < N; ++j )
@@ -417,7 +417,8 @@ inline void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const in
         A -= lda - 1;
     }
 }
-*/
+#endif
+
 inline void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     // general case:
@@ -518,10 +519,18 @@ template < int KD >
 inline void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
 {
     real temp[KD];
-    for ( int i = 0; i < KD; ++i )
-        temp[i] = X[i];
+    if ( KD < N )
+    {
+        // 'general case' with j = 0, initializing temp[]
+        real t = X[0] * A[0];
+        X[0] = t;
+        for ( int i = 1; i <= KD; ++i )
+            temp[i-1] = X[i] - t * A[i];
+        A += lda;
+        X += 1;
+    }
     // general case:
-    for ( int j = 0; j < N-KD; ++j )
+    for ( int j = 1; j < N-KD; ++j )
     {
         /*
         const real t = X[j] * A[0];
@@ -571,17 +580,12 @@ inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* 
 */
         for ( int i = j + 1; i < N; ++i )
             tmp -= A[i-j] * temp[i+KD-N]; // temp[] is X[i];
-        tmp = A[0] * tmp;
-        temp[j+KD-N] = tmp;
-        X[j] = tmp;
+        temp[j+KD-N] = A[0] * tmp;
+        X[j] = temp[j+KD-N];
         A -= lda;
     }
-    /*
-     // temp[1] = X[N-KD] and temp[KD] = X[N-1]:
-    for ( int i = 0; i < KD; ++i )
-        temp[i+1] = X[i+N-KD];
-     */
-    // general case, downward!:
+    // at this stage, temp[1] = X[N-KD] and temp[KD] = X[N-1]:
+    // general case, downward!
     for ( int j = N-KD-1; j >= 0; --j )
     {
         /*
@@ -589,26 +593,49 @@ inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* 
          for ( int i = 1; i <= KD; ++i )
             tmp -= A[i] * X[i+j];
          */
-        /*
-        real tmp = X[j];
-        for ( int i = 1; i <= KD; ++i )
-            tmp -= A[i] * temp[i-1];
-        for ( int i = KD-1; i > 0; --i )
-            temp[i] = temp[i-1];
-        */
         real tmp = X[j] - A[KD] * temp[KD-1];
         for ( int i = KD-1; i > 0; --i )
             temp[i] = temp[i-1];
         for ( int i = 1; i < KD; ++i )
             tmp -= A[i] * temp[i];
-        tmp = A[0] * tmp;
-        temp[0] = tmp;
-        X[j] = tmp;
+        temp[0] = A[0] * tmp;
+        X[j] = temp[0];
         A -= lda;
     }
 }
 
-
+/// Specialized version for KD==6
+inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* X)
+{
+    constexpr int KD = 6;
+    A += (N-1)*lda;
+    real temp[KD];
+    // process a few truncated case:
+    for ( int j = N-1; j >= N-KD; --j )
+    {
+        real tmp = X[j];
+        for ( int i = j + 1; i < N; ++i )
+            tmp -= A[i-j] * temp[i+KD-N]; // temp[] is X[i];
+        temp[j+KD-N] = A[0] * tmp;
+        X[j] = temp[j+KD-N];
+        A -= lda;
+    }
+    // general case, downward!
+    for ( int j = N-KD-1; j >= 0; --j )
+    {
+        real tmp = X[j] - A[6] * temp[5];
+        tmp -= A[5] * temp[4];
+        tmp -= A[4] * temp[3];
+        tmp -= A[3] * temp[2];
+        tmp -= A[2] * temp[1];
+        tmp -= A[1] * temp[0];
+        for ( int i = KD-1; i > 0; --i )
+            temp[i] = temp[i-1];
+        temp[0] = A[0] * tmp;
+        X[j] = temp[0];
+        A -= lda;
+    }
+}
 //------------------------------------------------------------------------------
 #pragma mark - Isotropic ALSATIAN DTBSV with KD==2
 
@@ -1220,6 +1247,7 @@ inline void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
     copy_real(N, B, tmp);
     alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
+    //alsatian_xtbsvLTN6(N, AB, LDAB, B);
     alsatian_xtbsvLTN(N, KD, AB, LDAB, tmp);
     printf("\n  - "); VecPrint::print(std::cout, S, tmp, 5);
     printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
