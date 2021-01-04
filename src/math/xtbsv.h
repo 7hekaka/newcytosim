@@ -430,7 +430,7 @@ inline void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const in
             X[i+j] -= tmp * A[i];
         A += lda;
     }
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-KD; j < N; ++j )
     {
         const real tmp = X[j] * A[0];
@@ -444,7 +444,7 @@ inline void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const in
 inline void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     A += (N-1)*lda;
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-1; j >= N-KD; --j )
     {
         real tmp = X[j];
@@ -478,7 +478,7 @@ inline void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* 
             X[i+j] -= tmp * A[i];
         A += lda;
     }
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-KD; j < N; ++j )
     {
         const real tmp = X[j] * A[0];
@@ -493,7 +493,7 @@ template < int KD >
 inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
 {
     A += (N-1)*lda;
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-1; j >= N-KD; --j )
     {
         real tmp = X[j];
@@ -546,7 +546,7 @@ inline void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* 
         A += lda;
         X += 1;
     }
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-KD; j < N; ++j )
     {
         /*
@@ -572,7 +572,7 @@ inline void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* 
     X += N-1;
     const int nkd = N-KD;
     real buf[KD];
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-1; j >= nkd; --j )
     {
         real tmp = X[0];
@@ -618,7 +618,7 @@ inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* 
     A += (N-1)*lda;
     X += N-1;
     real buf[KD];
-    // process a few truncated case:
+    // process truncated cases:
     for ( int j = N-1; j >= nkd; --j )
     {
         real tmp = X[0];
@@ -658,17 +658,92 @@ inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* 
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - SSE versions for KD = 6
+
 #if defined(__SSE__)
+inline void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* X)
+{
+    constexpr int KD = 6;
+    vec2 x0, x2, x4;
+    if ( KD < N )
+    {
+        // 'general case' with j = 0, initializing buf[]
+        vec2 tt = mul2(loaddup2(A), loaddup2(X));
+        store1(X, tt); // X[0] = t;
+        //for ( int i = 1; i <= KD; ++i ) buf[i-1] = X[i] - t * A[i];
+        x0 = fnmadd2(tt, loadu2(A+1), loadu2(X+1));
+        x2 = fnmadd2(tt, loadu2(A+3), loadu2(X+3));
+        x4 = fnmadd2(tt, loadu2(A+5), loadu2(X+5));
+        A += lda;
+        X += 1;
+    }
+    // general case:
+    for ( int j = 1; j < N-KD; ++j )
+    {
+        vec2 tt = mul2(loaddup2(A), unpacklo2(x0, x0)); // t = buf[0] * A[0];
+        store1(X, tt); //X[0] = t;
+        //for ( int i = 1; i < KD; ++i ) buf[i-1] = buf[i];
+        //buf[KD-1] = X[KD];
+        //for ( int i = 0; i < KD; ++i ) buf[i] = buf[i] - t * A[i];
+        x0 = shuffle2(x0, x2, 0b01);
+        x2 = shuffle2(x2, x4, 0b01);
+        x4 = shuffle2(x4, load1(X+KD), 0b01);
+        x0 = fnmadd2(tt, loadu2(A+1), x0);
+        x2 = fnmadd2(tt, loadu2(A+3), x2);
+        x4 = fnmadd2(tt, loadu2(A+5), x4);
+        A += lda;
+        X += 1;
+    }
+    // process 2 truncated cases:
+    for ( int j = N-KD; j < N-4; ++j )
+    {
+        vec2 tt = mul2(loaddup2(A), unpacklo2(x0, x0));
+        store1(X, tt);
+        x0 = shuffle2(x0, x2, 0b01);
+        x2 = shuffle2(x2, x4, 0b01);
+        x4 = unpackhi2(x4, setzero2());
+        x0 = fnmadd2(tt, loadu2(A+1), x0);
+        x2 = fnmadd2(tt, loadu2(A+3), x2);
+        x4 = fnmadd2(tt, loadu2(A+5), x4);
+        A += lda;
+        X += 1;
+    }
+    // process 2 truncated cases:
+    for ( int j = N-4; j < N-2; ++j )
+    {
+        vec2 tt = mul2(loaddup2(A), unpacklo2(x0, x0));
+        store1(X, tt);
+        x0 = shuffle2(x0, x2, 0b01);
+        x2 = unpackhi2(x2, setzero2());
+        x0 = fnmadd2(tt, loadu2(A+1), x0);
+        x2 = fnmadd2(tt, loadu2(A+3), x2);
+        A += lda;
+        X += 1;
+    }
+    // process 2 truncated cases:
+    if ( KD < N )
+    {
+        vec2 tt = mul1(load1(A), x0);
+        store1(X, tt);
+        x0 = unpackhi2(x0, setzero2());
+        x0 = fnmadd2(tt, load1(A+1), x0);
+        A += lda;
+        X += 1;
+        store1(X, mul1(load1(A), x0));
+    }
+}
+
+
 /// Specialized version for KD==6
 inline void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
 {
     assert_true( N > KD );
     constexpr int KD = 6;
-    const int nkd = N-KD;
     A += (N-1)*lda;
     X += N-1;
-    // process a few truncated case:
-    for ( int j = N-1; j >= nkd; --j )
+    // process truncated cases:
+    for ( int j = N-1; j >= N-KD; --j )
     {
         double tmp = X[0];
         for ( int i = 1; i < N-j; ++i )
@@ -681,7 +756,7 @@ inline void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, d
     vec2 x2 = loadu2(X+3);
     vec2 x4 = loadu2(X+5);
     // general case, downward!
-    for ( int j = nkd-1; j >= 0; --j )
+    for ( int j = N-KD-1; j >= 0; --j )
     {
         vec2 tt = fnmadd2(x4, loadu2(A+5), load1(X));
         tt = fnmadd2(x2, loadu2(A+3), tt);

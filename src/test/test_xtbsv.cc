@@ -184,8 +184,9 @@ void uni4(int N, real const* AB, real* B)
 
 void uni5(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
-    //alsatian_xtbsvLTN6(N, AB, BAND_LDD, B);
+#if REAL_IS_DOUBLE
+    alsatian_xtbsvLNN6SSE(N, AB, BAND_LDD, B);
+#endif
 }
 
 void uni6(int N, real const* AB, real* B)
@@ -251,7 +252,7 @@ void test(size_t cnt)
     check<uni4>(NVAL, AB, B, "LNNK<KD>", cnt);
     
     copy_real(NVAL, S, B);
-    check<uni5>(NVAL, AB, B, "LNN6", cnt);
+    check<uni5>(NVAL, AB, B, "LNN6_SSE", cnt);
 
     copy_real(NVAL, S, B);
     check<uni6>(NVAL, AB, B, "LTNK<KD>", cnt);
