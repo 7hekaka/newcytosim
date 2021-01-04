@@ -19,18 +19,18 @@ using namespace TicToc;
 #define DIM 3
 
 /// number of segments:
-const size_t NSEG = 1240;
-const size_t DISP = 16UL;
+const size_t NSEG = 124;
+const size_t NVAL = NSEG*DIM;
 
 
-template < void (*FUNC)(int N, real const* AB, real* B) >
-void check(real const* AB, real* B, char const str[], size_t cnt)
+template < void (*FUNC)(int, real const*, real*) >
+void check(int N, real const* AB, real* B, char const str[], size_t cnt)
 {
-    FUNC(NSEG, AB, B);
-    VecPrint::print(std::clog, std::min(DISP,NSEG), B, 2);
+    FUNC(N, AB, B);
+    VecPrint::print(std::clog, std::min(16,N), B, 3);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
-        FUNC(NSEG, AB, B);
+        FUNC(N, AB, B);
     printf(" %-14s %7.3f\n", str, toc(cnt));
 }
 
@@ -102,11 +102,11 @@ void iso5(int N, real const* AB, real* B)
 void testISO(size_t cnt)
 {
     std::cout << "isoXTBSV " << NSEG << " segments --- real " << sizeof(real);
-    std::cout << " --- " << __VERSION__ << "\n";
+    std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NSEG*LDAB);
-    real * S = new_real(NSEG*DIM);
-    real * B = new_real(NSEG*DIM);
+    real * S = new_real(NVAL);
+    real * B = new_real(NVAL);
 
     for ( size_t i = 0; i < NSEG; ++i )
     {
@@ -114,31 +114,31 @@ void testISO(size_t cnt)
         AB[1+LDAB*i] = 0.5;
         AB[2+LDAB*i] = RNG.sreal();
     }
-    for ( size_t i = 0; i < NSEG*DIM; ++i )
+    for ( size_t i = 0; i < NVAL; ++i )
         S[i] = RNG.sreal();
     int info;
     alsatian_xpbtf2L<2>(NSEG, AB, LDAB, &info);
     
 #if ( 0 )
-    copy_real(NSEG*DIM, S, B);
+    copy_real(NVAL, S, B);
     check<iso0>(AB, B, "buggy BLAS", cnt);
 #endif
     
-    copy_real(NSEG*DIM, S, B);
-    check<iso1>(AB, B, "xtbsv<'I'>", cnt);
+    copy_real(NVAL, S, B);
+    check<iso1>(NSEG, AB, B, "xtbsv<'I'>", cnt);
     
-    copy_real(NSEG*DIM, S, B);
-    check<iso2>(AB, B, "xtbsv<DIM>", cnt);
+    copy_real(NVAL, S, B);
+    check<iso2>(NSEG, AB, B, "xtbsv<DIM>", cnt);
 
-    copy_real(NSEG*DIM, S, B);
-    check<iso3>(AB, B, "xtbsvLNN3", cnt);
+    copy_real(NVAL, S, B);
+    check<iso3>(NSEG, AB, B, "xtbsvLNN3", cnt);
     
 #if 0
-    copy_real(NSEG*DIM, S, B);
-    check<iso4>(AB, B, "xtbsvLNN3", cnt);
+    copy_real(NVAL, S, B);
+    check<iso4>(NSEG, AB, B, "xtbsvLNN3", cnt);
     
-    copy_real(NSEG*DIM, S, B);
-    check<iso5>(AB, B, "xtbsvLTN3", cnt);
+    copy_real(NVAL, S, B);
+    check<iso5>(NSEG, AB, B, "xtbsvLTN3", cnt);
 #endif
     
     free_real(B);
@@ -200,6 +200,13 @@ void uni7(int N, real const* AB, real* B)
     alsatian_xtbsvLTN6(N, AB, BAND_LDD, B);
 }
 
+void uni8(int N, real const* AB, real* B)
+{
+#if REAL_IS_DOUBLE
+    alsatian_xtbsvLTN6SSE(N, AB, BAND_LDD, B);
+#endif
+}
+
 
 /**
  Test Lapack and custom implementation of routines used to factorize
@@ -208,50 +215,52 @@ void uni7(int N, real const* AB, real* B)
 void test(size_t cnt)
 {
     std::cout << "XTBSV " << NSEG << " segments --- real " << sizeof(real);
-    std::cout << " --- " << __VERSION__ << "\n";
+    std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NSEG*BAND_LDD);
-    real * S = new_real(NSEG*DIM);
-    real * B = new_real(NSEG*DIM);
-
-    for ( size_t i = 0; i < NSEG*BAND_LDD; ++i )
-        AB[i] = 0;
-    for ( size_t i = 0; i < NSEG; ++i )
+    real * AB = new_real(NVAL*BAND_LDD);
+    real * S = new_real(NVAL);
+    real * B = new_real(NVAL);
+    
+    zero_real(NVAL*BAND_LDD, AB);
+    for ( size_t i = 0; i < NVAL; ++i )
     {
-        AB[  BAND_LDD*i] = 5.0;
-        AB[1+BAND_LDD*i] = 0.5;
-        AB[2+BAND_LDD*i] = RNG.sreal();
-        AB[3+BAND_LDD*i] = 0.5*RNG.sreal();
-        AB[4+BAND_LDD*i] = 0.25*RNG.sreal();
-    }
-    for ( size_t i = 0; i < NSEG*DIM; ++i )
         S[i] = RNG.sreal();
+        AB[  BAND_LDD*i] = 8.0;
+        for ( size_t j = 1; j < BAND_LDD; ++j )
+            AB[j+BAND_LDD*i] = RNG.sreal() / j;
+    }
     int info;
-    alsatian_xpbtf2L<2>(NSEG, AB, BAND_LDD, &info);
+    alsatian_xpbtf2L<2>(NVAL, AB, BAND_LDD, &info);
+    
 #if 0
-    copy_real(NSEG*DIM, S, B);
-    check<uni0>(AB, B, "blas::", cnt);
+    copy_real(NVAL, S, B);
+    check<uni0>(NVAL, AB, B, "blas::", cnt);
 #endif
-    copy_real(NSEG*DIM, S, B);
-    check<uni1>(AB, B, "blas_xtbsv", cnt);
+    copy_real(NVAL, S, B);
+    check<uni1>(NVAL, AB, B, "blas_xtbsv", cnt);
 
-    copy_real(NSEG*DIM, S, B);
-    check<uni2>(AB, B, "xtbsvLNN", cnt);
+    copy_real(NVAL, S, B);
+    check<uni2>(NVAL, AB, B, "xtbsvLNN", cnt);
     
-    copy_real(NSEG*DIM, S, B);
-    check<uni3>(AB, B, "xtbsvLNNK<KD>", cnt);
+    copy_real(NVAL, S, B);
+    check<uni3>(NVAL, AB, B, "xtbsvLNNK<KD>", cnt);
     
-    copy_real(NSEG*DIM, S, B);
-    check<uni4>(AB, B, "LNNK<KD>", cnt);
+    std::cout << " ---\n";
     
-    copy_real(NSEG*DIM, S, B);
-    check<uni5>(AB, B, "LNN6", cnt);
+    copy_real(NVAL, S, B);
+    check<uni4>(NVAL, AB, B, "LNNK<KD>", cnt);
+    
+    copy_real(NVAL, S, B);
+    check<uni5>(NVAL, AB, B, "LNN6", cnt);
 
-    copy_real(NSEG*DIM, S, B);
-    check<uni6>(AB, B, "LTNK<KD>", cnt);
+    copy_real(NVAL, S, B);
+    check<uni6>(NVAL, AB, B, "LTNK<KD>", cnt);
     
-    copy_real(NSEG*DIM, S, B);
-    check<uni7>(AB, B, "LTN6", cnt);
+    copy_real(NVAL, S, B);
+    check<uni7>(NVAL, AB, B, "LTN6", cnt);
+    
+    copy_real(NVAL, S, B);
+    check<uni8>(NVAL, AB, B, "LTN6_SSE", cnt);
 
     free_real(B);
     free_real(S);
@@ -262,6 +271,6 @@ void test(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    //testISO(1<<16);
+    testISO(1<<16);
     test(1<<16);
 }

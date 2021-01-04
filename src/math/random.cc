@@ -330,17 +330,18 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
     real * d = dst;
     while ( src < src_end )
     {
-        vec8f x = mulf(fac, cvt8i(load8si(src++)));
-        vec8f y = mulf(fac, cvt8i(load8si(src++)));
-        vec8f n = addf(mulf(x,x), mulf(y,y));
+        vec8f x = mul8f(fac, cvt8i(load8si(src++)));
+        vec8f y = mul8f(fac, cvt8i(load8si(src++)));
+        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         /*
          The function used to calculate logarithm on SIMD data is part of the
          Intel SVML library, and is provided by the Intel compiler.
          */
-        n = rsqrtf(divf(n, mulf(two, _mm256_log_ps(n))));
+        vec8f i = rcp8f(_mm256_log_ps(n));
+        n = rsqrt8f(mul8f(mul8f(two, n), i));
         // the 16 single-precision values are converted to double-precision:
-        x = mulf(n, x);
-        y = mulf(n, y);
+        x = mul8f(n, x);
+        y = mul8f(n, y);
 #if REAL_IS_DOUBLE
         store4(d   , cvt4f(getlo4f(x)));
         store4(d+4 , cvt4f(getlo4f(y)));

@@ -647,24 +647,25 @@ void projectForcesU3D_AVX(SIZE_T nbs, const real* dif, const real* src, real* mu
 
 #endif
 
-void testU(SIZE_T cnt, void (*func)(SIZE_T, const real*, const real*, real*), char const* str)
+template <void (*FUNC)(SIZE_T, const real*, const real*, real*)>
+void testU(SIZE_T cnt, char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
     randomize(NVAL, x, y, z, 1.0);
     nan_fill(NVAL, lag_);
 
-    func(NSEG, dir_, force_, lag_);
+    FUNC(NSEG, dir_, force_, lag_);
     VecPrint::print(std::cout, std::min(DISP,NSEG), lag_);
     std::cout << " |";
     VecPrint::print(std::cout, 1, lag_+NSEG);
     tic();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
-        func(NSEG, dir_, y, z);
+        FUNC(NSEG, dir_, y, z);
         // check the code with unaligned memory:
-        func(NSEG, dir_, x+DIM, y);
-        func(NSEG, dir_, z, y);
+        FUNC(NSEG, dir_, x+DIM, y);
+        FUNC(NSEG, dir_, z, y);
     }
     printf("  %10s %5.2f\n", str, toc(cnt*NSEG));
     
@@ -675,21 +676,21 @@ void testU(SIZE_T cnt, void (*func)(SIZE_T, const real*, const real*, real*), ch
 void testProjectionU(SIZE_T cnt)
 {
     std::cout << "testProjection UP " << DIM << "D, " << NSEG << " segments\n";
-    testU(cnt, projectForcesU_,    " U_   ");
-    testU(cnt, projectForcesU_PTR, " U_PTR");
-    testU(cnt, projectForcesU_TWO, " U_TWO");
+    testU<projectForcesU_>(cnt,    " U_   ");
+    testU<projectForcesU_PTR>(cnt, " U_PTR");
+    testU<projectForcesU_TWO>(cnt, " U_TWO");
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE__)
-    testU(cnt, projectForcesU2D_SSE, " U_SSE");
+    testU<projectForcesU2D_SSE>(cnt, " U_SSE");
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-    testU(cnt, projectForcesU2D_AVX, " U_AVX");
-    testU(cnt, projectForcesU2D_AVY, " U_AVY");
+    testU<projectForcesU2D_AVX>(cnt, " U_AVX");
+    testU<projectForcesU2D_AVY>(cnt, " U_AVY");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE__)
-    testU(cnt, projectForcesU3D_SSE, " U_SSE");
+    testU<projectForcesU3D_SSE>(cnt, " U_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
-    testU(cnt, projectForcesU3D_AVX, " U_AVX");
+    testU<projectForcesU3D_AVX>(cnt, " U_AVX");
 #endif
 }
 
@@ -1331,14 +1332,15 @@ void projectForcesD3D_AVX(SIZE_T nbs, const real* dif, const real* src, const re
 
 #endif
 
-void testD(SIZE_T cnt, void (*func)(SIZE_T, const real*, const real*, const real*, real*), char const* str)
+template < void (*FUNC)(SIZE_T, const real*, const real*, const real*, real*) >
+void testD(SIZE_T cnt, char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
     randomize(NVAL, x, y, z, 1.0);
     nan_fill(NVAL, x);
     
-    func(NSEG, dir_, pos_, lag_, x);
+    FUNC(NSEG, dir_, pos_, lag_, x);
     VecPrint::print(std::cout, std::min(DISP,NVAL), x);
     std::cout << " |";
     VecPrint::print(std::cout, DIM, x+NVAL);
@@ -1346,10 +1348,10 @@ void testD(SIZE_T cnt, void (*func)(SIZE_T, const real*, const real*, const real
     tic();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
-        func(NSEG, dir_, x, lag_, z);
+        FUNC(NSEG, dir_, x, lag_, z);
         // check the code with unaligned memory in 3D:
-        func(NSEG, dir_, y, lag_, x+DIM);
-        func(NSEG, dir_, z+DIM, lag_, y);
+        FUNC(NSEG, dir_, y, lag_, x+DIM);
+        FUNC(NSEG, dir_, z+DIM, lag_, y);
     }
     printf("  %10s %5.2f\n", str, toc(cnt*NSEG));
     
@@ -1361,23 +1363,23 @@ void testProjectionD(SIZE_T cnt)
 {
     projectForcesU_(NSEG, dir_, force_, lag_);
     std::cout << "testProjection DOWN " << DIM << "D,  " << NSEG << " segments\n";
-    testD(cnt, projectForcesD_,    " D_   ");
-    testD(cnt, projectForcesD_ADD, " D_ADD");
-    testD(cnt, projectForcesD_REV, " D_REV");
-    testD(cnt, projectForcesD_RIV, " D_RIV");
-    testD(cnt, projectForcesD_FMA, " D_FMA");
-    testD(cnt, projectForcesD_PTR, " D_PTR");
+    testD<projectForcesD_>(cnt,    " D_   ");
+    testD<projectForcesD_ADD>(cnt, " D_ADD");
+    testD<projectForcesD_REV>(cnt, " D_REV");
+    testD<projectForcesD_RIV>(cnt, " D_RIV");
+    testD<projectForcesD_FMA>(cnt, " D_FMA");
+    testD<projectForcesD_PTR>(cnt, " D_PTR");
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE__)
-    testD(cnt, projectForcesD2D_SSE, " D_SSE");
+    testD<projectForcesD2D_SSE>(cnt, " D_SSE");
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-    testD(cnt, projectForcesD2D_AVX, " D_AVX");
+    testD<projectForcesD2D_AVX>(cnt, " D_AVX");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE__)
-    testD(cnt, projectForcesD3D_SSE, " D_SSE");
+    testD<projectForcesD3D_SSE>(cnt, " D_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
-    testD(cnt, projectForcesD3D_AVX, " D_AVX");
+    testD<projectForcesD3D_AVX>(cnt, " D_AVX");
 #endif
 }
 
@@ -1549,24 +1551,24 @@ void projectScale(SIZE_T nbs, const real* X, real* Y)
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
-
-void timeProject(SIZE_T cnt, void (*func)(SIZE_T, const real*, real*), char const* str)
+template < void (*FUNC)(SIZE_T, const real*, real*) >
+void timeProject(SIZE_T cnt, char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
     randomize(NVAL, x, y, z, 1.0);
 
     zero_real(ALOC, x);
-    func(NSEG, force_, x);
+    FUNC(NSEG, force_, x);
     VecPrint::print(std::cout, std::min(DISP,NVAL+2), x);
 
     tic();
     for ( SIZE_T ii=0; ii<cnt; ++ii )
     {
-        func(NSEG, x, y);
+        FUNC(NSEG, x, y);
         // check the code with unaligned memory:
-        func(NSEG, y+2, z);
-        func(NSEG, z, x);
+        FUNC(NSEG, y+2, z);
+        FUNC(NSEG, z, x);
     }
     printf("  %10s %5.2f\n", str, toc(cnt*NSEG));
     free_reals(x,y,z);
@@ -1593,16 +1595,16 @@ int main(int argc, char* argv[])
         setProjection(NSEG);
         setAnisotropy(NSEG);
         std::cout << "testProject " << DIM << "D, " << NSEG << " segments\n";
-        timeProject(CNT, projectForces,    " projF");
+        timeProject<projectForces>(CNT,    " projF");
 #if REAL_IS_DOUBLE && defined(__SSE3__)
-        timeProject(CNT, projectForces_SSE, " prSSE");
+        timeProject<projectForces_SSE>(CNT, " prSSE");
 #endif
 #if REAL_IS_DOUBLE && defined(__AVX__)
-        timeProject(CNT, projectForces_AVX, " prAVX");
+        timeProject<projectForces_AVX>(CNT, " prAVX");
 #endif
-        timeProject(CNT, projectDPTTS,   " dptts");
-        timeProject(CNT, projectTangent, " projT");
-        timeProject(CNT, projectScale,   " scale");
+        timeProject<projectDPTTS>(CNT,   " dptts");
+        timeProject<projectTangent>(CNT, " projT");
+        timeProject<projectScale>(CNT,   " scale");
     }
     
     free_reals(tmp_, lag_, force_, pos_);

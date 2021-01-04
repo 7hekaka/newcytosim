@@ -107,12 +107,13 @@ inline static vec8f setzero8f()                   { return _mm256_setzero_ps(); 
 inline static vec8f set8f(float const& a)         { return _mm256_set1_ps(a); }
 inline static vec8f load8f(float const* a)        { return _mm256_load_ps(a); }
 inline static vec8f loadu8f(float const* a)       { return _mm256_loadu_ps(a); }
+inline static void  store1f(float* a, vec8f b)    { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
 inline static void  store8f(float* a, vec8f b)    { _mm256_store_ps(a, b); }
 inline static void  storeu8f(float* a, vec8f b)   { _mm256_storeu_ps(a, b); }
-inline static vec8f mulf(vec8f a, vec8f b)        { return _mm256_mul_ps(a,b); }
-inline static vec8f divf(vec8f a, vec8f b)        { return _mm256_div_ps(a,b); }
-inline static vec8f addf(vec8f a, vec8f b)        { return _mm256_add_ps(a,b); }
-inline static vec8f subf(vec8f a, vec8f b)        { return _mm256_sub_ps(a,b); }
+inline static vec8f mul8f(vec8f a, vec8f b)       { return _mm256_mul_ps(a,b); }
+inline static vec8f div8f(vec8f a, vec8f b)       { return _mm256_div_ps(a,b); }
+inline static vec8f add8f(vec8f a, vec8f b)       { return _mm256_add_ps(a,b); }
+inline static vec8f sub8f(vec8f a, vec8f b)       { return _mm256_sub_ps(a,b); }
 
 inline static vec8f max8f(vec8f a, vec8f b)       { return _mm256_max_ps(a,b); }
 inline static vec8f min8f(vec8f a, vec8f b)       { return _mm256_min_ps(a,b); }
@@ -122,10 +123,10 @@ inline static vec8f abs8f(vec8f a)                { return _mm256_andnot_ps(_mm2
 
 #define permute8f128(a,b,c)  _mm256_permute4f128_ps(a,b,c)
 
-/// approximate inverse
-inline static vec8f rcpf(vec8f a)                 { return _mm256_rcp_ps(a); }
-/// approximate reciprocal square root
-inline static vec8f rsqrtf(vec8f a)               { return _mm256_rsqrt_ps(a); }
+/// approximate inverse: 1/a
+inline static vec8f rcp8f(vec8f a)                { return _mm256_rcp_ps(a); }
+/// approximate reciprocal square root: 1 / sqrt(a)
+inline static vec8f rsqrt8f(vec8f a)              { return _mm256_rsqrt_ps(a); }
 
 inline static vec4f getlo4f(vec8f a)              { return _mm256_castps256_ps128(a); }
 inline static vec4f gethi4f(vec8f a)              { return _mm256_extractf128_ps(a,1); }

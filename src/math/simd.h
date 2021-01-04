@@ -61,6 +61,7 @@ inline static vec2 setzero2()                       { return _mm_setzero_pd(); }
 
 inline static vec2 unpacklo2(vec2 a, vec2 b)        { return _mm_unpacklo_pd(a,b); }
 inline static vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
+inline static vec2 swap2(vec2 a)                    { return _mm_shuffle_pd(a, a, 0b01); }
 
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
 #define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)
@@ -68,28 +69,28 @@ inline static vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b
 /// returns the sum of the elements, broadcasted
 inline static vec2 esum2(vec2 v)
 {
-    return add2(v, shuffle2(v, v, 0b01));
+    return add2(v, swap2(v));
 }
 
 /// returns the dot product of two vectors, broadcasted
 inline static vec2 dot2(vec2 a, vec2 b)
 {
     vec2 p = mul2(a, b);
-    return add2(p, shuffle2(p, p, 0b01));
+    return add2(p, swap2(p));
 }
 
 /// square of vector norm, broadcasted
 inline static vec2 normsqr2(vec2 vec)
 {
     vec2 p = mul2(vec, vec);
-    return add2(p, shuffle2(p, p, 0b01));
+    return add2(p, swap2(p));
 }
 
 /// normalize vector
 inline static vec2 normalize2(vec2 vec)
 {
     vec2 p = mul2(vec, vec);
-    vec2 s = add2(p, shuffle2(p, p, 0b01));
+    vec2 s = add2(p, swap2(p));
     return div2(vec, sqrt2(s));
 }
 
@@ -97,7 +98,7 @@ inline static vec2 normalize2(vec2 vec)
 inline static vec2 normalize2(vec2 vec, double n)
 {
     vec2 p = mul2(vec, vec);
-    vec2 s = add2(p, shuffle2(p, p, 0b01));
+    vec2 s = add2(p, swap2(p));
     return mul2(vec, div2(set2(n), sqrt2(s)));
 }
 

@@ -576,7 +576,7 @@ void test_swap1()
     dump(permute2f128(a,b,0x31), "permute2f128(a,b,0x31)");
     dump(permute2f128(a,b,0x01), "permute2f128(a,b,0x01)");
 
-    vec4 x = permute2f128(a, a, 0b00100001);
+    vec4 x = permute2f128(a, a, 0x21);
     dump(shuffle4(a, x, 0b0101), "rotate >");
     dump(shuffle4(x, a, 0b0101), "rotate <");
     

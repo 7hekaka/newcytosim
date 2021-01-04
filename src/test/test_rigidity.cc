@@ -459,7 +459,8 @@ inline void tic() { rdt = __rdtsc(); }
 inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 
-void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real*), char const* str)
+template < void (*FUNC)(const size_t, const real*, real, real*) >
+void testRigidity(size_t cnt, char const* str)
 {
     const size_t nbt = DIM * ( NSEG - 1 );
     const real alpha = 64.0;
@@ -468,7 +469,7 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
     zero_real(ALOC, vY);
     zero_real(ALOC, vZ);
     
-    func(nbt, vP, alpha, vX);
+    FUNC(nbt, vP, alpha, vX);
     VecPrint::print(std::cout, std::min(DISP,nbt), vX);
     std::cout << " |";
     VecPrint::print(std::cout, DIM, vX+NVAL);
@@ -478,9 +479,9 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
     tic();
     for ( size_t i=0; i<cnt; ++i )
     {
-        func(nbt, vY, alpha, vZ);
-        func(nbt, vZ, alpha, vX);
-        func(nbt, vX, alpha, vY);
+        FUNC(nbt, vY, alpha, vZ);
+        FUNC(nbt, vZ, alpha, vX);
+        FUNC(nbt, vX, alpha, vY);
     }
     if ( abs_real(err) > 64*REAL_EPSILON )
         printf(" XXXX %e ", err);
@@ -490,24 +491,24 @@ void testRigidity(size_t cnt, void (*func)(const size_t, const real*, real, real
 }
 
 
-void testRigidity(size_t cnt)
+void test(size_t cnt)
 {
-    testRigidity(cnt, add_rigidity0, "0  ");
+    testRigidity<add_rigidity0>(cnt, "0  ");
 #if ( DIM == 2 )
-    testRigidity(cnt, add_rigidity2, "2  ");
+    testRigidity<add_rigidity2>(cnt, "2  ");
 #endif
-    testRigidity(cnt, add_rigidity3, "3  ");
-    testRigidity(cnt, add_rigidityF, "F  ");
-    testRigidity(cnt, add_rigidityG, "G  ");
-    testRigidity(cnt, add_rigidityF, "F  ");
-    testRigidity(cnt, add_rigidityG, "G  ");
-    testRigidity(cnt, add_rigidity4, "4  ");
+    testRigidity<add_rigidity3>(cnt, "3  ");
+    testRigidity<add_rigidityF>(cnt, "F  ");
+    testRigidity<add_rigidityG>(cnt, "G  ");
+    testRigidity<add_rigidityF>(cnt, "F  ");
+    testRigidity<add_rigidityG>(cnt, "G  ");
+    testRigidity<add_rigidity4>(cnt, "4  ");
 #if defined(__SSE__) & ( DIM == 2 ) & REAL_IS_DOUBLE
-    testRigidity(cnt, add_rigidity2D_SSO, "SSO");
-    testRigidity(cnt, add_rigidity2D_SSE, "SSE");
+    testRigidity<add_rigidity2D_SSO>(cnt, "SSO");
+    testRigidity<add_rigidity2D_SSE>(cnt, "SSE");
 #endif
 #if defined(__AVX__) & ( DIM == 2 ) & REAL_IS_DOUBLE
-    testRigidity(cnt, add_rigidity2D_AVX, "AVX");
+    testRigidity<add_rigidity2D_AVX>(cnt, "AVX");
 #endif
 }
 
@@ -522,6 +523,6 @@ int main(int argc, char* argv[])
     setFilament(NSEG, vP, 0.1, 17.0);
     std::cout << "addRigidity " << DIM << "D,  " << NSEG;
     std::cout << " segments,   " << __VERSION__ << "\n";
-    testRigidity(1<<20);
+    test(1<<20);
     free_reals(vP, vX, vY, vZ);
 }
