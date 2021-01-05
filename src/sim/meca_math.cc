@@ -301,22 +301,23 @@ Cholesky factorization by DPBTRF() or DPBTF2().
  This should work even if 'src==dst' provided `ldd <= N`
  */
 template < int KD >
-void lower_band_storage(size_t N, real const* src, real* dst, size_t ldd)
+void lower_band_storage(int N, real const* src, real* dst, int ldd)
 {
     assert_true( ldd == KD+1 );
     assert_true( dst != src || ldd <= N );
-    for ( size_t j = 0; j < N; ++j )
+    const int nkd = std::max(0, N-KD);
+    for ( int j = 0; j < N; ++j )
     {
-        size_t sup = std::min(N-1, j+KD);
+        int sup = std::min(N-1, j+KD);
         real const* S = src + N * j;
         real * D = dst + ldd * j;
-        for ( size_t i = j; i <= sup; ++i )
+        for ( int i = j; i <= sup; ++i )
             D[i-j] = S[i];
     }
     // zero-out unused values:
-    for ( size_t j = N-KD; j < N; ++j )
+    for ( int j = nkd; j < N; ++j )
     {
-        for ( size_t i = N-j; i < ldd; ++i )
+        for ( int i = std::max(0, N-j); i < ldd; ++i )
             dst[i+ldd*j] = 0;
     }
 }

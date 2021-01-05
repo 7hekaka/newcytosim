@@ -19,27 +19,30 @@ inline static vec4f load1f(float const* a)        { return _mm_load_ss(a); }
 inline static vec4f load2f(float const* a)        { return (vec4f)_mm_loadl_epi64((__m128i*)a); }
 inline static vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 inline static vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
+
 inline static void  store1f(float* a, vec4f b)    { _mm_store_ss(a,b); }
 inline static void  store2f(float* a, vec4f b)    { _mm_storeu_si64((void*)a,_mm_castps_si128(b)); } //_mm_storel_pi((__m64*)a, b); }
 inline static void  store3f(float* a, vec4f b)    { store2f(a,b); a[2]=b[2]; }
 inline static void  store4f(float* a, vec4f b)    { _mm_store_ps(a,b); }
 inline static void  storeu4f(float* a, vec4f b)   { _mm_storeu_ps(a,b); }
+
 inline static vec4f add4f(vec4f a, vec4f b)       { return _mm_add_ps(a,b); }
 inline static vec4f mul4f(vec4f a, vec4f b)       { return _mm_mul_ps(a,b); }
+
 inline static vec4f max4f(vec4f a, vec4f b)       { return _mm_max_ps(a,b); }
 inline static vec4f min4f(vec4f a, vec4f b)       { return _mm_min_ps(a,b); }
+
 inline static vec4f and4f(vec4f a, vec4f b)       { return _mm_and_ps(a,b); }
 inline static vec4f andnot4f(vec4f a, vec4f b)    { return _mm_andnot_ps(a,b); }
 inline static vec4f abs4f(vec4f a)                { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
+
 inline static vec4f unpacklo4f(vec4f a, vec4f b)  { return _mm_unpacklo_ps(a,b); }
 inline static vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b); }
+
 inline static vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline static vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
 #define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
-
-inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
-
 
 #endif  // __SSE3__
 
@@ -47,7 +50,9 @@ inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a)
 #if defined(__SSE4_1__)
 
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1000); }
+inline static vec4f blend22f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1100); }
 inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110); }
+
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
 
 inline static vec4f sign_select(vec4f val, vec4f neg, vec4f pos)
@@ -59,9 +64,15 @@ inline static vec4f sign_select(vec4f val, vec4f neg, vec4f pos)
 #endif
 }
 
+// loading 4 and clearing one
+inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
+
 #else
 
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
+
+// loading 3 elements
+inline static vec4f load3f(float const* a) { vec4f b; b[0]=a[0]; b[1]=a[2]; b[1]=a[2]; return b; }
 
 #endif
 
@@ -107,9 +118,11 @@ inline static vec8f setzero8f()                   { return _mm256_setzero_ps(); 
 inline static vec8f set8f(float const& a)         { return _mm256_set1_ps(a); }
 inline static vec8f load8f(float const* a)        { return _mm256_load_ps(a); }
 inline static vec8f loadu8f(float const* a)       { return _mm256_loadu_ps(a); }
+
 inline static void  store1f(float* a, vec8f b)    { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
 inline static void  store8f(float* a, vec8f b)    { _mm256_store_ps(a, b); }
 inline static void  storeu8f(float* a, vec8f b)   { _mm256_storeu_ps(a, b); }
+
 inline static vec8f mul8f(vec8f a, vec8f b)       { return _mm256_mul_ps(a,b); }
 inline static vec8f div8f(vec8f a, vec8f b)       { return _mm256_div_ps(a,b); }
 inline static vec8f add8f(vec8f a, vec8f b)       { return _mm256_add_ps(a,b); }
@@ -117,6 +130,7 @@ inline static vec8f sub8f(vec8f a, vec8f b)       { return _mm256_sub_ps(a,b); }
 
 inline static vec8f max8f(vec8f a, vec8f b)       { return _mm256_max_ps(a,b); }
 inline static vec8f min8f(vec8f a, vec8f b)       { return _mm256_min_ps(a,b); }
+
 inline static vec8f and8f(vec8f a, vec8f b)       { return _mm256_and_ps(a,b); }
 inline static vec8f andnot8f(vec8f a, vec8f b)    { return _mm256_andnot_ps(a,b); }
 inline static vec8f abs8f(vec8f a)                { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
