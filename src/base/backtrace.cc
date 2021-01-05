@@ -5,7 +5,7 @@
 #include "backtrace.h"
 
 // enable/disable backtrace with the '#if' below:
-#if 0
+#if 1
 
 #include <execinfo.h>
 #include <stdlib.h>
@@ -47,19 +47,21 @@ void print_backtrace(int out)
                 break;
             ++str;
         }
+        char* end = str;
         if ( *str )
         {
-            char* end = str;
             // find end of string
             while ( *end && *end != ' ' )
                 ++end;
             *end = 0;
             ptr = abi::__cxa_demangle(str, ptr, &n_ptr, &status);
+            *end = ' ';
         }
         if ( status == 0 )
         {
             (void) write(out, buf[i], str-buf[i]);
             (void) write(out, ptr, strlen(ptr));
+            (void) write(out, end, strlen(end));
         }
         else
             (void) write(out, buf[i], strlen(buf[i]));

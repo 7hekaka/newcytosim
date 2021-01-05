@@ -8,6 +8,7 @@
 #include "glossary.h"
 #include "exceptions.h"
 #include "print_color.h"
+#include "backtrace.h"
 #include "filepath.h"
 #include "splash.h"
 #include "tictoc.h"
@@ -31,13 +32,21 @@ void handle_signal(int sig)
      practically speaking, most syscalls(2) only
      */
     char str[128] = { 0 };
-    strncpy(str, "Cytosim received signal   \n", 128);
-    str[25] = (char)('0' + ( sig     % 10));
-    str[24] = (char)('0' + ((sig/10) % 10));
-    (void) write(STDERR_FILENO, str, 28);
-    _exit(sig);
+    strncpy(str, "\nCytosim received signal   \n", 128);
+    str[26] = (char)('0' + ( sig     % 10));
+    str[25] = (char)('0' + ((sig/10) % 10));
+    (void) write(STDERR_FILENO, str, 29);
+    print_backtrace();
+    abort();
+    //_exit(sig);
 }
 
+void handle_abort(int sig)
+{
+    // this will prevent crash reports to be generated
+    write(STDERR_FILENO, "\nCytosim catched abort\n", 23);
+    _exit(sig);
+}
 
 void handle_interrupt(int sig)
 {
@@ -62,13 +71,14 @@ int main(int argc, char* argv[])
         std::cerr << "Could not register SIGINT handler\n";
     if ( signal(SIGTERM, handle_interrupt) )
         std::cerr << "Could not register SIGTERM handler\n";
+#if 0
     if ( signal(SIGSEGV, handle_signal) )
         std::cerr << "Could not register SIGSEGV handler\n";
     if ( signal(SIGILL,  handle_signal) )
         std::cerr << "Could not register SIGILL handler\n";
-    if ( signal(SIGABRT, handle_signal) )
+    if ( signal(SIGABRT, handle_abort) )
         std::cerr << "Could not register SIGABRT handler\n";
-
+#endif
     // catch division by zero and Nan
     //feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 

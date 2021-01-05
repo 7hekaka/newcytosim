@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
         
         /*
         simul.reportInventory(std::cout);
-        std::clog << "\b\b\b\b\b" << std::setw(5) << cnt;
+        std::clog << "\r" << std::setw(5) << cnt << "   ";
         */
         
         try {

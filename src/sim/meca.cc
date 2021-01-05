@@ -217,6 +217,8 @@ constexpr size_t BAND_NUD = 2*DIM;
 inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
+    assert_true( ISOB_LDD < nbp );
+
 #if CHOUCROUTE
     alsatian_xpbtrsL<DIM>(nbp, mec->block(), ISOB_LDD, Y);
 #else
@@ -272,14 +274,19 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
+    assert_true( BAND_NUD < bks );
 #if CHOUCROUTE
     alsatian_xpbtrsLK<BAND_NUD>(bks, mec->block(), BAND_LDD, Y);
+#elif 1
+    blas_xtbsvLN<'N'>(bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
+    blas_xtbsvLT<'N'>(bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
+#elif 1
+    blas::xtbsv('L', 'N', 'N', bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
+    blas::xtbsv('L', 'T', 'N', bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
 #else
     int info = 0;
     lapack::xpbtrs('L', bks, BAND_NUD, 1, mec->block(), BAND_LDD, Y, bks, &info);
     assert_true(info==0);
-    //blas::xtbsv('L', 'N', 'N', bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
-    //blas::xtbsv('L', 'T', 'N', bks, BAND_NUD, mec->block(), BAND_LDD, Y, 1);
 #endif
 }
 
@@ -290,11 +297,12 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
     int bks = mec->blockSize();
 #if CHOUCROUTE
     alsatian_xpotrsL(bks, mec->block(), bks, Y);
-#else
+#elif 1
     iso_xpotrsL<1>(bks, mec->block(), bks, Y);
-    //int info = 0;
-    //lapack::xpotrs('L', bks, 1, mec->block(), bks, Y, bks, &info);
-    //assert_true(info==0);
+#else
+    int info = 0;
+    lapack::xpotrs('L', bks, 1, mec->block(), bks, Y, bks, &info);
+    assert_true(info==0);
 #endif
 }
 
@@ -303,10 +311,13 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
 inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
+#if 1
     lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
-    //int info = 0;
-    //lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
-    //assert_true(info==0);
+#else
+    int info = 0;
+    lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+    assert_true(info==0);
+#endif
 }
 
 
@@ -1025,14 +1036,13 @@ void Meca::computePrecondAlt()
 /**
  Compute a preconditionner block corresponding to 'mec'
  The dimension is reduced by DIM and banded with diagonal + 2 off-diagonals
- This block is symmetric definite positive, and is factorized by Cholesky's method
+ This block is usually symmetric definite positive, and is factorized by Cholesky's method
  */
 void Meca::computePrecondIsoB(Mecable* mec)
 {
     assert_true(ISOB_LDD>2);
     const size_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, ISOB_LDD*nbp, 0);
-    getIsoBBlock(mec, mec->block());
     
     //std::clog << "banded preconditionner " << nbp << "\n";
     //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
@@ -1042,15 +1052,33 @@ void Meca::computePrecondIsoB(Mecable* mec)
      born 15.10.1875 in Montguyon, France
      died 31.08.1918 in Bagneux, following wounds received in battlefield.
      */
-    int info = 0;
+    int bt, info = 0;
+    if ( ISOB_LDD < nbp )
+    {
+        getIsoBBlock(mec, mec->block());
+        // calculate Banded Cholesky factorization:
 #if CHOUCROUTE
-    alsatian_xpbtf2L<2>(nbp, mec->block(), ISOB_LDD, &info);
+        alsatian_xpbtf2L<2>(nbp, mec->block(), ISOB_LDD, &info);
 #else
-    lapack::xpbtf2('L', nbp, 2, mec->block(), ISOB_LDD, &info);
+        lapack::xpbtf2('L', nbp, 2, mec->block(), ISOB_LDD, &info);
 #endif
+        bt = 1;
+    }
+    else
+    {
+        getIsoBlock(mec, mec->block());
+        // calculate Cholesky factorization:
+#if CHOUCROUTE
+        alsatian_xpotf2L(nbp, mec->block(), nbp, &info);
+#else
+        lapack::xpotf2('L', nbp, mec->block(), nbp, &info);
+#endif
+        bt = 2;
+    }
+
     if ( 0 == info )
     {
-        mec->blockType(1);
+        mec->blockType(bt);
         //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
         //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
     }
@@ -1391,7 +1419,7 @@ void Meca::precondition(const real* X, real* Y) const
     auto rdt = __rdtsc();
     if ( Y != X )
     {
-        blas::xcopy(dimension(), X, 1, Y, 1);
+        copy_real(dimension(), X, Y);
         #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable const* mec : mecables )
         {
