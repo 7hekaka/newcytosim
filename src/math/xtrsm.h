@@ -89,9 +89,9 @@ void blas_xtrsmLLN(const int M, const int N, REAL ALPHA, const REAL* A, const in
             {
                 if ( diag == 'N' )
                     B[K] /= A[K+lda*K];
-                REAL temp = B[K];
+                REAL tmp = B[K];
                 for ( int I = K + 1; I < M; ++I )
-                    B[I] -= temp * A[I+lda*K];
+                    B[I] -= tmp * A[I+lda*K];
             }
         }
         B += ldb;
@@ -127,12 +127,12 @@ void blas_xtrsmLLT(const int M, const int N, REAL ALPHA, const REAL* A, const in
     {
         for ( int I = M-1; I >= 0; --I )
         {
-            REAL temp = ALPHA * B[I];
+            REAL tmp = ALPHA * B[I];
             for ( int K = I + 1; K < M; ++K )
-                temp -= A[K+lda*I] * B[K];
+                tmp -= A[K+lda*I] * B[K];
             if ( diag == 'N' )
-                temp /= A[I+lda*I];
-            B[I] = temp;
+                tmp /= A[I+lda*I];
+            B[I] = tmp;
         }
         B += ldb;
     }
@@ -181,9 +181,9 @@ void blas_xtrsmLUN(const int M, const int N, REAL ALPHA, const REAL* A, const in
              {
                  if ( diag == 'N' )
                      B[K] /= A[K+lda*K];
-                 REAL temp = B[K];
+                 REAL tmp = B[K];
                  for ( int I = 0; I < K; ++I )
-                     B[I] -= temp * A[I+lda*K];
+                     B[I] -= tmp * A[I+lda*K];
              }
         }
         B += ldb;
@@ -218,12 +218,12 @@ void blas_xtrsmLUT(const int M, const int N, REAL ALPHA, const REAL* A, const in
     {
         for ( int I = 0; I < M; ++I )
         {
-            REAL temp = ALPHA * B[I];
+            REAL tmp = ALPHA * B[I];
             for ( int K = 0; K < I; ++K )
-                temp -= A[K+lda*I] * B[K];
+                tmp -= A[K+lda*I] * B[K];
             if ( diag == 'N' )
-                temp /= A[I+lda*I];
-            B[I] = temp;
+                tmp /= A[I+lda*I];
+            B[I] = tmp;
         }
         B += ldb;
     }
@@ -287,9 +287,9 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, REAL 
  {
      if (nounit)
          B[K] /= A[K+lda*K];
-     real temp = B[K];
+     real tmp = B[K];
      for ( int I = K + 1; I < M; ++I )
-         B[I] -= temp * A[I+lda*K];
+         B[I] -= tmp * A[I+lda*K];
  }
 
  */
@@ -298,27 +298,27 @@ void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        REAL temp[ORD];
+        REAL tmp[ORD];
         if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
             {
-                temp[d] = B[ORD*K+d] / A[K+lda*K];
-                B[ORD*K+d] = temp[d];
+                tmp[d] = B[ORD*K+d] / A[K+lda*K];
+                B[ORD*K+d] = tmp[d];
             }
         } else if ( diag == 'I' ) {
             for ( int d = 0; d < ORD; ++d )
             {
-                temp[d] = B[ORD*K+d] * A[K+lda*K];
-                B[ORD*K+d] = temp[d];
+                tmp[d] = B[ORD*K+d] * A[K+lda*K];
+                B[ORD*K+d] = tmp[d];
             }
         } else {
             for ( int d = 0; d < ORD; ++d )
-                temp[d] = B[ORD*K+d];
+                tmp[d] = B[ORD*K+d];
         }
         for ( int I = K + 1; I < M; ++I )
         {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] -= temp[d] * A[I+lda*K];
+                B[ORD*I+d] -= tmp[d] * A[I+lda*K];
         }
     }
 }
@@ -332,12 +332,12 @@ void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
  
  for ( int I = M-1; I >= 0; --I )
  {
-     real temp = B[I];
+     real tmp = B[I];
      for ( int K = I + 1; K < M; ++K )
-         temp -= A[K+lda*I] * B[K];
+         tmp -= A[K+lda*I] * B[K];
      if (nounit)
-         temp /= A[I+lda*I];
-     B[I] = temp;
+         tmp /= A[I+lda*I];
+     B[I] = tmp;
  }
 */
 template < int ORD, char diag, typename REAL >
@@ -345,23 +345,23 @@ void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int I = M-1; I >= 0; --I )
     {
-        REAL temp[ORD];
+        REAL tmp[ORD];
         for ( int d = 0; d < ORD; ++d )
-            temp[d] = B[ORD*I+d];
+            tmp[d] = B[ORD*I+d];
         for ( int K = I + 1; K < M; ++K )
         {
             for ( int d = 0; d < ORD; ++d )
-                temp[d] -= A[K+lda*I] * B[ORD*K+d];
+                tmp[d] -= A[K+lda*I] * B[ORD*K+d];
         }
         if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] = temp[d] / A[I+lda*I];
+                B[ORD*I+d] = tmp[d] / A[I+lda*I];
         } else if ( diag == 'I' ) {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] = temp[d] * A[I+lda*I];
+                B[ORD*I+d] = tmp[d] * A[I+lda*I];
         } else {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] = temp[d];
+                B[ORD*I+d] = tmp[d];
         }
     }
 }
@@ -376,9 +376,9 @@ void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
  {
      if (nounit)
          B[K] /= A[K+lda*K];
-     real temp = B[K];
+     real tmp = B[K];
      for ( int I = 0; I < K; ++I )
-         B[I] -= temp * A[I+lda*K];
+         B[I] -= tmp * A[I+lda*K];
  }
 */
 template < int ORD, char diag, typename REAL >
@@ -388,27 +388,27 @@ void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
     {
         if ( B[K] != 0 )
         {
-            REAL temp[ORD];
+            REAL tmp[ORD];
             if ( diag == 'N' ) {
                 for ( int d = 0; d < ORD; ++d )
                 {
-                    temp[d] = B[ORD*K+d] / A[K+lda*K];
-                    B[ORD*K+d] = temp[d];
+                    tmp[d] = B[ORD*K+d] / A[K+lda*K];
+                    B[ORD*K+d] = tmp[d];
                 }
             } else if ( diag == 'I' ) {
                 for ( int d = 0; d < ORD; ++d )
                 {
-                    temp[d] = B[ORD*K+d] * A[K+lda*K];
-                    B[ORD*K+d] = temp[d];
+                    tmp[d] = B[ORD*K+d] * A[K+lda*K];
+                    B[ORD*K+d] = tmp[d];
                 }
             } else {
                 for ( int d = 0; d < ORD; ++d )
-                    temp[d] = B[ORD*K+d];
+                    tmp[d] = B[ORD*K+d];
             }
             for ( int I = 0; I < K; ++I )
             {
                 for ( int d = 0; d < ORD; ++d )
-                    B[ORD*I+d] -= temp[d] * A[I+lda*K];
+                    B[ORD*I+d] -= tmp[d] * A[I+lda*K];
             }
         }
     }
@@ -420,12 +420,12 @@ void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
 
  for ( int I = 0; I < M; ++I )
  {
-     real temp = B[I];
+     real tmp = B[I];
      for ( int K = 0; K < I; ++K )
-         temp -= A[K+lda*I] * B[K];
+         tmp -= A[K+lda*I] * B[K];
      if (nounit)
-         temp /= A[I+lda*I];
-     B[I] = temp;
+         tmp /= A[I+lda*I];
+     B[I] = tmp;
  }
 */
 template < int ORD, char diag, typename REAL >
@@ -433,23 +433,23 @@ void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int I = 0; I < M; ++I )
     {
-        REAL temp[ORD];
+        REAL tmp[ORD];
         for ( int d = 0; d < ORD; ++d )
-            temp[d] = B[I];
+            tmp[d] = B[I];
         for ( int K = 0; K < I; ++K )
         {
             for ( int d = 0; d < ORD; ++d )
-                temp[d] -= A[K+lda*I] * B[ORD*K+d];
+                tmp[d] -= A[K+lda*I] * B[ORD*K+d];
         }
         if ( diag == 'N' ) {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] = temp[d] / A[I+lda*I];
+                B[ORD*I+d] = tmp[d] / A[I+lda*I];
         } else if ( diag == 'I' ) {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] = temp[d] * A[I+lda*I];
+                B[ORD*I+d] = tmp[d] * A[I+lda*I];
         } else {
             for ( int d = 0; d < ORD; ++d )
-                B[ORD*I+d] = temp[d];
+                B[ORD*I+d] = tmp[d];
         }
     }
 }
@@ -464,10 +464,10 @@ void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
 /*
  for ( int K = 0; K < M; ++K )
  {
-     real temp = B[K] * A[K]; // DIV
-     B[K] = temp;
+     real tmp = B[K] * A[K]; // DIV
+     B[K] = tmp;
      for ( int I = K + 1; I < M; ++I )
-         B[I] -= temp * A[I];
+         B[I] -= tmp * A[I];
      A += lda;
  }
  */
@@ -602,12 +602,12 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
  for ( int I = M-1; I >= 0; --I )
  {
      A -= lda;
-     real temp = B[I];
+     real tmp = B[I];
      for ( int K = I + 1; K < M; ++K )
-         temp -= A[K] * B[K];
+         tmp -= A[K] * B[K];
      if ( nounit )
-         temp *= A[I]; // DIV
-     B[I] = temp;
+         tmp *= A[I]; // DIV
+     B[I] = tmp;
 }
 
  */
@@ -715,12 +715,11 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
             s0 = fnmadd4(broadcast1(A+K), loadu4(pB), s0);
             pB += 3;
         }
+        s0 = add4(s0, ori);
         if ( diag == 'N' )
-            s0 = sub4(div4(s0, broadcast1(A+I)), ori);
+            s0 = div4(s0, broadcast1(A+I));
         else if ( diag == 'I' )
-            s0 = fmadd4(s0, broadcast1(A+I), ori);
-        else
-            s0 = add4(s0, ori);
+            s0 = mul4(s0, broadcast1(A+I));
         storeu4(B+3*I, blend4(s0, ori, 0b1000));
     }
 }
@@ -735,9 +734,9 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
      A -= lda;
      if (nounit)
          B[K] /= A[K];
-     real temp = B[K];
+     real tmp = B[K];
      for ( int I = 0; I < K; ++I )
-         B[I] -= temp * A[I];
+         B[I] -= tmp * A[I];
  }
  */
 template < char diag >
@@ -834,17 +833,17 @@ void alsatian_xtrsmLLN2(const int M, const double* A, const int lda, double* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        vec2 temp = load2(B+2*K);
+        vec2 tmp = load2(B+2*K);
         if ( diag == 'N' ) {
-            temp = div2(temp, loaddup2(A+K));
-            store2(B+2*K, temp);
+            tmp = div2(tmp, loaddup2(A+K));
+            store2(B+2*K, tmp);
         } else if ( diag == 'I' ) {
-            temp = mul2(temp, loaddup2(A+K)); // DIV
-            store2(B+2*K, temp);
+            tmp = mul2(tmp, loaddup2(A+K)); // DIV
+            store2(B+2*K, tmp);
         }
         // could unroll, using AVX
         for ( int I = K + 1; I < M; ++I )
-            store2(B+2*I, fnmadd2(temp, loaddup2(A+I), load2(B+2*I)));
+            store2(B+2*I, fnmadd2(tmp, loaddup2(A+I), load2(B+2*I)));
         A += lda;
     }
 }
@@ -858,15 +857,15 @@ void alsatian_xtrsmLLT2(const int M, const double* A, const int lda, double* B)
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-        vec2 temp = load2(B+2*I);
+        vec2 tmp = load2(B+2*I);
         // could unroll, using AVX
         for ( int K = I + 1; K < M; ++K )
-            temp = fnmadd2(loaddup2(A+K), load2(B+2*K), temp);
+            tmp = fnmadd2(loaddup2(A+K), load2(B+2*K), tmp);
         if ( diag == 'N' )
-            temp = div2(temp, loaddup2(A+I));
+            tmp = div2(tmp, loaddup2(A+I));
         else if ( diag == 'I' )
-            temp = mul2(temp, loaddup2(A+I)); // DIV
-        store2(B+2*I, temp);
+            tmp = mul2(tmp, loaddup2(A+I)); // DIV
+        store2(B+2*I, tmp);
     }
 }
 
@@ -879,16 +878,16 @@ void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        vec2 temp = load2(B+2*K);
+        vec2 tmp = load2(B+2*K);
         if ( diag == 'N' ) {
-            temp = div2(temp, loaddup2(A+K));
-            store2(B+2*K, temp);
+            tmp = div2(tmp, loaddup2(A+K));
+            store2(B+2*K, tmp);
         } else if ( diag == 'I' ) {
-            temp = mul2(temp, loaddup2(A+K)); // DIV
-            store2(B+2*K, temp);
+            tmp = mul2(tmp, loaddup2(A+K)); // DIV
+            store2(B+2*K, tmp);
         }
         for ( int I = 0; I < K; ++I )
-            store2(B+2*I, fnmadd2(temp, loaddup2(A+I), load2(B+2*I)));
+            store2(B+2*I, fnmadd2(tmp, loaddup2(A+I), load2(B+2*I)));
     }
 }
 
@@ -901,17 +900,17 @@ void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 {
     for ( int K = 0; K < M; ++K )
     {
-        REAL temp = B[K];
+        REAL tmp = B[K];
         if ( diag == 'N' ) {
-            temp /= A[K];
-            B[K] = temp;
+            tmp /= A[K];
+            B[K] = tmp;
         } else if ( diag == 'I' ) {
-            temp *= A[K]; // DIV
-            B[K] = temp;
+            tmp *= A[K]; // DIV
+            B[K] = tmp;
         }
         # pragma ivdep
         for ( int I = K + 1; I < M; ++I )
-            B[I] -= temp * A[I];
+            B[I] -= tmp * A[I];
         A += lda;
     }
 }
@@ -925,15 +924,15 @@ void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-        REAL temp = B[I];
+        REAL tmp = B[I];
         # pragma ivdep
         for ( int K = I + 1; K < M; ++K )
-            temp -= A[K] * B[K];
+            tmp -= A[K] * B[K];
         if ( diag == 'N' )
-            temp /= A[I];
+            tmp /= A[I];
         else if ( diag == 'I' )
-            temp *= A[I]; // DIV
-        B[I] = temp;
+            tmp *= A[I]; // DIV
+        B[I] = tmp;
     }
 }
 
@@ -946,17 +945,17 @@ void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        REAL temp = B[K];
+        REAL tmp = B[K];
         if ( diag == 'N' ) {
-            temp /= A[K];
-            B[K] = temp;
+            tmp /= A[K];
+            B[K] = tmp;
         } else if ( diag == 'I' ) {
-            temp *= A[K]; // DIV
-            B[K] = temp;
+            tmp *= A[K]; // DIV
+            B[K] = tmp;
         }
         # pragma ivdep
         for ( int I = 0; I < K; ++I )
-            B[I] -= temp * A[I];
+            B[I] -= tmp * A[I];
     }
 }
 
@@ -1027,14 +1026,14 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
     if ( 0 == *INFO )
     {
         const int S = LDA+1;
-        for ( int u = 0; u < N; ++u )
-            A[S*u] = real(1) / A[S*u];
+        for ( int u = 0; u < N*S; u+=S )
+            A[u] = real(1) / A[u];
     }
 }
 
 
 template < int ORD >
-void alsatian_xpotrsLtest(const int N, const real* A, const int LDA, real* B)
+void alsatian_xpotrsLref(const int N, const real* A, const int LDA, real* B)
 {
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
@@ -1075,9 +1074,9 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
         ABORT_NOW("unexpected DIM!");
 #else
     // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLN<ORD, 'I'>(N, A, LDA, B);
+    iso_xtrsmLLN<ORD,'I'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLT<ORD, 'I'>(N, A, LDA, B);
+    iso_xtrsmLLT<ORD,'I'>(N, A, LDA, B);
 #endif
 }
 
