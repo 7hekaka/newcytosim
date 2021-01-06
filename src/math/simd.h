@@ -302,7 +302,7 @@ inline static vec4 rsqrt4(vec4 x)
     t2 = _mm256_mul_pd(h, x);
     t3 = _mm256_mul_pd(t, x);
 #if defined(__FMA__)
-    return _mm256fnmadd_pd(t1, t2, t3);
+    return _mm256_fnmadd_pd(t1, t2, t3);
 #else
     return _mm256_sub_pd(t3, _mm256_mul_pd(t1, t2));
 #endif

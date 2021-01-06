@@ -171,7 +171,7 @@ inline static vec8f rsqrt8f(vec8f x)
     vec8f t2 = _mm256_mul_ps(h, x);
     vec8f t3 = _mm256_mul_ps(_mm256_set1_ps(1.5f), x);
 #if defined(__FMA__)
-    return _mm256fnmadd_ps(t1, t2, t3);
+    return _mm256_fnmadd_ps(t1, t2, t3);
 #else
     return _mm256_sub_ps(t3, _mm256_mul_ps(t1, t2));
 #endif
