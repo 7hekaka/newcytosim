@@ -861,7 +861,6 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
 {
-    return alsatian_xtbsvLNN<3>(N, 2, pA, lda, pX);
     constexpr int ORD = 3;
     const double*const end = pA + (N-2) * lda;
     vec4 a1 = loadu4(pX); //may load garbage
@@ -911,7 +910,6 @@ void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX)
 {
-    return alsatian_xtbsvLTN<3>(N, 2, pA, lda, pX);
     constexpr int ORD = 3;
     const double*const end = pA + lda;
     const vec4 zero = setzero4();
