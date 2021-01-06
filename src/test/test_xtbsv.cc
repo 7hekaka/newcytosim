@@ -150,7 +150,18 @@ void testISO(size_t cnt)
 
 void iso4(int N, real const* AB, real* B)
 {
-#ifdef __AVX__
+    alsatian_xpotrsLref<DIM>(N, AB, N, B);
+}
+
+void iso5(int N, real const* AB, real* B)
+{
+    iso_xtrsmLLN<DIM,'I'>(N, AB, N, B);
+    iso_xtrsmLLT<DIM,'I'>(N, AB, N, B);
+}
+
+void iso6(int N, real const* AB, real* B)
+{
+#if defined(__AVX__) && REAL_IS_DOUBLE
 #if ( DIM == 3 )
     alsatian_xtrsmLLN3<'I'>(N, AB, N, B);
     alsatian_xtrsmLLT3<'I'>(N, AB, N, B);
@@ -164,17 +175,6 @@ void iso4(int N, real const* AB, real* B)
 #else
     zero_real(N, B);
 #endif
-}
-
-void iso5(int N, real const* AB, real* B)
-{
-    iso_xtrsmLLN<DIM,'I'>(N, AB, N, B);
-    iso_xtrsmLLT<DIM,'I'>(N, AB, N, B);
-}
-
-void iso6(int N, real const* AB, real* B)
-{
-    alsatian_xpotrsLref<DIM>(N, AB, N, B);
 }
 
 void testPOTRS(size_t cnt)
@@ -198,9 +198,9 @@ void testPOTRS(size_t cnt)
     int info;
     alsatian_xpotf2L(NSEG, AB, NSEG, &info);
 
-    check<iso4>(NSEG, S, AB, B, "alsa_trsmLLN3<", cnt);
+    check<iso4>(NSEG, S, AB, B, "alsa_potrsLref", cnt);
     check<iso5>(NSEG, S, AB, B, "iso_trsmLLN<D>", cnt);
-    check<iso6>(NSEG, S, AB, B, "alsa_potrsLref", cnt);
+    check<iso6>(NSEG, S, AB, B, "alsa_trsmLLND", cnt);
 
     free_real(B);
     free_real(S);
@@ -233,12 +233,6 @@ void uni2(int N, real const* AB, real* B)
 void uni3(int N, real const* AB, real* B)
 {
     alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
-    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
-}
-
-void uni4(int N, real const* AB, real* B)
-{
-    blas_xtbsvLN<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
     alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
 }
 
@@ -338,9 +332,8 @@ void test(size_t cnt)
     
     //check<uni0>(NVAL, S, AB, B, "blas::", cnt);
     check<uni1>(NVAL, S, AB, B, "blas_tbsv", cnt);
-    check<uni2>(NVAL, S, AB, B, "tbsvLNN", cnt);
-    check<uni3>(NVAL, S, AB, B, "tbsvLNNK<KD>", cnt);
-    check<uni4>(NVAL, S, AB, B, "mixed", cnt);
+    check<uni2>(NVAL, S, AB, B, "tbsvLxN", cnt);
+    check<uni3>(NVAL, S, AB, B, "tbsvLxNK<KD>", cnt);
 
     std::cout << "xTBSVLN ---\n";
     

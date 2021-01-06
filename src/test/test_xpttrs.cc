@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
         nbs = std::max(1, atoi(argv[1]));
     
     RNG.seed();
-    std::cout << "testPTTF   --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    std::cout << "Tridiagonal positive symmetric matrix solve --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
     testFactor(nbs, 1<<10);
     std::cout << "testPTTS\n";
     testSolve(nbs, 1<<17);

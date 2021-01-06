@@ -475,7 +475,7 @@ void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
 //------------------------------------------------------------------------------
 #pragma mark - 3D SIMD ALSATIAN DTRSM
 
-#if XTRSM_USES_AVX
+#if defined(__AVX__)
 
 /// specialized version for ORD==3, FJN 4.5.2020
 /*
@@ -1056,7 +1056,7 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
     if ( 0 == *INFO )
     {
         const int S = LDA+1;
-        for ( int u = 0; u < N*S; u+=S )
+        for ( int u = 0; u < N*S; u += S )
             A[u] = real(1) / A[u];
     }
 }

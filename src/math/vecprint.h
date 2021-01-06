@@ -106,7 +106,7 @@ namespace VecPrint
     
     /// print matrix `mat[]` of size 'lin*col', and leading dimension `ldd` with precision 'digits'
     template< typename T >
-    void print(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 3)
+    void print(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
     {
         if ( !mat )
             os << " nullptr";
@@ -118,7 +118,7 @@ namespace VecPrint
             char str[32] = { 0 }, zer[32] = { 0 }, fmt[32] = " %4.0f";
             
             { // build format strings:
-                snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+                snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
                 snprintf(zer, sizeof(zer), fmt, 0.0);
                 bool dot = false; char * d = zer;
                 for ( char * c = zer; *c; ++c )
