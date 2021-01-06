@@ -557,9 +557,9 @@ inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
     vec4 xy = unpacklo4(sx, sy);
     vec4 yz = unpackhi4(sy, sz);
     
-    storeu4(dst  , blend4(xy, zx, 0b1100));
-    storeu4(dst+4, blend4(yz, xy, 0b1100));
-    storeu4(dst+8, blend4(zx, yz, 0b1100));
+    storeu4(dst  , blend22(xy, zx));
+    storeu4(dst+4, blend22(yz, xy));
+    storeu4(dst+8, blend22(zx, yz));
 }
 
 /**
@@ -575,10 +575,10 @@ inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
     vec4 s1 = load4(src+4);
     vec4 s2 = load4(src+8);
 
-    vec4 zx = blend4(s0, s2, 0b0011);
+    vec4 zx = blend22(s2, s0);
+    vec4 xy = blend22(s0, s1);
     zx = swap2f128(zx);
-    vec4 xy = blend4(s0, s1, 0b1100);
-    vec4 yz = blend4(s1, s2, 0b1100);
+    vec4 yz = blend22(s1, s2);
     
     store4(X,   blend4(zx, xy, 0b0101));
     store4(Y, shuffle4(xy, yz, 0b0101));
@@ -601,10 +601,10 @@ void projectForcesU3D_AVX(SIZE_T nbs, const real* dif, const real* src, real* mu
         vec4 s1 = mul4(load4(dif+4), sub4(loadu4(src+ 7), loadu4(src+4)));
         vec4 s2 = mul4(load4(dif+8), sub4(loadu4(src+11), loadu4(src+8)));
 
-        vec4 zx = blend4(s0, s2, 0b0011);
-        vec4 xy = blend4(s0, s1, 0b1100);
+        vec4 zx = blend22(s2, s0);
+        vec4 xy = blend22(s0, s1);
         zx = swap2f128(zx);
-        vec4 yz = blend4(s1, s2, 0b1100);
+        vec4 yz = blend22(s1, s2);
         
         vec4 mm = shuffle4(xy, yz, 0b0101);
         zx = add4(blend4(zx, yz, 0b1010), blend4(zx, xy, 0b0101));
@@ -1181,9 +1181,9 @@ void projectForcesD3D_SSE(SIZE_T nbs, const real* dif,
  Ugly piece of code to harvest AVX power...
  FJN 18 and 19.04.2020
  */
-void projectForcesD3D_AVX(SIZE_T nbs, const real* dif, const real* src, const real* mul, real* dst)
+void projectForcesD3D_AVX(SIZE_T nbs, const double* dir, const double* src, const double* mul, double* dst)
 {
-    const real* const end = mul - 3 + nbs;
+    const double* const end = mul - 3 + nbs;
     /*
      This follows the standard pattern defined below, except
      that the negative terms are not present on the first vector.
@@ -1192,24 +1192,24 @@ void projectForcesD3D_AVX(SIZE_T nbs, const real* dif, const real* src, const re
     if ( mul < end )
     {
         vec4 m1 = broadcast1(mul  );
-        vec4 m0 = blend4(setzero4(), m1, 0b1000);
+        vec4 m0 = blend31(setzero4(), m1);
         vec4 m2 = broadcast1(mul+1);
-        vec4 p0 = blend4(m1, m2, 0b1000);
+        vec4 p0 = blend31(m1, m2);
         vec4 p2 = broadcast1(mul+2);
-        m1 = blend4(m1, m2, 0b1100);
-        vec4 p1 = blend4(m2, p2, 0b1100);
-        m2 = blend4(m2, p2, 0b1110);
-        p2 = blend4(p2, broadcast1(mul+3), 0b1110);
+        m1 = blend22(m1, m2);
+        vec4 p1 = blend22(m2, p2);
+        m2 = blend13(m2, p2);
+        p2 = blend13(p2, broadcast1(mul+3));
         
         mul += 4;
-        vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-        vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
-        vec4 a2 = fmadd4(p2, load4(dif+8), loadu4(src+8));
+        vec4 a0 = fmadd4(p0, load4(dir  ), loadu4(src  ));
+        vec4 a1 = fmadd4(p1, load4(dir+4), loadu4(src+4));
+        vec4 a2 = fmadd4(p2, load4(dir+8), loadu4(src+8));
 
-        storeu4(dst  , fnmadd4(m0, broadcast1(dif), a0));
-        storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-        storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
-        dif += 12;
+        storeu4(dst  , fnmadd4(m0, broadcast1(dir), a0));
+        storeu4(dst+4, fnmadd4(m1, loadu4(dir+1), a1));
+        storeu4(dst+8, fnmadd4(m2, loadu4(dir+5), a2));
+        dir += 12;
         dst += 12;
         src += 12;
     }
@@ -1221,24 +1221,25 @@ void projectForcesD3D_AVX(SIZE_T nbs, const real* dif, const real* src, const re
     {
         vec4 m0 = broadcast1(mul-1);
         vec4 m1 = broadcast1(mul  );
-        m0 = blend4(m0, m1, 0b1000);
+        m0 = blend31(m0, m1);
         vec4 m2 = broadcast1(mul+1);
-        vec4 p0 = blend4(m1, m2, 0b1000);
+        vec4 p0 = blend31(m1, m2);
         vec4 p2 = broadcast1(mul+2);
-        m1 = blend4(m1, m2, 0b1100);
-        vec4 p1 = blend4(m2, p2, 0b1100);
-        m2 = blend4(m2, p2, 0b1110);
-        p2 = blend4(p2, broadcast1(mul+3), 0b1110);
+        m1 = blend22(m1, m2);
+        vec4 p1 = blend22(m2, p2);
+        m2 = blend13(m2, p2);
+        p2 = blend13(p2, broadcast1(mul+3));
         
         mul += 4;
-        vec4 a0 = fnmadd4(m0, loadu4(dif-3), loadu4(src  ));
-        vec4 a1 = fnmadd4(m1, loadu4(dif+1), loadu4(src+4));
-        vec4 a2 = fnmadd4(m2, loadu4(dif+5), loadu4(src+8));
+        vec4 a0 = fnmadd4(m0, loadu4(dir-3), loadu4(src  ));
+        vec4 a1 = fnmadd4(m1, loadu4(dir+1), loadu4(src+4));
+        vec4 a2 = fnmadd4(m2, loadu4(dir+5), loadu4(src+8));
 
-        storeu4(dst  , fmadd4(p0, load4(dif  ), a0));
-        storeu4(dst+4, fmadd4(p1, load4(dif+4), a1));
-        storeu4(dst+8, fmadd4(p2, load4(dif+8), a2));
-        dif += 12;
+        storeu4(dst  , fmadd4(p0, load4(dir  ), a0));
+        storeu4(dst+4, fmadd4(p1, load4(dir+4), a1));
+        storeu4(dst+8, fmadd4(p2, load4(dir+8), a2));
+
+        dir += 12;
         dst += 12;
         src += 12;
     }
@@ -1254,78 +1255,79 @@ void projectForcesD3D_AVX(SIZE_T nbs, const real* dif, const real* src, const re
     if ( nbs < 4 )
     {
         mm = setzero4();
-        dd = blend4(mm, broadcast1(dif), 0b1000);
+        dd = blend31(mm, broadcast1(dir));
     }
     else
     {
         mm = broadcast1(mul-1);
-        dd = loadu4(dif-3);
+        dd = loadu4(dir-3);
     }
-    //printf("%lu case%lu", nbs, mul-end);
     switch ( mul - end )
     {
         case 0: {
             // 4 vectors remaining
             vec4 m1 = broadcast1(mul  );
-            vec4 m0 = blend4(mm, m1, 0b1000);
+            vec4 m0 = blend31(mm, m1);
             vec4 m2 = broadcast1(mul+1);
-            vec4 p0 = blend4(m1, m2, 0b1000);
+            vec4 p0 = blend31(m1, m2);
             vec4 p2 = broadcast1(mul+2);
-            m1 = blend4(m1, m2, 0b1100);
-            vec4 p1 = blend4(m2, p2, 0b1100);
-            m2 = blend4(m2, p2, 0b1110);
-            p2 = blend4(p2, setzero4(), 0b1110);
+            m1 = blend22(m1, m2);
+            vec4 p1 = blend22(m2, p2);
+            m2 = blend13(m2, p2);
+            p2 = blend13(p2, setzero4());
             
             mul += 3;
-            vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-            vec4 a1 = fmadd4(p1, load4(dif+4), loadu4(src+4));
-            vec4 a2 = fmadd4(p2, broadcast1(dif+8), loadu4(src+8));
-            
-            storeu4(dst  , fnmadd4(m0, dd, a0));
-            storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-            storeu4(dst+8, fnmadd4(m2, loadu4(dif+5), a2));
-            dif += 12; dst += 12; src += 12;
+            vec4 a0 = fmadd4(p0, load4(dir  ), loadu4(src  ));
+            vec4 a1 = fmadd4(p1, load4(dir+4), loadu4(src+4));
+            vec4 a2 = fmadd4(p2, broadcast1(dir+8), loadu4(src+8));
+            a0 = fnmadd4(m0, dd, a0);
+            a1 = fnmadd4(m1, loadu4(dir+1), a1);
+            a2 = fnmadd4(m2, loadu4(dir+5), a2);
+            storeu4(dst  , a0);
+            storeu4(dst+4, a1);
+            storeu4(dst+8, a2);
+            //dir += 12; dst += 12; src += 12;
         } break;
         case 1: {
             // 3 vectors remaining
             vec4 m1 = broadcast1(mul  );
-            vec4 m0 = blend4(mm, m1, 0b1000);
+            vec4 m0 = blend31(mm, m1);
             vec4 m2 = broadcast1(mul+1);
-            vec4 p0 = blend4(m1, m2, 0b1000);
-            m1 = blend4(m1, m2, 0b1100);
-            vec4 p1 = blend4(m2, setzero4(), 0b1100);
+            vec4 p0 = blend31(m1, m2);
+            m1 = blend22(m1, m2);
+            vec4 p1 = blend22(m2, setzero4());
             
             mul += 2;
-            vec4 a0 = fmadd4(p0, load4(dif  ), loadu4(src  ));
-            vec4 a1 = fmadd4(p1, load2Z(dif+4), loadu4(src+4));
+            vec4 a0 = fmadd4(p0, load4(dir  ), loadu4(src  ));
+            vec4 a1 = fmadd4(p1, load2Z(dir+4), loadu4(src+4));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
-            storeu4(dst+4, fnmadd4(m1, loadu4(dif+1), a1));
-             store1(dst+8, fnmadd2(getlo(m2), load1(dif+5), load1(src+8)));
-            dif += 9; dst += 9; src += 9;
+            storeu4(dst+4, fnmadd4(m1, loadu4(dir+1), a1));
+             store1(dst+8, fnmadd2(getlo(m2), load1(dir+5), load1(src+8)));
+            //dir += 9; dst += 9; src += 9;
         } break;
         case 2: {
             // 2 vectors remaining
             vec4 m1 = broadcast1(mul);
-            vec4 m0 = blend4(mm, m1, 0b1000);
-            vec4 p0 = blend4(m1, setzero4(), 0b1000);
+            vec4 m0 = blend31(mm, m1);
+            vec4 p0 = blend31(m1, setzero4());
             
             mul += 1;
-            vec4 a0 = fmadd4(p0, load3(dif), loadu4(src));
+            vec4 a0 = fmadd4(p0, load3(dir), loadu4(src));
             
             storeu4(dst  , fnmadd4(m0, dd, a0));
-            storeu2(dst+4, fnmadd2(getlo(m1), loadu2(dif+1), loadu2(src+4)));
-            dif += 6; dst += 6; src += 6;
+            storeu2(dst+4, fnmadd2(getlo(m1), loadu2(dir+1), loadu2(src+4)));
+            //dir += 6; dst += 6; src += 6;
         } break;
         case 3: {
             // 1 vector remaining
-            //store3(dst, fnmadd4(mm, blend4(dd, setzero4(), 0b1000), load3(src)));
+            //store3(dst, fnmadd4(mm, blend31(dd, setzero4()), load3(src)));
             storeu2(dst, fnmadd2(getlo(mm), getlo(dd), loadu2(src)));
             store1(dst+2, fnmadd1(getlo(mm), gethi(dd), load1(src+2)));
-            dif += 3; dst += 3; src += 3;
+            //dir += 3; dst += 3; src += 3;
         } break;
         default:
-            printf("unexpected case in projectForcesD3D_AVX!");
+            puts("unexpected case in projectForcesD3D_AVX!");
     }
     assert_true( mul == end+3 );
 }

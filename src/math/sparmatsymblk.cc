@@ -1210,8 +1210,8 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
         x2 = broadcast1(X+jj+2);
 #else
         vec4 p = swap2f128(tt);
-        vec4 l = blend4(tt, p, 0b1100);
-        vec4 u = blend4(tt, p, 0b0011);
+        vec4 l = blend22(tt, p);
+        vec4 u = blend22(p, tt);
         x0 = duplo4(l);
         x1 = duphi4(l);
         x2 = duplo4(u);
@@ -1259,7 +1259,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s1 = add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+    s1 = add4(twine2f128(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s1));
 #endif
 }
@@ -1287,8 +1287,8 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
         s2 = mul4(streamload4(M+8), tt);
         // prepare broadcasted vectors:
         vec4 p = swap2f128(tt);
-        vec4 l = blend4(tt, p, 0b1100);
-        vec4 u = blend4(tt, p, 0b0011);
+        vec4 l = blend22(tt, p);
+        vec4 u = blend22(p, tt);
         x0 = duplo4(l);
         x1 = duphi4(l);
         x2 = duplo4(u);
@@ -1374,7 +1374,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
     x0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s1 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
-    s0 = add4(twine2f128(s0, s1), blend4(s0, s1, 0b1100));
+    s0 = add4(twine2f128(s0, s1), blend22(s0, s1));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
 #endif
@@ -1439,7 +1439,7 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s1 = add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+    s1 = add4(twine2f128(s0, s2), blend22(s0, s2));
     store4(Y+jj, add4(load4(Y+jj), s1));
 }
 #endif

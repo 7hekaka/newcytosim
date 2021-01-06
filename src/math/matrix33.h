@@ -357,8 +357,8 @@ public:
         vec4 u = permute2f128(m678, z, 0x03);
         vec4 t = shuffle4(m012, m345, 0b1000);
         store4(res.val  , blend4(u, t, 0b1011));
-        store4(res.val+4, blend4(z, shuffle4(u, m345, 0b1100), 0b1100));
-        store4(res.val+8, blend4(u, m678, 0b1100));
+        store4(res.val+4, blend22(z, shuffle4(u, m345, 0b1100)));
+        store4(res.val+8, blend22(u, m678));
 #else
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
@@ -380,8 +380,8 @@ public:
         vec4 u = permute2f128(m678, z, 0x03);
         vec4 t = shuffle4(m012, m345, 0b1000);
         store4(res.val  , blend4(u, t, 0b1011));
-        store4(res.val+4, blend4(z, shuffle4(u, m345, 0b1100), 0b1100));
-        store4(res.val+8, blend4(u, m678, 0b1100));
+        store4(res.val+4, blend22(z, shuffle4(u, m345, 0b1100)));
+        store4(res.val+8, blend22(u, m678));
 #else
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
@@ -550,7 +550,7 @@ public:
         vec4 s3 = setzero4();
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+        return add4(twine2f128(s0, s2), blend22(s0, s2));
     }
 #endif
     
@@ -912,8 +912,8 @@ public:
         Matrix33 res;
         vec4 d = dir;
         vec4 p = swap2f128(d);
-        vec4 l = blend4(d, p, 0b1100);
-        vec4 u = blend4(d, p, 0b0011);
+        vec4 l = blend22(d, p);
+        vec4 u = blend22(p, d);
         vec4 a = mul4(d, set4(alpha));
         store4(res.val  , mul4(a, duplo4(l)));
         store4(res.val+4, mul4(a, duphi4(l)));
@@ -936,8 +936,8 @@ public:
         Matrix33 res;
         vec4 v = vec;
         vec4 p = swap2f128(v);
-        vec4 l = blend4(v, p, 0b1100);
-        vec4 u = blend4(v, p, 0b0011);
+        vec4 l = blend22(v, p);
+        vec4 u = blend22(p, v);
         vec4 d = dir;
         store4(res.val  , mul4(d, duplo4(l)));
         store4(res.val+4, mul4(d, duphi4(l)));

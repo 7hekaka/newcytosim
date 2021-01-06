@@ -236,6 +236,12 @@ void uni3(int N, real const* AB, real* B)
     alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
 }
 
+void uni4(int N, real const* AB, real* B)
+{
+    alsatian_xtbsvLNN(N, BAND_NUD, AB, BAND_LDD, B);
+    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+}
+
 
 void uniLN0(int N, real const* AB, real* B)
 {
@@ -334,6 +340,7 @@ void test(size_t cnt)
     check<uni1>(NVAL, S, AB, B, "blas_tbsv", cnt);
     check<uni2>(NVAL, S, AB, B, "tbsvLxN", cnt);
     check<uni3>(NVAL, S, AB, B, "tbsvLxNK<KD>", cnt);
+    check<uni4>(NVAL, S, AB, B, "mixed", cnt);
 
     std::cout << "xTBSVLN ---\n";
     

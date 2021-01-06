@@ -1298,8 +1298,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const double* X, double* Y, size
 # endif
         // prepare broacasted vectors
         vec4 p = swap2f128(tt);
-        vec4 l = blend4(tt, p, 0b1100);
-        vec4 u = blend4(tt, p, 0b0011);
+        vec4 l = blend22(tt, p);
+        vec4 u = blend22(p, tt);
         x0 = duplo4(l);
         x1 = duphi4(l);
         x2 = duplo4(u);
@@ -1352,7 +1352,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const double* X, double* Y, size
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+    s0 = add4(twine2f128(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 #endif
 }
@@ -1375,8 +1375,8 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const double* X, double* Y, siz
         s2 = mul4(streamload4(D+8), tt);
         // prepare broadcasted vectors:
         vec4 p = swap2f128(tt);
-        vec4 l = blend4(tt, p, 0b1100);
-        vec4 u = blend4(tt, p, 0b0011);
+        vec4 l = blend22(tt, p);
+        vec4 u = blend22(p, tt);
         x0 = duplo4(l);
         x1 = duphi4(l);
         x2 = duplo4(u);
@@ -1468,7 +1468,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const double* X, double* Y, siz
     x0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
-    s0 = add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+    s0 = add4(twine2f128(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
 #endif
@@ -1484,8 +1484,8 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_AVX(const double* X, double*
         vec4 tt = loadu4(X+jj);
         // prepare broadcasted vectors:
         vec4 p = swap2f128(tt);
-        vec4 l = blend4(tt, p, 0b1100);
-        vec4 u = blend4(tt, p, 0b0011);
+        vec4 l = blend22(tt, p);
+        vec4 u = blend22(p, tt);
         x0 = duplo4(l);
         x1 = duphi4(l);
         x2 = duplo4(u);
@@ -1580,7 +1580,7 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_AVX(const double* X, double*
     x0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
-    s0 = add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+    s0 = add4(twine2f128(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
 #endif
@@ -1645,7 +1645,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const double* X, double* Y, size
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s1 = add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+    s1 = add4(twine2f128(s0, s2), blend22(s0, s2));
     store4(Y+jj, add4(load4(Y+jj), s1));
 }
 #endif
@@ -1757,8 +1757,8 @@ void SparMatSymBlkDiag::vecMulDiagonal3D(const double* src, double* dst) const
 #if 1
         vec4 x0 = loadu4(src);
         vec4 x2 = swap2f128(x0);
-        vec4 x1 = blend4(x0, x2, 0b1100);
-        x2 = blend4(x0, x2, 0b0011);
+        vec4 x1 = blend22(x0, x2);
+        x2 = blend22(x2, x0);
         x0 = duplo4(x1);
         x1 = duphi4(x1);
         x2 = duplo4(x2);

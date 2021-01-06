@@ -498,11 +498,11 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
         if ( diag == 'N' ) {
             vec4 n = T;
             T = div4(T, broadcast1(A+K));
-            storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
+            storeu4(B+3*K, blend31(T, n)); // blend to keep 4th value!
         } else if ( diag == 'I' ) {
             vec4 n = T;
             T = mul4(T, broadcast1(A+K)); // DIV
-            storeu4(B+3*K, blend4(T, n, 0b1000)); // blend to keep 4th value!
+            storeu4(B+3*K, blend31(T, n)); // blend to keep 4th value!
         }
         int I = K + 1;
         double* pB = B+3*I;
@@ -515,8 +515,8 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
                  */
                 vec4 p = swap2f128(T);
                 vec4 h = shuffle4(T, p, 0b0001);
-                temp0 = blend4(T, h, 0b1000);
-                temp1 = blend4(h, p, 0b1100);
+                temp0 = blend31(T, h);
+                temp1 = blend22(h, p);
                 temp2 = shuffle4(p, T, 0b0100);
             }
 #if 0
@@ -547,12 +547,12 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
                 a5 = unpackhi4(a5, a5);
                 a7 = unpackhi4(a7, a7);
 #endif
-                vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
-                vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
-                vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
-                vec4 t3 = fnmadd4(blend4(a4, a5, 0b1000), temp0, loadu4(pB+12));
-                vec4 t4 = fnmadd4(blend4(a5, a6, 0b1100), temp1, loadu4(pB+16));
-                vec4 t5 = fnmadd4(blend4(a6, a7, 0b1110), temp2, loadu4(pB+20));
+                vec4 t0 = fnmadd4(blend31(a0, a1), temp0, loadu4(pB  ));
+                vec4 t1 = fnmadd4(blend22(a1, a2), temp1, loadu4(pB+4));
+                vec4 t2 = fnmadd4(blend13(a2, a3), temp2, loadu4(pB+8));
+                vec4 t3 = fnmadd4(blend31(a4, a5), temp0, loadu4(pB+12));
+                vec4 t4 = fnmadd4(blend22(a5, a6), temp1, loadu4(pB+16));
+                vec4 t5 = fnmadd4(blend13(a6, a7), temp2, loadu4(pB+20));
                 storeu4(pB  , t0);
                 storeu4(pB+4, t1);
                 storeu4(pB+8, t2);
@@ -585,9 +585,9 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
                  blend broadcasted values of A to generate the required vec4:
                  { AAAB } { BBCC } { CDDD }
                  */
-                vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
-                vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
-                vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
+                vec4 t0 = fnmadd4(blend31(a0, a1), temp0, loadu4(pB  ));
+                vec4 t1 = fnmadd4(blend22(a1, a2), temp1, loadu4(pB+4));
+                vec4 t2 = fnmadd4(blend13(a2, a3), temp2, loadu4(pB+8));
                 storeu4(pB  , t0);
                 storeu4(pB+4, t1);
                 storeu4(pB+8, t2);
@@ -679,12 +679,12 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
              blend broadcasted values of A to generate the required vec4:
              { AAAB } { BBCC } { CDDD }
              */
-            s0 = fnmadd4(blend4(a0, a1, 0b1000), loadu4(pB  ), s0);
-            s1 = fnmadd4(blend4(a1, a2, 0b1100), loadu4(pB+4), s1);
-            s2 = fnmadd4(blend4(a2, a3, 0b1110), loadu4(pB+8), s2);
-            s0 = fnmadd4(blend4(a4, a5, 0b1000), loadu4(pB+12), s0);
-            s1 = fnmadd4(blend4(a5, a6, 0b1100), loadu4(pB+16), s1);
-            s2 = fnmadd4(blend4(a6, a7, 0b1110), loadu4(pB+20), s2);
+            s0 = fnmadd4(blend31(a0, a1), loadu4(pB  ), s0);
+            s1 = fnmadd4(blend22(a1, a2), loadu4(pB+4), s1);
+            s2 = fnmadd4(blend13(a2, a3), loadu4(pB+8), s2);
+            s0 = fnmadd4(blend31(a4, a5), loadu4(pB+12), s0);
+            s1 = fnmadd4(blend22(a5, a6), loadu4(pB+16), s1);
+            s2 = fnmadd4(blend13(a6, a7), loadu4(pB+20), s2);
             pB += 24;
         }
 #endif
@@ -711,9 +711,9 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
              blend broadcasted values of A to generate the required vec4:
               { AAAB } { BBCC } { CDDD }
              */
-            s0 = fnmadd4(blend4(a0, a1, 0b1000), loadu4(pB  ), s0); //(B+3*K  )
-            s1 = fnmadd4(blend4(a1, a2, 0b1100), loadu4(pB+4), s1);
-            s2 = fnmadd4(blend4(a2, a3, 0b1110), loadu4(pB+8), s2);
+            s0 = fnmadd4(blend31(a0, a1), loadu4(pB  ), s0); //(B+3*K  )
+            s1 = fnmadd4(blend22(a1, a2), loadu4(pB+4), s1);
+            s2 = fnmadd4(blend13(a2, a3), loadu4(pB+8), s2);
             pB += 12;
         }
         {
@@ -722,7 +722,7 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
              from s0 = { XYZX } s1 = { YZXY } s2 = { ZXYZ }
              into s0 = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
              */
-            vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
+            vec4 h = shuffle4(blend31(s1, s0), s2, 0b0101);
             vec4 d3 = twine2f128(s1, s2);
             vec4 d2 = shuffle4(s2, s1, 0b0101);
             vec4 d1 = swap2f128(h);
@@ -739,7 +739,7 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
             s0 = div4(s0, broadcast1(A+I));
         else if ( diag == 'I' )
             s0 = mul4(s0, broadcast1(A+I));
-        storeu4(B+3*I, blend4(s0, ori, 0b1000));
+        storeu4(B+3*I, blend31(s0, ori));
     }
 }
 
@@ -770,10 +770,10 @@ void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
         vec4 ori = T;
         if ( diag == 'N' ) {
             T = div4(ori, broadcast1(A+K));
-            ori = blend4(T, ori, 0b1000);  // blend to keep 4th value!
+            ori = blend31(T, ori);  // blend to keep 4th value!
         } else if ( diag == 'I' ) {
             T = mul4(ori, broadcast1(A+K)); // DIV
-            ori = blend4(T, ori, 0b1000);
+            ori = blend31(T, ori);
         }
         int I = 0;
         double * pB = B;
@@ -786,8 +786,8 @@ void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
                  */
                 vec4 p = swap2f128(T);
                 vec4 h = shuffle4(T, p, 0b0001);
-                temp0 = blend4(T, h, 0b1000);
-                temp1 = blend4(h, p, 0b1100);
+                temp0 = blend31(T, h);
+                temp1 = blend22(h, p);
                 temp2 = shuffle4(p, T, 0b0100);
             }
             for ( ; I+3 < K; I += 4 )
@@ -813,9 +813,9 @@ void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
                  blend broadcasted values of A to generate the required vec4:
                  { AAAB } { BBCC } { CDDD }
                  */
-                vec4 t0 = fnmadd4(blend4(a0, a1, 0b1000), temp0, loadu4(pB  ));
-                vec4 t1 = fnmadd4(blend4(a1, a2, 0b1100), temp1, loadu4(pB+4));
-                vec4 t2 = fnmadd4(blend4(a2, a3, 0b1110), temp2, loadu4(pB+8));
+                vec4 t0 = fnmadd4(blend31(a0, a1), temp0, loadu4(pB  ));
+                vec4 t1 = fnmadd4(blend22(a1, a2), temp1, loadu4(pB+4));
+                vec4 t2 = fnmadd4(blend13(a2, a3), temp2, loadu4(pB+8));
                 storeu4(pB  , t0);
                 storeu4(pB+4, t1);
                 storeu4(pB+8, t2);

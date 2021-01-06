@@ -323,10 +323,10 @@ public:
         vec4 u3 = unpackhi4(v2, v3);
         v0 = twine2f128(u0, u2);
         v1 = twine2f128(u1, u3);
-        store4(res.val   , blend4(u0, v0, 0b1100));
-        store4(res.val+4 , blend4(u1, v1, 0b1100));
-        store4(res.val+8 , blend4(u2, v0, 0b0011));
-        store4(res.val+12, blend4(u3, v1, 0b0011));
+        store4(res.val   , blend22(u0, v0));
+        store4(res.val+4 , blend22(u1, v1));
+        store4(res.val+8 , blend22(v0, u2));
+        store4(res.val+12, blend22(v1, u3));
 #else
         for ( index x = 0; x < 4; ++x )
         for ( index y = 0; y < 4; ++y )
@@ -351,10 +351,10 @@ public:
         vec4 u3 = unpackhi4(v2, v3);
         v0 = twine2f128(u0, u2);
         v1 = twine2f128(u1, u3);
-        store4(res.val   , blend4(u0, v0, 0b1100));
-        store4(res.val+4 , blend4(u1, v1, 0b1100));
-        store4(res.val+8 , blend4(u2, v0, 0b0011));
-        store4(res.val+12, blend4(u3, v1, 0b0011));
+        store4(res.val   , blend22(u0, v0));
+        store4(res.val+4 , blend22(u1, v1));
+        store4(res.val+8 , blend22(v0, u2));
+        store4(res.val+12, blend22(v1, u3));
 #else
         for ( index x = 0; x < 4; ++x )
         for ( index y = 0; y < 4; ++y )
@@ -402,8 +402,8 @@ public:
     const vec4 vecmul4(vec4 const& vec) const
     {
         vec4 p = swap2f128(vec);
-        vec4 l = blend4(vec, p, 0b1100);
-        vec4 u = blend4(vec, p, 0b0011);
+        vec4 l = blend22(vec, p);
+        vec4 u = blend22(p, vec);
         vec4 x = mul4(load4(val   ), duplo4(l));
         vec4 y = mul4(load4(val+4 ), duphi4(l));
         x = fmadd4(load4(val+8 ), duplo4(u), x);
@@ -421,7 +421,7 @@ public:
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
         //return add4(permute2f128(s0, s2, 0x20), permute2f128(s0, s2, 0x31));
-        return add4(twine2f128(s0, s2), blend4(s0, s2, 0b1100));
+        return add4(twine2f128(s0, s2), blend22(s0, s2));
     }
 
     /// multiplication by a vector: this * V
@@ -716,8 +716,8 @@ public:
         Matrix44 res;
         vec4 s = load4(V);
         vec4 p = swap2f128(s);
-        vec4 l = blend4(s, p, 0b1100);
-        vec4 u = blend4(s, p, 0b0011);
+        vec4 l = blend22(s, p);
+        vec4 u = blend22(p, s);
         vec4 d = load4(D);
         store4(res.val   , mul4(d, duplo4(l)));
         store4(res.val+4 , mul4(d, duphi4(l)));

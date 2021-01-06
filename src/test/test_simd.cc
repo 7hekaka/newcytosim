@@ -177,8 +177,8 @@ inline void twinedup12(real const* src, real* dst)
     vec4 s = load3(src);
     vec4 p = permute2f128(s, s, 0x01);
     vec4 h = shuffle4(s, p, 0b0001);
-    vec4 d0 = blend4(s, h, 0b1000);
-    vec4 d1 = blend4(h, p, 0b1100);
+    vec4 d0 = blend31(s, h);
+    vec4 d1 = blend22(h, p);
     vec4 d2 = shuffle4(p, s, 0b0100);
     store4(dst  , d0);
     store4(dst+4, d1);
@@ -201,9 +201,9 @@ inline void repeat12(real const* src, real* dst)
     vec4 xy = unpacklo4(s, s);
     vec4 yz = unpackhi4(s, s);
     
-    store4(dst  , blend4(xy, zx, 0b1100));
-    store4(dst+4, blend4(yz, xy, 0b1100));
-    store4(dst+8, blend4(zx, yz, 0b1100));
+    store4(dst  , blend22(xy, zx));
+    store4(dst+4, blend22(yz, xy));
+    store4(dst+8, blend22(zx, yz));
 }
 
 
@@ -229,9 +229,9 @@ inline void twine12(real const* X, real const* Y, real const* Z, real* dst)
     vec4 xy = unpacklo4(sx, sy);
     vec4 yz = unpackhi4(sy, sz);
     
-    store4(dst  , blend4(xy, zx, 0b1100));
-    store4(dst+4, blend4(yz, xy, 0b1100));
-    store4(dst+8, blend4(zx, yz, 0b1100));
+    store4(dst  , blend22(xy, zx));
+    store4(dst+4, blend22(yz, xy));
+    store4(dst+8, blend22(zx, yz));
 }
 
 /**
@@ -250,10 +250,10 @@ inline void untwine12(real const* src, real* X, real* Y, real* Z)
     dump(s1, "s1");
     dump(s2, "s2");
 
-    vec4 zx = blend4(s0, s2, 0b0011);
+    vec4 zx = blend22(s2, s0);
     zx = swap2f128(zx);
-    vec4 xy = blend4(s0, s1, 0b1100);
-    vec4 yz = blend4(s1, s2, 0b1100);
+    vec4 xy = blend22(s0, s1);
+    vec4 yz = blend22(s1, s2);
     
     store4(X,   blend4(zx, xy, 0b0101));
     store4(Y, shuffle4(xy, yz, 0b0101));
@@ -273,7 +273,7 @@ inline void sumXXX(real const* src, real* dst)
     vec4 s1 = load4(src+4);
     vec4 s2 = load4(src+8);
     
-    vec4 h = shuffle4(blend4(s1, s0, 0b1000), s2, 0b0101);
+    vec4 h = shuffle4(blend31(s1, s0), s2, 0b0101);
     vec4 d3 = twine2f128(s1, s2);
     vec4 d2 = shuffle4(s2, s1, 0b0101);
     vec4 d1 = swap2f128(h);
@@ -295,10 +295,10 @@ inline void sumXYZ(real const* src, real* dst)
     vec4 s1 = load4(src+4);
     vec4 s2 = load4(src+8);
     
-    vec4 zx = blend4(s0, s2, 0b0011);
+    vec4 zx = blend22(s2, s0);
     zx = permute2f128(zx, zx, 0x21);
-    vec4 xy = blend4(s0, s1, 0b1100);
-    vec4 yz = blend4(s1, s2, 0b1100);
+    vec4 xy = blend22(s0, s1);
+    vec4 yz = blend22(s1, s2);
     
     vec4 d1 =   blend4(zx, xy, 0b0101);
     vec4 d2 = shuffle4(xy, yz, 0b0101);
@@ -348,7 +348,7 @@ inline void destride3x4(real const* src, real* dst)
     d1 = shuffle4(d1, s1, 0b0101);
     store4(dst+4 , d1);
     
-    vec4 d2 = blend4(s1, s2, 0b0011);
+    vec4 d2 = blend22(s2, s1);
     d2 = swap2f128(d2);
     store4(dst+8 , d2);
     
@@ -439,7 +439,7 @@ void test_load()
     dump(load3(mem), "load3");
     dump(cat4(load1(mem+2), load2(mem)), "cat4(load1, load2)");
 
-    vec4 t = blend4(load4(mem), setzero4(), 0b1000);
+    vec4 t = blend31(load4(mem), setzero4());
     dump(t, "blend(load4, zero)");
 
 
@@ -496,10 +496,10 @@ void test_broadcast()
     vec4 u1 = unpackhi4(xyzt, xyzt);
     vec4 v0 = swap2f128(u0);
     vec4 v1 = swap2f128(u1);
-    dump(blend4(u0, v0, 0b1100), " x");
-    dump(blend4(u1, v1, 0b1100), " y");
-    dump(blend4(u0, v0, 0b0011), " z");
-    dump(blend4(u1, v1, 0b0011), " t");
+    dump(blend22(u0, v0), " x");
+    dump(blend22(u1, v1), " y");
+    dump(blend22(v0, u0), " z");
+    dump(blend22(v1, u1), " t");
 
     // using 1 permute and 4 blends
     xyzt = load4(mem);
@@ -512,16 +512,16 @@ void test_broadcast()
     //dump(u1, "u1");
     //dump(v0, "v0");
     //dump(v1, "v1");
-    dump(blend4(u0, v0, 0b1100), "X ");
-    dump(blend4(u1, v1, 0b1100), "Y ");
-    dump(blend4(u0, v0, 0b0011), "Z ");
-    dump(blend4(u1, v1, 0b0011), "T ");
+    dump(blend22(u0, v0), " x");
+    dump(blend22(u1, v1), " y");
+    dump(blend22(v0, u0), " z");
+    dump(blend22(v1, u1), " t");
 
     // using 1 permute and 2 blends
     xyzt = load4(mem);
     ztxy = swap2f128(xyzt);
-    xy = blend4(xyzt, ztxy, 0b1100);
-    zt = blend4(xyzt, ztxy, 0b0011);
+    xy = blend22(xyzt, ztxy);
+    zt = blend22(ztxy, xyzt);
     dump(duplo4(xy), " x");
     dump(duphi4(xy), " y");
     dump(duplo4(zt), " z");
@@ -586,7 +586,7 @@ void test_swap1()
 #endif
     
     vec4 u = shuffle4(a, x, 0b0101);
-    dump(blend4(u, x, 0b1100), "rotate 3");
+    dump(blend22(u, x), "rotate 3");
 }
 
 
@@ -630,8 +630,8 @@ void test_swap4()
     }
     {
         vec4 p = permute2f128(s, s, 0x01);
-        vec4 l = blend4(s, p, 0b1100);
-        vec4 u = blend4(s, p, 0b0011);
+        vec4 l = blend22(s, p);
+        vec4 u = blend22(p, s);
         vec4 x0 = unpacklo4(l,l);
         vec4 x1 = unpackhi4(l,l);
         vec4 x2 = unpacklo4(u,u);
@@ -645,8 +645,8 @@ void test_swap4()
     }
     {
         vec4 p = permute2f128(s, s, 0x01);
-        vec4 l = blend4(s, p, 0b1100);
-        vec4 u = blend4(s, p, 0b0011);
+        vec4 l = blend22(s, p);
+        vec4 u = blend22(p, s);
         vec4 z = unpacklo4(u,u);
         
         dump(s, "xyzt");
@@ -697,7 +697,7 @@ void test_hsum()
     s0 = add4f(shuffle4f(s0, s2, 0x4E), shuffle4f(s0, s2, 0xE4));
     dump(s0, "sum ");
     
-    dump(blend4f(s0, s2, 0b1100), "blend  ");
+    dump(blend4f(s0, s2), "blend  ");
     dump(shuffle4f(s0, s2, 0xE4), "shuff  ");
 }
 
@@ -722,13 +722,13 @@ void test_mat()
     dump(z, "z");
     dump(u, "u");
     
-    vec4 m145 = blend4(z, m345, 0b1100);
-    vec4 m258 = blend4(u, m678, 0b1100);
+    vec4 m145 = blend22(z, m345);
+    vec4 m258 = blend22(u, m678);
     dump(m145, "m145");
     dump(m258, "m258");
     
     // transposed matrix:
-    vec4 m036 = blend4(u, shuffle4(m012, m345, 0b1000), 0b1011);
+    vec4 m036 = blend31(u, shuffle4(m012, m345));
     vec4 m147 = blend4(m145, permute4(u, 0b0101), 0b0100);
     
     dump(m036, "m036");
@@ -776,8 +776,8 @@ void test_transpose3()
     dump(shuffle4(u, m345, 0b1110), "tmp");
     // transposed matrix:
     vec4 m036 = blend4(u, t, 0b1011);
-    vec4 m147 = blend4(z, shuffle4(u, m345, 0b1100), 0b1100);
-    vec4 m258 = blend4(u, m678, 0b1100);
+    vec4 m147 = blend22(z, shuffle4(u, m345, 0b1100));
+    vec4 m258 = blend22(u, m678);
     
     dump(m036, "m036");
     dump(m147, "m147");
@@ -829,10 +829,10 @@ void test_transpose4()
     vec4 x13 = permute2f128(u1, u3, 0x21);
     dump(x02, "x02");
     dump(x13, "x13");
-    t0 = blend4(u0, x02, 0b1100);
-    t1 = blend4(u1, x13, 0b1100);
-    t2 = blend4(u2, x02, 0b0011);
-    t3 = blend4(u3, x13, 0b0011);
+    t0 = blend22(u0, x02);
+    t1 = blend22(u1, x13);
+    t2 = blend22(x02, u2);
+    t3 = blend22(x13, u3);
 
     // transposed matrix:
     dump(t0, "t0");

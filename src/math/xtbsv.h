@@ -857,7 +857,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 //------------------------------------------------------------------------------
 #pragma mark - DIMENSION-SPECIFIC ALSATIAN DPBTF2 with KD==2
 
-#ifdef __AVX__
+#if defined(__AVX__)
 /// specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
 {
@@ -920,8 +920,8 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     {
         vec4 a0 = load3(pX);   // would load garbage in 4th position
         a1 = mul4(broadcast1(pA), a0);
-        store3(pX, a1); //storeu4(pX, blend4(a1, a0, 0b1000));
-        a1 = blend4(a1, zero, 0b1000);
+        store3(pX, a1); //storeu4(pX, blend31(a1, a0));
+        a1 = blend31(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -931,8 +931,8 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
         vec4 a0 = loadu4(pX);
         a0 = fnmadd4(broadcast1(pA+1), a1, a0);
         a1 = mul4(broadcast1(pA), a0);
-        storeu4(pX, blend4(a1, a0, 0b1000));
-        a1 = blend4(a1, zero, 0b1000);
+        storeu4(pX, blend31(a1, a0));
+        a1 = blend31(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -945,10 +945,10 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
         a2 = a1;
         a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
         // restore 4th position that was saved in 'tt'
-        a0 = blend4(mul4(broadcast1(pA), a0), tt, 0b1000);
+        a0 = blend31(mul4(broadcast1(pA), a0), tt);
         tt = broadcast1(a0); // save 4th position for next round
         storeu4(pX, a0);
-        a1 = blend4(a0, zero, 0b1000);
+        a1 = blend31(a0, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -957,7 +957,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
         vec4 a0 = fnmadd4(broadcast1(pA+2), a2, af);
         a0 = fnmadd4(broadcast1(pA+1), a1, a0);
         // restore 4th position that was saved in 'tt'
-        a0 = blend4(mul4(broadcast1(pA), a0), tt, 0b1000);
+        a0 = blend31(mul4(broadcast1(pA), a0), tt);
         storeu4(pX, a0);
     }
 }

@@ -976,8 +976,8 @@ The low position of 'ss' is used locally
 inline static void multiply4(const real* X, real* Y, size_t ii,
                       const real* val, vec4 const& xx, vec4& ss)
 {
-    vec4 x = blend4(xx, broadcast2(X+ii), 0b1100);  // hi <- X , lo <- xx
-    ss = blend4(cast4(load2(Y+ii)), ss, 0b1100);    // hi <- ss, lo <- Y
+    vec4 x = blend22(xx, broadcast2(X+ii));  // hi <- X , lo <- xx
+    ss = blend22(cast4(load2(Y+ii)), ss);    // hi <- ss, lo <- Y
     ss = fmadd4(broadcast1(val), x, ss);
     store2(Y+ii, getlo(ss));
 }
@@ -1037,14 +1037,14 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
         const size_t i1 = inx[1];
         const size_t i2 = inx[2];
         const size_t i3 = inx[3];
-        s0 = blend4(cast4(load2(Y+i0)),s0,0b1100);    // lo = Y
-        s1 = blend4(cast4(load2(Y+i1)),s1,0b1100);    // lo = Y
-        s2 = blend4(cast4(load2(Y+i2)),s2,0b1100);    // lo = Y
-        s3 = blend4(cast4(load2(Y+i3)),s3,0b1100);    // lo = Y
-        vec4 x0 = blend4(xx,broadcast2(X+i0),0b1100);   // hi = X , lo <- xx
-        vec4 x1 = blend4(xx,broadcast2(X+i1),0b1100);   // hi = X , lo <- xx
-        vec4 x2 = blend4(xx,broadcast2(X+i2),0b1100);   // hi = X , lo <- xx
-        vec4 x3 = blend4(xx,broadcast2(X+i3),0b1100);   // hi = X , lo <- xx
+        s0 = blend22(cast4(load2(Y+i0)),s0);    // lo = Y
+        s1 = blend22(cast4(load2(Y+i1)),s1);    // lo = Y
+        s2 = blend22(cast4(load2(Y+i2)),s2);    // lo = Y
+        s3 = blend22(cast4(load2(Y+i3)),s3);    // lo = Y
+        vec4 x0 = blend22(xx,broadcast2(X+i0));   // hi = X , lo <- xx
+        vec4 x1 = blend22(xx,broadcast2(X+i1));   // hi = X , lo <- xx
+        vec4 x2 = blend22(xx,broadcast2(X+i2));   // hi = X , lo <- xx
+        vec4 x3 = blend22(xx,broadcast2(X+i3));   // hi = X , lo <- xx
         s0 = fmadd4(broadcast1(val  ), x0, s0);
         s1 = fmadd4(broadcast1(val+1), x1, s1);
         s2 = fmadd4(broadcast1(val+2), x2, s2);
@@ -1082,7 +1082,7 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
     assert_true( start <= stop );
     assert_true( stop <= nmax_ );
     vec4 zz = setzero4();
-    vec4 xx = blend4(loadu4(X+jj), zz, 0b1000);
+    vec4 xx = blend31(loadu4(X+jj), zz);
     vec4 yy = fmadd4(broadcast1(dia), xx, loadu4(Y+jj));
     real * val = sa_ + start;
     real const*end = sa_ + stop - 1;
