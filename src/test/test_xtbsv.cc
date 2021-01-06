@@ -257,7 +257,7 @@ void uni4(int N, real const* AB, real* B)
 void uniLN0(int N, real const* AB, real* B)
 {
     blas_xtbsvLN<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
-    //blas_xtbsvLT<'I'>(N, BAND_NUD, AB, BAND_LDD, B, 1);
+    //blas_xtbsvLT<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
 }
 
 void uniLN1(int N, real const* AB, real* B)

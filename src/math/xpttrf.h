@@ -78,9 +78,9 @@ void xpttrf(int size, real* D, real* E)
          B(I) = B(I) / D(I) - B(I+1) * E(I)
      CONTINUE
  */
-void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, int)
+void lapack_xptts2(int size, const real* D, const real* E, real* B)
 {
-    assert_true( NRHS == 1 ); // in this case, the last argument (LDB) is ignored
+    assert_true(size > 0);
 
     for ( int i = 1; i < size; ++i )
         B[i] = B[i] - B[i-1] * E[i-1];
@@ -89,6 +89,13 @@ void lapack_xptts2(int size, int NRHS, const real* D, const real* E, real* B, in
     
     for ( int i = size-2; i >= 0; --i )
         B[i] = B[i] / D[i] - B[i+1] * E[i];
+}
+
+
+inline void lapack_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int LDB)
+{
+    assert_true( nrhs == 1 ); // in this case, the last argument (LDB) is ignored
+    return lapack_xptts2(size, D, E, B);
 }
 
 //------------------------------------------------------------------------------
@@ -131,10 +138,9 @@ void italian_xpttrf(int size, real* D, real const* E, int* INFO)
      for i = N-1:-1:1
          x(i) = y(i) - gamma(i) * c(i) * x(i+1);
  */
-void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int)
+void italian_xptts2(int size, real const* D, real const* E, real* B)
 {
     assert_true(size > 0);
-    assert_true(nrhs == 1); // in this case, the last argument (LDB) is ignored
  
     B[0] = D[0] * B[0];
     if ( size > 1 )
@@ -151,6 +157,12 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
 }
 
 
+inline void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, int LDB)
+{
+    assert_true(nrhs == 1); // in this case, the last argument (LDB) is ignored
+    return italian_xptts2(size, D, E, B);
+}
+
 /**
  This implements Thomas's algorithm to solve a linear system
  with a tridiagonal matrix {L, D, U} and right-hand side vector 'B'
@@ -166,7 +178,7 @@ void italian_xptts2(int size, int nrhs, real const* D, real const* E, real* B, i
  Modified from:
  https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
  */
-void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
+void italian_thomas(int size, real* L, real* D, real* U, real* B)
 {
 #if 0
     D[0] = real(1) / D[0];
@@ -174,13 +186,13 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
     if ( size > 1 )
     {
         // upward recursion on B[]
-        for ( size_t n = 1; n < size; ++n )
+        for ( int n = 1; n < size; ++n )
         {
             D[n] = real(1) / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
             B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
         }
         // downward recursion on B[]
-        for ( size_t i = size-2; i > 0; --i )
+        for ( int i = size-2; i > 0; --i )
             B[i] = B[i] - ( D[i] * U[i] ) * B[i+1];
         B[0] = B[0] - ( D[0] * U[0] ) * B[1];
     }
@@ -193,7 +205,7 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
     if ( size > 1 )
     {
         // upward recursion on B[]
-        for ( size_t n = 1; n < size; ++n )
+        for ( int n = 1; n < size; ++n )
         {
             //D[n] = real(1) / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
             d = real(1) / ( D[n] - e * d );
@@ -204,7 +216,7 @@ void italian_thomas(size_t size, real* L, real* D, real* U, real* B)
             U[n] = U[n] * d;
         }
         // downward recursion on B[]
-        for ( size_t n = size-2; n > 0; --n )
+        for ( int n = size-2; n > 0; --n )
             B[n] = B[n] - U[n] * B[n+1];
         B[0] = B[0] - U[0] * B[1];
     }
@@ -260,7 +272,7 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
 
  Improved on 02.04.2020: reduced memory use
  */
-void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
+void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
 {
     if ( D[0] < 0 | size < 1 )
     {
@@ -274,7 +286,7 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
     D[0] = w;
     E[0] = w * E[0];
 
-    for ( size_t n = 1; n < size; ++n )
+    for ( int n = 1; n < size; ++n )
     {
         if ( D[n] < 0 )
         {
@@ -294,15 +306,14 @@ void alsatian_xpttrf(size_t size, real* D, real* E, int* INFO)
  
  Improved on 02.04.2020: removed one multiplication, now only using FMAs
  */
-void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, real* B, size_t)
+void alsatian_xptts2(int size, real const* D, real const* DE, real* B)
 {
     assert_true(size > 0);
-    assert_true(nrhs == 1); // in this case, the last argument (LDB) is ignored
 
     // upward recursion on B[]
     real x = B[0];
     real y = D[0] * x;
-    for ( size_t n = 1; n < size; ++n )
+    for ( int n = 1; n < size; ++n )
     {
         x = B[n] - x * DE[n-1];
         B[n] = D[n] * x;
@@ -312,7 +323,7 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
     {
         x = D[size-1] * x;
         // downward recursion on B[]
-        for ( size_t n = size-2; n > 0; --n )
+        for ( int n = size-2; n > 0; --n )
         {
             x = B[n] - x * DE[n];
             B[n] = x;
@@ -323,6 +334,12 @@ void alsatian_xptts2(size_t size, size_t nrhs, real const* D, real const* DE, re
         B[0] = y;
 }
 
+
+inline void alsatian_xptts2(int size, size_t nrhs, real const* D, real const* DE, real* B, size_t LDB)
+{
+    assert_true(nrhs == 1); // in this case, the last argument is ignored
+    return alsatian_xptts2(size, D, DE, B);
+}
 
 /**
 This implements Thomas's algorithm to solve a linear system

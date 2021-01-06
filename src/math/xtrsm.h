@@ -26,7 +26,7 @@
  
     op(A)*X = alpha*B,   or   X*op(A) = alpha*B,
  
- where alpha is a scalar, X and B are m by n matrices, A is a unit, or
+ where alpha is a scalar, X and B are M by N matrices, A is a unit, or
  non-unit, upper or lower triangular matrix and op(A) is one of
  
      op(A) = A   or   op(A) = A**T.
@@ -89,6 +89,8 @@ void blas_xtrsmLLN(const int M, const int N, REAL ALPHA, const REAL* A, const in
             {
                 if ( diag == 'N' )
                     B[K] /= A[K+lda*K];
+                else if ( diag == 'I' )
+                    B[K] *= A[K+lda*K]; // DIV
                 REAL tmp = B[K];
                 for ( int I = K + 1; I < M; ++I )
                     B[I] -= tmp * A[I+lda*K];
@@ -132,6 +134,8 @@ void blas_xtrsmLLT(const int M, const int N, REAL ALPHA, const REAL* A, const in
                 tmp -= A[K+lda*I] * B[K];
             if ( diag == 'N' )
                 tmp /= A[I+lda*I];
+            else if ( diag == 'I' )
+                tmp *= A[I+lda*I]; // DIV
             B[I] = tmp;
         }
         B += ldb;
@@ -181,6 +185,8 @@ void blas_xtrsmLUN(const int M, const int N, REAL ALPHA, const REAL* A, const in
              {
                  if ( diag == 'N' )
                      B[K] /= A[K+lda*K];
+                 else if ( diag == 'I' )
+                     B[K] *= A[K+lda*K]; // DIV
                  REAL tmp = B[K];
                  for ( int I = 0; I < K; ++I )
                      B[I] -= tmp * A[I+lda*K];
@@ -223,6 +229,8 @@ void blas_xtrsmLUT(const int M, const int N, REAL ALPHA, const REAL* A, const in
                 tmp -= A[K+lda*I] * B[K];
             if ( diag == 'N' )
                 tmp /= A[I+lda*I];
+            else if ( diag == 'I' )
+                tmp *= A[I+lda*I]; // DIV
             B[I] = tmp;
         }
         B += ldb;
@@ -277,12 +285,12 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, REAL 
 #pragma mark - DTRSM-STYLE for interleaved vectors
 
 /**
- Solve A*X = B, for 'ORD' interleaved vectors B
+ Solve A*X = B, when B contains 'ORD' interleaved vectors of size M
+ A is a unit, or non-unit, lower triangular matrix of size M x M
+
  like DTRSM('L', 'L', 'N', Diag, M, 1, 1.0, A, LDA, B, LDB);
- N = 1
- ALPHA = 1.0
- but for the ORD vectors
- 
+ with N = 1 and ALPHA = 1.0
+
  for ( int K = 0; K < M; ++K )
  {
      if (nounit)
@@ -326,10 +334,11 @@ void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
 
 
 /**
- Solve transposed(A)*X = B, for 'ORD' interleaved vectors B
- DTRSM('L', 'L', 'T', Diag, M, 1, 1.0, A, LDA, B, LDB);
- N = 1
- ALPHA = 1.0
+ Solve transposed(A)*X = B, when B contains 'ORD' interleaved vectors of size M
+ A is a unit, or non-unit, lower triangular matrix of size M x M
+ 
+ like DTRSM('L', 'L', 'T', Diag, M, 1, 1.0, A, LDA, B, LDB);
+ with N = 1 and ALPHA = 1.0
  
  for ( int I = M-1; I >= 0; --I )
  {
@@ -369,11 +378,12 @@ void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
 }
 
 /**
- Solve transposed(A)*X = B, for 'ORD' interleaved vectors B
- DTRSM('L', 'U', 'N', Diag, M, 1, 1.0, A, LDA, B, LDB);
- N = 1
- ALPHA = 1.0
+ Solve A*X = B, when B contains 'ORD' interleaved vectors of size M
+ A is a unit, or non-unit, upper triangular matrix of size M x M
  
+ like DTRSM('L', 'U', 'N', Diag, M, 1, 1.0, A, LDA, B, LDB);
+ with N = 1 and ALPHA = 1.0
+
  for ( int K = M-1; K >= 0; --K )
  {
      if (nounit)
@@ -418,8 +428,11 @@ void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
 }
 
 /**
- Solve transposed(A)*X = alpha*B, overwriting B with X.
- DTRSM('L', 'U', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
+ Solve transposed(A)*X = B, when B contains 'ORD' interleaved vectors of size M
+ A is a unit, or non-unit, upper triangular matrix of size M x M
+
+ like DTRSM('L', 'U', 'T', Diag, M, N, ALPHA, A, LDA, B, LDB);
+ with N = 1 and ALPHA = 1.0
 
  for ( int I = 0; I < M; ++I )
  {
@@ -1025,9 +1038,9 @@ void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
     free_real(tmp);
 #else
     // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLN<ORD, 'N'>(N, A, LDA, B);
+    iso_xtrsmLLN<ORD,'N'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLT<ORD, 'N'>(N, A, LDA, B);
+    iso_xtrsmLLT<ORD,'N'>(N, A, LDA, B);
 #endif
 }
 
@@ -1106,8 +1119,8 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
     // Solve U*X = B, overwriting B with X
     alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
 #else
-    iso_xtrsmLLN<'I'>(N, A, LDA, B);
-    iso_xtrsmLLT<'I'>(N, A, LDA, B);
+    iso_xtrsmLLN<1,'I'>(N, A, LDA, B);
+    iso_xtrsmLLT<1,'I'>(N, A, LDA, B);
 #endif
 }
 
@@ -1309,8 +1322,8 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
     else
         ABORT_NOW("unexpected DIM!");
 #else
-    iso_xtrsmLLN<ORD, 'U'>(N, A, LDA, B);
-    iso_xtrsmLLT<ORD, 'N'>(N, A, LDA, B);
+    iso_xtrsmLLN<ORD,'U'>(N, A, LDA, B);
+    iso_xtrsmLLT<ORD,'N'>(N, A, LDA, B);
 #endif
 }
 

@@ -99,6 +99,13 @@ inline void xptts2(int N, int NRHS, const real* D, const real* E, real* B, int L
     LAPACK(ptts2)(&N, &NRHS, D, E, B, &LDB);
 }
 
+inline void xptts2(int N, const real* D, const real* E, real* B)
+{
+    int NRHS = 1;
+    int LDB = 1;
+    LAPACK(ptts2)(&N, &NRHS, D, E, B, &LDB);
+}
+
 inline void xposv(char UPLO, int N, int NRHS, real* A, int LDA, real* B, int LDB, int* INFO)
 {
     LAPACK(posv)(&UPLO, &N, &NRHS, A, &LDA, B, &LDB, INFO);
