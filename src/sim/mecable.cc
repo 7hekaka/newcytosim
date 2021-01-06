@@ -60,7 +60,8 @@ void Mecable::blockSize(size_t bks, size_t block, size_t pivot)
         free_real(pBlock);
         pBlockAlc = static_cast<unsigned>(chunk_real(block));
         assert_true( pBlockAlc == chunk_real(block) );
-        pBlock = new_real(pBlockAlc);
+        // add 4 slots to allow for some SIMD instruction burr:
+        pBlock = new_real(pBlockAlc+4);
         //zero_real(pBlockAlc, pBlock);
         //std::clog << reference() << " allocateBlock " << bks << " " << pBlockAlc << "\n";
     }
