@@ -115,7 +115,7 @@ inline static vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _
 typedef __m256 vec8f;
 
 inline static vec8f setzero8f()                   { return _mm256_setzero_ps(); }
-inline static vec8f set8f(float const& a)         { return _mm256_set1_ps(a); }
+inline static vec8f set8f(float a)                { return _mm256_set1_ps(a); }
 inline static vec8f load8f(float const* a)        { return _mm256_load_ps(a); }
 inline static vec8f loadu8f(float const* a)       { return _mm256_loadu_ps(a); }
 
@@ -139,8 +139,6 @@ inline static vec8f abs8f(vec8f a)                { return _mm256_andnot_ps(_mm2
 
 /// approximate inverse: 1/a
 inline static vec8f rcp8f(vec8f a)                { return _mm256_rcp_ps(a); }
-/// approximate reciprocal square root: 1 / sqrt(a)
-inline static vec8f rsqrt8f(vec8f a)              { return _mm256_rsqrt_ps(a); }
 
 inline static vec4f getlo4f(vec8f a)              { return _mm256_castps256_ps128(a); }
 inline static vec4f gethi4f(vec8f a)              { return _mm256_extractf128_ps(a,1); }
@@ -157,6 +155,25 @@ inline static vec8f sign_select(vec8f val, vec8f neg, vec8f pos)
     return _mm256_mask_mov_ps(pos, val, neg);
 #else
     return _mm256_blendv_ps(pos, neg, val);
+#endif
+}
+
+/// approximate reciprocal square root: 1 / sqrt(a)
+inline static vec8f rsqrt1f(vec8f a) { return _mm256_rsqrt_ps(a); }
+
+/// approximate reciprocal square root : 1 / sqrt(x) for 8 floats
+inline static vec8f rsqrt8f(vec8f x)
+{
+    vec8f h = _mm256_mul_ps(x, _mm256_set1_ps(0.5f));
+    x = _mm256_rsqrt_ps(x);
+    // refinement: u  <-  1.5 * u - 0.5 * x * u^3
+    vec8f t1 = _mm256_mul_ps(x, x);
+    vec8f t2 = _mm256_mul_ps(h, x);
+    vec8f t3 = _mm256_mul_ps(_mm256_set1_ps(1.5f), x);
+#if defined(__FMA__)
+    return _mm256fnmadd_ps(t1, t2, t3);
+#else
+    return _mm256_sub_ps(t3, _mm256_mul_ps(t1, t2));
 #endif
 }
 

@@ -27,10 +27,11 @@ const size_t NVAL = DIM * ( NSEG + 1 );
 template < void (*FUNC)(int, real const*, real*) >
 void check(int N, real const* S, real const* AB, real* B, char const str[], size_t cnt)
 {
-    const size_t SUB = 1024;
+    const size_t SUB = 128;
     copy_real(NVAL, S, B);
     FUNC(N, AB, B);
-    VecPrint::print(std::clog, std::min(16,N), B, 3);
+    VecPrint::print(std::cout, std::min(16,N), B, 3);
+    printf("  nrm %7.3f ", blas::nrm8(N, B));
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -121,12 +122,13 @@ void testISO(size_t cnt)
 
     zero_real(NSEG*LDAB, AB);
     for ( size_t i = 0; i < NVAL; ++i )
-        S[i] = RNG.sreal();
+        S[i] = 1.0 + RNG.sreal();
     for ( size_t i = 0; i < NSEG; ++i )
     {
-        AB[  LDAB*i] = 2.0;
-        AB[1+LDAB*i] = RNG.sreal();
-        AB[2+LDAB*i] = 0.125;
+        real r = 0.0625 * RNG.sreal();
+        AB[  LDAB*i] = 1.5;
+        AB[1+LDAB*i] = -0.125 + r;
+        AB[2+LDAB*i] = -0.125 - r;
     }
     int info;
     alsatian_xpbtf2L<2>(NSEG, AB, LDAB, &info);
@@ -191,9 +193,10 @@ void testPOTRS(size_t cnt)
     zero_real(NSEG*NSEG, AB);
     for ( size_t i = 0; i < NSEG; ++i )
     {
-        AB[i+NSEG*i] = 2.0;
-        AB[i+1+NSEG*i] = 0.5;
-        AB[i+2+NSEG*i] = RNG.sreal();
+        real r = 0.0625 * RNG.sreal();
+        AB[i+NSEG*i] = 1.5;
+        AB[i+1+NSEG*i] = -0.125 + r;
+        AB[i+2+NSEG*i] = -0.125 - r;
     }
     int info;
     alsatian_xpotf2L(NSEG, AB, NSEG, &info);
@@ -209,8 +212,8 @@ void testPOTRS(size_t cnt)
 
 //------------------------------------------------------------------------------
 
-constexpr size_t BAND_LDD = 2*DIM+1;
 constexpr size_t BAND_NUD = 2*DIM;
+constexpr size_t BAND_LDD = 2*DIM+1;
 
 void uni0(int N, real const* AB, real* B)
 {
@@ -329,12 +332,19 @@ void test(size_t cnt)
     zero_real(NVAL*BAND_LDD, AB);
     for ( size_t i = 0; i < NVAL; ++i )
     {
-        AB[BAND_LDD*i] = 2.0; //diagonal term
+        real s = 0, r = 0.0625 * RNG.sreal();
         for ( size_t j = 1; j < BAND_LDD; ++j )
-            AB[j+BAND_LDD*i] = RNG.sreal() / (1<<j);
+        {
+            real x = -0.0625;
+            AB[j+BAND_LDD*i] = x;
+            s += x;
+        }
+        AB[  BAND_LDD*i] = 1.0 - 2*s; //diagonal term
+        AB[1+BAND_LDD*i] += r;
+        AB[2+BAND_LDD*i] -= r;
     }
     int info;
-    alsatian_xpbtf2L<2>(NVAL, AB, BAND_LDD, &info);
+    alsatian_xpbtf2L<BAND_NUD>(NVAL, AB, BAND_LDD, &info);
     
     //check<uni0>(NVAL, S, AB, B, "blas::", cnt);
     check<uni1>(NVAL, S, AB, B, "blas_tbsv", cnt);
@@ -366,7 +376,7 @@ void test(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    testISO(1<<6);
-    testPOTRS(1<<4);
-    test(1<<6);
+    testISO(1<<9);
+    testPOTRS(1<<7);
+    test(1<<9);
 }

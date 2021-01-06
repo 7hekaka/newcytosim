@@ -108,7 +108,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
     assert_true( lda >= N );
     for (int j = 0; j < N; ++j)
     {
-        if (X[j] != 0.)
+        if ( X[j] != 0 )
         {
             const real * pA = A + j * lda;
             if ( diag == 'N' ) X[j] /= pA[0];
@@ -270,12 +270,9 @@ void blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
 {
     for ( int J = 0; J < N; ++J )
     {
-        if ( X[J] != 0 )
-        {
-            real tmp = ALPHA * X[J];
-            for ( int I = J; I < N; ++I )
-                A[I] = A[I] + X[I] * tmp;
-        }
+        real tmp = ALPHA * X[J];
+        for ( int I = J; I < N; ++I )
+            A[I] += X[I] * tmp;
         A += LDA;
     }
 }
@@ -286,39 +283,46 @@ void blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
  and then *** inverts *** the diagonal terms
  
  SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
- 
- int KLD = std::max(1, LDAB-1);
- //Compute the Cholesky factorization A = L*L**T.
- for ( int J = 0; J < N; ++J )
- {
-     //Compute L(J,J) and test for non-positive-definiteness.
-     real dia = AB[0];
-     if ( dia <= 0 )
-     {
-         *INFO = J;
-         return;
-     }
-     dia = 1.0 / std::sqrt(dia);
-     AB[0] = dia;
-     // Compute elements J+1:J+KN of column J
-     int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
-     // scale off diagonal terms in column:
-     for ( int K = 1; K <= KN; ++K )
-         AB[K] *= dia;
-     // update the trailing submatrix within the band.
-     real* A = AB + LDAB; // next column of AB
-     real const* X = AB + 1;
-     for ( int K = 0; K < KN; ++K )
-     {
-         real tmp = X[K];
-         for ( int I = K; I < KN; ++I )
-             A[I] -= X[I] * tmp;
-         A += KLD;
-     }
-     AB += LDAB;
- }
 */
+void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* INFO)
+{
+    int KLD = std::max(1, LDAB-1);
+    //Compute the Cholesky factorization A = L*L**T.
+    for ( int J = 0; J < N; ++J )
+    {
+        //Compute L(J,J) and test for non-positive-definiteness.
+        real dia = AB[0];
+        if ( dia <= 0 )
+        {
+            *INFO = J;
+            return;
+        }
+        dia = real(1) / std::sqrt(dia);
+        AB[0] = dia;
+        // Compute elements J+1:J+KN of column J
+        int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
+        // scale off diagonal terms in column:
+        for ( int K = 1; K <= KN; ++K )
+            AB[K] *= dia;
+        // update the trailing submatrix within the band.
+        real* A = AB + LDAB; // next column of AB
+        for ( int K = 0; K < KN; ++K )
+        {
+            real tmp = AB[K+1];
+            for ( int I = K; I < KN; ++I )
+                A[I] -= AB[I+1] * tmp;
+            A += KLD;
+        }
+        AB += LDAB;
+    }
+}
 
+/**
+ This calls the standard lapack::pbtf2()
+ and then *** inverts *** the diagonal terms
+ 
+ SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
+*/
 template < int KD >
 void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
 {
@@ -343,22 +347,22 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
             *INFO = J;
             return;
         }
-        dia = real(1) / std::sqrt(dia); // inverse the diagonal term!!!
+        /* In the Alsatian version of the factorization, we invert
+         the diagonal term, such that only multiplications are needed
+         for applying the factorization to a vector. */
+        dia = std::sqrt(dia) * (real(1) / dia);
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
+        for ( int K = 1; K <= KD; ++K )
+            AB[K] *= dia;
+        real* nA = AB + LDAB; // next column of AB
+        for ( int K = 0; K < KD; ++K )
         {
-            for ( int K = 1; K <= KD; ++K )
-                AB[K] *= dia;
-            real* A = AB + LDAB; // next column of AB
-            real const* X = AB + 1;
-            for ( int K = 0; K < KD; ++K )
-            {
-                real tmp = X[K];
-                for ( int I = K; I < KD; ++I )
-                    A[I] -= X[I] * tmp;
-                A += KLD;
-            }
+            real tmp = AB[K+1];
+            for ( int I = K; I < KD; ++I )
+                nA[I] -= AB[I+1] * tmp;
+            nA += KLD;
         }
         AB += LDAB;
     }
@@ -372,23 +376,23 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
             *INFO = J;
             return;
         }
-        dia = real(1) / std::sqrt(dia);
+        /* In the Alsatian version of the factorization, we invert
+         the diagonal term, such that only multiplications are needed
+         for applying the factorization to a vector. */
+        dia = std::sqrt(dia) * (real(1) / dia);
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
         int KN = std::min(KD, N-1-J); // always N-1-J
+        for ( int K = 1; K <= KN; ++K )
+            AB[K] *= dia;
+        real* nA = AB + LDAB; // next column of AB
+        for ( int K = 0; K < KN; ++K )
         {
-            for ( int K = 1; K <= KN; ++K )
-                AB[K] *= dia;
-            real* A = AB + LDAB; // next column of AB
-            real const* X = AB + 1;
-            for ( int K = 0; K < KN; ++K )
-            {
-                real tmp = X[K];
-                for ( int I = K; I < KN; ++I )
-                    A[I] -= X[I] * tmp;
-                A += KLD;
-            }
+            real tmp = AB[K+1];
+            for ( int I = K; I < KN; ++I )
+                nA[I] -= AB[I+1] * tmp;
+            nA += KLD;
         }
         AB += LDAB;
     }
@@ -1387,9 +1391,9 @@ inline void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
     printf("\n");
     free_real(tmp);
-//#elif REAL_IS_DOUBLE && ( DIM == 3 )
-//    alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
-//    alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
+#elif REAL_IS_DOUBLE && ( DIM == 3 )
+    alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
+    alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
 #else
     alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
     alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
