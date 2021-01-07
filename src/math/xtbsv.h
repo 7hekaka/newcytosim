@@ -604,12 +604,6 @@ inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* 
     for ( int j = nkd-1; j >= 0; --j )
     {
         /*
-        real tmp = A[6] * buf[5] + A[3] * buf[2];
-        real b = A[5] * buf[4] + A[2] * buf[1];
-        real c = A[4] * buf[3] + A[1] * buf[0];
-        tmp = ( X[0] - tmp ) - ( b + c );
-        */
-        /*
         for ( int i = 1; i <= KD; ++i )
             tmp -= A[i] * buf[i-1];
          */
@@ -632,85 +626,206 @@ inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* 
 //------------------------------------------------------------------------------
 #pragma mark - SSE versions for KD = 6
 
+#include "../iacaMarks.h"
+
 #if defined(__SSE__)
-inline void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* X)
+/**
+ Attention: this works assuming that N > KD, and it will in particular write
+ to X[i] for i = 0 ... 6 for any value of N.
+ 
+ This is a direct translation of the C-code above, but there is a dependency
+ chain of 3 multiplications at each iteration, which is limiting throughput
+ */
+void alsatian_xtbsvLNN6SSEfac(const int N, const double* A, const int lda, double* X)
 {
     constexpr int KD = 6;
+    assert_true( N > KD );
     assert_true( lda > KD );
-    const int nkd = std::max(0, N-KD);
-    vec2 x0, x2, x4;
-    if ( 0 < N )
-    {
-        // 'general case' with j = 0, initializing buf[]
-        vec2 tt = mul2(loaddup2(A), loaddup2(X));
-        store1(X, tt); // X[0] = t;
-        //for ( int i = 1; i <= KD; ++i ) buf[i-1] = X[i] - t * A[i];
-        x0 = fnmadd2(tt, loadu2(A+1), loadu2(X+1));
-        x2 = fnmadd2(tt, loadu2(A+3), loadu2(X+3));
-        x4 = fnmadd2(tt, loadu2(A+5), loadu2(X+5));
-        A += lda;
-        X += 1;
-    }
+    const double * end = X + N - KD;
+    vec2 x0, x2, x4, t, tt;
+    // j = 0, initializing buf[]
+    t = mul1(load1(A), load1(X));
+    store1(X, t); // X[0] = t;
+    tt = unpacklo2(t, t);
+    //for ( int i = 1; i <= KD; ++i ) buf[i-1] = X[i] - t * A[i];
+    x0 = fnmadd2(tt, loadu2(A+1), loadu2(X+1));
+    x2 = fnmadd2(tt, loadu2(A+3), loadu2(X+3));
+    x4 = fnmadd2(tt, loadu2(A+5), loadu2(X+5));
+    A += lda;
+    X += 1;
     // general case:
-    for ( int j = 1; j < nkd; ++j )
+    for ( ; X < end; ++X ) //for ( int j = 1; j < nkd; ++j )
     {
-        vec2 tt = mul2(loaddup2(A), unpacklo2(x0, x0)); // t = buf[0] * A[0];
-        store1(X, tt); //X[0] = t;
-        //for ( int i = 1; i < KD; ++i ) buf[i-1] = buf[i];
-        //buf[KD-1] = X[KD];
-        //for ( int i = 0; i < KD; ++i ) buf[i] = buf[i] - t * A[i];
+        /*
+         t = buf[0] * A[0];
+         X[0] = t;
+         for ( int i = 1; i < KD; ++i ) buf[i-1] = buf[i];
+         buf[KD-1] = X[KD];
+         for ( int i = 0; i < KD; ++i ) buf[i] = buf[i] - t * A[i];
+        */
+        t = mul1(load1(A), x0);
+        store1(X, t);
         x0 = shuffle2(x0, x2, 0b01);
         x2 = shuffle2(x2, x4, 0b01);
         x4 = shuffle2(x4, load1(X+KD), 0b01);
+        tt = unpacklo2(t, t);
         x0 = fnmadd2(tt, loadu2(A+1), x0);
         x2 = fnmadd2(tt, loadu2(A+3), x2);
         x4 = fnmadd2(tt, loadu2(A+5), x4);
         A += lda;
-        X += 1;
     }
-    // process 2 truncated cases:
-    for ( int j = nkd; j < N-4; ++j )
+    // process truncated case: j = N-6
+    t = mul1(load1(A), x0);
+    store1(X, t);
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = shuffle2(x2, x4, 0b01);
+    x4 = unpackhi2(x4, setzero2());
+    tt = unpacklo2(t, t);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = fnmadd2(tt, loadu2(A+3), x2);
+    x4 = fnmadd1(tt, load1(A+5), x4);
+    A += lda;
+    // process truncated case: j = N-5
+    t = mul1(load1(A), x0);
+    store1(X+1, t);
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = shuffle2(x2, x4, 0b01);
+    x4 = setzero2();
+    tt = unpacklo2(t, t);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = fnmadd2(tt, loadu2(A+3), x2);
+    A += lda;
+    // process truncated case: j = N-4
+    t = mul1(load1(A), x0);
+    store1(X+2, t);
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = unpackhi2(x2, setzero2());
+    tt = unpacklo2(t, t);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = fnmadd1(tt, load1(A+3), x2);
+    A += lda;
+    // process truncated case: j = N-3
+    t = mul1(load1(A), x0);
+    store1(X+3, t);
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = unpackhi2(x2, setzero2());
+    tt = unpacklo2(t, t);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = setzero2();
+    A += lda;
+    // process last two cases:
+    t = mul1(load1(A), x0);
+    if ( N <= KD ) {
+        store1(X, t);
+        return;
+    }
+    x0 = unpackhi2(x0, x0);
+    x0 = fnmadd1(t, load1(A+1), x0);
+    x0 = mul1(load1(A+lda), x0);
+    storeu2(X+4, unpacklo2(t, x0));
+}
+
+
+/**
+Attention: this works assuming that N > KD, and it will in particular write
+to X[i] for i = 0 ... 6 for any value of N.
+*/
+void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* X)
+{
+    constexpr int KD = 6;
+    assert_true( lda > KD );
+    assert_true( N > KD );
+    const double * end = X + N - KD;
+    vec2 x0, x2, x4, aa, tt;
+    // first iteration with j = 0
+    aa = loaddup2(A);
+    tt = loaddup2(X);
+    store1(X, mul1(aa, tt));
+    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), loadu2(X+1));
+    x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), loadu2(X+3));
+    x4 = fnmadd2(tt, mul2(aa, loadu2(A+5)), loadu2(X+5)); // may load garbage if N <= KD
+    A += lda;
+    X += 1;
+    // general case:
+    for ( ; X < end; ++X ) //for ( int j = 1; j < nkd; ++j )
     {
-        vec2 tt = mul2(loaddup2(A), unpacklo2(x0, x0));
-        store1(X, tt);
+        /*
+         X[0] = buf[0] * A[0];
+         buf[0] = buf[1] - buf[0] * (A[0] * A[1]);
+         buf[1] = buf[2] - buf[0] * (A[0] * A[2]);
+         buf[2] = buf[3] - buf[0] * (A[0] * A[3]);
+         buf[3] = buf[4] - buf[0] * (A[0] * A[4]);
+         buf[4] = buf[5] - buf[0] * (A[0] * A[5]);
+         buf[5] =  X[KD] - buf[0] * (A[0] * A[6]);
+        */
+        aa = loaddup2(A);
+        tt = unpacklo2(x0, x0);
+        store1(X, mul1(aa, x0));
         x0 = shuffle2(x0, x2, 0b01);
         x2 = shuffle2(x2, x4, 0b01);
-        x4 = unpackhi2(x4, setzero2());
-        x0 = fnmadd2(tt, loadu2(A+1), x0);
-        x2 = fnmadd2(tt, loadu2(A+3), x2);
-        x4 = fnmadd2(tt, loadu2(A+5), x4);
+        x4 = shuffle2(x4, load1(X+KD), 0b01);
+        x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
+        x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
+        x4 = fnmadd2(tt, mul2(aa, loadu2(A+5)), x4);
         A += lda;
-        X += 1;
     }
-    // process 2 truncated cases:
-    for ( int j = nkd+2; j < N-2; ++j )
-    {
-        vec2 tt = mul2(loaddup2(A), unpacklo2(x0, x0));
-        store1(X, tt);
-        x0 = shuffle2(x0, x2, 0b01);
-        x2 = unpackhi2(x2, setzero2());
-        x0 = fnmadd2(tt, loadu2(A+1), x0);
-        x2 = fnmadd2(tt, loadu2(A+3), x2);
-        A += lda;
-        X += 1;
+    // process truncated case: j = N - KD
+    aa = loaddup2(A);
+    tt = unpacklo2(x0, x0);
+    vec2 yy = mul1(aa, x0);
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = shuffle2(x2, x4, 0b01);
+    x4 = unpackhi2(x4, setzero2());
+    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
+    x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
+    x4 = fnmadd1(tt, mul1(aa, load1(A+5)), x4);
+    A += lda;
+    // process truncated case: j = N - 5
+    aa = loaddup2(A);
+    tt = unpacklo2(x0, x0);
+    storeu2(X, unpacklo2(yy, mul1(aa, x0)));
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = shuffle2(x2, x4, 0b01);
+    x4 = setzero2();
+    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
+    x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
+    A += lda;
+    // process truncated case: j = N - 4
+    aa = loaddup2(A);
+    tt = unpacklo2(x0, x0);
+    yy = mul1(aa, x0);
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = shuffle2(x2, setzero2(), 0b01);
+    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
+    x2 = fnmadd1(tt, mul1(aa, load1(A+3)), x2);
+    A += lda;
+    // process truncated case: j = N - 3
+    aa = loaddup2(A);
+    tt = unpacklo2(x0, x0);
+    storeu2(X+2, unpacklo2(yy, mul1(aa, x0)));
+    x0 = shuffle2(x0, x2, 0b01);
+    x2 = setzero2();
+    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
+    A += lda;
+    // process last two cases
+    aa = loaddup2(A);
+    tt = x0;
+    yy = mul1(aa, x0);
+    if ( N <= KD ) {
+        store1(X, yy);
+        return;
     }
-    // process 2 truncated cases:
-    if ( nkd+4 < N )
-    {
-        vec2 tt = mul1(load1(A), x0);
-        store1(X, tt);
-        x0 = unpackhi2(x0, setzero2());
-        x0 = fnmadd2(tt, load1(A+1), x0);
-        A += lda;
-        X += 1;
-        store1(X, mul1(load1(A), x0));
-    }
+    x0 = unpackhi2(x0, x0);
+    x0 = fnmadd1(tt, mul1(aa, load1(A+1)), x0);
+    x0 = mul1(load1(A+lda), x0);
+    storeu2(X+4, unpacklo2(yy, x0));
 }
 
 
 /// Specialized version for KD==6
-inline void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
+void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
 {
+    const double * end = X;
     constexpr int KD = 6;
     assert_true( lda > KD );
     const int nkd = std::max(0, N-KD);
@@ -730,8 +845,20 @@ inline void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, d
     vec2 x2 = loadu2(X+3);
     vec2 x4 = loadu2(X+5);
     // general case, downward!
-    for ( int j = nkd-1; j >= 0; --j )
+    for ( ; X >= end; --X ) //for ( int j = nkd-1; j >= 0; --j )
     {
+        /*
+         real tmp = X[0] - A[6] * buf[5];
+         tmp -= A[5] * buf[4];
+         tmp -= A[4] * buf[3];
+         tmp -= A[3] * buf[2];
+         tmp -= A[2] * buf[1];
+         tmp -= A[1] * buf[0];
+         for ( int i = KD-1; i > 0; --i )
+             buf[i] = buf[i-1];
+         buf[0] = A[0] * tmp;
+         X[0] = buf[0];
+         */
         vec2 tt = fnmadd2(x4, loadu2(A+5), load1(X));
         tt = fnmadd2(x2, loadu2(A+3), tt);
         tt = fnmadd2(x0, loadu2(A+1), tt);
@@ -741,7 +868,6 @@ inline void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, d
         x0 = unpacklo2(tt, x0);
         store1(X, tt);
         A -= lda;
-        X -= 1;
     }
 }
 #endif
@@ -1262,7 +1388,7 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
 #pragma mark - LAPACK-STYLE DPBTRS
 
 
-inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, int LDAB, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
@@ -1287,7 +1413,7 @@ inline void lapack_xpbtrs(char UPLO, int N, int KD, int NRHS, real const* AB, in
 
 
 template < int ORD >
-inline void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int LDB, int* INFO)
+void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
@@ -1312,7 +1438,7 @@ inline void iso_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real*
 
 
 template < int ORD >
-inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int, int* INFO)
+void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, real* B, int, int* INFO)
 {
     *INFO = 0;
     if ( UPLO == 'U' )
@@ -1332,7 +1458,7 @@ inline void alsatian_xpbtrs(char UPLO, int N, int KD, real const* AB, int LDAB, 
 
 
 template < int ORD >
-inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
+void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 {
 #if defined(__AVX__) && REAL_IS_DOUBLE
     /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
@@ -1373,7 +1499,7 @@ inline void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 #include "vecprint.h"
 
 template < int KD >
-inline void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
+void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
 {
 #if 0
     int S = std::min(N, 16);
@@ -1391,12 +1517,17 @@ inline void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
     printf("\n");
     free_real(tmp);
-#elif REAL_IS_DOUBLE && ( DIM == 3 )
-    alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
-    alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
 #else
-    alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
-    alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
+    if ( KD == 6 )
+    {
+        alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
+        alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
+    }
+    else
+    {
+        alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
+        alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
+    }
 #endif
 }
 

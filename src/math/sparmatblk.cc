@@ -700,7 +700,6 @@ vec2 SparMatBlk::Line::vecMul2DU(const real* X) const
         assert_true( inx[0] < inx[1] );
         assert_true( inx[1] < inx[2] );
         assert_true( inx[2] < inx[3] );
-        //IACA_START
         vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
         vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
         vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
@@ -722,7 +721,6 @@ vec2 SparMatBlk::Line::vecMul2DU(const real* X) const
         vv = fmadd4(streamload4(M+12), permute4(xy3, 0b1100), vv);
 #endif
     }
-    //IACA_END
     ss = add4(add4(ss, tt), add4(uu, vv));
     end = sbk_[size_];
     #pragma nounroll

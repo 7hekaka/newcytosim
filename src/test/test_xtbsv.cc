@@ -20,17 +20,44 @@ using namespace TicToc;
 #define DIM 3
 
 /// number of segments:
-const size_t NSEG = 121;
-const size_t NVAL = DIM * ( NSEG + 1 );
+constexpr size_t NSEG = 121;
+constexpr size_t NVAL = DIM * ( NSEG + 1 );
 
+constexpr size_t BAND_NUD = 2*DIM;
+constexpr size_t BAND_LDD = 2*DIM+1;
+
+
+/// print only 16 scalars from given vector
+inline void print(size_t n, real const* vec)
+{
+    if ( n > 16 )
+    {
+        VecPrint::print(std::cout, 8, vec, 3);
+        VecPrint::print(std::cout, 8, vec+n-8, 3);
+    }
+    else
+    {
+        VecPrint::print(std::cout, n, vec, 3);
+        fprintf(stdout, " |");
+        VecPrint::print(std::cout, 2, vec+n, 3);
+    }
+}
+
+void nan_spill(size_t N, real * dst)
+{
+    real n = std::numeric_limits<real>::signaling_NaN();
+    for ( size_t i = 0; i < 4; ++i )
+        dst[N+i] = n;
+}
 
 template < void (*FUNC)(int, real const*, real*) >
 void check(int N, real const* S, real const* AB, real* B, char const str[], size_t cnt)
 {
     const size_t SUB = 128;
-    copy_real(NVAL, S, B);
+    copy_real(N, S, B);
+    nan_spill(NVAL, B);
     FUNC(N, AB, B);
-    VecPrint::print(std::cout, std::min(16,N), B, 3);
+    print(N, B);
     printf("  nrm %7.3f ", blas::nrm8(N, B));
     tic();
     for ( size_t n = 0; n < cnt; ++n )
@@ -116,11 +143,12 @@ void testISO(size_t cnt)
     std::cout << "isoTBSV " << NSEG << " segments --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NSEG*LDAB);
+    real * AB = new_real(NSEG*LDAB+4);
     real * S = new_real(NVAL);
-    real * B = new_real(NVAL);
+    real * B = new_real(NVAL+4);
 
     zero_real(NSEG*LDAB, AB);
+    nan_spill(NSEG*LDAB, AB);
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = 1.0 + RNG.sreal();
     for ( size_t i = 0; i < NSEG; ++i )
@@ -184,13 +212,14 @@ void testPOTRS(size_t cnt)
     std::cout << "xTBSVLN " << NSEG << " segments --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NSEG*NSEG);
+    real * AB = new_real(NSEG*NSEG+4);
     real * S = new_real(NVAL);
-    real * B = new_real(NVAL);
+    real * B = new_real(NVAL+4);
 
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = RNG.sreal();
     zero_real(NSEG*NSEG, AB);
+    nan_spill(NSEG*NSEG, AB);
     for ( size_t i = 0; i < NSEG; ++i )
     {
         real r = 0.0625 * RNG.sreal();
@@ -211,9 +240,6 @@ void testPOTRS(size_t cnt)
 }
 
 //------------------------------------------------------------------------------
-
-constexpr size_t BAND_NUD = 2*DIM;
-constexpr size_t BAND_LDD = 2*DIM+1;
 
 void uni0(int N, real const* AB, real* B)
 {
@@ -278,7 +304,16 @@ void uniLN3(int N, real const* AB, real* B)
 
 void uniLN4(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__SSE__)
+    alsatian_xtbsvLNN6SSEfac(N, AB, BAND_LDD, B);
+#else
+    zero_real(N, B);
+#endif
+}
+
+void uniLN5(int N, real const* AB, real* B)
+{
+#if REAL_IS_DOUBLE && defined(__SSE__)
     alsatian_xtbsvLNN6SSE(N, AB, BAND_LDD, B);
 #else
     zero_real(N, B);
@@ -336,13 +371,14 @@ void test(size_t cnt)
     std::cout << "xTBSV " << NSEG << " segments --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NVAL*std::max(NVAL, BAND_LDD));
+    real * AB = new_real(NVAL*std::max(NVAL, BAND_LDD)+4);
     real * S = new_real(NVAL);
-    real * B = new_real(NVAL);
+    real * B = new_real(NVAL+4);
 
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = RNG.sreal();
     zero_real(NVAL*BAND_LDD, AB);
+    nan_spill(NSEG*BAND_LDD, AB);
     for ( size_t i = 0; i < NVAL; ++i )
     {
         real s = 0, r = 0.0625 * RNG.sreal();
@@ -371,7 +407,8 @@ void test(size_t cnt)
     check<uniLN0>(NVAL, S, AB, B, "blas_xtbsvLN", cnt);
     check<uniLN1>(NVAL, S, AB, B, "tbsvLNN", cnt);
     check<uniLN2>(NVAL, S, AB, B, "LNNK<KD>", cnt);
-    check<uniLN4>(NVAL, S, AB, B, "LNN6SSE", cnt);
+    check<uniLN4>(NVAL, S, AB, B, "LNN6SSEfac", cnt);
+    check<uniLN5>(NVAL, S, AB, B, "LNN6SSE", cnt);
 
     std::cout << "xTBSVLT ---\n";
 

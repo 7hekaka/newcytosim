@@ -23,7 +23,7 @@ inline static vec2 load2(double const* a)           { return _mm_load_pd(a); }
 inline static vec2 loadu2(double const* a)          { return _mm_loadu_pd(a); }
 
 // load 1 double and duplicate
-inline static vec2 loaddup2(double const* a)        { return _mm_load1_pd(a); }
+inline static vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); }
 
 inline static vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
 inline static vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
