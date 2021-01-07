@@ -626,8 +626,6 @@ inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* 
 //------------------------------------------------------------------------------
 #pragma mark - SSE versions for KD = 6
 
-#include "../iacaMarks.h"
-
 #if defined(__SSE__)
 /**
  Attention: this works assuming that N > KD, and it will in particular write
@@ -636,7 +634,7 @@ inline void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* 
  This is a direct translation of the C-code above, but there is a dependency
  chain of 3 multiplications at each iteration, which is limiting throughput
  */
-void alsatian_xtbsvLNN6SSEfac(const int N, const double* A, const int lda, double* X)
+void alsatian_xtbsvLNN6SSEone(const int N, const double* A, const int lda, double* X)
 {
     constexpr int KD = 6;
     assert_true( N > KD );
@@ -750,6 +748,7 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     for ( ; X < end; ++X ) //for ( int j = 1; j < nkd; ++j )
     {
         /*
+         By expanding the multiplication, we reduce the dependency chain...
          X[0] = buf[0] * A[0];
          buf[0] = buf[1] - buf[0] * (A[0] * A[1]);
          buf[1] = buf[2] - buf[0] * (A[0] * A[2]);
@@ -820,26 +819,31 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     x0 = mul1(load1(A+lda), x0);
     storeu2(X+4, unpacklo2(yy, x0));
 }
+#endif
 
+
+#if defined(__SSE__)
 
 /// Specialized version for KD==6
-void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
+void alsatian_xtbsvLTN6SSEone(const int N, const double* A, const int lda, double* X)
 {
     const double * end = X;
     constexpr int KD = 6;
     assert_true( lda > KD );
-    const int nkd = std::max(0, N-KD);
     A += ( N - 1 ) * lda;
     X += N - 1;
     // process KD truncated cases:
-    for ( int j = N-1; j >= nkd; --j )
     {
-        double tmp = X[0];
-        for ( int i = 1; i < N-j; ++i )
-            tmp -= A[i] * X[i];
-        X[0] = A[0] * tmp;
-        A -= lda;
-        X -= 1;
+        const int nkd = std::max(0, N-KD);
+        for ( int j = N-1; j >= nkd; --j )
+        {
+            double tmp = X[0];
+            for ( int i = 1; i < N-j; ++i )
+                tmp -= A[i] * X[i];
+            X[0] = A[0] * tmp;
+            A -= lda;
+            X -= 1;
+        }
     }
     vec2 x0 = loadu2(X+1);
     vec2 x2 = loadu2(X+3);
@@ -865,6 +869,134 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
         tt = mul1(load1(A), add1(tt, swap2(tt)));
         x4 = shuffle2(x2, x4, 0b01);
         x2 = shuffle2(x0, x2, 0b01);
+        x0 = unpacklo2(tt, x0);
+        store1(X, tt);
+        A -= lda;
+    }
+}
+
+/// Specialized version for KD==6
+void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
+{
+    const double * end = X;
+    constexpr int KD = 6;
+    assert_true( lda > KD );
+    A += ( N - 1 ) * lda;
+    X += N - 1;
+    vec2 aa, tt;
+    vec2 x0 = setzero2();
+    vec2 x2 = setzero2();
+    vec2 x4 = setzero2();
+#if 1
+    // truncated round at j = N-1
+    aa = load1(A);
+    tt = mul1(aa, load1Z(X));
+    //x4 = shuffle2(x2, x4, 0b01);
+    //x2 = shuffle2(x0, x2, 0b01);
+    //tt = add1(tt, swap2(tt));
+    x0 = unpacklo2(tt, x0);
+    A -= lda;
+    // truncated round at j = N-2
+    aa = loaddup2(A);
+    tt = mul1(aa, load1(X-1));
+    //x4 = shuffle2(x2, x4, 0b01);
+    //x2 = shuffle2(x0, x2, 0b01);
+    tt = fnmadd1(x0, mul1(aa, load1(A+1)), tt);
+    //tt = add1(tt, swap2(tt));
+    x0 = unpacklo2(tt, x0);
+    storeu2(X-1, x0);
+    A -= lda;
+    // truncated round at j = N-3
+    aa = loaddup2(A);
+    tt = mul2(aa, load1Z(X-2));
+    //x4 = shuffle2(x2, x4, 0b01);
+    x2 = shuffle2(x0, x2, 0b01);
+    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
+    tt = add1(tt, swap2(tt));
+    x0 = unpacklo2(tt, x0);
+    A -= lda;
+    // truncated round at j = N-4
+    aa = loaddup2(A);
+    tt = mul2(aa, load1Z(X-3));
+    tt = fnmadd2(x2, mul2(aa, load1Z(A+3)), tt);
+    //x4 = shuffle2(x2, x4, 0b01);
+    x2 = shuffle2(x0, x2, 0b01);
+    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
+    tt = add1(tt, swap2(tt));
+    x0 = unpacklo2(tt, x0);
+    storeu2(X-3, x0);
+    A -= lda;
+    // truncated round at j = N-5
+    aa = loaddup2(A);
+    tt = mul2(aa, load1Z(X-4));
+    tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
+    x4 = shuffle2(x2, x4, 0b01);
+    x2 = shuffle2(x0, x2, 0b01);
+    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
+    tt = add1(tt, swap2(tt));
+    x0 = unpacklo2(tt, x0);
+    A -= lda;
+    // truncated round at j = N-6
+    aa = loaddup2(A);
+    tt = mul2(aa, fnmadd2(x4, load1Z(A+5), load1Z(X-5)));
+    tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
+    x4 = shuffle2(x2, x4, 0b01);
+    x2 = shuffle2(x0, x2, 0b01);
+    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
+    tt = add1(tt, swap2(tt));
+    x0 = unpacklo2(tt, x0);
+    storeu2(X-5, x0);
+    A -= lda;
+    X -= 6;
+#endif
+#if 0
+    // unrolling does not seem to help here...
+    for ( ; X > end; X -= 2 )
+    {
+        const double* B = A - lda;
+        aa = loaddup2(A);
+        tt = mul2(aa, fnmadd2(x4, loadu2(A+5), load1Z(X)));
+        tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
+        tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
+        tt = add1(tt, swap2(tt));
+        vec2 y4 = shuffle2(x2, x4, 0b01);
+        vec2 y2 = shuffle2(x0, x2, 0b01);
+        x4 = x2;
+        x2 = x0;
+        vec2 bb = loaddup2(B);
+        vec2 uu = mul2(bb, fnmadd2(y4, loadu2(B+5), load1Z(X-1)));
+        uu = fnmadd2(y2, mul2(bb, loadu2(B+3)), uu);
+        vec2 y0 = unpacklo2(tt, x0);
+        uu = fnmadd2(y0, mul2(bb, loadu2(B+1)), uu);
+        uu = add1(uu, swap2(uu));
+        x0 = unpacklo2(uu, tt);
+        storeu2(X-1, x0);
+        A -= 2*lda;
+    }
+#endif
+    // general case, downward!
+    for ( ; X >= end; --X ) //for ( int j = nkd-1; j >= 0; --j )
+    {
+        /*
+         // distributing the multiplication to reduce the dependency chain...
+         real tmp = A[0] * ( X[0] - A[6] * buf[5] );
+         tmp -= A[0] * ( A[5] * buf[4] );
+         tmp -= (A[0] * A[4]) * buf[3];
+         tmp -= (A[0] * A[3]) * buf[2];
+         tmp -= (A[0] * A[2]) * buf[1];
+         tmp -= (A[0] * A[1]) * buf[0];
+         for ( int i = KD-1; i > 0; --i )
+             buf[i] = buf[i-1];
+         buf[0] = tmp;
+         X[0] = buf[0];
+         */
+        aa = loaddup2(A);
+        tt = mul2(aa, fnmadd2(x4, loadu2(A+5), load1Z(X)));
+        tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
+        x4 = shuffle2(x2, x4, 0b01);
+        x2 = shuffle2(x0, x2, 0b01);
+        tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
+        tt = add1(tt, swap2(tt));
         x0 = unpacklo2(tt, x0);
         store1(X, tt);
         A -= lda;

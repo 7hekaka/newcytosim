@@ -20,7 +20,7 @@ using namespace TicToc;
 #define DIM 3
 
 /// number of segments:
-constexpr size_t NSEG = 121;
+constexpr size_t NSEG = 113;
 constexpr size_t NVAL = DIM * ( NSEG + 1 );
 
 constexpr size_t BAND_NUD = 2*DIM;
@@ -33,13 +33,16 @@ inline void print(size_t n, real const* vec)
     if ( n > 16 )
     {
         VecPrint::print(std::cout, 8, vec, 3);
+        fprintf(stdout, " :");
         VecPrint::print(std::cout, 8, vec+n-8, 3);
+        fprintf(stdout, " |");
+        VecPrint::print(std::cout, 2, vec+n, 1);
     }
     else
     {
         VecPrint::print(std::cout, n, vec, 3);
         fprintf(stdout, " |");
-        VecPrint::print(std::cout, 2, vec+n, 3);
+        VecPrint::print(std::cout, 2, vec+n, 1);
     }
 }
 
@@ -305,7 +308,7 @@ void uniLN3(int N, real const* AB, real* B)
 void uniLN4(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE && defined(__SSE__)
-    alsatian_xtbsvLNN6SSEfac(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLNN6SSEone(N, AB, BAND_LDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -353,6 +356,15 @@ void uniLT3(int N, real const* AB, real* B)
 }
 
 void uniLT4(int N, real const* AB, real* B)
+{
+#if REAL_IS_DOUBLE
+    alsatian_xtbsvLTN6SSEone(N, AB, BAND_LDD, B);
+#else
+    zero_real(N, B);
+#endif
+}
+
+void uniLT5(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE
     alsatian_xtbsvLTN6SSE(N, AB, BAND_LDD, B);
@@ -407,7 +419,7 @@ void test(size_t cnt)
     check<uniLN0>(NVAL, S, AB, B, "blas_xtbsvLN", cnt);
     check<uniLN1>(NVAL, S, AB, B, "tbsvLNN", cnt);
     check<uniLN2>(NVAL, S, AB, B, "LNNK<KD>", cnt);
-    check<uniLN4>(NVAL, S, AB, B, "LNN6SSEfac", cnt);
+    check<uniLN4>(NVAL, S, AB, B, "LNN6SSEone", cnt);
     check<uniLN5>(NVAL, S, AB, B, "LNN6SSE", cnt);
 
     std::cout << "xTBSVLT ---\n";
@@ -417,7 +429,8 @@ void test(size_t cnt)
     check<uniLT1>(NVAL, S, AB, B, "tbsvLTN", cnt);
     check<uniLT2>(NVAL, S, AB, B, "LTNK<KD>", cnt);
     check<uniLT3>(NVAL, S, AB, B, "LTN6", cnt);
-    check<uniLT4>(NVAL, S, AB, B, "LTN6SSE", cnt);
+    check<uniLT4>(NVAL, S, AB, B, "LTN6SSEone", cnt);
+    check<uniLT5>(NVAL, S, AB, B, "LTN6SSE", cnt);
 
     free_real(B);
     free_real(S);

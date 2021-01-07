@@ -15,8 +15,11 @@ typedef __m128d vec2;
 
 constexpr __m128d sgn11 = {-0.0, -0.0};
 
-// Attention: load1() and load2() do not initialize the upper AVX registers
+// Attention: the second value returned by load1() is not set and will be garbage!
 inline static vec2 load1(double const* a)           { return _mm_load_sd(a); }
+inline static vec2 load1Z(double const* a)          { return _mm_loadl_pd(_mm_setzero_pd(), a); }
+
+// Attention: load2() do not initialize the upper AVX registers
 inline static vec2 load2(double const* a)           { return _mm_load_pd(a); }
 
 // unaligned load

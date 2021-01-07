@@ -656,7 +656,6 @@ real SparMatBlk::Line::vecMul1D(const real* X) const
 #if MATRIXSB_USES_AVX
 
 #include "simd.h"
-//#include "iacaMarks.h"
 
 #if ( BLOCK_SIZE == 2 )
 vec2 SparMatBlk::Line::vecMul2D(const real* X) const
