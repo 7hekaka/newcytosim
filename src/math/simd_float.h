@@ -177,6 +177,20 @@ inline static vec8f rsqrt8f(vec8f x)
 #endif
 }
 
+// natural logarithm:
+#if defined(__INTEL_COMPILER)
+// using Intel's SVML library, provided by the Intel compiler.
+// Intrinsics for Short Vector Math Library (SVML) Operations
+inline static vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
+inline static vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
+#elif defined(__GLIBC__)
+// using libmvec (https://sourceware.org/glibc/wiki/libmvec)
+__m256d _ZGVdN4v_log(__m256d x);
+__m256 _ZGVdN8v_logf(__m256 x);
+//inline static vec4f log4(vec4f const x) { return _ZGVdN8v_logf(x); }
+inline static vec8f log8f(vec8f const x) { return _ZGVdN8v_logf(x); }
+#endif
+
 #endif  // AVX
 
 #endif // SIMD_FLOAT_H

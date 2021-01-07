@@ -429,7 +429,7 @@ real * gauss_fill_0(real dst[], const int32_t src[], int32_t const*const end)
         real w = x * x + y * y;
         if (( w <= 1 ) & ( 0 < w ))
         {
-            w = std::sqrt( -2 * std::log(w) / w );
+            w = std::sqrt( std::log(w) / ( -0.5 * w ) );
             *dst++ = w * x;
             *dst++ = w * y;
         }
@@ -449,9 +449,9 @@ void print(T const* vec, T const*const end)
 #if ( 1 )
     for ( T const* f = vec; f < end; ++f )
     {
-        for ( int i = 0; i < 8 && f < end; ++i )
-            printf(" %10.6f", *f++);
-            printf("\n");
+        for ( int i = 0; i < 16 && f < end; ++i )
+            printf(" %8.4f", *f++);
+        printf("\n");
     }
 #else
     for ( T const* f = vec; f < end; ++f )
@@ -498,33 +498,31 @@ T * remove_nans(T * s, T * e)
 
  F. Nedelec 02.01.2017
  */
-real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
+real * gauss_fill_AVX(real dst[], const __m256i src[], __m256i* end)
 {
     const vec8f fac = set8f(TWO_POWER_MINUS_31);
     const vec8f two = set8f(-0.5);
 
     real * d = dst;
-    while ( src < src_end )
+    while ( src < end )
     {
         vec8f x = mul8f(fac, cvt8i(load8si(src++)));
         vec8f y = mul8f(fac, cvt8i(load8si(src++)));
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
-        /*
-         The function used to calculate logarithm on SIMD data is part of the
-         Intel SVML library, and is provided by the Intel compiler.
-         */
+        //as there is no intrinsic for logarithm, and this relies on a library
         //w = std::sqrt( -2 * std::log(n) / n );
-        vec8f i = rcp8f(_mm256_log_ps(n));
-        n = rsqrt8f(mul8f(mul8f(two, n), i));
-        // the 16 single-precision values are converted to double-precision:
+        //n = rsqrt8f(div8f(mulf(two, n), log8f(n)));
+        n = rsqrt8f(mul8f(mul8f(two, n), rcp8f(log8f(n))));
         x = mul8f(n, x);
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE
-        store4(d   , cvt4f(getlo4f(x)));
-        store4(d+4 , cvt4f(getlo4f(y)));
-        store4(d+8 , cvt4f(gethi4f(x)));
-        store4(d+12, cvt4f(gethi4f(y)));
+        // convert 16 single-precision values
+        store4(d   , cvt4sd(getlo4f(x)));
+        store4(d+4 , cvt4sd(getlo4f(y)));
+        store4(d+8 , cvt4sd(gethi4f(x)));
+        store4(d+12, cvt4sd(gethi4f(y)));
 #else
+        // store 16 single-precision values
         store8f(d  , x);
         store8f(d+8, y);
 #endif
@@ -538,6 +536,7 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* src_end)
 
 void test_gaussian(int cnt)
 {
+    printf("Gaussian random numbers --- sizeof(real) = %lu\n", sizeof(real));
     int32_t * buf = (int32_t*)RNG.data();
 
     if ( 1 )
@@ -568,7 +567,7 @@ void test_gaussian(int cnt)
         tic();
         for ( int i = 0; i < cnt; ++i )
         {
-            end = gauss_fill(vec, mem, mem+SFMT_N256);
+            end = gauss_fill_AVX(vec, mem, mem+SFMT_N256);
             RNG.refill();
         }
         printf("gauss avx    %5.2f\n", toc(cnt));
