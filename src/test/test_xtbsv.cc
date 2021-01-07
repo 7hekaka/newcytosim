@@ -245,6 +245,12 @@ void uni4(int N, real const* AB, real* B)
     alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
 }
 
+// this gives wrong results
+void uniLNB(int N, real const* AB, real* B)
+{
+    blas::xtbsv('L', 'N', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
+    //blas::xtbsv('L', 'T', 'N', N, BAND_NUD, AB, BAND_LDD, B);
+}
 
 void uniLN0(int N, real const* AB, real* B)
 {
@@ -279,6 +285,13 @@ void uniLN4(int N, real const* AB, real* B)
 #endif
 }
 
+
+// this gives wrong results
+void uniLTB(int N, real const* AB, real* B)
+{
+    //blas::xtbsv('L', 'N', 'N', N, BAND_NUD, AB, BAND_LDD, B);
+    blas::xtbsv('L', 'T', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
+}
 
 void uniLT0(int N, real const* AB, real* B)
 {
@@ -354,6 +367,7 @@ void test(size_t cnt)
 
     std::cout << "xTBSVLN ---\n";
     
+    //check<uniLNB>(NVAL, S, AB, B, "blas::xtbsv", cnt);
     check<uniLN0>(NVAL, S, AB, B, "blas_xtbsvLN", cnt);
     check<uniLN1>(NVAL, S, AB, B, "tbsvLNN", cnt);
     check<uniLN2>(NVAL, S, AB, B, "LNNK<KD>", cnt);
@@ -361,6 +375,7 @@ void test(size_t cnt)
 
     std::cout << "xTBSVLT ---\n";
 
+    //check<uniLTB>(NVAL, S, AB, B, "blas::tbsv", cnt);
     check<uniLT0>(NVAL, S, AB, B, "blas_tbsvLT", cnt);
     check<uniLT1>(NVAL, S, AB, B, "tbsvLTN", cnt);
     check<uniLT2>(NVAL, S, AB, B, "LTNK<KD>", cnt);

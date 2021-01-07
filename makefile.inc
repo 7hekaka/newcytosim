@@ -87,12 +87,15 @@ endif
 ifeq ($(COMPILER),gcc)
 
 # Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2); -march=native
-# You can use g++-9 to support Intel OMP directives
+# You may use g++-10 to support Intel OMP directives
+# To use GCC on OSX, you need to specify the path to header files:
+# export CPATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+
     CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
     FAST     := -O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
     FAST     := -O3 -fno-trapping-math -ffast-math -funroll-loops -ffp-contract=fast -march=native
 
-    DEBUG    := -g3 -ggdb
+    DEBUG    := -g3 -ggdb # -Wconversion
     COVERAGE := -fprofile-arcs -ftest-coverage
     
 else ifeq ($(COMPILER),icc)
@@ -105,7 +108,7 @@ else ifeq ($(COMPILER),icc)
     CXX      := icpc -fargument-noalias -fp-trap=none -wd1224,161,1478
     # Intel advanced instruction sets:
     # '-xHost' to optimize for host machine
-    # '-xAVX' for AVX
+    # '-msse3' for SSE3 or '-xAVX' for AVX
     # '-march=corei7-avx' for AVX
     # '-march=core-avx2' for Intel core i7 (ca. 2015)
     FAST     := -O3 -march=core-avx2
@@ -347,9 +350,6 @@ ifeq ($(HAS_MKL),2)
 
     # sequential static linking (ICC and older GCC):
     MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a
-
-    # sequential static linking (newer GCC):
-    MKLLIB := -Wl,--start-group $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a -Wl,--end-group
 
     # threaded static linking:
     #MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_thread.a $(MKLDIR)/libmkl_core.a /opt/intel/lib/libiomp5.a
