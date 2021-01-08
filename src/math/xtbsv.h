@@ -832,22 +832,9 @@ void alsatian_xtbsvLTN6SSEone(const int N, const double* A, const int lda, doubl
     assert_true( lda > KD );
     A += ( N - 1 ) * lda;
     X += N - 1;
-    // process KD truncated cases:
-    {
-        const int nkd = std::max(0, N-KD);
-        for ( int j = N-1; j >= nkd; --j )
-        {
-            double tmp = X[0];
-            for ( int i = 1; i < N-j; ++i )
-                tmp -= A[i] * X[i];
-            X[0] = A[0] * tmp;
-            A -= lda;
-            X -= 1;
-        }
-    }
-    vec2 x0 = loadu2(X+1);
-    vec2 x2 = loadu2(X+3);
-    vec2 x4 = loadu2(X+5);
+    vec2 x0 = setzero2();
+    vec2 x2 = setzero2();
+    vec2 x4 = setzero2();
     // general case, downward!
     for ( ; X >= end; --X ) //for ( int j = nkd-1; j >= 0; --j )
     {
@@ -879,8 +866,8 @@ void alsatian_xtbsvLTN6SSEone(const int N, const double* A, const int lda, doubl
 void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
 {
     const double * end = X;
-    constexpr int KD = 6;
-    assert_true( lda > KD );
+    //constexpr int KD = 6;
+    assert_true( lda > 6 );
     A += ( N - 1 ) * lda;
     X += N - 1;
     vec2 aa, tt;
@@ -1104,12 +1091,20 @@ void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX
     vec4 a2 = loadu4(pX+ORD); //may load garbage @ pX+7
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
+#if 1
+        // this reduces the dependency path
         vec4 aa = broadcast1(pA);
         //vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
         vec4 a0 = a1;
         a1 = fnmadd4(mul4(aa, broadcast1(pA+1)), a0, a2);  // a2 = loadu4(pX+ORD);
         a2 = fnmadd4(mul4(aa, broadcast1(pA+2)), a0, loadu4(pX+2*ORD));
         storeu4(pX, mul4(aa, a0));
+#else
+        vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
+        a1 = fnmadd4(broadcast1(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
+        a2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+2*ORD));
+        storeu4(pX, a0);
+#endif
         pA += lda;
         pX += ORD;
     }
@@ -1196,9 +1191,8 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
         vec4f aa = broadcast1f(pA);
-        //vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
         vec4f a0 = a1;
-        a1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), a0, a2);  // a2 = loadu4(pX+ORD);
+        a1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), a0, a2);
         a2 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), a0, loadu4f(pX+2*ORD));
         storeu4f(pX, mul4f(aa, a0));
         pA += lda;
@@ -1285,11 +1279,19 @@ void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX
     vec2 a2 = load2(pX+ORD); //may load garbage if N < 1
     for ( int j = 0; j < N-2; ++j )
     {
+#if 1
+        // this reduces the dependency path
         vec2 aa = loaddup2(pA);
         vec2 a0 = a1;
-        store2(pX, mul2(aa, a1));      // a1 = loadu4(pX);
-        a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a0, a2);  // a2 = loadu4(pX+ORD);
+        store2(pX, mul2(aa, a1));
+        a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a0, a2);
         a2 = fnmadd2(mul2(aa, loaddup2(pA+2)), a0, load2(pX+2*ORD));
+#else
+        vec2 a0 = mul2(loaddup2(pA), a1);      // a1 = loadu4(pX);
+        a1 = fnmadd2(loaddup2(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
+        a2 = fnmadd2(loaddup2(pA+2), a0, load2(pX+2*ORD));
+        store2(pX, a0);
+#endif
         pA += lda;
         pX += ORD;
     }
@@ -1336,10 +1338,18 @@ void alsatian_xtbsvLTN2(const int N, const double* pA, const int lda, double* pX
     }
     for ( int j = N-3; j > 0; --j )
     {
+#if 1
+        // this reduces the dependency path
         vec2 aa = loaddup2(pA);
         vec2 a0 = fnmadd2(mul2(aa, loaddup2(pA+2)), a2, mul2(aa, load2(pX)));
         a2 = a1;
         a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a1, a0);
+#else
+        vec2 a0 = fnmadd2(loaddup2(pA+2), a2, load2(pX));
+        a0 = fnmadd2(loaddup2(pA+1), a1, a0);
+        a2 = a1;
+        a1 = mul2(loaddup2(pA), a0);
+#endif
         store2(pX, a1);
         pA -= lda;
         pX -= ORD;
@@ -1362,14 +1372,15 @@ void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
     real a2 = pX[1]; //may load garbage
     for ( int j = 0; j < N-2; ++j )
     {
-        real aa = pA[0];
 #if 1
+        // this reduces the dependency path
+        real aa = pA[0];
         real a0 = a1;
         a1 = a2 - ( aa * pA[1] ) * a0;
         a2 = pX[2] - ( aa * pA[2] ) * a0;
         pX[0] = aa * a0;
 #else
-        real a0 = aa * a1;
+        real a0 = pA[0] * a1;
         a1 = a2 - pA[1] * a0;
         a2 = pX[2] - pA[2] * a0;
         pX[0] = a0;
@@ -1420,8 +1431,9 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
     }
     for ( int j = N-3; j > 0; --j )
     {
-        real aa = pA[0];
 #if 1
+        // this reduces the dependency path
+        real aa = pA[0];
         real a0 = aa * pX[0] - ( aa * pA[2] ) * a2;
         a2 = a1;
         a1 = a0 - ( aa * pA[1] ) * a1;
@@ -1429,7 +1441,7 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
         real a0 = pX[0] - pA[2] * a2;
         a0 = a0 - pA[1] * a1;
         a2 = a1;
-        a1 = aa * a0;
+        a1 = pA[0] * a0;
 #endif
         pX[0] = a1;
         pA -= lda;
