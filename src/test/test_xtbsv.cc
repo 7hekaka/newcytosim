@@ -12,8 +12,18 @@
 #include "simd.h"
 #include "assert_macro.h"
 #include "cytoblas.h"
-#include "xtbsv.h"
 #include "xtrsm.h"
+
+#define DEVELOP_XTBSV 1
+#include "xtbsv.h"
+
+namespace U
+{
+#undef XTBSV_H
+#undef DEVELOP_XTBSV
+#define DEVELOP_XTBSV 0
+#include "xtbsv.h"
+}
 
 using namespace TicToc;
 
@@ -103,6 +113,11 @@ void iso2(int N, real const* AB, real* B)
 
 void iso3(int N, real const* AB, real* B)
 {
+    U::alsatian_xpbtrsL<DIM>(N, AB, LDAB, B);
+}
+
+void iso4(int N, real const* AB, real* B)
+{
     alsatian_xpbtrsL<DIM>(N, AB, LDAB, B);
 }
 
@@ -143,7 +158,7 @@ void isoLT(int N, real const* AB, real* B)
  */
 void testISO(size_t cnt)
 {
-    std::cout << "isoTBSV " << NPTS << " segments --- real " << sizeof(real);
+    std::cout << "isoTBSV " << NPTS << " points --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NPTS*LDAB+4);
@@ -164,10 +179,11 @@ void testISO(size_t cnt)
     int info;
     alsatian_xpbtf2L<2>(NPTS, AB, LDAB, &info);
     
-    //check<iso0>(NPTS, S, AB, B, "buggy BLAS", cnt);
+    //check<iso0>(NPTS, DIM, S, AB, B, "buggy BLAS", cnt);
     check<iso1>(NPTS, DIM, S, AB, B, "blas_pbtrsL", cnt);
     check<iso2>(NPTS, DIM, S, AB, B, "alsa_pbtrsL<D>", cnt);
-    check<iso3>(NPTS, DIM, S, AB, B, "alsa_pbtrsL", cnt);
+    check<iso3>(NPTS, DIM, S, AB, B, "alsa_pbtrs_U", cnt);
+    check<iso4>(NPTS, DIM, S, AB, B, "alsa_pbtrs", cnt);
 
 #if 0 && REAL_IS_DOUBLE
     check<isoLN>(NPTS, DIM, S, AB, B, "tbsvLNN3", cnt);
@@ -181,18 +197,18 @@ void testISO(size_t cnt)
 
 //------------------------------------------------------------------------------
 
-void iso4(int N, real const* AB, real* B)
+void pot1(int N, real const* AB, real* B)
 {
     alsatian_xpotrsLref<DIM>(N, AB, N, B);
 }
 
-void iso5(int N, real const* AB, real* B)
+void pot2(int N, real const* AB, real* B)
 {
     iso_xtrsmLLN<DIM,'I'>(N, AB, N, B);
     iso_xtrsmLLT<DIM,'I'>(N, AB, N, B);
 }
 
-void iso6(int N, real const* AB, real* B)
+void pot3(int N, real const* AB, real* B)
 {
 #if defined(__AVX__) && REAL_IS_DOUBLE
 #if ( DIM == 3 )
@@ -212,7 +228,7 @@ void iso6(int N, real const* AB, real* B)
 
 void testPOTRS(size_t cnt)
 {
-    std::cout << "xTBSVLN " << NPTS << " segments --- real " << sizeof(real);
+    std::cout << "xTBSVLN " << NPTS << " points --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NPTS*NPTS+4);
@@ -233,9 +249,9 @@ void testPOTRS(size_t cnt)
     int info;
     alsatian_xpotf2L(NPTS, AB, NPTS, &info);
 
-    check<iso4>(NPTS, DIM, S, AB, B, "alsa_potrsLref", cnt);
-    check<iso5>(NPTS, DIM, S, AB, B, "iso_trsmLLN<D>", cnt);
-    check<iso6>(NPTS, DIM, S, AB, B, "alsa_trsmLLND", cnt);
+    check<pot1>(NPTS, DIM, S, AB, B, "alsa_potrsLref", cnt);
+    check<pot2>(NPTS, DIM, S, AB, B, "iso_trsmLLN<D>", cnt);
+    check<pot3>(NPTS, DIM, S, AB, B, "alsa_trsmLLND", cnt);
 
     free_real(B);
     free_real(S);
@@ -270,8 +286,7 @@ void uni3(int N, real const* AB, real* B)
 
 void uni4(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN(N, BAND_NUD, AB, BAND_LDD, B);
-    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    alsatian_xpbtrsLK<BAND_NUD>(N, AB, BAND_LDD, B);
 }
 
 // this gives wrong results
@@ -301,14 +316,13 @@ void uniLN2(int N, real const* AB, real* B)
 
 void uniLN3(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
-    zero_real(N, B);
+    alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
 }
 
 void uniLN4(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE && defined(__SSE__)
-    alsatian_xtbsvLNN6SSEone(N, AB, BAND_LDD, B);
+    U::alsatian_xtbsvLNN6SSE(N, AB, BAND_LDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -358,7 +372,7 @@ void uniLT3(int N, real const* AB, real* B)
 void uniLT4(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE
-    alsatian_xtbsvLTN6SSEone(N, AB, BAND_LDD, B);
+    U::alsatian_xtbsvLTN6SSE(N, AB, BAND_LDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -380,7 +394,7 @@ void uniLT5(int N, real const* AB, real* B)
  */
 void test(size_t cnt)
 {
-    std::cout << "xTBSV " << NPTS << " segments --- real " << sizeof(real);
+    std::cout << "xTBSV " << NPTS << " points --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NVAL*std::max(NVAL, BAND_LDD)+4);
@@ -407,29 +421,33 @@ void test(size_t cnt)
     int info;
     alsatian_xpbtf2L<BAND_NUD>(NVAL, AB, BAND_LDD, &info);
     
-    //check<uni0>(NVAL, S, AB, B, "blas::", cnt);
+#if 1
+    check<uni0>(NVAL, 1, S, AB, B, "blas::tbsv", cnt);
     check<uni1>(NVAL, 1, S, AB, B, "blas_tbsv", cnt);
     check<uni2>(NVAL, 1, S, AB, B, "tbsvLxN", cnt);
     check<uni3>(NVAL, 1, S, AB, B, "tbsvLxNK<KD>", cnt);
-    check<uni4>(NVAL, 1, S, AB, B, "mixed", cnt);
-
+    check<uni4>(NVAL, 1, S, AB, B, "alsa_xpbtrsLK", cnt);
+#endif
+#if 1
     std::cout << "xTBSVLN ---\n";
     
     //check<uniLNB>(NVAL, S, AB, B, "blas::xtbsv", cnt);
     check<uniLN0>(NVAL, 1, S, AB, B, "blas_xtbsvLN", cnt);
-    check<uniLN1>(NVAL, 1, S, AB, B, "tbsvLNN", cnt);
+    check<uniLN1>(NVAL, 1, S, AB, B, "xtbsvLNN", cnt);
     check<uniLN2>(NVAL, 1, S, AB, B, "LNNK<KD>", cnt);
-    check<uniLN4>(NVAL, 1, S, AB, B, "LNN6SSEone", cnt);
+    check<uniLN3>(NVAL, 1, S, AB, B, "LLN6", cnt);
+    check<uniLN4>(NVAL, 1, S, AB, B, "LNN6SSE_U", cnt);
     check<uniLN5>(NVAL, 1, S, AB, B, "LNN6SSE", cnt);
-
+#endif
+    
     std::cout << "xTBSVLT ---\n";
 
     //check<uniLTB>(NVAL, S, AB, B, "blas::tbsv", cnt);
-    check<uniLT0>(NVAL, 1, S, AB, B, "blas_tbsvLT", cnt);
-    check<uniLT1>(NVAL, 1, S, AB, B, "tbsvLTN", cnt);
+    check<uniLT0>(NVAL, 1, S, AB, B, "blas_xtbsvLT", cnt);
+    check<uniLT1>(NVAL, 1, S, AB, B, "xtbsvLTN", cnt);
     check<uniLT2>(NVAL, 1, S, AB, B, "LTNK<KD>", cnt);
     check<uniLT3>(NVAL, 1, S, AB, B, "LTN6", cnt);
-    check<uniLT4>(NVAL, 1, S, AB, B, "LTN6SSEone", cnt);
+    check<uniLT4>(NVAL, 1, S, AB, B, "LTN6SSE_U", cnt);
     check<uniLT5>(NVAL, 1, S, AB, B, "LTN6SSE", cnt);
 
     free_real(B);
