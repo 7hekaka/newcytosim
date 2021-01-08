@@ -20,52 +20,52 @@ using namespace TicToc;
 #define DIM 3
 
 /// number of segments:
-constexpr size_t NSEG = 113;
-constexpr size_t NVAL = DIM * ( NSEG + 1 );
+constexpr size_t NPTS = 113;
+constexpr size_t NVAL = DIM * NPTS;
 
 constexpr size_t BAND_NUD = 2*DIM;
 constexpr size_t BAND_LDD = 2*DIM+1;
 
 
 /// print only 16 scalars from given vector
-inline void print(size_t n, real const* vec)
+inline void print(size_t num, real const* vec)
 {
-    if ( n > 16 )
+    if ( num > 16 )
     {
         VecPrint::print(std::cout, 8, vec, 3);
         fprintf(stdout, " :");
-        VecPrint::print(std::cout, 8, vec+n-8, 3);
+        VecPrint::print(std::cout, 8, vec+num-8, 3);
         fprintf(stdout, " |");
-        VecPrint::print(std::cout, 2, vec+n, 1);
+        VecPrint::print(std::cout, 2, vec+num, 1);
     }
     else
     {
-        VecPrint::print(std::cout, n, vec, 3);
+        VecPrint::print(std::cout, num, vec, 3);
         fprintf(stdout, " |");
-        VecPrint::print(std::cout, 2, vec+n, 1);
+        VecPrint::print(std::cout, 2, vec+num, 1);
     }
+    printf("  nrm %7.3f ", blas::nrm8(num, vec));
 }
 
-void nan_spill(size_t N, real * dst)
+void nan_spill(real * dst)
 {
     real n = std::numeric_limits<real>::signaling_NaN();
     for ( size_t i = 0; i < 4; ++i )
-        dst[N+i] = n;
+        dst[i] = n;
 }
 
 template < void (*FUNC)(int, real const*, real*) >
-void check(int N, real const* S, real const* AB, real* B, char const str[], size_t cnt)
+void check(int N, int ORD, real const* S, real const* AB, real* B, char const str[], size_t cnt)
 {
     const size_t SUB = 128;
-    copy_real(N, S, B);
-    nan_spill(NVAL, B);
+    copy_real(ORD*N, S, B);
+    nan_spill(B+ORD*N);
     FUNC(N, AB, B);
-    print(N, B);
-    printf("  nrm %7.3f ", blas::nrm8(N, B));
+    print(ORD*N, B);
     tic();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(NVAL, S, B);
+        copy_real(ORD*N, S, B);
         for ( size_t u = 0; u < SUB; ++u )
             FUNC(N, AB, B);
     }
@@ -97,8 +97,8 @@ void iso1(int N, real const* AB, real* B)
 
 void iso2(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
-    alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
+    alsatian_xtbsvLNN<DIM>(N, KD, AB, LDAB, B);
+    alsatian_xtbsvLTN<DIM>(N, KD, AB, LDAB, B);
 }
 
 void iso3(int N, real const* AB, real* B)
@@ -143,18 +143,18 @@ void isoLT(int N, real const* AB, real* B)
  */
 void testISO(size_t cnt)
 {
-    std::cout << "isoTBSV " << NSEG << " segments --- real " << sizeof(real);
+    std::cout << "isoTBSV " << NPTS << " segments --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NSEG*LDAB+4);
+    real * AB = new_real(NPTS*LDAB+4);
     real * S = new_real(NVAL);
     real * B = new_real(NVAL+4);
 
-    zero_real(NSEG*LDAB, AB);
-    nan_spill(NSEG*LDAB, AB);
+    zero_real(NPTS*LDAB, AB);
+    nan_spill(AB+NPTS*LDAB);
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = 1.0 + RNG.sreal();
-    for ( size_t i = 0; i < NSEG; ++i )
+    for ( size_t i = 0; i < NPTS; ++i )
     {
         real r = 0.0625 * RNG.sreal();
         AB[  LDAB*i] = 1.5;
@@ -162,16 +162,16 @@ void testISO(size_t cnt)
         AB[2+LDAB*i] = -0.125 - r;
     }
     int info;
-    alsatian_xpbtf2L<2>(NSEG, AB, LDAB, &info);
+    alsatian_xpbtf2L<2>(NPTS, AB, LDAB, &info);
     
-    //check<iso0>(NSEG, S, AB, B, "buggy BLAS", cnt);
-    check<iso1>(NSEG, S, AB, B, "blas_pbtrsL", cnt);
-    check<iso2>(NSEG, S, AB, B, "alsa_pbtrsL<D>", cnt);
-    check<iso3>(NSEG, S, AB, B, "alsa_pbtrsL", cnt);
+    //check<iso0>(NPTS, S, AB, B, "buggy BLAS", cnt);
+    check<iso1>(NPTS, DIM, S, AB, B, "blas_pbtrsL", cnt);
+    check<iso2>(NPTS, DIM, S, AB, B, "alsa_pbtrsL<D>", cnt);
+    check<iso3>(NPTS, DIM, S, AB, B, "alsa_pbtrsL", cnt);
 
 #if 0 && REAL_IS_DOUBLE
-    check<isoLN>(NSEG, S, AB, B, "tbsvLNN3", cnt);
-    check<isoLT>(NSEG, S, AB, B, "tbsvLTN3", cnt);
+    check<isoLN>(NPTS, DIM, S, AB, B, "tbsvLNN3", cnt);
+    check<isoLT>(NPTS, DIM, S, AB, B, "tbsvLTN3", cnt);
 #endif
 
     free_real(B);
@@ -212,30 +212,30 @@ void iso6(int N, real const* AB, real* B)
 
 void testPOTRS(size_t cnt)
 {
-    std::cout << "xTBSVLN " << NSEG << " segments --- real " << sizeof(real);
+    std::cout << "xTBSVLN " << NPTS << " segments --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NSEG*NSEG+4);
+    real * AB = new_real(NPTS*NPTS+4);
     real * S = new_real(NVAL);
     real * B = new_real(NVAL+4);
 
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = RNG.sreal();
-    zero_real(NSEG*NSEG, AB);
-    nan_spill(NSEG*NSEG, AB);
-    for ( size_t i = 0; i < NSEG; ++i )
+    zero_real(NPTS*NPTS, AB);
+    nan_spill(AB+NPTS*NPTS);
+    for ( size_t i = 0; i < NPTS; ++i )
     {
         real r = 0.0625 * RNG.sreal();
-        AB[i+NSEG*i] = 1.5;
-        AB[i+1+NSEG*i] = -0.125 + r;
-        AB[i+2+NSEG*i] = -0.125 - r;
+        AB[i+NPTS*i] = 1.5;
+        AB[i+1+NPTS*i] = -0.125 + r;
+        AB[i+2+NPTS*i] = -0.125 - r;
     }
     int info;
-    alsatian_xpotf2L(NSEG, AB, NSEG, &info);
+    alsatian_xpotf2L(NPTS, AB, NPTS, &info);
 
-    check<iso4>(NSEG, S, AB, B, "alsa_potrsLref", cnt);
-    check<iso5>(NSEG, S, AB, B, "iso_trsmLLN<D>", cnt);
-    check<iso6>(NSEG, S, AB, B, "alsa_trsmLLND", cnt);
+    check<iso4>(NPTS, DIM, S, AB, B, "alsa_potrsLref", cnt);
+    check<iso5>(NPTS, DIM, S, AB, B, "iso_trsmLLN<D>", cnt);
+    check<iso6>(NPTS, DIM, S, AB, B, "alsa_trsmLLND", cnt);
 
     free_real(B);
     free_real(S);
@@ -380,7 +380,7 @@ void uniLT5(int N, real const* AB, real* B)
  */
 void test(size_t cnt)
 {
-    std::cout << "xTBSV " << NSEG << " segments --- real " << sizeof(real);
+    std::cout << "xTBSV " << NPTS << " segments --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NVAL*std::max(NVAL, BAND_LDD)+4);
@@ -390,7 +390,7 @@ void test(size_t cnt)
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = RNG.sreal();
     zero_real(NVAL*BAND_LDD, AB);
-    nan_spill(NSEG*BAND_LDD, AB);
+    nan_spill(AB+NPTS*BAND_LDD);
     for ( size_t i = 0; i < NVAL; ++i )
     {
         real s = 0, r = 0.0625 * RNG.sreal();
@@ -408,29 +408,29 @@ void test(size_t cnt)
     alsatian_xpbtf2L<BAND_NUD>(NVAL, AB, BAND_LDD, &info);
     
     //check<uni0>(NVAL, S, AB, B, "blas::", cnt);
-    check<uni1>(NVAL, S, AB, B, "blas_tbsv", cnt);
-    check<uni2>(NVAL, S, AB, B, "tbsvLxN", cnt);
-    check<uni3>(NVAL, S, AB, B, "tbsvLxNK<KD>", cnt);
-    check<uni4>(NVAL, S, AB, B, "mixed", cnt);
+    check<uni1>(NVAL, 1, S, AB, B, "blas_tbsv", cnt);
+    check<uni2>(NVAL, 1, S, AB, B, "tbsvLxN", cnt);
+    check<uni3>(NVAL, 1, S, AB, B, "tbsvLxNK<KD>", cnt);
+    check<uni4>(NVAL, 1, S, AB, B, "mixed", cnt);
 
     std::cout << "xTBSVLN ---\n";
     
     //check<uniLNB>(NVAL, S, AB, B, "blas::xtbsv", cnt);
-    check<uniLN0>(NVAL, S, AB, B, "blas_xtbsvLN", cnt);
-    check<uniLN1>(NVAL, S, AB, B, "tbsvLNN", cnt);
-    check<uniLN2>(NVAL, S, AB, B, "LNNK<KD>", cnt);
-    check<uniLN4>(NVAL, S, AB, B, "LNN6SSEone", cnt);
-    check<uniLN5>(NVAL, S, AB, B, "LNN6SSE", cnt);
+    check<uniLN0>(NVAL, 1, S, AB, B, "blas_xtbsvLN", cnt);
+    check<uniLN1>(NVAL, 1, S, AB, B, "tbsvLNN", cnt);
+    check<uniLN2>(NVAL, 1, S, AB, B, "LNNK<KD>", cnt);
+    check<uniLN4>(NVAL, 1, S, AB, B, "LNN6SSEone", cnt);
+    check<uniLN5>(NVAL, 1, S, AB, B, "LNN6SSE", cnt);
 
     std::cout << "xTBSVLT ---\n";
 
     //check<uniLTB>(NVAL, S, AB, B, "blas::tbsv", cnt);
-    check<uniLT0>(NVAL, S, AB, B, "blas_tbsvLT", cnt);
-    check<uniLT1>(NVAL, S, AB, B, "tbsvLTN", cnt);
-    check<uniLT2>(NVAL, S, AB, B, "LTNK<KD>", cnt);
-    check<uniLT3>(NVAL, S, AB, B, "LTN6", cnt);
-    check<uniLT4>(NVAL, S, AB, B, "LTN6SSEone", cnt);
-    check<uniLT5>(NVAL, S, AB, B, "LTN6SSE", cnt);
+    check<uniLT0>(NVAL, 1, S, AB, B, "blas_tbsvLT", cnt);
+    check<uniLT1>(NVAL, 1, S, AB, B, "tbsvLTN", cnt);
+    check<uniLT2>(NVAL, 1, S, AB, B, "LTNK<KD>", cnt);
+    check<uniLT3>(NVAL, 1, S, AB, B, "LTN6", cnt);
+    check<uniLT4>(NVAL, 1, S, AB, B, "LTN6SSEone", cnt);
+    check<uniLT5>(NVAL, 1, S, AB, B, "LTN6SSE", cnt);
 
     free_real(B);
     free_real(S);

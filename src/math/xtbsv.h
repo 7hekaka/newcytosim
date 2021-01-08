@@ -166,7 +166,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
     }
 }
 
-    
+
 template < char diag >
 void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
@@ -949,31 +949,6 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
     A -= lda;
     X -= 6;
 #endif
-#if 0
-    // unrolling does not seem to help here...
-    for ( ; X > end; X -= 2 )
-    {
-        const double* B = A - lda;
-        aa = loaddup2(A);
-        tt = mul2(aa, fnmadd2(x4, loadu2(A+5), load1Z(X)));
-        tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-        tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
-        tt = add1(tt, swap2(tt));
-        vec2 y4 = shuffle2(x2, x4, 0b01);
-        vec2 y2 = shuffle2(x0, x2, 0b01);
-        x4 = x2;
-        x2 = x0;
-        vec2 bb = loaddup2(B);
-        vec2 uu = mul2(bb, fnmadd2(y4, loadu2(B+5), load1Z(X-1)));
-        uu = fnmadd2(y2, mul2(bb, loadu2(B+3)), uu);
-        vec2 y0 = unpacklo2(tt, x0);
-        uu = fnmadd2(y0, mul2(bb, loadu2(B+1)), uu);
-        uu = add1(uu, swap2(uu));
-        x0 = unpacklo2(uu, tt);
-        storeu2(X-1, x0);
-        A -= 2*lda;
-    }
-#endif
     // general case, downward!
     for ( ; X >= end; --X ) //for ( int j = nkd-1; j >= 0; --j )
     {
@@ -1127,27 +1102,14 @@ void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX
     const double*const end = pA + (N-2) * lda;
     vec4 a1 = loadu4(pX); //may load garbage
     vec4 a2 = loadu4(pX+ORD); //may load garbage @ pX+7
-#if ( 0 )
-    while ( pA < end-lda )
-    {
-        vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
-        vec4 b1 = fnmadd4(broadcast1(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        vec4 b2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+2*ORD));
-        storeu4(pX, a0);
-        vec4 b0 = mul4(broadcast1(pA+lda), b1);
-        a1 = fnmadd4(broadcast1(pA+lda+1), b0, b2);
-        a2 = fnmadd4(broadcast1(pA+lda+2), b0, loadu4(pX+3*ORD));
-        storeu4(pX+ORD, b0);
-        pA += 2*lda;
-        pX += 2*ORD;
-    }
-#endif
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
-        vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
-        a1 = fnmadd4(broadcast1(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        a2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+2*ORD));
-        storeu4(pX, a0);
+        vec4 aa = broadcast1(pA);
+        //vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
+        vec4 a0 = a1;
+        a1 = fnmadd4(mul4(aa, broadcast1(pA+1)), a0, a2);  // a2 = loadu4(pX+ORD);
+        a2 = fnmadd4(mul4(aa, broadcast1(pA+2)), a0, loadu4(pX+2*ORD));
+        storeu4(pX, mul4(aa, a0));
         pA += lda;
         pX += ORD;
     }
@@ -1174,16 +1136,14 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
 {
     constexpr int ORD = 3;
     const double*const end = pA + lda;
-    const vec4 zero = setzero4();
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
-    vec4 a1 = zero;
+    vec4 a1;
     if ( N >= 1 ) // j = N-1
     {
         vec4 a0 = load3(pX);   // would load garbage in 4th position
         a1 = mul4(broadcast1(pA), a0);
         store3(pX, a1); //storeu4(pX, blend31(a1, a0));
-        a1 = blend31(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -1194,7 +1154,6 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
         a0 = fnmadd4(broadcast1(pA+1), a1, a0);
         a1 = mul4(broadcast1(pA), a0);
         storeu4(pX, blend31(a1, a0));
-        a1 = blend31(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -1202,15 +1161,14 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     vec4 af = loadu4(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
-        vec4 a0 = fnmadd4(broadcast1(pA+2), a2, af);  // a2 = load3(pX+6);
+        vec4 aa = broadcast1(pA);
+        vec4 a0 = fnmadd4(mul4(aa, broadcast1(pA+2)), a2, mul4(aa, af));
         af = loadu4(pX-ORD);
         a2 = a1;
-        a0 = fnmadd4(broadcast1(pA+1), a1, a0);  // a1 = load3(pX+3);
+        a1 = fnmadd4(mul4(aa, broadcast1(pA+1)), a1, a0);
         // restore 4th position that was saved in 'tt'
-        a0 = blend31(mul4(broadcast1(pA), a0), tt);
-        tt = broadcast1(a0); // save 4th position for next round
-        storeu4(pX, a0);
-        a1 = blend31(a0, zero);
+        storeu4(pX, blend31(a1, tt));
+        tt = broadcast1(a1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }
@@ -1224,36 +1182,6 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     }
 }
 
-/*
- void alsatian_xtbsvLTN3(const int N, const real* pA, const int lda, real* pX)
- {
-     pX += ( N - 1 ) * 3;
-     pA += ( N - 1 ) * lda;
-     if ( N >= 1 ) // j = N-1
-     {
-         store3(pX, mul4(loadu4(pX), broadcast1(pA)));
-         pA -= lda;
-         pX -= 3;
-     }
-     if ( N >= 2 ) // j = N-2
-     {
-         vec4 buf = load3(pX); //real buf = X[jx];
-         buf = fnmadd4(broadcast1(pA+1), loadu4(pX+3), buf);
-         store3(pX, mul4(buf, broadcast1(pA)));
-         pA -= lda;
-         pX -= 3;
-     }
-     for ( int j = N-3; j >= 0; --j )
-     {
-         vec4 buf = load3(pX); //real buf = X[jx];
-         buf = fnmadd4(broadcast1(pA+2), loadu4(pX+6), buf);
-         buf = fnmadd4(broadcast1(pA+1), loadu4(pX+3), buf);
-         store3(pX, mul4(buf, broadcast1(pA)));
-         pA -= lda;
-         pX -= 3;
-     }
- }
-*/
 #endif
 
 
@@ -1265,27 +1193,14 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
     const float*const end = pA + (N-2) * lda;
     vec4f a1 = loadu4f(pX);     //may load garbage
     vec4f a2 = loadu4f(pX+ORD); //may load garbage @ pX+7
-#if ( 0 )
-    while ( pA+lda < end )
-    {
-        vec4f a0 = mul4f(broadcast1f(pA), a1);      // a1 = loadu4(pX);
-        vec4f b1 = fnmadd4f(broadcast1f(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        vec4f b2 = fnmadd4f(broadcast1f(pA+2), a0, loadu4f(pX+2*ORD));
-        storeu4f(pX, a0);
-        vec4f b0 = mul4f(broadcast1f(pA+lda), b1);
-        a1 = fnmadd4f(broadcast1f(pA+lda+1), b0, b2);
-        a2 = fnmadd4f(broadcast1f(pA+lda+2), b0, loadu4f(pX+3*ORD));
-        storeu4f(pX+ORD, b0);
-        pA += 2*lda;
-        pX += 2*ORD;
-    }
-#endif
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
-        vec4f a0 = mul4f(broadcast1f(pA), a1);     // a1 = loadu4(pX);
-        a1 = fnmadd4f(broadcast1f(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        a2 = fnmadd4f(broadcast1f(pA+2), a0, loadu4f(pX+2*ORD));
-        storeu4f(pX, a0);
+        vec4f aa = broadcast1f(pA);
+        //vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
+        vec4f a0 = a1;
+        a1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), a0, a2);  // a2 = loadu4(pX+ORD);
+        a2 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), a0, loadu4f(pX+2*ORD));
+        storeu4f(pX, mul4f(aa, a0));
         pA += lda;
         pX += ORD;
     }
@@ -1313,16 +1228,14 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 {
     constexpr int ORD = 3;
     const float*const end = pA + lda;
-    const vec4f zero = setzero4f();
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
-    vec4f a1 = zero;
+    vec4f a1;
     if ( N >= 1 ) // j = N-1
     {
         vec4f a0 = load3f(pX);   // would load garbage in 4th position
         a1 = mul4f(broadcast1f(pA), a0);
         store3f(pX, a1); // storeu4f(pX, blend31f(a1, a0));
-        a1 = blend31f(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -1333,7 +1246,6 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
         a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
         a1 = mul4f(broadcast1f(pA), a0);
         storeu4f(pX, blend31f(a1, a0));
-        a1 = blend31f(a1, zero);
         pA -= lda;
         pX -= ORD;
     }
@@ -1341,15 +1253,14 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
     vec4f af = loadu4f(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
-        vec4f a0 = fnmadd4f(broadcast1f(pA+2), a2, af);  // a2 = load3(pX+6);
+        vec4f aa = broadcast1f(pA);
+        vec4f a0 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), a2, mul4f(aa, af));
         af = loadu4f(pX-ORD);
         a2 = a1;
-        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);  // a1 = load3(pX+3);
+        a1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), a1, a0);
         // restore 4th position that was saved in 'tt'
-        a0 = blend31f(mul4f(broadcast1f(pA), a0), tt);
-        tt = broadcast1f(a0); // save 4th position for next round
-        storeu4f(pX, a0);
-        a1 = blend31f(a0, zero);
+        storeu4f(pX, blend31f(a1, tt));
+        tt = broadcast1f(a1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }
@@ -1374,10 +1285,11 @@ void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX
     vec2 a2 = load2(pX+ORD); //may load garbage if N < 1
     for ( int j = 0; j < N-2; ++j )
     {
-        vec2 a0 = mul2(loaddup2(pA), a1);      // a1 = loadu4(pX);
-        a1 = fnmadd2(loaddup2(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        a2 = fnmadd2(loaddup2(pA+2), a0, load2(pX+2*ORD));
-        store2(pX, a0);
+        vec2 aa = loaddup2(pA);
+        vec2 a0 = a1;
+        store2(pX, mul2(aa, a1));      // a1 = loadu4(pX);
+        a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a0, a2);  // a2 = loadu4(pX+ORD);
+        a2 = fnmadd2(mul2(aa, loaddup2(pA+2)), a0, load2(pX+2*ORD));
         pA += lda;
         pX += ORD;
     }
@@ -1424,10 +1336,10 @@ void alsatian_xtbsvLTN2(const int N, const double* pA, const int lda, double* pX
     }
     for ( int j = N-3; j > 0; --j )
     {
-        vec2 a0 = fnmadd2(loaddup2(pA+2), a2, load2(pX));
-        a0 = fnmadd2(loaddup2(pA+1), a1, a0);
+        vec2 aa = loaddup2(pA);
+        vec2 a0 = fnmadd2(mul2(aa, loaddup2(pA+2)), a2, mul2(aa, load2(pX)));
         a2 = a1;
-        a1 = mul2(loaddup2(pA), a0);
+        a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a1, a0);
         store2(pX, a1);
         pA -= lda;
         pX -= ORD;
@@ -1450,10 +1362,18 @@ void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
     real a2 = pX[1]; //may load garbage
     for ( int j = 0; j < N-2; ++j )
     {
-        real a0 = pA[0] * a1;
+        real aa = pA[0];
+#if 1
+        real a0 = a1;
+        a1 = a2 - ( aa * pA[1] ) * a0;
+        a2 = pX[2] - ( aa * pA[2] ) * a0;
+        pX[0] = aa * a0;
+#else
+        real a0 = aa * a1;
         a1 = a2 - pA[1] * a0;
         a2 = pX[2] - pA[2] * a0;
         pX[0] = a0;
+#endif
         pA += lda;
         pX += 1;
     }
@@ -1500,10 +1420,17 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
     }
     for ( int j = N-3; j > 0; --j )
     {
+        real aa = pA[0];
+#if 1
+        real a0 = aa * pX[0] - ( aa * pA[2] ) * a2;
+        a2 = a1;
+        a1 = a0 - ( aa * pA[1] ) * a1;
+#else
         real a0 = pX[0] - pA[2] * a2;
         a0 = a0 - pA[1] * a1;
         a2 = a1;
-        a1 = pA[0] * a0;
+        a1 = aa * a0;
+#endif
         pX[0] = a1;
         pA -= lda;
         pX -= 1;
@@ -1650,12 +1577,14 @@ void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     printf("\n");
     free_real(tmp);
 #else
+#if REAL_IS_DOUBLE
     if ( KD == 6 )
     {
         alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
         alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
     }
     else
+#endif
     {
         alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
         alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
