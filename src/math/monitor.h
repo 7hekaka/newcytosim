@@ -21,17 +21,17 @@ namespace LinearSolvers
         /// residual achieved in last step
         real res_;
         
-        /// residual from the past
-        real resOld_;
-        
         /// maximum allowed number of iterations
         unsigned limit_;
 
         /// counter for iterations or number of matrix-vector operations
-        unsigned cnt_, cntOld_;
+        unsigned cnt_;
         
         /// exit flag
         unsigned flag_;
+        
+        /// true if achieved desired residual
+        bool converged_;
 
     public:
         
@@ -39,7 +39,7 @@ namespace LinearSolvers
         Monitor(unsigned i, real r) { reset(); limit_=i; target_=r; }
         
         /// reset state variables (counters, flags and residual)
-        void reset() { flag_=0; cnt_=0; res_=INFINITY; cntOld_=0; resOld_=INFINITY; }
+        void reset() { flag_=0; cnt_=0; res_=INFINITY; converged_=0; }
         
         /// increment counter
         void operator ++() { ++cnt_; }
@@ -60,40 +60,31 @@ namespace LinearSolvers
         real residual()  const { return res_; }
         
         /// true if achieve residual < residual threshold
-        bool converged() const { return res_ < target_; }
+        bool converged() const { return converged_; }
         
+        /// true if converged or number of iterations are exceeded
+        bool finished() const { return converged_ | ( cnt_ > limit_ ); }
+
         /// register given residual and return true if target is achieved
         bool finished(real res)
         {
             res_ = res;
-            return ( res < target_ ) | ( cnt_ > limit_ );
+            converged_ = ( res < target_ );
+            return converged_ | ( cnt_ > limit_ );
         }
 
-        /// calculate residual from `x` and return true if threshold is achieved
-        bool finished(size_t size, const real* x)
+        /// calculate residual from `vec` and return true if threshold is achieved
+        bool finished(size_t size, const real* vec)
         {
-            //fprintf(stderr, "   Monitor %4u residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, x), blas::nrm8(size, x));
+            //fprintf(stderr, "   Monitor %4u residual %12.6f %9.6f\n", cnt_, blas::nrm2(size, vec), blas::nrm8(size, vec));
 #if ( 1 )
             // use the 'infinite' norm (i.e. the largest element)
-            real res = blas::nrm8(size, x);
+            real res = blas::nrm8(size, vec);
 #else
             // use the standard Euclidian norm:
-            real res = blas::nrm2(size, x);
+            real res = blas::nrm2(size, vec);
 #endif
-            //fprintf(stderr, "   Monitor %4u  isnan %i residual %12.6f\n", cnt_, isnan(size, x), res);
-#if ( 0 )
-            // check residual for non-smooth convergence pattern.
-            if ( 1 == (16&cnt_) )
-            {
-                if ( res > 4*resOld_ )
-                {
-                    printf("Warning: slow convergence (reduce time_step?)");
-                    printf(" residual %.3e at iteration %u, %.3e at %u\n", resOld_, cntOld_, res, cnt_);
-                }
-                resOld_ = res;
-                cntOld_ = cnt_;
-            }
-#endif
+            //fprintf(stderr, "   Monitor %4u  isnan %i residual %12.6f\n", cnt_, isnan(size, vec), res);
             if ( res != res )
             {
                 fprintf(stderr, "Solver diverged at step %3u (residual is not a number)\n", cnt_);
@@ -103,7 +94,7 @@ namespace LinearSolvers
         }
 
         /// calculate residual from `x` and set flag to `f`
-        void finish(unsigned f, size_t size, const real* x) { flag_ = f; finished(size, x); }
+        void finish(unsigned f, size_t size, const real* vec) { flag_ = f; finished(size, vec); }
     };
 }
 

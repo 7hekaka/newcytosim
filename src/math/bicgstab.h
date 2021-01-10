@@ -9,14 +9,12 @@
 #include "allocator.h"
 #include "monitor.h"
 
+
 /// assumes that vector 'sol' is zero initially
 #define NULL_INITIAL_SOLUTION 0
 
-/// print convergence parameters
-#define VERBOSE_SOLVERS 0
-
 /// in case of no convergence, use the best vector encountered during interations
-#define SAFER_CONVERGENCE_FAILURE !REAL_IS_DOUBLE
+#define SAFER_CONVERGENCE !REAL_IS_DOUBLE
 
 /// Bi-Conjugate Gradient Stabilized method to solve a system of linear equations
 /**
@@ -35,16 +33,12 @@ namespace LinearSolvers
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
         
         const int dim = mat.dimension();
-        allocator.allocate(dim, 5+SAFER_CONVERGENCE_FAILURE);
+        allocator.allocate(dim, 5+SAFER_CONVERGENCE);
         real * r  = allocator.bind(0);
         real * r0 = allocator.bind(1);
         real * p  = allocator.bind(2);
         real * t  = allocator.bind(3);
         real * v  = allocator.bind(4);
-#if SAFER_CONVERGENCE_FAILURE
-        real * best = allocator.bind(5);
-        real best_residual = INFINITY;
-#endif
 
 #if NULL_INITIAL_SOLUTION
         //blas::xfill(dim, 0, sol);
@@ -53,25 +47,40 @@ namespace LinearSolvers
         blas::xcopy(dim, rhs, 1, r0, 1);
         blas::xcopy(dim, rhs, 1, p, 1);
 #else
-        mat.multiply(sol, r0);                  // r0 = A * sol
+        mat.multiply(sol, r0);                  // r0 = MAT * sol
         blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
-        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * sol
+        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * sol
         if ( monitor.finished(dim, r) )
             return;
         blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
         blas::xcopy(dim, r, 1, p, 1);
 #endif
         rho = blas::dot(dim, r, r);
+#if SAFER_CONVERGENCE
+        real * best = allocator.bind(5);
+        blas::xcopy(dim, sol, 1, best, 1);
+        real best_residual = monitor.residual();
+#endif
         goto start;
         
+#if SAFER_CONVERGENCE
+        while ( ! monitor.finished() )
+        {
+            /*
+             Perform one more iteration after convergence is attained,
+             to mitigate a problem in which the estimated residual is below threshold,
+             when the true residual is in fact above.
+             */
+            // save closest vector to solution so far
+            if ( monitor.residual() < 0.5 * best_residual )
+            {
+                blas::xcopy(dim, sol, 1, best, 1);
+                best_residual = monitor.residual();
+                //fprintf(stderr, "\r(best %4i  %10.7f)", monitor.count(), best_residual);
+            }
+#else
         while ( ! monitor.finished(dim, r) )
         {
-#if SAFER_CONVERGENCE_FAILURE
-            if ( monitor.residual() < best_residual )
-            {
-                best_residual = monitor.residual();
-                blas::xcopy(dim, sol, 1, best, 1);
-            }
 #endif
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
@@ -83,7 +92,7 @@ namespace LinearSolvers
                  arbitrarily chosen direction r0, and we restart with a new r0 */
                 blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
                 mat.multiply(sol, r0);                  // r0 = A*x
-                blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - A * x
+                blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * x
                 blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
                 rho = blas::dot(dim, r0, r0);
 #else
@@ -104,7 +113,7 @@ namespace LinearSolvers
 
         start:
             
-            mat.multiply(p, v);                     // v = A * p;
+            mat.multiply(p, v);                     // v = MAT * p;
             alpha = rho / blas::dot(dim, r0, v);
 
             blas::xaxpy(dim, -alpha, v, 1, r, 1);   // r = r - alpha * v;
@@ -113,7 +122,7 @@ namespace LinearSolvers
             //if ( monitor.finished(dim, r) )
             //    break;
             
-            mat.multiply(r, t);                     // t = A * r;
+            mat.multiply(r, t);                     // t = MAT * r;
             monitor += 2;
 
             double tdt = blas::dot(dim, t, t);
@@ -134,16 +143,27 @@ namespace LinearSolvers
             else
                 omega = 0.0;
         }
-#if SAFER_CONVERGENCE_FAILURE
-        if ( best_residual < monitor.residual() )
-            blas::xcopy(dim, best, 1, sol, 1);
-#endif
-#if VERBOSE_SOLVERS
-        // calculate true residual = rhs - A * x
-        mat.multiply(sol, r0);
-        blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
-        real res = blas::nrm2(dim, r0);
-        fprintf(stderr, "   -BCGS     count %4lu  residual %.3e\n", monitor.count(), res);
+#if SAFER_CONVERGENCE
+        /* With numerical drift, the residual 'r' can be far from its exact mathematical
+         value, and to avoid returning a wrong information on the residual achieved,
+         we recalculate here the true residual r0 = rhs - MAT * sol */
+        //real est = monitor.residual();
+        mat.multiply(sol, r);
+        blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
+        monitor.finished(dim, r);
+        if ( !monitor.converged() )
+        {
+            mat.multiply(best, r0);
+            blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
+            best_residual = blas::nrm8(dim, r0);
+            if ( best_residual < monitor.residual() )
+            {
+                blas::xcopy(dim, best, 1, sol, 1);
+                monitor.finished(best_residual);
+                ++monitor;
+            }
+        }
+        //fprintf(stderr, "(BCGS %4i res %10.7f %10.7f)", monitor.count(), est, monitor.residual());
 #endif
         allocator.release();
     }
@@ -159,8 +179,8 @@ namespace LinearSolvers
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0, delta;
         
-        const size_t dim = mat.dimension();
-        allocator.allocate(dim, 7+SAFER_CONVERGENCE_FAILURE);
+        const int dim = mat.dimension();
+        allocator.allocate(dim, 7+SAFER_CONVERGENCE);
         real * r    = allocator.bind(0);
         real * r0   = allocator.bind(1);
         real * p    = allocator.bind(2);
@@ -168,11 +188,7 @@ namespace LinearSolvers
         real * v    = allocator.bind(4);
         real * phat = allocator.bind(5);
         real * shat = allocator.bind(6);
-        
-#if SAFER_CONVERGENCE_FAILURE
-        real * best = allocator.bind(7);
-        real best_residual = INFINITY;
-#endif
+
 #if NULL_INITIAL_SOLUTION
         //blas::xfill(dim, 0, sol);
         // assuming that 'sol == 0' initially:
@@ -189,16 +205,31 @@ namespace LinearSolvers
         blas::xcopy(dim, r, 1, p, 1);
 #endif
         rho = blas::dot(dim, r, r);
+#if SAFER_CONVERGENCE
+        real * best = allocator.bind(7);
+        blas::xcopy(dim, sol, 1, best, 1);
+        real best_residual = monitor.residual();
+#endif
         goto start;
 
+#if SAFER_CONVERGENCE
+        while ( ! monitor.finished() )
+        {
+            /* perform one more iteration after convergence is attained,
+             to mitigate a problem in which the estimated residual is below threshold,
+             when the true residual is in fact above.
+             */
+            monitor.finished(dim, r);
+            // save closest vector to solution so far
+            if ( monitor.residual() < 0.5 * best_residual )
+            {
+                blas::xcopy(dim, sol, 1, best, 1);
+                best_residual = monitor.residual();
+                //fprintf(stderr, "\r(Best %4i  %10.7f)", monitor.count(), best_residual);
+            }
+#else
         while ( ! monitor.finished(dim, r) )
         {
-#if SAFER_CONVERGENCE_FAILURE
-            if ( monitor.residual() < best_residual )
-            {
-                best_residual = monitor.residual();
-                blas::xcopy(dim, sol, 1, best, 1);
-            }
 #endif
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
@@ -267,16 +298,27 @@ namespace LinearSolvers
             else
                 omega = 0.0;
         }
-#if SAFER_CONVERGENCE_FAILURE
-        if ( best_residual < monitor.residual() )
-            blas::xcopy(dim, best, 1, sol, 1);
-#endif
-#if VERBOSE_SOLVERS
-        // calculate true residual = rhs - A * x
+#if SAFER_CONVERGENCE
+        /* With numerical drift, the residual 'r' can be far from its exact mathematical
+         value, and to avoid returning a wrong information on the residual achieved,
+         we recalculate here the true residual r0 = rhs - MAT * sol */
+        //real est = monitor.residual();
         mat.multiply(sol, r);
         blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        real res = blas::nrm2(dim, r);
-        fprintf(stderr, "   -BCGSP    count %4lu  residual %.3e\n", monitor.count(), res);
+        monitor.finished(dim, r);
+        if ( !monitor.converged() )
+        {
+            mat.multiply(best, r0);
+            blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
+            best_residual = blas::nrm8(dim, r0);
+            if ( best_residual < monitor.residual() )
+            {
+                blas::xcopy(dim, best, 1, sol, 1);
+                monitor.finished(best_residual);
+                ++monitor;
+            }
+        }
+        //fprintf(stderr, "(BCGSP %4i res %10.7f %10.7f)", monitor.count(), est, monitor.residual());
 #endif
         allocator.release();
     }
@@ -368,13 +410,6 @@ namespace LinearSolvers
             blas::xscal(dim, beta, p, 1);
             blas::xaxpy(dim, 1.0, r, 1, p, 1);
         }
-#if VERBOSE_SOLVERS
-        // calculate true residual = rhs - A * x
-        mat.multiply(sol, r);
-        blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        real res = blas::nrm2(dim, r);
-        fprintf(stderr, "   -bicgstab count %4lu  residual %.3e\n", monitor.count(), res);
-#endif
         allocator.release();
     }
 

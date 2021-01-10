@@ -171,10 +171,10 @@ private:
     //--------------------------------------------------------------------------
 
     /// working memory allocator for BCGS and GMRES used in solve()
-    LinearSolvers::Allocator allocator;
+    LinearSolvers::Allocator allocator_;
     
     /// secondary memory allocator for GMRES
-    LinearSolvers::Allocator temporary;
+    LinearSolvers::Allocator temporary_;
     
     /// Matrices used for GMRES
     //LinearSolvers::Matrix mH, mV;

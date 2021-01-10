@@ -987,13 +987,21 @@ void Parser::parse_call(std::istream& is)
 }
 
 //------------------------------------------------------------------------------
+
 /**
- Repeat specified code.
+ Repeat specified code a number of times.
  
      repeat INTEGER { CODE }
  
- */
+ Example:
+ 
+     repeat 100
+     {
+         run 1000 system
+         report microtubule:plus_state states.txt
+     }
 
+ */
 void Parser::parse_repeat(std::istream& is)
 {
     size_t cnt = 1;
@@ -1006,14 +1014,14 @@ void Parser::parse_repeat(std::istream& is)
     for ( size_t c = 0; c < cnt; ++c )
     {
         if ( simul.prop->verbose )
-            Cytosim::log("repeat %i\n", cnt);
+            Cytosim::log("repeat code %lu/%lu\n", c+1, cnt);
         evaluate(code);
     }
 }
 
 
 /**
- Repeat specified code.
+ Repeat specified code, with variable substitution
  
      for VAR=INTEGER:INTEGER { CODE }
  

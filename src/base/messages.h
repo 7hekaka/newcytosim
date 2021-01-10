@@ -32,8 +32,8 @@ namespace Cytosim
     public:
         
         /// create stream directed to given stream with `max_output` allowed
-        Output(std::ostream& os, size_t n_out = 1<<16, std::string const& p = "")
-        : pref_(p), out_(&os), cnt_(n_out)
+        Output(std::ostream& os, size_t sup = 0x1p31, std::string const& p = "")
+        : pref_(p), out_(&os), cnt_(sup)
         {
             nul_.open("/dev/null");
         }

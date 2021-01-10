@@ -208,6 +208,111 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 }
 
 
+#if PARALLELIZE_MATRIX
+
+/**
+calculate the matrix vector product corresponding to 'mec'
+
+    Y <- X + alpha * speed( Y + P' * X );
+
+*/
+void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
+{
+    const size_t inx = DIM * mec->matIndex();
+    const size_t bks = DIM * mec->nbPoints();
+
+    // multiply the lines corresponding to this Mecable:
+    mFUL.vecMul(X, Y, inx, inx+bks);
+
+#if SEPARATE_RIGIDITY_TERMS
+    mec->addRigidity(X+inx, Y+inx);
+#endif
+
+#if ADD_PROJECTION_DIFF
+    if ( mec->hasProjectionDiff() )
+        mec->addProjectionDiff(X+inx, Y+inx);
+#endif
+
+    mec->projectForces(Y+inx, Y+inx);
+
+    // Y <- X + alpha * Y
+    blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
+}
+
+
+/**
+ calculate the matrix product needed for the conjugate gradient algorithm
+ 
+     Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
+ 
+ */
+void Meca::multiply(const real* X, real* Y) const
+{
+#if NUM_THREADS > 1
+    #pragma omp parallel for num_threads(NUM_THREADS)
+    for ( Mecable * mec : mecables )
+        multiply1(mec, X, Y);
+#else
+    mFUL.vecMul(X, Y);
+
+    for ( Mecable * mec : mecables )
+    {
+        const size_t inx = DIM * mec->matIndex();
+    #if SEPARATE_RIGIDITY_TERMS
+        mec->addRigidity(X+inx, Y+inx);
+    #endif
+    #if ADD_PROJECTION_DIFF
+        if ( mec->hasProjectionDiff() )
+            mec->addProjectionDiff(X+inx, Y+inx);
+    #endif
+        mec->projectForces(Y+inx, Y+inx);
+        // Y <- X + alpha * Y
+        blas::xpay(DIM*mec->nbPoints(), X+inx, -tau_*mec->leftoverMobility(), Y+inx);
+    }
+#endif
+}
+
+#else  // PARALLELIZE_MATRIX
+
+/// Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
+void Meca::multiply(const real* X, real* Y) const
+{
+#if USE_ISO_MATRIX
+    // Y <- mFUL * X
+    if ( useFullMatrix )
+        mFUL.vecMul(X, Y);
+    else
+        zero_real(dimension(), Y);
+    // Y <- Y + mISO * X
+    mISO.VECMULADDISO(X, Y);
+#else
+    mFUL.vecMul(X, Y);
+#endif
+    
+    for ( Mecable * mec : mecables )
+    {
+        const size_t inx = DIM * mec->matIndex();
+#if SEPARATE_RIGIDITY_TERMS
+        mec->addRigidity(X+inx, Y+inx);
+#endif
+#if ADD_PROJECTION_DIFF
+        if ( mec->hasProjectionDiff() )
+            mec->addProjectionDiff(X+inx, Y+inx);
+#endif
+        mec->projectForces(Y+inx, Y+inx);
+        // Y <- X + alpha * Y
+        const real beta = -tau_ * mec->leftoverMobility();
+        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
+    }
+}
+
+#endif  // PARALLELIZE_MATRIX
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Precondition
+
+
 // the leading dimension of the banded matrix used for preconditionning
 constexpr size_t ISOB_LDD = 3;
 /*
@@ -325,6 +430,7 @@ inline void applyPrecondFull(Mecable const* mec, real* Y)
 }
 
 
+/// apply preconditionner block corresponding to Mecable
 inline void applyPreconditionner(Mecable const* mec, real* Y)
 {
     switch ( mec->blockType() )
@@ -341,90 +447,37 @@ inline void applyPreconditionner(Mecable const* mec, real* Y)
 }
 
 
-inline void applyPreconditionner(Mecable const* mec, real const* X, real* Y)
+/// apply preconditionner to entire system
+void Meca::precondition(const real* X, real* Y) const
 {
-    assert_true( Y != X );
-    //if ( Y != X ) blas::xcopy(bks, X, 1, Y, 1);
-    switch ( mec->blockType() )
-    {
-        case 0: break;
-        case 1: applyPrecondIsoB(mec, Y); break;
-        case 2: applyPrecondIsoS(mec, Y); break;
-        case 3: applyPrecondIsoP(mec, Y); break;
-        case 4: applyPrecondBand(mec, Y); break;
-        case 5: applyPrecondHalf(mec, Y); break;
-        case 6: applyPrecondFull(mec, Y); break;
-#if EXPERIMENTAL_PRECONDITIONNERS
-        case 7: mec->blockMultiply(X, Y); break;
-#endif
-        default: ABORT_NOW("unknown Mecable::blockType()"); break;
-    }
-}
-
-
-#if PARALLELIZE_MATRIX
-
-/**
-calculate the matrix vector product corresponding to 'mec'
-
-    Y <- X + alpha * speed( Y + P' * X );
-
-*/
-void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
-{
-    const size_t inx = DIM * mec->matIndex();
-    const size_t bks = DIM * mec->nbPoints();
-
-    // multiply the lines corresponding to this Mecable:
-    mFUL.vecMul(X, Y, inx, inx+bks);
-
-#if SEPARATE_RIGIDITY_TERMS
-    mec->addRigidity(X+inx, Y+inx);
-#endif
-
-#if ADD_PROJECTION_DIFF
-    if ( mec->hasProjectionDiff() )
-        mec->addProjectionDiff(X+inx, Y+inx);
-#endif
-
-    mec->projectForces(Y+inx, Y+inx);
-
-    // Y <- X + alpha * Y
-    blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
-}
-
-
-/**
- calculate the matrix product needed for the conjugate gradient algorithm
- 
-     Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
- 
- */
-void Meca::multiply(const real* X, real* Y) const
-{
-#if NUM_THREADS > 1
-    #pragma omp parallel for num_threads(NUM_THREADS)
-    for ( Mecable * mec : mecables )
-        multiply1(mec, X, Y);
-#else
-    mFUL.vecMul(X, Y);
-
-    for ( Mecable * mec : mecables )
+    auto rdt = __rdtsc();
+    if ( Y != X )
+        copy_real(dimension(), X, Y);
+    blas::xscal(dimension(), 10, Y, 1);
+    
+#pragma omp parallel for num_threads(NUM_THREADS)
+    for ( Mecable const* mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-    #if SEPARATE_RIGIDITY_TERMS
-        mec->addRigidity(X+inx, Y+inx);
-    #endif
-    #if ADD_PROJECTION_DIFF
-        if ( mec->hasProjectionDiff() )
-            mec->addProjectionDiff(X+inx, Y+inx);
-    #endif
-        mec->projectForces(Y+inx, Y+inx);
-        // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -tau_*mec->leftoverMobility(), Y+inx);
-    }
+#if EXPERIMENTAL_PRECONDITIONNERS
+        if ( mec->blockType() == 7 )
+            mec->blockMultiply(X+inx, Y+inx);
+        else
 #endif
+            applyPreconditionner(mec, Y+inx);
+    }
+    cycles_ += __rdtsc() - rdt;
 }
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Combined Multiply-Precondition
+/*
+ In parallel execution, the preconditionning and multiply can be intertwined,
+ because preconditionning is a diagonal square matrix
+ */
+
+#if PARALLELIZE_MATRIX
 
 /**
  This is equivalent to
@@ -526,45 +579,10 @@ void Meca::multiply_precondition(real const* X, real* Y) const
         multiply_precondition1(mec, X, Y);
 }
 
-#else  // PARALLELIZE_MATRIX
-
-/// Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
-void Meca::multiply(const real* X, real* Y) const
-{
-#if USE_ISO_MATRIX
-    // Y <- mFUL * X
-    if ( useFullMatrix )
-        mFUL.vecMul(X, Y);
-    else
-        zero_real(dimension(), Y);
-    // Y <- Y + mISO * X
-    mISO.VECMULADDISO(X, Y);
-#else
-    mFUL.vecMul(X, Y);
-#endif
-    
-    for ( Mecable * mec : mecables )
-    {
-        const size_t inx = DIM * mec->matIndex();
-#if SEPARATE_RIGIDITY_TERMS
-        mec->addRigidity(X+inx, Y+inx);
-#endif
-#if ADD_PROJECTION_DIFF
-        if ( mec->hasProjectionDiff() )
-            mec->addProjectionDiff(X+inx, Y+inx);
-#endif
-        mec->projectForces(Y+inx, Y+inx);
-        // Y <- X + alpha * Y
-        const real beta = -tau_ * mec->leftoverMobility();
-        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
-    }
-}
-
 #endif  // PARALLELIZE_MATRIX
 
 //------------------------------------------------------------------------------
-#pragma mark - Precondition
-
+#pragma mark - Compute Preconditionner
 
 void printBlock(Mecable* mec, size_t sup)
 {
@@ -904,7 +922,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     copy_real(bks*bks, wrk, mat);  // mat <- wrk
     for ( size_t i = 0; i < bks; ++i )
     {
-        applyPreconditionner(mec, wrk+bks*i, mat+bks*i);
+        applyPreconditionner(mec, mat+bks*i);
         mat[i+bks*i] -= 1;
     }
     real err = blas::nrm2(bks*bks, mat) / bks;
@@ -1418,32 +1436,6 @@ void Meca::computePreconditionner(int precond, int span)
 }
 
 
-void Meca::precondition(const real* X, real* Y) const
-{
-    auto rdt = __rdtsc();
-    if ( Y != X )
-    {
-        copy_real(dimension(), X, Y);
-        #pragma omp parallel for num_threads(NUM_THREADS)
-        for ( Mecable const* mec : mecables )
-        {
-            const size_t inx = DIM * mec->matIndex();
-            applyPreconditionner(mec, X+inx, Y+inx);
-        }
-    }
-    else
-    {
-        #pragma omp parallel for num_threads(NUM_THREADS)
-        for ( Mecable const* mec : mecables )
-        {
-            const size_t inx = DIM * mec->matIndex();
-            applyPreconditionner(mec, Y+inx);
-        }
-    }
-    cycles_ += __rdtsc() - rdt;
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark - Solve
 
@@ -1779,9 +1771,9 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      With exact arithmetic, biConjugate Gradient should converge at most
      in a number of iterations equal to the size of the linear system,
      with each BCGGS iteration involving 2 matrix-vector multiplications.
-     We set here this theoretical limit to the number multiplications:
+     This limit is however too large, and we set an arbitrary limit in practice.
      */
-    size_t max_iter = std::min(2048UL, 2*dimension());
+    size_t max_iter = std::min(1111UL, 2*dimension());
     LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
     //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dimension(), max_iter, tolerance_, precond);
@@ -1795,17 +1787,17 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     if ( precond )
     {
         precondition(vRHS, vSOL);
-        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
-        //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator, mH, mV, temporary);
+        //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator_, mH, mV, temporary_);
     }
     else
     {
-        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-        //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
+        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
+        //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
     }
     
-    //fprintf(stderr, "    BCGS%u    count %4lu  residual %.3e\n", precond, monitor.count(), monitor.residual());
+    //fprintf(stderr, "    BCGS%u    count %4i  residual %.3e\n", precond, monitor.count(), monitor.residual());
 
 #if ( 0 )
     // enable this to compare with GMRES using different restart parameters
@@ -1813,82 +1805,76 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     {
         monitor.reset();
         zero_real(dimension(), vSOL);
-        LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator, mH, mV, temporary);
-        fprintf(stderr, "    GMRES-%i  count %4u  residual %.3e\n", RS, monitor.count(), monitor.residual());
+        LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator_, mH, mV, temporary_);
+        fprintf(stderr, "    GMRES-%i  count %4i  residual %.3e\n", RS, monitor.count(), monitor.residual());
     }
 #endif
 #if ( 0 )
     // enable this to compare BCGS and GMRES
-    fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
+    fprintf(stderr, "    BCGS     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
     monitor.reset();
     zero_real(dimension(), vSOL);
-    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator, mH, mV, temporary);
-    fprintf(stderr, "    GMRES-64 count %4u  residual %.3e\n", monitor.count(), monitor.residual());
+    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
+    fprintf(stderr, "    GMRES-64 count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
     monitor.reset();
     zero_real(dimension(), vSOL);
-    LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator);
-    fprintf(stderr, "    bcgs     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
+    LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator_);
+    fprintf(stderr, "    bcgs     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
-    
-    //------- in case the solver did not converge, we try other methods:
     
     if ( !monitor.converged() )
     {
         Cytosim::out("  no convergence: size %lu precond %i flag %u count %4u residual %.3e",
             dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
-
+        if ( prop->verbose )
+            std::clog << " failed " << monitor.flag() << " count " << monitor.count() << " achieved " << monitor.residual()/tolerance_ << "\n";
+        
+        // in case the solver did not converge, we try other methods:
         monitor.reset();
-#if !SAFER_CONVERGENCE_FAILURE
+#if !SAFER_CONVERGENCE
         // try with a different seed
         precondition(vRHS, vSOL);
 #endif
         if ( precond )
-            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
+            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         else
-            LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
+            LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         
-        Cytosim::out(" -> restarted: count %4u residual %.3e\n", monitor.count(), monitor.residual());
+        Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+        if ( prop->verbose )
+            std::clog << " --> restarted: count " << monitor.count() << " achieved " << monitor.residual()/tolerance_;
 
-        if ( !monitor.converged() )
+        // relax the convergence criteria a bit
+        if ( monitor.residual() > 1.4142 * tolerance_ )
         {
+            // try with our strongest preconditioner
+            computePreconditionner(6, 0);
             monitor.reset();
+#if !SAFER_CONVERGENCE
             zero_real(dimension(), vSOL);
-            if ( precond )
-            {
-                // try without preconditioner
-                LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
-                //LinearSolvers::GMRES(*this, vRHS, vSOL, 255, monitor, allocator, mH, mV, temporary);
-                Cytosim::out("    BCGS  : count %4u residual %.3e\n", monitor.count(), monitor.residual());
-            }
-            else
-            {
-                // try with strongest preconditioner
-                computePreconditionner(4, 0);
-                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-                Cytosim::out("    BCGSP4: count %4u residual %.3e\n", monitor.count(), monitor.residual());
-            }
+#endif
+            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
+            Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), monitor.residual());
         }
 
-        if ( !monitor.converged() )
+#if SAFER_CONVERGENCE
+        // relax the convergence criteria a bit more
+        if ( monitor.residual() > 1.4142 * tolerance_ )
         {
-            monitor.reset();
             // try with different seed and strongest preconditioner
-            copy_real(dimension(), vRND, vSOL);
-            computePreconditionner(4, 0);
-            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator);
-            Cytosim::out(" reseeded: count %4u residual %.3e\n", monitor.count(), monitor.residual());
+            monitor.reset();
+            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
+            Cytosim::out(" reseeded: count %4i residual %.3e\n", monitor.count(), monitor.residual());
         }
-        
-        if ( !monitor.converged() )
-        {
-            // if the solver did not converge, its result cannot be used!
-            if ( monitor.residual() > 4*tolerance_ )
-                throw Exception("no convergence after ",monitor.count()," iterations, residual ",monitor.residual());
-            return 0;
-        }
+#endif
+
+        // if the solver did not converge, its result cannot be used!
+        if ( monitor.residual() > 1.4142 * tolerance_ )
+            throw Exception("no convergence, residual ", monitor.residual(),
+                            " achieved ", monitor.residual()/tolerance_);
     }
     
     const auto total = ( __rdtsc() - start ) >> 10;
@@ -1915,6 +1901,16 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         oss << " precond " << precond;
         oss << " count " << std::setw(3) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
+        size_t dim = dimension();
+        if ( prop->verbose & 8 )
+        {
+            // calculate true residual = rhs - A * x
+            real * tmp = allocator_.bind(0);
+            multiply(vSOL, tmp);
+            blas::sub(dim, vRHS, tmp);
+            oss << ": " << std::setw(11) << std::left << blas::nrm8(dim, tmp);
+            oss << " disp " << std::setw(11) << std::left << blas::nrm8(dim, vSOL);
+        }
         if ( prop->verbose & 4 )
         {
             unsigned cnt = std::max(1U, monitor.count());

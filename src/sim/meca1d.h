@@ -35,7 +35,7 @@ class Meca1D
 
     SparMatSym1 mat;             ///< matrix containing the elasticity coefficients
 
-    LinearSolvers::Allocator allocator;  ///< working memory allocator
+    LinearSolvers::Allocator allocator_;  ///< working memory allocator
     
     int ready_;                  ///< true if the solution is contained in 'vSOL'
 
@@ -179,7 +179,7 @@ public:
         mat.prepareForMultiply(1);
         LinearSolvers::Monitor monitor(dimension(), precision);
         // solve system using Bi-Conjugate Gradient Stabilized Method:
-        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator);
+        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         ready_ = monitor.converged();
         return monitor.count();
     }
