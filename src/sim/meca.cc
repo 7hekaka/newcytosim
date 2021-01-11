@@ -1829,8 +1829,6 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     {
         Cytosim::out("  no convergence: size %lu precond %i flag %u count %4u residual %.3e",
             dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
-        if ( prop->verbose )
-            std::clog << " failed " << monitor.flag() << " count " << monitor.count() << " achieved " << monitor.residual()/tolerance_ << "\n";
         
         // in case the solver did not converge, we try other methods:
         monitor.reset();
@@ -1844,8 +1842,6 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         
         Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), monitor.residual());
-        if ( prop->verbose )
-            std::clog << " --> restarted: count " << monitor.count() << " achieved " << monitor.residual()/tolerance_;
 
         // relax the convergence criteria a bit
         if ( monitor.residual() > 1.4142 * tolerance_ )
@@ -1899,7 +1895,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 #endif
         oss << " " << mFUL.what();
         oss << " precond " << precond;
-        oss << " count " << std::setw(3) << monitor.count();
+        oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         size_t dim = dimension();
         if ( prop->verbose & 8 )
@@ -1922,8 +1918,6 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             oss << " R " << std::setw(6) << ( total - factor - solve ) / cnt;
         }
         Cytosim::out << oss.str() << "\n";
-        if ( prop->verbose & 2 )
-            std::clog << oss.str() << "\n";
     }
     
     cycles_ = total;
