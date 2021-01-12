@@ -114,26 +114,36 @@ inline static vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _
 /// Vector of 8 floats
 typedef __m256 vec8f;
 
-inline static vec8f setzero8f()                   { return _mm256_setzero_ps(); }
-inline static vec8f set8f(float a)                { return _mm256_set1_ps(a); }
-inline static vec8f load8f(float const* a)        { return _mm256_load_ps(a); }
-inline static vec8f loadu8f(float const* a)       { return _mm256_loadu_ps(a); }
+inline static vec8f setzero8f()                  { return _mm256_setzero_ps(); }
+inline static vec8f set8f(float a)               { return _mm256_set1_ps(a); }
+inline static vec8f load8f(float const* a)       { return _mm256_load_ps(a); }
+inline static vec8f loadu8f(float const* a)      { return _mm256_loadu_ps(a); }
 
-inline static void  store1f(float* a, vec8f b)    { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
-inline static void  store8f(float* a, vec8f b)    { _mm256_store_ps(a, b); }
-inline static void  storeu8f(float* a, vec8f b)   { _mm256_storeu_ps(a, b); }
+inline static void store1f(float* a, vec8f b)    { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
+inline static void store8f(float* a, vec8f b)    { _mm256_store_ps(a, b); }
+inline static void storeu8f(float* a, vec8f b)   { _mm256_storeu_ps(a, b); }
 
-inline static vec8f mul8f(vec8f a, vec8f b)       { return _mm256_mul_ps(a,b); }
-inline static vec8f div8f(vec8f a, vec8f b)       { return _mm256_div_ps(a,b); }
-inline static vec8f add8f(vec8f a, vec8f b)       { return _mm256_add_ps(a,b); }
-inline static vec8f sub8f(vec8f a, vec8f b)       { return _mm256_sub_ps(a,b); }
+inline static vec8f mul8f(vec8f a, vec8f b)      { return _mm256_mul_ps(a,b); }
+inline static vec8f div8f(vec8f a, vec8f b)      { return _mm256_div_ps(a,b); }
+inline static vec8f add8f(vec8f a, vec8f b)      { return _mm256_add_ps(a,b); }
+inline static vec8f sub8f(vec8f a, vec8f b)      { return _mm256_sub_ps(a,b); }
 
-inline static vec8f max8f(vec8f a, vec8f b)       { return _mm256_max_ps(a,b); }
-inline static vec8f min8f(vec8f a, vec8f b)       { return _mm256_min_ps(a,b); }
+inline static vec8f max8f(vec8f a, vec8f b)      { return _mm256_max_ps(a,b); }
+inline static vec8f min8f(vec8f a, vec8f b)      { return _mm256_min_ps(a,b); }
 
-inline static vec8f and8f(vec8f a, vec8f b)       { return _mm256_and_ps(a,b); }
-inline static vec8f andnot8f(vec8f a, vec8f b)    { return _mm256_andnot_ps(a,b); }
-inline static vec8f abs8f(vec8f a)                { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
+inline static vec8f and8f(vec8f a, vec8f b)      { return _mm256_and_ps(a,b); }
+inline static vec8f andnot8f(vec8f a, vec8f b)   { return _mm256_andnot_ps(a,b); }
+inline static vec8f abs8f(vec8f a)               { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
+
+inline static vec8f unpacklo8f(vec8f a, vec8f b) { return _mm256_unpacklo_ps(a,b); }
+inline static vec8f unpackhi8f(vec8f a, vec8f b) { return _mm256_unpackhi_ps(a,b); }
+
+inline static vec8f isnan8f(vec8f a) { return _mm256_cmp_ps(a,a,3); }
+inline static vec8f blend8f(vec8f a, vec8f b, vec8f k) { return _mm256_blendv_ps(a,b,k); }
+inline static vec8f swap2f128(vec8f a) { return _mm256_permute2f128_ps(a, a, 0x01); }
+inline static vec8f permute8f(vec8f a) { return _mm256_permute_ps(a, 0xB1); }
+inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
+
 
 #define permute8f128(a,b,c)  _mm256_permute4f128_ps(a,b,c)
 

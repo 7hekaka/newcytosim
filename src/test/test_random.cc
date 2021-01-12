@@ -443,24 +443,12 @@ real * gauss_fill_0(real dst[], const int32_t src[], int32_t const*const end)
 #include "simd.h"
 #include "simd_float.h"
 
-template < typename T >
-void print(T const* vec, T const*const end)
-{
-#if ( 1 )
-    for ( T const* f = vec; f < end; ++f )
-    {
-        for ( int i = 0; i < 16 && f < end; ++i )
-            printf(" %8.4f", *f++);
-        printf("\n");
-    }
-#else
-    for ( T const* f = vec; f < end; ++f )
-        printf(" %10.6f\n", *f);
-#endif
-}
 
-
-// pack array by removing 'nan' values
+/**
+ This packs an array by removing 'nan' values. The order of the list is irrelevant.
+ This implementation is quite poor and takes much more time than the calculation
+ of the Gaussian to start with, so there must be a better way to proceed!
+ */
 template < typename T >
 T * remove_nans(T * s, T * e)
 {
@@ -502,19 +490,40 @@ real * gauss_fill_AVX(real dst[], const __m256i src[], __m256i* end)
 {
     const vec8f fac = set8f(TWO_POWER_MINUS_31);
     const vec8f two = set8f(-0.5);
-
+    vec8f x, y, t, n;
+    
     real * d = dst;
     while ( src < end )
     {
-        vec8f x = mul8f(fac, cvt8i(load8si(src++)));
-        vec8f y = mul8f(fac, cvt8i(load8si(src++)));
-        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
+        x = mul8f(fac, cvt8i(load8si(src++)));
+        y = mul8f(fac, cvt8i(load8si(src++)));
+        n = add8f(mul8f(x,x), mul8f(y,y));
         //as there is no intrinsic for logarithm, and this relies on a library
         //w = std::sqrt( -2 * std::log(n) / n );
         //n = rsqrt8f(div8f(mulf(two, n), log8f(n)));
         n = rsqrt8f(mul8f(mul8f(two, n), rcp8f(log8f(n))));
         x = mul8f(n, x);
         y = mul8f(n, y);
+        // place corresponding X and Y values next to each other:
+        t = unpacklo8f(x, y);
+        y = unpackhi8f(x, y);
+        // swap the NaNs to move them to 'y':
+        x = blend8f(t, y, isnan8f(t));
+        y = blend8f(y, t, isnan8f(t));
+#if 1 // can push more NaNs out by swapping within the lanes:
+        // swap the NaNs to move them to 'y':
+        t = swap2f128(x);
+        x = blend8f(t, y, isnan8f(t));
+        y = blend8f(y, t, isnan8f(t));
+        // swap the NaNs to move them to 'y':
+        t = permute44f(x);
+        x = blend8f(t, y, isnan8f(t));
+        y = blend8f(y, t, isnan8f(t));
+        // swap the NaNs to move them to 'y':
+        t = swap2f128(x);
+        x = blend8f(t, y, isnan8f(t));
+        y = blend8f(y, t, isnan8f(t));
+#endif
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
         store4(d   , cvt4sd(getlo4f(x)));
@@ -529,10 +538,43 @@ real * gauss_fill_AVX(real dst[], const __m256i src[], __m256i* end)
         d += 16;
     }
     _mm_empty();
-    return remove_nans(dst, d);
+    return d;
+    //return remove_nans(dst, d);
 }
 
 #endif
+
+
+template < typename T >
+void print_gaussian(size_t cnt, T const* vec)
+{
+    for ( size_t i = 0; i < cnt; )
+    {
+        for ( int j = 0; j < 16 && i < cnt; ++j, ++i )
+            printf(" %8.4f", vec[i]);
+        printf("\n");
+    }
+}
+
+void check_gaussian(size_t cnt, real* vec)
+{
+    size_t nan = 0;
+    real avg = 0, dev = 0;
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        if ( vec[i] != vec[i] )
+            ++nan;
+        else
+        {
+            avg += vec[i];
+            dev += vec[i] * vec[i];
+        }
+    }
+    cnt -= nan;
+    avg /= cnt;
+    dev = dev / cnt - avg;
+    printf("%6lu numbers: %lu NaNs, avg %7.4f dev %7.4f\n", cnt, nan, avg, dev);
+}
 
 void test_gaussian(int cnt)
 {
@@ -556,8 +598,9 @@ void test_gaussian(int cnt)
             end = gauss_fill_0(vec, buf, buf+SFMT_N32);
             RNG.refill();
         }
-        printf("gauss0       %5.2f\n", toc(cnt));
-        //print(vec, end);
+        printf("gauss0       %5.2f  :", toc(cnt));
+        check_gaussian(end-vec, vec);
+        //print_gaussian(end-vec, vec);
     }
 #if defined(__INTEL_COMPILER) && defined(__AVX__)
     __m256i * mem = (__m256i*)buf;
@@ -570,8 +613,9 @@ void test_gaussian(int cnt)
             end = gauss_fill_AVX(vec, mem, mem+SFMT_N256);
             RNG.refill();
         }
-        printf("gauss avx    %5.2f\n", toc(cnt));
-        print(vec, end);
+        printf("gauss AVX    %5.2f  :", toc(cnt));
+        check_gaussian(end-vec, vec);
+        print_gaussian((end-vec)/8, vec);
     }
 #endif
 }
