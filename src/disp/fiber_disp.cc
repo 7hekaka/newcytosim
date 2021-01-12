@@ -54,10 +54,12 @@ void FiberDisp::clear()
     
     length_scale     = 1;
     tension_scale    = 1;
-    force_scale      = 0;
-    force_color      = 0xFF0000FF;
     
-    explode          = 0;
+    force_style      = 0;
+    force_scale      = 1;
+    force_color      = 0xFF00FFFF;
+    
+    explode_style    = 0;
     explode_range    = 0;
     draw_average     = 0;
 }
@@ -145,15 +147,17 @@ void FiberDisp::read(Glossary& glos)
     
     glos.set(length_scale,     "length_scale");
     glos.set(tension_scale,    "tension_scale");
-    glos.set(force_scale,      "forces");
-    glos.set(force_color,      "forces", 1);
+
+    glos.set(force_style, "forces") || glos.set(force_style, "force");
+    glos.set(force_scale, "forces", 1) || glos.set(force_scale, "force", 1);
+    glos.set(force_color, "forces", 2) || glos.set(force_color, "force", 2);
     
-    glos.set(explode,          "explode");
+    glos.set(explode_style,    "explode");
     glos.set(explode_range,    "explode", 1);
     
 #ifdef BACKWARD_COMPATIBILITY
     if ( glos.set(explode_range, "display_shift") )
-        explode = 1;
+        explode_style = 1;
 #endif
     
     glos.set(draw_average,     "draw_average");
@@ -182,8 +186,8 @@ void FiberDisp::write_values(std::ostream& os) const
     
     write_value(os, "length_scale", length_scale);
     write_value(os, "tension_scale",tension_scale);
-    write_value(os, "forces",       force_scale, force_color);
-    write_value(os, "explode",      explode, explode_range);
+    write_value(os, "forces",       force_style, force_scale, force_color);
+    write_value(os, "explode",      explode_style, explode_range);
     write_value(os, "draw_average", draw_average);
 }
 

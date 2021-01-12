@@ -18,8 +18,8 @@ void processMenuFiber(int item)
             case 7:   FD->end_style[1] = 3*!FD->end_style[1];     break;
             case 8:   FD->end_style[0] = 2*!FD->end_style[0];     break;
                 
-            case 9:   FD->force_scale  = FD->force_scale>0?0:0.1; break;
-            case 10:  FD->visible      = !FD->visible;            break;
+            case 9:   FD->force_style = FD->force_style; break;
+            case 10:  FD->visible     = !FD->visible;    break;
                 
             case 20:  FD->coloring = FiberDisp::COLORING_OFF;       break;
             case 21:  FD->coloring = FiberDisp::COLORING_RANDOM;    break;
@@ -62,7 +62,7 @@ int buildMenuFiber()
         glutAddMenuEntry(FD->point_style==2 ? "Hide Arrows"      :"Show Arrows",       5);
         glutAddMenuEntry(FD->end_style[1]   ? "Hide Minus-ends"  :"Show Minus-end",    7);
         glutAddMenuEntry(FD->end_style[0]   ? "Hide Plus-ends"   :"Show Plus-end",     8);
-        glutAddMenuEntry(FD->force_scale>0  ? "Hide Point-forces":"Show Point-Forces", 9);
+        glutAddMenuEntry(FD->force_style    ? "Hide Point-forces":"Show Point-Forces", 9);
         glutAddMenuEntry("No coloring",           20);
         glutAddMenuEntry("Coloring by number",    21);
         glutAddMenuEntry("Coloring by mark",      22);

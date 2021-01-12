@@ -420,7 +420,7 @@ void Display::prepareLineDisp(const Fiber * fib)
         self->visible = 0;
     
     // set parameters for exploded display
-    if ( disp->explode )
+    if ( disp->explode_style )
         self->explode_shift = ( lcrng3(fib->signature()) * 0x1p-32 - 0.5 ) * disp->explode_range;
     else
         self->explode_shift = 0;
@@ -1403,10 +1403,10 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
 {
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
-    for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
+    for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
-        Vector p = fib.posP(ii);
-        Vector q = p + scale * fib.netForce(ii);
+        Vector p = fib.posP(i);
+        Vector q = p + scale * fib.netForce(i);
         gle::gleVertex(p);
         gle::gleVertex(q);
     }
@@ -1770,10 +1770,10 @@ void Display::drawFiber(Fiber const& fib)
             drawFiberPlusEnd(fib, disp->end_style[0], disp->end_size[0]);
         }
         
-        if ( disp->force_scale > 0 )
+        if ( disp->force_style )
         {
             disp->force_color.load();
-            lineWidth(disp->point_size);
+            lineWidth(std::max(1.0f, disp->point_size));
             drawFiberForces(fib, disp->force_scale);
         }
     }

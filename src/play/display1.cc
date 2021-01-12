@@ -474,7 +474,7 @@ inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA
         dispB->color.load();
         shiftedVertex(b, fibA);
     }
-    if ( dispB->visible && fibB->disp->visible && fibB->prop->disp->explode )
+    if ( dispB->visible && fibB->disp->visible && fibB->prop->disp->explode_style )
     {
         dispA->color.load();
         shiftedVertex(a, fibB);

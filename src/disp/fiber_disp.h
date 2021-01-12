@@ -268,14 +268,17 @@ public:
      */
     real         tension_scale;
 
-    /// ( if > 0 ) display the net forces FP acting on vertices (known as `force`)
+    /// ( if != 0 ) display the net forces acting on vertices (known as `force`)
+    real         force_style;
+
     /**
-     A force F acting on a vertex is displayed as a segment of length `force_scale * F`.
-     ( default = 0 )
+     if `force_style != 0), a force `F` acting on a vertex is displayed as a
+     segment of length `force_scale * F`.
+     ( known as force[1], default = 1 )
      */
     real         force_scale;
     
-    /// this color is specified as forces[1]
+    /// this color is specified as forces[2]
     gle_color    force_color;
 
     
@@ -284,7 +287,7 @@ public:
      This can be useful to visualize dense regions,
      but is only implemented for style=2
      */
-    int          explode;
+    int          explode_style;
     
     /// amount of lateral shift to separate fibers when display is exploded (known as `explode[1]`)
     real         explode_range;

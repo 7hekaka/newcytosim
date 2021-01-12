@@ -272,10 +272,10 @@ void changeExclude(FiberDisp* p, int val)
 
 void flipExplode(FiberDisp* p)
 {
-    p->explode = ! p->explode;
-    if ( p->explode && p->explode_range == 0 )
+    p->explode_style = ! p->explode_style;
+    if ( p->explode_style && p->explode_range == 0 )
         p->explode_range = 1;
-    flashText("fiber:explode = %i", p->explode);
+    flashText("fiber:explode = %i", p->explode_style);
 }
 
 
@@ -305,7 +305,7 @@ void changeScale(FiberDisp* p, int d)
         changeScale(p->length_scale, d);
         flashText("fiber:length_scale = %.5f", p->length_scale);
     }
-    else if ( p->force_scale > 0 )
+    else if ( p->force_style )
     {
         changeScale(p->force_scale, d);
         flashText("fiber:force_scale = %.5f", p->force_scale);
