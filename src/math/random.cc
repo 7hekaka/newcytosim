@@ -335,7 +335,7 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* end)
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         //as there is no intrinsic for logarithm, and this relies on a library
         //w = std::sqrt( -2 * std::log(n) / n );
-        //n = rsqrt8f(div8f(mulf(two, n), log8f(n)));
+        //n = rsqrt8f(div8f(mul8f(two, n), log8f(n)));
         n = rsqrt8f(mul8f(mul8f(two, n), rcp8f(log8f(n))));
         x = mul8f(n, x);
         y = mul8f(n, y);

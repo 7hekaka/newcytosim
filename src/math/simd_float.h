@@ -55,7 +55,7 @@ inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110)
 
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
 
-inline static vec4f sign_select(vec4f val, vec4f neg, vec4f pos)
+inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos)
 {
 #if defined(__AVX512VL__)
     return _mm_mask_mov_ps(pos, val, neg);
@@ -79,16 +79,16 @@ inline static vec4f load3f(float const* a) { vec4f b; b[0]=a[0]; b[1]=a[2]; b[1]
 
 #if defined(__AVX__)
 // copy a[0] into all elements of destination
-inline static vec4f broadcast1f(vec4f a)          { return _mm_permute_ps(a,0x00); }
+inline static vec4f broadcastlof(vec4f a)         { return _mm_permute_ps(a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
 inline static vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i*)a); }
 #define permute4f(a,k)    _mm_permute_ps(a,k)
 // Convert between vector types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
 inline static __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
-inline static void store4f(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
+inline static void store4d(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
 #elif defined(__SSE3__)
-inline static vec4f broadcast1f(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
+inline static vec4f broadcastlof(vec4f a)         { return _mm_shuffle_ps(a,a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
 inline static vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
 #define permute4f(a,k)    _mm_shuffle_ps(a,a,k)
@@ -119,7 +119,7 @@ inline static vec8f set8f(float a)               { return _mm256_set1_ps(a); }
 inline static vec8f load8f(float const* a)       { return _mm256_load_ps(a); }
 inline static vec8f loadu8f(float const* a)      { return _mm256_loadu_ps(a); }
 
-inline static void store1f(float* a, vec8f b)    { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
+inline static void storelof(float* a, vec8f b)   { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
 inline static void store8f(float* a, vec8f b)    { _mm256_store_ps(a, b); }
 inline static void storeu8f(float* a, vec8f b)   { _mm256_storeu_ps(a, b); }
 
@@ -131,6 +131,7 @@ inline static vec8f sub8f(vec8f a, vec8f b)      { return _mm256_sub_ps(a,b); }
 inline static vec8f max8f(vec8f a, vec8f b)      { return _mm256_max_ps(a,b); }
 inline static vec8f min8f(vec8f a, vec8f b)      { return _mm256_min_ps(a,b); }
 
+inline static vec8f or8f(vec8f a, vec8f b)       { return _mm256_or_ps(a,b); }
 inline static vec8f and8f(vec8f a, vec8f b)      { return _mm256_and_ps(a,b); }
 inline static vec8f andnot8f(vec8f a, vec8f b)   { return _mm256_andnot_ps(a,b); }
 inline static vec8f abs8f(vec8f a)               { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
@@ -147,19 +148,21 @@ inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
 
 #define permute8f128(a,b,c)  _mm256_permute4f128_ps(a,b,c)
 
+
 /// approximate inverse: 1/a
-inline static vec8f rcp8f(vec8f a)                { return _mm256_rcp_ps(a); }
+inline static vec8f rcp8f(vec8f a)    { return _mm256_rcp_ps(a); }
 
-inline static vec4f getlo4f(vec8f a)              { return _mm256_castps256_ps128(a); }
-inline static vec4f gethi4f(vec8f a)              { return _mm256_extractf128_ps(a,1); }
+inline static vec4f getlo4f(vec8f a)  { return _mm256_castps256_ps128(a); }
+inline static vec4f gethi4f(vec8f a)  { return _mm256_extractf128_ps(a,1); }
 
-inline static vec8f cvt8i(__m256i a)              { return _mm256_cvtepi32_ps(a); }
+inline static vec8f cvt8i(__m256i a)  { return _mm256_cvtepi32_ps(a); }
+inline static vec8f cast8f(__m256i a) { return _mm256_castsi256_ps(a); }
 
 #define load8si(a)           _mm256_load_si256(a)
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
 
-inline static vec8f sign_select(vec8f val, vec8f neg, vec8f pos)
+inline static vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos)
 {
 #if defined(__AVX512VL__)
     return _mm256_mask_mov_ps(pos, val, neg);
@@ -168,6 +171,7 @@ inline static vec8f sign_select(vec8f val, vec8f neg, vec8f pos)
 #endif
 }
 
+inline static vec8f sqrt8f(vec8f a) { return _mm256_sqrt_ps(a); }
 /// approximate reciprocal square root: 1 / sqrt(a)
 inline static vec8f rsqrt1f(vec8f a) { return _mm256_rsqrt_ps(a); }
 
@@ -189,18 +193,53 @@ inline static vec8f rsqrt8f(vec8f x)
 
 // natural logarithm:
 #if defined(__INTEL_COMPILER)
-// using Intel's SVML library, provided by the Intel compiler.
-// Intrinsics for Short Vector Math Library (SVML) Operations
-inline static vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
+
 inline static vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
-#elif defined(__GLIBC__)
-// using libmvec (https://sourceware.org/glibc/wiki/libmvec)
-__m256d _ZGVdN4v_log(__m256d x);
-__m256 _ZGVdN8v_logf(__m256 x);
-//inline static vec4f log4(vec4f const x) { return _ZGVdN8v_logf(x); }
-inline static vec8f log8f(vec8f const x) { return _ZGVdN8v_logf(x); }
+
+#else
+
+inline static __m256 MM256_INT32(int32_t arg) { return _mm256_castsi256_ps(_mm256_set1_epi32(arg)); }
+inline static __m256 MM256_FLOAT(float arg) { return _mm256_set1_ps(arg); }
+
+/*
+ Absolute error bounded by 1e-5 for normalized inputs
+   Returns a finite number for +inf input
+   Returns -inf for nan and <= 0 inputs.
+   Continuous error.
+ By Jacques-Henri Jourdan, SIMD by Francois Nedelec 12.01.2021
+ */
+inline vec8f log8f(__m256 xxx)
+{
+    // masks:
+    const vec8f mant = MM256_INT32(0x007fffff);
+    const vec8f expo = MM256_INT32(0x3f800000);
+    // polynomial coefficients
+    const vec8f a = MM256_FLOAT(+3.529304993f);
+    const vec8f b = MM256_FLOAT(-2.461222105f);
+    const vec8f c = MM256_FLOAT(+1.130626167f);
+    const vec8f d = MM256_FLOAT(-0.288739945f);
+    const vec8f e = MM256_FLOAT(+3.110401639e-2f);
+    const vec8f f = MM256_FLOAT(-89.970756366f);
+    const vec8f g = MM256_FLOAT(0.6931471805f);
+    // used to clear negative / NaN arguments:
+    vec8f invalid = _mm256_cmp_ps(xxx, setzero8f(), _CMP_NGT_US);
+    // extract exponent:
+    vec8f cst = cvt8i(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));
+    cst = add8f(mul8f(cst, g), f);
+    // clear exponents:
+    xxx = or8f(expo, and8f(mant, xxx));
+    // evaluate polynom:
+    vec8f tmp = add8f(mul8f(xxx, e), d);
+    tmp = add8f(mul8f(xxx, tmp), c);
+    tmp = add8f(mul8f(xxx, tmp), b);
+    tmp = add8f(mul8f(xxx, tmp), a);
+    tmp = add8f(mul8f(xxx, tmp), cst);
+    // clear negative arguments:
+    return or8f(tmp, invalid);
+}
+
 #endif
 
-#endif  // AVX
+#endif // AVX
 
 #endif // SIMD_FLOAT_H

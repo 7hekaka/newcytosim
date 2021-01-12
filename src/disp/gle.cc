@@ -111,7 +111,7 @@ namespace gle
         GLfloat * const end = CS + 2 * cnt;
         while ( ptr < end )
         {
-            store4f(ptr, pp);
+            store4d(ptr, pp);
             ptr += 4;
             // apply the rotation matrix
             // x = c * x - s * y;
