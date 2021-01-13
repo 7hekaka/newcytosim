@@ -58,7 +58,7 @@ void Simul::setFiberGrid(Space const* spc) const
 
 
 /**
- Will pepare the simulation engine to make it ready to make a step():
+ Will pepare the simulation engine to make it able to execute step():
  - set FiberGrid used for attachment of Hands,
  - set StericGrid
  - call complete() for all registered Property

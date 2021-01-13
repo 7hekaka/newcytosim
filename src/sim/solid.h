@@ -120,6 +120,9 @@ public:
 
     /// total translation drag-coefficient (force = drag * speed)
     real        dragCoefficient() const { return ( 6 * M_PI ) * prop->viscosity * sumRadius(); }
+    
+    /// The mobility of a model vertex ( speed = mobility * point_force )
+    real        pointMobility() const { return nbPoints() / dragCoefficient(); }
 
     /// add the interactions due to confinement
     void        setInteractions(Meca&) const;

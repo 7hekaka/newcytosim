@@ -82,6 +82,9 @@ public:
     
     /// the total drag-coefficient of object (force = drag * speed)
     real        dragCoefficient() const { return paDrag; }
+    
+    /// The mobility of a model vertex ( speed = mobility * point_force )
+    real        pointMobility() const { return 1 / paDrag; }
 
     /// sets the mobility
     void        prepareMecable() { setDragCoefficient(); }

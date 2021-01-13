@@ -158,6 +158,9 @@ public:
     /// total drag-coefficient of object (force = drag * speed)
     real        dragCoefficient() const { return nPoints / iPointMobility; }
     
+    /// The mobility of a model vertex ( speed = mobility * point_force )
+    real        pointMobility() const { return iPointMobility; }
+
     /// drag coefficient of one point
     real        leftoverMobility() const { return iPointMobility; }
 

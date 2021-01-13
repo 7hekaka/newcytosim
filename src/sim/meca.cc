@@ -234,7 +234,6 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 #endif
 
     mec->projectForces(Y+inx, Y+inx);
-
     // Y <- X + alpha * Y
     blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
 }
@@ -612,13 +611,13 @@ void printBlock(Mecable* mec, size_t sup)
  
      I - time_step * mobility * Rigidity
  
- This block is square, symmetric, definite positive and totally predictable
+ This block is square, symmetric, definite positive and predictable
  */
 void Meca::getIsoBBlock(const Mecable * mec, real* res) const
 {
     const size_t nbp = mec->nbPoints();
 
-    const real beta = -tau_ * mec->leftoverMobility();
+    const real beta = -tau_ * mec->pointMobility();
     
     if ( mec->hasRigidity() )
     {
@@ -695,10 +694,13 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     
     for ( size_t i = 0; i < bks; ++i )
         mec->projectForces(res+bks*i, res+bks*i);
+
+    const real beta = -tau_ * mec->leftoverMobility();
+#else
+    // the projection is not called, so we scale by mobility
+    const real beta = -tau_ * mec->pointMobility();
 #endif
 
-    // scale
-    const real beta = -tau_ * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < nbp*nbp; ++n )
         res[n] = beta * res[n];
@@ -744,7 +746,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
         mFUL.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
     
     // multiply by the drag coefficient, skipping projection
-    const real beta = -tau_ * nbp / mec->dragCoefficient();
+    const real beta = -tau_ * mec->pointMobility();
     
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < bks*bks; ++n )
@@ -1075,7 +1077,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
      died 31.08.1918 in Bagneux, following wounds received in battlefield.
      */
     int bt, info = 0;
-    if ( ISOB_LDD < nbp )
+    if ( 1 ) //ISOB_LDD <= nbp )
     {
         getIsoBBlock(mec, mec->block());
         // calculate Banded Cholesky factorization:
@@ -1827,8 +1829,8 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     
     if ( !monitor.converged() )
     {
-        Cytosim::out("  no convergence: size %lu precond %i flag %u count %4u residual %.3e",
-            dimension(), precond, monitor.flag(), monitor.count(), monitor.residual());
+        Cytosim::out("Failed with size %lu precond %i flag %u count %4u residual %.3e (%.3f)",
+            dimension(), precond, monitor.flag(), monitor.count(), monitor.residual(), monitor.residual()/tolerance_);
         
         // in case the solver did not converge, we try other methods:
         monitor.reset();
@@ -2133,7 +2135,7 @@ void Meca::saveDrag(FILE * file) const
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
-        const real drag = mec->dragCoefficient() / nbp;
+        const real drag = 1 / mec->pointMobility();
         for ( size_t p = 0; p < DIM * nbp; ++p )
             fprintf(file, "%f\n", drag);
     }
@@ -2451,7 +2453,7 @@ void Meca::dumpDrag(FILE * file, bool nat) const
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
-        const real drag = mec->dragCoefficient() / nbp;
+        const real drag = 1 / mec->pointMobility();
         for ( size_t p=0; p < nbp; ++p )
             vec[p] = drag;
         for ( int d = 0; d < DIM; ++ d )

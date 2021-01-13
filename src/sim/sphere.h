@@ -96,6 +96,9 @@ public:
     
     /// total drag-coefficient of object (force = drag * speed)
     real        dragCoefficient() const { return spDrag; }
+    
+    /// The mobility of a model vertex ( speed = mobility * point_force )
+    real        pointMobility() const { return 1 / spDrag; }
 
     /// add the interactions due to confinement
     void        setInteractions(Meca&) const;

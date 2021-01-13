@@ -678,11 +678,11 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
 
 void reportCPUtime(size_t frm, real simtime)
 {
-    static time_t nxt = TicToc::seconds_since_1970();
+    static time_t nxt = 0;
     time_t now = TicToc::seconds_since_1970();
     if ( now > nxt )
     {
-        nxt = nxt + 3600;
+        nxt = (nxt>0?nxt:now) + 3600;
         Cytosim::log << "% " << TicToc::date() << "\n";
     }
     
