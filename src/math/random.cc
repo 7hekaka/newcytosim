@@ -247,8 +247,10 @@ void Random::gauss_set(real & a, real & b, real v)
  For each 4 input values, this produces ~PI values.
  @Return address past the last value stored in `dst` = dst + nb_of_values_set
  */
-real * gauss_fill(real dst[], const int32_t src[], int32_t const*const end)
+real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
 {
+    int32_t const*const end = src + cnt;
+    real * d = dst;
     while ( src < end )
     {
         real x = src[0] * TWO_POWER_MINUS_31;
@@ -257,13 +259,13 @@ real * gauss_fill(real dst[], const int32_t src[], int32_t const*const end)
         if (( w <= 1 ) & ( 0 < w ))
         {
             w = std::sqrt( -2 * std::log(w) / w );
-            dst[0] = w * x;
-            dst[1] = w * y;
-            dst += 2;
+            d[0] = w * x;
+            d[1] = w * y;
+            d += 2;
         }
         src += 2;
     }
-    return dst;
+    return d;
 }
 
 /**
@@ -276,7 +278,7 @@ void Random::refill_gaussians()
 {
     int32_t * mem = reinterpret_cast<int32_t*>(gaussians_+SFMT_N32) - SFMT_N32;
     sfmt_fill_array32(&twister_, (uint32_t*)mem, SFMT_N32);
-    next_gaussian_ = gauss_fill(gaussians_, mem, mem+SFMT_N32);
+    next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, mem);
     //printf("refill_gaussians %lu\n", next_gaussian_ - gaussians_);
 }
 
@@ -322,12 +324,13 @@ real * remove_nans(real * s, real * e)
 
  F. Nedelec 02.01.2017 and 13.09.2018
  */
-real * gauss_fill(real dst[], const __m256i src[], __m256i* end)
+real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f fac = set8f(TWO_POWER_MINUS_31);
     const vec8f two = set8f(-0.5);
 
     real * d = dst;
+    __m256i const* end = src + cnt;
     while ( src < end )
     {
         vec8f x = mul8f(fac, cvt8i(load8si(src++)));
@@ -335,8 +338,8 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* end)
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         //as there is no intrinsic for logarithm, and this relies on a library
         //w = std::sqrt( -2 * std::log(n) / n );
-        //n = rsqrt8f(div8f(mul8f(two, n), log8f(n)));
-        n = rsqrt8f(mul8f(mul8f(two, n), rcp8f(log8f(n))));
+        n = rsqrt8f(div8f(mul8f(two, n), log8f(n)));
+        //n = rsqrt8f(mul8f(mul8f(two, n), rcp8f(log8f(n))));
         x = mul8f(n, x);
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE
@@ -352,8 +355,8 @@ real * gauss_fill(real dst[], const __m256i src[], __m256i* end)
 #endif
         d += 16;
     }
-    _mm_empty();
-    return remove_nans(dst, d);
+    //return remove_nans(dst, d);
+    return d;
 }
 
 /**
@@ -367,7 +370,7 @@ void Random::refill_gaussians()
     __m256i * mem = reinterpret_cast<__m256i*>(gaussians_+SFMT_N32) - SFMT_N256;
     //alignas(64) __m256i mem[SFMT_N32];
     sfmt_fill_array32(&twister_, (uint32_t*)mem, SFMT_N32);
-    next_gaussian_ = gauss_fill(gaussians_, mem, mem+SFMT_N256);
+    next_gaussian_ = gauss_fill_AVX(gaussians_, SFMT_N256, mem);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
 }
 

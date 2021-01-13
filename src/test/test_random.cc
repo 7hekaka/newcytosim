@@ -420,8 +420,10 @@ int testGillespie(const int method)
  the size of `vec` should be a multiple of 2, and sufficient to hold `end-src` values
  @Return the number of values that were stored in `vec`
  */
-real * gauss_fill_0(real dst[], const int32_t src[], int32_t const*const end)
+real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
 {
+    int32_t const*const end = src + cnt;
+    real * d = dst;
     while ( src < end )
     {
         real x = src[0] * TWO_POWER_MINUS_31;
@@ -430,12 +432,12 @@ real * gauss_fill_0(real dst[], const int32_t src[], int32_t const*const end)
         if (( w <= 1 ) & ( 0 < w ))
         {
             w = std::sqrt( std::log(w) / ( -0.5 * w ) );
-            *dst++ = w * x;
-            *dst++ = w * y;
+            *d++ = w * x;
+            *d++ = w * y;
         }
         src += 2;
     }
-    return dst;
+    return d;
 }
 
 #if defined(__AVX__)
@@ -606,9 +608,18 @@ __m256 logf_app(__m256 val)
  const vec8f mant = MM256_INT32(0x807fffff);
  const vec8f expo = MM256_INT32(0x3f800000);
  const vec8f ninf = MM256_INT32(0xff800000); // -INFINITY
+ const vec8f one = MM256_FLOAT(1.0f);
  x = or8f(expo, and8f(mant, cast8f(load8si(src++))));
  y = or8f(expo, and8f(mant, cast8f(load8si(src++))));
 */
+
+vec8f magic8f(vec8f xxx)
+{
+    // bad approximation of sqrt(x*ln(x)) for x in [1, 2]
+    const vec8f one = set8f(1.0f);
+    const vec8f alpha = set8f(-2*M_LN2);
+    return sqrt8f(mul8f(alpha, mul8f(xxx, sub8f(xxx, one))));
+}
 
 /**
  Calculates Gaussian-distributed, single precision random number,
@@ -622,15 +633,17 @@ __m256 logf_app(__m256 val)
 
  F. Nedelec 02.01.2017
  */
-real * gauss_fill_AVX(real dst[], const __m256i src[], __m256i* end)
+real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(TWO_POWER_MINUS_31);
     const vec8f half = set8f(-0.5);
-    
+    __m256i const* end = src + cnt;
+
     real * d = dst;
+    real * e = dst+8*(cnt-2);
     while ( src < end )
     {
-        // generate random floats in [-1, 1]:
+        // generate 16 random floats in [-1, 1]:
         vec8f x = mul8f(eps, cvt8i(load8si(src++)));
         vec8f y = mul8f(eps, cvt8i(load8si(src++)));
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
@@ -646,10 +659,10 @@ real * gauss_fill_AVX(real dst[], const __m256i src[], __m256i* end)
         // swap the NaNs to move them to 'y':
         x = blend8f(t, y, isnan8f(t));
         y = blend8f(y, t, isnan8f(t));
-#if 0   // can push more NaNs out by swapping within the lanes:
+#if 1   // can push more NaNs out by swapping within the lanes:
         // swap the NaNs to move them to 'y':
         t = permute44f(x);
-        x = blend8f(t, y, isnan8f(t)); d
+        x = blend8f(t, y, isnan8f(t));
         y = blend8f(y, t, isnan8f(t));
         // swap the NaNs to move them to 'y':
         t = swap2f128(x);
@@ -662,26 +675,28 @@ real * gauss_fill_AVX(real dst[], const __m256i src[], __m256i* end)
 #endif
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
-        store4(d   , cvt4sd(getlo4f(x)));
-        store4(d+4 , cvt4sd(getlo4f(y)));
-        store4(d+8 , cvt4sd(gethi4f(x)));
-        store4(d+12, cvt4sd(gethi4f(y)));
+        store4(d  , cvt4sd(getlo4f(x)));
+        store4(d+4, cvt4sd(gethi4f(x)));
+        store4(e  , cvt4sd(getlo4f(y)));
+        store4(e+4, cvt4sd(gethi4f(y)));
 #else
         // store 16 single-precision values
-        store8f(d  , x);
-        store8f(d+8, y);
+        store8f(d, x);
+        store8f(e, y);
 #endif
-        d += 16;
+        d += 8;
+        e -= 8;
     }
-    return d;
-    //return remove_nans(dst, d);
+    //return remove_nans(dst, d) - dst;
+    return dst+8*cnt;
 }
 
 
 /// use this to check the log()
-real * check_log(real dst[], const __m256i src[], __m256i* end)
+void check_log(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(TWO_POWER_MINUS_31);
+    __m256i const* end = src + cnt;
     real * d = dst;
     while ( src < end )
     {
@@ -704,8 +719,6 @@ real * check_log(real dst[], const __m256i src[], __m256i* end)
 #endif
         d += 16;
     }
-    return d;
-    //return remove_nans(dst, d);
 }
 
 
@@ -740,11 +753,20 @@ void check_gaussian(size_t cnt, real* vec)
             dev += vec[i] * vec[i];
         }
     }
+    // covariance of odd and even numbers:
+    real cov = 0;
+    for ( size_t i = 1; i < cnt; i += 2 )
+    {
+        if ( vec[i] == vec[i] )
+            cov += vec[i-1] * vec[i];
+    }
     cnt -= nan;
     avg /= cnt;
     dev = dev / cnt - avg;
-    printf("%6lu numbers + %lu NaNs: avg %7.4f dev %7.4f\n", cnt, nan, avg, dev);
+    cov = 0.5 * cov / cnt;
+    printf("%6lu numbers + %6lu NaNs: avg %7.4f dev %7.4f cov %7.4f\n", cnt, nan, avg, dev, cov);
 }
+
 
 void test_gaussian(int cnt)
 {
@@ -765,13 +787,14 @@ void test_gaussian(int cnt)
         tic();
         for ( int i = 0; i < cnt; ++i )
         {
-            end = gauss_fill_0(vec, buf, buf+SFMT_N32);
+            end = gauss_fill_0(vec, SFMT_N32, buf);
             RNG.refill();
         }
         printf("gauss0       %5.2f  :", toc(cnt));
         check_gaussian(end-vec, vec);
         //print_gaussian(end-vec, vec);
     }
+#if defined(__AVX__)
     __m256i * mem = (__m256i*)buf;
     if ( 1 )
     {
@@ -779,7 +802,7 @@ void test_gaussian(int cnt)
         tic();
         for ( int i = 0; i < cnt; ++i )
         {
-            end = gauss_fill_AVX(vec, mem, mem+SFMT_N256);
+            end = gauss_fill_AVX(vec, SFMT_N256, mem);
             RNG.refill();
         }
         printf("gauss AVX    %5.2f  :", toc(cnt));
@@ -789,10 +812,11 @@ void test_gaussian(int cnt)
     if ( 1 )
     {
         printf("Approximate logarithm:\n");
-        real *end, vec[SFMT_N32] = { 0 };
-        end = check_log(vec, mem, mem+SFMT_N256);
-        print_gaussian(std::min(end-vec, 32L), vec);
+        real vec[SFMT_N32] = { 0 };
+        check_log(vec, SFMT_N256, mem);
+        print_gaussian(std::min(SFMT_N256, 32), vec);
     }
+#endif
 }
 
 
