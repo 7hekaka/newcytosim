@@ -27,11 +27,13 @@ inline static void  store4f(float* a, vec4f b)    { _mm_store_ps(a,b); }
 inline static void  storeu4f(float* a, vec4f b)   { _mm_storeu_ps(a,b); }
 
 inline static vec4f add4f(vec4f a, vec4f b)       { return _mm_add_ps(a,b); }
+inline static vec4f sub4f(vec4f a, vec4f b)       { return _mm_sub_ps(a,b); }
 inline static vec4f mul4f(vec4f a, vec4f b)       { return _mm_mul_ps(a,b); }
 
 inline static vec4f max4f(vec4f a, vec4f b)       { return _mm_max_ps(a,b); }
 inline static vec4f min4f(vec4f a, vec4f b)       { return _mm_min_ps(a,b); }
 
+inline static vec4f or4f(vec4f a, vec4f b)        { return _mm_or_ps(a,b); }
 inline static vec4f and4f(vec4f a, vec4f b)       { return _mm_and_ps(a,b); }
 inline static vec4f andnot4f(vec4f a, vec4f b)    { return _mm_andnot_ps(a,b); }
 inline static vec4f abs4f(vec4f a)                { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
@@ -41,6 +43,9 @@ inline static vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b);
 
 inline static vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline static vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
+
+inline static vec4f cvt4i(__m128i a)  { return _mm_cvtepi32_ps(a); }
+inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
 
 #define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
 
@@ -112,7 +117,6 @@ inline static vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _
 #if defined(__AVX__)
 
 /// Vector of 8 floats
-typedef __m256 vec8f;
 
 inline static vec8f setzero8f()                  { return _mm256_setzero_ps(); }
 inline static vec8f set8f(float a)               { return _mm256_set1_ps(a); }
@@ -151,6 +155,10 @@ inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
 
 /// approximate inverse: 1/a
 inline static vec8f rcp8f(vec8f a)    { return _mm256_rcp_ps(a); }
+/// square root
+inline static vec8f sqrt8f(vec8f a)   { return _mm256_sqrt_ps(a); }
+/// approximate reciprocal square root: 1 / sqrt(a)
+inline static vec8f rsqrt8f(vec8f a)  { return _mm256_rsqrt_ps(a); }
 
 inline static vec4f getlo4f(vec8f a)  { return _mm256_castps256_ps128(a); }
 inline static vec4f gethi4f(vec8f a)  { return _mm256_extractf128_ps(a,1); }
@@ -170,75 +178,6 @@ inline static vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos)
     return _mm256_blendv_ps(pos, neg, val);
 #endif
 }
-
-inline static vec8f sqrt8f(vec8f a) { return _mm256_sqrt_ps(a); }
-/// approximate reciprocal square root: 1 / sqrt(a)
-inline static vec8f rsqrt1f(vec8f a) { return _mm256_rsqrt_ps(a); }
-
-/// approximate reciprocal square root : 1 / sqrt(x) for 8 floats
-inline static vec8f rsqrt8f(vec8f x)
-{
-    vec8f h = _mm256_mul_ps(x, _mm256_set1_ps(0.5f));
-    x = _mm256_rsqrt_ps(x);
-    // refinement: u  <-  1.5 * u - 0.5 * x * u^3
-    vec8f t1 = _mm256_mul_ps(x, x);
-    vec8f t2 = _mm256_mul_ps(h, x);
-    vec8f t3 = _mm256_mul_ps(_mm256_set1_ps(1.5f), x);
-#if defined(__FMA__)
-    return _mm256_fnmadd_ps(t1, t2, t3);
-#else
-    return _mm256_sub_ps(t3, _mm256_mul_ps(t1, t2));
-#endif
-}
-
-// natural logarithm:
-#if defined(__INTEL_COMPILER)
-
-inline static vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
-
-#else
-
-inline static __m256 MM256_INT32(int32_t arg) { return _mm256_castsi256_ps(_mm256_set1_epi32(arg)); }
-inline static __m256 MM256_FLOAT(float arg) { return _mm256_set1_ps(arg); }
-
-/*
- Absolute error bounded by 1e-5 for normalized inputs
-   Returns a finite number for +inf input
-   Returns -inf for nan and <= 0 inputs.
-   Continuous error.
- By Jacques-Henri Jourdan, SIMD by Francois Nedelec 12.01.2021
- */
-inline vec8f log8f(__m256 xxx)
-{
-    // masks:
-    const vec8f mant = MM256_INT32(0x007fffff);
-    const vec8f expo = MM256_INT32(0x3f800000);
-    // polynomial coefficients
-    const vec8f a = MM256_FLOAT(+3.529304993f);
-    const vec8f b = MM256_FLOAT(-2.461222105f);
-    const vec8f c = MM256_FLOAT(+1.130626167f);
-    const vec8f d = MM256_FLOAT(-0.288739945f);
-    const vec8f e = MM256_FLOAT(+3.110401639e-2f);
-    const vec8f f = MM256_FLOAT(-89.970756366f);
-    const vec8f g = MM256_FLOAT(0.6931471805f);
-    // used to clear negative / NaN arguments:
-    vec8f invalid = _mm256_cmp_ps(xxx, setzero8f(), _CMP_NGT_US);
-    // extract exponent:
-    vec8f cst = cvt8i(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));
-    cst = add8f(mul8f(cst, g), f);
-    // clear exponents:
-    xxx = or8f(expo, and8f(mant, xxx));
-    // evaluate polynom:
-    vec8f tmp = add8f(mul8f(xxx, e), d);
-    tmp = add8f(mul8f(xxx, tmp), c);
-    tmp = add8f(mul8f(xxx, tmp), b);
-    tmp = add8f(mul8f(xxx, tmp), a);
-    tmp = add8f(mul8f(xxx, tmp), cst);
-    // clear negative arguments:
-    return or8f(tmp, invalid);
-}
-
-#endif
 
 #endif // AVX
 

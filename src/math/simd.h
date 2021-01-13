@@ -12,6 +12,8 @@
 
 /// Vector of 2 doubles
 typedef __m128d vec2;
+/// Vector of 4 singles
+typedef __m128 vec4f;
 
 constexpr __m128d sgn11 = {-0.0, -0.0};
 
@@ -124,6 +126,8 @@ inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos)
 
 /// Vector of 4 doubles
 typedef __m256d vec4;
+/// Vector of 8 singles
+typedef __m256 vec8f;
 
 #define set64x(a,b,c,d)     _mm256_setr_epi64x(a,b,c,d)
 
@@ -283,32 +287,6 @@ inline static vec4 normalize4(vec4 vec, double n)
     vec4 s = add4(m, swap2f128(m));
     m = add4(s, permute4(s, 0b0101));
     return mul4(vec, div4(set4(n), sqrt4(m)));
-}
-
-/// approximate reciprocal square root : 1 / sqrt(x) for 4 doubles
-inline static vec4 rsqrt4(vec4 x)
-{
-    vec4 t = _mm256_set1_pd(1.5);
-    vec4 h = _mm256_mul_pd(x, _mm256_set1_pd(0.5));
-    x = _mm256_cvtps_pd(_mm_rsqrt_ps(_mm256_cvtpd_ps(x)));
-    // refinement: u  <-  1.5 * u - 0.5 * x * u^3
-    vec4 t1 = _mm256_mul_pd(x, x);
-    vec4 t2 = _mm256_mul_pd(h, x);
-    vec4 t3 = _mm256_mul_pd(t, x);
-#if defined(__FMA__)
-    x = _mm256_fnmadd_pd(t1, t2, t3);
-#else
-    x = _mm256_sub_pd(t3, _mm256_mul_pd(t1, t2));
-#endif
-    // refinement: u  <-  1.5 * u - 0.5 * x * u^3
-    t1 = _mm256_mul_pd(x, x);
-    t2 = _mm256_mul_pd(h, x);
-    t3 = _mm256_mul_pd(t, x);
-#if defined(__FMA__)
-    return _mm256_fnmadd_pd(t1, t2, t3);
-#else
-    return _mm256_sub_pd(t3, _mm256_mul_pd(t1, t2));
-#endif
 }
 
 #endif

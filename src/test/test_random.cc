@@ -444,6 +444,7 @@ real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
 
 #include "simd.h"
 #include "simd_float.h"
+#include "simd_math.h"
 
 /**
  This packs an array by removing 'nan' values. The order of the list is irrelevant.
@@ -512,12 +513,6 @@ inline float logapprox(float val)
     return ( val > 0 ) ? res : -(float)INFINITY;
 }
 
-#if 1
-// convenience functions for defining constant vectors
-inline static __m256 MM256_INT32(int32_t arg) { return _mm256_castsi256_ps(_mm256_set1_epi32(arg)); }
-inline static __m256 MM256_FLOAT(float arg) { return _mm256_set1_ps(arg); }
-#endif
-
 /*
  Absolute error bounded by 1e-5 for normalized inputs
    Returns a finite number for +inf input
@@ -528,20 +523,28 @@ inline static __m256 MM256_FLOAT(float arg) { return _mm256_set1_ps(arg); }
 inline static vec8f logapprox8f(__m256 xxx)
 {
     // masks:
-    const __m256 mant = MM256_INT32(0x007fffff);
-    const __m256 expo = MM256_INT32(0x3f800000);
+    const __m256 mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x007fffff));
+    const __m256 expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3f800000));
     // polynomial coefficients
-    const __m256 a = MM256_FLOAT(+3.529304993f);
-    const __m256 b = MM256_FLOAT(-2.461222105f);
-    const __m256 c = MM256_FLOAT(+1.130626167f);
-    const __m256 d = MM256_FLOAT(-0.288739945f);
-    const __m256 e = MM256_FLOAT(+3.110401639e-2f);
-    const __m256 f = MM256_FLOAT(-89.970756366f);
-    const __m256 g = MM256_FLOAT(0.6931471805f);
+    const __m256 a = _mm256_set1_ps(+3.529304993f);
+    const __m256 b = _mm256_set1_ps(-2.461222105f);
+    const __m256 c = _mm256_set1_ps(+1.130626167f);
+    const __m256 d = _mm256_set1_ps(-0.288739945f);
+    const __m256 e = _mm256_set1_ps(+3.110401639e-2f);
+    const __m256 f = _mm256_set1_ps(-89.970756366f);
+    const __m256 g = _mm256_set1_ps(0.6931471805f);
     // used to clear negative / NaN arguments:
     __m256 invalid = _mm256_cmp_ps(xxx, _mm256_setzero_ps(), _CMP_NGT_US);
     // extract exponent:
+#ifdef __AVX2__
     __m256 cst = _mm256_cvtepi32_ps(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));
+#else
+    __m128 hi = _mm256_extractf128_ps(xxx, 1);
+    __m128 lo = _mm256_extractf128_ps(xxx, 0);
+    hi = _mm_cvtepi32_ps(_mm_srli_epi32(_mm_castps_si128(hi), 23));
+    lo = _mm_cvtepi32_ps(_mm_srli_epi32(_mm_castps_si128(lo), 23));
+    __m256 cst = _mm256_set_m128(hi, lo);
+#endif
     cst = _mm256_add_ps(_mm256_mul_ps(cst, g), f);
     // clear exponents:
     xxx = _mm256_or_ps(expo, _mm256_and_ps(mant, xxx));
@@ -570,22 +573,30 @@ inline static vec8f logapprox8f(__m256 xxx)
 __m256 logf_app(__m256 val)
 {
     // constants
-    const __m256 mant = MM256_INT32(0x007FFFFF); // mantissa mask
-    const __m256 expo = MM256_INT32(0x3F800000); // exponent mask
+    const __m256 mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x007FFFFF)); // mantissa mask
+    const __m256 expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3F800000)); // exponent mask
     // polynomial coefficients
-    const __m256 a = MM256_FLOAT(+3.529304993f);
-    const __m256 b = MM256_FLOAT(-2.461222105f);
-    const __m256 c = MM256_FLOAT(+1.130626167f);
-    const __m256 d = MM256_FLOAT(-0.288739945f);
-    const __m256 e = MM256_FLOAT(+3.110401639e-2f);
-    const __m256 f = MM256_FLOAT(-89.970756366f);
-    const __m256 log2 = MM256_FLOAT(M_LN2);      // log(2)
+    const __m256 a = _mm256_set1_ps(+3.529304993f);
+    const __m256 b = _mm256_set1_ps(-2.461222105f);
+    const __m256 c = _mm256_set1_ps(+1.130626167f);
+    const __m256 d = _mm256_set1_ps(-0.288739945f);
+    const __m256 e = _mm256_set1_ps(+3.110401639e-2f);
+    const __m256 f = _mm256_set1_ps(-89.970756366f);
+    const __m256 log2 = _mm256_set1_ps(M_LN2);      // log(2)
 
     // mask out anything <= 0
     __m256 invalid = _mm256_cmp_ps(val, _mm256_setzero_ps(), _CMP_NGT_UQ);
 
     // extract exponents
+#ifdef __AVX2__
     __m256 exp = _mm256_cvtepi32_ps(_mm256_srli_epi32((__m256i)val, 23));
+#else
+    __m128 hi = _mm256_extractf128_ps(val, 1);
+    __m128 lo = _mm256_extractf128_ps(val, 0);
+    hi = _mm_cvtepi32_ps(_mm_srli_epi32(_mm_castps_si128(hi), 23));
+    lo = _mm_cvtepi32_ps(_mm_srli_epi32(_mm_castps_si128(lo), 23));
+    __m256 exp = _mm256_set_m128(hi, lo);
+#endif
 
     // clear exponent to 0 (+127)
     val = _mm256_and_ps(val, mant);
@@ -605,10 +616,10 @@ __m256 logf_app(__m256 val)
 
 /*
  // generate random floats in [1, 2]:
- const vec8f mant = MM256_INT32(0x807fffff);
- const vec8f expo = MM256_INT32(0x3f800000);
- const vec8f ninf = MM256_INT32(0xff800000); // -INFINITY
- const vec8f one = MM256_FLOAT(1.0f);
+ const vec8f mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x807fffff));
+ const vec8f expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3f800000));
+ const vec8f ninf = _mm256_castsi256_ps(_mm256_set1_epi32(0xff800000)); // -INFINITY
+ const vec8f one = _mm256_set1_ps(1.0f);
  x = or8f(expo, and8f(mant, cast8f(load8si(src++))));
  y = or8f(expo, and8f(mant, cast8f(load8si(src++))));
 */
@@ -635,7 +646,7 @@ vec8f magic8f(vec8f xxx)
  */
 real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
 {
-    const vec8f eps = set8f(TWO_POWER_MINUS_31);
+    const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
     const vec8f half = set8f(-0.5);
     __m256i const* end = src + cnt;
 
@@ -659,7 +670,7 @@ real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
         // swap the NaNs to move them to 'y':
         x = blend8f(t, y, isnan8f(t));
         y = blend8f(y, t, isnan8f(t));
-#if 1   // can push more NaNs out by swapping within the lanes:
+#if 0   // can push more NaNs out by swapping within the lanes:
         // swap the NaNs to move them to 'y':
         t = permute44f(x);
         x = blend8f(t, y, isnan8f(t));
@@ -695,22 +706,21 @@ real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
 /// use this to check the log()
 void check_log(real dst[], size_t cnt, const __m256i src[])
 {
-    const vec8f eps = set8f(TWO_POWER_MINUS_31);
+    const vec8f eps = set8f(0x1p-31f); //TWO_POWER_MINUS_31
     __m256i const* end = src + cnt;
     real * d = dst;
     while ( src < end )
     {
         // generate random floats in [-1, 1]:
-        vec8f x = mul8f(eps, cvt8i(load8si(src++)));
-        vec8f y = mul8f(eps, cvt8i(load8si(src++)));
-        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
-        x = log8f(y);
-        y = logapprox8f(y);
+        vec8f i = mul8f(eps, cvt8i(load8si(src++)));
+        vec8f j = mul8f(eps, cvt8i(load8si(src++)));
+        vec8f x = i;
+        vec8f y = logapprox8f(i);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
         store4(d   , cvt4sd(getlo4f(x)));
-        store4(d+4 , cvt4sd(getlo4f(y)));
-        store4(d+8 , cvt4sd(gethi4f(x)));
+        store4(d+4 , cvt4sd(gethi4f(x)));
+        store4(d+8 , cvt4sd(getlo4f(y)));
         store4(d+12, cvt4sd(gethi4f(y)));
 #else
         // store 16 single-precision values
@@ -745,7 +755,7 @@ void check_gaussian(size_t cnt, real* vec)
     real avg = 0, dev = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
-        if ( vec[i] != vec[i] )
+        if ( std::isnan(vec[i]) )
             ++nan;
         else
         {
@@ -757,7 +767,7 @@ void check_gaussian(size_t cnt, real* vec)
     real cov = 0;
     for ( size_t i = 1; i < cnt; i += 2 )
     {
-        if ( vec[i] == vec[i] )
+        if ( !std::isnan(vec[i]) )
             cov += vec[i-1] * vec[i];
     }
     cnt -= nan;
