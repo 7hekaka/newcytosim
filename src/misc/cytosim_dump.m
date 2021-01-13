@@ -1,11 +1,11 @@
-function [sys, rhs, con] = cytosim_dump(path)
+function [SYS, rhs, CON] = cytosim_dump(path)
 
 % This is used to explore Cytosim's linear system in matlab
 % - load the matrices and vector from Cytosim's dump
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
-% F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019,
-% 11.08.2019, 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020, 27.12.2020
+% F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019, 11.08.2019, 
+% 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020, 27.12.2020, 13.01.2021
 
 if nargin < 1
     path = '.';
@@ -33,12 +33,12 @@ if isfolder(path)
     if ( length(stp) > 1 )
         abstol = stp(2);
     end
-    obj = fread(fopen('obj.bin'), dim, precision);    
-    drg = fread(fopen('drg.bin'), dim, precision);
-    sys = fread(fopen('sys.bin'), [dim, dim], precision);
+    obj = fread(fopen('obj.bin'), dim, 'uint32');
+    mob = fread(fopen('mob.bin'), dim, precision);
+    SYS = fread(fopen('sys.bin'), [dim, dim], precision);
     ela = fread(fopen('ela.bin'), [dim, dim], precision);  % elasticity matrix
-    mob = fread(fopen('mob.bin'), [dim, dim], precision);  % projection matrix
-    con = fread(fopen('con.bin'), [dim, dim], precision);  % preconditionner
+    PRJ = fread(fopen('prj.bin'), [dim, dim], precision);  % projection matrix
+    CON = fread(fopen('con.bin'), [dim, dim], precision);  % preconditionner
     %pts = fread(fopen('pts.bin'), dim, precision);
     rhs = fread(fopen('rhs.bin'), dim, precision);
     sol = fread(fopen('sol.bin'), dim, precision);
@@ -52,14 +52,14 @@ fprintf(1, '----------------------- loaded system of size %i with time_step %f -
 
 %% Check matrix
 
-%figure('name', 'System matrix'); imshow(abs(sys)); 
-%imshow(abs(mob)); set(gcf, 'name','Projection matrix');
+%figure('name', 'System matrix'); imshow(abs(SYS)); 
+%imshow(abs(PRJ)); set(gcf, 'name','Projection matrix');
 %imshow(abs(ela)); set(gcf, 'name','Elasticity matrix');
 
-if ( 1 )
+if ( 0 )
     
-    mat = eye(dim) - time_step * mob * ela;
-    err0 = norm(mat-sys, 1);
+    MAT = eye(dim) - time_step * PRJ * ela;
+    err0 = norm(MAT-SYS, 1);
     
     nbo = 0;
     nbv = 0;
@@ -77,24 +77,24 @@ if ( 1 )
     fprintf(2, '    norm8(matrix - reconstituted_matrix) : %e\n', err0);
     if ( err0 > 1e-5 )
         figure;
-        imshow(abs(mat));
+        imshow(abs(MAT));
         set(gcf, 'name', 'Reconstituted matrix');
     end
 
     norm_rhs = norm(rhs);
     fprintf(2, '    norm(rhs) = %f', norm(rhs));
     fprintf(2, '    norm(sol) = %f', norm(sol));
-    fprintf(2, '    norm(con*rhs) = %f\n', norm(con*rhs));
+    fprintf(2, '    norm(CON*rhs) = %f\n', norm(CON*rhs));
 
 end
 
 if ( 0 )
-    mag = time_step * max(max(abs(mob * ela)));
+    mag = time_step * max(max(abs(PRJ * ela)));
     fprintf(1, 'norm8(system matrix - eye) : %e\n', mag);
 end
 if ( 0 )
     figure('Position', [50 50 1000 1000]);
-    plot(reshape(mat,1,dim*dim), reshape(sys,1,dim*dim), '.')
+    plot(reshape(MAT,1,dim*dim), reshape(SYS,1,dim*dim), '.')
     xl = xlim;
     ylim(xl);
     xlabel('Reconstituted matrix');
@@ -102,8 +102,8 @@ if ( 0 )
 end
 if ( 0 )
     figure('name', 'System matrix values');
-    plot(abs(sys), '^b'); hold on;
-    plot(abs(mat), 'vr');
+    plot(abs(SYS), '^b'); hold on;
+    plot(abs(MAT), 'vr');
 end
 if ( 0 )
     uuu = eye(dim) - time_step * ela;
@@ -121,12 +121,14 @@ if ( 0 )
     drawnow;
 end
 
+drawnow;
+
 %% RECALCULATE SOLUTION
 
 reltol = abstol / norm(rhs);
 
 maxit = dim;
-system = sparse(sys);
+system = sparse(SYS);
 
 mulcnt = 0;
 solution = bicgstab(@multiply, rhs, reltol*0.001, maxit);
@@ -148,30 +150,34 @@ convergence_axes = [];
 
 mulcnt = 0;
 [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit);
-report('bicgstab', mulcnt, vec, res, rv0, '-.');
+report('bicgstab', mulcnt, vec, res, rv0, '-');
 
 if 0
     % Matlab BiCGStab(L)
     mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit);
-    report('bicgstab(1)', mulcnt, vec, res, rv0, ':');
+    report('bicgstab(1)', mulcnt, vec, res, rv0, '-');
 end
 
 if 0
     % Matlab CGS
     mulcnt = 0;
     [vec,~,res,itr,rv0] = cgs(@multiply, rhs, reltol, maxit);
-    report('CGS', mulcnt, vec, res, rv0, ':');
+    report('CGS', mulcnt, vec, res, rv0, '-');
 end
-
+if 0
+    % BiCORSTAB
+    mulcnt = 0;
+    [vec,~,res,itr,rv0] = BiCORSTAB(@multiply, rhs, reltol, maxit);
+    report('BiCORstab', mulcnt, vec, res, rv0, ':');
+end
 if 0 %% no preconditionning
-    % BiCGStab(L)
     for i = 1:4
         OPT.Tol = reltol;
         OPT.ell = min(2^i, dim);
         OPT.MaxIt = maxit;
         [vec,rv0,itr] = cgstab(system, rhs, [], [], OPT);
-        report(sprintf('BiCGS(%i)', OPT.ell), 2*itr, vec, rv0(end,1), rv0(:,1), ':');
+        report(sprintf('cgstab(%i)', OPT.ell), 2*itr, vec, rv0(end,1), rv0(:,1), ':');
     end
 end
 if 1
@@ -180,7 +186,7 @@ if 1
         mulcnt = 0;
         RS = min(2^i, dim);
         [vec,~,res,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
-        report(sprintf('GMRES %03i', RS), mulcnt, vec, res, rv0, ':');
+        report(sprintf('GMRES %03i', RS), mulcnt, vec, res, rv0, '-.');
     end
 end
 if 0 %% no preconditionning
@@ -212,27 +218,28 @@ if 1
     report('BiCGCR2', 2*itr, vec, res, rv0, ':');
 end
 
+title('Convergence');
 drawnow;
 
 %% USING LOADED PRECONDITIONNER CALCULATED BY CYTOSIM
 fprintf(1, '  --  --  --  --  --  --  --  -- PRECONDITIONNED --  --  --  --  --  --  --  --  --\n');
 
 % Calculate block-diagonal preconditionner
-PRC = zeros(dim);
+BDP = zeros(dim);
 for o = 0:max(max(obj))
     i = find(obj==o);
     if ~isempty(i)
-        PRC(i,i) = inv(mat(i,i));
+        BDP(i,i) = inv(SYS(i,i));
     end
 end
 
-%figure('name', 'Mecable footprint'); imshow(PRC);
-fprintf(2, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', norm(PRC-con,1));
+%figure('name', 'Mecable footprint'); imshow(BDP);
+fprintf(2, '    norm8(preconditionner - reconstituted_preconditionner) : %e\n', norm(BDP-CON,1));
 
 fprintf(2, '    Elasticity            has %9i elements\n', nnz(ela));
-fprintf(2, '    Mobility/Projection   has %9i elements\n', nnz(mob));
-fprintf(2, '    Given Preconditionner has %9i elements\n', nnz(con));
-fprintf(2, '    Block preconditionner has %9i elements\n', nnz(PRC));
+fprintf(2, '    Mobility/Projection   has %9i elements\n', nnz(PRJ));
+fprintf(2, '    Given Preconditionner has %9i elements\n', nnz(CON));
+fprintf(2, '    Block preconditionner has %9i elements\n', nnz(BDP));
 
 convergence_axes = [];
 
@@ -242,7 +249,7 @@ report('P bicgstab', mulcnt, vec, res, rv0);
 
 % checking the reconstituted block preconditionner:
 mulcnt = 0;
-[vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionPRC);
+[vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionBDP);
 report('R bicgstab', mulcnt, vec, res, rv0);
 
 if 0
@@ -264,15 +271,15 @@ end
 if 1
     % CORS
     mulcnt = 0;
-    [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit, @preconditionPRC);
-    report('R CORS', mulcnt, vec, res, rv0);
+    [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit, @precondition);
+    report('P CORS', mulcnt, vec, res, rv0);
     % BiCOR
     mulcnt = 0;
-    [vec,~,res,itr,rv0] = BiCOR(@multiply, rhs, reltol, maxit, @preconditionPRC);
-    report('R BiCOR', mulcnt, vec, res, rv0);
+    [vec,~,res,itr,rv0] = BiCOR(@multiply, rhs, reltol, maxit, @precondition);
+    report('P BiCOR', mulcnt, vec, res, rv0);
     % BiCGCR2
-    [vec,~,res,itr,rv0] = BiCGCR2(system, rhs, reltol, maxit, @preconditionPRC);
-    report('R BiCGCR2', 2*itr, vec, res, rv0);
+    [vec,~,res,itr,rv0] = BiCGCR2(system, rhs, reltol, maxit, @precondition);
+    report('P BiCGCR2', 2*itr, vec, res, rv0);
 end
 
 if 0
@@ -304,11 +311,11 @@ end
 % we average all point drag coefficient to derive a matrix that is
 % symmetric and ammenable to incomplete Cholesky factorization
 
-fprintf(2, 'Mecable drag coefficients : %f +/- %f\n', mean(1./drg), var(1./drg));
+fprintf(2, 'Mecable point mobility coefficients : %f +/- %f\n', mean(mob), var(mob));
 
 if 0
     
-    val = time_step / mean(1./drg);
+    val = time_step * mean(mob);
     DRY = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
     DRY = sparse(DRY);
     
@@ -351,7 +358,7 @@ end
 
 if 0
     
-    val = time_step / mean(1./drg);
+    val = time_step * mean(mob);
     SML = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
     
     if ( ord(2) == 3 )
@@ -399,7 +406,7 @@ end
 
 if 0
     
-    WET = eye(dim) - diag(time_step./drg) * ela;
+    WET = eye(dim) - diag(time_step.*mob) * ela;
     
     sWET = sparse(WET);
     
@@ -436,17 +443,23 @@ end
 
 %% check preconditionning with iLU on the full matrix
 
-if 0
+if 1
     
     % preconditionner = incomplete LU factorization
+    clear OPT;
+    OPT.type = 'nofill';
+    OPT.milu = 'off';
     [L, U] = ilu(system, OPT);
     fprintf(2, 'incomplete LU      has %i + %i elements\n', nnz(L), nnz(U));
     
     mulcnt = 0;
-    [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
     report('iLU bicgstab', mulcnt, vec, res, rv0);
 
 end
+
+title('Convergence (preconditionned)');
+drawnow;
 
 %% Functions
 
@@ -461,17 +474,17 @@ end
 
     function y = precondition(x, mode)
         if nargin < 2 || strcmp(mode, 'notransp')
-            y = con * x;
+            y = CON * x;
         else
-            y = con' * x;
+            y = CON' * x;
         end
     end
 
-    function y = preconditionPRC(x, mode)
+    function y = preconditionBDP(x, mode)
         if nargin < 2 || strcmp(mode, 'notransp')
-            y = PRC * x;
+            y = BDP * x;
         else
-            y = PRC' * x;
+            y = BDP' * x;
         end
     end
 
@@ -489,11 +502,10 @@ end
             convergence_axes = gca;
             xlabel('Number of MAT.vec');
             ylabel('Relative residual');
-            title('Convergence');
             legend();
             hold on;
         else
-            p = semilogy(convergence_axes, mvs, dat,'DisplayName',str);
+            p = semilogy(convergence_axes,mvs,dat,'DisplayName',str);
         end
         %pick a random color
         col = rand(1,3);
@@ -501,7 +513,7 @@ end
             col = rand(1,3);
         end
         p.Color = col;
-        p.LineWidth = 2;
+        p.LineWidth = 4;
         p.LineStyle = lin;
     end
 
@@ -516,6 +528,6 @@ end
     end
 
 if nargin < 1 && dim > 0
-    sys = [];
+    SYS = [];
 end
 end

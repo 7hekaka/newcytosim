@@ -1093,9 +1093,9 @@ void Parser::parse_end(std::istream& is)
 }
 
 /**
- Save current system's matrix and right-hand-side vector in separate sub directory
+ Save current system's matrix and right-hand-side vector in sub directory
  
-     save DIRECTORY_NAME { mode = {1, 2, 4} }
+     dump DIRECTORY_NAME { mode = {1, 2, 4} }
  
  */
 void Parser::parse_dump(std::istream& is)

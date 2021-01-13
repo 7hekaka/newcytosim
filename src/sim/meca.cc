@@ -2130,12 +2130,12 @@ void Meca::saveObjectID(FILE * file) const
     }
 }
 
-void Meca::saveDrag(FILE * file) const
+void Meca::saveMobility(FILE * file) const
 {
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
-        const real drag = 1 / mec->pointMobility();
+        const real drag = mec->pointMobility();
         for ( size_t p = 0; p < DIM * nbp; ++p )
             fprintf(file, "%f\n", drag);
     }
@@ -2225,8 +2225,8 @@ void Meca::exportSystem() const
     fprintf(f, "%f %f\n", tau_, tolerance_);
     fclose(f);
 
-    f = fopen("drg.txt", "w");
-    saveDrag(f);
+    f = fopen("mob.txt", "w");
+    saveMobility(f);
     fclose(f);
     
     f = fopen("obj.txt", "w");
@@ -2372,7 +2372,7 @@ void Meca::dumpElasticity(FILE * file, bool nat) const
 /**
  Save the projection matrix multiplied by the mobility, in binary format
  */
-void Meca::dumpMobility(FILE * file, bool nat) const
+void Meca::dumpProjection(FILE * file, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2427,33 +2427,33 @@ void Meca::dumpPreconditionner(FILE * file, bool nat) const
 }
 
 
-void Meca::dumpObjectID(FILE * file, bool nat) const
+void Meca::dumpObjectID(FILE * file) const
 {
-    real * vec = new_real(largestMecable());
+    uint32_t * vec = new uint32_t[largestMecable()];
     
-    int i = 0;
+    uint32_t i = 0;
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
         for ( size_t p = 0; p < nbp; ++p )
             vec[p] = i;
         for ( int d = 0; d < DIM; ++d )
-            dumpVector(file, nbp, vec, nat);
+            fwrite(vec, sizeof(uint32_t), nbp, file);
         ++i;
     }
     
-    free_real(vec);
+    delete[](vec);
 }
 
 
-void Meca::dumpDrag(FILE * file, bool nat) const
+void Meca::dumpMobility(FILE * file, bool nat) const
 {
     real * vec = new_real(largestMecable());
     
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
-        const real drag = 1 / mec->pointMobility();
+        const real drag = mec->pointMobility();
         for ( size_t p=0; p < nbp; ++p )
             vec[p] = drag;
         for ( int d = 0; d < DIM; ++ d )
@@ -2470,15 +2470,16 @@ void Meca::dumpDrag(FILE * file, bool nat) const
  
      ord = load('ord.txt');
      time_step = load('stp.txt');
-     obj = fread(fopen('obj.bin'), ord, 'double');
-     drg = fread(fopen('drg.bin'), ord, 'double');
-     sys = fread(fopen('sys.bin'), [ord, ord], 'double');
-     ela = fread(fopen('ela.bin'), [ord, ord], 'double');
-     mob = fread(fopen('mob.bin'), [ord, ord], 'double');
-     con = fread(fopen('con.bin'), [ord, ord], 'double');
-     pts = fread(fopen('pts.bin'), ord, 'double');
-     rhs = fread(fopen('rhs.bin'), ord, 'double');
-     sol = fread(fopen('sol.bin'), ord, 'double');
+     precision = 'double' % or float?
+     obj = fread(fopen('obj.bin'), ord, 'uint32');
+     drg = fread(fopen('drg.bin'), ord, precision);
+     sys = fread(fopen('sys.bin'), [ord, ord], precision);
+     ela = fread(fopen('ela.bin'), [ord, ord], precision);
+     mob = fread(fopen('mob.bin'), [ord, ord], precision);
+     con = fread(fopen('con.bin'), [ord, ord], precision);
+     pts = fread(fopen('pts.bin'), ord, precision);
+     rhs = fread(fopen('rhs.bin'), ord, precision);
+     sol = fread(fopen('sol.bin'), ord, precision);
  
  To display the matrices:
 
@@ -2502,8 +2503,8 @@ void Meca::dumpSystem(bool nat) const
     fprintf(f, "%.12f %.12f\n", tau_, tolerance_);
     fclose(f);
  
-    f = fopen("drg.bin", "wb");
-    dumpDrag(f);
+    f = fopen("mob.bin", "wb");
+    dumpMobility(f);
     fclose(f);
     
     f = fopen("obj.bin", "wb");
@@ -2530,8 +2531,8 @@ void Meca::dumpSystem(bool nat) const
     dumpElasticity(f, nat);
     fclose(f);
     
-    f = fopen("mob.bin", "wb");
-    dumpMobility(f, nat);
+    f = fopen("prj.bin", "wb");
+    dumpProjection(f, nat);
     fclose(f);
     
     f = fopen("con.bin", "wb");

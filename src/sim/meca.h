@@ -679,16 +679,16 @@ public:
     void dumpElasticity(FILE *, bool nat=true) const;
     
     /// Save mobility/projection matrix in binary format
-    void dumpMobility(FILE *, bool nat=true) const;
+    void dumpProjection(FILE *, bool nat=true) const;
     
     /// Save preconditionner in binary format
     void dumpPreconditionner(FILE *, bool nat=true) const;
     
     /// Save drag coefficients associated with each degree of freedom in binary format
-    void dumpDrag(FILE *, bool nat=true) const;
+    void dumpMobility(FILE *, bool nat=true) const;
     
     /// Save the object ID associated with each degree of freedom
-    void dumpObjectID(FILE *, bool nat=true) const;
+    void dumpObjectID(FILE *) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
     void dumpSystem(bool nat=true) const;
@@ -698,7 +698,7 @@ public:
     void saveObjectID(FILE *) const;
 
     /// Save drag coefficients associated with each degree of freedom in binary format
-    void saveDrag(FILE *) const;
+    void saveMobility(FILE *) const;
 
     /// Save complete matrix in Matrix Market format
     void saveMatrix(FILE *, real threshold) const;
