@@ -63,14 +63,9 @@ namespace LinearSolvers
 #endif
         goto start;
         
-#if SAFER_CONVERGENCE
-        while ( ! monitor.finished() )
+        while ( ! monitor.finished(dim, r) )
         {
-            /*
-             Perform one more iteration after convergence is attained,
-             to mitigate a problem in which the estimated residual is below threshold,
-             when the true residual is in fact above.
-             */
+#if SAFER_CONVERGENCE
             // save closest vector to solution so far
             if ( monitor.residual() < 0.5 * best_residual )
             {
@@ -78,9 +73,6 @@ namespace LinearSolvers
                 best_residual = monitor.residual();
                 //fprintf(stderr, "\r(best %4i  %10.7f)", monitor.count(), best_residual);
             }
-#else
-        while ( ! monitor.finished(dim, r) )
-        {
 #endif
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
@@ -212,14 +204,9 @@ namespace LinearSolvers
 #endif
         goto start;
 
-#if SAFER_CONVERGENCE
-        while ( ! monitor.finished() )
+        while ( ! monitor.finished(dim, r) )
         {
-            /* perform one more iteration after convergence is attained,
-             to mitigate a problem in which the estimated residual is below threshold,
-             when the true residual is in fact above.
-             */
-            monitor.finished(dim, r);
+#if SAFER_CONVERGENCE
             // save closest vector to solution so far
             if ( monitor.residual() < 0.5 * best_residual )
             {
@@ -227,9 +214,6 @@ namespace LinearSolvers
                 best_residual = monitor.residual();
                 //fprintf(stderr, "\r(Best %4i  %10.7f)", monitor.count(), best_residual);
             }
-#else
-        while ( ! monitor.finished(dim, r) )
-        {
 #endif
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
