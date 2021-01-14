@@ -15,6 +15,7 @@ typedef __m128 vec4f;
 
 inline static vec4f setzero4f()                   { return _mm_setzero_ps(); }
 inline static vec4f set4f(float a)                { return _mm_set1_ps(a); }
+inline static vec4f set4fi(uint32_t a)            { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
 inline static vec4f load1f(float const* a)        { return _mm_load_ss(a); }
 inline static vec4f load2f(float const* a)        { return (vec4f)_mm_loadl_epi64((__m128i*)a); }
 inline static vec4f load4f(float const* a)        { return _mm_load_ps(a); }
@@ -44,8 +45,12 @@ inline static vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b);
 inline static vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline static vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
-inline static vec4f cvt4i(__m128i a)  { return _mm_cvtepi32_ps(a); }
+/// convert integer to float:
+inline static vec4f cvt4if(__m128i a) { return _mm_cvtepi32_ps(a); }
 inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
+
+/// approximate reciprocal square root: 1 / sqrt(a)
+inline static vec4f rsqrt4f(vec4f a)  { return _mm_rsqrt_ps(a); }
 
 #define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
 
@@ -88,7 +93,7 @@ inline static vec4f broadcastlof(vec4f a)         { return _mm_permute_ps(a,0x00
 inline static vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
 inline static vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i*)a); }
 #define permute4f(a,k)    _mm_permute_ps(a,k)
-// Convert between vector types
+// Convert between single and double types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
 inline static __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
 inline static void store4d(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
@@ -117,9 +122,11 @@ inline static vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _
 #if defined(__AVX__)
 
 /// Vector of 8 floats
+typedef __m256 vec8f;
 
 inline static vec8f setzero8f()                  { return _mm256_setzero_ps(); }
 inline static vec8f set8f(float a)               { return _mm256_set1_ps(a); }
+inline static vec8f set8fi(uint32_t a)           { return _mm256_castsi256_ps(_mm256_set1_epi32(a)); }
 inline static vec8f load8f(float const* a)       { return _mm256_load_ps(a); }
 inline static vec8f loadu8f(float const* a)      { return _mm256_loadu_ps(a); }
 
@@ -162,8 +169,10 @@ inline static vec8f rsqrt8f(vec8f a)  { return _mm256_rsqrt_ps(a); }
 
 inline static vec4f getlo4f(vec8f a)  { return _mm256_castps256_ps128(a); }
 inline static vec4f gethi4f(vec8f a)  { return _mm256_extractf128_ps(a,1); }
+/// concatenate two vec4f into a vec8f
+inline static vec8f cat4f(vec4f h, vec4f l) { return _mm256_set_m128(h, l); }
 
-inline static vec8f cvt8i(__m256i a)  { return _mm256_cvtepi32_ps(a); }
+inline static vec8f cvt8if(__m256i a) { return _mm256_cvtepi32_ps(a); }
 inline static vec8f cast8f(__m256i a) { return _mm256_castsi256_ps(a); }
 
 #define load8si(a)           _mm256_load_si256(a)

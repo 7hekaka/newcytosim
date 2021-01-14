@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "random.h"
 
@@ -14,17 +14,18 @@
 Random RNG;
 
 
-/// switch for using SIMD to generate Gaussians faster (requires Intel compiler)
-#define NEW_SIMD_GAUSSIANS 0
+/// switch for using SIMD to generate Gaussians faster (requires AVX)
+#define NEW_SIMD_GAUSSIANS 1
 
 
-/// the last bit in a 32-bits integer
+/// the most significant bit in a 32-bits integer
 constexpr uint32_t BIT31 = 1U << 31;
 
-/// constexpr uint32_t FRAC32 = 0x7FFFFFU;
+//constexpr uint32_t FRAC32 = 0x7FFFFFU;
+/// bit mask for exponent in single precision (float)
 constexpr uint32_t EXPON32 = 127U << 23;
 
-/// exponent for a double precision float
+/// sign bit in double precision (double)
 constexpr uint64_t BIT63 = 1ULL << 63;
 
 // constexpr uint64_t EXPON64 = 1023ULL << 52;
@@ -284,80 +285,11 @@ void Random::refill_gaussians()
 
 #else
 
+#include "simd.h"
 #include "simd_float.h"
+#include "simd_math.h"
+#include "random_simd.cc"
 
-// pack array by removing 'nan' values in arrray [s, e[
-real * remove_nans(real * s, real * e)
-{
-    while ( s < e )
-    {
-        --e;
-        // find the next `nan` going upward:
-        while ( !std::isnan(*s) )
-        {
-            if ( ++s > e )
-                return s;
-        }
-        // skip `nan` values going downward:
-        while ( std::isnan(*e) )
-        {
-            if ( --e <= s )
-                return s;
-        }
-        // copy number over:
-        *s++ = *e;
-        //*e = 0.0;
-    }
-    return s;
-}
-
-
-/**
- Calculates Gaussian-distributed, single precision random number,
- using SIMD AVX instructions
- Array `dst` should be able to hold as many 32-bit numbers as `src`.
- if 'real==float', for 256 bits of input, this produces ~64*PI bits of numbers.
- if 'real==double', this produces more output bits than input!
- 
- The function used to calculate logarithm on SIMD data is part of the
- Intel SVML library, and is provided by the Intel compiler.
-
- F. Nedelec 02.01.2017 and 13.09.2018
- */
-real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
-{
-    const vec8f fac = set8f(TWO_POWER_MINUS_31);
-    const vec8f two = set8f(-0.5);
-
-    real * d = dst;
-    __m256i const* end = src + cnt;
-    while ( src < end )
-    {
-        vec8f x = mul8f(fac, cvt8i(load8si(src++)));
-        vec8f y = mul8f(fac, cvt8i(load8si(src++)));
-        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
-        //as there is no intrinsic for logarithm, and this relies on a library
-        //w = std::sqrt( -2 * std::log(n) / n );
-        n = rsqrt8f(div8f(mul8f(two, n), log8f(n)));
-        //n = rsqrt8f(mul8f(mul8f(two, n), rcp8f(log8f(n))));
-        x = mul8f(n, x);
-        y = mul8f(n, y);
-#if REAL_IS_DOUBLE
-        // convert 16 single-precision values
-        store4(d   , cvt4sd(getlo4f(x)));
-        store4(d+4 , cvt4sd(getlo4f(y)));
-        store4(d+8 , cvt4sd(gethi4f(x)));
-        store4(d+12, cvt4sd(gethi4f(y)));
-#else
-        // store 16 single-precision values
-        store8f(d  , x);
-        store8f(d+8, y);
-#endif
-        d += 16;
-    }
-    //return remove_nans(dst, d);
-    return d;
-}
 
 /**
  Fill array `gaussians_` with approximately 500 Gaussian values ~ N(0,1).
@@ -370,7 +302,7 @@ void Random::refill_gaussians()
     __m256i * mem = reinterpret_cast<__m256i*>(gaussians_+SFMT_N32) - SFMT_N256;
     //alignas(64) __m256i mem[SFMT_N32];
     sfmt_fill_array32(&twister_, (uint32_t*)mem, SFMT_N32);
-    next_gaussian_ = gauss_fill_AVX(gaussians_, SFMT_N256, mem);
+    next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, mem);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
 }
 

@@ -780,7 +780,6 @@
 		BBC422FA247342CF007EA070 /* hand_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC422F8247342CF007EA070 /* hand_list.h */; };
 		BBC422FB247342CF007EA070 /* hand_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F9247342CF007EA070 /* hand_list.cc */; };
 		BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */; };
-		BBC6A56E25AF9BCB00C1EAE2 /* simd_math.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC6A56D25AF9BCB00C1EAE2 /* simd_math.h */; };
 		BBC96C5624A8A9CD00864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
 		BBC96C5724A8A9CD00864F9B /* sparmatsymblkdiag.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC96C5524A8A9CD00864F9B /* sparmatsymblkdiag.h */; };
 		BBC96C5824A8B56900864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
@@ -1665,6 +1664,7 @@
 		BB8EE1DC2542DE2100E15C40 /* test_platonic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_platonic; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB8EE1E52542DE6D00E15C40 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		BB8EE1E72542DE7400E15C40 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		BB901AD925B02E3B005FB57F /* random_simd.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = random_simd.cc; sourceTree = "<group>"; };
 		BB90E7EC12CA635C000DF711 /* wrist.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wrist.cc; path = singles/wrist.cc; sourceTree = "<group>"; };
 		BB90E7ED12CA635C000DF711 /* wrist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wrist.h; path = singles/wrist.h; sourceTree = "<group>"; };
 		BB9402E60E236764007410D7 /* solid_set.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = solid_set.cc; path = src/sim/solid_set.cc; sourceTree = SOURCE_ROOT; };
@@ -3283,6 +3283,7 @@
 			children = (
 				BB73589D05B98DA3006956D5 /* random.h */,
 				BB73589C05B98DA3006956D5 /* random.cc */,
+				BB901AD925B02E3B005FB57F /* random_simd.cc */,
 				BBE447D920646A420058ADAC /* SFMT-common.h */,
 				BBE447CE2064697D0058ADAC /* SFMT-params.h */,
 				BBE447CF2064697D0058ADAC /* SFMT-params19937.h */,
@@ -3689,7 +3690,6 @@
 				BBA27AEB211EC31600A7E184 /* vector4.h in Headers */,
 				BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */,
 				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
-				BBC6A56E25AF9BCB00C1EAE2 /* simd_math.h in Headers */,
 				BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */,
 				BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */,
 				BB6CD588254ED31A00FB7547 /* real_print.h in Headers */,

@@ -12,8 +12,6 @@
 
 /// Vector of 2 doubles
 typedef __m128d vec2;
-/// Vector of 4 singles
-typedef __m128 vec4f;
 
 constexpr __m128d sgn11 = {-0.0, -0.0};
 
@@ -126,8 +124,6 @@ inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos)
 
 /// Vector of 4 doubles
 typedef __m256d vec4;
-/// Vector of 8 singles
-typedef __m256 vec8f;
 
 #define set64x(a,b,c,d)     _mm256_setr_epi64x(a,b,c,d)
 

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "random.h"
 #include <cstdio>
@@ -446,35 +446,6 @@ real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
 #include "simd_float.h"
 #include "simd_math.h"
 
-/**
- This packs an array by removing 'nan' values. The order of the list is irrelevant.
- This implementation is quite poor and takes much more time than the calculation
- of the Gaussian to start with, so there must be a better way to proceed!
- */
-template < typename T >
-T * remove_nans(T * s, T * e)
-{
-    while ( s < e )
-    {
-        --e;
-        // find the next `nan` going upward:
-        while ( *s == *s )
-        {
-            if ( ++s > e )
-                return s;
-        }
-        // skip `nan` values going downward:
-        while ( *e != *e )
-        {
-            if ( --e <= s )
-                return s;
-        }
-        // copy number over:
-        *s++ = *e;
-    }
-    return s;
-}
-
 
 /* Absolute error bounded by 1e-5 for normalized inputs
    Returns a finite number for +inf input
@@ -614,94 +585,6 @@ __m256 logf_app(__m256 val)
     return _mm256_or_ps(res, invalid);
 }
 
-/*
- // generate random floats in [1, 2]:
- const vec8f mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x807fffff));
- const vec8f expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3f800000));
- const vec8f ninf = _mm256_castsi256_ps(_mm256_set1_epi32(0xff800000)); // -INFINITY
- const vec8f one = _mm256_set1_ps(1.0f);
- x = or8f(expo, and8f(mant, cast8f(load8si(src++))));
- y = or8f(expo, and8f(mant, cast8f(load8si(src++))));
-*/
-
-vec8f magic8f(vec8f xxx)
-{
-    // bad approximation of sqrt(x*ln(x)) for x in [1, 2]
-    const vec8f one = set8f(1.0f);
-    const vec8f alpha = set8f(-2*M_LN2);
-    return sqrt8f(mul8f(alpha, mul8f(xxx, sub8f(xxx, one))));
-}
-
-/**
- Calculates Gaussian-distributed, single precision random number,
- using SIMD AVX instructions
- Array `dst` should be able to hold as many 32-bit numbers as `src`.
- if 'real==float', for 256 bits of input, this produces ~64*PI bits of numbers.
- if 'real==double', this produces more output bits than input!
-
- The function used to calculate logarithm on SIMD data is part of the
- Intel SVML library, and is provided by the Intel compiler.
-
- F. Nedelec 02.01.2017
- */
-real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
-{
-    const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
-    const vec8f half = set8f(-0.5);
-    __m256i const* end = src + cnt;
-
-    real * d = dst;
-    real * e = dst+8*(cnt-2);
-    while ( src < end )
-    {
-        // generate 16 random floats in [-1, 1]:
-        vec8f x = mul8f(eps, cvt8i(load8si(src++)));
-        vec8f y = mul8f(eps, cvt8i(load8si(src++)));
-        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
-        //w = std::sqrt( -2 * std::log(n) / n );
-        n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
-        //n = rsqrt8f(div8f(mul8f(half, n), log8f(n)));
-        //n = rsqrt8f(mul8f(mul8f(half, n), rcp8f(log8f(n))));
-        x = mul8f(n, x);
-        y = mul8f(n, y);
-        // place corresponding X and Y values next to each other:
-        vec8f t = unpacklo8f(x, y);
-        y = unpackhi8f(x, y);
-        // swap the NaNs to move them to 'y':
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
-#if 0   // can push more NaNs out by swapping within the lanes:
-        // swap the NaNs to move them to 'y':
-        t = permute44f(x);
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
-        // swap the NaNs to move them to 'y':
-        t = swap2f128(x);
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
-        // swap the NaNs to move them to 'y':
-        t = permute44f(x);
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
-#endif
-#if REAL_IS_DOUBLE
-        // convert 16 single-precision values
-        store4(d  , cvt4sd(getlo4f(x)));
-        store4(d+4, cvt4sd(gethi4f(x)));
-        store4(e  , cvt4sd(getlo4f(y)));
-        store4(e+4, cvt4sd(gethi4f(y)));
-#else
-        // store 16 single-precision values
-        store8f(d, x);
-        store8f(e, y);
-#endif
-        d += 8;
-        e -= 8;
-    }
-    //return remove_nans(dst, d) - dst;
-    return dst+8*cnt;
-}
-
 
 /// use this to check the log()
 void check_log(real dst[], size_t cnt, const __m256i src[])
@@ -712,8 +595,8 @@ void check_log(real dst[], size_t cnt, const __m256i src[])
     while ( src < end )
     {
         // generate random floats in [-1, 1]:
-        vec8f i = mul8f(eps, cvt8i(load8si(src++)));
-        vec8f j = mul8f(eps, cvt8i(load8si(src++)));
+        vec8f i = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f j = mul8f(eps, cvt8if(load8si(src++)));
         vec8f x = i;
         vec8f y = logapprox8f(i);
 #if REAL_IS_DOUBLE
@@ -731,6 +614,7 @@ void check_log(real dst[], size_t cnt, const __m256i src[])
     }
 }
 
+#include "random_simd.cc"
 
 #endif
 
@@ -816,6 +700,19 @@ void test_gaussian(int cnt)
             RNG.refill();
         }
         printf("gauss AVX    %5.2f  :", toc(cnt));
+        check_gaussian(end-vec, vec);
+        print_gaussian((end-vec)/8, vec);
+    }
+    if ( 1 )
+    {
+        real *end, vec[SFMT_N32] = { 0 };
+        tic();
+        for ( int i = 0; i < cnt; ++i )
+        {
+            end = gauss_fill_AVX0(vec, SFMT_N256, mem);
+            RNG.refill();
+        }
+        printf("gauss AVX0   %5.2f  :", toc(cnt));
         check_gaussian(end-vec, vec);
         print_gaussian((end-vec)/8, vec);
     }
