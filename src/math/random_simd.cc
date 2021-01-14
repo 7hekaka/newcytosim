@@ -51,7 +51,7 @@ inline static vec8f magic8f(vec8f xxx)
 static inline vec8f sqrtlogdiv8f(const vec8f n)
 {
     const vec8f half = set8f(-0.5f);
-    return sqrt8f(div8f(log8f(n), mul8f(half, n)));
+    return sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
     //return rsqrt8f(div8f(mul8f(half, n), log8f(n)));
     //return rsqrt8f(mul8f(mul8f(half, n), rcp8f(log8f(n))));
 }
@@ -81,20 +81,24 @@ static inline void fold_corners(vec8f& x, vec8f& y)
 }
 
 
+/** This follows Box-Muller's method with approximate Log and Sin/Cos functions */
 static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
 {
-    const vec8f fac = set8f(TWO_POWER_MINUS_31);
+    const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
+    const vec8f two = set8f(-2.0f);
+    const vec8f PI = set8f(M_PI);
 
     real * d = dst;
     __m256i const* end = src + cnt;
     while ( src < end )
     {
-        vec8f x = mul8f(fac, cvt8if(load8si(src++)));
-        vec8f y = mul8f(fac, cvt8if(load8si(src++)));
-        fold_corners(x, y); // increases from 490 to 574 expected!
-        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
-        //w = std::sqrt( -2 * std::log(n) / n );
-        n = sqrtlogdiv8f(n);
+        // generate 16 random floats in [-1, 1]:
+        vec8f n = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f t = mul8f(eps, cvt8if(load8si(src++)));
+        // calculate norm:
+        n = sqrt8f(mul8f(logapprox8f(abs8f(n)), two));
+        vec8f x, y;
+        cossinapprox8f(x, y, mul8f(PI, t));
         x = mul8f(n, x);
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE
@@ -105,7 +109,44 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
         store4(d+12, cvt4sd(gethi4f(y)));
 #else
         // store 16 single-precision values
-        store8f(d  , x);
+        store8f(d, x);
+        store8f(d+8, y);
+#endif
+        d += 16;
+    }
+    return dst+8*cnt;
+}
+
+
+static real * gauss_fill_AVX1(real dst[], size_t cnt, const __m256i src[])
+{
+    const vec8f fac = set8f(TWO_POWER_MINUS_31);
+    const vec8f half = set8f(-0.5f);
+
+    real * d = dst;
+    __m256i const* end = src + cnt;
+    while ( src < end )
+    {
+        vec8f x = mul8f(fac, cvt8if(load8si(src++)));
+        vec8f y = mul8f(fac, cvt8if(load8si(src++)));
+        fold_corners(x, y); // increases from 490 to 574 expected!
+        vec8f n = add8f(mul8f(x,x), mul8f(y,y));
+        //w = std::sqrt( -2 * std::log(n) / n );
+        n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
+        x = mul8f(n, x);
+        y = mul8f(n, y);
+        // place corresponding X and Y values next to each other:
+        vec8f z = unpacklo8f(x, y);
+        y = unpackhi8f(x, y);
+#if REAL_IS_DOUBLE
+        // convert 16 single-precision values
+        store4(d   , cvt4sd(getlo4f(z)));
+        store4(d+4 , cvt4sd(getlo4f(y)));
+        store4(d+8 , cvt4sd(gethi4f(z)));
+        store4(d+12, cvt4sd(gethi4f(y)));
+#else
+        // store 16 single-precision values
+        store8f(d  , z);
         store8f(d+8, y);
 #endif
         d += 16;
@@ -114,6 +155,15 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
     return d;
 }
 
+
+
+static inline void sort_nans(vec8f& x, vec8f& y)
+{
+    vec8f u = x;
+    vec8f k = isnan8f(x);
+    x = blendv8f(u, y, k);
+    y = blendv8f(y, u, k);
+}
 
 /**
  Calculates Gaussian-distributed, single precision random number,
@@ -127,15 +177,16 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
 
  F. Nedelec 02.01.2017
  */
-static real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
+static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
     const vec8f half = set8f(-0.5f);
 
     __m256i const* end = src + cnt;
 
-    real * d = dst;
-    real * e = dst+8*(cnt-2);
+    real * d = dst;  //cnt=78=39*2 // cnt*8 = 640
+    real * e = dst+4*(cnt-2);
+    real * f = dst+6*(cnt-2);
     while ( src < end )
     {
         // generate 16 random floats in [-1, 1]:
@@ -152,24 +203,53 @@ static real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
         x = mul8f(n, x);
         y = mul8f(n, y);
         // place corresponding X and Y values next to each other:
-        vec8f t = unpacklo8f(x, y);
+        n = unpacklo8f(x, y);
         y = unpackhi8f(x, y);
         // swap the NaNs to move them to 'y':
-        x = blendv8f(t, y, isnan8f(t));
-        y = blendv8f(y, t, isnan8f(t));
+        vec8f k = isnan8f(n);
+        x = blendv8f(n, y, k);
+        y = blendv8f(y, n, k);
+#if 1
+        // generate 16 random floats in [-1, 1]:
+        vec8f z = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f t = mul8f(eps, cvt8if(load8si(src++)));
+        fold_corners(z, t);
+        vec8f p = add8f(mul8f(z,z), mul8f(t,t));
+        p = sqrt8f(div8f(logapprox8f(p), mul8f(half, p)));
+        z = mul8f(p, z);
+        t = mul8f(p, t);
+        p = unpacklo8f(z, t);
+        t = unpackhi8f(z, t);
+        // swap the NaNs to move them to 't':
+        vec8f l = isnan8f(p);
+        z = blendv8f(p, t, l);
+        t = blendv8f(t, p, l);
+        //sorting network for 4 inputs [[1-2][3-4][1 3][2-4][2 3]]
+        sort_nans(x, z);
+        sort_nans(y, t);
+        sort_nans(y, z);
+        //t = permute8f(t);
+        //sort_nans(z, t);
+#endif
 #if 0   // can push more NaNs out by swapping within the lanes:
+        vec8f k = isnan8f(u);
+        x = blendv8f(u, y, k);
+        y = blendv8f(y, u, k);
         // swap the NaNs to move them to 'y':
-        t = permute44f(x);
-        x = blendv8f(t, y, isnan8f(t));
-        y = blendv8f(y, t, isnan8f(t));
+        u = permute44f(x);
+        k = isnan8f(u);
+        x = blendv8f(u, y, k);
+        y = blendv8f(y, u, k);
         // swap the NaNs to move them to 'y':
-        t = swap2f128(x);
-        x = blendv8f(t, y, isnan8f(t));
-        y = blendv8f(y, t, isnan8f(t));
+        u = swap2f128(x);
+        k = isnan8f(u);
+        x = blendv8f(u, y, k);
+        y = blendv8f(y, u, k);
         // swap the NaNs to move them to 'y':
-        t = permute44f(x);
-        x = blendv8f(t, y, isnan8f(t));
-        y = blendv8f(y, t, isnan8f(t));
+        u = permute44f(x);
+        k = isnan8f(u);
+        x = blendv8f(u, y, k);
+        y = blendv8f(y, u, k);
 #endif
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
@@ -180,10 +260,13 @@ static real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
 #else
         // store 16 single-precision values
         store8f(d, x);
-        store8f(e, y);
+        store8f(d+8, y);
+        store8f(e, z);
+        store8f(f, t);
 #endif
-        d += 8;
-        e -= 8;
+        d += 16;
+        e += 8;
+        f += 8;
     }
     //return remove_nans(dst, d) - dst;
     return dst+8*cnt;

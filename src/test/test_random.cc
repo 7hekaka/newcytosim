@@ -624,11 +624,12 @@ void print_gaussian(size_t cnt, T const* vec)
 {
     for ( size_t i = 0; i < cnt; )
     {
-        for ( int j = 0; j < 8 && i < cnt; ++j, ++i )
-            printf(" %8.4f", vec[i]);
-        printf(" :");
-        for ( int j = 0; j < 8 && i < cnt; ++j, ++i )
-            printf(" %8.4f", vec[i]);
+        for ( int k = 0; k < 4; ++k )
+        {
+            for ( int j = 0; j < 8 && i < cnt; ++j, ++i )
+                printf(" %8.4f", vec[i]);
+            printf(" :");
+        }
         printf("\n");
     }
 }
@@ -662,65 +663,55 @@ void check_gaussian(size_t cnt, real* vec)
 }
 
 
+
+template < real* (*FUNC)(real*, size_t, const __m256i*) >
+void runGaussian(__m256i* buf, const char str[], int cnt)
+{
+    real *end, vec[SFMT_N32];
+    for ( int i = 0; i < SFMT_N32; ++i )
+        vec[i] = NAN;
+    tic();
+    for ( int i = 0; i < cnt; ++i )
+    {
+        RNG.refill();
+        end = FUNC(vec, SFMT_N256, buf);
+    }
+    printf("%-12s %5.2f :", str, toc(cnt));
+    check_gaussian(end-vec, vec);
+    print_gaussian(SFMT_N32, vec); //std::min(SFMT_N256, 64), vec);
+}
+
+
 void test_gaussian(int cnt)
 {
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
-    int32_t * buf = (int32_t*)RNG.data();
+    __m256i * buf = (__m256i*)RNG.data();
+    real *end, vec[SFMT_N32] = { 0 };
 
-    if ( 1 )
+    tic();
+    for ( int i = 0; i < cnt; ++i )
+        RNG.refill();
+    printf("RNG.refill   %5.2f\n", toc(cnt));
+    //print(vec, end);
+    
+    tic();
+    for ( int i = 0; i < cnt; ++i )
     {
-        tic();
-        for ( int i = 0; i < cnt; ++i )
-            RNG.refill();
-        printf("RNG.refill   %5.2f\n", toc(cnt));
-        //print(vec, end);
+        RNG.refill();
+        end = gauss_fill_0(vec, SFMT_N32, (int32_t*)buf);
     }
-    if ( 1 )
-    {
-        real *end, vec[SFMT_N32] = { 0 };
-        tic();
-        for ( int i = 0; i < cnt; ++i )
-        {
-            end = gauss_fill_0(vec, SFMT_N32, buf);
-            RNG.refill();
-        }
-        printf("gauss0       %5.2f  :", toc(cnt));
-        check_gaussian(end-vec, vec);
-        //print_gaussian(end-vec, vec);
-    }
+    printf("%-12s %5.2f :", "Gauss0", toc(cnt));
+    check_gaussian(end-vec, vec);
+    //print_gaussian(end-vec, vec);
 #if defined(__AVX__)
-    __m256i * mem = (__m256i*)buf;
-    if ( 1 )
-    {
-        real *end, vec[SFMT_N32] = { 0 };
-        tic();
-        for ( int i = 0; i < cnt; ++i )
-        {
-            end = gauss_fill_AVX(vec, SFMT_N256, mem);
-            RNG.refill();
-        }
-        printf("gauss AVX    %5.2f  :", toc(cnt));
-        check_gaussian(end-vec, vec);
-        print_gaussian((end-vec)/8, vec);
-    }
-    if ( 1 )
-    {
-        real *end, vec[SFMT_N32] = { 0 };
-        tic();
-        for ( int i = 0; i < cnt; ++i )
-        {
-            end = gauss_fill_AVX0(vec, SFMT_N256, mem);
-            RNG.refill();
-        }
-        printf("gauss AVX0   %5.2f  :", toc(cnt));
-        check_gaussian(end-vec, vec);
-        print_gaussian((end-vec)/8, vec);
-    }
+    runGaussian<gauss_fill_AVX0>(buf, "Gauss AVX0", cnt);
+    runGaussian<gauss_fill_AVX1>(buf, "Gauss AVX1", cnt);
+    runGaussian<gauss_fill_AVX2>(buf, "Gauss AVX2", cnt);
     if ( 1 )
     {
         printf("Approximate logarithm:\n");
-        real vec[SFMT_N32] = { 0 };
-        check_log(vec, SFMT_N256, mem);
+        real vec[SFMT_N32] = { NAN };
+        check_log(vec, SFMT_N256, buf);
         print_gaussian(std::min(SFMT_N256, 32), vec);
     }
 #endif

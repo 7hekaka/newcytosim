@@ -155,7 +155,9 @@ inline static vec8f isnan8f(vec8f a) { return _mm256_cmp_ps(a,a,3); }
 // blend to select `b` if `k == true`, and `a` otherwise:
 inline static vec8f blendv8f(vec8f a, vec8f b, vec8f k) { return _mm256_blendv_ps(a,b,k); }
 inline static vec8f swap2f128(vec8f a) { return _mm256_permute2f128_ps(a, a, 0x01); }
+// permute positions 1&2, 3&4, 5&6, 7&8
 inline static vec8f permute8f(vec8f a) { return _mm256_permute_ps(a, 0xB1); }
+// permute positions 12 and 34, 45 and 67
 inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
 
 

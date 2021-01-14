@@ -131,4 +131,25 @@ inline vec8f logapprox8f(vec8f x)
     return or8f(tmp, invalid);
 }
 
+
+/// Approximate cos+sin by Jacques-Henri Jourdan
+/* Correct only in [-pi, pi]
+   Absolute error bounded by 5e-5
+   Continuous error */
+inline float cossinapprox8f(vec8f& C, vec8f& S, vec8f x)
+{
+    vec8f xx = mul8f(x, x);
+    
+    C = add8f(mul8f(xx, set8f(1.8929864824e-5f)), set8f(-1.3422947025e-3f));
+    C = add8f(mul8f(xx, C), set8f(4.1518035216e-2f));
+    C = add8f(mul8f(xx, C), set8f(-0.4998515820f));
+    C = add8f(mul8f(xx, C), set8f(1.f));
+
+    S = add8f(mul8f(xx, set8f(2.1478401777e-6f)), set8f(-1.9264918228e-4f));
+    S = add8f(mul8f(xx, S), set8f(8.3089787513e-3f ));
+    S = add8f(mul8f(xx, S), set8f(-0.1666243672f));
+    S = add8f(mul8f(xx, S), set8f(0.9999793767f));
+    S = mul8f(x, S);
+}
+
 #endif
