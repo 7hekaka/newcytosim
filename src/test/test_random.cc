@@ -11,7 +11,7 @@
 using namespace TicToc;
 
 template < typename T >
-void print_bits(FILE* f, const T& val, char spc = 0)
+void print_bits(FILE* f, const T& val, char spc)
 {
     unsigned char * ptr = (unsigned char*) & val;
     for ( int i = sizeof(T)-1; i >= 0; --i)
@@ -120,10 +120,10 @@ void testbits()
     {
         float x = i / float(SCALE);
         printf(" %f :", x);
-        print_bits(stdout, x);
+        print_bits(stdout, x, 0);
         // x = -ii / float(SCALE);
         // printf("%f :", x);
-        // print_bits(stdout, x);
+        // print_bits(stdout, x, 0);
     }
     
     for ( int i=0; i < 16; ++i )
@@ -491,7 +491,7 @@ inline float logapprox(float val)
    Continuous error.
  By Jacques-Henri Jourdan, SIMD by Francois Nedelec
  */
-inline static vec8f logapprox8f(__m256 xxx)
+inline vec8f log_approx8f(__m256 xxx)
 {
     // masks:
     const __m256 mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x007fffff));
@@ -505,7 +505,7 @@ inline static vec8f logapprox8f(__m256 xxx)
     const __m256 f = _mm256_set1_ps(-89.970756366f);
     const __m256 g = _mm256_set1_ps(0.6931471805f);
     // used to clear negative / NaN arguments:
-    __m256 invalid = _mm256_cmp_ps(xxx, _mm256_setzero_ps(), _CMP_NGT_US);
+    __m256 invalid = _mm256_cmp_ps(xxx, _mm256_setzero_ps(), _CMP_NGT_UQ);
     // extract exponent:
 #ifdef __AVX2__
     __m256 cst = _mm256_cvtepi32_ps(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));

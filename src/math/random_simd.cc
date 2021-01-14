@@ -50,10 +50,34 @@ inline static vec8f magic8f(vec8f xxx)
 /// calculate  sqrt( -2 * log(n) / n )
 static inline vec8f sqrtlogdiv8f(const vec8f n)
 {
-    const vec8f half = set8f(-0.5);
+    const vec8f half = set8f(-0.5f);
     return sqrt8f(div8f(log8f(n), mul8f(half, n)));
     //return rsqrt8f(div8f(mul8f(half, n), log8f(n)));
     //return rsqrt8f(mul8f(mul8f(half, n), rcp8f(log8f(n))));
+}
+
+
+/**
+ This folds the corners of [-1, 1] x [-1, 1] that are outside the unit circle,
+ to map these points back onto the original square. For randomly distributed points,
+ this increases the number of points within the unit circle by a factor 3-2*sqrt(2)
+ without changing the property of being equidistributed within the unit circle.
+ */
+static inline void fold_corners(vec8f& x, vec8f& y)
+{
+    // fold the corners of the square, which is ~17% of the surface...
+    // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
+    vec8f mut = cmp8f(add8f(abs8f(x), abs8f(y)), set8f(M_SQRT2), _CMP_NLT_UQ);
+    // coordinates of nearest corner: copysign(S, x)
+    constexpr float S = M_SQRT1_2 + 1.0f;
+    vec8f cx = blendv8f(set8f(S), set8f(-S), x);
+    vec8f cy = blendv8f(set8f(S), set8f(-S), y);
+    // subtract corner and scale to recover a square of size sqrt(1/2)
+    cx = sub8f(mul8f(set8f(S), x), cx);
+    cy = sub8f(mul8f(set8f(S), y), cy);
+    // apply rotation, scaling by sqrt(2): x' = y + x;  y' = y - x
+    x = blendv8f(x, add8f(cy, cx), mut);
+    y = blendv8f(y, sub8f(cy, cx), mut);
 }
 
 
@@ -67,6 +91,7 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
     {
         vec8f x = mul8f(fac, cvt8if(load8si(src++)));
         vec8f y = mul8f(fac, cvt8if(load8si(src++)));
+        fold_corners(x, y); // increases from 490 to 574 expected!
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         //w = std::sqrt( -2 * std::log(n) / n );
         n = sqrtlogdiv8f(n);
@@ -105,7 +130,8 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
 static real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
-    const vec8f half = set8f(-0.5);
+    const vec8f half = set8f(-0.5f);
+
     __m256i const* end = src + cnt;
 
     real * d = dst;
@@ -115,33 +141,35 @@ static real * gauss_fill_AVX(real dst[], size_t cnt, const __m256i src[])
         // generate 16 random floats in [-1, 1]:
         vec8f x = mul8f(eps, cvt8if(load8si(src++)));
         vec8f y = mul8f(eps, cvt8if(load8si(src++)));
+        fold_corners(x, y);
         // calculate norm:
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
-        // complex transformation here:
-        //n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
+        // n = sqrt( -2 * log(n) / n )
+        n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
+        //n = sqrt8f(div8f(log8f(n), mul8f(half, n)));
         //n = rsqrt8f(div8f(mul8f(half, n), logapprox8f(n)));
-        n = sqrtlogdiv8f(n);
+        //n = sqrtlogdiv8f(n);
         x = mul8f(n, x);
         y = mul8f(n, y);
         // place corresponding X and Y values next to each other:
         vec8f t = unpacklo8f(x, y);
         y = unpackhi8f(x, y);
         // swap the NaNs to move them to 'y':
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
+        x = blendv8f(t, y, isnan8f(t));
+        y = blendv8f(y, t, isnan8f(t));
 #if 0   // can push more NaNs out by swapping within the lanes:
         // swap the NaNs to move them to 'y':
         t = permute44f(x);
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
+        x = blendv8f(t, y, isnan8f(t));
+        y = blendv8f(y, t, isnan8f(t));
         // swap the NaNs to move them to 'y':
         t = swap2f128(x);
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
+        x = blendv8f(t, y, isnan8f(t));
+        y = blendv8f(y, t, isnan8f(t));
         // swap the NaNs to move them to 'y':
         t = permute44f(x);
-        x = blend8f(t, y, isnan8f(t));
-        y = blend8f(y, t, isnan8f(t));
+        x = blendv8f(t, y, isnan8f(t));
+        y = blendv8f(y, t, isnan8f(t));
 #endif
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values

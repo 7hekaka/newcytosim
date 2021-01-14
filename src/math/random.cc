@@ -15,7 +15,7 @@ Random RNG;
 
 
 /// switch for using SIMD to generate Gaussians faster (requires AVX)
-#define NEW_SIMD_GAUSSIANS 1
+#define NEW_SIMD_GAUSSIANS 0
 
 
 /// the most significant bit in a 32-bits integer

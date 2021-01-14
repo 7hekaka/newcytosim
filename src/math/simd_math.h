@@ -43,7 +43,7 @@ inline static vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
 /// natural logarithm, part of Intel's SVML library
 inline static vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 
-#else
+#endif
 
 
 /// Approximate natural logarithm by Jacques-Henri Jourdan
@@ -54,7 +54,7 @@ inline static vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
  Continuous error.
  SIMD by Francois Nedelec 12.01.2021
  */
-inline vec4f log4f(vec4f x)
+inline vec4f logapprox4f(vec4f x)
 {
     // masks:
     const vec4f mant = set4fi(0x007fffff);
@@ -68,7 +68,7 @@ inline vec4f log4f(vec4f x)
     const vec4f f = set4f(-89.970756366f);
     const vec4f g = set4f(0.6931471805f);
     // used to clear negative / NaN arguments:
-    vec4f invalid = cmp4f(x, setzero4f(), _CMP_NGT_US);
+    vec4f invalid = cmp4f(x, setzero4f(), _CMP_NGT_UQ);
     // extract exponent:
     vec4f cst = cvt4if(_mm_srli_epi32(_mm_castps_si128(x), 23));
     cst = add4f(mul4f(cst, g), f);
@@ -93,7 +93,7 @@ inline vec4f log4f(vec4f x)
  Continuous error.
  SIMD by Francois Nedelec 12.01.2021
  */
-inline vec8f log8f(vec8f x)
+inline vec8f logapprox8f(vec8f x)
 {
     // masks:
     const vec8f mant = set8fi(0x007fffff);
@@ -107,7 +107,7 @@ inline vec8f log8f(vec8f x)
     const vec8f f = set8f(-89.970756366f);
     const vec8f g = set8f(0.6931471805f);
     // used to clear negative / NaN arguments:
-    vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_US);
+    vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_UQ);
     // extract exponent:
 #ifdef __AVX2__
     vec8f cst = cvt8if(_mm256_srli_epi32(_mm256_castps_si256(x), 23));
@@ -130,7 +130,5 @@ inline vec8f log8f(vec8f x)
     // clear negative arguments:
     return or8f(tmp, invalid);
 }
-
-#endif
 
 #endif

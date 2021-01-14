@@ -53,6 +53,7 @@ inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
 inline static vec4f rsqrt4f(vec4f a)  { return _mm_rsqrt_ps(a); }
 
 #define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
+#define cmp4f(a,b,c)     _mm_cmp_ps(a,b,c)
 
 #endif  // __SSE3__
 
@@ -151,7 +152,8 @@ inline static vec8f unpacklo8f(vec8f a, vec8f b) { return _mm256_unpacklo_ps(a,b
 inline static vec8f unpackhi8f(vec8f a, vec8f b) { return _mm256_unpackhi_ps(a,b); }
 
 inline static vec8f isnan8f(vec8f a) { return _mm256_cmp_ps(a,a,3); }
-inline static vec8f blend8f(vec8f a, vec8f b, vec8f k) { return _mm256_blendv_ps(a,b,k); }
+// blend to select `b` if `k == true`, and `a` otherwise:
+inline static vec8f blendv8f(vec8f a, vec8f b, vec8f k) { return _mm256_blendv_ps(a,b,k); }
 inline static vec8f swap2f128(vec8f a) { return _mm256_permute2f128_ps(a, a, 0x01); }
 inline static vec8f permute8f(vec8f a) { return _mm256_permute_ps(a, 0xB1); }
 inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
