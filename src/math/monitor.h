@@ -84,7 +84,7 @@ namespace LinearSolvers
             // use the standard Euclidian norm:
             real res = blas::nrm2(size, vec);
 #endif
-            //fprintf(stderr, "   Monitor %4u  isnan %i residual %12.6f\n", cnt_, isnan(size, vec), res);
+            //fprintf(stderr, "   Monitor %4u  isnan %i residual %12.6f\n", cnt_, has_nan(size, vec), res);
             if ( res != res )
             {
                 fprintf(stderr, "Solver diverged at step %3u (residual is not a number)\n", cnt_);

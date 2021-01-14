@@ -20,9 +20,9 @@
  It is possible to select double or single precision throughout Cytosim
  by editing this file.
  
- Cytosim is faster in single precision, but the iterative solver used
- in Meca::solve() (conjugate-gradient) may fail in adverse conditions.
- Much of the code was not optimized for double precision.
+ Calculations might be faster in single precision, but the iterative solver used
+ in Meca::solve() (the conjugate-gradient method) may fail in adverse conditions.
+ Much of the code was optimized for double precision but not for single precision.
  
  It is safer, and STRONGLY ADVISED therefore, to use double precision!
 */
@@ -212,7 +212,7 @@ inline static real fold_real(const real x, const real p)
 
 //----------------------------------- DEBUG ------------------------------------
 
-inline static bool isnan(size_t cnt, real const* ptr)
+inline static bool has_nan(size_t cnt, real const* ptr)
 {
     bool res = false;
     for ( size_t i = 0; i < cnt; ++i )

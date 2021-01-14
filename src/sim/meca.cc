@@ -1524,7 +1524,7 @@ void Meca::prepare(Simul const* sim)
         }
 #endif
     }
-    //fprintf(stderr, "Meca::prepare() isnan %i\n", isnan(dimension(), vPTS));
+    //fprintf(stderr, "Meca::prepare() isnan %i\n", has_nan(dimension(), vPTS));
 }
 
 
@@ -1935,15 +1935,15 @@ void Meca::apply()
         if ( 1 )
         {
             //check validity of the data:
-            bool a = isnan(dimension(), vPTS);
-            bool b = isnan(dimension(), vFOR);
+            bool a = has_nan(dimension(), vPTS);
+            bool b = has_nan(dimension(), vFOR);
             //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
             if ( a | b )
             {
                 fprintf(stderr, "Meca::solve failed (not-a-number %i %i):\n", a, b);
                 for ( Mecable * mec : mecables )
                 {
-                    b = isnan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
+                    b = has_nan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
                     fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
                 }
                 abort();
@@ -2135,9 +2135,9 @@ void Meca::saveMobility(FILE * file) const
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
-        const real drag = mec->pointMobility();
+        const real val = mec->pointMobility();
         for ( size_t p = 0; p < DIM * nbp; ++p )
-            fprintf(file, "%f\n", drag);
+            fprintf(file, "%f\n", val);
     }
 }
 
@@ -2453,9 +2453,9 @@ void Meca::dumpMobility(FILE * file, bool nat) const
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
-        const real drag = mec->pointMobility();
+        const real val = mec->pointMobility();
         for ( size_t p=0; p < nbp; ++p )
-            vec[p] = drag;
+            vec[p] = val;
         for ( int d = 0; d < DIM; ++ d )
             dumpVector(file, nbp, vec, nat);
     }
