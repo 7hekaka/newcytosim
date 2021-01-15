@@ -12,11 +12,11 @@
 
 #include "SFMT.h"
 
-/// the maximum value of a signed 32-bit integer is 2e31-1
+/// the maximum value of a signed 32-bit integer is 2^31-1
 #define TWO_POWER_MINUS_31 0x1p-31
-/// the maximum value of a unsigned 32-bit integer is 2e32-1
+/// the maximum value of a unsigned 32-bit integer is 2^32-1
 #define TWO_POWER_MINUS_32 0x1p-32
-/// the maximum value of a unsigned 32-bit integer is 2e64-1
+/// the maximum value of a unsigned 64-bit integer is 2^64-1
 #define TWO_POWER_MINUS_64 0x1p-64
 
 
@@ -92,14 +92,15 @@ protected:
         return *p;
     }
     
-    /// get positive 'real' using next 32 random bits
-    real PREAL()
+    /// a non-negative 'real' using 31 random bits, in [0, 1[
+    real ZERO2ONE()
     {
-        return static_cast<real>(URAND32());
+        // the cast gives a number with (x <= 2^31-1)
+        return std::fabs(static_cast<real>(RAND32())) * TWO_POWER_MINUS_31;
     }
 
-    /// get 'real' using next 32 random bits
-    real SREAL()
+    /// a signed 'real' using 31 random bits + sign bit (-2^31+1 < x <= 2^31-1)
+    real BIGREAL()
     {
         return static_cast<real>(RAND32());
     }
@@ -113,13 +114,13 @@ public:
     ~Random();
 
     /// true if state vector is not entirely zero
-    bool      seeded();
+    bool     seeded();
 
     /// seed with given 32 bit integer
-    void      seed(const uint32_t s);
+    void     seed(const uint32_t s);
     
     /// seed by reading /dev/random and if this fails using the clock
-    uint32_t  seed();
+    uint32_t seed();
    
     /// replenish state vector
     void refill()
@@ -146,10 +147,10 @@ public:
 
 #if ( 0 )
     /// unsigned integer in [0,n-1] for n < 2^32
-    uint32_t pint32(const uint32_t& n) { return uint32_t(URAND32()*TWO_POWER_MINUS_32*n); }
+    uint32_t pint32(const uint32_t& n) { return uint32_t(ZERO2ONE()*n); }
 
     /// unsigned integer in [0,n-1] for n < 2^64
-    uint64_t pint64(const uint64_t& n) { return uint32_t(URAND64()*TWO_POWER_MINUS_64*n); }
+    uint64_t pint64(const uint64_t& n) { return uint64_t(URAND64()*n); }
 #else
     /// unsigned integer in [0,n-1] for n < 2^32, Daniel Lemire's method
     uint32_t pint32(const uint32_t& n) { return (uint32_t)(((uint64_t)URAND32() * (uint64_t)n) >> 32); }
@@ -207,10 +208,10 @@ public:
     
     
     /// returns true with probability (p), and false with probability (1-p)
-    bool test(real p)     { return ( PREAL() * TWO_POWER_MINUS_32 <  p ); }
+    bool test(real p)     { return ( ZERO2ONE() <  p ); }
     
     /// returns true with probability (1-p), and false with probability (p)
-    bool test_not(real p) { return ( PREAL() * TWO_POWER_MINUS_32 >= p ); }
+    bool test_not(real p) { return ( ZERO2ONE() >= p ); }
     
     /// 0  or  1  with equal chance
     int  flip()           { return URAND32() & 1U; }
@@ -240,25 +241,25 @@ public:
     double sdouble();
     
     /// positive real number in [0,1[, zero included
-    real preal()           { return PREAL() * TWO_POWER_MINUS_32; }
+    real preal()           { return ZERO2ONE(); }
     
     /// positive real number in [0,n[ = n * preal() : deprecated, use preal() * n
-    real preal(real n)     { return n * ( PREAL() * TWO_POWER_MINUS_32 ); }
+    real preal(real n)     { return n * ( ZERO2ONE() ); }
     
     /// signed real number in ]-1,1[, boundaries excluded
-    real sreal()           { return SREAL() * TWO_POWER_MINUS_31; }
+    real sreal()           { return BIGREAL() * TWO_POWER_MINUS_31; }
     
     /// signed real number in ]-1/2, 1/2[, boundaries excluded
-    real shalf()           { return SREAL() * TWO_POWER_MINUS_32; }
+    real shalf()           { return BIGREAL() * TWO_POWER_MINUS_32; }
     
     /// returns -1.0 or 1.0 with equal chance
-    real sflip()           { return sign_real(SREAL()); }
+    real sflip()           { return sign_real(BIGREAL()); }
     
     /// returns -a or a with equal chance
-    real sflip(real a)     { return std::copysign(a, SREAL()); }
+    real sflip(real a)     { return std::copysign(a, BIGREAL()); }
 
     /// non-zero real number in ]0,1]
-    real preal_exc()       { return PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32; }
+    real preal_exc()       { return 1 - ZERO2ONE(); }
     
     /// non-zero real number in ]0,n]
     real preal_exc(real n) { return preal_exc() * n; }
@@ -293,10 +294,10 @@ public:
     void gauss_boxmuller(real &, real&);
     
     /// random in [0, inf[, with P(x) = exp(-x), mean = 1.0, variance = 1.0
-    real exponential() { return -std::log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
+    real exponential() { return -std::log(1 - ZERO2ONE());  }
     
     /// exponentially distributed positive real, with P(x) = exp(-x/E) / E,  parameter E is 1/Rate
-    real exponential(const real E) { return -E * std::log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }
+    real exponential(const real E) { return -E * std::log(1 - ZERO2ONE());  }
 
     /// fair choice among two given values
     template<typename T>

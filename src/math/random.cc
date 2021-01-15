@@ -46,9 +46,10 @@ Random::Random()
     //fprintf(stderr, "Random with SFMT_N32 = %i\n", SFMT_N32);
     
     uint32_t * buf = twister_.state[0].u;
-    // clear state:
+    // clear state (not necessary):
     memset(buf, 0, 4*SFMT_N32);
-    
+    memset(gaussians_, 0, sizeof(real)*SFMT_N32);
+
     // initialize pointers:
     start_ = buf;
     end_ = buf;

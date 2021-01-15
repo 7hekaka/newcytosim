@@ -136,7 +136,7 @@ inline vec8f logapprox8f(vec8f x)
 /* Correct only in [-pi, pi]
    Absolute error bounded by 5e-5
    Continuous error */
-inline float cossinapprox8f(vec8f& C, vec8f& S, vec8f x)
+inline void cossinapprox8f(vec8f& C, vec8f& S, vec8f x)
 {
     vec8f xx = mul8f(x, x);
     
